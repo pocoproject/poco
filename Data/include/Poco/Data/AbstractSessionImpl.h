@@ -56,7 +56,8 @@ public:
 			_bulk(false),
 			_emptyStringIsNull(false),
 			_forceEmptyString(false),
-			_sqlParse(true)
+			_sqlParse(true),
+			_autoCommit(true)
 		/// Creates the AbstractSessionImpl.
 		///
 		/// Adds "storage" property and sets the default internal storage container
@@ -113,6 +114,10 @@ public:
 		addFeature("sqlParse",
 			&AbstractSessionImpl<C>::setSQLParse,
 			&AbstractSessionImpl<C>::getSQLParse);
+
+		addFeature("autoCommit",
+			&AbstractSessionImpl<C>::setAutoCommit,
+			&AbstractSessionImpl<C>::getAutoCommit);
 	}
 
 	~AbstractSessionImpl()
@@ -302,6 +307,23 @@ public:
 		return _sqlParse;
 	}
 
+	void setAutoCommit(const std::string&, bool autoCommit)
+		/// Enables automatic commit. When this feature is true,
+		/// every query is automatically commited. When false,
+		/// every query starts a transaction, except SELECT queries
+		/// (if properly detected by parser, see set/getSQLParse() and
+		/// Statement::checkBeginTransaction() documentation).
+	{
+		_autoCommit = autoCommit;
+	}
+
+	bool getAutoCommit(const std::string& name = "") const
+		/// Returns the value of the automatic commit flag.
+		/// See setAutoCommit() documentation for more details.
+	{
+		return _autoCommit;
+	}
+
 protected:
 	void addFeature(const std::string& name, FeatureSetter setter, FeatureGetter getter)
 		/// Adds a feature to the map of supported features.
@@ -350,6 +372,7 @@ private:
 	bool        _emptyStringIsNull;
 	bool        _forceEmptyString;
 	bool        _sqlParse;
+	bool        _autoCommit;
 	Poco::Any   _handle;
 };
 

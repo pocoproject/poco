@@ -97,7 +97,7 @@ namespace Poco {
 
 using namespace std::literals;
 
-} // Poco
+} // namespace Poco
 
 
 //

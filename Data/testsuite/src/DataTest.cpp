@@ -39,6 +39,8 @@
 #include <set>
 
 
+using namespace Poco;
+using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 
 
@@ -181,6 +183,47 @@ void DataTest::testFeatures()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
 
+	// AbstractSession features
+	assertTrue (sess.hasFeature("bulk"));
+	assertTrue (!sess.getFeature("bulk"));
+	sess.setFeature("bulk", true);
+	assertTrue (sess.getFeature("bulk"));
+	sess.setFeature("bulk", false);
+	assertTrue (!sess.getFeature("bulk"));
+
+	assertTrue (sess.hasFeature("emptyStringIsNull"));
+	assertTrue (!sess.getFeature("emptyStringIsNull"));
+	sess.setFeature("emptyStringIsNull", true);
+	assertTrue (sess.getFeature("emptyStringIsNull"));
+	sess.setFeature("emptyStringIsNull", false);
+	assertTrue (!sess.getFeature("emptyStringIsNull"));
+
+	assertTrue (sess.hasFeature("forceEmptyString"));
+	assertTrue (!sess.getFeature("forceEmptyString"));
+	sess.setFeature("forceEmptyString", true);
+	assertTrue (sess.getFeature("forceEmptyString"));
+	sess.setFeature("forceEmptyString", false);
+	assertTrue (!sess.getFeature("forceEmptyString"));
+
+	assertTrue (sess.hasFeature("sqlParse"));
+	assertTrue (sess.getFeature("sqlParse"));
+	sess.setFeature("sqlParse", false);
+	assertTrue (!sess.getFeature("sqlParse"));
+	sess.setFeature("sqlParse", true);
+	assertTrue (sess.getFeature("sqlParse"));
+
+	assertTrue (sess.hasFeature("autoCommit"));
+	assertTrue (sess.getFeature("autoCommit"));
+	sess.setFeature("autoCommit", false);
+	assertTrue (!sess.getFeature("autoCommit"));
+	sess.setFeature("autoCommit", true);
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// Session implementation features
+	sess.setFeature("f1", true);
+	assertTrue (sess.getFeature("f1"));
+	assertTrue (sess.getFeature("f2"));
+
 	sess.setFeature("f1", true);
 	assertTrue (sess.getFeature("f1"));
 	assertTrue (sess.getFeature("f2"));
@@ -218,6 +261,16 @@ void DataTest::testProperties()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
 
+	// AbstractSession properties
+	sess.setProperty("storage", "myStorage"s);
+	Poco::Any s1 = sess.getProperty("storage");
+	assertTrue (Poco::AnyCast<std::string>(s1) == "myStorage"s);
+
+	sess.setProperty("handle", 1);
+	Poco::Any h1 = sess.getProperty("handle");
+	assertTrue (Poco::AnyCast<int>(h1) == 1);
+
+	// Session implementation properties
 	sess.setProperty("p1", 1);
 	Poco::Any v1 = sess.getProperty("p1");
 	assertTrue (Poco::AnyCast<int>(v1) == 1);
