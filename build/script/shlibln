@@ -1,0 +1,17 @@
+#! /bin/sh
+#
+# $Id: //poco/1.1.0/build/script/shlibln#1 $
+#
+# shlibln
+#
+# Create a symbolic link
+#
+
+if [ $# -ne 2 ] ; then
+	echo "usage: $0:t file link"
+	exit 1
+fi
+
+if [ "$1" != "$2" ] ; then
+	ln -sf "$1" "$2"
+fi

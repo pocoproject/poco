@@ -1,0 +1,45 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAXParser", "SAXParser\SAXParser_vs71.vcproj", "{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PrettyPrint", "PrettyPrint\PrettyPrint_vs71.vcproj", "{5A6FC255-BE1D-4E09-A680-A67FF16E832F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DOMParser", "DOMParser\DOMParser_vs71.vcproj", "{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DOMWriter", "DOMWriter\DOMWriter_vs71.vcproj", "{68F63799-6BCA-4058-89AC-DAC545C6AB0F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		release_shared = release_shared
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}.debug_shared.ActiveCfg = debug_shared|Win32
+		{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}.debug_shared.Build.0 = debug_shared|Win32
+		{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}.release_shared.ActiveCfg = release_shared|Win32
+		{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}.release_shared.Build.0 = release_shared|Win32
+		{5A6FC255-BE1D-4E09-A680-A67FF16E832F}.debug_shared.ActiveCfg = debug_shared|Win32
+		{5A6FC255-BE1D-4E09-A680-A67FF16E832F}.debug_shared.Build.0 = debug_shared|Win32
+		{5A6FC255-BE1D-4E09-A680-A67FF16E832F}.release_shared.ActiveCfg = release_shared|Win32
+		{5A6FC255-BE1D-4E09-A680-A67FF16E832F}.release_shared.Build.0 = release_shared|Win32
+		{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}.debug_shared.ActiveCfg = debug_shared|Win32
+		{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}.debug_shared.Build.0 = debug_shared|Win32
+		{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}.release_shared.ActiveCfg = release_shared|Win32
+		{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}.release_shared.Build.0 = release_shared|Win32
+		{68F63799-6BCA-4058-89AC-DAC545C6AB0F}.debug_shared.ActiveCfg = debug_shared|Win32
+		{68F63799-6BCA-4058-89AC-DAC545C6AB0F}.debug_shared.Build.0 = debug_shared|Win32
+		{68F63799-6BCA-4058-89AC-DAC545C6AB0F}.release_shared.ActiveCfg = release_shared|Win32
+		{68F63799-6BCA-4058-89AC-DAC545C6AB0F}.release_shared.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,370 @@
+This is the changelog file for the C++ Portable Components.
+
+Release 1.1.2 (2006-07-07)
+==========================
+
+- Changed license to Boost license
+
+
+Release 1.1.1 (2006-04-03)
+==========================
+
+- NetSSL_OpenSSL now supports separate certificate verification
+  settings for client and server.
+- fixed SF #1460309 (enumerating network interfaces failed on 64bit Linux)
+- TCPServer no longer crashes if accept() fails
+
+
+Release 1.1.0 (2006-03-23)
+==========================
+
+- events no longer require awkward += new syntax
+- source code and documentation cleanups
+- basic support for new compilers and platforms
+
+
+Release 1.1b2 (2006-03-04)
+==========================
+
+- made NetSSL threadsafe (added locking callbacks for OpenSSL)
+- improved OpenSSL initialization (random generator seeding)
+- various changes to improve compatibility with various platforms
+
+
+Release 1.1b1 (2006-03-03)
+==========================
+
+- New Events package in Foundation. The package supports C#-style event handling
+- New Cache package in Foundation: a templates-based caching framework
+- added Any class to Foundation
+- added DBLite library
+- fixed a memory leak with layered configurations in the application
+- made POCO_DLL the default (unless POCO_STATIC is #defined)
+  It is no longer necessary to specify POCO_DLL in projects that use Poco
+  (SourceForge Patch #1408231 and Feature Request #1407575).
+- added Buffer template class to Foundation
+- added the UnicodeConverter utility class. This is mainly used for Windows Unicode support and probably of little use for anything else.
+- added Path::resolve()
+- added Windows Unicode support. This calls the Unicode variant of the Windows API functions. 
+  For this to work, all strings must be UTF-8 encoded and POCO_WIN32_UTF8 must be defined in all compilation units.
+- added StreamCopier::copyToString()
+- added URIStreamOpener::unregisterStreamFactory() and new variants of URIStreamOpener::open() that also work with filesystem paths.
+  This fixes SourceForge Bug #1409064 and Feature Request #1409062.
+- added NodeIterator::currentNodeNP() to XML library
+- added some sanity checks to UTF8Encoding::convert()
+- added NetSSL - SSL support for Net library, based on OpenSSL
+- console output of processes launched with Process::launch() is now visible
+
+
+Release 1.0.0 (2006-01-19)
+==========================
+
+- removed unnecessary console output from ProcessTest
+- documentation fixes
+
+
+Release 1.0b2 (2006-01-16)
+==========================
+
+- added ProcessHandle class
+- Process::launch() now returns a ProcessHandle instead of a process ID.
+  This fixes a potential problem on Windows with Process::wait() when
+  the process terminates before wait() is called.
+- added SplitterChannel::close()
+- added Logger::destroy()
+- added POP3ClientSession::deleteMessage()
+- added test for Process::launch()
+- documentation fixes
+
+
+Release 1.0b1 (2006-01-09)
+==========================
+
+- improved recognition of Windows paths in Path::parseGuess()
+- added setCurrentLineNumber()/getCurrentLineNumber() to CountingStreamBuf
+- improvememts to StreamTokenizer and Token; fixed documentation
+- added a workaround for some strange istream behaviour with VS 2005 and FTPClientSessionTest
+- improved exception/error reporting in cppunit
+- added POP3ClientSession
+- added Process::launch() and Process::wait()
+- added Mail sample
+- added MailStream and SMTPClientSession classes
+- renamed some methods in DialogSocket to make them more general
+- NullPartHandler has moved out of HTMLForm.cpp into a separate file
+- Base64Encoder now always writes \r\n line ends
+- MessageHeader::quote has an optional addition arg controlling the treatment of whitespace
+- bugfix: MultipartReader had a problem with empty lines (\r\n sequences) in a part
+- added MailMessage and MailRecipient classes
+- added text encoding support for Windows-1252 codepage
+
+
+Release 1.0a1 (2006-01-03) [internal]
+=====================================
+
+- mediaType is used consistently to refer to a MIME media type (some occurences of contentType and mimeType have been replaced)
+- moved MediaType::quote() to MessageHeader and made it public
+- added MultipartWriter::stream()
+- Renamed AttachmentSource to PartSource and AttachmentHandler to PartHandler
+- SIGPIPE is always blocked in main thread on Unix systems
+- added EchoServer sample
+- fixed a bug in SocketImpl::setBlocking() - did exactly the opposite (value to ioctl was wrong)
+- fixed a memory leak in NotificationQueue sample
+- added comparison operators to Socket so that Sockets can be used as keys in maps
+- added Socket::setBlocking()
+- added StreamSocket::connectNB() (non-blocking connect)
+- added Observer::accepts()
+- added SocketReactor, SocketConnector and SocketAcceptor classes to support event-based socket programming
+- NamespacePrefixesStrategy now uses expat's XML_SetReturnNSTriplet(). 
+  The previously used separate namespace handling code has been removed. 
+  This improves performance if NamespacePrefixesStrategy is used (both the n
+  amespaces and namespace-prefixes SAX2 features are used)
+- upgraded expat to 2.0 pre-release (2005-12-27) snapshot
+- added TeeInputStream and TeeOutputStream classes
+- added download sample for URIStreamOpener
+- renamed registerOpener() to registerFactory() in HTTPStreamFactory and FTPStreamFactory
+- added LineEndingConverter streams
+- added FTPClientSession
+- code and documentation clean-up
+- added DialogSocket class
+- reorganized HTTP test suites
+- added FTPClientSession and FTPStreamFactory
+- added DialogSocket class
+
+
+Release 0.96.1 (2005-12-28)
+===========================
+
+- fixed a memory leak caused by a bug in Microsoft's stream implementation (see the comment in Foundation/StreamUtil.h for an explanation)
+- added samples for Net library
+- added uptime() and startTime() to Util::Application
+- added DateTimeFormatter::format() for Timespan
+- added ErrorHandler class and better exception handling for threads
+- added poco_debugger() and poco_debugger_msg() macros
+- added project and solution files for Visual Studio 2005 (due to some bugs/leaks in Microsofts standard library - see 
+  http://lab.msdn.microsoft.com/productfeedback/viewfeedback.aspx?feedbackid=e08bd793-3fef-40ff-adda-ed313e0eafcc
+  we do not recommend using this for production purposes)
+- fixed two problems with out-of-range string iterator in Path (the testsuite triggered an assertion in VC++ 8.0)
+- fixed mac line endings in a few files
+- added a workaround to the class loader that fixes strange behavior with VC++ 8.0. There seems to be a problem with typeid() not returning a valid typeinfo under certain circumstances.
+- added buffer allocator argument to buffered stream buffer templates
+- added buffer pools to HTTP to reduce memory fragmentation and to improve performance
+- added Net to Windows build.cmd script
+- added swap() to various classes that already support assignment
+- added a null pointer check in DOMWriter::writeNode()
+- fixed documentation in BinaryWriter.h and BinaryReader.h
+- added explicit support for network byte order to BinaryReader and BinaryWriter
+- added basic support for FreeBSD (needs more testing)
+- BinaryReader: renamed readRawData() to readRaw() to be consistent with BinaryWriter::writeRaw()
+- added support for uppercase output to HexBinaryEncoder.
+- added MediaType class
+- added QuotedPrintableEncoder and QuotedPrintableDecoder classes
+- renamed ObjectFactory to Instantiator. This should prevent the confusion caused by DynamicFactory and ObjectFactory. Sorry for the inconvenience if you are already using this.
+- AttachmentSource::filename() now returns const string&
+- added StringAttachmentSource
+- replaced old-style C casts with C++ casts in NetworkInterface.cpp
+- MutexImpl (WIN32): replaced InitializeCriticalSection with InitializeCriticalSectionAndSpinCount, which should increase performance on multiprocessor or multicore systems when many locks are used.
+- fixed a problem with STLport 5.0 when compiling StreamTokenizer
+- HTTPStreamOpener now also works with no-path URIs (like http://www.appinf.com)
+- fixed wrong delete usage (plain delete instead of delete [] was used in a few cases)
+- fixed a handle leak in WinTestRunner
+
+
+Release 0.95.4 (2005-11-07)
+===========================
+
+- fixed #1348006 and #1348005
+
+
+Release 0.95.3 (2005-10-28) [internal]
+======================================
+
+- updated build scripts (patch #1339015)
+- added support for AMD64 platforms (patch #1339015)
+- MultipartWriter creates its own boundary if an empty string is passed in as boundary
+- made MultipartWriter::createBoundary() public
+- fixed wrong documentation for DateTimeFormat::HTTP_FORMAT
+- added support for HTTP Basic authentication
+- added support for HTTP Cookies
+- added support for HTML forms
+
+
+Release 0.95.2 (2005-10-22) [internal]
+======================================
+
+- fixed a potential problems with streams when close in destructor fails (added try..catch block around close in destructors)
+- added HTTPServer & friends
+- added hasIdleThreads() method to NotificationQueue
+- added TCPServer and friend
+- added support for HTTP proxies to HTTPClientSession and HTTPStreamOpener
+- fixed documentation bugs (Mutex.h, ClassLoader.h)
+
+
+Relesae 0.95.1 (2005-10-15) [internal]
+======================================
+
+- Tasks can now throw custom notifications (contributed by Alex Fabijanic)
+- renamed URIFileStreamFactory to FileStreamFactory
+- added a few methods to URI (setPathEtc(), getPathEtc(), getPathAndQuery())
+- added new exception classes
+- fixed some documentation
+- added basic checks when reading a MessageHeader from a stream
+- added HTTP classes (testsuite still incomplete)
+- added MessageHeader, NameValueCollection, MultipartReader and MultipartWriter classes
+- added Timespan::useconds()
+- added ClassLoader::isLibraryLoaded()
+- Socket classes use Timespan::useconds() to fill struct timeval
+- added DatagramSocket, MulticastSocket and NetworkInterface classes
+- added socket classes and related basic stuff
+- added additonal constructor/assign to Timespan- added BasicBufferedBidirectionalStreamBuf
+- fixed a potential MT issue in Base64Decoder
+- code beautifying in [Un]BufferedStreamBuf
+- more improvements to ClassLoader
+- code cleanup and naming convention fixes (changed all *Imp classes to *Impl for consistency)
+
+
+Release 0.94.1 (2005-09-30) [internal]
+======================================
+
+- added MetaSingleton (based on a contribution by Alex Fabijanic)
+- added ClassLoader::create()
+- added ClassLoader::instance()
+- code clean-ups in FileChannel and related classes
+- added SimpleFileChannel
+- RotateAtTimeStrategy:
+  ::getNextRollover() rewritten (buggy)
+- DateTime 
+  microseconds assert corrected
+  asserts in computeGregorian() (except for year - see comment in computeGregorian())
+  milliseconds calculation modified in computeGregorian()
+  microseconds assigned in computeGregorian()
+  normalize() and checkLimit() private functions to correct cases of overflow for milli/microseconds
+- LocalDateTime: added timestamp() method
+- FileChannel:
+  added "times" property (used to determine whether to use UTC or local time with RotateAtTimeStrategy)
+  ::setProperty() modified (whenever "times" property is set, methods setRotation and setArchive are 
+  reinvoked to reflect the change)
+- FileChannel: added support for archived file compression and archived file purging
+- FileChannel tests modified
+- FileChannel: put LogFile, RotateStrategy and ArchiveStrategy into their own files
+- Message: added thread id field
+- PatternFormatter: added %I specifier for thread id
+- ThreadPool: PooledThread can be assigned a name
+- TaskManager: task name is reflected in thread name
+- fixed  LocalDateTime::operator - (const Timespan&) [#0000004]
+- upon startup all loggers' channels are set to a console channel
+- improved search for application configuration files (see loadConfiguration()).
+- added Glob class (fixes #1249700)
+- upgraded to zlib 1.2.3 (fixes #1261712)
+- added Logger::dump()
+- fixed a wrong condition in Logger::log(const Message&)
+- Path::find() now also works with relative paths in addition to plain file names
+- added Path(const Path&, const Path&) constructor
+- added SharedPtr template
+- added Path::tryParse()
+- SAXParser::parse()/EntityResolverImpl now works for both URIs and local filesystem paths (fixes #1254812)
+
+	
+Release 0.93.1 (2005-08-01)
+===========================
+
+This release contains various new features, improvements and bugfixes:
+- bugfix: UUIDGenerator throws an exception if no connected ethernet adapter can
+  be found (and thus no MAC address can be obtained)
+- added UUIDGenerator::createOne() method
+- added error handling to UUID sample application
+- added relational (==, !=, <, <=, >, >=) and arithmetic operators (+, -, +=, -=) to DateTime
+- added LocalDateTime class
+- added support for LocalDateTime to DateTimeParser and DateTimeFormatter
+- added enqueueUrgentNotification() to NotificationQueue
+- added support for timezone specifiers (%z, %Z) to PatternFormatter
+- added [] operator and count() to StringTokenizer
+- added elapsed() and isElapsed() to Timestamp
+- added tzd() to Timezone
+- added WinRegistryKey and WinService classes (Windows only)
+- added index operator and count() to StringTokenizer
+- added day/time-based log rotation (thanks to Alex Fabijanic), minor improvements to DateTimeParser
+- support for Mac OS X 10.4/gcc 4.0.0
+- added NamedMutex and NamedEvent
+- added Process::kill()
+- added NoPermissionException
+- added Task and TaskManager classes
+- added ServerApplication class
+- bugfix: EventLogChannel - _logFile was not properly initialized in one constructor
+- bugfix: File::createDirectories did not work for hierarchies deeper than three
+- added Util::FilesystemConfiguration
+- documented logging policy: log() must open channel if it hasn't been opened yet
+- FileChannel::log() opens channel if necessary
+- the application reference passed to initialize() and reinitialize() is no longer const
+- improved application logging initialization
+- fixed a problem with configuration view and property placeholders
+- fixed Util build configuration for Visual Studio
+- improved application samples
+- fixed documentation for Semaphore class
+
+
+Release 0.92.1 (2005-05-09)
+===========================
+
+This release introduces the Util library that provides support for
+configuration file parsing (different file formats), command line
+argument processing, logging configuration and a framework for
+command line/server applications.
+There have also been various changes to the Foundation library:
+- a new RefCountedObject class that acts as a base class for
+  various classes that use reference counting
+- some missing members have been added to the AutoPtr template
+- various improvements and bugfixes to the Logging framework, as well as
+  new LoggingFactory and LoggingRegistry classses, and a NullChannel class
+- the SignalHandler class (Unix platforms only)
+- ObjectFactory and DynamicFactory template classes
+- the Path::find method for searching a file in a list of directories
+- various new Exception classes
+
+
+Release 0.91.4 (2005-04-11)
+===========================
+
+This is mainly a maintenance release that adds support for QNX Neutrino
+and OpenVMS. There are also minor bugfixes and improvements.
+
+The Unix build system has been modified to work on QNX Neutrino.
+The OpenVMS build system has been fixed and works now.
+Some missing #include's have been added for QNX Neutrino.
+Foundation/String.h: icompare now supports comparison with const char*;
+the classic C version of isspace() has been used in a few places instead of the
+C++ <locale> version, this has been fixed.
+Foundation/Exception.h: IllegalStateException added.
+
+
+Release 0.91.3 (2005-03-19)
+===========================
+
+This is a maintenance release that adds support for Solaris/Sun Forte C++.
+No new features have been added.
+
+An implementation of FPEnvironment for Solaris has been included.
+All stream classes have been modified to work around an initialization
+problem that surfaced with Sun's C++ compiler when using STLport.
+Source-code compatibility with the previous release is not affected. Various
+minor changes, mostly adding missing #include's for Solaris.
+
+
+Release 0.91.2 (2005-02-27)
+===========================
+
+Minor improvements to the Unix build system. No actual changes in the
+libraries.
+
+
+Release 0.91.1 (2005-02-21)
+===========================
+
+This is the first public release of the C++ Portable Components.
+The release does not contain all features planned for the later 1.0 release
+(the NET library is missing, for example), but is already quite usable.
+Please refer to the README file for more information and instructions for
+building the libraries.
+
+
+--
+$Id: //poco/1.1.0/dist/CHANGELOG#3 $

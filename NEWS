@@ -1,0 +1,100 @@
+Release 1.1.2 (2006-07-07)
+==========================
+
+The POCO sources are now under the Boost license.
+
+
+Release 1.1.0 (2006-03-23)
+==========================
+
+The official 1.1 release.
+
+
+Release 1.1b1 (2006-03-03)
+==========================
+
+This release introduces the DBLite library, as well as SSL/TLS support
+for the Net library (NetSSL). Also included are lots of improvements
+to the existing libraries.
+
+
+Release 1.0.0 (2006-01-19)
+==========================
+
+This is the official 1.0 release.
+
+
+Release 1.0b2 (2006-01-16)
+==========================
+
+Minor improvements, mostly to documentation.
+
+
+Release 1.0b1 (2006-01-09)
+==========================
+
+Feature complete. Added support for SMTP and POP3 (SMTPClientSession,
+POP3ClientSession) and many bug fixes.
+
+
+Release 1.0a1 (2006-01-03)
+==========================
+
+First alpha release of 1.0. Added support for FTP (FTPClientSession,
+FTPStreamOpener), new stream classes (LineEndingConverter, TeeStream),
+upgraded to expat 2.0. Also added support for the Reactor/Acceptor/Connector
+patterns in Net. Various bugfixes and minor improvements.
+
+
+Release 0.96 (2005-12-28)
+=========================
+
+This last release before the 1.0 release adds support for Visual Studio 2005.
+Also included are performance improvements and bugfixes.
+
+
+Release 0.95 (2005-10-15)
+=========================
+
+This release introduces the Net library.
+
+
+Release 0.94 (2005-09-30)
+=========================
+
+This release brings major improvements to the logging classes.
+The FileChannel class now supports compression of archived log files,
+as well as automtic purging of archived log files.
+See the CHANGELOG file for the complete list of changes.
+
+
+Release 0.93 (2005-08-01)
+=========================
+
+This release brings major enchancements to all libraries.
+Highlights are the LocalDateTime class, the ServerApplication class
+with support for Windows services and Unix daemons, improvements
+to the FileChannel class, bugfixes and numerous other enchancements.
+Please see the CHANGELOG for details.
+
+
+Release 0.92 (2005-05-09)
+=========================
+
+The first major update to the C++ Portable Components since their public
+release introduces the Util library, as well as various enchancements and
+bugfixes to the Foundation and XML libraries. Please see the CHANGELOG
+for details.
+
+
+Release 0.91 (2005-02-21)
+=========================
+
+This is the first public release of the C++ Portable Components.
+The release does not contain all features planned for the later 1.0 release
+(the NET library is missing, for example), but is already quite usable.
+Please refer to the README file for more information and instructions for
+building the libraries.
+
+--
+$Id: //poco/1.1.0/dist/NEWS#2 $
