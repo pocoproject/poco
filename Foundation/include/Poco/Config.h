@@ -1,7 +1,7 @@
 //
 // Config.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Config.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Config.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -41,15 +41,15 @@
 
 
 // Define to enable Windows Unicode (UTF-8) support.
-#undef POCO_WIN32_UTF8
+// #define POCO_WIN32_UTF8
 
 
 // Define to disable FPEnvironment support
-#undef POCO_NO_FPENVIRONMENT
+// #define POCO_NO_FPENVIRONMENT
 
 
 // Define if std::wstring is not available
-#undef POCO_NO_WSTRING
+// #define POCO_NO_WSTRING
 
 
 #endif // Foundation_Config_INCLUDED
