@@ -1,7 +1,7 @@
 //
 // QuotedPrintableDecoder.cpp
 //
-// $Id: //poco/1.1.0/Net/src/QuotedPrintableDecoder.cpp#2 $
+// $Id: //poco/1.2/Net/src/QuotedPrintableDecoder.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,18 +34,19 @@
 //
 
 
-#include "Net/QuotedPrintableDecoder.h"
-#include "Foundation/NumberParser.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/QuotedPrintableDecoder.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Exception.h"
 #include <ctype.h>
 
 
-using Foundation::UnbufferedStreamBuf;
-using Foundation::NumberParser;
-using Foundation::DataFormatException;
+using Poco::UnbufferedStreamBuf;
+using Poco::NumberParser;
+using Poco::DataFormatException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 QuotedPrintableDecoderBuf::QuotedPrintableDecoderBuf(std::istream& istr): 
@@ -61,8 +62,6 @@ QuotedPrintableDecoderBuf::~QuotedPrintableDecoderBuf()
 
 int QuotedPrintableDecoderBuf::readFromDevice()
 {
-	static const int eof = std::char_traits<char>::eof();
-
 	int ch = _istr.get();
 	while (ch == '=')
 	{
@@ -122,4 +121,4 @@ QuotedPrintableDecoder::~QuotedPrintableDecoder()
 }
 
 
-Net_END
+} } // namespace Poco::Net

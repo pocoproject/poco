@@ -1,7 +1,7 @@
 //
 // Observer.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Observer.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Observer.cpp#1 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Observer.h"
+#include "Poco/Observer.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 AbstractObserver::AbstractObserver()
@@ -61,4 +61,4 @@ AbstractObserver& AbstractObserver::operator = (const AbstractObserver& observer
 }
 
 
-Foundation_END
+} // namespace Poco

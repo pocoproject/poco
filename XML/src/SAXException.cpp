@@ -1,7 +1,7 @@
 //
 // SAXException.cpp
 //
-// $Id: //poco/1.1.0/XML/src/SAXException.cpp#2 $
+// $Id: //poco/1.2/XML/src/SAXException.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,13 +34,14 @@
 //
 
 
-#include "SAX/SAXException.h"
-#include "SAX/Locator.h"
+#include "Poco/SAX/SAXException.h"
+#include "Poco/SAX/Locator.h"
 #include <typeinfo>
 #include <sstream>
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 POCO_IMPLEMENT_EXCEPTION(SAXException, XMLException, "SAX Exception")
@@ -58,7 +59,7 @@ SAXParseException::SAXParseException(const std::string& msg, const Locator& loc)
 }
 
 
-SAXParseException::SAXParseException(const std::string& msg, const Locator& loc, const Foundation::Exception& exc):
+SAXParseException::SAXParseException(const std::string& msg, const Locator& loc, const Poco::Exception& exc):
 	SAXException(buildMessage(msg, loc.getPublicId(), loc.getSystemId(), loc.getLineNumber(), loc.getColumnNumber()), exc),
 	_publicId(loc.getPublicId()),
 	_systemId(loc.getSystemId()),
@@ -78,7 +79,7 @@ SAXParseException::SAXParseException(const std::string& msg, const XMLString& pu
 }
 
 
-SAXParseException::SAXParseException(const std::string& msg, const XMLString& publicId, const XMLString& systemId, int lineNumber, int columnNumber, const Foundation::Exception& exc):
+SAXParseException::SAXParseException(const std::string& msg, const XMLString& publicId, const XMLString& systemId, int lineNumber, int columnNumber, const Poco::Exception& exc):
 	SAXException(buildMessage(msg, publicId, systemId, lineNumber, columnNumber), exc),
 	_publicId(publicId),
 	_systemId(systemId),
@@ -129,9 +130,15 @@ const char* SAXParseException::className() const throw()
 }
 
 
-Foundation::Exception* SAXParseException::clone() const
+Poco::Exception* SAXParseException::clone() const
 {
 	return new SAXParseException(*this);
+}
+
+
+void SAXParseException::rethrow() const
+{
+	throw *this;
 }
 
 
@@ -150,4 +157,4 @@ std::string SAXParseException::buildMessage(const std::string& msg, const XMLStr
 }
 
 
-XML_END
+} } // namespace Poco::XML

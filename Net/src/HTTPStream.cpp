@@ -1,7 +1,7 @@
 //
 // HTTPStream.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPStream.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPStream.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,11 +34,12 @@
 //
 
 
-#include "Net/HTTPStream.h"
-#include "Net/HTTPSession.h"
+#include "Poco/Net/HTTPStream.h"
+#include "Poco/Net/HTTPSession.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 //
@@ -117,7 +118,7 @@ HTTPStreamBuf* HTTPIOS::rdbuf()
 //
 
 
-Foundation::MemoryPool HTTPInputStream::_pool(sizeof(HTTPInputStream));
+Poco::MemoryPool HTTPInputStream::_pool(sizeof(HTTPInputStream));
 
 
 HTTPInputStream::HTTPInputStream(HTTPSession& session):
@@ -149,7 +150,7 @@ void HTTPInputStream::operator delete(void* ptr)
 //
 
 
-Foundation::MemoryPool HTTPOutputStream::_pool(sizeof(HTTPOutputStream));
+Poco::MemoryPool HTTPOutputStream::_pool(sizeof(HTTPOutputStream));
 
 
 HTTPOutputStream::HTTPOutputStream(HTTPSession& session):
@@ -176,4 +177,4 @@ void HTTPOutputStream::operator delete(void* ptr)
 }
 
 
-Net_END
+} } // namespace Poco::Net

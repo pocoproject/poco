@@ -1,7 +1,7 @@
 //
 // TestChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TestChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TestChannel.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -43,7 +43,7 @@ TestChannel::~TestChannel()
 }
 
 
-void TestChannel::log(const Foundation::Message& msg)
+void TestChannel::log(const Poco::Message& msg)
 {
 	_msgList.push_back(msg);
 }

@@ -1,7 +1,7 @@
 //
 // NetException.cpp
 //
-// $Id: //poco/1.1.0/Net/src/NetException.cpp#2 $
+// $Id: //poco/1.2/Net/src/NetException.cpp#1 $
 //
 // Library: Net
 // Package: NetCore
@@ -34,14 +34,15 @@
 //
 
 
-#include "Net/NetException.h"
+#include "Poco/Net/NetException.h"
 #include <typeinfo>
 
 
-using Foundation::IOException;
+using Poco::IOException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 POCO_IMPLEMENT_EXCEPTION(NetException, IOException, "Net Exception")
@@ -58,9 +59,11 @@ POCO_IMPLEMENT_EXCEPTION(MessageException, NetException, "Malformed message")
 POCO_IMPLEMENT_EXCEPTION(MultipartException, MessageException, "Malformed multipart message")
 POCO_IMPLEMENT_EXCEPTION(HTTPException, NetException, "HTTP Exception")
 POCO_IMPLEMENT_EXCEPTION(NotAuthenticatedException, HTTPException, "No authentication information found")
+POCO_IMPLEMENT_EXCEPTION(UnsupportedRedirectException, HTTPException, "Unsupported HTTP redirect (protocol change)")
 POCO_IMPLEMENT_EXCEPTION(FTPException, NetException, "FTP Exception")
 POCO_IMPLEMENT_EXCEPTION(SMTPException, NetException, "SMTP Exception")
 POCO_IMPLEMENT_EXCEPTION(POP3Exception, NetException, "POP3 Exception")
+POCO_IMPLEMENT_EXCEPTION(ICMPException, NetException, "ICMP Exception")
 
 
-Net_END
+} } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // ActiveMethodTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ActiveMethodTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ActiveMethodTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,49 +33,52 @@
 #include "ActiveMethodTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/ActiveMethod.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Event.h"
-#include "Foundation/Exception.h"
+#include "Poco/ActiveMethod.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::ActiveMethod;
-using Foundation::ActiveResult;
-using Foundation::Thread;
-using Foundation::Event;
-using Foundation::Exception;
+using Poco::ActiveMethod;
+using Poco::ActiveResult;
+using Poco::Thread;
+using Poco::Event;
+using Poco::Exception;
 
 
-class ActiveObject2
+namespace
 {
-public:
-	ActiveObject2():
-		testMethod(this, &ActiveObject2::testMethodImp)
+	class ActiveObject
 	{
-	}
-	
-	~ActiveObject2()
-	{
-	}
-	
-	ActiveMethod<int, int, ActiveObject2> testMethod;
-	
-	void cont()
-	{
-		_continue.set();
-	}
-	
-protected:
-	int testMethodImp(const int& n)
-	{	
-		if (n == 100) throw Exception("n == 100");
-		_continue.wait();
-		return n;
-	}
-	
-private:
-	Event _continue;
-};
+	public:
+		ActiveObject():
+			testMethod(this, &ActiveObject::testMethodImpl)
+		{
+		}
+		
+		~ActiveObject()
+		{
+		}
+		
+		ActiveMethod<int, int, ActiveObject> testMethod;
+		
+		void cont()
+		{
+			_continue.set();
+		}
+		
+	protected:
+		int testMethodImpl(const int& n)
+		{	
+			if (n == 100) throw Exception("n == 100");
+			_continue.wait();
+			return n;
+		}
+		
+	private:
+		Event _continue;
+	};
+}
 
 
 ActiveMethodTest::ActiveMethodTest(const std::string& name): CppUnit::TestCase(name)
@@ -90,7 +93,7 @@ ActiveMethodTest::~ActiveMethodTest()
 
 void ActiveMethodTest::testWait()
 {
-	ActiveObject2 activeObj;
+	ActiveObject activeObj;
 	ActiveResult<int> result = activeObj.testMethod(123);
 	assert (!result.available());
 	activeObj.cont();
@@ -103,7 +106,7 @@ void ActiveMethodTest::testWait()
 
 void ActiveMethodTest::testWaitInterval()
 {
-	ActiveObject2 activeObj;
+	ActiveObject activeObj;
 	ActiveResult<int> result = activeObj.testMethod(123);
 	assert (!result.available());
 	try
@@ -124,7 +127,7 @@ void ActiveMethodTest::testWaitInterval()
 
 void ActiveMethodTest::testTryWait()
 {
-	ActiveObject2 activeObj;
+	ActiveObject activeObj;
 	ActiveResult<int> result = activeObj.testMethod(123);
 	assert (!result.available());
 	assert (!result.tryWait(200));
@@ -138,7 +141,7 @@ void ActiveMethodTest::testTryWait()
 
 void ActiveMethodTest::testFailure()
 {
-	ActiveObject2 activeObj;
+	ActiveObject activeObj;
 	ActiveResult<int> result = activeObj.testMethod(100);
 	result.wait();
 	assert (result.available());

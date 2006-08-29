@@ -1,7 +1,7 @@
 //
 // NamePool.cpp
 //
-// $Id: //poco/1.1.0/XML/src/NamePool.cpp#2 $
+// $Id: //poco/1.2/XML/src/NamePool.cpp#1 $
 //
 // Library: XML
 // Package: XML
@@ -34,11 +34,12 @@
 //
 
 
-#include "XML/NamePool.h"
-#include "Foundation/Exception.h"
+#include "Poco/XML/NamePool.h"
+#include "Poco/Exception.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 class NamePoolItem
@@ -116,7 +117,7 @@ const Name& NamePool::insert(const XMLString& qname, const XMLString& namespaceU
 	while (!_pItems[n].set(qname, namespaceURI, localName) && i++ < _size) 
 		n = (n + 1) % _size;
 		
-	if (i > _size) throw Foundation::PoolOverflowException("XML name pool");
+	if (i > _size) throw Poco::PoolOverflowException("XML name pool");
 
 	return _pItems[n].get();
 }
@@ -144,4 +145,4 @@ unsigned long NamePool::hash(const XMLString& qname, const XMLString& namespaceU
 }
 
 
-XML_END
+} } // namespace Poco::XML

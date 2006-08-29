@@ -1,7 +1,7 @@
 //
 // HTTPRequestTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPRequestTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPRequestTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "HTTPRequestTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/HTTPRequest.h"
-#include "Net/NetException.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/NetException.h"
 #include <sstream>
 
 
-using Net::HTTPRequest;
-using Net::HTTPMessage;
-using Net::MessageException;
-using Net::NameValueCollection;
+using Poco::Net::HTTPRequest;
+using Poco::Net::HTTPMessage;
+using Poco::Net::MessageException;
+using Poco::Net::NameValueCollection;
 
 
 HTTPRequestTest::HTTPRequestTest(const std::string& name): CppUnit::TestCase(name)

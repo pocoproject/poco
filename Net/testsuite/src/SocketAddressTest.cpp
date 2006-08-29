@@ -1,7 +1,7 @@
 //
 // SocketAddressTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/SocketAddressTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/SocketAddressTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,16 +33,17 @@
 #include "SocketAddressTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/SocketAddress.h"
-#include "Net/NetException.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
 
 
-using Net::SocketAddress;
-using Net::IPAddress;
-using Net::InvalidAddressException;
-using Net::HostNotFoundException;
-using Net::ServiceNotFoundException;
-using Net::NoAddressFoundException;
+using Poco::Net::SocketAddress;
+using Poco::Net::IPAddress;
+using Poco::Net::InvalidAddressException;
+using Poco::Net::HostNotFoundException;
+using Poco::Net::ServiceNotFoundException;
+using Poco::Net::NoAddressFoundException;
+using Poco::InvalidArgumentException;
 
 
 SocketAddressTest::SocketAddressTest(const std::string& name): CppUnit::TestCase(name)
@@ -104,6 +105,32 @@ void SocketAddressTest::testSocketAddress()
 		fail("invalid port - must throw");
 	}
 	catch (ServiceNotFoundException&)
+	{
+	}
+	
+	SocketAddress sa7("192.168.2.120:88");
+	assert (sa7.host().toString() == "192.168.2.120");
+	assert (sa7.port() == 88);
+
+	SocketAddress sa8("[192.168.2.120]:88");
+	assert (sa8.host().toString() == "192.168.2.120");
+	assert (sa8.port() == 88);
+	
+	try
+	{
+		SocketAddress sa9("[192.168.2.260]");
+		fail("invalid address - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	try
+	{
+		SocketAddress sa9("[192.168.2.260:88");
+		fail("invalid address - must throw");
+	}
+	catch (InvalidArgumentException&)
 	{
 	}
 }

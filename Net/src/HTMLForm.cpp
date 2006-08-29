@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTMLForm.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTMLForm.cpp#1 $
 //
 // Library: Net
 // Package: HTML
@@ -34,30 +34,31 @@
 //
 
 
-#include "Net/HTMLForm.h"
-#include "Net/HTTPRequest.h"
-#include "Net/PartSource.h"
-#include "Net/PartHandler.h"
-#include "Net/MultipartWriter.h"
-#include "Net/MultipartReader.h"
-#include "Net/NullPartHandler.h"
-#include "Foundation/NullStream.h"
-#include "Foundation/StreamCopier.h"
-#include "Foundation/Exception.h"
-#include "Foundation/URI.h"
-#include "Foundation/String.h"
+#include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/PartSource.h"
+#include "Poco/Net/PartHandler.h"
+#include "Poco/Net/MultipartWriter.h"
+#include "Poco/Net/MultipartReader.h"
+#include "Poco/Net/NullPartHandler.h"
+#include "Poco/NullStream.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Exception.h"
+#include "Poco/URI.h"
+#include "Poco/String.h"
 #include <sstream>
 #include <ctype.h>
 
 
-using Foundation::NullInputStream;
-using Foundation::StreamCopier;
-using Foundation::SyntaxException;
-using Foundation::URI;
-using Foundation::icompare;
+using Poco::NullInputStream;
+using Poco::StreamCopier;
+using Poco::SyntaxException;
+using Poco::URI;
+using Poco::icompare;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 const std::string HTMLForm::ENCODING_URL       = "application/x-www-form-urlencoded";
@@ -76,15 +77,15 @@ HTMLForm::HTMLForm(const std::string& encoding):
 }
 
 
-HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& istr, PartHandler& handler)
+HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
 {
-	load(request, istr, handler);
+	load(request, requestBody, handler);
 }
 
 
-HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& istr)
+HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody)
 {
-	load(request, istr);
+	load(request, requestBody);
 }
 
 
@@ -122,13 +123,7 @@ void HTMLForm::addPart(const std::string& name, PartSource* pSource)
 
 void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
 {
-	if (request.getMethod() == HTTPRequest::HTTP_GET)
-	{
-		URI uri(request.getURI());
-		std::istringstream istr(uri.getRawQuery());
-		readUrl(istr);
-	}
-	else
+	if (request.getMethod() == HTTPRequest::HTTP_POST)
 	{
 		std::string mediaType;
 		NameValueCollection params;
@@ -143,6 +138,12 @@ void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartH
 		{
 			readUrl(requestBody);
 		}
+	}
+	else
+	{
+		URI uri(request.getURI());
+		std::istringstream istr(uri.getRawQuery());
+		readUrl(istr);
 	}
 }
 
@@ -173,16 +174,7 @@ void HTMLForm::read(std::istream& istr, PartHandler& handler)
 
 void HTMLForm::prepareSubmit(HTTPRequest& request)
 {
-	if (request.getMethod() == HTTPRequest::HTTP_GET)
-	{
-		std::string uri = request.getURI();
-		std::ostringstream ostr;
-		write(ostr);
-		uri.append("?");
-		uri.append(ostr.str());
-		request.setURI(uri);
-	}
-	else if (request.getMethod() == HTTPRequest::HTTP_POST)
+	if (request.getMethod() == HTTPRequest::HTTP_POST)
 	{
 		if (_encoding == ENCODING_URL)
 		{
@@ -206,6 +198,15 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 		{
 			request.setChunkedTransferEncoding(true);
 		}
+	}
+	else
+	{
+		std::string uri = request.getURI();
+		std::ostringstream ostr;
+		write(ostr);
+		uri.append("?");
+		uri.append(ostr.str());
+		request.setURI(uri);
 	}
 }
 
@@ -284,7 +285,7 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 			std::string cd = header.get("Content-Disposition");
 			MessageHeader::splitParameters(cd, disp, params);
 		}
-		if (icompare(disp, "file") == 0)
+		if (params.has("filename"))
 		{
 			handler.handlePart(header, reader.stream());
 		}
@@ -355,4 +356,4 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 }
 
 
-Net_END
+} } // namespace Poco::Net

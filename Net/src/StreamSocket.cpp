@@ -1,7 +1,7 @@
 //
 // StreamSocket.cpp
 //
-// $Id: //poco/1.1.0/Net/src/StreamSocket.cpp#2 $
+// $Id: //poco/1.2/Net/src/StreamSocket.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,15 +34,16 @@
 //
 
 
-#include "Net/StreamSocket.h"
-#include "Net/StreamSocketImpl.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/StreamSocketImpl.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::InvalidArgumentException;
+using Poco::InvalidArgumentException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
@@ -91,7 +92,7 @@ void StreamSocket::connect(const SocketAddress& address)
 }
 
 
-void StreamSocket::connect(const SocketAddress& address, const Foundation::Timespan& timeout)
+void StreamSocket::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
 	impl()->connect(address, timeout);
 }
@@ -139,4 +140,4 @@ void StreamSocket::sendUrgent(unsigned char data)
 }
 
 
-Net_END
+} } // namespace Poco::Net

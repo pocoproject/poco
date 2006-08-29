@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.1.0/XML/src/XMLWriter.cpp#2 $
+// $Id: //poco/1.2/XML/src/XMLWriter.cpp#1 $
 //
 // Library: XML
 // Package: XML
@@ -34,15 +34,16 @@
 //
 
 
-#include "XML/XMLWriter.h"
-#include "XML/XMLString.h"
-#include "XML/XMLException.h"
-#include "SAX/AttributesImpl.h"
-#include "Foundation/UTF8Encoding.h"
+#include "Poco/XML/XMLWriter.h"
+#include "Poco/XML/XMLString.h"
+#include "Poco/XML/XMLException.h"
+#include "Poco/SAX/AttributesImpl.h"
+#include "Poco/UTF8Encoding.h"
 #include <sstream>
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const std::string XMLWriter::NEWLINE_DEFAULT;
@@ -68,16 +69,16 @@ const std::string XMLWriter::MARKUP_END_CDATA   = "]]>";
 
 
 #if defined(XML_UNICODE_WCHAR_T)
-	#define NATIVE_ENCODING Foundation::UTF16Encoding
+	#define NATIVE_ENCODING Poco::UTF16Encoding
 #else
-	#define NATIVE_ENCODING Foundation::UTF8Encoding
+	#define NATIVE_ENCODING Poco::UTF8Encoding
 #endif
 
 
 XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 	_pTextConverter(0),
 	_pInEncoding(new NATIVE_ENCODING),
-	_pOutEncoding(new Foundation::UTF8Encoding),
+	_pOutEncoding(new Poco::UTF8Encoding),
 	_options(options),
 	_encoding("UTF-8"),
 	_depth(-1),
@@ -90,12 +91,12 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 	_unclosedStartTag(false),
 	_prefix(0)
 {
-	_pTextConverter = new Foundation::OutputStreamConverter(str, *_pInEncoding, *_pOutEncoding);
+	_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, *_pOutEncoding);
 	setNewLine(NEWLINE_DEFAULT);
 }
 
 
-XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Foundation::TextEncoding& textEncoding):
+XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding& textEncoding):
 	_pTextConverter(0),
 	_pInEncoding(new NATIVE_ENCODING),
 	_pOutEncoding(0),
@@ -111,12 +112,12 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 	_unclosedStartTag(false),
 	_prefix(0)
 {
-	_pTextConverter = new Foundation::OutputStreamConverter(str, *_pInEncoding, textEncoding);
+	_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, textEncoding);
 	setNewLine(NEWLINE_DEFAULT);
 }
 
 
-XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Foundation::TextEncoding* pTextEncoding):
+XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding* pTextEncoding):
 	_pTextConverter(0),
 	_pInEncoding(new NATIVE_ENCODING),
 	_pOutEncoding(0),
@@ -134,13 +135,13 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 {
 	if (pTextEncoding)
 	{
-		_pTextConverter = new Foundation::OutputStreamConverter(str, *_pInEncoding, *pTextEncoding);
+		_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, *pTextEncoding);
 	}
 	else
 	{
 		_encoding = "UTF-8";
-		_pOutEncoding = new Foundation::UTF8Encoding;
-		_pTextConverter = new Foundation::OutputStreamConverter(str, *_pInEncoding, *_pOutEncoding);
+		_pOutEncoding = new Poco::UTF8Encoding;
+		_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, *_pOutEncoding);
 	}
 	setNewLine(NEWLINE_DEFAULT);
 }
@@ -300,7 +301,7 @@ void XMLWriter::emptyElement(const XMLString& namespaceURI, const XMLString& loc
 void XMLWriter::characters(const XMLChar ch[], int start, int length)
 {
 	if (_unclosedStartTag) closeStartTag();
-	_contentWritten = length > 0;
+	_contentWritten = _contentWritten || length > 0;
 	if (_inCDATA)
 	{
 		while (length-- > 0) writeXML(ch[start++]);
@@ -340,6 +341,8 @@ void XMLWriter::characters(const XMLString& str)
 
 void XMLWriter::rawCharacters(const XMLString& str)
 {
+	if (_unclosedStartTag) closeStartTag();
+	_contentWritten = _contentWritten || !str.empty();
 	writeXML(str);
 }
 
@@ -650,6 +653,13 @@ void XMLWriter::declareAttributeNamespaces(const Attributes& attributes)
 			XMLString splitLocalName;
 			Name::split(qname, prefix, splitLocalName);
 			if (prefix.empty()) prefix = _namespaces.getPrefix(namespaceURI);
+			if (prefix.empty() && !namespaceURI.empty() && !_namespaces.isMapped(namespaceURI))
+			{
+				prefix = newPrefix();
+				_namespaces.declarePrefix(prefix, namespaceURI);
+			}
+
+
 			const XMLString& uri = _namespaces.getURI(prefix);
 			if ((uri.empty() || uri != namespaceURI) && !namespaceURI.empty())
 			{
@@ -796,4 +806,4 @@ XMLString XMLWriter::newPrefix()
 }
 
 
-XML_END
+} } // namespace Poco::XML

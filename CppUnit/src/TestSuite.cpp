@@ -1,7 +1,7 @@
 //
 // TestSuite.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/src/TestSuite.cpp#1 $
+// $Id: //poco/1.2/CppUnit/src/TestSuite.cpp#1 $
 //
 
 
@@ -9,7 +9,7 @@
 #include "CppUnit/TestResult.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 // Deletes all tests in the suite.
@@ -46,4 +46,4 @@ int TestSuite::countTestCases()
 }
 
 
-CppUnit_END
+} // namespace CppUnit

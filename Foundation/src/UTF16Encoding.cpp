@@ -1,7 +1,7 @@
 //
 // UTF16Encoding.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/UTF16Encoding.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/UTF16Encoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/UTF16Encoding.h"
-#include "Foundation/ByteOrder.h"
+#include "Poco/UTF16Encoding.h"
+#include "Poco/ByteOrder.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const TextEncoding::CharacterMap UTF16Encoding::_charMap = 
@@ -128,7 +128,7 @@ int UTF16Encoding::convert(int ch, unsigned char* bytes, int length) const
 		if (length >= 2)
 		{
 			UInt16 ch1 = _flipBytes ? ByteOrder::flipBytes((UInt16) ch) : (UInt16) ch;
-			unsigned char* p = (unsigned char*) &ch;
+			unsigned char* p = (unsigned char*) &ch1;
 			*bytes++ = *p++;
 			*bytes++ = *p++;
 		}
@@ -158,4 +158,4 @@ int UTF16Encoding::convert(int ch, unsigned char* bytes, int length) const
 }
 
 
-Foundation_END
+} // namespace Poco

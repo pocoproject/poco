@@ -1,7 +1,7 @@
 //
 // NameValueCollectionTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/NameValueCollectionTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/NameValueCollectionTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "NameValueCollectionTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/NameValueCollection.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Exception.h"
 
 
-using Net::NameValueCollection;
-using Foundation::NotFoundException;
+using Poco::Net::NameValueCollection;
+using Poco::NotFoundException;
 
 
 NameValueCollectionTest::NameValueCollectionTest(const std::string& name): CppUnit::TestCase(name)
@@ -86,6 +86,9 @@ void NameValueCollectionTest::testNameValueCollection()
 	catch (NotFoundException&)
 	{
 	}
+	
+	assert (nvc.get("name", "default") == "value");
+	assert (nvc.get("name3", "default") == "default");
 
 	assert (nvc.has("name"));
 	assert (nvc.has("name2"));

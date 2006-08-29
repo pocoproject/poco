@@ -1,7 +1,7 @@
 //
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Environment_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Environment_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/Environment_UNIX.h"
-#include "Foundation/Exception.h"
+#include "Poco/Environment_UNIX.h"
+#include "Poco/Exception.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 EnvironmentImpl::StringMap EnvironmentImpl::_map;
@@ -117,4 +117,4 @@ std::string EnvironmentImpl::nodeNameImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

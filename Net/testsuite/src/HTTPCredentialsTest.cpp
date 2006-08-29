@@ -1,7 +1,7 @@
 //
 // HTTPCredentialsTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPCredentialsTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPCredentialsTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "HTTPCredentialsTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/HTTPRequest.h"
-#include "Net/HTTPBasicCredentials.h"
-#include "Net/NetException.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/NetException.h"
 
 
-using Net::HTTPRequest;
-using Net::HTTPBasicCredentials;
-using Net::NotAuthenticatedException;
+using Poco::Net::HTTPRequest;
+using Poco::Net::HTTPBasicCredentials;
+using Poco::Net::NotAuthenticatedException;
 
 
 HTTPCredentialsTest::HTTPCredentialsTest(const std::string& name): CppUnit::TestCase(name)

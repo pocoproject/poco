@@ -1,7 +1,7 @@
 //
 // HTTPServerTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPServerTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPServerTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,32 +33,32 @@
 #include "HTTPServerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/HTTPServer.h"
-#include "Net/HTTPServerParams.h"
-#include "Net/HTTPRequestHandler.h"
-#include "Net/HTTPRequestHandlerFactory.h"
-#include "Net/HTTPClientSession.h"
-#include "Net/HTTPRequest.h"
-#include "Net/HTTPServerRequest.h"
-#include "Net/HTTPResponse.h"
-#include "Net/HTTPServerResponse.h"
-#include "Net/ServerSocket.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/Net/HTTPServer.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
-using Net::HTTPServer;
-using Net::HTTPServerParams;
-using Net::HTTPRequestHandler;
-using Net::HTTPRequestHandlerFactory;
-using Net::HTTPClientSession;
-using Net::HTTPRequest;
-using Net::HTTPServerRequest;
-using Net::HTTPResponse;
-using Net::HTTPServerResponse;
-using Net::HTTPMessage;
-using Net::ServerSocket;
-using Foundation::StreamCopier;
+using Poco::Net::HTTPServer;
+using Poco::Net::HTTPServerParams;
+using Poco::Net::HTTPRequestHandler;
+using Poco::Net::HTTPRequestHandlerFactory;
+using Poco::Net::HTTPClientSession;
+using Poco::Net::HTTPRequest;
+using Poco::Net::HTTPServerRequest;
+using Poco::Net::HTTPResponse;
+using Poco::Net::HTTPServerResponse;
+using Poco::Net::HTTPMessage;
+using Poco::Net::ServerSocket;
+using Poco::StreamCopier;
 
 
 namespace
@@ -156,6 +156,29 @@ void HTTPServerTest::testIdentityRequest()
 	HTTPClientSession cs("localhost", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
+	request.setContentLength((int) body.length());
+	request.setContentType("text/plain");
+	cs.sendRequest(request) << body;
+	HTTPResponse response;
+	std::string rbody;
+	cs.receiveResponse(response) >> rbody;
+	assert (response.getContentLength() == body.size());
+	assert (response.getContentType() == "text/plain");
+	assert (rbody == body);
+}
+
+
+void HTTPServerTest::testPutIdentityRequest()
+{
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	
+	HTTPClientSession cs("localhost", svs.address().port());
+	std::string body(5000, 'x');
+	HTTPRequest request("PUT", "/echoBody");
 	request.setContentLength((int) body.length());
 	request.setContentType("text/plain");
 	cs.sendRequest(request) << body;
@@ -407,6 +430,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
 
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequest);
+	CppUnit_addTest(pSuite, HTTPServerTest, testPutIdentityRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequestKeepAlive);

@@ -1,7 +1,7 @@
 //
 // OptionSetTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/OptionSetTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/OptionSetTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,13 +33,13 @@
 #include "OptionSetTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/OptionSet.h"
-#include "Util/Option.h"
-#include "Util/OptionException.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionException.h"
 
 
-using Util::OptionSet;
-using Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::Option;
 
 
 OptionSetTest::OptionSetTest(const std::string& name): CppUnit::TestCase(name)
@@ -102,7 +102,7 @@ void OptionSetTest::testOptionSet()
 		set.getOption("in");
 		fail("ambiguous - must throw");
 	}
-	catch (Util::AmbiguousOptionException&)
+	catch (Poco::Util::AmbiguousOptionException&)
 	{
 	}
 
@@ -111,7 +111,7 @@ void OptionSetTest::testOptionSet()
 		set.getOption("i");
 		fail("ambiguous - must throw");
 	}
-	catch (Util::AmbiguousOptionException&)
+	catch (Poco::Util::AmbiguousOptionException&)
 	{
 	}
 }

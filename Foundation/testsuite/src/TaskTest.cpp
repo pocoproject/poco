@@ -1,7 +1,7 @@
 //
 // TaskTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TaskTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TaskTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,16 +33,16 @@
 #include "TaskTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Task.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Event.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/Task.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/AutoPtr.h"
 
 
-using Foundation::Task;
-using Foundation::Thread;
-using Foundation::Event;
-using Foundation::AutoPtr;
+using Poco::Task;
+using Poco::Thread;
+using Poco::Event;
+using Poco::AutoPtr;
 
 
 namespace

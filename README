@@ -1,9 +1,9 @@
-This is the README file for the Applied Informatics C++ Portable Components.
+This is the README file for POCO - The C++ Portable Components.
 
 In this document you will find a brief description of the directory layout,
 as well as a description necessary steps to build the C++ Portable Components.
 
-The Applied Informatics C++ Portable Components currently consist of four libraries.
+The C++ Portable Components currently consist of four libraries.
 The Foundation library contains a platform abstraction layer (including classes
 for multithreading, file system access, logging, etc.), as well as
 a large number of useful utility classes, such various stream buffer and stream
@@ -58,9 +58,10 @@ XML/                       project and make/build files for the XML library
 DOCUMENTATION
 =============
 
-At this time, no online-browsable API documentation is available. Please refer to
-the comments in the header files. API documentation in HTML format will be
-provided with the 1.0 release.
+Online browsable reference documentation in HTML is available at
+<http://poco.appinf.com/docs/>. Additional documentation, 
+including and overview and an introduction to the samples
+is available at <http://poco/appinf.com/documentation/>.
 
 
 BUILDING ON WINDOWS
@@ -99,9 +100,9 @@ BUILDING ON UNIX/LINUX/MAC OS X
 
 For building on Unix platforms, the C++ Portable Components come with their own
 build system. The build system is based on GNU Make 3.80, with the help from a few
-shell scripts. If you do not have GNU Make 3.80 installed on your machine, you will
-need to download it from <http://directory.fsf.org/devel/build/make.html>, build
-and install it prior to building the C++ Portable Components.
+shell scripts. If you do not have GNU Make 3.80 (or later) installed on your machine, 
+you will need to download it from <http://directory.fsf.org/devel/build/make.html>, 
+build and install it prior to building the C++ Portable Components.
 
 You can check the version of GNU Make installed on your system with
 
@@ -112,28 +113,26 @@ or
 > make --version
 
 Once you have GNU Make up and running, the rest is quite simple.
-Before starting a build, you must define the environment variable POCO_BASE to point
-to the directory where you have extracted the sources for the C++ Portable Components.
-For example, if you have extracted the sources to /home/jdoe/poco-0.95, then you would
-define POCO_BASE as follows (assuming you are using sh or bash)
+To extract the sources and build all libraries, testsuites and samples, simply
 
-> export POCO_BASE=/home/jdoe/poco-0.95
+> gunzip poco-X.Y.tar.gz
+> tar -xf poco-X.Y.tar.gz
+> cd poco-X.Y.tar.gz
+> ./configure
+> gmake -s
 
-Once you have defined POCO_BASE, you are ready to go.
-To build all libraries, testsuites and samples, simply
+See the configure script source for a list of possible options.
 
-> cd $POCO_BASE
-> gmake
+Once you have successfully built POCO, you can install it
+to /usr/local (or another directory specified as parameter
+to configure --prefix=<path>):
 
-NOTE: The global Makefile automatically sets POCO_BASE to the current working
-directory if it is undefined. However, you must define POCO_BASE yourself if
-you want to build only specific components (for example, the Foundation library,
-a test suite or the samples).
+> sudo gmake -s install
 
-To build on Mac OS X 10.4 with GCC 4.0, define the following environment variable:
+To build on Mac OS X 10.3 with GCC 3, do the following:
 
-> export POCO_CONFIG=Darwin8
-> make
+> ./configure --config=Darwin7
+> make -s
 
 
 BUILDING ON QNX NEUTRINO
@@ -155,6 +154,10 @@ default (Dinkumware) C++ standard library.
 
 BUILDING ON OPENVMS
 ===================
+
+OpenVMS is no longer supported in recent versions of POCO, due to both a
+lack of interest and a lack of contributors. The following
+instructions are here for historical reasons.
 
 The C++ Portable Components come with their own build system for OpenVMS, implemented
 by a bunch of DCL scripts. The scripts can be found in the build/vms directory.
@@ -188,4 +191,4 @@ at <http://poco.appinf.com>.
 
 
 --
-$Id: //poco/1.1.0/dist/README#2 $
+$Id: //poco/1.2/dist/README#1 $

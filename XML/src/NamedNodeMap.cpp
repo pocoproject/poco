@@ -1,7 +1,7 @@
 //
 // NamedNodeMap.cpp
 //
-// $Id: //poco/1.1.0/XML/src/NamedNodeMap.cpp#2 $
+// $Id: //poco/1.2/XML/src/NamedNodeMap.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/NamedNodeMap.h"
+#include "Poco/DOM/NamedNodeMap.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 NamedNodeMap::~NamedNodeMap()
@@ -45,4 +46,4 @@ NamedNodeMap::~NamedNodeMap()
 }
 
 
-XML_END
+} } // namespace Poco::XML

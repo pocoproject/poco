@@ -1,7 +1,7 @@
 //
 // DTDMap.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DTDMap.cpp#2 $
+// $Id: //poco/1.2/XML/src/DTDMap.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,13 +34,14 @@
 //
 
 
-#include "DOM/DTDMap.h"
-#include "DOM/DocumentType.h"
-#include "DOM/Document.h"
-#include "DOM/DOMException.h"
+#include "Poco/DOM/DTDMap.h"
+#include "Poco/DOM/DocumentType.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DOMException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 DTDMap::DTDMap(const DocumentType* pDocumentType, unsigned short type):
@@ -135,4 +136,4 @@ void DTDMap::autoRelease()
 }
 
 
-XML_END
+} } // namespace Poco::XML

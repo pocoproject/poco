@@ -1,7 +1,7 @@
 //
 // LoggingConfigurator.cpp
 //
-// $Id: //poco/1.1.0/Util/src/LoggingConfigurator.cpp#2 $
+// $Id: //poco/1.2/Util/src/LoggingConfigurator.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,29 +34,30 @@
 //
 
 
-#include "Util/LoggingConfigurator.h"
-#include "Util/AbstractConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Channel.h"
-#include "Foundation/FormattingChannel.h"
-#include "Foundation/Formatter.h"
-#include "Foundation/PatternFormatter.h"
-#include "Foundation/Logger.h"
-#include "Foundation/LoggingRegistry.h"
-#include "Foundation/LoggingFactory.h"
+#include "Poco/Util/LoggingConfigurator.h"
+#include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Channel.h"
+#include "Poco/FormattingChannel.h"
+#include "Poco/Formatter.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/Logger.h"
+#include "Poco/LoggingRegistry.h"
+#include "Poco/LoggingFactory.h"
 
 
-using Foundation::AutoPtr;
-using Foundation::Formatter;
-using Foundation::PatternFormatter;
-using Foundation::Channel;
-using Foundation::FormattingChannel;
-using Foundation::Logger;
-using Foundation::LoggingRegistry;
-using Foundation::LoggingFactory;
+using Poco::AutoPtr;
+using Poco::Formatter;
+using Poco::PatternFormatter;
+using Poco::Channel;
+using Poco::FormattingChannel;
+using Poco::Logger;
+using Poco::LoggingRegistry;
+using Poco::LoggingFactory;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 LoggingConfigurator::LoggingConfigurator()
@@ -195,4 +196,4 @@ void LoggingConfigurator::configureLogger(AbstractConfiguration* pConfig)
 }
 
 
-Util_END
+} } // namespace Poco::Util

@@ -1,7 +1,7 @@
 //
 // TestFailure.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/src/TestFailure.cpp#1 $
+// $Id: //poco/1.2/CppUnit/src/TestFailure.cpp#1 $
 //
 
 
@@ -9,7 +9,7 @@
 #include "CppUnit/Test.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 // Returns a short description of the failure.
@@ -19,4 +19,4 @@ std::string TestFailure::toString()
 }
 
 
-CppUnit_END
+} // namespace CppUnit

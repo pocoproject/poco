@@ -1,7 +1,7 @@
 //
 // FTPStreamFactory.cpp
 //
-// $Id: //poco/1.1.0/Net/src/FTPStreamFactory.cpp#2 $
+// $Id: //poco/1.2/Net/src/FTPStreamFactory.cpp#1 $
 //
 // Library: Net
 // Package: FTP
@@ -34,23 +34,24 @@
 //
 
 
-#include "Net/FTPStreamFactory.h"
-#include "Net/FTPClientSession.h"
-#include "Net/NetException.h"
-#include "Foundation/URI.h"
-#include "Foundation/URIStreamOpener.h"
-#include "Foundation/UnbufferedStreamBuf.h"
-#include "Foundation/Path.h"
+#include "Poco/Net/FTPStreamFactory.h"
+#include "Poco/Net/FTPClientSession.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/URI.h"
+#include "Poco/URIStreamOpener.h"
+#include "Poco/UnbufferedStreamBuf.h"
+#include "Poco/Path.h"
 
 
-using Foundation::URIStreamFactory;
-using Foundation::URI;
-using Foundation::URIStreamOpener;
-using Foundation::UnbufferedStreamBuf;
-using Foundation::Path;
+using Poco::URIStreamFactory;
+using Poco::URI;
+using Poco::URIStreamOpener;
+using Poco::UnbufferedStreamBuf;
+using Poco::Path;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 class FTPStreamBuf: public UnbufferedStreamBuf
@@ -231,7 +232,7 @@ void FTPStreamFactory::getUserInfo(const URI& uri, std::string& username, std::s
 }
 
 
-void FTPStreamFactory::getPathAndType(const Foundation::URI& uri, std::string& path, char& type)
+void FTPStreamFactory::getPathAndType(const Poco::URI& uri, std::string& path, char& type)
 {
 	path = uri.getPath();
 	type = 'i';
@@ -253,4 +254,4 @@ void FTPStreamFactory::registerFactory()
 }
 
 
-Net_END
+} } // namespace Poco::Net

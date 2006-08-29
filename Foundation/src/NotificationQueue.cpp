@@ -1,7 +1,7 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NotificationQueue.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NotificationQueue.cpp#1 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/NotificationQueue.h"
-#include "Foundation/NotificationCenter.h"
-#include "Foundation/Notification.h"
-#include "Foundation/SingletonHolder.h"
+#include "Poco/NotificationQueue.h"
+#include "Poco/NotificationCenter.h"
+#include "Poco/Notification.h"
+#include "Poco/SingletonHolder.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NotificationQueue::NotificationQueue()
@@ -224,4 +224,4 @@ NotificationQueue& NotificationQueue::defaultQueue()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // base64decode.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/base64decode/src/base64decode.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/base64decode/src/base64decode.cpp#1 $
 //
 // This sample demonstrates the Base64Decoder and StreamCopier classes.
 //
@@ -32,14 +32,14 @@
 //
 
 
-#include "Foundation/Base64Decoder.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/Base64Decoder.h"
+#include "Poco/StreamCopier.h"
 #include <iostream>
 #include <fstream>
 
 
-using Foundation::Base64Decoder;
-using Foundation::StreamCopier;
+using Poco::Base64Decoder;
+using Poco::StreamCopier;
 
 
 int main(int argc, char** argv)

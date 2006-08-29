@@ -1,7 +1,7 @@
 //
 // ChildNodesList.cpp
 //
-// $Id: //poco/1.1.0/XML/src/ChildNodesList.cpp#2 $
+// $Id: //poco/1.2/XML/src/ChildNodesList.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,12 +34,13 @@
 //
 
 
-#include "DOM/ChildNodesList.h"
-#include "DOM/Node.h"
-#include "DOM/Document.h"
+#include "Poco/DOM/ChildNodesList.h"
+#include "Poco/DOM/Node.h"
+#include "Poco/DOM/Document.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 ChildNodesList::ChildNodesList(const Node* pParent):
@@ -88,4 +89,4 @@ void ChildNodesList::autoRelease()
 }
 
 
-XML_END
+} } // namespace Poco::XML

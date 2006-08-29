@@ -1,7 +1,7 @@
 //
 // UUID.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/UUID.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/UUID.cpp#1 $
 //
 // Library: Foundation
 // Package: UUID
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/UUID.h"
-#include "Foundation/ByteOrder.h"
-#include "Foundation/Exception.h"
+#include "Poco/UUID.h"
+#include "Poco/ByteOrder.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 #include <string.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 UUID::UUID(): 
@@ -369,4 +369,4 @@ const UUID& UUID::x500()
 }
 
 
-Foundation_END
+} // namespace Poco

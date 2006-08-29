@@ -1,7 +1,7 @@
 //
 // FPETest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/FPETest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/FPETest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "FPETest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/FPEnvironment.h"
+#include "Poco/FPEnvironment.h"
 
 
-using Foundation::FPE;
+using Poco::FPE;
 
 
 FPETest::FPETest(const std::string& name): CppUnit::TestCase(name)

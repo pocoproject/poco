@@ -1,7 +1,7 @@
 //
 // MD5Engine.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/MD5Engine.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/MD5Engine.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -57,11 +57,11 @@
 //
 
 
-#include "Foundation/MD5Engine.h"
+#include "Poco/MD5Engine.h"
 #include <string.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 MD5Engine::MD5Engine()
@@ -328,4 +328,4 @@ void MD5Engine::decode(UInt32* output, const unsigned char* input, unsigned int 
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // Element.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Element.cpp#2 $
+// $Id: //poco/1.2/XML/src/Element.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,16 +34,17 @@
 //
 
 
-#include "DOM/Element.h"
-#include "DOM/Document.h"
-#include "DOM/Attr.h"
-#include "DOM/DOMException.h"
-#include "DOM/ElementsByTagNameList.h"
-#include "DOM/Text.h"
-#include "DOM/AttrMap.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/DOM/DOMException.h"
+#include "Poco/DOM/ElementsByTagNameList.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/AttrMap.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 Element::Element(Document* pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
@@ -332,6 +333,19 @@ bool Element::hasAttributes() const
 }
 
 
+XMLString Element::innerText() const
+{
+	XMLString result;
+	Node* pChild = firstChild();
+	while (pChild)
+	{
+		result.append(pChild->innerText());
+		pChild = pChild->nextSibling();
+	}
+	return result;
+}
+
+
 Element* Element::getChildElement(const XMLString& name) const
 {
 	Node* pNode = firstChild();
@@ -390,5 +404,5 @@ Node* Element::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-XML_END
+} } // namespace Poco::XML
 

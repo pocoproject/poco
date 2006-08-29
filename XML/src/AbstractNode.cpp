@@ -1,7 +1,7 @@
 //
 // AbstractNode.cpp
 //
-// $Id: //poco/1.1.0/XML/src/AbstractNode.cpp#2 $
+// $Id: //poco/1.2/XML/src/AbstractNode.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,19 +34,20 @@
 //
 
 
-#include "DOM/AbstractNode.h"
-#include "DOM/Document.h"
-#include "DOM/ChildNodesList.h"
-#include "DOM/EventDispatcher.h"
-#include "DOM/DOMException.h"
-#include "DOM/EventException.h"
-#include "DOM/DOMImplementation.h"
-#include "DOM/Attr.h"
-#include "XML/Name.h"
-#include "DOM/AutoPtr.h"
+#include "Poco/DOM/AbstractNode.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/ChildNodesList.h"
+#include "Poco/DOM/EventDispatcher.h"
+#include "Poco/DOM/DOMException.h"
+#include "Poco/DOM/EventException.h"
+#include "Poco/DOM/DOMImplementation.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/XML/Name.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString AbstractNode::NODE_NAME = toXMLString("#node");
@@ -232,14 +233,7 @@ bool AbstractNode::hasAttributes() const
 
 XMLString AbstractNode::innerText() const
 {
-	XMLString result = nodeValue();
-	Node* pChild = firstChild();
-	while (pChild)
-	{
-		result.append(pChild->innerText());
-		pChild = pChild->nextSibling();
-	}
-	return result;
+	return EMPTY_STRING;
 }
 
 
@@ -380,4 +374,4 @@ void AbstractNode::setOwnerDocument(Document* pOwnerDocument)
 }
 
 
-XML_END
+} } // namespace Poco::XML

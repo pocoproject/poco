@@ -1,7 +1,7 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/1.1.0/XML/samples/SAXParser/src/SAXParser.cpp#2 $
+// $Id: //poco/1.2/XML/samples/SAXParser/src/SAXParser.cpp#1 $
 //
 // This sample demonstrates the SAXParser class.
 //
@@ -32,23 +32,23 @@
 //
 
 
-#include "SAX/SAXParser.h"
-#include "SAX/ContentHandler.h"
-#include "SAX/LexicalHandler.h"
-#include "SAX/Attributes.h"
-#include "SAX/Locator.h"
-#include "Foundation/Exception.h"
+#include "Poco/SAX/SAXParser.h"
+#include "Poco/SAX/ContentHandler.h"
+#include "Poco/SAX/LexicalHandler.h"
+#include "Poco/SAX/Attributes.h"
+#include "Poco/SAX/Locator.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-using XML::SAXParser;
-using XML::XMLReader;
-using XML::XMLString;
-using XML::XMLChar;
-using XML::ContentHandler;
-using XML::LexicalHandler;
-using XML::Attributes;
-using XML::Locator;
+using Poco::XML::SAXParser;
+using Poco::XML::XMLReader;
+using Poco::XML::XMLString;
+using Poco::XML::XMLChar;
+using Poco::XML::ContentHandler;
+using Poco::XML::LexicalHandler;
+using Poco::XML::Attributes;
+using Poco::XML::Locator;
 
 
 class MyHandler: public ContentHandler, public LexicalHandler
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
 	{
 		parser.parse(argv[1]);
 	}
-	catch (Foundation::Exception& e)
+	catch (Poco::Exception& e)
 	{
 		std::cerr << e.displayText() << std::endl;
 		return 2;

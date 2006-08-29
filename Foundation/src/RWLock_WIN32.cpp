@@ -1,7 +1,7 @@
 //
 // RWLock_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/RWLock_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/RWLock_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/RWLock_WIN32.h"
+#include "Poco/RWLock_WIN32.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 RWLockImpl::RWLockImpl(): _readers(0), _writers(0)
@@ -196,4 +196,4 @@ void RWLockImpl::unlockImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // MessageHeaderTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MessageHeaderTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MessageHeaderTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "MessageHeaderTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/MessageHeader.h"
-#include "Net/NetException.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/NetException.h"
 #include <sstream>
 
 
-using Net::MessageHeader;
-using Net::NameValueCollection;
-using Net::MessageException;
+using Poco::Net::MessageHeader;
+using Poco::Net::NameValueCollection;
+using Poco::Net::MessageException;
 
 
 MessageHeaderTest::MessageHeaderTest(const std::string& name): CppUnit::TestCase(name)

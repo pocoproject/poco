@@ -1,7 +1,7 @@
 //
 // LayeredConfigurationTest.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/LayeredConfigurationTest.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/LayeredConfigurationTest.h#1 $
 //
 // Definition of the LayeredConfigurationTest class.
 //
@@ -36,12 +36,8 @@
 #define LayeredConfigurationTest_INCLUDED
 
 
-#ifndef Util_Util_INCLUDED
-#include "Util/Util.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Util/Util.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class LayeredConfigurationTest: public CppUnit::TestCase

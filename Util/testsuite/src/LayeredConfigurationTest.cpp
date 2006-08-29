@@ -1,7 +1,7 @@
 //
 // LayeredConfigurationTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/LayeredConfigurationTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/LayeredConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,19 +33,19 @@
 #include "LayeredConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/LayeredConfiguration.h"
-#include "Util/MapConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/LayeredConfiguration.h"
+#include "Poco/Util/MapConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 
 
-using Util::AbstractConfiguration;
-using Util::LayeredConfiguration;
-using Util::MapConfiguration;
-using Foundation::AutoPtr;
-using Foundation::NotFoundException;
-using Foundation::RuntimeException;
+using Poco::Util::AbstractConfiguration;
+using Poco::Util::LayeredConfiguration;
+using Poco::Util::MapConfiguration;
+using Poco::AutoPtr;
+using Poco::NotFoundException;
+using Poco::RuntimeException;
 
 
 LayeredConfigurationTest::LayeredConfigurationTest(const std::string& name): CppUnit::TestCase(name)

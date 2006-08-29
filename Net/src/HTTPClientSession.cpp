@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPClientSession.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPClientSession.cpp#1 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -34,22 +34,23 @@
 //
 
 
-#include "Net/HTTPClientSession.h"
-#include "Net/HTTPRequest.h"
-#include "Net/HTTPResponse.h"
-#include "Net/HTTPHeaderStream.h"
-#include "Net/HTTPStream.h"
-#include "Net/HTTPFixedLengthStream.h"
-#include "Net/HTTPChunkedStream.h"
-#include "Net/NetException.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPHeaderStream.h"
+#include "Poco/Net/HTTPStream.h"
+#include "Poco/Net/HTTPFixedLengthStream.h"
+#include "Poco/Net/HTTPChunkedStream.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/NumberFormatter.h"
 
 
-using Foundation::NumberFormatter;
-using Foundation::IllegalStateException;
+using Poco::NumberFormatter;
+using Poco::IllegalStateException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPClientSession::HTTPClientSession():
@@ -75,7 +76,19 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 }
 
 
-HTTPClientSession::HTTPClientSession(const std::string& host, Foundation::UInt16 port):
+HTTPClientSession::HTTPClientSession(const SocketAddress& address):
+	_host(address.host().toString()),
+	_port(address.port()),
+	_proxyPort(HTTPSession::HTTP_PORT),
+	_reconnect(false),
+	_expectResponseBody(false),
+	_pRequestStream(0),
+	_pResponseStream(0)
+{
+}
+
+
+HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port):
 	_host(host),
 	_port(port),
 	_proxyPort(HTTPSession::HTTP_PORT),
@@ -103,7 +116,7 @@ void HTTPClientSession::setHost(const std::string& host)
 }
 
 
-void HTTPClientSession::setPort(Foundation::UInt16 port)
+void HTTPClientSession::setPort(Poco::UInt16 port)
 {
 	if (!connected())
 		_port = port;
@@ -112,7 +125,7 @@ void HTTPClientSession::setPort(Foundation::UInt16 port)
 }
 
 
-void HTTPClientSession::setProxy(const std::string& host, Foundation::UInt16 port)
+void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 {
 	if (!connected())
 	{
@@ -132,7 +145,7 @@ void HTTPClientSession::setProxyHost(const std::string& host)
 }
 
 
-void HTTPClientSession::setProxyPort(Foundation::UInt16 port)
+void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 {
 	if (!connected())
 		_proxyPort = port;
@@ -178,9 +191,24 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 	delete _pRequestStream;
 	_pRequestStream = 0;
 
-	response.clear();
-	HTTPHeaderInputStream his(*this);
-	response.read(his);
+	do
+	{
+		response.clear();
+		HTTPHeaderInputStream his(*this);
+		try
+		{
+			response.read(his);
+		}
+		catch (MessageException&)
+		{
+			if (networkException())
+				networkException()->rethrow();
+			else
+				throw;
+		}
+	}
+	while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
+
 	if (!_expectResponseBody)
 		_pResponseStream = new HTTPFixedLengthInputStream(*this, 0);
 	else if (response.getChunkedTransferEncoding())
@@ -266,4 +294,4 @@ void HTTPClientSession::setRequestStream(std::ostream* pRequestStream)
 }
 
 
-Net_END
+} } // namespace Poco::Net

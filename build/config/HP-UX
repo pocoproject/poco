@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/config/HP-UX#1 $
+# $Id: //poco/1.2/build/config/HP-UX#1 $
 #
 # HP-UX
 #
@@ -16,10 +16,10 @@ LINKMODE = SHARED
 #
 CC      = cc
 CXX     = aCC
-LINK    = aCC
+LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = aCC $(LINKFLAGS) -b -Wl,+h$(notdir $@) -o $@ -Wl,+s
+SHLIB   = $(CXX) $(LINKFLAGS) -b -Wl,+h$(notdir $@) -o $@ -Wl,+s
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.aCC 
 SHELL   = sh

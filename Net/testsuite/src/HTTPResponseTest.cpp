@@ -1,7 +1,7 @@
 //
 // HTTPResponseTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPResponseTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPResponseTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,16 +33,16 @@
 #include "HTTPResponseTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/HTTPResponse.h"
-#include "Net/HTTPCookie.h"
-#include "Net/NetException.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPCookie.h"
+#include "Poco/Net/NetException.h"
 #include <sstream>
 
 
-using Net::HTTPResponse;
-using Net::HTTPMessage;
-using Net::HTTPCookie;
-using Net::MessageException;
+using Poco::Net::HTTPResponse;
+using Poco::Net::HTTPMessage;
+using Poco::Net::HTTPCookie;
+using Poco::Net::MessageException;
 
 
 HTTPResponseTest::HTTPResponseTest(const std::string& name): CppUnit::TestCase(name)
@@ -94,22 +94,6 @@ void HTTPResponseTest::testRead1()
 void HTTPResponseTest::testRead2()
 {
 	std::string s("HTTP/1.0 301 Moved Permanently\r\nLocation: http://www.appinf.com/index.html\r\nServer: Poco/1.0\r\n\r\n");
-	std::istringstream istr(s);
-	HTTPResponse response;
-	response.read(istr);
-	assert (response.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY);
-	assert (response.getReason() == "Moved Permanently");
-	assert (response.getVersion() == HTTPMessage::HTTP_1_0);
-	assert (response.size() == 2);
-	assert (response["Location"] == "http://www.appinf.com/index.html");
-	assert (response["Server"] == "Poco/1.0");
-	assert (istr.get() == -1);
-}
-
-
-void HTTPResponseTest::testRead3()
-{
-	std::string s("HTTP/1.0 100 Continue\r\nHTTP/1.0 301 Moved Permanently\r\nLocation: http://www.appinf.com/index.html\r\nServer: Poco/1.0\r\n\r\n");
 	std::istringstream istr(s);
 	HTTPResponse response;
 	response.read(istr);
@@ -233,7 +217,6 @@ CppUnit::Test* HTTPResponseTest::suite()
 	CppUnit_addTest(pSuite, HTTPResponseTest, testWrite2);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testRead1);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testRead2);
-	CppUnit_addTest(pSuite, HTTPResponseTest, testRead3);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid1);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid3);

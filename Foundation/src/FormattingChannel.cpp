@@ -1,7 +1,7 @@
 //
 // FormattingChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/FormattingChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/FormattingChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/FormattingChannel.h"
-#include "Foundation/Formatter.h"
-#include "Foundation/Message.h"
-#include "Foundation/LoggingRegistry.h"
+#include "Poco/FormattingChannel.h"
+#include "Poco/Formatter.h"
+#include "Poco/Message.h"
+#include "Poco/LoggingRegistry.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FormattingChannel::FormattingChannel(): 
@@ -145,4 +145,4 @@ void FormattingChannel::close()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // FTPClientSessionTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/FTPClientSessionTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/FTPClientSessionTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,24 +34,24 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "DialogServer.h"
-#include "Net/FTPClientSession.h"
-#include "Net/DialogSocket.h"
-#include "Net/SocketAddress.h"
-#include "Net/NetException.h"
-#include "Foundation/Thread.h"
-#include "Foundation/ActiveMethod.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/Net/FTPClientSession.h"
+#include "Poco/Net/DialogSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Thread.h"
+#include "Poco/ActiveMethod.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
-using Net::FTPClientSession;
-using Net::DialogSocket;
-using Net::SocketAddress;
-using Net::FTPException;
-using Foundation::ActiveMethod;
-using Foundation::ActiveResult;
-using Foundation::StreamCopier;
-using Foundation::Thread;
+using Poco::Net::FTPClientSession;
+using Poco::Net::DialogSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::FTPException;
+using Poco::ActiveMethod;
+using Poco::ActiveResult;
+using Poco::StreamCopier;
+using Poco::Thread;
 
 
 namespace
@@ -321,7 +321,7 @@ void FTPClientSessionTest::testDownloadPORT()
 	cmd = server.popCommandWait();
 	assert (cmd == "RETR test.txt");
 
-	SocketAddress sa("localhost", (Foundation::UInt16) port);
+	SocketAddress sa("localhost", (Poco::UInt16) port);
 	DialogSocket dataSock;
 	dataSock.connect(sa);
 
@@ -369,7 +369,7 @@ void FTPClientSessionTest::testDownloadEPRT()
 	cmd = server.popCommandWait();
 	assert (cmd == "RETR test.txt");
 	
-	SocketAddress sa("localhost", (Foundation::UInt16) port);
+	SocketAddress sa("localhost", (Poco::UInt16) port);
 	DialogSocket dataSock;
 	dataSock.connect(sa);
 

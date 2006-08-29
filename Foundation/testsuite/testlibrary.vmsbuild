@@ -1,7 +1,7 @@
 #
 # buildfiles.vms
 #
-# $Id: //poco/1.1.0/Foundation/testsuite/testlibrary.vmsbuild#1 $
+# $Id: //poco/1.2/Foundation/testsuite/testlibrary.vmsbuild#1 $
 #
 SHR=TestLibrary
 TestPlugin

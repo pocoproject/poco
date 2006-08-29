@@ -1,7 +1,7 @@
 //
 // PurgeStrategy.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/PurgeStrategy.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/PurgeStrategy.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/PurgeStrategy.h"
-#include "Foundation/Path.h"
-#include "Foundation/DirectoryIterator.h"
-#include "Foundation/Timestamp.h"
+#include "Poco/PurgeStrategy.h"
+#include "Poco/Path.h"
+#include "Poco/DirectoryIterator.h"
+#include "Poco/Timestamp.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 //
@@ -150,4 +150,4 @@ void PurgeByCountStrategy::purge(const std::string& path)
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // StreamsTestSuite.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/StreamsTestSuite.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/StreamsTestSuite.h#1 $
 //
 // Definition of the StreamsTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define StreamsTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class StreamsTestSuite

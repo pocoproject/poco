@@ -1,7 +1,7 @@
 //
 // HelpFormatter.cpp
 //
-// $Id: //poco/1.1.0/Util/src/HelpFormatter.cpp#2 $
+// $Id: //poco/1.2/Util/src/HelpFormatter.cpp#1 $
 //
 // Library: Util
 // Package: Options
@@ -34,12 +34,13 @@
 //
 
 
-#include "Util/HelpFormatter.h"
-#include "Util/OptionSet.h"
-#include "Util/Option.h"
+#include "Poco/Util/HelpFormatter.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/Option.h"
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 const int HelpFormatter::TAB_WIDTH  = 4;
@@ -305,4 +306,4 @@ std::string HelpFormatter::longPrefix() const
 }
 
 
-Util_END
+} } // namespace Poco::Util

@@ -1,7 +1,7 @@
 //
 // BinaryReader.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/BinaryReader.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/BinaryReader.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/BinaryReader.h"
-#include "Foundation/ByteOrder.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/ByteOrder.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
@@ -147,7 +147,7 @@ BinaryReader& BinaryReader::operator >> (float& value)
 	{
 		char* ptr = (char*) &value;
 		ptr += sizeof(value);
-		for (int i = 0; i < sizeof(value); ++i)
+		for (unsigned i = 0; i < sizeof(value); ++i)
 			_istr.read(--ptr, 1);
 	}
 	else
@@ -164,7 +164,7 @@ BinaryReader& BinaryReader::operator >> (double& value)
 	{
 		char* ptr = (char*) &value;
 		ptr += sizeof(value);
-		for (int i = 0; i < sizeof(value); ++i)
+		for (unsigned i = 0; i < sizeof(value); ++i)
 			_istr.read(--ptr, 1);
 	}
 	else
@@ -270,10 +270,10 @@ void BinaryReader::readRaw(int length, std::string& value)
 
 void BinaryReader::readBOM()
 {
-	UInt32 bom;
+	UInt16 bom;
 	_istr.read((char*) &bom, sizeof(bom));
 	_flipBytes = bom != 0xFEFF;
 }
 
 
-Foundation_END
+} // namespace Poco

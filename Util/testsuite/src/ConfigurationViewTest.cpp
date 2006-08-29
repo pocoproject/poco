@@ -1,7 +1,7 @@
 //
 // ConfigurationViewTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/ConfigurationViewTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/ConfigurationViewTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "ConfigurationViewTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/MapConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/MapConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 
 
-using Util::AbstractConfiguration;
-using Util::MapConfiguration;
-using Foundation::AutoPtr;
+using Poco::Util::AbstractConfiguration;
+using Poco::Util::MapConfiguration;
+using Poco::AutoPtr;
 
 
 ConfigurationViewTest::ConfigurationViewTest(const std::string& name): CppUnit::TestCase(name)

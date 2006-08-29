@@ -1,7 +1,7 @@
 //
 // EntityResolverImpl.cpp
 //
-// $Id: //poco/1.1.0/XML/src/EntityResolverImpl.cpp#2 $
+// $Id: //poco/1.2/XML/src/EntityResolverImpl.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,24 +34,25 @@
 //
 
 
-#include "SAX/EntityResolverImpl.h"
-#include "SAX/InputSource.h"
-#include "XML/XMLString.h"
-#include "Foundation/URI.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
+#include "Poco/SAX/EntityResolverImpl.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/XML/XMLString.h"
+#include "Poco/URI.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
 #include <fstream>
 
 
-using Foundation::URIStreamOpener;
-using Foundation::URI;
-using Foundation::Path;
-using Foundation::Exception;
-using Foundation::IOException;
-using Foundation::OpenFileException;
+using Poco::URIStreamOpener;
+using Poco::URI;
+using Poco::Path;
+using Poco::Exception;
+using Poco::IOException;
+using Poco::OpenFileException;
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 EntityResolverImpl::EntityResolverImpl():
@@ -97,4 +98,4 @@ std::istream* EntityResolverImpl::resolveSystemId(const XMLString& systemId)
 }
 
 
-XML_END
+} } // namespace Poco::XML

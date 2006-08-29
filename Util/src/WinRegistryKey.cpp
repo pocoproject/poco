@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/1.1.0/Util/src/WinRegistryKey.cpp#2 $
+// $Id: //poco/1.2/Util/src/WinRegistryKey.cpp#1 $
 //
 // Library: Util
 // Package: Windows
@@ -34,16 +34,20 @@
 //
 
 
-#include "Util/WinRegistryKey.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/WinRegistryKey.h"
+#include "Poco/Exception.h"
+#if defined(POCO_WIN32_UTF8)
+#include "Poco/UnicodeConverter.h"
+#endif
 
 
-using Foundation::SystemException;
-using Foundation::NotFoundException;
-using Foundation::InvalidArgumentException;
+using Poco::SystemException;
+using Poco::NotFoundException;
+using Poco::InvalidArgumentException;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 WinRegistryKey::WinRegistryKey(const std::string& key):
@@ -77,26 +81,55 @@ WinRegistryKey::~WinRegistryKey()
 void WinRegistryKey::setString(const std::string& name, const std::string& value)
 {
 	open();
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	std::wstring uvalue;
+	Poco::UnicodeConverter::toUTF16(value, uvalue);
+	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_SZ, (CONST BYTE*) uvalue.c_str(), (DWORD) (uvalue.size() + 1)*sizeof(wchar_t)) != ERROR_SUCCESS)
+		handleSetError(name); 
+#else
 	if (RegSetValueEx(_hKey, name.c_str(), 0, REG_SZ, (CONST BYTE*) value.c_str(), (DWORD) value.size() + 1) != ERROR_SUCCESS)
 		handleSetError(name); 
+#endif
 }
 
-#include <winerror.h>
+
 std::string WinRegistryKey::getString(const std::string& name)
 {
 	open();
 	DWORD type;
 	DWORD size;
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
+		throw NotFoundException(key(name));
+	if (size > 0)
+	{
+		DWORD len = size/2;
+		wchar_t* buffer = new wchar_t[len + 1];
+		RegQueryValueExW(_hKey, uname.c_str(), NULL, NULL, (BYTE*) buffer, &size);
+		buffer[len] = 0;
+		std::wstring uresult(buffer);
+		delete [] buffer;
+		std::string result;
+		Poco::UnicodeConverter::toUTF8(uresult, result);
+		return result;
+	}
+#else
 	if (RegQueryValueEx(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
-		char* buffer = new char[size];
+		char* buffer = new char[size + 1];
 		RegQueryValueEx(_hKey, name.c_str(), NULL, NULL, (BYTE*) buffer, &size);
-		std::string result(buffer, size - 1);
+		buffer[size] = 0;
+		std::string result(buffer);
 		delete [] buffer;
 		return result;
 	}
+#endif
 	return std::string();
 }
 
@@ -104,8 +137,17 @@ std::string WinRegistryKey::getString(const std::string& name)
 void WinRegistryKey::setStringExpand(const std::string& name, const std::string& value)
 {
 	open();
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	std::wstring uvalue;
+	Poco::UnicodeConverter::toUTF16(value, uvalue);
+	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_EXPAND_SZ, (CONST BYTE*) uvalue.c_str(), (DWORD) (uvalue.size() + 1)*sizeof(wchar_t)) != ERROR_SUCCESS)
+		handleSetError(name); 
+#else
 	if (RegSetValueEx(_hKey, name.c_str(), 0, REG_EXPAND_SZ, (CONST BYTE*) value.c_str(), (DWORD) value.size() + 1) != ERROR_SUCCESS)
 		handleSetError(name); 
+#endif
 }
 
 
@@ -114,12 +156,35 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 	open();
 	DWORD type;
 	DWORD size;
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	if (RegQueryValueEx(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
+		throw NotFoundException(key(name));
+	if (size > 0)
+	{
+		DWORD len = size/2;
+		wchar_t* buffer = new wchar_t[len + 1];
+		RegQueryValueExW(_hKey, uname.c_str(), NULL, NULL, (BYTE*) buffer, &size);
+		buffer[len] = 0;
+		wchar_t temp;
+		DWORD expSize = ExpandEnvironmentStrings(buffer, &temp, 1);	
+		wchar_t* expBuffer = new wchar_t[expSize];
+		ExpandEnvironmentStringsW(buffer, expBuffer, expSize);
+		std::string result;
+		UnicodeConverter::toUTF8(expBuffer, result);
+		delete [] buffer;
+		delete [] expBuffer;
+		return result;
+	}
+#else
 	if (RegQueryValueEx(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
-		char* buffer = new char[size];
+		char* buffer = new char[size + 1];
 		RegQueryValueEx(_hKey, name.c_str(), NULL, NULL, (BYTE*) buffer, &size);
+		buffer[size] = 0;
 		char temp;
 		DWORD expSize = ExpandEnvironmentStrings(buffer, &temp, 1);	
 		char* expBuffer = new char[expSize];
@@ -129,6 +194,7 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 		delete [] expBuffer;
 		return result;
 	}
+#endif
 	return std::string();
 }
 
@@ -137,8 +203,15 @@ void WinRegistryKey::setInt(const std::string& name, int value)
 {
 	open();
 	DWORD data = value;
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	if (RegSetValueExW(_hKey, uname.c_str(), 0, REG_DWORD, (CONST BYTE*) &data, sizeof(data)) != ERROR_SUCCESS)
+		handleSetError(name); 
+#else
 	if (RegSetValueEx(_hKey, name.c_str(), 0, REG_DWORD, (CONST BYTE*) &data, sizeof(data)) != ERROR_SUCCESS)
 		handleSetError(name); 
+#endif
 }
 
 	
@@ -148,8 +221,15 @@ int WinRegistryKey::getInt(const std::string& name)
 	DWORD type;
 	DWORD data;
 	DWORD size;
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, (BYTE*) &data, &size) != ERROR_SUCCESS || type != REG_DWORD)
+		throw NotFoundException(key(name));
+#else
 	if (RegQueryValueEx(_hKey, name.c_str(), NULL, &type, (BYTE*) &data, &size) != ERROR_SUCCESS || type != REG_DWORD)
 		throw NotFoundException(key(name));
+#endif
 	return data;
 }
 
@@ -157,32 +237,79 @@ int WinRegistryKey::getInt(const std::string& name)
 void WinRegistryKey::deleteValue(const std::string& name)
 {
 	open();
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	if (RegDeleteValueW(_hKey, uname.c_str()) != ERROR_SUCCESS)
+		throw NotFoundException(key(name));
+#else
 	if (RegDeleteValue(_hKey, name.c_str()) != ERROR_SUCCESS)
 		throw NotFoundException(key(name));
+#endif
 }
 
 
 void WinRegistryKey::deleteKey()
 {
 	close();
+#if defined(POCO_WIN32_UTF8)
+	std::wstring usubKey;
+	Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
+	if (RegDeleteKeyW(_hRootKey, usubKey.c_str()) != ERROR_SUCCESS)
+		throw NotFoundException(key());
+#else
 	if (RegDeleteKey(_hRootKey, _subKey.c_str()) != ERROR_SUCCESS)
 		throw NotFoundException(key());
+#endif
 }
 
 
 bool WinRegistryKey::exists()
 {
 	open();
-	char name[256];
 	DWORD size;
+#if defined(POCO_WIN32_UTF8)
+	wchar_t name[256];
+	return RegEnumValueW(_hKey, 0, name, &size, NULL, NULL, NULL, NULL) == ERROR_SUCCESS;
+#else
+	char name[256];
 	return RegEnumValue(_hKey, 0, name, &size, NULL, NULL, NULL, NULL) == ERROR_SUCCESS;
+#endif
+}
+
+
+WinRegistryKey::Type WinRegistryKey::type(const std::string& name)
+{
+	open();
+	DWORD type = REG_NONE;
+	DWORD size;
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS)
+		throw NotFoundException(key(name));
+#else
+	if (RegQueryValueEx(_hKey, name.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS)
+		throw NotFoundException(key(name));
+#endif
+	if (type != REG_SZ && type != REG_EXPAND_SZ && type != REG_DWORD)
+		throw NotFoundException(key(name)+": type not supported");
+
+	Type aType = (Type)type;
+	return aType;
 }
 
 
 bool WinRegistryKey::exists(const std::string& name)
 {
 	open();
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(name, uname);
+	return RegQueryValueExW(_hKey, uname.c_str(), NULL, NULL, NULL, NULL) == ERROR_SUCCESS;
+#else
 	return RegQueryValueEx(_hKey, name.c_str(), NULL, NULL, NULL, NULL) == ERROR_SUCCESS;
+#endif
 }
 
 
@@ -190,8 +317,15 @@ void WinRegistryKey::open()
 {
 	if (!_hKey)
 	{
+#if defined(POCO_WIN32_UTF8)
+		std::wstring usubKey;
+		Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
+		if (RegCreateKeyEx(_hRootKey, usubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE, NULL, &_hKey, NULL) != ERROR_SUCCESS)
+			throw SystemException("Cannot open registry key: ", key());
+#else
 		if (RegCreateKeyEx(_hRootKey, _subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE, NULL, &_hKey, NULL) != ERROR_SUCCESS)
 			throw SystemException("Cannot open registry key: ", key());
+#endif
 	}
 }
 
@@ -267,4 +401,83 @@ void WinRegistryKey::handleSetError(const std::string& name)
 }
 
 
-Util_END
+void WinRegistryKey::subKeys(WinRegistryKey::Keys& keys)
+{
+	open();
+
+	DWORD subKeyCount = 0;
+	DWORD valueCount = 0;
+	
+	if (RegQueryInfoKey(_hKey, NULL, NULL, NULL, &subKeyCount, NULL, NULL, &valueCount, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
+		return;
+
+#if defined(POCO_WIN32_UTF8)
+	wchar_t buf[256];
+	DWORD bufSize = sizeof(buf)/sizeof(wchar_t);
+	for (DWORD i = 0; i< subKeyCount; ++i)
+	{
+		if (RegEnumKeyExW(_hKey, i, buf, &bufSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
+		{
+			std::wstring uname(buf);
+			std::string name;
+			Poco::UnicodeConverter::toUTF8(uname, name);
+			keys.push_back(name);
+		}
+		bufSize = sizeof(buf)/sizeof(wchar_t);
+	}
+#else
+	char buf[256];
+	DWORD bufSize = sizeof(buf);
+	for (DWORD i = 0; i< subKeyCount; ++i)
+	{
+		if (RegEnumKeyEx(_hKey, i, buf, &bufSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
+		{
+			std::string name(buf);
+			keys.push_back(name);
+		}
+		bufSize = sizeof(buf);
+	}
+#endif
+}
+
+
+void WinRegistryKey::values(WinRegistryKey::Values& vals)
+{
+	open();
+
+	DWORD valueCount = 0;
+	
+	if (RegQueryInfoKey(_hKey, NULL, NULL, NULL, NULL, NULL, NULL, &valueCount, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
+		return ;
+
+#if defined(POCO_WIN32_UTF8)
+	wchar_t buf[256];
+	DWORD bufSize = sizeof(buf)/sizeof(wchar_t);
+	for (DWORD i = 0; i< valueCount; ++i)
+	{
+		if (RegEnumValueW(_hKey, i, buf, &bufSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
+		{
+			std::wstring uname(buf);
+			std::string name;
+			Poco::UnicodeConverter::toUTF8(uname, name);
+			vals.push_back(name);
+		}
+		bufSize = sizeof(buf)/sizeof(wchar_t);
+	}
+#else
+	char buf[256];
+	DWORD bufSize = sizeof(buf);
+	for (DWORD i = 0; i< valueCount; ++i)
+	{
+		if (RegEnumValue(_hKey, i, buf, &bufSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
+		{
+			std::string name(buf);
+			vals.push_back(name);
+		}
+		bufSize = sizeof(buf);
+	}
+#endif
+}
+
+
+} } // namespace Poco::Util

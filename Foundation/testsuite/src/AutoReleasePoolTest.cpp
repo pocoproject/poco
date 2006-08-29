@@ -1,7 +1,7 @@
 //
 // AutoReleasePoolTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/AutoReleasePoolTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/AutoReleasePoolTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "AutoReleasePoolTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/AutoReleasePool.h"
+#include "Poco/AutoReleasePool.h"
 
 
-using Foundation::AutoReleasePool;
+using Poco::AutoReleasePool;
 
 
 namespace

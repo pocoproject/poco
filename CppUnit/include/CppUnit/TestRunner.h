@@ -1,7 +1,7 @@
 //
 // TestRunner.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TestRunner.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TestRunner.h#1 $
 //
 
 
@@ -9,20 +9,12 @@
 #define CppUnit_TestRunner_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef STD_VECTOR_INCLUDED
 #include <vector>
-#define STD_VECTOR_INCLUDED
-#endif
-#ifndef STD_STRING_INCLUDED
 #include <string>
-#define STD_STRING_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class Test;
@@ -65,7 +57,7 @@ private:
 };
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #define CppUnitMain(testCase) \

@@ -1,7 +1,7 @@
 //
 // MulticastEchoServer.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MulticastEchoServer.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MulticastEchoServer.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,15 +31,15 @@
 
 
 #include "MulticastEchoServer.h"
-#include "Foundation/Timespan.h"
+#include "Poco/Timespan.h"
 #include <iostream>
 
 
-using Net::Socket;
-using Net::DatagramSocket;
-using Net::SocketAddress;
-using Net::IPAddress;
-using Net::NetworkInterface;
+using Poco::Net::Socket;
+using Poco::Net::DatagramSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::IPAddress;
+using Poco::Net::NetworkInterface;
 
 
 MulticastEchoServer::MulticastEchoServer():
@@ -63,7 +63,7 @@ MulticastEchoServer::~MulticastEchoServer()
 }
 
 
-Foundation::UInt16 MulticastEchoServer::port() const
+Poco::UInt16 MulticastEchoServer::port() const
 {
 	return _socket.address().port();
 }
@@ -72,7 +72,7 @@ Foundation::UInt16 MulticastEchoServer::port() const
 void MulticastEchoServer::run()
 {
 	_ready.set();
-	Foundation::Timespan span(250000);
+	Poco::Timespan span(250000);
 	while (!_stop)
 	{
 		if (_socket.poll(span, Socket::SELECT_READ))
@@ -84,7 +84,7 @@ void MulticastEchoServer::run()
 				int n = _socket.receiveFrom(buffer, sizeof(buffer), sender);
 				_socket.sendTo(buffer, n, sender);
 			}
-			catch (Foundation::Exception& exc)
+			catch (Poco::Exception& exc)
 			{
 				std::cerr << "MulticastEchoServer: " << exc.displayText() << std::endl;
 			}
@@ -105,7 +105,7 @@ const NetworkInterface& MulticastEchoServer::interface() const
 }
 
 
-Net::NetworkInterface MulticastEchoServer::findInterface()
+Poco::Net::NetworkInterface MulticastEchoServer::findInterface()
 {
 	NetworkInterface::NetworkInterfaceList ifs = NetworkInterface::list();
 	for (NetworkInterface::NetworkInterfaceList::const_iterator it = ifs.begin(); it != ifs.end(); ++it)

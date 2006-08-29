@@ -1,7 +1,7 @@
 //
 // TestRunnerDlg.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/src/TestRunnerDlg.cpp#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/src/TestRunnerDlg.cpp#1 $
 //
 
 
@@ -17,7 +17,7 @@
 #include "TestRunnerDlg.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 TestRunnerDlg::TestRunnerDlg(CWnd* pParent): CDialog(TestRunnerDlg::IDD, pParent)
@@ -421,4 +421,4 @@ void TestRunnerDlg::addTest(Test* pTest, int level)
 }
 
 
-CppUnit_END
+} // namespace CppUnit

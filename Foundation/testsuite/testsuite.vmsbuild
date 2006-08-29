@@ -1,7 +1,7 @@
 #
 # buildfiles.vms
 #
-# $Id: //poco/1.1.0/Foundation/testsuite/testsuite.vmsbuild#1 $
+# $Id: //poco/1.2/Foundation/testsuite/testsuite.vmsbuild#1 $
 #
 EXE=TestRunner
 ActiveMethodTest
@@ -33,6 +33,7 @@ GlobTest
 FilesystemTestSuite
 FoundationTestSuite
 HMACEngineTest
+HashTest
 HexBinaryTest
 LoggerTest
 LoggingFactoryTest

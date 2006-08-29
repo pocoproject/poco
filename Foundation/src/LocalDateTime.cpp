@@ -1,7 +1,7 @@
 //
 // LocalDateTime.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/LocalDateTime.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/LocalDateTime.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/LocalDateTime.h"
-#include "Foundation/Timezone.h"
-#include "Foundation/Timespan.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/Timezone.h"
+#include "Poco/Timespan.h"
 #include <algorithm>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 LocalDateTime::LocalDateTime():
@@ -184,8 +184,6 @@ DateTime LocalDateTime::utc() const
 
 bool LocalDateTime::operator == (const LocalDateTime& dateTime) const
 {
-	Timestamp::UtcTimeVal t1 = utcTime();
-	Timestamp::UtcTimeVal t2 = dateTime.utcTime();
 	return utcTime() == dateTime.utcTime();
 }
 
@@ -252,4 +250,4 @@ LocalDateTime& LocalDateTime::operator -= (const Timespan& span)
 }
 
 
-Foundation_END
+} // namespace Poco

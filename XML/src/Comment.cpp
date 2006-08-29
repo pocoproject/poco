@@ -1,7 +1,7 @@
 //
 // Comment.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Comment.cpp#2 $
+// $Id: //poco/1.2/XML/src/Comment.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/Comment.h"
+#include "Poco/DOM/Comment.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString Comment::NODE_NAME = toXMLString("#comment");
@@ -78,4 +79,4 @@ Node* Comment::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-XML_END
+} } // namespace Poco::XML

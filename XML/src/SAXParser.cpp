@@ -1,7 +1,7 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/1.1.0/XML/src/SAXParser.cpp#2 $
+// $Id: //poco/1.2/XML/src/SAXParser.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,15 +34,16 @@
 //
 
 
-#include "SAX/SAXParser.h"
-#include "SAX/SAXException.h"
-#include "SAX/EntityResolverImpl.h"
-#include "SAX/InputSource.h"
-#include "XML/NamespaceStrategy.h"
+#include "Poco/SAX/SAXParser.h"
+#include "Poco/SAX/SAXException.h"
+#include "Poco/SAX/EntityResolverImpl.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/XML/NamespaceStrategy.h"
 #include <sstream>
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 SAXParser::SAXParser():
@@ -77,7 +78,7 @@ const XMLString& SAXParser::getEncoding() const
 }
 
 
-void SAXParser::addEncoding(const XMLString& name, Foundation::TextEncoding* pEncoding)
+void SAXParser::addEncoding(const XMLString& name, Poco::TextEncoding* pEncoding)
 {
 	_engine.addEncoding(name, pEncoding);
 }
@@ -244,4 +245,4 @@ void SAXParser::setupParse()
 }
 
 
-XML_END
+} } // namespace Poco::XML

@@ -1,7 +1,7 @@
 //
 // EventListener.cpp
 //
-// $Id: //poco/1.1.0/XML/src/EventListener.cpp#2 $
+// $Id: //poco/1.2/XML/src/EventListener.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/EventListener.h"
+#include "Poco/DOM/EventListener.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 EventListener::~EventListener()
@@ -45,4 +46,4 @@ EventListener::~EventListener()
 }
 
 
-XML_END
+} } // namespace Poco::XML

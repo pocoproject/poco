@@ -1,14 +1,14 @@
 //
 // TestResult.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/src/TestResult.cpp#1 $
+// $Id: //poco/1.2/CppUnit/src/TestResult.cpp#1 $
 //
 
 
 #include "CppUnit/TestResult.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 // Destroys a test result
@@ -26,4 +26,4 @@ TestResult::~TestResult()
 }
 
 
-CppUnit_END
+} // namespace CppUnit

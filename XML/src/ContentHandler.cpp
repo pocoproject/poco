@@ -1,7 +1,7 @@
 //
 // ContentHandler.cpp
 //
-// $Id: //poco/1.1.0/XML/src/ContentHandler.cpp#2 $
+// $Id: //poco/1.2/XML/src/ContentHandler.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/ContentHandler.h"
+#include "Poco/SAX/ContentHandler.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 ContentHandler::~ContentHandler()
@@ -45,4 +46,4 @@ ContentHandler::~ContentHandler()
 }
 
 
-XML_END
+} } // namespace Poco::XML

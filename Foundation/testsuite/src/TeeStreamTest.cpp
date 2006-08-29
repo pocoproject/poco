@@ -1,7 +1,7 @@
 //
 // TeeStreamTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TeeStreamTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TeeStreamTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "TeeStreamTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/TeeStream.h"
+#include "Poco/TeeStream.h"
 #include <sstream>
 
 
-using Foundation::TeeInputStream;
-using Foundation::TeeOutputStream;
+using Poco::TeeInputStream;
+using Poco::TeeOutputStream;
 
 
 TeeStreamTest::TeeStreamTest(const std::string& name): CppUnit::TestCase(name)

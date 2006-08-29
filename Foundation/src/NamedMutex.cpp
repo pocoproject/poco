@@ -1,7 +1,7 @@
 //
 // NamedMutex.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedMutex.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedMutex.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/NamedMutex.h"
+#include "Poco/NamedMutex.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
@@ -48,7 +48,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NamedMutex::NamedMutex(const std::string& name):
@@ -62,4 +62,4 @@ NamedMutex::~NamedMutex()
 }
 
 
-Foundation_END
+} // namespace Poco

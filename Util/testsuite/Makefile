@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Util/testsuite/Makefile#1 $
+# $Id: //poco/1.2/Util/testsuite/Makefile#1 $
 #
 # Makefile for Poco Util testsuite
 #
@@ -15,10 +15,10 @@ objects = AbstractConfigurationTest ConfigurationTestSuite \
 	OptionProcessorTest OptionSetTest OptionTest \
 	OptionsTestSuite PropertyFileConfigurationTest \
 	SystemConfigurationTest UtilTestSuite XMLConfigurationTest \
-	FilesystemConfigurationTest
+	FilesystemConfigurationTest ValidatorTest
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoUtil PocoFoundation PocoXML CppUnit
+target_libs    = PocoUtil PocoXML PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec

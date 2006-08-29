@@ -1,7 +1,7 @@
 //
 // EchoServer.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/EchoServer.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/EchoServer.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,15 +31,15 @@
 
 
 #include "EchoServer.h"
-#include "Net/StreamSocket.h"
-#include "Net/SocketAddress.h"
-#include "Foundation/Timespan.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Timespan.h"
 #include <iostream>
 
 
-using Net::Socket;
-using Net::StreamSocket;
-using Net::SocketAddress;
+using Poco::Net::Socket;
+using Poco::Net::StreamSocket;
+using Poco::Net::SocketAddress;
 
 
 EchoServer::EchoServer():
@@ -59,7 +59,7 @@ EchoServer::~EchoServer()
 }
 
 
-Foundation::UInt16 EchoServer::port() const
+Poco::UInt16 EchoServer::port() const
 {
 	return _socket.address().port();
 }
@@ -68,7 +68,7 @@ Foundation::UInt16 EchoServer::port() const
 void EchoServer::run()
 {
 	_ready.set();
-	Foundation::Timespan span(250000);
+	Poco::Timespan span(250000);
 	while (!_stop)
 	{
 		if (_socket.poll(span, Socket::SELECT_READ))
@@ -84,7 +84,7 @@ void EchoServer::run()
 					n = ss.receiveBytes(buffer, sizeof(buffer));
 				}
 			}
-			catch (Foundation::Exception& exc)
+			catch (Poco::Exception& exc)
 			{
 				std::cerr << "EchoServer: " << exc.displayText() << std::endl;
 			}

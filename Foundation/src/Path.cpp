@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Path.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Path.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Path.h"
-#include "Foundation/File.h"
-#include "Foundation/Exception.h"
-#include "Foundation/StringTokenizer.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
+#include "Poco/Exception.h"
+#include "Poco/StringTokenizer.h"
 #include <algorithm>
 
 
@@ -52,7 +52,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Path::Path(): _absolute(false)
@@ -984,4 +984,4 @@ std::string Path::buildVMS() const
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // TestSuite.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TestSuite.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TestSuite.h#1 $
 //
 
 
@@ -9,26 +9,14 @@
 #define CppUnit_TestSuite_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_Guards_INCLUDED
 #include "CppUnit/Guards.h"
-#endif
-#ifndef CppUnit_Test_INCLUDED
 #include "CppUnit/Test.h"
-#endif
-#ifndef STD_VECTOR_INCLUDED
 #include <vector>
-#define STD_VECTOR_INCLUDED
-#endif
-#ifndef STD_STRING_INCLUDED
 #include <string>
-#define STD_STRING_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class TestResult;
@@ -104,7 +92,7 @@ inline const std::vector<Test*> TestSuite::tests() const
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_TestSuite_INCLUDED

@@ -1,7 +1,7 @@
 //
 // URITestSuite.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/URITestSuite.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/URITestSuite.h#1 $
 //
 // Definition of the URITestSuite class.
 //
@@ -36,9 +36,7 @@
 #define URITestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class URITestSuite

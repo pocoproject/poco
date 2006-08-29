@@ -1,7 +1,7 @@
 //
 // AnyTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/AnyTest.cpp#5 $
+// $Id: //poco/1.2/Foundation/testsuite/src/AnyTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,17 +31,16 @@
 
 
 #include "AnyTest.h"
-
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-
-#include "Foundation/Exception.h"
-#include "Foundation/Any.h"
-#include "Foundation/Bugcheck.h"
-
+#include "Poco/Exception.h"
+#include "Poco/Any.h"
+#include "Poco/Bugcheck.h"
 #include <vector>
-using namespace std;
-using namespace Foundation;
+
+
+using namespace Poco;
+
 
 class SomeClass
 {
@@ -107,15 +106,15 @@ void AnyTest::testComplexType()
 
 void AnyTest::testVector()
 {
-	vector < int > tmp;
+	std::vector < int > tmp;
 	tmp.push_back( 1 );
 	tmp.push_back( 2 );
 	tmp.push_back( 3 );
 	Any a = tmp;
-	poco_assert (a.type() == typeid(vector < int >) );
-	vector < int > tmp2 = AnyCast < vector < int > >(a);
-	const vector < int >& vecCRef = RefAnyCast < vector < int > >(a);
-	vector < int >& vecRef = RefAnyCast < vector < int > >(a);
+	poco_assert (a.type() == typeid(std::vector < int >) );
+	std::vector < int > tmp2 = AnyCast < std::vector < int > >(a);
+	const std::vector < int >& vecCRef = RefAnyCast < std::vector < int > >(a);
+	std::vector < int >& vecRef = RefAnyCast < std::vector < int > >(a);
 	vecRef[0] = 0;
 	poco_assert( vecRef[0] == vecCRef[0] );
 }

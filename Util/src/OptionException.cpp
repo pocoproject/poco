@@ -1,7 +1,7 @@
 //
 // OptionException.cpp
 //
-// $Id: //poco/1.1.0/Util/src/OptionException.cpp#2 $
+// $Id: //poco/1.2/Util/src/OptionException.cpp#1 $
 //
 // Library: Util
 // Package: Options
@@ -34,21 +34,24 @@
 //
 
 
-#include "Util/OptionException.h"
+#include "Poco/Util/OptionException.h"
 #include <typeinfo>
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
-POCO_IMPLEMENT_EXCEPTION(OptionException, Foundation::DataException, "Option exception")
+POCO_IMPLEMENT_EXCEPTION(OptionException, Poco::DataException, "Option exception")
 POCO_IMPLEMENT_EXCEPTION(UnknownOptionException, OptionException, "Unknown option specified")
 POCO_IMPLEMENT_EXCEPTION(AmbiguousOptionException, OptionException, "Ambiguous option specified")
+POCO_IMPLEMENT_EXCEPTION(MissingOptionException, OptionException, "Required option not specified")
 POCO_IMPLEMENT_EXCEPTION(MissingArgumentException, OptionException, "Missing option argument")
+POCO_IMPLEMENT_EXCEPTION(InvalidArgumentException, OptionException, "Invalid option argument")
 POCO_IMPLEMENT_EXCEPTION(UnexpectedArgumentException, OptionException, "Unexpected option argument")
 POCO_IMPLEMENT_EXCEPTION(IncompatibleOptionsException, OptionException, "Incompatible options")
 POCO_IMPLEMENT_EXCEPTION(DuplicateOptionException, OptionException, "Option must not be given more than once")
 POCO_IMPLEMENT_EXCEPTION(EmptyOptionException, OptionException, "Empty option specified")
 
 
-Util_END
+} } // namespace Poco::Util

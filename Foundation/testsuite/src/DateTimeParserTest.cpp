@@ -1,7 +1,7 @@
 //
 // DateTimeParserTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/DateTimeParserTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/DateTimeParserTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,18 +33,18 @@
 #include "DateTimeParserTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/DateTimeParser.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/Exception.h"
+#include "Poco/DateTimeParser.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTime.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::DateTime;
-using Foundation::DateTimeFormat;
-using Foundation::DateTimeParser;
-using Foundation::Timestamp;
-using Foundation::SyntaxException;
+using Poco::DateTime;
+using Poco::DateTimeFormat;
+using Poco::DateTimeParser;
+using Poco::Timestamp;
+using Poco::SyntaxException;
 
 
 DateTimeParserTest::DateTimeParserTest(const std::string& name): CppUnit::TestCase(name)

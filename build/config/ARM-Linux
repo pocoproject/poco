@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/config/ARM-Linux#1 $
+# $Id: //poco/1.2/build/config/ARM-Linux#1 $
 #
 # ARM-Linux
 #
@@ -22,10 +22,10 @@ OPENSSL_LIB        = /usr/local/arm/2.95.3/lib
 #
 CC      = arm-linux-gcc
 CXX     = arm-linux-g++
-LINK    = arm-linux-g++
+LINK    = $(CXX)
 LIB     = arm-linux-ar -cr
 RANLIB  = arm-linux-ranlib
-SHLIB   = arm-linux-g++ -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
+SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
@@ -67,7 +67,7 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -I$(STLPORT_INCLUDE) -I$(OPENSSL_INCLUDE) -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -D_REENTRANT -D_THREAD_SAFE
+SYSFLAGS = -I$(STLPORT_INCLUDE) -I$(OPENSSL_INCLUDE) -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -D_REENTRANT -D_THREAD_SAFE -DPOCO_NO_FPENVIRONMENT
 
 #
 # System Specific Libraries

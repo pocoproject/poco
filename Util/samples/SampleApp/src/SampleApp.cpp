@@ -1,7 +1,7 @@
 //
 // SampleApp.cpp
 //
-// $Id: //poco/1.1.0/Util/samples/SampleApp/src/SampleApp.cpp#2 $
+// $Id: //poco/1.2/Util/samples/SampleApp/src/SampleApp.cpp#1 $
 //
 // This sample demonstrates the Application class.
 //
@@ -32,21 +32,22 @@
 //
 
 
-#include "Util/Application.h"
-#include "Util/Option.h"
-#include "Util/OptionSet.h"
-#include "Util/HelpFormatter.h"
-#include "Util/AbstractConfiguration.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/Util/Application.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/HelpFormatter.h"
+#include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/AutoPtr.h"
 #include <iostream>
 
 
-using Util::Application;
-using Util::Option;
-using Util::OptionSet;
-using Util::HelpFormatter;
-using Util::AbstractConfiguration;
-using Foundation::AutoPtr;
+using Poco::Util::Application;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::HelpFormatter;
+using Poco::Util::AbstractConfiguration;
+using Poco::Util::OptionCallback;
+using Poco::AutoPtr;
 
 
 class SampleApp: public Application
@@ -88,39 +89,54 @@ protected:
 		options.addOption(
 			Option("help", "h", "display help information on command line arguments")
 				.required(false)
-				.repeatable(false));
+				.repeatable(false)
+				.callback(OptionCallback<SampleApp>(this, &SampleApp::handleHelp)));
 
 		options.addOption(
 			Option("define", "D", "define a configuration property")
 				.required(false)
 				.repeatable(true)
-				.argument("name=value"));
+				.argument("name=value")
+				.callback(OptionCallback<SampleApp>(this, &SampleApp::handleDefine)));
 				
 		options.addOption(
 			Option("config-file", "f", "load configuration data from a file")
 				.required(false)
 				.repeatable(true)
-				.argument("file"));
-	}
-	
-	void handleOption(const std::string& name, const std::string& value)
-	{
-		Application::handleOption(name, value);
+				.argument("file")
+				.callback(OptionCallback<SampleApp>(this, &SampleApp::handleConfig)));
 
-		if (name == "help")
-			_helpRequested = true;
-		else if (name == "define")
-			defineProperty(value);
-		else if (name == "config-file")
-			loadConfiguration(value);
+		options.addOption(
+			Option("bind", "b", "bind option value to test.property")
+				.required(false)
+				.repeatable(false)
+				.argument("value")
+				.binding("test.property"));
 	}
 	
+	void handleHelp(const std::string& name, const std::string& value)
+	{
+		_helpRequested = true;
+		displayHelp();
+		stopOptionsProcessing();
+	}
+	
+	void handleDefine(const std::string& name, const std::string& value)
+	{
+		defineProperty(value);
+	}
+	
+	void handleConfig(const std::string& name, const std::string& value)
+	{
+		loadConfiguration(value);
+	}
+		
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
 		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("A sample application that demonstrates some of the features of the Util::Application class.");
+		helpFormatter.setHeader("A sample application that demonstrates some of the features of the Poco::Util::Application class.");
 		helpFormatter.format(std::cout);
 	}
 	
@@ -140,11 +156,7 @@ protected:
 
 	int main(const std::vector<std::string>& args)
 	{
-		if (_helpRequested)
-		{
-			displayHelp();
-		}
-		else
+		if (!_helpRequested)
 		{
 			logger().information("Arguments to main():");
 			for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
@@ -154,7 +166,6 @@ protected:
 			logger().information("Application properties:");
 			printProperties("");
 		}
-		
 		return Application::EXIT_OK;
 	}
 	
@@ -184,23 +195,10 @@ protected:
 			}
 		}
 	}
-
+	
 private:
 	bool _helpRequested;
 };
 
 
-int main(int argc, char** argv)
-{
-	AutoPtr<SampleApp> pApp = new SampleApp;
-	try
-	{
-		pApp->init(argc, argv);
-	}
-	catch (Foundation::Exception& exc)
-	{
-		pApp->logger().log(exc);
-		return Application::EXIT_CONFIG;
-	}
-	return pApp->run();
-}
+POCO_APP_MAIN(SampleApp)

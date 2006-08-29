@@ -1,7 +1,7 @@
 //
 // DialogServer.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/DialogServer.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/DialogServer.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,17 +31,17 @@
 
 
 #include "DialogServer.h"
-#include "Net/DialogSocket.h"
-#include "Net/SocketAddress.h"
-#include "Foundation/Timespan.h"
+#include "Poco/Net/DialogSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Timespan.h"
 #include <iostream>
 
 
-using Net::Socket;
-using Net::DialogSocket;
-using Net::SocketAddress;
-using Foundation::FastMutex;
-using Foundation::Thread;
+using Poco::Net::Socket;
+using Poco::Net::DialogSocket;
+using Poco::Net::SocketAddress;
+using Poco::FastMutex;
+using Poco::Thread;
 
 
 DialogServer::DialogServer(bool acceptCommands):
@@ -63,7 +63,7 @@ DialogServer::~DialogServer()
 }
 
 
-Foundation::UInt16 DialogServer::port() const
+Poco::UInt16 DialogServer::port() const
 {
 	return _socket.address().port();
 }
@@ -72,7 +72,7 @@ Foundation::UInt16 DialogServer::port() const
 void DialogServer::run()
 {
 	_ready.set();
-	Foundation::Timespan span(250000);
+	Poco::Timespan span(250000);
 	while (!_stop)
 	{
 		if (_socket.poll(span, Socket::SELECT_READ))
@@ -106,7 +106,7 @@ void DialogServer::run()
 						}
 					}
 				}
-				catch (Foundation::Exception& exc)
+				catch (Poco::Exception& exc)
 				{
 					std::cerr << "DialogServer: " << exc.displayText() << std::endl;
 				}

@@ -1,7 +1,7 @@
 //
 // StreamTokenizer.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/StreamTokenizer.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/StreamTokenizer.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/StreamTokenizer.h"
+#include "Poco/StreamTokenizer.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 StreamTokenizer::StreamTokenizer():
@@ -124,4 +124,4 @@ const Token* StreamTokenizer::next()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // StringTokenizerTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/StringTokenizerTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/StringTokenizerTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "StringTokenizerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/StringTokenizer.h"
+#include "Poco/StringTokenizer.h"
 
 
-using Foundation::StringTokenizer;
+using Poco::StringTokenizer;
 
 
 StringTokenizerTest::StringTokenizerTest(const std::string& name): CppUnit::TestCase(name)

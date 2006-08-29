@@ -1,7 +1,7 @@
 //
 // LocatorImpl.cpp
 //
-// $Id: //poco/1.1.0/XML/src/LocatorImpl.cpp#2 $
+// $Id: //poco/1.2/XML/src/LocatorImpl.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/LocatorImpl.h"
+#include "Poco/SAX/LocatorImpl.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 LocatorImpl::LocatorImpl()
@@ -122,4 +123,4 @@ void LocatorImpl::setColumnNumber(int columnNumber)
 }
 
 
-XML_END
+} } // namespace Poco::XML

@@ -1,7 +1,7 @@
 //
 // FilePartSource.cpp
 //
-// $Id: //poco/1.1.0/Net/src/FilePartSource.cpp#2 $
+// $Id: //poco/1.2/Net/src/FilePartSource.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,16 +34,17 @@
 //
 
 
-#include "Net/FilePartSource.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/FilePartSource.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::Path;
-using Foundation::OpenFileException;
+using Poco::Path;
+using Poco::OpenFileException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 FilePartSource::FilePartSource(const std::string& path):
@@ -84,4 +85,4 @@ const std::string& FilePartSource::filename()
 }
 
 
-Net_END
+} } // namespace Poco::Net

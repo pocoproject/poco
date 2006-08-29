@@ -1,7 +1,7 @@
 //
 // ChildNodesTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/ChildNodesTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/ChildNodesTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "ChildNodesTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "DOM/Document.h"
-#include "DOM/Element.h"
-#include "DOM/NodeList.h"
-#include "DOM/AutoPtr.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/NodeList.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
-using XML::Element;
-using XML::Document;
-using XML::NodeList;
-using XML::Node;
-using XML::AutoPtr;
+using Poco::XML::Element;
+using Poco::XML::Document;
+using Poco::XML::NodeList;
+using Poco::XML::Node;
+using Poco::XML::AutoPtr;
 
 
 ChildNodesTest::ChildNodesTest(const std::string& name): CppUnit::TestCase(name)

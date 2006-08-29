@@ -1,7 +1,7 @@
 //
 // NotificationCenterTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NotificationCenterTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NotificationCenterTest.h#1 $
 //
 // Definition of the NotificationCenterTest class.
 //
@@ -36,19 +36,10 @@
 #define NotificationCenterTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
-#ifndef Foundation_Notification_INCLUDED
-#include "Foundation/Notification.h"
-#endif
-#ifndef STD_SET_INCLUDED
+#include "Poco/Notification.h"
 #include <set>
-#define STD_SET_INCLUDED
-#endif
 
 
 class TestNotification;
@@ -73,9 +64,9 @@ public:
 	static CppUnit::Test* suite();
 
 protected:
-	void handle1(Foundation::Notification* pNf);
-	void handle2(Foundation::Notification* pNf);
-	void handle3(Foundation::Notification* pNf);
+	void handle1(Poco::Notification* pNf);
+	void handle2(Poco::Notification* pNf);
+	void handle3(Poco::Notification* pNf);
 	void handleTest(TestNotification* pNf);
 	
 private:

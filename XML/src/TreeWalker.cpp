@@ -1,7 +1,7 @@
 //
 // TreeWalker.cpp
 //
-// $Id: //poco/1.1.0/XML/src/TreeWalker.cpp#2 $
+// $Id: //poco/1.2/XML/src/TreeWalker.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,12 +34,13 @@
 //
 
 
-#include "DOM/TreeWalker.h"
-#include "DOM/Node.h"
-#include "DOM/NodeFilter.h"
+#include "Poco/DOM/TreeWalker.h"
+#include "Poco/DOM/Node.h"
+#include "Poco/DOM/NodeFilter.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 TreeWalker::TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter):
@@ -245,4 +246,4 @@ Node* TreeWalker::previous(Node* pNode) const
 }
 
 
-XML_END
+} } // namespace Poco::XML

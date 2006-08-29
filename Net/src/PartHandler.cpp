@@ -1,7 +1,7 @@
 //
 // PartHandler.cpp
 //
-// $Id: //poco/1.1.0/Net/src/PartHandler.cpp#2 $
+// $Id: //poco/1.2/Net/src/PartHandler.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/PartHandler.h"
+#include "Poco/Net/PartHandler.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 PartHandler::PartHandler()
@@ -50,4 +51,4 @@ PartHandler::~PartHandler()
 }
 
 
-Net_END
+} } // namespace Poco::Net

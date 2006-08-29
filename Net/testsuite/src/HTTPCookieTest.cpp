@@ -1,7 +1,7 @@
 //
 // HTTPCookieTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPCookieTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPCookieTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "HTTPCookieTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/HTTPCookie.h"
+#include "Poco/Net/HTTPCookie.h"
 
 
-using Net::HTTPCookie;
+using Poco::Net::HTTPCookie;
 
 
 HTTPCookieTest::HTTPCookieTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // RefCountedObject.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/RefCountedObject.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/RefCountedObject.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/RefCountedObject.h"
+#include "Poco/RefCountedObject.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 RefCountedObject::RefCountedObject(): _rc(1)
@@ -67,4 +67,4 @@ void RefCountedObject::release() const
 }
 
 
-Foundation_END
+} // namespace Poco

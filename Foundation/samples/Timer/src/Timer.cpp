@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/Timer/src/Timer.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/Timer/src/Timer.cpp#1 $
 //
 // This sample demonstrates the Timer and Stopwatch classes.
 //
@@ -32,16 +32,16 @@
 //
 
 
-#include "Foundation/Timer.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Stopwatch.h"
+#include "Poco/Timer.h"
+#include "Poco/Thread.h"
+#include "Poco/Stopwatch.h"
 #include <iostream>
 
 
-using Foundation::Timer;
-using Foundation::TimerCallback;
-using Foundation::Thread;
-using Foundation::Stopwatch;
+using Poco::Timer;
+using Poco::TimerCallback;
+using Poco::Thread;
+using Poco::Stopwatch;
 
 
 class TimerExample

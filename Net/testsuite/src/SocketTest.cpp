@@ -1,7 +1,7 @@
 //
 // SocketTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/SocketTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/SocketTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,24 +34,24 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "EchoServer.h"
-#include "Net/StreamSocket.h"
-#include "Net/ServerSocket.h"
-#include "Net/SocketAddress.h"
-#include "Net/NetException.h"
-#include "Foundation/Timespan.h"
-#include "Foundation/Stopwatch.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Timespan.h"
+#include "Poco/Stopwatch.h"
 #include <iostream>
 
 
-using Net::Socket;
-using Net::StreamSocket;
-using Net::ServerSocket;
-using Net::SocketAddress;
-using Net::ConnectionRefusedException;
-using Foundation::Timespan;
-using Foundation::Stopwatch;
-using Foundation::TimeoutException;
-using Foundation::InvalidArgumentException;
+using Poco::Net::Socket;
+using Poco::Net::StreamSocket;
+using Poco::Net::ServerSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::ConnectionRefusedException;
+using Poco::Timespan;
+using Poco::Stopwatch;
+using Poco::TimeoutException;
+using Poco::InvalidArgumentException;
 
 
 SocketTest::SocketTest(const std::string& name): CppUnit::TestCase(name)
@@ -138,7 +138,7 @@ void SocketTest::testConnectRefused()
 	ServerSocket serv;
 	serv.bind(SocketAddress());
 	serv.listen();
-	Foundation::UInt16 port = serv.address().port();
+	Poco::UInt16 port = serv.address().port();
 	serv.close();
 	StreamSocket ss;
 	Timespan timeout(250000);
@@ -158,7 +158,7 @@ void SocketTest::testConnectRefusedNB()
 	ServerSocket serv;
 	serv.bind(SocketAddress());
 	serv.listen();
-	Foundation::UInt16 port = serv.address().port();
+	Poco::UInt16 port = serv.address().port();
 	serv.close();
 	StreamSocket ss;
 	Timespan timeout(10000);

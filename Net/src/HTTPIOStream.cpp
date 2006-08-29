@@ -34,14 +34,15 @@
 //
 
 
-#include "Net/HTTPIOStream.h"
-#include "Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPIOStream.h"
+#include "Poco/Net/HTTPClientSession.h"
 
 
-using Foundation::UnbufferedStreamBuf;
+using Poco::UnbufferedStreamBuf;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPResponseStreamBuf::HTTPResponseStreamBuf(std::istream& istr):
@@ -81,4 +82,4 @@ HTTPResponseStream::~HTTPResponseStream()
 }
 
 
-Net_END
+} } // namespace Poco::Net

@@ -1,12 +1,14 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Net/samples/Makefile#1 $
+# $Id: //poco/1.2/Net/samples/Makefile#1 $
 #
 # Makefile for Poco Net Samples
 #
 
-.DEFAULT all:
+.PHONY: projects
+clean all: projects
+projects:
 	$(MAKE) -C dict $(MAKECMDGOALS)
 	$(MAKE) -C TimeServer $(MAKECMDGOALS)
 	$(MAKE) -C httpget $(MAKECMDGOALS)

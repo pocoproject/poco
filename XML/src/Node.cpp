@@ -1,7 +1,7 @@
 //
 // Node.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Node.cpp#2 $
+// $Id: //poco/1.2/XML/src/Node.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/Node.h"
+#include "Poco/DOM/Node.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 Node::~Node()
@@ -45,4 +46,4 @@ Node::~Node()
 }
 
 
-XML_END
+} } // namespace Poco::XML

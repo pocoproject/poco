@@ -1,7 +1,7 @@
 //
 // RepeatedTest.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/RepeatedTest.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/RepeatedTest.h#1 $
 //
 
 
@@ -9,18 +9,12 @@
 #define CppUnit_RepeatedTest_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_Guards_INCLUDED
 #include "CppUnit/Guards.h"
-#endif
-#ifndef CppUnit_TestDecorator_INCLUDED
 #include "CppUnit/TestDecorator.h"
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class Test;
@@ -53,14 +47,14 @@ private:
 // Counts the number of test cases that will be run by this test.
 inline RepeatedTest::countTestCases ()
 {
-	return TestDecorator::countTestCases () * _timesRepeat;
+	return TestDecorator::countTestCases() * _timesRepeat;
 }
 
 
 // Returns the name of the test instance.
 inline std::string RepeatedTest::toString()
 {
-	return TestDecorator::toString () + " (repeated)";
+	return TestDecorator::toString() + " (repeated)";
 }
 
 
@@ -77,7 +71,7 @@ inline void RepeatedTest::run(TestResult *result)
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_RepeatedTest_INCLUDED

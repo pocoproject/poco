@@ -1,7 +1,7 @@
 //
 // NamespaceSupport.cpp
 //
-// $Id: //poco/1.1.0/XML/src/NamespaceSupport.cpp#2 $
+// $Id: //poco/1.2/XML/src/NamespaceSupport.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,11 +34,12 @@
 //
 
 
-#include "SAX/NamespaceSupport.h"
-#include "XML/Name.h"
+#include "Poco/SAX/NamespaceSupport.h"
+#include "Poco/XML/Name.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString NamespaceSupport::EMPTY_STRING;
@@ -205,4 +206,4 @@ void NamespaceSupport::reset()
 }
 
 
-XML_END
+} } // namespace Poco::XML

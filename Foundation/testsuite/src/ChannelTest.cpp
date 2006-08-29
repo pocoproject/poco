@@ -1,7 +1,7 @@
 //
 // ChannelTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ChannelTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ChannelTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,26 +33,26 @@
 #include "ChannelTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/SplitterChannel.h"
-#include "Foundation/AsyncChannel.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Message.h"
-#include "Foundation/Formatter.h"
-#include "Foundation/FormattingChannel.h"
-#include "Foundation/ConsoleChannel.h"
-#include "Foundation/StreamChannel.h"
+#include "Poco/SplitterChannel.h"
+#include "Poco/AsyncChannel.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Message.h"
+#include "Poco/Formatter.h"
+#include "Poco/FormattingChannel.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/StreamChannel.h"
 #include "TestChannel.h"
 #include <sstream>
 
 
-using Foundation::SplitterChannel;
-using Foundation::AsyncChannel;
-using Foundation::FormattingChannel;
-using Foundation::ConsoleChannel;
-using Foundation::StreamChannel;
-using Foundation::Formatter;
-using Foundation::Message;
-using Foundation::AutoPtr;
+using Poco::SplitterChannel;
+using Poco::AsyncChannel;
+using Poco::FormattingChannel;
+using Poco::ConsoleChannel;
+using Poco::StreamChannel;
+using Poco::Formatter;
+using Poco::Message;
+using Poco::AutoPtr;
 
 
 class SimpleFormatter: public Formatter

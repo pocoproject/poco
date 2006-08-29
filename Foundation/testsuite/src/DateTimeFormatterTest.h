@@ -1,7 +1,7 @@
 //
 // DateTimeFormatterTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/DateTimeFormatterTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/DateTimeFormatterTest.h#1 $
 //
 // Definition of the DateTimeFormatterTest class.
 //
@@ -36,12 +36,8 @@
 #define DateTimeFormatterTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class DateTimeFormatterTest: public CppUnit::TestCase

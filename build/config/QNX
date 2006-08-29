@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/config/QNX#1 $
+# $Id: //poco/1.2/build/config/QNX#1 $
 #
 # QNX
 #
@@ -17,7 +17,7 @@ LINKMODE = SHARED
 CCVER   = 3.3.1,gcc_ntox86
 CC      = qcc -V$(CCVER)
 CXX     = QCC -V$(CCVER)
-LINK    = QCC -V$(CCVER)
+LINK    = $(CXX) -V$(CCVER)
 LIB     = ar -cr
 RANLIB  = ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@

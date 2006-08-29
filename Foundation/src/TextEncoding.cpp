@@ -1,7 +1,7 @@
 //
 // TextEncoding.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/TextEncoding.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/TextEncoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/TextEncoding.h"
+#include "Poco/TextEncoding.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 TextEncoding::~TextEncoding()
@@ -57,5 +57,5 @@ int TextEncoding::convert(int ch, unsigned char* bytes, int length) const
 }
 
 
-Foundation_END
+} // namespace Poco
 

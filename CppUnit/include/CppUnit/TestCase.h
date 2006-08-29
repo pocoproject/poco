@@ -1,7 +1,7 @@
 //
 // TestCase.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TestCase.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TestCase.h#1 $
 //
 
 
@@ -9,29 +9,15 @@
 #define CppUnit_TestCase_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_Guards_INCLUDED
 #include "CppUnit/Guards.h"
-#endif
-#ifndef CppUnit_Test_INCLUDED
 #include "CppUnit/Test.h"
-#endif
-#ifndef CppUnit_CppUnitException_INCLUDED
 #include "CppUnit/CppUnitException.h"
-#endif
-#ifndef STD_STRING_INCLUDED
 #include <string>
-#define STD_STRING_INCLUDED
-#endif
-#ifndef STD_TYPEINFO_INCLUDED
 #include <typeinfo>
-#define STD_TYPEINFO_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class TestResult;
@@ -123,6 +109,19 @@ protected:
 	                          long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                          const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
+	void loop1assertImplementation(bool condition,
+	                               const std::string& conditionExpression = "",
+	                               long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+                                   long dataLineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+	                               const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
+	void loop2assertImplementation(bool condition,
+	                               const std::string& conditionExpression = "",
+	                               long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+                                   long data1LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+                                   long data2LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+	                               const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+
 	void assertEquals(long expected,
 	                  long actual,
 	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
@@ -150,9 +149,9 @@ protected:
 	std::string notEqualsMessage(const std::string& expected, const std::string& actual);
 
 	void assertNotNull(const void* pointer,
-	                  const std::string& pointerExpression = "",
-	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+	                   const std::string& pointerExpression = "",
+	                   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+	                   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void assertNull(const void* pointer,  
 	                const std::string& pointerExpression = "",
@@ -222,6 +221,12 @@ inline std::string TestCase::toString()
 #define assert(condition) \
 	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
 
+#define loop_1_assert(data1line, condition) \
+	(this->loop1assertImplementation((condition), (#condition), __LINE__, data1line, __FILE__))
+
+#define loop_2_assert(data1line, data2line, condition) \
+	(this->loop2assertImplementation((condition), (#condition), __LINE__, data1line, data2line, __FILE__))
+
 #define assertEqualDelta(expected, actual, delta) \
 	(this->assertEquals((expected), (actual), (delta), __LINE__, __FILE__))
 
@@ -238,7 +243,7 @@ inline std::string TestCase::toString()
 	(this->fail(msg, __LINE__, __FILE__))
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_TestCase_INCLUDED

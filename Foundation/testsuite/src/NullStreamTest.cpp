@@ -1,7 +1,7 @@
 //
 // NullStreamTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NullStreamTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NullStreamTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "NullStreamTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/NullStream.h"
+#include "Poco/NullStream.h"
 
 
-using Foundation::NullInputStream;
-using Foundation::NullOutputStream;
+using Poco::NullInputStream;
+using Poco::NullOutputStream;
 
 
 NullStreamTest::NullStreamTest(const std::string& name): CppUnit::TestCase(name)

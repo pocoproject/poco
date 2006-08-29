@@ -1,7 +1,7 @@
 //
 // CDATASection.cpp
 //
-// $Id: //poco/1.1.0/XML/src/CDATASection.cpp#2 $
+// $Id: //poco/1.2/XML/src/CDATASection.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,12 +34,13 @@
 //
 
 
-#include "DOM/CDATASection.h"
-#include "DOM/Document.h"
-#include "DOM/DOMException.h"
+#include "Poco/DOM/CDATASection.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DOMException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString CDATASection::NODE_NAME = toXMLString("#cdata-section");
@@ -92,4 +93,4 @@ Node* CDATASection::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-XML_END
+} } // namespace Poco::XML

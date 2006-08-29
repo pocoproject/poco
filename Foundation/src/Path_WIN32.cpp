@@ -1,7 +1,7 @@
 //
 // Path_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Path_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Path_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/Path_WIN32.h"
-#include "Foundation/Environment_WIN32.h"
+#include "Poco/Path_WIN32.h"
+#include "Poco/Environment_WIN32.h"
 #include <windows.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::string PathImpl::currentImpl()
@@ -117,4 +117,4 @@ void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 }
 
 
-Foundation_END
+} // namespace Poco

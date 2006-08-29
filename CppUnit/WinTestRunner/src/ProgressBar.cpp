@@ -1,14 +1,14 @@
 //
 // ProgressBar.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/src/ProgressBar.cpp#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/src/ProgressBar.cpp#1 $
 //
 
 
 #include "ProgressBar.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 // Paint the progress bar in response to a paint message
@@ -137,4 +137,4 @@ void ProgressBar::reset ()
 }
 
 
-CppUnit_END
+} // namespace CppUnit

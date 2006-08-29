@@ -1,7 +1,7 @@
 //
 // HTTPStreamFactoryTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPStreamFactoryTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPStreamFactoryTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,20 +33,20 @@
 #include "HTTPStreamFactoryTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/HTTPStreamFactory.h"
-#include "Net/NetException.h"
-#include "Foundation/URI.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/Net/HTTPStreamFactory.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/URI.h"
+#include "Poco/StreamCopier.h"
 #include "HTTPTestServer.h"
 #include <sstream>
 #include <memory>
 
 
-using Net::HTTPStreamFactory;
-using Net::NetException;
-using Net::HTTPException;
-using Foundation::URI;
-using Foundation::StreamCopier;
+using Poco::Net::HTTPStreamFactory;
+using Poco::Net::NetException;
+using Poco::Net::HTTPException;
+using Poco::URI;
+using Poco::StreamCopier;
 
 
 HTTPStreamFactoryTest::HTTPStreamFactoryTest(const std::string& name): CppUnit::TestCase(name)

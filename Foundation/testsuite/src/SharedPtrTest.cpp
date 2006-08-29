@@ -1,7 +1,7 @@
 //
 // SharedPtrTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/SharedPtrTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/SharedPtrTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "SharedPtrTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/SharedPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::SharedPtr;
-using Foundation::NullPointerException;
+using Poco::SharedPtr;
+using Poco::NullPointerException;
 
 
 namespace
@@ -51,7 +51,7 @@ namespace
 			++_count;
 		}
 		
-		~TestObject()
+		virtual ~TestObject()
 		{
 			--_count;
 		}
@@ -72,6 +72,21 @@ namespace
 	};
 	
 	int TestObject::_count = 0;
+
+	class DerivedObject: public TestObject
+	{
+	public:
+		DerivedObject(const std::string& s, int i): TestObject(s), _number(i)
+		{
+		}
+
+		int number() const
+		{
+			return _number;
+		}
+	private:
+		int _number;
+	};
 }
 
 
@@ -162,6 +177,41 @@ void SharedPtrTest::testSharedPtr()
 }
 
 
+void SharedPtrTest::testImplicitCast()
+{
+	{
+		// null assign test
+		SharedPtr < DerivedObject > ptr2;
+		assertNull(ptr2.get());
+		SharedPtr<TestObject> ptr1 = ptr2;
+	}
+	{
+		SharedPtr < DerivedObject > ptr2(new DerivedObject("test", 666));
+		assert (TestObject::count() == 1);
+		SharedPtr<TestObject> ptr1 = ptr2;
+		assert (TestObject::count() == 1);
+	}
+	assert (TestObject::count() == 0);
+	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
+	assert (TestObject::count() == 1);
+	ptr1 = 0;
+	assert (TestObject::count() == 0);
+}
+
+void SharedPtrTest::testExplicitCast()
+{
+	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
+	SharedPtr < DerivedObject > ptr2 = ptr1.cast<DerivedObject>();
+	assert (ptr2.get() != 0);
+
+	// cast the other way round must fail
+	ptr1 = new TestObject("test");
+	assert (TestObject::count() == 2);
+	ptr2 = ptr1.cast<DerivedObject>();
+	assert (TestObject::count() == 1);
+	assert (ptr2.get() == 0);
+}
+
 void SharedPtrTest::setUp()
 {
 }
@@ -177,6 +227,8 @@ CppUnit::Test* SharedPtrTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SharedPtrTest");
 
 	CppUnit_addTest(pSuite, SharedPtrTest, testSharedPtr);
+	CppUnit_addTest(pSuite, SharedPtrTest, testImplicitCast);
+	CppUnit_addTest(pSuite, SharedPtrTest, testExplicitCast);
 
 	return pSuite;
 }

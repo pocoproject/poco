@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.1.0/Net/src/MessageHeader.cpp#2 $
+// $Id: //poco/1.2/Net/src/MessageHeader.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,13 +34,14 @@
 //
 
 
-#include "Net/MessageHeader.h"
-#include "Net/NetException.h"
-#include "Foundation/String.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/String.h"
 #include <ctype.h>
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 MessageHeader::MessageHeader()
@@ -139,7 +140,7 @@ void MessageHeader::splitElements(const std::string& s, std::vector<std::string>
 		}
 		else if (*it == ',')
 		{
-			Foundation::trimInPlace(elem);
+			Poco::trimInPlace(elem);
 			if (!ignoreEmpty || !elem.empty())
 				elements.push_back(elem);
 			elem.clear();
@@ -149,7 +150,7 @@ void MessageHeader::splitElements(const std::string& s, std::vector<std::string>
 	}
 	if (!elem.empty())
 	{
-		Foundation::trimInPlace(elem);
+		Poco::trimInPlace(elem);
 		if (!ignoreEmpty || !elem.empty())
 			elements.push_back(elem);
 	}
@@ -164,7 +165,7 @@ void MessageHeader::splitParameters(const std::string& s, std::string& value, Na
 	std::string::const_iterator end = s.end();
 	while (it != end && isspace(*it)) ++it;
 	while (it != end && *it != ';') value += *it++;
-	Foundation::trimRightInPlace(value);
+	Poco::trimRightInPlace(value);
 	if (it != end) ++it;
 	splitParameters(it, end, parameters);
 }
@@ -179,7 +180,7 @@ void MessageHeader::splitParameters(const std::string::const_iterator& begin, co
 		std::string pvalue;
 		while (it != end && isspace(*it)) ++it;
 		while (it != end && *it != '=' && *it != ';') pname += *it++;
-		Foundation::trimRightInPlace(pname);
+		Poco::trimRightInPlace(pname);
 		if (it != end && *it != ';') ++it;
 		while (it != end && isspace(*it)) ++it;
 		while (it != end && *it != ';')
@@ -205,7 +206,7 @@ void MessageHeader::splitParameters(const std::string::const_iterator& begin, co
 			}
 			else pvalue += *it++;
 		}
-		Foundation::trimRightInPlace(pvalue);
+		Poco::trimRightInPlace(pvalue);
 		if (!pname.empty()) parameters.add(pname, pvalue);
 		if (it != end) ++it;
 	}
@@ -226,4 +227,4 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 }
 
 
-Net_END
+} } // namespace Poco::Net

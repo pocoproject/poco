@@ -1,7 +1,7 @@
 //
 // DocumentTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/DocumentTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/DocumentTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,22 +33,22 @@
 #include "DocumentTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "DOM/Document.h"
-#include "DOM/Element.h"
-#include "DOM/Text.h"
-#include "DOM/NodeList.h"
-#include "DOM/AutoPtr.h"
-#include "DOM/DOMException.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/NodeList.h"
+#include "Poco/DOM/AutoPtr.h"
+#include "Poco/DOM/DOMException.h"
 
 
-using XML::Element;
-using XML::Document;
-using XML::Text;
-using XML::Node;
-using XML::NodeList;
-using XML::AutoPtr;
-using XML::XMLString;
-using XML::DOMException;
+using Poco::XML::Element;
+using Poco::XML::Document;
+using Poco::XML::Text;
+using Poco::XML::Node;
+using Poco::XML::NodeList;
+using Poco::XML::AutoPtr;
+using Poco::XML::XMLString;
+using Poco::XML::DOMException;
 
 
 DocumentTest::DocumentTest(const std::string& name): CppUnit::TestCase(name)

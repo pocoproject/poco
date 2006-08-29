@@ -1,7 +1,7 @@
 //
 // ByteOrder.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/ByteOrder.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/ByteOrder.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,4 +34,4 @@
 //
 
 
-#include "Foundation/ByteOrder.h"
+#include "Poco/ByteOrder.h"

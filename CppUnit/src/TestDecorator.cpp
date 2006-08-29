@@ -1,14 +1,14 @@
 //
 // TestDecorator.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/src/TestDecorator.cpp#1 $
+// $Id: //poco/1.2/CppUnit/src/TestDecorator.cpp#1 $
 //
 
 
 #include "CppUnit/TestDecorator.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 TestDecorator::TestDecorator(Test* test)
@@ -40,4 +40,4 @@ std::string TestDecorator::toString()
 }
 
 
-CppUnit_END
+} // namespace CppUnit

@@ -1,7 +1,7 @@
 //
 // DOMObject.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DOMObject.cpp#2 $
+// $Id: //poco/1.2/XML/src/DOMObject.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/DOMObject.h"
+#include "Poco/DOM/DOMObject.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 DOMObject::DOMObject(): _rc(1)
@@ -50,4 +51,4 @@ DOMObject::~DOMObject()
 }
 
 
-XML_END
+} } // namespace Poco::XML

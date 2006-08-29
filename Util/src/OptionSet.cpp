@@ -1,7 +1,7 @@
 //
 // OptionSet.cpp
 //
-// $Id: //poco/1.1.0/Util/src/OptionSet.cpp#2 $
+// $Id: //poco/1.2/Util/src/OptionSet.cpp#1 $
 //
 // Library: Util
 // Package: Options
@@ -34,12 +34,13 @@
 //
 
 
-#include "Util/OptionSet.h"
-#include "Util/OptionException.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/OptionException.h"
+#include "Poco/Exception.h"
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 OptionSet::OptionSet()
@@ -123,4 +124,4 @@ OptionSet::Iterator OptionSet::end() const
 }
 
 
-Util_END
+} } // namespace Poco::Util

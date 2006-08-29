@@ -1,7 +1,7 @@
 //
 // ActiveMethod.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/ActiveMethod/src/ActiveMethod.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/ActiveMethod/src/ActiveMethod.cpp#1 $
 //
 // This sample demonstrates the ActiveMethod and ActiveResult classes.
 //
@@ -32,13 +32,13 @@
 //
 
 
-#include "Foundation/ActiveMethod.h"
-#include "Foundation/ActiveResult.h"
+#include "Poco/ActiveMethod.h"
+#include "Poco/ActiveResult.h"
 #include <iostream>
 
 
-using Foundation::ActiveMethod;
-using Foundation::ActiveResult;
+using Poco::ActiveMethod;
+using Poco::ActiveResult;
 
 
 class ActiveMethodExample

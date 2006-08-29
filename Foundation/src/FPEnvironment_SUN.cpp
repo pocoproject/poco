@@ -1,7 +1,7 @@
 //
 // FPEnvironment_SUN.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/FPEnvironment_SUN.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/FPEnvironment_SUN.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -35,10 +35,10 @@
 
 
 #include <math.h>
-#include "Foundation/FPEnvironment_SUN.h"
+#include "Poco/FPEnvironment_SUN.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FPEnvironmentImpl::FPEnvironmentImpl()
@@ -158,4 +158,4 @@ FPEnvironmentImpl::RoundingModeImpl FPEnvironmentImpl::getRoundingModeImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

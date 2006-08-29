@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.1.0/Net/src/Socket.cpp#2 $
+// $Id: //poco/1.2/Net/src/Socket.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,13 +34,14 @@
 //
 
 
-#include "Net/Socket.h"
-#include "Net/StreamSocketImpl.h"
+#include "Poco/Net/Socket.h"
+#include "Poco/Net/StreamSocketImpl.h"
 #include <algorithm>
 #include <string.h>
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 Socket::Socket():
@@ -83,7 +84,7 @@ Socket::~Socket()
 }
 
 
-int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Foundation::Timespan& timeout)
+int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
 {
 	fd_set fdRead;
 	fd_set fdWrite;
@@ -141,4 +142,4 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 }
 
 
-Net_END
+} } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // FPEnvironment_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/FPEnvironment_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/FPEnvironment_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/FPEnvironment_WIN32.h"
+#include "Poco/FPEnvironment_WIN32.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FPEnvironmentImpl::FPEnvironmentImpl()
@@ -95,4 +95,4 @@ FPEnvironmentImpl::RoundingModeImpl FPEnvironmentImpl::getRoundingModeImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

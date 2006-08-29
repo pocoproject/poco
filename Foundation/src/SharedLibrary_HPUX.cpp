@@ -1,7 +1,7 @@
 //
 // SharedLibrary_HPUX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SharedLibrary_HPUX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SharedLibrary_HPUX.cpp#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/SharedLibrary_HPUX.h"
+#include "Poco/SharedLibrary_HPUX.h"
 #include <dl.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FastMutex SharedLibraryImpl::_mutex;
@@ -113,4 +113,4 @@ std::string SharedLibraryImpl::suffixImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

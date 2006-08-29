@@ -1,7 +1,7 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/DateTime/src/DateTime.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/DateTime/src/DateTime.cpp#1 $
 //
 // This sample demonstrates the DateTime class.
 //
@@ -32,13 +32,13 @@
 //
 
 
-#include "Foundation/DateTime.h"
-#include "Foundation/DateTimeFormat.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
 #include <iostream>
 
 
-using Foundation::DateTime;
-using Foundation::DateTimeFormat;
+using Poco::DateTime;
+using Poco::DateTimeFormat;
 
 
 int main(int argc, char** argv)

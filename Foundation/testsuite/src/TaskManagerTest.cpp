@@ -1,7 +1,7 @@
 //
 // TaskManagerTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TaskManagerTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TaskManagerTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,33 +33,33 @@
 #include "TaskManagerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/TaskManager.h"
-#include "Foundation/Task.h"
-#include "Foundation/TaskNotification.h"
-#include "Foundation/NotificationCenter.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Event.h"
-#include "Foundation/Observer.h"
-#include "Foundation/Exception.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/TaskManager.h"
+#include "Poco/Task.h"
+#include "Poco/TaskNotification.h"
+#include "Poco/NotificationCenter.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/Observer.h"
+#include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
 
 
-using Foundation::TaskManager;
-using Foundation::Task;
-using Foundation::NotificationCenter;
-using Foundation::TaskStartedNotification;
-using Foundation::TaskCancelledNotification;
-using Foundation::TaskFinishedNotification;
-using Foundation::TaskFailedNotification;
-using Foundation::TaskProgressNotification;
-using Foundation::TaskCustomNotification;
-using Foundation::Thread;
-using Foundation::Event;
-using Foundation::Observer;
-using Foundation::Exception;
-using Foundation::SystemException;
-using Foundation::NullPointerException;
-using Foundation::AutoPtr;
+using Poco::TaskManager;
+using Poco::Task;
+using Poco::NotificationCenter;
+using Poco::TaskStartedNotification;
+using Poco::TaskCancelledNotification;
+using Poco::TaskFinishedNotification;
+using Poco::TaskFailedNotification;
+using Poco::TaskProgressNotification;
+using Poco::TaskCustomNotification;
+using Poco::Thread;
+using Poco::Event;
+using Poco::Observer;
+using Poco::Exception;
+using Poco::SystemException;
+using Poco::NullPointerException;
+using Poco::AutoPtr;
 
 
 namespace

@@ -1,7 +1,7 @@
 //
 // NotificationCenter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NotificationCenter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NotificationCenter.cpp#1 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/NotificationCenter.h"
-#include "Foundation/Notification.h"
-#include "Foundation/Observer.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/SingletonHolder.h"
+#include "Poco/NotificationCenter.h"
+#include "Poco/Notification.h"
+#include "Poco/Observer.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/SingletonHolder.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NotificationCenter::NotificationCenter()
@@ -116,4 +116,4 @@ NotificationCenter& NotificationCenter::defaultCenter()
 }
 
 
-Foundation_END
+} // namespace Poco

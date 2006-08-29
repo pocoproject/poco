@@ -1,7 +1,7 @@
 //
 // UDPEchoServer.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/UDPEchoServer.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/UDPEchoServer.h#1 $
 //
 // Definition of the UDPEchoServer class.
 //
@@ -36,52 +36,42 @@
 #define UDPEchoServer_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef Net_DatagramSocket_INCLUDED
-#include "Net/DatagramSocket.h"
-#endif
-#ifndef Net_SocketAddress_INCLUDED
-#include "Net/SocketAddress.h"
-#endif
-#ifndef Net_Foundation_Thread_INCLUDED
-#include "Foundation/Thread.h"
-#endif
-#ifndef Net_Foundation_Event_INCLUDED
-#include "Foundation/Event.h"
-#endif
+#include "Poco/Net/Net.h"
+#include "Poco/Net/DatagramSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
 
 
-class UDPEchoServer: public Foundation::Runnable
+class UDPEchoServer: public Poco::Runnable
 	/// A simple sequential UDP echo server.
 {
 public:
 	UDPEchoServer();
 		/// Creates the UDPEchoServer.
 
-	UDPEchoServer(const Net::SocketAddress& sa);
+	UDPEchoServer(const Poco::Net::SocketAddress& sa);
 		/// Creates the UDPEchoServer and binds it to
 		/// the given address.
 
 	~UDPEchoServer();
 		/// Destroys the UDPEchoServer.
 
-	Foundation::UInt16 port() const;
+	Poco::UInt16 port() const;
 		/// Returns the port the echo server is
 		/// listening on.
 		
-	Net::SocketAddress address() const;
+	Poco::Net::SocketAddress address() const;
 		/// Returns the address of the server.	
 		
 	void run();
 		/// Does the work.
 		
 private:
-	Net::DatagramSocket _socket;
-	Foundation::Thread  _thread;
-	Foundation::Event   _ready;
-	bool                _stop;
+	Poco::Net::DatagramSocket _socket;
+	Poco::Thread _thread;
+	Poco::Event  _ready;
+	bool         _stop;
 };
 
 

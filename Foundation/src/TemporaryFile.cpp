@@ -1,7 +1,7 @@
 //
 // TemporaryFile.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/TemporaryFile.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/TemporaryFile.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,16 +34,16 @@
 //
 
 
-#include "Foundation/TemporaryFile.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Process.h"
-#include "Foundation/Mutex.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
+#include "Poco/Process.h"
+#include "Poco/Mutex.h"
 #include <set>
 #include <sstream>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 class TempFileCollector
@@ -141,4 +141,4 @@ std::string TemporaryFile::tempName()
 }
 
 
-Foundation_END
+} // namespace Poco

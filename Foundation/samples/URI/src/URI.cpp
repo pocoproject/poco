@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/URI/src/URI.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/URI/src/URI.cpp#1 $
 //
 // This sample demonstrates the URI class.
 //
@@ -32,11 +32,11 @@
 //
 
 
-#include "Foundation/URI.h"
+#include "Poco/URI.h"
 #include <iostream>
 
 
-using Foundation::URI;
+using Poco::URI;
 
 
 int main(int argc, char** argv)

@@ -1,7 +1,7 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#1 $
 //
 // This sample demonstrates the NotificationQueue, ThreadPool,
 // FastMutex and ScopedLock classes.
@@ -33,25 +33,25 @@
 //
 
 
-#include "Foundation/Notification.h"
-#include "Foundation/NotificationQueue.h"
-#include "Foundation/ThreadPool.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Runnable.h"
-#include "Foundation/Mutex.h"
-#include "Foundation/Random.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/Notification.h"
+#include "Poco/NotificationQueue.h"
+#include "Poco/ThreadPool.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Mutex.h"
+#include "Poco/Random.h"
+#include "Poco/AutoPtr.h"
 #include <iostream>
 
 
-using Foundation::Notification;
-using Foundation::NotificationQueue;
-using Foundation::ThreadPool;
-using Foundation::Thread;
-using Foundation::Runnable;
-using Foundation::FastMutex;
-using Foundation::Random;
-using Foundation::AutoPtr;
+using Poco::Notification;
+using Poco::NotificationQueue;
+using Poco::ThreadPool;
+using Poco::Thread;
+using Poco::Runnable;
+using Poco::FastMutex;
+using Poco::Random;
+using Poco::AutoPtr;
 
 
 class WorkNotification: public Notification

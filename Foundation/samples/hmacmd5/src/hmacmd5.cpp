@@ -1,7 +1,7 @@
 //
 // hmacmd5.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/hmacmd5/src/hmacmd5.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/hmacmd5/src/hmacmd5.cpp#1 $
 //
 // This sample demonstrates the HMACEngine class.
 //
@@ -32,19 +32,19 @@
 //
 
 
-#include "Foundation/HMACEngine.h"
-#include "Foundation/MD5Engine.h"
-#include "Foundation/DigestStream.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/HMACEngine.h"
+#include "Poco/MD5Engine.h"
+#include "Poco/DigestStream.h"
+#include "Poco/StreamCopier.h"
 #include <fstream>
 #include <iostream>
 
 
-using Foundation::DigestEngine;
-using Foundation::HMACEngine;
-using Foundation::MD5Engine;
-using Foundation::DigestOutputStream;
-using Foundation::StreamCopier;
+using Poco::DigestEngine;
+using Poco::HMACEngine;
+using Poco::MD5Engine;
+using Poco::DigestOutputStream;
+using Poco::StreamCopier;
 
 
 int main(int argc, char** argv)

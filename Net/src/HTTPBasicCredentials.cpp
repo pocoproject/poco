@@ -1,7 +1,7 @@
 //
 // HTTPBasicCredentials.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPBasicCredentials.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPBasicCredentials.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,21 +34,22 @@
 //
 
 
-#include "Net/HTTPBasicCredentials.h"
-#include "Net/HTTPRequest.h"
-#include "Net/NetException.h"
-#include "Foundation/Base64Encoder.h"
-#include "Foundation/Base64Decoder.h"
-#include "Foundation/String.h"
+#include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/Base64Decoder.h"
+#include "Poco/String.h"
 #include <sstream>
 
 
-using Foundation::Base64Decoder;
-using Foundation::Base64Encoder;
-using Foundation::icompare;
+using Poco::Base64Decoder;
+using Poco::Base64Encoder;
+using Poco::icompare;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 const std::string HTTPBasicCredentials::SCHEME = "Basic";
@@ -121,4 +122,4 @@ void HTTPBasicCredentials::authenticate(HTTPRequest& request)
 }
 
 
-Net_END
+} } // namespace Poco::Net

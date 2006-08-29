@@ -1,7 +1,7 @@
 //
 // HelpFormatterTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/HelpFormatterTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/HelpFormatterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "HelpFormatterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/Option.h"
-#include "Util/OptionSet.h"
-#include "Util/HelpFormatter.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/HelpFormatter.h"
 #include <iostream>
 
 
-using Util::Option;
-using Util::OptionSet;
-using Util::HelpFormatter;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::HelpFormatter;
 
 
 HelpFormatterTest::HelpFormatterTest(const std::string& name): CppUnit::TestCase(name)

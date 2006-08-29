@@ -1,7 +1,7 @@
 //
 // TCPServerParams.cpp
 //
-// $Id: //poco/1.1.0/Net/src/TCPServerParams.cpp#2 $
+// $Id: //poco/1.2/Net/src/TCPServerParams.cpp#1 $
 //
 // Library: Net
 // Package: TCPServer
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/TCPServerParams.h"
+#include "Poco/Net/TCPServerParams.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 TCPServerParams::TCPServerParams():
@@ -53,7 +54,7 @@ TCPServerParams::~TCPServerParams()
 }
 
 
-void TCPServerParams::setThreadIdleTime(const Foundation::Timespan& milliseconds)
+void TCPServerParams::setThreadIdleTime(const Poco::Timespan& milliseconds)
 {
 	_threadIdleTime = milliseconds;
 }
@@ -77,4 +78,4 @@ void TCPServerParams::setMaxQueued(int count)
 
 
 
-Net_END
+} } // namespace Poco::Net

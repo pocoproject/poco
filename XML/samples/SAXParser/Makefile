@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/XML/samples/SAXParser/Makefile#1 $
+# $Id: //poco/1.2/XML/samples/SAXParser/Makefile#1 $
 #
 # Makefile for Poco SAXParser
 #
@@ -12,6 +12,6 @@ objects = SAXParser
 
 target         = SAXParser
 target_version = 1
-target_libs    = PocoFoundation PocoXML
+target_libs    = PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

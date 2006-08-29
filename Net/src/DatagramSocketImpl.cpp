@@ -1,7 +1,7 @@
 //
 // DatagramSocketImpl.cpp
 //
-// $Id: //poco/1.1.0/Net/src/DatagramSocketImpl.cpp#2 $
+// $Id: //poco/1.2/Net/src/DatagramSocketImpl.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,14 +34,15 @@
 //
 
 
-#include "Net/DatagramSocketImpl.h"
-#include "Net/NetException.h"
+#include "Poco/Net/DatagramSocketImpl.h"
+#include "Poco/Net/NetException.h"
 
 
-using Foundation::InvalidArgumentException;
+using Poco::InvalidArgumentException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 DatagramSocketImpl::DatagramSocketImpl()
@@ -79,4 +80,4 @@ void DatagramSocketImpl::init(int af)
 }
 
 
-Net_END
+} } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // Timespan.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Timespan.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Timespan.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/Timespan.h"
+#include "Poco/Timespan.h"
 #include <algorithm>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const Timespan::TimeDiff Timespan::MILLISECONDS = 1000;
@@ -169,4 +169,4 @@ Timespan& Timespan::operator -= (TimeDiff microseconds)
 }
 
 
-Foundation_END
+} // namespace Poco

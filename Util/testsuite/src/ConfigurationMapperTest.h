@@ -1,7 +1,7 @@
 //
 // ConfigurationMapperTest.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/ConfigurationMapperTest.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/ConfigurationMapperTest.h#1 $
 //
 // Definition of the ConfigurationMapperTest class.
 //
@@ -36,13 +36,9 @@
 #define ConfigurationMapperTest_INCLUDED
 
 
-#ifndef Util_Util_INCLUDED
-#include "Util/Util.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Util/Util.h"
 #include "CppUnit/TestCase.h"
-#endif
-#include "Util/AbstractConfiguration.h"
+#include "Poco/Util/AbstractConfiguration.h"
 
 
 class ConfigurationMapperTest: public CppUnit::TestCase
@@ -62,7 +58,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	Util::AbstractConfiguration* createConfiguration() const;
+	Poco::Util::AbstractConfiguration* createConfiguration() const;
 };
 
 

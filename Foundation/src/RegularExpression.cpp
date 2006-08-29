@@ -1,7 +1,7 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/1.1.0/Foundation/src/RegularExpression.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/RegularExpression.cpp#1 $
 //
 // Library: Foundation
 // Package: RegExp
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/RegularExpression.h"
-#include "Foundation/Exception.h"
+#include "Poco/RegularExpression.h"
+#include "Poco/Exception.h"
 #include <sstream>
 #include "pcre.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const int RegularExpression::OVEC_SIZE = 64;
@@ -288,4 +288,4 @@ bool RegularExpression::match(const std::string& subject, const std::string& pat
 }
 
 
-Foundation_END
+} // namespace Poco

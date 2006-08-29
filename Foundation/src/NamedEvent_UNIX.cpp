@@ -1,7 +1,7 @@
 //
 // NamedEvent_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedEvent_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedEvent_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,8 +34,8 @@
 //
 
 
-#include "Foundation/NamedEvent_UNIX.h"
-#include "Foundation/Exception.h"
+#include "Poco/NamedEvent_UNIX.h"
+#include "Poco/Exception.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
@@ -49,7 +49,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 #if defined(linux) || defined(__CYGWIN__)
@@ -156,4 +156,4 @@ std::string NamedEventImpl::getFileName()
 }
 
 
-Foundation_END
+} // namespace Poco

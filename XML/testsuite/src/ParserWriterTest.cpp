@@ -1,7 +1,7 @@
 //
 // ParserWriterTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/ParserWriterTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/ParserWriterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,22 +33,22 @@
 #include "ParserWriterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "DOM/DOMParser.h"
-#include "DOM/DOMWriter.h"
-#include "DOM/Document.h"
-#include "DOM/AutoPtr.h"
-#include "SAX/InputSource.h"
-#include "XML/XMLWriter.h"
+#include "Poco/DOM/DOMParser.h"
+#include "Poco/DOM/DOMWriter.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/AutoPtr.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/XML/XMLWriter.h"
 #include <sstream>
 #include <fstream>
 
 
-using XML::DOMParser;
-using XML::DOMWriter;
-using XML::XMLWriter;
-using XML::Document;
-using XML::AutoPtr;
-using XML::InputSource;
+using Poco::XML::DOMParser;
+using Poco::XML::DOMWriter;
+using Poco::XML::XMLWriter;
+using Poco::XML::Document;
+using Poco::XML::AutoPtr;
+using Poco::XML::InputSource;
 
 
 ParserWriterTest::ParserWriterTest(const std::string& name): CppUnit::TestCase(name)

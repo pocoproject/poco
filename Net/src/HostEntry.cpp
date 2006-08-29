@@ -1,7 +1,7 @@
 //
 // HostEntry.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HostEntry.cpp#2 $
+// $Id: //poco/1.2/Net/src/HostEntry.cpp#1 $
 //
 // Library: Net
 // Package: NetCore
@@ -34,12 +34,13 @@
 //
 
 
-#include "Net/HostEntry.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/HostEntry.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HostEntry::HostEntry()
@@ -126,4 +127,4 @@ HostEntry::~HostEntry()
 }
 
 
-Net_END
+} } // namespace Poco::Net

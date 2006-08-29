@@ -1,9 +1,108 @@
-This is the changelog file for the C++ Portable Components.
+This is the changelog file for POCO - the C++ Portable Components.
+
+Release 1.2.0 (2006-08-29)
+==========================
+
+- DateTime fixes: Julian Day is no longer stored internally. 
+  Times (hours, minutes, seconds, ...) are now always taken from an utcValue (if available) and not from the Julian day.
+  The Julian day is only used for calculating year, month and day (except when the Julian day is the only thing we have)
+  This helps us get rid of rounding errors that the Julian Day arithmetic introduced.- on Windows, UUIDGenerator no longer uses Netbios, but GetAdaptersInfo instead
+- The main Makefile now has correct dependencies
+- updated poco-doc.pl with latest version by Caleb Epstein
+- fixed SF #1542722: InflatingInputStream: buffer error
+- improved Windows UTF-8 support
+- added Logger::names()
+- added configure script and make install target
+- XMLWriter bugfix: pretty-print bug with characters() and rawCharacters()
+- improvements to build system: support builds outside of source tree
+- added header doc conversion tool contributed by Caleb Epstein
+- fixed SF #1542618 (build/config/Linux patch)
+- bugfix: BinaryReader/BinaryWriter BOM is now 16 bits, as documented
+- fixed SF #1542247 (Compiler warning from OptionCallback)
+- fixed SF #1542253 (ServerApplication::handleOption doesn't call Application::handleOption)
+- added Application::stopOptionsProcessing()
+- updated samples
+- Util::Application command line handling now supports:
+  * argument validation (Option::validator(); see Validator, IntValidator, RegExpValidator)
+  * binding of argument values to config properties (Option::binding())
+  * callbacks for arguments (Option::callback())
+  * checking of required parameters
+- changed header file locations:
+  Foundation headers are now in Poco (#include "Poco/Foundation.h")
+  XML headers are now in Poco/XML, Poco/SAX and Poco/DOM (#include "Poco/XML/XML.h")
+  Util headers are now in Poco/Util (#include "Poco/Util/Util.h")
+  etc.
+  Unfortunately, this change will break existing code. However, fixing the code is
+  a matter of a few global search/replace operations and can be done quickly.
+  On the plus side, POCO is now a much better citizen when used with other
+  libraries.
+- changed namespaces:
+  Foundation is now Poco
+  XML is now Poco::XML
+  Util is now Poco::Util
+  Net is now Poco::Net
+- removed namespace macros
+- fixed some warnings reported by gcc -Wall -Wextra
+- fixed AutoPtr and LayeredConfiguration documentation
+- improved StreamSocket::receiveBytes() doc
+- added Pipe and PipeStream classes
+- added support for I/O redirection (pipes) to Process::launch()
+- added LogStream class (ostream interface to Logger)
+- improved Makefiles (no more double-building if clean all is specified)
+- added CppUnit and DateTime testsuite contributions by Andrew Marlow
+- improved Cygwin and minimal MinGW support
+- FileChannel: gzip compression if archived files now runs in a background thread (SF #1537481)
+- POCO now compiles with large (64-bit) file support on Linux (SF #1536634)
+- added format() function, which provides typesafe sprintf-like functionality (SF #1327621)
+- added File::isLink()
+- bugfix: dangling symbolic links in a directory no longer cause recursive remove to fail with file not found error
+- added Void class (useful as argument to ActiveMethod)
+- ActiveResult now supports exceptions
+- bugfix: Timezone::utcOffset() and Timezone::dst() returned wrong values on Unix platforms (SF #1535428)
+- added ActiveDispatcher class
+- added ActiveStarter class, which is a policy used by ActiveMethod for starting methods
+- ActiveRunnable moved to its own header file
+- ThreadPool: added startWithPriority(), which allows for running threads with a different priority
+- added error handling to dir sample
+- added additional test case to HTTPServer test suite- HTMLForm: should now work with request methods other than POST and GET (all non-POST requests are treated the same as GET)
+- clarified HTMLForm documentation
+- HTMLForm bugfix: uploaded files no longer end up in value; PartHandler is called instead
+- NameValueCollection: added get(name, defaultValue)
+- added HTTPFormServer sample
+- added Foundation::HashTable and SimpleHashTable
+- added Net::HTTPSessionFactory
+- improvements to AutoPtr and SharedPtr
+- improvements to namespaces handling in XMLWriter
+- Foundation Cache: fixed add implementation to match the docu: a 2nd add will now simply overwrite existing entries
+- added DateTime::isValid()
+- added Exception::rethrow() (virtual, must be overridden by all subclasses)
+- Timer can now use a user-supplied ThreadPool
+- added rethrow() to exception classes
+- Net: made some constructors explicit
+- Net: added SocketAddress constructor to HTTPClientSession
+- Net: added HTTPSession::networkException() to check for exceptions swallowed by stream classes
+- Net: added single string argument constructor to SocketAddress.
+- Net: improved HTTPClientSession error handling (no more "Invalid HTTP version string" exceptions when the server prematurely closes the connection due to too much load)
+- Net: improved HTTPSession error handling. Exceptions while sending and receiving data are stored for later retrieval and no longer get lost since streambufs swallow them.
+- Net: added HTTPLoadTest sample
+- fixed a bug when opening logfiles on Unix platforms causing an existing logfile to be truncated
+- bugfix: log file purge intervals given in months did not work, due to a stupid typo
+- added RawSocket and ICMP classes
+- UUID: fixed a doc formatting bug
+- NetworkInterface::list() now includes loopback interface on Windows (SF #1460309)
+- made Exception::message() and Exception::nested() inline
+- added Net::UnsupportedRedirectException
+- HTTPStreamFactory throws an UnsupportedRedirectException if it encounters a redirect to https
+- HTTP: fixed bad 100 Continue handling in client and server code
+- added CONTRIBUTORS file
+
 
 Release 1.1.2 (2006-07-07)
 ==========================
 
 - Changed license to Boost license
+- DBlite and NetSSL have been removed from the Boost-licensed release.
+  Please contact Applied Informatics (info@appinf.com) if you're interested in them.
 
 
 Release 1.1.1 (2006-04-03)
@@ -367,4 +466,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.1.0/dist/CHANGELOG#3 $
+$Id: //poco/1.2/dist/CHANGELOG#1 $

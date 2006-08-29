@@ -1,7 +1,7 @@
 //
 // StreamCopierTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/StreamCopierTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/StreamCopierTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "StreamCopierTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
-using Foundation::StreamCopier;
+using Poco::StreamCopier;
 
 
 StreamCopierTest::StreamCopierTest(const std::string& name): CppUnit::TestCase(name)

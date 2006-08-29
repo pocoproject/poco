@@ -1,7 +1,7 @@
 //
 // File.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/File.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/File.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,9 +34,9 @@
 //
 
 
-#include "Foundation/File.h"
-#include "Foundation/Path.h"
-#include "Foundation/DirectoryIterator.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include "Poco/DirectoryIterator.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
@@ -50,7 +50,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 File::File()
@@ -148,6 +148,12 @@ bool File::isDirectory() const
 }
 
 
+bool File::isLink() const
+{
+	return isLinkImpl();
+}
+
+
 Timestamp File::created() const
 {
 	return createdImpl();
@@ -224,7 +230,7 @@ void File::renameTo(const std::string& path)
 	
 void File::remove(bool recursive)
 {
-	if (recursive && isDirectory())
+	if (recursive && !isLink() && isDirectory())
 	{
 		std::vector<File> files;
 		list(files);
@@ -292,4 +298,4 @@ void File::list(std::vector<File>& files) const
 }
 
 
-Foundation_END
+} // namespace Poco

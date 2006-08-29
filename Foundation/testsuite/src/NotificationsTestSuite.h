@@ -1,7 +1,7 @@
 //
 // NotificationsTestSuite.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NotificationsTestSuite.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NotificationsTestSuite.h#1 $
 //
 // Definition of the NotificationsTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define NotificationsTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class NotificationsTestSuite

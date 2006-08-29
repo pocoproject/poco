@@ -1,7 +1,7 @@
 //
 // HTTPResponse.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPResponse.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPResponse.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,26 +34,27 @@
 //
 
 
-#include "Net/HTTPResponse.h"
-#include "Net/NetException.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/NumberParser.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/DateTimeParser.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeParser.h"
 #include <ctype.h>
 
 
-using Foundation::DateTime;
-using Foundation::NumberFormatter;
-using Foundation::NumberParser;
-using Foundation::DateTimeFormatter;
-using Foundation::DateTimeFormat;
-using Foundation::DateTimeParser;
+using Poco::DateTime;
+using Poco::NumberFormatter;
+using Poco::NumberParser;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
+using Poco::DateTimeParser;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 const std::string HTTPResponse::HTTP_REASON_CONTINUE                        = "Continue";
@@ -175,13 +176,13 @@ void HTTPResponse::setStatusAndReason(HTTPStatus status)
 }
 
 
-void HTTPResponse::setDate(const Foundation::Timestamp& dateTime)
+void HTTPResponse::setDate(const Poco::Timestamp& dateTime)
 {
 	set(DATE, DateTimeFormatter::format(dateTime, DateTimeFormat::HTTP_FORMAT));
 }
 
 	
-Foundation::Timestamp HTTPResponse::getDate() const
+Poco::Timestamp HTTPResponse::getDate() const
 {
 	const std::string& dateTime = get(DATE);
 	int tzd;
@@ -224,25 +225,20 @@ void HTTPResponse::read(std::istream& istr)
 	std::string version;
 	std::string status;
 	std::string reason;
-	int ch = 0;
-	do
-	{
-		version.clear();
-		status.clear();
-		reason.clear();
-		ch = istr.get();
-		while (isspace(ch)) ch = istr.get();
-		while (!isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
-		if (!isspace(ch)) throw MessageException("Invalid HTTP version string");
-		while (isspace(ch)) ch = istr.get();
-		while (!isspace(ch) && ch != eof && status.length() < MAX_STATUS_LENGTH) { status += (char) ch; ch = istr.get(); }
-		if (!isspace(ch)) throw MessageException("Invalid HTTP status code");
-		while (isspace(ch)) ch = istr.get();
-		while (ch != '\r' && ch != '\n' && ch != eof && reason.length() < MAX_REASON_LENGTH) { reason += (char) ch; ch = istr.get(); }
-		if (!isspace(ch)) throw MessageException("HTTP reason string too long");
-		if (ch == '\r') ch = istr.get();
-	}
-	while (ch != eof && status == "100");
+	
+	int ch =  istr.get();
+	while (isspace(ch)) ch = istr.get();
+	if (ch == eof) throw MessageException("No HTTP response header");
+	while (!isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
+	if (!isspace(ch)) throw MessageException("Invalid HTTP version string");
+	while (isspace(ch)) ch = istr.get();
+	while (!isspace(ch) && ch != eof && status.length() < MAX_STATUS_LENGTH) { status += (char) ch; ch = istr.get(); }
+	if (!isspace(ch)) throw MessageException("Invalid HTTP status code");
+	while (isspace(ch)) ch = istr.get();
+	while (ch != '\r' && ch != '\n' && ch != eof && reason.length() < MAX_REASON_LENGTH) { reason += (char) ch; ch = istr.get(); }
+	if (!isspace(ch)) throw MessageException("HTTP reason string too long");
+	if (ch == '\r') ch = istr.get();
+
 	HTTPMessage::read(istr);
 	ch = istr.get();
 	while (ch != '\n' && ch != eof) { ch = istr.get(); }
@@ -342,4 +338,4 @@ const std::string& HTTPResponse::getReasonForStatus(HTTPStatus status)
 }
 
 
-Net_END
+} } // namespace Poco::Net

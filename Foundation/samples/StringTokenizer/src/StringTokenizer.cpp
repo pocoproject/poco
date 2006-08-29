@@ -1,7 +1,7 @@
 //
 // StringTokenizer.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/StringTokenizer/src/StringTokenizer.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/StringTokenizer/src/StringTokenizer.cpp#1 $
 //
 // This sample demonstrates the usage of the StringTokenizer class.
 //
@@ -32,11 +32,11 @@
 //
 
 
-#include "Foundation/StringTokenizer.h"
+#include "Poco/StringTokenizer.h"
 #include <iostream>
 
 
-using Foundation::StringTokenizer;
+using Poco::StringTokenizer;
 
 
 int main(int argc, char** argv)

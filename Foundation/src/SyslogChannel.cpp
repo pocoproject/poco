@@ -1,7 +1,7 @@
 //
 // SyslogChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SyslogChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SyslogChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/SyslogChannel.h"
-#include "Foundation/Message.h"
-#include "Foundation/StringTokenizer.h"
+#include "Poco/SyslogChannel.h"
+#include "Poco/Message.h"
+#include "Poco/StringTokenizer.h"
 #include <syslog.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const std::string SyslogChannel::PROP_NAME     = "name";
@@ -275,4 +275,4 @@ int SyslogChannel::getPrio(const Message& msg)
 }
 
 
-Foundation_END
+} // namespace Poco

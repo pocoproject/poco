@@ -1,7 +1,7 @@
 //
 // Glob.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Glob.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Glob.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/Glob.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
-#include "Foundation/DirectoryIterator.h"
-#include "Foundation/File.h"
+#include "Poco/Glob.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
+#include "Poco/DirectoryIterator.h"
+#include "Poco/File.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Glob::Glob(const std::string& pattern, int options): 
@@ -239,4 +239,4 @@ void Glob::collect(const Path& pathPattern, const Path& base, const Path& curren
 }
 
 
-Foundation_END
+} // namespace Poco

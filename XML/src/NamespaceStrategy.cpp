@@ -1,7 +1,7 @@
 //
 // NamespaceStrategy.cpp
 //
-// $Id: //poco/1.1.0/XML/src/NamespaceStrategy.cpp#2 $
+// $Id: //poco/1.2/XML/src/NamespaceStrategy.cpp#1 $
 //
 // Library: XML
 // Package: XML
@@ -34,14 +34,15 @@
 //
 
 
-#include "XML/NamespaceStrategy.h"
-#include "SAX/AttributesImpl.h"
-#include "SAX/ContentHandler.h"
-#include "XML/XMLException.h"
-#include "XML/Name.h"
+#include "Poco/XML/NamespaceStrategy.h"
+#include "Poco/SAX/AttributesImpl.h"
+#include "Poco/SAX/ContentHandler.h"
+#include "Poco/XML/XMLException.h"
+#include "Poco/XML/Name.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString NamespaceStrategy::NOTHING;
@@ -207,4 +208,4 @@ void NamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler* 
 }
 
 
-XML_END
+} } // namespace Poco::XML

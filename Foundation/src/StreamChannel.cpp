@@ -1,7 +1,7 @@
 //
 // StreamChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/StreamChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/StreamChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/StreamChannel.h"
-#include "Foundation/Message.h"
+#include "Poco/StreamChannel.h"
+#include "Poco/Message.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 StreamChannel::StreamChannel(std::ostream& str): _str(str)
@@ -59,4 +59,4 @@ void StreamChannel::log(const Message& msg)
 }
 
 
-Foundation_END
+} // namespace Poco

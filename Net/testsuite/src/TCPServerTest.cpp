@@ -1,7 +1,7 @@
 //
 // TCPServerTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/TCPServerTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/TCPServerTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,25 +33,25 @@
 #include "TCPServerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/TCPServer.h"
-#include "Net/TCPServerConnection.h"
-#include "Net/TCPServerConnectionFactory.h"
-#include "Net/TCPServerParams.h"
-#include "Net/StreamSocket.h"
-#include "Net/ServerSocket.h"
-#include "Foundation/Thread.h"
+#include "Poco/Net/TCPServer.h"
+#include "Poco/Net/TCPServerConnection.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/TCPServerParams.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Thread.h"
 #include <iostream>
 
 
-using Net::TCPServer;
-using Net::TCPServerConnection;
-using Net::TCPServerConnectionFactory;
-using Net::TCPServerConnectionFactoryImpl;
-using Net::TCPServerParams;
-using Net::StreamSocket;
-using Net::ServerSocket;
-using Net::SocketAddress;
-using Foundation::Thread;
+using Poco::Net::TCPServer;
+using Poco::Net::TCPServerConnection;
+using Poco::Net::TCPServerConnectionFactory;
+using Poco::Net::TCPServerConnectionFactoryImpl;
+using Poco::Net::TCPServerParams;
+using Poco::Net::StreamSocket;
+using Poco::Net::ServerSocket;
+using Poco::Net::SocketAddress;
+using Poco::Thread;
 
 
 namespace
@@ -76,7 +76,7 @@ namespace
 					n = ss.receiveBytes(buffer, sizeof(buffer));
 				}
 			}
-			catch (Foundation::Exception& exc)
+			catch (Poco::Exception& exc)
 			{
 				std::cerr << "EchoConnection: " << exc.displayText() << std::endl;
 			}

@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.1.0/Util/src/Application.cpp#2 $
+// $Id: //poco/1.2/Util/src/Application.cpp#1 $
 //
 // Library: Util
 // Package: Application
@@ -34,43 +34,48 @@
 //
 
 
-#include "Util/Application.h"
-#include "Util/SystemConfiguration.h"
-#include "Util/MapConfiguration.h"
-#include "Util/PropertyFileConfiguration.h"
-#include "Util/IniFileConfiguration.h"
-#include "Util/XMLConfiguration.h"
-#include "Util/LoggingSubsystem.h"
-#include "Util/Option.h"
-#include "Util/OptionProcessor.h"
-#include "Foundation/Environment.h"
-#include "Foundation/Exception.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/File.h"
-#include "Foundation/Path.h"
-#include "Foundation/String.h"
-#include "Foundation/ConsoleChannel.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/Util/Application.h"
+#include "Poco/Util/SystemConfiguration.h"
+#include "Poco/Util/MapConfiguration.h"
+#include "Poco/Util/PropertyFileConfiguration.h"
+#include "Poco/Util/IniFileConfiguration.h"
+#include "Poco/Util/XMLConfiguration.h"
+#include "Poco/Util/LoggingSubsystem.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionProcessor.h"
+#include "Poco/Util/Validator.h"
+#include "Poco/Environment.h"
+#include "Poco/Exception.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include "Poco/String.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/AutoPtr.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include <windows.h>
 #endif
 #if defined(POCO_OS_FAMILY_UNIX)
-#include "Foundation/SignalHandler.h"
+#include "Poco/SignalHandler.h"
+#endif
+#if defined(POCO_WIN32_UTF8)
+#include "Poco/UnicodeConverter.h"
 #endif
 
 
-using Foundation::Logger;
-using Foundation::Path;
-using Foundation::File;
-using Foundation::Environment;
-using Foundation::SystemException;
-using Foundation::ConsoleChannel;
-using Foundation::NumberFormatter;
-using Foundation::AutoPtr;
-using Foundation::icompare;
+using Poco::Logger;
+using Poco::Path;
+using Poco::File;
+using Poco::Environment;
+using Poco::SystemException;
+using Poco::ConsoleChannel;
+using Poco::NumberFormatter;
+using Poco::AutoPtr;
+using Poco::icompare;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 Application* Application::_pInstance = 0;
@@ -79,8 +84,9 @@ Application* Application::_pInstance = 0;
 Application::Application():
 	_pConfig(new LayeredConfiguration),
 	_initialized(false),
+	_unixOptions(true),
 	_pLogger(&Logger::get("ApplicationStartup")),
-	_unixOptions(true)
+	_stopOptionsProcessing(false)
 {
 	setup();
 }
@@ -89,8 +95,9 @@ Application::Application():
 Application::Application(int argc, char* argv[]):
 	_pConfig(new LayeredConfiguration),
 	_initialized(false),
+	_unixOptions(true),
 	_pLogger(&Logger::get("ApplicationStartup")),
-	_unixOptions(true)
+	_stopOptionsProcessing(false)
 {
 	setup();
 	init(argc, argv);
@@ -120,7 +127,7 @@ void Application::setup()
 	
 #if defined(POCO_OS_FAMILY_UNIX)
 	#if !defined(_DEBUG)
-	Foundation::SignalHandler::install();
+	Poco::SignalHandler::install();
 	#endif
 #else
 	setUnixOptions(false);
@@ -144,6 +151,34 @@ void Application::addSubsystem(Subsystem* pSubsystem)
 void Application::init(int argc, char* argv[])
 {
 	setArgs(argc, argv);
+	init();
+}
+
+
+#if defined(POCO_WIN32_UTF8)
+void Application::init(int argc, wchar_t* argv[])
+{
+	std::vector<std::string> args;
+	for (int i = 0; i < argc; ++i)
+	{
+		std::string arg;
+		Poco::UnicodeConverter::toUTF8(argv[i], arg);
+		args.push_back(arg);
+	}
+	init(args);
+}
+#endif
+
+
+void Application::init(const std::vector<std::string>& args)
+{
+	setArgs(args);
+	init();
+}
+
+
+void Application::init()
+{
 	Path appPath;
 	getApplicationPath(appPath);
 	_pConfig->setString("application.path", appPath.toString());
@@ -243,7 +278,7 @@ void Application::loadConfiguration(const std::string& path)
 	else if (icompare(ext, "xml") == 0)
 		_pConfig->addFront(new XMLConfiguration(confPath.toString()), false);
 	else
-		throw Foundation::InvalidArgumentException("Unsupported configuration file type", ext);
+		throw Poco::InvalidArgumentException("Unsupported configuration file type", ext);
 }
 
 
@@ -253,17 +288,31 @@ std::string Application::commandName() const
 }
 
 
+void Application::stopOptionsProcessing()
+{
+	_stopOptionsProcessing = true;
+}
+
+
 int Application::run()
 {
 	try
 	{
 		return main(_args);
 	}
-	catch (Foundation::Exception& exc)
+	catch (Poco::Exception& exc)
 	{
 		logger().log(exc);
-		return EXIT_SOFTWARE;
 	}
+	catch (std::exception& exc)
+	{
+		logger().error(exc.what());
+	}
+	catch (...)
+	{
+		logger().fatal("system exception");
+	}
+	return EXIT_SOFTWARE;
 }
 
 
@@ -288,6 +337,21 @@ void Application::setArgs(int argc, char* argv[])
 }
 
 
+void Application::setArgs(const std::vector<std::string>& args)
+{
+	poco_assert (!args.empty());
+	
+	_command = args[0];
+	_pConfig->setInt("application.argc", (int) args.size());
+	_args = args;
+	std::string argvKey = "application.argv[";
+	for (int i = 0; i < args.size(); ++i)
+	{
+		_pConfig->setString(argvKey + NumberFormatter::format(i) + "]", args[i]);
+	}
+}
+
+
 void Application::processOptions()
 {
 	defineOptions(_options);
@@ -295,21 +359,23 @@ void Application::processOptions()
 	processor.setUnixStyle(_unixOptions);
 	_args.erase(_args.begin());
 	ArgVec::iterator it = _args.begin();
-	while (it != _args.end())
+	while (it != _args.end() && !_stopOptionsProcessing)
 	{
 		std::string name;
 		std::string value;
 		if (processor.process(*it, name, value))
 		{
 			handleOption(name, value);
-			_args.erase(it);
+			it = _args.erase(it);
 		}
 		else ++it;
 	}
+	if (!_stopOptionsProcessing)
+		processor.checkRequired();
 }
 
 
-void Application::getApplicationPath(Foundation::Path& appPath) const
+void Application::getApplicationPath(Poco::Path& appPath) const
 {
 #if defined(POCO_OS_FAMILY_UNIX)
 	if (_command.find('/') != std::string::npos)
@@ -331,19 +397,31 @@ void Application::getApplicationPath(Foundation::Path& appPath) const
 			appPath = Path(Path::current(), _command);
 	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-	char path[1024];
-	int n = GetModuleFileName(0, path, sizeof(path));
-	if (n > 0)
-		appPath = path;
-	else
-		throw SystemException("Cannot get application file name.");
+	#if defined(POCO_WIN32_UTF8)
+		wchar_t path[1024];
+		int n = GetModuleFileNameW(0, path, sizeof(path)/sizeof(wchar_t));
+		if (n > 0)
+		{
+			std::string p;
+			Poco::UnicodeConverter::toUTF8(path, p);
+			appPath = p;
+		}
+		else throw SystemException("Cannot get application file name.");
+	#else
+		char path[1024];
+		int n = GetModuleFileName(0, path, sizeof(path));
+		if (n > 0)
+			appPath = path;
+		else
+			throw SystemException("Cannot get application file name.");
+	#endif
 #else
 	appPath = _command;
 #endif
 }
 
 
-bool Application::findFile(Foundation::Path& path) const
+bool Application::findFile(Poco::Path& path) const
 {
 	if (path.isAbsolute()) return true;
 	
@@ -395,6 +473,19 @@ void Application::defineOptions(OptionSet& options)
 
 void Application::handleOption(const std::string& name, const std::string& value)
 {
+	const Option& option = _options.getOption(name);
+	if (option.validator())
+	{
+		option.validator()->validate(option, value);
+	}
+	if (!option.binding().empty())
+	{
+		config().setString(option.binding(), value);
+	}
+	if (option.callback())
+	{
+		option.callback()->invoke(name, value);
+	}
 }
 
 
@@ -404,4 +495,4 @@ void Application::setLogger(Logger& logger)
 }
 
 
-Util_END
+} } // namespace Poco::Util

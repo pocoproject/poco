@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.cpp
 //
-// $Id: //poco/1.1.0/Util/src/AbstractConfiguration.cpp#2 $
+// $Id: //poco/1.2/Util/src/AbstractConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,24 +34,25 @@
 //
 
 
-#include "Util/AbstractConfiguration.h"
-#include "Util/ConfigurationView.h"
-#include "Foundation/Exception.h"
-#include "Foundation/NumberParser.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/String.h"
+#include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Util/ConfigurationView.h"
+#include "Poco/Exception.h"
+#include "Poco/NumberParser.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/String.h"
 
 
-using Foundation::FastMutex;
-using Foundation::NotFoundException;
-using Foundation::SyntaxException;
-using Foundation::CircularReferenceException;
-using Foundation::NumberParser;
-using Foundation::NumberFormatter;
-using Foundation::icompare;
+using Poco::FastMutex;
+using Poco::NotFoundException;
+using Poco::SyntaxException;
+using Poco::CircularReferenceException;
+using Poco::NumberParser;
+using Poco::NumberFormatter;
+using Poco::icompare;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 AbstractConfiguration::AbstractConfiguration(): _depth(0)
@@ -366,4 +367,4 @@ bool AbstractConfiguration::parseBool(const std::string& value)
 }
 
 
-Util_END
+} } // namespace Poco::Util

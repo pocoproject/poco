@@ -1,7 +1,7 @@
 //
 // TestResult.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TestResult.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TestResult.h#1 $
 //
 
 
@@ -9,22 +9,13 @@
 #define CppUnit_TestResult_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_Guards_INCLUDED
 #include "CppUnit/Guards.h"
-#endif
-#ifndef CppUnit_TestFailure_INCLUDED
 #include "CppUnit/TestFailure.h"
-#endif
-#ifndef STD_VECTOR_INCLUDED
 #include <vector>
-#define STD_VECTOR_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class CppUnitException;
@@ -234,7 +225,7 @@ inline void TestResult::setSynchronizationObject(SynchronizationObject* syncObje
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_TestResult_INCLUDED

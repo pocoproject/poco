@@ -1,7 +1,7 @@
 //
 // SocketNotifier.cpp
 //
-// $Id: //poco/1.1.0/Net/src/SocketNotifier.cpp#2 $
+// $Id: //poco/1.2/Net/src/SocketNotifier.cpp#1 $
 //
 // Library: Net
 // Package: Reactor
@@ -34,12 +34,13 @@
 //
 
 
-#include "Net/SocketNotifier.h"
-#include "Net/SocketReactor.h"
-#include "Net/SocketNotification.h"
+#include "Poco/Net/SocketNotifier.h"
+#include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/SocketNotification.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 SocketNotifier::SocketNotifier(const Socket& socket):
@@ -53,7 +54,7 @@ SocketNotifier::~SocketNotifier()
 }
 
 	
-void SocketNotifier::addObserver(SocketReactor* pReactor, const Foundation::AbstractObserver& observer)
+void SocketNotifier::addObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer)
 {
 	_nc.addObserver(observer);
 	if (observer.accepts(pReactor->_pReadableNotification))
@@ -67,7 +68,7 @@ void SocketNotifier::addObserver(SocketReactor* pReactor, const Foundation::Abst
 }
 
 	
-void SocketNotifier::removeObserver(SocketReactor* pReactor, const Foundation::AbstractObserver& observer)
+void SocketNotifier::removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer)
 {
 	_nc.removeObserver(observer);
 	EventSet::iterator it = _events.end();
@@ -92,4 +93,4 @@ void SocketNotifier::dispatch(SocketNotification* pNotification)
 }
 
 
-Net_END
+} } // namespace Poco::Net

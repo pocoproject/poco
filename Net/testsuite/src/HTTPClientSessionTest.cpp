@@ -1,7 +1,7 @@
 //
 // HTTPClientSessionTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPClientSessionTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPClientSessionTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,21 +33,21 @@
 #include "HTTPClientSessionTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/HTTPClientSession.h"
-#include "Net/HTTPRequest.h"
-#include "Net/HTTPResponse.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/StreamCopier.h"
 #include "HTTPTestServer.h"
 #include <istream>
 #include <ostream>
 #include <sstream>
 
 
-using Net::HTTPClientSession;
-using Net::HTTPRequest;
-using Net::HTTPResponse;
-using Net::HTTPMessage;
-using Foundation::StreamCopier;
+using Poco::Net::HTTPClientSession;
+using Poco::Net::HTTPRequest;
+using Poco::Net::HTTPResponse;
+using Poco::Net::HTTPMessage;
+using Poco::StreamCopier;
 
 
 HTTPClientSessionTest::HTTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // DocumentTypeTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/DocumentTypeTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/DocumentTypeTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,22 +33,22 @@
 #include "DocumentTypeTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "DOM/DocumentType.h"
-#include "DOM/Document.h"
-#include "DOM/Notation.h"
-#include "DOM/Entity.h"
-#include "DOM/DOMImplementation.h"
-#include "DOM/NamedNodeMap.h"
-#include "DOM/AutoPtr.h"
+#include "Poco/DOM/DocumentType.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Notation.h"
+#include "Poco/DOM/Entity.h"
+#include "Poco/DOM/DOMImplementation.h"
+#include "Poco/DOM/NamedNodeMap.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
-using XML::DocumentType;
-using XML::Document;
-using XML::Entity;
-using XML::Notation;
-using XML::DOMImplementation;
-using XML::NamedNodeMap;
-using XML::AutoPtr;
+using Poco::XML::DocumentType;
+using Poco::XML::Document;
+using Poco::XML::Entity;
+using Poco::XML::Notation;
+using Poco::XML::DOMImplementation;
+using Poco::XML::NamedNodeMap;
+using Poco::XML::AutoPtr;
 
 
 DocumentTypeTest::DocumentTypeTest(const std::string& name): CppUnit::TestCase(name)

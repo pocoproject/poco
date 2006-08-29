@@ -1,7 +1,7 @@
 //
 // TaskTestSuite.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TaskTestSuite.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TaskTestSuite.h#1 $
 //
 // Definition of the TaskTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define TaskTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class TaskTestSuite

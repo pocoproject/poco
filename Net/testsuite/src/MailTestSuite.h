@@ -1,7 +1,7 @@
 //
 // MailTestSuite.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MailTestSuite.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MailTestSuite.h#1 $
 //
 // Definition of the MailTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define MailTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class MailTestSuite

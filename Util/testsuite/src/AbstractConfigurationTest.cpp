@@ -1,7 +1,7 @@
 //
 // AbstractConfigurationTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/AbstractConfigurationTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/AbstractConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "AbstractConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/MapConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/MapConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 
 
-using Util::AbstractConfiguration;
-using Util::MapConfiguration;
-using Foundation::AutoPtr;
+using Poco::Util::AbstractConfiguration;
+using Poco::Util::MapConfiguration;
+using Poco::AutoPtr;
 
 
 AbstractConfigurationTest::AbstractConfigurationTest(const std::string& name): CppUnit::TestCase(name)
@@ -82,7 +82,7 @@ void AbstractConfigurationTest::testGetString()
 		std::string res = pConf->getString("foo");
 		fail("nonexistent property - must throw");
 	}
-	catch (Foundation::NotFoundException&)
+	catch (Poco::NotFoundException&)
 	{
 	}
 	
@@ -108,7 +108,7 @@ void AbstractConfigurationTest::testGetInt()
 		int x = pConf->getInt("prop1");
 		fail("not a number - must throw");
 	}
-	catch (Foundation::SyntaxException&)
+	catch (Poco::SyntaxException&)
 	{
 	}
 	
@@ -130,7 +130,7 @@ void AbstractConfigurationTest::testGetDouble()
 		double x = pConf->getDouble("prop1");
 		fail("not a number - must throw");
 	}
-	catch (Foundation::SyntaxException&)
+	catch (Poco::SyntaxException&)
 	{
 	}
 	
@@ -158,7 +158,7 @@ void AbstractConfigurationTest::testGetBool()
 		bool x = pConf->getBool("prop1");
 		fail("not a boolean - must throw");
 	}
-	catch (Foundation::SyntaxException&)
+	catch (Poco::SyntaxException&)
 	{
 	}
 
@@ -181,7 +181,7 @@ void AbstractConfigurationTest::testExpand()
 		std::string s = pConf->getString("ref3");
 		fail("circular reference - must throw");
 	}
-	catch (Foundation::CircularReferenceException&)
+	catch (Poco::CircularReferenceException&)
 	{
 	}
 	

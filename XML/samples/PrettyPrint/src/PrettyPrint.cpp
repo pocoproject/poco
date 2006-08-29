@@ -1,7 +1,7 @@
 //
 // PrettyPrint.cpp
 //
-// $Id: //poco/1.1.0/XML/samples/PrettyPrint/src/PrettyPrint.cpp#2 $
+// $Id: //poco/1.2/XML/samples/PrettyPrint/src/PrettyPrint.cpp#1 $
 //
 // This sample demonstrates the SAXParser, WhitespaceFilter,
 // InputSource and XMLWriter classes.
@@ -33,20 +33,20 @@
 //
 
 
-#include "SAX/SAXParser.h"
-#include "SAX/WhitespaceFilter.h"
-#include "SAX/InputSource.h"
-#include "XML/XMLWriter.h"
-#include "Foundation/Exception.h"
+#include "Poco/SAX/SAXParser.h"
+#include "Poco/SAX/WhitespaceFilter.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/XML/XMLWriter.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-using XML::SAXParser;
-using XML::XMLReader;
-using XML::WhitespaceFilter;
-using XML::InputSource;
-using XML::XMLWriter;
-using Foundation::Exception;
+using Poco::XML::SAXParser;
+using Poco::XML::XMLReader;
+using Poco::XML::WhitespaceFilter;
+using Poco::XML::InputSource;
+using Poco::XML::XMLWriter;
+using Poco::Exception;
 
 
 int main(int argc, char** argv)
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 
 	filter.setContentHandler(&writer);
 	filter.setDTDHandler(&writer);
-	filter.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<XML::LexicalHandler*>(&writer));
+	filter.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
 
 	try
 	{

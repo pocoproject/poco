@@ -1,7 +1,7 @@
 #
 # $Id: //poco/Main/build/config/Linux#5 $
 #
-# Linux
+# CYGWIN
 #
 # Make settings for Cygwin on WinXP/gcc 3.4
 #
@@ -17,10 +17,10 @@ LINKMODE = SHARED
 #
 CC      = gcc
 CXX     = g++
-LINK    = g++
+LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = g++ -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
+SHLIB   = $(CXX) -shared -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
 SHELL   = sh
@@ -31,6 +31,7 @@ MKDIR   = mkdir -p
 #
 # Extension for Shared Libraries
 #
+LIBPREFIX        = cyg
 SHAREDLIBEXT     = .$(target_version).dll
 SHAREDLIBLINKEXT = .dll
 
@@ -40,7 +41,7 @@ SHAREDLIBLINKEXT = .dll
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = 
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       =
@@ -50,8 +51,8 @@ STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
 SHAREDOPT_CC    = 
-SHAREDOPT_CXX   = -DPOCO_DLL
-SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
+SHAREDOPT_CXX   = 
+SHAREDOPT_LINK  = 
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
@@ -62,9 +63,9 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE 
+SYSFLAGS = -D_XOPEN_SOURCE=500
 
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lpthread -lcygwin
+SYSLIBS  = 

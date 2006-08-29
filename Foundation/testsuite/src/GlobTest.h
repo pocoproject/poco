@@ -1,7 +1,7 @@
 //
 // GlobTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/GlobTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/GlobTest.h#1 $
 //
 // Definition of the GlobTest class.
 //
@@ -36,16 +36,9 @@
 #define GlobTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
-#ifndef STD_SET_INCLUDED
 #include <set>
-#define STD_SET_INCLUDED
-#endif
 
 
 class GlobTest: public CppUnit::TestCase

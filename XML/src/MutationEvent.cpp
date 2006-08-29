@@ -1,7 +1,7 @@
 //
 // MutationEvent.cpp
 //
-// $Id: //poco/1.1.0/XML/src/MutationEvent.cpp#2 $
+// $Id: //poco/1.2/XML/src/MutationEvent.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/MutationEvent.h"
+#include "Poco/DOM/MutationEvent.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString MutationEvent::DOMSubtreeModified          = toXMLString("DOMSubtreeModified");
@@ -94,4 +95,4 @@ void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, boo
 }
 
 	 
-XML_END
+} } // namespace Poco::XML

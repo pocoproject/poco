@@ -1,7 +1,7 @@
 //
 // SampleServer.cpp
 //
-// $Id: //poco/1.1.0/Util/samples/SampleServer/src/SampleServer.cpp#2 $
+// $Id: //poco/1.2/Util/samples/SampleServer/src/SampleServer.cpp#1 $
 //
 // This sample demonstrates the ServerApplication class.
 //
@@ -32,24 +32,25 @@
 //
 
 
-#include "Util/ServerApplication.h"
-#include "Util/Option.h"
-#include "Util/OptionSet.h"
-#include "Util/HelpFormatter.h"
-#include "Foundation/Task.h"
-#include "Foundation/TaskManager.h"
-#include "Foundation/DateTimeFormatter.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/HelpFormatter.h"
+#include "Poco/Task.h"
+#include "Poco/TaskManager.h"
+#include "Poco/DateTimeFormatter.h"
 #include <iostream>
 
 
-using Util::Application;
-using Util::ServerApplication;
-using Util::Option;
-using Util::OptionSet;
-using Util::HelpFormatter;
-using Foundation::Task;
-using Foundation::TaskManager;
-using Foundation::DateTimeFormatter;
+using Poco::Util::Application;
+using Poco::Util::ServerApplication;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::OptionCallback;
+using Poco::Util::HelpFormatter;
+using Poco::Task;
+using Poco::TaskManager;
+using Poco::DateTimeFormatter;
 
 
 class SampleTask: public Task
@@ -102,15 +103,15 @@ protected:
 		options.addOption(
 			Option("help", "h", "display help information on command line arguments")
 				.required(false)
-				.repeatable(false));
+				.repeatable(false)
+				.callback(OptionCallback<SampleServer>(this, &SampleServer::handleHelp)));
 	}
 
-	void handleOption(const std::string& name, const std::string& value)
+	void handleHelp(const std::string& name, const std::string& value)
 	{
-		ServerApplication::handleOption(name, value);
-
-		if (name == "help")
-			_helpRequested = true;
+		_helpRequested = true;
+		displayHelp();
+		stopOptionsProcessing();
 	}
 
 	void displayHelp()
@@ -124,11 +125,7 @@ protected:
 
 	int main(const std::vector<std::string>& args)
 	{
-		if (_helpRequested)
-		{
-			displayHelp();
-		}
-		else
+		if (!_helpRequested)
 		{
 			TaskManager tm;
 			tm.start(new SampleTask);
@@ -144,8 +141,4 @@ private:
 };
 
 
-int main(int argc, char** argv)
-{
-	SampleServer app;
-	return app.run(argc, argv);
-}
+POCO_SERVER_MAIN(SampleServer)

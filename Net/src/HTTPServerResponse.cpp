@@ -1,7 +1,7 @@
 //
 // HTTPServerResponse.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPServerResponse.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPServerResponse.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -34,28 +34,29 @@
 //
 
 
-#include "Net/HTTPServerResponse.h"
-#include "Net/HTTPServerSession.h"
-#include "Net/HTTPHeaderStream.h"
-#include "Net/HTTPStream.h"
-#include "Net/HTTPFixedLengthStream.h"
-#include "Net/HTTPChunkedStream.h"
-#include "Foundation/File.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/StreamCopier.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerSession.h"
+#include "Poco/Net/HTTPHeaderStream.h"
+#include "Poco/Net/HTTPStream.h"
+#include "Poco/Net/HTTPFixedLengthStream.h"
+#include "Poco/Net/HTTPChunkedStream.h"
+#include "Poco/File.h"
+#include "Poco/Timestamp.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Exception.h"
 #include <fstream>
 
 
-using Foundation::File;
-using Foundation::Timestamp;
-using Foundation::NumberFormatter;
-using Foundation::StreamCopier;
-using Foundation::OpenFileException;
+using Poco::File;
+using Poco::Timestamp;
+using Poco::NumberFormatter;
+using Poco::StreamCopier;
+using Poco::OpenFileException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPServerResponse::HTTPServerResponse(HTTPServerSession& session):
@@ -74,7 +75,7 @@ HTTPServerResponse::~HTTPServerResponse()
 void HTTPServerResponse::sendContinue()
 {
 	HTTPHeaderOutputStream hs(_session);
-	hs << getVersion() << " 100 Continue\r\n";
+	hs << getVersion() << " 100 Continue\r\n\r\n";
 }
 
 
@@ -147,4 +148,4 @@ void HTTPServerResponse::requireAuthentication(const std::string& realm)
 }
 
 
-Net_END
+} } // namespace Poco::Net

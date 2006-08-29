@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/rules/lib#1 $
+# $Id: //poco/1.2/build/rules/lib#1 $
 #
 # lib
 #
@@ -9,18 +9,22 @@
 #
 # Target names
 #
+ifeq ($(OSNAME),CYGWIN)
+SHL_EXT = $(SHAREDLIBLINKEXT)
+else
 ifdef target_version
 SHL_EXT = $(SHAREDLIBEXT)
 else
 SHL_EXT = $(SHAREDLIBLINKEXT)
 endif
+endif
 
-LIB_RELEASE_STATIC      = $(LIBPATH)/lib$(target)$(OSARCH_POSTFIX).a
-LIB_DEBUG_STATIC        = $(LIBPATH)/lib$(target)d$(OSARCH_POSTFIX).a
-LIB_RELEASE_SHARED      = $(LIBPATH)/lib$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
-LIB_DEBUG_SHARED        = $(LIBPATH)/lib$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)
-LIB_RELEASE_SHARED_LINK = $(LIBPATH)/lib$(target)$(OSARCH_POSTFIX)$(SHAREDLIBLINKEXT)
-LIB_DEBUG_SHARED_LINK   = $(LIBPATH)/lib$(target)d$(OSARCH_POSTFIX)$(SHAREDLIBLINKEXT)
+LIB_RELEASE_STATIC      = $(LIBPATH)/$(LIBPREFIX)$(target)$(OSARCH_POSTFIX).a
+LIB_DEBUG_STATIC        = $(LIBPATH)/$(LIBPREFIX)$(target)d$(OSARCH_POSTFIX).a
+LIB_RELEASE_SHARED      = $(LIBPATH)/$(LIBPREFIX)$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
+LIB_DEBUG_SHARED        = $(LIBPATH)/$(LIBPREFIX)$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)
+LIB_RELEASE_SHARED_LINK = $(LIBPATH)/$(LIBPREFIX)$(target)$(OSARCH_POSTFIX)$(SHAREDLIBLINKEXT)
+LIB_DEBUG_SHARED_LINK   = $(LIBPATH)/$(LIBPREFIX)$(target)d$(OSARCH_POSTFIX)$(SHAREDLIBLINKEXT)
 
 TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
 TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
@@ -28,7 +32,7 @@ TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
 #
 # Include the compile rules
 #
-include $(POCO_BUILD)/rules/compile
+include $(POCO_BASE)/build/rules/compile
 
 #
 # Rules for creating a library
@@ -37,10 +41,10 @@ clean:
 	$(RM) $(OBJPATH)
 	$(RM) $(LIB_RELEASE_STATIC) $(LIB_DEBUG_STATIC) $(LIB_RELEASE_SHARED) $(LIB_DEBUG_SHARED)
 
-static_debug:   dirs $(LIB_DEBUG_STATIC)
-static_release: dirs $(LIB_RELEASE_STATIC)
-shared_debug:   dirs $(LIB_DEBUG_SHARED)
-shared_release: dirs $(LIB_RELEASE_SHARED)
+static_debug:   libdirs $(LIB_DEBUG_STATIC)
+static_release: libdirs $(LIB_RELEASE_STATIC)
+shared_debug:   libdirs $(LIB_DEBUG_SHARED)
+shared_release: libdirs $(LIB_RELEASE_SHARED)
 
 $(LIB_DEBUG_STATIC): $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
 	@echo "** Building library (debug)" $@

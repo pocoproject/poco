@@ -1,7 +1,7 @@
 //
 // NamedMutex_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedMutex_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedMutex_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/NamedMutex_VMS.h"
+#include "Poco/NamedMutex_VMS.h"
 #include <starlet.h>
 #include <iodef.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NamedMutexImpl::NamedMutexImpl(const std::string& name):
@@ -84,4 +84,4 @@ void NamedMutexImpl::unlockImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

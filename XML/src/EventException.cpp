@@ -1,7 +1,7 @@
 //
 // EventException.cpp
 //
-// $Id: //poco/1.1.0/XML/src/EventException.cpp#2 $
+// $Id: //poco/1.2/XML/src/EventException.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,11 +34,12 @@
 //
 
 
-#include "DOM/EventException.h"
+#include "Poco/DOM/EventException.h"
 #include <typeinfo>
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 EventException::EventException(int code):
@@ -77,10 +78,10 @@ const char* EventException::className() const throw()
 }
 
 
-Foundation::Exception* EventException::clone() const
+Poco::Exception* EventException::clone() const
 {
 	return new EventException(*this);
 }
 
 
-XML_END
+} } // namespace Poco::XML

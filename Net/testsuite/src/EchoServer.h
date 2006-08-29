@@ -1,7 +1,7 @@
 //
 // EchoServer.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/EchoServer.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/EchoServer.h#1 $
 //
 // Definition of the EchoServer class.
 //
@@ -36,21 +36,13 @@
 #define EchoServer_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef Net_ServerSocket_INCLUDED
-#include "Net/ServerSocket.h"
-#endif
-#ifndef Net_Foundation_Thread_INCLUDED
-#include "Foundation/Thread.h"
-#endif
-#ifndef Net_Foundation_Event_INCLUDED
-#include "Foundation/Event.h"
-#endif
+#include "Poco/Net/Net.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
 
 
-class EchoServer: public Foundation::Runnable
+class EchoServer: public Poco::Runnable
 	/// A simple sequential echo server.
 {
 public:
@@ -60,7 +52,7 @@ public:
 	~EchoServer();
 		/// Destroys the EchoServer.
 
-	Foundation::UInt16 port() const;
+	Poco::UInt16 port() const;
 		/// Returns the port the echo server is
 		/// listening on.
 		
@@ -68,10 +60,10 @@ public:
 		/// Does the work.
 		
 private:
-	Net::ServerSocket  _socket;
-	Foundation::Thread _thread;
-	Foundation::Event  _ready;
-	bool               _stop;
+	Poco::Net::ServerSocket _socket;
+	Poco::Thread _thread;
+	Poco::Event  _ready;
+	bool         _stop;
 };
 
 

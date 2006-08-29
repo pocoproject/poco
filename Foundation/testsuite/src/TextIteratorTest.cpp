@@ -1,7 +1,7 @@
 //
 // TextIteratorTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TextIteratorTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TextIteratorTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "TextIteratorTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/TextIterator.h"
-#include "Foundation/Latin1Encoding.h"
-#include "Foundation/UTF8Encoding.h"
+#include "Poco/TextIterator.h"
+#include "Poco/Latin1Encoding.h"
+#include "Poco/UTF8Encoding.h"
 
 
-using Foundation::TextIterator;
-using Foundation::Latin1Encoding;
-using Foundation::UTF8Encoding;
+using Poco::TextIterator;
+using Poco::Latin1Encoding;
+using Poco::UTF8Encoding;
 
 
 TextIteratorTest::TextIteratorTest(const std::string& name): CppUnit::TestCase(name)
@@ -131,7 +131,7 @@ void TextIteratorTest::testOneUTF8()
 	++it;
 	assert (it == end);
 	
-	unsigned char data[Foundation::TextEncoding::MAX_SEQUENCE_LENGTH];
+	unsigned char data[Poco::TextEncoding::MAX_SEQUENCE_LENGTH];
 	
 	// 2 byte sequence
 	int n = encoding.convert(0xab, data, sizeof(data));

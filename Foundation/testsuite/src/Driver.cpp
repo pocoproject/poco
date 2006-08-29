@@ -1,7 +1,7 @@
 //
 // Driver.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/Driver.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/Driver.cpp#1 $
 //
 // Console-based test driver.
 //

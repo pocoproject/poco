@@ -1,7 +1,7 @@
 //
 // DNSTest.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/DNSTest.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/DNSTest.h#1 $
 //
 // Definition of the DNSTest class.
 //
@@ -36,12 +36,8 @@
 #define DNSTest_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class DNSTest: public CppUnit::TestCase

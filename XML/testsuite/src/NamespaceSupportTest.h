@@ -1,7 +1,7 @@
 //
 // NamespaceSupportTest.h
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/NamespaceSupportTest.h#2 $
+// $Id: //poco/1.2/XML/testsuite/src/NamespaceSupportTest.h#1 $
 //
 // Definition of the NamespaceSupportTest class.
 //
@@ -36,12 +36,8 @@
 #define NamespaceSupportTest_INCLUDED
 
 
-#ifndef XML_XML_INCLUDED
-#include "XML/XML.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/XML/XML.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class NamespaceSupportTest: public CppUnit::TestCase

@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Net/testsuite/Makefile#1 $
+# $Id: //poco/1.2/Net/testsuite/Makefile#1 $
 #
 # Makefile for Poco Net testsuite
 #
@@ -23,7 +23,8 @@ objects = \
 	FTPStreamFactoryTest DialogServer \
 	SocketReactorTest ReactorTestSuite \
 	MailTestSuite MailMessageTest MailStreamTest \
-	SMTPClientSessionTest POP3ClientSessionTest
+	SMTPClientSessionTest POP3ClientSessionTest \
+	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite
 
 target         = testrunner
 target_version = 1

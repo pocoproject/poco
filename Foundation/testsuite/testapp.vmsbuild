@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/1.1.0/Foundation/testsuite/testapp.vmsbuild#1 $
+# $Id: //poco/1.2/Foundation/testsuite/testapp.vmsbuild#1 $
 #
 EXE=TestApp
 TestApp

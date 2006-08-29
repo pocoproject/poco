@@ -1,7 +1,7 @@
 //
 // WinRegistryTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/WinRegistryTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/WinRegistryTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "WinRegistryTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/WinRegistryKey.h"
-#include "Foundation/Environment.h"
+#include "Poco/Util/WinRegistryKey.h"
+#include "Poco/Environment.h"
 
 
-using Util::WinRegistryKey;
-using Foundation::Environment;
+using Poco::Util::WinRegistryKey;
+using Poco::Environment;
 
 
 WinRegistryTest::WinRegistryTest(const std::string& name): CppUnit::TestCase(name)
@@ -54,6 +54,7 @@ WinRegistryTest::~WinRegistryTest()
 void WinRegistryTest::testRegistry()
 {
 	WinRegistryKey regKey("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
+	regKey.deleteKey();
 	regKey.setString("name1", "value1");
 	assert (regKey.getString("name1") == "value1");
 	regKey.setString("name1", "Value1");
@@ -63,7 +64,14 @@ void WinRegistryTest::testRegistry()
 	assert (regKey.exists("name1"));
 	assert (regKey.exists("name2"));
 	assert (regKey.exists());
-	
+
+	WinRegistryKey::Values vals;
+	regKey.values(vals);
+	assert (vals.size() == 2);
+	assert (vals[0] == "name1" || vals[0] == "name2");
+	assert (vals[1] == "name1" || vals[1] == "name2");
+	assert (vals[0] != vals[1]);
+
 	Environment::set("FOO", "bar");
 	regKey.setStringExpand("name3", "%FOO%");
 	assert (regKey.getStringExpand("name3") == "bar");

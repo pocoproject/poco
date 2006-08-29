@@ -1,7 +1,7 @@
 //
 // ElementTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/ElementTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/ElementTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,24 +33,24 @@
 #include "ElementTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "DOM/Document.h"
-#include "DOM/Element.h"
-#include "DOM/Attr.h"
-#include "DOM/Text.h"
-#include "DOM/NamedNodeMap.h"
-#include "DOM/NodeList.h"
-#include "DOM/AutoPtr.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/NamedNodeMap.h"
+#include "Poco/DOM/NodeList.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
-using XML::Element;
-using XML::Document;
-using XML::Attr;
-using XML::Text;
-using XML::Node;
-using XML::NamedNodeMap;
-using XML::NodeList;
-using XML::AutoPtr;
-using XML::XMLString;
+using Poco::XML::Element;
+using Poco::XML::Document;
+using Poco::XML::Attr;
+using Poco::XML::Text;
+using Poco::XML::Node;
+using Poco::XML::NamedNodeMap;
+using Poco::XML::NodeList;
+using Poco::XML::AutoPtr;
+using Poco::XML::XMLString;
 
 
 ElementTest::ElementTest(const std::string& name): CppUnit::TestCase(name)

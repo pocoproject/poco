@@ -1,7 +1,7 @@
 //
 // TestPlugin.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TestPlugin.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TestPlugin.h#1 $
 //
 // Definition of the TestPlugin class.
 //
@@ -36,9 +36,7 @@
 #define TestPlugin_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
+#include "Poco/Foundation.h"
 
 
 class TestPlugin

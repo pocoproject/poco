@@ -1,7 +1,7 @@
 //
 // LayeredConfiguration.cpp
 //
-// $Id: //poco/1.1.0/Util/src/LayeredConfiguration.cpp#2 $
+// $Id: //poco/1.2/Util/src/LayeredConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,16 +34,17 @@
 //
 
 
-#include "Util/LayeredConfiguration.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/LayeredConfiguration.h"
+#include "Poco/Exception.h"
 #include <set>
 
 
-using Foundation::AutoPtr;
-using Foundation::RuntimeException;
+using Poco::AutoPtr;
+using Poco::RuntimeException;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 LayeredConfiguration::LayeredConfiguration()
@@ -123,4 +124,4 @@ void LayeredConfiguration::enumerate(const std::string& key, Keys& range) const
 }
 
 
-Util_END
+} } // namespace Poco::Util

@@ -1,7 +1,7 @@
 //
 // MediaType.cpp
 //
-// $Id: //poco/1.1.0/Net/src/MediaType.cpp#2 $
+// $Id: //poco/1.2/Net/src/MediaType.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,17 +34,18 @@
 //
 
 
-#include "Net/MediaType.h"
-#include "Net/MessageHeader.h"
-#include "Foundation/String.h"
+#include "Poco/Net/MediaType.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/String.h"
 #include <algorithm>
 #include <ctype.h>
 
 
-using Foundation::icompare;
+using Poco::icompare;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 MediaType::MediaType(const std::string& mediaType)
@@ -187,4 +188,4 @@ void MediaType::parse(const std::string& mediaType)
 }
 
 
-Net_END
+} } // namespace Poco::Net

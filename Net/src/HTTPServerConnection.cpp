@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPServerConnection.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPServerConnection.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -34,19 +34,20 @@
 //
 
 
-#include "Net/HTTPServerConnection.h"
-#include "Net/HTTPServerSession.h"
-#include "Net/HTTPServerRequest.h"
-#include "Net/HTTPServerResponse.h"
-#include "Net/HTTPRequestHandler.h"
-#include "Net/HTTPRequestHandlerFactory.h"
-#include "Net/HTTPServerParams.h"
-#include "Net/NetException.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/HTTPServerConnection.h"
+#include "Poco/Net/HTTPServerSession.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/NumberFormatter.h"
 #include <memory>
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams* pParams, HTTPRequestHandlerFactory* pFactory):
@@ -99,4 +100,4 @@ void HTTPServerConnection::run()
 }
 
 
-Net_END
+} } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // SimpleFileChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SimpleFileChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SimpleFileChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,15 +34,15 @@
 //
 
 
-#include "Foundation/SimpleFileChannel.h"
-#include "Foundation/LogFile.h"
-#include "Foundation/File.h"
-#include "Foundation/Message.h"
-#include "Foundation/Exception.h"
+#include "Poco/SimpleFileChannel.h"
+#include "Poco/LogFile.h"
+#include "Poco/File.h"
+#include "Poco/Message.h"
+#include "Poco/Exception.h"
 #include <ctype.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const std::string SimpleFileChannel::PROP_PATH          = "path";
@@ -225,4 +225,4 @@ void SimpleFileChannel::rotate()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // StreamTokenizerTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/StreamTokenizerTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/StreamTokenizerTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "StreamTokenizerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/StreamTokenizer.h"
-#include "Foundation/Token.h"
+#include "Poco/StreamTokenizer.h"
+#include "Poco/Token.h"
 #include <ctype.h>
 #include <sstream>
 
 
-using Foundation::StreamTokenizer;
-using Foundation::Token;
-using Foundation::InvalidToken;
-using Foundation::EOFToken;
-using Foundation::WhitespaceToken;
+using Poco::StreamTokenizer;
+using Poco::Token;
+using Poco::InvalidToken;
+using Poco::EOFToken;
+using Poco::WhitespaceToken;
 
 
 class IdentifierToken: public Token

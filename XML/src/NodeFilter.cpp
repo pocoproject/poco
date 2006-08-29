@@ -1,7 +1,7 @@
 //
 // NodeFilter.cpp
 //
-// $Id: //poco/1.1.0/XML/src/NodeFilter.cpp#2 $
+// $Id: //poco/1.2/XML/src/NodeFilter.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/NodeFilter.h"
+#include "Poco/DOM/NodeFilter.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 NodeFilter::~NodeFilter()
@@ -45,4 +46,4 @@ NodeFilter::~NodeFilter()
 }
 
 
-XML_END
+} } // namespace Poco::XML

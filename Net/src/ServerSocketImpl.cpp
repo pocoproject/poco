@@ -1,7 +1,7 @@
 //
 // ServerSocketImpl.cpp
 //
-// $Id: //poco/1.1.0/Net/src/ServerSocketImpl.cpp#2 $
+// $Id: //poco/1.2/Net/src/ServerSocketImpl.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/ServerSocketImpl.h"
+#include "Poco/Net/ServerSocketImpl.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 ServerSocketImpl::ServerSocketImpl()
@@ -50,4 +51,4 @@ ServerSocketImpl::~ServerSocketImpl()
 }
 
 
-Net_END
+} } // namespace Poco::Net

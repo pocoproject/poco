@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Net"
 	ProjectGUID="{B057A1FE-09F7-465E-B8B5-E1B659051D76}"
 	RootNamespace="Net"
@@ -212,31 +212,31 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\DNS.h"
+					RelativePath=".\include\Poco\Net\DNS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HostEntry.h"
+					RelativePath=".\include\Poco\Net\HostEntry.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\IPAddress.h"
+					RelativePath=".\include\Poco\Net\IPAddress.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\Net.h"
+					RelativePath=".\include\Poco\Net\Net.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\NetException.h"
+					RelativePath=".\include\Poco\Net\NetException.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SocketAddress.h"
+					RelativePath=".\include\Poco\Net\SocketAddress.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SocketDefs.h"
+					RelativePath=".\include\Poco\Net\SocketDefs.h"
 					>
 				</File>
 			</Filter>
@@ -272,51 +272,59 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\DatagramSocket.h"
+					RelativePath=".\include\Poco\Net\DatagramSocket.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\DatagramSocketImpl.h"
+					RelativePath=".\include\Poco\Net\DatagramSocketImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\DialogSocket.h"
+					RelativePath=".\include\Poco\Net\DialogSocket.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\MulticastSocket.h"
+					RelativePath=".\include\Poco\Net\MulticastSocket.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\NetworkInterface.h"
+					RelativePath=".\include\Poco\Net\NetworkInterface.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\ServerSocket.h"
+					RelativePath=".\include\Poco\Net\RawSocket.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\ServerSocketImpl.h"
+					RelativePath=".\include\Poco\Net\RawSocketImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\Socket.h"
+					RelativePath=".\include\Poco\Net\ServerSocket.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SocketImpl.h"
+					RelativePath=".\include\Poco\Net\ServerSocketImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SocketStream.h"
+					RelativePath=".\include\Poco\Net\Socket.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\StreamSocket.h"
+					RelativePath=".\include\Poco\Net\SocketImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\StreamSocketImpl.h"
+					RelativePath=".\include\Poco\Net\SocketStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\StreamSocket.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\StreamSocketImpl.h"
 					>
 				</File>
 			</Filter>
@@ -341,6 +349,14 @@
 				</File>
 				<File
 					RelativePath=".\src\NetworkInterface.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RawSocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RawSocketImpl.cpp"
 					>
 				</File>
 				<File
@@ -380,51 +396,51 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\FilePartSource.h"
+					RelativePath=".\include\Poco\Net\FilePartSource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\MediaType.h"
+					RelativePath=".\include\Poco\Net\MediaType.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\MessageHeader.h"
+					RelativePath=".\include\Poco\Net\MessageHeader.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\MultipartReader.h"
+					RelativePath=".\include\Poco\Net\MultipartReader.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\MultipartWriter.h"
+					RelativePath=".\include\Poco\Net\MultipartWriter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\NameValueCollection.h"
+					RelativePath=".\include\Poco\Net\NameValueCollection.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\NullPartHandler.h"
+					RelativePath=".\include\Poco\Net\NullPartHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\PartHandler.h"
+					RelativePath=".\include\Poco\Net\PartHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\PartSource.h"
+					RelativePath=".\include\Poco\Net\PartSource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\QuotedPrintableDecoder.h"
+					RelativePath=".\include\Poco\Net\QuotedPrintableDecoder.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\QuotedPrintableEncoder.h"
+					RelativePath=".\include\Poco\Net\QuotedPrintableEncoder.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\StringPartSource.h"
+					RelativePath=".\include\Poco\Net\StringPartSource.h"
 					>
 				</File>
 			</Filter>
@@ -488,51 +504,51 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\HTTPBasicCredentials.h"
+					RelativePath=".\include\Poco\Net\HTTPBasicCredentials.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPBasicStreamBuf.h"
+					RelativePath=".\include\Poco\Net\HTTPBasicStreamBuf.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPBufferAllocator.h"
+					RelativePath=".\include\Poco\Net\HTTPBufferAllocator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPChunkedStream.h"
+					RelativePath=".\include\Poco\Net\HTTPChunkedStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPCookie.h"
+					RelativePath=".\include\Poco\Net\HTTPCookie.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPFixedLengthStream.h"
+					RelativePath=".\include\Poco\Net\HTTPFixedLengthStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPHeaderStream.h"
+					RelativePath=".\include\Poco\Net\HTTPHeaderStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPMessage.h"
+					RelativePath=".\include\Poco\Net\HTTPMessage.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPRequest.h"
+					RelativePath=".\include\Poco\Net\HTTPRequest.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPResponse.h"
+					RelativePath=".\include\Poco\Net\HTTPResponse.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPSession.h"
+					RelativePath=".\include\Poco\Net\HTTPSession.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPStream.h"
+					RelativePath=".\include\Poco\Net\HTTPStream.h"
 					>
 				</File>
 			</Filter>
@@ -592,23 +608,23 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\TCPServer.h"
+					RelativePath=".\include\Poco\Net\TCPServer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\TCPServerConnection.h"
+					RelativePath=".\include\Poco\Net\TCPServerConnection.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\TCPServerConnectionFactory.h"
+					RelativePath=".\include\Poco\Net\TCPServerConnectionFactory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\TCPServerDispatcher.h"
+					RelativePath=".\include\Poco\Net\TCPServerDispatcher.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\TCPServerParams.h"
+					RelativePath=".\include\Poco\Net\TCPServerParams.h"
 					>
 				</File>
 			</Filter>
@@ -644,39 +660,39 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\HTTPRequestHandler.h"
+					RelativePath=".\include\Poco\Net\HTTPRequestHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPRequestHandlerFactory.h"
+					RelativePath=".\include\Poco\Net\HTTPRequestHandlerFactory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPServer.h"
+					RelativePath=".\include\Poco\Net\HTTPServer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPServerConnection.h"
+					RelativePath=".\include\Poco\Net\HTTPServerConnection.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPServerConnectionFactory.h"
+					RelativePath=".\include\Poco\Net\HTTPServerConnectionFactory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPServerParams.h"
+					RelativePath=".\include\Poco\Net\HTTPServerParams.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPServerRequest.h"
+					RelativePath=".\include\Poco\Net\HTTPServerRequest.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPServerResponse.h"
+					RelativePath=".\include\Poco\Net\HTTPServerResponse.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPServerSession.h"
+					RelativePath=".\include\Poco\Net\HTTPServerSession.h"
 					>
 				</File>
 			</Filter>
@@ -728,15 +744,23 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\HTTPClientSession.h"
+					RelativePath=".\include\Poco\Net\HTTPClientSession.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPIOStream.h"
+					RelativePath=".\include\Poco\Net\HTTPIOStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\HTTPStreamFactory.h"
+					RelativePath=".\include\Poco\Net\HTTPSessionFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPSessionInstantiator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPStreamFactory.h"
 					>
 				</File>
 			</Filter>
@@ -752,6 +776,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\HTTPSessionFactory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPSessionInstantiator.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\HTTPStreamFactory.cpp"
 					>
 				</File>
@@ -764,7 +796,7 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\HTMLForm.h"
+					RelativePath=".\include\Poco\Net\HTMLForm.h"
 					>
 				</File>
 			</Filter>
@@ -784,11 +816,11 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\FTPClientSession.h"
+					RelativePath=".\include\Poco\Net\FTPClientSession.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\FTPStreamFactory.h"
+					RelativePath=".\include\Poco\Net\FTPStreamFactory.h"
 					>
 				</File>
 			</Filter>
@@ -812,23 +844,23 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\SocketAcceptor.h"
+					RelativePath=".\include\Poco\Net\SocketAcceptor.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SocketConnector.h"
+					RelativePath=".\include\Poco\Net\SocketConnector.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SocketNotification.h"
+					RelativePath=".\include\Poco\Net\SocketNotification.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SocketNotifier.h"
+					RelativePath=".\include\Poco\Net\SocketNotifier.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SocketReactor.h"
+					RelativePath=".\include\Poco\Net\SocketReactor.h"
 					>
 				</File>
 			</Filter>
@@ -856,23 +888,23 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Net\MailMessage.h"
+					RelativePath=".\include\Poco\Net\MailMessage.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\MailRecipient.h"
+					RelativePath=".\include\Poco\Net\MailRecipient.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\MailStream.h"
+					RelativePath=".\include\Poco\Net\MailStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\POP3ClientSession.h"
+					RelativePath=".\include\Poco\Net\POP3ClientSession.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Net\SMTPClientSession.h"
+					RelativePath=".\include\Poco\Net\SMTPClientSession.h"
 					>
 				</File>
 			</Filter>
@@ -897,6 +929,74 @@
 				</File>
 				<File
 					RelativePath=".\src\SMTPClientSession.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="ICMP"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPClient.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPEventArgs.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPPacket.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPPacketImpl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPSocket.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPSocketImpl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPv4PacketImpl.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\ICMPClient.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPEventArgs.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPPacket.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPPacketImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPSocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPSocketImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPv4PacketImpl.cpp"
 					>
 				</File>
 			</Filter>

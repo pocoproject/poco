@@ -1,7 +1,7 @@
 //
 // EventTestSuite.h
 //
-// $Id: $
+// $Id: //poco/1.2/Foundation/testsuite/src/EventTestSuite.h#1 $
 //
 // Definition of the EventTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define EventTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class EventTestSuite

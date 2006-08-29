@@ -1,7 +1,7 @@
 //
 // inflate.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/inflate/src/inflate.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/inflate/src/inflate.cpp#1 $
 //
 // This sample demonstrates the InflatingInputStream and StreamCopier classes.
 //
@@ -32,14 +32,14 @@
 //
 
 
-#include "Foundation/InflatingStream.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/InflatingStream.h"
+#include "Poco/StreamCopier.h"
 #include <iostream>
 #include <fstream>
 
 
-using Foundation::InflatingInputStream;
-using Foundation::StreamCopier;
+using Poco::InflatingInputStream;
+using Poco::StreamCopier;
 
 
 int main(int argc, char** argv)

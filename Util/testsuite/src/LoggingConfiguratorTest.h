@@ -1,7 +1,7 @@
 //
 // LoggingConfiguratorTest.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/LoggingConfiguratorTest.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/LoggingConfiguratorTest.h#1 $
 //
 // Definition of the LoggingConfiguratorTest class.
 //
@@ -36,12 +36,8 @@
 #define LoggingConfiguratorTest_INCLUDED
 
 
-#ifndef Util_Util_INCLUDED
-#include "Util/Util.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Util/Util.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class LoggingConfiguratorTest: public CppUnit::TestCase

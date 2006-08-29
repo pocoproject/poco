@@ -1,7 +1,7 @@
 //
 // DigestStream.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DigestStream.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DigestStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/DigestStream.h"
+#include "Poco/DigestStream.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const int DigestBuf::BUFFER_SIZE = 256;
@@ -46,8 +46,8 @@ const int DigestBuf::BUFFER_SIZE = 256;
 DigestBuf::DigestBuf(DigestEngine& eng): 
 	BufferedStreamBuf(BUFFER_SIZE, std::ios::out), 
 	_eng(eng), 
-	_pOstr(0), 
-	_pIstr(0)
+	_pIstr(0),
+	_pOstr(0) 
 {
 }
 
@@ -169,4 +169,4 @@ void DigestOutputStream::close()
 }
 
 
-Foundation_END
+} // namespace Poco

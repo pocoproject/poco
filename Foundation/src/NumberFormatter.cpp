@@ -1,7 +1,7 @@
 //
 // NumberFormatter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NumberFormatter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NumberFormatter.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/NumberFormatter.h"
+#include "Poco/NumberFormatter.h"
 #include <stdio.h>
 #include <ctype.h>
 
@@ -48,7 +48,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::string NumberFormatter::format(int value)
@@ -381,4 +381,4 @@ std::string NumberFormatter::format(const void* ptr)
 }
 
 
-Foundation_END
+} // namespace Poco

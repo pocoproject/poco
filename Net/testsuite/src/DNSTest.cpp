@@ -1,7 +1,7 @@
 //
 // DNSTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/DNSTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/DNSTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,18 +33,18 @@
 #include "DNSTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/DNS.h"
-#include "Net/HostEntry.h"
-#include "Net/NetException.h"
+#include "Poco/Net/DNS.h"
+#include "Poco/Net/HostEntry.h"
+#include "Poco/Net/NetException.h"
 
 
-using Net::DNS;
-using Net::IPAddress;
-using Net::HostEntry;
-using Net::InvalidAddressException;
-using Net::HostNotFoundException;
-using Net::ServiceNotFoundException;
-using Net::NoAddressFoundException;
+using Poco::Net::DNS;
+using Poco::Net::IPAddress;
+using Poco::Net::HostEntry;
+using Poco::Net::InvalidAddressException;
+using Poco::Net::HostNotFoundException;
+using Poco::Net::ServiceNotFoundException;
+using Poco::Net::NoAddressFoundException;
 
 
 DNSTest::DNSTest(const std::string& name): CppUnit::TestCase(name)

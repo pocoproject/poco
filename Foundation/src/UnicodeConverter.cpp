@@ -1,7 +1,7 @@
 //
 // UnicodeConverter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/UnicodeConverter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/UnicodeConverter.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,16 +34,19 @@
 //
 
 
-#include "Foundation/UnicodeConverter.h"
-#include "Foundation/TextConverter.h"
-#include "Foundation/TextIterator.h"
-#include "Foundation/UTF8Encoding.h"
-#include "Foundation/UTF16Encoding.h"
+#ifndef POCO_NO_WSTRING
+
+
+#include "Poco/UnicodeConverter.h"
+#include "Poco/TextConverter.h"
+#include "Poco/TextIterator.h"
+#include "Poco/UTF8Encoding.h"
+#include "Poco/UTF16Encoding.h"
 #include <string.h>
 #include <wchar.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 void UnicodeConverter::toUTF16(const std::string& utf8String, std::wstring& utf16String)
@@ -71,7 +74,7 @@ void UnicodeConverter::toUTF16(const char* utf8String, int length, std::wstring&
 	{
 		unsigned char c = *it;
 		int n = utf8Encoding.characterMap()[c];
-		int uc;
+		int uc = '?';
 		if (n == -1) 
 		{
 			++it;
@@ -87,10 +90,6 @@ void UnicodeConverter::toUTF16(const char* utf8String, int length, std::wstring&
 			{
 				uc = utf8Encoding.convert(it);
 				if (uc == -1) uc = '?';
-			}
-			else 
-			{ 
-				uc = '?'; 
 			}
 			it -= n;
 		}
@@ -131,4 +130,7 @@ void UnicodeConverter::toUTF8(const wchar_t* utf16String, std::string& utf8Strin
 }
 
 
-Foundation_END
+} // namespace Poco
+
+
+#endif // POCO_NO_WSTRING

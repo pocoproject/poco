@@ -1,7 +1,7 @@
 //
 // HTTPServerSession.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPServerSession.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPServerSession.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -34,11 +34,12 @@
 //
 
 
-#include "Net/HTTPServerSession.h"
-#include "Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPServerSession.h"
+#include "Poco/Net/HTTPServerParams.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParams* pParams):
@@ -84,4 +85,4 @@ SocketAddress HTTPServerSession::serverAddress()
 }
 
 
-Net_END
+} } // namespace Poco::Net

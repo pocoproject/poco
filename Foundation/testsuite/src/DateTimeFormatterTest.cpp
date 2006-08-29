@@ -1,7 +1,7 @@
 //
 // DateTimeFormatterTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/DateTimeFormatterTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/DateTimeFormatterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,16 +33,16 @@
 #include "DateTimeFormatterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/Timespan.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTime.h"
+#include "Poco/Timespan.h"
 
 
-using Foundation::DateTime;
-using Foundation::Timespan;
-using Foundation::DateTimeFormat;
-using Foundation::DateTimeFormatter;
+using Poco::DateTime;
+using Poco::Timespan;
+using Poco::DateTimeFormat;
+using Poco::DateTimeFormatter;
 
 
 DateTimeFormatterTest::DateTimeFormatterTest(const std::string& name): CppUnit::TestCase(name)

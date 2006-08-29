@@ -1,7 +1,7 @@
 //
 // SharedLibrary.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SharedLibrary.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SharedLibrary.cpp#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -34,14 +34,16 @@
 //
 
 
-#include "Foundation/SharedLibrary.h"
-#include "Foundation/Exception.h"
+#include "Poco/SharedLibrary.h"
+#include "Poco/Exception.h"
 
 
 #if defined(hpux) || defined(_hpux)
 #include "SharedLibrary_HPUX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "SharedLibrary_UNIX.cpp"
+#elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#include "SharedLibrary_WIN32U.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "SharedLibrary_WIN32.cpp"
 #elif defined(POCO_OS_FAMILY_VMS)
@@ -49,7 +51,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 SharedLibrary::SharedLibrary()
@@ -114,4 +116,4 @@ std::string SharedLibrary::suffix()
 }
 
 
-Foundation_END
+} // namespace Poco

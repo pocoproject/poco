@@ -1,7 +1,7 @@
 //
 // NullStream.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NullStream.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NullStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/NullStream.h"
+#include "Poco/NullStream.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NullStreamBuf::NullStreamBuf()
@@ -93,4 +93,4 @@ NullOutputStream::~NullOutputStream()
 }
 
 
-Foundation_END
+} // namespace Poco

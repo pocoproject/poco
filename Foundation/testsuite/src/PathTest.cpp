@@ -1,7 +1,7 @@
 //
 // PathTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/PathTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/PathTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "PathTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Random.h"
-#include "Foundation/Environment.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
+#include "Poco/Random.h"
+#include "Poco/Environment.h"
 #include <iostream>
 
 
-using Foundation::Path;
-using Foundation::PathSyntaxException;
-using Foundation::Random;
-using Foundation::Environment;
+using Poco::Path;
+using Poco::PathSyntaxException;
+using Poco::Random;
+using Poco::Environment;
 
 
 PathTest::PathTest(const std::string& name): CppUnit::TestCase(name)

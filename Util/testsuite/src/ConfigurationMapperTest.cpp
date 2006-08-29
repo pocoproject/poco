@@ -1,7 +1,7 @@
 //
 // ConfigurationMapperTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/ConfigurationMapperTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/ConfigurationMapperTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "ConfigurationMapperTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/ConfigurationMapper.h"
-#include "Util/MapConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/ConfigurationMapper.h"
+#include "Poco/Util/MapConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 
 
-using Util::AbstractConfiguration;
-using Util::ConfigurationMapper;
-using Util::MapConfiguration;
-using Foundation::AutoPtr;
+using Poco::Util::AbstractConfiguration;
+using Poco::Util::ConfigurationMapper;
+using Poco::Util::MapConfiguration;
+using Poco::AutoPtr;
 
 
 ConfigurationMapperTest::ConfigurationMapperTest(const std::string& name): CppUnit::TestCase(name)

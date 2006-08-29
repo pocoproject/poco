@@ -1,7 +1,7 @@
 //
 // NetCoreTestSuite.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/NetCoreTestSuite.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/NetCoreTestSuite.h#1 $
 //
 // Definition of the NetCoreTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define NetCoreTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class NetCoreTestSuite

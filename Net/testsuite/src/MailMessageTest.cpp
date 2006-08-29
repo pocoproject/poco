@@ -1,7 +1,7 @@
 //
 // MailMessageTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MailMessageTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MailMessageTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,23 +33,23 @@
 #include "MailMessageTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/MailMessage.h"
-#include "Net/MailRecipient.h"
-#include "Net/PartHandler.h"
-#include "Net/StringPartSource.h"
-#include "Net/MediaType.h"
-#include "Foundation/Timestamp.h"
+#include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailRecipient.h"
+#include "Poco/Net/PartHandler.h"
+#include "Poco/Net/StringPartSource.h"
+#include "Poco/Net/MediaType.h"
+#include "Poco/Timestamp.h"
 #include <sstream>
 #include <vector>
 
 
-using Net::MailMessage;
-using Net::MailRecipient;
-using Net::MessageHeader;
-using Net::PartHandler;
-using Net::MediaType;
-using Net::StringPartSource;
-using Foundation::Timestamp;
+using Poco::Net::MailMessage;
+using Poco::Net::MailRecipient;
+using Poco::Net::MessageHeader;
+using Poco::Net::PartHandler;
+using Poco::Net::MediaType;
+using Poco::Net::StringPartSource;
+using Poco::Timestamp;
 
 
 namespace

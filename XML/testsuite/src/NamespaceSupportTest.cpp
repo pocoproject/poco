@@ -1,7 +1,7 @@
 //
 // NamespaceSupportTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/NamespaceSupportTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/NamespaceSupportTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "NamespaceSupportTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "SAX/NamespaceSupport.h"
+#include "Poco/SAX/NamespaceSupport.h"
 
 
-using XML::NamespaceSupport;
+using Poco::XML::NamespaceSupport;
 
 
 NamespaceSupportTest::NamespaceSupportTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // FileStreamFactory.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/FileStreamFactory.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/FileStreamFactory.cpp#1 $
 //
 // Library: Foundation
 // Package: URI
@@ -34,15 +34,15 @@
 //
 
 
-#include "Foundation/FileStreamFactory.h"
-#include "Foundation/URI.h"
-#include "Foundation/Path.h"
-#include "Foundation/File.h"
-#include "Foundation/Exception.h"
+#include "Poco/FileStreamFactory.h"
+#include "Poco/URI.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
+#include "Poco/Exception.h"
 #include <fstream>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FileStreamFactory::FileStreamFactory()
@@ -83,4 +83,4 @@ std::istream* FileStreamFactory::open(const Path& path)
 }
 
 
-Foundation_END
+} // namespace Poco

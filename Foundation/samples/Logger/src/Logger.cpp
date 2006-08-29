@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/Logger/src/Logger.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/Logger/src/Logger.cpp#1 $
 //
 // This class demonstrates the Logger, PatternFormatter, FormattingChannel,
 // ConsoleChannel and FileChannel classes.
@@ -33,20 +33,20 @@
 //
 
 
-#include "Foundation/Logger.h"
-#include "Foundation/PatternFormatter.h"
-#include "Foundation/FormattingChannel.h"
-#include "Foundation/ConsoleChannel.h"
-#include "Foundation/FileChannel.h"
-#include "Foundation/Message.h"
+#include "Poco/Logger.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/FormattingChannel.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/FileChannel.h"
+#include "Poco/Message.h"
 
 
-using Foundation::Logger;
-using Foundation::PatternFormatter;
-using Foundation::FormattingChannel;
-using Foundation::ConsoleChannel;
-using Foundation::FileChannel;
-using Foundation::Message;
+using Poco::Logger;
+using Poco::PatternFormatter;
+using Poco::FormattingChannel;
+using Poco::ConsoleChannel;
+using Poco::FileChannel;
+using Poco::Message;
 
 
 int main(int argc, char** argv)

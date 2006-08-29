@@ -1,7 +1,7 @@
 //
 // WinTestRunner.h
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#1 $
 //
 // Application shell for CppUnit's TestRunner dialog.
 //
@@ -18,17 +18,12 @@
 #endif
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef STD_VECTOR_INCLUDED
 #include <vector>
-#define STD_VECTOR_INCLUDED
-#endif
 #include <afxwin.h>
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class Test;
@@ -61,7 +56,7 @@ public:
 };
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // WinTestRunner_H_INCLUDED

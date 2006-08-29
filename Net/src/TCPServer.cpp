@@ -1,7 +1,7 @@
 //
 // TCPServer.cpp
 //
-// $Id: //poco/1.1.0/Net/src/TCPServer.cpp#3 $
+// $Id: //poco/1.2/Net/src/TCPServer.cpp#1 $
 //
 // Library: Net
 // Package: TCPServer
@@ -34,33 +34,34 @@
 //
 
 
-#include "Net/TCPServer.h"
-#include "Net/TCPServerDispatcher.h"
-#include "Net/TCPServerConnection.h"
-#include "Net/TCPServerConnectionFactory.h"
-#include "Foundation/Timespan.h"
-#include "Foundation/Exception.h"
-#include "Foundation/ErrorHandler.h"
+#include "Poco/Net/TCPServer.h"
+#include "Poco/Net/TCPServerDispatcher.h"
+#include "Poco/Net/TCPServerConnection.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Timespan.h"
+#include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 
 
-using Foundation::ErrorHandler;
+using Poco::ErrorHandler;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 TCPServer::TCPServer(TCPServerConnectionFactory* pFactory, const ServerSocket& socket, TCPServerParams* pParams):
-	_pDispatcher(new TCPServerDispatcher(pFactory, Foundation::ThreadPool::defaultPool(), pParams)),
 	_socket(socket),
+	_pDispatcher(new TCPServerDispatcher(pFactory, Poco::ThreadPool::defaultPool(), pParams)),
 	_thread(threadName(socket)),
 	_stopped(false)
 {
 }
 
 
-TCPServer::TCPServer(TCPServerConnectionFactory* pFactory, Foundation::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams* pParams):
-	_pDispatcher(new TCPServerDispatcher(pFactory, threadPool, pParams)),
+TCPServer::TCPServer(TCPServerConnectionFactory* pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams* pParams):
 	_socket(socket),
+	_pDispatcher(new TCPServerDispatcher(pFactory, threadPool, pParams)),
 	_thread(threadName(socket)),
 	_stopped(false)
 {
@@ -103,7 +104,7 @@ void TCPServer::run()
 {
 	 while (!_stopped)
 	 {
-		Foundation::Timespan timeout(250000);
+		Poco::Timespan timeout(250000);
 		if (_socket.poll(timeout, Socket::SELECT_READ))
 		{
 			try
@@ -111,7 +112,7 @@ void TCPServer::run()
 				StreamSocket ss = _socket.acceptConnection();
 				_pDispatcher->enqueue(ss);
 			}
-			catch (Foundation::Exception& exc)
+			catch (Poco::Exception& exc)
 			{
 				ErrorHandler::handle(exc);
 			}
@@ -172,4 +173,4 @@ std::string TCPServer::threadName(const ServerSocket& socket)
 }
 
 
-Net_END
+} } // namespace Poco::Net

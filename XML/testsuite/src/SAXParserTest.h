@@ -1,7 +1,7 @@
 //
 // SAXParserTest.h
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/SAXParserTest.h#2 $
+// $Id: //poco/1.2/XML/testsuite/src/SAXParserTest.h#1 $
 //
 // Definition of the SAXParserTest class.
 //
@@ -36,15 +36,9 @@
 #define SAXParserTest_INCLUDED
 
 
-#ifndef XML_XML_INCLUDED
-#include "XML/XML.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/XML/XML.h"
 #include "CppUnit/TestCase.h"
-#endif
-#ifndef SAX_XMLReader_INCLUDED
-#include "SAX/XMLReader.h"
-#endif
+#include "Poco/SAX/XMLReader.h"
 
 
 class SAXParserTest: public CppUnit::TestCase
@@ -77,7 +71,7 @@ public:
 	void setUp();
 	void tearDown();
 
-	std::string parse(XML::XMLReader& reader, int options, const std::string& data);
+	std::string parse(Poco::XML::XMLReader& reader, int options, const std::string& data);
 
 	static CppUnit::Test* suite();
 

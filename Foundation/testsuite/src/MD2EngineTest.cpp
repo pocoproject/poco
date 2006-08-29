@@ -1,7 +1,7 @@
 //
 // MD2EngineTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/MD2EngineTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/MD2EngineTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "MD2EngineTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/MD2Engine.h"
+#include "Poco/MD2Engine.h"
 
 
-using Foundation::MD2Engine;
-using Foundation::DigestEngine;
+using Poco::MD2Engine;
+using Poco::DigestEngine;
 
 
 MD2EngineTest::MD2EngineTest(const std::string& name): CppUnit::TestCase(name)

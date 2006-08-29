@@ -1,7 +1,7 @@
 //
 // HTTPServerRequest.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPServerRequest.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPServerRequest.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -34,20 +34,21 @@
 //
 
 
-#include "Net/HTTPServerRequest.h"
-#include "Net/HTTPServerSession.h"
-#include "Net/HTTPHeaderStream.h"
-#include "Net/HTTPStream.h"
-#include "Net/HTTPFixedLengthStream.h"
-#include "Net/HTTPChunkedStream.h"
-#include "Net/HTTPServerParams.h"
-#include "Foundation/String.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerSession.h"
+#include "Poco/Net/HTTPHeaderStream.h"
+#include "Poco/Net/HTTPStream.h"
+#include "Poco/Net/HTTPFixedLengthStream.h"
+#include "Poco/Net/HTTPChunkedStream.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/String.h"
 
 
-using Foundation::icompare;
+using Poco::icompare;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPServerRequest::HTTPServerRequest(HTTPServerSession& session, HTTPServerParams* pParams):
@@ -87,4 +88,4 @@ bool HTTPServerRequest::expectContinue() const
 }
 
 
-Net_END
+} } // namespace Poco::Net

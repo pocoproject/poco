@@ -1,7 +1,7 @@
 //
 // Notification.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Notification.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Notification.cpp#1 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/Notification.h"
+#include "Poco/Notification.h"
 #include <typeinfo>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Notification::Notification()
@@ -57,4 +57,4 @@ std::string Notification::name() const
 }
 
 
-Foundation_END
+} // namespace Poco

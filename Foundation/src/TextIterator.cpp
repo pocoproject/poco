@@ -1,7 +1,7 @@
 //
 // TextIterator.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/TextIterator.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/TextIterator.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/TextIterator.h"
-#include "Foundation/TextEncoding.h"
+#include "Poco/TextIterator.h"
+#include "Poco/TextEncoding.h"
 #include <algorithm>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 TextIterator::TextIterator():
@@ -49,32 +49,32 @@ TextIterator::TextIterator():
 
 
 TextIterator::TextIterator(const std::string& str, const TextEncoding& encoding):
+	_pEncoding(&encoding),
 	_it(str.begin()),
-	_end(str.end()),
-	_pEncoding(&encoding)
+	_end(str.end())
 {
 }
 
 TextIterator::TextIterator(const std::string::const_iterator& begin, const std::string::const_iterator& end, const TextEncoding& encoding):
+	_pEncoding(&encoding),
 	_it(begin),
-	_end(end),
-	_pEncoding(&encoding)
+	_end(end)
 {
 }
 
 
 TextIterator::TextIterator(const std::string& str):
+	_pEncoding(0),
 	_it(str.end()),
-	_end(str.end()),
-	_pEncoding(0)
+	_end(str.end())
 {
 }
 
 
 TextIterator::TextIterator(const std::string::const_iterator& end):
+	_pEncoding(0),
 	_it(end),
-	_end(end),
-	_pEncoding(0)
+	_end(end)
 {
 }
 
@@ -85,9 +85,9 @@ TextIterator::~TextIterator()
 
 
 TextIterator::TextIterator(const TextIterator& it):
+	_pEncoding(it._pEncoding),
 	_it(it._it),
-	_end(it._end),
-	_pEncoding(it._pEncoding)
+	_end(it._end)
 {
 }
 
@@ -96,9 +96,9 @@ TextIterator& TextIterator::operator = (const TextIterator& it)
 {
 	if (&it != this)
 	{
+		_pEncoding = it._pEncoding;
 		_it        = it._it;
 		_end       = it._end;
-		_pEncoding = it._pEncoding;
 	}
 	return *this;
 }
@@ -106,9 +106,9 @@ TextIterator& TextIterator::operator = (const TextIterator& it)
 
 void TextIterator::swap(TextIterator& it)
 {
+	std::swap(_pEncoding, it._pEncoding);
 	std::swap(_it, it._it);
 	std::swap(_end, it._end);
-	std::swap(_pEncoding, it._pEncoding);
 }
 
 
@@ -160,4 +160,4 @@ TextIterator TextIterator::operator ++ (int)
 }
 
 
-Foundation_END
+} // namespace Poco

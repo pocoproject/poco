@@ -1,7 +1,7 @@
 //
 // AttributesImplTest.h
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/AttributesImplTest.h#2 $
+// $Id: //poco/1.2/XML/testsuite/src/AttributesImplTest.h#1 $
 //
 // Definition of the AttributesImplTest class.
 //
@@ -36,12 +36,8 @@
 #define AttributesImplTest_INCLUDED
 
 
-#ifndef XML_XML_INCLUDED
-#include "XML/XML.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/XML/XML.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class AttributesImplTest: public CppUnit::TestCase

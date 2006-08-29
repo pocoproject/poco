@@ -1,7 +1,7 @@
 //
 // Runnable.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Runnable.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Runnable.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Runnable.h"
+#include "Poco/Runnable.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Runnable::Runnable()
@@ -50,4 +50,4 @@ Runnable::~Runnable()
 }
 
 
-Foundation_END
+} // namespace Poco

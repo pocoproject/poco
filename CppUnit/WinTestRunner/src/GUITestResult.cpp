@@ -1,7 +1,7 @@
 //
 // GUITestResult.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/src/GUITestResult.cpp#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/src/GUITestResult.cpp#1 $
 //
 
 
@@ -9,7 +9,7 @@
 #include "GUITestResult.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 void GUITestResult::addError(Test *test, CppUnitException *e)
@@ -39,5 +39,5 @@ void GUITestResult::endTest(Test *test)
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 

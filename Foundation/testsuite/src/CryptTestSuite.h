@@ -1,7 +1,7 @@
 //
 // CryptTestSuite.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/CryptTestSuite.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/CryptTestSuite.h#1 $
 //
 // Definition of the CryptTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define CryptTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class CryptTestSuite

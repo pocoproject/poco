@@ -1,7 +1,7 @@
 //
 // IniFileConfiguration.cpp
 //
-// $Id: //poco/1.1.0/Util/src/IniFileConfiguration.cpp#2 $
+// $Id: //poco/1.2/Util/src/IniFileConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,19 +34,20 @@
 //
 
 
-#include "Util/IniFileConfiguration.h"
-#include "Foundation/Exception.h"
-#include "Foundation/String.h"
+#include "Poco/Util/IniFileConfiguration.h"
+#include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <fstream>
 #include <locale>
 #include <set>
 
 
-using Foundation::icompare;
-using Foundation::trim;
+using Poco::icompare;
+using Poco::trim;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 IniFileConfiguration::IniFileConfiguration()
@@ -88,7 +89,7 @@ void IniFileConfiguration::load(const std::string& path)
 	if (istr.good())
 		load(istr);
 	else
-		throw Foundation::OpenFileException(path);
+		throw Poco::OpenFileException(path);
 }
 
 
@@ -106,7 +107,7 @@ bool IniFileConfiguration::getRaw(const std::string& key, std::string& value) co
 
 void IniFileConfiguration::setRaw(const std::string& key, const std::string& value)
 {
-	throw Foundation::NotImplementedException("Setting a property in an IniFileConfiguration");
+	throw Poco::NotImplementedException("Setting a property in an IniFileConfiguration");
 }
 
 
@@ -181,4 +182,4 @@ void IniFileConfiguration::parseLine(std::istream& istr)
 }
 
 
-Util_END
+} } // namespace Poco::Util

@@ -1,7 +1,7 @@
 //
 // Timezone.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Timezone.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Timezone.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/Timezone.h"
+#include "Poco/Timezone.h"
 #include <time.h>
 
 
@@ -45,7 +45,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 int Timezone::tzd()
@@ -54,4 +54,4 @@ int Timezone::tzd()
 }
 
 
-Foundation_END
+} // namespace Poco

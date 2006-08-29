@@ -1,9 +1,18 @@
 #
-# $Id: //poco/1.1.0/build/rules/global#1 $
+# $Id: //poco/1.2/build/rules/global#1 $
 #
 # global
 #
 # Global build configuration
+#
+# Environment variables:
+# POCO_BASE:   Path to POCO source tree. Must be defined.
+# POCO_BUILD:  Path to directory where build files are put.
+#              Defaults to $(POCO_BASE)
+# POCO_CONFIG: Build configuration to use.
+#              Defaults to `uname`.
+# POCO_TARGET_OSNAME: Target system operating system name (for cross builds)
+# POCO_TARGET_OSARCH: Target system architecture (forr cross builds)
 #
 
 #
@@ -12,13 +21,27 @@
 ifndef POCO_BASE
 $(error POCO_BASE is not defined.)
 endif
-POCO_BUILD = $(POCO_BASE)/build
+
+#
+# Check for POCO_BUILD
+#
+ifndef POCO_BUILD
+POCO_BUILD = $(POCO_BASE)
+endif
+
+#
+# Determine OS
+#
+POCO_HOST_OSNAME = $(shell uname)
+ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
+POCO_HOST_OSNAME = CYGWIN
+endif
 
 #
 # If POCO_CONFIG is not set, use the OS name as configuration name
 #
 ifndef POCO_CONFIG
-POCO_CONFIG = $(shell uname)
+POCO_CONFIG = $(POCO_HOST_OSNAME)
 endif
 
 #
@@ -37,13 +60,13 @@ endif
 #
 # Include System Specific Settings
 #
-include $(POCO_BUILD)/config/$(POCO_CONFIG)
+include $(POCO_BASE)/build/config/$(POCO_CONFIG)
 
 #
 # Determine operating system
 #
 ifndef POCO_TARGET_OSNAME
-OSNAME   := $(shell uname)
+OSNAME   := $(POCO_HOST_OSNAME)
 else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
@@ -57,7 +80,7 @@ HOSTNAME := $(shell hostname)
 #
 # Find out current component
 #
-COMPONENT := $(shell $(POCO_BUILD)/script/projname)
+COMPONENT := $(shell $(POCO_BASE)/build/script/projname)
 
 #
 # Define standard directories
@@ -68,15 +91,24 @@ LIBDIR   = lib/$(OSNAME)/$(OSARCH)
 BINDIR   = bin/$(OSNAME)/$(OSARCH)
 OBJDIR   = obj/$(OSNAME)/$(OSARCH)
 DEPDIR   = .dep/$(OSNAME)/$(OSARCH)
-LIBPATH  = $(POCO_BASE)/$(LIBDIR)
-BINPATH  = $(POCO_BASE)/$(COMPONENT)/$(BINDIR)
-OBJPATH  = $(POCO_BASE)/$(COMPONENT)/$(OBJDIR)
-DEPPATH  = $(POCO_BASE)/$(COMPONENT)/$(DEPDIR)
+LIBPATH  = $(POCO_BUILD)/$(LIBDIR)
+BINPATH  = $(POCO_BUILD)/$(COMPONENT)/$(BINDIR)
+OBJPATH  = $(POCO_BUILD)/$(COMPONENT)/$(OBJDIR)
+DEPPATH  = $(POCO_BUILD)/$(COMPONENT)/$(DEPDIR)
+
+ifndef LIBPREFIX
+LIBPREFIX = lib
+endif
 
 #
 # Build component list
 #
 COMPONENTS := $(shell cat $(POCO_BASE)/components)
+
+#
+# Read global library version number
+#
+LIBVERSION := $(shell cat $(POCO_BASE)/libversion)
 
 #
 # Determine link mode

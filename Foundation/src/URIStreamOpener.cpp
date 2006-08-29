@@ -1,7 +1,7 @@
 //
 // URIStreamOpener.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/URIStreamOpener.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/URIStreamOpener.cpp#1 $
 //
 // Library: Foundation
 // Package: URI
@@ -34,16 +34,16 @@
 //
 
 
-#include "Foundation/URIStreamOpener.h"
-#include "Foundation/URIStreamFactory.h"
-#include "Foundation/FileStreamFactory.h"
-#include "Foundation/URI.h"
-#include "Foundation/Path.h"
-#include "Foundation/SingletonHolder.h"
-#include "Foundation/Exception.h"
+#include "Poco/URIStreamOpener.h"
+#include "Poco/URIStreamFactory.h"
+#include "Poco/FileStreamFactory.h"
+#include "Poco/URI.h"
+#include "Poco/Path.h"
+#include "Poco/SingletonHolder.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 URIStreamOpener::URIStreamOpener()
@@ -171,4 +171,4 @@ std::istream* URIStreamOpener::openFile(const Path& path) const
 
 
 
-Foundation_END
+} // namespace Poco

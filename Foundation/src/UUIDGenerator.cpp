@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/UUIDGenerator.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/UUIDGenerator.cpp#1 $
 //
 // Library: Foundation
 // Package: UUID
@@ -34,16 +34,16 @@
 //
 
 
-#include "Foundation/UUIDGenerator.h"
-#include "Foundation/Thread.h"
-#include "Foundation/RandomStream.h"
-#include "Foundation/DigestEngine.h"
-#include "Foundation/MD5Engine.h"
-#include "Foundation/SingletonHolder.h"
+#include "Poco/UUIDGenerator.h"
+#include "Poco/Thread.h"
+#include "Poco/RandomStream.h"
+#include "Poco/DigestEngine.h"
+#include "Poco/MD5Engine.h"
+#include "Poco/SingletonHolder.h"
 #include <string.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 UUIDGenerator::UUIDGenerator(): _ticks(0), _haveNode(false)
@@ -152,7 +152,7 @@ UUIDGenerator& UUIDGenerator::defaultGenerator()
 }
 
 
-Foundation_END
+} // namespace Poco
 
 
 //
@@ -164,66 +164,59 @@ Foundation_END
 //
 // Windows
 //
-// The following code is based on the example code
-// from the MSDN knowledge base article ID 118623:
-// "How To Get the MAC Address for an Ethernet Adapter".
-//
 #include <windows.h>
-#include <wincon.h>
-#include <nb30.h>
+#include <iphlpapi.h>
 
 
-Foundation_BEGIN
-
-
-struct ASTAT
-{
-	ADAPTER_STATUS adapt;
-	NAME_BUFFER    nameBuffer[30];
-};
+namespace Poco {
 
 
 void UUIDGenerator::getNode()
 {
-	ASTAT adapter;
-	NCB ncb;
-	LANA_ENUM lenum;
-
-	memset(&ncb, 0, sizeof(ncb));
-	ncb.ncb_command = NCBENUM;
-	ncb.ncb_buffer  = (UCHAR*) &lenum;
-	ncb.ncb_length  = sizeof(lenum);
-	UCHAR rc = Netbios(&ncb);
-	if (rc) throw SystemException("cannot enumerate network adapters");
-	bool foundEtherNet = false;
-	for (int i = 0; i < lenum.length; i++)
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = 0;
+	ULONG len    = sizeof(IP_ADAPTER_INFO);
+	pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+	// Make an initial call to GetAdaptersInfo to get
+	// the necessary size into len
+	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
+	if (rc == ERROR_BUFFER_OVERFLOW) 
 	{
-		memset(&ncb, 0, sizeof(ncb));
-		ncb.ncb_command  = NCBRESET;
-		ncb.ncb_lana_num = lenum.lana[i];
-		rc = Netbios(&ncb);
-		if (rc) throw SystemException("cannot determine MAC address (NCBRESET failed)");
-
-		memset(&ncb, 0, sizeof(ncb));
-		ncb.ncb_command  = NCBASTAT;
-		ncb.ncb_lana_num = lenum.lana[i];
-		ncb.ncb_buffer   = (UCHAR*) &adapter;
-		ncb.ncb_length   = sizeof(adapter);
-		strcpy((char*) ncb.ncb_callname,  "*");
-		rc = Netbios(&ncb);
-		if (rc) throw SystemException("cannot determine MAC address (NCBASTAT failed)");
-		if (adapter.adapt.adapter_type == 0xFE)
-		{
-			memcpy(_node, adapter.adapt.adapter_address, sizeof(_node));
-			foundEtherNet = true;
-			break;
-		}
+		delete [] reinterpret_cast<char*>(pAdapterInfo);
+		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
 	}
-	if (!foundEtherNet) throw SystemException("cannot determine MAC address (no Ethernet adapter found)");
+	else if (rc != ERROR_SUCCESS)
+	{
+		throw SystemException("cannot get network adapter list");
+	}
+	try
+	{
+		bool found = false;
+		if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR) 
+		{
+			pAdapter = pAdapterInfo;
+			while (pAdapter && !found) 
+			{
+				if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(_node))
+				{
+					memcpy(_node, pAdapter->Address, pAdapter->AddressLength);
+					found = true;
+				}
+			}
+		}
+		else throw SystemException("cannot get network adapter list");
+		if (!found) throw SystemException("no Ethernet adapter found");
+	}
+	catch (Exception&)
+	{
+		delete [] reinterpret_cast<char*>(pAdapterInfo);
+		throw;
+	}
+	delete [] reinterpret_cast<char*>(pAdapterInfo);
 }
 
 
-Foundation_END
+} // namespace Poco
 
 
 #elif defined(POCO_OS_FAMILY_BSD) || POCO_OS == POCO_OS_QNX
@@ -236,7 +229,7 @@ Foundation_END
 #include <net/if_dl.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 void UUIDGenerator::getNode()
@@ -266,7 +259,7 @@ void UUIDGenerator::getNode()
 }
 
 
-Foundation_END
+} // namespace Poco
 
 
 #elif defined(__CYGWIN__) || POCO_OS == POCO_OS_LINUX
@@ -281,7 +274,7 @@ Foundation_END
 #include <unistd.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 void UUIDGenerator::getNode()
@@ -300,7 +293,7 @@ void UUIDGenerator::getNode()
 }
 
 
-Foundation_END
+} // namespace Poco
 
 
 #elif defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_VMS)
@@ -335,7 +328,7 @@ Foundation_END
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 void UUIDGenerator::getNode()
@@ -362,7 +355,7 @@ void UUIDGenerator::getNode()
 }
 
 
-Foundation_END
+} // namespace Poco
 
 
 #endif

@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Thread_POSIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Thread_POSIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,9 +34,9 @@
 //
 
 
-#include "Foundation/Thread_POSIX.h"
-#include "Foundation/Exception.h"
-#include "Foundation/ErrorHandler.h"
+#include "Poco/Thread_POSIX.h"
+#include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 #include <signal.h>
 
 
@@ -66,7 +66,7 @@ namespace
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 pthread_key_t ThreadImpl::_currentKey;
@@ -218,4 +218,4 @@ int ThreadImpl::mapPrio(int prio)
 }
 
 
-Foundation_END
+} // namespace Poco

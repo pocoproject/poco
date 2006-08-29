@@ -1,7 +1,7 @@
 //
 // uuidgen.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/uuidgen/src/uuidgen.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/uuidgen/src/uuidgen.cpp#1 $
 //
 // This sample demonstrates the UUIDGenerator and UUID classes.
 //
@@ -32,15 +32,15 @@
 //
 
 
-#include "Foundation/UUID.h"
-#include "Foundation/UUIDGenerator.h"
-#include "Foundation/Exception.h"
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-using Foundation::UUID;
-using Foundation::UUIDGenerator;
-using Foundation::Exception;
+using Poco::UUID;
+using Poco::UUIDGenerator;
+using Poco::Exception;
 
 
 int main(int argc, char** argv)

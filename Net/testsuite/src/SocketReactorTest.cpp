@@ -1,7 +1,7 @@
 //
 // SocketReactorTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/SocketReactorTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/SocketReactorTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,29 +33,29 @@
 #include "SocketReactorTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/SocketReactor.h"
-#include "Net/SocketNotification.h"
-#include "Net/SocketConnector.h"
-#include "Net/SocketAcceptor.h"
-#include "Net/StreamSocket.h"
-#include "Net/ServerSocket.h"
-#include "Net/SocketAddress.h"
-#include "Foundation/Observer.h"
+#include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/SocketNotification.h"
+#include "Poco/Net/SocketConnector.h"
+#include "Poco/Net/SocketAcceptor.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Observer.h"
 #include <sstream>
 
 
-using Net::SocketReactor;
-using Net::SocketConnector;
-using Net::SocketAcceptor;
-using Net::StreamSocket;
-using Net::ServerSocket;
-using Net::SocketAddress;
-using Net::SocketNotification;
-using Net::ReadableNotification;
-using Net::WritableNotification;
-using Net::TimeoutNotification;
-using Net::ShutdownNotification;
-using Foundation::Observer;
+using Poco::Net::SocketReactor;
+using Poco::Net::SocketConnector;
+using Poco::Net::SocketAcceptor;
+using Poco::Net::StreamSocket;
+using Poco::Net::ServerSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::SocketNotification;
+using Poco::Net::ReadableNotification;
+using Poco::Net::WritableNotification;
+using Poco::Net::TimeoutNotification;
+using Poco::Net::ShutdownNotification;
+using Poco::Observer;
 
 
 namespace

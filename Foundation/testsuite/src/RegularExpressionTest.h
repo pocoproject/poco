@@ -1,7 +1,7 @@
 //
 // RegularExpressionTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/RegularExpressionTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/RegularExpressionTest.h#1 $
 //
 // Definition of the RegularExpressionTest class.
 //
@@ -36,12 +36,8 @@
 #define RegularExpressionTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class RegularExpressionTest: public CppUnit::TestCase

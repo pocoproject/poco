@@ -1,7 +1,7 @@
 //
 // EventDispatcher.cpp
 //
-// $Id: //poco/1.1.0/XML/src/EventDispatcher.cpp#2 $
+// $Id: //poco/1.2/XML/src/EventDispatcher.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,9 +34,9 @@
 //
 
 
-#include "DOM/EventDispatcher.h"
-#include "DOM/Event.h"
-#include "DOM/EventListener.h"
+#include "Poco/DOM/EventDispatcher.h"
+#include "Poco/DOM/Event.h"
+#include "Poco/DOM/EventListener.h"
 
 
 namespace 
@@ -61,7 +61,8 @@ namespace
 }
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 EventDispatcher::EventDispatcher():
@@ -164,4 +165,4 @@ void EventDispatcher::bubbleEvent(Event* evt)
 }
 
 
-XML_END
+} } // namespace Poco::XML

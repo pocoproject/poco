@@ -1,7 +1,7 @@
 //
 // Attr.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Attr.cpp#2 $
+// $Id: //poco/1.2/XML/src/Attr.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,12 +34,13 @@
 //
 
 
-#include "DOM/Attr.h"
-#include "DOM/Document.h"
-#include "XML/NamePool.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/XML/NamePool.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified):
@@ -139,10 +140,16 @@ const XMLString& Attr::localName() const
 }
 
 
+XMLString Attr::innerText() const
+{
+	return nodeValue();
+}
+
+
 Node* Attr::copyNode(bool deep, Document* pOwnerDocument) const
 {
 	return new Attr(pOwnerDocument, *this);
 }
 
 
-XML_END
+} } // namespace Poco::XML

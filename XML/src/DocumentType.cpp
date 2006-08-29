@@ -1,7 +1,7 @@
 //
 // DocumentType.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DocumentType.cpp#2 $
+// $Id: //poco/1.2/XML/src/DocumentType.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,13 +34,14 @@
 //
 
 
-#include "DOM/DocumentType.h"
-#include "DOM/Document.h"
-#include "DOM/DTDMap.h"
-#include "DOM/DOMException.h"
+#include "Poco/DOM/DocumentType.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DTDMap.h"
+#include "Poco/DOM/DOMException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId): 
@@ -102,4 +103,4 @@ Node* DocumentType::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-XML_END
+} } // namespace Poco::XML

@@ -1,7 +1,7 @@
 //
 // DOMBuilder.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DOMBuilder.cpp#2 $
+// $Id: //poco/1.2/XML/src/DOMBuilder.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,25 +34,26 @@
 //
 
 
-#include "DOM/DOMBuilder.h"
-#include "DOM/Document.h"
-#include "DOM/DocumentType.h"
-#include "DOM/CharacterData.h"
-#include "DOM/Text.h"
-#include "DOM/Comment.h"
-#include "DOM/CDATASection.h"
-#include "DOM/Element.h"
-#include "DOM/Attr.h"
-#include "DOM/Entity.h"
-#include "DOM/EntityReference.h"
-#include "DOM/Notation.h"
-#include "DOM/ProcessingInstruction.h"
-#include "DOM/AutoPtr.h"
-#include "SAX/XMLReader.h"
-#include "SAX/AttributesImpl.h"
+#include "Poco/DOM/DOMBuilder.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DocumentType.h"
+#include "Poco/DOM/CharacterData.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/Comment.h"
+#include "Poco/DOM/CDATASection.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/DOM/Entity.h"
+#include "Poco/DOM/EntityReference.h"
+#include "Poco/DOM/Notation.h"
+#include "Poco/DOM/ProcessingInstruction.h"
+#include "Poco/DOM/AutoPtr.h"
+#include "Poco/SAX/XMLReader.h"
+#include "Poco/SAX/AttributesImpl.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString DOMBuilder::EMPTY_STRING;
@@ -310,4 +311,4 @@ void DOMBuilder::comment(const XMLChar ch[], int start, int length)
 }
 
 
-XML_END
+} } // namespace Poco::XML

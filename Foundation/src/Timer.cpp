@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Timer.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Timer.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/Timer.h"
-#include "Foundation/ThreadPool.h"
-#include "Foundation/Exception.h"
-#include "Foundation/ErrorHandler.h"
+#include "Poco/Timer.h"
+#include "Poco/ThreadPool.h"
+#include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Timer::Timer(long startInterval, long periodicInterval): 
@@ -60,12 +60,18 @@ Timer::~Timer()
 
 void Timer::start(const AbstractTimerCallback& method)
 {
+	start(method, ThreadPool::defaultPool());
+}
+
+
+void Timer::start(const AbstractTimerCallback& method, ThreadPool& threadPool)
+{
 	poco_assert (!_pCallback);
 
 	FastMutex::ScopedLock lock(_mutex);	
 	_pCallback = method.clone();
 	_wakeUp.reset();
-	ThreadPool::defaultPool().start(*this);
+	threadPool.start(*this);
 }
 
 
@@ -201,4 +207,4 @@ AbstractTimerCallback& AbstractTimerCallback::operator = (const AbstractTimerCal
 }
 
 
-Foundation_END
+} // namespace Poco

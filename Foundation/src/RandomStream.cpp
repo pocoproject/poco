@@ -1,7 +1,7 @@
 //
 // RandomStream.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/RandomStream.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/RandomStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -34,9 +34,9 @@
 //
 
 
-#include "Foundation/RandomStream.h"
-#include "Foundation/Random.h"
-#include "Foundation/SHA1Engine.h"
+#include "Poco/RandomStream.h"
+#include "Poco/Random.h"
+#include "Poco/SHA1Engine.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include <windows.h>
 #include <wincrypt.h>
@@ -47,7 +47,7 @@
 #include <time.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 RandomBuf::RandomBuf(): BufferedStreamBuf(256, std::ios::in)
@@ -146,4 +146,4 @@ RandomInputStream::~RandomInputStream()
 }
 
 
-Foundation_END
+} // namespace Poco

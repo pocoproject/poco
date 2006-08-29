@@ -1,7 +1,7 @@
 //
 // ConfigurationTestSuite.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/ConfigurationTestSuite.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/ConfigurationTestSuite.h#1 $
 //
 // Definition of the ConfigurationTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define ConfigurationTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class ConfigurationTestSuite

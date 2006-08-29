@@ -1,7 +1,7 @@
 //
 // Event_POSIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Event_POSIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Event_POSIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/Event_POSIX.h"
+#include "Poco/Event_POSIX.h"
 #include <sys/time.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
@@ -114,4 +114,4 @@ bool EventImpl::waitImpl(long milliseconds)
 }
 
 
-Foundation_END
+} // namespace Poco

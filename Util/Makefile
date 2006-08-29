@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Util/Makefile#1 $
+# $Id: //poco/1.2/Util/Makefile#1 $
 #
 # Makefile for Poco Util
 #
@@ -13,10 +13,11 @@ objects = AbstractConfiguration Application ConfigurationMapper \
 	LoggingConfigurator LoggingSubsystem MapConfiguration \
 	Option OptionException OptionProcessor OptionSet \
 	PropertyFileConfiguration Subsystem SystemConfiguration \
-	XMLConfiguration FilesystemConfiguration ServerApplication
+	XMLConfiguration FilesystemConfiguration ServerApplication \
+	Validator IntValidator RegExpValidator OptionCallback
 
 target         = PocoUtil
-target_version = 1
+target_version = $(LIBVERSION)
 target_libs    = PocoFoundation PocoXML
 
 include $(POCO_BASE)/build/rules/lib

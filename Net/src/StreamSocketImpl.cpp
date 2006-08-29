@@ -1,7 +1,7 @@
 //
 // StreamSocketImpl.cpp
 //
-// $Id: //poco/1.1.0/Net/src/StreamSocketImpl.cpp#2 $
+// $Id: //poco/1.2/Net/src/StreamSocketImpl.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/StreamSocketImpl.h"
+#include "Poco/Net/StreamSocketImpl.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 StreamSocketImpl::StreamSocketImpl()
@@ -69,4 +70,4 @@ int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 }
 
 
-Net_END
+} } // namespace Poco::Net

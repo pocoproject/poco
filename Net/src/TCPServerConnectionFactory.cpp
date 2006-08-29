@@ -1,7 +1,7 @@
 //
 // TCPServerConnectionFactory.cpp
 //
-// $Id: //poco/1.1.0/Net/src/TCPServerConnectionFactory.cpp#2 $
+// $Id: //poco/1.2/Net/src/TCPServerConnectionFactory.cpp#1 $
 //
 // Library: Net
 // Package: TCPServer
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 TCPServerConnectionFactory::TCPServerConnectionFactory()
@@ -50,4 +51,4 @@ TCPServerConnectionFactory::~TCPServerConnectionFactory()
 }
 
 
-Net_END
+} } // namespace Poco::Net

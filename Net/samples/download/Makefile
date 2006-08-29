@@ -12,6 +12,6 @@ objects = download
 
 target         = download
 target_version = 1
-target_libs    = PocoFoundation PocoXML PocoNet PocoUtil
+target_libs    = PocoUtil PocoNet PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

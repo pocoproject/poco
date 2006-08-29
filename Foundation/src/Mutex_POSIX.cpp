@@ -1,7 +1,7 @@
 //
 // Mutex_POSIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Mutex_POSIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Mutex_POSIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Mutex_POSIX.h"
+#include "Poco/Mutex_POSIX.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 MutexImpl::MutexImpl()
@@ -92,4 +92,4 @@ FastMutexImpl::~FastMutexImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

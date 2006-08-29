@@ -1,7 +1,7 @@
 //
 // dict.cpp
 //
-// $Id: //poco/1.1.0/Net/samples/dict/src/dict.cpp#2 $
+// $Id: //poco/1.2/Net/samples/dict/src/dict.cpp#1 $
 //
 // This sample demonstrates the StreamSocket and SocketStream classes.
 //
@@ -32,21 +32,21 @@
 //
 
 
-#include "Net/StreamSocket.h"
-#include "Net/SocketStream.h"
-#include "Net/SocketAddress.h"
-#include "Foundation/StreamCopier.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketStream.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-using Net::StreamSocket;
-using Net::SocketStream;
-using Net::SocketAddress;
-using Foundation::StreamCopier;
-using Foundation::Path;
-using Foundation::Exception;
+using Poco::Net::StreamSocket;
+using Poco::Net::SocketStream;
+using Poco::Net::SocketAddress;
+using Poco::StreamCopier;
+using Poco::Path;
+using Poco::Exception;
 
 
 int main(int argc, char** argv)

@@ -1,7 +1,7 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Debugger.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Debugger.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/Debugger.h"
+#include "Poco/Debugger.h"
 #include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,6 +47,9 @@
 	#include <lib$routines.h>
 	#include <ssdef.h>
 #endif
+#if defined(POCO_WIN32_UTF8)
+#include "Poco/UnicodeConverter.h"
+#endif
 
 
 // NOTE: In this module, we use the C library functions (fputs) for,
@@ -54,7 +57,7 @@
 // might not have been initialized yet.
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 bool Debugger::isAvailable()
@@ -82,8 +85,15 @@ void Debugger::message(const std::string& msg)
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 	if (IsDebuggerPresent())
 	{
+#if defined(POCO_WIN32_UTF8)
+		std::wstring umsg;
+		UnicodeConverter::toUTF16(msg, umsg);
+		umsg += '\n';
+		OutputDebugStringW(umsg.c_str());
+#else
 		OutputDebugString(msg.c_str());
 		OutputDebugString("\n");
+#endif
 	}
 	#elif defined(POCO_OS_FAMILY_UNIX)
 	#elif defined(POCO_OS_FAMILY_VMS)
@@ -152,4 +162,4 @@ void Debugger::enter(const char* file, int line)
 }
 
 
-Foundation_END
+} // namespace Poco

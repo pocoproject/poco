@@ -1,7 +1,7 @@
 //
 // Locator.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Locator.cpp#2 $
+// $Id: //poco/1.2/XML/src/Locator.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/Locator.h"
+#include "Poco/SAX/Locator.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 Locator::~Locator()
@@ -45,4 +46,4 @@ Locator::~Locator()
 }
 
 
-XML_END
+} } // namespace Poco::XML

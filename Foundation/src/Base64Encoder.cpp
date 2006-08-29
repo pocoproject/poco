@@ -1,7 +1,7 @@
 //
 // Base64Encoder.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Base64Encoder.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Base64Encoder.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Base64Encoder.h"
+#include "Poco/Base64Encoder.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const unsigned char Base64EncoderBuf::OUT_ENCODING[64] =
@@ -178,4 +178,4 @@ Base64Encoder::~Base64Encoder()
 }
 
 
-Foundation_END
+} // namespace Poco

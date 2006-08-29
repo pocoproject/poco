@@ -1,7 +1,7 @@
 //
 // PropertyFileConfigurationTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/PropertyFileConfigurationTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/PropertyFileConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "PropertyFileConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/PropertyFileConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/PropertyFileConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include <sstream>
 #include <algorithm>
 
 
-using Util::PropertyFileConfiguration;
-using Util::AbstractConfiguration;
-using Foundation::AutoPtr;
-using Foundation::NotFoundException;
+using Poco::Util::PropertyFileConfiguration;
+using Poco::Util::AbstractConfiguration;
+using Poco::AutoPtr;
+using Poco::NotFoundException;
 
 
 PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& name): CppUnit::TestCase(name)

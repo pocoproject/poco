@@ -1,7 +1,7 @@
 //
 // Subsystem.cpp
 //
-// $Id: //poco/1.1.0/Util/src/Subsystem.cpp#2 $
+// $Id: //poco/1.2/Util/src/Subsystem.cpp#1 $
 //
 // Library: Util
 // Package: Application
@@ -34,10 +34,11 @@
 //
 
 
-#include "Util/Subsystem.h"
+#include "Poco/Util/Subsystem.h"
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 Subsystem::Subsystem()
@@ -57,4 +58,4 @@ void Subsystem::reinitialize(Application& app)
 }
 
 
-Util_END
+} } // namespace Poco::Util

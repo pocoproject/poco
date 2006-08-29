@@ -1,7 +1,7 @@
 //
 // DateTimeFormatter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DateTimeFormatter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DateTimeFormatter.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,15 +34,15 @@
 //
 
 
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/LocalDateTime.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTime.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/Timestamp.h"
+#include "Poco/NumberFormatter.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::string DateTimeFormatter::format(const Timestamp& timestamp, const std::string& fmt, int timeZoneDifferential)
@@ -185,4 +185,4 @@ std::string DateTimeFormatter::tzdRFC(int timeZoneDifferential)
 }
 
 
-Foundation_END
+} // namespace Poco

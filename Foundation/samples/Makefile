@@ -1,12 +1,14 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Foundation/samples/Makefile#1 $
+# $Id: //poco/1.2/Foundation/samples/Makefile#1 $
 #
 # Makefile for Poco Foundation Samples
 #
 
-.DEFAULT all:
+.PHONY: projects
+clean all: projects
+projects:
 	$(MAKE) -C ActiveMethod $(MAKECMDGOALS)
 	$(MAKE) -C Activity $(MAKECMDGOALS)
 	$(MAKE) -C Timer $(MAKECMDGOALS)

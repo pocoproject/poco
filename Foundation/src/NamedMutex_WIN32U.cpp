@@ -1,7 +1,7 @@
 //
 // NamedMutex_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedMutex_WIN32U.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedMutex_WIN32U.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/NamedMutex_WIN32U.h"
-#include "Foundation/Exception.h"
-#include "Foundation/UnicodeConverter.h"
+#include "Poco/NamedMutex_WIN32U.h"
+#include "Poco/Exception.h"
+#include "Poco/UnicodeConverter.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NamedMutexImpl::NamedMutexImpl(const std::string& name):
@@ -94,4 +94,4 @@ void NamedMutexImpl::unlockImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

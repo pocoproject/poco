@@ -1,7 +1,7 @@
 //
 // ThreadingTestSuite.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ThreadingTestSuite.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ThreadingTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -39,6 +39,7 @@
 #include "ThreadLocalTest.h"
 #include "ActivityTest.h"
 #include "ActiveMethodTest.h"
+#include "ActiveDispatcherTest.h"
 
 
 CppUnit::Test* ThreadingTestSuite::suite()
@@ -53,6 +54,7 @@ CppUnit::Test* ThreadingTestSuite::suite()
 	pSuite->addTest(ThreadLocalTest::suite());
 	pSuite->addTest(ActivityTest::suite());
 	pSuite->addTest(ActiveMethodTest::suite());
+	pSuite->addTest(ActiveDispatcherTest::suite());
 
 	return pSuite;
 }

@@ -1,7 +1,7 @@
 //
 // EventTarget.cpp
 //
-// $Id: //poco/1.1.0/XML/src/EventTarget.cpp#2 $
+// $Id: //poco/1.2/XML/src/EventTarget.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/EventTarget.h"
+#include "Poco/DOM/EventTarget.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 EventTarget::~EventTarget()
@@ -45,4 +46,4 @@ EventTarget::~EventTarget()
 }
 
 
-XML_END
+} } // namespace Poco::XML

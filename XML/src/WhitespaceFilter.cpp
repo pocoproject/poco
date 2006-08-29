@@ -1,7 +1,7 @@
 //
 // WhitespaceFilter.cpp
 //
-// $Id: //poco/1.1.0/XML/src/WhitespaceFilter.cpp#2 $
+// $Id: //poco/1.2/XML/src/WhitespaceFilter.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,11 +34,12 @@
 //
 
 
-#include "SAX/WhitespaceFilter.h"
-#include "SAX/SAXException.h"
+#include "Poco/SAX/WhitespaceFilter.h"
+#include "Poco/SAX/SAXException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 WhitespaceFilter::WhitespaceFilter():
@@ -230,4 +231,4 @@ void WhitespaceFilter::setupParse()
 }
 
 
-XML_END
+} } // namespace Poco::XML

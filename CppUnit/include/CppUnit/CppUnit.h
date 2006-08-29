@@ -1,7 +1,7 @@
 //
 // CppUnit.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/CppUnit.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/CppUnit.h#1 $
 //
 
 
@@ -27,7 +27,7 @@
 // CppUnit_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
+#if defined(_WIN32) && defined(POCO_DLL)
 	#if defined(CppUnit_EXPORTS)
 		#define CppUnit_API __declspec(dllexport)
 	#else
@@ -39,13 +39,6 @@
 #if !defined(CppUnit_API)
 	#define CppUnit_API
 #endif
-
-
-//
-// Macros to declare the namespace
-//
-#define CppUnit_BEGIN namespace CppUnit {
-#define CppUnit_END   }
 
 
 // Turn off some annoying warnings

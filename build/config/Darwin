@@ -1,9 +1,9 @@
 #
-# $Id: //poco/1.1.0/build/config/Darwin#1 $
+# $Id: //poco/1.2/build/config/Darwin#1 $
 #
-# Darwin
+# Darwin8
 #
-# Build settings for Mac OS X 10.3
+# Build settings for Mac OS X 10.4/GCC 4.0.0
 # 
 
 #
@@ -16,11 +16,11 @@ LINKMODE = SHARED
 #
 CC      = gcc
 CXX     = c++
-LINK    = c++ -bind_at_load
+LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib
-SHLIB   = libtool -dynamic -flat_namespace -undefined suppress -noprebind -install_name $@ -o $@
-DYLIB   = ld -dynamic -bundle -read_only_relocs suppress -flat_namespace -undefined warning -noprebind -bind_at_load -o $@ /usr/lib/bundle1.o
+SHLIB   = $(CXX) -dynamiclib -Wl,-install_name,$@ -o $@
+DYLIB   = $(CXX) -dynamic -bundle -read_only_relocs suppress -Wl,-noprebind -Wl,-bind_at_load -o $@ 
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
@@ -40,7 +40,7 @@ SHAREDLIBLINKEXT = .dylib
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = -Wno-long-double -fmessage-length=0 -fcoalesce-templates 
+CXXFLAGS        = -Wall -Wno-sign-compare
 CXXFLAGS32      =
 CXXFLAGS64      = 
 LINKFLAGS       =
@@ -49,11 +49,11 @@ LINKFLAGS64     =
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  =
-SHAREDOPT_CC    = 
-SHAREDOPT_CXX   =
+SHAREDOPT_CC    = -fPIC 
+SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = 
 DEBUGOPT_CC     = -g -D_DEBUG=$(DEBUGLEVEL)
-DEBUGOPT_CXX    = -g -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_CXX    = -g -D_DEBUG=$(DEBUGLEVEL) 
 DEBUGOPT_LINK   =
 RELEASEOPT_CC   = -DNDEBUG -O2
 RELEASEOPT_CXX  = -DNDEBUG -O 
@@ -62,9 +62,9 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE
+SYSFLAGS = -DPOCO_HAVE_IPv6
 
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lstdc++ -framework System -ldl -lcc_dynamic 
+SYSLIBS  =  -ldl

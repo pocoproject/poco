@@ -1,7 +1,7 @@
 //
 // FIFOEventTest.h
 //
-// $Id: $
+// $Id: //poco/1.2/Foundation/testsuite/src/FIFOEventTest.h#1 $
 //
 // Definition of the FIFOEventTest class.
 //
@@ -31,28 +31,25 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef FIFOEventTest_INCLUDED
 #define FIFOEventTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
+#include "Poco/FIFOEvent.h"
+#include "Poco/EventArgs.h"
 
-#include "Foundation/FIFOEvent.h"
-#include "Foundation/EventArgs.h"
 
 class FIFOEventTest: public CppUnit::TestCase
 {
-	Foundation::FIFOEvent<int> Simple;
-	Foundation::FIFOEvent<const int> ConstSimple;
-	Foundation::FIFOEvent<Foundation::EventArgs*> Complex;
-	Foundation::FIFOEvent<Foundation::EventArgs> Complex2;
-	Foundation::FIFOEvent<const Foundation::EventArgs*> ConstComplex;
-	Foundation::FIFOEvent<const Foundation::EventArgs * const> Const2Complex;
+	Poco::FIFOEvent<int> Simple;
+	Poco::FIFOEvent<const int> ConstSimple;
+	Poco::FIFOEvent<Poco::EventArgs*> Complex;
+	Poco::FIFOEvent<Poco::EventArgs> Complex2;
+	Poco::FIFOEvent<const Poco::EventArgs*> ConstComplex;
+	Poco::FIFOEvent<const Poco::EventArgs * const> Const2Complex;
 public:
 	FIFOEventTest(const std::string& name);
 	~FIFOEventTest();
@@ -79,10 +76,10 @@ protected:
 	void onSimple ( const void* pSender, int& i );
 	void onSimpleOther ( const void* pSender, int& i );
 	void onConstSimple ( const void* pSender, const int& i );
-	void onComplex ( const void* pSender, Foundation::EventArgs* & i );
-	void onComplex2 ( const void* pSender, Foundation::EventArgs & i );
-	void onConstComplex ( const void* pSender, const Foundation::EventArgs*& i );
-	void onConst2Complex ( const void* pSender, const Foundation::EventArgs * const & i );
+	void onComplex ( const void* pSender, Poco::EventArgs* & i );
+	void onComplex2 ( const void* pSender, Poco::EventArgs & i );
+	void onConstComplex ( const void* pSender, const Poco::EventArgs*& i );
+	void onConst2Complex ( const void* pSender, const Poco::EventArgs * const & i );
 	void onAsync ( const void* pSender, int& i );
 
 	int getCount () const;

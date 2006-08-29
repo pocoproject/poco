@@ -1,7 +1,7 @@
 //
 // SplitterChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SplitterChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SplitterChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/SplitterChannel.h"
-#include "Foundation/LoggingRegistry.h"
+#include "Poco/SplitterChannel.h"
+#include "Poco/LoggingRegistry.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 SplitterChannel::SplitterChannel()
@@ -119,4 +119,4 @@ int SplitterChannel::count() const
 }
 
 
-Foundation_END
+} // namespace Poco

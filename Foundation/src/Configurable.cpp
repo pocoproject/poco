@@ -1,7 +1,7 @@
 //
 // Configurable.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Configurable.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Configurable.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Configurable.h"
+#include "Poco/Configurable.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Configurable::Configurable()
@@ -50,4 +50,4 @@ Configurable::~Configurable()
 }
 
 
-Foundation_END
+} // namespace Poco

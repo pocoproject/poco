@@ -1,7 +1,7 @@
 //
 // MD2Engine.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/MD2Engine.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/MD2Engine.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -53,11 +53,11 @@
 //
 
 
-#include "Foundation/MD2Engine.h"
+#include "Poco/MD2Engine.h"
 #include <string.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 MD2Engine::MD2Engine()
@@ -213,4 +213,4 @@ void MD2Engine::transform(unsigned char state[16], unsigned char checksum[16], c
 }
 
 
-Foundation_END
+} // namespace Poco

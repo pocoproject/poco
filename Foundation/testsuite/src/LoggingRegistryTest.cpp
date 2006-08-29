@@ -1,7 +1,7 @@
 //
 // LoggingRegistryTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/LoggingRegistryTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/LoggingRegistryTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,18 +33,18 @@
 #include "LoggingRegistryTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/LoggingRegistry.h"
-#include "Foundation/ConsoleChannel.h"
-#include "Foundation/PatternFormatter.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/LoggingRegistry.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/AutoPtr.h"
 
 
-using Foundation::LoggingRegistry;
-using Foundation::Channel;
-using Foundation::ConsoleChannel;
-using Foundation::Formatter;
-using Foundation::PatternFormatter;
-using Foundation::AutoPtr;
+using Poco::LoggingRegistry;
+using Poco::Channel;
+using Poco::ConsoleChannel;
+using Poco::Formatter;
+using Poco::PatternFormatter;
+using Poco::AutoPtr;
 
 
 LoggingRegistryTest::LoggingRegistryTest(const std::string& name): CppUnit::TestCase(name)
@@ -88,7 +88,7 @@ void LoggingRegistryTest::testRegister()
 		pC = reg.channelForName("c3");
 		fail("not found - must throw");
 	}
-	catch (Foundation::NotFoundException&)
+	catch (Poco::NotFoundException&)
 	{
 	}
 }
@@ -151,7 +151,7 @@ void LoggingRegistryTest::testUnregister()
 		Channel* pC = reg.channelForName("c1");
 		fail("unregistered - must throw");
 	}
-	catch (Foundation::NotFoundException&)
+	catch (Poco::NotFoundException&)
 	{
 	}
 
@@ -160,7 +160,7 @@ void LoggingRegistryTest::testUnregister()
 		Formatter* pF = reg.formatterForName("f2");
 		fail("unregistered - must throw");
 	}
-	catch (Foundation::NotFoundException&)
+	catch (Poco::NotFoundException&)
 	{
 	}
 }

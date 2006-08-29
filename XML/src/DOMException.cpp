@@ -1,7 +1,7 @@
 //
 // DOMException.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DOMException.cpp#2 $
+// $Id: //poco/1.2/XML/src/DOMException.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,11 +34,12 @@
 //
 
 
-#include "DOM/DOMException.h"
+#include "Poco/DOM/DOMException.h"
 #include <typeinfo>
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const std::string DOMException::MESSAGES[_NUMBER_OF_MESSAGES] =
@@ -104,9 +105,15 @@ const char* DOMException::className() const throw()
 }
 
 
-Foundation::Exception* DOMException::clone() const
+Poco::Exception* DOMException::clone() const
 {
 	return new DOMException(*this);
+}
+
+
+void DOMException::rethrow() const
+{
+	throw *this;
 }
 
 
@@ -119,4 +126,4 @@ const std::string& DOMException::message(unsigned short code)
 }
 
 
-XML_END
+} } // namespace Poco::XML

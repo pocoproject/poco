@@ -1,7 +1,7 @@
 //
 // MultipartReader.cpp
 //
-// $Id: //poco/1.1.0/Net/src/MultipartReader.cpp#2 $
+// $Id: //poco/1.2/Net/src/MultipartReader.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,16 +34,17 @@
 //
 
 
-#include "Net/MultipartReader.h"
-#include "Net/MessageHeader.h"
-#include "Net/NetException.h"
+#include "Poco/Net/MultipartReader.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/NetException.h"
 #include <ctype.h>
 
 
-using Foundation::BufferedStreamBuf;
+using Poco::BufferedStreamBuf;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 //
@@ -313,4 +314,4 @@ bool MultipartReader::readLine(std::string& line, std::string::size_type n)
 }
 
 
-Net_END
+} } // namespace Poco::Net

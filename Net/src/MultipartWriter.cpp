@@ -1,7 +1,7 @@
 //
 // MultipartWriter.cpp
 //
-// $Id: //poco/1.1.0/Net/src/MultipartWriter.cpp#2 $
+// $Id: //poco/1.2/Net/src/MultipartWriter.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,17 +34,18 @@
 //
 
 
-#include "Net/MultipartWriter.h"
-#include "Net/MessageHeader.h"
-#include "Foundation/Random.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/MultipartWriter.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Random.h"
+#include "Poco/NumberFormatter.h"
 
 
-using Foundation::Random;
-using Foundation::NumberFormatter;
+using Poco::Random;
+using Poco::NumberFormatter;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 MultipartWriter::MultipartWriter(std::ostream& ostr):
@@ -98,4 +99,4 @@ std::string MultipartWriter::createBoundary()
 }
 
 
-Net_END
+} } // namespace Poco::Net

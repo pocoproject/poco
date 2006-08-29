@@ -1,7 +1,7 @@
 //
 // TreeWalkerTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/TreeWalkerTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/TreeWalkerTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,22 +33,22 @@
 #include "TreeWalkerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "DOM/TreeWalker.h"
-#include "DOM/NodeFilter.h"
-#include "DOM/Document.h"
-#include "DOM/Element.h"
-#include "DOM/Text.h"
-#include "DOM/AutoPtr.h"
+#include "Poco/DOM/TreeWalker.h"
+#include "Poco/DOM/NodeFilter.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
-using XML::TreeWalker;
-using XML::NodeFilter;
-using XML::Element;
-using XML::Document;
-using XML::Text;
-using XML::Node;
-using XML::AutoPtr;
-using XML::XMLString;
+using Poco::XML::TreeWalker;
+using Poco::XML::NodeFilter;
+using Poco::XML::Element;
+using Poco::XML::Document;
+using Poco::XML::Text;
+using Poco::XML::Node;
+using Poco::XML::AutoPtr;
+using Poco::XML::XMLString;
 
 
 namespace

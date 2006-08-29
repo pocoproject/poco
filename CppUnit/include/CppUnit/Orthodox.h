@@ -1,7 +1,7 @@
 //
 // Orthodox.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/Orthodox.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/Orthodox.h#1 $
 //
 
 
@@ -9,15 +9,11 @@
 #define CppUnit_Orthodox_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
 #include "CppUnit/TestCase.h"
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 /*
@@ -103,7 +99,7 @@ ClassUnderTest Orthodox<ClassUnderTest>::call(ClassUnderTest object)
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_Orthodox_INCLUDED

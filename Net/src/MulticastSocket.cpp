@@ -1,7 +1,7 @@
 //
 // MulticastSocket.cpp
 //
-// $Id: //poco/1.1.0/Net/src/MulticastSocket.cpp#2 $
+// $Id: //poco/1.2/Net/src/MulticastSocket.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,8 +34,8 @@
 //
 
 
-#include "Net/MulticastSocket.h"
-#include "Net/NetException.h"
+#include "Poco/Net/MulticastSocket.h"
+#include "Poco/Net/NetException.h"
 #include <string.h>
 
 
@@ -57,7 +57,8 @@ struct ip_mreq
 #endif
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 MulticastSocket::MulticastSocket()
@@ -115,7 +116,7 @@ NetworkInterface MulticastSocket::getInterface() const
 		impl()->getOption(IPPROTO_IP, IP_MULTICAST_IF, addr);
 		return NetworkInterface::forAddress(addr);
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 #if defined(POCO_HAVE_IPv6)
 		int ix;
@@ -257,4 +258,4 @@ void MulticastSocket::leaveGroup(const IPAddress& groupAddress, const NetworkInt
 }
 
 
-Net_END
+} } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DirectoryIterator_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DirectoryIterator_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/DirectoryIterator_WIN32.h"
-#include "Foundation/File_WIN32.h"
-#include "Foundation/Path.h"
+#include "Poco/DirectoryIterator_WIN32.h"
+#include "Poco/File_WIN32.h"
+#include "Poco/Path.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVALID_HANDLE_VALUE), _rc(1)
@@ -82,4 +82,4 @@ const std::string& DirectoryIteratorImpl::next()
 }
 
 
-Foundation_END
+} // namespace Poco

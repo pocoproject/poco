@@ -1,7 +1,7 @@
 //
 // Path_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Path_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Path_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,9 +34,9 @@
 //
 
 
-#include "Foundation/Path_UNIX.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Environment_UNIX.h"
+#include "Poco/Path_UNIX.h"
+#include "Poco/Exception.h"
+#include "Poco/Environment_UNIX.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -51,7 +51,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::string PathImpl::currentImpl()
@@ -159,4 +159,4 @@ void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 }
 
 
-Foundation_END
+} // namespace Poco

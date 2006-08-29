@@ -1,7 +1,7 @@
 //
 // NamedEvent_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedEvent_WIN32U.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedEvent_WIN32U.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/NamedEvent_WIN32U.h"
-#include "Foundation/Exception.h"
-#include "Foundation/UnicodeConverter.h"
+#include "Poco/NamedEvent_WIN32U.h"
+#include "Poco/Exception.h"
+#include "Poco/UnicodeConverter.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NamedEventImpl::NamedEventImpl(const std::string& name):
@@ -77,4 +77,4 @@ void NamedEventImpl::waitImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // deflate.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/deflate/src/deflate.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/deflate/src/deflate.cpp#1 $
 //
 // This sample demonstrates the DeflatingOutputStream and StreamCopier classes.
 //
@@ -32,14 +32,14 @@
 //
 
 
-#include "Foundation/DeflatingStream.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/DeflatingStream.h"
+#include "Poco/StreamCopier.h"
 #include <iostream>
 #include <fstream>
 
 
-using Foundation::DeflatingOutputStream;
-using Foundation::StreamCopier;
+using Poco::DeflatingOutputStream;
+using Poco::StreamCopier;
 
 
 int main(int argc, char** argv)

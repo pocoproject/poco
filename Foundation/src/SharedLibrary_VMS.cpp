@@ -1,7 +1,7 @@
 //
 // SharedLibrary_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SharedLibrary_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SharedLibrary_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -34,8 +34,8 @@
 //
 
 
-#include "Foundation/SharedLibrary_VMS.h"
-#include "Foundation/Path.h"
+#include "Poco/SharedLibrary_VMS.h"
+#include "Poco/Path.h"
 #include <lib$routines.h>
 #include <libdef.h>
 #include <descrip.h>
@@ -43,7 +43,7 @@
 #include <libfisdef.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FastMutex SharedLibraryImpl::_mutex;
@@ -136,4 +136,4 @@ std::string SharedLibraryImpl::suffixImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

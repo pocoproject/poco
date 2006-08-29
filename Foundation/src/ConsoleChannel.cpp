@@ -1,7 +1,7 @@
 //
 // ConsoleChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/ConsoleChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/ConsoleChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/ConsoleChannel.h"
-#include "Foundation/Message.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/Message.h"
 #include <iostream>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FastMutex ConsoleChannel::_mutex;
@@ -68,4 +68,4 @@ void ConsoleChannel::log(const Message& msg)
 }
 
 
-Foundation_END
+} // namespace Poco

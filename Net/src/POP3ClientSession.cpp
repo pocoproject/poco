@@ -1,7 +1,7 @@
 //
 // POP3ClientSession.cpp
 //
-// $Id: //poco/1.1.0/Net/src/POP3ClientSession.cpp#2 $
+// $Id: //poco/1.2/Net/src/POP3ClientSession.cpp#1 $
 //
 // Library: Net
 // Package: Mail
@@ -34,26 +34,27 @@
 //
 
 
-#include "Net/POP3ClientSession.h"
-#include "Net/MailMessage.h"
-#include "Net/MailStream.h"
-#include "Net/SocketAddress.h"
-#include "Net/NetException.h"
-#include "Foundation/StreamCopier.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/UnbufferedStreamBuf.h"
+#include "Poco/Net/POP3ClientSession.h"
+#include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailStream.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/UnbufferedStreamBuf.h"
 #include <istream>
 #include <ctype.h>
 
 
-using Foundation::NumberFormatter;
-using Foundation::StreamCopier;
+using Poco::NumberFormatter;
+using Poco::StreamCopier;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
-class DialogStreamBuf: public Foundation::UnbufferedStreamBuf
+class DialogStreamBuf: public Poco::UnbufferedStreamBuf
 {
 public:
 	DialogStreamBuf(DialogSocket& socket):
@@ -120,7 +121,7 @@ POP3ClientSession::POP3ClientSession(const StreamSocket& socket):
 }
 
 
-POP3ClientSession::POP3ClientSession(const std::string& host, Foundation::UInt16 port):	
+POP3ClientSession::POP3ClientSession(const std::string& host, Poco::UInt16 port):	
 	_socket(SocketAddress(host, port)),
 	_isOpen(true)
 {
@@ -139,13 +140,13 @@ POP3ClientSession::~POP3ClientSession()
 }
 
 
-void POP3ClientSession::setTimeout(const Foundation::Timespan& timeout)
+void POP3ClientSession::setTimeout(const Poco::Timespan& timeout)
 {
 	_socket.setReceiveTimeout(timeout);
 }
 
 	
-Foundation::Timespan POP3ClientSession::getTimeout() const
+Poco::Timespan POP3ClientSession::getTimeout() const
 {
 	return _socket.getReceiveTimeout();
 }
@@ -296,4 +297,4 @@ bool POP3ClientSession::isPositive(const std::string& response)
 }
 
 
-Net_END
+} } // namespace Poco::Net

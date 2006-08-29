@@ -1,7 +1,7 @@
 //
 // FilesystemConfiguration.cpp
 //
-// $Id: //poco/1.1.0/Util/src/FilesystemConfiguration.cpp#2 $
+// $Id: //poco/1.2/Util/src/FilesystemConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,22 +34,23 @@
 //
 
 
-#include "Util/FilesystemConfiguration.h"
-#include "Foundation/File.h"
-#include "Foundation/DirectoryIterator.h"
-#include "Foundation/StringTokenizer.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/FilesystemConfiguration.h"
+#include "Poco/File.h"
+#include "Poco/DirectoryIterator.h"
+#include "Poco/StringTokenizer.h"
+#include "Poco/Exception.h"
 #include <fstream>
 
 
-using Foundation::Path;
-using Foundation::File;
-using Foundation::DirectoryIterator;
-using Foundation::StringTokenizer;
-using Foundation::NotFoundException;
+using Poco::Path;
+using Poco::File;
+using Poco::DirectoryIterator;
+using Poco::StringTokenizer;
+using Poco::NotFoundException;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 FilesystemConfiguration::FilesystemConfiguration(const std::string& path):
@@ -128,4 +129,4 @@ Path FilesystemConfiguration::keyToPath(const std::string& key) const
 }
 
 
-Util_END
+} } // namespace Poco::Util

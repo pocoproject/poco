@@ -306,6 +306,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\RawSocketTest.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\SocketsTestSuite.h"
 					>
 				</File>
@@ -351,6 +355,10 @@
 				</File>
 				<File
 					RelativePath=".\src\NetworkInterfaceTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RawSocketTest.cpp"
 					>
 				</File>
 				<File
@@ -731,6 +739,42 @@
 				</File>
 				<File
 					RelativePath=".\src\SMTPClientSessionTest.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="ICMP"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\ICMPClientTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPClientTestSuite.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPSocketTest.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\ICMPClientTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPClientTestSuite.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPSocketTest.cpp"
 					>
 				</File>
 			</Filter>

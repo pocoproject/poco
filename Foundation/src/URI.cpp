@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/URI.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/URI.cpp#1 $
 //
 // Library: Foundation
 // Package: URI
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/URI.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/Exception.h"
-#include "Foundation/String.h"
-#include "Foundation/NumberParser.h"
+#include "Poco/URI.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Exception.h"
+#include "Poco/String.h"
+#include "Poco/NumberParser.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const std::string URI::RESERVED_PATH     = "?#";
@@ -838,4 +838,4 @@ void URI::buildPath(const std::vector<std::string>& segments, bool leadingSlash,
 }
 
 
-Foundation_END
+} // namespace Poco

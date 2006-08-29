@@ -1,7 +1,7 @@
 //
 // NotificationCenterTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NotificationCenterTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NotificationCenterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "NotificationCenterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/NotificationCenter.h"
-#include "Foundation/Observer.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/NotificationCenter.h"
+#include "Poco/Observer.h"
+#include "Poco/AutoPtr.h"
 
 
-using Foundation::NotificationCenter;
-using Foundation::Observer;
-using Foundation::Notification;
-using Foundation::AutoPtr;
+using Poco::NotificationCenter;
+using Poco::Observer;
+using Poco::Notification;
+using Poco::AutoPtr;
 
 
 class TestNotification: public Notification
@@ -142,7 +142,7 @@ void NotificationCenterTest::testDefaultCenter()
 }
 
 
-void NotificationCenterTest::handle1(Foundation::Notification* pNf)
+void NotificationCenterTest::handle1(Poco::Notification* pNf)
 {
 	poco_check_ptr (pNf);
 	AutoPtr<Notification> nf = pNf;	
@@ -150,7 +150,7 @@ void NotificationCenterTest::handle1(Foundation::Notification* pNf)
 }
 
 
-void NotificationCenterTest::handle2(Foundation::Notification* pNf)
+void NotificationCenterTest::handle2(Poco::Notification* pNf)
 {
 	poco_check_ptr (pNf);
 	AutoPtr<Notification> nf = pNf;	
@@ -158,7 +158,7 @@ void NotificationCenterTest::handle2(Foundation::Notification* pNf)
 }
 
 
-void NotificationCenterTest::handle3(Foundation::Notification* pNf)
+void NotificationCenterTest::handle3(Poco::Notification* pNf)
 {
 	poco_check_ptr (pNf);
 	AutoPtr<Notification> nf = pNf;	

@@ -1,7 +1,7 @@
 //
-// TimeServer.cpp
+// HTTPTimeServer.cpp
 //
-// $Id: //poco/1.1.0/Net/samples/HTTPTimeServer/src/HTTPTimeServer.cpp#2 $
+// $Id: //poco/1.2/Net/samples/HTTPTimeServer/src/HTTPTimeServer.cpp#1 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -32,40 +32,42 @@
 //
 
 
-#include "Net/HTTPServer.h"
-#include "Net/HTTPRequestHandler.h"
-#include "Net/HTTPRequestHandlerFactory.h"
-#include "Net/HTTPServerParams.h"
-#include "Net/HTTPServerRequest.h"
-#include "Net/HTTPServerResponse.h"
-#include "Net/HTTPServerParams.h"
-#include "Net/ServerSocket.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/Exception.h"
-#include "Util/ServerApplication.h"
-#include "Util/Option.h"
-#include "Util/OptionSet.h"
-#include "Util/HelpFormatter.h"
+#include "Poco/Net/HTTPServer.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Timestamp.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/Exception.h"
+#include "Poco/ThreadPool.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/HelpFormatter.h"
 #include <iostream>
 
 
-using Net::ServerSocket;
-using Net::HTTPRequestHandler;
-using Net::HTTPRequestHandlerFactory;
-using Net::HTTPServer;
-using Net::HTTPServerRequest;
-using Net::HTTPServerResponse;
-using Net::HTTPServerParams;
-using Foundation::Timestamp;
-using Foundation::DateTimeFormatter;
-using Foundation::DateTimeFormat;
-using Util::ServerApplication;
-using Util::Application;
-using Util::Option;
-using Util::OptionSet;
-using Util::HelpFormatter;
+using Poco::Net::ServerSocket;
+using Poco::Net::HTTPRequestHandler;
+using Poco::Net::HTTPRequestHandlerFactory;
+using Poco::Net::HTTPServer;
+using Poco::Net::HTTPServerRequest;
+using Poco::Net::HTTPServerResponse;
+using Poco::Net::HTTPServerParams;
+using Poco::Timestamp;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
+using Poco::ThreadPool;
+using Poco::Util::ServerApplication;
+using Poco::Util::Application;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::HelpFormatter;
 
 
 class TimeRequestHandler: public HTTPRequestHandler
@@ -122,7 +124,7 @@ private:
 };
 
 
-class HTTPTimeServer: public Util::ServerApplication
+class HTTPTimeServer: public Poco::Util::ServerApplication
 	/// The main application class.
 	///
 	/// This class handles command-line arguments and
@@ -200,11 +202,18 @@ protected:
 			// get parameters from configuration file
 			unsigned short port = (unsigned short) config().getInt("HTTPTimeServer.port", 9980);
 			std::string format(config().getString("HTTPTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
+			int maxQueued  = config().getInt("HTTPTimeServer.maxQueued", 100);
+			int maxThreads = config().getInt("HTTPTimeServer.maxThreads", 16);
+			ThreadPool::defaultPool().addCapacity(maxThreads);
+			
+			HTTPServerParams* pParams = new HTTPServerParams;
+			pParams->setMaxQueued(maxQueued);
+			pParams->setMaxThreads(maxThreads);
 			
 			// set-up a server socket
 			ServerSocket svs(port);
 			// set-up a HTTPServer instance
-			HTTPServer srv(new TimeRequestHandlerFactory(format), svs, new HTTPServerParams);
+			HTTPServer srv(new TimeRequestHandlerFactory(format), svs, pParams);
 			// start the HTTPServer
 			srv.start();
 			// wait for CTRL-C or kill

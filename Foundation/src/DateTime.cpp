@@ -1,7 +1,7 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DateTime.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DateTime.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/DateTime.h"
+#include "Poco/DateTime.h"
 #include <algorithm>
 #include <math.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
@@ -59,16 +59,16 @@ DateTime::DateTime()
 {
 	Timestamp now;
 	_utcTime = now.utcTime();
-	_julianDay = toJulianDay(_utcTime);
-	computeGregorian();
+	computeGregorian(julianDay());
+	computeDaytime();
 }
 
 
 DateTime::DateTime(const Timestamp& timestamp):
-	_utcTime(timestamp.utcTime()),
-	_julianDay(toJulianDay(_utcTime))
+	_utcTime(timestamp.utcTime())
 {
-	computeGregorian();
+	computeGregorian(julianDay());
+	computeDaytime();
 }
 
 	
@@ -91,30 +91,27 @@ DateTime::DateTime(int year, int month, int day, int hour, int minute, int secon
 	poco_assert (millisecond >= 0 && millisecond <= 999);
 	poco_assert (microsecond >= 0 && microsecond <= 999);
 	
-	_julianDay = toJulianDay(year, month, day, hour, minute, second, millisecond, microsecond);
-	_utcTime   = toUtcTime(_julianDay);
+	_utcTime = toUtcTime(toJulianDay(year, month, day)) + 10*(hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS + millisecond*Timespan::MILLISECONDS + microsecond);
 }
 
 
 DateTime::DateTime(double julianDay):
-	_utcTime(toUtcTime(julianDay)),
-	_julianDay(julianDay)
+	_utcTime(toUtcTime(julianDay))
 {
-	computeGregorian();
+	computeGregorian(julianDay);
 }
 
 
 DateTime::DateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff):
-	_utcTime(utcTime + diff*10),
-	_julianDay(toJulianDay(_utcTime))
+	_utcTime(utcTime + diff*10)
 {
-	computeGregorian();
+	computeGregorian(julianDay());
+	computeDaytime();
 }
 
 
 DateTime::DateTime(const DateTime& dateTime):
 	_utcTime(dateTime._utcTime),
-	_julianDay(dateTime._julianDay),
 	_year(dateTime._year),
 	_month(dateTime._month),
 	_day(dateTime._day),
@@ -137,7 +134,6 @@ DateTime& DateTime::operator = (const DateTime& dateTime)
 	if (&dateTime != this)
 	{
 		_utcTime     = dateTime._utcTime;
-		_julianDay   = dateTime._julianDay;
 		_year        = dateTime._year;
 		_month       = dateTime._month;
 		_day         = dateTime._day;
@@ -153,18 +149,17 @@ DateTime& DateTime::operator = (const DateTime& dateTime)
 	
 DateTime& DateTime::operator = (const Timestamp& timestamp)
 {
-	_utcTime   = timestamp.utcTime();
-	_julianDay = toJulianDay(_utcTime);
-	computeGregorian();
+	_utcTime = timestamp.utcTime();
+	computeGregorian(julianDay());
+	computeDaytime();
 	return *this;
 }
 
 
 DateTime& DateTime::operator = (double julianDay)
 {
-	_julianDay = julianDay;
-	_utcTime   = toUtcTime(julianDay);
-	computeGregorian();
+	_utcTime = toUtcTime(julianDay);
+	computeGregorian(julianDay);
 	return *this;
 }
 
@@ -180,8 +175,7 @@ DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, i
 	poco_assert (millisecond >= 0 && millisecond <= 999);
 	poco_assert (microsecond >= 0 && microsecond <= 999);
 
-	_julianDay   = toJulianDay(year, month, day, hour, minute, second, millisecond, microsecond);
-	_utcTime     = toUtcTime(_julianDay);
+	_utcTime     = toUtcTime(toJulianDay(year, month, day)) + 10*(hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS + millisecond*Timespan::MILLISECONDS + microsecond);
 	_year        = year;
 	_month       = month;
 	_day         = day;
@@ -198,7 +192,6 @@ DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, i
 void DateTime::swap(DateTime& dateTime)
 {
 	std::swap(_utcTime, dateTime._utcTime);
-	std::swap(_julianDay, dateTime._julianDay);
 	std::swap(_year, dateTime._year);
 	std::swap(_month, dateTime._month);
 	std::swap(_day, dateTime._day);
@@ -212,7 +205,7 @@ void DateTime::swap(DateTime& dateTime)
 
 int DateTime::dayOfWeek() const
 {
-	return int((floor(_julianDay + 1.5))) % 7;
+	return int((floor(julianDay() + 1.5))) % 7;
 }
 
 
@@ -239,6 +232,20 @@ int DateTime::daysOfMonth(int year, int month)
 }
 
 
+bool DateTime::isValid(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond)
+{
+	return
+		(year >= 0 && year <= 9999) &&
+		(month >= 1 && month <= 12) &&
+		(day >= 1 && day <= daysOfMonth(year, month)) &&
+		(hour >= 0 && hour <= 23) &&
+		(minute >= 0 && minute <= 59) &&
+		(second >= 0 && second <= 59) &&
+		(millisecond >= 0 && millisecond <= 999) &&
+		(microsecond >= 0 && microsecond <= 999);
+}
+
+
 int DateTime::week(int firstDayOfWeek) const
 {
 	poco_assert (firstDayOfWeek >= 0 && firstDayOfWeek <= 6);
@@ -253,6 +260,12 @@ int DateTime::week(int firstDayOfWeek) const
 		return offs;
 	else
 		return (doy - baseDay)/7 + 1 + offs;
+}
+
+
+double DateTime::julianDay() const
+{
+	return toJulianDay(_utcTime);
 }
 
 
@@ -277,8 +290,8 @@ Timespan DateTime::operator - (const DateTime& dateTime) const
 DateTime& DateTime::operator += (const Timespan& span)
 {
 	_utcTime += span.totalMicroseconds()*10;
-	_julianDay = toJulianDay(_utcTime);
-	computeGregorian();
+	computeGregorian(julianDay());
+	computeDaytime();
 	return *this;
 }
 
@@ -286,8 +299,8 @@ DateTime& DateTime::operator += (const Timespan& span)
 DateTime& DateTime::operator -= (const Timespan& span)
 {
 	_utcTime -= span.totalMicroseconds()*10;
-	_julianDay = toJulianDay(_utcTime);
-	computeGregorian();
+	computeGregorian(julianDay());
+	computeDaytime();
 	return *this;
 }
 
@@ -339,10 +352,10 @@ void DateTime::normalize()
 }
 
 
-void DateTime::computeGregorian()
+void DateTime::computeGregorian(double julianDay)
 {
-	double z    = floor(_julianDay - 1721118.5);
-	double r    = _julianDay - 1721118.5 - z;
+	double z    = floor(julianDay - 1721118.5);
+	double r    = julianDay - 1721118.5 - z;
 	double g    = z - 0.25;
 	double a    = floor(g / 36524.25);
 	double b    = a - floor(a/4);
@@ -380,8 +393,18 @@ void DateTime::computeGregorian()
 	poco_assert_dbg (_second >= 0 && _second <= 59);
 	poco_assert_dbg (_millisecond >= 0 && _millisecond <= 999);
 	poco_assert_dbg (_microsecond >= 0 && _microsecond <= 999);
-	
 }
 
 
-Foundation_END
+void DateTime::computeDaytime()
+{
+	Timespan span(_utcTime/10);
+	_hour        = span.hours();
+	_minute      = span.minutes();
+	_second      = span.seconds();
+	_millisecond = span.milliseconds();
+	_microsecond = span.microseconds();
+}
+
+
+} // namespace Poco

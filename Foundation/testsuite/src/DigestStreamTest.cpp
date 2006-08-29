@@ -1,7 +1,7 @@
 //
 // DigestStreamTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/DigestStreamTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/DigestStreamTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "DigestStreamTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/DigestStream.h"
-#include "Foundation/MD5Engine.h"
+#include "Poco/DigestStream.h"
+#include "Poco/MD5Engine.h"
 #include <sstream>
 
 
-using Foundation::DigestInputStream;
-using Foundation::DigestOutputStream;
-using Foundation::DigestEngine;
-using Foundation::MD5Engine;
+using Poco::DigestInputStream;
+using Poco::DigestOutputStream;
+using Poco::DigestEngine;
+using Poco::MD5Engine;
 
 
 DigestStreamTest::DigestStreamTest(const std::string& name): CppUnit::TestCase(name)

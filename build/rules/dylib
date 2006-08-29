@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/rules/dylib#1 $
+# $Id: //poco/1.2/build/rules/dylib#1 $
 #
 # dylib
 #
@@ -32,7 +32,7 @@ TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
 #
 # Include the compile rules
 #
-include $(POCO_BUILD)/rules/compile
+include $(POCO_BASE)/build/rules/compile
 
 #
 # Rules for creating a dynamically loadable shared library
@@ -41,18 +41,15 @@ clean:
 	$(RM) $(OBJPATH)
 	$(RM) $(DYLIB_DEBUG) $(DYLIB_RELEASE) $(DYLIB_S_DEBUG) $(DYLIB_S_RELEASE)
 
-forcelink:
-	$(RM) $(DYLIB_DEBUG) $(DYLIB_RELEASE) $(DYLIB_S_DEBUG) $(DYLIB_S_RELEASE)
-
 ifeq ($(LINKMODE),BOTH)
-static_debug:   dirs $(DYLIB_S_DEBUG)
-static_release: dirs $(DYLIB_S_RELEASE)
+static_debug:   bindirs $(DYLIB_S_DEBUG)
+static_release: bindirs $(DYLIB_S_RELEASE)
 else
-static_debug:   dirs $(DYLIB_DEBUG)
-static_release: dirs $(DYLIB_RELEASE)
+static_debug:   bindirs $(DYLIB_DEBUG)
+static_release: bindirs $(DYLIB_RELEASE)
 endif
-shared_debug:   dirs $(DYLIB_DEBUG)
-shared_release: dirs $(DYLIB_RELEASE)
+shared_debug:   bindirs $(DYLIB_DEBUG)
+shared_release: bindirs $(DYLIB_RELEASE)
 
 $(DYLIB_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug)" $@

@@ -1,7 +1,7 @@
 //
 // ExpireCacheTest.h
 //
-// $Id: $
+// $Id: //poco/1.2/Foundation/testsuite/src/ExpireCacheTest.h#1 $
 //
 // Tests for ExpireCache
 //
@@ -35,12 +35,9 @@
 #define ExpireCacheTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
+
 
 class ExpireCacheTest: public CppUnit::TestCase
 {
@@ -49,6 +46,7 @@ public:
 	~ExpireCacheTest();
 
 	void testClear();
+	void testDuplicateAdd();
 	void testExpire0();
 	void testExpireN();
 

@@ -1,7 +1,7 @@
 //
 // Text.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Text.cpp#2 $
+// $Id: //poco/1.2/XML/src/Text.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,12 +34,13 @@
 //
 
 
-#include "DOM/Text.h"
-#include "DOM/Document.h"
-#include "DOM/DOMException.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DOMException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString Text::NODE_NAME = toXMLString("#text");
@@ -86,10 +87,16 @@ unsigned short Text::nodeType() const
 }
 
 
+XMLString Text::innerText() const
+{
+	return nodeValue();
+}
+
+
 Node* Text::copyNode(bool deep, Document* pOwnerDocument) const
 {
 	return new Text(pOwnerDocument, *this);
 }
 
 
-XML_END
+} } // namespace Poco::XML

@@ -36,6 +36,7 @@ Glob
 FileChannel
 Formatter
 FormattingChannel
+HashStatistic
 HexBinaryDecoder
 HexBinaryEncoder
 InflatingStream

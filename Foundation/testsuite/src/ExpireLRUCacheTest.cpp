@@ -1,7 +1,7 @@
 //
 // ExpireLRUCacheTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ExpireLRUCacheTest.cpp#5 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ExpireLRUCacheTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,19 +31,21 @@
 
 
 #include "ExpireLRUCacheTest.h"
-
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Exception.h"
+#include "Poco/ExpireLRUCache.h"
+#include "Poco/Bugcheck.h"
+#include "Poco/Thread.h"
 
-#include "Foundation/Exception.h"
-#include "Foundation/ExpireLRUCache.h"
-#include "Foundation/Bugcheck.h"
-#include "Foundation/Thread.h"
-using namespace Foundation;
+
+using namespace Poco;
+
 
 #define DURSLEEP 250
 #define DURHALFSLEEP DURSLEEP / 2
 #define DURWAIT  300
+
 
 ExpireLRUCacheTest::ExpireLRUCacheTest(const std::string& name ): CppUnit::TestCase(name)
 {
@@ -71,20 +73,17 @@ void ExpireLRUCacheTest::testClear()
 	poco_assert ( !aCache.has( 1 ) );
 	poco_assert ( !aCache.has( 3 ) );
 	poco_assert ( !aCache.has( 5 ) );
-
-
 }
 
 
 void ExpireLRUCacheTest::testExpire0()
 {
-
 	try
 	{
 		ExpireLRUCache < int, int > aCache( 1024, 24 );
 		failmsg ( "cache expire lower than 25 is illegal, test should fail");
 	}
-	catch (Foundation::InvalidArgumentException&)
+	catch (Poco::InvalidArgumentException&)
 	{
 	}
 }
@@ -150,7 +149,7 @@ void ExpireLRUCacheTest::testCacheSize0()
 		ExpireLRUCache < int, int > aCache( 0 );
 		failmsg ("cache size of 0 is illegal, test should fail");
 	}
-	catch (Foundation::InvalidArgumentException&)
+	catch (Poco::InvalidArgumentException&)
 	{
 	}
 }
@@ -179,8 +178,6 @@ void ExpireLRUCacheTest::testCacheSize1()
 
 	// removing illegal entries should work too
 	aCache.remove(666);
-
-
 }
 
 
@@ -274,6 +271,19 @@ void ExpireLRUCacheTest::testCacheSizeN()
 	poco_assert ( !aCache.has( 3 ) );
 }
 
+
+void ExpireLRUCacheTest::testDuplicateAdd()
+{
+	ExpireLRUCache < int, int > aCache( 3 );
+	aCache.add(1, 2); // 1
+	poco_assert (aCache.has(1));
+	poco_assert (*aCache.get(1) == 2);
+	aCache.add(1, 3);
+	poco_assert (aCache.has(1));
+	poco_assert (*aCache.get(1) == 3);
+}
+
+
 void ExpireLRUCacheTest::setUp()
 {
 }
@@ -295,6 +305,7 @@ CppUnit::Test* ExpireLRUCacheTest::suite()
 	CppUnit_addTest(pSuite, ExpireLRUCacheTest, testCacheSize1);
 	CppUnit_addTest(pSuite, ExpireLRUCacheTest, testCacheSize2);
 	CppUnit_addTest(pSuite, ExpireLRUCacheTest, testCacheSizeN);
+	CppUnit_addTest(pSuite, ExpireLRUCacheTest, testDuplicateAdd);
 
 	return pSuite;
 }

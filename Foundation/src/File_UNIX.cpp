@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/File_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/File_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,9 +34,9 @@
 //
 
 
-#include "Foundation/File_UNIX.h"
-#include "Foundation/Buffer.h"
-#include "Foundation/Exception.h"
+#include "Poco/File_UNIX.h"
+#include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -48,7 +48,7 @@
 #include <string.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FileImpl::FileImpl()
@@ -148,6 +148,19 @@ bool FileImpl::isDirectoryImpl() const
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 		return S_ISDIR(st.st_mode);
+	else
+		handleError(_path);
+	return false;
+}
+
+
+bool FileImpl::isLinkImpl() const
+{
+	poco_assert (!_path.empty());
+
+	struct stat st;
+	if (lstat(_path.c_str(), &st) == 0)
+		return S_ISLNK(st.st_mode);
 	else
 		handleError(_path);
 	return false;
@@ -300,7 +313,7 @@ void FileImpl::removeImpl()
 	poco_assert (!_path.empty());
 
 	int rc;
-	if (isDirectoryImpl())
+	if (!isLinkImpl() && isDirectoryImpl())
 		rc = rmdir(_path.c_str());
 	else
 		rc = unlink(_path.c_str());
@@ -372,4 +385,4 @@ void FileImpl::handleError(const std::string& path)
 }
 
 
-Foundation_END
+} // namespace Poco

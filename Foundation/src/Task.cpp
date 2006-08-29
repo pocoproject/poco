@@ -1,7 +1,7 @@
 //
 // Task.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Task.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Task.cpp#1 $
 //
 // Library: Foundation
 // Package: Tasks
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/Task.h"
-#include "Foundation/TaskManager.h"
-#include "Foundation/Exception.h"
+#include "Poco/Task.h"
+#include "Poco/TaskManager.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Task::Task(const std::string& name):
@@ -148,4 +148,4 @@ void Task::postNotification(Notification* pNf)
 }
 
 
-Foundation_END
+} // namespace Poco

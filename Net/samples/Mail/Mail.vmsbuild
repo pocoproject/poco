@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/1.1.0/Net/samples/Mail/Mail.vmsbuild#1 $
+# $Id: //poco/1.2/Net/samples/Mail/Mail.vmsbuild#1 $
 #
 EXE=Mail
 Mail

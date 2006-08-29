@@ -1,7 +1,7 @@
 //
 // Timezone_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Timezone_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Timezone_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/Timezone.h"
+#include "Poco/Timezone.h"
 #include <windows.h>
 #include <time.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 int Timezone::utcOffset()
@@ -99,4 +99,4 @@ std::string Timezone::dstName()
 }
 
 
-Foundation_END
+} // namespace Poco

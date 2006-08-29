@@ -1,10 +1,10 @@
 #! /bin/sh
 #
-# $Id: //poco/1.1.0/build/script/shlibln#1 $
+# $Id: //poco/1.2/build/script/shlibln#1 $
 #
 # shlibln
 #
-# Create a symbolic link
+# Create a symbolic link for a shared library
 #
 
 if [ $# -ne 2 ] ; then
@@ -12,6 +12,17 @@ if [ $# -ne 2 ] ; then
 	exit 1
 fi
 
+source="$1"
+target="$2"
+
+sourcedir=`dirname "$source"`
+targetdir=`dirname "$target"`
+
+if [ "$sourcedir" = "$targetdir" ] ; then
+	source=`basename $source`
+fi
+
+
 if [ "$1" != "$2" ] ; then
-	ln -sf "$1" "$2"
+	ln -sf "$source" "$target"
 fi

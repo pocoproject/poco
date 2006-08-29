@@ -1,7 +1,7 @@
 //
 // TextTestResult.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TextTestResult.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TextTestResult.h#1 $
 //
 
 
@@ -9,19 +9,12 @@
 #define CppUnit_TextTestResult_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_TestResult_INCLUDED
 #include "CppUnit/TestResult.h"
-#endif
-#ifndef STD_OSTREAM_INCLUDED
 #include <ostream>
-#define STD_OSTREAM_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class CppUnit_API TextTestResult: public TestResult
@@ -48,7 +41,7 @@ inline std::ostream& operator<< (std::ostream& stream, TextTestResult& result)
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_TextTestResult_INCLUDED

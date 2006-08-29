@@ -1,7 +1,7 @@
 //
 // SocketReactor.cpp
 //
-// $Id: //poco/1.1.0/Net/src/SocketReactor.cpp#2 $
+// $Id: //poco/1.2/Net/src/SocketReactor.cpp#1 $
 //
 // Library: Net
 // Package: Reactor
@@ -34,19 +34,20 @@
 //
 
 
-#include "Net/SocketReactor.h"
-#include "Net/SocketNotification.h"
-#include "Net/SocketNotifier.h"
-#include "Foundation/ErrorHandler.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/SocketNotification.h"
+#include "Poco/Net/SocketNotifier.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::FastMutex;
-using Foundation::Exception;
-using Foundation::ErrorHandler;
+using Poco::FastMutex;
+using Poco::Exception;
+using Poco::ErrorHandler;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 SocketReactor::SocketReactor():
@@ -61,7 +62,7 @@ SocketReactor::SocketReactor():
 }
 
 
-SocketReactor::SocketReactor(const Foundation::Timespan& timeout):
+SocketReactor::SocketReactor(const Poco::Timespan& timeout):
 	_stop(false),
 	_timeout(timeout),
 	_pReadableNotification(new ReadableNotification(this)),
@@ -122,19 +123,19 @@ void SocketReactor::stop()
 }
 
 
-void SocketReactor::setTimeout(const Foundation::Timespan& timeout)
+void SocketReactor::setTimeout(const Poco::Timespan& timeout)
 {
 	_timeout = timeout;
 }
 
 	
-const Foundation::Timespan& SocketReactor::getTimeout() const
+const Poco::Timespan& SocketReactor::getTimeout() const
 {
 	return _timeout;
 }
 
 
-void SocketReactor::addEventHandler(const Socket& socket, const Foundation::AbstractObserver& observer)
+void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
 	FastMutex::ScopedLock lock(_mutex);
 	
@@ -150,7 +151,7 @@ void SocketReactor::addEventHandler(const Socket& socket, const Foundation::Abst
 }
 
 
-void SocketReactor::removeEventHandler(const Socket& socket, const Foundation::AbstractObserver& observer)
+void SocketReactor::removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
 	FastMutex::ScopedLock lock(_mutex);
 	
@@ -229,4 +230,4 @@ void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotifi
 }
 
 
-Net_END
+} } // namespace Poco::Net

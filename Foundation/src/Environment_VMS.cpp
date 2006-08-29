@@ -1,7 +1,7 @@
 //
 // Environment_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Environment_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Environment_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,8 +34,8 @@
 //
 
 
-#include "Foundation/Environment_VMS.h"
-#include "Foundation/Exception.h"
+#include "Poco/Environment_VMS.h"
+#include "Poco/Exception.h"
 #include <stdlib.h>
 #include <starlet.h>
 #include <descrip.h>
@@ -45,7 +45,7 @@
 #include <lnmdef.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FastMutex EnvironmentImpl::_mutex;
@@ -168,4 +168,4 @@ std::string EnvironmentImpl::trnlnm(const std::string& name)
 }
 
 
-Foundation_END
+} // namespace Poco

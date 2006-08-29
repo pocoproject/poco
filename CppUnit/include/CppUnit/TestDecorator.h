@@ -1,7 +1,7 @@
 //
 // TestDecorator.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TestDecorator.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TestDecorator.h#1 $
 //
 
 
@@ -9,18 +9,12 @@
 #define CppUnit_TestDecorator_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_Guards_INCLUDED
 #include "CppUnit/Guards.h"
-#endif
-#ifndef CppUnit_Test_INCLUDED
 #include "CppUnit/Test.h"
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class TestResult;
@@ -52,7 +46,7 @@ protected:
 };
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_TestDecorator_INCLUDED

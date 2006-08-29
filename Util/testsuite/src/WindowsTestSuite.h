@@ -1,7 +1,7 @@
 //
 // WindowsTestSuite.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/WindowsTestSuite.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/WindowsTestSuite.h#1 $
 //
 // Definition of the WindowsTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define WindowsTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class WindowsTestSuite

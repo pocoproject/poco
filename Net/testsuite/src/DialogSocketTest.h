@@ -1,7 +1,7 @@
 //
 // DialogSocketTest.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/DialogSocketTest.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/DialogSocketTest.h#1 $
 //
 // Definition of the DialogSocketTest class.
 //
@@ -36,12 +36,8 @@
 #define DialogSocketTest_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class DialogSocketTest: public CppUnit::TestCase

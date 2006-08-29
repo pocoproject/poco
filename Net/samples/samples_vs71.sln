@@ -27,6 +27,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mail", "Mail\Mail_vs71.vcpr
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPLoadTest", "HTTPLoadTest\HTTPLoadTest_vs71.vcproj", "{455C9515-4914-49B6-93FB-C37242A6C21C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ping", "Ping\Ping_vs71.vcproj", "{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPFormServer", "HTTPFormServer\HTTPFormServer_vs71.vcproj", "{45A054E6-44EC-4943-809A-BA8B2A25DA21}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug_shared = debug_shared
@@ -61,6 +73,18 @@ Global
 		{1B776CF5-3889-48D1-A58B-694D06FBD632}.debug_shared.Build.0 = debug_shared|Win32
 		{1B776CF5-3889-48D1-A58B-694D06FBD632}.release_shared.ActiveCfg = release_shared|Win32
 		{1B776CF5-3889-48D1-A58B-694D06FBD632}.release_shared.Build.0 = release_shared|Win32
+		{455C9515-4914-49B6-93FB-C37242A6C21C}.debug_shared.ActiveCfg = debug_shared|Win32
+		{455C9515-4914-49B6-93FB-C37242A6C21C}.debug_shared.Build.0 = debug_shared|Win32
+		{455C9515-4914-49B6-93FB-C37242A6C21C}.release_shared.ActiveCfg = release_shared|Win32
+		{455C9515-4914-49B6-93FB-C37242A6C21C}.release_shared.Build.0 = release_shared|Win32
+		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.debug_shared.ActiveCfg = debug_shared|Win32
+		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.debug_shared.Build.0 = debug_shared|Win32
+		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.release_shared.ActiveCfg = release_shared|Win32
+		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.release_shared.Build.0 = release_shared|Win32
+		{45A054E6-44EC-4943-809A-BA8B2A25DA21}.debug_shared.ActiveCfg = debug_shared|Win32
+		{45A054E6-44EC-4943-809A-BA8B2A25DA21}.debug_shared.Build.0 = debug_shared|Win32
+		{45A054E6-44EC-4943-809A-BA8B2A25DA21}.release_shared.ActiveCfg = release_shared|Win32
+		{45A054E6-44EC-4943-809A-BA8B2A25DA21}.release_shared.Build.0 = release_shared|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

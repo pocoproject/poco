@@ -1,7 +1,7 @@
 //
 // NotificationQueueTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NotificationQueueTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NotificationQueueTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "NotificationQueueTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/NotificationQueue.h"
-#include "Foundation/Notification.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Runnable.h"
-#include "Foundation/RunnableAdapter.h"
+#include "Poco/NotificationQueue.h"
+#include "Poco/Notification.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/RunnableAdapter.h"
 
 
-using Foundation::NotificationQueue;
-using Foundation::Notification;
-using Foundation::Thread;
-using Foundation::RunnableAdapter;
+using Poco::NotificationQueue;
+using Poco::Notification;
+using Poco::Thread;
+using Poco::RunnableAdapter;
 
 
 class QTestNotification: public Notification

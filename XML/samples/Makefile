@@ -1,12 +1,14 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/XML/samples/Makefile#1 $
+# $Id: //poco/1.2/XML/samples/Makefile#1 $
 #
 # Makefile for Poco XML Samples
 #
 
-.DEFAULT all:
+.PHONY: projects
+clean all: projects
+projects:
 	$(MAKE) -C DOMParser $(MAKECMDGOALS)
 	$(MAKE) -C DOMWriter $(MAKECMDGOALS)
 	$(MAKE) -C PrettyPrint $(MAKECMDGOALS)

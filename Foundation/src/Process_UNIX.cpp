@@ -1,7 +1,7 @@
 //
 // Process_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Process_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Process_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,9 +34,10 @@
 //
 
 
-#include "Foundation/Process_UNIX.h"
-#include "Foundation/Exception.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Process_UNIX.h"
+#include "Poco/Exception.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Pipe.h"
 #include <errno.h>
 #include <signal.h>
 #include <sys/time.h>
@@ -47,10 +48,12 @@
 
 #if defined(__QNX__)
 #include <process.h>
+#include <spawn.h>
+#include <string.h>
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 //
@@ -100,7 +103,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
 {
 #if defined(__QNX__)
 	/// use QNX's spawn system call which is more efficient than fork/exec.
@@ -110,10 +113,16 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
 		argv[i++] = const_cast<char*>(it->c_str());
 	argv[i] = NULL;
-	int pid = spawnvp(P_NOWAIT, command.c_str(), argv);
+	struct inheritance inherit;
+	memset(&inherit, 0, sizeof(inherit));
+	inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
+	int fdmap[3];
+	fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
+	fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
+	fdmap[2] = errPipe ? errPipe->writeHandle() : 2;
+	int pid = spawn(command.c_str(), 3, fdmap, &inherit, argv, NULL);
 	delete [] argv;
-	if (pid == -1) throw SystemException("Cannot spawn", command);
-	return new ProcessHandleImpl(pid);
+	if (pid == -1) throw SystemException("cannot spawn", command);
 #else
 	int pid = fork();
 	if (pid < 0)
@@ -122,6 +131,21 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	}
 	else if (pid == 0)
 	{
+		// setup redirection
+		if (inPipe)
+		{
+			dup2(inPipe->readHandle(), STDIN_FILENO);
+			inPipe->close(Pipe::CLOSE_BOTH);
+		}
+		// outPipe and errPipe may be the same, so we dup first and close later
+		if (outPipe) dup2(outPipe->writeHandle(), STDOUT_FILENO);
+		if (errPipe) dup2(errPipe->writeHandle(), STDERR_FILENO);
+		if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
+		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
+		// close all open file descriptors other than stdin, stdout, stderr
+		for (int i = 3; i < getdtablesize(); ++i)
+			close(i);
+			
 		char** argv = new char*[args.size() + 2];
 		int i = 0;
 		argv[i++] = const_cast<char*>(command.c_str());
@@ -131,8 +155,11 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		execvp(command.c_str(), argv);
 		_exit(72);
 	}
-	return new ProcessHandleImpl(pid);
 #endif
+	if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
+	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
+	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
+	return new ProcessHandleImpl(pid);
 }
 
 
@@ -170,4 +197,4 @@ void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 }
 
 
-Foundation_END
+} // namespace Poco

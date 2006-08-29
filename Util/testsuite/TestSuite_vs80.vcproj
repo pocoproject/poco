@@ -373,6 +373,10 @@
 					RelativePath=".\src\OptionTest.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\ValidatorTest.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -397,6 +401,10 @@
 					RelativePath=".\src\OptionTest.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\ValidatorTest.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -405,6 +413,10 @@
 			<Filter
 				Name="Header Files"
 				>
+				<File
+					RelativePath=".\src\WinConfigurationTest.h"
+					>
+				</File>
 				<File
 					RelativePath=".\src\WindowsTestSuite.h"
 					>
@@ -417,6 +429,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\WinConfigurationTest.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\WindowsTestSuite.cpp"
 					>

@@ -1,7 +1,7 @@
 //
 // URIStreamFactory.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/URIStreamFactory.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/URIStreamFactory.cpp#1 $
 //
 // Library: Foundation
 // Package: URI
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/URIStreamFactory.h"
+#include "Poco/URIStreamFactory.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 URIStreamFactory::URIStreamFactory()
@@ -50,4 +50,4 @@ URIStreamFactory::~URIStreamFactory()
 }
 
 
-Foundation_END
+} // namespace Poco

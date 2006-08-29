@@ -1,7 +1,7 @@
 //
 // ActivityTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ActivityTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ActivityTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,48 +33,51 @@
 #include "ActivityTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Activity.h"
-#include "Foundation/Thread.h"
+#include "Poco/Activity.h"
+#include "Poco/Thread.h"
 
 
-using Foundation::Activity;
-using Foundation::Thread;
+using Poco::Activity;
+using Poco::Thread;
 
 
-class ActiveObject
+namespace
 {
-public:
-	ActiveObject(): 
-		_activity(this, &ActiveObject::run),
-		_count(0)
+	class ActiveObject
 	{
-	}
-	
-	~ActiveObject()
-	{
-	}
-	
-	Activity<ActiveObject>& activity()
-	{
-		return _activity;
-	}
-	
-	int count() const
-	{
-		return _count;
-	}
+	public:
+		ActiveObject(): 
+			_activity(this, &ActiveObject::run),
+			_count(0)
+		{
+		}
+		
+		~ActiveObject()
+		{
+		}
+		
+		Activity<ActiveObject>& activity()
+		{
+			return _activity;
+		}
+		
+		int count() const
+		{
+			return _count;
+		}
 
-protected:
-	void run()
-	{
-		while (!_activity.isStopped()) 
-			++_count;
-	}
+	protected:
+		void run()
+		{
+			while (!_activity.isStopped()) 
+				++_count;
+		}
 
-private:
-	Activity<ActiveObject> _activity;
-	int                    _count;
-};
+	private:
+		Activity<ActiveObject> _activity;
+		int                    _count;
+	};
+}
  
 
 ActivityTest::ActivityTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // EchoServer.cpp
 //
-// $Id: //poco/1.1.0/Net/samples/EchoServer/src/EchoServer.cpp#2 $
+// $Id: //poco/1.2/Net/samples/EchoServer/src/EchoServer.cpp#1 $
 //
 // This sample demonstrates the SocketReactor and SocketAcceptor classes.
 //
@@ -32,34 +32,34 @@
 //
 
 
-#include "Net/SocketReactor.h"
-#include "Net/SocketAcceptor.h"
-#include "Net/SocketNotification.h"
-#include "Net/StreamSocket.h"
-#include "Net/ServerSocket.h"
-#include "Foundation/Observer.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Thread.h"
-#include "Util/ServerApplication.h"
-#include "Util/Option.h"
-#include "Util/OptionSet.h"
-#include "Util/HelpFormatter.h"
+#include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/SocketAcceptor.h"
+#include "Poco/Net/SocketNotification.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Observer.h"
+#include "Poco/Exception.h"
+#include "Poco/Thread.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/HelpFormatter.h"
 #include <iostream>
 
 
-using Net::SocketReactor;
-using Net::SocketAcceptor;
-using Net::ReadableNotification;
-using Net::ShutdownNotification;
-using Net::ServerSocket;
-using Net::StreamSocket;
-using Foundation::Observer;
-using Foundation::Thread;
-using Util::ServerApplication;
-using Util::Application;
-using Util::Option;
-using Util::OptionSet;
-using Util::HelpFormatter;
+using Poco::Net::SocketReactor;
+using Poco::Net::SocketAcceptor;
+using Poco::Net::ReadableNotification;
+using Poco::Net::ShutdownNotification;
+using Poco::Net::ServerSocket;
+using Poco::Net::StreamSocket;
+using Poco::Observer;
+using Poco::Thread;
+using Poco::Util::ServerApplication;
+using Poco::Util::Application;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::HelpFormatter;
 
 
 class EchoServiceHandler
@@ -119,7 +119,7 @@ private:
 };
 
 
-class EchoServer: public Util::ServerApplication
+class EchoServer: public Poco::Util::ServerApplication
 	/// The main application class.
 	///
 	/// This class handles command-line arguments and

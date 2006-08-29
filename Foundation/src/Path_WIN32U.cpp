@@ -1,7 +1,7 @@
 //
 // Path_WIN32U.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Path_WIN32U.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Path_WIN32U.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,15 +34,15 @@
 //
 
 
-#include "Foundation/Path_WIN32U.h"
-#include "Foundation/Environment_WIN32.h"
-#include "Foundation/UnicodeConverter.h"
-#include "Foundation/Buffer.h"
-#include "Foundation/Exception.h"
+#include "Poco/Path_WIN32U.h"
+#include "Poco/Environment_WIN32.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include <windows.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::string PathImpl::currentImpl()
@@ -118,18 +118,20 @@ std::string PathImpl::expandImpl(const std::string& path)
 void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 {
 	roots.clear();
-	char buffer[128];
-	DWORD n = GetLogicalDriveStrings(sizeof(buffer) - 1, buffer);
-	char* it = buffer;
-	char* end = buffer + (n > sizeof(buffer) ? sizeof(buffer) : n);
+	wchar_t buffer[128];
+	DWORD n = GetLogicalDriveStringsW(sizeof(buffer)/sizeof(wchar_t) - 1, buffer);
+	wchar_t* it  = buffer;
+	wchar_t* end = buffer + (n > sizeof(buffer) ? sizeof(buffer) : n);
 	while (it < end)
 	{
+		std::wstring udev;
+		while (it < end && *it) udev += *it++;
 		std::string dev;
-		while (it < end && *it) dev += *it++;
+		UnicodeConverter::toUTF8(udev, dev);
 		roots.push_back(dev);
 		++it;
 	}
 }
 
 
-Foundation_END
+} // namespace Poco

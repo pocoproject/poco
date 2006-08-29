@@ -1,7 +1,7 @@
 //
 // NameValueCollection.cpp
 //
-// $Id: //poco/1.1.0/Net/src/NameValueCollection.cpp#2 $
+// $Id: //poco/1.2/Net/src/NameValueCollection.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,15 +34,16 @@
 //
 
 
-#include "Net/NameValueCollection.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 
 
-using Foundation::NotFoundException;
+using Poco::NotFoundException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 NameValueCollection::NameValueCollection()
@@ -112,6 +113,16 @@ const std::string& NameValueCollection::get(const std::string& name) const
 }
 
 
+const std::string& NameValueCollection::get(const std::string& name, const std::string& defaultValue) const
+{
+	ConstIterator it = _map.find(name);
+	if (it != _map.end())
+		return it->second;
+	else
+		return defaultValue;
+}
+
+
 bool NameValueCollection::has(const std::string& name) const
 {
 	return _map.find(name) != _map.end();
@@ -160,4 +171,4 @@ void NameValueCollection::clear()
 }
 
 
-Net_END
+} } // namespace Poco::Net

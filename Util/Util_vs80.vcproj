@@ -212,19 +212,19 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Util\Application.h"
+					RelativePath=".\include\Poco\Util\Application.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\LoggingSubsystem.h"
+					RelativePath=".\include\Poco\Util\LoggingSubsystem.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\ServerApplication.h"
+					RelativePath=".\include\Poco\Util\ServerApplication.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\Subsystem.h"
+					RelativePath=".\include\Poco\Util\Subsystem.h"
 					>
 				</File>
 			</Filter>
@@ -256,47 +256,47 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Util\AbstractConfiguration.h"
+					RelativePath=".\include\Poco\Util\AbstractConfiguration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\ConfigurationMapper.h"
+					RelativePath=".\include\Poco\Util\ConfigurationMapper.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\ConfigurationView.h"
+					RelativePath=".\include\Poco\Util\ConfigurationView.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\FilesystemConfiguration.h"
+					RelativePath=".\include\Poco\Util\FilesystemConfiguration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\IniFileConfiguration.h"
+					RelativePath=".\include\Poco\Util\IniFileConfiguration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\LayeredConfiguration.h"
+					RelativePath=".\include\Poco\Util\LayeredConfiguration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\LoggingConfigurator.h"
+					RelativePath=".\include\Poco\Util\LoggingConfigurator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\MapConfiguration.h"
+					RelativePath=".\include\Poco\Util\MapConfiguration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\PropertyFileConfiguration.h"
+					RelativePath=".\include\Poco\Util\PropertyFileConfiguration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\SystemConfiguration.h"
+					RelativePath=".\include\Poco\Util\SystemConfiguration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\XMLConfiguration.h"
+					RelativePath=".\include\Poco\Util\XMLConfiguration.h"
 					>
 				</File>
 			</Filter>
@@ -356,23 +356,39 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Util\HelpFormatter.h"
+					RelativePath=".\include\Poco\Util\HelpFormatter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\Option.h"
+					RelativePath=".\include\Poco\Util\IntValidator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\OptionException.h"
+					RelativePath=".\include\Poco\Util\Option.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\OptionProcessor.h"
+					RelativePath=".\include\Poco\Util\OptionCallback.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\OptionSet.h"
+					RelativePath=".\include\Poco\Util\OptionException.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\OptionProcessor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\OptionSet.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\RegExpValidator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\Validator.h"
 					>
 				</File>
 			</Filter>
@@ -384,7 +400,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\IntValidator.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Option.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\OptionCallback.cpp"
 					>
 				</File>
 				<File
@@ -399,6 +423,14 @@
 					RelativePath=".\src\OptionSet.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\RegExpValidator.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Validator.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -408,17 +440,25 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Util\WinRegistryKey.h"
+					RelativePath=".\include\Poco\Util\WinRegistryConfiguration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Util\WinService.h"
+					RelativePath=".\include\Poco\Util\WinRegistryKey.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\WinService.h"
 					>
 				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\WinRegistryConfiguration.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\WinRegistryKey.cpp"
 					>
@@ -436,7 +476,7 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Util\Util.h"
+					RelativePath=".\include\Poco\Util\Util.h"
 					>
 				</File>
 			</Filter>

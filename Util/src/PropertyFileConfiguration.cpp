@@ -1,7 +1,7 @@
 //
 // PropertyFileConfiguration.cpp
 //
-// $Id: //poco/1.1.0/Util/src/PropertyFileConfiguration.cpp#2 $
+// $Id: //poco/1.2/Util/src/PropertyFileConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,17 +34,18 @@
 //
 
 
-#include "Util/PropertyFileConfiguration.h"
-#include "Foundation/Exception.h"
-#include "Foundation/String.h"
+#include "Poco/Util/PropertyFileConfiguration.h"
+#include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <fstream>
 #include <locale>
 
 
-using Foundation::trim;
+using Poco::trim;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 PropertyFileConfiguration::PropertyFileConfiguration()
@@ -85,7 +86,7 @@ void PropertyFileConfiguration::load(const std::string& path)
 	if (istr.good())
 		load(istr);
 	else
-		throw Foundation::OpenFileException(path);
+		throw Poco::OpenFileException(path);
 }
 
 
@@ -108,9 +109,9 @@ void PropertyFileConfiguration::save(const std::string& path) const
 	{
 		save(ostr);
 		ostr.flush();
-		if (!ostr.good()) throw Foundation::WriteFileException(path);
+		if (!ostr.good()) throw Poco::WriteFileException(path);
 	}
-	else throw Foundation::CreateFileException(path);
+	else throw Poco::CreateFileException(path);
 }
 
 
@@ -176,4 +177,4 @@ int PropertyFileConfiguration::readChar(std::istream& istr)
 }
 
 
-Util_END
+} } // namespace Poco::Util

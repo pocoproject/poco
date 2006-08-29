@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.1.0/Net/src/SMTPClientSession.cpp#2 $
+// $Id: //poco/1.2/Net/src/SMTPClientSession.cpp#1 $
 //
 // Library: Net
 // Package: Mail
@@ -34,20 +34,21 @@
 //
 
 
-#include "Net/SMTPClientSession.h"
-#include "Net/MailMessage.h"
-#include "Net/MailRecipient.h"
-#include "Net/MailStream.h"
-#include "Net/SocketAddress.h"
-#include "Net/SocketStream.h"
-#include "Net/NetException.h"
-#include "Foundation/Environment.h"
+#include "Poco/Net/SMTPClientSession.h"
+#include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailRecipient.h"
+#include "Poco/Net/MailStream.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/SocketStream.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Environment.h"
 
 
-using Foundation::Environment;
+using Poco::Environment;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 SMTPClientSession::SMTPClientSession(const StreamSocket& socket):
@@ -57,7 +58,7 @@ SMTPClientSession::SMTPClientSession(const StreamSocket& socket):
 }
 
 
-SMTPClientSession::SMTPClientSession(const std::string& host, Foundation::UInt16 port):
+SMTPClientSession::SMTPClientSession(const std::string& host, Poco::UInt16 port):
 	_socket(SocketAddress(host, port)),
 	_isOpen(true)
 {
@@ -76,13 +77,13 @@ SMTPClientSession::~SMTPClientSession()
 }
 
 
-void SMTPClientSession::setTimeout(const Foundation::Timespan& timeout)
+void SMTPClientSession::setTimeout(const Poco::Timespan& timeout)
 {
 	_socket.setReceiveTimeout(timeout);
 }
 
 	
-Foundation::Timespan SMTPClientSession::getTimeout() const
+Poco::Timespan SMTPClientSession::getTimeout() const
 {
 	return _socket.getReceiveTimeout();
 }
@@ -160,4 +161,4 @@ int SMTPClientSession::sendCommand(const std::string& command, const std::string
 }
 
 
-Net_END
+} } // namespace Poco::Net

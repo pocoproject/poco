@@ -1,7 +1,7 @@
 //
 // AbstractContainerNode.cpp
 //
-// $Id: //poco/1.1.0/XML/src/AbstractContainerNode.cpp#2 $
+// $Id: //poco/1.2/XML/src/AbstractContainerNode.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,12 +34,13 @@
 //
 
 
-#include "DOM/AbstractContainerNode.h"
-#include "DOM/Document.h"
-#include "DOM/DOMException.h"
+#include "Poco/DOM/AbstractContainerNode.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DOMException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument): 
@@ -321,4 +322,4 @@ bool AbstractContainerNode::hasAttributes() const
 }
 
 
-XML_END
+} } // namespace Poco::XML

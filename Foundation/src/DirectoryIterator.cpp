@@ -1,7 +1,7 @@
 //
 // DirectoryIterator.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DirectoryIterator.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DirectoryIterator.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/DirectoryIterator.h"
+#include "Poco/DirectoryIterator.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
@@ -48,7 +48,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 DirectoryIterator::DirectoryIterator(): _pImpl(0)
@@ -168,4 +168,4 @@ DirectoryIterator DirectoryIterator::operator ++ (int dummy)
 }
 
 
-Foundation_END
+} // namespace Poco

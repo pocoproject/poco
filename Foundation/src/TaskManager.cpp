@@ -1,7 +1,7 @@
 //
 // TaskManager.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/TaskManager.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/TaskManager.cpp#1 $
 //
 // Library: Foundation
 // Package: Tasks
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/TaskManager.h"
-#include "Foundation/TaskNotification.h"
-#include "Foundation/ThreadPool.h"
+#include "Poco/TaskManager.h"
+#include "Poco/TaskNotification.h"
+#include "Poco/ThreadPool.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const int TaskManager::MIN_PROGRESS_NOTIFICATION_INTERVAL = 100000; // 100 milliseconds
@@ -162,4 +162,4 @@ void TaskManager::taskFailed(Task* pTask, const Exception& exc)
 }
 
 
-Foundation_END
+} // namespace Poco

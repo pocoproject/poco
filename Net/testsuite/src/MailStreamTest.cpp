@@ -1,7 +1,7 @@
 //
 // MailStreamTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MailStreamTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MailStreamTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "MailStreamTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/MailStream.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/Net/MailStream.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
-using Net::MailInputStream;
-using Net::MailOutputStream;
-using Foundation::StreamCopier;
+using Poco::Net::MailInputStream;
+using Poco::Net::MailOutputStream;
+using Poco::StreamCopier;
 
 
 MailStreamTest::MailStreamTest(const std::string& name): CppUnit::TestCase(name)

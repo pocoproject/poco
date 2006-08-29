@@ -1,7 +1,7 @@
 //
 // NodeTest.h
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/NodeTest.h#2 $
+// $Id: //poco/1.2/XML/testsuite/src/NodeTest.h#1 $
 //
 // Definition of the NodeTest class.
 //
@@ -36,12 +36,8 @@
 #define NodeTest_INCLUDED
 
 
-#ifndef XML_XML_INCLUDED
-#include "XML/XML.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/XML/XML.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class NodeTest: public CppUnit::TestCase

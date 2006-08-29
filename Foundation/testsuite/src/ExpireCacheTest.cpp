@@ -1,7 +1,7 @@
 //
 // ExpireCacheTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ExpireCacheTest.cpp#5 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ExpireCacheTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,19 +31,21 @@
 
 
 #include "ExpireCacheTest.h"
-
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Exception.h"
+#include "Poco/ExpireCache.h"
+#include "Poco/Bugcheck.h"
+#include "Poco/Thread.h"
 
-#include "Foundation/Exception.h"
-#include "Foundation/ExpireCache.h"
-#include "Foundation/Bugcheck.h"
-#include "Foundation/Thread.h"
-using namespace Foundation;
+
+using namespace Poco;
+
 
 #define DURSLEEP 250
 #define DURHALFSLEEP DURSLEEP / 2
 #define DURWAIT  300
+
 
 ExpireCacheTest::ExpireCacheTest(const std::string& name ): CppUnit::TestCase(name)
 {
@@ -71,20 +73,17 @@ void ExpireCacheTest::testClear()
 	poco_assert ( !aCache.has( 1 ) );
 	poco_assert ( !aCache.has( 3 ) );
 	poco_assert ( !aCache.has( 5 ) );
-
-
 }
 
 
 void ExpireCacheTest::testExpire0()
 {
-
 	try
 	{
 		ExpireCache < int, int > aCache( 24 );
 		failmsg ( "cache expire lower than 25 is illegal, test should fail");
 	}
-	catch ( Foundation::InvalidArgumentException& )
+	catch ( Poco::InvalidArgumentException& )
 	{
 	}
 }
@@ -142,6 +141,18 @@ void ExpireCacheTest::testExpireN()
 }
 
 
+void ExpireCacheTest::testDuplicateAdd()
+{
+	ExpireCache < int, int > aCache( DURSLEEP );
+	aCache.add(1, 2); // 1
+	poco_assert (aCache.has(1));
+	poco_assert (*aCache.get(1) == 2);
+	aCache.add(1, 3);
+	poco_assert (aCache.has(1));
+	poco_assert (*aCache.get(1) == 3);
+}
+
+
 void ExpireCacheTest::setUp()
 {
 }
@@ -159,6 +170,7 @@ CppUnit::Test* ExpireCacheTest::suite()
 	CppUnit_addTest(pSuite, ExpireCacheTest, testClear);
 	CppUnit_addTest(pSuite, ExpireCacheTest, testExpire0);
 	CppUnit_addTest(pSuite, ExpireCacheTest, testExpireN);
+	CppUnit_addTest(pSuite, ExpireCacheTest, testDuplicateAdd);
 
 	return pSuite;
 }

@@ -1,7 +1,7 @@
 //
 // File_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/File_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/File_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/File_WIN32.h"
-#include "Foundation/Exception.h"
+#include "Poco/File_WIN32.h"
+#include "Poco/Exception.h"
 #include <windows.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 class FileHandle
@@ -167,6 +167,12 @@ bool FileImpl::isDirectoryImpl() const
 	if (attr == 0xFFFFFFFF)
 		handleError(_path);
 	return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+}
+
+
+bool FileImpl::isLinkImpl() const
+{
+	return false;
 }
 
 
@@ -350,4 +356,4 @@ void FileImpl::handleError(const std::string& path)
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // TextTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/TextTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/TextTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,19 +33,19 @@
 #include "TextTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "DOM/Text.h"
-#include "DOM/CDATASection.h"
-#include "DOM/Element.h"
-#include "DOM/Document.h"
-#include "DOM/AutoPtr.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/CDATASection.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
-using XML::Text;
-using XML::CDATASection;
-using XML::Element;
-using XML::Document;
-using XML::AutoPtr;
-using XML::XMLString;
+using Poco::XML::Text;
+using Poco::XML::CDATASection;
+using Poco::XML::Element;
+using Poco::XML::Document;
+using Poco::XML::AutoPtr;
+using Poco::XML::XMLString;
 
 
 TextTest::TextTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // DOMParser.cpp
 //
-// $Id: //poco/1.1.0/XML/samples/DOMParser/src/DOMParser.cpp#2 $
+// $Id: //poco/1.2/XML/samples/DOMParser/src/DOMParser.cpp#1 $
 //
 // This sample demonstrates the DOMParser, AutoPtr and
 // NodeIterator classes.
@@ -33,24 +33,24 @@
 //
 
 
-#include "DOM/DOMParser.h"
-#include "DOM/Document.h"
-#include "DOM/NodeIterator.h"
-#include "DOM/NodeFilter.h"
-#include "DOM/AutoPtr.h"
-#include "SAX/InputSource.h"
-#include "Foundation/Exception.h"
+#include "Poco/DOM/DOMParser.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/NodeIterator.h"
+#include "Poco/DOM/NodeFilter.h"
+#include "Poco/DOM/AutoPtr.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-using XML::DOMParser;
-using XML::InputSource;
-using XML::Document;
-using XML::NodeIterator;
-using XML::NodeFilter;
-using XML::Node;
-using XML::AutoPtr;
-using Foundation::Exception;
+using Poco::XML::DOMParser;
+using Poco::XML::InputSource;
+using Poco::XML::Document;
+using Poco::XML::NodeIterator;
+using Poco::XML::NodeFilter;
+using Poco::XML::Node;
+using Poco::XML::AutoPtr;
+using Poco::Exception;
 
 
 int main(int argc, char** argv)

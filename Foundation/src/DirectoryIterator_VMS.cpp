@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DirectoryIterator_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DirectoryIterator_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,16 +34,16 @@
 //
 
 
-#include "Foundation/DirectoryIterator_VMS.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
+#include "Poco/DirectoryIterator_VMS.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
 #include <iodef.h>
 #include <atrdef.h>
 #include <fibdef.h>
 #include <starlet.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _rc(1)
@@ -84,4 +84,4 @@ const std::string& DirectoryIteratorImpl::next()
 }
 
 
-Foundation_END
+} // namespace Poco

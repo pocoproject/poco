@@ -1,7 +1,7 @@
 //
 // HTTPServerParams.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPServerParams.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPServerParams.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPServerParams.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPServerParams::HTTPServerParams():
@@ -66,7 +67,7 @@ void HTTPServerParams::setSoftwareVersion(const std::string& softwareVersion)
 }
 
 
-void HTTPServerParams::setTimeout(const Foundation::Timespan& timeout)
+void HTTPServerParams::setTimeout(const Poco::Timespan& timeout)
 {
 	_timeout = timeout;
 }
@@ -78,7 +79,7 @@ void HTTPServerParams::setKeepAlive(bool keepAlive)
 }
 
 	
-void HTTPServerParams::setKeepAliveTimeout(const Foundation::Timespan& timeout)
+void HTTPServerParams::setKeepAliveTimeout(const Poco::Timespan& timeout)
 {
 	_keepAliveTimeout = timeout;
 }
@@ -91,4 +92,4 @@ void HTTPServerParams::setMaxKeepAliveRequests(int maxKeepAliveRequests)
 }
 	
 
-Net_END
+} } // namespace Poco::Net

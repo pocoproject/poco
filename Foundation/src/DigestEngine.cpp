@@ -1,7 +1,7 @@
 //
 // DigestEngine.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DigestEngine.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DigestEngine.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/DigestEngine.h"
+#include "Poco/DigestEngine.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 DigestEngine::DigestEngine()
@@ -65,4 +65,4 @@ std::string DigestEngine::digestToHex(const Digest& bytes)
 }
 
 
-Foundation_END
+} // namespace Poco

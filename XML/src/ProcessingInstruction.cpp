@@ -1,7 +1,7 @@
 //
 // ProcessingInstruction.cpp
 //
-// $Id: //poco/1.1.0/XML/src/ProcessingInstruction.cpp#2 $
+// $Id: //poco/1.2/XML/src/ProcessingInstruction.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/ProcessingInstruction.h"
+#include "Poco/DOM/ProcessingInstruction.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data): 
@@ -97,4 +98,4 @@ Node* ProcessingInstruction::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-XML_END
+} } // namespace Poco::XML

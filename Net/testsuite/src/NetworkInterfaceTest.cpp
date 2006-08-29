@@ -1,7 +1,7 @@
 //
 // NetworkInterfaceTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/NetworkInterfaceTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/NetworkInterfaceTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "NetworkInterfaceTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/NetworkInterface.h"
+#include "Poco/Net/NetworkInterface.h"
 #include <iostream>
 
 
-using Net::NetworkInterface;
+using Poco::Net::NetworkInterface;
 
 
 NetworkInterfaceTest::NetworkInterfaceTest(const std::string& name): CppUnit::TestCase(name)

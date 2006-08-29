@@ -1,7 +1,7 @@
 //
 // UTF8Encoding.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/UTF8Encoding.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/UTF8Encoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/UTF8Encoding.h"
+#include "Poco/UTF8Encoding.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const TextEncoding::CharacterMap UTF8Encoding::_charMap = 
@@ -157,4 +157,4 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 }
 
 
-Foundation_END
+} // namespace Poco

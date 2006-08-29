@@ -1,7 +1,7 @@
 //
 // SAXTestSuite.h
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/SAXTestSuite.h#2 $
+// $Id: //poco/1.2/XML/testsuite/src/SAXTestSuite.h#1 $
 //
 // Definition of the SAXTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define SAXTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class SAXTestSuite

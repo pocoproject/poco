@@ -1,7 +1,7 @@
 //
 // XMLString.cpp
 //
-// $Id: //poco/1.1.0/XML/src/XMLString.cpp#2 $
+// $Id: //poco/1.2/XML/src/XMLString.cpp#1 $
 //
 // Library: XML
 // Package: XML
@@ -34,7 +34,7 @@
 //
 
 
-#include "XML/XMLString.h"
+#include "Poco/XML/XMLString.h"
 
 
 #if defined(XML_UNICODE_WCHAR_T)
@@ -42,7 +42,8 @@
 #endif
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 #if defined(XML_UNICODE_WCHAR_T)
@@ -82,4 +83,4 @@ XMLString toXMLString(const std::string& str)
 #endif // XML_UNICODE_WCHAR_T
 
 
-XML_END
+} } // namespace Poco::XML

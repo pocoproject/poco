@@ -1,7 +1,7 @@
 //
 // Thread.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Thread.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Thread.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Thread.h"
-#include "Foundation/Mutex.h"
-#include "Foundation/Exception.h"
-#include "Foundation/ThreadLocal.h"
+#include "Poco/Thread.h"
+#include "Poco/Mutex.h"
+#include "Poco/Exception.h"
+#include "Poco/ThreadLocal.h"
 #include <sstream>
 
 
@@ -48,7 +48,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Thread::Thread(): 
@@ -140,4 +140,4 @@ void Thread::setName(const std::string& name)
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -160,7 +160,13 @@
 					RelativePath=".\src\DynamicFactoryTest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\FormatTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\FPETest.cpp">
+				</File>
+				<File
+					RelativePath=".\src\HashTest.cpp">
 				</File>
 				<File
 					RelativePath=".\src\MemoryPoolTest.cpp">
@@ -212,7 +218,13 @@
 					RelativePath=".\src\DynamicFactoryTest.h">
 				</File>
 				<File
+					RelativePath=".\src\FormatTest.h">
+				</File>
+				<File
 					RelativePath=".\src\FPETest.h">
+				</File>
+				<File
+					RelativePath=".\src\HashTest.h">
 				</File>
 				<File
 					RelativePath=".\src\MemoryPoolTest.h">
@@ -421,6 +433,9 @@
 				Name="Source Files"
 				Filter="">
 				<File
+					RelativePath=".\src\ActiveDispatcherTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\ActiveMethodTest.cpp">
 				</File>
 				<File
@@ -451,6 +466,9 @@
 			<Filter
 				Name="Header Files"
 				Filter="">
+				<File
+					RelativePath=".\src\ActiveDispatcherTest.h">
+				</File>
 				<File
 					RelativePath=".\src\ActiveMethodTest.h">
 				</File>
@@ -547,6 +565,9 @@
 					RelativePath=".\src\LoggingTestSuite.cpp">
 				</File>
 				<File
+					RelativePath=".\src\LogStreamTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\PatternFormatterTest.cpp">
 				</File>
 				<File
@@ -576,6 +597,9 @@
 				</File>
 				<File
 					RelativePath=".\src\LoggingTestSuite.h">
+				</File>
+				<File
+					RelativePath=".\src\LogStreamTest.h">
 				</File>
 				<File
 					RelativePath=".\src\PatternFormatterTest.h">

@@ -1,7 +1,7 @@
 //
 // TimestampTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TimestampTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TimestampTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "TimestampTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/Thread.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Thread.h"
 
 
-using Foundation::Timestamp;
-using Foundation::Thread;
+using Poco::Timestamp;
+using Poco::Thread;
 
 
 TimestampTest::TimestampTest(const std::string& name): CppUnit::TestCase(name)
@@ -92,8 +92,8 @@ void TimestampTest::testTimestamp()
 #if defined(_WIN32)
 	{
 		Timestamp now;
-		Foundation::UInt32 low;
-		Foundation::UInt32 high;
+		Poco::UInt32 low;
+		Poco::UInt32 high;
 		now.toFileTimeNP(low, high);
 		Timestamp ts = Timestamp::fromFileTimeNP(low, high);
 		assert (now == ts);

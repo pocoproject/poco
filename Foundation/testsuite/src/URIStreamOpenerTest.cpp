@@ -1,7 +1,7 @@
 //
 // URIStreamOpenerTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/URIStreamOpenerTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/URIStreamOpenerTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,20 +33,20 @@
 #include "URIStreamOpenerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/URIStreamOpener.h"
-#include "Foundation/URIStreamFactory.h"
-#include "Foundation/URI.h"
-#include "Foundation/TemporaryFile.h"
-#include "Foundation/Path.h"
+#include "Poco/URIStreamOpener.h"
+#include "Poco/URIStreamFactory.h"
+#include "Poco/URI.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/Path.h"
 #include <fstream>
 #include <sstream>
 
 
-using Foundation::URIStreamOpener;
-using Foundation::URIStreamFactory;
-using Foundation::URI;
-using Foundation::TemporaryFile;
-using Foundation::Path;
+using Poco::URIStreamOpener;
+using Poco::URIStreamFactory;
+using Poco::URI;
+using Poco::TemporaryFile;
+using Poco::Path;
 
 
 namespace

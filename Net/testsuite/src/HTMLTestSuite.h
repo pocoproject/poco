@@ -1,7 +1,7 @@
 //
 // HTMLTestSuite.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTMLTestSuite.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTMLTestSuite.h#1 $
 //
 // Definition of the HTMLTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define HTMLTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class HTMLTestSuite

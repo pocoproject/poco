@@ -1,7 +1,7 @@
 //
 // Event_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Event_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Event_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Event_WIN32.h"
+#include "Poco/Event_WIN32.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 EventImpl::EventImpl(bool autoReset)
@@ -80,4 +80,4 @@ bool EventImpl::waitImpl(long milliseconds)
 }
 
 
-Foundation_END
+} // namespace Poco

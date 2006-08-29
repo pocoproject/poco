@@ -1,7 +1,7 @@
 //
 // RandomTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/RandomTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/RandomTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,13 +33,13 @@
 #include "RandomTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Random.h"
+#include "Poco/Random.h"
 #include <vector>
 #include <math.h>
 
 
-using Foundation::Random;
-using Foundation::UInt32;
+using Poco::Random;
+using Poco::UInt32;
 
 
 RandomTest::RandomTest(const std::string& name): CppUnit::TestCase(name)

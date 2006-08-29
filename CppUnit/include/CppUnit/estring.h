@@ -1,7 +1,7 @@
 //
 // estring.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/estring.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/estring.h#1 $
 //
 
 
@@ -9,20 +9,12 @@
 #define CppUnit_estring_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef STD_STRING_INCLUDED
 #include <string>
-#define STD_STRING_INCLUDED
-#endif
-#ifndef STD_STDIO_INCLUDED
 #include <stdio.h>
-#define STD_STDIO_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 // Create a std::string from a const char pointer
@@ -75,7 +67,7 @@ inline std::string estring(const void* ptr)
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_estring_INCLUDED

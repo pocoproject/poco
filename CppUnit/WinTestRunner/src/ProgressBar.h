@@ -1,7 +1,7 @@
 //
 // ProgressBar.h
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/src/ProgressBar.h#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/src/ProgressBar.h#1 $
 //
 
 
@@ -9,13 +9,11 @@
 #define ProgressBar_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
 #include <afxwin.h>
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 /* A Simple ProgressBar for test execution display
@@ -70,7 +68,7 @@ inline COLORREF ProgressBar::getStatusColor()
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // ProgressBar_INCLUDED

@@ -1,7 +1,7 @@
 //
 // DeflatingStream.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DeflatingStream.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DeflatingStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/DeflatingStream.h"
-#include "Foundation/Exception.h"
+#include "Poco/DeflatingStream.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, StreamType type, int level): 
@@ -136,7 +136,7 @@ int DeflatingStreamBuf::close()
 int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_pIstr) return 0;
-	if (!_zstr.next_in && !_eof)
+	if (_zstr.avail_in == 0 && !_eof)
 	{
 		int n = 0;
 		if (_pIstr->good())
@@ -155,14 +155,9 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			_zstr.avail_in = 0;
 			_eof = true;
 		}
-		_zstr.next_out  = (unsigned char*) buffer;
-		_zstr.avail_out = length;
 	}
-	else if (_zstr.avail_out == 0)
-	{
-		_zstr.next_out  = (unsigned char*) buffer;
-		_zstr.avail_out = length;
-	}
+	_zstr.next_out  = (unsigned char*) buffer;
+	_zstr.avail_out = length;
 	for (;;)
 	{
 		int rc = deflate(&_zstr, _eof ? Z_FINISH : Z_NO_FLUSH);
@@ -289,4 +284,4 @@ DeflatingInputStream::~DeflatingInputStream()
 }
 
 
-Foundation_END
+} // namespace Poco

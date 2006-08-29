@@ -1,7 +1,7 @@
 //
 // POP3ClientSessionTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/POP3ClientSessionTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/POP3ClientSessionTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,15 +34,15 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "DialogServer.h"
-#include "Net/POP3ClientSession.h"
-#include "Net/MailMessage.h"
-#include "Net/NetException.h"
+#include "Poco/Net/POP3ClientSession.h"
+#include "Poco/Net/MailMessage.h"
+#include "Poco/Net/NetException.h"
 
 
-using Net::POP3ClientSession;
-using Net::MessageHeader;
-using Net::MailMessage;
-using Net::POP3Exception;
+using Poco::Net::POP3ClientSession;
+using Poco::Net::MessageHeader;
+using Poco::Net::MailMessage;
+using Poco::Net::POP3Exception;
 
 
 POP3ClientSessionTest::POP3ClientSessionTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // FTPClientSession.cpp
 //
-// $Id: //poco/1.1.0/Net/src/FTPClientSession.cpp#2 $
+// $Id: //poco/1.2/Net/src/FTPClientSession.cpp#1 $
 //
 // Library: Net
 // Package: FTP
@@ -34,19 +34,20 @@
 //
 
 
-#include "Net/FTPClientSession.h"
-#include "Net/SocketAddress.h"
-#include "Net/SocketStream.h"
-#include "Net/ServerSocket.h"
-#include "Net/NetException.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/FTPClientSession.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/SocketStream.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/NumberFormatter.h"
 #include <ctype.h>
 
 
-using Foundation::NumberFormatter;
+using Poco::NumberFormatter;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 FTPClientSession::FTPClientSession(const StreamSocket& socket):
@@ -62,7 +63,7 @@ FTPClientSession::FTPClientSession(const StreamSocket& socket):
 }
 
 	
-FTPClientSession::FTPClientSession(const std::string& host, Foundation::UInt16 port):
+FTPClientSession::FTPClientSession(const std::string& host, Poco::UInt16 port):
 	_controlSocket(SocketAddress(host, port)),
 	_pDataStream(0),
 	_passiveMode(true),
@@ -87,14 +88,14 @@ FTPClientSession::~FTPClientSession()
 }
 
 
-void FTPClientSession::setTimeout(const Foundation::Timespan& timeout)
+void FTPClientSession::setTimeout(const Poco::Timespan& timeout)
 {
 	_timeout = timeout;
 	_controlSocket.setReceiveTimeout(timeout);
 }
 
 	
-Foundation::Timespan FTPClientSession::getTimeout() const
+Poco::Timespan FTPClientSession::getTimeout() const
 {
 	return _timeout;
 }
@@ -415,7 +416,7 @@ void FTPClientSession::sendPORT(const SocketAddress& addr)
 		if (*it == '.') *it = ',';
 	}
 	arg += ',';
-	Foundation::UInt16 port = addr.port();
+	Poco::UInt16 port = addr.port();
 	arg += NumberFormatter::format(port/256);
 	arg += ',';
 	arg += NumberFormatter::format(port % 256);
@@ -466,10 +467,10 @@ void FTPClientSession::parseAddress(const std::string& str, SocketAddress& addr)
 	if (it != end && *it == ',') { host += '.'; ++it; }
 	while (it != end && isdigit(*it)) host += *it++;
 	if (it != end && *it == ',') ++it;
-	Foundation::UInt16 portHi = 0;
+	Poco::UInt16 portHi = 0;
 	while (it != end && isdigit(*it)) { portHi *= 10; portHi += *it++ - '0'; }
 	if (it != end && *it == ',') ++it;
-	Foundation::UInt16 portLo = 0;
+	Poco::UInt16 portLo = 0;
 	while (it != end && isdigit(*it)) { portLo *= 10; portLo += *it++ - '0'; }
 	addr = SocketAddress(host, portHi*256 + portLo);
 }
@@ -485,7 +486,7 @@ void FTPClientSession::parseExtAddress(const std::string& str, SocketAddress& ad
 	if (it != end) delim = *it++;
 	if (it != end && *it == delim) ++it;
 	if (it != end && *it == delim) ++it;
-	Foundation::UInt16 port = 0;
+	Poco::UInt16 port = 0;
 	while (it != end && isdigit(*it)) { port *= 10; port += *it++ - '0'; }	
 	addr = SocketAddress(_controlSocket.peerAddress().host(), port);	
 }
@@ -504,4 +505,4 @@ void FTPClientSession::endTransfer()
 }
 
 
-Net_END
+} } // namespace Poco::Net

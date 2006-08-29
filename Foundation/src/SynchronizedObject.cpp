@@ -1,7 +1,7 @@
 //
 // SynchronizedObject.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SynchronizedObject.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SynchronizedObject.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/SynchronizedObject.h"
+#include "Poco/SynchronizedObject.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 SynchronizedObject::SynchronizedObject()
@@ -50,4 +50,4 @@ SynchronizedObject::~SynchronizedObject()
 }
 
 
-Foundation_END
+} // namespace Poco

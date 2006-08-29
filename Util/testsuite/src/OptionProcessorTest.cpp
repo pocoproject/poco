@@ -1,7 +1,7 @@
 //
 // OptionProcessorTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/OptionProcessorTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/OptionProcessorTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "OptionProcessorTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/Option.h"
-#include "Util/OptionSet.h"
-#include "Util/OptionProcessor.h"
-#include "Util/OptionException.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/OptionProcessor.h"
+#include "Poco/Util/OptionException.h"
 
 
-using Util::Option;
-using Util::OptionSet;
-using Util::OptionProcessor;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::OptionProcessor;
 
 
 OptionProcessorTest::OptionProcessorTest(const std::string& name): CppUnit::TestCase(name)
@@ -128,7 +128,7 @@ void OptionProcessorTest::testUnix()
 		p1.process("--output:file", name, value);
 		fail("duplicate - must throw");
 	}
-	catch (Util::DuplicateOptionException&)
+	catch (Poco::Util::DuplicateOptionException&)
 	{
 	}
 	
@@ -141,7 +141,7 @@ void OptionProcessorTest::testUnix()
 		p1.process("--optimize", name, value);
 		fail("incompatible - must throw");
 	}
-	catch (Util::IncompatibleOptionsException&)
+	catch (Poco::Util::IncompatibleOptionsException&)
 	{
 	}
 	
@@ -150,7 +150,7 @@ void OptionProcessorTest::testUnix()
 		p1.process("-x", name, value);
 		fail("unknown option - must throw");
 	}
-	catch (Util::UnknownOptionException&)
+	catch (Poco::Util::UnknownOptionException&)
 	{
 	}
 
@@ -159,7 +159,7 @@ void OptionProcessorTest::testUnix()
 		p1.process("--in", name, value);
 		fail("ambiguous option - must throw");
 	}
-	catch (Util::AmbiguousOptionException&)
+	catch (Poco::Util::AmbiguousOptionException&)
 	{
 	}
 }
@@ -240,7 +240,7 @@ void OptionProcessorTest::testDefault()
 		p1.process("/output:file", name, value);
 		fail("duplicate - must throw");
 	}
-	catch (Util::DuplicateOptionException&)
+	catch (Poco::Util::DuplicateOptionException&)
 	{
 	}
 	
@@ -253,7 +253,7 @@ void OptionProcessorTest::testDefault()
 		p1.process("/OPT", name, value);
 		fail("incompatible - must throw");
 	}
-	catch (Util::IncompatibleOptionsException&)
+	catch (Poco::Util::IncompatibleOptionsException&)
 	{
 	}
 	
@@ -262,7 +262,7 @@ void OptionProcessorTest::testDefault()
 		p1.process("/x", name, value);
 		fail("unknown option - must throw");
 	}
-	catch (Util::UnknownOptionException&)
+	catch (Poco::Util::UnknownOptionException&)
 	{
 	}
 
@@ -271,9 +271,35 @@ void OptionProcessorTest::testDefault()
 		p1.process("/in", name, value);
 		fail("ambiguous option - must throw");
 	}
-	catch (Util::AmbiguousOptionException&)
+	catch (Poco::Util::AmbiguousOptionException&)
 	{
 	}
+}
+
+
+void OptionProcessorTest::testRequired()
+{
+	OptionSet set;
+	set.addOption(
+		Option("option", "o")
+			.required(true)
+			.repeatable(true));
+
+	OptionProcessor p1(set);
+	std::string name;
+	std::string value;
+	
+	try
+	{
+		p1.checkRequired();
+		fail("no options specified - must throw");
+	}
+	catch (Poco::Util::MissingOptionException&)
+	{
+	}
+	
+	assert (p1.process("-o", name, value));
+	p1.checkRequired();
 }
 
 
@@ -293,6 +319,7 @@ CppUnit::Test* OptionProcessorTest::suite()
 
 	CppUnit_addTest(pSuite, OptionProcessorTest, testUnix);
 	CppUnit_addTest(pSuite, OptionProcessorTest, testDefault);
+	CppUnit_addTest(pSuite, OptionProcessorTest, testRequired);
 
 	return pSuite;
 }

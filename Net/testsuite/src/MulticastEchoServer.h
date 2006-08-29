@@ -1,7 +1,7 @@
 //
 // MulticastEchoServer.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MulticastEchoServer.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MulticastEchoServer.h#1 $
 //
 // Definition of the MulticastEchoServer class.
 //
@@ -36,27 +36,15 @@
 #define MulticastEchoServer_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef Net_MulticastSocket_INCLUDED
-#include "Net/MulticastSocket.h"
-#endif
-#ifndef Net_SocketAddress_INCLUDED
-#include "Net/SocketAddress.h"
-#endif
-#ifndef Net_NetworkInterface_INCLUDED
-#include "Net/NetworkInterface.h"
-#endif
-#ifndef Net_Foundation_Thread_INCLUDED
-#include "Foundation/Thread.h"
-#endif
-#ifndef Net_Foundation_Event_INCLUDED
-#include "Foundation/Event.h"
-#endif
+#include "Poco/Net/Net.h"
+#include "Poco/Net/MulticastSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetworkInterface.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
 
 
-class MulticastEchoServer: public Foundation::Runnable
+class MulticastEchoServer: public Poco::Runnable
 	/// A simple sequential Multicast echo server.
 {
 public:
@@ -66,31 +54,31 @@ public:
 	~MulticastEchoServer();
 		/// Destroys the MulticastEchoServer.
 
-	Foundation::UInt16 port() const;
+	Poco::UInt16 port() const;
 		/// Returns the port the echo server is
 		/// listening on.
 		
 	void run();
 		/// Does the work.
 		
-	const Net::SocketAddress& group() const;
+	const Poco::Net::SocketAddress& group() const;
 		/// Returns the group address where the server listens.
 	
-	const Net::NetworkInterface& interface() const;
+	const Poco::Net::NetworkInterface& interface() const;
 		/// Returns the network interface for multicasting.
 	
 protected:	
-	static Net::NetworkInterface findInterface();
+	static Poco::Net::NetworkInterface findInterface();
 		/// Finds an appropriate network interface for
 		/// multicasting.
 	
 private:
-	Net::MulticastSocket  _socket;
-	Net::SocketAddress    _group;
-	Net::NetworkInterface _if;
-	Foundation::Thread    _thread;
-	Foundation::Event     _ready;
-	bool                  _stop;
+	Poco::Net::MulticastSocket  _socket;
+	Poco::Net::SocketAddress    _group;
+	Poco::Net::NetworkInterface _if;
+	Poco::Thread _thread;
+	Poco::Event  _ready;
+	bool         _stop;
 };
 
 

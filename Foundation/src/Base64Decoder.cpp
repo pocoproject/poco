@@ -1,7 +1,7 @@
 //
 // Base64Decoder.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Base64Decoder.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Base64Decoder.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/Base64Decoder.h"
-#include "Foundation/Base64Encoder.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Mutex.h"
+#include "Poco/Base64Decoder.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/Exception.h"
+#include "Poco/Mutex.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 unsigned char Base64DecoderBuf::IN_ENCODING[256];
@@ -56,11 +56,11 @@ Base64DecoderBuf::Base64DecoderBuf(std::istream& istr):
 	FastMutex::ScopedLock lock(mutex);
 	if (!IN_ENCODING_INIT)
 	{
-		for (int i = 0; i < sizeof(IN_ENCODING); i++)
+		for (unsigned i = 0; i < sizeof(IN_ENCODING); i++)
 		{
 			IN_ENCODING[i] = 0xFF;
 		}
-		for (int i = 0; i < sizeof(Base64EncoderBuf::OUT_ENCODING); i++)
+		for (unsigned i = 0; i < sizeof(Base64EncoderBuf::OUT_ENCODING); i++)
 		{
 			IN_ENCODING[Base64EncoderBuf::OUT_ENCODING[i]] = i;
 		}
@@ -150,4 +150,4 @@ Base64Decoder::~Base64Decoder()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // NotificationQueueTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NotificationQueueTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NotificationQueueTest.h#1 $
 //
 // Definition of the NotificationQueueTest class.
 //
@@ -36,22 +36,11 @@
 #define NotificationQueueTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
-#ifndef Foundation_NotificationQueue_INCLUDED
-#include "Foundation/NotificationQueue.h"
-#endif
-#ifndef Foundation_Mutex_INCLUDED
-#include "Foundation/Mutex.h"
-#endif
-#ifndef STD_SET_INCLUDED
+#include "Poco/NotificationQueue.h"
+#include "Poco/Mutex.h"
 #include <set>
-#define STD_SET_INCLUDED
-#endif
 
 
 class NotificationQueueTest: public CppUnit::TestCase
@@ -75,9 +64,9 @@ protected:
 	void work();
 
 private:
-	Foundation::NotificationQueue    _queue;
+	Poco::NotificationQueue    _queue;
 	std::multiset<std::string> _handled;
-	Foundation::FastMutex            _mutex;
+	Poco::FastMutex            _mutex;
 };
 
 

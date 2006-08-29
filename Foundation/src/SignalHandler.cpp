@@ -1,7 +1,7 @@
 //
 // SignalHandler.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SignalHandler.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SignalHandler.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,19 +34,19 @@
 //
 
 
-#include "Foundation/SignalHandler.h"
+#include "Poco/SignalHandler.h"
 
 
 #if defined(POCO_OS_FAMILY_UNIX)
 
 
-#include "Foundation/Thread.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/Exception.h"
+#include "Poco/Thread.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Exception.h"
 #include <signal.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 SignalHandler::JumpBufferVec SignalHandler::_jumpBufferVec;
@@ -121,7 +121,7 @@ SignalHandler::JumpBufferVec& SignalHandler::jumpBufferVec()
 }
 
 
-Foundation_END
+} // namespace Poco
 
 
 #endif // POCO_OS_FAMILY_UNIX

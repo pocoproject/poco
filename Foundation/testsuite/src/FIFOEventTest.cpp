@@ -1,7 +1,7 @@
 //
 // FIFOEventTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FIFOEventTest.cpp#5 $
+// $Id: //poco/1.2/Foundation/testsuite/src/FIFOEventTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,15 +34,17 @@
 #include "DummyDelegate.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Delegate.h"
+#include "Poco/Expire.h"
+#include "Poco/Thread.h"
+#include "Poco/Exception.h"
 
-#include "Foundation/Delegate.h"
-#include "Foundation/Expire.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Exception.h"
 
-using namespace Foundation;
+using namespace Poco;
+
 
 #define LARGEINC 100
+
 
 FIFOEventTest::FIFOEventTest(const std::string& name ): CppUnit::TestCase(name)
 {
@@ -74,24 +76,24 @@ void FIFOEventTest::testNoDelegate()
 	
 	//Note: passing &args will not work due to &
 	EventArgs* pArgs = &args;
-	Complex += Delegate < FIFOEventTest, Foundation::EventArgs* > (this, &FIFOEventTest::onComplex);
-	Complex -= Delegate < FIFOEventTest, Foundation::EventArgs* > (this, &FIFOEventTest::onComplex);
+	Complex += Delegate < FIFOEventTest, Poco::EventArgs* > (this, &FIFOEventTest::onComplex);
+	Complex -= Delegate < FIFOEventTest, Poco::EventArgs* > (this, &FIFOEventTest::onComplex);
 	Complex.notify ( this, pArgs );
 	poco_assert ( _count == 0 );
 
-	Complex2 += Delegate < FIFOEventTest, Foundation::EventArgs > (this, &FIFOEventTest::onComplex2);
-	Complex2 -= Delegate < FIFOEventTest, Foundation::EventArgs > (this, &FIFOEventTest::onComplex2);
+	Complex2 += Delegate < FIFOEventTest, Poco::EventArgs > (this, &FIFOEventTest::onComplex2);
+	Complex2 -= Delegate < FIFOEventTest, Poco::EventArgs > (this, &FIFOEventTest::onComplex2);
 	Complex2.notify ( this, args );
 	poco_assert ( _count == 0 );
 
 	const EventArgs* pCArgs = &args;
-	ConstComplex += Delegate < FIFOEventTest, const Foundation::EventArgs* > (this, &FIFOEventTest::onConstComplex);
-	ConstComplex -= Delegate < FIFOEventTest, const Foundation::EventArgs* > (this, &FIFOEventTest::onConstComplex);
+	ConstComplex += Delegate < FIFOEventTest, const Poco::EventArgs* > (this, &FIFOEventTest::onConstComplex);
+	ConstComplex -= Delegate < FIFOEventTest, const Poco::EventArgs* > (this, &FIFOEventTest::onConstComplex);
 	ConstComplex.notify ( this, pCArgs );
 	poco_assert ( _count == 0 );
 
-	Const2Complex += Delegate < FIFOEventTest, const Foundation::EventArgs* const > (this, &FIFOEventTest::onConst2Complex);
-	Const2Complex -= Delegate < FIFOEventTest, const Foundation::EventArgs* const > (this, &FIFOEventTest::onConst2Complex);
+	Const2Complex += Delegate < FIFOEventTest, const Poco::EventArgs* const > (this, &FIFOEventTest::onConst2Complex);
+	Const2Complex -= Delegate < FIFOEventTest, const Poco::EventArgs* const > (this, &FIFOEventTest::onConst2Complex);
 	Const2Complex.notify ( this, pArgs );
 	poco_assert ( _count == 0 );
 }
@@ -112,20 +114,20 @@ void FIFOEventTest::testSingleDelegate()
 	poco_assert ( _count == 2 );
 	
 	EventArgs* pArgs = &args;
-	Complex += Delegate < FIFOEventTest, Foundation::EventArgs* > (this, &FIFOEventTest::onComplex);
+	Complex += Delegate < FIFOEventTest, Poco::EventArgs* > (this, &FIFOEventTest::onComplex);
 	Complex.notify ( this, pArgs );
 	poco_assert ( _count == 3 );
 
-	Complex2 += Delegate < FIFOEventTest, Foundation::EventArgs > (this, &FIFOEventTest::onComplex2);
+	Complex2 += Delegate < FIFOEventTest, Poco::EventArgs > (this, &FIFOEventTest::onComplex2);
 	Complex2.notify ( this, args );
 	poco_assert ( _count == 4 );
 
 	const EventArgs* pCArgs = &args;
-	ConstComplex += Delegate < FIFOEventTest, const Foundation::EventArgs* > (this, &FIFOEventTest::onConstComplex);
+	ConstComplex += Delegate < FIFOEventTest, const Poco::EventArgs* > (this, &FIFOEventTest::onConstComplex);
 	ConstComplex.notify ( this, pCArgs );
 	poco_assert ( _count == 5 );
 
-	Const2Complex += Delegate < FIFOEventTest, const Foundation::EventArgs* const > (this, &FIFOEventTest::onConst2Complex);
+	Const2Complex += Delegate < FIFOEventTest, const Poco::EventArgs* const > (this, &FIFOEventTest::onConst2Complex);
 	Const2Complex.notify ( this, pArgs );
 	poco_assert ( _count == 6 );
 	// check if 2nd notify also works
@@ -222,7 +224,7 @@ void FIFOEventTest::testFIFOOrder ()
 		Simple.notify ( this, tmp );
 		failmsg ("Notify should not work");
 	}
-	catch ( Foundation::InvalidArgumentException& )
+	catch ( Poco::InvalidArgumentException& )
 	{
 	}
 }
@@ -270,7 +272,7 @@ void FIFOEventTest::testFIFOOrderExpire ()
 		Simple.notify ( this, tmp );
 		failmsg ("Notify should not work");
 	}
-	catch ( Foundation::InvalidArgumentException& )
+	catch ( Poco::InvalidArgumentException& )
 	{
 		
 	}
@@ -286,7 +288,7 @@ void FIFOEventTest::testExpire ()
 	Simple += Expire < int > (Delegate < FIFOEventTest, int > (this, &FIFOEventTest::onSimple), 500 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 1 );
-	Foundation::Thread::sleep ( 700 );
+	Poco::Thread::sleep ( 700 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 1 );
 }
@@ -301,15 +303,15 @@ void FIFOEventTest::testExpireReRegister()
 	Simple += Expire < int > (Delegate < FIFOEventTest, int > (this, &FIFOEventTest::onSimple), 500 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 1 );
-	Foundation::Thread::sleep ( 200 );
+	Poco::Thread::sleep ( 200 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 2 );
 	// renew registration
 	Simple += Expire < int > (Delegate < FIFOEventTest, int > (this, &FIFOEventTest::onSimple), 600 );
-	Foundation::Thread::sleep( 400 );
+	Poco::Thread::sleep( 400 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 3 );
-	Foundation::Thread::sleep( 300 );
+	Poco::Thread::sleep( 300 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 3 );
 }
@@ -343,11 +345,11 @@ void FIFOEventTest::testOverwriteDelegate ()
 
 void FIFOEventTest::testAsyncNotify ()
 {
-	Foundation::FIFOEvent < int >* pSimple= new Foundation::FIFOEvent < int >();
+	Poco::FIFOEvent < int >* pSimple= new Poco::FIFOEvent < int >();
 	(*pSimple) += Delegate < FIFOEventTest, int > (this, &FIFOEventTest::onAsync);
 	poco_assert ( _count == 0 );
 	int tmp = 0;
-	Foundation::ActiveResult < int > retArg = pSimple->notifyAsync ( this, tmp );
+	Poco::ActiveResult < int > retArg = pSimple->notifyAsync ( this, tmp );
 	delete pSimple; // must work even when the event got deleted!
 	pSimple = NULL;
 	poco_assert ( _count == 0 );
@@ -371,29 +373,29 @@ void FIFOEventTest::onConstSimple ( const void* pSender, const int& i )
 	_count++;
 }
 
-void FIFOEventTest::onComplex ( const void* pSender, Foundation::EventArgs* & i )
+void FIFOEventTest::onComplex ( const void* pSender, Poco::EventArgs* & i )
 {
 	_count++;
 }
 
-void FIFOEventTest::onComplex2 ( const void* pSender, Foundation::EventArgs & i )
+void FIFOEventTest::onComplex2 ( const void* pSender, Poco::EventArgs & i )
 {
 	_count++;
 }
 
-void FIFOEventTest::onConstComplex ( const void* pSender, const Foundation::EventArgs*& i )
+void FIFOEventTest::onConstComplex ( const void* pSender, const Poco::EventArgs*& i )
 {
 	_count++;
 }
 
-void FIFOEventTest::onConst2Complex ( const void* pSender, const Foundation::EventArgs * const & i )
+void FIFOEventTest::onConst2Complex ( const void* pSender, const Poco::EventArgs * const & i )
 {
 	_count++;
 }
 
 void FIFOEventTest::onAsync ( const void* pSender, int& i )
 {
-	Foundation::Thread::sleep ( 700 );
+	Poco::Thread::sleep ( 700 );
 	_count += LARGEINC ;
 }
 

@@ -1,7 +1,7 @@
 //
 // Process_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Process_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Process_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/Process_VMS.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/NamedEvent.h"
+#include "Poco/Process_VMS.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NamedEvent.h"
 #include <times.h>
 #include <time.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 //
@@ -91,7 +91,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
 {
 	char** argv = new char*[args.size() + 2];
 	int i = 0;
@@ -151,4 +151,4 @@ void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 }
 
 
-Foundation_END
+} // namespace Poco

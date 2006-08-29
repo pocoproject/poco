@@ -1,7 +1,7 @@
 //
 // ErrorHandler.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/ErrorHandler.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/ErrorHandler.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/ErrorHandler.h"
-#include "Foundation/SingletonHolder.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/SingletonHolder.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 ErrorHandler* ErrorHandler::_pHandler = ErrorHandler::defaultHandler();
@@ -130,4 +130,4 @@ ErrorHandler* ErrorHandler::defaultHandler()
 }
 
 
-Foundation_END
+} // namespace Poco

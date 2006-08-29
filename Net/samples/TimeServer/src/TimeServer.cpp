@@ -1,7 +1,7 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/1.1.0/Net/samples/TimeServer/src/TimeServer.cpp#2 $
+// $Id: //poco/1.2/Net/samples/TimeServer/src/TimeServer.cpp#1 $
 //
 // This sample demonstrates the TCPServer and ServerSocket classes.
 //
@@ -32,36 +32,36 @@
 //
 
 
-#include "Net/TCPServer.h"
-#include "Net/TCPServerConnection.h"
-#include "Net/TCPServerConnectionFactory.h"
-#include "Net/TCPServerParams.h"
-#include "Net/StreamSocket.h"
-#include "Net/ServerSocket.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/Exception.h"
-#include "Util/ServerApplication.h"
-#include "Util/Option.h"
-#include "Util/OptionSet.h"
-#include "Util/HelpFormatter.h"
+#include "Poco/Net/TCPServer.h"
+#include "Poco/Net/TCPServerConnection.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/TCPServerParams.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Timestamp.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/Exception.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/HelpFormatter.h"
 #include <iostream>
 
 
-using Net::ServerSocket;
-using Net::StreamSocket;
-using Net::TCPServerConnection;
-using Net::TCPServerConnectionFactory;
-using Net::TCPServer;
-using Foundation::Timestamp;
-using Foundation::DateTimeFormatter;
-using Foundation::DateTimeFormat;
-using Util::ServerApplication;
-using Util::Application;
-using Util::Option;
-using Util::OptionSet;
-using Util::HelpFormatter;
+using Poco::Net::ServerSocket;
+using Poco::Net::StreamSocket;
+using Poco::Net::TCPServerConnection;
+using Poco::Net::TCPServerConnectionFactory;
+using Poco::Net::TCPServer;
+using Poco::Timestamp;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
+using Poco::Util::ServerApplication;
+using Poco::Util::Application;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::HelpFormatter;
 
 
 class TimeServerConnection: public TCPServerConnection
@@ -87,7 +87,7 @@ public:
 			dt.append("\r\n");
 			socket().sendBytes(dt.data(), (int) dt.length());
 		}
-		catch (Foundation::Exception& exc)
+		catch (Poco::Exception& exc)
 		{
 			app.logger().log(exc);
 		}
@@ -117,7 +117,7 @@ private:
 };
 
 
-class TimeServer: public Util::ServerApplication
+class TimeServer: public Poco::Util::ServerApplication
 	/// The main application class.
 	///
 	/// This class handles command-line arguments and

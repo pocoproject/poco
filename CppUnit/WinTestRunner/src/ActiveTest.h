@@ -1,7 +1,7 @@
 //
 // ActiveTest.h
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/src/ActiveTest.h#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/src/ActiveTest.h#1 $
 //
 
 
@@ -9,16 +9,12 @@
 #define ActiveTest_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_TestDecorator_INCLUDED
 #include "CppUnit/TestDecorator.h"
-#endif
 #include <afxmt.h>
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 /* A Microsoft-specific active test
@@ -85,7 +81,7 @@ inline void ActiveTest::run()
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // ActiveTest_INCLUDED

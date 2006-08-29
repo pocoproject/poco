@@ -1,7 +1,7 @@
 //
 // RWLockTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/RWLockTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/RWLockTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "RWLockTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/RWLock.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Runnable.h"
+#include "Poco/RWLock.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
 
 
-using Foundation::RWLock;
-using Foundation::Thread;
-using Foundation::Runnable;
+using Poco::RWLock;
+using Poco::Thread;
+using Poco::Runnable;
 
 
 class RWLockRunnable: public Runnable

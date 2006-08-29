@@ -1,7 +1,7 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Exception.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Exception.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/Exception.h"
+#include "Poco/Exception.h"
 #include <typeinfo>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Exception::Exception(): _pNested(0)
@@ -66,7 +66,7 @@ Exception::Exception(const std::string& msg, const Exception& nested): _msg(msg)
 }
 
 
-Exception::Exception(const Exception& exc)
+Exception::Exception(const Exception& exc): std::exception(exc)
 {
 	_msg = exc._msg;
 	_pNested = exc._pNested ? exc._pNested->clone() : 0;
@@ -109,18 +109,6 @@ const char* Exception::what() const throw()
 }
 
 	
-const Exception* Exception::nested() const
-{
-	return _pNested;
-}
-
-
-const std::string& Exception::message() const
-{
-	return _msg;
-}
-
-
 std::string Exception::displayText() const
 {
 	std::string txt = name();
@@ -139,6 +127,12 @@ Exception* Exception::clone() const
 }
 
 
+void Exception::rethrow() const
+{
+	throw *this;
+}
+
+
 POCO_IMPLEMENT_EXCEPTION(LogicException, Exception, "Logic exception")
 POCO_IMPLEMENT_EXCEPTION(AssertionViolationException, LogicException, "Assertion violation")
 POCO_IMPLEMENT_EXCEPTION(NullPointerException, LogicException, "Null pointer")
@@ -149,6 +143,7 @@ POCO_IMPLEMENT_EXCEPTION(RangeException, LogicException, "Out of range")
 POCO_IMPLEMENT_EXCEPTION(IllegalStateException, LogicException, "Illegal state")
 POCO_IMPLEMENT_EXCEPTION(InvalidAccessException, LogicException, "Invalid access")
 POCO_IMPLEMENT_EXCEPTION(SignalException, LogicException, "Signal received")
+POCO_IMPLEMENT_EXCEPTION(UnhandledException, LogicException, "Signal received")
 
 POCO_IMPLEMENT_EXCEPTION(RuntimeException, Exception, "Runtime exception")
 POCO_IMPLEMENT_EXCEPTION(NotFoundException, RuntimeException, "Not found")
@@ -186,4 +181,4 @@ POCO_IMPLEMENT_EXCEPTION(UnknownURISchemeException, RuntimeException, "Unknown U
 POCO_IMPLEMENT_EXCEPTION(ApplicationException, Exception, "Application exception")
 POCO_IMPLEMENT_EXCEPTION(BadCastException, RuntimeException, "Bad cast exception")
 
-Foundation_END
+} // namespace Poco

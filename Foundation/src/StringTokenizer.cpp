@@ -1,7 +1,7 @@
 //
 // StringTokenizer.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/StringTokenizer.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/StringTokenizer.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/StringTokenizer.h"
+#include "Poco/StringTokenizer.h"
 #include <locale>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 StringTokenizer::StringTokenizer(const std::string& str, const std::string& separators, int options)
@@ -84,4 +84,4 @@ StringTokenizer::~StringTokenizer()
 }
 
 
-Foundation_END
+} // namespace Poco

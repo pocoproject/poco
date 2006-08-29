@@ -1,7 +1,7 @@
 //
 // AnyTest.h
 //
-// $Id: $
+// $Id: //poco/1.2/Foundation/testsuite/src/AnyTest.h#1 $
 //
 // Tests for Any types
 //
@@ -35,12 +35,9 @@
 #define AnyTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
+
 
 class AnyTest: public CppUnit::TestCase
 {

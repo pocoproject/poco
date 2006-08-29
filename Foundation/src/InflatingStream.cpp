@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/InflatingStream.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/InflatingStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/InflatingStream.h"
-#include "Foundation/Exception.h"
+#include "Poco/InflatingStream.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type): 
@@ -114,7 +114,7 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (_eof || !_pIstr) return 0;
 
-	if (!_zstr.next_in)
+	if (_zstr.avail_in == 0)
 	{
 		int n = 0;
 		if (_pIstr->good())
@@ -125,14 +125,9 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (n == 0) return 0;
 		_zstr.next_in   = (unsigned char*) _buffer;
 		_zstr.avail_in  = n;
-		_zstr.next_out  = (unsigned char*) buffer;
-		_zstr.avail_out = length;
 	}
-	else if (_zstr.avail_out == 0)
-	{
-		_zstr.next_out  = (unsigned char*) buffer;
-		_zstr.avail_out = length;
-	}
+	_zstr.next_out  = (unsigned char*) buffer;
+	_zstr.avail_out = length;
 	for (;;)
 	{
 		int rc = inflate(&_zstr, Z_NO_FLUSH);
@@ -255,4 +250,4 @@ InflatingInputStream::~InflatingInputStream()
 }
 
 
-Foundation_END
+} // namespace Poco

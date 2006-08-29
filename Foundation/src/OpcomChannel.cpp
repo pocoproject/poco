@@ -1,7 +1,7 @@
 //
 // OpcomChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/OpcomChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/OpcomChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/OpcomChannel.h"
-#include "Foundation/Message.h"
+#include "Poco/OpcomChannel.h"
+#include "Poco/Message.h"
 #include <starlet.h>
 #include <opcdef.h>
 #include <descrip.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const std::string OpcomChannel::PROP_TARGET = "target";
@@ -196,4 +196,4 @@ std::string OpcomChannel::getProperty(const std::string& name) const
 }
 
 
-Foundation_END
+} // namespace Poco

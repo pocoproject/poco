@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/1.1.0/Foundation/src/Thread_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Thread_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/Thread_WIN32.h"
-#include "Foundation/Exception.h"
-#include "Foundation/ErrorHandler.h"
+#include "Poco/Thread_WIN32.h"
+#include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 #include <process.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 DWORD ThreadImpl::_currentKey = TLS_OUT_OF_INDEXES;
@@ -157,4 +157,4 @@ unsigned __stdcall ThreadImpl::entry(void* pThread)
 }
 
 
-Foundation_END
+} // namespace Poco

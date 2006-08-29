@@ -1,7 +1,7 @@
 //
 // TextConverter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/TextConverter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/TextConverter.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/TextConverter.h"
-#include "Foundation/TextIterator.h"
-#include "Foundation/TextEncoding.h"
+#include "Poco/TextConverter.h"
+#include "Poco/TextIterator.h"
+#include "Poco/TextEncoding.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 TextConverter::TextConverter(const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
@@ -124,4 +124,4 @@ int TextConverter::convert(const void* source, int length, std::string& destinat
 }
 
 
-Foundation_END
+} // namespace Poco

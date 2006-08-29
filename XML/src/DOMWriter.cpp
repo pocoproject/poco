@@ -1,7 +1,7 @@
 //
 // DOMWriter.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DOMWriter.cpp#2 $
+// $Id: //poco/1.2/XML/src/DOMWriter.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -35,19 +35,20 @@
 
 
 
-#include "DOM/DOMWriter.h"
-#include "XML/XMLWriter.h"
-#include "DOM/Document.h"
-#include "DOM/DocumentFragment.h"
-#include "DOM/DocumentType.h"
-#include "DOM/DOMException.h"
-#include "DOM/DOMSerializer.h"
-#include "SAX/LexicalHandler.h"
-#include "XML/XMLException.h"
+#include "Poco/DOM/DOMWriter.h"
+#include "Poco/XML/XMLWriter.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DocumentFragment.h"
+#include "Poco/DOM/DocumentType.h"
+#include "Poco/DOM/DOMException.h"
+#include "Poco/DOM/DOMSerializer.h"
+#include "Poco/SAX/LexicalHandler.h"
+#include "Poco/XML/XMLException.h"
 #include <fstream>
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 DOMWriter::DOMWriter():
@@ -62,7 +63,7 @@ DOMWriter::~DOMWriter()
 }
 
 
-void DOMWriter::setEncoding(const XMLString& encodingName, Foundation::TextEncoding& textEncoding)
+void DOMWriter::setEncoding(const XMLString& encodingName, Poco::TextEncoding& textEncoding)
 {
 	_encodingName  = encodingName;
 	_pTextEncoding = &textEncoding;
@@ -106,9 +107,9 @@ void DOMWriter::writeNode(const XMLString& systemId, const Node* pNode)
 	if (ostr.good())
 		writeNode(ostr, pNode);
 	else 
-		throw Foundation::CreateFileException(systemId);
+		throw Poco::CreateFileException(systemId);
 }
 
 
-XML_END
+} } // namespace Poco::XML
 

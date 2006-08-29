@@ -1,7 +1,7 @@
 //
 // EntityResolver.cpp
 //
-// $Id: //poco/1.1.0/XML/src/EntityResolver.cpp#2 $
+// $Id: //poco/1.2/XML/src/EntityResolver.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/EntityResolver.h"
+#include "Poco/SAX/EntityResolver.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 EntityResolver::~EntityResolver()
@@ -45,4 +46,4 @@ EntityResolver::~EntityResolver()
 }
 
 
-XML_END
+} } // namespace Poco::XML

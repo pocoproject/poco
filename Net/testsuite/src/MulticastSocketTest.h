@@ -1,7 +1,7 @@
 //
 // MulticastSocketTest.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MulticastSocketTest.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MulticastSocketTest.h#1 $
 //
 // Definition of the MulticastSocketTest class.
 //
@@ -36,12 +36,8 @@
 #define MulticastSocketTest_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class MulticastSocketTest: public CppUnit::TestCase

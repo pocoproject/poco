@@ -1,7 +1,7 @@
 //
 // OptionProcessor.cpp
 //
-// $Id: //poco/1.1.0/Util/src/OptionProcessor.cpp#2 $
+// $Id: //poco/1.2/Util/src/OptionProcessor.cpp#1 $
 //
 // Library: Util
 // Package: Options
@@ -34,13 +34,14 @@
 //
 
 
-#include "Util/OptionProcessor.h"
-#include "Util/OptionSet.h"
-#include "Util/Option.h"
-#include "Util/OptionException.h"
+#include "Poco/Util/OptionProcessor.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionException.h"
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 OptionProcessor::OptionProcessor(const OptionSet& options): 
@@ -72,6 +73,16 @@ bool OptionProcessor::process(const std::string& argument, std::string& optionNa
 			return processDefault(argument, optionName, optionArg);
 	}
 	return false;
+}
+
+
+void OptionProcessor::checkRequired() const
+{
+	for (OptionSet::Iterator it = _options.begin(); it != _options.end(); ++it)
+	{
+		if (it->required() && _specifiedOptions.find(it->fullName()) == _specifiedOptions.end())
+			throw MissingOptionException(it->fullName());
+	}
 }
 
 
@@ -141,4 +152,4 @@ bool OptionProcessor::processCommon(const std::string& optionStr, bool isShort, 
 }
 
 
-Util_END
+} } // namespace Poco::Util

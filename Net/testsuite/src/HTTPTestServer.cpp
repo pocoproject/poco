@@ -1,7 +1,7 @@
 //
 // HTTPTestServer.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPTestServer.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPTestServer.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,17 +31,17 @@
 
 
 #include "HTTPTestServer.h"
-#include "Net/StreamSocket.h"
-#include "Net/SocketAddress.h"
-#include "Foundation/Timespan.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Timespan.h"
+#include "Poco/NumberFormatter.h"
 #include <iostream>
 
 
-using Net::Socket;
-using Net::StreamSocket;
-using Net::SocketAddress;
-using Foundation::NumberFormatter;
+using Poco::Net::Socket;
+using Poco::Net::StreamSocket;
+using Poco::Net::SocketAddress;
+using Poco::NumberFormatter;
 
 
 const std::string HTTPTestServer::SMALL_BODY("This is some random text data returned by the server");
@@ -66,7 +66,7 @@ HTTPTestServer::~HTTPTestServer()
 }
 
 
-Foundation::UInt16 HTTPTestServer::port() const
+Poco::UInt16 HTTPTestServer::port() const
 {
 	return _socket.address().port();
 }
@@ -81,7 +81,7 @@ const std::string& HTTPTestServer::lastRequest() const
 void HTTPTestServer::run()
 {
 	_ready.set();
-	Foundation::Timespan span(250000);
+	Poco::Timespan span(250000);
 	while (!_stop)
 	{
 		if (_socket.poll(span, Socket::SELECT_READ))
@@ -102,9 +102,9 @@ void HTTPTestServer::run()
 				}
 				std::string response = handleRequest();
 				ss.sendBytes(response.data(), (int) response.size());
-				Foundation::Thread::sleep(1000);
+				Poco::Thread::sleep(1000);
 			}
-			catch (Foundation::Exception& exc)
+			catch (Poco::Exception& exc)
 			{
 				std::cerr << "HTTPTestServer: " << exc.displayText() << std::endl;
 			}

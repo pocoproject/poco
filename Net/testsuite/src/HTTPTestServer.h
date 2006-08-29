@@ -1,7 +1,7 @@
 //
 // HTTPTestServer.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPTestServer.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPTestServer.h#1 $
 //
 // Definition of the HTTPTestServer class.
 //
@@ -36,21 +36,13 @@
 #define HTTPTestServer_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef Net_ServerSocket_INCLUDED
-#include "Net/ServerSocket.h"
-#endif
-#ifndef Net_Foundation_Thread_INCLUDED
-#include "Foundation/Thread.h"
-#endif
-#ifndef Net_Foundation_Event_INCLUDED
-#include "Foundation/Event.h"
-#endif
+#include "Poco/Net/Net.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
 
 
-class HTTPTestServer: public Foundation::Runnable
+class HTTPTestServer: public Poco::Runnable
 	/// A simple sequential echo server.
 {
 public:
@@ -60,7 +52,7 @@ public:
 	~HTTPTestServer();
 		/// Destroys the HTTPTestServer.
 
-	Foundation::UInt16 port() const;
+	Poco::UInt16 port() const;
 		/// Returns the port the echo server is
 		/// listening on.
 		
@@ -78,11 +70,11 @@ protected:
 	std::string handleRequest() const;
 
 private:
-	Net::ServerSocket  _socket;
-	Foundation::Thread _thread;
-	Foundation::Event  _ready;
-	bool               _stop;
-	std::string        _lastRequest;
+	Poco::Net::ServerSocket  _socket;
+	Poco::Thread _thread;
+	Poco::Event  _ready;
+	bool         _stop;
+	std::string  _lastRequest;
 };
 
 

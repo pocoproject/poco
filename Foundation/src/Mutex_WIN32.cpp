@@ -1,7 +1,7 @@
 //
 // Mutex_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Mutex_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Mutex_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Mutex_WIN32.h"
+#include "Poco/Mutex_WIN32.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 MutexImpl::MutexImpl()
@@ -53,4 +53,4 @@ MutexImpl::~MutexImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

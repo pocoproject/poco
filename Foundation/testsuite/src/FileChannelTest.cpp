@@ -1,7 +1,7 @@
 //
 // FileChannelTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/FileChannelTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/FileChannelTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,37 +33,37 @@
 #include "FileChannelTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/FileChannel.h"
-#include "Foundation/Message.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/TemporaryFile.h"
-#include "Foundation/Thread.h"
-#include "Foundation/File.h"
-#include "Foundation/Path.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/LocalDateTime.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/DirectoryIterator.h"
+#include "Poco/FileChannel.h"
+#include "Poco/Message.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/Thread.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include "Poco/Timestamp.h"
+#include "Poco/DateTime.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/DirectoryIterator.h"
 #include <vector>
 
 
-using Foundation::FileChannel;
-using Foundation::Message;
-using Foundation::AutoPtr;
-using Foundation::TemporaryFile;
-using Foundation::Thread;
-using Foundation::File;
-using Foundation::Path;
-using Foundation::Timestamp;
-using Foundation::NumberFormatter;
-using Foundation::DateTime;
-using Foundation::LocalDateTime;
-using Foundation::DateTimeFormatter;
-using Foundation::DateTimeFormat;
-using Foundation::DirectoryIterator;
+using Poco::FileChannel;
+using Poco::Message;
+using Poco::AutoPtr;
+using Poco::TemporaryFile;
+using Poco::Thread;
+using Poco::File;
+using Poco::Path;
+using Poco::Timestamp;
+using Poco::NumberFormatter;
+using Poco::DateTime;
+using Poco::LocalDateTime;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
+using Poco::DirectoryIterator;
 
 
 FileChannelTest::FileChannelTest(const std::string& name): CppUnit::TestCase(name)
@@ -348,6 +348,7 @@ void FileChannelTest::testCompress()
 		{
 			pChannel->log(msg);
 		}
+		Thread::sleep(3000); // allow time for background compression
 		File f0(name + ".0.gz");
 		assert (f0.exists());
 		File f1(name + ".1.gz");

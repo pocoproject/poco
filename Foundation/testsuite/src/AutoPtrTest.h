@@ -1,7 +1,7 @@
 //
 // AutoPtrTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/AutoPtrTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/AutoPtrTest.h#1 $
 //
 // Definition of the AutoPtrTest class.
 //
@@ -36,12 +36,8 @@
 #define AutoPtrTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class AutoPtrTest: public CppUnit::TestCase

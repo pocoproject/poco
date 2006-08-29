@@ -1,7 +1,7 @@
 //
 // StopwatchTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/StopwatchTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/StopwatchTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "StopwatchTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Stopwatch.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/Thread.h"
+#include "Poco/Stopwatch.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Thread.h"
 
 
-using Foundation::Stopwatch;
-using Foundation::Timestamp;
-using Foundation::Thread;
+using Poco::Stopwatch;
+using Poco::Timestamp;
+using Poco::Thread;
 
 
 StopwatchTest::StopwatchTest(const std::string& name): CppUnit::TestCase(name)

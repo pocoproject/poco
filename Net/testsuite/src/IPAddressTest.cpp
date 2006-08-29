@@ -1,7 +1,7 @@
 //
 // IPAddressTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/IPAddressTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/IPAddressTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "IPAddressTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/IPAddress.h"
-#include "Net/NetException.h"
+#include "Poco/Net/IPAddress.h"
+#include "Poco/Net/NetException.h"
 
 
-using Net::IPAddress;
-using Net::InvalidAddressException;
+using Poco::Net::IPAddress;
+using Poco::Net::InvalidAddressException;
 
 
 IPAddressTest::IPAddressTest(const std::string& name): CppUnit::TestCase(name)

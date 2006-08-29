@@ -1,7 +1,7 @@
 //
 // HTTPFixedLengthStream.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPFixedLengthStream.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPFixedLengthStream.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,14 +34,15 @@
 //
 
 
-#include "Net/HTTPFixedLengthStream.h"
-#include "Net/HTTPSession.h"
+#include "Poco/Net/HTTPFixedLengthStream.h"
+#include "Poco/Net/HTTPSession.h"
 
 
-using Foundation::BufferedStreamBuf;
+using Poco::BufferedStreamBuf;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 //
@@ -126,7 +127,7 @@ HTTPFixedLengthStreamBuf* HTTPFixedLengthIOS::rdbuf()
 //
 
 
-Foundation::MemoryPool HTTPFixedLengthInputStream::_pool(sizeof(HTTPFixedLengthInputStream));
+Poco::MemoryPool HTTPFixedLengthInputStream::_pool(sizeof(HTTPFixedLengthInputStream));
 
 
 HTTPFixedLengthInputStream::HTTPFixedLengthInputStream(HTTPSession& session, std::streamsize length):
@@ -158,7 +159,7 @@ void HTTPFixedLengthInputStream::operator delete(void* ptr)
 //
 
 
-Foundation::MemoryPool HTTPFixedLengthOutputStream::_pool(sizeof(HTTPFixedLengthOutputStream));
+Poco::MemoryPool HTTPFixedLengthOutputStream::_pool(sizeof(HTTPFixedLengthOutputStream));
 
 
 HTTPFixedLengthOutputStream::HTTPFixedLengthOutputStream(HTTPSession& session, std::streamsize length):
@@ -185,4 +186,4 @@ void HTTPFixedLengthOutputStream::operator delete(void* ptr)
 }
 
 
-Net_END
+} } // namespace Poco::Net

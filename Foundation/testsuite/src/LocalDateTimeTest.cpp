@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/LocalDateTimeTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/LocalDateTimeTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,18 +33,18 @@
 #include "LocalDateTimeTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/LocalDateTime.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/Timespan.h"
-#include "Foundation/Timezone.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/DateTime.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
+#include "Poco/Timezone.h"
 
 
-using Foundation::LocalDateTime;
-using Foundation::DateTime;
-using Foundation::Timestamp;
-using Foundation::Timespan;
-using Foundation::Timezone;
+using Poco::LocalDateTime;
+using Poco::DateTime;
+using Poco::Timestamp;
+using Poco::Timespan;
+using Poco::Timezone;
 
 
 LocalDateTimeTest::LocalDateTimeTest(const std::string& name): CppUnit::TestCase(name)

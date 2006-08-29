@@ -1,7 +1,7 @@
 //
 // ActiveTest.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/src/ActiveTest.cpp#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/src/ActiveTest.cpp#1 $
 //
 
 
@@ -9,7 +9,7 @@
 #include "ActiveTest.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 // Spawn a thread to a test
@@ -40,5 +40,5 @@ UINT ActiveTest::threadFunction(LPVOID thisInstance)
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 

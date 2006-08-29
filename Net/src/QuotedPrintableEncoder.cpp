@@ -1,7 +1,7 @@
 //
 // QuotedPrintableEncoder.cpp
 //
-// $Id: //poco/1.1.0/Net/src/QuotedPrintableEncoder.cpp#2 $
+// $Id: //poco/1.2/Net/src/QuotedPrintableEncoder.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,15 +34,16 @@
 //
 
 
-#include "Net/QuotedPrintableEncoder.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/QuotedPrintableEncoder.h"
+#include "Poco/NumberFormatter.h"
 
 
-using Foundation::UnbufferedStreamBuf;
-using Foundation::NumberFormatter;
+using Poco::UnbufferedStreamBuf;
+using Poco::NumberFormatter;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 QuotedPrintableEncoderBuf::QuotedPrintableEncoderBuf(std::ostream& ostr): 
@@ -168,4 +169,4 @@ QuotedPrintableEncoder::~QuotedPrintableEncoder()
 }
 
 
-Net_END
+} } // namespace Poco::Net

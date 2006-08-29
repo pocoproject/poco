@@ -1,7 +1,7 @@
 //
 // ASCIIEncoding.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/ASCIIEncoding.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/ASCIIEncoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/ASCIIEncoding.h"
+#include "Poco/ASCIIEncoding.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const TextEncoding::CharacterMap ASCIIEncoding::_charMap = 
@@ -94,4 +94,4 @@ int ASCIIEncoding::convert(int ch, unsigned char* bytes, int length) const
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // StreamCopier.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/StreamCopier.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/StreamCopier.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/StreamCopier.h"
-#include "Foundation/Buffer.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Buffer.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::streamsize StreamCopier::copyStream(std::istream& istr, std::ostream& ostr, unsigned bufferSize)
@@ -102,4 +102,4 @@ std::streamsize StreamCopier::copyStreamUnbuffered(std::istream& istr, std::ostr
 }
 
 
-Foundation_END
+} // namespace Poco

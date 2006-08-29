@@ -1,7 +1,7 @@
 //
 // Timezone_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Timezone_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Timezone_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/Timezone.h"
+#include "Poco/Timezone.h"
 #include <time.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 class TZInfo
@@ -58,9 +58,9 @@ public:
 		time_t utc = mktime(&t);
 		return now - utc;
 	#elif defined(__CYGWIN__)
-		return _timezone;
+		return -_timezone;
 	#else
-		return timezone;
+		return -timezone;
 	#endif
 	}
 	
@@ -85,7 +85,7 @@ int Timezone::dst()
 	time_t now = time(NULL);
 	struct tm t;
 	localtime_r(&now, &t);
-	return t.tm_isdst == 1 ? -3600 : 0;
+	return t.tm_isdst == 1 ? 3600 : 0;
 }
 
 
@@ -115,4 +115,4 @@ std::string Timezone::dstName()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // ThreadTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ThreadTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ThreadTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "ThreadTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Runnable.h"
-#include "Foundation/Event.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Event.h"
 
 
-using Foundation::Thread;
-using Foundation::Runnable;
-using Foundation::Event;
+using Poco::Thread;
+using Poco::Runnable;
+using Poco::Event;
 
 
 class MyRunnable: public Runnable

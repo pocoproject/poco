@@ -1,7 +1,7 @@
 //
 // NameTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/NameTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/NameTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "NameTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "XML/Name.h"
+#include "Poco/XML/Name.h"
 
 
-using XML::Name;
+using Poco::XML::Name;
 
 
 NameTest::NameTest(const std::string& name): CppUnit::TestCase(name)

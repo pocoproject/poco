@@ -1,7 +1,7 @@
 //
 // ThreadingTestSuite.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ThreadingTestSuite.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ThreadingTestSuite.h#1 $
 //
 // Definition of the ThreadingTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define ThreadingTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class ThreadingTestSuite

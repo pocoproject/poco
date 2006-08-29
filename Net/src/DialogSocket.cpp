@@ -1,7 +1,7 @@
 //
 // DialogSocket.cpp
 //
-// $Id: //poco/1.1.0/Net/src/DialogSocket.cpp#2 $
+// $Id: //poco/1.2/Net/src/DialogSocket.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,12 +34,13 @@
 //
 
 
-#include "Net/DialogSocket.h"
+#include "Poco/Net/DialogSocket.h"
 #include <string.h>
 #include <ctype.h>
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 DialogSocket::DialogSocket():
@@ -274,4 +275,4 @@ int DialogSocket::receiveStatusLine(std::string& line)
 }
 
 
-Net_END
+} } // namespace Poco::Net

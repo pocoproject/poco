@@ -1,7 +1,7 @@
 //
 // TestCaller.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TestCaller.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TestCaller.h#1 $
 //
 
 
@@ -9,22 +9,13 @@
 #define CppUnit_TestCaller_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_Guards_INCLUDED
 #include "Guards.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
 #include "TestCase.h"
-#endif
-#ifndef STD_MEMORY_INCLUDED
 #include <memory>
-#define STD_MEMORY_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 /*
@@ -65,7 +56,10 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& name, TestMethod test): TestCase(name), _fixture(new Fixture(name)), _test(test)
+	TestCaller(const std::string& name, TestMethod test): 
+		TestCase(name), 
+		_test(test),
+		_fixture(new Fixture(name))
 	{
 	}
 
@@ -91,7 +85,7 @@ private:
 };
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #define CppUnit_addTest(suite, cls, mth) \

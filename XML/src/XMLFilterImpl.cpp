@@ -1,7 +1,7 @@
 //
 // XMLFilterImpl.cpp
 //
-// $Id: //poco/1.1.0/XML/src/XMLFilterImpl.cpp#2 $
+// $Id: //poco/1.2/XML/src/XMLFilterImpl.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,11 +34,12 @@
 //
 
 
-#include "SAX/XMLFilterImpl.h"
-#include "SAX/SAXException.h"
+#include "Poco/SAX/XMLFilterImpl.h"
+#include "Poco/SAX/SAXException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 XMLFilterImpl::XMLFilterImpl():
@@ -324,4 +325,4 @@ void XMLFilterImpl::setupParse()
 }
 
 
-XML_END
+} } // namespace Poco::XML

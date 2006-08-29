@@ -1,7 +1,7 @@
 //
 // Mutex.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Mutex.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Mutex.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/Mutex.h"
+#include "Poco/Mutex.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -44,7 +44,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Mutex::Mutex()
@@ -67,4 +67,4 @@ FastMutex::~FastMutex()
 }
 
 
-Foundation_END
+} // namespace Poco

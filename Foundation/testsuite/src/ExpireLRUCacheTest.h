@@ -1,7 +1,7 @@
 //
 // ExpireLRUCacheTest.h
 //
-// $Id: $
+// $Id: //poco/1.2/Foundation/testsuite/src/ExpireLRUCacheTest.h#1 $
 //
 // Tests for ExpireLRUCache
 //
@@ -35,12 +35,9 @@
 #define ExpireLRUCacheTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
+
 
 class ExpireLRUCacheTest: public CppUnit::TestCase
 {
@@ -55,6 +52,7 @@ public:
 	void testCacheSize1();
 	void testCacheSize2();
 	void testCacheSizeN();
+	void testDuplicateAdd();
 	
 	void setUp();
 	void tearDown();

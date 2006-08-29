@@ -1,7 +1,7 @@
 //
 // FPEnvironment_DEC.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/FPEnvironment_DEC.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/FPEnvironment_DEC.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -47,10 +47,10 @@
 #if defined(__VMS)
 #include <starlet.h>
 #endif
-#include "Foundation/FPEnvironment_DEC.h"
+#include "Poco/FPEnvironment_DEC.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FPEnvironmentImpl::FPEnvironmentImpl()
@@ -214,4 +214,4 @@ FPEnvironmentImpl::RoundingModeImpl FPEnvironmentImpl::getRoundingModeImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

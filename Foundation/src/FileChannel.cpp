@@ -1,7 +1,7 @@
 //
 // FileChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/FileChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/FileChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,22 +34,22 @@
 //
 
 
-#include "Foundation/FileChannel.h"
-#include "Foundation/ArchiveStrategy.h"
-#include "Foundation/RotateStrategy.h"
-#include "Foundation/PurgeStrategy.h"
-#include "Foundation/Message.h"
-#include "Foundation/NumberParser.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/LocalDateTime.h"
-#include "Foundation/String.h"
-#include "Foundation/Timespan.h"
-#include "Foundation/Exception.h"
+#include "Poco/FileChannel.h"
+#include "Poco/ArchiveStrategy.h"
+#include "Poco/RotateStrategy.h"
+#include "Poco/PurgeStrategy.h"
+#include "Poco/Message.h"
+#include "Poco/NumberParser.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTime.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/String.h"
+#include "Poco/Timespan.h"
+#include "Poco/Exception.h"
 #include <ctype.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const std::string FileChannel::PROP_PATH       = "path";
@@ -73,9 +73,9 @@ FileChannel::FileChannel():
 
 
 FileChannel::FileChannel(const std::string& path):
+	_path(path),
 	_times("utc"),
 	_compress(false),
-	_path(path),
 	_pFile(0),
 	_pRotateStrategy(0),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
@@ -315,7 +315,7 @@ void FileChannel::setPurgeAge(const std::string& age)
 	else if (unit == "weeks")
 		factor = 7*Timespan::DAYS;
 	else if (unit == "months")
-		factor *= 30*Timespan::DAYS;
+		factor = 30*Timespan::DAYS;
 	else if (unit != "seconds")
 		throw InvalidArgumentException("purgeAge", age);
 		
@@ -355,4 +355,4 @@ void FileChannel::purge()
 }
 
 
-Foundation_END
+} // namespace Poco

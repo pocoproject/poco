@@ -1,7 +1,7 @@
 //
 // NDCTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NDCTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NDCTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "NDCTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/NestedDiagnosticContext.h"
+#include "Poco/NestedDiagnosticContext.h"
 #include <iostream>
 
 
-using Foundation::NDC;
+using Poco::NDC;
 
 
 NDCTest::NDCTest(const std::string& name): CppUnit::TestCase(name)

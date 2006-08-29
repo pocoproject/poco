@@ -1,7 +1,7 @@
 //
 // OptionsTestSuite.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/OptionsTestSuite.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/OptionsTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,6 +35,7 @@
 #include "OptionSetTest.h"
 #include "HelpFormatterTest.h"
 #include "OptionProcessorTest.h"
+#include "ValidatorTest.h"
 
 
 CppUnit::Test* OptionsTestSuite::suite()
@@ -45,6 +46,7 @@ CppUnit::Test* OptionsTestSuite::suite()
 	pSuite->addTest(OptionSetTest::suite());
 	pSuite->addTest(HelpFormatterTest::suite());
 	pSuite->addTest(OptionProcessorTest::suite());
+	pSuite->addTest(ValidatorTest::suite());
 
 	return pSuite;
 }

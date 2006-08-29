@@ -1,7 +1,7 @@
 //
 // SocketsTestSuite.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/SocketsTestSuite.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/SocketsTestSuite.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,6 +37,7 @@
 #include "NetworkInterfaceTest.h"
 #include "MulticastSocketTest.h"
 #include "DialogSocketTest.h"
+#include "RawSocketTest.h"
 
 
 CppUnit::Test* SocketsTestSuite::suite()
@@ -49,6 +50,7 @@ CppUnit::Test* SocketsTestSuite::suite()
 	pSuite->addTest(NetworkInterfaceTest::suite());
 	pSuite->addTest(MulticastSocketTest::suite());
 	pSuite->addTest(DialogSocketTest::suite());
+	pSuite->addTest(RawSocketTest::suite());
 
 	return pSuite;
 }

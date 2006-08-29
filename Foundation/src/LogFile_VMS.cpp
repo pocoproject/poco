@@ -1,7 +1,7 @@
 //
 // LogFile_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/LogFile_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/LogFile_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/LogFile_VMS.h"
-#include "Foundation/File.h"
-#include "Foundation/Exception.h"
+#include "Poco/LogFile_VMS.h"
+#include "Poco/File.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 LogFileImpl::LogFileImpl(const std::string& path): _path(path)
@@ -88,4 +88,4 @@ const std::string& LogFileImpl::pathImpl() const
 }
 
 
-Foundation_END
+} // namespace Poco

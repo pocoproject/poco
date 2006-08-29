@@ -1,7 +1,7 @@
 //
 // StringTokenizerTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/StringTokenizerTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/StringTokenizerTest.h#1 $
 //
 // Definition of the StringTokenizerTest class.
 //
@@ -36,12 +36,8 @@
 #define StringTokenizerTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class StringTokenizerTest: public CppUnit::TestCase

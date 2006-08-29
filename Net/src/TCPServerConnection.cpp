@@ -1,7 +1,7 @@
 //
 // TCPServerConnection.cpp
 //
-// $Id: //poco/1.1.0/Net/src/TCPServerConnection.cpp#2 $
+// $Id: //poco/1.2/Net/src/TCPServerConnection.cpp#1 $
 //
 // Library: Net
 // Package: TCPServer
@@ -34,16 +34,17 @@
 //
 
 
-#include "Net/TCPServerConnection.h"
-#include "Foundation/Exception.h"
-#include "Foundation/ErrorHandler.h"
+#include "Poco/Net/TCPServerConnection.h"
+#include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 
 
-using Foundation::Exception;
-using Foundation::ErrorHandler;
+using Poco::Exception;
+using Poco::ErrorHandler;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 TCPServerConnection::TCPServerConnection(const StreamSocket& socket):
@@ -78,4 +79,4 @@ void TCPServerConnection::start()
 }
 
 
-Net_END
+} } // namespace Poco::Net

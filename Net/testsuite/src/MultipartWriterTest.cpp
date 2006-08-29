@@ -1,7 +1,7 @@
 //
 // MultipartWriterTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MultipartWriterTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MultipartWriterTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,13 +33,13 @@
 #include "MultipartWriterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/MultipartWriter.h"
-#include "Net/MessageHeader.h"
+#include "Poco/Net/MultipartWriter.h"
+#include "Poco/Net/MessageHeader.h"
 #include <sstream>
 
 
-using Net::MultipartWriter;
-using Net::MessageHeader;
+using Poco::Net::MultipartWriter;
+using Poco::Net::MessageHeader;
 
 
 MultipartWriterTest::MultipartWriterTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // MediaTypeTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MediaTypeTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MediaTypeTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "MediaTypeTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/MediaType.h"
+#include "Poco/Net/MediaType.h"
 
 
-using Net::MediaType;
+using Poco::Net::MediaType;
 
 
 MediaTypeTest::MediaTypeTest(const std::string& name): CppUnit::TestCase(name)

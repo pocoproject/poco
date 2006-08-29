@@ -1,7 +1,7 @@
 //
 // NumberParserTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NumberParserTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NumberParserTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "NumberParserTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/NumberParser.h"
-#include "Foundation/Exception.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::NumberParser;
-using Foundation::SyntaxException;
+using Poco::NumberParser;
+using Poco::SyntaxException;
 
 
 NumberParserTest::NumberParserTest(const std::string& name): CppUnit::TestCase(name)

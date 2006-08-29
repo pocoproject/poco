@@ -1,7 +1,7 @@
 //
 // DialogServer.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/DialogServer.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/DialogServer.h#1 $
 //
 // Definition of the DialogServer class.
 //
@@ -36,31 +36,16 @@
 #define DialogServer_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef Net_ServerSocket_INCLUDED
-#include "Net/ServerSocket.h"
-#endif
-#ifndef Net_StreamSocket_INCLUDED
-#include "Net/StreamSocket.h"
-#endif
-#ifndef Net_Foundation_Thread_INCLUDED
-#include "Foundation/Thread.h"
-#endif
-#ifndef Net_Foundation_Event_INCLUDED
-#include "Foundation/Event.h"
-#endif
-#ifndef Net_Foundation_Mutex_INCLUDED
-#include "Foundation/Mutex.h"
-#endif
-#ifndef STD_VECTOR_INCLUDED
+#include "Poco/Net/Net.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/Mutex.h"
 #include <vector>
-#define STD_VECTOR_INCLUDED
-#endif
 
 
-class DialogServer: public Foundation::Runnable
+class DialogServer: public Poco::Runnable
 	/// A server for testing FTPClientSession and friends.
 {
 public:
@@ -70,7 +55,7 @@ public:
 	~DialogServer();
 		/// Destroys the DialogServer.
 
-	Foundation::UInt16 port() const;
+	Poco::UInt16 port() const;
 		/// Returns the port the echo server is
 		/// listening on.
 		
@@ -103,15 +88,15 @@ public:
 		/// Enables or disables logging to stdout.
 	
 private:
-	Net::ServerSocket             _socket;
-	Foundation::Thread            _thread;
-	Foundation::Event             _ready;
-	mutable Foundation::FastMutex _mutex;
-	bool                          _stop;
-	std::vector<std::string>      _nextResponses;
-	std::vector<std::string>      _lastCommands;
-	bool                          _acceptCommands;
-	bool                          _log;
+	Poco::Net::ServerSocket  _socket;
+	Poco::Thread             _thread;
+	Poco::Event              _ready;
+	mutable Poco::FastMutex  _mutex;
+	bool                     _stop;
+	std::vector<std::string> _nextResponses;
+	std::vector<std::string> _lastCommands;
+	bool                     _acceptCommands;
+	bool                     _log;
 };
 
 

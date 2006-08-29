@@ -1,7 +1,7 @@
 //
 // PatternFormatter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/PatternFormatter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/PatternFormatter.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,18 +34,18 @@
 //
 
 
-#include "Foundation/PatternFormatter.h"
-#include "Foundation/Message.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/Timezone.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/Environment.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/Message.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTime.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Timezone.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Environment.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const std::string PatternFormatter::PROP_PATTERN = "pattern";
@@ -187,4 +187,4 @@ const std::string& PatternFormatter::getPriorityName(int prio)
 }
 
 
-Foundation_END
+} // namespace Poco

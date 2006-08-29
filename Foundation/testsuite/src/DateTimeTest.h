@@ -1,7 +1,7 @@
 //
 // DateTimeTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/DateTimeTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/DateTimeTest.h#1 $
 //
 // Definition of the DateTimeTest class.
 //
@@ -36,12 +36,8 @@
 #define DateTimeTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class DateTimeTest: public CppUnit::TestCase
@@ -60,6 +56,11 @@ public:
 	void testRelational();
 	void testArithmetics();
 	void testSwap();
+	void testUsage();
+	void testSetYearDay();
+	void testIsValid();
+	void testDayOfWeek();
+	void testIncrementDecrement();
 
 	void setUp();
 	void tearDown();

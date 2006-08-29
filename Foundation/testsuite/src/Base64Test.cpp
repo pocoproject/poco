@@ -1,7 +1,7 @@
 //
 // Base64Test.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/Base64Test.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/Base64Test.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "Base64Test.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Base64Encoder.h"
-#include "Foundation/Base64Decoder.h"
-#include "Foundation/Exception.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/Base64Decoder.h"
+#include "Poco/Exception.h"
 #include <sstream>
 
 
-using Foundation::Base64Encoder;
-using Foundation::Base64Decoder;
-using Foundation::DataFormatException;
+using Poco::Base64Encoder;
+using Poco::Base64Decoder;
+using Poco::DataFormatException;
 
 
 Base64Test::Base64Test(const std::string& name): CppUnit::TestCase(name)

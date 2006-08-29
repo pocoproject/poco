@@ -1,7 +1,7 @@
 //
 // MultipartReaderTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MultipartReaderTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MultipartReaderTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "MultipartReaderTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/MultipartReader.h"
-#include "Net/MessageHeader.h"
-#include "Net/NetException.h"
+#include "Poco/Net/MultipartReader.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/NetException.h"
 #include <sstream>
 
 
-using Net::MultipartReader;
-using Net::MessageHeader;
-using Net::MultipartException;
+using Poco::Net::MultipartReader;
+using Poco::Net::MessageHeader;
+using Poco::Net::MultipartException;
 
 
 MultipartReaderTest::MultipartReaderTest(const std::string& name): CppUnit::TestCase(name)

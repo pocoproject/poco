@@ -1,7 +1,7 @@
 //
 // NamePoolTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/NamePoolTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/NamePoolTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "NamePoolTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "XML/NamePool.h"
-#include "XML/Name.h"
-#include "DOM/AutoPtr.h"
+#include "Poco/XML/NamePool.h"
+#include "Poco/XML/Name.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
-using XML::NamePool;
-using XML::Name;
-using XML::AutoPtr;
+using Poco::XML::NamePool;
+using Poco::XML::Name;
+using Poco::XML::AutoPtr;
 
 
 NamePoolTest::NamePoolTest(const std::string& name): CppUnit::TestCase(name)

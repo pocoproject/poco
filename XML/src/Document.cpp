@@ -1,7 +1,7 @@
 //
 // Document.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Document.cpp#2 $
+// $Id: //poco/1.2/XML/src/Document.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,26 +34,27 @@
 //
 
 
-#include "DOM/Document.h"
-#include "DOM/DocumentType.h"
-#include "DOM/DOMImplementation.h"
-#include "DOM/Element.h"
-#include "DOM/Attr.h"
-#include "DOM/DocumentFragment.h"
-#include "DOM/Text.h"
-#include "DOM/Comment.h"
-#include "DOM/CDATASection.h"
-#include "DOM/ProcessingInstruction.h"
-#include "DOM/EntityReference.h"
-#include "DOM/DOMException.h"
-#include "DOM/ElementsByTagNameList.h"
-#include "DOM/Entity.h"
-#include "DOM/Notation.h"
-#include "XML/Name.h"
-#include "XML/NamePool.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DocumentType.h"
+#include "Poco/DOM/DOMImplementation.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/DOM/DocumentFragment.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/Comment.h"
+#include "Poco/DOM/CDATASection.h"
+#include "Poco/DOM/ProcessingInstruction.h"
+#include "Poco/DOM/EntityReference.h"
+#include "Poco/DOM/DOMException.h"
+#include "Poco/DOM/ElementsByTagNameList.h"
+#include "Poco/DOM/Entity.h"
+#include "Poco/DOM/Notation.h"
+#include "Poco/XML/Name.h"
+#include "Poco/XML/NamePool.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString Document::NODE_NAME = toXMLString("#document");
@@ -305,4 +306,4 @@ Notation* Document::createNotation(const XMLString& name, const XMLString& publi
 }
 
 
-XML_END
+} } // namespace Poco::XML

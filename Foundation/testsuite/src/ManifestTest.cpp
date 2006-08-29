@@ -1,7 +1,7 @@
 //
 // ManifestTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ManifestTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ManifestTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,13 +33,13 @@
 #include "ManifestTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Manifest.h"
-#include "Foundation/MetaObject.h"
+#include "Poco/Manifest.h"
+#include "Poco/MetaObject.h"
 #include <set>
 
 
-using Foundation::Manifest;
-using Foundation::MetaObject;
+using Poco::Manifest;
+using Poco::MetaObject;
 
 
 class MfTestBase

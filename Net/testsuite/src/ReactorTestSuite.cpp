@@ -1,7 +1,7 @@
 //
 // ReactorTestSuite.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/ReactorTestSuite.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/ReactorTestSuite.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

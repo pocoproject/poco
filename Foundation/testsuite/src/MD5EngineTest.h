@@ -1,7 +1,7 @@
 //
 // MD5EngineTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/MD5EngineTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/MD5EngineTest.h#1 $
 //
 // Definition of the MD5EngineTest class.
 //
@@ -36,12 +36,8 @@
 #define MD5EngineTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class MD5EngineTest: public CppUnit::TestCase

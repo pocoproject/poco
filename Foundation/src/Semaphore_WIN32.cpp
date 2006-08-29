@@ -1,7 +1,7 @@
 //
 // Semaphore_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Semaphore_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Semaphore_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Semaphore_WIN32.h"
+#include "Poco/Semaphore_WIN32.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 SemaphoreImpl::SemaphoreImpl(int n, int max)
@@ -84,4 +84,4 @@ bool SemaphoreImpl::waitImpl(long milliseconds)
 }
 
 
-Foundation_END
+} // namespace Poco

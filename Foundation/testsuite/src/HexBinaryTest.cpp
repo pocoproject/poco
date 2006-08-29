@@ -1,7 +1,7 @@
 //
 // HexBinaryTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/HexBinaryTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/HexBinaryTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "HexBinaryTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/HexBinaryEncoder.h"
-#include "Foundation/HexBinaryDecoder.h"
-#include "Foundation/Exception.h"
+#include "Poco/HexBinaryEncoder.h"
+#include "Poco/HexBinaryDecoder.h"
+#include "Poco/Exception.h"
 #include <sstream>
 
 
-using Foundation::HexBinaryEncoder;
-using Foundation::HexBinaryDecoder;
-using Foundation::DataFormatException;
+using Poco::HexBinaryEncoder;
+using Poco::HexBinaryDecoder;
+using Poco::DataFormatException;
 
 
 HexBinaryTest::HexBinaryTest(const std::string& name): CppUnit::TestCase(name)

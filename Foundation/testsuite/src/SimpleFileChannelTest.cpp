@@ -1,7 +1,7 @@
 //
 // SimpleFileChannelTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/SimpleFileChannelTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/SimpleFileChannelTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,27 +30,27 @@
 //
 
 
-#include "Foundation/SimpleFileChannel.h"
-#include "Foundation/Message.h"
-#include "Foundation/Path.h"
-#include "Foundation/File.h"
-#include "Foundation/DirectoryIterator.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/SimpleFileChannel.h"
+#include "Poco/Message.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
+#include "Poco/DirectoryIterator.h"
+#include "Poco/Timestamp.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/AutoPtr.h"
 #include "SimpleFileChannelTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 
 
-using Foundation::SimpleFileChannel;
-using Foundation::Message;
-using Foundation::Path;
-using Foundation::File;
-using Foundation::DirectoryIterator;
-using Foundation::Timestamp;
-using Foundation::DateTimeFormatter;
-using Foundation::AutoPtr;
+using Poco::SimpleFileChannel;
+using Poco::Message;
+using Poco::Path;
+using Poco::File;
+using Poco::DirectoryIterator;
+using Poco::Timestamp;
+using Poco::DateTimeFormatter;
+using Poco::AutoPtr;
 
 
 SimpleFileChannelTest::SimpleFileChannelTest(const std::string& name): CppUnit::TestCase(name)

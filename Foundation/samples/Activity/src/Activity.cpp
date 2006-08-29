@@ -1,7 +1,7 @@
 //
 // Activity.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/Activity/src/Activity.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/Activity/src/Activity.cpp#1 $
 //
 // This sample demonstrates the Activity class.
 //
@@ -32,13 +32,13 @@
 //
 
 
-#include "Foundation/Activity.h"
-#include "Foundation/Thread.h"
+#include "Poco/Activity.h"
+#include "Poco/Thread.h"
 #include <iostream>
 
 
-using Foundation::Activity;
-using Foundation::Thread;
+using Poco::Activity;
+using Poco::Thread;
 
 
 class ActivityExample

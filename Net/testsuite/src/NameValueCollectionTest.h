@@ -1,7 +1,7 @@
 //
 // NameValueCollectionTest.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/NameValueCollectionTest.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/NameValueCollectionTest.h#1 $
 //
 // Definition of the NameValueCollectionTest class.
 //
@@ -36,12 +36,8 @@
 #define NameValueCollectionTest_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class NameValueCollectionTest: public CppUnit::TestCase

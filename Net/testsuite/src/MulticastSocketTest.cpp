@@ -1,7 +1,7 @@
 //
 // MulticastSocketTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/MulticastSocketTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/MulticastSocketTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,22 +34,22 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "MulticastEchoServer.h"
-#include "Net/MulticastSocket.h"
-#include "Net/SocketAddress.h"
-#include "Net/NetException.h"
-#include "Foundation/Timespan.h"
-#include "Foundation/Stopwatch.h"
+#include "Poco/Net/MulticastSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Timespan.h"
+#include "Poco/Stopwatch.h"
 
 
-using Net::Socket;
-using Net::MulticastSocket;
-using Net::SocketAddress;
-using Net::IPAddress;
-using Foundation::Timespan;
-using Foundation::Stopwatch;
-using Foundation::TimeoutException;
-using Foundation::InvalidArgumentException;
-using Foundation::IOException;
+using Poco::Net::Socket;
+using Poco::Net::MulticastSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::IPAddress;
+using Poco::Timespan;
+using Poco::Stopwatch;
+using Poco::TimeoutException;
+using Poco::InvalidArgumentException;
+using Poco::IOException;
 
 
 MulticastSocketTest::MulticastSocketTest(const std::string& name): CppUnit::TestCase(name)

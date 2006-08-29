@@ -1,7 +1,7 @@
 //
 // RandomStreamTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/RandomStreamTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/RandomStreamTest.h#1 $
 //
 // Definition of the RandomStreamTest class.
 //
@@ -36,12 +36,8 @@
 #define RandomStreamTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class RandomStreamTest: public CppUnit::TestCase

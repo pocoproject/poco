@@ -1,7 +1,7 @@
 //
 // DOMWriter.cpp
 //
-// $Id: //poco/1.1.0/XML/samples/DOMWriter/src/DOMWriter.cpp#2 $
+// $Id: //poco/1.2/XML/samples/DOMWriter/src/DOMWriter.cpp#1 $
 //
 // This sample demonstrates the DOMWriter class and how to
 // build DOM documents in memory.
@@ -33,21 +33,21 @@
 //
 
 
-#include "DOM/Document.h"
-#include "DOM/Element.h"
-#include "DOM/Text.h"
-#include "DOM/AutoPtr.h"
-#include "DOM/DOMWriter.h"
-#include "XML/XMLWriter.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/AutoPtr.h"
+#include "Poco/DOM/DOMWriter.h"
+#include "Poco/XML/XMLWriter.h"
 #include <iostream>
 
 
-using XML::Document;
-using XML::Element;
-using XML::Text;
-using XML::AutoPtr;
-using XML::DOMWriter;
-using XML::XMLWriter;
+using Poco::XML::Document;
+using Poco::XML::Element;
+using Poco::XML::Text;
+using Poco::XML::AutoPtr;
+using Poco::XML::DOMWriter;
+using Poco::XML::XMLWriter;
 
 
 int main(int argc, char** argv)

@@ -1,7 +1,7 @@
 //
 // TestFailure.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TestFailure.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TestFailure.h#1 $
 //
 
 
@@ -9,18 +9,12 @@
 #define CppUnit_TestFailure_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_CppUnitException_INCLUDED
 #include "CppUnit/CppUnitException.h"
-#endif
-#ifndef CppUnit_Guards_INCLUDED
 #include "CppUnit/Guards.h"
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class Test;
@@ -84,7 +78,7 @@ inline CppUnitException* TestFailure::thrownException()
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_TestFailure_INCLUDED

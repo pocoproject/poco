@@ -1,7 +1,7 @@
 //
 // SHA1EngineTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/SHA1EngineTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/SHA1EngineTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "SHA1EngineTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/SHA1Engine.h"
+#include "Poco/SHA1Engine.h"
 
 
-using Foundation::SHA1Engine;
-using Foundation::DigestEngine;
+using Poco::SHA1Engine;
+using Poco::DigestEngine;
 
 
 SHA1EngineTest::SHA1EngineTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // LineEndingConverter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/LineEndingConverter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/LineEndingConverter.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/LineEndingConverter.h"
+#include "Poco/LineEndingConverter.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 #if defined(_WIN32)
@@ -201,4 +201,4 @@ OutputLineEndingConverter::~OutputLineEndingConverter()
 }
 
 
-Foundation_END
+} // namespace Poco

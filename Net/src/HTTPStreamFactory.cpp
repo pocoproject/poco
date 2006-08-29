@@ -1,7 +1,7 @@
 //
 // HTTPStreamFactory.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPStreamFactory.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPStreamFactory.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,24 +34,25 @@
 //
 
 
-#include "Net/HTTPStreamFactory.h"
-#include "Net/HTTPClientSession.h"
-#include "Net/HTTPIOStream.h"
-#include "Net/HTTPRequest.h"
-#include "Net/HTTPResponse.h"
-#include "Net/NetException.h"
-#include "Foundation/URI.h"
-#include "Foundation/URIStreamOpener.h"
-#include "Foundation/UnbufferedStreamBuf.h"
+#include "Poco/Net/HTTPStreamFactory.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPIOStream.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/URI.h"
+#include "Poco/URIStreamOpener.h"
+#include "Poco/UnbufferedStreamBuf.h"
 
 
-using Foundation::URIStreamFactory;
-using Foundation::URI;
-using Foundation::URIStreamOpener;
-using Foundation::UnbufferedStreamBuf;
+using Poco::URIStreamFactory;
+using Poco::URI;
+using Poco::URIStreamOpener;
+using Poco::UnbufferedStreamBuf;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPStreamFactory::HTTPStreamFactory():
@@ -60,7 +61,7 @@ HTTPStreamFactory::HTTPStreamFactory():
 }
 
 
-HTTPStreamFactory::HTTPStreamFactory(const std::string& proxyHost, Foundation::UInt16 proxyPort):
+HTTPStreamFactory::HTTPStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort):
 	_proxyHost(proxyHost),
 	_proxyPort(proxyPort)
 {
@@ -98,6 +99,7 @@ std::istream* HTTPStreamFactory::open(const URI& uri)
 			{
 				resolvedURI.resolve(res.get("Location"));
 				delete pSession;
+				if (resolvedURI.getScheme() != "http") throw UnsupportedRedirectException(uri.toString());
 				++redirects;
 			}
 			else if (res.getStatus() == HTTPResponse::HTTP_OK)
@@ -123,4 +125,4 @@ void HTTPStreamFactory::registerFactory()
 }
 
 
-Net_END
+} } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // SystemConfigurationTest.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/SystemConfigurationTest.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/SystemConfigurationTest.h#1 $
 //
 // Definition of the SystemConfigurationTest class.
 //
@@ -36,12 +36,8 @@
 #define SystemConfigurationTest_INCLUDED
 
 
-#ifndef Util_Util_INCLUDED
-#include "Util/Util.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Util/Util.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class SystemConfigurationTest: public CppUnit::TestCase

@@ -1,7 +1,7 @@
 //
 // NullPartHandler.cpp
 //
-// $Id: //poco/1.1.0/Net/src/NullPartHandler.cpp#2 $
+// $Id: //poco/1.2/Net/src/NullPartHandler.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,17 +34,18 @@
 //
 
 
-#include "Net/NullPartHandler.h"
-#include "Net/MessageHeader.h"
-#include "Foundation/NullStream.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/Net/NullPartHandler.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/NullStream.h"
+#include "Poco/StreamCopier.h"
 
 
-using Foundation::NullOutputStream;
-using Foundation::StreamCopier;
+using Poco::NullOutputStream;
+using Poco::StreamCopier;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 NullPartHandler::NullPartHandler()
@@ -64,4 +65,4 @@ void NullPartHandler::handlePart(const MessageHeader& header, std::istream& stre
 }
 
 
-Net_END
+} } // namespace Poco::Net

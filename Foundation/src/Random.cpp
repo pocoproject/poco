@@ -1,7 +1,7 @@
 //
 // Random.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Random.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Random.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -70,8 +70,8 @@
 //
 
 
-#include "Foundation/Random.h"
-#include "Foundation/RandomStream.h"
+#include "Poco/Random.h"
+#include "Poco/RandomStream.h"
 #include "time.h"
 
 
@@ -168,7 +168,7 @@
 #define	SEP_4		1
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Random::Random(int stateSize)
@@ -379,4 +379,4 @@ UInt32 Random::next()
 }
 
 
-Foundation_END
+} // namespace Poco

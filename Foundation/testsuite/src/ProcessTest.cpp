@@ -1,7 +1,7 @@
 //
 // ProcessTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ProcessTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ProcessTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,16 @@
 #include "ProcessTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Process.h"
+#include "Poco/Process.h"
+#include "Poco/Pipe.h"
+#include "Poco/PipeStream.h"
 
 
-using Foundation::Process;
-using Foundation::ProcessHandle;
+using Poco::Process;
+using Poco::ProcessHandle;
+using Poco::Pipe;
+using Poco::PipeInputStream;
+using Poco::PipeOutputStream;
 
 
 ProcessTest::ProcessTest(const std::string& name): CppUnit::TestCase(name)
@@ -75,6 +80,62 @@ void ProcessTest::testLaunch()
 }
 
 
+void ProcessTest::testLaunchRedirectIn()
+{
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd = "./";
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
+	PipeOutputStream ostr(inPipe);
+	ostr << std::string(100, 'x');
+	ostr.close();
+	int rc = ph.wait();
+	assert (rc == 100);
+}
+
+
+void ProcessTest::testLaunchRedirectOut()
+{
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd = "./";
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	args.push_back("-hello");
+	Pipe outPipe;
+	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0);
+	PipeInputStream istr(outPipe);
+	std::string s;
+	int c = istr.get();
+	while (c != -1) { s += (char) c; c = istr.get(); }
+	assert (s == "Hello, world!");
+	int rc = ph.wait();
+	assert (rc == 1);
+}
+
+
 void ProcessTest::setUp()
 {
 }
@@ -90,6 +151,8 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ProcessTest");
 
 	CppUnit_addTest(pSuite, ProcessTest, testLaunch);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectIn);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectOut);
 
 	return pSuite;
 }

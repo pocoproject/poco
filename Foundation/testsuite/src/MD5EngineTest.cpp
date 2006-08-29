@@ -1,7 +1,7 @@
 //
 // MD5EngineTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/MD5EngineTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/MD5EngineTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "MD5EngineTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/MD5Engine.h"
+#include "Poco/MD5Engine.h"
 
 
-using Foundation::MD5Engine;
-using Foundation::DigestEngine;
+using Poco::MD5Engine;
+using Poco::DigestEngine;
 
 
 MD5EngineTest::MD5EngineTest(const std::string& name): CppUnit::TestCase(name)

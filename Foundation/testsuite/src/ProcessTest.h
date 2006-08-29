@@ -1,7 +1,7 @@
 //
 // ProcessTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ProcessTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ProcessTest.h#1 $
 //
 // Definition of the ProcessTest class.
 //
@@ -36,12 +36,8 @@
 #define ProcessTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class ProcessTest: public CppUnit::TestCase
@@ -51,6 +47,8 @@ public:
 	~ProcessTest();
 
 	void testLaunch();
+	void testLaunchRedirectIn();
+	void testLaunchRedirectOut();
 
 	void setUp();
 	void tearDown();

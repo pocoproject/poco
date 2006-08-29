@@ -1,7 +1,7 @@
 //
 // SystemConfiguration.cpp
 //
-// $Id: //poco/1.1.0/Util/src/SystemConfiguration.cpp#2 $
+// $Id: //poco/1.2/Util/src/SystemConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,17 +34,18 @@
 //
 
 
-#include "Util/SystemConfiguration.h"
-#include "Foundation/Environment.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/SystemConfiguration.h"
+#include "Poco/Environment.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::Environment;
-using Foundation::Path;
+using Poco::Environment;
+using Poco::Path;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 const std::string SystemConfiguration::OSNAME         = "system.osName";
@@ -93,7 +94,7 @@ bool SystemConfiguration::getRaw(const std::string& key, std::string& value) con
 
 void SystemConfiguration::setRaw(const std::string& key, const std::string& value)
 {
-	throw Foundation::InvalidAccessException("Attempt to modify a system property", key);
+	throw Poco::InvalidAccessException("Attempt to modify a system property", key);
 }
 
 
@@ -128,4 +129,4 @@ bool SystemConfiguration::getEnv(const std::string& name, std::string& value)
 }
 
 
-Util_END
+} } // namespace Poco::Util

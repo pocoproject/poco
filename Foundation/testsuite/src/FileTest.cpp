@@ -1,7 +1,7 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/FileTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/FileTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,21 +33,21 @@
 #include "FileTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/File.h"
-#include "Foundation/TemporaryFile.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Thread.h"
+#include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
+#include "Poco/Thread.h"
 #include <fstream>
 #include <set>
 
 
-using Foundation::File;
-using Foundation::TemporaryFile;
-using Foundation::Path;
-using Foundation::Exception;
-using Foundation::Timestamp;
-using Foundation::Thread;
+using Poco::File;
+using Poco::TemporaryFile;
+using Poco::Path;
+using Poco::Exception;
+using Poco::Timestamp;
+using Poco::Thread;
 
 
 FileTest::FileTest(const std::string& name): CppUnit::TestCase(name)

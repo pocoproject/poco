@@ -1,7 +1,7 @@
 //
 // TestSetup.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/TestSetup.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/TestSetup.h#1 $
 //
 
 
@@ -9,18 +9,12 @@
 #define CppUnit_TestSetup_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_Guards_INCLUDED
 #include "CppUnit/Guards.h"
-#endif
-#ifndef CppUnit_TestDecorator_INCLUDED
 #include "CppUnit/TestDecorator.h"
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class Test;
@@ -57,7 +51,7 @@ inline void TestSetup::run(TestResult* result)
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_TestSetup_INCLUDED

@@ -1,7 +1,7 @@
 //
 // TestApp.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TestApp.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TestApp.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,7 +30,26 @@
 //
 
 
+#include <string>
+#include <iostream>
+
+
 int main(int argc, char** argv)
 {
+	if (argc > 1)
+	{
+		std::string arg(argv[1]);
+		if (arg == "-hello")
+		{
+			std::cout << "Hello, world!";
+		}
+		else if (arg == "-count")
+		{
+			int n = 0;
+			int c = std::cin.get();
+			while (c != -1) { ++n; c = std::cin.get(); }
+			return n;
+		}
+	}
 	return argc - 1;
 }

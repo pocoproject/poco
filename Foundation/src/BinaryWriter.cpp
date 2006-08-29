@@ -1,7 +1,7 @@
 //
 // BinaryWriter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/BinaryWriter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/BinaryWriter.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/BinaryWriter.h"
-#include "Foundation/ByteOrder.h"
+#include "Poco/BinaryWriter.h"
+#include "Poco/ByteOrder.h"
 #include <string.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 BinaryWriter::BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder):
@@ -190,7 +190,7 @@ BinaryWriter& BinaryWriter::operator << (float value)
 	{
 		const char* ptr = (const char*) &value;
 		ptr += sizeof(value);
-		for (int i = 0; i < sizeof(value); ++i)
+		for (unsigned i = 0; i < sizeof(value); ++i)
 			_ostr.write(--ptr, 1);
 	}
 	else
@@ -207,7 +207,7 @@ BinaryWriter& BinaryWriter::operator << (double value)
 	{
 		const char* ptr = (const char*) &value;
 		ptr += sizeof(value);
-		for (int i = 0; i < sizeof(value); ++i)
+		for (unsigned i = 0; i < sizeof(value); ++i)
 			_ostr.write(--ptr, 1);
 	}
 	else
@@ -313,7 +313,7 @@ void BinaryWriter::writeRaw(const std::string& rawData)
 
 void BinaryWriter::writeBOM()
 {
-	UInt32 value = 0xFEFF;
+	UInt16 value = 0xFEFF;
 	if (_flipBytes) value = ByteOrder::flipBytes(value);
 	_ostr.write((const char*) &value, sizeof(value));
 }
@@ -325,4 +325,4 @@ void BinaryWriter::flush()
 }
 
 
-Foundation_END
+} // namespace Poco

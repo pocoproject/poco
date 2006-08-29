@@ -1,7 +1,7 @@
 //
 // XMLWriterTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/XMLWriterTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/XMLWriterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "XMLWriterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "XML/XMLWriter.h"
-#include "SAX/AttributesImpl.h"
-#include "Foundation/Exception.h"
+#include "Poco/XML/XMLWriter.h"
+#include "Poco/SAX/AttributesImpl.h"
+#include "Poco/Exception.h"
 #include <sstream>
 
 
-using XML::XMLWriter;
-using XML::AttributesImpl;
+using Poco::XML::XMLWriter;
+using Poco::XML::AttributesImpl;
 
 
 XMLWriterTest::XMLWriterTest(const std::string& name): CppUnit::TestCase(name)
@@ -387,6 +387,22 @@ void XMLWriterTest::testNamespaces()
 	assert (xml == "<ns1:r xmlns:ns1=\"urn:ns\">data</ns1:r>");
 }
 
+void XMLWriterTest::testAttributeNamespaces()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL);
+	Poco::XML::AttributesImpl attrs;
+	attrs.addAttribute("urn:other", "myattr", "", "", "attrValue");
+	attrs.addAttribute("urn:ns", "myattr2", "", "", "attrValue2");
+	writer.startDocument();
+	writer.startElement("urn:ns", "r", "", attrs);
+	writer.characters("data");
+	writer.endElement("urn:ns", "r", "");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<ns1:r myattr2=\"attrValue2\" ns2:myattr=\"attrValue\" xmlns:ns1=\"urn:ns\" xmlns:ns2=\"urn:other\">data</ns1:r>");
+}
+
 
 void XMLWriterTest::testNamespacesNested()
 {
@@ -438,7 +454,7 @@ void XMLWriterTest::testWellformed()
 		writer.endElement("", "", "bar");
 		fail("not wellformed - must throw exception");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 	}
 }
@@ -456,7 +472,7 @@ void XMLWriterTest::testWellformedNested()
 		writer.endElement("", "", "foo");
 		fail("not wellformed - must throw exception");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 	}
 }
@@ -474,7 +490,7 @@ void XMLWriterTest::testWellformedNamespace()
 		writer.endElement("urn:ns1", "bar", "");
 		fail("not wellformed - must throw exception");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 	}
 }
@@ -515,6 +531,7 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testQNamespaces);
 	CppUnit_addTest(pSuite, XMLWriterTest, testQNamespacesNested);
 	CppUnit_addTest(pSuite, XMLWriterTest, testNamespaces);
+	CppUnit_addTest(pSuite, XMLWriterTest, testAttributeNamespaces);
 	CppUnit_addTest(pSuite, XMLWriterTest, testNamespacesNested);
 	CppUnit_addTest(pSuite, XMLWriterTest, testExplicitNamespaces);
 	CppUnit_addTest(pSuite, XMLWriterTest, testWellformed);

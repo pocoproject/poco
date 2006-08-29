@@ -1,7 +1,7 @@
 //
 // Event.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Event.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Event.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/Event.h"
+#include "Poco/Event.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -44,7 +44,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Event::Event(bool autoReset): EventImpl(autoReset)
@@ -57,4 +57,4 @@ Event::~Event()
 }
 
 
-Foundation_END
+} // namespace Poco

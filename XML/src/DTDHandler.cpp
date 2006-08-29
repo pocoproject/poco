@@ -1,7 +1,7 @@
 //
 // DTDHandler.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DTDHandler.cpp#2 $
+// $Id: //poco/1.2/XML/src/DTDHandler.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/DTDHandler.h"
+#include "Poco/SAX/DTDHandler.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 DTDHandler::~DTDHandler()
@@ -45,4 +46,4 @@ DTDHandler::~DTDHandler()
 }
 
 
-XML_END
+} } // namespace Poco::XML

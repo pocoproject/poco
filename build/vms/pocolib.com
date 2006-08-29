@@ -1,7 +1,7 @@
 $ !
 $ ! POCOLIB.COM
 $ !
-$ ! $Id: //poco/1.1.0/build/vms/pocolib.com#1 $
+$ ! $Id: //poco/1.2/build/vms/pocolib.com#1 $
 $ !
 $ ! C++ library creation procedure for Poco libraries
 $ !

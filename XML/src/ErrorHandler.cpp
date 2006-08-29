@@ -1,7 +1,7 @@
 //
 // ErrorHandler.cpp
 //
-// $Id: //poco/1.1.0/XML/src/ErrorHandler.cpp#2 $
+// $Id: //poco/1.2/XML/src/ErrorHandler.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/ErrorHandler.h"
+#include "Poco/SAX/ErrorHandler.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 ErrorHandler::~ErrorHandler()
@@ -45,4 +46,4 @@ ErrorHandler::~ErrorHandler()
 }
 
 
-XML_END
+} } // namespace Poco::XML

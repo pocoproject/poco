@@ -1,7 +1,7 @@
 //
 // MailRecipient.cpp
 //
-// $Id: //poco/1.1.0/Net/src/MailRecipient.cpp#2 $
+// $Id: //poco/1.2/Net/src/MailRecipient.cpp#1 $
 //
 // Library: Net
 // Package: Mail
@@ -34,11 +34,12 @@
 //
 
 
-#include "Net/MailRecipient.h"
+#include "Poco/Net/MailRecipient.h"
 #include <algorithm>
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 MailRecipient::MailRecipient():
@@ -48,24 +49,24 @@ MailRecipient::MailRecipient():
 
 	
 MailRecipient::MailRecipient(const MailRecipient& recipient):
-	_type(recipient._type),
 	_address(recipient._address),
-	_realName(recipient._realName)
+	_realName(recipient._realName),
+	_type(recipient._type)
 {
 }
 
 	
 MailRecipient::MailRecipient(RecipientType type, const std::string& address):
-	_type(type),
-	_address(address)
+	_address(address),
+	_type(type)
 {
 }
 
 
 MailRecipient::MailRecipient(RecipientType type, const std::string& address, const std::string& realName):
-	_type(type),
 	_address(address),
-	_realName(realName)
+	_realName(realName),
+	_type(type)
 {
 }
 
@@ -112,4 +113,4 @@ void MailRecipient::setRealName(const std::string& realName)
 }
 
 
-Net_END
+} } // namespace Poco::Net

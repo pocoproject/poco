@@ -1,7 +1,7 @@
 //
 // MemoryPoolTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/MemoryPoolTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/MemoryPoolTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "MemoryPoolTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/MemoryPool.h"
+#include "Poco/MemoryPool.h"
 #include <vector>
 
 
-using Foundation::MemoryPool;
+using Poco::MemoryPool;
 
 
 MemoryPoolTest::MemoryPoolTest(const std::string& name): CppUnit::TestCase(name)
@@ -71,7 +71,7 @@ void MemoryPoolTest::testMemoryPool()
 		pool1.get();
 		fail("pool exhausted - must throw exception");
 	}
-	catch (Foundation::OutOfMemoryException&)
+	catch (Poco::OutOfMemoryException&)
 	{
 	}
 	

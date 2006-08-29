@@ -1,7 +1,7 @@
 //
 // RotateStrategy.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/RotateStrategy.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/RotateStrategy.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/RotateStrategy.h"
+#include "Poco/RotateStrategy.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 //
@@ -100,4 +100,4 @@ bool RotateBySizeStrategy::mustRotate(LogFile* pFile)
 }
 
 
-Foundation_END
+} // namespace Poco

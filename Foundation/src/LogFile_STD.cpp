@@ -1,7 +1,7 @@
 //
 // LogFile_STD.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/LogFile_STD.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/LogFile_STD.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,17 +34,17 @@
 //
 
 
-#include "Foundation/LogFile_STD.h"
-#include "Foundation/File.h"
-#include "Foundation/Exception.h"
+#include "Poco/LogFile_STD.h"
+#include "Poco/File.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 LogFileImpl::LogFileImpl(const std::string& path): _path(path)
 {
-	_str.open(path.c_str(), std::ios::ate);
+	_str.open(path.c_str(), std::ios::app | std::ios::ate);
 	if (!_str.good()) throw OpenFileException(path);
 	if (sizeImpl() == 0)
 		_creationDate = File(path).getLastModified();
@@ -83,4 +83,4 @@ const std::string& LogFileImpl::pathImpl() const
 }
 
 
-Foundation_END
+} // namespace Poco

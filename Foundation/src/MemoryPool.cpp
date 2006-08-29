@@ -1,7 +1,7 @@
 //
 // MemoryPool.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/MemoryPool.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/MemoryPool.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/MemoryPool.h"
-#include "Foundation/Exception.h"
+#include "Poco/MemoryPool.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 MemoryPool::MemoryPool(size_t blockSize, int preAlloc, int maxAlloc):
@@ -100,4 +100,4 @@ void MemoryPool::release(void* ptr)
 }
 
 
-Foundation_END
+} // namespace Poco

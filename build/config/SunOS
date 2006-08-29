@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/config/SunOS#1 $
+# $Id: //poco/1.2/build/config/SunOS#1 $
 #
 # SunOS
 #
@@ -16,10 +16,10 @@ LINKMODE = SHARED
 #
 CC      = cc
 CXX     = CC
-LINK    = CC
-LIB     = CC -xar -o $@
+LINK    = $(CXX)
+LIB     = $(CXX) -xar -o $@
 RANLIB  = ranlib
-SHLIB   = CC $(LINKFLAGS) -G -o $@ -h$(notdir $@)
+SHLIB   = $(CXX) $(LINKFLAGS) -G -o $@ -h$(notdir $@)
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.SunCC
 SHELL   = sh

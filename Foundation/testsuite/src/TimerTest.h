@@ -1,7 +1,7 @@
 //
 // TimerTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TimerTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TimerTest.h#1 $
 //
 // Definition of the TimerTest class.
 //
@@ -36,18 +36,10 @@
 #define TimerTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
-#ifndef Foundation_Timer_INCLUDED
-#include "Foundation/Timer.h"
-#endif
-#ifndef Foundation_Event_INCLUDED
-#include "Foundation/Event.h"
-#endif
+#include "Poco/Timer.h"
+#include "Poco/Event.h"
 
 
 class TimerTest: public CppUnit::TestCase
@@ -64,10 +56,10 @@ public:
 	static CppUnit::Test* suite();
 
 protected:
-	void onTimer(Foundation::Timer& t);
+	void onTimer(Poco::Timer& t);
 
 private:
-	Foundation::Event _event;
+	Poco::Event _event;
 };
 
 

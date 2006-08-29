@@ -1,7 +1,7 @@
 //
 // FilesystemConfigurationTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/FilesystemConfigurationTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/FilesystemConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "FilesystemConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/FilesystemConfiguration.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/Util/FilesystemConfiguration.h"
+#include "Poco/AutoPtr.h"
 #include <algorithm>
 
 
-using Util::FilesystemConfiguration;
-using Util::AbstractConfiguration;
-using Foundation::AutoPtr;
+using Poco::Util::FilesystemConfiguration;
+using Poco::Util::AbstractConfiguration;
+using Poco::AutoPtr;
 
 
 FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& name): CppUnit::TestCase(name)

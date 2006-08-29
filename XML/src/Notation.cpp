@@ -1,7 +1,7 @@
 //
 // Notation.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Notation.cpp#2 $
+// $Id: //poco/1.2/XML/src/Notation.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/Notation.h"
+#include "Poco/DOM/Notation.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId): 
@@ -81,4 +82,4 @@ Node* Notation::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-XML_END
+} } // namespace Poco::XML

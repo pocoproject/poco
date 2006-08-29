@@ -1,7 +1,7 @@
 //
 // ThreadLocal.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/ThreadLocal.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/ThreadLocal.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/ThreadLocal.h"
-#include "Foundation/SingletonHolder.h"
-#include "Foundation/Thread.h"
+#include "Poco/ThreadLocal.h"
+#include "Poco/SingletonHolder.h"
+#include "Poco/Thread.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 TLSAbstractSlot::TLSAbstractSlot()
@@ -99,4 +99,4 @@ void ThreadLocalStorage::clear()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // HMACEngineTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/HMACEngineTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/HMACEngineTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,13 +33,13 @@
 #include "HMACEngineTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/HMACEngine.h"
-#include "Foundation/MD5Engine.h"
+#include "Poco/HMACEngine.h"
+#include "Poco/MD5Engine.h"
 
 
-using Foundation::HMACEngine;
-using Foundation::MD5Engine;
-using Foundation::DigestEngine;
+using Poco::HMACEngine;
+using Poco::MD5Engine;
+using Poco::DigestEngine;
 
 
 HMACEngineTest::HMACEngineTest(const std::string& name): CppUnit::TestCase(name)

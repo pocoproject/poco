@@ -1,7 +1,7 @@
 //
 // NamedEventTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NamedEventTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NamedEventTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,16 +33,16 @@
 #include "NamedEventTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/NamedEvent.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Runnable.h"
-#include "Foundation/Timestamp.h"
+#include "Poco/NamedEvent.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Timestamp.h"
 
 
-using Foundation::NamedEvent;
-using Foundation::Thread;
-using Foundation::Runnable;
-using Foundation::Timestamp;
+using Poco::NamedEvent;
+using Poco::Thread;
+using Poco::Runnable;
+using Poco::Timestamp;
 
 
 static NamedEvent testEvent("TestEvent");

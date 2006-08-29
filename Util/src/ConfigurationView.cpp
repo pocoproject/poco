@@ -1,7 +1,7 @@
 //
 // ConfigurationView.cpp
 //
-// $Id: //poco/1.1.0/Util/src/ConfigurationView.cpp#2 $
+// $Id: //poco/1.2/Util/src/ConfigurationView.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,10 +34,11 @@
 //
 
 
-#include "Util/ConfigurationView.h"
+#include "Poco/Util/ConfigurationView.h"
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 ConfigurationView::ConfigurationView(const std::string& prefix, AbstractConfiguration* pConfig):
@@ -86,4 +87,4 @@ std::string ConfigurationView::translateKey(const std::string& key) const
 }
 
 
-Util_END
+} } // namespace Poco::Util

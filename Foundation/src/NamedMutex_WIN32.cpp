@@ -1,7 +1,7 @@
 //
 // NamedMutex_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedMutex_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedMutex_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/NamedMutex_WIN32.h"
-#include "Foundation/Exception.h"
+#include "Poco/NamedMutex_WIN32.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NamedMutexImpl::NamedMutexImpl(const std::string& name):
@@ -92,4 +92,4 @@ void NamedMutexImpl::unlockImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

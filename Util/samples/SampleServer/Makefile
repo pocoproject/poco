@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Util/samples/SampleServer/Makefile#1 $
+# $Id: //poco/1.2/Util/samples/SampleServer/Makefile#1 $
 #
 # Makefile for Poco SampleServer
 #
@@ -12,6 +12,6 @@ objects = SampleServer
 
 target         = SampleServer
 target_version = 1
-target_libs    = PocoFoundation PocoXML PocoUtil
+target_libs    = PocoUtil PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

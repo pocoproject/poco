@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/ArchiveStrategy.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/ArchiveStrategy.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,17 +34,63 @@
 //
 
 
-#include "Foundation/ArchiveStrategy.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/File.h"
-#include "Foundation/Path.h"
-#include "Foundation/DeflatingStream.h"
-#include "Foundation/StreamCopier.h"
-#include "Foundation/Exception.h"
+#include "Poco/ArchiveStrategy.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include "Poco/DeflatingStream.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Exception.h"
+#include "Poco/ActiveDispatcher.h"
+#include "Poco/ActiveMethod.h"
+#include "Poco/Void.h"
 #include <fstream>
 
 
-Foundation_BEGIN
+namespace Poco {
+
+
+//
+// ArchiveCompressor
+//
+
+
+class ArchiveCompressor: public ActiveDispatcher
+{
+public:
+	ArchiveCompressor():
+		compress(this, &ArchiveCompressor::compressImpl)
+	{
+	}
+	
+	~ArchiveCompressor()
+	{
+	}
+	
+	ActiveMethod<Void, std::string, ArchiveCompressor, ActiveStarter<ActiveDispatcher> > compress;
+
+protected:
+	Void compressImpl(const std::string& path)
+	{
+		std::string gzPath(path);
+		gzPath.append(".gz");
+		std::ifstream istr(path.c_str(), std::ios::binary | std::ios::in);
+		if (!istr.good()) throw OpenFileException(path);
+		std::ofstream ostr(gzPath.c_str(), std::ios::binary | std::ios::out);
+		if (ostr.good())
+		{
+			DeflatingOutputStream deflater(ostr, DeflatingStreamBuf::STREAM_GZIP);
+			StreamCopier::copyStream(istr, deflater);
+			deflater.close();
+			ostr.close();
+			istr.close();
+			File f(path);
+			f.remove();
+		}
+		else throw CreateFileException(gzPath);
+		return Void();
+	}
+};
 
 
 //
@@ -52,13 +98,16 @@ Foundation_BEGIN
 //
 
 
-ArchiveStrategy::ArchiveStrategy(): _compress(false)
+ArchiveStrategy::ArchiveStrategy(): 
+	_compress(false),
+	_pCompressor(0)
 {
 }
 
 
 ArchiveStrategy::~ArchiveStrategy()
 {
+	delete _pCompressor;
 }
 
 
@@ -87,19 +136,9 @@ void ArchiveStrategy::moveFile(const std::string& oldPath, const std::string& ne
 	}
 	else
 	{
-		std::ifstream istr(f.path().c_str(), std::ios::binary | std::ios::in);
-		if (!istr.good()) throw OpenFileException(oldPath);
-		std::ofstream ostr(mvPath.c_str(), std::ios::binary | std::ios::out);
-		if (ostr.good())
-		{
-			DeflatingOutputStream deflater(ostr, DeflatingStreamBuf::STREAM_GZIP);
-			StreamCopier::copyStream(istr, deflater);
-			deflater.close();
-			ostr.close();
-			istr.close();
-			f.remove();
-		}
-		else throw CreateFileException(mvPath);
+		f.renameTo(newPath);
+		if (!_pCompressor) _pCompressor = new ArchiveCompressor;
+		_pCompressor->compress(newPath);
 	}
 }
 
@@ -169,4 +208,4 @@ LogFile* ArchiveByNumberStrategy::archive(LogFile* pFile)
 }
 
 
-Foundation_END
+} // namespace Poco

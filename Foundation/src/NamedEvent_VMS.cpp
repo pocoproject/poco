@@ -1,7 +1,7 @@
 //
 // NamedEvent_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedEvent_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedEvent_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/NamedEvent_VMS.h"
+#include "Poco/NamedEvent_VMS.h"
 #include <lib$routines.h>
 #include <starlet.h>
 #include <descrip.h>
 #include <iodef.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NamedEventImpl::NamedEventImpl(const std::string& name):
@@ -82,4 +82,4 @@ void NamedEventImpl::waitImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

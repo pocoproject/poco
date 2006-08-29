@@ -1,7 +1,7 @@
 //
 // Token.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Token.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Token.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/Token.h"
-#include "Foundation/NumberParser.h"
+#include "Poco/Token.h"
+#include "Poco/NumberParser.h"
 #include <ctype.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Token::Token()
@@ -165,4 +165,4 @@ void WhitespaceToken::finish(std::istream& istr)
 }
 
 
-Foundation_END
+} // namespace Poco

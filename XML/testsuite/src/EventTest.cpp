@@ -1,7 +1,7 @@
 //
 // EventTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/EventTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/EventTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,26 +33,26 @@
 #include "EventTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "DOM/Event.h"
-#include "DOM/MutationEvent.h"
-#include "DOM/EventListener.h"
-#include "DOM/Document.h"
-#include "DOM/Element.h"
-#include "DOM/Attr.h"
-#include "DOM/Text.h"
-#include "DOM/AutoPtr.h"
+#include "Poco/DOM/Event.h"
+#include "Poco/DOM/MutationEvent.h"
+#include "Poco/DOM/EventListener.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
-using XML::Event;
-using XML::MutationEvent;
-using XML::EventListener;
-using XML::Element;
-using XML::Document;
-using XML::Attr;
-using XML::Text;
-using XML::Node;
-using XML::AutoPtr;
-using XML::XMLString;
+using Poco::XML::Event;
+using Poco::XML::MutationEvent;
+using Poco::XML::EventListener;
+using Poco::XML::Element;
+using Poco::XML::Document;
+using Poco::XML::Attr;
+using Poco::XML::Text;
+using Poco::XML::Node;
+using Poco::XML::AutoPtr;
+using Poco::XML::XMLString;
 
 
 class TestEventListener: public EventListener

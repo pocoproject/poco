@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Logger.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Logger.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/Logger.h"
-#include "Foundation/Formatter.h"
-#include "Foundation/LoggingRegistry.h"
-#include "Foundation/Exception.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Logger.h"
+#include "Poco/Formatter.h"
+#include "Poco/LoggingRegistry.h"
+#include "Poco/Exception.h"
+#include "Poco/NumberFormatter.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Logger::LoggerMap* Logger::_pLoggerMap = 0;
@@ -371,6 +371,21 @@ void Logger::destroy(const std::string& name)
 }
 
 
+void Logger::names(std::vector<std::string>& names)
+{
+	Mutex::ScopedLock lock(_mapMtx);
+
+	names.clear();
+	if (_pLoggerMap)
+	{
+		for (LoggerMap::const_iterator it = _pLoggerMap->begin(); it != _pLoggerMap->end(); ++it)
+		{
+			names.push_back(it->first);
+		}
+	}
+}
+
+
 Logger& Logger::parent(const std::string& name)
 {
 	std::string::size_type pos = name.rfind('.');
@@ -413,4 +428,4 @@ void Logger::add(Logger* pLogger)
 }
 
 
-Foundation_END
+} // namespace Poco

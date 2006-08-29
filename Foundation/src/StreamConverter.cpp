@@ -1,7 +1,7 @@
 //
 // StreamConverter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/StreamConverter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/StreamConverter.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/StreamConverter.h"
-#include "Foundation/TextEncoding.h"
+#include "Poco/StreamConverter.h"
+#include "Poco/TextEncoding.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 StreamConverterBuf::StreamConverterBuf(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
@@ -216,4 +216,4 @@ OutputStreamConverter::~OutputStreamConverter()
 }
 
 
-Foundation_END
+} // namespace Poco

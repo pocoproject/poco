@@ -1,7 +1,7 @@
 //
 // ClassLoaderTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ClassLoaderTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ClassLoaderTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,18 +33,18 @@
 #include "ClassLoaderTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/ClassLoader.h"
-#include "Foundation/Manifest.h"
-#include "Foundation/Exception.h"
+#include "Poco/ClassLoader.h"
+#include "Poco/Manifest.h"
+#include "Poco/Exception.h"
 #include "TestPlugin.h"
 
 
-using Foundation::ClassLoader;
-using Foundation::Manifest;
-using Foundation::SharedLibrary;
-using Foundation::AbstractMetaObject;
-using Foundation::NotFoundException;
-using Foundation::InvalidAccessException;
+using Poco::ClassLoader;
+using Poco::Manifest;
+using Poco::SharedLibrary;
+using Poco::AbstractMetaObject;
+using Poco::NotFoundException;
+using Poco::InvalidAccessException;
 
 
 ClassLoaderTest::ClassLoaderTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,21 +1,22 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Foundation/testsuite/Makefile-Driver#1 $
+# $Id: //poco/1.2/Foundation/testsuite/Makefile-Driver#1 $
 #
 # Makefile for Poco Foundation testsuite
 #
 
 include $(POCO_BASE)/build/rules/global
 
-objects = ActiveMethodTest ActivityTest AutoPtrTest SharedPtrTest Base64Test \
-	AutoReleasePoolTest BinaryReaderWriterTest LineEndingConverterTest \
+objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
+	AutoPtrTest SharedPtrTest AutoReleasePoolTest Base64Test \
+	BinaryReaderWriterTest LineEndingConverterTest \
 	ByteOrderTest ChannelTest ClassLoaderTest CoreTest CoreTestSuite \
 	CountingStreamTest CryptTestSuite DateTimeFormatterTest \
 	DateTimeParserTest DateTimeTest LocalDateTimeTest DateTimeTestSuite DigestStreamTest \
 	Driver DynamicFactoryTest FPETest FileChannelTest FileTest GlobTest FilesystemTestSuite \
 	FoundationTestSuite HMACEngineTest HexBinaryTest LoggerTest \
-	LoggingFactoryTest LoggingRegistryTest LoggingTestSuite \
+	LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
 	NamedEventTest NamedMutexTest ProcessesTestSuite ProcessTest \
 	MemoryPoolTest MD2EngineTest MD4EngineTest MD5EngineTest ManifestTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
@@ -32,7 +33,7 @@ objects = ActiveMethodTest ActivityTest AutoPtrTest SharedPtrTest Base64Test \
 	TimespanTest TimestampTest TimezoneTest URIStreamOpenerTest URITest \
 	URITestSuite UUIDGeneratorTest UUIDTest UUIDTestSuite ZLibTest \
 	TestPlugin DummyDelegate BasicEventTest FIFOEventTest PriorityEventTest EventTestSuite \
-	LRUCacheTest ExpireCacheTest ExpireLRUCacheTest CacheTestSuite AnyTest
+	LRUCacheTest ExpireCacheTest ExpireLRUCacheTest CacheTestSuite AnyTest HashTest FormatTest
 
 target         = testrunner
 target_version = 1

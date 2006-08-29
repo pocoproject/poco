@@ -1,7 +1,7 @@
 //
 // Name.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Name.cpp#2 $
+// $Id: //poco/1.2/XML/src/Name.cpp#1 $
 //
 // Library: XML
 // Package: XML
@@ -34,11 +34,12 @@
 //
 
 
-#include "XML/Name.h"
+#include "Poco/XML/Name.h"
 #include <algorithm>
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString Name::EMPTY_NAME;
@@ -188,4 +189,4 @@ XMLString Name::prefix(const XMLString& qname)
 }
 
 
-XML_END
+} } // namespace Poco::XML

@@ -1,7 +1,7 @@
 //
 // StringTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/StringTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/StringTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,23 +33,23 @@
 #include "StringTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/String.h"
+#include "Poco/String.h"
 
 
-using Foundation::trimLeft;
-using Foundation::trimLeftInPlace;
-using Foundation::trimRight;
-using Foundation::trimRightInPlace;
-using Foundation::trim;
-using Foundation::trimInPlace;
-using Foundation::toUpper;
-using Foundation::toUpperInPlace;
-using Foundation::toLower;
-using Foundation::toLowerInPlace;
-using Foundation::icompare;
-using Foundation::translate;
-using Foundation::translateInPlace;
-using Foundation::cat;
+using Poco::trimLeft;
+using Poco::trimLeftInPlace;
+using Poco::trimRight;
+using Poco::trimRightInPlace;
+using Poco::trim;
+using Poco::trimInPlace;
+using Poco::toUpper;
+using Poco::toUpperInPlace;
+using Poco::toLower;
+using Poco::toLowerInPlace;
+using Poco::icompare;
+using Poco::translate;
+using Poco::translateInPlace;
+using Poco::cat;
 
 
 StringTest::StringTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // SMTPClientSessionTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/SMTPClientSessionTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/SMTPClientSessionTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,16 +34,16 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "DialogServer.h"
-#include "Net/SMTPClientSession.h"
-#include "Net/MailMessage.h"
-#include "Net/MailRecipient.h"
-#include "Net/NetException.h"
+#include "Poco/Net/SMTPClientSession.h"
+#include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailRecipient.h"
+#include "Poco/Net/NetException.h"
 
 
-using Net::SMTPClientSession;
-using Net::MailMessage;
-using Net::MailRecipient;
-using Net::SMTPException;
+using Poco::Net::SMTPClientSession;
+using Poco::Net::MailMessage;
+using Poco::Net::MailRecipient;
+using Poco::Net::SMTPException;
 
 
 SMTPClientSessionTest::SMTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)

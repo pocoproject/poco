@@ -16,7 +16,7 @@
 #endif
 #endif /* ndef COMPILED_FROM_DSP */
 
-#include "XML/expat_external.h"
+#include "Poco/XML/expat_external.h"
 #include "internal.h"
 #include "xmltok.h"
 #include "nametab.h"

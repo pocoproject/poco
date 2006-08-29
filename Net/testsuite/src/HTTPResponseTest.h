@@ -1,7 +1,7 @@
 //
 // HTTPResponseTest.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTTPResponseTest.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTTPResponseTest.h#1 $
 //
 // Definition of the HTTPResponseTest class.
 //
@@ -36,12 +36,8 @@
 #define HTTPResponseTest_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class HTTPResponseTest: public CppUnit::TestCase
@@ -54,7 +50,6 @@ public:
 	void testWrite2();
 	void testRead1();
 	void testRead2();
-	void testRead3();
 	void testInvalid1();
 	void testInvalid2();
 	void testInvalid3();

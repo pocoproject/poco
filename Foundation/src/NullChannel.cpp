@@ -1,7 +1,7 @@
 //
 // NullChannel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NullChannel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NullChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/NullChannel.h"
+#include "Poco/NullChannel.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NullChannel::NullChannel()
@@ -60,4 +60,4 @@ void NullChannel::setProperty(const std::string&, const std::string&)
 }
 
 
-Foundation_END
+} // namespace Poco

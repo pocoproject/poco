@@ -1,7 +1,7 @@
 //
 // PatternFormatterTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/PatternFormatterTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/PatternFormatterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "PatternFormatterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/PatternFormatter.h"
-#include "Foundation/Message.h"
-#include "Foundation/DateTime.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/Message.h"
+#include "Poco/DateTime.h"
 
 
-using Foundation::PatternFormatter;
-using Foundation::Message;
-using Foundation::DateTime;
+using Poco::PatternFormatter;
+using Poco::Message;
+using Poco::DateTime;
 
 
 PatternFormatterTest::PatternFormatterTest(const std::string& name): CppUnit::TestCase(name)

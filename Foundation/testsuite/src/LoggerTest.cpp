@@ -1,7 +1,7 @@
 //
 // LoggerTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/LoggerTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/LoggerTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "LoggerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Logger.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/Logger.h"
+#include "Poco/AutoPtr.h"
 #include "TestChannel.h"
 
 
-using Foundation::Logger;
-using Foundation::Channel;
-using Foundation::Message;
-using Foundation::AutoPtr;
+using Poco::Logger;
+using Poco::Channel;
+using Poco::Message;
+using Poco::AutoPtr;
 
 
 LoggerTest::LoggerTest(const std::string& name): CppUnit::TestCase(name)
@@ -83,6 +83,17 @@ void LoggerTest::testLogger()
 	Logger& logger12 = Logger::get("Logger1.Logger2");
 	Logger& logger21 = Logger::get("Logger2.Logger1");
 	Logger& logger22 = Logger::get("Logger2.Logger2");
+
+	std::vector<std::string> loggers;
+	Logger::names(loggers);
+	assert (loggers.size() == 7);
+	assert (loggers[0] == "");
+	assert (loggers[1] == "Logger1");
+	assert (loggers[2] == "Logger1.Logger1");
+	assert (loggers[3] == "Logger1.Logger2");
+	assert (loggers[4] == "Logger2");
+	assert (loggers[5] == "Logger2.Logger1");
+	assert (loggers[6] == "Logger2.Logger2");
 
 	Logger::setLevel("Logger1", Message::PRIO_DEBUG);
 	assert (logger1.is(Message::PRIO_DEBUG));

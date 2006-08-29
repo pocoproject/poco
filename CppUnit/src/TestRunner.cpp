@@ -1,7 +1,7 @@
 //
 // TestRunner.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/src/TestRunner.cpp#1 $
+// $Id: //poco/1.2/CppUnit/src/TestRunner.cpp#1 $
 //
 
 
@@ -12,7 +12,7 @@
 #include <iostream>
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 TestRunner::TestRunner()
@@ -178,4 +178,4 @@ Test* TestRunner::find(const std::string& name, Test* pTest, const std::string& 
 }
 
 
-CppUnit_END
+} // namespace CppUnit

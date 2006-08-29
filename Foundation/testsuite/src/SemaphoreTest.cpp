@@ -1,7 +1,7 @@
 //
 // SemaphoreTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/SemaphoreTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/SemaphoreTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,16 +33,16 @@
 #include "SemaphoreTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Runnable.h"
-#include "Foundation/Semaphore.h"
-#include "Foundation/Exception.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Semaphore.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::Thread;
-using Foundation::Runnable;
-using Foundation::Semaphore;
-using Foundation::TimeoutException;
+using Poco::Thread;
+using Poco::Runnable;
+using Poco::Semaphore;
+using Poco::TimeoutException;
 
 
 class SemaRunnable: public Runnable

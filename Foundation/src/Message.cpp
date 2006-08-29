@@ -1,7 +1,7 @@
 //
 // Message.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Message.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Message.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,20 +34,20 @@
 //
 
 
-#include "Foundation/Message.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Process.h"
-#include "Foundation/Thread.h"
+#include "Poco/Message.h"
+#include "Poco/Exception.h"
+#include "Poco/Process.h"
+#include "Poco/Thread.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Message::Message(): 
 	_prio(PRIO_FATAL), 
-	_pMap(0), 
 	_tid(0), 
-	_pid(0)
+	_pid(0),
+	_pMap(0) 
 {
 	init();
 }
@@ -57,9 +57,9 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 	_source(source), 
 	_text(text), 
 	_prio(prio), 
-	_pMap(0), 
 	_tid(0),
-	_pid(0)
+	_pid(0),
+	_pMap(0) 
 {
 	init();
 }
@@ -199,4 +199,4 @@ std::string& Message::operator [] (const std::string& param)
 }
 
 
-Foundation_END
+} // namespace Poco

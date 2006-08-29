@@ -1,7 +1,7 @@
 //
 // DOMImplementation.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DOMImplementation.cpp#2 $
+// $Id: //poco/1.2/XML/src/DOMImplementation.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,15 +34,16 @@
 //
 
 
-#include "DOM/DOMImplementation.h"
-#include "DOM/DocumentType.h"
-#include "DOM/Document.h"
-#include "DOM/Element.h"
-#include "Foundation/String.h"
-#include "Foundation/SingletonHolder.h"
+#include "Poco/DOM/DOMImplementation.h"
+#include "Poco/DOM/DocumentType.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/String.h"
+#include "Poco/SingletonHolder.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString DOMImplementation::FEATURE_XML            = toXMLString("xml");
@@ -64,7 +65,7 @@ DOMImplementation::~DOMImplementation()
 
 bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& version) const
 {
-	XMLString lcFeature = Foundation::toLower(feature);
+	XMLString lcFeature = Poco::toLower(feature);
 	return lcFeature == FEATURE_XML && version == "1.0" ||
 	       lcFeature == FEATURE_CORE && version == "2.0" ||
 	       lcFeature == FEATURE_EVENTS && version == "2.0" ||
@@ -92,9 +93,9 @@ Document* DOMImplementation::createDocument(const XMLString& namespaceURI, const
 
 const DOMImplementation& DOMImplementation::instance()
 {
-	static Foundation::SingletonHolder<DOMImplementation> sh;
+	static Poco::SingletonHolder<DOMImplementation> sh;
 	return *sh.get();
 }
 
 
-XML_END
+} } // namespace Poco::XML

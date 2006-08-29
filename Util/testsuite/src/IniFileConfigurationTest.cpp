@@ -1,7 +1,7 @@
 //
 // IniFileConfigurationTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/IniFileConfigurationTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/IniFileConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,18 +33,18 @@
 #include "IniFileConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/IniFileConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/IniFileConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include <sstream>
 #include <algorithm>
 
 
-using Util::IniFileConfiguration;
-using Util::AbstractConfiguration;
-using Foundation::AutoPtr;
-using Foundation::NotImplementedException;
-using Foundation::NotFoundException;
+using Poco::Util::IniFileConfiguration;
+using Poco::Util::AbstractConfiguration;
+using Poco::AutoPtr;
+using Poco::NotImplementedException;
+using Poco::NotFoundException;
 
 
 IniFileConfigurationTest::IniFileConfigurationTest(const std::string& name): CppUnit::TestCase(name)

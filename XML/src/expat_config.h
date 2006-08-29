@@ -1,7 +1,7 @@
 //
 // expat_config.h
 //
-// $Id: //poco/1.1.0/XML/src/expat_config.h#2 $
+// $Id: //poco/1.2/XML/src/expat_config.h#1 $
 //
 // Poco XML specific configuration for expat.
 //
@@ -36,9 +36,7 @@
 #define EXPAT_CONFIG_H
 
 
-#ifndef Foundation_Platform_INCLUDED
-#include "Foundation/Platform.h"
-#endif
+#include "Poco/Platform.h"
 
 
 #include <memory.h>

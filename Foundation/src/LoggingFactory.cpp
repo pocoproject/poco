@@ -1,7 +1,7 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/LoggingFactory.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/LoggingFactory.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,27 +34,27 @@
 //
 
 
-#include "Foundation/LoggingFactory.h"
-#include "Foundation/SingletonHolder.h"
-#include "Foundation/AsyncChannel.h"
-#include "Foundation/ConsoleChannel.h"
-#include "Foundation/FileChannel.h"
-#include "Foundation/FormattingChannel.h"
-#include "Foundation/SplitterChannel.h"
-#include "Foundation/NullChannel.h"
+#include "Poco/LoggingFactory.h"
+#include "Poco/SingletonHolder.h"
+#include "Poco/AsyncChannel.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/FileChannel.h"
+#include "Poco/FormattingChannel.h"
+#include "Poco/SplitterChannel.h"
+#include "Poco/NullChannel.h"
 #if defined(POCO_OS_FAMILY_UNIX)
-#include "Foundation/SyslogChannel.h"
+#include "Poco/SyslogChannel.h"
 #endif
 #if defined(POCO_OS_FAMILY_VMS)
-#include "Foundation/OpcomChannel.h"
+#include "Poco/OpcomChannel.h"
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#include "Foundation/EventLogChannel.h"
+#include "Poco/EventLogChannel.h"
 #endif
-#include "Foundation/PatternFormatter.h"
+#include "Poco/PatternFormatter.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 LoggingFactory::LoggingFactory()
@@ -122,4 +122,4 @@ void LoggingFactory::registerBuiltins()
 }
 
 
-Foundation_END
+} // namespace Poco

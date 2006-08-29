@@ -1,7 +1,7 @@
 //
 // PriorityEventTest.h
 //
-// $Id: $
+// $Id: //poco/1.2/Foundation/testsuite/src/PriorityEventTest.h#1 $
 //
 // Definition of the PriorityEventTest class.
 //
@@ -31,28 +31,25 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #ifndef PriorityEventTest_INCLUDED
 #define PriorityEventTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
+#include "Poco/PriorityEvent.h"
+#include "Poco/EventArgs.h"
 
-#include "Foundation/PriorityEvent.h"
-#include "Foundation/EventArgs.h"
 
 class PriorityEventTest: public CppUnit::TestCase
 {
-	Foundation::PriorityEvent<int> Simple;
-	Foundation::PriorityEvent<const int> ConstSimple;
-	Foundation::PriorityEvent<Foundation::EventArgs*> Complex;
-	Foundation::PriorityEvent<Foundation::EventArgs> Complex2;
-	Foundation::PriorityEvent<const Foundation::EventArgs*> ConstComplex;
-	Foundation::PriorityEvent<const Foundation::EventArgs * const> Const2Complex;
+	Poco::PriorityEvent<int> Simple;
+	Poco::PriorityEvent<const int> ConstSimple;
+	Poco::PriorityEvent<Poco::EventArgs*> Complex;
+	Poco::PriorityEvent<Poco::EventArgs> Complex2;
+	Poco::PriorityEvent<const Poco::EventArgs*> ConstComplex;
+	Poco::PriorityEvent<const Poco::EventArgs * const> Const2Complex;
 public:
 	PriorityEventTest(const std::string& name);
 	~PriorityEventTest();
@@ -79,10 +76,10 @@ protected:
 	void onSimple ( const void* pSender, int& i );
 	void onSimpleOther ( const void* pSender, int& i );
 	void onConstSimple ( const void* pSender, const int& i );
-	void onComplex ( const void* pSender, Foundation::EventArgs* & i );
-	void onComplex2 ( const void* pSender, Foundation::EventArgs & i );
-	void onConstComplex ( const void* pSender, const Foundation::EventArgs*& i );
-	void onConst2Complex ( const void* pSender, const Foundation::EventArgs * const & i );
+	void onComplex ( const void* pSender, Poco::EventArgs* & i );
+	void onComplex2 ( const void* pSender, Poco::EventArgs & i );
+	void onConstComplex ( const void* pSender, const Poco::EventArgs*& i );
+	void onConst2Complex ( const void* pSender, const Poco::EventArgs * const & i );
 	void onAsync ( const void* pSender, int& i );
 
 	int getCount () const;

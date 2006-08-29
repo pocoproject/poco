@@ -1,7 +1,7 @@
 //
 // ConfigurationMapper.cpp
 //
-// $Id: //poco/1.1.0/Util/src/ConfigurationMapper.cpp#2 $
+// $Id: //poco/1.2/Util/src/ConfigurationMapper.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,10 +34,11 @@
 //
 
 
-#include "Util/ConfigurationMapper.h"
+#include "Poco/Util/ConfigurationMapper.h"
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration* pConfig):
@@ -112,4 +113,4 @@ std::string ConfigurationMapper::translateKey(const std::string& key) const
 }
 
 
-Util_END
+} } // namespace Poco::Util

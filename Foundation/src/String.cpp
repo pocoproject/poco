@@ -1,7 +1,7 @@
 //
 // String.h
 //
-// $Id: //poco/1.1.0/Foundation/src/String.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/String.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/String.h"
+#include "Poco/String.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 #if defined(POCO_NO_TEMPLATE_ICOMPARE)
@@ -155,4 +155,4 @@ int icompare(const std::string& str, const std::string::value_type* ptr)
 #endif
 
 
-Foundation_END
+} // namespace Poco

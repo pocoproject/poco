@@ -1,7 +1,7 @@
 //
 // FilesystemTestSuite.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/FilesystemTestSuite.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/FilesystemTestSuite.h#1 $
 //
 // Definition of the FilesystemTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define FilesystemTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class FilesystemTestSuite

@@ -1,7 +1,7 @@
 //
 // DocumentEvent.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DocumentEvent.cpp#2 $
+// $Id: //poco/1.2/XML/src/DocumentEvent.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/DocumentEvent.h"
+#include "Poco/DOM/DocumentEvent.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 DocumentEvent::~DocumentEvent()
@@ -45,4 +46,4 @@ DocumentEvent::~DocumentEvent()
 }
 
 
-XML_END
+} } // namespace Poco::XML

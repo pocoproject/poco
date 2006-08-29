@@ -1,7 +1,7 @@
 //
 // Latin9Encoding.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Latin9Encoding.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Latin9Encoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Latin9Encoding.h"
+#include "Poco/Latin9Encoding.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const TextEncoding::CharacterMap Latin9Encoding::_charMap = 
@@ -105,4 +105,4 @@ int Latin9Encoding::convert(int ch, unsigned char* bytes, int length) const
 }
 
 
-Foundation_END
+} // namespace Poco

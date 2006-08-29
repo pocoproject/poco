@@ -1,7 +1,7 @@
 //
 // httpget.cpp
 //
-// $Id: //poco/1.1.0/Net/samples/httpget/src/httpget.cpp#2 $
+// $Id: //poco/1.2/Net/samples/httpget/src/httpget.cpp#1 $
 //
 // This sample demonstrates the HTTPClientSession class.
 //
@@ -32,24 +32,24 @@
 //
 
 
-#include "Net/HTTPClientSession.h"
-#include "Net/HTTPRequest.h"
-#include "Net/HTTPResponse.h"
-#include "Foundation/StreamCopier.h"
-#include "Foundation/Path.h"
-#include "Foundation/URI.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Path.h"
+#include "Poco/URI.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-using Net::HTTPClientSession;
-using Net::HTTPRequest;
-using Net::HTTPResponse;
-using Net::HTTPMessage;
-using Foundation::StreamCopier;
-using Foundation::Path;
-using Foundation::URI;
-using Foundation::Exception;
+using Poco::Net::HTTPClientSession;
+using Poco::Net::HTTPRequest;
+using Poco::Net::HTTPResponse;
+using Poco::Net::HTTPMessage;
+using Poco::StreamCopier;
+using Poco::Path;
+using Poco::URI;
+using Poco::Exception;
 
 
 int main(int argc, char** argv)

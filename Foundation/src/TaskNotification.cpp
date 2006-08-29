@@ -1,7 +1,7 @@
 //
 // TaskNotification.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/TaskNotification.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/TaskNotification.cpp#1 $
 //
 // Library: Foundation
 // Package: Tasks
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/TaskNotification.h"
+#include "Poco/TaskNotification.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 TaskNotification::TaskNotification(Task* pTask):
@@ -111,4 +111,4 @@ TaskProgressNotification::~TaskProgressNotification()
 }
 
 
-Foundation_END
+} // namespace Poco

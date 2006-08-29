@@ -1,7 +1,7 @@
 //
 // PriorityEventTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/PriorityEventTest.cpp#5 $
+// $Id: //poco/1.2/Foundation/testsuite/src/PriorityEventTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,13 +34,14 @@
 #include "DummyDelegate.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/PriorityDelegate.h"
+#include "Poco/PriorityExpire.h"
+#include "Poco/Thread.h"
+#include "Poco/Exception.h"
 
-#include "Foundation/PriorityDelegate.h"
-#include "Foundation/PriorityExpire.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Exception.h"
 
-using namespace Foundation;
+using namespace Poco;
+
 
 #define LARGEINC 100
 
@@ -75,24 +76,24 @@ void PriorityEventTest::testNoDelegate()
 	
 	//Note: passing &args will not work due to &
 	EventArgs* pArgs = &args;
-	Complex += PriorityDelegate < PriorityEventTest, Foundation::EventArgs* > (this, &PriorityEventTest::onComplex, 0);
-	Complex -= PriorityDelegate < PriorityEventTest, Foundation::EventArgs* > (this, &PriorityEventTest::onComplex, 0);
+	Complex += PriorityDelegate < PriorityEventTest, Poco::EventArgs* > (this, &PriorityEventTest::onComplex, 0);
+	Complex -= PriorityDelegate < PriorityEventTest, Poco::EventArgs* > (this, &PriorityEventTest::onComplex, 0);
 	Complex.notify ( this, pArgs );
 	poco_assert ( _count == 0 );
 
-	Complex2 += PriorityDelegate < PriorityEventTest, Foundation::EventArgs > (this, &PriorityEventTest::onComplex2, 0);
-	Complex2 -= PriorityDelegate < PriorityEventTest, Foundation::EventArgs > (this, &PriorityEventTest::onComplex2, 0);
+	Complex2 += PriorityDelegate < PriorityEventTest, Poco::EventArgs > (this, &PriorityEventTest::onComplex2, 0);
+	Complex2 -= PriorityDelegate < PriorityEventTest, Poco::EventArgs > (this, &PriorityEventTest::onComplex2, 0);
 	Complex2.notify ( this, args );
 	poco_assert ( _count == 0 );
 
 	const EventArgs* pCArgs = &args;
-	ConstComplex += PriorityDelegate < PriorityEventTest, const Foundation::EventArgs* > (this, &PriorityEventTest::onConstComplex, 0);
-	ConstComplex -= PriorityDelegate < PriorityEventTest, const Foundation::EventArgs* > (this, &PriorityEventTest::onConstComplex, 0);
+	ConstComplex += PriorityDelegate < PriorityEventTest, const Poco::EventArgs* > (this, &PriorityEventTest::onConstComplex, 0);
+	ConstComplex -= PriorityDelegate < PriorityEventTest, const Poco::EventArgs* > (this, &PriorityEventTest::onConstComplex, 0);
 	ConstComplex.notify ( this, pCArgs );
 	poco_assert ( _count == 0 );
 
-	Const2Complex += PriorityDelegate < PriorityEventTest, const Foundation::EventArgs* const > (this, &PriorityEventTest::onConst2Complex, 0);
-	Const2Complex -= PriorityDelegate < PriorityEventTest, const Foundation::EventArgs* const > (this, &PriorityEventTest::onConst2Complex, 0);
+	Const2Complex += PriorityDelegate < PriorityEventTest, const Poco::EventArgs* const > (this, &PriorityEventTest::onConst2Complex, 0);
+	Const2Complex -= PriorityDelegate < PriorityEventTest, const Poco::EventArgs* const > (this, &PriorityEventTest::onConst2Complex, 0);
 	Const2Complex.notify ( this, pArgs );
 	poco_assert ( _count == 0 );
 }
@@ -116,24 +117,24 @@ void PriorityEventTest::testSingleDelegate()
 	poco_assert ( _count == 2 );
 	
 	EventArgs* pArgs = &args;
-	Complex += PriorityDelegate < PriorityEventTest, Foundation::EventArgs* > (this, &PriorityEventTest::onComplex, 0);
-	Complex -= PriorityDelegate < PriorityEventTest, Foundation::EventArgs* > (this, &PriorityEventTest::onComplex, 3);
+	Complex += PriorityDelegate < PriorityEventTest, Poco::EventArgs* > (this, &PriorityEventTest::onComplex, 0);
+	Complex -= PriorityDelegate < PriorityEventTest, Poco::EventArgs* > (this, &PriorityEventTest::onComplex, 3);
 	Complex.notify ( this, pArgs );
 	poco_assert ( _count == 3 );
 
-	Complex2 += PriorityDelegate < PriorityEventTest, Foundation::EventArgs > (this, &PriorityEventTest::onComplex2, 0);
-	Complex2 -= PriorityDelegate < PriorityEventTest, Foundation::EventArgs > (this, &PriorityEventTest::onComplex2, 3);
+	Complex2 += PriorityDelegate < PriorityEventTest, Poco::EventArgs > (this, &PriorityEventTest::onComplex2, 0);
+	Complex2 -= PriorityDelegate < PriorityEventTest, Poco::EventArgs > (this, &PriorityEventTest::onComplex2, 3);
 	Complex2.notify ( this, args );
 	poco_assert ( _count == 4 );
 
 	const EventArgs* pCArgs = &args;
-	ConstComplex += PriorityDelegate < PriorityEventTest, const Foundation::EventArgs* > (this, &PriorityEventTest::onConstComplex, 0);
-	ConstComplex -= PriorityDelegate < PriorityEventTest, const Foundation::EventArgs* > (this, &PriorityEventTest::onConstComplex, 3);
+	ConstComplex += PriorityDelegate < PriorityEventTest, const Poco::EventArgs* > (this, &PriorityEventTest::onConstComplex, 0);
+	ConstComplex -= PriorityDelegate < PriorityEventTest, const Poco::EventArgs* > (this, &PriorityEventTest::onConstComplex, 3);
 	ConstComplex.notify ( this, pCArgs );
 	poco_assert ( _count == 5 );
 
-	Const2Complex += PriorityDelegate < PriorityEventTest, const Foundation::EventArgs* const > (this, &PriorityEventTest::onConst2Complex, 0);
-	Const2Complex -= PriorityDelegate < PriorityEventTest, const Foundation::EventArgs* const > (this, &PriorityEventTest::onConst2Complex, 3);
+	Const2Complex += PriorityDelegate < PriorityEventTest, const Poco::EventArgs* const > (this, &PriorityEventTest::onConst2Complex, 0);
+	Const2Complex -= PriorityDelegate < PriorityEventTest, const Poco::EventArgs* const > (this, &PriorityEventTest::onConst2Complex, 3);
 	Const2Complex.notify ( this, pArgs );
 	poco_assert ( _count == 6 );
 	// check if 2nd notify also works
@@ -239,7 +240,7 @@ void PriorityEventTest::testPriorityOrder ()
 		Simple.notify ( this, tmp );
 		failmsg ("Notify should not work");
 	}
-	catch ( Foundation::InvalidArgumentException& )
+	catch ( Poco::InvalidArgumentException& )
 	{
 	}
 
@@ -291,7 +292,7 @@ void PriorityEventTest::testPriorityOrderExpire ()
 		Simple.notify ( this, tmp );
 		failmsg ("Notify should not work");
 	}
-	catch ( Foundation::InvalidArgumentException& )
+	catch ( Poco::InvalidArgumentException& )
 	{
 	}
 
@@ -309,7 +310,7 @@ void PriorityEventTest::testExpire ()
 	Simple += PriorityExpire < int > (PriorityDelegate < PriorityEventTest, int > (this, &PriorityEventTest::onSimple, 1), 500 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 1 );
-	Foundation::Thread::sleep ( 700 );
+	Poco::Thread::sleep ( 700 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 1 );
 	Simple -= PriorityExpire < int > (PriorityDelegate < PriorityEventTest, int > (this, &PriorityEventTest::onSimple, 1), 500 );
@@ -325,15 +326,15 @@ void PriorityEventTest::testExpireReRegister()
 	Simple += PriorityExpire < int > (PriorityDelegate < PriorityEventTest, int > (this, &PriorityEventTest::onSimple, 1), 500 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 1 );
-	Foundation::Thread::sleep ( 200 );
+	Poco::Thread::sleep ( 200 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 2 );
 	// renew registration
 	Simple += PriorityExpire < int > (PriorityDelegate < PriorityEventTest, int > (this, &PriorityEventTest::onSimple, 1), 600 );
-	Foundation::Thread::sleep( 400 );
+	Poco::Thread::sleep( 400 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 3 );
-	Foundation::Thread::sleep( 300 );
+	Poco::Thread::sleep( 300 );
 	Simple.notify ( this, tmp );
 	poco_assert ( _count == 3 );
 }
@@ -368,11 +369,11 @@ void PriorityEventTest::testOverwriteDelegate ()
 
 void PriorityEventTest::testAsyncNotify ()
 {
-	Foundation::PriorityEvent < int >* pSimple= new Foundation::PriorityEvent < int >();
+	Poco::PriorityEvent < int >* pSimple= new Poco::PriorityEvent < int >();
 	(*pSimple) += PriorityDelegate < PriorityEventTest, int > (this, &PriorityEventTest::onAsync, 0);
 	poco_assert ( _count == 0 );
 	int tmp = 0;
-	Foundation::ActiveResult < int > retArg = pSimple->notifyAsync ( this, tmp );
+	Poco::ActiveResult < int > retArg = pSimple->notifyAsync ( this, tmp );
 	delete pSimple; // must work even when the event got deleted!
 	pSimple = NULL;
 	poco_assert ( _count == 0 );
@@ -397,29 +398,29 @@ void PriorityEventTest::onConstSimple ( const void* pSender, const int& i )
 	_count++;
 }
 
-void PriorityEventTest::onComplex ( const void* pSender, Foundation::EventArgs* & i )
+void PriorityEventTest::onComplex ( const void* pSender, Poco::EventArgs* & i )
 {
 	_count++;
 }
 
-void PriorityEventTest::onComplex2 ( const void* pSender, Foundation::EventArgs & i )
+void PriorityEventTest::onComplex2 ( const void* pSender, Poco::EventArgs & i )
 {
 	_count++;
 }
 
-void PriorityEventTest::onConstComplex ( const void* pSender, const Foundation::EventArgs*& i )
+void PriorityEventTest::onConstComplex ( const void* pSender, const Poco::EventArgs*& i )
 {
 	_count++;
 }
 
-void PriorityEventTest::onConst2Complex ( const void* pSender, const Foundation::EventArgs * const & i )
+void PriorityEventTest::onConst2Complex ( const void* pSender, const Poco::EventArgs * const & i )
 {
 	_count++;
 }
 
 void PriorityEventTest::onAsync ( const void* pSender, int& i )
 {
-	Foundation::Thread::sleep ( 700 );
+	Poco::Thread::sleep ( 700 );
 	_count += LARGEINC ;
 }
 

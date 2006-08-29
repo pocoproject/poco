@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.1.0/Net/src/NetworkInterface.cpp#3 $
+// $Id: //poco/1.2/Net/src/NetworkInterface.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,18 +34,19 @@
 //
 
 
-#include "Net/NetworkInterface.h"
-#include "Net/DatagramSocket.h"
-#include "Net/NetException.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/NetworkInterface.h"
+#include "Poco/Net/DatagramSocket.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/NumberFormatter.h"
 #include <string.h>
 
 
-using Foundation::NumberFormatter;
-using Foundation::FastMutex;
+using Poco::NumberFormatter;
+using Poco::FastMutex;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 FastMutex NetworkInterface::_mutex;
@@ -66,9 +67,9 @@ NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& add
 
 
 NetworkInterface::NetworkInterface(const NetworkInterface& interface):
-	_index(interface._index),
 	_name(interface._name),
-	_address(interface._address)
+	_address(interface._address),
+	_index(interface._index)
 {
 }
 
@@ -82,9 +83,9 @@ NetworkInterface& NetworkInterface::operator = (const NetworkInterface& interfac
 {
 	if (&interface != this)
 	{
-		_index   = interface._index;
 		_name    = interface._name;
 		_address = interface._address;
+		_index   = interface._index;
 	}
 	return *this;
 }
@@ -154,7 +155,7 @@ NetworkInterface NetworkInterface::forIndex(int i)
 }
 
 
-Foundation_END
+} } // namespace Poco::Net
 
 
 //
@@ -169,7 +170,8 @@ Foundation_END
 #include <iphlpapi.h>
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 	
 NetworkInterface::NetworkInterfaceList NetworkInterface::list()
@@ -212,13 +214,15 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 		}
 		else throw NetException("cannot get network adapter list");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 		delete [] reinterpret_cast<char*>(pAdapterAddresses);
 		throw;
 	}
 	delete [] reinterpret_cast<char*>(pAdapterAddresses);
 #else
+	// Add loopback interface (not returned by GetAdaptersInfo)
+	result.push_back(NetworkInterface("Loopback", IPAddress("127.0.0.1"), -1));
 	// On Windows 2000 we use GetAdaptersInfo.
 	PIP_ADAPTER_INFO pAdapterInfo;
 	PIP_ADAPTER_INFO pAdapter = 0;
@@ -250,7 +254,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 		}
 		else throw NetException("cannot get network adapter list");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 		delete [] reinterpret_cast<char*>(pAdapterInfo);
 		throw;
@@ -262,7 +266,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 }
 
 
-Net_END
+} } // namespace Poco::Net
 
 
 #elif defined(POCO_OS_FAMILY_BSD) || POCO_OS == POCO_OS_QNX
@@ -275,7 +279,8 @@ Net_END
 #include <net/if_dl.h>
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 NetworkInterface::NetworkInterfaceList NetworkInterface::list()
@@ -310,7 +315,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 }
 
 
-Net_END
+} } // namespace Poco::Net
 
 
 #elif POCO_OS == POCO_OS_LINUX
@@ -319,7 +324,8 @@ Net_END
 //
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 NetworkInterface::NetworkInterfaceList NetworkInterface::list()
@@ -396,7 +402,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 }
 
 
-Net_END
+} } // namespace Poco::Net
 
 
 #else
@@ -405,7 +411,8 @@ Net_END
 //
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 NetworkInterface::NetworkInterfaceList NetworkInterface::list()
@@ -491,7 +498,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 }
 
 
-Net_END
+} } // namespace Poco::Net
 
 
 #endif

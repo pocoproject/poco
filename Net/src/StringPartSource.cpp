@@ -1,7 +1,7 @@
 //
 // StringPartSource.cpp
 //
-// $Id: //poco/1.1.0/Net/src/StringPartSource.cpp#2 $
+// $Id: //poco/1.2/Net/src/StringPartSource.cpp#1 $
 //
 // Library: Net
 // Package: Messages
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/StringPartSource.h"
+#include "Poco/Net/StringPartSource.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 StringPartSource::StringPartSource(const std::string& str):
@@ -79,4 +80,4 @@ const std::string& StringPartSource::filename()
 }
 
 
-Net_END
+} } // namespace Poco::Net

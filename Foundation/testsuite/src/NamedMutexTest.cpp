@@ -1,7 +1,7 @@
 //
 // NamedMutexTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/NamedMutexTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NamedMutexTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,16 +33,16 @@
 #include "NamedMutexTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/NamedMutex.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Runnable.h"
-#include "Foundation/Timestamp.h"
+#include "Poco/NamedMutex.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Timestamp.h"
 
 
-using Foundation::NamedMutex;
-using Foundation::Thread;
-using Foundation::Runnable;
-using Foundation::Timestamp;
+using Poco::NamedMutex;
+using Poco::Thread;
+using Poco::Runnable;
+using Poco::Timestamp;
 
 
 static NamedMutex testMutex("TestMutex");

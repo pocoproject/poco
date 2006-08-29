@@ -1,7 +1,7 @@
 //
 // DateTimeFormat.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DateTimeFormat.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DateTimeFormat.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/DateTimeFormat.h"
+#include "Poco/DateTimeFormat.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const std::string DateTimeFormat::ISO8601_FORMAT  = "%Y-%m-%dT%H:%M:%S%z";
@@ -79,4 +79,4 @@ const std::string DateTimeFormat::MONTH_NAMES[] =
 };
 
 
-Foundation_END
+} // namespace Poco

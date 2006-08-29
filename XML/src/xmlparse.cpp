@@ -18,7 +18,7 @@
 #include "expat_config.h"
 #endif /* ndef COMPILED_FROM_DSP */
 
-#include "XML/expat.h"
+#include "Poco/XML/expat.h"
 
 #ifdef XML_UNICODE
 #define XML_ENCODE_MAX XML_UTF16_ENCODE_MAX

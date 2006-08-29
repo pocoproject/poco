@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DirectoryIterator_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DirectoryIterator_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/DirectoryIterator_UNIX.h"
-#include "Foundation/File_UNIX.h"
-#include "Foundation/Path.h"
+#include "Poco/DirectoryIterator_UNIX.h"
+#include "Poco/File_UNIX.h"
+#include "Poco/Path.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _pDir(0), _rc(1)
@@ -75,4 +75,4 @@ const std::string& DirectoryIteratorImpl::next()
 }
 
 
-Foundation_END
+} // namespace Poco

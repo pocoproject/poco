@@ -1,7 +1,7 @@
 //
 // CoreTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/CoreTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/CoreTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "CoreTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Bugcheck.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Environment.h"
-#include "Foundation/Thread.h"
+#include "Poco/Bugcheck.h"
+#include "Poco/Exception.h"
+#include "Poco/Environment.h"
+#include "Poco/Thread.h"
 #include <iostream>
 
 
-using Foundation::Bugcheck;
-using Foundation::Exception;
-using Foundation::Environment;
-using Foundation::Thread;
+using Poco::Bugcheck;
+using Poco::Exception;
+using Poco::Environment;
+using Poco::Thread;
 
 
 //
@@ -72,18 +72,18 @@ void CoreTest::testPlatform()
 
 void CoreTest::testFixedLength()
 {
-	assert (sizeof(Foundation::Int8) == 1);
-	assert (sizeof(Foundation::UInt8) == 1);
-	assert (sizeof(Foundation::Int16) == 2);
-	assert (sizeof(Foundation::UInt16) == 2);
-	assert (sizeof(Foundation::Int32) == 4);
-	assert (sizeof(Foundation::UInt32) == 4);
+	assert (sizeof(Poco::Int8) == 1);
+	assert (sizeof(Poco::UInt8) == 1);
+	assert (sizeof(Poco::Int16) == 2);
+	assert (sizeof(Poco::UInt16) == 2);
+	assert (sizeof(Poco::Int32) == 4);
+	assert (sizeof(Poco::UInt32) == 4);
 	#if defined(POCO_HAVE_INT64)
-	assert (sizeof(Foundation::Int64) == 8);
-	assert (sizeof(Foundation::UInt64) == 8);
+	assert (sizeof(Poco::Int64) == 8);
+	assert (sizeof(Poco::UInt64) == 8);
 	#endif
-	assert (sizeof(Foundation::IntPtr) == sizeof(void*));
-	assert (sizeof(Foundation::UIntPtr) == sizeof(void*));	
+	assert (sizeof(Poco::IntPtr) == sizeof(void*));
+	assert (sizeof(Poco::UIntPtr) == sizeof(void*));	
 }
 
 

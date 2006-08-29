@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/XML/Makefile#1 $
+# $Id: //poco/1.2/XML/Makefile#1 $
 #
 # Makefile for Poco XML
 #
@@ -23,9 +23,9 @@ objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 	ParserEngine ProcessingInstruction SAXException SAXParser Text \
 	TreeWalker WhitespaceFilter XMLException XMLFilter XMLFilterImpl XMLReader \
 	XMLString XMLWriter xmlparse xmlrole xmltok
-	
+
 target         = PocoXML
-target_version = 1
+target_version = $(LIBVERSION)
 target_libs    = PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

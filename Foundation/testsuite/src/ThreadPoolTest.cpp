@@ -1,7 +1,7 @@
 //
 // ThreadPoolTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ThreadPoolTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ThreadPoolTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,15 +33,15 @@
 #include "ThreadPoolTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/ThreadPool.h"
-#include "Foundation/RunnableAdapter.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Thread.h"
+#include "Poco/ThreadPool.h"
+#include "Poco/RunnableAdapter.h"
+#include "Poco/Exception.h"
+#include "Poco/Thread.h"
 
 
-using Foundation::ThreadPool;
-using Foundation::RunnableAdapter;
-using Foundation::Thread;
+using Poco::ThreadPool;
+using Poco::RunnableAdapter;
+using Poco::Thread;
 
 
 ThreadPoolTest::ThreadPoolTest(const std::string& name): CppUnit::TestCase(name), _event(false)
@@ -98,7 +98,7 @@ void ThreadPoolTest::testThreadPool()
 		pool.start(ra);
 		failmsg("thread pool exhausted - must throw exception");
 	}	
-	catch (Foundation::NoThreadAvailableException&)
+	catch (Poco::NoThreadAvailableException&)
 	{
 	}
 	catch (...)

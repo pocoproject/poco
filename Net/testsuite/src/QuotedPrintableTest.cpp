@@ -1,7 +1,7 @@
 //
 // QuotedPrintableTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/QuotedPrintableTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/QuotedPrintableTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,13 +33,13 @@
 #include "QuotedPrintableTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/QuotedPrintableEncoder.h"
-#include "Net/QuotedPrintableDecoder.h"
+#include "Poco/Net/QuotedPrintableEncoder.h"
+#include "Poco/Net/QuotedPrintableDecoder.h"
 #include <sstream>
 
 
-using Net::QuotedPrintableEncoder;
-using Net::QuotedPrintableDecoder;
+using Poco::Net::QuotedPrintableEncoder;
+using Poco::Net::QuotedPrintableDecoder;
 
 
 QuotedPrintableTest::QuotedPrintableTest(const std::string& name): CppUnit::TestCase(name)

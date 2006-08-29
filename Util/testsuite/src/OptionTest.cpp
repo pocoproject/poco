@@ -1,7 +1,7 @@
 //
 // OptionTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/OptionTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/OptionTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "OptionTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/Option.h"
-#include "Util/OptionException.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionException.h"
 
 
-using Util::Option;
+using Poco::Util::Option;
 
 
 OptionTest::OptionTest(const std::string& name): CppUnit::TestCase(name)
@@ -183,7 +183,7 @@ void OptionTest::testProcess1()
 		incOpt.process("I", arg);
 		fail("argument required - must throw");
 	}
-	catch (Util::MissingArgumentException&)
+	catch (Poco::Util::MissingArgumentException&)
 	{
 	}
 
@@ -192,7 +192,7 @@ void OptionTest::testProcess1()
 		incOpt.process("Include", arg);
 		fail("argument required - must throw");
 	}
-	catch (Util::MissingArgumentException&)
+	catch (Poco::Util::MissingArgumentException&)
 	{
 	}
 	
@@ -201,7 +201,7 @@ void OptionTest::testProcess1()
 		incOpt.process("Llib", arg);
 		fail("wrong option - must throw");
 	}
-	catch (Util::UnknownOptionException&)
+	catch (Poco::Util::UnknownOptionException&)
 	{
 	}
 	
@@ -220,7 +220,7 @@ void OptionTest::testProcess1()
 		vrbOpt.process("v2", arg);
 		fail("no argument expected - must throw");
 	}
-	catch (Util::UnexpectedArgumentException&)
+	catch (Poco::Util::UnexpectedArgumentException&)
 	{
 	}
 
@@ -229,7 +229,7 @@ void OptionTest::testProcess1()
 		vrbOpt.process("verbose:2", arg);
 		fail("no argument expected - must throw");
 	}
-	catch (Util::UnexpectedArgumentException&)
+	catch (Poco::Util::UnexpectedArgumentException&)
 	{
 	}
 	
@@ -276,7 +276,7 @@ void OptionTest::testProcess2()
 		incOpt.process("Iinclude", arg);
 		fail("unknown option - must throw");
 	}
-	catch (Util::UnknownOptionException&)
+	catch (Poco::Util::UnknownOptionException&)
 	{
 	}
 	
@@ -285,7 +285,7 @@ void OptionTest::testProcess2()
 		incOpt.process("I", arg);
 		fail("argument required - must throw");
 	}
-	catch (Util::MissingArgumentException&)
+	catch (Poco::Util::MissingArgumentException&)
 	{
 	}
 
@@ -294,7 +294,7 @@ void OptionTest::testProcess2()
 		incOpt.process("Include", arg);
 		fail("argument required - must throw");
 	}
-	catch (Util::MissingArgumentException&)
+	catch (Poco::Util::MissingArgumentException&)
 	{
 	}
 	
@@ -303,7 +303,7 @@ void OptionTest::testProcess2()
 		incOpt.process("Llib", arg);
 		fail("wrong option - must throw");
 	}
-	catch (Util::UnknownOptionException&)
+	catch (Poco::Util::UnknownOptionException&)
 	{
 	}
 	
@@ -322,7 +322,7 @@ void OptionTest::testProcess2()
 		vrbOpt.process("v2", arg);
 		fail("no argument expected - must throw");
 	}
-	catch (Util::UnknownOptionException&)
+	catch (Poco::Util::UnknownOptionException&)
 	{
 	}
 
@@ -331,7 +331,7 @@ void OptionTest::testProcess2()
 		vrbOpt.process("verbose:2", arg);
 		fail("no argument expected - must throw");
 	}
-	catch (Util::UnexpectedArgumentException&)
+	catch (Poco::Util::UnexpectedArgumentException&)
 	{
 	}
 }

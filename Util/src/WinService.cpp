@@ -1,7 +1,7 @@
 //
 // WinService.cpp
 //
-// $Id: //poco/1.1.0/Util/src/WinService.cpp#2 $
+// $Id: //poco/1.2/Util/src/WinService.cpp#1 $
 //
 // Library: Util
 // Package: Windows
@@ -34,18 +34,22 @@
 //
 
 
-#include "Util/WinService.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/WinService.h"
+#include "Poco/Thread.h"
+#include "Poco/Exception.h"
+#if defined(POCO_WIN32_UTF8)
+#include "Poco/UnicodeConverter.h"
+#endif
 
 
-using Foundation::Thread;
-using Foundation::SystemException;
-using Foundation::NotFoundException;
-using Foundation::OutOfMemoryException;
+using Poco::Thread;
+using Poco::SystemException;
+using Poco::NotFoundException;
+using Poco::OutOfMemoryException;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 const int WinService::STARTUP_TIMEOUT = 30000;
@@ -76,7 +80,13 @@ const std::string& WinService::name() const
 std::string WinService::displayName() const
 {
 	LPQUERY_SERVICE_CONFIG pSvcConfig = config();
+#if defined(POCO_WIN32_UTF8)
+	std::wstring udispName(pSvcConfig->lpDisplayName);
+	std::string dispName;
+	Poco::UnicodeConverter::toUTF8(udispName, dispName);
+#else
 	std::string dispName(pSvcConfig->lpDisplayName);
+#endif
 	LocalFree(pSvcConfig);
 	return dispName;
 }
@@ -85,7 +95,13 @@ std::string WinService::displayName() const
 std::string WinService::path() const
 {
 	LPQUERY_SERVICE_CONFIG pSvcConfig = config();
+#if defined(POCO_WIN32_UTF8)
+	std::wstring upath(pSvcConfig->lpBinaryPathName);
+	std::string path;
+	UnicodeConverter::toUTF8(upath, path);
+#else
 	std::string path(pSvcConfig->lpBinaryPathName);
+#endif
 	LocalFree(pSvcConfig);
 	return path;
 }
@@ -94,6 +110,24 @@ std::string WinService::path() const
 void WinService::registerService(const std::string& path, const std::string& displayName)
 {
 	close();
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(_name, uname);
+	std::wstring udisplayName;
+	Poco::UnicodeConverter::toUTF16(displayName, udisplayName);
+	std::wstring upath;
+	Poco::UnicodeConverter::toUTF16(path, upath);
+	_svcHandle = CreateService(
+		_scmHandle,
+		uname.c_str(),
+		udisplayName.c_str(), 
+		SERVICE_ALL_ACCESS,
+		SERVICE_WIN32_OWN_PROCESS,
+		SERVICE_DEMAND_START,
+		SERVICE_ERROR_NORMAL,
+		upath.c_str(),
+		NULL, NULL, NULL, NULL, NULL);
+#else
 	_svcHandle = CreateService(
 		_scmHandle,
 		_name.c_str(),
@@ -104,6 +138,7 @@ void WinService::registerService(const std::string& path, const std::string& dis
 		SERVICE_ERROR_NORMAL,
 		path.c_str(),
 		NULL, NULL, NULL, NULL, NULL);
+#endif
 	if (!_svcHandle)
 		throw SystemException("cannot register service", _name);
 }
@@ -230,7 +265,13 @@ void WinService::open() const
 
 bool WinService::tryOpen() const
 {
+#if defined(POCO_WIN32_UTF8)
+	std::wstring uname;
+	Poco::UnicodeConverter::toUTF16(_name, uname);
+	_svcHandle = OpenService(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
+#else
 	_svcHandle = OpenService(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
+#endif
 	return _svcHandle != 0;
 }
 
@@ -273,4 +314,4 @@ LPQUERY_SERVICE_CONFIG WinService::config() const
 }
 
 
-Util_END
+} } // namespace Poco::Util

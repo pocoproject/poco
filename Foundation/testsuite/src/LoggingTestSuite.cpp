@@ -1,7 +1,7 @@
 //
 // LoggingTestSuite.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/LoggingTestSuite.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/LoggingTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -38,6 +38,7 @@
 #include "SimpleFileChannelTest.h"
 #include "LoggingFactoryTest.h"
 #include "LoggingRegistryTest.h"
+#include "LogStreamTest.h"
 
 
 CppUnit::Test* LoggingTestSuite::suite()
@@ -51,6 +52,7 @@ CppUnit::Test* LoggingTestSuite::suite()
 	pSuite->addTest(SimpleFileChannelTest::suite());
 	pSuite->addTest(LoggingFactoryTest::suite());
 	pSuite->addTest(LoggingRegistryTest::suite());
+	pSuite->addTest(LogStreamTest::suite());
 
 	return pSuite;
 }

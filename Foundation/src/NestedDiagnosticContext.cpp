@@ -1,7 +1,7 @@
 //
 // NestedDiagnosticContext.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NestedDiagnosticContext.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NestedDiagnosticContext.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,12 +34,12 @@
 //
 
 
-#include "Foundation/NestedDiagnosticContext.h"
-#include "Foundation/SingletonHolder.h"
-#include "Foundation/ThreadLocal.h"
+#include "Poco/NestedDiagnosticContext.h"
+#include "Poco/SingletonHolder.h"
+#include "Poco/ThreadLocal.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NestedDiagnosticContext::NestedDiagnosticContext()
@@ -143,4 +143,4 @@ NestedDiagnosticContext& NestedDiagnosticContext::current()
 }
 
 
-Foundation_END
+} // namespace Poco

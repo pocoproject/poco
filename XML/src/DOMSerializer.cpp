@@ -1,7 +1,7 @@
 //
 // DOMSerializer.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DOMSerializer.cpp#2 $
+// $Id: //poco/1.2/XML/src/DOMSerializer.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,30 +34,31 @@
 //
 
 
-#include "DOM/DOMSerializer.h"
-#include "DOM/Document.h"
-#include "DOM/DocumentType.h"
-#include "DOM/DocumentFragment.h"
-#include "DOM/Element.h"
-#include "DOM/Attr.h"
-#include "DOM/Text.h"
-#include "DOM/CDATASection.h"
-#include "DOM/Comment.h"
-#include "DOM/ProcessingInstruction.h"
-#include "DOM/Entity.h"
-#include "DOM/Notation.h"
-#include "DOM/NamedNodeMap.h"
-#include "DOM/AutoPtr.h"
-#include "SAX/EntityResolver.h"
-#include "SAX/DTDHandler.h"
-#include "SAX/ContentHandler.h"
-#include "SAX/LexicalHandler.h"
-#include "SAX/AttributesImpl.h"
-#include "SAX/ErrorHandler.h"
-#include "SAX/SAXException.h"
+#include "Poco/DOM/DOMSerializer.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DocumentType.h"
+#include "Poco/DOM/DocumentFragment.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/CDATASection.h"
+#include "Poco/DOM/Comment.h"
+#include "Poco/DOM/ProcessingInstruction.h"
+#include "Poco/DOM/Entity.h"
+#include "Poco/DOM/Notation.h"
+#include "Poco/DOM/NamedNodeMap.h"
+#include "Poco/DOM/AutoPtr.h"
+#include "Poco/SAX/EntityResolver.h"
+#include "Poco/SAX/DTDHandler.h"
+#include "Poco/SAX/ContentHandler.h"
+#include "Poco/SAX/LexicalHandler.h"
+#include "Poco/SAX/AttributesImpl.h"
+#include "Poco/SAX/ErrorHandler.h"
+#include "Poco/SAX/SAXException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString DOMSerializer::CDATA = toXMLString("CDATA");
@@ -335,4 +336,4 @@ void DOMSerializer::handleEntity(const Entity* pEntity) const
 }
 
 
-XML_END
+} } // namespace Poco::XML

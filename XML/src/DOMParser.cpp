@@ -1,7 +1,7 @@
 //
 // DOMParser.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DOMParser.cpp#2 $
+// $Id: //poco/1.2/XML/src/DOMParser.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,15 +34,16 @@
 //
 
 
-#include "DOM/DOMParser.h"
-#include "DOM/DOMBuilder.h"
-#include "SAX/WhitespaceFilter.h"
-#include "SAX/InputSource.h"
-#include "XML/NamePool.h"
+#include "Poco/DOM/DOMParser.h"
+#include "Poco/DOM/DOMBuilder.h"
+#include "Poco/SAX/WhitespaceFilter.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/XML/NamePool.h"
 #include <sstream>
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString DOMParser::FEATURE_WHITESPACE = toXMLString("http://www.appinf.com/features/no-whitespace-in-element-content");
@@ -74,7 +75,7 @@ const XMLString& DOMParser::getEncoding() const
 }
 
 
-void DOMParser::addEncoding(const XMLString& name, Foundation::TextEncoding* pEncoding)
+void DOMParser::addEncoding(const XMLString& name, Poco::TextEncoding* pEncoding)
 {
 	_saxParser.addEncoding(name, pEncoding);
 }
@@ -150,4 +151,4 @@ void DOMParser::setEntityResolver(EntityResolver* pEntityResolver)
 }
 
 
-XML_END
+} } // namespace Poco::XML

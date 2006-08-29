@@ -1,7 +1,7 @@
 //
 // NumberParser.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NumberParser.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NumberParser.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,8 +34,8 @@
 //
 
 
-#include "Foundation/NumberParser.h"
-#include "Foundation/Exception.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Exception.h"
 #include <stdio.h>
 #include <ctype.h>
 
@@ -49,7 +49,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 int NumberParser::parse(const std::string& s)
@@ -170,4 +170,4 @@ bool NumberParser::tryParseFloat(const std::string& s, double& value)
 }
 
 
-Foundation_END
+} // namespace Poco

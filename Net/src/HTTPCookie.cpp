@@ -1,7 +1,7 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPCookie.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPCookie.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,29 +34,30 @@
 //
 
 
-#include "Net/HTTPCookie.h"
-#include "Net/NameValueCollection.h"
-#include "Foundation/Timestamp.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/DateTimeParser.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/NumberParser.h"
-#include "Foundation/String.h"
+#include "Poco/Net/HTTPCookie.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Timestamp.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeParser.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/String.h"
 
 
-using Foundation::Timestamp;
-using Foundation::DateTime;
-using Foundation::DateTimeFormatter;
-using Foundation::DateTimeFormat;
-using Foundation::DateTimeParser;
-using Foundation::NumberFormatter;
-using Foundation::NumberParser;
-using Foundation::icompare;
+using Poco::Timestamp;
+using Poco::DateTime;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
+using Poco::DateTimeParser;
+using Poco::NumberFormatter;
+using Poco::NumberParser;
+using Poco::icompare;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPCookie::HTTPCookie():
@@ -288,4 +289,4 @@ std::string HTTPCookie::toString() const
 }
 
 
-Net_END
+} } // namespace Poco::Net

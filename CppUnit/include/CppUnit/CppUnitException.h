@@ -1,7 +1,7 @@
 //
 // CppUnitException.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/CppUnitException.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/CppUnitException.h#1 $
 //
 
 
@@ -9,20 +9,12 @@
 #define CppUnit_CppUnitException_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef STD_EXCEPTION_INCLUDED
 #include <exception>
-#define STD_EXCEPTION_INCLUDED
-#endif
-#ifndef STD_STRING_INCLUDED
 #include <string>
-#define STD_STRING_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class CppUnit_API CppUnitException: public std::exception
@@ -33,6 +25,15 @@ public:
 	CppUnitException(const std::string& message = "", 
 	                 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER, 
 	                 const std::string& fileName = CPPUNIT_UNKNOWNFILENAME);
+	CppUnitException(const std::string& message,
+	                 long lineNumber,
+	                 long data1lineNumber,
+	                 const std::string& fileName);
+	CppUnitException(const std::string& message,
+	                 long lineNumber,
+	                 long data1lineNumber,
+	                 long data2lineNumber,
+	                 const std::string& fileName);
 	CppUnitException(const CppUnitException& other);
 	virtual ~CppUnitException() throw();
 
@@ -41,6 +42,8 @@ public:
 	const char* what() const throw ();
 
 	long lineNumber() const;
+	long data1LineNumber() const;
+	long data2LineNumber() const;
 	const std::string& fileName() const;
 
 	static const std::string CPPUNIT_UNKNOWNFILENAME;
@@ -49,18 +52,33 @@ public:
 private:
 	std::string _message;
 	long        _lineNumber;
+	long        _data1lineNumber;
+	long        _data2lineNumber;
 	std::string _fileName;
 };
 
 
 inline CppUnitException::CppUnitException(const CppUnitException& other): exception (other)
 {
-    _message    = other._message;
-    _lineNumber = other._lineNumber;
-    _fileName   = other._fileName;
+    _message         = other._message;
+    _lineNumber      = other._lineNumber;
+    _data1lineNumber = other._data1lineNumber;
+    _data2lineNumber = other._data2lineNumber;
+    _fileName        = other._fileName;
 }
 
-inline CppUnitException::CppUnitException (const std::string& message, long lineNumber, const std::string& fileName): _message(message), _lineNumber(lineNumber), _fileName(fileName)
+
+inline CppUnitException::CppUnitException (const std::string& message, long lineNumber, const std::string& fileName): _message(message), _lineNumber(lineNumber), _data1lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _data2lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _fileName(fileName)
+{
+}
+
+
+inline CppUnitException::CppUnitException (const std::string& message, long lineNumber, long data1lineNumber, const std::string& fileName): _message(message), _lineNumber(lineNumber), _data1lineNumber(data1lineNumber), _data2lineNumber(CPPUNIT_UNKNOWNLINENUMBER), _fileName(fileName)
+{
+}
+
+
+inline CppUnitException::CppUnitException (const std::string& message, long lineNumber, long data1lineNumber, long data2lineNumber, const std::string& fileName): _message(message), _lineNumber(lineNumber), _data1lineNumber(data1lineNumber), _data2lineNumber(data2lineNumber), _fileName(fileName)
 {
 }
 
@@ -78,6 +96,8 @@ inline CppUnitException& CppUnitException::operator = (const CppUnitException& o
     {
         _message    = other._message;
         _lineNumber = other._lineNumber;
+        _data1lineNumber = other._data1lineNumber;
+        _data2lineNumber = other._data2lineNumber;
         _fileName   = other._fileName;
     }
     return *this;
@@ -96,6 +116,18 @@ inline long CppUnitException::lineNumber() const
 }
 
 
+inline long CppUnitException::data1LineNumber() const
+{
+	return _data1lineNumber; 
+}
+
+
+inline long CppUnitException::data2LineNumber() const
+{
+	return _data2lineNumber; 
+}
+
+
 // The file in which the error occurred
 inline const std::string& CppUnitException::fileName() const
 {
@@ -103,8 +135,7 @@ inline const std::string& CppUnitException::fileName() const
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_CppUnitException_INCLUDED
-

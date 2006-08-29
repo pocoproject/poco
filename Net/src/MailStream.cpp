@@ -1,7 +1,7 @@
 //
 // MailStream.cpp
 //
-// $Id: //poco/1.1.0/Net/src/MailStream.cpp#2 $
+// $Id: //poco/1.2/Net/src/MailStream.cpp#1 $
 //
 // Library: Net
 // Package: Mail
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/MailStream.h"
+#include "Poco/Net/MailStream.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 MailStreamBuf::MailStreamBuf(std::istream& istr):
@@ -237,4 +238,4 @@ MailOutputStream::~MailOutputStream()
 }
 
 
-Net_END
+} } // namespace Poco::Net

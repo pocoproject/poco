@@ -1,7 +1,7 @@
 //
 // TimerTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TimerTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TimerTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "TimerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Stopwatch.h"
+#include "Poco/Thread.h"
+#include "Poco/Stopwatch.h"
 
 
-using Foundation::Timer;
-using Foundation::TimerCallback;
-using Foundation::Thread;
-using Foundation::Stopwatch;
+using Poco::Timer;
+using Poco::TimerCallback;
+using Poco::Thread;
+using Poco::Stopwatch;
 
 
 TimerTest::TimerTest(const std::string& name): CppUnit::TestCase(name)

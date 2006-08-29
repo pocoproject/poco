@@ -1,7 +1,7 @@
 //
 // POP3ClientSessionTest.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/POP3ClientSessionTest.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/POP3ClientSessionTest.h#1 $
 //
 // Definition of the POP3ClientSessionTest class.
 //
@@ -36,12 +36,8 @@
 #define POP3ClientSessionTest_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class POP3ClientSessionTest: public CppUnit::TestCase

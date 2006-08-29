@@ -1,7 +1,7 @@
 //
 // LoggingConfiguratorTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/LoggingConfiguratorTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/LoggingConfiguratorTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,32 +33,32 @@
 #include "LoggingConfiguratorTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/LoggingConfigurator.h"
-#include "Util/PropertyFileConfiguration.h"
-#include "Foundation/LoggingRegistry.h"
-#include "Foundation/ConsoleChannel.h"
-#include "Foundation/FileChannel.h"
-#include "Foundation/SplitterChannel.h"
-#include "Foundation/FormattingChannel.h"
-#include "Foundation/PatternFormatter.h"
-#include "Foundation/Logger.h"
-#include "Foundation/Message.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/Util/LoggingConfigurator.h"
+#include "Poco/Util/PropertyFileConfiguration.h"
+#include "Poco/LoggingRegistry.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/FileChannel.h"
+#include "Poco/SplitterChannel.h"
+#include "Poco/FormattingChannel.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/Logger.h"
+#include "Poco/Message.h"
+#include "Poco/AutoPtr.h"
 #include <sstream>
 
 
-using Util::LoggingConfigurator;
-using Util::PropertyFileConfiguration;
-using Foundation::LoggingRegistry;
-using Foundation::Channel;
-using Foundation::ConsoleChannel;
-using Foundation::FileChannel;
-using Foundation::SplitterChannel;
-using Foundation::FormattingChannel;
-using Foundation::PatternFormatter;
-using Foundation::Logger;
-using Foundation::Message;
-using Foundation::AutoPtr;
+using Poco::Util::LoggingConfigurator;
+using Poco::Util::PropertyFileConfiguration;
+using Poco::LoggingRegistry;
+using Poco::Channel;
+using Poco::ConsoleChannel;
+using Poco::FileChannel;
+using Poco::SplitterChannel;
+using Poco::FormattingChannel;
+using Poco::PatternFormatter;
+using Poco::Logger;
+using Poco::Message;
+using Poco::AutoPtr;
 
 
 LoggingConfiguratorTest::LoggingConfiguratorTest(const std::string& name): CppUnit::TestCase(name)
@@ -163,7 +163,7 @@ void LoggingConfiguratorTest::testBadConfiguration1()
 		configurator.configure(pConfig);
 		fail("bad configuration - must throw");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 	}
 }
@@ -206,7 +206,7 @@ void LoggingConfiguratorTest::testBadConfiguration2()
 		configurator.configure(pConfig);
 		fail("bad configuration - must throw");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 	}
 }
@@ -249,7 +249,7 @@ void LoggingConfiguratorTest::testBadConfiguration3()
 		configurator.configure(pConfig);
 		fail("bad configuration - must throw");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 	}
 }
@@ -293,7 +293,7 @@ void LoggingConfiguratorTest::testBadConfiguration4()
 		configurator.configure(pConfig);
 		fail("bad configuration - must throw");
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 	}
 }

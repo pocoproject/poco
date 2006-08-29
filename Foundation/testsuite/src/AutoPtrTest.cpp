@@ -1,7 +1,7 @@
 //
 // AutoPtrTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/AutoPtrTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/AutoPtrTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "AutoPtrTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::AutoPtr;
-using Foundation::NullPointerException;
+using Poco::AutoPtr;
+using Poco::NullPointerException;
 
 
 namespace

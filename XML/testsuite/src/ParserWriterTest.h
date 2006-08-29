@@ -1,7 +1,7 @@
 //
 // ParserWriterTest.h
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/ParserWriterTest.h#2 $
+// $Id: //poco/1.2/XML/testsuite/src/ParserWriterTest.h#1 $
 //
 // Definition of the ParserWriterTest class.
 //
@@ -36,12 +36,8 @@
 #define ParserWriterTest_INCLUDED
 
 
-#ifndef XML_XML_INCLUDED
-#include "XML/XML.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/XML/XML.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class ParserWriterTest: public CppUnit::TestCase

@@ -1,7 +1,7 @@
 //
 // HTTPRequestHandlerFactory.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPRequestHandlerFactory.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPRequestHandlerFactory.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPRequestHandlerFactory::HTTPRequestHandlerFactory()
@@ -50,4 +51,4 @@ HTTPRequestHandlerFactory::~HTTPRequestHandlerFactory()
 }
 
 
-Net_END
+} } // namespace Poco::Net

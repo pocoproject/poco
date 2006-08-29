@@ -1,7 +1,7 @@
 //
 // RandomStreamTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/RandomStreamTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/RandomStreamTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "RandomStreamTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/RandomStream.h"
+#include "Poco/RandomStream.h"
 #include <vector>
 #include <math.h>
 
 
-using Foundation::RandomInputStream;
+using Poco::RandomInputStream;
 
 
 RandomStreamTest::RandomStreamTest(const std::string& name): CppUnit::TestCase(name)

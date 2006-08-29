@@ -1,7 +1,7 @@
 //
 // AttributesImpl.cpp
 //
-// $Id: //poco/1.1.0/XML/src/AttributesImpl.cpp#2 $
+// $Id: //poco/1.2/XML/src/AttributesImpl.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/AttributesImpl.h"
+#include "Poco/SAX/AttributesImpl.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 AttributesImpl::AttributesImpl()
@@ -46,6 +47,12 @@ AttributesImpl::AttributesImpl()
 
 
 AttributesImpl::AttributesImpl(const Attributes& attributes)
+{
+	setAttributes(attributes);
+}
+
+
+AttributesImpl::AttributesImpl(const AttributesImpl& attributes)
 {
 	setAttributes(attributes);
 }
@@ -389,4 +396,4 @@ AttributesImpl::Attribute* AttributesImpl::find(const XMLString& namespaceURI, c
 }
 
 
-XML_END
+} } // namespace Poco::XML

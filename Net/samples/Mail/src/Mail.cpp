@@ -1,7 +1,7 @@
 //
 // Mail.cpp
 //
-// $Id: //poco/1.1.0/Net/samples/Mail/src/Mail.cpp#2 $
+// $Id: //poco/1.2/Net/samples/Mail/src/Mail.cpp#1 $
 //
 // This sample demonstrates the MailMessage and SMTPClientSession classes.
 //
@@ -32,21 +32,21 @@
 //
 
 
-#include "Net/MailMessage.h"
-#include "Net/MailRecipient.h"
-#include "Net/SMTPClientSession.h"
-#include "Net/StringPartSource.h"
-#include "Foundation/Path.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailRecipient.h"
+#include "Poco/Net/SMTPClientSession.h"
+#include "Poco/Net/StringPartSource.h"
+#include "Poco/Path.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-using Net::MailMessage;
-using Net::MailRecipient;
-using Net::SMTPClientSession;
-using Net::StringPartSource;
-using Foundation::Path;
-using Foundation::Exception;
+using Poco::Net::MailMessage;
+using Poco::Net::MailRecipient;
+using Poco::Net::SMTPClientSession;
+using Poco::Net::StringPartSource;
+using Poco::Path;
+using Poco::Exception;
 
 
 const unsigned char PocoLogo[] =

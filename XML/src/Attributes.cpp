@@ -1,7 +1,7 @@
 //
 // Attributes.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Attributes.cpp#2 $
+// $Id: //poco/1.2/XML/src/Attributes.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/Attributes.h"
+#include "Poco/SAX/Attributes.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 Attributes::~Attributes()
@@ -45,4 +46,4 @@ Attributes::~Attributes()
 }
 
 
-XML_END
+} } // namespace Poco::XML

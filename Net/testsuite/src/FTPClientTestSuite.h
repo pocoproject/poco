@@ -1,7 +1,7 @@
 //
 // FTPClientTestSuite.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/FTPClientTestSuite.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/FTPClientTestSuite.h#1 $
 //
 // Definition of the FTPClientTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define FTPClientTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class FTPClientTestSuite

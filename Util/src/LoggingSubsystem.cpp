@@ -1,7 +1,7 @@
 //
 // LoggingSubsystem.cpp
 //
-// $Id: //poco/1.1.0/Util/src/LoggingSubsystem.cpp#2 $
+// $Id: //poco/1.2/Util/src/LoggingSubsystem.cpp#1 $
 //
 // Library: Util
 // Package: Application
@@ -34,16 +34,17 @@
 //
 
 
-#include "Util/LoggingSubsystem.h"
-#include "Util/LoggingConfigurator.h"
-#include "Util/Application.h"
-#include "Foundation/Logger.h"
+#include "Poco/Util/LoggingSubsystem.h"
+#include "Poco/Util/LoggingConfigurator.h"
+#include "Poco/Util/Application.h"
+#include "Poco/Logger.h"
 
 
-using Foundation::Logger;
+using Poco::Logger;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 LoggingSubsystem::LoggingSubsystem()
@@ -76,4 +77,4 @@ void LoggingSubsystem::uninitialize()
 }
 
 
-Util_END
+} } // namespace Poco::Util

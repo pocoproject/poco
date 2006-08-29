@@ -1,7 +1,7 @@
 //
 // MapConfiguration.cpp
 //
-// $Id: //poco/1.1.0/Util/src/MapConfiguration.cpp#2 $
+// $Id: //poco/1.2/Util/src/MapConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
@@ -34,11 +34,12 @@
 //
 
 
-#include "Util/MapConfiguration.h"
+#include "Poco/Util/MapConfiguration.h"
 #include <set>
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 MapConfiguration::MapConfiguration()
@@ -113,4 +114,4 @@ MapConfiguration::iterator MapConfiguration::end() const
 }
 
 
-Util_END
+} } // namespace Poco::Util

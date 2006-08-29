@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.1.0/Net/src/MailMessage.cpp#2 $
+// $Id: //poco/1.2/Net/src/MailMessage.cpp#1 $
 //
 // Library: Net
 // Package: Mail
@@ -34,35 +34,36 @@
 //
 
 
-#include "Net/MailMessage.h"
-#include "Net/MediaType.h"
-#include "Net/MultipartReader.h"
-#include "Net/MultipartWriter.h"
-#include "Net/PartSource.h"
-#include "Net/PartHandler.h"
-#include "Net/QuotedPrintableEncoder.h"
-#include "Net/QuotedPrintableDecoder.h"
-#include "Foundation/Base64Encoder.h"
-#include "Foundation/Base64Decoder.h"
-#include "Foundation/StreamCopier.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeParser.h"
-#include "Foundation/String.h"
+#include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MediaType.h"
+#include "Poco/Net/MultipartReader.h"
+#include "Poco/Net/MultipartWriter.h"
+#include "Poco/Net/PartSource.h"
+#include "Poco/Net/PartHandler.h"
+#include "Poco/Net/QuotedPrintableEncoder.h"
+#include "Poco/Net/QuotedPrintableDecoder.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/Base64Decoder.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeParser.h"
+#include "Poco/String.h"
 #include <sstream>
 #include <ctype.h>
 
 
-using Foundation::Base64Encoder;
-using Foundation::Base64Decoder;
-using Foundation::StreamCopier;
-using Foundation::DateTimeFormat;
-using Foundation::DateTimeFormatter;
-using Foundation::DateTimeParser;
-using Foundation::icompare;
+using Poco::Base64Encoder;
+using Poco::Base64Decoder;
+using Poco::StreamCopier;
+using Poco::DateTimeFormat;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeParser;
+using Poco::icompare;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 namespace
@@ -115,7 +116,7 @@ const std::string MailMessage::CTE_BASE64("base64");
 
 MailMessage::MailMessage()
 {
-	Foundation::Timestamp now;
+	Poco::Timestamp now;
 	setDate(now);
 	setContentType("text/plain");
 }
@@ -195,13 +196,13 @@ const std::string& MailMessage::getContentType() const
 }
 
 
-void MailMessage::setDate(const Foundation::Timestamp& dateTime)
+void MailMessage::setDate(const Poco::Timestamp& dateTime)
 {
 	set(HEADER_DATE, DateTimeFormatter::format(dateTime, DateTimeFormat::RFC1123_FORMAT));
 }
 
 	
-Foundation::Timestamp MailMessage::getDate() const
+Poco::Timestamp MailMessage::getDate() const
 {
 	const std::string& dateTime = get(HEADER_DATE);
 	int tzd;
@@ -489,4 +490,4 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 }
 
 
-Net_END
+} } // namespace Poco::Net

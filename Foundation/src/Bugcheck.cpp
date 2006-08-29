@@ -1,7 +1,7 @@
 //
 // Bugcheck.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Bugcheck.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Bugcheck.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/Bugcheck.h"
-#include "Foundation/Debugger.h"
-#include "Foundation/Exception.h"
+#include "Poco/Bugcheck.h"
+#include "Poco/Debugger.h"
+#include "Poco/Exception.h"
 #include <sstream>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 void Bugcheck::assertion(const char* cond, const char* file, int line)
@@ -100,4 +100,4 @@ std::string Bugcheck::what(const char* msg, const char* file, int line)
 
 
 
-Foundation_END
+} // namespace Poco

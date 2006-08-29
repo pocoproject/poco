@@ -1,7 +1,7 @@
 //
 // SystemConfigurationTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/SystemConfigurationTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/SystemConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,21 +33,21 @@
 #include "SystemConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/SystemConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Environment.h"
-#include "Foundation/Path.h"
+#include "Poco/Util/SystemConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
+#include "Poco/Environment.h"
+#include "Poco/Path.h"
 #include <algorithm>
 
 
-using Util::SystemConfiguration;
-using Util::AbstractConfiguration;
-using Foundation::AutoPtr;
-using Foundation::Environment;
-using Foundation::Path;
-using Foundation::InvalidAccessException;
-using Foundation::NotFoundException;
+using Poco::Util::SystemConfiguration;
+using Poco::Util::AbstractConfiguration;
+using Poco::AutoPtr;
+using Poco::Environment;
+using Poco::Path;
+using Poco::InvalidAccessException;
+using Poco::NotFoundException;
 
 
 SystemConfigurationTest::SystemConfigurationTest(const std::string& name): CppUnit::TestCase(name)

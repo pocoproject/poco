@@ -1,7 +1,7 @@
 //
 // File_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/File_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/File_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,9 +34,9 @@
 //
 
 
-#include "Foundation/File_VMS.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Path.h"
+#include "Poco/File_VMS.h"
+#include "Poco/Exception.h"
+#include "Poco/Path.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <unixio.h>
@@ -52,7 +52,7 @@
 #include <descrip.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FileImpl::FileImpl()
@@ -156,6 +156,12 @@ bool FileImpl::isDirectoryImpl() const
 		return S_ISDIR(st.st_mode);
 	else
 		handleError(_path);
+	return false;
+}
+
+
+bool FileImpl::isLinkImpl() const
+{
 	return false;
 }
 
@@ -372,4 +378,4 @@ void FileImpl::handleError(const std::string& path)
 }
 
 
-Foundation_END
+} // namespace Poco

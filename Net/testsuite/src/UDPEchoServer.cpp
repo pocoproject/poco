@@ -1,7 +1,7 @@
 //
 // UDPEchoServer.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/UDPEchoServer.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/UDPEchoServer.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,15 +31,15 @@
 
 
 #include "UDPEchoServer.h"
-#include "Net/SocketAddress.h"
-#include "Foundation/Timespan.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Timespan.h"
 #include <iostream>
 
 
-using Net::Socket;
-using Net::DatagramSocket;
-using Net::SocketAddress;
-using Net::IPAddress;
+using Poco::Net::Socket;
+using Poco::Net::DatagramSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::IPAddress;
 
 
 UDPEchoServer::UDPEchoServer():
@@ -69,7 +69,7 @@ UDPEchoServer::~UDPEchoServer()
 }
 
 
-Foundation::UInt16 UDPEchoServer::port() const
+Poco::UInt16 UDPEchoServer::port() const
 {
 	return _socket.address().port();
 }
@@ -78,7 +78,7 @@ Foundation::UInt16 UDPEchoServer::port() const
 void UDPEchoServer::run()
 {
 	_ready.set();
-	Foundation::Timespan span(250000);
+	Poco::Timespan span(250000);
 	while (!_stop)
 	{
 		if (_socket.poll(span, Socket::SELECT_READ))
@@ -90,7 +90,7 @@ void UDPEchoServer::run()
 				int n = _socket.receiveFrom(buffer, sizeof(buffer), sender);
 				_socket.sendTo(buffer, n, sender);
 			}
-			catch (Foundation::Exception& exc)
+			catch (Poco::Exception& exc)
 			{
 				std::cerr << "UDPEchoServer: " << exc.displayText() << std::endl;
 			}

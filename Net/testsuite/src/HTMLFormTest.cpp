@@ -1,7 +1,7 @@
 //
 // HTMLFormTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/HTMLFormTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/HTMLFormTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,21 +33,21 @@
 #include "HTMLFormTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Net/HTMLForm.h"
-#include "Net/PartSource.h"
-#include "Net/StringPartSource.h"
-#include "Net/PartHandler.h"
-#include "Net/HTTPRequest.h"
+#include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/PartSource.h"
+#include "Poco/Net/StringPartSource.h"
+#include "Poco/Net/PartHandler.h"
+#include "Poco/Net/HTTPRequest.h"
 #include <sstream>
 
 
-using Net::HTMLForm;
-using Net::PartSource;
-using Net::StringPartSource;
-using Net::PartHandler;
-using Net::HTTPRequest;
-using Net::HTTPMessage;
-using Net::MessageHeader;
+using Poco::Net::HTMLForm;
+using Poco::Net::PartSource;
+using Poco::Net::StringPartSource;
+using Poco::Net::PartHandler;
+using Poco::Net::HTTPRequest;
+using Poco::Net::HTTPMessage;
+using Poco::Net::MessageHeader;
 
 
 namespace

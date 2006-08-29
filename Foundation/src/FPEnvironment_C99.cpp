@@ -1,7 +1,7 @@
 //
 // FPEnvironment_C99.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/FPEnvironment_C99.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/FPEnvironment_C99.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/FPEnvironment_C99.h"
+#include "Poco/FPEnvironment_C99.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FPEnvironmentImpl::FPEnvironmentImpl()
@@ -101,4 +101,4 @@ long double FPEnvironmentImpl::copySignImpl(long double target, long double sour
 }
 
 
-Foundation_END
+} // namespace Poco

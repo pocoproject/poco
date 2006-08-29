@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/rules/exec#1 $
+# $Id: //poco/1.2/build/rules/exec#1 $
 #
 # exec
 #
@@ -20,7 +20,7 @@ TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
 #
 # Include the compile rules
 #
-include $(POCO_BUILD)/rules/compile
+include $(POCO_BASE)/build/rules/compile
 
 #
 # Rules for creating an executable
@@ -29,13 +29,10 @@ clean:
 	$(RM) $(OBJPATH)
 	$(RM) $(EXEC_RELEASE_STATIC) $(EXEC_DEBUG_STATIC) $(EXEC_RELEASE_SHARED) $(EXEC_DEBUG_SHARED)
 
-forcelink:
-	$(RM) $(EXEC_RELEASE_STATIC) $(EXEC_DEBUG_STATIC) $(EXEC_RELEASE_SHARED) $(EXEC_DEBUG_SHARED)
-
-static_debug:   dirs $(EXEC_DEBUG_STATIC)
-static_release: dirs $(EXEC_RELEASE_STATIC)
-shared_debug:   dirs $(EXEC_DEBUG_SHARED)
-shared_release: dirs $(EXEC_RELEASE_SHARED)
+static_debug:   bindirs $(EXEC_DEBUG_STATIC)
+static_release: bindirs $(EXEC_RELEASE_STATIC)
+shared_debug:   bindirs $(EXEC_DEBUG_SHARED)
+shared_release: bindirs $(EXEC_RELEASE_SHARED)
 
 $(EXEC_DEBUG_STATIC): $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
 	@echo "** Building executable (debug)" $@

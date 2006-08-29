@@ -1,7 +1,7 @@
 //
 // NamedMutex_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedMutex_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedMutex_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,8 +34,8 @@
 //
 
 
-#include "Foundation/NamedMutex_UNIX.h"
-#include "Foundation/Exception.h"
+#include "Poco/NamedMutex_UNIX.h"
+#include "Poco/Exception.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(sun) || defined(__APPLE__) || defined(__osf__)
@@ -49,7 +49,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 #if defined(linux) || defined(__CYGWIN__)
@@ -170,4 +170,4 @@ std::string NamedMutexImpl::getFileName()
 }
 
 
-Foundation_END
+} // namespace Poco

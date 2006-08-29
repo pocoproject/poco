@@ -1,7 +1,7 @@
 //
 // SharedLibrary_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SharedLibrary_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SharedLibrary_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/SharedLibrary_WIN32.h"
+#include "Poco/SharedLibrary_WIN32.h"
 #include <windows.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FastMutex SharedLibraryImpl::_mutex;
@@ -113,4 +113,4 @@ std::string SharedLibraryImpl::suffixImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

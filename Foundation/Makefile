@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Foundation/Makefile#1 $
+# $Id: //poco/1.2/Foundation/Makefile#1 $
 #
 # Makefile for Poco Foundation
 #
@@ -15,7 +15,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	Environment Event EventArgs ErrorHandler Exception FPEnvironment File Glob \
 	FileChannel Formatter FormattingChannel HexBinaryDecoder LineEndingConverter \
 	HexBinaryEncoder InflatingStream Latin1Encoding Latin9Encoding LogFile Logger \
-	LoggingFactory LoggingRegistry NamedEvent NamedMutex NullChannel \
+	LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
 	MemoryPool MD2Engine MD4Engine MD5Engine Manifest Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue NullStream NumberFormatter NumberParser Observer \
@@ -24,17 +24,18 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel Stopwatch StreamChannel StreamConverter StreamCopier \
 	StreamTokenizer String StringTokenizer SynchronizedObject SyslogChannel \
-	Task TaskManager TaskNotification TeeStream \
+	Task TaskManager TaskNotification TeeStream HashStatistic\
 	TemporaryFile TextConverter TextEncoding TextIterator Thread ThreadLocal \
-	ThreadPool Timer Timespan Timestamp Timezone Token URI \
+	ThreadPool ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \
-	UTF8Encoding UnicodeConverter UUID UUIDGenerator \
+	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Format \
+	Pipe PipeImpl PipeStream \
 	adler32 chartables compress crc32 \
 	deflate get gzio infback inffast inflate inftrees maketables pcre study \
 	trees zutil
 
 target         = PocoFoundation
-target_version = 1
+target_version = $(LIBVERSION)
 target_libs    =
 
 include $(POCO_BASE)/build/rules/lib

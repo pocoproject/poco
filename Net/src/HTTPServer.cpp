@@ -1,7 +1,7 @@
 //
 // HTTPServer.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPServer.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPServer.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -34,12 +34,13 @@
 //
 
 
-#include "Net/HTTPServer.h"
-#include "Net/HTTPServerParams.h"
-#include "Net/HTTPServerConnectionFactory.h"
+#include "Poco/Net/HTTPServer.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPServerConnectionFactory.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPServer::HTTPServer(HTTPRequestHandlerFactory* pFactory, const ServerSocket& socket, HTTPServerParams* pParams):
@@ -48,7 +49,7 @@ HTTPServer::HTTPServer(HTTPRequestHandlerFactory* pFactory, const ServerSocket& 
 }
 
 
-HTTPServer::HTTPServer(HTTPRequestHandlerFactory* pFactory, Foundation::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams* pParams):
+HTTPServer::HTTPServer(HTTPRequestHandlerFactory* pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams* pParams):
 	TCPServer(new HTTPServerConnectionFactory(pParams, pFactory), threadPool, socket, pParams)
 {
 }
@@ -59,4 +60,4 @@ HTTPServer::~HTTPServer()
 }
 
 
-Net_END
+} } // namespace Poco::Net

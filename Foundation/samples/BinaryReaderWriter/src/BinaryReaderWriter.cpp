@@ -1,7 +1,7 @@
 //
 // BinaryReaderWriter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/BinaryReaderWriter/src/BinaryReaderWriter.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/BinaryReaderWriter/src/BinaryReaderWriter.cpp#1 $
 //
 // This sample demonstrates the BinaryWriter and BinaryReader classes.
 //
@@ -32,14 +32,14 @@
 //
 
 
-#include "Foundation/BinaryWriter.h"
-#include "Foundation/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
+#include "Poco/BinaryReader.h"
 #include <sstream>
 #include <iostream>
 
 
-using Foundation::BinaryWriter;
-using Foundation::BinaryReader;
+using Poco::BinaryWriter;
+using Poco::BinaryReader;
 
 
 int main(int argc, char** argv)

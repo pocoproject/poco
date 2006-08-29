@@ -1,7 +1,7 @@
 //
 // Entity.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Entity.cpp#2 $
+// $Id: //poco/1.2/XML/src/Entity.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,10 +34,11 @@
 //
 
 
-#include "DOM/Entity.h"
+#include "Poco/DOM/Entity.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 const XMLString Entity::NODE_NAME = toXMLString("#entity");
@@ -86,4 +87,4 @@ Node* Entity::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-XML_END
+} } // namespace Poco::XML

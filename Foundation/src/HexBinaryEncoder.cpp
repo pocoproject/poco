@@ -1,7 +1,7 @@
 //
 // HexBinaryEncoder.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/HexBinaryEncoder.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/HexBinaryEncoder.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/HexBinaryEncoder.h"
+#include "Poco/HexBinaryEncoder.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 HexBinaryEncoderBuf::HexBinaryEncoderBuf(std::ostream& ostr): 
@@ -137,4 +137,4 @@ HexBinaryEncoder::~HexBinaryEncoder()
 }
 
 
-Foundation_END
+} // namespace Poco

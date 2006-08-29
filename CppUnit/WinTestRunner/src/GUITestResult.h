@@ -1,7 +1,7 @@
 //
 // GUITestResult.h
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/src/GUITestResult.h#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/src/GUITestResult.h#1 $
 //
 
 
@@ -9,16 +9,12 @@
 #define GuiTestResult_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef CppUnit_TestResult_INCLUDED
 #include "CppUnit/TestResult.h"
-#endif
 #include <afxmt.h>
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class TestRunnerDlg;
@@ -80,7 +76,7 @@ inline void GUITestResult::stop()
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // GuiTestResult_INCLUDED

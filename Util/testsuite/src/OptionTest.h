@@ -1,7 +1,7 @@
 //
 // OptionTest.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/OptionTest.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/OptionTest.h#1 $
 //
 // Definition of the OptionTest class.
 //
@@ -36,12 +36,8 @@
 #define OptionTest_INCLUDED
 
 
-#ifndef Util_Util_INCLUDED
-#include "Util/Util.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Util/Util.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class OptionTest: public CppUnit::TestCase

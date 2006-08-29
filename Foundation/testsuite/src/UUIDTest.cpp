@@ -1,7 +1,7 @@
 //
 // UUIDTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/UUIDTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/UUIDTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "UUIDTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/UUID.h"
+#include "Poco/UUID.h"
 
 
-using Foundation::UUID;
+using Poco::UUID;
 
 
 UUIDTest::UUIDTest(const std::string& name): CppUnit::TestCase(name)

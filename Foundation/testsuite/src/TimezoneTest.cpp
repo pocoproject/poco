@@ -1,7 +1,7 @@
 //
 // TimezoneTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TimezoneTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TimezoneTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "TimezoneTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/Timezone.h"
+#include "Poco/Timezone.h"
 #include <iostream>
 
 
-using Foundation::Timezone;
+using Poco::Timezone;
 
 
 TimezoneTest::TimezoneTest(const std::string& name): CppUnit::TestCase(name)

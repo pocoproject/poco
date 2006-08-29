@@ -1,7 +1,7 @@
 //
 // StreamConverterTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/StreamConverterTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/StreamConverterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,20 +33,20 @@
 #include "StreamConverterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/StreamConverter.h"
-#include "Foundation/ASCIIEncoding.h"
-#include "Foundation/Latin1Encoding.h"
-#include "Foundation/UTF8Encoding.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/StreamConverter.h"
+#include "Poco/ASCIIEncoding.h"
+#include "Poco/Latin1Encoding.h"
+#include "Poco/UTF8Encoding.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
-using Foundation::InputStreamConverter;
-using Foundation::OutputStreamConverter;
-using Foundation::Latin1Encoding;
-using Foundation::UTF8Encoding;
-using Foundation::ASCIIEncoding;
-using Foundation::StreamCopier;
+using Poco::InputStreamConverter;
+using Poco::OutputStreamConverter;
+using Poco::Latin1Encoding;
+using Poco::UTF8Encoding;
+using Poco::ASCIIEncoding;
+using Poco::StreamCopier;
 
 
 StreamConverterTest::StreamConverterTest(const std::string& name): CppUnit::TestCase(name)

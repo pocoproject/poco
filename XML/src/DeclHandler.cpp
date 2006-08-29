@@ -1,7 +1,7 @@
 //
 // DeclHandler.cpp
 //
-// $Id: //poco/1.1.0/XML/src/DeclHandler.cpp#2 $
+// $Id: //poco/1.2/XML/src/DeclHandler.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/DeclHandler.h"
+#include "Poco/SAX/DeclHandler.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 DeclHandler::~DeclHandler()
@@ -45,4 +46,4 @@ DeclHandler::~DeclHandler()
 }
 
 
-XML_END
+} } // namespace Poco::XML

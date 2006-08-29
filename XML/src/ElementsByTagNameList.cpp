@@ -1,7 +1,7 @@
 //
 // ElementsByTagNameList.cpp
 //
-// $Id: //poco/1.1.0/XML/src/ElementsByTagNameList.cpp#2 $
+// $Id: //poco/1.2/XML/src/ElementsByTagNameList.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,12 +34,13 @@
 //
 
 
-#include "DOM/ElementsByTagNameList.h"
-#include "DOM/Node.h"
-#include "DOM/Document.h"
+#include "Poco/DOM/ElementsByTagNameList.h"
+#include "Poco/DOM/Node.h"
+#include "Poco/DOM/Document.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, const XMLString& name):
@@ -166,4 +167,4 @@ void ElementsByTagNameListNS::autoRelease()
 }
 
 
-XML_END
+} } // namespace Poco::XML

@@ -1,7 +1,7 @@
 //
 // dir.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/dir/src/dir.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/dir/src/dir.cpp#1 $
 //
 // This sample demonstrates the DirectoryIterator, File and Path classes.
 //
@@ -32,19 +32,20 @@
 //
 
 
-#include "Foundation/DirectoryIterator.h"
-#include "Foundation/File.h"
-#include "Foundation/Path.h"
-#include "Foundation/DateTimeFormatter.h"
-#include "Foundation/DateTimeFormat.h"
+#include "Poco/DirectoryIterator.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-using Foundation::DirectoryIterator;
-using Foundation::File;
-using Foundation::Path;
-using Foundation::DateTimeFormatter;
-using Foundation::DateTimeFormat;
+using Poco::DirectoryIterator;
+using Poco::File;
+using Poco::Path;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
 
 
 int main(int argc, char** argv)
@@ -55,20 +56,28 @@ int main(int argc, char** argv)
 	else
 		dir = Path::current();
 		
-	DirectoryIterator it(dir);
-	DirectoryIterator end;
-	while (it != end)
+	try
 	{
-		Path p(it->path());
-		std::cout << (it->isDirectory() ? 'd' : '-')
-		          << (it->canRead() ? 'r' : '-')
-		          << (it->canWrite() ? 'w' : '-')
-		          << ' '
-		          << DateTimeFormatter::format(it->getLastModified(), DateTimeFormat::SORTABLE_FORMAT)
-		          << ' '
-		          << p.getFileName()
-		          << std::endl;
-		++it;
+		DirectoryIterator it(dir);
+		DirectoryIterator end;
+		while (it != end)
+		{
+			Path p(it->path());
+			std::cout << (it->isDirectory() ? 'd' : '-')
+					  << (it->canRead() ? 'r' : '-')
+					  << (it->canWrite() ? 'w' : '-')
+					  << ' '
+					  << DateTimeFormatter::format(it->getLastModified(), DateTimeFormat::SORTABLE_FORMAT)
+					  << ' '
+					  << p.getFileName()
+					  << std::endl;
+			++it;
+		}
+	}
+	catch (Poco::Exception& exc)
+	{
+		std::cerr << exc.displayText() << std::endl;
+		return 1;
 	}
 		
 	return 0;

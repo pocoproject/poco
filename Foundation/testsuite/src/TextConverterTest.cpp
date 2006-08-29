@@ -1,7 +1,7 @@
 //
 // TextConverterTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TextConverterTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TextConverterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,16 +33,16 @@
 #include "TextConverterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/TextConverter.h"
-#include "Foundation/ASCIIEncoding.h"
-#include "Foundation/Latin1Encoding.h"
-#include "Foundation/UTF8Encoding.h"
+#include "Poco/TextConverter.h"
+#include "Poco/ASCIIEncoding.h"
+#include "Poco/Latin1Encoding.h"
+#include "Poco/UTF8Encoding.h"
 
 
-using Foundation::TextConverter;
-using Foundation::Latin1Encoding;
-using Foundation::UTF8Encoding;
-using Foundation::ASCIIEncoding;
+using Poco::TextConverter;
+using Poco::Latin1Encoding;
+using Poco::UTF8Encoding;
+using Poco::ASCIIEncoding;
 
 
 TextConverterTest::TextConverterTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // Environment_WIN32.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Environment_WIN32.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Environment_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,13 +34,13 @@
 //
 
 
-#include "Foundation/Environment_WIN32.h"
-#include "Foundation/Exception.h"
+#include "Poco/Environment_WIN32.h"
+#include "Poco/Exception.h"
 #include <sstream>
 #include <windows.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::string EnvironmentImpl::getImpl(const std::string& name)
@@ -144,4 +144,4 @@ std::string EnvironmentImpl::nodeNameImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

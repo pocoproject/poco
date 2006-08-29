@@ -1,7 +1,7 @@
 //
 // OptionsTestSuite.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/OptionsTestSuite.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/OptionsTestSuite.h#1 $
 //
 // Definition of the OptionsTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define OptionsTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class OptionsTestSuite

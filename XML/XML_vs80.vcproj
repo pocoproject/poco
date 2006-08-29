@@ -210,39 +210,39 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Xml\Name.h"
+					RelativePath=".\include\Poco\XML\Name.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\NamePool.h"
+					RelativePath=".\include\Poco\Xml\NamePool.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\NamespaceStrategy.h"
+					RelativePath=".\include\Poco\Xml\NamespaceStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\ParserEngine.h"
+					RelativePath=".\include\Poco\Xml\ParserEngine.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\XML.h"
+					RelativePath=".\include\Poco\Xml\XML.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\XMLException.h"
+					RelativePath=".\include\Poco\Xml\XMLException.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\XMLStream.h"
+					RelativePath=".\include\Poco\Xml\XMLStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\XMLString.h"
+					RelativePath=".\include\Poco\Xml\XMLString.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\XMLWriter.h"
+					RelativePath=".\include\Poco\Xml\XMLWriter.h"
 					>
 				</File>
 			</Filter>
@@ -286,83 +286,83 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\SAX\Attributes.h"
+					RelativePath=".\include\Poco\SAX\Attributes.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\AttributesImpl.h"
+					RelativePath=".\include\Poco\SAX\AttributesImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\ContentHandler.h"
+					RelativePath=".\include\Poco\SAX\ContentHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\DeclHandler.h"
+					RelativePath=".\include\Poco\SAX\DeclHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\DefaultHandler.h"
+					RelativePath=".\include\Poco\SAX\DefaultHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\DTDHandler.h"
+					RelativePath=".\include\Poco\SAX\DTDHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\EntityResolver.h"
+					RelativePath=".\include\Poco\SAX\EntityResolver.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Sax\EntityResolverImpl.h"
+					RelativePath=".\include\Poco\Sax\EntityResolverImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\ErrorHandler.h"
+					RelativePath=".\include\Poco\SAX\ErrorHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\InputSource.h"
+					RelativePath=".\include\Poco\SAX\InputSource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\LexicalHandler.h"
+					RelativePath=".\include\Poco\SAX\LexicalHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\Locator.h"
+					RelativePath=".\include\Poco\SAX\Locator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Sax\LocatorImpl.h"
+					RelativePath=".\include\Poco\Sax\LocatorImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\NamespaceSupport.h"
+					RelativePath=".\include\Poco\SAX\NamespaceSupport.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\SAXException.h"
+					RelativePath=".\include\Poco\SAX\SAXException.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Sax\SAXParser.h"
+					RelativePath=".\include\Poco\Sax\SAXParser.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Sax\WhitespaceFilter.h"
+					RelativePath=".\include\Poco\Sax\WhitespaceFilter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Sax\XMLFilter.h"
+					RelativePath=".\include\Poco\Sax\XMLFilter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Sax\XMLFilterImpl.h"
+					RelativePath=".\include\Poco\Sax\XMLFilterImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\SAX\XMLReader.h"
+					RelativePath=".\include\Poco\SAX\XMLReader.h"
 					>
 				</File>
 			</Filter>
@@ -458,163 +458,163 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Dom\AbstractContainerNode.h"
+					RelativePath=".\include\Poco\Dom\AbstractContainerNode.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\AbstractNode.h"
+					RelativePath=".\include\Poco\Dom\AbstractNode.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Attr.h"
+					RelativePath=".\include\Poco\DOM\Attr.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\AttrMap.h"
+					RelativePath=".\include\Poco\Dom\AttrMap.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\AutoPtr.h"
+					RelativePath=".\include\Poco\Dom\AutoPtr.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\CDATASection.h"
+					RelativePath=".\include\Poco\DOM\CDATASection.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\CharacterData.h"
+					RelativePath=".\include\Poco\DOM\CharacterData.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\ChildNodesList.h"
+					RelativePath=".\include\Poco\Dom\ChildNodesList.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Comment.h"
+					RelativePath=".\include\Poco\DOM\Comment.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Document.h"
+					RelativePath=".\include\Poco\DOM\Document.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\DocumentEvent.h"
+					RelativePath=".\include\Poco\DOM\DocumentEvent.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\DocumentFragment.h"
+					RelativePath=".\include\Poco\DOM\DocumentFragment.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\DocumentType.h"
+					RelativePath=".\include\Poco\DOM\DocumentType.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\DOMBuilder.h"
+					RelativePath=".\include\Poco\Dom\DOMBuilder.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\DOMException.h"
+					RelativePath=".\include\Poco\DOM\DOMException.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\DOMImplementation.h"
+					RelativePath=".\include\Poco\DOM\DOMImplementation.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\DOMObject.h"
+					RelativePath=".\include\Poco\DOM\DOMObject.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\DOMParser.h"
+					RelativePath=".\include\Poco\Dom\DOMParser.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\DOMSerializer.h"
+					RelativePath=".\include\Poco\Dom\DOMSerializer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\DOMWriter.h"
+					RelativePath=".\include\Poco\DOM\DOMWriter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\DTDMap.h"
+					RelativePath=".\include\Poco\Dom\DTDMap.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Element.h"
+					RelativePath=".\include\Poco\DOM\Element.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\ElementsByTagNameList.h"
+					RelativePath=".\include\Poco\Dom\ElementsByTagNameList.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Entity.h"
+					RelativePath=".\include\Poco\DOM\Entity.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\EntityReference.h"
+					RelativePath=".\include\Poco\DOM\EntityReference.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Event.h"
+					RelativePath=".\include\Poco\DOM\Event.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\EventDispatcher.h"
+					RelativePath=".\include\Poco\Dom\EventDispatcher.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\EventException.h"
+					RelativePath=".\include\Poco\DOM\EventException.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\EventListener.h"
+					RelativePath=".\include\Poco\DOM\EventListener.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\EventTarget.h"
+					RelativePath=".\include\Poco\DOM\EventTarget.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\MutationEvent.h"
+					RelativePath=".\include\Poco\DOM\MutationEvent.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\NamedNodeMap.h"
+					RelativePath=".\include\Poco\DOM\NamedNodeMap.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Node.h"
+					RelativePath=".\include\Poco\DOM\Node.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\NodeFilter.h"
+					RelativePath=".\include\Poco\Dom\NodeFilter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\NodeIterator.h"
+					RelativePath=".\include\Poco\Dom\NodeIterator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\NodeList.h"
+					RelativePath=".\include\Poco\DOM\NodeList.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Notation.h"
+					RelativePath=".\include\Poco\DOM\Notation.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\ProcessingInstruction.h"
+					RelativePath=".\include\Poco\DOM\ProcessingInstruction.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\DOM\Text.h"
+					RelativePath=".\include\Poco\DOM\Text.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Dom\TreeWalker.h"
+					RelativePath=".\include\Poco\Dom\TreeWalker.h"
 					>
 				</File>
 			</Filter>
@@ -786,11 +786,11 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Xml\expat.h"
+					RelativePath=".\include\Poco\Xml\expat.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Xml\expat_external.h"
+					RelativePath=".\include\Poco\Xml\expat_external.h"
 					>
 				</File>
 			</Filter>

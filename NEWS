@@ -1,3 +1,23 @@
+Release 1.2.0 (2006-08-29)
+==========================
+
+This release contains major improvements and new features.
+Summary of changes (please see CHANGELOG for details):
+- namespaces and header locations have changed
+- improvements to command line options handling
+- improvements to HTTP server and client classes
+- support for raw sockets and ICMP
+- improvements to DateTime, bugfixes in Timezone
+- improvements to Logging (including a new LogStream class)
+- HashTable classes in Foundation
+- ThreadPool now supports thread priorities
+- ActiveMethod now supports start policies; improved exception support
+- typesafe sprintf-like formatting
+- Process::launch() now supports I/O redirection to pipes
+- improvements to the build system (configure; make; make install is now supported)
+- various other bugfixes and enchancements
+
+
 Release 1.1.2 (2006-07-07)
 ==========================
 
@@ -97,4 +117,4 @@ Please refer to the README file for more information and instructions for
 building the libraries.
 
 --
-$Id: //poco/1.1.0/dist/NEWS#2 $
+$Id: //poco/1.2/dist/NEWS#1 $

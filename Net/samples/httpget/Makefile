@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/Net/samples/httpget/Makefile#1 $
+# $Id: //poco/1.2/Net/samples/httpget/Makefile#1 $
 #
 # Makefile for Poco httpget
 #
@@ -12,6 +12,6 @@ objects = httpget
 
 target         = httpget
 target_version = 1
-target_libs    = PocoFoundation PocoXML PocoNet PocoUtil
+target_libs    = PocoUtil PocoNet PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

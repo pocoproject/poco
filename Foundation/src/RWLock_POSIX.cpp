@@ -1,7 +1,7 @@
 //
 // RWLock_POSIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/RWLock_POSIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/RWLock_POSIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/RWLock_POSIX.h"
+#include "Poco/RWLock_POSIX.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 RWLockImpl::RWLockImpl()
@@ -53,4 +53,4 @@ RWLockImpl::~RWLockImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

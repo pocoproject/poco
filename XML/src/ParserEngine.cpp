@@ -1,7 +1,7 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/1.1.0/XML/src/ParserEngine.cpp#2 $
+// $Id: //poco/1.2/XML/src/ParserEngine.cpp#1 $
 //
 // Library: XML
 // Package: XML
@@ -34,29 +34,30 @@
 //
 
 
-#include "XML/ParserEngine.h"
-#include "XML/NamespaceStrategy.h"
-#include "XML/XMLException.h"
-#include "SAX/EntityResolver.h"
-#include "SAX/EntityResolverImpl.h"
-#include "SAX/DTDHandler.h"
-#include "SAX/DeclHandler.h"
-#include "SAX/ContentHandler.h"
-#include "SAX/LexicalHandler.h"
-#include "SAX/ErrorHandler.h"
-#include "SAX/InputSource.h"
-#include "SAX/Locator.h"
-#include "SAX/LocatorImpl.h"
-#include "SAX/SAXException.h"
-#include "Foundation/URI.h"
+#include "Poco/XML/ParserEngine.h"
+#include "Poco/XML/NamespaceStrategy.h"
+#include "Poco/XML/XMLException.h"
+#include "Poco/SAX/EntityResolver.h"
+#include "Poco/SAX/EntityResolverImpl.h"
+#include "Poco/SAX/DTDHandler.h"
+#include "Poco/SAX/DeclHandler.h"
+#include "Poco/SAX/ContentHandler.h"
+#include "Poco/SAX/LexicalHandler.h"
+#include "Poco/SAX/ErrorHandler.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/SAX/Locator.h"
+#include "Poco/SAX/LocatorImpl.h"
+#include "Poco/SAX/SAXException.h"
+#include "Poco/URI.h"
 #include <string.h>
 
 
-using Foundation::URI;
-using Foundation::TextEncoding;
+using Poco::URI;
+using Poco::TextEncoding;
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 class ContextLocator: public Locator
@@ -527,7 +528,7 @@ void ParserEngine::handleError(int errorNo)
 		if (_pErrorHandler) _pErrorHandler->error(exc);
 		throw;
 	}
-	catch (Foundation::Exception& exc)
+	catch (Poco::Exception& exc)
 	{
 		if (_pErrorHandler) _pErrorHandler->fatalError(SAXParseException("Fatal error", locator(), exc));
 		throw;
@@ -828,4 +829,4 @@ int ParserEngine::convert(void* data, const char* s)
 }
 
 
-XML_END
+} } // namespace Poco::XML

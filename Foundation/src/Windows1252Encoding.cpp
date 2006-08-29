@@ -1,7 +1,7 @@
 //
 // Windows1252Encoding.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Windows1252Encoding.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Windows1252Encoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Windows1252Encoding.h"
+#include "Poco/Windows1252Encoding.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const TextEncoding::CharacterMap Windows1252Encoding::_charMap = 
@@ -95,4 +95,4 @@ int Windows1252Encoding::convert(int ch, unsigned char* bytes, int length) const
 }
 
 
-Foundation_END
+} // namespace Poco

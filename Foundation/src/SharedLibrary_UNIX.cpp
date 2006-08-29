@@ -1,7 +1,7 @@
 //
 // SharedLibrary_UNIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SharedLibrary_UNIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SharedLibrary_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -34,8 +34,8 @@
 //
 
 
-#include "Foundation/SharedLibrary_UNIX.h"
-#include "Foundation/Exception.h"
+#include "Poco/SharedLibrary_UNIX.h"
+#include "Poco/Exception.h"
 #include <dlfcn.h>
 
 
@@ -45,7 +45,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FastMutex SharedLibraryImpl::_mutex;
@@ -128,6 +128,12 @@ std::string SharedLibraryImpl::suffixImpl()
 	#else
 		return ".sl";
 	#endif
+#elif defined(__CYGWIN__)
+	#if defined(_DEBUG)
+		return "d.dll";
+	#else
+		return ".dll";
+	#endif
 #else
 	#if defined(_DEBUG)
 		return "d.so";
@@ -138,4 +144,4 @@ std::string SharedLibraryImpl::suffixImpl()
 }
 
 
-Foundation_END
+} // namespace Poco

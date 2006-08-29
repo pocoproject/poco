@@ -34,13 +34,14 @@
 //
 
 
-#include "Net/HTTPBufferAllocator.h"
+#include "Poco/Net/HTTPBufferAllocator.h"
 
 
-using Foundation::MemoryPool;
+using Poco::MemoryPool;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 MemoryPool HTTPBufferAllocator::_pool(HTTPBufferAllocator::BUFFER_SIZE, 16);
@@ -62,4 +63,4 @@ void HTTPBufferAllocator::deallocate(char* ptr, std::streamsize size)
 }
 
 
-Net_END
+} } // namespace Poco::Net

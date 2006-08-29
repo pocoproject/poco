@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="netapi32.lib"
+				AdditionalDependencies="iphlpapi.lib"
 				OutputFile="..\bin\PocoFoundationd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -161,7 +161,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="netapi32.lib"
+				AdditionalDependencies="iphlpapi.lib"
 				OutputFile="..\bin\PocoFoundation.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -310,6 +310,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Format.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\FPEnvironment.cpp"
 					>
 				</File>
@@ -414,6 +418,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\HashStatistic.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\MemoryPool.cpp"
 					>
 				</File>
@@ -441,152 +449,188 @@
 					RelativePath=".\src\StringTokenizer.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\Void.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\Any.h"
+					RelativePath=".\include\Poco\Any.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\AutoPtr.h"
+					RelativePath=".\include\Poco\AutoPtr.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\AutoReleasePool.h"
+					RelativePath=".\include\Poco\AutoReleasePool.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Buffer.h"
+					RelativePath=".\include\Poco\Buffer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Bugcheck.h"
+					RelativePath=".\include\Poco\Bugcheck.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ByteOrder.h"
+					RelativePath=".\include\Poco\ByteOrder.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Debugger.h"
+					RelativePath=".\include\Poco\Config.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DynamicFactory.h"
+					RelativePath=".\include\Poco\Debugger.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Environment.h"
+					RelativePath=".\include\Poco\DynamicFactory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Environment_UNIX.h"
+					RelativePath=".\include\Poco\Environment.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Environment_VMS.h"
+					RelativePath=".\include\Poco\Environment_UNIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Environment_WIN32.h"
+					RelativePath=".\include\Poco\Environment_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Environment_WIN32U.h"
+					RelativePath=".\include\Poco\Environment_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Exception.h"
+					RelativePath=".\include\Poco\Environment_WIN32U.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Foundation.h"
+					RelativePath=".\include\Poco\Exception.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FPEnvironment.h"
+					RelativePath=".\include\Poco\Format.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FPEnvironment_C99.h"
+					RelativePath=".\include\Poco\Foundation.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FPEnvironment_DEC.h"
+					RelativePath=".\include\Poco\FPEnvironment.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FPEnvironment_DUMMY.h"
+					RelativePath=".\include\Poco\FPEnvironment_C99.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FPEnvironment_SUN.h"
+					RelativePath=".\include\Poco\FPEnvironment_DEC.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FPEnvironment_WIN32.h"
+					RelativePath=".\include\Poco\FPEnvironment_DUMMY.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Instantiator.h"
+					RelativePath=".\include\Poco\FPEnvironment_SUN.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\MemoryPool.h"
+					RelativePath=".\include\Poco\FPEnvironment_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NestedDiagnosticContext.h"
+					RelativePath=".\include\Poco\HashFunction.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NumberFormatter.h"
+					RelativePath=".\include\Poco\HashStatistic.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NumberParser.h"
+					RelativePath=".\include\Poco\HashTable.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Platform.h"
+					RelativePath=".\include\Poco\Instantiator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Platform_POSIX.h"
+					RelativePath=".\include\Poco\MemoryPool.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Platform_VMS.h"
+					RelativePath=".\include\Poco\NestedDiagnosticContext.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Platform_WIN32.h"
+					RelativePath=".\include\Poco\NumberFormatter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\RefCountedObject.h"
+					RelativePath=".\include\Poco\NumberParser.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SharedPtr.h"
+					RelativePath=".\include\Poco\Platform.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SingletonHolder.h"
+					RelativePath=".\include\Poco\Platform_POSIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\String.h"
+					RelativePath=".\include\Poco\Platform_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\StringTokenizer.h"
+					RelativePath=".\include\Poco\Platform_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Types.h"
+					RelativePath=".\include\Poco\Poco.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\RefCountedObject.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SharedPtr.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SimpleHashTable.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SingletonHolder.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\String.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\StringTokenizer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Types.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Void.h"
 					>
 				</File>
 			</Filter>
@@ -662,83 +706,83 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\Base64Decoder.h"
+					RelativePath=".\include\Poco\Base64Decoder.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Base64Encoder.h"
+					RelativePath=".\include\Poco\Base64Encoder.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\BinaryReader.h"
+					RelativePath=".\include\Poco\BinaryReader.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\BinaryWriter.h"
+					RelativePath=".\include\Poco\BinaryWriter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\BufferAllocator.h"
+					RelativePath=".\include\Poco\BufferAllocator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\BufferedBidirectionalStreamBuf.h"
+					RelativePath=".\include\Poco\BufferedBidirectionalStreamBuf.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\BufferedStreamBuf.h"
+					RelativePath=".\include\Poco\BufferedStreamBuf.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\CountingStream.h"
+					RelativePath=".\include\Poco\CountingStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DeflatingStream.h"
+					RelativePath=".\include\Poco\DeflatingStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\HexBinaryDecoder.h"
+					RelativePath=".\include\Poco\HexBinaryDecoder.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\HexBinaryEncoder.h"
+					RelativePath=".\include\Poco\HexBinaryEncoder.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\InflatingStream.h"
+					RelativePath=".\include\Poco\InflatingStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LineEndingConverter.h"
+					RelativePath=".\include\Poco\LineEndingConverter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NullStream.h"
+					RelativePath=".\include\Poco\NullStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\StreamCopier.h"
+					RelativePath=".\include\Poco\StreamCopier.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\StreamTokenizer.h"
+					RelativePath=".\include\Poco\StreamTokenizer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\StreamUtil.h"
+					RelativePath=".\include\Poco\StreamUtil.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\TeeStream.h"
+					RelativePath=".\include\Poco\TeeStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Token.h"
+					RelativePath=".\include\Poco\Token.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\UnbufferedStreamBuf.h"
+					RelativePath=".\include\Poco\UnbufferedStreamBuf.h"
 					>
 				</File>
 			</Filter>
@@ -833,6 +877,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\ActiveDispatcher.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\ErrorHandler.cpp"
 					>
@@ -1086,111 +1134,123 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\ActiveMethod.h"
+					RelativePath=".\include\Poco\ActiveDispatcher.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ActiveResult.h"
+					RelativePath=".\include\Poco\ActiveMethod.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Activity.h"
+					RelativePath=".\include\Poco\ActiveResult.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ErrorHandler.h"
+					RelativePath=".\include\Poco\ActiveRunnable.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Event.h"
+					RelativePath=".\include\Poco\ActiveStarter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Event_POSIX.h"
+					RelativePath=".\include\Poco\Activity.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Event_WIN32.h"
+					RelativePath=".\include\Poco\ErrorHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Mutex.h"
+					RelativePath=".\include\Poco\Event.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Mutex_POSIX.h"
+					RelativePath=".\include\Poco\Event_POSIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Mutex_WIN32.h"
+					RelativePath=".\include\Poco\Event_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Runnable.h"
+					RelativePath=".\include\Poco\Mutex.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\RunnableAdapter.h"
+					RelativePath=".\include\Poco\Mutex_POSIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\RWLock.h"
+					RelativePath=".\include\Poco\Mutex_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\RWLock_POSIX.h"
+					RelativePath=".\include\Poco\Runnable.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\RWLock_WIN32.h"
+					RelativePath=".\include\Poco\RunnableAdapter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ScopedLock.h"
+					RelativePath=".\include\Poco\RWLock.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Semaphore.h"
+					RelativePath=".\include\Poco\RWLock_POSIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Semaphore_POSIX.h"
+					RelativePath=".\include\Poco\RWLock_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Semaphore_WIN32.h"
+					RelativePath=".\include\Poco\ScopedLock.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SignalHandler.h"
+					RelativePath=".\include\Poco\Semaphore.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SynchronizedObject.h"
+					RelativePath=".\include\Poco\Semaphore_POSIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Thread.h"
+					RelativePath=".\include\Poco\Semaphore_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Thread_POSIX.h"
+					RelativePath=".\include\Poco\SignalHandler.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Thread_WIN32.h"
+					RelativePath=".\include\Poco\SynchronizedObject.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ThreadLocal.h"
+					RelativePath=".\include\Poco\Thread.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ThreadPool.h"
+					RelativePath=".\include\Poco\Thread_POSIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Timer.h"
+					RelativePath=".\include\Poco\Thread_WIN32.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ThreadLocal.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ThreadPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Timer.h"
 					>
 				</File>
 			</Filter>
@@ -1238,39 +1298,39 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\DigestEngine.h"
+					RelativePath=".\include\Poco\DigestEngine.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DigestStream.h"
+					RelativePath=".\include\Poco\DigestStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\HMACEngine.h"
+					RelativePath=".\include\Poco\HMACEngine.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\MD2Engine.h"
+					RelativePath=".\include\Poco\MD2Engine.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\MD4Engine.h"
+					RelativePath=".\include\Poco\MD4Engine.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\MD5Engine.h"
+					RelativePath=".\include\Poco\MD5Engine.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Random.h"
+					RelativePath=".\include\Poco\Random.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\RandomStream.h"
+					RelativePath=".\include\Poco\RandomStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SHA1Engine.h"
+					RelativePath=".\include\Poco\SHA1Engine.h"
 					>
 				</File>
 			</Filter>
@@ -1369,44 +1429,68 @@
 						/>
 					</FileConfiguration>
 				</File>
+				<File
+					RelativePath=".\src\SharedLibrary_WIN32U.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\ClassLibrary.h"
+					RelativePath=".\include\Poco\ClassLibrary.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ClassLoader.h"
+					RelativePath=".\include\Poco\ClassLoader.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Manifest.h"
+					RelativePath=".\include\Poco\Manifest.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\MetaObject.h"
+					RelativePath=".\include\Poco\MetaObject.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SharedLibrary.h"
+					RelativePath=".\include\Poco\SharedLibrary.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SharedLibrary_HPUX.h"
+					RelativePath=".\include\Poco\SharedLibrary_HPUX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SharedLibrary_UNIX.h"
+					RelativePath=".\include\Poco\SharedLibrary_UNIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SharedLibrary_VMS.h"
+					RelativePath=".\include\Poco\SharedLibrary_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SharedLibrary_WIN32.h"
+					RelativePath=".\include\Poco\SharedLibrary_WIN32.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SharedLibrary_WIN32U.h"
 					>
 				</File>
 			</Filter>
@@ -1454,7 +1538,7 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\RegularExpression.h"
+					RelativePath=".\include\Poco\RegularExpression.h"
 					>
 				</File>
 			</Filter>
@@ -1566,6 +1650,26 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\LogFile_WIN32U.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\src\Logger.cpp"
 					>
 				</File>
@@ -1575,6 +1679,10 @@
 				</File>
 				<File
 					RelativePath=".\src\LoggingRegistry.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LogStream.cpp"
 					>
 				</File>
 				<File
@@ -1654,83 +1762,91 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\ArchiveStrategy.h"
+					RelativePath=".\include\Poco\ArchiveStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\AsyncChannel.h"
+					RelativePath=".\include\Poco\AsyncChannel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Channel.h"
+					RelativePath=".\include\Poco\Channel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Configurable.h"
+					RelativePath=".\include\Poco\Configurable.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ConsoleChannel.h"
+					RelativePath=".\include\Poco\ConsoleChannel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\EventLogChannel.h"
+					RelativePath=".\include\Poco\EventLogChannel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FileChannel.h"
+					RelativePath=".\include\Poco\FileChannel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Formatter.h"
+					RelativePath=".\include\Poco\Formatter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FormattingChannel.h"
+					RelativePath=".\include\Poco\FormattingChannel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LogFile.h"
+					RelativePath=".\include\Poco\LogFile.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LogFile_STD.h"
+					RelativePath=".\include\Poco\LogFile_STD.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LogFile_VMS.h"
+					RelativePath=".\include\Poco\LogFile_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LogFile_WIN32.h"
+					RelativePath=".\include\Poco\LogFile_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Logger.h"
+					RelativePath=".\include\Poco\LogFile_WIN32U.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LoggingFactory.h"
+					RelativePath=".\include\Poco\Logger.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LoggingRegistry.h"
+					RelativePath=".\include\Poco\LoggingFactory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Message.h"
+					RelativePath=".\include\Poco\LoggingRegistry.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NullChannel.h"
+					RelativePath=".\include\Poco\LogStream.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\OpcomChannel.h"
+					RelativePath=".\include\Poco\Message.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\PatternFormatter.h"
+					RelativePath=".\include\Poco\NullChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\OpcomChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\PatternFormatter.h"
 					>
 				</File>
 				<File
@@ -1738,27 +1854,27 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\PurgeStrategy.h"
+					RelativePath=".\include\Poco\PurgeStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\RotateStrategy.h"
+					RelativePath=".\include\Poco\RotateStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SimpleFileChannel.h"
+					RelativePath=".\include\Poco\SimpleFileChannel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SplitterChannel.h"
+					RelativePath=".\include\Poco\SplitterChannel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\StreamChannel.h"
+					RelativePath=".\include\Poco\StreamChannel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\SyslogChannel.h"
+					RelativePath=".\include\Poco\SyslogChannel.h"
 					>
 				</File>
 			</Filter>
@@ -1824,19 +1940,19 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\Notification.h"
+					RelativePath=".\include\Poco\Notification.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NotificationCenter.h"
+					RelativePath=".\include\Poco\NotificationCenter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NotificationQueue.h"
+					RelativePath=".\include\Poco\NotificationQueue.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Observer.h"
+					RelativePath=".\include\Poco\Observer.h"
 					>
 				</File>
 			</Filter>
@@ -2112,71 +2228,71 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\DirectoryIterator.h"
+					RelativePath=".\include\Poco\DirectoryIterator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DirectoryIterator_UNIX.h"
+					RelativePath=".\include\Poco\DirectoryIterator_UNIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DirectoryIterator_VMS.h"
+					RelativePath=".\include\Poco\DirectoryIterator_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DirectoryIterator_WIN32.h"
+					RelativePath=".\include\Poco\DirectoryIterator_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DirectoryIterator_WIN32U.h"
+					RelativePath=".\include\Poco\DirectoryIterator_WIN32U.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\File.h"
+					RelativePath=".\include\Poco\File.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\File_UNIX.h"
+					RelativePath=".\include\Poco\File_UNIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\File_VMS.h"
+					RelativePath=".\include\Poco\File_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\File_WIN32.h"
+					RelativePath=".\include\Poco\File_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\File_WIN32U.h"
+					RelativePath=".\include\Poco\File_WIN32U.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Glob.h"
+					RelativePath=".\include\Poco\Glob.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Path.h"
+					RelativePath=".\include\Poco\Path.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Path_UNIX.h"
+					RelativePath=".\include\Poco\Path_UNIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Path_VMS.h"
+					RelativePath=".\include\Poco\Path_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Path_WIN32.h"
+					RelativePath=".\include\Poco\Path_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Path_WIN32U.h"
+					RelativePath=".\include\Poco\Path_WIN32U.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\TemporaryFile.h"
+					RelativePath=".\include\Poco\TemporaryFile.h"
 					>
 				</File>
 			</Filter>
@@ -2356,6 +2472,78 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\Pipe.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PipeImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PipeImpl_DUMMY.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\src\PipeImpl_POSIX.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\src\PipeImpl_WIN32.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\src\PipeStream.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Process.cpp"
 					>
 				</File>
@@ -2444,63 +2632,87 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\NamedEvent.h"
+					RelativePath=".\include\Poco\NamedEvent.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedEvent_UNIX.h"
+					RelativePath=".\include\Poco\NamedEvent_UNIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedEvent_VMS.h"
+					RelativePath=".\include\Poco\NamedEvent_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedEvent_WIN32.h"
+					RelativePath=".\include\Poco\NamedEvent_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedEvent_WIN32U.h"
+					RelativePath=".\include\Poco\NamedEvent_WIN32U.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedMutex.h"
+					RelativePath=".\include\Poco\NamedMutex.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedMutex_UNIX.h"
+					RelativePath=".\include\Poco\NamedMutex_UNIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedMutex_VMS.h"
+					RelativePath=".\include\Poco\NamedMutex_VMS.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedMutex_WIN32.h"
+					RelativePath=".\include\Poco\NamedMutex_WIN32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NamedMutex_WIN32U.h"
+					RelativePath=".\include\Poco\NamedMutex_WIN32U.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Process.h"
+					RelativePath=".\include\Poco\Pipe.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Process_UNIX.h"
+					RelativePath=".\include\Poco\PipeImpl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Process_VMS.h"
+					RelativePath=".\include\Poco\PipeImpl_DUMMY.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Process_WIN32.h"
+					RelativePath=".\include\Poco\PipeImpl_POSIX.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Process_WIN32U.h"
+					RelativePath=".\include\Poco\PipeImpl_WIN32.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\PipeStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Process.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Process_UNIX.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Process_VMS.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Process_WIN32.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Process_WIN32U.h"
 					>
 				</File>
 			</Filter>
@@ -2524,11 +2736,11 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\UUID.h"
+					RelativePath=".\include\Poco\UUID.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\UUIDGenerator.h"
+					RelativePath=".\include\Poco\UUIDGenerator.h"
 					>
 				</File>
 			</Filter>
@@ -2620,39 +2832,39 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\DateTime.h"
+					RelativePath=".\include\Poco\DateTime.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DateTimeFormat.h"
+					RelativePath=".\include\Poco\DateTimeFormat.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DateTimeFormatter.h"
+					RelativePath=".\include\Poco\DateTimeFormatter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DateTimeParser.h"
+					RelativePath=".\include\Poco\DateTimeParser.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LocalDateTime.h"
+					RelativePath=".\include\Poco\LocalDateTime.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Stopwatch.h"
+					RelativePath=".\include\Poco\Stopwatch.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Timespan.h"
+					RelativePath=".\include\Poco\Timespan.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Timestamp.h"
+					RelativePath=".\include\Poco\Timestamp.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Timezone.h"
+					RelativePath=".\include\Poco\Timezone.h"
 					>
 				</File>
 			</Filter>
@@ -2712,47 +2924,47 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\ASCIIEncoding.h"
+					RelativePath=".\include\Poco\ASCIIEncoding.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Latin1Encoding.h"
+					RelativePath=".\include\Poco\Latin1Encoding.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Latin9Encoding.h"
+					RelativePath=".\include\Poco\Latin9Encoding.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\StreamConverter.h"
+					RelativePath=".\include\Poco\StreamConverter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\TextConverter.h"
+					RelativePath=".\include\Poco\TextConverter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\TextEncoding.h"
+					RelativePath=".\include\Poco\TextEncoding.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\TextIterator.h"
+					RelativePath=".\include\Poco\TextIterator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\UnicodeConverter.h"
+					RelativePath=".\include\Poco\UnicodeConverter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\UTF16Encoding.h"
+					RelativePath=".\include\Poco\UTF16Encoding.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\UTF8Encoding.h"
+					RelativePath=".\include\Poco\UTF8Encoding.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Windows1252Encoding.h"
+					RelativePath=".\include\Poco\Windows1252Encoding.h"
 					>
 				</File>
 			</Filter>
@@ -2784,19 +2996,19 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\FileStreamFactory.h"
+					RelativePath=".\include\Poco\FileStreamFactory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\URI.h"
+					RelativePath=".\include\Poco\URI.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\URIStreamFactory.h"
+					RelativePath=".\include\Poco\URIStreamFactory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\URIStreamOpener.h"
+					RelativePath=".\include\Poco\URIStreamOpener.h"
 					>
 				</File>
 			</Filter>
@@ -2824,15 +3036,15 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\Task.h"
+					RelativePath=".\include\Poco\Task.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\TaskManager.h"
+					RelativePath=".\include\Poco\TaskManager.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\TaskNotification.h"
+					RelativePath=".\include\Poco\TaskNotification.h"
 					>
 				</File>
 			</Filter>
@@ -2844,63 +3056,63 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\AbstractDelegate.h"
+					RelativePath=".\include\Poco\AbstractDelegate.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\AbstractEvent.h"
+					RelativePath=".\include\Poco\AbstractEvent.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\AbstractPriorityDelegate.h"
+					RelativePath=".\include\Poco\AbstractPriorityDelegate.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\BasicEvent.h"
+					RelativePath=".\include\Poco\BasicEvent.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\CompareFunctions.h"
+					RelativePath=".\include\Poco\CompareFunctions.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\DefaultStrategy.h"
+					RelativePath=".\include\Poco\DefaultStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Delegate.h"
+					RelativePath=".\include\Poco\Delegate.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\EventArgs.h"
+					RelativePath=".\include\Poco\EventArgs.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\Expire.h"
+					RelativePath=".\include\Poco\Expire.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FIFOEvent.h"
+					RelativePath=".\include\Poco\FIFOEvent.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\FIFOStrategy.h"
+					RelativePath=".\include\Poco\FIFOStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\NotificationStrategy.h"
+					RelativePath=".\include\Poco\NotificationStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\PriorityDelegate.h"
+					RelativePath=".\include\Poco\PriorityDelegate.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\PriorityEvent.h"
+					RelativePath=".\include\Poco\PriorityEvent.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\PriorityExpire.h"
+					RelativePath=".\include\Poco\PriorityExpire.h"
 					>
 				</File>
 			</Filter>
@@ -2920,43 +3132,43 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Foundation\AbstractCache.h"
+					RelativePath=".\include\Poco\AbstractCache.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\AbstractStrategy.h"
+					RelativePath=".\include\Poco\AbstractStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ExpireCache.h"
+					RelativePath=".\include\Poco\ExpireCache.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ExpireLRUCache.h"
+					RelativePath=".\include\Poco\ExpireLRUCache.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ExpireStrategy.h"
+					RelativePath=".\include\Poco\ExpireStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\KeyValueArgs.h"
+					RelativePath=".\include\Poco\KeyValueArgs.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LRUCache.h"
+					RelativePath=".\include\Poco\LRUCache.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\LRUStrategy.h"
+					RelativePath=".\include\Poco\LRUStrategy.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\StrategyCollection.h"
+					RelativePath=".\include\Poco\StrategyCollection.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Foundation\ValidArgs.h"
+					RelativePath=".\include\Poco\ValidArgs.h"
 					>
 				</File>
 			</Filter>

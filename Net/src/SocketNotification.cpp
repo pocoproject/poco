@@ -1,7 +1,7 @@
 //
 // SocketNotification.cpp
 //
-// $Id: //poco/1.1.0/Net/src/SocketNotification.cpp#2 $
+// $Id: //poco/1.2/Net/src/SocketNotification.cpp#1 $
 //
 // Library: Net
 // Package: Reactor
@@ -34,10 +34,11 @@
 //
 
 
-#include "Net/SocketNotification.h"
+#include "Poco/Net/SocketNotification.h"
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 SocketNotification::SocketNotification(SocketReactor* pReactor):
@@ -112,4 +113,4 @@ ShutdownNotification::~ShutdownNotification()
 }
 
 
-Net_END
+} } // namespace Poco::Net

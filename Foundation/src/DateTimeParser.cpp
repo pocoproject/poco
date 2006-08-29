@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/DateTimeParser.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/DateTimeParser.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,14 +34,14 @@
 //
 
 
-#include "Foundation/DateTimeParser.h"
-#include "Foundation/DateTimeFormat.h"
-#include "Foundation/DateTime.h"
-#include "Foundation/Exception.h"
+#include "Poco/DateTimeParser.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTime.h"
+#include "Poco/Exception.h"
 #include <ctype.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 #define SKIP_JUNK() \
@@ -275,7 +275,7 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 			if (it != end && isalpha(*it)) designator += *it++;
 			if (it != end && isalpha(*it)) designator += *it++;
 			if (it != end && isalpha(*it)) designator += *it++;
-			for (int i = 0; i < sizeof(zones)/sizeof(Zone); ++i)
+			for (unsigned i = 0; i < sizeof(zones)/sizeof(Zone); ++i)
 			{
 				if (designator == zones[i].designator)
 					return zones[i].timeZoneDifferential;
@@ -366,4 +366,4 @@ int DateTimeParser::parseAMPM(std::string::const_iterator& it, const std::string
 }
 
 
-Foundation_END
+} // namespace Poco

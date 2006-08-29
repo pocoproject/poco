@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Environment.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Environment.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/Environment.h"
+#include "Poco/Environment.h"
 
 
 #if defined(POCO_OS_FAMILY_VMS)
@@ -48,7 +48,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::string Environment::get(const std::string& name)
@@ -93,4 +93,4 @@ std::string Environment::nodeName()
 }
 
 
-Foundation_END
+} // namespace Poco

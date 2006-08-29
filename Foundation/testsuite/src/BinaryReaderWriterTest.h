@@ -1,7 +1,7 @@
 //
 // BinaryReaderWriterTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/BinaryReaderWriterTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/BinaryReaderWriterTest.h#1 $
 //
 // Definition of the BinaryReaderWriterTest class.
 //
@@ -36,18 +36,10 @@
 #define BinaryReaderWriterTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
-#ifndef Foundation_BinaryReader_INCLUDED
-#include "Foundation/BinaryReader.h"
-#endif
-#ifndef Foundation_BinaryWriter_INCLUDED
-#include "Foundation/BinaryWriter.h"
-#endif
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
 
 
 class BinaryReaderWriterTest: public CppUnit::TestCase
@@ -59,8 +51,8 @@ public:
 	void testNative();
 	void testBigEndian();
 	void testLittleEndian();
-	void write(Foundation::BinaryWriter& writer);
-	void read(Foundation::BinaryReader& reader);
+	void write(Poco::BinaryWriter& writer);
+	void read(Poco::BinaryReader& reader);
 
 	void setUp();
 	void tearDown();

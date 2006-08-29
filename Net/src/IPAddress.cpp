@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.1.0/Net/src/IPAddress.cpp#2 $
+// $Id: //poco/1.2/Net/src/IPAddress.cpp#1 $
 //
 // Library: Net
 // Package: NetCore
@@ -34,23 +34,24 @@
 //
 
 
-#include "Net/IPAddress.h"
-#include "Net/NetException.h"
-#include "Foundation/RefCountedObject.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/Types.h"
+#include "Poco/Net/IPAddress.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/RefCountedObject.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Types.h"
 #include <algorithm>
 #include <string.h>
 
 
-using Foundation::RefCountedObject;
-using Foundation::NumberFormatter;
-using Foundation::UInt8;
-using Foundation::UInt16;
-using Foundation::UInt32;
+using Poco::RefCountedObject;
+using Poco::NumberFormatter;
+using Poco::UInt8;
+using Poco::UInt16;
+using Poco::UInt32;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 //
@@ -465,7 +466,7 @@ IPAddress::IPAddress(Family family): _pImpl(0)
 	else if (family == IPv6)
 		_pImpl = new IPv6AddressImpl();
 #endif
-	else Foundation::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	else Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
@@ -488,7 +489,7 @@ IPAddress::IPAddress(const std::string& addr, Family family): _pImpl(0)
 	else if (family == IPv6)
 		_pImpl = IPv6AddressImpl::parse(addr);
 #endif
-	else throw Foundation::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
@@ -500,7 +501,7 @@ IPAddress::IPAddress(const void* addr, poco_socklen_t length)
 	else if (length == sizeof(struct in6_addr))
 		_pImpl = new IPv6AddressImpl(addr);
 #endif
-	else throw Foundation::InvalidArgumentException("Invalid address length passed to IPAddress()");
+	else throw Poco::InvalidArgumentException("Invalid address length passed to IPAddress()");
 }
 
 
@@ -741,4 +742,4 @@ bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 }
 
 
-Net_END
+} } // namespace Poco::Net

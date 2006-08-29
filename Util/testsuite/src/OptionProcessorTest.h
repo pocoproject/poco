@@ -1,7 +1,7 @@
 //
 // OptionProcessorTest.h
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/OptionProcessorTest.h#2 $
+// $Id: //poco/1.2/Util/testsuite/src/OptionProcessorTest.h#1 $
 //
 // Definition of the OptionProcessorTest class.
 //
@@ -36,12 +36,8 @@
 #define OptionProcessorTest_INCLUDED
 
 
-#ifndef Util_Util_INCLUDED
-#include "Util/Util.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Util/Util.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class OptionProcessorTest: public CppUnit::TestCase
@@ -52,6 +48,7 @@ public:
 
 	void testUnix();
 	void testDefault();
+	void testRequired();
 
 	void setUp();
 	void tearDown();

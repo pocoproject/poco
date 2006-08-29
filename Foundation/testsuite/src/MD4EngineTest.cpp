@@ -1,7 +1,7 @@
 //
 // MD4EngineTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/MD4EngineTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/MD4EngineTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,11 +33,11 @@
 #include "MD4EngineTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/MD4Engine.h"
+#include "Poco/MD4Engine.h"
 
 
-using Foundation::MD4Engine;
-using Foundation::DigestEngine;
+using Poco::MD4Engine;
+using Poco::DigestEngine;
 
 
 MD4EngineTest::MD4EngineTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // LRUCacheTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LRUCacheTest.cpp#5 $
+// $Id: //poco/1.2/Foundation/testsuite/src/LRUCacheTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,16 +31,14 @@
 
 
 #include "LRUCacheTest.h"
-
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Exception.h"
+#include "Poco/LRUCache.h"
+#include "Poco/Bugcheck.h"
 
-#include "Foundation/Exception.h"
-#include "Foundation/LRUCache.h"
-#include "Foundation/Bugcheck.h"
 
-using namespace Foundation;
-
+using namespace Poco;
 
 
 LRUCacheTest::LRUCacheTest(const std::string& name ): CppUnit::TestCase(name)
@@ -69,8 +67,6 @@ void LRUCacheTest::testClear()
 	poco_assert ( !aCache.has( 1 ) );
 	poco_assert ( !aCache.has( 3 ) );
 	poco_assert ( !aCache.has( 5 ) );
-
-
 }
 
 
@@ -82,7 +78,7 @@ void LRUCacheTest::testCacheSize0()
 		LRUCache < int, int > aCache( 0 );
 		failmsg ("cache size of 0 is illegal, test should fail");
 	}
-	catch (Foundation::InvalidArgumentException&)
+	catch (Poco::InvalidArgumentException&)
 	{
 	}
 }
@@ -111,8 +107,6 @@ void LRUCacheTest::testCacheSize1()
 
 	// removing illegal entries should work too
 	aCache.remove(666);
-
-
 }
 
 
@@ -207,6 +201,18 @@ void LRUCacheTest::testCacheSizeN()
 }
 
 
+void LRUCacheTest::testDuplicateAdd()
+{
+	LRUCache < int, int > aCache( 3 );
+	aCache.add(1, 2); // 1
+	poco_assert (aCache.has(1));
+	poco_assert (*aCache.get(1) == 2);
+	aCache.add(1, 3);
+	poco_assert (aCache.has(1));
+	poco_assert (*aCache.get(1) == 3);
+}
+
+
 void LRUCacheTest::setUp()
 {
 }
@@ -226,6 +232,7 @@ CppUnit::Test* LRUCacheTest::suite()
 	CppUnit_addTest(pSuite, LRUCacheTest, testCacheSize1);
 	CppUnit_addTest(pSuite, LRUCacheTest, testCacheSize2);
 	CppUnit_addTest(pSuite, LRUCacheTest, testCacheSizeN);
+	CppUnit_addTest(pSuite, LRUCacheTest, testDuplicateAdd);
 
 	return pSuite;
 }

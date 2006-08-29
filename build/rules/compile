@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/rules/compile#1 $
+# $Id: //poco/1.2/build/rules/compile#1 $
 #
 # compiile
 #
@@ -9,6 +9,9 @@
 #
 # Targets
 #
+.PHONY: all all_static all_shared all_debug all_release \
+        clean static_debug static_release shared_debug shared_release
+
 all: $(DEFAULT_TARGET)
 all_static: static_debug static_release
 all_shared: shared_debug shared_release
@@ -18,7 +21,10 @@ all_release: static_release shared_release
 #
 # Create directories if necessary
 #
-dirs: $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_SHARED) $(OBJPATH_DEBUG_SHARED) $(LIBPATH) $(BINPATH)
+.PHONY: objdirs libdirs bindirs
+objdirs: $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_SHARED) $(OBJPATH_DEBUG_SHARED) 
+libdirs: objdirs $(LIBPATH) 
+bindirs: objdirs $(BINPATH)
 
 $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_SHARED) $(OBJPATH_DEBUG_SHARED) $(LIBPATH) $(BINPATH):
 	$(MKDIR) $@

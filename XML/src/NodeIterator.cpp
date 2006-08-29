@@ -1,7 +1,7 @@
 //
 // NodeIterator.cpp
 //
-// $Id: //poco/1.1.0/XML/src/NodeIterator.cpp#2 $
+// $Id: //poco/1.2/XML/src/NodeIterator.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,13 +34,14 @@
 //
 
 
-#include "DOM/NodeIterator.h"
-#include "DOM/AbstractNode.h"
-#include "DOM/NodeFilter.h"
-#include "DOM/DOMException.h"
+#include "Poco/DOM/NodeIterator.h"
+#include "Poco/DOM/AbstractNode.h"
+#include "Poco/DOM/NodeFilter.h"
+#include "Poco/DOM/DOMException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter):
@@ -194,4 +195,4 @@ Node* NodeIterator::last()
 }
 
 
-XML_END
+} } // namespace Poco::XML

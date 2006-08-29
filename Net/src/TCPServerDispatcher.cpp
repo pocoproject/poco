@@ -1,7 +1,7 @@
 //
 // TCPServerDispatcher.cpp
 //
-// $Id: //poco/1.1.0/Net/src/TCPServerDispatcher.cpp#2 $
+// $Id: //poco/1.2/Net/src/TCPServerDispatcher.cpp#1 $
 //
 // Library: Net
 // Package: TCPServer
@@ -34,20 +34,21 @@
 //
 
 
-#include "Net/TCPServerDispatcher.h"
-#include "Net/TCPServerConnectionFactory.h"
-#include "Net/TCPServerParams.h"
-#include "Foundation/Notification.h"
-#include "Foundation/AutoPtr.h"
+#include "Poco/Net/TCPServerDispatcher.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/TCPServerParams.h"
+#include "Poco/Notification.h"
+#include "Poco/AutoPtr.h"
 #include <memory>
 
 
-using Foundation::Notification;
-using Foundation::FastMutex;
-using Foundation::AutoPtr;
+using Poco::Notification;
+using Poco::FastMutex;
+using Poco::AutoPtr;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 class TCPConnectionNotification: public Notification
@@ -72,7 +73,7 @@ private:
 };
 
 
-TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory* pFactory, Foundation::ThreadPool& threadPool, TCPServerParams* pParams):
+TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory* pFactory, Poco::ThreadPool& threadPool, TCPServerParams* pParams):
 	_rc(1),
 	_pParams(pParams),
 	_currentThreads(0),
@@ -165,7 +166,7 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 				_threadPool.start(*this, threadName);
 				++_currentThreads;
 			}
-			catch (Foundation::Exception&)
+			catch (Poco::Exception&)
 			{
 				// no problem here, connection is already queued
 				// and a new thread might be available later.
@@ -252,4 +253,4 @@ void TCPServerDispatcher::endConnection()
 }
 
 
-Net_END
+} } // namespace Poco::Net

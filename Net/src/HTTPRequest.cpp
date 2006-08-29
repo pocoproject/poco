@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPRequest.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPRequest.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,18 +34,19 @@
 //
 
 
-#include "Net/HTTPRequest.h"
-#include "Net/HTTPSession.h"
-#include "Net/NetException.h"
-#include "Net/NameValueCollection.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/NumberFormatter.h"
 #include <ctype.h>
 
 
-using Foundation::NumberFormatter;
+using Poco::NumberFormatter;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 const std::string HTTPRequest::HTTP_GET      = "GET";
@@ -114,7 +115,7 @@ void HTTPRequest::setHost(const std::string& host)
 }
 
 	
-void HTTPRequest::setHost(const std::string& host, Foundation::UInt16 port)
+void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 {
 	std::string value(host);
 	if (port != HTTPSession::HTTP_PORT)
@@ -208,6 +209,7 @@ void HTTPRequest::read(std::istream& istr)
 	std::string version;
 	int ch = istr.get();
 	while (isspace(ch)) ch = istr.get();
+	if (ch == eof) throw MessageException("No HTTP request header");
 	while (!isspace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
 	if (!isspace(ch)) throw MessageException("HTTP request method too long");
 	while (isspace(ch)) ch = istr.get();
@@ -226,4 +228,4 @@ void HTTPRequest::read(std::istream& istr)
 }
 
 
-Net_END
+} } // namespace Poco::Net

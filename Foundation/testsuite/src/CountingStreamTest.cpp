@@ -1,7 +1,7 @@
 //
 // CountingStreamTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/CountingStreamTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/CountingStreamTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "CountingStreamTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/CountingStream.h"
+#include "Poco/CountingStream.h"
 #include <sstream>
 
 
-using Foundation::CountingInputStream;
-using Foundation::CountingOutputStream;
+using Poco::CountingInputStream;
+using Poco::CountingOutputStream;
 
 
 CountingStreamTest::CountingStreamTest(const std::string& name): CppUnit::TestCase(name)

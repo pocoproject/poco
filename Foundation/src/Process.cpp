@@ -1,7 +1,7 @@
 //
 // Process.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Process.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Process.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/Process.h"
+#include "Poco/Process.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
@@ -48,7 +48,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 //
@@ -103,7 +103,15 @@ int ProcessHandle::wait() const
 //
 ProcessHandle Process::launch(const std::string& command, const Args& args)
 {
-	return ProcessHandle(launchImpl(command, args));
+	return ProcessHandle(launchImpl(command, args, 0, 0, 0));
+}
+
+
+ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
+{
+	poco_assert (inPipe == 0 || inPipe != outPipe && inPipe != errPipe);
+
+	return ProcessHandle(launchImpl(command, args, inPipe, outPipe, errPipe));
 }
 
 	
@@ -125,4 +133,4 @@ void Process::requestTermination(PID pid)
 }
 
 
-Foundation_END
+} // namespace Poco

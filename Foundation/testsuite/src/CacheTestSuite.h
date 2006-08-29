@@ -1,7 +1,7 @@
 //
 // CacheTestSuite.h
 //
-// $Id: $
+// $Id: //poco/1.2/Foundation/testsuite/src/CacheTestSuite.h#1 $
 //
 // Definition of the CacheTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define CacheTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class CacheTestSuite

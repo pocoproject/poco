@@ -1,7 +1,7 @@
 //
 // QuotedPrintableTest.h
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/QuotedPrintableTest.h#2 $
+// $Id: //poco/1.2/Net/testsuite/src/QuotedPrintableTest.h#1 $
 //
 // Definition of the QuotedPrintableTest class.
 //
@@ -36,12 +36,8 @@
 #define QuotedPrintableTest_INCLUDED
 
 
-#ifndef Net_Net_INCLUDED
-#include "Net/Net.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
-#endif
 
 
 class QuotedPrintableTest: public CppUnit::TestCase

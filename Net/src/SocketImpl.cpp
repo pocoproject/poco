@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.1.0/Net/src/SocketImpl.cpp#2 $
+// $Id: //poco/1.2/Net/src/SocketImpl.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,21 +34,22 @@
 //
 
 
-#include "Net/SocketImpl.h"
-#include "Net/NetException.h"
-#include "Net/StreamSocketImpl.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/SocketImpl.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Net/StreamSocketImpl.h"
+#include "Poco/NumberFormatter.h"
 #include <string.h>
 
 
-using Foundation::IOException;
-using Foundation::TimeoutException;
-using Foundation::InvalidArgumentException;
-using Foundation::NumberFormatter;
-using Foundation::Timespan;
+using Poco::IOException;
+using Poco::TimeoutException;
+using Poco::InvalidArgumentException;
+using Poco::NumberFormatter;
+using Poco::Timespan;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 SocketImpl::SocketImpl():
@@ -108,7 +109,7 @@ void SocketImpl::connect(const SocketAddress& address)
 }
 
 
-void SocketImpl::connect(const SocketAddress& address, const Foundation::Timespan& timeout)
+void SocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
 	poco_assert (_sockfd == POCO_INVALID_SOCKET);
 	
@@ -122,12 +123,12 @@ void SocketImpl::connect(const SocketAddress& address, const Foundation::Timespa
 			if (lastError() != POCO_EINPROGRESS && lastError() != POCO_EWOULDBLOCK)
 				error(address.toString());
 			if (!poll(timeout, SELECT_READ | SELECT_WRITE))
-				throw Foundation::TimeoutException("connect timed out", address.toString());
+				throw Poco::TimeoutException("connect timed out", address.toString());
 			int err = socketError();
 			if (err != 0) error(err);
 		}
 	}
-	catch (Foundation::Exception&)
+	catch (Poco::Exception&)
 	{
 		setBlocking(true);
 		throw;
@@ -324,7 +325,7 @@ int SocketImpl::available()
 }
 
 
-bool SocketImpl::poll(const Foundation::Timespan& timeout, int mode)
+bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 {
 	fd_set fdRead;
 	fd_set fdWrite;
@@ -381,7 +382,7 @@ int SocketImpl::getReceiveBufferSize()
 }
 
 
-void SocketImpl::setSendTimeout(const Foundation::Timespan& timeout)
+void SocketImpl::setSendTimeout(const Poco::Timespan& timeout)
 {
 #if defined(_WIN32)
 	int value = (int) timeout.totalMilliseconds();
@@ -392,7 +393,7 @@ void SocketImpl::setSendTimeout(const Foundation::Timespan& timeout)
 }
 
 
-Foundation::Timespan SocketImpl::getSendTimeout()
+Poco::Timespan SocketImpl::getSendTimeout()
 {
 	Timespan result;
 #if defined(_WIN32)
@@ -406,7 +407,7 @@ Foundation::Timespan SocketImpl::getSendTimeout()
 }
 
 
-void SocketImpl::setReceiveTimeout(const Foundation::Timespan& timeout)
+void SocketImpl::setReceiveTimeout(const Poco::Timespan& timeout)
 {
 #if defined(_WIN32)
 	int value = (int) timeout.totalMilliseconds();
@@ -420,7 +421,7 @@ void SocketImpl::setReceiveTimeout(const Foundation::Timespan& timeout)
 }
 
 
-Foundation::Timespan SocketImpl::getReceiveTimeout()
+Poco::Timespan SocketImpl::getReceiveTimeout()
 {
 	Timespan result;
 #if defined(_WIN32)
@@ -492,7 +493,7 @@ void SocketImpl::setOption(int level, int option, const IPAddress& value)
 }
 
 
-void SocketImpl::setOption(int level, int option, const Foundation::Timespan& value)
+void SocketImpl::setOption(int level, int option, const Poco::Timespan& value)
 {
 	struct timeval tv;
 	tv.tv_sec  = (long) value.totalSeconds();
@@ -532,7 +533,7 @@ void SocketImpl::getOption(int level, int option, unsigned char& value)
 }
 
 
-void SocketImpl::getOption(int level, int option, Foundation::Timespan& value)
+void SocketImpl::getOption(int level, int option, Poco::Timespan& value)
 {
 	struct timeval tv;
 	poco_socklen_t len = sizeof(tv);
@@ -639,6 +640,7 @@ void SocketImpl::setReusePort(bool flag)
 	}
 #endif
 }
+
 
 bool SocketImpl::getReusePort()
 {
@@ -842,4 +844,4 @@ void SocketImpl::error(int code, const std::string& arg)
 }
 
 
-Net_END
+} } // namespace Poco::Net

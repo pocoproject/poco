@@ -1,7 +1,7 @@
 //
 // Path_VMS.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Path_VMS.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Path_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -34,8 +34,8 @@
 //
 
 
-#include "Foundation/Path_VMS.h"
-#include "Foundation/Environment_VMS.h"
+#include "Poco/Path_VMS.h"
+#include "Poco/Environment_VMS.h"
 #include <unistd.h>
 #include <descrip.h>
 #include <dvsdef.h>
@@ -45,7 +45,7 @@
 #include <starlet.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 std::string PathImpl::currentImpl()
@@ -136,4 +136,4 @@ void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 }
 
 
-Foundation_END
+} // namespace Poco

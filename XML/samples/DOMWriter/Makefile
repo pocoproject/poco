@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.1.0/XML/samples/DOMWriter/Makefile#1 $
+# $Id: //poco/1.2/XML/samples/DOMWriter/Makefile#1 $
 #
 # Makefile for Poco DOMWriter
 #
@@ -12,6 +12,6 @@ objects = DOMWriter
 
 target         = DOMWriter
 target_version = 1
-target_libs    = PocoFoundation PocoXML
+target_libs    = PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

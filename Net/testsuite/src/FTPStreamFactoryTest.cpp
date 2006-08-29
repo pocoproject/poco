@@ -1,7 +1,7 @@
 //
 // FTPStreamFactoryTest.cpp
 //
-// $Id: //poco/1.1.0/Net/testsuite/src/FTPStreamFactoryTest.cpp#2 $
+// $Id: //poco/1.2/Net/testsuite/src/FTPStreamFactoryTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,23 +34,23 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "DialogServer.h"
-#include "Net/FTPStreamFactory.h"
-#include "Net/DialogSocket.h"
-#include "Net/SocketAddress.h"
-#include "Net/NetException.h"
-#include "Foundation/URI.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/Net/FTPStreamFactory.h"
+#include "Poco/Net/DialogSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/URI.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 #include <memory>
 
 
-using Net::FTPStreamFactory;
-using Net::FTPPasswordProvider;
-using Net::DialogSocket;
-using Net::SocketAddress;
-using Net::FTPException;
-using Foundation::URI;
-using Foundation::StreamCopier;
+using Poco::Net::FTPStreamFactory;
+using Poco::Net::FTPPasswordProvider;
+using Poco::Net::DialogSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::FTPException;
+using Poco::URI;
+using Poco::StreamCopier;
 
 
 namespace

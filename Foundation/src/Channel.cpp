@@ -1,7 +1,7 @@
 //
 // Channel.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Channel.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Channel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Channel.h"
+#include "Poco/Channel.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Channel::Channel()
@@ -72,4 +72,4 @@ std::string Channel::getProperty(const std::string& name) const
 }
 
 
-Foundation_END
+} // namespace Poco

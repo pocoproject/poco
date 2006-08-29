@@ -1,7 +1,7 @@
 //
 // CountingStream.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/CountingStream.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/CountingStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/CountingStream.h"
+#include "Poco/CountingStream.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 CountingStreamBuf::CountingStreamBuf(): 
@@ -182,4 +182,4 @@ CountingOutputStream::~CountingOutputStream()
 }
 
 
-Foundation_END
+} // namespace Poco

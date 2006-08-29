@@ -1,7 +1,7 @@
 //
 // download.cpp
 //
-// $Id: //poco/1.1.0/Net/samples/download/src/download.cpp#2 $
+// $Id: //poco/1.2/Net/samples/download/src/download.cpp#1 $
 //
 // This sample demonstrates the URIStreamOpener class.
 //
@@ -32,24 +32,24 @@
 //
 
 
-#include "Foundation/URIStreamOpener.h"
-#include "Foundation/StreamCopier.h"
-#include "Foundation/Path.h"
-#include "Foundation/URI.h"
-#include "Foundation/Exception.h"
-#include "Net/HTTPStreamFactory.h"
-#include "Net/FTPStreamFactory.h"
+#include "Poco/URIStreamOpener.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Path.h"
+#include "Poco/URI.h"
+#include "Poco/Exception.h"
+#include "Poco/Net/HTTPStreamFactory.h"
+#include "Poco/Net/FTPStreamFactory.h"
 #include <memory>
 #include <iostream>
 
 
-using Foundation::URIStreamOpener;
-using Foundation::StreamCopier;
-using Foundation::Path;
-using Foundation::URI;
-using Foundation::Exception;
-using Net::HTTPStreamFactory;
-using Net::FTPStreamFactory;
+using Poco::URIStreamOpener;
+using Poco::StreamCopier;
+using Poco::Path;
+using Poco::URI;
+using Poco::Exception;
+using Poco::Net::HTTPStreamFactory;
+using Poco::Net::FTPStreamFactory;
 
 
 int main(int argc, char** argv)

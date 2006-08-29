@@ -1,7 +1,7 @@
 //
 // EventArgs.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/EventArgs.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/EventArgs.cpp#1 $
 //
 // Library: Foundation
 // Package: Events
@@ -36,10 +36,10 @@
 //
 
 
-#include "Foundation/EventArgs.h"
+#include "Poco/EventArgs.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 EventArgs::EventArgs()
@@ -52,4 +52,4 @@ EventArgs::~EventArgs()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // DummyDelegate.cpp
 //
-// $Id: $
+// $Id: //poco/1.2/Foundation/testsuite/src/DummyDelegate.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -31,7 +31,7 @@
 
 
 #include "DummyDelegate.h"
-#include "Foundation/Exception.h"
+#include "Poco/Exception.h"
 
 DummyDelegate::DummyDelegate () {}
 DummyDelegate::~DummyDelegate () {}
@@ -40,7 +40,7 @@ void DummyDelegate::onSimple ( const void* pSender, int& i )
 {
 	if ( i != 0)
 	{
-		throw Foundation::InvalidArgumentException();
+		throw Poco::InvalidArgumentException();
 	}
 	i++;
 }
@@ -48,7 +48,7 @@ void DummyDelegate::onSimple2 ( const void* pSender, int& i )
 {
 	if ( i != 1)
 	{
-		throw Foundation::InvalidArgumentException();
+		throw Poco::InvalidArgumentException();
 	}
 	i++;
 }

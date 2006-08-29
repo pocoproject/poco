@@ -1,7 +1,7 @@
 //
 // Semaphore_POSIX.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Semaphore_POSIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Semaphore_POSIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/Semaphore_POSIX.h"
+#include "Poco/Semaphore_POSIX.h"
 #include <sys/time.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 SemaphoreImpl::SemaphoreImpl(int n, int max): _n(n), _max(max)
@@ -115,4 +115,4 @@ bool SemaphoreImpl::waitImpl(long milliseconds)
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // Semaphore.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Semaphore.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Semaphore.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/Semaphore.h"
+#include "Poco/Semaphore.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -44,7 +44,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Semaphore::Semaphore(int n): SemaphoreImpl(n, n)
@@ -62,4 +62,4 @@ Semaphore::~Semaphore()
 }
 
 
-Foundation_END
+} // namespace Poco

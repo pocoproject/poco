@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.1.0/Util/src/ServerApplication.cpp#2 $
+// $Id: //poco/1.2/Util/src/ServerApplication.cpp#1 $
 //
 // Library: Util
 // Package: Application
@@ -34,14 +34,14 @@
 //
 
 
-#include "Util/ServerApplication.h"
-#include "Util/Option.h"
-#include "Util/OptionSet.h"
-#include "Foundation/Exception.h"
-#include "Foundation/Process.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/NamedEvent.h"
-#include "Foundation/Logger.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Exception.h"
+#include "Poco/Process.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NamedEvent.h"
+#include "Poco/Logger.h"
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <stdlib.h>
 #include <unistd.h>
@@ -49,24 +49,28 @@
 #include <signal.h>
 #include <sys/stat.h>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Util/WinService.h"
+#include "Poco/Util/WinService.h"
 #include <windows.h>
 #include <string.h>
 #endif
+#if defined(POCO_WIN32_UTF8)
+#include "Poco/UnicodeConverter.h"
+#endif
 
 
-using Foundation::NamedEvent;
-using Foundation::Process;
-using Foundation::NumberFormatter;
-using Foundation::Exception;
-using Foundation::SystemException;
+using Poco::NamedEvent;
+using Poco::Process;
+using Poco::NumberFormatter;
+using Poco::Exception;
+using Poco::SystemException;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-Foundation::Event     ServerApplication::_terminated;
+Poco::Event     ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus; 
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
 #endif
@@ -146,7 +150,11 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 {
 	ServerApplication& app = static_cast<ServerApplication&>(Application::instance());
 
+#if defined(POCO_WIN32_UTF8)
+	_serviceStatusHandle = RegisterServiceCtrlHandlerW(L"", ServiceControlHandler);
+#else
 	_serviceStatusHandle = RegisterServiceCtrlHandler("", ServiceControlHandler);
+#endif
 	if (!_serviceStatusHandle)
 		throw SystemException("cannot register service control handler");
 
@@ -161,7 +169,18 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 
 	try
 	{
+#if defined(POCO_WIN32_UTF8)
+		std::vector<std::string> args;
+		for (DWORD i = 0; i < argc; ++i)
+		{
+			std::string arg;
+			Poco::UnicodeConverter::toUTF8(argv[i], arg);
+			args.push_back(arg);
+		}
+		app.init(args);
+#else
 		app.init(argc, argv);
+#endif
 		_serviceStatus.dwCurrentState = SERVICE_RUNNING; 
 		SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
 		int rc = app.run();
@@ -241,10 +260,54 @@ int ServerApplication::run(int argc, char** argv)
 }
 
 
+#if defined(POCO_WIN32_UTF8)
+int ServerApplication::run(int argc, wchar_t** argv)
+{
+	if (!hasConsole() && isService())
+	{
+		config().setBool("application.runAsService", true);
+		return 0;
+	}
+	else 
+	{
+		int rc = EXIT_OK;
+		try
+		{
+			init(argc, argv);
+			switch (_action)
+			{
+			case SRV_REGISTER:
+				registerService();
+				rc = EXIT_OK;
+				break;
+			case SRV_UNREGISTER:
+				unregisterService();
+				rc = EXIT_OK;
+				break;
+			default:
+				rc = run();
+				uninitialize();
+			}
+		}
+		catch (Exception& exc)
+		{
+			logger().log(exc);
+			rc = EXIT_SOFTWARE;
+		}
+		return rc;
+	}
+}
+#endif
+
+
 bool ServerApplication::isService()
 {
 	SERVICE_TABLE_ENTRY svcDispatchTable[2];
+#if defined(POCO_WIN32_UTF8)
+	svcDispatchTable[0].lpServiceName = L"";
+#else
 	svcDispatchTable[0].lpServiceName = "";
+#endif
 	svcDispatchTable[0].lpServiceProc = ServiceMain;
 	svcDispatchTable[1].lpServiceName = NULL;
 	svcDispatchTable[1].lpServiceProc = NULL; 
@@ -314,6 +377,8 @@ void ServerApplication::handleOption(const std::string& name, const std::string&
 		_action = SRV_UNREGISTER;
 	else if (name == "displayName")
 		_displayName = value;
+	else
+		Application::handleOption(name, value);
 }
 
 
@@ -411,6 +476,7 @@ void ServerApplication::handleOption(const std::string& name, const std::string&
 	{
 		config().setBool("application.runAsDaemon", true);
 	}
+	else Application::handleOption(name, value);
 }
 
 
@@ -496,10 +562,11 @@ void ServerApplication::defineOptions(OptionSet& options)
 
 void ServerApplication::handleOption(const std::string& name, const std::string& value)
 {
+	Application::handleOption(name, value);
 }
 
 
 #endif
 
 
-Util_END
+} } // namespace Poco::Util

@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/1.1.0/Foundation/samples/inflate/inflate.vmsbuild#1 $
+# $Id: //poco/1.2/Foundation/samples/inflate/inflate.vmsbuild#1 $
 #
 EXE=inflate
 inflate

@@ -1,7 +1,7 @@
 //
 // DateTimeTestSuite.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/DateTimeTestSuite.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/DateTimeTestSuite.h#1 $
 //
 // Definition of the DateTimeTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define DateTimeTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class DateTimeTestSuite

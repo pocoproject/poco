@@ -1,7 +1,7 @@
 //
 // SharedLibraryTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/SharedLibraryTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/SharedLibraryTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,14 +33,14 @@
 #include "SharedLibraryTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/SharedLibrary.h"
-#include "Foundation/Exception.h"
+#include "Poco/SharedLibrary.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::SharedLibrary;
-using Foundation::NotFoundException;
-using Foundation::LibraryLoadException;
-using Foundation::LibraryAlreadyLoadedException;
+using Poco::SharedLibrary;
+using Poco::NotFoundException;
+using Poco::LibraryLoadException;
+using Poco::LibraryAlreadyLoadedException;
 
 
 typedef int (*GimmeFiveFunc)();

@@ -1,7 +1,7 @@
 //
 // Option.cpp
 //
-// $Id: //poco/1.1.0/Util/src/Option.cpp#2 $
+// $Id: //poco/1.2/Util/src/Option.cpp#1 $
 //
 // Library: Util
 // Package: Options
@@ -34,21 +34,26 @@
 //
 
 
-#include "Util/Option.h"
-#include "Util/OptionException.h"
-#include "Foundation/String.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionException.h"
+#include "Poco/Util/Validator.h"
+#include "Poco/String.h"
+#include <algorithm>
 
 
-using Foundation::icompare;
+using Poco::icompare;
 
 
-Util_BEGIN
+namespace Poco {
+namespace Util {
 
 
 Option::Option(): 
 	_required(false), 
 	_repeatable(false), 
-	_argRequired(false)
+	_argRequired(false),
+	_pValidator(0),
+	_pCallback(0)
 {
 }
 
@@ -61,46 +66,59 @@ Option::Option(const Option& option):
 	_repeatable(option._repeatable),
 	_argName(option._argName),
 	_argRequired(option._argRequired),
-	_group(option._group)
+	_group(option._group),
+	_binding(option._binding),
+	_pValidator(option._pValidator),
+	_pCallback(option._pCallback)
 {
+	if (_pValidator) _pValidator->duplicate();
+	if (_pCallback) _pCallback = _pCallback->clone();
 }
 
 
 Option::Option(const std::string& fullName, const std::string& shortName):
-	_fullName(fullName),
 	_shortName(shortName),
+	_fullName(fullName),
 	_required(false),
 	_repeatable(false),
-	_argRequired(false)
+	_argRequired(false),
+	_pValidator(0),
+	_pCallback(0)
 {
 }
 
 
 Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required):
-	_fullName(fullName),
 	_shortName(shortName),
+	_fullName(fullName),
 	_description(description),
 	_required(required),
 	_repeatable(false),
-	_argRequired(false)
+	_argRequired(false),
+	_pValidator(0),
+	_pCallback(0)
 {
 }
 
 
 Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argOptional):
-	_fullName(fullName),
 	_shortName(shortName),
+	_fullName(fullName),
 	_description(description),
 	_required(required),
 	_repeatable(false),
 	_argName(argName),
-	_argRequired(argOptional)
+	_argRequired(argOptional),
+	_pValidator(0),
+	_pCallback(0)
 {
 }
 
 
 Option::~Option()
 {
+	if (_pValidator) _pValidator->release();
+	delete _pCallback;
 }
 
 
@@ -108,16 +126,26 @@ Option& Option::operator = (const Option& option)
 {
 	if (&option != this)
 	{
-		_shortName   = option._shortName;
-		_fullName    = option._fullName;
-		_description = option._description;
-		_required    = option._required;
-		_repeatable  = option._repeatable;
-		_argName     = option._argName;
-		_argRequired = option._argRequired;
-		_group       = option._group;
+		Option tmp(option);
+		swap(tmp);
 	}
 	return *this;
+}
+
+
+void Option::swap(Option& option)
+{
+	std::swap(_shortName, option._shortName);
+	std::swap(_fullName, option._fullName);
+	std::swap(_description, option._description);
+	std::swap(_required, option._required);
+	std::swap(_repeatable, option._repeatable);
+	std::swap(_argName, option._argName);
+	std::swap(_argRequired, option._argRequired);
+	std::swap(_group, option._group);
+	std::swap(_binding, option._binding);
+	std::swap(_pValidator, option._pValidator);
+	std::swap(_pCallback, option._pCallback);
 }
 
 	
@@ -179,6 +207,29 @@ Option& Option::group(const std::string& group)
 }
 
 
+Option& Option::binding(const std::string& propertyName)
+{
+	_binding = propertyName;
+	return *this;
+}
+
+
+Option& Option::callback(const AbstractOptionCallback& cb)
+{
+	_pCallback = cb.clone();
+	return *this;
+}
+
+
+Option& Option::validator(Validator* pValidator)
+{
+	if (_pValidator) _pValidator->release();
+	_pValidator = pValidator;
+	if (_pValidator) _pValidator->duplicate();
+	return *this;
+}
+
+
 bool Option::matchesShort(const std::string& option) const
 {
 	return option.length() > 0 
@@ -234,4 +285,4 @@ void Option::process(const std::string& option, std::string& arg) const
 }
 
 
-Util_END
+} } // namespace Poco::Util

@@ -1,7 +1,7 @@
 //
 // ZLibTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ZLibTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ZLibTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,19 +33,19 @@
 #include "ZLibTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/InflatingStream.h"
-#include "Foundation/DeflatingStream.h"
-#include "Foundation/StreamCopier.h"
+#include "Poco/InflatingStream.h"
+#include "Poco/DeflatingStream.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
-using Foundation::InflatingInputStream;
-using Foundation::InflatingOutputStream;
-using Foundation::DeflatingOutputStream;
-using Foundation::DeflatingInputStream;
-using Foundation::InflatingStreamBuf;
-using Foundation::DeflatingStreamBuf;
-using Foundation::StreamCopier;
+using Poco::InflatingInputStream;
+using Poco::InflatingOutputStream;
+using Poco::DeflatingOutputStream;
+using Poco::DeflatingInputStream;
+using Poco::InflatingStreamBuf;
+using Poco::DeflatingStreamBuf;
+using Poco::StreamCopier;
 
 
 ZLibTest::ZLibTest(const std::string& name): CppUnit::TestCase(name)

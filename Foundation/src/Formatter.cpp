@@ -1,7 +1,7 @@
 //
 // Formatter.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Formatter.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Formatter.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/Formatter.h"
-#include "Foundation/Exception.h"
+#include "Poco/Formatter.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Formatter::Formatter()
@@ -63,4 +63,4 @@ std::string Formatter::getProperty(const std::string& name) const
 }
 
 
-Foundation_END
+} // namespace Poco

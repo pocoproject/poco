@@ -1,7 +1,7 @@
 //
 // SAXParserTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/SAXParserTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/SAXParserTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,25 +33,25 @@
 #include "SAXParserTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "SAX/SAXParser.h"
-#include "SAX/InputSource.h"
-#include "SAX/EntityResolver.h"
-#include "SAX/SAXException.h"
-#include "SAX/WhitespaceFilter.h"
-#include "XML/XMLWriter.h"
-#include "Foundation/Latin9Encoding.h"
+#include "Poco/SAX/SAXParser.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/SAX/EntityResolver.h"
+#include "Poco/SAX/SAXException.h"
+#include "Poco/SAX/WhitespaceFilter.h"
+#include "Poco/XML/XMLWriter.h"
+#include "Poco/Latin9Encoding.h"
 #include <sstream>
 #include <fstream>
 
 
-using XML::SAXParser;
-using XML::XMLWriter;
-using XML::XMLReader;
-using XML::InputSource;
-using XML::EntityResolver;
-using XML::XMLString;
-using XML::SAXParseException;
-using XML::WhitespaceFilter;
+using Poco::XML::SAXParser;
+using Poco::XML::XMLWriter;
+using Poco::XML::XMLReader;
+using Poco::XML::InputSource;
+using Poco::XML::EntityResolver;
+using Poco::XML::XMLString;
+using Poco::XML::SAXParseException;
+using Poco::XML::WhitespaceFilter;
 
 
 class TestEntityResolver: public EntityResolver
@@ -281,7 +281,7 @@ void SAXParserTest::testRSS()
 	XMLWriter writer(ostr, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
 	filter.setContentHandler(&writer);
 	filter.setDTDHandler(&writer);
-	filter.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<XML::LexicalHandler*>(&writer));
+	filter.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
 	InputSource source(istr);
 	filter.parse(&source);
 }
@@ -290,7 +290,7 @@ void SAXParserTest::testRSS()
 void SAXParserTest::testEncoding()
 {
 	SAXParser parser;
-	Foundation::Latin9Encoding encoding;
+	Poco::Latin9Encoding encoding;
 	parser.addEncoding("ISO-8859-15", &encoding); 
 	
 	std::istringstream istr(ENCODING);
@@ -298,7 +298,7 @@ void SAXParserTest::testEncoding()
 	XMLWriter writer(ostr, XMLWriter::WRITE_XML_DECLARATION, "ISO-8859-15", encoding);
 	parser.setContentHandler(&writer);
 	parser.setDTDHandler(&writer);
-	parser.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<XML::LexicalHandler*>(&writer));
+	parser.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
 	InputSource source(istr);
 	parser.parse(&source);
 	
@@ -324,7 +324,7 @@ std::string SAXParserTest::parse(XMLReader& reader, int options, const std::stri
 	XMLWriter writer(ostr, options);
 	reader.setContentHandler(&writer);
 	reader.setDTDHandler(&writer);
-	reader.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<XML::LexicalHandler*>(&writer));
+	reader.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
 	InputSource source(istr);
 	reader.parse(&source);
 	return ostr.str();

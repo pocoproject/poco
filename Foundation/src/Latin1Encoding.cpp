@@ -1,7 +1,7 @@
 //
 // Latin1Encoding.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Latin1Encoding.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Latin1Encoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Latin1Encoding.h"
+#include "Poco/Latin1Encoding.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 const TextEncoding::CharacterMap Latin1Encoding::_charMap = 
@@ -94,4 +94,4 @@ int Latin1Encoding::convert(int ch, unsigned char* bytes, int length) const
 }
 
 
-Foundation_END
+} // namespace Poco

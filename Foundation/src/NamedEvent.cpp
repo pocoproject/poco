@@ -1,7 +1,7 @@
 //
 // NamedEvent.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/NamedEvent.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/NamedEvent.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/NamedEvent.h"
+#include "Poco/NamedEvent.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
@@ -48,7 +48,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 NamedEvent::NamedEvent(const std::string& name):
@@ -62,4 +62,4 @@ NamedEvent::~NamedEvent()
 }
 
 
-Foundation_END
+} // namespace Poco

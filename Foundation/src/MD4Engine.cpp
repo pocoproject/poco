@@ -1,7 +1,7 @@
 //
 // MD4Engine.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/MD4Engine.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/MD4Engine.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -57,11 +57,11 @@
 //
 
 
-#include "Foundation/MD4Engine.h"
+#include "Poco/MD4Engine.h"
 #include <string.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 MD4Engine::MD4Engine()
@@ -297,4 +297,4 @@ void MD4Engine::decode(UInt32* output, const unsigned char* input, unsigned int 
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // Process_WIN32U.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Process_WIN32U.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Process_WIN32U.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -34,14 +34,15 @@
 //
 
 
-#include "Foundation/Process_WIN32U.h"
-#include "Foundation/Exception.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/NamedEvent.h"
-#include "Foundation/UnicodeConverter.h"
+#include "Poco/Process_WIN32U.h"
+#include "Poco/Exception.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NamedEvent.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/Pipe.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 //
@@ -113,7 +114,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args)
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
 {
 	std::string commandLine = command;
 	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
@@ -131,9 +132,28 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	startupInfo.lpReserved  = NULL;
 	startupInfo.lpDesktop   = NULL;
 	startupInfo.lpTitle     = NULL;
-	startupInfo.dwFlags     = STARTF_FORCEOFFFEEDBACK;
+	startupInfo.dwFlags     = STARTF_FORCEOFFFEEDBACK | STARTF_USESTDHANDLES;
 	startupInfo.cbReserved2 = 0;
 	startupInfo.lpReserved2 = NULL;
+	
+	HANDLE hProc = GetCurrentProcess();
+	if (inPipe)
+	{
+		DuplicateHandle(hProc, inPipe->readHandle(), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
+		inPipe->close(Pipe::CLOSE_READ);
+	}
+	else DuplicateHandle(hProc, GetStdHandle(STD_INPUT_HANDLE), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
+	// outPipe may be the same as errPipe, so we duplicate first and close later.
+	if (outPipe)
+		DuplicateHandle(hProc, outPipe->writeHandle(), hProc, &startupInfo.hStdOutput, 0, TRUE, DUPLICATE_SAME_ACCESS);
+	else
+		DuplicateHandle(hProc, GetStdHandle(STD_OUTPUT_HANDLE), hProc, &startupInfo.hStdOutput, 0, TRUE, DUPLICATE_SAME_ACCESS);
+	if (errPipe)
+		DuplicateHandle(hProc, errPipe->writeHandle(), hProc, &startupInfo.hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS);
+	else
+		DuplicateHandle(hProc, GetStdHandle(STD_ERROR_HANDLE), hProc, &startupInfo.hStdError, 0, TRUE, DUPLICATE_SAME_ACCESS);
+	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
+	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
 
 	PROCESS_INFORMATION processInfo;
 	BOOL rc = CreateProcessW(
@@ -148,6 +168,9 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		&startupInfo, 
 		&processInfo
 	);
+	CloseHandle(startupInfo.hStdInput);
+	CloseHandle(startupInfo.hStdOutput);
+	CloseHandle(startupInfo.hStdError);
 	if (rc)
 	{
 		CloseHandle(processInfo.hThread);
@@ -193,4 +216,4 @@ void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 }
 
 
-Foundation_END
+} // namespace Poco

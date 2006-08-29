@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/XMLConfigurationTest.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/XMLConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,18 +33,18 @@
 #include "XMLConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Util/XMLConfiguration.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/Util/XMLConfiguration.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include <sstream>
 #include <algorithm>
 
 
-using Util::XMLConfiguration;
-using Util::AbstractConfiguration;
-using Foundation::AutoPtr;
-using Foundation::NotImplementedException;
-using Foundation::NotFoundException;
+using Poco::Util::XMLConfiguration;
+using Poco::Util::AbstractConfiguration;
+using Poco::AutoPtr;
+using Poco::NotImplementedException;
+using Poco::NotFoundException;
 
 
 XMLConfigurationTest::XMLConfigurationTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // FPEnvironment_C99.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/FPEnvironment_DUMMY.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/FPEnvironment_DUMMY.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/FPEnvironment_DUMMY.h"
+#include "Poco/FPEnvironment_DUMMY.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 FPEnvironmentImpl::RoundingModeImpl FPEnvironmentImpl::_roundingMode;
@@ -98,4 +98,4 @@ long double FPEnvironmentImpl::copySignImpl(long double target, long double sour
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // WinTestRunner.cpp
 //
-// $Id: //poco/1.1.0/CppUnit/WinTestRunner/src/WinTestRunner.cpp#1 $
+// $Id: //poco/1.2/CppUnit/WinTestRunner/src/WinTestRunner.cpp#1 $
 //
 
 
@@ -9,7 +9,7 @@
 #include "TestRunnerDlg.h"
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 WinTestRunner::WinTestRunner()
@@ -61,4 +61,4 @@ void WinTestRunnerApp::TestMain()
 }
 
 
-CppUnit_END
+} // namespace CppUnit

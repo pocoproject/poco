@@ -1,7 +1,7 @@
 //
 // SocketStream.cpp
 //
-// $Id: //poco/1.1.0/Net/src/SocketStream.cpp#2 $
+// $Id: //poco/1.2/Net/src/SocketStream.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,16 +34,17 @@
 //
 
 
-#include "Net/SocketStream.h"
-#include "Net/StreamSocketImpl.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/SocketStream.h"
+#include "Poco/Net/StreamSocketImpl.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::BufferedBidirectionalStreamBuf;
-using Foundation::InvalidArgumentException;
+using Poco::BufferedBidirectionalStreamBuf;
+using Poco::InvalidArgumentException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 //
@@ -174,4 +175,4 @@ SocketStream::~SocketStream()
 }
 
 
-Net_END
+} } // namespace Poco::Net

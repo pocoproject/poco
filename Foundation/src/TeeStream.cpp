@@ -1,7 +1,7 @@
 //
 // TeeStream.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/TeeStream.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/TeeStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/TeeStream.h"
+#include "Poco/TeeStream.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 TeeStreamBuf::TeeStreamBuf(): 
@@ -152,4 +152,4 @@ TeeOutputStream::~TeeOutputStream()
 }
 
 
-Foundation_END
+} // namespace Poco

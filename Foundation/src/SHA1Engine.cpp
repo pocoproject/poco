@@ -1,7 +1,7 @@
 //
 // SHA1Engine.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/SHA1Engine.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/SHA1Engine.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -37,7 +37,7 @@
 //
 
 
-#include "Foundation/SHA1Engine.h"
+#include "Poco/SHA1Engine.h"
 #include <string.h>
 
 
@@ -48,7 +48,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 SHA1Engine::SHA1Engine()
@@ -302,4 +302,4 @@ void SHA1Engine::transform()
 }
 
 
-Foundation_END
+} // namespace Poco

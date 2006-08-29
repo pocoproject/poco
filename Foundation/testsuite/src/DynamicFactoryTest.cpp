@@ -1,7 +1,7 @@
 //
 // DynamicFactoryTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/DynamicFactoryTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/DynamicFactoryTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,13 +33,13 @@
 #include "DynamicFactoryTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/DynamicFactory.h"
-#include "Foundation/Exception.h"
+#include "Poco/DynamicFactory.h"
+#include "Poco/Exception.h"
 #include <memory>
 
 
-using Foundation::DynamicFactory;
-using Foundation::Instantiator;
+using Poco::DynamicFactory;
+using Poco::Instantiator;
 
 
 namespace
@@ -99,7 +99,7 @@ void DynamicFactoryTest::testDynamicFactory()
 		dynFactory.registerClass<A>("A");
 		fail("already registered - must throw");
 	}
-	catch (Foundation::ExistsException&)
+	catch (Poco::ExistsException&)
 	{
 	}
 	
@@ -112,7 +112,7 @@ void DynamicFactoryTest::testDynamicFactory()
 		std::auto_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
 		fail("unregistered - must throw");
 	}
-	catch (Foundation::NotFoundException&)
+	catch (Poco::NotFoundException&)
 	{
 	}
 }

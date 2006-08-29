@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPChunkedStream.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPChunkedStream.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,18 +34,19 @@
 //
 
 
-#include "Net/HTTPChunkedStream.h"
-#include "Net/HTTPSession.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/NumberParser.h"
+#include "Poco/Net/HTTPChunkedStream.h"
+#include "Poco/Net/HTTPSession.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
 #include <ctype.h>
 
 
-using Foundation::NumberFormatter;
-using Foundation::NumberParser;
+using Poco::NumberFormatter;
+using Poco::NumberParser;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 //
@@ -151,7 +152,7 @@ HTTPChunkedStreamBuf* HTTPChunkedIOS::rdbuf()
 //
 
 
-Foundation::MemoryPool HTTPChunkedInputStream::_pool(sizeof(HTTPChunkedInputStream));
+Poco::MemoryPool HTTPChunkedInputStream::_pool(sizeof(HTTPChunkedInputStream));
 
 
 HTTPChunkedInputStream::HTTPChunkedInputStream(HTTPSession& session):
@@ -183,7 +184,7 @@ void HTTPChunkedInputStream::operator delete(void* ptr)
 //
 
 
-Foundation::MemoryPool HTTPChunkedOutputStream::_pool(sizeof(HTTPChunkedOutputStream));
+Poco::MemoryPool HTTPChunkedOutputStream::_pool(sizeof(HTTPChunkedOutputStream));
 
 
 HTTPChunkedOutputStream::HTTPChunkedOutputStream(HTTPSession& session):
@@ -210,4 +211,4 @@ void HTTPChunkedOutputStream::operator delete(void* ptr)
 }
 
 
-Net_END
+} } // namespace Poco::Net

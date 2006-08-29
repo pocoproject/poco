@@ -1,7 +1,7 @@
 //
 // ThreadPoolTest.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ThreadPoolTest.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ThreadPoolTest.h#1 $
 //
 // Definition of the ThreadPoolTest class.
 //
@@ -36,18 +36,10 @@
 #define ThreadPoolTest_INCLUDED
 
 
-#ifndef Foundation_Foundation_INCLUDED
-#include "Foundation/Foundation.h"
-#endif
-#ifndef CppUnit_TestCase_INCLUDED
+#include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#endif
-#ifndef Foundation_Event_INCLUDED
-#include "Foundation/Event.h"
-#endif
-#ifndef Foundation_Mutex_INCLUDED
-#include "Foundation/Mutex.h"
-#endif
+#include "Poco/Event.h"
+#include "Poco/Mutex.h"
 
 
 class ThreadPoolTest: public CppUnit::TestCase
@@ -67,8 +59,8 @@ protected:
 	void count();
 
 private:
-	Foundation::FastMutex _mutex;
-	Foundation::Event _event;
+	Poco::FastMutex _mutex;
+	Poco::Event _event;
 	int   _count;
 };
 

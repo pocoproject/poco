@@ -1,7 +1,7 @@
 //
 // AttrMap.cpp
 //
-// $Id: //poco/1.1.0/XML/src/AttrMap.cpp#2 $
+// $Id: //poco/1.2/XML/src/AttrMap.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,14 +34,15 @@
 //
 
 
-#include "DOM/AttrMap.h"
-#include "DOM/Attr.h"
-#include "DOM/Element.h"
-#include "DOM/Document.h"
-#include "DOM/DOMException.h"
+#include "Poco/DOM/AttrMap.h"
+#include "Poco/DOM/Attr.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/DOMException.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 AttrMap::AttrMap(Element* pElement):
@@ -140,5 +141,5 @@ void AttrMap::autoRelease()
 }
 
 
-XML_END
+} } // namespace Poco::XML
 

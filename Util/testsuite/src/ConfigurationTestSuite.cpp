@@ -1,7 +1,7 @@
 //
 // ConfigurationTestSuite.cpp
 //
-// $Id: //poco/1.1.0/Util/testsuite/src/ConfigurationTestSuite.cpp#2 $
+// $Id: //poco/1.2/Util/testsuite/src/ConfigurationTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

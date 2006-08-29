@@ -1,7 +1,7 @@
 //
 // LoggingRegistry.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/LoggingRegistry.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/LoggingRegistry.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/LoggingRegistry.h"
-#include "Foundation/SingletonHolder.h"
+#include "Poco/LoggingRegistry.h"
+#include "Poco/SingletonHolder.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 LoggingRegistry::LoggingRegistry()
@@ -131,4 +131,4 @@ LoggingRegistry& LoggingRegistry::defaultRegistry()
 }
 
 
-Foundation_END
+} // namespace Poco

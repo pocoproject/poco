@@ -1,7 +1,7 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Timestamp.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Timestamp.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,8 +34,8 @@
 //
 
 
-#include "Foundation/Timestamp.h"
-#include "Foundation/Exception.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <unistd.h>
@@ -46,7 +46,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Timestamp::Timestamp()
@@ -169,4 +169,4 @@ void Timestamp::toFileTimeNP(UInt32& fileTimeLow, UInt32& fileTimeHigh) const
 
 
 
-Foundation_END
+} // namespace Poco

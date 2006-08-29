@@ -1,7 +1,7 @@
 //
 // Manifest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Manifest.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Manifest.cpp#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Manifest.h"
+#include "Poco/Manifest.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 ManifestBase::ManifestBase()
@@ -50,4 +50,4 @@ ManifestBase::~ManifestBase()
 }
 
 
-Foundation_END
+} // namespace Poco

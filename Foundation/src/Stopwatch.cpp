@@ -1,7 +1,7 @@
 //
 // Stopwatch.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/Stopwatch.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Stopwatch.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -34,10 +34,10 @@
 //
 
 
-#include "Foundation/Stopwatch.h"
+#include "Poco/Stopwatch.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 Stopwatch::Stopwatch(): _elapsed(0), _running(false)
@@ -79,4 +79,4 @@ void Stopwatch::restart()
 }
 
 
-Foundation_END
+} // namespace Poco

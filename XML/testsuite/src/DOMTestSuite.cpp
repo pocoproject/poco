@@ -1,7 +1,7 @@
 //
 // DOMTestSuite.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/DOMTestSuite.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/DOMTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

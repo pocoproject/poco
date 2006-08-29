@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.1.0/build/config/Linux#1 $
+# $Id: //poco/1.2/build/config/Linux#1 $
 #
 # Linux
 #
@@ -17,10 +17,10 @@ LINKMODE = SHARED
 #
 CC      = gcc
 CXX     = g++
-LINK    = g++
+LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = g++ -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
+SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
 SHELL   = sh
@@ -62,7 +62,7 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE 
+SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
 
 #
 # System Specific Libraries

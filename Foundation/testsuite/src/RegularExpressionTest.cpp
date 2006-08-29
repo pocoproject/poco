@@ -1,7 +1,7 @@
 //
 // RegularExpressionTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/RegularExpressionTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/RegularExpressionTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,12 +33,12 @@
 #include "RegularExpressionTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/RegularExpression.h"
-#include "Foundation/Exception.h"
+#include "Poco/RegularExpression.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::RegularExpression;
-using Foundation::RegularExpressionException;
+using Poco::RegularExpression;
+using Poco::RegularExpressionException;
 
 
 RegularExpressionTest::RegularExpressionTest(const std::string& name): CppUnit::TestCase(name)

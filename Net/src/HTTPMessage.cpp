@@ -1,7 +1,7 @@
 //
 // HTTPMessage.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPMessage.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPMessage.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,19 +34,20 @@
 //
 
 
-#include "Net/HTTPMessage.h"
-#include "Net/MediaType.h"
-#include "Foundation/NumberFormatter.h"
-#include "Foundation/NumberParser.h"
-#include "Foundation/String.h"
+#include "Poco/Net/HTTPMessage.h"
+#include "Poco/Net/MediaType.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/String.h"
 
 
-using Foundation::NumberFormatter;
-using Foundation::NumberParser;
-using Foundation::icompare;
+using Poco::NumberFormatter;
+using Poco::NumberParser;
+using Poco::icompare;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 const std::string HTTPMessage::HTTP_1_0                   = "HTTP/1.0";
@@ -179,4 +180,4 @@ bool HTTPMessage::getKeepAlive() const
 }
 
 
-Net_END
+} } // namespace Poco::Net

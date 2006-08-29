@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/ThreadPool.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/ThreadPool.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,17 +34,17 @@
 //
 
 
-#include "Foundation/ThreadPool.h"
-#include "Foundation/Runnable.h"
-#include "Foundation/Thread.h"
-#include "Foundation/Event.h"
-#include "Foundation/ThreadLocal.h"
-#include "Foundation/ErrorHandler.h"
+#include "Poco/ThreadPool.h"
+#include "Poco/Runnable.h"
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/ThreadLocal.h"
+#include "Poco/ErrorHandler.h"
 #include <sstream>
 #include <time.h>
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 class PooledThread: public Runnable
@@ -54,8 +54,8 @@ public:
 	~PooledThread();
 
 	void start();
-	void start(Runnable& target);
-	void start(Runnable& target, const std::string& name);
+	void start(Thread::Priority priority, Runnable& target);
+	void start(Thread::Priority priority, Runnable& target, const std::string& name);
 	bool idle();
 	int idleTime();
 	void join();
@@ -66,13 +66,13 @@ public:
 private:
 	volatile bool   _idle;
 	volatile time_t _idleTime;
-	Runnable* _pTarget;
-	std::string _name;
-	Thread      _thread;
-	Event       _targetReady;
-	Event       _targetCompleted;
-	Event       _started;
-	FastMutex   _mutex;
+	Runnable*        _pTarget;
+	std::string      _name;
+	Thread           _thread;
+	Event            _targetReady;
+	Event            _targetCompleted;
+	Event            _started;
+	FastMutex        _mutex;
 };
 
 
@@ -99,18 +99,19 @@ void PooledThread::start()
 }
 
 
-void PooledThread::start(Runnable& target)
+void PooledThread::start(Thread::Priority priority, Runnable& target)
 {
 	FastMutex::ScopedLock lock(_mutex);
 	
 	poco_assert (_pTarget == 0);
 
 	_pTarget = &target;
+	_thread.setPriority(priority);
 	_targetReady.set();
 }
 
 
-void PooledThread::start(Runnable& target, const std::string& name)
+void PooledThread::start(Thread::Priority priority, Runnable& target, const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
@@ -126,6 +127,7 @@ void PooledThread::start(Runnable& target, const std::string& name)
 		fullName.append(")");
 	}
 	_thread.setName(fullName);
+	_thread.setPriority(priority);
 	
 	poco_assert (_pTarget == 0);
 
@@ -220,6 +222,7 @@ void PooledThread::run()
 			_targetCompleted.set();
 			ThreadLocalStorage::clear();
 			_thread.setName(_name);
+			_thread.setPriority(Thread::PRIO_NORMAL);
 		}
 		else
 		{
@@ -325,13 +328,25 @@ int ThreadPool::allocated() const
 
 void ThreadPool::start(Runnable& target)
 {
-	getThread()->start(target);
+	getThread()->start(Thread::PRIO_NORMAL, target);
 }
 
 
 void ThreadPool::start(Runnable& target, const std::string& name)
 {
-	getThread()->start(target, name);
+	getThread()->start(Thread::PRIO_NORMAL, target, name);
+}
+
+
+void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target)
+{
+	getThread()->start(priority, target);
+}
+
+
+void ThreadPool::startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name)
+{
+	getThread()->start(priority, target, name);
 }
 
 
@@ -458,4 +473,4 @@ ThreadPool& ThreadPool::defaultPool()
 }
 
 
-Foundation_END
+} // namespace Poco

@@ -1,7 +1,7 @@
 //
 // XMLException.cpp
 //
-// $Id: //poco/1.1.0/XML/src/XMLException.cpp#2 $
+// $Id: //poco/1.2/XML/src/XMLException.cpp#1 $
 //
 // Library: XML
 // Package: XML
@@ -34,17 +34,18 @@
 //
 
 
-#include "XML/XMLException.h"
+#include "Poco/XML/XMLException.h"
 #include <typeinfo>
 
 
-using Foundation::RuntimeException;
+using Poco::RuntimeException;
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 POCO_IMPLEMENT_EXCEPTION(XMLException, RuntimeException, "XML Exception")
 
 
-XML_END
+} } // namespace Poco::XML

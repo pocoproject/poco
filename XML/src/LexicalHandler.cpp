@@ -1,7 +1,7 @@
 //
 // LexicalHandler.cpp
 //
-// $Id: //poco/1.1.0/XML/src/LexicalHandler.cpp#2 $
+// $Id: //poco/1.2/XML/src/LexicalHandler.cpp#1 $
 //
 // Library: XML
 // Package: SAX
@@ -34,10 +34,11 @@
 //
 
 
-#include "SAX/LexicalHandler.h"
+#include "Poco/SAX/LexicalHandler.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 LexicalHandler::~LexicalHandler()
@@ -45,4 +46,4 @@ LexicalHandler::~LexicalHandler()
 }
 
 
-XML_END
+} } // namespace Poco::XML

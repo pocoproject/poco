@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/1.1.0/Net/src/HTTPSession.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPSession.cpp#1 $
 //
 // Library: Net
 // Package: HTTP
@@ -34,16 +34,17 @@
 //
 
 
-#include "Net/HTTPSession.h"
-#include "Net/HTTPBufferAllocator.h"
-#include "Net/NetException.h"
+#include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/HTTPBufferAllocator.h"
+#include "Poco/Net/NetException.h"
 #include <string.h>
 
 
-using Foundation::TimeoutException;
+using Poco::TimeoutException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 HTTPSession::HTTPSession():
@@ -51,7 +52,8 @@ HTTPSession::HTTPSession():
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(false),
-	_timeout(HTTP_DEFAULT_TIMEOUT)
+	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_pException(0)
 {
 }
 
@@ -62,7 +64,8 @@ HTTPSession::HTTPSession(const StreamSocket& socket):
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(false),
-	_timeout(HTTP_DEFAULT_TIMEOUT)
+	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_pException(0)
 {
 }
 
@@ -73,7 +76,8 @@ HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(keepAlive),
-	_timeout(HTTP_DEFAULT_TIMEOUT)
+	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_pException(0)
 {
 }
 
@@ -82,6 +86,7 @@ HTTPSession::~HTTPSession()
 {
 	if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
 	close();
+	delete _pException;
 }
 
 
@@ -91,7 +96,7 @@ void HTTPSession::setKeepAlive(bool keepAlive)
 }
 
 
-void HTTPSession::setTimeout(const Foundation::Timespan& timeout)
+void HTTPSession::setTimeout(const Poco::Timespan& timeout)
 {
 	_timeout = timeout;
 }
@@ -137,16 +142,32 @@ int HTTPSession::read(char* buffer, std::streamsize length)
 
 int HTTPSession::write(const char* buffer, std::streamsize length)
 {
-	return _socket.sendBytes(buffer, (int) length);
+	try
+	{
+		return _socket.sendBytes(buffer, (int) length);
+	}
+	catch (Poco::Exception& exc)
+	{
+		setException(exc);
+		throw;
+	}
 }
 
 
 int HTTPSession::receive(char* buffer, int length)
 {
-	if (_socket.poll(_timeout, Socket::SELECT_READ))
-		return _socket.receiveBytes(buffer, length);
-	else
-		throw TimeoutException();
+	try
+	{
+		if (_socket.poll(_timeout, Socket::SELECT_READ))
+			return _socket.receiveBytes(buffer, length);
+		else
+			throw TimeoutException();
+	}
+	catch (Poco::Exception& exc)
+	{
+		setException(exc);
+		throw;
+	}
 }
 
 
@@ -187,4 +208,11 @@ void HTTPSession::close()
 }
 
 
-Net_END
+void HTTPSession::setException(const Poco::Exception& exc)
+{
+	delete _pException;
+	_pException = exc.clone();
+}
+
+
+} } // namespace Poco::Net

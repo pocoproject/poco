@@ -1,7 +1,7 @@
 //
 // Test.h
 //
-// $Id: //poco/1.1.0/CppUnit/include/CppUnit/Test.h#1 $
+// $Id: //poco/1.2/CppUnit/include/CppUnit/Test.h#1 $
 //
 
 
@@ -9,16 +9,11 @@
 #define CppUnit_Test_INCLUDED
 
 
-#ifndef CppUnit_CppUnit_INCLUDED
 #include "CppUnit/CppUnit.h"
-#endif
-#ifndef STD_STRING_INCLUDED
 #include <string>
-#define STD_STRING_INCLUDED
-#endif
 
 
-CppUnit_BEGIN
+namespace CppUnit {
 
 
 class TestResult;
@@ -64,7 +59,7 @@ inline std::string Test::toString()
 }
 
 
-CppUnit_END
+} // namespace CppUnit
 
 
 #endif // CppUnit_Test_INCLUDED

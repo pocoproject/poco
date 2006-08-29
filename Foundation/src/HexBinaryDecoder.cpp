@@ -1,7 +1,7 @@
 //
 // HexBinaryDecoder.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/HexBinaryDecoder.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/HexBinaryDecoder.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -34,11 +34,11 @@
 //
 
 
-#include "Foundation/HexBinaryDecoder.h"
-#include "Foundation/Exception.h"
+#include "Poco/HexBinaryDecoder.h"
+#include "Poco/Exception.h"
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 HexBinaryDecoderBuf::HexBinaryDecoderBuf(std::istream& istr): _istr(istr)
@@ -112,4 +112,4 @@ HexBinaryDecoder::~HexBinaryDecoder()
 }
 
 
-Foundation_END
+} // namespace Poco

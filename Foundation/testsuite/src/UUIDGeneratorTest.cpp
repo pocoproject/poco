@@ -1,7 +1,7 @@
 //
 // UUIDGeneratorTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/UUIDGeneratorTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/UUIDGeneratorTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,13 +33,13 @@
 #include "UUIDGeneratorTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/UUIDGenerator.h"
-#include "Foundation/UUID.h"
+#include "Poco/UUIDGenerator.h"
+#include "Poco/UUID.h"
 #include <set>
 
 
-using Foundation::UUIDGenerator;
-using Foundation::UUID;
+using Poco::UUIDGenerator;
+using Poco::UUID;
 
 
 UUIDGeneratorTest::UUIDGeneratorTest(const std::string& name): CppUnit::TestCase(name)

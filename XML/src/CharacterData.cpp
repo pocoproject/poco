@@ -1,7 +1,7 @@
 //
 // CharacterData.cpp
 //
-// $Id: //poco/1.1.0/XML/src/CharacterData.cpp#2 $
+// $Id: //poco/1.2/XML/src/CharacterData.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,12 +34,13 @@
 //
 
 
-#include "DOM/CharacterData.h"
-#include "DOM/DOMException.h"
-#include "Foundation/String.h"
+#include "Poco/DOM/CharacterData.h"
+#include "Poco/DOM/DOMException.h"
+#include "Poco/String.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& data): 
@@ -133,8 +134,8 @@ void CharacterData::setNodeValue(const XMLString& value)
 
 XMLString CharacterData::trimmedData() const
 {
-	return Foundation::trim(_data);
+	return Poco::trim(_data);
 }
 
 
-XML_END
+} } // namespace Poco::XML

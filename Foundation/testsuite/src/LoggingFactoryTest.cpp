@@ -1,7 +1,7 @@
 //
 // LoggingFactoryTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/LoggingFactoryTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/LoggingFactoryTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,30 +33,30 @@
 #include "LoggingFactoryTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/LoggingFactory.h"
-#include "Foundation/Instantiator.h"
-#include "Foundation/Channel.h"
-#include "Foundation/ConsoleChannel.h"
-#include "Foundation/FileChannel.h"
-#include "Foundation/SplitterChannel.h"
-#include "Foundation/Formatter.h"
-#include "Foundation/PatternFormatter.h"
-#include "Foundation/Message.h"
-#include "Foundation/AutoPtr.h"
-#include "Foundation/Exception.h"
+#include "Poco/LoggingFactory.h"
+#include "Poco/Instantiator.h"
+#include "Poco/Channel.h"
+#include "Poco/ConsoleChannel.h"
+#include "Poco/FileChannel.h"
+#include "Poco/SplitterChannel.h"
+#include "Poco/Formatter.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/Message.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include <memory>
 
 
-using Foundation::LoggingFactory;
-using Foundation::Channel;
-using Foundation::ConsoleChannel;
-using Foundation::FileChannel;
-using Foundation::SplitterChannel;
-using Foundation::Formatter;
-using Foundation::PatternFormatter;
-using Foundation::Message;
-using Foundation::AutoPtr;
-using Foundation::Instantiator;
+using Poco::LoggingFactory;
+using Poco::Channel;
+using Poco::ConsoleChannel;
+using Poco::FileChannel;
+using Poco::SplitterChannel;
+using Poco::Formatter;
+using Poco::PatternFormatter;
+using Poco::Message;
+using Poco::AutoPtr;
+using Poco::Instantiator;
 
 
 namespace
@@ -106,7 +106,7 @@ void LoggingFactoryTest::testBuiltins()
 		AutoPtr<Channel> pUnknownChannel = fact.createChannel("UnknownChannel");
 		fail("unknown class - must throw");
 	}
-	catch (Foundation::NotFoundException&)
+	catch (Poco::NotFoundException&)
 	{
 	}
 	
@@ -118,7 +118,7 @@ void LoggingFactoryTest::testBuiltins()
 		AutoPtr<Formatter> pUnknownFormatter = fact.createFormatter("UnknownFormatter");
 		fail("unknown class - must throw");
 	}
-	catch (Foundation::NotFoundException&)
+	catch (Poco::NotFoundException&)
 	{
 	}
 }

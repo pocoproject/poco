@@ -1,7 +1,7 @@
 //
 // ByteOrderTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/ByteOrderTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ByteOrderTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "ByteOrderTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/ByteOrder.h"
+#include "Poco/ByteOrder.h"
 
 
-using Foundation::ByteOrder;
-using Foundation::Int16;
-using Foundation::UInt16;
-using Foundation::Int32;
-using Foundation::UInt32;
+using Poco::ByteOrder;
+using Poco::Int16;
+using Poco::UInt16;
+using Poco::Int32;
+using Poco::UInt32;
 #if defined(POCO_HAVE_INT64)
-using Foundation::Int64;
-using Foundation::UInt64;
+using Poco::Int64;
+using Poco::UInt64;
 #endif
 
 

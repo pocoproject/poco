@@ -1,7 +1,7 @@
 //
 // Event.cpp
 //
-// $Id: //poco/1.1.0/XML/src/Event.cpp#2 $
+// $Id: //poco/1.2/XML/src/Event.cpp#1 $
 //
 // Library: XML
 // Package: DOM
@@ -34,11 +34,12 @@
 //
 
 
-#include "DOM/Event.h"
-#include "DOM/Document.h"
+#include "Poco/DOM/Event.h"
+#include "Poco/DOM/Document.h"
 
 
-XML_BEGIN
+namespace Poco {
+namespace XML {
 
 
 Event::Event(Document* pOwnerDocument, const XMLString& type):
@@ -120,4 +121,4 @@ void Event::autoRelease()
 }
 
 
-XML_END
+} } // namespace Poco::XML

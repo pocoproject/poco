@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.1.0/Net/src/DNS.cpp#2 $
+// $Id: //poco/1.2/Net/src/DNS.cpp#1 $
 //
 // Library: Net
 // Package: NetCore
@@ -34,17 +34,17 @@
 //
 
 
-#include "Net/DNS.h"
-#include "Net/NetException.h"
-#include "Net/SocketAddress.h"
-#include "Foundation/Environment.h"
-#include "Foundation/NumberFormatter.h"
+#include "Poco/Net/DNS.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Environment.h"
+#include "Poco/NumberFormatter.h"
 
 
-using Foundation::FastMutex;
-using Foundation::Environment;
-using Foundation::NumberFormatter;
-using Foundation::IOException;
+using Poco::FastMutex;
+using Poco::Environment;
+using Poco::NumberFormatter;
+using Poco::IOException;
 
 
 //
@@ -74,11 +74,12 @@ namespace
 #endif // _WIN32
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 DNS::DNSCache DNS::_cache;
-Foundation::FastMutex DNS::_mutex;
+Poco::FastMutex DNS::_mutex;
 
 
 const HostEntry& DNS::hostByName(const std::string& hostname)
@@ -223,4 +224,4 @@ void DNS::error(int code, const std::string& arg)
 }
 
 
-Net_END
+} } // namespace Poco::Net

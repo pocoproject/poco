@@ -1,7 +1,7 @@
 //
 // DOMTestSuite.h
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/DOMTestSuite.h#2 $
+// $Id: //poco/1.2/XML/testsuite/src/DOMTestSuite.h#1 $
 //
 // Definition of the DOMTestSuite class.
 //
@@ -36,9 +36,7 @@
 #define DOMTestSuite_INCLUDED
 
 
-#ifndef CppUnit_TestSuite_INCLUDED
 #include "CppUnit/TestSuite.h"
-#endif
 
 
 class DOMTestSuite

@@ -1,7 +1,7 @@
 //
 // TestChannel.h
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/TestChannel.h#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TestChannel.h#1 $
 //
 // Definition of the TestChannel class.
 //
@@ -36,27 +36,20 @@
 #define TestChannel_INCLUDED
 
 
-#ifndef Foundation_Channel_INCLUDED
-#include "Foundation/Channel.h"
-#endif
-#ifndef Foundation_Message_INCLUDED
-#include "Foundation/Message.h"
-#endif
-#ifndef STD_LIST_INCLUDED
+#include "Poco/Channel.h"
+#include "Poco/Message.h"
 #include <list>
-#define STD_LIST_INCLUDED
-#endif
 
 
-class TestChannel: public Foundation::Channel
+class TestChannel: public Poco::Channel
 {
 public:
-	typedef std::list<Foundation::Message> MsgList;
+	typedef std::list<Poco::Message> MsgList;
 
 	TestChannel();
 	~TestChannel();
 	
-	void log(const Foundation::Message& msg);
+	void log(const Poco::Message& msg);
 	MsgList& list();
 	void clear();
 	

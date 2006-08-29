@@ -1,7 +1,7 @@
 //
 // RWLock.cpp
 //
-// $Id: //poco/1.1.0/Foundation/src/RWLock.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/RWLock.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -34,7 +34,7 @@
 //
 
 
-#include "Foundation/RWLock.h"
+#include "Poco/RWLock.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -44,7 +44,7 @@
 #endif
 
 
-Foundation_BEGIN
+namespace Poco {
 
 
 RWLock::RWLock()
@@ -57,4 +57,4 @@ RWLock::~RWLock()
 }
 
 
-Foundation_END
+} // namespace Poco

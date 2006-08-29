@@ -1,7 +1,7 @@
 //
 // ServerSocket.cpp
 //
-// $Id: //poco/1.1.0/Net/src/ServerSocket.cpp#2 $
+// $Id: //poco/1.2/Net/src/ServerSocket.cpp#1 $
 //
 // Library: Net
 // Package: Sockets
@@ -34,15 +34,16 @@
 //
 
 
-#include "Net/ServerSocket.h"
-#include "Net/ServerSocketImpl.h"
-#include "Foundation/Exception.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/ServerSocketImpl.h"
+#include "Poco/Exception.h"
 
 
-using Foundation::InvalidArgumentException;
+using Poco::InvalidArgumentException;
 
 
-Net_BEGIN
+namespace Poco {
+namespace Net {
 
 
 ServerSocket::ServerSocket(): Socket(new ServerSocketImpl)
@@ -64,7 +65,7 @@ ServerSocket::ServerSocket(const SocketAddress& address, int backlog): Socket(ne
 }
 
 
-ServerSocket::ServerSocket(Foundation::UInt16 port, int backlog): Socket(new ServerSocketImpl)
+ServerSocket::ServerSocket(Poco::UInt16 port, int backlog): Socket(new ServerSocketImpl)
 {
 	IPAddress wildcardAddr;
 	SocketAddress address(wildcardAddr, port);
@@ -99,7 +100,7 @@ void ServerSocket::bind(const SocketAddress& address, bool reuseAddress)
 }
 
 
-void ServerSocket::bind(Foundation::UInt16 port, bool reuseAddress)
+void ServerSocket::bind(Poco::UInt16 port, bool reuseAddress)
 {
 	IPAddress wildcardAddr;
 	SocketAddress address(wildcardAddr, port);
@@ -126,4 +127,4 @@ StreamSocket ServerSocket::acceptConnection()
 }
 
 
-Net_END
+} } // namespace Poco::Net

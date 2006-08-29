@@ -1,7 +1,7 @@
 //
 // grep.cpp
 //
-// $Id: //poco/1.1.0/Foundation/samples/grep/src/grep.cpp#2 $
+// $Id: //poco/1.2/Foundation/samples/grep/src/grep.cpp#1 $
 //
 // This sample demonstrates the RegularExpression class.
 //
@@ -32,11 +32,11 @@
 //
 
 
-#include "Foundation/RegularExpression.h"
+#include "Poco/RegularExpression.h"
 #include <iostream>
 
 
-using Foundation::RegularExpression;
+using Poco::RegularExpression;
 
 
 int main(int argc, char** argv)

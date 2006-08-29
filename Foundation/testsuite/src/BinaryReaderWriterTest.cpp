@@ -1,7 +1,7 @@
 //
 // BinaryReaderWriterTest.cpp
 //
-// $Id: //poco/1.1.0/Foundation/testsuite/src/BinaryReaderWriterTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/BinaryReaderWriterTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,17 +33,17 @@
 #include "BinaryReaderWriterTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Foundation/BinaryWriter.h"
-#include "Foundation/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
+#include "Poco/BinaryReader.h"
 #include <sstream>
 
 
-using Foundation::BinaryWriter;
-using Foundation::BinaryReader;
-using Foundation::Int32;
-using Foundation::UInt32;
-using Foundation::Int64;
-using Foundation::UInt64;
+using Poco::BinaryWriter;
+using Poco::BinaryReader;
+using Poco::Int32;
+using Poco::UInt32;
+using Poco::Int64;
+using Poco::UInt64;
 
 
 BinaryReaderWriterTest::BinaryReaderWriterTest(const std::string& name): CppUnit::TestCase(name)

@@ -1,7 +1,7 @@
 //
 // AttributesImplTest.cpp
 //
-// $Id: //poco/1.1.0/XML/testsuite/src/AttributesImplTest.cpp#2 $
+// $Id: //poco/1.2/XML/testsuite/src/AttributesImplTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,10 +33,10 @@
 #include "AttributesImplTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "SAX/AttributesImpl.h"
+#include "Poco/SAX/AttributesImpl.h"
 
 
-using XML::AttributesImpl;
+using Poco::XML::AttributesImpl;
 
 
 AttributesImplTest::AttributesImplTest(const std::string& name): CppUnit::TestCase(name)
