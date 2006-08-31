@@ -1,7 +1,7 @@
 //
 // MultipartReader.h
 //
-// $Id: //poco/1.2/Net/include/Poco/Net/MultipartReader.h#1 $
+// $Id: //poco/1.2/Net/include/Poco/Net/MultipartReader.h#2 $
 //
 // Library: Net
 // Package: Messages
@@ -112,6 +112,10 @@ class Net_API MultipartReader
 	///     an input stream and optionally a boundary string.
 	///   - while hasNextPart() returns true, call nextPart()
 	///     and read the part from stream().
+	///
+	/// Always ensure that you read all data from the part
+	/// stream, otherwise the MultipartReader will fail to
+	/// find the next part.
 {
 public:
 	explicit MultipartReader(std::istream& istr);

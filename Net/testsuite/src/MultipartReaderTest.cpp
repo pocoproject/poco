@@ -1,7 +1,7 @@
 //
 // MultipartReaderTest.cpp
 //
-// $Id: //poco/1.2/Net/testsuite/src/MultipartReaderTest.cpp#1 $
+// $Id: //poco/1.2/Net/testsuite/src/MultipartReaderTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -329,6 +329,49 @@ void MultipartReaderTest::testRobustness()
 }
 
 
+void MultipartReaderTest::testUnixLineEnds()
+{
+	std::string s("\n--MIME_boundary_01234567\nname1: value1\n\nthis is part 1\n--MIME_boundary_01234567\n\nthis is part 2\n\n--MIME_boundary_01234567--\n");
+	std::istringstream istr(s);
+	MultipartReader r(istr, "MIME_boundary_01234567");
+	assert (r.hasNextPart());
+	MessageHeader h;
+	r.nextPart(h);
+	assert (h.size() == 1);
+	assert (h["name1"] == "value1");
+	std::istream& i = r.stream();
+	int ch = i.get();
+	std::string part;
+	while (ch >= 0)
+	{
+		part += (char) ch;
+		ch = i.get();
+	}
+	assert (part == "this is part 1");
+	assert (r.hasNextPart());
+	r.nextPart(h);
+	assert (h.empty());
+	std::istream& ii = r.stream();
+	part.clear();
+	ch = ii.get();
+	while (ch >= 0)
+	{
+		part += (char) ch;
+		ch = ii.get();
+	}
+	assert (part == "this is part 2\n");
+
+	try
+	{
+		r.nextPart(h);
+		fail("no more parts - must throw");
+	}
+	catch (MultipartException&)
+	{
+	}
+}
+
+
 void MultipartReaderTest::setUp()
 {
 }
@@ -351,6 +394,7 @@ CppUnit::Test* MultipartReaderTest::suite()
 	CppUnit_addTest(pSuite, MultipartReaderTest, testPreamble);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testBadBoundary);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testRobustness);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testUnixLineEnds);
 
 	return pSuite;
 }

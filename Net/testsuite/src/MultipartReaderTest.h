@@ -1,7 +1,7 @@
 //
 // MultipartReaderTest.h
 //
-// $Id: //poco/1.2/Net/testsuite/src/MultipartReaderTest.h#1 $
+// $Id: //poco/1.2/Net/testsuite/src/MultipartReaderTest.h#2 $
 //
 // Definition of the MultipartReaderTest class.
 //
@@ -54,6 +54,7 @@ public:
 	void testPreamble();
 	void testBadBoundary();
 	void testRobustness();
+	void testUnixLineEnds();
 
 	void setUp();
 	void tearDown();

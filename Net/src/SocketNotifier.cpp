@@ -1,7 +1,7 @@
 //
 // SocketNotifier.cpp
 //
-// $Id: //poco/1.2/Net/src/SocketNotifier.cpp#1 $
+// $Id: //poco/1.2/Net/src/SocketNotifier.cpp#2 $
 //
 // Library: Net
 // Package: Reactor
@@ -64,7 +64,7 @@ void SocketNotifier::addObserver(SocketReactor* pReactor, const Poco::AbstractOb
 	else if (observer.accepts(pReactor->_pErrorNotification))
 		_events.insert(pReactor->_pErrorNotification.get());
 	else if (observer.accepts(pReactor->_pTimeoutNotification))
-		_events.insert(pReactor->_pErrorNotification.get());
+		_events.insert(pReactor->_pTimeoutNotification.get());
 }
 
 	

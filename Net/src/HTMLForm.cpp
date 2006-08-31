@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.2/Net/src/HTMLForm.cpp#1 $
+// $Id: //poco/1.2/Net/src/HTMLForm.cpp#2 $
 //
 // Library: Net
 // Package: HTML
@@ -288,6 +288,8 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 		if (params.has("filename"))
 		{
 			handler.handlePart(header, reader.stream());
+			// Ensure that the complete part has been read.
+			while (reader.stream().good()) reader.stream().get();
 		}
 		else
 		{

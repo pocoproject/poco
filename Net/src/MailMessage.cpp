@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.2/Net/src/MailMessage.cpp#1 $
+// $Id: //poco/1.2/Net/src/MailMessage.cpp#2 $
 //
 // Library: Net
 // Package: Mail
@@ -405,17 +405,26 @@ void MailMessage::readPart(std::istream& istr, const MessageHeader& header, Part
 	if (icompare(encoding, CTE_QUOTED_PRINTABLE) == 0)
 	{
 		QuotedPrintableDecoder decoder(istr);
-		handler.handlePart(header, decoder);
+		handlePart(decoder, header, handler);
 	}
 	else if (icompare(encoding, CTE_BASE64) == 0)
 	{
 		Base64Decoder decoder(istr);
-		handler.handlePart(header, decoder);
+		handlePart(decoder, header, handler);
 	}
 	else
 	{
-		handler.handlePart(header, istr);
+		handlePart(istr, header, handler);
 	}
+}
+
+
+void MailMessage::handlePart(std::istream& istr, const MessageHeader& header, PartHandler& handler)
+{
+	handler.handlePart(header, istr);
+	// Read remaining characters from stream in case
+	// the handler failed to read the complete stream.
+	while (istr.good()) istr.get();
 }
 
 

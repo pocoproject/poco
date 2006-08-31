@@ -1,7 +1,7 @@
 //
 // MailMessage.h
 //
-// $Id: //poco/1.2/Net/include/Poco/Net/MailMessage.h#1 $
+// $Id: //poco/1.2/Net/include/Poco/Net/MailMessage.h#2 $
 //
 // Library: Net
 // Package: Mail
@@ -200,6 +200,7 @@ protected:
 	void readHeader(std::istream& istr);
 	void readMultipart(std::istream& istr, PartHandler& handler);
 	void readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler);
+	void handlePart(std::istream& istr, const MessageHeader& header, PartHandler& handler);
 	static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
 	static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
