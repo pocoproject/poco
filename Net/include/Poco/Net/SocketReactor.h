@@ -1,7 +1,7 @@
 //
 // SocketReactor.h
 //
-// $Id: //poco/1.2/Net/include/Poco/Net/SocketReactor.h#1 $
+// $Id: //poco/1.2/Net/include/Poco/Net/SocketReactor.h#2 $
 //
 // Library: Net
 // Package: Reactor
@@ -192,7 +192,7 @@ protected:
 private:
 	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
-	typedef std::map<Socket, NotifierPtr>           EventHandlerMap;
+	typedef std::map<Socket, NotifierPtr>     EventHandlerMap;
 
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
 

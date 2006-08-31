@@ -1,7 +1,7 @@
 //
 // EchoServer.cpp
 //
-// $Id: //poco/1.2/Net/samples/EchoServer/src/EchoServer.cpp#1 $
+// $Id: //poco/1.2/Net/samples/EchoServer/src/EchoServer.cpp#2 $
 //
 // This sample demonstrates the SocketReactor and SocketAcceptor classes.
 //
@@ -104,6 +104,7 @@ public:
 	
 	void onShutdown(ShutdownNotification* pNf)
 	{
+		pNf->release();
 		delete this;
 	}
 	
