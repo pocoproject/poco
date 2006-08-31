@@ -1,7 +1,7 @@
 //
 // NotificationCenter.cpp
 //
-// $Id: //poco/1.2/Foundation/src/NotificationCenter.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/NotificationCenter.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -105,7 +105,14 @@ void NotificationCenter::postNotification(Notification* pNotification)
 bool NotificationCenter::hasObservers() const
 {
 	Mutex::ScopedLock lock(_mutex);
-	return !_observers.empty();
+
+	ObserverList::const_iterator it = _observers.begin();
+	while (it != _observers.end())
+	{
+		if (*it) return true;
+		++it;
+	}
+	return false;
 }
 
 
