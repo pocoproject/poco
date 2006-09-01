@@ -1,5 +1,22 @@
 This is the changelog file for POCO - the C++ Portable Components.
 
+Release 1.2.2 (2006-09-01)
+==========================
+
+- fixed SF # 1549973: NotificationCenter::hasObservers() returns wrong result
+- fixed a memory leak in EchoServer sample
+- fixed SocketReactor TimeoutNotification bug (SF #1549365, SocketNotifier::addObserver() incorrect behavior)
+- fixed SF# 1549513: MultipartReader does not work with Unix-style linefeeds
+- MailMessage and HTMLForm: processing of multipart messages will no longer fail if a PartHandler does not read all data from the part stream.
+- added additional test case (Unix-style line ends) to MultipartReaderTest
+
+
+Release 1.2.1 (2006-08-29)
+==========================
+
+- fixed Config.h header (no more #undefs)
+
+
 Release 1.2.0 (2006-08-29)
 ==========================
 
@@ -466,4 +483,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.2/dist/CHANGELOG#1 $
+$Id: //poco/1.2/dist/CHANGELOG#4 $
