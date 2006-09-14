@@ -1463,7 +1463,7 @@
 					RelativePath=".\src\NotificationQueue.cpp">
 				</File>
 				<File
-					RelativePath=".\src\Observer.cpp">
+					RelativePath=".\src\AbstractObserver.cpp">
 				</File>
 			</Filter>
 			<Filter
@@ -1479,7 +1479,13 @@
 					RelativePath=".\include\Poco\NotificationQueue.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\AbstractObserver.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Observer.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\NObserver.h">
 				</File>
 			</Filter>
 		</Filter>

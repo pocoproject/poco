@@ -1,7 +1,7 @@
 //
 // EchoServer.cpp
 //
-// $Id: //poco/1.2/Net/samples/EchoServer/src/EchoServer.cpp#2 $
+// $Id: //poco/1.2/Net/samples/EchoServer/src/EchoServer.cpp#3 $
 //
 // This sample demonstrates the SocketReactor and SocketAcceptor classes.
 //
@@ -37,7 +37,7 @@
 #include "Poco/Net/SocketNotification.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
-#include "Poco/Observer.h"
+#include "Poco/NObserver.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
 #include "Poco/Util/ServerApplication.h"
@@ -53,7 +53,8 @@ using Poco::Net::ReadableNotification;
 using Poco::Net::ShutdownNotification;
 using Poco::Net::ServerSocket;
 using Poco::Net::StreamSocket;
-using Poco::Observer;
+using Poco::NObserver;
+using Poco::AutoPtr;
 using Poco::Thread;
 using Poco::Util::ServerApplication;
 using Poco::Util::Application;
@@ -73,8 +74,8 @@ public:
 		Application& app = Application::instance();
 		app.logger().information("Connection from " + socket.peerAddress().toString());
 
-		_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
-		_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onShutdown));
+		_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+		_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onShutdown));
 	}
 	
 	~EchoServiceHandler()
@@ -87,14 +88,13 @@ public:
 		catch (...)
 		{
 		}
-		_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
-		_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onShutdown));
+		_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+		_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onShutdown));
 		delete [] _pBuffer;
 	}
 	
-	void onReadable(ReadableNotification* pNf)
+	void onReadable(const AutoPtr<ReadableNotification>& pNf)
 	{
-		pNf->release(); // we get ownership of the notification, but we do not need it, so we kiss it goodbye.
 		int n = _socket.receiveBytes(_pBuffer, BUFFER_SIZE);
 		if (n > 0)
 			_socket.sendBytes(_pBuffer, n);
@@ -102,9 +102,8 @@ public:
 			delete this;
 	}
 	
-	void onShutdown(ShutdownNotification* pNf)
+	void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 	{
-		pNf->release();
 		delete this;
 	}
 	

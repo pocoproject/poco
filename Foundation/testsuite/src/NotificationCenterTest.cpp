@@ -1,7 +1,7 @@
 //
 // NotificationCenterTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/NotificationCenterTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NotificationCenterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,11 +35,13 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/NotificationCenter.h"
 #include "Poco/Observer.h"
+#include "Poco/NObserver.h"
 #include "Poco/AutoPtr.h"
 
 
 using Poco::NotificationCenter;
 using Poco::Observer;
+using Poco::NObserver;
 using Poco::Notification;
 using Poco::AutoPtr;
 
@@ -131,6 +133,17 @@ void NotificationCenterTest::test5()
 }
 
 
+void NotificationCenterTest::testAuto()
+{
+	NotificationCenter nc;
+	nc.addObserver(NObserver<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handleAuto));
+	nc.postNotification(new Notification);
+	assert (_set.size() == 1);
+	assert (_set.find("handleAuto") != _set.end());
+	nc.removeObserver(NObserver<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handleAuto));
+}
+
+
 void NotificationCenterTest::testDefaultCenter()
 {
 	NotificationCenter& nc = NotificationCenter::defaultCenter();
@@ -174,6 +187,12 @@ void NotificationCenterTest::handleTest(TestNotification* pNf)
 }
 
 
+void NotificationCenterTest::handleAuto(const AutoPtr<Notification>& pNf)
+{
+	_set.insert("handleAuto");
+}
+
+
 void NotificationCenterTest::setUp()
 {
 	_set.clear();
@@ -194,6 +213,7 @@ CppUnit::Test* NotificationCenterTest::suite()
 	CppUnit_addTest(pSuite, NotificationCenterTest, test3);
 	CppUnit_addTest(pSuite, NotificationCenterTest, test4);
 	CppUnit_addTest(pSuite, NotificationCenterTest, test5);
+	CppUnit_addTest(pSuite, NotificationCenterTest, testAuto);
 	CppUnit_addTest(pSuite, NotificationCenterTest, testDefaultCenter);
 
 	return pSuite;

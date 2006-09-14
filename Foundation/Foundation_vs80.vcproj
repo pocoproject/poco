@@ -1932,7 +1932,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Observer.cpp"
+					RelativePath=".\src\AbstractObserver.cpp"
 					>
 				</File>
 			</Filter>
@@ -1952,7 +1952,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\AbstractObserver.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Observer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\NObserver.h"
 					>
 				</File>
 			</Filter>

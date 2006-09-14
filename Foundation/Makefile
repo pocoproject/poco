@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.2/Foundation/Makefile#1 $
+# $Id: //poco/1.2/Foundation/Makefile#2 $
 #
 # Makefile for Poco Foundation
 #
@@ -18,7 +18,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
 	MemoryPool MD2Engine MD4Engine MD5Engine Manifest Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
-	NotificationQueue NullStream NumberFormatter NumberParser Observer \
+	NotificationQueue NullStream NumberFormatter NumberParser AbstractObserver \
 	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
 	RegularExpression RefCountedObject Runnable RotateStrategy \
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \

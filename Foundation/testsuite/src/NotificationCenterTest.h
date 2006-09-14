@@ -1,7 +1,7 @@
 //
 // NotificationCenterTest.h
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/NotificationCenterTest.h#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/NotificationCenterTest.h#2 $
 //
 // Definition of the NotificationCenterTest class.
 //
@@ -39,6 +39,7 @@
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
 #include "Poco/Notification.h"
+#include "Poco/AutoPtr.h"
 #include <set>
 
 
@@ -56,6 +57,7 @@ public:
 	void test3();
 	void test4();
 	void test5();
+	void testAuto();
 	void testDefaultCenter();
 
 	void setUp();
@@ -68,6 +70,7 @@ protected:
 	void handle2(Poco::Notification* pNf);
 	void handle3(Poco::Notification* pNf);
 	void handleTest(TestNotification* pNf);
+	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
 	
 private:
 	std::set<std::string> _set;
