@@ -1,7 +1,7 @@
 //
 // Random.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Random.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/Random.cpp#2 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -182,7 +182,7 @@ Random::Random(int stateSize)
 
 Random::~Random()
 {
-	delete _pBuffer;
+	delete [] _pBuffer;
 }
 
 

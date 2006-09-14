@@ -1,7 +1,7 @@
 //
 // Process_UNIX.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Process_UNIX.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/Process_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -79,7 +79,13 @@ pid_t ProcessHandleImpl::id() const
 int ProcessHandleImpl::wait() const
 {
 	int status;
-	if (waitpid(_pid, &status, 0) != _pid)
+	int rc;
+	do
+	{
+		rc = waitpid(_pid, &status, 0);
+	}
+	while (rc < 0 && errno == EINTR);
+	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
 	return WEXITSTATUS(status);
 }

@@ -1,5 +1,21 @@
 This is the changelog file for POCO - the C++ Portable Components.
 
+Release 1.2.3 (2006-09-14)
+==========================
+
+- configure script now checks if (auto)selected configuration is supported
+- fixed SF #1552904: NamedEvent bug?
+- fixed SF #1552787: POCO not handling EINTR
+- fixed SF #1552846: Random::~Random uses scalar delete
+- fixed SF #1552987: TLSSlot should explicitly default-construct _value
+- IPAddress no longer accepts an empty address string
+- split up Observer.h into AbstractObserver.h and Observer.h
+- added NObserver class template which supports an AutoPtr
+  argument for the notification callback
+- changed EchoServer sample to use NObserver
+- some Windows-specific files were missing in the tarballs
+
+
 Release 1.2.2 (2006-09-01)
 ==========================
 
@@ -483,4 +499,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.2/dist/CHANGELOG#4 $
+$Id: //poco/1.2/dist/CHANGELOG#6 $

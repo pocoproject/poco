@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.2/Net/src/IPAddress.cpp#1 $
+// $Id: //poco/1.2/Net/src/IPAddress.cpp#2 $
 //
 // Library: Net
 // Package: NetCore
@@ -221,6 +221,7 @@ public:
 
 	static IPv4AddressImpl* parse(const std::string& addr)
 	{
+		if (addr.empty()) return 0;		
 #if defined(_WIN32)
 		struct in_addr ia;
 		ia.s_addr = inet_addr(addr.c_str());
@@ -412,6 +413,7 @@ public:
 
 	static IPv6AddressImpl* parse(const std::string& addr)
 	{
+		if (addr.empty()) return 0;
 #if defined(_WIN32)
 		struct addrinfo* pAI;
 		struct addrinfo hints;

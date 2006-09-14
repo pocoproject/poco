@@ -1,7 +1,7 @@
 //
 // NamedEvent_UNIX.cpp
 //
-// $Id: //poco/1.2/Foundation/src/NamedEvent_UNIX.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/NamedEvent_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -38,6 +38,7 @@
 #include "Poco/Exception.h"
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <errno.h>
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
 #include <semaphore.h>
 #else
@@ -45,7 +46,6 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
-#include <errno.h>
 #endif
 
 
@@ -120,7 +120,7 @@ void NamedEventImpl::setImpl()
 	struct sembuf op;
 	op.sem_num = 0;
 	op.sem_op  = 1;
-	op.sem_flg = SEM_UNDO;
+	op.sem_flg = 0;
 	if (semop(_semid, &op, 1) != 0)
 	   	throw SystemException("cannot set named event", _name);
 #endif
@@ -130,15 +130,25 @@ void NamedEventImpl::setImpl()
 void NamedEventImpl::waitImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
-	if (sem_wait(_sem) != 0)
-		throw SystemException("cannot wait for named event", _name);
+	int err;
+	do
+	{
+		err = sem_wait(_sem);
+	}
+	while (err && errno == EINTR);
+	if (err) throw SystemException("cannot wait for named event", _name);
 #else
 	struct sembuf op;
 	op.sem_num = 0;
 	op.sem_op  = -1;
-	op.sem_flg = SEM_UNDO;
-	if (semop(_semid, &op, 1) != 0)
-		throw SystemException("cannot wait for named event", _name);
+	op.sem_flg = 0;
+	int err;
+	do
+	{
+		err = semop(_semid, &op, 1);
+	}
+	while (err && errno == EINTR); 
+	if (err) throw SystemException("cannot wait for named event", _name);
 #endif
 }
 

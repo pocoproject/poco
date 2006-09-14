@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.2/Net/src/Socket.cpp#1 $
+// $Id: //poco/1.2/Net/src/Socket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -36,6 +36,7 @@
 
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/StreamSocketImpl.h"
+#include "Poco/Timestamp.h"
 #include <algorithm>
 #include <string.h>
 
@@ -111,10 +112,26 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 			nfd = int(it->sockfd());
 		FD_SET(it->sockfd(), &fdExcept);
 	}
-	struct timeval tv;
-	tv.tv_sec  = (long) timeout.totalSeconds();
-	tv.tv_usec = (long) timeout.useconds();
-	int rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		struct timeval tv;
+		tv.tv_sec  = (long) remainingTime.totalSeconds();
+		tv.tv_usec = (long) remainingTime.useconds();
+		Poco::Timestamp start;
+		rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
+		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited > remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
 	if (rc < 0) SocketImpl::error();
 	
 	SocketList readyReadList;

@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.2/Net/src/MailMessage.cpp#2 $
+// $Id: //poco/1.2/Net/src/MailMessage.cpp#3 $
 //
 // Library: Net
 // Package: Mail
@@ -443,6 +443,8 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 			break;
 		case MailRecipient::CC_RECIPIENT:
 			appendRecipient(*it, cc);
+			break;
+		case MailRecipient::BCC_RECIPIENT:
 			break;
 		}
 	}

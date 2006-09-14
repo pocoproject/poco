@@ -1,7 +1,7 @@
 //
 // NotificationCenter.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/NotificationCenter.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/NotificationCenter.h#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -89,6 +89,14 @@ class Foundation_API NotificationCenter
 	///         AutoPtr<MyNotification> nf(pNf);
 	///         ...
 	///     }
+	///
+	/// Alternatively, the NObserver class template can be used to register a callback
+	/// method. In this case, the callback method receives the Notification in an
+	/// AutoPtr and thus does not have to deal with object ownership issues:
+	///     void MyClass::handleNotification(const AutoPtr<MyNotification>& pNf)
+	///     {
+	///         ...
+	///     }
 {
 public:
 	NotificationCenter();
@@ -102,6 +110,8 @@ public:
 		/// Usage:
 		///     Observer<MyClass, MyNotification> obs(*this, &MyClass::handleNotification);
 		///     notificationCenter.addObserver(obs);
+		///
+		/// Alternatively, the NObserver template class can be used instead of Observer.
 
 	void removeObserver(const AbstractObserver& observer);
 		/// Unregisters an observer with the NotificationCenter.

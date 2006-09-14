@@ -1,15 +1,15 @@
 //
-// Observer.h
+// NObserver.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Observer.h#2 $
+// $Id: //poco/1.2/Foundation/include/Poco/NObserver.h#1 $
 //
 // Library: Foundation
 // Package: Notifications
 // Module:  NotificationCenter
 //
-// Definition of the Observer class template.
+// Definition of the NObserver class template.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,19 +36,20 @@
 //
 
 
-#ifndef Foundation_Observer_INCLUDED
-#define Foundation_Observer_INCLUDED
+#ifndef Foundation_NObserver_INCLUDED
+#define Foundation_NObserver_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "Poco/AbstractObserver.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
 
 
 template <class C, class N>
-class Observer: public AbstractObserver
+class NObserver: public AbstractObserver
 	/// This template class implements an adapter that sits between
 	/// a NotificationCenter and an object receiving notifications
 	/// from it. It is quite similar in concept to the 
@@ -57,32 +58,34 @@ class Observer: public AbstractObserver
 	/// See the NotificationCenter class for information on how
 	/// to use this template class.
 	///
-	/// Instead of the Observer class template, you might want to
-	/// use the NObserver class template, which uses an AutoPtr to
-	/// pass the Notification to the callback function, thus freeing
-	/// you from memory management issues.
+	/// This class template is quite similar to the Observer class
+	/// template. The only difference is that the NObserver
+	/// expects the callback function to accept a const AutoPtr& 
+	/// instead of a plain pointer as argument, thus simplifying memory
+	/// management.
 {
 public:
-	typedef void (C::*Callback)(N*);
+	typedef AutoPtr<N> NotificationPtr;
+	typedef void (C::*Callback)(const NotificationPtr&);
 
-	Observer(C& object, Callback method): 
+	NObserver(C& object, Callback method): 
 		_pObject(&object), 
 		_method(method)
 	{
 	}
 	
-	Observer(const Observer& observer):
+	NObserver(const NObserver& observer):
 		AbstractObserver(observer),
 		_pObject(observer._pObject), 
 		_method(observer._method)
 	{
 	}
 	
-	~Observer()
+	~NObserver()
 	{
 	}
 	
-	Observer& operator = (const Observer& observer)
+	NObserver& operator = (const NObserver& observer)
 	{
 		if (&observer != this)
 		{
@@ -97,14 +100,14 @@ public:
 		N* pCastNf = dynamic_cast<N*>(pNf);
 		if (pCastNf)
 		{
-			pCastNf->duplicate();
-			(_pObject->*_method)(pCastNf);
+			NotificationPtr ptr(pCastNf, true);
+			(_pObject->*_method)(ptr);
 		}
 	}
 	
 	bool equals(const AbstractObserver& abstractObserver) const
 	{
-		const Observer* pObs = dynamic_cast<const Observer*>(&abstractObserver);
+		const NObserver* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
 
@@ -115,11 +118,11 @@ public:
 	
 	AbstractObserver* clone() const
 	{
-		return new Observer(*this);
+		return new NObserver(*this);
 	}
 	
 private:
-	Observer();
+	NObserver();
 
 	C*       _pObject;
 	Callback _method;
@@ -129,4 +132,4 @@ private:
 } // namespace Poco
 
 
-#endif // Foundation_Observer_INCLUDED
+#endif // Foundation_NObserver_INCLUDED

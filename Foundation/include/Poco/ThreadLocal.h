@@ -1,7 +1,7 @@
 //
 // ThreadLocal.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ThreadLocal.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/ThreadLocal.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -65,7 +65,8 @@ class TLSSlot: public TLSAbstractSlot
 	/// must not create instances of it yourself.
 {
 public:
-	TLSSlot()
+	TLSSlot():
+		_value()
 	{
 	}
 	

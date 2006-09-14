@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.2/Net/src/SocketImpl.cpp#1 $
+// $Id: //poco/1.2/Net/src/SocketImpl.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -38,6 +38,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/Timestamp.h"
 #include <string.h>
 
 
@@ -345,10 +346,26 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	{
 		FD_SET(_sockfd, &fdExcept);
 	}
-	struct timeval tv;
-	tv.tv_sec  = (long) timeout.totalSeconds();
-	tv.tv_usec = (long) timeout.useconds();
-	int rc = ::select(int(_sockfd) + 1, &fdRead, &fdWrite, &fdExcept, &tv);
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		struct timeval tv;
+		tv.tv_sec  = (long) remainingTime.totalSeconds();
+		tv.tv_usec = (long) remainingTime.useconds();
+		Poco::Timestamp start;
+		rc = ::select(int(_sockfd) + 1, &fdRead, &fdWrite, &fdExcept, &tv);
+		if (rc < 0 && lastError() == POCO_EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited > remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
 	return rc > 0; 
 }

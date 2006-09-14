@@ -2,7 +2,7 @@
 #
 # configure
 #
-# $Id: //poco/1.2/dist/configure#1 $
+# $Id: //poco/1.2/dist/configure#3 $
 #
 # Configuration script for POCO.
 #
@@ -56,21 +56,27 @@ while [ "$1" != "" ] ; do
 	shift
 done
 
-# copy Makefile to build dir
-if [ "$base" != "$build" ] ; then
-	cp $base/Makefile $build
-fi
-
 if [ "$config" = "" ] ; then
 	config=`uname`
 	cyg=`expr $config : '\(CYGWIN\).*'`
-	if [ "$cyg" != "" ] ; then
+	if [ "$cyg" = "CYGWIN" ] ; then
 		config=CYGWIN
 	fi
 fi
 
+if [ ! -f "$base/build/config/$config" ] ; then
+	echo "Unknown configuration: $config"
+	echo "Please use the --config option to specify another build configuration"
+	exit 1
+fi
+
 if [ "$prefix" = "" ] ; then
 	prefix=/usr/local
+fi
+
+# copy Makefile to build dir
+if [ "$base" != "$build" ] ; then
+	cp $base/Makefile $build
 fi
 
 # create config.make

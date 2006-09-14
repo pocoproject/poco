@@ -1,7 +1,7 @@
-Release 1.2.2 (2006-09-01)
+Release 1.2.3 (2006-09-14)
 ==========================
 
-This release contains bugfixes only.
+This release contains bugfixes and minor enchancements.
 See the CHANGELOG for details.
 
 
@@ -124,4 +124,4 @@ Please refer to the README file for more information and instructions for
 building the libraries.
 
 --
-$Id: //poco/1.2/dist/NEWS#2 $
+$Id: //poco/1.2/dist/NEWS#4 $

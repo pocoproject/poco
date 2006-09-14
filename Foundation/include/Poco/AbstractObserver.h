@@ -1,11 +1,13 @@
 //
-// PipeImpl_POSIX.cpp
+// AbstractObserver.h
 //
-// $Id: //poco/1.2/Foundation/src/PipeImpl_POSIX.cpp#2 $
+// $Id: //poco/1.2/Foundation/include/Poco/AbstractObserver.h#1 $
 //
 // Library: Foundation
-// Package: Processes
-// Module:  PipeImpl
+// Package: Notifications
+// Module:  NotificationCenter
+//
+// Definition of the AbstractObserver class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,99 +36,36 @@
 //
 
 
-#include "Poco/PipeImpl_POSIX.h"
-#include "Poco/Exception.h"
-#include <sys/types.h>
-#include <unistd.h>
+#ifndef Foundation_AbstractObserver_INCLUDED
+#define Foundation_AbstractObserver_INCLUDED
+
+
+#include "Poco/Foundation.h"
+#include "Poco/Notification.h"
 
 
 namespace Poco {
 
 
-PipeImpl::PipeImpl()
+class Foundation_API AbstractObserver
+	/// The base class for all instantiations of
+	/// the Observer and NObserver template classes.
 {
-	int fds[2];
-	int rc = pipe(fds);
-	if (rc == 0)
-	{
-		_readfd  = fds[0];
-		_writefd = fds[1];
-	}
-	else throw CreateFileException("anonymous pipe");
-}
+public:
+	AbstractObserver();
+	AbstractObserver(const AbstractObserver& observer);
+	virtual ~AbstractObserver();
+	
+	AbstractObserver& operator = (const AbstractObserver& observer);
 
-
-PipeImpl::~PipeImpl()
-{
-	closeRead();
-	closeWrite();
-}
-
-
-int PipeImpl::writeBytes(const void* buffer, int length)
-{
-	poco_assert (_writefd != -1);
-
-	int n;
-	do
-	{
-		n = write(_writefd, buffer, length);
-	}
-	while (n < 0 && errno == EINTR);
-	if (n >= 0)
-		return n;
-	else
-		throw WriteFileException("anonymous pipe");
-}
-
-
-int PipeImpl::readBytes(void* buffer, int length)
-{
-	poco_assert (_readfd != -1);
-
-	int n;
-	do
-	{
-		n = read(_readfd, buffer, length);
-	}
-	while (n < 0 && errno == EINTR);
-	if (n >= 0)
-		return n;
-	else
-		throw ReadFileException("anonymous pipe");
-}
-
-
-PipeImpl::Handle PipeImpl::readHandle() const
-{
-	return _readfd;
-}
-
-
-PipeImpl::Handle PipeImpl::writeHandle() const
-{
-	return _writefd;
-}
-
-
-void PipeImpl::closeRead()
-{
-	if (_readfd != -1)
-	{
-		close(_readfd);
-		_readfd = -1;
-	}
-}
-
-
-void PipeImpl::closeWrite()
-{
-	if (_writefd != -1)
-	{
-		close(_writefd);
-		_writefd = -1;
-	}
-}
+	virtual void notify(Notification* pNf) const = 0;
+	virtual bool equals(const AbstractObserver& observer) const = 0;
+	virtual bool accepts(Notification* pNf) const = 0;
+	virtual AbstractObserver* clone() const = 0;
+};
 
 
 } // namespace Poco
+
+
+#endif // Foundation_AbstractObserver_INCLUDED

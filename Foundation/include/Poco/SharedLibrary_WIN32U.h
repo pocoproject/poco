@@ -1,11 +1,13 @@
 //
-// Observer.cpp
+// SharedLibrary_WIN32U.h
 //
-// $Id: //poco/1.2/Foundation/src/Observer.cpp#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/SharedLibrary_WIN32U.h#1 $
 //
 // Library: Foundation
-// Package: Notifications
-// Module:  NotificationCenter
+// Package: SharedLibrary
+// Module:  SharedLibrary
+//
+// Definition of the SharedLibraryImpl class for Win32.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,31 +36,37 @@
 //
 
 
-#include "Poco/Observer.h"
+#ifndef Foundation_SharedLibrary_WIN32U_INCLUDED
+#define Foundation_SharedLibrary_WIN32U_INCLUDED
+
+
+#include "Poco/Foundation.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
 
 
-AbstractObserver::AbstractObserver()
+class Foundation_API SharedLibraryImpl
 {
-}
+protected:
+	SharedLibraryImpl();
+	~SharedLibraryImpl();
+	void loadImpl(const std::string& path);
+	void unloadImpl();
+	bool isLoadedImpl() const;
+	void* findSymbolImpl(const std::string& name);
+	const std::string& getPathImpl() const;
+	static std::string suffixImpl();
 
-
-AbstractObserver::AbstractObserver(const AbstractObserver& observer)
-{
-}
-
-
-AbstractObserver::~AbstractObserver()
-{
-}
-
-	
-AbstractObserver& AbstractObserver::operator = (const AbstractObserver& observer)
-{
-	return *this;
-}
+private:
+	std::string _path;
+	void* _handle;
+	static FastMutex _mutex;
+};
 
 
 } // namespace Poco
+
+
+#endif // Foundation_SharedLibrary_WIN32U_INCLUDED

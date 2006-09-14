@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/SharedPtr.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/SharedPtr.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -208,6 +208,11 @@ public:
 	C* get()
 	{
 		return _ptr;
+	}
+
+	bool isNull() const
+	{
+		return (_ptr == 0);
 	}
 	
 	operator C* ()

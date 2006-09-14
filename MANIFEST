@@ -116,6 +116,7 @@ Foundation/include/Poco
 Foundation/include/Poco/AbstractCache.h
 Foundation/include/Poco/AbstractDelegate.h
 Foundation/include/Poco/AbstractEvent.h
+Foundation/include/Poco/AbstractObserver.h
 Foundation/include/Poco/AbstractPriorityDelegate.h
 Foundation/include/Poco/AbstractStrategy.h
 Foundation/include/Poco/ActiveDispatcher.h
@@ -246,6 +247,7 @@ Foundation/include/Poco/NamedMutex_VMS.h
 Foundation/include/Poco/NamedMutex_WIN32.h
 Foundation/include/Poco/NamedMutex_WIN32U.h
 Foundation/include/Poco/NestedDiagnosticContext.h
+Foundation/include/Poco/NObserver.h
 Foundation/include/Poco/Notification.h
 Foundation/include/Poco/NotificationCenter.h
 Foundation/include/Poco/NotificationQueue.h
@@ -302,6 +304,7 @@ Foundation/include/Poco/SharedLibrary_HPUX.h
 Foundation/include/Poco/SharedLibrary_UNIX.h
 Foundation/include/Poco/SharedLibrary_VMS.h
 Foundation/include/Poco/SharedLibrary_WIN32.h
+Foundation/include/Poco/SharedLibrary_WIN32U.h
 Foundation/include/Poco/SharedPtr.h
 Foundation/include/Poco/SignalHandler.h
 Foundation/include/Poco/SimpleFileChannel.h
@@ -484,6 +487,7 @@ Foundation/samples/uuidgen/uuidgen.vmsbuild
 Foundation/samples/uuidgen/uuidgen_vs71.vcproj
 Foundation/samples/uuidgen/uuidgen_vs80.vcproj
 Foundation/src
+Foundation/src/AbstractObserver.cpp
 Foundation/src/ActiveDispatcher.cpp
 Foundation/src/adler32.c
 Foundation/src/ArchiveStrategy.cpp
@@ -603,7 +607,6 @@ Foundation/src/NullChannel.cpp
 Foundation/src/NullStream.cpp
 Foundation/src/NumberFormatter.cpp
 Foundation/src/NumberParser.cpp
-Foundation/src/Observer.cpp
 Foundation/src/OpcomChannel.cpp
 Foundation/src/Path.cpp
 Foundation/src/Path_UNIX.cpp
