@@ -10,6 +10,8 @@ Release 1.2.4 (2006-10-02)
 - added Document::getElementById() (two-argument) and getElementByIdNS()
 - added another test for DOMParser
 - added AutoPtr::isNull() (to be consistent with SharedPtr)
+- this release again compiles on PA-RISC HP-UX systems with aCC
+- added CMAKE support files contributed by Andrew J. P. Maclean
 
 
 Release 1.2.3 (2006-09-14)
@@ -511,4 +513,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.2/dist/CHANGELOG#7 $
+$Id: //poco/1.2/dist/CHANGELOG#9 $
