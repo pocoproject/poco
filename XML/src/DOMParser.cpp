@@ -1,7 +1,7 @@
 //
 // DOMParser.cpp
 //
-// $Id: //poco/1.2/XML/src/DOMParser.cpp#1 $
+// $Id: //poco/1.2/XML/src/DOMParser.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -54,6 +54,8 @@ DOMParser::DOMParser(NamePool* pNamePool):
 	_whitespace(true)
 {
 	if (_pNamePool) _pNamePool->duplicate();
+	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 }
 
 

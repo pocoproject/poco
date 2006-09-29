@@ -1,7 +1,7 @@
 //
 // DocumentTest.cpp
 //
-// $Id: //poco/1.2/XML/testsuite/src/DocumentTest.cpp#1 $
+// $Id: //poco/1.2/XML/testsuite/src/DocumentTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -203,6 +203,87 @@ void DocumentTest::testElementsByTagNameNS()
 }
 
 
+void DocumentTest::testElementById()
+{
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("root");
+	pRoot->setAttribute("id", "0");
+	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
+	pElem1->setAttribute("id", "1");
+	AutoPtr<Text> pText1 = pDoc->createTextNode("text");
+	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
+	pElem2->setAttribute("id", "2");
+	AutoPtr<Element> pElem3 = pDoc->createElement("elem");
+	pElem3->setAttribute("id", "3");
+
+	pElem1->appendChild(pText1);
+	pElem1->appendChild(pElem2);
+	pRoot->appendChild(pElem1);
+	pRoot->appendChild(pElem3);
+	pDoc->appendChild(pRoot);
+	
+	Element* pFound = pDoc->getElementById("0", "id");
+	assert (pFound == pRoot);
+	
+	pFound = pDoc->getElementById("1", "id");
+	assert (pFound == pElem1);
+	
+	pFound = pDoc->getElementById("2", "id");
+	assert (pFound == pElem2);
+
+	pFound = pDoc->getElementById("3", "id");
+	assert (pFound == pElem3);
+
+	pFound = pDoc->getElementById("4", "id");
+	assert (pFound == 0);
+	
+	pFound = pDoc->getElementById("0", "ID");
+	assert (pFound == 0);
+}
+
+
+void DocumentTest::testElementByIdNS()
+{
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElementNS("urn:ns1", "root");
+	pRoot->setAttributeNS("urn:ns1", "id", "0");
+	AutoPtr<Element> pElem1 = pDoc->createElementNS("urn:ns1", "elem");
+	pElem1->setAttributeNS("urn:ns1", "id", "1");
+	AutoPtr<Text> pText1 = pDoc->createTextNode("text");
+	AutoPtr<Element> pElem2 = pDoc->createElementNS("urn:ns1", "elem");
+	pElem2->setAttributeNS("urn:ns1", "id", "2");
+	AutoPtr<Element> pElem3 = pDoc->createElementNS("urn:ns1", "elem");
+	pElem3->setAttributeNS("urn:ns1", "id", "3");
+
+	pElem1->appendChild(pText1);
+	pElem1->appendChild(pElem2);
+	pRoot->appendChild(pElem1);
+	pRoot->appendChild(pElem3);
+	pDoc->appendChild(pRoot);
+
+	Element* pFound = pDoc->getElementByIdNS("0", "urn:ns1", "id");
+	assert (pFound == pRoot);
+	
+	pFound = pDoc->getElementByIdNS("1", "urn:ns1", "id");
+	assert (pFound == pElem1);
+	
+	pFound = pDoc->getElementByIdNS("2", "urn:ns1", "id");
+	assert (pFound == pElem2);
+
+	pFound = pDoc->getElementByIdNS("3", "urn:ns1", "id");
+	assert (pFound == pElem3);
+
+	pFound = pDoc->getElementByIdNS("4", "urn:ns1", "id");
+	assert (pFound == 0);
+	
+	pFound = pDoc->getElementByIdNS("0", "urn:ns1", "ID");
+	assert (pFound == 0);
+
+	pFound = pDoc->getElementByIdNS("0", "urn:ns2", "id");
+	assert (pFound == 0);
+}
+
+
 void DocumentTest::setUp()
 {
 }
@@ -222,6 +303,8 @@ CppUnit::Test* DocumentTest::suite()
 	CppUnit_addTest(pSuite, DocumentTest, testImportDeep);
 	CppUnit_addTest(pSuite, DocumentTest, testElementsByTagName);
 	CppUnit_addTest(pSuite, DocumentTest, testElementsByTagNameNS);
+	CppUnit_addTest(pSuite, DocumentTest, testElementById);
+	CppUnit_addTest(pSuite, DocumentTest, testElementByIdNS);
 
 	return pSuite;
 }

@@ -1,7 +1,7 @@
 //
 // Application.h
 //
-// $Id: //poco/1.2/Util/include/Poco/Util/Application.h#1 $
+// $Id: //poco/1.2/Util/include/Poco/Util/Application.h#2 $
 //
 // Library: Util
 // Package: Application
@@ -418,7 +418,7 @@ inline Poco::Timespan Application::uptime() const
 	#define POCO_APP_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)		\
 	{										\
-		AutoPtr<SampleApp> pApp = new App;	\
+		AutoPtr<App> pApp = new App;		\
 		try									\
 		{									\
 			pApp->init(argc, argv);			\
@@ -434,7 +434,7 @@ inline Poco::Timespan Application::uptime() const
 	#define POCO_APP_MAIN(App) \
 	int main(int argc, char** argv)			\
 	{										\
-		AutoPtr<SampleApp> pApp = new App;	\
+		AutoPtr<App> pApp = new App;		\
 		try									\
 		{									\
 			pApp->init(argc, argv);			\

@@ -1,7 +1,7 @@
 //
 // AbstractStrategy.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AbstractStrategy.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/AbstractStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -53,8 +53,8 @@ class AbstractStrategy
 	/// An AbstractStrategy is the interface for all strategies. 
 {
 public:
-	AbstractStrategy()	
-	{	
+	AbstractStrategy()
+	{
 	}
 
 	virtual ~AbstractStrategy()
@@ -71,7 +71,7 @@ public:
 
 	virtual void onGet(const void* pSender, const TKey& key) = 0;
 		/// Informs the strategy that a read-access happens to an element.
-		
+
 	virtual void onClear(const void* pSender, const EventArgs& args) = 0;
 		/// Removes all elements from the cache.
 

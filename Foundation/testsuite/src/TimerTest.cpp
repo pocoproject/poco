@@ -1,7 +1,7 @@
 //
 // TimerTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/TimerTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/TimerTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -63,7 +63,6 @@ void TimerTest::testTimer()
 	TimerCallback<TimerTest> tc(*this, &TimerTest::onTimer);
 	sw.start();
 	t.start(tc);
-/***
 	_event.wait();
 	sw.stop();
 	assert (sw.elapsed() >= 90000 && sw.elapsed() < 150000);
@@ -75,7 +74,6 @@ void TimerTest::testTimer()
 	_event.wait();
 	sw.stop();
 	assert (sw.elapsed() >= 190000 && sw.elapsed() < 250000);
-***/
 	t.stop();	
 }
 

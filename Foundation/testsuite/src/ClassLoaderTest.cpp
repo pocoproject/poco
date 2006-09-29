@@ -1,7 +1,7 @@
 //
 // ClassLoaderTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/ClassLoaderTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/ClassLoaderTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -171,7 +171,7 @@ void ClassLoaderTest::testClassLoader2()
 	}
 	
 	const AbstractMetaObject<TestPlugin>& meta1 = cl.classFor("PluginC");
-	assert(meta1.isAutoDelete(&(meta1.instance())));
+	assert (meta1.isAutoDelete(&(meta1.instance())));
 
 	// the following must not produce memory leaks
 	const AbstractMetaObject<TestPlugin>& meta2 = cl.classFor("PluginA");
@@ -180,9 +180,9 @@ void ClassLoaderTest::testClassLoader2()
 
 	TestPlugin* pPlugin = meta2.create();
 	meta2.autoDelete(pPlugin);
-	assert(meta2.isAutoDelete(pPlugin));
+	assert (meta2.isAutoDelete(pPlugin));
 	meta2.destroy(pPlugin);
-	assert(!meta2.isAutoDelete(pPlugin));
+	assert (!meta2.isAutoDelete(pPlugin));
 
 	cl.unloadLibrary(path);
 }

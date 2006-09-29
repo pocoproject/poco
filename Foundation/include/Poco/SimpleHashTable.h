@@ -1,7 +1,7 @@
 //
 // SimpleHashTable.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/SimpleHashTable.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/SimpleHashTable.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -191,7 +191,7 @@ public:
 			UInt32 origHash = hsh;
 			while (_entries[hsh % _maxCapacity])
 			{
-				if(_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _maxCapacity]->key == key)
 				{
 					_entries[hsh % _maxCapacity]->value = value;
 					return;
@@ -225,7 +225,7 @@ public:
 		{
 			if (_entries[hsh % _maxCapacity])
 			{
-				if(_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _maxCapacity]->key == key)
 				{
 					return _entries[hsh % _maxCapacity]->value;
 				}
@@ -248,7 +248,7 @@ public:
 		{
 			if (_entries[hsh % _maxCapacity])
 			{
-				if(_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _maxCapacity]->key == key)
 				{
 					return _entries[hsh % _maxCapacity]->key;
 				}
@@ -277,7 +277,7 @@ public:
 		{
 			if (_entries[hsh % _maxCapacity])
 			{
-				if(_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _maxCapacity]->key == key)
 				{
 					v = _entries[hsh % _maxCapacity]->value;
 					return true;
@@ -304,7 +304,7 @@ public:
 		{
 			if (_entries[hsh % _maxCapacity])
 			{
-				if(_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _maxCapacity]->key == key)
 				{
 					return true;
 				}

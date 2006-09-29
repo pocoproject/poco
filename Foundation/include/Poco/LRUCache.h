@@ -1,7 +1,7 @@
 //
 // LRUCache.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/LRUCache.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/LRUCache.h#3 $
 //
 // Library: Foundation
 // Package: Cache
@@ -51,14 +51,13 @@ template <class TKey, class TValue>
 class LRUCache: public AbstractCache<TKey, TValue, LRUStrategy<TKey, TValue> >
 	/// An LRUCache is the interface of all caches. 
 {
-
 public:
-	LRUCache(long size = 1024): 
+	LRUCache(long size = 1024):
 		AbstractCache<TKey, TValue, LRUStrategy<TKey, TValue> >(LRUStrategy<TKey, TValue>(size))
-	{	
+	{
 	}
 
-	virtual ~LRUCache()
+	~LRUCache()
 	{
 	}
 

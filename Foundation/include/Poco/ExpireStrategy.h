@@ -1,7 +1,7 @@
 //
 // ExpireStrategy.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ExpireStrategy.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/ExpireStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -56,15 +56,15 @@ namespace Poco {
 template < 
 	class TKey,
 	class TValue
-> 
+>
 class ExpireStrategy: public AbstractStrategy<TKey, TValue>
-	/// An ExpireStrategy implements time based ecpiration of cache entries
+	/// An ExpireStrategy implements time based expiration of cache entries
 {
 public:
 	typedef std::multimap<Timestamp, TKey>     TimeIndex;
 	typedef typename TimeIndex::iterator       IndexIterator;
 	typedef typename TimeIndex::const_iterator ConstIndexIterator;
-	typedef std::map<TKey, IndexIterator>	   Keys;
+	typedef std::map<TKey, IndexIterator>      Keys;
 	typedef typename Keys::iterator            Iterator;
 
 public:
@@ -75,7 +75,7 @@ public:
 		if (_expireTime < 25000) throw InvalidArgumentException("expireTime must be at least 25 ms");  
 	}
 
-	virtual ~ExpireStrategy()
+	~ExpireStrategy()
 	{
 	}
 
@@ -83,7 +83,7 @@ public:
 	{
 		Timestamp now;
 		IndexIterator it = _keyIndex.insert(std::make_pair(now, args.key()));
-		std::pair < Iterator, bool > stat = _keys.insert(std::make_pair(args.key(), it));
+		std::pair<Iterator, bool> stat = _keys.insert(std::make_pair(args.key(), it));
 		if (!stat.second)
 		{
 			_keyIndex.erase(stat.first->second);
@@ -94,7 +94,7 @@ public:
 	void onRemove(const void*, const TKey& key)
 	{
 		Iterator it = _keys.find(key);
-		if (it != _keys.end ())
+		if (it != _keys.end())
 		{
 			_keyIndex.erase(it->second);
 			_keys.erase(it);
@@ -111,11 +111,11 @@ public:
 		_keys.clear();
 		_keyIndex.clear();
 	}
-		
+
 	void onIsValid(const void*, ValidArgs<TKey>& args)
 	{
 		Iterator it = _keys.find(args.key());
-		if (it != _keys.end ())
+		if (it != _keys.end())
 		{
 			if (it->second->first.isElapsed(_expireTime))
 			{

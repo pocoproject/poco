@@ -1,7 +1,7 @@
 //
 // Document.cpp
 //
-// $Id: //poco/1.2/XML/src/Document.cpp#1 $
+// $Id: //poco/1.2/XML/src/Document.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -303,6 +303,22 @@ Entity* Document::createEntity(const XMLString& name, const XMLString& publicId,
 Notation* Document::createNotation(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
 {
 	return new Notation(const_cast<Document*>(this), name, publicId, systemId);
+}
+
+
+Element* Document::getElementById(const XMLString& elementId, const XMLString& idAttribute) const
+{
+	Element* pElem = documentElement();
+	if (pElem) pElem = pElem->getElementById(elementId, idAttribute);
+	return pElem;
+}
+
+
+Element* Document::getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const
+{
+	Element* pElem = documentElement();
+	if (pElem) pElem = pElem->getElementByIdNS(elementId, idAttributeURI, idAttributeLocalName);
+	return pElem;
 }
 
 

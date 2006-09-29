@@ -1,7 +1,7 @@
 //
 // LoggerTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/LoggerTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/LoggerTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -197,7 +197,7 @@ void LoggerTest::testDump()
 	
 	char buffer1[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
 	root.dump("test", buffer1, sizeof(buffer1));
-	assert(pChannel->list().empty());
+	assert (pChannel->list().empty());
 	
 	root.setLevel(Message::PRIO_DEBUG);
 	root.dump("test", buffer1, sizeof(buffer1));

@@ -1,7 +1,7 @@
 //
 // SharedPtrTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/SharedPtrTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/SharedPtrTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -112,7 +112,7 @@ void SharedPtrTest::testSharedPtr()
 		pTO1 = pTO2;
 		pTO2 = pTmp;
 	}
-	assert(pTO1 < pTO2);
+	assert (pTO1 < pTO2);
 	ptr1 = pTO1;
 	SharedPtr<TestObject> ptr2 = pTO2;
 	SharedPtr<TestObject> ptr3 = ptr1;
@@ -181,12 +181,12 @@ void SharedPtrTest::testImplicitCast()
 {
 	{
 		// null assign test
-		SharedPtr < DerivedObject > ptr2;
+		SharedPtr<DerivedObject> ptr2;
 		assertNull(ptr2.get());
 		SharedPtr<TestObject> ptr1 = ptr2;
 	}
 	{
-		SharedPtr < DerivedObject > ptr2(new DerivedObject("test", 666));
+		SharedPtr<DerivedObject> ptr2(new DerivedObject("test", 666));
 		assert (TestObject::count() == 1);
 		SharedPtr<TestObject> ptr1 = ptr2;
 		assert (TestObject::count() == 1);
@@ -201,7 +201,7 @@ void SharedPtrTest::testImplicitCast()
 void SharedPtrTest::testExplicitCast()
 {
 	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
-	SharedPtr < DerivedObject > ptr2 = ptr1.cast<DerivedObject>();
+	SharedPtr<DerivedObject> ptr2 = ptr1.cast<DerivedObject>();
 	assert (ptr2.get() != 0);
 
 	// cast the other way round must fail

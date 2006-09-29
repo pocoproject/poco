@@ -1,7 +1,7 @@
 //
 // ValidArgs.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ValidArgs.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/ValidArgs.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -46,7 +46,7 @@
 namespace Poco {
 
 
-template <class TKey> 
+template <class TKey>
 class ValidArgs
 {
 public:
@@ -82,7 +82,7 @@ public:
 	}
 
 protected:
-	const TKey&	_key;
+	const TKey& _key;
 	bool        _isValid;
 
 private:

@@ -1,7 +1,7 @@
 //
 // KeyValueArgs.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/KeyValueArgs.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/KeyValueArgs.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -68,7 +68,7 @@ public:
 	{
 	}
 
-	const TKey&	key() const
+	const TKey& key() const
 		/// Returns a reference to the key,
 	{
 		return _key;
@@ -79,7 +79,7 @@ public:
 	{
 		return _value;
 	}
-	
+
 protected:
 	const TKey&   _key;
 	const TValue& _value;

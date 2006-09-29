@@ -1,7 +1,7 @@
 //
 // LRUStrategy.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/LRUStrategy.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/LRUStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -52,7 +52,7 @@
 namespace Poco {
 
 
-template <class TKey, class TValue> 
+template <class TKey, class TValue>
 class LRUStrategy: public AbstractStrategy<TKey, TValue>
 	/// An LRUStrategy implements least recently used cache replacement.
 {
@@ -71,14 +71,14 @@ public:
 		if (_size < 1) throw InvalidArgumentException("size must be > 0");
 	}
 
-	virtual ~LRUStrategy()
+	~LRUStrategy()
 	{
 	}
-	
+
 	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
 	{
 		_keys.push_front(args.key());
-		std::pair < IndexIterator, bool > stat = _keyIndex.insert(make_pair(args.key(), _keys.begin()));
+		std::pair<IndexIterator, bool> stat = _keyIndex.insert(make_pair(args.key(), _keys.begin()));
 		if (!stat.second)
 		{
 			stat.first->second = _keys.begin();
@@ -135,7 +135,7 @@ public:
 		}
 
 		size_t diff = curSize - _size;
-		Iterator it = --_keys.end (); //--keys can never be invoked on an empty list due to the minSize==1 requirement of LRU
+		Iterator it = --_keys.end(); //--keys can never be invoked on an empty list due to the minSize==1 requirement of LRU
 		size_t i = 0;
 
 		while (i++ < diff) 

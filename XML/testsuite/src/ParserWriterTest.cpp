@@ -1,7 +1,7 @@
 //
 // ParserWriterTest.cpp
 //
-// $Id: //poco/1.2/XML/testsuite/src/ParserWriterTest.cpp#1 $
+// $Id: //poco/1.2/XML/testsuite/src/ParserWriterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -45,6 +45,7 @@
 
 using Poco::XML::DOMParser;
 using Poco::XML::DOMWriter;
+using Poco::XML::XMLReader;
 using Poco::XML::XMLWriter;
 using Poco::XML::Document;
 using Poco::XML::AutoPtr;
@@ -66,12 +67,28 @@ void ParserWriterTest::testParseWriteXHTML()
 	std::ostringstream ostr;
 	
 	DOMParser parser;
+	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	DOMWriter writer;
 	AutoPtr<Document> pDoc = parser.parseString(XHTML);
 	writer.writeNode(ostr, pDoc);
 	
 	std::string xml = ostr.str();
 	assert (xml == XHTML);
+}
+
+
+void ParserWriterTest::testParseWriteXHTML2()
+{
+	std::ostringstream ostr;
+	
+	DOMParser parser;
+	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+	DOMWriter writer;
+	AutoPtr<Document> pDoc = parser.parseString(XHTML2);
+	writer.writeNode(ostr, pDoc);
+	
+	std::string xml = ostr.str();
+	assert (xml == XHTML2);
 }
 
 
@@ -82,6 +99,7 @@ void ParserWriterTest::testParseWriteWSDL()
 
 	DOMParser parser;
 	parser.setFeature(DOMParser::FEATURE_WHITESPACE, false);
+	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	DOMWriter writer;
 	writer.setOptions(XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
 	writer.setNewLine(XMLWriter::NEWLINE_LF);
@@ -109,6 +127,7 @@ CppUnit::Test* ParserWriterTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ParserWriterTest");
 
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML);
+	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML2);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteWSDL);
 
 	return pSuite;
@@ -134,6 +153,27 @@ const std::string ParserWriterTest::XHTML =
 	"\t\t]]>\n"
 	"\t</ns1:body>\n"
 	"</ns1:html>";
+
+
+const std::string ParserWriterTest::XHTML2 =
+	"<!--\n"
+	"\tThis is a comment.\n"
+	"-->"
+	"<xns:html xml:lang=\"en\" xmlns:xns=\"http://www.w3.org/1999/xhtml\">\n"
+	"\t<xns:head>\n"
+	"\t\t<xns:link href=\"styles.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+	"\t\t<?xml-stylesheet href=\"styles.css\" type=\"text/css\"?>\n"
+	"\t\t<xns:title>A XHTML Example</xns:title>\n"
+	"\t</xns:head>\n"
+	"\t<xns:body>\n"
+	"\t\t<xns:h1>XHTML Example</xns:h1>\n"
+	"\t\t<xns:p>This is a XHTML example page.</xns:p>\n"
+	"\t\t<xns:img alt=\"Example Picture\" border=\"0\" height=\"192\" src=\"example.gif\" width=\"256\"/>\n"
+	"\t\t<![CDATA[\n"
+	"\t\tThe following <tag attr=\"value\">is inside a CDATA section</tag>.\n"
+	"\t\t]]>\n"
+	"\t</xns:body>\n"
+	"</xns:html>";
 
 
 const std::string ParserWriterTest::WSDL =

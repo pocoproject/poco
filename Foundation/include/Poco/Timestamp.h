@@ -1,7 +1,7 @@
 //
 // Timestamp.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Timestamp.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Timestamp.h#2 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -80,6 +80,7 @@ public:
 		/// Swaps the Timestamp with another one.
 	
 	void update();
+		/// Updates the Timestamp with the current time.
 
 	bool operator == (const Timestamp& ts) const;
 	bool operator != (const Timestamp& ts) const;

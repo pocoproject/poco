@@ -1,7 +1,7 @@
 //
 // Foundation.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Foundation.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Foundation.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -83,6 +83,7 @@
 //
 // Include platform-specific definitions
 //
+#include "Poco/Platform.h"
 #if defined(_WIN32)
 	#include "Poco/Platform_WIN32.h"
 #elif defined(__VMS)
@@ -95,7 +96,6 @@
 //
 // Pull in basic definitions
 //
-#include "Poco/Platform.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Types.h"
 #include <string>

@@ -1,7 +1,7 @@
 //
 // AutoPtrTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/AutoPtrTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/AutoPtrTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -131,7 +131,7 @@ void AutoPtrTest::testOps()
 		pTO1 = pTO2;
 		pTO2 = pTmp;
 	}
-	assert(pTO1 < pTO2);
+	assert (pTO1 < pTO2);
 	ptr1 = pTO1;
 	AutoPtr<TestObj> ptr2 = pTO2;
 	AutoPtr<TestObj> ptr3 = ptr1;

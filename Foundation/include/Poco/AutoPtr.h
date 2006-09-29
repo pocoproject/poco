@@ -1,7 +1,7 @@
 //
 // AutoPtr.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AutoPtr.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/AutoPtr.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -151,18 +151,18 @@ public:
 	}
 
 	template <class Other> 
-	AutoPtr < Other > cast()
+	AutoPtr<Other> cast()
 		/// Casts the AutoPtr via a dynamic cast to the given type.
 		/// Returns an AutoPtr containing NULL if the cast fails.
 		/// Example: (assume class Sub: public Super)
-		///    AutoPtr < Super > super(new Sub());
-		///    AutoPtr < Sub > sub = super.cast<Sub>();
+		///    AutoPtr<Super> super(new Sub());
+		///    AutoPtr<Sub> sub = super.cast<Sub>();
 		///    poco_assert (sub.get());
 	{
 		Other* pOther = dynamic_cast <Other*>(_ptr);
 		if (pOther)
 			pOther->duplicate();
-		return AutoPtr < Other > (pOther);
+		return AutoPtr<Other>(pOther);
 	}
 
 	C* operator -> ()
@@ -200,6 +200,11 @@ public:
 	C* get()
 	{
 		return _ptr;
+	}
+
+	bool isNull() const
+	{
+		return _ptr == 0;
 	}
 	
 	operator C* ()

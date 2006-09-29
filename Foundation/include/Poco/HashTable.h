@@ -1,7 +1,7 @@
 //
 // HashTable.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/HashTable.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/HashTable.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -172,7 +172,7 @@ public:
 	{
 		if (!_entries[hsh])
 			_entries[hsh] = new HashEntryMap();
-		std::pair < Iterator, bool > res = _entries[hsh]->insert(make_pair(key, value));
+		std::pair<Iterator, bool> res = _entries[hsh]->insert(make_pair(key, value));
 		if (res.second == false)
 			res.first->second = value;
 		else

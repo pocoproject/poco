@@ -1,7 +1,7 @@
 //
 // SHA1Engine.cpp
 //
-// $Id: //poco/1.2/Foundation/src/SHA1Engine.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/SHA1Engine.cpp#2 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -137,7 +137,7 @@ const DigestEngine::Digest& SHA1Engine::digest()
 	((BYTE*) _context.data)[count++] = 0x80;
 
 	/* Pad out to 56 mod 64 */
-	if(count > 56)
+	if (count > 56)
 	{
 		/* Two lots of padding:  Pad the first block to 64 bytes */
 		memset((BYTE*) &_context.data + count, 0, 64 - count);

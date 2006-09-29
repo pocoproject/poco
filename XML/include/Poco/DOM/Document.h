@@ -1,7 +1,7 @@
 //
 // Document.h
 //
-// $Id: //poco/1.2/XML/include/Poco/DOM/Document.h#1 $
+// $Id: //poco/1.2/XML/include/Poco/DOM/Document.h#2 $
 //
 // Library: XML
 // Package: DOM
@@ -209,6 +209,9 @@ public:
 		/// are not of type ID unless so defined. Implementations that do 
 		/// not know whether attributes are of type ID or not are expected to
 		/// return null. This implementation therefore returns null.
+		///
+		/// See also the non-standard two argument variant of getElementById()
+		/// and getElementByIdNS().
 
 	// DocumentEvent
 	Event* createEvent(const XMLString& eventType) const;
@@ -230,6 +233,18 @@ public:
 		/// Creates a Notation with the given name, publicId and systemId.
 		///
 		/// This method is not part of the W3C Document Object Model.
+
+	Element* getElementById(const XMLString& elementId, const XMLString& idAttribute) const;
+		/// Returns the first Element whose ID attribute (given in idAttribute)
+		/// has the given elementId. If no such element exists, returns null. 
+		///
+		/// This method is an extension to the W3C Document Object Model.
+
+	Element* getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const;
+		/// Returns the first Element whose ID attribute (given in idAttributeURI and idAttributeLocalName)
+		/// has the given elementId. If no such element exists, returns null. 
+		///
+		/// This method is an extension to the W3C Document Object Model.
 
 protected:
 	~Document();

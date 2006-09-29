@@ -1,7 +1,7 @@
 //
 // DocumentTest.h
 //
-// $Id: //poco/1.2/XML/testsuite/src/DocumentTest.h#1 $
+// $Id: //poco/1.2/XML/testsuite/src/DocumentTest.h#2 $
 //
 // Definition of the DocumentTest class.
 //
@@ -51,6 +51,8 @@ public:
 	void testImportDeep();
 	void testElementsByTagName();
 	void testElementsByTagNameNS();
+	void testElementById();
+	void testElementByIdNS();
 
 	void setUp();
 	void tearDown();

@@ -1,7 +1,7 @@
 //
 // Element.h
 //
-// $Id: //poco/1.2/XML/include/Poco/DOM/Element.h#1 $
+// $Id: //poco/1.2/XML/include/Poco/DOM/Element.h#2 $
 //
 // Library: XML
 // Package: DOM
@@ -79,6 +79,9 @@ public:
 
 	const XMLString& getAttribute(const XMLString& name) const;
 		/// Retrieves an attribute value by name.
+		///
+		/// Returns the attribute's value, if the attribute
+		/// exists, or an empty string otherwise.
 
 	void setAttribute(const XMLString& name, const XMLString& value);
 		/// Adds a new attribute. If an attribute with that name is already present
@@ -127,6 +130,9 @@ public:
 	// DOM Level 2
 	const XMLString& getAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Retrieves an attribute value by name.
+		///
+		/// Returns the attribute's value, if the attribute
+		/// exists, or an empty string otherwise.
 
 	void setAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName, const XMLString& value);
 		/// Adds a new attribute. If an attribute with that name
@@ -177,7 +183,19 @@ public:
 		/// or null if such an element does not exist.
 		///
 		/// This method is an extension to the W3C Document Object Model.
-		
+	
+	Element* getElementById(const XMLString& elementId, const XMLString& idAttribute) const;
+		/// Returns the first Element whose ID attribute (given in idAttribute)
+		/// has the given elementId. If no such element exists, returns null. 
+		///
+		/// This method is an extension to the W3C Document Object Model.
+
+	Element* getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const;
+		/// Returns the first Element whose ID attribute (given in idAttributeURI and idAttributeLocalName)
+		/// has the given elementId. If no such element exists, returns null. 
+		///
+		/// This method is an extension to the W3C Document Object Model.
+	
 	// Node
 	const XMLString& nodeName() const;
 	NamedNodeMap* attributes() const;

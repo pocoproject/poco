@@ -1,7 +1,7 @@
 //
 // ExpireLRUCache.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ExpireLRUCache.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/ExpireLRUCache.h#3 $
 //
 // Library: Foundation
 // Package: Cache
@@ -52,7 +52,7 @@ namespace Poco {
 template < 
 	class TKey,
 	class TValue
-> 
+>
 class ExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >
 	/// An ExpireLRUCache combines LUR caching and time based expire caching.
 	/// It cache entries for a fixed time period (per default 10 minutes)
@@ -66,10 +66,10 @@ public:
 		this->_strategy.pushBack(new ExpireStrategy<TKey, TValue>(expire));
 	}
 
-	virtual ~ExpireLRUCache()
+	~ExpireLRUCache()
 	{
 	}
-	
+
 private:
 	ExpireLRUCache(const ExpireLRUCache& aCache);
 	ExpireLRUCache& operator = (const ExpireLRUCache& aCache);

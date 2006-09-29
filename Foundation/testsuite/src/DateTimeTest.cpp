@@ -1,7 +1,7 @@
 //
 // DateTimeTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/DateTimeTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/DateTimeTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -599,18 +599,18 @@ void DateTimeTest::testSwap()
 void DateTimeTest::testUsage()
 {
     DateTime dt1(1776, 7, 4);
-    assert(dt1.year() == 1776);
-    assert(dt1.month() == 7);
-    assert(dt1.day() == 4);
+    assert (dt1.year() == 1776);
+    assert (dt1.month() == 7);
+    assert (dt1.day() == 4);
 
     DateTime dt2(dt1);
     dt2 += Timespan(6, 0, 0, 0, 0);
-    assert(dt2.year() == 1776);
-    assert(dt2.month() == 7);
-    assert(dt2.day() == 10);
+    assert (dt2.year() == 1776);
+    assert (dt2.month() == 7);
+    assert (dt2.day() == 10);
 
     Timespan span = dt2 - dt1;
-    assert(span.days() == 6);
+    assert (span.days() == 6);
 
     // TODO - When adding months and years we need to be
     // able to specify the end-end convention.
@@ -662,8 +662,8 @@ void DateTimeTest::testSetYearDay()
         // TODO - need to be able to assert with the loop counter
         // but cppUnit is not able to do this.
 
-        assert(r   == x);
-        assert(day == X.dayOfYear());
+        assert (r   == x);
+        assert (day == X.dayOfYear());
 #endif
     }
 

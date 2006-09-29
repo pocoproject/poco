@@ -1,7 +1,7 @@
 //
 // FileChannel.cpp
 //
-// $Id: //poco/1.2/Foundation/src/FileChannel.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/FileChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -143,10 +143,10 @@ void FileChannel::setProperty(const std::string& name, const std::string& value)
 	{
 		_times = value;
 
-		if(!_rotation.empty())
+		if (!_rotation.empty())
 			setRotation(_rotation);
 
-		if(!_archive.empty())
+		if (!_archive.empty())
 			setArchive(_archive);
 	}
 	else if (name == PROP_PATH)
@@ -225,9 +225,9 @@ void FileChannel::setRotation(const std::string& rotation)
 	RotateStrategy* pStrategy = 0;
 	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
-		if(_times == "utc")
+		if (_times == "utc")
 			pStrategy = new RotateAtTimeStrategy<DateTime>(rotation);
-		else if(_times == "local")
+		else if (_times == "local")
 			pStrategy = new RotateAtTimeStrategy<LocalDateTime>(rotation);
 		else
 			throw PropertyNotSupportedException("times", _times);
@@ -271,9 +271,9 @@ void FileChannel::setArchive(const std::string& archive)
 	}
 	else if (archive == "timestamp")
 	{
-		if(_times == "utc")
+		if (_times == "utc")
 			pStrategy = new ArchiveByTimestampStrategy<DateTime>;
-		else if(_times == "local")
+		else if (_times == "local")
 			pStrategy = new ArchiveByTimestampStrategy<LocalDateTime>;
 		else
 			throw PropertyNotSupportedException("times", _times);

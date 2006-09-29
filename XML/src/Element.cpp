@@ -1,7 +1,7 @@
 //
 // Element.cpp
 //
-// $Id: //poco/1.2/XML/src/Element.cpp#1 $
+// $Id: //poco/1.2/XML/src/Element.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -404,5 +404,42 @@ Node* Element::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+Element* Element::getElementById(const XMLString& elementId, const XMLString& idAttribute) const
+{
+	if (getAttribute(idAttribute) == elementId)
+		return const_cast<Element*>(this);
 
+	Node* pNode = firstChild();
+	while (pNode)
+	{
+		if (pNode->nodeType() == Node::ELEMENT_NODE)
+		{
+			Element* pResult = static_cast<Element*>(pNode)->getElementById(elementId, idAttribute);
+			if (pResult) return pResult;
+		}
+		pNode = pNode->nextSibling();
+	}
+	return 0;
+}
+
+
+Element* Element::getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const
+{
+	if (getAttributeNS(idAttributeURI, idAttributeLocalName) == elementId)
+		return const_cast<Element*>(this);
+
+	Node* pNode = firstChild();
+	while (pNode)
+	{
+		if (pNode->nodeType() == Node::ELEMENT_NODE)
+		{
+			Element* pResult = static_cast<Element*>(pNode)->getElementByIdNS(elementId, idAttributeURI, idAttributeLocalName);
+			if (pResult) return pResult;
+		}
+		pNode = pNode->nextSibling();
+	}
+	return 0;
+}
+
+
+} } // namespace Poco::XML

@@ -1,7 +1,7 @@
 //
 // StrategyCollection.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/StrategyCollection.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/StrategyCollection.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -60,14 +60,14 @@ public:
 	typedef typename Strategies::const_iterator ConstIterator;
 
 public:
-	StrategyCollection()	
+	StrategyCollection()
 	{
 	}
 
-	virtual ~StrategyCollection()
-	{	
+	~StrategyCollection()
+	{
 	}
-	
+
 	void pushBack(AbstractStrategy<TKey, TValue>* pStrat)
 		/// Adds an AbstractStrategy to the collection. Class takes ownership of pointer
 	{
@@ -78,7 +78,7 @@ public:
 		/// Removes the last added AbstractStrategy from the collection.
 	{
 		_strategies.pop_back();
-	}	
+	}
 
 	void onAdd(const void* pSender, const KeyValueArgs <TKey, TValue>& key)
 		/// Adds the key to the strategy.
@@ -103,7 +103,7 @@ public:
 			(*it)->onRemove(pSender, key);
 		}
 	}
-		
+
 	void onGet(const void* pSender, const TKey& key)
 	{
 		Iterator it = _strategies.begin();
@@ -113,7 +113,7 @@ public:
 			(*it)->onGet(pSender, key);
 		}
 	}
-		
+
 	void onClear(const void* pSender, const EventArgs& args)
 	{
 		Iterator it = _strategies.begin();
@@ -128,7 +128,7 @@ public:
 	{
 		Iterator it = _strategies.begin();
 		Iterator endIt = _strategies.end();
-		for (; it != endIt && key.isValid (); ++it)
+		for (; it != endIt && key.isValid(); ++it)
 		{
 			(*it)->onIsValid(pSender, key);
 		}

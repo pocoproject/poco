@@ -1,7 +1,7 @@
 //
 // AnyTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/AnyTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/AnyTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -57,7 +57,7 @@ public:
 };
 
 
-AnyTest::AnyTest(const std::string& name ): CppUnit::TestCase(name)
+AnyTest::AnyTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -70,21 +70,21 @@ AnyTest::~AnyTest()
 void AnyTest::testInt()
 {
 	Any a = 13;
-	poco_assert (a.type() == typeid(int) );
-	int* i = AnyCast < int > (&a);
-	poco_assert ( *i == 13 );
+	assert (a.type() == typeid(int));
+	int* i = AnyCast<int>(&a);
+	assert (*i == 13);
 	Any b = a;
-	poco_assert ( b.type() == typeid(int) );
-	int *cpyI = AnyCast < int > (&b);
-	poco_assert ( *cpyI == *i );
+	assert (b.type() == typeid(int));
+	int *cpyI = AnyCast<int>(&b);
+	assert (*cpyI == *i);
 	*cpyI = 20;
-	poco_assert ( *cpyI != *i );
-	std::string* s = AnyCast < std::string > (&a);
-	poco_assert ( s == NULL);
+	assert (*cpyI != *i);
+	std::string* s = AnyCast<std::string>(&a);
+	assert (s == NULL);
 
-	int tmp = AnyCast < int > (a);
+	int tmp = AnyCast<int>(a);
 	const Any c = a;
-	tmp = AnyCast < int > (a);
+	tmp = AnyCast<int>(a);
 }
 
 
@@ -93,30 +93,30 @@ void AnyTest::testComplexType()
 	SomeClass str(13,std::string("hello"));
 	Any a = str;
 	Any b = a;
-	poco_assert (a.type() == typeid(SomeClass) );
-	poco_assert (b.type() == typeid(SomeClass) );
-	SomeClass str2 = AnyCast < SomeClass > (a);
-	poco_assert ( str == str2 );
-	const SomeClass& strCRef = RefAnyCast < SomeClass > (a);
-	poco_assert ( str == strCRef );
-	SomeClass& strRef = RefAnyCast < SomeClass > (a);
-	poco_assert ( str == strRef );
+	assert (a.type() == typeid(SomeClass));
+	assert (b.type() == typeid(SomeClass));
+	SomeClass str2 = AnyCast<SomeClass>(a);
+	assert (str == str2);
+	const SomeClass& strCRef = RefAnyCast<SomeClass>(a);
+	assert (str == strCRef);
+	SomeClass& strRef = RefAnyCast<SomeClass>(a);
+	assert (str == strRef);
 }
 
 
 void AnyTest::testVector()
 {
-	std::vector < int > tmp;
-	tmp.push_back( 1 );
-	tmp.push_back( 2 );
-	tmp.push_back( 3 );
+	std::vector<int> tmp;
+	tmp.push_back(1);
+	tmp.push_back(2);
+	tmp.push_back(3);
 	Any a = tmp;
-	poco_assert (a.type() == typeid(std::vector < int >) );
-	std::vector < int > tmp2 = AnyCast < std::vector < int > >(a);
-	const std::vector < int >& vecCRef = RefAnyCast < std::vector < int > >(a);
-	std::vector < int >& vecRef = RefAnyCast < std::vector < int > >(a);
+	assert (a.type() == typeid(std::vector<int>));
+	std::vector<int>tmp2 = AnyCast<std::vector<int> >(a);
+	const std::vector<int >& vecCRef = RefAnyCast<std::vector<int> >(a);
+	std::vector<int >& vecRef = RefAnyCast<std::vector<int> >(a);
 	vecRef[0] = 0;
-	poco_assert( vecRef[0] == vecCRef[0] );
+	assert (vecRef[0] == vecCRef[0]);
 }
 
 

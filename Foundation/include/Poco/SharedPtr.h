@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/SharedPtr.h#2 $
+// $Id: //poco/1.2/Foundation/include/Poco/SharedPtr.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -166,18 +166,18 @@ public:
 	}
 
 	template <class Other> 
-	SharedPtr < Other > cast()
+	SharedPtr<Other> cast()
 		/// Casts the SharedPtr via a dynamic cast to the given type.
 		/// Returns an SharedPtr containing NULL if the cast fails.
 		/// Example: (assume class Sub: public Super)
-		///    SharedPtr < Super > super(new Sub());
-		///    SharedPtr < Sub > sub = super.cast<Sub>();
+		///    SharedPtr<Super> super(new Sub());
+		///    SharedPtr<Sub> sub = super.cast<Sub>();
 		///    poco_assert (sub.get());
 	{
 		Other* pOther = dynamic_cast <Other*>(_ptr);
 		if (pOther)
-			return SharedPtr < Other > (_pCounter, pOther);
-		return SharedPtr < Other > ();
+			return SharedPtr<Other> (_pCounter, pOther);
+		return SharedPtr<Other>();
 	}
 
 	void swap(SharedPtr& ptr)
@@ -212,7 +212,7 @@ public:
 
 	bool isNull() const
 	{
-		return (_ptr == 0);
+		return _ptr == 0;
 	}
 	
 	operator C* ()
@@ -344,19 +344,18 @@ private:
 		}
 	}
 
-	SharedPtr(ReferenceCounter* pCounter, C* ptr):_pCounter(pCounter), _ptr(ptr)
+	SharedPtr(ReferenceCounter* pCounter, C* ptr): _pCounter(pCounter), _ptr(ptr)
 		/// for cast operation
 	{
 		poco_assert_dbg (_pCounter);
 		_pCounter->duplicate();
 	}
 
-
 private:
 	ReferenceCounter* _pCounter;
 	C*                _ptr;
 
-	template < class Other > friend class SharedPtr;
+	template<class Other> friend class SharedPtr;
 };
 
 

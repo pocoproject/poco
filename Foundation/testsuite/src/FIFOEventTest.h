@@ -1,7 +1,7 @@
 //
 // FIFOEventTest.h
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/FIFOEventTest.h#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/FIFOEventTest.h#2 $
 //
 // Definition of the FIFOEventTest class.
 //
@@ -56,16 +56,16 @@ public:
 
 	void testNoDelegate();
 	void testSingleDelegate();
-	void testDuplicateRegister ();
-	void testDuplicateUnregister ();
-	void testDisabling ();
-	void testFIFOOrder ();
-	void testFIFOOrderExpire ();
-	void testExpire ();
+	void testDuplicateRegister();
+	void testDuplicateUnregister();
+	void testDisabling();
+	void testFIFOOrder();
+	void testFIFOOrderExpire();
+	void testExpire();
 	void testExpireReRegister();
-	void testReturnParams ();
-	void testOverwriteDelegate ();
-	void testAsyncNotify ();
+	void testReturnParams();
+	void testOverwriteDelegate();
+	void testAsyncNotify();
 
 	void setUp();
 	void tearDown();
@@ -73,16 +73,16 @@ public:
 
 protected:
 
-	void onSimple ( const void* pSender, int& i );
-	void onSimpleOther ( const void* pSender, int& i );
-	void onConstSimple ( const void* pSender, const int& i );
-	void onComplex ( const void* pSender, Poco::EventArgs* & i );
-	void onComplex2 ( const void* pSender, Poco::EventArgs & i );
-	void onConstComplex ( const void* pSender, const Poco::EventArgs*& i );
-	void onConst2Complex ( const void* pSender, const Poco::EventArgs * const & i );
-	void onAsync ( const void* pSender, int& i );
+	void onSimple(const void* pSender, int& i);
+	void onSimpleOther(const void* pSender, int& i);
+	void onConstSimple(const void* pSender, const int& i);
+	void onComplex(const void* pSender, Poco::EventArgs* & i);
+	void onComplex2(const void* pSender, Poco::EventArgs & i);
+	void onConstComplex(const void* pSender, const Poco::EventArgs*& i);
+	void onConst2Complex(const void* pSender, const Poco::EventArgs * const & i);
+	void onAsync(const void* pSender, int& i);
 
-	int getCount () const;
+	int getCount() const;
 private:
 	int		_count;
 };

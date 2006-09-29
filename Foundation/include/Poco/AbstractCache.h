@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AbstractCache.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/AbstractCache.h#3 $
 //
 // Library: Foundation
 // Package: Cache
@@ -70,12 +70,12 @@ public:
 	typedef typename DataHolder::const_iterator ConstIterator;
 	typedef std::set<TKey>                      KeySet;
 
-	AbstractCache()	
+	AbstractCache()
 	{
 		initialize();
 	}
 
-	AbstractCache(const TStrategy& strat):_strategy(strat)
+	AbstractCache(const TStrategy& strat): _strategy(strat)
 	{
 		initialize();
 	}
@@ -84,7 +84,7 @@ public:
 	{
 		uninitialize();
 	}
-	
+
 	void add(const TKey& key, const TValue& val)
 		/// Adds the key value pair to the cache.
 		/// If for the key already an entry exists, it will be overwritten.
@@ -92,7 +92,7 @@ public:
 		FastMutex::ScopedLock lock(_mutex);
 		doAdd(key, val);
 	}
-		
+
 	void remove(const TKey& key)
 		/// Removes an entry from the cache. If the entry is not found,
 		/// the remove is ignored.
@@ -100,13 +100,13 @@ public:
 		FastMutex::ScopedLock lock(_mutex);
 		doRemove(key);
 	}
-		
+
 	bool has(const TKey& key) const
 		/// Returns true if the cache contains a value for the key.
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		return doHas(key);
-	}	
+	}
 
 	SharedPtr<TValue> get(const TKey& key)
 		/// Returns a SharedPtr of the value. The SharedPointer will remain valid
@@ -116,7 +116,7 @@ public:
 		FastMutex::ScopedLock lock(_mutex);
 		return doGet (key);
 	}
-			
+
 	void clear()
 		/// Removes all elements from the cache.
 	{
@@ -138,7 +138,7 @@ protected:
 		IsValid	+= Delegate<TStrategy, ValidArgs<TKey> >(&_strategy, &TStrategy::onIsValid);
 		Replace	+= Delegate<TStrategy, KeySet>(&_strategy, &TStrategy::onReplace);
 	}
-		
+
 	void uninitialize()
 		/// Reverts event registration.
 	{
@@ -165,7 +165,7 @@ protected:
 		
 		doReplace();
 	}
-		
+
 	void doRemove(const TKey& key) 
 		/// Removes an entry from the cache. If the entry is not found
 		/// the remove is ignored.
@@ -173,7 +173,7 @@ protected:
 		Remove.notify(this, key);
 		_data.erase(key);
 	}
-		
+
 	bool doHas(const TKey& key) const
 		/// Returns true if the cache contains a value for the key
 	{
@@ -218,7 +218,7 @@ protected:
 
 		return result;
 	}
-			
+
 	void doClear()
 	{
 		static EventArgs _emptyArgs;
@@ -243,7 +243,6 @@ protected:
 	TStrategy          _strategy;
 	mutable DataHolder _data;
 	mutable FastMutex  _mutex;
-
 
 private:
 	AbstractCache(const AbstractCache& aCache);

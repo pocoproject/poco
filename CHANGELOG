@@ -1,5 +1,17 @@
 This is the changelog file for POCO - the C++ Portable Components.
 
+Release 1.2.4 (2006-10-02)
+==========================
+
+- some code beautifying and improvements to comments
+- DOMParser now automatically sets FEATURE_NAMESPACE_PREFIXES
+- fixed SF #1567051:  DOMBuilder/DOMParser/NamespaceStrategy bug
+- fixed SF #1567364: POCO_APP_MAIN
+- added Document::getElementById() (two-argument) and getElementByIdNS()
+- added another test for DOMParser
+- added AutoPtr::isNull() (to be consistent with SharedPtr)
+
+
 Release 1.2.3 (2006-09-14)
 ==========================
 
@@ -499,4 +511,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.2/dist/CHANGELOG#6 $
+$Id: //poco/1.2/dist/CHANGELOG#7 $
