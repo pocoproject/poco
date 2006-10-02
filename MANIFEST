@@ -40,6 +40,10 @@ CHANGELOG
 components
 configure
 contrib
+contrib/cmake
+contrib/cmake/CMakeLists.txt
+contrib/cmake/PocoConfig.cmake
+contrib/cmake/README
 contrib/poco-doc.pl
 CONTRIBUTORS
 CppUnit

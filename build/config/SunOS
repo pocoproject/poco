@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.2/build/config/SunOS#1 $
+# $Id: //poco/1.2/build/config/SunOS#2 $
 #
 # SunOS
 #
@@ -51,9 +51,9 @@ STATICOPT_LINK  = -Bstatic
 SHAREDOPT_CC    = -KPIC
 SHAREDOPT_CXX   = -KPIC
 SHAREDOPT_LINK  = -Bdynamic
-DEBUGOPT_CC     = -g -xs -xcheck -D_DEBUG=$(DEBUGLEVEL)
-DEBUGOPT_CXX    = -g -xs -xcheck -D_DEBUG=$(DEBUGLEVEL)
-DEBUGOPT_LINK   = -g -xs -xcheck
+DEBUGOPT_CC     = -g -xs -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_CXX    = -g -xs -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_LINK   = -g -xs
 RELEASEOPT_CC   = -O -DNDEBUG
 RELEASEOPT_CXX  = -O -DNDEBUG
 RELEASEOPT_LINK =
