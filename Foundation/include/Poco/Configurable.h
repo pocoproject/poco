@@ -1,7 +1,7 @@
 //
 // Configurable.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Configurable.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Configurable.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -59,6 +59,13 @@ class Foundation_API Configurable
 	/// Every property controls a certain aspect of a
 	/// Formatter or Channel. For example, the PatternFormatter's
 	/// formatting pattern is set via a property.
+	///
+	/// NOTE: The following property names are use internally
+	/// by the logging framework and must not be used by
+	/// channels or formatters:
+	///   - class
+	///   - pattern (Channel)
+	///   - formatter (Channel)
 {
 public:
 	Configurable();

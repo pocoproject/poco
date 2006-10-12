@@ -1,7 +1,7 @@
 //
 // DOMImplementation.cpp
 //
-// $Id: //poco/1.2/XML/src/DOMImplementation.cpp#1 $
+// $Id: //poco/1.2/XML/src/DOMImplementation.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -51,6 +51,8 @@ const XMLString DOMImplementation::FEATURE_CORE           = toXMLString("core");
 const XMLString DOMImplementation::FEATURE_EVENTS         = toXMLString("events");
 const XMLString DOMImplementation::FEATURE_MUTATIONEVENTS = toXMLString("mutationevents");
 const XMLString DOMImplementation::FEATURE_TRAVERSAL      = toXMLString("traversal");
+const XMLString DOMImplementation::VERSION_1_0            = toXMLString("1.0");
+const XMLString DOMImplementation::VERSION_2_0            = toXMLString("2.0");
 
 
 DOMImplementation::DOMImplementation()
@@ -66,11 +68,11 @@ DOMImplementation::~DOMImplementation()
 bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& version) const
 {
 	XMLString lcFeature = Poco::toLower(feature);
-	return lcFeature == FEATURE_XML && version == "1.0" ||
-	       lcFeature == FEATURE_CORE && version == "2.0" ||
-	       lcFeature == FEATURE_EVENTS && version == "2.0" ||
-	       lcFeature == FEATURE_MUTATIONEVENTS && version == "2.0" ||
-	       lcFeature == FEATURE_TRAVERSAL && version == "2.0";
+	return lcFeature == FEATURE_XML && version == VERSION_1_0 ||
+	       lcFeature == FEATURE_CORE && version == VERSION_2_0 ||
+	       lcFeature == FEATURE_EVENTS && version == VERSION_2_0 ||
+	       lcFeature == FEATURE_MUTATIONEVENTS && version == VERSION_2_0 ||
+	       lcFeature == FEATURE_TRAVERSAL && version == VERSION_2_0;
 }
 
 		

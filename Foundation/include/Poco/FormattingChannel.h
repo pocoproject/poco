@@ -1,7 +1,7 @@
 //
 // FormattingChannel.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/FormattingChannel.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/FormattingChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -94,6 +94,8 @@ public:
 		/// Only the "channel" and "formatter" properties are supported, which allow
 		/// setting the target channel and formatter, respectively, via the LoggingRegistry.
 		/// The "channel" and "formatter" properties are set-only.
+		///
+		/// Unsupported properties are passed to the attached Channel.
 
 	void open();
 		/// Opens the attached channel.

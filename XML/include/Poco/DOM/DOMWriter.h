@@ -1,7 +1,7 @@
 //
 // DOMWriter.h
 //
-// $Id: //poco/1.2/XML/include/Poco/DOM/DOMWriter.h#1 $
+// $Id: //poco/1.2/XML/include/Poco/DOM/DOMWriter.h#2 $
 //
 // Library: XML
 // Package: DOM
@@ -69,7 +69,7 @@ public:
 	void setEncoding(const std::string& encodingName, Poco::TextEncoding& textEncoding);
 		/// Sets the encoding, which will be reflected in the written XML declaration.
 
-	const XMLString& getEncoding() const;
+	const std::string& getEncoding() const;
 		/// Returns the encoding name set with setEncoding.
 
 	void setOptions(int options);
@@ -97,7 +97,7 @@ public:
 		/// using a standard file output stream (std::ofstream).
 
 private:
-	XMLString           _encodingName;
+	std::string         _encodingName;
 	Poco::TextEncoding* _pTextEncoding;
 	int                 _options;
 	std::string         _newLine;
@@ -107,7 +107,7 @@ private:
 //
 // inlines
 //
-inline const XMLString& DOMWriter::getEncoding() const
+inline const std::string& DOMWriter::getEncoding() const
 {
 	return _encodingName;
 }

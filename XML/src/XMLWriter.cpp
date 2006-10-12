@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.2/XML/src/XMLWriter.cpp#1 $
+// $Id: //poco/1.2/XML/src/XMLWriter.cpp#2 $
 //
 // Library: XML
 // Package: XML
@@ -39,6 +39,7 @@
 #include "Poco/XML/XMLException.h"
 #include "Poco/SAX/AttributesImpl.h"
 #include "Poco/UTF8Encoding.h"
+#include "Poco/UTF16Encoding.h"
 #include <sstream>
 
 
@@ -682,7 +683,7 @@ void XMLWriter::addNamespaceAttributes(AttributeMap& attributeMap)
 		
 		if (!prefix.empty())
 		{
-			qname.append(MARKUP_COLON);
+			qname.append(toXMLString(MARKUP_COLON));
 			qname.append(prefix);
 		}
 		attributeMap[qname] = uri;
@@ -705,7 +706,7 @@ void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attr
 			if (!prefix.empty())
 			{
 				qname = prefix;
-				qname.append(MARKUP_COLON);
+				qname.append(toXMLString(MARKUP_COLON));
 			}
 			else qname.clear();
 			qname.append(localName);
@@ -746,7 +747,7 @@ void XMLWriter::writeXML(XMLChar ch) const
 }
 
 
-void XMLWriter::writeName(const std::string& prefix, const std::string& localName)
+void XMLWriter::writeName(const XMLString& prefix, const XMLString& localName)
 {
 	if (prefix.empty())
 	{

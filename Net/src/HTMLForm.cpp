@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.2/Net/src/HTMLForm.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTMLForm.cpp#3 $
 //
 // Library: Net
 // Package: HTML
@@ -263,7 +263,7 @@ void HTMLForm::readUrl(std::istream& istr)
 		std::string decodedValue;
 		URI::decode(name, decodedName);
 		URI::decode(value, decodedValue);
-		set(decodedName, decodedValue);
+		add(decodedName, decodedValue);
 		if (ch == '&') ch = istr.get();
 	}
 }
@@ -302,7 +302,7 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 				value += (char) ch;
 				ch = istr.get();
 			}
-			set(name, value);
+			add(name, value);
 		}
 	}
 }

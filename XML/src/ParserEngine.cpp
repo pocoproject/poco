@@ -1,7 +1,7 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/1.2/XML/src/ParserEngine.cpp#1 $
+// $Id: //poco/1.2/XML/src/ParserEngine.cpp#2 $
 //
 // Library: XML
 // Package: XML
@@ -659,18 +659,18 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
 	
-	URI uri(pThis->_context.back()->getSystemId());
-	uri.resolve(sysId);
+	URI uri(fromXMLString(pThis->_context.back()->getSystemId()));
+	uri.resolve(fromXMLString(sysId));
 
 	if (pThis->_pEntityResolver)
 	{
 		pEntityResolver = pThis->_pEntityResolver;
-		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, uri.toString());
+		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, toXMLString(uri.toString()));
 	}
 	if (!pInputSource && pThis->_externalGeneralEntities)
 	{
 		pEntityResolver = &defaultResolver;
-		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, uri.toString());
+		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, toXMLString(uri.toString()));
 	}
 
 	if (pInputSource)
@@ -719,8 +719,13 @@ void ParserEngine::handleComment(void* userData, const XML_Char* data)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
+#if defined(XML_UNICODE_WCHAR_T)
+	if (pThis->_pLexicalHandler)
+		pThis->_pLexicalHandler->comment(data, 0, (int) wcslen(data));
+#else
 	if (pThis->_pLexicalHandler)
 		pThis->_pLexicalHandler->comment(data, 0, (int) strlen(data));
+#endif
 }
 
 

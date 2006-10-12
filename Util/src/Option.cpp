@@ -1,7 +1,7 @@
 //
 // Option.cpp
 //
-// $Id: //poco/1.2/Util/src/Option.cpp#1 $
+// $Id: //poco/1.2/Util/src/Option.cpp#2 $
 //
 // Library: Util
 // Package: Options
@@ -238,6 +238,15 @@ bool Option::matchesShort(const std::string& option) const
 
 
 bool Option::matchesFull(const std::string& option) const
+{
+	std::string::size_type pos = option.find_first_of(":=");
+	std::string::size_type len = pos == std::string::npos ? option.length() : pos;
+	return len == _fullName.length()
+		&& icompare(option, 0, len, _fullName, 0, len) == 0;
+}
+
+
+bool Option::matchesPartial(const std::string& option) const
 {
 	std::string::size_type pos = option.find_first_of(":=");
 	std::string::size_type len = pos == std::string::npos ? option.length() : pos;

@@ -1,7 +1,7 @@
 //
 // OptionSet.cpp
 //
-// $Id: //poco/1.2/Util/src/OptionSet.cpp#1 $
+// $Id: //poco/1.2/Util/src/OptionSet.cpp#2 $
 //
 // Library: Util
 // Package: Options
@@ -70,6 +70,15 @@ OptionSet& OptionSet::operator = (const OptionSet& options)
 void OptionSet::addOption(const Option& option)
 {
 	poco_assert (!option.fullName().empty());
+	OptionVec::const_iterator it = _options.begin();
+	OptionVec::const_iterator itEnd = _options.end();
+	for (; it != itEnd; ++it)
+	{
+		if (it->fullName() == option.fullName())
+		{
+			throw DuplicateOptionException(it->fullName());
+		}
+	}
 
 	_options.push_back(option);
 }
@@ -97,12 +106,20 @@ const Option& OptionSet::getOption(const std::string& name, bool matchShort) con
 	const Option* pOption = 0;
 	for (Iterator it = _options.begin(); it != _options.end(); ++it)
 	{
-		if (matchShort && it->matchesShort(name) || !matchShort && it->matchesFull(name))
+		if (matchShort && it->matchesShort(name) || !matchShort && it->matchesPartial(name))
 		{
 			if (!pOption)
+			{
 				pOption = &*it;
-			else
-				throw AmbiguousOptionException(name);
+				if (!matchShort && it->matchesFull(name))
+					break;
+			}
+			else if (!matchShort && it->matchesFull(name))
+			{
+				pOption = &*it;
+				break;
+			}
+			else throw AmbiguousOptionException(name);
 		}
 	}
 	if (pOption)

@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/1.2/Foundation/src/ThreadPool.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/ThreadPool.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -66,13 +66,13 @@ public:
 private:
 	volatile bool   _idle;
 	volatile time_t _idleTime;
-	Runnable*        _pTarget;
-	std::string      _name;
-	Thread           _thread;
-	Event            _targetReady;
-	Event            _targetCompleted;
-	Event            _started;
-	FastMutex        _mutex;
+	Runnable*       _pTarget;
+	std::string     _name;
+	Thread          _thread;
+	Event           _targetReady;
+	Event           _targetCompleted;
+	Event           _started;
+	FastMutex       _mutex;
 };
 
 
@@ -146,10 +146,7 @@ int PooledThread::idleTime()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	if (_idle)
-		return (int) (time(NULL) - _idleTime);
-	else
-		return 0;
+	return (int) (time(NULL) - _idleTime);
 }
 
 
@@ -214,11 +211,10 @@ void PooledThread::run()
 			{
 				ErrorHandler::handle();
 			}
-			_mutex.lock();
-			_idle = true;
+			FastMutex::ScopedLock lock(_mutex);
+			_pTarget  = 0;
 			_idleTime = time(NULL);
-			_pTarget = 0;
-			_mutex.unlock();
+			_idle     = true;
 			_targetCompleted.set();
 			ThreadLocalStorage::clear();
 			_thread.setName(_name);
@@ -238,7 +234,8 @@ ThreadPool::ThreadPool(int minCapacity, int maxCapacity, int idleTime):
 	_minCapacity(minCapacity), 
 	_maxCapacity(maxCapacity), 
 	_idleTime(idleTime),
-	_serial(0)
+	_serial(0),
+	_age(0)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
@@ -256,7 +253,8 @@ ThreadPool::ThreadPool(const std::string& name, int minCapacity, int maxCapacity
 	_minCapacity(minCapacity), 
 	_maxCapacity(maxCapacity), 
 	_idleTime(idleTime),
-	_serial(0)
+	_serial(0),
+	_age(0)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
@@ -383,21 +381,42 @@ void ThreadPool::collect()
 
 void ThreadPool::housekeep()
 {
-	bool moreThreads = true;
-	while (moreThreads && _threads.size() > _minCapacity)
+	if (_threads.size() <= _minCapacity)
+		return;
+
+	ThreadVec idleThreads;
+	ThreadVec expiredThreads;
+	ThreadVec activeThreads;
+	idleThreads.reserve(_threads.size());
+	activeThreads.reserve(_threads.size());
+	
+	for (ThreadVec::iterator it = _threads.begin(); it != _threads.end(); ++it)
 	{
-		moreThreads = false;
-		for (ThreadVec::iterator it = _threads.begin(); it != _threads.end(); ++it)
+		if ((*it)->idle())
 		{
-			if ((*it)->idleTime() >= _idleTime)
-			{
-				(*it)->release();
-				_threads.erase(it);
-				moreThreads = true;
-				break;
-			}
+			if ((*it)->idleTime() < _idleTime)
+				idleThreads.push_back(*it);
+			else 
+				expiredThreads.push_back(*it);	
 		}
+		else activeThreads.push_back(*it);
 	}
+	int n = (int) activeThreads.size();
+	int limit = (int) idleThreads.size() + n;
+	if (limit < _minCapacity) limit = _minCapacity;
+	idleThreads.insert(idleThreads.end(), expiredThreads.begin(), expiredThreads.end());
+	_threads.clear();
+	for (ThreadVec::iterator it = idleThreads.begin(); it != idleThreads.end(); ++it)
+	{
+		if (n < limit)
+		{
+			_threads.push_back(*it);
+			++n;
+		}
+		else (*it)->release();
+	}
+	_threads.insert(_threads.end(), activeThreads.begin(), activeThreads.end());
+	_age = 0;
 }
 
 
@@ -405,7 +424,8 @@ PooledThread* ThreadPool::getThread()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	housekeep();
+	if (++_age == 32)
+		housekeep();
 
 	PooledThread* pThread = 0;
 	for (ThreadVec::iterator it = _threads.begin(); !pThread && it != _threads.end(); ++it)
@@ -420,10 +440,7 @@ PooledThread* ThreadPool::getThread()
 			_threads.push_back(pThread);
 			pThread->start();
 		}
-		else
-		{
-			throw NoThreadAvailableException();
-		}
+		else throw NoThreadAvailableException();
 	}
 	pThread->activate();
 	return pThread;

@@ -1,7 +1,7 @@
 //
 // NamespaceStrategy.cpp
 //
-// $Id: //poco/1.2/XML/src/NamespaceStrategy.cpp#2 $
+// $Id: //poco/1.2/XML/src/NamespaceStrategy.cpp#3 $
 //
 // Library: XML
 // Package: XML
@@ -186,7 +186,7 @@ void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar*
 		XMLString attrLocal;
 		XMLString attrQName;
 		splitName(attrName, attrURI, attrLocal, attrQName);
-		if (!attrQName.empty()) attrQName.append(":");
+		if (!attrQName.empty()) attrQName += ':';
 		attrQName.append(attrLocal);
 		attributes.addAttribute(attrURI, attrLocal, attrQName, CDATA, attrValue, i < specifiedCount);
 	}
@@ -194,7 +194,7 @@ void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar*
 	XMLString local;
 	XMLString qname;
 	splitName(name, uri, local, qname);
-	if (!qname.empty()) qname.append(":");
+	if (!qname.empty()) qname += ':';
 	qname.append(local);
 	pContentHandler->startElement(uri, local, qname, attributes);
 }
@@ -208,7 +208,7 @@ void NamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler* 
 	XMLString local;
 	XMLString qname;
 	splitName(name, uri, local, qname);
-	if (!qname.empty()) qname.append(":");
+	if (!qname.empty()) qname += ':';
 	qname.append(local);
 	pContentHandler->endElement(uri, local, qname);
 }

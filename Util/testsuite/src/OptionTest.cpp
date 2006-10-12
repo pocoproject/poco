@@ -1,7 +1,7 @@
 //
 // OptionTest.cpp
 //
-// $Id: //poco/1.2/Util/testsuite/src/OptionTest.cpp#1 $
+// $Id: //poco/1.2/Util/testsuite/src/OptionTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -124,15 +124,20 @@ void OptionTest::testMatches1()
 		.argument("path");
 		
 	assert (incOpt.matchesShort("Iinclude"));
-	assert (incOpt.matchesFull("include:include"));
-	assert (incOpt.matchesFull("include-dir:include"));
-	assert (incOpt.matchesFull("inc=include"));
-	assert (incOpt.matchesFull("INCLUDE=include"));
-	assert (incOpt.matchesFull("include"));
+	assert (incOpt.matchesPartial("include:include"));
+	assert (incOpt.matchesPartial("include-dir:include"));
+	assert (incOpt.matchesPartial("inc=include"));
+	assert (incOpt.matchesPartial("INCLUDE=include"));
+	assert (incOpt.matchesPartial("include"));
 	assert (incOpt.matchesShort("I"));
-	assert (incOpt.matchesFull("i"));
+	assert (incOpt.matchesPartial("i"));
 	
-	assert (!incOpt.matchesFull("include-dir2=include"));
+	assert (incOpt.matchesFull("include-dir:include"));
+	assert (incOpt.matchesFull("INClude-dir:include"));
+	assert (!incOpt.matchesFull("include:include"));
+	assert (!incOpt.matchesFull("include-dir2:include"));
+	
+	assert (!incOpt.matchesPartial("include-dir2=include"));
 	assert (!incOpt.matchesShort("linclude"));
 }
 
@@ -145,12 +150,17 @@ void OptionTest::testMatches2()
 		.argument("path");
 		
 	assert (!incOpt.matchesShort("Iinclude"));
-	assert (incOpt.matchesFull("include:include"));
+	assert (incOpt.matchesPartial("include:include"));
+	assert (incOpt.matchesPartial("include-dir:include"));
+	assert (incOpt.matchesPartial("inc=include"));
+	assert (incOpt.matchesPartial("INCLUDE=include"));
+	assert (incOpt.matchesPartial("I"));
+	assert (incOpt.matchesPartial("i"));
+	
 	assert (incOpt.matchesFull("include-dir:include"));
-	assert (incOpt.matchesFull("inc=include"));
-	assert (incOpt.matchesFull("INCLUDE=include"));
-	assert (incOpt.matchesFull("I"));
-	assert (incOpt.matchesFull("i"));
+	assert (incOpt.matchesFull("INClude-dir:include"));
+	assert (!incOpt.matchesFull("include:include"));
+	assert (!incOpt.matchesFull("include-dir2:include"));
 	
 	assert (!incOpt.matchesFull("include-dir2=include"));
 	assert (!incOpt.matchesShort("linclude"));

@@ -1,7 +1,7 @@
 //
 // TCPServerParams.cpp
 //
-// $Id: //poco/1.2/Net/src/TCPServerParams.cpp#1 $
+// $Id: //poco/1.2/Net/src/TCPServerParams.cpp#2 $
 //
 // Library: Net
 // Package: TCPServer
@@ -74,8 +74,6 @@ void TCPServerParams::setMaxQueued(int count)
 
 	_maxQueued = count;
 }
-
-
 
 
 } } // namespace Poco::Net

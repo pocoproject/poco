@@ -1,7 +1,7 @@
 //
 // DOMImplementation.h
 //
-// $Id: //poco/1.2/XML/include/Poco/DOM/DOMImplementation.h#1 $
+// $Id: //poco/1.2/XML/include/Poco/DOM/DOMImplementation.h#2 $
 //
 // Library: XML
 // Package: DOM
@@ -93,6 +93,8 @@ private:
 	static const XMLString FEATURE_EVENTS;
 	static const XMLString FEATURE_MUTATIONEVENTS;
 	static const XMLString FEATURE_TRAVERSAL;
+	static const XMLString VERSION_1_0;
+	static const XMLString VERSION_2_0;	
 };
 
 

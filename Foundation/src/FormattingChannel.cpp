@@ -1,7 +1,7 @@
 //
 // FormattingChannel.cpp
 //
-// $Id: //poco/1.2/Foundation/src/FormattingChannel.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/FormattingChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -126,8 +126,8 @@ void FormattingChannel::setProperty(const std::string& name, const std::string& 
 		setChannel(LoggingRegistry::defaultRegistry().channelForName(value));
 	else if (name == "formatter")
 		setFormatter(LoggingRegistry::defaultRegistry().formatterForName(value));
-	else
-		Channel::setProperty(name, value);
+	else if (_pChannel)
+		_pChannel->setProperty(name, value);
 }
 
 

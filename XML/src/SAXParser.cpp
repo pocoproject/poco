@@ -1,7 +1,7 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/1.2/XML/src/SAXParser.cpp#1 $
+// $Id: //poco/1.2/XML/src/SAXParser.cpp#2 $
 //
 // Library: XML
 // Package: SAX
@@ -222,7 +222,7 @@ void SAXParser::parse(const XMLString& systemId)
 		}
 		entityResolver.releaseInputSource(pInputSource);
 	}
-	else throw XMLException("Cannot resolve system identifier", systemId);
+	else throw XMLException("Cannot resolve system identifier", fromXMLString(systemId));
 }
 
 

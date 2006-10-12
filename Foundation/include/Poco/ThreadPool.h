@@ -1,7 +1,7 @@
 //
 // ThreadPool.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ThreadPool.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/ThreadPool.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -158,6 +158,7 @@ private:
 	int _maxCapacity;
 	int _idleTime;
 	int _serial;
+	int _age;
 	ThreadVec _threads;
 	mutable FastMutex _mutex;
 };

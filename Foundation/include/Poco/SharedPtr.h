@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/SharedPtr.h#4 $
+// $Id: //poco/1.2/Foundation/include/Poco/SharedPtr.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -133,8 +133,9 @@ public:
 	{
 		if (get() != ptr)
 		{
+			ReferenceCounter* pTmp = new ReferenceCounter;
 			release();
-			_pCounter = new ReferenceCounter;
+			_pCounter = pTmp;
 			_ptr = ptr;
 		}
 		return *this;
@@ -144,10 +145,8 @@ public:
 	{
 		if (&ptr != this)
 		{
-			release();
-			_pCounter = ptr._pCounter;
-			_pCounter->duplicate();
-			_ptr = const_cast<C*>(ptr.get());
+			SharedPtr tmp(ptr);
+			swap(tmp);
 		}
 		return *this;
 	}
@@ -157,10 +156,8 @@ public:
 	{
 		if (ptr.get() != _ptr)
 		{
-			release();
-			_pCounter = ptr._pCounter;
-			_pCounter->duplicate();
-			_ptr = const_cast<Other*>(ptr.get());
+			SharedPtr tmp(ptr);
+			swap(tmp);
 		}
 		return *this;
 	}
@@ -183,6 +180,7 @@ public:
 	void swap(SharedPtr& ptr)
 	{
 		std::swap(_ptr, ptr._ptr);
+		std::swap(_pCounter, ptr._pCounter);
 	}
 
 	C* operator -> ()

@@ -1,7 +1,7 @@
 //
 // Option.h
 //
-// $Id: //poco/1.2/Util/include/Poco/Util/Option.h#1 $
+// $Id: //poco/1.2/Util/include/Poco/Util/Option.h#2 $
 //
 // Library: Util
 // Package: Options
@@ -215,6 +215,13 @@ public:
 
 	bool matchesFull(const std::string& option) const;
 		/// Returns true if the given option string matches the
+		/// full name.
+		///
+		/// The option string must match the full
+		/// name (case insensitive).
+
+	bool matchesPartial(const std::string& option) const;
+		/// Returns true if the given option string partially matches the
 		/// full name.
 		///
 		/// The option string must partially match the full

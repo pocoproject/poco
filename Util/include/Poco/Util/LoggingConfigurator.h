@@ -1,7 +1,7 @@
 //
 // LoggingConfigurator.h
 //
-// $Id: //poco/1.2/Util/include/Poco/Util/LoggingConfigurator.h#1 $
+// $Id: //poco/1.2/Util/include/Poco/Util/LoggingConfigurator.h#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -66,7 +66,7 @@ class Util_API LoggingConfigurator
 	/// Configuring Formatters
 	///
 	/// A formatter is configured using the "logging.formatters" property. Every 
-	/// formatter has an internal name, which is only used for referring to it in 
+	/// formatter has an internal name, which is only used for referring to it 
 	/// during configuration time. This name becomes part of the property name.
 	/// Every formatter has a mandatory "class" property, which specifies the actual
 	/// class implementing the formatter. Any other properties are passed on to
@@ -126,38 +126,6 @@ class Util_API LoggingConfigurator
 	///     logging.loggers.l1.channel.class = ConsoleChannel
 	///     logging.loggers.l1.channel.pattern = %s: [%p] %t
 	///     logging.loggers.l1.level = information
-	///
-	/// Known Problems
-	///
-	/// When using a PropertyFileConfiguration or IniFileConfiguration with the
-	/// LoggingConfigurator, the channels are constructed in alphabetical order
-	/// with regard to their internal name. When a channel (e.g., a SplitterChannel)
-	/// references another channel, the referenced channel must have a "higher" name
-	/// than the referring channel, otherwise it will not be found.
-	///
-	/// For example, the following configuration won't work:
-	///
-	///     logging.channels.c1.class = SplitterChannel
-	///     logging.channels.c1.channel1 = c2
-	///     logging.channels.c1.channel2 = c3
-	///     logging.channels.c2.class = ...
-	///     ...
-	///     logging.channels.c3.class = ...
-	///     ...
-	///
-	/// The workaround is to change the internal channel names:
-	/// 
-	///     logging.channels.cx.class = SplitterChannel
-	///     logging.channels.cx.channel1 = c1
-	///     logging.channels.cx.channel2 = c2
-	///     logging.channels.c1.class = ...
-	///     ...
-	///     logging.channels.c2.class = ...
-	///     ...
-	///
-	/// When using an XMLConfiguration, the channels are created in the order
-	/// in which they are specified in the configuration file, so this problem
-	/// does not occur.
 {
 public:
 	LoggingConfigurator();
@@ -179,6 +147,7 @@ private:
 	void configureLoggers(AbstractConfiguration* pConfig);
 	Poco::Formatter* createFormatter(AbstractConfiguration* pConfig);
 	Poco::Channel* createChannel(AbstractConfiguration* pConfig);
+	void configureChannel(Channel* pChannel, AbstractConfiguration* pConfig);
 	void configureLogger(AbstractConfiguration* pConfig);
 	
 	LoggingConfigurator(const LoggingConfigurator&);

@@ -1,7 +1,7 @@
 //
 // DOMWriter.cpp
 //
-// $Id: //poco/1.2/XML/src/DOMWriter.cpp#1 $
+// $Id: //poco/1.2/XML/src/DOMWriter.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -63,7 +63,7 @@ DOMWriter::~DOMWriter()
 }
 
 
-void DOMWriter::setEncoding(const XMLString& encodingName, Poco::TextEncoding& textEncoding)
+void DOMWriter::setEncoding(const std::string& encodingName, Poco::TextEncoding& textEncoding)
 {
 	_encodingName  = encodingName;
 	_pTextEncoding = &textEncoding;
@@ -76,7 +76,7 @@ void DOMWriter::setOptions(int options)
 }
 
 
-void DOMWriter::setNewLine(const XMLString& newLine)
+void DOMWriter::setNewLine(const std::string& newLine)
 {
 	_newLine = newLine;
 }
@@ -101,7 +101,7 @@ void DOMWriter::writeNode(XMLByteOutputStream& ostr, const Node* pNode)
 }
 
 
-void DOMWriter::writeNode(const XMLString& systemId, const Node* pNode)
+void DOMWriter::writeNode(const std::string& systemId, const Node* pNode)
 {
 	std::ofstream ostr(systemId.c_str());
 	if (ostr.good())

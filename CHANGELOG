@@ -1,5 +1,21 @@
 This is the changelog file for POCO - the C++ Portable Components.
 
+Release 1.2.5 (2006-10-xx)
+==========================
+
+- Improved LoggingConfigurator: channel creation and configuration is now a two-step process.
+  This means that the previous problems with PropertyFileConfiguration and IniFileConfiguration when referencing other channels are solved.
+- improved options handling: better handling of (non) ambiguities.
+  If both an option named "help" and one named "helper" is specified, this no longer causes ambiguity errors.
+- added check for duplicate option definition
+- ThreadPool bugfix: fixed a crash that occurs on Linux multiprocessor machines 
+  (caused by an thread unsafe string assignment corrupting the heap...) 
+  (SF# 1575315)
+- improved ThreadPool performance
+- XML now compiles with -DXML_UNICODE_WCHAR_T (SF# 1575174)
+- fixed SF# 1572757: HTML forms can have more than one key/value pair with the same name
+
+
 Release 1.2.4 (2006-10-02)
 ==========================
 
@@ -513,4 +529,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.2/dist/CHANGELOG#9 $
+$Id: //poco/1.2/dist/CHANGELOG#10 $

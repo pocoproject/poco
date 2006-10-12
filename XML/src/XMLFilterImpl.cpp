@@ -1,7 +1,7 @@
 //
 // XMLFilterImpl.cpp
 //
-// $Id: //poco/1.2/XML/src/XMLFilterImpl.cpp#1 $
+// $Id: //poco/1.2/XML/src/XMLFilterImpl.cpp#2 $
 //
 // Library: XML
 // Package: SAX
@@ -132,7 +132,7 @@ void XMLFilterImpl::setFeature(const XMLString& featureId, bool state)
 	if (_pParent)
 		_pParent->setFeature(featureId, state);
 	else
-		throw SAXNotRecognizedException(featureId);
+		throw SAXNotRecognizedException(fromXMLString(featureId));
 }
 
 
@@ -141,7 +141,7 @@ bool XMLFilterImpl::getFeature(const XMLString& featureId) const
 	if (_pParent)
 		return _pParent->getFeature(featureId);
 	else
-		throw SAXNotRecognizedException(featureId);
+		throw SAXNotRecognizedException(fromXMLString(featureId));
 }
 
 
@@ -150,7 +150,7 @@ void XMLFilterImpl::setProperty(const XMLString& propertyId, const XMLString& va
 	if (_pParent)
 		_pParent->setProperty(propertyId, value);
 	else
-		throw SAXNotRecognizedException(propertyId);
+		throw SAXNotRecognizedException(fromXMLString(propertyId));
 }
 
 
@@ -159,7 +159,7 @@ void XMLFilterImpl::setProperty(const XMLString& propertyId, void* value)
 	if (_pParent)
 		_pParent->setProperty(propertyId, value);
 	else
-		throw SAXNotRecognizedException(propertyId);
+		throw SAXNotRecognizedException(fromXMLString(propertyId));
 }
 
 
@@ -168,7 +168,7 @@ void* XMLFilterImpl::getProperty(const XMLString& propertyId) const
 	if (_pParent)
 		return _pParent->getProperty(propertyId);
 	else
-		throw SAXNotRecognizedException(propertyId);
+		throw SAXNotRecognizedException(fromXMLString(propertyId));
 }
 
 
