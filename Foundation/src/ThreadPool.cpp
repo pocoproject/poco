@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/1.2/Foundation/src/ThreadPool.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/ThreadPool.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -381,6 +381,7 @@ void ThreadPool::collect()
 
 void ThreadPool::housekeep()
 {
+	_age = 0;
 	if (_threads.size() <= _minCapacity)
 		return;
 
@@ -416,7 +417,6 @@ void ThreadPool::housekeep()
 		else (*it)->release();
 	}
 	_threads.insert(_threads.end(), activeThreads.begin(), activeThreads.end());
-	_age = 0;
 }
 
 
