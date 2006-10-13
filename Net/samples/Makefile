@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.2/Net/samples/Makefile#1 $
+# $Id: //poco/Main/Net/samples/Makefile#8 $
 #
 # Makefile for Poco Net Samples
 #
@@ -13,6 +13,9 @@ projects:
 	$(MAKE) -C TimeServer $(MAKECMDGOALS)
 	$(MAKE) -C httpget $(MAKECMDGOALS)
 	$(MAKE) -C HTTPTimeServer $(MAKECMDGOALS)
+	$(MAKE) -C HTTPFormServer $(MAKECMDGOALS)
+	$(MAKE) -C HTTPLoadTest $(MAKECMDGOALS)
 	$(MAKE) -C download $(MAKECMDGOALS)
 	$(MAKE) -C EchoServer $(MAKECMDGOALS)
 	$(MAKE) -C Mail $(MAKECMDGOALS)
+	$(MAKE) -C Ping $(MAKECMDGOALS)
