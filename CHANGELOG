@@ -1,6 +1,6 @@
 This is the changelog file for POCO - the C++ Portable Components.
 
-Release 1.2.5 (2006-10-xx)
+Release 1.2.5 (2006-10-23)
 ==========================
 
 - Improved LoggingConfigurator: channel creation and configuration is now a two-step process.
@@ -14,6 +14,20 @@ Release 1.2.5 (2006-10-xx)
 - improved ThreadPool performance
 - XML now compiles with -DXML_UNICODE_WCHAR_T (SF# 1575174)
 - fixed SF# 1572757: HTML forms can have more than one key/value pair with the same name
+- got rid of the dynamic casts in Events, Events/Cache: simpler/faster Delegate < operator, 
+  prevents some rare dynamic casts error from occuring when using StrategyCollection with Caches
+- improvements to Logger and LoggingConfigurator:
+  * added Logger::unsafeGet()
+  * added Logger::setProperty(loggerName, propertyName, value)
+  * LoggingConfigurator now correctly (re)configures existing Loggers
+    (prior to this change, if a Logger named "a.b.c" existed before
+    the LoggingConfigurator started its work, and the LoggingConfigurator
+    configured a Logger named "a.b", then "a.b.c" would not inherit
+    the new configuration).
+- improvements to SplitterChannel and EventLogChannel configuration
+- improved LoggingRegistry exception messages
+- MessageHeader::read() is more liberal with malformed message headers.
+  This fixes problems with certain network cameras sending malformed HTTP headers.
 
 
 Release 1.2.4 (2006-10-02)
@@ -529,4 +543,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.2/dist/CHANGELOG#10 $
+$Id: //poco/1.2/dist/CHANGELOG#13 $

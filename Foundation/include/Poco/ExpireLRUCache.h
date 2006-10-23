@@ -1,7 +1,7 @@
 //
 // ExpireLRUCache.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ExpireLRUCache.h#3 $
+// $Id: //poco/1.2/Foundation/include/Poco/ExpireLRUCache.h#4 $
 //
 // Library: Foundation
 // Package: Cache
@@ -54,7 +54,7 @@ template <
 	class TValue
 >
 class ExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >
-	/// An ExpireLRUCache combines LUR caching and time based expire caching.
+	/// An ExpireLRUCache combines LRU caching and time based expire caching.
 	/// It cache entries for a fixed time period (per default 10 minutes)
 	/// but also limits the size of the cache (per default: 1024).
 {

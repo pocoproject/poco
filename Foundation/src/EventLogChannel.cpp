@@ -1,7 +1,7 @@
 //
 // EventLogChannel.cpp
 //
-// $Id: //poco/1.2/Foundation/src/EventLogChannel.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/EventLogChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -36,6 +36,7 @@
 
 #include "Poco/EventLogChannel.h"
 #include "Poco/Message.h"
+#include "Poco/String.h"
 #include "pocomsg.h"
 #if defined(POCO_WIN32_UTF8)
 #include "Poco/UnicodeConverter.h"
@@ -47,7 +48,8 @@ namespace Poco {
 
 const std::string EventLogChannel::PROP_NAME    = "name";
 const std::string EventLogChannel::PROP_HOST    = "host";
-const std::string EventLogChannel::PROP_LOGFILE = "logFile";
+const std::string EventLogChannel::PROP_LOGHOST = "loghost";
+const std::string EventLogChannel::PROP_LOGFILE = "logfile";
 
 
 EventLogChannel::EventLogChannel(): 
@@ -142,11 +144,13 @@ void EventLogChannel::log(const Message& msg)
 
 void EventLogChannel::setProperty(const std::string& name, const std::string& value)
 {
-	if (name == PROP_NAME)
+	if (icompare(name, PROP_NAME) == 0)
 		_name = value;
-	else if (name == PROP_HOST)
+	else if (icompare(name, PROP_HOST) == 0)
 		_host = value;
-	else if (name == PROP_LOGFILE)
+	else if (icompare(name, PROP_LOGHOST) == 0)
+		_host = value;
+	else if (icompare(name, PROP_LOGFILE) == 0)
 		_logFile = value;
 	else
 		Channel::setProperty(name, value);
@@ -155,11 +159,13 @@ void EventLogChannel::setProperty(const std::string& name, const std::string& va
 
 std::string EventLogChannel::getProperty(const std::string& name) const
 {
-	if (name == PROP_NAME)
+	if (icompare(name, PROP_NAME) == 0)
 		return _name;
-	else if (name == PROP_HOST)
+	else if (icompare(name, PROP_HOST) == 0)
 		return _host;
-	else if (name == PROP_LOGFILE)
+	else if (icompare(name, PROP_LOGHOST) == 0)
+		return _host;
+	else if (icompare(name, PROP_LOGFILE) == 0)
 		return _logFile;
 	else
 		return Channel::getProperty(name);

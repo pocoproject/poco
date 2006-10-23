@@ -1,7 +1,7 @@
 //
 // AbstractDelegate.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AbstractDelegate.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/AbstractDelegate.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -54,8 +54,14 @@ class AbstractDelegate
 	/// instead of run-time checks.
 {
 public:
-	AbstractDelegate() 
+	AbstractDelegate(void* pTarget): _pTarget(pTarget)
 	{
+		poco_assert_dbg (_pTarget != 0);
+	}
+
+	AbstractDelegate(const AbstractDelegate& del):_pTarget(del._pTarget)
+	{
+		poco_assert_dbg (_pTarget != 0);
 	}
 
 	virtual ~AbstractDelegate() 
@@ -68,8 +74,19 @@ public:
 	virtual AbstractDelegate* clone() const = 0;
 		/// Returns a deep-copy of the AbstractDelegate
 
-	virtual bool operator < (const AbstractDelegate<TArgs>& other) const = 0;
+	bool operator < (const AbstractDelegate<TArgs>& other) const
 		/// For comparing AbstractDelegates in a collection.
+	{
+		return _pTarget < other._pTarget;
+	}
+
+	void* target() const
+	{
+		return _pTarget;
+	}
+
+protected:
+	void* _pTarget;
 };
 
 

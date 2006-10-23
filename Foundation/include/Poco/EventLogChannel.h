@@ -1,7 +1,7 @@
 //
 // EventLogChannel.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/EventLogChannel.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/EventLogChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -88,16 +88,18 @@ public:
 		///
 		/// The following properties are supported:
 		///
-		///   * name: The name of the event source.
-		///   * host: The name of the host where the Event Log service is running.
-		///           The default is "localhost".
-		///   * logFile: The name of the log file. The default is "Application".
+		///   * name:    The name of the event source.
+		///   * loghost: The name of the host where the Event Log service is running.
+		///              The default is "localhost".
+		///   * host:    same as host.
+		///   * logfile: The name of the log file. The default is "Application".
 		
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the given property.
 
 	static const std::string PROP_NAME;
 	static const std::string PROP_HOST;
+	static const std::string PROP_LOGHOST;
 	static const std::string PROP_LOGFILE;
 
 protected:

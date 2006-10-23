@@ -1,7 +1,7 @@
 //
 // AbstractEvent.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AbstractEvent.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/AbstractEvent.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -211,7 +211,7 @@ public:
 		/// the next notify. If one of the delegates throws an exception, the execution
 		/// is aborted and the exception is reported to the caller.
 	{
-		NotifyAsyncParams params;
+		NotifyAsyncParams params(pSender, args);
 
 		{
 			FastMutex::ScopedLock lock(_mutex);
@@ -223,8 +223,6 @@ public:
 			// between notifyAsync and the execution of the method no changes can occur
 				
 			params.ptrStrat = SharedPtr<TStrategy>(new TStrategy(_strategy));
-			params.pSender  = pSender;
-			params.args     = args;
 			params.enabled  = _enabled;
 		}
 
@@ -267,7 +265,13 @@ protected:
 		const void* pSender;
 		TArgs       args;
 		bool        enabled;
+		
+		NotifyAsyncParams(const void* pSend, const TArgs& a):ptrStrat(), pSender(pSend), args(a), enabled(true)
+			/// default constructor reduces the need for TArgs to have an empty constructor, only copy constructor is needed.
+		{
+		}
 	};
+
 	ActiveMethod<TArgs, NotifyAsyncParams, AbstractEvent> _executeAsync;
 
 	TArgs executeAsyncImpl(const NotifyAsyncParams& par)
@@ -278,7 +282,7 @@ protected:
 		}
 
 		NotifyAsyncParams params = par;
-		TArgs retArgs = params.args;
+		TArgs retArgs(params.args);
 		params.ptrStrat->notify(params.pSender, retArgs);
 		return retArgs;
 	}

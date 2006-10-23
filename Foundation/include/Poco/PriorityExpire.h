@@ -1,7 +1,7 @@
 //
 // PriorityExpire.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/PriorityExpire.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/PriorityExpire.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -54,13 +54,15 @@ class PriorityExpire: public AbstractPriorityDelegate<TArgs>
 	/// expiring of registrations to AbstractPriorityDelegate.
 {
 public:
-	PriorityExpire(const AbstractPriorityDelegate<TArgs>& p, Timestamp::TimeDiff expireMilliSec): 
+	PriorityExpire(const AbstractPriorityDelegate<TArgs>& p, Timestamp::TimeDiff expireMilliSec):
+		AbstractPriorityDelegate<TArgs>(p),
 		_pDelegate(p.clone()), 
 		_expire(expireMilliSec*1000)
 	{
 	}
 	
 	PriorityExpire(const PriorityExpire& expire):
+		AbstractPriorityDelegate<TArgs>(expire),
 		_pDelegate(expire._pDelegate->clone()),
 		_expire(expire._expire),
 		_creationTime(expire._creationTime)
@@ -76,10 +78,11 @@ public:
 	{
 		if (&expire != this)
 		{
-			delete _pDelegate;
-			_pDelegate    = expire._pDelegate->clone();
-			_expire       = expire._expire;
-			_creationTime = expire._creationTime;
+			delete this->_pDelegate;
+			this->_pTarget      = expire._pTarget;
+			this->_pDelegate    = expire._pDelegate->clone();
+			this->_expire       = expire._expire;
+			this->_creationTime = expire._creationTime;
 		}
 		return *this; 
 	}
@@ -87,7 +90,7 @@ public:
 	bool notify(const void* sender, TArgs& arguments)
 	{
 		if (!expired())
-			return _pDelegate->notify(sender, arguments);
+			return this->_pDelegate->notify(sender, arguments);
 		else
 			return false;
 	}
@@ -97,34 +100,18 @@ public:
 		return new PriorityExpire(*this);
 	}
 
-	bool operator < (const AbstractPriorityDelegate<TArgs>& other) const
-	{
-		const PriorityExpire<TArgs>* pOther = dynamic_cast<const PriorityExpire<TArgs>*>(&other);
-
-		if (pOther)
-			return _pDelegate->operator < (*pOther->_pDelegate);
-		else
-			return _pDelegate->operator < (other);
-	}
-
 	void destroy()
 	{
-		delete _pDelegate;
-		_pDelegate = 0;
+		delete this->_pDelegate;
+		this->_pDelegate = 0;
 	}
 
 	const AbstractPriorityDelegate<TArgs>& getDelegate() const
 	{
-		return *_pDelegate;
+		return *this->_pDelegate;
 	}
 
 protected:
-	PriorityExpire(AbstractPriorityDelegate<TArgs>* p, Timestamp::TimeDiff expireMilliSec): 
-		_pDelegate(p), 
-		_expire(expireMilliSec*1000)
-	{
-	}
-
 	bool expired() const
 	{
 		return _creationTime.isElapsed(_expire);

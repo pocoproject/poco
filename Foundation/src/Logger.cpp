@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Logger.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/Logger.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -46,6 +46,7 @@ namespace Poco {
 
 Logger::LoggerMap* Logger::_pLoggerMap = 0;
 Mutex Logger::_mapMtx;
+const std::string Logger::ROOT;
 
 
 Logger::Logger(const std::string& name, Channel* pChannel, int level): _name(name), _pChannel(pChannel), _level(level)
@@ -172,6 +173,22 @@ void Logger::setChannel(const std::string& name, Channel* pChannel)
 }
 
 
+void Logger::setProperty(const std::string& loggerName, const std::string& propertyName, const std::string& value)
+{
+	Mutex::ScopedLock lock(_mapMtx);
+
+	if (_pLoggerMap)
+	{
+		std::string::size_type len = loggerName.length();
+		for (LoggerMap::iterator it = _pLoggerMap->begin(); it != _pLoggerMap->end(); ++it)
+		{
+			if (len == 0 || it->first.compare(0, len, loggerName) == 0 && (it->first.length() == len || it->first[len] == '.'))
+				it->second->setProperty(propertyName, value);
+		}
+	}
+}
+
+
 std::string Logger::format(const std::string& fmt, const std::string& arg)
 {
 	std::string args[] =
@@ -289,11 +306,24 @@ Logger& Logger::get(const std::string& name)
 {
 	Mutex::ScopedLock lock(_mapMtx);
 
-	Logger* pLogger = has(name);
+	return unsafeGet(name);
+}
+
+
+Logger& Logger::unsafeGet(const std::string& name)
+{
+	Logger* pLogger = find(name);
 	if (!pLogger)
 	{
-		Logger& par = parent(name);
-		pLogger = new Logger(name, par.getChannel(), par.getLevel());
+		if (name == ROOT)
+		{
+			pLogger = new Logger(name, 0, Message::PRIO_INFORMATION);
+		}
+		else
+		{
+			Logger& par = parent(name);
+			pLogger = new Logger(name, par.getChannel(), par.getLevel());
+		}
 		add(pLogger);
 	}
 	return *pLogger;
@@ -304,7 +334,7 @@ Logger& Logger::create(const std::string& name, Channel* pChannel, int level)
 {
 	Mutex::ScopedLock lock(_mapMtx);
 
-	if (has(name)) throw ExistsException();
+	if (find(name)) throw ExistsException();
 	Logger* pLogger = new Logger(name, pChannel, level);
 	add(pLogger);
 	return *pLogger;
@@ -315,13 +345,7 @@ Logger& Logger::root()
 {
 	Mutex::ScopedLock lock(_mapMtx);
 
-	Logger* pRoot = has("");
-	if (!pRoot)
-	{
-		pRoot = new Logger("", 0, Message::PRIO_INFORMATION);
-		add(pRoot);
-	}
-	return *pRoot;
+	return unsafeGet(ROOT);
 }
 
 
@@ -329,13 +353,7 @@ Logger* Logger::has(const std::string& name)
 {
 	Mutex::ScopedLock lock(_mapMtx);
 
-	if (_pLoggerMap)
-	{
-		LoggerMap::iterator it = _pLoggerMap->find(name);
-		if (it != _pLoggerMap->end())
-			return it->second;
-	}
-	return 0;
+	return find(name);
 }
 
 
@@ -352,6 +370,18 @@ void Logger::shutdown()
 		delete _pLoggerMap;
 		_pLoggerMap = 0;
 	}
+}
+
+
+Logger* Logger::find(const std::string& name)
+{
+	if (_pLoggerMap)
+	{
+		LoggerMap::iterator it = _pLoggerMap->find(name);
+		if (it != _pLoggerMap->end())
+			return it->second;
+	}
+	return 0;
 }
 
 
@@ -392,16 +422,13 @@ Logger& Logger::parent(const std::string& name)
 	if (pos != std::string::npos)
 	{
 		std::string pname = name.substr(0, pos);
-		Logger* pParent = has(pname);
+		Logger* pParent = find(pname);
 		if (pParent)
 			return *pParent;
 		else
 			return parent(pname);
 	}
-	else
-	{
-		return root();
-	}
+	else return unsafeGet(ROOT);
 }
 
 

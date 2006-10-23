@@ -1,7 +1,7 @@
 //
 // LoggingConfigurator.cpp
 //
-// $Id: //poco/1.2/Util/src/LoggingConfigurator.cpp#2 $
+// $Id: //poco/1.2/Util/src/LoggingConfigurator.cpp#3 $
 //
 // Library: Util
 // Package: Configuration
@@ -44,6 +44,7 @@
 #include "Poco/Logger.h"
 #include "Poco/LoggingRegistry.h"
 #include "Poco/LoggingFactory.h"
+#include <map>
 
 
 using Poco::AutoPtr;
@@ -119,12 +120,20 @@ void LoggingConfigurator::configureChannels(AbstractConfiguration* pConfig)
 
 void LoggingConfigurator::configureLoggers(AbstractConfiguration* pConfig)
 {
+	typedef std::map<std::string, AutoPtr<AbstractConfiguration> > LoggerMap;
+
 	AbstractConfiguration::Keys loggers;
 	pConfig->keys(loggers);
+	// use a map to sort loggers by their name, ensuring initialization in correct order (parents before children)
+	LoggerMap loggerMap; 
 	for (AbstractConfiguration::Keys::const_iterator it = loggers.begin(); it != loggers.end(); ++it)
 	{
 		AutoPtr<AbstractConfiguration> pLoggerConfig(pConfig->createView(*it));
-		configureLogger(pLoggerConfig);
+		loggerMap[pLoggerConfig->getString("name", "")] = pLoggerConfig;
+	}
+	for (LoggerMap::iterator it = loggerMap.begin(); it != loggerMap.end(); ++it)
+	{
+		configureLogger(it->second);
 	}
 }
 
@@ -203,11 +212,11 @@ void LoggingConfigurator::configureLogger(AbstractConfiguration* pConfig)
 			AutoPtr<AbstractConfiguration> pChannelConfig(pConfig->createView(*it));	
 			AutoPtr<Channel> pChannel(createChannel(pChannelConfig));
 			configureChannel(pChannel, pChannelConfig);
-			logger.setChannel(pChannel);
+			Logger::setChannel(logger.name(), pChannel);
 		}
 		else if (*it != "name")
 		{
-			logger.setProperty(*it, pConfig->getString(*it));
+			Logger::setProperty(logger.name(), *it, pConfig->getString(*it));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 //
 // LoggingRegistry.cpp
 //
-// $Id: //poco/1.2/Foundation/src/LoggingRegistry.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/LoggingRegistry.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -59,7 +59,7 @@ Channel* LoggingRegistry::channelForName(const std::string& name) const
 	if (it != _channelMap.end())
 		return const_cast<Channel*>(it->second.get());
 	else
-		throw NotFoundException(name);
+		throw NotFoundException("logging channel", name);
 }
 
 
@@ -71,7 +71,7 @@ Formatter* LoggingRegistry::formatterForName(const std::string& name) const
 	if (it != _formatterMap.end())
 		return const_cast<Formatter*>(it->second.get());
 	else
-		throw NotFoundException(name);
+		throw NotFoundException("logging formatter", name);
 }
 
 
@@ -99,7 +99,7 @@ void LoggingRegistry::unregisterChannel(const std::string& name)
 	if (it != _channelMap.end())
 		_channelMap.erase(it);
 	else
-		throw NotFoundException(name);
+		throw NotFoundException("logging channel", name);
 }
 
 
@@ -111,7 +111,7 @@ void LoggingRegistry::unregisterFormatter(const std::string& name)
 	if (it != _formatterMap.end())
 		_formatterMap.erase(it);
 	else
-		throw NotFoundException(name);
+		throw NotFoundException("logging formatter", name);
 }
 
 

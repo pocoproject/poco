@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AbstractCache.h#3 $
+// $Id: //poco/1.2/Foundation/include/Poco/AbstractCache.h#4 $
 //
 // Library: Foundation
 // Package: Cache
@@ -123,6 +123,25 @@ public:
 		FastMutex::ScopedLock lock(_mutex);
 		doClear();
 	}
+
+	std::size_t size() const
+		/// Returns the number of cached elements
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		return _data.size();
+	}
+
+	void forceReplace()
+		/// Forces cache replacement. Note that Poco's cache strategy use for efficiency reason no background thread
+		/// which periodically triggers cache replacement. Cache Replacement is only started when the cache is modified
+		/// from outside, i.e. add is called, or when a user tries to access an cache element via get.
+		/// In some cases, i.e. expire based caching where for a long time no access to the cache happens,
+		/// it might be desirable to be able to trigger cache replacement manually.
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		doReplace();
+	}
+
 
 protected:
 	mutable BasicEvent<ValidArgs<TKey> > IsValid;

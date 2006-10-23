@@ -1,7 +1,7 @@
 //
 // Expire.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Expire.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Expire.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -55,12 +55,14 @@ class Expire: public AbstractDelegate<TArgs>
 {
 public:
 	Expire(const AbstractDelegate<TArgs>& p, Timestamp::TimeDiff expireMillisecs):
+		AbstractDelegate<TArgs>(p),
 		_pDelegate(p.clone()), 
 		_expire(expireMillisecs*1000)
 	{
 	}
 
 	Expire(const Expire& expire):
+		AbstractDelegate<TArgs>(expire),
 		_pDelegate(expire._pDelegate->clone()),
 		_expire(expire._expire),
 		_creationTime(expire._creationTime)
@@ -76,10 +78,11 @@ public:
 	{
 		if (&expire != this)
 		{
-			delete _pDelegate;
-			_pDelegate    = expire._pDelegate->clone();
-			_expire       = expire._expire;
-			_creationTime = expire._creationTime;
+			delete this->_pDelegate;
+			this->_pDelegate    = expire._pDelegate->clone();
+			this->_expire       = expire._expire;
+			this->_creationTime = expire._creationTime;
+			this->_pTarget = expire._pTarget;
 		}
 		return *this;
 	}
@@ -87,7 +90,7 @@ public:
 	bool notify(const void* sender, TArgs& arguments)
 	{
 		if (!expired())
-			return _pDelegate->notify(sender, arguments);
+			return this->_pDelegate->notify(sender, arguments);
 		else
 			return false;
 	}
@@ -97,34 +100,18 @@ public:
 		return new Expire(*this);
 	}
 
-	bool operator < (const AbstractDelegate<TArgs>& other) const
-	{
-		const Expire* pOther = dynamic_cast<const Expire*>(&other);
-
-		if (pOther)
-			return _pDelegate->operator < (*pOther->_pDelegate);
-		else
-			return _pDelegate->operator < (other);
-	}
-
 	void destroy()
 	{
-		delete _pDelegate;
-		_pDelegate = 0;
+		delete this->_pDelegate;
+		this->_pDelegate = 0;
 	}
 
 	const AbstractDelegate<TArgs>& getDelegate() const
 	{
-		return *_pDelegate;
+		return *this->_pDelegate;
 	}
 
 protected:
-	Expire(AbstractDelegate<TArgs>* p, Timestamp::TimeDiff expireMillisecs):
-		_pDelegate(p), 
-		_expire(expireMillisecs*1000)
-	{
-	}
-
 	bool expired() const
 	{
 		return _creationTime.isElapsed(_expire);

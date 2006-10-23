@@ -1,7 +1,7 @@
 //
 // Logger.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Logger.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Logger.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -241,10 +241,24 @@ public:
 		/// Attaches the given Channel to all loggers that are
 		/// descendants of the Logger with the given name.
 
+	static void setProperty(const std::string& loggerName, const std::string& propertyName, const std::string& value);
+		/// Sets or changes a configuration property for all loggers
+		/// that are descendants of the Logger with the given name.
+
 	static Logger& get(const std::string& name);
 		/// Returns a reference to the Logger with the given name.
 		/// If the Logger does not yet exist, it is created, based
 		/// on its parent logger.
+
+	static Logger& unsafeGet(const std::string& name);
+		/// Returns a reference to the Logger with the given name.
+		/// If the Logger does not yet exist, it is created, based
+		/// on its parent logger.
+		///
+		/// WARNING: This method is not thread safe. You should
+		/// probably use get() instead.
+		/// The only time this method should be used is during
+		/// program initialization, when only one thread is running.
 		
 	static Logger& create(const std::string& name, Channel* pChannel, int level = Message::PRIO_INFORMATION);
 		/// Creates and returns a reference to a Logger with the
@@ -274,6 +288,8 @@ public:
 		/// Fills the given vector with the names
 		/// of all currently defined loggers.
 		
+	static const std::string ROOT; /// The name of the root logger ("").	
+		
 protected:
 	typedef std::map<std::string, Logger*> LoggerMap;
 
@@ -286,6 +302,7 @@ protected:
 	static void formatDump(std::string& message, const void* buffer, int length);
 	static Logger& parent(const std::string& name);
 	static void add(Logger* pLogger);
+	static Logger* find(const std::string& name);
 
 private:
 	Logger();

@@ -1,7 +1,7 @@
 //
 // SplitterChannel.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/SplitterChannel.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/SplitterChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -71,7 +71,7 @@ public:
 		/// Sets or changes a configuration property.
 		///
 		/// Only the "channel" property is supported, which allows
-		/// adding a channel via the LoggingRegistry.
+		/// adding a comma-separated list of channels via the LoggingRegistry.
 		/// The "channel" property is set-only.
 		/// To simplify file-based configuration, all property
 		/// names starting with "channel" are treated as "channel".

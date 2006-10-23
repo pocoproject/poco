@@ -1,7 +1,7 @@
 //
 // PriorityDelegate.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/PriorityDelegate.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/PriorityDelegate.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -54,17 +54,17 @@ class PriorityDelegate: public AbstractPriorityDelegate<TArgs>
 public:
 	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
 
-	PriorityDelegate(TObj* obj, NotifyMethod method, int prio): 
-		_receiverObject(obj), 
-		_receiverMethod(method),
-		_priority(prio)
+	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
+		AbstractPriorityDelegate<TArgs>(obj, prio),
+		_receiverObject(obj),
+		_receiverMethod(method)
 	{
 	}
 	
 	PriorityDelegate(const PriorityDelegate& delegate):
+		AbstractPriorityDelegate<TArgs>(delegate._pTarget, delegate._priority),
 		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod),
-		_priority(delegate._priority)
+		_receiverMethod(delegate._receiverMethod)
 	{
 	}
 	
@@ -72,9 +72,10 @@ public:
 	{
 		if (&delegate != this)
 		{
-			_receiverObject = delegate._receiverObject;
-			_receiverMethod = delegate._receiverMethod;
-			_priority       = delegate._priority;
+			this->_pTarget        = delegate._pTarget;
+			this->_receiverObject = delegate._receiverObject;
+			this->_receiverMethod = delegate._receiverMethod;
+			this->_priority       = delegate._priority;
 		}
 		return *this;
 	}
@@ -94,35 +95,9 @@ public:
 		return new PriorityDelegate(*this);
 	}
 
-	bool operator < (const AbstractPriorityDelegate<TArgs>& other) const
-	{
-		const PriorityDelegate* pOther = dynamic_cast<const PriorityDelegate*>(&other);
-
-		if (pOther == 0)
-		{
-			const PriorityExpire<TArgs>* pExpire = dynamic_cast<const PriorityExpire<TArgs>*>(&other);
-			poco_check_ptr(pExpire);
-
-			return this->operator < (pExpire->getDelegate());
-		}
-
-		if (_priority < pOther->_priority)
-		{
-			return true;
-		}
-
-		if (_priority > pOther->_priority)
-		{
-			return false;
-		}
-
-		return _receiverObject < pOther->_receiverObject;
-	}
-
 protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
-	int	         _priority;
 
 private:
 	PriorityDelegate();

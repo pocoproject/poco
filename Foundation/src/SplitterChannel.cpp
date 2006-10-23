@@ -1,7 +1,7 @@
 //
 // SplitterChannel.cpp
 //
-// $Id: //poco/1.2/Foundation/src/SplitterChannel.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/SplitterChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -36,6 +36,7 @@
 
 #include "Poco/SplitterChannel.h"
 #include "Poco/LoggingRegistry.h"
+#include "Poco/StringTokenizer.h"
 
 
 namespace Poco {
@@ -82,9 +83,14 @@ void SplitterChannel::removeChannel(Channel* pChannel)
 void SplitterChannel::setProperty(const std::string& name, const std::string& value)
 {
 	if (name.compare(0, 7, "channel") == 0)
-		addChannel(LoggingRegistry::defaultRegistry().channelForName(value));
-	else
-		Channel::setProperty(name, value);
+	{
+		StringTokenizer tokenizer(value, ",;", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+		for (StringTokenizer::Iterator it = tokenizer.begin(); it != tokenizer.end(); ++it)
+		{
+			addChannel(LoggingRegistry::defaultRegistry().channelForName(*it));
+		}
+	}
+	else Channel::setProperty(name, value);
 }
 
 

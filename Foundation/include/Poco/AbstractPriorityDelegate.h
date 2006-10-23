@@ -1,7 +1,7 @@
 //
 // AbstractPriorityDelegate.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AbstractPriorityDelegate.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/AbstractPriorityDelegate.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -54,7 +54,15 @@ class AbstractPriorityDelegate
 	/// instead of run-time checks.
 {
 public:
-	AbstractPriorityDelegate() 
+	AbstractPriorityDelegate(void* pTarget, int prio):
+		_pTarget(pTarget),
+		_priority(prio)
+	{
+	}
+
+	AbstractPriorityDelegate(const AbstractPriorityDelegate& del):
+		_pTarget(del._pTarget),
+		_priority(del._priority)
 	{
 	}
 
@@ -68,8 +76,30 @@ public:
 	virtual AbstractPriorityDelegate* clone() const = 0;
 		// Returns a deep-copy of the object.
 
-	virtual bool operator < (const AbstractPriorityDelegate<TArgs>& other) const = 0;
+	bool operator < (const AbstractPriorityDelegate<TArgs>& other) const
 		/// Operator used for comparing AbstractPriorityDelegates in a collection.
+	{
+		if (_priority == other._priority)
+		{
+			return _pTarget < other._pTarget;
+		}
+
+		return (_priority < other._priority);
+	}
+
+	void* target() const
+	{
+		return _pTarget;
+	}
+
+	int priority() const
+	{
+		return _priority;
+	}
+
+protected:
+	void* _pTarget;
+	int   _priority;
 };
 
 

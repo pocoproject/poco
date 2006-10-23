@@ -940,7 +940,6 @@ Foundation/testsuite/TestSuite_vs80.vcproj
 libversion
 LICENSE
 Makefile
-MANIFEST
 Net
 Net/include
 Net/include/Poco

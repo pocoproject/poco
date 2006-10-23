@@ -1,7 +1,7 @@
 //
 // LRUCacheTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/LRUCacheTest.cpp#2 $
+// $Id: //poco/1.2/Foundation/testsuite/src/LRUCacheTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -54,9 +54,11 @@ LRUCacheTest::~LRUCacheTest()
 void LRUCacheTest::testClear()
 {
 	LRUCache<int, int> aCache(3);
+	assert (aCache.size() == 0);
 	aCache.add(1, 2);
 	aCache.add(3, 4);
 	aCache.add(5, 6);
+	assert (aCache.size() == 3);
 	assert (aCache.has(1));
 	assert (aCache.has(3));
 	assert (aCache.has(5));

@@ -1,7 +1,7 @@
 //
 // Delegate.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Delegate.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Delegate.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -55,12 +55,14 @@ public:
 	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
 
 	Delegate(TObj* obj, NotifyMethod method):
+		AbstractDelegate<TArgs>(obj),
 		_receiverObject(obj), 
 		_receiverMethod(method)
 	{
 	}
 
 	Delegate(const Delegate& delegate):
+		AbstractDelegate<TArgs>(delegate),
 		_receiverObject(delegate._receiverObject),
 		_receiverMethod(delegate._receiverMethod)
 	{
@@ -74,8 +76,9 @@ public:
 	{
 		if (&delegate != this)
 		{
-			_receiverObject = delegate._receiverObject;
-			_receiverMethod = delegate._receiverMethod;
+			this->_pTarget        = delegate._pTarget;
+			this->_receiverObject = delegate._receiverObject;
+			this->_receiverMethod = delegate._receiverMethod;
 		}
 		return *this;
 	}
@@ -89,20 +92,6 @@ public:
 	AbstractDelegate<TArgs>* clone() const
 	{
 		return new Delegate(*this);
-	}
-
-	bool operator < (const AbstractDelegate<TArgs>& other) const
-	{
-		const Delegate<TObj, TArgs>* pOther = dynamic_cast<const Delegate<TObj, TArgs>*>(&other);
-
-		if (pOther == 0)
-		{
-			const Expire<TArgs>* pExpire = dynamic_cast<const Expire<TArgs>*>(&other);
-			poco_check_ptr(pExpire);
-			return this->operator < (pExpire->getDelegate());
-		}
-
-		return _receiverObject < pOther->_receiverObject;
 	}
 
 protected:

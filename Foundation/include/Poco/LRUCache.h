@@ -1,7 +1,7 @@
 //
 // LRUCache.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/LRUCache.h#3 $
+// $Id: //poco/1.2/Foundation/include/Poco/LRUCache.h#4 $
 //
 // Library: Foundation
 // Package: Cache
@@ -49,7 +49,7 @@ namespace Poco {
 
 template <class TKey, class TValue> 
 class LRUCache: public AbstractCache<TKey, TValue, LRUStrategy<TKey, TValue> >
-	/// An LRUCache is the interface of all caches. 
+	/// An LRUCache implements Least Recently Used caching. The default size for a cache is 1024 entries
 {
 public:
 	LRUCache(long size = 1024):
