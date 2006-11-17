@@ -1,7 +1,7 @@
 //
 // String.h
 //
-// $Id: //poco/1.2/Foundation/src/String.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/String.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -149,6 +149,71 @@ int icompare(const std::string& str, std::string::size_type pos, const std::stri
 int icompare(const std::string& str, const std::string::value_type* ptr)
 {
 	return icompare(str, 0, str.size(), ptr);
+}
+
+
+std::string replace(const std::string& str, const std::string& from, const std::string& to, std::string::size_type start)
+{
+	std::string result(str);
+	replaceInPlace(result, from, to, start);
+	return result;
+}
+
+
+std::string replace(const std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start)
+{
+	std::string result(str);
+	replaceInPlace(result, from, to, start);
+	return result;
+}
+
+	
+std::string& replaceInPlace(std::string& str, const std::string& from, const std::string& to, std::string::size_type start)
+{
+	poco_assert (from.size() > 0);
+	
+	std::string result;
+	std::string::size_type pos = 0;
+	result.append(str, 0, start);
+	do
+	{
+		pos = str.find(from, start);
+		if (pos != std::string::npos)
+		{
+			result.append(str, start, pos - start);
+			result.append(to);
+			start = pos + from.length();
+		}
+		else result.append(str, start, str.size() - start);
+	}
+	while (pos != std::string::npos);
+	str.swap(result);
+	return str;
+}
+
+
+std::string& replaceInPlace(std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start)
+{
+	poco_assert (*from);
+
+	std::string result;
+	std::string::size_type pos = 0;
+	std::string::size_type fromLen = strlen(from);
+	result.append(str, 0, start);
+	do
+	{
+		pos = str.find(from, start);
+		if (pos != std::string::npos)
+		{
+			result.append(str, start, pos - start);
+			result.append(to);
+			start = pos + fromLen;
+		}
+		else result.append(str, start, str.size() - start);
+	}
+	while (pos != std::string::npos);
+	str.swap(result);
+	return str;
 }
 
 

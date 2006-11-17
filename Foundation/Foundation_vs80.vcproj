@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Foundation"
 	ProjectGUID="{8164D41D-B053-405B-826C-CF37AC0EF176}"
 	RootNamespace="Foundation"
@@ -418,10 +418,6 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\HashStatistic.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\MemoryPool.cpp"
 					>
 				</File>
@@ -550,23 +546,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\HashFunction.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\HashStatistic.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\HashTable.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Instantiator.h"
 					>
 				</File>
 				<File
 					RelativePath=".\include\Poco\MemoryPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MetaProgramming.h"
 					>
 				</File>
 				<File
@@ -610,10 +598,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\SimpleHashTable.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\SingletonHolder.h"
 					>
 				</File>
@@ -623,6 +607,14 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\StringTokenizer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Tuple.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\TypeList.h"
 					>
 				</File>
 				<File
@@ -1920,6 +1912,10 @@
 				Name="Source Files"
 				>
 				<File
+					RelativePath=".\src\AbstractObserver.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Notification.cpp"
 					>
 				</File>
@@ -1931,14 +1927,18 @@
 					RelativePath=".\src\NotificationQueue.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\src\AbstractObserver.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
 				>
+				<File
+					RelativePath=".\include\Poco\AbstractObserver.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\NObserver.h"
+					>
+				</File>
 				<File
 					RelativePath=".\include\Poco\Notification.h"
 					>
@@ -1952,15 +1952,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\AbstractObserver.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Observer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\NObserver.h"
 					>
 				</File>
 			</Filter>
@@ -3148,6 +3140,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\ExpirationDecorator.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\ExpireCache.h"
 					>
 				</File>
@@ -3176,6 +3172,18 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\UniqueExpireCache.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\UniqueExpireLRUCache.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\UniqueExpireStrategy.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\ValidArgs.h"
 					>
 				</File>
@@ -3183,6 +3191,58 @@
 			<Filter
 				Name="Source Files"
 				>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Hashing"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Hash.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\HashFunction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\HashMap.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\HashSet.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\HashStatistic.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\HashTable.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\LinearHashTable.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SimpleHashTable.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\Hash.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HashStatistic.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>

@@ -1,7 +1,7 @@
 //
 // StringTest.h
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/StringTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/StringTest.h#1 $
 //
 // Definition of the StringTest class.
 //
@@ -57,6 +57,8 @@ public:
 	void testIcompare();
 	void testTranslate();
 	void testTranslateInPlace();
+	void testReplace();
+	void testReplaceInPlace();
 	void testCat();
 
 	void setUp();

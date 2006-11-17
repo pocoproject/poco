@@ -1,10 +1,10 @@
 //
 // HashTable.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/HashTable.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/HashTable.h#1 $
 //
 // Library: Foundation
-// Package: Core
+// Package: Hashing
 // Module:  HashTable
 //
 // Definition of the HashTable class.
@@ -52,6 +52,7 @@
 namespace Poco {
 
 
+//@ deprecated
 template <class Key, class Value, class KeyHashFunction = HashFunction<Key> >
 class HashTable
 	/// A HashTable stores a key value pair that can be looked up via a hashed key.
@@ -146,15 +147,17 @@ public:
 		return hsh;
 	}
 
-	void insertRaw(const Key& key, UInt32 hsh, const Value& value)
+	Value& insertRaw(const Key& key, UInt32 hsh, const Value& value)
 		/// Returns the hash value of the inserted item.
 		/// Throws an exception if the entry was already inserted
 	{
 		if (!_entries[hsh])
 			_entries[hsh] = new HashEntryMap();
-		if (!_entries[hsh]->insert(std::make_pair(key, value)).second)
+		std::pair<typename HashEntryMap::iterator, bool> res(_entries[hsh]->insert(std::make_pair(key, value)));
+		if (!res.second)
 			throw InvalidArgumentException("HashTable::insert, key already exists.");
 		_size++;
+		return res.first->second;
 	}
 
 	UInt32 update(const Key& key, const Value& value)
@@ -196,7 +199,7 @@ public:
 
 	UInt32 hash(const Key& key) const
 	{
-		return KeyHashFunction::hash(key, _maxCapacity);
+		return _hash(key, _maxCapacity);
 	}
 
 	const Value& get(const Key& key) const
@@ -219,6 +222,32 @@ public:
 		return it->second;
 	}
 
+	Value& get(const Key& key)
+		/// Throws an exception if the value does not exist
+	{
+		UInt32 hsh = hash(key);
+		return const_cast<Value&>(getRaw(key, hsh));
+	}
+
+	const Value& operator [] (const Key& key) const
+	{
+		return get(key);
+	}
+	
+	Value& operator [] (const Key& key)
+	{
+		UInt32 hsh = hash(key);
+
+		if (!_entries[hsh])
+			return insertRaw(key, hsh, Value());
+			
+		ConstIterator it = _entries[hsh]->find(key);
+		if (it == _entries[hsh]->end())
+			return insertRaw(key, hsh, Value());
+
+		return it->second;
+	}
+	
 	const Key& getKeyRaw(const Key& key, UInt32 hsh)
 		/// Throws an exception if the key does not exist. returns a reference to the internally
 		/// stored key. Useful when someone does an insert and wants for performance reason only to store
@@ -263,7 +292,6 @@ public:
 	{
 		return _entries[hsh] && (_entries[hsh]->end() != _entries[hsh]->find(key));
 	}
-
 
 	size_t size() const
 		/// Returns the number of elements already inserted into the HashTable
@@ -353,6 +381,7 @@ private:
 	HashTableVector _entries;
 	size_t _size;
 	UInt32 _maxCapacity;
+	KeyHashFunction _hash;
 };
 
 

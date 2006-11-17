@@ -1,7 +1,7 @@
 //
 // Void.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Void.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Void.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -81,7 +81,25 @@ public:
 
 	Void& operator = (const Void& v);
 		/// Assigns another void.
+
+	bool operator ==(const Void& v) const;
+		/// Will return always true due to Voids having no members.
+
+	bool operator !=(const Void& v) const;
+		/// Will return always false due to Voids having no members.
 };
+
+
+inline bool Void::operator ==(const Void& v) const
+{
+	return true;
+}
+
+
+inline bool Void::operator !=(const Void& v) const
+{
+	return false;
+}
 
 
 } // namespace Poco

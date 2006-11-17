@@ -1,7 +1,7 @@
 //
 // ExpireLRUCacheTest.h
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/ExpireLRUCacheTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ExpireLRUCacheTest.h#1 $
 //
 // Tests for ExpireLRUCache
 //

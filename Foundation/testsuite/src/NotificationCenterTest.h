@@ -1,7 +1,7 @@
 //
 // NotificationCenterTest.h
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/NotificationCenterTest.h#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/NotificationCenterTest.h#1 $
 //
 // Definition of the NotificationCenterTest class.
 //

@@ -1,7 +1,7 @@
 //
 // FormattingChannel.cpp
 //
-// $Id: //poco/1.2/Foundation/src/FormattingChannel.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/FormattingChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging

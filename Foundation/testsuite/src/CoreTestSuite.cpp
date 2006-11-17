@@ -1,7 +1,7 @@
 //
 // CoreTestSuite.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/CoreTestSuite.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CoreTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -46,8 +46,8 @@
 #include "DynamicFactoryTest.h"
 #include "MemoryPoolTest.h"
 #include "AnyTest.h"
-#include "HashTest.h"
 #include "FormatTest.h"
+#include "TuplesTest.h"
 
 
 CppUnit::Test* CoreTestSuite::suite()
@@ -69,8 +69,8 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(DynamicFactoryTest::suite());
 	pSuite->addTest(MemoryPoolTest::suite());
 	pSuite->addTest(AnyTest::suite());
-	pSuite->addTest(HashTest::suite());
 	pSuite->addTest(FormatTest::suite());
+	pSuite->addTest(TuplesTest::suite());
 
 	return pSuite;
 }

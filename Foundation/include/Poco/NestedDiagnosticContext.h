@@ -1,7 +1,7 @@
 //
 // NestedDiagnosticContext.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/NestedDiagnosticContext.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/NestedDiagnosticContext.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -178,8 +178,16 @@ inline NDCScope::~NDCScope()
 //
 // helper macros
 //
-#define poco_ndc(msg) \
-	Poco::NDCScope _theNdcScope(msg, __LINE__, __FILE__)
+#define poco_ndc(func) \
+	Poco::NDCScope _theNdcScope(#func, __LINE__, __FILE__)
+
+
+#if defined(_DEBUG)
+	#define poco_ndc_dbg(func) \
+		Poco::NDCScope _theNdcScope(#func, __LINE__, __FILE__)
+#else
+	#define poco_ndc_dbg(func)
+#endif
 
 
 } // namespace Poco

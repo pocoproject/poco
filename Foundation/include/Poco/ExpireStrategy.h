@@ -1,7 +1,7 @@
 //
 // ExpireStrategy.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ExpireStrategy.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/ExpireStrategy.h#1 $
 //
 // Library: Foundation
 // Package: Cache

@@ -1,7 +1,7 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Exception.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/Exception.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -105,7 +105,7 @@ const char* Exception::className() const throw()
 	
 const char* Exception::what() const throw()
 {
-	return _msg.c_str();
+	return name();
 }
 
 	

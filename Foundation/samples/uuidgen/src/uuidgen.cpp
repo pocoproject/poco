@@ -1,7 +1,7 @@
 //
 // uuidgen.cpp
 //
-// $Id: //poco/1.2/Foundation/samples/uuidgen/src/uuidgen.cpp#1 $
+// $Id: //poco/1.3/Foundation/samples/uuidgen/src/uuidgen.cpp#1 $
 //
 // This sample demonstrates the UUIDGenerator and UUID classes.
 //

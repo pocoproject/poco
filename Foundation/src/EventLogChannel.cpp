@@ -1,7 +1,7 @@
 //
 // EventLogChannel.cpp
 //
-// $Id: //poco/1.2/Foundation/src/EventLogChannel.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/EventLogChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging

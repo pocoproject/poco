@@ -1,10 +1,10 @@
 //
 // HashStatistic.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/HashStatistic.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/HashStatistic.h#1 $
 //
 // Library: Foundation
-// Package: Core
+// Package: Hashing
 // Module:  HashStatistic
 //
 // Definition of the HashStatistic class.
@@ -47,6 +47,7 @@
 namespace Poco {
 
 
+//@ deprecated
 class Foundation_API HashStatistic
 	/// HashStatistic class bundles statistical information on the current state of a HashTable
 {

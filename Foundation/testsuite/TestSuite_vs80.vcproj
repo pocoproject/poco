@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="TestSuite"
 	ProjectGUID="{F1EE93DF-347F-4CB3-B191-C4E63F38E972}"
 	Keyword="Win32Proj"
@@ -238,10 +238,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\HashTest.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\MemoryPoolTest.cpp"
 					>
 				</File>
@@ -271,6 +267,10 @@
 				</File>
 				<File
 					RelativePath=".\src\StringTokenizerTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TuplesTest.cpp"
 					>
 				</File>
 			</Filter>
@@ -314,10 +314,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\HashTest.h"
-					>
-				</File>
-				<File
 					RelativePath=".\src\MemoryPoolTest.h"
 					>
 				</File>
@@ -347,6 +343,10 @@
 				</File>
 				<File
 					RelativePath=".\src\StringTokenizerTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TuplesTest.h"
 					>
 				</File>
 			</Filter>
@@ -1237,6 +1237,14 @@
 					RelativePath=".\src\LRUCacheTest.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\UniqueExpireCacheTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UniqueExpireLRUCacheTest.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -1255,6 +1263,74 @@
 				</File>
 				<File
 					RelativePath=".\src\LRUCacheTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UniqueExpireCacheTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UniqueExpireLRUCacheTest.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Hashing"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\HashingTestSuite.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HashMapTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HashSetTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HashTableTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LinearHashTableTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SimpleHashTableTest.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\HashingTestSuite.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HashMapTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HashSetTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HashTableTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LinearHashTableTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SimpleHashTableTest.cpp"
 					>
 				</File>
 			</Filter>

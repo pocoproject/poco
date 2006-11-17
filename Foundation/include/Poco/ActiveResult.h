@@ -1,7 +1,7 @@
 //
 // ActiveResult.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ActiveResult.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/ActiveResult.h#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -45,6 +45,7 @@
 #include "Poco/Event.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 
 
 namespace Poco {
@@ -60,16 +61,24 @@ class ActiveResultHolder: public RefCountedObject
 {
 public:
 	ActiveResultHolder():
+		_pData(0),
 		_pExc(0),
 		_event(false)
 		/// Creates an ActiveResultHolder.
 	{
 	}
-	
+		
 	ResultType& data()
 		/// Returns a reference to the actual result.
 	{
-		return _data;
+		poco_check_ptr(_pData);
+		return *_pData;
+	}
+	
+	void data(ResultType* pData)
+	{
+		delete _pData;
+		_pData = pData;
 	}
 	
 	void wait()
@@ -142,13 +151,14 @@ public:
 protected:
 	~ActiveResultHolder()
 	{
+		delete _pData;
 		delete _pExc;
 	}
 
 private:
-	ResultType _data;
-	Exception* _pExc;
-	Event      _event;
+	ResultType* _pData;
+	Exception*  _pExc;
+	Event       _event;
 };
 
 
@@ -185,19 +195,26 @@ public:
 	ActiveResult& operator = (const ActiveResult& result)
 		/// Assignment operator.
 	{
-		if (&result != this)
-		{
-			_pHolder->release();
-			_pHolder = result._pHolder;
-			_pHolder->duplicate();
-		}
+		ActiveResult tmp(result);
+		swap(tmp);
 		return *this;
 	}
 	
-	const ResultType& data() const
+	void swap(const ActiveResult& result)
+	{
+		using std::swap;
+		swap(_pHolder, result._pHolder);
+	}
+	
+	ResultType& data() const
 		/// Returns a reference to the result data.
 	{
 		return _pHolder->data();
+	}
+	
+	void data(ResultType* pValue)
+	{
+		_pHolder->data(pValue);
 	}
 	
 	void wait()

@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.2/Foundation/samples/Logger/Makefile#1 $
+# $Id: //poco/1.3/Foundation/samples/Logger/Makefile#1 $
 #
 # Makefile for Poco Logger
 #

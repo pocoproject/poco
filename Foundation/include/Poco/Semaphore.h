@@ -1,7 +1,7 @@
 //
 // Semaphore.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Semaphore.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Semaphore.h#1 $
 //
 // Library: Foundation
 // Package: Threading

@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.2/Foundation/Makefile#2 $
+# $Id: //poco/1.3/Foundation/Makefile#1 $
 #
 # Makefile for Poco Foundation
 #
@@ -24,7 +24,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel Stopwatch StreamChannel StreamConverter StreamCopier \
 	StreamTokenizer String StringTokenizer SynchronizedObject SyslogChannel \
-	Task TaskManager TaskNotification TeeStream HashStatistic\
+	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
 	TemporaryFile TextConverter TextEncoding TextIterator Thread ThreadLocal \
 	ThreadPool ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \

@@ -1,7 +1,7 @@
 //
 // MemoryPool.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/MemoryPool.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/MemoryPool.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Mutex.h"
 #include <vector>
+#include <cstddef>
 
 
 namespace Poco {
@@ -62,7 +63,7 @@ class Foundation_API MemoryPool
 	/// Blocks can be preallocated.
 {
 public:
-	MemoryPool(size_t blockSize, int preAlloc = 0, int maxAlloc = 0);
+	MemoryPool(std::size_t blockSize, int preAlloc = 0, int maxAlloc = 0);
 		/// Creates a MemoryPool for blocks with the given blockSize.
 		/// The number of blocks given in preAlloc are preallocated.
 		
@@ -78,7 +79,7 @@ public:
 	void release(void* ptr);
 		/// Releases a memory block and returns it to the pool.
 	
-	size_t blockSize() const;
+	std::size_t blockSize() const;
 		/// Returns the block size.
 		
 	int allocated() const;
@@ -99,18 +100,18 @@ private:
 	
 	typedef std::vector<char*> BlockVec;
 	
-	size_t    _blockSize;
-	int       _maxAlloc;
-	int       _allocated;
-	BlockVec  _blocks;
-	FastMutex _mutex;
+	std::size_t _blockSize;
+	int         _maxAlloc;
+	int         _allocated;
+	BlockVec    _blocks;
+	FastMutex   _mutex;
 };
 
 
 //
 // inlines
 //
-inline size_t MemoryPool::blockSize() const
+inline std::size_t MemoryPool::blockSize() const
 {
 	return _blockSize;
 }

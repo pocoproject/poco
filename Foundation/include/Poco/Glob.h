@@ -1,7 +1,7 @@
 //
 // Glob.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Glob.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Glob.h#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -55,9 +55,9 @@ class Foundation_API Glob
 	/// as known from Unix shells.
 	///
 	/// In the pattern string, '*' matches any sequence of characters,
-	/// '?' matches any character, [SET] matches any character in the 
-	/// specified set, [!SET] matches any character not in the specified 
-	/// set.
+	/// '?' matches any single character, [SET] matches any single character 
+	/// in the specified set, [!SET] matches any character not in the  
+	/// specified set.
 	///
 	/// A set is composed of characters or ranges; a range looks like
 	/// character hyphen character (as in 0-9 or A-Z).

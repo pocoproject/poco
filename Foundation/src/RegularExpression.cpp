@@ -1,7 +1,7 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/1.2/Foundation/src/RegularExpression.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/RegularExpression.cpp#1 $
 //
 // Library: Foundation
 // Package: RegExp
@@ -147,6 +147,14 @@ bool RegularExpression::match(const std::string& subject, std::string::size_type
 }
 
 
+bool RegularExpression::match(const std::string& subject, std::string::size_type offset, int options) const
+{
+	Match mtch;
+	match(subject, offset, mtch, options);
+	return mtch.offset == offset && mtch.length == subject.length() - offset;
+}
+
+
 int RegularExpression::extract(const std::string& subject, std::string& str, int options) const
 {
 	Match mtch;
@@ -284,7 +292,7 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 bool RegularExpression::match(const std::string& subject, const std::string& pattern, int options)
 {
 	RegularExpression re(pattern, options, false);
-	return re.match(subject);
+	return re.match(subject, 0, options);
 }
 
 

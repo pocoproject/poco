@@ -1,7 +1,7 @@
 //
 // AutoPtr.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AutoPtr.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/AutoPtr.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -111,8 +111,8 @@ public:
 	{
 		if (_ptr) _ptr->release();
 	}
-
-	AutoPtr& operator = (C* ptr)
+	
+	AutoPtr& assign(C* ptr)
 	{
 		if (_ptr != ptr)
 		{
@@ -122,7 +122,18 @@ public:
 		return *this;
 	}
 
-	AutoPtr& operator = (const AutoPtr& ptr)
+	AutoPtr& assign(C* ptr, bool shared)
+	{
+		if (_ptr != ptr)
+		{
+			if (_ptr) _ptr->release();
+			_ptr = ptr;
+			if (shared && _ptr) _ptr->duplicate();
+		}
+		return *this;
+	}
+	
+	AutoPtr& assign(const AutoPtr& ptr)
 	{
 		if (&ptr != this)
 		{
@@ -133,13 +144,8 @@ public:
 		return *this;
 	}
 	
-	void swap(AutoPtr& ptr)
-	{
-		std::swap(_ptr, ptr._ptr);
-	}
-	
 	template <class Other> 
-	AutoPtr& operator = (const AutoPtr<Other>& ptr)
+	AutoPtr& assign(const AutoPtr<Other>& ptr)
 	{
 		if (ptr.get() != _ptr)
 		{
@@ -150,8 +156,29 @@ public:
 		return *this;
 	}
 
+	AutoPtr& operator = (C* ptr)
+	{
+		return assign(ptr);
+	}
+
+	AutoPtr& operator = (const AutoPtr& ptr)
+	{
+		return assign(ptr);
+	}
+	
 	template <class Other> 
-	AutoPtr<Other> cast()
+	AutoPtr& operator = (const AutoPtr<Other>& ptr)
+	{
+		return assign<Other>(ptr);
+	}
+
+	void swap(AutoPtr& ptr)
+	{
+		std::swap(_ptr, ptr._ptr);
+	}
+	
+	template <class Other> 
+	AutoPtr<Other> cast() const
 		/// Casts the AutoPtr via a dynamic cast to the given type.
 		/// Returns an AutoPtr containing NULL if the cast fails.
 		/// Example: (assume class Sub: public Super)
@@ -159,10 +186,8 @@ public:
 		///    AutoPtr<Sub> sub = super.cast<Sub>();
 		///    poco_assert (sub.get());
 	{
-		Other* pOther = dynamic_cast <Other*>(_ptr);
-		if (pOther)
-			pOther->duplicate();
-		return AutoPtr<Other>(pOther);
+		Other* pOther = dynamic_cast<Other*>(_ptr);
+		return AutoPtr<Other>(pOther, true);
 	}
 
 	C* operator -> ()
@@ -202,11 +227,11 @@ public:
 		return _ptr;
 	}
 
-	bool isNull() const
+	const C* get() const
 	{
-		return _ptr == 0;
+		return _ptr;
 	}
-	
+
 	operator C* ()
 	{
 		return _ptr;
@@ -216,12 +241,17 @@ public:
 	{
 		return _ptr;
 	}
-
-	const C* get() const
+	
+	bool operator ! () const
 	{
-		return _ptr;
+		return _ptr == 0;
 	}
 
+	bool isNull() const
+	{
+		return _ptr == 0;
+	}
+	
 	C* duplicate()
 	{
 		if (_ptr) _ptr->duplicate();

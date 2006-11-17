@@ -1,7 +1,7 @@
 //
 // DirectoryIterator.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/DirectoryIterator.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/DirectoryIterator.h#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -54,6 +54,14 @@ class DirectoryIteratorImpl;
 class Foundation_API DirectoryIterator
 	/// The DirectoryIterator class is used to enumerate
 	/// all files in a directory.
+	///
+	/// DirectoryIterator has some limitations:
+	///   * only forward iteration (++) is supported
+	///   * an iterator copied from another one will always
+	///   * point to the same file as the original iterator,
+	///   * even is the original iterator has been advanced
+	///     (all copies of an iterator share their state with
+	///     the original iterator)
 {
 public:
 	DirectoryIterator();

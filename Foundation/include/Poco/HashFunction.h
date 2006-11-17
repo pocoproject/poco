@@ -1,10 +1,10 @@
 //
 // HashFunction.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/HashFunction.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/HashFunction.h#1 $
 //
 // Library: Foundation
-// Package: Core
+// Package: Hashing
 // Module:  HashFunction
 //
 // Definition of the HashFunction class.
@@ -41,37 +41,21 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Hash.h"
 
 
 namespace Poco {
 
+
+//@ deprecated
 template <class T>
 struct HashFunction
-	/// A generic hash function for numeric values.
+	/// A generic hash function.
 {
-	static UInt32 hash(T key, UInt32 maxValue)
-		/// Returns the hash value for the given key
+	UInt32 operator () (T key, UInt32 maxValue) const
+		/// Returns the hash value for the given key.
 	{
-		return key * 0xf4243 % maxValue;
-	}
-};
-
-
-template <> 
-struct HashFunction<std::string>
-	/// A specialization of HashFunction for strings.
-{
-	static UInt32 hash(const std::string& key, UInt32 maxValue)
-	{
-		// hash function taken from XML expat
-		UInt32 h = 0;
-
-		for (int i = 0; i < key.length(); ++i)
-		{
-			h = h * 0xf4243 ^ key[i];
-		}
-
-		return h % maxValue;
+		return ((UInt32) hash(key)) % maxValue;
 	}
 };
 

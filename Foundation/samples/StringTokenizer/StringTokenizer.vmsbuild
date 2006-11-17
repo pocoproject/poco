@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/1.2/Foundation/samples/StringTokenizer/StringTokenizer.vmsbuild#1 $
+# $Id: //poco/1.3/Foundation/samples/StringTokenizer/StringTokenizer.vmsbuild#1 $
 #
 EXE=StringTokenizer
 StringTokenizer

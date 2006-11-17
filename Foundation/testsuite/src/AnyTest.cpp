@@ -1,7 +1,7 @@
 //
 // AnyTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/AnyTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/AnyTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

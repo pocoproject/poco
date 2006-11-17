@@ -1,7 +1,7 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/RegularExpression.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/RegularExpression.h#1 $
 //
 // Library: Foundation
 // Package: RegExp
@@ -73,24 +73,32 @@ class Foundation_API RegularExpression
 {
 public:
 	enum Options // These must match the corresponsing options in pcre.h!
+		/// Some of the following options can only be passed to the constructor;
+		/// some can be passed only to matching functions, and some can be used
+		/// everywhere.
+		/// 
+		/// * Options marked [ctor] can be passed to the constructor.
+		/// * Options marked [match] can be passed to match, extract, split and subst.
+		/// * Options marked [subst] can be passed to subst.
+		///
 		/// See the PCRE documentation for more information.
 	{
-		RE_CASELESS        = 0x00001, /// case insensitive matching (/i)
-		RE_MULTILINE       = 0x00002, /// enable multi-line mode; affects ^ and $ (/m)
-		RE_DOTALL          = 0x00004, /// dot matches all characters, including newline (/s)
-		RE_EXTENDED        = 0x00004, /// totally ignore whitespace (/x)
-		RE_ANCHORED        = 0x00010, /// treat pattern as if it starts with a ^
-		RE_DOLLAR_ENDONLY  = 0x00020, /// dollar matches end-of-string only, not last newline in string
-		RE_EXTRA           = 0x00040, /// enable optional PCRE functionality
-		RE_NOTBOL          = 0x00080, /// circumflex does not match beginning of string
-		RE_NOTEOL          = 0x00100, /// $ does not match end of string
-		RE_UNGREEDY        = 0x00200, /// make quantifiers ungreedy
-		RE_NOTEMPTY        = 0x00400, /// empty string never matches
-		RE_UTF8            = 0x00800, /// assume pattern and subject is UTF-8 encoded
-		RE_NO_AUTO_CAPTURE = 0x01000, /// disable numbered capturing parentheses
-		RE_NO_UTF8_CHECK   = 0x02000, /// do not check validity of UTF-8 code sequences
-		RE_GLOBAL          = 0x10000, /// replace all occurences (/g)
-		RE_NO_VARS         = 0x20000  /// treat dollar in replacement string as ordinary character
+		RE_CASELESS        = 0x00001, /// case insensitive matching (/i) [ctor]
+		RE_MULTILINE       = 0x00002, /// enable multi-line mode; affects ^ and $ (/m) [ctor]
+		RE_DOTALL          = 0x00004, /// dot matches all characters, including newline (/s) [ctor]
+		RE_EXTENDED        = 0x00004, /// totally ignore whitespace (/x) [ctor]
+		RE_ANCHORED        = 0x00010, /// treat pattern as if it starts with a ^ [ctor, match]
+		RE_DOLLAR_ENDONLY  = 0x00020, /// dollar matches end-of-string only, not last newline in string [ctor]
+		RE_EXTRA           = 0x00040, /// enable optional PCRE functionality [ctor]
+		RE_NOTBOL          = 0x00080, /// circumflex does not match beginning of string [match]
+		RE_NOTEOL          = 0x00100, /// $ does not match end of string [match]
+		RE_UNGREEDY        = 0x00200, /// make quantifiers ungreedy [ctor]
+		RE_NOTEMPTY        = 0x00400, /// empty string never matches [match]
+		RE_UTF8            = 0x00800, /// assume pattern and subject is UTF-8 encoded [ctor]
+		RE_NO_AUTO_CAPTURE = 0x01000, /// disable numbered capturing parentheses [ctor, match]
+		RE_NO_UTF8_CHECK   = 0x02000, /// do not check validity of UTF-8 code sequences [match]
+		RE_GLOBAL          = 0x10000, /// replace all occurences (/g) [subst]
+		RE_NO_VARS         = 0x20000  /// treat dollar in replacement string as ordinary character [subst]
 	};
 	
 	struct Match
@@ -136,6 +144,13 @@ public:
 		/// Returns the number of matches.
 
 	bool match(const std::string& subject, std::string::size_type offset = 0) const;
+		/// Returns true if and only if the subject matches the regular expression.
+		///
+		/// Internally, this method sets the RE_ANCHORED and RE_NOTEMPTY options for
+		/// matching, which means that the empty string will never match and
+		/// the pattern is treated as if it starts with a ^.
+
+	bool match(const std::string& subject, std::string::size_type offset, int options) const;
 		/// Returns true if and only if the subject matches the regular expression.
 
 	int extract(const std::string& subject, std::string& str, int options = 0) const;

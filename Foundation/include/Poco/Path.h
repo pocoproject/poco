@@ -1,7 +1,7 @@
 //
 // Path.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Path.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Path.h#1 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -108,16 +108,16 @@ public:
 		/// Assignment operator.
 		
 	Path& operator = (const std::string& path);
-		/// Assigns a string containing a path.
+		/// Assigns a string containing a path in native format.
 
 	Path& operator = (const char* path);
-		/// Assigns a string containing a path.
+		/// Assigns a string containing a path in native format.
 
 	void swap(Path& path);
 		/// Swaps the path with another one.
 
 	Path& assign(const std::string& path);
-		/// Assigns a string containing a path.
+		/// Assigns a string containing a path in native format.
 		
 	Path& assign(const std::string& path, Style style);
 		/// Assigns a string containing a path.
@@ -141,7 +141,8 @@ public:
 		/// Assigns a string containing a path.
 
 	bool tryParse(const std::string& path);
-		/// Tries to interpret the given string as a path.
+		/// Tries to interpret the given string as a path
+		/// in native format.
 		/// If the path is syntactically valid, assigns the
 		/// path and returns true. Otherwise leaves the 
 		/// object unchanged and returns false.

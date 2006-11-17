@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AbstractCache.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/AbstractCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -44,7 +44,7 @@
 #include "Poco/ValidArgs.h" 
 #include "Poco/Mutex.h"
 #include "Poco/Exception.h"
-#include "Poco/BasicEvent.h"
+#include "Poco/FIFOEvent.h"
 #include "Poco/EventArgs.h"
 #include "Poco/Delegate.h"
 #include "Poco/SharedPtr.h"
@@ -60,10 +60,10 @@ class AbstractCache
 	/// An AbstractCache is the interface of all caches. 
 {
 public:
-	BasicEvent<const KeyValueArgs<TKey, TValue > > Add;
-	BasicEvent<const TKey>                         Remove;
-	BasicEvent<const TKey>                         Get;
-	BasicEvent<const EventArgs>                    Clear;
+	FIFOEvent<const KeyValueArgs<TKey, TValue > > Add;
+	FIFOEvent<const TKey>                         Remove;
+	FIFOEvent<const TKey>                         Get;
+	FIFOEvent<const EventArgs>                    Clear;
 
 	typedef std::map<TKey, SharedPtr<TValue > > DataHolder;
 	typedef typename DataHolder::iterator       Iterator;
@@ -98,7 +98,8 @@ public:
 		/// the remove is ignored.
 	{
 		FastMutex::ScopedLock lock(_mutex);
-		doRemove(key);
+		Iterator it = _data.find(key);
+		doRemove(it);
 	}
 
 	bool has(const TKey& key) const
@@ -124,10 +125,11 @@ public:
 		doClear();
 	}
 
-	std::size_t size() const
+	std::size_t size()
 		/// Returns the number of cached elements
 	{
 		FastMutex::ScopedLock lock(_mutex);
+		doReplace();
 		return _data.size();
 	}
 
@@ -142,10 +144,23 @@ public:
 		doReplace();
 	}
 
+	std::set<TKey> getAllKeys()
+		/// Returns a copy of all keys stored in the cache
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		doReplace();
+		ConstIterator it = _data.begin();
+		ConstIterator itEnd = _data.end();
+		std::set<TKey> result;
+		for (; it != itEnd; ++it)
+			result.insert(it->first);
+
+		return result;
+	}
 
 protected:
-	mutable BasicEvent<ValidArgs<TKey> > IsValid;
-	mutable BasicEvent<KeySet>           Replace;
+	mutable FIFOEvent<ValidArgs<TKey> > IsValid;
+	mutable FIFOEvent<KeySet>           Replace;
 
 	void initialize()
 		/// Sets up event registration.
@@ -173,10 +188,8 @@ protected:
 		/// Adds the key value pair to the cache.
 		/// If for the key already an entry exists, it will be overwritten.
 	{
-		if (doHas(key))
-		{
-			doRemove(key);
-		}
+		Iterator it = _data.find(key);
+		doRemove(it);
 
 		KeyValueArgs<TKey, TValue> args(key, val);
 		Add.notify(this, args);
@@ -185,12 +198,15 @@ protected:
 		doReplace();
 	}
 
-	void doRemove(const TKey& key) 
+	void doRemove(Iterator it) 
 		/// Removes an entry from the cache. If the entry is not found
 		/// the remove is ignored.
 	{
-		Remove.notify(this, key);
-		_data.erase(key);
+		if (it != _data.end())
+		{
+			Remove.notify(this, it->first);
+			_data.erase(it);
+		}
 	}
 
 	bool doHas(const TKey& key) const
@@ -227,7 +243,7 @@ protected:
 
 			if (!args.isValid())
 			{
-				doRemove(key);
+				doRemove(it);
 			}
 			else
 			{
@@ -255,7 +271,8 @@ protected:
 
 		for (; it != endIt; ++it)
 		{
-			doRemove(*it);
+			Iterator itH = _data.find(*it);
+			doRemove(itH);
 		}
 	}
 

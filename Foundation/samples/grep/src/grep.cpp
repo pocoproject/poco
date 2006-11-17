@@ -1,7 +1,7 @@
 //
 // grep.cpp
 //
-// $Id: //poco/1.2/Foundation/samples/grep/src/grep.cpp#1 $
+// $Id: //poco/1.3/Foundation/samples/grep/src/grep.cpp#1 $
 //
 // This sample demonstrates the RegularExpression class.
 //

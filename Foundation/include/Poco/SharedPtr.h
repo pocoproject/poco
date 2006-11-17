@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/SharedPtr.h#5 $
+// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -104,7 +104,6 @@ class SharedPtr
 	/// is required.
 {
 public:
-	
 	SharedPtr(): _pCounter(new ReferenceCounter), _ptr(0)
 	{
 	}
@@ -129,7 +128,7 @@ public:
 		release();
 	}
 
-	SharedPtr& operator = (C* ptr)
+	SharedPtr& assign(C* ptr)
 	{
 		if (get() != ptr)
 		{
@@ -140,8 +139,8 @@ public:
 		}
 		return *this;
 	}
-
-	SharedPtr& operator = (const SharedPtr& ptr)
+	
+	SharedPtr& assign(const SharedPtr& ptr)
 	{
 		if (&ptr != this)
 		{
@@ -150,9 +149,9 @@ public:
 		}
 		return *this;
 	}
-
+	
 	template <class Other>
-	SharedPtr& operator = (const SharedPtr<Other>& ptr)
+	SharedPtr& assign(const SharedPtr<Other>& ptr)
 	{
 		if (ptr.get() != _ptr)
 		{
@@ -162,8 +161,30 @@ public:
 		return *this;
 	}
 
+	SharedPtr& operator = (C* ptr)
+	{
+		return assign(ptr);
+	}
+
+	SharedPtr& operator = (const SharedPtr& ptr)
+	{
+		return assign(ptr);
+	}
+
+	template <class Other>
+	SharedPtr& operator = (const SharedPtr<Other>& ptr)
+	{
+		return assign<Other>(ptr);
+	}
+
+	void swap(SharedPtr& ptr)
+	{
+		std::swap(_ptr, ptr._ptr);
+		std::swap(_pCounter, ptr._pCounter);
+	}
+
 	template <class Other> 
-	SharedPtr<Other> cast()
+	SharedPtr<Other> cast() const
 		/// Casts the SharedPtr via a dynamic cast to the given type.
 		/// Returns an SharedPtr containing NULL if the cast fails.
 		/// Example: (assume class Sub: public Super)
@@ -171,16 +192,10 @@ public:
 		///    SharedPtr<Sub> sub = super.cast<Sub>();
 		///    poco_assert (sub.get());
 	{
-		Other* pOther = dynamic_cast <Other*>(_ptr);
+		Other* pOther = dynamic_cast<Other*>(_ptr);
 		if (pOther)
-			return SharedPtr<Other> (_pCounter, pOther);
+			return SharedPtr<Other>(_pCounter, pOther);
 		return SharedPtr<Other>();
-	}
-
-	void swap(SharedPtr& ptr)
-	{
-		std::swap(_ptr, ptr._ptr);
-		std::swap(_pCounter, ptr._pCounter);
 	}
 
 	C* operator -> ()
@@ -208,11 +223,11 @@ public:
 		return _ptr;
 	}
 
-	bool isNull() const
+	const C* get() const
 	{
-		return _ptr == 0;
+		return _ptr;
 	}
-	
+
 	operator C* ()
 	{
 		return _ptr;
@@ -223,9 +238,14 @@ public:
 		return _ptr;
 	}
 
-	const C* get() const
+	bool operator ! () const
 	{
-		return _ptr;
+		return _ptr == 0;
+	}
+
+	bool isNull() const
+	{
+		return _ptr == 0;
 	}
 
 	bool operator == (const SharedPtr& ptr) const

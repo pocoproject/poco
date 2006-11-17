@@ -1,7 +1,7 @@
 //
 // ExpireCacheTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/ExpireCacheTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ExpireCacheTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -99,7 +99,9 @@ void ExpireCacheTest::testExpireN()
 	SharedPtr<int> tmp = aCache.get(1);
 	assert (!tmp.isNull());
 	assert (*tmp == 2);
+	assert (aCache.size() == 1);
 	Thread::sleep(DURWAIT);
+	assert (aCache.size() == 0);
 	assert (!aCache.has(1));
 
 	// tmp must still be valid, access it

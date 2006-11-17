@@ -1,7 +1,7 @@
 //
 // EventTestSuite.h
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/EventTestSuite.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/EventTestSuite.h#1 $
 //
 // Definition of the EventTestSuite class.
 //

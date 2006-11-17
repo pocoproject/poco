@@ -1,10 +1,10 @@
 //
 // HashStatistic.cpp
 //
-// $Id: //poco/1.2/Foundation/src/HashStatistic.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/HashStatistic.cpp#1 $
 //
 // Library: Foundation
-// Package: Core
+// Package: Hashing
 // Module:  HashStatistic
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

@@ -1,7 +1,7 @@
 //
 // ActiveRunnable.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ActiveRunnable.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/ActiveRunnable.h#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -71,7 +71,7 @@ public:
 	{
 		try
 		{
-			_result.data() = (_pOwner->*_method)(_arg);
+			_result.data(new ResultType((_pOwner->*_method)(_arg)));
 		}
 		catch (Exception& e)
 		{

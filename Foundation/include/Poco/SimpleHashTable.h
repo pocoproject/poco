@@ -1,10 +1,10 @@
 //
 // SimpleHashTable.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/SimpleHashTable.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/SimpleHashTable.h#1 $
 //
 // Library: Foundation
-// Package: Core
+// Package: Hashing
 // Module:  SimpleHashTable
 //
 // Definition of the SimpleHashTable class.
@@ -46,13 +46,15 @@
 #include "Poco/HashStatistic.h"
 #include <vector>
 #include <map>
-#include <stddef.h>
+#include <cstddef>
+#include <algorithm>
 
 
 namespace Poco {
 
 
-template< class Key, class Value, class KeyHashFunction = HashFunction< Key> >
+//@ deprecated
+template <class Key, class Value, class KeyHashFunction = HashFunction<Key> >
 class SimpleHashTable
 	/// A SimpleHashTable stores a key value pair that can be looked up via a hashed key.
 	///
@@ -67,35 +69,31 @@ public:
 	class HashEntry
 	{
 	public:
-		Key key;
+		Key   key;
 		Value value;
-		HashEntry(const Key k, const Value v): 
-			key(k), 
-			value(v)
+		HashEntry(const Key k, const Value v): key(k), value(v)
 		{
 		}
 	};
 
-	typedef HashEntry** HashTableVector;
+	typedef std::vector<HashEntry*> HashTableVector;
 
-	SimpleHashTable(UInt32 initialSize = 251): _entries(0), _size(0), _maxCapacity(initialSize)
+	SimpleHashTable(UInt32 capacity = 251): _entries(capacity, 0), _size(0), _capacity(capacity)
 		/// Creates the SimpleHashTable.
 	{
-		_entries = new HashEntry*[initialSize];
-		memset(_entries, '\0', sizeof(HashEntry*)*initialSize);
 	}
 
 	SimpleHashTable(const SimpleHashTable& ht):
-		_entries (new HashEntry*[ht._maxCapacity]),
 		_size(ht._size),
-		_maxCapacity(ht._maxCapacity)
+		_capacity(ht._capacity)
 	{
-		for (int i = 0; i < _maxCapacity; ++i)
+		_entries.reserve(ht._capacity);
+		for (typename HashTableVector::iterator it = ht._entries.begin(); it != ht._entries.end(); ++it)
 		{
-			if (ht._entries[i])
-				_entries[i] = new HashEntry(*ht._entries[i]);
+			if (*it) 
+				_entries.push_back(new HashEntry(*it));
 			else
-				_entries[i] = 0;
+				_entries.push_back(0);
 		}
 	}
 
@@ -109,36 +107,28 @@ public:
 	{
 		if (this != &ht)
 		{
-			clear();
-			_maxCapacity = ht._maxCapacity;
-			delete[] _entries;
-			_entries = new HashEntry*[_maxCapacity];
-			_size = ht._size;
-
-			for (int i = 0; i < _maxCapacity; ++i)
-			{
-				if (ht._entries[i])
-					_entries[i] = new HashEntry(*ht._entries[i]);
-				else
-					_entries[i] = 0;
-			}
+			SimpleHashTable tmp(ht);
+			swap(tmp);
 		}
 		return *this;
+	}
+	
+	void swap(SimpleHashTable& ht)
+	{
+		using std::swap;
+		swap(_entries, ht._entries);
+		swap(_size, ht._size);
+		swap(_capacity, ht._capacity);
 	}
 
 	void clear()
 	{
-		if (!_entries)
-			return;
-		for (int i = 0; i < _maxCapacity; ++i)
+		for (typename HashTableVector::iterator it = _entries.begin(); it != _entries.end(); ++it)
 		{
-			if (_entries[i])
-				delete _entries[i];
+			delete *it;
+			*it = 0;
 		}
-		delete[] _entries;
-		_entries     = 0;
-		_size        = 0;
-		_maxCapacity = 0;
+		_size = 0;
 	}
 
 	UInt32 insert(const Key& key, const Value& value)
@@ -150,25 +140,29 @@ public:
 		return hsh;
 	}
 
-	void insertRaw(const Key& key, UInt32 hsh, const Value& value)
+	Value& insertRaw(const Key& key, UInt32 hsh, const Value& value)
 		/// Returns the hash value of the inserted item.
 		/// Throws an exception if the entry was already inserted
 	{
-		if (!_entries[hsh])
-			_entries[hsh] = new HashEntry(key, value);
+		UInt32 pos = hsh;
+		if (!_entries[pos])
+			_entries[pos] = new HashEntry(key, value);
 		else
 		{
 			UInt32 origHash = hsh;
-			while (_entries[hsh % _maxCapacity])
+			while (_entries[hsh % _capacity])
 			{
-				poco_assert_dbg(_entries[hsh % _maxCapacity]->key != key);
-				if (hsh - origHash > _maxCapacity)
+				if (_entries[hsh % _capacity]->key == key)
+					throw ExistsException();
+				if (hsh - origHash > _capacity)
 					throw PoolOverflowException("SimpleHashTable full");
 				hsh++;
 			}
-			_entries[hsh % _maxCapacity] = new HashEntry(key, value);
+			pos = hsh % _capacity;
+			_entries[pos] = new HashEntry(key, value);
 		}
 		_size++;
+		return _entries[pos]->value;
 	}
 
 	UInt32 update(const Key& key, const Value& value)
@@ -189,25 +183,25 @@ public:
 		else
 		{
 			UInt32 origHash = hsh;
-			while (_entries[hsh % _maxCapacity])
+			while (_entries[hsh % _capacity])
 			{
-				if (_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _capacity]->key == key)
 				{
-					_entries[hsh % _maxCapacity]->value = value;
+					_entries[hsh % _capacity]->value = value;
 					return;
 				}
-				if (hsh - origHash > _maxCapacity)
+				if (hsh - origHash > _capacity)
 					throw PoolOverflowException("SimpleHashTable full");
 				hsh++;
 			}
-			_entries[hsh % _maxCapacity] = new HashEntry(key, value);
+			_entries[hsh % _capacity] = new HashEntry(key, value);
 		}
 		_size++;
 	}
 
 	UInt32 hash(const Key& key) const
 	{
-		return KeyHashFunction::hash(key, _maxCapacity);
+		return _hash(key, _capacity);
 	}
 
 	const Value& get(const Key& key) const
@@ -223,17 +217,49 @@ public:
 		UInt32 origHash = hsh;
 		while (true)
 		{
-			if (_entries[hsh % _maxCapacity])
+			if (_entries[hsh % _capacity])
 			{
-				if (_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _capacity]->key == key)
 				{
-					return _entries[hsh % _maxCapacity]->value;
+					return _entries[hsh % _capacity]->value;
 				}
 			}
 			else
 				throw InvalidArgumentException("value not found");
-			if (hsh - origHash > _maxCapacity)
+			if (hsh - origHash > _capacity)
 				throw InvalidArgumentException("value not found");
+			hsh++;
+		}
+	}
+
+	Value& get(const Key& key)
+		/// Throws an exception if the value does not exist
+	{
+		UInt32 hsh = hash(key);
+		return const_cast<Value&>(getRaw(key, hsh));
+	}
+	
+	const Value& operator [] (const Key& key) const
+	{
+		return get(key);
+	}
+	
+	Value& operator [] (const Key& key)
+	{
+		UInt32 hsh = hash(key);
+		UInt32 origHash = hsh;
+		while (true)
+		{
+			if (_entries[hsh % _capacity])
+			{
+				if (_entries[hsh % _capacity]->key == key)
+				{
+					return _entries[hsh % _capacity]->value;
+				}
+			}
+			else return insertRaw(key, hsh, Value());
+			if (hsh - origHash > _capacity)
+				return insertRaw(key, hsh, Value());
 			hsh++;
 		}
 	}
@@ -246,17 +272,17 @@ public:
 		UInt32 origHash = hsh;
 		while (true)
 		{
-			if (_entries[hsh % _maxCapacity])
+			if (_entries[hsh % _capacity])
 			{
-				if (_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _capacity]->key == key)
 				{
-					return _entries[hsh % _maxCapacity]->key;
+					return _entries[hsh % _capacity]->key;
 				}
 			}
 			else
 				throw InvalidArgumentException("key not found");
 
-			if (hsh - origHash > _maxCapacity)
+			if (hsh - origHash > _capacity)
 				throw InvalidArgumentException("key not found");
 			hsh++;
 		}
@@ -275,17 +301,17 @@ public:
 		UInt32 origHash = hsh;
 		while (true)
 		{
-			if (_entries[hsh % _maxCapacity])
+			if (_entries[hsh % _capacity])
 			{
-				if (_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _capacity]->key == key)
 				{
-					v = _entries[hsh % _maxCapacity]->value;
+					v = _entries[hsh % _capacity]->value;
 					return true;
 				}
 			}
 			else
 				return false;
-			if (hsh - origHash > _maxCapacity)
+			if (hsh - origHash > _capacity)
 				return false;
 			hsh++;
 		}
@@ -302,16 +328,16 @@ public:
 		UInt32 origHash = hsh;
 		while (true)
 		{
-			if (_entries[hsh % _maxCapacity])
+			if (_entries[hsh % _capacity])
 			{
-				if (_entries[hsh % _maxCapacity]->key == key)
+				if (_entries[hsh % _capacity]->key == key)
 				{
 					return true;
 				}
 			}
 			else
 				return false;
-			if (hsh - origHash > _maxCapacity)
+			if (hsh - origHash > _capacity)
 				return false;
 			hsh++;
 		}
@@ -323,39 +349,25 @@ public:
 		return _size;
 	}
 	
-	UInt32 maxCapacity() const
+	UInt32 capacity() const
 	{
-		return _maxCapacity;
+		return _capacity;
 	}
 
 	void resize(UInt32 newSize)
 		/// Resizes the hashtable, rehashes all existing entries. Expensive!
 	{
-		if (_maxCapacity != newSize)
+		if (_capacity != newSize)
 		{
-			HashTableVector cpy = _entries;
-			_entries = 0;
-			UInt32 oldSize = _maxCapacity;
-			_maxCapacity = newSize;
-			_entries = new HashEntry*[_maxCapacity];
-			memset(_entries, '\0', sizeof(HashEntry*)*_maxCapacity);
-			
-			if (_size == 0)
+			SimpleHashTable tmp(newSize);
+			swap(tmp);
+			for (typename HashTableVector::const_iterator it = tmp._entries.begin(); it != tmp._entries.end(); ++it)
 			{
-				// no data was yet inserted
-				delete[] cpy;
-				return;
-			}
-			_size = 0;
-			for (int i=0; i < oldSize; ++i)
-			{
-				if (cpy[i])
+				if (*it)
 				{
-					insert(cpy[i]->key, cpy[i]->value);
-					delete cpy[i];
+					insertRaw((*it)->key, hash((*it)->key), (*it)->value);
 				}
 			}
-			delete[] cpy;
 		}
 	}
 
@@ -369,7 +381,7 @@ public:
 	#ifdef _DEBUG
 		UInt32 totalSize = 0;
 	#endif
-		for (int i=0; i < _maxCapacity; ++i)
+		for (int i=0; i < _capacity; ++i)
 		{
 			if (_entries[i])
 			{
@@ -388,16 +400,16 @@ public:
 					detailedEntriesPerHash.push_back(0);
 			}
 		}
-	#ifdef DEBUG
 		poco_assert_dbg(totalSize == numberOfEntries);
-	#endif
-		return HashStatistic(_maxCapacity, numberOfEntries, numZeroEntries, maxEntriesPerHash, detailedEntriesPerHash);
+
+		return HashStatistic(_capacity, numberOfEntries, numZeroEntries, maxEntriesPerHash, detailedEntriesPerHash);
 	}
 
 private:
 	HashTableVector _entries;
-	size_t _size;
-	UInt32 _maxCapacity;
+	size_t          _size;
+	UInt32          _capacity;
+	KeyHashFunction _hash;
 };
 
 

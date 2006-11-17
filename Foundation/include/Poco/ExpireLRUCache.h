@@ -1,7 +1,7 @@
 //
 // ExpireLRUCache.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/ExpireLRUCache.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/ExpireLRUCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache

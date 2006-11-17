@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.2/Foundation/samples/deflate/Makefile#1 $
+# $Id: //poco/1.3/Foundation/samples/deflate/Makefile#1 $
 #
 # Makefile for Poco deflate
 #

@@ -1,7 +1,7 @@
 //
 // StringTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/StringTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/StringTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -49,6 +49,8 @@ using Poco::toLowerInPlace;
 using Poco::icompare;
 using Poco::translate;
 using Poco::translateInPlace;
+using Poco::replace;
+using Poco::replaceInPlace;
 using Poco::cat;
 
 
@@ -268,6 +270,56 @@ void StringTest::testTranslateInPlace()
 }
 
 
+void StringTest::testReplace()
+{
+	std::string s("aabbccdd");
+	
+	assert (replace(s, std::string("aa"), std::string("xx")) == "xxbbccdd");
+	assert (replace(s, std::string("bb"), std::string("xx")) == "aaxxccdd");
+	assert (replace(s, std::string("dd"), std::string("xx")) == "aabbccxx");
+	assert (replace(s, std::string("bbcc"), std::string("xx")) == "aaxxdd");
+	assert (replace(s, std::string("b"), std::string("xx")) == "aaxxxxccdd");
+	assert (replace(s, std::string("bb"), std::string("")) == "aaccdd");
+	assert (replace(s, std::string("b"), std::string("")) == "aaccdd");
+	assert (replace(s, std::string("ee"), std::string("xx")) == "aabbccdd");
+	assert (replace(s, std::string("dd"), std::string("")) == "aabbcc");
+
+	assert (replace(s, "aa", "xx") == "xxbbccdd");
+	assert (replace(s, "bb", "xx") == "aaxxccdd");
+	assert (replace(s, "dd", "xx") == "aabbccxx");
+	assert (replace(s, "bbcc", "xx") == "aaxxdd");
+	assert (replace(s, "bb", "") == "aaccdd");
+	assert (replace(s, "b", "") == "aaccdd");
+	assert (replace(s, "ee", "xx") == "aabbccdd");
+	assert (replace(s, "dd", "") == "aabbcc");
+	
+	s = "aabbaabb";
+	assert (replace(s, std::string("aa"), std::string("")) == "bbbb");
+	assert (replace(s, std::string("a"), std::string("")) == "bbbb");
+	assert (replace(s, std::string("a"), std::string("x")) == "xxbbxxbb");
+	assert (replace(s, std::string("a"), std::string("xx")) == "xxxxbbxxxxbb");
+	assert (replace(s, std::string("aa"), std::string("xxx")) == "xxxbbxxxbb");
+
+	assert (replace(s, std::string("aa"), std::string("xx"), 2) == "aabbxxbb");
+
+	assert (replace(s, "aa", "") == "bbbb");
+	assert (replace(s, "a", "") == "bbbb");
+	assert (replace(s, "a", "x") == "xxbbxxbb");
+	assert (replace(s, "a", "xx") == "xxxxbbxxxxbb");
+	assert (replace(s, "aa", "xxx") == "xxxbbxxxbb");
+	
+	assert (replace(s, "aa", "xx", 2) == "aabbxxbb");	
+}
+
+
+void StringTest::testReplaceInPlace()
+{
+	std::string s("aabbccdd");
+
+	assert (replaceInPlace(s, std::string("aa"), std::string("xx")) == "xxbbccdd");
+}
+
+
 void StringTest::testCat()
 {
 	std::string s1("one");
@@ -320,6 +372,8 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testIcompare);
 	CppUnit_addTest(pSuite, StringTest, testTranslate);
 	CppUnit_addTest(pSuite, StringTest, testTranslateInPlace);
+	CppUnit_addTest(pSuite, StringTest, testReplace);
+	CppUnit_addTest(pSuite, StringTest, testReplaceInPlace);
 	CppUnit_addTest(pSuite, StringTest, testCat);
 
 	return pSuite;

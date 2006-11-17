@@ -1,7 +1,7 @@
 #
 # buildfiles.vms
 #
-# $Id: //poco/1.2/Foundation/testsuite/testsuite.vmsbuild#1 $
+# $Id: //poco/1.3/Foundation/testsuite/testsuite.vmsbuild#1 $
 #
 EXE=TestRunner
 ActiveMethodTest
@@ -102,3 +102,6 @@ LRUCacheTest
 PriorityEventTest
 AnyTest
 TypesTestSuite
+UniqueExpireCacheTest
+UniqueExpireLRUCacheTest
+TuplesTest

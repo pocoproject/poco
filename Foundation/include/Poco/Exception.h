@@ -1,7 +1,7 @@
 //
 // Exception.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Exception.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Exception.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -78,7 +78,9 @@ public:
 		/// Returns the name of the exception class.
 		
 	virtual const char* what() const throw();
-		/// Returns the message text as a C string.
+		/// Returns a static string describing the exception.
+		///
+		/// Same as name(), but for compatibility with std::exception.
 		
 	const Exception* nested() const;
 		/// Returns a pointer to the nested exception, or
@@ -136,19 +138,19 @@ inline const std::string& Exception::message() const
 // are not allowed as template arguments.
 //
 #define POCO_DECLARE_EXCEPTION(API, CLS, BASE) \
-	class API CLS: public BASE							\
+	class API CLS: public BASE											\
 	{																	\
 	public:																\
 		CLS();															\
 		CLS(const std::string& msg);									\
 		CLS(const std::string& msg, const std::string& arg);			\
-		CLS(const std::string& msg, const Poco::Exception& exc);	\
+		CLS(const std::string& msg, const Poco::Exception& exc);		\
 		CLS(const CLS& exc);											\
 		~CLS() throw();													\
 		CLS& operator = (const CLS& exc);								\
 		const char* name() const throw();								\
 		const char* className() const throw();							\
-		Poco::Exception* clone() const;							\
+		Poco::Exception* clone() const;									\
 		void rethrow() const;											\
 	};
 
@@ -163,7 +165,7 @@ inline const std::string& Exception::message() const
 	CLS::CLS(const std::string& msg, const std::string& arg): BASE(msg, arg)			\
 	{																					\
 	}																					\
-	CLS::CLS(const std::string& msg, const Poco::Exception& exc): BASE(msg, exc)	\
+	CLS::CLS(const std::string& msg, const Poco::Exception& exc): BASE(msg, exc)		\
 	{																					\
 	}																					\
 	CLS::CLS(const CLS& exc): BASE(exc)													\
@@ -185,7 +187,7 @@ inline const std::string& Exception::message() const
 	{																					\
 		return typeid(*this).name();													\
 	}																					\
-	Poco::Exception* CLS::clone() const											\
+	Poco::Exception* CLS::clone() const													\
 	{																					\
 		return new CLS(*this);															\
 	}																					\
