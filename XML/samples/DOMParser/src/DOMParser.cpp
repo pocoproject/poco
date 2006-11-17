@@ -1,7 +1,7 @@
 //
 // DOMParser.cpp
 //
-// $Id: //poco/1.2/XML/samples/DOMParser/src/DOMParser.cpp#1 $
+// $Id: //poco/1.3/XML/samples/DOMParser/src/DOMParser.cpp#1 $
 //
 // This sample demonstrates the DOMParser, AutoPtr and
 // NodeIterator classes.

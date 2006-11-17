@@ -1,7 +1,7 @@
 //
 // EventTarget.h
 //
-// $Id: //poco/1.2/XML/include/Poco/DOM/EventTarget.h#1 $
+// $Id: //poco/1.3/XML/include/Poco/DOM/EventTarget.h#1 $
 //
 // Library: XML
 // Package: DOM

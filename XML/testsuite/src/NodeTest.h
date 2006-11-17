@@ -1,7 +1,7 @@
 //
 // NodeTest.h
 //
-// $Id: //poco/1.2/XML/testsuite/src/NodeTest.h#1 $
+// $Id: //poco/1.3/XML/testsuite/src/NodeTest.h#1 $
 //
 // Definition of the NodeTest class.
 //

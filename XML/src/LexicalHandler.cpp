@@ -1,7 +1,7 @@
 //
 // LexicalHandler.cpp
 //
-// $Id: //poco/1.2/XML/src/LexicalHandler.cpp#1 $
+// $Id: //poco/1.3/XML/src/LexicalHandler.cpp#1 $
 //
 // Library: XML
 // Package: SAX

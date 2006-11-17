@@ -1,7 +1,7 @@
 //
 // TreeWalkerTest.h
 //
-// $Id: //poco/1.2/XML/testsuite/src/TreeWalkerTest.h#1 $
+// $Id: //poco/1.3/XML/testsuite/src/TreeWalkerTest.h#1 $
 //
 // Definition of the TreeWalkerTest class.
 //

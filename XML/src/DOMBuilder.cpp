@@ -1,7 +1,7 @@
 //
 // DOMBuilder.cpp
 //
-// $Id: //poco/1.2/XML/src/DOMBuilder.cpp#1 $
+// $Id: //poco/1.3/XML/src/DOMBuilder.cpp#1 $
 //
 // Library: XML
 // Package: DOM

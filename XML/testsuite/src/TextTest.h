@@ -1,7 +1,7 @@
 //
 // TextTest.h
 //
-// $Id: //poco/1.2/XML/testsuite/src/TextTest.h#1 $
+// $Id: //poco/1.3/XML/testsuite/src/TextTest.h#1 $
 //
 // Definition of the TextTest class.
 //

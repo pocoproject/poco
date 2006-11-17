@@ -1,7 +1,7 @@
 //
 // XMLString.h
 //
-// $Id: //poco/1.2/XML/include/Poco/XML/XMLString.h#1 $
+// $Id: //poco/1.3/XML/include/Poco/XML/XMLString.h#1 $
 //
 // Library: XML
 // Package: XML
