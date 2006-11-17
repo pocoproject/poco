@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.2/build/config/HP-UX#1 $
+# $Id: //poco/1.3/build/config/HP-UX#1 $
 #
 # HP-UX
 #
@@ -22,6 +22,7 @@ RANLIB  = ranlib
 SHLIB   = $(CXX) $(LINKFLAGS) -b -Wl,+h$(notdir $@) -o $@ -Wl,+s
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.aCC 
+STRIP   = 
 SHELL   = sh
 RM      = rm -rf
 CP      = cp

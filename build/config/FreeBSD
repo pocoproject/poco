@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.2/build/config/FreeBSD#1 $
+# $Id: //poco/1.3/build/config/FreeBSD#1 $
 #
 # FreeBSD
 #
@@ -23,6 +23,7 @@ RANLIB  = ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+STRIP   = strip
 SHELL   = sh
 RM      = rm -rf
 CP      = cp

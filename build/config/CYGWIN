@@ -8,7 +8,7 @@
 #
 
 #
-# General Settings
+# General Settings, note that strip doesn't do anything on Cygwin, thus empty
 #
 LINKMODE = SHARED
 
@@ -22,6 +22,7 @@ LIB     = ar -cr
 RANLIB  = ranlib
 SHLIB   = $(CXX) -shared -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
+STRIP   =
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
 SHELL   = sh
 RM      = rm -rf

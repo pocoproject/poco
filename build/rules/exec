@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.2/build/rules/exec#1 $
+# $Id: //poco/1.3/build/rules/exec#1 $
 #
 # exec
 #
@@ -41,6 +41,7 @@ $(EXEC_DEBUG_STATIC): $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
 $(EXEC_RELEASE_STATIC): $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
 	@echo "** Building executable (release)" $@
 	$(LINK) $(LINKFLAGS) $(RELEASEOPT_LINK) $(STATICOPT_LINK) -o $@ $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(STRIPCMD)
 
 $(EXEC_DEBUG_SHARED): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building shared executable (debug)" $@
@@ -49,6 +50,7 @@ $(EXEC_DEBUG_SHARED): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 $(EXEC_RELEASE_SHARED): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building shared executable (release)" $@
 	$(LINK) $(LINKFLAGS) $(RELEASEOPT_LINK) $(SHAREDOPT_LINK) -o $@ $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(STRIPCMD)
 
 #
 # Include the automatically generated dependency files

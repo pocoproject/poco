@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.2/build/config/SunOS#2 $
+# $Id: //poco/1.3/build/config/SunOS#1 $
 #
 # SunOS
 #
@@ -21,6 +21,7 @@ LIB     = $(CXX) -xar -o $@
 RANLIB  = ranlib
 SHLIB   = $(CXX) $(LINKFLAGS) -G -o $@ -h$(notdir $@)
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
+STRIP   = 
 DEP     = $(POCO_BASE)/build/script/makedepend.SunCC
 SHELL   = sh
 RM      = rm -rf

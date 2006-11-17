@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.2/build/rules/global#1 $
+# $Id: //poco/1.3/build/rules/global#2 $
 #
 # global
 #
@@ -162,6 +162,15 @@ INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR))
 # Build Library Directory List
 #
 LIBRARY = -L$(LIBPATH)
+
+#
+# Strip Command definition
+#
+ifeq ($(strip $(STRIP)),)
+STRIPCMD = 
+else
+STRIPCMD = $(STRIP) $@
+endif
 
 #
 # Make CC and CXX environment vars

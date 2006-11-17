@@ -2,7 +2,7 @@
 #
 # makeldpath
 #
-# $Id: //poco/1.2/build/script/makeldpath#1 $
+# $Id: //poco/1.3/build/script/makeldpath#1 $
 #
 # Create a LD_LIBRARY_PATH for all project libraries.
 #

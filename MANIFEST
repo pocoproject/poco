@@ -2,6 +2,7 @@
 build
 build/config
 build/config/ARM-Linux
+build/config/CEGCCARM
 build/config/CYGWIN
 build/config/Darwin
 build/config/Darwin7
@@ -11,6 +12,7 @@ build/config/Linux
 build/config/MinGW
 build/config/OSF1
 build/config/QNX
+build/config/SSV-LINUX
 build/config/SunOS
 build/rules
 build/rules/compile
@@ -182,6 +184,7 @@ Foundation/include/Poco/EventLogChannel.h
 Foundation/include/Poco/Event_POSIX.h
 Foundation/include/Poco/Event_WIN32.h
 Foundation/include/Poco/Exception.h
+Foundation/include/Poco/ExpirationDecorator.h
 Foundation/include/Poco/Expire.h
 Foundation/include/Poco/ExpireCache.h
 Foundation/include/Poco/ExpireLRUCache.h
@@ -206,7 +209,10 @@ Foundation/include/Poco/FPEnvironment_DUMMY.h
 Foundation/include/Poco/FPEnvironment_SUN.h
 Foundation/include/Poco/FPEnvironment_WIN32.h
 Foundation/include/Poco/Glob.h
+Foundation/include/Poco/Hash.h
 Foundation/include/Poco/HashFunction.h
+Foundation/include/Poco/HashMap.h
+Foundation/include/Poco/HashSet.h
 Foundation/include/Poco/HashStatistic.h
 Foundation/include/Poco/HashTable.h
 Foundation/include/Poco/HexBinaryDecoder.h
@@ -217,6 +223,7 @@ Foundation/include/Poco/Instantiator.h
 Foundation/include/Poco/KeyValueArgs.h
 Foundation/include/Poco/Latin1Encoding.h
 Foundation/include/Poco/Latin9Encoding.h
+Foundation/include/Poco/LinearHashTable.h
 Foundation/include/Poco/LineEndingConverter.h
 Foundation/include/Poco/LocalDateTime.h
 Foundation/include/Poco/LogFile.h
@@ -237,6 +244,7 @@ Foundation/include/Poco/MD5Engine.h
 Foundation/include/Poco/MemoryPool.h
 Foundation/include/Poco/Message.h
 Foundation/include/Poco/MetaObject.h
+Foundation/include/Poco/MetaProgramming.h
 Foundation/include/Poco/Mutex.h
 Foundation/include/Poco/Mutex_POSIX.h
 Foundation/include/Poco/Mutex_WIN32.h
@@ -344,9 +352,14 @@ Foundation/include/Poco/Timespan.h
 Foundation/include/Poco/Timestamp.h
 Foundation/include/Poco/Timezone.h
 Foundation/include/Poco/Token.h
+Foundation/include/Poco/Tuple.h
+Foundation/include/Poco/TypeList.h
 Foundation/include/Poco/Types.h
 Foundation/include/Poco/UnbufferedStreamBuf.h
 Foundation/include/Poco/UnicodeConverter.h
+Foundation/include/Poco/UniqueExpireCache.h
+Foundation/include/Poco/UniqueExpireLRUCache.h
+Foundation/include/Poco/UniqueExpireStrategy.h
 Foundation/include/Poco/URI.h
 Foundation/include/Poco/URIStreamFactory.h
 Foundation/include/Poco/URIStreamOpener.h
@@ -557,6 +570,7 @@ Foundation/src/FPEnvironment_WIN32.cpp
 Foundation/src/get.c
 Foundation/src/Glob.cpp
 Foundation/src/gzio.c
+Foundation/src/Hash.cpp
 Foundation/src/HashStatistic.cpp
 Foundation/src/HexBinaryDecoder.cpp
 Foundation/src/HexBinaryEncoder.cpp
@@ -782,12 +796,20 @@ Foundation/testsuite/src/FPETest.cpp
 Foundation/testsuite/src/FPETest.h
 Foundation/testsuite/src/GlobTest.cpp
 Foundation/testsuite/src/GlobTest.h
-Foundation/testsuite/src/HashTest.cpp
-Foundation/testsuite/src/HashTest.h
+Foundation/testsuite/src/HashingTestSuite.cpp
+Foundation/testsuite/src/HashingTestSuite.h
+Foundation/testsuite/src/HashMapTest.cpp
+Foundation/testsuite/src/HashMapTest.h
+Foundation/testsuite/src/HashSetTest.cpp
+Foundation/testsuite/src/HashSetTest.h
+Foundation/testsuite/src/HashTableTest.cpp
+Foundation/testsuite/src/HashTableTest.h
 Foundation/testsuite/src/HexBinaryTest.cpp
 Foundation/testsuite/src/HexBinaryTest.h
 Foundation/testsuite/src/HMACEngineTest.cpp
 Foundation/testsuite/src/HMACEngineTest.h
+Foundation/testsuite/src/LinearHashTableTest.cpp
+Foundation/testsuite/src/LinearHashTableTest.h
 Foundation/testsuite/src/LineEndingConverterTest.cpp
 Foundation/testsuite/src/LineEndingConverterTest.h
 Foundation/testsuite/src/LocalDateTimeTest.cpp
@@ -862,6 +884,8 @@ Foundation/testsuite/src/SharedPtrTest.cpp
 Foundation/testsuite/src/SharedPtrTest.h
 Foundation/testsuite/src/SimpleFileChannelTest.cpp
 Foundation/testsuite/src/SimpleFileChannelTest.h
+Foundation/testsuite/src/SimpleHashTableTest.cpp
+Foundation/testsuite/src/SimpleHashTableTest.h
 Foundation/testsuite/src/StopwatchTest.cpp
 Foundation/testsuite/src/StopwatchTest.h
 Foundation/testsuite/src/StreamConverterTest.cpp
@@ -912,6 +936,12 @@ Foundation/testsuite/src/TimestampTest.cpp
 Foundation/testsuite/src/TimestampTest.h
 Foundation/testsuite/src/TimezoneTest.cpp
 Foundation/testsuite/src/TimezoneTest.h
+Foundation/testsuite/src/TuplesTest.cpp
+Foundation/testsuite/src/TuplesTest.h
+Foundation/testsuite/src/UniqueExpireCacheTest.cpp
+Foundation/testsuite/src/UniqueExpireCacheTest.h
+Foundation/testsuite/src/UniqueExpireLRUCacheTest.cpp
+Foundation/testsuite/src/UniqueExpireLRUCacheTest.h
 Foundation/testsuite/src/URIStreamOpenerTest.cpp
 Foundation/testsuite/src/URIStreamOpenerTest.h
 Foundation/testsuite/src/URITest.cpp
@@ -940,6 +970,7 @@ Foundation/testsuite/TestSuite_vs80.vcproj
 libversion
 LICENSE
 Makefile
+MANIFEST
 Net
 Net/include
 Net/include/Poco
@@ -1007,6 +1038,7 @@ Net/include/Poco/Net/QuotedPrintableDecoder.h
 Net/include/Poco/Net/QuotedPrintableEncoder.h
 Net/include/Poco/Net/RawSocket.h
 Net/include/Poco/Net/RawSocketImpl.h
+Net/include/Poco/Net/RemoteSyslogChannel.h
 Net/include/Poco/Net/ServerSocket.h
 Net/include/Poco/Net/ServerSocketImpl.h
 Net/include/Poco/Net/SMTPClientSession.h
@@ -1176,6 +1208,7 @@ Net/src/QuotedPrintableDecoder.cpp
 Net/src/QuotedPrintableEncoder.cpp
 Net/src/RawSocket.cpp
 Net/src/RawSocketImpl.cpp
+Net/src/RemoteSyslogChannel.cpp
 Net/src/ServerSocket.cpp
 Net/src/ServerSocketImpl.cpp
 Net/src/SMTPClientSession.cpp
