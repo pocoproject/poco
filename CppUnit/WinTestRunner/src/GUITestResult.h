@@ -1,7 +1,7 @@
 //
 // GUITestResult.h
 //
-// $Id: //poco/1.2/CppUnit/WinTestRunner/src/GUITestResult.h#1 $
+// $Id: //poco/1.3/CppUnit/WinTestRunner/src/GUITestResult.h#1 $
 //
 
 

@@ -1,7 +1,7 @@
 //
 // TestSetup.h
 //
-// $Id: //poco/1.2/CppUnit/include/CppUnit/TestSetup.h#1 $
+// $Id: //poco/1.3/CppUnit/include/CppUnit/TestSetup.h#1 $
 //
 
 

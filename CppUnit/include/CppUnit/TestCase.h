@@ -1,7 +1,7 @@
 //
 // TestCase.h
 //
-// $Id: //poco/1.2/CppUnit/include/CppUnit/TestCase.h#1 $
+// $Id: //poco/1.3/CppUnit/include/CppUnit/TestCase.h#1 $
 //
 
 
