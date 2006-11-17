@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.2/Net/src/MailMessage.cpp#3 $
+// $Id: //poco/1.3/Net/src/MailMessage.cpp#1 $
 //
 // Library: Net
 // Package: Mail

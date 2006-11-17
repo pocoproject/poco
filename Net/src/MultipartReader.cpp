@@ -1,7 +1,7 @@
 //
 // MultipartReader.cpp
 //
-// $Id: //poco/1.2/Net/src/MultipartReader.cpp#2 $
+// $Id: //poco/1.3/Net/src/MultipartReader.cpp#1 $
 //
 // Library: Net
 // Package: Messages

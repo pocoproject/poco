@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.2/Net/samples/HTTPFormServer/Makefile#1 $
+# $Id: //poco/1.3/Net/samples/HTTPFormServer/Makefile#1 $
 #
 # Makefile for Poco HTTPFormServer
 #

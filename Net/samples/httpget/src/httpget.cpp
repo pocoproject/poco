@@ -1,7 +1,7 @@
 //
 // httpget.cpp
 //
-// $Id: //poco/1.2/Net/samples/httpget/src/httpget.cpp#1 $
+// $Id: //poco/1.3/Net/samples/httpget/src/httpget.cpp#1 $
 //
 // This sample demonstrates the HTTPClientSession class.
 //

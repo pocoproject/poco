@@ -1001,6 +1001,26 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Logging"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\RemoteSyslogChannel.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\RemoteSyslogChannel.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

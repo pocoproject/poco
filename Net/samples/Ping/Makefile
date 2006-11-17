@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.2/Net/samples/Ping/Makefile#1 $
+# $Id: //poco/1.3/Net/samples/Ping/Makefile#1 $
 #
 # Makefile for Poco ping
 #
@@ -12,6 +12,6 @@ objects = Ping
 
 target         = Ping
 target_version = 1
-target_libs    = PocoFoundation PocoXML PocoUtil PocoNet
+target_libs    = PocoNet PocoUtil PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

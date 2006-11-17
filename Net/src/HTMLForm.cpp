@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.2/Net/src/HTMLForm.cpp#3 $
+// $Id: //poco/1.3/Net/src/HTMLForm.cpp#1 $
 //
 // Library: Net
 // Package: HTML

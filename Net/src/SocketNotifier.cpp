@@ -1,7 +1,7 @@
 //
 // SocketNotifier.cpp
 //
-// $Id: //poco/1.2/Net/src/SocketNotifier.cpp#2 $
+// $Id: //poco/1.3/Net/src/SocketNotifier.cpp#1 $
 //
 // Library: Net
 // Package: Reactor

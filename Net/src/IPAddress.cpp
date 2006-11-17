@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.2/Net/src/IPAddress.cpp#2 $
+// $Id: //poco/1.3/Net/src/IPAddress.cpp#1 $
 //
 // Library: Net
 // Package: NetCore
