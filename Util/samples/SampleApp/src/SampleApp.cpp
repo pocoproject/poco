@@ -1,7 +1,7 @@
 //
 // SampleApp.cpp
 //
-// $Id: //poco/1.2/Util/samples/SampleApp/src/SampleApp.cpp#1 $
+// $Id: //poco/1.3/Util/samples/SampleApp/src/SampleApp.cpp#1 $
 //
 // This sample demonstrates the Application class.
 //

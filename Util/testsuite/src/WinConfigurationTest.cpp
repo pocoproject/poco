@@ -1,7 +1,7 @@
 //
 // WinConfigurationTest.cpp
 //
-// $Id: //poco/1.2/Util/testsuite/src/WinConfigurationTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/WinConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

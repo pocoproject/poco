@@ -1,7 +1,7 @@
 //
 // Subsystem.h
 //
-// $Id: //poco/1.2/Util/include/Poco/Util/Subsystem.h#1 $
+// $Id: //poco/1.3/Util/include/Poco/Util/Subsystem.h#1 $
 //
 // Library: Util
 // Package: Application
