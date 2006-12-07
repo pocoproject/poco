@@ -1,7 +1,7 @@
 //
 // Base64Decoder.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Base64Decoder.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/Base64Decoder.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -64,7 +64,7 @@ Base64DecoderBuf::Base64DecoderBuf(std::istream& istr):
 		{
 			IN_ENCODING[Base64EncoderBuf::OUT_ENCODING[i]] = i;
 		}
-		IN_ENCODING['='] = 0;
+		IN_ENCODING[static_cast<unsigned char>('=')] = '\0';
 		IN_ENCODING_INIT = true;
 	}
 }

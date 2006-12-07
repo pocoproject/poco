@@ -1,7 +1,7 @@
 //
 // MemoryPool.cpp
 //
-// $Id: //poco/1.2/Foundation/src/MemoryPool.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/MemoryPool.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -41,7 +41,7 @@
 namespace Poco {
 
 
-MemoryPool::MemoryPool(size_t blockSize, int preAlloc, int maxAlloc):
+MemoryPool::MemoryPool(std::size_t blockSize, int preAlloc, int maxAlloc):
 	_blockSize(blockSize),
 	_maxAlloc(maxAlloc),
 	_allocated(preAlloc)

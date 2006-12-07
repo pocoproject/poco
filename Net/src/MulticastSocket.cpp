@@ -1,7 +1,7 @@
 //
 // MulticastSocket.cpp
 //
-// $Id: //poco/1.2/Net/src/MulticastSocket.cpp#1 $
+// $Id: //poco/1.2/Net/src/MulticastSocket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -185,7 +185,7 @@ void MulticastSocket::setTimeToLive(unsigned value)
 	
 unsigned MulticastSocket::getTimeToLive() const
 {
-	unsigned ttl;
+	unsigned ttl(0);
 	if (address().af() == AF_INET)
 	{
 		unsigned char cttl;

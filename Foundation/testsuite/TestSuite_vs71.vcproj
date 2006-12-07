@@ -965,6 +965,12 @@
 				<File
 					RelativePath=".\src\LRUCacheTest.cpp">
 				</File>
+				<File
+					RelativePath=".\src\UniqueExpireCacheTest.cpp">
+				</File>
+				<File
+					RelativePath=".\src\UniqueExpireLRUCacheTest.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -980,6 +986,12 @@
 				</File>
 				<File
 					RelativePath=".\src\LRUCacheTest.h">
+				</File>
+				<File
+					RelativePath=".\src\UniqueExpireCacheTest.h">
+				</File>
+				<File
+					RelativePath=".\src\UniqueExpireLRUCacheTest.h">
 				</File>
 			</Filter>
 		</Filter>

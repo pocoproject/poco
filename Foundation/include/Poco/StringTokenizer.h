@@ -1,7 +1,7 @@
 //
 // StringTokenizer.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/StringTokenizer.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/StringTokenizer.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include <vector>
+#include <cstddef>
 
 
 namespace Poco {
@@ -79,11 +80,11 @@ public:
 	Iterator begin() const;
 	Iterator end() const;
 	
-	const std::string& operator [] (int index) const;
+	const std::string& operator [] (std::size_t index) const;
 		/// Returns the index'th token.
 		/// Throws a RangeException if the index is out of range.
 		
-	int count() const;
+	std::size_t count() const;
 		/// Returns the number of tokens.
 
 private:
@@ -111,16 +112,16 @@ inline StringTokenizer::Iterator StringTokenizer::end() const
 }
 
 
-inline const std::string& StringTokenizer::operator [] (int index) const
+inline const std::string& StringTokenizer::operator [] (std::size_t index) const
 {
-	if (index < 0 || index >= _tokens.size()) throw RangeException();
+	if (index >= _tokens.size()) throw RangeException();
 	return _tokens[index];
 }
 
 
-inline int StringTokenizer::count() const
+inline std::size_t StringTokenizer::count() const
 {
-	return (int) _tokens.size();
+	return _tokens.size();
 }
 
 

@@ -1,7 +1,7 @@
 //
 // LayeredConfigurationTest.h
 //
-// $Id: //poco/1.2/Util/testsuite/src/LayeredConfigurationTest.h#1 $
+// $Id: //poco/1.2/Util/testsuite/src/LayeredConfigurationTest.h#2 $
 //
 // Definition of the LayeredConfigurationTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testEmpty();
 	void testOneLayer();
 	void testTwoLayers();
+	void testThreeLayers();
 
 	void setUp();
 	void tearDown();

@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.2/build/rules/global#1 $
+# $Id: //poco/1.2/build/rules/global#2 $
 #
 # global
 #
@@ -130,7 +130,7 @@ endif
 #
 # Compose compiler flags
 #
-COMMONFLAGS = -DPOCO_BUILD_HOST=$(HOSTNAME)
+COMMONFLAGS = -DPOCO_BUILD_HOST=$(HOSTNAME) $(POCO_FLAGS)
 CFLAGS     += $(COMMONFLAGS) $(SYSFLAGS)
 CXXFLAGS   += $(COMMONFLAGS) $(SYSFLAGS)
 LINKFLAGS  += $(COMMONFLAGS) $(SYSFLAGS)

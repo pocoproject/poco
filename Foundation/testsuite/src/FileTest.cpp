@@ -1,7 +1,7 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/FileTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/FileTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -269,6 +269,24 @@ void FileTest::testCompare()
 }
 
 
+void FileTest::testRootDir()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	File f1("/");
+	File f2("c:/");
+	File f3("c:\\");
+	File f4("\\");
+	assert (f1.exists());
+	assert (f2.exists());
+	assert (f3.exists());
+	assert (f4.exists());
+#else
+	File f1("/");
+	assert (f1.exists());
+#endif
+}
+
+
 void FileTest::testSwap()
 {
 	File f1("abc.txt");
@@ -429,6 +447,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testCopy);
 	CppUnit_addTest(pSuite, FileTest, testMove);
 	CppUnit_addTest(pSuite, FileTest, testRename);
+	CppUnit_addTest(pSuite, FileTest, testRootDir);
 
 	return pSuite;
 }

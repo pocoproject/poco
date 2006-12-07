@@ -1,7 +1,7 @@
 //
 // Logger.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Logger.h#2 $
+// $Id: //poco/1.2/Foundation/include/Poco/Logger.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -45,6 +45,7 @@
 #include "Poco/Message.h"
 #include <map>
 #include <vector>
+#include <cstddef>
 
 
 namespace Poco {
@@ -177,7 +178,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 		
-	void dump(const std::string& msg, const void* buffer, int length, Message::Priority prio = Message::PRIO_DEBUG);
+	void dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio = Message::PRIO_DEBUG);
 		/// Logs the given message, followed by the data in buffer.
 		///
 		/// The data in buffer is written in canonical hex+ASCII form:
@@ -299,7 +300,7 @@ protected:
 	void log(const std::string& text, Message::Priority prio);
 
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
-	static void formatDump(std::string& message, const void* buffer, int length);
+	static void formatDump(std::string& message, const void* buffer, std::size_t length);
 	static Logger& parent(const std::string& name);
 	static void add(Logger* pLogger);
 	static Logger* find(const std::string& name);

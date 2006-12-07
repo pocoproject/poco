@@ -1,7 +1,7 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/1.2/Foundation/src/RegularExpression.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/RegularExpression.cpp#2 $
 //
 // Library: Foundation
 // Package: RegExp
@@ -147,6 +147,14 @@ bool RegularExpression::match(const std::string& subject, std::string::size_type
 }
 
 
+bool RegularExpression::match(const std::string& subject, std::string::size_type offset, int options) const
+{
+	Match mtch;
+	match(subject, offset, mtch, options);
+	return mtch.offset == offset && mtch.length == subject.length() - offset;
+}
+
+
 int RegularExpression::extract(const std::string& subject, std::string& str, int options) const
 {
 	Match mtch;
@@ -283,8 +291,10 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 
 bool RegularExpression::match(const std::string& subject, const std::string& pattern, int options)
 {
-	RegularExpression re(pattern, options, false);
-	return re.match(subject);
+	int ctorOptions = options & (RE_CASELESS | RE_MULTILINE | RE_DOTALL | RE_EXTENDED | RE_ANCHORED | RE_DOLLAR_ENDONLY | RE_EXTRA | RE_UNGREEDY | RE_UTF8 | RE_NO_AUTO_CAPTURE);
+	int mtchOptions = options & (RE_ANCHORED | RE_NOTBOL | RE_NOTEOL | RE_NOTEMPTY | RE_NO_AUTO_CAPTURE | RE_NO_UTF8_CHECK);
+	RegularExpression re(pattern, ctorOptions, false);
+	return re.match(subject, 0, mtchOptions);
 }
 
 

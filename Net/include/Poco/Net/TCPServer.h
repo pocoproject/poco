@@ -1,7 +1,7 @@
 //
 // TCPServer.h
 //
-// $Id: //poco/1.2/Net/include/Poco/Net/TCPServer.h#1 $
+// $Id: //poco/1.2/Net/include/Poco/Net/TCPServer.h#2 $
 //
 // Library: Net
 // Package: TCPServer
@@ -152,16 +152,19 @@ public:
 		/// Returns the total number of handled connections.
 		
 	int currentConnections() const;
-		/// Returns the number of currently handled connections.	
+		/// Returns the number of currently handled connections.
 
 	int maxConcurrentConnections() const;
 		/// Returns the maximum number of concurrently handled connections.	
 		
 	int queuedConnections() const;
-		/// Returns the number of queued connections.	
+		/// Returns the number of queued connections.
 
 	int refusedConnections() const;
 		/// Returns the number of refused connections.
+
+	Poco::UInt16 port() const;
+		/// Returns the port the server socket listens to
 
 protected:
 	void run();
@@ -183,6 +186,12 @@ private:
 	Poco::Thread         _thread;
 	bool                 _stopped;
 };
+
+
+inline Poco::UInt16 TCPServer::port() const
+{
+	return _socket.address().port();
+}
 
 
 } } // namespace Poco::Net

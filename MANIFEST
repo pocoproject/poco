@@ -182,6 +182,7 @@ Foundation/include/Poco/EventLogChannel.h
 Foundation/include/Poco/Event_POSIX.h
 Foundation/include/Poco/Event_WIN32.h
 Foundation/include/Poco/Exception.h
+Foundation/include/Poco/ExpirationDecorator.h
 Foundation/include/Poco/Expire.h
 Foundation/include/Poco/ExpireCache.h
 Foundation/include/Poco/ExpireLRUCache.h
@@ -347,6 +348,9 @@ Foundation/include/Poco/Token.h
 Foundation/include/Poco/Types.h
 Foundation/include/Poco/UnbufferedStreamBuf.h
 Foundation/include/Poco/UnicodeConverter.h
+Foundation/include/Poco/UniqueExpireCache.h
+Foundation/include/Poco/UniqueExpireLRUCache.h
+Foundation/include/Poco/UniqueExpireStrategy.h
 Foundation/include/Poco/URI.h
 Foundation/include/Poco/URIStreamFactory.h
 Foundation/include/Poco/URIStreamOpener.h
@@ -912,6 +916,10 @@ Foundation/testsuite/src/TimestampTest.cpp
 Foundation/testsuite/src/TimestampTest.h
 Foundation/testsuite/src/TimezoneTest.cpp
 Foundation/testsuite/src/TimezoneTest.h
+Foundation/testsuite/src/UniqueExpireCacheTest.cpp
+Foundation/testsuite/src/UniqueExpireCacheTest.h
+Foundation/testsuite/src/UniqueExpireLRUCacheTest.cpp
+Foundation/testsuite/src/UniqueExpireLRUCacheTest.h
 Foundation/testsuite/src/URIStreamOpenerTest.cpp
 Foundation/testsuite/src/URIStreamOpenerTest.h
 Foundation/testsuite/src/URITest.cpp

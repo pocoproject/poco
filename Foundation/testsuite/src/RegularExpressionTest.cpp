@@ -1,7 +1,7 @@
 //
 // RegularExpressionTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/RegularExpressionTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/RegularExpressionTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -146,6 +146,15 @@ void RegularExpressionTest::testMatch5()
 	assert (RegularExpression::match(digits, "[0-9]+"));
 	std::string alphas = "abcd";
 	assert (!RegularExpression::match(alphas, "[0-9]+"));
+}
+
+
+void RegularExpressionTest::testMatch6()
+{
+	RegularExpression expr("^([a-z]*)?$");
+	assert (expr.match("", 0, 0));
+	assert (expr.match("abcde", 0, 0));
+	assert (!expr.match("123", 0, 0));
 }
 
 
@@ -296,6 +305,7 @@ CppUnit::Test* RegularExpressionTest::suite()
 	CppUnit_addTest(pSuite, RegularExpressionTest, testMatch3);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testMatch4);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testMatch5);
+	CppUnit_addTest(pSuite, RegularExpressionTest, testMatch6);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testExtract);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSplit1);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSplit2);

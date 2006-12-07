@@ -1,7 +1,7 @@
 //
 // PatternFormatterTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/PatternFormatterTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/PatternFormatterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -88,6 +88,16 @@ void PatternFormatterTest::testPatternFormatter()
 	fmt.format(msg, result);
 	assert (result.find("2005-01-01 ") == 0);
 	assert (result.find(":TestSource]3-Test message text") != std::string::npos);
+	
+	result.clear();
+	fmt.setProperty("pattern", "%[testParam]");
+	fmt.format(msg, result);
+	assert (result == "Test Parameter");
+
+	result.clear();
+	fmt.setProperty("pattern", "%[testParam] %p");
+	fmt.format(msg, result);
+	assert (result == "Test Parameter Error");
 }
 
 

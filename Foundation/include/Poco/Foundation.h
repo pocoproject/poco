@@ -1,7 +1,7 @@
 //
 // Foundation.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Foundation.h#2 $
+// $Id: //poco/1.2/Foundation/include/Poco/Foundation.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -43,6 +43,12 @@
 
 
 //
+// Include library configuration
+//
+#include "Poco/Config.h"
+
+
+//
 // Ensure that POCO_DLL is default unless POCO_STATIC is defined
 //
 #if defined(_WIN32) && defined(_DLL)
@@ -72,12 +78,6 @@
 #if !defined(Foundation_API)
 	#define Foundation_API
 #endif
-
-
-//
-// Include library configuration
-//
-#include "Poco/Config.h"
 
 
 //

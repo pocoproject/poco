@@ -1,7 +1,7 @@
 //
 // UtilTestSuite.cpp
 //
-// $Id: //poco/1.2/Util/testsuite/src/UtilTestSuite.cpp#1 $
+// $Id: //poco/1.2/Util/testsuite/src/UtilTestSuite.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -40,7 +40,7 @@
 
 CppUnit::Test* UtilTestSuite::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ConfigurationTestSuite");
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UtilTestSuite");
 
 	pSuite->addTest(ConfigurationTestSuite::suite());
 	pSuite->addTest(OptionsTestSuite::suite());

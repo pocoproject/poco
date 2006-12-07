@@ -1,7 +1,7 @@
 //
 // AbstractEvent.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/AbstractEvent.h#3 $
+// $Id: //poco/1.2/Foundation/include/Poco/AbstractEvent.h#4 $
 //
 // Library: Foundation
 // Package: Events
@@ -76,12 +76,15 @@ class AbstractEvent
 	///         ...
 	///     };
 	///
-	/// Throwing the event can be done either by the events notify or notifyAsync method:
+	/// Throwing the event can be done either by the events notify() or notifyAsync() method:
+	///
+	///
+	/// Alternatively, instead of notify(), operator () can be used.
 	///
 	///     void MyData::setAge(int i)
 	///     {
 	///         this->_age = i;
-	///         AgeChanged.notify(this, this->_age);
+	///         AgeChanged(this, this->_age);
 	///     }
 	///
 	/// Note that notify and notifyAsync do not catch exceptions, i.e. in case a delegate 
@@ -170,6 +173,11 @@ public:
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		_strategy.remove(aDelegate);
+	}
+	
+	void operator () (const void* pSender, TArgs& args)
+	{
+		notify(pSender, args);
 	}
 
 	void notify(const void* pSender, TArgs& args)

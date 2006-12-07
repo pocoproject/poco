@@ -1,7 +1,7 @@
 //
 // Buffer.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Buffer.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Buffer.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <cstddef>
 
 
 namespace Poco {
@@ -56,7 +57,7 @@ class Buffer
 	/// is needed.
 {
 public:
-	Buffer(int size):
+	Buffer(std::size_t size):
 		_size(size),
 		_ptr(new T[size])
 		/// Creates and allocates the Buffer.
@@ -69,7 +70,7 @@ public:
 		delete [] _ptr;
 	}
 	
-	int size() const
+	std::size_t size() const
 		/// Returns the size of the buffer.
 	{
 		return _size;
@@ -99,14 +100,14 @@ public:
 		return _ptr + _size;
 	}
 	
-	T& operator [] (int index)
+	T& operator [] (std::size_t index)
 	{
 		poco_assert (index >= 0 && index < _size);
 		
 		return _ptr[index];
 	}
 
-	const T& operator [] (int index) const
+	const T& operator [] (std::size_t index) const
 	{
 		poco_assert (index >= 0 && index < _size);
 		
@@ -118,8 +119,8 @@ private:
 	Buffer(const Buffer&);
 	Buffer& operator = (const Buffer&);
 
-	int _size;
-	T*  _ptr;
+	std::size_t _size;
+	T* _ptr;
 };
 
 

@@ -1,7 +1,7 @@
 //
 // Environment.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Environment.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Environment.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -55,6 +55,11 @@ public:
 		/// Returns the value of the environment variable
 		/// with the given name. Throws a NotFoundException
 		/// if the variable does not exist.
+		
+	static std::string get(const std::string& name, const std::string& defaultValue);
+		/// Returns the value of the environment variable
+		/// with the given name. If the environment variable
+		/// is undefined, returns defaultValue instead.
 		
 	static bool has(const std::string& name);
 		/// Returns true iff an environment variable

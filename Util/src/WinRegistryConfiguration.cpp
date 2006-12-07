@@ -1,7 +1,7 @@
 //
 // WinRegistryConfiguration.cpp
 //
-// $Id: //poco/1.2/Util/src/WinRegistryConfiguration.cpp#1 $
+// $Id: //poco/1.2/Util/src/WinRegistryConfiguration.cpp#2 $
 //
 // Library: Util
 // Package: Windows
@@ -47,7 +47,8 @@ namespace Util {
 WinRegistryConfiguration::WinRegistryConfiguration(const std::string& rootPath): _rootPath(rootPath)
 {
 	// rootPath must end with backslash
-	if (*(--_rootPath.end()) != '\\')
+	std::string::iterator it = _rootPath.end();
+	if (*(--it) != '\\')
 		_rootPath.append("\\");
 }
 

@@ -1,7 +1,7 @@
 //
 // Message.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Message.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Message.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -93,6 +93,9 @@ public:
 	
 	Message& operator = (const Message& msg);
 		/// Assignment operator.
+		
+	void swap(Message& msg);
+		/// Swaps the message with another one.	
 		
 	void setSource(const std::string& src);
 		/// Sets the source of the message.
@@ -199,6 +202,12 @@ inline long Message::getTid() const
 inline long Message::getPid() const
 {
 	return _pid;
+}
+
+
+inline void swap(Message& m1, Message& m2)
+{
+	m1.swap(m2);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Option.h
 //
-// $Id: //poco/1.2/Util/include/Poco/Util/Option.h#2 $
+// $Id: //poco/1.2/Util/include/Poco/Util/Option.h#3 $
 //
 // Library: Util
 // Package: Options
@@ -50,6 +50,7 @@ namespace Util {
 
 class Application;
 class Validator;
+class AbstractConfiguration;
 
 
 class Util_API Option
@@ -146,6 +147,12 @@ public:
 		/// Binds the option to the configuration property with the given name.
 		///
 		/// The configuration will automatically receive the option's argument.
+
+	Option& binding(const std::string& propertyName, AbstractConfiguration* pConfig);
+		/// Binds the option to the configuration property with the given name, 
+		/// using the given AbstractConfiguration.
+		///
+		/// The configuration will automatically receive the option's argument.
 		
 	Option& callback(const AbstractOptionCallback& cb);
 		/// Binds the option to the given method.
@@ -204,6 +211,9 @@ public:
 		/// Returns the option's Validator, if one has been specified,
 		/// or NULL otherwise.	
 		
+	AbstractConfiguration* config() const;
+		/// Returns the configuration, if specified, or NULL otherwise.
+		
 	bool matchesShort(const std::string& option) const;
 		/// Returns true if the given option string matches the
 		/// short name.
@@ -251,6 +261,7 @@ private:
 	std::string _binding;
 	Validator*  _pValidator;
 	AbstractOptionCallback* _pCallback;
+	AbstractConfiguration*  _pConfig;
 };
 
 
@@ -328,6 +339,12 @@ inline AbstractOptionCallback* Option::callback() const
 inline Validator* Option::validator() const
 {
 	return _pValidator;
+}
+
+
+inline AbstractConfiguration* Option::config() const
+{
+	return _pConfig;
 }
 
 

@@ -13,43 +13,49 @@ set OPENSSL_LIB=%OPENSSL_DIR%\lib\VC
 set INCLUDE=%INCLUDE%;%OPENSSL_INCLUDE%
 set LIB=%LIB%;%OPENSSL_LIB%
 
+set POCOBASE=%CD%
+
 cd CppUnit
 devenv /useenv /rebuild debug_shared CppUnit_vs80.sln
 devenv /useenv /rebuild release_shared CppUnit_vs80.sln
-cd ..
+cd %POCOBASE%
 
 cd Foundation
 devenv /useenv /rebuild debug_shared Foundation_vs80.sln
 devenv /useenv /rebuild release_shared Foundation_vs80.sln
-cd samples
-devenv /useenv /rebuild debug_shared samples_vs80.sln
-devenv /useenv /rebuild release_shared samples_vs80.sln
-cd ..
-cd ..
+cd %POCOBASE%
 
 cd XML
 devenv /useenv /rebuild debug_shared XML_vs80.sln
 devenv /useenv /rebuild release_shared XML_vs80.sln
-cd samples
-devenv /useenv /rebuild debug_shared samples_vs80.sln
-devenv /useenv /rebuild release_shared samples_vs80.sln
-cd ..
-cd ..
+cd %POCOBASE%
 
 cd Util
 devenv /useenv /rebuild debug_shared Util_vs80.sln
 devenv /useenv /rebuild release_shared Util_vs80.sln
-cd samples
-devenv /useenv /rebuild debug_shared samples_vs80.sln
-devenv /useenv /rebuild release_shared samples_vs80.sln
-cd ..
-cd ..
+cd %POCOBASE%
 
 cd Net
 devenv /useenv /rebuild debug_shared Net_vs80.sln
 devenv /useenv /rebuild release_shared Net_vs80.sln
-cd samples
+cd %POCOBASE%
+		
+cd Foundation/samples
 devenv /useenv /rebuild debug_shared samples_vs80.sln
 devenv /useenv /rebuild release_shared samples_vs80.sln
-cd ..
-cd ..
+cd %POCOBASE%
+		
+cd XML/samples
+devenv /useenv /rebuild debug_shared samples_vs80.sln
+devenv /useenv /rebuild release_shared samples_vs80.sln
+cd %POCOBASE%
+		
+cd Util/samples
+devenv /useenv /rebuild debug_shared samples_vs80.sln
+devenv /useenv /rebuild release_shared samples_vs80.sln
+cd %POCOBASE%
+		
+cd Net/samples
+devenv /useenv /rebuild debug_shared samples_vs80.sln
+devenv /useenv /rebuild release_shared samples_vs80.sln
+cd %POCOBASE%

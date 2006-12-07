@@ -1,7 +1,7 @@
 //
 // SAXParser.h
 //
-// $Id: //poco/1.2/XML/include/Poco/SAX/SAXParser.h#1 $
+// $Id: //poco/1.2/XML/include/Poco/SAX/SAXParser.h#2 $
 //
 // Library: XML
 // Package: SAX
@@ -80,7 +80,7 @@ public:
 		/// the XML document.
 
 	void addEncoding(const XMLString& name, Poco::TextEncoding* pEncoding);
-		/// Adds an encoding to the parser.
+		/// Adds an encoding to the parser. Does not take ownership of the pointer!
 
 	/// XMLReader
 	void setEntityResolver(EntityResolver* pResolver);

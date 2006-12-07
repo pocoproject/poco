@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.2/Foundation/testsuite/Makefile-Driver#1 $
+# $Id: //poco/1.2/Foundation/testsuite/Makefile-Driver#2 $
 #
 # Makefile for Poco Foundation testsuite
 #
@@ -33,7 +33,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	TimespanTest TimestampTest TimezoneTest URIStreamOpenerTest URITest \
 	URITestSuite UUIDGeneratorTest UUIDTest UUIDTestSuite ZLibTest \
 	TestPlugin DummyDelegate BasicEventTest FIFOEventTest PriorityEventTest EventTestSuite \
-	LRUCacheTest ExpireCacheTest ExpireLRUCacheTest CacheTestSuite AnyTest HashTest FormatTest
+	LRUCacheTest ExpireCacheTest ExpireLRUCacheTest UniqueExpireCacheTest UniqueExpireLRUCacheTest \
+	CacheTestSuite AnyTest HashTest FormatTest
 
 target         = testrunner
 target_version = 1
