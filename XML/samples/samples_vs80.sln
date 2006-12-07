@@ -1,0 +1,37 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SAXParser", "SAXParser\SAXParser_vs80.vcproj", "{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PrettyPrint", "PrettyPrint\PrettyPrint_vs80.vcproj", "{5A6FC255-BE1D-4E09-A680-A67FF16E832F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DOMParser", "DOMParser\DOMParser_vs80.vcproj", "{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DOMWriter", "DOMWriter\DOMWriter_vs80.vcproj", "{68F63799-6BCA-4058-89AC-DAC545C6AB0F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Win32 = debug_shared|Win32
+		release_shared|Win32 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{7E4D1B8E-B4FE-432A-92C9-352C98B646B4}.release_shared|Win32.Build.0 = release_shared|Win32
+		{5A6FC255-BE1D-4E09-A680-A67FF16E832F}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{5A6FC255-BE1D-4E09-A680-A67FF16E832F}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{5A6FC255-BE1D-4E09-A680-A67FF16E832F}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{5A6FC255-BE1D-4E09-A680-A67FF16E832F}.release_shared|Win32.Build.0 = release_shared|Win32
+		{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{383DAD0B-41DF-4130-B3E3-C9A6B19E9F3A}.release_shared|Win32.Build.0 = release_shared|Win32
+		{68F63799-6BCA-4058-89AC-DAC545C6AB0F}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{68F63799-6BCA-4058-89AC-DAC545C6AB0F}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{68F63799-6BCA-4058-89AC-DAC545C6AB0F}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{68F63799-6BCA-4058-89AC-DAC545C6AB0F}.release_shared|Win32.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

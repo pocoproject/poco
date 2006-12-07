@@ -1,0 +1,16 @@
+#! /bin/sh
+#
+# $Id: //poco/1.2/build/script/projname#1 $
+#
+# projname
+#
+# Extract the project name from the current path
+# NOTE: the cd $POCO_BASE is necessary to resolve symbolic links,
+#       ditto is the kinda strange sh -c pwd
+#
+
+cdir=`sh -c pwd`
+cd $POCO_BASE
+pocobase=`sh -c pwd`
+cd "$cdir"
+sh -c pwd | sed "s:^$pocobase::" | sed "s:^/::"
