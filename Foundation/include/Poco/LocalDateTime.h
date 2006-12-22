@@ -1,7 +1,7 @@
 //
 // LocalDateTime.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LocalDateTime.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/LocalDateTime.h#1 $
 //
 // Library: Foundation
 // Package: DateTime

@@ -1,7 +1,7 @@
 //
 // TimespanTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TimespanTest.cpp#11 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TimespanTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

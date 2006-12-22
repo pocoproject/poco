@@ -1,7 +1,7 @@
 //
 // NamedEventTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NamedEventTest.h#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/NamedEventTest.h#1 $
 //
 // Definition of the NamedEventTest class.
 //

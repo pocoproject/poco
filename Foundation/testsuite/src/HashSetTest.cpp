@@ -1,7 +1,7 @@
 //
 // HashSetTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashSetTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/HashSetTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

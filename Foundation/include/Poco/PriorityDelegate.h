@@ -1,7 +1,7 @@
 //
 // PriorityDelegate.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/PriorityDelegate.h#5 $
+// $Id: //poco/1.3/Foundation/include/Poco/PriorityDelegate.h#1 $
 //
 // Library: Foundation
 // Package: Events

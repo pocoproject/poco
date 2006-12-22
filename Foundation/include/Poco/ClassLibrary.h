@@ -1,7 +1,7 @@
 //
 // ClassLibrary.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/ClassLibrary.h#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary

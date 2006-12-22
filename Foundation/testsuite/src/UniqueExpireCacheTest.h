@@ -1,7 +1,7 @@
 //
 // UniqueExpireCacheTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/UniqueExpireCacheTest.h#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/UniqueExpireCacheTest.h#1 $
 //
 // Tests for ExpireCache
 //

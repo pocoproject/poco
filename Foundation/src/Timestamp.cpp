@@ -1,7 +1,7 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timestamp.cpp#11 $
+// $Id: //poco/1.3/Foundation/src/Timestamp.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime

@@ -1,7 +1,7 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/Main/Foundation/src/Exception.cpp#19 $
+// $Id: //poco/1.3/Foundation/src/Exception.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

@@ -1,7 +1,7 @@
 //
 // SemaphoreTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SemaphoreTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/SemaphoreTest.h#1 $
 //
 // Definition of the SemaphoreTest class.
 //

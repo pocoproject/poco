@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/BinaryReaderWriter/Makefile#5 $
+# $Id: //poco/1.3/Foundation/samples/BinaryReaderWriter/Makefile#1 $
 #
 # Makefile for Poco BinaryReaderWriter
 #

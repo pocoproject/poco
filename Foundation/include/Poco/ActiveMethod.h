@@ -1,7 +1,7 @@
 //
 // ActiveMethod.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ActiveMethod.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/ActiveMethod.h#1 $
 //
 // Library: Foundation
 // Package: Threading

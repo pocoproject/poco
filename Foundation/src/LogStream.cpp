@@ -1,7 +1,7 @@
 //
 // LogStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/LogStream.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/LogStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging

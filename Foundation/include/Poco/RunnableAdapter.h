@@ -1,7 +1,7 @@
 //
 // RunnableAdapter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/RunnableAdapter.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/RunnableAdapter.h#1 $
 //
 // Library: Foundation
 // Package: Threading

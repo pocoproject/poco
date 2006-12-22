@@ -1,7 +1,7 @@
 //
 // NamedEvent_VMS.cpp
 //
-// $Id: //poco/Main/Foundation/src/NamedEvent_VMS.cpp#8 $
+// $Id: //poco/1.3/Foundation/src/NamedEvent_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes

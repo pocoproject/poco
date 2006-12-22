@@ -1,7 +1,7 @@
 //
 // FPEnvironment_SUN.cpp
 //
-// $Id: //poco/Main/Foundation/src/FPEnvironment_SUN.cpp#9 $
+// $Id: //poco/1.3/Foundation/src/FPEnvironment_SUN.cpp#1 $
 //
 // Library: Foundation
 // Package: Core

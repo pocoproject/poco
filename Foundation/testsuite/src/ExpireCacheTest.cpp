@@ -1,7 +1,7 @@
 //
 // ExpireCacheTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ExpireCacheTest.cpp#9 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ExpireCacheTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

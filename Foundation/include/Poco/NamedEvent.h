@@ -1,7 +1,7 @@
 //
 // NamedEvent.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NamedEvent.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/NamedEvent.h#1 $
 //
 // Library: Foundation
 // Package: Processes

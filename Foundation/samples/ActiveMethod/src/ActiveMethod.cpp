@@ -1,7 +1,7 @@
 //
 // ActiveMethod.cpp
 //
-// $Id: //poco/Main/Foundation/samples/ActiveMethod/src/ActiveMethod.cpp#9 $
+// $Id: //poco/1.3/Foundation/samples/ActiveMethod/src/ActiveMethod.cpp#1 $
 //
 // This sample demonstrates the ActiveMethod and ActiveResult classes.
 //

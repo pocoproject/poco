@@ -1,7 +1,7 @@
 //
 // ThreadPoolTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ThreadPoolTest.h#9 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ThreadPoolTest.h#1 $
 //
 // Definition of the ThreadPoolTest class.
 //

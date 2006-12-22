@@ -1,7 +1,7 @@
 //
 // BasicEventTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/BasicEventTest.cpp#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/BasicEventTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

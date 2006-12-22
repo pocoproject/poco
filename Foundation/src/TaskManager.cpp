@@ -1,7 +1,7 @@
 //
 // TaskManager.cpp
 //
-// $Id: //poco/Main/Foundation/src/TaskManager.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/TaskManager.cpp#1 $
 //
 // Library: Foundation
 // Package: Tasks

@@ -1,7 +1,7 @@
 //
 // Hash.cpp
 //
-// $Id: //poco/Main/Foundation/src/Hash.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Hash.cpp#1 $
 //
 // Library: Foundation
 // Package: Hashing

@@ -1,7 +1,7 @@
 //
 // CountingStreamTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/CountingStreamTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CountingStreamTest.h#1 $
 //
 // Definition of the CountingStreamTest class.
 //

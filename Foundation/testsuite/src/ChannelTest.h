@@ -1,7 +1,7 @@
 //
 // ChannelTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ChannelTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ChannelTest.h#1 $
 //
 // Definition of the ChannelTest class.
 //

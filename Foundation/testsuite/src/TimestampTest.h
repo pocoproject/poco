@@ -1,7 +1,7 @@
 //
 // TimestampTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TimestampTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TimestampTest.h#1 $
 //
 // Definition of the TimestampTest class.
 //

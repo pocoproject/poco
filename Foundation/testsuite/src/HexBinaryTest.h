@@ -1,7 +1,7 @@
 //
 // HexBinaryTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HexBinaryTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/HexBinaryTest.h#1 $
 //
 // Definition of the HexBinaryTest class.
 //

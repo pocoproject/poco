@@ -1,7 +1,7 @@
 //
 // AnyTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/AnyTest.h#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/AnyTest.h#1 $
 //
 // Tests for Any types
 //

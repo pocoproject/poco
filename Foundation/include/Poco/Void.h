@@ -1,7 +1,7 @@
 //
 // Void.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Void.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/Void.h#1 $
 //
 // Library: Foundation
 // Package: Core

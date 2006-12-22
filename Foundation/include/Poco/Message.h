@@ -1,7 +1,7 @@
 //
 // Message.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Message.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/Message.h#2 $
 //
 // Library: Foundation
 // Package: Logging

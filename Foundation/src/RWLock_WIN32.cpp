@@ -1,7 +1,7 @@
 //
 // RWLock_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/RWLock_WIN32.cpp#11 $
+// $Id: //poco/1.3/Foundation/src/RWLock_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading

@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_VMS.cpp
 //
-// $Id: //poco/Main/Foundation/src/DirectoryIterator_VMS.cpp#11 $
+// $Id: //poco/1.3/Foundation/src/DirectoryIterator_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem

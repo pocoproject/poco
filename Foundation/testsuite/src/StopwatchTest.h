@@ -1,7 +1,7 @@
 //
 // StopwatchTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/StopwatchTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/StopwatchTest.h#1 $
 //
 // Definition of the StopwatchTest class.
 //

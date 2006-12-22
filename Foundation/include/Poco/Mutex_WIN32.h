@@ -1,7 +1,7 @@
 //
 // Mutex_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Mutex_WIN32.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Mutex_WIN32.h#1 $
 //
 // Library: Foundation
 // Package: Threading

@@ -1,7 +1,7 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/WinDriver.cpp#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/WinDriver.cpp#1 $
 //
 // Test driver for Windows.
 //

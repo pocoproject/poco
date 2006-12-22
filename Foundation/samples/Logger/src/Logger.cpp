@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/Main/Foundation/samples/Logger/src/Logger.cpp#9 $
+// $Id: //poco/1.3/Foundation/samples/Logger/src/Logger.cpp#1 $
 //
 // This class demonstrates the Logger, PatternFormatter, FormattingChannel,
 // ConsoleChannel and FileChannel classes.
@@ -39,7 +39,6 @@
 #include "Poco/ConsoleChannel.h"
 #include "Poco/FileChannel.h"
 #include "Poco/Message.h"
-#include "Poco/AutoPtr.h"
 
 
 using Poco::Logger;
@@ -48,22 +47,18 @@ using Poco::FormattingChannel;
 using Poco::ConsoleChannel;
 using Poco::FileChannel;
 using Poco::Message;
-using Poco::AutoPtr;
 
 
 int main(int argc, char** argv)
 {
 	// set up two channel chains - one to the
 	// console and the other one to a log file.
-	AutoPtr<FormattingChannel> pFCConsole(new FormattingChannel(new PatternFormatter("%s: %p: %t")));
-	AutoPtr<ConsoleChannel> pConsole(new ConsoleChannel);
-	pFCConsole->setChannel(pConsole);
+	FormattingChannel* pFCConsole = new FormattingChannel(new PatternFormatter("%s: %p: %t"));
+	pFCConsole->setChannel(new ConsoleChannel);
 	pFCConsole->open();
 	
-	AutoPtr<PatternFormatter> pPF(new PatternFormatter("%Y-%m-%d %H:%M:%S.%c %N[%P]:%s:%q:%t"));
-	AutoPtr<FormattingChannel> pFCFile(new FormattingChannel(pPF));
-	AutoPtr<FileChannel> pFC(new FileChannel("sample.log"));
-	pFCFile->setChannel(pFC);
+	FormattingChannel* pFCFile = new FormattingChannel(new PatternFormatter("%Y-%m-%d %H:%M:%S.%c %N[%P]:%s:%q:%t"));
+	pFCFile->setChannel(new FileChannel("sample.log"));
 	pFCFile->open();
 
 	// create two Logger objects - one for
@@ -76,7 +71,7 @@ int main(int argc, char** argv)
 	fileLogger.error("An error message");
 	
 	consoleLogger.warning("A warning message");
-	fileLogger.warning("A warning message");
+	fileLogger.error("A warning message");
 	
 	consoleLogger.information("An information message");
 	fileLogger.information("An information message");

@@ -1,7 +1,7 @@
 //
 // TaskManagerTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TaskManagerTest.h#7 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TaskManagerTest.h#1 $
 //
 // Definition of the TaskManagerTest class.
 //

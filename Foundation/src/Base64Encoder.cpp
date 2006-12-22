@@ -1,7 +1,7 @@
 //
 // Base64Encoder.cpp
 //
-// $Id: //poco/Main/Foundation/src/Base64Encoder.cpp#14 $
+// $Id: //poco/1.3/Foundation/src/Base64Encoder.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams

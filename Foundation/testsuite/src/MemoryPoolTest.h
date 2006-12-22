@@ -1,7 +1,7 @@
 //
 // MemoryPoolTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/MemoryPoolTest.h#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/MemoryPoolTest.h#1 $
 //
 // Definition of the MemoryPoolTest class.
 //

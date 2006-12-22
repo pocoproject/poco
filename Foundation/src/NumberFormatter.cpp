@@ -1,7 +1,7 @@
 //
 // NumberFormatter.cpp
 //
-// $Id: //poco/Main/Foundation/src/NumberFormatter.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/NumberFormatter.cpp#1 $
 //
 // Library: Foundation
 // Package: Core

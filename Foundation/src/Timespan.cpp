@@ -1,7 +1,7 @@
 //
 // Timespan.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timespan.cpp#12 $
+// $Id: //poco/1.3/Foundation/src/Timespan.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime

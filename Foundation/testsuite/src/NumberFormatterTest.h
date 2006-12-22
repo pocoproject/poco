@@ -1,7 +1,7 @@
 //
 // NumberFormatterTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NumberFormatterTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/NumberFormatterTest.h#1 $
 //
 // Definition of the NumberFormatterTest class.
 //

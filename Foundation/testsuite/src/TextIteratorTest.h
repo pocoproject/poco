@@ -1,7 +1,7 @@
 //
 // TextIteratorTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TextIteratorTest.h#9 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TextIteratorTest.h#1 $
 //
 // Definition of the TextIteratorTest class.
 //

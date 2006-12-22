@@ -1,7 +1,7 @@
 ;//
 ;// pocomsg.mc[.h]
 ;//
-;// $Id: //poco/Main/Foundation/src/pocomsg.mc#7 $
+;// $Id: //poco/1.3/Foundation/src/pocomsg.mc#1 $
 ;//
 ;// The Poco message source/header file.
 ;//

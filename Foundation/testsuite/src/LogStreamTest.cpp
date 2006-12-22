@@ -1,7 +1,7 @@
 //
 // LogStreamTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LogStreamTest.cpp#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/LogStreamTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.

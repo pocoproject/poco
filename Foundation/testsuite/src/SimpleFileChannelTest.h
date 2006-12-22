@@ -1,7 +1,7 @@
 //
 // SimpleFileChannelTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SimpleFileChannelTest.h#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/SimpleFileChannelTest.h#1 $
 //
 // Definition of the SimpleFileChannelTest class.
 //

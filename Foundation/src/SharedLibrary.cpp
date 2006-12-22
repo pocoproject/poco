@@ -1,7 +1,7 @@
 //
 // SharedLibrary.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedLibrary.cpp#12 $
+// $Id: //poco/1.3/Foundation/src/SharedLibrary.cpp#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary

@@ -1,7 +1,7 @@
 //
 // CacheTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/CacheTestSuite.h#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CacheTestSuite.h#1 $
 //
 // Definition of the CacheTestSuite class.
 //

@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LocalDateTimeTest.cpp#6 $
+// $Id: //poco/1.3/Foundation/testsuite/src/LocalDateTimeTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

@@ -1,7 +1,7 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/Main/Foundation/src/LoggingFactory.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/LoggingFactory.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging

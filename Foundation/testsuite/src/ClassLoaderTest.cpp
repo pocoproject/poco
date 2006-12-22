@@ -1,7 +1,7 @@
 //
 // ClassLoaderTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ClassLoaderTest.cpp#16 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ClassLoaderTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

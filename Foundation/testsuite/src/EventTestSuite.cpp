@@ -1,7 +1,7 @@
 //
 // EventTestSuite.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/EventTestSuite.cpp#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/EventTestSuite.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

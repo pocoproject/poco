@@ -1,7 +1,7 @@
 //
 // Environment_UNIX.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Environment_UNIX.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Environment_UNIX.h#1 $
 //
 // Library: Foundation
 // Package: Core

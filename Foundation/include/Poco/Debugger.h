@@ -1,7 +1,7 @@
 //
 // Debugger.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Debugger.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Debugger.h#1 $
 //
 // Library: Foundation
 // Package: Core

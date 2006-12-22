@@ -1,7 +1,7 @@
 //
 // DateTimeFormat.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DateTimeFormat.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/DateTimeFormat.h#1 $
 //
 // Library: Foundation
 // Package: DateTime

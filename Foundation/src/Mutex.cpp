@@ -1,7 +1,7 @@
 //
 // Mutex.cpp
 //
-// $Id: //poco/Main/Foundation/src/Mutex.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/Mutex.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading

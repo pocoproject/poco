@@ -1,7 +1,7 @@
 //
 // ThreadLocal.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ThreadLocal.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/ThreadLocal.h#1 $
 //
 // Library: Foundation
 // Package: Threading

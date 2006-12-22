@@ -1,7 +1,7 @@
 //
 // NumberFormatter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NumberFormatter.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/NumberFormatter.h#1 $
 //
 // Library: Foundation
 // Package: Core

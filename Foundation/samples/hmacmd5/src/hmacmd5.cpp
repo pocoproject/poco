@@ -1,7 +1,7 @@
 //
 // hmacmd5.cpp
 //
-// $Id: //poco/Main/Foundation/samples/hmacmd5/src/hmacmd5.cpp#9 $
+// $Id: //poco/1.3/Foundation/samples/hmacmd5/src/hmacmd5.cpp#1 $
 //
 // This sample demonstrates the HMACEngine class.
 //

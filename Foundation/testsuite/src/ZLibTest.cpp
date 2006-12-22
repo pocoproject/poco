@@ -1,7 +1,7 @@
 //
 // ZLibTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ZLibTest.cpp#9 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ZLibTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

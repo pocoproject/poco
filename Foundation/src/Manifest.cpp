@@ -1,7 +1,7 @@
 //
 // Manifest.cpp
 //
-// $Id: //poco/Main/Foundation/src/Manifest.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/Manifest.cpp#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary

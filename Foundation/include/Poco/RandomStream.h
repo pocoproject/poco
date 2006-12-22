@@ -1,7 +1,7 @@
 //
 // RandomStream.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/RandomStream.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/RandomStream.h#1 $
 //
 // Library: Foundation
 // Package: Crypt

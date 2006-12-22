@@ -1,7 +1,7 @@
 //
 // HMACEngine.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HMACEngine.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/HMACEngine.h#1 $
 //
 // Library: Foundation
 // Package: Crypt

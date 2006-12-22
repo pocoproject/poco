@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#12 $
+// $Id: //poco/1.3/Foundation/include/Poco/AbstractCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache

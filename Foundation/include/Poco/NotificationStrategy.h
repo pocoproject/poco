@@ -1,7 +1,7 @@
 //
 // NotificationStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NotificationStrategy.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/NotificationStrategy.h#1 $
 //
 // Library: Foundation
 // Package: Events

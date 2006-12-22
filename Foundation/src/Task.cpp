@@ -1,7 +1,7 @@
 //
 // Task.cpp
 //
-// $Id: //poco/Main/Foundation/src/Task.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/Task.cpp#1 $
 //
 // Library: Foundation
 // Package: Tasks

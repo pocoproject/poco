@@ -1,7 +1,7 @@
 //
 // Stopwatch.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Stopwatch.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Stopwatch.h#1 $
 //
 // Library: Foundation
 // Package: DateTime

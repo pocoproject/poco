@@ -1,7 +1,7 @@
 //
 // TaskTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TaskTest.cpp#6 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TaskTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

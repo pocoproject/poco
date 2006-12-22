@@ -1,7 +1,7 @@
 //
 // PatternFormatter.cpp
 //
-// $Id: //poco/Main/Foundation/src/PatternFormatter.cpp#13 $
+// $Id: //poco/1.3/Foundation/src/PatternFormatter.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging

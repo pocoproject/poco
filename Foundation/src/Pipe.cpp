@@ -1,7 +1,7 @@
 //
 // Pipe.cpp
 //
-// $Id: //poco/Main/Foundation/src/Pipe.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Pipe.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes

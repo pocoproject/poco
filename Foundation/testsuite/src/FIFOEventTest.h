@@ -1,7 +1,7 @@
 //
 // FIFOEventTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FIFOEventTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FIFOEventTest.h#1 $
 //
 // Definition of the FIFOEventTest class.
 //

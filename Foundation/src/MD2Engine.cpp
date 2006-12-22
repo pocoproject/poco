@@ -1,7 +1,7 @@
 //
 // MD2Engine.cpp
 //
-// $Id: //poco/Main/Foundation/src/MD2Engine.cpp#11 $
+// $Id: //poco/1.3/Foundation/src/MD2Engine.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt

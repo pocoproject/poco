@@ -1,7 +1,7 @@
 //
 // BinaryReaderWriterTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/BinaryReaderWriterTest.h#9 $
+// $Id: //poco/1.3/Foundation/testsuite/src/BinaryReaderWriterTest.h#1 $
 //
 // Definition of the BinaryReaderWriterTest class.
 //

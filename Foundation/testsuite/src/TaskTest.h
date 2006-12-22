@@ -1,7 +1,7 @@
 //
 // TaskTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TaskTest.h#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TaskTest.h#1 $
 //
 // Definition of the TaskTest class.
 //

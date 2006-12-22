@@ -1,7 +1,7 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FileTest.cpp#13 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FileTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

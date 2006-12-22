@@ -1,7 +1,7 @@
 //
 // BasicEventTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/BasicEventTest.h#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/BasicEventTest.h#1 $
 //
 // Tests for BasicEvent
 //

@@ -1,7 +1,7 @@
 //
 // StreamTokenizer.cpp
 //
-// $Id: //poco/Main/Foundation/src/StreamTokenizer.cpp#11 $
+// $Id: //poco/1.3/Foundation/src/StreamTokenizer.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams

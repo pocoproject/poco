@@ -1,7 +1,7 @@
 //
 // TypeList.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/TypeList.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/TypeList.h#2 $
 //
 // Library: Foundation
 // Package: Core

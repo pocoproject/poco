@@ -1,7 +1,7 @@
 //
 // Token.cpp
 //
-// $Id: //poco/Main/Foundation/src/Token.cpp#11 $
+// $Id: //poco/1.3/Foundation/src/Token.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams

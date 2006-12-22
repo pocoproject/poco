@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/hmacmd5/Makefile#5 $
+# $Id: //poco/1.3/Foundation/samples/hmacmd5/Makefile#1 $
 #
 # Makefile for Poco hmacmd5
 #

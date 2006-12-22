@@ -1,7 +1,7 @@
 //
 // HashMapTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashMapTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/HashMapTest.h#1 $
 //
 // Definition of the HashMapTest class.
 //

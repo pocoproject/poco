@@ -1,7 +1,7 @@
 //
 // ThreadPool.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ThreadPool.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/ThreadPool.h#1 $
 //
 // Library: Foundation
 // Package: Threading
