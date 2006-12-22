@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#1 $
+// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#2 $
 //
 // Library: Net
 // Package: Mail
@@ -53,14 +53,14 @@ namespace Net {
 
 SMTPClientSession::SMTPClientSession(const StreamSocket& socket):
 	_socket(socket),
-	_isOpen(true)
+	_isOpen(false)
 {
 }
 
 
 SMTPClientSession::SMTPClientSession(const std::string& host, Poco::UInt16 port):
 	_socket(SocketAddress(host, port)),
-	_isOpen(true)
+	_isOpen(false)
 {
 }
 
@@ -91,10 +91,9 @@ Poco::Timespan SMTPClientSession::getTimeout() const
 
 void SMTPClientSession::login(const std::string& hostname)
 {
+	open();
 	std::string response;
-	int status = _socket.receiveStatusMessage(response);
-	if (!isPositiveCompletion(status)) throw SMTPException("The mail service is unavailable", response);
-	status = sendCommand("EHLO", hostname, response);
+	int status = sendCommand("EHLO", hostname, response);
 	if (isPermanentNegative(status))
 		status = sendCommand("HELO", hostname, response);
 	if (!isPositiveCompletion(status)) throw SMTPException("Login failed", response);
@@ -104,6 +103,18 @@ void SMTPClientSession::login(const std::string& hostname)
 void SMTPClientSession::login()
 {
 	login(Environment::nodeName());
+}
+
+
+void SMTPClientSession::open()
+{
+	if (!_isOpen)
+	{
+		std::string response;
+		int status = _socket.receiveStatusMessage(response);
+		if (!isPositiveCompletion(status)) throw SMTPException("The mail service is unavailable", response);
+		_isOpen = true;
+	}
 }
 
 

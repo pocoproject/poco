@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#2 $
 //
 // Library: Net
 // Package: Mail
@@ -93,6 +93,15 @@ public:
 
 	void login();
 		/// Calls login(hostname) with the current host name.
+
+	void open();
+		/// Reads the initial response from the SMTP server.
+		///
+		/// Usually called implicitly through login(), but can
+		/// also be called explicitly to implement different forms
+		/// of SMTP authentication.
+		///
+		/// Does nothing if called more than once.
 
 	void close();
 		/// Sends a QUIT command and closes the connection to the server.	
