@@ -1,7 +1,7 @@
 //
 // TestSuite.h
 //
-// $Id: //poco/Main/CppUnit/include/CppUnit/TestSuite.h#7 $
+// $Id: //poco/1.3/CppUnit/include/CppUnit/TestSuite.h#1 $
 //
 
 

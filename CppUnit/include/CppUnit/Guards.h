@@ -1,7 +1,7 @@
 //
 // Guards.h
 //
-// $Id: //poco/Main/CppUnit/include/CppUnit/Guards.h#5 $
+// $Id: //poco/1.3/CppUnit/include/CppUnit/Guards.h#1 $
 //
 
 

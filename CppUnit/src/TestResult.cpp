@@ -1,7 +1,7 @@
 //
 // TestResult.cpp
 //
-// $Id: //poco/Main/CppUnit/src/TestResult.cpp#6 $
+// $Id: //poco/1.3/CppUnit/src/TestResult.cpp#1 $
 //
 
 

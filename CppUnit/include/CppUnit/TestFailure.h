@@ -1,7 +1,7 @@
 //
 // TestFailure.h
 //
-// $Id: //poco/Main/CppUnit/include/CppUnit/TestFailure.h#7 $
+// $Id: //poco/1.3/CppUnit/include/CppUnit/TestFailure.h#1 $
 //
 
 

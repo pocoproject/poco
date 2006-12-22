@@ -1,7 +1,7 @@
 //
 // DLLMain.cpp
 //
-// $Id: //poco/Main/CppUnit/WinTestRunner/src/DLLMain.cpp#5 $
+// $Id: //poco/1.3/CppUnit/WinTestRunner/src/DLLMain.cpp#1 $
 //
 
 

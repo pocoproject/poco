@@ -1,7 +1,7 @@
 //
 // estring.h
 //
-// $Id: //poco/Main/CppUnit/include/CppUnit/estring.h#7 $
+// $Id: //poco/1.3/CppUnit/include/CppUnit/estring.h#1 $
 //
 
 

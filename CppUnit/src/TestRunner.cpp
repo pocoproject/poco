@@ -1,7 +1,7 @@
 //
 // TestRunner.cpp
 //
-// $Id: //poco/Main/CppUnit/src/TestRunner.cpp#6 $
+// $Id: //poco/1.3/CppUnit/src/TestRunner.cpp#1 $
 //
 
 

@@ -1,7 +1,7 @@
 //
 // TestResult.h
 //
-// $Id: //poco/Main/CppUnit/include/CppUnit/TestResult.h#7 $
+// $Id: //poco/1.3/CppUnit/include/CppUnit/TestResult.h#1 $
 //
 
 

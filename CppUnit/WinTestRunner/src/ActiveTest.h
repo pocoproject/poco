@@ -1,7 +1,7 @@
 //
 // ActiveTest.h
 //
-// $Id: //poco/Main/CppUnit/WinTestRunner/src/ActiveTest.h#8 $
+// $Id: //poco/1.3/CppUnit/WinTestRunner/src/ActiveTest.h#1 $
 //
 
 
