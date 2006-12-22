@@ -1,7 +1,7 @@
 //
 // ProgressBar.cpp
 //
-// $Id: //poco/1.3/CppUnit/WinTestRunner/src/ProgressBar.cpp#1 $
+// $Id: //poco/Main/CppUnit/WinTestRunner/src/ProgressBar.cpp#6 $
 //
 
 

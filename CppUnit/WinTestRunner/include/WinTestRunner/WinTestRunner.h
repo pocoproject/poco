@@ -1,7 +1,7 @@
 //
 // WinTestRunner.h
 //
-// $Id: //poco/1.3/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#1 $
+// $Id: //poco/Main/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#8 $
 //
 // Application shell for CppUnit's TestRunner dialog.
 //
@@ -11,10 +11,14 @@
 #define WinTestRunner_H_INCLUDED
 
 
+#if !defined(POCO_STATIC)
 #if defined(WinTestRunner_EXPORTS)
-	#define WinTestRunner_API __declspec(dllexport)
+#define WinTestRunner_API __declspec(dllexport)
 #else
-	#define WinTestRunner_API __declspec(dllimport)
+#define WinTestRunner_API __declspec(dllimport)
+#endif
+#else
+#define WinTestRunner_API
 #endif
 
 

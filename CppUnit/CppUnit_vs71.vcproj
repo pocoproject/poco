@@ -4,8 +4,6 @@
 	Version="7.10"
 	Name="CppUnit"
 	ProjectGUID="{138BB448-808A-4FE5-A66D-78D1F8770F59}"
-	SccProjectName="CppUnit"
-	SccLocalPath="."
 	Keyword="MFCProj">
 	<Platforms>
 		<Platform
@@ -157,6 +155,133 @@
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
+		<Configuration
+			Name="debug_static|Win32"
+			OutputDirectory=".\obj\debug_static"
+			IntermediateDirectory=".\obj\debug_static"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="FALSE"
+				AdditionalIncludeDirectories="include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC"
+				StringPooling="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="TRUE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				PrecompiledHeaderFile=""
+				AssemblerListingLocation=""
+				ObjectFile="$(IntDir)/"
+				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="4"
+				CompileAs="0"
+				ShowIncludes="FALSE"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\CppUnitmtd.lib"/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="TRUE"
+				SuppressStartupBanner="TRUE"
+				TargetEnvironment="1"
+				TypeLibraryName=".\lib/CppUnit.tlb"
+				HeaderFileName=""/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="3079"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="release_static|Win32"
+			OutputDirectory=".\obj\release_static"
+			IntermediateDirectory=".\obj\release_static"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				AdditionalIncludeDirectories="include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_AFXDLL;POCO_STATIC;CppUnit_EXPORTS"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				PrecompiledHeaderFile=""
+				AssemblerListingLocation=""
+				ObjectFile="$(IntDir)/"
+				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\CppUnitmt.lib"/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="TRUE"
+				SuppressStartupBanner="TRUE"
+				TargetEnvironment="1"
+				TypeLibraryName=".\lib/CppUnit.tlb"
+				HeaderFileName=""/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="3079"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -174,6 +299,18 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="release_shared|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="debug_static|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="release_static|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
