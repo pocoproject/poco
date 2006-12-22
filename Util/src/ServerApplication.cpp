@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#1 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#2 $
 //
 // Library: Util
 // Package: Application
@@ -403,14 +403,18 @@ void ServerApplication::waitForTerminationRequest()
 
 int ServerApplication::run(int argc, char** argv)
 {
-	if (isDaemon(argc, argv))
+	bool runAsDaemon = isDaemon(argc, argv);
+	if (runAsDaemon)
 	{
 		beDaemon();
 	}
 	try
 	{
 		init(argc, argv);
-		chdir("/");
+		if (runAsDaemon)
+		{
+			chdir("/");
+		}
 	}
 	catch (Exception& exc)
 	{

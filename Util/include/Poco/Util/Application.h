@@ -1,7 +1,7 @@
 //
 // Application.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/Application.h#1 $
+// $Id: //poco/1.3/Util/include/Poco/Util/Application.h#2 $
 //
 // Library: Util
 // Package: Application
@@ -78,14 +78,21 @@ class Util_API Application: public Subsystem
 	/// There may be at most one instance of the Application class
 	/// in a process.
 	///
+	/// The Application class maintains a LayeredConfiguration (available
+	/// via the config() member function) consisting of:
+	///   - a MapConfiguration (priority -100) storing application-specific
+	///     properties, as well as properties from bound command line arguments.
+	///   - a SystemConfiguration (priority 100)
+	///   - the configurations loaded with loadConfiguration().
+	///
 	/// The Application class sets a few default properties in 
-	/// its configuration (available via the config() method).
-	/// These are:
+	/// its configuration. These are:
 	///   - application.path: the absolute path to application executable
 	///   - application.name: the file name of the application executable
 	///   - application.baseName: the file name (excluding extension) of the application executable
 	///   - application.dir: the path to the directory where the application executable resides
 	///   - application.configDir: the path to the directory where the last configuration file loaded with loadConfiguration() was found.
+	///
 	/// If loadConfiguration() has never been called, application.configDir will be equal to application.dir.
 	///
 	/// The POCO_APP_MAIN macro can be used to implement main(argc, argv).
@@ -113,6 +120,13 @@ public:
 		EXIT_PROTOCOL    = 76, /// remote error in protocol
 		EXIT_NOPERM      = 77, /// permission denied
 		EXIT_CONFIG      = 78  /// configuration error
+	};
+	
+	enum ConfigPriority
+	{
+		PRIO_APPLICATION = -100,
+		PRIO_DEFAULT     = 0,
+		PRIO_SYSTEM      = 100
 	};
 	
 	Application();
@@ -152,9 +166,15 @@ public:
 	void setUnixOptions(bool flag);
 		/// Specify whether command line option handling is Unix-style
 		/// (flag == true; default) or Windows/OpenVMS-style (flag == false).
+		///
+		/// This member function should be called from the constructor of
+		/// a subclass to be effective.
 
-	int loadConfiguration();
+	int loadConfiguration(int priority = PRIO_DEFAULT);
 		/// Loads configuration information from a default location.
+		///
+		/// The configuration(s) will be added to the application's 
+		/// LayeredConfiguration with the given priority.
 		///
 		/// The configuration file(s) must be located in the same directory
 		/// as the executable or a parent directory of it, and must have the 
@@ -179,7 +199,7 @@ public:
 		/// This method must not be called before initialize(argc, argv)
 		/// has been called.
 
-	void loadConfiguration(const std::string& path);
+	void loadConfiguration(const std::string& path, int priority = PRIO_DEFAULT);
 		/// Loads configuration information from the file specified by
 		/// the given path. The file type is determined by the file
 		/// extension. The following extensions are supported:
@@ -188,6 +208,10 @@ public:
 		///   - .xml        - XML file (XMLConfiguration)
 		///
 		/// Extensions are not case sensitive.
+		///
+		/// The configuration will be added to the application's 
+		/// LayeredConfiguration with the given priority.
+		///
 
 	template <class C> C& getSubsystem() const;
 		/// Returns a reference to the subsystem of the class
@@ -354,8 +378,9 @@ template <class C> C& Application::getSubsystem() const
 {
 	for (SubsystemVec::const_iterator it = _subsystems.begin(); it != _subsystems.end(); ++it)
 	{
-		if (dynamic_cast<C*>(*it))
-			return **it;
+		Poco::AutoPtr<C> pSubsystem(it->cast<C>());
+		if (!pSubsystem.isNull())
+			return *pSubsystem;
 	}
 	throw Poco::NotFoundException("The subsystem has not been registered");
 }

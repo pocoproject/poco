@@ -1,7 +1,7 @@
 //
 // LayeredConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/LayeredConfiguration.cpp#1 $
+// $Id: //poco/1.3/Util/src/LayeredConfiguration.cpp#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -59,37 +59,72 @@ LayeredConfiguration::~LayeredConfiguration()
 
 void LayeredConfiguration::add(AbstractConfiguration* pConfig)
 {
-	add(pConfig, true);
+	add(pConfig, highest(), false, true);
 }
 
 
 void LayeredConfiguration::add(AbstractConfiguration* pConfig, bool shared)
 {
-	poco_check_ptr (pConfig);
+	add(pConfig, highest(), false, shared);
+}
 
-	_configs.push_back(ConfigPtr(pConfig, shared));
+
+void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority)
+{
+	add(pConfig, priority, false, true);
+}
+
+
+void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, bool shared)
+{
+	add(pConfig, priority, false, shared);
 }
 
 
 void LayeredConfiguration::addFront(AbstractConfiguration* pConfig)
 {
-	addFront(pConfig, true);
+	add(pConfig, lowest(), false, true);
 }
 
 
 void LayeredConfiguration::addFront(AbstractConfiguration* pConfig, bool shared)
 {
-	poco_check_ptr (pConfig);
+	add(pConfig, lowest(), false, shared);
+}
 
-	_configs.insert(_configs.begin(), ConfigPtr(pConfig, shared));
+
+void LayeredConfiguration::addWriteable(AbstractConfiguration* pConfig, int priority)
+{
+	add(pConfig, priority, true, true);
+}
+
+
+void LayeredConfiguration::addWriteable(AbstractConfiguration* pConfig, int priority, bool shared)
+{
+	add(pConfig, priority, true, shared);
+}
+
+
+void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, bool writeable, bool shared)
+{
+	ConfigItem item;
+	item.pConfig   = ConfigPtr(pConfig, shared);
+	item.priority  = priority;
+	item.writeable = writeable;
+	
+	ConfigList::iterator it = _configs.begin();
+	while (it != _configs.end() && it->priority < priority)
+		++it;
+		
+	_configs.insert(it, item);
 }
 
 
 bool LayeredConfiguration::getRaw(const std::string& key, std::string& value) const
 {
-	for (ConfigVec::const_iterator it = _configs.begin(); it != _configs.end(); ++it)
+	for (ConfigList::const_iterator it = _configs.begin(); it != _configs.end(); ++it)
 	{
-		if ((*it)->getRaw(key, value))
+		if (it->pConfig->getRaw(key, value))
 			return true;
 	}
 	return false;
@@ -98,20 +133,25 @@ bool LayeredConfiguration::getRaw(const std::string& key, std::string& value) co
 
 void LayeredConfiguration::setRaw(const std::string& key, const std::string& value)
 {
-	if (!_configs.empty())
-		_configs.back()->setRaw(key, value);
-	else
-		throw RuntimeException("No configuration object to store the property", key);
+	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
+	{
+		if (it->writeable)
+		{
+			it->pConfig->setRaw(key, value);
+			return;
+		}
+	}
+	throw RuntimeException("No writeable configuration object to store the property", key);
 }
 
 
 void LayeredConfiguration::enumerate(const std::string& key, Keys& range) const
 {
 	std::set<std::string> keys;
-	for (ConfigVec::const_iterator itc = _configs.begin(); itc != _configs.end(); ++itc)
+	for (ConfigList::const_iterator itc = _configs.begin(); itc != _configs.end(); ++itc)
 	{
 		Keys partRange;
-		(*itc)->enumerate(key, partRange);
+		itc->pConfig->enumerate(key, partRange);
 		for (Keys::const_iterator itr = partRange.begin(); itr != partRange.end(); ++itr)
 		{
 			if (keys.find(*itr) == keys.end())
@@ -121,6 +161,24 @@ void LayeredConfiguration::enumerate(const std::string& key, Keys& range) const
 			}
 		}
 	}
+}
+
+
+int LayeredConfiguration::lowest() const
+{
+	if (_configs.empty())
+		return 0;
+	else
+		return _configs.front().priority - 1;
+}
+
+
+int LayeredConfiguration::highest() const
+{
+	if (_configs.empty())
+		return 0;
+	else
+		return _configs.back().priority + 1;
 }
 
 
