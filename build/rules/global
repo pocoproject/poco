@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/rules/global#2 $
+# $Id: //poco/1.3/build/rules/global#3 $
 #
 # global
 #
@@ -21,6 +21,11 @@
 ifndef POCO_BASE
 $(error POCO_BASE is not defined.)
 endif
+
+#
+# Include some optional make configuration
+#
+sinclude $(POCO_BASE)/config.build
 
 #
 # Check for POCO_BUILD
@@ -130,7 +135,7 @@ endif
 #
 # Compose compiler flags
 #
-COMMONFLAGS = -DPOCO_BUILD_HOST=$(HOSTNAME)
+COMMONFLAGS = -DPOCO_BUILD_HOST=$(HOSTNAME) $(POCO_FLAGS)
 CFLAGS     += $(COMMONFLAGS) $(SYSFLAGS)
 CXXFLAGS   += $(COMMONFLAGS) $(SYSFLAGS)
 LINKFLAGS  += $(COMMONFLAGS) $(SYSFLAGS)
@@ -170,6 +175,17 @@ ifeq ($(strip $(STRIP)),)
 STRIPCMD = 
 else
 STRIPCMD = $(STRIP) $@
+endif
+
+#
+# Remote debugging support
+#
+ifeq ($(strip $(STRIPDBG)),)
+CPYDBG =
+STRIPDBGCMD = 
+else
+CPYDBG = cp $@ $@x
+STRIPDBGCMD = $(STRIP) $@x
 endif
 
 #

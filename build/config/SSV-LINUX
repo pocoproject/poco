@@ -12,7 +12,7 @@
 LINKMODE           = STATIC
 POCO_TARGET_OSNAME = Linux
 POCO_TARGET_OSARCH = ARM
-TOOL               = arm-ssv1-linux
+TOOL               = /usr/local/arm-ssv1-linux/bin/arm-ssv1-linux
 
 #
 # Define Tools
@@ -21,6 +21,7 @@ CC      = $(TOOL)-gcc
 CXX     = $(TOOL)-g++
 LINK    = $(CXX)
 STRIP   = $(TOOL)-strip
+STRIPDBG = $(TOOL)-strip
 LIB     = $(TOOL)-ar -cr
 RANLIB  = $(TOOL)-ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@

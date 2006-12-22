@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/config/Linux#1 $
+# $Id: //poco/1.3/build/config/Linux#2 $
 #
 # Linux
 #
@@ -41,7 +41,7 @@ SHAREDLIBLINKEXT = .so
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        =
+CXXFLAGS        = -Wall -Wno-sign-compare
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       =

@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/rules/exec#1 $
+# $Id: //poco/1.3/build/rules/exec#2 $
 #
 # exec
 #
@@ -37,6 +37,8 @@ shared_release: bindirs $(EXEC_RELEASE_SHARED)
 $(EXEC_DEBUG_STATIC): $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
 	@echo "** Building executable (debug)" $@
 	$(LINK) $(LINKFLAGS) $(DEBUGOPT_LINK) $(STATICOPT_LINK) -o $@ $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(CPYDBG)
+	$(STRIPDBGCMD)
 
 $(EXEC_RELEASE_STATIC): $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
 	@echo "** Building executable (release)" $@
