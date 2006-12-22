@@ -1,7 +1,7 @@
 //
 // Foundation.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Foundation.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/Foundation.h#6 $
 //
 // Library: Foundation
 // Package: Core

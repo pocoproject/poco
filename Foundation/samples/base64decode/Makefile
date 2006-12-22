@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Foundation/samples/base64decode/Makefile#1 $
+# $Id: //poco/Main/Foundation/samples/base64decode/Makefile#5 $
 #
 # Makefile for Poco base64decode
 #

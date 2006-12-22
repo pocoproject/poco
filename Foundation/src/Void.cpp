@@ -1,7 +1,7 @@
 //
 // Void.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Void.cpp#1 $
+// $Id: //poco/Main/Foundation/src/Void.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -58,9 +58,8 @@ Void::Void()
 }
 
 
-Void::Void(const Void& v)
+Void::Void(const Void&)
 {
-	v;
 }
 
 
@@ -69,9 +68,8 @@ Void::~Void()
 }
 
 
-Void& Void::operator = (const Void& v)
+Void& Void::operator = (const Void&)
 {
-	v;
 	return *this;
 }
 

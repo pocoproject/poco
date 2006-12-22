@@ -1,7 +1,7 @@
 //
 // TuplesTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TuplesTest.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/TuplesTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,6 +37,12 @@
 #include "Poco/Void.h"
 
 
+using Poco::TypeList;
+using Poco::NullTypeList;
+using Poco::TypeGetter;
+using Poco::TypeLocator;
+using Poco::TypeAppender;
+using Poco::TypeEraser;
 using Poco::Tuple;
 using Poco::Void;
 
@@ -142,6 +148,114 @@ void TuplesTest::testMemOverhead()
 	assert (sz == 8);
 }
 
+
+void TuplesTest::testTypeList()
+{
+	typedef TYPELIST_15(Poco::Int8,
+		Poco::UInt8,
+		Poco::Int16,
+		Poco::UInt16,
+		Poco::Int32,
+		Poco::UInt32,
+		float,
+		double,
+		Poco::Int8,
+		Poco::UInt8,
+		Poco::Int16,
+		Poco::UInt16,
+		Poco::Int32,
+		Poco::UInt32,
+		float) Type15;
+
+	TypeLocator<Type15, Poco::Int8> pos0; pos0;
+	TypeLocator<Type15, Poco::UInt8> pos1; pos1;
+	TypeLocator<Type15, Poco::Int16> pos2; pos2;
+	TypeLocator<Type15, Poco::UInt16> pos3; pos3;
+	TypeLocator<Type15, Poco::Int32> pos4; pos4;
+	TypeLocator<Type15, Poco::UInt32> pos5; pos5;
+	TypeLocator<Type15, float> pos6; pos6;
+	TypeLocator<Type15, double> pos7; pos7;
+	TypeLocator<Type15, Poco::Int8> pos8; pos8;
+	TypeLocator<Type15, std::string> posUnknown; posUnknown;
+
+	assert (pos0.value == 0);
+	assert (pos1.value == 1);
+	assert (pos2.value == 2);
+	assert (pos3.value == 3);
+	assert (pos4.value == 4);
+	assert (pos5.value == 5);
+	assert (pos6.value == 6);
+	assert (pos7.value == 7);
+	assert (pos8.value == 0);
+	assert (posUnknown.value == -1);
+
+	assert (typeid(TypeGetter<0, Type15>::HeadType) == typeid(Poco::Int8));
+	assert (typeid(TypeGetter<0, Type15>::ConstHeadType) == typeid(const Poco::Int8));
+	assert (typeid(TypeGetter<1, Type15>::HeadType) == typeid(Poco::UInt8));
+	assert (typeid(TypeGetter<1, Type15>::ConstHeadType) == typeid(const Poco::UInt8));
+	assert (typeid(TypeGetter<2, Type15>::HeadType) == typeid(Poco::Int16));
+	assert (typeid(TypeGetter<2, Type15>::ConstHeadType) == typeid(const Poco::Int16));
+	assert (typeid(TypeGetter<3, Type15>::HeadType) == typeid(Poco::UInt16));
+	assert (typeid(TypeGetter<3, Type15>::ConstHeadType) == typeid(const Poco::UInt16));
+	assert (typeid(TypeGetter<4, Type15>::HeadType) == typeid(Poco::Int32));
+	assert (typeid(TypeGetter<4, Type15>::ConstHeadType) == typeid(const Poco::Int32));
+	assert (typeid(TypeGetter<5, Type15>::HeadType) == typeid(Poco::UInt32));
+	assert (typeid(TypeGetter<5, Type15>::ConstHeadType) == typeid(const Poco::UInt32));
+	assert (typeid(TypeGetter<6, Type15>::HeadType) == typeid(float));
+	assert (typeid(TypeGetter<6, Type15>::ConstHeadType) == typeid(const float));
+	assert (typeid(TypeGetter<7, Type15>::HeadType) == typeid(double));
+	assert (typeid(TypeGetter<7, Type15>::ConstHeadType) == typeid(const double));
+	assert (typeid(TypeGetter<8, Type15>::HeadType) == typeid(Poco::Int8));
+	assert (typeid(TypeGetter<8, Type15>::ConstHeadType) == typeid(const Poco::Int8));
+	assert (typeid(TypeGetter<9, Type15>::HeadType) == typeid(Poco::UInt8));
+	assert (typeid(TypeGetter<9, Type15>::ConstHeadType) == typeid(const Poco::UInt8));
+	assert (typeid(TypeGetter<10, Type15>::HeadType) == typeid(Poco::Int16));
+	assert (typeid(TypeGetter<10, Type15>::ConstHeadType) == typeid(const Poco::Int16));
+	assert (typeid(TypeGetter<11, Type15>::HeadType) == typeid(Poco::UInt16));
+	assert (typeid(TypeGetter<11, Type15>::ConstHeadType) == typeid(const Poco::UInt16));
+	assert (typeid(TypeGetter<12, Type15>::HeadType) == typeid(Poco::Int32));
+	assert (typeid(TypeGetter<12, Type15>::ConstHeadType) == typeid(const Poco::Int32));
+	assert (typeid(TypeGetter<13, Type15>::HeadType) == typeid(Poco::UInt32));
+	assert (typeid(TypeGetter<13, Type15>::ConstHeadType) == typeid(const Poco::UInt32));
+	assert (typeid(TypeGetter<14, Type15>::HeadType) == typeid(float));
+	assert (typeid(TypeGetter<14, Type15>::ConstHeadType) == typeid(const float));
+
+	typedef TYPELIST_1(Poco::Int8) Type1;
+	assert (1 == Type1::length);
+	typedef TYPELIST_2(Poco::Int16, Poco::Int32) Type2;
+	assert (2 == Type2::length);
+	typedef TypeAppender<Type1, Type2>::HeadType Type3;
+	assert (3 == Type3::length);
+
+	assert (typeid(TypeGetter<0, Type3>::HeadType) == typeid(Poco::Int8));
+	assert (typeid(TypeGetter<1, Type3>::HeadType) == typeid(Poco::Int16));
+	assert (typeid(TypeGetter<2, Type3>::HeadType) == typeid(Poco::Int32));
+
+	TypeLocator<Type3, Poco::Int8> posNo1; posNo1;
+	TypeLocator<Type3, Poco::Int16> posNo2; posNo2;
+	TypeLocator<Type3, Poco::Int32> posNo3; posNo3;
+
+	assert (posNo1.value == 0);
+	assert (posNo2.value == 1);
+	assert (posNo3.value == 2);
+
+	typedef TypeEraser<Type3, Poco::Int8>::HeadType TypeEraser1;
+	assert (2 == TypeEraser1::length);
+	assert (typeid(TypeGetter<0, TypeEraser1>::HeadType) == typeid(Poco::Int16));
+	assert (typeid(TypeGetter<1, TypeEraser1>::HeadType) == typeid(Poco::Int32));
+
+	typedef TypeEraser<Type3, Poco::Int16>::HeadType TypeEraser2;
+	assert (2 == TypeEraser2::length);
+	assert (typeid(TypeGetter<0, TypeEraser2>::HeadType) == typeid(Poco::Int8));
+	assert (typeid(TypeGetter<1, TypeEraser2>::HeadType) == typeid(Poco::Int32));
+
+	typedef TypeEraser<Type3, Poco::Int32>::HeadType TypeEraser3;
+	assert (2 == TypeEraser3::length);
+	assert (typeid(TypeGetter<0, TypeEraser3>::HeadType) == typeid(Poco::Int8));
+	assert (typeid(TypeGetter<1, TypeEraser3>::HeadType) == typeid(Poco::Int16));
+}
+
+
 void TuplesTest::setUp()
 {
 }
@@ -160,6 +274,7 @@ CppUnit::Test* TuplesTest::suite()
 	CppUnit_addTest(pSuite, TuplesTest, testTupleSize5);
 	CppUnit_addTest(pSuite, TuplesTest, testTupleSize10);
 	CppUnit_addTest(pSuite, TuplesTest, testMemOverhead);
+	CppUnit_addTest(pSuite, TuplesTest, testTypeList);
 
 
 	return pSuite;

@@ -1,7 +1,7 @@
 //
 // ManifestTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ManifestTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/ManifestTest.h#8 $
 //
 // Definition of the ManifestTest class.
 //

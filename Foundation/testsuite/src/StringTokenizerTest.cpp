@@ -1,7 +1,7 @@
 //
 // StringTokenizerTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/StringTokenizerTest.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/StringTokenizerTest.cpp#10 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

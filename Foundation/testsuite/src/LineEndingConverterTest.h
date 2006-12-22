@@ -1,7 +1,7 @@
 //
 // LineEndingConverterTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/LineEndingConverterTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/LineEndingConverterTest.h#4 $
 //
 // Definition of the LineEndingConverterTest class.
 //

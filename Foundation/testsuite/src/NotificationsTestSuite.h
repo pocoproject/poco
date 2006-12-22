@@ -1,7 +1,7 @@
 //
 // NotificationsTestSuite.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/NotificationsTestSuite.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/NotificationsTestSuite.h#8 $
 //
 // Definition of the NotificationsTestSuite class.
 //

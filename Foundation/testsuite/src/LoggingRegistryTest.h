@@ -1,7 +1,7 @@
 //
 // LoggingRegistryTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/LoggingRegistryTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/LoggingRegistryTest.h#4 $
 //
 // Definition of the LoggingRegistryTest class.
 //

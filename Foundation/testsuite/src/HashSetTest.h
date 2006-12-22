@@ -1,7 +1,7 @@
 //
 // HashSetTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/HashSetTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/HashSetTest.h#1 $
 //
 // Definition of the HashSetTest class.
 //

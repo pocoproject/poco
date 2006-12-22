@@ -1,7 +1,7 @@
 //
 // HashMap.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/HashMap.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/HashMap.h#2 $
 //
 // Library: Foundation
 // Package: Hashing

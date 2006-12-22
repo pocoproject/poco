@@ -1,7 +1,7 @@
 //
 // Message.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Message.cpp#1 $
+// $Id: //poco/Main/Foundation/src/Message.cpp#13 $
 //
 // Library: Foundation
 // Package: Logging
@@ -38,6 +38,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Process.h"
 #include "Poco/Thread.h"
+#include <algorithm>
 
 
 namespace Poco {
@@ -117,20 +118,25 @@ void Message::init()
 
 Message& Message::operator = (const Message& msg)
 {
-	if (this == &msg) return *this;
-	
-	_source = msg._source;
-	_text   = msg._text;
-	_prio   = msg._prio;
-	_time   = msg._time;
-	_thread = msg._thread;
-	_pid    = msg._pid;
-	if (msg._pMap)
-		_pMap = new StringMap(*msg._pMap);
-	else
-		_pMap = 0;
-		
+	if (&msg != this)
+	{
+		Message tmp(msg);
+		swap(tmp);
+	}
 	return *this;
+}
+
+
+void Message::swap(Message& msg)
+{
+	using std::swap;
+	swap(_source, msg._source);
+	swap(_text, msg._text);
+	swap(_prio, msg._prio);
+	swap(_time, msg._time);
+	swap(_thread, msg._thread);
+	swap(_pid, msg._pid);
+	swap(_pMap, msg._pMap);
 }
 
 

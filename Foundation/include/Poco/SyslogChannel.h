@@ -1,7 +1,7 @@
 //
 // SyslogChannel.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/SyslogChannel.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/SyslogChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging

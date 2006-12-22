@@ -1,7 +1,7 @@
 //
 // Path.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Path.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/Path.h#3 $
 //
 // Library: Foundation
 // Package: Filesystem

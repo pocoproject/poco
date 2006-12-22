@@ -1,7 +1,7 @@
 //
 // TuplesTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TuplesTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/TuplesTest.h#3 $
 //
 // Definition of the TuplesTest class.
 //
@@ -50,6 +50,8 @@ public:
 	void testTupleSize5();
 	void testTupleSize10();
 	void testMemOverhead();
+	void testTypeList();
+
 	void setUp();
 	void tearDown();
 

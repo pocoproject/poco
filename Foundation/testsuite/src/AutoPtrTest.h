@@ -1,7 +1,7 @@
 //
 // AutoPtrTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/AutoPtrTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/AutoPtrTest.h#9 $
 //
 // Definition of the AutoPtrTest class.
 //

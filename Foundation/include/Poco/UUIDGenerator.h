@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/UUIDGenerator.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/UUIDGenerator.h#3 $
 //
 // Library: Foundation
 // Package: UUID
@@ -85,9 +85,9 @@ public:
 		/// Creates a random UUID.
 		
 	UUID createOne();
-		/// Tries to create and return a time-based UUID (see createSecure()), and, 
+		/// Tries to create and return a time-based UUID (see create()), and, 
 		/// if that does not work due to the unavailability of a MAC address,
-		/// creates and returns a random UUID.
+		/// creates and returns a random UUID (see createRandom()).
 		///
 		/// The UUID::version() method can be used to determine the actual kind of
 		/// the UUID generated.

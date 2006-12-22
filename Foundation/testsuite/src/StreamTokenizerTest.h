@@ -1,7 +1,7 @@
 //
 // StreamTokenizerTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/StreamTokenizerTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/StreamTokenizerTest.h#8 $
 //
 // Definition of the StreamTokenizerTest class.
 //

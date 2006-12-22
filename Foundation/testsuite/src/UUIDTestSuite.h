@@ -1,7 +1,7 @@
 //
 // UUIDTestSuite.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/UUIDTestSuite.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/UUIDTestSuite.h#8 $
 //
 // Definition of the UUIDTestSuite class.
 //

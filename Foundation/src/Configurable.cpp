@@ -1,7 +1,7 @@
 //
 // Configurable.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Configurable.cpp#1 $
+// $Id: //poco/Main/Foundation/src/Configurable.cpp#10 $
 //
 // Library: Foundation
 // Package: Logging

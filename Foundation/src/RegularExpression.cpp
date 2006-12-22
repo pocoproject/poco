@@ -1,7 +1,7 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/1.3/Foundation/src/RegularExpression.cpp#1 $
+// $Id: //poco/Main/Foundation/src/RegularExpression.cpp#12 $
 //
 // Library: Foundation
 // Package: RegExp
@@ -291,8 +291,10 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 
 bool RegularExpression::match(const std::string& subject, const std::string& pattern, int options)
 {
-	RegularExpression re(pattern, options, false);
-	return re.match(subject, 0, options);
+	int ctorOptions = options & (RE_CASELESS | RE_MULTILINE | RE_DOTALL | RE_EXTENDED | RE_ANCHORED | RE_DOLLAR_ENDONLY | RE_EXTRA | RE_UNGREEDY | RE_UTF8 | RE_NO_AUTO_CAPTURE);
+	int mtchOptions = options & (RE_ANCHORED | RE_NOTBOL | RE_NOTEOL | RE_NOTEMPTY | RE_NO_AUTO_CAPTURE | RE_NO_UTF8_CHECK);
+	RegularExpression re(pattern, ctorOptions, false);
+	return re.match(subject, 0, mtchOptions);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Exception.cpp#1 $
+// $Id: //poco/Main/Foundation/src/Exception.cpp#19 $
 //
 // Library: Foundation
 // Package: Core
@@ -150,7 +150,7 @@ POCO_IMPLEMENT_EXCEPTION(NotFoundException, RuntimeException, "Not found")
 POCO_IMPLEMENT_EXCEPTION(ExistsException, RuntimeException, "Exists")
 POCO_IMPLEMENT_EXCEPTION(TimeoutException, RuntimeException, "Timeout")
 POCO_IMPLEMENT_EXCEPTION(SystemException, RuntimeException, "System exception")
-POCO_IMPLEMENT_EXCEPTION(RegularExpressionException, RuntimeException, "Error in regular exception")
+POCO_IMPLEMENT_EXCEPTION(RegularExpressionException, RuntimeException, "Error in regular expression")
 POCO_IMPLEMENT_EXCEPTION(LibraryLoadException, RuntimeException, "Cannot load library")
 POCO_IMPLEMENT_EXCEPTION(LibraryAlreadyLoadedException, RuntimeException, "Library already loaded")
 POCO_IMPLEMENT_EXCEPTION(NoThreadAvailableException, RuntimeException, "No thread available")

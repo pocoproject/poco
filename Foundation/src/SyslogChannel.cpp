@@ -1,7 +1,7 @@
 //
 // SyslogChannel.cpp
 //
-// $Id: //poco/1.3/Foundation/src/SyslogChannel.cpp#1 $
+// $Id: //poco/Main/Foundation/src/SyslogChannel.cpp#10 $
 //
 // Library: Foundation
 // Package: Logging

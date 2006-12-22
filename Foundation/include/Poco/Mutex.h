@@ -1,7 +1,7 @@
 //
 // Mutex.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Mutex.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/Mutex.h#3 $
 //
 // Library: Foundation
 // Package: Threading

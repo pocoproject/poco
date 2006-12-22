@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="TestLibrary"
 	ProjectGUID="{0955EB03-544B-4BD4-9C10-89CF38078F5F}"
 	Keyword="Win32Proj"

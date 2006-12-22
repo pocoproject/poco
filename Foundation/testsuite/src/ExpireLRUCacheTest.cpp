@@ -1,7 +1,7 @@
 //
 // ExpireLRUCacheTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ExpireLRUCacheTest.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/ExpireLRUCacheTest.cpp#8 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

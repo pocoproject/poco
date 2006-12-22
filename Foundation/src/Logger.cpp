@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Logger.cpp#1 $
+// $Id: //poco/Main/Foundation/src/Logger.cpp#17 $
 //
 // Library: Foundation
 // Package: Logging
@@ -130,7 +130,7 @@ void Logger::log(const Exception& exc)
 }
 
 
-void Logger::dump(const std::string& msg, const void* buffer, int length, Message::Priority prio)
+void Logger::dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio)
 {
 	if (_level >= prio && _pChannel)
 	{
@@ -267,7 +267,7 @@ std::string Logger::format(const std::string& fmt, int argc, std::string argv[])
 }
 
 
-void Logger::formatDump(std::string& message, const void* buffer, int length)
+void Logger::formatDump(std::string& message, const void* buffer, std::size_t length)
 {
 	const int BYTES_PER_LINE = 16;
 

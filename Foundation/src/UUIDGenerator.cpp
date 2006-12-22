@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UUIDGenerator.cpp#1 $
+// $Id: //poco/Main/Foundation/src/UUIDGenerator.cpp#15 $
 //
 // Library: Foundation
 // Package: UUID

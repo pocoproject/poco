@@ -1,7 +1,7 @@
 //
 // RegularExpressionTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/RegularExpressionTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/RegularExpressionTest.h#9 $
 //
 // Definition of the RegularExpressionTest class.
 //

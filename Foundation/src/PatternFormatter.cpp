@@ -1,7 +1,7 @@
 //
 // PatternFormatter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/PatternFormatter.cpp#1 $
+// $Id: //poco/Main/Foundation/src/PatternFormatter.cpp#13 $
 //
 // Library: Foundation
 // Package: Logging
@@ -125,7 +125,7 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 					++it;
 					std::string prop;
 					while (it != end && *it != ']') prop += *it++;
-					if (it != end) ++it;
+					if (it == end) --it;
 					try
 					{
 						text.append(msg[prop]);

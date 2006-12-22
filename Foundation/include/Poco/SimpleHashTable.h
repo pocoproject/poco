@@ -1,7 +1,7 @@
 //
 // SimpleHashTable.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/SimpleHashTable.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/SimpleHashTable.h#10 $
 //
 // Library: Foundation
 // Package: Hashing

@@ -5,7 +5,7 @@
  * Compile this file with -DNO_GZCOMPRESS to avoid the compression code.
  */
 
-/* @(#) $Id: //poco/1.3/Foundation/src/gzio.c#1 $ */
+/* @(#) $Id: //poco/Main/Foundation/src/gzio.c#8 $ */
 
 #include <stdio.h>
 

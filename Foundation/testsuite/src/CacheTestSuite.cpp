@@ -1,7 +1,7 @@
 //
 // CacheTestSuite.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/CacheTestSuite.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/CacheTestSuite.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

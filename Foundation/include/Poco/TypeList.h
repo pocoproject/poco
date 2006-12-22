@@ -1,7 +1,7 @@
 //
 // TypeList.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/TypeList.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/TypeList.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -137,6 +137,179 @@ struct TypeList
 	
 	HeadType head;
 	TailType tail;
+};
+
+
+#define TYPELIST_1(T1) TypeList<T1, NullTypeList>
+#define TYPELIST_2(T1, T2) TypeList<T1, TYPELIST_1(T2)>
+#define TYPELIST_3(T1, T2, T3) TypeList<T1, TYPELIST_2(T2, T3)>
+#define TYPELIST_4(T1, T2, T3, T4) TypeList<T1, TYPELIST_3(T2, T3, T4)>
+#define TYPELIST_5(T1, T2, T3, T4, T5) TypeList<T1, TYPELIST_4(T2, T3, T4, T5)>
+#define TYPELIST_6(T1, T2, T3, T4, T5, T6) TypeList<T1, TYPELIST_5(T2, T3, T4, T5, T6)>
+#define TYPELIST_7(T1, T2, T3, T4, T5, T6, T7) TypeList<T1, TYPELIST_6(T2, T3, T4, T5, T6, T7)>
+#define TYPELIST_8(T1, T2, T3, T4, T5, T6, T7, T8) TypeList<T1, TYPELIST_7(T2, T3, T4, T5, T6, T7, T8)>
+#define TYPELIST_9(T1, T2, T3, T4, T5, T6, T7, T8, T9) TypeList<T1, TYPELIST_8(T2, T3, T4, T5, T6, T7, T8, T9)>
+#define TYPELIST_10(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) \
+	TypeList<T1, TYPELIST_9(T2, T3, T4, T5, T6, T7, T8, T9, T10)>
+#define TYPELIST_11(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) \
+	TypeList<T1, TYPELIST_10(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)>
+#define TYPELIST_12(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) \
+	TypeList<T1, TYPELIST_11(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)>
+#define TYPELIST_13(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) \
+	TypeList<T1, TYPELIST_12(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13)>
+#define TYPELIST_14(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) \
+	TypeList<T1, TYPELIST_13(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14)>
+#define TYPELIST_15(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) \
+	TypeList<T1, TYPELIST_14(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15)>
+
+
+template<int n> 
+struct Getter
+{
+	template<class Ret, class Head, class Tail>
+	inline static Ret& get(TypeList<Head, Tail>& val)
+	{
+		return Getter<n-1>::template get<Ret, typename Tail::HeadType, typename Tail::TailType>(val.tail);
+	}
+
+	template<class Ret, class Head, class Tail>
+	inline static const Ret& get(const TypeList<Head, Tail>& val)
+	{
+		return Getter<n-1>::template get<Ret, typename Tail::HeadType, typename Tail::TailType>(val.tail);
+	}
+};
+
+
+template<> 
+struct Getter<0>
+{
+	template<class Ret, class Head, class Tail>
+	inline static Ret& get(TypeList<Head, Tail>& val)
+	{
+		return val.head;
+	}
+
+	template<class Ret, class Head, class Tail>
+	inline static const Ret& get(const TypeList<Head, Tail>& val)
+	{
+		return val.head;
+	}
+};
+
+template <int N, class Head> 
+struct TypeGetter;
+
+
+template <int N, class Head, class Tail> 
+struct TypeGetter<N, TypeList<Head, Tail> >
+{
+	typedef typename TypeGetter<N-1, Tail>::HeadType HeadType;
+	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
+};
+
+
+template <class Head, class Tail> 
+struct TypeGetter<0, TypeList<Head, Tail> >
+{
+	typedef typename TypeList<Head, Tail>::HeadType HeadType;
+	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
+};
+
+
+///
+/// TypeLocator
+///
+
+template <class Head, class T>
+struct TypeLocator;
+
+
+template <class T>
+struct TypeLocator<NullTypeList, T>
+{
+	enum { value = -1 };
+};
+
+
+template <class T, class Tail>
+struct TypeLocator<TypeList<T, Tail>, T>
+{
+	enum { value = 0 };
+};
+
+
+template <class Head, class Tail, class T>
+struct TypeLocator<TypeList<Head, Tail>, T>
+{
+private:
+	enum { tmp = TypeLocator<Tail, T>::value };
+public:
+	enum { value = tmp == -1 ? -1 : 1 + tmp };
+};
+
+
+///
+/// TypeAppender
+///
+
+template <class Head, class T> 
+struct TypeAppender;
+
+
+template<>
+struct TypeAppender<NullTypeList, NullTypeList>
+{
+	typedef NullTypeList HeadType;
+};
+
+
+template<class T>
+struct TypeAppender<NullTypeList, T>
+{
+	typedef TYPELIST_1(T) HeadType;
+};
+
+
+template<class Head, class Tail>
+struct TypeAppender<NullTypeList, TypeList<Head, Tail> >
+{
+	typedef TypeList<Head, Tail> HeadType;
+};
+
+
+template<class Head, class Tail, class T>
+struct TypeAppender<TypeList<Head, Tail>, T>
+{
+	typedef TypeList<Head, typename TypeAppender<Tail, T>::HeadType> HeadType;
+};
+
+
+///
+/// TypeEraser
+///
+
+template <class HEad, class T> 
+struct TypeEraser;
+
+
+template <class T>
+struct TypeEraser<NullTypeList, T>
+{
+	typedef NullTypeList HeadType;
+};
+
+
+template <class T, class Tail>
+struct TypeEraser<TypeList<T, Tail>, T>
+{
+	typedef Tail HeadType;
+};
+
+
+template <class Head, class Tail, class T>
+struct TypeEraser<TypeList<Head, Tail>, T>
+{
+	typedef TypeList <Head, typename TypeEraser<Tail, T>::HeadType> HeadType;
 };
 
 

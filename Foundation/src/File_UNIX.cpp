@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#1 $
+// $Id: //poco/Main/Foundation/src/File_UNIX.cpp#16 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -59,7 +59,7 @@ FileImpl::FileImpl()
 FileImpl::FileImpl(const std::string& path): _path(path)
 {
 	std::string::size_type n = _path.size();
-	if (n > 0 && _path[n - 1] == '/')
+	if (n > 1 && _path[n - 1] == '/')
 		_path.resize(n - 1);
 }
 
@@ -78,6 +78,9 @@ void FileImpl::swapImpl(FileImpl& file)
 void FileImpl::setPathImpl(const std::string& path)
 {
 	_path = path;
+	std::string::size_type n = _path.size();
+	if (n > 1 && _path[n - 1] == '/')
+		_path.resize(n - 1);
 }
 
 

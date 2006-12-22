@@ -1,7 +1,7 @@
 //
 // TimezoneTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TimezoneTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/TimezoneTest.h#8 $
 //
 // Definition of the TimezoneTest class.
 //

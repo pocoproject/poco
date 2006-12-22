@@ -1,7 +1,7 @@
 //
 // Tuple.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Tuple.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/Tuple.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -52,59 +52,6 @@ namespace Poco {
 #else
 #define POCO_TYPEWRAPPER_DEFAULTVALUE(T) typename TypeWrapper<T>::TYPE()
 #endif
-
-
-template<int n> 
-struct Getter
-{
-	template<class Ret, class Head, class Tail>
-	inline static Ret& get(TypeList<Head, Tail>& val)
-	{
-		return Getter<n-1>::template get<Ret, typename Tail::HeadType, typename Tail::TailType>(val.tail);
-	}
-
-	template<class Ret, class Head, class Tail>
-	inline static const Ret& get(const TypeList<Head, Tail>& val)
-	{
-		return Getter<n-1>::template get<Ret, typename Tail::HeadType, typename Tail::TailType>(val.tail);
-	}
-};
-
-
-template<> 
-struct Getter<0>
-{
-	template<class Ret, class Head, class Tail>
-	inline static Ret& get(TypeList<Head, Tail>& val)
-	{
-		return val.head;
-	}
-
-	template<class Ret, class Head, class Tail>
-	inline static const Ret& get(const TypeList<Head, Tail>& val)
-	{
-		return val.head;
-	}
-};
-
-template <int N, class Head> 
-struct TypeGetter;
-
-
-template <int N, class Head, class Tail> 
-struct TypeGetter<N, TypeList<Head, Tail> >
-{
-	typedef typename TypeGetter<N-1, Tail>::HeadType HeadType;
-	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
-};
-
-
-template <class Head, class Tail> 
-struct TypeGetter<0, TypeList<Head, Tail> >
-{
-	typedef typename TypeList<Head, Tail>::HeadType HeadType;
-	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
-};
 
 
 template<	class T0,

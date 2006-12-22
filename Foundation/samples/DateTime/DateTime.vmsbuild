@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/1.3/Foundation/samples/DateTime/DateTime.vmsbuild#1 $
+# $Id: //poco/Main/Foundation/samples/DateTime/DateTime.vmsbuild#5 $
 #
 EXE=DateTime
 DateTime
