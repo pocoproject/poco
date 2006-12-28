@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPChunkedStream.cpp#1 $
+// $Id: //poco/1.3/Net/src/HTTPChunkedStream.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -73,7 +73,7 @@ void HTTPChunkedStreamBuf::close()
 	if (_mode & std::ios::out)
 	{
 		sync();
-		_session.write("0\r\n", 3);
+		_session.write("0\r\n\r\n", 5);
 	}
 }
 
