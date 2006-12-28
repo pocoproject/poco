@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPChunkedStream.cpp#2 $
+// $Id: //poco/1.3/Net/src/HTTPChunkedStream.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -102,7 +102,12 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (n > 0) _chunk -= n;
 		return n;
 	}
-	else return 0;
+	else 
+	{
+		int ch = _session.get();
+		while (ch != eof && ch != '\n') ch = _session.get();
+		return 0;
+	}
 }
 
 

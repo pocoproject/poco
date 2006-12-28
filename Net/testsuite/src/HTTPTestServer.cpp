@@ -1,7 +1,7 @@
 //
 // HTTPTestServer.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPTestServer.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/HTTPTestServer.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -199,7 +199,7 @@ std::string HTTPTestServer::handleRequest() const
 		response.append(NumberFormatter::formatHex((unsigned) body.length()));
 		response.append("\r\n");
 		response.append(body);
-		response.append("\r\n0\r\n");
+		response.append("\r\n0\r\n\r\n");
 		response.append("HTTP/1.1 200 OK\r\n");
 		response.append("Connection: close\r\n");
 		response.append("Content-Type: text/plain\r\n");
