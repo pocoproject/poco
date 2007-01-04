@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -91,7 +91,8 @@ std::ostream& HTTPSClientSession::sendRequest(HTTPRequest& request)
 		close();
 	if (!connected())
 		reconnect();
-	request.setKeepAlive(keepAlive);
+	if (!keepAlive)
+		request.setKeepAlive(false);
 	request.setHost(getHost(), getPort());
 	
 	{

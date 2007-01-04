@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Format.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Format.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -79,7 +79,7 @@ namespace
 	void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
 	{
 		int width = 0;
-		while (itFmt != endFmt && isdigit(*itFmt))
+		while (itFmt != endFmt && std::isdigit(*itFmt))
 		{
 			width = 10*width + *itFmt - '0';
 			++itFmt;
@@ -94,7 +94,7 @@ namespace
 		{
 			++itFmt;
 			int prec = 0;
-			while (itFmt != endFmt && isdigit(*itFmt))
+			while (itFmt != endFmt && std::isdigit(*itFmt))
 			{
 				prec = 10*prec + *itFmt - '0';
 				++itFmt;

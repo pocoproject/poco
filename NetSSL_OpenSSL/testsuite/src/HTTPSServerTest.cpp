@@ -1,7 +1,7 @@
 //
 // HTTPSServerTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -226,7 +226,7 @@ void HTTPSServerTest::testIdentityRequestKeepAlive()
 	HTTPSClientSession cs("localhost", svs.address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
-	HTTPRequest request("POST", "/echoBody");
+	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
 	request.setContentLength((int) body.length());
 	request.setContentType("text/plain");
 	cs.sendRequest(request) << body;
@@ -240,7 +240,7 @@ void HTTPSServerTest::testIdentityRequestKeepAlive()
 	
 	body.assign(1000, 'y');
 	request.setContentLength((int) body.length());
-	cs.setKeepAlive(false);
+	request.setKeepAlive(false);
 	cs.sendRequest(request) << body;
 	cs.receiveResponse(response) >> rbody;
 	assert (response.getContentLength() == body.size());
@@ -260,7 +260,7 @@ void HTTPSServerTest::testChunkedRequestKeepAlive()
 	HTTPSClientSession cs("localhost", svs.address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
-	HTTPRequest request("POST", "/echoBody");
+	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
 	request.setContentType("text/plain");
 	request.setChunkedTransferEncoding(true);
 	cs.sendRequest(request) << body;
@@ -273,7 +273,7 @@ void HTTPSServerTest::testChunkedRequestKeepAlive()
 	assert (rbody == body);
 
 	body.assign(1000, 'y');
-	cs.setKeepAlive(false);
+	request.setKeepAlive(false);
 	cs.sendRequest(request) << body;
 	cs.receiveResponse(response) >> rbody;
 	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
