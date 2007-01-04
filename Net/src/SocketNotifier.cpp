@@ -1,7 +1,7 @@
 //
 // SocketNotifier.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketNotifier.cpp#1 $
+// $Id: //poco/1.3/Net/src/SocketNotifier.cpp#2 $
 //
 // Library: Net
 // Package: Reactor
@@ -87,9 +87,20 @@ void SocketNotifier::removeObserver(SocketReactor* pReactor, const Poco::Abstrac
 
 void SocketNotifier::dispatch(SocketNotification* pNotification)
 {
+	static Socket nullSocket;
+
 	pNotification->setSocket(_socket);
 	pNotification->duplicate();
-	_nc.postNotification(pNotification);
+	try
+	{
+		_nc.postNotification(pNotification);
+	}
+	catch (...)
+	{
+		pNotification->setSocket(nullSocket);
+		throw;
+	}
+	pNotification->setSocket(nullSocket);
 }
 
 

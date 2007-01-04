@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Format.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Format.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -113,7 +113,7 @@ namespace
 			case 'l':
 			case 'h':
 			case 'L': 
-			case '*': mod = *itFmt++; break;
+			case '?': mod = *itFmt++; break;
 			}
 		}
 		return mod;
@@ -186,7 +186,7 @@ namespace
 				case 'l': str << AnyCast<long>(*itVal++); break;
 				case 'L': str << AnyCast<Int64>(*itVal++); break;
 				case 'h': str << AnyCast<short>(*itVal++); break;
-				case '*': writeAnyInt(str, *itVal++); break;
+				case '?': writeAnyInt(str, *itVal++); break;
 				default:  str << AnyCast<int>(*itVal++); break;
 				}
 				break;
@@ -199,7 +199,7 @@ namespace
 				case 'l': str << AnyCast<unsigned long>(*itVal++); break;
 				case 'L': str << AnyCast<UInt64>(*itVal++); break;
 				case 'h': str << AnyCast<unsigned short>(*itVal++); break;
-				case '*': writeAnyInt(str, *itVal++); break;
+				case '?': writeAnyInt(str, *itVal++); break;
 				default:  str << AnyCast<unsigned>(*itVal++); break;
 				}
 				break;

@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.3/Net/src/IPAddress.cpp#1 $
+// $Id: //poco/1.3/Net/src/IPAddress.cpp#2 $
 //
 // Library: Net
 // Package: NetCore
@@ -300,7 +300,7 @@ public:
 					}
 				}
 				if (i > 0) result.append(":");
-				if (i < 8) result.append(NumberFormatter::formatHex(words[i++]));
+				if (i < 8) result.append(NumberFormatter::formatHex(ntohs(words[i++])));
 			}
 			return result;
 		}
