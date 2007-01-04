@@ -1,7 +1,7 @@
 //
 // TaskNotification.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/TaskNotification.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/TaskNotification.h#2 $
 //
 // Library: Foundation
 // Package: Tasks
@@ -146,7 +146,7 @@ class TaskCustomNotification: public TaskNotification
 	/// mechanism between the task and its observer(s).
 {
 public:
-	TaskCustomNotification(Task* pTask, C& custom):
+	TaskCustomNotification(Task* pTask, const C& custom):
 		TaskNotification(pTask),
 		_custom(custom)
 	{

@@ -1,7 +1,7 @@
 //
 // Application.h
 //
-// $Id: //poco/1.2/Util/include/Poco/Util/Application.h#3 $
+// $Id: //poco/1.2/Util/include/Poco/Util/Application.h#4 $
 //
 // Library: Util
 // Package: Application
@@ -50,6 +50,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include <vector>
+#include <typeinfo>
 
 
 namespace Poco {
@@ -378,11 +379,11 @@ template <class C> C& Application::getSubsystem() const
 {
 	for (SubsystemVec::const_iterator it = _subsystems.begin(); it != _subsystems.end(); ++it)
 	{
-		Poco::AutoPtr<C> pSubsystem(it->cast<C>());
-		if (!pSubsystem.isNull())
-			return *pSubsystem;
+		const Subsystem* pSS(it->get());
+		const C* pC = dynamic_cast<const C*>(pSS);
+		if (pC) return *const_cast<C*>(pC);
 	}
-	throw Poco::NotFoundException("The subsystem has not been registered");
+	throw Poco::NotFoundException("The subsystem has not been registered", typeid(C).name());
 }
 
 

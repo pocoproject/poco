@@ -1,7 +1,7 @@
 //
 // Format.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Format.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/Format.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -93,6 +93,7 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * E signed floating-point value in the form [-]d.ddddE[<sign>]dd[d]
 	///   * f signed floating-point value in the form [-]dddd.dddd
 	///   * s std::string
+	///   * z std::size_t
 	///
 	/// The following flags are supported:
 	///
@@ -108,6 +109,7 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * l      argument is long (d, i), unsigned long (o, u, x, X) or long double (e, E, f, g, G)
 	///   * L      argument is long long (d, i), unsigned long long (o, u, x, X)
 	///   * h      argument is short (d, i), unsigned short (o, u, x, X) or float (e, E, f, g, G)
+	///   * ?      argument is any signed or unsigned int, short, long, or 64-bit integer (d, i, o, x, X)
 	///
 	/// The width argument is a nonnegative decimal integer controlling the minimum number of characters printed.
 	/// If the number of characters in the output value is less than the specified width, blanks or

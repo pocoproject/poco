@@ -1,5 +1,23 @@
 This is the changelog file for POCO - the C++ Portable Components.
 
+Release 1.2.8 (2007-01-04)
+==========================
+
+- fixed SF# 1613906: Util/Application.h and GCC 3.3
+- fixed a byte order issue (failed test) in IPv6 address formatting
+- fixed SF# 1626640: Poco::Net::SocketReactor bug
+- fixed client side chunked transfer encoding handling
+- fixed client side persistent connection handling
+- fixed SF# 1623536: HTTP Server Chunked Transfer Encoding Bug
+- improved HTTP server exception text
+- fixed SF# 1616294: KeepAlive HTTPServerSession patch
+- fixed SF# 1616296: Trivial Poco::TaskCustomNotification patch
+- fixed SF# 1619282: PurgeStrategy bug fix
+- fixed SF# 1620855: Format problem
+  there is a new format specifier %z for std::size_t, as well as a new
+  flag ? for %d, %i, %o, %x meaning any signed or unsigned integer
+
+
 Release 1.2.7 (2006-12-07)
 ==========================
 
@@ -591,4 +609,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.2/dist/CHANGELOG#16 $
+$Id: //poco/1.2/dist/CHANGELOG#20 $

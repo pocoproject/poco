@@ -1,7 +1,7 @@
 //
 // FormatTest.cpp
 //
-// $Id: //poco/1.2/Foundation/testsuite/src/FormatTest.cpp#1 $
+// $Id: //poco/1.2/Foundation/testsuite/src/FormatTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
@@ -208,7 +208,62 @@ void FormatTest::testInt()
 	catch (BadCastException&)
 	{
 	}
+}
 
+
+void FormatTest::testAnyInt()
+{
+	char c = 42;
+	std::string s(format("%?i", c));
+	assert (s == "42");
+	
+	signed char sc = -42;
+	s = format("%?i", sc);
+	assert (s == "-42");
+	
+	unsigned char uc = 65;
+	s = format("%?i", uc);
+	assert (s == "65");
+	
+	short ss = -134;
+	s = format("%?i", ss);
+	assert (s == "-134");
+	
+	unsigned short us = 200;
+	s = format("%?i", us);
+	assert (s == "200");
+	
+	int i = -12345;
+	s = format("%?i", i);
+	assert (s == "-12345");
+	
+	unsigned ui = 12345;
+	s = format("%?i", ui);
+	assert (s == "12345");
+	
+	long l = -54321;
+	s = format("%?i", l);
+	assert (s == "-54321");
+	
+	unsigned long ul = 54321;
+	s = format("%?i", ul);
+	assert (s == "54321");
+	
+	Int64 i64 = -12345678;
+	s = format("%?i", i64);
+	assert (s == "-12345678");
+
+	UInt64 ui64 = 12345678;
+	s = format("%?i", ui64);
+	assert (s == "12345678");
+	
+	ss = 0x42;
+	s = format("%?x", ss);
+	assert (s == "42");
+
+	ss = 042;
+	s = format("%?o", ss);
+	assert (s == "42");
 }
 
 
@@ -301,6 +356,7 @@ CppUnit::Test* FormatTest::suite()
 
 	CppUnit_addTest(pSuite, FormatTest, testChar);
 	CppUnit_addTest(pSuite, FormatTest, testInt);
+	CppUnit_addTest(pSuite, FormatTest, testAnyInt);
 	CppUnit_addTest(pSuite, FormatTest, testFloatFix);
 	CppUnit_addTest(pSuite, FormatTest, testFloatSci);
 	CppUnit_addTest(pSuite, FormatTest, testString);

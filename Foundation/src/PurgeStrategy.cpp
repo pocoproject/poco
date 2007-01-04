@@ -1,7 +1,7 @@
 //
 // PurgeStrategy.cpp
 //
-// $Id: //poco/1.2/Foundation/src/PurgeStrategy.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/PurgeStrategy.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -66,7 +66,7 @@ void PurgeStrategy::list(const std::string& path, std::vector<File>& files)
 	std::string baseName = p.getFileName();
 	baseName.append(".");
 
-	DirectoryIterator it(Path::current());
+	DirectoryIterator it(parent);
 	DirectoryIterator end;
 	while (it != end)
 	{

@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Format.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/Format.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -50,7 +50,8 @@
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
 #include <sstream>
-#include <ctype.h>
+#include <cctype>
+#include <cstddef>
 
 
 namespace Poco {
@@ -78,7 +79,7 @@ namespace
 	void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
 	{
 		int width = 0;
-		while (itFmt != endFmt && isdigit(*itFmt))
+		while (itFmt != endFmt && std::isdigit(*itFmt))
 		{
 			width = 10*width + *itFmt - '0';
 			++itFmt;
@@ -93,7 +94,7 @@ namespace
 		{
 			++itFmt;
 			int prec = 0;
-			while (itFmt != endFmt && isdigit(*itFmt))
+			while (itFmt != endFmt && std::isdigit(*itFmt))
 			{
 				prec = 10*prec + *itFmt - '0';
 				++itFmt;
@@ -111,7 +112,8 @@ namespace
 			{
 			case 'l':
 			case 'h':
-			case 'L': mod = *itFmt++; break;
+			case 'L': 
+			case '?': mod = *itFmt++; break;
 			}
 		}
 		return mod;
@@ -131,6 +133,33 @@ namespace
 		case 'E': str << std::scientific << std::uppercase; break;
 		case 'f': str << std::fixed; break;
 		}
+	}
+	
+	
+	void writeAnyInt(std::ostream& str, const Any& any)
+	{
+		if (any.type() == typeid(char))
+			str << static_cast<int>(AnyCast<char>(any));
+		else if (any.type() == typeid(signed char))
+			str << static_cast<int>(AnyCast<signed char>(any));
+		else if (any.type() == typeid(unsigned char))
+			str << static_cast<unsigned>(AnyCast<unsigned char>(any));
+		else if (any.type() == typeid(short))
+			str << AnyCast<short>(any);
+		else if (any.type() == typeid(unsigned short))
+			str << AnyCast<unsigned short>(any);
+		else if (any.type() == typeid(int))
+			str << AnyCast<int>(any);
+		else if (any.type() == typeid(unsigned int))
+			str << AnyCast<unsigned int>(any);
+		else if (any.type() == typeid(long))
+			str << AnyCast<long>(any);
+		else if (any.type() == typeid(unsigned long))
+			str << AnyCast<unsigned long>(any);
+		else if (any.type() == typeid(Int64))
+			str << AnyCast<Int64>(any);
+		else if (any.type() == typeid(UInt64))
+			str << AnyCast<UInt64>(any);
 	}
 
 
@@ -157,6 +186,7 @@ namespace
 				case 'l': str << AnyCast<long>(*itVal++); break;
 				case 'L': str << AnyCast<Int64>(*itVal++); break;
 				case 'h': str << AnyCast<short>(*itVal++); break;
+				case '?': writeAnyInt(str, *itVal++); break;
 				default:  str << AnyCast<int>(*itVal++); break;
 				}
 				break;
@@ -169,6 +199,7 @@ namespace
 				case 'l': str << AnyCast<unsigned long>(*itVal++); break;
 				case 'L': str << AnyCast<UInt64>(*itVal++); break;
 				case 'h': str << AnyCast<unsigned short>(*itVal++); break;
+				case '?': writeAnyInt(str, *itVal++); break;
 				default:  str << AnyCast<unsigned>(*itVal++); break;
 				}
 				break;
@@ -186,6 +217,11 @@ namespace
 			case 's':
 				str << RefAnyCast<std::string>(*itVal++);
 				break;
+			case 'z':
+				str << AnyCast<std::size_t>(*itVal++); 
+				break;
+			case 'I':
+			case 'D':
 			default:
 				str << type;
 			}
