@@ -1,7 +1,7 @@
 //
 // MultipartReader.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/MultipartReader.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/MultipartReader.h#2 $
 //
 // Library: Net
 // Package: Messages
@@ -104,7 +104,7 @@ class Net_API MultipartReader
 	/// message into its single parts.
 	///
 	/// The format of multipart messages is described
-	/// in section 7.2 of RFC 1341.
+	/// in section 5.1 of RFC 2046.
 	///
 	/// To split a multipart message into its parts,
 	/// do the following:

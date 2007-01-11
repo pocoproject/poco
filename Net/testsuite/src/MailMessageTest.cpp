@@ -1,7 +1,7 @@
 //
 // MailMessageTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/MailMessageTest.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/MailMessageTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -283,7 +283,6 @@ void MailMessageTest::testWriteMultiPart()
 		"Mime-Version: 1.0\r\n"
 		"Subject: Test Message\r\n"
 		"To: John Doe <john.doe@no.where>\r\n"
-		"\r\n"
 		"\r\n"
 		"--$\r\n"
 		"Content-Disposition: inline\r\n"

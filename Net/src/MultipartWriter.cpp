@@ -1,7 +1,7 @@
 //
 // MultipartWriter.cpp
 //
-// $Id: //poco/1.3/Net/src/MultipartWriter.cpp#1 $
+// $Id: //poco/1.3/Net/src/MultipartWriter.cpp#2 $
 //
 // Library: Net
 // Package: Messages
@@ -50,14 +50,16 @@ namespace Net {
 
 MultipartWriter::MultipartWriter(std::ostream& ostr):
 	_ostr(ostr),
-	_boundary(createBoundary())
+	_boundary(createBoundary()),
+	_firstPart(true)
 {
 }
 
 
 MultipartWriter::MultipartWriter(std::ostream& ostr, const std::string& boundary):
 	_ostr(ostr),
-	_boundary(boundary)
+	_boundary(boundary),
+	_firstPart(true)
 {
 	if (_boundary.empty())
 		_boundary = createBoundary();
@@ -71,7 +73,11 @@ MultipartWriter::~MultipartWriter()
 	
 void MultipartWriter::nextPart(const MessageHeader& header)
 {
-	_ostr << "\r\n--" << _boundary << "\r\n";
+	if (_firstPart)
+		_firstPart = false;
+	else
+		_ostr << "\r\n";
+	_ostr << "--" << _boundary << "\r\n";
 	header.write(_ostr);
 	_ostr << "\r\n";
 }
