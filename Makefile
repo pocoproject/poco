@@ -20,7 +20,7 @@ endif
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML Util Net NetSSL_OpenSSL
+COMPONENTS = Foundation XML Util Net
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
@@ -39,13 +39,13 @@ install: libexecs
 	done
 	find $(POCO_BUILD)/lib -name "libPoco*" -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec
-.PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests
-.PHONY: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples
+.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec
+.PHONY: Foundation-tests XML-tests Util-tests Net-tests
+.PHONY: Foundation-samples XML-samples Util-samples Net-samples
 
-libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec
-tests: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests
-samples: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples
+libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec
+tests: Foundation-tests XML-tests Util-tests Net-tests
+samples: Foundation-samples XML-samples Util-samples Net-samples
 
 Foundation-libexec: 
 	$(MAKE) -C $(POCO_BASE)/Foundation
@@ -82,12 +82,3 @@ Net-tests: Net-libexec cppunit
 	
 Net-samples: Net-libexec  Foundation-libexec XML-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Net/samples
-
-NetSSL_OpenSSL-libexec:  Foundation-libexec Net-libexec Util-libexec
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL
-
-NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/testsuite
-	
-NetSSL_OpenSSL-samples: NetSSL_OpenSSL-libexec 
-	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples

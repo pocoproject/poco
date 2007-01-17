@@ -39,11 +39,6 @@ cd Net
 devenv /useenv /rebuild debug_shared Net_vs71.sln
 devenv /useenv /rebuild release_shared Net_vs71.sln
 cd %POCOBASE%
-
-cd NetSSL_OpenSSL
-devenv /useenv /rebuild debug_shared NetSSL_OpenSSL_vs71.sln
-devenv /useenv /rebuild release_shared NetSSL_OpenSSL_vs71.sln
-cd %POCOBASE%
 		
 cd Foundation/samples
 devenv /useenv /rebuild debug_shared samples_vs71.sln
@@ -61,11 +56,6 @@ devenv /useenv /rebuild release_shared samples_vs71.sln
 cd %POCOBASE%
 		
 cd Net/samples
-devenv /useenv /rebuild debug_shared samples_vs71.sln
-devenv /useenv /rebuild release_shared samples_vs71.sln
-cd %POCOBASE%
-		
-cd NetSSL_OpenSSL/samples
 devenv /useenv /rebuild debug_shared samples_vs71.sln
 devenv /useenv /rebuild release_shared samples_vs71.sln
 cd %POCOBASE%
