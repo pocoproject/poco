@@ -310,6 +310,9 @@
 				<File
 					RelativePath=".\src\TuplesTest.cpp">
 				</File>
+				<File
+					RelativePath=".\src\TypeListTest.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -367,6 +370,9 @@
 				</File>
 				<File
 					RelativePath=".\src\TuplesTest.h">
+				</File>
+				<File
+					RelativePath=".\src\TypeListTest.h">
 				</File>
 			</Filter>
 		</Filter>

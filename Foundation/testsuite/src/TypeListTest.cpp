@@ -37,7 +37,9 @@
 #include "Poco/TypeList.h"
 #include "Poco/Void.h"
 #include <iostream>
-
+#if defined(_MSC_VER)
+#	pragma warning(disable:4800) // forcing value to bool 'true' or 'false' on MSVC 71
+#endif
 
 using Poco::TypeList;
 using Poco::Tuple;
