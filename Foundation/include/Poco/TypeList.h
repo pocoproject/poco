@@ -1,7 +1,7 @@
 //
 // TypeList.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/TypeList.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/TypeList.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -11,6 +11,10 @@
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
+//
+// Portions extracted and adapted from
+// The Loki Library
+// Copyright (c) 2001 by Andrei Alexandrescu
 //
 // Permission is hereby granted, free of charge, to any person or organization
 // obtaining a copy of the software and accompanying documentation covered by
@@ -45,7 +49,6 @@
 
 
 namespace Poco {
-
 
 
 template <class Head, class Tail> 
@@ -140,27 +143,80 @@ struct TypeList
 };
 
 
-#define TYPELIST_1(T1) TypeList<T1, NullTypeList>
-#define TYPELIST_2(T1, T2) TypeList<T1, TYPELIST_1(T2)>
-#define TYPELIST_3(T1, T2, T3) TypeList<T1, TYPELIST_2(T2, T3)>
-#define TYPELIST_4(T1, T2, T3, T4) TypeList<T1, TYPELIST_3(T2, T3, T4)>
-#define TYPELIST_5(T1, T2, T3, T4, T5) TypeList<T1, TYPELIST_4(T2, T3, T4, T5)>
-#define TYPELIST_6(T1, T2, T3, T4, T5, T6) TypeList<T1, TYPELIST_5(T2, T3, T4, T5, T6)>
-#define TYPELIST_7(T1, T2, T3, T4, T5, T6, T7) TypeList<T1, TYPELIST_6(T2, T3, T4, T5, T6, T7)>
-#define TYPELIST_8(T1, T2, T3, T4, T5, T6, T7, T8) TypeList<T1, TYPELIST_7(T2, T3, T4, T5, T6, T7, T8)>
-#define TYPELIST_9(T1, T2, T3, T4, T5, T6, T7, T8, T9) TypeList<T1, TYPELIST_8(T2, T3, T4, T5, T6, T7, T8, T9)>
-#define TYPELIST_10(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) \
-	TypeList<T1, TYPELIST_9(T2, T3, T4, T5, T6, T7, T8, T9, T10)>
-#define TYPELIST_11(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) \
-	TypeList<T1, TYPELIST_10(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)>
-#define TYPELIST_12(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) \
-	TypeList<T1, TYPELIST_11(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)>
-#define TYPELIST_13(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) \
-	TypeList<T1, TYPELIST_12(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13)>
-#define TYPELIST_14(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) \
-	TypeList<T1, TYPELIST_13(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14)>
-#define TYPELIST_15(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) \
-	TypeList<T1, TYPELIST_14(T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15)>
+#define POCO_TYPELIST_1(T0) TypeList<T0, NullTypeList>
+#define POCO_TYPELIST_2(T0, T1) TypeList<T0, POCO_TYPELIST_1(T1)>
+#define POCO_TYPELIST_3(T0, T1, T2) TypeList<T0, POCO_TYPELIST_2(T1, T2)>
+#define POCO_TYPELIST_4(T0, T1, T2, T3) TypeList<T0, POCO_TYPELIST_3(T1, T2, T3)>
+#define POCO_TYPELIST_5(T0, T1, T2, T3, T4) TypeList<T0, POCO_TYPELIST_4(T1, T2, T3, T4)>
+#define POCO_TYPELIST_6(T0, T1, T2, T3, T4, T5) TypeList<T0, POCO_TYPELIST_5(T1, T2, T3, T4, T5)>
+#define POCO_TYPELIST_7(T0, T1, T2, T3, T4, T5, T6) TypeList<T0, POCO_TYPELIST_6(T1, T2, T3, T4, T5, T6)>
+#define POCO_TYPELIST_8(T0, T1, T2, T3, T4, T5, T6, T7) TypeList<T0, POCO_TYPELIST_7(T1, T2, T3, T4, T5, T6, T7)>
+#define POCO_TYPELIST_9(T0, T1, T2, T3, T4, T5, T6, T7, T8) TypeList<T0, POCO_TYPELIST_8(T1, T2, T3, T4, T5, T6, T7, T8)>
+#define POCO_TYPELIST_10(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9) \
+	TypeList<T0, POCO_TYPELIST_9(T1, T2, T3, T4, T5, T6, T7, T8, T9)>
+#define POCO_TYPELIST_11(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) \
+	TypeList<T0, POCO_TYPELIST_10(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)>
+#define POCO_TYPELIST_12(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) \
+	TypeList<T0, POCO_TYPELIST_11(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)>
+#define POCO_TYPELIST_13(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) \
+	TypeList<T0, POCO_TYPELIST_12(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)>
+#define POCO_TYPELIST_14(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) \
+	TypeList<T0, POCO_TYPELIST_13(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13)>
+#define POCO_TYPELIST_15(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) \
+	TypeList<T0, POCO_TYPELIST_14(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14)>
+#define POCO_TYPELIST_16(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) \
+	TypeList<T0, POCO_TYPELIST_15(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15)>
+#define POCO_TYPELIST_17(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) \
+	TypeList<T0, POCO_TYPELIST_16(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16)>
+#define POCO_TYPELIST_18(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) \
+	TypeList<T0, POCO_TYPELIST_17(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17)>
+#define POCO_TYPELIST_19(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) \
+	TypeList<T0, POCO_TYPELIST_18(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18)>
+#define POCO_TYPELIST_20(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) \
+	TypeList<T0, POCO_TYPELIST_19(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19)>
+
+
+template <typename T0  = NullTypeList, 
+	typename T1  = NullTypeList, 
+	typename T2  = NullTypeList,
+    typename T3  = NullTypeList, 
+	typename T4  = NullTypeList, 
+	typename T5  = NullTypeList,
+    typename T6  = NullTypeList, 
+	typename T7  = NullTypeList, 
+	typename T8  = NullTypeList,
+    typename T9  = NullTypeList, 
+	typename T10 = NullTypeList, 
+	typename T11 = NullTypeList,
+    typename T12 = NullTypeList, 
+	typename T13 = NullTypeList, 
+	typename T14 = NullTypeList,
+    typename T15 = NullTypeList, 
+	typename T16 = NullTypeList, 
+	typename T17 = NullTypeList,
+	typename T18 = NullTypeList,
+	typename T19 = NullTypeList> 
+struct TypeListType
+	/// TypeListType takes 1 - 20 typename arguments.
+	/// Usage:
+	///
+	/// TypeListType<T0, T1, ... , Tn>::HeadType typeList;
+	///
+	/// typeList is a TypeList of T0, T1, ... , Tn
+{
+private:
+    typedef typename TypeListType<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::HeadType TailType;
+
+public:
+    typedef TypeList<T0, TailType> HeadType;
+};
+
+
+template<>
+struct TypeListType<>
+{
+    typedef NullTypeList HeadType;
+};
 
 
 template<int n> 
@@ -216,13 +272,18 @@ struct TypeGetter<0, TypeList<Head, Tail> >
 };
 
 
-///
-/// TypeLocator
-///
-
 template <class Head, class T>
 struct TypeLocator;
-
+	/// TypeLocator returns the first occurrence of the type T in Head
+	/// or -1 if the type is not found.
+	///
+	/// Usage example:
+	///
+	/// TypeLocator<Head, int>::HeadType TypeLoc;
+	///
+	/// if (2 == TypeLoc.value) ...
+	///
+	
 
 template <class T>
 struct TypeLocator<NullTypeList, T>
@@ -248,13 +309,20 @@ public:
 };
 
 
-///
-/// TypeAppender
-///
-
 template <class Head, class T> 
 struct TypeAppender;
-
+	/// TypeAppender appends T (type or a TypeList) to Head.
+	///
+	/// Usage:
+	///
+	/// typedef TypeListType<char>::HeadType Type1;
+	/// typedef TypeAppender<Type1, int>::HeadType Type2;
+	/// (Type2 is a TypeList of char,int)
+	///
+	///	typedef TypeListType<float, double>::HeadType Type3;
+	/// typedef TypeAppender<Type2, Type3>::HeadType Type4;
+	/// (Type4 is a TypeList of char,int,float,double)
+	///
 
 template<>
 struct TypeAppender<NullTypeList, NullTypeList>
@@ -266,7 +334,7 @@ struct TypeAppender<NullTypeList, NullTypeList>
 template<class T>
 struct TypeAppender<NullTypeList, T>
 {
-	typedef TYPELIST_1(T) HeadType;
+	typedef POCO_TYPELIST_1(T) HeadType;
 };
 
 
@@ -284,32 +352,161 @@ struct TypeAppender<TypeList<Head, Tail>, T>
 };
 
 
-///
-/// TypeEraser
-///
-
-template <class HEad, class T> 
-struct TypeEraser;
+template <class Head, class T> 
+struct TypeOneEraser;
+	/// TypeOneEraser erases the first occurence of the type T in Head.
+	/// Usage:
+	///
+	/// typedef TypeListType<char, int, float>::HeadType Type3;
+	/// typedef TypeOneEraser<Type3, int>::HeadType Type2;
+	/// (Type2 is a TypeList of char,float)
+	///
 
 
 template <class T>
-struct TypeEraser<NullTypeList, T>
+struct TypeOneEraser<NullTypeList, T>
 {
 	typedef NullTypeList HeadType;
 };
 
 
 template <class T, class Tail>
-struct TypeEraser<TypeList<T, Tail>, T>
+struct TypeOneEraser<TypeList<T, Tail>, T>
 {
 	typedef Tail HeadType;
 };
 
 
 template <class Head, class Tail, class T>
-struct TypeEraser<TypeList<Head, Tail>, T>
+struct TypeOneEraser<TypeList<Head, Tail>, T>
 {
-	typedef TypeList <Head, typename TypeEraser<Tail, T>::HeadType> HeadType;
+	typedef TypeList <Head, typename TypeOneEraser<Tail, T>::HeadType> HeadType;
+};
+
+
+template <class Head, class T> 
+struct TypeAllEraser;
+	/// TypeAllEraser erases all the occurences of the type T in Head.
+	/// Usage:
+	///
+	/// typedef TypeListType<char, int, float, int>::HeadType Type4;
+	/// typedef TypeAllEraser<Type4, int>::HeadType Type2;
+	/// (Type2 is a TypeList of char,float)
+	///
+
+
+template <class T>
+struct TypeAllEraser<NullTypeList, T>
+{
+	typedef NullTypeList HeadType;
+};
+
+
+template <class T, class Tail>
+struct TypeAllEraser<TypeList<T, Tail>, T>
+{
+	typedef typename TypeAllEraser<Tail, T>::HeadType HeadType;
+};
+
+
+template <class Head, class Tail, class T>
+struct TypeAllEraser<TypeList<Head, Tail>, T>
+{
+	typedef TypeList <Head, typename TypeAllEraser<Tail, T>::HeadType> HeadType;
+};
+
+
+template <class Head> 
+struct TypeDuplicateEraser;
+	/// TypeDuplicateEraser erases all but the first occurence of the type T in Head.
+	/// Usage:
+	///
+	/// typedef TypeListType<char, int, float, int>::HeadType Type4;
+	/// typedef TypeDuplicateEraser<Type4, int>::HeadType Type3;
+	/// (Type3 is a TypeList of char,int,float)
+	///
+
+
+template <> 
+struct TypeDuplicateEraser<NullTypeList>
+{
+	typedef NullTypeList HeadType;
+};
+
+
+template <class Head, class Tail>
+struct TypeDuplicateEraser<TypeList<Head, Tail> >
+{
+private:
+	typedef typename TypeDuplicateEraser<Tail>::HeadType L1;
+	typedef typename TypeOneEraser<L1, Head>::HeadType L2;
+public:
+	typedef TypeList<Head, L2> HeadType;
+};
+
+
+template <class Head, class T, class R>
+struct TypeOneReplacer;
+	/// TypeOneReplacer replaces the first occurence 
+	/// of the type T in Head with type R.
+	/// Usage:
+	///
+	/// typedef TypeListType<char, int, float, int>::HeadType Type4;
+	/// typedef TypeOneReplacer<Type4, int, double>::HeadType TypeR;
+	/// (TypeR is a TypeList of char,double,float,int)
+	///
+
+template <class T, class R>
+struct TypeOneReplacer<NullTypeList, T, R>
+{
+	typedef NullTypeList HeadType;
+};
+
+
+template <class T, class Tail, class R>
+struct TypeOneReplacer<TypeList<T, Tail>, T, R>
+{
+	typedef TypeList<R, Tail> HeadType;
+};
+
+
+template <class Head, class Tail, class T, class R>
+struct TypeOneReplacer<TypeList<Head, Tail>, T, R>
+{
+	typedef TypeList<Head, typename TypeOneReplacer<Tail, T, R>::HeadType> HeadType;
+};
+
+
+template <class Head, class T, class R>
+struct TypeAllReplacer;
+	/// TypeAllReplacer replaces all the occurences 
+	/// of the type T in Head with type R.
+	/// Usage:
+	///
+	/// typedef TypeListType<char, int, float, int>::HeadType Type4;
+	/// typedef TypeAllReplacer<Type4, int, double>::HeadType TypeR;
+	/// (TypeR is a TypeList of char,double,float,double)
+	///
+
+
+template <class T, class R>
+struct TypeAllReplacer<NullTypeList, T, R>
+{
+	typedef NullTypeList HeadType;
+};
+
+
+template <class T, class Tail, class R>
+struct TypeAllReplacer<TypeList<T, Tail>, T, R>
+{
+	typedef TypeList<R, typename TypeAllReplacer<Tail, T, R>::HeadType> HeadType;
+};
+
+
+template <class Head, class Tail, class T, class R>
+struct TypeAllReplacer<TypeList<Head, Tail>, T, R>
+{
+	typedef TypeList<Head, typename TypeAllReplacer<Tail, T, R>::HeadType> HeadType;
 };
 
 

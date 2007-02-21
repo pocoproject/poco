@@ -48,6 +48,7 @@
 #include "AnyTest.h"
 #include "FormatTest.h"
 #include "TuplesTest.h"
+#include "TypeListTest.h"
 
 
 CppUnit::Test* CoreTestSuite::suite()
@@ -71,6 +72,7 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(AnyTest::suite());
 	pSuite->addTest(FormatTest::suite());
 	pSuite->addTest(TuplesTest::suite());
+	pSuite->addTest(TypeListTest::suite());
 
 	return pSuite;
 }

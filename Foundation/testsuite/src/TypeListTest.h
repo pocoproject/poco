@@ -1,9 +1,9 @@
 //
-// TuplesTest.h
+// TypeListTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TuplesTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TypeListTest.h#1 $
 //
-// Definition of the TuplesTest class.
+// Definition of the TypeListTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,41 +32,22 @@
 //
 
 
-#ifndef TuplesTest_INCLUDED
-#define TuplesTest_INCLUDED
+#ifndef TypeListTest_INCLUDED
+#define TypeListTest_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
 
 
-class TuplesTest: public CppUnit::TestCase
+class TypeListTest: public CppUnit::TestCase
 {
 public:
-	TuplesTest(const std::string& name);
-	~TuplesTest();
+	TypeListTest(const std::string& name);
+	~TypeListTest();
 
-	void testTuple1();
-	void testTuple2();
-	void testTuple3();
-	void testTuple4();
-	void testTuple5();
-	void testTuple6();
-	void testTuple7();
-	void testTuple8();
-	void testTuple9();
-	void testTuple10();
-	void testTuple11();
-	void testTuple12();
-	void testTuple13();
-	void testTuple14();
-	void testTuple15();
-	void testTuple16();
-	void testTuple17();
-	void testTuple18();
-	void testTuple19();
-	void testTuple20();
-	void testMemOverhead();
+	void testTypeListMacro();
+	void testTypeListTemplate();
 	void setUp();
 	void tearDown();
 
@@ -76,4 +57,4 @@ private:
 };
 
 
-#endif // TuplesTest_INCLUDED
+#endif // TypeListTest_INCLUDED
