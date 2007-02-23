@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ArchiveStrategy.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/ArchiveStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Logging

@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.cpp
 //
-// $Id: //poco/1.3/Foundation/src/ArchiveStrategy.cpp#1 $
+// $Id: //poco/Main/Foundation/src/ArchiveStrategy.cpp#7 $
 //
 // Library: Foundation
 // Package: Logging
@@ -74,9 +74,9 @@ protected:
 	{
 		std::string gzPath(path);
 		gzPath.append(".gz");
-		std::ifstream istr(path.c_str(), std::ios::binary | std::ios::in);
+		std::ifstream istr(Path::transcode(path).c_str(), std::ios::binary | std::ios::in);
 		if (!istr.good()) throw OpenFileException(path);
-		std::ofstream ostr(gzPath.c_str(), std::ios::binary | std::ios::out);
+		std::ofstream ostr(Path::transcode(gzPath).c_str(), std::ios::binary | std::ios::out);
 		if (ostr.good())
 		{
 			DeflatingOutputStream deflater(ostr, DeflatingStreamBuf::STREAM_GZIP);

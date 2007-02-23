@@ -1,7 +1,7 @@
 //
 // AbstractEvent.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/AbstractEvent.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/AbstractEvent.h#8 $
 //
 // Library: Foundation
 // Package: Events

@@ -1,7 +1,7 @@
 //
 // Path_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Path_WIN32U.cpp#1 $
+// $Id: //poco/Main/Foundation/src/Path_WIN32U.cpp#7 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -79,7 +79,7 @@ std::string PathImpl::homeImpl()
 std::string PathImpl::tempImpl()
 {
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
-	DWORD n = GetTempPathW(buffer.size(), buffer.begin());
+	DWORD n = GetTempPathW(static_cast<DWORD>(buffer.size()), buffer.begin());
 	if (n > 0)
 	{
 		std::string result;
@@ -103,7 +103,7 @@ std::string PathImpl::expandImpl(const std::string& path)
 	std::wstring upath;
 	UnicodeConverter::toUTF16(path, upath);
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
-	DWORD n = ExpandEnvironmentStringsW(upath.c_str(), buffer.begin(), buffer.size());
+	DWORD n = ExpandEnvironmentStringsW(upath.c_str(), buffer.begin(), static_cast<DWORD>(buffer.size()));
 	if (n > 0 && n < buffer.size() - 1)
 	{
 		buffer[n + 1] = 0;

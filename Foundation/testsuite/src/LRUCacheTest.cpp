@@ -1,7 +1,7 @@
 //
 // LRUCacheTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/LRUCacheTest.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/LRUCacheTest.cpp#10 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

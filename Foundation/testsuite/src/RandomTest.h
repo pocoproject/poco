@@ -1,7 +1,7 @@
 //
 // RandomTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/RandomTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/RandomTest.h#8 $
 //
 // Definition of the RandomTest class.
 //

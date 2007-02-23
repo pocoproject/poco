@@ -1,7 +1,7 @@
 //
 // HashStatistic.cpp
 //
-// $Id: //poco/1.3/Foundation/src/HashStatistic.cpp#1 $
+// $Id: //poco/Main/Foundation/src/HashStatistic.cpp#7 $
 //
 // Library: Foundation
 // Package: Hashing

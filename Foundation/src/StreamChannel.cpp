@@ -1,7 +1,7 @@
 //
 // StreamChannel.cpp
 //
-// $Id: //poco/1.3/Foundation/src/StreamChannel.cpp#1 $
+// $Id: //poco/Main/Foundation/src/StreamChannel.cpp#10 $
 //
 // Library: Foundation
 // Package: Logging

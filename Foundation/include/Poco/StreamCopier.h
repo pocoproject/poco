@@ -1,7 +1,7 @@
 //
 // StreamCopier.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/StreamCopier.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/StreamCopier.h#2 $
 //
 // Library: Foundation
 // Package: Streams

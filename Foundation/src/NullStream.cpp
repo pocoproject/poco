@@ -1,7 +1,7 @@
 //
 // NullStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NullStream.cpp#1 $
+// $Id: //poco/Main/Foundation/src/NullStream.cpp#12 $
 //
 // Library: Foundation
 // Package: Streams

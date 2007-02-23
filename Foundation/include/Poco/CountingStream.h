@@ -1,7 +1,7 @@
 //
 // CountingStream.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/CountingStream.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/CountingStream.h#2 $
 //
 // Library: Foundation
 // Package: Streams

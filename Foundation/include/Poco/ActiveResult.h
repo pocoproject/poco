@@ -1,7 +1,7 @@
 //
 // ActiveResult.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ActiveResult.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/ActiveResult.h#4 $
 //
 // Library: Foundation
 // Package: Threading

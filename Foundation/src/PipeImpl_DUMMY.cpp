@@ -1,7 +1,7 @@
 //
 // PipeImpl_DUMMY.cpp
 //
-// $Id: //poco/1.3/Foundation/src/PipeImpl_DUMMY.cpp#1 $
+// $Id: //poco/Main/Foundation/src/PipeImpl_DUMMY.cpp#4 $
 //
 // Library: Foundation
 // Package: Processes

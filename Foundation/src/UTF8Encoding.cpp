@@ -1,7 +1,7 @@
 //
 // UTF8Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UTF8Encoding.cpp#1 $
+// $Id: //poco/Main/Foundation/src/UTF8Encoding.cpp#12 $
 //
 // Library: Foundation
 // Package: Text
@@ -108,49 +108,65 @@ int UTF8Encoding::convert(const unsigned char* bytes) const
 
 int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
-	if (ch <= 0x7F && length >= 1)
+	if (ch <= 0x7F)
 	{
-		*bytes = (unsigned char) ch;
+		if (bytes && length >= 1)
+			*bytes = (unsigned char) ch;
 		return 1;
 	}
-	else if (ch <= 0x7FF && length >= 2)
+	else if (ch <= 0x7FF)
 	{
-		*bytes++ = (unsigned char) ((ch >> 6) & 0x1F | 0xC0);
-		*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		if (bytes && length >= 2)
+		{
+			*bytes++ = (unsigned char) ((ch >> 6) & 0x1F | 0xC0);
+			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		}
 		return 2;
 	}
-	else if (ch <= 0xFFFF && length >= 3)
+	else if (ch <= 0xFFFF)
 	{
-		*bytes++ = (unsigned char) ((ch >> 12) & 0x0F | 0xE0);
-		*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
-		*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		if (bytes && length >= 3)
+		{
+			*bytes++ = (unsigned char) ((ch >> 12) & 0x0F | 0xE0);
+			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
+			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		}
 		return 3;
 	}
-	else if (ch <= 0x1FFFFF && length >= 4)
+	else if (ch <= 0x1FFFFF)
 	{
-		*bytes++ = (unsigned char) ((ch >> 18) & 0x07 | 0xF0);
-		*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
-		*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
-		*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		if (bytes && length >= 4)
+		{
+			*bytes++ = (unsigned char) ((ch >> 18) & 0x07 | 0xF0);
+			*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
+			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
+			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		}
 		return 4;
 	}
-	else if (ch <= 0x3FFFFFF && length >= 5)
+	else if (ch <= 0x3FFFFFF)
 	{
-		*bytes++ = (unsigned char) ((ch >> 24) & 0x03 | 0xF8);
-		*bytes++ = (unsigned char) ((ch >> 18) & 0x3F | 0x80);
-		*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
-		*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
-		*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		if (bytes && length >= 5)
+		{
+			*bytes++ = (unsigned char) ((ch >> 24) & 0x03 | 0xF8);
+			*bytes++ = (unsigned char) ((ch >> 18) & 0x3F | 0x80);
+			*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
+			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
+			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		}
 		return 5;
 	}
-	else if (ch <= 0x7FFFFFFF && length >= 6)
+	else if (ch <= 0x7FFFFFFF)
 	{
-		*bytes++ = (unsigned char) ((ch >> 30) & 0x01 | 0xFC);
-		*bytes++ = (unsigned char) ((ch >> 24) & 0x3F | 0x80);
-		*bytes++ = (unsigned char) ((ch >> 18) & 0x3F | 0x80);
-		*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
-		*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
-		*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		if (bytes && length >= 6)
+		{
+			*bytes++ = (unsigned char) ((ch >> 30) & 0x01 | 0xFC);
+			*bytes++ = (unsigned char) ((ch >> 24) & 0x3F | 0x80);
+			*bytes++ = (unsigned char) ((ch >> 18) & 0x3F | 0x80);
+			*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
+			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
+			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
+		}
 		return 6;
 	}
 	else return 0;

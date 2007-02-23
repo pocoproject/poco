@@ -1,7 +1,7 @@
 //
 // Any.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Any.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/Any.h#2 $
 //
 // Library: Foundation
 // Package: Core

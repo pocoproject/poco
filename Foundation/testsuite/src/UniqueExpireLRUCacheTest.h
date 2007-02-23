@@ -1,7 +1,7 @@
 //
 // UniqueExpireLRUCacheTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/UniqueExpireLRUCacheTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/UniqueExpireLRUCacheTest.h#1 $
 //
 // Tests for UniqueExpireLRUCache
 //

@@ -1,7 +1,7 @@
 //
 // TimerTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TimerTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/TimerTest.h#9 $
 //
 // Definition of the TimerTest class.
 //

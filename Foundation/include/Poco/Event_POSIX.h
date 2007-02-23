@@ -1,7 +1,7 @@
 //
 // Event_POSIX.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Event_POSIX.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/Event_POSIX.h#2 $
 //
 // Library: Foundation
 // Package: Threading

@@ -1,7 +1,7 @@
 //
 // Latin1Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Latin1Encoding.cpp#1 $
+// $Id: //poco/Main/Foundation/src/Latin1Encoding.cpp#11 $
 //
 // Library: Foundation
 // Package: Text
@@ -87,7 +87,8 @@ int Latin1Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
 	if (ch >= 0 && ch <= 255)
 	{
-		*bytes = (unsigned char) ch;
+		if (bytes && length >= 1)
+			*bytes = (unsigned char) ch;
 		return 1;
 	}
 	else return 0;

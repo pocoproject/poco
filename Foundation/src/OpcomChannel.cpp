@@ -1,7 +1,7 @@
 //
 // OpcomChannel.cpp
 //
-// $Id: //poco/1.3/Foundation/src/OpcomChannel.cpp#1 $
+// $Id: //poco/Main/Foundation/src/OpcomChannel.cpp#10 $
 //
 // Library: Foundation
 // Package: Logging

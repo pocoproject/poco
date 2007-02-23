@@ -1,7 +1,7 @@
 //
 // Windows1252Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Windows1252Encoding.cpp#1 $
+// $Id: //poco/Main/Foundation/src/Windows1252Encoding.cpp#6 $
 //
 // Library: Foundation
 // Package: Text
@@ -88,7 +88,8 @@ int Windows1252Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
 	if (ch >= 0 && ch <= 255)
 	{
-		*bytes = (unsigned char) ch;
+		if (bytes && length >= 1)
+			*bytes = (unsigned char) ch;
 		return 1;
 	}
 	else return 0;

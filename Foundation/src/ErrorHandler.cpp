@@ -1,7 +1,7 @@
 //
 // ErrorHandler.cpp
 //
-// $Id: //poco/1.3/Foundation/src/ErrorHandler.cpp#1 $
+// $Id: //poco/Main/Foundation/src/ErrorHandler.cpp#6 $
 //
 // Library: Foundation
 // Package: Threading

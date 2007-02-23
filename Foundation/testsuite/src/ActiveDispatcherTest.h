@@ -1,7 +1,7 @@
 //
 // ActiveDispatcherTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ActiveDispatcherTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/ActiveDispatcherTest.h#2 $
 //
 // Definition of the ActiveDispatcherTest class.
 //

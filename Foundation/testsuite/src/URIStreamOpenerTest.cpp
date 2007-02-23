@@ -1,7 +1,7 @@
 //
 // URIStreamOpenerTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/URIStreamOpenerTest.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/URIStreamOpenerTest.cpp#10 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

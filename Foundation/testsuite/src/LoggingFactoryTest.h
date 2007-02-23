@@ -1,7 +1,7 @@
 //
 // LoggingFactoryTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/LoggingFactoryTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/LoggingFactoryTest.h#4 $
 //
 // Definition of the LoggingFactoryTest class.
 //

@@ -1,7 +1,7 @@
 //
 // PatternFormatterTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/PatternFormatterTest.cpp#2 $
+// $Id: //poco/Main/Foundation/testsuite/src/PatternFormatterTest.cpp#11 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

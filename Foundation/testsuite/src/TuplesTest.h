@@ -1,7 +1,7 @@
 //
 // TuplesTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TuplesTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/TuplesTest.h#4 $
 //
 // Definition of the TuplesTest class.
 //

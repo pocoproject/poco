@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.3/Foundation/samples/Timer/src/Timer.cpp#1 $
+// $Id: //poco/Main/Foundation/samples/Timer/src/Timer.cpp#9 $
 //
 // This sample demonstrates the Timer and Stopwatch classes.
 //

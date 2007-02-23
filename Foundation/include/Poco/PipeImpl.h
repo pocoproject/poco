@@ -1,7 +1,7 @@
 //
 // PipeImpl.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/PipeImpl.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/PipeImpl.h#3 $
 //
 // Library: Foundation
 // Package: Processes

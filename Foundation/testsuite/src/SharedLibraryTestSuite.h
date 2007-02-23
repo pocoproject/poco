@@ -1,7 +1,7 @@
 //
 // SharedLibraryTestSuite.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/SharedLibraryTestSuite.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/SharedLibraryTestSuite.h#8 $
 //
 // Definition of the SharedLibraryTestSuite class.
 //

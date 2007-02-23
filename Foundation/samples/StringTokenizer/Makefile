@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Foundation/samples/StringTokenizer/Makefile#1 $
+# $Id: //poco/Main/Foundation/samples/StringTokenizer/Makefile#5 $
 #
 # Makefile for Poco StringTokenizer
 #

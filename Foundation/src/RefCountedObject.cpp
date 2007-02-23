@@ -1,7 +1,7 @@
 //
 // RefCountedObject.cpp
 //
-// $Id: //poco/1.3/Foundation/src/RefCountedObject.cpp#1 $
+// $Id: //poco/Main/Foundation/src/RefCountedObject.cpp#7 $
 //
 // Library: Foundation
 // Package: Core

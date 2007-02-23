@@ -1,7 +1,7 @@
 //
 // LogFile_STD.cpp
 //
-// $Id: //poco/1.3/Foundation/src/LogFile_STD.cpp#1 $
+// $Id: //poco/Main/Foundation/src/LogFile_STD.cpp#8 $
 //
 // Library: Foundation
 // Package: Logging

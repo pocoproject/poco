@@ -1,7 +1,7 @@
 //
 // TeeStream.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/TeeStream.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/TeeStream.h#2 $
 //
 // Library: Foundation
 // Package: Streams

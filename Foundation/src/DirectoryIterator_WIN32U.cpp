@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DirectoryIterator_WIN32U.cpp#1 $
+// $Id: //poco/Main/Foundation/src/DirectoryIterator_WIN32U.cpp#5 $
 //
 // Library: Foundation
 // Package: Filesystem
