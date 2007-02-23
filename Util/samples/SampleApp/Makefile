@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Util/samples/SampleApp/Makefile#1 $
+# $Id: //poco/Main/Util/samples/SampleApp/Makefile#3 $
 #
 # Makefile for Poco SampleApp
 #

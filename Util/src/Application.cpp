@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.3/Util/src/Application.cpp#2 $
+// $Id: //poco/Main/Util/src/Application.cpp#25 $
 //
 // Library: Util
 // Package: Application

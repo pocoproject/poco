@@ -1,7 +1,7 @@
 //
 // IniFileConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/IniFileConfiguration.cpp#1 $
+// $Id: //poco/Main/Util/src/IniFileConfiguration.cpp#7 $
 //
 // Library: Util
 // Package: Configuration
@@ -37,6 +37,7 @@
 #include "Poco/Util/IniFileConfiguration.h"
 #include "Poco/Exception.h"
 #include "Poco/String.h"
+#include "Poco/Path.h"
 #include <fstream>
 #include <locale>
 #include <set>
@@ -44,6 +45,7 @@
 
 using Poco::icompare;
 using Poco::trim;
+using Poco::Path;
 
 
 namespace Poco {
@@ -85,7 +87,7 @@ void IniFileConfiguration::load(std::istream& istr)
 
 void IniFileConfiguration::load(const std::string& path)
 {
-	std::ifstream istr(path.c_str());
+	std::ifstream istr(Path::transcode(path).c_str());
 	if (istr.good())
 		load(istr);
 	else

@@ -1,7 +1,7 @@
 //
 // LayeredConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/LayeredConfigurationTest.h#2 $
+// $Id: //poco/Main/Util/testsuite/src/LayeredConfigurationTest.h#5 $
 //
 // Definition of the LayeredConfigurationTest class.
 //

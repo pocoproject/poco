@@ -1,7 +1,7 @@
 //
 // FilesystemConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/FilesystemConfigurationTest.cpp#1 $
+// $Id: //poco/Main/Util/testsuite/src/FilesystemConfigurationTest.cpp#6 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

@@ -1,7 +1,7 @@
 //
 // LoggingConfigurator.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/LoggingConfigurator.h#1 $
+// $Id: //poco/Main/Util/include/Poco/Util/LoggingConfigurator.h#3 $
 //
 // Library: Util
 // Package: Configuration

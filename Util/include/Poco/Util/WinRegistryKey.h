@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/WinRegistryKey.h#1 $
+// $Id: //poco/Main/Util/include/Poco/Util/WinRegistryKey.h#2 $
 //
 // Library: Util
 // Package: Windows

@@ -1,7 +1,7 @@
 //
 // WinConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/WinConfigurationTest.h#1 $
+// $Id: //poco/Main/Util/testsuite/src/WinConfigurationTest.h#4 $
 //
 // Definition of the WinConfigurationTest class.
 //

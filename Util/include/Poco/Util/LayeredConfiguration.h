@@ -1,7 +1,7 @@
 //
 // LayeredConfiguration.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/LayeredConfiguration.h#2 $
+// $Id: //poco/Main/Util/include/Poco/Util/LayeredConfiguration.h#3 $
 //
 // Library: Util
 // Package: Configuration

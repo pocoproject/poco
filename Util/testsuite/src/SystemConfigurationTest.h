@@ -1,7 +1,7 @@
 //
 // SystemConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/SystemConfigurationTest.h#1 $
+// $Id: //poco/Main/Util/testsuite/src/SystemConfigurationTest.h#4 $
 //
 // Definition of the SystemConfigurationTest class.
 //

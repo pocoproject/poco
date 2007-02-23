@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/AbstractConfiguration.cpp#1 $
+// $Id: //poco/Main/Util/src/AbstractConfiguration.cpp#6 $
 //
 // Library: Util
 // Package: Configuration

@@ -1,7 +1,7 @@
 //
 // WinRegistryConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/WinRegistryConfiguration.cpp#2 $
+// $Id: //poco/Main/Util/src/WinRegistryConfiguration.cpp#6 $
 //
 // Library: Util
 // Package: Windows

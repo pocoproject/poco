@@ -1,7 +1,7 @@
 //
 // FilesystemConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/FilesystemConfiguration.cpp#1 $
+// $Id: //poco/Main/Util/src/FilesystemConfiguration.cpp#7 $
 //
 // Library: Util
 // Package: Configuration
@@ -36,6 +36,7 @@
 
 #include "Poco/Util/FilesystemConfiguration.h"
 #include "Poco/File.h"
+#include "Poco/Path.h"
 #include "Poco/DirectoryIterator.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Exception.h"
@@ -80,7 +81,7 @@ bool FilesystemConfiguration::getRaw(const std::string& key, std::string& value)
 	if (f.exists())
 	{
 		value.reserve((std::string::size_type) f.getSize());
-		std::ifstream istr(p.toString().c_str());
+		std::ifstream istr(Path::transcode(p.toString()).c_str());
 		int c = istr.get();
 		while (c != std::char_traits<char>::eof())
 		{
@@ -99,7 +100,7 @@ void FilesystemConfiguration::setRaw(const std::string& key, const std::string& 
 	File dir(p);
 	dir.createDirectories();
 	p.setFileName("data");
-	std::ofstream ostr(p.toString().c_str());
+	std::ofstream ostr(Path::transcode(p.toString()).c_str());
 	ostr.write(value.data(), (std::streamsize) value.length());
 }
 

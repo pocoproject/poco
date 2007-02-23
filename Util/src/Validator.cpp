@@ -1,7 +1,7 @@
 //
 // Validator.cpp
 //
-// $Id: //poco/1.3/Util/src/Validator.cpp#1 $
+// $Id: //poco/Main/Util/src/Validator.cpp#1 $
 //
 // Library: Util
 // Package: Options
