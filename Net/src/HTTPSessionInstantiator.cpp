@@ -1,7 +1,7 @@
 //
 // HTTPSessionInstantiator.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPSessionInstantiator.cpp#1 $
+// $Id: //poco/Main/Net/src/HTTPSessionInstantiator.cpp#4 $
 //
 // Library: Net
 // Package: HTTPClient

@@ -1,7 +1,7 @@
 //
 // HTTPTestServer.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPTestServer.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPTestServer.h#5 $
 //
 // Definition of the HTTPTestServer class.
 //

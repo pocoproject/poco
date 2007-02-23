@@ -1,7 +1,7 @@
 //
 // HTTPServerSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerSession.h#1 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerSession.h#4 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -67,7 +67,10 @@ public:
 				
 	bool hasMoreRequests();
 		/// Returns true if there are requests available.
-		
+	
+	bool canKeepAlive() const;
+		/// Returns true if the session can be kept alive.
+	
 	SocketAddress clientAddress();
 		/// Returns the client's address.
 		
@@ -79,6 +82,15 @@ private:
 	Poco::Timespan _keepAliveTimeout;
 	int            _maxKeepAliveRequests;
 };
+
+
+//
+// inlines
+//
+inline bool HTTPServerSession::canKeepAlive() const
+{
+	return _maxKeepAliveRequests != 0;
+}
 
 
 } } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // ICMPSocketTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/ICMPSocketTest.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/ICMPSocketTest.h#3 $
 //
 // Definition of the ICMPSocketTest class.
 //

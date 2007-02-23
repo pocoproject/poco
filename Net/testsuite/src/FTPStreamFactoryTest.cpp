@@ -1,7 +1,7 @@
 //
 // FTPStreamFactoryTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/FTPStreamFactoryTest.cpp#1 $
+// $Id: //poco/Main/Net/testsuite/src/FTPStreamFactoryTest.cpp#5 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

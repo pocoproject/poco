@@ -1,7 +1,7 @@
 //
 // ICMPClientTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/ICMPClientTest.cpp#1 $
+// $Id: //poco/Main/Net/testsuite/src/ICMPClientTest.cpp#4 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

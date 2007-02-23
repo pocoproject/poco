@@ -1,7 +1,7 @@
 //
 // QuotedPrintableTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/QuotedPrintableTest.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/QuotedPrintableTest.h#4 $
 //
 // Definition of the QuotedPrintableTest class.
 //

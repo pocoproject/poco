@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPServerConnection.cpp#1 $
+// $Id: //poco/Main/Net/src/HTTPServerConnection.cpp#8 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -74,29 +74,50 @@ void HTTPServerConnection::run()
 	HTTPServerSession session(socket(), _pParams);
 	while (session.hasMoreRequests())
 	{
-		HTTPServerRequest request(session, _pParams);
-		HTTPServerResponse response(session);
-		response.setVersion(request.getVersion());
-		response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive());
-		if (!server.empty())
-			response.set("Server", server);
-		std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-		if (pHandler.get())
+		try
 		{
-			if (request.expectContinue())
-				response.sendContinue();
-			
-			pHandler->handleRequest(request, response);
-			session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive());
+			HTTPServerRequest request(session, _pParams);
+			HTTPServerResponse response(session);
+			response.setVersion(request.getVersion());
+			response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
+			if (!server.empty())
+				response.set("Server", server);
+			try
+			{
+				std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+				if (pHandler.get())
+				{
+					if (request.expectContinue())
+						response.sendContinue();
+					
+					pHandler->handleRequest(request, response);
+					session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
+				}
+				else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
+			}
+			catch (Poco::Exception&)
+			{
+				if (!response.sent())
+					sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+				throw;
+			}
 		}
-		else 
+		catch (MessageException&)
 		{
-			response.setStatusAndReason(HTTPResponse::HTTP_NOT_IMPLEMENTED);
-			response.setKeepAlive(false);
-			response.send();
-			session.setKeepAlive(false);
+			sendErrorResponse(session, HTTPResponse::HTTP_BAD_REQUEST);
 		}
 	}
+}
+
+
+void HTTPServerConnection::sendErrorResponse(HTTPServerSession& session, HTTPResponse::HTTPStatus status)
+{
+	HTTPServerResponse response(session);
+	response.setVersion(HTTPMessage::HTTP_1_1);
+	response.setStatusAndReason(status);
+	response.setKeepAlive(false);
+	response.send();
+	session.setKeepAlive(false);
 }
 
 

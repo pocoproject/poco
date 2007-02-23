@@ -1,7 +1,7 @@
 //
 // NetCoreTestSuite.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/NetCoreTestSuite.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/NetCoreTestSuite.h#4 $
 //
 // Definition of the NetCoreTestSuite class.
 //

@@ -1,7 +1,7 @@
 //
 // MulticastSocketTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/MulticastSocketTest.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/MulticastSocketTest.h#4 $
 //
 // Definition of the MulticastSocketTest class.
 //

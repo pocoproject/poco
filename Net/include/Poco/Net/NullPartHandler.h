@@ -1,7 +1,7 @@
 //
 // NullPartHandler.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/NullPartHandler.h#1 $
+// $Id: //poco/Main/Net/include/Poco/Net/NullPartHandler.h#2 $
 //
 // Library: Net
 // Package: Messages

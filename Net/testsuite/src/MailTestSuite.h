@@ -1,7 +1,7 @@
 //
 // MailTestSuite.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/MailTestSuite.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/MailTestSuite.h#4 $
 //
 // Definition of the MailTestSuite class.
 //

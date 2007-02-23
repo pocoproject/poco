@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPSession.cpp#1 $
+// $Id: //poco/Main/Net/src/HTTPSession.cpp#10 $
 //
 // Library: Net
 // Package: HTTP
@@ -192,6 +192,7 @@ bool HTTPSession::connected() const
 void HTTPSession::connect(const SocketAddress& address)
 {
 	_socket.connect(address, _timeout);
+	_socket.setNoDelay(true);
 }
 
 

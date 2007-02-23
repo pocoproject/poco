@@ -1,7 +1,7 @@
 //
 // HTTPClientTestSuite.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPClientTestSuite.cpp#1 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPClientTestSuite.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

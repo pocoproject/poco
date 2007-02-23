@@ -1,7 +1,7 @@
 //
 // HTTPCredentialsTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPCredentialsTest.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPCredentialsTest.h#4 $
 //
 // Definition of the HTTPCredentialsTest class.
 //

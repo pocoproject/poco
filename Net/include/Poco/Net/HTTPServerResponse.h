@@ -1,7 +1,7 @@
 //
 // HTTPServerResponse.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerResponse.h#1 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerResponse.h#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -83,19 +83,33 @@ public:
 		/// The returned stream is valid until the response
 		/// object is destroyed.
 		///
-		/// Must not be called after sendFile() or redirect() 
-		/// has been called.
+		/// Must not be called after sendFile(), sendBuffer() 
+		/// or redirect() has been called.
 		
 	void sendFile(const std::string& path, const std::string& mediaType);
 		/// Sends the response header to the client, followed
 		/// by the content of the given file.
 		///
-		/// Must not be called after send() or redirect() 
-		/// has been called.
+		/// Must not be called after send(), sendBuffer() 
+		/// or redirect() has been called.
 		///
 		/// Throws a FileNotFoundException if the file
 		/// cannot be found, or an OpenFileException if
 		/// the file cannot be opened.
+		
+	void sendBuffer(const void* pBuffer, std::size_t length);
+		/// Sends the response header to the client, followed
+		/// by the contents of the given buffer.
+		///
+		/// The Content-Length header of the response is set
+		/// to length and chunked transfer encoding is disabled.
+		///
+		/// If both the HTTP message header and body (from the
+		/// given buffer) fit into one single network packet, the 
+		/// complete response can be sent in one network packet.
+		///
+		/// Must not be called after send(), sendFile()  
+		/// or redirect() has been called.
 		
 	void redirect(const std::string& uri);
 		/// Sets the status code to 302 (Found)
@@ -109,11 +123,23 @@ public:
 		/// Sets the status code to 401 (Unauthorized)
 		/// and sets the "WWW-Authenticate" header field
 		/// according to the given realm.
+		
+	bool sent() const;
+		/// Returns true if the response (header) has been sent.
 
 private:
 	HTTPServerSession& _session;
 	std::ostream*      _pStream;
 };
+
+
+//
+// inlines
+//
+inline bool HTTPServerResponse::sent() const
+{
+	return _pStream != 0;
+}
 
 
 } } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // NameValueCollection.cpp
 //
-// $Id: //poco/1.3/Net/src/NameValueCollection.cpp#1 $
+// $Id: //poco/Main/Net/src/NameValueCollection.cpp#7 $
 //
 // Library: Net
 // Package: Messages

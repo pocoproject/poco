@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.3/Net/src/HTMLForm.cpp#1 $
+// $Id: //poco/Main/Net/src/HTMLForm.cpp#16 $
 //
 // Library: Net
 // Package: HTML
@@ -42,6 +42,7 @@
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/NullPartHandler.h"
 #include "Poco/NullStream.h"
+#include "Poco/CountingStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Exception.h"
 #include "Poco/URI.h"
@@ -179,6 +180,10 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 		if (_encoding == ENCODING_URL)
 		{
 			request.setContentType(_encoding);
+			request.setChunkedTransferEncoding(false);
+			Poco::CountingOutputStream ostr;
+			writeUrl(ostr);
+			request.setContentLength(ostr.chars());
 		}
 		else
 		{
@@ -194,7 +199,7 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 			request.setKeepAlive(false);
 			request.setChunkedTransferEncoding(false);
 		}
-		else
+		else if (_encoding != ENCODING_URL)
 		{
 			request.setChunkedTransferEncoding(true);
 		}
@@ -203,7 +208,7 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 	{
 		std::string uri = request.getURI();
 		std::ostringstream ostr;
-		write(ostr);
+		writeUrl(ostr);
 		uri.append("?");
 		uri.append(ostr.str());
 		request.setURI(uri);

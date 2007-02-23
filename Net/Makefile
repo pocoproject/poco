@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Net/Makefile#1 $
+# $Id: //poco/Main/Net/Makefile#34 $
 #
 # Makefile for Poco Net
 #

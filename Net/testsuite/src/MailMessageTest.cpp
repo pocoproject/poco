@@ -1,7 +1,7 @@
 //
 // MailMessageTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/MailMessageTest.cpp#2 $
+// $Id: //poco/Main/Net/testsuite/src/MailMessageTest.cpp#8 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

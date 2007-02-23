@@ -1,7 +1,7 @@
 //
 // MediaTypeTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/MediaTypeTest.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/MediaTypeTest.h#4 $
 //
 // Definition of the MediaTypeTest class.
 //

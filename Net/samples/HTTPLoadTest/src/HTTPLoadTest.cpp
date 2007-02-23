@@ -1,7 +1,7 @@
 //
 // HTTPLoadTest.cpp
 //
-// $Id: //poco/1.3/Net/samples/HTTPLoadTest/src/HTTPLoadTest.cpp#1 $
+// $Id: //poco/Main/Net/samples/HTTPLoadTest/src/HTTPLoadTest.cpp#5 $
 //
 // This sample demonstrates the HTTPClientSession class.
 //

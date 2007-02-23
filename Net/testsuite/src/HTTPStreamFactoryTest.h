@@ -1,7 +1,7 @@
 //
 // HTTPStreamFactoryTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPStreamFactoryTest.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPStreamFactoryTest.h#6 $
 //
 // Definition of the HTTPStreamFactoryTest class.
 //

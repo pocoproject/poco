@@ -1,7 +1,7 @@
 //
 // SocketReactorTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketReactorTest.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/SocketReactorTest.h#6 $
 //
 // Definition of the SocketReactorTest class.
 //

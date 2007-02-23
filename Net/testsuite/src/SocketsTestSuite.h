@@ -1,7 +1,7 @@
 //
 // SocketsTestSuite.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketsTestSuite.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/SocketsTestSuite.h#4 $
 //
 // Definition of the SocketsTestSuite class.
 //

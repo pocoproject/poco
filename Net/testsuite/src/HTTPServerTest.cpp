@@ -1,7 +1,7 @@
 //
 // HTTPServerTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPServerTest.cpp#2 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPServerTest.cpp#11 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -115,6 +115,16 @@ namespace
 		}
 	};
 	
+	class BufferRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			std::string data("xxxxxxxxxx");
+			response.sendBuffer(data.data(), data.length());
+		}
+	};
+	
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	{
 	public:
@@ -128,6 +138,8 @@ namespace
 				return new RedirectRequestHandler();
 			else if (request.getURI() == "/auth")
 				return new AuthRequestHandler();
+			else if (request.getURI() == "/buffer")
+				return new BufferRequestHandler();
 			else
 				return 0;
 		}
@@ -328,7 +340,61 @@ void HTTPServerTest::testClosedRequestKeepAlive()
 	assert (!response.getChunkedTransferEncoding());
 	assert (!response.getKeepAlive());
 	assert (rbody == body);
-	int n = (int) rbody.size();
+}
+
+
+void HTTPServerTest::testMaxKeepAlive()
+{
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	pParams->setMaxKeepAliveRequests(4);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	
+	HTTPClientSession cs("localhost", svs.address().port());
+	cs.setKeepAlive(true);
+	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
+	request.setContentType("text/plain");
+	request.setChunkedTransferEncoding(true);
+	std::string body(5000, 'x');
+	for (int i = 0; i < 3; ++i)
+	{
+		cs.sendRequest(request) << body;
+		HTTPResponse response;
+		std::string rbody;
+		cs.receiveResponse(response) >> rbody;
+		assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+		assert (response.getContentType() == "text/plain");
+		assert (response.getChunkedTransferEncoding());
+		assert (response.getKeepAlive());
+		assert (rbody == body);
+	}
+
+	{
+		cs.sendRequest(request) << body;
+		HTTPResponse response;
+		std::string rbody;
+		cs.receiveResponse(response) >> rbody;
+		assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+		assert (response.getContentType() == "text/plain");
+		assert (response.getChunkedTransferEncoding());
+		assert (!response.getKeepAlive());
+		assert (rbody == body);
+	}
+
+	{
+		cs.setKeepAlive(false);
+		cs.sendRequest(request) << body;
+		HTTPResponse response;
+		std::string rbody;
+		cs.receiveResponse(response) >> rbody;
+		assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+		assert (response.getContentType() == "text/plain");
+		assert (response.getChunkedTransferEncoding());
+		assert (!response.getKeepAlive());
+		assert (rbody == body);
+	}
 }
 
 
@@ -415,6 +481,25 @@ void HTTPServerTest::testNotImpl()
 }
 
 
+void HTTPServerTest::testBuffer()
+{
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	
+	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPRequest request("GET", "/buffer");
+	cs.sendRequest(request);
+	HTTPResponse response;
+	std::string rbody;
+	cs.receiveResponse(response) >> rbody;
+	assert (response.getStatus() == HTTPResponse::HTTP_OK);
+	assert (rbody == "xxxxxxxxxx");
+}
+
+
 void HTTPServerTest::setUp()
 {
 }
@@ -436,10 +521,12 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequestKeepAlive);
+	CppUnit_addTest(pSuite, HTTPServerTest, testMaxKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, test100Continue);
 	CppUnit_addTest(pSuite, HTTPServerTest, testRedirect);
 	CppUnit_addTest(pSuite, HTTPServerTest, testAuth);
 	CppUnit_addTest(pSuite, HTTPServerTest, testNotImpl);
+	CppUnit_addTest(pSuite, HTTPServerTest, testBuffer);
 
 	return pSuite;
 }

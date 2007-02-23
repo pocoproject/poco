@@ -1,7 +1,7 @@
 //
 // DialogServer.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/DialogServer.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/DialogServer.h#7 $
 //
 // Definition of the DialogServer class.
 //

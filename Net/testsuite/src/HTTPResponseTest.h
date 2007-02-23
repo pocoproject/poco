@@ -1,7 +1,7 @@
 //
 // HTTPResponseTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPResponseTest.h#1 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPResponseTest.h#6 $
 //
 // Definition of the HTTPResponseTest class.
 //
