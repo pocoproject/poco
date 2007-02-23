@@ -1,7 +1,7 @@
 //
 // Element.cpp
 //
-// $Id: //poco/1.3/XML/src/Element.cpp#1 $
+// $Id: //poco/Main/XML/src/Element.cpp#11 $
 //
 // Library: XML
 // Package: DOM

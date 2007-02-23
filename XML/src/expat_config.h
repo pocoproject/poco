@@ -1,7 +1,7 @@
 //
 // expat_config.h
 //
-// $Id: //poco/1.3/XML/src/expat_config.h#1 $
+// $Id: //poco/Main/XML/src/expat_config.h#8 $
 //
 // Poco XML specific configuration for expat.
 //

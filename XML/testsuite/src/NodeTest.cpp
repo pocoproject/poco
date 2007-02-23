@@ -1,7 +1,7 @@
 //
 // NodeTest.cpp
 //
-// $Id: //poco/1.3/XML/testsuite/src/NodeTest.cpp#1 $
+// $Id: //poco/Main/XML/testsuite/src/NodeTest.cpp#9 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

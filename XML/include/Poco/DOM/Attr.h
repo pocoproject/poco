@@ -1,7 +1,7 @@
 //
 // Attr.h
 //
-// $Id: //poco/1.3/XML/include/Poco/DOM/Attr.h#1 $
+// $Id: //poco/Main/XML/include/Poco/DOM/Attr.h#2 $
 //
 // Library: XML
 // Package: DOM

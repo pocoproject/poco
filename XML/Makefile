@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/XML/Makefile#1 $
+# $Id: //poco/Main/XML/Makefile#11 $
 #
 # Makefile for Poco XML
 #

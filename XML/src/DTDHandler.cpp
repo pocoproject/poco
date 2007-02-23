@@ -1,7 +1,7 @@
 //
 // DTDHandler.cpp
 //
-// $Id: //poco/1.3/XML/src/DTDHandler.cpp#1 $
+// $Id: //poco/Main/XML/src/DTDHandler.cpp#10 $
 //
 // Library: XML
 // Package: SAX

@@ -1,7 +1,7 @@
 //
 // NamedNodeMap.cpp
 //
-// $Id: //poco/1.3/XML/src/NamedNodeMap.cpp#1 $
+// $Id: //poco/Main/XML/src/NamedNodeMap.cpp#10 $
 //
 // Library: XML
 // Package: DOM

@@ -1,7 +1,7 @@
 //
 // Name.cpp
 //
-// $Id: //poco/1.3/XML/src/Name.cpp#1 $
+// $Id: //poco/Main/XML/src/Name.cpp#11 $
 //
 // Library: XML
 // Package: XML

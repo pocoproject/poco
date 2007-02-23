@@ -1,7 +1,7 @@
 //
 // InputSource.cpp
 //
-// $Id: //poco/1.3/XML/src/InputSource.cpp#1 $
+// $Id: //poco/Main/XML/src/InputSource.cpp#10 $
 //
 // Library: XML
 // Package: SAX

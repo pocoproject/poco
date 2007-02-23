@@ -1,7 +1,7 @@
 //
 // EntityResolverImpl.cpp
 //
-// $Id: //poco/1.3/XML/src/EntityResolverImpl.cpp#1 $
+// $Id: //poco/Main/XML/src/EntityResolverImpl.cpp#13 $
 //
 // Library: XML
 // Package: SAX
@@ -40,7 +40,6 @@
 #include "Poco/URI.h"
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
-#include <fstream>
 
 
 using Poco::URIStreamOpener;

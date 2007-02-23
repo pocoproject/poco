@@ -1,7 +1,7 @@
 //
 // DTDMap.cpp
 //
-// $Id: //poco/1.3/XML/src/DTDMap.cpp#1 $
+// $Id: //poco/Main/XML/src/DTDMap.cpp#10 $
 //
 // Library: XML
 // Package: DOM

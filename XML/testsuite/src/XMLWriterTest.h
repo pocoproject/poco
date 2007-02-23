@@ -1,7 +1,7 @@
 //
 // XMLWriterTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/XMLWriterTest.h#1 $
+// $Id: //poco/Main/XML/testsuite/src/XMLWriterTest.h#9 $
 //
 // Definition of the XMLWriterTest class.
 //

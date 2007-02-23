@@ -1,7 +1,7 @@
 //
 // ChildNodesTest.cpp
 //
-// $Id: //poco/1.3/XML/testsuite/src/ChildNodesTest.cpp#1 $
+// $Id: //poco/Main/XML/testsuite/src/ChildNodesTest.cpp#9 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

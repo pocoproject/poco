@@ -1,7 +1,7 @@
 //
 // TreeWalker.h
 //
-// $Id: //poco/1.3/XML/include/Poco/DOM/TreeWalker.h#1 $
+// $Id: //poco/Main/XML/include/Poco/DOM/TreeWalker.h#2 $
 //
 // Library: XML
 // Package: DOM

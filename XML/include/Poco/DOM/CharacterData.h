@@ -1,7 +1,7 @@
 //
 // CharacterData.h
 //
-// $Id: //poco/1.3/XML/include/Poco/DOM/CharacterData.h#1 $
+// $Id: //poco/Main/XML/include/Poco/DOM/CharacterData.h#2 $
 //
 // Library: XML
 // Package: DOM
