@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#19 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets

@@ -1,7 +1,7 @@
 //
 // HTTPSSessionInstantiator.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSSessionInstantiator.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/HTTPSSessionInstantiator.cpp#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient

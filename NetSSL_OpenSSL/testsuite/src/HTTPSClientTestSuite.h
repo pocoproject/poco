@@ -1,7 +1,7 @@
 //
 // HTTPSClientTestSuite.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientTestSuite.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSClientTestSuite.h#7 $
 //
 // Definition of the HTTPSClientTestSuite class.
 //

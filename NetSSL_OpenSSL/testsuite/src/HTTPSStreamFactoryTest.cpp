@@ -1,7 +1,7 @@
 //
 // HTTPSStreamFactoryTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.cpp#7 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

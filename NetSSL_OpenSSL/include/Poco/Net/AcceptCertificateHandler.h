@@ -1,7 +1,7 @@
 //
 // AcceptCertificateHandler.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/AcceptCertificateHandler.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/AcceptCertificateHandler.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
