@@ -1,7 +1,7 @@
 //
 // GUITestResult.cpp
 //
-// $Id: //poco/1.3/CppUnit/WinTestRunner/src/GUITestResult.cpp#1 $
+// $Id: //poco/Main/CppUnit/WinTestRunner/src/GUITestResult.cpp#7 $
 //
 
 
@@ -27,6 +27,15 @@ void GUITestResult::addFailure(Test *test, CppUnitException *e)
 
     TestResult::addFailure(test, e);
     _runner->addFailure(this, test, e);
+}
+
+
+void GUITestResult::startTest(Test *test)
+{
+    ExclusiveZone zone(_syncObject);
+
+    TestResult::startTest(test);
+    _runner->startTest(test);
 }
 
 

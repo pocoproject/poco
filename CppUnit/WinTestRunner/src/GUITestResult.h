@@ -1,7 +1,7 @@
 //
 // GUITestResult.h
 //
-// $Id: //poco/1.3/CppUnit/WinTestRunner/src/GUITestResult.h#1 $
+// $Id: //poco/Main/CppUnit/WinTestRunner/src/GUITestResult.h#8 $
 //
 
 
@@ -29,6 +29,7 @@ public:
 	void addError(Test* test, CppUnitException* e);
 	void addFailure(Test* test, CppUnitException* e);
 
+	void startTest(Test* test);
 	void endTest(Test* test);
 	void stop();
 

@@ -1,7 +1,7 @@
 $ !
 $ ! BUILD.COM
 $ !
-$ ! $Id: //poco/1.3/build/vms/build.com#1 $
+$ ! $Id: //poco/Main/build/vms/build.com#5 $
 $ !
 $ ! OpenVMS build procedure
 $ !

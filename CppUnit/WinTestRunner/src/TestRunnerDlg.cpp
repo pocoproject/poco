@@ -1,7 +1,7 @@
 //
 // TestRunnerDlg.cpp
 //
-// $Id: //poco/1.3/CppUnit/WinTestRunner/src/TestRunnerDlg.cpp#1 $
+// $Id: //poco/Main/CppUnit/WinTestRunner/src/TestRunnerDlg.cpp#7 $
 //
 
 
@@ -28,6 +28,7 @@ TestRunnerDlg::TestRunnerDlg(CWnd* pParent): CDialog(TestRunnerDlg::IDD, pParent
 
     _testsProgress     = 0;
     _selectedTest      = 0;
+    _currentTest       = 0;
 }
 
 
@@ -211,6 +212,7 @@ void TestRunnerDlg::addError (TestResult *result, Test *test, CppUnitException *
     addListEntry ("Error", result, test, e);
     _errors++;
 
+	_currentTest = 0;
     updateCountsDisplay ();
 
 }
@@ -221,8 +223,16 @@ void TestRunnerDlg::addFailure (TestResult *result, Test *test, CppUnitException
     addListEntry ("Failure", result, test, e);
     _failures++;
 
+	_currentTest = 0;
     updateCountsDisplay ();
 
+}
+
+
+void TestRunnerDlg::startTest(Test* test)
+{
+	_currentTest = test;
+	updateCountsDisplay();
 }
 
 
@@ -230,6 +240,7 @@ void TestRunnerDlg::endTest (TestResult *result, Test *test)
 {
 	if (_selectedTest == 0)
 		return;
+	_currentTest = 0;
 
     _testsRun++;
     updateCountsDisplay ();
@@ -325,7 +336,11 @@ void TestRunnerDlg::updateCountsDisplay ()
     argumentString.Format ("%d", _failures);
     statFailures    ->SetWindowText (argumentString);
 
-    argumentString.Format ("Execution time: %3.3lf seconds", (_testEndTime - _testStartTime) / 1000.0);
+	if (_currentTest)
+		argumentString.Format ("Execution Time: %3.3lf seconds, Current Test: %s", (_testEndTime - _testStartTime) / 1000.0, _currentTest->toString().c_str());
+	else
+		argumentString.Format ("Execution Time: %3.3lf seconds", (_testEndTime - _testStartTime) / 1000.0);
+		
     editTime        ->SetWindowText (argumentString);
 
 

@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: //poco/1.3/build/script/makedepend.qcc#1 $
+# $Id: //poco/Main/build/script/makedepend.qcc#5 $
 #
 # makedepend.gcc
 #

@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: //poco/1.3/build/script/makedepend.cxx#1 $
+# $Id: //poco/Main/build/script/makedepend.cxx#7 $
 #
 # makedepend.cxx
 #

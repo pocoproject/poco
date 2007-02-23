@@ -1,7 +1,7 @@
 //
 // TestRunnerDlg.h
 //
-// $Id: //poco/1.3/CppUnit/WinTestRunner/src/TestRunnerDlg.h#1 $
+// $Id: //poco/Main/CppUnit/WinTestRunner/src/TestRunnerDlg.h#8 $
 //
 
 
@@ -34,6 +34,7 @@ public:
 
     void addError(TestResult* result, Test* test, CppUnitException* e);
     void addFailure(TestResult* result, Test* test, CppUnitException* e);
+    void startTest(Test* test);
     void endTest(TestResult* result, Test* test);
 
     //{{AFX_DATA(TestRunnerDlg)
@@ -82,6 +83,7 @@ protected:
     int   _failures;
     DWORD _testStartTime;
     DWORD _testEndTime;
+    Test* _currentTest;
 };
 
 

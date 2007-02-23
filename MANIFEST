@@ -3,6 +3,7 @@ build
 build/config
 build/config/ARM-Linux
 build/config/CEGCCARM
+build/config/CygLinux
 build/config/CYGWIN
 build/config/Darwin
 build/config/Darwin7
@@ -379,6 +380,7 @@ Foundation/samples/ActiveMethod
 Foundation/samples/ActiveMethod/ActiveMethod.vmsbuild
 Foundation/samples/ActiveMethod/ActiveMethod_vs71.vcproj
 Foundation/samples/ActiveMethod/ActiveMethod_vs80.vcproj
+Foundation/samples/ActiveMethod/bin
 Foundation/samples/ActiveMethod/Makefile
 Foundation/samples/ActiveMethod/src
 Foundation/samples/ActiveMethod/src/ActiveMethod.cpp
@@ -386,6 +388,7 @@ Foundation/samples/Activity
 Foundation/samples/Activity/Activity.vmsbuild
 Foundation/samples/Activity/Activity_vs71.vcproj
 Foundation/samples/Activity/Activity_vs80.vcproj
+Foundation/samples/Activity/bin
 Foundation/samples/Activity/Makefile
 Foundation/samples/Activity/src
 Foundation/samples/Activity/src/Activity.cpp
@@ -393,6 +396,7 @@ Foundation/samples/base64decode
 Foundation/samples/base64decode/base64decode.vmsbuild
 Foundation/samples/base64decode/base64decode_vs71.vcproj
 Foundation/samples/base64decode/base64decode_vs80.vcproj
+Foundation/samples/base64decode/bin
 Foundation/samples/base64decode/Makefile
 Foundation/samples/base64decode/src
 Foundation/samples/base64decode/src/base64decode.cpp
@@ -400,10 +404,12 @@ Foundation/samples/base64encode
 Foundation/samples/base64encode/base64encode.vmsbuild
 Foundation/samples/base64encode/base64encode_vs71.vcproj
 Foundation/samples/base64encode/base64encode_vs80.vcproj
+Foundation/samples/base64encode/bin
 Foundation/samples/base64encode/Makefile
 Foundation/samples/base64encode/src
 Foundation/samples/base64encode/src/base64encode.cpp
 Foundation/samples/BinaryReaderWriter
+Foundation/samples/BinaryReaderWriter/bin
 Foundation/samples/BinaryReaderWriter/BinaryReaderWriter.vmsbuild
 Foundation/samples/BinaryReaderWriter/BinaryReaderWriter_vs71.vcproj
 Foundation/samples/BinaryReaderWriter/BinaryReaderWriter_vs80.vcproj
@@ -411,6 +417,7 @@ Foundation/samples/BinaryReaderWriter/Makefile
 Foundation/samples/BinaryReaderWriter/src
 Foundation/samples/BinaryReaderWriter/src/BinaryReaderWriter.cpp
 Foundation/samples/DateTime
+Foundation/samples/DateTime/bin
 Foundation/samples/DateTime/DateTime.vmsbuild
 Foundation/samples/DateTime/DateTime_vs71.vcproj
 Foundation/samples/DateTime/DateTime_vs80.vcproj
@@ -418,6 +425,7 @@ Foundation/samples/DateTime/Makefile
 Foundation/samples/DateTime/src
 Foundation/samples/DateTime/src/DateTime.cpp
 Foundation/samples/deflate
+Foundation/samples/deflate/bin
 Foundation/samples/deflate/deflate.vmsbuild
 Foundation/samples/deflate/deflate_vs71.vcproj
 Foundation/samples/deflate/deflate_vs80.vcproj
@@ -425,6 +433,7 @@ Foundation/samples/deflate/Makefile
 Foundation/samples/deflate/src
 Foundation/samples/deflate/src/deflate.cpp
 Foundation/samples/dir
+Foundation/samples/dir/bin
 Foundation/samples/dir/dir.vmsbuild
 Foundation/samples/dir/dir_vs71.vcproj
 Foundation/samples/dir/dir_vs80.vcproj
@@ -432,6 +441,7 @@ Foundation/samples/dir/Makefile
 Foundation/samples/dir/src
 Foundation/samples/dir/src/dir.cpp
 Foundation/samples/grep
+Foundation/samples/grep/bin
 Foundation/samples/grep/grep.vmsbuild
 Foundation/samples/grep/grep_vs71.vcproj
 Foundation/samples/grep/grep_vs80.vcproj
@@ -439,6 +449,7 @@ Foundation/samples/grep/Makefile
 Foundation/samples/grep/src
 Foundation/samples/grep/src/grep.cpp
 Foundation/samples/hmacmd5
+Foundation/samples/hmacmd5/bin
 Foundation/samples/hmacmd5/hmacmd5.vmsbuild
 Foundation/samples/hmacmd5/hmacmd5_vs71.vcproj
 Foundation/samples/hmacmd5/hmacmd5_vs80.vcproj
@@ -446,6 +457,7 @@ Foundation/samples/hmacmd5/Makefile
 Foundation/samples/hmacmd5/src
 Foundation/samples/hmacmd5/src/hmacmd5.cpp
 Foundation/samples/inflate
+Foundation/samples/inflate/bin
 Foundation/samples/inflate/inflate.vmsbuild
 Foundation/samples/inflate/inflate_vs71.vcproj
 Foundation/samples/inflate/inflate_vs80.vcproj
@@ -453,6 +465,7 @@ Foundation/samples/inflate/Makefile
 Foundation/samples/inflate/src
 Foundation/samples/inflate/src/inflate.cpp
 Foundation/samples/Logger
+Foundation/samples/Logger/bin
 Foundation/samples/Logger/Logger.vmsbuild
 Foundation/samples/Logger/Logger_vs71.vcproj
 Foundation/samples/Logger/Logger_vs80.vcproj
@@ -461,6 +474,7 @@ Foundation/samples/Logger/src
 Foundation/samples/Logger/src/Logger.cpp
 Foundation/samples/Makefile
 Foundation/samples/md5
+Foundation/samples/md5/bin
 Foundation/samples/md5/Makefile
 Foundation/samples/md5/md5.vmsbuild
 Foundation/samples/md5/md5_vs71.vcproj
@@ -468,6 +482,7 @@ Foundation/samples/md5/md5_vs80.vcproj
 Foundation/samples/md5/src
 Foundation/samples/md5/src/md5.cpp
 Foundation/samples/NotificationQueue
+Foundation/samples/NotificationQueue/bin
 Foundation/samples/NotificationQueue/Makefile
 Foundation/samples/NotificationQueue/NotificationQueue.vmsbuild
 Foundation/samples/NotificationQueue/NotificationQueue_vs71.vcproj
@@ -477,6 +492,7 @@ Foundation/samples/NotificationQueue/src/NotificationQueue.cpp
 Foundation/samples/samples_vs71.sln
 Foundation/samples/samples_vs80.sln
 Foundation/samples/StringTokenizer
+Foundation/samples/StringTokenizer/bin
 Foundation/samples/StringTokenizer/Makefile
 Foundation/samples/StringTokenizer/src
 Foundation/samples/StringTokenizer/src/StringTokenizer.cpp
@@ -484,13 +500,23 @@ Foundation/samples/StringTokenizer/StringTokenizer.vmsbuild
 Foundation/samples/StringTokenizer/StringTokenizer_vs71.vcproj
 Foundation/samples/StringTokenizer/StringTokenizer_vs80.vcproj
 Foundation/samples/Timer
+Foundation/samples/Timer/bin
 Foundation/samples/Timer/Makefile
 Foundation/samples/Timer/src
 Foundation/samples/Timer/src/Timer.cpp
 Foundation/samples/Timer/Timer.vmsbuild
 Foundation/samples/Timer/Timer_vs71.vcproj
 Foundation/samples/Timer/Timer_vs80.vcproj
+Foundation/samples/training
+Foundation/samples/training/bin
+Foundation/samples/training/Makefile
+Foundation/samples/training/src
+Foundation/samples/training/src/training.cpp
+Foundation/samples/training/training.vmsbuild
+Foundation/samples/training/training_VS71.vcproj
+Foundation/samples/training/training_VS80.vcproj
 Foundation/samples/URI
+Foundation/samples/URI/bin
 Foundation/samples/URI/Makefile
 Foundation/samples/URI/src
 Foundation/samples/URI/src/URI.cpp
@@ -498,6 +524,7 @@ Foundation/samples/URI/URI.vmsbuild
 Foundation/samples/URI/URI_vs71.vcproj
 Foundation/samples/URI/URI_vs80.vcproj
 Foundation/samples/uuidgen
+Foundation/samples/uuidgen/bin
 Foundation/samples/uuidgen/Makefile
 Foundation/samples/uuidgen/src
 Foundation/samples/uuidgen/src/uuidgen.cpp
@@ -939,6 +966,8 @@ Foundation/testsuite/src/TimezoneTest.cpp
 Foundation/testsuite/src/TimezoneTest.h
 Foundation/testsuite/src/TuplesTest.cpp
 Foundation/testsuite/src/TuplesTest.h
+Foundation/testsuite/src/TypeListTest.cpp
+Foundation/testsuite/src/TypeListTest.h
 Foundation/testsuite/src/UniqueExpireCacheTest.cpp
 Foundation/testsuite/src/UniqueExpireCacheTest.h
 Foundation/testsuite/src/UniqueExpireLRUCacheTest.cpp
@@ -1069,6 +1098,7 @@ Net/Net_vs80.sln
 Net/Net_vs80.vcproj
 Net/samples
 Net/samples/dict
+Net/samples/dict/bin
 Net/samples/dict/dict.vmsbuild
 Net/samples/dict/dict_vs71.vcproj
 Net/samples/dict/dict_vs80.vcproj
@@ -1076,6 +1106,7 @@ Net/samples/dict/Makefile
 Net/samples/dict/src
 Net/samples/dict/src/dict.cpp
 Net/samples/download
+Net/samples/download/bin
 Net/samples/download/download.vmsbuild
 Net/samples/download/download_vs71.vcproj
 Net/samples/download/download_vs80.vcproj
@@ -1083,6 +1114,7 @@ Net/samples/download/Makefile
 Net/samples/download/src
 Net/samples/download/src/download.cpp
 Net/samples/EchoServer
+Net/samples/EchoServer/bin
 Net/samples/EchoServer/EchoServer.properties
 Net/samples/EchoServer/EchoServer.vmsbuild
 Net/samples/EchoServer/EchoServer_vs71.vcproj
@@ -1091,6 +1123,7 @@ Net/samples/EchoServer/Makefile
 Net/samples/EchoServer/src
 Net/samples/EchoServer/src/EchoServer.cpp
 Net/samples/HTTPFormServer
+Net/samples/HTTPFormServer/bin
 Net/samples/HTTPFormServer/HTTPFormServer.properties
 Net/samples/HTTPFormServer/HTTPFormServer.vmsbuild
 Net/samples/HTTPFormServer/HTTPFormServer_vs71.vcproj
@@ -1099,6 +1132,7 @@ Net/samples/HTTPFormServer/Makefile
 Net/samples/HTTPFormServer/src
 Net/samples/HTTPFormServer/src/HTTPFormServer.cpp
 Net/samples/httpget
+Net/samples/httpget/bin
 Net/samples/httpget/httpget.vmsbuild
 Net/samples/httpget/httpget_vs71.vcproj
 Net/samples/httpget/httpget_vs80.vcproj
@@ -1106,6 +1140,7 @@ Net/samples/httpget/Makefile
 Net/samples/httpget/src
 Net/samples/httpget/src/httpget.cpp
 Net/samples/HTTPLoadTest
+Net/samples/HTTPLoadTest/bin
 Net/samples/HTTPLoadTest/HTTPLoadTest.vmsbuild
 Net/samples/HTTPLoadTest/HTTPLoadTest_vs71.vcproj
 Net/samples/HTTPLoadTest/HTTPLoadTest_vs80.vcproj
@@ -1113,6 +1148,7 @@ Net/samples/HTTPLoadTest/Makefile
 Net/samples/HTTPLoadTest/src
 Net/samples/HTTPLoadTest/src/HTTPLoadTest.cpp
 Net/samples/HTTPTimeServer
+Net/samples/HTTPTimeServer/bin
 Net/samples/HTTPTimeServer/HTTPTimeServer.properties
 Net/samples/HTTPTimeServer/HTTPTimeServer.vmsbuild
 Net/samples/HTTPTimeServer/HTTPTimeServer_vs71.vcproj
@@ -1120,7 +1156,16 @@ Net/samples/HTTPTimeServer/HTTPTimeServer_vs80.vcproj
 Net/samples/HTTPTimeServer/Makefile
 Net/samples/HTTPTimeServer/src
 Net/samples/HTTPTimeServer/src/HTTPTimeServer.cpp
+Net/samples/lt
+Net/samples/lt/bin
+Net/samples/lt/lt.vmsbuild
+Net/samples/lt/lt_VS71.vcproj
+Net/samples/lt/lt_VS80.vcproj
+Net/samples/lt/Makefile
+Net/samples/lt/src
+Net/samples/lt/src/lt.cpp
 Net/samples/Mail
+Net/samples/Mail/bin
 Net/samples/Mail/Mail.vmsbuild
 Net/samples/Mail/Mail_vs71.vcproj
 Net/samples/Mail/Mail_vs80.vcproj
@@ -1130,6 +1175,7 @@ Net/samples/Mail/src/Mail.cpp
 Net/samples/Mail/src/PocoLogo.hpp
 Net/samples/Makefile
 Net/samples/Ping
+Net/samples/Ping/bin
 Net/samples/Ping/Makefile
 Net/samples/Ping/ping.properties
 Net/samples/Ping/Ping.vmsbuild
@@ -1137,9 +1183,30 @@ Net/samples/Ping/Ping_vs71.vcproj
 Net/samples/Ping/Ping_vs80.vcproj
 Net/samples/Ping/src
 Net/samples/Ping/src/Ping.cpp
+Net/samples/SampleApp
+Net/samples/SampleApp/bin
+Net/samples/SampleApp/Makefile
+Net/samples/SampleApp/SampleApp.properties
+Net/samples/SampleApp/SampleApp.vmsbuild
+Net/samples/SampleApp/SampleApp_vs71.vcproj
+Net/samples/SampleApp/SampleApp_vs80.vcproj
+Net/samples/SampleApp/src
+Net/samples/SampleApp/src/SampleApp.cpp
+Net/samples/SampleServer
+Net/samples/SampleServer/bin
+Net/samples/SampleServer/bin/SampleServerd.properties
+Net/samples/SampleServer/Makefile
+Net/samples/SampleServer/SampleServer.properties
+Net/samples/SampleServer/SampleServer.vmsbuild
+Net/samples/SampleServer/SampleServer_vs71.vcproj
+Net/samples/SampleServer/SampleServer_vs80.vcproj
+Net/samples/SampleServer/src
+Net/samples/SampleServer/src/SampleServer.cpp
 Net/samples/samples_vs71.sln
 Net/samples/samples_vs80.sln
 Net/samples/TimeServer
+Net/samples/TimeServer/bin
+Net/samples/TimeServer/bin/TimeServerd.properties
 Net/samples/TimeServer/Makefile
 Net/samples/TimeServer/src
 Net/samples/TimeServer/src/TimeServer.cpp
@@ -1147,6 +1214,14 @@ Net/samples/TimeServer/TimeServer.properties
 Net/samples/TimeServer/TimeServer.vmsbuild
 Net/samples/TimeServer/TimeServer_vs71.vcproj
 Net/samples/TimeServer/TimeServer_vs80.vcproj
+Net/samples/tst
+Net/samples/tst/bin
+Net/samples/tst/Makefile
+Net/samples/tst/src
+Net/samples/tst/src/tst.cpp
+Net/samples/tst/tst.vmsbuild
+Net/samples/tst/tst_VS71.vcproj
+Net/samples/tst/tst_VS80.vcproj
 Net/src
 Net/src/DatagramSocket.cpp
 Net/src/DatagramSocketImpl.cpp
@@ -1380,6 +1455,7 @@ NetSSL_OpenSSL/NetSSL_OpenSSL_vs80.vcproj
 NetSSL_OpenSSL/samples
 NetSSL_OpenSSL/samples/download
 NetSSL_OpenSSL/samples/download/any.pem
+NetSSL_OpenSSL/samples/download/bin
 NetSSL_OpenSSL/samples/download/download.vmsbuild
 NetSSL_OpenSSL/samples/download/download_vs71.vcproj
 NetSSL_OpenSSL/samples/download/download_vs80.vcproj
@@ -1389,6 +1465,7 @@ NetSSL_OpenSSL/samples/download/src
 NetSSL_OpenSSL/samples/download/src/download.cpp
 NetSSL_OpenSSL/samples/HTTPSTimeServer
 NetSSL_OpenSSL/samples/HTTPSTimeServer/any.pem
+NetSSL_OpenSSL/samples/HTTPSTimeServer/bin
 NetSSL_OpenSSL/samples/HTTPSTimeServer/HTTPSTimeServer.properties
 NetSSL_OpenSSL/samples/HTTPSTimeServer/HTTPSTimeServer.vmsbuild
 NetSSL_OpenSSL/samples/HTTPSTimeServer/HTTPSTimeServer_vs71.vcproj
@@ -1494,6 +1571,8 @@ Util/Makefile
 Util/samples
 Util/samples/Makefile
 Util/samples/SampleApp
+Util/samples/SampleApp/bin
+Util/samples/SampleApp/bin/÷¸‰ﬂtest.properties
 Util/samples/SampleApp/Makefile
 Util/samples/SampleApp/SampleApp.properties
 Util/samples/SampleApp/SampleApp.vmsbuild
@@ -1502,6 +1581,8 @@ Util/samples/SampleApp/SampleApp_vs80.vcproj
 Util/samples/SampleApp/src
 Util/samples/SampleApp/src/SampleApp.cpp
 Util/samples/SampleServer
+Util/samples/SampleServer/bin
+Util/samples/SampleServer/bin/SampleServerd.properties
 Util/samples/SampleServer/Makefile
 Util/samples/SampleServer/SampleServer.properties
 Util/samples/SampleServer/SampleServer.vmsbuild
@@ -1679,6 +1760,7 @@ XML/samples
 XML/samples/data
 XML/samples/data/sample.xml
 XML/samples/DOMParser
+XML/samples/DOMParser/bin
 XML/samples/DOMParser/DOMParser.vmsbuild
 XML/samples/DOMParser/DOMParser_vs71.vcproj
 XML/samples/DOMParser/DOMParser_vs80.vcproj
@@ -1686,6 +1768,7 @@ XML/samples/DOMParser/Makefile
 XML/samples/DOMParser/src
 XML/samples/DOMParser/src/DOMParser.cpp
 XML/samples/DOMWriter
+XML/samples/DOMWriter/bin
 XML/samples/DOMWriter/DOMWriter.vmsbuild
 XML/samples/DOMWriter/DOMWriter_vs71.vcproj
 XML/samples/DOMWriter/DOMWriter_vs80.vcproj
@@ -1694,6 +1777,7 @@ XML/samples/DOMWriter/src
 XML/samples/DOMWriter/src/DOMWriter.cpp
 XML/samples/Makefile
 XML/samples/PrettyPrint
+XML/samples/PrettyPrint/bin
 XML/samples/PrettyPrint/Makefile
 XML/samples/PrettyPrint/PrettyPrint.vmsbuild
 XML/samples/PrettyPrint/PrettyPrint_vs71.vcproj
@@ -1703,12 +1787,21 @@ XML/samples/PrettyPrint/src/PrettyPrint.cpp
 XML/samples/samples_vs71.sln
 XML/samples/samples_vs80.sln
 XML/samples/SAXParser
+XML/samples/SAXParser/bin
 XML/samples/SAXParser/Makefile
 XML/samples/SAXParser/SAXParser.vmsbuild
 XML/samples/SAXParser/SAXParser_vs71.vcproj
 XML/samples/SAXParser/SAXParser_vs80.vcproj
 XML/samples/SAXParser/src
 XML/samples/SAXParser/src/SAXParser.cpp
+XML/samples/tst
+XML/samples/tst/bin
+XML/samples/tst/Makefile
+XML/samples/tst/src
+XML/samples/tst/src/tst.cpp
+XML/samples/tst/tst.vmsbuild
+XML/samples/tst/tst_VS71.vcproj
+XML/samples/tst/tst_VS80.vcproj
 XML/src
 XML/src/AbstractContainerNode.cpp
 XML/src/AbstractNode.cpp
@@ -1794,6 +1887,7 @@ XML/src/xmltok_ns.c
 XML/src/XMLWriter.cpp
 XML/testsuite
 XML/testsuite/Makefile
+XML/testsuite/rss.xml
 XML/testsuite/src
 XML/testsuite/src/AttributesImplTest.cpp
 XML/testsuite/src/AttributesImplTest.h
