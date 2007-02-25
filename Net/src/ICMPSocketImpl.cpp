@@ -1,7 +1,7 @@
 //
 // ICMPSocketImpl.cpp
 //
-// $Id: //poco/Main/Net/src/ICMPSocketImpl.cpp#5 $
+// $Id: //poco/1.3/Net/src/ICMPSocketImpl.cpp#1 $
 //
 // Library: Net
 // Package: ICMP

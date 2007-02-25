@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/Main/Net/src/Socket.cpp#10 $
+// $Id: //poco/1.3/Net/src/Socket.cpp#1 $
 //
 // Library: Net
 // Package: Sockets

@@ -1,7 +1,7 @@
 //
 // StreamSocketImpl.cpp
 //
-// $Id: //poco/Main/Net/src/StreamSocketImpl.cpp#6 $
+// $Id: //poco/1.3/Net/src/StreamSocketImpl.cpp#1 $
 //
 // Library: Net
 // Package: Sockets

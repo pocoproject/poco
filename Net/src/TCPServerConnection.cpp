@@ -1,7 +1,7 @@
 //
 // TCPServerConnection.cpp
 //
-// $Id: //poco/Main/Net/src/TCPServerConnection.cpp#7 $
+// $Id: //poco/1.3/Net/src/TCPServerConnection.cpp#1 $
 //
 // Library: Net
 // Package: TCPServer

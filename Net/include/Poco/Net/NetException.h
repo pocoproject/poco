@@ -1,7 +1,7 @@
 //
 // NetException.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/NetException.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/NetException.h#2 $
 //
 // Library: Net
 // Package: NetCore
@@ -58,6 +58,7 @@ POCO_DECLARE_EXCEPTION(Net_API, DNSException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, HostNotFoundException, DNSException)
 POCO_DECLARE_EXCEPTION(Net_API, NoAddressFoundException, DNSException)
 POCO_DECLARE_EXCEPTION(Net_API, InterfaceNotFoundException, NetException)
+POCO_DECLARE_EXCEPTION(Net_API, NoMessageException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, MessageException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, MultipartException, MessageException)
 POCO_DECLARE_EXCEPTION(Net_API, HTTPException, NetException)

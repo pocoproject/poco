@@ -1,7 +1,7 @@
 //
 // PartHandler.cpp
 //
-// $Id: //poco/Main/Net/src/PartHandler.cpp#6 $
+// $Id: //poco/1.3/Net/src/PartHandler.cpp#1 $
 //
 // Library: Net
 // Package: Messages

@@ -1,7 +1,7 @@
 //
 // ICMPPacket.cpp
 //
-// $Id: //poco/Main/Net/src/ICMPPacket.cpp#4 $
+// $Id: //poco/1.3/Net/src/ICMPPacket.cpp#1 $
 //
 // Library: Net
 // Package: ICMP

@@ -1,7 +1,7 @@
 //
 // HTTPStreamFactory.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPStreamFactory.cpp#11 $
+// $Id: //poco/1.3/Net/src/HTTPStreamFactory.cpp#1 $
 //
 // Library: Net
 // Package: HTTP

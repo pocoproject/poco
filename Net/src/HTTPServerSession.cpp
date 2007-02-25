@@ -1,7 +1,7 @@
 //
 // HTTPServerSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerSession.cpp#7 $
+// $Id: //poco/1.3/Net/src/HTTPServerSession.cpp#2 $
 //
 // Library: Net
 // Package: HTTPServer

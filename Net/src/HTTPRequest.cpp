@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPRequest.cpp#10 $
+// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -208,6 +208,7 @@ void HTTPRequest::read(std::istream& istr)
 	std::string uri;
 	std::string version;
 	int ch = istr.get();
+	if (ch == eof) throw NoMessageException();
 	while (isspace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP request header");
 	while (!isspace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }

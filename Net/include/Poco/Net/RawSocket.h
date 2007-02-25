@@ -1,7 +1,7 @@
 //
 // RawSocket.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/RawSocket.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/RawSocket.h#1 $
 //
 // Library: Net
 // Package: Sockets

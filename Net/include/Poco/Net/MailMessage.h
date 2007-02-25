@@ -1,7 +1,7 @@
 //
 // MailMessage.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/MailMessage.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/MailMessage.h#1 $
 //
 // Library: Net
 // Package: Mail

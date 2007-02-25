@@ -1,7 +1,7 @@
 //
 // HTTPRequestHandler.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPRequestHandler.cpp#6 $
+// $Id: //poco/1.3/Net/src/HTTPRequestHandler.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer

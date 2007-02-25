@@ -1,7 +1,7 @@
 //
 // MailRecipient.cpp
 //
-// $Id: //poco/Main/Net/src/MailRecipient.cpp#6 $
+// $Id: //poco/1.3/Net/src/MailRecipient.cpp#1 $
 //
 // Library: Net
 // Package: Mail

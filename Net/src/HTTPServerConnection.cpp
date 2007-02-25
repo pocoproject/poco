@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerConnection.cpp#8 $
+// $Id: //poco/1.3/Net/src/HTTPServerConnection.cpp#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -101,6 +101,10 @@ void HTTPServerConnection::run()
 					sendErrorResponse(session, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 				throw;
 			}
+		}
+		catch (NoMessageException&)
+		{
+			break;
 		}
 		catch (MessageException&)
 		{

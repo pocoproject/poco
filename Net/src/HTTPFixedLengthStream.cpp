@@ -1,7 +1,7 @@
 //
 // HTTPFixedLengthStream.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPFixedLengthStream.cpp#9 $
+// $Id: //poco/1.3/Net/src/HTTPFixedLengthStream.cpp#1 $
 //
 // Library: Net
 // Package: HTTP

@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPSession.cpp#10 $
+// $Id: //poco/1.3/Net/src/HTTPSession.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
