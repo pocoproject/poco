@@ -1,7 +1,7 @@
 //
 // HelpFormatterTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/HelpFormatterTest.cpp#5 $
+// $Id: //poco/1.3/Util/testsuite/src/HelpFormatterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -64,7 +64,7 @@ void HelpFormatterTest::testHelpFormatter()
 			.argument("path"));
 			
 	set.addOption(
-		Option("library-dir", "L", "specify a search path for locating library files")
+		Option("library-dir", "L", "specify a search path for locating library files (this option has a very long description)")
 			.required(false)
 			.repeatable(true)
 			.argument("path"));
