@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPChunkedStream.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPChunkedStream.h#3 $
 //
 // Library: Net
 // Package: HTTP

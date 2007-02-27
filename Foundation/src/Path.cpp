@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/Main/Foundation/src/Path.cpp#19 $
+// $Id: //poco/Main/Foundation/src/Path.cpp#20 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -38,8 +38,10 @@
 #include "Poco/File.h"
 #include "Poco/Exception.h"
 #include "Poco/StringTokenizer.h"
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Buffer.h"
+#endif
 #include <algorithm>
 
 

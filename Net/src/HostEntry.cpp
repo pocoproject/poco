@@ -1,7 +1,7 @@
 //
 // HostEntry.cpp
 //
-// $Id: //poco/1.3/Net/src/HostEntry.cpp#1 $
+// $Id: //poco/Main/Net/src/HostEntry.cpp#7 $
 //
 // Library: Net
 // Package: NetCore

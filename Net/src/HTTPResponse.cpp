@@ -1,7 +1,7 @@
 //
 // HTTPResponse.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPResponse.cpp#2 $
+// $Id: //poco/Main/Net/src/HTTPResponse.cpp#11 $
 //
 // Library: Net
 // Package: HTTP

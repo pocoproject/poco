@@ -1,7 +1,7 @@
 //
 // NetException.cpp
 //
-// $Id: //poco/1.3/Net/src/NetException.cpp#2 $
+// $Id: //poco/Main/Net/src/NetException.cpp#16 $
 //
 // Library: Net
 // Package: NetCore

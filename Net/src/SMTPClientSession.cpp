@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#2 $
+// $Id: //poco/Main/Net/src/SMTPClientSession.cpp#8 $
 //
 // Library: Net
 // Package: Mail

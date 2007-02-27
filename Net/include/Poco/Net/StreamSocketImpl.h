@@ -1,7 +1,7 @@
 //
 // StreamSocketImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/StreamSocketImpl.h#1 $
+// $Id: //poco/Main/Net/include/Poco/Net/StreamSocketImpl.h#2 $
 //
 // Library: Net
 // Package: Sockets

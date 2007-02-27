@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPClientSession.cpp#3 $
+// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#16 $
 //
 // Library: Net
 // Package: HTTPClient

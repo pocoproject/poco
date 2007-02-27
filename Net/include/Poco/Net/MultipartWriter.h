@@ -1,7 +1,7 @@
 //
 // MultipartWriter.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/MultipartWriter.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/MultipartWriter.h#3 $
 //
 // Library: Net
 // Package: Messages
