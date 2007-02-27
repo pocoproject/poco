@@ -1,7 +1,7 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/1.2/Foundation/src/File_WIN32U.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/File_WIN32U.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -75,7 +75,6 @@ FileImpl::FileImpl()
 FileImpl::FileImpl(const std::string& path): _path(path)
 {
 	std::string::size_type n = _path.size();
-	std::string::size_type n = _path.size();
 	if (n > 1 && (_path[n - 1] == '\\' || _path[n - 1] == '/') && !((n == 3 && _path[1]==':')))
 	{
 		_path.resize(n - 1);
@@ -99,7 +98,6 @@ void FileImpl::swapImpl(FileImpl& file)
 void FileImpl::setPathImpl(const std::string& path)
 {
 	_path = path;
-	std::string::size_type n = _path.size();
 	std::string::size_type n = _path.size();
 	if (n > 1 && (_path[n - 1] == '\\' || _path[n - 1] == '/') && !((n == 3 && _path[1]==':')))
 	{

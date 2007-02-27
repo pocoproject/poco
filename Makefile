@@ -74,7 +74,7 @@ Util-tests: Util-libexec cppunit
 Util-samples: Util-libexec 
 	$(MAKE) -C $(POCO_BASE)/Util/samples
 
-Net-libexec:  Foundation-libexec XML-libexec Util-libexec
+Net-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Net
 
 Net-tests: Net-libexec cppunit

@@ -1,7 +1,7 @@
 //
 // TCPServer.cpp
 //
-// $Id: //poco/1.2/Net/src/TCPServer.cpp#1 $
+// $Id: //poco/1.2/Net/src/TCPServer.cpp#2 $
 //
 // Library: Net
 // Package: TCPServer
@@ -102,14 +102,16 @@ void TCPServer::stop()
 
 void TCPServer::run()
 {
-	 while (!_stopped)
-	 {
+	while (!_stopped)
+	{
 		Poco::Timespan timeout(250000);
 		if (_socket.poll(timeout, Socket::SELECT_READ))
 		{
 			try
 			{
 				StreamSocket ss = _socket.acceptConnection();
+				// enabe nodelay per default: OSX really needs that
+				ss.setNoDelay(true);
 				_pDispatcher->enqueue(ss);
 			}
 			catch (Poco::Exception& exc)
@@ -125,7 +127,7 @@ void TCPServer::run()
 				ErrorHandler::handle();
 			}
 		}
-	 }
+	}
 }
 
 

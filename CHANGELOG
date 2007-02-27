@@ -1,4 +1,40 @@
-This is the changelog file for POCO - the C++ Portable Components.
+This is the changelog file for the POCO C++ Libraries.
+
+Release 1.2.9 (2007-02-26)
+==========================
+
+- fixed a formatting problem in Util::HelpFormatter
+- HTTPClientSession::sendRequest() now attempts to send the complete request in one network packet.
+- improved network performance of ChunkedOutputStream: chunk size and chunk data 
+  are sent in one network packet if possible
+- fixed SF# 1655035: Wrong expires field calculation in HTTPCookie 
+  (thanks to Sergey N. Yatskevich for this and other fixes)
+- fixed SF# 1655049: Fix discrepancy of a code to the description
+- fixed SF# 1655170: Poco::Timezone::standardName() problem on WIN32
+- fixed SF# 1629095: POCO_WIN32_UTF8 problem
+  There is a new function Path::transcode() that can be used to convert a path (or any other string)
+  from UTF-8 to the current Windows code page. This string can the be passed as a filename
+  to an fstream or fopen(). This function only does the conversion on Windows,
+  and only, if POCO_WIN32_UTF8 is defined. Otherwise, it simply returns the unmodified argument.
+- fixed SF# 1659607: Probably a bug in Poco::Net::DialogSocket
+- HTTPServer network performance improvement: responses that fit into a single network packet
+  sent with HTTPServerResponse::sendFile() or the new HTTPServerResponse::sendBuffer() are
+  sent in only one packet.
+- added HTTPServerResponse::sendBuffer()
+- HTTPServer now sends a Bad Request response if it fails to parse the HTTP request header.
+- HTTPServer now sends an Internal Server Error response if the request handler throws an
+  exception prior to sending a response.- enabled TCP_NODELAY per default on TCPServer/HTTPServer
+- fixed a bug in HTTP persistent connection handling 
+  (server does not send Connection: close when it reaches connection maximum)
+- HTMLForm - POST submission of URL encoded form no longer uses chunked transfer encoding
+  (thus improving interoperability with certain web servers)
+- integrated Environment.cpp from Main (missing get(var, default))
+- added missing AutoPtr include to Util/Application 
+  (and using Poco::AutoPtr is no longer necessary for POCO_APP_MAIN macro)
+- fixed SF# 1635420: Per Regents of the University of Calfornia letter, 
+  remove advertising from BSD licensed parts
+- fixed SF# 1633133: MultipartWriter writes superluous CR-LF at beginning
+
 
 Release 1.2.8 (2007-01-04)
 ==========================
@@ -609,4 +645,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.2/dist/CHANGELOG#20 $
+$Id: //poco/1.2/dist/CHANGELOG#26 $

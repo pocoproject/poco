@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.2/Net/src/HTTPRequest.cpp#1 $
+// $Id: //poco/1.2/Net/src/HTTPRequest.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -208,13 +208,14 @@ void HTTPRequest::read(std::istream& istr)
 	std::string uri;
 	std::string version;
 	int ch = istr.get();
+	if (ch == eof) throw NoMessageException();
 	while (isspace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP request header");
 	while (!isspace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
-	if (!isspace(ch)) throw MessageException("HTTP request method too long");
+	if (!isspace(ch)) throw MessageException("HTTP request method invalid or too long");
 	while (isspace(ch)) ch = istr.get();
 	while (!isspace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
-	if (!isspace(ch)) throw MessageException("HTTP request URI too long");
+	if (!isspace(ch)) throw MessageException("HTTP request URI invalid or too long");
 	while (isspace(ch)) ch = istr.get();
 	while (!isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
 	if (!isspace(ch)) throw MessageException("Invalid HTTP version string");

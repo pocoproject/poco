@@ -1,7 +1,7 @@
 //
 // Path.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/Path.h#2 $
+// $Id: //poco/1.2/Foundation/include/Poco/Path.h#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -338,6 +338,17 @@ public:
 		/// If the file is found in one of the locations, the complete
 		/// path of the file is stored in the path given as argument and true is returned. 
 		/// Otherwise false is returned and the path argument remains unchanged.
+		
+	static std::string transcode(const std::string& path);
+		/// On Windows, if POCO has been compiled with Windows UTF-8 support 
+		/// (POCO_WIN32_UTF8), this function converts a string (usually containing a path) 
+		/// encoded in UTF-8 into a string encoded in the current Windows code page.
+		/// 
+		/// This function should be used for every string passed as a file name to
+		/// a string stream or fopen().
+		///
+		/// On all other platforms, or if POCO has not been compiled with Windows UTF-8
+		/// support, this function returns the string unchanged.
 
 protected:
 	void parseUnix(const std::string& path);

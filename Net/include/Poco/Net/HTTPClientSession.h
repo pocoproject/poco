@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.2/Net/include/Poco/Net/HTTPClientSession.h#1 $
+// $Id: //poco/1.2/Net/include/Poco/Net/HTTPClientSession.h#2 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -194,6 +194,7 @@ private:
 	std::string   _proxyHost;
 	Poco::UInt16  _proxyPort;
 	bool          _reconnect;
+	bool          _mustReconnect;
 	bool          _expectResponseBody;
 	std::ostream* _pRequestStream;
 	std::istream* _pResponseStream;

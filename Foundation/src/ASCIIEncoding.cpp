@@ -1,7 +1,7 @@
 //
 // ASCIIEncoding.cpp
 //
-// $Id: //poco/1.2/Foundation/src/ASCIIEncoding.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/ASCIIEncoding.cpp#2 $
 //
 // Library: Foundation
 // Package: Text
@@ -87,7 +87,8 @@ int ASCIIEncoding::convert(int ch, unsigned char* bytes, int length) const
 {
 	if (ch >= 0 && ch <= 127)
 	{
-		*bytes = (unsigned char) ch;
+		if (bytes && length >= 1)
+			*bytes = (unsigned char) ch;
 		return 1;
 	}
 	else return 0;

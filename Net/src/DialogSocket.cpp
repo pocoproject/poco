@@ -1,7 +1,7 @@
 //
 // DialogSocket.cpp
 //
-// $Id: //poco/1.2/Net/src/DialogSocket.cpp#1 $
+// $Id: //poco/1.2/Net/src/DialogSocket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -172,7 +172,7 @@ int DialogSocket::get()
 {
 	refill();
 	if (_pNext != _pEnd)
-		return *_pNext++;
+		return std::char_traits<char>::to_int_type(*_pNext++);
 	else
 		return EOF_CHAR;
 }
@@ -182,7 +182,7 @@ int DialogSocket::peek()
 {
 	refill();
 	if (_pNext != _pEnd)
-		return *_pNext;
+		return std::char_traits<char>::to_int_type(*_pNext);
 	else
 		return EOF_CHAR;
 }

@@ -1,7 +1,7 @@
 //
 // String.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/String.h#1 $
+// $Id: //poco/1.2/Foundation/include/Poco/String.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <cstring>
 #include <locale>
 
 
@@ -417,6 +418,92 @@ S translateInPlace(S& str, const typename S::value_type* from, const typename S:
 	str = translate(str, S(from), S(to));
 	return str;
 }
+
+
+#if !defined(POCO_NO_TEMPLATE_ICOMPARE)
+
+
+template <class S>
+S replace(const S& str, const S& from, const S& to, typename S::size_type start = 0)
+	/// Replace all occurences of from (which must not be the empty string)
+	/// in str with to, starting at position start.
+{
+	S result(str);
+	replaceInPlace(result, from, to, start);
+	return result;
+}
+
+
+template <class S>
+S replace(const S& str, const typename S::value_type* from, const typename S::value_type* to, typename S::size_type start = 0)
+{
+	S result(str);
+	replaceInPlace(result, from, to, start);
+	return result;
+}
+
+
+template <class S>
+S& replaceInPlace(S& str, const S& from, const S& to, typename S::size_type start = 0)
+{
+	poco_assert (from.size() > 0);
+	
+	S result;
+	typename S::size_type pos = 0;
+	result.append(str, 0, start);
+	do
+	{
+		pos = str.find(from, start);
+		if (pos != S::npos)
+		{
+			result.append(str, start, pos - start);
+			result.append(to);
+			start = pos + from.length();
+		}
+		else result.append(str, start, str.size() - start);
+	}
+	while (pos != S::npos);
+	str.swap(result);
+	return str;
+}
+
+
+template <class S>
+S& replaceInPlace(S& str, const typename S::value_type* from, const typename S::value_type* to, typename S::size_type start = 0)
+{
+	poco_assert (*from);
+
+	S result;
+	typename S::size_type pos = 0;
+	typename S::size_type fromLen = strlen(from);
+	result.append(str, 0, start);
+	do
+	{
+		pos = str.find(from, start);
+		if (pos != S::npos)
+		{
+			result.append(str, start, pos - start);
+			result.append(to);
+			start = pos + fromLen;
+		}
+		else result.append(str, start, str.size() - start);
+	}
+	while (pos != S::npos);
+	str.swap(result);
+	return str;
+}
+
+
+#else
+
+
+std::string Foundation_API replace(const std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
+std::string Foundation_API replace(const std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
+std::string& Foundation_API replaceInPlace(std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
+std::string& Foundation_API replaceInPlace(std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
+	
+
+#endif	
 
 
 template <class S>

@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.h
 //
-// $Id: //poco/1.2/Net/include/Poco/Net/HTTPServerConnection.h#1 $
+// $Id: //poco/1.2/Net/include/Poco/Net/HTTPServerConnection.h#2 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -42,6 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/TCPServerConnection.h"
+#include "Poco/Net/HTTPResponse.h"
 
 
 namespace Poco {
@@ -50,6 +51,7 @@ namespace Net {
 
 class HTTPServerParams;
 class HTTPRequestHandlerFactory;
+class HTTPServerSession;
 
 
 class Net_API HTTPServerConnection: public TCPServerConnection
@@ -65,7 +67,10 @@ public:
 		
 	void run();
 		/// Handles all HTTP requests coming in.
-		
+
+protected:
+	void sendErrorResponse(HTTPServerSession& session, HTTPResponse::HTTPStatus status);
+
 private:
 	HTTPServerParams*          _pParams;
 	HTTPRequestHandlerFactory* _pFactory;

@@ -1,7 +1,7 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.2/Net/src/HTTPCookie.cpp#1 $
+// $Id: //poco/1.2/Net/src/HTTPCookie.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -111,7 +111,7 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 			int tzd;
 			DateTime exp = DateTimeParser::parse(value, tzd);
 			Timestamp now;
-			setMaxAge((int) ((exp.timestamp() - now)/1000000));
+			setMaxAge((int) ((exp.timestamp() - now)/Timestamp::resolution()));
 		}
 		else if (icompare(name, "version") == 0)
 		{
@@ -240,9 +240,9 @@ std::string HTTPCookie::toString() const
 		if (_maxAge >= 0)
 		{
 			Timestamp ts;
-			ts += _maxAge*1000000;
+			ts += _maxAge*Timestamp::resolution();
 			result.append("; expires=");
-			result.append(DateTimeFormatter::format(ts, DateTimeFormat::RFC850_FORMAT));
+			result.append(DateTimeFormatter::format(ts, DateTimeFormat::HTTP_FORMAT));
 		}
 		if (_secure)
 		{

@@ -1,7 +1,7 @@
 //
 // MultipartWriter.h
 //
-// $Id: //poco/1.2/Net/include/Poco/Net/MultipartWriter.h#1 $
+// $Id: //poco/1.2/Net/include/Poco/Net/MultipartWriter.h#2 $
 //
 // Library: Net
 // Package: Messages
@@ -56,7 +56,7 @@ class Net_API MultipartWriter
 	/// messages to an output stream.
 	///
 	/// The format of multipart messages is described
-	/// in section 7.2 of RFC 1341.
+	/// in section 5.1 of RFC 2046.
 	///
 	/// To create a multipart message, first create
 	/// a MultipartWriter object.
@@ -112,6 +112,7 @@ private:
 
 	std::ostream& _ostr;
 	std::string   _boundary;
+	bool          _firstPart;
 };
 
 

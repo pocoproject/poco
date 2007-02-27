@@ -1,7 +1,7 @@
 //
 // MultipartWriterTest.cpp
 //
-// $Id: //poco/1.2/Net/testsuite/src/MultipartWriterTest.cpp#1 $
+// $Id: //poco/1.2/Net/testsuite/src/MultipartWriterTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -63,7 +63,7 @@ void MultipartWriterTest::testWriteOnePart()
 	ostr << "this is part 1";
 	w.close();
 	std::string s = ostr.str();	
-	assert (s == "\r\n--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
+	assert (s == "--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
 }
 
 
@@ -80,7 +80,7 @@ void MultipartWriterTest::testWriteTwoParts()
 	ostr << "this is part 2";
 	w.close();
 	std::string s = ostr.str();	
-	assert (s == "\r\n--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
+	assert (s == "--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
 }
 
 

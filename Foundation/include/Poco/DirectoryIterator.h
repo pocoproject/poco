@@ -1,7 +1,7 @@
 //
 // DirectoryIterator.h
 //
-// $Id: //poco/1.2/Foundation/include/Poco/DirectoryIterator.h#2 $
+// $Id: //poco/1.2/Foundation/include/Poco/DirectoryIterator.h#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -58,10 +58,12 @@ class Foundation_API DirectoryIterator
 	/// DirectoryIterator has some limitations:
 	///   * only forward iteration (++) is supported
 	///   * an iterator copied from another one will always
-	///   * point to the same file as the original iterator,
-	///   * even is the original iterator has been advanced
+	///     point to the same file as the original iterator,
+	///     even is the original iterator has been advanced
 	///     (all copies of an iterator share their state with
 	///     the original iterator)
+	///   * because of this you should only use the prefix 
+	///     increment operator
 {
 public:
 	DirectoryIterator();
@@ -94,11 +96,16 @@ public:
 	DirectoryIterator& operator = (const std::string& path);
 	
 	DirectoryIterator& operator ++ ();   // prefix
+	
+	//@ deprecated
 	DirectoryIterator operator ++ (int); // postfix
+		/// Please use the prefix increment operator instead.
+	
 	const File& operator * () const;
 	File& operator * ();
 	const File* operator -> () const;
 	File* operator -> ();
+	
 	bool operator == (const DirectoryIterator& iterator) const;
 	bool operator != (const DirectoryIterator& iterator) const;
 

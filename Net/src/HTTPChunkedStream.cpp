@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.cpp
 //
-// $Id: //poco/1.2/Net/src/HTTPChunkedStream.cpp#3 $
+// $Id: //poco/1.2/Net/src/HTTPChunkedStream.cpp#4 $
 //
 // Library: Net
 // Package: HTTP
@@ -113,11 +113,11 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 int HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	std::string chunkSize(NumberFormatter::formatHex(length));
-	chunkSize.append("\r\n");
-	_session.write(chunkSize.data(), (std::streamsize) chunkSize.length());
-	_session.write(buffer, length);
-	_session.write("\r\n", 2);
+	_chunkBuffer = NumberFormatter::formatHex(length);
+	_chunkBuffer.append("\r\n", 2);
+	_chunkBuffer.append(buffer, length);
+	_chunkBuffer.append("\r\n", 2);
+	_session.write(_chunkBuffer.data(), static_cast<std::streamsize>(_chunkBuffer.size()));
 	return length;
 }
 

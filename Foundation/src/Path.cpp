@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Path.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/Path.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -38,6 +38,10 @@
 #include "Poco/File.h"
 #include "Poco/Exception.h"
 #include "Poco/StringTokenizer.h"
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#include "Poco/UnicodeConverter.h"
+#include "Poco/Buffer.h"
+#endif
 #include <algorithm>
 
 
@@ -981,6 +985,26 @@ std::string Path::buildVMS() const
 		result.append(_version);
 	}
 	return result;
+}
+
+
+std::string Path::transcode(const std::string& path)
+{
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+	std::wstring uniPath;
+	UnicodeConverter::toUTF16(path, uniPath);
+	DWORD len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), NULL, 0, NULL, NULL);
+	if (len > 0)
+	{
+		Buffer<char> buffer(len);
+		DWORD rc = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), buffer.begin(), static_cast<int>(buffer.size()), NULL, NULL);
+		if (rc)
+		{
+			return std::string(buffer.begin(), buffer.size());
+		}
+	}
+#endif
+	return path;
 }
 
 

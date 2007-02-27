@@ -1,7 +1,7 @@
 //
 // HelpFormatter.cpp
 //
-// $Id: //poco/1.2/Util/src/HelpFormatter.cpp#1 $
+// $Id: //poco/1.2/Util/src/HelpFormatter.cpp#2 $
 //
 // Library: Util
 // Package: Options
@@ -50,12 +50,13 @@ const int HelpFormatter::LINE_WIDTH = 78;
 HelpFormatter::HelpFormatter(const OptionSet& options): 
 	_options(options),
 	_width(LINE_WIDTH),
-	_indent(calcIndent()),
+	_indent(0),
 	_unixStyle(true)
 {
 #if !defined(POCO_OS_FAMILY_UNIX)
 	_unixStyle = false;
 #endif
+	_indent = calcIndent();
 }
 
 

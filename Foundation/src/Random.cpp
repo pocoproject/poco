@@ -1,7 +1,7 @@
 //
 // Random.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Random.cpp#2 $
+// $Id: //poco/1.2/Foundation/src/Random.cpp#3 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -36,7 +36,7 @@
 //
 //
 // Based on the FreeBSD random number generator.
-// src/lib/libc/stdlib/random.c,v 1.13 2000/01/27 23:06:49 jasone Exp
+// src/lib/libc/stdlib/random.c,v 1.25 
 //
 // Copyright (c) 1983, 1993
 // The Regents of the University of California.  All rights reserved.
@@ -48,10 +48,6 @@
 // 2. Redistributions in binary form must reproduce the above copyright
 //    notice, this list of conditions and the following disclaimer in the
 //    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by the University of
-//    California, Berkeley and its contributors.
 // 4. Neither the name of the University nor the names of its contributors
 //    may be used to endorse or promote products derived from this software
 //    without specific prior written permission.
@@ -91,10 +87,10 @@
  * congruential generator.  If the amount of state information is less than
  * 32 bytes, a simple linear congruential R.N.G. is used.
  *
- * Internally, the state information is treated as an array of longs; the
+ * Internally, the state information is treated as an array of uint32_t's; the
  * zeroeth element of the array is the type of R.N.G. being used (small
  * integer); the remainder of the array is the state information for the
- * R.N.G.  Thus, 32 bytes of state information will give 7 longs worth of
+ * R.N.G.  Thus, 32 bytes of state information will give 7 ints worth of
  * state information, which will allow a degree seven polynomial.  (Note:
  * the zeroeth word of state information also has some other information
  * stored in it -- see setstate() for details).
@@ -110,7 +106,7 @@
  * period of the generator is approximately deg*(2**deg - 1); thus doubling
  * the amount of state information has a vast influence on the period of the
  * generator.  Note: the deg*(2**deg - 1) is an approximation only good for
- * large deg, when the period of the shift register is the dominant factor.
+ * large deg, when the period of the shift is the dominant factor.
  * With deg equal to seven, the period is actually much longer than the
  * 7*(2**7 - 1) predicted by this formula.
  *
@@ -278,6 +274,7 @@ void Random::seed()
  *
  * Returns a pointer to the old state.
  *
+ * Note: The Sparc platform requires that arg_state begin on an int
  * word boundary; otherwise a bus error will occur. Even so, lint will
  * complain about mis-alignment, but you should disregard these messages.
  */

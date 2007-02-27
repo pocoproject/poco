@@ -1,7 +1,7 @@
 //
 // UTF16Encoding.cpp
 //
-// $Id: //poco/1.2/Foundation/src/UTF16Encoding.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/UTF16Encoding.cpp#2 $
 //
 // Library: Foundation
 // Package: Text
@@ -125,7 +125,7 @@ int UTF16Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
 	if (ch <= 0xFFFF)
 	{
-		if (length >= 2)
+		if (bytes && length >= 2)
 		{
 			UInt16 ch1 = _flipBytes ? ByteOrder::flipBytes((UInt16) ch) : (UInt16) ch;
 			unsigned char* p = (unsigned char*) &ch1;
@@ -136,7 +136,7 @@ int UTF16Encoding::convert(int ch, unsigned char* bytes, int length) const
 	}
 	else
 	{
-		if (length >= 4)
+		if (bytes && length >= 4)
 		{
 			int ch1 = ch - 0x10000;
 			UInt16 w1 = 0xD800 + ((ch1 >> 10) & 0x3FF);

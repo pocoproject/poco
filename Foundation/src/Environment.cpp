@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.2/Foundation/src/Environment.cpp#1 $
+// $Id: //poco/1.2/Foundation/src/Environment.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -54,6 +54,15 @@ namespace Poco {
 std::string Environment::get(const std::string& name)
 {
 	return EnvironmentImpl::getImpl(name);
+}
+
+
+std::string Environment::get(const std::string& name, const std::string& defaultValue)
+{
+	if (has(name))
+		return get(name);
+	else
+		return defaultValue;
 }
 
 	

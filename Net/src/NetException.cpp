@@ -1,7 +1,7 @@
 //
 // NetException.cpp
 //
-// $Id: //poco/1.2/Net/src/NetException.cpp#1 $
+// $Id: //poco/1.2/Net/src/NetException.cpp#2 $
 //
 // Library: Net
 // Package: NetCore
@@ -55,6 +55,7 @@ POCO_IMPLEMENT_EXCEPTION(DNSException, NetException, "DNS error")
 POCO_IMPLEMENT_EXCEPTION(HostNotFoundException, DNSException, "Host not found")
 POCO_IMPLEMENT_EXCEPTION(NoAddressFoundException, DNSException, "No address found")
 POCO_IMPLEMENT_EXCEPTION(InterfaceNotFoundException, NetException, "Interface not found")
+POCO_IMPLEMENT_EXCEPTION(NoMessageException, NetException, "No message received")
 POCO_IMPLEMENT_EXCEPTION(MessageException, NetException, "Malformed message")
 POCO_IMPLEMENT_EXCEPTION(MultipartException, MessageException, "Malformed multipart message")
 POCO_IMPLEMENT_EXCEPTION(HTTPException, NetException, "HTTP Exception")

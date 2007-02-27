@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.2/Net/src/HTTPClientSession.cpp#2 $
+// $Id: //poco/1.2/Net/src/HTTPClientSession.cpp#4 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -43,6 +43,7 @@
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/CountingStream.h"
 
 
 using Poco::NumberFormatter;
@@ -57,6 +58,7 @@ HTTPClientSession::HTTPClientSession():
 	_port(HTTPSession::HTTP_PORT),
 	_proxyPort(HTTPSession::HTTP_PORT),
 	_reconnect(false),
+	_mustReconnect(false),
 	_expectResponseBody(false),
 	_pRequestStream(0),
 	_pResponseStream(0)
@@ -69,6 +71,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_port(HTTPSession::HTTP_PORT),
 	_proxyPort(HTTPSession::HTTP_PORT),
 	_reconnect(false),
+	_mustReconnect(false),
 	_expectResponseBody(false),
 	_pRequestStream(0),
 	_pResponseStream(0)
@@ -81,6 +84,7 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_port(address.port()),
 	_proxyPort(HTTPSession::HTTP_PORT),
 	_reconnect(false),
+	_mustReconnect(false),
 	_expectResponseBody(false),
 	_pRequestStream(0),
 	_pResponseStream(0)
@@ -93,6 +97,7 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_port(port),
 	_proxyPort(HTTPSession::HTTP_PORT),
 	_reconnect(false),
+	_mustReconnect(false),
 	_expectResponseBody(false),
 	_pRequestStream(0),
 	_pResponseStream(0)
@@ -160,8 +165,11 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	_pResponseStream = 0;
 
 	bool keepAlive = getKeepAlive();
-	if (connected() && !keepAlive)
+	if (connected() && !keepAlive || _mustReconnect)
+	{
 		close();
+		_mustReconnect = false;
+	}
 	if (!connected())
 		reconnect();
 	if (!keepAlive)
@@ -169,20 +177,33 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	request.setHost(_host, _port);
 	if (!_proxyHost.empty())
 		request.setURI(getHostInfo() + request.getURI());
-	HTTPHeaderOutputStream hos(*this);
 	_reconnect = keepAlive;
-	request.write(hos);
-	_reconnect = false;
 	_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
 	if (request.getChunkedTransferEncoding())
+	{
+		HTTPHeaderOutputStream hos(*this);
+		request.write(hos);
 		_pRequestStream = new HTTPChunkedOutputStream(*this);
+	}
 	else if (request.getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
-		_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength());
+	{
+		Poco::CountingOutputStream cs;
+		request.write(cs);
+		_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength() + cs.chars());
+		request.write(*_pRequestStream);
+	}
 	else if (request.getMethod() == HTTPRequest::HTTP_GET || request.getMethod() == HTTPRequest::HTTP_HEAD)
-		_pRequestStream = new HTTPFixedLengthOutputStream(*this, 0);
+	{
+		Poco::CountingOutputStream cs;
+		request.write(cs);
+		_pRequestStream = new HTTPFixedLengthOutputStream(*this, cs.chars());
+		request.write(*_pRequestStream);
+	}
 	else
+	{
 		_pRequestStream = new HTTPOutputStream(*this);
-		
+		request.write(*_pRequestStream);
+	}	
 	return *_pRequestStream;
 }
 
@@ -209,6 +230,8 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 		}
 	}
 	while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
+
+	_mustReconnect = getKeepAlive() && !response.getKeepAlive();
 
 	if (!_expectResponseBody)
 		_pResponseStream = new HTTPFixedLengthInputStream(*this, 0);
@@ -239,6 +262,7 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 		}
 		else throw;
 	}
+	_reconnect = false;
 }
 
 

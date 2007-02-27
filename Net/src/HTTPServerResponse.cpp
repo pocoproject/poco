@@ -1,7 +1,7 @@
 //
 // HTTPServerResponse.cpp
 //
-// $Id: //poco/1.2/Net/src/HTTPServerResponse.cpp#1 $
+// $Id: //poco/1.2/Net/src/HTTPServerResponse.cpp#2 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -44,6 +44,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/CountingStream.h"
 #include "Poco/Exception.h"
 #include <fstream>
 
@@ -85,20 +86,23 @@ std::ostream& HTTPServerResponse::send()
 
 	if (getChunkedTransferEncoding())
 	{
+		HTTPHeaderOutputStream hs(_session);
+		write(hs);
 		_pStream = new HTTPChunkedOutputStream(_session);
 	}
 	else if (getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
 	{
-		_pStream = new HTTPFixedLengthOutputStream(_session, getContentLength());
+		Poco::CountingOutputStream cs;
+		write(cs);
+		_pStream = new HTTPFixedLengthOutputStream(_session, getContentLength() + cs.chars());
+		write(*_pStream);
 	}
 	else
 	{
 		_pStream = new HTTPOutputStream(_session);
 		setKeepAlive(false);
+		write(*_pStream);
 	}
-	HTTPHeaderOutputStream hs(_session);
-	write(hs);
-
 	return *_pStream;
 }
 
@@ -111,16 +115,31 @@ void HTTPServerResponse::sendFile(const std::string& path, const std::string& me
 	Timestamp dateTime    = f.getLastModified();
 	File::FileSize length = f.getSize();
 	setDate(dateTime);
-	setContentLength((int) length);
+	setContentLength(static_cast<int>(length));
 	setContentType(mediaType);
+	setChunkedTransferEncoding(false);
 
 	std::ifstream istr(path.c_str(), std::ios::binary | std::ios::in);
 	if (istr.good())
 	{
-		send();
+		_pStream = new HTTPOutputStream(_session);
+		write(*_pStream);
 		StreamCopier::copyStream(istr, *_pStream);
 	}
 	else throw OpenFileException(path);
+}
+
+
+void HTTPServerResponse::sendBuffer(const void* pBuffer, std::size_t length)
+{
+	poco_assert (!_pStream);
+
+	setContentLength(static_cast<int>(length));
+	setChunkedTransferEncoding(false);
+	
+	_pStream = new HTTPOutputStream(_session);
+	write(*_pStream);
+	_pStream->write(static_cast<const char*>(pBuffer), static_cast<std::streamsize>(length));
 }
 
 
@@ -131,8 +150,8 @@ void HTTPServerResponse::redirect(const std::string& uri)
 	setStatusAndReason(HTTPResponse::HTTP_FOUND);
 	set("Location", uri);
 
-	HTTPHeaderOutputStream hs(_session);
-	write(hs);
+	_pStream = new HTTPOutputStream(_session);
+	write(*_pStream);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // HTMLFormTest.cpp
 //
-// $Id: //poco/1.2/Net/testsuite/src/HTMLFormTest.cpp#1 $
+// $Id: //poco/1.2/Net/testsuite/src/HTMLFormTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -133,7 +133,7 @@ void HTMLFormTest::testWriteMultipart()
 	std::ostringstream ostr;
 	form.write(ostr, "MIME_boundary_0123456789");
 	std::string s = ostr.str();
-	assert (s == "\r\n"
+	assert (s == 
 		"--MIME_boundary_0123456789\r\n"
 		"Content-Disposition: form-data; name=\"field1\"\r\n"
 		"\r\n"

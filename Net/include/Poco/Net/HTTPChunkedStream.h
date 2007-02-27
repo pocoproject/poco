@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.h
 //
-// $Id: //poco/1.2/Net/include/Poco/Net/HTTPChunkedStream.h#1 $
+// $Id: //poco/1.2/Net/include/Poco/Net/HTTPChunkedStream.h#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -73,6 +73,7 @@ private:
 	HTTPSession&    _session;
 	openmode        _mode;
 	std::streamsize _chunk;
+	std::string     _chunkBuffer;
 };
 
 

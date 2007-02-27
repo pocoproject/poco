@@ -1,7 +1,7 @@
 //
 // HTTPResponse.cpp
 //
-// $Id: //poco/1.2/Net/src/HTTPResponse.cpp#1 $
+// $Id: //poco/1.2/Net/src/HTTPResponse.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -227,6 +227,7 @@ void HTTPResponse::read(std::istream& istr)
 	std::string reason;
 	
 	int ch =  istr.get();
+	if (ch == eof) throw NoMessageException();
 	while (isspace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP response header");
 	while (!isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }

@@ -1,4 +1,4 @@
-Release 1.2.8 (2007-01-04)
+Release 1.2.9 (2007-02-26)
 ==========================
 
 This release contains bugfixes and minor enchancements.
@@ -124,4 +124,4 @@ Please refer to the README file for more information and instructions for
 building the libraries.
 
 --
-$Id: //poco/1.2/dist/NEWS#11 $
+$Id: //poco/1.2/dist/NEWS#12 $
