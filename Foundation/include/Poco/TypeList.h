@@ -179,19 +179,19 @@ struct TypeList
 template <typename T0  = NullTypeList, 
 	typename T1  = NullTypeList, 
 	typename T2  = NullTypeList,
-    typename T3  = NullTypeList, 
+	typename T3  = NullTypeList, 
 	typename T4  = NullTypeList, 
 	typename T5  = NullTypeList,
-    typename T6  = NullTypeList, 
+	typename T6  = NullTypeList, 
 	typename T7  = NullTypeList, 
 	typename T8  = NullTypeList,
-    typename T9  = NullTypeList, 
+	typename T9  = NullTypeList, 
 	typename T10 = NullTypeList, 
 	typename T11 = NullTypeList,
-    typename T12 = NullTypeList, 
+	typename T12 = NullTypeList, 
 	typename T13 = NullTypeList, 
 	typename T14 = NullTypeList,
-    typename T15 = NullTypeList, 
+	typename T15 = NullTypeList, 
 	typename T16 = NullTypeList, 
 	typename T17 = NullTypeList,
 	typename T18 = NullTypeList,
@@ -251,6 +251,7 @@ struct Getter<0>
 		return val.head;
 	}
 };
+
 
 template <int N, class Head> 
 struct TypeGetter;
@@ -323,6 +324,7 @@ struct TypeAppender;
 	/// typedef TypeAppender<Type2, Type3>::HeadType Type4;
 	/// (Type4 is a TypeList of char,int,float,double)
 	///
+
 
 template<>
 struct TypeAppender<NullTypeList, NullTypeList>
@@ -455,6 +457,7 @@ struct TypeOneReplacer;
 	/// typedef TypeOneReplacer<Type4, int, double>::HeadType TypeR;
 	/// (TypeR is a TypeList of char,double,float,int)
 	///
+
 
 template <class T, class R>
 struct TypeOneReplacer<NullTypeList, T, R>

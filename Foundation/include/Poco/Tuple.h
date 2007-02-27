@@ -54,26 +54,26 @@ namespace Poco {
 #endif
 
 
-template<	class T0,
-			class T1 = NullTypeList,
-			class T2 = NullTypeList,
-			class T3 = NullTypeList,
-			class T4 = NullTypeList,
-			class T5 = NullTypeList,
-			class T6 = NullTypeList,
-			class T7 = NullTypeList,
-			class T8 = NullTypeList,
-			class T9 = NullTypeList,
-			class T10 = NullTypeList,
-			class T11 = NullTypeList,
-			class T12 = NullTypeList,
-			class T13 = NullTypeList,
-			class T14 = NullTypeList,
-			class T15 = NullTypeList,
-			class T16 = NullTypeList,
-			class T17 = NullTypeList,
-			class T18 = NullTypeList,
-			class T19 = NullTypeList>
+template<class T0,
+	class T1 = NullTypeList,
+	class T2 = NullTypeList,
+	class T3 = NullTypeList,
+	class T4 = NullTypeList,
+	class T5 = NullTypeList,
+	class T6 = NullTypeList,
+	class T7 = NullTypeList,
+	class T8 = NullTypeList,
+	class T9 = NullTypeList,
+	class T10 = NullTypeList,
+	class T11 = NullTypeList,
+	class T12 = NullTypeList,
+	class T13 = NullTypeList,
+	class T14 = NullTypeList,
+	class T15 = NullTypeList,
+	class T16 = NullTypeList,
+	class T17 = NullTypeList,
+	class T18 = NullTypeList,
+	class T19 = NullTypeList>
 struct Tuple
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::HeadType Type;
@@ -168,25 +168,25 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10,
-			class T11,
-			class T12,
-			class T13,
-			class T14,
-			class T15,
-			class T16,
-			class T17,
-			class T18>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
+	class T15,
+	class T16,
+	class T17,
+	class T18>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::HeadType Type;
@@ -280,23 +280,23 @@ private:
 
 
 template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10,
-			class T11,
-			class T12,
-			class T13,
-			class T14,
-			class T15,
-			class T16,
-			class T17>
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
+	class T15,
+	class T16,
+	class T17>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::HeadType Type;
@@ -387,23 +387,23 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10,
-			class T11,
-			class T12,
-			class T13,
-			class T14,
-			class T15,
-			class T16>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
+	class T15,
+	class T16>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::HeadType Type;
@@ -492,22 +492,22 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10,
-			class T11,
-			class T12,
-			class T13,
-			class T14,
-			class T15>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
+	class T15>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::HeadType Type;
@@ -594,21 +594,21 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10,
-			class T11,
-			class T12,
-			class T13,
-			class T14>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::HeadType Type;
@@ -693,20 +693,20 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10,
-			class T11,
-			class T12,
-			class T13>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::HeadType Type;
@@ -789,19 +789,19 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10,
-			class T11,
-			class T12>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::HeadType Type;
@@ -882,18 +882,18 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10,
-			class T11>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11>
 struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::HeadType Type;
@@ -972,17 +972,17 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9,
-			class T10>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10>
 struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::HeadType Type;
@@ -1059,16 +1059,16 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8,
-			class T9>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9>
 struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9, NullTypeList>
 {
 	typedef typename TypeListType<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9>::HeadType Type;
@@ -1143,15 +1143,15 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7,
-			class T8>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8>
 struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8>::HeadType Type;
@@ -1224,14 +1224,14 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6,
-			class T7>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7>
 struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7>::HeadType Type;
@@ -1302,13 +1302,13 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5,
-			class T6>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6>
 struct Tuple<T0, T1,T2,T3,T4,T5,T6, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6>::HeadType Type;
@@ -1377,12 +1377,12 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4,
-			class T5>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5>
 struct Tuple<T0, T1,T2,T3,T4,T5, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5>::HeadType Type;
@@ -1449,11 +1449,11 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3,
-			class T4>
+template<class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4>
 struct Tuple<T0, T1,T2,T3,T4, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4>::HeadType Type;
@@ -1518,10 +1518,10 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2,
-			class T3>
+template<class T0,
+	class T1,
+	class T2,
+	class T3>
 struct Tuple<T0, T1,T2,T3, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3>::HeadType Type;
@@ -1584,9 +1584,9 @@ private:
 };
 
 
-template<	class T0,
-			class T1,
-			class T2>
+template<class T0,
+	class T1,
+	class T2>
 struct Tuple<T0, T1,T2, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2>::HeadType Type;
@@ -1647,8 +1647,8 @@ private:
 };
 
 
-template<	class T0,
-			class T1>
+template<class T0,
+	class T1>
 struct Tuple<T0, T1, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1>::HeadType Type;
