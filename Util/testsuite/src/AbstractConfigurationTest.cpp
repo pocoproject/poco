@@ -1,7 +1,7 @@
 //
 // AbstractConfigurationTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/AbstractConfigurationTest.cpp#5 $
+// $Id: //poco/Main/Util/testsuite/src/AbstractConfigurationTest.cpp#6 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -193,6 +193,9 @@ void AbstractConfigurationTest::testExpand()
 	assert (pConf->expand("undef='${undef}'") == "undef='${undef}'");
 	assert (pConf->expand("deep='${ref1}'") == "deep='foobar'");
 	assert (pConf->expand("deep='${ref7}'") == "deep='foobar'");
+	
+	assert (pConf->getString("dollar.atend") == "foo$");
+	assert (pConf->getString("dollar.middle") == "foo$bar");
 }
 
 
@@ -245,7 +248,7 @@ void AbstractConfigurationTest::testKeys()
 
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
-	assert (keys.size() == 11);
+	assert (keys.size() == 12);
 	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
@@ -257,6 +260,7 @@ void AbstractConfigurationTest::testKeys()
 	assert (std::find(keys.begin(), keys.end(), "ref5") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "ref6") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "ref7") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "dollar") != keys.end());
 
 	pConf->keys("prop1", keys);
 	assert (keys.empty());
@@ -296,6 +300,8 @@ AbstractConfiguration* AbstractConfigurationTest::createConfiguration() const
 	pConfig->setString("ref5", "${refx}");
 	pConfig->setString("ref6", "${refx");
 	pConfig->setString("ref7", "${ref1}");
+	pConfig->setString("dollar.atend", "foo$");
+	pConfig->setString("dollar.middle", "foo$bar");
 	
 	return pConfig;
 }

@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.cpp
 //
-// $Id: //poco/Main/Util/src/AbstractConfiguration.cpp#6 $
+// $Id: //poco/Main/Util/src/AbstractConfiguration.cpp#7 $
 //
 // Library: Util
 // Package: Configuration
@@ -328,7 +328,7 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 					result.append("}");
 				}
 			}
-			else result += *it++;
+			else result += '$';
 		}
 		else result += *it++;
 	}
