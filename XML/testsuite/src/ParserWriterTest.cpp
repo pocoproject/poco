@@ -1,7 +1,7 @@
 //
 // ParserWriterTest.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/ParserWriterTest.cpp#11 $
+// $Id: //poco/Main/XML/testsuite/src/ParserWriterTest.cpp#12 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -40,7 +40,6 @@
 #include "Poco/SAX/InputSource.h"
 #include "Poco/XML/XMLWriter.h"
 #include <sstream>
-#include <fstream>
 
 
 using Poco::XML::DOMParser;

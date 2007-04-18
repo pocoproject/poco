@@ -1,7 +1,7 @@
 //
 // AbstractNode.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/AbstractNode.h#2 $
+// $Id: //poco/Main/XML/include/Poco/DOM/AbstractNode.h#3 $
 //
 // Library: XML
 // Package: DOM
@@ -135,6 +135,7 @@ private:
 	friend class Attr;
 	friend class CharacterData;
 	friend class DOMBuilder;
+	friend class NodeAppender;
 };
 
 

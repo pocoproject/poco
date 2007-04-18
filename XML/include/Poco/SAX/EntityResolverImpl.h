@@ -1,7 +1,7 @@
 //
 // EntityResolverImpl.h
 //
-// $Id: //poco/Main/XML/include/Poco/SAX/EntityResolverImpl.h#2 $
+// $Id: //poco/Main/XML/include/Poco/SAX/EntityResolverImpl.h#3 $
 //
 // Library: XML
 // Package: SAX
@@ -58,7 +58,7 @@ class XML_API EntityResolverImpl: public EntityResolver
 	/// for an InputSource.
 	///
 	/// If the system ID is not a valid URI, it is
-	/// interpreted as a filesystem path and a ifstream
+	/// interpreted as a filesystem path and a Poco::FileInputStream
 	/// is opened for it.
 {
 public:
@@ -78,7 +78,7 @@ public:
 		/// for the given systemId, which is interpreted as an URI.
 		///
 		/// If the systemId is not a valid URI, it is interpreted as
-		/// a local filesystem path and an ifstream is opened for it.
+		/// a local filesystem path and a Poco::FileInputStream is opened for it.
 		
 	void releaseInputSource(InputSource* pSource);
 		/// Deletes the InputSource's stream.

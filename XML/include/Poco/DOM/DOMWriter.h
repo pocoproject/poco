@@ -1,7 +1,7 @@
 //
 // DOMWriter.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/DOMWriter.h#3 $
+// $Id: //poco/Main/XML/include/Poco/DOM/DOMWriter.h#4 $
 //
 // Library: XML
 // Package: DOM
@@ -94,7 +94,7 @@ public:
 
 	void writeNode(const std::string& systemId, const Node* pNode);
 		/// Writes the XML for the given node to the file specified in systemId,
-		/// using a standard file output stream (std::ofstream).
+		/// using a standard file output stream (Poco::FileOutputStream).
 
 private:
 	std::string         _encodingName;

@@ -1,7 +1,7 @@
 //
 // AbstractContainerNode.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/AbstractContainerNode.h#2 $
+// $Id: //poco/Main/XML/include/Poco/DOM/AbstractContainerNode.h#3 $
 //
 // Library: XML
 // Package: DOM
@@ -77,6 +77,7 @@ private:
 	AbstractNode* _pFirstChild;
 
 	friend class AbstractNode;
+	friend class NodeAppender;
 };
 
 

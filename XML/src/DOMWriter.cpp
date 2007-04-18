@@ -1,7 +1,7 @@
 //
 // DOMWriter.cpp
 //
-// $Id: //poco/Main/XML/src/DOMWriter.cpp#13 $
+// $Id: //poco/Main/XML/src/DOMWriter.cpp#14 $
 //
 // Library: XML
 // Package: DOM
@@ -45,7 +45,7 @@
 #include "Poco/SAX/LexicalHandler.h"
 #include "Poco/XML/XMLException.h"
 #include "Poco/Path.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 
 
 namespace Poco {
@@ -104,7 +104,7 @@ void DOMWriter::writeNode(XMLByteOutputStream& ostr, const Node* pNode)
 
 void DOMWriter::writeNode(const std::string& systemId, const Node* pNode)
 {
-	std::ofstream ostr(Poco::Path::transcode(systemId).c_str());
+	Poco::FileOutputStream ostr(systemId);
 	if (ostr.good())
 		writeNode(ostr, pNode);
 	else 

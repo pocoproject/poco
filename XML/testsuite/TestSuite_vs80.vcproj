@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="TestSuite"
 	ProjectGUID="{C9ACF028-17A1-44C2-8C09-DFD3BD9E7D45}"
 	Keyword="Win32Proj"
@@ -483,6 +483,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\NodeAppenderTest.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\NodeIteratorTest.h"
 					>
 				</File>
@@ -528,6 +532,10 @@
 				</File>
 				<File
 					RelativePath=".\src\EventTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\NodeAppenderTest.cpp"
 					>
 				</File>
 				<File

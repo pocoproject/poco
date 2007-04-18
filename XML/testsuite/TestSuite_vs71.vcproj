@@ -341,6 +341,9 @@
 					RelativePath=".\src\EventTest.h">
 				</File>
 				<File
+					RelativePath=".\src\NodeAppenderTest.h">
+				</File>
+				<File
 					RelativePath=".\src\NodeIteratorTest.h">
 				</File>
 				<File
@@ -376,6 +379,9 @@
 				</File>
 				<File
 					RelativePath=".\src\EventTest.cpp">
+				</File>
+				<File
+					RelativePath=".\src\NodeAppenderTest.cpp">
 				</File>
 				<File
 					RelativePath=".\src\NodeIteratorTest.cpp">

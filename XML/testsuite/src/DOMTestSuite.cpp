@@ -1,7 +1,7 @@
 //
 // DOMTestSuite.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/DOMTestSuite.cpp#8 $
+// $Id: //poco/Main/XML/testsuite/src/DOMTestSuite.cpp#9 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -41,6 +41,7 @@
 #include "NodeIteratorTest.h"
 #include "TreeWalkerTest.h"
 #include "ParserWriterTest.h"
+#include "NodeAppenderTest.h"
 
 
 CppUnit::Test* DOMTestSuite::suite()
@@ -57,6 +58,7 @@ CppUnit::Test* DOMTestSuite::suite()
 	pSuite->addTest(NodeIteratorTest::suite());
 	pSuite->addTest(TreeWalkerTest::suite());
 	pSuite->addTest(ParserWriterTest::suite());
+	pSuite->addTest(NodeAppenderTest::suite());
 
 	return pSuite;
 }

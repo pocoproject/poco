@@ -539,6 +539,9 @@
 					RelativePath=".\include\Poco\DOM\Node.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Dom\NodeAppender.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\DOM\NodeFilter.h">
 				</File>
 				<File
@@ -658,6 +661,9 @@
 				</File>
 				<File
 					RelativePath=".\src\Node.cpp">
+				</File>
+				<File
+					RelativePath=".\src\NodeAppender.cpp">
 				</File>
 				<File
 					RelativePath=".\src\NodeFilter.cpp">

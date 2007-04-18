@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="XML"
 	ProjectGUID="{9E211743-85FE-4977-82F3-4F04B40C912D}"
 	>
@@ -736,6 +736,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\DOM\NodeAppender.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Dom\NodeFilter.h"
 					>
 				</File>
@@ -893,6 +897,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Node.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\NodeAppender.cpp"
 					>
 				</File>
 				<File
