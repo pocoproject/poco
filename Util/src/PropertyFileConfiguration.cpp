@@ -1,7 +1,7 @@
 //
 // PropertyFileConfiguration.cpp
 //
-// $Id: //poco/Main/Util/src/PropertyFileConfiguration.cpp#7 $
+// $Id: //poco/Main/Util/src/PropertyFileConfiguration.cpp#8 $
 //
 // Library: Util
 // Package: Configuration
@@ -38,7 +38,7 @@
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/Path.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 #include <locale>
 
 
@@ -84,7 +84,7 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	
 void PropertyFileConfiguration::load(const std::string& path)
 {
-	std::ifstream istr(Path::transcode(path).c_str());
+	Poco::FileInputStream istr(path);
 	if (istr.good())
 		load(istr);
 	else
@@ -106,7 +106,7 @@ void PropertyFileConfiguration::save(std::ostream& ostr) const
 
 void PropertyFileConfiguration::save(const std::string& path) const
 {
-	std::ofstream ostr(Path::transcode(path).c_str());
+	Poco::FileOutputStream ostr(path);
 	if (ostr.good())
 	{
 		save(ostr);

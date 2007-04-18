@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/Main/Util/src/Application.cpp#25 $
+// $Id: //poco/Main/Util/src/Application.cpp#26 $
 //
 // Library: Util
 // Package: Application
@@ -469,6 +469,10 @@ bool Application::findAppConfigFile(const std::string& appName, const std::strin
 
 void Application::defineOptions(OptionSet& options)
 {
+	for (SubsystemVec::iterator it = _subsystems.begin(); it != _subsystems.end(); ++it)
+	{
+		(*it)->defineOptions(options);
+	}
 }
 
 

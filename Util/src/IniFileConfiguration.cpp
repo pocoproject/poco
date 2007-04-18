@@ -1,7 +1,7 @@
 //
 // IniFileConfiguration.cpp
 //
-// $Id: //poco/Main/Util/src/IniFileConfiguration.cpp#7 $
+// $Id: //poco/Main/Util/src/IniFileConfiguration.cpp#8 $
 //
 // Library: Util
 // Package: Configuration
@@ -38,7 +38,7 @@
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/Path.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 #include <locale>
 #include <set>
 
@@ -87,7 +87,7 @@ void IniFileConfiguration::load(std::istream& istr)
 
 void IniFileConfiguration::load(const std::string& path)
 {
-	std::ifstream istr(Path::transcode(path).c_str());
+	Poco::FileInputStream istr(path);
 	if (istr.good())
 		load(istr);
 	else

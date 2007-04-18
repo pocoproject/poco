@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/Main/Util/src/ServerApplication.cpp#18 $
+// $Id: //poco/Main/Util/src/ServerApplication.cpp#19 $
 //
 // Library: Util
 // Package: Application
@@ -70,7 +70,7 @@ namespace Util {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-Poco::Event     ServerApplication::_terminated;
+Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus; 
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
 #endif

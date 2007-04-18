@@ -1,7 +1,7 @@
 //
 // Subsystem.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/Subsystem.h#2 $
+// $Id: //poco/Main/Util/include/Poco/Util/Subsystem.h#3 $
 //
 // Library: Util
 // Package: Application
@@ -49,6 +49,7 @@ namespace Util {
 
 
 class Application;
+class OptionSet;
 
 
 class Util_API Subsystem: public Poco::RefCountedObject
@@ -91,6 +92,16 @@ protected:
 		/// Actual implementations might want to use a
 		/// less radical and possibly more performant 
 		/// approach.
+
+	virtual void defineOptions(OptionSet& options);
+		/// Called before the Application's command line processing begins.
+		/// If a subsystem wants to support command line arguments,
+		/// it must override this method.
+		/// The default implementation does not define any options.
+		///
+		/// To effectively handle options, a subsystem should either bind
+		/// the option to a configuration property or specify a callback
+		/// to handle the option.
 
 	virtual ~Subsystem();
 		/// Destroys the Subsystem.

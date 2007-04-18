@@ -1,7 +1,7 @@
 //
 // Application.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/Application.h#12 $
+// $Id: //poco/Main/Util/include/Poco/Util/Application.h#14 $
 //
 // Library: Util
 // Package: Application
@@ -299,7 +299,8 @@ protected:
 		/// Called before command line processing begins.
 		/// If a subclass wants to support command line arguments,
 		/// it must override this method.
-		/// The default implementation does not define any options.
+		/// The default implementation does not define any options itself,
+		/// but calls defineOptions() on all registered subsystems.
 		///
 		/// Overriding implementations should call the base class implementation.
 
@@ -441,7 +442,7 @@ inline Poco::Timespan Application::uptime() const
 //
 // Macro to implement main()
 //
-#if defined(POCO_WIN32_UTF8)
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
 	#define POCO_APP_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)		\
 	{										\

@@ -1,7 +1,7 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/ServerApplication.h#3 $
+// $Id: //poco/Main/Util/include/Poco/Util/ServerApplication.h#4 $
 //
 // Library: Util
 // Package: Application
@@ -194,7 +194,7 @@ private:
 //
 // Macro to implement main()
 //
-#if defined(POCO_WIN32_UTF8)
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
 	#define POCO_SERVER_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)	\
 	{									\

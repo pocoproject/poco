@@ -1,7 +1,7 @@
 //
 // SystemConfiguration.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/SystemConfiguration.h#2 $
+// $Id: //poco/Main/Util/include/Poco/Util/SystemConfiguration.h#3 $
 //
 // Library: Util
 // Package: Configuration
@@ -66,7 +66,7 @@ class Util_API SystemConfiguration: public AbstractConfiguration
 	/// InvalidAccessException being thrown.
 	/// 
 	/// Enumerating environment variables is not supported. 
-	/// An attemp to call keys("system.env") will return an empty range. 
+	/// An attempt to call keys("system.env") will return an empty range. 
 {
 public:
 	SystemConfiguration();
