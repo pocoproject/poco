@@ -1,7 +1,7 @@
 //
 // HexBinaryEncoder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HexBinaryEncoder.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/HexBinaryEncoder.h#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -60,11 +60,23 @@ class Foundation_API HexBinaryEncoderBuf: public UnbufferedStreamBuf
 public:
 	HexBinaryEncoderBuf(std::ostream& ostr);
 	~HexBinaryEncoderBuf();
+	
 	int close();
+		/// Closes the stream buffer.
 	
 	void setLineLength(int lineLength);
+		/// Specify the line length.
+		///
+		/// After the given number of characters have been written, 
+		/// a newline character will be written.
+		///
+		/// Specify 0 for an unlimited line length.
+		
 	int getLineLength() const;
+		/// Returns the currently set line length.
+		
 	void setUppercase(bool flag = true);
+		/// Specify whether hex digits a-f are written in upper or lower case.
 	
 private:
 	int writeToDevice(char c);

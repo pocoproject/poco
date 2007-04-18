@@ -1,7 +1,7 @@
 //
 // Any.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Any.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Any.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -60,7 +60,7 @@ public:
     {
     }
 
-    template<typename ValueType>
+    template <typename ValueType>
     Any(const ValueType& value):
 		_content(new Holder<ValueType>(value))
 		/// Creates an any which stores the init parameter inside.

@@ -1,7 +1,7 @@
 //
 // Path.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Path.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/Path.h#5 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -294,7 +294,7 @@ public:
 		/// Returns the platform's path separator, which separates
 		/// single paths in a list of paths.
 		///
-		/// On Unix systems, this is the colon ':'. Opn Windows systems,
+		/// On Unix systems, this is the colon ':'. On Windows systems,
 		/// this is the semicolon ';'. On OpenVMS systems, this is the
 		/// comma ','.
 		

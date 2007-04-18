@@ -1,7 +1,7 @@
 //
 // BufferedBidirectionalStreamBuf.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#5 $
 //
 // Library: Foundation
 // Package: Streams
@@ -51,7 +51,7 @@
 namespace Poco {
 
 
-template<typename ch, typename tr, typename ba = BufferAllocator<ch> > 
+template <typename ch, typename tr, typename ba = BufferAllocator<ch> > 
 class BasicBufferedBidirectionalStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of a buffered bidirectional 
 	/// streambuf that greatly simplifies the implementation of
@@ -82,8 +82,7 @@ public:
 		_pWriteBuffer(Allocator::allocate(_bufsize)),
 		_mode(mode)
 	{
-		this->setg(_pReadBuffer + 4, _pReadBuffer + 4, _pReadBuffer + 4);
-		this->setp(_pWriteBuffer, _pWriteBuffer + (_bufsize - 1));
+		resetBuffers();
 	}
 
 	~BasicBufferedBidirectionalStreamBuf()
@@ -91,7 +90,7 @@ public:
 		Allocator::deallocate(_pReadBuffer, _bufsize);
 		Allocator::deallocate(_pWriteBuffer, _bufsize);
 	}
-
+	
 	virtual int_type overflow(int_type c)
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
@@ -101,7 +100,7 @@ public:
 			*this->pptr() = char_traits::to_char_type(c);
 			this->pbump(1);
 		}
-		if (flush_buffer() == std::streamsize(-1)) return char_traits::eof();
+		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
 
 		return c;
 	}
@@ -131,9 +130,26 @@ public:
 	{
 		if (this->pptr() && this->pptr() > this->pbase()) 
 		{
-			if (flush_buffer() == -1) return -1;
+			if (flushBuffer() == -1) return -1;
 		}
 		return 0;
+	}
+
+protected:
+	void setMode(openmode mode)
+	{
+		_mode = mode;
+	}
+
+	openmode getMode() const
+	{
+		return _mode;
+	}
+	
+	void resetBuffers()
+	{
+		this->setg(_pReadBuffer + 4, _pReadBuffer + 4, _pReadBuffer + 4);
+		this->setp(_pWriteBuffer, _pWriteBuffer + (_bufsize - 1));
 	}
 
 private:
@@ -147,7 +163,7 @@ private:
 		return 0;
 	}
 
-	int flush_buffer()
+	int flushBuffer()
 	{
 		int n = int(this->pptr() - this->pbase());
 		if (writeToDevice(this->pbase(), n) == n) 

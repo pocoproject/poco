@@ -1,7 +1,7 @@
 //
 // LocalDateTime.cpp
 //
-// $Id: //poco/Main/Foundation/src/LocalDateTime.cpp#11 $
+// $Id: //poco/Main/Foundation/src/LocalDateTime.cpp#12 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -93,6 +93,15 @@ LocalDateTime::LocalDateTime(int tzd, const DateTime& dateTime):
 	_tzd(tzd)
 {
 	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+}
+
+
+LocalDateTime::LocalDateTime(int tzd, const DateTime& dateTime, bool adjust):
+	_dateTime(dateTime),
+	_tzd(tzd)
+{
+	if (adjust)
+		_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
 }
 
 

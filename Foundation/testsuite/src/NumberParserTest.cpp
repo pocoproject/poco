@@ -1,7 +1,7 @@
 //
 // NumberParserTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NumberParserTest.cpp#9 $
+// $Id: //poco/Main/Foundation/testsuite/src/NumberParserTest.cpp#10 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -105,6 +105,15 @@ void NumberParserTest::testParseError()
 	catch (SyntaxException&)
 	{
 	}
+
+	try
+	{
+		NumberParser::parseHex("23z");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException&)
+	{
+	}
 	
 #if defined(POCO_HAVE_INT64)
 
@@ -134,12 +143,30 @@ void NumberParserTest::testParseError()
 	catch (SyntaxException&)
 	{
 	}
+
+	try
+	{
+		NumberParser::parseHex64("12345z");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException&)
+	{
+	}
 	
 #endif
 
 	try
 	{
 		NumberParser::parseFloat("a12.3");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException&)
+	{
+	}
+
+	try
+	{
+		NumberParser::parseFloat("12.3aa");
 		failmsg("must throw SyntaxException");
 	}
 	catch (SyntaxException&)

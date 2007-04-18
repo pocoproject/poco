@@ -1,7 +1,7 @@
 //
 // SimpleHashTable.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SimpleHashTable.h#10 $
+// $Id: //poco/Main/Foundation/include/Poco/SimpleHashTable.h#11 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -317,13 +317,13 @@ public:
 		}
 	}
 
-	bool exists(const Key& key)
+	bool exists(const Key& key) const
 	{
 		UInt32 hsh = hash(key);
 		return existsRaw(key, hsh);
 	}
 
-	bool existsRaw(const Key& key, UInt32 hsh)
+	bool existsRaw(const Key& key, UInt32 hsh) const
 	{
 		UInt32 origHash = hsh;
 		while (true)

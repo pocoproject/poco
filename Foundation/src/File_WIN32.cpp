@@ -1,7 +1,7 @@
 //
 // File_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/File_WIN32.cpp#14 $
+// $Id: //poco/Main/Foundation/src/File_WIN32.cpp#16 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -36,6 +36,7 @@
 
 #include "Poco/File_WIN32.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <windows.h>
 
 
@@ -48,7 +49,7 @@ public:
 	FileHandle(const std::string& path, DWORD access, DWORD share, DWORD disp)
 	{
 		_h = CreateFile(path.c_str(), access, share, 0, disp, 0, 0);
-		if (!_h) FileImpl::handleError(path);
+		if (!_h) FileImpl::handleLastErrorImpl(path);
 	}
 	
 	~FileHandle()
@@ -118,7 +119,7 @@ bool FileImpl::existsImpl() const
 		case ERROR_INVALID_DRIVE:
 			return false;
 		default:
-			handleError(_path);
+			handleLastErrorImpl(_path);
 		}
 	}
 	return true;
@@ -137,7 +138,7 @@ bool FileImpl::canReadImpl() const
 		case ERROR_ACCESS_DENIED:
 			return false;
 		default:
-			handleError(_path);
+			handleLastErrorImpl(_path);
 		}
 	}
 	return true;
@@ -150,8 +151,15 @@ bool FileImpl::canWriteImpl() const
 	
 	DWORD attr = GetFileAttributes(_path.c_str());
 	if (attr == 0xFFFFFFFF)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_READONLY) == 0;
+}
+
+
+bool FileImpl::canExecuteImpl() const
+{
+	Path p(_path);
+	return icompare(p.getExtension(), "exe") == 0;
 }
 
 
@@ -161,7 +169,7 @@ bool FileImpl::isFileImpl() const
 
 	DWORD attr = GetFileAttributes(_path.c_str());
 	if (attr == 0xFFFFFFFF)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
 
@@ -172,7 +180,7 @@ bool FileImpl::isDirectoryImpl() const
 
 	DWORD attr = GetFileAttributes(_path.c_str());
 	if (attr == 0xFFFFFFFF)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
@@ -189,7 +197,7 @@ Timestamp FileImpl::createdImpl() const
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
 	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return Timestamp::fromFileTimeNP(fad.ftCreationTime.dwLowDateTime, fad.ftCreationTime.dwHighDateTime);
 }
 
@@ -200,7 +208,7 @@ Timestamp FileImpl::getLastModifiedImpl() const
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
 	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return Timestamp::fromFileTimeNP(fad.ftLastWriteTime.dwLowDateTime, fad.ftLastWriteTime.dwHighDateTime);
 }
 
@@ -217,7 +225,7 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 	ft.dwHighDateTime = high;
 	FileHandle fh(_path, FILE_ALL_ACCESS, FILE_SHARE_WRITE, OPEN_EXISTING);
 	if (SetFileTime(fh.get(), 0, &ft, &ft) == 0)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -227,7 +235,7 @@ FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
 	if (GetFileAttributesEx(_path.c_str(), GetFileExInfoStandard, &fad) == 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	LARGE_INTEGER li;
 	li.LowPart  = fad.nFileSizeLow;
 	li.HighPart = fad.nFileSizeHigh;
@@ -243,9 +251,9 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 	LARGE_INTEGER li;
 	li.QuadPart = size;
 	if (SetFilePointer(fh.get(), li.LowPart, &li.HighPart, FILE_BEGIN) == -1)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	if (SetEndOfFile(fh.get()) == 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -255,13 +263,19 @@ void FileImpl::setWriteableImpl(bool flag)
 
 	DWORD attr = GetFileAttributes(_path.c_str());
 	if (attr == -1)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	if (flag)
 		attr &= ~FILE_ATTRIBUTE_READONLY;
 	else
 		attr |= FILE_ATTRIBUTE_READONLY;
 	if (SetFileAttributes(_path.c_str(), attr) == 0)
-		handleError(_path);
+		handleLastErrorImpl(_path);
+}
+
+
+void FileImpl::setExecutableImpl(bool flag)
+{
+	// not supported
 }
 
 
@@ -270,7 +284,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	poco_assert (!_path.empty());
 
 	if (CopyFile(_path.c_str(), path.c_str(), FALSE) == 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -279,7 +293,7 @@ void FileImpl::renameToImpl(const std::string& path)
 	poco_assert (!_path.empty());
 
 	if (MoveFile(_path.c_str(), path.c_str()) == 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -290,12 +304,12 @@ void FileImpl::removeImpl()
 	if (isDirectoryImpl())
 	{
 		if (RemoveDirectory(_path.c_str()) == 0) 
-			handleError(_path);
+			handleLastErrorImpl(_path);
 	}
 	else
 	{
 		if (DeleteFile(_path.c_str()) == 0)
-			handleError(_path);
+			handleLastErrorImpl(_path);
 	}
 }
 
@@ -313,7 +327,7 @@ bool FileImpl::createFileImpl()
 	else if (GetLastError() == ERROR_ALREADY_EXISTS)
 		return false;
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -325,12 +339,12 @@ bool FileImpl::createDirectoryImpl()
 	if (existsImpl() && isDirectoryImpl())
 		return false;
 	if (CreateDirectory(_path.c_str(), 0) == 0)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return true;
 }
 
 
-void FileImpl::handleError(const std::string& path)
+void FileImpl::handleLastErrorImpl(const std::string& path)
 {
 	switch (GetLastError())
 	{
@@ -357,6 +371,21 @@ void FileImpl::handleError(const std::string& path)
 		throw CreateFileException(path);
 	case ERROR_DIR_NOT_EMPTY:
 		throw FileException("directory not empty", path);
+	case ERROR_WRITE_FAULT:
+		throw WriteFileException(path);
+	case ERROR_READ_FAULT:
+		throw ReadFileException(path);
+	case ERROR_SHARING_VIOLATION:
+		throw FileException("sharing violation", path);
+	case ERROR_LOCK_VIOLATION:
+		throw FileException("lock violation", path);
+	case ERROR_HANDLE_EOF:
+		throw ReadFileException("EOF reached", path);
+	case ERROR_HANDLE_DISK_FULL:
+	case ERROR_DISK_FULL:
+		throw WriteFileException("disk is full", path);
+	case ERROR_NEGATIVE_SEEK:
+		throw FileException("negative seek", path);
 	default:
 		throw FileException(path);
 	}

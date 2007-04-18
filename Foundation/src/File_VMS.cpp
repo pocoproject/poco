@@ -1,7 +1,7 @@
 //
 // File_VMS.cpp
 //
-// $Id: //poco/Main/Foundation/src/File_VMS.cpp#13 $
+// $Id: //poco/Main/Foundation/src/File_VMS.cpp#15 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -37,6 +37,7 @@
 #include "Poco/File_VMS.h"
 #include "Poco/Exception.h"
 #include "Poco/Path.h"
+#include "Poco/String.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <unixio.h>
@@ -110,7 +111,7 @@ bool FileImpl::canReadImpl() const
 		else
 			return (st.st_mode & S_IROTH) != 0;
 	}
-	else handleError(_path);
+	else handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -129,8 +130,15 @@ bool FileImpl::canWriteImpl() const
 		else
 			return (st.st_mode & S_IWOTH) != 0;
 	}
-	else handleError(_path);
+	else handleLastErrorImpl(_path);
 	return false;
+}
+
+
+bool FileImpl::canExecuteImpl() const
+{
+	Path p(_path);
+	return icompare(p.getExtension(), "exe") == 0;
 }
 
 
@@ -142,7 +150,7 @@ bool FileImpl::isFileImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return S_ISREG(st.st_mode);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -155,7 +163,7 @@ bool FileImpl::isDirectoryImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return S_ISDIR(st.st_mode);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -174,7 +182,7 @@ Timestamp FileImpl::createdImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp(st.st_mtime);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return 0;
 }
 
@@ -187,7 +195,7 @@ Timestamp FileImpl::getLastModifiedImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp(st.st_mtime);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return 0;
 }
 
@@ -200,7 +208,7 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 	tb.actime  = ts.epochTime();
 	tb.modtime = ts.epochTime();
 	if (utime(_path.c_str(), &tb) != 0)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -212,7 +220,7 @@ FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return st.st_size;
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return 0;
 }
 
@@ -222,7 +230,7 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 	poco_assert (!_path.empty());
 
 	if (truncate(_path.c_str(), size) != 0)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -232,7 +240,7 @@ void FileImpl::setWriteableImpl(bool flag)
 
 	struct stat st;
 	if (stat(_path.c_str(), &st) != 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
 	{
@@ -244,7 +252,13 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode = st.st_mode & ~wmask;
 	}
 	if (chmod(_path.c_str(), mode) != 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
+}
+
+
+void FileImpl::setExecutableImpl(bool flag)
+{
+	// not supported
 }
 
 
@@ -307,7 +321,7 @@ void FileImpl::removeImpl()
 	{
 		rc = unlink(_path.c_str());
 	}
-	if (rc) handleError(_path);
+	if (rc) handleLastErrorImpl(_path);
 }
 
 
@@ -325,7 +339,7 @@ bool FileImpl::createFileImpl()
 	if (n == -1 && errno == EEXIST)
 		return false;
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -339,12 +353,12 @@ bool FileImpl::createDirectoryImpl()
 	Path p(_path);
 	p.makeDirectory();
 	if (mkdir(p.toString().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return true;
 }
 
 
-void FileImpl::handleError(const std::string& path)
+void FileImpl::handleLastErrorImpl(const std::string& path)
 {
 	switch (errno)
 	{

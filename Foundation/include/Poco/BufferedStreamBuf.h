@@ -1,7 +1,7 @@
 //
 // BufferedStreamBuf.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BufferedStreamBuf.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/BufferedStreamBuf.h#4 $
 //
 // Library: Foundation
 // Package: Streams
@@ -99,7 +99,7 @@ public:
 			*this->pptr() = char_traits::to_char_type(c);
 			this->pbump(1);
 		}
-		if (flush_buffer() == std::streamsize(-1)) return char_traits::eof();
+		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
 
 		return c;
 	}
@@ -129,9 +129,20 @@ public:
 	{
 		if (this->pptr() && this->pptr() > this->pbase()) 
 		{
-			if (flush_buffer() == -1) return -1;
+			if (flushBuffer() == -1) return -1;
 		}
 		return 0;
+	}
+
+protected:
+	void setMode(openmode mode)
+	{
+		_mode = mode;
+	}
+	
+	openmode getMode() const
+	{
+		return _mode;
 	}
 
 private:
@@ -145,7 +156,7 @@ private:
 		return 0;
 	}
 
-	int flush_buffer()
+	int flushBuffer()
 	{
 		int n = int(this->pptr() - this->pbase());
 		if (writeToDevice(this->pbase(), n) == n) 

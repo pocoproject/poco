@@ -1,7 +1,7 @@
 //
 // LocalDateTime.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LocalDateTime.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/LocalDateTime.h#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -100,7 +100,13 @@ public:
 
 	LocalDateTime(int tzd, const DateTime& dateTime);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
-		/// using the given time zone differential.
+		/// using the given time zone differential. Adjusts dateTime
+		/// for the given time zone differential.
+
+	LocalDateTime(int tzd, const DateTime& dateTime, bool adjust);
+		/// Creates a LocalDateTime from the UTC time given in dateTime,
+		/// using the given time zone differential. If adjust is true, 
+		/// adjusts dateTime for the given time zone differential.
 
 	LocalDateTime(double julianDay);
 		/// Creates a LocalDateTime for the given Julian day in the local time zone.

@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/InflatingStream.cpp#13 $
+// $Id: //poco/Main/Foundation/src/InflatingStream.cpp#15 $
 //
 // Library: Foundation
 // Package: Streams
@@ -45,7 +45,8 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
 	_pOstr(0),
-	_eof(false)
+	_eof(false),
+	_check(type != STREAM_ZIP)
 {
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
@@ -66,7 +67,8 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
 	_pIstr(0),
 	_pOstr(&ostr),
-	_eof(false)
+	_eof(false),
+	_check(type != STREAM_ZIP)
 {
 	_zstr.zalloc    = Z_NULL;
 	_zstr.zfree     = Z_NULL;
@@ -131,6 +133,16 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	for (;;)
 	{
 		int rc = inflate(&_zstr, Z_NO_FLUSH);
+		if (rc == Z_DATA_ERROR && !_check)
+		{
+			if (_zstr.avail_in == 0)
+			{
+				if (_pIstr->good())
+					rc = Z_OK;
+				else
+					rc = Z_STREAM_END;
+			}
+		}
 		if (rc == Z_STREAM_END)
 		{
 			_eof = true;

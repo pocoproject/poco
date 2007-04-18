@@ -1,7 +1,7 @@
 //
 // LogFile_STD.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LogFile_STD.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/LogFile_STD.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -42,14 +42,14 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Timestamp.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 
 
 namespace Poco {
 
 
 class Foundation_API LogFileImpl
-	/// The implementation of LogFile for Windows.
+	/// The implementation of LogFile for non-Windows platforms.
 	/// The native filesystem APIs are used for
 	/// total control over locking behavior.
 {
@@ -62,9 +62,9 @@ public:
 	const std::string& pathImpl() const;
 
 private:
-	std::string           _path;
-	mutable std::ofstream _str;
-	Timestamp             _creationDate;
+	std::string _path;
+	mutable Poco::FileOutputStream _str;
+	Timestamp _creationDate;
 };
 
 

@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_WIN32U.cpp
 //
-// $Id: //poco/Main/Foundation/src/DirectoryIterator_WIN32U.cpp#5 $
+// $Id: //poco/Main/Foundation/src/DirectoryIterator_WIN32U.cpp#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -57,7 +57,7 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVAL
 	if (_fh == INVALID_HANDLE_VALUE)
 	{
 		if (GetLastError() != ERROR_NO_MORE_FILES)
-			FileImpl::handleError(path);
+			File::handleLastError(path);
 	}
 	UnicodeConverter::toUTF8(_fd.cFileName, _current);
 	if (_current == "." || _current == "..")	

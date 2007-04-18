@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_UNIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/DirectoryIterator_UNIX.cpp#11 $
+// $Id: //poco/Main/Foundation/src/DirectoryIterator_UNIX.cpp#12 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -48,7 +48,7 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _pDir(0),
 	p.makeFile();
 
 	_pDir = opendir(p.toString().c_str());
-	if (!_pDir) FileImpl::handleError(path);
+	if (!_pDir) File::handleLastError(path);
 
 	next();
 }

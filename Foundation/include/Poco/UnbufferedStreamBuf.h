@@ -1,7 +1,7 @@
 //
 // UnufferedStreamBuf.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UnbufferedStreamBuf.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/UnbufferedStreamBuf.h#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -50,7 +50,7 @@
 namespace Poco {
 
 
-template<typename ch, typename tr> 
+template <typename ch, typename tr> 
 class BasicUnbufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of an unbuffered streambuf
 	/// that greatly simplifies the implementation of

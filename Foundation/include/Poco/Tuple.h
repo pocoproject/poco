@@ -1,7 +1,7 @@
 //
 // Tuple.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Tuple.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/Tuple.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -54,7 +54,7 @@ namespace Poco {
 #endif
 
 
-template<class T0,
+template <class T0,
 	class T1 = NullTypeList,
 	class T2 = NullTypeList,
 	class T3 = NullTypeList,
@@ -130,19 +130,19 @@ struct Tuple
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -168,7 +168,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -241,19 +241,19 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,N
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -279,7 +279,7 @@ private:
 };
 
 
-template<	class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -349,19 +349,19 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,NullT
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -387,7 +387,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -454,19 +454,19 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,NullTypeL
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -492,7 +492,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -556,19 +556,19 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -594,7 +594,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -655,19 +655,19 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -693,7 +693,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -751,19 +751,19 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -789,7 +789,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -844,19 +844,19 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -882,7 +882,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -934,19 +934,19 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -972,7 +972,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1021,19 +1021,19 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1059,7 +1059,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1105,19 +1105,19 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1143,7 +1143,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1186,19 +1186,19 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1224,7 +1224,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1264,19 +1264,19 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1302,7 +1302,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1339,19 +1339,19 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1377,7 +1377,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1411,19 +1411,19 @@ struct Tuple<T0, T1,T2,T3,T4,T5, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1449,7 +1449,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1480,19 +1480,19 @@ struct Tuple<T0, T1,T2,T3,T4, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1518,7 +1518,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3>
@@ -1546,19 +1546,19 @@ struct Tuple<T0, T1,T2,T3, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1584,7 +1584,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2>
 struct Tuple<T0, T1,T2, NullTypeList>
@@ -1609,19 +1609,19 @@ struct Tuple<T0, T1,T2, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1647,7 +1647,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1>
 struct Tuple<T0, T1, NullTypeList>
 {
@@ -1668,19 +1668,19 @@ struct Tuple<T0, T1, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;
@@ -1706,7 +1706,7 @@ private:
 };
 
 
-template<class T0>
+template <class T0>
 struct Tuple<T0, NullTypeList>
 {
 	typedef TypeList<T0, NullTypeList> Type;
@@ -1725,19 +1725,19 @@ struct Tuple<T0, NullTypeList>
 	{
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data);
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		Getter<N>::template get<typename TypeGetter<N, Type>::HeadType, typename Type::HeadType, typename Type::TailType>(_data) = val;

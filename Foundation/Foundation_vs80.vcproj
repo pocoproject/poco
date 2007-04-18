@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Foundation"
 	ProjectGUID="{8164D41D-B053-405B-826C-CF37AC0EF176}"
 	RootNamespace="Foundation"
@@ -364,7 +364,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Checksum.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Debugger.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\DynamicAny.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\DynamicAnyHolder.cpp"
 					>
 				</File>
 				<File
@@ -768,11 +780,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Checksum.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Config.h"
 					>
 				</File>
 				<File
 					RelativePath=".\include\Poco\Debugger.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\DynamicAny.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\DynamicAnyHolder.h"
 					>
 				</File>
 				<File
@@ -948,6 +972,82 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\FileStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FileStream_POSIX.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\src\FileStream_WIN32.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\src\HexBinaryDecoder.cpp"
 					>
 				</File>
@@ -1021,6 +1121,18 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\DeflatingStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\FileStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\FileStream_POSIX.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\FileStream_WIN32.h"
 					>
 				</File>
 				<File
@@ -3703,6 +3815,86 @@
 						/>
 					</FileConfiguration>
 				</File>
+				<File
+					RelativePath=".\src\SharedMemory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SharedMemory_DUMMY.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SharedMemory_POSIX.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\src\SharedMemory_WIN32.cpp"
+					>
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -3789,6 +3981,22 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Process_WIN32U.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SharedMemory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SharedMemory_DUMMY.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SharedMemory_POSIX.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\SharedMemory_WIN32.h"
 					>
 				</File>
 			</Filter>

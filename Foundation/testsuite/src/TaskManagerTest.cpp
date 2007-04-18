@@ -195,7 +195,7 @@ namespace
 	};
 
 
-	template<typename T>
+	template <typename T>
 	class CustomNotificationTask: public Task
 	{
 	public:

@@ -1,7 +1,7 @@
 //
 // TypeList.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/TypeList.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/TypeList.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -212,23 +212,23 @@ public:
 };
 
 
-template<>
+template <>
 struct TypeListType<>
 {
     typedef NullTypeList HeadType;
 };
 
 
-template<int n> 
+template <int n> 
 struct Getter
 {
-	template<class Ret, class Head, class Tail>
+	template <class Ret, class Head, class Tail>
 	inline static Ret& get(TypeList<Head, Tail>& val)
 	{
 		return Getter<n-1>::template get<Ret, typename Tail::HeadType, typename Tail::TailType>(val.tail);
 	}
 
-	template<class Ret, class Head, class Tail>
+	template <class Ret, class Head, class Tail>
 	inline static const Ret& get(const TypeList<Head, Tail>& val)
 	{
 		return Getter<n-1>::template get<Ret, typename Tail::HeadType, typename Tail::TailType>(val.tail);
@@ -236,16 +236,16 @@ struct Getter
 };
 
 
-template<> 
+template <> 
 struct Getter<0>
 {
-	template<class Ret, class Head, class Tail>
+	template <class Ret, class Head, class Tail>
 	inline static Ret& get(TypeList<Head, Tail>& val)
 	{
 		return val.head;
 	}
 
-	template<class Ret, class Head, class Tail>
+	template <class Ret, class Head, class Tail>
 	inline static const Ret& get(const TypeList<Head, Tail>& val)
 	{
 		return val.head;
@@ -326,28 +326,28 @@ struct TypeAppender;
 	///
 
 
-template<>
+template <>
 struct TypeAppender<NullTypeList, NullTypeList>
 {
 	typedef NullTypeList HeadType;
 };
 
 
-template<class T>
+template <class T>
 struct TypeAppender<NullTypeList, T>
 {
 	typedef POCO_TYPELIST_1(T) HeadType;
 };
 
 
-template<class Head, class Tail>
+template <class Head, class Tail>
 struct TypeAppender<NullTypeList, TypeList<Head, Tail> >
 {
 	typedef TypeList<Head, Tail> HeadType;
 };
 
 
-template<class Head, class Tail, class T>
+template <class Head, class Tail, class T>
 struct TypeAppender<TypeList<Head, Tail>, T>
 {
 	typedef TypeList<Head, typename TypeAppender<Tail, T>::HeadType> HeadType;

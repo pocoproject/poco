@@ -1,7 +1,7 @@
 //
 // DateTimeParser.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DateTimeParser.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/DateTimeParser.h#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -52,6 +52,11 @@ class Foundation_API DateTimeParser
 	/// from strings. All parsing methods do their best to
 	/// parse a meaningful result, even from malformed input
 	/// strings.
+	///
+	/// The returned DateTime will always contain a time in the same
+	/// timezone as the time in the string. Call DateTime::makeUTC()
+	/// with the timeZoneDifferential returned by parse() to convert
+	/// the DateTime to UTC.
 	///
 	/// Note: When parsing a time in 12-hour (AM/PM) format, the hour
 	/// (%h) must be parsed before the AM/PM designator (%a, %A),

@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/DirectoryIterator_WIN32.cpp#11 $
+// $Id: //poco/Main/Foundation/src/DirectoryIterator_WIN32.cpp#12 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -53,7 +53,7 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVAL
 	if (_fh == INVALID_HANDLE_VALUE)
 	{
 		if (GetLastError() != ERROR_NO_MORE_FILES)
-			FileImpl::handleError(path);
+			File::handleLastError(path);
 	}
 	_current = _fd.cFileName;
 	if (_current == "." || _current == "..")	

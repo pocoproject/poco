@@ -1,7 +1,7 @@
 //
 // File.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/File.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/File.h#4 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -112,7 +112,15 @@ public:
 		
 	bool canWrite() const;
 		/// Returns true iff the file is writeable.
-		
+
+	bool canExecute() const;
+		/// Returns true iff the file is executable.
+		///
+		/// On Windows and OpenVMS, the file must have
+		/// the extension ".EXE" to be executable.
+		/// On Unix platforms, the executable permission
+		/// bit must be set.
+
 	bool isFile() const;
 		/// Returns true iff the file is a regular file.
 		
@@ -121,7 +129,7 @@ public:
 		
 	bool isDirectory() const;
 		/// Returns true iff the file is a directory.
-	
+		
 	Timestamp created() const;
 		/// Returns the creation date of the file.
 
@@ -147,6 +155,13 @@ public:
 		/// Makes the file non-writeable (if flag is true), or
 		/// writeable (if flag is false) by setting the
 		/// file's flags in the filesystem accordingly.
+		
+	void setExecutable(bool flag = true);
+		/// Makes the file executable (if flag is true), or
+		/// non-executable (if flag is false) by setting
+		/// the file's permission bits accordingly.
+		///
+		/// Does nothing on Windows and OpenVMS.	
 		
 	void copyTo(const std::string& path) const;
 		/// Copies the file to the given path. The target path
@@ -193,6 +208,10 @@ public:
 	bool operator <= (const File& file) const;
 	bool operator >  (const File& file) const;
 	bool operator >= (const File& file) const;
+	
+	static void handleLastError(const std::string& path);
+		/// For internal use only. Throws an appropriate
+		/// exception for the last file-related error.
 };
 
 

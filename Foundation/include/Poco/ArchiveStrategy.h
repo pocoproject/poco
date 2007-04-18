@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ArchiveStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/ArchiveStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -96,7 +96,7 @@ public:
 };
 
 
-template<class DT>
+template <class DT>
 class ArchiveByTimestampStrategy: public ArchiveStrategy
 	/// A timestamp (YYYYMMDDhhmmss) is appended to archived
 	/// log files.

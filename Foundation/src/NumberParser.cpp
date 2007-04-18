@@ -1,7 +1,7 @@
 //
 // NumberParser.cpp
 //
-// $Id: //poco/Main/Foundation/src/NumberParser.cpp#10 $
+// $Id: //poco/Main/Foundation/src/NumberParser.cpp#11 $
 //
 // Library: Foundation
 // Package: Core
@@ -64,7 +64,8 @@ int NumberParser::parse(const std::string& s)
 
 bool NumberParser::tryParse(const std::string& s, int& value)
 {
-	return sscanf(s.c_str(), "%d", &value) == 1;
+	char temp;
+	return sscanf(s.c_str(), "%d%c", &value, &temp) == 1;
 }
 
 
@@ -80,7 +81,8 @@ unsigned NumberParser::parseUnsigned(const std::string& s)
 
 bool NumberParser::tryParseUnsigned(const std::string& s, unsigned& value)
 {
-	return sscanf(s.c_str(), "%u", &value) == 1;
+	char temp;
+	return sscanf(s.c_str(), "%u%c", &value, &temp) == 1;
 }
 
 
@@ -96,7 +98,8 @@ unsigned NumberParser::parseHex(const std::string& s)
 
 bool NumberParser::tryParseHex(const std::string& s, unsigned& value)
 {
-	return sscanf(s.c_str(), "%x", &value) == 1;
+	char temp;
+	return sscanf(s.c_str(), "%x%c", &value, &temp) == 1;
 }
 
 
@@ -115,7 +118,8 @@ Int64 NumberParser::parse64(const std::string& s)
 
 bool NumberParser::tryParse64(const std::string& s, Int64& value)
 {
-	return sscanf(s.c_str(), "%"I64_FMT"d", &value) == 1;
+	char temp;
+	return sscanf(s.c_str(), "%"I64_FMT"d%c", &value, &temp) == 1;
 }
 
 
@@ -131,7 +135,8 @@ UInt64 NumberParser::parseUnsigned64(const std::string& s)
 
 bool NumberParser::tryParseUnsigned64(const std::string& s, UInt64& value)
 {
-	 return sscanf(s.c_str(), "%"I64_FMT"u", &value) == 1;
+	char temp;
+	return sscanf(s.c_str(), "%"I64_FMT"u%c", &value, &temp) == 1;
 }
 
 
@@ -147,7 +152,8 @@ UInt64 NumberParser::parseHex64(const std::string& s)
 
 bool NumberParser::tryParseHex64(const std::string& s, UInt64& value)
 {
-	return sscanf(s.c_str(), "%"I64_FMT"x", &value) == 1;
+	char temp;
+	return sscanf(s.c_str(), "%"I64_FMT"x%c", &value, &temp) == 1;
 }
 
 
@@ -166,7 +172,8 @@ double NumberParser::parseFloat(const std::string& s)
 	
 bool NumberParser::tryParseFloat(const std::string& s, double& value)
 {
-	return sscanf(s.c_str(), "%lf", &value) == 1;
+	char temp;
+	return sscanf(s.c_str(), "%lf%c", &value, &temp) == 1;
 }
 
 

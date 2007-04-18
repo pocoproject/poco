@@ -1,7 +1,7 @@
 //
 // DateTimeTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DateTimeTest.h#12 $
+// $Id: //poco/Main/Foundation/testsuite/src/DateTimeTest.h#13 $
 //
 // Definition of the DateTimeTest class.
 //
@@ -61,6 +61,7 @@ public:
 	void testIsValid();
 	void testDayOfWeek();
 	void testIncrementDecrement();
+	void testUTC();
 
 	void setUp();
 	void tearDown();

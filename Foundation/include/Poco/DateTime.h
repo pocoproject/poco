@@ -1,7 +1,7 @@
 //
 // DateTime.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DateTime.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/DateTime.h#4 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -237,6 +237,12 @@ public:
 	Timespan  operator -  (const DateTime& dateTime) const;
 	DateTime& operator += (const Timespan& span);
 	DateTime& operator -= (const Timespan& span);
+	
+	void makeUTC(int tzd);
+		/// Converts a local time into UTC, by applying the given time zone differential.
+		
+	void makeLocal(int tzd);
+		/// Converts a UTC time into a local time, by applying the given time zone differential.
 	
 	static bool isLeapYear(int year);
 		/// Returns true if the given year is a leap year;

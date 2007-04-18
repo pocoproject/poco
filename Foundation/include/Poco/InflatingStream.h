@@ -1,7 +1,7 @@
 //
 // InflatingStream.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/InflatingStream.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/InflatingStream.h#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -61,7 +61,8 @@ public:
 	enum StreamType
 	{
 		STREAM_ZLIB,
-		STREAM_GZIP
+		STREAM_GZIP,
+		STREAM_ZIP // ZIP is handled as STREAM_ZLIB, except that we do not check the ADLER32 value (must be checked by an outside class!)
 	};
 
 	InflatingStreamBuf(std::istream& istr, StreamType type);
@@ -85,6 +86,7 @@ private:
 	char*    _buffer;
 	z_stream _zstr;
 	bool     _eof;
+	bool     _check;
 };
 
 

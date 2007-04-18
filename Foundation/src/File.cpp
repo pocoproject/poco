@@ -1,7 +1,7 @@
 //
 // File.cpp
 //
-// $Id: //poco/Main/Foundation/src/File.cpp#15 $
+// $Id: //poco/Main/Foundation/src/File.cpp#17 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -135,7 +135,13 @@ bool File::canWrite() const
 	return canWriteImpl();
 }
 
-	
+
+bool File::canExecute() const
+{
+	return canExecuteImpl();
+}
+
+
 bool File::isFile() const
 {
 	return isFileImpl();
@@ -193,6 +199,12 @@ void File::setWriteable(bool flag)
 void File::setReadOnly(bool flag)
 {
 	setWriteableImpl(!flag);
+}
+
+
+void File::setExecutable(bool flag)
+{
+	setExecutableImpl(flag);
 }
 
 	
@@ -295,6 +307,12 @@ void File::list(std::vector<File>& files) const
 		files.push_back(*it);
 		++it;
 	}
+}
+
+
+void File::handleLastError(const std::string& path)
+{
+	handleLastErrorImpl(path);
 }
 
 

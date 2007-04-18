@@ -1,7 +1,7 @@
 //
 // RotateStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/RotateStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/RotateStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -71,7 +71,7 @@ private:
 };
 
 
-template<class DT>
+template <class DT>
 class RotateAtTimeStrategy: public RotateStrategy
 	/// The file is rotated at specified [day,][hour]:minute
 {

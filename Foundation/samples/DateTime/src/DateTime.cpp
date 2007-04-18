@@ -1,7 +1,7 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/Main/Foundation/samples/DateTime/src/DateTime.cpp#9 $
+// $Id: //poco/Main/Foundation/samples/DateTime/src/DateTime.cpp#10 $
 //
 // This sample demonstrates the DateTime class.
 //
@@ -32,30 +32,30 @@
 //
 
 
+#include "Poco/LocalDateTime.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeParser.h"
 #include <iostream>
 
 
+using Poco::LocalDateTime;
 using Poco::DateTime;
 using Poco::DateTimeFormat;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeParser;
 
 
 int main(int argc, char** argv)
 {
-	DateTime now;
+	LocalDateTime now;
 	
-	std::cout << "Today is "
-	          << DateTimeFormat::WEEKDAY_NAMES[now.dayOfWeek()] << ", "
-	          << DateTimeFormat::MONTH_NAMES[now.month() - 1] << " "
-	          << now.day() << " - "
-	          << "day number "
-	          << now.dayOfYear()
-	          << " in "
-	          << now.year()
-	          << " and day number "
-	          << (long) now.julianDay()
-	          << " in the Julian calendar." << std::endl;
-	
+	std::string str = DateTimeFormatter::format(now, DateTimeFormat::ISO8601_FORMAT);
+	DateTime dt;
+	int tzd;
+	DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, str, dt, tzd);
+	dt.makeUTC(tzd);
+	LocalDateTime ldt(tzd, dt);
 	return 0;
 }

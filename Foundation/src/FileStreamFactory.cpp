@@ -1,7 +1,7 @@
 //
 // FileStreamFactory.cpp
 //
-// $Id: //poco/Main/Foundation/src/FileStreamFactory.cpp#8 $
+// $Id: //poco/Main/Foundation/src/FileStreamFactory.cpp#9 $
 //
 // Library: Foundation
 // Package: URI
@@ -39,7 +39,7 @@
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/Exception.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 
 
 namespace Poco {
@@ -73,7 +73,7 @@ std::istream* FileStreamFactory::open(const Path& path)
 	File file(path);
 	if (!file.exists()) throw FileNotFoundException(path.toString());
 	
-	std::ifstream* istr = new std::ifstream(Path::transcode(path.toString()).c_str(), std::ios::binary);
+	FileInputStream* istr = new FileInputStream(path.toString(), std::ios::binary);
 	if (!istr->good())
 	{
 		delete istr;

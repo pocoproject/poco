@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.cpp
 //
-// $Id: //poco/Main/Foundation/src/ArchiveStrategy.cpp#7 $
+// $Id: //poco/Main/Foundation/src/ArchiveStrategy.cpp#8 $
 //
 // Library: Foundation
 // Package: Logging
@@ -44,7 +44,7 @@
 #include "Poco/ActiveDispatcher.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/Void.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 
 
 namespace Poco {
@@ -74,9 +74,9 @@ protected:
 	{
 		std::string gzPath(path);
 		gzPath.append(".gz");
-		std::ifstream istr(Path::transcode(path).c_str(), std::ios::binary | std::ios::in);
+		FileInputStream istr(path, std::ios::binary | std::ios::in);
 		if (!istr.good()) throw OpenFileException(path);
-		std::ofstream ostr(Path::transcode(gzPath).c_str(), std::ios::binary | std::ios::out);
+		FileOutputStream ostr(gzPath, std::ios::binary | std::ios::out);
 		if (ostr.good())
 		{
 			DeflatingOutputStream deflater(ostr, DeflatingStreamBuf::STREAM_GZIP);

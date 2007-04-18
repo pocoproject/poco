@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/Main/Foundation/src/ThreadPool.cpp#18 $
+// $Id: //poco/Main/Foundation/src/ThreadPool.cpp#19 $
 //
 // Library: Foundation
 // Package: Threading
@@ -81,7 +81,8 @@ PooledThread::PooledThread(const std::string& name):
 	_idleTime(0), 
 	_pTarget(0), 
 	_name(name), 
-	_thread(name)
+	_thread(name),
+	_targetCompleted(false)
 {
 	_idleTime = time(NULL);
 }

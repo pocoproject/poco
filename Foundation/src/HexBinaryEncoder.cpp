@@ -1,7 +1,7 @@
 //
 // HexBinaryEncoder.cpp
 //
-// $Id: //poco/Main/Foundation/src/HexBinaryEncoder.cpp#14 $
+// $Id: //poco/Main/Foundation/src/HexBinaryEncoder.cpp#15 $
 //
 // Library: Foundation
 // Package: Streams
@@ -63,8 +63,6 @@ HexBinaryEncoderBuf::~HexBinaryEncoderBuf()
 
 void HexBinaryEncoderBuf::setLineLength(int lineLength)
 {
-	poco_assert (lineLength > 0);
-
 	_lineLength = lineLength;
 }
 
@@ -87,7 +85,7 @@ int HexBinaryEncoderBuf::writeToDevice(char c)
 	_ostr.put(digits[_uppercase + ((c >> 4) & 0xF)]);
 	++_pos;
 	_ostr.put(digits[_uppercase + (c & 0xF)]);
-	if (++_pos >= _lineLength) 
+	if (++_pos >= _lineLength && _lineLength > 0) 
 	{
 		_ostr << std::endl;
 		_pos = 0;

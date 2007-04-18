@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/Main/Foundation/src/Format.cpp#6 $
+// $Id: //poco/Main/Foundation/src/Format.cpp#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -66,10 +66,10 @@ namespace
 		{
 			switch (*itFmt)
 			{
-			case '-': str.setf(std::ios_base::left); ++itFmt; break;
-			case '+': str.setf(std::ios_base::showpos); ++itFmt; break;
+			case '-': str.setf(std::ios::left); ++itFmt; break;
+			case '+': str.setf(std::ios::showpos); ++itFmt; break;
 			case '0': str.fill('0'); ++itFmt; break;
-			case '#': str.setf(std::ios_base::showpoint | std::ios_base::showbase); ++itFmt; break;
+			case '#': str.setf(std::ios::showpoint | std::ios_base::showbase); ++itFmt; break;
 			default:  isFlag = false; break;
 			}
 		}

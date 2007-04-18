@@ -1,7 +1,7 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/Main/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#10 $
+// $Id: //poco/Main/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#11 $
 //
 // This sample demonstrates the NotificationQueue, ThreadPool,
 // FastMutex and ScopedLock classes.
@@ -95,10 +95,10 @@ public:
 				WorkNotification* pWorkNf = dynamic_cast<WorkNotification*>(pNf.get());
 				if (pWorkNf)
 				{
-					FastMutex::ScopedLock lock(_mutex);
-					
-					std::cout << _name << " got work notification " << pWorkNf->data() << std::endl;
-					
+					{
+						FastMutex::ScopedLock lock(_mutex);
+						std::cout << _name << " got work notification " << pWorkNf->data() << std::endl;
+					}
 					Thread::sleep(rnd.next(200));
 				}
 			}

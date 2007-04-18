@@ -1,7 +1,7 @@
 //
 // Timespan.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Timespan.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Timespan.h#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -145,7 +145,7 @@ public:
 		
 	int useconds() const;
 		/// Returns the fractions of a second
-		/// in microseconds (0 to 999).
+		/// in microseconds (0 to 999999).
 		
 	TimeDiff totalMicroseconds() const;
 		/// Returns the total number of microseconds.

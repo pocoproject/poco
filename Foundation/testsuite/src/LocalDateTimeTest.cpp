@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LocalDateTimeTest.cpp#6 $
+// $Id: //poco/Main/Foundation/testsuite/src/LocalDateTimeTest.cpp#7 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -139,6 +139,15 @@ void LocalDateTimeTest::testConversions()
 	assert (dt5.millisecond() == 234);
 	assert (dt5.dayOfWeek() == 5);
 	assert (dt5.tzd() == -4*3600);
+	
+	DateTime dt6(2005, 1, 28, 14, 24, 44, 234, 0);
+	LocalDateTime dt7(3600, dt6);
+	LocalDateTime dt8(3600, dt6, false);
+	LocalDateTime dt9(3600, dt6, true);
+	
+	assert (dt7.hour() == 15);
+	assert (dt8.hour() == 14);
+	assert (dt9.hour() == 15);
 }
 
 

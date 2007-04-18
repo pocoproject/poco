@@ -1,7 +1,7 @@
 //
 // Base64Encoder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Base64Encoder.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Base64Encoder.h#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -56,9 +56,20 @@ class Foundation_API Base64EncoderBuf: public UnbufferedStreamBuf
 public:
 	Base64EncoderBuf(std::ostream& ostr);
 	~Base64EncoderBuf();
+	
 	int close();
+		/// Closes the stream buffer.
+
 	void setLineLength(int lineLength);
+		/// Specify the line length.
+		///
+		/// After the given number of characters have been written, 
+		/// a newline character will be written.
+		///
+		/// Specify 0 for an unlimited line length.
+
 	int getLineLength() const;
+		/// Returns the currently set line length.
 	
 private:
 	int writeToDevice(char c);

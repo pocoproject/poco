@@ -480,7 +480,7 @@ std::string FileChannelTest::filename() const
 }
 
 
-template<class DT>
+template <class DT>
 std::string FileChannelTest::rotation(TimeRotation rtype) const
 {
 	DT now;

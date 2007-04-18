@@ -1,7 +1,7 @@
 //
 // Base64Encoder.cpp
 //
-// $Id: //poco/Main/Foundation/src/Base64Encoder.cpp#14 $
+// $Id: //poco/Main/Foundation/src/Base64Encoder.cpp#15 $
 //
 // Library: Foundation
 // Package: Streams
@@ -76,8 +76,6 @@ Base64EncoderBuf::~Base64EncoderBuf()
 
 void Base64EncoderBuf::setLineLength(int lineLength)
 {
-	poco_assert (lineLength > 0);
-	
 	_lineLength = lineLength;
 }
 
@@ -103,7 +101,7 @@ int Base64EncoderBuf::writeToDevice(char c)
 		idx = _group[2] & 0x3F;
 		_ostr.put(OUT_ENCODING[idx]);
 		_pos += 4;
-		if (_pos >= _lineLength) 
+		if (_lineLength > 0 && _pos >= _lineLength) 
 		{
 			_ostr << "\r\n";
 			_pos = 0;

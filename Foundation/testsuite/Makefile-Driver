@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/testsuite/Makefile-Driver#28 $
+# $Id: //poco/Main/Foundation/testsuite/Makefile-Driver#31 $
 #
 # Makefile for Poco Foundation testsuite
 #
@@ -35,9 +35,9 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	TestPlugin DummyDelegate BasicEventTest FIFOEventTest PriorityEventTest EventTestSuite \
 	LRUCacheTest ExpireCacheTest ExpireLRUCacheTest CacheTestSuite AnyTest FormatTest \
 	HashingTestSuite HashTableTest SimpleHashTableTest LinearHashTableTest \
-	HashSetTest HashMapTest \
+	HashSetTest HashMapTest SharedMemoryTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest \
-	TuplesTest TypeListTest
+	TuplesTest TypeListTest DynamicAnyTest FileStreamTest
 
 target         = testrunner
 target_version = 1

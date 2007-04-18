@@ -1,7 +1,7 @@
 //
 // HashTable.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HashTable.h#7 $
+// $Id: //poco/Main/Foundation/include/Poco/HashTable.h#8 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -87,7 +87,7 @@ public:
 		_size(ht._size),
 		_maxCapacity(ht._maxCapacity)
 	{
-		for (int i = 0; i < _maxCapacity; ++i)
+		for (UInt32 i = 0; i < _maxCapacity; ++i)
 		{
 			if (ht._entries[i])
 				_entries[i] = new HashEntryMap(ht._entries[i]->begin(), ht._entries[i]->end());
@@ -112,7 +112,7 @@ public:
 			_entries = new HashEntryMap*[_maxCapacity];
 			_size = ht._size;
 
-			for (int i = 0; i < _maxCapacity; ++i)
+			for (UInt32 i = 0; i < _maxCapacity; ++i)
 			{
 				if (ht._entries[i])
 					_entries[i] = new HashEntryMap(ht._entries[i]->begin(), ht._entries[i]->end());
@@ -127,7 +127,7 @@ public:
 	{
 		if (!_entries)
 			return;
-		for (int i = 0; i < _maxCapacity; ++i)
+		for (UInt32 i = 0; i < _maxCapacity; ++i)
 		{
 			if (_entries[i])
 				delete _entries[i];
@@ -323,7 +323,7 @@ public:
 				return;
 			}
 			_size = 0;
-			for (int i=0; i < oldSize; ++i)
+			for (UInt32 i = 0; i < oldSize; ++i)
 			{
 				if (cpy[i])
 				{
@@ -350,7 +350,7 @@ public:
 	#ifdef DEBUG
 		UInt32 totalSize = 0;
 	#endif
-		for (int i=0; i < _maxCapacity; ++i)
+		for (UInt32 i = 0; i < _maxCapacity; ++i)
 		{
 			if (_entries[i])
 			{

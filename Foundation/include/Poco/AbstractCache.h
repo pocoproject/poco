@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#12 $
+// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#13 $
 //
 // Library: Foundation
 // Package: Cache
@@ -87,6 +87,14 @@ public:
 
 	void add(const TKey& key, const TValue& val)
 		/// Adds the key value pair to the cache.
+		/// If for the key already an entry exists, it will be overwritten.
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		doAdd(key, val);
+	}
+
+	void add(const TKey& key, SharedPtr<TValue > val)
+		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
 		/// If for the key already an entry exists, it will be overwritten.
 	{
 		FastMutex::ScopedLock lock(_mutex);
@@ -194,6 +202,20 @@ protected:
 		KeyValueArgs<TKey, TValue> args(key, val);
 		Add.notify(this, args);
 		_data.insert(std::make_pair(key, SharedPtr<TValue>(new TValue(val))));
+		
+		doReplace();
+	}
+
+	void doAdd(const TKey& key, SharedPtr<TValue>& val)
+		/// Adds the key value pair to the cache.
+		/// If for the key already an entry exists, it will be overwritten.
+	{
+		Iterator it = _data.find(key);
+		doRemove(it);
+
+		KeyValueArgs<TKey, TValue> args(key, *val);
+		Add.notify(this, args);
+		_data.insert(std::make_pair(key, val));
 		
 		doReplace();
 	}

@@ -72,7 +72,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	template<class D> std::string rotation(TimeRotation rtype) const;
+	template <class D> std::string rotation(TimeRotation rtype) const;
 	void remove(const std::string& baseName);
 	std::string filename() const;
 };

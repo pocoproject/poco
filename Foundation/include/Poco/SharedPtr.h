@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedPtr.h#9 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedPtr.h#10 $
 //
 // Library: Foundation
 // Package: Core
@@ -373,7 +373,7 @@ private:
 	ReferenceCounter* _pCounter;
 	C*                _ptr;
 
-	template<class Other> friend class SharedPtr;
+	template <class Other> friend class SharedPtr;
 };
 
 

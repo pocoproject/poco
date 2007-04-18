@@ -1,7 +1,7 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/Main/Foundation/src/DateTime.cpp#15 $
+// $Id: //poco/Main/Foundation/src/DateTime.cpp#16 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -35,6 +35,7 @@
 
 
 #include "Poco/DateTime.h"
+#include "Poco/Timespan.h"
 #include <algorithm>
 #include <math.h>
 
@@ -302,6 +303,18 @@ DateTime& DateTime::operator -= (const Timespan& span)
 	computeGregorian(julianDay());
 	computeDaytime();
 	return *this;
+}
+
+
+void DateTime::makeUTC(int tzd)
+{
+	operator -= (Timespan(((Timestamp::TimeDiff) tzd)*Timespan::SECONDS));
+}
+
+	
+void DateTime::makeLocal(int tzd)
+{
+	operator += (Timespan(((Timestamp::TimeDiff) tzd)*Timespan::SECONDS));
 }
 
 

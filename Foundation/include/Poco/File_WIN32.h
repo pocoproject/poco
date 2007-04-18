@@ -1,7 +1,7 @@
 //
 // File_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/File_WIN32.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/File_WIN32.h#4 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -61,6 +61,7 @@ protected:
 	bool existsImpl() const;
 	bool canReadImpl() const;
 	bool canWriteImpl() const;
+	bool canExecuteImpl() const;
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
 	bool isLinkImpl() const;
@@ -70,12 +71,13 @@ protected:
 	FileSizeImpl getSizeImpl() const;
 	void setSizeImpl(FileSizeImpl size);
 	void setWriteableImpl(bool flag = true);		
+	void setExecutableImpl(bool flag = true);		
 	void copyToImpl(const std::string& path) const;
 	void renameToImpl(const std::string& path);
 	void removeImpl();
 	bool createFileImpl();
 	bool createDirectoryImpl();
-	static void handleError(const std::string& path);
+	static void handleLastErrorImpl(const std::string& path);
 	
 private:
 	std::string _path;

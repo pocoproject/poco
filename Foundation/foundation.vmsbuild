@@ -13,6 +13,7 @@ BinaryWriter
 Bugcheck
 ByteOrder
 Channel
+Checksum
 Configurable
 ConsoleChannel
 CountingStream

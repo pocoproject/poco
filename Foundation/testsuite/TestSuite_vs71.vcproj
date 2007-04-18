@@ -275,6 +275,9 @@
 					RelativePath=".\src\CoreTestSuite.cpp">
 				</File>
 				<File
+					RelativePath=".\src\DynamicAnyTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\DynamicFactoryTest.cpp">
 				</File>
 				<File
@@ -336,6 +339,9 @@
 					RelativePath=".\src\CoreTestSuite.h">
 				</File>
 				<File
+					RelativePath=".\src\DynamicAnyTest.h">
+				</File>
+				<File
 					RelativePath=".\src\DynamicFactoryTest.h">
 				</File>
 				<File
@@ -392,6 +398,9 @@
 					RelativePath=".\src\CountingStreamTest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\FileStreamTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\HexBinaryTest.cpp">
 				</File>
 				<File
@@ -427,6 +436,9 @@
 				</File>
 				<File
 					RelativePath=".\src\CountingStreamTest.h">
+				</File>
+				<File
+					RelativePath=".\src\FileStreamTest.h">
 				</File>
 				<File
 					RelativePath=".\src\HexBinaryTest.h">
@@ -981,6 +993,9 @@
 				<File
 					RelativePath=".\src\ProcessTest.cpp">
 				</File>
+				<File
+					RelativePath=".\src\SharedMemoryTest.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -996,6 +1011,9 @@
 				</File>
 				<File
 					RelativePath=".\src\ProcessTest.h">
+				</File>
+				<File
+					RelativePath=".\src\SharedMemoryTest.h">
 				</File>
 			</Filter>
 		</Filter>

@@ -1,7 +1,7 @@
 //
 // StreamsTestSuite.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/StreamsTestSuite.cpp#10 $
+// $Id: //poco/Main/Foundation/testsuite/src/StreamsTestSuite.cpp#11 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -41,6 +41,7 @@
 #include "BinaryReaderWriterTest.h"
 #include "LineEndingConverterTest.h"
 #include "TeeStreamTest.h"
+#include "FileStreamTest.h"
 
 
 CppUnit::Test* StreamsTestSuite::suite()
@@ -57,6 +58,7 @@ CppUnit::Test* StreamsTestSuite::suite()
 	pSuite->addTest(BinaryReaderWriterTest::suite());
 	pSuite->addTest(LineEndingConverterTest::suite());
 	pSuite->addTest(TeeStreamTest::suite());
+	pSuite->addTest(FileStreamTest::suite());
 
 	return pSuite;
 }

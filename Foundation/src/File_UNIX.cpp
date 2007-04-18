@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/File_UNIX.cpp#16 $
+// $Id: //poco/Main/Foundation/src/File_UNIX.cpp#19 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -107,7 +107,7 @@ bool FileImpl::canReadImpl() const
 		else
 			return (st.st_mode & S_IROTH) != 0;
 	}
-	else handleError(_path);
+	else handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -126,7 +126,26 @@ bool FileImpl::canWriteImpl() const
 		else
 			return (st.st_mode & S_IWOTH) != 0;
 	}
-	else handleError(_path);
+	else handleLastErrorImpl(_path);
+	return false;
+}
+
+
+bool FileImpl::canExecuteImpl() const
+{
+	poco_assert (!_path.empty());
+
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+	{
+		if (st.st_uid == geteuid())
+			return (st.st_mode & S_IXUSR) != 0;
+		else if (st.st_gid == getegid())
+			return (st.st_mode & S_IXGRP) != 0;
+		else
+			return (st.st_mode & S_IXOTH) != 0;
+	}
+	else handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -139,7 +158,7 @@ bool FileImpl::isFileImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return S_ISREG(st.st_mode);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -152,7 +171,7 @@ bool FileImpl::isDirectoryImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return S_ISDIR(st.st_mode);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -165,7 +184,7 @@ bool FileImpl::isLinkImpl() const
 	if (lstat(_path.c_str(), &st) == 0)
 		return S_ISLNK(st.st_mode);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -178,7 +197,7 @@ Timestamp FileImpl::createdImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_mtime);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return 0;
 }
 
@@ -191,7 +210,7 @@ Timestamp FileImpl::getLastModifiedImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_mtime);
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return 0;
 }
 
@@ -204,7 +223,7 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 	tb.actime  = ts.epochTime();
 	tb.modtime = ts.epochTime();
 	if (utime(_path.c_str(), &tb) != 0)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -216,7 +235,7 @@ FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return st.st_size;
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return 0;
 }
 
@@ -226,7 +245,7 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 	poco_assert (!_path.empty());
 
 	if (truncate(_path.c_str(), size) != 0)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -236,7 +255,7 @@ void FileImpl::setWriteableImpl(bool flag)
 
 	struct stat st;
 	if (stat(_path.c_str(), &st) != 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
 	{
@@ -248,7 +267,29 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode = st.st_mode & ~wmask;
 	}
 	if (chmod(_path.c_str(), mode) != 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
+}
+
+
+void FileImpl::setExecutableImpl(bool flag)
+{
+	poco_assert (!_path.empty());
+
+	struct stat st;
+	if (stat(_path.c_str(), &st) != 0) 
+		handleLastErrorImpl(_path);
+	mode_t mode;
+	if (flag)
+	{
+		mode = st.st_mode | S_IXUSR;
+	}
+	else
+	{
+		mode_t wmask = S_IXUSR | S_IXGRP | S_IXOTH;
+		mode = st.st_mode & ~wmask;
+	}
+	if (chmod(_path.c_str(), mode) != 0) 
+		handleLastErrorImpl(_path);
 }
 
 
@@ -257,13 +298,13 @@ void FileImpl::copyToImpl(const std::string& path) const
 	poco_assert (!_path.empty());
 
 	int sd = open(_path.c_str(), O_RDONLY);
-	if (sd == -1) handleError(_path);
+	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
 	if (fstat(sd, &st) != 0) 
 	{
 		close(sd);
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	}
 	const long blockSize = st.st_blksize;
 
@@ -271,7 +312,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (dd == -1)
 	{
 		close(sd);
-		handleError(path);
+		handleLastErrorImpl(path);
 	}
 	Buffer<char> buffer(blockSize);
 	try
@@ -280,10 +321,10 @@ void FileImpl::copyToImpl(const std::string& path) const
 		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
 		{
 			if (write(dd, buffer.begin(), n) != n) 
-				handleError(path);
+				handleLastErrorImpl(path);
 		}
 		if (n < 0)
-			handleError(_path);
+			handleLastErrorImpl(_path);
 	}
 	catch (...)
 	{
@@ -295,10 +336,10 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (fsync(dd) != 0) 
 	{
 		close(dd);
-		handleError(path);
+		handleLastErrorImpl(path);
 	}
 	if (close(dd) != 0)
-		handleError(path);
+		handleLastErrorImpl(path);
 }
 
 
@@ -307,7 +348,7 @@ void FileImpl::renameToImpl(const std::string& path)
 	poco_assert (!_path.empty());
 
 	if (rename(_path.c_str(), path.c_str()) != 0)
-		handleError(_path);
+		handleLastErrorImpl(_path);
 }
 
 
@@ -320,7 +361,7 @@ void FileImpl::removeImpl()
 		rc = rmdir(_path.c_str());
 	else
 		rc = unlink(_path.c_str());
-	if (rc) handleError(_path);
+	if (rc) handleLastErrorImpl(_path);
 }
 
 
@@ -337,7 +378,7 @@ bool FileImpl::createFileImpl()
 	if (n == -1 && errno == EEXIST)
 		return false;
 	else
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -349,12 +390,12 @@ bool FileImpl::createDirectoryImpl()
 	if (existsImpl() && isDirectoryImpl())
 		return false;
 	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) 
-		handleError(_path);
+		handleLastErrorImpl(_path);
 	return true;
 }
 
 
-void FileImpl::handleError(const std::string& path)
+void FileImpl::handleLastErrorImpl(const std::string& path)
 {
 	switch (errno)
 	{
@@ -382,6 +423,9 @@ void FileImpl::handleError(const std::string& path)
 		throw FileException("directory not empty", path);
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path);
+	case ENFILE:
+	case EMFILE:
+		throw FileException("too many open files", path);
 	default:
 		throw FileException(strerror(errno), path);
 	}

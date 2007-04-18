@@ -1,7 +1,7 @@
 //
 // AsyncChannel.cpp
 //
-// $Id: //poco/Main/Foundation/src/AsyncChannel.cpp#10 $
+// $Id: //poco/Main/Foundation/src/AsyncChannel.cpp#12 $
 //
 // Library: Foundation
 // Package: Logging
@@ -98,7 +98,10 @@ Channel* AsyncChannel::getChannel() const
 
 void AsyncChannel::open()
 {
-	_thread.start(*this);
+	FastMutex::ScopedLock lock(_mutex);
+
+	if (!_thread.isRunning())
+		_thread.start(*this);
 }
 
 
@@ -115,6 +118,8 @@ void AsyncChannel::close()
 
 void AsyncChannel::log(const Message& msg)
 {
+	open();
+
 	_queue.enqueueNotification(new MessageNotification(msg));
 }
 
