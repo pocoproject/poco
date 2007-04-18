@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/config/OSF1#9 $
+# $Id: //poco/Main/build/config/OSF1#10 $
 #
 # OSF1
 #
@@ -19,7 +19,7 @@ CXX     = cxx
 LINK    = $(CXX) 
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = $(CXX) $(LINKFLAGS) -shared -o $@ -rpath $(LIBPATH) -soname $(notdir $@)
+SHLIB   = $(CXX) $(LINKFLAGS) -shared -o $@ -soname $(notdir $@)
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = 
 DEP     = $(POCO_BASE)/build/script/makedepend.cxx 

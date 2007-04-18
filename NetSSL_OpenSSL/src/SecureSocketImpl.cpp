@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#19 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#20 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -315,15 +315,6 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
 	poco_assert (sockfd() != POCO_INVALID_SOCKET);
 	poco_check_ptr (_pSSL);	
-
-#if defined(POCO_BROKEN_TIMEOUTS)
-	Poco::Timespan recvTimeout = _socket.getReceiveTimeout();
-	if (recvTimeout.totalMicroseconds() != 0)
-	{
-		if (!_socket.poll(recvTimeout, SocketImpl::SELECT_READ))
-			throw TimeoutException();
-	}
-#endif
 
 	int rc;
 	do

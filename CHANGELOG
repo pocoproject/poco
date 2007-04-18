@@ -1,9 +1,13 @@
-This is the changelog file for POCO - the C++ Portable Components.
+This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.0b1 (2006-11-17)
-==========================
+Release 1.3-20070418 (2007-04-18)
+=================================
 
 - added HashMap, HashSet classes
+- the HashFunction class template has been changed in an incompatible
+  way. The member function formerly named hash() is now the function
+  call operator. If you have defined your own HashFunction classes,
+  you have to update your code. Sorry for the inconvenience.
 - added Poco::Tuple
 - added AbstractCache::getAllKeys(), improved performance of the get operation
 - fixed AbstractCache::size() to do cache replacement before returning the size
@@ -21,6 +25,139 @@ Release 1.3.0b1 (2006-11-17)
 - added operator () to AbstractEvent
 - gcc Makefiles now strip release builds
 - Void now has a == and != operator
+- Base64Encoder and HexBinaryEncoder now support an unlimited line length
+  (no newlines written), by specifying a line length of 0
+- minor fix to NotificationQueue sample (reported by Laszlo Keresztfalvi)
+- added File::canExecute() and File::setExecutable()
+- added SharedMemory class to Foundation
+- added FileStream, FileInputStream, FileOutputStream to Foundation
+- added NodeAppender class to XML for faster DOM tree creation
+- HTTPServerRequest and HTTPServerResponse are now abstract base classes,
+  actual functionality has moved into HTTPServerRequestImpl and 
+  HTTPServerResponseImpl. This allows us to plug other HTTP servers
+  into POCO.
+- added DynamicAny class to Foundation
+- replaced std::fstream with Poco::FileStream across POCO.
+- added Poco::Checksum class to Foundation.
+- fixed SF# 1700811: conflict in threadpool
+
+
+Release 1.2.9b (2007-03-25)
+===========================
+
+- NumberParser now has stricter syntax requirements: garbage following a number leads to a SyntaxException
+  (Thanks to phireis@gmail.com for the suggestion)
+- fixed SF# 1676830: Don't use -rpath in libraries
+- fixed SF# 1670279: AbstractConfiguration::unckeckedExpand crash
+- fixed a warning in Hashtable
+- HTTPClientSession now uses a keepAliveTimeout for better persistent connection handling
+- added DateTime::makeUTC() and DateTime::makeLocal()
+- added another constructor to LocalDateTime
+- POCO_WIN32_UTF8 is ignored on non-Windows platforms
+- fixed a timeout bug (with NetSSL) in HTTPSession
+- AsyncChannel is automatically opened with first log()\
+
+
+Release 1.2.9 (2007-02-26)
+==========================
+
+- fixed a formatting problem in Util::HelpFormatter
+- HTTPClientSession::sendRequest() now attempts to send the complete request in one network packet.
+- improved network performance of ChunkedOutputStream: chunk size and chunk data 
+  are sent in one network packet if possible
+- fixed SF# 1655035: Wrong expires field calculation in HTTPCookie 
+  (thanks to Sergey N. Yatskevich for this and other fixes)
+- fixed SF# 1655049: Fix discrepancy of a code to the description
+- fixed SF# 1655170: Poco::Timezone::standardName() problem on WIN32
+- fixed SF# 1629095: POCO_WIN32_UTF8 problem
+  There is a new function Path::transcode() that can be used to convert a path (or any other string)
+  from UTF-8 to the current Windows code page. This string can the be passed as a filename
+  to an fstream or fopen(). This function only does the conversion on Windows,
+  and only, if POCO_WIN32_UTF8 is defined. Otherwise, it simply returns the unmodified argument.
+- fixed SF# 1659607: Probably a bug in Poco::Net::DialogSocket
+- HTTPServer network performance improvement: responses that fit into a single network packet
+  sent with HTTPServerResponse::sendFile() or the new HTTPServerResponse::sendBuffer() are
+  sent in only one packet.
+- added HTTPServerResponse::sendBuffer()
+- HTTPServer now sends a Bad Request response if it fails to parse the HTTP request header.
+- HTTPServer now sends an Internal Server Error response if the request handler throws an
+  exception prior to sending a response.- enabled TCP_NODELAY per default on TCPServer/HTTPServer
+- fixed a bug in HTTP persistent connection handling 
+  (server does not send Connection: close when it reaches connection maximum)
+- HTMLForm - POST submission of URL encoded form no longer uses chunked transfer encoding
+  (thus improving interoperability with certain web servers)
+- integrated Environment.cpp from Main (missing get(var, default))
+- added missing AutoPtr include to Util/Application 
+  (and using Poco::AutoPtr is no longer necessary for POCO_APP_MAIN macro)
+- fixed SF# 1635420: Per Regents of the University of Calfornia letter, 
+  remove advertising from BSD licensed parts
+- fixed SF# 1633133: MultipartWriter writes superluous CR-LF at beginning
+
+
+Release 1.2.8 (2007-01-04)
+==========================
+
+- fixed SF# 1613906: Util/Application.h and GCC 3.3
+- fixed a byte order issue (failed test) in IPv6 address formatting
+- fixed SF# 1626640: Poco::Net::SocketReactor bug
+- fixed client side chunked transfer encoding handling
+- fixed client side persistent connection handling
+- fixed SF# 1623536: HTTP Server Chunked Transfer Encoding Bug
+- improved HTTP server exception text
+- fixed SF# 1616294: KeepAlive HTTPServerSession patch
+- fixed SF# 1616296: Trivial Poco::TaskCustomNotification patch
+- fixed SF# 1619282: PurgeStrategy bug fix
+- fixed SF# 1620855: Format problem
+  there is a new format specifier %z for std::size_t, as well as a new
+  flag ? for %d, %i, %o, %x meaning any signed or unsigned integer
+
+
+Release 1.2.7 (2006-12-07)
+==========================
+
+- Poco::File: fixed root directory handling
+- fixed UUIDGenerator documentation
+- clarified Application::setUnixOptions() documentation
+- fixes for issue [SOAPLite Transport 0000023]: SOAP Transport Listener should be able to use existing HTTPServer instance
+- fixing mantis issues 13, 14, 15, 16, 17, 18, 19, 21
+- fixed SF# 1597022: Signed/unsigned warning in StringTokenizer::operator[]
+- fixed SF# 1598601: Message::op= leaks
+- fixed SF# 1605960: PatternFormatter crashes on custom property
+- fixed SF# 1605950: Memory leak in Logger sample code
+- fixed SF# 1591635: Copy Paste Error in sample code
+- fixed SF# 1591512: SMTPClientSession response stream
+- fixed SF #1592776: LayeredConfiguration: getRaw should enumerate in reverse order
+- SF Patch # 1599848 ] VS 2005 Util build fails
+- Logger::dump() now uses std::size_t instead of int for buffer size
+- LayeredConfiguration now supports a priority value for each configuration. 
+  Also, it's possible to specify for each configuration added whether it
+  should be writeable.
+- ServerApplication: cd to root directory only if running as a daemon
+- added Message::swap()
+- improvements to build system:
+  global Makefile has correct dependencies for samples
+  on Windows, samples build after libraries are ready
+  configure supports --no-wstring and --no-fpenvironment flags
+  build system supports POCO_FLAGS environment variable for compiler flags
+- RemoteGen: fixed error handling for write protected files (SystemException)
+  fixing integral constant overflow messages with large cache expiration, m_ support for type serializers, 
+  case-insensitive comparison added
+
+
+Release 1.2.6 (2006-11-19)
+==========================
+
+- added additional match() method to RegularExpression and documented the fact that the simple
+  match() method internally sets RE_ANCHORED and RE_NOTEMPTY.
+- added ExpirationDecorator template. Decorates data types so that they can be used with UniqueExpireCaches
+- added operator ! to AutoPtr and SharedPtr
+- Buffer uses std::size_t instead of int
+- added poco_ndc_dbg() macro (same as poco_ndc(), but only enabled in debug builds)
+- Foundation.h now includes Config.h at the very beginning.
+- added AutoPtr::assign() and SharedPtr::assign()
+- added operator () to AbstractEvent
+- gcc Makefiles now strip release builds
+- documentation improvements
 
 
 Release 1.2.5 (2006-10-23)
@@ -565,4 +702,4 @@ building the libraries.
 
 
 --
-$Id: //poco/Main/dist/CHANGELOG#45 $
+$Id: //poco/Main/dist/CHANGELOG#47 $

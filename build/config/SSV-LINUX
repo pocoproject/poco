@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/config/ARM-Linux#6 $
+# $Id: //poco/Main/build/config/SSV-LINUX#4 $
 #
 # ARM-Linux
 #
@@ -24,7 +24,7 @@ STRIP   = $(TOOL)-strip
 STRIPDBG = $(TOOL)-strip
 LIB     = $(TOOL)-ar -cr
 RANLIB  = $(TOOL)-ranlib
-SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
+SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh

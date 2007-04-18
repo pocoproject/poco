@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/config/QNX#5 $
+# $Id: //poco/Main/build/config/QNX#6 $
 #
 # QNX
 #
@@ -20,7 +20,7 @@ CXX     = QCC -V$(CCVER)
 LINK    = $(CXX) -V$(CCVER)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
+SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = 
 DEP     = $(POCO_BASE)/build/script/makedepend.qcc 

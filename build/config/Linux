@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/config/Linux#9 $
+# $Id: //poco/Main/build/config/Linux#11 $
 #
 # Linux
 #
@@ -20,7 +20,7 @@ CXX     = g++
 LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -Wl,-rpath,$(dir $@) -o $@
+SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = strip
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
@@ -68,4 +68,4 @@ SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=6
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lpthread -ldl
+SYSLIBS  = -lpthread -ldl -lrt
