@@ -1,7 +1,7 @@
 //
 // HTTPServerTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/HTTPServerTest.cpp#11 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPServerTest.cpp#13 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,7 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPServerParams.h"
-#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/AbstractHTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
@@ -50,6 +50,7 @@
 using Poco::Net::HTTPServer;
 using Poco::Net::HTTPServerParams;
 using Poco::Net::HTTPRequestHandler;
+using Poco::Net::AbstractHTTPRequestHandler;
 using Poco::Net::HTTPRequestHandlerFactory;
 using Poco::Net::HTTPClientSession;
 using Poco::Net::HTTPRequest;
@@ -96,12 +97,12 @@ namespace
 		}
 	};
 
-	class RedirectRequestHandler: public HTTPRequestHandler
+	class RedirectRequestHandler: public AbstractHTTPRequestHandler
 	{
 	public:
-		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		void run()
 		{
-			response.redirect("http://www.appinf.com/");
+			response().redirect("http://www.appinf.com/");
 		}
 	};
 
@@ -398,6 +399,52 @@ void HTTPServerTest::testMaxKeepAlive()
 }
 
 
+void HTTPServerTest::testKeepAliveTimeout()
+{
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	pParams->setMaxKeepAliveRequests(4);
+	pParams->setKeepAliveTimeout(Poco::Timespan(3, 0));
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	
+	HTTPClientSession cs("localhost", svs.address().port());
+	cs.setKeepAlive(true);
+	cs.setKeepAliveTimeout(Poco::Timespan(2, 0));
+	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
+	request.setContentType("text/plain");
+	request.setChunkedTransferEncoding(true);
+	std::string body(5000, 'x');
+	for (int i = 0; i < 3; ++i)
+	{
+		cs.sendRequest(request) << body;
+		HTTPResponse response;
+		std::string rbody;
+		cs.receiveResponse(response) >> rbody;
+		assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+		assert (response.getContentType() == "text/plain");
+		assert (response.getChunkedTransferEncoding());
+		assert (response.getKeepAlive());
+		assert (rbody == body);
+	}
+
+	Poco::Thread::sleep(4000);
+
+	{
+		cs.sendRequest(request) << body;
+		HTTPResponse response;
+		std::string rbody;
+		cs.receiveResponse(response) >> rbody;
+		assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+		assert (response.getContentType() == "text/plain");
+		assert (response.getChunkedTransferEncoding());
+		assert (response.getKeepAlive());
+		assert (rbody == body);
+	}
+}
+
+
 void HTTPServerTest::test100Continue()
 {
 	ServerSocket svs(0);
@@ -522,6 +569,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testMaxKeepAlive);
+	CppUnit_addTest(pSuite, HTTPServerTest, testKeepAliveTimeout);
 	CppUnit_addTest(pSuite, HTTPServerTest, test100Continue);
 	CppUnit_addTest(pSuite, HTTPServerTest, testRedirect);
 	CppUnit_addTest(pSuite, HTTPServerTest, testAuth);

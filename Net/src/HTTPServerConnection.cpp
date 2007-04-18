@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerConnection.cpp#9 $
+// $Id: //poco/Main/Net/src/HTTPServerConnection.cpp#10 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -36,8 +36,8 @@
 
 #include "Poco/Net/HTTPServerConnection.h"
 #include "Poco/Net/HTTPServerSession.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
+#include "Poco/Net/HTTPServerResponseImpl.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerParams.h"
@@ -76,8 +76,9 @@ void HTTPServerConnection::run()
 	{
 		try
 		{
-			HTTPServerRequest request(session, _pParams);
-			HTTPServerResponse response(session);
+			HTTPServerResponseImpl response(session);
+			HTTPServerRequestImpl request(response, session, _pParams);
+			
 			response.setVersion(request.getVersion());
 			response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
 			if (!server.empty())
@@ -116,7 +117,7 @@ void HTTPServerConnection::run()
 
 void HTTPServerConnection::sendErrorResponse(HTTPServerSession& session, HTTPResponse::HTTPStatus status)
 {
-	HTTPServerResponse response(session);
+	HTTPServerResponseImpl response(session);
 	response.setVersion(HTTPMessage::HTTP_1_1);
 	response.setStatusAndReason(status);
 	response.setKeepAlive(false);

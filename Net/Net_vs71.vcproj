@@ -601,6 +601,9 @@
 				Name="Header Files"
 				Filter="">
 				<File
+					RelativePath=".\include\Poco\Net\AbstractHTTPRequestHandler.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Net\HTTPRequestHandler.h">
 				</File>
 				<File
@@ -622,7 +625,13 @@
 					RelativePath=".\include\Poco\Net\HTTPServerRequest.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Net\HTTPServerRequestImpl.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Net\HTTPServerResponse.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerResponseImpl.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Net\HTTPServerSession.h">
@@ -631,6 +640,9 @@
 			<Filter
 				Name="Source Files"
 				Filter="">
+				<File
+					RelativePath=".\src\AbstractHTTPRequestHandler.cpp">
+				</File>
 				<File
 					RelativePath=".\src\HTTPRequestHandler.cpp">
 				</File>
@@ -653,7 +665,13 @@
 					RelativePath=".\src\HTTPServerRequest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\HTTPServerRequestImpl.cpp">
+				</File>
+				<File
 					RelativePath=".\src\HTTPServerResponse.cpp">
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerResponseImpl.cpp">
 				</File>
 				<File
 					RelativePath=".\src\HTTPServerSession.cpp">
@@ -885,12 +903,18 @@
 				<File
 					RelativePath=".\include\Poco\Net\RemoteSyslogChannel.h">
 				</File>
+				<File
+					RelativePath=".\include\Poco\Net\RemoteSyslogListener.h">
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				Filter="">
 				<File
 					RelativePath=".\src\RemoteSyslogChannel.cpp">
+				</File>
+				<File
+					RelativePath=".\src\RemoteSyslogListener.cpp">
 				</File>
 			</Filter>
 		</Filter>

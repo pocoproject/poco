@@ -1,7 +1,7 @@
 //
 // FilePartSource.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/FilePartSource.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/FilePartSource.h#3 $
 //
 // Library: Net
 // Package: Messages
@@ -42,7 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/PartSource.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 
 
 namespace Poco {
@@ -77,8 +77,8 @@ public:
 		/// Returns the filename portion of the path.
 
 private:
-	std::ifstream _istr;
-	std::string   _filename;
+	std::string _filename;
+	Poco::FileInputStream _istr;
 };
 
 

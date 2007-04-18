@@ -1,7 +1,7 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/Main/Net/src/RemoteSyslogChannel.cpp#2 $
+// $Id: //poco/Main/Net/src/RemoteSyslogChannel.cpp#3 $
 //
 // Library: Net
 // Package: Logging
@@ -49,6 +49,8 @@ namespace Poco {
 namespace Net {
 
 
+const std::string RemoteSyslogChannel::BSD_TIMEFORMAT("%b %f %H:%M:%S");
+const std::string RemoteSyslogChannel::SYSLOG_TIMEFORMAT("%Y-%m-%dT%H:%M:%S.%i%z");
 const std::string RemoteSyslogChannel::PROP_NAME("name");
 const std::string RemoteSyslogChannel::PROP_FACILITY("facility");
 const std::string RemoteSyslogChannel::PROP_FORMAT("format");
@@ -129,14 +131,14 @@ void RemoteSyslogChannel::log(const Message& msg)
 	m += '>';
 	if (_bsdFormat)
 	{
-		m += Poco::DateTimeFormatter::format(msg.getTime(), "%w %f %H:%M:%S");
+		m += Poco::DateTimeFormatter::format(msg.getTime(), BSD_TIMEFORMAT);
 		m += ' ';
 		m += _host;
 	}
 	else
 	{
 		m += "1 "; // version
-		m += Poco::DateTimeFormatter::format(msg.getTime(), "%Y-%m-%dT%H:%M:%S.%i%z");
+		m += Poco::DateTimeFormatter::format(msg.getTime(), SYSLOG_TIMEFORMAT);
 		m += ' ';
 		m += _host;
 		m += ' ';

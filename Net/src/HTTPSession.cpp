@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPSession.cpp#10 $
+// $Id: //poco/Main/Net/src/HTTPSession.cpp#12 $
 //
 // Library: Net
 // Package: HTTP
@@ -158,10 +158,7 @@ int HTTPSession::receive(char* buffer, int length)
 {
 	try
 	{
-		if (_socket.poll(_timeout, Socket::SELECT_READ))
-			return _socket.receiveBytes(buffer, length);
-		else
-			throw TimeoutException();
+		return _socket.receiveBytes(buffer, length);
 	}
 	catch (Poco::Exception& exc)
 	{
@@ -192,6 +189,7 @@ bool HTTPSession::connected() const
 void HTTPSession::connect(const SocketAddress& address)
 {
 	_socket.connect(address, _timeout);
+	_socket.setReceiveTimeout(_timeout);
 	_socket.setNoDelay(true);
 }
 

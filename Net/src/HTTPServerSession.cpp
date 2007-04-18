@@ -1,7 +1,7 @@
 //
 // HTTPServerSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerSession.cpp#7 $
+// $Id: //poco/Main/Net/src/HTTPServerSession.cpp#8 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -48,6 +48,8 @@ HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParam
 	_keepAliveTimeout(pParams->getKeepAliveTimeout()),
 	_maxKeepAliveRequests(pParams->getMaxKeepAliveRequests())
 {
+	setTimeout(pParams->getTimeout());
+	this->socket().setReceiveTimeout(pParams->getTimeout());
 }
 
 

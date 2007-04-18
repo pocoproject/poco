@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#16 $
+// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#18 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -57,6 +57,7 @@ namespace Net {
 HTTPClientSession::HTTPClientSession():
 	_port(HTTPSession::HTTP_PORT),
 	_proxyPort(HTTPSession::HTTP_PORT),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
@@ -70,6 +71,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
 	_proxyPort(HTTPSession::HTTP_PORT),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
@@ -83,6 +85,7 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_host(address.host().toString()),
 	_port(address.port()),
 	_proxyPort(HTTPSession::HTTP_PORT),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
@@ -96,6 +99,7 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_host(host),
 	_port(port),
 	_proxyPort(HTTPSession::HTTP_PORT),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
@@ -159,13 +163,19 @@ void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 }
 
 
+void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
+{
+	_keepAliveTimeout = timeout;
+}
+
+
 std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 {
 	delete _pResponseStream;
 	_pResponseStream = 0;
 
 	bool keepAlive = getKeepAlive();
-	if (connected() && !keepAlive || _mustReconnect)
+	if (connected() && !keepAlive || mustReconnect())
 	{
 		close();
 		_mustReconnect = false;
@@ -204,6 +214,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		_pRequestStream = new HTTPOutputStream(*this);
 		request.write(*_pRequestStream);
 	}	
+	_lastRequest.update();
 	return *_pRequestStream;
 }
 
@@ -250,7 +261,9 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 {
 	try
 	{
-		return HTTPSession::write(buffer, length);
+		int rc = HTTPSession::write(buffer, length);
+		_reconnect = false;
+		return rc;
 	}
 	catch (NetException&)
 	{
@@ -258,11 +271,12 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 		{
 			close();
 			reconnect();
-			return HTTPSession::write(buffer, length);
+			int rc = HTTPSession::write(buffer, length);
+			_reconnect = false;
+			return rc;
 		}
 		else throw;
 	}
-	_reconnect = false;
 }
 
 
@@ -316,6 +330,17 @@ void HTTPClientSession::setRequestStream(std::ostream* pRequestStream)
 {
 	poco_assert (!_pRequestStream);
 	_pRequestStream = pRequestStream;
+}
+
+
+bool HTTPClientSession::mustReconnect() const
+{
+	if (!_mustReconnect)
+	{
+		Poco::Timestamp now;
+		return _keepAliveTimeout <= now - _lastRequest;
+	}
+	else return true;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // HTTPServerTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/HTTPServerTest.h#8 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPServerTest.h#9 $
 //
 // Definition of the HTTPServerTest class.
 //
@@ -54,6 +54,7 @@ public:
 	void testChunkedRequestKeepAlive();
 	void testClosedRequestKeepAlive();
 	void testMaxKeepAlive();
+	void testKeepAliveTimeout();
 	void test100Continue();
 	void testRedirect();
 	void testAuth();

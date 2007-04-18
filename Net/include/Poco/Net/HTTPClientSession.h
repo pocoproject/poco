@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPClientSession.h#3 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPClientSession.h#5 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -129,6 +129,12 @@ public:
 		
 	Poco::UInt16 getProxyPort() const;
 		/// Returns the proxy port number.
+
+	void setKeepAliveTimeout(const Poco::Timespan& timeout);
+		/// Sets the connection timeout for HTTP connections.
+		
+	const Poco::Timespan& getKeepAliveTimeout() const;
+		/// Returns the connection timeout for HTTP connections.
 		
 	virtual std::ostream& sendRequest(HTTPRequest& request);
 		/// Sends the header for the given HTTP request to
@@ -152,6 +158,11 @@ public:
 		/// destroyed.
 	
 protected:
+	enum
+	{
+		DEFAULT_KEEP_ALIVE_TIMEOUT = 8
+	};
+	
 	void reconnect();
 		/// Connects the underlying socket to the HTTP server.
 
@@ -188,16 +199,21 @@ protected:
 	bool getExpectResponseBody() const;
 		/// Returns _expectResponseBody.
 
+	bool mustReconnect() const;
+		/// Checks if we can reuse a persistent connection.
+
 private:
-	std::string   _host;
-	Poco::UInt16  _port;
-	std::string   _proxyHost;
-	Poco::UInt16  _proxyPort;
-	bool          _reconnect;
-	bool          _mustReconnect;
-	bool          _expectResponseBody;
-	std::ostream* _pRequestStream;
-	std::istream* _pResponseStream;
+	std::string     _host;
+	Poco::UInt16    _port;
+	std::string     _proxyHost;
+	Poco::UInt16    _proxyPort;
+	Poco::Timespan  _keepAliveTimeout;
+	Poco::Timestamp _lastRequest;
+	bool            _reconnect;
+	bool            _mustReconnect;
+	bool            _expectResponseBody;
+	std::ostream*   _pRequestStream;
+	std::istream*   _pResponseStream;
 };
 
 
@@ -255,6 +271,12 @@ inline void HTTPClientSession::setExpectResponseBody(bool expect)
 inline bool HTTPClientSession::getExpectResponseBody() const
 {
 	return _expectResponseBody;
+}
+
+
+inline const Poco::Timespan& HTTPClientSession::getKeepAliveTimeout() const
+{
+	return _keepAliveTimeout;
 }
 
 

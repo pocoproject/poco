@@ -1,7 +1,7 @@
 //
 // FilePartSource.cpp
 //
-// $Id: //poco/Main/Net/src/FilePartSource.cpp#7 $
+// $Id: //poco/Main/Net/src/FilePartSource.cpp#8 $
 //
 // Library: Net
 // Package: Messages
@@ -48,7 +48,7 @@ namespace Net {
 
 
 FilePartSource::FilePartSource(const std::string& path):
-	_istr(path.c_str(), std::ios::in | std::ios::binary)
+	_istr(path)
 {
 	Path p(path);
 	_filename = p.getFileName();
@@ -59,7 +59,7 @@ FilePartSource::FilePartSource(const std::string& path):
 
 FilePartSource::FilePartSource(const std::string& path, const std::string& mediaType):
 	PartSource(mediaType),
-	_istr(path.c_str(), std::ios::in | std::ios::binary)
+	_istr(path)
 {
 	Path p(path);
 	_filename = p.getFileName();

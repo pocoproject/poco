@@ -1,7 +1,7 @@
 //
 // HTTPServerResponse.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerResponse.h#3 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerResponse.h#5 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -65,17 +65,17 @@ class Net_API HTTPServerResponse: public HTTPResponse
 	/// as necessary, and provide a message body.
 {
 public:
-	HTTPServerResponse(HTTPServerSession& session);
+	HTTPServerResponse();
 		/// Creates the HTTPServerResponse.
 
 	~HTTPServerResponse();
 		/// Destroys the HTTPServerResponse.
 
-	void sendContinue();
+	virtual void sendContinue() = 0;
 		/// Sends a 100 Continue response to the
 		/// client.
 		
-	std::ostream& send();
+	virtual std::ostream& send() = 0;
 		/// Sends the response header to the client and
 		/// returns an output stream for sending the
 		/// response body.
@@ -86,7 +86,7 @@ public:
 		/// Must not be called after sendFile(), sendBuffer() 
 		/// or redirect() has been called.
 		
-	void sendFile(const std::string& path, const std::string& mediaType);
+	virtual void sendFile(const std::string& path, const std::string& mediaType) = 0;
 		/// Sends the response header to the client, followed
 		/// by the content of the given file.
 		///
@@ -97,7 +97,7 @@ public:
 		/// cannot be found, or an OpenFileException if
 		/// the file cannot be opened.
 		
-	void sendBuffer(const void* pBuffer, std::size_t length);
+	virtual void sendBuffer(const void* pBuffer, std::size_t length) = 0;
 		/// Sends the response header to the client, followed
 		/// by the contents of the given buffer.
 		///
@@ -111,7 +111,7 @@ public:
 		/// Must not be called after send(), sendFile()  
 		/// or redirect() has been called.
 		
-	void redirect(const std::string& uri);
+	virtual void redirect(const std::string& uri) = 0;
 		/// Sets the status code to 302 (Found)
 		/// and sets the "Location" header field
 		/// to the given URI, which according to
@@ -119,27 +119,14 @@ public:
 		///
 		/// Must not be called after send() has been called.
 		
-	void requireAuthentication(const std::string& realm);
+	virtual void requireAuthentication(const std::string& realm) = 0;
 		/// Sets the status code to 401 (Unauthorized)
 		/// and sets the "WWW-Authenticate" header field
 		/// according to the given realm.
 		
-	bool sent() const;
+	virtual bool sent() const = 0;
 		/// Returns true if the response (header) has been sent.
-
-private:
-	HTTPServerSession& _session;
-	std::ostream*      _pStream;
 };
-
-
-//
-// inlines
-//
-inline bool HTTPServerResponse::sent() const
-{
-	return _pStream != 0;
-}
 
 
 } } // namespace Poco::Net

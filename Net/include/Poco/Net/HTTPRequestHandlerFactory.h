@@ -1,7 +1,7 @@
 //
 // HTTPRequestHandlerFactory.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPRequestHandlerFactory.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPRequestHandlerFactory.h#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -48,12 +48,13 @@ namespace Net {
 
 
 class HTTPServerRequest;
+class HTTPServerResponse;
 class HTTPRequestHandler;
 
 
 class Net_API HTTPRequestHandlerFactory
 	/// A factory for HTTPRequestHandler objects.
-	/// Subclasses must override the createRequstHandler()
+	/// Subclasses must override the createRequestHandler()
 	/// method.
 {
 public:

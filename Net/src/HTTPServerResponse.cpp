@@ -1,7 +1,7 @@
 //
 // HTTPServerResponse.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerResponse.cpp#10 $
+// $Id: //poco/Main/Net/src/HTTPServerResponse.cpp#12 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -35,135 +35,19 @@
 
 
 #include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/HTTPServerSession.h"
-#include "Poco/Net/HTTPHeaderStream.h"
-#include "Poco/Net/HTTPStream.h"
-#include "Poco/Net/HTTPFixedLengthStream.h"
-#include "Poco/Net/HTTPChunkedStream.h"
-#include "Poco/File.h"
-#include "Poco/Timestamp.h"
-#include "Poco/NumberFormatter.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/CountingStream.h"
-#include "Poco/Exception.h"
-#include <fstream>
-
-
-using Poco::File;
-using Poco::Timestamp;
-using Poco::NumberFormatter;
-using Poco::StreamCopier;
-using Poco::OpenFileException;
 
 
 namespace Poco {
 namespace Net {
 
 
-HTTPServerResponse::HTTPServerResponse(HTTPServerSession& session):
-	_session(session),
-	_pStream(0)
+HTTPServerResponse::HTTPServerResponse()
 {
 }
 
 
 HTTPServerResponse::~HTTPServerResponse()
 {
-	delete _pStream;
-}
-
-
-void HTTPServerResponse::sendContinue()
-{
-	HTTPHeaderOutputStream hs(_session);
-	hs << getVersion() << " 100 Continue\r\n\r\n";
-}
-
-
-std::ostream& HTTPServerResponse::send()
-{
-	poco_assert (!_pStream);
-
-	if (getChunkedTransferEncoding())
-	{
-		HTTPHeaderOutputStream hs(_session);
-		write(hs);
-		_pStream = new HTTPChunkedOutputStream(_session);
-	}
-	else if (getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
-	{
-		Poco::CountingOutputStream cs;
-		write(cs);
-		_pStream = new HTTPFixedLengthOutputStream(_session, getContentLength() + cs.chars());
-		write(*_pStream);
-	}
-	else
-	{
-		_pStream = new HTTPOutputStream(_session);
-		setKeepAlive(false);
-		write(*_pStream);
-	}
-	return *_pStream;
-}
-
-
-void HTTPServerResponse::sendFile(const std::string& path, const std::string& mediaType)
-{
-	poco_assert (!_pStream);
-
-	File f(path);
-	Timestamp dateTime    = f.getLastModified();
-	File::FileSize length = f.getSize();
-	setDate(dateTime);
-	setContentLength(static_cast<int>(length));
-	setContentType(mediaType);
-	setChunkedTransferEncoding(false);
-
-	std::ifstream istr(path.c_str(), std::ios::binary | std::ios::in);
-	if (istr.good())
-	{
-		_pStream = new HTTPOutputStream(_session);
-		write(*_pStream);
-		StreamCopier::copyStream(istr, *_pStream);
-	}
-	else throw OpenFileException(path);
-}
-
-
-void HTTPServerResponse::sendBuffer(const void* pBuffer, std::size_t length)
-{
-	poco_assert (!_pStream);
-
-	setContentLength(static_cast<int>(length));
-	setChunkedTransferEncoding(false);
-	
-	_pStream = new HTTPOutputStream(_session);
-	write(*_pStream);
-	_pStream->write(static_cast<const char*>(pBuffer), static_cast<std::streamsize>(length));
-}
-
-
-void HTTPServerResponse::redirect(const std::string& uri)
-{
-	poco_assert (!_pStream);
-
-	setStatusAndReason(HTTPResponse::HTTP_FOUND);
-	set("Location", uri);
-
-	_pStream = new HTTPOutputStream(_session);
-	write(*_pStream);
-}
-
-
-void HTTPServerResponse::requireAuthentication(const std::string& realm)
-{
-	poco_assert (!_pStream);
-	
-	setStatusAndReason(HTTPResponse::HTTP_UNAUTHORIZED);
-	std::string auth("Basic realm=\"");
-	auth.append(realm);
-	auth.append("\"");
-	set("WWW-Authenticate", auth);
 }
 
 

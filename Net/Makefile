@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Net/Makefile#34 $
+# $Id: //poco/Main/Net/Makefile#36 $
 #
 # Makefile for Poco Net
 #
@@ -17,19 +17,19 @@ objects = \
 	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \
 	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream \
 	HTTPClientSession HTTPServerParams MultipartReader StreamSocket SocketImpl \
-	HTTPFixedLengthStream HTTPServerRequest MultipartWriter StreamSocketImpl \
-	HTTPHeaderStream HTTPServerResponse NameValueCollection TCPServer \
+	HTTPFixedLengthStream HTTPServerRequest HTTPServerRequestImpl MultipartWriter StreamSocketImpl \
+	HTTPHeaderStream HTTPServerResponse HTTPServerResponseImpl NameValueCollection TCPServer \
 	HTTPMessage HTTPServerSession NetException TCPServerConnection HTTPBufferAllocator \
 	HTTPRequest HTTPSession HTTPSessionInstantiator HTTPSessionFactory NetworkInterface TCPServerConnectionFactory \
 	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher \
 	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
 	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
 	FTPClientSession FTPStreamFactory PartHandler PartSource NullPartHandler \
-	SocketReactor SocketNotifier SocketNotification \
+	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
-	RemoteSyslogChannel
+	RemoteSyslogChannel RemoteSyslogListener
 
 target         = PocoNet
 target_version = $(LIBVERSION)

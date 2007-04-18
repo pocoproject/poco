@@ -1,7 +1,7 @@
 //
 // HTTPServerRequest.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerRequest.cpp#6 $
+// $Id: //poco/Main/Net/src/HTTPServerRequest.cpp#8 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -35,56 +35,19 @@
 
 
 #include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerSession.h"
-#include "Poco/Net/HTTPHeaderStream.h"
-#include "Poco/Net/HTTPStream.h"
-#include "Poco/Net/HTTPFixedLengthStream.h"
-#include "Poco/Net/HTTPChunkedStream.h"
-#include "Poco/Net/HTTPServerParams.h"
-#include "Poco/String.h"
-
-
-using Poco::icompare;
 
 
 namespace Poco {
 namespace Net {
 
 
-HTTPServerRequest::HTTPServerRequest(HTTPServerSession& session, HTTPServerParams* pParams):
-	_pStream(0),
-	_pParams(pParams),
-	_clientAddress(session.clientAddress()),
-	_serverAddress(session.serverAddress())
+HTTPServerRequest::HTTPServerRequest()
 {
-	poco_check_ptr (_pParams);
-	
-	_pParams->duplicate();
-
-	HTTPHeaderInputStream hs(session);
-	read(hs);
-	
-	if (getChunkedTransferEncoding())
-		_pStream = new HTTPChunkedInputStream(session);
-	else if (getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
-		_pStream = new HTTPFixedLengthInputStream(session, getContentLength());
-	else if (getMethod() == HTTPRequest::HTTP_GET || getMethod() == HTTPRequest::HTTP_HEAD)
-		_pStream = new HTTPFixedLengthInputStream(session, 0);
-	else
-		_pStream = new HTTPInputStream(session);
 }
 
 
 HTTPServerRequest::~HTTPServerRequest()
 {
-	_pParams->release();
-	delete _pStream;
-}
-
-
-bool HTTPServerRequest::expectContinue() const
-{
-	return has("Expect") && icompare(get("Expect"), "100-continue") == 0;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // RemoteSyslogChannel.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/RemoteSyslogChannel.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/RemoteSyslogChannel.h#4 $
 //
 // Library: Net
 // Package: Logging
@@ -59,6 +59,9 @@ class Net_API RemoteSyslogChannel: public Poco::Channel
 	/// protocol, as described in RFC 3164.
 {
 public:
+	static const std::string BSD_TIMEFORMAT;
+	static const std::string SYSLOG_TIMEFORMAT;
+
 	enum Severity
 	{
 		SYSLOG_EMERGENCY     = 0, /// Emergency: system is unusable
@@ -118,7 +121,7 @@ public:
 		/// Closes the RemoteSyslogChannel.
 		
 	void log(const Message& msg);
-		/// Sens the message's text to the syslog service.
+		/// Sends the message's text to the syslog service.
 		
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets the property with the given value.

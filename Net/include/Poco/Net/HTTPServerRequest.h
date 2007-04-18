@@ -1,7 +1,7 @@
 //
 // HTTPServerRequest.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerRequest.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerRequest.h#5 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -51,79 +51,47 @@ namespace Net {
 
 
 class HTTPServerSession;
+class HTTPServerResponse;
 class HTTPServerParams;
 
 
 class Net_API HTTPServerRequest: public HTTPRequest
-	/// This subclass of HTTPRequest is used for
+	/// This abstract HTTPServerRequest of HTTPRequest is used for
 	/// representing server-side HTTP requests.
 	///
 	/// A HTTPServerRequest is passed to the
 	/// handleRequest() method of HTTPRequestHandler.
 {
 public:
-	HTTPServerRequest(HTTPServerSession& session, HTTPServerParams* pParams);
-		/// Creates the HTTPServerRequest, using the
-		/// given HTTPServerSession.
+	HTTPServerRequest();
+		/// Creates the HTTPServerRequest
 
 	~HTTPServerRequest();
 		/// Destroys the HTTPServerRequest.
 		
-	std::istream& stream();
+	virtual std::istream& stream() = 0;
 		/// Returns the input stream for reading
 		/// the request body.
 		///
-		/// The stream is valid until the HTTPServerRequest
+		/// The stream must be valid until the HTTPServerRequest
 		/// object is destroyed.
 		
-	bool expectContinue() const;
+	virtual bool expectContinue() const = 0;
 		/// Returns true if the client expects a
 		/// 100 Continue response.
 		
-	const SocketAddress& clientAddress() const;
+	virtual const SocketAddress& clientAddress() const = 0;
 		/// Returns the client's address.
 
-	const SocketAddress& serverAddress() const;
+	virtual const SocketAddress& serverAddress() const = 0;
 		/// Returns the server's address.
 		
-	const HTTPServerParams& serverParams() const;
+	virtual const HTTPServerParams& serverParams() const = 0;
 		/// Returns a reference to the server parameters.
-		
-private:
-	std::istream*     _pStream;
-	HTTPServerParams* _pParams;
-	SocketAddress     _clientAddress;
-	SocketAddress     _serverAddress;
+
+	virtual HTTPServerResponse& response() const = 0;
+		/// Returns a reference to the associated response.
 };
-
-
-//
-// inlines
-//
-inline std::istream& HTTPServerRequest::stream()
-{
-	poco_check_ptr (_pStream);
-	
-	return *_pStream;
-}
-
-
-inline const SocketAddress& HTTPServerRequest::clientAddress() const
-{
-	return _clientAddress;
-}
-
-
-inline const SocketAddress& HTTPServerRequest::serverAddress() const
-{
-	return _serverAddress;
-}
-
-
-inline const HTTPServerParams& HTTPServerRequest::serverParams() const
-{
-	return *_pParams;
-}
 
 
 } } // namespace Poco::Net
