@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#3 $
 //
 // Library: Poco
 // Package: Core
@@ -101,6 +101,16 @@ public:
 		/// Example usage:
 		///     DynamicAny any("42");
 		///     int i = any.convert<int>();
+	{
+		T result;
+		_pHolder->convert(result);
+		return result;
+	}
+	
+	template <typename T>
+	operator T() const
+		/// Conversion operator for implicit type
+		/// conversions.
 	{
 		T result;
 		_pHolder->convert(result);

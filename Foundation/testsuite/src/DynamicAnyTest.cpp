@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#2 $
+// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -933,6 +933,18 @@ void DynamicAnyTest::testULong()
 }
 
 
+void DynamicAnyTest::testConversionOperator()
+{
+	DynamicAny any("42");
+	int i = any;
+	assert (i == 42);
+	
+	any = 123;
+	std::string s(any);
+	assert (s == "123");
+}
+
+
 void DynamicAnyTest::setUp()
 {
 }
@@ -962,6 +974,7 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testString);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testULong);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testConversionOperator);
 
 	return pSuite;
 }
