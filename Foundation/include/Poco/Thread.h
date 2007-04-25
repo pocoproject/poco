@@ -1,7 +1,7 @@
 //
 // Thread.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Thread.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -107,6 +107,16 @@ public:
 		/// Waits until the thread completes execution.	
 		/// If multiple threads try to join the same
 		/// thread, the result is undefined.
+		
+	void join(long milliseconds);
+		/// Waits for at most the given interval for the thread
+		/// to complete. Throws a TimeoutException if the thread
+		/// does not complete within the specified time interval.
+		
+	bool tryJoin(long milliseconds);
+		/// Waits for at most the given interval for the thread
+		/// to complete. Returns true if the thread has finished,
+		/// false otherwise.
 
 	bool isRunning() const;
 		/// Returns true if the thread is running.

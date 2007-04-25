@@ -1276,6 +1276,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Condition.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ErrorHandler.cpp"
 					>
 				</File>
@@ -1712,6 +1716,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Condition.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\ErrorHandler.h"
 					>
 				</File>
@@ -1761,6 +1769,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\ScopedLock.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ScopedUnlock.h"
 					>
 				</File>
 				<File

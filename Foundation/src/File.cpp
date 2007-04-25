@@ -1,7 +1,7 @@
 //
 // File.cpp
 //
-// $Id: //poco/Main/Foundation/src/File.cpp#17 $
+// $Id: //poco/Main/Foundation/src/File.cpp#19 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -211,24 +211,40 @@ void File::setExecutable(bool flag)
 void File::copyTo(const std::string& path) const
 {
 	Path src(getPathImpl());
-	File srcFile(src);
-	if (srcFile.isDirectory()) 
-		throw OpenFileException("cannot copy directory", src.toString());
-
 	Path dest(path);
-	if (dest.isDirectory())
+	File destFile(path);
+	if (destFile.exists() && destFile.isDirectory() || dest.isDirectory())
 	{
 		dest.makeDirectory();
 		dest.setFileName(src.getFileName());
 	}
-	copyToImpl(dest.toString());
+	if (isDirectory())
+		copyDirectory(dest.toString());
+	else
+		copyToImpl(dest.toString());
+}
+
+
+void File::copyDirectory(const std::string& path) const
+{
+	File target(path);
+	target.createDirectories();
+
+	Path src(getPathImpl());
+	src.makeFile();
+	DirectoryIterator it(src);
+	DirectoryIterator end;
+	for (; it != end; ++it)
+	{
+		it->copyTo(path);
+	}
 }
 
 
 void File::moveTo(const std::string& path)
 {
-	copyToImpl(path);
-	removeImpl();
+	copyTo(path);
+	remove(true);
 	setPathImpl(path);
 }
 

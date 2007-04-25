@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#4 $
 //
 // Library: Poco
 // Package: Core
@@ -61,7 +61,7 @@ class Foundation_API DynamicAny
 	/// Precision loss, such as in conversion from floating-point types to integers or from double to float on platforms
 	/// where they differ in size (provided internal actual value fits in float min/max range), is allowed.
 	/// 
-	/// String truncation is allowed - it is possible to convert between string and character when string length is 
+	/// String truncation is allowed -- it is possible to convert between string and character when string length is 
 	/// greater than 1. An empty string gets converted to the char '\0', a non-empty string is truncated to the first character. 
 	///
 	/// Bolean conversion are performed as follows:
@@ -99,23 +99,33 @@ public:
 
 	template <typename T> 
 	void convert(T& val) const
-		/// Invoke this method to perform conversion.
+		/// Invoke this method to perform a safe conversion.
 		///
 		/// Example usage:
 		///     DynamicAny any("42");
 		///     int i;
 		///     any.convert(i);
+		///
+		/// Throws a RangeException if the value does not fit
+		/// into the result variable.
+		/// Throws a NotImplementedException if conversion is
+		/// not available for the given type.
 	{
 		_pHolder->convert(val);
 	}
 	
 	template <typename T> 
 	T convert() const
-		/// Invoke this method to perform conversion.
+		/// Invoke this method to perform a safe conversion.
 		///
 		/// Example usage:
 		///     DynamicAny any("42");
 		///     int i = any.convert<int>();
+		///
+		/// Throws a RangeException if the value does not fit
+		/// into the result variable.
+		/// Throws a NotImplementedException if conversion is
+		/// not available for the given type.
 	{
 		T result;
 		_pHolder->convert(result);
@@ -124,8 +134,13 @@ public:
 	
 	template <typename T>
 	operator T() const
-		/// Conversion operator for implicit type
+		/// Safe conversion operator for implicit type
 		/// conversions.
+		///
+		/// Throws a RangeException if the value does not fit
+		/// into the result variable.
+		/// Throws a NotImplementedException if conversion is
+		/// not available for the given type.
 	{
 		T result;
 		_pHolder->convert(result);

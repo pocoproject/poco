@@ -1,7 +1,7 @@
 //
 // SynchronizedObject.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SynchronizedObject.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/SynchronizedObject.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -86,7 +86,7 @@ public:
 
 	void wait(long milliseconds) const;
 		/// Waits for the object to become signalled.
-		/// Throws a TimeOutException if the object
+		/// Throws a TimeoutException if the object
 		/// does not become signalled within the specified
 		/// time interval.
 

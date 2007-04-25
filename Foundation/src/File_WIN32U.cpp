@@ -1,7 +1,7 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/Main/Foundation/src/File_WIN32U.cpp#10 $
+// $Id: //poco/Main/Foundation/src/File_WIN32U.cpp#11 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -327,7 +327,7 @@ bool FileImpl::createFileImpl()
 	poco_assert (!_path.empty());
 
 	HANDLE hFile = CreateFileW(_upath.c_str(), GENERIC_WRITE, 0, 0, CREATE_NEW, 0, 0);
-	if (hFile)
+	if (hFile != INVALID_HANDLE_VALUE)
 	{
 		CloseHandle(hFile);
 		return true;

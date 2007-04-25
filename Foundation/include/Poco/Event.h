@@ -1,7 +1,7 @@
 //
 // Event.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Event.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Event.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -84,7 +84,7 @@ public:
 
 	void wait(long milliseconds);
 		/// Waits for the event to become signalled.
-		/// Throws a TimeOutException if the event
+		/// Throws a TimeoutException if the event
 		/// does not become signalled within the specified
 		/// time interval.
 

@@ -1,13 +1,13 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/Thread_POSIX.cpp#13 $
+// $Id: //poco/Main/Foundation/src/Thread_POSIX.cpp#15 $
 //
 // Library: Foundation
 // Package: Threading
 // Module:  Thread
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -73,10 +73,8 @@ pthread_key_t ThreadImpl::_currentKey;
 bool ThreadImpl::_haveCurrentKey = false;
 
 
-ThreadImpl::ThreadImpl(): 
-	_pTarget(0), 
-	_thread(0), 
-	_prio(PRIO_NORMAL_IMPL)
+ThreadImpl::ThreadImpl():
+	_pData(new ThreadData)
 {
 	if (!_haveCurrentKey)
 	{
@@ -89,21 +87,21 @@ ThreadImpl::ThreadImpl():
 			
 ThreadImpl::~ThreadImpl()
 {
-	if (_pTarget)
-		pthread_detach(_thread);
+	if (_pData->pTarget)
+		pthread_detach(_pData->thread);
 }
 
 
 void ThreadImpl::setPriorityImpl(int prio)
 {
-	if (prio != _prio)
+	if (prio != _pData->prio)
 	{
-		_prio = prio;
-		if (_pTarget)
+		_pData->prio = prio;
+		if (_pData->pTarget)
 		{
 			struct sched_param par;
-			par.sched_priority = mapPrio(_prio);
-			if (pthread_setschedparam(_thread, SCHED_OTHER, &par))
+			par.sched_priority = mapPrio(_pData->prio);
+			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
 				throw SystemException("cannot set thread priority");
 		}
 	}
@@ -112,20 +110,20 @@ void ThreadImpl::setPriorityImpl(int prio)
 
 void ThreadImpl::startImpl(Runnable& target)
 {
-	if (_pTarget) throw SystemException("thread already running");
+	if (_pData->pTarget) throw SystemException("thread already running");
 
-	_pTarget = &target;
-	if (pthread_create(&_thread, NULL, entry, this))
+	_pData->pTarget = &target;
+	if (pthread_create(&_pData->thread, NULL, entry, this))
 	{
-		_pTarget = 0;
+		_pData->pTarget = 0;
 		throw SystemException("cannot start thread");
 	}
 
-	if (_prio != PRIO_NORMAL_IMPL)
+	if (_pData->prio != PRIO_NORMAL_IMPL)
 	{
 		struct sched_param par;
-		par.sched_priority = mapPrio(_prio);
-		if (pthread_setschedparam(_thread, SCHED_OTHER, &par))
+		par.sched_priority = mapPrio(_pData->prio);
+		if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
 			throw SystemException("cannot set thread priority");
 	}
 }
@@ -133,24 +131,36 @@ void ThreadImpl::startImpl(Runnable& target)
 
 void ThreadImpl::joinImpl()
 {
-	if (!_pTarget) return;
+	_pData->done.wait();
 	void* result;
-	if (pthread_join(_thread, &result))
+	if (pthread_join(_pData->thread, &result))
 		throw SystemException("cannot join thread"); 
-	_pTarget = 0;
+}
+
+
+bool ThreadImpl::joinImpl(long milliseconds)
+{
+	if (_pData->done.tryWait(milliseconds))
+	{
+		void* result;
+		if (pthread_join(_pData->thread, &result))
+			throw SystemException("cannot join thread");
+		return true;
+	}
+	else return false;
 }
 
 
 bool ThreadImpl::isRunningImpl() const
 {
-	return _pTarget != 0;
+	return _pData->pTarget != 0;
 }
 
 
 ThreadImpl* ThreadImpl::currentImpl()
 {
 	if (_haveCurrentKey)
-		return (ThreadImpl*) pthread_getspecific(_currentKey);
+		return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_currentKey));
 	else
 		return 0;
 }
@@ -169,9 +179,11 @@ void* ThreadImpl::entry(void* pThread)
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 
+	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
-		reinterpret_cast<ThreadImpl*>(pThread)->_pTarget->run();
+		pData->pTarget->run();
 	}
 	catch (Exception& exc)
 	{
@@ -185,6 +197,8 @@ void* ThreadImpl::entry(void* pThread)
 	{
 		ErrorHandler::handle();
 	}
+	pData->pTarget = 0;
+	pData->done.set();
 	return 0;
 }
 

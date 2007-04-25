@@ -1,7 +1,7 @@
 //
 // ClassLibrary.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#3 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -76,13 +76,13 @@ extern "C"
 //
 #define POCO_BEGIN_MANIFEST(base) \
 	bool pocoBuildManifest(Poco::ManifestBase* pManifest_)							\
-	{																						\
-		typedef base _Base;																	\
-		typedef Poco::Manifest<_Base> _Manifest;										\
-		std::string requiredType(typeid(_Manifest).name());									\
-		std::string actualType(pManifest_->className());									\
-		if (requiredType == actualType)														\
-		{																					\
+	{																				\
+		typedef base _Base;															\
+		typedef Poco::Manifest<_Base> _Manifest;									\
+		std::string requiredType(typeid(_Manifest).name());							\
+		std::string actualType(pManifest_->className());							\
+		if (requiredType == actualType)												\
+		{																			\
 			Poco::Manifest<_Base>* pManifest = static_cast<_Manifest*>(pManifest_);
 
 

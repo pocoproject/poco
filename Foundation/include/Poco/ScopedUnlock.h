@@ -1,11 +1,13 @@
 //
-// SharedMemory.cpp
+// ScopedUnlock.h
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory.cpp#5 $
+// $Id: //poco/Main/Foundation/include/Poco/ScopedUnlock.h#1 $
 //
-// Library: Poco
-// Package: Processes
-// Module:  SharedMemory
+// Library: Foundation
+// Package: Threading
+// Module:  Mutex
+//
+// Definition of the ScopedUnlock template class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,83 +36,44 @@
 //
 
 
-#if POCO_OS == POCO_OS_SOLARIS
-#undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 500
-#endif
+#ifndef Foundation_ScopedUnlock_INCLUDED
+#define Foundation_ScopedUnlock_INCLUDED
 
 
-#include "Poco/SharedMemory.h"
-#include "Poco/Exception.h"
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#include "SharedMemory_WIN32.cpp"
-#elif defined(POCO_OS_FAMILY_UNIX)
-#include "SharedMemory_POSIX.cpp"
-#else
-#include "SharedMemory_DUMMY.cpp"
-#endif
+#include "Poco/Foundation.h"
 
 
 namespace Poco {
 
 
-SharedMemory::SharedMemory():
-	_pImpl(0)
+template <class M>
+class ScopedUnlock
+	/// A class that simplifies thread synchronization
+	/// with a mutex.
+	/// The constructor accepts a Mutex and unlocks it.
+	/// The destructor unlocks the mutex.
 {
-}
+public:
+	inline ScopedUnlock(M& mutex, bool unlockNow = true): _mutex(mutex)
+	{
+		if (unlockNow)
+			_mutex.unlock();
+	}
+	inline ~ScopedUnlock()
+	{
+		_mutex.lock();
+	}
 
+private:
+	M& _mutex;
 
-SharedMemory::SharedMemory(const std::string& name, std::size_t size, AccessMode mode, const void* addrHint):
-	_pImpl(new SharedMemoryImpl(name, size, mode, addrHint))
-{
-}
-
-
-SharedMemory::SharedMemory(const Poco::File& file, AccessMode mode, const void* addrHint):
-	_pImpl(new SharedMemoryImpl(file, mode, addrHint))
-{
-}
-
-
-SharedMemory::SharedMemory(const SharedMemory& other):
-	_pImpl(other._pImpl)
-{
-	if (_pImpl)
-		_pImpl->duplicate();
-}
-
-
-SharedMemory::~SharedMemory()
-{
-	if (_pImpl)
-		_pImpl->release();
-}
-
-
-SharedMemory& SharedMemory::operator = (const SharedMemory& other)
-{
-	SharedMemory tmp(other);
-	swap(tmp);
-	return *this;
-}
-
-
-char* SharedMemory::begin() const
-{
-	if (_pImpl)
-		return _pImpl->begin();
-	else
-		return 0;
-}
-
-
-char* SharedMemory::end() const
-{
-	if (_pImpl)
-		return _pImpl->end();
-	else
-		return 0;
-}
+	ScopedUnlock();
+	ScopedUnlock(const ScopedUnlock&);
+	ScopedUnlock& operator = (const ScopedUnlock&);
+};
 
 
 } // namespace Poco
+
+
+#endif // Foundation_ScopedUnlock_INCLUDED

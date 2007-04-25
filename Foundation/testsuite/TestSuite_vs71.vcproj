@@ -578,6 +578,9 @@
 					RelativePath=".\src\ActivityTest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\ConditionTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\RWLockTest.cpp">
 				</File>
 				<File
@@ -610,6 +613,9 @@
 				</File>
 				<File
 					RelativePath=".\src\ActivityTest.h">
+				</File>
+				<File
+					RelativePath=".\src\ConditionTest.h">
 				</File>
 				<File
 					RelativePath=".\src\RWLockTest.h">
@@ -893,6 +899,9 @@
 					RelativePath=".\src\TextConverterTest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\TextEncodingTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\TextIteratorTest.cpp">
 				</File>
 				<File
@@ -907,6 +916,9 @@
 				</File>
 				<File
 					RelativePath=".\src\TextConverterTest.h">
+				</File>
+				<File
+					RelativePath=".\src\TextEncodingTest.h">
 				</File>
 				<File
 					RelativePath=".\src\TextIteratorTest.h">

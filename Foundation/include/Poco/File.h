@@ -1,7 +1,7 @@
 //
 // File.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/File.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/File.h#5 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -164,12 +164,14 @@ public:
 		/// Does nothing on Windows and OpenVMS.	
 		
 	void copyTo(const std::string& path) const;
-		/// Copies the file to the given path. The target path
-		/// can be a directory.
+		/// Copies the file (or directory) to the given path. 
+		/// The target path can be a directory.
+		///
+		/// A directory is copied recursively.
 
 	void moveTo(const std::string& path);
-		/// Copies the file to the given path and removes the
-		/// original file. The target path can be a directory.
+		/// Copies the file (or directory) to the given path and 
+		/// removes the original file. The target path can be a directory.
 		
 	void renameTo(const std::string& path);
 		/// Renames the file to the new name.
@@ -212,6 +214,10 @@ public:
 	static void handleLastError(const std::string& path);
 		/// For internal use only. Throws an appropriate
 		/// exception for the last file-related error.
+
+protected:
+	void copyDirectory(const std::string& path) const;
+		/// Copies a directory. Used internally by copyTo().
 };
 
 

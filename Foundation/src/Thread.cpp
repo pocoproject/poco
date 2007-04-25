@@ -1,7 +1,7 @@
 //
 // Thread.cpp
 //
-// $Id: //poco/Main/Foundation/src/Thread.cpp#12 $
+// $Id: //poco/Main/Foundation/src/Thread.cpp#13 $
 //
 // Library: Foundation
 // Package: Threading
@@ -94,6 +94,19 @@ void Thread::start(Runnable& target)
 void Thread::join()
 {
 	joinImpl();
+}
+
+
+void Thread::join(long milliseconds)
+{
+	if (!joinImpl(milliseconds))
+		throw TimeoutException();
+}
+
+
+bool Thread::tryJoin(long milliseconds)
+{
+	return joinImpl(milliseconds);
 }
 
 

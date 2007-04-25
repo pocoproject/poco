@@ -1,11 +1,11 @@
 //
-// SharedMemory.cpp
+// Condition.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory.cpp#5 $
+// $Id: //poco/Main/Foundation/src/Condition.cpp#1 $
 //
-// Library: Poco
-// Package: Processes
-// Module:  SharedMemory
+// Library: Foundation
+// Package: Threading
+// Module:  Condition
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,82 +34,67 @@
 //
 
 
-#if POCO_OS == POCO_OS_SOLARIS
-#undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 500
-#endif
-
-
-#include "Poco/SharedMemory.h"
-#include "Poco/Exception.h"
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#include "SharedMemory_WIN32.cpp"
-#elif defined(POCO_OS_FAMILY_UNIX)
-#include "SharedMemory_POSIX.cpp"
-#else
-#include "SharedMemory_DUMMY.cpp"
-#endif
+#include "Poco/Condition.h"
 
 
 namespace Poco {
 
 
-SharedMemory::SharedMemory():
-	_pImpl(0)
+Condition::Condition()
+{
+}
+
+Condition::~Condition()
 {
 }
 
 
-SharedMemory::SharedMemory(const std::string& name, std::size_t size, AccessMode mode, const void* addrHint):
-	_pImpl(new SharedMemoryImpl(name, size, mode, addrHint))
+void Condition::signal()
 {
+	FastMutex::ScopedLock lock(_mutex);
+	
+	if (!_waitQueue.empty())
+	{
+		_waitQueue.front()->set();
+		dequeue();
+	}
 }
 
 
-SharedMemory::SharedMemory(const Poco::File& file, AccessMode mode, const void* addrHint):
-	_pImpl(new SharedMemoryImpl(file, mode, addrHint))
+void Condition::broadcast()
 {
+	FastMutex::ScopedLock lock(_mutex);
+	
+	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+	{
+		(*it)->set();
+	}
+	_waitQueue.clear();
 }
 
 
-SharedMemory::SharedMemory(const SharedMemory& other):
-	_pImpl(other._pImpl)
+void Condition::enqueue(Event& event)
 {
-	if (_pImpl)
-		_pImpl->duplicate();
+	_waitQueue.push_back(&event);
 }
 
 
-SharedMemory::~SharedMemory()
+void Condition::dequeue()
 {
-	if (_pImpl)
-		_pImpl->release();
+	_waitQueue.pop_front();
 }
 
 
-SharedMemory& SharedMemory::operator = (const SharedMemory& other)
+void Condition::dequeue(Event& event)
 {
-	SharedMemory tmp(other);
-	swap(tmp);
-	return *this;
-}
-
-
-char* SharedMemory::begin() const
-{
-	if (_pImpl)
-		return _pImpl->begin();
-	else
-		return 0;
-}
-
-
-char* SharedMemory::end() const
-{
-	if (_pImpl)
-		return _pImpl->end();
-	else
-		return 0;
+	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+	{
+		if (*it == &event)
+		{
+			_waitQueue.erase(it);
+			break;
+		}
+	}
 }
 
 

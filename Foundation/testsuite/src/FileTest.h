@@ -1,7 +1,7 @@
 //
 // FileTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FileTest.h#10 $
+// $Id: //poco/Main/Foundation/testsuite/src/FileTest.h#11 $
 //
 // Definition of the FileTest class.
 //
@@ -55,6 +55,7 @@ public:
 	void testDirectory();
 	void testCopy();
 	void testMove();
+	void testCopyDirectory();
 	void testRename();
 	void testRootDir();
 	

@@ -1,7 +1,7 @@
 //
 // ThreadTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ThreadTest.h#8 $
+// $Id: //poco/Main/Foundation/testsuite/src/ThreadTest.h#9 $
 //
 // Definition of the ThreadTest class.
 //
@@ -50,6 +50,7 @@ public:
 	void testNamedThread();
 	void testCurrent();
 	void testThreads();
+	void testJoin();
 
 	void setUp();
 	void tearDown();

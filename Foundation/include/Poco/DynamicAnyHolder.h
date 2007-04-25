@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#3 $
 //
 // Library: Poco
 // Package: Core
@@ -47,35 +47,6 @@
 #include "Poco/Exception.h"
 #include <typeinfo>
 #include <limits>
-
-///BEGIN ported from boost
-/// following macros were ported from boost to help the DynamicAnyHolder development
-/// for complete multi-platform code, see static_assert.hpp in boost libraries
-
-// Helper macro POCO_JOIN:
-// The following piece of macro magic joins the two
-// arguments together, even when one of the arguments is
-// itself a macro (see 16.3.1 in C++ standard).  The key
-// is that macro expansion of macro arguments does not
-// occur in POCO_DO_JOIN2 but does in POCO_DO_JOIN.
-//
-#define POCO_JOIN(X, Y) POCO_DO_JOIN( X, Y )
-#define POCO_DO_JOIN(X, Y) POCO_DO_JOIN2(X,Y)
-#define POCO_DO_JOIN2(X, Y) X##Y
-
-template <bool x> struct STATIC_ASSERTION_FAILURE;
-template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
-template<int x> struct static_assert_test{};
-
-#if defined(__GNUC__) && (__GNUC__ == 3) && ((__GNUC_MINOR__ == 3) || (__GNUC_MINOR__ == 4))
-# define poco_static_assert( B ) \
-    typedef char POCO_JOIN(poco_static_assert_typedef_, __LINE__) \
-        [ STATIC_ASSERTION_FAILURE< (bool)(B) >::value ]
-#else
-# define poco_static_assert(B) \
-   typedef static_assert_test<sizeof(STATIC_ASSERTION_FAILURE<(bool)(B)>)> poco_static_assert_typedef_
-#endif
-///END ported from boost
 
 
 namespace Poco {
@@ -203,7 +174,6 @@ private:
 		if (from < std::numeric_limits<T>::min()) 
 			throw RangeException("Value too small.");
 	}
-
 };
 
 
@@ -326,7 +296,6 @@ class DynamicAnyHolderImpl: public DynamicAnyHolder
 };
 
 
-
 template <>
 class DynamicAnyHolderImpl<Int8>: public DynamicAnyHolder
 {
@@ -417,7 +386,6 @@ public:
 private:
 	Int8 _val;
 };
-
 
 
 template <>

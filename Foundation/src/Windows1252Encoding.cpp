@@ -1,13 +1,13 @@
 //
 // Windows1252Encoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/Windows1252Encoding.cpp#6 $
+// $Id: //poco/Main/Foundation/src/Windows1252Encoding.cpp#7 $
 //
 // Library: Foundation
 // Package: Text
 // Module:  Windows1252Encoding
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,9 +35,18 @@
 
 
 #include "Poco/Windows1252Encoding.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
+
+
+const char* Windows1252Encoding::_names[] =
+{
+	"Windows-1252",
+	"CP1252",
+	NULL
+};
 
 
 const TextEncoding::CharacterMap Windows1252Encoding::_charMap = 
@@ -69,6 +78,23 @@ Windows1252Encoding::Windows1252Encoding()
 
 Windows1252Encoding::~Windows1252Encoding()
 {
+}
+
+
+const char* Windows1252Encoding::canonicalName() const
+{
+	return _names[0];
+}
+
+
+bool Windows1252Encoding::isA(const std::string& encodingName) const
+{
+	for (const char** name = _names; *name; ++name)
+	{
+		if (Poco::icompare(encodingName, *name) == 0)
+			return true;
+	}
+	return false;
 }
 
 

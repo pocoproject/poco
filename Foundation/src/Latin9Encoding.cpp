@@ -1,13 +1,13 @@
 //
 // Latin9Encoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/Latin9Encoding.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Latin9Encoding.cpp#12 $
 //
 // Library: Foundation
 // Package: Text
 // Module:  Latin9Encoding
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,9 +35,19 @@
 
 
 #include "Poco/Latin9Encoding.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
+
+
+const char* Latin9Encoding::_names[] =
+{
+	"ISO-8859-15",
+	"Latin9",
+	"Latin-9",
+	NULL
+};
 
 
 const TextEncoding::CharacterMap Latin9Encoding::_charMap = 
@@ -68,6 +78,23 @@ Latin9Encoding::Latin9Encoding()
 
 Latin9Encoding::~Latin9Encoding()
 {
+}
+
+
+const char* Latin9Encoding::canonicalName() const
+{
+	return _names[0];
+}
+
+
+bool Latin9Encoding::isA(const std::string& encodingName) const
+{
+	for (const char** name = _names; *name; ++name)
+	{
+		if (Poco::icompare(encodingName, *name) == 0)
+			return true;
+	}
+	return false;
 }
 
 

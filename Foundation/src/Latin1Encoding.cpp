@@ -1,13 +1,13 @@
 //
 // Latin1Encoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/Latin1Encoding.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Latin1Encoding.cpp#12 $
 //
 // Library: Foundation
 // Package: Text
 // Module:  Latin1Encoding
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,9 +35,19 @@
 
 
 #include "Poco/Latin1Encoding.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
+
+
+const char* Latin1Encoding::_names[] =
+{
+	"ISO-8859-1",
+	"Latin1",
+	"Latin-1",
+	NULL
+};
 
 
 const TextEncoding::CharacterMap Latin1Encoding::_charMap = 
@@ -68,6 +78,23 @@ Latin1Encoding::Latin1Encoding()
 
 Latin1Encoding::~Latin1Encoding()
 {
+}
+
+
+const char* Latin1Encoding::canonicalName() const
+{
+	return _names[0];
+}
+
+
+bool Latin1Encoding::isA(const std::string& encodingName) const
+{
+	for (const char** name = _names; *name; ++name)
+	{
+		if (Poco::icompare(encodingName, *name) == 0)
+			return true;
+	}
+	return false;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/Main/Foundation/src/Thread_WIN32.cpp#12 $
+// $Id: //poco/Main/Foundation/src/Thread_WIN32.cpp#13 $
 //
 // Library: Foundation
 // Package: Threading
@@ -104,6 +104,22 @@ void ThreadImpl::joinImpl()
 	{
 	case WAIT_OBJECT_0:
 		return;
+	default:
+		throw SystemException("cannot join thread");
+	}
+}
+
+
+bool ThreadImpl::joinImpl(long milliseconds)
+{
+	if (!_thread) return true;
+
+	switch (WaitForSingleObject(_thread, milliseconds + 1))
+	{
+	case WAIT_TIMEOUT:
+		return false;
+	case WAIT_OBJECT_0:
+		return true;
 	default:
 		throw SystemException("cannot join thread");
 	}

@@ -1,7 +1,7 @@
 //
 // UTF16Encoding.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UTF16Encoding.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/UTF16Encoding.h#3 $
 //
 // Library: Foundation
 // Package: Text
@@ -9,7 +9,7 @@
 //
 // Definition of the UTF16Encoding class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -86,12 +86,15 @@ public:
 		/// byte order mark, which is the Unicode
 		/// character 0xFEFF.
 	
+	const char* canonicalName() const;
+	bool isA(const std::string& encodingName) const;
 	const CharacterMap& characterMap() const;
 	int convert(const unsigned char* bytes) const;
 	int convert(int ch, unsigned char* bytes, int length) const;
 	
 private:
 	bool _flipBytes;
+	static const char* _names[];
 	static const CharacterMap _charMap;
 };
 

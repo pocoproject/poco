@@ -1,7 +1,7 @@
 //
 // String.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/String.h#5 $
+// $Id: //poco/Main/Foundation/include/Poco/String.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -475,7 +475,7 @@ S& replaceInPlace(S& str, const typename S::value_type* from, const typename S::
 
 	S result;
 	typename S::size_type pos = 0;
-	typename S::size_type fromLen = strlen(from);
+	typename S::size_type fromLen = std::strlen(from);
 	result.append(str, 0, start);
 	do
 	{

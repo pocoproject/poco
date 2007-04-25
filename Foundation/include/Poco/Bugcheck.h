@@ -1,7 +1,7 @@
 //
 // Bugcheck.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Bugcheck.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/Bugcheck.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -86,6 +86,9 @@ protected:
 };
 
 
+} // namespace Poco
+
+
 //
 // useful macros (these automatically supply line number and file name)
 //
@@ -121,7 +124,42 @@ protected:
 	Poco::Bugcheck::debugger(msg, __FILE__, __LINE__)
 
 
-} // namespace Poco
+//
+// poco_static_assert
+// 
+// The following was ported from <boost/static_assert.hpp>
+//
+
+
+template <bool x>
+struct POCO_STATIC_ASSERTION_FAILURE;
+
+
+template <> 
+struct POCO_STATIC_ASSERTION_FAILURE<true> 
+{
+	enum 
+	{ 
+		value = 1 
+	}; 
+};
+
+
+template <int x> 
+struct poco_static_assert_test
+{
+};
+
+
+#if defined(__GNUC__) && (__GNUC__ == 3) && ((__GNUC_MINOR__ == 3) || (__GNUC_MINOR__ == 4))
+#define poco_static_assert(B) \
+	typedef char POCO_JOIN(poco_static_assert_typedef_, __LINE__) \
+        [POCO_STATIC_ASSERTION_FAILURE<(bool) (B)>::value]
+#else
+#define poco_static_assert(B) \
+	typedef poco_static_assert_test<sizeof(POCO_STATIC_ASSERTION_FAILURE<(bool) (B)>)> \
+		POCO_JOIN(poco_static_assert_typedef_, __LINE__)
+#endif
 
 
 #endif // Foundation_Bugcheck_INCLUDED

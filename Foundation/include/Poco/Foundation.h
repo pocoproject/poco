@@ -1,7 +1,7 @@
 //
 // Foundation.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Foundation.h#6 $
+// $Id: //poco/Main/Foundation/include/Poco/Foundation.h#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -91,6 +91,20 @@
 #elif defined(POCO_OS_FAMILY_UNIX)
 	#include "Poco/Platform_POSIX.h"
 #endif
+
+
+//
+// POCO_JOIN
+//
+// The following piece of macro magic joins the two
+// arguments together, even when one of the arguments is
+// itself a macro (see 16.3.1 in C++ standard).  The key
+// is that macro expansion of macro arguments does not
+// occur in POCO_DO_JOIN2 but does in POCO_DO_JOIN.
+//
+#define POCO_JOIN(X, Y) POCO_DO_JOIN( X, Y )
+#define POCO_DO_JOIN(X, Y) POCO_DO_JOIN2(X,Y)
+#define POCO_DO_JOIN2(X, Y) X##Y
 
 
 //

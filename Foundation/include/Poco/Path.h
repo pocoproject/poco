@@ -1,7 +1,7 @@
 //
 // Path.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Path.h#5 $
+// $Id: //poco/Main/Foundation/include/Poco/Path.h#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -93,6 +93,10 @@ public:
 		/// Copy constructor
 
 	Path(const Path& parent, const std::string& fileName);
+		/// Creates a path from a parent path and a filename.
+		/// The parent path is expected to reference a directory.
+
+	Path(const Path& parent, const char* fileName);
 		/// Creates a path from a parent path and a filename.
 		/// The parent path is expected to reference a directory.
 

@@ -1,13 +1,13 @@
 //
 // UTF8Encoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/UTF8Encoding.cpp#12 $
+// $Id: //poco/Main/Foundation/src/UTF8Encoding.cpp#13 $
 //
 // Library: Foundation
 // Package: Text
 // Module:  UTF8Encoding
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,9 +35,18 @@
 
 
 #include "Poco/UTF8Encoding.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
+
+
+const char* UTF8Encoding::_names[] =
+{
+	"UTF-8",
+	"UTF8",
+	NULL
+};
 
 
 const TextEncoding::CharacterMap UTF8Encoding::_charMap = 
@@ -68,6 +77,23 @@ UTF8Encoding::UTF8Encoding()
 
 UTF8Encoding::~UTF8Encoding()
 {
+}
+
+
+const char* UTF8Encoding::canonicalName() const
+{
+	return _names[0];
+}
+
+
+bool UTF8Encoding::isA(const std::string& encodingName) const
+{
+	for (const char** name = _names; *name; ++name)
+	{
+		if (Poco::icompare(encodingName, *name) == 0)
+			return true;
+	}
+	return false;
 }
 
 

@@ -1,13 +1,13 @@
 //
 // UTF16Encoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/UTF16Encoding.cpp#12 $
+// $Id: //poco/Main/Foundation/src/UTF16Encoding.cpp#13 $
 //
 // Library: Foundation
 // Package: Text
 // Module:  UTF16Encoding
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,9 +36,18 @@
 
 #include "Poco/UTF16Encoding.h"
 #include "Poco/ByteOrder.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
+
+
+const char* UTF16Encoding::_names[] =
+{
+	"UTF-16",
+	"UTF16",
+	NULL
+};
 
 
 const TextEncoding::CharacterMap UTF16Encoding::_charMap = 
@@ -102,6 +111,23 @@ void UTF16Encoding::setByteOrder(ByteOrderType byteOrder)
 void UTF16Encoding::setByteOrder(int byteOrderMark)
 {
 	_flipBytes = byteOrderMark != 0xFEFF;
+}
+
+
+const char* UTF16Encoding::canonicalName() const
+{
+	return _names[0];
+}
+
+
+bool UTF16Encoding::isA(const std::string& encodingName) const
+{
+	for (const char** name = _names; *name; ++name)
+	{
+		if (Poco::icompare(encodingName, *name) == 0)
+			return true;
+	}
+	return false;
 }
 
 

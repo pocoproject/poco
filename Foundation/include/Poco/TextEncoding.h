@@ -1,7 +1,7 @@
 //
 // TextEncoding.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/TextEncoding.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/TextEncoding.h#4 $
 //
 // Library: Foundation
 // Package: Text
@@ -9,7 +9,7 @@
 //
 // Definition of the abstract TextEncoding class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -41,19 +41,30 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/SharedPtr.h"
 
 
 namespace Poco {
+
+
+class TextEncodingManager;
 
 
 class Foundation_API TextEncoding
 	/// An abstract base class for implementing text encodings
 	/// like UTF-8 or ISO 8859-1. 
 	///
-	/// Subclasses must override the characterMap() and convert()
-	/// methods.
+	/// Subclasses must override the canonicalName(), isA(),
+	/// characterMap() and convert() methods and need to be
+	/// thread safe and stateless.
+	///
+	/// TextEncoding also provides static member functions
+	/// for managing mappings from encoding names to
+	/// TextEncoding objects.
 {
 public:
+	typedef SharedPtr<TextEncoding> Ptr;
+	
 	enum
 	{
 		MAX_SEQUENCE_LENGTH = 6 /// The maximum character byte sequence length supported.
@@ -70,6 +81,17 @@ public:
 
 	virtual ~TextEncoding();
 		/// Destroys the encoding.
+
+	virtual const char* canonicalName() const = 0;
+		/// Returns the canonical name of this encoding,
+		/// e.g. "ISO-8859-1". Encoding name comparisons are case
+		/// insensitive.
+
+	virtual bool isA(const std::string& encodingName) const = 0;
+		/// Returns true if the given name is one of the names of this encoding.
+		/// For example, the "ISO-8859-1" encoding is also known as "Latin-1".
+		///
+		/// Encoding name comparision are be case insensitive.
 			
 	virtual const CharacterMap& characterMap() const = 0;
 		/// Returns the CharacterMap for the encoding.
@@ -97,6 +119,49 @@ public:
 		/// If the character cannot be converted, 0 is returned and
 		/// the byte sequence remains unchanged.
 		/// The default implementation simply returns 0.
+
+	static TextEncoding& byName(const std::string& encodingName);
+		/// Returns the TextEncoding object for the given encoding name.
+		///
+		/// Throws a NotFoundException if the encoding with given name is not available.
+		
+	static TextEncoding::Ptr find(const std::string& encodingName);
+		/// Returns a pointer to the TextEncoding object for the given encodingName,
+		/// or NULL if no such TextEncoding object exists.
+
+	static void add(TextEncoding::Ptr encoding);
+		/// Adds the given TextEncoding to the table of text encodings,
+		/// under the encoding's canonical name.
+		///
+		/// If an encoding with the given name is already registered,
+		/// it is replaced.
+
+	static void add(TextEncoding::Ptr encoding, const std::string& name);
+		/// Adds the given TextEncoding to the table of text encodings,
+		/// under the given name.
+		///
+		/// If an encoding with the given name is already registered,
+		/// it is replaced.
+
+	static void remove(const std::string& encodingName);
+		/// Removes the encoding with the given name from the table
+		/// of text encodings.
+
+	static TextEncoding::Ptr global(TextEncoding::Ptr encoding);
+		/// Sets global TextEncoding object.
+		///
+		/// This function sets the global encoding to the argument and returns a
+		/// reference of the previous global encoding.
+
+	static TextEncoding& global();
+		/// Return the current global TextEncoding object
+
+	static const std::string GLOBAL;
+		/// Name of the global TextEncoding, which is the empty string.
+		
+protected:
+	static TextEncodingManager& manager();
+		/// Returns the TextEncodingManager.
 };
 
 

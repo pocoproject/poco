@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Thread_WIN32.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread_WIN32.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -68,6 +68,7 @@ public:
 	void startImpl(Runnable& target);
 
 	void joinImpl();
+	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
 	static void sleepImpl(long milliseconds);
 	static void yieldImpl();

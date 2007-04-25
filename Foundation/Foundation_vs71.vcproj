@@ -945,6 +945,9 @@
 					RelativePath=".\src\ActiveDispatcher.cpp">
 				</File>
 				<File
+					RelativePath=".\src\Condition.cpp">
+				</File>
+				<File
 					RelativePath=".\src\ErrorHandler.cpp">
 				</File>
 				<File
@@ -1273,6 +1276,9 @@
 					RelativePath=".\include\Poco\Activity.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Condition.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\ErrorHandler.h">
 				</File>
 				<File
@@ -1310,6 +1316,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\ScopedLock.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\ScopedUnlock.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Semaphore.h">

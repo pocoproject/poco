@@ -1,7 +1,7 @@
 //
 // ThreadTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ThreadTest.cpp#9 $
+// $Id: //poco/Main/Foundation/testsuite/src/ThreadTest.cpp#10 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -180,6 +180,21 @@ void ThreadTest::testThreads()
 }
 
 
+void ThreadTest::testJoin()
+{
+	Thread thread;
+	MyRunnable r;
+	assert (!thread.isRunning());
+	thread.start(r);
+	Thread::sleep(200);
+	assert (thread.isRunning());
+	assert (!thread.tryJoin(100));
+	r.notify();
+	assert (thread.tryJoin(500));
+	assert (!thread.isRunning());
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -198,6 +213,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testNamedThread);
 	CppUnit_addTest(pSuite, ThreadTest, testCurrent);
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
+	CppUnit_addTest(pSuite, ThreadTest, testJoin);
 
 	return pSuite;
 }

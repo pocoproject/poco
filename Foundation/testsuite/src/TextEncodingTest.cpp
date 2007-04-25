@@ -1,13 +1,9 @@
 //
-// SharedMemory.cpp
+// TextEncodingTest.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory.cpp#5 $
+// $Id: //poco/Main/Foundation/testsuite/src/TextEncodingTest.cpp#2 $
 //
-// Library: Poco
-// Package: Processes
-// Module:  SharedMemory
-//
-// Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,83 +30,60 @@
 //
 
 
-#if POCO_OS == POCO_OS_SOLARIS
-#undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 500
-#endif
+#include "TextEncodingTest.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
+#include "Poco/TextEncoding.h"
+#include "Poco/Latin1Encoding.h"
 
 
-#include "Poco/SharedMemory.h"
-#include "Poco/Exception.h"
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#include "SharedMemory_WIN32.cpp"
-#elif defined(POCO_OS_FAMILY_UNIX)
-#include "SharedMemory_POSIX.cpp"
-#else
-#include "SharedMemory_DUMMY.cpp"
-#endif
+using Poco::TextEncoding;
+using Poco::Latin1Encoding;
 
 
-namespace Poco {
-
-
-SharedMemory::SharedMemory():
-	_pImpl(0)
+TextEncodingTest::TextEncodingTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
 
-SharedMemory::SharedMemory(const std::string& name, std::size_t size, AccessMode mode, const void* addrHint):
-	_pImpl(new SharedMemoryImpl(name, size, mode, addrHint))
+TextEncodingTest::~TextEncodingTest()
 {
 }
 
 
-SharedMemory::SharedMemory(const Poco::File& file, AccessMode mode, const void* addrHint):
-	_pImpl(new SharedMemoryImpl(file, mode, addrHint))
+void TextEncodingTest::testTextEncoding()
+{
+	TextEncoding& utf8 = TextEncoding::byName("utf8");
+	assert (std::string("UTF-8") == utf8.canonicalName());
+	
+	TextEncoding& latin1 = TextEncoding::byName("latin1");
+	assert (std::string("ISO-8859-1") == latin1.canonicalName());
+	
+	TextEncoding& glob = TextEncoding::global();
+	assert (std::string("UTF-8") == glob.canonicalName());
+	
+	TextEncoding::global(new Latin1Encoding);
+
+	TextEncoding& glob2 = TextEncoding::global();
+	assert (std::string("ISO-8859-1") == glob2.canonicalName());
+}
+
+
+void TextEncodingTest::setUp()
 {
 }
 
 
-SharedMemory::SharedMemory(const SharedMemory& other):
-	_pImpl(other._pImpl)
+void TextEncodingTest::tearDown()
 {
-	if (_pImpl)
-		_pImpl->duplicate();
 }
 
 
-SharedMemory::~SharedMemory()
+CppUnit::Test* TextEncodingTest::suite()
 {
-	if (_pImpl)
-		_pImpl->release();
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("TextEncodingTest");
+
+	CppUnit_addTest(pSuite, TextEncodingTest, testTextEncoding);
+
+	return pSuite;
 }
-
-
-SharedMemory& SharedMemory::operator = (const SharedMemory& other)
-{
-	SharedMemory tmp(other);
-	swap(tmp);
-	return *this;
-}
-
-
-char* SharedMemory::begin() const
-{
-	if (_pImpl)
-		return _pImpl->begin();
-	else
-		return 0;
-}
-
-
-char* SharedMemory::end() const
-{
-	if (_pImpl)
-		return _pImpl->end();
-	else
-		return 0;
-}
-
-
-} // namespace Poco

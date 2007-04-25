@@ -1,13 +1,13 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/Main/XML/src/ParserEngine.cpp#12 $
+// $Id: //poco/Main/XML/src/ParserEngine.cpp#13 $
 //
 // Library: XML
 // Package: XML
 // Module:  ParserEngine
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -699,14 +699,21 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(encodingHandlerData);
 	
 	XMLString encoding(name);
+	TextEncoding* knownEncoding = 0;
+
 	EncodingMap::const_iterator it = pThis->_encodings.find(encoding);
 	if (it != pThis->_encodings.end())
+		knownEncoding = it->second;
+	else
+		knownEncoding = Poco::TextEncoding::find(encoding);
+
+	if (knownEncoding)
 	{
-		const TextEncoding::CharacterMap& map = it->second->characterMap();
+		const TextEncoding::CharacterMap& map = knownEncoding->characterMap();
 		for (int i = 0; i < 256; ++i)
 			info->map[i] = map[i];
 			
-		info->data    = it->second;
+		info->data    = knownEncoding;
 		info->convert = &ParserEngine::convert;
 		info->release = 0;
 		return XML_STATUS_OK;

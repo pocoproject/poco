@@ -1,7 +1,7 @@
 //
 // Semaphore.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Semaphore.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Semaphore.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -100,7 +100,7 @@ public:
 		/// Waits for the semaphore to become signalled.
 		/// To become signalled, a semaphore's value must
 		/// be greater than zero.
-		/// Throws a TimeOutException if the semaphore
+		/// Throws a TimeoutException if the semaphore
 		/// does not become signalled within the specified
 		/// time interval.
 		/// Decrements the semaphore's value by one

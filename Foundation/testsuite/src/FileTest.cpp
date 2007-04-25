@@ -1,7 +1,7 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FileTest.cpp#13 $
+// $Id: //poco/Main/Foundation/testsuite/src/FileTest.cpp#14 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -390,6 +390,76 @@ void FileTest::testMove()
 }
 
 
+void FileTest::testCopyDirectory()
+{
+	Path pd1("testdir");
+	File fd1(pd1);
+	try
+	{
+		fd1.remove(true);
+	}
+	catch (...)
+	{
+	}
+	fd1.createDirectories();
+	Path pd2(pd1, "subdir");
+	File fd2(pd2);
+	fd2.createDirectories();
+	Path pf1(pd1, "testfile1.dat");
+	std::ofstream ostr1(pf1.toString().c_str());
+	ostr1 << "Hello, world!" << std::endl;
+	ostr1.close();
+	Path pf2(pd1, "testfile2.dat");
+	std::ofstream ostr2(pf2.toString().c_str());
+	ostr2 << "Hello, world!" << std::endl;
+	ostr2.close();
+	Path pf3(pd2, "testfile3.dat");
+	std::ofstream ostr3(pf3.toString().c_str());
+	ostr3 << "Hello, world!" << std::endl;
+	ostr3.close();
+	
+	File fd3("testdir2");
+	
+	try
+	{
+		fd3.remove(true);
+	}
+	catch (...)
+	{
+	}
+	
+	fd1.copyTo("testdir2");
+	
+	Path pd1t("testdir2");
+	File fd1t(pd1t);
+	assert (fd1t.exists());
+	assert (fd1t.isDirectory());
+	
+	Path pd2t(pd1t, "subdir");
+	File fd2t(pd2t);
+	assert (fd2t.exists());
+	assert (fd2t.isDirectory());
+	
+	Path pf1t(pd1t, "testfile1.dat");
+	File ff1t(pf1t);
+	assert (ff1t.exists());
+	assert (ff1t.isFile());
+
+	Path pf2t(pd1t, "testfile2.dat");
+	File ff2t(pf2t);
+	assert (ff2t.exists());
+	assert (ff2t.isFile());
+
+	Path pf3t(pd2t, "testfile3.dat");
+	File ff3t(pf3t);
+	assert (ff3t.exists());
+	assert (ff3t.isFile());
+	
+	fd1.remove(true);
+	fd3.remove(true);
+}
+
+
 void FileTest::testRename()
 {
 	std::ofstream ostr("testfile.dat");
@@ -446,6 +516,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testDirectory);
 	CppUnit_addTest(pSuite, FileTest, testCopy);
 	CppUnit_addTest(pSuite, FileTest, testMove);
+	CppUnit_addTest(pSuite, FileTest, testCopyDirectory);
 	CppUnit_addTest(pSuite, FileTest, testRename);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 

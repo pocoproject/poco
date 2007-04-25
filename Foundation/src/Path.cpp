@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/Main/Foundation/src/Path.cpp#20 $
+// $Id: //poco/Main/Foundation/src/Path.cpp#21 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -107,6 +107,19 @@ Path::Path(const Path& path):
 
 
 Path::Path(const Path& parent, const std::string& fileName):
+	_node(parent._node), 
+	_device(parent._device),
+	_name(parent._name),
+	_version(parent._version),
+	_dirs(parent._dirs),
+	_absolute(parent._absolute)
+{	
+	makeDirectory();
+	_name = fileName;
+}
+
+
+Path::Path(const Path& parent, const char* fileName):
 	_node(parent._node), 
 	_device(parent._device),
 	_name(parent._name),

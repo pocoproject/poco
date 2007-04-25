@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Thread_POSIX.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread_POSIX.h#5 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the ThreadImpl class for POSIX Threads.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -43,6 +43,9 @@
 #include "Poco/Foundation.h"
 #include "Poco/Runnable.h"
 #include "Poco/SignalHandler.h"
+#include "Poco/Event.h"
+#include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 #include <pthread.h>
 #if !defined(POCO_NO_SYS_SELECT_H)
 #include <sys/select.h>
@@ -74,6 +77,7 @@ public:
 	void startImpl(Runnable& target);
 
 	void joinImpl();
+	bool joinImpl(long milliseconds);
 	bool isRunningImpl() const;
 	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
@@ -84,9 +88,23 @@ protected:
 	static int mapPrio(int prio);
 
 private:
-	Runnable* _pTarget;
-	pthread_t _thread;
-	int       _prio;
+	struct ThreadData: public RefCountedObject
+	{
+		ThreadData():
+			pTarget(0),
+			thread(0),
+			prio(PRIO_NORMAL_IMPL),
+			done(false)
+		{
+		}
+
+		Runnable* pTarget;
+		pthread_t thread;
+		int       prio;
+		Event     done;
+	};
+	
+	AutoPtr<ThreadData> _pData;
 	
 	static pthread_key_t _currentKey;
 	static bool          _haveCurrentKey;
@@ -103,7 +121,7 @@ private:
 //
 inline int ThreadImpl::getPriorityImpl() const
 {
-	return _prio;
+	return _pData->prio;
 }
 
 

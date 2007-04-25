@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="TestSuite"
 	ProjectGUID="{F1EE93DF-347F-4CB3-B191-C4E63F38E972}"
 	Keyword="Win32Proj"
@@ -791,6 +791,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ConditionTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\RWLockTest.cpp"
 					>
 				</File>
@@ -832,6 +836,10 @@
 				</File>
 				<File
 					RelativePath=".\src\ActivityTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ConditionTest.h"
 					>
 				</File>
 				<File
@@ -1187,6 +1195,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\TextEncodingTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\TextIteratorTest.cpp"
 					>
 				</File>
@@ -1204,6 +1216,10 @@
 				</File>
 				<File
 					RelativePath=".\src\TextConverterTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TextEncodingTest.h"
 					>
 				</File>
 				<File

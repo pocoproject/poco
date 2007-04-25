@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/Makefile#40 $
+# $Id: //poco/Main/Foundation/Makefile#41 $
 #
 # Makefile for Poco Foundation
 #
@@ -20,7 +20,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue NullStream NumberFormatter NumberParser AbstractObserver \
 	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
-	RegularExpression RefCountedObject Runnable RotateStrategy \
+	RegularExpression RefCountedObject Runnable RotateStrategy Condition \
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel Stopwatch StreamChannel StreamConverter StreamCopier \
 	StreamTokenizer String StringTokenizer SynchronizedObject SyslogChannel \

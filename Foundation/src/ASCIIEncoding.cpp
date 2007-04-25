@@ -1,13 +1,13 @@
 //
 // ASCIIEncoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/ASCIIEncoding.cpp#11 $
+// $Id: //poco/Main/Foundation/src/ASCIIEncoding.cpp#12 $
 //
 // Library: Foundation
 // Package: Text
 // Module:  ASCIIEncoding
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,9 +35,17 @@
 
 
 #include "Poco/ASCIIEncoding.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
+
+
+const char* ASCIIEncoding::_names[] =
+{
+	"ASCII",
+	NULL
+};
 
 
 const TextEncoding::CharacterMap ASCIIEncoding::_charMap = 
@@ -68,6 +76,23 @@ ASCIIEncoding::ASCIIEncoding()
 
 ASCIIEncoding::~ASCIIEncoding()
 {
+}
+
+
+const char* ASCIIEncoding::canonicalName() const
+{
+	return _names[0];
+}
+
+
+bool ASCIIEncoding::isA(const std::string& encodingName) const
+{
+	for (const char** name = _names; *name; ++name)
+	{
+		if (Poco::icompare(encodingName, *name) == 0)
+			return true;
+	}
+	return false;
 }
 
 
