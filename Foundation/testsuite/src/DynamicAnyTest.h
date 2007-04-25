@@ -36,6 +36,8 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/DynamicAny.h"
+#include "Poco/Exception.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -61,10 +63,67 @@ public:
 	void testULong();
 	void testString();
 	void testConversionOperator();
-	
+	void testLimitsInt();
+	void testLimitsFloat();
+
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();
+
+private:
+	template<typename TL, typename TS>
+	void testLimitsSigned()
+	{
+		TL iMin = std::numeric_limits<TS>::min();
+		Poco::DynamicAny da = iMin - 1;
+		try { TS i; i = da; fail("must fail"); }
+		catch (Poco::RangeException&) {}
+
+		TL iMax = std::numeric_limits<TS>::max();
+		da = iMax + 1;
+		try { TS i; i = da; fail("must fail"); }
+		catch (Poco::RangeException&) {}
+	}
+
+	template<typename TL, typename TS>
+	void testLimitsFloatToInt()
+	{
+		Poco::DynamicAny da;
+
+		if (std::numeric_limits<TS>::is_signed)
+		{
+			TL iMin = static_cast<TL>(std::numeric_limits<TS>::min());
+			da = iMin * 10;
+			try { TS i; i = da; fail("must fail"); }
+			catch (Poco::RangeException&) {}
+		}
+
+		TL iMax = static_cast<TL>(std::numeric_limits<TS>::max());
+		da = iMax * 10;
+		try { TS i; i = da; fail("must fail"); }
+		catch (Poco::RangeException&) {}
+	}
+
+	template<typename TS, typename TU>
+	void testLimitsSignedUnsigned()
+	{
+		assert (std::numeric_limits<TS>::is_signed);
+		assert (!std::numeric_limits<TU>::is_signed);
+
+		TS iMin = std::numeric_limits<TS>::min();
+		Poco::DynamicAny da = iMin;
+		try { TU i; i = da; fail("must fail"); }
+		catch (Poco::RangeException&) {}
+	}
+
+	template<typename TL, typename TS>
+	void testLimitsUnsigned()
+	{
+		TL iMax = std::numeric_limits<TS>::max();
+		Poco::DynamicAny da = iMax + 1;
+		try { TS i; i = da; fail("must fail"); }
+		catch (Poco::RangeException&) {}
+	}
 };
 
 

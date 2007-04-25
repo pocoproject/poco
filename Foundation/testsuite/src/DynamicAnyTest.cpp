@@ -38,7 +38,6 @@
 #include "Poco/Bugcheck.h"
 
 
-
 using namespace Poco;
 
 
@@ -940,8 +939,88 @@ void DynamicAnyTest::testConversionOperator()
 	assert (i == 42);
 	
 	any = 123;
-	std::string s(any);
+	std::string s = any;//'s(any)' bombs on gcc 3.4.4
 	assert (s == "123");
+}
+
+
+void DynamicAnyTest::testLimitsInt()
+{
+	testLimitsSigned<Int16, Int8>();
+	testLimitsSigned<Int32, Int8>();
+	testLimitsSigned<Int64, Int8>();
+	testLimitsFloatToInt<float, Int8>();
+	testLimitsFloatToInt<double, Int8>();
+
+	testLimitsSigned<Int16, char>();
+	testLimitsSigned<Int32, char>();
+	testLimitsSigned<Int64, char>();
+	testLimitsFloatToInt<float, char>();
+	testLimitsFloatToInt<double, char>();
+
+	testLimitsSigned<Int32, Int16>();
+	testLimitsSigned<Int64, Int16>();
+	testLimitsFloatToInt<float, Int16>();
+	testLimitsFloatToInt<double, Int16>();
+
+	testLimitsSigned<Int64, Int32>();
+	testLimitsFloatToInt<float, Int32>();
+	testLimitsFloatToInt<double, Int32>();
+
+	testLimitsSignedUnsigned<Int8, UInt8>();
+	testLimitsSignedUnsigned<Int16, UInt8>();
+	testLimitsSignedUnsigned<Int32, UInt8>();
+	testLimitsSignedUnsigned<Int64, UInt8>();
+	testLimitsFloatToInt<float, UInt8>();
+	testLimitsFloatToInt<double, UInt8>();
+
+	testLimitsSignedUnsigned<Int8, UInt16>();
+	testLimitsSignedUnsigned<Int16, UInt16>();
+	testLimitsSignedUnsigned<Int32, UInt16>();
+	testLimitsSignedUnsigned<Int64, UInt16>();
+	testLimitsFloatToInt<float, UInt16>();
+	testLimitsFloatToInt<double, UInt16>();
+
+	testLimitsSignedUnsigned<Int8, UInt32>();
+	testLimitsSignedUnsigned<Int16, UInt32>();
+	testLimitsSignedUnsigned<Int32, UInt32>();
+	testLimitsSignedUnsigned<Int64, UInt32>();
+	testLimitsFloatToInt<float, UInt32>();
+	testLimitsFloatToInt<double, UInt32>();
+
+	testLimitsSignedUnsigned<Int8, UInt64>();
+	testLimitsSignedUnsigned<Int16, UInt64>();
+	testLimitsSignedUnsigned<Int32, UInt64>();
+	testLimitsSignedUnsigned<Int64, UInt64>();
+	testLimitsFloatToInt<float, UInt64>();
+	testLimitsFloatToInt<double, UInt64>();
+
+
+	testLimitsUnsigned<UInt16, UInt8>();
+	testLimitsUnsigned<UInt32, UInt8>();
+	testLimitsUnsigned<UInt64, UInt8>();
+
+	testLimitsUnsigned<UInt32, UInt16>();
+	testLimitsUnsigned<UInt64, UInt16>();
+
+	testLimitsUnsigned<UInt64, UInt32>();
+}
+
+
+void DynamicAnyTest::testLimitsFloat()
+{
+	if (std::numeric_limits<double>::max() != std::numeric_limits<float>::max())
+	{
+		double iMin = -1 * std::numeric_limits<float>::max();
+		DynamicAny da = iMin * 10;
+		try { float f; f = da; fail("must fail"); }
+		catch (RangeException&) {}
+
+		double iMax = std::numeric_limits<float>::max();
+		da = iMax * 10;
+		try { float f; f = da; fail("must fail"); }
+		catch (RangeException&) {}
+	}
 }
 
 
@@ -975,6 +1054,8 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testULong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testConversionOperator);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsInt);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsFloat);
 
 	return pSuite;
 }

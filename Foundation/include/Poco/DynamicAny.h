@@ -49,15 +49,30 @@ namespace Poco {
 
 
 class Foundation_API DynamicAny
-	/// A DynamicAny allows to store data of different types and to convert between these types transparently.
-	/// It's the reponsibility of the programmer to ensure that conversions are meaningful.
-	/// For example: it is possible to convert between string and character. An empty string gets converted to 
-	/// the char '\0', a non-empty string gets truncated to the very first character. Numeric values are truncated,
-	/// no overflow/underflow errors are checked. A string value "false" can be converted to a boolean value false,
-	/// any other string not "false" (not case sensitive) or "0" to true (e.g: "hi" -> true).
+	/// DynamicAny allows to store data of different types and to convert between these types transparently.
+	/// DynamicAny puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent 
+	/// unexpected data loss, particularly when performing narrowing or signedness conversions of numeric data types.
 	///
-	/// A DynamicAny can be created from a value of any type for which a
-	/// specialization of DynamicAnyHolderImpl is available.
+	/// Loss of signedness is not allowed for numeric values. This means that if an attempt is made to convert 
+	/// the internal value which is a negative signed integer to an unsigned integer type storage, a RangeException is thrown. 
+	/// Overflow is not allowed, so if the internal value is a larger number than the target numeric type size can accomodate, 
+	/// a RangeException is thrown.
+	///
+	/// Precision loss, such as in conversion from floating-point types to integers or from double to float on platforms
+	/// where they differ in size (provided internal actual value fits in float min/max range), is allowed.
+	/// 
+	/// String truncation is allowed - it is possible to convert between string and character when string length is 
+	/// greater than 1. An empty string gets converted to the char '\0', a non-empty string is truncated to the first character. 
+	///
+	/// Bolean conversion are performed as follows:
+	///
+	/// A string value "false" (not case sensitive) or "0" can be converted to a boolean value false, any other string 
+	/// not being false by the above criteria evaluates to true (e.g: "hi" -> true).
+	/// Integer 0 values are false, everything else is true.
+	/// Floating point values equal to the minimal FP representation on a given platform are false, everything else is true.
+	///
+	/// A DynamicAny can be created from and converted to a value of any type for which a specialization of 
+	/// DynamicAnyHolderImpl is available. For supported types, see DynamicAnyHolder documentation.
 {
 public:
 	DynamicAny();

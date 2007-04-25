@@ -46,15 +46,46 @@
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <typeinfo>
+#include <limits>
+
+///BEGIN ported from boost
+/// following macros were ported from boost to help the DynamicAnyHolder development
+/// for complete multi-platform code, see static_assert.hpp in boost libraries
+
+// Helper macro POCO_JOIN:
+// The following piece of macro magic joins the two
+// arguments together, even when one of the arguments is
+// itself a macro (see 16.3.1 in C++ standard).  The key
+// is that macro expansion of macro arguments does not
+// occur in POCO_DO_JOIN2 but does in POCO_DO_JOIN.
+//
+#define POCO_JOIN(X, Y) POCO_DO_JOIN( X, Y )
+#define POCO_DO_JOIN(X, Y) POCO_DO_JOIN2(X,Y)
+#define POCO_DO_JOIN2(X, Y) X##Y
+
+template <bool x> struct STATIC_ASSERTION_FAILURE;
+template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
+template<int x> struct static_assert_test{};
+
+#if defined(__GNUC__) && (__GNUC__ == 3) && ((__GNUC_MINOR__ == 3) || (__GNUC_MINOR__ == 4))
+# define poco_static_assert( B ) \
+    typedef char POCO_JOIN(poco_static_assert_typedef_, __LINE__) \
+        [ STATIC_ASSERTION_FAILURE< (bool)(B) >::value ]
+#else
+# define poco_static_assert(B) \
+   typedef static_assert_test<sizeof(STATIC_ASSERTION_FAILURE<(bool)(B)>)> poco_static_assert_typedef_
+#endif
+///END ported from boost
 
 
 namespace Poco {
 
 
 class Foundation_API DynamicAnyHolder
-	/// Interface for a data holder used by the DynamicAny class. Provides methods to convert between data types.
+	/// Interface for a data holder used by the DynamicAny class. 
+	/// Provides methods to convert between data types.
 	/// Only data types for which a convert method exists are supported, which are
-	/// all C++ built-in types, along with std::string.
+	/// all C++ built-in types with addition of std::string.
 {
 public:
 	DynamicAnyHolder();
@@ -88,6 +119,91 @@ public:
 	virtual void convert(double& val) const = 0;
 	virtual void convert(char& val) const = 0;
 	virtual void convert(std::string& val) const = 0;
+
+protected:
+	template <typename F, typename T>
+	void convertToSmaller(const F& from, T& to) const
+		/// This function is meant to convert signed integral values from
+		/// larger to smaller type. It checks the upper and lower bound and
+		/// if from value is within limits of type T (i.e. check calls do not throw), 
+		/// it is converted.
+	{
+		poco_static_assert (std::numeric_limits<F>::is_specialized);
+		poco_static_assert (std::numeric_limits<T>::is_specialized);
+		poco_static_assert (std::numeric_limits<F>::is_signed);
+		poco_static_assert (std::numeric_limits<T>::is_signed);
+
+		checkUpperLimit(from, to); 
+		checkLowerLimit(from, to);
+		to = static_cast<T>(from);
+	}
+
+	template <typename F, typename T>
+	void convertToSmallerUnsigned(const F& from, T& to) const
+		/// This function is meant for converting unsigned integral data types,
+		/// from larger to smaller type. Since lower limit is always 0 for unigned types, 
+		/// only the upper limit is checked, thus saving some cycles compared to the signed 
+		/// version of the function. If the value to be converted is smaller than
+		/// the maximum value for the target type, the conversion is performed.
+	{
+		poco_static_assert (std::numeric_limits<F>::is_specialized);
+		poco_static_assert (std::numeric_limits<T>::is_specialized);
+		poco_static_assert (!std::numeric_limits<F>::is_signed);
+		poco_static_assert (!std::numeric_limits<T>::is_signed);
+
+		checkUpperLimit(from, to); 
+		to = static_cast<T>(from);
+	}
+
+	template <typename F, typename T>
+	void convertSignedToUnsigned(const F& from, T& to) const
+		/// This function is meant for converting signed integral data types to
+		/// unsigned data types. Negative values can not be converted and if one is 
+		/// encountered, RangeException is thrown. 
+		/// If uper limit is within the target data type limits, the converiosn is performed.
+	{
+		poco_static_assert (std::numeric_limits<F>::is_specialized);
+		poco_static_assert (std::numeric_limits<T>::is_specialized);
+		poco_static_assert (std::numeric_limits<F>::is_signed);
+		poco_static_assert (!std::numeric_limits<T>::is_signed);
+
+		if (from < 0)
+			throw RangeException("Value too small.");
+		checkUpperLimit(from, to); 
+		to = static_cast<T>(from);
+	}
+
+	template <typename F, typename T>
+	void convertUnsignedToSigned(const F& from, T& to) const
+		/// This function is meant for converting unsigned integral data types to
+		/// unsigned data types. Negative values can not be converted and if one is 
+		/// encountered, RangeException is thrown. 
+		/// If uper limit is within the target data type limits, the converiosn is performed.
+	{
+		poco_static_assert (std::numeric_limits<F>::is_specialized);
+		poco_static_assert (std::numeric_limits<T>::is_specialized);
+		poco_static_assert (!std::numeric_limits<F>::is_signed);
+		poco_static_assert (std::numeric_limits<T>::is_signed);
+
+		checkUpperLimit(from, to); 
+		to = static_cast<T>(from);
+	}
+
+private:
+	template <typename F, typename T>
+	void checkUpperLimit(const F& from, T& to) const
+	{
+		if (from > std::numeric_limits<T>::max()) 
+			throw RangeException("Value too large.");
+	}
+
+	template <typename F, typename T>
+	void checkLowerLimit(const F& from, T& to) const
+	{
+		if (from < std::numeric_limits<T>::min()) 
+			throw RangeException("Value too small.");
+	}
+
 };
 
 
@@ -119,6 +235,11 @@ class DynamicAnyHolderImpl: public DynamicAnyHolder
 	///
 	/// DynamicAny can be used for any type for which a specialization for
 	/// DynamicAnyHolderImpl is available.
+	///
+	/// DynamicAnyHolderImpl throws following exceptions:
+	///		NotImplementedException (if the specialization for a type does not exist)
+	///		RangeException (if an attempt is made to assign a numeric value outside of the target min/max limits
+	///		SyntaxException (if an attempt is made to convert a string containing non-numeric characters to number)
 {
 	DynamicAnyHolderImpl()
 	{
@@ -245,22 +366,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		val = static_cast<UInt64>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -318,7 +439,7 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int16& val) const
@@ -338,22 +459,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		val = static_cast<UInt64>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -373,7 +494,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -410,12 +531,12 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertToSmaller(_val, val);
 	}
 	
 	void convert(Int32& val) const
@@ -430,22 +551,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		val = static_cast<UInt64>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -465,7 +586,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -502,17 +623,17 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertToSmaller(_val, val);
 	}
 	
 	void convert(Int32& val) const
 	{
-		val = static_cast<Int32>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int64& val) const
@@ -522,22 +643,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		val = static_cast<UInt64>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -557,7 +678,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -594,12 +715,12 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 	
 	void convert(Int32& val) const
@@ -649,7 +770,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -686,17 +807,17 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 	
 	void convert(Int32& val) const
 	{
-		val = static_cast<Int32>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int64& val) const
@@ -706,7 +827,7 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
@@ -741,7 +862,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -778,32 +899,32 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 	
 	void convert(Int32& val) const
 	{
-		val = static_cast<Int32>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int64& val) const
 	{
-		val = static_cast<Int64>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
@@ -833,7 +954,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -870,37 +991,37 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 	
 	void convert(Int32& val) const
 	{
-		val = static_cast<Int32>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int64& val) const
 	{
-		val = static_cast<Int64>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
@@ -925,7 +1046,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -1054,47 +1175,48 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertToSmaller(_val, val);
 	}
 	
 	void convert(Int32& val) const
 	{
-		val = static_cast<Int32>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int64& val) const
 	{
-		val = static_cast<Int64>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		val = static_cast<UInt64>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
 	{
-		val = !(_val < 0.0001f && _val > -0.0001f);
+		val = !(_val <= std::numeric_limits<float>::min() && 
+			_val >= -1 * std::numeric_limits<float>::min());
 	}
 
 	void convert(float& val) const
@@ -1109,7 +1231,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -1146,51 +1268,58 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertToSmaller(_val, val);
 	}
 	
 	void convert(Int32& val) const
 	{
-		val = static_cast<Int32>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int64& val) const
 	{
-		val = static_cast<Int64>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		val = static_cast<UInt64>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
 	{
-		val = !(_val < 0.0001 && _val > -0.0001);
+		val = !(_val <= std::numeric_limits<double>::min() && 
+			_val >= -1 * std::numeric_limits<double>::min());
 	}
 
 	void convert(float& val) const
 	{
+		double fMin = -1 * std::numeric_limits<float>::max();
+		double fMax = std::numeric_limits<float>::max();
+
+		if (_val < fMin) throw RangeException("Value too small.");
+		if (_val > fMax) throw RangeException("Value too large.");
+
 		val = static_cast<float>(_val);
 	}
 
@@ -1201,7 +1330,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -1258,22 +1387,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		val = static_cast<UInt64>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -1334,12 +1463,14 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(NumberParser::parse(_val));
+		int v = NumberParser::parse(_val);
+		convertToSmaller(v, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(NumberParser::parse(_val));
+		int v = NumberParser::parse(_val);
+		convertToSmaller(v, val);
 	}
 	
 	void convert(Int32& val) const
@@ -1354,12 +1485,14 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(NumberParser::parseUnsigned(_val));
+		unsigned int v = NumberParser::parseUnsigned(_val);
+		convertToSmallerUnsigned(v, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(NumberParser::parseUnsigned(_val));
+		unsigned int v = NumberParser::parseUnsigned(_val);
+		convertToSmallerUnsigned(v, val);
 	}
 	
 	void convert(UInt32& val) const
@@ -1385,7 +1518,8 @@ public:
 
 	void convert(float& val) const
 	{
-		val = static_cast<float>(NumberParser::parseFloat(_val));
+		double v = NumberParser::parseFloat(_val);
+		convertToSmaller(v, val);
 	}
 
 	void convert(double& val) const
@@ -1438,12 +1572,12 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertToSmaller(_val, val);
 	}
 	
 	void convert(Int32& val) const
@@ -1458,22 +1592,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		val = static_cast<UInt64>(_val);
+		convertSignedToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -1493,7 +1627,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(std::string& val) const
@@ -1530,37 +1664,37 @@ public:
 
 	void convert(Int8& val) const
 	{
-		val = static_cast<Int8>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 	
 	void convert(Int32& val) const
 	{
-		val = static_cast<Int32>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(Int64& val) const
 	{
-		val = static_cast<Int64>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(UInt8& val) const
 	{
-		val = static_cast<UInt8>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		val = static_cast<UInt16>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		val = static_cast<UInt32>(_val);
+		convertToSmallerUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
@@ -1585,7 +1719,7 @@ public:
 
 	void convert(char& val) const
 	{
-		val = static_cast<char>(_val);
+		convertUnsignedToSigned(_val, val);
 	}
 
 	void convert(std::string& val) const
