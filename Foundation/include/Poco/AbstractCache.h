@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#13 $
+// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#14 $
 //
 // Library: Foundation
 // Package: Cache
@@ -50,6 +50,7 @@
 #include "Poco/SharedPtr.h"
 #include <map>
 #include <set>
+#include <cstddef>
 
 
 namespace Poco {

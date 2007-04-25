@@ -1,7 +1,7 @@
 //
 // IPAddress.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/IPAddress.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/IPAddress.h#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -287,6 +287,18 @@ public:
 		
 	int af() const;
 		/// Returns the address family (AF_INET or AF_INET6) of the address.
+		
+	void mask(const IPAddress& mask);
+		/// Masks the IP address using the given netmask, which is usually
+		/// a IPv4 subnet mask. Only supported for IPv4 addresses.
+		///
+		/// The new address is (address & mask).
+		
+	void mask(const IPAddress& mask, const IPAddress& set);
+		/// Masks the IP address using the given netmask, which is usually
+		/// a IPv4 subnet mask. Only supported for IPv4 addresses.
+		///
+		/// The new address is (address & mask) | (set & ~mask).
 		
 	static IPAddress parse(const std::string& addr);
 		/// Creates an IPAddress from the string containing

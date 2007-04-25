@@ -1,7 +1,7 @@
 //
 // POP3ClientSession.cpp
 //
-// $Id: //poco/Main/Net/src/POP3ClientSession.cpp#6 $
+// $Id: //poco/Main/Net/src/POP3ClientSession.cpp#7 $
 //
 // Library: Net
 // Package: Mail
@@ -220,6 +220,7 @@ void POP3ClientSession::retrieveMessage(int id, MailMessage& message)
 	DialogInputStream sis(_socket);
 	MailInputStream mis(sis);
 	message.read(mis);
+	while (mis.good()) mis.get(); // read any remaining junk
 }
 
 
@@ -231,6 +232,7 @@ void POP3ClientSession::retrieveMessage(int id, MailMessage& message, PartHandle
 	DialogInputStream sis(_socket);
 	MailInputStream mis(sis);
 	message.read(mis, handler);
+	while (mis.good()) mis.get(); // read any remaining junk
 }
 
 

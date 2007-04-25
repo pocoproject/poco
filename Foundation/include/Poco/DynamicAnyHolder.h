@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#4 $
 //
 // Library: Poco
 // Package: Core
@@ -211,6 +211,7 @@ class DynamicAnyHolderImpl: public DynamicAnyHolder
 	///		RangeException (if an attempt is made to assign a numeric value outside of the target min/max limits
 	///		SyntaxException (if an attempt is made to convert a string containing non-numeric characters to number)
 {
+public:
 	DynamicAnyHolderImpl()
 	{
 	}

@@ -1,7 +1,7 @@
 //
 // HTTPHeaderStream.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPHeaderStream.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPHeaderStream.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -43,6 +43,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPBasicStreamBuf.h"
 #include "Poco/MemoryPool.h"
+#include <cstddef>
 #include <istream>
 #include <ostream>
 
@@ -94,7 +95,7 @@ public:
 	HTTPHeaderInputStream(HTTPSession& session);
 	~HTTPHeaderInputStream();
 
-	void* operator new(size_t size);
+	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 	
 private:
@@ -109,7 +110,7 @@ public:
 	HTTPHeaderOutputStream(HTTPSession& session);
 	~HTTPHeaderOutputStream();
 
-	void* operator new(size_t size);
+	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 	
 private:

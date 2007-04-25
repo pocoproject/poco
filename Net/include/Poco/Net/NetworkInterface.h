@@ -1,7 +1,7 @@
 //
 // NetworkInterface.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/NetworkInterface.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/NetworkInterface.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -50,6 +50,9 @@ namespace Poco {
 namespace Net {
 
 
+class NetworkInterfaceImpl;
+
+
 class Net_API NetworkInterface
 	/// This class represents a network interface.
 	/// 
@@ -76,6 +79,9 @@ public:
 	NetworkInterface& operator = (const NetworkInterface& interface);
 		/// Assigns another NetworkInterface.
 		
+	void swap(NetworkInterface& other);
+		/// Swaps the NetworkInterface with another one.	
+		
 	int index() const;
 		/// Returns the interface index.
 		///
@@ -87,6 +93,12 @@ public:
 		
 	const IPAddress& address() const;
 		/// Returns the IP address bound to the interface.
+		
+	const IPAddress& subnetMask() const;
+		/// Returns the IPv4 subnet mask for this network interface.
+		
+	const IPAddress& broadcastAddress() const;
+		/// Returns the IPv4 broadcast address for this network interface.
 		
 	bool supportsIPv4() const;
 		/// Returns true if the interface supports IPv4.
@@ -130,6 +142,9 @@ public:
 protected:
 	NetworkInterface(const std::string& name, const IPAddress& address, int index = -1);
 		/// Creates the NetworkInterface.
+
+	NetworkInterface(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
+		/// Creates the NetworkInterface.
 		
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;
 		/// Determines the IPAddress bound to the interface with the given name.
@@ -138,45 +153,10 @@ protected:
 		/// Determines the interface index of the interface with the given name.
 
 private:
-	std::string _name;
-	IPAddress   _address;
-	int         _index;
+	NetworkInterfaceImpl* _pImpl;
 	
 	static Poco::FastMutex _mutex;
 };
-
-
-//
-// inlines
-//
-inline int NetworkInterface::index() const
-{
-	return _index;
-}
-
-
-inline const std::string& NetworkInterface::name() const
-{
-	return _name;
-}
-
-
-inline const IPAddress& NetworkInterface::address() const
-{
-	return _address;
-}
-
-
-inline bool NetworkInterface::supportsIPv4() const
-{
-	return _index == -1;
-}
-
-	
-inline bool NetworkInterface::supportsIPv6() const
-{
-	return _index != -1;
-}
 
 
 } } // namespace Poco::Net

@@ -1,7 +1,7 @@
 //
 // RemoteSyslogListener.cpp
 //
-// $Id: //poco/Main/Net/src/RemoteSyslogListener.cpp#6 $
+// $Id: //poco/Main/Net/src/RemoteSyslogListener.cpp#7 $
 //
 // Library: Net
 // Package: Logging
@@ -47,6 +47,7 @@
 #include "Poco/LoggingFactory.h"
 #include "Poco/Buffer.h"
 #include <cctype>
+#include <cstddef>
 
 
 namespace Poco {

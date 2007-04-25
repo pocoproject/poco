@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory_POSIX.cpp#7 $
+// $Id: //poco/Main/Foundation/src/SharedMemory_POSIX.cpp#8 $
 //
 // Library: Poco
 // Package: Processes
@@ -55,6 +55,10 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	_name("/"),
 	_fileMapped(false)
 {
+#if POCO_OS == POCO_OS_HPUX
+	_name.append("tmp/");
+#endif
+
 	_name.append(name);
 
 	int flags = O_CREAT;

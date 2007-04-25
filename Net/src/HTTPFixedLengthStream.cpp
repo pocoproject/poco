@@ -1,7 +1,7 @@
 //
 // HTTPFixedLengthStream.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPFixedLengthStream.cpp#9 $
+// $Id: //poco/Main/Net/src/HTTPFixedLengthStream.cpp#10 $
 //
 // Library: Net
 // Package: HTTP
@@ -142,7 +142,7 @@ HTTPFixedLengthInputStream::~HTTPFixedLengthInputStream()
 }
 
 
-void* HTTPFixedLengthInputStream::operator new(size_t size)
+void* HTTPFixedLengthInputStream::operator new(std::size_t size)
 {
 	return _pool.get();
 }
@@ -174,7 +174,7 @@ HTTPFixedLengthOutputStream::~HTTPFixedLengthOutputStream()
 }
 
 
-void* HTTPFixedLengthOutputStream::operator new(size_t size)
+void* HTTPFixedLengthOutputStream::operator new(std::size_t size)
 {
 	return _pool.get();
 }

@@ -1,7 +1,7 @@
 //
 // LRUStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LRUStrategy.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/LRUStrategy.h#5 $
 //
 // Library: Foundation
 // Package: Cache
@@ -47,6 +47,7 @@
 #include "Poco/Exception.h"
 #include <list>
 #include <map>
+#include <cstddef>
 
 
 namespace Poco {
@@ -65,7 +66,7 @@ public:
 	typedef typename KeyIndex::const_iterator ConstIndexIterator;
 
 public:
-	LRUStrategy(size_t size): 
+	LRUStrategy(std::size_t size): 
 		_size(size)
 	{
 		if (_size < 1) throw InvalidArgumentException("size must be > 0");
@@ -127,16 +128,16 @@ public:
 		// Note: replace only informs the cache which elements
 		// it would like to remove!
 		// it does not remove them on its own!
-		size_t curSize = _keyIndex.size();
+		std::size_t curSize = _keyIndex.size();
 
 		if (curSize < _size)
 		{
 			return;
 		}
 
-		size_t diff = curSize - _size;
+		std::size_t diff = curSize - _size;
 		Iterator it = --_keys.end(); //--keys can never be invoked on an empty list due to the minSize==1 requirement of LRU
-		size_t i = 0;
+		std::size_t i = 0;
 
 		while (i++ < diff) 
 		{
@@ -149,9 +150,9 @@ public:
 	}
 
 protected:
-	size_t   _size;     /// Number of keys the cache can store.
-	Keys     _keys;
-	KeyIndex _keyIndex; /// For faster access to _keys
+	std::size_t _size;     /// Number of keys the cache can store.
+	Keys        _keys;
+	KeyIndex    _keyIndex; /// For faster access to _keys
 };
 
 

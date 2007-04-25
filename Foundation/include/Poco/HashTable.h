@@ -1,7 +1,7 @@
 //
 // HashTable.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HashTable.h#8 $
+// $Id: //poco/Main/Foundation/include/Poco/HashTable.h#9 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -46,7 +46,7 @@
 #include "Poco/HashStatistic.h"
 #include <vector>
 #include <map>
-#include <stddef.h>
+#include <cstddef>
 
 
 namespace Poco {
@@ -293,7 +293,7 @@ public:
 		return _entries[hsh] && (_entries[hsh]->end() != _entries[hsh]->find(key));
 	}
 
-	size_t size() const
+	std::size_t size() const
 		/// Returns the number of elements already inserted into the HashTable
 	{
 		return _size;
@@ -379,8 +379,8 @@ public:
 
 private:
 	HashTableVector _entries;
-	size_t _size;
-	UInt32 _maxCapacity;
+	std::size_t     _size;
+	UInt32          _maxCapacity;
 	KeyHashFunction _hash;
 };
 

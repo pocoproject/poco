@@ -1,7 +1,7 @@
 //
 // NetworkInterfaceTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/NetworkInterfaceTest.cpp#5 $
+// $Id: //poco/Main/Net/testsuite/src/NetworkInterfaceTest.cpp#6 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -56,9 +56,11 @@ void NetworkInterfaceTest::testList()
 	assert (!list.empty());
 	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
 	{
-		std::cout << "Name:    " << it->name() << std::endl;
-		std::cout << "Address: " << it->address().toString() << std::endl;
-		std::cout << "Index:   " << it->index() << std::endl;		
+		std::cout << "Name:      " << it->name() << std::endl;
+		std::cout << "Address:   " << it->address().toString() << std::endl;
+		std::cout << "Subnet:    " << it->subnetMask().toString() << std::endl;
+		std::cout << "Broadcast: " << it->broadcastAddress().toString() << std::endl;
+		std::cout << "Index:     " << it->index() << std::endl;		
 	}
 }
 

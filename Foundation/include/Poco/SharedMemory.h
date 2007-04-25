@@ -1,7 +1,7 @@
 //
 // SharedMemory.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedMemory.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedMemory.h#4 $
 //
 // Library: Poco
 // Package: Processes
@@ -42,6 +42,7 @@
 
 #include "Poco/Poco.h"
 #include <algorithm>
+#include <cstddef>
 
 
 namespace Poco {

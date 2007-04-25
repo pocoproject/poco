@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPChunkedStream.cpp#12 $
+// $Id: //poco/Main/Net/src/HTTPChunkedStream.cpp#13 $
 //
 // Library: Net
 // Package: HTTP
@@ -172,7 +172,7 @@ HTTPChunkedInputStream::~HTTPChunkedInputStream()
 }
 
 
-void* HTTPChunkedInputStream::operator new(size_t size)
+void* HTTPChunkedInputStream::operator new(std::size_t size)
 {
 	return _pool.get();
 }
@@ -204,7 +204,7 @@ HTTPChunkedOutputStream::~HTTPChunkedOutputStream()
 }
 
 
-void* HTTPChunkedOutputStream::operator new(size_t size)
+void* HTTPChunkedOutputStream::operator new(std::size_t size)
 {
 	return _pool.get();
 }

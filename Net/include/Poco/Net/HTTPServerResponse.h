@@ -1,7 +1,7 @@
 //
 // HTTPServerResponse.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerResponse.h#5 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerResponse.h#6 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -42,6 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPResponse.h"
+#include <cstddef>
 #include <ostream>
 
 

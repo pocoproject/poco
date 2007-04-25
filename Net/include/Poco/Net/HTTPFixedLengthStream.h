@@ -1,7 +1,7 @@
 //
 // HTTPFixedLengthStream.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPFixedLengthStream.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPFixedLengthStream.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -42,6 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPBasicStreamBuf.h"
+#include <cstddef>
 #include <istream>
 #include <ostream>
 
@@ -96,7 +97,7 @@ public:
 	HTTPFixedLengthInputStream(HTTPSession& session, std::streamsize length);
 	~HTTPFixedLengthInputStream();
 	
-	void* operator new(size_t size);
+	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 	
 private:
@@ -111,7 +112,7 @@ public:
 	HTTPFixedLengthOutputStream(HTTPSession& session, std::streamsize length);
 	~HTTPFixedLengthOutputStream();
 
-	void* operator new(size_t size);
+	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 	
 private:

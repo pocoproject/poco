@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/Main/Net/src/NetworkInterface.cpp#16 $
+// $Id: //poco/Main/Net/src/NetworkInterface.cpp#18 $
 //
 // Library: Net
 // Package: Sockets
@@ -38,6 +38,7 @@
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/RefCountedObject.h"
 #include <string.h>
 
 
@@ -49,45 +50,212 @@ namespace Poco {
 namespace Net {
 
 
-FastMutex NetworkInterface::_mutex;
+//
+// NetworkInterfaceImpl
+//
 
 
-NetworkInterface::NetworkInterface():
-	_index(0)
+class NetworkInterfaceImpl: public Poco::RefCountedObject
+{
+public:
+	NetworkInterfaceImpl();
+	NetworkInterfaceImpl(const std::string& name, const IPAddress& address, int index = -1);
+	NetworkInterfaceImpl(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
+
+	int index() const;		
+	const std::string& name() const;
+	const IPAddress& address() const;
+	const IPAddress& subnetMask() const;
+	const IPAddress& broadcastAddress() const;
+
+protected:
+	~NetworkInterfaceImpl();
+
+private:	
+	std::string _name;
+	IPAddress   _address;
+	IPAddress   _subnetMask;
+	IPAddress   _broadcastAddress;
+	int         _index;
+};
+
+
+NetworkInterfaceImpl::NetworkInterfaceImpl():
+	_index(-1)
 {
 }
 
 
-NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, int index):
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const IPAddress& address, int index):
 	_name(name),
 	_address(address),
+	_index(index)
+{
+#ifndef _WIN32
+	if (index == -1) // IPv4
+	{
+		struct ifreq ifr;
+		strncpy(ifr.ifr_name, name.c_str(), IFNAMSIZ);
+		DatagramSocket ds(IPAddress::IPv4);
+		ds.impl()->ioctl(SIOCGIFNETMASK, &ifr);
+		if (ifr.ifr_addr.sa_family == AF_INET)
+			_subnetMask = IPAddress(&reinterpret_cast<const struct sockaddr_in*>(&ifr.ifr_addr)->sin_addr, sizeof(struct in_addr));
+		if (!address.isLoopback())
+		{
+			try
+			{
+				// Not every interface (e.g. loopback) has a broadcast address
+				ds.impl()->ioctl(SIOCGIFBRDADDR, &ifr);
+				if (ifr.ifr_addr.sa_family == AF_INET)
+					_broadcastAddress = IPAddress(&reinterpret_cast<const struct sockaddr_in*>(&ifr.ifr_addr)->sin_addr, sizeof(struct in_addr));
+			}
+			catch (...)
+			{
+			}
+		}
+	}
+#endif
+}
+
+
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
+	_name(name),
+	_address(address),
+	_subnetMask(subnetMask),
+	_broadcastAddress(broadcastAddress),
 	_index(index)
 {
 }
 
 
+NetworkInterfaceImpl::~NetworkInterfaceImpl()
+{
+}
+
+
+inline int NetworkInterfaceImpl::index() const
+{
+	return _index;
+}
+
+
+inline const std::string& NetworkInterfaceImpl::name() const
+{
+	return _name;
+}
+
+
+inline const IPAddress& NetworkInterfaceImpl::address() const
+{
+	return _address;
+}
+
+
+inline const IPAddress& NetworkInterfaceImpl::subnetMask() const
+{
+	return _subnetMask;
+}
+
+
+inline const IPAddress& NetworkInterfaceImpl::broadcastAddress() const
+{
+	return _broadcastAddress;
+}
+
+
+//
+// NetworkInterface
+//
+
+
+FastMutex NetworkInterface::_mutex;
+
+
+NetworkInterface::NetworkInterface():
+	_pImpl(new NetworkInterfaceImpl)
+{
+}
+
+
 NetworkInterface::NetworkInterface(const NetworkInterface& interface):
-	_name(interface._name),
-	_address(interface._address),
-	_index(interface._index)
+	_pImpl(interface._pImpl)
+{
+	_pImpl->duplicate();
+}
+
+
+NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, int index):
+	_pImpl(new NetworkInterfaceImpl(name, address, index))
+{
+}
+
+
+NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
+	_pImpl(new NetworkInterfaceImpl(name, address, subnetMask, broadcastAddress, index))
 {
 }
 
 
 NetworkInterface::~NetworkInterface()
 {
+	_pImpl->release();
 }
 
 
 NetworkInterface& NetworkInterface::operator = (const NetworkInterface& interface)
 {
-	if (&interface != this)
-	{
-		_name    = interface._name;
-		_address = interface._address;
-		_index   = interface._index;
-	}
+	NetworkInterface tmp(interface);
+	swap(tmp);
 	return *this;
+}
+
+
+void NetworkInterface::swap(NetworkInterface& other)
+{
+	using std::swap;
+	swap(_pImpl, other._pImpl);
+}
+
+
+int NetworkInterface::index() const
+{
+	return _pImpl->index();
+}
+
+
+const std::string& NetworkInterface::name() const
+{
+	return _pImpl->name();
+}
+
+
+const IPAddress& NetworkInterface::address() const
+{
+	return _pImpl->address();
+}
+
+
+const IPAddress& NetworkInterface::subnetMask() const
+{
+	return _pImpl->subnetMask();
+}
+
+
+const IPAddress& NetworkInterface::broadcastAddress() const
+{
+	return _pImpl->broadcastAddress();
+}
+
+
+bool NetworkInterface::supportsIPv4() const
+{
+	return _pImpl->index() == -1;
+}
+
+	
+bool NetworkInterface::supportsIPv6() const
+{
+	return _pImpl->index() != -1;
 }
 
 
@@ -114,12 +282,14 @@ NetworkInterface NetworkInterface::forName(const std::string& name, bool require
 		addr = IPAddress(&reinterpret_cast<const struct sockaddr_in*>(&ifr.ifr_addr)->sin_addr, sizeof(struct in_addr));
 	else if (ifr.ifr_addr.sa_family == AF_INET6)
 		addr = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(&ifr.ifr_addr)->sin6_addr, sizeof(struct in6_addr));
-	else throw InterfaceNotFoundException(addr.toString(), "interface has no IP address");
+	else
+		throw InterfaceNotFoundException(addr.toString(), "interface has no IP address");
 	int index = if_nametoindex(name.c_str());
 #else
 	if (ifr.ifr_addr.sa_family == AF_INET)
 		addr = IPAddress(&reinterpret_cast<const struct sockaddr_in*>(&ifr.ifr_addr)->sin_addr, sizeof(struct in_addr));
-	else throw InterfaceNotFoundException(addr.toString(), "interface has no IP address");
+	else
+		throw InterfaceNotFoundException(addr.toString(), "interface has no IP address");
 	int index = 0;
 #endif
 	return NetworkInterface(name, addr, index);
@@ -178,20 +348,21 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 {
 	FastMutex::ScopedLock lock(_mutex);
 	NetworkInterfaceList result;
-	
+	DWORD rc;
+
 #if defined(POCO_HAVE_IPv6)
 	// On Windows XP/Server 2003 and later we use GetAdaptersAddresses.
 	PIP_ADAPTER_ADDRESSES pAdapterAddresses;
-	PIP_ADAPTER_ADDRESSES pAdapter = 0;
-	ULONG len         = sizeof(IP_ADAPTER_ADDRESSES);
-	pAdapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(new char[len]);
+	PIP_ADAPTER_ADDRESSES pAddress = 0;
+	ULONG addrLen     = sizeof(IP_ADAPTER_ADDRESSES);
+	pAdapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(new char[addrLen]);
 	// Make an initial call to GetAdaptersAddresses to get
-	// the necessary size into len
-	DWORD rc = GetAdaptersAddresses(AF_UNSPEC, 0, 0, pAdapterAddresses, &len);
+	// the necessary size into addrLen
+	rc = GetAdaptersAddresses(AF_INET6, 0, 0, pAdapterAddresses, &addrLen);
 	if (rc == ERROR_BUFFER_OVERFLOW) 
 	{
 		delete [] reinterpret_cast<char*>(pAdapterAddresses);
-		pAdapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(new char[len]);
+		pAdapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(new char[addrLen]);
 	}
 	else if (rc != ERROR_SUCCESS)
 	{
@@ -199,16 +370,16 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 	}
 	try
 	{
-		if (GetAdaptersAddresses(AF_UNSPEC, 0, 0, pAdapterAddresses, &len) == NO_ERROR) 
+		if (GetAdaptersAddresses(AF_INET6, 0, 0, pAdapterAddresses, &addrLen) == NO_ERROR) 
 		{
-			pAdapter = pAdapterAddresses;
-			while (pAdapter) 
+			pAddress = pAdapterAddresses;
+			while (pAddress) 
 			{
-				if (pAdapter->FirstUnicastAddress)
+				if (pAddress->FirstUnicastAddress)
 				{
-					IPAddress addr(pAdapter->FirstUnicastAddress->Address.lpSockaddr, pAdapter->FirstUnicastAddress->Address.iSockaddrLength);
-					result.push_back(NetworkInterface(std::string(pAdapter->AdapterName), addr, pAdapter->Ipv6IfIndex));
-					pAdapter = pAdapter->Next;
+					IPAddress addr(pAddress->FirstUnicastAddress->Address.lpSockaddr, pAddress->FirstUnicastAddress->Address.iSockaddrLength);
+					result.push_back(NetworkInterface(std::string(pAddress->AdapterName), addr, pAddress->Ipv6IfIndex));
+					pAddress = pAddress->Next;
 				}
 			}
 		}
@@ -220,21 +391,22 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 		throw;
 	}
 	delete [] reinterpret_cast<char*>(pAdapterAddresses);
-#else
-	// Add loopback interface (not returned by GetAdaptersInfo)
+#endif
+
+	// Add IPv4 loopback interface (not returned by GetAdaptersInfo)
 	result.push_back(NetworkInterface("Loopback", IPAddress("127.0.0.1"), -1));
 	// On Windows 2000 we use GetAdaptersInfo.
 	PIP_ADAPTER_INFO pAdapterInfo;
-	PIP_ADAPTER_INFO pAdapter = 0;
-	ULONG len    = sizeof(IP_ADAPTER_INFO);
-	pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+	PIP_ADAPTER_INFO pInfo = 0;
+	ULONG infoLen = sizeof(IP_ADAPTER_INFO);
+	pAdapterInfo  = reinterpret_cast<IP_ADAPTER_INFO*>(new char[infoLen]);
 	// Make an initial call to GetAdaptersInfo to get
-	// the necessary size into len
-	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
+	// the necessary size into infoLen
+	rc = GetAdaptersInfo(pAdapterInfo, &infoLen);
 	if (rc == ERROR_BUFFER_OVERFLOW) 
 	{
 		delete [] reinterpret_cast<char*>(pAdapterInfo);
-		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[infoLen]);
 	}
 	else if (rc != ERROR_SUCCESS)
 	{
@@ -242,14 +414,17 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 	}
 	try
 	{
-		if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR) 
+		if (GetAdaptersInfo(pAdapterInfo, &infoLen) == NO_ERROR) 
 		{
-			pAdapter = pAdapterInfo;
-			while (pAdapter) 
+			pInfo = pAdapterInfo;
+			while (pInfo) 
 			{
-				IPAddress addr(std::string(pAdapter->IpAddressList.IpAddress.String));
-				result.push_back(NetworkInterface(std::string(pAdapter->AdapterName), addr));
-				pAdapter = pAdapter->Next;
+				IPAddress address(std::string(pInfo->IpAddressList.IpAddress.String));
+				IPAddress subnetMask(std::string(pInfo->IpAddressList.IpMask.String));
+				IPAddress broadcastAddress(address);
+				broadcastAddress.mask(subnetMask, IPAddress("255.255.255.255"));
+				result.push_back(NetworkInterface(std::string(pInfo->AdapterName), address, subnetMask, broadcastAddress));
+				pInfo = pInfo->Next;
 			}
 		}
 		else throw NetException("cannot get network adapter list");
@@ -260,7 +435,6 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 		throw;
 	}
 	delete [] reinterpret_cast<char*>(pAdapterInfo);
-#endif
 
 	return result;
 }
