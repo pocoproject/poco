@@ -1,7 +1,7 @@
 //
 // SimpleHashTable.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SimpleHashTable.h#11 $
+// $Id: //poco/Main/Foundation/include/Poco/SimpleHashTable.h#12 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -343,7 +343,7 @@ public:
 		}
 	}
 
-	size_t size() const
+	std::size_t size() const
 		/// Returns the number of elements already inserted into the SimpleHashTable
 	{
 		return _size;
@@ -407,7 +407,7 @@ public:
 
 private:
 	HashTableVector _entries;
-	size_t          _size;
+	std::size_t     _size;
 	UInt32          _capacity;
 	KeyHashFunction _hash;
 };
