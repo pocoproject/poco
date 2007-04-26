@@ -171,6 +171,23 @@ public:
 		return *this;
 	}
 	
+	template <typename T> 
+	bool operator == (const T& other)
+		/// Equality operator
+	{
+		T result;
+		_pHolder->convert(result);
+		return result == other;
+	}
+
+	bool operator == (const char* other)
+		/// Equality operator
+	{
+		std::string result;
+		_pHolder->convert(result);
+		return result == other;
+	}
+
     const std::type_info& type() const;
 		/// Returns the type information of the stored content.
 	
