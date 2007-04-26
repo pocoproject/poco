@@ -1,9 +1,9 @@
 //
 // DynamicAny.cpp
 //
-// $Id: //poco/Main/Foundation/src/DynamicAny.cpp#2 $
+// $Id: //poco/Main/Foundation/src/DynamicAny.cpp#3 $
 //
-// Library: Poco
+// Library: Foundation
 // Package: Core
 // Module:  DynamicAny
 //

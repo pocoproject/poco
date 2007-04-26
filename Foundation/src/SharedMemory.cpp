@@ -1,9 +1,9 @@
 //
 // SharedMemory.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory.cpp#5 $
+// $Id: //poco/Main/Foundation/src/SharedMemory.cpp#6 $
 //
-// Library: Poco
+// Library: Foundation
 // Package: Processes
 // Module:  SharedMemory
 //

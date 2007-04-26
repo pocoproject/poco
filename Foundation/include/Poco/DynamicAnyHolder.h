@@ -1,9 +1,9 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#6 $
 //
-// Library: Poco
+// Library: Foundation
 // Package: Core
 // Module:  DynamicAnyHolder
 //
@@ -36,11 +36,11 @@
 //
 
 
-#ifndef Poco_DynamicAnyHolder_INCLUDED
-#define Poco_DynamicAnyHolder_INCLUDED
+#ifndef Foundation_DynamicAnyHolder_INCLUDED
+#define Foundation_DynamicAnyHolder_INCLUDED
 
 
-#include "Poco/Poco.h"
+#include "Poco/Foundation.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
@@ -210,6 +210,10 @@ class DynamicAnyHolderImpl: public DynamicAnyHolder
 	///		NotImplementedException (if the specialization for a type does not exist)
 	///		RangeException (if an attempt is made to assign a numeric value outside of the target min/max limits
 	///		SyntaxException (if an attempt is made to convert a string containing non-numeric characters to number)
+	///
+	/// All specializations must additionally implement a public member function:
+	///     const T& value() const
+	/// returning a const reference to the actual stored value.
 {
 public:
 	DynamicAnyHolderImpl()
@@ -383,6 +387,11 @@ public:
 	{
 		return new DynamicAnyHolderImpl(_val);
 	}
+	
+	const Int8& value() const
+	{
+		return _val;
+	}
 
 private:
 	Int8 _val;
@@ -474,6 +483,11 @@ public:
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
+	}
+
+	const Int16& value() const
+	{
+		return _val;
 	}
 
 private:
@@ -568,6 +582,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 
+	const Int32& value() const
+	{
+		return _val;
+	}
+
 private:
 	Int32 _val;
 };
@@ -658,6 +677,11 @@ public:
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
+	}
+
+	const Int64& value() const
+	{
+		return _val;
 	}
 
 private:
@@ -752,6 +776,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 
+	const UInt8& value() const
+	{
+		return _val;
+	}
+
 private:
 	UInt8 _val;
 };
@@ -842,6 +871,11 @@ public:
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
+	}
+
+	const UInt16& value() const
+	{
+		return _val;
 	}
 
 private:
@@ -936,6 +970,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 
+	const UInt32& value() const
+	{
+		return _val;
+	}
+
 private:
 	UInt32 _val;
 };
@@ -1026,6 +1065,11 @@ public:
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
+	}
+
+	const UInt64& value() const
+	{
+		return _val;
 	}
 
 private:
@@ -1120,6 +1164,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 
+	const bool& value() const
+	{
+		return _val;
+	}
+
 private:
 	bool _val;
 };
@@ -1211,6 +1260,11 @@ public:
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
+	}
+
+	const float& value() const
+	{
+		return _val;
 	}
 
 private:
@@ -1312,6 +1366,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 
+	const double& value() const
+	{
+		return _val;
+	}
+
 private:
 	double _val;
 };
@@ -1402,6 +1461,11 @@ public:
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
+	}
+
+	const char& value() const
+	{
+		return _val;
 	}
 
 private:
@@ -1514,6 +1578,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 
+	const std::string& value() const
+	{
+		return _val;
+	}
+
 private:
 	std::string _val;
 };
@@ -1609,6 +1678,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 
+	const long& value() const
+	{
+		return _val;
+	}
+
 private:
 	long _val;
 };
@@ -1701,6 +1775,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 
+	const unsigned long& value() const
+	{
+		return _val;
+	}
+
 private:
 	unsigned long _val;
 };
@@ -1712,4 +1791,4 @@ private:
 } // namespace Poco
 
 
-#endif // Poco_DynamicAnyHolder_INCLUDED
+#endif // Foundation_DynamicAnyHolder_INCLUDED

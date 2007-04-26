@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#5 $
+// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#6 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -107,6 +107,18 @@ void DynamicAnyTest::testInt8()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+	
+	Int8 value = a1.extract<Int8>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -166,6 +178,18 @@ void DynamicAnyTest::testInt16()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	Int16 value = a1.extract<Int16>();
+	assert (value == 32);
+	
+	try
+	{
+		Int32 value2 = a1.extract<Int32>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -225,6 +249,18 @@ void DynamicAnyTest::testInt32()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+	
+	Int32 value = a1.extract<Int32>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -284,6 +320,18 @@ void DynamicAnyTest::testInt64()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	Int64 value = a1.extract<Int64>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -343,6 +391,18 @@ void DynamicAnyTest::testUInt8()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	UInt8 value = a1.extract<UInt8>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -402,6 +462,18 @@ void DynamicAnyTest::testUInt16()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	UInt16 value = a1.extract<UInt16>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -461,6 +533,18 @@ void DynamicAnyTest::testUInt32()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	UInt32 value = a1.extract<UInt32>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -520,6 +604,18 @@ void DynamicAnyTest::testUInt64()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	UInt64 value = a1.extract<UInt64>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -579,6 +675,18 @@ void DynamicAnyTest::testBool()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	bool value = a1.extract<bool>();
+	assert (value);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -638,6 +746,18 @@ void DynamicAnyTest::testChar()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	char value = a1.extract<char>();
+	assert (value == ' ');
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -697,6 +817,18 @@ void DynamicAnyTest::testFloat()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	float value = a1.extract<float>();
+	assert (value == 32.0f);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -756,6 +888,18 @@ void DynamicAnyTest::testDouble()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	double value = a1.extract<double>();
+	assert (value == 32.0);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -810,8 +954,19 @@ void DynamicAnyTest::testString()
 	assert (s11 == 32.0);
 	assert (s12);
 	assert (s13 == '3');
-}
 
+	const std::string& value = a1.extract<std::string>();
+	assert (value == "32");
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+}
 
 
 void DynamicAnyTest::testLong()
@@ -870,6 +1025,18 @@ void DynamicAnyTest::testLong()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+	
+	long value = a1.extract<long>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 
@@ -929,6 +1096,18 @@ void DynamicAnyTest::testULong()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
+
+	unsigned long value = a1.extract<unsigned long>();
+	assert (value == 32);
+	
+	try
+	{
+		Int16 value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
 }
 
 

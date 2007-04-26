@@ -1,9 +1,9 @@
 //
 // SharedMemoryImpl.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedMemory_DUMMY.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedMemory_DUMMY.h#4 $
 //
-// Library: Poco
+// Library: Foundation
 // Package: Processes
 // Module:  SharedMemoryImpl
 //
@@ -36,11 +36,11 @@
 //
 
 
-#ifndef Poco_SharedMemoryImpl_INCLUDED
-#define Poco_SharedMemoryImpl_INCLUDED
+#ifndef Foundation_SharedMemoryImpl_INCLUDED
+#define Foundation_SharedMemoryImpl_INCLUDED
 
 
-#include "Poco/Poco.h"
+#include "Poco/Foundation.h"
 #include "Poco/SharedMemory.h"
 #include "Poco/RefCountedObject.h"
 
@@ -107,4 +107,4 @@ inline char* SharedMemoryImpl::end() const
 } // namespace Poco
 
 
-#endif // Poco_SharedMemoryImpl_INCLUDED
+#endif // Foundation_SharedMemoryImpl_INCLUDED

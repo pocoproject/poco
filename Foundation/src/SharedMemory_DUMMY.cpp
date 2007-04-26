@@ -1,9 +1,9 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory_DUMMY.cpp#2 $
+// $Id: //poco/Main/Foundation/src/SharedMemory_DUMMY.cpp#3 $
 //
-// Library: Poco
+// Library: Foundation
 // Package: Processes
 // Module:  SharedMemoryImpl
 //

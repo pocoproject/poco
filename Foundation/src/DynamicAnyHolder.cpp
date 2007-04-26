@@ -1,9 +1,9 @@
 //
 // DynamicAnyHolder.cpp
 //
-// $Id: //poco/Main/Foundation/src/DynamicAnyHolder.cpp#1 $
+// $Id: //poco/Main/Foundation/src/DynamicAnyHolder.cpp#2 $
 //
-// Library: Poco
+// Library: Foundation
 // Package: Core
 // Module:  DynamicAnyHolder
 //

@@ -1,9 +1,9 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#6 $
 //
-// Library: Poco
+// Library: Foundation
 // Package: Core
 // Module:  DynamicAny
 //
@@ -36,11 +36,11 @@
 //
 
 
-#ifndef Poco_DynamicAny_INCLUDED
-#define Poco_DynamicAny_INCLUDED
+#ifndef Foundation_DynamicAny_INCLUDED
+#define Foundation_DynamicAny_INCLUDED
 
 
-#include "Poco/Poco.h"
+#include "Poco/Foundation.h"
 #include "Poco/DynamicAnyHolder.h"
 #include <typeinfo>
 
@@ -146,6 +146,21 @@ public:
 		_pHolder->convert(result);
 		return result;
 	}
+	
+	template <typename T>
+	const T& extract() const
+		/// Returns a const reference to the actual value.
+		///
+		/// Must be instantiated with the exact type of
+		/// the stored value, otherwise a BadCastException
+		/// is thrown.
+	{
+		DynamicAnyHolderImpl<T>* pHolder = dynamic_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
+		if (pHolder)
+			return pHolder->value();
+		else
+			throw BadCastException();
+	}
 
 	template <typename T> 
 	DynamicAny& operator = (const T& other)
@@ -167,4 +182,4 @@ private:
 } // namespace Poco
 
 
-#endif // Poco_DynamicAny_INCLUDED
+#endif // Foundation_DynamicAny_INCLUDED

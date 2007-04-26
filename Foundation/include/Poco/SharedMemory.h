@@ -1,9 +1,9 @@
 //
 // SharedMemory.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedMemory.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedMemory.h#5 $
 //
-// Library: Poco
+// Library: Foundation
 // Package: Processes
 // Module:  SharedMemory
 //
@@ -36,11 +36,11 @@
 //
 
 
-#ifndef Poco_SharedMemory_INCLUDED
-#define Poco_SharedMemory_INCLUDED
+#ifndef Foundation_SharedMemory_INCLUDED
+#define Foundation_SharedMemory_INCLUDED
 
 
-#include "Poco/Poco.h"
+#include "Poco/Foundation.h"
 #include <algorithm>
 #include <cstddef>
 
@@ -128,4 +128,4 @@ inline void SharedMemory::swap(SharedMemory& other)
 } // namespace Poco::Poco
 
 
-#endif // Poco_SharedMemory_INCLUDED
+#endif // Foundation_SharedMemory_INCLUDED
