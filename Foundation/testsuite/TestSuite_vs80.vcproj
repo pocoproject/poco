@@ -423,6 +423,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\NamedTuplesTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\NDCTest.cpp"
 					>
 				</File>
@@ -504,6 +508,10 @@
 				</File>
 				<File
 					RelativePath=".\src\MemoryPoolTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\NamedTuplesTest.h"
 					>
 				</File>
 				<File

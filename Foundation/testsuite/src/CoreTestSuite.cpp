@@ -49,6 +49,7 @@
 #include "DynamicAnyTest.h"
 #include "FormatTest.h"
 #include "TuplesTest.h"
+#include "NamedTuplesTest.h"
 #include "TypeListTest.h"
 
 
@@ -74,6 +75,7 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(DynamicAnyTest::suite());
 	pSuite->addTest(FormatTest::suite());
 	pSuite->addTest(TuplesTest::suite());
+	pSuite->addTest(NamedTuplesTest::suite());
 	pSuite->addTest(TypeListTest::suite());
 
 	return pSuite;
