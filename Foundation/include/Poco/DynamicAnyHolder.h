@@ -46,6 +46,8 @@
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <typeinfo>
+#undef min
+#undef max
 #include <limits>
 
 
