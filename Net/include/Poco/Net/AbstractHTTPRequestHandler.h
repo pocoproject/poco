@@ -1,7 +1,7 @@
 //
 // AbstractHTTPRequestHandler.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/AbstractHTTPRequestHandler.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/AbstractHTTPRequestHandler.h#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -83,6 +83,10 @@ public:
 		///   - call authorize();
 		///   - if authorize() returns true call run(),
 		///     else send 401 (Unauthorized) response.
+		///
+		/// If run() throws an exception and the response has not been
+		/// sent yet, sends a 500 (Internal Server Error) response with
+		/// the exception's display text.
 
 	HTTPServerRequest& request();
 		/// Returns the request.

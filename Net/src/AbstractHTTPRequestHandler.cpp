@@ -1,7 +1,7 @@
 //
 // AbstractHTTPRequestHandler.cpp
 //
-// $Id: //poco/Main/Net/src/AbstractHTTPRequestHandler.cpp#3 $
+// $Id: //poco/Main/Net/src/AbstractHTTPRequestHandler.cpp#4 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -39,6 +39,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/Exception.h"
 
 
 using Poco::NumberFormatter;
@@ -68,7 +69,24 @@ void AbstractHTTPRequestHandler::handleRequest(HTTPServerRequest& request, HTTPS
 	_pResponse = &response;
 	if (authenticate())
 	{
-		run();
+		try
+		{
+			run();
+		}
+		catch (Poco::Exception& exc)
+		{
+			if (!response.sent())
+			{
+				sendErrorResponse(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.displayText());
+			}
+		}
+		catch (std::exception& exc)
+		{
+			if (!response.sent())
+			{
+				sendErrorResponse(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.what());
+			}
+		}
 	}
 	else
 	{
