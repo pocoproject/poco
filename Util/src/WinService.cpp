@@ -1,7 +1,7 @@
 //
 // WinService.cpp
 //
-// $Id: //poco/Main/Util/src/WinService.cpp#9 $
+// $Id: //poco/Main/Util/src/WinService.cpp#10 $
 //
 // Library: Util
 // Package: Windows
@@ -79,7 +79,7 @@ const std::string& WinService::name() const
 
 std::string WinService::displayName() const
 {
-	LPQUERY_SERVICE_CONFIG pSvcConfig = config();
+	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = config();
 #if defined(POCO_WIN32_UTF8)
 	std::wstring udispName(pSvcConfig->lpDisplayName);
 	std::string dispName;
@@ -94,7 +94,7 @@ std::string WinService::displayName() const
 
 std::string WinService::path() const
 {
-	LPQUERY_SERVICE_CONFIG pSvcConfig = config();
+	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = config();
 #if defined(POCO_WIN32_UTF8)
 	std::wstring upath(pSvcConfig->lpBinaryPathName);
 	std::string path;
@@ -117,7 +117,7 @@ void WinService::registerService(const std::string& path, const std::string& dis
 	Poco::UnicodeConverter::toUTF16(displayName, udisplayName);
 	std::wstring upath;
 	Poco::UnicodeConverter::toUTF16(path, upath);
-	_svcHandle = CreateService(
+	_svcHandle = CreateServiceW(
 		_scmHandle,
 		uname.c_str(),
 		udisplayName.c_str(), 
@@ -232,7 +232,7 @@ void WinService::setStartup(WinService::Startup startup)
 	
 WinService::Startup WinService::getStartup() const
 {
-	LPQUERY_SERVICE_CONFIG pSvcConfig = config();
+	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = config();
 	Startup result;
 	switch (pSvcConfig->dwStartType)
 	{
@@ -268,7 +268,7 @@ bool WinService::tryOpen() const
 #if defined(POCO_WIN32_UTF8)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(_name, uname);
-	_svcHandle = OpenService(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
+	_svcHandle = OpenServiceW(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
 #else
 	_svcHandle = OpenService(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
 #endif
@@ -285,22 +285,26 @@ void WinService::close() const
 }
 
 
-LPQUERY_SERVICE_CONFIG WinService::config() const
+POCO_LPQUERY_SERVICE_CONFIG WinService::config() const
 {
 	open();
 	int size = 4096;
 	DWORD bytesNeeded;
-	LPQUERY_SERVICE_CONFIG pSvcConfig = (LPQUERY_SERVICE_CONFIG) LocalAlloc(LPTR, size);
+	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = (POCO_LPQUERY_SERVICE_CONFIG) LocalAlloc(LPTR, size);
 	if (!pSvcConfig) throw OutOfMemoryException("cannot allocate service config buffer");
 	try
 	{
+#if defined(POCO_WIN32_UTF8)
+		while (!QueryServiceConfigW(_svcHandle, pSvcConfig, size, &bytesNeeded))
+#else
 		while (!QueryServiceConfig(_svcHandle, pSvcConfig, size, &bytesNeeded))
+#endif
 		{
 			if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 			{
 				LocalFree(pSvcConfig);
 				size = bytesNeeded;
-				pSvcConfig = (LPQUERY_SERVICE_CONFIG) LocalAlloc(LPTR, size);
+				pSvcConfig = (POCO_LPQUERY_SERVICE_CONFIG) LocalAlloc(LPTR, size);
 			}
 			else throw SystemException("cannot query service configuration", _name);
 		}

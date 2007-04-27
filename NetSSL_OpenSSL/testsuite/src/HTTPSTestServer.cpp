@@ -1,7 +1,7 @@
 //
 // HTTPSTestServer.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSTestServer.cpp#8 $
+// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSTestServer.cpp#9 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -173,7 +173,10 @@ std::string HTTPSTestServer::handleRequest() const
 		{
 			response.append("Transfer-Encoding: chunked\r\n");
 		}
-		response.append("Connection: Close\r\n");
+		if (_lastRequest.substr(0,15) == "POST /keepAlive")
+			response.append("Connection: keep-alive\r\n");
+		else
+			response.append("Connection: Close\r\n");
 		response.append("\r\n");
 		response.append(body);
 	}

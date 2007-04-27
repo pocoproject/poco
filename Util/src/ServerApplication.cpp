@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/Main/Util/src/ServerApplication.cpp#19 $
+// $Id: //poco/Main/Util/src/ServerApplication.cpp#20 $
 //
 // Library: Util
 // Package: Application
@@ -146,7 +146,11 @@ void ServerApplication::ServiceControlHandler(DWORD control)
 }
 
 
+#if defined(POCO_WIN32_UTF8)
+void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
+#else
 void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
+#endif
 {
 	ServerApplication& app = static_cast<ServerApplication&>(Application::instance());
 
@@ -302,17 +306,21 @@ int ServerApplication::run(int argc, wchar_t** argv)
 
 bool ServerApplication::isService()
 {
-	SERVICE_TABLE_ENTRY svcDispatchTable[2];
 #if defined(POCO_WIN32_UTF8)
+	SERVICE_TABLE_ENTRYW svcDispatchTable[2];
 	svcDispatchTable[0].lpServiceName = L"";
-#else
-	svcDispatchTable[0].lpServiceName = "";
-#endif
 	svcDispatchTable[0].lpServiceProc = ServiceMain;
 	svcDispatchTable[1].lpServiceName = NULL;
 	svcDispatchTable[1].lpServiceProc = NULL; 
-
+	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0; 
+#else
+	SERVICE_TABLE_ENTRY svcDispatchTable[2];
+	svcDispatchTable[0].lpServiceName = "";
+	svcDispatchTable[0].lpServiceProc = ServiceMain;
+	svcDispatchTable[1].lpServiceName = NULL;
+	svcDispatchTable[1].lpServiceProc = NULL; 
 	return StartServiceCtrlDispatcher(svcDispatchTable) != 0; 
+#endif
 }
 
 

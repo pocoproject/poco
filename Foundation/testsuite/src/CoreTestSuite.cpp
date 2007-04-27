@@ -1,7 +1,7 @@
 //
 // CoreTestSuite.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/CoreTestSuite.cpp#20 $
+// $Id: //poco/Main/Foundation/testsuite/src/CoreTestSuite.cpp#21 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

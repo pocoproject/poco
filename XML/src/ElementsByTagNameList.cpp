@@ -1,7 +1,7 @@
 //
 // ElementsByTagNameList.cpp
 //
-// $Id: //poco/Main/XML/src/ElementsByTagNameList.cpp#10 $
+// $Id: //poco/Main/XML/src/ElementsByTagNameList.cpp#11 $
 //
 // Library: XML
 // Package: DOM
@@ -37,6 +37,7 @@
 #include "Poco/DOM/ElementsByTagNameList.h"
 #include "Poco/DOM/Node.h"
 #include "Poco/DOM/Document.h"
+#include <climits>
 
 
 namespace Poco {

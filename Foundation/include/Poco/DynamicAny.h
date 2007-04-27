@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#6 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#8 $
 //
 // Library: Foundation
 // Package: Core
@@ -175,17 +175,34 @@ public:
 	bool operator == (const T& other)
 		/// Equality operator
 	{
-		T result;
-		_pHolder->convert(result);
-		return result == other;
+		T value;
+		_pHolder->convert(value);
+		return value == other;
 	}
 
 	bool operator == (const char* other)
 		/// Equality operator
 	{
-		std::string result;
-		_pHolder->convert(result);
-		return result == other;
+		std::string value;
+		_pHolder->convert(value);
+		return value == other;
+	}
+
+	template <typename T> 
+	bool operator != (const T& other)
+		/// Inequality operator
+	{
+		T value;
+		_pHolder->convert(value);
+		return value != other;
+	}
+
+	bool operator != (const char* other)
+		/// Inequality operator
+	{
+		std::string value;
+		_pHolder->convert(value);
+		return value != other;
 	}
 
     const std::type_info& type() const;

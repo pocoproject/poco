@@ -1,7 +1,7 @@
 //
 // HTTPSClientSessionTest.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#7 $
+// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#8 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,7 +35,13 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPServer.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerParams.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Exception.h"
 #include "HTTPSTestServer.h"
@@ -44,11 +50,43 @@
 #include <sstream>
 
 
-using Poco::Net::HTTPSClientSession;
-using Poco::Net::HTTPRequest;
-using Poco::Net::HTTPResponse;
-using Poco::Net::HTTPMessage;
+using namespace Poco::Net;
+
 using Poco::StreamCopier;
+
+
+
+class TestRequestHandler: public HTTPRequestHandler
+	/// Return a HTML document with the current date and time.
+{
+public:
+	TestRequestHandler()
+	{
+	}
+	
+	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+	{
+		response.setChunkedTransferEncoding(true);
+		response.setContentType(request.getContentType());
+		std::ostream& ostr = response.send();
+		Poco::StreamCopier::copyStream(request.stream(), ostr);
+	}
+
+};
+
+
+class TestRequestHandlerFactory: public HTTPRequestHandlerFactory
+{
+public:
+	TestRequestHandlerFactory()
+	{
+	}
+
+	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
+	{
+		return new TestRequestHandler();
+	}
+};
 
 
 HTTPSClientSessionTest::HTTPSClientSessionTest(const std::string& name): CppUnit::TestCase(name)
@@ -179,6 +217,39 @@ void HTTPSClientSessionTest::testPostLargeChunked()
 }
 
 
+void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
+{
+	SecureServerSocket svs(32322);
+	HTTPServer srv(new TestRequestHandlerFactory(), svs, new HTTPServerParams());
+	srv.start();
+	try
+	{
+		HTTPSClientSession s("localhost", srv.port());
+		s.setKeepAlive(true);
+		for (int i = 0; i < 10; ++i)
+		{
+			HTTPRequest request(HTTPRequest::HTTP_POST, "/keepAlive", HTTPMessage::HTTP_1_1);
+			std::string body(16000, 'x');
+			request.setChunkedTransferEncoding(true);
+			s.sendRequest(request) << body;
+			HTTPResponse response;
+			std::istream& rs = s.receiveResponse(response);
+			assert (response.getChunkedTransferEncoding());
+			assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+			std::ostringstream ostr;
+			StreamCopier::copyStream(rs, ostr);
+			assert (ostr.str() == body);
+		}
+		srv.stop();
+	}
+	catch (...)
+	{
+		srv.stop();
+		throw;
+	}
+}
+
+
 void HTTPSClientSessionTest::testPostSmallClose()
 {
 	HTTPSTestServer srv;
@@ -297,6 +368,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeIdentity);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallChunked);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunked);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunkedKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallClose);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeClose);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);

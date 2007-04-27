@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/Main/Util/src/WinRegistryKey.cpp#11 $
+// $Id: //poco/Main/Util/src/WinRegistryKey.cpp#12 $
 //
 // Library: Util
 // Package: Windows
@@ -159,7 +159,7 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 #if defined(POCO_WIN32_UTF8)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
-	if (RegQueryValueEx(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
+	if (RegQueryValueExW(_hKey, uname.c_str(), NULL, &type, NULL, &size) != ERROR_SUCCESS || type != REG_SZ && type != REG_EXPAND_SZ)
 		throw NotFoundException(key(name));
 	if (size > 0)
 	{
@@ -168,7 +168,7 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 		RegQueryValueExW(_hKey, uname.c_str(), NULL, NULL, (BYTE*) buffer, &size);
 		buffer[len] = 0;
 		wchar_t temp;
-		DWORD expSize = ExpandEnvironmentStrings(buffer, &temp, 1);	
+		DWORD expSize = ExpandEnvironmentStringsW(buffer, &temp, 1);	
 		wchar_t* expBuffer = new wchar_t[expSize];
 		ExpandEnvironmentStringsW(buffer, expBuffer, expSize);
 		std::string result;
@@ -320,7 +320,7 @@ void WinRegistryKey::open()
 #if defined(POCO_WIN32_UTF8)
 		std::wstring usubKey;
 		Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
-		if (RegCreateKeyEx(_hRootKey, usubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE, NULL, &_hKey, NULL) != ERROR_SUCCESS)
+		if (RegCreateKeyExW(_hRootKey, usubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE, NULL, &_hKey, NULL) != ERROR_SUCCESS)
 			throw SystemException("Cannot open registry key: ", key());
 #else
 		if (RegCreateKeyEx(_hRootKey, _subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE, NULL, &_hKey, NULL) != ERROR_SUCCESS)

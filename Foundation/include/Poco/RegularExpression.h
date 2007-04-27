@@ -1,7 +1,7 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/RegularExpression.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/RegularExpression.h#5 $
 //
 // Library: Foundation
 // Package: RegExp
@@ -77,9 +77,9 @@ public:
 		/// some can be passed only to matching functions, and some can be used
 		/// everywhere.
 		/// 
-		/// * Options marked [ctor] can be passed to the constructor.
-		/// * Options marked [match] can be passed to match, extract, split and subst.
-		/// * Options marked [subst] can be passed to subst.
+		///   * Options marked [ctor] can be passed to the constructor.
+		///   * Options marked [match] can be passed to match, extract, split and subst.
+		///   * Options marked [subst] can be passed to subst.
 		///
 		/// See the PCRE documentation for more information.
 	{

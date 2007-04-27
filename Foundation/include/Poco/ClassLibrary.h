@@ -1,7 +1,7 @@
 //
 // ClassLibrary.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#4 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -64,6 +64,16 @@ extern "C"
 
 
 //
+// additional support for named manifests
+//
+#define POCO_DECLARE_NAMED_MANIFEST(name) \
+extern "C"	\
+{			\
+	void POCO_LIBRARY_API POCO_JOIN(pocoBuildManifest, name)(Poco::ManifestBase* pManifest); \
+}
+
+
+//
 // Macros to automatically implement pocoBuildManifest
 //
 // usage:
@@ -74,8 +84,8 @@ extern "C"
 //     ...
 // POCO_END_MANIFEST
 //
-#define POCO_BEGIN_MANIFEST(base) \
-	bool pocoBuildManifest(Poco::ManifestBase* pManifest_)							\
+#define POCO_BEGIN_MANIFEST_IMPL(fnName, base) \
+	bool fnName(Poco::ManifestBase* pManifest_)										\
 	{																				\
 		typedef base _Base;															\
 		typedef Poco::Manifest<_Base> _Manifest;									\
@@ -84,6 +94,14 @@ extern "C"
 		if (requiredType == actualType)												\
 		{																			\
 			Poco::Manifest<_Base>* pManifest = static_cast<_Manifest*>(pManifest_);
+
+
+#define POCO_BEGIN_MANIFEST(base) \
+	POCO_BEGIN_MANIFEST_IMPL(pocoBuildManifest, base)
+
+
+#define POCO_BEGIN_NAMED_MANIFEST(name, base) \
+	POCO_BEGIN_MANIFEST_IMPL(POCO_JOIN(pocoBuildManifest, name), base)
 
 
 #define POCO_END_MANIFEST \

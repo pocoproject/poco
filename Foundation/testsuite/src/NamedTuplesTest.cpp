@@ -1,7 +1,7 @@
 //
 // NamedTuplesTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NamedTuplesTest.cpp#4 $
+// $Id: //poco/Main/Foundation/testsuite/src/NamedTuplesTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

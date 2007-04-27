@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#6 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#7 $
 //
 // Library: Foundation
 // Package: Core

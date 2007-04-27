@@ -1,7 +1,7 @@
 //
 // Platform_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Platform_WIN32.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/Platform_WIN32.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -68,9 +68,6 @@
 // Unicode Support
 #if defined(UNICODE) && !defined(POCO_WIN32_UTF8)
 #define POCO_WIN32_UTF8
-#endif
-#if defined(POCO_WIN32_UTF8) && !defined(UNICODE)
-#define UNICODE
 #endif
 
 

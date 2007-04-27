@@ -1,7 +1,7 @@
 //
 // Foundation.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Foundation.h#7 $
+// $Id: //poco/Main/Foundation/include/Poco/Foundation.h#8 $
 //
 // Library: Foundation
 // Package: Core
@@ -102,8 +102,8 @@
 // is that macro expansion of macro arguments does not
 // occur in POCO_DO_JOIN2 but does in POCO_DO_JOIN.
 //
-#define POCO_JOIN(X, Y) POCO_DO_JOIN( X, Y )
-#define POCO_DO_JOIN(X, Y) POCO_DO_JOIN2(X,Y)
+#define POCO_JOIN(X, Y) POCO_DO_JOIN(X, Y)
+#define POCO_DO_JOIN(X, Y) POCO_DO_JOIN2(X, Y)
 #define POCO_DO_JOIN2(X, Y) X##Y
 
 

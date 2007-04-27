@@ -1,7 +1,7 @@
 //
 // ElementsByTagNameList.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/ElementsByTagNameList.h#2 $
+// $Id: //poco/Main/XML/include/Poco/DOM/ElementsByTagNameList.h#4 $
 //
 // Library: XML
 // Package: DOM

@@ -1,7 +1,7 @@
 //
 // Environment_WIN32U.cpp
 //
-// $Id: //poco/Main/Foundation/src/Environment_WIN32U.cpp#6 $
+// $Id: //poco/Main/Foundation/src/Environment_WIN32U.cpp#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -105,9 +105,9 @@ std::string EnvironmentImpl::osNameImpl()
 
 std::string EnvironmentImpl::osVersionImpl()
 {
-	OSVERSIONINFO vi;
+	OSVERSIONINFOW vi;
 	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionEx(&vi) == 0) throw SystemException("Cannot get OS version information");
+	if (GetVersionExW(&vi) == 0) throw SystemException("Cannot get OS version information");
 	std::ostringstream str;
 	str << vi.dwMajorVersion << "." << vi.dwMinorVersion << " (Build " << (vi.dwBuildNumber & 0xFFFF);
 	std::string version;

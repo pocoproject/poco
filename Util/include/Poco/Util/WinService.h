@@ -1,7 +1,7 @@
 //
 // WinService.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/WinService.h#2 $
+// $Id: //poco/Main/Util/include/Poco/Util/WinService.h#3 $
 //
 // Library: Util
 // Package: Windows
@@ -42,6 +42,13 @@
 
 #include "Poco/Util/Util.h"
 #include <windows.h>
+
+
+#if defined(POCO_WIN32_UTF8)
+#define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGW
+#else
+#define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGA
+#endif
 
 
 namespace Poco {
@@ -128,8 +135,8 @@ private:
 	void open() const;
 	bool tryOpen() const;
 	void close() const;
-	LPQUERY_SERVICE_CONFIG config() const;
-	
+	POCO_LPQUERY_SERVICE_CONFIG config() const;
+
 	WinService();
 	WinService(const WinService&);
 	WinService& operator = (const WinService&);

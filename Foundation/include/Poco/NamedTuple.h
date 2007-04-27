@@ -1,7 +1,7 @@
 //
 // NamedTuple.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NamedTuple.h#6 $
+// $Id: //poco/Main/Foundation/include/Poco/NamedTuple.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -9,7 +9,7 @@
 //
 // Definition of the NamedTuple class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization

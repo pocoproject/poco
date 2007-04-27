@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#11 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#12 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -79,74 +79,6 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 
 HTTPSClientSession::~HTTPSClientSession()
 {
-}
-
-
-std::ostream& HTTPSClientSession::sendRequest(HTTPRequest& request)
-{
-	deleteResponseStream();
-
-	bool keepAlive = getKeepAlive();
-	if (connected() && !keepAlive)
-		close();
-	if (!connected())
-		reconnect();
-	if (!keepAlive)
-		request.setKeepAlive(false);
-	request.setHost(getHost(), getPort());
-	
-	{
-		HTTPHeaderOutputStream hos(*this);
-		setReconnect(keepAlive);
-		request.write(hos);
-		setReconnect(false);
-		setExpectResponseBody(request.getMethod() != HTTPRequest::HTTP_HEAD);
-	}
-	if (request.getChunkedTransferEncoding())
-		setRequestStream(new HTTPChunkedOutputStream(*this));
-	else if (request.getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
-		setRequestStream(new HTTPFixedLengthOutputStream(*this, request.getContentLength()));
-	else if (request.getMethod() == HTTPRequest::HTTP_GET || request.getMethod() == HTTPRequest::HTTP_HEAD)
-		setRequestStream(new HTTPFixedLengthOutputStream(*this, 0));
-	else
-		setRequestStream(new HTTPOutputStream(*this));
-
-	return *getRequestStream();
-}
-
-
-std::istream& HTTPSClientSession::receiveResponse(HTTPResponse& response)
-{
-	deleteRequestStream();
-
-	do
-	{
-		response.clear();
-		HTTPHeaderInputStream his(*this);
-		try
-		{
-			response.read(his);
-		}
-		catch (MessageException&)
-		{
-			if (networkException())
-				networkException()->rethrow();
-			else
-				throw;
-		}
-	}
-	while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
-
-	if (!getExpectResponseBody())
-		setResponseStream(new HTTPFixedLengthInputStream(*this, 0));
-	else if (response.getChunkedTransferEncoding())
-		setResponseStream(new HTTPChunkedInputStream(*this));
-	else if (response.getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
-		setResponseStream(new HTTPFixedLengthInputStream(*this, response.getContentLength()));
-	else
-		setResponseStream(new HTTPInputStream(*this));
-		
-	return *getResponseStream();
 }
 
 

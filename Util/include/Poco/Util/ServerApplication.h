@@ -1,7 +1,7 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/ServerApplication.h#4 $
+// $Id: //poco/Main/Util/include/Poco/Util/ServerApplication.h#5 $
 //
 // Library: Util
 // Package: Application
@@ -170,7 +170,11 @@ private:
 	};
 	static BOOL __stdcall ConsoleCtrlHandler(DWORD ctrlType);
 	static void __stdcall ServiceControlHandler(DWORD control);
+#if defined(POCO_WIN32_UTF8)
+	static void __stdcall ServiceMain(DWORD argc, LPWSTR* argv);
+#else
 	static void __stdcall ServiceMain(DWORD argc, LPTSTR* argv);
+#endif
 
 	bool hasConsole();
 	bool isService();

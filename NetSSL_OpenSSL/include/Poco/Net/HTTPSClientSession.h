@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#6 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -92,28 +92,7 @@ public:
 	~HTTPSClientSession();
 		/// Destroys the HTTPSClientSession and closes
 		/// the underlying socket.
-		
-	std::ostream& sendRequest(HTTPRequest& request);
-		/// Sends the header for the given HTTPS request to
-		/// the server.
-		///
-		/// The HTTPSClientSession will set the request's
-		/// Host and Keep-Alive headers accordingly.
-		///
-		/// The returned output stream can be used to write
-		/// the request body. The stream is valid until
-		/// receiveResponse() is called or the session
-		/// is destroyed.
-		
-	std::istream& receiveResponse(HTTPResponse& response);
-		/// Receives the header for the response to the previous 
-		/// HTTPS request.
-		///
-		/// The returned input stream can be used to read
-		/// the response body. The stream is valid until
-		/// sendRequest() is called or the session is
-		/// destroyed.
-	
+
 protected:
 	void connect(const SocketAddress& address);
 		// Connects the socket to the server.

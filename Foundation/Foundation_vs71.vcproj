@@ -636,6 +636,9 @@
 					RelativePath=".\include\Poco\MetaProgramming.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\NamedTuple.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\NestedDiagnosticContext.h">
 				</File>
 				<File

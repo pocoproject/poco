@@ -1,7 +1,7 @@
 //
 // ClassLoader.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ClassLoader.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/ClassLoader.h#3 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -62,6 +62,15 @@ class ClassLoader
 	/// The Manifest for a shared library can be easily built
 	/// with the help of the macros in the header file
 	/// "Foundation/ClassLibrary.h".
+	///
+	/// Starting with POCO release 1.3, a class library can
+	/// export multiple manifests. In addition to the default
+	/// (unnamed) manifest, multiple named manifests can
+	/// be exported, each having a different base class.
+	///
+	/// There is one important restriction: one instance of
+	/// ClassLoader can only load one manifest from a class
+	/// library.
 {
 public:
 	typedef AbstractMetaObject<Base> Meta;
@@ -152,9 +161,9 @@ public:
 		}
 	}
 
-	void loadLibrary(const std::string& path)
-		/// Loads a library from the given path. Does nothing
-		/// if the library is already loaded.
+	void loadLibrary(const std::string& path, const std::string& manifest)
+		/// Loads a library from the given path, using the given manifest. 
+		/// Does nothing if the library is already loaded.
 		/// Throws a LibraryLoadException if the library
 		/// cannot be loaded or does not have a Manifest.
 		/// If the library exports a function named "pocoInitializeLibrary",
@@ -174,20 +183,22 @@ public:
 			li.refCount  = 1;
 			try
 			{
+				std::string pocoBuildManifestSymbol("pocoBuildManifest");
+				pocoBuildManifestSymbol.append(manifest);
 				if (li.pLibrary->hasSymbol("pocoInitializeLibrary"))
 				{
 					InitializeLibraryFunc initializeLibrary = (InitializeLibraryFunc) li.pLibrary->getSymbol("pocoInitializeLibrary");
 					initializeLibrary();
 				}
-				if (li.pLibrary->hasSymbol("pocoBuildManifest"))
+				if (li.pLibrary->hasSymbol(pocoBuildManifestSymbol))
 				{
-					BuildManifestFunc buildManifest = (BuildManifestFunc) li.pLibrary->getSymbol("pocoBuildManifest");
+					BuildManifestFunc buildManifest = (BuildManifestFunc) li.pLibrary->getSymbol(pocoBuildManifestSymbol);
 					if (buildManifest(const_cast<Manif*>(li.pManifest)))
 						_map[path] = li;
 					else
-						throw LibraryLoadException(std::string("Manifest class mismatch in ") + path);
+						throw LibraryLoadException(std::string("Manifest class mismatch in ") + path, manifest);
 				}
-				else throw LibraryLoadException(std::string("No manifest in ") + path);
+				else throw LibraryLoadException(std::string("No manifest in ") + path, manifest);
 			}
 			catch (...)
 			{
@@ -202,6 +213,22 @@ public:
 		}
 	}
 
+	void loadLibrary(const std::string& path)
+		/// Loads a library from the given path. Does nothing
+		/// if the library is already loaded.
+		/// Throws a LibraryLoadException if the library
+		/// cannot be loaded or does not have a Manifest.
+		/// If the library exports a function named "pocoInitializeLibrary",
+		/// this function is executed.
+		/// If called multiple times for the same library,
+		/// the number of calls to unloadLibrary() must be the same
+		/// for the library to become unloaded.
+		///
+		/// Equivalent to loadLibrary(path, "").
+	{
+		loadLibrary(path, "");
+	}
+		
 	void unloadLibrary(const std::string& path)
 		/// Unloads the given library. 
 		/// Be extremely cautious when unloading shared libraries.
