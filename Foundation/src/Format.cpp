@@ -356,8 +356,8 @@ void format(std::string& result, const std::string& fmt, const std::vector<Any>&
 			++itFmt;
 			if (itFmt != endFmt && itVal != endVal)
 				formatOne(result, itFmt, endFmt, itVal);
-			else 
-				result += *itFmt;
+			else if (itFmt != endFmt)
+				result += *itFmt++;
 			break;
 		default:
 			result += *itFmt;

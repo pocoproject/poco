@@ -318,6 +318,12 @@ void FormatTest::testString()
 
 	s = format("%-5s", foo);
 	assert (s == "foo  ");
+
+	s = format("%s%%a", foo);
+	assert (s == "foo%a");
+
+	s = format("'%s%%''%s%%'", foo, foo);
+	assert (s == "'foo%''foo%'");
 }
 
 
