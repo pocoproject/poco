@@ -1,7 +1,7 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/FileStream_WIN32.cpp#7 $
+// $Id: //poco/Main/Foundation/src/FileStream_WIN32.cpp#8 $
 //
 // Library: Foundation
 // Package: Streams
@@ -112,7 +112,7 @@ int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		sync();
 	
 	DWORD bytesRead(0);
-	BOOL rc = ReadFile(_handle, buffer, length, &bytesRead, NULL);
+	BOOL rc = ReadFile(_handle, buffer, static_cast<DWORD>(length), &bytesRead, NULL);
 	if (rc == 0)
 		File::handleLastError(_path);
 
@@ -138,7 +138,7 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	}
 
 	DWORD bytesWritten(0);
-	BOOL rc = WriteFile(_handle, buffer, length, &bytesWritten, NULL);
+	BOOL rc = WriteFile(_handle, buffer, static_cast<DWORD>(length), &bytesWritten, NULL);
 	if (rc == 0)
 		File::handleLastError(_path);
 		

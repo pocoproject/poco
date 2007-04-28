@@ -1,7 +1,7 @@
 //
 // StreamCopier.cpp
 //
-// $Id: //poco/Main/Foundation/src/StreamCopier.cpp#11 $
+// $Id: //poco/Main/Foundation/src/StreamCopier.cpp#12 $
 //
 // Library: Foundation
 // Package: Streams
@@ -75,7 +75,7 @@ std::streamsize StreamCopier::copyToString(std::istream& istr, std::string& str,
 	while (n > 0)
 	{
 		len += n;
-		str.append(buffer.begin(), n);
+		str.append(buffer.begin(), static_cast<std::string::size_type>(n));
 		if (istr)
 		{
 			istr.read(buffer.begin(), bufferSize);

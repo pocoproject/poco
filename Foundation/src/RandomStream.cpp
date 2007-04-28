@@ -1,7 +1,7 @@
 //
 // RandomStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/RandomStream.cpp#11 $
+// $Id: //poco/Main/Foundation/src/RandomStream.cpp#12 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -67,9 +67,9 @@ int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	HCRYPTPROV hProvider = 0;
 	CryptAcquireContext(&hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
-	CryptGenRandom(hProvider, length, (BYTE*) buffer);
+	CryptGenRandom(hProvider, (DWORD) length, (BYTE*) buffer);
 	CryptReleaseContext(hProvider, 0);
-	n = length;
+	n = static_cast<int>(length);
 #else
 	#if defined(POCO_OS_FAMILY_UNIX)
 	int fd = open("/dev/urandom", O_RDONLY, 0);

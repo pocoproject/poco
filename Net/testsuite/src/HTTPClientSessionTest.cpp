@@ -1,7 +1,7 @@
 //
 // HTTPClientSessionTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/HTTPClientSessionTest.cpp#6 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPClientSessionTest.cpp#7 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -245,7 +245,7 @@ void HTTPClientSessionTest::testKeepAlive()
 	assert (response.getChunkedTransferEncoding());
 	assert (response.getKeepAlive());
 	std::ostringstream ostr3;
-	int n = StreamCopier::copyStream(rs3, ostr3);
+	std::streamsize n = StreamCopier::copyStream(rs3, ostr3);
 	assert (ostr3.str() == HTTPTestServer::LARGE_BODY);
 
 	request.setMethod(HTTPRequest::HTTP_HEAD);

@@ -1,7 +1,7 @@
 //
 // BufferAllocator.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BufferAllocator.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/BufferAllocator.h#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -42,6 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include <ios>
+#include <cstddef>
 
 
 namespace Poco {
@@ -57,7 +58,7 @@ public:
 
 	static char_type* allocate(std::streamsize size)
 	{
-		return new char_type[size];
+		return new char_type[static_cast<std::size_t>(size)];
 	}
 	
 	static void deallocate(char_type* ptr, std::streamsize size)

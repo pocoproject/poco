@@ -1,7 +1,7 @@
 //
 // HTTPServerTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/HTTPServerTest.cpp#13 $
+// $Id: //poco/Main/Net/testsuite/src/HTTPServerTest.cpp#14 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -78,7 +78,7 @@ namespace
 			
 			std::istream& istr = request.stream();
 			std::ostream& ostr = response.send();
-			int n = StreamCopier::copyStream(istr, ostr);
+			std::streamsize n = StreamCopier::copyStream(istr, ostr);
 		}
 	};
 	

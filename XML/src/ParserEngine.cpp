@@ -1,7 +1,7 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/Main/XML/src/ParserEngine.cpp#13 $
+// $Id: //poco/Main/XML/src/ParserEngine.cpp#14 $
 //
 // Library: XML
 // Package: XML
@@ -252,7 +252,7 @@ void ParserEngine::parse(InputSource* pInputSource)
 void ParserEngine::parseByteInputStream(XMLByteInputStream& istr)
 {
 	istr.read(_pBuffer, PARSE_BUFFER_SIZE);
-	int n = istr.gcount();
+	int n = static_cast<int>(istr.gcount());
 	while (n > 0)
 	{
 		if (!XML_Parse(_parser, _pBuffer, n, 0))
@@ -260,7 +260,7 @@ void ParserEngine::parseByteInputStream(XMLByteInputStream& istr)
 		if (istr.good())
 		{
 			istr.read(_pBuffer, PARSE_BUFFER_SIZE);
-			n = istr.gcount();
+			n = static_cast<int>(istr.gcount());
 		}
 		else n = 0;
 	}
@@ -272,7 +272,7 @@ void ParserEngine::parseByteInputStream(XMLByteInputStream& istr)
 void ParserEngine::parseCharInputStream(XMLCharInputStream& istr)
 {
 	istr.read(reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
-	int n = istr.gcount();
+	int n = static_cast<int>(istr.gcount());
 	while (n > 0)
 	{
 		if (!XML_Parse(_parser, _pBuffer, n*sizeof(XMLChar), 0))
@@ -280,7 +280,7 @@ void ParserEngine::parseCharInputStream(XMLCharInputStream& istr)
 		if (istr.good())
 		{
 			istr.read(reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
-			n = istr.gcount();
+			n = static_cast<int>(istr.gcount());
 		}
 		else n = 0;
 	}
@@ -307,7 +307,7 @@ void ParserEngine::parseExternalByteInputStream(XML_Parser extParser, XMLByteInp
 	try
 	{
 		istr.read(pBuffer, PARSE_BUFFER_SIZE);
-		int n = istr.gcount();
+		int n = static_cast<int>(istr.gcount());
 		while (n > 0)
 		{
 			if (!XML_Parse(extParser, pBuffer, n, 0))
@@ -315,7 +315,7 @@ void ParserEngine::parseExternalByteInputStream(XML_Parser extParser, XMLByteInp
 			if (istr.good())
 			{
 				istr.read(pBuffer, PARSE_BUFFER_SIZE);
-				n = istr.gcount();
+				n = static_cast<int>(istr.gcount());
 			} 
 			else n = 0;
 		}
@@ -337,7 +337,7 @@ void ParserEngine::parseExternalCharInputStream(XML_Parser extParser, XMLCharInp
 	try
 	{
 		istr.read(pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
-		int n = istr.gcount();
+		int n = static_cast<int>(istr.gcount());
 		while (n > 0)
 		{
 			if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), n*sizeof(XMLChar), 0))
@@ -345,7 +345,7 @@ void ParserEngine::parseExternalCharInputStream(XML_Parser extParser, XMLCharInp
 			if (istr.good())
 			{
 				istr.read(pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
-				n = istr.gcount();
+				n = static_cast<int>(istr.gcount());
 			} 
 			else n = 0;
 		}

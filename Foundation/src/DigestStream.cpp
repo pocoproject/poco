@@ -1,7 +1,7 @@
 //
 // DigestStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/DigestStream.cpp#12 $
+// $Id: //poco/Main/Foundation/src/DigestStream.cpp#13 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -81,8 +81,8 @@ int DigestBuf::readFromDevice(char* buffer, std::streamsize length)
 	{
 		_pIstr->read(buffer, length);
 		std::streamsize n = _pIstr->gcount();
-		if (n > 0) _eng.update(buffer, n);
-		return n;
+		if (n > 0) _eng.update(buffer, static_cast<unsigned>(n));
+		return static_cast<int>(n);
 	}
 	return -1;
 }
@@ -92,7 +92,7 @@ int DigestBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	_eng.update(buffer, (unsigned) length);
 	if (_pOstr) _pOstr->write(buffer, length);
-	return length;
+	return static_cast<int>(length);
 }
 
 

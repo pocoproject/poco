@@ -1,7 +1,7 @@
 //
 // DeflatingStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/DeflatingStream.cpp#13 $
+// $Id: //poco/Main/Foundation/src/DeflatingStream.cpp#14 $
 //
 // Library: Foundation
 // Package: Streams
@@ -142,7 +142,7 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (_pIstr->good())
 		{
 			_pIstr->read(_buffer, DEFLATE_BUFFER_SIZE);
-			n = _pIstr->gcount();
+			n = static_cast<int>(_pIstr->gcount());
 		}
 		if (n > 0)
 		{
@@ -157,7 +157,7 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		}
 	}
 	_zstr.next_out  = (unsigned char*) buffer;
-	_zstr.avail_out = length;
+	_zstr.avail_out = static_cast<unsigned>(length);
 	for (;;)
 	{
 		int rc = deflate(&_zstr, _eof ? Z_FINISH : Z_NO_FLUSH);
@@ -166,12 +166,12 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			rc = deflateEnd(&_zstr);
 			if (rc != Z_OK) throw IOException(zError(rc));
 			_pIstr = 0;
-			return length - _zstr.avail_out;
+			return static_cast<int>(length) - _zstr.avail_out;
 		}
 		if (rc != Z_OK) throw IOException(zError(rc)); 
 		if (_zstr.avail_out == 0)
 		{
-			return length;
+			return static_cast<int>(length);
 		}
 		if (_zstr.avail_in == 0)
 		{
@@ -179,7 +179,7 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			if (_pIstr->good())
 			{
 				_pIstr->read(_buffer, DEFLATE_BUFFER_SIZE);
-				n = _pIstr->gcount();
+				n = static_cast<int>(_pIstr->gcount());
 			}
 			if (n > 0)
 			{
@@ -202,7 +202,7 @@ int DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 	if (length == 0 || !_pOstr) return 0;
 
 	_zstr.next_in   = (unsigned char*) buffer;
-	_zstr.avail_in  = length;
+	_zstr.avail_in  = static_cast<unsigned>(length);
 	_zstr.next_out  = (unsigned char*) _buffer;
 	_zstr.avail_out = DEFLATE_BUFFER_SIZE;
 	for (;;)
@@ -225,7 +225,7 @@ int DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 			break;
 		}
 	}
-	return length;
+	return static_cast<int>(length);
 }
 
 

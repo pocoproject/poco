@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/InflatingStream.cpp#15 $
+// $Id: //poco/Main/Foundation/src/InflatingStream.cpp#16 $
 //
 // Library: Foundation
 // Package: Streams
@@ -122,14 +122,14 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (_pIstr->good())
 		{
 			_pIstr->read(_buffer, INFLATE_BUFFER_SIZE);
-			n = _pIstr->gcount();
+			n = static_cast<int>(_pIstr->gcount());
 		}
 		if (n == 0) return 0;
 		_zstr.next_in   = (unsigned char*) _buffer;
 		_zstr.avail_in  = n;
 	}
 	_zstr.next_out  = (unsigned char*) buffer;
-	_zstr.avail_out = length;
+	_zstr.avail_out = static_cast<unsigned>(length);
 	for (;;)
 	{
 		int rc = inflate(&_zstr, Z_NO_FLUSH);
@@ -146,18 +146,18 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (rc == Z_STREAM_END)
 		{
 			_eof = true;
-			return length - _zstr.avail_out;
+			return static_cast<int>(length) - _zstr.avail_out;
 		}
 		if (rc != Z_OK) throw IOException(zError(rc));
 		if (_zstr.avail_out == 0)
-			return length;
+			return static_cast<int>(length);
 		if (_zstr.avail_in == 0)
 		{
 			int n = 0;
 			if (_pIstr->good())
 			{
 				_pIstr->read(_buffer, INFLATE_BUFFER_SIZE);
-				n = _pIstr->gcount();
+				n = static_cast<int>(_pIstr->gcount());
 			}
 			if (n > 0)
 			{
@@ -174,7 +174,7 @@ int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 	if (length == 0 || !_pOstr) return 0;
 	
 	_zstr.next_in   = (unsigned char*) buffer;
-	_zstr.avail_in  = length;
+	_zstr.avail_in  = static_cast<unsigned>(length);
 	_zstr.next_out  = (unsigned char*) _buffer;
 	_zstr.avail_out = INFLATE_BUFFER_SIZE;
 	for (;;)
@@ -203,7 +203,7 @@ int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 			break;
 		}
 	}
-	return length;
+	return static_cast<int>(length);
 }
 
 
