@@ -1,13 +1,13 @@
 //
 // TCPServerParams.cpp
 //
-// $Id: //poco/Main/Net/src/TCPServerParams.cpp#6 $
+// $Id: //poco/Main/Net/src/TCPServerParams.cpp#7 $
 //
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerParams
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -44,7 +44,8 @@ namespace Net {
 TCPServerParams::TCPServerParams():
 	_threadIdleTime(10000000),
 	_maxThreads(0),
-	_maxQueued(64)
+	_maxQueued(64),
+	_threadPriority(Poco::Thread::PRIO_NORMAL)
 {
 }
 
@@ -73,6 +74,12 @@ void TCPServerParams::setMaxQueued(int count)
 	poco_assert (count > 0);
 
 	_maxQueued = count;
+}
+
+
+void TCPServerParams::setThreadPriority(Poco::Thread::Priority prio)
+{
+	_threadPriority = prio;
 }
 
 

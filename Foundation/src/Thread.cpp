@@ -1,7 +1,7 @@
 //
 // Thread.cpp
 //
-// $Id: //poco/Main/Foundation/src/Thread.cpp#13 $
+// $Id: //poco/Main/Foundation/src/Thread.cpp#14 $
 //
 // Library: Foundation
 // Package: Threading
@@ -149,6 +149,8 @@ int Thread::uniqueId()
 
 void Thread::setName(const std::string& name)
 {
+	FastMutex::ScopedLock lock(_mutex);
+
 	_name = name;
 }
 

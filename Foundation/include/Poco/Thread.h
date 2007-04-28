@@ -1,7 +1,7 @@
 //
 // Thread.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Thread.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Mutex.h"
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -64,6 +65,7 @@ class Foundation_API Thread: private ThreadImpl
 	/// Every Thread object gets a unique (within
 	/// its process) numeric thread ID.
 	/// Furthermore, a thread can be assigned a name.
+	/// The name of a thread can be changed at any time.
 {
 public:	
 	enum Priority
@@ -88,8 +90,14 @@ public:
 	int id() const;
 		/// Returns the unique thread ID of the thread.
 
-	const std::string& name() const;
+	std::string name() const;
 		/// Returns the name of the thread.
+
+	std::string getName() const;
+		/// Returns teh name of the thread.
+
+	void setName(const std::string& name);
+		/// Sets the name of the thread.
 
 	void setPriority(Priority prio);
 		/// Sets the thread's priority.
@@ -145,9 +153,6 @@ protected:
 	static int uniqueId();
 		/// Creates and returns a unique id for a thread.
 		
-	void setName(const std::string& name);
-		/// Sets the name of the thread.
-
 private:
 	Thread(const Thread&);
 	Thread& operator = (const Thread&);
@@ -155,6 +160,7 @@ private:
 	int                 _id;
 	std::string         _name;
 	ThreadLocalStorage* _pTLS;
+	mutable FastMutex   _mutex;
 
 	friend class ThreadLocalStorage;
 	friend class PooledThread;
@@ -170,8 +176,18 @@ inline int Thread::id() const
 }
 
 
-inline const std::string& Thread::name() const
+inline std::string Thread::name() const
 {
+	FastMutex::ScopedLock lock(_mutex);
+	
+	return _name;
+}
+
+
+inline std::string Thread::getName() const
+{
+	FastMutex::ScopedLock lock(_mutex);
+	
 	return _name;
 }
 

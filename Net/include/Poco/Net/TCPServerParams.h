@@ -1,7 +1,7 @@
 //
 // TCPServerParams.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/TCPServerParams.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/TCPServerParams.h#3 $
 //
 // Library: Net
 // Package: TCPServer
@@ -9,7 +9,7 @@
 //
 // Definition of the TCPServerParams class.
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -43,6 +43,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Timespan.h"
+#include "Poco/Thread.h"
 
 
 namespace Poco {
@@ -101,6 +102,14 @@ public:
 	int getMaxThreads() const;
 		/// Returns the maximum number of simultaneous threads
 		/// available for this TCPServerDispatcher.	
+		
+	void setThreadPriority(Poco::Thread::Priority prio);
+		/// Sets the priority of TCP server threads 
+		/// created by TCPServer.
+		
+	Poco::Thread::Priority getThreadPriority() const;
+		/// Returns the priority of TCP server threads
+		/// created by TCPServer. 
 
 protected:
 	virtual ~TCPServerParams();
@@ -110,6 +119,7 @@ private:
 	Poco::Timespan _threadIdleTime;
 	int _maxThreads;
 	int _maxQueued;
+	Poco::Thread::Priority _threadPriority;
 };
 
 
@@ -131,6 +141,12 @@ inline int TCPServerParams::getMaxThreads() const
 inline int TCPServerParams::getMaxQueued() const
 {
 	return _maxQueued;
+}
+
+
+inline Poco::Thread::Priority TCPServerParams::getThreadPriority() const
+{
+	return _threadPriority;
 }
 
 

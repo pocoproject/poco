@@ -53,7 +53,7 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
 			/>
@@ -146,7 +146,7 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
 			/>
@@ -241,7 +241,7 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
 			/>
@@ -312,7 +312,7 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
 			/>
@@ -2146,33 +2146,33 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="RegExp"
+			Name="RegularExpression"
 			>
 			<Filter
-				Name="PCRE"
+				Name="PCRE Header Files"
 				>
-				<File
-					RelativePath=".\src\get.c"
-					>
-				</File>
-				<File
-					RelativePath=".\src\maketables.c"
-					>
-				</File>
-				<File
-					RelativePath=".\src\pcre.c"
-					>
-				</File>
 				<File
 					RelativePath=".\src\pcre.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\pcreconfig.h"
+					RelativePath=".\src\pcre_config.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\study.c"
+					RelativePath=".\src\pcre_internal.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ucp.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ucpinternal.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ucptable.h"
 					>
 				</File>
 			</Filter>
@@ -2189,6 +2189,66 @@
 				>
 				<File
 					RelativePath=".\include\Poco\RegularExpression.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="PCRE Source Files"
+				>
+				<File
+					RelativePath=".\src\pcre_chartables.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_compile.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_exec.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_fullinfo.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_globals.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_maketables.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_newline.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_ord2utf8.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_study.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_tables.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_try_flipped.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_ucp_searchfuncs.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_valid_utf8.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\pcre_xclass.c"
 					>
 				</File>
 			</Filter>

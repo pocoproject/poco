@@ -1,7 +1,7 @@
 //
 // AsyncChannel.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AsyncChannel.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/AsyncChannel.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -9,7 +9,7 @@
 //
 // Definition of the AsyncChannel class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -62,7 +62,7 @@ class Foundation_API AsyncChannel: public Channel, public Runnable
 	/// then processed by a separate thread.
 {
 public:
-	AsyncChannel(Channel* pChannel = 0);
+	AsyncChannel(Channel* pChannel = 0, Thread::Priority prio = Thread::PRIO_NORMAL);
 		/// Creates the AsyncChannel and connects it to
 		/// the given channel.
 
@@ -88,13 +88,24 @@ public:
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets or changes a configuration property.
 		///
-		/// Only the "channel" property is supported, which allows
-		/// setting the target channel via the LoggingRegistry.
+		/// The "channel" property allows setting the target 
+		/// channel via the LoggingRegistry.
 		/// The "channel" property is set-only.
-	
+		///
+		/// The "priority" property allows setting the thread
+		/// priority. The following values are supported:
+		///    * lowest
+		///    * low
+		///    * normal (default)
+		///    * high
+		///    * highest
+		///
+		/// The "priority" property is set-only.
+
 protected:
 	~AsyncChannel();
 	void run();
+	void setPriority(const std::string& value);
 		
 private:
 	Channel*  _pChannel;

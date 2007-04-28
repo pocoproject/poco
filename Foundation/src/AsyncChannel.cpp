@@ -1,13 +1,13 @@
 //
 // AsyncChannel.cpp
 //
-// $Id: //poco/Main/Foundation/src/AsyncChannel.cpp#12 $
+// $Id: //poco/Main/Foundation/src/AsyncChannel.cpp#13 $
 //
 // Library: Foundation
 // Package: Logging
 // Module:  AsyncChannel
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -40,6 +40,7 @@
 #include "Poco/Formatter.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/LoggingRegistry.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -67,9 +68,12 @@ private:
 };
 
 
-AsyncChannel::AsyncChannel(Channel* pChannel): _pChannel(pChannel), _thread("AsyncChannel")
+AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio): 
+	_pChannel(pChannel), 
+	_thread("AsyncChannel")
 {
 	if (_pChannel) _pChannel->duplicate();
+	_thread.setPriority(prio);
 }
 
 
@@ -128,6 +132,8 @@ void AsyncChannel::setProperty(const std::string& name, const std::string& value
 {
 	if (name == "channel")
 		setChannel(LoggingRegistry::defaultRegistry().channelForName(value));
+	else if (name == "priority")
+		setPriority(value);
 	else
 		Channel::setProperty(name, value);
 }
@@ -148,5 +154,26 @@ void AsyncChannel::run()
 	}
 }
 		
+		
+void AsyncChannel::setPriority(const std::string& value)
+{
+	Thread::Priority prio = Thread::PRIO_NORMAL;
+	
+	if (value == "lowest")
+		prio = Thread::PRIO_LOWEST;
+	else if (value == "low")
+		prio = Thread::PRIO_LOW;
+	else if (value == "normal")
+		prio = Thread::PRIO_NORMAL;
+	else if (value == "high")
+		prio = Thread::PRIO_HIGH;
+	else if (value == "highest")
+		prio = Thread::PRIO_HIGHEST;
+	else
+		throw InvalidArgumentException("thread priority", value);
+		
+	_thread.setPriority(prio);
+}
+
 
 } // namespace Poco

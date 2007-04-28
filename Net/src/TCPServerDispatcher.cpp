@@ -1,13 +1,13 @@
 //
 // TCPServerDispatcher.cpp
 //
-// $Id: //poco/Main/Net/src/TCPServerDispatcher.cpp#8 $
+// $Id: //poco/Main/Net/src/TCPServerDispatcher.cpp#9 $
 //
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerDispatcher
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -163,7 +163,7 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 			try
 			{
 				static const std::string threadName("TCPServerConnection");
-				_threadPool.start(*this, threadName);
+				_threadPool.startWithPriority(_pParams->getThreadPriority(), *this, threadName);
 				++_currentThreads;
 			}
 			catch (Poco::Exception&)
