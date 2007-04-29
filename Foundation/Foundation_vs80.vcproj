@@ -2563,6 +2563,10 @@
 						/>
 					</FileConfiguration>
 				</File>
+				<File
+					RelativePath=".\src\WindowsConsoleChannel.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -2681,6 +2685,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\SyslogChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\WindowsConsoleChannel.h"
 					>
 				</File>
 			</Filter>

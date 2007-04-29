@@ -1,7 +1,7 @@
 //
 // FormatTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FormatTest.cpp#6 $
+// $Id: //poco/Main/Foundation/testsuite/src/FormatTest.cpp#7 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.

@@ -1,7 +1,7 @@
 //
 // AutoPtr.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AutoPtr.h#6 $
+// $Id: //poco/Main/Foundation/include/Poco/AutoPtr.h#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -187,6 +187,18 @@ public:
 		///    poco_assert (sub.get());
 	{
 		Other* pOther = dynamic_cast<Other*>(_ptr);
+		return AutoPtr<Other>(pOther, true);
+	}
+
+	template <class Other> 
+	AutoPtr<Other> unsafeCast() const
+		/// Casts the AutoPtr via a static cast to the given type.
+		/// Example: (assume class Sub: public Super)
+		///    AutoPtr<Super> super(new Sub());
+		///    AutoPtr<Sub> sub = super.unsafeCast<Sub>();
+		///    poco_assert (sub.get());
+	{
+		Other* pOther = static_cast<Other*>(_ptr);
 		return AutoPtr<Other>(pOther, true);
 	}
 

@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/Main/Foundation/src/Format.cpp#7 $
+// $Id: //poco/Main/Foundation/src/Format.cpp#8 $
 //
 // Library: Foundation
 // Package: Core

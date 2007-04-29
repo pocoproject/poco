@@ -1,7 +1,7 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/Main/Foundation/src/LoggingFactory.cpp#7 $
+// $Id: //poco/Main/Foundation/src/LoggingFactory.cpp#8 $
 //
 // Library: Foundation
 // Package: Logging
@@ -50,6 +50,7 @@
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/EventLogChannel.h"
+#include "Poco/WindowsConsoleChannel.h"
 #endif
 #include "Poco/PatternFormatter.h"
 
@@ -102,7 +103,11 @@ LoggingFactory& LoggingFactory::defaultFactory()
 void LoggingFactory::registerBuiltins()
 {
 	_channelFactory.registerClass("AsyncChannel", new Instantiator<AsyncChannel, Channel>);
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_channelFactory.registerClass("ConsoleChannel", new Instantiator<WindowsConsoleChannel, Channel>);
+#else
 	_channelFactory.registerClass("ConsoleChannel", new Instantiator<ConsoleChannel, Channel>);
+#endif
 	_channelFactory.registerClass("FileChannel", new Instantiator<FileChannel, Channel>);
 	_channelFactory.registerClass("FormattingChannel", new Instantiator<FormattingChannel, Channel>);
 	_channelFactory.registerClass("SplitterChannel", new Instantiator<SplitterChannel, Channel>);

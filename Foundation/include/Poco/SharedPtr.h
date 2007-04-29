@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedPtr.h#10 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedPtr.h#11 $
 //
 // Library: Foundation
 // Package: Core
@@ -196,6 +196,18 @@ public:
 		if (pOther)
 			return SharedPtr<Other>(_pCounter, pOther);
 		return SharedPtr<Other>();
+	}
+
+	template <class Other> 
+	SharedPtr<Other> unsafeCast() const
+		/// Casts the SharedPtr via a static cast to the given type.
+		/// Example: (assume class Sub: public Super)
+		///    SharedPtr<Super> super(new Sub());
+		///    SharedPtr<Sub> sub = super.unsafeCast<Sub>();
+		///    poco_assert (sub.get());
+	{
+		Other* pOther = static_cast<Other*>(_ptr);
+		return SharedPtr<Other>(_pCounter, pOther);
 	}
 
 	C* operator -> ()

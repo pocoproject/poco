@@ -1,7 +1,7 @@
 //
 // ClassLibrary.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#5 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -53,7 +53,7 @@
 
 
 //
-// the entry point for every class library
+// the entry points for every class library
 //
 extern "C"
 {
@@ -100,7 +100,8 @@ extern "C"	\
 	POCO_BEGIN_MANIFEST_IMPL(pocoBuildManifest, base)
 
 
-#define POCO_BEGIN_NAMED_MANIFEST(name, base) \
+#define POCO_BEGIN_NAMED_MANIFEST(name, base)	\
+	POCO_DECLARE_NAMED_MANIFEST(name)			\
 	POCO_BEGIN_MANIFEST_IMPL(POCO_JOIN(pocoBuildManifest, name), base)
 
 

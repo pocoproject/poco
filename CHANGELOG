@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3-20070418 (2007-04-18)
+Release 1.3-20070429 (2007-04-29)
 =================================
 
 - added HashMap, HashSet classes
@@ -27,6 +27,17 @@ Release 1.3-20070418 (2007-04-18)
 - Void now has a == and != operator
 - Base64Encoder and HexBinaryEncoder now support an unlimited line length
   (no newlines written), by specifying a line length of 0
+- NumberParser now has stricter syntax requirements: garbage following a number leads to a SyntaxException
+  (Thanks to phireis@gmail.com for the suggestion)
+- fixed SF# 1676830: Don't use -rpath in libraries
+- fixed SF# 1670279: AbstractConfiguration::unckeckedExpand crash
+- fixed a warning in Hashtable
+- HTTPClientSession now uses a keepAliveTimeout for better persistent connection handling
+- added DateTime::makeUTC() and DateTime::makeLocal()
+- added another constructor to LocalDateTime
+- POCO_WIN32_UTF8 is ignored on non-Windows platforms
+- fixed a timeout bug (with NetSSL) in HTTPSession
+- AsyncChannel is automatically opened with first log()\
 - minor fix to NotificationQueue sample (reported by Laszlo Keresztfalvi)
 - added File::canExecute() and File::setExecutable()
 - added SharedMemory class to Foundation
@@ -40,22 +51,25 @@ Release 1.3-20070418 (2007-04-18)
 - replaced std::fstream with Poco::FileStream across POCO.
 - added Poco::Checksum class to Foundation.
 - fixed SF# 1700811: conflict in threadpool
-
-
-Release 1.2.9b (2007-03-25)
-===========================
-
-- NumberParser now has stricter syntax requirements: garbage following a number leads to a SyntaxException
-  (Thanks to phireis@gmail.com for the suggestion)
-- fixed SF# 1676830: Don't use -rpath in libraries
-- fixed SF# 1670279: AbstractConfiguration::unckeckedExpand crash
-- fixed a warning in Hashtable
-- HTTPClientSession now uses a keepAliveTimeout for better persistent connection handling
-- added DateTime::makeUTC() and DateTime::makeLocal()
-- added another constructor to LocalDateTime
-- POCO_WIN32_UTF8 is ignored on non-Windows platforms
-- fixed a timeout bug (with NetSSL) in HTTPSession
-- AsyncChannel is automatically opened with first log()\
+- bugfix: File::moveTo() does not work if the target is a directory
+- File::copyTo() and File::moveTo() now copy/move directories recursively
+- refactored NetworkInterface (now using pimpl idiom);
+  added broadcast address and netmask support
+- fixed SF# 1688982: POP3ClientSession fails when retrieving mails with attachment
+- fixed SF# 1655104: Enhance Poco::TextEncoding functionality
+- added Poco::Condition class, implementing a POSIX-style condition variable
+- fixed a bug in File::create() for Windows
+- added poco_static_assert (imported from boost)
+- added Thread::join(timeout) and Thread::tryJoin()
+- ClassLoader support for named manifests (see ClassLibrary.h - POCO_EXPORT_NAMED_MANIFEST)
+- POCO_WIN32_UTF8: UNICODE #define is no longer required (and no longer
+  automatically defined in POCO_WIN32_UTF8 is defined)
+- PCRE: upgraded to PCRE version 7.1
+- fixed SF# 1682162: Suggestion on thread priority
+- fixed SF# 1613460: MSVC/STLPort warnings
+- fixed SF# 1709358: Format double percent std::String bug
+- added WindowsConsoleChannel class to Foundation
+- added AutoPtr::unsafeCast<>() and SharedPtr::unsafeCast<>()
 
 
 Release 1.2.9 (2007-02-26)
@@ -702,4 +716,4 @@ building the libraries.
 
 
 --
-$Id: //poco/Main/dist/CHANGELOG#47 $
+$Id: //poco/Main/dist/CHANGELOG#51 $
