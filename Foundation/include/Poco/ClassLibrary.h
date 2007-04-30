@@ -1,7 +1,7 @@
 //
 // ClassLibrary.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#5 $
+// $Id: //poco/Main/Foundation/include/Poco/ClassLibrary.h#6 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -69,7 +69,7 @@ extern "C"
 #define POCO_DECLARE_NAMED_MANIFEST(name) \
 extern "C"	\
 {			\
-	void POCO_LIBRARY_API POCO_JOIN(pocoBuildManifest, name)(Poco::ManifestBase* pManifest); \
+	bool POCO_LIBRARY_API POCO_JOIN(pocoBuildManifest, name)(Poco::ManifestBase* pManifest); \
 }
 
 
