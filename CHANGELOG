@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3-20070429 (2007-04-29)
+Release 1.3-20070501 (2007-05-01)
 =================================
 
 - added HashMap, HashSet classes
@@ -70,6 +70,13 @@ Release 1.3-20070429 (2007-04-29)
 - fixed SF# 1709358: Format double percent std::String bug
 - added WindowsConsoleChannel class to Foundation
 - added AutoPtr::unsafeCast<>() and SharedPtr::unsafeCast<>()
+- fixed SF# 1708552: Failed to build on arm and powerpc
+- fixed SF$ 1708529: Failed to build using GCC 4.3: missing #includes
+- fixed SF# 1710053: LogStream proposal
+- fixed a bug involving empty root directories in Windows DirectoryIterator implementation
+  (see http://www.appinf.com/poco/wiki/tiki-view_forum_thread.php?comments_parentId=343&forumId=6)
+- robustness improvements to ActiveMethod - removed the opportunity for memory leaks in 
+  case something goes while invoking the method
 
 
 Release 1.2.9 (2007-02-26)
@@ -716,4 +723,4 @@ building the libraries.
 
 
 --
-$Id: //poco/Main/dist/CHANGELOG#51 $
+$Id: //poco/Main/dist/CHANGELOG#55 $
