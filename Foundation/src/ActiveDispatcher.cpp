@@ -1,13 +1,13 @@
 //
 // ActiveDispatcher.cpp
 //
-// $Id: //poco/Main/Foundation/src/ActiveDispatcher.cpp#4 $
+// $Id: //poco/Main/Foundation/src/ActiveDispatcher.cpp#5 $
 //
 // Library: Foundation
 // Package: Threading
 // Module:  ActiveObjects
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -47,18 +47,18 @@ namespace
 	class MethodNotification: public Notification
 	{
 	public:
-		MethodNotification(Runnable* pRunnable):
+		MethodNotification(ActiveRunnableBase::Ptr pRunnable):
 			_pRunnable(pRunnable)
 		{
 		}
 		
-		Runnable* runnable() const
+		ActiveRunnableBase::Ptr runnable() const
 		{
 			return _pRunnable;
 		}
 		
 	private:
-		Runnable* _pRunnable;
+		ActiveRunnableBase::Ptr _pRunnable;
 	};
 	
 	class StopNotification: public Notification
@@ -92,7 +92,7 @@ ActiveDispatcher::~ActiveDispatcher()
 }
 
 
-void ActiveDispatcher::start(Runnable* pRunnable)
+void ActiveDispatcher::start(ActiveRunnableBase::Ptr pRunnable)
 {
 	poco_check_ptr (pRunnable);
 
@@ -113,9 +113,9 @@ void ActiveDispatcher::run()
 	{
 		MethodNotification* pMethodNf = dynamic_cast<MethodNotification*>(pNf.get());
 		poco_check_ptr (pMethodNf);
-		Runnable* pRunnable = pMethodNf->runnable();
-		poco_check_ptr (pRunnable);
-		pRunnable->run();	
+		ActiveRunnableBase::Ptr pRunnable = pMethodNf->runnable();
+		pRunnable->duplicate(); // run will release
+		pRunnable->run();
 		pNf = _queue.waitDequeueNotification();
 	}
 }

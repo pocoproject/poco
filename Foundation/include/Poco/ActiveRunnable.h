@@ -1,7 +1,7 @@
 //
 // ActiveRunnable.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ActiveRunnable.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/ActiveRunnable.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the ActiveRunnable class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -43,14 +43,24 @@
 #include "Poco/Foundation.h"
 #include "Poco/ActiveResult.h"
 #include "Poco/Runnable.h"
+#include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 
 
 namespace Poco {
 
 
+class ActiveRunnableBase: public Runnable, public RefCountedObject
+	/// The base class for all ActiveRunnable instantiations.
+{
+public:
+	typedef AutoPtr<ActiveRunnableBase> Ptr;
+};
+
+
 template <class ResultType, class ArgType, class OwnerType>
-class ActiveRunnable: public Runnable
+class ActiveRunnable: public ActiveRunnableBase
 	/// This class is used by ActiveMethod.
 	/// See the ActiveMethod class for more information.
 {
@@ -69,6 +79,7 @@ public:
 
 	void run()
 	{
+		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
 		{
 			_result.data(new ResultType((_pOwner->*_method)(_arg)));
@@ -86,7 +97,6 @@ public:
 			_result.error("unknown exception");
 		}
 		_result.notify();
-		delete this;
 	}
 
 private:

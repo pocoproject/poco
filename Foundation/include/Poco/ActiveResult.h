@@ -1,7 +1,7 @@
 //
 // ActiveResult.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ActiveResult.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/ActiveResult.h#5 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the ActiveResult class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -200,7 +200,7 @@ public:
 		return *this;
 	}
 	
-	void swap(const ActiveResult& result)
+	void swap(ActiveResult& result)
 	{
 		using std::swap;
 		swap(_pHolder, result._pHolder);

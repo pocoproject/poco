@@ -1,7 +1,7 @@
 //
 // ActiveMethod.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ActiveMethod.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/ActiveMethod.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the ActiveMethod class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -44,6 +44,7 @@
 #include "Poco/ActiveResult.h"
 #include "Poco/ActiveRunnable.h"
 #include "Poco/ActiveStarter.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -109,7 +110,7 @@ public:
 		/// Invokes the ActiveMethod.
 	{
 		ActiveResultType result(new ActiveResultHolder<ResultType>());
-		ActiveRunnableType* pRunnable = new ActiveRunnableType(_pOwner, _method, arg, result);
+		ActiveRunnableBase::Ptr pRunnable(new ActiveRunnableType(_pOwner, _method, arg, result));
 		StarterType::start(_pOwner, pRunnable);
 		return result;
 	}

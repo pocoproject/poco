@@ -1,7 +1,7 @@
 //
 // ActiveDispatcher.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ActiveDispatcher.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/ActiveDispatcher.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the ActiveDispatcher class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -44,6 +44,7 @@
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
 #include "Poco/ActiveStarter.h"
+#include "Poco/ActiveRunnable.h"
 #include "Poco/NotificationQueue.h"
 
 
@@ -102,7 +103,7 @@ public:
 	virtual ~ActiveDispatcher();
 		/// Destroys the ActiveDispatcher.
 
-	void start(Runnable* pRunnable);
+	void start(ActiveRunnableBase::Ptr pRunnable);
 		/// Adds the Runnable to the dispatch queue.
 
 	void cancel();
@@ -124,7 +125,7 @@ class ActiveStarter<ActiveDispatcher>
 	/// for ActiveDispatcher.
 {
 public:
-	static void start(ActiveDispatcher* pOwner, Runnable* pRunnable)
+	static void start(ActiveDispatcher* pOwner, ActiveRunnableBase::Ptr pRunnable)
 	{
 		pOwner->start(pRunnable);
 	}

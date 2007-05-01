@@ -1,7 +1,7 @@
 //
 // ActiveStarter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ActiveStarter.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/ActiveStarter.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the ActiveStarter class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -42,12 +42,10 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/ThreadPool.h"
+#include "Poco/ActiveRunnable.h"
 
 
 namespace Poco {
-
-
-class Runnable;
 
 
 template <class OwnerType>
@@ -58,9 +56,10 @@ class ActiveStarter
 	/// thread pool.
 {
 public:
-	static void start(OwnerType* pOwner, Runnable* pRunnable)
+	static void start(OwnerType* pOwner, ActiveRunnableBase::Ptr pRunnable)
 	{
 		ThreadPool::defaultPool().start(*pRunnable);
+		pRunnable->duplicate(); // The runnable will release itself.
 	}
 };
 
