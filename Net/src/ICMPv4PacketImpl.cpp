@@ -1,7 +1,7 @@
 //
 // ICMPv4PacketImpl.cpp
 //
-// $Id: //poco/Main/Net/src/ICMPv4PacketImpl.cpp#4 $
+// $Id: //poco/Main/Net/src/ICMPv4PacketImpl.cpp#5 $
 //
 // Library: Net
 // Package: ICMP
@@ -147,7 +147,7 @@ void ICMPv4PacketImpl::initPacket()
 	if (_seq >= MAX_SEQ_VALUE) resetSequence();
 
 	Header* icp = (Header*) packet(false);
-	icp->type     = ECHO;
+	icp->type     = ECHO_REQUEST;
 	icp->code     = 0;
 	icp->checksum = 0;
 	icp->seq      = ++_seq;

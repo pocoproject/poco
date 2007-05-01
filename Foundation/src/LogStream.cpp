@@ -1,13 +1,13 @@
 //
 // LogStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/LogStream.cpp#3 $
+// $Id: //poco/Main/Foundation/src/LogStream.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
 // Module:  LogStream
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -128,9 +128,23 @@ LogStream& LogStream::fatal()
 	return priority(Message::PRIO_FATAL);
 }
 
+
+LogStream& LogStream::fatal(const std::string& message)
+{
+	_buf.logger().fatal(message);
+	return priority(Message::PRIO_FATAL);
+}
+
 	
 LogStream& LogStream::critical()
 {
+	return priority(Message::PRIO_CRITICAL);
+}
+
+
+LogStream& LogStream::critical(const std::string& message)
+{
+	_buf.logger().critical(message);
 	return priority(Message::PRIO_CRITICAL);
 }
 
@@ -141,8 +155,22 @@ LogStream& LogStream::error()
 }
 
 
+LogStream& LogStream::error(const std::string& message)
+{
+	_buf.logger().error(message);
+	return priority(Message::PRIO_ERROR);
+}
+
+
 LogStream& LogStream::warning()
 {
+	return priority(Message::PRIO_WARNING);
+}
+
+
+LogStream& LogStream::warning(const std::string& message)
+{
+	_buf.logger().warning(message);
 	return priority(Message::PRIO_WARNING);
 }
 
@@ -153,8 +181,22 @@ LogStream& LogStream::notice()
 }
 
 
+LogStream& LogStream::notice(const std::string& message)
+{
+	_buf.logger().notice(message);
+	return priority(Message::PRIO_NOTICE);
+}
+
+
 LogStream& LogStream::information()
 {
+	return priority(Message::PRIO_INFORMATION);
+}
+
+
+LogStream& LogStream::information(const std::string& message)
+{
+	_buf.logger().information(message);
 	return priority(Message::PRIO_INFORMATION);
 }
 
@@ -165,8 +207,22 @@ LogStream& LogStream::debug()
 }
 
 
+LogStream& LogStream::debug(const std::string& message)
+{
+	_buf.logger().debug(message);
+	return priority(Message::PRIO_DEBUG);
+}
+
+
 LogStream& LogStream::trace()
 {
+	return priority(Message::PRIO_TRACE);
+}
+
+
+LogStream& LogStream::trace(const std::string& message)
+{
+	_buf.logger().trace(message);
 	return priority(Message::PRIO_TRACE);
 }
 

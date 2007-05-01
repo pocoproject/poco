@@ -1,7 +1,7 @@
 //
 // HTTPServerRequest.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerRequest.h#5 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerRequest.h#6 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -56,7 +56,7 @@ class HTTPServerParams;
 
 
 class Net_API HTTPServerRequest: public HTTPRequest
-	/// This abstract HTTPServerRequest of HTTPRequest is used for
+	/// This abstract subclass of HTTPRequest is used for
 	/// representing server-side HTTP requests.
 	///
 	/// A HTTPServerRequest is passed to the

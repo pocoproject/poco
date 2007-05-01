@@ -1,7 +1,7 @@
 //
 // LogStream.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LogStream.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/LogStream.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -9,7 +9,7 @@
 //
 // Definition of the LogStream class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -71,6 +71,9 @@ public:
 	Message::Priority getPriority() const;
 		/// Returns the priority for log messages.
 
+	Logger& logger() const;
+		/// Returns a reference to the Logger.
+
 private:
 	int writeToDevice(char c);
 
@@ -125,26 +128,58 @@ public:
 	LogStream& fatal();
 		/// Sets the priority for log messages to Message::PRIO_FATAL.
 		
+	LogStream& fatal(const std::string& message);
+		/// Sets the priority for log messages to Message::PRIO_FATAL
+		/// and writes the given message.
+		
 	LogStream& critical();
 		/// Sets the priority for log messages to Message::PRIO_CRITICAL.
+
+	LogStream& critical(const std::string& message);
+		/// Sets the priority for log messages to Message::PRIO_CRITICAL
+		/// and writes the given message.
 
 	LogStream& error();
 		/// Sets the priority for log messages to Message::PRIO_ERROR.
 
+	LogStream& error(const std::string& message);
+		/// Sets the priority for log messages to Message::PRIO_ERROR
+		/// and writes the given message.
+
 	LogStream& warning();
 		/// Sets the priority for log messages to Message::PRIO_WARNING.
+
+	LogStream& warning(const std::string& message);
+		/// Sets the priority for log messages to Message::PRIO_WARNING
+		/// and writes the given message.
 
 	LogStream& notice();
 		/// Sets the priority for log messages to Message::PRIO_NOTICE.
 
+	LogStream& notice(const std::string& message);
+		/// Sets the priority for log messages to Message::PRIO_NOTICE
+		/// and writes the given message.
+
 	LogStream& information();
 		/// Sets the priority for log messages to Message::PRIO_INFORMATION.
+
+	LogStream& information(const std::string& message);
+		/// Sets the priority for log messages to Message::PRIO_INFORMATION
+		/// and writes the given message.
 
 	LogStream& debug();
 		/// Sets the priority for log messages to Message::PRIO_DEBUG.
 
+	LogStream& debug(const std::string& message);
+		/// Sets the priority for log messages to Message::PRIO_DEBUG
+		/// and writes the given message.
+
 	LogStream& trace();
 		/// Sets the priority for log messages to Message::PRIO_TRACE.
+
+	LogStream& trace(const std::string& message);
+		/// Sets the priority for log messages to Message::PRIO_TRACE
+		/// and writes the given message.
 
 	LogStream& priority(Message::Priority priority);
 		/// Sets the priority for log messages.
@@ -157,6 +192,12 @@ public:
 inline Message::Priority LogStreamBuf::getPriority() const
 {
 	return _priority;
+}
+
+
+inline Logger& LogStreamBuf::logger() const
+{
+	return _logger;
 }
 
 

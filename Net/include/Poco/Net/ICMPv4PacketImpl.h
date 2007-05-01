@@ -1,7 +1,7 @@
 //
 // ICMPv4PacketImpl.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/ICMPv4PacketImpl.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/ICMPv4PacketImpl.h#3 $
 //
 // Library: Net
 // Package: ICMP
@@ -77,12 +77,12 @@ public:
 		REDIRECT,
 		ICMP_6,
 		ICMP_7,
-		ECHO,
+		ECHO_REQUEST,
 		ICMP_9,
 		ICMP_10,
 		TIME_EXCEEDED,
 		PARAMETER_PROBLEM,
-		TIMESTAMP,
+		TIMESTAMP_REQUEST,
 		TIMESTAMP_REPLY,
 		INFORMATION_REQUEST,
 		INFORMATION_REPLY,
