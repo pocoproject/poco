@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/Makefile#41 $
+# $Id: //poco/Main/Foundation/Makefile#42 $
 #
 # Makefile for Poco Foundation
 #
@@ -31,9 +31,11 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Format \
 	Pipe PipeImpl PipeStream DynamicAny DynamicAnyHolder SharedMemory \
 	FileStream \
-	adler32 chartables compress crc32 \
-	deflate get gzio infback inffast inflate inftrees maketables pcre study \
-	trees zutil
+	adler32 compress crc32  deflate gzio infback inffast inflate inftrees  \
+	trees zutil \
+	pcre_chartables pcre_compile pcre_globals pcre_maketables pcre_study \
+	pcre_tables pcre_try_flipped pcre_ucp_searchfuncs pcre_valid_utf8 \
+	pcre_exec pcre_ord2utf8 pcre_newline pcre_fullinfo pcre_xclass
 
 target         = PocoFoundation
 target_version = $(LIBVERSION)
