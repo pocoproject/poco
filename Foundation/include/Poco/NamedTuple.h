@@ -111,7 +111,8 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
         typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17), 
         typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18), 
         typename TypeWrapper<T19>::CONSTTYPE& t19 = POCO_TYPEWRAPPER_DEFAULTVALUE(T19)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19), 
+		_pNames(0)
     {
         init();
     }
@@ -137,7 +138,7 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
         typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17), 
         typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18), 
         typename TypeWrapper<T19>::CONSTTYPE& t19 = POCO_TYPEWRAPPER_DEFAULTVALUE(T19)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -185,7 +186,8 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
         typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18),
 		const std::string& n19 = "T",
         typename TypeWrapper<T19>::CONSTTYPE& t19 = POCO_TYPEWRAPPER_DEFAULTVALUE(T19)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19);
     }
@@ -404,7 +406,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
         typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16), 
         typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17), 
         typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18), 
+		_pNames(0)
     {
         init();
     }
@@ -429,7 +432,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
         typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16), 
         typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17), 
         typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -475,7 +478,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
         typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17),
         const std::string& n18 = "S",
         typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18);
     }
@@ -689,7 +693,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
         typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15), 
         typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16), 
         typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17), 
+		_pNames(0)
     {
         init();
     }
@@ -713,7 +718,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
         typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15), 
         typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16), 
         typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -757,7 +762,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
         typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16),
         const std::string& n17 = "R",
         typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17);
     }
@@ -966,7 +972,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
         typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14), 
         typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15), 
         typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16), 
+		_pNames(0)
     {
         init();
     }
@@ -989,7 +996,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
         typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14), 
         typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15), 
         typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -1031,7 +1038,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
         typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15),
         const std::string& n16 = "Q",
         typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16);
     }
@@ -1236,7 +1244,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
         typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13), 
         typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14), 
         typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15), 
+		_pNames(0)
     {
         init();
     }
@@ -1258,7 +1267,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
         typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13), 
         typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14), 
         typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -1298,7 +1307,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
         typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14),
         const std::string& n15 = "P",
         typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15);
     }
@@ -1498,7 +1508,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
         typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12), 
         typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13), 
         typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14), 
+		_pNames(0)
     {
         init();
     }
@@ -1519,7 +1530,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
         typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12), 
         typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13), 
         typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -1557,7 +1568,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
         typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13),
         const std::string& n14 = "O",
         typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14);
     }
@@ -1752,7 +1764,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
         typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11), 
         typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12), 
         typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13), 
+		_pNames(0)
     {
         init();
     }
@@ -1772,7 +1785,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
         typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11), 
         typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12), 
         typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -1808,7 +1821,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
         typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12),
         const std::string& n13 = "N",
         typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13);
     }
@@ -1998,7 +2012,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
         typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10), 
         typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11), 
         typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12), 
+		_pNames(0)
     {
         init();
     }
@@ -2017,7 +2032,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
         typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10), 
         typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11), 
         typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -2236,7 +2251,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
         typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9), 
         typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10), 
         typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11), 
+		_pNames(0)
     {
         init();
     }
@@ -2254,7 +2270,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
         typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9), 
         typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10), 
         typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -2286,7 +2302,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
         typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10),
         const std::string& n11 = "L",
         typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11);
     }
@@ -2466,7 +2483,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
         typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8), 
         typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9), 
         typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10), 
+		_pNames(0)
     {
         init();
     }
@@ -2483,7 +2501,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
         typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8), 
         typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9), 
         typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -2688,7 +2706,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
         typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7),
         typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8), 
         typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9), 
+		_pNames(0)
     {
         init();
     }
@@ -2704,7 +2723,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
         typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7),
         typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8), 
         typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -2732,7 +2751,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
         typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8), 
         const std::string& n9 = "J",
         typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9);
     }
@@ -2902,7 +2922,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
         typename TypeWrapper<T6>::CONSTTYPE& t6 = POCO_TYPEWRAPPER_DEFAULTVALUE(T6),
         typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7),
         typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8), 
+		_pNames(0)
     {
         init();
     }
@@ -2917,7 +2938,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
         typename TypeWrapper<T6>::CONSTTYPE& t6 = POCO_TYPEWRAPPER_DEFAULTVALUE(T6),
         typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7),
         typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -2943,7 +2964,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
         typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7),
         const std::string& n8 = "I",
         typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8);
     }
@@ -3108,7 +3130,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
         typename TypeWrapper<T5>::CONSTTYPE& t5 = POCO_TYPEWRAPPER_DEFAULTVALUE(T5), 
         typename TypeWrapper<T6>::CONSTTYPE& t6 = POCO_TYPEWRAPPER_DEFAULTVALUE(T6),
         typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7), 
+		_pNames(0)
     {
         init();
     }
@@ -3122,7 +3145,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
         typename TypeWrapper<T5>::CONSTTYPE& t5 = POCO_TYPEWRAPPER_DEFAULTVALUE(T5), 
         typename TypeWrapper<T6>::CONSTTYPE& t6 = POCO_TYPEWRAPPER_DEFAULTVALUE(T6),
         typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7)
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -3146,7 +3169,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
         typename TypeWrapper<T6>::CONSTTYPE& t6 = POCO_TYPEWRAPPER_DEFAULTVALUE(T6), 
         const std::string& n7 = "H",
         typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7)): 
-    TupleType(t0,t1,t2,t3,t4,t5,t6,t7), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4,t5,t6,t7), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4,n5,n6,n7);
     }
@@ -3678,7 +3702,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
         typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2), 
         typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3),
         typename TypeWrapper<T4>::CONSTTYPE& t4 = POCO_TYPEWRAPPER_DEFAULTVALUE(T4)): 
-    TupleType(t0,t1,t2,t3,t4), _pNames(0)
+		TupleType(t0,t1,t2,t3,t4), 
+		_pNames(0)
     {
         init();
     }
@@ -3689,7 +3714,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
         typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2), 
         typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3),
         typename TypeWrapper<T4>::CONSTTYPE& t4 = POCO_TYPEWRAPPER_DEFAULTVALUE(T4)): 
-    TupleType(t0,t1,t2,t3,t4)
+		TupleType(t0,t1,t2,t3,t4)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -3707,7 +3732,8 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
         typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3),
         const std::string& n4 = "E",
         typename TypeWrapper<T4>::CONSTTYPE& t4 = POCO_TYPEWRAPPER_DEFAULTVALUE(T4)): 
-    TupleType(t0,t1,t2,t3,t4), _pNames(0) 
+		TupleType(t0,t1,t2,t3,t4), 
+		_pNames(0) 
     {
         init(n0,n1,n2,n3,n4);
     }
@@ -3852,7 +3878,8 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
         typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1), 
         typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2), 
         typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3)): 
-    TupleType(t0,t1,t2,t3), _pNames(0)
+		TupleType(t0,t1,t2,t3), 
+		_pNames(0)
     {
         init();
     }
@@ -3862,7 +3889,7 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
         typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1),
         typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2), 
         typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3)): 
-    TupleType(t0,t1,t2,t3)
+		TupleType(t0,t1,t2,t3)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -4018,7 +4045,8 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
     NamedTuple(typename TypeWrapper<T0>::CONSTTYPE& t0,
         typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1), 
         typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2)): 
-    TupleType(t0,t1,t2), _pNames(0)
+		TupleType(t0,t1,t2), 
+		_pNames(0)
     {
         init();
     }
@@ -4027,7 +4055,7 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
         typename TypeWrapper<T0>::CONSTTYPE& t0,
         typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1),
         typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2)): 
-    TupleType(t0,t1,t2)
+		TupleType(t0,t1,t2)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -4041,7 +4069,8 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
         typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1),
         const std::string& n2 = "C",
         typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2)): 
-    TupleType(t0,t1,t2), _pNames(0) 
+		TupleType(t0,t1,t2), 
+		_pNames(0) 
     {
         init(n0,n1,n2);
     }
@@ -4176,7 +4205,8 @@ struct NamedTuple<T0,T1,NullTypeList>:
 
     NamedTuple(typename TypeWrapper<T0>::CONSTTYPE& t0,
         typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1)): 
-    TupleType(t0,t1), _pNames(0)
+		TupleType(t0,t1), 
+		_pNames(0)
     {
         init();
     }
@@ -4184,7 +4214,7 @@ struct NamedTuple<T0,T1,NullTypeList>:
     NamedTuple(const NameVecPtr& rNames, 
         typename TypeWrapper<T0>::CONSTTYPE& t0,
         typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1)): 
-    TupleType(t0,t1)
+		TupleType(t0,t1)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -4196,7 +4226,8 @@ struct NamedTuple<T0,T1,NullTypeList>:
         typename TypeWrapper<T0>::CONSTTYPE& t0, 
         const std::string& n1 = "B",
         typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1)): 
-    TupleType(t0,t1), _pNames(0) 
+		TupleType(t0,t1), 
+		_pNames(0) 
     {
         init(n0,n1);
     }
@@ -4326,14 +4357,15 @@ struct NamedTuple<T0,NullTypeList>:
     }
 
     NamedTuple(typename TypeWrapper<T0>::CONSTTYPE& t0): 
-    TupleType(t0), _pNames(0)
+		TupleType(t0), 
+		_pNames(0)
     {
         init();
     }
 
     NamedTuple(const NameVecPtr& rNames, 
         typename TypeWrapper<T0>::CONSTTYPE& t0): 
-    TupleType(t0)
+		TupleType(t0)
     {
 		if (rNames->size() != TupleType::length)
             throw InvalidArgumentException("Wrong names vector length."); 
@@ -4342,7 +4374,8 @@ struct NamedTuple<T0,NullTypeList>:
     }
 
     NamedTuple(const std::string& n0, typename TypeWrapper<T0>::CONSTTYPE& t0): 
-    TupleType(t0), _pNames(0) 
+		TupleType(t0), 
+		_pNames(0) 
     {
         init(n0);
     }
@@ -4432,8 +4465,7 @@ struct NamedTuple<T0,NullTypeList>:
     }
 
 private:
-    void init(const std::string& n0 = "A",
-        const std::string& n1 = "B")
+    void init(const std::string& n0 = "A")
     { 
         if (!_pNames)
         {
