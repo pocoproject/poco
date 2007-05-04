@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/Main/Net/src/IPAddress.cpp#15 $
+// $Id: //poco/Main/Net/src/IPAddress.cpp#16 $
 //
 // Library: Net
 // Package: NetCore
@@ -40,7 +40,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Types.h"
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 
 using Poco::RefCountedObject;
@@ -103,12 +103,12 @@ class IPv4AddressImpl: public IPAddressImpl
 public:
 	IPv4AddressImpl()
 	{
-		memset(&_addr, 0, sizeof(_addr));
+		std::memset(&_addr, 0, sizeof(_addr));
 	}
 	
 	IPv4AddressImpl(const void* addr)
 	{
-		memcpy(&_addr, addr, sizeof(_addr));
+		std::memcpy(&_addr, addr, sizeof(_addr));
 	}
 	
 	std::string toString() const
@@ -260,12 +260,12 @@ class IPv6AddressImpl: public IPAddressImpl
 public:
 	IPv6AddressImpl()
 	{
-		memset(&_addr, 0, sizeof(_addr));
+		std::memset(&_addr, 0, sizeof(_addr));
 	}
 
 	IPv6AddressImpl(const void* addr)
 	{
-		memcpy(&_addr, addr, sizeof(_addr));
+		std::memcpy(&_addr, addr, sizeof(_addr));
 	}
 
 	std::string toString() const
@@ -426,7 +426,7 @@ public:
 #if defined(_WIN32)
 		struct addrinfo* pAI;
 		struct addrinfo hints;
-		memset(&hints, 0, sizeof(hints));
+		std::memset(&hints, 0, sizeof(hints));
 		hints.ai_flags = AI_NUMERICHOST;
 		int rc = getaddrinfo(addr.c_str(), NULL, &hints, &pAI);
 		if (rc == 0)
@@ -651,7 +651,7 @@ bool IPAddress::operator == (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-		return memcmp(addr(), a.addr(), l1) == 0;
+		return std::memcmp(addr(), a.addr(), l1) == 0;
 	else
 		return false;
 }
@@ -662,7 +662,7 @@ bool IPAddress::operator != (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-		return memcmp(addr(), a.addr(), l1) != 0;
+		return std::memcmp(addr(), a.addr(), l1) != 0;
 	else
 		return true;
 }
@@ -673,7 +673,7 @@ bool IPAddress::operator < (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-		return memcmp(addr(), a.addr(), l1) < 0;
+		return std::memcmp(addr(), a.addr(), l1) < 0;
 	else
 		return l1 < l2;
 }
@@ -684,7 +684,7 @@ bool IPAddress::operator <= (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-		return memcmp(addr(), a.addr(), l1) <= 0;
+		return std::memcmp(addr(), a.addr(), l1) <= 0;
 	else
 		return l1 < l2;
 }
@@ -695,7 +695,7 @@ bool IPAddress::operator > (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-		return memcmp(addr(), a.addr(), l1) > 0;
+		return std::memcmp(addr(), a.addr(), l1) > 0;
 	else
 		return l1 > l2;
 }
@@ -706,7 +706,7 @@ bool IPAddress::operator >= (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-		return memcmp(addr(), a.addr(), l1) >= 0;
+		return std::memcmp(addr(), a.addr(), l1) >= 0;
 	else
 		return l1 > l2;
 }

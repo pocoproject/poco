@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPSession.cpp#12 $
+// $Id: //poco/Main/Net/src/HTTPSession.cpp#13 $
 //
 // Library: Net
 // Package: HTTP
@@ -37,7 +37,7 @@
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/HTTPBufferAllocator.h"
 #include "Poco/Net/NetException.h"
-#include <string.h>
+#include <cstring>
 
 
 using Poco::TimeoutException;
@@ -132,7 +132,7 @@ int HTTPSession::read(char* buffer, std::streamsize length)
 	{
 		int n = (int) (_pEnd - _pCurrent);
 		if (n > length) n = (int) length;
-		memcpy(buffer, _pCurrent, n);
+		std::memcpy(buffer, _pCurrent, n);
 		_pCurrent += n;
 		return n;
 	}

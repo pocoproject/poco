@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPChunkedStream.cpp#14 $
+// $Id: //poco/Main/Net/src/HTTPChunkedStream.cpp#16 $
 //
 // Library: Net
 // Package: HTTP
@@ -38,7 +38,7 @@
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
-#include <ctype.h>
+#include <cctype>
 
 
 using Poco::NumberFormatter;
@@ -85,9 +85,9 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (_chunk == 0)
 	{
 		int ch = _session.get();
-		while (isspace(ch)) ch = _session.get();
+		while (std::isspace(ch)) ch = _session.get();
 		std::string chunkLen;
-		while (isxdigit(ch)) { chunkLen += (char) ch; ch = _session.get(); }
+		while (std::isxdigit(ch)) { chunkLen += (char) ch; ch = _session.get(); }
 		while (ch != eof && ch != '\n') ch = _session.get();
 		unsigned chunk;
 		if (NumberParser::tryParseHex(chunkLen, chunk))

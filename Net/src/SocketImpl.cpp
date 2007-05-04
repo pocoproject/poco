@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/Main/Net/src/SocketImpl.cpp#19 $
+// $Id: //poco/Main/Net/src/SocketImpl.cpp#22 $
 //
 // Library: Net
 // Package: Sockets
@@ -39,7 +39,7 @@
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
-#include <string.h>
+#include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
 using Poco::IOException;

@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/Main/Net/src/MailMessage.cpp#9 $
+// $Id: //poco/Main/Net/src/MailMessage.cpp#10 $
 //
 // Library: Net
 // Package: Mail
@@ -50,7 +50,7 @@
 #include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
 #include <sstream>
-#include <ctype.h>
+#include <cctype>
 
 
 using Poco::Base64Encoder;

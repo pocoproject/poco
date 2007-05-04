@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/Main/Net/src/Socket.cpp#10 $
+// $Id: //poco/Main/Net/src/Socket.cpp#13 $
 //
 // Library: Net
 // Package: Sockets
@@ -38,7 +38,7 @@
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Timestamp.h"
 #include <algorithm>
-#include <string.h>
+#include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
 namespace Poco {

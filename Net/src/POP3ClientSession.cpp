@@ -1,7 +1,7 @@
 //
 // POP3ClientSession.cpp
 //
-// $Id: //poco/Main/Net/src/POP3ClientSession.cpp#7 $
+// $Id: //poco/Main/Net/src/POP3ClientSession.cpp#8 $
 //
 // Library: Net
 // Package: Mail
@@ -43,7 +43,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/UnbufferedStreamBuf.h"
 #include <istream>
-#include <ctype.h>
+#include <cctype>
 
 
 using Poco::NumberFormatter;
@@ -184,9 +184,9 @@ int POP3ClientSession::messageCount()
 	std::string::const_iterator it  = response.begin();
 	std::string::const_iterator end = response.end();
 	int count = 0;
-	while (it != end && !isspace(*it)) ++it;
-	while (it != end && isspace(*it)) ++it;
-	while (it != end && isdigit(*it)) count = count*10 + *it++ - '0';
+	while (it != end && !std::isspace(*it)) ++it;
+	while (it != end && std::isspace(*it)) ++it;
+	while (it != end && std::isdigit(*it)) count = count*10 + *it++ - '0';
 	return count;
 }
 
@@ -203,9 +203,9 @@ void POP3ClientSession::listMessages(MessageInfoVec& messages)
 		MessageInfo info = {0, 0};
 		std::string::const_iterator it  = response.begin();
 		std::string::const_iterator end = response.end();
-		while (it != end && isdigit(*it)) info.id = info.id*10 + *it++ - '0';
-		while (it != end && isspace(*it)) ++it;
-		while (it != end && isdigit(*it)) info.size = info.size*10 + *it++ - '0';
+		while (it != end && std::isdigit(*it)) info.id = info.id*10 + *it++ - '0';
+		while (it != end && std::isspace(*it)) ++it;
+		while (it != end && std::isdigit(*it)) info.size = info.size*10 + *it++ - '0';
 		messages.push_back(info);
 		_socket.receiveMessage(response);
 	}

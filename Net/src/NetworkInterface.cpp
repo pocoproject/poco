@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/Main/Net/src/NetworkInterface.cpp#18 $
+// $Id: //poco/Main/Net/src/NetworkInterface.cpp#20 $
 //
 // Library: Net
 // Package: Sockets
@@ -39,7 +39,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/RefCountedObject.h"
-#include <string.h>
+#include <cstring>
 
 
 using Poco::NumberFormatter;
@@ -95,7 +95,7 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const IPAddr
 	if (index == -1) // IPv4
 	{
 		struct ifreq ifr;
-		strncpy(ifr.ifr_name, name.c_str(), IFNAMSIZ);
+		std::strncpy(ifr.ifr_name, name.c_str(), IFNAMSIZ);
 		DatagramSocket ds(IPAddress::IPv4);
 		ds.impl()->ioctl(SIOCGIFNETMASK, &ifr);
 		if (ifr.ifr_addr.sa_family == AF_INET)
@@ -273,7 +273,7 @@ NetworkInterface NetworkInterface::forName(const std::string& name, bool require
 	FastMutex::ScopedLock lock(_mutex);
 
 	struct ifreq ifr;
-	strncpy(ifr.ifr_name, name.c_str(), IFNAMSIZ);
+	std::strncpy(ifr.ifr_name, name.c_str(), IFNAMSIZ);
 	DatagramSocket ds(requireIPv6 ? IPAddress::IPv6 : IPAddress::IPv4);
 	ds.impl()->ioctl(SIOCGIFADDR, &ifr);
 	IPAddress addr;

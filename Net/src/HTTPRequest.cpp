@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPRequest.cpp#11 $
+// $Id: //poco/Main/Net/src/HTTPRequest.cpp#12 $
 //
 // Library: Net
 // Package: HTTP
@@ -39,7 +39,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/NumberFormatter.h"
-#include <ctype.h>
+#include <cctype>
 
 
 using Poco::NumberFormatter;
@@ -174,9 +174,9 @@ void HTTPRequest::getCredentials(std::string& scheme, std::string& authInfo) con
 		const std::string& auth = get(AUTHORIZATION);
 		std::string::const_iterator it  = auth.begin();
 		std::string::const_iterator end = auth.end();
-		while (it != end && isspace(*it)) ++it;
-		while (it != end && !isspace(*it)) scheme += *it++;
-		while (it != end && isspace(*it)) ++it;
+		while (it != end && std::isspace(*it)) ++it;
+		while (it != end && !std::isspace(*it)) scheme += *it++;
+		while (it != end && std::isspace(*it)) ++it;
 		while (it != end) authInfo += *it++;
 	}
 	else throw NotAuthenticatedException();
@@ -209,16 +209,16 @@ void HTTPRequest::read(std::istream& istr)
 	std::string version;
 	int ch = istr.get();
 	if (ch == eof) throw NoMessageException();
-	while (isspace(ch)) ch = istr.get();
+	while (std::isspace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP request header");
-	while (!isspace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
-	if (!isspace(ch)) throw MessageException("HTTP request method invalid or too long");
-	while (isspace(ch)) ch = istr.get();
-	while (!isspace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
-	if (!isspace(ch)) throw MessageException("HTTP request URI invalid or too long");
-	while (isspace(ch)) ch = istr.get();
-	while (!isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
-	if (!isspace(ch)) throw MessageException("Invalid HTTP version string");
+	while (!std::isspace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
+	if (!std::isspace(ch)) throw MessageException("HTTP request method invalid or too long");
+	while (std::isspace(ch)) ch = istr.get();
+	while (!std::isspace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
+	if (!std::isspace(ch)) throw MessageException("HTTP request URI invalid or too long");
+	while (std::isspace(ch)) ch = istr.get();
+	while (!std::isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
+	if (!std::isspace(ch)) throw MessageException("Invalid HTTP version string");
 	while (ch != '\n' && ch != eof) { ch = istr.get(); }
 	HTTPMessage::read(istr);
 	ch = istr.get();

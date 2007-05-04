@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/Main/Net/src/MessageHeader.cpp#11 $
+// $Id: //poco/Main/Net/src/MessageHeader.cpp#12 $
 //
 // Library: Net
 // Package: Messages
@@ -37,7 +37,7 @@
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/String.h"
-#include <ctype.h>
+#include <cctype>
 
 
 namespace Poco {
@@ -90,7 +90,7 @@ void MessageHeader::read(std::istream& istr)
 		if (ch == '\n') { ch = istr.get(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
 		if (ch != eof) ch = istr.get(); // ':'
-		while (isspace(ch)) ch = istr.get();
+		while (std::isspace(ch)) ch = istr.get();
 		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = istr.get(); }
 		if (ch == '\r') ch = istr.get();
 		if (ch == '\n')
@@ -164,7 +164,7 @@ void MessageHeader::splitParameters(const std::string& s, std::string& value, Na
 	parameters.clear();
 	std::string::const_iterator it  = s.begin();
 	std::string::const_iterator end = s.end();
-	while (it != end && isspace(*it)) ++it;
+	while (it != end && std::isspace(*it)) ++it;
 	while (it != end && *it != ';') value += *it++;
 	Poco::trimRightInPlace(value);
 	if (it != end) ++it;
@@ -179,11 +179,11 @@ void MessageHeader::splitParameters(const std::string::const_iterator& begin, co
 	{
 		std::string pname;
 		std::string pvalue;
-		while (it != end && isspace(*it)) ++it;
+		while (it != end && std::isspace(*it)) ++it;
 		while (it != end && *it != '=' && *it != ';') pname += *it++;
 		Poco::trimRightInPlace(pname);
 		if (it != end && *it != ';') ++it;
-		while (it != end && isspace(*it)) ++it;
+		while (it != end && std::isspace(*it)) ++it;
 		while (it != end && *it != ';')
 		{
 			if (*it == '"')
@@ -219,7 +219,7 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 	bool mustQuote = false;
 	for (std::string::const_iterator it = value.begin(); !mustQuote && it != value.end(); ++it)
 	{
-		if (!isalnum(*it) && *it != '.' && *it != '_' && *it != '-' && !(isspace(*it) && allowSpace))
+		if (!std::isalnum(*it) && *it != '.' && *it != '_' && *it != '-' && !(std::isspace(*it) && allowSpace))
 			mustQuote = true;
 	}
 	if (mustQuote) result += '"';

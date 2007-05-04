@@ -1,7 +1,7 @@
 //
 // HTTPResponse.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPResponse.cpp#11 $
+// $Id: //poco/Main/Net/src/HTTPResponse.cpp#12 $
 //
 // Library: Net
 // Package: HTTP
@@ -42,7 +42,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeParser.h"
-#include <ctype.h>
+#include <cctype>
 
 
 using Poco::DateTime;
@@ -228,16 +228,16 @@ void HTTPResponse::read(std::istream& istr)
 	
 	int ch =  istr.get();
 	if (ch == eof) throw NoMessageException();
-	while (isspace(ch)) ch = istr.get();
+	while (std::isspace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP response header");
-	while (!isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
-	if (!isspace(ch)) throw MessageException("Invalid HTTP version string");
-	while (isspace(ch)) ch = istr.get();
-	while (!isspace(ch) && ch != eof && status.length() < MAX_STATUS_LENGTH) { status += (char) ch; ch = istr.get(); }
-	if (!isspace(ch)) throw MessageException("Invalid HTTP status code");
-	while (isspace(ch)) ch = istr.get();
+	while (!std::isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
+	if (!std::isspace(ch)) throw MessageException("Invalid HTTP version string");
+	while (std::isspace(ch)) ch = istr.get();
+	while (!std::isspace(ch) && ch != eof && status.length() < MAX_STATUS_LENGTH) { status += (char) ch; ch = istr.get(); }
+	if (!std::isspace(ch)) throw MessageException("Invalid HTTP status code");
+	while (std::isspace(ch)) ch = istr.get();
 	while (ch != '\r' && ch != '\n' && ch != eof && reason.length() < MAX_REASON_LENGTH) { reason += (char) ch; ch = istr.get(); }
-	if (!isspace(ch)) throw MessageException("HTTP reason string too long");
+	if (!std::isspace(ch)) throw MessageException("HTTP reason string too long");
 	if (ch == '\r') ch = istr.get();
 
 	HTTPMessage::read(istr);

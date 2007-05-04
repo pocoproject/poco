@@ -1,7 +1,7 @@
 //
 // QuotedPrintableDecoder.cpp
 //
-// $Id: //poco/Main/Net/src/QuotedPrintableDecoder.cpp#8 $
+// $Id: //poco/Main/Net/src/QuotedPrintableDecoder.cpp#10 $
 //
 // Library: Net
 // Package: Messages
@@ -37,7 +37,7 @@
 #include "Poco/Net/QuotedPrintableDecoder.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
-#include <ctype.h>
+#include <cctype>
 
 
 using Poco::UnbufferedStreamBuf;
@@ -70,12 +70,12 @@ int QuotedPrintableDecoderBuf::readFromDevice()
 		{
 			ch = _istr.get(); // read \n
 		}
-		else if (isxdigit(ch))
+		else if (std::isxdigit(ch))
 		{
 			std::string hex;
 			hex += (char) ch;
 			ch = _istr.get();
-			if (isxdigit(ch))
+			if (std::isxdigit(ch))
 			{
 				hex += (char) ch;
 				return NumberParser::parseHex(hex);

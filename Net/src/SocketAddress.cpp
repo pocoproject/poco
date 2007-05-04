@@ -1,7 +1,7 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/Main/Net/src/SocketAddress.cpp#12 $
+// $Id: //poco/Main/Net/src/SocketAddress.cpp#13 $
 //
 // Library: Net
 // Package: NetCore
@@ -42,7 +42,7 @@
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 
 using Poco::RefCountedObject;
@@ -90,21 +90,21 @@ class IPv4SocketAddressImpl: public SocketAddressImpl
 public:
 	IPv4SocketAddressImpl()
 	{
-		memset(&_addr, 0, sizeof(_addr));
+		std::memset(&_addr, 0, sizeof(_addr));
 		_addr.sin_family = AF_INET;
 		poco_set_sin_len(&_addr);
 	}
 	
 	IPv4SocketAddressImpl(const struct sockaddr_in* addr)
 	{
-		memcpy(&_addr, addr, sizeof(_addr));
+		std::memcpy(&_addr, addr, sizeof(_addr));
 	}
 	
 	IPv4SocketAddressImpl(const void* addr, UInt16 port)
 	{
-		memset(&_addr, 0, sizeof(_addr));
+		std::memset(&_addr, 0, sizeof(_addr));
 		_addr.sin_family = AF_INET;
-		memcpy(&_addr.sin_addr, addr, sizeof(_addr.sin_addr));
+		std::memcpy(&_addr.sin_addr, addr, sizeof(_addr.sin_addr));
 		_addr.sin_port = port;
 	}
 
@@ -146,15 +146,15 @@ class IPv6SocketAddressImpl: public SocketAddressImpl
 public:
 	IPv6SocketAddressImpl(const struct sockaddr_in6* addr)
 	{
-		memcpy(&_addr, addr, sizeof(_addr));
+		std::memcpy(&_addr, addr, sizeof(_addr));
 	}
 	
 	IPv6SocketAddressImpl(const void* addr, UInt16 port)
 	{
-		memset(&_addr, 0, sizeof(_addr));
+		std::memset(&_addr, 0, sizeof(_addr));
 		_addr.sin6_family = AF_INET6;
 		poco_set_sin6_len(&_addr);
-		memcpy(&_addr.sin6_addr, addr, sizeof(_addr.sin6_addr));
+		std::memcpy(&_addr.sin6_addr, addr, sizeof(_addr.sin6_addr));
 		_addr.sin6_port = port;
 	}
 

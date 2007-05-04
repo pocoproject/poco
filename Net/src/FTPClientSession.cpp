@@ -1,7 +1,7 @@
 //
 // FTPClientSession.cpp
 //
-// $Id: //poco/Main/Net/src/FTPClientSession.cpp#7 $
+// $Id: //poco/Main/Net/src/FTPClientSession.cpp#8 $
 //
 // Library: Net
 // Package: FTP
@@ -40,7 +40,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
-#include <ctype.h>
+#include <cctype>
 
 
 using Poco::NumberFormatter;
@@ -459,19 +459,19 @@ void FTPClientSession::parseAddress(const std::string& str, SocketAddress& addr)
 	while (it != end && *it != '(') ++it;
 	if (it != end) ++it;
 	std::string host;
-	while (it != end && isdigit(*it)) host += *it++;
+	while (it != end && std::isdigit(*it)) host += *it++;
 	if (it != end && *it == ',') { host += '.'; ++it; }
-	while (it != end && isdigit(*it)) host += *it++;
+	while (it != end && std::isdigit(*it)) host += *it++;
 	if (it != end && *it == ',') { host += '.'; ++it; }
-	while (it != end && isdigit(*it)) host += *it++;
+	while (it != end && std::isdigit(*it)) host += *it++;
 	if (it != end && *it == ',') { host += '.'; ++it; }
-	while (it != end && isdigit(*it)) host += *it++;
+	while (it != end && std::isdigit(*it)) host += *it++;
 	if (it != end && *it == ',') ++it;
 	Poco::UInt16 portHi = 0;
-	while (it != end && isdigit(*it)) { portHi *= 10; portHi += *it++ - '0'; }
+	while (it != end && std::isdigit(*it)) { portHi *= 10; portHi += *it++ - '0'; }
 	if (it != end && *it == ',') ++it;
 	Poco::UInt16 portLo = 0;
-	while (it != end && isdigit(*it)) { portLo *= 10; portLo += *it++ - '0'; }
+	while (it != end && std::isdigit(*it)) { portLo *= 10; portLo += *it++ - '0'; }
 	addr = SocketAddress(host, portHi*256 + portLo);
 }
 
@@ -487,7 +487,7 @@ void FTPClientSession::parseExtAddress(const std::string& str, SocketAddress& ad
 	if (it != end && *it == delim) ++it;
 	if (it != end && *it == delim) ++it;
 	Poco::UInt16 port = 0;
-	while (it != end && isdigit(*it)) { port *= 10; port += *it++ - '0'; }	
+	while (it != end && std::isdigit(*it)) { port *= 10; port += *it++ - '0'; }	
 	addr = SocketAddress(_controlSocket.peerAddress().host(), port);	
 }
 
