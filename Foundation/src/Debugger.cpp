@@ -1,7 +1,7 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/Main/Foundation/src/Debugger.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Debugger.cpp#13 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,8 +36,8 @@
 
 #include "Poco/Debugger.h"
 #include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#include <windows.h>
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -66,7 +66,7 @@ bool Debugger::isAvailable()
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 		return IsDebuggerPresent() ? true : false;
 	#elif defined(POCO_OS_FAMILY_UNIX)
-		return getenv("POCO_ENABLE_DEBUGGER") ? true : false;
+		return std::getenv("POCO_ENABLE_DEBUGGER") ? true : false;
 	#elif defined(POCO_OS_FAMILY_VMS)
 		return true;
 	#endif
@@ -79,9 +79,9 @@ bool Debugger::isAvailable()
 void Debugger::message(const std::string& msg)
 {
 #if defined(_DEBUG)
-	fputs("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n", stderr);
-	fputs(msg.c_str(), stderr);
-	fputs("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n", stderr);
+	std::fputs("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n", stderr);
+	std::fputs(msg.c_str(), stderr);
+	std::fputs("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n", stderr);
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 	if (IsDebuggerPresent())
 	{

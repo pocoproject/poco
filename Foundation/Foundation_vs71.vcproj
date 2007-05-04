@@ -3327,6 +3327,9 @@
 					RelativePath=".\src\TextIterator.cpp">
 				</File>
 				<File
+					RelativePath=".\src\Unicode.cpp">
+				</File>
+				<File
 					RelativePath=".\src\UnicodeConverter.cpp">
 				</File>
 				<File
@@ -3334,6 +3337,9 @@
 				</File>
 				<File
 					RelativePath=".\src\UTF8Encoding.cpp">
+				</File>
+				<File
+					RelativePath=".\src\UTF8String.cpp">
 				</File>
 				<File
 					RelativePath=".\src\Windows1252Encoding.cpp">
@@ -3364,6 +3370,9 @@
 					RelativePath=".\include\Poco\TextIterator.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Unicode.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\UnicodeConverter.h">
 				</File>
 				<File
@@ -3371,6 +3380,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\UTF8Encoding.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\UTF8String.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Windows1252Encoding.h">

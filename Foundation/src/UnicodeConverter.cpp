@@ -1,7 +1,7 @@
 //
 // UnicodeConverter.cpp
 //
-// $Id: //poco/Main/Foundation/src/UnicodeConverter.cpp#8 $
+// $Id: //poco/Main/Foundation/src/UnicodeConverter.cpp#9 $
 //
 // Library: Foundation
 // Package: Text
@@ -42,7 +42,7 @@
 #include "Poco/TextIterator.h"
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
-#include <string.h>
+#include <cstring>
 #include <wchar.h>
 
 
@@ -100,7 +100,7 @@ void UnicodeConverter::toUTF16(const char* utf8String, int length, std::wstring&
 
 void UnicodeConverter::toUTF16(const char* utf8String, std::wstring& utf16String)
 {
-	toUTF16(utf8String, (int) strlen(utf8String), utf16String);
+	toUTF16(utf8String, (int) std::strlen(utf8String), utf16String);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // SHA1Engine.cpp
 //
-// $Id: //poco/Main/Foundation/src/SHA1Engine.cpp#12 $
+// $Id: //poco/Main/Foundation/src/SHA1Engine.cpp#14 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -38,7 +38,7 @@
 
 
 #include "Poco/SHA1Engine.h"
-#include <string.h>
+#include <cstring>
 
 
 #ifdef POCO_ARCH_LITTLE_ENDIAN
@@ -119,7 +119,7 @@ void SHA1Engine::reset()
 	_context.countLo   = 0;
 	_context.countHi   = 0;
 	_context.slop      = 0;
-	memset(_context.data, 0, sizeof(_context.data));
+	std::memset(_context.data, 0, sizeof(_context.data));
 }
 
 
@@ -140,17 +140,17 @@ const DigestEngine::Digest& SHA1Engine::digest()
 	if (count > 56)
 	{
 		/* Two lots of padding:  Pad the first block to 64 bytes */
-		memset((BYTE*) &_context.data + count, 0, 64 - count);
+		std::memset((BYTE*) &_context.data + count, 0, 64 - count);
 		SHA1_BYTE_REVERSE(_context.data, BLOCK_SIZE);
 		transform();
 
 		/* Now fill the next block with 56 bytes */
-		memset(&_context.data, 0, 56);
+		std::memset(&_context.data, 0, 56);
 	}
 	else
 	{
 		/* Pad block to 56 bytes */
-		memset((BYTE*) &_context.data + count, 0, 56 - count);
+		std::memset((BYTE*) &_context.data + count, 0, 56 - count);
 	}
 	SHA1_BYTE_REVERSE(_context.data, BLOCK_SIZE);
 

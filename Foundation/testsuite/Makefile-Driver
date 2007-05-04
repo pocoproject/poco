@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/testsuite/Makefile-Driver#34 $
+# $Id: //poco/Main/Foundation/testsuite/Makefile-Driver#35 $
 #
 # Makefile for Poco Foundation testsuite
 #
@@ -27,7 +27,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	SimpleFileChannelTest StopwatchTest \
 	StreamConverterTest StreamCopierTest StreamTokenizerTest \
 	StreamsTestSuite StringTest StringTokenizerTest TaskTestSuite TaskTest \
-	TaskManagerTest TestChannel TeeStreamTest \
+	TaskManagerTest TestChannel TeeStreamTest UTF8StringTest \
 	TextConverterTest TextIteratorTest TextTestSuite TextEncodingTest \
 	ThreadLocalTest ThreadPoolTest ThreadTest ThreadingTestSuite TimerTest \
 	TimespanTest TimestampTest TimezoneTest URIStreamOpenerTest URITest \

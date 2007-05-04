@@ -1,7 +1,7 @@
 //
 // RandomStreamTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/RandomStreamTest.cpp#9 $
+// $Id: //poco/Main/Foundation/testsuite/src/RandomStreamTest.cpp#10 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,7 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/RandomStream.h"
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 
 using Poco::RandomInputStream;
@@ -70,7 +70,7 @@ void RandomStreamTest::testStream()
 	int var = 0;
 	for (int k = 0; k < n; ++k) var += (d[k] - avg)*(d[k] - avg);
 	var /= n;
-	int sd = int(sqrt((double) var));
+	int sd = int(std::sqrt((double) var));
 	
 	assert (110 < avg && avg < 140);
 	assert (sd < 20);

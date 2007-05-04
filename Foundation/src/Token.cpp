@@ -1,7 +1,7 @@
 //
 // Token.cpp
 //
-// $Id: //poco/Main/Foundation/src/Token.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Token.cpp#12 $
 //
 // Library: Foundation
 // Package: Streams
@@ -36,7 +36,7 @@
 
 #include "Poco/Token.h"
 #include "Poco/NumberParser.h"
-#include <ctype.h>
+#include <cctype>
 
 
 namespace Poco {
@@ -144,7 +144,7 @@ Token::Class WhitespaceToken::tokenClass() const
 
 bool WhitespaceToken::start(char c, std::istream& istr)
 {
-	if (isspace(c))
+	if (std::isspace(c))
 	{
 		_value = c;
 		return true;
@@ -156,7 +156,7 @@ bool WhitespaceToken::start(char c, std::istream& istr)
 void WhitespaceToken::finish(std::istream& istr)
 {
 	int c = istr.peek();
-	while (isspace(c))
+	while (std::isspace(c))
 	{
 		istr.get();
 		_value += (char) c;

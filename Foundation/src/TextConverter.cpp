@@ -1,7 +1,7 @@
 //
 // TextConverter.cpp
 //
-// $Id: //poco/Main/Foundation/src/TextConverter.cpp#10 $
+// $Id: //poco/Main/Foundation/src/TextConverter.cpp#11 $
 //
 // Library: Foundation
 // Package: Text
@@ -39,6 +39,14 @@
 #include "Poco/TextEncoding.h"
 
 
+namespace {
+	int nullTransform(int ch)
+	{
+		return ch;
+	}
+}
+
+
 namespace Poco {
 
 
@@ -55,7 +63,7 @@ TextConverter::~TextConverter()
 }
 
 
-int TextConverter::convert(const std::string& source, std::string& destination)
+int TextConverter::convert(const std::string& source, std::string& destination, Transform trans)
 {
 	int errors = 0;
 	TextIterator it(source, _inEncoding);
@@ -66,6 +74,7 @@ int TextConverter::convert(const std::string& source, std::string& destination)
 	{
 		int c = *it;
 		if (c == -1) { ++errors; c = _defaultChar; }
+		c = trans(c);
 		int n = _outEncoding.convert(c, buffer, sizeof(buffer));
 		if (n == 0) n = _outEncoding.convert(_defaultChar, buffer, sizeof(buffer));
 		poco_assert (n <= sizeof(buffer));
@@ -76,7 +85,7 @@ int TextConverter::convert(const std::string& source, std::string& destination)
 }
 
 
-int TextConverter::convert(const void* source, int length, std::string& destination)
+int TextConverter::convert(const void* source, int length, std::string& destination, Transform trans)
 {
 	poco_check_ptr (source);
 
@@ -115,12 +124,25 @@ int TextConverter::convert(const void* source, int length, std::string& destinat
 			}
 			it -= n;
 		}
+		uc = trans(uc);
 		n = _outEncoding.convert(uc, buffer, sizeof(buffer));
 		if (n == 0) n = _outEncoding.convert(_defaultChar, buffer, sizeof(buffer));
 		poco_assert (n <= sizeof(buffer));
 		destination.append((const char*) buffer, n);
 	}
 	return errors;
+}
+
+
+int TextConverter::convert(const std::string& source, std::string& destination)
+{
+	return convert(source, destination, nullTransform);
+}
+
+
+int TextConverter::convert(const void* source, int length, std::string& destination)
+{
+	return convert(source, length, destination, nullTransform);
 }
 
 

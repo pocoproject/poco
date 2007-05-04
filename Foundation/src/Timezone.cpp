@@ -1,7 +1,7 @@
 //
 // Timezone.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timezone.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Timezone.cpp#12 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -35,7 +35,7 @@
 
 
 #include "Poco/Timezone.h"
-#include <time.h>
+#include <ctime>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)

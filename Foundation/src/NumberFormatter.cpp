@@ -1,7 +1,7 @@
 //
 // NumberFormatter.cpp
 //
-// $Id: //poco/Main/Foundation/src/NumberFormatter.cpp#10 $
+// $Id: //poco/Main/Foundation/src/NumberFormatter.cpp#12 $
 //
 // Library: Foundation
 // Package: Core
@@ -35,8 +35,8 @@
 
 
 #include "Poco/NumberFormatter.h"
-#include <stdio.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cctype>
 
 
 #if defined(_MSC_VER)
@@ -54,7 +54,7 @@ namespace Poco {
 std::string NumberFormatter::format(int value)
 {
 	char buffer[64];
-	sprintf(buffer, "%d", value);
+	std::sprintf(buffer, "%d", value);
 	return std::string(buffer);
 }
 
@@ -64,7 +64,7 @@ std::string NumberFormatter::format(int value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%*d", width, value);
+	std::sprintf(buffer, "%*d", width, value);
 	return std::string(buffer);
 }
 
@@ -74,7 +74,7 @@ std::string NumberFormatter::format0(int value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*d", width, value);
+	std::sprintf(buffer, "%0*d", width, value);
 	return std::string(buffer);
 }
 
@@ -82,7 +82,7 @@ std::string NumberFormatter::format0(int value, int width)
 std::string NumberFormatter::formatHex(int value)
 {
 	char buffer[64];
-	sprintf(buffer, "%X", value);
+	std::sprintf(buffer, "%X", value);
 	return std::string(buffer);
 }
 
@@ -92,7 +92,7 @@ std::string NumberFormatter::formatHex(int value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*X", width, value);
+	std::sprintf(buffer, "%0*X", width, value);
 	return std::string(buffer);
 }
 
@@ -100,7 +100,7 @@ std::string NumberFormatter::formatHex(int value, int width)
 std::string NumberFormatter::format(unsigned value)
 {
 	char buffer[64];
-	sprintf(buffer, "%u", value);
+	std::sprintf(buffer, "%u", value);
 	return std::string(buffer);
 }
 
@@ -110,7 +110,7 @@ std::string NumberFormatter::format(unsigned value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%*u", width, value);
+	std::sprintf(buffer, "%*u", width, value);
 	return std::string(buffer);
 }
 
@@ -120,7 +120,7 @@ std::string NumberFormatter::format0(unsigned int value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*u", width, value);
+	std::sprintf(buffer, "%0*u", width, value);
 	return std::string(buffer);
 }
 
@@ -128,7 +128,7 @@ std::string NumberFormatter::format0(unsigned int value, int width)
 std::string NumberFormatter::formatHex(unsigned value)
 {
 	char buffer[64];
-	sprintf(buffer, "%X", value);
+	std::sprintf(buffer, "%X", value);
 	return std::string(buffer);
 }
 
@@ -138,7 +138,7 @@ std::string NumberFormatter::formatHex(unsigned value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*X", width, value);
+	std::sprintf(buffer, "%0*X", width, value);
 	return std::string(buffer);
 }
 
@@ -146,7 +146,7 @@ std::string NumberFormatter::formatHex(unsigned value, int width)
 std::string NumberFormatter::format(long value)
 {
 	char buffer[64];
-	sprintf(buffer, "%ld", value);
+	std::sprintf(buffer, "%ld", value);
 	return std::string(buffer);
 }
 
@@ -156,7 +156,7 @@ std::string NumberFormatter::format(long value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%*ld", width, value);
+	std::sprintf(buffer, "%*ld", width, value);
 	return std::string(buffer);
 }
 
@@ -166,7 +166,7 @@ std::string NumberFormatter::format0(long value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*ld", width, value);
+	std::sprintf(buffer, "%0*ld", width, value);
 	return std::string(buffer);
 }
 
@@ -174,7 +174,7 @@ std::string NumberFormatter::format0(long value, int width)
 std::string NumberFormatter::formatHex(long value)
 {
 	char buffer[64];
-	sprintf(buffer, "%lX", value);
+	std::sprintf(buffer, "%lX", value);
 	return std::string(buffer);
 }
 
@@ -184,7 +184,7 @@ std::string NumberFormatter::formatHex(long value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*lX", width, value);
+	std::sprintf(buffer, "%0*lX", width, value);
 	return std::string(buffer);
 }
 
@@ -192,7 +192,7 @@ std::string NumberFormatter::formatHex(long value, int width)
 std::string NumberFormatter::format(unsigned long value)
 {
 	char buffer[64];
-	sprintf(buffer, "%lu", value);
+	std::sprintf(buffer, "%lu", value);
 	return std::string(buffer);
 }
 
@@ -202,7 +202,7 @@ std::string NumberFormatter::format(unsigned long value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%*lu", width, value);
+	std::sprintf(buffer, "%*lu", width, value);
 	return std::string(buffer);
 }
 
@@ -212,7 +212,7 @@ std::string NumberFormatter::format0(unsigned long value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*lu", width, value);
+	std::sprintf(buffer, "%0*lu", width, value);
 	return std::string(buffer);
 }
 
@@ -220,7 +220,7 @@ std::string NumberFormatter::format0(unsigned long value, int width)
 std::string NumberFormatter::formatHex(unsigned long value)
 {
 	char buffer[64];
-	sprintf(buffer, "%lX", value);
+	std::sprintf(buffer, "%lX", value);
 	return std::string(buffer);
 }
 
@@ -230,7 +230,7 @@ std::string NumberFormatter::formatHex(unsigned long value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*lX", width, value);
+	std::sprintf(buffer, "%0*lX", width, value);
 	return std::string(buffer);
 }
 
@@ -241,7 +241,7 @@ std::string NumberFormatter::formatHex(unsigned long value, int width)
 std::string NumberFormatter::format(Int64 value)
 {
 	char buffer[64];
-	sprintf(buffer, "%"I64_FMT"d", value);
+	std::sprintf(buffer, "%"I64_FMT"d", value);
 	return std::string(buffer);
 }
 
@@ -251,7 +251,7 @@ std::string NumberFormatter::format(Int64 value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%*"I64_FMT"d", width, value);
+	std::sprintf(buffer, "%*"I64_FMT"d", width, value);
 	return std::string(buffer);
 }
 
@@ -261,7 +261,7 @@ std::string NumberFormatter::format0(Int64 value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*"I64_FMT"d", width, value);
+	std::sprintf(buffer, "%0*"I64_FMT"d", width, value);
 	return std::string(buffer);
 }
 
@@ -269,7 +269,7 @@ std::string NumberFormatter::format0(Int64 value, int width)
 std::string NumberFormatter::formatHex(Int64 value)
 {
 	char buffer[64];
-	sprintf(buffer, "%"I64_FMT"X", value);
+	std::sprintf(buffer, "%"I64_FMT"X", value);
 	return std::string(buffer);
 }
 
@@ -279,7 +279,7 @@ std::string NumberFormatter::formatHex(Int64 value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*"I64_FMT"X", width, value);
+	std::sprintf(buffer, "%0*"I64_FMT"X", width, value);
 	return std::string(buffer);
 }
 
@@ -287,7 +287,7 @@ std::string NumberFormatter::formatHex(Int64 value, int width)
 std::string NumberFormatter::format(UInt64 value)
 {
 	char buffer[64];
-	sprintf(buffer, "%"I64_FMT"u", value);
+	std::sprintf(buffer, "%"I64_FMT"u", value);
 	return std::string(buffer);
 }
 
@@ -297,7 +297,7 @@ std::string NumberFormatter::format(UInt64 value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%*"I64_FMT"u", width, value);
+	std::sprintf(buffer, "%*"I64_FMT"u", width, value);
 	return std::string(buffer);
 }
 
@@ -307,7 +307,7 @@ std::string NumberFormatter::format0(UInt64 value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*"I64_FMT"u", width, value);
+	std::sprintf(buffer, "%0*"I64_FMT"u", width, value);
 	return std::string(buffer);
 }
 
@@ -315,7 +315,7 @@ std::string NumberFormatter::format0(UInt64 value, int width)
 std::string NumberFormatter::formatHex(UInt64 value)
 {
 	char buffer[64];
-	sprintf(buffer, "%"I64_FMT"X", value);
+	std::sprintf(buffer, "%"I64_FMT"X", value);
 	return std::string(buffer);
 }
 
@@ -325,7 +325,7 @@ std::string NumberFormatter::formatHex(UInt64 value, int width)
 	poco_assert (width > 0 && width < 64);
 
 	char buffer[64];
-	sprintf(buffer, "%0*"I64_FMT"X", width, value);
+	std::sprintf(buffer, "%0*"I64_FMT"X", width, value);
 	return std::string(buffer);
 }
 
@@ -336,7 +336,7 @@ std::string NumberFormatter::formatHex(UInt64 value, int width)
 std::string NumberFormatter::format(float value)
 {
 	char buffer[64];
-	sprintf(buffer, "%.*g", 10, (double) value);
+	std::sprintf(buffer, "%.*g", 10, (double) value);
 	return std::string(buffer);
 }
 
@@ -344,7 +344,7 @@ std::string NumberFormatter::format(float value)
 std::string NumberFormatter::format(double value)
 {
 	char buffer[64];
-	sprintf(buffer, "%.*g", 20, value);
+	std::sprintf(buffer, "%.*g", 20, value);
 	return std::string(buffer);
 }
 
@@ -354,7 +354,7 @@ std::string NumberFormatter::format(double value, int precision)
 	poco_assert (precision >= 0 && precision < 32);
 
 	char buffer[64];
-	sprintf(buffer, "%.*f", precision, value);
+	std::sprintf(buffer, "%.*f", precision, value);
 	return std::string(buffer);
 }
 
@@ -364,7 +364,7 @@ std::string NumberFormatter::format(double value, int width, int precision)
 	poco_assert (width > 0 && width < 64 && precision >= 0 && precision < width);
 
 	char buffer[64];
-	sprintf(buffer, "%*.*f", width, precision, value);
+	std::sprintf(buffer, "%*.*f", width, precision, value);
 	return std::string(buffer);
 }
 
@@ -373,9 +373,9 @@ std::string NumberFormatter::format(const void* ptr)
 {
 	char buffer[24];
 #if defined(POCO_PTR_IS_64_BIT)
-	sprintf(buffer, "%016"I64_FMT"X", (UIntPtr) ptr);
+	std::sprintf(buffer, "%016"I64_FMT"X", (UIntPtr) ptr);
 #else
-	sprintf(buffer, "%08lX", (UIntPtr) ptr);
+	std::sprintf(buffer, "%08lX", (UIntPtr) ptr);
 #endif
 	return std::string(buffer);
 }

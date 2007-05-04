@@ -1214,6 +1214,10 @@
 					RelativePath=".\src\TextTestSuite.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\UTF8StringTest.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -1236,6 +1240,10 @@
 				</File>
 				<File
 					RelativePath=".\src\TextTestSuite.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UTF8StringTest.h"
 					>
 				</File>
 			</Filter>

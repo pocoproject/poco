@@ -1,7 +1,7 @@
 //
 // Path_UNIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/Path_UNIX.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Path_UNIX.cpp#12 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -41,9 +41,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <pwd.h>
-#include <ctype.h>
-#include <limits.h>
-#include <locale>
+#include <cctype>
+#include <climits>
 
 
 #ifndef PATH_MAX
@@ -114,7 +113,6 @@ std::string PathImpl::nullImpl()
 
 std::string PathImpl::expandImpl(const std::string& path)
 {
-	std::locale loc;
 	std::string result;
 	std::string::const_iterator it  = path.begin();
 	std::string::const_iterator end = path.end();
@@ -141,7 +139,7 @@ std::string PathImpl::expandImpl(const std::string& path)
 			}
 			else
 			{
-				while (it != end && (isalnum(*it, loc) || *it == '_')) var += *it++;
+				while (it != end && (std::isalnum(*it) || *it == '_')) var += *it++;
 			}
 			char* val = getenv(var.c_str());
 			if (val) result += val;

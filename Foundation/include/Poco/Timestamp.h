@@ -1,7 +1,7 @@
 //
 // Timestamp.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Timestamp.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/Timestamp.h#4 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -41,7 +41,7 @@
 
 
 #include "Poco/Foundation.h"
-#include <time.h>
+#include <ctime>
 
 
 namespace Poco {
@@ -95,7 +95,7 @@ public:
 	Timestamp& operator += (TimeDiff d);
 	Timestamp& operator -= (TimeDiff d);
 	
-	time_t epochTime() const;
+	std::time_t epochTime() const;
 		/// Returns the timestamp expressed in time_t.
 		/// time_t base time is midnight, January 1, 1970.
 		/// Resolution is one second.
@@ -117,8 +117,8 @@ public:
 		/// Returns true iff the given interval has passed
 		/// since the time denoted by the timestamp.
 	
-	static Timestamp fromEpochTime(time_t t);
-		/// Creates a timestamp from a time_t.
+	static Timestamp fromEpochTime(std::time_t t);
+		/// Creates a timestamp from a std::time_t.
 		
 	static Timestamp fromUtcTime(UtcTimeVal val);
 		/// Creates a timestamp from a UTC time value.
@@ -209,9 +209,9 @@ inline Timestamp& Timestamp::operator -= (Timestamp::TimeDiff d)
 }
 
 
-inline time_t Timestamp::epochTime() const
+inline std::time_t Timestamp::epochTime() const
 {
-	return time_t(_ts/resolution());
+	return std::time_t(_ts/resolution());
 }
 
 

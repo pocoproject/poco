@@ -1,11 +1,9 @@
 //
-// DynamicAny.cpp
+// UTF8StringTest.h
 //
-// $Id: //poco/Main/Foundation/src/DynamicAny.cpp#4 $
+// $Id: //poco/Main/Foundation/testsuite/src/UTF8StringTest.h#1 $
 //
-// Library: Foundation
-// Package: Core
-// Module:  DynamicAny
+// Definition of the UTF8StringTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,49 +32,30 @@
 //
 
 
-#include "Poco/DynamicAny.h"
-#include <algorithm>
+#ifndef UTF8StringTest_INCLUDED
+#define UTF8StringTest_INCLUDED
 
 
-namespace Poco {
+#include "Poco/Foundation.h"
+#include "CppUnit/TestCase.h"
 
 
-DynamicAny::DynamicAny():
-	_pHolder(new DynamicAnyHolderImpl<int>(0))
+class UTF8StringTest: public CppUnit::TestCase
 {
-}
+public:
+	UTF8StringTest(const std::string& name);
+	~UTF8StringTest();
+
+	void testCompare();
+	void testTransform();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+};
 
 
-DynamicAny::DynamicAny(const char* pVal): 
-	_pHolder(new DynamicAnyHolderImpl<std::string>(pVal))
-{
-}
-
-
-DynamicAny::DynamicAny(const DynamicAny& other):
-	_pHolder(0)
-{
-	if (other._pHolder)
-		_pHolder = other._pHolder->clone();
-}
-
-
-DynamicAny::~DynamicAny()
-{
-	delete _pHolder;
-}
-
-
-void DynamicAny::swap(DynamicAny& ptr)
-{
-	std::swap(_pHolder, ptr._pHolder);
-}
-
-
-const std::type_info& DynamicAny::type() const
-{
-    return _pHolder->type();
-}
-
-
-} // namespace Poco::Poco
+#endif // UTF8StringTest_INCLUDED

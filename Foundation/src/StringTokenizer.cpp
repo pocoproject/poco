@@ -1,7 +1,7 @@
 //
 // StringTokenizer.cpp
 //
-// $Id: //poco/Main/Foundation/src/StringTokenizer.cpp#11 $
+// $Id: //poco/Main/Foundation/src/StringTokenizer.cpp#12 $
 //
 // Library: Foundation
 // Package: Core
@@ -35,7 +35,7 @@
 
 
 #include "Poco/StringTokenizer.h"
-#include <locale>
+#include <cctype>
 
 
 namespace Poco {
@@ -43,7 +43,6 @@ namespace Poco {
 
 StringTokenizer::StringTokenizer(const std::string& str, const std::string& separators, int options)
 {
-	std::locale loc;
 	std::string::const_iterator it1 = str.begin();
 	std::string::const_iterator it2;
 	std::string::const_iterator it3;
@@ -53,7 +52,7 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 	{
 		if (options & TOK_TRIM)
 		{
-			while (it1 != end && std::isspace(*it1, loc)) ++it1;
+			while (it1 != end && std::isspace(*it1)) ++it1;
 		}
 		it2 = it1;
 		while (it2 != end && separators.find(*it2) == std::string::npos) ++it2;
@@ -61,8 +60,8 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 		if (it3 != it1 && (options & TOK_TRIM))
 		{
 			--it3;
-			while (it3 != it1 && std::isspace(*it3, loc)) --it3;
-			if (!std::isspace(*it3, loc)) ++it3;
+			while (it3 != it1 && std::isspace(*it3)) --it3;
+			if (!std::isspace(*it3)) ++it3;
 		}
 		if (options & TOK_IGNORE_EMPTY)
 		{

@@ -1,7 +1,7 @@
 //
 // MD5Engine.cpp
 //
-// $Id: //poco/Main/Foundation/src/MD5Engine.cpp#11 $
+// $Id: //poco/Main/Foundation/src/MD5Engine.cpp#13 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -58,7 +58,7 @@
 
 
 #include "Poco/MD5Engine.h"
-#include <string.h>
+#include <cstring>
 
 
 namespace Poco {
@@ -95,7 +95,7 @@ void MD5Engine::updateImpl(const void* input_, unsigned inputLen)
 	/* Transform as many times as possible. */
 	if (inputLen >= partLen) 
 	{
-		memcpy(&_context.buffer[index], input, partLen);
+		std::memcpy(&_context.buffer[index], input, partLen);
 		transform(_context.state, _context.buffer);
 
 		for (i = partLen; i + 63 < inputLen; i += 64)
@@ -106,7 +106,7 @@ void MD5Engine::updateImpl(const void* input_, unsigned inputLen)
 	else i = 0;
 
 	/* Buffer remaining input */
-	memcpy(&_context.buffer[index], &input[i],inputLen-i);
+	std::memcpy(&_context.buffer[index], &input[i],inputLen-i);
 }
 
 
@@ -118,7 +118,7 @@ unsigned MD5Engine::digestLength() const
 
 void MD5Engine::reset()
 {
-	memset(&_context, 0, sizeof(_context));
+	std::memset(&_context, 0, sizeof(_context));
 	_context.count[0] = _context.count[1] = 0;
 	_context.state[0] = 0x67452301;
 	_context.state[1] = 0xefcdab89;
@@ -156,7 +156,7 @@ const DigestEngine::Digest& MD5Engine::digest()
 	_digest.insert(_digest.begin(), digest, digest + sizeof(digest));
 
 	/* Zeroize sensitive information. */
-	memset(&_context, 0, sizeof (_context));
+	std::memset(&_context, 0, sizeof (_context));
 	reset();
 	return _digest;
 }
@@ -300,7 +300,7 @@ void MD5Engine::transform (UInt32 state[4], const unsigned char block[64])
 	state[3] += d;
 
 	/* Zeroize sensitive information. */
-	memset(x, 0, sizeof(x));
+	std::memset(x, 0, sizeof(x));
 }
 
 

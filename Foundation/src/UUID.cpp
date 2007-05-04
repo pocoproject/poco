@@ -1,7 +1,7 @@
 //
 // UUID.cpp
 //
-// $Id: //poco/Main/Foundation/src/UUID.cpp#12 $
+// $Id: //poco/Main/Foundation/src/UUID.cpp#13 $
 //
 // Library: Foundation
 // Package: UUID
@@ -38,7 +38,7 @@
 #include "Poco/ByteOrder.h"
 #include "Poco/Exception.h"
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 
 namespace Poco {
@@ -50,7 +50,7 @@ UUID::UUID():
 	_timeHiAndVersion(0),
 	_clockSeq(0)
 {
-	memset(_node, 0, sizeof(_node));
+	std::memset(_node, 0, sizeof(_node));
 }
 
 
@@ -60,7 +60,7 @@ UUID::UUID(const UUID& uuid):
 	_timeHiAndVersion(uuid._timeHiAndVersion),
 	_clockSeq(uuid._clockSeq)
 {
-	memcpy(_node, uuid._node, sizeof(_node));
+	std::memcpy(_node, uuid._node, sizeof(_node));
 }
 
 
@@ -83,7 +83,7 @@ UUID::UUID(UInt32 timeLow, UInt32 timeMid, UInt32 timeHiAndVersion, UInt16 clock
 	_timeHiAndVersion(timeHiAndVersion),
 	_clockSeq(clockSeq)
 {
-	memcpy(_node, node, sizeof(_node));
+	std::memcpy(_node, node, sizeof(_node));
 }
 
 
@@ -91,19 +91,19 @@ UUID::UUID(const char* bytes, Version version)
 {
 	UInt32 i32;
 	UInt16 i16;
-	memcpy(&i32, bytes, sizeof(i32));
+	std::memcpy(&i32, bytes, sizeof(i32));
 	_timeLow = ByteOrder::fromNetwork(i32);
 	bytes += sizeof(i32);
-	memcpy(&i16, bytes, sizeof(i16));
+	std::memcpy(&i16, bytes, sizeof(i16));
 	_timeMid = ByteOrder::fromNetwork(i16);
 	bytes += sizeof(i16);
-	memcpy(&i16, bytes, sizeof(i16));
+	std::memcpy(&i16, bytes, sizeof(i16));
 	_timeHiAndVersion = ByteOrder::fromNetwork(i16);
 	bytes += sizeof(i16);
-	memcpy(&i16, bytes, sizeof(i16));
+	std::memcpy(&i16, bytes, sizeof(i16));
 	_clockSeq = ByteOrder::fromNetwork(i16);
 	bytes += sizeof(i16);
-	memcpy(_node, bytes, sizeof(_node));
+	std::memcpy(_node, bytes, sizeof(_node));
 
 	_timeHiAndVersion &= 0x0FFF;
 	_timeHiAndVersion |= (version << 12);
@@ -125,7 +125,7 @@ UUID& UUID::operator = (const UUID& uuid)
 		_timeMid = uuid._timeMid;
 		_timeHiAndVersion = uuid._timeHiAndVersion;
 		_clockSeq         = uuid._clockSeq;
-		memcpy(_node, uuid._node, sizeof(_node));
+		std::memcpy(_node, uuid._node, sizeof(_node));
 	}
 	return *this;
 }
@@ -191,7 +191,7 @@ void UUID::parse(const std::string& uuid)
 		_timeMid = timeMid;
 		_timeHiAndVersion = timeHiAndVersion;
 		_clockSeq = clockSeq;
-		memcpy(_node, node, sizeof(_node));
+		std::memcpy(_node, node, sizeof(_node));
 	}
 }
 
@@ -218,37 +218,37 @@ void UUID::copyFrom(const char* buffer)
 {
 	UInt32 i32;
 	UInt16 i16;
-	memcpy(&i32, buffer, sizeof(i32));
+	std::memcpy(&i32, buffer, sizeof(i32));
 	_timeLow = ByteOrder::fromNetwork(i32);
 	buffer += sizeof(i32);
-	memcpy(&i16, buffer, sizeof(i16));
+	std::memcpy(&i16, buffer, sizeof(i16));
 	_timeMid = ByteOrder::fromNetwork(i16);
 	buffer += sizeof(i16);
-	memcpy(&i16, buffer, sizeof(i16));
+	std::memcpy(&i16, buffer, sizeof(i16));
 	_timeHiAndVersion = ByteOrder::fromNetwork(i16);
 	buffer += sizeof(i16);
-	memcpy(&i16, buffer, sizeof(i16));
+	std::memcpy(&i16, buffer, sizeof(i16));
 	_clockSeq = ByteOrder::fromNetwork(i16);
 	buffer += sizeof(i16);
-	memcpy(_node, buffer, sizeof(_node));
+	std::memcpy(_node, buffer, sizeof(_node));
 }
 
 
 void UUID::copyTo(char* buffer) const
 {
 	UInt32 i32 = ByteOrder::toNetwork(_timeLow);
-	memcpy(buffer, &i32, sizeof(i32));
+	std::memcpy(buffer, &i32, sizeof(i32));
 	buffer += sizeof(i32);
 	UInt16 i16 = ByteOrder::toNetwork(_timeMid);
-	memcpy(buffer, &i16, sizeof(i16));
+	std::memcpy(buffer, &i16, sizeof(i16));
 	buffer += sizeof(i16);
 	i16 = ByteOrder::toNetwork(_timeHiAndVersion);
-	memcpy(buffer, &i16, sizeof(i16));
+	std::memcpy(buffer, &i16, sizeof(i16));
 	buffer += sizeof(i16);
 	i16 = ByteOrder::toNetwork(_clockSeq);
-	memcpy(buffer, &i16, sizeof(i16));
+	std::memcpy(buffer, &i16, sizeof(i16));
 	buffer += sizeof(i16);
-	memcpy(buffer, _node, sizeof(_node));
+	std::memcpy(buffer, _node, sizeof(_node));
 }
 
 

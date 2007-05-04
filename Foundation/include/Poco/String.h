@@ -1,7 +1,7 @@
 //
 // String.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/String.h#6 $
+// $Id: //poco/Main/Foundation/include/Poco/String.h#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -42,7 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include <cstring>
-#include <locale>
+#include <cctype>
 
 
 namespace Poco {
@@ -53,11 +53,10 @@ S trimLeft(const S& str)
 	/// Returns a copy of str with all leading
 	/// whitespace removed.
 {
-	std::locale loc;
 	typename S::const_iterator it  = str.begin();
 	typename S::const_iterator end = str.end();
 	
-	while (it != end && isspace(*it, loc)) ++it;
+	while (it != end && std::isspace(*it)) ++it;
 	return S(it, end);
 }
 
@@ -66,11 +65,10 @@ template <class S>
 S& trimLeftInPlace(S& str)
 	/// Removes all leading whitespace in str.
 {
-	std::locale loc;
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
 	
-	while (it != end && isspace(*it, loc)) ++it;
+	while (it != end && std::isspace(*it)) ++it;
 	str.erase(str.begin(), it);
 	return str;
 }
@@ -81,10 +79,9 @@ S trimRight(const S& str)
 	/// Returns a copy of str with all trailing
 	/// whitespace removed.
 {
-	std::locale loc;
 	int pos = int(str.size()) - 1;
 		
-	while (pos >= 0 && isspace(str[pos], loc)) --pos;
+	while (pos >= 0 && std::isspace(str[pos])) --pos;
 	return S(str, 0, pos + 1);
 }
 
@@ -93,10 +90,9 @@ template <class S>
 S& trimRightInPlace(S& str)
 	/// Removes all trailing whitespace in str.
 {
-	std::locale loc;
 	int pos = int(str.size()) - 1;
 		
-	while (pos >= 0 && isspace(str[pos], loc)) --pos;
+	while (pos >= 0 && std::isspace(str[pos])) --pos;
 	str.resize(pos + 1);
 
 	return str;
@@ -108,12 +104,11 @@ S trim(const S& str)
 	/// Returns a copy of str with all leading and
 	/// trailing whitespace removed.
 {
-	std::locale loc;
 	int first = 0;
 	int last  = int(str.size()) - 1;
 	
-	while (first <= last && isspace(str[first], loc)) ++first;
-	while (last >= first && isspace(str[last], loc)) --last;
+	while (first <= last && std::isspace(str[first])) ++first;
+	while (last >= first && std::isspace(str[last])) --last;
 
 	return S(str, first, last - first + 1);
 }
@@ -123,12 +118,11 @@ template <class S>
 S& trimInPlace(S& str)
 	/// Removes all leading and trailing whitespace in str.
 {
-	std::locale loc;
 	int first = 0;
 	int last  = int(str.size()) - 1;
 	
-	while (first <= last && isspace(str[first], loc)) ++first;
-	while (last >= first && isspace(str[last], loc)) --last;
+	while (first <= last && std::isspace(str[first])) ++first;
+	while (last >= first && std::isspace(str[last])) --last;
 
 	str.resize(last + 1);
 	str.erase(0, first);
@@ -141,13 +135,12 @@ template <class S>
 S toUpper(const S& str)
 	/// Returns a copy of str containing all upper-case characters.
 {
-	std::locale loc;
 	typename S::const_iterator it  = str.begin();
 	typename S::const_iterator end = str.end();
 
 	S result;
 	result.reserve(str.size());
-	while (it != end) result += toupper(*it++, loc);
+	while (it != end) result += std::toupper(*it++);
 	return result;
 }
 
@@ -156,11 +149,10 @@ template <class S>
 S& toUpperInPlace(S& str)
 	/// Replaces all characters in str with their upper-case counterparts.
 {
-	std::locale loc;
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
 
-	while (it != end) { *it = toupper(*it, loc); ++it; }
+	while (it != end) { *it = std::toupper(*it); ++it; }
 	return str;
 }
 
@@ -169,13 +161,12 @@ template <class S>
 S toLower(const S& str)
 	/// Returns a copy of str containing all lower-case characters.
 {
-	std::locale loc;
 	typename S::const_iterator it  = str.begin();
 	typename S::const_iterator end = str.end();
 
 	S result;
 	result.reserve(str.size());
-	while (it != end) result += tolower(*it++, loc);
+	while (it != end) result += std::tolower(*it++);
 	return result;
 }
 
@@ -184,11 +175,10 @@ template <class S>
 S& toLowerInPlace(S& str)
 	/// Replaces all characters in str with their lower-case counterparts.
 {
-	std::locale loc;
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
 
-	while (it != end) { *it = tolower(*it, loc); ++it; }
+	while (it != end) { *it = std::tolower(*it); ++it; }
 	return str;
 }
 
@@ -210,11 +200,10 @@ int icompare(
 	if (pos + n > sz) n = sz - pos;
 	It it1  = str.begin() + pos; 
 	It end1 = str.begin() + pos + n;
-	std::locale loc;
 	while (it1 != end1 && it2 != end2)
 	{
-        typename S::value_type c1 = tolower(*it1, loc);
-        typename S::value_type c2 = tolower(*it2, loc);
+        typename S::value_type c1 = std::tolower(*it1);
+        typename S::value_type c2 = std::tolower(*it2);
         if (c1 < c2)
             return -1;
         else if (c1 > c2)
@@ -303,11 +292,10 @@ int icompare(
 	if (pos + n > sz) n = sz - pos;
 	typename S::const_iterator it  = str.begin() + pos; 
 	typename S::const_iterator end = str.begin() + pos + n;
-	std::locale loc;
 	while (it != end && *ptr)
 	{
-        typename S::value_type c1 = tolower(*it, loc);
-        typename S::value_type c2 = tolower(*ptr, loc);
+        typename S::value_type c1 = std::tolower(*it);
+        typename S::value_type c2 = std::tolower(*ptr);
         if (c1 < c2)
             return -1;
         else if (c1 > c2)

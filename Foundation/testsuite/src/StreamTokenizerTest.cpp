@@ -1,7 +1,7 @@
 //
 // StreamTokenizerTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/StreamTokenizerTest.cpp#9 $
+// $Id: //poco/Main/Foundation/testsuite/src/StreamTokenizerTest.cpp#10 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,7 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/StreamTokenizer.h"
 #include "Poco/Token.h"
-#include <ctype.h>
+#include <cctype>
 #include <sstream>
 
 
@@ -64,7 +64,7 @@ public:
 	
 	bool start(char c, std::istream& istr)
 	{
-		if (isalpha(c))
+		if (std::isalpha(c))
 		{
 			_value = c;
 			return true;
@@ -75,7 +75,7 @@ public:
 	void finish(std::istream& istr)
 	{
 		int c = istr.peek();
-		while (isalnum(c))
+		while (std::isalnum(c))
 		{
 			istr.get();
 			_value += c;
@@ -103,7 +103,7 @@ public:
 	
 	bool start(char c, std::istream& istr)
 	{
-		if (isdigit(c))
+		if (std::isdigit(c))
 		{
 			_value = c;
 			return true;
@@ -114,7 +114,7 @@ public:
 	void finish(std::istream& istr)
 	{
 		int c = istr.peek();
-		while (isdigit(c))
+		while (std::isdigit(c))
 		{
 			istr.get();
 			_value += c;

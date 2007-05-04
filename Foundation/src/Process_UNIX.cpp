@@ -1,7 +1,7 @@
 //
 // Process_UNIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/Process_UNIX.cpp#28 $
+// $Id: //poco/Main/Foundation/src/Process_UNIX.cpp#29 $
 //
 // Library: Foundation
 // Package: Processes
@@ -49,7 +49,7 @@
 #if defined(__QNX__)
 #include <process.h>
 #include <spawn.h>
-#include <string.h>
+#include <cstring>
 #endif
 
 
@@ -120,7 +120,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		argv[i++] = const_cast<char*>(it->c_str());
 	argv[i] = NULL;
 	struct inheritance inherit;
-	memset(&inherit, 0, sizeof(inherit));
+	std::memset(&inherit, 0, sizeof(inherit));
 	inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
 	int fdmap[3];
 	fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;

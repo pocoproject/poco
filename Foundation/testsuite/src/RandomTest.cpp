@@ -1,7 +1,7 @@
 //
 // RandomTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/RandomTest.cpp#9 $
+// $Id: //poco/Main/Foundation/testsuite/src/RandomTest.cpp#10 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,7 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Random.h"
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 
 using Poco::Random;
@@ -118,7 +118,7 @@ void RandomTest::testDistribution2()
 	int var = 0;
 	for (int k = 0; k < n; ++k) var += (d[k] - avg)*(d[k] - avg);
 	var /= n;
-	int sd = int(sqrt((double) var));
+	int sd = int(std::sqrt((double) var));
 	
 	assert (95 < avg && avg < 105);
 	assert (sd < 15);
@@ -141,7 +141,7 @@ void RandomTest::testDistribution3()
 	int var = 0;
 	for (int k = 0; k < n; ++k) var += (d[k] - avg)*(d[k] - avg);
 	var /= n;
-	int sd = int(sqrt((double) var));
+	int sd = int(std::sqrt((double) var));
 	
 	assert (95 < avg && avg < 105);
 	assert (sd < 15);

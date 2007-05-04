@@ -1,7 +1,7 @@
 //
 // Platform_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Platform_WIN32.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/Platform_WIN32.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -10,7 +10,7 @@
 // Platform and architecture identification macros
 // and platform-specific definitions for Windows.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -77,6 +77,8 @@
 	#pragma warning(disable:4251) // ... needs to have dll-interface warning 
 	#pragma warning(disable:4355) // 'this' : used in base member initializer list
 	#pragma warning(disable:4996) // VC++ 8.0 deprecation warnings
+	#pragma warning(disable:4351) // new behavior: elements of array '...' will be default initialized
+	#pragma warning(disable:4675) // resolved overload was found by argument-dependent lookup
 #endif
 
 

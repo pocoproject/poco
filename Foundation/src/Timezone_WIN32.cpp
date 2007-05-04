@@ -1,7 +1,7 @@
 //
 // Timezone_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timezone_WIN32.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Timezone_WIN32.cpp#12 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -37,7 +37,7 @@
 #include "Poco/Timezone.h"
 #include "Poco/UnicodeConverter.h"
 #include <windows.h>
-#include <time.h>
+#include <ctime>
 
 
 namespace Poco {
@@ -61,8 +61,8 @@ int Timezone::dst()
 
 bool Timezone::isDst(const Timestamp& timestamp)
 {
-	time_t time = timestamp.epochTime();
-	struct tm* tms = localtime(&time);
+	std::time_t time = timestamp.epochTime();
+	struct std::tm* tms = std::localtime(&time);
 	return tms->tm_isdst > 0;
 }
 

@@ -1,7 +1,7 @@
 //
 // Timezone_UNIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timezone_UNIX.cpp#13 $
+// $Id: //poco/Main/Foundation/src/Timezone_UNIX.cpp#14 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -35,7 +35,7 @@
 
 
 #include "Poco/Timezone.h"
-#include <time.h>
+#include <ctime>
 
 
 namespace Poco {
@@ -52,10 +52,10 @@ public:
 	int timeZone()
 	{
 	#if defined(__APPLE__)  || defined(__FreeBSD__) // no timezone global var
-		time_t now = time(NULL);
-		struct tm t;
+		std::time_t now = std::time(NULL);
+		struct std::tm t;
 		gmtime_r(&now, &t);
-		time_t utc = mktime(&t);
+		std::time_t utc = std::mktime(&t);
 		return now - utc;
 	#elif defined(__CYGWIN__)
 		return -_timezone;
@@ -82,8 +82,8 @@ int Timezone::utcOffset()
 	
 int Timezone::dst()
 {
-	time_t now = time(NULL);
-	struct tm t;
+	std::time_t now = std::time(NULL);
+	struct std::tm t;
 	localtime_r(&now, &t);
 	return t.tm_isdst == 1 ? 3600 : 0;
 }
@@ -91,8 +91,8 @@ int Timezone::dst()
 
 bool Timezone::isDst(const Timestamp& timestamp)
 {
-	time_t time = timestamp.epochTime();
-	struct tm* tms = localtime(&time);
+	std::time_t time = timestamp.epochTime();
+	struct std::tm* tms = std::localtime(&time);
 	return tms->tm_isdst > 0;
 }
 

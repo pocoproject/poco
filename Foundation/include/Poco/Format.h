@@ -1,7 +1,7 @@
 //
 // Format.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Format.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/Format.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -67,7 +67,7 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	/// different number of arguments (up to six).
 	///
 	/// The formatting is controlled by the format string in fmt.
-	/// Format strings are quite similar to those of the printf() function, but
+	/// Format strings are quite similar to those of the std::printf() function, but
 	/// there are some minor differences.
 	///
 	/// The format string can consist of any sequence of characters; certain

@@ -1,7 +1,7 @@
 //
 // LoggingFactoryTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LoggingFactoryTest.cpp#6 $
+// $Id: //poco/Main/Foundation/testsuite/src/LoggingFactoryTest.cpp#7 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,6 +37,9 @@
 #include "Poco/Instantiator.h"
 #include "Poco/Channel.h"
 #include "Poco/ConsoleChannel.h"
+#if defined(_WIN32)
+#include "Poco/WindowsConsoleChannel.h"
+#endif
 #include "Poco/FileChannel.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/Formatter.h"
@@ -93,8 +96,12 @@ void LoggingFactoryTest::testBuiltins()
 	LoggingFactory& fact = LoggingFactory::defaultFactory();
 	
 	AutoPtr<Channel> pConsoleChannel = fact.createChannel("ConsoleChannel");
+#if defined(_WIN32)
+	assert (dynamic_cast<Poco::WindowsConsoleChannel*>(pConsoleChannel.get()) != 0);
+#else
 	assert (dynamic_cast<ConsoleChannel*>(pConsoleChannel.get()) != 0);
-	
+#endif
+
 	AutoPtr<Channel> pFileChannel = fact.createChannel("FileChannel");
 	assert (dynamic_cast<FileChannel*>(pFileChannel.get()) != 0);
 	

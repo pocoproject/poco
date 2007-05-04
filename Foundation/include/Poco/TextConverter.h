@@ -1,7 +1,7 @@
 //
 // TextConverter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/TextConverter.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/TextConverter.h#3 $
 //
 // Library: Foundation
 // Package: Text
@@ -54,6 +54,9 @@ class Foundation_API TextConverter
 	/// into another.
 {
 public:
+	typedef int (*Transform)(int);
+		/// Transform function for convert.
+		
 	TextConverter(const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 		/// Creates the TextConverter. The encoding objects must not be deleted while the
 		/// TextConverter is in use.
@@ -61,6 +64,24 @@ public:
 	~TextConverter();
 		/// Destroys the TextConverter.
 		
+	int convert(const std::string& source, std::string& destination, Transform trans);
+		/// Converts the source string from inEncoding to outEncoding
+		/// and appends the result to destination. Every character is
+		/// passed to the transform function.
+		/// If a character cannot be represented in outEncoding, defaultChar
+		/// is used instead.
+		/// Returns the number of encoding errors (invalid byte sequences
+		/// in source).
+
+	int convert(const void* source, int length, std::string& destination, Transform trans);
+		/// Converts the source buffer from inEncoding to outEncoding
+		/// and appends the result to destination. Every character is
+		/// passed to the transform function.
+		/// If a character cannot be represented in outEncoding, defaultChar
+		/// is used instead.
+		/// Returns the number of encoding errors (invalid byte sequences
+		/// in source).
+
 	int convert(const std::string& source, std::string& destination);
 		/// Converts the source string from inEncoding to outEncoding
 		/// and appends the result to destination.

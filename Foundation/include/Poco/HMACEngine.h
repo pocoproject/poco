@@ -1,7 +1,7 @@
 //
 // HMACEngine.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HMACEngine.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/HMACEngine.h#3 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -42,7 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/DigestEngine.h"
-#include <string.h>
+#include <cstring>
 
 
 namespace Poco {
@@ -80,8 +80,8 @@ public:
 	
 	~HMACEngine()
 	{
-		memset(_ipad, 0, BLOCK_SIZE);
-		memset(_opad, 0, BLOCK_SIZE);
+		std::memset(_ipad, 0, BLOCK_SIZE);
+		std::memset(_opad, 0, BLOCK_SIZE);
 		delete [] _ipad;
 		delete [] _opad;
 	}
@@ -117,8 +117,8 @@ protected:
 	{
 		_ipad = new char[BLOCK_SIZE];
 		_opad = new char[BLOCK_SIZE];
-		memset(_ipad, 0, BLOCK_SIZE);
-		memset(_opad, 0, BLOCK_SIZE);
+		std::memset(_ipad, 0, BLOCK_SIZE);
+		std::memset(_opad, 0, BLOCK_SIZE);
 		if (length > BLOCK_SIZE)
 		{
 			_engine.reset();
@@ -135,8 +135,8 @@ protected:
 		}
 		else
 		{
-			memcpy(_ipad, passphrase, length);
-			memcpy(_opad, passphrase, length);
+			std::memcpy(_ipad, passphrase, length);
+			std::memcpy(_opad, passphrase, length);
 		}
 		for (int i = 0; i < BLOCK_SIZE; ++i)
 		{

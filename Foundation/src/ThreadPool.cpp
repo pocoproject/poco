@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/Main/Foundation/src/ThreadPool.cpp#19 $
+// $Id: //poco/Main/Foundation/src/ThreadPool.cpp#20 $
 //
 // Library: Foundation
 // Package: Threading
@@ -41,7 +41,7 @@
 #include "Poco/ThreadLocal.h"
 #include "Poco/ErrorHandler.h"
 #include <sstream>
-#include <time.h>
+#include <ctime>
 
 
 namespace Poco {
@@ -64,8 +64,8 @@ public:
 	void run();
 
 private:
-	volatile bool   _idle;
-	volatile time_t _idleTime;
+	volatile bool        _idle;
+	volatile std::time_t _idleTime;
 	Runnable*       _pTarget;
 	std::string     _name;
 	Thread          _thread;

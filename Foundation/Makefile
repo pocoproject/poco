@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/Makefile#42 $
+# $Id: //poco/Main/Foundation/Makefile#43 $
 #
 # Makefile for Poco Foundation
 #
@@ -30,7 +30,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \
 	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Format \
 	Pipe PipeImpl PipeStream DynamicAny DynamicAnyHolder SharedMemory \
-	FileStream \
+	FileStream Unicode UTF8String \
 	adler32 compress crc32  deflate gzio infback inffast inflate inftrees  \
 	trees zutil \
 	pcre_chartables pcre_compile pcre_globals pcre_maketables pcre_study \

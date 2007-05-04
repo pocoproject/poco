@@ -1,11 +1,11 @@
 //
-// DynamicAny.cpp
+// Unicode.cpp
 //
-// $Id: //poco/Main/Foundation/src/DynamicAny.cpp#4 $
+// $Id: //poco/Main/Foundation/src/Unicode.cpp#1 $
 //
 // Library: Foundation
-// Package: Core
-// Module:  DynamicAny
+// Package: Text
+// Module:  Unicode
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,49 +34,61 @@
 //
 
 
-#include "Poco/DynamicAny.h"
-#include <algorithm>
+#include "Poco/Unicode.h"
+
+
+extern "C"
+{
+#include "pcre_internal.h"
+}
 
 
 namespace Poco {
 
 
-DynamicAny::DynamicAny():
-	_pHolder(new DynamicAnyHolderImpl<int>(0))
+void Unicode::properties(int ch, CharacterProperties& props)
 {
+	int type;
+	int script;
+	int category = _pcre_ucp_findprop(static_cast<unsigned>(ch), &type, &script);
+	props.category = static_cast<CharacterCategory>(category);
+	props.type     = static_cast<CharacterType>(type);
+	props.script   = static_cast<Script>(script);
+}
+
+	
+bool Unicode::isLower(int ch)
+{
+	CharacterProperties props;
+	properties(ch, props);
+	return props.category == UCP_LETTER && props.type == UCP_LOWER_CASE_LETTER;
+}
+
+	
+bool Unicode::isUpper(int ch)
+{
+	CharacterProperties props;
+	properties(ch, props);
+	return props.category == UCP_LETTER && props.type == UCP_UPPER_CASE_LETTER;
+}
+
+	
+int Unicode::toLower(int ch)
+{
+	if (isUpper(ch))
+		return static_cast<int>(_pcre_ucp_othercase(static_cast<unsigned>(ch)));
+	else
+		return ch;
 }
 
 
-DynamicAny::DynamicAny(const char* pVal): 
-	_pHolder(new DynamicAnyHolderImpl<std::string>(pVal))
+int Unicode::toUpper(int ch)
 {
+	if (isLower(ch))
+		return static_cast<int>(_pcre_ucp_othercase(static_cast<unsigned>(ch)));
+	else
+		return ch;
 }
 
 
-DynamicAny::DynamicAny(const DynamicAny& other):
-	_pHolder(0)
-{
-	if (other._pHolder)
-		_pHolder = other._pHolder->clone();
-}
-
-
-DynamicAny::~DynamicAny()
-{
-	delete _pHolder;
-}
-
-
-void DynamicAny::swap(DynamicAny& ptr)
-{
-	std::swap(_pHolder, ptr._pHolder);
-}
-
-
-const std::type_info& DynamicAny::type() const
-{
-    return _pHolder->type();
-}
-
-
-} // namespace Poco::Poco
+} // namespace Poco

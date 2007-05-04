@@ -1,7 +1,7 @@
 //
 // Random.cpp
 //
-// $Id: //poco/Main/Foundation/src/Random.cpp#13 $
+// $Id: //poco/Main/Foundation/src/Random.cpp#14 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -68,7 +68,7 @@
 
 #include "Poco/Random.h"
 #include "Poco/RandomStream.h"
-#include "time.h"
+#include <ctime>
 
 
 /*
@@ -172,7 +172,7 @@ Random::Random(int stateSize)
 	poco_assert (BREAK_0 <= stateSize && stateSize <= BREAK_4);
 
 	_pBuffer = new char[stateSize];
-	initState((UInt32) time(NULL), _pBuffer, stateSize);
+	initState((UInt32) std::time(NULL), _pBuffer, stateSize);
 }
 
 

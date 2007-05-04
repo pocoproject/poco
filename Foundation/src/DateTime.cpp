@@ -1,7 +1,7 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/Main/Foundation/src/DateTime.cpp#16 $
+// $Id: //poco/Main/Foundation/src/DateTime.cpp#18 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -37,7 +37,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/Timespan.h"
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 
 namespace Poco {
@@ -206,7 +206,7 @@ void DateTime::swap(DateTime& dateTime)
 
 int DateTime::dayOfWeek() const
 {
-	return int((floor(julianDay() + 1.5))) % 7;
+	return int((std::floor(julianDay() + 1.5))) % 7;
 }
 
 
@@ -331,7 +331,7 @@ double DateTime::toJulianDay(int year, int month, int day, int hour, int minute,
 		--year;
 	}
 	double dyear = double(year);
-	return dday + lookup[month] + 365*year + floor(dyear/4) - floor(dyear/100) + floor(dyear/400) + 1721118.5;
+	return dday + lookup[month] + 365*year + std::floor(dyear/4) - std::floor(dyear/100) + std::floor(dyear/400) + 1721118.5;
 }
 
 
@@ -367,15 +367,15 @@ void DateTime::normalize()
 
 void DateTime::computeGregorian(double julianDay)
 {
-	double z    = floor(julianDay - 1721118.5);
+	double z    = std::floor(julianDay - 1721118.5);
 	double r    = julianDay - 1721118.5 - z;
 	double g    = z - 0.25;
-	double a    = floor(g / 36524.25);
-	double b    = a - floor(a/4);
-	_year       = short(floor((b + g)/365.25));
-	double c    = b + z - floor(365.25*_year);
-	_month      = short(floor((5*c + 456)/153));
-	double dday = c - floor((153.0*_month - 457)/5) + r;
+	double a    = std::floor(g / 36524.25);
+	double b    = a - std::floor(a/4);
+	_year       = short(std::floor((b + g)/365.25));
+	double c    = b + z - std::floor(365.25*_year);
+	_month      = short(std::floor((5*c + 456)/153));
+	double dday = c - std::floor((153.0*_month - 457)/5) + r;
 	_day        = short(dday);
 	if (_month > 12)
 	{
@@ -383,17 +383,17 @@ void DateTime::computeGregorian(double julianDay)
 		_month -= 12;
 	}
 	r      *= 24;
-	_hour   = short(floor(r));
-	r      -= floor(r);
+	_hour   = short(std::floor(r));
+	r      -= std::floor(r);
 	r      *= 60;
-	_minute = short(floor(r));
-	r      -= floor(r);
+	_minute = short(std::floor(r));
+	r      -= std::floor(r);
 	r      *= 60;
-	_second = short(floor(r));
-	r      -= floor(r);
+	_second = short(std::floor(r));
+	r      -= std::floor(r);
 	r      *= 1000;
-	_millisecond = short(floor(r));
-	r      -= floor(r);
+	_millisecond = short(std::floor(r));
+	r      -= std::floor(r);
 	r      *= 1000;
 	_microsecond = short(r + 0.5);
 

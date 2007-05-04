@@ -1,7 +1,7 @@
 //
 // SimpleFileChannel.cpp
 //
-// $Id: //poco/Main/Foundation/src/SimpleFileChannel.cpp#6 $
+// $Id: //poco/Main/Foundation/src/SimpleFileChannel.cpp#7 $
 //
 // Library: Foundation
 // Package: Logging
@@ -39,7 +39,7 @@
 #include "Poco/File.h"
 #include "Poco/Message.h"
 #include "Poco/Exception.h"
-#include <ctype.h>
+#include <cctype>
 
 
 namespace Poco {
@@ -182,11 +182,11 @@ void SimpleFileChannel::setRotation(const std::string& rotation)
 	std::string::const_iterator it  = rotation.begin();
 	std::string::const_iterator end = rotation.end();
 	UInt64 n = 0;
-	while (it != end && isspace(*it)) ++it;
-	while (it != end && isdigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && isspace(*it)) ++it;
+	while (it != end && std::isspace(*it)) ++it;
+	while (it != end && std::isdigit(*it)) { n *= 10; n += *it++ - '0'; }
+	while (it != end && std::isspace(*it)) ++it;
 	std::string unit;
-	while (it != end && isalpha(*it)) unit += *it++;
+	while (it != end && std::isalpha(*it)) unit += *it++;
 	
 	if (unit == "K")
 		_limit = n*1024;

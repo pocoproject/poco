@@ -1,7 +1,7 @@
 //
 // Environment_WIN32U.cpp
 //
-// $Id: //poco/Main/Foundation/src/Environment_WIN32U.cpp#7 $
+// $Id: //poco/Main/Foundation/src/Environment_WIN32U.cpp#8 $
 //
 // Library: Foundation
 // Package: Core
@@ -39,7 +39,7 @@
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Buffer.h"
 #include <sstream>
-#include <string.h>
+#include <cstring>
 #include <windows.h>
 
 

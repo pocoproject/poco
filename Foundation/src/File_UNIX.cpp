@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/File_UNIX.cpp#19 $
+// $Id: //poco/Main/Foundation/src/File_UNIX.cpp#21 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -45,7 +45,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <utime.h>
-#include <string.h>
 
 
 namespace Poco {
@@ -427,7 +426,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case EMFILE:
 		throw FileException("too many open files", path);
 	default:
-		throw FileException(strerror(errno), path);
+		throw FileException(std::strerror(errno), path);
 	}
 }
 

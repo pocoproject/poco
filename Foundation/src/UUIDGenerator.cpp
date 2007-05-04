@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.cpp
 //
-// $Id: //poco/Main/Foundation/src/UUIDGenerator.cpp#15 $
+// $Id: //poco/Main/Foundation/src/UUIDGenerator.cpp#17 $
 //
 // Library: Foundation
 // Package: UUID
@@ -40,7 +40,7 @@
 #include "Poco/DigestEngine.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SingletonHolder.h"
-#include <string.h>
+#include <cstring>
 
 
 namespace Poco {
@@ -199,7 +199,7 @@ void UUIDGenerator::getNode()
 			{
 				if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(_node))
 				{
-					memcpy(_node, pAdapter->Address, pAdapter->AddressLength);
+					std::memcpy(_node, pAdapter->Address, pAdapter->AddressLength);
 					found = true;
 				}
 			}
@@ -248,7 +248,7 @@ void UUIDGenerator::getNode()
 			int alen = sdl->sdl_alen;
 			if (ap && alen > 0) 
 			{
-				memcpy(_node, ap, sizeof(_node));
+				std::memcpy(_node, ap, sizeof(_node));
 				foundAdapter = true;
 				break;
 			}
@@ -289,7 +289,7 @@ void UUIDGenerator::getNode()
 	close(s);
 	if (rc < 0) throw SystemException("cannot get MAC address");
 	struct sockaddr* sa = reinterpret_cast<struct sockaddr*>(&ifr.ifr_addr);
-	memcpy(_node, sa->sa_data, sizeof(_node));
+	std::memcpy(_node, sa->sa_data, sizeof(_node));
 }
 
 
@@ -344,14 +344,14 @@ void UUIDGenerator::getNode()
 	if (s == -1) throw SystemException("cannot open socket");
 
 	struct arpreq ar;
-	memset(&ar, 0, sizeof(ar));
+	std::memset(&ar, 0, sizeof(ar));
 	struct sockaddr_in* pAddr = reinterpret_cast<struct sockaddr_in*>(&ar.arp_pa);
 	pAddr->sin_family = AF_INET;
-	memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
+	std::memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
 	int rc = ioctl(s, SIOCGARP, &ar);
 	close(s);
 	if (rc < 0) throw SystemException("cannot get MAC address");
-	memcpy(_node, ar.arp_ha.sa_data, sizeof(_node));
+	std::memcpy(_node, ar.arp_ha.sa_data, sizeof(_node));
 }
 
 

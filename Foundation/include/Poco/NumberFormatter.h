@@ -1,7 +1,7 @@
 //
 // NumberFormatter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NumberFormatter.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/NumberFormatter.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -187,15 +187,15 @@ public:
 
 	static std::string format(float value);
 		/// Formats a float value in decimal floating-point notation,
-		/// according to printf's %g format with a precision of 8 fractional digits.
+		/// according to std::printf's %g format with a precision of 8 fractional digits.
 
 	static std::string format(double value);
 		/// Formats a double value in decimal floating-point notation,
-		/// according to printf's %g format with a precision of 16 fractional digits.
+		/// according to std::printf's %g format with a precision of 16 fractional digits.
 
 	static std::string format(double value, int precision);
 		/// Formats a double value in decimal floating-point notation,
-		/// according to printf's %f format with the given precision.
+		/// according to std::printf's %f format with the given precision.
 
 	static std::string format(double value, int width, int precision);
 		/// Formats a double value in decimal floating-point notation,

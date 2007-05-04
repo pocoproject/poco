@@ -1,7 +1,7 @@
 //
 // BinaryWriter.cpp
 //
-// $Id: //poco/Main/Foundation/src/BinaryWriter.cpp#12 $
+// $Id: //poco/Main/Foundation/src/BinaryWriter.cpp#13 $
 //
 // Library: Foundation
 // Package: Streams
@@ -36,7 +36,6 @@
 
 #include "Poco/BinaryWriter.h"
 #include "Poco/ByteOrder.h"
-#include <string.h>
 
 
 namespace Poco {
@@ -266,7 +265,7 @@ BinaryWriter& BinaryWriter::operator << (const std::string& value)
 BinaryWriter& BinaryWriter::operator << (const char* value)
 {
 	poco_check_ptr (value);
-	UInt32 length = (UInt32) strlen(value);
+	UInt32 length = (UInt32) std::strlen(value);
 	write7BitEncoded(length);
 	_ostr.write(value, length);
 	return *this;

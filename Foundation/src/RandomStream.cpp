@@ -1,7 +1,7 @@
 //
 // RandomStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/RandomStream.cpp#12 $
+// $Id: //poco/Main/Foundation/src/RandomStream.cpp#13 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -44,7 +44,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #endif
-#include <time.h>
+#include <ctime>
 
 
 namespace Poco {
@@ -90,7 +90,7 @@ int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
  
 		n = 0;
 		SHA1Engine engine;
-		UInt32 t = (UInt32) time(NULL);
+		UInt32 t = (UInt32) std::time(NULL);
 		engine.update(&t, sizeof(t));
 		void* p = this;
 		engine.update(&p, sizeof(p));

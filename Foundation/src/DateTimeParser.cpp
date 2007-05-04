@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/Main/Foundation/src/DateTimeParser.cpp#14 $
+// $Id: //poco/Main/Foundation/src/DateTimeParser.cpp#16 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -38,22 +38,22 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
-#include <ctype.h>
+#include <cctype>
 
 
 namespace Poco {
 
 
 #define SKIP_JUNK() \
-	while (it != end && !isdigit(*it)) ++it
+	while (it != end && !std::isdigit(*it)) ++it
 
 
 #define PARSE_NUMBER(var) \
-	while (it != end && isdigit(*it)) var = var*10 + ((*it++) - '0')
+	while (it != end && std::isdigit(*it)) var = var*10 + ((*it++) - '0')
 
 
 #define PARSE_NUMBER_N(var, n) \
-	{ int i = 0; while (i++ < n && it != end && isdigit(*it)) var = var*10 + ((*it++) - '0'); }
+	{ int i = 0; while (i++ < n && it != end && std::isdigit(*it)) var = var*10 + ((*it++) - '0'); }
 
 
 void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
@@ -82,8 +82,8 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 				{
 				case 'w':
 				case 'W':
-					while (it != end && isspace(*it)) ++it;
-					while (it != end && isalpha(*it)) ++it;
+					while (it != end && std::isspace(*it)) ++it;
+					while (it != end && std::isalpha(*it)) ++it;
 					break;
 				case 'b':
 				case 'B':
@@ -208,7 +208,7 @@ bool DateTimeParser::tryParse(const std::string& str, DateTime& dateTime, int& t
 		return tryParse(DateTimeFormat::ASCTIME_FORMAT, str, dateTime, timeZoneDifferential);
 	else if (str.find(',') != std::string::npos)
 		return tryParse(DateTimeFormat::RFC850_FORMAT, str, dateTime, timeZoneDifferential);
-	else if (isdigit(str[0]))
+	else if (std::isdigit(str[0]))
 	{
 		if (str.find(' ') != std::string::npos || str.length() == 10)
 			return tryParse(DateTimeFormat::SORTABLE_FORMAT, str, dateTime, timeZoneDifferential);
@@ -265,16 +265,16 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 		{"AWDT",   9*3600}
 	};
 
-	while (it != end && isspace(*it)) ++it;
+	while (it != end && std::isspace(*it)) ++it;
 	if (it != end)
 	{
-		if (isalpha(*it))
+		if (std::isalpha(*it))
 		{
 			std::string designator;
 			designator += *it++;
-			if (it != end && isalpha(*it)) designator += *it++;
-			if (it != end && isalpha(*it)) designator += *it++;
-			if (it != end && isalpha(*it)) designator += *it++;
+			if (it != end && std::isalpha(*it)) designator += *it++;
+			if (it != end && std::isalpha(*it)) designator += *it++;
+			if (it != end && std::isalpha(*it)) designator += *it++;
 			for (unsigned i = 0; i < sizeof(zones)/sizeof(Zone); ++i)
 			{
 				if (designator == zones[i].designator)
@@ -300,13 +300,13 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
 	std::string month;
-	while (it != end && isspace(*it) || ispunct(*it)) ++it;
+	while (it != end && std::isspace(*it) || std::ispunct(*it)) ++it;
 	bool isFirst = true;
-	while (it != end && isalpha(*it)) 
+	while (it != end && std::isalpha(*it)) 
 	{
 		char ch = (*it++);
-		if (isFirst) { month += toupper(ch); isFirst = false; }
-		else month += tolower(ch);
+		if (isFirst) { month += std::toupper(ch); isFirst = false; }
+		else month += std::tolower(ch);
 	}
 	if (month.length() < 3) throw SyntaxException("Month name must be at least three characters long", month);
 	for (int i = 0; i < 12; ++i) 
@@ -321,13 +321,13 @@ int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::strin
 int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
 	std::string dow;
-	while (it != end && isspace(*it) || ispunct(*it)) ++it;
+	while (it != end && std::isspace(*it) || std::ispunct(*it)) ++it;
 	bool isFirst = true;
-	while (it != end && isalpha(*it)) 
+	while (it != end && std::isalpha(*it)) 
 	{
 		char ch = (*it++);
-		if (isFirst) { dow += toupper(ch); isFirst = false; }
-		else dow += tolower(ch);
+		if (isFirst) { dow += std::toupper(ch); isFirst = false; }
+		else dow += std::tolower(ch);
 	}
 	if (dow.length() < 3) throw SyntaxException("Weekday name must be at least three characters long", dow);
 	for (int i = 0; i < 7; ++i) 
@@ -342,11 +342,11 @@ int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::s
 int DateTimeParser::parseAMPM(std::string::const_iterator& it, const std::string::const_iterator& end, int hour)
 {
 	std::string ampm;
-	while (it != end && isspace(*it) || ispunct(*it)) ++it;
-	while (it != end && isalpha(*it)) 
+	while (it != end && std::isspace(*it) || std::ispunct(*it)) ++it;
+	while (it != end && std::isalpha(*it)) 
 	{
 		char ch = (*it++);
-		ampm += toupper(ch);
+		ampm += std::toupper(ch);
 	}
 	if (ampm == "AM")
 	{

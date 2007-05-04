@@ -1,7 +1,7 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timestamp.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Timestamp.cpp#13 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -38,6 +38,7 @@
 #include "Poco/Exception.h"
 #include <algorithm>
 #if defined(POCO_OS_FAMILY_UNIX)
+#include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/times.h>
@@ -92,7 +93,7 @@ void Timestamp::swap(Timestamp& timestamp)
 }
 
 
-Timestamp Timestamp::fromEpochTime(time_t t)
+Timestamp Timestamp::fromEpochTime(std::time_t t)
 {
 	return Timestamp(TimeVal(t)*resolution());
 }

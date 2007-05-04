@@ -1,7 +1,7 @@
 //
 // MD2Engine.cpp
 //
-// $Id: //poco/Main/Foundation/src/MD2Engine.cpp#11 $
+// $Id: //poco/Main/Foundation/src/MD2Engine.cpp#12 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -54,7 +54,7 @@
 
 
 #include "Poco/MD2Engine.h"
-#include <string.h>
+#include <cstring>
 
 
 namespace Poco {
@@ -87,7 +87,7 @@ void MD2Engine::updateImpl(const void* input_, unsigned inputLen)
 	/* Transform as many times as possible.	*/
 	if (inputLen >= partLen) 
 	{
-		memcpy(&_context.buffer[index], input, partLen);
+		std::memcpy(&_context.buffer[index], input, partLen);
 		transform(_context.state, _context.checksum, _context.buffer);
 
 		for (i = partLen; i + 15 < inputLen; i += 16)
@@ -98,7 +98,7 @@ void MD2Engine::updateImpl(const void* input_, unsigned inputLen)
 	else i = 0;
 
 	/* Buffer remaining input */
-	memcpy(&_context.buffer[index], &input[i], inputLen-i);
+	std::memcpy(&_context.buffer[index], &input[i], inputLen-i);
 }
 
 
@@ -110,7 +110,7 @@ unsigned MD2Engine::digestLength() const
 
 void MD2Engine::reset()
 {
-	memset(&_context, 0, sizeof(_context));
+	std::memset(&_context, 0, sizeof(_context));
 }
 
 
@@ -151,7 +151,7 @@ const DigestEngine::Digest& MD2Engine::digest()
 	_digest.insert(_digest.begin(), _context.state, _context.state + 16);
 
 	/* Zeroize sensitive information. */
-	memset(&_context, 0, sizeof(_context));
+	std::memset(&_context, 0, sizeof(_context));
 	reset();
 	return _digest;
 }
@@ -186,8 +186,8 @@ void MD2Engine::transform(unsigned char state[16], unsigned char checksum[16], c
 	unsigned char x[48];
 
 	/* Form encryption block from state, block, state ^ block. */
-	memcpy(x, state, 16);
-	memcpy(x+16, block, 16);
+	std::memcpy(x, state, 16);
+	std::memcpy(x+16, block, 16);
 	for (i = 0; i < 16; i++)
 		x[i+32] = state[i] ^ block[i];
 
@@ -201,7 +201,7 @@ void MD2Engine::transform(unsigned char state[16], unsigned char checksum[16], c
 	}
 
 	/* Save new state */
-	memcpy(state, x, 16);
+	std::memcpy(state, x, 16);
 
 	/* Update checksum. */
 	t = checksum[15];
@@ -209,7 +209,7 @@ void MD2Engine::transform(unsigned char state[16], unsigned char checksum[16], c
 	t = checksum[i] ^= PI_SUBST[block[i] ^ t];
 
 	/* Zeroize sensitive information. */
-	memset(x, 0, sizeof(x));
+	std::memset(x, 0, sizeof(x));
 }
 
 
