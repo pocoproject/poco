@@ -1,7 +1,7 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/Main/XML/src/ParserEngine.cpp#14 $
+// $Id: //poco/Main/XML/src/ParserEngine.cpp#15 $
 //
 // Library: XML
 // Package: XML
@@ -49,7 +49,7 @@
 #include "Poco/SAX/LocatorImpl.h"
 #include "Poco/SAX/SAXException.h"
 #include "Poco/URI.h"
-#include <string.h>
+#include <cstring>
 
 
 using Poco::URI;
@@ -728,10 +728,10 @@ void ParserEngine::handleComment(void* userData, const XML_Char* data)
 
 #if defined(XML_UNICODE_WCHAR_T)
 	if (pThis->_pLexicalHandler)
-		pThis->_pLexicalHandler->comment(data, 0, (int) wcslen(data));
+		pThis->_pLexicalHandler->comment(data, 0, (int) std::wcslen(data));
 #else
 	if (pThis->_pLexicalHandler)
-		pThis->_pLexicalHandler->comment(data, 0, (int) strlen(data));
+		pThis->_pLexicalHandler->comment(data, 0, (int) std::strlen(data));
 #endif
 }
 

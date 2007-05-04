@@ -1,7 +1,7 @@
 //
 // LoggingConfiguratorTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/LoggingConfiguratorTest.cpp#5 $
+// $Id: //poco/Main/Util/testsuite/src/LoggingConfiguratorTest.cpp#6 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,6 +37,9 @@
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/LoggingRegistry.h"
 #include "Poco/ConsoleChannel.h"
+#if defined(_WIN32)
+#include "Poco/WindowsConsoleChannel.h"
+#endif
 #include "Poco/FileChannel.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/FormattingChannel.h"
@@ -108,7 +111,11 @@ void LoggingConfiguratorTest::testConfigurator()
 	assert (root.getLevel() == Message::PRIO_WARNING);
 	FormattingChannel* pFC = dynamic_cast<FormattingChannel*>(root.getChannel());
 	assertNotNull (pFC);
+#if defined(_WIN32)
+	assertNotNull (dynamic_cast<Poco::WindowsConsoleChannel*>(pFC->getChannel()));
+#else
 	assertNotNull (dynamic_cast<ConsoleChannel*>(pFC->getChannel()));
+#endif
 	assertNotNull (dynamic_cast<PatternFormatter*>(pFC->getFormatter()));
 	assert (static_cast<PatternFormatter*>(pFC->getFormatter())->getProperty("pattern") == "%s-[%p] %t");
 	

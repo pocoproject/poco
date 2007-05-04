@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3-20070501 (2007-05-01)
+Release 1.3-20070504 (2007-05-04)
 =================================
 
 - added HashMap, HashSet classes
@@ -77,6 +77,12 @@ Release 1.3-20070501 (2007-05-01)
   (see http://www.appinf.com/poco/wiki/tiki-view_forum_thread.php?comments_parentId=343&forumId=6)
 - robustness improvements to ActiveMethod - removed the opportunity for memory leaks in 
   case something goes while invoking the method
+- made C library usage more C++-like - use C++ headers (e.g. <cstring>) instead of 
+  C ones (<string.h>). Also, use C library functions in std namespace.
+- added Unicode and UTF8String for improved Unicode support.
+  The Unicode class can be used to obtain the Unicode properties of a character.
+  The UTF8 class provides case insensitive comparison and case conversion
+  for UTF-8 encoded strings.
 
 
 Release 1.2.9 (2007-02-26)
@@ -723,4 +729,4 @@ building the libraries.
 
 
 --
-$Id: //poco/Main/dist/CHANGELOG#55 $
+$Id: //poco/Main/dist/CHANGELOG#56 $

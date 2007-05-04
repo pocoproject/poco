@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/Main/Util/src/ServerApplication.cpp#20 $
+// $Id: //poco/Main/Util/src/ServerApplication.cpp#21 $
 //
 // Library: Util
 // Package: Application
@@ -51,7 +51,7 @@
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Util/WinService.h"
 #include <windows.h>
-#include <string.h>
+#include <cstring>
 #endif
 #if defined(POCO_WIN32_UTF8)
 #include "Poco/UnicodeConverter.h"
@@ -80,7 +80,7 @@ ServerApplication::ServerApplication()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	_action = SRV_RUN;
-	memset(&_serviceStatus, 0, sizeof(_serviceStatus));
+	std::memset(&_serviceStatus, 0, sizeof(_serviceStatus));
 #endif
 }
 

@@ -1,7 +1,7 @@
 //
 // PropertyFileConfiguration.cpp
 //
-// $Id: //poco/Main/Util/src/PropertyFileConfiguration.cpp#8 $
+// $Id: //poco/Main/Util/src/PropertyFileConfiguration.cpp#9 $
 //
 // Library: Util
 // Package: Configuration
@@ -39,7 +39,7 @@
 #include "Poco/String.h"
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
-#include <locale>
+#include <cctype>
 
 
 using Poco::trim;
@@ -120,10 +120,9 @@ void PropertyFileConfiguration::save(const std::string& path) const
 void PropertyFileConfiguration::parseLine(std::istream& istr)
 {
 	static const int eof = std::char_traits<char>::eof(); 
-	std::locale loc;
 
 	int c = istr.get();
-	while (c != eof && isspace((char) c, loc)) c = istr.get();
+	while (c != eof && std::isspace((char) c)) c = istr.get();
 	if (c != eof)
 	{
 		if (c == '#' || c == '!')
