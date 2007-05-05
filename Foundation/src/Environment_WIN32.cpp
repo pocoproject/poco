@@ -1,7 +1,7 @@
 //
 // Environment_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Environment_WIN32.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Environment_WIN32.cpp#12 $
 //
 // Library: Foundation
 // Package: Core
@@ -37,7 +37,7 @@
 #include "Poco/Environment_WIN32.h"
 #include "Poco/Exception.h"
 #include <sstream>
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

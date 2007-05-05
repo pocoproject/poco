@@ -1,7 +1,7 @@
 //
 // PipeImpl_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/PipeImpl_WIN32.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/PipeImpl_WIN32.h#4 $
 //
 // Library: Foundation
 // Package: Processes
@@ -42,7 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/RefCountedObject.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

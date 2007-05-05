@@ -1,7 +1,7 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timestamp.cpp#13 $
+// $Id: //poco/Main/Foundation/src/Timestamp.cpp#14 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -43,7 +43,7 @@
 #include <sys/time.h>
 #include <sys/times.h>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 
 

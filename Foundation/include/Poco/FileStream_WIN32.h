@@ -1,7 +1,7 @@
 //
 // FileStream_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FileStream_WIN32.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/FileStream_WIN32.h#5 $
 //
 // Library: Foundation
 // Package: Streams
@@ -42,7 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/BufferedBidirectionalStreamBuf.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

@@ -1,7 +1,7 @@
 //
 // Event_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Event_WIN32.cpp#12 $
+// $Id: //poco/Main/Foundation/src/Event_WIN32.cpp#13 $
 //
 // Library: Foundation
 // Package: Threading
@@ -42,7 +42,7 @@ namespace Poco {
 
 EventImpl::EventImpl(bool autoReset)
 {
-	_event = CreateEvent(NULL, autoReset ? FALSE : TRUE, FALSE, NULL);
+	_event = CreateEventW(NULL, autoReset ? FALSE : TRUE, FALSE, NULL);
 	if (!_event)
 		throw SystemException("cannot create event");
 }

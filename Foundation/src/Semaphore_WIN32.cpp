@@ -1,7 +1,7 @@
 //
 // Semaphore_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Semaphore_WIN32.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Semaphore_WIN32.cpp#12 $
 //
 // Library: Foundation
 // Package: Threading
@@ -44,7 +44,7 @@ SemaphoreImpl::SemaphoreImpl(int n, int max)
 {
 	poco_assert (n >= 0 && max > 0 && n <= max);
 
-	_sema = CreateSemaphore(NULL, n, max, NULL);
+	_sema = CreateSemaphoreW(NULL, n, max, NULL);
 	if (!_sema)
 	{
 		throw SystemException("cannot create semaphore");

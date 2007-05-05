@@ -83,7 +83,9 @@ Release 1.3-20070504 (2007-05-04)
   The Unicode class can be used to obtain the Unicode properties of a character.
   The UTF8 class provides case insensitive comparison and case conversion
   for UTF-8 encoded strings.
-
+- added UnWindows.h header file, replaced all #include <windows.h> with #include "Poco/UnWindows.h".
+  See the Poco/UnWindows.h header file for a rationale and explanations.
+  
 
 Release 1.2.9 (2007-02-26)
 ==========================
@@ -729,4 +731,4 @@ building the libraries.
 
 
 --
-$Id: //poco/Main/dist/CHANGELOG#56 $
+$Id: //poco/Main/dist/CHANGELOG#57 $

@@ -1,7 +1,7 @@
 //
 // SharedLibrary_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedLibrary_WIN32.cpp#11 $
+// $Id: //poco/Main/Foundation/src/SharedLibrary_WIN32.cpp#12 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -35,7 +35,7 @@
 
 
 #include "Poco/SharedLibrary_WIN32.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

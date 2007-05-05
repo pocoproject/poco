@@ -1,7 +1,7 @@
 //
 // Platform_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Platform_WIN32.h#6 $
+// $Id: //poco/Main/Foundation/include/Poco/Platform_WIN32.h#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -54,7 +54,7 @@
 #endif
 
 
-// Reduce bloat imported by <windows.h>
+// Reduce bloat imported by "Poco/UnWindows.h"
 #if defined(_WIN32)
 	#if !defined(_WIN32_WINNT)
 		#define _WIN32_WINNT 0x0500

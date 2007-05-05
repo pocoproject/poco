@@ -1,7 +1,7 @@
 //
 // WindowsConsoleChannel.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/WindowsConsoleChannel.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/WindowsConsoleChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -43,7 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Channel.h"
 #include "Poco/Mutex.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

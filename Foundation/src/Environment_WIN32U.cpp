@@ -1,7 +1,7 @@
 //
 // Environment_WIN32U.cpp
 //
-// $Id: //poco/Main/Foundation/src/Environment_WIN32U.cpp#8 $
+// $Id: //poco/Main/Foundation/src/Environment_WIN32U.cpp#9 $
 //
 // Library: Foundation
 // Package: Core
@@ -40,7 +40,7 @@
 #include "Poco/Buffer.h"
 #include <sstream>
 #include <cstring>
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

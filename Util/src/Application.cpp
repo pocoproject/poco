@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/Main/Util/src/Application.cpp#26 $
+// $Id: //poco/Main/Util/src/Application.cpp#27 $
 //
 // Library: Util
 // Package: Application
@@ -53,7 +53,7 @@
 #include "Poco/ConsoleChannel.h"
 #include "Poco/AutoPtr.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/SignalHandler.h"

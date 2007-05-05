@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DirectoryIterator_WIN32.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/DirectoryIterator_WIN32.h#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -41,7 +41,7 @@
 
 
 #include "Poco/Foundation.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

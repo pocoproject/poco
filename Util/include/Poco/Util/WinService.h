@@ -1,7 +1,7 @@
 //
 // WinService.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/WinService.h#3 $
+// $Id: //poco/Main/Util/include/Poco/Util/WinService.h#4 $
 //
 // Library: Util
 // Package: Windows
@@ -41,7 +41,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 #if defined(POCO_WIN32_UTF8)

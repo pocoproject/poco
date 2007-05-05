@@ -121,7 +121,7 @@ them both to 0; an emulation function will be used. */
 #define HAVE_UNSIGNED_LONG_LONG 0
 #endif
 
-/* Define to 1 if you have the <windows.h> header file. */
+/* Define to 1 if you have the "Poco/UnWindows.h" header file. */
 /* #undef HAVE_WINDOWS_H */
 
 /* The value of LINK_SIZE determines the number of bytes used to store links

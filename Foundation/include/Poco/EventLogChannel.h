@@ -1,7 +1,7 @@
 //
 // EventLogChannel.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/EventLogChannel.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/EventLogChannel.h#5 $
 //
 // Library: Foundation
 // Package: Logging
@@ -42,7 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Channel.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

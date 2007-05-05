@@ -1,7 +1,7 @@
 //
 // SocketDefs.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/SocketDefs.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/SocketDefs.h#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -41,6 +41,7 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/UnWindows.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #define POCO_INVALID_SOCKET  INVALID_SOCKET

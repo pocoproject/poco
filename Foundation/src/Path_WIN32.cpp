@@ -1,7 +1,7 @@
 //
 // Path_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Path_WIN32.cpp#11 $
+// $Id: //poco/Main/Foundation/src/Path_WIN32.cpp#12 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -36,7 +36,7 @@
 
 #include "Poco/Path_WIN32.h"
 #include "Poco/Environment_WIN32.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

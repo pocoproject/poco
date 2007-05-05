@@ -1,7 +1,7 @@
 //
 // RandomStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/RandomStream.cpp#13 $
+// $Id: //poco/Main/Foundation/src/RandomStream.cpp#14 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -38,7 +38,7 @@
 #include "Poco/Random.h"
 #include "Poco/SHA1Engine.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <wincrypt.h>
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include <fcntl.h>

@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/WinRegistryKey.h#2 $
+// $Id: //poco/Main/Util/include/Poco/Util/WinRegistryKey.h#3 $
 //
 // Library: Util
 // Package: Windows
@@ -41,7 +41,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <vector>
 
 

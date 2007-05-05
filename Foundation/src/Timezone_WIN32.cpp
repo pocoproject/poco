@@ -1,7 +1,7 @@
 //
 // Timezone_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timezone_WIN32.cpp#12 $
+// $Id: //poco/Main/Foundation/src/Timezone_WIN32.cpp#13 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -36,7 +36,7 @@
 
 #include "Poco/Timezone.h"
 #include "Poco/UnicodeConverter.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <ctime>
 
 

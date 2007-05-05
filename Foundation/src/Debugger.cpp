@@ -1,7 +1,7 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/Main/Foundation/src/Debugger.cpp#13 $
+// $Id: //poco/Main/Foundation/src/Debugger.cpp#14 $
 //
 // Library: Foundation
 // Package: Core
@@ -39,7 +39,7 @@
 #include <cstdlib>
 #include <cstdio>
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	#include <windows.h>
+	#include "Poco/UnWindows.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 	#include <unistd.h>
 	#include <signal.h>

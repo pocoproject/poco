@@ -1,7 +1,7 @@
 //
 // LogFile_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LogFile_WIN32.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/LogFile_WIN32.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -42,7 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Timestamp.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

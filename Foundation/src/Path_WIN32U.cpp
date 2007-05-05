@@ -1,7 +1,7 @@
 //
 // Path_WIN32U.cpp
 //
-// $Id: //poco/Main/Foundation/src/Path_WIN32U.cpp#7 $
+// $Id: //poco/Main/Foundation/src/Path_WIN32U.cpp#8 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -39,7 +39,7 @@
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

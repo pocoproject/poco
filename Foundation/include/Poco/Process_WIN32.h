@@ -1,7 +1,7 @@
 //
 // Process_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Process_WIN32.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Process_WIN32.h#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -43,7 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/RefCountedObject.h"
 #include <vector>
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

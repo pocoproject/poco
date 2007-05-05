@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Thread_WIN32.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread_WIN32.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -42,7 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Runnable.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {

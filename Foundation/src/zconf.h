@@ -3,7 +3,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id: //poco/Main/Foundation/src/zconf.h#8 $ */
+/* @(#) $Id: //poco/Main/Foundation/src/zconf.h#9 $ */
 
 #ifndef ZCONF_H
 #define ZCONF_H
@@ -219,7 +219,7 @@
 #    ifdef FAR
 #      undef FAR
 #    endif
-#    include <windows.h>
+#    include "Poco/UnWindows.h"
      /* No need for _export, use ZLIB.DEF instead. */
      /* For complete Windows compatibility, use WINAPI, not __stdcall. */
 #    define ZEXPORT WINAPI

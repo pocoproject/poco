@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.cpp
 //
-// $Id: //poco/Main/Foundation/src/UUIDGenerator.cpp#17 $
+// $Id: //poco/Main/Foundation/src/UUIDGenerator.cpp#18 $
 //
 // Library: Foundation
 // Package: UUID
@@ -164,7 +164,7 @@ UUIDGenerator& UUIDGenerator::defaultGenerator()
 //
 // Windows
 //
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <iphlpapi.h>
 
 

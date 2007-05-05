@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/Main/Util/src/ServerApplication.cpp#21 $
+// $Id: //poco/Main/Util/src/ServerApplication.cpp#22 $
 //
 // Library: Util
 // Package: Application
@@ -50,7 +50,7 @@
 #include <sys/stat.h>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Util/WinService.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <cstring>
 #endif
 #if defined(POCO_WIN32_UTF8)

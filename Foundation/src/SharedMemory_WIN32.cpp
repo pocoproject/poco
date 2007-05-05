@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory_WIN32.cpp#5 $
+// $Id: //poco/Main/Foundation/src/SharedMemory_WIN32.cpp#6 $
 //
 // Library: Foundation
 // Package: Processes
@@ -40,7 +40,7 @@
 #if defined (POCO_WIN32_UTF8)
 #include "Poco/UnicodeConverter.h"
 #endif
-#include <windows.h>
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {
