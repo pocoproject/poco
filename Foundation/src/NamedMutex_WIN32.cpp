@@ -1,7 +1,7 @@
 //
 // NamedMutex_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/NamedMutex_WIN32.cpp#8 $
+// $Id: //poco/Main/Foundation/src/NamedMutex_WIN32.cpp#9 $
 //
 // Library: Foundation
 // Package: Processes
@@ -44,7 +44,7 @@ namespace Poco {
 NamedMutexImpl::NamedMutexImpl(const std::string& name):
 	_name(name)
 {
-	_mutex = CreateMutex(NULL, FALSE, _name.c_str());
+	_mutex = CreateMutexA(NULL, FALSE, _name.c_str());
 	if (!_mutex) 
 		throw SystemException("cannot create named mutex", _name);
 }

@@ -1,7 +1,7 @@
 //
 // StreamSocketImpl.cpp
 //
-// $Id: //poco/Main/Net/src/StreamSocketImpl.cpp#6 $
+// $Id: //poco/Main/Net/src/StreamSocketImpl.cpp#7 $
 //
 // Library: Net
 // Package: Sockets
@@ -62,7 +62,7 @@ int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	int remaining = length;
 	while (remaining > 0)
 	{
-		int n = SocketImpl::sendBytes(p, length, flags); 
+		int n = SocketImpl::sendBytes(p, remaining, flags); 
 		p += n; 
 		remaining -= n;
 	}

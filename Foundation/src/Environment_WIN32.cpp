@@ -1,7 +1,7 @@
 //
 // Environment_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Environment_WIN32.cpp#12 $
+// $Id: //poco/Main/Foundation/src/Environment_WIN32.cpp#13 $
 //
 // Library: Foundation
 // Package: Core
@@ -45,10 +45,10 @@ namespace Poco {
 
 std::string EnvironmentImpl::getImpl(const std::string& name)
 {
-	DWORD len = GetEnvironmentVariable(name.c_str(), 0, 0);
+	DWORD len = GetEnvironmentVariableA(name.c_str(), 0, 0);
 	if (len == 0) throw NotFoundException(name);
 	char* buffer = new char[len];
-	GetEnvironmentVariable(name.c_str(), buffer, len);
+	GetEnvironmentVariableA(name.c_str(), buffer, len);
 	std::string result(buffer);
 	delete [] buffer;
 	return result;
@@ -57,14 +57,14 @@ std::string EnvironmentImpl::getImpl(const std::string& name)
 
 bool EnvironmentImpl::hasImpl(const std::string& name)
 {
-	DWORD len = GetEnvironmentVariable(name.c_str(), 0, 0);
+	DWORD len = GetEnvironmentVariableA(name.c_str(), 0, 0);
 	return len > 0;
 }
 
 
 void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 {
-	if (SetEnvironmentVariable(name.c_str(), value.c_str()) == 0)
+	if (SetEnvironmentVariableA(name.c_str(), value.c_str()) == 0)
 	{
 		std::string msg = "cannot set environment variable: ";
 		msg.append(name);
@@ -139,7 +139,7 @@ std::string EnvironmentImpl::nodeNameImpl()
 {
 	char name[MAX_COMPUTERNAME_LENGTH + 1];
 	DWORD size = sizeof(name);
-	if (GetComputerName(name, &size) == 0) throw SystemException("Cannot get computer name");
+	if (GetComputerNameA(name, &size) == 0) throw SystemException("Cannot get computer name");
 	return std::string(name);
 }
 

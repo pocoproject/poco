@@ -230,7 +230,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;PCRE_STATIC"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;Foundation_EXPORTS;POCO_STATIC;PCRE_STATIC"
 				GeneratePreprocessedFile="0"
 				KeepComments="false"
 				StringPooling="true"
@@ -301,7 +301,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;PCRE_STATIC"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;Foundation_EXPORTS;POCO_STATIC;PCRE_STATIC"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -937,6 +937,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Types.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\UnWindows.h"
 					>
 				</File>
 				<File

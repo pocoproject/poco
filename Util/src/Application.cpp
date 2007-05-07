@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/Main/Util/src/Application.cpp#27 $
+// $Id: //poco/Main/Util/src/Application.cpp#28 $
 //
 // Library: Util
 // Package: Application
@@ -410,7 +410,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 		else throw SystemException("Cannot get application file name.");
 	#else
 		char path[1024];
-		int n = GetModuleFileName(0, path, sizeof(path));
+		int n = GetModuleFileNameA(0, path, sizeof(path));
 		if (n > 0)
 			appPath = path;
 		else

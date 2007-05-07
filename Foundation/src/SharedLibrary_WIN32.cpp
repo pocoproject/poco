@@ -1,7 +1,7 @@
 //
 // SharedLibrary_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedLibrary_WIN32.cpp#12 $
+// $Id: //poco/Main/Foundation/src/SharedLibrary_WIN32.cpp#13 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -60,7 +60,7 @@ void SharedLibraryImpl::loadImpl(const std::string& path)
 	FastMutex::ScopedLock lock(_mutex);
 
 	if (_handle) throw LibraryAlreadyLoadedException(_path);
-	_handle = LoadLibrary(path.c_str());
+	_handle = LoadLibraryA(path.c_str());
 	if (!_handle) throw LibraryLoadException(path);
 	_path = path;
 }

@@ -1,7 +1,7 @@
 //
 // Path_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Path_WIN32.cpp#12 $
+// $Id: //poco/Main/Foundation/src/Path_WIN32.cpp#13 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -45,7 +45,7 @@ namespace Poco {
 std::string PathImpl::currentImpl()
 {
 	char buffer[_MAX_PATH];
-	DWORD n = GetCurrentDirectory(sizeof(buffer), buffer);
+	DWORD n = GetCurrentDirectoryA(sizeof(buffer), buffer);
 	if (n > 0 && n < sizeof(buffer))
 	{
 		std::string result(buffer, n);
@@ -71,7 +71,7 @@ std::string PathImpl::homeImpl()
 std::string PathImpl::tempImpl()
 {
 	char buffer[_MAX_PATH];
-	DWORD n = GetTempPath(sizeof(buffer), buffer);
+	DWORD n = GetTempPathA(sizeof(buffer), buffer);
 	if (n > 0 && n < sizeof(buffer))
 	{
 		std::string result(buffer, n);
@@ -92,7 +92,7 @@ std::string PathImpl::nullImpl()
 std::string PathImpl::expandImpl(const std::string& path)
 {
 	char buffer[_MAX_PATH];
-	DWORD n = ExpandEnvironmentStrings(path.c_str(), buffer, sizeof(buffer));
+	DWORD n = ExpandEnvironmentStringsA(path.c_str(), buffer, sizeof(buffer));
 	if (n > 0 && n < sizeof(buffer))
 		return std::string(buffer, n - 1);
 	else

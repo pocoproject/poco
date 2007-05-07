@@ -1,7 +1,7 @@
 //
 // Util.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/Util.h#2 $
+// $Id: //poco/Main/Util/include/Poco/Util/Util.h#3 $
 //
 // Library: Util
 // Package: Util
@@ -64,6 +64,28 @@
 
 #if !defined(Util_API)
 	#define Util_API
+#endif
+
+
+//
+// Automatically link Util library.
+//
+#if defined(_MSC_VER)
+	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Util_EXPORTS)
+		#if defined(POCO_DLL)
+			#if defined(_DEBUG)
+				#pragma comment(lib, "PocoUtild.lib")
+			#else
+				#pragma comment(lib, "PocoUtil.lib")
+			#endif
+		#else
+			#if defined(_DEBUG)
+				#pragma comment(lib, "PocoUtilmtd.lib")
+			#else
+				#pragma comment(lib, "PocoUtilmt.lib")
+			#endif
+		#endif
+	#endif
 #endif
 
 

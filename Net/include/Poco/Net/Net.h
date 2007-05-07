@@ -1,7 +1,7 @@
 //
 // Net.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/Net.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/Net.h#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -64,6 +64,28 @@
 
 #if !defined(Net_API)
 	#define Net_API
+#endif
+
+
+//
+// Automatically link Net library.
+//
+#if defined(_MSC_VER)
+	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Net_EXPORTS)
+		#if defined(POCO_DLL)
+			#if defined(_DEBUG)
+				#pragma comment(lib, "PocoNetd.lib")
+			#else
+				#pragma comment(lib, "PocoNet.lib")
+			#endif
+		#else
+			#if defined(_DEBUG)
+				#pragma comment(lib, "PocoNetmtd.lib")
+			#else
+				#pragma comment(lib, "PocoNetmt.lib")
+			#endif
+		#endif
+	#endif
 #endif
 
 

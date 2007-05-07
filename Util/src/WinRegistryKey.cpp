@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/Main/Util/src/WinRegistryKey.cpp#12 $
+// $Id: //poco/Main/Util/src/WinRegistryKey.cpp#13 $
 //
 // Library: Util
 // Package: Windows
@@ -186,9 +186,9 @@ std::string WinRegistryKey::getStringExpand(const std::string& name)
 		RegQueryValueEx(_hKey, name.c_str(), NULL, NULL, (BYTE*) buffer, &size);
 		buffer[size] = 0;
 		char temp;
-		DWORD expSize = ExpandEnvironmentStrings(buffer, &temp, 1);	
+		DWORD expSize = ExpandEnvironmentStringsA(buffer, &temp, 1);	
 		char* expBuffer = new char[expSize];
-		ExpandEnvironmentStrings(buffer, expBuffer, expSize);
+		ExpandEnvironmentStringsA(buffer, expBuffer, expSize);
 		std::string result(expBuffer);
 		delete [] buffer;
 		delete [] expBuffer;

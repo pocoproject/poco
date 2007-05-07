@@ -1,7 +1,7 @@
 //
 // NamedEvent_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/NamedEvent_WIN32.cpp#8 $
+// $Id: //poco/Main/Foundation/src/NamedEvent_WIN32.cpp#9 $
 //
 // Library: Foundation
 // Package: Processes
@@ -44,7 +44,7 @@ namespace Poco {
 NamedEventImpl::NamedEventImpl(const std::string& name):
 	_name(name)
 {
-	_event = CreateEvent(NULL, FALSE, FALSE, _name.c_str());
+	_event = CreateEventA(NULL, FALSE, FALSE, _name.c_str());
 	if (!_event)
 		throw SystemException("cannot create named event", _name);
 }

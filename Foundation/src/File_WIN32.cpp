@@ -1,7 +1,7 @@
 //
 // File_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/File_WIN32.cpp#18 $
+// $Id: //poco/Main/Foundation/src/File_WIN32.cpp#20 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -48,7 +48,7 @@ class FileHandle
 public:
 	FileHandle(const std::string& path, DWORD access, DWORD share, DWORD disp)
 	{
-		_h = CreateFile(path.c_str(), access, share, 0, disp, 0, 0);
+		_h = CreateFileA(path.c_str(), access, share, 0, disp, 0, 0);
 		if (!_h) FileImpl::handleLastErrorImpl(path);
 	}
 	
@@ -283,8 +283,12 @@ void FileImpl::copyToImpl(const std::string& path) const
 {
 	poco_assert (!_path.empty());
 
-	if (CopyFile(_path.c_str(), path.c_str(), FALSE) == 0) 
-		handleLastErrorImpl(_path);
+	if (CopyFileA(_path.c_str(), path.c_str(), FALSE) != 0) 
+	{
+		FileImpl copy(path);
+		copy.setWriteableImpl(true);
+	}
+	else handleLastErrorImpl(_path);
 }
 
 
@@ -292,7 +296,7 @@ void FileImpl::renameToImpl(const std::string& path)
 {
 	poco_assert (!_path.empty());
 
-	if (MoveFile(_path.c_str(), path.c_str()) == 0) 
+	if (MoveFileA(_path.c_str(), path.c_str()) == 0) 
 		handleLastErrorImpl(_path);
 }
 
@@ -303,12 +307,12 @@ void FileImpl::removeImpl()
 
 	if (isDirectoryImpl())
 	{
-		if (RemoveDirectory(_path.c_str()) == 0) 
+		if (RemoveDirectoryA(_path.c_str()) == 0) 
 			handleLastErrorImpl(_path);
 	}
 	else
 	{
-		if (DeleteFile(_path.c_str()) == 0)
+		if (DeleteFileA(_path.c_str()) == 0)
 			handleLastErrorImpl(_path);
 	}
 }
@@ -318,7 +322,7 @@ bool FileImpl::createFileImpl()
 {
 	poco_assert (!_path.empty());
 
-	HANDLE hFile = CreateFile(_path.c_str(), GENERIC_WRITE, 0, 0, CREATE_NEW, 0, 0);
+	HANDLE hFile = CreateFileA(_path.c_str(), GENERIC_WRITE, 0, 0, CREATE_NEW, 0, 0);
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
 		CloseHandle(hFile);
@@ -338,7 +342,7 @@ bool FileImpl::createDirectoryImpl()
 	
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (CreateDirectory(_path.c_str(), 0) == 0)
+	if (CreateDirectoryA(_path.c_str(), 0) == 0)
 		handleLastErrorImpl(_path);
 	return true;
 }

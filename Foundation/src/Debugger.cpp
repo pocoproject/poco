@@ -1,7 +1,7 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/Main/Foundation/src/Debugger.cpp#14 $
+// $Id: //poco/Main/Foundation/src/Debugger.cpp#15 $
 //
 // Library: Foundation
 // Package: Core
@@ -91,8 +91,8 @@ void Debugger::message(const std::string& msg)
 		umsg += '\n';
 		OutputDebugStringW(umsg.c_str());
 #else
-		OutputDebugString(msg.c_str());
-		OutputDebugString("\n");
+		OutputDebugStringA(msg.c_str());
+		OutputDebugStringA("\n");
 #endif
 	}
 	#elif defined(POCO_OS_FAMILY_UNIX)

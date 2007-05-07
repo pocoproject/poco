@@ -1,7 +1,7 @@
 //
 // Config.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Config.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/Config.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -40,8 +40,12 @@
 #define Foundation_Config_INCLUDED
 
 
-// Define to enable Windows Unicode (UTF-8) support.
+// Define to enable Windows Unicode (UTF-8) support
 #define POCO_WIN32_UTF8
+
+
+// Define to disable implicit linking
+// #define POCO_NO_AUTOMATIC_LIBS
 
 
 // Define to disable FPEnvironment support

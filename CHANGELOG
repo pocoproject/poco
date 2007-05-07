@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3-20070504 (2007-05-04)
-=================================
+Release 1.3.0 (2007-05-07)
+==========================
 
 - added HashMap, HashSet classes
 - the HashFunction class template has been changed in an incompatible
@@ -37,7 +37,7 @@ Release 1.3-20070504 (2007-05-04)
 - added another constructor to LocalDateTime
 - POCO_WIN32_UTF8 is ignored on non-Windows platforms
 - fixed a timeout bug (with NetSSL) in HTTPSession
-- AsyncChannel is automatically opened with first log()\
+- AsyncChannel is automatically opened with first log()
 - minor fix to NotificationQueue sample (reported by Laszlo Keresztfalvi)
 - added File::canExecute() and File::setExecutable()
 - added SharedMemory class to Foundation
@@ -85,6 +85,15 @@ Release 1.3-20070504 (2007-05-04)
   for UTF-8 encoded strings.
 - added UnWindows.h header file, replaced all #include <windows.h> with #include "Poco/UnWindows.h".
   See the Poco/UnWindows.h header file for a rationale and explanations.
+- fixed SF# 1713820: StreamSocketImpl::sendBytes sends too many bytes
+- File::copyTo(): on Windows, the copy now always has the read-only flag reset, to be consistent
+  with other platforms.
+- With Microsoft Visual C++, the necessary POCO libraries are now implicitly linked when
+  the corresponding header files are included (#pragma comment(lib, "PocoXYZ.lib") is used).
+  To disable this, compile POCO with the preprocessor symbol POCO_NO_AUTOMATIC_LIBS #define'd
+  (see Poco/Foundation.h and Poco/Config.h).
+- The Visual Studio project files for the POCO libraries now include configurations
+  for building static libraries.
   
 
 Release 1.2.9 (2007-02-26)
@@ -731,4 +740,4 @@ building the libraries.
 
 
 --
-$Id: //poco/Main/dist/CHANGELOG#57 $
+$Id: //poco/Main/dist/CHANGELOG#60 $

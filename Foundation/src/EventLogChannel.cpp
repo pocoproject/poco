@@ -1,7 +1,7 @@
 //
 // EventLogChannel.cpp
 //
-// $Id: //poco/Main/Foundation/src/EventLogChannel.cpp#13 $
+// $Id: //poco/Main/Foundation/src/EventLogChannel.cpp#14 $
 //
 // Library: Foundation
 // Package: Logging
@@ -69,7 +69,7 @@ EventLogChannel::EventLogChannel():
 	}
 #else
 	char name[256];
-	int n = GetModuleFileName(NULL, name, sizeof(name));
+	int n = GetModuleFileNameA(NULL, name, sizeof(name));
 	if (n > 0)
 	{
 		char* end = name + n - 1;
@@ -299,11 +299,11 @@ std::wstring EventLogChannel::findLibrary(const wchar_t* name)
 std::string EventLogChannel::findLibrary(const char* name)
 {
 	std::string path;
-	HMODULE dll = LoadLibrary(name);
+	HMODULE dll = LoadLibraryA(name);
 	if (dll)
 	{
 		char name[MAX_PATH + 1];
-		int n = GetModuleFileName(dll, name, sizeof(name));
+		int n = GetModuleFileNameA(dll, name, sizeof(name));
 		if (n > 0) path = name;
 		FreeLibrary(dll);
 	}

@@ -1,7 +1,7 @@
 //
 // UTF8String.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UTF8String.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/UTF8String.h#2 $
 //
 // Library: Foundation
 // Package: Text
@@ -53,7 +53,7 @@ struct Foundation_API UTF8
 	/// The various variants of icompare() provide case insensitive comparison
 	/// for UTF-8 encoded strings.
 	///
-	/// toUppwer(), toUpperInPlace(), toLower() and toLowerInPlace() provide
+	/// toUpper(), toUpperInPlace(), toLower() and toLowerInPlace() provide
 	/// Unicode-based character case transformation for UTF-8 encoded strings.
 {
 	static int icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2);

@@ -1,7 +1,7 @@
 //
 // Process_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/Process_WIN32.cpp#18 $
+// $Id: //poco/Main/Foundation/src/Process_WIN32.cpp#19 $
 //
 // Library: Foundation
 // Package: Processes
@@ -152,7 +152,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
 
 	PROCESS_INFORMATION processInfo;
-	BOOL rc = CreateProcess(
+	BOOL rc = CreateProcessA(
 		NULL, 
 		const_cast<char*>(commandLine.c_str()), 
 		NULL, 

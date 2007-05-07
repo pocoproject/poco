@@ -1,7 +1,7 @@
 //
 // LogFile_WIN32.cpp
 //
-// $Id: //poco/Main/Foundation/src/LogFile_WIN32.cpp#7 $
+// $Id: //poco/Main/Foundation/src/LogFile_WIN32.cpp#8 $
 //
 // Library: Foundation
 // Package: Logging
@@ -44,7 +44,7 @@ namespace Poco {
 
 LogFileImpl::LogFileImpl(const std::string& path): _path(path)
 {
-	_hFile = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	_hFile = CreateFileA(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (_hFile == INVALID_HANDLE_VALUE) throw OpenFileException(path);
 	SetFilePointer(_hFile, 0, 0, FILE_END);
 	// There seems to be a strange "optimization" in the Windows NTFS

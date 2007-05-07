@@ -1,7 +1,7 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/Main/Foundation/src/File_WIN32U.cpp#12 $
+// $Id: //poco/Main/Foundation/src/File_WIN32U.cpp#13 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -289,8 +289,12 @@ void FileImpl::copyToImpl(const std::string& path) const
 
 	std::wstring upath;
 	UnicodeConverter::toUTF16(path, upath);
-	if (CopyFileW(_upath.c_str(), upath.c_str(), FALSE) == 0) 
-		handleLastErrorImpl(_path);
+	if (CopyFileW(_upath.c_str(), upath.c_str(), FALSE) != 0)
+	{
+		FileImpl copy(path);
+		copy.setWriteableImpl(true);
+	}
+	else handleLastErrorImpl(_path);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // XML.h
 //
-// $Id: //poco/Main/XML/include/Poco/XML/XML.h#2 $
+// $Id: //poco/Main/XML/include/Poco/XML/XML.h#3 $
 //
 // Library: XML
 // Package: XML
@@ -64,6 +64,28 @@
 
 #if !defined(XML_API)
 	#define XML_API
+#endif
+
+
+//
+// Automatically link XML library.
+//
+#if defined(_MSC_VER)
+	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(XML_EXPORTS)
+		#if defined(POCO_DLL)
+			#if defined(_DEBUG)
+				#pragma comment(lib, "PocoXMLd.lib")
+			#else
+				#pragma comment(lib, "PocoXML.lib")
+			#endif
+		#else
+			#if defined(_DEBUG)
+				#pragma comment(lib, "PocoXMLmtd.lib")
+			#else
+				#pragma comment(lib, "PocoXMLmt.lib")
+			#endif
+		#endif
+	#endif
 #endif
 
 
