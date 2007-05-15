@@ -1,7 +1,7 @@
 //
 // ODBCAccessTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCAccessTest.cpp#2 $
+// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCAccessTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -39,7 +39,7 @@
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/ODBC/SessionInstantiator.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
@@ -69,7 +69,7 @@ ODBCAccessTest::ODBCAccessTest(const std::string& name):
 {
 	static bool beenHere = false;
 
-	ODBC::SessionInstantiator::addToFactory();
+	ODBC::Connector::registerConnector();
 	if (_drivers.empty() || _dataSources.empty()) 
 	{
 		Utility::drivers(_drivers);
@@ -80,7 +80,7 @@ ODBCAccessTest::ODBCAccessTest(const std::string& name):
 	{
 		try
 		{
-			_pSession = new Session(SessionFactory::instance().create(ODBC::SessionInstantiator::KEY, _dbConnString));
+			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
 		}catch (ConnectionException& ex)
 		{
 			std::cout << "!!! WARNING: Connection failed. Access tests will fail !!!" << std::endl;
@@ -100,7 +100,7 @@ ODBCAccessTest::ODBCAccessTest(const std::string& name):
 
 ODBCAccessTest::~ODBCAccessTest()
 {
-	ODBC::SessionInstantiator::removeFromFactory();
+	ODBC::Connector::unregisterConnector();
 }
 
 

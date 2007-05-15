@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/Makefile#10 $
+# $Id: //poco/Main/Data/Makefile#11 $
 #
 # Makefile for Poco Data
 #
@@ -13,7 +13,7 @@ objects = AbstractBinder AbstractBinding AbstractExtraction \
 	BLOB BLOBStream DataException Limit MetaColumn \
 	PooledSessionHolder PooledSessionImpl \
 	Range RecordSet Session SessionFactory SessionImpl \
-	SessionInstantiator SessionPool Statement StatementCreator StatementImpl
+	Connector SessionPool Statement StatementCreator StatementImpl
 
 target         = PocoData
 target_version = $(LIBVERSION)

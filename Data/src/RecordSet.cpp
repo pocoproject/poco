@@ -99,4 +99,44 @@ DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
 }
 
 
+bool RecordSet::moveFirst()
+{
+	if (rowCount() > 0)
+	{
+		_currentRow = 1;
+		return true;
+	}
+	else return false;
+}
+
+
+bool RecordSet::moveNext()
+{
+	if (_currentRow >= rowCount()) return false;
+	++_currentRow;
+	return true;
+}
+
+
+bool RecordSet::movePrevious()
+{
+	if (0 == _currentRow) return false;
+	--_currentRow;
+	return true;
+}
+
+
+bool RecordSet::moveLast()
+{
+	if (rowCount() > 0)
+	{
+		_currentRow = rowCount();
+		return true;
+	}
+	else return false;
+}
+
+
+
+
 } } // namespace Poco::Data

@@ -1,7 +1,7 @@
 //
 // SessionFactory.cpp
 //
-// $Id: //poco/Main/Data/src/SessionFactory.cpp#4 $
+// $Id: //poco/Main/Data/src/SessionFactory.cpp#6 $
 //
 // Library: Data
 // Package: DataCore
@@ -58,11 +58,11 @@ SessionFactory& SessionFactory::instance()
 }
 
 
-void SessionFactory::add(const std::string& key, SessionInstantiator* pIn)
+void SessionFactory::add(const std::string& key, Connector* pIn)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	SessionInfo info(pIn);
-	std::pair<Instantiators::iterator, bool> res = _instantiators.insert(std::make_pair(key, info));
+	std::pair<Connectors::iterator, bool> res = _connectors.insert(std::make_pair(key, info));
 	if (!res.second)
 	{
 		res.first->second.cnt++;
@@ -73,26 +73,26 @@ void SessionFactory::add(const std::string& key, SessionInstantiator* pIn)
 void SessionFactory::remove(const std::string& key)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	Instantiators::iterator it = _instantiators.find(key);
-	poco_assert (_instantiators.end() != it);
+	Connectors::iterator it = _connectors.find(key);
+	poco_assert (_connectors.end() != it);
 
 	--(it->second.cnt);
 	if (it->second.cnt == 0)
-		_instantiators.erase(it);
+		_connectors.erase(it);
 }
 
 
-Session SessionFactory::create(const std::string& key, const std::string& initString)
+Session SessionFactory::create(const std::string& key, const std::string& connectionString)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	Instantiators::iterator it = _instantiators.find(key);
-	poco_assert (_instantiators.end() != it);
+	Connectors::iterator it = _connectors.find(key);
+	poco_assert (_connectors.end() != it);
 
-	return Session(it->second.ptrSI->create(initString));
+	return Session(it->second.ptrSI->createSession(connectionString));
 }
 
 
-SessionFactory::SessionInfo::SessionInfo(SessionInstantiator* pSI): 
+SessionFactory::SessionInfo::SessionInfo(Connector* pSI): 
 	cnt(1), 
 	ptrSI(pSI)
 {

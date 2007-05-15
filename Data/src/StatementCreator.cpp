@@ -1,7 +1,7 @@
 //
 // StatementCreator.cpp
 //
-// $Id: //poco/Main/Data/src/StatementCreator.cpp#3 $
+// $Id: //poco/Main/Data/src/StatementCreator.cpp#4 $
 //
 // Library: Data
 // Package: DataCore
@@ -40,6 +40,11 @@
 
 namespace Poco {
 namespace Data {
+
+
+StatementCreator::StatementCreator()
+{
+}
 
 
 StatementCreator::StatementCreator(Poco::AutoPtr<SessionImpl> ptrImpl):

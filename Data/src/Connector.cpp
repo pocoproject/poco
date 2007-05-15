@@ -1,9 +1,11 @@
 //
-// SessionInstantiator.h
+// Connector.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionInstantiator.h#1 $
+// $Id: //poco/Main/Data/src/Connector.cpp#2 $
 //
-// Definition of the SessionInstantiator class.
+// Library: Data
+// Package: DataCore
+// Module:  Connector
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,43 +34,21 @@
 //
 
 
-#ifndef Data_Test_SessionInstantiator_INCLUDED
-#define Data_Test_SessionInstantiator_INCLUDED
-
-
-#include "Poco/Data/SessionInstantiator.h"
+#include "Poco/Data/Connector.h"
 
 
 namespace Poco {
 namespace Data {
-namespace Test {
 
 
-class SessionInstantiator: public Poco::Data::SessionInstantiator
-	/// SessionInstantiator instantiates SessionImpl objects for testing.
+Connector::Connector()
 {
-public:
-	static const std::string KEY;
-		/// Keyword for creating test sessions.
-
-	SessionInstantiator();
-		/// Creates the SessionInstantiator.
-
-	~SessionInstantiator();
-	/// Destroys the SessionInstantiator.
-
-	Poco::AutoPtr<Poco::Data::SessionImpl> create(const std::string& initString);
-		/// Creates a test SessionImpl object and initializes it with the given initString.
-
-	static void addToFactory();
-		/// Registers the SessionInstantiator under the Keyword SessionInstantiator::KEY at the Poco::Data::SessionFactory.
-
-	static void removeFromFactory();
-		/// Unregisters the SessionInstantiator under the Keyword SessionInstantiator::KEY at the Poco::Data::SessionFactory.
-};
+}
 
 
-} } } // namespace Poco::Data::Test
+Connector::~Connector()
+{
+}
 
 
-#endif // Data_Test_SessionInstantiator_INCLUDED
+} } // namespace Poco::Data

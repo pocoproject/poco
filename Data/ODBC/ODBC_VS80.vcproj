@@ -218,6 +218,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\ODBC\Connector.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\ODBC\DataTypes.h"
 					>
 				</File>
@@ -270,10 +274,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\SessionInstantiator.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Data\ODBC\Utility.h"
 					>
 				</File>
@@ -287,6 +287,10 @@
 				</File>
 				<File
 					RelativePath=".\src\ConnectionHandle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Connector.cpp"
 					>
 				</File>
 				<File
@@ -323,10 +327,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SessionImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SessionInstantiator.cpp"
 					>
 				</File>
 				<File

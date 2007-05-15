@@ -256,6 +256,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Connector.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Extractor.h"
 					>
 				</File>
@@ -265,10 +269,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SessionImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SessionInstantiator.h"
 					>
 				</File>
 				<File
@@ -284,6 +284,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Connector.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Extractor.cpp"
 					>
 				</File>
@@ -293,10 +297,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SessionImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SessionInstantiator.cpp"
 					>
 				</File>
 				<File

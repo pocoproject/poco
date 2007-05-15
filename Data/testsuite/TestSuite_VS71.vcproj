@@ -201,7 +201,7 @@
 					RelativePath=".\src\SessionImpl.h">
 				</File>
 				<File
-					RelativePath=".\src\SessionInstantiator.h">
+					RelativePath=".\src\Connector.h">
 				</File>
 				<File
 					RelativePath=".\src\TestStatementImpl.h">
@@ -220,7 +220,7 @@
 					RelativePath=".\src\SessionImpl.cpp">
 				</File>
 				<File
-					RelativePath=".\src\SessionInstantiator.cpp">
+					RelativePath=".\src\Connector.cpp">
 				</File>
 				<File
 					RelativePath=".\src\TestStatementImpl.cpp">

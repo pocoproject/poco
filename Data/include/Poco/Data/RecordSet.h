@@ -1,7 +1,7 @@
 //
 // RecordSet.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#4 $
+// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#5 $
 //
 // Library: Data
 // Package: DataCore
@@ -93,7 +93,7 @@ public:
 		if (pos > rExtractions.size())
 			throw RangeException(format("Invalid column number: %z", pos));
 		
-		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos-1].get());
+		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos - 1].get());
 
 		if (pExtraction)
 		{
@@ -127,7 +127,7 @@ public:
 	DynamicAny value(const std::string& name, std::size_t row) const;
 		/// Returns the reference to data value at named column, row location.
 
-	void moveFirst();
+	bool moveFirst();
 		/// Moves the row cursor to the first row.
 
 	bool moveNext();
@@ -136,13 +136,19 @@ public:
 	bool movePrevious();
 		/// Moves the row cursor to the previous row.
 
-	void moveLast();
+	bool moveLast();
 		/// Moves the row cursor to the last row.
 
 	DynamicAny value(const std::string& name);
 		/// Returns the value in the named column of the current row.
 
+	DynamicAny value(std::size_t index);
+		/// Returns the value in the given column of the current row.
+
 	DynamicAny operator [] (const std::string& name);
+		/// Returns the value in the named column of the current row.
+
+	DynamicAny operator [] (std::size_t index);
 		/// Returns the value in the named column of the current row.
 
 private:
@@ -199,43 +205,27 @@ inline Statement& RecordSet::operator = (const Statement& stmt)
 }
 
 
-inline void RecordSet::moveFirst()
-{
-	_currentRow = 1;
-}
-
-
-inline bool RecordSet::moveNext()
-{
-	if (_currentRow >= rowCount()) return false;
-	++_currentRow;
-	return true;
-}
-
-
-inline bool RecordSet::movePrevious()
-{
-	if (0 == _currentRow) return false;
-	--_currentRow;
-	return true;
-}
-
-
-inline void RecordSet::moveLast()
-{
-	_currentRow = rowCount();
-}
-
-
 inline DynamicAny RecordSet::value(const std::string& name)
 {
 	return value(name, _currentRow);
 }
 
 
+inline DynamicAny RecordSet::value(std::size_t index)
+{
+	return value(index, _currentRow);
+}
+
+
 inline DynamicAny RecordSet::operator [] (const std::string& name)
 {
 	return value(name, _currentRow);
+}
+
+
+inline DynamicAny RecordSet::operator [] (std::size_t index)
+{
+	return value(index, _currentRow);
 }
 
 

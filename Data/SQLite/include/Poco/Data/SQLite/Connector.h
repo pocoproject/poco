@@ -1,11 +1,13 @@
 //
-// SessionInstantiator.cpp
+// Connector.h
 //
-// $Id: //poco/Main/Data/SQLite/src/SessionInstantiator.cpp#2 $
+// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Connector.h#2 $
 //
 // Library: SQLite
 // Package: SQLite
-// Module:  SessionInstantiator
+// Module:  Connector
+//
+// Definition of the Connector class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,9 +36,12 @@
 //
 
 
-#include "Poco/Data/SQLite/SessionInstantiator.h"
-#include "Poco/Data/SQLite/SessionImpl.h"
-#include "Poco/Data/SessionFactory.h"
+#ifndef DataConnectors_SQLite_Connector_INCLUDED
+#define DataConnectors_SQLite_Connector_INCLUDED
+
+
+#include "Poco/Data/SQLite/SQLite.h"
+#include "Poco/Data/Connector.h"
 
 
 namespace Poco {
@@ -44,35 +49,31 @@ namespace Data {
 namespace SQLite {
 
 
-const std::string SessionInstantiator::KEY("sqlite");
-
-
-SessionInstantiator::SessionInstantiator()
+class SQLite_API Connector: public Poco::Data::Connector
+	/// Connector instantiates SqLite SessionImpl objects.
 {
-}
+public:
+	static const std::string KEY;
+		/// Keyword for creating SQLite sessions ("SQLite").
 
+	Connector();
+		/// Creates the Connector.
 
-SessionInstantiator::~SessionInstantiator()
-{
-}
+	~Connector();
+	/// Destroys the Connector.
 
+	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString);
+		/// Creates a SQLite SessionImpl object and initializes it with the given connectionString.
 
-Poco::AutoPtr<Poco::Data::SessionImpl> SessionInstantiator::create(const std::string& initString)
-{
-	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(initString));
-}
+	static void registerConnector();
+		/// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.
 
-
-void SessionInstantiator::addToFactory()
-{
-	Poco::Data::SessionFactory::instance().add(KEY, new SessionInstantiator());
-}
-
-
-void SessionInstantiator::removeFromFactory()
-{
-	Poco::Data::SessionFactory::instance().remove(KEY);
-}
+	static void unregisterConnector();
+		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.
+};
 
 
 } } } // namespace Poco::Data::SQLite
+
+
+#endif // DataConnectors_SQLite_Connector_INCLUDED

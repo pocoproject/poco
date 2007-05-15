@@ -1,7 +1,7 @@
 //
 // Statement.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Statement.h#14 $
+// $Id: //poco/Main/Data/include/Poco/Data/Statement.h#16 $
 //
 // Library: Data
 // Package: DataCore
@@ -66,6 +66,20 @@ public:
 	
 	Statement(StatementImpl* pImpl);
 		/// Creates the Statement.
+
+	Statement(Session& session);
+		/// Creates the Statement for the given Session.
+		///
+		/// The following:
+		///
+		///     Statement stmt(sess);
+		///     stmt << "SELECT * FROM Table", ...
+		///
+		/// is equivalent to:
+		/// 
+		///     Statement stmt(sess << "SELECT * FROM Table", ...);
+		///
+		/// but in some cases better readable.
 
 	~Statement();
 		/// Destroys the Statement.

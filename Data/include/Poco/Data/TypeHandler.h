@@ -1,7 +1,7 @@
 //
 // TypeHandler.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/TypeHandler.h#10 $
+// $Id: //poco/Main/Data/include/Poco/Data/TypeHandler.h#11 $
 //
 // Library: Data
 // Package: DataCore
@@ -54,7 +54,7 @@ namespace Data {
 
 template <class T>
 class TypeHandler
-	/// Converts Rows to a Type and the other way round. Provide template specializations to support your own complex types.
+	/// Converts Rows to a Type and the other way around. Provide template specializations to support your own complex types.
 	///
 	/// Take as example the following (simplified) class:
 	///    class Person
@@ -72,6 +72,11 @@ class TypeHandler
 	///    class TypeHandler<struct Person>
 	///    {
 	///    public:
+	///        static std::size_t size()
+	///        {
+	///            return 3; // lastName + firstname + age occupy three columns
+	///        }
+	///    
 	///        static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder)
 	///        {
 	///            // the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
@@ -80,11 +85,6 @@ class TypeHandler
 	///            TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder);
 	///            TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder);
 	///            TypeHandler<int>::bind(pos++, obj.getAge(), pBinder);
-	///        }
-	///    
-	///        static std::size_t size()
-	///        {
-	///            return 3; // lastName + firstname + age occupy three columns
 	///        }
 	///    
 	///        static void prepare(std::size_t pos, const Person& obj, AbstractPreparation* pPrepare)

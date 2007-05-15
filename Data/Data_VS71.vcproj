@@ -221,7 +221,7 @@
 					RelativePath=".\include\Poco\Data\SessionImpl.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\SessionInstantiator.h">
+					RelativePath=".\include\Poco\Data\Connector.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Statement.h">
@@ -288,7 +288,7 @@
 					RelativePath=".\src\SessionImpl.cpp">
 				</File>
 				<File
-					RelativePath=".\src\SessionInstantiator.cpp">
+					RelativePath=".\src\Connector.cpp">
 				</File>
 				<File
 					RelativePath=".\src\Statement.cpp">

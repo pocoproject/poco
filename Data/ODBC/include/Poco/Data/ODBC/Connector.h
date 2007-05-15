@@ -1,13 +1,13 @@
 //
-// SessionInstantiator.h
+// Connector.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SessionInstantiator.h#3 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Connector.h#2 $
 //
-// Library: Data
-// Package: DataCore
-// Module:  SessionInstantiator
+// Library: ODBC
+// Package: ODBC
+// Module:  Connector
 //
-// Definition of the SessionInstantiator class.
+// Definition of the Connector class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,35 +36,44 @@
 //
 
 
-#ifndef Data_SessionInstantiator_INCLUDED
-#define Data_SessionInstantiator_INCLUDED
+#ifndef DataConnectors_ODBC_Connector_INCLUDED
+#define DataConnectors_ODBC_Connector_INCLUDED
 
 
-#include "Poco/Data/Data.h"
-#include "Poco/Data/SessionImpl.h"
-#include "Poco/AutoPtr.h"
+#include "Poco/Data/ODBC/ODBC.h"
+#include "Poco/Data/Connector.h"
 
 
 namespace Poco {
 namespace Data {
+namespace ODBC {
 
 
-class Data_API SessionInstantiator
-	/// A SessionInstantiator creates SessionImpl objects.
+class ODBC_API Connector: public Poco::Data::Connector
+	/// Connector instantiates SqLite SessionImpl objects.
 {
 public:
-	SessionInstantiator();
-		/// Creates the SessionInstantiator.
+	static const std::string KEY;
+		/// Keyword for creating ODBC sessions
 
-	virtual ~SessionInstantiator();
-		/// Destroys the SessionInstantiator.
+	Connector();
+		/// Creates the Connector.
 
-	virtual Poco::AutoPtr<SessionImpl> create(const std::string& initString) = 0;
-		/// Create a SessionImpl object and initialize it with the initString.
+	~Connector();
+	/// Destroys the Connector.
+
+	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString);
+		/// Creates a ODBC SessionImpl object and initializes it with the given connectionString.
+
+	static void registerConnector();
+		/// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
+
+	static void unregisterConnector();
+		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
 };
 
 
-} } // namespace Poco::Data
+} } } // namespace Poco::Data::ODBC
 
 
-#endif // Data_SessionInstantiator_INCLUDED
+#endif // DataConnectors_ODBC_Connector_INCLUDED

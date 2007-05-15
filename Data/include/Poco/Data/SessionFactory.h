@@ -1,7 +1,7 @@
 //
 // SessionFactory.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SessionFactory.h#3 $
+// $Id: //poco/Main/Data/include/Poco/Data/SessionFactory.h#5 $
 //
 // Library: Data
 // Package: DataCore
@@ -41,7 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/Data/SessionInstantiator.h"
+#include "Poco/Data/Connector.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Mutex.h"
 #include "Poco/SharedPtr.h"
@@ -53,33 +53,38 @@ namespace Data {
 
 
 class Data_API SessionFactory
-	/// A SessionFactory is a singleton class that stores SessionInstantiators and allows to 
+	/// A SessionFactory is a singleton class that stores Connectors and allows to 
 	/// create Sessions of the required type:
 	///    
-	///    Session ses(SessionFactory::instance().create(dbKey, initString));
+	///     Session ses(SessionFactory::instance().create(connector, connectionString));
 	///    
-	/// where the first param presents the type of session one wants to create (e.g. for SQLite one would choose "sqlite")
-	/// and the second param is the initialization string that the session implementation requires to connect to the database.
+	/// where the first param presents the type of session one wants to create (e.g. for SQLite one would choose "SQLite")
+	/// and the second param is the connection string that the connector requires to connect to the database.
 	///
 	/// A concrete example to open an SQLite database stored in the file "dummy.db" would be
 	///    
-	///    Session tmp(SessionFactory::instance().create(SQLite::SessionInstantiator::KEY, "dummy.db"));
+	///     Session tmp(SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	///
+	/// An even simpler way to create a session is to use the two argument constructor of Session, which
+	/// automatically invokes the SessionFactory:
+	///
+	///      Session ses("SQLite", "dummy.db");
 {
 public:
 	static SessionFactory& instance();
 		/// returns the static instance of the singleton.
 
-	void add(const std::string& key, SessionInstantiator* pIn);
-		/// Registers a SessionInstantiator under the given key at the factory. If a registration for that
+	void add(const std::string& key, Connector* pIn);
+		/// Registers a Connector under the given key at the factory. If a registration for that
 		/// key is already active, the first registration will be kept, only its reference count will be increased.
 		/// Always takes ownership of parameter pIn.
 
 	void remove(const std::string& key);
-		/// Lowers the reference count for the SessionInstantiator registered under that key. If the count reaches zero,
+		/// Lowers the reference count for the Connector registered under that key. If the count reaches zero,
 		/// the object is removed.
 
-	Session create(const std::string& key, const std::string& initString);
-		/// Creates a Session for the given key with the initString. Throws an Poco:Data::UnknownDataBaseException
+	Session create(const std::string& key, const std::string& connectionString);
+		/// Creates a Session for the given key with the connectionString. Throws an Poco:Data::UnknownDataBaseException
 		/// if no instantiator is registered for that key.
 
 private:
@@ -91,12 +96,12 @@ private:
 	struct SessionInfo
 	{
 		int cnt;
-		Poco::SharedPtr<SessionInstantiator> ptrSI;
-		SessionInfo(SessionInstantiator* pSI);
+		Poco::SharedPtr<Connector> ptrSI;
+		SessionInfo(Connector* pSI);
 	};
 
-	typedef std::map<std::string, SessionInfo> Instantiators;
-	Instantiators   _instantiators;
+	typedef std::map<std::string, SessionInfo> Connectors;
+	Connectors      _connectors;
 	Poco::FastMutex _mutex;
 };
 

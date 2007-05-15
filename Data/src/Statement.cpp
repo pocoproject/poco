@@ -1,7 +1,7 @@
 //
 // Statement.cpp
 //
-// $Id: //poco/Main/Data/src/Statement.cpp#8 $
+// $Id: //poco/Main/Data/src/Statement.cpp#9 $
 //
 // Library: Data
 // Package: DataCore
@@ -37,6 +37,7 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/Extraction.h"
+#include "Poco/Data/Session.h"
 #include "Poco/Any.h"
 #include "Poco/Tuple.h"
 #include <algorithm>
@@ -51,6 +52,14 @@ Statement::Statement(StatementImpl* pImpl):
 	_ptr(pImpl)
 {
 	poco_check_ptr (pImpl);
+}
+
+
+Statement::Statement(Session& session):
+	_executed(false)
+{
+	Statement stmt(session.createStatementImpl());
+	swap(stmt);
 }
 
 

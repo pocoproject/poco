@@ -258,6 +258,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Connector.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Data.h"
 					>
 				</File>
@@ -299,10 +303,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\SessionImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Data\SessionInstantiator.h"
 					>
 				</File>
 				<File
@@ -358,6 +358,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Connector.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\DataException.cpp"
 					>
 				</File>
@@ -387,10 +391,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SessionImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SessionInstantiator.cpp"
 					>
 				</File>
 				<File

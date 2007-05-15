@@ -1,7 +1,13 @@
 //
-// SessionInstantiator.cpp
+// Connector.h
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionInstantiator.cpp#1 $
+// $Id: //poco/Main/Data/include/Poco/Data/Connector.h#4 $
+//
+// Library: Data
+// Package: DataCore
+// Module:  Connector
+//
+// Definition of the Connector class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,45 +36,39 @@
 //
 
 
-#include "SessionInstantiator.h"
-#include "SessionImpl.h"
-#include "Poco/Data/SessionFactory.h"
+#ifndef Data_Connector_INCLUDED
+#define Data_Connector_INCLUDED
+
+
+#include "Poco/Data/Data.h"
+#include "Poco/Data/SessionImpl.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
 namespace Data {
-namespace Test {
 
 
-const std::string SessionInstantiator::KEY("test");
-
-
-SessionInstantiator::SessionInstantiator()
+class Data_API Connector
+	/// A Connector creates SessionImpl objects.
+	///
+	/// Every connector library (like the SQLite or the ODBC connector)
+	/// provides a subclass of this class, an instance of which is
+	/// registered with the SessionFactory.
 {
-}
+public:
+	Connector();
+		/// Creates the Connector.
+
+	virtual ~Connector();
+		/// Destroys the Connector.
+
+	virtual Poco::AutoPtr<SessionImpl> createSession(const std::string& connectionString) = 0;
+		/// Create a SessionImpl object and initialize it with the given connectionString.
+};
 
 
-SessionInstantiator::~SessionInstantiator()
-{
-}
+} } // namespace Poco::Data
 
 
-Poco::AutoPtr<Poco::Data::SessionImpl> SessionInstantiator::create(const std::string& initString)
-{
-	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(initString));
-}
-
-
-void SessionInstantiator::addToFactory()
-{
-	Poco::Data::SessionFactory::instance().add(KEY, new SessionInstantiator());
-}
-
-
-void SessionInstantiator::removeFromFactory()
-{
-	Poco::Data::SessionFactory::instance().remove(KEY);
-}
-
-
-} } } // namespace Poco::Data::Test
+#endif // Data_Connector_INCLUDED

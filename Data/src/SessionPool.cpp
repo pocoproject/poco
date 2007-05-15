@@ -1,7 +1,7 @@
 //
 // SessionPool.cpp
 //
-// $Id: //poco/Main/Data/src/SessionPool.cpp#2 $
+// $Id: //poco/Main/Data/src/SessionPool.cpp#3 $
 //
 // Library: Data
 // Package: SessionPooling
@@ -44,9 +44,9 @@ namespace Poco {
 namespace Data {
 
 
-SessionPool::SessionPool(const std::string& sessionKey, const std::string& initString, int minSessions, int maxSessions, int idleTime):
+SessionPool::SessionPool(const std::string& sessionKey, const std::string& connectionString, int minSessions, int maxSessions, int idleTime):
 	_sessionKey(sessionKey),
-	_initString(initString),
+	_connectionString(connectionString),
 	_minSessions(minSessions),
 	_maxSessions(maxSessions),
 	_idleTime(idleTime),
@@ -74,12 +74,12 @@ Session SessionPool::get()
 	{
 		if (_nSessions < _maxSessions)
 		{
-			Session newSession(SessionFactory::instance().create(_sessionKey, _initString));
+			Session newSession(SessionFactory::instance().create(_sessionKey, _connectionString));
 			PooledSessionHolderPtr pHolder(new PooledSessionHolder(*this, newSession.impl()));
 			_idleSessions.push_front(pHolder);
 			++_nSessions;
 		}
-		else throw SessionPoolExhaustedException(_sessionKey, _initString);
+		else throw SessionPoolExhaustedException(_sessionKey, _connectionString);
 	}
 	PooledSessionHolderPtr pHolder(_idleSessions.front());
 	PooledSessionImplPtr pPSI(new PooledSessionImpl(pHolder));

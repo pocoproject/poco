@@ -1,7 +1,7 @@
 //
 // DataTest.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.cpp#8 $
+// $Id: //poco/Main/Data/testsuite/src/DataTest.cpp#9 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -38,7 +38,7 @@
 #include "Poco/Data/BLOBStream.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/Column.h"
-#include "SessionInstantiator.h"
+#include "Connector.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/Types.h"
@@ -57,13 +57,13 @@ using Poco::RangeException;
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
 {
-	Poco::Data::Test::SessionInstantiator::addToFactory();
+	Poco::Data::Test::Connector::addToFactory();
 }
 
 
 DataTest::~DataTest()
 {
-	Poco::Data::Test::SessionInstantiator::removeFromFactory();
+	Poco::Data::Test::Connector::removeFromFactory();
 }
 
 

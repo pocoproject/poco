@@ -1,7 +1,7 @@
 //
 // Session.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Session.h#6 $
+// $Id: //poco/Main/Data/include/Poco/Data/Session.h#9 $
 //
 // Library: Data
 // Package: DataCore
@@ -44,6 +44,7 @@
 #include "Poco/Data/SessionImpl.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/StatementCreator.h"
+#include "Poco/Data/Binding.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Any.h"
 
@@ -60,20 +61,24 @@ class Data_API Session
 	///
 	/// Sessions are always created via the SessionFactory:
 	///    
-	///    Session ses(SessionFactory::instance().create(dbKey, initString));
+	///     Session ses(SessionFactory::instance().create(connectorKey, connectionString));
 	///    
-	/// where the first param presents the type of session one wants to create (e.g. for SQLite one would choose "sqlite")
-	/// and the second param is the initialization string that the session implementation requires to connect to the database.
+	/// where the first param presents the type of session one wants to create (e.g., for SQLite one would choose "SQLite",
+	/// for ODBC the key is "ODBC") and the second param is the connection string that the session implementation 
+	/// requires to connect to the database. The format of the connection string is specific to the actual connector.
+	///
+	/// A simpler form to create the session is to pass the connector key and connection string directly to
+	/// the Session constructor.
 	///
 	/// A concrete example to open an SQLite database stored in the file "dummy.db" would be
 	///    
-	///    Session tmp(SessionFactory::instance().create(SQLite::SessionInstantiator::KEY, "dummy.db"));
+	///     Session ses("SQLite", "dummy.db");
 	///    
 	/// Via a Session one can create two different types of statements. First, statements that should only be executed once and immediately, and
 	/// second, statements that should be executed multiple times, using a separate execute() call.
 	/// The simple one is immediate execution:
 	///    
-	///    ses << "CREATE TABLE Dummy (data INTEGER(10))", now;
+	///     ses << "CREATE TABLE Dummy (data INTEGER(10))", now;
 	///
 	/// The now at the end of the statement is required, otherwise the statement
 	/// would not be executed.
@@ -81,13 +86,13 @@ class Data_API Session
 	/// If one wants to reuse a Statement (and avoid the overhead of repeatedly parsing an SQL statement)
 	/// one uses an explicit Statement object and its execute() method:
 	///    
-	///    int i = 0;
-	///    Statement stmt = (ses << "INSERT INTO Dummy VALUES(:data)", use(i));
+	///     int i = 0;
+	///     Statement stmt = (ses << "INSERT INTO Dummy VALUES(:data)", use(i));
 	///    
-	///    for (i = 0; i < 100; ++i)
-	///    {
-	///        stmt.execute();
-	///    }
+	///     for (i = 0; i < 100; ++i)
+	///     {
+	///         stmt.execute();
+	///     }
 	///    
 	/// The above example assigns the variable i to the ":data" placeholder in the SQL query. The query is parsed and compiled exactly
 	/// once, but executed 100 times. At the end the values 0 to 99 will be present in the Table "DUMMY".
@@ -95,60 +100,73 @@ class Data_API Session
 	/// A faster implementaton of the above code will simply create a vector of int
 	/// and use the vector as parameter to the use clause (you could also use set or multiset instead):
 	///    
-	///    std::vector<int> data;
-	///    for (int i = 0; i < 100; ++i)
-	///    {
-	///        data.push_back(i);
-	///    }
-	///    ses << "INSERT INTO Dummy VALUES(:data)", use(data);
+	///     std::vector<int> data;
+	///     for (int i = 0; i < 100; ++i)
+	///     {
+	///         data.push_back(i);
+	///     }
+	///     ses << "INSERT INTO Dummy VALUES(:data)", use(data);
 	///
-	/// NEVER try to bind to an empty collection. This will give a BindingException during run-time!
+	/// NEVER try to bind to an empty collection. This will give a BindingException at run-time!
 	///
 	/// Retrieving data from a database works similar, you could use simple data types, vectors, sets or multiset as your targets:
-	///    std::set<int> retData;
-	///    ses << "SELECT * FROM Dummy", into(retData));
+	///
+	///     std::set<int> retData;
+	///     ses << "SELECT * FROM Dummy", into(retData));
 	///
 	/// Due to the blocking nature of the above call it is possible to partition the data retrieval into chunks by setting a limit to
 	/// the maximum number of rows retrieved from the database:
-	///    std::set<int> retData;
-	///    Statement stmt = (ses << "SELECT * FROM Dummy", into(retData), limit(50));
-	///    while (!stmt.done())
-	///    {
-	///        stmt.execute();
-	///    }
+	///
+	///     std::set<int> retData;
+	///     Statement stmt = (ses << "SELECT * FROM Dummy", into(retData), limit(50));
+	///     while (!stmt.done())
+	///     {
+	///         stmt.execute();
+	///     }
+	///
 	/// The "into" keyword is used to inform the statement where output results should be placed. The limit value ensures
-	/// that during each run at most 50 rows are retrieved. Assuming DUMMY contains 100 rows, retData will contain 50 
+	/// that during each run at most 50 rows are retrieved. Assuming Dummy contains 100 rows, retData will contain 50 
 	/// elements after the first run and 100 after the second run, i.e.
 	/// the collection is not cleared between consecutive runs. After the second execute stmt.done() will return true.
 	///
-	/// A prepared-Statement will behave exactly the same but a further call to execute() will simply reset the Statement, execute it again and
-	/// append more data to the result set.
+	/// A prepared Statement will behave exactly the same but a further call to execute() will simply reset the Statement, 
+	/// execute it again and append more data to the result set.
+	///
 	/// Note that it is possible to append several "bind" or "into" clauses to the statement. Theoretically, one could also have several
-	/// limit clauses but only the last one that was added will be effective. Also several preconditions must be met concerning binds and intos.
+	/// limit clauses but only the last one that was added will be effective. 
+	/// Also several preconditions must be met concerning binds and intos.
 	/// Take the following example:
-	///    ses << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))";
-	///    std::vector<std::string> nameVec; // [...] add some elements
-	///    std::vector<int> ageVec; // [...] add some elements
-	///    ses << "INSERT INTO Person (LastName, Age) VALUES(:ln, :age)", use(nameVec), use(ageVec);
+	///
+	///     ses << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))";
+	///     std::vector<std::string> nameVec; // [...] add some elements
+	///     std::vector<int> ageVec; // [...] add some elements
+	///     ses << "INSERT INTO Person (LastName, Age) VALUES(:ln, :age)", use(nameVec), use(ageVec);
 	///
 	/// The size of all use parameters MUST be the same, otherwise an exception is thrown. Furthermore,
 	/// the amount of use clauses must match the number of wildcards in the query (to be more precisely: 
 	/// each binding has a numberOfColumnsHandled() value which is per default 1. The sum of all these values must match the wildcard count in the query.
 	/// But this is only important if you have written your own TypeHandler specializations).
-	/// If you plan to map complex object types to Tables take a look at the TypeHandler documentation.
+	/// If you plan to map complex object types to tables see the TypeHandler documentation.
 	/// For now, we simply assume we have written one TypeHandler for Person objects. Instead of having n different vectors,
-	/// we have now one collection:
-	///    std::vector<Person> people; // [...] add some elements
-	///    ses << "INSERT INTO Person (LastName, FirstName, Age) VALUES(:ln, :fn, :age)", use(people);
+	/// we have one collection:
+	///
+	///     std::vector<Person> people; // [...] add some elements
+	///     ses << "INSERT INTO Person (LastName, FirstName, Age) VALUES(:ln, :fn, :age)", use(people);
+	///
 	/// which will insert all Person objects from the people vector to the database (and again, you can use set, multiset too,
-	/// even map and multimap if Person provides an operator() which returns the key for the map)
+	/// even map and multimap if Person provides an operator() which returns the key for the map).
 	/// The same works for a SELECT statement with "into" clauses:
-	///    std::vector<Person> people;
-	///    ses << "SELECT * FROM PERSON", into(people);
+	///
+	///     std::vector<Person> people;
+	///     ses << "SELECT * FROM PERSON", into(people);
 {
 public:
 	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
 		/// Creates the Session.
+
+	Session(const std::string& connector, const std::string& connectionString);
+		/// Creates a new session, using the given connector (which must have
+		/// been registered), and connectionString.
 
 	Session(const Session&);
 		/// Creates a session by copying another one.
@@ -170,6 +188,7 @@ public:
 	}
 
 	StatementImpl* createStatementImpl();
+		/// Creates a StatementImpl.
 
 	void begin();
 		/// Starts a transaction.

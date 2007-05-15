@@ -1,7 +1,7 @@
 //
 // StatementCreator.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/StatementCreator.h#4 $
+// $Id: //poco/Main/Data/include/Poco/Data/StatementCreator.h#5 $
 //
 // Library: Data
 // Package: DataCore
@@ -54,6 +54,9 @@ class Data_API StatementCreator
 	/// A StatementCreator creates Statements.
 {
 public:
+	StatementCreator();
+		/// Creates an unitialized StatementCreator.
+		
 	StatementCreator(Poco::AutoPtr<SessionImpl> ptrImpl);
 		/// Creates a StatementCreator.
 

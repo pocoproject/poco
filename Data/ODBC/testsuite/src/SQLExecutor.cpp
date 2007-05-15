@@ -41,7 +41,7 @@
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
-#include "Poco/Data/ODBC/SessionInstantiator.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/Preparation.h"

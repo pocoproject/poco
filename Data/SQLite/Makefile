@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/SQLite/Makefile#2 $
+# $Id: //poco/Main/Data/SQLite/Makefile#3 $
 #
 # Makefile for Poco SQLite
 #
@@ -10,7 +10,7 @@ include $(POCO_BASE)/build/rules/global
 
 SYSFLAGS += -DTHREADSAFE -DNO_TCL
 
-objects = Binder Extractor SessionImpl SessionInstantiator \
+objects = Binder Extractor SessionImpl Connector \
 	SQLiteException SQLiteStatementImpl Utility \
 	sqlite3
 

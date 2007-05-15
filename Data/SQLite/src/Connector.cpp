@@ -1,13 +1,11 @@
 //
-// SessionInstantiator.h
+// Connector.cpp
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/SessionInstantiator.h#2 $
+// $Id: //poco/Main/Data/SQLite/src/Connector.cpp#2 $
 //
-// Library: ODBC
-// Package: ODBC
-// Module:  SessionInstantiator
-//
-// Definition of the SessionInstantiator class.
+// Library: SQLite
+// Package: SQLite
+// Module:  Connector
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,44 +34,45 @@
 //
 
 
-#ifndef DataConnectors_ODBC_SessionInstantiator_INCLUDED
-#define DataConnectors_ODBC_SessionInstantiator_INCLUDED
-
-
-#include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/SessionInstantiator.h"
+#include "Poco/Data/SQLite/Connector.h"
+#include "Poco/Data/SQLite/SessionImpl.h"
+#include "Poco/Data/SessionFactory.h"
 
 
 namespace Poco {
 namespace Data {
-namespace ODBC {
+namespace SQLite {
 
 
-class ODBC_API SessionInstantiator: public Poco::Data::SessionInstantiator
-	/// SessionInstantiator instantiates SqLite SessionImpl objects.
+const std::string Connector::KEY("SQLite");
+
+
+Connector::Connector()
 {
-public:
-	static const std::string KEY;
-		/// Keyword for creating ODBC sessions
-
-	SessionInstantiator();
-		/// Creates the SessionInstantiator.
-
-	~SessionInstantiator();
-	/// Destroys the SessionInstantiator.
-
-	Poco::AutoPtr<Poco::Data::SessionImpl> create(const std::string& initString);
-		/// Creates a ODBC SessionImpl object and initializes it with the given initString.
-
-	static void addToFactory();
-		/// Registers the SessionInstantiator under the Keyword SessionInstantiator::KEY at the Poco::Data::SessionFactory
-
-	static void removeFromFactory();
-		/// Unregisters the SessionInstantiator under the Keyword SessionInstantiator::KEY at the Poco::Data::SessionFactory
-};
+}
 
 
-} } } // namespace Poco::Data::ODBC
+Connector::~Connector()
+{
+}
 
 
-#endif // DataConnectors_ODBC_SessionInstantiator_INCLUDED
+Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString)
+{
+	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString));
+}
+
+
+void Connector::registerConnector()
+{
+	Poco::Data::SessionFactory::instance().add(KEY, new Connector());
+}
+
+
+void Connector::unregisterConnector()
+{
+	Poco::Data::SessionFactory::instance().remove(KEY);
+}
+
+
+} } } // namespace Poco::Data::SQLite

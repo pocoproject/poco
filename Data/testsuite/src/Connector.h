@@ -1,13 +1,9 @@
 //
-// SessionInstantiator.h
+// Connector.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SessionInstantiator.h#2 $
+// $Id: //poco/Main/Data/testsuite/src/Connector.h#2 $
 //
-// Library: SQLite
-// Package: SQLite
-// Module:  SessionInstantiator
-//
-// Definition of the SessionInstantiator class.
+// Definition of the Connector class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,44 +32,43 @@
 //
 
 
-#ifndef DataConnectors_SQLite_SessionInstantiator_INCLUDED
-#define DataConnectors_SQLite_SessionInstantiator_INCLUDED
+#ifndef Data_Test_Connector_INCLUDED
+#define Data_Test_Connector_INCLUDED
 
 
-#include "Poco/Data/SQLite/SQLite.h"
-#include "Poco/Data/SessionInstantiator.h"
+#include "Poco/Data/Connector.h"
 
 
 namespace Poco {
 namespace Data {
-namespace SQLite {
+namespace Test {
 
 
-class SQLite_API SessionInstantiator: public Poco::Data::SessionInstantiator
-	/// SessionInstantiator instantiates SqLite SessionImpl objects.
+class Connector: public Poco::Data::Connector
+	/// Connector instantiates SessionImpl objects for testing.
 {
 public:
 	static const std::string KEY;
-		/// Keyword for creating SQLite sessions.
+		/// Keyword for creating test sessions.
 
-	SessionInstantiator();
-		/// Creates the SessionInstantiator.
+	Connector();
+		/// Creates the Connector.
 
-	~SessionInstantiator();
-	/// Destroys the SessionInstantiator.
+	~Connector();
+	/// Destroys the Connector.
 
-	Poco::AutoPtr<Poco::Data::SessionImpl> create(const std::string& initString);
-		/// Creates a SQLite SessionImpl object and initializes it with the given initString.
+	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString);
+		/// Creates a test SessionImpl object and initializes it with the given connectionString.
 
 	static void addToFactory();
-		/// Registers the SessionInstantiator under the Keyword SessionInstantiator::KEY at the Poco::Data::SessionFactory.
+		/// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.
 
 	static void removeFromFactory();
-		/// Unregisters the SessionInstantiator under the Keyword SessionInstantiator::KEY at the Poco::Data::SessionFactory.
+		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.
 };
 
 
-} } } // namespace Poco::Data::SQLite
+} } } // namespace Poco::Data::Test
 
 
-#endif // DataConnectors_SQLite_SessionInstantiator_INCLUDED
+#endif // Data_Test_Connector_INCLUDED

@@ -1,7 +1,7 @@
 //
 // ODBCSQLiteTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCSQLiteTest.cpp#2 $
+// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCSQLiteTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -39,7 +39,7 @@
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/ODBC/SessionInstantiator.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
@@ -69,7 +69,7 @@ ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name):
 {
 	static bool beenHere = false;
 
-	ODBC::SessionInstantiator::addToFactory();
+	ODBC::Connector::registerConnector();
 	if (_drivers.empty()) 
 	{
 		Utility::drivers(_drivers);
@@ -79,7 +79,7 @@ ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name):
 	{
 		try
 		{
-			_pSession = new Session(SessionFactory::instance().create(ODBC::SessionInstantiator::KEY, _dbConnString));
+			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
 		}catch (ConnectionException& ex)
 		{
 			std::cout << "!!! WARNING: Connection failed. SQLite tests will fail !!!" << std::endl;
@@ -100,7 +100,7 @@ ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name):
 
 ODBCSQLiteTest::~ODBCSQLiteTest()
 {
-	ODBC::SessionInstantiator::removeFromFactory();
+	ODBC::Connector::unregisterConnector();
 }
 
 

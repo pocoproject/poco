@@ -1,7 +1,7 @@
 //
 // Session.cpp
 //
-// $Id: //poco/Main/Data/src/Session.cpp#3 $
+// $Id: //poco/Main/Data/src/Session.cpp#5 $
 //
 // Library: Data
 // Package: DataCore
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/Session.h"
+#include "Poco/Data/SessionFactory.h"
 #include <algorithm>
 
 
@@ -47,6 +48,13 @@ Session::Session(Poco::AutoPtr<SessionImpl> ptrImpl):
 	_statementCreator(ptrImpl)
 {
 	poco_check_ptr (ptrImpl.get());
+}
+
+
+Session::Session(const std::string& connector, const std::string& connectionString)
+{
+	Session newSession(SessionFactory::instance().create(connector, connectionString));
+	swap(newSession);
 }
 
 

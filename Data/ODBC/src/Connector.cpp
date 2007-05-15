@@ -1,11 +1,11 @@
 //
-// SessionInstantiator.cpp
+// Connector.cpp
 //
-// $Id: //poco/Main/Data/src/SessionInstantiator.cpp#2 $
+// $Id: //poco/Main/Data/ODBC/src/Connector.cpp#2 $
 //
-// Library: Data
-// Package: DataCore
-// Module:  SessionInstantiator
+// Library: ODBC
+// Package: ODBC
+// Module:  Connector
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,21 +34,45 @@
 //
 
 
-#include "Poco/Data/SessionInstantiator.h"
+#include "Poco/Data/ODBC/Connector.h"
+#include "Poco/Data/ODBC/SessionImpl.h"
+#include "Poco/Data/SessionFactory.h"
 
 
 namespace Poco {
 namespace Data {
+namespace ODBC {
 
 
-SessionInstantiator::SessionInstantiator()
+const std::string Connector::KEY("ODBC");
+
+
+Connector::Connector()
 {
 }
 
 
-SessionInstantiator::~SessionInstantiator()
+Connector::~Connector()
 {
 }
 
 
-} } // namespace Poco::Data
+Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString)
+{
+	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString));
+}
+
+
+void Connector::registerConnector()
+{
+	Poco::Data::SessionFactory::instance().add(KEY, new Connector());
+}
+
+
+void Connector::unregisterConnector()
+{
+	Poco::Data::SessionFactory::instance().remove(KEY);
+}
+
+
+} } } // namespace Poco::Data::ODBC

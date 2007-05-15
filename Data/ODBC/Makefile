@@ -16,7 +16,7 @@ endif
 
 objects = Binder ConnectionHandle DataTypes EnvironmentHandle \
 	Extractor ODBCColumn ODBCException ODBCStatementImpl Parameter Preparation \
-	SessionImpl SessionInstantiator Utility 
+	SessionImpl Connector Utility 
 
 target         = PocoODBC
 target_version = $(LIBVERSION)

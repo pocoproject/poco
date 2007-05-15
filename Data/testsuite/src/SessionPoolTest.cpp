@@ -1,7 +1,7 @@
 //
 // SessionPoolTest.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionPoolTest.cpp#2 $
+// $Id: //poco/Main/Data/testsuite/src/SessionPoolTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,7 +36,7 @@
 #include "Poco/Data/Common.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Thread.h"
-#include "SessionInstantiator.h"
+#include "Connector.h"
 
 
 using namespace Poco::Data;
@@ -45,13 +45,13 @@ using Poco::Thread;
 
 SessionPoolTest::SessionPoolTest(const std::string& name): CppUnit::TestCase(name)
 {
-	Poco::Data::Test::SessionInstantiator::addToFactory();
+	Poco::Data::Test::Connector::addToFactory();
 }
 
 
 SessionPoolTest::~SessionPoolTest()
 {
-	Poco::Data::Test::SessionInstantiator::removeFromFactory();
+	Poco::Data::Test::Connector::removeFromFactory();
 }
 
 

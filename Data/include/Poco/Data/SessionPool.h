@@ -1,7 +1,7 @@
 //
 // SessionPool.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SessionPool.h#2 $
+// $Id: //poco/Main/Data/include/Poco/Data/SessionPool.h#4 $
 //
 // Library: Data
 // Package: SessionPooling
@@ -73,16 +73,23 @@ class Data_API SessionPool
 	/// Sessions found not to be connected to the database are purged
 	/// from the pool whenever one of the following events occurs:
 	/// 
-	/// - JanitorTimer event
-	/// - get() request
-	/// - putBack() request
+	///   - JanitorTimer event
+	///   - get() request
+	///   - putBack() request
 	///
 	/// Not connected idle sessions can not exist.
+	///
+	/// Usage example:
+	///
+	///     SessionPool pool("ODBC", "...");
+	///     ...
+	///     Session sess(pool.get());
+	///     ...
 {
 public:
-	SessionPool(const std::string& sessionKey, const std::string& initString, int minSessions = 1, int maxSessions = 32, int idleTime = 60);
+	SessionPool(const std::string& sessionKey, const std::string& connectionString, int minSessions = 1, int maxSessions = 32, int idleTime = 60);
 		/// Creates the SessionPool for sessions with the given sessionKey
-		/// and initString.
+		/// and connectionString.
 		///
 		/// The pool allows for at most maxSessions sessions to be created.
 		/// If a session has been idle for more than idleTime seconds, and more than
@@ -135,7 +142,7 @@ private:
 	SessionPool& operator = (const SessionPool&);
 		
 	std::string _sessionKey;
-	std::string _initString;
+	std::string _connectionString;
 	int _minSessions;
 	int _maxSessions;
 	int _idleTime;
