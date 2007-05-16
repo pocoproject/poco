@@ -135,10 +135,10 @@ protected:
 	const AbstractExtractionVec& extractions() const;
 		/// Returns the extractions vector.
 
-	MetaColumn::ColumnDataType columnType(std::size_t pos) const;
+	const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns the type for the column at specified position.
 
-	MetaColumn::ColumnDataType columnType(const std::string& name) const;
+	inline const MetaColumn& metaColumn(const std::string& name) const;
 		/// Returns the type for the column with specified name.
 
 private:
@@ -206,15 +206,14 @@ inline const AbstractExtractionVec& Statement::extractions() const
 }
 
 
-inline MetaColumn::ColumnDataType Statement::columnType(std::size_t pos)const
+inline const MetaColumn& Statement::metaColumn(std::size_t pos) const
 {
-	return (_ptr->metaColumn(static_cast<UInt32>(pos))).type();
+	return _ptr->metaColumn(static_cast<UInt32>(pos));
 }
 
-
-inline MetaColumn::ColumnDataType Statement::columnType(const std::string& name)const
+inline const MetaColumn& Statement::metaColumn(const std::string& name) const
 {
-	return (_ptr->metaColumn(name)).type();
+	return _ptr->metaColumn(name);
 }
 
 

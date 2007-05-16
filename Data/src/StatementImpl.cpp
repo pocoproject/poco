@@ -258,7 +258,7 @@ void StatementImpl::makeExtractors(Poco::UInt32 count)
 {
 	for (int i = 0; i < count; ++i)
 	{
-		const MetaColumn& mc = metaColumn(i+1);
+		const MetaColumn& mc = metaColumn(i);
 		switch (mc.type())
 		{
 			case MetaColumn::FDT_BOOL:
@@ -310,7 +310,7 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 	Poco::UInt32 cols = columnsReturned();
 	for (Poco::UInt32 i = 0; i < cols; ++i)
 	{
-		const MetaColumn& column = metaColumn(i+1);
+		const MetaColumn& column = metaColumn(i);
 		if (0 == icompare(column.name(), name)) return column;
 	}
 

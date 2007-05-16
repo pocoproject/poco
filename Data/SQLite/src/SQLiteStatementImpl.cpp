@@ -116,7 +116,7 @@ void SQLiteStatementImpl::compileImpl()
 
 	for (int i = 0; i < colCount; ++i)
 	{
-		MetaColumn mc(i + 1, sqlite3_column_name(_pStmt, i), Utility::getColumnType(_pStmt, i));
+		MetaColumn mc(i, sqlite3_column_name(_pStmt, i), Utility::getColumnType(_pStmt, i));
 		_columns.push_back(mc);
 	}
 }
@@ -225,8 +225,8 @@ Poco::UInt32 SQLiteStatementImpl::columnsReturned() const
 
 const MetaColumn& SQLiteStatementImpl::metaColumn(Poco::UInt32 pos) const
 {
-	poco_assert (pos > 0 && pos <= _columns.size());
-	return _columns[pos-1];
+	poco_assert (pos >= 0 && pos <= _columns.size());
+	return _columns[pos];
 }
 
 

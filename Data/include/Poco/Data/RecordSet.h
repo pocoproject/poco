@@ -55,7 +55,7 @@ namespace Data {
 
 class Data_API RecordSet: private Statement
 	/// RecordSet class provides access to data returned from a query.
-	/// Data access indexes (row and column) are 1-based.
+	/// Data access indexes (row and column) are 0-based.
 	/// Recordset provides navigation methods to iterate through the
 	/// recordset and retrieval methods to extract data.
 {
@@ -90,10 +90,11 @@ public:
 
 		const AbstractExtractionVec& rExtractions = extractions();
 
-		if (pos > rExtractions.size())
+		std::size_t s = rExtractions.size();
+		if (0 == s || pos > s - 1)
 			throw RangeException(format("Invalid column number: %z", pos));
 		
-		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos - 1].get());
+		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos].get());
 
 		if (pExtraction)
 		{
@@ -151,6 +152,29 @@ public:
 	DynamicAny operator [] (std::size_t index);
 		/// Returns the value in the named column of the current row.
 
+	MetaColumn::ColumnDataType columnType(std::size_t pos) const;
+		/// Returns the type for the column at specified position.
+
+	MetaColumn::ColumnDataType columnType(const std::string& name) const;
+		/// Returns the type for the column with specified name.
+
+	const std::string& columnName(std::size_t pos) const;
+		/// Returns column name for the column at specified position.
+
+	std::size_t columnLength(std::size_t pos) const;
+		/// Returns column maximum length for the column at specified position.
+
+	std::size_t columnLength(const std::string& name) const;
+		/// Returns column maximum length for the column with specified name.
+
+	std::size_t columnPrecision(std::size_t pos) const;
+		/// Returns column precision for the column at specified position.
+		/// Valid for floating point fields only (zero for other data types).
+
+	std::size_t columnPrecision(const std::string& name) const;
+		/// Returns column precision for the column with specified name.
+		/// Valid for floating point fields only (zero for other data types).
+
 private:
 	RecordSet();
 
@@ -185,6 +209,8 @@ private:
 ///
 /// inlines
 ///
+
+
 inline std::size_t RecordSet::rowCount() const
 {
 	poco_assert (extractions().size());
@@ -226,6 +252,48 @@ inline DynamicAny RecordSet::operator [] (const std::string& name)
 inline DynamicAny RecordSet::operator [] (std::size_t index)
 {
 	return value(index, _currentRow);
+}
+
+
+inline MetaColumn::ColumnDataType RecordSet::columnType(std::size_t pos)const
+{
+	return metaColumn(static_cast<UInt32>(pos)).type();
+}
+
+
+inline MetaColumn::ColumnDataType RecordSet::columnType(const std::string& name)const
+{
+	return metaColumn(name).type();
+}
+
+
+inline const std::string& RecordSet::columnName(std::size_t pos) const
+{
+	return metaColumn(static_cast<UInt32>(pos)).name();
+}
+
+
+inline std::size_t RecordSet::columnLength(std::size_t pos) const
+{
+	return metaColumn(static_cast<UInt32>(pos)).length();
+}
+
+
+inline std::size_t RecordSet::columnLength(const std::string& name)const
+{
+	return metaColumn(name).length();
+}
+
+
+inline std::size_t RecordSet::columnPrecision(std::size_t pos) const
+{
+	return metaColumn(static_cast<UInt32>(pos)).precision();
+}
+
+
+inline std::size_t RecordSet::columnPrecision(const std::string& name)const
+{
+	return metaColumn(name).precision();
 }
 
 

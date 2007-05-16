@@ -1585,32 +1585,32 @@ void SQLExecutor::internalExtraction()
 		assert (3 == rset2.columnCount());
 		assert (4 == rset2.rowCount());
 
-		int i = rset.value<int>(1,1);
+		int i = rset.value<int>(0,0);
 		assert (1 == i);
 
-		std::string s = rset.value(1,1);
+		std::string s = rset.value(0,0);
 		assert ("1" == s);
 
-		int a = rset.value<int>(1,3);
+		int a = rset.value<int>(0,2);
 		assert (3 == a);
 
 		try
 		{
-			double d = rset.value<double>(2,2);
+			double d = rset.value<double>(1,1);
 			assert (2.5 == d);
 		}
 		catch (BadCastException&)
 		{
-			float f = rset.value<float>(2,2);
+			float f = rset.value<float>(1,1);
 			assert (2.5 == f);
 		}
 
-		s = rset.value<std::string>(3,3);
+		s = rset.value<std::string>(2,2);
 		assert ("5" == s);
-		i = rset.value("str0", 3);
+		i = rset.value("str0", 2);
 		assert (5 == i);
 		
-		const Column<int>& col = rset.column<int>(1);
+		const Column<int>& col = rset.column<int>(0);
 		Column<int>::Iterator it = col.begin();
 		Column<int>::Iterator end = col.end();
 		for (int i = 1; it != end; ++it, ++i)
@@ -1622,7 +1622,7 @@ void SQLExecutor::internalExtraction()
 		try
 		{
 			//this is what most drivers will return
-			int i = rset.value<int>(1,1);
+			int i = rset.value<int>(0,0);
 			assert (4 == i);
 		}
 		catch(BadCastException&)
@@ -1630,30 +1630,30 @@ void SQLExecutor::internalExtraction()
 			try
 			{
 				//this is for Oracle
-				double i = rset.value<double>(1,1);
+				double i = rset.value<double>(0,0);
 				assert (4 == int(i));
 			}
 			catch(BadCastException&)
 			{
 				//this is for PostgreSQL
-				Poco::Int64 big = rset.value<Poco::Int64>(1,1);
+				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
 				assert (4 == big);
 			}
 		}
 
-		s = rset.value("cnt", 1).convert<std::string>();
+		s = rset.value("cnt", 0).convert<std::string>();
 		assert ("4" == s);
 
 		try { const Column<int>& col1 = rset.column<int>(100); fail ("must fail"); }
 		catch (RangeException&) { }
 
-		try	{ rset.value<std::string>(1,1); fail ("must fail"); }
+		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
 		catch (BadCastException&) {	}
 		
 		stmt = (*_pSession << "DELETE FROM Vectors", now);
 		rset = stmt;
 
-		try { const Column<int>& col1 = rset.column<int>(1); fail ("must fail"); }
+		try { const Column<int>& col1 = rset.column<int>(0); fail ("must fail"); }
 		catch (RangeException&) { }
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }

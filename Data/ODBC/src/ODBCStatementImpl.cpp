@@ -315,7 +315,7 @@ void ODBCStatementImpl::fillColumns()
 {
 	Poco::UInt32 colCount = columnsReturned();
 
-	for (int i = 1; i <= colCount; ++i)
+	for (int i = 0; i < colCount; ++i)
 		_columnPtrs.push_back(new ODBCColumn(_stmt, i));
 }
 

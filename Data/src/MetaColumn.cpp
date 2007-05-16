@@ -59,7 +59,7 @@ MetaColumn::MetaColumn(std::size_t position,
 	_type(type),
 	_nullable(nullable)
 {
-	poco_assert(position > 0);
+	poco_assert(position >= 0);
 }
 
 

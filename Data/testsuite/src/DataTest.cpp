@@ -346,10 +346,10 @@ void DataTest::readFromBLOB(BinaryReader& reader)
 
 void DataTest::testColumn()
 {
-	MetaColumn mc(1, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
+	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 
 	assert (mc.name() == "mc");
-	assert (mc.position() == 1);
+	assert (mc.position() == 0);
 	assert (mc.length() == 2);
 	assert (mc.precision() == 3);
 	assert (mc.type() == MetaColumn::FDT_DOUBLE);
@@ -365,13 +365,13 @@ void DataTest::testColumn()
 	Column<int> c(mc, pData);
 
 	assert (c.rowCount() == 5);
-	assert (c[1] == 1);
-	assert (c[2] == 2);
-	assert (c[3] == 3);
-	assert (c[4] == 4);
-	assert (c[5] == 5);
+	assert (c[0] == 1);
+	assert (c[1] == 2);
+	assert (c[2] == 3);
+	assert (c[3] == 4);
+	assert (c[4] == 5);
 	assert (c.name() == "mc");
-	assert (c.position() == 1);
+	assert (c.position() == 0);
 	assert (c.length() == 2);
 	assert (c.precision() == 3);
 	assert (c.type() == MetaColumn::FDT_DOUBLE);
@@ -386,20 +386,20 @@ void DataTest::testColumn()
 	Column<int> c1 = c;
 
 	assert (c1.rowCount() == 5);
-	assert (c1[1] == 1);
-	assert (c1[2] == 2);
-	assert (c1[3] == 3);
-	assert (c1[4] == 4);
-	assert (c1[5] == 5);
+	assert (c1[0] == 1);
+	assert (c1[1] == 2);
+	assert (c1[2] == 3);
+	assert (c1[3] == 4);
+	assert (c1[4] == 5);
 
 	Column<int> c2(c1);
 
 	assert (c2.rowCount() == 5);
-	assert (c2[1] == 1);
-	assert (c2[2] == 2);
-	assert (c2[3] == 3);
-	assert (c2[4] == 4);
-	assert (c2[5] == 5);
+	assert (c2[0] == 1);
+	assert (c2[1] == 2);
+	assert (c2[2] == 3);
+	assert (c2[3] == 4);
+	assert (c2[4] == 5);
 
 	std::vector<int> vi;
 	vi.assign(c.begin(), c.end());

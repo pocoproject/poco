@@ -59,7 +59,7 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 {
 	poco_assert_dbg (pStmt);
 
-	const char* pc = sqlite3_column_decltype(pStmt, (int)pos);
+	const char* pc = sqlite3_column_decltype(pStmt, (int) pos);
 	std::string sqliteType = pc ? pc : "";
 	Poco::toUpperInPlace(sqliteType);
 	

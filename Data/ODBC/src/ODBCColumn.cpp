@@ -66,7 +66,7 @@ void ODBCColumn::getDescription()
 	_columnDesc.isNullable = 0;
 
 	if (Utility::isError(SQLDescribeCol(_rStmt, 
-		(SQLUSMALLINT) position(), 
+		(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
 		_columnDesc.name, 
 		NAME_BUFFER_LENGTH,
 		&_columnDesc.nameBufferLength, 
@@ -85,7 +85,7 @@ void ODBCColumn::init()
 	getDescription();
 
 	if (Utility::isError(SQLColAttribute(_rStmt,
-			(SQLUSMALLINT) position(),
+			(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
 			SQL_DESC_LENGTH,
 			0,
 			0,

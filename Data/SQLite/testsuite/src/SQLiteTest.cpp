@@ -1567,25 +1567,25 @@ void SQLiteTest::testInternalExtraction()
 	assert (3 == rset2.columnCount());
 	assert (4 == rset2.rowCount());
 
-	int a = rset.value<int>(1,3);
+	int a = rset.value<int>(0,2);
 	assert (3 == a);
 
-	int b = rset2.value<int>("InT0",3);
+	int b = rset2.value<int>("InT0",2);
 	assert (3 == b);
 
-	double d = rset.value<double>(2,1);
+	double d = rset.value<double>(1,0);
 	assert (1.5 == d);
 
-	std::string s = rset.value<std::string>(3,2);
+	std::string s = rset.value<std::string>(2,1);
 	assert ("4" == s);
 	
-	const Column<int>& col = rset.column<int>(1);
-	assert (col[1] == 1);
+	const Column<int>& col = rset.column<int>(0);
+	assert (col[0] == 1);
 
 	try { const Column<int>& col1 = rset.column<int>(100); fail ("must fail"); }
 	catch (RangeException&) { }
 
-	const Column<int>& col1 = rset.column<int>(1);
+	const Column<int>& col1 = rset.column<int>(0);
 	assert ("int0" == col1.name());
 	Column<int>::Iterator it = col1.begin();
 	Column<int>::Iterator itEnd = col1.end();
@@ -1594,13 +1594,13 @@ void SQLiteTest::testInternalExtraction()
 		assert (counter == *it);
 
 	rset = (tmp << "SELECT COUNT(*) FROM Vectors", now);
-	s = rset.value<std::string>(1,1);
+	s = rset.value<std::string>(0,0);
 	assert ("4" == s);
 	
 	stmt = (tmp << "DELETE FROM Vectors", now);
 	rset = stmt;
 
-	try { const Column<int>& col1 = rset.column<int>(1); fail ("must fail"); }
+	try { const Column<int>& col1 = rset.column<int>(0); fail ("must fail"); }
 	catch (RangeException&) { }
 }
 

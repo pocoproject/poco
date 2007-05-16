@@ -105,7 +105,7 @@ public:
 	{
 		try
 		{
-			return _pData->at(row-1);
+			return _pData->at(row);
 		}
 		catch (std::out_of_range& ex)
 		{ 
@@ -173,6 +173,8 @@ public:
 	{
 		return _pData->end();
 	}
+
+	
 
 private:
 	Column();
