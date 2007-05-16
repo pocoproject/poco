@@ -1,7 +1,7 @@
 //
 // Statement.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Statement.h#16 $
+// $Id: //poco/Main/Data/include/Poco/Data/Statement.h#17 $
 //
 // Library: Data
 // Package: DataCore
@@ -67,7 +67,7 @@ public:
 	Statement(StatementImpl* pImpl);
 		/// Creates the Statement.
 
-	Statement(Session& session);
+	explicit Statement(Session& session);
 		/// Creates the Statement for the given Session.
 		///
 		/// The following:
@@ -131,6 +131,9 @@ public:
 		/// Returns if the statement was completely executed or if a previously set limit stopped it
 		/// and there is more work to do. When no limit is set, it will always - after calling execute() - return true.
 
+	Statement& reset(Session& session);
+		/// Resets the Statement so that it can be filled with a new SQL command.
+
 protected:
 	const AbstractExtractionVec& extractions() const;
 		/// Returns the extractions vector.
@@ -138,7 +141,7 @@ protected:
 	const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns the type for the column at specified position.
 
-	inline const MetaColumn& metaColumn(const std::string& name) const;
+	const MetaColumn& metaColumn(const std::string& name) const;
 		/// Returns the type for the column with specified name.
 
 private:
@@ -210,6 +213,7 @@ inline const MetaColumn& Statement::metaColumn(std::size_t pos) const
 {
 	return _ptr->metaColumn(static_cast<UInt32>(pos));
 }
+
 
 inline const MetaColumn& Statement::metaColumn(const std::string& name) const
 {

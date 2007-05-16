@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="Tuple"
-	ProjectGUID="{79D784CB-663C-444E-BCB2-1A1166D19DFB}"
+	ProjectGUID="{08C81227-3322-4DBD-A83F-55CCC933A5F7}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

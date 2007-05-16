@@ -1,7 +1,7 @@
 //
 // BLOB.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/BLOB.h#10 $
+// $Id: //poco/Main/Data/include/Poco/Data/BLOB.h#11 $
 //
 // Library: Data
 // Package: DataCore
@@ -56,6 +56,9 @@ class Data_API BLOB
 	///
 	/// A BLOB can hold arbitrary binary data.
 	/// The maximum size depends on the underlying database.
+	///
+	/// The BLOBInputStream and BLOBOutputStream classes provide
+	/// a convenient way to access the data in a BLOB.
 {
 public:
 	typedef std::vector<char>::const_iterator Iterator;

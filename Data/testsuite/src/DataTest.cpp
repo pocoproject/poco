@@ -1,7 +1,7 @@
 //
 // DataTest.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.cpp#9 $
+// $Id: //poco/Main/Data/testsuite/src/DataTest.cpp#11 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -43,8 +43,11 @@
 #include "Poco/BinaryWriter.h"
 #include "Poco/Types.h"
 #include "Poco/Exception.h"
+#include <cstring>
+
 
 using namespace Poco::Data;
+
 
 using Poco::BinaryReader;
 using Poco::BinaryWriter;
@@ -166,7 +169,7 @@ void DataTest::testBLOB()
 	
 	BLOB blobNumStr(strDigit.c_str(), strDigit.size());
 	assert (blobNumStr.size() == strDigit.size());
-	assert (0 == strncmp(strDigit.c_str(), blobNumStr.rawContent(), blobNumStr.size()));
+	assert (0 == std::strncmp(strDigit.c_str(), blobNumStr.rawContent(), blobNumStr.size()));
 	assert (*blobNumStr.begin() == '1');
 	assert (*(blobNumStr.end()-1) == '0');
 	BLOB blobNumVec(vecDigit);
@@ -179,7 +182,7 @@ void DataTest::testBLOB()
 	BLOB blobChrStr(strAlpha.c_str(), strAlpha.size());
 	BLOB blobChrVec(vecAlpha);
 	assert (blobChrStr.size() == strAlpha.size());
-	assert (0 == strncmp(strAlpha.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
+	assert (0 == std::strncmp(strAlpha.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
 	assert (*blobChrStr.begin() == 'a');
 	assert (*(blobChrStr.end()-1) == 'z');
 	assert (blobChrStr == blobChrVec);

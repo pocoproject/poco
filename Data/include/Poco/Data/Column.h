@@ -1,7 +1,7 @@
 //
 // Column.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Column.h#3 $
+// $Id: //poco/Main/Data/include/Poco/Data/Column.h#4 $
 //
 // Library: Data
 // Package: DataCore
@@ -173,8 +173,6 @@ public:
 	{
 		return _pData->end();
 	}
-
-	
 
 private:
 	Column();

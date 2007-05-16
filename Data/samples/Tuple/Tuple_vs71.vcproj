@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="Binding"
-	ProjectGUID="{F2972327-DCA7-49BB-B55D-66C554CF1205}"
+	Name="Tuple"
+	ProjectGUID="{08C81227-3322-4DBD-A83F-55CCC933A5F7}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -37,11 +37,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="bin/Bindingd.exe"
+				OutputFile="bin/Tupled.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="bin/Bindingd.pdb"
+				ProgramDatabaseFile="bin/Tupled.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -96,7 +96,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="bin/Binding.exe"
+				OutputFile="bin/Tuple.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="FALSE"
@@ -138,7 +138,7 @@
 			Name="Source Files"
 			Filter="">
 			<File
-				RelativePath=".\src\Binding.cpp">
+				RelativePath=".\src\Tuple.cpp">
 			</File>
 		</Filter>
 	</Files>

@@ -1,7 +1,7 @@
 //
 // RecordSet.cpp
 //
-// $Id: //poco/Main/Data/samples/RecordSet/src/RecordSet.cpp#1 $
+// $Id: //poco/Main/Data/samples/RecordSet/src/RecordSet.cpp#2 $
 //
 // This sample demonstrates the Data library.
 //
@@ -59,13 +59,19 @@ int main(int argc, char** argv)
 	select << "SELECT * FROM Person";
 	select.execute();
 
-	// create a RecordSet and iterate over it
+	// create a RecordSet 
 	RecordSet rs(select);
 	std::size_t cols = rs.columnCount();
+	// print all column names
+	for (std::size_t col = 0; col < cols; ++col)
+	{
+		std::cout << rs.columnName(col) << std::endl;
+	}
+	// iterate over all rows and columns
 	bool more = rs.moveFirst();
 	while (more)
 	{
-		for (std::size_t col = 1; col <= cols; ++col)
+		for (std::size_t col = 0; col < cols; ++col)
 		{
 			std::cout << rs[col].convert<std::string>() << " ";
 		}

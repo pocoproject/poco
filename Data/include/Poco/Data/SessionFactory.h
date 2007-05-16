@@ -1,7 +1,7 @@
 //
 // SessionFactory.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SessionFactory.h#5 $
+// $Id: //poco/Main/Data/include/Poco/Data/SessionFactory.h#7 $
 //
 // Library: Data
 // Package: DataCore
@@ -63,7 +63,7 @@ class Data_API SessionFactory
 	///
 	/// A concrete example to open an SQLite database stored in the file "dummy.db" would be
 	///    
-	///     Session tmp(SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	///     Session ses(SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
 	///
 	/// An even simpler way to create a session is to use the two argument constructor of Session, which
 	/// automatically invokes the SessionFactory:
@@ -85,7 +85,7 @@ public:
 
 	Session create(const std::string& key, const std::string& connectionString);
 		/// Creates a Session for the given key with the connectionString. Throws an Poco:Data::UnknownDataBaseException
-		/// if no instantiator is registered for that key.
+		/// if no Connector is registered for that key.
 
 private:
 	SessionFactory();

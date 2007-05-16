@@ -1,7 +1,7 @@
 //
 // BLOBStream.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/BLOBStream.h#2 $
+// $Id: //poco/Main/Data/include/Poco/Data/BLOBStream.h#3 $
 //
 // Library: Data
 // Package: DataCore
@@ -107,10 +107,6 @@ public:
 
 class Data_API BLOBInputStream: public BLOBIOS, public std::istream
 	/// An input stream for reading from a BLOB.
-	///
-	/// Using formatted input from a BLOBInputStream
-	/// is not recommended, due to the read-ahead behavior of
-	/// istream with formatted reads.
 {
 public:
 	BLOBInputStream(BLOB& blob);

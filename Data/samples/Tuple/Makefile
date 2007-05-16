@@ -1,14 +1,14 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/samples/Tuple/Makefile#1 $
+# $Id: //poco/Main/Data/samples/Tuple/Makefile#2 $
 #
 # Makefile for Poco Data Tuple sample
 #
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Binding
+objects = Tuple
 
 target         = Tuple
 target_version = 1

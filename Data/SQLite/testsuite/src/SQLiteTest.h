@@ -1,7 +1,7 @@
 //
 // SQLiteTest.h
 //
-// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.h#2 $
+// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.h#3 $
 //
 // Definition of the SQLiteTest class.
 //
@@ -109,8 +109,6 @@ public:
 	void testTupleVector10();
 
 	void testInternalExtraction();
-
-	void testTAC();
 
 	void setUp();
 	void tearDown();

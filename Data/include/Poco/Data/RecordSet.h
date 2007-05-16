@@ -1,7 +1,7 @@
 //
 // RecordSet.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#5 $
+// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#6 $
 //
 // Library: Data
 // Package: DataCore
@@ -54,10 +54,23 @@ namespace Data {
 
 
 class Data_API RecordSet: private Statement
-	/// RecordSet class provides access to data returned from a query.
-	/// Data access indexes (row and column) are 0-based.
+	/// RecordSet provides access to data returned from a query.
+	/// Data access indexes (row and column) are 0-based, as usual in C++.
+	/// 
 	/// Recordset provides navigation methods to iterate through the
-	/// recordset and retrieval methods to extract data.
+	/// recordset, retrieval methods to extract data, and methods
+	/// to get metadata (type, etc.) about columns.
+	///
+	/// To work with a RecordSet, first create a Statement, execute it, and
+	/// create the RecordSet from the Statement, as follows:
+	///
+	///     Statement select(session);
+	///     select << "SELECT * FROM Person";
+	///     select.execute();
+	///     RecordSet rs(select);
+	///
+	/// The number of rows in the RecordSet can be limited by specifying
+	/// a limit for the Statement.
 {
 public:
 	explicit RecordSet(const Statement& rStatement);
@@ -91,8 +104,8 @@ public:
 		const AbstractExtractionVec& rExtractions = extractions();
 
 		std::size_t s = rExtractions.size();
-		if (0 == s || pos > s - 1)
-			throw RangeException(format("Invalid column number: %z", pos));
+		if (0 == s || pos >= s)
+			throw RangeException(format("Invalid column index: %z", pos));
 		
 		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos].get());
 
@@ -130,15 +143,28 @@ public:
 
 	bool moveFirst();
 		/// Moves the row cursor to the first row.
+		///
+		/// Returns true if there is at least one row in the RecordSet,
+		/// false otherwise.
 
 	bool moveNext();
 		/// Moves the row cursor to the next row.
+		///
+		/// Returns true if the row is available, or false
+		/// if the end of the record set has been reached and
+		/// no more rows are available.
 
 	bool movePrevious();
 		/// Moves the row cursor to the previous row.
+		///
+		/// Returns true if the row is available, or false
+		/// if there are no more rows available.
 
 	bool moveLast();
 		/// Moves the row cursor to the last row.
+		///
+		/// Returns true if there is at least one row in the RecordSet,
+		/// false otherwise.
 
 	DynamicAny value(const std::string& name);
 		/// Returns the value in the named column of the current row.
@@ -195,7 +221,8 @@ private:
 			if (pExtraction)
 			{
 				const Column<T>& col = pExtraction->column();
-				if (0 == Poco::icompare(name, col.name())) return col.position();
+				if (0 == Poco::icompare(name, col.name()))
+					return col.position();
 			}
 		}
 
@@ -209,8 +236,6 @@ private:
 ///
 /// inlines
 ///
-
-
 inline std::size_t RecordSet::rowCount() const
 {
 	poco_assert (extractions().size());

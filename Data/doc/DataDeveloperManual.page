@@ -1,17 +1,18 @@
-POCO Data Developer Guide
+POCO Data Connectors Developer Guide
 Data
 
 !!!Overview
-Developing one's own <[DataConnector]> implementation is rather straight-forward.
+Developing one's own <*Data Connector*> implementation is rather straight-forward.
 Just implement the following interfaces:
   * Poco::Data::AbstractBinder
   * Poco::Data::AbstractExtractor
   * Poco::Data::StatementImpl
   * Poco::Data::SessionImpl
-  * Poco::Data::SessionInstantiator
+  * Poco::Data::Connector
   * optional: Poco::Data::AbstractPreparation
 
-It is recommended to implement the classes from top to down (ie. start with Binder and Extractor) and to use a namespace that has <[ Poco::Data ]> as parent, e.g.<[ Poco::Data::SQLite ]>.
+It is recommended to implement the classes from top to down (ie. start with Binder and Extractor) and to use a 
+namespace that has <[ Poco::Data ]> as parent, e.g.<[ Poco::Data::SQLite ]>.
 
 !!!AbstractBinder
 An <[AbstractBinder]> is a class that maps values to placeholders. It is also responsible to bind primitive C++ data types to database 
@@ -398,31 +399,31 @@ The connection is opened in the constructor, and closed in the destructor.
         /// Aborts a transaction
 ----
 
-!!!SessionInstantiator
-Finally, one needs to implement the <[SessionInstantiator]>.
-Each <[SessionInstantiator]> should have a public static const string member named <*KEY*> and must have a factory method to <*create*> <[ Poco::AutoPtr ]> objects of type <[SessionImpl]>.
+!!!Connector
+Finally, one needs to implement the <[Connector]>.
+Each <[Connector]> should have a public static const string member named <*KEY*> and must have a factory method to <*create*> <[ Poco::AutoPtr ]> objects of type <[SessionImpl]>.
 It should also have a static <*addToFactory()*> and a static <*removeFromFactory()*> method:
 
-    class My_API SessionInstantiator: public Poco::Data::SessionInstantiator
-        /// SessionInstantiator instantiates SessionImpl objects.
+    class My_API Connector: public Poco::Data::Connector
+        /// Connector instantiates SessionImpl objects.
     {
     public:
         static const std::string KEY;
             /// Keyword for creating sessions
     
-        SessionInstantiator();
-            /// Creates the SessionInstantiator.
+        Connector();
+            /// Creates the Connector.
     
-        ~SessionInstantiator();
-        /// Destroys the SessionInstantiator.
+        ~Connector();
+        /// Destroys the Connector.
     
-        Poco::AutoPtr < Poco::Data::SessionImpl > create(const std::string& initString);
-            /// Creates a SessionImpl object and initializes it with the given initString.
+        Poco::AutoPtr < Poco::Data::SessionImpl > createSession(const std::string& connectionString);
+            /// Creates a SessionImpl object and initializes it with the given connectionString.
     
-        static void addToFactory();
-            /// Registers the SessionInstantiator under the Keyword SessionInstantiator::KEY at the Poco::Data::SessionFactory
+        static void registerConnector();
+            /// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
     
-        static void removeFromFactory();
-            /// Unregisters the SessionInstantiator under the Keyword SessionInstantiator::KEY at the Poco::Data::SessionFactory
+        static void unregisterConnector();
+            /// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
     };
 ----

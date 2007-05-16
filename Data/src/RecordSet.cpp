@@ -58,18 +58,18 @@ DynamicAny RecordSet::value(std::size_t col, std::size_t row) const
 	switch (columnType(col))
 	{
 		case MetaColumn::FDT_BOOL:
-		case MetaColumn::FDT_INT8:   return value<Int8>(col, row);        break;
-		case MetaColumn::FDT_UINT8:  return value<UInt8>(col, row);       break;
-		case MetaColumn::FDT_INT16:  return value<Int16>(col, row);       break;
-		case MetaColumn::FDT_UINT16: return value<UInt16>(col, row);      break;
-		case MetaColumn::FDT_INT32:  return value<Int32>(col, row);       break;
-		case MetaColumn::FDT_UINT32: return value<UInt32>(col, row);      break;
-		case MetaColumn::FDT_INT64:  return value<Int64>(col, row);       break;
-		case MetaColumn::FDT_UINT64: return value<UInt64>(col, row);      break;
-		case MetaColumn::FDT_FLOAT:  return value<float>(col, row);       break;
-		case MetaColumn::FDT_DOUBLE: return value<double>(col, row);      break;
-		case MetaColumn::FDT_STRING: return value<std::string>(col, row); break;
-		case MetaColumn::FDT_BLOB:   return value<BLOB>(col, row);        break;
+		case MetaColumn::FDT_INT8:   return value<Int8>(col, row);
+		case MetaColumn::FDT_UINT8:  return value<UInt8>(col, row);
+		case MetaColumn::FDT_INT16:  return value<Int16>(col, row);
+		case MetaColumn::FDT_UINT16: return value<UInt16>(col, row);
+		case MetaColumn::FDT_INT32:  return value<Int32>(col, row);
+		case MetaColumn::FDT_UINT32: return value<UInt32>(col, row);
+		case MetaColumn::FDT_INT64:  return value<Int64>(col, row);
+		case MetaColumn::FDT_UINT64: return value<UInt64>(col, row);
+		case MetaColumn::FDT_FLOAT:  return value<float>(col, row);
+		case MetaColumn::FDT_DOUBLE: return value<double>(col, row);
+		case MetaColumn::FDT_STRING: return value<std::string>(col, row);
+		case MetaColumn::FDT_BLOB:   return value<BLOB>(col, row);
 		default:
 			throw Poco::InvalidArgumentException("Data type not supported.");
 	}
@@ -120,7 +120,7 @@ bool RecordSet::moveNext()
 
 bool RecordSet::movePrevious()
 {
-	if (-1 == _currentRow) return false;
+	if (0 == _currentRow) return false;
 	--_currentRow;
 	return true;
 }
@@ -135,8 +135,6 @@ bool RecordSet::moveLast()
 	}
 	else return false;
 }
-
-
 
 
 } } // namespace Poco::Data

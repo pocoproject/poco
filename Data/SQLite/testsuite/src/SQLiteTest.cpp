@@ -1,7 +1,7 @@
 //
 // SQLiteTest.cpp
 //
-// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.cpp#3 $
+// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -160,34 +160,6 @@ SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
 SQLiteTest::~SQLiteTest()
 {
 	SQLite::Connector::unregisterConnector();
-}
-
-
-void SQLiteTest::testTAC()
-{
-	Poco::File aFile("sqlite.db");
-	
-	if (aFile.exists())
-		aFile.remove();
-
-	Session ses (SessionFactory::instance().create(SQLite::Connector::KEY, "sqlite.db"));
-	
-	ses << "CREATE TABLE LogTest (Id INTEGER PRIMARY KEY, Time INTEGER, Value INTEGER)", now;
-	//ses << "PRAGMA synchronous = OFF", now;
-
-	double value = -200000000000.0;
-	Poco::Int64 time = (Poco::Int64)22329988776655.0;
-	Poco::Stopwatch sw;
-	sw.start();
-	ses.begin();
-	Statement stmt = (ses << "INSERT INTO LogTest ([Time], Value) VALUES (:time, :value)", use(time), use(value));
-	for(int i = 0; i < 1000; i++)
-	{
-		stmt.execute();
-	}
-	ses.commit();
-	sw.stop();
-	std::cout << std::endl << "Ms for 1000 inserts: " << sw.elapsed() << std::endl; 
 }
 
 
@@ -1619,7 +1591,6 @@ CppUnit::Test* SQLiteTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteTest");
 
-	CppUnit_addTest(pSuite, SQLiteTest, testTAC);
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccess);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer2);

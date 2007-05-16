@@ -1,7 +1,7 @@
 //
 // Range.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Range.h#4 $
+// $Id: //poco/Main/Data/include/Poco/Data/Range.h#5 $
 //
 // Library: Data
 // Package: DataCore
@@ -49,7 +49,7 @@ namespace Data {
 
 
 class Data_API Range
-	/// Limit stores information how many rows a query should return.
+	/// Range stores information how many rows a query should return.
 {
 public:
 	Range(Poco::UInt32 lowValue, Poco::UInt32 upValue, bool hardLimit);

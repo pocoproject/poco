@@ -58,8 +58,7 @@ Statement::Statement(StatementImpl* pImpl):
 Statement::Statement(Session& session):
 	_executed(false)
 {
-	Statement stmt(session.createStatementImpl());
-	swap(stmt);
+	reset(session);
 }
 
 
@@ -104,6 +103,14 @@ Poco::UInt32 Statement::execute()
 bool Statement::done()
 {
 	return _ptr->getState() == StatementImpl::ST_DONE;
+}
+
+
+Statement& Statement::reset(Session& session)
+{
+	Statement stmt(session.createStatementImpl());
+	swap(stmt);
+	return *this;
 }
 
 

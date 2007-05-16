@@ -216,8 +216,6 @@ private:
 //
 // inlines
 //
-
-
 inline void StatementImpl::addBinding(AbstractBinding* info)
 {
 	_bindings.push_back(info);

@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/SQLiteStatementImpl.cpp#4 $
+// $Id: //poco/Main/Data/SQLite/src/SQLiteStatementImpl.cpp#6 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -38,8 +38,9 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/String.h"
-#include "sqlite3.h"
 #include <cstdlib>
+#include <cstring>
+#include "sqlite3.h"
 
 
 namespace Poco {
@@ -96,7 +97,7 @@ void SQLiteStatementImpl::compileImpl()
 		else if(rc == SQLITE_OK && !pStmt) // comment/whitespace ignore
 		{
 			pSql = pLeftover;
-			if (strlen(pSql) == 0)
+			if (std::strlen(pSql) == 0)
 			{
 				// empty statement or an conditional statement! like CREATE IF NOT EXISTS
 				// this is valid
