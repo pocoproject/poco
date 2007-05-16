@@ -3,8 +3,6 @@
 	<name>Net</name>
 	<comment></comment>
 	<projects>
-		<project>Foundation</project>
-		<project>XML</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
