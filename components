@@ -3,7 +3,4 @@ XML
 Util
 Net
 NetSSL_OpenSSL
-Data
-Data/SQLite
-Data/ODBC
 CppUnit
