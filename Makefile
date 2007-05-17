@@ -33,11 +33,11 @@ install: libexecs
 		if [ -d "$(POCO_BASE)/$$comp/include" ] ; then \
 			cp -Rf $(POCO_BASE)/$$comp/include/* $(INSTALLDIR)/include/ ; \
 		fi ; \
-		if [ -d "$(POCO_BUILD)/$$comp/bin" ] ; then \
-			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -Rf {} $(INSTALLDIR)/bin \; ; \
+		if [ -d "$(POCO_BASE)/$$comp/bin" ] ; then \
+			find $(POCO_BASE)/$$comp/bin -perm -700 -type f -exec cp -Rf {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "libPoco*" -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BASE)/lib -name "libPoco*" -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 .PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec
 .PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests
