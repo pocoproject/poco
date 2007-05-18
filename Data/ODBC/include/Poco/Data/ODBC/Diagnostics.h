@@ -70,9 +70,9 @@ public:
 	struct DiagnosticFields
 	{
 		/// SQLGetDiagRec fields
-		POCO_SQLCHAR     _sqlState[SQL_STATE_SIZE];
-		POCO_SQLCHAR     _message[SQL_MESSAGE_LENGTH];
-		SQLINTEGER  _nativeError;
+		POCO_SQLCHAR _sqlState[SQL_STATE_SIZE];
+		POCO_SQLCHAR _message[SQL_MESSAGE_LENGTH];
+		SQLINTEGER   _nativeError;
 	};
 
 	typedef std::vector<DiagnosticFields> FieldVec;
