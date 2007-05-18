@@ -71,15 +71,16 @@ ODBCOracleTest::ODBCOracleTest(const std::string& name):
 {
 	static bool beenHere = false;
 
-	ODBC::Connector::registerConnector();
 	if (_drivers.empty() || _dataSources.empty()) 
 	{
 		Utility::drivers(_drivers);
 		Utility::dataSources(_dataSources);
 		checkODBCSetup();
 	}
+	
 	if (!_pSession && !_dbConnString.empty() && !beenHere)
 	{
+		ODBC::Connector::registerConnector();
 		try
 		{
 			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
@@ -91,7 +92,8 @@ ODBCOracleTest::ODBCOracleTest(const std::string& name):
 
 		if (_pSession && _pSession->isConnected()) 
 			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
-		if (!_pExecutor) _pExecutor = new SQLExecutor("Oracle SQL Executor", _pSession);
+		if (!_pExecutor) 
+			_pExecutor = new SQLExecutor("Oracle SQL Executor", _pSession);
 	}
 	else 
 	if (!_pSession && !beenHere) 
@@ -103,7 +105,6 @@ ODBCOracleTest::ODBCOracleTest(const std::string& name):
 
 ODBCOracleTest::~ODBCOracleTest()
 {
-	ODBC::Connector::unregisterConnector();
 }
 
 

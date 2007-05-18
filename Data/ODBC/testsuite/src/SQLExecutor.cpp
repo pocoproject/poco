@@ -169,6 +169,7 @@ SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession)
 
 SQLExecutor::~SQLExecutor()
 {
+	ODBC::Connector::unregisterConnector();
 }
 
 
@@ -231,7 +232,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			float fifth = 1.5;
 			SQLLEN li = SQL_NTS;
 			SQLINTEGER size = (SQLINTEGER) str[0].size();
-			
+	
 			if (SQLExecutor::PB_AT_EXEC == bindMode)
 				li = SQL_LEN_DATA_AT_EXEC(size);
 
@@ -275,7 +276,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				SQL_LONGVARBINARY, 
 				(SQLUINTEGER) size,
 				0,
-				(SQLPOINTER) str[2].c_str(), 
+				(SQLPOINTER) str[2].data(), 
 				size, 
 				&li);
 			assert (SQL_SUCCEEDED(rc));
@@ -338,7 +339,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
 			assert (SQL_SUCCEEDED(rc));
 
-			char chr[3][5] = { 0 };
+			char chr[3][5] = {{ 0 }};
 			SQLLEN lengths[5] = { 0 };
 			fourth = 0;
 			fifth = 0.0f;
@@ -460,6 +461,8 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 	// Environment end
 	rc = SQLFreeHandle(SQL_HANDLE_ENV, henv);
 	assert (SQL_SUCCEEDED(rc));
+	
+	std::cout << "barebone end" << std::endl;
 }
 
 
@@ -629,7 +632,6 @@ void SQLExecutor::insertEmptyVector()
 {
 	std::string funct = "insertEmptyVector()";
 	std::vector<std::string> str;
-	int count = 100;
 
 	try
 	{
@@ -749,7 +751,6 @@ void SQLExecutor::limits()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	int count = 0;
 	std::vector<int> retData;
 	try { *_pSession << "SELECT * FROM Strings", into(retData), limit(50), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -775,7 +776,6 @@ void SQLExecutor::limitZero()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	int count = 0;
 	std::vector<int> retData;
 	try { *_pSession << "SELECT * FROM Strings", into(retData), limit(0), now; }// stupid test, but at least we shouldn't crash
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -797,7 +797,6 @@ void SQLExecutor::limitOnce()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	int count = 0;
 	std::vector<int> retData;
 	Statement stmt = (*_pSession << "SELECT * FROM Strings", into(retData), limit(50), now);
 	assert (!stmt.done());
@@ -829,7 +828,6 @@ void SQLExecutor::limitPrepare()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	int count = 0;
 	std::vector<int> retData;
 	Statement stmt = (*_pSession << "SELECT * FROM Strings", into(retData), limit(50));
 	assert (retData.size() == 0);
@@ -847,7 +845,7 @@ void SQLExecutor::limitPrepare()
 
 	try { stmt.execute(); }// will restart execution!
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	size_t s = retData.size();
+
 	assert (!stmt.done());
 	assert (retData.size() == 150);
 	for (int x = 0; x < 150; ++x)
@@ -1644,7 +1642,7 @@ void SQLExecutor::internalExtraction()
 		s = rset.value("cnt", 0).convert<std::string>();
 		assert ("4" == s);
 
-		try { const Column<int>& col1 = rset.column<int>(100); fail ("must fail"); }
+		try { rset.column<int>(100); fail ("must fail"); }
 		catch (RangeException&) { }
 
 		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
@@ -1653,7 +1651,7 @@ void SQLExecutor::internalExtraction()
 		stmt = (*_pSession << "DELETE FROM Vectors", now);
 		rset = stmt;
 
-		try { const Column<int>& col1 = rset.column<int>(0); fail ("must fail"); }
+		try { rset.column<int>(0); fail ("must fail"); }
 		catch (RangeException&) { }
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }

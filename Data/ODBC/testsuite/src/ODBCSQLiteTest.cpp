@@ -69,14 +69,15 @@ ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name):
 {
 	static bool beenHere = false;
 
-	ODBC::Connector::registerConnector();
 	if (_drivers.empty()) 
 	{
 		Utility::drivers(_drivers);
 		checkODBCSetup();
 	}
+	
 	if (!_pSession && !_dbConnString.empty() && !beenHere)
 	{
+		ODBC::Connector::registerConnector();
 		try
 		{
 			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
@@ -88,7 +89,8 @@ ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name):
 
 		if (_pSession && _pSession->isConnected()) 
 			std::cout << "*** Connected to " << _dbConnString << std::endl;
-		if (!_pExecutor) _pExecutor = new SQLExecutor("SQLite SQL Executor", _pSession);
+		if (!_pExecutor) 
+			_pExecutor = new SQLExecutor("SQLite SQL Executor", _pSession);
 	}
 	else 
 	if (!_pSession && !beenHere) 
@@ -100,7 +102,6 @@ ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name):
 
 ODBCSQLiteTest::~ODBCSQLiteTest()
 {
-	ODBC::Connector::unregisterConnector();
 }
 
 

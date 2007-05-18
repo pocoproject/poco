@@ -71,15 +71,16 @@ ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name):
 {
 	static bool beenHere = false;
 
-	ODBC::Connector::registerConnector();
 	if (_drivers.empty() || _dataSources.empty()) 
 	{
 		Utility::drivers(_drivers);
 		Utility::dataSources(_dataSources);
 		checkODBCSetup();
 	}
+	
 	if (!_pSession && !_dbConnString.empty() && !beenHere)
 	{
+		ODBC::Connector::registerConnector();
 		try
 		{
 			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
@@ -91,7 +92,8 @@ ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name):
 
 		if (_pSession && _pSession->isConnected()) 
 			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
-		if (!_pExecutor) _pExecutor = new SQLExecutor("PostgreSQL SQL Executor", _pSession);
+		if (!_pExecutor) 
+			_pExecutor = new SQLExecutor("PostgreSQL SQL Executor", _pSession);
 	}
 	else 
 	if (!_pSession && !beenHere) 
@@ -103,7 +105,6 @@ ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name):
 
 ODBCPostgreSQLTest::~ODBCPostgreSQLTest()
 {
-	ODBC::Connector::unregisterConnector();
 }
 
 
@@ -130,12 +131,6 @@ void ODBCPostgreSQLTest::testSimpleAccess()
 	if (!_pSession) fail ("Test not available.");
 
 	std::string tableName("Person");
-	int count = 0;
-
-	recreatePersonTable();
-
-	//*_pSession << "SELECT count(*) FROM sys.all_all_tables WHERE table_name = upper(?)", into(count), use(tableName), now;
-	//assert (1 == count);
 
 	for (int i = 0; i < 8;)
 	{
@@ -861,16 +856,18 @@ void ODBCPostgreSQLTest::checkODBCSetup()
 				break;
 			}
 		}
-
+/*
 		if (!dsnFound) 
 		{
 			std::cout << "PostgreSQL DSN NOT found, tests will fail." << std::endl;
 			return;
 		}
+		*/
 	}
 
 	if (!_pSession)
-		format(_dbConnString, "DSN=%s;", _dsn);
+		_dbConnString = "DRIVER={PostgreSQL ANSI};UID=postgres;PWD=postgres;SERVER=a-fabijanic.nucorsteel.com;Port=5432;Database=postgres";
+		//format(_dbConnString, "DSN=%s;", _dsn);
 }
 
 
