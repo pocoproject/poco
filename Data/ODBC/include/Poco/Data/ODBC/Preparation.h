@@ -314,7 +314,7 @@ inline std::size_t Preparation::maxDataSize(std::size_t pos) const
 
 	try 
 	{
-		sz = ODBCColumn(_rStmt, pos).length();
+		sz = ODBCColumn(_rStmt, pos-1).length();
 	}
 	catch (StatementException&) 
 	{

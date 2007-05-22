@@ -111,7 +111,6 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	void checkODBCSetup();
 	void dropTable(const std::string& tableName);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
@@ -120,6 +119,9 @@ private:
 	void recreateFloatsTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
+
+	static bool checkODBCSetup(const std::string& dbName = "SQLite3");
+	static bool init(const std::string& dbName = "SQLite3");
 
 	static Poco::Data::ODBC::Utility::DriverMap _drivers;
 	static std::string _dbConnString;

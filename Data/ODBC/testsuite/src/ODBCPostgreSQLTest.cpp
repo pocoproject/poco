@@ -60,46 +60,13 @@ using Poco::NotFoundException;
 const bool ODBCPostgreSQLTest::bindValues[8] = {true, true, true, false, false, true, false, false};
 Poco::SharedPtr<Poco::Data::Session> ODBCPostgreSQLTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> ODBCPostgreSQLTest::_pExecutor = 0;
-std::string ODBCPostgreSQLTest::_dsn = "PocoDataPgSQLTest";
 std::string ODBCPostgreSQLTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCPostgreSQLTest::_drivers;
-Poco::Data::ODBC::Utility::DSNMap ODBCPostgreSQLTest::_dataSources;
 
 
 ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	static bool beenHere = false;
-
-	if (_drivers.empty() || _dataSources.empty()) 
-	{
-		Utility::drivers(_drivers);
-		Utility::dataSources(_dataSources);
-		checkODBCSetup();
-	}
-	
-	if (!_pSession && !_dbConnString.empty() && !beenHere)
-	{
-		ODBC::Connector::registerConnector();
-		try
-		{
-			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
-		}catch (ConnectionException& ex)
-		{
-			std::cout << "!!! WARNING: Connection failed. PostgreSQL tests will fail !!!" << std::endl;
-			std::cout << ex.toString() << std::endl;
-		}
-
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
-		if (!_pExecutor) 
-			_pExecutor = new SQLExecutor("PostgreSQL SQL Executor", _pSession);
-	}
-	else 
-	if (!_pSession && !beenHere) 
-		std::cout << "!!! WARNING: No driver or DSN found. PostgreSQL tests will fail !!!" << std::endl;
-
-	beenHere = true;
 }
 
 
@@ -815,57 +782,63 @@ void ODBCPostgreSQLTest::recreateVectorsTable()
 }
 
 
-void ODBCPostgreSQLTest::checkODBCSetup()
+bool ODBCPostgreSQLTest::checkODBCSetup(const std::string& dbName)
 {
-	static bool beenHere = false;
-
-	if (!beenHere)
+	Utility::DriverMap::iterator itDrv = _drivers.begin();
+	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		beenHere = true;
-		
-		bool driverFound = false;
-		bool dsnFound = false;
-
-		Utility::DriverMap::iterator itDrv = _drivers.begin();
-		for (; itDrv != _drivers.end(); ++itDrv)
+		if (((itDrv->first).find(dbName) != std::string::npos))
 		{
-			if (((itDrv->first).find("PostgreSQL") != std::string::npos))
-			{
-				std::cout << "Driver found: " << itDrv->first 
-					<< " (" << itDrv->second << ')' << std::endl;
-				driverFound = true;
-				break;
-			}
-		}
-
-		if (!driverFound) 
-		{
-			std::cout << "PostgreSQL driver NOT found, tests will fail." << std::endl;
-			return;
-		}
-		
-		Utility::DSNMap::iterator itDSN = _dataSources.begin();
-		for (; itDSN != _dataSources.end(); ++itDSN)
-		{
-			if (((itDSN->first).find(_dsn) != std::string::npos) &&
-				((itDSN->second).find("PostgreSQL") != std::string::npos))
-			{
-				std::cout << "DSN found: " << itDSN->first 
-					<< " (" << itDSN->second << ')' << std::endl;
-				dsnFound = true;
-				break;
-			}
-		}
-
-		if (!dsnFound) 
-		{
-			std::cout << "PostgreSQL DSN NOT found, tests will fail." << std::endl;
-			return;
+			std::cout << "Driver found: " << itDrv->first 
+				<< " (" << itDrv->second << ')' << std::endl;
+			break;
 		}
 	}
 
-	if (!_pSession)
-		format(_dbConnString, "DSN=%s;", _dsn);
+	if (_drivers.end() == itDrv) 
+	{
+		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		return false;
+	}
+
+	_dbConnString = "DRIVER=PostgreSQL ANSI;"
+		"DATABASE=postgres;"
+		"SERVER=localhost;"
+		"PORT=5432;"
+		"UID=postgres;"
+		"PWD=postgres;"
+		"SSLMODE=prefer;"
+		"LowerCaseIdentifier=0;"
+		"UseServerSidePrepare=0;"
+		"ByteaAsLongVarBinary=1;"
+		"BI=0;"
+		"TrueIsMinus1=0;"
+		"DisallowPremature=0;"
+		"UpdatableCursors=0;"
+		"LFConversion=1;"
+		"CancelAsFreeStmt=0;"
+		"Parse=0;"
+		"BoolsAsChar=1;"
+		"UnknownsAsLongVarchar=0;"
+		"TextAsLongVarchar=1;"
+		"UseDeclareFetch=0;"
+		"Ksqo=1;"
+		"Optimizer=1;"
+		"CommLog=0;"
+		"Debug=0;"
+		"MaxLongVarcharSize=8190;"
+		"MaxVarcharSize=254;"
+		"UnknownSizes=0;"
+		"Socket=8192;"
+		"Fetch=100;"
+		"ConnSettings=;"
+		"ShowSystemTables=0;"
+		"RowVersioning=0;"
+		"ShowOidColumn=0;"
+		"FakeOidIndex=0;"
+		"ReadOnly=0;";
+
+	return true;
 }
 
 
@@ -881,50 +854,79 @@ void ODBCPostgreSQLTest::tearDown()
 }
 
 
+bool ODBCPostgreSQLTest::init(const std::string& dbName)
+{
+	Utility::drivers(_drivers);
+	if (!checkODBCSetup()) return false;
+	
+	ODBC::Connector::registerConnector();
+	try
+	{
+		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
+	}catch (ConnectionException& ex)
+	{
+		std::cout << ex.toString() << std::endl;
+		return false;
+	}
+
+	if (_pSession && _pSession->isConnected()) 
+		std::cout << "*** Connected to " << dbName << " test database." << std::endl;
+	
+	_pExecutor = new SQLExecutor(dbName + " SQL Executor", _pSession);
+
+	return true;
+}
+
+
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCPostgreSQLTest");
+	if (init())
+	{
+		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCPostgreSQLTest");
 
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBareboneODBC);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccess);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexType);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccessVector);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexTypeVector);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertVector);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertEmptyVector);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertSingleBulk);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertSingleBulkVec);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimit);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitOnce);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitPrepare);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitZero);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testPrepare);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetSimple);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetComplex);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetComplexUnique);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultiSetSimple);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultiSetComplex);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMapComplex);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMapComplexUnique);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultiMapComplex);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSelectIntoSingle);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSelectIntoSingleStep);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSelectIntoSingleFail);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLowerLimitOk);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLowerLimitFail);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testCombinedLimits);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testCombinedIllegalLimits);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRange);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testIllegalRange);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSingleSelect);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testEmptyDB);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOB);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBStmt);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testFloat);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDouble);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTuple);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTupleVector);
-	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccess);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexType);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccessVector);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertVector);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertSingleBulk);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertSingleBulkVec);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimit);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitOnce);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitPrepare);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitZero);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetSimple);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetComplex);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetComplexUnique);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultiSetSimple);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultiSetComplex);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMapComplex);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMapComplexUnique);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultiMapComplex);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSelectIntoSingle);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSelectIntoSingleStep);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSelectIntoSingleFail);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLowerLimitOk);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLowerLimitFail);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testCombinedLimits);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testCombinedIllegalLimits);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRange);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testIllegalRange);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSingleSelect);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testEmptyDB);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testFloat);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDouble);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTuple);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTupleVector);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalExtraction);
 
-	return pSuite;
+		return pSuite;
+	}
+
+	return 0;
 }

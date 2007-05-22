@@ -518,7 +518,6 @@ void SQLExecutor::complexType()
 	assert (count == 2);
 
 	Person c1;
-	Person c2;
 	try { *_pSession << "SELECT * FROM PERSON WHERE LastName = 'LN1'", into(c1), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }

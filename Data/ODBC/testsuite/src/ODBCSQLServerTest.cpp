@@ -60,47 +60,14 @@ using Poco::NotFoundException;
 const bool ODBCSQLServerTest::bindValues[8] = {true, true, true, false, false, true, false, false};
 Poco::SharedPtr<Poco::Data::Session> ODBCSQLServerTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> ODBCSQLServerTest::_pExecutor = 0;
-std::string ODBCSQLServerTest::_dsn = "PocoDataSQLServerTest";
 std::string ODBCSQLServerTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCSQLServerTest::_drivers;
-Poco::Data::ODBC::Utility::DSNMap ODBCSQLServerTest::_dataSources;
 
 
 ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	static bool beenHere = false;
 
-	if (_drivers.empty() || _dataSources.empty()) 
-	{
-		Utility::drivers(_drivers);
-		Utility::dataSources(_dataSources);
-		checkODBCSetup();
-	}
-	
-	if (!_pSession && !_dbConnString.empty() && !beenHere)
-	{
-		ODBC::Connector::registerConnector();
-		try
-		{
-			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
-		}catch (ConnectionException& ex)
-		{
-			std::cout << "!!! WARNING: Connection failed. SQL Server tests will fail !!!" << std::endl;
-			std::cout << ex.toString() << std::endl;
-		}
-
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
-		if (!_pExecutor) 
-			_pExecutor = new SQLExecutor("SQLServer SQL Executor", _pSession);
-		
-	}
-	else 
-	if (!_pSession && !beenHere) 
-		std::cout << "!!! WARNING: No driver or DSN found. SQL Server tests will fail !!!" << std::endl;
-
-	beenHere = true;
 }
 
 
@@ -842,58 +809,32 @@ void ODBCSQLServerTest::recreateVectorsTable()
 }
 
 
-void ODBCSQLServerTest::checkODBCSetup()
+bool ODBCSQLServerTest::checkODBCSetup(const std::string& dbName)
 {
-	static bool beenHere = false;
-
-	if (!beenHere)
+	Utility::DriverMap::iterator itDrv = _drivers.begin();
+	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		beenHere = true;
-		
-		bool driverFound = false;
-		bool dsnFound = false;
-
-		Utility::DriverMap::iterator itDrv = _drivers.begin();
-		for (; itDrv != _drivers.end(); ++itDrv)
+		if (((itDrv->first).find(dbName) != std::string::npos))
 		{
-			if (((itDrv->first).find("SQL Server") != std::string::npos))
-			{
-				std::cout << "Driver found: " << itDrv->first 
-					<< " (" << itDrv->second << ')' << std::endl;
-				driverFound = true;
-				break;
-			}
-		}
-
-		if (!driverFound) 
-		{
-			std::cout << "SQL Server driver NOT found, tests will fail." << std::endl;
-			return;
-		}
-		
-		Utility::DSNMap::iterator itDSN = _dataSources.begin();
-		for (; itDSN != _dataSources.end(); ++itDSN)
-		{
-			if (((itDSN->first).find(_dsn) != std::string::npos) &&
-				(((itDSN->second).find("SQL Server") != std::string::npos) ||
-				 ((itDSN->second).find("SQL Native Client") != std::string::npos)))
-			{
-				std::cout << "DSN found: " << itDSN->first 
-					<< " (" << itDSN->second << ')' << std::endl;
-				dsnFound = true;
-				break;
-			}
-		}
-
-		if (!dsnFound) 
-		{
-			std::cout << "SQL Server DSN NOT found, tests will fail." << std::endl;
-			return;
+			std::cout << "Driver found: " << itDrv->first 
+				<< " (" << itDrv->second << ')' << std::endl;
+			break;
 		}
 	}
 
-	if (!_pSession)
-		format(_dbConnString, "DSN=%s;Uid=test;Pwd=test;", _dsn);
+	if (_drivers.end() == itDrv) 
+	{
+		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		return false;
+	}
+
+	_dbConnString = "DRIVER=SQL Server;"
+		"UID=test;"
+		"PWD=test;"
+		"DATABASE=test;"
+		"SERVER=(local);";
+
+	return true;
 }
 
 
@@ -909,50 +850,79 @@ void ODBCSQLServerTest::tearDown()
 }
 
 
+bool ODBCSQLServerTest::init(const std::string& dbName)
+{
+	Utility::drivers(_drivers);
+	if (!checkODBCSetup()) return false;
+	
+	ODBC::Connector::registerConnector();
+	try
+	{
+		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
+	}catch (ConnectionException& ex)
+	{
+		std::cout << ex.toString() << std::endl;
+		return false;
+	}
+
+	if (_pSession && _pSession->isConnected()) 
+		std::cout << "*** Connected to " << dbName << " test database." << std::endl;
+	
+	_pExecutor = new SQLExecutor(dbName + " SQL Executor", _pSession);
+
+	return true;
+}
+
+
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
+	if (init())
+	{
+		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
 
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testBareboneODBC);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccess);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexType);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessVector);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexTypeVector);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertVector);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertEmptyVector);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertSingleBulk);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertSingleBulkVec);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimit);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitOnce);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitPrepare);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitZero);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplexUnique);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultiSetSimple);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultiSetComplex);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testMapComplex);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testMapComplexUnique);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultiMapComplex);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSelectIntoSingle);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSelectIntoSingleStep);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSelectIntoSingleFail);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testLowerLimitOk);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testLowerLimitFail);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testCombinedLimits);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testCombinedIllegalLimits);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testRange);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testIllegalRange);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testSingleSelect);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testEmptyDB);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testDouble);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testTuple);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testTupleVector);
-	CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccess);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexType);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertSingleBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertSingleBulkVec);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimit);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitOnce);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitPrepare);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitZero);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplexUnique);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultiSetSimple);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultiSetComplex);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMapComplex);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMapComplexUnique);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultiMapComplex);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSelectIntoSingle);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSelectIntoSingleStep);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSelectIntoSingleFail);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLowerLimitOk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLowerLimitFail);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testCombinedLimits);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testCombinedIllegalLimits);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRange);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testIllegalRange);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSingleSelect);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEmptyDB);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDouble);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTuple);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTupleVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
 
-	return pSuite;
+		return pSuite;
+	}
+
+	return 0;
 }

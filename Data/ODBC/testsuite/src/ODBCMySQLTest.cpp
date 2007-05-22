@@ -60,46 +60,13 @@ using Poco::NotFoundException;
 const bool ODBCMySQLTest::bindValues[8] = {true, true, true, false, false, true, false, false};
 Poco::SharedPtr<Poco::Data::Session> ODBCMySQLTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> ODBCMySQLTest::_pExecutor = 0;
-std::string ODBCMySQLTest::_dsn = "PocoDataMySQLTest";
 std::string ODBCMySQLTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCMySQLTest::_drivers;
-Poco::Data::ODBC::Utility::DSNMap ODBCMySQLTest::_dataSources;
 
 
 ODBCMySQLTest::ODBCMySQLTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	static bool beenHere = false;
-
-	if (_drivers.empty() || _dataSources.empty()) 
-	{
-		Utility::drivers(_drivers);
-		Utility::dataSources(_dataSources);
-		checkODBCSetup();
-	}
-	
-	if (!_pSession && !_dbConnString.empty() && !beenHere)
-	{
-		ODBC::Connector::registerConnector();
-		try
-		{
-			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
-		}catch (ConnectionException& ex)
-		{
-			std::cout << "!!! WARNING: Connection failed. MySQL tests will fail !!!" << std::endl;
-			std::cout << ex.toString() << std::endl;
-		}
-
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
-		if (!_pExecutor) 
-			_pExecutor = new SQLExecutor("MySQL SQL Executor", _pSession);
-	}
-	else 
-	if (!_pSession && !beenHere) 
-		std::cout << "!!! WARNING: No driver or DSN found. MySQL tests will fail !!!" << std::endl;
-
-	beenHere = true;
 }
 
 
@@ -129,16 +96,6 @@ void ODBCMySQLTest::testBareboneODBC()
 void ODBCMySQLTest::testSimpleAccess()
 {
 	if (!_pSession) fail ("Test not available.");
-
-	int count = 0;
-
-	//recreatePersonTable();
-
-	//try { *_pSession << "SELECT count(*) FROM sys.tables WHERE name = 'Person'", into(count), use(tableName), now;  }
-	//catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
-	//catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("testSimpleAccess()"); }
-
-	//assert (1 == count);
 
 	for (int i = 0; i < 8;)
 	{
@@ -831,57 +788,32 @@ void ODBCMySQLTest::recreateVectorsTable()
 }
 
 
-void ODBCMySQLTest::checkODBCSetup()
+bool ODBCMySQLTest::checkODBCSetup(const std::string& dbName)
 {
-	static bool beenHere = false;
-
-	if (!beenHere)
+	Utility::DriverMap::iterator itDrv = _drivers.begin();
+	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		beenHere = true;
-		
-		bool driverFound = false;
-		bool dsnFound = false;
-
-		Utility::DriverMap::iterator itDrv = _drivers.begin();
-		for (; itDrv != _drivers.end(); ++itDrv)
+		if (((itDrv->first).find(dbName) != std::string::npos))
 		{
-			if (((itDrv->first).find("MySQL") != std::string::npos))
-			{
-				std::cout << "Driver found: " << itDrv->first 
-					<< " (" << itDrv->second << ')' << std::endl;
-				driverFound = true;
-				break;
-			}
-		}
-
-		if (!driverFound) 
-		{
-			std::cout << "MySQL driver NOT found, tests will fail." << std::endl;
-			return;
-		}
-		
-		Utility::DSNMap::iterator itDSN = _dataSources.begin();
-		for (; itDSN != _dataSources.end(); ++itDSN)
-		{
-			if (((itDSN->first).find(_dsn) != std::string::npos) &&
-				((itDSN->second).find("MySQL") != std::string::npos))
-			{
-				std::cout << "DSN found: " << itDSN->first 
-					<< " (" << itDSN->second << ')' << std::endl;
-				dsnFound = true;
-				break;
-			}
-		}
-
-		if (!dsnFound) 
-		{
-			std::cout << "SQL Server DSN NOT found, tests will fail." << std::endl;
-			return;
+			std::cout << "Driver found: " << itDrv->first 
+				<< " (" << itDrv->second << ')' << std::endl;
+			break;
 		}
 	}
 
-	if (!_pSession)
-		format(_dbConnString, "DSN=%s;", _dsn);
+	if (_drivers.end() == itDrv) 
+	{
+		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		return false;
+	}
+
+	_dbConnString = "DRIVER=MySQL ODBC 3.51 Driver;"
+		"DATABASE=test;"
+		"SERVER=localhost;"
+		"UID=root;"
+		"PWD=mysql;";
+
+	return true;
 }
 
 
@@ -897,50 +829,79 @@ void ODBCMySQLTest::tearDown()
 }
 
 
+bool ODBCMySQLTest::init(const std::string& dbName)
+{
+	Utility::drivers(_drivers);
+	if (!checkODBCSetup()) return false;
+	
+	ODBC::Connector::registerConnector();
+	try
+	{
+		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
+	}catch (ConnectionException& ex)
+	{
+		std::cout << ex.toString() << std::endl;
+		return false;
+	}
+
+	if (_pSession && _pSession->isConnected()) 
+		std::cout << "*** Connected to " << dbName << " test database." << std::endl;
+	
+	_pExecutor = new SQLExecutor(dbName + " SQL Executor", _pSession);
+
+	return true;
+}
+
+
 CppUnit::Test* ODBCMySQLTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCMySQLTest");
+	if (init())
+	{
+		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCMySQLTest");
 
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testBareboneODBC);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccess);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexType);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccessVector);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexTypeVector);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertVector);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertEmptyVector);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertSingleBulk);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertSingleBulkVec);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testLimit);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitOnce);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplexUnique);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testMultiSetSimple);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testMultiSetComplex);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testMapComplex);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testMapComplexUnique);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testMultiMapComplex);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSelectIntoSingle);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSelectIntoSingleStep);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSelectIntoSingleFail);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testLowerLimitOk);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testLowerLimitFail);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testCombinedLimits);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testCombinedIllegalLimits);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testRange);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testIllegalRange);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testSingleSelect);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testEmptyDB);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOB);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBStmt);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testFloat);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testDouble);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testTuple);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testTupleVector);
-	CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccess);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexType);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccessVector);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertVector);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertSingleBulk);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertSingleBulkVec);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimit);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitOnce);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplexUnique);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testMultiSetSimple);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testMultiSetComplex);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testMapComplex);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testMapComplexUnique);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testMultiMapComplex);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSelectIntoSingle);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSelectIntoSingleStep);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSelectIntoSingleFail);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testLowerLimitOk);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testLowerLimitFail);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testCombinedLimits);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testCombinedIllegalLimits);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testRange);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testIllegalRange);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSingleSelect);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testEmptyDB);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testFloat);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testDouble);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testTuple);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testTupleVector);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalExtraction);
 
-	return pSuite;
+		return pSuite;
+	}
+
+	return 0;
 }

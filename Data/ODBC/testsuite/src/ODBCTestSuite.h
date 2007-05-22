@@ -43,6 +43,9 @@ class ODBCTestSuite
 {
 public:
 	static CppUnit::Test* suite();
+
+private:
+	static void addTest(CppUnit::TestSuite* pSuite, CppUnit::Test* pT);
 };
 
 

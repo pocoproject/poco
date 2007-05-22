@@ -113,7 +113,6 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	void checkODBCSetup();
 	void dropTable(const std::string& tableName);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
@@ -123,9 +122,10 @@ private:
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 
+	static bool checkODBCSetup(const std::string& dbName = "MySQL");
+	static bool init(const std::string& dbName = "MySQL");
+
 	static Poco::Data::ODBC::Utility::DriverMap _drivers;
-	static Poco::Data::ODBC::Utility::DSNMap _dataSources;
-	static std::string _dsn;
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;
 	static Poco::SharedPtr<SQLExecutor> _pExecutor;

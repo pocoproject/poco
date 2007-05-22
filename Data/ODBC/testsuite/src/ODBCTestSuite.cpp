@@ -38,14 +38,15 @@
 #include "ODBCSQLiteTest.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "ODBCAccessTest.h"
-#include "ODBCSQLServerTest.h"
 #endif
+#include "ODBCSQLServerTest.h"
+
 
 CppUnit::Test* ODBCTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCTestSuite");
 
-	//!FIXME
+	// WARNING!
 	// On Win XP Pro:
 	//
 	// 1) The PostgreSQL connection fails if attempted after DB2 w/ following error:
@@ -54,20 +55,26 @@ CppUnit::Test* ODBCTestSuite::suite()
 	// message="Specified driver could not be loaded due to system error  127 (PostgreSQL ANSI)." 
 	// nativeError=160 
 	// System error 127 is "The specified procedure could not be found."
-	// Workaround is to connect to PostgreSQL prior to connecting to DB2.
 	//
 	// 2) When Oracle test is loaded after DB2, the test application does not exit cleanly.
 	//    All tests pass, though.
 	//
+	// Workaround is to connect to DB2 after connecting to PostgreSQL and Oracle.
+	// The reason causing these errors is not known.
 
-	pSuite->addTest(ODBCOracleTest::suite());
-	pSuite->addTest(ODBCPostgreSQLTest::suite());
-	pSuite->addTest(ODBCDB2Test::suite());
-	pSuite->addTest(ODBCMySQLTest::suite());
-	pSuite->addTest(ODBCSQLiteTest::suite());
-#if defined(POCO_OS_FAMILY_WINDOWS)
-	pSuite->addTest(ODBCAccessTest::suite());
-	pSuite->addTest(ODBCSQLServerTest::suite());
-#endif	
+	addTest(pSuite, ODBCOracleTest::suite());
+	addTest(pSuite, ODBCPostgreSQLTest::suite());
+	addTest(pSuite, ODBCDB2Test::suite());
+	addTest(pSuite, ODBCMySQLTest::suite());
+	addTest(pSuite, ODBCSQLiteTest::suite());
+	addTest(pSuite, ODBCAccessTest::suite());
+	addTest(pSuite, ODBCSQLServerTest::suite());
+
 	return pSuite;
+}
+
+
+void ODBCTestSuite::addTest(CppUnit::TestSuite* pSuite, CppUnit::Test* pT)
+{
+	if (pSuite && pT) pSuite->addTest(pT);
 }

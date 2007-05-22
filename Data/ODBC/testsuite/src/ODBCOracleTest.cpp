@@ -60,46 +60,13 @@ using Poco::NotFoundException;
 const bool ODBCOracleTest::bindValues[8] = {true, true, true, false, false, true, false, false};
 Poco::SharedPtr<Poco::Data::Session> ODBCOracleTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> ODBCOracleTest::_pExecutor = 0;
-std::string ODBCOracleTest::_dsn = "PocoDataOracleTest";
 std::string ODBCOracleTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCOracleTest::_drivers;
-Poco::Data::ODBC::Utility::DSNMap ODBCOracleTest::_dataSources;
 
 
 ODBCOracleTest::ODBCOracleTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	static bool beenHere = false;
-
-	if (_drivers.empty() || _dataSources.empty()) 
-	{
-		Utility::drivers(_drivers);
-		Utility::dataSources(_dataSources);
-		checkODBCSetup();
-	}
-	
-	if (!_pSession && !_dbConnString.empty() && !beenHere)
-	{
-		ODBC::Connector::registerConnector();
-		try
-		{
-			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
-		}catch (ConnectionException& ex)
-		{
-			std::cout << "!!! WARNING: Connection failed. Oracle tests will fail !!!" << std::endl;
-			std::cout << ex.toString() << std::endl;
-		}
-
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
-		if (!_pExecutor) 
-			_pExecutor = new SQLExecutor("Oracle SQL Executor", _pSession);
-	}
-	else 
-	if (!_pSession && !beenHere) 
-		std::cout << "!!! WARNING: No driver or DSN found. Oracle tests will fail !!!" << std::endl;
-
-	beenHere = true;
 }
 
 
@@ -829,58 +796,28 @@ void ODBCOracleTest::recreateVectorsTable()
 }
 
 
-void ODBCOracleTest::checkODBCSetup()
+bool ODBCOracleTest::checkODBCSetup(const std::string& dbName)
 {
-	static bool beenHere = false;
-
-	if (!beenHere)
+	Utility::DriverMap::iterator itDrv = _drivers.begin();
+	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		beenHere = true;
-		
-		bool driverFound = false;
-		bool dsnFound = false;
-
-		Utility::DriverMap::iterator itDrv = _drivers.begin();
-		for (; itDrv != _drivers.end(); ++itDrv)
+		if (((itDrv->first).find(dbName) != std::string::npos))
 		{
-			if (((itDrv->first).find("Oracle") != std::string::npos) &&
-				((itDrv->first).find("Microsoft") == std::string::npos))
-			{
-				std::cout << "Driver found: " << itDrv->first 
-					<< " (" << itDrv->second << ')' << std::endl;
-				driverFound = true;
-				break;
-			}
-		}
-
-		if (!driverFound) 
-		{
-			std::cout << "Oracle driver NOT found, tests will fail." << std::endl;
-			return;
-		}
-		
-		Utility::DSNMap::iterator itDSN = _dataSources.begin();
-		for (; itDSN != _dataSources.end(); ++itDSN)
-		{
-			if (((itDSN->first).find(_dsn) != std::string::npos) &&
-				((itDSN->second).find("Oracle") != std::string::npos))
-			{
-				std::cout << "DSN found: " << itDSN->first 
-					<< " (" << itDSN->second << ')' << std::endl;
-				dsnFound = true;
-				break;
-			}
-		}
-
-		if (!dsnFound) 
-		{
-			std::cout << "Oracle DSN NOT found, tests will fail." << std::endl;
-			return;
+			std::cout << "Driver found: " << itDrv->first 
+				<< " (" << itDrv->second << ')' << std::endl;
+			break;
 		}
 	}
 
-	if (!_pSession)
-		format(_dbConnString, "DSN=%s;Uid=Scott;Pwd=Tiger;", _dsn);
+	if (_drivers.end() == itDrv) 
+	{
+		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		return false;
+	}
+
+	_dbConnString = "DSN=PocoDataOracleTest;Uid=Scott;Pwd=Tiger;";
+
+	return true;
 }
 
 
@@ -896,50 +833,79 @@ void ODBCOracleTest::tearDown()
 }
 
 
+bool ODBCOracleTest::init(const std::string& dbName)
+{
+	Utility::drivers(_drivers);
+	if (!checkODBCSetup()) return false;
+	
+	ODBC::Connector::registerConnector();
+	try
+	{
+		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
+	}catch (ConnectionException& ex)
+	{
+		std::cout << ex.toString() << std::endl;
+		return false;
+	}
+
+	if (_pSession && _pSession->isConnected()) 
+		std::cout << "*** Connected to " << dbName << " test database." << std::endl;
+	
+	_pExecutor = new SQLExecutor(dbName + " SQL Executor", _pSession);
+
+	return true;
+}
+
+
 CppUnit::Test* ODBCOracleTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCOracleTest");
+	if (init())
+	{
+		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCOracleTest");
 
-	CppUnit_addTest(pSuite, ODBCOracleTest, testBareboneODBC);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccess);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testComplexType);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccessVector);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeVector);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testInsertVector);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testInsertEmptyVector);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testInsertSingleBulk);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testInsertSingleBulkVec);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testLimit);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testLimitOnce);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testLimitPrepare);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testLimitZero);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testPrepare);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSetSimple);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSetComplex);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSetComplexUnique);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testMultiSetSimple);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testMultiSetComplex);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testMapComplex);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testMapComplexUnique);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testMultiMapComplex);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSelectIntoSingle);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSelectIntoSingleStep);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSelectIntoSingleFail);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testLowerLimitOk);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testLowerLimitFail);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testCombinedLimits);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testCombinedIllegalLimits);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testRange);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testIllegalRange);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testSingleSelect);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testEmptyDB);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testBLOB);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testFloat);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testDouble);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testTupleVector);
-	CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccess);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexType);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccessVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertSingleBulk);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertSingleBulkVec);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testLimit);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testLimitOnce);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testLimitPrepare);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testLimitZero);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSetSimple);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSetComplex);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSetComplexUnique);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testMultiSetSimple);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testMultiSetComplex);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testMapComplex);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testMapComplexUnique);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testMultiMapComplex);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSelectIntoSingle);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSelectIntoSingleStep);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSelectIntoSingleFail);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testLowerLimitOk);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testLowerLimitFail);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testCombinedLimits);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testCombinedIllegalLimits);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testRange);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testIllegalRange);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSingleSelect);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testEmptyDB);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testFloat);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testDouble);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testTupleVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
 
-	return pSuite;
+		return pSuite;
+	}
+
+	return 0;
 }

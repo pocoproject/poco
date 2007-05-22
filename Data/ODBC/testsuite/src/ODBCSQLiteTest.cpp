@@ -67,36 +67,6 @@ Poco::Data::ODBC::Utility::DriverMap ODBCSQLiteTest::_drivers;
 ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	static bool beenHere = false;
-
-	if (_drivers.empty()) 
-	{
-		Utility::drivers(_drivers);
-		checkODBCSetup();
-	}
-	
-	if (!_pSession && !_dbConnString.empty() && !beenHere)
-	{
-		ODBC::Connector::registerConnector();
-		try
-		{
-			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
-		}catch (ConnectionException& ex)
-		{
-			std::cout << "!!! WARNING: Connection failed. SQLite tests will fail !!!" << std::endl;
-			std::cout << ex.toString() << std::endl;
-		}
-
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dbConnString << std::endl;
-		if (!_pExecutor) 
-			_pExecutor = new SQLExecutor("SQLite SQL Executor", _pSession);
-	}
-	else 
-	if (!_pSession && !beenHere) 
-		std::cout << "!!! WARNING: No driver or DSN found. SQLite tests will fail !!!" << std::endl;
-
-	beenHere = true;
 }
 
 
@@ -808,37 +778,28 @@ void ODBCSQLiteTest::recreateVectorsTable()
 }
 
 
-void ODBCSQLiteTest::checkODBCSetup()
+bool ODBCSQLiteTest::checkODBCSetup(const std::string& dbName)
 {
-	static bool beenHere = false;
-
-	if (!beenHere)
+	Utility::DriverMap::iterator itDrv = _drivers.begin();
+	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		beenHere = true;
-		bool driverFound = false;
-
-		Utility::DriverMap::iterator itDriver = _drivers.begin();
-		for (; itDriver != _drivers.end(); ++itDriver)
+		if (((itDrv->first).find(dbName) != std::string::npos))
 		{
-			if (((itDriver->first).find("SQLite3") != std::string::npos))
-			{
-				std::cout << "Driver found: " << itDriver->first 
-					<< " (" << itDriver->second << ')' << std::endl;
-
-				driverFound = true; 
-				break;
-			}
-		}
-
-		if (!driverFound) 
-		{
-			std::cout << "SQLite3 driver NOT found, tests will fail." << std::endl;
-			return;
+			std::cout << "Driver found: " << itDrv->first 
+				<< " (" << itDrv->second << ')' << std::endl;
+			break;
 		}
 	}
 
-	if (!_pSession)
-		_dbConnString = "Driver=SQLite3 ODBC Driver;Database=dummy.db;";
+	if (_drivers.end() == itDrv) 
+	{
+		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		return false;
+	}
+
+	_dbConnString = "Driver=SQLite3 ODBC Driver;Database=dummy.db;";
+
+	return true;
 }
 
 
@@ -854,50 +815,79 @@ void ODBCSQLiteTest::tearDown()
 }
 
 
+bool ODBCSQLiteTest::init(const std::string& dbName)
+{
+	Utility::drivers(_drivers);
+	if (!checkODBCSetup()) return false;
+	
+	ODBC::Connector::registerConnector();
+	try
+	{
+		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
+	}catch (ConnectionException& ex)
+	{
+		std::cout << ex.toString() << std::endl;
+		return false;
+	}
+
+	if (_pSession && _pSession->isConnected()) 
+		std::cout << "*** Connected to " << dbName << " test database." << std::endl;
+	
+	_pExecutor = new SQLExecutor(dbName + " SQL Executor", _pSession);
+
+	return true;
+}
+
+
 CppUnit::Test* ODBCSQLiteTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLiteTest");
+	if (init())
+	{
+		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLiteTest");
 
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSimpleAccess);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexType);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSimpleAccessVector);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexTypeVector);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertVector);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertEmptyVector);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertSingleBulk);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertSingleBulkVec);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimit);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitOnce);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitPrepare);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitZero);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testPrepare);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetSimple);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplex);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplexUnique);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testMultiSetSimple);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testMultiSetComplex);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testMapComplex);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testMapComplexUnique);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testMultiMapComplex);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSelectIntoSingle);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSelectIntoSingleStep);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSelectIntoSingleFail);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testLowerLimitOk);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testLowerLimitFail);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testCombinedLimits);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testCombinedIllegalLimits);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testRange);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testIllegalRange);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testSingleSelect);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testEmptyDB);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOB);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOBStmt);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testFloat);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testDouble);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testTuple);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testTupleVector);
-	CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSimpleAccess);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexType);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSimpleAccessVector);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertVector);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertSingleBulk);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertSingleBulkVec);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimit);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitOnce);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitPrepare);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitZero);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetSimple);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplex);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplexUnique);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testMultiSetSimple);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testMultiSetComplex);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testMapComplex);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testMapComplexUnique);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testMultiMapComplex);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSelectIntoSingle);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSelectIntoSingleStep);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSelectIntoSingleFail);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLowerLimitOk);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLowerLimitFail);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testCombinedLimits);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testCombinedIllegalLimits);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testRange);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testIllegalRange);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSingleSelect);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testEmptyDB);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testFloat);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testDouble);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTuple);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTupleVector);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalExtraction);
 
-	return pSuite;
+		return pSuite;
+	}
+
+	return 0;
 }

@@ -58,43 +58,13 @@ using Poco::NotFoundException;
 
 
 Poco::SharedPtr<Poco::Data::Session> ODBCAccessTest::_pSession = 0;
-std::string ODBCAccessTest::_dsn = "PocoDataAccessTest";
 std::string ODBCAccessTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
-Poco::Data::ODBC::Utility::DSNMap ODBCAccessTest::_dataSources;
 
 
 ODBCAccessTest::ODBCAccessTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	static bool beenHere = false;
-
-	ODBC::Connector::registerConnector();
-	if (_drivers.empty() || _dataSources.empty()) 
-	{
-		Utility::drivers(_drivers);
-		Utility::dataSources(_dataSources);
-		checkODBCSetup();
-	}
-	if (!_pSession && !_dbConnString.empty() && !beenHere)
-	{
-		try
-		{
-			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
-		}catch (ConnectionException& ex)
-		{
-			std::cout << "!!! WARNING: Connection failed. Access tests will fail !!!" << std::endl;
-			std::cout << ex.toString() << std::endl;
-		}
-
-		//N.B. Access driver does not suport check for connection.
-		if (_pSession) std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
-	}
-	else 
-	if (!_pSession && !beenHere) 
-		std::cout << "!!! WARNING: No driver or DSN found. Access tests will fail !!!" << std::endl;
-
-	beenHere = true;
 }
 
 
@@ -169,57 +139,39 @@ void ODBCAccessTest::recreatePersonTable()
 }
 
 
-void ODBCAccessTest::checkODBCSetup()
+bool ODBCAccessTest::checkODBCSetup(const std::string& dbName)
 {
-	static bool beenHere = false;
-
-	if (!beenHere)
+	Utility::DriverMap::iterator itDrv = _drivers.begin();
+	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		beenHere = true;
-
-		bool driverFound = false;
-		bool dsnFound = false;
-
-		Utility::DriverMap::iterator itDrv = _drivers.begin();
-		for (; itDrv != _drivers.end(); ++itDrv)
+		if (((itDrv->first).find(dbName) != std::string::npos))
 		{
-			if (((itDrv->first).find("Microsoft Access Driver") != std::string::npos))
-			{
-				std::cout << "Driver found: " << itDrv->first 
-					<< " (" << itDrv->second << ')' << std::endl;
-				driverFound = true;
-				break;
-			}
-		}
-
-		if (!driverFound) 
-		{
-			std::cout << "Driver NOT found, will throw." << std::endl;
-			throw NotFoundException("Microsoft Access ODBC driver.");
-		}
-		
-		Utility::DSNMap::iterator itDSN = _dataSources.begin();
-		for (; itDSN != _dataSources.end(); ++itDSN)
-		{
-			if (((itDSN->first).find(_dsn) != std::string::npos) &&
-				((itDSN->second).find("Microsoft Access Driver") != std::string::npos))
-			{
-				std::cout << "DSN found: " << itDSN->first 
-					<< " (" << itDSN->second << ')' << std::endl;
-				dsnFound = true;
-				break;
-			}
-		}
-
-		if (!dsnFound) 
-		{
-			std::cout << "Access DSN NOT found, tests will fail." << std::endl;
-			return;
+			std::cout << "Driver found: " << itDrv->first 
+				<< " (" << itDrv->second << ')' << std::endl;
+			break;
 		}
 	}
 
-	if (!_pSession)
-		format(_dbConnString, "DSN=%s;Uid=Admin;Pwd=;", _dsn);
+	if (_drivers.end() == itDrv) 
+	{
+		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		return false;
+	}
+
+	_dbConnString = "DRIVER=Microsoft Access Driver (*.mdb);"
+		"UID=admin;"
+		"UserCommitSync=Yes;"
+		"Threads=3;"
+		"SafeTransactions=0;"
+		"PageTimeout=5;"
+		"MaxScanRows=8;"
+		"MaxBufferSize=2048;"
+		"FIL=MS Access;"
+		"DriverId=25;"
+		"DefaultDir=C:\\;"
+		"DBQ=C:\\test.mdb;";
+
+	return true;
 }
 
 
@@ -234,11 +186,38 @@ void ODBCAccessTest::tearDown()
 }
 
 
+bool ODBCAccessTest::init(const std::string& dbName)
+{
+	Utility::drivers(_drivers);
+	if (!checkODBCSetup()) return false;
+
+	ODBC::Connector::registerConnector();
+	try
+	{
+		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
+	}catch (ConnectionException& ex)
+	{
+		std::cout << ex.toString() << std::endl;
+		return false;
+	}
+
+	//N.B. Access driver does not suport check for connection.
+	std::cout << "*** Connected to " << dbName << std::endl;
+
+	return true;
+}
+
+
 CppUnit::Test* ODBCAccessTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCAccessTest");
+	if (init())
+	{
+		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCAccessTest");
 
-	CppUnit_addTest(pSuite, ODBCAccessTest, testSimpleAccess);
+		CppUnit_addTest(pSuite, ODBCAccessTest, testSimpleAccess);
 
-	return pSuite;
+		return pSuite;
+	}
+
+	return 0;
 }
