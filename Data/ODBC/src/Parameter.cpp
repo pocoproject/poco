@@ -61,7 +61,7 @@ Parameter::~Parameter()
 void Parameter::init()
 {
 	if (Utility::isError(SQLDescribeParam(_rStmt, 
-		(SQLUSMALLINT) _number, 
+		(SQLUSMALLINT) _number + 1, 
 		&_dataType,
 		&_columnSize,
 		&_decimalDigits,

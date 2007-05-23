@@ -75,7 +75,7 @@ void Binder::bind(std::size_t pos, const std::string& val)
 	_dataSize.insert(SizeMap::value_type((SQLPOINTER) val.c_str(), size));
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos, 
+		(SQLUSMALLINT) pos + 1, 
 		SQL_PARAM_INPUT, 
 		SQL_C_CHAR, 
 		SQL_LONGVARCHAR, 
@@ -104,7 +104,7 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 		_dataSize.insert(SizeMap::value_type((SQLPOINTER) val.rawContent(), size));
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos, 
+			(SQLUSMALLINT) pos + 1, 
 			SQL_PARAM_INPUT, 
 			SQL_C_BINARY, 
 			SQL_LONGVARBINARY, 

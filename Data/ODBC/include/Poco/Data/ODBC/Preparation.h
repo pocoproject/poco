@@ -179,24 +179,24 @@ private:
 	void preparePOD(std::size_t pos, SQLSMALLINT valueType)
 	{
 		poco_assert (DE_BOUND == _dataExtraction);
-		poco_assert (pos > 0 && pos <= _pValues.size());
+		poco_assert (pos >= 0 && pos < _pValues.size());
 
 		std::size_t dataSize = sizeof(T);
 
-		_pValues[pos-1] = new Poco::Any(T());
-		_pLengths[pos-1] = new SQLLEN;
-		*_pLengths[pos-1] = 0;
+		_pValues[pos] = new Poco::Any(T());
+		_pLengths[pos] = new SQLLEN;
+		*_pLengths[pos] = 0;
 
-		T* pVal = AnyCast<T>(_pValues[pos-1]);
+		T* pVal = AnyCast<T>(_pValues[pos]);
 
 		poco_assert_dbg (pVal);
 
 		if (Utility::isError(SQLBindCol(_rStmt, 
-			(SQLUSMALLINT) pos, 
+			(SQLUSMALLINT) pos + 1, 
 			valueType, 
 			(SQLPOINTER) pVal, 
 			(SQLINTEGER) dataSize, 
-			_pLengths[pos-1])))
+			_pLengths[pos])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");
 		}
@@ -307,14 +307,14 @@ inline std::size_t Preparation::columns() const
 
 inline std::size_t Preparation::maxDataSize(std::size_t pos) const
 {
-	poco_assert (pos > 0 && pos <= _pValues.size());
+	poco_assert (pos >= 0 && pos < _pValues.size());
 
 	std::size_t sz = 0;
 	std::size_t maxsz = getMaxFieldSize();
 
 	try 
 	{
-		sz = ODBCColumn(_rStmt, pos-1).length();
+		sz = ODBCColumn(_rStmt, pos).length();
 	}
 	catch (StatementException&) 
 	{
@@ -326,10 +326,10 @@ inline std::size_t Preparation::maxDataSize(std::size_t pos) const
 
 inline std::size_t Preparation::actualDataSize(std::size_t pos) const
 {
-	poco_assert (pos > 0 && pos <= _pValues.size());
-	poco_assert (_pLengths[pos-1]);
+	poco_assert (pos >= 0 && pos < _pValues.size());
+	poco_assert (_pLengths[pos]);
 
-	return *_pLengths[pos-1];
+	return *_pLengths[pos];
 }
 
 

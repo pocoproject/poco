@@ -81,32 +81,32 @@ Preparation::~Preparation()
 
 Poco::Any& Preparation::operator [] (std::size_t pos)
 {
-	poco_assert (pos > 0 && pos <= _pValues.size());
+	poco_assert (pos >= 0 && pos < _pValues.size());
 	
-	return *_pValues[pos-1];
+	return *_pValues[pos];
 }
 
 
 void Preparation::prepareRaw(std::size_t pos, SQLSMALLINT valueType, std::size_t size)
 {
 	poco_assert (DE_BOUND == _dataExtraction);
-	poco_assert (pos > 0 && pos <= _pValues.size());
+	poco_assert (pos >= 0 && pos < _pValues.size());
 
 	char* pChr = new char[size]; 
 	poco_assert_dbg (pChr);
 	memset(pChr, 0, size);
 
 	SharedPtr<char> sp = pChr; 
-	_pValues[pos-1] = new Any(sp);
-	_pLengths[pos-1] = new SQLLEN;
-	*_pLengths[pos-1] = (SQLLEN) size;
+	_pValues[pos] = new Any(sp);
+	_pLengths[pos] = new SQLLEN;
+	*_pLengths[pos] = (SQLLEN) size;
 
 	if (Utility::isError(SQLBindCol(_rStmt, 
-		(SQLUSMALLINT) pos, 
+		(SQLUSMALLINT) pos + 1, 
 		valueType, 
 		(SQLPOINTER) pChr, 
 		(SQLINTEGER) size, 
-		_pLengths[pos-1])))
+		_pLengths[pos])))
 	{
 		throw StatementException(_rStmt, "SQLBindCol()");
 	}

@@ -153,7 +153,7 @@ private:
 		T value = (T) 0;
 		
 		rc = SQLGetData(_rStmt, 
-			(SQLUSMALLINT) pos, 
+			(SQLUSMALLINT) pos + 1, 
 			cType,  //C data type
 			&value, //returned value
 			0,      //buffer length (ignored)

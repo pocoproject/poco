@@ -120,11 +120,10 @@ void ODBCStatementImpl::compileImpl()
 
 	if (Preparation::DE_BOUND == ext && dataAvailable)
 	{
-		std::size_t pos = 1;
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
-		for (; it != itEnd; ++it)
+		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
 			AbstractPrepare* pAP = (*it)->createPrepareObject(_pPreparation, pos);
 			pAP->prepare();
@@ -150,11 +149,9 @@ void ODBCStatementImpl::bindImpl()
 	Bindings& binds = bindings();
 	if (!binds.empty())
 	{
-		std::size_t pos = 1;
-
 		Bindings::iterator it    = binds.begin();
 		Bindings::iterator itEnd = binds.end();
-		for (; it != itEnd && (*it)->canBind(); ++it)
+		for (std::size_t pos = 0; it != itEnd && (*it)->canBind(); ++it)
 		{
 			(*it)->bind(pos);
 			pos += (*it)->numOfColumnsHandled();
@@ -245,8 +242,7 @@ void ODBCStatementImpl::next()
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
-		std::size_t pos = 1;
-		for (; it != itEnd; ++it)
+		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
 			(*it)->extract(pos);
 			pos += (*it)->numOfColumnsHandled();
