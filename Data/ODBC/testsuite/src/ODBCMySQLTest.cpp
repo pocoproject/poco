@@ -870,7 +870,11 @@ bool ODBCMySQLTest::init(const std::string& driver, const std::string& dsn)
 
 CppUnit::Test* ODBCMySQLTest::suite()
 {
+#ifdef POCO_OS_FAMILY_WINDOWS
 	if (init("MySQL ODBC 3.51 Driver", "PocoDataMySQLTest"))
+#else
+	if (init("MySQL", "PocoDataMySQLTest"))
+#endif
 	{
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCMySQLTest");
 

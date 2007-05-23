@@ -847,7 +847,8 @@ bool ODBCSQLServerTest::canConnect(const std::string& driver, const std::string&
 		"UID=test;"
 		"PWD=test;"
 		"DATABASE=test;"
-		"SERVER=(local);", driver);
+		"SERVER=localhost;"
+		"PORT=1433;", driver);
 
 	return true;
 }
@@ -891,7 +892,11 @@ bool ODBCSQLServerTest::init(const std::string& driver, const std::string& dsn)
 
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
+#ifdef POCO_OS_FAMILY_WINDOWS
 	if (init("SQL Server", "PocoDataSQLServerTest"))
+#else
+	if (init("FreeTDS", "PocoDataSQLServerTest"))
+#endif
 	{
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
 

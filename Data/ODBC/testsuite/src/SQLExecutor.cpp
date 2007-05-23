@@ -169,7 +169,6 @@ SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession)
 
 SQLExecutor::~SQLExecutor()
 {
-	ODBC::Connector::unregisterConnector();
 }
 
 

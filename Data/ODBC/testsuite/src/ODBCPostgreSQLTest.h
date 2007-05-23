@@ -48,10 +48,11 @@ class ODBCPostgreSQLTest: public CppUnit::TestCase
 	/// PostgreSQL ODBC test class
 	/// Tested:
 	/// 
-	/// Driver		|	DB				| OS										| Notes
-	/// ------------+-------------------+-------------------------------------------+--------------------------------
-	///	07.03.02.60	| PostgreSQL 7.4.6	| MS Windows XP Professional x64 v.2003/SP1	| BLOB fails (missing 'lo' module)
-	/// 08.01.02.00 | PostgreSQL 8.1.5-1| MS Windows XP Professional x64 v.2003/SP1 |
+	/// Driver		  |	DB                | OS                                        | Driver Manager     |Notes
+	/// --------------+-------------------+-------------------------------------------+--------------------+--------------------------
+	///	07.03.02.60	  | PostgreSQL 7.4.6  | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       | BLOB fails (missing 'lo')
+	/// 08.01.02.00   | PostgreSQL 8.1.5-1| MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       |
+	/// 1:08.01.0200-2| PostgreSQL 8.1.5-1| Ubuntu 7.04 (2.6.20-15-generic #2 SMP)    | unixODBC 2.2.11.-13|
 	/// 
 {
 public:

@@ -162,8 +162,8 @@ public:
 		DiagnosticFields df;
 		SQLSMALLINT count = 1;
 		SQLSMALLINT messageLength = 0;
-		static const std::string& none = "None";
-		static const std::string& na = "Not applicable";
+		const std::string none = "None";
+		const std::string na = "Not applicable";
 
 		reset();
 
@@ -178,11 +178,6 @@ public:
 		{
 			if (1 == count)
 			{
-				poco_assert (sizeof(_connectionName) > none.length());
-				poco_assert (sizeof(_connectionName) > na.length());
-				poco_assert (sizeof(_serverName) > none.length());
-				poco_assert (sizeof(_serverName) > na.length());
-
 				// success of the following two calls is optional
 				// (they fail if connection has not been established yet
 				//  or return empty string if not applicable for the context)
@@ -191,22 +186,38 @@ public:
 					count, 
 					SQL_DIAG_CONNECTION_NAME, 
 					_connectionName, 
-					SQL_NAME_LENGTH, 
+					sizeof(_connectionName), 
 					&messageLength)))
-						memcpy(_connectionName, none.c_str(), none.length());
+				{
+					std::size_t len = sizeof(_connectionName) > none.length() ? 
+						none.length() : sizeof(_connectionName) - 1;
+					memcpy(_connectionName, none.c_str(), len);
+				}
 				else if (0 == _connectionName[0]) 
-						memcpy(_connectionName, na.c_str(), na.length());
+				{
+					std::size_t len = sizeof(_connectionName) > na.length() ? 
+						na.length() : sizeof(_connectionName) - 1;
+					memcpy(_connectionName, na.c_str(), len);
+				}
 				
 				if (Utility::isError(SQLGetDiagField(handleType, 
 					_rHandle, 
 					count, 
 					SQL_DIAG_SERVER_NAME, 
 					_serverName, 
-					SQL_NAME_LENGTH, 
+					sizeof(_serverName), 
 					&messageLength)))
-						memcpy(_serverName, none.c_str(), none.length());
+				{
+					std::size_t len = sizeof(_serverName) > none.length() ? 
+						none.length() : sizeof(_serverName) - 1;
+					memcpy(_serverName, none.c_str(), len);
+				}
 				else if (0 == _serverName[0]) 
-						memcpy(_serverName, na.c_str(), na.length());
+				{
+					std::size_t len = sizeof(_serverName) > na.length() ? 
+						na.length() : sizeof(_serverName) - 1;
+					memcpy(_serverName, na.c_str(), len);
+				}
 			}
 
 			_fields.push_back(df);
