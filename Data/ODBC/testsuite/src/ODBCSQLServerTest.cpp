@@ -809,12 +809,12 @@ void ODBCSQLServerTest::recreateVectorsTable()
 }
 
 
-bool ODBCSQLServerTest::checkODBCSetup(const std::string& dbName)
+bool ODBCSQLServerTest::canConnect(const std::string& driver, const std::string& dsn)
 {
 	Utility::DriverMap::iterator itDrv = _drivers.begin();
 	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		if (((itDrv->first).find(dbName) != std::string::npos))
+		if (((itDrv->first).find(driver) != std::string::npos))
 		{
 			std::cout << "Driver found: " << itDrv->first 
 				<< " (" << itDrv->second << ')' << std::endl;
@@ -824,15 +824,30 @@ bool ODBCSQLServerTest::checkODBCSetup(const std::string& dbName)
 
 	if (_drivers.end() == itDrv) 
 	{
-		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		std::cout << driver << " driver NOT found, tests not available." << std::endl;
 		return false;
 	}
 
-	_dbConnString = "DRIVER=SQL Server;"
+	Utility::DSNMap dataSources;
+	Utility::dataSources(dataSources);
+	Utility::DSNMap::iterator itDSN = dataSources.begin();
+	for (; itDSN != dataSources.end(); ++itDSN)
+	{
+		if (itDSN->first == dsn && itDSN->second == driver)
+		{
+			std::cout << "DSN found: " << itDSN->first 
+				<< " (" << itDSN->second << ')' << std::endl;
+			format(_dbConnString, "DSN=%s", dsn);
+			return true;
+		}
+	}
+
+	// DSN not found, try connect without it
+	format(_dbConnString, "DRIVER=%s;"
 		"UID=test;"
 		"PWD=test;"
 		"DATABASE=test;"
-		"SERVER=(local);";
+		"SERVER=(local);", driver);
 
 	return true;
 }
@@ -850,10 +865,10 @@ void ODBCSQLServerTest::tearDown()
 }
 
 
-bool ODBCSQLServerTest::init(const std::string& dbName)
+bool ODBCSQLServerTest::init(const std::string& driver, const std::string& dsn)
 {
 	Utility::drivers(_drivers);
-	if (!checkODBCSetup()) return false;
+	if (!canConnect(driver, dsn)) return false;
 	
 	ODBC::Connector::registerConnector();
 	try
@@ -866,9 +881,9 @@ bool ODBCSQLServerTest::init(const std::string& dbName)
 	}
 
 	if (_pSession && _pSession->isConnected()) 
-		std::cout << "*** Connected to " << dbName << " test database." << std::endl;
+		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
 	
-	_pExecutor = new SQLExecutor(dbName + " SQL Executor", _pSession);
+	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
 
 	return true;
 }
@@ -876,7 +891,7 @@ bool ODBCSQLServerTest::init(const std::string& dbName)
 
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
-	if (init())
+	if (init("SQL Server", "PocoDataSQLServerTest"))
 	{
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
 

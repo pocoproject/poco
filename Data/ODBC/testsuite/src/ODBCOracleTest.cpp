@@ -796,12 +796,12 @@ void ODBCOracleTest::recreateVectorsTable()
 }
 
 
-bool ODBCOracleTest::checkODBCSetup(const std::string& dbName)
+bool ODBCOracleTest::canConnect(const std::string& driver, const std::string& dsn)
 {
 	Utility::DriverMap::iterator itDrv = _drivers.begin();
 	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		if (((itDrv->first).find(dbName) != std::string::npos))
+		if (((itDrv->first).find(driver) != std::string::npos))
 		{
 			std::cout << "Driver found: " << itDrv->first 
 				<< " (" << itDrv->second << ')' << std::endl;
@@ -811,11 +811,54 @@ bool ODBCOracleTest::checkODBCSetup(const std::string& dbName)
 
 	if (_drivers.end() == itDrv) 
 	{
-		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		std::cout << driver << " driver NOT found, tests not available." << std::endl;
 		return false;
 	}
 
-	_dbConnString = "DSN=PocoDataOracleTest;Uid=Scott;Pwd=Tiger;";
+	Utility::DSNMap dataSources;
+	Utility::dataSources(dataSources);
+	Utility::DSNMap::iterator itDSN = dataSources.begin();
+	for (; itDSN != dataSources.end(); ++itDSN)
+	{
+		if (itDSN->first == dsn && itDSN->second == driver)
+		{
+			std::cout << "DSN found: " << itDSN->first 
+				<< " (" << itDSN->second << ')' << std::endl;
+			format(_dbConnString, "DSN=%s", dsn);
+			return true;
+		}
+	}
+
+	// DSN not found, try connect without it
+	format(_dbConnString, "DRIVER={%s};"
+		"UID=Scott;"
+		"PWD=Tiger;"
+		"TLO=O;"
+		"FBS=60000;"
+		"FWC=F;"
+		"CSR=F;"
+		"MDI=Me;"
+		"MTS=T;"
+		"DPM=F;"
+		"NUM=NLS;"
+		"BAM=IfAllSuccessful;"
+		"BTD=F;"
+		"RST=T;"
+		"LOB=T;"
+		"FDL=10;"
+		"FRC=10;"
+		"QTO=T;"
+		"FEN=T;"
+		"XSM=Default;"
+		"EXC=F;"
+		"APA=T;"
+		"DBA=W;"
+		"DBQ=XE;"
+		"SERVER="
+		"(DESCRIPTION="
+		" (ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))"
+		" (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE))"
+		");", driver);
 
 	return true;
 }
@@ -833,10 +876,10 @@ void ODBCOracleTest::tearDown()
 }
 
 
-bool ODBCOracleTest::init(const std::string& dbName)
+bool ODBCOracleTest::init(const std::string& driver, const std::string& dsn)
 {
 	Utility::drivers(_drivers);
-	if (!checkODBCSetup()) return false;
+	if (!canConnect(driver, dsn)) return false;
 	
 	ODBC::Connector::registerConnector();
 	try
@@ -849,9 +892,9 @@ bool ODBCOracleTest::init(const std::string& dbName)
 	}
 
 	if (_pSession && _pSession->isConnected()) 
-		std::cout << "*** Connected to " << dbName << " test database." << std::endl;
+		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
 	
-	_pExecutor = new SQLExecutor(dbName + " SQL Executor", _pSession);
+	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
 
 	return true;
 }
@@ -859,7 +902,7 @@ bool ODBCOracleTest::init(const std::string& dbName)
 
 CppUnit::Test* ODBCOracleTest::suite()
 {
-	if (init())
+	if (init("Oracle in XE", "PocoDataOracleTest"))
 	{
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCOracleTest");
 

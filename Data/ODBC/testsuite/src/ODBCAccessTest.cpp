@@ -139,12 +139,12 @@ void ODBCAccessTest::recreatePersonTable()
 }
 
 
-bool ODBCAccessTest::checkODBCSetup(const std::string& dbName)
+bool ODBCAccessTest::canConnect(const std::string& driver, const std::string& dsn)
 {
 	Utility::DriverMap::iterator itDrv = _drivers.begin();
 	for (; itDrv != _drivers.end(); ++itDrv)
 	{
-		if (((itDrv->first).find(dbName) != std::string::npos))
+		if (((itDrv->first).find(driver) != std::string::npos))
 		{
 			std::cout << "Driver found: " << itDrv->first 
 				<< " (" << itDrv->second << ')' << std::endl;
@@ -154,11 +154,26 @@ bool ODBCAccessTest::checkODBCSetup(const std::string& dbName)
 
 	if (_drivers.end() == itDrv) 
 	{
-		std::cout << dbName << " driver NOT found, tests not available." << std::endl;
+		std::cout << driver << " driver NOT found, tests not available." << std::endl;
 		return false;
 	}
 
-	_dbConnString = "DRIVER=Microsoft Access Driver (*.mdb);"
+	Utility::DSNMap dataSources;
+	Utility::dataSources(dataSources);
+	Utility::DSNMap::iterator itDSN = dataSources.begin();
+	for (; itDSN != dataSources.end(); ++itDSN)
+	{
+		if (itDSN->first == dsn && itDSN->second == driver)
+		{
+			std::cout << "DSN found: " << itDSN->first 
+				<< " (" << itDSN->second << ')' << std::endl;
+			format(_dbConnString, "DSN=%s", dsn);
+			return true;
+		}
+	}
+
+	// DSN not found, try connect without it
+	format(_dbConnString, "DRIVER=%s;"
 		"UID=admin;"
 		"UserCommitSync=Yes;"
 		"Threads=3;"
@@ -168,8 +183,7 @@ bool ODBCAccessTest::checkODBCSetup(const std::string& dbName)
 		"MaxBufferSize=2048;"
 		"FIL=MS Access;"
 		"DriverId=25;"
-		"DefaultDir=C:\\;"
-		"DBQ=C:\\test.mdb;";
+		"DBQ=test.mdb;", driver);
 
 	return true;
 }
@@ -186,10 +200,10 @@ void ODBCAccessTest::tearDown()
 }
 
 
-bool ODBCAccessTest::init(const std::string& dbName)
+bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 {
 	Utility::drivers(_drivers);
-	if (!checkODBCSetup()) return false;
+	if (!canConnect(driver, dsn)) return false;
 
 	ODBC::Connector::registerConnector();
 	try
@@ -202,7 +216,7 @@ bool ODBCAccessTest::init(const std::string& dbName)
 	}
 
 	//N.B. Access driver does not suport check for connection.
-	std::cout << "*** Connected to " << dbName << std::endl;
+	std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
 
 	return true;
 }
@@ -210,7 +224,7 @@ bool ODBCAccessTest::init(const std::string& dbName)
 
 CppUnit::Test* ODBCAccessTest::suite()
 {
-	if (init())
+	if (init("Microsoft Access Driver (*.mdb)", "PocoDataAccessTest"))
 	{
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCAccessTest");
 

@@ -16,7 +16,8 @@ endif
 
 objects = ODBCTestSuite Driver \
 	ODBCDB2Test ODBCMySQLTest ODBCOracleTest \
-	ODBCPostgreSQLTest ODBCSQLiteTest SQLExecutor
+	ODBCPostgreSQLTest ODBCSQLiteTest ODBCSQLServerTest \
+	SQLExecutor
 
 target         = testrunner
 target_version = 1

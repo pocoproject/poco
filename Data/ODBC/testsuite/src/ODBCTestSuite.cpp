@@ -67,8 +67,10 @@ CppUnit::Test* ODBCTestSuite::suite()
 	addTest(pSuite, ODBCDB2Test::suite());
 	addTest(pSuite, ODBCMySQLTest::suite());
 	addTest(pSuite, ODBCSQLiteTest::suite());
-	addTest(pSuite, ODBCAccessTest::suite());
 	addTest(pSuite, ODBCSQLServerTest::suite());
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	addTest(pSuite, ODBCAccessTest::suite());
+#endif
 
 	return pSuite;
 }

@@ -120,8 +120,8 @@ private:
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 
-	static bool init(const std::string& dbName = "IBM DB2");
-	static bool checkODBCSetup(const std::string& dbName = "IBM DB2");
+	static bool init(const std::string& driver, const std::string& dsn);
+	static bool canConnect(const std::string& driver, const std::string& dsn);
 
 	static Poco::Data::ODBC::Utility::DriverMap _drivers;
 	static std::string _dbConnString;
