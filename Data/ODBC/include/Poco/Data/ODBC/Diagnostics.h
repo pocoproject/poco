@@ -162,8 +162,8 @@ public:
 		DiagnosticFields df;
 		SQLSMALLINT count = 1;
 		SQLSMALLINT messageLength = 0;
-		const std::string none = "None";
-		const std::string na = "Not applicable";
+		static const std::string none = "None";
+		static const std::string na = "Not applicable";
 
 		reset();
 
