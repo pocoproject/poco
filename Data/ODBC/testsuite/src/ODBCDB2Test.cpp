@@ -194,6 +194,126 @@ void ODBCDB2Test::testInsertEmptyVector()
 }
 
 
+void ODBCDB2Test::testSimpleAccessList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->simpleAccessList();
+		i += 2;
+	}
+}
+
+
+void ODBCDB2Test::testComplexTypeList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeList();
+		i += 2;
+	}	
+}
+
+
+void ODBCDB2Test::testInsertList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertList();
+		i += 2;
+	}	
+}
+
+
+void ODBCDB2Test::testInsertEmptyList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertEmptyList();
+		i += 2;
+	}	
+}
+
+
+void ODBCDB2Test::testSimpleAccessDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->simpleAccessDeque();
+		i += 2;
+	}
+}
+
+
+void ODBCDB2Test::testComplexTypeDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeDeque();
+		i += 2;
+	}	
+}
+
+
+void ODBCDB2Test::testInsertDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertDeque();
+		i += 2;
+	}	
+}
+
+
+void ODBCDB2Test::testInsertEmptyDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertEmptyDeque();
+		i += 2;
+	}	
+}
+
+
 void ODBCDB2Test::testInsertSingleBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -854,6 +974,7 @@ void ODBCDB2Test::tearDown()
 {
 	dropTable("Person");
 	dropTable("Strings");
+	dropTable("Tuples");
 }
 
 
@@ -894,6 +1015,14 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testSimpleAccessList);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testComplexTypeList);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertList);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertEmptyList);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testSimpleAccessDeque);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testComplexTypeDeque);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertDeque);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertEmptyDeque);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertSingleBulkVec);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testLimit);

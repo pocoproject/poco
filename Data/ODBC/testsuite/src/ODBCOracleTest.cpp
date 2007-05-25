@@ -191,6 +191,126 @@ void ODBCOracleTest::testInsertEmptyVector()
 }
 
 
+void ODBCOracleTest::testSimpleAccessList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->simpleAccessList();
+		i += 2;
+	}
+}
+
+
+void ODBCOracleTest::testComplexTypeList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeList();
+		i += 2;
+	}	
+}
+
+
+void ODBCOracleTest::testInsertList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertList();
+		i += 2;
+	}	
+}
+
+
+void ODBCOracleTest::testInsertEmptyList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertEmptyList();
+		i += 2;
+	}	
+}
+
+
+void ODBCOracleTest::testSimpleAccessDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->simpleAccessDeque();
+		i += 2;
+	}
+}
+
+
+void ODBCOracleTest::testComplexTypeDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeDeque();
+		i += 2;
+	}	
+}
+
+
+void ODBCOracleTest::testInsertDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertDeque();
+		i += 2;
+	}	
+}
+
+
+void ODBCOracleTest::testInsertEmptyDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertEmptyDeque();
+		i += 2;
+	}	
+}
+
+
 void ODBCOracleTest::testInsertSingleBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -705,6 +825,12 @@ void ODBCOracleTest::testInternalExtraction()
 }
 
 
+void ODBCOracleTest::testStoredProcedure()
+{
+	//TODO
+}
+
+
 void ODBCOracleTest::dropTable(const std::string& tableName)
 {
 	try
@@ -873,6 +999,7 @@ void ODBCOracleTest::tearDown()
 {
 	dropTable("Person");
 	dropTable("Strings");
+	dropTable("Tuples");
 }
 
 
@@ -913,6 +1040,14 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccessList);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeList);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertList);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertEmptyList);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccessDeque);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeDeque);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertDeque);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertEmptyDeque);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertSingleBulkVec);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testLimit);
@@ -945,6 +1080,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDouble);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTupleVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
 
 		return pSuite;

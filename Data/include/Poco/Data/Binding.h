@@ -44,8 +44,10 @@
 #include "Poco/Data/AbstractBinding.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/TypeHandler.h"
-#include <set>
 #include <vector>
+#include <list>
+#include <deque>
+#include <set>
 #include <map>
 #include <cstddef>
 
@@ -152,6 +154,112 @@ private:
 	const std::vector<T>&                   _val;
 	typename std::vector<T>::const_iterator _begin;
 	typename std::vector<T>::const_iterator _end;
+};
+
+
+template <class T>
+class Binding<std::list<T> >: public AbstractBinding
+	/// Specialization for std::list.
+{
+public:
+	explicit Binding(const std::list<T>& val): _val(val), _begin(val.begin()), _end(val.end())
+		/// Creates the Binding.
+	{
+		if (numOfRowsHandled() == 0)
+			throw BindingException("It is illegal to bind to an empty data collection");
+	}
+
+	~Binding()
+		/// Destroys the Binding.
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return TypeHandler<T>::size();
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return _val.size();
+	}
+
+	bool canBind() const
+	{
+		return _begin != _end;
+	}
+
+	void bind(std::size_t pos)
+	{
+		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(canBind());
+		TypeHandler<T>::bind(pos, *_begin, getBinder());
+		++_begin;
+	}
+
+	void reset()
+	{
+		_begin = _val.begin();
+		_end   = _val.end();
+	}
+
+private:
+	const std::list<T>&                   _val;
+	typename std::list<T>::const_iterator _begin;
+	typename std::list<T>::const_iterator _end;
+};
+
+
+template <class T>
+class Binding<std::deque<T> >: public AbstractBinding
+	/// Specialization for std::deque.
+{
+public:
+	explicit Binding(const std::deque<T>& val): _val(val), _begin(val.begin()), _end(val.end())
+		/// Creates the Binding.
+	{
+		if (numOfRowsHandled() == 0)
+			throw BindingException("It is illegal to bind to an empty data collection");
+	}
+
+	~Binding()
+		/// Destroys the Binding.
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return TypeHandler<T>::size();
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return _val.size();
+	}
+
+	bool canBind() const
+	{
+		return _begin != _end;
+	}
+
+	void bind(std::size_t pos)
+	{
+		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(canBind());
+		TypeHandler<T>::bind(pos, *_begin, getBinder());
+		++_begin;
+	}
+
+	void reset()
+	{
+		_begin = _val.begin();
+		_end   = _val.end();
+	}
+
+private:
+	const std::deque<T>&                   _val;
+	typename std::deque<T>::const_iterator _begin;
+	typename std::deque<T>::const_iterator _end;
 };
 
 

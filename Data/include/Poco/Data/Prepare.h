@@ -47,13 +47,12 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <list>
+#include <deque>
 
 
 namespace Poco {
 namespace Data {
-
-
-class BLOB;
 
 
 template<typename T>
@@ -85,6 +84,60 @@ private:
 
 template<typename T>
 class Prepare<std::vector<T> >: public AbstractPrepare
+	/// Class for calling the appropriate AbstractPreparation method.
+{
+public:
+	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const T& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
+		/// Creates the Prepare.
+	{
+	}
+
+	~Prepare()
+		/// Destroys the Prepare.
+	{
+	}
+
+	void prepare()
+		/// Prepares data.
+	{
+		TypeHandler<T>::prepare(_pos, _val, preparation());
+	}
+
+private:
+	std::size_t _pos;
+	const T&    _val;
+};
+
+
+template<typename T>
+class Prepare<std::list<T> >: public AbstractPrepare
+	/// Class for calling the appropriate AbstractPreparation method.
+{
+public:
+	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const T& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
+		/// Creates the Prepare.
+	{
+	}
+
+	~Prepare()
+		/// Destroys the Prepare.
+	{
+	}
+
+	void prepare()
+		/// Prepares data.
+	{
+		TypeHandler<T>::prepare(_pos, _val, preparation());
+	}
+
+private:
+	std::size_t _pos;
+	const T&    _val;
+};
+
+
+template<typename T>
+class Prepare<std::deque<T> >: public AbstractPrepare
 	/// Class for calling the appropriate AbstractPreparation method.
 {
 public:

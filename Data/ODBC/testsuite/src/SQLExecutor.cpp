@@ -640,6 +640,238 @@ void SQLExecutor::insertEmptyVector()
 }
 
 
+void SQLExecutor::simpleAccessList()
+{
+	std::string funct = "simpleAccessList()";
+	std::list<std::string> lastNames;
+	std::list<std::string> firstNames;
+	std::list<std::string> addresses;
+	std::list<int> ages;
+	std::string tableName("Person");
+	lastNames.push_back("LN1");
+	lastNames.push_back("LN2");
+	firstNames.push_back("FN1");
+	firstNames.push_back("FN2");
+	addresses.push_back("ADDR1");
+	addresses.push_back("ADDR2");
+	ages.push_back(1);
+	ages.push_back(2);
+	int count = 0;
+	std::string result;
+
+	try { *_pSession << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 2);
+
+	std::list<std::string> lastNamesR;
+	std::list<std::string> firstNamesR;
+	std::list<std::string> addressesR;
+	std::list<int> agesR;
+	try { *_pSession << "SELECT * FROM PERSON", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (ages == agesR);
+	assert (lastNames == lastNamesR);
+	assert (firstNames == firstNamesR);
+	assert (addresses == addressesR);
+}
+
+
+void SQLExecutor::complexTypeList()
+{
+	std::string funct = "complexTypeList()";
+	std::list<Person> people;
+	people.push_back(Person("LN1", "FN1", "ADDR1", 1));
+	people.push_back(Person("LN2", "FN2", "ADDR2", 2));
+
+	try { *_pSession << "INSERT INTO PERSON VALUES (?,?,?,?)", use(people), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 2);
+
+	std::list<Person> result;
+	try { *_pSession << "SELECT * FROM PERSON", into(result), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (result == people);
+}
+
+
+void SQLExecutor::insertList()
+{
+	std::string funct = "insertList()";
+	std::list<std::string> str;
+	str.push_back("s1");
+	str.push_back("s2");
+	str.push_back("s3");
+	str.push_back("s3");
+	int count = 100;
+
+	{
+		Statement stmt((*_pSession << "INSERT INTO Strings VALUES (?)", use(str)));
+		try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		assert (count == 0);
+
+		try { stmt.execute(); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+		try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		assert (count == 4);
+	}
+	count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 4);
+}
+
+
+void SQLExecutor::insertEmptyList()
+{
+	std::string funct = "insertEmptyList()";
+	std::list<std::string> str;
+
+	try
+	{
+		*_pSession << "INSERT INTO Strings VALUES (?)", use(str), now;
+		fail("empty collections should not work");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+}
+
+
+void SQLExecutor::simpleAccessDeque()
+{
+	std::string funct = "simpleAccessDeque()";
+	std::deque<std::string> lastNames;
+	std::deque<std::string> firstNames;
+	std::deque<std::string> addresses;
+	std::deque<int> ages;
+	std::string tableName("Person");
+	lastNames.push_back("LN1");
+	lastNames.push_back("LN2");
+	firstNames.push_back("FN1");
+	firstNames.push_back("FN2");
+	addresses.push_back("ADDR1");
+	addresses.push_back("ADDR2");
+	ages.push_back(1);
+	ages.push_back(2);
+	int count = 0;
+	std::string result;
+
+	try { *_pSession << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 2);
+
+	std::deque<std::string> lastNamesR;
+	std::deque<std::string> firstNamesR;
+	std::deque<std::string> addressesR;
+	std::deque<int> agesR;
+	try { *_pSession << "SELECT * FROM PERSON", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (ages == agesR);
+	assert (lastNames == lastNamesR);
+	assert (firstNames == firstNamesR);
+	assert (addresses == addressesR);
+}
+
+
+void SQLExecutor::complexTypeDeque()
+{
+	std::string funct = "complexTypeDeque()";
+	std::deque<Person> people;
+	people.push_back(Person("LN1", "FN1", "ADDR1", 1));
+	people.push_back(Person("LN2", "FN2", "ADDR2", 2));
+
+	try { *_pSession << "INSERT INTO PERSON VALUES (?,?,?,?)", use(people), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 2);
+
+	std::deque<Person> result;
+	try { *_pSession << "SELECT * FROM PERSON", into(result), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (result == people);
+}
+
+
+void SQLExecutor::insertDeque()
+{
+	std::string funct = "insertDeque()";
+	std::deque<std::string> str;
+	str.push_back("s1");
+	str.push_back("s2");
+	str.push_back("s3");
+	str.push_back("s3");
+	int count = 100;
+
+	{
+		Statement stmt((*_pSession << "INSERT INTO Strings VALUES (?)", use(str)));
+		try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		assert (count == 0);
+
+		try { stmt.execute(); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+		try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		assert (count == 4);
+	}
+	count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 4);
+}
+
+
+void SQLExecutor::insertEmptyDeque()
+{
+	std::string funct = "insertEmptyDeque()";
+	std::deque<std::string> str;
+
+	try
+	{
+		*_pSession << "INSERT INTO Strings VALUES (?)", use(str), now;
+		fail("empty collections should not work");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+}
+
+
 void SQLExecutor::insertSingleBulk()
 {
 	std::string funct = "insertSingleBulk()";

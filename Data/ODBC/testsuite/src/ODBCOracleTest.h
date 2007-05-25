@@ -61,10 +61,21 @@ public:
 
 	void testSimpleAccess();
 	void testComplexType();
+
 	void testSimpleAccessVector();
 	void testComplexTypeVector();
 	void testInsertVector();
 	void testInsertEmptyVector();
+
+	void testSimpleAccessList();
+	void testComplexTypeList();
+	void testInsertList();
+	void testInsertEmptyList();
+
+	void testSimpleAccessDeque();
+	void testComplexTypeDeque();
+	void testInsertDeque();
+	void testInsertEmptyDeque();
 
 	void testInsertSingleBulk();
 	void testInsertSingleBulkVec();
@@ -105,6 +116,7 @@ public:
 	void testTupleVector();
 
 	void testInternalExtraction();
+	void testStoredProcedure();
 
 	void setUp();
 	void tearDown();

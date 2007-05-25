@@ -185,6 +185,126 @@ void ODBCPostgreSQLTest::testInsertEmptyVector()
 }
 
 
+void ODBCPostgreSQLTest::testSimpleAccessList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->simpleAccessList();
+		i += 2;
+	}
+}
+
+
+void ODBCPostgreSQLTest::testComplexTypeList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeList();
+		i += 2;
+	}	
+}
+
+
+void ODBCPostgreSQLTest::testInsertList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertList();
+		i += 2;
+	}	
+}
+
+
+void ODBCPostgreSQLTest::testInsertEmptyList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertEmptyList();
+		i += 2;
+	}	
+}
+
+
+void ODBCPostgreSQLTest::testSimpleAccessDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->simpleAccessDeque();
+		i += 2;
+	}
+}
+
+
+void ODBCPostgreSQLTest::testComplexTypeDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeDeque();
+		i += 2;
+	}	
+}
+
+
+void ODBCPostgreSQLTest::testInsertDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertDeque();
+		i += 2;
+	}	
+}
+
+
+void ODBCPostgreSQLTest::testInsertEmptyDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertEmptyDeque();
+		i += 2;
+	}	
+}
+
+
 void ODBCPostgreSQLTest::testInsertSingleBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -866,6 +986,7 @@ void ODBCPostgreSQLTest::tearDown()
 {
 	dropTable("Person");
 	dropTable("Strings");
+	dropTable("Tuples");
 }
 
 
@@ -906,6 +1027,14 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccessList);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexTypeList);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertList);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertEmptyList);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccessDeque);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexTypeDeque);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertDeque);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertEmptyDeque);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertSingleBulkVec);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimit);

@@ -72,10 +72,21 @@ public:
 
 	void simpleAccess();
 	void complexType();
+
 	void simpleAccessVector();
 	void complexTypeVector();
 	void insertVector();
 	void insertEmptyVector();
+
+	void simpleAccessList();
+	void complexTypeList();
+	void insertList();
+	void insertEmptyList();
+
+	void simpleAccessDeque();
+	void complexTypeDeque();
+	void insertDeque();
+	void insertEmptyDeque();
 
 	void insertSingleBulk();
 	void insertSingleBulkVec();

@@ -183,6 +183,126 @@ void ODBCMySQLTest::testInsertEmptyVector()
 }
 
 
+void ODBCMySQLTest::testSimpleAccessList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->simpleAccessList();
+		i += 2;
+	}
+}
+
+
+void ODBCMySQLTest::testComplexTypeList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeList();
+		i += 2;
+	}	
+}
+
+
+void ODBCMySQLTest::testInsertList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertList();
+		i += 2;
+	}	
+}
+
+
+void ODBCMySQLTest::testInsertEmptyList()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertEmptyList();
+		i += 2;
+	}	
+}
+
+
+void ODBCMySQLTest::testSimpleAccessDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->simpleAccessDeque();
+		i += 2;
+	}
+}
+
+
+void ODBCMySQLTest::testComplexTypeDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeDeque();
+		i += 2;
+	}	
+}
+
+
+void ODBCMySQLTest::testInsertDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertDeque();
+		i += 2;
+	}	
+}
+
+
+void ODBCMySQLTest::testInsertEmptyDeque()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->insertEmptyDeque();
+		i += 2;
+	}	
+}
+
+
 void ODBCMySQLTest::testInsertSingleBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -841,6 +961,7 @@ void ODBCMySQLTest::tearDown()
 {
 	dropTable("Person");
 	dropTable("Strings");
+	dropTable("Tuples");
 }
 
 
@@ -885,6 +1006,14 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccessList);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexTypeList);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertList);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertEmptyList);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccessDeque);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexTypeDeque);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertDeque);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertEmptyDeque);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertSingleBulkVec);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimit);

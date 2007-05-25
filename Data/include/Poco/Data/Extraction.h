@@ -49,6 +49,7 @@
 #include <set>
 #include <vector>
 #include <list>
+#include <deque>
 #include <map>
 #include <cstddef>
 
@@ -232,6 +233,66 @@ protected:
 
 private:
 	std::list<T>& _rResult;
+	T               _default; // copy the default
+};
+
+
+template <class T>
+class Extraction<std::deque<T> >: public AbstractExtraction
+	/// Deque Data Type specialization for extraction of values from a query result set.
+{
+public:
+	Extraction(std::deque<T>& result): _rResult(result), _default()
+	{
+	}
+
+	Extraction(std::deque<T>& result, const T& def): _rResult(result), _default(def)
+	{
+	}
+
+	virtual ~Extraction()
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return TypeHandler<T>::size();
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return _rResult.size();
+	}
+
+	std::size_t numOfRowsAllowed() const
+	{
+		return getLimit();
+	}
+
+	void extract(std::size_t pos)
+	{
+		_rResult.push_back(_default);
+		TypeHandler<T>::extract(pos, _rResult.back(), _default, getExtractor());
+	}
+
+	virtual void reset()
+	{
+	}
+
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	{
+		return new Prepare<T>(pPrep, pos, _default);
+	}
+
+protected:
+
+	const std::deque<T>& result() const
+	{
+		return _rResult;
+	}
+
+private:
+	std::deque<T>& _rResult;
 	T               _default; // copy the default
 };
 
