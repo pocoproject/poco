@@ -42,7 +42,9 @@ namespace Data {
 
 
 AbstractBinding::AbstractBinding(): 
-	_pBinder(0)
+	_pBinder(0),
+	_inBound(true),
+	_outBound(false)
 {
 }
 

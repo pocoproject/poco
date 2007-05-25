@@ -34,6 +34,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/String.h"
+#include "Poco/Tuple.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
@@ -54,6 +55,7 @@ using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
+using Poco::Tuple;
 using Poco::NotFoundException;
 
 
@@ -827,7 +829,98 @@ void ODBCOracleTest::testInternalExtraction()
 
 void ODBCOracleTest::testStoredProcedure()
 {
-	//TODO
+	*_pSession << "CREATE OR REPLACE "
+		"PROCEDURE storedProcedure(outParam OUT NUMBER) IS "
+		" BEGIN outParam := -1; "
+		"END storedProcedure;" , now;
+
+	int i = 0;
+	*_pSession << "{call storedProcedure(?)}", out(i), now;
+	assert(-1 == i);
+	*_pSession << "DROP PROCEDURE storedProcedure;", now;
+
+	*_pSession << "CREATE OR REPLACE "
+		"PROCEDURE storedProcedure(inParam IN NUMBER, outParam OUT NUMBER) IS "
+		" BEGIN outParam := inParam*inParam; "
+		"END storedProcedure;" , now;
+
+	i = 2;
+	int j = 0;
+	*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+	assert(4 == j);
+	*_pSession << "DROP PROCEDURE storedProcedure;", now;
+
+	*_pSession << "CREATE OR REPLACE "
+		"PROCEDURE storedProcedure(ioParam IN OUT NUMBER) IS "
+		" BEGIN ioParam := ioParam*ioParam; "
+		" END storedProcedure;" , now;
+
+	i = 2;
+	*_pSession << "{call storedProcedure(?)}", io(i), now;
+	assert(4 == i);
+	*_pSession << "DROP PROCEDURE storedProcedure;", now;
+}
+
+
+void ODBCOracleTest::testStoredFunction()
+{
+	*_pSession << "CREATE OR REPLACE "
+		"FUNCTION storedFunction RETURN NUMBER IS "
+		" BEGIN return(-1); "
+		" END storedFunction;" , now;
+
+	int i = 0;
+	*_pSession << "{? = call storedFunction()}", out(i), now;
+	assert(-1 == i);
+	*_pSession << "DROP FUNCTION storedFunction;", now;
+
+	*_pSession << "CREATE OR REPLACE "
+		"FUNCTION storedFunction(inParam IN NUMBER) RETURN NUMBER IS "
+		" BEGIN RETURN(inParam*inParam); "
+		" END storedFunction;" , now;
+
+	i = 2;
+	int result = 0;
+	*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+	assert(4 == result);
+	*_pSession << "DROP FUNCTION storedFunction;", now;
+
+	*_pSession << "CREATE OR REPLACE "
+		"FUNCTION storedFunction(inParam IN NUMBER, outParam OUT NUMBER) RETURN NUMBER IS "
+		" BEGIN outParam := inParam*inParam; RETURN(outParam); "
+		" END storedFunction;" , now;
+
+	i = 2;
+	int j = 0;
+	result = 0;
+	*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
+	assert(4 == j);
+	assert(j == result); 
+	*_pSession << "DROP FUNCTION storedFunction;", now;
+
+	*_pSession << "CREATE OR REPLACE "
+		"FUNCTION storedFunction(param1 IN OUT NUMBER, param2 IN OUT NUMBER) RETURN NUMBER IS "
+		" temp NUMBER := param1; "
+		" BEGIN param1 := param2; param2 := temp; RETURN(param1+param2); "
+		" END storedFunction;" , now;
+
+	i = 1;
+	j = 2;
+	result = 0;
+	*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
+	assert(1 == j);
+	assert(2 == i);
+	assert(3 == result); 
+	
+	Tuple<int, int> params(1, 2);
+	assert(1 == params.get<0>());
+	assert(2 == params.get<1>());
+	result = 0;
+	*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
+	assert(1 == params.get<1>());
+	assert(2 == params.get<0>());
+	assert(3 == result); 
+	*_pSession << "DROP FUNCTION storedFunction;", now;
 }
 
 
@@ -1081,6 +1174,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
 
 		return pSuite;

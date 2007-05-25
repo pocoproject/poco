@@ -478,7 +478,36 @@ private:
 template <typename T> Binding<T>* use(const T& t)
 	/// Convenience function for a more compact Binding creation.
 {
-	return new Binding<T>(t);
+	Binding<T>* pB = new Binding<T>(t);
+	poco_check_ptr (pB);
+	return pB;
+}
+
+
+template <typename T> Binding<T>* in(const T& t)
+	/// Convenience function for a more compact Binding creation.
+{
+	return use(t);
+}
+
+
+template <typename T> Binding<T>* out(const T& t)
+	/// Convenience function for a more compact Binding creation.
+{
+	Binding<T>* pB = use(t);
+	pB->setInBound(false);
+	pB->setOutBound(true);
+	return pB;
+}
+
+
+template <typename T> Binding<T>* io(const T& t)
+	/// Convenience function for a more compact Binding creation.
+{
+	Binding<T>* pB = use(t);
+	pB->setInBound(true);
+	pB->setOutBound(true);
+	return pB;
 }
 
 

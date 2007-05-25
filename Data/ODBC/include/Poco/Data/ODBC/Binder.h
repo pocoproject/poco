@@ -165,9 +165,17 @@ private:
 			catch (StatementException&) { }
 		}
 
+		bool in = isInBound();
+		bool out = isOutBound();
+		SQLSMALLINT ioType = SQL_PARAM_TYPE_UNKNOWN;
+		if (in && out) ioType = SQL_PARAM_INPUT_OUTPUT; 
+		else if(in)    ioType = SQL_PARAM_INPUT;
+		else if(out)   ioType = SQL_PARAM_OUTPUT;
+		else throw Poco::IllegalStateException("Binder not bound (must be [in] OR [out]).");
+
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
-			SQL_PARAM_INPUT, 
+			ioType, 
 			cDataType, 
 			sqlDataType, 
 			columnSize,

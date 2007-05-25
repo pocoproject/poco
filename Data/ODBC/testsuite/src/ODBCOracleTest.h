@@ -117,6 +117,7 @@ public:
 
 	void testInternalExtraction();
 	void testStoredProcedure();
+	void testStoredFunction();
 
 	void setUp();
 	void tearDown();

@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/AbstractBinder.h"
 #include "Poco/Any.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -50,9 +51,6 @@
 
 namespace Poco {
 namespace Data {
-
-
-class AbstractBinder;
 
 
 class Data_API AbstractBinding: public Poco::RefCountedObject
@@ -92,8 +90,16 @@ public:
 	virtual void reset() = 0;
 		/// Allows a binding to be reused.
 
+	void setInBound(bool inBound = true);
+		/// Sets the binder to be in-bound.
+
+	void setOutBound(bool outBound = true);
+		/// Sets the binder to be out-bound.
+
 private:
 	AbstractBinder* _pBinder;
+	bool _inBound;
+	bool _outBound;
 };
 
 
@@ -106,13 +112,29 @@ typedef std::vector<AbstractBindingPtr> AbstractBindingVec;
 //
 inline void AbstractBinding::setBinder(AbstractBinder* pBinder)
 {
+	poco_check_ptr (pBinder);
 	_pBinder = pBinder;
+	_pBinder->setInBound(_inBound);
+	_pBinder->setOutBound(_outBound);
+	poco_assert_dbg (_inBound || _outBound);
 }
 
 
 inline AbstractBinder* AbstractBinding::getBinder() const
 {
 	return _pBinder;
+}
+
+
+inline void AbstractBinding::setInBound(bool inBound)
+{
+	_inBound = inBound;
+}
+
+
+inline void AbstractBinding::setOutBound(bool outBound)
+{
+	_outBound = outBound;
 }
 
 

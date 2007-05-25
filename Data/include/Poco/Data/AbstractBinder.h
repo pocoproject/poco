@@ -106,7 +106,50 @@ public:
 
 	virtual void bind(std::size_t pos, const BLOB& val) = 0;
 		/// Binds a BLOB.
+
+	bool isInBound() const;
+		/// Returns true if binder is in-bound.
+
+	bool isOutBound() const;
+		/// Returns true if binder is out-bound.
+
+	void setInBound(bool inBound = true);
+		/// If inBound is true, binder is set to be in-bound.
+
+	void setOutBound(bool outBound = true);
+		/// If outBound is true, binder is set to be out-bound.
+
+protected:
+	bool _inBound;
+	bool _outBound;
 };
+
+
+///
+/// inlines
+///
+inline bool AbstractBinder::isInBound() const
+{
+	return _inBound;
+}
+
+
+inline bool AbstractBinder::isOutBound() const
+{
+	return _outBound;
+}
+
+
+inline void AbstractBinder::setInBound(bool inBound)
+{
+	_inBound = inBound;
+}
+
+
+inline void AbstractBinder::setOutBound(bool outBound)
+{
+	_outBound = outBound;
+}
 
 
 } } // namespace Poco::Data
