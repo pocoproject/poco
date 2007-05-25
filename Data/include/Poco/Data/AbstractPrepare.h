@@ -64,10 +64,10 @@ public:
 	virtual void prepare() = 0;
 		/// Prepares data.
 
+protected:
 	AbstractPreparation* preparation();
 		/// Returns the preparation object
 
-protected:
 	AbstractPreparation* _pPrepare;
 };
 
