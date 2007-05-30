@@ -88,18 +88,18 @@ public:
 	std::size_t columnCount() const;
 		/// Returns the number of rows in the recordset.
 
-	template<class T>
-	const Column<T>& column(const std::string& name) const
+	template<class T, class C>
+	const Column<T,C>& column(const std::string& name) const
 		/// Returns the reference to the first Column with the specified name.
 	{
-		return column<T>(columnPosition<T>(name));
+		return column<T,C>(columnPosition<T,C>(name));
 	}
 
-	template<class T>
-	const Column<T>& column(std::size_t pos) const
+	template<class T, class C>
+	const Column<T,C>& column(std::size_t pos) const
 		/// Returns the reference to column at specified location.
 	{
-		typedef const InternalExtraction<T>* ExtractionVecPtr;
+		typedef const InternalExtraction<T,C>* ExtractionVecPtr;
 
 		const AbstractExtractionVec& rExtractions = extractions();
 
@@ -125,14 +125,36 @@ public:
 	const T& value(std::size_t col, std::size_t row) const
 		/// Returns the reference to data value at [col, row] location.
 	{
-		return column<T>(col).value(row);
+		switch (storage())
+		{
+		case STORAGE_VECTOR:
+		case STORAGE_UNKNOWN:
+			return column<T, std::vector<T> >(col).value(row);
+		case STORAGE_LIST:
+			return column<T, std::list<T> >(col).value(row);
+		case STORAGE_DEQUE:
+			return column<T, std::deque<T> >(col).value(row);
+		default:
+			throw IllegalStateException("Invalid storage setting.");
+		}
 	}
 
 	template<class T>
 	const T& value(const std::string& name, std::size_t row) const
 		/// Returns the reference to data value at named column, row location.
 	{
-		return column<T>(name).value(row);
+		switch (storage())
+		{
+		case STORAGE_VECTOR:
+		case STORAGE_UNKNOWN:
+			return column<T, std::vector<T> >(name).value(row);
+		case STORAGE_LIST:
+			return column<T, std::list<T> >(name).value(row);
+		case STORAGE_DEQUE:
+			return column<T, std::deque<T> >(name).value(row);
+		default:
+			throw IllegalStateException("Invalid storage setting.");
+		}
 	}
 
 	DynamicAny value(std::size_t col, std::size_t row) const;
@@ -204,11 +226,11 @@ public:
 private:
 	RecordSet();
 
-	template<class T>
+	template<class T, class C>
 	std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.
 	{
-		typedef const InternalExtraction<T>* ExtractionVecPtr;
+		typedef const InternalExtraction<T,C>* ExtractionVecPtr;
 
 		const AbstractExtractionVec& rExtractions = extractions();
 		AbstractExtractionVec::const_iterator it = rExtractions.begin();
@@ -220,7 +242,7 @@ private:
 
 			if (pExtraction)
 			{
-				const Column<T>& col = pExtraction->column();
+				const Column<T,C>& col = pExtraction->column();
 				if (0 == Poco::icompare(name, col.name()))
 					return col.position();
 			}

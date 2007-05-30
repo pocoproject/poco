@@ -53,7 +53,9 @@ public:
 	void testProperties();
 	void testBLOB();
 	void testBLOBStreams();
-	void testColumn();
+	void testColumnVector();
+	void testColumnDeque();
+	void testColumnList();
 
 	void setUp();
 	void tearDown();

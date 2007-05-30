@@ -128,7 +128,7 @@ private:
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
-	SessionImpl&                 _rSession;
+	const SQLHDBC&               _rConnection;
 	const StatementHandle        _stmt;
 	Poco::SharedPtr<Preparation> _pPreparation;
 	Poco::SharedPtr<Binder>      _pBinder;

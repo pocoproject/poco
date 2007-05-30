@@ -63,7 +63,15 @@ class Data_API Statement
 {
 public:
 	typedef void (*Manipulator)(Statement&);
-	
+
+	enum Storage
+	{
+		STORAGE_VECTOR = StatementImpl::STORAGE_VECTOR_IMPL,
+		STORAGE_LIST = StatementImpl::STORAGE_LIST_IMPL,
+		STORAGE_DEQUE = StatementImpl::STORAGE_DEQUE_IMPL,
+		STORAGE_UNKNOWN = StatementImpl::STORAGE_UNKNOWN_IMPL
+	};
+
 	Statement(StatementImpl* pImpl);
 		/// Creates the Statement.
 
@@ -134,6 +142,22 @@ public:
 	Statement& reset(Session& session);
 		/// Resets the Statement so that it can be filled with a new SQL command.
 
+	bool canModifyStorage();
+		/// Returns true if statement is in a state that allows the internal storage to be modified.
+
+	Storage storage() const;
+		/// Returns the internal storage type for the stamement.
+
+	void setStorage(const std::string& storage);
+		/// Sets the internal storage type for the stamement.
+
+	const std::string& getStorage() const;
+		/// Returns the internal storage type for the stamement.
+
+	std::size_t extractionCount() const;
+		/// Returns the number of extraction storage buffers associated
+		/// with the statement.
+
 protected:
 	const AbstractExtractionVec& extractions() const;
 		/// Returns the extractions vector.
@@ -156,6 +180,12 @@ private:
 // Manipulators
 //
 void Data_API now(Statement& statement);
+
+void Data_API vector(Statement& statement);
+
+void Data_API list(Statement& statement);
+
+void Data_API deque(Statement& statement);
 
 
 //
@@ -218,6 +248,24 @@ inline const MetaColumn& Statement::metaColumn(std::size_t pos) const
 inline const MetaColumn& Statement::metaColumn(const std::string& name) const
 {
 	return _ptr->metaColumn(name);
+}
+
+
+inline void Statement::setStorage(const std::string& storage)
+{
+	_ptr->setStorage(storage);
+}
+
+
+inline std::size_t Statement::extractionCount() const
+{
+	return _ptr->extractionCount();
+}
+
+
+inline Statement::Storage Statement::storage() const
+{
+	return static_cast<Storage>(_ptr->getStorage());
 }
 
 

@@ -807,6 +807,21 @@ void ODBCSQLiteTest::testInternalExtraction()
 }
 
 
+void ODBCSQLiteTest::testInternalStorageType()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->internalStorageType();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLiteTest::dropTable(const std::string& tableName)
 {
 	try
@@ -1029,6 +1044,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalStorageType);
 
 		return pSuite;
 	}

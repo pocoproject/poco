@@ -61,7 +61,7 @@ SessionImpl::~SessionImpl()
 
 Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
 {
-	return new TestStatementImpl;
+	return new TestStatementImpl(*this);
 }
 
 

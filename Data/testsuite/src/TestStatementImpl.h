@@ -44,20 +44,19 @@
 #include "Preparation.h"
 
 
-struct sqlite3;
-struct sqlite3_stmt;
-
-
 namespace Poco {
 namespace Data {
 namespace Test {
+
+
+class SessionImpl;
 
 
 class TestStatementImpl: public Poco::Data::StatementImpl
 	/// A no-op implementation of TestStatementImpl for testing.
 {
 public:
-	TestStatementImpl();
+	TestStatementImpl(SessionImpl& rSession);
 		/// Creates the TestStatementImpl.
 
 	~TestStatementImpl();

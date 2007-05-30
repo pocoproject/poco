@@ -62,7 +62,7 @@ DynamicAny RecordSet::value(std::size_t col, std::size_t row) const
 		case MetaColumn::FDT_UINT8:  return value<UInt8>(col, row);
 		case MetaColumn::FDT_INT16:  return value<Int16>(col, row);
 		case MetaColumn::FDT_UINT16: return value<UInt16>(col, row);
-		case MetaColumn::FDT_INT32:  return value<Int32>(col, row);
+		case MetaColumn::FDT_INT32:	 return value<Int32>(col, row);
 		case MetaColumn::FDT_UINT32: return value<UInt32>(col, row);
 		case MetaColumn::FDT_INT64:  return value<Int64>(col, row);
 		case MetaColumn::FDT_UINT64: return value<UInt64>(col, row);
@@ -81,18 +81,18 @@ DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
 	switch (columnType(name))
 	{
 		case MetaColumn::FDT_BOOL:
-		case MetaColumn::FDT_INT8:   return value<Int8>(name, row);        
-		case MetaColumn::FDT_UINT8:  return value<UInt8>(name, row);       
-		case MetaColumn::FDT_INT16:  return value<Int16>(name, row);       
-		case MetaColumn::FDT_UINT16: return value<UInt16>(name, row);      
-		case MetaColumn::FDT_INT32:  return value<Int32>(name, row);       
-		case MetaColumn::FDT_UINT32: return value<UInt32>(name, row);      
-		case MetaColumn::FDT_INT64:  return value<Int64>(name, row);       
-		case MetaColumn::FDT_UINT64: return value<UInt64>(name, row);      
-		case MetaColumn::FDT_FLOAT:  return value<float>(name, row);       
-		case MetaColumn::FDT_DOUBLE: return value<double>(name, row);      
-		case MetaColumn::FDT_STRING: return value<std::string>(name, row); 
-		case MetaColumn::FDT_BLOB:   return value<BLOB>(name, row);        
+		case MetaColumn::FDT_INT8:   return value<Int8>(name, row);
+		case MetaColumn::FDT_UINT8:  return value<UInt8>(name, row);
+		case MetaColumn::FDT_INT16:  return value<Int16>(name, row);
+		case MetaColumn::FDT_UINT16: return value<UInt16>(name, row);
+		case MetaColumn::FDT_INT32:	 return value<Int32>(name, row);
+		case MetaColumn::FDT_UINT32: return value<UInt32>(name, row);
+		case MetaColumn::FDT_INT64:  return value<Int64>(name, row);
+		case MetaColumn::FDT_UINT64: return value<UInt64>(name, row);
+		case MetaColumn::FDT_FLOAT:  return value<float>(name, row);
+		case MetaColumn::FDT_DOUBLE: return value<double>(name, row);
+		case MetaColumn::FDT_STRING: return value<std::string>(name, row);
+		case MetaColumn::FDT_BLOB:   return value<BLOB>(name, row);
 		default:
 			throw Poco::InvalidArgumentException("Data type not supported.");
 	}

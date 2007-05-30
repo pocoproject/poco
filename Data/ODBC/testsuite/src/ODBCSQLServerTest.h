@@ -117,7 +117,11 @@ public:
 	void testTuple();
 	void testTupleVector();
 
+	void testStoredProcedure();
+	void testStoredFunction();
+
 	void testInternalExtraction();
+	void testInternalStorageType();
 
 	void setUp();
 	void tearDown();
@@ -125,7 +129,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	void dropTable(const std::string& tableName);
+	void dropObject(const std::string& type, const std::string& name);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
 	void recreateStringsTable();

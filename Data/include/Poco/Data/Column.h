@@ -44,13 +44,14 @@
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/SharedPtr.h"
 #include <vector>
+#include <list>
 
 
 namespace Poco {
 namespace Data {
 
 
-template <class T>
+template <class T, class C = std::vector<T> >
 class Column
 	/// Column class is column data container.
 	/// Data (a pointer to vector of contained values) is assigned to the class 
@@ -59,11 +60,11 @@ class Column
 	/// This class owns the data assigned to it and deletes the storage on destruction.
 {
 public:
-	typedef std::vector<T> DataVec;
-	typedef typename DataVec::const_iterator Iterator;
-	typedef typename DataVec::size_type Size;
+	typedef C Container;
+	typedef typename Container::const_iterator Iterator;
+	typedef typename Container::size_type Size;
 
-	Column(const MetaColumn& metaColumn, std::vector<T>* pData): _metaColumn(metaColumn), _pData(pData)
+	Column(const MetaColumn& metaColumn, C* pData): _metaColumn(metaColumn), _pData(pData)
 		/// Creates the Column.
 	{
 		poco_check_ptr (_pData);
@@ -94,7 +95,7 @@ public:
 		std::swap(_pData, other._pData);
 	}
 
-	DataVec& data()
+	Container& data()
 		/// Returns reference to contained data.
 	{
 		return *_pData;
@@ -128,7 +129,7 @@ public:
 	void reset()
 		/// Clears and shrinks the storage.
 	{
-		std::vector<T>().swap(*_pData);
+		C().swap(*_pData);
 	}
 
 	const std::string& name() const
@@ -177,8 +178,134 @@ public:
 private:
 	Column();
 
-	MetaColumn               _metaColumn;
-	Poco::SharedPtr<DataVec> _pData;
+	MetaColumn _metaColumn;
+	Poco::SharedPtr<Container> _pData;
+};
+
+
+template <class T>
+class Column<T, std::list<T> >
+	/// Column specialization for std::list
+{
+public:
+	typedef std::list<T> List;
+	typedef typename List::const_iterator Iterator;
+	typedef typename List::size_type Size;
+
+	Column(const MetaColumn& metaColumn, std::list<T>* pData): _metaColumn(metaColumn), _pData(pData)
+		/// Creates the Column.
+	{
+		poco_check_ptr (_pData);
+	}
+
+	Column(const Column& col): _metaColumn(col._metaColumn), _pData(col._pData)
+		/// Creates the Column.
+	{
+	}
+
+	~Column()
+		/// Destroys the Column.
+	{
+	}
+
+	Column& operator = (const Column& col)
+		/// Assignment operator.
+	{
+		Column tmp(col);
+		swap(tmp);
+		return *this;
+	}
+
+	void swap(Column& other)
+		/// Swaps the column with another one.
+	{
+		std::swap(_metaColumn, other._metaColumn);
+		std::swap(_pData, other._pData);
+	}
+
+	List& data()
+		/// Returns reference to contained data.
+	{
+		return *_pData;
+	}
+
+	const T& value(std::size_t row) const
+		/// Returns the field value in specified row.
+	{
+		List::const_iterator it = _pData->begin();
+		List::const_iterator end = _pData->end();
+		for (int i = 0; it != end; ++it, ++i)
+			if (i == row) return *it;
+
+		throw RangeException("Invalid row number."); 
+	}
+
+	const T& operator [] (std::size_t row) const
+		/// Returns the field value in specified row.
+	{
+		return value(row);
+	}
+
+	Size rowCount() const
+		/// Returns number of rows.
+	{
+		return _pData->size();
+	}
+
+	void reset()
+		/// Clears the storage.
+	{
+		_pData->clear();
+	}
+
+	const std::string& name() const
+		/// Returns column name.
+	{
+		return _metaColumn.name();
+	}
+
+	std::size_t length() const
+		/// Returns column maximum length.
+	{
+		return _metaColumn.length();
+	}
+
+	std::size_t precision() const
+		/// Returns column precision.
+		/// Valid for floating point fields only (zero for other data types).
+	{
+		return _metaColumn.precision();
+	}
+
+	std::size_t position() const
+		/// Returns column position.
+	{
+		return _metaColumn.position();
+	}
+
+	MetaColumn::ColumnDataType type() const
+		/// Returns column type.
+	{
+		return _metaColumn.type();
+	}
+
+	Iterator begin() const
+		/// Returns iterator pointing to the beginning of data storage vector.
+	{
+		return _pData->begin();
+	}
+
+	Iterator end() const
+		/// Returns iterator pointing to the end of data storage vector.
+	{
+		return _pData->end();
+	}
+
+private:
+	Column();
+
+	MetaColumn _metaColumn;
+	Poco::SharedPtr<List> _pData;
 };
 
 

@@ -31,6 +31,7 @@
 
 
 #include "TestStatementImpl.h"
+#include "SessionImpl.h"
 
 
 namespace Poco {
@@ -38,7 +39,8 @@ namespace Data {
 namespace Test {
 
 
-TestStatementImpl::TestStatementImpl()
+TestStatementImpl::TestStatementImpl(SessionImpl& rSession):
+	Poco::Data::StatementImpl(rSession)
 {
 }
 

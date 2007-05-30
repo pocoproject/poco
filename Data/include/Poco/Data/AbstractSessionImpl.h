@@ -74,7 +74,19 @@ public:
 
 	AbstractSessionImpl()
 		/// Creates the AbstractSessionImpl.
+		/// Adds "storage" property and sets the default internal storage container 
+		/// type to std::vector.
+		/// The storage is created by statements automatically whenever a query 
+		/// returning results is executed but external storage is provided by the user.
+		/// Storage type can be reconfigured at runtime both globally (for the
+		/// duration of the session) and locally (for a single statement execution only). 
+		/// See StatementImpl for details on how this property is used at runtime.
 	{
+		addProperty("storage", 
+			&AbstractSessionImpl<C>::setStorage, 
+			&AbstractSessionImpl<C>::getStorage);
+
+		setProperty("storage", std::string("vector"));
 	}
 
 	~AbstractSessionImpl()
@@ -142,6 +154,24 @@ public:
 		else throw NotSupportedException(name);
 	}
 	
+	void setStorage(const std::string& value)
+		/// Sets the storage type.
+	{
+		_storage = value;
+	}
+
+	void setStorage(const std::string& name, const Poco::Any& value)
+		/// Sets the storage type.
+	{
+		_storage = Poco::RefAnyCast<std::string>(value);
+	}
+		
+	Poco::Any getStorage(const std::string& name="")
+		/// Returns the storage type
+	{
+		return _storage;
+	}
+
 protected:
 	void addFeature(const std::string& name, FeatureSetter setter, FeatureGetter getter)
 		/// Adds a feature to the map of supported features.
@@ -185,6 +215,7 @@ private:
 	
 	FeatureMap  _features;
 	PropertyMap _properties;
+	std::string _storage;
 };
 
 

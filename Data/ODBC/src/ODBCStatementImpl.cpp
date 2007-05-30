@@ -35,7 +35,7 @@
 
 
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
-#include "Poco/Data/ODBC/Handle.h"
+#include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractPrepare.h"
@@ -51,8 +51,9 @@ const std::string ODBCStatementImpl::INVALID_CURSOR_STATE = "24000";
 
 
 ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
-	_rSession(rSession),
-	_stmt(_rSession.dbc()),
+	Poco::Data::StatementImpl(rSession),
+	_rConnection(rSession.dbc()),
+	_stmt(rSession.dbc()),
 	_stepCalled(false),
 	_nextResponse(0)
 {
@@ -62,7 +63,7 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 		0),
 			"SQLSetStmtAttr(SQL_CURSOR_TYPE, SQL_CURSOR_FORWARD_ONLY)");
 
-	if (_rSession.getFeature("autoBind"))
+	if (session().getFeature("autoBind"))
 	{
 		SQLSetStmtAttr(_stmt, 
 			SQL_ATTR_PARAM_BIND_TYPE, 
@@ -96,16 +97,16 @@ void ODBCStatementImpl::compileImpl()
 	if (statement.empty())
 		throw ODBCException("Empty statements are illegal");
 
-	Preparation::DataExtraction ext = _rSession.getFeature("autoExtract") ? 
+	Preparation::DataExtraction ext = session().getFeature("autoExtract") ? 
 		Preparation::DE_BOUND : Preparation::DE_MANUAL;
 	
-	std::size_t maxFieldSize = AnyCast<std::size_t>(_rSession.getProperty("maxFieldSize"));
+	std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 	_pPreparation = new Preparation(_stmt, 
 		statement, 
 		maxFieldSize,
 		ext);
 
-	Binder::ParameterBinding bind = _rSession.getFeature("autoBind") ? 
+	Binder::ParameterBinding bind = session().getFeature("autoBind") ? 
 		Binder::PB_IMMEDIATE : Binder::PB_AT_EXEC;
 
 	_pBinder = new Binder(_stmt, bind);
@@ -274,7 +275,7 @@ std::string ODBCStatementImpl::nativeSQL()
 		pNative = new char[retlen];
 		memset(pNative, 0, retlen);
 		length = retlen;
-		if (Utility::isError(SQLNativeSql(_rSession.dbc(),
+		if (Utility::isError(SQLNativeSql(_rConnection,
 			(POCO_SQLCHAR*) statement.c_str(),
 			(SQLINTEGER) statement.size(),
 			(POCO_SQLCHAR*) pNative,
@@ -282,7 +283,7 @@ std::string ODBCStatementImpl::nativeSQL()
 			&retlen)))
 		{
 			delete [] pNative;
-			throw ConnectionException(_rSession.dbc(), "SQLNativeSql()");
+			throw ConnectionException(_rConnection, "SQLNativeSql()");
 		}
 		++retlen;//accomodate for terminating '\0'
 	}while (retlen > length);

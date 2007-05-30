@@ -59,6 +59,9 @@ namespace Poco {
 namespace Data {
 
 
+class SessionImpl;
+
+
 class Data_API StatementImpl: public Poco::RefCountedObject
 	/// StatementImpl interface that subclasses must implement to define database dependent query execution.
 	///
@@ -74,7 +77,20 @@ public:
 		ST_RESET
 	};
 
-	StatementImpl();
+	enum Storage
+	{
+		STORAGE_VECTOR_IMPL,
+		STORAGE_LIST_IMPL,
+		STORAGE_DEQUE_IMPL,
+		STORAGE_UNKNOWN_IMPL
+	};
+
+	static const std::string VECTOR;
+	static const std::string LIST;
+	static const std::string DEQUE;
+	static const std::string UNKNOWN;
+
+	StatementImpl(SessionImpl& rSession);
 		/// Creates the StatementImpl.
 
 	virtual ~StatementImpl();
@@ -106,6 +122,19 @@ public:
 
 	State getState() const;
 		/// Returns the state of the Statement.
+
+	void setStorage(Storage storage);
+		/// Sets the storage type for this statement;
+
+	void setStorage(const std::string& storage);
+		/// Sets the storage type for this statement;
+
+	Storage getStorage() const;
+		/// Returns the storage type for this statement.
+
+	std::size_t extractionCount() const;
+		/// Returns the number of extraction storage buffers associated
+		/// with the statement.
 
 protected:
 	virtual Poco::UInt32 columnsReturned() const = 0;
@@ -161,8 +190,29 @@ protected:
 		/// Returns the extractions vector.
 
 	void makeExtractors(Poco::UInt32 count);
-		/// Creates extraction vector. Used in case when there is
-		/// data returned, but no extraction supplied externally.
+		/// Determines the type of the internal extraction container and
+		/// calls the extraction creation function (addInternalExtract)
+		/// with appropriate data type and container type arguments.
+		/// 
+		/// This function is only called in cases when there is data 
+		/// returned by query, but no data storage supplied by user.
+		///
+		/// The type of the internal container is determined in the
+		/// following order:
+		/// 1. If statement has the container type set, the type is used.
+		/// 2. If statement does not have the container type set,
+		///    session is queried for container type setting. If the
+		///    session container type setting is found, it is used.
+		/// 3. If neither session nor statement have the internal
+		///    container type set, std::vector is used.
+		///
+		/// Supported internal extraction container types are:
+		/// - std::vector (default)
+		/// - std::deque
+		/// - std::list
+
+	SessionImpl& session();
+		/// Rteurns session associated with this statement.
 
 private:
 	void compile();
@@ -193,9 +243,9 @@ private:
 	void addInternalExtract(const MetaColumn& mc)
 		/// Utility function to create and add an internal extraction.
 	{
-		std::vector<T>* pData = new C;
-		Column<T>* pCol = new Column<T>(mc, pData);
-		addExtract(new InternalExtraction<T>(*pData, pCol));
+		C* pData = new C;
+		Column<T,C>* pCol = new Column<T,C>(mc, pData);
+		addExtract(new InternalExtraction<T,C>(*pData, pCol));
 	}
 
 	StatementImpl(const StatementImpl& stmt);
@@ -208,6 +258,8 @@ private:
 	std::ostringstream    _ostr;
 	AbstractBindingVec    _bindings;
 	AbstractExtractionVec _extractors;
+	SessionImpl&          _rSession;
+	Storage               _storage;
 
 	friend class Statement; 
 };
@@ -267,6 +319,30 @@ inline int StatementImpl::columnsExtracted() const
 inline StatementImpl::State StatementImpl::getState() const
 {
 	return _state;
+}
+
+
+inline SessionImpl& StatementImpl::session()
+{
+	return _rSession;
+}
+
+
+inline void StatementImpl::setStorage(Storage storage)
+{
+	_storage = storage;
+}
+
+
+inline StatementImpl::Storage StatementImpl::getStorage() const
+{
+	return _storage;
+}
+
+
+inline std::size_t StatementImpl::extractionCount() const
+{
+	return extractions().size();
 }
 
 

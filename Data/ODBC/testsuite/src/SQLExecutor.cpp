@@ -1836,7 +1836,7 @@ void SQLExecutor::internalExtraction()
 		i = rset.value("str0", 2);
 		assert (5 == i);
 		
-		const Column<int>& col = rset.column<int>(0);
+		const Column<int>& col = rset.column<int, std::vector<int> >(0);
 		Column<int>::Iterator it = col.begin();
 		Column<int>::Iterator end = col.end();
 		for (int i = 1; it != end; ++it, ++i)
@@ -1870,7 +1870,7 @@ void SQLExecutor::internalExtraction()
 		s = rset.value("cnt", 0).convert<std::string>();
 		assert ("4" == s);
 
-		try { rset.column<int>(100); fail ("must fail"); }
+		try { rset.column<int, std::vector<int> >(100); fail ("must fail"); }
 		catch (RangeException&) { }
 
 		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
@@ -1879,8 +1879,78 @@ void SQLExecutor::internalExtraction()
 		stmt = (*_pSession << "DELETE FROM Vectors", now);
 		rset = stmt;
 
-		try { rset.column<int>(0); fail ("must fail"); }
+		try { rset.column<int, std::vector<int> >(0); fail ("must fail"); }
 		catch (RangeException&) { }
+	}
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+}
+
+
+void SQLExecutor::internalStorageType()
+{
+	std::string funct = "internalStorageType()";
+	std::vector<Statement::Manipulator> manips;
+	manips.push_back(list);
+	manips.push_back(deque);
+	manips.push_back(vector);
+
+	std::vector<Tuple<int, double, std::string> > v;
+	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
+	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
+	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
+	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
+
+	try { *_pSession << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	try 
+	{ 
+		std::vector<Statement::Manipulator>::iterator it = manips.begin();
+		std::vector<Statement::Manipulator>::iterator end = manips.end();
+
+		for (; it != end; ++it)
+		{
+			Statement stmt = (*_pSession << "SELECT * FROM Vectors", *it, now);
+			RecordSet rset(stmt);
+
+			assert (3 == rset.columnCount());
+			assert (4 == rset.rowCount());
+
+			int curVal = 3;
+			do
+			{
+				assert (rset["str0"] == curVal);
+				++curVal;
+			} while (rset.moveNext());
+
+			rset.moveFirst();
+			assert (rset["str0"] == "3");
+			rset.moveLast();
+			assert (rset["str0"] == "6");
+
+			try
+			{
+				stmt = (*_pSession << "SELECT * FROM Vectors", now, *it);
+				fail ("must fail");
+			}
+			catch(InvalidAccessException&){}
+
+			try
+			{
+				stmt = (*_pSession << "SELECT * FROM Vectors", into(v), now, *it);
+				fail ("must fail");
+			}
+			catch(InvalidAccessException&){}
+
+			try
+			{
+				stmt = (*_pSession << "SELECT * FROM Vectors", into(v), *it, now);
+				fail ("must fail");
+			}
+			catch(InvalidAccessException&){}
+		}
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }

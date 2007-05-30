@@ -310,7 +310,7 @@ class InternalExtraction: public Extraction<C>
 	/// InternalExtraction objects can not be copied or assigned.
 {
 public:
-	explicit InternalExtraction(C& result, Column<T>* pColumn): 
+	explicit InternalExtraction(C& result, Column<T,C>* pColumn): 
 		Extraction<C>(result), 
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.
@@ -341,7 +341,7 @@ public:
 		}
 	}
 
-	const Column<T>& column() const
+	const Column<T,C>& column() const
 	{
 		return *_pColumn;
 	}
@@ -351,7 +351,7 @@ private:
 	InternalExtraction(const InternalExtraction&);
 	InternalExtraction& operator = (const InternalExtraction&);
 
-	Column<T>* _pColumn;
+	Column<T,C>* _pColumn;
 };
 
 

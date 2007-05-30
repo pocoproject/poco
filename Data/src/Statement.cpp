@@ -106,6 +106,14 @@ bool Statement::done()
 }
 
 
+bool Statement::canModifyStorage()
+{
+	return 0 == extractionCount() &&
+		(_ptr->getState() == StatementImpl::ST_INITIALIZED ||
+		_ptr->getState() == StatementImpl::ST_RESET);
+}
+
+
 Statement& Statement::reset(Session& session)
 {
 	Statement stmt(session.createStatementImpl());
@@ -114,9 +122,54 @@ Statement& Statement::reset(Session& session)
 }
 
 
+const std::string& Statement::getStorage() const
+{
+	switch (storage())
+	{
+	case STORAGE_VECTOR:
+		return StatementImpl::VECTOR;
+	case STORAGE_LIST:
+		return StatementImpl::LIST;
+	case STORAGE_DEQUE:
+		return StatementImpl::DEQUE;
+	case STORAGE_UNKNOWN:
+		return StatementImpl::UNKNOWN;
+	}
+
+	throw IllegalStateException("Invalid storage setting.");
+}
+
+
 void now(Statement& statement)
 {
 	statement.execute();
+}
+
+
+void vector(Statement& statement)
+{
+	if (!statement.canModifyStorage())
+		throw InvalidAccessException("Storage not modifiable.");
+
+	statement.setStorage("vector");
+}
+
+
+void list(Statement& statement)
+{
+	if (!statement.canModifyStorage())
+		throw InvalidAccessException("Storage not modifiable.");
+
+	statement.setStorage("list");
+}
+
+
+void deque(Statement& statement)
+{
+	if (!statement.canModifyStorage())
+		throw InvalidAccessException("Storage not modifiable.");
+
+	statement.setStorage("deque");
 }
 
 

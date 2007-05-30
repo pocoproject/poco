@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/SessionImpl.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/Extraction.h"
@@ -44,15 +45,26 @@
 #include "Poco/Exception.h"
 
 
+using Poco::icompare;
+
+
 namespace Poco {
 namespace Data {
 
 
-StatementImpl::StatementImpl():
+const std::string StatementImpl::VECTOR = "vector";
+const std::string StatementImpl::LIST = "list";
+const std::string StatementImpl::DEQUE = "deque";
+const std::string StatementImpl::UNKNOWN = "unknown";
+
+
+StatementImpl::StatementImpl(SessionImpl& rSession):
 	_state(ST_INITIALIZED),
 	_extrLimit(upperLimit((Poco::UInt32) Limit::LIMIT_UNLIMITED, false)),
 	_lowerLimit(0),
 	_columnsExtracted(0),
+	_rSession(rSession),
+	_storage(STORAGE_UNKNOWN_IMPL),
 	_ostr(),
 	_bindings()
 {
@@ -254,49 +266,138 @@ void StatementImpl::resetExtraction()
 }
 
 
+void StatementImpl::setStorage(const std::string& storage)
+{
+	if (0 == icompare(VECTOR, storage))
+		_storage = STORAGE_VECTOR_IMPL; 
+	else if (0 == icompare(LIST, storage))
+		_storage = STORAGE_LIST_IMPL;
+	else if (0 == icompare(DEQUE, storage))
+		_storage = STORAGE_DEQUE_IMPL;
+	else if (0 == icompare(UNKNOWN, storage))
+		_storage = STORAGE_UNKNOWN_IMPL;
+	else
+		throw NotFoundException();
+}
+
+
 void StatementImpl::makeExtractors(Poco::UInt32 count)
 {
+	std::string storage;
+	
+	switch (_storage)
+	{
+	case STORAGE_VECTOR_IMPL: storage = VECTOR; break;
+	case STORAGE_LIST_IMPL:   storage = LIST; break;
+	case STORAGE_DEQUE_IMPL:  storage = DEQUE; break;
+	case STORAGE_UNKNOWN_IMPL:
+		storage = AnyCast<std::string>(session().getProperty("storage")); 
+		break;
+	}
+
+	if ("" == storage) storage = VECTOR;
+
 	for (int i = 0; i < count; ++i)
 	{
 		const MetaColumn& mc = metaColumn(i);
 		switch (mc.type())
 		{
 			case MetaColumn::FDT_BOOL:
-			case MetaColumn::FDT_INT8:   
-				addInternalExtract<Int8, std::vector<Int8> >(mc); 
+			case MetaColumn::FDT_INT8:  
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<Int8, std::vector<Int8> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<Int8, std::list<Int8> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<Int8, std::deque<Int8> >(mc);
 				break;
 			case MetaColumn::FDT_UINT8:  
-				addInternalExtract<UInt8, std::vector<UInt8> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<UInt8, std::vector<UInt8> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<UInt8, std::list<UInt8> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<UInt8, std::deque<UInt8> >(mc);
 				break;
 			case MetaColumn::FDT_INT16:  
-				addInternalExtract<Int16, std::vector<Int16> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<Int16, std::vector<Int16> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<Int16, std::list<Int16> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<Int16, std::deque<Int16> >(mc);
 				break;
 			case MetaColumn::FDT_UINT16: 
-				addInternalExtract<UInt16, std::vector<UInt16> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<UInt16, std::vector<UInt16> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<UInt16, std::list<UInt16> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<UInt16, std::deque<UInt16> >(mc);
 				break;
 			case MetaColumn::FDT_INT32:  
-				addInternalExtract<Int32, std::vector<Int32> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<Int32, std::vector<Int32> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<Int32, std::list<Int32> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<Int32, std::deque<Int32> >(mc);
 				break;
 			case MetaColumn::FDT_UINT32: 
-				addInternalExtract<UInt32, std::vector<UInt32> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<UInt32, std::vector<UInt32> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<UInt32, std::list<UInt32> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<UInt32, std::deque<UInt32> >(mc);
 				break;
 			case MetaColumn::FDT_INT64:  
-				addInternalExtract<Int64, std::vector<Int64> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<Int64, std::vector<Int64> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<Int64, std::list<Int64> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<Int64, std::deque<Int64> >(mc); 
 				break;
 			case MetaColumn::FDT_UINT64: 
-				addInternalExtract<UInt64, std::vector<UInt64> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<UInt64, std::vector<UInt64> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<UInt64, std::list<UInt64> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<UInt64, std::deque<UInt64> >(mc);
 				break;
 			case MetaColumn::FDT_FLOAT:  
-				addInternalExtract<float, std::vector<float> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<float, std::vector<float> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<float, std::list<float> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<float, std::deque<float> >(mc);
 				break;
 			case MetaColumn::FDT_DOUBLE: 
-				addInternalExtract<double, std::vector<double> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<double, std::vector<double> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<double, std::list<double> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<double, std::deque<double> >(mc); 
 				break;
 			case MetaColumn::FDT_STRING: 
-				addInternalExtract<std::string, std::vector<std::string> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<std::string, std::vector<std::string> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<std::string, std::list<std::string> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<std::string, std::deque<std::string> >(mc);
 				break;
 			case MetaColumn::FDT_BLOB:   
-				addInternalExtract<BLOB, std::vector<BLOB> >(mc); 
+				if (0 == icompare(VECTOR, storage))
+					addInternalExtract<BLOB, std::vector<BLOB> >(mc); 
+				else if (0 == icompare(LIST, storage))
+					addInternalExtract<BLOB, std::list<BLOB> >(mc);
+				else if (0 == icompare(DEQUE, storage))
+					addInternalExtract<BLOB, std::deque<BLOB> >(mc);
 				break;
 			default:
 				throw Poco::InvalidArgumentException("Data type not supported.");

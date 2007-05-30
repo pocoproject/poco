@@ -35,6 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
+#include "Poco/Tuple.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
@@ -54,6 +55,7 @@ using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
+using Poco::Tuple;
 using Poco::NotFoundException;
 
 
@@ -811,6 +813,21 @@ void ODBCPostgreSQLTest::testInternalExtraction()
 }
 
 
+void ODBCPostgreSQLTest::testInternalStorageType()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->internalStorageType();
+		i += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::dropTable(const std::string& tableName)
 {
 	try
@@ -1068,6 +1085,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalStorageType);
 
 		return pSuite;
 	}

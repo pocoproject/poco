@@ -116,6 +116,8 @@ public:
 	void testTupleVector();
 
 	void testInternalExtraction();
+	void testInternalStorageType();
+
 	void testStoredProcedure();
 	void testStoredFunction();
 

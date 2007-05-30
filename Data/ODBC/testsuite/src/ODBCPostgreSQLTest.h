@@ -118,6 +118,7 @@ public:
 	void testTupleVector();
 
 	void testInternalExtraction();
+	void testInternalStorageType();
 
 	void setUp();
 	void tearDown();

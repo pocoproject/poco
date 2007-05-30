@@ -347,7 +347,7 @@ void DataTest::readFromBLOB(BinaryReader& reader)
 }
 
 
-void DataTest::testColumn()
+void DataTest::testColumnVector()
 {
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 
@@ -417,7 +417,156 @@ void DataTest::testColumn()
 	assert (c.rowCount() == 0);
 	assert (c1.rowCount() == 0);
 	assert (c2.rowCount() == 0);
+}
 
+
+void DataTest::testColumnDeque()
+{
+	typedef std::deque<int> ContainerType;
+	typedef Column<int, ContainerType> ColumnType;
+
+	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
+
+	assert (mc.name() == "mc");
+	assert (mc.position() == 0);
+	assert (mc.length() == 2);
+	assert (mc.precision() == 3);
+	assert (mc.type() == MetaColumn::FDT_DOUBLE);
+	assert (mc.isNullable());
+
+	ContainerType* pData = new ContainerType;
+	pData->push_back(1);
+	pData->push_back(2);
+	pData->push_back(3);
+	pData->push_back(4);
+	pData->push_back(5);
+	
+	ColumnType c(mc, pData);
+
+	assert (c.rowCount() == 5);
+	assert (c[0] == 1);
+	assert (c[1] == 2);
+	assert (c[2] == 3);
+	assert (c[3] == 4);
+	assert (c[4] == 5);
+	assert (c.name() == "mc");
+	assert (c.position() == 0);
+	assert (c.length() == 2);
+	assert (c.precision() == 3);
+	assert (c.type() == MetaColumn::FDT_DOUBLE);
+
+	try
+	{
+		int i = c[100];
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+
+	ColumnType c1 = c;
+
+	assert (c1.rowCount() == 5);
+	assert (c1[0] == 1);
+	assert (c1[1] == 2);
+	assert (c1[2] == 3);
+	assert (c1[3] == 4);
+	assert (c1[4] == 5);
+
+	ColumnType c2(c1);
+
+	assert (c2.rowCount() == 5);
+	assert (c2[0] == 1);
+	assert (c2[1] == 2);
+	assert (c2[2] == 3);
+	assert (c2[3] == 4);
+	assert (c2[4] == 5);
+
+	ContainerType vi;
+	vi.assign(c.begin(), c.end());
+	assert (vi.size() == 5);
+	assert (vi[0] == 1);
+	assert (vi[1] == 2);
+	assert (vi[2] == 3);
+	assert (vi[3] == 4);
+	assert (vi[4] == 5);
+
+	c.reset();
+	assert (c.rowCount() == 0);
+	assert (c1.rowCount() == 0);
+	assert (c2.rowCount() == 0);
+}
+
+
+void DataTest::testColumnList()
+{
+	typedef std::list<int> ContainerType;
+	typedef Column<int, ContainerType> ColumnType;
+
+	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
+
+	assert (mc.name() == "mc");
+	assert (mc.position() == 0);
+	assert (mc.length() == 2);
+	assert (mc.precision() == 3);
+	assert (mc.type() == MetaColumn::FDT_DOUBLE);
+	assert (mc.isNullable());
+
+	ContainerType* pData = new ContainerType;
+	pData->push_back(1);
+	pData->push_back(2);
+	pData->push_back(3);
+	pData->push_back(4);
+	pData->push_back(5);
+	
+	ColumnType c(mc, pData);
+
+	assert (c.rowCount() == 5);
+	assert (c[0] == 1);
+	assert (c[1] == 2);
+	assert (c[2] == 3);
+	assert (c[3] == 4);
+	assert (c[4] == 5);
+	assert (c.name() == "mc");
+	assert (c.position() == 0);
+	assert (c.length() == 2);
+	assert (c.precision() == 3);
+	assert (c.type() == MetaColumn::FDT_DOUBLE);
+
+	try
+	{
+		int i = c[100];
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+
+	ColumnType c1 = c;
+
+	assert (c1.rowCount() == 5);
+	assert (c1[0] == 1);
+	assert (c1[1] == 2);
+	assert (c1[2] == 3);
+	assert (c1[3] == 4);
+	assert (c1[4] == 5);
+
+	ColumnType c2(c1);
+	assert (c2.rowCount() == 5);
+	assert (c2[0] == 1);
+	assert (c2[1] == 2);
+	assert (c2[2] == 3);
+	assert (c2[3] == 4);
+	assert (c2[4] == 5);
+
+	ContainerType vi;
+	vi.assign(c.begin(), c.end());
+	assert (vi.size() == 5);
+	ContainerType::const_iterator it = vi.begin();
+	ContainerType::const_iterator end = vi.end();
+	for (int i = 1; it != end; ++it, ++i)
+		assert (*it == i);
+
+	c.reset();
+	assert (c.rowCount() == 0);
+	assert (c1.rowCount() == 0);
+	assert (c2.rowCount() == 0);
 }
 
 
@@ -440,7 +589,9 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testProperties);
 	CppUnit_addTest(pSuite, DataTest, testBLOB);
 	CppUnit_addTest(pSuite, DataTest, testBLOBStreams);
-	CppUnit_addTest(pSuite, DataTest, testColumn);
+	CppUnit_addTest(pSuite, DataTest, testColumnVector);
+	CppUnit_addTest(pSuite, DataTest, testColumnDeque);
+	CppUnit_addTest(pSuite, DataTest, testColumnList);
 
 	return pSuite;
 }

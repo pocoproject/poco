@@ -126,6 +126,7 @@ public:
 	void tupleVector();
 
 	void internalExtraction();
+	void internalStorageType();
 
 private:
 	Poco::Data::Session* _pSession;

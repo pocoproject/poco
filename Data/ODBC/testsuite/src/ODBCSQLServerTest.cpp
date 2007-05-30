@@ -35,6 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
+#include "Poco/Tuple.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
@@ -54,6 +55,7 @@ using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
+using Poco::Tuple;
 using Poco::NotFoundException;
 
 
@@ -829,11 +831,147 @@ void ODBCSQLServerTest::testInternalExtraction()
 }
 
 
-void ODBCSQLServerTest::dropTable(const std::string& tableName)
+void ODBCSQLServerTest::testInternalStorageType()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->internalStorageType();
+		i += 2;
+	}
+}
+
+
+void ODBCSQLServerTest::testStoredProcedure()
+{
+	dropObject("PROCEDURE", "storedProcedure");
+
+	*_pSession << "CREATE PROCEDURE storedProcedure "
+	"@outParam int = 0 OUTPUT "
+	"AS "
+	"SET @outParam = -1 "
+	, now;
+	
+	int i = 0;
+	*_pSession << "{call storedProcedure(?)}", out(i), now;
+	assert(-1 == i);
+	dropObject("PROCEDURE", "storedProcedure");
+
+	*_pSession << "CREATE PROCEDURE storedProcedure "
+	"@inParam int, "
+	"@outParam int = 0 OUTPUT "
+	"AS "
+	"SET @outParam = @inParam*@inParam "
+	, now;
+
+	i = 2;
+	int j = 0;
+	/*not working */
+	try{
+		*_pSession << "{call storedProcedure(2, ?)}", out(j), now;
+	}catch(StatementException& ex)
+	{
+		std::cout << ex.toString();
+	}
+	//assert(4 == j);
+	dropObject("PROCEDURE", "storedProcedure");
+
+	*_pSession << "CREATE PROCEDURE storedProcedure "
+	"@ioParam int "
+	"AS "
+	"SET @ioParam = @ioParam*@ioParam "
+	, now;
+
+	i = 2;
+	/*not working*/
+	try{
+		*_pSession << "{call storedProcedure(?)}", io(i), now;
+	}catch(StatementException& ex)
+	{
+		std::cout << ex.toString();
+	}
+	//assert(4 == i);
+	dropObject("PROCEDURE", "storedProcedure");
+}
+
+
+void ODBCSQLServerTest::testStoredFunction()
+{
+	dropObject("PROCEDURE", "storedFunction");
+	*_pSession << "CREATE PROCEDURE storedFunction "
+	"AS "
+	"DECLARE @retVal int "
+	"SET @retVal = -1 "
+	"RETURN @retVal"
+	, now;
+
+	int i = 0;
+	*_pSession << "{? = call storedFunction}", out(i), now;
+
+	assert(-1 == i);
+	dropObject("PROCEDURE", "storedFunction");
+
+	/*TODO
+	*_pSession << "CREATE OR REPLACE "
+		"FUNCTION storedFunction(inParam IN NUMBER) RETURN NUMBER IS "
+		" BEGIN RETURN(inParam*inParam); "
+		" END storedFunction;" , now;
+
+	i = 2;
+	int result = 0;
+	*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+	assert(4 == result);
+	*_pSession << "DROP FUNCTION storedFunction;", now;
+
+	*_pSession << "CREATE OR REPLACE "
+		"FUNCTION storedFunction(inParam IN NUMBER, outParam OUT NUMBER) RETURN NUMBER IS "
+		" BEGIN outParam := inParam*inParam; RETURN(outParam); "
+		" END storedFunction;" , now;
+
+	i = 2;
+	int j = 0;
+	result = 0;
+	*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
+	assert(4 == j);
+	assert(j == result); 
+	*_pSession << "DROP FUNCTION storedFunction;", now;
+
+	*_pSession << "CREATE OR REPLACE "
+		"FUNCTION storedFunction(param1 IN OUT NUMBER, param2 IN OUT NUMBER) RETURN NUMBER IS "
+		" temp NUMBER := param1; "
+		" BEGIN param1 := param2; param2 := temp; RETURN(param1+param2); "
+		" END storedFunction;" , now;
+
+	i = 1;
+	j = 2;
+	result = 0;
+	*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
+	assert(1 == j);
+	assert(2 == i);
+	assert(3 == result); 
+	
+	Tuple<int, int> params(1, 2);
+	assert(1 == params.get<0>());
+	assert(2 == params.get<1>());
+	result = 0;
+	*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
+	assert(1 == params.get<1>());
+	assert(2 == params.get<0>());
+	assert(3 == result); 
+	*_pSession << "DROP FUNCTION storedFunction;", now;
+	*/
+}
+
+
+void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
 	{
-		*_pSession << format("DROP TABLE %s", tableName), now;
+		*_pSession << format("DROP %s %s", type, name), now;
 	}
 	catch (StatementException& ex)
 	{
@@ -856,7 +994,7 @@ void ODBCSQLServerTest::dropTable(const std::string& tableName)
 
 void ODBCSQLServerTest::recreatePersonTable()
 {
-	dropTable("Person");
+	dropObject("TABLE", "Person");
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
@@ -865,7 +1003,7 @@ void ODBCSQLServerTest::recreatePersonTable()
 
 void ODBCSQLServerTest::recreatePersonBLOBTable()
 {
-	dropTable("Person");
+	dropObject("TABLE", "Person");
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(MAX))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
@@ -874,7 +1012,7 @@ void ODBCSQLServerTest::recreatePersonBLOBTable()
 
 void ODBCSQLServerTest::recreateIntsTable()
 {
-	dropTable("Strings");
+	dropObject("TABLE", "Strings");
 	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
@@ -883,7 +1021,7 @@ void ODBCSQLServerTest::recreateIntsTable()
 
 void ODBCSQLServerTest::recreateStringsTable()
 {
-	dropTable("Strings");
+	dropObject("TABLE", "Strings");
 	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
@@ -892,7 +1030,7 @@ void ODBCSQLServerTest::recreateStringsTable()
 
 void ODBCSQLServerTest::recreateFloatsTable()
 {
-	dropTable("Strings");
+	dropObject("TABLE", "Strings");
 	try { *_pSession << "CREATE TABLE Strings (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
@@ -901,7 +1039,7 @@ void ODBCSQLServerTest::recreateFloatsTable()
 
 void ODBCSQLServerTest::recreateTuplesTable()
 {
-	dropTable("Tuples");
+	dropObject("TABLE", "Tuples");
 	try { *_pSession << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
@@ -913,7 +1051,7 @@ void ODBCSQLServerTest::recreateTuplesTable()
 
 void ODBCSQLServerTest::recreateVectorTable()
 {
-	dropTable("Vector");
+	dropObject("TABLE", "Vector");
 	try { *_pSession << "CREATE TABLE Vector (i0 INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorTable()"); }
@@ -922,7 +1060,7 @@ void ODBCSQLServerTest::recreateVectorTable()
 
 void ODBCSQLServerTest::recreateVectorsTable()
 {
-	dropTable("Vectors");
+	dropObject("TABLE", "Vectors");
 	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
@@ -981,9 +1119,9 @@ void ODBCSQLServerTest::setUp()
 
 void ODBCSQLServerTest::tearDown()
 {
-	dropTable("Person");
-	dropTable("Strings");
-	dropTable("Tuples");
+	dropObject("TABLE", "Person");
+	dropObject("TABLE", "Strings");
+	dropObject("TABLE", "Tuples");
 }
 
 
@@ -1068,7 +1206,10 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDouble);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTupleVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedure);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalStorageType);
 
 		return pSuite;
 	}
