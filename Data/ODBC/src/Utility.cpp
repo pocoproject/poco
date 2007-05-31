@@ -38,6 +38,8 @@
 #include "Poco/Data/ODBC/Handle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/DateTime.h"
+#include <cmath>
 
 
 namespace Poco {
@@ -119,6 +121,34 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 		throw EnvironmentError(henv);
 
 	return dsnMap;
+}
+
+
+void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
+{
+	double msec = ts.fraction/1000000;
+	double usec = 1000 * (msec - floor(msec));
+
+	dt.assign(ts.year, 
+		ts.month, 
+		ts.day, 
+		ts.hour, 
+		ts.minute, 
+		ts.second, 
+		(int) floor(msec),
+		(int) floor(usec));
+}
+
+
+void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
+{
+	ts.year = dt.year();
+	ts.month = dt.month();
+	ts.day = dt.day();
+	ts.hour = dt.hour();
+	ts.minute = dt.minute();
+	ts.second = dt.second();
+	ts.fraction = (dt.millisecond() * 1000000) + (dt.microsecond() * 1000);
 }
 
 

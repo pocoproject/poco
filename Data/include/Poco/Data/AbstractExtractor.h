@@ -45,8 +45,10 @@
 
 
 namespace Poco {
-namespace Data {
 
+class DateTime;
+
+namespace Data {
 
 class BLOB;
 
@@ -103,6 +105,9 @@ public:
 
 	virtual bool extract(std::size_t pos, BLOB& val) = 0;
 		/// Extracts a BLOB. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, DateTime& val) = 0;
+		/// Extracts a DateTime. Returns false if null was received.
 };
 
 

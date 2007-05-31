@@ -36,6 +36,7 @@
 #include "Poco/String.h"
 #include "Poco/Tuple.h"
 #include "Poco/Format.h"
+#include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
@@ -56,6 +57,7 @@ using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
+using Poco::DateTime;
 using Poco::NotFoundException;
 
 
@@ -752,6 +754,21 @@ void ODBCOracleTest::testBLOBStmt()
 }
 
 
+void ODBCOracleTest::testDateTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonDateTimeTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->dateTime();
+		i += 2;
+	}
+}
+
+
 void ODBCOracleTest::testFloat()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -884,6 +901,19 @@ void ODBCOracleTest::testStoredProcedure()
 
 		k += 2;
 	}
+
+	//DateTime io params only for autoBind for now
+	_pSession->setFeature("autoBind", true);
+
+	*_pSession << "CREATE OR REPLACE "
+			"PROCEDURE storedProcedure(ioParam IN OUT DATE) IS "
+			" BEGIN ioParam := ioParam + 1; "
+			" END storedProcedure;" , now;
+
+	DateTime dt(1965, 6, 18, 5, 35, 1);
+	*_pSession << "{call storedProcedure(?)}", io(dt), now;
+	assert(19 == dt.day());
+	*_pSession << "DROP PROCEDURE storedProcedure;", now;
 }
 
 
@@ -951,7 +981,7 @@ void ODBCOracleTest::testStoredFunction()
 		assert(3 == result); 
 		*_pSession << "DROP FUNCTION storedFunction;", now;
 
-		k = k + 2;
+		k += 2;
 	}
 }
 
@@ -996,6 +1026,15 @@ void ODBCOracleTest::recreatePersonBLOBTable()
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
+}
+
+
+void ODBCOracleTest::recreatePersonDateTimeTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
 
 
@@ -1201,6 +1240,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDouble);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);

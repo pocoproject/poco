@@ -163,6 +163,8 @@ void ODBCStatementImpl::bindImpl()
 
 	if (SQL_NEED_DATA == rc) putData();
 	else checkError(rc, "SQLExecute()");
+
+	_pBinder->sync(Binder::PD_OUT);
 }
 
 

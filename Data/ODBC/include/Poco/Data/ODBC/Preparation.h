@@ -47,6 +47,7 @@
 #include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Any.h"
+#include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <vector>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -143,6 +144,9 @@ public:
 	void prepare(std::size_t pos, const Poco::Data::BLOB&);
 		/// Prepares a BLOB.
 
+	void prepare(std::size_t pos, const Poco::DateTime&);
+		/// Prepares a DateTime.
+
 	void prepare(std::size_t pos, const Poco::Any&);
 		/// Prepares an Any.
 
@@ -202,7 +206,31 @@ private:
 		}
 	}
 
-	void prepareRaw(std::size_t pos, SQLSMALLINT valueType, std::size_t size);
+	template <typename T>
+	void prepareRaw(std::size_t pos, SQLSMALLINT valueType, std::size_t size)
+	{
+		poco_assert (DE_BOUND == _dataExtraction);
+		poco_assert (pos >= 0 && pos < _pValues.size());
+
+		T* pChr = new T[size]; 
+		poco_assert_dbg (pChr);
+		memset(pChr, 0, size);
+
+		SharedPtr<T> sp = pChr; 
+		_pValues[pos] = new Any(sp);
+		_pLengths[pos] = new SQLLEN;
+		*_pLengths[pos] = (SQLLEN) size;
+
+		if (Utility::isError(SQLBindCol(_rStmt, 
+			(SQLUSMALLINT) pos + 1, 
+			valueType, 
+			(SQLPOINTER) pChr, 
+			(SQLINTEGER) size, 
+			_pLengths[pos])))
+		{
+			throw StatementException(_rStmt, "SQLBindCol()");
+		}
+	}
 
 	const StatementHandle& _rStmt;
 	std::vector<Poco::Any*> _pValues;
@@ -289,13 +317,21 @@ inline void Preparation::prepare(std::size_t pos, char)
 
 inline void Preparation::prepare(std::size_t pos, const std::string&)
 {
-	prepareRaw(pos, SQL_C_CHAR, maxDataSize(pos));
+	prepareRaw<char>(pos, SQL_C_CHAR, maxDataSize(pos));
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const Poco::Data::BLOB&)
 {
-	prepareRaw(pos, SQL_C_BINARY, maxDataSize(pos));
+	prepareRaw<char>(pos, SQL_C_BINARY, maxDataSize(pos));
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const Poco::DateTime&)
+{
+	prepareRaw<SQL_TIMESTAMP_STRUCT>(pos, 
+		SQL_C_TYPE_TIMESTAMP, 
+		sizeof(SQL_TIMESTAMP_STRUCT));
 }
 
 

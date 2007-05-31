@@ -36,6 +36,7 @@
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
+#include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
@@ -62,6 +63,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
+using Poco::DateTime;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 using Poco::BadCastException;
@@ -1724,6 +1726,32 @@ void SQLExecutor::blobStmt()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	poco_assert (res == blob);
 }
+
+
+void SQLExecutor::dateTime()
+{
+	std::string funct = "dateTime()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+
+	DateTime born(1965, 6, 18, 5, 35, 1);
+	int count = 0;
+	try { *_pSession << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(born), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	DateTime res;
+	try { *_pSession << "SELECT Born FROM Person", into(res), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (res == born);
+}
+
 
 void SQLExecutor::tuples()
 {

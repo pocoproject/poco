@@ -255,11 +255,11 @@ private:
 	Limit                 _extrLimit;
 	Poco::UInt32          _lowerLimit;
 	int                   _columnsExtracted;
+	SessionImpl&          _rSession;
+	Storage               _storage;
 	std::ostringstream    _ostr;
 	AbstractBindingVec    _bindings;
 	AbstractExtractionVec _extractors;
-	SessionImpl&          _rSession;
-	Storage               _storage;
 
 	friend class Statement; 
 };

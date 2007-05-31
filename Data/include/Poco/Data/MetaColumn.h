@@ -67,6 +67,7 @@ public:
 		FDT_DOUBLE,
 		FDT_STRING,
 		FDT_BLOB,
+		FDT_TIMESTAMP,
 		FDT_UNKNOWN
 	};
 

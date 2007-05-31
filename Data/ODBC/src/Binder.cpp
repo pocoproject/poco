@@ -38,6 +38,7 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/ODBC/ODBCException.h"
+#include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include <sql.h>
 
@@ -56,14 +57,21 @@ Binder::Binder(const StatementHandle& rStmt, Binder::ParameterBinding dataBindin
 
 Binder::~Binder()
 {
-	std::vector<SQLLEN*>::iterator it = _lengthIndicator.begin();
-	std::vector<SQLLEN*>::iterator itEnd = _lengthIndicator.end();
-	for(; it != itEnd; ++it) delete *it;
+	LengthVec::iterator itLen = _lengthIndicator.begin();
+	LengthVec::iterator itLenEnd = _lengthIndicator.end();
+	for(; itLen != itLenEnd; ++itLen) delete *itLen;
+
+	TimestampMap::iterator itTS = _timestamps.begin();
+	TimestampMap::iterator itTSEnd = _timestamps.end();
+	for(; itTS != itTSEnd; ++itTS) delete itTS->first;
 }
 
 
 void Binder::bind(std::size_t pos, const std::string& val)
 {
+	if (isOutBound())
+		throw InvalidAccessException("std::string can only be in-bound");
+
 	SQLINTEGER size = (SQLINTEGER) val.size();
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn = SQL_NTS;
@@ -85,38 +93,72 @@ void Binder::bind(std::size_t pos, const std::string& val)
 		(SQLINTEGER) size, 
 		_lengthIndicator.back())))
 	{
-		throw StatementException(_rStmt, 
-				"SQLBindParameter()");
+		throw StatementException(_rStmt, "SQLBindParameter(std::string)");
 	}
 }
 
 
 void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 {
-		SQLINTEGER size = (SQLINTEGER) val.size();
-		SQLLEN* pLenIn = new SQLLEN;
-		*pLenIn  = size;
+	if (isOutBound())
+		throw InvalidAccessException("BLOB can only be in-bound");
 
-		if (PB_AT_EXEC == _paramBinding)
-			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
+	SQLINTEGER size = (SQLINTEGER) val.size();
+	SQLLEN* pLenIn = new SQLLEN;
+	*pLenIn  = size;
 
-		_lengthIndicator.push_back(pLenIn);
-		_dataSize.insert(SizeMap::value_type((SQLPOINTER) val.rawContent(), size));
+	if (PB_AT_EXEC == _paramBinding)
+		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			SQL_PARAM_INPUT, 
-			SQL_C_BINARY, 
-			SQL_LONGVARBINARY, 
-			(SQLUINTEGER) size,
-			0,
-			(SQLPOINTER) val.rawContent(), 
-			(SQLINTEGER) size, 
-			_lengthIndicator.back())))
-		{
-			throw StatementException(_rStmt, 
-				"SQLBindParameter()");
-		}
+	_lengthIndicator.push_back(pLenIn);
+	_dataSize.insert(SizeMap::value_type((SQLPOINTER) val.rawContent(), size));
+
+	if (Utility::isError(SQLBindParameter(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		SQL_PARAM_INPUT, 
+		SQL_C_BINARY, 
+		SQL_LONGVARBINARY, 
+		(SQLUINTEGER) size,
+		0,
+		(SQLPOINTER) val.rawContent(), 
+		(SQLINTEGER) size, 
+		_lengthIndicator.back())))
+	{
+		throw StatementException(_rStmt, "SQLBindParameter(BLOB)");
+	}
+}
+
+
+void Binder::bind(std::size_t pos, const Poco::DateTime& val)
+{
+	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
+	SQLLEN* pLenIn = new SQLLEN;
+	*pLenIn  = size;
+
+	if (PB_AT_EXEC == _paramBinding)
+		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
+
+	_lengthIndicator.push_back(pLenIn);
+
+	SQL_TIMESTAMP_STRUCT* pTS = new SQL_TIMESTAMP_STRUCT;
+	Utility::dateTimeSync(*pTS, val);
+	
+	_timestamps.insert(TimestampMap::value_type(pTS, const_cast<DateTime*>(&val)));
+	_dataSize.insert(SizeMap::value_type((SQLPOINTER) pTS, size));
+
+	if (Utility::isError(SQLBindParameter(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		getParamType(), 
+		SQL_C_TIMESTAMP, 
+		SQL_TIMESTAMP, 
+		(SQLUINTEGER) size,
+		0,
+		(SQLPOINTER) pTS, 
+		(SQLINTEGER) size, 
+		_lengthIndicator.back())))
+	{
+		throw StatementException(_rStmt, "SQLBindParameter(BLOB)");
+	}
 }
 
 
@@ -132,6 +174,34 @@ std::size_t Binder::dataSize(SQLPOINTER pAddr) const
 void Binder::bind(std::size_t pos, const char* const &pVal)
 {
 	//no-op
+}
+
+
+SQLSMALLINT Binder::getParamType() const
+{
+	bool in = isInBound();
+	bool out = isOutBound();
+	SQLSMALLINT ioType = SQL_PARAM_TYPE_UNKNOWN;
+	if (in && out) ioType = SQL_PARAM_INPUT_OUTPUT; 
+	else if(in)    ioType = SQL_PARAM_INPUT;
+	else if(out)   ioType = SQL_PARAM_OUTPUT;
+	else throw Poco::IllegalStateException("Binder not bound (must be [in] OR [out]).");
+
+	return ioType;
+}
+
+
+void Binder::sync(Binder::Direction direction)
+{
+	TimestampMap::iterator itTS = _timestamps.begin();
+	TimestampMap::iterator itTSEnd = _timestamps.end();
+	for(; itTS != itTSEnd; ++itTS) 
+	{
+		if (PD_OUT == direction) // SQL_TIMESTAMP_STRUCT => DateTime
+			Utility::dateTimeSync(*itTS->second, *itTS->first);
+		else // DateTime => SQL_TIMESTAMP_STRUCT
+			Utility::dateTimeSync(*itTS->first, *itTS->second);
+	}
 }
 
 

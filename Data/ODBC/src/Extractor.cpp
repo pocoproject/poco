@@ -40,7 +40,6 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Exception.h"
-#include <memory>
 
 
 namespace Poco {
@@ -88,6 +87,18 @@ bool Extractor::extractBoundImpl<Poco::Data::BLOB>(std::size_t pos, Poco::Data::
 	checkDataSize(dataSize);
 	SharedPtr<char>& sp = RefAnyCast<SharedPtr<char> >(_rPreparation[pos]);
 	val.assignRaw(sp, dataSize);
+	return true;
+}
+
+
+template<>
+bool Extractor::extractBoundImpl<Poco::DateTime>(std::size_t pos, Poco::DateTime& val)
+{
+	std::size_t dataSize = _rPreparation.actualDataSize(pos);
+	checkDataSize(dataSize);
+	SharedPtr<SQL_TIMESTAMP_STRUCT>& sp = RefAnyCast<SharedPtr<SQL_TIMESTAMP_STRUCT> >(_rPreparation[pos]);
+	
+	Utility::dateTimeSync(val, *sp);
 	return true;
 }
 
@@ -186,6 +197,33 @@ bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
 }
 
 
+template<>
+bool Extractor::extractManualImpl<Poco::DateTime>(std::size_t pos, 
+	Poco::DateTime& val, 
+	SQLSMALLINT cType)
+{
+	SQLLEN len = 0;
+	SQL_TIMESTAMP_STRUCT ts;
+
+	SQLRETURN rc = SQLGetData(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		cType, //C data type
+		&ts, //returned value
+		sizeof(ts), //buffer length
+		&len); //length indicator
+	
+	if (Utility::isError(rc))
+		throw StatementException(_rStmt, "SQLGetData()");
+
+	if (SQL_NULL_DATA == len) 
+		val.assign(0,0,0,0,0,0);
+	else 
+		Utility::dateTimeSync(val, ts);
+
+	return true;
+}
+
+
 bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 {
 	if (Preparation::DE_MANUAL == _dataExtraction)
@@ -227,6 +265,15 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
 	if (Preparation::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_BINARY);
+	else
+		return extractBoundImpl(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::DateTime& val)
+{
+	if (Preparation::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_TIMESTAMP);
 	else
 		return extractBoundImpl(pos, val);
 }
@@ -357,6 +404,9 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 
 		case MetaColumn::FDT_BLOB:
 		{ Poco::Data::BLOB b; extract(pos, b); val = b; return true; }
+
+		case MetaColumn::FDT_TIMESTAMP:
+		{ Poco::DateTime b; extract(pos, b); val = b; return true; }
 
 		default: 
 			throw DataFormatException("Unsupported data type.");

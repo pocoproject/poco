@@ -46,8 +46,11 @@
 
 
 namespace Poco {
-namespace Data {
 
+class DateTime;
+class Any;
+
+namespace Data {
 
 class BLOB;
 
@@ -106,6 +109,12 @@ public:
 
 	virtual void prepare(std::size_t pos, const BLOB&) = 0;
 		/// Prepares a BLOB.
+
+	virtual void prepare(std::size_t pos, const DateTime&) = 0;
+		/// Prepares a DateTime.
+
+	virtual void prepare(std::size_t pos, const Any&) = 0;
+		/// Prepares an Any.
 };
 
 

@@ -45,8 +45,10 @@
 
 
 namespace Poco {
-namespace Data {
 
+class DateTime;
+
+namespace Data {
 
 class BLOB;
 
@@ -106,6 +108,9 @@ public:
 
 	virtual void bind(std::size_t pos, const BLOB& val) = 0;
 		/// Binds a BLOB.
+
+	virtual void bind(std::size_t pos, const DateTime& val) = 0;
+		/// Binds a DateTime.
 
 	bool isInBound() const;
 		/// Returns true if binder is in-bound.

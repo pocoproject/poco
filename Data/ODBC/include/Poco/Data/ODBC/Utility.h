@@ -42,6 +42,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/DataTypes.h"
+#include "Poco/DateTime.h"
 #include <sstream>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
@@ -92,6 +93,12 @@ public:
 
 	static int sqlDataType(int cDataType);
 		/// Returns SQL data type corresponding to supplied C data type.
+
+	static void dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts);
+		/// Transfers data from ODBC SQL_TIMESTAMP_STRUCT to Poco::DateTime.
+
+	static void dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt);
+		/// Transfers data from Poco::DateTime to ODBC SQL_TIMESTAMP_STRUCT.
 
 	static const SQLSMALLINT boolDataType;
 		/// ODBC size for bool data type.

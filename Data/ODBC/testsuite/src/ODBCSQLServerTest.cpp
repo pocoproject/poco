@@ -756,6 +756,21 @@ void ODBCSQLServerTest::testBLOBStmt()
 }
 
 
+void ODBCSQLServerTest::testDateTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonDateTimeTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->dateTime();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLServerTest::testFloat()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -868,6 +883,7 @@ void ODBCSQLServerTest::testStoredProcedure()
 	"SET @outParam = @inParam*@inParam "
 	, now;
 
+	fail("TODO");
 	i = 2;
 	int j = 0;
 	/*not working */
@@ -1007,6 +1023,15 @@ void ODBCSQLServerTest::recreatePersonBLOBTable()
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(MAX))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
+}
+
+
+void ODBCSQLServerTest::recreatePersonDateTimeTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
 
 
@@ -1202,6 +1227,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDouble);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTuple);

@@ -46,6 +46,8 @@
 #include "Poco/Data/ODBC/ODBCColumn.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/DateTime.h"
+#include "Poco/Any.h"
 #include "Poco/Exception.h"
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -112,6 +114,9 @@ public:
 
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
+
+	bool extract(std::size_t pos, Poco::DateTime& val);
+		/// Extracts a DateTime.
 	
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
@@ -124,10 +129,10 @@ public:
 
 private:
 	static const int CHUNK_SIZE = 1024;
-	/// Amount of data retrieved in one SQLGetData() request when doing manual extract.
+		/// Amount of data retrieved in one SQLGetData() request when doing manual extract.
 
 	static const std::string FLD_SIZE_EXCEEDED_FMT;
-	/// String format for the exception message when the field size is exceeded.
+		/// String format for the exception message when the field size is exceeded.
 
 	void checkDataSize(std::size_t size);
 		/// This check is only performed for bound data

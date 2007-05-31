@@ -87,32 +87,6 @@ Poco::Any& Preparation::operator [] (std::size_t pos)
 }
 
 
-void Preparation::prepareRaw(std::size_t pos, SQLSMALLINT valueType, std::size_t size)
-{
-	poco_assert (DE_BOUND == _dataExtraction);
-	poco_assert (pos >= 0 && pos < _pValues.size());
-
-	char* pChr = new char[size]; 
-	poco_assert_dbg (pChr);
-	memset(pChr, 0, size);
-
-	SharedPtr<char> sp = pChr; 
-	_pValues[pos] = new Any(sp);
-	_pLengths[pos] = new SQLLEN;
-	*_pLengths[pos] = (SQLLEN) size;
-
-	if (Utility::isError(SQLBindCol(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		valueType, 
-		(SQLPOINTER) pChr, 
-		(SQLINTEGER) size, 
-		_pLengths[pos])))
-	{
-		throw StatementException(_rStmt, "SQLBindCol()");
-	}
-}
-
-
 void Preparation::prepare(std::size_t pos, const Poco::Any&)
 {
 	ODBCColumn col(_rStmt, pos);
@@ -153,16 +127,14 @@ void Preparation::prepare(std::size_t pos, const Poco::Any&)
 			return preparePOD<float>(pos, SQL_C_DOUBLE);
 
 		case MetaColumn::FDT_STRING:
-			return prepareRaw(pos, SQL_C_CHAR, maxDataSize(pos));
+			return prepareRaw<char>(pos, SQL_C_CHAR, maxDataSize(pos));
 
 		case MetaColumn::FDT_BLOB:
-			return prepareRaw(pos, SQL_C_BINARY, maxDataSize(pos));
+			return prepareRaw<char>(pos, SQL_C_BINARY, maxDataSize(pos));
 
 		default: 
 			throw DataFormatException("Unsupported data type.");
 	}
-
-	prepareRaw(pos, SQL_C_BINARY, maxDataSize(pos));
 }
 
 

@@ -54,7 +54,7 @@ namespace Data {
 template <class T, class C = std::vector<T> >
 class Column
 	/// Column class is column data container.
-	/// Data (a pointer to vector of contained values) is assigned to the class 
+	/// Data (a pointer to container) is assigned to the class 
 	/// through either constructor or set() member function.
 	/// Construction with null pointer is not allowed.
 	/// This class owns the data assigned to it and deletes the storage on destruction.
@@ -62,6 +62,7 @@ class Column
 public:
 	typedef C Container;
 	typedef typename Container::const_iterator Iterator;
+	typedef typename Container::const_reverse_iterator RIterator;
 	typedef typename Container::size_type Size;
 
 	Column(const MetaColumn& metaColumn, C* pData): _metaColumn(metaColumn), _pData(pData)
@@ -190,6 +191,7 @@ class Column<T, std::list<T> >
 public:
 	typedef std::list<T> List;
 	typedef typename List::const_iterator Iterator;
+	typedef typename List::const_reverse_iterator RIterator;
 	typedef typename List::size_type Size;
 
 	Column(const MetaColumn& metaColumn, std::list<T>* pData): _metaColumn(metaColumn), _pData(pData)
@@ -231,11 +233,30 @@ public:
 
 	const T& value(std::size_t row) const
 		/// Returns the field value in specified row.
+		/// This is the std::list specialization and std::list
+		/// is not the optimal solution for cases where random 
+		/// access is needed.
+		/// However, to allow for compatibility with other
+		/// containers, this functionality is provided here.
+		/// To alleviate the problem, an effort is made
+		/// to start iteration from beginning or end,
+		/// depending on the position requested.
 	{
-		List::const_iterator it = _pData->begin();
-		List::const_iterator end = _pData->end();
-		for (int i = 0; it != end; ++it, ++i)
-			if (i == row) return *it;
+		if (row <= (std::size_t) (_pData->size() / 2))
+		{
+			Iterator it = _pData->begin();
+			Iterator end = _pData->end();
+			for (int i = 0; it != end; ++it, ++i)
+				if (i == row) return *it;
+		}
+		else
+		{
+			row = _pData->size() - row;
+			RIterator it = _pData->rbegin();
+			RIterator end = _pData->rend();
+			for (int i = 1; it != end; ++it, ++i)
+				if (i == row) return *it;
+		}
 
 		throw RangeException("Invalid row number."); 
 	}

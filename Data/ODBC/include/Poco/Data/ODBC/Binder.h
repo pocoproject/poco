@@ -47,7 +47,10 @@
 #include "Poco/Data/ODBC/Parameter.h"
 #include "Poco/Data/ODBC/ODBCColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/DateTime.h"
 #include "Poco/Exception.h"
+#include <vector>
+#include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -67,6 +70,12 @@ public:
 	{
 		PB_IMMEDIATE,
 		PB_AT_EXEC
+	};
+
+	enum Direction
+	{
+		PD_IN,
+		PD_OUT
 	};
 
 	Binder(const StatementHandle& rStmt,
@@ -118,6 +127,9 @@ public:
 	void bind(std::size_t pos, const Poco::Data::BLOB& val);
 		/// Binds a BLOB.
 
+	void bind(std::size_t pos, const Poco::DateTime& val);
+		/// Binds a DateTime.
+
 	void setDataBinding(ParameterBinding binding);
 		/// Set data binding type.
 
@@ -127,13 +139,20 @@ public:
 	std::size_t dataSize(SQLPOINTER pAddr) const;
 		/// Returns bound data size for parameter at specified position.
 
+	void sync(Direction direction);
+		/// Synchronizes non-POD parameters.
+
 private:
+	typedef std::vector<SQLLEN*> LengthVec;
+	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*> TimestampMap;
 	typedef std::map<SQLPOINTER, SQLLEN> SizeMap;
 
 	void bind(std::size_t pos, const char* const &pVal);
 		/// Binds a const char ptr. 
 		/// This is a private no-op in this implementation
 		/// due to security risk.
+
+	SQLSMALLINT getParamType() const;
 
 	template <typename T>
 	void bindImpl(std::size_t pos, T& val, SQLSMALLINT cDataType)
@@ -165,17 +184,9 @@ private:
 			catch (StatementException&) { }
 		}
 
-		bool in = isInBound();
-		bool out = isOutBound();
-		SQLSMALLINT ioType = SQL_PARAM_TYPE_UNKNOWN;
-		if (in && out) ioType = SQL_PARAM_INPUT_OUTPUT; 
-		else if(in)    ioType = SQL_PARAM_INPUT;
-		else if(out)   ioType = SQL_PARAM_OUTPUT;
-		else throw Poco::IllegalStateException("Binder not bound (must be [in] OR [out]).");
-
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
-			ioType, 
+			getParamType(), 
 			cDataType, 
 			sqlDataType, 
 			columnSize,
@@ -189,9 +200,10 @@ private:
 	}
 
 	const StatementHandle& _rStmt;
-	std::vector<SQLLEN*> _lengthIndicator;
+	LengthVec _lengthIndicator;
 	SizeMap _dataSize;
 	ParameterBinding _paramBinding;
+	TimestampMap _timestamps;
 };
 
 
