@@ -62,7 +62,8 @@ public:
 	void bareboneODBCTest(const std::string& dbConnString,
 		const std::string& tableCreateString,
 		DataBinding bindMode, 
-		DataExtraction extractMode);
+		DataExtraction extractMode,
+		bool doTime=true);
 		/// This function uses "bare bone" ODBC API calls (i.e. calls are not 
 		/// "wrapped" in PocoData framework structures).
 		/// The purpose of the function is to verify that driver behaves

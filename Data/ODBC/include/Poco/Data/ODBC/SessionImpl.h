@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
+#include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/Data/ODBC/Binder.h"
 #include "Poco/Data/ODBC/Handle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
@@ -133,14 +134,21 @@ public:
 	const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.
 
+	Poco::Any dataTypeInfo(const std::string& rName="");
+		/// Returns the data types information.
+
 private:
+	void setDataTypeInfo(const std::string& rName, const Poco::Any& rValue);
+		/// No-op. Throws InvalidAccessException.
+
 	static const int FUNCTIONS = SQL_API_ODBC3_ALL_FUNCTIONS_SIZE;
 
 	void open();
 		/// Opens a connection to the Database
 
-	bool isCapable();
-		/// Returns true if driver supports all required functions.
+	bool isCapable(int function = 0);
+		/// Returns true if driver supports specified function, or if
+		/// specified function is zero, all required functions.
 		/// Called upon succesful connection if _enforceCapability is true.
 		/// This function code should be updated whenever a new 
 		/// ODBC API call is introduced anywhere in ODBC data connector.
@@ -153,6 +161,7 @@ private:
 	bool _enforceCapability;
 	bool _autoBind;
 	bool _autoExtract;
+	TypeInfo _dataTypes;
 };
 
 
@@ -195,6 +204,18 @@ inline void SessionImpl::setMaxFieldSize(const std::string& rName, const Poco::A
 inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName)
 {
 	return _maxFieldSize;
+}
+
+
+inline void SessionImpl::setDataTypeInfo(const std::string& rName, const Poco::Any& rValue)
+{
+	throw InvalidAccessException();
+}
+
+		
+inline Poco::Any SessionImpl::dataTypeInfo(const std::string& rName)
+{
+	return &_dataTypes;
 }
 
 

@@ -109,7 +109,14 @@ void ODBCStatementImpl::compileImpl()
 	Binder::ParameterBinding bind = session().getFeature("autoBind") ? 
 		Binder::PB_IMMEDIATE : Binder::PB_AT_EXEC;
 
-	_pBinder = new Binder(_stmt, bind);
+	TypeInfo* pDT = 0;
+	try
+	{
+		Poco::Any dti = session().getProperty("dataTypeInfo");
+		pDT = AnyCast<TypeInfo*>(dti);
+	}catch (NotSupportedException&) { }
+
+	_pBinder = new Binder(_stmt, bind, pDT);
 	_pExtractor = new Extractor(_stmt, *_pPreparation);
 
 	bool dataAvailable = hasData();

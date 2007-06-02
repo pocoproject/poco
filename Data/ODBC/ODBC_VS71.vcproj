@@ -158,7 +158,7 @@
 					RelativePath=".\include\Poco\Data\Odbc\Connector.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\Odbc\DataTypes.h">
+					RelativePath=".\include\Poco\Data\Odbc\TypeInfo.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Odbc\Diagnostics.h">
@@ -213,7 +213,7 @@
 					RelativePath=".\src\Connector.cpp">
 				</File>
 				<File
-					RelativePath=".\src\DataTypes.cpp">
+					RelativePath=".\src\TypeInfo.cpp">
 				</File>
 				<File
 					RelativePath=".\src\EnvironmentHandle.cpp">

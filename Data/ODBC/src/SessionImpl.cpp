@@ -98,6 +98,11 @@ void SessionImpl::open()
 		throw exc;
 	}
 
+	_dataTypes.fillTypeInfo(_db);
+		addProperty("dataTypeInfo", 
+		&SessionImpl::setDataTypeInfo, 
+		&SessionImpl::dataTypeInfo);
+
 	addFeature("enforceCapability", 
 		&SessionImpl::setEnforceCapability, 
 		&SessionImpl::getEnforceCapability);
@@ -189,7 +194,7 @@ void SessionImpl::close()
 }
 
 
-bool SessionImpl::isCapable()
+bool SessionImpl::isCapable(int function)
 {
 	SQLUSMALLINT exists[FUNCTIONS] = {0};
 
@@ -199,7 +204,8 @@ bool SessionImpl::isCapable()
 			"SQLGetFunctions(SQL_API_ODBC3_ALL_FUNCTIONS)");
 	}
 
-	return 
+	if (0 != function) return 0 != exists[function];
+	else return 
 		exists[SQL_API_SQLBINDPARAMETER]  &&
 		exists[SQL_API_SQLBINDCOL]        &&
 		exists[SQL_API_SQLGETDATA]        &&
@@ -208,6 +214,7 @@ bool SessionImpl::isCapable()
 		exists[SQL_API_SQLDESCRIBECOL]    &&
 		exists[SQL_API_SQLDESCRIBEPARAM]  &&
 		exists[SQL_API_SQLGETINFO]        &&
+		exists[SQL_API_SQLGETTYPEINFO]    &&
 		exists[SQL_API_SQLGETDIAGREC]     &&
 		exists[SQL_API_SQLGETDIAGFIELD]   &&
 		exists[SQL_API_SQLPREPARE]        &&

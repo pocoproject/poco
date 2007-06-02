@@ -88,7 +88,21 @@ void ODBCOracleTest::testBareboneODBC()
 		"Second VARCHAR(30),"
 		"Third BLOB,"
 		"Fourth INTEGER,"
-		"Fifth NUMBER)";
+		"Fifth NUMBER,"
+		"Sixth TIMESTAMP)";
+
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+
+	tableCreateString = "CREATE TABLE Test "
+		"(First VARCHAR(30),"
+		"Second VARCHAR(30),"
+		"Third BLOB,"
+		"Fourth INTEGER,"
+		"Fifth NUMBER,"
+		"Sixth DATE)";
 
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);

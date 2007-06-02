@@ -177,7 +177,8 @@ SQLExecutor::~SQLExecutor()
 void SQLExecutor::bareboneODBCTest(const std::string& dbConnString, 
 	const std::string& tableCreateString, 
 	SQLExecutor::DataBinding bindMode, 
-	SQLExecutor::DataExtraction extractMode)
+	SQLExecutor::DataExtraction extractMode,
+	bool doTime)
 {
 	SQLRETURN rc;
 	SQLHENV henv = SQL_NULL_HENV;
@@ -206,6 +207,25 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			, SQL_DRIVER_NOPROMPT);
 		assert (SQL_SUCCEEDED(rc));
 
+		// retrieve datetime type information for this DBMS
+		rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+		assert (SQL_SUCCEEDED(rc));
+
+		rc = SQLGetTypeInfo(hstmt, SQL_TIMESTAMP);
+		assert (SQL_SUCCEEDED(rc));
+		SQLINTEGER dateTimeColSize = 0;
+		SQLSMALLINT dateTimeDecDigits = 0;
+		
+		rc = SQLFetch(hstmt);
+		assert (SQL_SUCCEEDED(rc));
+		rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &dateTimeColSize, sizeof(SQLINTEGER), 0);
+		assert (SQL_SUCCEEDED(rc));
+		rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &dateTimeDecDigits, sizeof(SQLSMALLINT), 0);
+		assert (SQL_SUCCEEDED(rc));
+
+		rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+		assert (SQL_SUCCEEDED(rc));
+
 			// Statement begin
 			rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 			assert (SQL_SUCCEEDED(rc));
@@ -215,6 +235,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			SQLExecDirect(hstmt, pStr, (SQLINTEGER) sql.length());
 			//no return code check - ignore drop errors
 
+			// create table and go
 			sql = tableCreateString;
 			pStr = (POCO_SQLCHAR*) sql.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
@@ -223,7 +244,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			rc = SQLExecute(hstmt);
 			assert (SQL_SUCCEEDED(rc));
 
-			sql = "INSERT INTO Test VALUES (?,?,?,?,?)";
+			sql = "INSERT INTO Test VALUES (?,?,?,?,?,?)";
 			pStr = (POCO_SQLCHAR*) sql.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
 			assert (SQL_SUCCEEDED(rc));
@@ -231,6 +252,16 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			std::string str[3] = { "111", "222", "333" };
 			int fourth = 4;
 			float fifth = 1.5;
+			SQL_TIMESTAMP_STRUCT sixth;
+			sixth.year = 1965;
+			sixth.month = 6;
+			sixth.day = 18;
+			sixth.hour = 5;
+			sixth.minute = 34;
+			sixth.second = 59;
+			//some DBMS do not support this (e.g. MS SQL Server), hence 0
+			sixth.fraction = 0;
+
 			SQLLEN li = SQL_NTS;
 			SQLINTEGER size = (SQLINTEGER) str[0].size();
 	
@@ -306,6 +337,18 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				0);
 			assert (SQL_SUCCEEDED(rc));
 
+			rc = SQLBindParameter(hstmt, 
+				(SQLUSMALLINT) 6, 
+				SQL_PARAM_INPUT, 
+				SQL_C_TIMESTAMP, 
+				SQL_TIMESTAMP, 
+				dateTimeColSize,
+				dateTimeDecDigits,
+				(SQLPOINTER) &sixth, 
+				0, 
+				0);
+			assert (SQL_SUCCEEDED(rc));
+
 			size = 0;
 			if (SQLExecutor::PB_AT_EXEC == bindMode)
 				li = SQL_LEN_DATA_AT_EXEC((int) sizeof(int));
@@ -341,9 +384,10 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			assert (SQL_SUCCEEDED(rc));
 
 			char chr[3][5] = {{ 0 }};
-			SQLLEN lengths[5] = { 0 };
+			SQLLEN lengths[6] = { 0 };
 			fourth = 0;
 			fifth = 0.0f;
+			memset(&sixth, 0, sizeof(sixth));
 
 			if (SQLExecutor::DE_BOUND == extractMode)
 			{
@@ -386,6 +430,14 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLINTEGER) 0, 
 					&lengths[4]);
 				assert (SQL_SUCCEEDED(rc));
+
+				rc = SQLBindCol(hstmt, 
+					(SQLUSMALLINT) 6, 
+					SQL_C_TIMESTAMP, 
+					(SQLPOINTER) &sixth, 
+					(SQLINTEGER) 0, 
+					&lengths[5]);
+				assert (SQL_SUCCEEDED(rc));
 			}
 			
 			rc = SQLExecute(hstmt);
@@ -423,7 +475,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLUSMALLINT) 4, 
 					SQL_C_SLONG, 
 					&fourth, 
-					4,
+					0,
 					&lengths[3]);
 				assert (SQL_SUCCEEDED(rc));
 
@@ -431,8 +483,16 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLUSMALLINT) 5, 
 					SQL_C_FLOAT, 
 					&fifth, 
-					5,
+					0,
 					&lengths[4]);
+				assert (SQL_SUCCEEDED(rc));
+
+				rc = SQLGetData(hstmt, 
+					(SQLUSMALLINT) 6, 
+					SQL_C_TIMESTAMP, 
+					&sixth, 
+					0,
+					&lengths[5]);
 				assert (SQL_SUCCEEDED(rc));
 			}
 
@@ -441,6 +501,15 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			assert (0 == strncmp("333", chr[2], 3));
 			assert (4 == fourth);
 			assert (1.5 == fifth);
+			assert (1965 == sixth.year);
+			assert (6 == sixth.month);
+			assert (18 == sixth.day);
+			if (doTime)
+			{
+				assert (5 == sixth.hour);
+				assert (34 == sixth.minute);
+				assert (59 == sixth.second);
+			}
 
 			rc = SQLCloseCursor(hstmt);
 			assert (SQL_SUCCEEDED(rc));

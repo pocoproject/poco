@@ -47,6 +47,7 @@
 #include "Poco/Data/ODBC/Parameter.h"
 #include "Poco/Data/ODBC/ODBCColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include <vector>
@@ -79,7 +80,8 @@ public:
 	};
 
 	Binder(const StatementHandle& rStmt,
-		ParameterBinding dataBinding = PB_IMMEDIATE);
+		ParameterBinding dataBinding = PB_IMMEDIATE,
+		TypeInfo* pDataTypes = 0);
 		/// Creates the Binder.
 
 	~Binder();
@@ -204,6 +206,7 @@ private:
 	SizeMap _dataSize;
 	ParameterBinding _paramBinding;
 	TimestampMap _timestamps;
+	const TypeInfo* _pTypeInfo;
 };
 
 

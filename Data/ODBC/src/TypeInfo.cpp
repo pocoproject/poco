@@ -1,11 +1,11 @@
 //
-// DataTypes.cpp
+// TypeInfo.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/DataTypes.cpp#3 $
+// $Id: //poco/Main/Data/ODBC/src/TypeInfo.cpp#3 $
 //
 // Library: ODBC
 // Package: ODBC
-// Module:  DataTypes
+// Module:  TypeInfo
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,17 +34,31 @@
 //
 
 
-#include "Poco/Data/ODBC/DataTypes.h"
+#include "Poco/Data/ODBC/TypeInfo.h"
+#include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
-
+#include <iostream>
 
 namespace Poco {
 namespace Data {
 namespace ODBC {
 
 
-DataTypes::DataTypes()
+TypeInfo::TypeInfo(SQLHDBC* pHDBC): _pHDBC(pHDBC)
+{
+	fillCTypes();
+	fillSQLTypes();
+	if (_pHDBC) fillTypeInfo(*_pHDBC);
+}
+
+
+TypeInfo::~TypeInfo()
+{
+}
+
+
+void TypeInfo::fillCTypes()
 {
 	_cDataTypes.insert(ValueType(SQL_CHAR, SQL_C_CHAR));
 	_cDataTypes.insert(ValueType(SQL_VARCHAR, SQL_C_CHAR));
@@ -62,10 +76,14 @@ DataTypes::DataTypes()
 	_cDataTypes.insert(ValueType(SQL_BINARY, SQL_C_BINARY));
 	_cDataTypes.insert(ValueType(SQL_VARBINARY, SQL_C_BINARY));
 	_cDataTypes.insert(ValueType(SQL_LONGVARBINARY, SQL_C_BINARY));
-	_cDataTypes.insert(ValueType(SQL_TYPE_DATE, SQL_C_TYPE_DATE));
-	_cDataTypes.insert(ValueType(SQL_TYPE_TIME, SQL_C_TYPE_TIME));
-	_cDataTypes.insert(ValueType(SQL_TYPE_TIMESTAMP, SQL_C_TYPE_TIMESTAMP));
+	_cDataTypes.insert(ValueType(SQL_DATE, SQL_C_DATE));
+	_cDataTypes.insert(ValueType(SQL_TIME, SQL_C_TIME));
+	_cDataTypes.insert(ValueType(SQL_TIMESTAMP, SQL_C_TIMESTAMP));
+}
 
+
+void TypeInfo::fillSQLTypes()
+{
 	_sqlDataTypes.insert(ValueType(SQL_C_CHAR, SQL_LONGVARCHAR));
 	_sqlDataTypes.insert(ValueType(SQL_C_BIT, SQL_BIT));
 	_sqlDataTypes.insert(ValueType(SQL_C_TINYINT, SQL_TINYINT));
@@ -82,18 +100,98 @@ DataTypes::DataTypes()
 	_sqlDataTypes.insert(ValueType(SQL_C_FLOAT, SQL_REAL));
 	_sqlDataTypes.insert(ValueType(SQL_C_DOUBLE, SQL_DOUBLE));
 	_sqlDataTypes.insert(ValueType(SQL_C_BINARY, SQL_LONGVARBINARY));
-	_sqlDataTypes.insert(ValueType(SQL_C_TYPE_DATE, SQL_TYPE_DATE));
-	_sqlDataTypes.insert(ValueType(SQL_C_TYPE_TIME, SQL_TYPE_TIME));
-	_sqlDataTypes.insert(ValueType(SQL_C_TYPE_TIMESTAMP, SQL_TYPE_TIMESTAMP));
+	_sqlDataTypes.insert(ValueType(SQL_C_DATE, SQL_DATE));
+	_sqlDataTypes.insert(ValueType(SQL_C_TIME, SQL_TIME));
+	_sqlDataTypes.insert(ValueType(SQL_C_TIMESTAMP, SQL_TIMESTAMP));
 }
 
 
-DataTypes::~DataTypes()
+void TypeInfo::fillTypeInfo(SQLHDBC pHDBC)
 {
+	_pHDBC = &pHDBC;
+
+	if (_typeInfo.empty() && _pHDBC)
+	{
+		const static int stringSize = 512;
+		TypeInfoVec().swap(_typeInfo);
+
+		SQLRETURN rc;
+		SQLHSTMT hstmt = SQL_NULL_HSTMT;
+
+		rc = SQLAllocHandle(SQL_HANDLE_STMT, *_pHDBC, &hstmt);
+		if (!SQL_SUCCEEDED(rc))
+			throw StatementException(hstmt, "SQLGetData()");
+
+		DataTypeMap::const_iterator it = _cDataTypes.begin();
+		DataTypeMap::const_iterator end = _cDataTypes.end();
+
+		for(; it != end; ++it)
+		{
+			char typeName[stringSize] = { 0 };
+			char literalPrefix[stringSize] = { 0 };
+			char literalSuffix[stringSize] = { 0 };
+			char createParams[stringSize] = { 0 };
+			char localTypeName[stringSize] = { 0 };
+			
+			TypeInfoTup ti("TYPE_NAME", "",
+				"DATA_TYPE", 0,
+				"COLUMN_SIZE", 0,
+				"LITERAL_PREFIX", "",
+				"LITERAL_SUFFIX", "",
+				"CREATE_PARAMS", "",
+				"NULLABLE", 0,
+				"CASE_SENSITIVE", 0,
+				"SEARCHABLE", 0,
+				"UNSIGNED_ATTRIBUTE", 0,
+				"FIXED_PREC_SCALE", 0,
+				"AUTO_UNIQUE_VALUE", 0,
+				"LOCAL_TYPE_NAME", "",
+				"MINIMUM_SCALE", 0,
+				"MAXIMUM_SCALE", 0,
+				"SQL_DATA_TYPE", 0,
+				"SQL_DATETIME_SUB", 0,
+				"NUM_PREC_RADIX", 0,
+				"INTERVAL_PRECISION", 0);
+
+			rc = SQLGetTypeInfo(hstmt, it->first);
+			rc = SQLFetch(hstmt);
+			if (SQL_SUCCEEDED(rc))
+			{
+				rc = SQLGetData(hstmt, 1, SQL_C_CHAR, typeName, sizeof(typeName), 0);
+				ti.set<0>(typeName);
+				rc = SQLGetData(hstmt, 2, SQL_C_SSHORT, &ti.get<1>(), sizeof(SQLSMALLINT), 0);
+				rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &ti.get<2>(), sizeof(SQLINTEGER), 0);
+				rc = SQLGetData(hstmt, 4, SQL_C_CHAR, literalPrefix, sizeof(literalPrefix), 0);
+				ti.set<3>(literalPrefix);
+				rc = SQLGetData(hstmt, 5, SQL_C_CHAR, literalSuffix, sizeof(literalSuffix), 0);
+				ti.set<4>(literalSuffix);
+				rc = SQLGetData(hstmt, 6, SQL_C_CHAR, createParams, sizeof(createParams), 0);
+				ti.set<5>(createParams);
+				rc = SQLGetData(hstmt, 7, SQL_C_SSHORT, &ti.get<6>(), sizeof(SQLSMALLINT), 0); 
+				rc = SQLGetData(hstmt, 8, SQL_C_SSHORT, &ti.get<7>(), sizeof(SQLSMALLINT), 0); 
+				rc = SQLGetData(hstmt, 9, SQL_C_SSHORT, &ti.get<8>(), sizeof(SQLSMALLINT), 0); 
+				rc = SQLGetData(hstmt, 10, SQL_C_SSHORT, &ti.get<9>(), sizeof(SQLSMALLINT), 0); 
+				rc = SQLGetData(hstmt, 11, SQL_C_SSHORT, &ti.get<10>(), sizeof(SQLSMALLINT), 0);
+				rc = SQLGetData(hstmt, 12, SQL_C_SSHORT, &ti.get<11>(), sizeof(SQLSMALLINT), 0);
+				rc = SQLGetData(hstmt, 13, SQL_C_CHAR, localTypeName, sizeof(localTypeName), 0);
+				ti.set<12>(localTypeName);
+				rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &ti.get<13>(), sizeof(SQLSMALLINT), 0);
+				rc = SQLGetData(hstmt, 15, SQL_C_SSHORT, &ti.get<14>(), sizeof(SQLSMALLINT), 0);
+				rc = SQLGetData(hstmt, 16, SQL_C_SSHORT, &ti.get<15>(), sizeof(SQLSMALLINT), 0);
+				rc = SQLGetData(hstmt, 17, SQL_C_SSHORT, &ti.get<16>(), sizeof(SQLSMALLINT), 0);
+				rc = SQLGetData(hstmt, 18, SQL_C_SLONG, &ti.get<17>(), sizeof(SQLINTEGER), 0);
+				rc = SQLGetData(hstmt, 19, SQL_C_SSHORT, &ti.get<18>(), sizeof(SQLSMALLINT), 0);
+
+				_typeInfo.push_back(ti);
+			}
+		}
+
+		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+	}
 }
 
 
-int DataTypes::cDataType(int sqlDataType) const
+int TypeInfo::cDataType(int sqlDataType) const
 {
 	DataTypeMap::const_iterator it = _cDataTypes.find(sqlDataType);
 
@@ -104,7 +202,7 @@ int DataTypes::cDataType(int sqlDataType) const
 }
 
 
-int DataTypes::sqlDataType(int cDataType) const
+int TypeInfo::sqlDataType(int cDataType) const
 {
 	DataTypeMap::const_iterator it = _sqlDataTypes.find(cDataType);
 

@@ -41,9 +41,10 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/DataTypes.h"
+#include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/DateTime.h"
 #include <sstream>
+#include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -104,7 +105,7 @@ public:
 		/// ODBC size for bool data type.
 
 private:
-	static const DataTypes _dataTypes;
+	static const TypeInfo _dataTypes;
 		/// C <==> SQL data type mapping
 };
 

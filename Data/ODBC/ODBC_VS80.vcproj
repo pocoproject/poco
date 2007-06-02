@@ -222,10 +222,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\DataTypes.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Data\ODBC\Diagnostics.h"
 					>
 				</File>
@@ -274,6 +270,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\ODBC\TypeInfo.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\ODBC\Utility.h"
 					>
 				</File>
@@ -291,10 +291,6 @@
 				</File>
 				<File
 					RelativePath=".\src\Connector.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\DataTypes.cpp"
 					>
 				</File>
 				<File
@@ -327,6 +323,10 @@
 				</File>
 				<File
 					RelativePath=".\src\SessionImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TypeInfo.cpp"
 					>
 				</File>
 				<File

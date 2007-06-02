@@ -48,9 +48,12 @@ namespace Data {
 namespace ODBC {
 
 
-Binder::Binder(const StatementHandle& rStmt, Binder::ParameterBinding dataBinding):
+Binder::Binder(const StatementHandle& rStmt, 
+	Binder::ParameterBinding dataBinding,
+	TypeInfo* pDataTypes):
 	_rStmt(rStmt),
-	_paramBinding(dataBinding)
+	_paramBinding(dataBinding),
+	_pTypeInfo(pDataTypes)
 {
 }
 
@@ -146,15 +149,27 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val)
 	_timestamps.insert(TimestampMap::value_type(pTS, const_cast<DateTime*>(&val)));
 	_dataSize.insert(SizeMap::value_type((SQLPOINTER) pTS, size));
 
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+
+	if (_pTypeInfo)
+	{
+		try
+		{
+			colSize = _pTypeInfo->getInfo(SQL_TIMESTAMP, "COLUMN_SIZE");
+			decDigits = _pTypeInfo->getInfo(SQL_TIMESTAMP, "MINIMUM_SCALE");
+		}catch (NotFoundException&) { }
+	}
+
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
 		getParamType(), 
 		SQL_C_TIMESTAMP, 
 		SQL_TIMESTAMP, 
-		(SQLUINTEGER) size,
-		0,
+		colSize,
+		decDigits,
 		(SQLPOINTER) pTS, 
-		(SQLINTEGER) size, 
+		0, 
 		_lengthIndicator.back())))
 	{
 		throw StatementException(_rStmt, "SQLBindParameter(BLOB)");

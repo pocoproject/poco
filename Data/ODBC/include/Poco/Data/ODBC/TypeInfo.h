@@ -1,13 +1,13 @@
 //
-// DataTypes.h
+// TypeInfo.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/DataTypes.h#3 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/TypeInfo.h#3 $
 //
 // Library: ODBC
 // Package: ODBC
-// Module:  DataTypes
+// Module:  TypeInfo
 //
-// Definition of DataTypes.
+// Definition of TypeInfo.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -41,6 +41,9 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
+#include "Poco/NamedTuple.h"
+#include "Poco/DynamicAny.h"
+#include <vector>
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
@@ -53,18 +56,38 @@ namespace Data {
 namespace ODBC {
 
 
-class ODBC_API DataTypes
+class ODBC_API TypeInfo
 	/// C <==> SQL datatypes mapping utility class.
 {
 public:
 	typedef std::map<int, int> DataTypeMap;
 	typedef DataTypeMap::value_type ValueType;
+	typedef Poco::NamedTuple<std::string,
+		SQLSMALLINT,
+		SQLINTEGER,
+		std::string,
+		std::string,
+		std::string,
+		SQLSMALLINT,
+		SQLSMALLINT,
+		SQLSMALLINT,
+		SQLSMALLINT,
+		SQLSMALLINT,
+		SQLSMALLINT,
+		std::string,
+		SQLSMALLINT,
+		SQLSMALLINT,
+		SQLSMALLINT,
+		SQLSMALLINT,
+		SQLINTEGER,
+		SQLSMALLINT> TypeInfoTup;
+	typedef std::vector<TypeInfoTup> TypeInfoVec;
 
-	DataTypes();
-		/// Creates the DataTypes.
+	explicit TypeInfo(SQLHDBC* pHDBC=0);
+		/// Creates the TypeInfo.
 
-	~DataTypes();
-		/// Destroys the DataTypes.
+	~TypeInfo();
+		/// Destroys the TypeInfo.
 
 	int cDataType(int sqlDataType) const;
 		/// Returns C data type corresponding to supplied SQL data type.
@@ -72,10 +95,35 @@ public:
 	int sqlDataType(int cDataType) const;
 		/// Returns SQL data type corresponding to supplied C data type.
 
+	void fillTypeInfo(SQLHDBC pHDBC);
+		/// Fills the data type info structure for the database.
+
+	DynamicAny getInfo(SQLSMALLINT type, const std::string& param) const;
+		/// Returns information about specified data type.
+
 private:
+	void fillCTypes();
+	void fillSQLTypes();
+
 	DataTypeMap _cDataTypes; 
 	DataTypeMap _sqlDataTypes; 
+	TypeInfoVec _typeInfo;
+	SQLHDBC*    _pHDBC;
 };
+
+
+inline DynamicAny TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
+{
+	TypeInfoVec::const_iterator it = _typeInfo.begin();
+	TypeInfoVec::const_iterator end = _typeInfo.end();
+	for (; it != end; ++it)
+	{
+		if (type == it->get<1>())
+			return (*it)[param];
+	}
+
+	throw NotFoundException(param);
+}
 
 
 } } } // namespace Poco::Data::ODBC

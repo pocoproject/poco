@@ -86,12 +86,26 @@ void ODBCMySQLTest::testBareboneODBC()
 		"Second VARCHAR(30),"
 		"Third VARBINARY(30),"
 		"Fourth INTEGER,"
-		"Fifth FLOAT)";
+		"Fifth FLOAT,"
+		"Sixth DATETIME)";
 
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+
+	tableCreateString = "CREATE TABLE Test "
+		"(First VARCHAR(30),"
+		"Second VARCHAR(30),"
+		"Third VARBINARY(30),"
+		"Fourth INTEGER,"
+		"Fifth FLOAT,"
+		"Sixth DATE)";
+
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, false);
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, false);
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, false);
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, false);
 }
 
 

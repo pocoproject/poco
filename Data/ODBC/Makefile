@@ -16,7 +16,7 @@ else
 $(error No ODBC library found. Please install unixODBC or iODBC and try again)
 endif
 
-objects = Binder ConnectionHandle DataTypes EnvironmentHandle \
+objects = Binder ConnectionHandle TypeInfo EnvironmentHandle \
 	Extractor ODBCColumn ODBCException ODBCStatementImpl Parameter Preparation \
 	SessionImpl Connector Utility 
 
