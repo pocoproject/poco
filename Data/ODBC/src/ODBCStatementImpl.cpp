@@ -126,10 +126,6 @@ void ODBCStatementImpl::compileImpl()
 	// these calls must occur before.
 	fixupBinding(); doBind(false, true);
 
-	// Following code creates internal extraction storage in case when none is provided by user.
-	// Under normal circumstances, this is the responsibility of the Data framework. Due to some 
-	// ODBC peculiarities, for ODBC it is implemented here. Data library detects this being already
-	// done and does not try to do it again.
 	bool dataAvailable = hasData();
 	if (dataAvailable && !extractions().size()) 
 	{
@@ -195,7 +191,9 @@ void ODBCStatementImpl::bindImpl()
 	if (SQL_NEED_DATA == rc) putData();
 	else checkError(rc, "SQLExecute()");
 
-	_pBinder->sync(Binder::PD_OUT);
+	getData();
+
+	_pBinder->synchronize();
 }
 
 
@@ -215,22 +213,42 @@ void ODBCStatementImpl::putData()
 	}while (SQL_NEED_DATA == (rc = SQLParamData(_stmt, &pParam)));
 
 	checkError(rc, "SQLParamData()");
+}
 
-/* TODO: this is how manual extraction of parameters should work
-   in practice, for the time being, we only support automatic binding for output params
-	Binder::ParameterMap outParamMap = _pBinder->outParameters();
-	Binder::ParameterMap::iterator it = outParamMap.begin();
-	Binder::ParameterMap::iterator end = outParamMap.end();
+
+void ODBCStatementImpl::getData()
+{
+	Binder::ParamVec& outParams = _pBinder->outParameters();
+	if (0 == outParams.size()) return;
+
+	Binder::ParamVec::iterator it = outParams.begin();
+	Binder::ParamVec::iterator end = outParams.end();
 	for (int i = 1; it != end; ++it, ++i)
 	{
 		SQLINTEGER retLen = 0;
-		while (SQL_NO_DATA != (rc = SQLGetData(_stmt, i, SQL_C_TYPE_TIMESTAMP, (SQLPOINTER) (it->first + retLen), it->second - retLen, &retLen)))
-			if (0 == retLen || SQL_NULL_DATA == retLen) break;
+		char* ptr = (char*) it->get<0>();
+		SQLINTEGER len = it->get<1>();
+		//NB: Oracle SQLGetData call returns string data, but does NOT report the returned length.
+		// (no other drivers tested for this functionality yet)
+		// Thus, for the string length we trust ptr being zeroed when allocated in binder.
+		// As a "safety net", the last member of the binder-supplied char* array is set to '\0' (see below)
+		while (len > 0 && SQL_NO_DATA != (SQLGetData(_stmt, i, it->get<2>(), (SQLPOINTER) ptr, len, &retLen)))
+		{
+			if (0 == retLen || 
+				SQL_NULL_DATA == retLen || 
+				SQL_NO_TOTAL == retLen) 
+				break;
 
-		StatementException se(_stmt);
-		std::cout << se.toString();
+			if (ptr + retLen < ptr + len)
+			{
+				ptr += retLen;
+				len -= retLen;
+			}
+		}
+
+		//just in case, terminate the string
+		((char*) it->get<0>())[it->get<1>()-1] = '\0';
 	}
-*/
 }
 
 

@@ -67,15 +67,41 @@ Binder::~Binder()
 	TimestampMap::iterator itTS = _timestamps.begin();
 	TimestampMap::iterator itTSEnd = _timestamps.end();
 	for(; itTS != itTSEnd; ++itTS) delete itTS->first;
+
+	StringMap::iterator itStr = _strings.begin();
+	StringMap::iterator itStrEnd = _strings.end();
+	for(; itStr != itStrEnd; ++itStr) std::free(itStr->first);
+
+	BLOBMap::iterator itB = _blobs.begin();
+	BLOBMap::iterator itBEnd = _blobs.end();
+	for(; itB != itBEnd; ++itB) std::free(itB->first);
 }
 
 
 void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
-	if (isOutBound(dir))
-		throw InvalidAccessException("std::string can only be in-bound");
-
+	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER) val.size();
+
+	if (isOutBound(dir))
+	{
+		Parameter p(_rStmt, pos);
+		size = p.columnSize();
+		char* pChar = (char*) std::calloc(size, sizeof(char));
+		ParamTuple pt(pChar, size, SQL_C_CHAR, SQL_LONGVARCHAR);
+		_outParams.push_back(pt);
+		_strings.insert(StringMap::value_type(pChar, const_cast<std::string*>(&val)));
+		pVal = (SQLPOINTER) pChar;
+	}
+	else if (isInBound(dir))
+	{
+		pVal = (SQLPOINTER) val.c_str();
+		ParamTuple pt((SQLPOINTER) pVal, size, SQL_C_CHAR, SQL_LONGVARCHAR);
+		_inParams.push_back(pt);
+	}
+	else
+		throw IllegalStateException("Parameter must be [in] OR [out] bound.");
+
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn = SQL_NTS;
 
@@ -83,20 +109,15 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
 
 	_lengthIndicator.push_back(pLenIn);
-	if (isInBound(dir))
-		_inParams.insert(ParameterMap::value_type((SQLPOINTER) val.c_str(), size));
-	//TODO
-	//if (isOutBound(dir))
-	//	_outParams.insert(ParameterMap::value_type((SQLPOINTER) pTS, size));
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
-		SQL_PARAM_INPUT, 
+		getParamType(dir), 
 		SQL_C_CHAR, 
 		SQL_LONGVARCHAR, 
 		(SQLUINTEGER) size,
 		0,
-		(SQLPOINTER) val.c_str(), 
+		pVal, 
 		(SQLINTEGER) size, 
 		_lengthIndicator.back())))
 	{
@@ -107,9 +128,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
 {
-	if (isOutBound(dir))
-		throw InvalidAccessException("BLOB can only be in-bound");
-
+	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER) val.size();
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
@@ -118,20 +137,33 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
 		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
 
 	_lengthIndicator.push_back(pLenIn);
-	if (isInBound(dir))
-		_inParams.insert(ParameterMap::value_type((SQLPOINTER) val.rawContent(), size));
-	//TODO
-	//if (isOutBound(dir))
-	//	_outParams.insert(ParameterMap::value_type((SQLPOINTER) pTS, size));
+	
+	if (isOutBound(dir))
+	{
+		size = getParamSize(pos);
+		char* pChar = (char*) std::calloc(size, sizeof(char));
+		ParamTuple pt(pChar, size, SQL_C_BINARY, SQL_LONGVARBINARY);
+		_outParams.push_back(pt);
+		_blobs.insert(BLOBMap::value_type(pChar, const_cast<BLOB*>(&val)));
+		pVal = (SQLPOINTER) pChar;
+	}
+	else if (isInBound(dir))
+	{
+		pVal = (SQLPOINTER) val.rawContent();
+		ParamTuple pt((SQLPOINTER) pVal, size, SQL_C_BINARY, SQL_LONGVARBINARY);
+		_inParams.push_back(pt);
+	}
+	else
+		throw IllegalStateException("Parameter must be [in] OR [out] bound.");
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
-		SQL_PARAM_INPUT, 
+		getParamType(dir), 
 		SQL_C_BINARY, 
 		SQL_LONGVARBINARY, 
 		(SQLUINTEGER) size,
 		0,
-		(SQLPOINTER) val.rawContent(), 
+		pVal, 
 		(SQLINTEGER) size, 
 		_lengthIndicator.back())))
 	{
@@ -183,8 +215,15 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 
 std::size_t Binder::parameterSize(SQLPOINTER pAddr) const
 {
-	ParameterMap::const_iterator it = _inParams.find(pAddr);
-	if (it != _inParams.end()) return it->second;
+	ParamVec::const_iterator it = _inParams.begin();
+	ParamVec::const_iterator end = _inParams.end();
+	for (; it != end; ++it)
+		if (it->get<0>() == pAddr) return it->get<1>();
+
+	it = _outParams.begin();
+	end = _outParams.end();
+	for (; it != end; ++it) 
+		if (it->get<0>() == pAddr) return it->get<1>();
 	
 	throw NotFoundException("Requested data size not found.");
 }
@@ -210,17 +249,22 @@ SQLSMALLINT Binder::getParamType(Direction dir) const
 }
 
 
-void Binder::sync(Direction direction)
+void Binder::synchronize()
 {
 	TimestampMap::iterator itTS = _timestamps.begin();
 	TimestampMap::iterator itTSEnd = _timestamps.end();
 	for(; itTS != itTSEnd; ++itTS) 
-	{
-		if (PD_OUT == direction) // SQL_TIMESTAMP_STRUCT => DateTime
-			Utility::dateTimeSync(*itTS->second, *itTS->first);
-		else // DateTime => SQL_TIMESTAMP_STRUCT
-			Utility::dateTimeSync(*itTS->first, *itTS->second);
-	}
+		Utility::dateTimeSync(*itTS->second, *itTS->first);
+
+	StringMap::iterator itStr = _strings.begin();
+	StringMap::iterator itStrEnd = _strings.end();
+	for(; itStr != itStrEnd; ++itStr)
+		itStr->second->assign(itStr->first, strlen(itStr->first));
+
+	BLOBMap::iterator itB = _blobs.begin();
+	BLOBMap::iterator itBEnd = _blobs.end();
+	for(; itB != itBEnd; ++itB)
+		itB->second->assignRaw(itB->first, strlen(itB->first));
 }
 
 

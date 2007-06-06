@@ -136,6 +136,7 @@ inline const std::vector<char>& BLOB::content() const
 
 inline const char* BLOB::rawContent() const
 {
+	poco_assert (_pContent->size());
 	return &(*_pContent)[0];
 }
 

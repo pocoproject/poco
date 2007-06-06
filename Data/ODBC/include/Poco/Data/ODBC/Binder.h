@@ -68,7 +68,10 @@ class ODBC_API Binder: public Poco::Data::AbstractBinder
 {
 public:
 	typedef AbstractBinder::Direction Direction;
-	typedef std::map<SQLPOINTER, SQLLEN> ParameterMap;
+	typedef Tuple<SQLPOINTER, SQLLEN, SQLSMALLINT, SQLSMALLINT> ParamTuple;
+	typedef std::vector<ParamTuple> ParamVec;
+
+	static const size_t DEFAULT_PARAM_SIZE = 1024;
 
 	enum ParameterBinding
 	{
@@ -138,15 +141,18 @@ public:
 	std::size_t parameterSize(SQLPOINTER pAddr) const;
 		/// Returns bound data size for parameter at specified position.
 
-	void sync(Direction direction);
-		/// Synchronizes non-POD parameters.
+	void synchronize();
+		/// Transfers the results of non-POD outbound parameters from internal 
+		/// holders back into the externally supplied buffers.
 
-	ParameterMap& outParameters();
+	ParamVec& outParameters();
 		/// Returns map of output parameter pointers and sizes.
 
 private:
 	typedef std::vector<SQLLEN*> LengthVec;
 	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*> TimestampMap;
+	typedef std::map<char*, std::string*> StringMap;
+	typedef std::map<char*, BLOB*> BLOBMap;
 
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
@@ -156,17 +162,22 @@ private:
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 
+	std::size_t getParamSize(std::size_t pos);
+		/// Returns parameter size as defined by data source.
+		/// Used to determine buffer size for variable size out-bound parameters 
+		/// (string and BLOB).
+
 	SQLSMALLINT getParamType(Direction dir) const;
+		/// Returns ODBC parameter type based on the parameter binding direction
+		/// specified by user.
 
 	template <typename T>
 	void bindImpl(std::size_t pos, T& val, SQLSMALLINT cDataType, Direction dir)
 	{
 		_lengthIndicator.push_back(0);
 
-		int sqlDataType = Utility::sqlDataType(cDataType);
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
-
 		if (_pTypeInfo)
 		{
 			try
@@ -180,12 +191,12 @@ private:
 			(SQLUSMALLINT) pos + 1, 
 			getParamType(dir), 
 			cDataType, 
-			sqlDataType, 
+			Utility::sqlDataType(cDataType), 
 			colSize,
 			decDigits,
 			(SQLPOINTER) &val, 
 			0, 
-			_lengthIndicator.back())))
+			0)))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
@@ -193,10 +204,12 @@ private:
 
 	const StatementHandle& _rStmt;
 	LengthVec _lengthIndicator;
-	ParameterMap _inParams;
-	ParameterMap _outParams;
+	ParamVec _inParams;
+	ParamVec _outParams;
 	ParameterBinding _paramBinding;
 	TimestampMap _timestamps;
+	StringMap _strings;
+	BLOBMap _blobs;
 	const TypeInfo* _pTypeInfo;
 };
 
@@ -288,9 +301,21 @@ inline Binder::ParameterBinding Binder::getDataBinding() const
 }
 
 
-inline Binder::ParameterMap& Binder::outParameters()
+inline Binder::ParamVec& Binder::outParameters()
 {
 	return _outParams;
+}
+
+
+inline std::size_t Binder::getParamSize(std::size_t pos)
+{
+	try
+	{
+		return Parameter(_rStmt, pos).columnSize();
+	}catch (StatementException&)
+	{ 
+		return DEFAULT_PARAM_SIZE; 
+	}
 }
 
 

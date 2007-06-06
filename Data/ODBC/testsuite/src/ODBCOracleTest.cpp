@@ -925,6 +925,36 @@ void ODBCOracleTest::testStoredProcedure()
 
 		k += 2;
 	}
+
+	//string and BLOB for automatic binding only
+	_pSession->setFeature("autoBind", true);
+
+	*_pSession << "CREATE OR REPLACE "
+		"PROCEDURE storedProcedure(inParam IN VARCHAR2, outParam OUT VARCHAR2) IS "
+		" BEGIN outParam := inParam; "
+		"END storedProcedure;" , now;
+
+	std::string inParam = "123";
+	std::string outParam;
+	try{
+	*_pSession << "{call storedProcedure(?,?)}", in(inParam), out(outParam), now;
+	}catch(StatementException& ex){std::cout << ex.toString();}
+	assert(inParam == outParam);
+	dropObject("PROCEDURE", "storedProcedure");
+/*TODO - currently failing
+	*_pSession << "CREATE OR REPLACE "
+		"PROCEDURE storedProcedure(inParam IN BLOB, outParam OUT BLOB) IS "
+		" BEGIN outParam := inParam; "
+		"END storedProcedure;" , now;
+
+	BLOB inBLOB = "123";
+	BLOB outBLOB;
+	try{
+	*_pSession << "{call storedProcedure(?,?)}", in(inBLOB), out(outBLOB), now;
+	}catch(StatementException& ex){std::cout << ex.toString();}
+	assert(inBLOB == outBLOB);
+	dropObject("PROCEDURE", "storedProcedure");
+	*/
 }
 
 
@@ -937,10 +967,12 @@ void ODBCOracleTest::testStoredFunction()
 		_pSession->setFeature("autoBind", bindValues[k]);
 		_pSession->setFeature("autoExtract", bindValues[k+1]);
 
+		try{
 		*_pSession << "CREATE OR REPLACE "
 			"FUNCTION storedFunction RETURN NUMBER IS "
 			" BEGIN return(-1); "
 			" END storedFunction;" , now;
+		}catch(StatementException& se) { std::cout << se.toString() << std::endl; }
 
 		int i = 0;
 		*_pSession << "{? = call storedFunction()}", out(i), now;
@@ -997,6 +1029,23 @@ void ODBCOracleTest::testStoredFunction()
 
 		k += 2;
 	}
+
+	//string and BLOB for automatic binding only
+	_pSession->setFeature("autoBind", true);
+
+	*_pSession << "CREATE OR REPLACE "
+		"FUNCTION storedFunction(inParam IN VARCHAR2, outParam OUT VARCHAR2) RETURN VARCHAR2 IS "
+		" BEGIN outParam := inParam; RETURN outParam;"
+		"END storedFunction;" , now;
+
+	std::string inParam = "123";
+	std::string outParam;
+	std::string ret;
+	*_pSession << "{? = call storedFunction(?,?)}", out(ret), in(inParam), out(outParam), now;
+	assert("123" == inParam);
+	assert(inParam == outParam);
+	assert(ret == outParam);
+	dropObject("PROCEDURE", "storedFunction");
 }
 
 
@@ -1013,7 +1062,8 @@ void ODBCOracleTest::dropObject(const std::string& type, const std::string& name
 		StatementDiagnostics::Iterator it = flds.begin();
 		for (; it != flds.end(); ++it)
 		{
-			if (942 == it->_nativeError)//ORA-00942 (table does not exist)
+			if (4043 == it->_nativeError || //ORA-04043 (object does not exist)
+				942 == it->_nativeError)//ORA-00942 (table does not exist)
 			{
 				ignoreError = true;
 				break;

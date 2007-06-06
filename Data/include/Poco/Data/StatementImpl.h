@@ -52,6 +52,8 @@
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
 #include <vector>
+#include <list>
+#include <deque>
 #include <sstream>
 
 
@@ -239,13 +241,54 @@ private:
 	void resetExtraction();
 		/// Resets binding so it can be reused again.
 
-	template <class T, class C>
+	template <class T>
 	void addInternalExtract(const MetaColumn& mc)
-		/// Utility function to create and add an internal extraction.
+		/// Creates and adds the internal extraction.
+		///
+		/// The decision about internal extraction container is done 
+		/// in a following way:
+		///
+		/// If this statement has _storage member set, that setting
+		/// overrides the session setting for storage, otherwise the
+		/// session setting is used.
+		/// If neither this statement nor the session have the storage
+		/// type set, std::vector is the default container type used.
 	{
-		C* pData = new C;
-		Column<T,C>* pCol = new Column<T,C>(mc, pData);
-		addExtract(new InternalExtraction<T,C>(*pData, pCol));
+		std::string storage;
+	
+		switch (_storage)
+		{
+		case STORAGE_VECTOR_IMPL: 
+			storage = VECTOR; break;
+		case STORAGE_LIST_IMPL:   
+			storage = LIST; break;
+		case STORAGE_DEQUE_IMPL:  
+			storage = DEQUE; break;
+		case STORAGE_UNKNOWN_IMPL:
+			storage = AnyCast<std::string>(session().getProperty("storage")); 
+			break;
+		}
+
+		if (storage.empty()) storage = VECTOR;
+
+		if (0 == icompare(VECTOR, storage))
+		{
+			std::vector<T>* pData = new std::vector<T>;
+			Column<T,std::vector<T> >* pCol = new Column<T, std::vector<T> >(mc, pData);
+			addExtract(new InternalExtraction<T, std::vector<T> >(*pData, pCol));
+		}
+		else if (0 == icompare(LIST, storage))
+		{
+			std::list<T>* pData = new std::list<T>;
+			Column<T,std::list<T> >* pCol = new Column<T, std::list<T> >(mc, pData);
+			addExtract(new InternalExtraction<T, std::list<T> >(*pData, pCol));
+		}
+		else if (0 == icompare(DEQUE, storage))
+		{
+			std::deque<T>* pData = new std::deque<T>;
+			Column<T,std::deque<T> >* pCol = new Column<T, std::deque<T> >(mc, pData);
+			addExtract(new InternalExtraction<T, std::deque<T> >(*pData, pCol));
+		}
 	}
 
 	StatementImpl(const StatementImpl& stmt);
