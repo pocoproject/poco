@@ -90,7 +90,7 @@ ODBCStatementImpl::~ODBCStatementImpl()
 
 void ODBCStatementImpl::compileImpl()
 {
-	_stepCalled   = false;
+	_stepCalled = false;
 	_nextResponse = 0;
 
 	std::string statement(toString());
@@ -119,6 +119,17 @@ void ODBCStatementImpl::compileImpl()
 	_pBinder = new Binder(_stmt, bind, pDT);
 	_pExtractor = new Extractor(_stmt, *_pPreparation);
 
+	// This is a hack to conform to some ODBC drivers behavior (e.g. MS SQLServer) with 
+	// stored procedure calls: driver refuses to report the number of columns, unless all 
+	// parameters for the stored procedure are bound. Since number of columns is essential 
+	// information for the internal extraction creation, in order to allow for querying it,
+	// these calls must occur before.
+	fixupBinding(); doBind(false, true);
+
+	// Following code creates internal extraction storage in case when none is provided by user.
+	// Under normal circumstances, this is the responsibility of the Data framework. Due to some 
+	// ODBC peculiarities, for ODBC it is implemented here. Data library detects this being already
+	// done and does not try to do it again.
 	bool dataAvailable = hasData();
 	if (dataAvailable && !extractions().size()) 
 	{
@@ -151,9 +162,9 @@ bool ODBCStatementImpl::canBind() const
 }
 
 
-void ODBCStatementImpl::bindImpl()
+void ODBCStatementImpl::doBind(bool clear, bool reset)
 {
-	clear();
+	if (clear) this->clear();
 	Bindings& binds = bindings();
 	if (!binds.empty())
 	{
@@ -164,7 +175,20 @@ void ODBCStatementImpl::bindImpl()
 			(*it)->bind(pos);
 			pos += (*it)->numOfColumnsHandled();
 		}
+
+		if (reset)
+		{
+			it = binds.begin();
+			for (; it != itEnd && (*it)->canBind(); ++it)
+				(*it)->reset();
+		}
 	}
+}
+
+
+void ODBCStatementImpl::bindImpl()
+{
+	doBind();
 
 	SQLRETURN rc = SQLExecute(_stmt);
 
@@ -184,13 +208,29 @@ void ODBCStatementImpl::putData()
 	{
 		poco_assert_dbg (pParam);
 		
-		SQLINTEGER dataSize = (SQLINTEGER) _pBinder->dataSize(pParam);
+		SQLINTEGER dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
 
 		if (Utility::isError(SQLPutData(_stmt, pParam, dataSize))) 
 			throw StatementException(_stmt, "SQLPutData()");
 	}while (SQL_NEED_DATA == (rc = SQLParamData(_stmt, &pParam)));
 
 	checkError(rc, "SQLParamData()");
+
+/* TODO: this is how manual extraction of parameters should work
+   in practice, for the time being, we only support automatic binding for output params
+	Binder::ParameterMap outParamMap = _pBinder->outParameters();
+	Binder::ParameterMap::iterator it = outParamMap.begin();
+	Binder::ParameterMap::iterator end = outParamMap.end();
+	for (int i = 1; it != end; ++it, ++i)
+	{
+		SQLINTEGER retLen = 0;
+		while (SQL_NO_DATA != (rc = SQLGetData(_stmt, i, SQL_C_TYPE_TIMESTAMP, (SQLPOINTER) (it->first + retLen), it->second - retLen, &retLen)))
+			if (0 == retLen || SQL_NULL_DATA == retLen) break;
+
+		StatementException se(_stmt);
+		std::cout << se.toString();
+	}
+*/
 }
 
 

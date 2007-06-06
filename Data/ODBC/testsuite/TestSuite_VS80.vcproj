@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="TestSuite"
 	ProjectGUID="{1B30A91B-375F-11DB-837B-00123FC423B5}"
+	RootNamespace="TestSuite"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

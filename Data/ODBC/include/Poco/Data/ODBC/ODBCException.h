@@ -129,7 +129,7 @@ public:
 	std::string toString() const
 	{
 		std::stringstream os;
-		os << "ODBC Error: " << _error.toString() << std::endl 
+		os << "ODBC Error: " << what() << std::endl 
 			<< "===================" << std::endl 
 			<< _error.toString() << std::endl ;
 		return os.str();

@@ -57,7 +57,16 @@ namespace ODBC {
 
 
 class ODBC_API TypeInfo
-	/// C <==> SQL datatypes mapping utility class.
+	/// Datatypes mapping utility class.
+	///
+	/// This class provides mapping between C and SQL datatypes as well
+	/// as datatypes supported by the underlying database. In order for database
+	/// types to be available, a valid conection handle must be supplied at either
+	/// object construction time, or at a later point in time, through call to
+	/// fillTypeInfo member function.
+	///
+	/// Class also provides a convenient debugging function that prints
+	/// tabulated data to an output stream.
 {
 public:
 	typedef std::map<int, int> DataTypeMap;
@@ -99,7 +108,12 @@ public:
 		/// Fills the data type info structure for the database.
 
 	DynamicAny getInfo(SQLSMALLINT type, const std::string& param) const;
-		/// Returns information about specified data type.
+		/// Returns information about specified data type as specified by parameter 'type'.
+		/// The requested information is specified by parameter 'param'.
+
+	void print(std::ostream& ostr);
+		/// Prints all the types (as reported by the underlying database)
+		/// to the supplied output stream.
 
 private:
 	void fillCTypes();

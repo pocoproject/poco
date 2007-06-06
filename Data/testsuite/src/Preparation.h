@@ -97,6 +97,9 @@ public:
 	void prepare(std::size_t pos, const Poco::Data::BLOB&);
 		/// Extracts a BLOB.
 
+	void prepare(std::size_t pos, const Poco::DateTime&);
+		/// Extracts a DateTime.
+
 	void prepare(std::size_t pos, const Poco::Any&);
 		/// Extracts an Any.
 };

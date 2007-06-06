@@ -57,7 +57,14 @@ class Data_API AbstractBinding: public Poco::RefCountedObject
 	/// AbstractBinding connects a value with a placeholder via an AbstractBinder interface.
 {
 public:
-	AbstractBinding();
+	enum Direction
+	{
+		PD_IN = AbstractBinder::PD_IN,
+		PD_OUT = AbstractBinder::PD_OUT,
+		PD_IN_OUT = AbstractBinder::PD_IN_OUT
+	};
+
+	AbstractBinding(const std::string& name = "", Direction direction = PD_IN);
 		/// Creates the AbstractBinding.
 
 	virtual ~AbstractBinding();
@@ -90,16 +97,16 @@ public:
 	virtual void reset() = 0;
 		/// Allows a binding to be reused.
 
-	void setInBound(bool inBound = true);
-		/// Sets the binder to be in-bound.
+	AbstractBinder::Direction getDirection() const;
+		/// Returns the binding direction.
 
-	void setOutBound(bool outBound = true);
-		/// Sets the binder to be out-bound.
+	const std::string& name() const;
+		/// Returns the name for this binding.
 
 private:
 	AbstractBinder* _pBinder;
-	bool _inBound;
-	bool _outBound;
+	std::string _name;
+	Direction _direction;
 };
 
 
@@ -110,31 +117,21 @@ typedef std::vector<AbstractBindingPtr> AbstractBindingVec;
 //
 // inlines
 //
-inline void AbstractBinding::setBinder(AbstractBinder* pBinder)
-{
-	poco_check_ptr (pBinder);
-	_pBinder = pBinder;
-	_pBinder->setInBound(_inBound);
-	_pBinder->setOutBound(_outBound);
-	poco_assert_dbg (_inBound || _outBound);
-}
-
-
 inline AbstractBinder* AbstractBinding::getBinder() const
 {
 	return _pBinder;
 }
 
 
-inline void AbstractBinding::setInBound(bool inBound)
+inline const std::string& AbstractBinding::name() const
 {
-	_inBound = inBound;
+	return _name;
 }
 
 
-inline void AbstractBinding::setOutBound(bool outBound)
+inline AbstractBinder::Direction AbstractBinding::getDirection() const
 {
-	_outBound = outBound;
+	return (AbstractBinder::Direction) _direction;
 }
 
 

@@ -70,9 +70,9 @@ Binder::~Binder()
 }
 
 
-void Binder::bind(std::size_t pos, const std::string& val)
+void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
-	if (isOutBound())
+	if (isOutBound(dir))
 		throw InvalidAccessException("std::string can only be in-bound");
 
 	SQLINTEGER size = (SQLINTEGER) val.size();
@@ -83,7 +83,11 @@ void Binder::bind(std::size_t pos, const std::string& val)
 		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
 
 	_lengthIndicator.push_back(pLenIn);
-	_dataSize.insert(SizeMap::value_type((SQLPOINTER) val.c_str(), size));
+	if (isInBound(dir))
+		_inParams.insert(ParameterMap::value_type((SQLPOINTER) val.c_str(), size));
+	//TODO
+	//if (isOutBound(dir))
+	//	_outParams.insert(ParameterMap::value_type((SQLPOINTER) pTS, size));
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
@@ -101,9 +105,9 @@ void Binder::bind(std::size_t pos, const std::string& val)
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
+void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
 {
-	if (isOutBound())
+	if (isOutBound(dir))
 		throw InvalidAccessException("BLOB can only be in-bound");
 
 	SQLINTEGER size = (SQLINTEGER) val.size();
@@ -114,7 +118,11 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
 
 	_lengthIndicator.push_back(pLenIn);
-	_dataSize.insert(SizeMap::value_type((SQLPOINTER) val.rawContent(), size));
+	if (isInBound(dir))
+		_inParams.insert(ParameterMap::value_type((SQLPOINTER) val.rawContent(), size));
+	//TODO
+	//if (isOutBound(dir))
+	//	_outParams.insert(ParameterMap::value_type((SQLPOINTER) pTS, size));
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
@@ -132,14 +140,11 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::DateTime& val)
+void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 {
 	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
-
-	if (PB_AT_EXEC == _paramBinding)
-		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
 
 	_lengthIndicator.push_back(pLenIn);
 
@@ -147,7 +152,6 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val)
 	Utility::dateTimeSync(*pTS, val);
 	
 	_timestamps.insert(TimestampMap::value_type(pTS, const_cast<DateTime*>(&val)));
-	_dataSize.insert(SizeMap::value_type((SQLPOINTER) pTS, size));
 
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
@@ -156,14 +160,14 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val)
 	{
 		try
 		{
-			colSize = _pTypeInfo->getInfo(SQL_TIMESTAMP, "COLUMN_SIZE");
-			decDigits = _pTypeInfo->getInfo(SQL_TIMESTAMP, "MINIMUM_SCALE");
+			colSize = _pTypeInfo->getInfo(SQL_TYPE_TIMESTAMP, "COLUMN_SIZE");
+			decDigits = _pTypeInfo->getInfo(SQL_TYPE_TIMESTAMP, "MINIMUM_SCALE");
 		}catch (NotFoundException&) { }
 	}
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
-		getParamType(), 
+		getParamType(dir), 
 		SQL_C_TIMESTAMP, 
 		SQL_TIMESTAMP, 
 		colSize,
@@ -177,25 +181,25 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val)
 }
 
 
-std::size_t Binder::dataSize(SQLPOINTER pAddr) const
+std::size_t Binder::parameterSize(SQLPOINTER pAddr) const
 {
-	SizeMap::const_iterator it = _dataSize.find(pAddr);
-	if (it != _dataSize.end()) return it->second;
+	ParameterMap::const_iterator it = _inParams.find(pAddr);
+	if (it != _inParams.end()) return it->second;
 	
 	throw NotFoundException("Requested data size not found.");
 }
 
 
-void Binder::bind(std::size_t pos, const char* const &pVal)
+void Binder::bind(std::size_t pos, const char* const &pVal, Direction dir)
 {
-	//no-op
+	throw NotImplementedException("char* binding not implemented, Use std::string instead.");
 }
 
 
-SQLSMALLINT Binder::getParamType() const
+SQLSMALLINT Binder::getParamType(Direction dir) const
 {
-	bool in = isInBound();
-	bool out = isOutBound();
+	bool in = isInBound(dir);
+	bool out = isOutBound(dir);
 	SQLSMALLINT ioType = SQL_PARAM_TYPE_UNKNOWN;
 	if (in && out) ioType = SQL_PARAM_INPUT_OUTPUT; 
 	else if(in)    ioType = SQL_PARAM_INPUT;
@@ -206,7 +210,7 @@ SQLSMALLINT Binder::getParamType() const
 }
 
 
-void Binder::sync(Binder::Direction direction)
+void Binder::sync(Direction direction)
 {
 	TimestampMap::iterator itTS = _timestamps.begin();
 	TimestampMap::iterator itTSEnd = _timestamps.end();

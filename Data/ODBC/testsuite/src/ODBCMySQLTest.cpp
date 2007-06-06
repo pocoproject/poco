@@ -758,6 +758,21 @@ void ODBCMySQLTest::testBLOBStmt()
 }
 
 
+void ODBCMySQLTest::testDateTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonDateTimeTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->dateTime();
+		i += 2;
+	}
+}
+
+
 void ODBCMySQLTest::testFloat()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -885,6 +900,15 @@ void ODBCMySQLTest::recreatePersonBLOBTable()
 	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
+}
+
+
+void ODBCMySQLTest::recreatePersonDateTimeTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
 
 
@@ -1070,6 +1094,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testDouble);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testTuple);

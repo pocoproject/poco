@@ -41,9 +41,7 @@ namespace Poco {
 namespace Data {
 
 
-AbstractBinder::AbstractBinder(): 
-	_inBound(true), 
-	_outBound(false)
+AbstractBinder::AbstractBinder()
 {
 }
 

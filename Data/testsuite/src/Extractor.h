@@ -96,6 +96,9 @@ public:
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
 
+	bool extract(std::size_t pos, Poco::DateTime& val);
+		/// Extracts a DateTime.
+
 	void reset();
 };
 

@@ -61,7 +61,10 @@ class Binding: public AbstractBinding
 	/// A Binding maps a value to a column.
 {
 public:
-	explicit Binding(const T& val): _val(val), _bound(false)
+	explicit Binding(const T& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_bound(false)
 		/// Creates the Binding.
 	{
 	}
@@ -89,7 +92,7 @@ public:
 	void bind(std::size_t pos)
 	{
 		poco_assert_dbg(getBinder() != 0);
-		TypeHandler<T>::bind(pos, _val, getBinder());
+		TypeHandler<T>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
 
@@ -109,7 +112,11 @@ class Binding<std::vector<T> >: public AbstractBinding
 	/// Specialization for std::vector.
 {
 public:
-	explicit Binding(const std::vector<T>& val): _val(val), _begin(val.begin()), _end(val.end())
+	explicit Binding(const std::vector<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_begin(val.begin()), 
+		_end(val.end())
 		/// Creates the Binding.
 	{
 		if (numOfRowsHandled() == 0)
@@ -140,7 +147,7 @@ public:
 	{
 		poco_assert_dbg(getBinder() != 0);
 		poco_assert_dbg(canBind());
-		TypeHandler<T>::bind(pos, *_begin, getBinder());
+		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
 	}
 
@@ -162,7 +169,11 @@ class Binding<std::list<T> >: public AbstractBinding
 	/// Specialization for std::list.
 {
 public:
-	explicit Binding(const std::list<T>& val): _val(val), _begin(val.begin()), _end(val.end())
+	explicit Binding(const std::list<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_begin(val.begin()), 
+		_end(val.end())
 		/// Creates the Binding.
 	{
 		if (numOfRowsHandled() == 0)
@@ -193,7 +204,7 @@ public:
 	{
 		poco_assert_dbg(getBinder() != 0);
 		poco_assert_dbg(canBind());
-		TypeHandler<T>::bind(pos, *_begin, getBinder());
+		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
 	}
 
@@ -215,7 +226,11 @@ class Binding<std::deque<T> >: public AbstractBinding
 	/// Specialization for std::deque.
 {
 public:
-	explicit Binding(const std::deque<T>& val): _val(val), _begin(val.begin()), _end(val.end())
+	explicit Binding(const std::deque<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_begin(val.begin()), 
+		_end(val.end())
 		/// Creates the Binding.
 	{
 		if (numOfRowsHandled() == 0)
@@ -246,7 +261,7 @@ public:
 	{
 		poco_assert_dbg(getBinder() != 0);
 		poco_assert_dbg(canBind());
-		TypeHandler<T>::bind(pos, *_begin, getBinder());
+		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
 	}
 
@@ -268,7 +283,11 @@ class Binding<std::set<T> >: public AbstractBinding
 	/// Specialization for std::set.
 {
 public:
-	explicit Binding(const std::set<T>& val): AbstractBinding(), _val(val), _begin(val.begin()), _end(val.end())
+	explicit Binding(const std::set<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_begin(val.begin()), 
+		_end(val.end())
 		/// Creates the Binding.
 	{
 		if (numOfRowsHandled() == 0)
@@ -299,7 +318,7 @@ public:
 	{
 		poco_assert_dbg(getBinder() != 0);
 		poco_assert_dbg(canBind());
-		TypeHandler<T>::bind(pos, *_begin, getBinder());
+		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
 	}
 
@@ -321,7 +340,11 @@ class Binding<std::multiset<T> >: public AbstractBinding
 	/// Specialization for std::multiset.
 {
 public:
-	explicit Binding(const std::multiset<T>& val): AbstractBinding(), _val(val), _begin(val.begin()), _end(val.end())
+	explicit Binding(const std::multiset<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_begin(val.begin()), 
+		_end(val.end())
 		/// Creates the Binding.
 	{
 		if (numOfRowsHandled() == 0)
@@ -352,7 +375,7 @@ public:
 	{
 		poco_assert_dbg(getBinder() != 0);
 		poco_assert_dbg(canBind());
-		TypeHandler<T>::bind(pos, *_begin, getBinder());
+		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
 	}
 
@@ -374,7 +397,11 @@ class Binding<std::map<K, V> >: public AbstractBinding
 	/// Specialization for std::map.
 {
 public:
-	explicit Binding(const std::map<K, V>& val): AbstractBinding(), _val(val), _begin(val.begin()), _end(val.end())
+	explicit Binding(const std::map<K, V>& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_begin(val.begin()), 
+		_end(val.end())
 		/// Creates the Binding.
 	{
 		if (numOfRowsHandled() == 0)
@@ -405,7 +432,7 @@ public:
 	{
 		poco_assert_dbg(getBinder() != 0);
 		poco_assert_dbg(canBind());
-		TypeHandler<V>::bind(pos, _begin->second, getBinder());
+		TypeHandler<V>::bind(pos, _begin->second, getBinder(), getDirection());
 		++_begin;
 	}
 
@@ -427,7 +454,11 @@ class Binding<std::multimap<K, V> >: public AbstractBinding
 	/// Specialization for std::multimap.
 {
 public:
-	explicit Binding(const std::multimap<K, V>& val): AbstractBinding(), _val(val), _begin(val.begin()), _end(val.end())
+	explicit Binding(const std::multimap<K, V>& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_begin(val.begin()), 
+		_end(val.end())
 		/// Creates the Binding.
 	{
 		if (numOfRowsHandled() == 0)
@@ -458,7 +489,7 @@ public:
 	{
 		poco_assert_dbg(getBinder() != 0);
 		poco_assert_dbg(canBind());
-		TypeHandler<V>::bind(pos, _begin->second, getBinder());
+		TypeHandler<V>::bind(pos, _begin->second, getBinder(), getDirection());
 		++_begin;
 	}
 
@@ -475,38 +506,38 @@ private:
 };
 
 
-template <typename T> Binding<T>* use(const T& t)
+template <typename T> Binding<T>* use(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	Binding<T>* pB = new Binding<T>(t);
+	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN);
 	poco_check_ptr (pB);
 	return pB;
 }
 
 
-template <typename T> Binding<T>* in(const T& t)
+template <typename T> Binding<T>* in(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	return use(t);
-}
-
-
-template <typename T> Binding<T>* out(const T& t)
-	/// Convenience function for a more compact Binding creation.
-{
-	Binding<T>* pB = use(t);
-	pB->setInBound(false);
-	pB->setOutBound(true);
+	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN);
+	poco_check_ptr (pB);
 	return pB;
 }
 
 
-template <typename T> Binding<T>* io(const T& t)
+template <typename T> Binding<T>* out(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	Binding<T>* pB = use(t);
-	pB->setInBound(true);
-	pB->setOutBound(true);
+	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_OUT);
+	poco_check_ptr (pB);
+	return pB;
+}
+
+
+template <typename T> Binding<T>* io(const T& t, const std::string& name = "")
+	/// Convenience function for a more compact Binding creation.
+{
+	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN_OUT);
+	poco_check_ptr (pB);
 	return pB;
 }
 

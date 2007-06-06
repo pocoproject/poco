@@ -67,16 +67,13 @@ class ODBC_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
 public:
+	typedef AbstractBinder::Direction Direction;
+	typedef std::map<SQLPOINTER, SQLLEN> ParameterMap;
+
 	enum ParameterBinding
 	{
 		PB_IMMEDIATE,
 		PB_AT_EXEC
-	};
-
-	enum Direction
-	{
-		PD_IN,
-		PD_OUT
 	};
 
 	Binder(const StatementHandle& rStmt,
@@ -87,49 +84,49 @@ public:
 	~Binder();
 		/// Destroys the Binder.
 
-	void bind(std::size_t pos, const Poco::Int8& val);
+	void bind(std::size_t pos, const Poco::Int8& val, Direction dir = PD_IN);
 		/// Binds an Int8.
 
-	void bind(std::size_t pos, const Poco::UInt8& val);
+	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir = PD_IN);
 		/// Binds an UInt8.
 
-	void bind(std::size_t pos, const Poco::Int16& val);
+	void bind(std::size_t pos, const Poco::Int16& val, Direction dir = PD_IN);
 		/// Binds an Int16.
 
-	void bind(std::size_t pos, const Poco::UInt16& val);
+	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir = PD_IN);
 		/// Binds an UInt16.
 
-	void bind(std::size_t pos, const Poco::Int32& val);
+	void bind(std::size_t pos, const Poco::Int32& val, Direction dir = PD_IN);
 		/// Binds an Int32.
 
-	void bind(std::size_t pos, const Poco::UInt32& val);
+	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir = PD_IN);
 		/// Binds an UInt32.
 
-	void bind(std::size_t pos, const Poco::Int64& val);
+	void bind(std::size_t pos, const Poco::Int64& val, Direction dir = PD_IN);
 		/// Binds an Int64.
 
-	void bind(std::size_t pos, const Poco::UInt64& val);
+	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir = PD_IN);
 		/// Binds an UInt64.
 
-	void bind(std::size_t pos, const bool& val);
+	void bind(std::size_t pos, const bool& val, Direction dir = PD_IN);
 		/// Binds a boolean.
 
-	void bind(std::size_t pos, const float& val);
+	void bind(std::size_t pos, const float& val, Direction dir = PD_IN);
 		/// Binds a float.
 
-	void bind(std::size_t pos, const double& val);
+	void bind(std::size_t pos, const double& val, Direction dir = PD_IN);
 		/// Binds a double.
 
-	void bind(std::size_t pos, const char& val);
+	void bind(std::size_t pos, const char& val, Direction dir = PD_IN);
 		/// Binds a single character.
 
-	void bind(std::size_t pos, const std::string& val);
+	void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN);
 		/// Binds a string.
 
-	void bind(std::size_t pos, const Poco::Data::BLOB& val);
+	void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir = PD_IN);
 		/// Binds a BLOB.
 
-	void bind(std::size_t pos, const Poco::DateTime& val);
+	void bind(std::size_t pos, const Poco::DateTime& val, Direction dir = PD_IN);
 		/// Binds a DateTime.
 
 	void setDataBinding(ParameterBinding binding);
@@ -138,61 +135,54 @@ public:
 	ParameterBinding getDataBinding() const;
 		/// Return data binding type.
 
-	std::size_t dataSize(SQLPOINTER pAddr) const;
+	std::size_t parameterSize(SQLPOINTER pAddr) const;
 		/// Returns bound data size for parameter at specified position.
 
 	void sync(Direction direction);
 		/// Synchronizes non-POD parameters.
 
+	ParameterMap& outParameters();
+		/// Returns map of output parameter pointers and sizes.
+
 private:
 	typedef std::vector<SQLLEN*> LengthVec;
 	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*> TimestampMap;
-	typedef std::map<SQLPOINTER, SQLLEN> SizeMap;
 
-	void bind(std::size_t pos, const char* const &pVal);
+	void describeParameter(std::size_t pos);
+		/// Sets the description field for the parameter, if needed.
+
+	void bind(std::size_t pos, const char* const &pVal, Direction dir = PD_IN);
 		/// Binds a const char ptr. 
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 
-	SQLSMALLINT getParamType() const;
+	SQLSMALLINT getParamType(Direction dir) const;
 
 	template <typename T>
-	void bindImpl(std::size_t pos, T& val, SQLSMALLINT cDataType)
+	void bindImpl(std::size_t pos, T& val, SQLSMALLINT cDataType, Direction dir)
 	{
 		_lengthIndicator.push_back(0);
-		_dataSize.insert(SizeMap::value_type((SQLPOINTER) &val, sizeof(T)));
 
 		int sqlDataType = Utility::sqlDataType(cDataType);
-		
-		SQLUINTEGER columnSize = 0;
-		SQLSMALLINT decimalDigits = 0;
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
 
-		// somewhat funky flow control, but not all
-		// ODBC drivers will cooperate here
-		try 
-		{ 
-			Parameter p(_rStmt, pos); 
-			columnSize = (SQLUINTEGER) p.columnSize();
-			decimalDigits = (SQLSMALLINT) p.decimalDigits();
-		}
-		catch (StatementException&)
-		{	
-			try 
-			{ 
-				ODBCColumn c(_rStmt, pos);
-				columnSize = (SQLUINTEGER) c.length();
-				decimalDigits = (SQLSMALLINT) c.precision();
-			}
-			catch (StatementException&) { }
+		if (_pTypeInfo)
+		{
+			try
+			{
+				colSize = _pTypeInfo->getInfo(cDataType, "COLUMN_SIZE");
+				decDigits = _pTypeInfo->getInfo(cDataType, "MINIMUM_SCALE");
+			}catch (NotFoundException&) { }
 		}
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
-			getParamType(), 
+			getParamType(dir), 
 			cDataType, 
 			sqlDataType, 
-			columnSize,
-			decimalDigits,
+			colSize,
+			decDigits,
 			(SQLPOINTER) &val, 
 			0, 
 			_lengthIndicator.back())))
@@ -203,7 +193,8 @@ private:
 
 	const StatementHandle& _rStmt;
 	LengthVec _lengthIndicator;
-	SizeMap _dataSize;
+	ParameterMap _inParams;
+	ParameterMap _outParams;
 	ParameterBinding _paramBinding;
 	TimestampMap _timestamps;
 	const TypeInfo* _pTypeInfo;
@@ -213,75 +204,75 @@ private:
 //
 // inlines
 //
-inline void Binder::bind(std::size_t pos, const Poco::Int8& val)
+inline void Binder::bind(std::size_t pos, const Poco::Int8& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_STINYINT);
+	bindImpl(pos, val, SQL_C_STINYINT, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt8& val)
+inline void Binder::bind(std::size_t pos, const Poco::UInt8& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_UTINYINT);
+	bindImpl(pos, val, SQL_C_UTINYINT, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::Int16& val)
+inline void Binder::bind(std::size_t pos, const Poco::Int16& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_SSHORT);
+	bindImpl(pos, val, SQL_C_SSHORT, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt16& val)
+inline void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_USHORT);
+	bindImpl(pos, val, SQL_C_USHORT, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt32& val)
+inline void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_ULONG);
+	bindImpl(pos, val, SQL_C_ULONG, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::Int32& val)
+inline void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_SLONG);
+	bindImpl(pos, val, SQL_C_SLONG, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt64& val)
+inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_UBIGINT);
+	bindImpl(pos, val, SQL_C_UBIGINT, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::Int64& val)
+inline void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_SBIGINT);
+	bindImpl(pos, val, SQL_C_SBIGINT, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const float& val)
+inline void Binder::bind(std::size_t pos, const float& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_FLOAT);
+	bindImpl(pos, val, SQL_C_FLOAT, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const double& val)
+inline void Binder::bind(std::size_t pos, const double& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_DOUBLE);
+	bindImpl(pos, val, SQL_C_DOUBLE, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const bool& val)
+inline void Binder::bind(std::size_t pos, const bool& val, Direction dir)
 {
-	bindImpl(pos, val, Utility::boolDataType);
+	bindImpl(pos, val, Utility::boolDataType, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const char& val)
+inline void Binder::bind(std::size_t pos, const char& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_STINYINT);
+	bindImpl(pos, val, SQL_C_STINYINT, dir);
 }
 
 
@@ -294,6 +285,12 @@ inline void Binder::setDataBinding(Binder::ParameterBinding binding)
 inline Binder::ParameterBinding Binder::getDataBinding() const
 {
 	return _paramBinding;
+}
+
+
+inline Binder::ParameterMap& Binder::outParameters()
+{
+	return _outParams;
 }
 
 

@@ -41,16 +41,23 @@ namespace Poco {
 namespace Data {
 
 
-AbstractBinding::AbstractBinding(): 
+AbstractBinding::AbstractBinding(const std::string& name, Direction direction): 
 	_pBinder(0),
-	_inBound(true),
-	_outBound(false)
+	_name(name),
+	_direction(direction)
 {
 }
 
 
 AbstractBinding::~AbstractBinding()
 {
+}
+
+
+void AbstractBinding::setBinder(AbstractBinder* pBinder)
+{
+	poco_check_ptr (pBinder);
+	_pBinder = pBinder;
 }
 
 

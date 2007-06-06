@@ -54,16 +54,6 @@ Preparation::Preparation(const StatementHandle& rStmt,
 	POCO_SQLCHAR* pStr = (POCO_SQLCHAR*) statement.c_str();
 	if (Utility::isError(SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
 		throw StatementException(_rStmt);
-
-	SQLSMALLINT nCol;
-	if (Utility::isError(SQLNumResultCols(_rStmt, &nCol)))
-		throw StatementException(_rStmt);
-
-	if (nCol)
-	{
-		_pValues.resize(nCol, 0);
-		_pLengths.resize(nCol, 0);
-	}
 }
 
 
@@ -76,6 +66,25 @@ Preparation::~Preparation()
 	std::vector<Poco::Any*>::iterator itVal = _pValues.begin();
 	std::vector<Poco::Any*>::iterator itValEnd = _pValues.end();
 	for (; itVal != itValEnd; ++itVal) delete *itVal;
+}
+
+
+std::size_t Preparation::columns() const
+{
+	if (_pValues.empty())
+	{
+		SQLSMALLINT nCol = 0;
+		if (Utility::isError(SQLNumResultCols(_rStmt, &nCol)))
+			throw StatementException(_rStmt);
+
+		if (nCol)
+		{
+			_pValues.resize(nCol, 0);
+			_pLengths.resize(nCol, 0);
+		}
+	}
+
+	return _pValues.size();
 }
 
 

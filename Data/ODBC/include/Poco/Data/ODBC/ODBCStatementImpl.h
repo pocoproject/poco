@@ -95,7 +95,7 @@ protected:
 		/// Compiles the statement, doesn't bind yet
 
 	void bindImpl();
-		/// Binds parameters
+		/// Binds all parameters and executes the statement.
 
 	AbstractExtractor& extractor();
 		/// Returns the concrete extractor used by the statement.
@@ -115,6 +115,9 @@ private:
 	void clear();
 		/// Closes the cursor and resets indicator variables.
 	
+	void doBind(bool clear = true, bool reset = false);
+		/// Binds parameters.
+
 	bool hasData() const;
 		/// Returns true if statement returns data.
 

@@ -113,14 +113,17 @@ template <>
 class TypeHandler<Person>
 {
 public:
-	static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, 
+		const Person& obj, 
+		AbstractBinder* pBinder, 
+		AbstractBinder::Direction dir = AbstractBinder::PD_IN)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
 		poco_assert_dbg (pBinder != 0);
-		pBinder->bind(pos++, obj.lastName);
-		pBinder->bind(pos++, obj.firstName);
-		pBinder->bind(pos++, obj.address);
-		pBinder->bind(pos++, obj.age);
+		pBinder->bind(pos++, obj.lastName, dir);
+		pBinder->bind(pos++, obj.firstName, dir);
+		pBinder->bind(pos++, obj.address, dir);
+		pBinder->bind(pos++, obj.age, dir);
 	}
 
 	static void prepare(std::size_t pos, const Person& obj, AbstractPreparation* pPrepare)
@@ -217,11 +220,16 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 		SQLSMALLINT dateTimeDecDigits = 0;
 		
 		rc = SQLFetch(hstmt);
-		assert (SQL_SUCCEEDED(rc));
-		rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &dateTimeColSize, sizeof(SQLINTEGER), 0);
-		assert (SQL_SUCCEEDED(rc));
-		rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &dateTimeDecDigits, sizeof(SQLSMALLINT), 0);
-		assert (SQL_SUCCEEDED(rc));
+		assert (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
+		if (SQL_SUCCEEDED(rc))
+		{
+			rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &dateTimeColSize, sizeof(SQLINTEGER), 0);
+			assert (SQL_SUCCEEDED(rc));
+			rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &dateTimeDecDigits, sizeof(SQLSMALLINT), 0);
+			assert (SQL_SUCCEEDED(rc));
+		}
+		else if (SQL_NO_DATA == rc)
+			std::cerr << "Warning: no data type info returned by driver." << std::endl;
 
 		rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 		assert (SQL_SUCCEEDED(rc));
@@ -359,7 +367,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			if (SQL_NEED_DATA == rc)
 			{
 				SQLPOINTER pParam = 0;
-				int i = 0;
+				int i = 1;
 				rc = SQLParamData(hstmt, &pParam);
 				do
 				{
@@ -368,12 +376,14 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					// non-variable length fields, but SQLite ODBC 
 					// driver insists on it always being the actual 
 					// data length
-					if (i < 3)
-						dataSize = (SQLINTEGER) str[i++].size();
-					else if (3 == i) dataSize = sizeof(int);
-					else if (4 == i) dataSize = sizeof(float);
+					if (i < 4)
+						dataSize = (SQLINTEGER) str[i-1].size();
+					else if (4 == i) dataSize = sizeof(int);
+					else if (5 == i) dataSize = sizeof(float);
+					else if (6 == i) dataSize = sizeof(SQL_TIMESTAMP_STRUCT);
 
 					rc = SQLPutData(hstmt, pParam, dataSize);
+					++i;
 				}while (SQL_NEED_DATA == (rc = SQLParamData(hstmt, &pParam)));
 			}
 			assert (SQL_SUCCEEDED(rc));

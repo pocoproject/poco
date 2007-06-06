@@ -50,77 +50,82 @@ Binder::~Binder()
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Int8 &val)
+void Binder::bind(std::size_t pos, const Poco::Int8 &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::UInt8 &val)
+void Binder::bind(std::size_t pos, const Poco::UInt8 &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Int16 &val)
+void Binder::bind(std::size_t pos, const Poco::Int16 &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::UInt16 &val)
+void Binder::bind(std::size_t pos, const Poco::UInt16 &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Int32 &val)
+void Binder::bind(std::size_t pos, const Poco::Int32 &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::UInt32 &val)
+void Binder::bind(std::size_t pos, const Poco::UInt32 &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Int64 &val)
+void Binder::bind(std::size_t pos, const Poco::Int64 &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::UInt64 &val)
+void Binder::bind(std::size_t pos, const Poco::UInt64 &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const bool &val)
+void Binder::bind(std::size_t pos, const bool &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const float &val)
+void Binder::bind(std::size_t pos, const float &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const double &val)
+void Binder::bind(std::size_t pos, const double &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const char &val)
+void Binder::bind(std::size_t pos, const char &val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const char* const &pVal)
+void Binder::bind(std::size_t pos, const char* const &pVal, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const std::string& val)
+void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
+void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
+{
+}
+
+
+void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 {
 }
 

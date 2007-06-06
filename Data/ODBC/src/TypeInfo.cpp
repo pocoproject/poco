@@ -76,9 +76,9 @@ void TypeInfo::fillCTypes()
 	_cDataTypes.insert(ValueType(SQL_BINARY, SQL_C_BINARY));
 	_cDataTypes.insert(ValueType(SQL_VARBINARY, SQL_C_BINARY));
 	_cDataTypes.insert(ValueType(SQL_LONGVARBINARY, SQL_C_BINARY));
-	_cDataTypes.insert(ValueType(SQL_DATE, SQL_C_DATE));
-	_cDataTypes.insert(ValueType(SQL_TIME, SQL_C_TIME));
-	_cDataTypes.insert(ValueType(SQL_TIMESTAMP, SQL_C_TIMESTAMP));
+	_cDataTypes.insert(ValueType(SQL_TYPE_DATE, SQL_C_DATE));
+	_cDataTypes.insert(ValueType(SQL_TYPE_TIME, SQL_C_TIME));
+	_cDataTypes.insert(ValueType(SQL_TYPE_TIMESTAMP, SQL_C_TIMESTAMP));
 }
 
 
@@ -100,9 +100,9 @@ void TypeInfo::fillSQLTypes()
 	_sqlDataTypes.insert(ValueType(SQL_C_FLOAT, SQL_REAL));
 	_sqlDataTypes.insert(ValueType(SQL_C_DOUBLE, SQL_DOUBLE));
 	_sqlDataTypes.insert(ValueType(SQL_C_BINARY, SQL_LONGVARBINARY));
-	_sqlDataTypes.insert(ValueType(SQL_C_DATE, SQL_DATE));
-	_sqlDataTypes.insert(ValueType(SQL_C_TIME, SQL_TIME));
-	_sqlDataTypes.insert(ValueType(SQL_C_TIMESTAMP, SQL_TIMESTAMP));
+	_sqlDataTypes.insert(ValueType(SQL_C_DATE, SQL_TYPE_DATE));
+	_sqlDataTypes.insert(ValueType(SQL_C_TIME, SQL_TYPE_TIME));
+	_sqlDataTypes.insert(ValueType(SQL_C_TIMESTAMP, SQL_TYPE_TIMESTAMP));
 }
 
 
@@ -122,41 +122,37 @@ void TypeInfo::fillTypeInfo(SQLHDBC pHDBC)
 		if (!SQL_SUCCEEDED(rc))
 			throw StatementException(hstmt, "SQLGetData()");
 
-		DataTypeMap::const_iterator it = _cDataTypes.begin();
-		DataTypeMap::const_iterator end = _cDataTypes.end();
-
-		for(; it != end; ++it)
+		rc = SQLGetTypeInfo(hstmt, SQL_ALL_TYPES);
+		if (SQL_SUCCEEDED(rc))
 		{
-			char typeName[stringSize] = { 0 };
-			char literalPrefix[stringSize] = { 0 };
-			char literalSuffix[stringSize] = { 0 };
-			char createParams[stringSize] = { 0 };
-			char localTypeName[stringSize] = { 0 };
-			
-			TypeInfoTup ti("TYPE_NAME", "",
-				"DATA_TYPE", 0,
-				"COLUMN_SIZE", 0,
-				"LITERAL_PREFIX", "",
-				"LITERAL_SUFFIX", "",
-				"CREATE_PARAMS", "",
-				"NULLABLE", 0,
-				"CASE_SENSITIVE", 0,
-				"SEARCHABLE", 0,
-				"UNSIGNED_ATTRIBUTE", 0,
-				"FIXED_PREC_SCALE", 0,
-				"AUTO_UNIQUE_VALUE", 0,
-				"LOCAL_TYPE_NAME", "",
-				"MINIMUM_SCALE", 0,
-				"MAXIMUM_SCALE", 0,
-				"SQL_DATA_TYPE", 0,
-				"SQL_DATETIME_SUB", 0,
-				"NUM_PREC_RADIX", 0,
-				"INTERVAL_PRECISION", 0);
-
-			rc = SQLGetTypeInfo(hstmt, it->first);
-			rc = SQLFetch(hstmt);
-			if (SQL_SUCCEEDED(rc))
+			while (SQLFetch(hstmt) != SQL_NO_DATA_FOUND)
 			{
+				char typeName[stringSize] = { 0 };
+				char literalPrefix[stringSize] = { 0 };
+				char literalSuffix[stringSize] = { 0 };
+				char createParams[stringSize] = { 0 };
+				char localTypeName[stringSize] = { 0 };
+				
+				TypeInfoTup ti("TYPE_NAME", "",
+					"DATA_TYPE", 0,
+					"COLUMN_SIZE", 0,
+					"LITERAL_PREFIX", "",
+					"LITERAL_SUFFIX", "",
+					"CREATE_PARAMS", "",
+					"NULLABLE", 0,
+					"CASE_SENSITIVE", 0,
+					"SEARCHABLE", 0,
+					"UNSIGNED_ATTRIBUTE", 0,
+					"FIXED_PREC_SCALE", 0,
+					"AUTO_UNIQUE_VALUE", 0,
+					"LOCAL_TYPE_NAME", "",
+					"MINIMUM_SCALE", 0,
+					"MAXIMUM_SCALE", 0,
+					"SQL_DATA_TYPE", 0,
+					"SQL_DATETIME_SUB", 0,
+					"NUM_PREC_RADIX", 0,
+					"INTERVAL_PRECISION", 0);
+
 				rc = SQLGetData(hstmt, 1, SQL_C_CHAR, typeName, sizeof(typeName), 0);
 				ti.set<0>(typeName);
 				rc = SQLGetData(hstmt, 2, SQL_C_SSHORT, &ti.get<1>(), sizeof(SQLSMALLINT), 0);
@@ -210,6 +206,49 @@ int TypeInfo::sqlDataType(int cDataType) const
 		throw NotFoundException(format("SQL data type not found for C data type: %d", cDataType));
 
 	return it->second;
+}
+
+
+void TypeInfo::print(std::ostream& ostr)
+{
+	if (_typeInfo.empty())
+	{
+		ostr << "No data found.";
+		return;
+	}
+
+	TypeInfoTup::NameVec::const_iterator nIt = (*_typeInfo[0].names()).begin();
+	TypeInfoTup::NameVec::const_iterator nItEnd = (*_typeInfo[0].names()).end();
+	for (; nIt != nItEnd; ++nIt)
+		ostr << *nIt << "\t";
+
+	ostr << std::endl;
+
+	TypeInfoVec::const_iterator it = _typeInfo.begin();
+	TypeInfoVec::const_iterator end = _typeInfo.end();
+
+	for (; it != end; ++it)
+	{
+		ostr << it->get<0>() << "\t" 
+			<< it->get<1>() << "\t" 
+			<< it->get<2>() << "\t" 
+			<< it->get<3>() << "\t" 
+			<< it->get<4>() << "\t" 
+			<< it->get<5>() << "\t" 
+			<< it->get<6>() << "\t" 
+			<< it->get<7>() << "\t" 
+			<< it->get<8>() << "\t" 
+			<< it->get<9>() << "\t" 
+			<< it->get<10>() << "\t" 
+			<< it->get<11>() << "\t" 
+			<< it->get<12>() << "\t" 
+			<< it->get<13>() << "\t" 
+			<< it->get<14>() << "\t"
+			<< it->get<15>() << "\t" 
+			<< it->get<16>() << "\t" 
+			<< it->get<17>() << "\t" 
+			<< it->get<18>() << std::endl;
+	}
 }
 
 

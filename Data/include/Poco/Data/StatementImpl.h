@@ -214,6 +214,12 @@ protected:
 	SessionImpl& session();
 		/// Rteurns session associated with this statement.
 
+	void fixupBinding();
+		/// Sets the AbstractBinder at the bindings.
+
+	void resetBinding();
+		/// Resets binding so it can be reused again.
+
 private:
 	void compile();
 		/// Compiles the statement, if not yet compiled. doesn't bind yet
@@ -230,14 +236,8 @@ private:
 	void fixupExtraction();
 		/// Sets the AbstractExtractor at the extractors.
 
-	void fixupBinding();
-		/// Sets the AbstractBinder at the bindings
-
-	void resetBinding();
-		/// Resets binding so we can reuse it again.
-
 	void resetExtraction();
-		/// Resets binding so we can reuse it again.
+		/// Resets binding so it can be reused again.
 
 	template <class T, class C>
 	void addInternalExtract(const MetaColumn& mc)

@@ -864,123 +864,135 @@ void ODBCSQLServerTest::testInternalStorageType()
 
 void ODBCSQLServerTest::testStoredProcedure()
 {
-	dropObject("PROCEDURE", "storedProcedure");
-
-	*_pSession << "CREATE PROCEDURE storedProcedure "
-	"@outParam int = 0 OUTPUT "
-	"AS "
-	"SET @outParam = -1 "
-	, now;
-	
-	int i = 0;
-	*_pSession << "{call storedProcedure(?)}", out(i), now;
-	assert(-1 == i);
-	dropObject("PROCEDURE", "storedProcedure");
-
-	*_pSession << "CREATE PROCEDURE storedProcedure "
-	"@inParam int, "
-	"@outParam int = 0 OUTPUT "
-	"AS "
-	"SET @outParam = @inParam*@inParam "
-	, now;
-
-	fail("TODO");
-	i = 2;
-	int j = 0;
-	/*not working */
-	try{
-		*_pSession << "{call storedProcedure(2, ?)}", out(j), now;
-	}catch(StatementException& ex)
+	for (int k = 0; k < 8;)
 	{
-		std::cout << ex.toString();
-	}
-	//assert(4 == j);
-	dropObject("PROCEDURE", "storedProcedure");
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
 
-	*_pSession << "CREATE PROCEDURE storedProcedure "
-	"@ioParam int "
-	"AS "
-	"SET @ioParam = @ioParam*@ioParam "
-	, now;
+		dropObject("PROCEDURE", "storedProcedure");
 
-	i = 2;
-	/*not working*/
-	try{
+		*_pSession << "CREATE PROCEDURE storedProcedure "
+		"@outParam int OUTPUT "
+		"AS "
+		"SET @outParam = -1 "
+		, now;
+		
+		int i = 0;
+		*_pSession << "{call storedProcedure(?)}", out(i), now;
+		assert(-1 == i);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		*_pSession << "CREATE PROCEDURE storedProcedure "
+		"@inParam int, "
+		"@outParam int OUTPUT "
+		"AS "
+		"SET @outParam = @inParam*@inParam "
+		, now;
+
+		i = 2;
+		int j = 0;
+		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		assert(4 == j);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		*_pSession << "CREATE PROCEDURE storedProcedure "
+		"@ioParam int OUTPUT "
+		"AS "
+		"SET @ioParam = @ioParam*@ioParam "
+		, now;
+
+		i = 2;
 		*_pSession << "{call storedProcedure(?)}", io(i), now;
-	}catch(StatementException& ex)
-	{
-		std::cout << ex.toString();
+		assert(4 == i);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		k += 2;
 	}
-	//assert(4 == i);
-	dropObject("PROCEDURE", "storedProcedure");
 }
 
 
 void ODBCSQLServerTest::testStoredFunction()
 {
-	dropObject("PROCEDURE", "storedFunction");
-	*_pSession << "CREATE PROCEDURE storedFunction "
-	"AS "
-	"DECLARE @retVal int "
-	"SET @retVal = -1 "
-	"RETURN @retVal"
-	, now;
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
 
-	int i = 0;
-	*_pSession << "{? = call storedFunction}", out(i), now;
+		dropObject("PROCEDURE", "storedFunction");
+		*_pSession << "CREATE PROCEDURE storedFunction AS "
+		"BEGIN "
+		"DECLARE @retVal int;"
+		"SET @retVal = -1;"
+		"RETURN @retVal;"
+		"END;"
+		, now;
 
-	assert(-1 == i);
-	dropObject("PROCEDURE", "storedFunction");
+		int i = 0;
+		*_pSession << "{? = call storedFunction}", out(i), now;
+		assert(-1 == i);
+		dropObject("PROCEDURE", "storedFunction");
 
-	/*TODO
-	*_pSession << "CREATE OR REPLACE "
-		"FUNCTION storedFunction(inParam IN NUMBER) RETURN NUMBER IS "
-		" BEGIN RETURN(inParam*inParam); "
-		" END storedFunction;" , now;
 
-	i = 2;
-	int result = 0;
-	*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
-	assert(4 == result);
-	*_pSession << "DROP FUNCTION storedFunction;", now;
+		*_pSession << "CREATE PROCEDURE storedFunction(@inParam int) AS "
+		"BEGIN "
+		"RETURN @inParam*@inParam;"
+		"END;"
+		, now;
 
-	*_pSession << "CREATE OR REPLACE "
-		"FUNCTION storedFunction(inParam IN NUMBER, outParam OUT NUMBER) RETURN NUMBER IS "
-		" BEGIN outParam := inParam*inParam; RETURN(outParam); "
-		" END storedFunction;" , now;
+		i = 2;
+		int result = 0;
+		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		assert(4 == result);
+		dropObject("PROCEDURE", "storedFunction");
 
-	i = 2;
-	int j = 0;
-	result = 0;
-	*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
-	assert(4 == j);
-	assert(j == result); 
-	*_pSession << "DROP FUNCTION storedFunction;", now;
 
-	*_pSession << "CREATE OR REPLACE "
-		"FUNCTION storedFunction(param1 IN OUT NUMBER, param2 IN OUT NUMBER) RETURN NUMBER IS "
-		" temp NUMBER := param1; "
-		" BEGIN param1 := param2; param2 := temp; RETURN(param1+param2); "
-		" END storedFunction;" , now;
+		*_pSession << "CREATE PROCEDURE storedFunction(@inParam int, @outParam int OUTPUT) AS "
+		"BEGIN "
+		"SET @outParam = @inParam*@inParam;"
+		"RETURN @outParam;"
+		"END"
+		, now;
 
-	i = 1;
-	j = 2;
-	result = 0;
-	*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
-	assert(1 == j);
-	assert(2 == i);
-	assert(3 == result); 
-	
-	Tuple<int, int> params(1, 2);
-	assert(1 == params.get<0>());
-	assert(2 == params.get<1>());
-	result = 0;
-	*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
-	assert(1 == params.get<1>());
-	assert(2 == params.get<0>());
-	assert(3 == result); 
-	*_pSession << "DROP FUNCTION storedFunction;", now;
-	*/
+		i = 2;
+		int j = 0;
+		result = 0;
+		*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
+		assert(4 == j);
+		assert(j == result);
+		dropObject("PROCEDURE", "storedFunction");
+
+
+		*_pSession << "CREATE PROCEDURE storedFunction(@param1 int OUTPUT,@param2 int OUTPUT) AS "
+		"BEGIN "
+		"DECLARE @temp int; "
+		"SET @temp = @param1;"
+		"SET @param1 = @param2;"
+		"SET @param2 = @temp;"
+		"RETURN @param1 + @param2; "
+		"END"
+		, now;
+
+		i = 1;
+		j = 2;
+		result = 0;
+		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
+		assert(1 == j);
+		assert(2 == i);
+		assert(3 == result); 
+
+		Tuple<int, int> params(1, 2);
+		assert(1 == params.get<0>());
+		assert(2 == params.get<1>());
+		result = 0;
+		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
+		assert(1 == params.get<1>());
+		assert(2 == params.get<0>());
+		assert(3 == result); 
+
+		dropObject("PROCEDURE", "storedFunction");
+
+		k += 2;
+	}
 }
 
 

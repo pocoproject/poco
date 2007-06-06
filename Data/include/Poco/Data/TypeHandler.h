@@ -77,13 +77,13 @@ class TypeHandler
 	///            return 3; // lastName + firstname + age occupy three columns
 	///        }
 	///    
-	///        static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder)
+	///        static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	///        {
 	///            // the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
 	///            // Note that we advance pos by the number of columns the datatype uses! For string/int this is one.
 	///            poco_assert_dbg (pBinder != 0);
-	///            TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder);
-	///            TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder);
+	///            TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder, dir);
+	///            TypeHandler<std::string>::bind(pos++, obj.getFirstName(), pBinder, dir);
 	///            TypeHandler<int>::bind(pos++, obj.getAge(), pBinder);
 	///        }
 	///    
@@ -118,10 +118,10 @@ class TypeHandler
 	/// Apart from that no further work is needed. One can now use Person with into and use clauses.
 {
 public:
-	static void bind(std::size_t pos, const T& obj, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, const T& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert_dbg (pBinder != 0);
-		pBinder->bind(pos, obj);
+		pBinder->bind(pos, obj, dir);
 	}
 
 	static std::size_t size()
@@ -179,29 +179,29 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
-		pBinder->bind(pos++, tuple.template get<12>());
-		pBinder->bind(pos++, tuple.template get<13>());
-		pBinder->bind(pos++, tuple.template get<14>());
-		pBinder->bind(pos++, tuple.template get<15>());
-		pBinder->bind(pos++, tuple.template get<16>());
-		pBinder->bind(pos++, tuple.template get<17>());
-		pBinder->bind(pos++, tuple.template get<18>());
-		pBinder->bind(pos++, tuple.template get<19>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
+		pBinder->bind(pos++, tuple.template get<12>(), dir);
+		pBinder->bind(pos++, tuple.template get<13>(), dir);
+		pBinder->bind(pos++, tuple.template get<14>(), dir);
+		pBinder->bind(pos++, tuple.template get<15>(), dir);
+		pBinder->bind(pos++, tuple.template get<16>(), dir);
+		pBinder->bind(pos++, tuple.template get<17>(), dir);
+		pBinder->bind(pos++, tuple.template get<18>(), dir);
+		pBinder->bind(pos++, tuple.template get<19>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -312,28 +312,28 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
-		pBinder->bind(pos++, tuple.template get<12>());
-		pBinder->bind(pos++, tuple.template get<13>());
-		pBinder->bind(pos++, tuple.template get<14>());
-		pBinder->bind(pos++, tuple.template get<15>());
-		pBinder->bind(pos++, tuple.template get<16>());
-		pBinder->bind(pos++, tuple.template get<17>());
-		pBinder->bind(pos++, tuple.template get<18>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
+		pBinder->bind(pos++, tuple.template get<12>(), dir);
+		pBinder->bind(pos++, tuple.template get<13>(), dir);
+		pBinder->bind(pos++, tuple.template get<14>(), dir);
+		pBinder->bind(pos++, tuple.template get<15>(), dir);
+		pBinder->bind(pos++, tuple.template get<16>(), dir);
+		pBinder->bind(pos++, tuple.template get<17>(), dir);
+		pBinder->bind(pos++, tuple.template get<18>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -440,27 +440,27 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
-		pBinder->bind(pos++, tuple.template get<12>());
-		pBinder->bind(pos++, tuple.template get<13>());
-		pBinder->bind(pos++, tuple.template get<14>());
-		pBinder->bind(pos++, tuple.template get<15>());
-		pBinder->bind(pos++, tuple.template get<16>());
-		pBinder->bind(pos++, tuple.template get<17>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
+		pBinder->bind(pos++, tuple.template get<12>(), dir);
+		pBinder->bind(pos++, tuple.template get<13>(), dir);
+		pBinder->bind(pos++, tuple.template get<14>(), dir);
+		pBinder->bind(pos++, tuple.template get<15>(), dir);
+		pBinder->bind(pos++, tuple.template get<16>(), dir);
+		pBinder->bind(pos++, tuple.template get<17>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -563,26 +563,26 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
-		pBinder->bind(pos++, tuple.template get<12>());
-		pBinder->bind(pos++, tuple.template get<13>());
-		pBinder->bind(pos++, tuple.template get<14>());
-		pBinder->bind(pos++, tuple.template get<15>());
-		pBinder->bind(pos++, tuple.template get<16>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
+		pBinder->bind(pos++, tuple.template get<12>(), dir);
+		pBinder->bind(pos++, tuple.template get<13>(), dir);
+		pBinder->bind(pos++, tuple.template get<14>(), dir);
+		pBinder->bind(pos++, tuple.template get<15>(), dir);
+		pBinder->bind(pos++, tuple.template get<16>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -681,25 +681,25 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
-		pBinder->bind(pos++, tuple.template get<12>());
-		pBinder->bind(pos++, tuple.template get<13>());
-		pBinder->bind(pos++, tuple.template get<14>());
-		pBinder->bind(pos++, tuple.template get<15>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
+		pBinder->bind(pos++, tuple.template get<12>(), dir);
+		pBinder->bind(pos++, tuple.template get<13>(), dir);
+		pBinder->bind(pos++, tuple.template get<14>(), dir);
+		pBinder->bind(pos++, tuple.template get<15>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -794,24 +794,24 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
-		pBinder->bind(pos++, tuple.template get<12>());
-		pBinder->bind(pos++, tuple.template get<13>());
-		pBinder->bind(pos++, tuple.template get<14>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
+		pBinder->bind(pos++, tuple.template get<12>(), dir);
+		pBinder->bind(pos++, tuple.template get<13>(), dir);
+		pBinder->bind(pos++, tuple.template get<14>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -902,23 +902,23 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
-		pBinder->bind(pos++, tuple.template get<12>());
-		pBinder->bind(pos++, tuple.template get<13>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
+		pBinder->bind(pos++, tuple.template get<12>(), dir);
+		pBinder->bind(pos++, tuple.template get<13>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1005,22 +1005,22 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
-		pBinder->bind(pos++, tuple.template get<12>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
+		pBinder->bind(pos++, tuple.template get<12>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1103,21 +1103,21 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
-		pBinder->bind(pos++, tuple.template get<11>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
+		pBinder->bind(pos++, tuple.template get<11>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1196,20 +1196,20 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
-		pBinder->bind(pos++, tuple.template get<10>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
+		pBinder->bind(pos++, tuple.template get<10>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1275,19 +1275,19 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
-		pBinder->bind(pos++, tuple.template get<9>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
+		pBinder->bind(pos++, tuple.template get<9>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1350,18 +1350,18 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
-		pBinder->bind(pos++, tuple.template get<8>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
+		pBinder->bind(pos++, tuple.template get<8>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1421,17 +1421,17 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
-		pBinder->bind(pos++, tuple.template get<7>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
+		pBinder->bind(pos++, tuple.template get<7>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1488,16 +1488,16 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
-		pBinder->bind(pos++, tuple.template get<6>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
+		pBinder->bind(pos++, tuple.template get<6>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1551,15 +1551,15 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
-		pBinder->bind(pos++, tuple.template get<5>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
+		pBinder->bind(pos++, tuple.template get<5>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1610,14 +1610,14 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
-		pBinder->bind(pos++, tuple.template get<4>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
+		pBinder->bind(pos++, tuple.template get<4>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1665,13 +1665,13 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
-		pBinder->bind(pos++, tuple.template get<3>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
+		pBinder->bind(pos++, tuple.template get<3>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1716,12 +1716,12 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
-		pBinder->bind(pos++, tuple.template get<2>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
+		pBinder->bind(pos++, tuple.template get<2>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1763,11 +1763,11 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
-		pBinder->bind(pos++, tuple.template get<1>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
+		pBinder->bind(pos++, tuple.template get<1>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
@@ -1806,10 +1806,10 @@ public:
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList> >::CONSTREFTYPE TupleConstRef;
 	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList> >::REFTYPE      TupleRef;
 
-	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		pBinder->bind(pos++, tuple.template get<0>());
+		pBinder->bind(pos++, tuple.template get<0>(), dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)

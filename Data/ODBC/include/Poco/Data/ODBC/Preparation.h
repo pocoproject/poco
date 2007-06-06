@@ -233,8 +233,8 @@ private:
 	}
 
 	const StatementHandle& _rStmt;
-	std::vector<Poco::Any*> _pValues;
-	std::vector<SQLLEN*> _pLengths;
+	mutable std::vector<Poco::Any*> _pValues;
+	mutable std::vector<SQLLEN*> _pLengths;
 	std::size_t _maxFieldSize;
 	DataExtraction _dataExtraction;
 };
@@ -332,12 +332,6 @@ inline void Preparation::prepare(std::size_t pos, const Poco::DateTime&)
 	prepareRaw<SQL_TIMESTAMP_STRUCT>(pos, 
 		SQL_C_TYPE_TIMESTAMP, 
 		sizeof(SQL_TIMESTAMP_STRUCT));
-}
-
-
-inline std::size_t Preparation::columns() const
-{
-	return _pValues.size();
 }
 
 

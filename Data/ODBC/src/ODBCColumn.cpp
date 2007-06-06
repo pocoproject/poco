@@ -125,7 +125,7 @@ void ODBCColumn::init()
 	case SQL_LONGVARBINARY:
 	case -98:// IBM DB2 non-standard type
 		setType(MetaColumn::FDT_BLOB); break;
-	case SQL_TIMESTAMP:
+	case SQL_TYPE_TIMESTAMP:
 		setType(MetaColumn::FDT_TIMESTAMP); break;
 	default:
 		throw DataFormatException("Unsupported data type.");

@@ -58,102 +58,85 @@ class Data_API AbstractBinder
 	/// in the SQL query is ":name".
 {
 public:
+	enum Direction
+		/// Binding direction for a parameter.
+	{
+		PD_IN,
+		PD_OUT,
+		PD_IN_OUT
+	};
+
 	AbstractBinder();
 		/// Creates the AbstractBinder.
 
 	virtual ~AbstractBinder();
 		/// Destroys the AbstractBinder.
 
-	virtual void bind(std::size_t pos, const Poco::Int8& val) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir) = 0;
 		/// Binds an Int8.
 
-	virtual void bind(std::size_t pos, const Poco::UInt8& val) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir) = 0;
 		/// Binds an UInt8.
 
-	virtual void bind(std::size_t pos, const Poco::Int16& val) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir) = 0;
 		/// Binds an Int16.
 
-	virtual void bind(std::size_t pos, const Poco::UInt16& val) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir) = 0;
 		/// Binds an UInt16.
 
-	virtual void bind(std::size_t pos, const Poco::Int32& val) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir) = 0;
 		/// Binds an Int32.
 
-	virtual void bind(std::size_t pos, const Poco::UInt32& val) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir) = 0;
 		/// Binds an UInt32.
 		
-	virtual void bind(std::size_t pos, const Poco::Int64& val) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir) = 0;
 		/// Binds an Int64.
 
-	virtual void bind(std::size_t pos, const Poco::UInt64& val) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir) = 0;
 		/// Binds an UInt64.
 
-	virtual void bind(std::size_t pos, const bool& val) = 0;
+	virtual void bind(std::size_t pos, const bool& val, Direction dir) = 0;
 		/// Binds a boolean.
 
-	virtual void bind(std::size_t pos, const float& val) = 0;
+	virtual void bind(std::size_t pos, const float& val, Direction dir) = 0;
 		/// Binds a float.
 
-	virtual void bind(std::size_t pos, const double& val) = 0;
+	virtual void bind(std::size_t pos, const double& val, Direction dir) = 0;
 		/// Binds a double.
 
-	virtual void bind(std::size_t pos, const char& val) = 0;
+	virtual void bind(std::size_t pos, const char& val, Direction dir) = 0;
 		/// Binds a single character.
 
-	virtual void bind(std::size_t pos, const char* const &pVal) = 0;
+	virtual void bind(std::size_t pos, const char* const &pVal, Direction dir) = 0;
 		/// Binds a const char ptr.
 
-	virtual void bind(std::size_t pos, const std::string& val) = 0;
+	virtual void bind(std::size_t pos, const std::string& val, Direction dir) = 0;
 		/// Binds a string.
 
-	virtual void bind(std::size_t pos, const BLOB& val) = 0;
+	virtual void bind(std::size_t pos, const BLOB& val, Direction dir) = 0;
 		/// Binds a BLOB.
 
-	virtual void bind(std::size_t pos, const DateTime& val) = 0;
+	virtual void bind(std::size_t pos, const DateTime& val, Direction dir) = 0;
 		/// Binds a DateTime.
 
-	bool isInBound() const;
-		/// Returns true if binder is in-bound.
+	static bool isOutBound(Direction dir);
+		/// Returns true if direction is out bound;
 
-	bool isOutBound() const;
-		/// Returns true if binder is out-bound.
-
-	void setInBound(bool inBound = true);
-		/// If inBound is true, binder is set to be in-bound.
-
-	void setOutBound(bool outBound = true);
-		/// If outBound is true, binder is set to be out-bound.
-
-protected:
-	bool _inBound;
-	bool _outBound;
+	static bool isInBound(Direction dir);
+		/// Returns true if direction is in bound;
 };
 
 
-///
-/// inlines
-///
-inline bool AbstractBinder::isInBound() const
+inline bool AbstractBinder::isOutBound(Direction dir)
 {
-	return _inBound;
+	return PD_OUT == dir || PD_IN_OUT == dir;
 }
 
 
-inline bool AbstractBinder::isOutBound() const
+inline bool AbstractBinder::isInBound(Direction dir)
 {
-	return _outBound;
-}
-
-
-inline void AbstractBinder::setInBound(bool inBound)
-{
-	_inBound = inBound;
-}
-
-
-inline void AbstractBinder::setOutBound(bool outBound)
-{
-	_outBound = outBound;
+	return PD_IN == dir || PD_IN_OUT == dir;
 }
 
 
