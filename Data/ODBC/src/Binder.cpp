@@ -130,14 +130,7 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
 {
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER) val.size();
-	SQLLEN* pLenIn = new SQLLEN;
-	*pLenIn  = size;
-
-	if (PB_AT_EXEC == _paramBinding)
-		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
-
-	_lengthIndicator.push_back(pLenIn);
-	
+		
 	if (isOutBound(dir))
 	{
 		size = getParamSize(pos);
@@ -155,6 +148,14 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
 	}
 	else
 		throw IllegalStateException("Parameter must be [in] OR [out] bound.");
+
+	SQLLEN* pLenIn = new SQLLEN;
+	*pLenIn  = size;
+
+	if (PB_AT_EXEC == _paramBinding)
+		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
+
+	_lengthIndicator.push_back(pLenIn);
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
