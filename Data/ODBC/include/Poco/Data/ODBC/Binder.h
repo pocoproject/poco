@@ -68,8 +68,7 @@ class ODBC_API Binder: public Poco::Data::AbstractBinder
 {
 public:
 	typedef AbstractBinder::Direction Direction;
-	typedef Tuple<SQLPOINTER, SQLLEN, SQLSMALLINT, SQLSMALLINT> ParamTuple;
-	typedef std::vector<ParamTuple> ParamVec;
+	typedef std::map<SQLPOINTER, SQLLEN> ParamMap;
 
 	static const size_t DEFAULT_PARAM_SIZE = 1024;
 
@@ -145,14 +144,10 @@ public:
 		/// Transfers the results of non-POD outbound parameters from internal 
 		/// holders back into the externally supplied buffers.
 
-	ParamVec& outParameters();
-		/// Returns map of output parameter pointers and sizes.
-
 private:
 	typedef std::vector<SQLLEN*> LengthVec;
 	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*> TimestampMap;
 	typedef std::map<char*, std::string*> StringMap;
-	typedef std::map<char*, BLOB*> BLOBMap;
 
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
@@ -204,12 +199,11 @@ private:
 
 	const StatementHandle& _rStmt;
 	LengthVec _lengthIndicator;
-	ParamVec _inParams;
-	ParamVec _outParams;
+	ParamMap _inParams;
+	ParamMap _outParams;
 	ParameterBinding _paramBinding;
 	TimestampMap _timestamps;
 	StringMap _strings;
-	BLOBMap _blobs;
 	const TypeInfo* _pTypeInfo;
 };
 
@@ -298,24 +292,6 @@ inline void Binder::setDataBinding(Binder::ParameterBinding binding)
 inline Binder::ParameterBinding Binder::getDataBinding() const
 {
 	return _paramBinding;
-}
-
-
-inline Binder::ParamVec& Binder::outParameters()
-{
-	return _outParams;
-}
-
-
-inline std::size_t Binder::getParamSize(std::size_t pos)
-{
-	try
-	{
-		return Parameter(_rStmt, pos).columnSize();
-	}catch (StatementException&)
-	{ 
-		return DEFAULT_PARAM_SIZE; 
-	}
 }
 
 

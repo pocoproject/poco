@@ -191,8 +191,6 @@ void ODBCStatementImpl::bindImpl()
 	if (SQL_NEED_DATA == rc) putData();
 	else checkError(rc, "SQLExecute()");
 
-	getData();
-
 	_pBinder->synchronize();
 }
 
@@ -200,55 +198,20 @@ void ODBCStatementImpl::bindImpl()
 void ODBCStatementImpl::putData()
 {
 	SQLPOINTER pParam = 0;
+	SQLINTEGER dataSize = 0;
 	SQLRETURN rc = SQLParamData(_stmt, &pParam);
 
 	do
 	{
 		poco_assert_dbg (pParam);
+		dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
 		
-		SQLINTEGER dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
-
 		if (Utility::isError(SQLPutData(_stmt, pParam, dataSize))) 
 			throw StatementException(_stmt, "SQLPutData()");
+
 	}while (SQL_NEED_DATA == (rc = SQLParamData(_stmt, &pParam)));
 
 	checkError(rc, "SQLParamData()");
-}
-
-
-void ODBCStatementImpl::getData()
-{
-	Binder::ParamVec& outParams = _pBinder->outParameters();
-	if (0 == outParams.size()) return;
-
-	Binder::ParamVec::iterator it = outParams.begin();
-	Binder::ParamVec::iterator end = outParams.end();
-	for (int i = 1; it != end; ++it, ++i)
-	{
-		SQLINTEGER retLen = 0;
-		char* ptr = (char*) it->get<0>();
-		SQLINTEGER len = it->get<1>();
-		//NB: Oracle SQLGetData call returns string data, but does NOT report the returned length.
-		// (no other drivers tested for this functionality yet)
-		// Thus, for the string length we trust ptr being zeroed when allocated in binder.
-		// As a "safety net", the last member of the binder-supplied char* array is set to '\0' (see below)
-		while (len > 0 && SQL_NO_DATA != (SQLGetData(_stmt, i, it->get<2>(), (SQLPOINTER) ptr, len, &retLen)))
-		{
-			if (0 == retLen || 
-				SQL_NULL_DATA == retLen || 
-				SQL_NO_TOTAL == retLen) 
-				break;
-
-			if (ptr + retLen < ptr + len)
-			{
-				ptr += retLen;
-				len -= retLen;
-			}
-		}
-
-		//just in case, terminate the string
-		((char*) it->get<0>())[it->get<1>()-1] = '\0';
-	}
 }
 
 
@@ -365,10 +328,10 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 {
 	if (Utility::isError(rc))
 	{
-		std::ostringstream os; 	 
-	    os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
-	    os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
-	    std::string str(msg); str += os.str();
+		std::ostringstream os;
+		os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
+		os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
+		std::string str(msg); str += os.str();
 
 		throw StatementException(_stmt, str);
 	}

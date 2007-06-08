@@ -871,10 +871,10 @@ void ODBCSQLServerTest::testStoredProcedure()
 
 		dropObject("PROCEDURE", "storedProcedure");
 
-		*_pSession << "CREATE PROCEDURE storedProcedure "
-		"@outParam int OUTPUT "
-		"AS "
-		"SET @outParam = -1 "
+		*_pSession << "CREATE PROCEDURE storedProcedure(@outParam int OUTPUT) AS "
+			"BEGIN "
+			"SET @outParam = -1; "
+			"END;"
 		, now;
 		
 		int i = 0;
@@ -882,11 +882,10 @@ void ODBCSQLServerTest::testStoredProcedure()
 		assert(-1 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
-		*_pSession << "CREATE PROCEDURE storedProcedure "
-		"@inParam int, "
-		"@outParam int OUTPUT "
-		"AS "
-		"SET @outParam = @inParam*@inParam "
+		*_pSession << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+			"BEGIN "
+			"SET @outParam = @inParam*@inParam; "
+			"END;"
 		, now;
 
 		i = 2;
@@ -895,10 +894,10 @@ void ODBCSQLServerTest::testStoredProcedure()
 		assert(4 == j);
 		dropObject("PROCEDURE", "storedProcedure");
 
-		*_pSession << "CREATE PROCEDURE storedProcedure "
-		"@ioParam int OUTPUT "
-		"AS "
-		"SET @ioParam = @ioParam*@ioParam "
+		*_pSession << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+			"BEGIN "
+			"SET @ioParam = @ioParam*@ioParam; "
+			"END;"
 		, now;
 
 		i = 2;
@@ -908,6 +907,22 @@ void ODBCSQLServerTest::testStoredProcedure()
 
 		k += 2;
 	}
+/*TODO
+	_pSession->setFeature("autoBind", true);
+	*_pSession << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR, @outParam VARCHAR OUTPUT) AS "
+		"BEGIN "
+		"SET @outParam = @inParam; "
+		"END;"
+	, now;
+
+	std::string inParam = "123";
+	std::string outParam;
+	try{
+	*_pSession << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
+	}catch(StatementException& ex){std::cout << ex.toString();}
+	assert(outParam == inParam);
+	dropObject("PROCEDURE", "storedProcedure");
+	*/
 }
 
 
@@ -920,11 +935,11 @@ void ODBCSQLServerTest::testStoredFunction()
 
 		dropObject("PROCEDURE", "storedFunction");
 		*_pSession << "CREATE PROCEDURE storedFunction AS "
-		"BEGIN "
-		"DECLARE @retVal int;"
-		"SET @retVal = -1;"
-		"RETURN @retVal;"
-		"END;"
+			"BEGIN "
+			"DECLARE @retVal int;"
+			"SET @retVal = -1;"
+			"RETURN @retVal;"
+			"END;"
 		, now;
 
 		int i = 0;
@@ -934,9 +949,9 @@ void ODBCSQLServerTest::testStoredFunction()
 
 
 		*_pSession << "CREATE PROCEDURE storedFunction(@inParam int) AS "
-		"BEGIN "
-		"RETURN @inParam*@inParam;"
-		"END;"
+			"BEGIN "
+			"RETURN @inParam*@inParam;"
+			"END;"
 		, now;
 
 		i = 2;
@@ -947,10 +962,10 @@ void ODBCSQLServerTest::testStoredFunction()
 
 
 		*_pSession << "CREATE PROCEDURE storedFunction(@inParam int, @outParam int OUTPUT) AS "
-		"BEGIN "
-		"SET @outParam = @inParam*@inParam;"
-		"RETURN @outParam;"
-		"END"
+			"BEGIN "
+			"SET @outParam = @inParam*@inParam;"
+			"RETURN @outParam;"
+			"END"
 		, now;
 
 		i = 2;
@@ -963,13 +978,13 @@ void ODBCSQLServerTest::testStoredFunction()
 
 
 		*_pSession << "CREATE PROCEDURE storedFunction(@param1 int OUTPUT,@param2 int OUTPUT) AS "
-		"BEGIN "
-		"DECLARE @temp int; "
-		"SET @temp = @param1;"
-		"SET @param1 = @param2;"
-		"SET @param2 = @temp;"
-		"RETURN @param1 + @param2; "
-		"END"
+			"BEGIN "
+			"DECLARE @temp int; "
+			"SET @temp = @param1;"
+			"SET @param1 = @param2;"
+			"SET @param2 = @temp;"
+			"RETURN @param1 + @param2; "
+			"END"
 		, now;
 
 		i = 1;
