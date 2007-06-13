@@ -1,7 +1,7 @@
 //
 // WinRegistryConfiguration.cpp
 //
-// $Id: //poco/Main/Util/src/WinRegistryConfiguration.cpp#6 $
+// $Id: //poco/Main/Util/src/WinRegistryConfiguration.cpp#7 $
 //
 // Library: Util
 // Package: Windows
@@ -63,25 +63,27 @@ bool WinRegistryConfiguration::getRaw(const std::string& key, std::string& value
 	std::string keyName;
 	std::string fullPath = _rootPath + ConvertToRegFormat(key, keyName);
 	WinRegistryKey aKey(fullPath);
-	WinRegistryKey::Type type = aKey.type(keyName);
-	bool ret = true;
-
-	switch(type)
+	bool exists = aKey.exists(keyName);
+	if (exists)
 	{
-	case WinRegistryKey::REGT_STRING:
-		value = aKey.getString(keyName);
-		break;
-	case WinRegistryKey::REGT_STRING_EXPAND:
-		value = aKey.getStringExpand(keyName);
-		break;
-	case WinRegistryKey::REGT_DWORD:
-		value = Poco::NumberFormatter::format(aKey.getInt(keyName));
-		break;
-	default:
-		ret = false;
-	}
+		WinRegistryKey::Type type = aKey.type(keyName);
 
-	return ret;
+		switch (type)
+		{
+		case WinRegistryKey::REGT_STRING:
+			value = aKey.getString(keyName);
+			break;
+		case WinRegistryKey::REGT_STRING_EXPAND:
+			value = aKey.getStringExpand(keyName);
+			break;
+		case WinRegistryKey::REGT_DWORD:
+			value = Poco::NumberFormatter::format(aKey.getInt(keyName));
+			break;
+		default:
+			exists = false;
+		}
+	}
+	return exists;
 }
 
 

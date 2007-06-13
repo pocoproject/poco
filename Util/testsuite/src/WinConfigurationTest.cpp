@@ -1,7 +1,7 @@
 //
 // WinConfigurationTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/WinConfigurationTest.cpp#5 $
+// $Id: //poco/Main/Util/testsuite/src/WinConfigurationTest.cpp#6 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -64,6 +64,9 @@ void WinConfigurationTest::testConfiguration()
 	assert (reg->getString("name2") == "value2");
 	assert (reg->hasProperty("name1"));
 	assert (reg->hasProperty("name2"));
+	
+	std::string dfl = reg->getString("nonexistent", "default");
+	assert (dfl == "default");
 }
 
 
