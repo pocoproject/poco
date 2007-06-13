@@ -1,7 +1,7 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/Main/Data/samples/TypeHandler/src/TypeHandler.cpp#1 $
+// $Id: //poco/Main/Data/samples/TypeHandler/src/TypeHandler.cpp#2 $
 //
 // This sample demonstrates the Data library.
 //
@@ -51,11 +51,11 @@ public:
 		return 3;
 	}
 	
-	static void bind(std::size_t pos, const Person& person, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, const Person& person, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
-		TypeHandler<std::string>::bind(pos++, person.name, pBinder);
-		TypeHandler<std::string>::bind(pos++, person.address, pBinder);
-		TypeHandler<int>::bind(pos++, person.age, pBinder);
+		TypeHandler<std::string>::bind(pos++, person.name, pBinder, dir);
+		TypeHandler<std::string>::bind(pos++, person.address, pBinder, dir);
+		TypeHandler<int>::bind(pos++, person.age, pBinder, dir);
 	}
 	
 	static void extract(std::size_t pos, Person& person, const Person& deflt, AbstractExtractor* pExtr)
