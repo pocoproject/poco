@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/rules/dylib#9 $
+# $Id: //poco/Main/build/rules/dylib#10 $
 #
 # dylib
 #
@@ -54,18 +54,22 @@ shared_release: bindirs $(DYLIB_RELEASE)
 $(DYLIB_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug)" $@
 	$(DYLIB) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(postbuild)
 
 $(DYLIB_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release)" $@
 	$(DYLIB) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(postbuild)
 
 $(DYLIB_S_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug)" $@
 	$(DYLIB) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(postbuild)
 
 $(DYLIB_S_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release)" $@
 	$(DYLIB) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(postbuild)
 
 #
 # Include the automatically generated dependency files

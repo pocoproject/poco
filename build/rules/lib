@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/rules/lib#10 $
+# $Id: //poco/Main/build/rules/lib#11 $
 #
 # lib
 #
@@ -50,22 +50,26 @@ $(LIB_DEBUG_STATIC): $(foreach o,$(objects),$(OBJPATH_DEBUG_STATIC)/$(o).o)
 	@echo "** Building library (debug)" $@
 	$(LIB) $@ $^
 	$(RANLIB) $@
+	$(postbuild)
 
 $(LIB_RELEASE_STATIC): $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
 	@echo "** Building library (release)" $@
 	$(LIB) $@ $^
 	$(RANLIB) $@
+	$(postbuild)
 
 $(LIB_DEBUG_SHARED): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building shared library (debug)" $@
 	$(SHLIB) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
 	$(SHLIBLN) $(LIB_DEBUG_SHARED) $(LIB_DEBUG_SHARED_LINK)
+	$(postbuild)
 
 $(LIB_RELEASE_SHARED): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building shared library (release)" $@
 	$(SHLIB) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
 	$(SHLIBLN) $(LIB_RELEASE_SHARED) $(LIB_RELEASE_SHARED_LINK)
 	$(STRIPCMD)
+	$(postbuild)
 
 #
 # Include the automatically generated dependency files

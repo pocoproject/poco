@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/rules/global#18 $
+# $Id: //poco/Main/build/rules/global#20 $
 #
 # global
 #
@@ -28,11 +28,20 @@ endif
 sinclude $(POCO_BASE)/config.build
 
 #
+# Check for PROJECT_BASE
+#
+ifndef PROJECT_BASE
+PROJECT_BASE = $(POCO_BASE)
+endif
+export PROJECT_BASE
+
+#
 # Check for POCO_BUILD
 #
 ifndef POCO_BUILD
-POCO_BUILD = $(POCO_BASE)
+POCO_BUILD = $(PROJECT_BASE)
 endif
+export POCO_BUILD
 
 #
 # Determine OS
@@ -85,7 +94,7 @@ HOSTNAME := $(shell hostname)
 #
 # Find out current component
 #
-COMPONENT := $(shell $(POCO_BASE)/build/script/projname)
+COMPONENT := $(shell $(POCO_BASE)/build/script/projname "$(PROJECT_BASE)")
 
 #
 # Define standard directories
@@ -100,6 +109,12 @@ LIBPATH  = $(POCO_BUILD)/$(LIBDIR)
 BINPATH  = $(POCO_BUILD)/$(COMPONENT)/$(BINDIR)
 OBJPATH  = $(POCO_BUILD)/$(COMPONENT)/$(OBJDIR)
 DEPPATH  = $(POCO_BUILD)/$(COMPONENT)/$(DEPDIR)
+
+ifeq ($(POCO_BASE),$(PROJECT_BASE))
+POCO_LIBRARY =
+else
+POCO_LIBRARY = -L$(POCO_BASE)/$(LIBDIR)
+endif
 
 ifndef LIBPREFIX
 LIBPREFIX = lib
@@ -166,7 +181,7 @@ INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR))
 #
 # Build Library Directory List
 #
-LIBRARY = -L$(LIBPATH)
+LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY)
 
 #
 # Strip Command definition
