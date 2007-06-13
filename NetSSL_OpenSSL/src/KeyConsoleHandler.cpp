@@ -1,7 +1,7 @@
 //
 // KeyConsoleHandler.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/KeyConsoleHandler.cpp#9 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/KeyConsoleHandler.cpp#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -35,7 +35,6 @@
 
 
 #include "Poco/Net/KeyConsoleHandler.h"
-#include "Poco/Net/PrivateKeyFactory.h"
 #include <iostream>
 
 
@@ -58,9 +57,6 @@ void KeyConsoleHandler::onPrivateKeyRequested(const void* pSender, std::string& 
 	std::cout << "Please enter the pass-phrase for the private key: ";
 	std::cin >> privateKey;
 }
-
-
-POCO_REGISTER_KEYFACTORY(NetSSL_API, KeyConsoleHandler)
 
 
 } } // namespace Poco::Net

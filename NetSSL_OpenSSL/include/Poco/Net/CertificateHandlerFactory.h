@@ -1,7 +1,7 @@
 //
 // CertificateHandlerFactory.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/CertificateHandlerFactory.h#6 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/CertificateHandlerFactory.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -82,22 +82,32 @@ public:
 		/// Destroys the CertificateHandlerFactoryRegistrar.
 };
 
+template <typename T>
+class CertificateHandlerFactoryImpl: public Poco::Net::CertificateHandlerFactory
+{
+public:
+	CertificateHandlerFactoryImpl()
+	{
+	}
 
-#define POCO_REGISTER_CHFACTORY(API, PKCLS)		\
-	class API PKCLS##Factory: public Poco::Net::CertificateHandlerFactory	\
-	{																		\
-	public:																	\
-		PKCLS##Factory(){}													\
-		~PKCLS##Factory(){} 												\
-		Poco::Net::InvalidCertificateHandler* create(bool server) const		\
-		{																	\
-			return new PKCLS(server);										\
-		}																	\
-	};																		\
-	static Poco::Net::CertificateHandlerFactoryRegistrar aRegistrar(std::string(#PKCLS), new PKCLS##Factory());
+	~CertificateHandlerFactoryImpl()
+	{
+	}
+
+	InvalidCertificateHandler* create(bool server) const
+	{
+		return new T(server);
+	}
+};
 
 
 } } // namespace Poco::Net
+
+
+// DEPRECATED: register the factory directly at the FactoryMgr:
+// Poco::Net::SSLManager::instance().certificateHandlerFactoryMgr().setFactory(name, new Poco::Net::CertificateHandlerFactoryImpl<MyConsoleHandler>());
+#define POCO_REGISTER_CHFACTORY(API, PKCLS)		\
+	static Poco::Net::CertificateHandlerFactoryRegistrar aRegistrar(std::string(#PKCLS), new Poco::Net::CertificateHandlerFactoryImpl<PKCLS>());
 
 
 #endif // NetSSL_CertificateHandlerFactory_INCLUDED

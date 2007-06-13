@@ -1,7 +1,7 @@
 //
 // AcceptCertificateHandler.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/AcceptCertificateHandler.cpp#9 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/AcceptCertificateHandler.cpp#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -35,7 +35,6 @@
 
 
 #include "Poco/Net/AcceptCertificateHandler.h"
-#include "Poco/Net/CertificateHandlerFactory.h"
 
 
 namespace Poco {
@@ -50,9 +49,6 @@ AcceptCertificateHandler::AcceptCertificateHandler(bool server):InvalidCertifica
 AcceptCertificateHandler::~AcceptCertificateHandler()
 {
 }
-
-
-POCO_REGISTER_CHFACTORY(NetSSL_API, AcceptCertificateHandler)
 
 
 } } // namespace Poco::Net

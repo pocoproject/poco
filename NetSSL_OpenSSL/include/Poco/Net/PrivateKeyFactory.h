@@ -1,7 +1,7 @@
 //
 // PrivateKeyFactory.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/PrivateKeyFactory.h#6 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/PrivateKeyFactory.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -84,21 +84,32 @@ public:
 };
 
 
-#define POCO_REGISTER_KEYFACTORY(API, PKCLS)		\
-	class API PKCLS##Factory: public Poco::Net::PrivateKeyFactory	\
-	{																\
-	public:															\
-		PKCLS##Factory(){}											\
-		~PKCLS##Factory(){} 										\
-		Poco::Net::PrivateKeyPassphraseHandler* create(bool server) const	\
-		{															\
-			return new PKCLS(server);								\
-		}															\
-	};																\
-	static Poco::Net::PrivateKeyFactoryRegistrar aRegistrar(std::string(#PKCLS), new PKCLS##Factory());
+template<typename T>
+class PrivateKeyFactoryImpl: public Poco::Net::PrivateKeyFactory
+{
+public:
+	PrivateKeyFactoryImpl()
+	{
+	}
+
+	~PrivateKeyFactoryImpl()
+	{
+	}
+
+	PrivateKeyPassphraseHandler* create(bool server) const
+	{
+		return new T(server);
+	}
+};
 
 
 } } // namespace Poco::Net
+
+
+// DEPRECATED: register the factory directly at the FactoryMgr:
+// Poco::Net::SSLManager::instance().privateKeyFactoryMgr().setFactory(name, new Poco::Net::PrivateKeyFactoryImpl<MyKeyHandler>());
+#define POCO_REGISTER_KEYFACTORY(API, PKCLS)	\
+	static Poco::Net::PrivateKeyFactoryRegistrar aRegistrar(std::string(#PKCLS), new Poco::Net::PrivateKeyFactoryImpl<PKCLS>());
 
 
 #endif // NetSSL_PrivateKeyFactory_INCLUDED

@@ -1,7 +1,7 @@
 //
 // KeyFileHandler.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/KeyFileHandler.cpp#10 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/KeyFileHandler.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -35,7 +35,6 @@
 
 
 #include "Poco/Net/KeyFileHandler.h"
-#include "Poco/Net/PrivateKeyFactory.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/File.h"
 #include "Poco/Util/LayeredConfiguration.h"
@@ -71,9 +70,6 @@ void KeyFileHandler::onPrivateKeyRequested(const void* pSender, std::string& pri
 
 	privateKey = config.getString(prefix+CFG_PRIV_KEY_FILE);
 }
-
-
-POCO_REGISTER_KEYFACTORY(NetSSL_API,KeyFileHandler)
 
 
 } } // namespace Poco::Net

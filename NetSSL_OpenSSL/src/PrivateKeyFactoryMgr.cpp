@@ -1,7 +1,7 @@
 //
 // PrivateKeyFactoryMgr.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/PrivateKeyFactoryMgr.cpp#8 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/PrivateKeyFactoryMgr.cpp#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -35,6 +35,8 @@
 
 
 #include "Poco/Net/PrivateKeyFactoryMgr.h"
+#include "Poco/Net/KeyFileHandler.h"
+#include "Poco/Net/KeyConsoleHandler.h"
 
 
 namespace Poco {
@@ -43,6 +45,8 @@ namespace Net {
 
 PrivateKeyFactoryMgr::PrivateKeyFactoryMgr()
 {
+	setFactory("KeyFileHandler", new PrivateKeyFactoryImpl<KeyFileHandler>());
+	setFactory("KeyConsoleHandler", new PrivateKeyFactoryImpl<KeyConsoleHandler>());
 }
 
 

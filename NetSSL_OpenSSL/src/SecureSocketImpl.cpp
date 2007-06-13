@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#20 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#21 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -576,8 +576,13 @@ bool SecureSocketImpl::containsWildcards(const std::string& commonName)
 
 bool SecureSocketImpl::matchByAlias(const std::string& alias, const HostEntry& heData)
 {
+	// fix wildcards
+	std::string aliasRep = Poco::replace(alias, "*", ".*");
+	Poco::replaceInPlace(aliasRep, "..*", ".*");
+	Poco::replaceInPlace(aliasRep, "?", ".?");
+	Poco::replaceInPlace(aliasRep, "..?", ".?");
 	// compare by name
-	Poco::RegularExpression expr(alias);
+	Poco::RegularExpression expr(aliasRep);
 	bool found = false;
 	const HostEntry::AliasList& aliases = heData.aliases();
 	HostEntry::AliasList::const_iterator it = aliases.begin();

@@ -1,7 +1,7 @@
 //
 // ConsoleCertificateHandler.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/ConsoleCertificateHandler.cpp#9 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/ConsoleCertificateHandler.cpp#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -36,7 +36,6 @@
 
 #include "Poco/Net/ConsoleCertificateHandler.h"
 #include <iostream>
-#include "Poco/Net/CertificateHandlerFactory.h"
 
 
 namespace Poco {
@@ -70,9 +69,6 @@ void ConsoleCertificateHandler::onInvalidCertificate(const void*, VerificationEr
 	else
 		errorCert.setIgnoreError(false);
 }
-
-
-POCO_REGISTER_CHFACTORY(NetSSL_API, ConsoleCertificateHandler)
 
 
 } } // namespace Poco::Net
