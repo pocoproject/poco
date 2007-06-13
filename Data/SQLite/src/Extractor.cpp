@@ -1,7 +1,7 @@
 //
 // Extractor.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/Extractor.cpp#4 $
+// $Id: //poco/Main/Data/SQLite/src/Extractor.cpp#5 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -38,9 +38,13 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/DateTimeParser.h"
 #include "Poco/Exception.h"
 #include "sqlite3.h"
 #include <cstdlib>
+
+
+using Poco::DateTimeParser;
 
 
 namespace Poco {
@@ -186,6 +190,16 @@ bool Extractor::extract(std::size_t pos, char& val)
 {
 	if (isNull(pos)) return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, DateTime& val)
+{
+	std::string dt;
+	extract(pos, dt);
+	int tzd;
+	DateTimeParser::parse(dt, val, tzd);
 	return true;
 }
 

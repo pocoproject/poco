@@ -1,7 +1,7 @@
 //
 // Statement.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Statement.h#17 $
+// $Id: //poco/Main/Data/include/Poco/Data/Statement.h#18 $
 //
 // Library: Data
 // Package: DataCore
@@ -66,9 +66,9 @@ public:
 
 	enum Storage
 	{
-		STORAGE_VECTOR = StatementImpl::STORAGE_VECTOR_IMPL,
-		STORAGE_LIST = StatementImpl::STORAGE_LIST_IMPL,
-		STORAGE_DEQUE = StatementImpl::STORAGE_DEQUE_IMPL,
+		STORAGE_VECTOR  = StatementImpl::STORAGE_VECTOR_IMPL,
+		STORAGE_LIST    = StatementImpl::STORAGE_LIST_IMPL,
+		STORAGE_DEQUE   = StatementImpl::STORAGE_DEQUE_IMPL,
 		STORAGE_UNKNOWN = StatementImpl::STORAGE_UNKNOWN_IMPL
 	};
 

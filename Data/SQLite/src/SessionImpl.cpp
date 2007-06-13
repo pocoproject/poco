@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/SessionImpl.cpp#4 $
+// $Id: //poco/Main/Data/SQLite/src/SessionImpl.cpp#5 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -69,13 +69,13 @@ SessionImpl::~SessionImpl()
 Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
 {
 	poco_check_ptr (_pDB);
-	return new SQLiteStatementImpl(_pDB);
+	return new SQLiteStatementImpl(*this, _pDB);
 }
 
 
 void SessionImpl::begin()
 {
-	SQLiteStatementImpl tmp(_pDB);
+	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(DEFERRED_BEGIN_TRANSACTION);
 	tmp.execute();
 }
@@ -83,7 +83,7 @@ void SessionImpl::begin()
 
 void SessionImpl::commit()
 {
-	SQLiteStatementImpl tmp(_pDB);
+	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(COMMIT_TRANSACTION);
 	tmp.execute();
 }
@@ -91,7 +91,7 @@ void SessionImpl::commit()
 
 void SessionImpl::rollback()
 {
-	SQLiteStatementImpl tmp(_pDB);
+	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(ABORT_TRANSACTION);
 	tmp.execute();
 }

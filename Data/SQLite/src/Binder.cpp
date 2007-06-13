@@ -1,7 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/Binder.cpp#4 $
+// $Id: //poco/Main/Data/SQLite/src/Binder.cpp#5 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -38,8 +38,14 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Exception.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
 #include "sqlite3.h"
 #include <cstdlib>
+
+
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
 
 
 namespace Poco {
@@ -58,35 +64,35 @@ Binder::~Binder()
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Int32 &val)
+void Binder::bind(std::size_t pos, const Poco::Int32 &val, Direction dir)
 {
 	int rc = sqlite3_bind_int(_pStmt, (int) pos, val);
 	checkReturn(rc);
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Int64 &val)
+void Binder::bind(std::size_t pos, const Poco::Int64 &val, Direction dir)
 {
 	int rc = sqlite3_bind_int64(_pStmt, (int) pos, val);
 	checkReturn(rc);
 }
 
 
-void Binder::bind(std::size_t pos, const double &val)
+void Binder::bind(std::size_t pos, const double &val, Direction dir)
 {
 	int rc = sqlite3_bind_double(_pStmt, (int) pos, val);
 	checkReturn(rc);
 }
 
 
-void Binder::bind(std::size_t pos, const std::string& val)
+void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
 	int rc = sqlite3_bind_text(_pStmt, (int) pos, val.c_str(), (int) val.size()*sizeof(char), SQLITE_TRANSIENT);
 	checkReturn(rc);
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
+void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
 {
 	// convert a blob to a an unsigned char* array
 	const unsigned char* pData = reinterpret_cast<const unsigned char*>(val.rawContent());
@@ -94,6 +100,13 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 
 	int rc = sqlite3_bind_blob(_pStmt, static_cast<int>(pos), pData, valSize, SQLITE_STATIC); // no deep copy, do not free memory
 	checkReturn(rc);
+}
+
+
+void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
+{
+	std::string dt(DateTimeFormatter::format(val, DateTimeFormat::ISO8601_FORMAT));
+	bind(pos, dt, dir);
 }
 
 

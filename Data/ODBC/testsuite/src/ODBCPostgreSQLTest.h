@@ -1,7 +1,7 @@
 //
 // ODBCPostgreSQLTest.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCPostgreSQLTest.h#2 $
+// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCPostgreSQLTest.h#4 $
 //
 // Definition of the ODBCPostgreSQLTest class.
 //

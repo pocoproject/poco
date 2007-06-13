@@ -1,7 +1,7 @@
 //
 // BLOB.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/BLOB.h#11 $
+// $Id: //poco/Main/Data/include/Poco/Data/BLOB.h#12 $
 //
 // Library: Data
 // Package: DataCore

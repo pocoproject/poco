@@ -1,7 +1,7 @@
 //
 // Binding.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Binding.h#4 $
+// $Id: //poco/Main/Data/include/Poco/Data/Binding.h#6 $
 //
 // Library: Data
 // Package: DataCore

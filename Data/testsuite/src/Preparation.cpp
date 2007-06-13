@@ -1,7 +1,7 @@
 //
 // Preparation.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/Preparation.cpp#2 $
+// $Id: //poco/Main/Data/testsuite/src/Preparation.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

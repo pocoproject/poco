@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SQLiteStatementImpl.h#3 $
+// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SQLiteStatementImpl.h#4 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -61,7 +61,7 @@ class SQLite_API SQLiteStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for SQLite
 {
 public:
-	SQLiteStatementImpl(sqlite3* pDB);
+	SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB);
 		/// Creates the SQLiteStatementImpl.
 
 	~SQLiteStatementImpl();

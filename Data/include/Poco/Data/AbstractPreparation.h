@@ -1,7 +1,7 @@
 //
 // AbstractPreparation.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractPreparation.h#4 $
+// $Id: //poco/Main/Data/include/Poco/Data/AbstractPreparation.h#5 $
 //
 // Library: Data
 // Package: DataCore
@@ -47,10 +47,13 @@
 
 namespace Poco {
 
+
 class DateTime;
 class Any;
 
+
 namespace Data {
+
 
 class BLOB;
 

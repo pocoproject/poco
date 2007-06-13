@@ -1,7 +1,7 @@
 //
 // TypeHandler.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/TypeHandler.h#11 $
+// $Id: //poco/Main/Data/include/Poco/Data/TypeHandler.h#12 $
 //
 // Library: Data
 // Package: DataCore

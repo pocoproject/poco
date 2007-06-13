@@ -1,7 +1,7 @@
 //
 // SQLiteTest.cpp
 //
-// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.cpp#5 $
+// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.cpp#7 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -38,6 +38,7 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/SQLite/Connector.h"
+#include "Poco/Data/TypeHandler.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
@@ -98,14 +99,14 @@ template <>
 class TypeHandler<Person>
 {
 public:
-	static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder)
+	static void bind(std::size_t pos, const Person& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
 		poco_assert_dbg (pBinder != 0);
-		pBinder->bind(pos++, obj.lastName);
-		pBinder->bind(pos++, obj.firstName);
-		pBinder->bind(pos++, obj.address);
-		pBinder->bind(pos++, obj.age);
+		pBinder->bind(pos++, obj.lastName, dir);
+		pBinder->bind(pos++, obj.firstName, dir);
+		pBinder->bind(pos++, obj.address, dir);
+		pBinder->bind(pos++, obj.age, dir);
 	}
 
 	static void prepare(std::size_t pos, const Person& obj, AbstractPreparation* pPrepare)
@@ -1551,13 +1552,15 @@ void SQLiteTest::testInternalExtraction()
 	std::string s = rset.value<std::string>(2,1);
 	assert ("4" == s);
 	
-	const Column<int>& col = rset.column<int>(0);
+	typedef std::vector<int> IntVec;
+	
+	const Column<int, IntVec>& col = rset.column<int, IntVec>(0);
 	assert (col[0] == 1);
 
-	try { const Column<int>& col1 = rset.column<int>(100); fail ("must fail"); }
+	try { const Column<int, IntVec>& col1 = rset.column<int, IntVec>(100); fail ("must fail"); }
 	catch (RangeException&) { }
 
-	const Column<int>& col1 = rset.column<int>(0);
+	const Column<int, IntVec>& col1 = rset.column<int, IntVec>(0);
 	assert ("int0" == col1.name());
 	Column<int>::Iterator it = col1.begin();
 	Column<int>::Iterator itEnd = col1.end();
@@ -1572,8 +1575,38 @@ void SQLiteTest::testInternalExtraction()
 	stmt = (tmp << "DELETE FROM Vectors", now);
 	rset = stmt;
 
-	try { const Column<int>& col1 = rset.column<int>(0); fail ("must fail"); }
+	try { const Column<int, IntVec>& col1 = rset.column<int, IntVec>(0); fail ("must fail"); }
 	catch (RangeException&) { }
+}
+
+
+void SQLiteTest::testPrimaryKeyConstraint()
+{
+	Session ses (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	ses << "DROP TABLE IF EXISTS LogTest", now;
+	ses << "CREATE TABLE LogTest (Id INTEGER PRIMARY KEY, Time INTEGER, Value INTEGER)", now;
+	const double value = -200000000000.0;
+	const Poco::Int64 timeIn = static_cast<Poco::Int64>(22329988776655.0);
+	int id = 1;
+
+	ses.begin();
+
+	for(int i = 0; i < 10; i++)
+	{
+		try
+		{
+			ses << "INSERT INTO LogTest (Id, [Time], Value) VALUES (:id, :time, :value)", use(id), use(timeIn), use(value), now; //lint !e1058
+			if (i > 0)
+				fail("must fail");
+		}
+		catch(Poco::Exception&)
+		{
+			if (i == 0) // the very first insert must work
+				throw;
+		}
+	}
+
+	ses.commit(); 
 }
 
 
@@ -1648,6 +1681,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple1);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector1);
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
+	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
 
 	return pSuite;
 }

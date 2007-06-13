@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/SQLiteStatementImpl.cpp#6 $
+// $Id: //poco/Main/Data/SQLite/src/SQLiteStatementImpl.cpp#8 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -48,7 +48,8 @@ namespace Data {
 namespace SQLite {
 
 
-SQLiteStatementImpl::SQLiteStatementImpl(sqlite3* pDB):
+SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
+	StatementImpl(rSession),
 	_pDB(pDB),
 	_pStmt(0),
 	_stepCalled(false),
@@ -177,13 +178,17 @@ bool SQLiteStatementImpl::hasNext()
 	// _pStmt is allowed to be null for conditional SQL statements
 	if (_pStmt == 0)
 	{
-		_stepCalled      = true;
+		_stepCalled   = true;
 		_nextResponse = SQLITE_DONE;
 		return false;
 	}
 
-	_stepCalled      = true;
+	_stepCalled   = true;
 	_nextResponse = sqlite3_step(_pStmt);
+	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
+	{
+		Utility::throwException(_nextResponse);
+	}
 
 	return (_nextResponse == SQLITE_ROW);
 }

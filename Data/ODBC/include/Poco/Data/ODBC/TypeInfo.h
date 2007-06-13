@@ -1,7 +1,7 @@
 //
 // TypeInfo.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/TypeInfo.h#3 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/TypeInfo.h#1 $
 //
 // Library: ODBC
 // Package: ODBC

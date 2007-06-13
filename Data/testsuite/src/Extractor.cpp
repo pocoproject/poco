@@ -1,7 +1,7 @@
 //
 // Extractor.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/Extractor.cpp#3 $
+// $Id: //poco/Main/Data/testsuite/src/Extractor.cpp#4 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

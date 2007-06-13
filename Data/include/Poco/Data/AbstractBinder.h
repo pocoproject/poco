@@ -1,7 +1,7 @@
 //
 // AbstractBinder.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractBinder.h#10 $
+// $Id: //poco/Main/Data/include/Poco/Data/AbstractBinder.h#12 $
 //
 // Library: Data
 // Package: DataCore
@@ -46,9 +46,12 @@
 
 namespace Poco {
 
+
 class DateTime;
 
+
 namespace Data {
+
 
 class BLOB;
 
@@ -128,6 +131,9 @@ public:
 };
 
 
+//
+// inlines
+//
 inline bool AbstractBinder::isOutBound(Direction dir)
 {
 	return PD_OUT == dir || PD_IN_OUT == dir;

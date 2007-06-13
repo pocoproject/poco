@@ -1,7 +1,7 @@
 //
 // ODBCException.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCException.h#2 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCException.h#4 $
 //
 // Library: ODBC
 // Package: ODBC

@@ -1,7 +1,7 @@
 //
 // Extractor.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Extractor.h#3 $
+// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Extractor.h#4 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -105,6 +105,9 @@ public:
 
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
+
+	bool extract(std::size_t pos, Poco::DateTime& val);
+		/// Extracts a DateTime.
 
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.

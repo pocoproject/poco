@@ -1,7 +1,7 @@
 //
 // AbstractBinding.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractBinding.h#4 $
+// $Id: //poco/Main/Data/include/Poco/Data/AbstractBinding.h#6 $
 //
 // Library: Data
 // Package: DataCore

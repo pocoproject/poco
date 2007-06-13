@@ -1,7 +1,7 @@
 //
 // AbstractExtractor.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractExtractor.h#8 $
+// $Id: //poco/Main/Data/include/Poco/Data/AbstractExtractor.h#9 $
 //
 // Library: Data
 // Package: DataCore
@@ -46,9 +46,12 @@
 
 namespace Poco {
 
+
 class DateTime;
 
+
 namespace Data {
+
 
 class BLOB;
 

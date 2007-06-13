@@ -1,7 +1,7 @@
 //
 // RecordSet.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#6 $
+// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#7 $
 //
 // Library: Data
 // Package: DataCore
@@ -88,14 +88,14 @@ public:
 	std::size_t columnCount() const;
 		/// Returns the number of rows in the recordset.
 
-	template<class T, class C>
+	template <class T, class C>
 	const Column<T,C>& column(const std::string& name) const
 		/// Returns the reference to the first Column with the specified name.
 	{
 		return column<T,C>(columnPosition<T,C>(name));
 	}
 
-	template<class T, class C>
+	template <class T, class C>
 	const Column<T,C>& column(std::size_t pos) const
 		/// Returns the reference to column at specified location.
 	{
@@ -121,7 +121,7 @@ public:
 		}
 	}
 
-	template<class T>
+	template <class T>
 	const T& value(std::size_t col, std::size_t row) const
 		/// Returns the reference to data value at [col, row] location.
 	{
@@ -139,7 +139,7 @@ public:
 		}
 	}
 
-	template<class T>
+	template <class T>
 	const T& value(const std::string& name, std::size_t row) const
 		/// Returns the reference to data value at named column, row location.
 	{

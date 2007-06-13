@@ -1,7 +1,7 @@
 //
 // Extractor.h
 //
-// $Id: //poco/Main/Data/testsuite/src/Extractor.h#4 $
+// $Id: //poco/Main/Data/testsuite/src/Extractor.h#5 $
 //
 // Definition of the Extractor class.
 //
