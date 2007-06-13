@@ -1,7 +1,7 @@
 //
 // MultipartReader.cpp
 //
-// $Id: //poco/Main/Net/src/MultipartReader.cpp#11 $
+// $Id: //poco/Main/Net/src/MultipartReader.cpp#12 $
 //
 // Library: Net
 // Package: Messages
@@ -74,6 +74,7 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	static const int eof = std::char_traits<char>::eof();
 	int n  = 0;
 	int ch = _istr.get();
+	if (ch == eof) return -1;
 	*buffer++ = (char) ch; ++n;
 	if (ch == '\n' || ch == '\r' && _istr.peek() == '\n')
 	{

@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/Main/Net/src/Socket.cpp#13 $
+// $Id: //poco/Main/Net/src/Socket.cpp#14 $
 //
 // Library: Net
 // Package: Sockets
@@ -125,7 +125,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		{
 			Poco::Timestamp end;
 			Poco::Timespan waited = end - start;
-			if (waited > remainingTime)
+			if (waited < remainingTime)
 				remainingTime -= waited;
 			else
 				remainingTime = 0;

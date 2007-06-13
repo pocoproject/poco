@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/Main/Net/src/SocketImpl.cpp#22 $
+// $Id: //poco/Main/Net/src/SocketImpl.cpp#23 $
 //
 // Library: Net
 // Package: Sockets
@@ -220,6 +220,14 @@ int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	poco_assert (_sockfd != POCO_INVALID_SOCKET);
 
+#if defined(POCO_BROKEN_TIMEOUTS)
+	if (_sndTimeout.totalMicroseconds() != 0)
+	{
+		if (!poll(_sndTimeout, SELECT_WRITE))
+			throw TimeoutException();
+	}
+#endif
+
 	int rc;
 	do
 	{
@@ -359,7 +367,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		{
 			Poco::Timestamp end;
 			Poco::Timespan waited = end - start;
-			if (waited > remainingTime)
+			if (waited < remainingTime)
 				remainingTime -= waited;
 			else
 				remainingTime = 0;
@@ -404,6 +412,8 @@ void SocketImpl::setSendTimeout(const Poco::Timespan& timeout)
 #if defined(_WIN32)
 	int value = (int) timeout.totalMilliseconds();
 	setOption(SOL_SOCKET, SO_SNDTIMEO, value);
+#elif defined(POCO_BROKEN_TIMEOUTS)
+	_sndTimeout = timeout;
 #else
 	setOption(SOL_SOCKET, SO_SNDTIMEO, timeout);
 #endif
@@ -417,6 +427,8 @@ Poco::Timespan SocketImpl::getSendTimeout()
 	int value;
 	getOption(SOL_SOCKET, SO_SNDTIMEO, value);
 	result = Timespan::TimeDiff(value)*1000;
+#elif defined(POCO_BROKEN_TIMEOUTS)
+	result = _sndTimeout;
 #else
 	getOption(SOL_SOCKET, SO_SNDTIMEO, result);
 #endif
@@ -426,13 +438,14 @@ Poco::Timespan SocketImpl::getSendTimeout()
 
 void SocketImpl::setReceiveTimeout(const Poco::Timespan& timeout)
 {
+#ifndef POCO_BROKEN_TIMEOUTS
 #if defined(_WIN32)
 	int value = (int) timeout.totalMilliseconds();
 	setOption(SOL_SOCKET, SO_RCVTIMEO, value);
 #else
-	setOption(SOL_SOCKET, SO_RCVTIMEO, timeout);
+  setOption(SOL_SOCKET, SO_RCVTIMEO, timeout);
 #endif
-#if defined(POCO_BROKEN_TIMEOUTS)
+#else
 	_recvTimeout = timeout;
 #endif
 }

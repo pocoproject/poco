@@ -1,7 +1,7 @@
 //
 // SocketImpl.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/SocketImpl.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/SocketImpl.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -407,6 +407,7 @@ private:
 	poco_socket_t _sockfd;
 #if defined(POCO_BROKEN_TIMEOUTS)
 	Poco::Timespan _recvTimeout;
+	Poco::Timespan _sndTimeout;
 #endif
 	
 	friend class Socket;

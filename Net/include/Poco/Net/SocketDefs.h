@@ -1,7 +1,7 @@
 //
 // SocketDefs.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/SocketDefs.h#3 $
+// $Id: //poco/Main/Net/include/Poco/Net/SocketDefs.h#4 $
 //
 // Library: Net
 // Package: NetCore
@@ -176,7 +176,7 @@
 #endif
 
 
-#if (POCO_OS == POCO_OS_HPUX)
+#if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS)
 #define POCO_BROKEN_TIMEOUTS 1
 #endif
 

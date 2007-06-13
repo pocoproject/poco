@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/Main/Net/src/IPAddress.cpp#16 $
+// $Id: //poco/Main/Net/src/IPAddress.cpp#17 $
 //
 // Library: Net
 // Package: NetCore
@@ -82,6 +82,7 @@ public:
 	virtual bool isOrgLocalMC() const = 0;
 	virtual bool isGlobalMC() const = 0;
 	virtual void mask(const IPAddressImpl* pMask, const IPAddressImpl* pSet) = 0;
+	virtual IPAddressImpl* clone() const = 0;
 
 protected:
 	IPAddressImpl()
@@ -245,6 +246,11 @@ public:
 		
 		_addr.s_addr &= static_cast<const IPv4AddressImpl*>(pMask)->_addr.s_addr;
 		_addr.s_addr |= static_cast<const IPv4AddressImpl*>(pSet)->_addr.s_addr & ~static_cast<const IPv4AddressImpl*>(pMask)->_addr.s_addr;
+	}
+	
+	IPAddressImpl* clone() const
+	{
+		return new IPv4AddressImpl(&_addr);
 	}
 		
 private:
@@ -448,6 +454,11 @@ public:
 	void mask(const IPAddressImpl* pMask, const IPAddressImpl* pSet)
 	{
 		throw Poco::NotImplementedException("mask() is only supported for IPv4 addresses");
+	}
+
+	IPAddressImpl* clone() const
+	{
+		return new IPv6AddressImpl(&_addr);
 	}
 
 private:
@@ -760,6 +771,9 @@ bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 
 void IPAddress::mask(const IPAddress& mask)
 {
+	IPAddressImpl* pClone = _pImpl->clone();
+	_pImpl->release();
+	_pImpl = pClone;
 	IPAddress null;
 	_pImpl->mask(mask._pImpl, null._pImpl);
 }
@@ -767,6 +781,9 @@ void IPAddress::mask(const IPAddress& mask)
 
 void IPAddress::mask(const IPAddress& mask, const IPAddress& set)
 {
+	IPAddressImpl* pClone = _pImpl->clone();
+	_pImpl->release();
+	_pImpl = pClone;
 	_pImpl->mask(mask._pImpl, set._pImpl);
 }
 
