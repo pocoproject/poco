@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.h#3 $
+// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.h#4 $
 //
 // Tests for Any types
 //
@@ -65,6 +65,7 @@ public:
 	void testConversionOperator();
 	void testLimitsInt();
 	void testLimitsFloat();
+	void testCtor();
 
 	void setUp();
 	void tearDown();

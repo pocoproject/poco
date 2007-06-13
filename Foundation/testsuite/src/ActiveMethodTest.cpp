@@ -1,7 +1,7 @@
 //
 // ActiveMethodTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ActiveMethodTest.cpp#11 $
+// $Id: //poco/Main/Foundation/testsuite/src/ActiveMethodTest.cpp#13 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -52,7 +52,10 @@ namespace
 	{
 	public:
 		ActiveObject():
-			testMethod(this, &ActiveObject::testMethodImpl)
+			testMethod(this, &ActiveObject::testMethodImpl),
+			testVoid(this,&ActiveObject::testVoidOutImpl),
+			testVoidInOut(this,&ActiveObject::testVoidInOutImpl),
+			testVoidIn(this,&ActiveObject::testVoidInImpl)
 		{
 		}
 		
@@ -61,6 +64,12 @@ namespace
 		}
 		
 		ActiveMethod<int, int, ActiveObject> testMethod;
+
+		ActiveMethod<void, int, ActiveObject> testVoid;
+
+		ActiveMethod<void, void, ActiveObject> testVoidInOut;
+
+		ActiveMethod<int, void, ActiveObject> testVoidIn;
 		
 		void cont()
 		{
@@ -69,10 +78,27 @@ namespace
 		
 	protected:
 		int testMethodImpl(const int& n)
-		{	
+		{
 			if (n == 100) throw Exception("n == 100");
 			_continue.wait();
 			return n;
+		}
+
+		void testVoidOutImpl(const int& n)
+		{
+			if (n == 100) throw Exception("n == 100");
+			_continue.wait();
+		}
+
+		void testVoidInOutImpl()
+		{
+			_continue.wait();
+		}
+
+		int testVoidInImpl()
+		{
+			_continue.wait();
+			return 123;
 		}
 		
 	private:
@@ -151,6 +177,40 @@ void ActiveMethodTest::testFailure()
 }
 
 
+void ActiveMethodTest::testVoidOut()
+{
+	ActiveObject activeObj;
+	ActiveResult<void> result = activeObj.testVoid(101);
+	activeObj.cont();
+	result.wait();
+	assert (result.available());
+	assert (!result.failed());
+}
+
+
+void ActiveMethodTest::testVoidInOut()
+{
+	ActiveObject activeObj;
+	ActiveResult<void> result = activeObj.testVoidInOut();
+	activeObj.cont();
+	result.wait();
+	assert (result.available());
+	assert (!result.failed());
+}
+
+
+void ActiveMethodTest::testVoidIn()
+{
+	ActiveObject activeObj;
+	ActiveResult<int> result = activeObj.testVoidIn();
+	activeObj.cont();
+	result.wait();
+	assert (result.available());
+	assert (!result.failed());
+	assert (result.data() == 123);
+}
+
+
 void ActiveMethodTest::setUp()
 {
 }
@@ -169,6 +229,9 @@ CppUnit::Test* ActiveMethodTest::suite()
 	CppUnit_addTest(pSuite, ActiveMethodTest, testWaitInterval);
 	CppUnit_addTest(pSuite, ActiveMethodTest, testTryWait);
 	CppUnit_addTest(pSuite, ActiveMethodTest, testFailure);
+	CppUnit_addTest(pSuite, ActiveMethodTest, testVoidOut);
+	CppUnit_addTest(pSuite, ActiveMethodTest, testVoidIn);
+	CppUnit_addTest(pSuite, ActiveMethodTest, testVoidInOut);
 
 	return pSuite;
 }

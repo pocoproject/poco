@@ -1,7 +1,7 @@
 //
 // HashSetTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashSetTest.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/HashSetTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -158,6 +158,30 @@ void HashSetTest::testIterator()
 }
 
 
+void HashSetTest::testConstIterator()
+{
+	const int N = 1000;
+
+	HashSet<int> hs;
+
+	for (int i = 0; i < N; ++i)
+	{
+		hs.insert(i);
+	}
+	
+	std::set<int> values;
+	HashSet<int>::ConstIterator it = hs.begin();
+	while (it != hs.end())
+	{
+		assert (values.find(*it) == values.end());
+		values.insert(*it);
+		++it;
+	}
+	
+	assert (values.size() == N);
+}
+
+
 void HashSetTest::setUp()
 {
 }
@@ -175,6 +199,7 @@ CppUnit::Test* HashSetTest::suite()
 	CppUnit_addTest(pSuite, HashSetTest, testInsert);
 	CppUnit_addTest(pSuite, HashSetTest, testErase);
 	CppUnit_addTest(pSuite, HashSetTest, testIterator);
+	CppUnit_addTest(pSuite, HashSetTest, testConstIterator);
 
 	return pSuite;
 }

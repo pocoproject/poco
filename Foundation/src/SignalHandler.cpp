@@ -1,7 +1,7 @@
 //
 // SignalHandler.cpp
 //
-// $Id: //poco/Main/Foundation/src/SignalHandler.cpp#8 $
+// $Id: //poco/Main/Foundation/src/SignalHandler.cpp#10 $
 //
 // Library: Foundation
 // Package: Threading
@@ -43,6 +43,7 @@
 #include "Poco/Thread.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
+#include <cstdlib>
 #include <signal.h>
 
 
@@ -108,6 +109,9 @@ void SignalHandler::handleSignal(int sig)
 	JumpBufferVec& jb = jumpBufferVec();
 	if (!jb.empty())
 		siglongjmp(jb.back().buf, sig);
+		
+	// Abort if no jump buffer registered
+	std::abort();
 }
 
 

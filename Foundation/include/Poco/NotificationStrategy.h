@@ -1,7 +1,7 @@
 //
 // NotificationStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NotificationStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/NotificationStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -70,6 +70,9 @@ public:
 
 	virtual void clear() = 0;
 		/// Removes all delegates from the strategy.
+
+	virtual bool empty() const = 0;
+		/// Returns false if the strategy contains at least one delegate.
 };
 
 

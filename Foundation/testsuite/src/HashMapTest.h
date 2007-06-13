@@ -1,7 +1,7 @@
 //
 // HashMapTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashMapTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/HashMapTest.h#2 $
 //
 // Definition of the HashMapTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testInsert();
 	void testErase();
 	void testIterator();
+	void testConstIterator();
 	void testIndex();
 
 	void setUp();

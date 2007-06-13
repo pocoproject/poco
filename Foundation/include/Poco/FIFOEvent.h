@@ -1,7 +1,7 @@
 //
 // FIFOEvent.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FIFOEvent.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/FIFOEvent.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -64,8 +64,8 @@ class FIFOEvent: public AbstractEvent <
 	/// For example:
 	///     FIFOEvent<int> tmp;
 	///     MyClass myObject;
-	///     tmp += Delegate<MyClass, int>(&myObject, &MyClass::myMethod1);
-	///     tmp += Delegate<MyClass, int>(&myObject, &MyClass::myMethod2);
+	///     tmp += delegate(&myObject, &MyClass::myMethod1);
+	///     tmp += delegate(&myObject, &MyClass::myMethod2);
 	///
 	/// The second registration will overwrite the first one.
 {

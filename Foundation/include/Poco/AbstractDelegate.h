@@ -1,7 +1,7 @@
 //
 // AbstractDelegate.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AbstractDelegate.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/AbstractDelegate.h#4 $
 //
 // Library: Foundation
 // Package: Events
@@ -59,7 +59,7 @@ public:
 		poco_assert_dbg (_pTarget != 0);
 	}
 
-	AbstractDelegate(const AbstractDelegate& del):_pTarget(del._pTarget)
+	AbstractDelegate(const AbstractDelegate& del): _pTarget(del._pTarget)
 	{
 		poco_assert_dbg (_pTarget != 0);
 	}

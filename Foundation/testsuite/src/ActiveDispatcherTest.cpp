@@ -1,7 +1,7 @@
 //
 // ActiveDispatcherTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ActiveDispatcherTest.cpp#4 $
+// $Id: //poco/Main/Foundation/testsuite/src/ActiveDispatcherTest.cpp#6 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
@@ -68,7 +68,10 @@ namespace
 	{
 	public:
 		ActiveObject():
-			testMethod(this, &ActiveObject::testMethodImpl)
+			testMethod(this, &ActiveObject::testMethodImpl),
+			testVoid(this, &ActiveObject::testVoidImpl),
+			testVoidInOut(this, &ActiveObject::testVoidInOutImpl),
+			testVoidIn(this, &ActiveObject::testVoidInImpl)
 		{
 		}
 		
@@ -77,6 +80,12 @@ namespace
 		}
 		
 		ActiveMethod<int, int, ActiveObject, ActiveStarter<ActiveDispatcher> > testMethod;
+
+		ActiveMethod<void, int, ActiveObject, ActiveStarter<ActiveDispatcher> > testVoid;
+
+		ActiveMethod<void, void, ActiveObject, ActiveStarter<ActiveDispatcher> > testVoidInOut;
+
+		ActiveMethod<int, void, ActiveObject, ActiveStarter<ActiveDispatcher> > testVoidIn;
 		
 		void cont()
 		{
@@ -85,10 +94,27 @@ namespace
 		
 	protected:
 		int testMethodImpl(const int& n)
-		{	
+		{
 			if (n == 100) throw Exception("n == 100");
 			_continue.wait();
 			return n;
+		}
+
+		void testVoidImpl(const int& n)
+		{
+			if (n == 100) throw Exception("n == 100");
+			_continue.wait();
+		}
+
+		void testVoidInOutImpl()
+		{
+			_continue.wait();
+		}
+
+		int testVoidInImpl()
+		{
+			_continue.wait();
+			return 123;
 		}
 		
 	private:
@@ -167,6 +193,43 @@ void ActiveDispatcherTest::testFailure()
 }
 
 
+void ActiveDispatcherTest::testVoid()
+{
+	ActiveObject activeObj;
+	ActiveResult<void> result = activeObj.testVoid(123);
+	assert (!result.available());
+	activeObj.cont();
+	result.wait();
+	assert (result.available());
+	assert (!result.failed());
+}
+
+
+void ActiveDispatcherTest::testVoidInOut()
+{
+	ActiveObject activeObj;
+	ActiveResult<void> result = activeObj.testVoidInOut();
+	assert (!result.available());
+	activeObj.cont();
+	result.wait();
+	assert (result.available());
+	assert (!result.failed());
+}
+
+
+void ActiveDispatcherTest::testVoidIn()
+{
+	ActiveObject activeObj;
+	ActiveResult<int> result = activeObj.testVoidIn();
+	assert (!result.available());
+	activeObj.cont();
+	result.wait();
+	assert (result.available());
+	assert (!result.failed());
+	assert (result.data() == 123);
+}
+
+
 void ActiveDispatcherTest::setUp()
 {
 }
@@ -185,6 +248,9 @@ CppUnit::Test* ActiveDispatcherTest::suite()
 	CppUnit_addTest(pSuite, ActiveDispatcherTest, testWaitInterval);
 	CppUnit_addTest(pSuite, ActiveDispatcherTest, testTryWait);
 	CppUnit_addTest(pSuite, ActiveDispatcherTest, testFailure);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoid);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidIn);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidInOut);
 
 	return pSuite;
 }

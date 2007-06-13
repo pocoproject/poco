@@ -1,7 +1,7 @@
 //
 // LinearHashTable.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LinearHashTable.h#9 $
+// $Id: //poco/Main/Foundation/include/Poco/LinearHashTable.h#11 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -88,6 +88,9 @@ public:
 	typedef std::vector<Bucket> BucketVec;
 	
 	template <class VecIt, class BuckIt>
+	class BasicConstIterator;
+	
+	template <class VecIt, class BuckIt>
 	class BasicIterator
 	{
 	public:
@@ -111,7 +114,7 @@ public:
 		
 		BasicIterator& operator = (const BasicIterator& it)
 		{
-			Iterator tmp(it);
+			BasicIterator tmp(it);
 			swap(tmp);
 			return *this;
 		}
@@ -170,7 +173,110 @@ public:
 		
 		BasicIterator operator ++ (int) // postfix
 		{
-			Iterator tmp(*this);
+			BasicIterator tmp(*this);
+			++*this;
+			return tmp;
+		}
+		
+	private:
+		VecIt  _vecIt;
+		VecIt  _endIt;
+		BuckIt _buckIt;
+		
+		friend class LinearHashTable;
+		template <class, class> friend class BasicConstIterator;
+	};
+
+	typedef BasicIterator<typename BucketVec::iterator, typename Bucket::iterator> Iterator;
+
+	template <class VecIt, class BuckIt>
+	class BasicConstIterator
+	{
+	public:
+		BasicConstIterator()
+		{
+		}
+		
+		BasicConstIterator(const VecIt& vecIt, const VecIt& endIt, const BuckIt& buckIt):
+			_vecIt(vecIt),
+			_endIt(endIt),
+			_buckIt(buckIt)
+		{
+		}
+
+		BasicConstIterator(const BasicConstIterator& it):
+			_vecIt(it._vecIt),
+			_endIt(it._endIt),
+			_buckIt(it._buckIt)
+		{
+		}
+
+		BasicConstIterator(const Iterator& it):
+			_vecIt(it._vecIt),
+			_endIt(it._endIt),
+			_buckIt(it._buckIt)
+		{
+		}
+		
+		BasicConstIterator& operator = (const BasicConstIterator& it)
+		{
+			BasicConstIterator tmp(it);
+			swap(tmp);
+			return *this;
+		}
+
+		BasicConstIterator& operator = (const Iterator& it)
+		{
+			BasicConstIterator tmp(it);
+			swap(tmp);
+			return *this;
+		}
+		
+		void swap(BasicConstIterator& it)
+		{
+			using std::swap;
+			swap(_vecIt, it._vecIt);
+			swap(_endIt, it._endIt);
+			swap(_buckIt, it._buckIt);
+		}
+		
+		bool operator == (const BasicConstIterator& it) const
+		{
+			return _vecIt == it._vecIt && (_vecIt == _endIt || _buckIt == it._buckIt);
+		}
+
+		bool operator != (const BasicConstIterator& it) const
+		{
+			return _vecIt != it._vecIt || (_vecIt != _endIt && _buckIt != it._buckIt);
+		}
+		
+		const typename Bucket::value_type& operator * () const
+		{
+			return *_buckIt;
+		}
+
+		const typename Bucket::value_type* operator -> () const
+		{
+			return &*_buckIt;
+		}
+		
+		BasicConstIterator& operator ++ () // prefix
+		{
+			if (_vecIt != _endIt)
+			{
+				++_buckIt;
+				while (_vecIt != _endIt && _buckIt == _vecIt->end())
+				{
+					++_vecIt;
+					if (_vecIt != _endIt) _buckIt = _vecIt->begin();
+				}
+			}
+			return *this;
+		}
+		
+		BasicConstIterator operator ++ (int) // postfix
+		{
+			BasicConstIterator tmp(*this);
 			++*this;
 			return tmp;
 		}
@@ -182,9 +288,8 @@ public:
 		
 		friend class LinearHashTable;
 	};
-	
-	typedef BasicIterator<typename BucketVec::iterator, typename Bucket::iterator>                   Iterator;
-	typedef const BasicIterator<typename BucketVec::const_iterator, typename Bucket::const_iterator> ConstIterator;
+
+	typedef BasicConstIterator<typename BucketVec::const_iterator, typename Bucket::const_iterator> ConstIterator;
 	
 	LinearHashTable(std::size_t initialReserve = 64): 
 		_split(0),
@@ -231,8 +336,8 @@ public:
 	ConstIterator begin() const
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
-		typename BucketVec::iterator it  = _buckets.begin();
-		typename BucketVec::iterator end = _buckets.end();
+		typename BucketVec::const_iterator it  = _buckets.begin();
+		typename BucketVec::const_iterator end = _buckets.end();
 		while (it != end && it->empty())
 		{
 			++it;

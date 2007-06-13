@@ -1,7 +1,7 @@
 //
 // ActiveDispatcherTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ActiveDispatcherTest.h#2 $
+// $Id: //poco/Main/Foundation/testsuite/src/ActiveDispatcherTest.h#4 $
 //
 // Definition of the ActiveDispatcherTest class.
 //
@@ -63,6 +63,9 @@ public:
 	void testWaitInterval();
 	void testTryWait();
 	void testFailure();
+	void testVoid();
+	void testVoidIn();
+	void testVoidInOut();
 
 	void setUp();
 	void tearDown();

@@ -1,7 +1,7 @@
 //
 // FIFOStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FIFOStrategy.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/FIFOStrategy.h#4 $
 //
 // Library: Foundation
 // Package: Events
@@ -146,6 +146,11 @@ public:
 
 		_observers.clear();
 		_observerIndex.clear();
+	}
+
+	bool empty() const
+	{
+		return _observers.empty();
 	}
 
 protected:

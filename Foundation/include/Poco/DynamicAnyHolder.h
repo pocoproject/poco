@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#7 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#9 $
 //
 // Library: Foundation
 // Package: Core
@@ -474,7 +474,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertToSmaller(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -571,7 +573,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertToSmaller(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -668,7 +672,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertToSmaller(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -765,7 +771,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertUnsignedToSigned(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -862,7 +870,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertUnsignedToSigned(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -959,7 +969,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertUnsignedToSigned(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1056,7 +1068,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertUnsignedToSigned(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1251,7 +1265,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertToSmaller(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1355,7 +1371,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertToSmaller(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1402,37 +1420,37 @@ public:
 
 	void convert(Int16& val) const
 	{
-		val = static_cast<Int16>(_val);
+		val = static_cast<UInt8>(_val);
 	}
 	
 	void convert(Int32& val) const
 	{
-		val = static_cast<Int32>(_val);
+		val = static_cast<UInt8>(_val);
 	}
 
 	void convert(Int64& val) const
 	{
-		val = static_cast<Int64>(_val);
+		val = static_cast<UInt8>(_val);
 	}
 
 	void convert(UInt8& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		val = static_cast<UInt8>(_val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		val = static_cast<UInt8>(_val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		val = static_cast<UInt8>(_val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		val = static_cast<UInt8>(_val);
 	}
 
 	void convert(bool& val) const
@@ -1667,7 +1685,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertToSmaller(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const
@@ -1764,7 +1784,9 @@ public:
 
 	void convert(char& val) const
 	{
-		convertUnsignedToSigned(_val, val);
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
 	}
 
 	void convert(std::string& val) const

@@ -39,7 +39,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib unicows.lib"
 				OutputFile="..\bin\PocoFoundationd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -103,7 +103,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib unicows.lib"
 				OutputFile="..\bin\PocoFoundation.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -3496,6 +3496,12 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\FIFOStrategy.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\FunctionDelegate.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\FunctionPriorityDelegate.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\NotificationStrategy.h">

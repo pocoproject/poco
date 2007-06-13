@@ -1,7 +1,7 @@
 //
 // DefaultStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DefaultStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/DefaultStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -141,6 +141,11 @@ public:
 			delete *it;
 		}
 		_observers.clear();
+	}
+
+	bool empty() const
+	{
+		return _observers.empty();
 	}
 
 protected:

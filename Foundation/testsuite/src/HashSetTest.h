@@ -1,7 +1,7 @@
 //
 // HashSetTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashSetTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/HashSetTest.h#2 $
 //
 // Definition of the HashSetTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testInsert();
 	void testErase();
 	void testIterator();
+	void testConstIterator();
 
 	void setUp();
 	void tearDown();

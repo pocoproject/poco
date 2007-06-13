@@ -1,7 +1,7 @@
 //
 // LinearHashTableTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LinearHashTableTest.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/LinearHashTableTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -162,6 +162,43 @@ void LinearHashTableTest::testIterator()
 	}
 	
 	assert (values.size() == N);
+}
+
+
+void LinearHashTableTest::testConstIterator()
+{
+	const int N = 1000;
+
+	LinearHashTable<int> ht;
+
+	for (int i = 0; i < N; ++i)
+	{
+		ht.insert(i);
+	}
+	
+	std::set<int> values;
+	LinearHashTable<int>::ConstIterator it = ht.begin();
+	while (it != ht.end())
+	{
+		assert (values.find(*it) == values.end());
+		values.insert(*it);
+		++it;
+	}
+	
+	assert (values.size() == N);
+	
+	values.clear();
+	const LinearHashTable<int> cht(ht);
+
+	LinearHashTable<int>::ConstIterator cit = cht.begin();
+	while (cit != cht.end())
+	{
+		assert (values.find(*cit) == values.end());
+		values.insert(*cit);
+		++cit;
+	}
+	
+	assert (values.size() == N);	
 }
 
 
@@ -329,6 +366,7 @@ CppUnit::Test* LinearHashTableTest::suite()
 	CppUnit_addTest(pSuite, LinearHashTableTest, testInsert);
 	CppUnit_addTest(pSuite, LinearHashTableTest, testErase);
 	CppUnit_addTest(pSuite, LinearHashTableTest, testIterator);
+	CppUnit_addTest(pSuite, LinearHashTableTest, testConstIterator);
 	//CppUnit_addTest(pSuite, LinearHashTableTest, testPerformanceInt);
 	//CppUnit_addTest(pSuite, LinearHashTableTest, testPerformanceStr);
 

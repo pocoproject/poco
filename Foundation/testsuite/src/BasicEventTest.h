@@ -1,7 +1,7 @@
 //
 // BasicEventTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/BasicEventTest.h#8 $
+// $Id: //poco/Main/Foundation/testsuite/src/BasicEventTest.h#9 $
 //
 // Tests for BasicEvent
 //
@@ -71,6 +71,10 @@ public:
 
 protected:
 
+	static void onStaticSimple(const void* pSender, int& i);
+	static void onStaticSimple2(void* pSender, int& i);
+	static void onStaticSimple3(int& i);
+	void onSimpleNoSender(int& i);
 	void onSimple(const void* pSender, int& i);
 	void onSimpleOther(const void* pSender, int& i);
 	void onConstSimple(const void* pSender, const int& i);

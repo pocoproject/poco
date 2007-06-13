@@ -1,7 +1,7 @@
 //
 // ActiveMethod.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ActiveMethod.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/ActiveMethod.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -111,6 +111,81 @@ public:
 	{
 		ActiveResultType result(new ActiveResultHolder<ResultType>());
 		ActiveRunnableBase::Ptr pRunnable(new ActiveRunnableType(_pOwner, _method, arg, result));
+		StarterType::start(_pOwner, pRunnable);
+		return result;
+	}
+		
+private:
+	ActiveMethod();
+	ActiveMethod(const ActiveMethod&);
+	ActiveMethod& operator = (const ActiveMethod&);
+
+	OwnerType* _pOwner;
+	Callback   _method;
+};
+
+
+
+template <class ResultType, class OwnerType, class StarterType>
+class ActiveMethod <ResultType, void, OwnerType, StarterType>
+	/// An active method is a method that, when called, executes
+	/// in its own thread. ActiveMethod's take exactly one
+	/// argument and can return a value. To pass more than one
+	/// argument to the method, use a struct.
+	/// The following example shows how to add an ActiveMethod
+	/// to a class:
+	///
+	///     class ActiveObject
+	///     {
+	///     public:
+	///         ActiveObject():
+	///             exampleActiveMethod(this, &ActiveObject::exampleActiveMethodImpl)
+	///         {
+	///         }
+	///
+	///         ActiveMethod<std::string, std::string, ActiveObject> exampleActiveMethod;
+	///
+	///     protected:
+	///         std::string exampleActiveMethodImpl(const std::string& arg)
+	///         {
+	///             ...
+	///         }
+	///     };
+	///
+	/// And following is an example that shows how to invoke an ActiveMethod.
+	///
+	///     ActiveObject myActiveObject;
+	///     ActiveResult<std::string> result = myActiveObject.exampleActiveMethod("foo");
+	///     ...
+	///     result.wait();
+	///     std::cout << result.data() << std::endl;
+	///
+	/// The way an ActiveMethod is started can be changed by passing a StarterType
+	/// template argument with a corresponding class. The default ActiveStarter
+	/// starts the method in its own thread, obtained from a thread pool.
+	///
+	/// For an alternative implementation of StarterType, see ActiveDispatcher.
+	///
+	/// For methods that do not require an argument or a return value, simply use void.
+{
+public:
+	typedef ResultType (OwnerType::*Callback)(void);
+	typedef ActiveResult<ResultType> ActiveResultType;
+	typedef ActiveRunnable<ResultType, void, OwnerType> ActiveRunnableType;
+
+	ActiveMethod(OwnerType* pOwner, Callback method):
+		_pOwner(pOwner),
+		_method(method)
+		/// Creates an ActiveMethod object.
+	{
+		poco_check_ptr (pOwner);
+	}
+	
+	ActiveResultType operator () (void)
+		/// Invokes the ActiveMethod.
+	{
+		ActiveResultType result(new ActiveResultHolder<ResultType>());
+		ActiveRunnableBase::Ptr pRunnable(new ActiveRunnableType(_pOwner, _method, result));
 		StarterType::start(_pOwner, pRunnable);
 		return result;
 	}

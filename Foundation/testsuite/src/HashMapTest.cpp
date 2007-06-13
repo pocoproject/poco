@@ -1,7 +1,7 @@
 //
 // HashMapTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashMapTest.cpp#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/HashMapTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -167,6 +167,31 @@ void HashMapTest::testIterator()
 }
 
 
+void HashMapTest::testConstIterator()
+{
+	const int N = 1000;
+
+	typedef HashMap<int, int> IntMap;
+	IntMap hm;
+
+	for (int i = 0; i < N; ++i)
+	{
+		hm.insert(IntMap::ValueType(i, i*2));
+	}
+	
+	std::map<int, int> values;
+	IntMap::ConstIterator it = hm.begin();
+	while (it != hm.end())
+	{
+		assert (values.find(it->first) == values.end());
+		values[it->first] = it->second;
+		++it;
+	}
+	
+	assert (values.size() == N);
+}
+
+
 void HashMapTest::testIndex()
 {
 	typedef HashMap<int, int> IntMap;
@@ -210,6 +235,7 @@ CppUnit::Test* HashMapTest::suite()
 	CppUnit_addTest(pSuite, HashMapTest, testInsert);
 	CppUnit_addTest(pSuite, HashMapTest, testErase);
 	CppUnit_addTest(pSuite, HashMapTest, testIterator);
+	CppUnit_addTest(pSuite, HashMapTest, testConstIterator);
 	CppUnit_addTest(pSuite, HashMapTest, testIndex);
 
 	return pSuite;

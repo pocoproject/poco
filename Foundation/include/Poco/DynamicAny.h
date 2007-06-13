@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#8 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#9 $
 //
 // Library: Foundation
 // Package: Core
@@ -160,6 +160,14 @@ public:
 			return pHolder->value();
 		else
 			throw BadCastException();
+	}
+
+	DynamicAny& operator = (const DynamicAny& other)
+		/// Assignment operator
+	{
+		DynamicAny tmp(other);
+		swap(tmp);
+		return *this;
 	}
 
 	template <typename T> 

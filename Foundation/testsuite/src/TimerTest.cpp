@@ -1,7 +1,7 @@
 //
 // TimerTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TimerTest.cpp#10 $
+// $Id: //poco/Main/Foundation/testsuite/src/TimerTest.cpp#11 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -78,6 +78,19 @@ void TimerTest::testTimer()
 }
 
 
+void TimerTest::testDuplicateStop()
+{
+	Timer t(100, 200);
+	t.stop();
+	t.stop();
+
+	TimerCallback<TimerTest> tc(*this, &TimerTest::onTimer);
+	t.start(tc);
+	_event.wait();
+	t.stop();
+	t.stop();
+}
+
 void TimerTest::setUp()
 {
 }
@@ -99,6 +112,7 @@ CppUnit::Test* TimerTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("TimerTest");
 
 	CppUnit_addTest(pSuite, TimerTest, testTimer);
+	CppUnit_addTest(pSuite, TimerTest, testDuplicateStop);
 
 	return pSuite;
 }

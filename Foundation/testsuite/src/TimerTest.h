@@ -1,7 +1,7 @@
 //
 // TimerTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TimerTest.h#9 $
+// $Id: //poco/Main/Foundation/testsuite/src/TimerTest.h#10 $
 //
 // Definition of the TimerTest class.
 //
@@ -49,6 +49,7 @@ public:
 	~TimerTest();
 
 	void testTimer();
+	void testDuplicateStop();
 
 	void setUp();
 	void tearDown();

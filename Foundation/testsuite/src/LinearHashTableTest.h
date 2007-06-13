@@ -1,7 +1,7 @@
 //
 // LinearHashTableTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LinearHashTableTest.h#1 $
+// $Id: //poco/Main/Foundation/testsuite/src/LinearHashTableTest.h#2 $
 //
 // Definition of the LinearHashTableTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testInsert();
 	void testErase();
 	void testIterator();
+	void testConstIterator();
 	void testPerformanceInt();
 	void testPerformanceStr();
 	

@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#7 $
+// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#9 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -1139,12 +1139,6 @@ void DynamicAnyTest::testLimitsInt()
 	testLimitsFloatToInt<float, Int8>();
 	testLimitsFloatToInt<double, Int8>();
 
-	testLimitsSigned<Int16, char>();
-	testLimitsSigned<Int32, char>();
-	testLimitsSigned<Int64, char>();
-	testLimitsFloatToInt<float, char>();
-	testLimitsFloatToInt<double, char>();
-
 	testLimitsSigned<Int32, Int16>();
 	testLimitsSigned<Int64, Int16>();
 	testLimitsFloatToInt<float, Int16>();
@@ -1211,6 +1205,22 @@ void DynamicAnyTest::testLimitsFloat()
 }
 
 
+void DynamicAnyTest::testCtor()
+{
+	// this is mainly to test a reported compiler error with assignment on HP aCC.
+	// (SF# 1733964)
+
+	DynamicAny a1(42);
+	DynamicAny a2(a1);
+	DynamicAny a3;
+	
+	a3 = a1;
+	
+	assert (a2 == 42);
+	assert (a3 == 42);
+}
+
+
 void DynamicAnyTest::setUp()
 {
 }
@@ -1243,6 +1253,7 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testConversionOperator);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsInt);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsFloat);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testCtor);
 
 	return pSuite;
 }
