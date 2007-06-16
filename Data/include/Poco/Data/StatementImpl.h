@@ -222,6 +222,20 @@ protected:
 	void resetBinding();
 		/// Resets binding so it can be reused again.
 
+	virtual bool isStoredProcedure() const;
+		/// Returns true if the statement is stored procedure.
+		/// Used as a help to determine whether to automatically create the
+		/// internal extractions when no outside extraction is supplied.
+		/// The reason for this function is to prevent unnecessary internal
+		/// extraction creation in cases (behavior exhibited by some ODBC drivers) 
+		/// when there is data available from the stored procedure call 
+		/// statement execution but no external extraction is supplied (as is 
+		/// usually the case when stored procedures are called). In such cases
+		/// no storage is needed because output parameters serve as storage.
+		/// At the Data framework level, this function always returns false.
+		/// When connector-specific behavior is desired, it should be overriden 
+		/// by the statement implementation.
+
 private:
 	void compile();
 		/// Compiles the statement, if not yet compiled. doesn't bind yet
@@ -240,6 +254,14 @@ private:
 
 	void resetExtraction();
 		/// Resets binding so it can be reused again.
+
+	template <class T, class C>
+	InternalExtraction<T,C>* createExtract(const MetaColumn& mc)
+	{
+		C* pData = new C;
+		Column<T,C>* pCol = new Column<T,C>(mc, pData);
+		return new InternalExtraction<T,C>(*pData, pCol);
+	}
 
 	template <class T>
 	void addInternalExtract(const MetaColumn& mc)
@@ -272,23 +294,11 @@ private:
 		if (storage.empty()) storage = VECTOR;
 
 		if (0 == icompare(VECTOR, storage))
-		{
-			std::vector<T>* pData = new std::vector<T>;
-			Column<T,std::vector<T> >* pCol = new Column<T, std::vector<T> >(mc, pData);
-			addExtract(new InternalExtraction<T, std::vector<T> >(*pData, pCol));
-		}
+			addExtract(createExtract<T, std::vector<T> >(mc));
 		else if (0 == icompare(LIST, storage))
-		{
-			std::list<T>* pData = new std::list<T>;
-			Column<T,std::list<T> >* pCol = new Column<T, std::list<T> >(mc, pData);
-			addExtract(new InternalExtraction<T, std::list<T> >(*pData, pCol));
-		}
+			addExtract(createExtract<T, std::list<T> >(mc));
 		else if (0 == icompare(DEQUE, storage))
-		{
-			std::deque<T>* pData = new std::deque<T>;
-			Column<T,std::deque<T> >* pCol = new Column<T, std::deque<T> >(mc, pData);
-			addExtract(new InternalExtraction<T, std::deque<T> >(*pData, pCol));
-		}
+			addExtract(createExtract<T, std::deque<T> >(mc));
 	}
 
 	StatementImpl(const StatementImpl& stmt);
@@ -386,6 +396,12 @@ inline StatementImpl::Storage StatementImpl::getStorage() const
 inline std::size_t StatementImpl::extractionCount() const
 {
 	return extractions().size();
+}
+
+
+inline bool StatementImpl::isStoredProcedure() const
+{
+	return false;
 }
 
 

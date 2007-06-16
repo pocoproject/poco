@@ -122,6 +122,8 @@ public:
 	void testInternalExtraction();
 	void testInternalStorageType();
 
+	void testStoredFunction();
+
 	void setUp();
 	void tearDown();
 
@@ -140,12 +142,25 @@ private:
 
 	static bool init(const std::string& driver, const std::string& dsn);
 	static bool canConnect(const std::string& driver, const std::string& dsn);
+	
+	void configurePLPgSQL();
+		/// Configures PL/pgSQL in the database. A reasonable defaults
+		/// for the interpreter location on WIN32 and POSIX platforms are 
+		/// supplied (see installDir member variable). 
+		/// If these do not work, user must determine the proper location,
+		/// modify the function and recompile.
+		/// Alternative is direct database configuration for PL/pgSQL usage.
 
 	static Poco::Data::ODBC::Utility::DriverMap _drivers;
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;
 	static Poco::SharedPtr<SQLExecutor> _pExecutor;
 	static const bool bindValues[8];
+	static const std::string libDir;
+		/// Varible determining the location of the library directory
+		/// on the database installation system.
+		/// Used to enable PLpgSQL language programmaticaly when
+		/// it is not enabled.
 };
 
 

@@ -153,7 +153,7 @@ void StatementImpl::compile()
 		compileImpl();
 		_state = ST_COMPILED;
 
-		if (!extractions().size())
+		if (!extractions().size() && !isStoredProcedure())
 		{
 			Poco::UInt32 cols = columnsReturned();
 			if (cols) makeExtractors(cols);

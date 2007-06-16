@@ -57,8 +57,8 @@ template <typename H, SQLSMALLINT handleType>
 class Diagnostics
 	/// Utility class providing functionality for retrieving ODBC diagnostic
 	/// records. Diagnostics object must be created with corresponding handle
-	/// as constructor argument. During construction, diagnostic records with corresponding
-	/// fields are populated and the object is ready for querying on various diagnostic fields.
+	/// as constructor argument. During construction, diagnostic records fields 
+	/// are populated and the object is ready for querying.
 {
 public:
 
@@ -147,12 +147,12 @@ public:
 		return _fields;
 	}
 
-	const Iterator begin() const
+	Iterator begin() const
 	{
 		return _fields.begin();
 	}
 
-	const Iterator end() const
+	Iterator end() const
 	{
 		return _fields.end();
 	}

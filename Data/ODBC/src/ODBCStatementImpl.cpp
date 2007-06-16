@@ -347,4 +347,13 @@ void ODBCStatementImpl::fillColumns()
 }
 
 
+bool ODBCStatementImpl::isStoredProcedure() const
+{
+	std::string str = toString();
+	if (trimInPlace(str).size() < 2) return false;
+
+	return ('{' == str[0] && '}' == str[str.size()-1]);
+}
+
+
 } } } // namespace Poco::Data::ODBC

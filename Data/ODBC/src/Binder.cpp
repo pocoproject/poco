@@ -81,8 +81,26 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 
 	if (isOutBound(dir))
 	{
-		Parameter p(_rStmt, pos);
-		size = (SQLINTEGER) p.columnSize();
+		try
+		{
+			Parameter p(_rStmt, pos);
+			size = (SQLUINTEGER) p.columnSize();
+		}
+		catch (StatementException&)
+			// some drivers (e.g. MS SQL) refuse to describe output parameters
+		{
+			SQLHDESC hIPD = 0;
+			if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, 0, 0)))
+			{
+				size = 1024;
+				SQLUINTEGER sz = size;
+				if (Utility::isError(SQLSetDescField(hIPD, (SQLSMALLINT) pos + 1, SQL_DESC_LENGTH, &sz, 0)))
+					throw StatementException(_rStmt, "Could not set output parameter size");
+			}
+			else
+				throw StatementException(_rStmt, "Could not get statement IPD attribute handle.");
+		}
+
 		char* pChar = (char*) std::calloc(size, sizeof(char));
 		pVal = (SQLPOINTER) pChar;
 		_outParams.insert(ParamMap::value_type(pVal, size));
@@ -106,7 +124,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
-		getParamType(dir), 
+		toODBCDirection(dir), 
 		SQL_C_CHAR, 
 		SQL_LONGVARCHAR, 
 		(SQLUINTEGER) size,
@@ -181,7 +199,7 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
-		getParamType(dir), 
+		toODBCDirection(dir), 
 		SQL_C_TIMESTAMP, 
 		SQL_TIMESTAMP, 
 		colSize,
@@ -213,7 +231,7 @@ void Binder::bind(std::size_t pos, const char* const &pVal, Direction dir)
 }
 
 
-SQLSMALLINT Binder::getParamType(Direction dir) const
+SQLSMALLINT Binder::toODBCDirection(Direction dir) const
 {
 	bool in = isInBound(dir);
 	bool out = isOutBound(dir);

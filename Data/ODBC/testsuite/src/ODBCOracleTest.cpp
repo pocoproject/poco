@@ -1023,7 +1023,7 @@ void ODBCOracleTest::testStoredFunction()
 		k += 2;
 	}
 
-	//string and BLOB for automatic binding only
+	//string for automatic binding only
 	_pSession->setFeature("autoBind", true);
 
 	*_pSession << "CREATE OR REPLACE "

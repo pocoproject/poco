@@ -157,13 +157,8 @@ private:
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 
-	std::size_t getParamSize(std::size_t pos);
-		/// Returns parameter size as defined by data source.
-		/// Used to determine buffer size for variable size out-bound parameters 
-		/// (string and BLOB).
-
-	SQLSMALLINT getParamType(Direction dir) const;
-		/// Returns ODBC parameter type based on the parameter binding direction
+	SQLSMALLINT toODBCDirection(Direction dir) const;
+		/// Returns ODBC parameter direction based on the parameter binding direction
 		/// specified by user.
 
 	template <typename T>
@@ -184,7 +179,7 @@ private:
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
-			getParamType(dir), 
+			toODBCDirection(dir), 
 			cDataType, 
 			Utility::sqlDataType(cDataType), 
 			colSize,

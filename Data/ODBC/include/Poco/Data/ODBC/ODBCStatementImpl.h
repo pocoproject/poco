@@ -132,6 +132,12 @@ private:
 
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");
+	
+	bool isStoredProcedure() const;
+		/// Returns true if this statement is stored procedure.
+		/// Only the ODBC CALL escape sequence is supported.
+		/// The function checks whether trimmed statement 
+		/// text begins with '{' and ends with '}';
 
 	const SQLHDBC&               _rConnection;
 	const StatementHandle        _stmt;
@@ -171,7 +177,7 @@ inline Poco::UInt32 ODBCStatementImpl::columnsReturned() const
 inline bool ODBCStatementImpl::hasData() const
 {
 	poco_assert_dbg (_pPreparation);
-	return (_pPreparation->columns() > 0);
+	return (_pPreparation->columns(!isStoredProcedure()) > 0);
 }
 
 

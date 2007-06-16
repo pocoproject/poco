@@ -51,6 +51,7 @@
 
 using namespace Poco::Data;
 using Poco::Data::ODBC::Utility;
+using Poco::Data::ODBC::ODBCException;
 using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
@@ -64,6 +65,11 @@ Poco::SharedPtr<Poco::Data::Session> ODBCPostgreSQLTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> ODBCPostgreSQLTest::_pExecutor = 0;
 std::string ODBCPostgreSQLTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCPostgreSQLTest::_drivers;
+#ifdef POCO_OS_FAMILY_WINDOWS
+const std::string ODBCPostgreSQLTest::libDir = "C:\\\\Program Files\\\\PostgreSQL\\\\8.2\\\\lib\\\\";
+#else
+const std::string ODBCPostgreSQLTest::libDir = "/usr/local/pgsql/lib/";
+#endif
 
 
 ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name): 
@@ -857,6 +863,83 @@ void ODBCPostgreSQLTest::testInternalStorageType()
 }
 
 
+void ODBCPostgreSQLTest::testStoredFunction()
+{
+	configurePLPgSQL();
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		*_pSession << "CREATE FUNCTION storedFunction() RETURNS INTEGER AS '"
+			"BEGIN "
+			" return -1; "
+			"END;'"
+			"LANGUAGE 'plpgsql'", now;
+
+		int i = 0;
+		*_pSession << "{? = call storedFunction()}", out(i), now;
+		assert(-1 == i);
+		dropObject("FUNCTION", "storedFunction()");
+
+		*_pSession << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
+			"BEGIN "
+			" RETURN $1 * $1; "
+			"END;'"
+			"LANGUAGE 'plpgsql'" , now;
+
+		i = 2;
+		int result = 0;
+		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		assert(4 == result);
+		dropObject("FUNCTION", "storedFunction(INTEGER)");
+/*TODO
+		*_pSession << "CREATE FUNCTION storedFunction(TEXT) RETURNS TEXT AS '"
+		"BEGIN "
+		" RETURN $1;"
+		"END;'"
+		"LANGUAGE 'plpgsql'" , now;
+		
+		std::string param = "123";
+		std::string ret;
+		try {
+		*_pSession << "{? = call storedFunction(?)}", out(ret), in(param), now;
+		}catch(StatementException & ex) { std::cout << ex.toString();}
+		assert(ret == param);
+		dropObject("FUNCTION", "storedFunction(TEXT)");
+*/
+
+		k += 2;
+	}
+}
+
+
+void ODBCPostgreSQLTest::configurePLPgSQL()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	try
+	{
+		*_pSession << format("CREATE FUNCTION plpgsql_call_handler () "
+			"RETURNS OPAQUE "
+			"AS '%splpgsql.dll' "
+			"LANGUAGE 'C';", libDir), now;
+		
+		*_pSession << "CREATE LANGUAGE 'plpgsql' "
+			"HANDLER plpgsql_call_handler "
+			"LANCOMPILER 'PL/pgSQL'", now;
+
+	}catch(StatementException& ex) 
+	{  
+		if (7 != ex.diagnostics().nativeError(0)) 
+			throw;
+	}
+
+	return;
+}
+
+
 void ODBCPostgreSQLTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1063,7 +1146,7 @@ bool ODBCPostgreSQLTest::init(const std::string& driver, const std::string& dsn)
 
 	if (_pSession && _pSession->isConnected()) 
 		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
-	
+
 	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
 
 	return true;
@@ -1073,6 +1156,7 @@ bool ODBCPostgreSQLTest::init(const std::string& driver, const std::string& dsn)
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
 	if (init("PostgreSQL ANSI", "PocoDataPostgreSQLTest"))
+	//if (init("Mammoth ODBCng Beta", "Mammoth ODBCng beta"))
 	{
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCPostgreSQLTest");
 
@@ -1126,6 +1210,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalStorageType);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunction);
 
 		return pSuite;
 	}

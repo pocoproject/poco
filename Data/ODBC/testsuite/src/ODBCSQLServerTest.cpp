@@ -907,9 +907,14 @@ void ODBCSQLServerTest::testStoredProcedure()
 
 		k += 2;
 	}
-/*TODO
+/*TODO - currently fails with following error:
+
+[Microsoft][ODBC SQL Server Driver][SQL Server]Invalid parameter 
+2 (''):  Data type 0x23 is a deprecated large object, or LOB, but is marked as output parameter.  
+Deprecated types are not supported as output parameters.  Use current large object types instead.
+
 	_pSession->setFeature("autoBind", true);
-	*_pSession << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR, @outParam VARCHAR OUTPUT) AS "
+	*_pSession << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
 		"BEGIN "
 		"SET @outParam = @inParam; "
 		"END;"
@@ -1206,6 +1211,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 {
 #ifdef POCO_OS_FAMILY_WINDOWS
 	if (init("SQL Server", "PocoDataSQLServerTest"))
+	//if (init("SQL Native Client", "PocoDataSQLServerTest"))
 #else
 	if (init("FreeTDS", "PocoDataSQLServerTest"))
 #endif

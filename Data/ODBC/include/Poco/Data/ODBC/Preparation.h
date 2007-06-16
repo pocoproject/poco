@@ -150,8 +150,9 @@ public:
 	void prepare(std::size_t pos, const Poco::Any&);
 		/// Prepares an Any.
 
-	std::size_t columns() const;
+	std::size_t columns(bool resize = true) const;
 		/// Returns the number of columns.
+		/// Resizes the internal storage iff resize is true.
 
 	Poco::Any& operator [] (std::size_t pos);
 		/// Returns reference to column data.

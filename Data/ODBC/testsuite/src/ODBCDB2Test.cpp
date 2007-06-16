@@ -35,6 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
+#include "Poco/Tuple.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
@@ -54,6 +55,7 @@ using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
+using Poco::Tuple;
 using Poco::NotFoundException;
 
 
@@ -859,6 +861,170 @@ void ODBCDB2Test::testInternalStorageType()
 }
 
 
+void ODBCDB2Test::testStoredProcedure()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		dropObject("PROCEDURE", "storedProcedure");
+		*_pSession << "CREATE PROCEDURE storedProcedure(OUT outParam INTEGER) "
+			"BEGIN "
+			" SET outParam = -1; "
+			"END" , now;
+
+		int i = 0;
+		*_pSession << "{call storedProcedure(?)}", out(i), now;
+		assert(-1 == i);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		*_pSession << "CREATE PROCEDURE storedProcedure(inParam INTEGER, OUT outParam INTEGER) "
+			"BEGIN "
+			" SET outParam = inParam*inParam; "
+			"END" , now;
+		
+
+		i = 2;
+		int j = 0;
+		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		assert(4 == j);
+		dropObject("PROCEDURE", "storedProcedure");
+	
+		*_pSession << "CREATE PROCEDURE storedProcedure(INOUT ioParam INTEGER) "
+			"BEGIN "
+			" SET ioParam = ioParam*ioParam; "
+			"END" , now;
+
+		i = 2;
+		*_pSession << "{call storedProcedure(?)}", io(i), now;
+		assert(4 == i);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		//TIMESTAMP is not supported as stored procedure parameter in DB2
+		//(SQL0182N An expression with a datetime value or a labeled duration is not valid.)
+
+		*_pSession << "CREATE PROCEDURE storedProcedure(inParam VARCHAR(1000), OUT outParam VARCHAR(1000)) "
+			"BEGIN "
+			" SET outParam = inParam; "
+			"END" , now;
+
+		std::string inParam = 
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+		std::string outParam;
+		*_pSession << "{call storedProcedure(?,?)}", in(inParam), out(outParam), now;
+		assert(inParam == outParam);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		k += 2;
+	}
+}
+
+
+void ODBCDB2Test::testStoredFunction()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		dropObject("PROCEDURE", "storedFunction");
+		*_pSession << "CREATE PROCEDURE storedFunction() "
+			"BEGIN "
+			"  RETURN -1; "
+			"END" , now;
+
+		int i = 0;
+		*_pSession << "{? = call storedFunction()}", out(i), now;
+		assert(-1 == i);
+		dropObject("PROCEDURE", "storedFunction");
+		
+		*_pSession << "CREATE PROCEDURE storedFunction(inParam INTEGER) "
+			"BEGIN "
+			" RETURN inParam*inParam; "
+			"END" , now;
+		
+		i = 2;
+		int result = 0;
+		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		assert(4 == result);
+		dropObject("PROCEDURE", "storedFunction");
+
+		*_pSession << "CREATE PROCEDURE storedFunction(inParam INTEGER, OUT outParam INTEGER) "
+			"BEGIN "
+			" SET outParam = inParam*inParam; "
+			" RETURN outParam; "
+			"END" , now;
+
+		i = 2;
+		int j = 0;
+		result = 0;
+		*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
+		assert(4 == j);
+		assert(j == result); 
+		dropObject("PROCEDURE", "storedFunction");
+
+		*_pSession << "CREATE PROCEDURE storedFunction(INOUT param1 INTEGER, INOUT param2 INTEGER) "
+			"BEGIN "
+			" DECLARE temp INTEGER;"
+			" SET temp = param1; "
+			" SET param1 = param2; "
+			" SET param2 = temp; "
+			" RETURN param1 + param2; "
+			"END" , now;
+
+		i = 1;
+		j = 2;
+		result = 0;
+		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
+		assert(1 == j);
+		assert(2 == i);
+		assert(3 == result); 
+
+		Tuple<int, int> params(1, 2);
+		assert(1 == params.get<0>());
+		assert(2 == params.get<1>());
+		result = 0;
+		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
+		assert(1 == params.get<1>());
+		assert(2 == params.get<0>());
+		assert(3 == result); 
+
+		dropObject("PROCEDURE", "storedFunction");
+
+		_pSession->setFeature("autoBind", true);
+
+		*_pSession << "CREATE PROCEDURE storedFunction(inParam VARCHAR(10), OUT outParam VARCHAR(10)) "
+			"BEGIN "
+			" SET outParam = inParam; "
+			" RETURN LENGTH(outParam);"//DB2 allows only integer as return type
+			"END" , now;
+
+		std::string inParam = "123456789";
+		std::string outParam;
+		int ret;
+		*_pSession << "{? = call storedFunction(?,?)}", out(ret), in(inParam), out(outParam), now;
+		assert(inParam == outParam);
+		assert(ret == inParam.size());
+		dropObject("PROCEDURE", "storedFunction");
+
+		k += 2;
+	}
+}
+
+
 void ODBCDB2Test::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1098,6 +1264,8 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInternalStorageType);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedure);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredFunction);
 
 		return pSuite;
 	}

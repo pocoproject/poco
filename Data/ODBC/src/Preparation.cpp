@@ -69,15 +69,13 @@ Preparation::~Preparation()
 }
 
 
-std::size_t Preparation::columns() const
+std::size_t Preparation::columns(bool resize) const
 {
-	if (_pValues.empty())
+	if (_pValues.empty() && resize)
 	{
 		SQLSMALLINT nCol = 0;
-		if (Utility::isError(SQLNumResultCols(_rStmt, &nCol)))
-			throw StatementException(_rStmt);
-
-		if (nCol)
+		if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 
+			0 != nCol)
 		{
 			_pValues.resize(nCol, 0);
 			_pLengths.resize(nCol, 0);
