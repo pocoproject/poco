@@ -3620,6 +3620,42 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="AsyncIO"
+			Filter="">
+			<Filter
+				Name="Header Files"
+				Filter="">
+				<File
+					RelativePath=".\include\Poco\AsyncIOChannel.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\AsyncIOCommand.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\AsyncIOEvent.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\AsyncStreamChannel.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				Filter="">
+				<File
+					RelativePath=".\src\AsyncIOChannel.cpp">
+				</File>
+				<File
+					RelativePath=".\src\AsyncIOCommand.cpp">
+				</File>
+				<File
+					RelativePath=".\src\AsyncIOEvent.cpp">
+				</File>
+				<File
+					RelativePath=".\src\AsyncStreamChannel.cpp">
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

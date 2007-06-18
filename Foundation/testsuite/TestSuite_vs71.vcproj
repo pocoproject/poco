@@ -1209,6 +1209,30 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="AsyncIO"
+			Filter="">
+			<Filter
+				Name="Header Files"
+				Filter="">
+				<File
+					RelativePath=".\src\AsyncIOChannelTest.h">
+				</File>
+				<File
+					RelativePath=".\src\AsyncIOTestSuite.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				Filter="">
+				<File
+					RelativePath=".\src\AsyncIOChannelTest.cpp">
+				</File>
+				<File
+					RelativePath=".\src\AsyncIOTestSuite.cpp">
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

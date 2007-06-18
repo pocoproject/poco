@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Foundation"
 	ProjectGUID="{8164D41D-B053-405B-826C-CF37AC0EF176}"
 	RootNamespace="Foundation"
@@ -4701,6 +4701,50 @@
 				</File>
 				<File
 					RelativePath=".\src\HashStatistic.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="AsyncIO"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\AsyncIOChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\AsyncIOCommand.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\AsyncIOEvent.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\AsyncStreamChannel.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\AsyncIOChannel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AsyncIOCommand.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AsyncIOEvent.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AsyncStreamChannel.cpp"
 					>
 				</File>
 			</Filter>

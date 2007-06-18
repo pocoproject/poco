@@ -1,7 +1,7 @@
 //
 // FoundationTestSuite.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FoundationTestSuite.cpp#12 $
+// $Id: //poco/Main/Foundation/testsuite/src/FoundationTestSuite.cpp#13 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -48,6 +48,7 @@
 #include "EventTestSuite.h"
 #include "CacheTestSuite.h"
 #include "HashingTestSuite.h"
+#include "AsyncIOTestSuite.h"
 
 
 CppUnit::Test* FoundationTestSuite::suite()
@@ -71,6 +72,7 @@ CppUnit::Test* FoundationTestSuite::suite()
 	pSuite->addTest(EventTestSuite::suite());
 	pSuite->addTest(CacheTestSuite::suite());
 	pSuite->addTest(HashingTestSuite::suite());
+	pSuite->addTest(AsyncIOTestSuite::suite());
 
 	return pSuite;
 }

@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/Makefile#43 $
+# $Id: //poco/Main/Foundation/Makefile#44 $
 #
 # Makefile for Poco Foundation
 #
@@ -31,6 +31,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Format \
 	Pipe PipeImpl PipeStream DynamicAny DynamicAnyHolder SharedMemory \
 	FileStream Unicode UTF8String \
+	AsyncIOCommand AsyncIOEvent AsyncIOChannel AsyncStreamChannel \
 	adler32 compress crc32  deflate gzio infback inffast inflate inftrees  \
 	trees zutil \
 	pcre_chartables pcre_compile pcre_globals pcre_maketables pcre_study \
