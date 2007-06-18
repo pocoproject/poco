@@ -39,7 +39,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="PocoFoundationd.lib ws2_32.lib iphlpapi.lib unicows.lib"
 				OutputFile="..\bin\PocoNetd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -104,7 +104,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="PocoFoundation.lib ws2_32.lib iphlpapi.lib unicows.lib"
 				OutputFile="..\bin\PocoNet.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -915,6 +915,24 @@
 				</File>
 				<File
 					RelativePath=".\src\RemoteSyslogListener.cpp">
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="AsyncIO"
+			Filter="">
+			<Filter
+				Name="Header Files"
+				Filter="">
+				<File
+					RelativePath=".\include\Poco\Net\AsyncSocketChannel.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				Filter="">
+				<File
+					RelativePath=".\src\AsyncSocketChannel.cpp">
 				</File>
 			</Filter>
 		</Filter>
