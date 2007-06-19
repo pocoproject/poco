@@ -216,6 +216,52 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 }
 
 
+void Binder::bindNull(std::size_t pos, SQLSMALLINT cDataType)
+{
+	_inParams.insert(ParamMap::value_type(0, 0));
+
+	SQLLEN* pLenIn = new SQLLEN;
+	*pLenIn  = SQL_NULL_DATA;
+
+	if (PB_AT_EXEC == _paramBinding)
+		*pLenIn  = SQL_LEN_DATA_AT_EXEC(SQL_NULL_DATA);
+
+	_lengthIndicator.push_back(pLenIn);
+
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	
+	try
+	{
+		Parameter p(_rStmt, pos);
+		colSize = (SQLINTEGER) p.columnSize();
+		decDigits = (SQLSMALLINT) p.decimalDigits();
+	}catch (StatementException&)
+	{
+		try
+		{
+			ODBCColumn c(_rStmt, pos);
+			colSize = (SQLINTEGER) c.length();
+			decDigits = (SQLSMALLINT) c.precision();
+		}catch (StatementException&) { }
+	}
+
+	if (Utility::isError(SQLBindParameter(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		SQL_PARAM_INPUT, 
+		cDataType, 
+		Utility::sqlDataType(cDataType), 
+		colSize,
+		decDigits,
+		0, 
+		0, 
+		_lengthIndicator.back())))
+	{
+		throw StatementException(_rStmt, "SQLBindParameter()");
+	}
+}
+
+
 std::size_t Binder::parameterSize(SQLPOINTER pAddr) const
 {
 	ParamMap::const_iterator it = _inParams.find(pAddr);

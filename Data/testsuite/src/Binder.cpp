@@ -120,12 +120,17 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
+void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
 {
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
+void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
+{
+}
+
+
+void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 {
 }
 

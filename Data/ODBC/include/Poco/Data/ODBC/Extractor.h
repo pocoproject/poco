@@ -127,6 +127,9 @@ public:
 	Preparation::DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
+	bool isNull(std::size_t pos);
+		/// Returns true if the current row value at pos column is null.
+
 private:
 	static const int CHUNK_SIZE = 1024;
 		/// Amount of data retrieved in one SQLGetData() request when doing manual extract.
@@ -197,6 +200,12 @@ inline void Extractor::setDataExtraction(Preparation::DataExtraction ext)
 inline Preparation::DataExtraction Extractor::getDataExtraction() const
 {
 	return _dataExtraction;
+}
+
+
+inline bool Extractor::isNull(std::size_t pos)
+{
+	throw NotImplementedException("TODO");
 }
 
 

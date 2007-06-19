@@ -185,6 +185,8 @@ bool SQLiteStatementImpl::hasNext()
 
 	_stepCalled   = true;
 	_nextResponse = sqlite3_step(_pStmt);
+	_pExtractor->reset();//to clear the cached null indicators
+
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
 	{
 		Utility::throwException(_nextResponse);

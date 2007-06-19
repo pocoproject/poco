@@ -168,6 +168,9 @@ protected:
 	const MetaColumn& metaColumn(const std::string& name) const;
 		/// Returns the type for the column with specified name.
 
+	 bool isNull(std::size_t col, std::size_t row);
+		/// Returns true if the current row value at column pos is null.
+
 private:
 	typedef Poco::SharedPtr<StatementImpl> StatementImplPtr;
 
@@ -266,6 +269,12 @@ inline std::size_t Statement::extractionCount() const
 inline Statement::Storage Statement::storage() const
 {
 	return static_cast<Storage>(_ptr->getStorage());
+}
+
+
+inline bool Statement::isNull(std::size_t col, std::size_t row)
+{
+	return _ptr->isNull(col, row);
 }
 
 

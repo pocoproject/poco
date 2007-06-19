@@ -63,57 +63,61 @@ public:
 	~Binder();
 		/// Destroys the Binder.
 
-	void bind(std::size_t pos, const Poco::Int8 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int8 &val, Direction dir = PD_IN);
 		/// Binds an Int8.
 
-	void bind(std::size_t pos, const Poco::UInt8 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt8 &val, Direction dir = PD_IN);
 		/// Binds an UInt8.
 
-	void bind(std::size_t pos, const Poco::Int16 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int16 &val, Direction dir = PD_IN);
 		/// Binds an Int16.
 
-	void bind(std::size_t pos, const Poco::UInt16 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt16 &val, Direction dir = PD_IN);
 		/// Binds an UInt16.
 
-	void bind(std::size_t pos, const Poco::Int32 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int32 &val, Direction dir = PD_IN);
 		/// Binds an Int32.
 
-	void bind(std::size_t pos, const Poco::UInt32 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt32 &val, Direction dir = PD_IN);
 		/// Binds an UInt32.
 
-	void bind(std::size_t pos, const Poco::Int64 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int64 &val, Direction dir = PD_IN);
 		/// Binds an Int64.
 
-	void bind(std::size_t pos, const Poco::UInt64 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt64 &val, Direction dir = PD_IN);
 		/// Binds an UInt64.
 
-	void bind(std::size_t pos, const bool &val, Direction dir);
+	void bind(std::size_t pos, const bool &val, Direction dir = PD_IN);
 		/// Binds a boolean.
 
-	void bind(std::size_t pos, const float &val, Direction dir);
+	void bind(std::size_t pos, const float &val, Direction dir = PD_IN);
 		/// Binds a float.
 
-	void bind(std::size_t pos, const double &val, Direction dir);
+	void bind(std::size_t pos, const double &val, Direction dir = PD_IN);
 		/// Binds a double.
 
-	void bind(std::size_t pos, const char &val, Direction dir);
+	void bind(std::size_t pos, const char &val, Direction dir = PD_IN);
 		/// Binds a single character.
 
-	void bind(std::size_t pos, const char* const &pVal, Direction dir);
+	void bind(std::size_t pos, const char* const &pVal, Direction dir = PD_IN);
 		/// Binds a const char ptr.
 
-	void bind(std::size_t pos, const std::string& val, Direction dir);
+	void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN);
 		/// Binds a string.
 
-	void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir = PD_IN);
 		/// Binds a BLOB.
 
-	void bind(std::size_t pos, const DateTime& val, Direction dir);
+	void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN);
 		/// Binds a DateTime.
+
+	void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN);
+		/// Binds a null.
 
 private:
 	void checkReturn(int rc);
-		/// Checks the SQLite return code and throws an appropriate exception.
+		/// Checks the SQLite return code and throws an appropriate exception
+		/// if error has occurred.
 
 	sqlite3_stmt* _pStmt;
 };

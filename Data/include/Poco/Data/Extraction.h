@@ -93,11 +93,18 @@ public:
 		return 1u;
 	}
 
+	bool isNull(std::size_t row = 0) const
+	{
+		return _null;
+	}
+
 	void extract(std::size_t pos)
 	{
 		if (_extracted) throw ExtractException("value already extracted");
 		_extracted = true;
-		TypeHandler<T>::extract(pos, _rResult, _default, getExtractor());
+		AbstractExtractor* pExt = getExtractor();
+		TypeHandler<T>::extract(pos, _rResult, _default, pExt);
+		_null = pExt->isNull(pos);
 	}
 
 	void reset()
@@ -114,6 +121,7 @@ private:
 	T&   _rResult;
 	T    _default;   // copy the default
 	bool _extracted;
+	bool _null;
 };
 
 
@@ -149,10 +157,23 @@ public:
 		return getLimit();
 	}
 
+	bool isNull(std::size_t row) const
+	{
+		try
+		{
+			return _nulls.at(row);
+		}catch (std::out_of_range& ex)
+		{ 
+			throw RangeException(ex.what()); 
+		}
+	}
+
 	void extract(std::size_t pos)
 	{
+		AbstractExtractor* pExt = getExtractor();
 		_rResult.push_back(_default);
-		TypeHandler<T>::extract(pos, _rResult.back(), _default, getExtractor());
+		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
+		_nulls.push_back(pExt->isNull(pos));
 	}
 
 	virtual void reset()
@@ -172,8 +193,9 @@ protected:
 	}
 
 private:
-	std::vector<T>& _rResult;
-	T               _default; // copy the default
+	std::vector<T>&  _rResult;
+	T                _default; // copy the default
+	std::deque<bool> _nulls;
 };
 
 
@@ -209,10 +231,23 @@ public:
 		return getLimit();
 	}
 
+	bool isNull(std::size_t row) const
+	{
+		try
+		{
+			return _nulls.at(row);
+		}catch (std::out_of_range& ex)
+		{ 
+			throw RangeException(ex.what()); 
+		}
+	}
+
 	void extract(std::size_t pos)
 	{
+		AbstractExtractor* pExt = getExtractor();
 		_rResult.push_back(_default);
-		TypeHandler<T>::extract(pos, _rResult.back(), _default, getExtractor());
+		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
+		_nulls.push_back(pExt->isNull(pos));
 	}
 
 	virtual void reset()
@@ -232,8 +267,9 @@ protected:
 	}
 
 private:
-	std::list<T>& _rResult;
-	T               _default; // copy the default
+	std::list<T>&    _rResult;
+	T                _default; // copy the default
+	std::deque<bool> _nulls;
 };
 
 
@@ -269,10 +305,23 @@ public:
 		return getLimit();
 	}
 
+	bool isNull(std::size_t row) const
+	{
+		try
+		{
+			return _nulls.at(row);
+		}catch (std::out_of_range& ex)
+		{ 
+			throw RangeException(ex.what()); 
+		}
+	}
+
 	void extract(std::size_t pos)
 	{
+		AbstractExtractor* pExt = getExtractor();
 		_rResult.push_back(_default);
-		TypeHandler<T>::extract(pos, _rResult.back(), _default, getExtractor());
+		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
+		_nulls.push_back(pExt->isNull(pos));
 	}
 
 	virtual void reset()
@@ -292,8 +341,9 @@ protected:
 	}
 
 private:
-	std::deque<T>& _rResult;
-	T               _default; // copy the default
+	std::deque<T>&   _rResult;
+	T                _default; // copy the default
+	std::deque<bool> _nulls;
 };
 
 
@@ -339,6 +389,11 @@ public:
 		{ 
 			throw RangeException(ex.what()); 
 		}
+	}
+
+	bool isNull(std::size_t row) const
+	{
+		return Extraction<C>::isNull(row);
 	}
 
 	const Column<T,C>& column() const

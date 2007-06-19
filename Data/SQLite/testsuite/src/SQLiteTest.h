@@ -110,6 +110,7 @@ public:
 
 	void testInternalExtraction();
 	void testPrimaryKeyConstraint();
+	void testNull();
 
 	void setUp();
 	void tearDown();

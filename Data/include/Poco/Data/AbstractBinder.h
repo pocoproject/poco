@@ -46,14 +46,31 @@
 
 namespace Poco {
 
-
 class DateTime;
-
 
 namespace Data {
 
-
 class BLOB;
+
+enum NullData
+{
+	NULL_GENERIC = 0,
+	NULL_INT8,
+	NULL_UINT8,
+	NULL_INT16,
+	NULL_UINT16,
+	NULL_INT32,
+	NULL_UINT32,
+	NULL_INT64,
+	NULL_UINT64,
+	NULL_FLOAT,
+	NULL_DOUBLE,
+	NULL_STRING,
+	NULL_BLOB
+};
+
+
+static const NullData null = NULL_GENERIC;
 
 
 class Data_API AbstractBinder
@@ -122,6 +139,9 @@ public:
 
 	virtual void bind(std::size_t pos, const DateTime& val, Direction dir) = 0;
 		/// Binds a DateTime.
+
+	virtual void bind(std::size_t pos, const NullData& val, Direction dir) = 0;
+		/// Binds a null.
 
 	static bool isOutBound(Direction dir);
 		/// Returns true if direction is out bound;

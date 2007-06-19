@@ -96,10 +96,13 @@ public:
 	void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN);
 		/// Binds a string.
 
-	void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir = PD_IN);
+	void bind(std::size_t pos, const BLOB& val, Direction dir = PD_IN);
 		/// Binds a BLOB.
 
-	void bind(std::size_t pos, const Poco::DateTime& val, Direction dir = PD_IN);
+	void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN);
+		/// Binds a DateTime.
+
+	void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN);
 		/// Binds a DateTime.
 
 	void reset();

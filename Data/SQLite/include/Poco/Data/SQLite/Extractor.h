@@ -43,6 +43,8 @@
 #include "Poco/Data/SQLite/SQLite.h"
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Any.h"
+#include <vector>
+#include <utility>
 
 
 struct sqlite3_stmt;
@@ -58,6 +60,9 @@ class SQLite_API Extractor: public Poco::Data::AbstractExtractor
 	/// If NULL is received, the incoming val value is not changed and false is returned
 {
 public:
+	typedef std::vector<std::pair<bool, bool> > NullIndVec;
+		/// Type for null indicators container.
+
 	Extractor(sqlite3_stmt* pStmt);
 		/// Creates the Extractor.
 
@@ -112,12 +117,36 @@ public:
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
 
-private:
 	bool isNull(std::size_t pos);
-		/// Returns true if a non null value can be extracted
+		/// Returns true if the current row value at pos column is null.
+		/// Because of the loss of information about null-ness of the 
+		/// underlying database values due to the nature of SQLite engine, 
+		/// (once null value is converted to default value, SQLite API 
+		/// treats it  as non-null), a null indicator container member
+		/// variable is used to cache the indicators of the underlying nulls 
+		/// thus rendering this function idempotent. 
+		/// The container is a vector of [bool, bool] pairs.
+		/// The vector index corresponds to the column position, the first
+		/// bool value in the pair is true if the null indicator has 
+		/// been set and the second bool value in the pair is true if
+		/// the column is actually null.
 
+	void reset();
+		/// Clears the cached nulls indicator vector.
+
+private:
 	sqlite3_stmt* _pStmt;
+	NullIndVec _nulls;
 };
+
+
+///
+/// inlines
+///
+inline void Extractor::reset()
+{
+	_nulls.clear();
+}
 
 
 } } } // namespace Poco::Data::SQLite

@@ -106,6 +106,14 @@ public:
 	Poco::UInt32 getLimit() const;
 		/// Gets the limit.
 
+	virtual bool isNull(std::size_t row) const;
+		/// In implementations, this function returns true if value at row is null, 
+		/// false otherwise. 
+		/// Normal behavior is to replace nulls with default values.
+		/// However, extraction implementations may remember the underlying database
+		/// null values and be able to later provide information about them.
+		/// Here, this function throws NotImplementedException.
+
 private:
 	AbstractExtractor* _pExtractor;
 	Poco::UInt32       _limit;
@@ -140,6 +148,12 @@ inline void AbstractExtraction::setLimit(Poco::UInt32 limit)
 inline Poco::UInt32 AbstractExtraction::getLimit() const
 {
 	return _limit;
+}
+
+
+inline bool AbstractExtraction::isNull(std::size_t row) const
+{
+	throw NotImplementedException("Check for null values not implemented.");
 }
 
 

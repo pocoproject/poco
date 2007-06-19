@@ -313,7 +313,16 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 
 bool Extractor::isNull(std::size_t pos)
 {
-	return sqlite3_column_type(_pStmt, (int) pos) == SQLITE_NULL;
+	if (pos >= _nulls.size())
+		_nulls.resize(pos + 1);
+
+	if (!_nulls[pos].first)
+	{
+		_nulls[pos].first = true;
+		_nulls[pos].second = (SQLITE_NULL == sqlite3_column_type(_pStmt, pos));
+	}
+	
+	return _nulls[pos].second;
 }
 
 

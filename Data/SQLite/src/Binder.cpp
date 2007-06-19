@@ -110,6 +110,12 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 }
 
 
+void Binder::bind(std::size_t pos, const NullData&, Direction)
+{
+	sqlite3_bind_null(_pStmt, pos);
+}
+
+
 void Binder::checkReturn(int rc)
 {
 	if (rc != SQLITE_OK)

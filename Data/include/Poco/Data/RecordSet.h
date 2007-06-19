@@ -53,6 +53,9 @@ namespace Poco {
 namespace Data {
 
 
+class Session;
+
+
 class Data_API RecordSet: private Statement
 	/// RecordSet provides access to data returned from a query.
 	/// Data access indexes (row and column) are 0-based, as usual in C++.
@@ -73,7 +76,12 @@ class Data_API RecordSet: private Statement
 	/// a limit for the Statement.
 {
 public:
+	using Statement::isNull;
+
 	explicit RecordSet(const Statement& rStatement);
+		/// Creates the RecordSet.
+
+	explicit RecordSet(Session& rSession, const std::string& query);
 		/// Creates the RecordSet.
 
 	~RecordSet();
@@ -223,6 +231,9 @@ public:
 		/// Returns column precision for the column with specified name.
 		/// Valid for floating point fields only (zero for other data types).
 
+	bool isNull(const std::string& name);
+		/// Returns true if column value of the current row is null.
+
 private:
 	RecordSet();
 
@@ -273,7 +284,7 @@ inline std::size_t RecordSet::columnCount() const
 
 inline Statement& RecordSet::operator = (const Statement& stmt)
 {
-	_currentRow = 1;
+	_currentRow = 0;
 	return Statement::operator = (stmt);
 }
 
@@ -341,6 +352,12 @@ inline std::size_t RecordSet::columnPrecision(std::size_t pos) const
 inline std::size_t RecordSet::columnPrecision(const std::string& name)const
 {
 	return metaColumn(name).precision();
+}
+
+
+inline bool RecordSet::isNull(const std::string& name)
+{
+	return isNull(metaColumn(name).position(), _currentRow);
 }
 
 

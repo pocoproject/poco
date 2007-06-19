@@ -111,7 +111,23 @@ public:
 
 	virtual bool extract(std::size_t pos, DateTime& val) = 0;
 		/// Extracts a DateTime. Returns false if null was received.
+
+	virtual bool isNull(std::size_t pos) = 0;
+		/// Returns true if the current row value at pos column is null.
+
+	virtual void reset();
+		/// Resets any information internally cached by the extractor.
+		/// (e.g. info about underlying DB null values)
 };
+
+
+///
+/// inlines
+///
+inline void AbstractExtractor::reset()
+{
+	//default no-op
+}
 
 
 } } // namespace Poco::Data

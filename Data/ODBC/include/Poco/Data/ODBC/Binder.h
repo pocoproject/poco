@@ -125,11 +125,14 @@ public:
 	void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN);
 		/// Binds a string.
 
-	void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir = PD_IN);
-		/// Binds a BLOB.
+	void bind(std::size_t pos, const BLOB& val, Direction dir = PD_IN);
+		/// Binds a BLOB. In-bound only.
 
-	void bind(std::size_t pos, const Poco::DateTime& val, Direction dir = PD_IN);
+	void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN);
 		/// Binds a DateTime.
+
+	void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN);
+		/// Binds a null. In-bound only.
 
 	void setDataBinding(ParameterBinding binding);
 		/// Set data binding type.
@@ -211,6 +214,10 @@ private:
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
 	}
+
+	void bindNull(std::size_t pos, SQLSMALLINT cDataType);
+		/// Utility function for binding null values.
+		/// For in-bound purposes only.
 
 	const StatementHandle& _rStmt;
 	LengthVec _lengthIndicator;
@@ -295,6 +302,15 @@ inline void Binder::bind(std::size_t pos, const bool& val, Direction dir)
 inline void Binder::bind(std::size_t pos, const char& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_STINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
+{
+	if (isOutBound(dir) || !isInBound(dir))
+		throw NotImplementedException("NULL parameter type can only be inbound.");
+
+	throw NotImplementedException("TODO");
 }
 
 

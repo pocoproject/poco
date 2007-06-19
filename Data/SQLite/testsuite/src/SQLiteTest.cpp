@@ -38,13 +38,12 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/SQLite/Connector.h"
+#include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
 #include <iostream>
-#include "Poco/File.h"
-#include "Poco/Stopwatch.h"
 
 
 using namespace Poco::Data;
@@ -54,7 +53,7 @@ using Poco::AnyCast;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
-
+using Poco::Data::SQLite::InvalidSQLStatementException;
 
 struct Person
 {
@@ -187,6 +186,9 @@ void SQLiteTest::testSimpleAccess()
 	assert (lastName == result);
 	tmp << "SELECT Age FROM PERSON", into(count), now;
 	assert (count == age);
+	tmp << "UPDATE PERSON SET Age = -1", now;
+	tmp << "SELECT Age FROM PERSON", into(age), now;
+	assert (-1 == age);
 	tmp.close();
 	assert (!tmp.isConnected());
 }
@@ -1610,6 +1612,68 @@ void SQLiteTest::testPrimaryKeyConstraint()
 }
 
 
+void SQLiteTest::testNull()
+{
+	Session ses (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	ses << "DROP TABLE IF EXISTS NullTest", now;
+
+	ses << "CREATE TABLE NullTest (i INTEGER NOT NULL)", now;
+
+	try
+	{
+		ses << "INSERT INTO NullTest VALUES(:i)", use(null), now;
+		fail ("must fail");
+	}catch (InvalidSQLStatementException&) { }
+
+	ses << "DROP TABLE IF EXISTS NullTest", now;
+	ses << "CREATE TABLE NullTest (i INTEGER, r REAL, v VARCHAR)", now;
+
+	ses << "INSERT INTO NullTest VALUES(:i, :r, :v)", use(null), use(null), use(null), now;
+	
+	RecordSet rs(ses, "SELECT * FROM NullTest");
+	rs.moveFirst();
+	assert (rs.isNull("i"));
+	assert (rs["i"] == 0);
+	assert (rs.isNull("r"));
+	assert (rs.isNull("v"));
+	assert (rs["v"] == "");
+
+	ses << "DROP TABLE IF EXISTS NullTest", now;
+	ses << "CREATE TABLE NullTest (i INTEGER, r REAL, v VARCHAR)", now;
+	int i = 1;
+	double f = 1.2;
+	std::string s = "123";
+
+	ses << "INSERT INTO NullTest (i, r, v) VALUES (:i, :r, :v)", use(i), use(f), use(s), now;
+	rs = (ses << "SELECT * FROM NullTest", now);
+	rs.moveFirst();
+	assert (!rs.isNull("i"));
+	assert (rs["i"] == 1);
+	assert (!rs.isNull("v"));
+	assert (!rs.isNull("r"));
+	assert (rs["v"] == "123");
+	
+	ses << "UPDATE NullTest SET v = :n WHERE i == :i", use(null), use(i), now;
+	i = 2;
+	f = 3.4;
+	ses << "INSERT INTO NullTest (i, r, v) VALUES (:i, :r, :v)", use(i), use(null), use(null), now;
+	rs = (ses << "SELECT i, r, v FROM NullTest ORDER BY i ASC", now);
+	rs.moveFirst();
+	assert (!rs.isNull("i"));
+	assert (rs["i"] == 1);
+	assert (!rs.isNull("r"));
+	assert (rs.isNull("v"));
+	assert (rs["v"] == "");
+
+	assert (rs.moveNext());
+	assert (!rs.isNull("i"));
+	assert (rs["i"] == 2);
+	assert (rs.isNull("r"));
+	assert (rs.isNull("v"));
+	assert (rs["v"] == "");
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -1682,6 +1746,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector1);
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
+	CppUnit_addTest(pSuite, SQLiteTest, testNull);
 
 	return pSuite;
 }

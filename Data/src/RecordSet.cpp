@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/Session.h"
 
 
 namespace Poco {
@@ -43,6 +44,13 @@ namespace Data {
 
 RecordSet::RecordSet(const Statement& rStatement): 
 	Statement(rStatement),
+	_currentRow(0)
+{
+}
+
+
+RecordSet::RecordSet(Session& rSession, const std::string& query): 
+	Statement((rSession << query, now)),
 	_currentRow(0)
 {
 }
