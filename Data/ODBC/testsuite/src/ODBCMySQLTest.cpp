@@ -868,6 +868,11 @@ void ODBCMySQLTest::testStoredProcedure()
 	//MySQL is currently buggy in this area: 
 	// http://bugs.mysql.com/bug.php?id=17898
 	// http://bugs.mysql.com/bug.php?id=27632
+	// Additionally, the standard ODBC stored procedure call syntax 
+	// {call storedProcedure(?)} is currently (3.51.12.00) not supported.
+	// See http://bugs.mysql.com/bug.php?id=26535
+	// Poco::Data support for MySQL ODBC is postponed until the above
+	// issues are resolved.
 }
 
 
@@ -876,6 +881,11 @@ void ODBCMySQLTest::testStoredFunction()
 	//MySQL is currently buggy in this area: 
 	// http://bugs.mysql.com/bug.php?id=17898
 	// http://bugs.mysql.com/bug.php?id=27632
+	// Additionally, the standard ODBC stored procedure call syntax 
+	// {call storedProcedure(?)} is currently (3.51.12.00) not supported.
+	// See http://bugs.mysql.com/bug.php?id=26535
+	// Poco::Data support for MySQL ODBC is postponed until the above
+	// issues are resolved.
 }
 
 

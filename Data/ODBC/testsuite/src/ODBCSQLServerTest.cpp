@@ -36,6 +36,7 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
+#include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
@@ -56,6 +57,7 @@ using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
+using Poco::DateTime;
 using Poco::NotFoundException;
 
 
@@ -903,6 +905,16 @@ void ODBCSQLServerTest::testStoredProcedure()
 		i = 2;
 		*_pSession << "{call storedProcedure(?)}", io(i), now;
 		assert(4 == i);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		*_pSession << "CREATE PROCEDURE storedProcedure(@ioParam DATETIME OUTPUT) AS "
+			"BEGIN "
+			" SET @ioParam = @ioParam + 1; "
+			"END;" , now;
+
+		DateTime dt(1965, 6, 18, 5, 35, 1);
+		*_pSession << "{call storedProcedure(?)}", io(dt), now;
+		assert(19 == dt.day());
 		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;

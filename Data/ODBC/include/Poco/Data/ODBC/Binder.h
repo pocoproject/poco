@@ -168,13 +168,33 @@ private:
 
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
-		if (_pTypeInfo)
+		try
 		{
-			try
+			// This is a proper way to find out about database specific type sizes.
+			// Not all drivers are equally willing to cooperate in this matter, though.
+			// Hence the funky flow control.
+			if (_pTypeInfo)
 			{
 				colSize = _pTypeInfo->getInfo(cDataType, "COLUMN_SIZE");
 				decDigits = _pTypeInfo->getInfo(cDataType, "MINIMUM_SCALE");
-			}catch (NotFoundException&) { }
+			}
+			else throw NotFoundException();
+		}catch (NotFoundException&) 
+		{ 
+			try
+			{
+				Parameter p(_rStmt, pos);
+				colSize = (SQLINTEGER) p.columnSize();
+				decDigits = (SQLSMALLINT) p.decimalDigits();
+			}catch (StatementException&)
+			{
+				try
+				{
+					ODBCColumn c(_rStmt, pos);
+					colSize = (SQLINTEGER) c.length();
+					decDigits = (SQLSMALLINT) c.precision();
+				}catch (StatementException&) { }
+			}
 		}
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 

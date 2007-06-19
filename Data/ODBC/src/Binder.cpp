@@ -87,18 +87,21 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 			size = (SQLUINTEGER) p.columnSize();
 		}
 		catch (StatementException&)
-			// some drivers (e.g. MS SQL) refuse to describe output parameters
 		{
+			size = DEFAULT_PARAM_SIZE;
+//On Linux, PostgreSQL driver segfaults on SQLGetDescField, so this is disabled for now
+#ifdef POCO_OS_FAMILY_WINDOWS
 			SQLHDESC hIPD = 0;
 			if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, 0, 0)))
 			{
-				size = 1024;
-				SQLUINTEGER sz = size;
-				if (Utility::isError(SQLSetDescField(hIPD, (SQLSMALLINT) pos + 1, SQL_DESC_LENGTH, &sz, 0)))
-					throw StatementException(_rStmt, "Could not set output parameter size");
+				SQLUINTEGER sz = 0;
+				if (!Utility::isError(SQLGetDescField(hIPD, (SQLSMALLINT) pos + 1, SQL_DESC_LENGTH, &sz, sizeof(sz), 0)) && 
+					sz > 0)
+				{
+					size = sz;
+				}
 			}
-			else
-				throw StatementException(_rStmt, "Could not get statement IPD attribute handle.");
+#endif
 		}
 
 		char* pChar = (char*) std::calloc(size, sizeof(char));

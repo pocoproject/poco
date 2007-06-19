@@ -118,7 +118,7 @@ void ODBCStatementImpl::compileImpl()
 
 	_pBinder = new Binder(_stmt, bind, pDT);
 	_pExtractor = new Extractor(_stmt, *_pPreparation);
-
+	
 	// This is a hack to conform to some ODBC drivers behavior (e.g. MS SQLServer) with 
 	// stored procedure calls: driver refuses to report the number of columns, unless all 
 	// parameters for the stored procedure are bound. Since number of columns is essential 

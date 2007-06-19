@@ -36,6 +36,7 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
+#include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
@@ -57,6 +58,7 @@ using Poco::Data::ODBC::StatementException;
 using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
+using Poco::DateTime;
 using Poco::NotFoundException;
 
 
@@ -894,21 +896,32 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
 		assert(4 == result);
 		dropObject("FUNCTION", "storedFunction(INTEGER)");
-/*TODO
-		*_pSession << "CREATE FUNCTION storedFunction(TEXT) RETURNS TEXT AS '"
-		"BEGIN "
-		" RETURN $1;"
-		"END;'"
-		"LANGUAGE 'plpgsql'" , now;
+
+
+		*_pSession << "CREATE FUNCTION storedFunction(TIMESTAMP) RETURNS TIMESTAMP AS '"
+			"BEGIN "
+			" RETURN $1; "
+			"END;'"
+			"LANGUAGE 'plpgsql'" , now;
+
+		DateTime dtIn(1965, 6, 18, 5, 35, 1);
+		DateTime dtOut;
+		*_pSession << "{? = call storedFunction(?)}", out(dtOut), in(dtIn), now;
+		assert(dtOut == dtIn);
+		dropObject("FUNCTION", "storedFunction(TIMESTAMP)");
+
+		*_pSession << "CREATE FUNCTION storedFunction(TEXT,TEXT) RETURNS TEXT AS '"
+			"BEGIN "
+			" RETURN $1 || '', '' || $2 || ''!'';"
+			"END;'"
+			"LANGUAGE 'plpgsql'" , now;
 		
-		std::string param = "123";
+		std::string param1 = "Hello";
+		std::string param2 = "world";
 		std::string ret;
-		try {
-		*_pSession << "{? = call storedFunction(?)}", out(ret), in(param), now;
-		}catch(StatementException & ex) { std::cout << ex.toString();}
-		assert(ret == param);
-		dropObject("FUNCTION", "storedFunction(TEXT)");
-*/
+		*_pSession << "{? = call storedFunction(?,?)}", out(ret), in(param1), in(param2), now;
+		assert(ret == "Hello, world!");
+		dropObject("FUNCTION", "storedFunction(TEXT, TEXT)");
 
 		k += 2;
 	}

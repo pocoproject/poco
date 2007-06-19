@@ -46,6 +46,7 @@
 #include "Poco/Data/Range.h"
 #include "Poco/Data/Column.h"
 #include "Poco/Data/Extraction.h"
+#include "Poco/Data/SessionImpl.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/String.h"
@@ -59,9 +60,6 @@
 
 namespace Poco {
 namespace Data {
-
-
-class SessionImpl;
 
 
 class Data_API StatementImpl: public Poco::RefCountedObject

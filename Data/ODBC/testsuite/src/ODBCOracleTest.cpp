@@ -926,7 +926,8 @@ void ODBCOracleTest::testStoredProcedure()
 		k += 2;
 	}
 
-	//std::string automatic binding only
+	
+	//strings only work with auto-binding
 	_pSession->setFeature("autoBind", true);
 
 	*_pSession << "CREATE OR REPLACE "
@@ -1019,11 +1020,10 @@ void ODBCOracleTest::testStoredFunction()
 		assert(2 == params.get<0>());
 		assert(3 == result); 
 		dropObject("FUNCTION", "storedFunction");
-
+		
 		k += 2;
 	}
 
-	//string for automatic binding only
 	_pSession->setFeature("autoBind", true);
 
 	*_pSession << "CREATE OR REPLACE "
