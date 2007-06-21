@@ -865,6 +865,32 @@ void ODBCPostgreSQLTest::testInternalStorageType()
 }
 
 
+void ODBCPostgreSQLTest::testNull()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	// test for NOT NULL violation exception
+	for (int i = 0; i < 8;)
+	{
+		recreateNullsTable("NOT NULL");
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->notNulls();
+		i += 2;
+	}
+
+	// test for null insertion
+	for (int i = 0; i < 8;)
+	{
+		recreateNullsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->nulls();
+		i += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::testStoredFunction()
 {
 	configurePLPgSQL();
@@ -1054,6 +1080,18 @@ void ODBCPostgreSQLTest::recreateVectorsTable()
 }
 
 
+void ODBCPostgreSQLTest::recreateNullsTable(const std::string& notNull)
+{
+	dropObject("TABLE", "NullTest");
+	try { *_pSession << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+		notNull,
+		notNull,
+		notNull), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
+}
+
+
 bool ODBCPostgreSQLTest::canConnect(const std::string& driver, const std::string& dsn)
 {
 	Utility::DriverMap::iterator itDrv = _drivers.begin();
@@ -1090,7 +1128,7 @@ bool ODBCPostgreSQLTest::canConnect(const std::string& driver, const std::string
 	// DSN not found, try connect without it
 	format(_dbConnString, "DRIVER=%s;"
 		"DATABASE=postgres;"
-		"SERVER=localhost;"
+		"SERVER=a-fabijanic;"
 		"PORT=5432;"
 		"UID=postgres;"
 		"PWD=postgres;"
@@ -1224,6 +1262,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunction);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNull);
 
 		return pSuite;
 	}

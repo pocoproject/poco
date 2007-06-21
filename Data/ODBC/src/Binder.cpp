@@ -190,15 +190,7 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
-
-	if (_pTypeInfo)
-	{
-		try
-		{
-			colSize = _pTypeInfo->getInfo(SQL_TYPE_TIMESTAMP, "COLUMN_SIZE");
-			decDigits = _pTypeInfo->getInfo(SQL_TYPE_TIMESTAMP, "MINIMUM_SCALE");
-		}catch (NotFoundException&) { }
-	}
+	getColSizeAndPrecision(pos, SQL_TYPE_TIMESTAMP, colSize, decDigits);
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
@@ -216,6 +208,34 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 }
 
 
+void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
+{
+	if (isOutBound(dir) || !isInBound(dir))
+		throw NotImplementedException("NULL parameter type can only be inbound.");
+
+	switch (val)
+	{
+		case NULL_INT8:	     bindNull(pos, SQL_C_STINYINT); break;
+		case NULL_UINT8:     bindNull(pos, SQL_C_UTINYINT); break;
+		case NULL_INT16:     bindNull(pos, SQL_C_SSHORT); break;
+		case NULL_UINT16:    bindNull(pos, SQL_C_USHORT); break;
+		case NULL_INT32:     bindNull(pos, SQL_C_SLONG); break;
+		case NULL_UINT32:    bindNull(pos, SQL_C_ULONG); break;
+		case NULL_INT64:     bindNull(pos, SQL_C_SBIGINT); break;
+		case NULL_UINT64:    bindNull(pos, SQL_C_UBIGINT); break;
+		case NULL_BOOL:      bindNull(pos, Utility::boolDataType); break;
+		case NULL_FLOAT:     bindNull(pos, SQL_C_FLOAT); break;
+		case NULL_DOUBLE:    bindNull(pos, SQL_C_DOUBLE); break;
+		case NULL_STRING:    bindNull(pos, SQL_C_CHAR); break;
+		case NULL_BLOB:      bindNull(pos, SQL_C_BINARY); break;
+		case NULL_TIMESTAMP: bindNull(pos, SQL_C_TIMESTAMP); break;
+
+		default: 
+			throw DataFormatException("Unsupported data type.");
+	}
+}
+
+
 void Binder::bindNull(std::size_t pos, SQLSMALLINT cDataType)
 {
 	_inParams.insert(ParamMap::value_type(0, 0));
@@ -223,28 +243,11 @@ void Binder::bindNull(std::size_t pos, SQLSMALLINT cDataType)
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = SQL_NULL_DATA;
 
-	if (PB_AT_EXEC == _paramBinding)
-		*pLenIn  = SQL_LEN_DATA_AT_EXEC(SQL_NULL_DATA);
-
 	_lengthIndicator.push_back(pLenIn);
 
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
-	
-	try
-	{
-		Parameter p(_rStmt, pos);
-		colSize = (SQLINTEGER) p.columnSize();
-		decDigits = (SQLSMALLINT) p.decimalDigits();
-	}catch (StatementException&)
-	{
-		try
-		{
-			ODBCColumn c(_rStmt, pos);
-			colSize = (SQLINTEGER) c.length();
-			decDigits = (SQLSMALLINT) c.precision();
-		}catch (StatementException&) { }
-	}
+	getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
@@ -305,6 +308,51 @@ void Binder::synchronize()
 	StringMap::iterator itStrEnd = _strings.end();
 	for(; itStr != itStrEnd; ++itStr)
 		itStr->second->assign(itStr->first, strlen(itStr->first));
+}
+
+
+void Binder::getColSizeAndPrecision(std::size_t pos, 
+	SQLSMALLINT cDataType, 
+	SQLINTEGER& colSize, 
+	SQLSMALLINT& decDigits)
+{
+	// Not all drivers are equally willing to cooperate in this matter.
+	// Hence the funky flow control.
+	try
+	{
+		if (_pTypeInfo)
+		{
+			colSize = _pTypeInfo->getInfo(cDataType, "COLUMN_SIZE");
+			decDigits = _pTypeInfo->getInfo(cDataType, "MINIMUM_SCALE");
+			return;
+		}
+		else 
+			throw NotFoundException();
+	}catch (NotFoundException&)
+	{ 
+		try
+		{
+			Parameter p(_rStmt, pos);
+			colSize = (SQLINTEGER) p.columnSize();
+			decDigits = (SQLSMALLINT) p.decimalDigits();
+			return;
+		}catch (StatementException&)
+		{
+			try
+			{
+				ODBCColumn c(_rStmt, pos);
+				colSize = (SQLINTEGER) c.length();
+				decDigits = (SQLSMALLINT) c.precision();
+				return;
+			}catch (StatementException&) { }
+		}
+	}
+
+	// no success, set to zero and hope for the best
+	// (most drivers do not require these most of the times anyway)
+	colSize = 0;
+	decDigits = 0;
+	return;
 }
 
 

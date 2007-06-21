@@ -129,6 +129,8 @@ public:
 
 	void internalExtraction();
 	void internalStorageType();
+	void nulls();
+	void notNulls(const std::string& sqlState = "23502");
 
 private:
 	Poco::Data::Session* _pSession;

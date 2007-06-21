@@ -2062,3 +2062,80 @@ void SQLExecutor::internalStorageType()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 }
+
+
+void SQLExecutor::notNulls(const std::string& sqlState)
+{
+	try
+	{
+		*_pSession << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(NULL_INT8), use(NULL_FLOAT), use(NULL_STRING), now;
+		fail ("must fail");
+	}catch (StatementException& se) 
+	{ 
+		//make sure we're failing for the right reason
+		//default sqlState value is "23502", but some drivers report "HY???" codes
+		assert (sqlState == se.diagnostics().sqlState(0));
+	}
+}
+
+
+void SQLExecutor::nulls()
+{
+	std::string funct = "nulls()";
+
+	try { *_pSession << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(NULL_INT32), use(NULL_FLOAT), use(NULL_STRING), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	RecordSet rs(*_pSession, "SELECT * FROM NullTest");
+	assert (1 == rs.rowCount());
+	rs.moveFirst();
+	assert (rs.isNull("i"));
+	assert (rs["i"] == 0);
+	assert (rs.isNull("r"));
+	assert (rs.isNull("v"));
+	assert (rs["v"] == "");
+	try { *_pSession << "DELETE FROM NullTest", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int i = 1;
+	double f = 1.2;
+	std::string s = "123";
+
+	try { *_pSession << "INSERT INTO NullTest (i, r, v) VALUES (?,?,?)", use(i), use(f), use(s), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	rs = (*_pSession << "SELECT * FROM NullTest", now);
+	assert (1 == rs.rowCount());
+	rs.moveFirst();
+	assert (!rs.isNull("i"));
+	assert (rs["i"] == 1);
+	assert (!rs.isNull("v"));
+	assert (!rs.isNull("r"));
+	assert (rs["v"] == "123");
+	
+	try { *_pSession << "UPDATE NullTest SET v = ? WHERE i = ?", use(NULL_STRING), use(i), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	i = 2;
+	f = 3.4;
+	try { *_pSession << "INSERT INTO NullTest (i, r, v) VALUES (?,?,?)", use(i), use(NULL_FLOAT), use(NULL_STRING), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	rs = (*_pSession << "SELECT i, r, v FROM NullTest ORDER BY i ASC", now);
+	assert (2 == rs.rowCount());
+	rs.moveFirst();
+	assert (!rs.isNull("i"));
+	assert (rs["i"] == 1);
+	assert (!rs.isNull("r"));
+	assert (rs.isNull("v"));
+	assert (rs["v"] == "");
+
+	assert (rs.moveNext());
+	assert (!rs.isNull("i"));
+	assert (rs["i"] == 2);
+	assert (rs.isNull("r"));
+	assert (rs.isNull("v"));
+	assert (rs["v"] == "");
+}

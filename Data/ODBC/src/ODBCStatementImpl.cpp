@@ -249,6 +249,7 @@ bool ODBCStatementImpl::hasNext()
 			return _stepCalled = nextRowReady();
 
 		_stepCalled = true;
+		_pExtractor->reset();
 		_nextResponse = SQLFetch(_stmt);
 
 		if (!nextRowReady())

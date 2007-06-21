@@ -864,6 +864,32 @@ void ODBCSQLiteTest::testInternalStorageType()
 }
 
 
+void ODBCSQLiteTest::testNull()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	// test for NOT NULL violation exception
+	for (int i = 0; i < 8;)
+	{
+		recreateNullsTable("NOT NULL");
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->notNulls("HY000");
+		i += 2;
+	}
+
+	// test for null insertion
+	for (int i = 0; i < 8;)
+	{
+		recreateNullsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->nulls();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -961,6 +987,18 @@ void ODBCSQLiteTest::recreateVectorsTable()
 	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
+}
+
+
+void ODBCSQLiteTest::recreateNullsTable(const std::string& notNull)
+{
+	dropObject("TABLE", "NullTest");
+	try { *_pSession << format("CREATE TABLE NullTest (i INTEGER %s, r REAL %s, v VARCHAR(30) %s)",
+		notNull,
+		notNull,
+		notNull), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
 }
 
 
@@ -1097,6 +1135,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalStorageType);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testNull);
 
 		return pSuite;
 	}

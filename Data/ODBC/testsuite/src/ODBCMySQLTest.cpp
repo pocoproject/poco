@@ -863,6 +863,32 @@ void ODBCMySQLTest::testInternalStorageType()
 }
 
 
+void ODBCMySQLTest::testNull()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	// test for NOT NULL violation exception
+	for (int i = 0; i < 8;)
+	{
+		recreateNullsTable("NOT NULL");
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->notNulls("HYT00");
+		i += 2;
+	}
+
+	// test for null insertion
+	for (int i = 0; i < 8;)
+	{
+		recreateNullsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->nulls();
+		i += 2;
+	}
+}
+
+
 void ODBCMySQLTest::testStoredProcedure()
 {
 	//MySQL is currently buggy in this area: 
@@ -967,6 +993,18 @@ void ODBCMySQLTest::recreateVectorsTable()
 	try { *_pSession << "CREATE TABLE Vectors (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
+}
+
+
+void ODBCMySQLTest::recreateNullsTable(const std::string& notNull)
+{
+	dropObject("TABLE", "NullTest");
+	try { *_pSession << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+		notNull,
+		notNull,
+		notNull), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
 }
 
 
@@ -1113,6 +1151,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalStorageType);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testNull);
 
 		return pSuite;
 	}

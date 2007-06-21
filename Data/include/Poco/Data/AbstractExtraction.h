@@ -95,7 +95,7 @@ public:
 		/// Extracts a value from the param, starting at the given column position.
 
 	virtual void reset() = 0;
-		/// Resets the etxractor so that it can be re-used.
+		/// Resets the extractor so that it can be re-used.
 
 	virtual AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const = 0;
 		/// Creates a Prepare object for the etxracting object

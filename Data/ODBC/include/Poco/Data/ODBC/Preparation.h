@@ -168,10 +168,11 @@ public:
 		/// Returned length for variable length fields is the one 
 		/// supported by this implementation, not the underlying DB.
 
-	std::size_t actualDataSize(std::size_t pos) const;
+	int actualDataSize(std::size_t pos) const;
 		/// Returns the returned length. This is usually
 		/// equal to the column size, except for variable length fields
 		/// (BLOB and variable length strings).
+		/// For null values, the return value is -1 (SQL_NO_DATA)
 
 	void setDataExtraction(DataExtraction ext);
 		/// Set data extraction mode.
@@ -355,7 +356,7 @@ inline std::size_t Preparation::maxDataSize(std::size_t pos) const
 }
 
 
-inline std::size_t Preparation::actualDataSize(std::size_t pos) const
+inline int Preparation::actualDataSize(std::size_t pos) const
 {
 	poco_assert (pos >= 0 && pos < _pValues.size());
 	poco_assert (_pLengths[pos]);

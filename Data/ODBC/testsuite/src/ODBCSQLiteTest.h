@@ -119,6 +119,8 @@ public:
 	void testInternalExtraction();
 	void testInternalStorageType();
 
+	void testNull();
+
 	void setUp();
 	void tearDown();
 
@@ -134,6 +136,7 @@ private:
 	void recreateFloatsTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
+	void recreateNullsTable(const std::string& notNull = "");
 
 	static bool init(const std::string& driver, const std::string& dsn);
 	static bool canConnect(const std::string& driver, const std::string& dsn);

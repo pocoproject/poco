@@ -171,34 +171,7 @@ private:
 
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
-		try
-		{
-			// This is a proper way to find out about database specific type sizes.
-			// Not all drivers are equally willing to cooperate in this matter, though.
-			// Hence the funky flow control.
-			if (_pTypeInfo)
-			{
-				colSize = _pTypeInfo->getInfo(cDataType, "COLUMN_SIZE");
-				decDigits = _pTypeInfo->getInfo(cDataType, "MINIMUM_SCALE");
-			}
-			else throw NotFoundException();
-		}catch (NotFoundException&) 
-		{ 
-			try
-			{
-				Parameter p(_rStmt, pos);
-				colSize = (SQLINTEGER) p.columnSize();
-				decDigits = (SQLSMALLINT) p.decimalDigits();
-			}catch (StatementException&)
-			{
-				try
-				{
-					ODBCColumn c(_rStmt, pos);
-					colSize = (SQLINTEGER) c.length();
-					decDigits = (SQLSMALLINT) c.precision();
-				}catch (StatementException&) { }
-			}
-		}
+		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
@@ -214,6 +187,18 @@ private:
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
 	}
+
+	void getColSizeAndPrecision(std::size_t pos, 
+		SQLSMALLINT cDataType, 
+		SQLINTEGER& colSize, 
+		SQLSMALLINT& decDigits);
+		/// Used to retrieve column size and precision.
+		/// Not all drivers cooperate with this inquiry under all circumstances
+		/// This function runs for query and stored procedure parameters (in and 
+		/// out-bound). Some drivers, however, do not care about knowing this 
+		/// information to start with. For that reason, after all the attempts 
+		/// to discover the required values are unsuccesfully exhausted, the values 
+		/// are both set to zero and no exception is thrown.
 
 	void bindNull(std::size_t pos, SQLSMALLINT cDataType);
 		/// Utility function for binding null values.
@@ -257,27 +242,27 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir)
-{
-	bindImpl(pos, val, SQL_C_ULONG, dir);
-}
-
-
 inline void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_SLONG, dir);
 }
 
 
-inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
+inline void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir)
 {
-	bindImpl(pos, val, SQL_C_UBIGINT, dir);
+	bindImpl(pos, val, SQL_C_ULONG, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_SBIGINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
+{
+	bindImpl(pos, val, SQL_C_UBIGINT, dir);
 }
 
 
@@ -302,15 +287,6 @@ inline void Binder::bind(std::size_t pos, const bool& val, Direction dir)
 inline void Binder::bind(std::size_t pos, const char& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_STINYINT, dir);
-}
-
-
-inline void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
-{
-	if (isOutBound(dir) || !isInBound(dir))
-		throw NotImplementedException("NULL parameter type can only be inbound.");
-
-	throw NotImplementedException("TODO");
 }
 
 

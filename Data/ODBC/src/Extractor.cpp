@@ -70,6 +70,8 @@ Extractor::~Extractor()
 template<>
 bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 {
+	if (isNull(pos)) return false;
+
 	std::size_t dataSize = _rPreparation.actualDataSize(pos);
 	SharedPtr<char>& sp = RefAnyCast<SharedPtr<char> >(_rPreparation[pos]);
 	std::size_t len = strlen(sp);
@@ -83,6 +85,8 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 template<>
 bool Extractor::extractBoundImpl<Poco::Data::BLOB>(std::size_t pos, Poco::Data::BLOB& val)
 {
+	if (isNull(pos)) return false;
+
 	std::size_t dataSize = _rPreparation.actualDataSize(pos);
 	checkDataSize(dataSize);
 	SharedPtr<char>& sp = RefAnyCast<SharedPtr<char> >(_rPreparation[pos]);
@@ -94,6 +98,8 @@ bool Extractor::extractBoundImpl<Poco::Data::BLOB>(std::size_t pos, Poco::Data::
 template<>
 bool Extractor::extractBoundImpl<Poco::DateTime>(std::size_t pos, Poco::DateTime& val)
 {
+	if (isNull(pos)) return false;
+
 	std::size_t dataSize = _rPreparation.actualDataSize(pos);
 	checkDataSize(dataSize);
 	SharedPtr<SQL_TIMESTAMP_STRUCT>& sp = RefAnyCast<SharedPtr<SQL_TIMESTAMP_STRUCT> >(_rPreparation[pos]);
@@ -109,12 +115,14 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 	std::size_t maxSize = _rPreparation.getMaxFieldSize();
 	std::size_t fetchedSize = 0;
 	std::size_t totalSize = 0;
-
+	
 	SQLLEN len;
 	std::auto_ptr<char> apChar(new char[CHUNK_SIZE]);
 	char* pChar = apChar.get();
 	SQLRETURN rc = 0;
+	
 	val.clear();
+	resizeLengths(pos);
 
 	do
 	{
@@ -127,16 +135,21 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 			CHUNK_SIZE, //buffer length
 			&len); //length indicator
 		
+		_lengths[pos] += len;
+
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
 			throw StatementException(_rStmt, "SQLGetData()");
 
 		if (SQL_NO_TOTAL == len)//unknown length, throw
 			throw UnknownDataLengthException("Could not determine returned data length.");
 
-		if (SQL_NO_DATA == rc || SQL_NULL_DATA == len || !len)
+		if (isNullLengthIndicator(len))
+			return false;
+
+		if (SQL_NO_DATA == rc || !len)
 			break;
 
-		fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
+		fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
 		totalSize += fetchedSize;
 		if (totalSize <= maxSize) val.append(pChar, fetchedSize);
 		else throw DataException(format(FLD_SIZE_EXCEEDED_FMT, 
@@ -162,7 +175,9 @@ bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
 	std::auto_ptr<char> apChar(new char[CHUNK_SIZE]);
 	char* pChar = apChar.get();
 	SQLRETURN rc = 0;
+	
 	val.clear();
+	resizeLengths(pos);
 
 	do
 	{
@@ -175,19 +190,26 @@ bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
 			CHUNK_SIZE, //buffer length
 			&len); //length indicator
 		
+		_lengths[pos] += len;
+
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
 			throw StatementException(_rStmt, "SQLGetData()");
 
 		if (SQL_NO_TOTAL == len)//unknown length, throw
 			throw UnknownDataLengthException("Could not determine returned data length.");
 
-		if (SQL_NO_DATA == rc || SQL_NULL_DATA == len || !len)
+		if (isNullLengthIndicator(len))
+			return false;
+
+		if (SQL_NO_DATA == rc || !len)
 			break;
 
 		fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
 		totalSize += fetchedSize;
-		if (totalSize <= maxSize) val.appendRaw(pChar, fetchedSize);
-		else throw DataException(format(FLD_SIZE_EXCEEDED_FMT, 
+		if (totalSize <= maxSize) 
+			val.appendRaw(pChar, fetchedSize);
+		else 
+			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, 
 				fetchedSize, 
 				maxSize));
 
@@ -202,21 +224,21 @@ bool Extractor::extractManualImpl<Poco::DateTime>(std::size_t pos,
 	Poco::DateTime& val, 
 	SQLSMALLINT cType)
 {
-	SQLLEN len = 0;
 	SQL_TIMESTAMP_STRUCT ts;
+	resizeLengths(pos);
 
 	SQLRETURN rc = SQLGetData(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
 		cType, //C data type
 		&ts, //returned value
 		sizeof(ts), //buffer length
-		&len); //length indicator
+		&_lengths[pos]); //length indicator
 	
 	if (Utility::isError(rc))
 		throw StatementException(_rStmt, "SQLGetData()");
 
-	if (SQL_NULL_DATA == len) 
-		val.assign(0,0,0,0,0,0);
+	if (isNullLengthIndicator(_lengths[pos])) 
+		return false;
 	else 
 		Utility::dateTimeSync(val, ts);
 
@@ -367,7 +389,7 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 	switch (column.type())
 	{
 		case MetaColumn::FDT_INT8:
-		{ Poco::Int8 i = 0; extract(pos, i); val = i;	return true; }
+		{ Poco::Int8 i = 0; extract(pos, i); val = i; return true; }
 
 		case MetaColumn::FDT_UINT8:
 		{ Poco::UInt8 i = 0; extract(pos, i); val = i; return true;	}
@@ -391,13 +413,13 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 		{ Poco::UInt64 i = 0; extract(pos, i); val = i; return true; }
 
 		case MetaColumn::FDT_BOOL:
-		{ bool b; extract(pos, b); val = b; return true;	}
+		{ bool b; extract(pos, b); val = b; return true; }
 
 		case MetaColumn::FDT_FLOAT:
-		{ float f; extract(pos, f); val = f; return true;	}
+		{ float f; extract(pos, f); val = f; return true; }
 
 		case MetaColumn::FDT_DOUBLE:
-		{ double d; extract(pos, d); val = d; return true;	}
+		{ double d; extract(pos, d); val = d; return true; }
 
 		case MetaColumn::FDT_STRING:
 		{ std::string s; extract(pos, s); val = s; return true;	}
@@ -413,6 +435,23 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 	}
 
 	return false;
+}
+
+
+bool Extractor::isNull(std::size_t pos)
+{
+	if (Preparation::DE_MANUAL == _dataExtraction)
+	{
+		try
+		{
+			return isNullLengthIndicator(_lengths.at(pos));
+		}catch (std::out_of_range& ex)
+		{ 
+			throw RangeException(ex.what()); 
+		}
+	}
+	else
+		return SQL_NULL_DATA == _rPreparation.actualDataSize(pos);
 }
 
 

@@ -130,6 +130,9 @@ public:
 	bool isNull(std::size_t pos);
 		/// Returns true if the current row value at pos column is null.
 
+	void reset();
+		/// Resets the internally cached null value indicators. 
+
 private:
 	static const int CHUNK_SIZE = 1024;
 		/// Amount of data retrieved in one SQLGetData() request when doing manual extract.
@@ -145,9 +148,15 @@ private:
 		/// (i.e. the bound buffer is large enough to receive
 		/// the returned value)
 
+	void resizeLengths(std::size_t pos);
+		/// Resizes the vector holding extracted data lengths to the
+		/// appropriate size.
+
 	template<typename T>
 	bool extractBoundImpl(std::size_t pos, T& val)
 	{
+		if (isNull(pos)) return false;
+
 		poco_assert (typeid(T) == _rPreparation[pos].type());
 		val = *AnyCast<T>(&_rPreparation[pos]); 
 		return true;
@@ -157,32 +166,42 @@ private:
 	bool extractManualImpl(std::size_t pos, T& val, SQLSMALLINT cType)
 	{
 		SQLRETURN rc = 0;
-		SQLLEN len = 0;
 		T value = (T) 0;
-		
+
+		resizeLengths(pos);
+
 		rc = SQLGetData(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			cType,  //C data type
 			&value, //returned value
 			0,      //buffer length (ignored)
-			&len);  //length indicator
-
-		//for fixed-length data, buffer must be large enough
-		//otherwise, driver may write past the end
-		poco_assert_dbg (len <= sizeof(T));
+			&_lengths[pos]);  //length indicator
 
 		if (Utility::isError(rc))
 			throw StatementException(_rStmt, "SQLGetData()");
 		
-		if (SQL_NULL_DATA == len) val = (T) 0;
-		else val = value;
+		if (isNullLengthIndicator(_lengths[pos])) 
+			return false;
+		else 
+		{
+			//for fixed-length data, buffer must be large enough
+			//otherwise, driver may write past the end
+			poco_assert_dbg (_lengths[pos] <= sizeof(T));
+			val = value;
+		}
 
 		return true;
 	}
 
+	bool isNullLengthIndicator(SQLLEN val) const;
+		/// The reason for this utility wrapper are platforms where 
+		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value, 
+		/// while SQL_NULL_DATA (#define'd as -1 literal) remains 32-bit.
+
 	const StatementHandle& _rStmt;
 	Preparation& _rPreparation;
 	Preparation::DataExtraction _dataExtraction;
+	std::vector<SQLLEN> _lengths;
 };
 
 
@@ -203,9 +222,22 @@ inline Preparation::DataExtraction Extractor::getDataExtraction() const
 }
 
 
-inline bool Extractor::isNull(std::size_t pos)
+inline void Extractor::reset()
 {
-	throw NotImplementedException("TODO");
+	_lengths.clear();
+}
+
+
+inline void Extractor::resizeLengths(std::size_t pos)
+{
+	if (pos >= _lengths.size()) 
+		_lengths.resize(pos + 1, (SQLLEN) 0);
+}
+
+
+inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
+{
+	return SQL_NULL_DATA == (int) val;
 }
 
 

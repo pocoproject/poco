@@ -873,6 +873,32 @@ void ODBCOracleTest::testInternalStorageType()
 }
 
 
+void ODBCOracleTest::testNull()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	// test for NOT NULL violation exception
+	for (int i = 0; i < 8;)
+	{
+		recreateNullsTable("NOT NULL");
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->notNulls("HY000");
+		i += 2;
+	}
+
+	// test for null insertion
+	for (int i = 0; i < 8;)
+	{
+		recreateNullsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->nulls();
+		i += 2;
+	}
+}
+
+
 void ODBCOracleTest::testStoredProcedure()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1143,6 +1169,18 @@ void ODBCOracleTest::recreateVectorsTable()
 }
 
 
+void ODBCOracleTest::recreateNullsTable(const std::string& notNull)
+{
+	dropObject("TABLE", "NullTest");
+	try { *_pSession << format("CREATE TABLE NullTest (i INTEGER %s, r NUMBER %s, v VARCHAR(30) %s)",
+		notNull,
+		notNull,
+		notNull), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
+}
+
+
 bool ODBCOracleTest::canConnect(const std::string& driver, const std::string& dsn)
 {
 	Utility::DriverMap::iterator itDrv = _drivers.begin();
@@ -1306,6 +1344,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalStorageType);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testNull);
 
 		return pSuite;
 	}
