@@ -129,7 +129,7 @@ public:
 		std::string lastName;
 		std::string firstName;
 		std::string address;
-		int age = 0;
+
 		if (!pExt->extract(pos++, obj.lastName))
 			obj.lastName = defVal.lastName;
 		if (!pExt->extract(pos++, obj.firstName))
@@ -351,7 +351,6 @@ void SQLiteTest::testInsertEmptyVector()
 	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
 	std::vector<std::string> str;
 
-	int count = 100;
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str VARCHAR(30))", now;
 	try
@@ -423,7 +422,6 @@ void SQLiteTest::testLimit()
 	}
 
 	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
-	int count = 0;
 	std::vector<int> retData;
 	tmp << "SELECT * FROM Strings", into(retData), limit(50), now;
 	assert (retData.size() == 50);
@@ -446,7 +444,6 @@ void SQLiteTest::testLimitZero()
 	}
 
 	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
-	int count = 0;
 	std::vector<int> retData;
 	tmp << "SELECT * FROM Strings", into(retData), limit(0), now; // stupid test, but at least we shouldn't crash
 	assert (retData.size() == 0);
@@ -465,7 +462,6 @@ void SQLiteTest::testLimitOnce()
 	}
 
 	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
-	int count = 0;
 	std::vector<int> retData;
 	Statement stmt = (tmp << "SELECT * FROM Strings", into(retData), limit(50), now);
 	assert (!stmt.done());
@@ -496,7 +492,6 @@ void SQLiteTest::testLimitPrepare()
 	}
 
 	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
-	int count = 0;
 	std::vector<int> retData;
 	Statement stmt = (tmp << "SELECT * FROM Strings", into(retData), limit(50));
 	assert (retData.size() == 0);
@@ -1559,7 +1554,7 @@ void SQLiteTest::testInternalExtraction()
 	const Column<int, IntVec>& col = rset.column<int, IntVec>(0);
 	assert (col[0] == 1);
 
-	try { const Column<int, IntVec>& col1 = rset.column<int, IntVec>(100); fail ("must fail"); }
+	try { rset.column<int, IntVec>(100); fail ("must fail"); }
 	catch (RangeException&) { }
 
 	const Column<int, IntVec>& col1 = rset.column<int, IntVec>(0);
@@ -1577,7 +1572,7 @@ void SQLiteTest::testInternalExtraction()
 	stmt = (tmp << "DELETE FROM Vectors", now);
 	rset = stmt;
 
-	try { const Column<int, IntVec>& col1 = rset.column<int, IntVec>(0); fail ("must fail"); }
+	try { rset.column<int, IntVec>(0); fail ("must fail"); }
 	catch (RangeException&) { }
 }
 
