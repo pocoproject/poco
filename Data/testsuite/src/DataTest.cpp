@@ -38,12 +38,15 @@
 #include "Poco/Data/BLOBStream.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/Column.h"
+#include "Poco/Data/Row.h"
 #include "Connector.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/Types.h"
 #include "Poco/Exception.h"
 #include <cstring>
+#include <sstream>
+#include <map>
 
 
 using namespace Poco::Data;
@@ -570,6 +573,84 @@ void DataTest::testColumnList()
 }
 
 
+void DataTest::testRow()
+{
+	Row row;
+
+	row.append("field0", 0);
+	row.append("field1", 1);
+	row.append("field2", 2);
+	row.append("field3", 3);
+	row.append("field4", 4);
+
+	assert (5 == row.fieldCount());
+	assert (row[0] == 0);
+	assert (row["field0"] == 0);
+	assert (row[1] == 1);
+	assert (row["field1"] == 1);
+	assert (row[2] == 2);
+	assert (row["field2"] == 2);
+	assert (row[3] == 3);
+	assert (row["field3"] == 3);
+	assert (row[4] == 4);
+	assert (row["field4"] == 4);
+
+	assert (row.toStringN() == std::string("field0\tfield1\tfield2\tfield3\tfield4") + Row::EOL);
+	std::ostringstream os;
+	os << row;
+	assert (os.str() == std::string("0\t1\t2\t3\t4") + Row::EOL);
+	row.separator(",");
+	assert (row.toStringN() == std::string("field0,field1,field2,field3,field4") + Row::EOL);
+	os.str("");
+	os << row;
+	assert (os.str() == std::string("0,1,2,3,4") + Row::EOL);
+
+	Row row2;
+
+	row2.append("field0", 5);
+	row2.append("field1", 4);
+	row2.append("field2", 3);
+	row2.append("field3", 2);
+	row2.append("field4", 1);
+
+	assert (row != row2);
+
+	std::map<Row, int> rowMap;
+	rowMap.insert(std::map<Row, int>::value_type(row2, 0));
+	rowMap.insert(std::map<Row, int>::value_type(row, 1));
+	std::map<Row, int>::iterator it = rowMap.begin();
+	assert (row == it->first);
+	++it;
+	assert (row2 == it->first);
+
+	rowMap.clear();
+	row.sortField("field4");
+	rowMap.insert(std::map<Row, int>::value_type(row, 0));
+	try
+	{
+		rowMap.insert(std::map<Row, int>::value_type(row2, 1));
+		fail ("must fail");
+	}catch (InvalidAccessException&) {}
+
+	row2.sortField("field4");
+	rowMap.insert(std::map<Row, int>::value_type(row2, 1));
+	it = rowMap.begin();
+	assert (row2 == it->first);
+	++it;
+	assert (row == it->first);
+
+	Row row3;
+
+	row3.append("field0", 0);
+	row3.append("field1", 1);
+	row3.append("field2", 2);
+	row3.append("field3", 3);
+	row3.append("field4", 4);
+
+	assert (row3 == row);
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -592,6 +673,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testColumnVector);
 	CppUnit_addTest(pSuite, DataTest, testColumnDeque);
 	CppUnit_addTest(pSuite, DataTest, testColumnList);
+	CppUnit_addTest(pSuite, DataTest, testRow);
 
 	return pSuite;
 }

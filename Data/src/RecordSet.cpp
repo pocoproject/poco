@@ -44,20 +44,31 @@ namespace Data {
 
 RecordSet::RecordSet(const Statement& rStatement): 
 	Statement(rStatement),
-	_currentRow(0)
+	_currentRow(0),
+	_pBegin(0),
+	_pEnd(0)
 {
 }
 
 
 RecordSet::RecordSet(Session& rSession, const std::string& query): 
 	Statement((rSession << query, now)),
-	_currentRow(0)
+	_currentRow(0),
+	_pBegin(0),
+	_pEnd(0)
 {
 }
 
 
 RecordSet::~RecordSet()
 {
+	delete _pBegin;
+	delete _pEnd;
+
+	RowMap::iterator it = _rowMap.begin();
+	RowMap::iterator end = _rowMap.end();
+	for (; it != end; ++it)
+		delete it->second;
 }
 
 
@@ -104,6 +115,36 @@ DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
 		default:
 			throw Poco::InvalidArgumentException("Data type not supported.");
 	}
+}
+
+
+const RowIterator& RecordSet::begin()
+{
+	if (!_pBegin)
+		_pBegin = new RowIterator(*this, 0 == extractions().size());
+
+	return *_pBegin;
+}
+
+
+const Row& RecordSet::row(std::size_t pos) const
+{
+	if (pos > rowCount() - 1)
+		throw RangeException("Invalid recordset row requested.");
+
+	RowMap::iterator it = _rowMap.find(pos);
+	Row* pRow = 0;
+	if (it == _rowMap.end())
+	{
+		pRow = new Row;
+		for (std::size_t i = 0; i < columnCount(); ++i)
+			pRow->append(metaColumn(static_cast<UInt32>(pos)).name(), value(i, pos));
+
+		_rowMap.insert(RowMap::value_type(pos, pRow));
+	}
+
+	poco_check_ptr (pRow);
+	return *pRow;
 }
 
 

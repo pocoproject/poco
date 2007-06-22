@@ -2068,7 +2068,7 @@ void SQLExecutor::notNulls(const std::string& sqlState)
 {
 	try
 	{
-		*_pSession << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(NULL_INT8), use(NULL_FLOAT), use(NULL_STRING), now;
+		*_pSession << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(null), use(null), use(null), now;
 		fail ("must fail");
 	}catch (StatementException& se) 
 	{ 
@@ -2083,7 +2083,7 @@ void SQLExecutor::nulls()
 {
 	std::string funct = "nulls()";
 
-	try { *_pSession << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(NULL_INT32), use(NULL_FLOAT), use(NULL_STRING), now; }
+	try { *_pSession << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(null), use(null), use(null), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
@@ -2115,12 +2115,12 @@ void SQLExecutor::nulls()
 	assert (!rs.isNull("r"));
 	assert (rs["v"] == "123");
 	
-	try { *_pSession << "UPDATE NullTest SET v = ? WHERE i = ?", use(NULL_STRING), use(i), now; }
+	try { *_pSession << "UPDATE NullTest SET v = ? WHERE i = ?", use(null), use(i), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	i = 2;
 	f = 3.4;
-	try { *_pSession << "INSERT INTO NullTest (i, r, v) VALUES (?,?,?)", use(i), use(NULL_FLOAT), use(NULL_STRING), now; }
+	try { *_pSession << "INSERT INTO NullTest (i, r, v) VALUES (?,?,?)", use(i), use(null), use(null), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	rs = (*_pSession << "SELECT i, r, v FROM NullTest ORDER BY i ASC", now);

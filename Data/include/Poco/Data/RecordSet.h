@@ -43,6 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Extraction.h"
 #include "Poco/Data/Statement.h"
+#include "Poco/Data/RowIterator.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/String.h"
 #include "Poco/DynamicAny.h"
@@ -58,7 +59,7 @@ class Session;
 
 class Data_API RecordSet: private Statement
 	/// RecordSet provides access to data returned from a query.
-	/// Data access indexes (row and column) are 0-based, as usual in C++.
+	/// Data access indices (row and column) are 0-based, as usual in C++.
 	/// 
 	/// Recordset provides navigation methods to iterate through the
 	/// recordset, retrieval methods to extract data, and methods
@@ -76,6 +77,8 @@ class Data_API RecordSet: private Statement
 	/// a limit for the Statement.
 {
 public:
+	typedef std::map<std::size_t, Row*> RowMap;
+
 	using Statement::isNull;
 
 	explicit RecordSet(const Statement& rStatement);
@@ -129,6 +132,10 @@ public:
 		}
 	}
 
+	const Row& row(std::size_t pos) const;
+		/// Returns row at position pos.
+		/// Rows are lazy-created and cached.
+
 	template <class T>
 	const T& value(std::size_t col, std::size_t row) const
 		/// Returns the reference to data value at [col, row] location.
@@ -166,10 +173,13 @@ public:
 	}
 
 	DynamicAny value(std::size_t col, std::size_t row) const;
-		/// Returns the reference to data value at column, row location.
+		/// Returns the data value at column, row location.
 
 	DynamicAny value(const std::string& name, std::size_t row) const;
-		/// Returns the reference to data value at named column, row location.
+		/// Returns the data value at named column, row location.
+
+	const RowIterator& begin();
+		/// Moves the row cursor to the first row and returns the pointer to row.
 
 	bool moveFirst();
 		/// Moves the row cursor to the first row.
@@ -189,6 +199,9 @@ public:
 		///
 		/// Returns true if the row is available, or false
 		/// if there are no more rows available.
+
+	const RowIterator& end();
+		/// Moves the row cursor to the last row and returns null pointer.
 
 	bool moveLast();
 		/// Moves the row cursor to the last row.
@@ -262,7 +275,10 @@ private:
 		throw NotFoundException(format("Unknown column name: %s", name));
 	}
 
-	std::size_t _currentRow;
+	std::size_t    _currentRow;
+	RowIterator*   _pBegin;
+	RowIterator*   _pEnd;
+	mutable RowMap _rowMap;
 };
 
 
@@ -358,6 +374,15 @@ inline std::size_t RecordSet::columnPrecision(const std::string& name)const
 inline bool RecordSet::isNull(const std::string& name)
 {
 	return isNull(metaColumn(name).position(), _currentRow);
+}
+
+
+inline const RowIterator& RecordSet::end()
+{
+	if (!_pEnd)
+		_pEnd = new RowIterator(*this);
+
+	return *_pEnd;
 }
 
 

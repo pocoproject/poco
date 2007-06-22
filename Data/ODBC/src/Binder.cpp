@@ -215,22 +215,23 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 
 	switch (val)
 	{
-		case NULL_INT8:	     bindNull(pos, SQL_C_STINYINT); break;
-		case NULL_UINT8:     bindNull(pos, SQL_C_UTINYINT); break;
-		case NULL_INT16:     bindNull(pos, SQL_C_SSHORT); break;
-		case NULL_UINT16:    bindNull(pos, SQL_C_USHORT); break;
-		case NULL_INT32:     bindNull(pos, SQL_C_SLONG); break;
-		case NULL_UINT32:    bindNull(pos, SQL_C_ULONG); break;
-		case NULL_INT64:     bindNull(pos, SQL_C_SBIGINT); break;
-		case NULL_UINT64:    bindNull(pos, SQL_C_UBIGINT); break;
-		case NULL_BOOL:      bindNull(pos, Utility::boolDataType); break;
-		case NULL_FLOAT:     bindNull(pos, SQL_C_FLOAT); break;
-		case NULL_DOUBLE:    bindNull(pos, SQL_C_DOUBLE); break;
-		case NULL_STRING:    bindNull(pos, SQL_C_CHAR); break;
-		case NULL_BLOB:      bindNull(pos, SQL_C_BINARY); break;
-		case NULL_TIMESTAMP: bindNull(pos, SQL_C_TIMESTAMP); break;
+	case NULL_GENERIC:
+	case NULL_INT8:	     bindNull(pos, SQL_C_STINYINT); break;
+	case NULL_UINT8:     bindNull(pos, SQL_C_UTINYINT); break;
+	case NULL_INT16:     bindNull(pos, SQL_C_SSHORT); break;
+	case NULL_UINT16:    bindNull(pos, SQL_C_USHORT); break;
+	case NULL_INT32:     bindNull(pos, SQL_C_SLONG); break;
+	case NULL_UINT32:    bindNull(pos, SQL_C_ULONG); break;
+	case NULL_INT64:     bindNull(pos, SQL_C_SBIGINT); break;
+	case NULL_UINT64:    bindNull(pos, SQL_C_UBIGINT); break;
+	case NULL_BOOL:      bindNull(pos, Utility::boolDataType); break;
+	case NULL_FLOAT:     bindNull(pos, SQL_C_FLOAT); break;
+	case NULL_DOUBLE:    bindNull(pos, SQL_C_DOUBLE); break;
+	case NULL_STRING:    bindNull(pos, SQL_C_CHAR); break;
+	case NULL_BLOB:      bindNull(pos, SQL_C_BINARY); break;
+	case NULL_TIMESTAMP: bindNull(pos, SQL_C_TIMESTAMP); break;
 
-		default: 
+	default: 
 			throw DataFormatException("Unsupported data type.");
 	}
 }

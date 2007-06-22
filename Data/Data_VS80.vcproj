@@ -294,6 +294,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Row.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\RowIterator.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Session.h"
 					>
 				</File>
@@ -379,6 +387,14 @@
 				</File>
 				<File
 					RelativePath=".\src\RecordSet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Row.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RowIterator.cpp"
 					>
 				</File>
 				<File

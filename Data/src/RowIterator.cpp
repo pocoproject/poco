@@ -1,9 +1,11 @@
 //
-// DataTest.h
+// RowIterator.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.h#6 $
+// $Id: //poco/Main/Data/src/RowIterator.cpp#2 $
 //
-// Definition of the DataTest class.
+// Library: Data
+// Package: DataCore
+// Module:  RowIterator
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,41 +34,85 @@
 //
 
 
-#ifndef DataTest_INCLUDED
-#define DataTest_INCLUDED
+#include "Poco/Data/RowIterator.h"
+#include "Poco/Data/RecordSet.h"
+#undef min
+#undef max
+#include <limits>
 
 
-#include "Poco/Data/Data.h"
-#include "Poco/BinaryReader.h"
-#include "Poco/BinaryWriter.h"
-#include "CppUnit/TestCase.h"
+namespace Poco {
+namespace Data {
 
 
-class DataTest: public CppUnit::TestCase
+const int RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
+
+
+RowIterator::RowIterator(const RecordSet& recordSet, bool isEmpty): 
+	_position(isEmpty ? POSITION_END : 0),
+	_recordSet(recordSet)
 {
-public:
-	DataTest(const std::string& name);
-	~DataTest();
-
-	void testSession();
-	void testFeatures();
-	void testProperties();
-	void testBLOB();
-	void testBLOBStreams();
-	void testColumnVector();
-	void testColumnDeque();
-	void testColumnList();
-	void testRow();
-
-	void setUp();
-	void tearDown();
-
-	static CppUnit::Test* suite();
-
-private:
-	void writeToBLOB(Poco::BinaryWriter& writer);
-	void readFromBLOB(Poco::BinaryReader& reader);
-};
+}
 
 
-#endif // DataTest_INCLUDED
+RowIterator::~RowIterator()
+{
+}
+
+
+void RowIterator::increment()
+{
+	if (POSITION_END == _position)
+		throw RangeException("End of iterator reached.");
+
+	if (_position < _recordSet.rowCount() - 1)
+		++_position;
+	else
+		_position = POSITION_END;
+}
+
+
+void RowIterator::decrement()
+{
+	if (0 == _position)
+		throw RangeException("End of iterator reached.");
+
+	--_position;
+}
+
+
+const Row& RowIterator::operator * () const
+{
+	return _recordSet.row(_position);
+}
+
+
+const Row& RowIterator::operator ++ ()
+{
+	increment();
+	return _recordSet.row(_position);
+}
+
+
+const Row& RowIterator::operator ++ (int)
+{
+	increment();
+	return _recordSet.row(_position - 1);
+}
+
+
+const Row& RowIterator::operator -- ()
+{
+	decrement();
+	return _recordSet.row(_position);
+}
+
+
+const Row& RowIterator::operator -- (int)
+{
+	decrement();
+	return _recordSet.row(_position + 1);
+}
+
+
+} } // namespace Poco::Data
