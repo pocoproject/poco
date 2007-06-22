@@ -1128,7 +1128,7 @@ bool ODBCPostgreSQLTest::canConnect(const std::string& driver, const std::string
 	// DSN not found, try connect without it
 	format(_dbConnString, "DRIVER=%s;"
 		"DATABASE=postgres;"
-		"SERVER=a-fabijanic;"
+		"SERVER=localhost;"
 		"PORT=5432;"
 		"UID=postgres;"
 		"PWD=postgres;"
