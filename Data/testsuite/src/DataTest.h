@@ -39,6 +39,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
+#include "Poco/Data/Row.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -57,6 +58,7 @@ public:
 	void testColumnDeque();
 	void testColumnList();
 	void testRow();
+	void testRowSort();
 
 	void setUp();
 	void tearDown();
@@ -64,6 +66,15 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void testRowStrictWeak(const Poco::Data::Row& row1, 
+		const Poco::Data::Row& row2, 
+		const Poco::Data::Row& row3);
+		/// Strict weak ordering requirement for sorted containers
+		/// as described in Josuttis "The Standard C++ Library"
+		/// chapter 6.5. pg. 176.
+		/// For this to pass, the following condition must be satisifed: 
+		/// row1 < row2 < row3
+
 	void writeToBLOB(Poco::BinaryWriter& writer);
 	void readFromBLOB(Poco::BinaryReader& reader);
 };

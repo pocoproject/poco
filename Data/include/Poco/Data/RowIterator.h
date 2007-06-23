@@ -1,7 +1,7 @@
 //
 // RowIterator.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RowIterator.h#7 $
+// $Id: //poco/Main/Data/include/Poco/Data/RowIterator.h#1 $
 //
 // Library: Data
 // Package: DataCore
@@ -43,6 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Row.h"
 #include "Poco/DynamicAny.h"
+#include <iterator>
 
 
 namespace Poco {
@@ -53,10 +54,16 @@ class RecordSet;
 
 
 class Data_API RowIterator
-	/// RowIterator class is an interface to a row of RecordSet data.
+	/// RowIterator class.
 {
 public:
-	RowIterator(const RecordSet& recordSet, bool isEmpty = true);
+	typedef std::bidirectional_iterator_tag iterator_category;
+	typedef Row value_type;
+	typedef std::ptrdiff_t difference_type;
+	typedef Row* pointer;
+	typedef Row& reference;
+
+	RowIterator(RecordSet& recordSet, bool positionEnd = false);
 		/// Creates the RowIterator and positions it at the beginning.
 
 	~RowIterator();
@@ -68,24 +75,23 @@ public:
 	bool operator != (const RowIterator& other);
 		/// Inequality operator.
 
-	const Row& operator * () const;
-		/// Returns const reference to the current row.
+	Row& operator * () const;
+		/// Returns reference to the current row.
 
-	const Row& operator ++ ();
-		/// Advances by one position and returns const reference 
-		/// to the current row.
+	Row* operator -> () const;
+		/// Returns pointer to the current row.
 
-	const Row& operator ++ (int);
-		/// Advances by one position and returns const reference 
-		/// to the previous current row.
+	std::size_t operator ++ ();
+		/// Advances by one position and returns current position.
 
-	const Row& operator -- ();
-		/// Goes back by one position and returns const reference 
-		/// to the current row.
+	std::size_t operator ++ (int);
+		/// Advances by one position and returns previous current position.
 
-	const Row& operator -- (int);
-		/// Goes back by one position and returns const reference 
-		/// to the previous current row.
+	std::size_t operator -- ();
+		/// Goes back by one position and returns current position.
+
+	std::size_t operator -- (int);
+		/// Goes back by one position and returns previouscurrent position.
 
 private:
 	RowIterator();
@@ -95,8 +101,8 @@ private:
 
 	static const int POSITION_END;
 
+	RecordSet& _recordSet;
 	std::size_t _position;
-	const RecordSet& _recordSet;
 };
 
 

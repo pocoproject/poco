@@ -1054,6 +1054,21 @@ void ODBCSQLServerTest::testStoredFunction()
 }
 
 
+void ODBCSQLServerTest::testRowIterator()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->rowIterator();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1321,6 +1336,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNull);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRowIterator);
 
 		return pSuite;
 	}

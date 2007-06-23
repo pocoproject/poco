@@ -1,7 +1,7 @@
 //
 // Row.cpp
 //
-// $Id: //poco/Main/Data/src/Row.cpp#2 $
+// $Id: //poco/Main/Data/src/Row.cpp#1 $
 //
 // Library: Data
 // Package: DataCore
@@ -52,16 +52,23 @@ const std::string Row::EOL = "\n";
 
 std::ostream& operator << (std::ostream &os, const Row& row)
 {
-      os << row.toStringV();
+      os << row.valuesToString();
       return os;
 }
 
 
-Row::Row(): 
-	_separator("\t"), 
-	_sortField(0),
-	_comparison(COMPARE_AS_STRING)
+Row::Row(): _separator("\t"), _pNames(0)
 {
+}
+
+
+Row::Row(NameVecPtr pNames): _separator("\t"), _pNames(pNames)
+{
+	if (!_pNames)
+		throw NullPointerException();
+
+	_values.resize(_pNames->size());
+	addSortField(0);
 }
 
 
@@ -70,42 +77,49 @@ Row::~Row()
 }
 
 
-DynamicAny& Row::operator [] (std::size_t col)
+DynamicAny& Row::get(std::size_t col)
 {
 	try
 	{
 		return _values.at(col);
-	}catch (std::range_error& re)
+	}catch (std::out_of_range& re)
 	{
 		throw RangeException(re.what());
 	}
 }
 
 
-DynamicAny& Row::operator [] (const std::string& name)
-{
-	std::size_t col = getPosition(name);
-	return (*this)[col];
-}
-
-
 std::size_t Row::getPosition(const std::string& name)
 {
-	std::vector<std::string>::const_iterator it = _names.begin();
-	std::vector<std::string>::const_iterator end = _names.end();
+	if (!_pNames)
+		throw NullPointerException();
+
+	NameVec::const_iterator it = _pNames->begin();
+	NameVec::const_iterator end = _pNames->end();
 	std::size_t col = 0;
 	for (; it != end; ++it, ++col)
 		if (name == *it) break;
 	
+	if (it == end)
+		throw NotFoundException(name);
+
 	return col;
 }
 
 
-void Row::sortField(std::size_t pos)
+void Row::addSortField(std::size_t pos)
 {
 	poco_assert (pos <= _values.size());
-	_sortField = pos;
 
+	SortMap::iterator it = _sortFields.begin();
+	SortMap::iterator end = _sortFields.end();
+	for (; it != end; ++it)
+	{
+		if (it->get<0>() == pos)
+			throw InvalidAccessException("Field already in comparison set.");
+	}
+
+	ComparisonType ct;
 	if ((_values[pos].type() == typeid(Poco::Int8))   ||
 		(_values[pos].type() == typeid(Poco::UInt8))  ||
 		(_values[pos].type() == typeid(Poco::Int16))  ||
@@ -116,24 +130,103 @@ void Row::sortField(std::size_t pos)
 		(_values[pos].type() == typeid(Poco::UInt64)) ||
 		(_values[pos].type() == typeid(bool)))
 	{
-		comparison(COMPARE_AS_INTEGER);
+		ct = COMPARE_AS_INTEGER;
 	}
 	else if ((_values[pos].type() == typeid(float)) ||
 		(_values[pos].type() == typeid(double)))
 	{
-		comparison(COMPARE_AS_FLOAT);
+		ct = COMPARE_AS_FLOAT;
 	}
 	else
 	{
-		comparison(COMPARE_AS_STRING);
+		ct = COMPARE_AS_STRING;
 	}
 
+	_sortFields.push_back(SortTuple(pos, ct));
 }
 
 
-void Row::sortField(const std::string& name)
+void Row::addSortField(const std::string& name)
 {
-	sortField(getPosition(name));
+	addSortField(getPosition(name));
+}
+
+
+void Row::removeSortField(std::size_t pos)
+{
+	SortMap::iterator it = _sortFields.begin();
+	SortMap::iterator end = _sortFields.end();
+	for (; it != end; ++it)
+	{
+		if (it->get<0>() == pos)
+		{
+			_sortFields.erase(it);
+			return;
+		}
+	}
+}
+
+
+void Row::removeSortField(const std::string& name)
+{
+	removeSortField(getPosition(name));
+}
+
+
+void Row::replaceSortField(std::size_t oldPos, std::size_t newPos)
+{
+	poco_assert (oldPos <= _values.size());
+	poco_assert (newPos <= _values.size());
+
+	ComparisonType ct;
+
+	if ((_values[newPos].type() == typeid(Poco::Int8))   ||
+		(_values[newPos].type() == typeid(Poco::UInt8))  ||
+		(_values[newPos].type() == typeid(Poco::Int16))  ||
+		(_values[newPos].type() == typeid(Poco::UInt16)) ||
+		(_values[newPos].type() == typeid(Poco::Int32))  ||
+		(_values[newPos].type() == typeid(Poco::UInt32)) ||
+		(_values[newPos].type() == typeid(Poco::Int64))  ||
+		(_values[newPos].type() == typeid(Poco::UInt64)) ||
+		(_values[newPos].type() == typeid(bool)))
+	{
+		ct = COMPARE_AS_INTEGER;
+	}
+	else if ((_values[newPos].type() == typeid(float)) ||
+		(_values[newPos].type() == typeid(double)))
+	{
+		ct = COMPARE_AS_FLOAT;
+	}
+	else
+	{
+		ct = COMPARE_AS_STRING;
+	}
+
+	SortMap::iterator it = _sortFields.begin();
+	SortMap::iterator end = _sortFields.end();
+	for (; it != end; ++it)
+	{
+		if (it->get<0>() == oldPos)
+		{
+			*it = SortTuple(newPos, ct);
+			return;
+		}
+	}
+
+	throw NotFoundException("Field not found");
+}
+
+
+void Row::replaceSortField(const std::string& oldName, const std::string& newName)
+{
+	replaceSortField(getPosition(oldName), getPosition(newName));
+}
+
+
+void Row::resetSort()
+{
+	_sortFields.clear();
+	if (_values.size())	addSortField(0);
 }
 
 
@@ -154,12 +247,6 @@ bool Row::isEqualType(const Row& other) const
 	}
 
 	return true;
-}
-
-
-void Row::comparison(Comparison comp)
-{
-	_comparison = comp;
 }
 
 
@@ -188,57 +275,80 @@ bool Row::operator != (const Row& other) const
 
 bool Row::operator < (const Row& other) const
 {
-	if (_sortField != other._sortField)
+	if (_sortFields != other._sortFields)
 		throw InvalidAccessException("Rows compared have different sorting criteria.");
 
-	switch (_comparison)
+	SortMap::const_iterator it = _sortFields.begin();
+	SortMap::const_iterator end = _sortFields.end();
+	for (; it != end; ++it)
 	{
-	case COMPARE_AS_INTEGER:
-		return (_values[_sortField].convert<Poco::Int64>() < 
-			other._values[other._sortField].convert<Poco::Int64>());
+		switch (it->get<1>())
+		{
+		case COMPARE_AS_INTEGER:
+			if (_values[it->get<0>()].convert<Poco::Int64>() < 
+				other._values[it->get<0>()].convert<Poco::Int64>())
+				return true;
+			else if (_values[it->get<0>()].convert<Poco::Int64>() != 
+				other._values[it->get<0>()].convert<Poco::Int64>())
+				return false;
+			break;
 
-	case COMPARE_AS_FLOAT:
-		return (_values[_sortField].convert<double>() < 
-			other._values[other._sortField].convert<double>());
+		case COMPARE_AS_FLOAT:
+			if (_values[it->get<0>()].convert<double>() < 
+				other._values[it->get<0>()].convert<double>())
+				return true;
+			else if (_values[it->get<0>()].convert<double>() < 
+				other._values[it->get<0>()].convert<double>())
+				return false;
+			break;
 
-	case COMPARE_AS_STRING:
-		return (_values[_sortField].convert<std::string>() < 
-			other._values[other._sortField].convert<std::string>());
+		case COMPARE_AS_STRING:
+			if (_values[it->get<0>()].convert<std::string>() < 
+				other._values[it->get<0>()].convert<std::string>())
+				return true;
+			else if (_values[it->get<0>()].convert<std::string>() < 
+				other._values[it->get<0>()].convert<std::string>())
+				return false;
+			break;
+		}
 	}
 
-	throw IllegalStateException("Unknown comparison mode.");
+	return false;
 }
 
 
-const std::string& Row::toStringV() const
+const std::string Row::valuesToString() const
 {
-	_strValues.clear();
-	std::vector<DynamicAny>::const_iterator it = _values.begin();
-	std::vector<DynamicAny>::const_iterator end = _values.end();
+	std::string strValues;
+	ValueVec::const_iterator it = _values.begin();
+	ValueVec::const_iterator end = _values.end();
 	for (; it != end; ++it)
 	{
-		_strValues.append(it->convert<std::string>());
-		_strValues.append(_separator);
+		strValues.append(it->convert<std::string>());
+		strValues.append(_separator);
 	}
-	_strValues.replace(_strValues.find_last_of(_separator), _separator.length(), EOL);
+	strValues.replace(strValues.find_last_of(_separator), _separator.length(), EOL);
 
-	return _strValues;
+	return strValues;
 }
 
 
-const std::string& Row::toStringN() const
+const std::string Row::namesToString() const
 {
-	_strNames.clear();
-	std::vector<std::string>::const_iterator it = _names.begin();
-	std::vector<std::string>::const_iterator end = _names.end();
+	if (!_pNames)
+		throw NullPointerException();
+
+	std::string strNames;
+	NameVec::const_iterator it = _pNames->begin();
+	NameVec::const_iterator end = _pNames->end();
 	for (; it != end; ++it)
 	{
-		_strNames.append(*it);
-		_strNames.append(_separator);
+		strNames.append(*it);
+		strNames.append(_separator);
 	}
-	_strNames.replace(_strNames.find_last_of(_separator), _separator.length(), EOL);
+	strNames.replace(strNames.find_last_of(_separator), _separator.length(), EOL);
 
-	return _strNames;
+	return strNames;
 }
 
 

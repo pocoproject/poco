@@ -12,7 +12,7 @@ objects = AbstractBinder AbstractBinding AbstractExtraction \
 	AbstractExtractor AbstractPreparation AbstractPrepare \
 	BLOB BLOBStream DataException Limit MetaColumn \
 	PooledSessionHolder PooledSessionImpl \
-	Range RecordSet Session SessionFactory SessionImpl \
+	Range RecordSet Row RowIterator Session SessionFactory SessionImpl \
 	Connector SessionPool Statement StatementCreator StatementImpl
 
 target         = PocoData

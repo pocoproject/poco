@@ -38,7 +38,6 @@
 #include "Poco/Data/BLOBStream.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/Column.h"
-#include "Poco/Data/Row.h"
 #include "Connector.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
@@ -46,7 +45,7 @@
 #include "Poco/Exception.h"
 #include <cstring>
 #include <sstream>
-#include <map>
+#include <set>
 
 
 using namespace Poco::Data;
@@ -59,6 +58,7 @@ using Poco::Int64;
 using Poco::UInt64;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
+using Poco::NotFoundException;
 
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
@@ -576,12 +576,35 @@ void DataTest::testColumnList()
 void DataTest::testRow()
 {
 	Row row;
-
 	row.append("field0", 0);
 	row.append("field1", 1);
 	row.append("field2", 2);
 	row.append("field3", 3);
 	row.append("field4", 4);
+
+	assert (row["field0"] == 0);
+	assert (row["field1"] == 1);
+	assert (row["field2"] == 2);
+	assert (row["field3"] == 3);
+	assert (row["field4"] == 4);
+
+	assert (row[0] == 0);
+	assert (row[1] == 1);
+	assert (row[2] == 2);
+	assert (row[3] == 3);
+	assert (row[4] == 4);
+
+	try
+	{
+		int i = row[5];
+		fail ("must fail");
+	}catch (RangeException&) {}
+
+	try
+	{
+		int i = row["a bad name"];
+		fail ("must fail");
+	}catch (NotFoundException&) {}
 
 	assert (5 == row.fieldCount());
 	assert (row[0] == 0);
@@ -595,12 +618,12 @@ void DataTest::testRow()
 	assert (row[4] == 4);
 	assert (row["field4"] == 4);
 
-	assert (row.toStringN() == std::string("field0\tfield1\tfield2\tfield3\tfield4") + Row::EOL);
+	assert (row.namesToString() == std::string("field0\tfield1\tfield2\tfield3\tfield4") + Row::EOL);
 	std::ostringstream os;
 	os << row;
 	assert (os.str() == std::string("0\t1\t2\t3\t4") + Row::EOL);
 	row.separator(",");
-	assert (row.toStringN() == std::string("field0,field1,field2,field3,field4") + Row::EOL);
+	assert (row.namesToString() == std::string("field0,field1,field2,field3,field4") + Row::EOL);
 	os.str("");
 	os << row;
 	assert (os.str() == std::string("0,1,2,3,4") + Row::EOL);
@@ -615,30 +638,6 @@ void DataTest::testRow()
 
 	assert (row != row2);
 
-	std::map<Row, int> rowMap;
-	rowMap.insert(std::map<Row, int>::value_type(row2, 0));
-	rowMap.insert(std::map<Row, int>::value_type(row, 1));
-	std::map<Row, int>::iterator it = rowMap.begin();
-	assert (row == it->first);
-	++it;
-	assert (row2 == it->first);
-
-	rowMap.clear();
-	row.sortField("field4");
-	rowMap.insert(std::map<Row, int>::value_type(row, 0));
-	try
-	{
-		rowMap.insert(std::map<Row, int>::value_type(row2, 1));
-		fail ("must fail");
-	}catch (InvalidAccessException&) {}
-
-	row2.sortField("field4");
-	rowMap.insert(std::map<Row, int>::value_type(row2, 1));
-	it = rowMap.begin();
-	assert (row2 == it->first);
-	++it;
-	assert (row == it->first);
-
 	Row row3;
 
 	row3.append("field0", 0);
@@ -648,6 +647,160 @@ void DataTest::testRow()
 	row3.append("field4", 4);
 
 	assert (row3 == row);
+	assert (!(row < row3 | row3 < row));
+
+	Row row4(row3.names());
+	try
+	{
+		row4.set("badfieldname", 0);
+		fail ("must fail");
+	}catch (NotFoundException&) {}
+
+	row4.set("field0", 0);
+	row4.set("field1", 1);
+	row4.set("field2", 2);
+	row4.set("field3", 3);
+	row4.set("field4", 4);
+	assert (row3 == row4);
+	try
+	{
+		row4.set(5, 0);
+		fail ("must fail");
+	}catch (RangeException&) {}
+	row4.set("field0", 1);
+	assert (row3 != row4);
+	assert (row3 < row4);
+}
+
+
+void DataTest::testRowSort()
+{
+	Row row1;
+	row1.append("0", 0);
+	row1.append("1", 1);
+	row1.append("2", 2);
+	row1.append("3", 3);
+	row1.append("4", 4);
+
+	Row row2;
+	row2.append("0", 0);
+	row2.append("1", 1);
+	row2.append("2", 2);
+	row2.append("3", 3);
+	row2.append("4", 4);
+
+	std::multiset<Row> rowSet1;
+	rowSet1.insert(row1);
+	rowSet1.insert(row2);
+	std::multiset<Row>::iterator it1 = rowSet1.begin();
+	assert (row1 == *it1);
+	++it1;
+	assert (row2 == *it1);
+
+	Row row3;
+	row3.append("0", 1);
+	row3.append("1", 1);
+	row3.append("2", 2);
+	row3.append("3", 3);
+	row3.append("4", 4);
+
+	Row row4;
+	row4.append("0", 0);
+	row4.append("1", 1);
+	row4.append("2", 2);
+	row4.append("3", 3);
+	row4.append("4", 4);
+
+	std::set<Row> rowSet2;
+	rowSet2.insert(row4);
+	rowSet2.insert(row3);
+	std::set<Row>::iterator it2 = rowSet2.begin();
+	assert (row4 == *it2);
+	++it2;
+	assert (row3 == *it2);
+
+	Row row5;
+	row5.append("0", 2);
+	row5.append("1", 2);
+	row5.append("2", 0);
+	row5.append("3", 3);
+	row5.append("4", 4);
+	row5.addSortField("1");
+
+	Row row6;
+	row6.append("0", 1);
+	row6.append("1", 0);
+	row6.append("2", 1);
+	row6.append("3", 3);
+	row6.append("4", 4);
+	row6.addSortField("1");
+
+	Row row7;
+	row7.append("0", 0);
+	row7.append("1", 1);
+	row7.append("2", 2);
+	row7.append("3", 3);
+	row7.append("4", 4);
+
+	std::set<Row> rowSet3;
+	rowSet3.insert(row5);
+	rowSet3.insert(row6);
+	try
+	{
+		rowSet3.insert(row7);//has no same sort criteria
+		fail ("must fail");
+	} catch (InvalidAccessException&) {}
+
+	row7.addSortField("1");
+	testRowStrictWeak(row7, row6, row5);
+	rowSet3.insert(row7);
+
+	std::set<Row>::iterator it3 = rowSet3.begin();
+	assert (row7 == *it3);
+	++it3;
+	assert (row6 == *it3);
+	++it3;
+	assert (row5 == *it3);
+
+	row5.replaceSortField("0", "2");
+	row6.replaceSortField("0", "2");
+	row7.replaceSortField("0", "2");
+
+	rowSet3.clear();
+	rowSet3.insert(row7);
+	rowSet3.insert(row6);
+	rowSet3.insert(row5);
+
+	it3 = rowSet3.begin();
+	assert (row5 == *it3);
+	++it3;
+	assert (row6 == *it3);
+	++it3;
+	assert (row7 == *it3);
+
+	row5.resetSort();
+	row6.resetSort();
+	row7.resetSort();
+
+	rowSet3.clear();
+	rowSet3.insert(row5);
+	rowSet3.insert(row6);
+	rowSet3.insert(row7);
+
+	it3 = rowSet3.begin();
+	assert (row7 == *it3);
+	++it3;
+	assert (row6 == *it3);
+	++it3;
+	assert (row5 == *it3);
+}
+
+
+void DataTest::testRowStrictWeak(const Row& row1, const Row& row2, const Row& row3)
+{
+	assert (row1 < row2 && !(row2 < row1)); // antisymmetric
+	assert (row1 < row2 && row2 < row3 && row1 < row3); // transitive
+	assert (!(row1 < row1)); // irreflexive
 }
 
 
@@ -674,6 +827,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testColumnDeque);
 	CppUnit_addTest(pSuite, DataTest, testColumnList);
 	CppUnit_addTest(pSuite, DataTest, testRow);
+	CppUnit_addTest(pSuite, DataTest, testRowSort);
 
 	return pSuite;
 }

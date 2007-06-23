@@ -111,6 +111,7 @@ public:
 	void testInternalExtraction();
 	void testPrimaryKeyConstraint();
 	void testNull();
+	void testRowIterator();
 
 	void setUp();
 	void tearDown();

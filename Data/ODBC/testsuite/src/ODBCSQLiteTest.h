@@ -120,6 +120,7 @@ public:
 	void testInternalStorageType();
 
 	void testNull();
+	void testRowIterator();
 
 	void setUp();
 	void tearDown();

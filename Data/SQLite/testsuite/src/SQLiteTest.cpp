@@ -1669,6 +1669,38 @@ void SQLiteTest::testNull()
 }
 
 
+void SQLiteTest::testRowIterator()
+{
+	Session ses (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	ses << "DROP TABLE IF EXISTS Vectors", now;
+	ses << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+
+	std::vector<Tuple<int, double, std::string> > v;
+	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
+	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
+	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
+	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
+
+	ses << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now;
+
+	RecordSet rset(ses, "SELECT * FROM Vectors");
+
+	std::ostringstream osLoop;
+	RecordSet::Iterator it = rset.begin();
+	RecordSet::Iterator end = rset.end();
+	for (int i = 1; it != end; ++it, ++i) 
+	{
+		assert (it->get(0) == i);
+		osLoop << *it;
+	}
+	assert (!osLoop.str().empty());
+
+	std::ostringstream osCopy;
+	std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(osCopy));
+	assert (osLoop.str() == osCopy.str());
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -1742,6 +1774,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
 	CppUnit_addTest(pSuite, SQLiteTest, testNull);
+	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
 
 	return pSuite;
 }

@@ -42,6 +42,7 @@
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/RowIterator.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -50,6 +51,8 @@
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
 #include <sqltypes.h>
 #include <iostream>
+#include <sstream>
+#include <iterator>
 
 
 using namespace Poco::Data;
@@ -2138,4 +2141,35 @@ void SQLExecutor::nulls()
 	assert (rs.isNull("r"));
 	assert (rs.isNull("v"));
 	assert (rs["v"] == "");
+}
+
+
+void SQLExecutor::rowIterator()
+{
+	std::string funct = "internalExtraction()";
+	std::vector<Tuple<int, double, std::string> > v;
+	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
+	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
+	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
+	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
+
+	try { *_pSession << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	RecordSet rset(*_pSession, "SELECT * FROM Vectors");
+
+	std::ostringstream osLoop;
+	RecordSet::Iterator it = rset.begin();
+	RecordSet::Iterator end = rset.end();
+	for (int i = 1; it != end; ++it, ++i) 
+	{
+		assert (it->get(0) == i);
+		osLoop << *it;
+	}
+	assert (!osLoop.str().empty());
+
+	std::ostringstream osCopy;
+	std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(osCopy));
+	assert (osLoop.str() == osCopy.str());
 }

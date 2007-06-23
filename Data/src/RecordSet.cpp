@@ -121,13 +121,13 @@ DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
 const RowIterator& RecordSet::begin()
 {
 	if (!_pBegin)
-		_pBegin = new RowIterator(*this, 0 == extractions().size());
+		_pBegin = new RowIterator(*this);
 
 	return *_pBegin;
 }
 
 
-const Row& RecordSet::row(std::size_t pos) const
+Row& RecordSet::row(std::size_t pos)
 {
 	if (pos > rowCount() - 1)
 		throw RangeException("Invalid recordset row requested.");
@@ -136,12 +136,23 @@ const Row& RecordSet::row(std::size_t pos) const
 	Row* pRow = 0;
 	if (it == _rowMap.end())
 	{
-		pRow = new Row;
-		for (std::size_t i = 0; i < columnCount(); ++i)
-			pRow->append(metaColumn(static_cast<UInt32>(pos)).name(), value(i, pos));
+		if (_rowMap.size())//reuse first row column names to save some memory 
+		{
+			pRow = new Row(_rowMap.begin()->second->names());
+			for (std::size_t i = 0; i < columnCount(); ++i)
+				pRow->set(i, value(i, pos));
+		}
+		else 
+		{
+			pRow = new Row;
+			for (std::size_t i = 0; i < columnCount(); ++i)
+				pRow->append(metaColumn(static_cast<UInt32>(pos)).name(), value(i, pos));
+		}
 
 		_rowMap.insert(RowMap::value_type(pos, pRow));
 	}
+	else
+		pRow = it->second;
 
 	poco_check_ptr (pRow);
 	return *pRow;

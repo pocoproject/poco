@@ -78,6 +78,7 @@ class Data_API RecordSet: private Statement
 {
 public:
 	typedef std::map<std::size_t, Row*> RowMap;
+	typedef RowIterator Iterator;
 
 	using Statement::isNull;
 
@@ -132,8 +133,8 @@ public:
 		}
 	}
 
-	const Row& row(std::size_t pos) const;
-		/// Returns row at position pos.
+	Row& row(std::size_t pos);
+		/// Returns reference to row at position pos.
 		/// Rows are lazy-created and cached.
 
 	template <class T>
@@ -278,7 +279,7 @@ private:
 	std::size_t    _currentRow;
 	RowIterator*   _pBegin;
 	RowIterator*   _pEnd;
-	mutable RowMap _rowMap;
+	RowMap         _rowMap;
 };
 
 
@@ -380,7 +381,7 @@ inline bool RecordSet::isNull(const std::string& name)
 inline const RowIterator& RecordSet::end()
 {
 	if (!_pEnd)
-		_pEnd = new RowIterator(*this);
+		_pEnd = new RowIterator(*this, true);
 
 	return *_pEnd;
 }

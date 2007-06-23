@@ -954,6 +954,21 @@ void ODBCPostgreSQLTest::testStoredFunction()
 }
 
 
+void ODBCPostgreSQLTest::testRowIterator()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->rowIterator();
+		i += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::configurePLPgSQL()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1263,6 +1278,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNull);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRowIterator);
 
 		return pSuite;
 	}

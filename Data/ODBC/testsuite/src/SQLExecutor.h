@@ -131,6 +131,7 @@ public:
 	void internalStorageType();
 	void nulls();
 	void notNulls(const std::string& sqlState = "23502");
+	void rowIterator();
 
 private:
 	Poco::Data::Session* _pSession;

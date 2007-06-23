@@ -125,6 +125,7 @@ public:
 	void testStoredFunction();
 
 	void testNull();
+	void testRowIterator();
 
 	void setUp();
 	void tearDown();

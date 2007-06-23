@@ -915,6 +915,21 @@ void ODBCMySQLTest::testStoredFunction()
 }
 
 
+void ODBCMySQLTest::testRowIterator()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->rowIterator();
+		i += 2;
+	}
+}
+
+
 void ODBCMySQLTest::dropObject(const std::string& type, const std::string& name)
 {
 	*_pSession << format("DROP %s IF EXISTS %s", type, name), now;
@@ -1152,7 +1167,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testNull);
-
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testRowIterator);
 		return pSuite;
 	}
 

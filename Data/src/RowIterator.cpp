@@ -1,7 +1,7 @@
 //
 // RowIterator.cpp
 //
-// $Id: //poco/Main/Data/src/RowIterator.cpp#2 $
+// $Id: //poco/Main/Data/src/RowIterator.cpp#1 $
 //
 // Library: Data
 // Package: DataCore
@@ -48,9 +48,9 @@ namespace Data {
 const int RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
-RowIterator::RowIterator(const RecordSet& recordSet, bool isEmpty): 
-	_position(isEmpty ? POSITION_END : 0),
-	_recordSet(recordSet)
+RowIterator::RowIterator(RecordSet& recordSet, bool positionEnd): 
+	_recordSet(recordSet),
+	_position((0 == recordSet.rowCount()) || positionEnd ? POSITION_END : 0)
 {
 }
 
@@ -75,43 +75,59 @@ void RowIterator::increment()
 void RowIterator::decrement()
 {
 	if (0 == _position)
-		throw RangeException("End of iterator reached.");
-
-	--_position;
+		throw RangeException("Beginning of iterator reached.");
+	else if (POSITION_END == _position)
+		_position = _recordSet.rowCount() - 1;
+	else
+		--_position;
 }
 
 
-const Row& RowIterator::operator * () const
+Row& RowIterator::operator * () const
 {
+	if (POSITION_END == _position)
+		throw InvalidAccessException("End of iterator reached.");
+
 	return _recordSet.row(_position);
 }
 
 
-const Row& RowIterator::operator ++ ()
+Row* RowIterator::operator -> () const
+{
+	if (POSITION_END == _position)
+		throw InvalidAccessException("End of iterator reached.");
+
+	return &_recordSet.row(_position);
+}
+
+
+std::size_t RowIterator::operator ++ ()
 {
 	increment();
-	return _recordSet.row(_position);
+	return _position;
 }
 
 
-const Row& RowIterator::operator ++ (int)
+std::size_t RowIterator::operator ++ (int)
 {
+	std::size_t oldPos = _position;
 	increment();
-	return _recordSet.row(_position - 1);
+	return oldPos;
 }
 
 
-const Row& RowIterator::operator -- ()
+std::size_t RowIterator::operator -- ()
 {
 	decrement();
-	return _recordSet.row(_position);
+	return _position;
 }
 
 
-const Row& RowIterator::operator -- (int)
+std::size_t RowIterator::operator -- (int)
 {
+	std::size_t oldPos = _position;
 	decrement();
-	return _recordSet.row(_position + 1);
+	return oldPos;
 }
 
 
