@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPFormServer", "HTTPFormServer\HTTPFormServer_vs71.vcproj", "{42166902-22B1-461F-B36B-53C17025052D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		release_shared = release_shared
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{42166902-22B1-461F-B36B-53C17025052D}.debug_shared.ActiveCfg = debug_shared|Win32
+		{42166902-22B1-461F-B36B-53C17025052D}.debug_shared.Build.0 = debug_shared|Win32
+		{42166902-22B1-461F-B36B-53C17025052D}.release_shared.ActiveCfg = release_shared|Win32
+		{42166902-22B1-461F-B36B-53C17025052D}.release_shared.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,16 @@
+<rootPanel name="Test Document">
+	<children>
+		<flow id="ff">
+			<image id="i1" alt="Micro Image" title="Micro sized Image" src="http://appinf.com/poco/images/PocoLayers.jpg" width="20" height="16"/>
+			<image id="i2" alt="Medium Image" title="Medium sized Image" src="http://appinf.com/poco/images/PocoLayers.jpg" width="50" height="40">
+				<events>
+					<onclick>
+						<delegate function="printMessage" file="additional.js"/> 
+						<delegate function="printMessage2" file="additional.js"/> 
+					</onclick>
+				</events>
+			</image>	
+			<image id="i3" alt="Full Image" src="http://appinf.com/poco/images/PocoLayers.jpg"/>
+		</flow>
+	</children>
+</rootPanel>

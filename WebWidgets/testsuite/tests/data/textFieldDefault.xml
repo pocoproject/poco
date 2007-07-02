@@ -1,0 +1,8 @@
+<rootPanel name="Test Document">
+	<children>
+		<stack id="s1">
+			<label>A Text Field with a default value</label>
+			<textField id="i1" size="20" maxLength="40" name="textField">default value</textField>
+		</stack>	
+	</children>
+</rootPanel>

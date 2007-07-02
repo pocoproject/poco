@@ -1,0 +1,15 @@
+<html><head><script src="appinf.js"></script>
+<script type="text/javascript">
+function onClickh1() {
+	var child = $("i1");
+	var imgBut = $("h1");
+	if (child.style.display == "none") {
+		child.style.display = "inline";
+		imgBut.src = "on.gif";
+	} else {
+		child.style.display = "none";
+		imgBut.src = "off.gif";
+	}
+}
+</script>
+<title>Test Document</title></head><body><div id="s1">A Optional block of input data<br><input class="imagebutton" id="h1" onclick="onClickh1()" src="on.gif" type="image"/>Extended Settings<br/><table border="1" class="table" id="i1"><tbody><tr><td>First Name</td><td><input class="textfield" id="t1" maxlength="40" name="first" size="20" type="text"/></td></tr><tr><td>Last Name</td><td><input class="textfield" id="t2" maxlength="40" name="last" size="20" type="text"/></td></tr><tr><td>Address</td><td><input class="textfield" id="t3" maxlength="40" name="last" size="20" type="text"/></td></tr></tbody></table></div></body></html>

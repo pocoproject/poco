@@ -1,0 +1,34 @@
+<rootPanel name="Test Document">
+	<children>
+		<form id="f1" action="/test.xml" method="post">
+			<table border="1" cols="3" id="t1">
+				<cell>
+					<stack id="s1">
+						<radioButton id="b1" name="radio" checked="false">Click me</radioButton>
+						<radioButton id="b2" name="radio" checked="true"><![CDATA[<b>No! Click Me!</b>]]></radioButton>
+					</stack>
+				</cell>
+				<cell>
+					<stack id="s2">
+						<checkBox id="c1" name="check" checked="true">Check This</checkBox>
+						<checkBox id="c2" name="check">Check That</checkBox>
+					</stack>
+				</cell>
+				<!-- the third column has no value -->
+				<cell row="1">
+					<stack id="s3">
+						<label>A Text Area</label>
+						<textArea id="ta1" rows="10" cols="30" name="textArea"/>
+					</stack>	
+				</cell>
+				<cell col="2">
+					<flow id="s4">
+						<label>A Text Field:</label>
+						<textField id="tf1" size="20" maxLength="40" name="textField"/>
+					</flow>	
+				</cell>
+			</table>
+			<button id="b3" text="Submit" type="submit"/>
+		</form>
+	</children>
+</rootPanel>

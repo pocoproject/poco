@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebWidgets", "WebWidgets_VS71.vcproj", "{8AF41214-5398-4B9B-BD80-D4910704A8FD}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_VS71.vcproj", "{90E72549-3DE3-4274-B744-238AC717FC2E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8AF41214-5398-4B9B-BD80-D4910704A8FD} = {8AF41214-5398-4B9B-BD80-D4910704A8FD}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		release_shared = release_shared
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{8AF41214-5398-4B9B-BD80-D4910704A8FD}.debug_shared.ActiveCfg = debug_shared|Win32
+		{8AF41214-5398-4B9B-BD80-D4910704A8FD}.debug_shared.Build.0 = debug_shared|Win32
+		{8AF41214-5398-4B9B-BD80-D4910704A8FD}.release_shared.ActiveCfg = release_shared|Win32
+		{8AF41214-5398-4B9B-BD80-D4910704A8FD}.release_shared.Build.0 = release_shared|Win32
+		{90E72549-3DE3-4274-B744-238AC717FC2E}.debug_shared.ActiveCfg = debug_shared|Win32
+		{90E72549-3DE3-4274-B744-238AC717FC2E}.debug_shared.Build.0 = debug_shared|Win32
+		{90E72549-3DE3-4274-B744-238AC717FC2E}.release_shared.ActiveCfg = release_shared|Win32
+		{90E72549-3DE3-4274-B744-238AC717FC2E}.release_shared.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

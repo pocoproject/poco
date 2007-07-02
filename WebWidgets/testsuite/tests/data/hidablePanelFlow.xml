@@ -1,0 +1,15 @@
+<rootPanel name="Test Document">
+	<children>
+		<stack id="s1">
+			<label>A Optional block of input data</label>
+			<hidablePanel id="h1" on="on.gif" off="off.gif" text="Extended Settings">
+				<flow id="s2">
+					<label>First Name</label>
+					<textField id="t1" size="20" maxLength="40" name="first"/>
+					<label>Last Name</label>
+					<textField id="t2" size="20" maxLength="40" name="last"/>
+				</flow>
+			</hidablePanel>
+		</stack>	
+	</children>
+</rootPanel>

@@ -1,0 +1,15 @@
+<rootPanel name="Test Document">
+	<children>
+		<flow id="ff">
+			<hyperLink id="l1" ref="http://pocoproject.org">
+				<label>The POCO Project</label>
+			</hyperLink>
+			<hyperLink id="l2" ref="http://pocoproject.org">
+				<label>The POCO Project Again</label>
+			</hyperLink>
+			<hyperLink id="l3" ref="http://pocoproject.org">
+				<image alt="A POCO Project Image" src="http://appinf.com/poco/images/PocoLayers.jpg" width="100" height="80"/>
+			</hyperLink>
+		</flow>
+	</children>
+</rootPanel>

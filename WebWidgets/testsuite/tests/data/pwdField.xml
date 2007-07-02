@@ -1,0 +1,8 @@
+<rootPanel name="Test Document">
+	<children>
+		<stack id="s1">
+			<label>A Password Field:</label>
+			<pwdField id="i1" size="20" maxLength="40" name="pwdField"/>
+		</stack>	
+	</children>
+</rootPanel>

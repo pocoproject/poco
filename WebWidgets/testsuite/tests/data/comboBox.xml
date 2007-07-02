@@ -1,0 +1,10 @@
+<rootPanel name="Test Document">
+	<children>
+		<comboBox name="combo" id="c1">
+			<label>1st</label>
+			<label>2nd</label>
+			<label>3rd</label>
+			<label>4th</label>
+		</comboBox>
+	</children>
+</rootPanel>

@@ -1,0 +1,8 @@
+<rootPanel name="Test Document">
+	<children>
+		<stack id="s2">
+			<label>A Text Area with a default value</label>
+			<textArea id="i1" rows="10" cols="30" name="textArea"> This default value should show up</textArea>
+		</stack>	
+	</children>
+</rootPanel>
