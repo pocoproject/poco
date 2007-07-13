@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="CppUnit"
 	ProjectGUID="{138BB448-808A-4FE5-A66D-78D1F8770F59}"
 	Keyword="MFCProj"
@@ -475,6 +475,10 @@
 			</File>
 			<File
 				RelativePath=".\include\CppUnit\CppUnitException.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\CppUnit\DataDrivenTestCaller.h"
 				>
 			</File>
 			<File

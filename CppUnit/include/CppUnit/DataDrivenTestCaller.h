@@ -182,9 +182,11 @@ public:
 		std::vector<std::string>::const_iterator itInEnd = inputFiles.end();
 		for (; itIn != itInEnd; ++itIn)
 		{
+			std::cout << *itIn << std::endl;
 			Poco::Path inTmp(data, *itIn);
 			Poco::File inFTmp(inTmp);
-			pairs.insert(std::make_pair(inTmp.getBaseName(), std::make_pair(inFTmp, Poco::File())));
+			if (!inTmp.getBaseName().empty())
+				pairs.insert(std::make_pair(inTmp.getBaseName(), std::make_pair(inFTmp, Poco::File())));
 		}
 
 		std::vector<std::string>::const_iterator itRef = referenceFiles.begin();
