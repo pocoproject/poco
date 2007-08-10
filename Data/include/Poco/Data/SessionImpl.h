@@ -81,6 +81,9 @@ public:
 	virtual bool isConnected() = 0;
 		/// Returns true if session is connected, false otherwise.
 
+	virtual bool isTransaction() = 0;
+		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+
 	virtual void setFeature(const std::string& name, bool state) = 0;
 		/// Set the state of a feature.
 		///

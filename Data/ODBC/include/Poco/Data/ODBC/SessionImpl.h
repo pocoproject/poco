@@ -90,6 +90,9 @@ public:
 	bool isConnected();
 		/// Returns true if session is connected
 
+	bool isTransaction();
+		/// Returns true iff a transaction is in progress.
+
 	void setEnforceCapability(const std::string&, bool val);
 		/// Configures session to enforce driver capability check 
 		/// after connection.

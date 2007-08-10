@@ -83,6 +83,9 @@ public:
 	bool isConnected();
 		/// Returns true if connected, false otherwise.
 
+	bool isTransaction();
+		/// Returns true iff a transaction is in progress.
+
 private:
 	void open();
 		/// Opens a connection to the Database.
@@ -90,11 +93,21 @@ private:
 	std::string _dbFileName;
 	sqlite3*    _pDB;
 	bool        _connected;
+	bool        _isTransaction;
 	
 	static const std::string DEFERRED_BEGIN_TRANSACTION;
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
 };
+
+
+//
+// inlines
+//
+inline 	bool SessionImpl::isTransaction()
+{
+	return _isTransaction;
+}
 
 
 } } } // namespace Poco::Data::SQLite

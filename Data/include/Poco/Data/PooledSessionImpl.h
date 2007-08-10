@@ -1,7 +1,7 @@
 //
 // PooledSessionImpl.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/PooledSessionImpl.h#2 $
+// $Id: //poco/Main/Data/include/Poco/Data/PooledSessionImpl.h#3 $
 //
 // Library: Data
 // Package: SessionPooling
@@ -72,6 +72,7 @@ public:
 	void rollback();
 	void close();
 	bool isConnected();
+	bool isTransaction();
 	void setFeature(const std::string& name, bool state);	
 	bool getFeature(const std::string& name);
 	void setProperty(const std::string& name, const Poco::Any& value);

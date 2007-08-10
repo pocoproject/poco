@@ -185,6 +185,20 @@ bool SessionImpl::isConnected()
 }
 
 
+bool SessionImpl::isTransaction()
+{
+	Poco::UInt32 value = 0;
+
+	checkError(SQLGetConnectAttr(_db,
+		SQL_ATTR_AUTOCOMMIT,
+		&value,
+		0,
+		0));
+
+	return (0 == value);
+}
+
+
 void SessionImpl::close()
 {
 	if (!isConnected()) return;

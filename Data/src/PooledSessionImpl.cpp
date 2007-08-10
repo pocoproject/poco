@@ -1,7 +1,7 @@
 //
 // PooledSessionImpl.cpp
 //
-// $Id: //poco/Main/Data/src/PooledSessionImpl.cpp#2 $
+// $Id: //poco/Main/Data/src/PooledSessionImpl.cpp#3 $
 //
 // Library: Data
 // Package: SessionPooling
@@ -79,6 +79,12 @@ bool PooledSessionImpl::isConnected()
 }
 
 
+bool PooledSessionImpl::isTransaction()
+{
+	return access()->isTransaction();
+}
+
+
 void PooledSessionImpl::rollback()
 {
 	return access()->rollback();
@@ -89,6 +95,18 @@ void PooledSessionImpl::close()
 {
 	if (_pHolder)
 	{
+		if (isTransaction())
+		{
+			try
+			{
+				rollback();
+			}
+			catch (...)
+			{
+				// Something's wrong with the session. Get rid of it.
+				access()->close();
+			}
+		}
 		_pHolder->owner().putBack(_pHolder);
 		_pHolder = 0;
 	}

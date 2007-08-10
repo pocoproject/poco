@@ -54,7 +54,8 @@ const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 SessionImpl::SessionImpl(const std::string& fileName):
 	_dbFileName(fileName),
 	_pDB(0),
-	_connected(false)
+	_connected(false),
+	_isTransaction(false)
 {
 	open();
 }
@@ -78,6 +79,7 @@ void SessionImpl::begin()
 	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(DEFERRED_BEGIN_TRANSACTION);
 	tmp.execute();
+	_isTransaction = true;
 }
 
 
@@ -86,6 +88,7 @@ void SessionImpl::commit()
 	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(COMMIT_TRANSACTION);
 	tmp.execute();
+	_isTransaction = false;
 }
 
 
@@ -94,6 +97,7 @@ void SessionImpl::rollback()
 	SQLiteStatementImpl tmp(*this, _pDB);
 	tmp.add(ABORT_TRANSACTION);
 	tmp.execute();
+	_isTransaction = false;
 }
 
 

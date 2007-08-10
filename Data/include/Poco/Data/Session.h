@@ -203,7 +203,10 @@ public:
 		/// Closes the session.
 
 	bool isConnected();
-		/// Returns true if session is connected, false otherwise.
+		/// Returns true iff session is connected, false otherwise.
+
+	bool isTransaction();
+		/// Returns true iff a transaction is in progress, false otherwise.
 
 	void setFeature(const std::string& name, bool state);
 		/// Set the state of a feature.
@@ -288,6 +291,12 @@ inline void Session::close()
 inline bool Session::isConnected()
 {
 	return _ptrImpl->isConnected();
+}
+
+
+inline bool Session::isTransaction()
+{
+	return _ptrImpl->isTransaction();
 }
 
 
