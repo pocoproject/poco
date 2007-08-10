@@ -1,7 +1,7 @@
 //
 // Application.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/Application.h#14 $
+// $Id: //poco/Main/Util/include/Poco/Util/Application.h#15 $
 //
 // Library: Util
 // Package: Application
@@ -371,6 +371,9 @@ private:
 	static Application* _pInstance;
 	
 	friend class LoggingSubsystem;
+
+	Application(const Application&);
+	Application& operator = (const Application&);
 };
 
 

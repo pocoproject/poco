@@ -1,7 +1,7 @@
 //
 // Process_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Process_WIN32.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/Process_WIN32.h#4 $
 //
 // Library: Foundation
 // Package: Processes
@@ -64,6 +64,9 @@ public:
 private:
 	HANDLE _hProcess;
 	UInt32 _pid;
+	
+	ProcessHandleImpl(const ProcessHandleImpl&);
+	ProcessHandleImpl& operator = (const ProcessHandleImpl&);
 };
 
 

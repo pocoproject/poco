@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory_DUMMY.cpp#3 $
+// $Id: //poco/Main/Foundation/src/SharedMemory_DUMMY.cpp#4 $
 //
 // Library: Foundation
 // Package: Processes
@@ -40,7 +40,7 @@
 namespace Poco {
 
 
-SharedMemoryImpl::SharedMemoryImpl(const std::string&, std::size_t, SharedMemory::AccessMode, const void*)
+SharedMemoryImpl::SharedMemoryImpl(const std::string&, std::size_t, SharedMemory::AccessMode, const void*, bool)
 {
 }
 

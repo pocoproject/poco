@@ -1,7 +1,7 @@
 //
 // DynamicAny.cpp
 //
-// $Id: //poco/Main/Foundation/src/DynamicAny.cpp#4 $
+// $Id: //poco/Main/Foundation/src/DynamicAny.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -35,7 +35,9 @@
 
 
 #include "Poco/DynamicAny.h"
+#include "Poco/DynamicStruct.h"
 #include <algorithm>
+#include <cctype>
 
 
 namespace Poco {
@@ -75,7 +77,187 @@ void DynamicAny::swap(DynamicAny& ptr)
 
 const std::type_info& DynamicAny::type() const
 {
-    return _pHolder->type();
+	return _pHolder->type();
+}
+
+
+DynamicAny& DynamicAny::operator[](std::vector<DynamicAny>::size_type n)
+{
+	DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder = dynamic_cast<DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
+	if (pHolder)
+		return pHolder->operator[](n);
+	else
+		throw BadCastException();
+}
+
+
+const DynamicAny& DynamicAny::operator[](std::vector<DynamicAny>::size_type n) const
+{
+	const DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder = dynamic_cast<const DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
+	if (pHolder)
+		return pHolder->operator[](n);
+	else
+		throw BadCastException();
+}
+
+
+
+DynamicAny& DynamicAny::operator[](const std::string& name)
+{
+	DynamicAnyHolderImpl<DynamicStruct>* pHolder = dynamic_cast<DynamicAnyHolderImpl<DynamicStruct> *>(_pHolder);
+	if (pHolder)
+		return pHolder->operator[](name);
+	else
+		throw BadCastException();
+}
+
+
+const DynamicAny& DynamicAny::operator[](const std::string& name) const
+{
+	const DynamicAnyHolderImpl<DynamicStruct>* pHolder = dynamic_cast<const DynamicAnyHolderImpl<DynamicStruct>* >(_pHolder);
+	if (pHolder)
+		return pHolder->operator[](name);
+	else
+		throw BadCastException();
+}
+
+
+DynamicAny DynamicAny::parse(const std::string& val)
+{
+	std::string::size_type t = 0;
+	return parse(val, t);
+}
+
+
+DynamicAny DynamicAny::parse(const std::string& val, std::string::size_type& pos)
+{
+	// { -> an Object==DynamicStruct
+	// [ -> an array
+	// '/" -> a string (strip '/")
+	// other: also treat as string
+	skipWhiteSpace(val, pos);
+	if (pos < val.size())
+	{
+		switch(val[pos])
+		{
+		case '{':
+			return parseObject(val, pos);
+		case '[':
+			return parseArray(val, pos);
+		default:
+			return parseString(val, pos);
+		}
+	}
+	std::string empty;
+	return empty;
+}
+
+
+DynamicAny DynamicAny::parseObject(const std::string& val, std::string::size_type& pos)
+{
+	poco_assert_dbg (val[pos] == '{');
+	++pos;
+	skipWhiteSpace(val, pos);
+	DynamicStruct aStruct;
+	while(val[pos] != '}' && pos < val.size())
+	{
+		std::string key = parseString(val, pos);
+		skipWhiteSpace(val, pos);
+		if (val[pos] != ':')
+			throw DataFormatException("Incorrect object, must contain: key : value pairs"); 
+		++pos; // skip past :
+		DynamicAny value = parse(val, pos);
+		aStruct.insert(key, value);
+		skipWhiteSpace(val, pos);
+		if (val[pos] == ',')
+		{
+			++pos;
+			skipWhiteSpace(val, pos);
+		}
+	}
+	if (val[pos] != '}')
+		throw DataFormatException("Unterminated object"); 
+	++pos;
+	return aStruct;
+}
+
+
+DynamicAny DynamicAny::parseArray(const std::string& val, std::string::size_type& pos)
+{
+	poco_assert_dbg (val[pos] == '[');
+	++pos;
+	skipWhiteSpace(val, pos);
+	std::vector<DynamicAny> result;
+	while(val[pos] != ']' && pos < val.size())
+	{
+		result.push_back(parse(val, pos));
+		skipWhiteSpace(val, pos);
+		if (val[pos] == ',')
+		{
+			++pos;
+			skipWhiteSpace(val, pos);
+		}
+	}
+	if (val[pos] != ']')
+		throw DataFormatException("Unterminated array"); 
+	++pos;
+	return result;
+}
+
+
+std::string DynamicAny::parseString(const std::string& val, std::string::size_type& pos)
+{
+	static const std::string STR_STOP("'\"");
+	static const std::string OTHER_STOP(" ,]}"); // we stop at space, ',', ']' or '}'
+
+	bool inString = false;
+	//skip optional ' "
+	if (val[pos] == '\'' || val[pos] == '"')
+	{
+		inString = true;
+		++pos;
+	}
+	
+
+	std::string::size_type stop = std::string::npos;
+	if (inString)
+	{
+		stop = val.find_first_of(STR_STOP, pos);
+		if (stop == std::string::npos)
+			throw DataFormatException("Unterminated string");
+	}
+	else
+	{
+		// we stop at space, ',', ']' or '}' or end of string
+		stop = val.find_first_of(OTHER_STOP, pos);
+		if (stop == std::string::npos)
+			stop = val.size();
+
+		std::string::size_type safeCheck = val.find_first_of(STR_STOP, pos);
+		if (safeCheck != std::string::npos && safeCheck < stop)
+			throw DataFormatException("Misplaced string termination char found");
+
+	}
+
+	// stop now points to the last char to be not included
+	std::string result = val.substr(pos, stop - pos);
+	++stop; // point past '/"
+	pos = stop;
+	return result;
+}
+
+void DynamicAny::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
+{
+	while (std::isspace(val[pos]))
+		++pos;
+}
+
+
+std::string DynamicAny::toString(const DynamicAny& any)
+{
+	std::string res;
+	appendJSONString(res, any);
+	return res;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // BufferedBidirectionalStreamBuf.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#5 $
+// $Id: //poco/Main/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#6 $
 //
 // Library: Foundation
 // Package: Streams
@@ -178,6 +178,9 @@ private:
 	char_type*      _pReadBuffer;
 	char_type*      _pWriteBuffer;
 	openmode        _mode;
+
+	BasicBufferedBidirectionalStreamBuf(const BasicBufferedBidirectionalStreamBuf&);
+	BasicBufferedBidirectionalStreamBuf& operator = (const BasicBufferedBidirectionalStreamBuf&);
 };
 
 

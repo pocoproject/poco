@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#9 $
+// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#11 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,6 +36,7 @@
 #include "Poco/Exception.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/Bugcheck.h"
+#include "Poco/DynamicStruct.h"
 
 
 using namespace Poco;
@@ -1221,6 +1222,534 @@ void DynamicAnyTest::testCtor()
 }
 
 
+void DynamicAnyTest::testIsStruct()
+{
+	std::string s1("string");
+	Poco::Int8 s2(-23);
+	Poco::Int16 s3(-33);
+	Poco::Int32 s4(-388);
+	Poco::Int64 s5(-23823838);
+	Poco::UInt8 s6(32);
+	Poco::UInt16 s7(16000);
+	Poco::UInt32 s8(334234);
+	Poco::UInt64 s9(2328328382);
+	float s10(13.333f);
+	double s11(13.555);
+	bool s12(true);
+	char s13('c');
+	long s14(232323);
+	unsigned long s15(21233232);
+	std::vector<DynamicAny> s16;
+	DynamicStruct s17;
+
+	DynamicAny d1(s1);
+	DynamicAny d2(s2);
+	DynamicAny d3(s3);
+	DynamicAny d4(s4);
+	DynamicAny d5(s5);
+	DynamicAny d6(s6);
+	DynamicAny d7(s7);
+	DynamicAny d8(s8);
+	DynamicAny d9(s9);
+	DynamicAny d10(s10);
+	DynamicAny d11(s11);
+	DynamicAny d12(s12);
+	DynamicAny d13(s13);
+	DynamicAny d14(s14);
+	DynamicAny d15(s15);
+	DynamicAny d16(s16);
+	DynamicAny d17(s17);
+
+	assert (!d1.isStruct());
+	assert (!d2.isStruct());
+	assert (!d3.isStruct());
+	assert (!d4.isStruct());
+	assert (!d5.isStruct());
+	assert (!d6.isStruct());
+	assert (!d7.isStruct());
+	assert (!d8.isStruct());
+	assert (!d9.isStruct());
+	assert (!d10.isStruct());
+	assert (!d11.isStruct());
+	assert (!d12.isStruct());
+	assert (!d13.isStruct());
+	assert (!d14.isStruct());
+	assert (!d15.isStruct());
+	assert (!d16.isStruct());
+	assert (d17.isStruct());
+}
+
+
+void DynamicAnyTest::testIsArray()
+{
+	std::string s1("string");
+	Poco::Int8 s2(-23);
+	Poco::Int16 s3(-33);
+	Poco::Int32 s4(-388);
+	Poco::Int64 s5(-23823838);
+	Poco::UInt8 s6(32);
+	Poco::UInt16 s7(16000);
+	Poco::UInt32 s8(334234);
+	Poco::UInt64 s9(2328328382);
+	float s10(13.333f);
+	double s11(13.555);
+	bool s12(true);
+	char s13('c');
+	long s14(232323);
+	unsigned long s15(21233232);
+	std::vector<DynamicAny> s16;
+	DynamicStruct s17;
+
+	DynamicAny d1(s1);
+	DynamicAny d2(s2);
+	DynamicAny d3(s3);
+	DynamicAny d4(s4);
+	DynamicAny d5(s5);
+	DynamicAny d6(s6);
+	DynamicAny d7(s7);
+	DynamicAny d8(s8);
+	DynamicAny d9(s9);
+	DynamicAny d10(s10);
+	DynamicAny d11(s11);
+	DynamicAny d12(s12);
+	DynamicAny d13(s13);
+	DynamicAny d14(s14);
+	DynamicAny d15(s15);
+	DynamicAny d16(s16);
+	DynamicAny d17(s17);
+
+	assert (!d1.isArray());
+	assert (!d2.isArray());
+	assert (!d3.isArray());
+	assert (!d4.isArray());
+	assert (!d5.isArray());
+	assert (!d6.isArray());
+	assert (!d7.isArray());
+	assert (!d8.isArray());
+	assert (!d9.isArray());
+	assert (!d10.isArray());
+	assert (!d11.isArray());
+	assert (!d12.isArray());
+	assert (!d13.isArray());
+	assert (!d14.isArray());
+	assert (!d15.isArray());
+	assert (d16.isArray());
+	assert (!d17.isArray());
+}
+
+
+void DynamicAnyTest::testArrayIdxOperator()
+{
+	std::string s1("string");
+	Poco::Int8 s2(-23);
+	Poco::Int16 s3(-33);
+	Poco::Int32 s4(-388);
+	Poco::Int64 s5(-23823838);
+	Poco::UInt8 s6(32);
+	Poco::UInt16 s7(16000);
+	Poco::UInt32 s8(334234);
+	Poco::UInt64 s9(2328328382);
+	float s10(13.333f);
+	double s11(13.555);
+	bool s12(true);
+	char s13('c');
+	long s14(232323);
+	unsigned long s15(21233232);
+	std::vector<DynamicAny> s16;
+	s16.push_back(s1);
+	s16.push_back(s2);
+	DynamicStruct s17;
+
+	DynamicAny d1(s1);
+	DynamicAny d2(s2);
+	DynamicAny d3(s3);
+	DynamicAny d4(s4);
+	DynamicAny d5(s5);
+	DynamicAny d6(s6);
+	DynamicAny d7(s7);
+	DynamicAny d8(s8);
+	DynamicAny d9(s9);
+	DynamicAny d10(s10);
+	DynamicAny d11(s11);
+	DynamicAny d12(s12);
+	DynamicAny d13(s13);
+	DynamicAny d14(s14);
+	DynamicAny d15(s15);
+	DynamicAny d16(s16);
+	DynamicAny d17(s17);
+
+	testGetIdxMustThrow(d1, 0);
+	testGetIdxMustThrow(d2, 0);
+	testGetIdxMustThrow(d3, 0);
+	testGetIdxMustThrow(d4, 0);
+	testGetIdxMustThrow(d5, 0);
+	testGetIdxMustThrow(d6, 0);
+	testGetIdxMustThrow(d7, 0);
+	testGetIdxMustThrow(d8, 0);
+	testGetIdxMustThrow(d9, 0);
+	testGetIdxMustThrow(d10, 0);
+	testGetIdxMustThrow(d11, 0);
+	testGetIdxMustThrow(d12, 0);
+	testGetIdxMustThrow(d13, 0);
+	testGetIdxMustThrow(d14, 0);
+	testGetIdxMustThrow(d15, 0);
+	testGetIdx(d16, 0, s1);
+	testGetIdx(d16, 1, s2);
+	testGetIdxMustThrow(d17, 0);
+}
+
+
+void DynamicAnyTest::testDynamicStructBasics()
+{
+	DynamicStruct aStruct;
+	assert (aStruct.empty());
+	assert (aStruct.size() == 0);
+	assert (aStruct.members().empty());
+
+	aStruct.insert("First Name", "Little");
+	assert (!aStruct.empty());
+	assert (aStruct.size() == 1);
+	assert (*(aStruct.members().begin()) == "First Name");
+	assert (aStruct["First Name"] == "Little");
+	aStruct.insert("Last Name", "POCO");
+	assert (aStruct.members().size() == 2);
+	aStruct.erase("First Name");
+	assert (aStruct.size() == 1);
+	assert (*(aStruct.members().begin()) == "Last Name");
+}
+
+
+void DynamicAnyTest::testDynamicStruct()
+{
+	DynamicStruct aStruct;
+	aStruct["First Name"] = "Junior";
+	aStruct["Last Name"] = "POCO";
+	DynamicAny a1(aStruct);
+	assert (a1["First Name"] == "Junior");
+	assert (a1["Last Name"] == "POCO");
+	a1["First Name"] = "Senior";
+	assert (a1["First Name"] == "Senior");
+	testGetIdxMustThrow(a1, 0);
+}
+
+
+void DynamicAnyTest::testArrayToString()
+{
+	std::string s1("string");
+	Poco::Int8 s2(23);
+	std::vector<DynamicAny> s16;
+	s16.push_back(s1);
+	s16.push_back(s2);
+	DynamicAny a1(s16);
+	std::string res = a1.convert<std::string>();
+	std::string expected("[ 'string', 23 ]");
+	assert (res == expected);
+}
+
+
+void DynamicAnyTest::testStructToString()
+{
+	DynamicStruct aStruct;
+	aStruct["First Name"] = "Junior";
+	aStruct["Last Name"] = "POCO";
+	aStruct["Age"] = 1;
+	DynamicAny a1(aStruct);
+	std::string res = a1.convert<std::string>();
+	std::string expected = "{ 'Age' : 1, 'First Name' : 'Junior', 'Last Name' : 'POCO' }";
+;
+	assert (res == expected);
+}
+
+
+void DynamicAnyTest::testArrayOfStructsToString()
+{
+	std::vector<DynamicAny> s16;
+	DynamicStruct aStruct;
+	aStruct["First Name"] = "Junior";
+	aStruct["Last Name"] = "POCO";
+	aStruct["Age"] = 1;
+	s16.push_back(aStruct);
+	aStruct["First Name"] = "Senior";
+	aStruct["Last Name"] = "POCO";
+	aStruct["Age"] = 100;
+	s16.push_back(aStruct);
+	std::vector<DynamicAny> s16Cpy = s16;
+	// recursive arrays!
+	s16Cpy.push_back(s16);
+	s16.push_back(s16Cpy);
+	DynamicAny a1(s16);
+	std::string res = a1.convert<std::string>();
+	std::string expected = "[ "
+						"{ 'Age' : 1, 'First Name' : 'Junior', 'Last Name' : 'POCO' }, "
+						"{ 'Age' : 100, 'First Name' : 'Senior', 'Last Name' : 'POCO' }, "
+							"[ "
+							"{ 'Age' : 1, 'First Name' : 'Junior', 'Last Name' : 'POCO' }, "
+							"{ 'Age' : 100, 'First Name' : 'Senior', 'Last Name' : 'POCO' }, "
+								"[ "
+								"{ 'Age' : 1, 'First Name' : 'Junior', 'Last Name' : 'POCO' }, "
+								"{ 'Age' : 100, 'First Name' : 'Senior', 'Last Name' : 'POCO' } "
+								"] ] ]";
+	
+	assert (res == expected);
+}
+
+
+void DynamicAnyTest::testStructWithArraysToString()
+{
+	std::string s1("string");
+	Poco::Int8 s2(23);
+	std::vector<DynamicAny> s16;
+	s16.push_back(s1);
+	s16.push_back(s2);
+	DynamicAny a1(s16);
+	DynamicStruct addr;
+	addr["Number"] = 4;
+	addr["Street"] = "Unknown";
+	addr["Country"] = "Carinthia";
+	DynamicStruct aStruct;
+	aStruct["First Name"] = "Junior";
+	aStruct["Last Name"] = a1;
+	aStruct["Age"] = 1;
+	aStruct["Address"] = addr;
+	DynamicAny a2(aStruct);
+	std::string res = a2.convert<std::string>();
+	std::string expected = "{ 'Address' : { 'Country' : 'Carinthia', 'Number' : 4, 'Street' : 'Unknown' }, "
+								"'Age' : 1, 'First Name' : 'Junior', 'Last Name' : [ 'string', 23 ] }";
+
+	assert (res == expected);
+}
+
+
+void DynamicAnyTest::testJSONDeserializeString()
+{
+	DynamicAny a("test");
+	std::string tst = DynamicAny::toString(a);
+	DynamicAny b = DynamicAny::parse(tst);
+	assert (b.convert<std::string>() == "test");
+
+	DynamicAny c('c');
+	std::string tst2 = DynamicAny::toString(c);
+	DynamicAny b2 = DynamicAny::parse(tst2);
+	char cc = b2.convert<char>();
+	assert (cc == 'c');
+}
+
+
+void DynamicAnyTest::testJSONDeserializePrimitives()
+{
+	Poco::Int8 i8(-12);
+	Poco::UInt16 u16(2345);
+	Poco::Int32 i32(-24343);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	float f = 3.1415f;
+	double d = 3.1415;
+
+	std::string s8 = DynamicAny::toString(i8);
+	std::string s16 = DynamicAny::toString(u16);
+	std::string s32 = DynamicAny::toString(i32);
+	std::string s64 = DynamicAny::toString(u64);
+	std::string sb = DynamicAny::toString(b);
+	std::string sf = DynamicAny::toString(f);
+	std::string sd = DynamicAny::toString(d);
+	DynamicAny a8 = DynamicAny::parse(s8);
+	DynamicAny a16 = DynamicAny::parse(s16);
+	DynamicAny a32 = DynamicAny::parse(s32);
+	DynamicAny a64 = DynamicAny::parse(s64);
+	DynamicAny ab = DynamicAny::parse(sb);
+	DynamicAny af = DynamicAny::parse(sf);
+	DynamicAny ad = DynamicAny::parse(sd);
+	assert (a8 == i8);
+	assert (a16 == u16);
+	assert (a32 == i32);
+	assert (a64 == u64);
+	assert (ab == b);
+	assert (af == f);
+	assert (ad == d);
+}
+
+
+void DynamicAnyTest::testJSONDeserializeArray()
+{
+	Poco::Int8 i8(-12);
+	Poco::UInt16 u16(2345);
+	Poco::Int32 i32(-24343);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	float f = 3.1415f;
+	double d = 3.1415;
+	std::string s("test string");
+	char c('x');
+	std::vector<DynamicAny> aVec;
+	aVec.push_back(i8);
+	aVec.push_back(u16);
+	aVec.push_back(i32);
+	aVec.push_back(u64);
+	aVec.push_back(b);
+	aVec.push_back(f);
+	aVec.push_back(d);
+	aVec.push_back(s);
+	aVec.push_back(c);
+
+	std::string sVec = DynamicAny::toString(aVec);
+	DynamicAny a = DynamicAny::parse(sVec);
+	assert (a[0] == i8);
+	assert (a[1] == u16);
+	assert (a[2] == i32);
+	assert (a[3] == u64);
+	assert (a[4] == b);
+	assert (a[5] == f);
+	assert (a[6] == d);
+	assert (a[7] == s);
+	assert (a[8] == c);
+}
+
+
+void DynamicAnyTest::testJSONDeserializeComplex()
+{
+	Poco::Int8 i8(-12);
+	Poco::UInt16 u16(2345);
+	Poco::Int32 i32(-24343);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	float f = 3.1415f;
+	double d = 3.1415;
+	std::string s("test string");
+	char c('x');
+	DynamicStruct aStr;
+	aStr["i8"] = i8;
+	aStr["u16"] = u16;
+	aStr["i32"] = i32;
+	aStr["u64"] = u64;
+	aStr["b"] = b;
+	aStr["f"] = f;
+	aStr["d"] = d;
+	aStr["s"] = s;
+	aStr["c"] = c;
+	std::vector<DynamicAny> aVec;
+	aVec.push_back(i8);
+	aVec.push_back(u16);
+	aVec.push_back(i32);
+	aVec.push_back(u64);
+	aVec.push_back(b);
+	aVec.push_back(f);
+	aVec.push_back(d);
+	aVec.push_back(s);
+	aVec.push_back(c);
+	aVec.push_back(aStr);
+	aStr["vec"] = aVec;
+
+	std::string sStr = DynamicAny::toString(aStr);
+	DynamicAny a = DynamicAny::parse(sStr);
+	assert (a.isStruct());
+	assert (aStr["i8"] == i8);
+	assert (aStr["u16"] == u16);
+	assert (aStr["i32"] == i32);
+	assert (aStr["u64"] == u64);
+	assert (aStr["b"] == b);
+	assert (aStr["f"] == f);
+	assert (aStr["d"] == d);
+	assert (aStr["s"] == s);
+	assert (aStr["c"] == c);
+	DynamicAny vecRet = a["vec"];
+	assert (vecRet.isArray());
+	assert (vecRet[0] == i8);
+	assert (vecRet[1] == u16);
+	assert (vecRet[2] == i32);
+	assert (vecRet[3] == u64);
+	assert (vecRet[4] == b);
+	assert (vecRet[5] == f);
+	assert (vecRet[6] == d);
+	assert (vecRet[7] == s);
+	assert (vecRet[8] == c);
+	DynamicAny strRet = vecRet[9];
+	assert (strRet.isStruct());
+}
+
+
+void DynamicAnyTest::testJSONDeserializeStruct()
+{
+	Poco::Int8 i8(-12);
+	Poco::UInt16 u16(2345);
+	Poco::Int32 i32(-24343);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	float f = 3.1415f;
+	double d = 3.1415;
+	std::string s("test string");
+	char c('x');
+	DynamicStruct aStr;
+	aStr["i8"] = i8;
+	aStr["u16"] = u16;
+	aStr["i32"] = i32;
+	aStr["u64"] = u64;
+	aStr["b"] = b;
+	aStr["f"] = f;
+	aStr["d"] = d;
+	aStr["s"] = s;
+	aStr["c"] = c;
+
+	std::string sStr = DynamicAny::toString(aStr);
+	DynamicAny a = DynamicAny::parse(sStr);
+	assert (aStr["i8"] == i8);
+	assert (aStr["u16"] == u16);
+	assert (aStr["i32"] == i32);
+	assert (aStr["u64"] == u64);
+	assert (aStr["b"] == b);
+	assert (aStr["f"] == f);
+	assert (aStr["d"] == d);
+	assert (aStr["s"] == s);
+	assert (aStr["c"] == c);
+}
+
+
+void DynamicAnyTest::testDate()
+{
+	Poco::DateTime dtNow(2007, 3, 13, 8, 12, 15);
+	
+	Poco::Timestamp tsNow = dtNow.timestamp();
+	Poco::LocalDateTime ldtNow(dtNow.timestamp());
+	DynamicAny dt(dtNow);
+	DynamicAny ts(tsNow);
+	DynamicAny ldt(ldtNow);
+	DynamicAny dtStr(dt.convert<std::string>());
+	DynamicAny tsStr(ts.convert<std::string>());
+	DynamicAny ldtStr(ldt.convert<std::string>());
+	DateTime dtRes = dtStr.convert<DateTime>();
+	LocalDateTime ldtRes = ldtStr.convert<LocalDateTime>();
+	Timestamp tsRes = tsStr.convert<Timestamp>();
+	assert (dtNow == dtRes);
+	assert (ldtNow == ldtRes);
+	assert (tsNow == tsRes);
+}
+
+void DynamicAnyTest::testGetIdxMustThrow(DynamicAny& a1, std::vector<DynamicAny>::size_type n)
+{
+	try
+	{
+		DynamicAny& val1 = a1[n];
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+
+	try
+	{
+		const DynamicAny& c1 = a1;
+		const DynamicAny& cval1 = c1[n];
+		fail("bad const cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+}
+
+
 void DynamicAnyTest::setUp()
 {
 }
@@ -1254,6 +1783,21 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsInt);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsFloat);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testCtor);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testIsStruct);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testIsArray);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testArrayIdxOperator);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testDynamicStructBasics);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testDynamicStruct);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testArrayToString);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testStructToString);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testArrayOfStructsToString);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testStructWithArraysToString);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testJSONDeserializeString);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testJSONDeserializePrimitives);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testJSONDeserializeArray);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testJSONDeserializeStruct);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testJSONDeserializeComplex);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testDate);
 
 	return pSuite;
 }

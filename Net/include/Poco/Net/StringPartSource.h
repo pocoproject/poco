@@ -1,7 +1,7 @@
 //
 // StringPartSource.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/StringPartSource.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/StringPartSource.h#3 $
 //
 // Library: Net
 // Package: Messages
@@ -78,6 +78,9 @@ public:
 private:
 	std::istringstream _istr;
 	std::string        _filename;
+	
+	StringPartSource(const StringPartSource&);
+	StringPartSource& operator = (const StringPartSource&);
 };
 
 

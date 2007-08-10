@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.cpp
 //
-// $Id: //poco/Main/Foundation/src/UUIDGenerator.cpp#18 $
+// $Id: //poco/Main/Foundation/src/UUIDGenerator.cpp#19 $
 //
 // Library: Foundation
 // Package: UUID
@@ -202,6 +202,7 @@ void UUIDGenerator::getNode()
 					std::memcpy(_node, pAdapter->Address, pAdapter->AddressLength);
 					found = true;
 				}
+				pAdapter = pAdapter->Next;
 			}
 		}
 		else throw SystemException("cannot get network adapter list");

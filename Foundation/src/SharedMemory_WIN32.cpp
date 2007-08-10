@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory_WIN32.cpp#6 $
+// $Id: //poco/Main/Foundation/src/SharedMemory_WIN32.cpp#7 $
 //
 // Library: Foundation
 // Package: Processes
@@ -46,7 +46,7 @@
 namespace Poco {
 
 
-SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void*):
+SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void*, bool):
 	_name(name),
 	_memHandle(INVALID_HANDLE_VALUE),
 	_fileHandle(INVALID_HANDLE_VALUE),

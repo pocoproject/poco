@@ -1,7 +1,7 @@
 //
 // MemoryPool.cpp
 //
-// $Id: //poco/Main/Foundation/src/MemoryPool.cpp#6 $
+// $Id: //poco/Main/Foundation/src/MemoryPool.cpp#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -47,6 +47,7 @@ MemoryPool::MemoryPool(std::size_t blockSize, int preAlloc, int maxAlloc):
 	_allocated(preAlloc)
 {
 	poco_assert (maxAlloc == 0 || maxAlloc >= preAlloc);
+	poco_assert (preAlloc >= 0 && maxAlloc >= 0);
 
 	int r = BLOCK_RESERVE;
 	if (preAlloc > r)

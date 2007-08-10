@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#7 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -99,6 +99,10 @@ protected:
 	
 	std::string getHostInfo() const;
 		/// Returns the target host and port number for proxy requests.
+
+private:
+	HTTPSClientSession(const HTTPSClientSession&);
+	HTTPSClientSession& operator = (const HTTPSClientSession&);
 };
 
 

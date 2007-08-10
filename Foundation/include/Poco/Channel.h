@@ -1,7 +1,7 @@
 //
 // Channel.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Channel.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Channel.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -87,6 +87,10 @@ public:
 		
 protected:
 	virtual ~Channel();
+	
+private:
+	Channel(const Channel&);
+	Channel& operator = (const Channel&);
 };
 
 

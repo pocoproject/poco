@@ -1,7 +1,7 @@
 //
 // BufferedStreamBuf.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BufferedStreamBuf.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/BufferedStreamBuf.h#5 $
 //
 // Library: Foundation
 // Package: Streams
@@ -170,6 +170,9 @@ private:
 	std::streamsize _bufsize;
 	char_type*      _pBuffer;
 	openmode        _mode;
+
+	BasicBufferedStreamBuf(const BasicBufferedStreamBuf&);
+	BasicBufferedStreamBuf& operator = (const BasicBufferedStreamBuf&);
 };
 
 

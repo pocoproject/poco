@@ -1,7 +1,7 @@
 //
 // HTTPServerRequestImpl.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerRequestImpl.cpp#2 $
+// $Id: //poco/Main/Net/src/HTTPServerRequestImpl.cpp#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -54,9 +54,7 @@ namespace Net {
 HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPServerSession& session, HTTPServerParams* pParams):
 	_response(response),
 	_pStream(0),
-	_pParams(pParams),
-	_clientAddress(session.clientAddress()),
-	_serverAddress(session.serverAddress())
+	_pParams(pParams)
 {
 	poco_check_ptr (_pParams);
 	
@@ -64,6 +62,10 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPS
 
 	HTTPHeaderInputStream hs(session);
 	read(hs);
+	
+	// Now that we know socket is still connected, obtain addresses
+	_clientAddress = session.clientAddress();
+	_serverAddress = session.serverAddress();
 	
 	if (getChunkedTransferEncoding())
 		_pStream = new HTTPChunkedInputStream(session);

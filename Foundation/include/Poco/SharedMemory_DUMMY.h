@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedMemory_DUMMY.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedMemory_DUMMY.h#5 $
 //
 // Library: Foundation
 // Package: Processes
@@ -53,7 +53,7 @@ class Foundation_API SharedMemoryImpl: public RefCountedObject
 	/// that do not have shared memory support.
 {
 public:
-	SharedMemoryImpl(const std::string& id, std::size_t size, SharedMemory::AccessMode mode, const void* addr);
+	SharedMemoryImpl(const std::string& id, std::size_t size, SharedMemory::AccessMode mode, const void* addr, bool server);
 		/// Creates or connects to a shared memory object with the given name.
 		///
 		/// For maximum portability, name should be a valid Unix filename and not

@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedMemory_WIN32.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedMemory_WIN32.h#5 $
 //
 // Library: Foundation
 // Package: Processes
@@ -52,7 +52,7 @@ class Foundation_API SharedMemoryImpl: public RefCountedObject
 	/// Shared memory implementation for Windows platforms.
 {
 public:
-	SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void* addrHint);
+	SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void* addrHint, bool server);
 		/// Creates or connects to a shared memory object with the given name.
 		///
 		/// For maximum portability, name should be a valid Unix filename and not

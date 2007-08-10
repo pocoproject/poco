@@ -1,11 +1,11 @@
 //
-// SharedMemory.cpp
+// DynamicStruct.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory.cpp#7 $
+// $Id: //poco/Main/Foundation/src/DynamicStruct.cpp#4 $
 //
 // Library: Foundation
-// Package: Processes
-// Module:  SharedMemory
+// Package: Core
+// Module:  DynamicStruct
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,83 +34,48 @@
 //
 
 
-#if POCO_OS == POCO_OS_SOLARIS
-#undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 500
-#endif
-
-
-#include "Poco/SharedMemory.h"
+#include "Poco/DynamicStruct.h"
 #include "Poco/Exception.h"
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#include "SharedMemory_WIN32.cpp"
-#elif defined(POCO_OS_FAMILY_UNIX)
-#include "SharedMemory_POSIX.cpp"
-#else
-#include "SharedMemory_DUMMY.cpp"
-#endif
 
 
 namespace Poco {
 
 
-SharedMemory::SharedMemory():
-	_pImpl(0)
+DynamicStruct::DynamicStruct():
+	_data()
 {
 }
 
 
-SharedMemory::SharedMemory(const std::string& name, std::size_t size, AccessMode mode, const void* addrHint, bool server):
-	_pImpl(new SharedMemoryImpl(name, size, mode, addrHint, server))
+DynamicStruct::DynamicStruct(const Data& d):
+	_data(d)
 {
 }
 
 
-SharedMemory::SharedMemory(const Poco::File& file, AccessMode mode, const void* addrHint):
-	_pImpl(new SharedMemoryImpl(file, mode, addrHint))
+DynamicStruct::~DynamicStruct()
 {
 }
 
 
-SharedMemory::SharedMemory(const SharedMemory& other):
-	_pImpl(other._pImpl)
+const DynamicAny& DynamicStruct::operator[](const std::string& name) const
 {
-	if (_pImpl)
-		_pImpl->duplicate();
+	ConstIterator it = find(name);
+	if (it == end())
+		throw NotFoundException(name);
+	return it->second;
 }
 
 
-SharedMemory::~SharedMemory()
+std::set<std::string> DynamicStruct::members() const
 {
-	if (_pImpl)
-		_pImpl->release();
+	std::set<std::string> keys;
+	ConstIterator it = begin();
+	ConstIterator itEnd = end();
+	for (; it != itEnd; ++it)
+		keys.insert(it->first);
+	return keys;
 }
 
 
-SharedMemory& SharedMemory::operator = (const SharedMemory& other)
-{
-	SharedMemory tmp(other);
-	swap(tmp);
-	return *this;
-}
-
-
-char* SharedMemory::begin() const
-{
-	if (_pImpl)
-		return _pImpl->begin();
-	else
-		return 0;
-}
-
-
-char* SharedMemory::end() const
-{
-	if (_pImpl)
-		return _pImpl->end();
-	else
-		return 0;
-}
-
-
-} // namespace Poco
+} // namespace Poco::Poco

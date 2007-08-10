@@ -1,7 +1,7 @@
 //
 // Glob.cpp
 //
-// $Id: //poco/Main/Foundation/src/Glob.cpp#6 $
+// $Id: //poco/Main/Foundation/src/Glob.cpp#7 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -219,7 +219,7 @@ void Glob::collect(const Path& pathPattern, const Path& base, const Path& curren
 				else
 				{
 					p.setFileName(name);
-					if (File(p).isDirectory())
+					if (isDirectory(p, (options & GLOB_FOLLOW_SYMLINKS) != 0))
 					{
 						p.makeDirectory();
 						files.insert(p.toString());
@@ -236,6 +236,29 @@ void Glob::collect(const Path& pathPattern, const Path& base, const Path& curren
 	catch (Exception&)
 	{
 	}
+}
+
+
+bool Glob::isDirectory(const Path& path, bool followSymlink)
+{
+	File f(path);
+	if (f.isDirectory())
+	{
+		return true;
+	}
+	else if (followSymlink && f.isLink())
+	{
+		try
+		{
+			// Test if link resolves to a directory.
+			DirectoryIterator it(f);
+			return true;
+		}
+		catch (Exception&)
+		{
+		}
+	}
+	return false;
 }
 
 

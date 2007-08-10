@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#9 $
+// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#10 $
 //
 // Library: Foundation
 // Package: Core
@@ -64,7 +64,7 @@ class Foundation_API DynamicAny
 	/// String truncation is allowed -- it is possible to convert between string and character when string length is 
 	/// greater than 1. An empty string gets converted to the char '\0', a non-empty string is truncated to the first character. 
 	///
-	/// Bolean conversion are performed as follows:
+	/// Boolean conversion is performed as follows:
 	///
 	/// A string value "false" (not case sensitive) or "0" can be converted to a boolean value false, any other string 
 	/// not being false by the above criteria evaluates to true (e.g: "hi" -> true).
@@ -180,7 +180,7 @@ public:
 	}
 	
 	template <typename T> 
-	bool operator == (const T& other)
+	bool operator == (const T& other) const
 		/// Equality operator
 	{
 		T value;
@@ -188,7 +188,7 @@ public:
 		return value == other;
 	}
 
-	bool operator == (const char* other)
+	bool operator == (const char* other) const
 		/// Equality operator
 	{
 		std::string value;
@@ -197,7 +197,7 @@ public:
 	}
 
 	template <typename T> 
-	bool operator != (const T& other)
+	bool operator != (const T& other) const
 		/// Inequality operator
 	{
 		T value;
@@ -205,7 +205,7 @@ public:
 		return value != other;
 	}
 
-	bool operator != (const char* other)
+	bool operator != (const char* other) const
 		/// Inequality operator
 	{
 		std::string value;
@@ -213,12 +213,61 @@ public:
 		return value != other;
 	}
 
-    const std::type_info& type() const;
+	bool isArray() const;
+		/// Returns true if DynamicAny represents a vector
+
+	bool isStruct() const;
+		/// Returns true if DynamicAny represents a struct
+
+	DynamicAny& operator[](std::vector<DynamicAny>::size_type n);
+		/// Index operator, only use on DynamicAnys where isArray
+		/// returns true! In all other cases a BadCastException is thrown!
+
+	const DynamicAny& operator[](std::vector<DynamicAny>::size_type n) const;
+		/// const Index operator, only use on DynamicAnys where isArray
+		/// returns true! In all other cases a BadCastException is thrown!
+
+	DynamicAny& operator[](const std::string& name);
+		/// Index operator by name, only use on DynamicAnys where isStruct
+		/// returns true! In all other cases a BadCastException is thrown!
+
+	const DynamicAny& operator[](const std::string& name) const;
+		/// Index operator by name, only use on DynamicAnys where isStruct
+		/// returns true! In all other cases a BadCastException is thrown!
+
+	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
+
+	static DynamicAny parse(const std::string& val);
+		/// Parses the string which must be in JSON format
+
+	static std::string toString(const DynamicAny& any);
+		/// Converts the DynamicAny to a string in JSON format. Note that toString will return
+		/// a different result than any.convert<std::string>()!
 	
+private:
+	static DynamicAny parse(const std::string& val, std::string::size_type& offset);
+		/// Parses the string which must be in JSON format
+
+	static DynamicAny parseObject(const std::string& val, std::string::size_type& pos);
+	static DynamicAny parseArray(const std::string& val, std::string::size_type& pos);
+	static std::string parseString(const std::string& val, std::string::size_type& pos);
+	static void skipWhiteSpace(const std::string& val, std::string::size_type& pos);
 private:
 	DynamicAnyHolder* _pHolder;
 };
+
+
+inline bool DynamicAny::isArray() const
+{
+	return _pHolder->isArray();
+}
+
+
+inline bool DynamicAny::isStruct() const
+{
+	return _pHolder->isStruct();
+}
 
 
 } // namespace Poco

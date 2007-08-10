@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.cpp
 //
-// $Id: //poco/Main/Foundation/src/DynamicAnyHolder.cpp#2 $
+// $Id: //poco/Main/Foundation/src/DynamicAnyHolder.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -35,6 +35,7 @@
 
 
 #include "Poco/DynamicAnyHolder.h"
+#include "Poco/DynamicAny.h"
 
 
 namespace Poco {
@@ -49,5 +50,19 @@ DynamicAnyHolder::~DynamicAnyHolder()
 {
 }
 
+
+void appendJSONString(std::string& val, const DynamicAny& any)
+{
+	bool isJsonString = (any.type() == typeid(std::string) || any.type() == typeid(char) || any.type() == typeid(Poco::DateTime) || any.type() == typeid(Poco::LocalDateTime));
+	if (isJsonString)
+	{
+		val.append(1, '\'');
+	}
+	val.append(any.convert<std::string>());
+	if (isJsonString)
+	{
+		val.append(1, '\'');
+	}
+}
 
 } // namespace Poco

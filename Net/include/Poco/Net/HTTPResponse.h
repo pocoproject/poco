@@ -1,7 +1,7 @@
 //
 // HTTPResponse.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPResponse.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPResponse.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -244,6 +244,9 @@ private:
 	
 	HTTPStatus  _status;
 	std::string _reason;
+	
+	HTTPResponse(const HTTPResponse&);
+	HTTPResponse& operator = (const HTTPResponse&);
 };
 
 

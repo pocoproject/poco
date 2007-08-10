@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#18 $
+// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#19 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -184,7 +184,8 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		reconnect();
 	if (!keepAlive)
 		request.setKeepAlive(false);
-	request.setHost(_host, _port);
+	if (!request.has(HTTPRequest::HOST))
+		request.setHost(_host, _port);
 	if (!_proxyHost.empty())
 		request.setURI(getHostInfo() + request.getURI());
 	_reconnect = keepAlive;

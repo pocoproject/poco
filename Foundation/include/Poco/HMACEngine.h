@@ -1,7 +1,7 @@
 //
 // HMACEngine.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HMACEngine.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/HMACEngine.h#4 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -153,6 +153,8 @@ protected:
 
 private:
 	HMACEngine();
+	HMACEngine(const HMACEngine&);
+	HMACEngine& operator = (const HMACEngine&);
 
 	Engine _engine;
 	char*  _ipad;

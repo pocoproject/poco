@@ -266,6 +266,9 @@
 					RelativePath=".\src\DynamicAnyHolder.cpp">
 				</File>
 				<File
+					RelativePath=".\src\DynamicStruct.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Environment.cpp">
 				</File>
 				<File
@@ -583,6 +586,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\DynamicFactory.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\DynamicStruct.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Environment.h">

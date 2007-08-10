@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#21 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#23 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -240,10 +240,6 @@ void SecureSocketImpl::connectNB(const SocketAddress& address)
 	}
 	else
 	{
-		int tmpSocket=0;
-		BIO_get_fd(_pBIO,&tmpSocket);
-		poco_assert (-1 != tmpSocket);
-		setSockfd(tmpSocket);
 		establishTunnel();
 		connectSSL(address);
 		poco_check_ptr (_pSSL);
@@ -317,6 +313,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	poco_check_ptr (_pSSL);	
 
 	int rc;
+	bool renegotiating = false;
 	do
 	{
 		rc = SSL_read(_pSSL, buffer, length);
@@ -331,6 +328,8 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 			case SSL_ERROR_NONE:
 			case SSL_ERROR_WANT_WRITE: //renegotiation
 			case SSL_ERROR_WANT_READ: //renegotiation
+				renegotiating = true;
+				break;
 			default:
 				;
 			}
@@ -339,7 +338,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	while (rc < 0 && _socket.lastError() == POCO_EINTR);
 	if (rc < 0) 
 	{
-		if (_socket.lastError() == POCO_EAGAIN || _socket.lastError() == POCO_ETIMEDOUT)
+		if (renegotiating || _socket.lastError() == POCO_EAGAIN || _socket.lastError() == POCO_ETIMEDOUT)
 			throw TimeoutException();
 		else
 			SocketImpl::error("failed to read bytes");

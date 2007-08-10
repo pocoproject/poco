@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedMemory_POSIX.h#5 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedMemory_POSIX.h#6 $
 //
 // Library: Foundation
 // Package: Processes
@@ -52,7 +52,7 @@ class Foundation_API SharedMemoryImpl: public RefCountedObject
 	/// Shared memory implementation for POSIX platforms.
 {
 public:
-	SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void* addrHint);
+	SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void* addrHint, bool server);
 		/// Creates or connects to a shared memory object with the given name.
 		///
 		/// For maximum portability, name should be a valid Unix filename and not
@@ -62,6 +62,9 @@ public:
 		/// start address of the shared memory area. Whether the hint
 		/// is actually honored is, however, up to the system. Windows platform
 		/// will generally ignore the hint.
+		///
+		/// If server is set to false, the shared memory region will be unlinked
+		/// by calling shm_unlink when the SharedMemory object is destroyed.
 
 	SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessMode mode, const void* addrHint);
 		/// Maps the entire contents of file into a shared memory segment.
@@ -101,6 +104,7 @@ private:
 	SharedMemory::AccessMode _access;
 	std::string _name;
 	bool        _fileMapped;
+	bool        _server;
 };
 
 

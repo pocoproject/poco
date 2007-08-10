@@ -1,7 +1,7 @@
 //
 // HTTPRequest.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPRequest.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPRequest.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -152,6 +152,9 @@ private:
 	
 	std::string _method;
 	std::string _uri;
+	
+	HTTPRequest(const HTTPRequest&);
+	HTTPRequest& operator = (const HTTPRequest&);
 };
 
 

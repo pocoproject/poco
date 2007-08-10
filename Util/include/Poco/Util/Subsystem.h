@@ -1,7 +1,7 @@
 //
 // Subsystem.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/Subsystem.h#3 $
+// $Id: //poco/Main/Util/include/Poco/Util/Subsystem.h#4 $
 //
 // Library: Util
 // Package: Application
@@ -107,6 +107,10 @@ protected:
 		/// Destroys the Subsystem.
 		
 	friend class Application;
+	
+private:
+	Subsystem(const Subsystem&);
+	Subsystem& operator = (const Subsystem&);
 };
 
 

@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedMemory_POSIX.cpp#9 $
+// $Id: //poco/Main/Foundation/src/SharedMemory_POSIX.cpp#10 $
 //
 // Library: Foundation
 // Package: Processes
@@ -47,13 +47,14 @@
 namespace Poco {
 
 
-SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void* addrHint):
+SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, SharedMemory::AccessMode mode, const void* addrHint, bool server):
 	_size(size),
 	_fd(-1),
 	_address(0),
 	_access(mode),
 	_name("/"),
-	_fileMapped(false)
+	_fileMapped(false),
+	_server(server)
 {
 #if POCO_OS == POCO_OS_HPUX
 	_name.append("tmp/");
@@ -90,7 +91,8 @@ SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessM
 	_address(0),
 	_access(mode),
 	_name(file.path()),
-	_fileMapped(true)
+	_fileMapped(true),
+	_server(false)
 {
 	if (!file.exists() || !file.isFile())
 		throw FileNotFoundException(file.path());
@@ -144,7 +146,7 @@ void SharedMemoryImpl::close()
 		::close(_fd);
 		_fd = -1;
 	}
-	if (!_fileMapped)
+	if (!_fileMapped && _server)
 	{
 		::shm_unlink(_name.c_str());
 	}

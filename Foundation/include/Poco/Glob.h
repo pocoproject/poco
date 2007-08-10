@@ -1,7 +1,7 @@
 //
 // Glob.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Glob.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/Glob.h#4 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -73,9 +73,10 @@ public:
 	enum Options
 		/// Flags that modify the matching behavior.
 	{
-		GLOB_DEFAULT     = 0x00, /// default behavior
-		GLOB_DOT_SPECIAL = 0x01, /// '*' and '?' do not match '.' at beginning of subject
-		GLOB_DIRS_ONLY   = 0x80  /// only glob for directories (for internal use only)
+		GLOB_DEFAULT         = 0x00, /// default behavior
+		GLOB_DOT_SPECIAL     = 0x01, /// '*' and '?' do not match '.' at beginning of subject
+		GLOB_FOLLOW_SYMLINKS = 0x02, /// follow symbolic links
+		GLOB_DIRS_ONLY       = 0x80  /// only glob for directories (for internal use only)
 	};
 	
 	Glob(const std::string& pattern, int options = 0);
@@ -141,7 +142,8 @@ protected:
 	bool matchAfterAsterisk(std::string::const_iterator itp, const std::string::const_iterator& endp, std::string::const_iterator its, const std::string::const_iterator& ends);
 	bool matchSet(std::string::const_iterator& itp, const std::string::const_iterator& endp, char c);
 	static void collect(const Path& pathPattern, const Path& base, const Path& current, const std::string& pattern, std::set<std::string>& files, int options);
-
+	static bool isDirectory(const Path& path, bool followSymlink);
+	
 private:
 	std::string _pattern;
 	int         _options;

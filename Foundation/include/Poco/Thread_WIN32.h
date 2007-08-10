@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Thread_WIN32.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread_WIN32.h#5 $
 //
 // Library: Foundation
 // Package: Threading
@@ -101,7 +101,7 @@ inline int ThreadImpl::getPriorityImpl() const
 
 inline void ThreadImpl::sleepImpl(long milliseconds)
 {
-	Sleep(milliseconds);
+	Sleep(DWORD(milliseconds));
 }
 
 

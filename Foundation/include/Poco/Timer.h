@@ -1,7 +1,7 @@
 //
 // Timer.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Timer.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Timer.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -138,6 +138,9 @@ private:
 	Event         _done;
 	AbstractTimerCallback* _pCallback;
 	mutable FastMutex      _mutex;
+	
+	Timer(const Timer&);
+	Timer& operator = (const Timer&);
 };
 
 

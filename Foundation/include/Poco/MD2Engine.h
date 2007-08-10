@@ -1,7 +1,7 @@
 //
 // MD2Engine.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/MD2Engine.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/MD2Engine.h#3 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -100,6 +100,9 @@ private:
 
 	Context _context;
 	DigestEngine::Digest _digest;
+
+	MD2Engine(const MD2Engine&);
+	MD2Engine& operator = (const MD2Engine&);
 };
 
 

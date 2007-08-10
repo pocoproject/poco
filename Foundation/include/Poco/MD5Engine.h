@@ -1,7 +1,7 @@
 //
 // MD5Engine.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/MD5Engine.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/MD5Engine.h#3 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -105,6 +105,9 @@ private:
 
 	Context _context;
 	DigestEngine::Digest _digest;
+
+	MD5Engine(const MD5Engine&);
+	MD5Engine& operator = (const MD5Engine&);
 };
 
 

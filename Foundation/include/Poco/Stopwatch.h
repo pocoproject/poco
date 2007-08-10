@@ -49,7 +49,7 @@ namespace Poco {
 
 class Foundation_API Stopwatch
 	/// A simple facility to measure time intervals
-	/// with (theoretical) microsecond resolution.
+	/// with microsecond resolution.
 {
 public:
 	Stopwatch();

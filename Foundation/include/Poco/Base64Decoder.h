@@ -1,7 +1,7 @@
 //
 // Base64Decoder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Base64Decoder.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Base64Decoder.h#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -67,6 +67,10 @@ private:
 	
 	static unsigned char IN_ENCODING[256];
 	static bool          IN_ENCODING_INIT;
+	
+private:
+	Base64DecoderBuf(const Base64DecoderBuf&);
+	Base64DecoderBuf& operator = (const Base64DecoderBuf&);
 };
 
 
@@ -83,6 +87,10 @@ public:
 
 protected:
 	Base64DecoderBuf _buf;
+	
+private:
+	Base64DecoderIOS(const Base64DecoderIOS&);
+	Base64DecoderIOS& operator = (const Base64DecoderIOS&);
 };
 
 
@@ -93,6 +101,10 @@ class Foundation_API Base64Decoder: public Base64DecoderIOS, public std::istream
 public:
 	Base64Decoder(std::istream& istr);
 	~Base64Decoder();
+
+private:
+	Base64Decoder(const Base64Decoder&);
+	Base64Decoder& operator = (const Base64Decoder&);
 };
 
 

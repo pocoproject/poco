@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/Main/Net/src/NetworkInterface.cpp#20 $
+// $Id: //poco/Main/Net/src/NetworkInterface.cpp#21 $
 //
 // Library: Net
 // Package: Sockets
@@ -394,7 +394,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #endif
 
 	// Add IPv4 loopback interface (not returned by GetAdaptersInfo)
-	result.push_back(NetworkInterface("Loopback", IPAddress("127.0.0.1"), -1));
+	result.push_back(NetworkInterface("Loopback", IPAddress("127.0.0.1"), IPAddress("255.0.0.0"), IPAddress(), -1));
 	// On Windows 2000 we use GetAdaptersInfo.
 	PIP_ADAPTER_INFO pAdapterInfo;
 	PIP_ADAPTER_INFO pInfo = 0;
@@ -420,10 +420,13 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 			while (pInfo) 
 			{
 				IPAddress address(std::string(pInfo->IpAddressList.IpAddress.String));
-				IPAddress subnetMask(std::string(pInfo->IpAddressList.IpMask.String));
-				IPAddress broadcastAddress(address);
-				broadcastAddress.mask(subnetMask, IPAddress("255.255.255.255"));
-				result.push_back(NetworkInterface(std::string(pInfo->AdapterName), address, subnetMask, broadcastAddress));
+				if (!address.isWildcard()) // only return interfaces that have an address assigned.
+				{
+					IPAddress subnetMask(std::string(pInfo->IpAddressList.IpMask.String));
+					IPAddress broadcastAddress(address);
+					broadcastAddress.mask(subnetMask, IPAddress("255.255.255.255"));
+					result.push_back(NetworkInterface(std::string(pInfo->AdapterName), address, subnetMask, broadcastAddress));
+				}
 				pInfo = pInfo->Next;
 			}
 		}

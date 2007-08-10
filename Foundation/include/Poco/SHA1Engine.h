@@ -1,7 +1,7 @@
 //
 // SHA1Engine.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SHA1Engine.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/SHA1Engine.h#3 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -91,6 +91,9 @@ private:
 
 	Context _context;
 	DigestEngine::Digest _digest;
+
+	SHA1Engine(const SHA1Engine&);
+	SHA1Engine& operator = (const SHA1Engine&);
 };
 
 

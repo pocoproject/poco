@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPClientSession.h#5 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPClientSession.h#6 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -214,6 +214,9 @@ private:
 	bool            _expectResponseBody;
 	std::ostream*   _pRequestStream;
 	std::istream*   _pResponseStream;
+	
+	HTTPClientSession(const HTTPClientSession&);
+	HTTPClientSession& operator = (const HTTPClientSession&);
 };
 
 

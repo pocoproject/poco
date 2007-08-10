@@ -1,7 +1,7 @@
 //
 // SharedMemory.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedMemory.h#5 $
+// $Id: //poco/Main/Foundation/include/Poco/SharedMemory.h#6 $
 //
 // Library: Foundation
 // Package: Processes
@@ -71,7 +71,7 @@ public:
 		/// Default constructor creates an unmapped SharedMemory object. 
 		/// No clients can connect to an unmapped SharedMemory object.
 
-	SharedMemory(const std::string& name, std::size_t size, AccessMode mode, const void* addrHint = 0);
+	SharedMemory(const std::string& name, std::size_t size, AccessMode mode, const void* addrHint = 0, bool server = true);
 		/// Creates or connects to a shared memory object with the given name.
 		///
 		/// For maximum portability, name should be a valid Unix filename and not
@@ -81,6 +81,10 @@ public:
 		/// start address of the shared memory area. Whether the hint
 		/// is actually honored is, however, up to the system. Windows platform
 		/// will generally ignore the hint.
+		///
+		/// If server is set to false, the shared memory region will be unlinked
+		/// by calling shm_unlink (on POSIX platforms) when the SharedMemory object is destroyed.
+		/// The server parameter is ignored on Windows platforms.
 
 	SharedMemory(const File& file, AccessMode mode, const void* addrHint = 0);
 		/// Maps the entire contents of file into a shared memory segment.

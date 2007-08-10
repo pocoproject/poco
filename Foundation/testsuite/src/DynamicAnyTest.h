@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.h#4 $
+// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.h#5 $
 //
 // Tests for Any types
 //
@@ -66,12 +66,40 @@ public:
 	void testLimitsInt();
 	void testLimitsFloat();
 	void testCtor();
+	void testIsStruct();
+	void testIsArray();
+	void testArrayIdxOperator();
+	void testDynamicStructBasics();
+	void testDynamicStruct();
+	void testArrayToString();
+	void testStructToString();
+	void testArrayOfStructsToString();
+	void testStructWithArraysToString();
+	void testJSONDeserializeString();
+	void testJSONDeserializePrimitives();
+	void testJSONDeserializeArray();
+	void testJSONDeserializeStruct();
+	void testJSONDeserializeComplex();
+	void testDate();
 
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();
 
 private:
+	void testGetIdxMustThrow(Poco::DynamicAny& a1, std::vector<Poco::DynamicAny>::size_type n);
+	template<typename T>
+	void testGetIdx(Poco::DynamicAny& a1, std::vector<Poco::DynamicAny>::size_type n, const T& expectedResult)
+	{
+		Poco::DynamicAny& val1 = a1[n];
+		assert (val1 == expectedResult);
+
+		const Poco::DynamicAny& c1 = a1;
+		const Poco::DynamicAny& cval1 = a1[n];
+		assert (cval1 == expectedResult);
+	}
+
+
 	template<typename TL, typename TS>
 	void testLimitsSigned()
 	{

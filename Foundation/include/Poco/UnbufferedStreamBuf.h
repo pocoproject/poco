@@ -1,7 +1,7 @@
 //
 // UnufferedStreamBuf.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UnbufferedStreamBuf.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/UnbufferedStreamBuf.h#4 $
 //
 // Library: Foundation
 // Package: Streams
@@ -169,13 +169,16 @@ private:
 		return char_traits::eof();
 	}
 	
-	virtual int_type writeToDevice(char_type c)
+	virtual int_type writeToDevice(char_type)
 	{
 		return char_traits::eof();
 	}
 
 	int_type _pb;
 	bool     _ispb;
+	
+	BasicUnbufferedStreamBuf(const BasicUnbufferedStreamBuf&);
+	BasicUnbufferedStreamBuf& operator = (const BasicUnbufferedStreamBuf&);
 };
 
 
