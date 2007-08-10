@@ -1,5 +1,0 @@
-<rootPanel name="Test Document">
-	<children>
-		<imageButton id="i1" text="Micro Image" img="http://appinf.com/poco/images/PocoLayers.jpg" width="30" height="30"/>
-	</children>
-</rootPanel>

@@ -1,9 +1,0 @@
-<rootPanel name="Test Document">
-	<children>
-		<stack id="s2">
-			<label>Test Label</label>
-			<label>2nd label</label>
-			<label>3rd label</label>
-		</stack>
-	</children>
-</rootPanel>
