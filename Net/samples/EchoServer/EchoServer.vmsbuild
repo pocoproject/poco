@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.3/Net/samples/EchoServer/EchoServer.vmsbuild#1 $
+#
+EXE=EchoServer
+EchoServer
+<SourceFilesHere>

@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.3/Net/samples/httpget/httpget.vmsbuild#1 $
+#
+EXE=httpget
+httpget
+<SourceFilesHere>

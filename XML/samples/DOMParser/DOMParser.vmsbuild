@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.3/XML/samples/DOMParser/DOMParser.vmsbuild#1 $
+#
+EXE=DOMParser
+DOMParser
+<SourceFilesHere>

@@ -1,0 +1,16 @@
+#
+# TestSuite.vmsbuild
+#
+# $Id: //poco/1.3/Data/testsuite/TestSuite.vmsbuild#1 $
+#
+EXE=TestRunner
+DataTestSuite
+Driver
+DataTest
+SessionPoolTest
+Binder 
+Extractor 
+Preparation 
+SessionImpl 
+SessionInstantiator 
+StatementImpl

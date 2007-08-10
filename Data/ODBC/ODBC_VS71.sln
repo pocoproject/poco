@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_VS71.vcproj", "{1B30A91B-375F-11DB-837B-00123FC423B5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1B29820D-375F-11DB-837B-00123FC423B5} = {1B29820D-375F-11DB-837B-00123FC423B5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ODBC", "ODBC_VS71.vcproj", "{1B29820D-375F-11DB-837B-00123FC423B5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		release_shared = release_shared
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{1B30A91B-375F-11DB-837B-00123FC423B5}.debug_shared.ActiveCfg = debug_shared|Win32
+		{1B30A91B-375F-11DB-837B-00123FC423B5}.debug_shared.Build.0 = debug_shared|Win32
+		{1B30A91B-375F-11DB-837B-00123FC423B5}.release_shared.ActiveCfg = release_shared|Win32
+		{1B30A91B-375F-11DB-837B-00123FC423B5}.release_shared.Build.0 = release_shared|Win32
+		{1B29820D-375F-11DB-837B-00123FC423B5}.debug_shared.ActiveCfg = debug_shared|Win32
+		{1B29820D-375F-11DB-837B-00123FC423B5}.debug_shared.Build.0 = debug_shared|Win32
+		{1B29820D-375F-11DB-837B-00123FC423B5}.release_shared.ActiveCfg = release_shared|Win32
+		{1B29820D-375F-11DB-837B-00123FC423B5}.release_shared.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

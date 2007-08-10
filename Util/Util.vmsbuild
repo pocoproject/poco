@@ -1,0 +1,26 @@
+#
+# Util.vmsbuild
+#
+# $Id: //poco/1.3/Util/Util.vmsbuild#1 $
+#
+LIB=PocoUtil
+AbstractConfiguration 
+Application 
+ConfigurationMapper
+ConfigurationView 
+HelpFormatter 
+IniFileConfiguration 
+LayeredConfiguration
+LoggingConfigurator 
+LoggingSubsystem 
+MapConfiguration
+Option 
+OptionException 
+OptionProcessor 
+OptionSet
+PropertyFileConfiguration 
+Subsystem 
+SystemConfiguration
+XMLConfiguration 
+FilesystemConfiguration 
+ServerApplication

@@ -1,0 +1,72 @@
+#
+# $Id: //poco/1.3/build/config/MinGW#1 $
+#
+# MinGW32
+#
+# Make settings for MinGW on WinXP
+#
+
+#
+# General Settings
+#
+LINKMODE = SHARED
+POCO_TARGET_OSNAME = MinGW
+POCO_TARGET_OSARCH = ia32
+
+#
+# Define Tools
+#
+CC      = gcc
+CXX     = g++
+LINK    = $(CXX)
+LIB     = ar -cr
+RANLIB  = ranlib
+SHLIB   = $(CXX) -shared -mno-cygwin -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(basename $(notdir $@))).a
+SHLIBLN = $(POCO_BASE)/build/script/shlibln
+STRIP   = strip
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+SHELL   = sh
+RM      = rm -rf
+CP      = cp
+MKDIR   = mkdir -p
+
+#
+# Extension for Shared Libraries
+#
+SHAREDLIBEXT     = .dll
+SHAREDLIBLINKEXT = .dll
+
+#
+# Compiler and Linker Flags
+#
+CFLAGS          = 
+CFLAGS32        =
+CFLAGS64        =
+CXXFLAGS        = 
+CXXFLAGS32      =
+CXXFLAGS64      =
+LINKFLAGS       =
+LINKFLAGS32     =
+LINKFLAGS64     =
+STATICOPT_CC    =
+STATICOPT_CXX   =
+STATICOPT_LINK  = -static
+SHAREDOPT_CC    = 
+SHAREDOPT_CXX   = 
+SHAREDOPT_LINK  = 
+DEBUGOPT_CC     = -g -D_DEBUG
+DEBUGOPT_CXX    = -g -D_DEBUG
+DEBUGOPT_LINK   = -g
+RELEASEOPT_CC   = -O2 -DNDEBUG
+RELEASEOPT_CXX  = -O2 -DNDEBUG
+RELEASEOPT_LINK = -O2
+
+#
+# System Specific Flags
+#
+SYSFLAGS = -mno-cygwin -D_WIN32 -DPOCO_NO_FPENVIRONMENT
+
+#
+# System Specific Libraries
+#
+SYSLIBS  = -liphlpapi

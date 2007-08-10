@@ -1,0 +1,25 @@
+#
+# TestSuite.vmsbuild
+#
+# $Id: //poco/1.3/Util/testsuite/TestSuite.vmsbuild#1 $
+#
+EXE=TestRunner
+AbstractConfigurationTest 
+ConfigurationTestSuite
+ConfigurationMapperTest 
+ConfigurationViewTest 
+Driver
+HelpFormatterTest 
+IniFileConfigurationTest 
+LayeredConfigurationTest
+LoggingConfiguratorTest 
+MapConfigurationTest
+OptionProcessorTest 
+OptionSetTest 
+OptionTest
+OptionsTestSuite 
+PropertyFileConfigurationTest
+SystemConfigurationTest 
+UtilTestSuite 
+XMLConfigurationTest
+FilesystemConfigurationTest

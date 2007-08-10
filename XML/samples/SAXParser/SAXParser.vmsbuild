@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.3/XML/samples/SAXParser/SAXParser.vmsbuild#1 $
+#
+EXE=SAXParser
+SAXParser
+<SourceFilesHere>

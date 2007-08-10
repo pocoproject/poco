@@ -1,0 +1,9 @@
+#
+# TestSuite.vmsbuild
+#
+# $Id: //poco/1.3/Net/testsuite/TestSuite.vmsbuild#1 $
+#
+EXE=TestRunner
+NetTestSuite
+Driver
+<SourceFilesHere>

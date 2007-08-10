@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.3/XML/samples/PrettyPrint/PrettyPrint.vmsbuild#1 $
+#
+EXE=PrettyPrint
+PrettyPrint
+<SourceFilesHere>

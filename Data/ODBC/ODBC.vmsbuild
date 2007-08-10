@@ -1,0 +1,17 @@
+#
+# ODBC.vmsbuild
+#
+# $Id: //poco/1.3/Data/ODBC/ODBC.vmsbuild#1 $
+#
+LIB=PocoODBC
+Binder
+Column
+DataTypes
+Extractor
+Handle
+ODBCException
+ODBCStatementImpl
+Preparation
+SessionImpl
+SessionInstantiator
+Utility

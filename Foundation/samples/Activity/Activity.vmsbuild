@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.3/Foundation/samples/Activity/Activity.vmsbuild#1 $
+#
+EXE=Activity
+Activity
+<SourceFilesHere>

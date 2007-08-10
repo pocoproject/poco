@@ -1,0 +1,26 @@
+#
+# TestSuite.vmsbuild
+#
+# $Id: //poco/1.3/XML/testsuite/TestSuite.vmsbuild#1 $
+#
+EXE=TestRunner
+AttributesImplTest
+ChildNodesTest
+DOMTestSuite
+DocumentTest
+DocumentTypeTest
+Driver
+ElementTest
+EventTest
+NamePoolTest
+NameTest
+NamespaceSupportTest
+NodeIteratorTest
+NodeTest
+ParserWriterTest
+SAXParserTest
+SAXTestSuite
+TextTest
+TreeWalkerTest
+XMLTestSuite
+XMLWriterTest

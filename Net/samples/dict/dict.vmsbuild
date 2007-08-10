@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.3/Net/samples/dict/dict.vmsbuild#1 $
+#
+EXE=dict
+dict
+<SourceFilesHere>

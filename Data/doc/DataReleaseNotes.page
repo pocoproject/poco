@@ -1,0 +1,26 @@
+POCO Data Release Notes
+Data
+
+!!!Release 1.3
+
+Release 1.3 of the POCO C++ Libraries is the first official release containing the Data library.
+The Data library has been available in a development state for the 1.2 release. For the 1.3
+release, a few things have been changed in an incompatible way that requires changes
+to existing code.
+
+!!Summary of Changes
+
+  - Class Poco::Data::RecordSet has been added providing generic access
+    to arbitrary tables.
+  - SessionInstantiator has been renamed Poco::Data::Connector.
+  - Poco::Data::BLOBInputStream and Poco::Data::BLOBOutputStream allow convenient access to Poco::Data::BLOB data.
+  - Poco::Data::Session and Poco::Data::Statement can be used in simpler ways.
+  - The DataConnectors project directory has been merged into the Data project directory.
+
+
+!!Incompatible Changes and Possible Transition Issues
+
+SessionInstantiator has been renamed Poco::Data::Connector, and the
+member functions addToFactory() and removeFromFactory() are now named
+registerConnector() and unregisterConnector(), respectively.
+This requires a change in all applications already using POCO Data.

@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/1.3/XML/samples/DOMWriter/DOMWriter.vmsbuild#1 $
+#
+EXE=DOMWriter
+DOMWriter
+<SourceFilesHere>

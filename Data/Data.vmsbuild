@@ -1,0 +1,27 @@
+#
+# Data.vmsbuild
+#
+# $Id: //poco/1.3/Data/Data.vmsbuild#1 $
+#
+LIB=PocoData
+AbstractBinder
+AbstractBinding
+AbstractExtraction
+AbstractExtractor
+AbstractPreparation 
+AbstractPrepare
+BLOB
+BLOBStream
+DataException
+Limit
+PooledSessionHolder
+PooledSessionImpl
+Range
+Session
+SessionFactory
+SessionImpl
+SessionInstantiator
+SessionPool
+Statement
+StatementCreator
+StatementImpl
