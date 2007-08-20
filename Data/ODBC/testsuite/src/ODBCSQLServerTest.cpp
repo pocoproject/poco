@@ -51,21 +51,22 @@
 
 
 using namespace Poco::Data;
-using Poco::Data::ODBC::Utility;
-using Poco::Data::ODBC::ConnectionException;
-using Poco::Data::ODBC::StatementException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using ODBC::Utility;
+using ODBC::ConnectionException;
+using ODBC::StatementException;
+using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
 using Poco::DateTime;
 using Poco::NotFoundException;
 
 
-const bool ODBCSQLServerTest::bindValues[8] = {true, true, true, false, false, true, false, false};
-Poco::SharedPtr<Poco::Data::Session> ODBCSQLServerTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> ODBCSQLServerTest::_pExecutor = 0;
-std::string ODBCSQLServerTest::_dbConnString;
-Poco::Data::ODBC::Utility::DriverMap ODBCSQLServerTest::_drivers;
+ODBCSQLServerTest::SessionPtr ODBCSQLServerTest::_pSession = 0;
+ODBCSQLServerTest::ExecPtr    ODBCSQLServerTest::_pExecutor = 0;
+std::string                   ODBCSQLServerTest::_dbConnString;
+ODBCSQLServerTest::Drivers    ODBCSQLServerTest::_drivers;
+const bool                    ODBCSQLServerTest::bindValues[8] = 
+	{true, true, true, false, false, true, false, false};
 
 
 ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name): 

@@ -294,6 +294,31 @@ public:
 		throw Poco::BadCastException();
 	}
 
+	void convert(Poco::Timestamp& val) const
+	{
+		throw Poco::BadCastException();
+	}
+
+	void convert(Poco::DateTime& val) const
+	{
+		throw Poco::BadCastException();
+	}
+
+	void convert(Poco::LocalDateTime& val) const
+	{
+		throw Poco::BadCastException();
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	virtual bool isStruct() const
+	{
+		return false;
+	}
+
 	void convert(std::string& val) const
 	{
 		val.assign(_val.begin(), _val.end());

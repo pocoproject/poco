@@ -75,6 +75,9 @@ public:
 		/// Returns true if session is connected to the database, 
 		/// false otherwise.
 
+	bool isTransaction();
+		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+
 	void setConnected(const std::string& name, bool value);
 	bool getConnected(const std::string& name);
 		/// Sets/gets the connected property.

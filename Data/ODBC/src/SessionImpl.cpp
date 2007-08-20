@@ -203,8 +203,12 @@ void SessionImpl::close()
 {
 	if (!isConnected()) return;
 
-	commit();
-	checkError(SQLDisconnect(_db));
+	try
+	{
+		commit();
+	}catch (ConnectionException&) { }
+
+	SQLDisconnect(_db);
 }
 
 
@@ -262,42 +266,6 @@ int SessionImpl::maxStatementLength()
 	}
 
 	return info;
-}
-
-
-void SessionImpl::setEnforceCapability(const std::string&, bool val)
-{
-	_enforceCapability = val;
-}
-
-
-bool SessionImpl::getEnforceCapability(const std::string&)
-{
-	return _enforceCapability;
-}
-
-
-void SessionImpl::autoBind(const std::string&, bool val)
-{
-	_autoBind = val;
-}
-
-
-bool SessionImpl::isAutoBind(const std::string& name)
-{
-	return _autoBind;
-}
-
-
-void SessionImpl::autoExtract(const std::string&, bool val)
-{
-	_autoExtract = val;
-}
-
-
-bool SessionImpl::isAutoExtract(const std::string& name)
-{
-	return _autoExtract;
 }
 
 

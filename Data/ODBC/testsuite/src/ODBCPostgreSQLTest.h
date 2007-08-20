@@ -132,6 +132,10 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
+	typedef Poco::SharedPtr<Poco::Data::Session> SessionPtr;
+	typedef Poco::SharedPtr<SQLExecutor>         ExecPtr;
+
 	void dropObject(const std::string& type, const std::string& name);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
@@ -154,11 +158,12 @@ private:
 		/// modify the function and recompile.
 		/// Alternative is direct database configuration for PL/pgSQL usage.
 
-	static Poco::Data::ODBC::Utility::DriverMap _drivers;
+	static Drivers     _drivers;
 	static std::string _dbConnString;
-	static Poco::SharedPtr<Poco::Data::Session> _pSession;
-	static Poco::SharedPtr<SQLExecutor> _pExecutor;
-	static const bool bindValues[8];
+	static SessionPtr  _pSession;
+	static ExecPtr     _pExecutor;
+	static const bool  bindValues[8];
+
 	static const std::string libDir;
 		/// Varible determining the location of the library directory
 		/// on the database installation system.

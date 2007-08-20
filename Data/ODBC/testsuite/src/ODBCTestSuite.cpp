@@ -56,16 +56,19 @@ CppUnit::Test* ODBCTestSuite::suite()
 	// nativeError=160 
 	// System error 127 is "The specified procedure could not be found."
 	//
-	// 2) When Oracle test is loaded after DB2, the test application does not exit cleanly.
-	//    All tests pass, though.
+	// Workaround is to connect to DB2 after connecting to PostgreSQL.
 	//
-	// Workaround is to connect to DB2 after connecting to PostgreSQL and Oracle.
-	// The reason causing these errors is not known.
+	// 2) When Oracle driver is found, but no tests executed, the test application does not exit cleanly.
+	//
+	// Workaround is to run barebone ODBC test upon initialization of Oracle test.
+	// (see ODBCOracleTest::init())
+	//
+	// The reason causing the above errors is not known at this time.
 
-	addTest(pSuite, ODBCOracleTest::suite());
 	addTest(pSuite, ODBCPostgreSQLTest::suite());
 	addTest(pSuite, ODBCDB2Test::suite());
 	addTest(pSuite, ODBCMySQLTest::suite());
+	addTest(pSuite, ODBCOracleTest::suite());
 	addTest(pSuite, ODBCSQLiteTest::suite());
 	addTest(pSuite, ODBCSQLServerTest::suite());
 #if defined(POCO_OS_FAMILY_WINDOWS)

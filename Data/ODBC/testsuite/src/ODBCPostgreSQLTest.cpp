@@ -51,22 +51,25 @@
 
 
 using namespace Poco::Data;
-using Poco::Data::ODBC::Utility;
-using Poco::Data::ODBC::ODBCException;
-using Poco::Data::ODBC::ConnectionException;
-using Poco::Data::ODBC::StatementException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using ODBC::Utility;
+using ODBC::ODBCException;
+using ODBC::ConnectionException;
+using ODBC::StatementException;
+using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
 using Poco::DateTime;
 using Poco::NotFoundException;
 
 
-const bool ODBCPostgreSQLTest::bindValues[8] = {true, true, true, false, false, true, false, false};
-Poco::SharedPtr<Poco::Data::Session> ODBCPostgreSQLTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> ODBCPostgreSQLTest::_pExecutor = 0;
-std::string ODBCPostgreSQLTest::_dbConnString;
-Poco::Data::ODBC::Utility::DriverMap ODBCPostgreSQLTest::_drivers;
+ODBCPostgreSQLTest::SessionPtr  ODBCPostgreSQLTest::_pSession = 0;
+ODBCPostgreSQLTest::ExecPtr ODBCPostgreSQLTest::_pExecutor = 0;
+std::string                     ODBCPostgreSQLTest::_dbConnString;
+ODBCPostgreSQLTest::Drivers     ODBCPostgreSQLTest::_drivers;
+const bool                      ODBCPostgreSQLTest::bindValues[8] = 
+	{true, true, true, false, false, true, false, false};
+
+
 #ifdef POCO_OS_FAMILY_WINDOWS
 const std::string ODBCPostgreSQLTest::libDir = "C:\\\\Program Files\\\\PostgreSQL\\\\8.2\\\\lib\\\\";
 #else
@@ -1222,7 +1225,7 @@ bool ODBCPostgreSQLTest::init(const std::string& driver, const std::string& dsn)
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
 	if (init("PostgreSQL ANSI", "PocoDataPostgreSQLTest"))
-	//if (init("Mammoth ODBCng Beta", "Mammoth ODBCng beta"))
+	//if (init("Mammoth ODBCng Beta", "Mammoth ODBCng Beta"))
 	{
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCPostgreSQLTest");
 

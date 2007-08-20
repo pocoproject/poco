@@ -50,20 +50,21 @@
 
 
 using namespace Poco::Data;
-using Poco::Data::ODBC::Utility;
-using Poco::Data::ODBC::ConnectionException;
-using Poco::Data::ODBC::StatementException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using ODBC::Utility;
+using ODBC::ConnectionException;
+using ODBC::StatementException;
+using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-const bool ODBCMySQLTest::bindValues[8] = {true, true, true, false, false, true, false, false};
-Poco::SharedPtr<Poco::Data::Session> ODBCMySQLTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> ODBCMySQLTest::_pExecutor = 0;
-std::string ODBCMySQLTest::_dbConnString;
-Poco::Data::ODBC::Utility::DriverMap ODBCMySQLTest::_drivers;
+ODBCMySQLTest::SessionPtr  ODBCMySQLTest::_pSession = 0;
+ODBCMySQLTest::ExecPtr ODBCMySQLTest::_pExecutor = 0;
+std::string                ODBCMySQLTest::_dbConnString;
+ODBCMySQLTest::Drivers     ODBCMySQLTest::_drivers;
+const bool                 ODBCMySQLTest::bindValues[8] = 
+	{true, true, true, false, false, true, false, false};
 
 
 ODBCMySQLTest::ODBCMySQLTest(const std::string& name): 

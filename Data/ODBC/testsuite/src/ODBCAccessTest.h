@@ -72,7 +72,7 @@ private:
 
 	static Poco::Data::ODBC::Utility::DriverMap _drivers;
 	static std::string _dbConnString;
-	static Poco::SharedPtr<Poco::Data::Session> _pSession;
+	static Poco::Data::Session* _pSession;
 	bool _owner;
 };
 

@@ -91,6 +91,12 @@ bool SessionImpl::isConnected()
 }
 
 
+bool SessionImpl::isTransaction()
+{
+	return false;
+}
+
+
 bool SessionImpl::getConnected(const std::string& name)
 {
 	return _connected;

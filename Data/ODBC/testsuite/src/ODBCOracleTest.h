@@ -131,6 +131,12 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
+	typedef Poco::SharedPtr<Poco::Data::Session> SessionPtr;
+	typedef Poco::SharedPtr<SQLExecutor>         ExecPtr;
+
+	static void testBarebone();
+	
 	void dropObject(const std::string& type, const std::string& name);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
@@ -145,12 +151,18 @@ private:
 	static bool init(const std::string& driver, const std::string& dsn);
 	static bool canConnect(const std::string& driver, const std::string& dsn);
 
-	static Poco::Data::ODBC::Utility::DriverMap _drivers;
+	static Drivers     _drivers;
 	static std::string _dbConnString;
-	static Poco::SharedPtr<Poco::Data::Session> _pSession;
-	static Poco::SharedPtr<SQLExecutor> _pExecutor;
-	static const bool bindValues[8];
+	static SessionPtr  _pSession;
+	static ExecPtr     _pExecutor;
+	static const bool  bindValues[8];
 };
+
+
+inline void ODBCOracleTest::testBareboneODBC()
+{
+	return testBarebone();
+}
 
 
 #endif // ODBCOracleTest_INCLUDED

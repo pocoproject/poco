@@ -51,21 +51,22 @@
 
 
 using namespace Poco::Data;
-using Poco::Data::ODBC::Utility;
-using Poco::Data::ODBC::ConnectionException;
-using Poco::Data::ODBC::StatementException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using ODBC::Utility;
+using ODBC::ConnectionException;
+using ODBC::StatementException;
+using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
 using Poco::DateTime;
 using Poco::NotFoundException;
 
 
-const bool ODBCOracleTest::bindValues[8] = {true, true, true, false, false, true, false, false};
-Poco::SharedPtr<Poco::Data::Session> ODBCOracleTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> ODBCOracleTest::_pExecutor = 0;
-std::string ODBCOracleTest::_dbConnString;
-Poco::Data::ODBC::Utility::DriverMap ODBCOracleTest::_drivers;
+ODBCOracleTest::SessionPtr  ODBCOracleTest::_pSession = 0;
+ODBCOracleTest::ExecPtr ODBCOracleTest::_pExecutor = 0;
+std::string                 ODBCOracleTest::_dbConnString;
+ODBC::Utility::DriverMap    ODBCOracleTest::_drivers;
+const bool                  ODBCOracleTest::bindValues[8] = 
+	{true, true, true, false, false, true, false, false};
 
 
 ODBCOracleTest::ODBCOracleTest(const std::string& name): 
@@ -79,10 +80,8 @@ ODBCOracleTest::~ODBCOracleTest()
 }
 
 
-void ODBCOracleTest::testBareboneODBC()
+void ODBCOracleTest::testBarebone()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	std::string tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
@@ -1296,6 +1295,15 @@ bool ODBCOracleTest::init(const std::string& driver, const std::string& dsn)
 		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
 	
 	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
+
+	// Workaround:
+	//
+	// Barebone ODBC test is called initially for Oracle only.
+	// The test framework does not exit cleanly if
+	// Oracle tests are enabled (i.e. Oracle driver is found) 
+	// but no tests are executed.
+	// The exact reason for this behavior is unknown at this time.
+	testBarebone();
 
 	return true;
 }

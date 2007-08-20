@@ -50,20 +50,21 @@
 
 
 using namespace Poco::Data;
-using Poco::Data::ODBC::Utility;
-using Poco::Data::ODBC::ConnectionException;
-using Poco::Data::ODBC::StatementException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using ODBC::Utility;
+using ODBC::ConnectionException;
+using ODBC::StatementException;
+using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-const bool ODBCDB2Test::bindValues[8] = {true, true, true, false, false, true, false, false};
-Poco::SharedPtr<Poco::Data::Session> ODBCDB2Test::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> ODBCDB2Test::_pExecutor = 0;
-std::string ODBCDB2Test::_dbConnString;
-Poco::Data::ODBC::Utility::DriverMap ODBCDB2Test::_drivers;
+ODBCDB2Test::SessionPtr  ODBCDB2Test::_pSession = 0;
+ODBCDB2Test::ExecPtr ODBCDB2Test::_pExecutor = 0;
+std::string              ODBCDB2Test::_dbConnString;
+ODBCDB2Test::Drivers     ODBCDB2Test::_drivers;
+const bool               ODBCDB2Test::bindValues[8] = 
+	{true, true, true, false, false, true, false, false};
 
 
 ODBCDB2Test::ODBCDB2Test(const std::string& name): 

@@ -49,19 +49,20 @@
 
 
 using namespace Poco::Data;
-using Poco::Data::ODBC::Utility;
-using Poco::Data::ODBC::ConnectionException;
-using Poco::Data::ODBC::StatementException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using ODBC::Utility;
+using ODBC::ConnectionException;
+using ODBC::StatementException;
+using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::NotFoundException;
 
 
-const bool ODBCSQLiteTest::bindValues[8] = {true, true, true, false, false, true, false, false};
-Poco::SharedPtr<Poco::Data::Session> ODBCSQLiteTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> ODBCSQLiteTest::_pExecutor = 0;
-std::string ODBCSQLiteTest::_dbConnString;
-Poco::Data::ODBC::Utility::DriverMap ODBCSQLiteTest::_drivers;
+ODBCSQLiteTest::SessionPtr  ODBCSQLiteTest::_pSession = 0;
+ODBCSQLiteTest::ExecPtr ODBCSQLiteTest::_pExecutor = 0;
+std::string                 ODBCSQLiteTest::_dbConnString;
+ODBCSQLiteTest::Drivers     ODBCSQLiteTest::_drivers;
+const bool                  ODBCSQLiteTest::bindValues[8] = 
+	{true, true, true, false, false, true, false, false};
 
 
 ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name): 

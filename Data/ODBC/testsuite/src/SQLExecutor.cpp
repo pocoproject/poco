@@ -56,12 +56,12 @@
 
 
 using namespace Poco::Data;
-using Poco::Data::ODBC::Utility;
-using Poco::Data::ODBC::Preparation;
-using Poco::Data::ODBC::ConnectionException;
-using Poco::Data::ODBC::StatementException;
-using Poco::Data::ODBC::DataTruncatedException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using ODBC::Utility;
+using ODBC::Preparation;
+using ODBC::ConnectionException;
+using ODBC::StatementException;
+using ODBC::DataTruncatedException;
+using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
@@ -1831,6 +1831,12 @@ void SQLExecutor::dateTime()
 	try { *_pSession << "SELECT Born FROM Person", into(res), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (res == born);
+
+	Statement stmt = (*_pSession << "SELECT Born FROM Person", now);
+	RecordSet rset(stmt);
+
+	res = rset["Born"].convert<DateTime>();
 	assert (res == born);
 }
 

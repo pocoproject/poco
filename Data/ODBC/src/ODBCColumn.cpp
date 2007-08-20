@@ -104,6 +104,7 @@ void ODBCColumn::init()
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
+	case -9:// SQL Server NVARCHAR
 		setType(MetaColumn::FDT_STRING); break;
 	case SQL_TINYINT:
 		setType(MetaColumn::FDT_INT8); break;

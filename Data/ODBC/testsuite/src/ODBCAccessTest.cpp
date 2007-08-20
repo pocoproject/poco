@@ -49,28 +49,28 @@
 
 
 using namespace Poco::Data;
-using Poco::Data::ODBC::Utility;
-using Poco::Data::ODBC::ConnectionException;
-using Poco::Data::ODBC::StatementException;
-using Poco::Data::ODBC::StatementDiagnostics;
+using ODBC::Utility;
+using ODBC::ConnectionException;
+using ODBC::StatementException;
+using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::NotFoundException;
 
 
-Poco::SharedPtr<Poco::Data::Session> ODBCAccessTest::_pSession = 0;
-std::string ODBCAccessTest::_dbConnString;
-Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
+Session*                 ODBCAccessTest::_pSession = 0;
+std::string              ODBCAccessTest::_dbConnString;
+ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
 
 
 ODBCAccessTest::ODBCAccessTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
+	ODBC::Connector::registerConnector();
 }
 
 
 ODBCAccessTest::~ODBCAccessTest()
 {
-	ODBC::Connector::unregisterConnector();
 }
 
 

@@ -222,6 +222,42 @@ inline Poco::Any SessionImpl::dataTypeInfo(const std::string& rName)
 }
 
 
+inline void SessionImpl::setEnforceCapability(const std::string&, bool val)
+{
+	_enforceCapability = val;
+}
+
+
+inline bool SessionImpl::getEnforceCapability(const std::string&)
+{
+	return _enforceCapability;
+}
+
+
+inline void SessionImpl::autoBind(const std::string&, bool val)
+{
+	_autoBind = val;
+}
+
+
+inline bool SessionImpl::isAutoBind(const std::string& name)
+{
+	return _autoBind;
+}
+
+
+inline void SessionImpl::autoExtract(const std::string&, bool val)
+{
+	_autoExtract = val;
+}
+
+
+inline bool SessionImpl::isAutoExtract(const std::string& name)
+{
+	return _autoExtract;
+}
+
+
 } } } // namespace Poco::Data::ODBC
 
 
