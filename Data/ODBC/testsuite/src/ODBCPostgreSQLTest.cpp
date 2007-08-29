@@ -1224,8 +1224,11 @@ bool ODBCPostgreSQLTest::init(const std::string& driver, const std::string& dsn)
 
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
+#ifndef POCO_ODBC_USE_MAMMOTH_NG
 	if (init("PostgreSQL ANSI", "PocoDataPostgreSQLTest"))
-	//if (init("Mammoth ODBCng Beta", "Mammoth ODBCng Beta"))
+#else
+	if (init("Mammoth ODBCng Beta", "Mammoth ODBCng Beta"))
+#endif
 	{
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCPostgreSQLTest");
 

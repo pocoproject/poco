@@ -44,15 +44,21 @@
 #include "SQLExecutor.h"
 
 
+// uncomment to use Mammoth ODBCng driver
+//#define POCO_ODBC_USE_MAMMOTH_NG
+
+
 class ODBCPostgreSQLTest: public CppUnit::TestCase
 	/// PostgreSQL ODBC test class
 	/// Tested:
 	/// 
-	/// Driver		  |	DB                | OS                                        | Driver Manager     |Notes
-	/// --------------+-------------------+-------------------------------------------+--------------------+--------------------------
-	///	07.03.02.60	  | PostgreSQL 7.4.6  | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       | BLOB fails (missing 'lo')
-	/// 08.01.02.00   | PostgreSQL 8.1.5-1| MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       |
-	/// 1:08.01.0200-2| PostgreSQL 8.1.5-1| Ubuntu 7.04 (2.6.20-15-generic #2 SMP)    | unixODBC 2.2.11.-13|
+	/// Driver		   |	DB                | OS                                        | Driver Manager     |Notes
+	/// ---------------+----------------------+-------------------------------------------+--------------------+--------------------------
+	///	07.03.02.60	   | PostgreSQL 7.4.6     | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       | BLOB fails (missing 'lo')
+	/// 08.01.02.00    | PostgreSQL 8.1.5-1   | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       |
+	/// 1:08.01.0200-2 | PostgreSQL 8.1.5-1   | Ubuntu 7.04 (2.6.20-15-generic #2 SMP)    | unixODBC 2.2.11.-13|
+	/// Mammoth ODBCng |                      |                                           |                    | 
+	/// (0.99.00.122)  | PostgreSQL 8.1.5-1   | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       |
 	/// 
 {
 public:

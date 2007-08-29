@@ -57,6 +57,7 @@ CppUnit::Test* ODBCTestSuite::suite()
 	// System error 127 is "The specified procedure could not be found."
 	//
 	// Workaround is to connect to DB2 after connecting to PostgreSQL.
+	// This problem does not manifest with Mammoth ODBCng PostgreSQL driver.
 	//
 	// 2) When Oracle driver is found, but no tests executed, the test application does not exit cleanly.
 	//
