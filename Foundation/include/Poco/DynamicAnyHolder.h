@@ -116,7 +116,7 @@ public:
 protected:
 	template <typename F, typename T>
 	void convertToSmaller(const F& from, T& to) const
-		/// This function is meant to convert signed integral values from
+		/// This function is meant to convert signed numeric values from
 		/// larger to smaller type. It checks the upper and lower bound and
 		/// if from value is within limits of type T (i.e. check calls do not throw), 
 		/// it is converted.
@@ -126,7 +126,11 @@ protected:
 		poco_static_assert (std::numeric_limits<F>::is_signed);
 		poco_static_assert (std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit(from, to); 
+		if (std::numeric_limits<F>::is_integer)
+			checkUpperLimit(from, to); 
+		else
+			checkUpperLimitFloat(from, to); 
+
 		checkLowerLimit(from, to);
 		to = static_cast<T>(from);
 	}
@@ -153,7 +157,7 @@ protected:
 		/// This function is meant for converting signed integral data types to
 		/// unsigned data types. Negative values can not be converted and if one is 
 		/// encountered, RangeException is thrown. 
-		/// If uper limit is within the target data type limits, the converiosn is performed.
+		/// If uper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
 		poco_static_assert (std::numeric_limits<T>::is_specialized);
@@ -167,11 +171,30 @@ protected:
 	}
 
 	template <typename F, typename T>
+	void convertSignedFloatToUnsigned(const F& from, T& to) const
+		/// This function is meant for converting floating point data types to
+		/// unsigned integral data types. Negative values can not be converted and if one is 
+		/// encountered, RangeException is thrown. 
+		/// If uper limit is within the target data type limits, the conversion is performed.
+	{
+		poco_static_assert (std::numeric_limits<F>::is_specialized);
+		poco_static_assert (std::numeric_limits<T>::is_specialized);
+		poco_static_assert (!std::numeric_limits<F>::is_integer);
+		poco_static_assert (std::numeric_limits<T>::is_integer);
+		poco_static_assert (!std::numeric_limits<T>::is_signed);
+
+		if (from < 0)
+			throw RangeException("Value too small.");
+		checkUpperLimitFloat(from, to); 
+		to = static_cast<T>(from);
+	}
+
+	template <typename F, typename T>
 	void convertUnsignedToSigned(const F& from, T& to) const
 		/// This function is meant for converting unsigned integral data types to
 		/// unsigned data types. Negative values can not be converted and if one is 
 		/// encountered, RangeException is thrown. 
-		/// If uper limit is within the target data type limits, the converiosn is performed.
+		/// If upper limit is within the target data type limits, the converiosn is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
 		poco_static_assert (std::numeric_limits<T>::is_specialized);
@@ -186,7 +209,22 @@ private:
 	template <typename F, typename T>
 	void checkUpperLimit(const F& from, T& to) const
 	{
-		if (from > std::numeric_limits<T>::max()) 
+		if ((sizeof(T) < sizeof(F)) &&
+			(from > static_cast<F>(std::numeric_limits<T>::max())))
+		{
+			throw RangeException("Value too large.");
+		}
+		else
+		if (static_cast<T>(from) > std::numeric_limits<T>::max()) 
+		{
+			throw RangeException("Value too large.");
+		}
+	}
+
+	template <typename F, typename T>
+	void checkUpperLimitFloat(const F& from, T& to) const
+	{
+		if (from > std::numeric_limits<T>::max())
 			throw RangeException("Value too large.");
 	}
 
@@ -1505,22 +1543,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -1630,22 +1668,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
