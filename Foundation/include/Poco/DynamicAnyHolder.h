@@ -101,6 +101,10 @@ public:
 	virtual void convert(Timestamp& val) const = 0;
 	virtual bool isArray() const = 0;
 	virtual bool isStruct() const = 0;
+	virtual bool isInteger() const = 0;
+	virtual bool isSigned() const = 0;
+	virtual bool isNumeric() const = 0;
+	virtual bool isString() const = 0;
 
 #ifndef POCO_LONG_IS_64_BIT
 	void convert(long& val) const;
@@ -287,6 +291,26 @@ public:
 	const std::type_info& type() const
 	{
 		return typeid(T);
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<T>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<T>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<T>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return type() == typeid(std::string);
 	}
 
 	void convert(Int8&) const
@@ -503,6 +527,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return std::numeric_limits<Int8>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<Int8>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<Int8>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	Int8 _val;
 };
@@ -623,6 +667,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<Int16>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<Int16>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<Int16>::is_specialized;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}
@@ -751,6 +815,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return std::numeric_limits<Int32>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<Int32>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<Int32>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	Int32 _val;
 };
@@ -871,6 +955,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<Int64>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<Int64>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<Int64>::is_specialized;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}
@@ -999,6 +1103,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return std::numeric_limits<UInt8>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<UInt8>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<UInt8>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	UInt8 _val;
 };
@@ -1123,6 +1247,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return std::numeric_limits<UInt16>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<UInt16>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<UInt16>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	UInt16 _val;
 };
@@ -1243,6 +1387,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<UInt32>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<UInt32>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<UInt32>::is_specialized;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}
@@ -1377,6 +1541,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return std::numeric_limits<UInt64>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<UInt64>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<UInt64>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	UInt64 _val;
 };
@@ -1495,6 +1679,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<bool>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<bool>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<bool>::is_specialized;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}
@@ -1620,6 +1824,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<float>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<float>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<float>::is_specialized;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}
@@ -1755,6 +1979,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return std::numeric_limits<double>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<double>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<double>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	double _val;
 };
@@ -1873,6 +2117,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<char>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<char>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<char>::is_specialized;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}
@@ -2029,6 +2293,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return true;
+	}
+
 private:
 	std::string _val;
 };
@@ -2152,6 +2436,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<long>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<long>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<long>::is_specialized;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}
@@ -2280,6 +2584,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return std::numeric_limits<unsigned long>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<unsigned long>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<unsigned long>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	unsigned long _val;
 };
@@ -2369,7 +2693,7 @@ public:
 	{
 		// Serialize in JSON format: note: although this a vector<T>, the code only 
 		// supports vector<DynamicAny>. We can't make this a total specialization,
-		// because of an otherwise cyclic dependency between DynamicAny and DynamicAnyHolder
+		// because of the cyclic dependency between DynamicAny and DynamicAnyHolder
 
 		// JSON format definition: [ n times: elem ',' ], no ',' for last elem
 		val.append("[ ");
@@ -2420,6 +2744,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}
@@ -2556,6 +2900,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	DateTime _val;
 };
@@ -2678,6 +3042,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	LocalDateTime _val;
 };
@@ -2796,6 +3180,26 @@ public:
 	}
 
 	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
 	{
 		return false;
 	}

@@ -63,6 +63,7 @@ public:
 	void testULong();
 	void testString();
 	void testConversionOperator();
+	void testArithmeticOperators();
 	void testLimitsInt();
 	void testLimitsFloat();
 	void testCtor();

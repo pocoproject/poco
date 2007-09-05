@@ -71,6 +71,16 @@ class Foundation_API DynamicAny
 	/// Integer 0 values are false, everything else is true.
 	/// Floating point values equal to the minimal FP representation on a given platform are false, everything else is true.
 	///
+	/// Arithmetic operations with POD types as well as between DynamicAny's are supported, subject to following
+	/// limitations:
+	/// 
+	/// 	- for std::string and const char* values, only '+' and '+=' operations are supported
+	/// 
+	/// 	- for integral and floating point numeric values, following operations are supported:
+	///			'+', '+=', '-', '-=', '*', '*=' , '/' and '/=' 
+	/// 
+	///		- for all other types, InvalidArgumentException is thrown upon attempt of an arithmetic operation
+	/// 
 	/// A DynamicAny can be created from and converted to a value of any type for which a specialization of 
 	/// DynamicAnyHolderImpl is available. For supported types, see DynamicAnyHolder documentation.
 {
@@ -133,7 +143,7 @@ public:
 	}
 	
 	template <typename T>
-	operator T() const
+	operator T () const
 		/// Safe conversion operator for implicit type
 		/// conversions.
 		///
@@ -146,7 +156,7 @@ public:
 		_pHolder->convert(result);
 		return result;
 	}
-	
+
 	template <typename T>
 	const T& extract() const
 		/// Returns a const reference to the actual value.
@@ -162,14 +172,6 @@ public:
 			throw BadCastException();
 	}
 
-	DynamicAny& operator = (const DynamicAny& other)
-		/// Assignment operator
-	{
-		DynamicAny tmp(other);
-		swap(tmp);
-		return *this;
-	}
-
 	template <typename T> 
 	DynamicAny& operator = (const T& other)
 		/// Assignment operator
@@ -179,39 +181,114 @@ public:
 		return *this;
 	}
 	
+	DynamicAny& operator = (const DynamicAny& other);
+		/// Assignment operator  specialization for DynamicAny
+
+	template <typename T> 
+	DynamicAny operator + (const T& other) const
+		/// Addition operator
+	{
+		return convert<T>() + other;
+	}
+
+	DynamicAny operator + (const DynamicAny& other) const;
+		/// Addition operator specialization for DynamicAny
+
+	DynamicAny operator + (const char* other) const;
+		/// Addition operator specialization for const char*
+
+	template <typename T> 
+	DynamicAny& operator += (const T& other)
+		/// Addition asignment operator
+	{
+		return *this = convert<T>() + other;
+	}
+
+	DynamicAny& operator += (const DynamicAny& other);
+		/// Addition asignment operator specialization for DynamicAny
+
+	DynamicAny& operator += (const char* other);
+		/// Addition asignment operator specialization for const char*
+
+	template <typename T> 
+	DynamicAny operator - (const T& other) const
+		/// Subtraction operator
+	{
+		return convert<T>() - other;
+	}
+
+	DynamicAny operator - (const DynamicAny& other) const;
+		/// Subtraction operator specialization for DynamicAny
+
+	template <typename T> 
+	DynamicAny& operator -= (const T& other)
+		/// Subtraction asignment operator
+	{
+		return *this = convert<T>() - other;
+	}
+
+	DynamicAny& operator -= (const DynamicAny& other);
+		/// Subtraction asignment specialization operator for DynamicAny
+
+	template <typename T> 
+	DynamicAny operator * (const T& other) const
+		/// Multiplication operator
+	{
+		return convert<T>() * other;
+	}
+
+	DynamicAny operator * (const DynamicAny& other) const;
+		/// Multiplication operator specialization for DynamicAny
+
+	template <typename T> 
+	DynamicAny& operator *= (const T& other)
+		/// Multiplication asignment operator
+	{
+		return *this = convert<T>() * other;
+	}
+
+	DynamicAny& operator *= (const DynamicAny& other);
+		/// Multiplication asignment operator specialization for DynamicAny
+
+	template <typename T> 
+	DynamicAny operator / (const T& other) const
+		/// Division operator
+	{
+		return convert<T>() / other;
+	}
+
+	DynamicAny operator / (const DynamicAny& other) const;
+		/// Division operator specialization for DynamicAny
+
+	template <typename T> 
+	DynamicAny& operator /= (const T& other)
+		/// Division asignment operator
+	{
+		return *this = convert<T>() / other;
+	}
+
+	DynamicAny& operator /= (const DynamicAny& other);
+		/// Division asignment operator specialization for DynamicAny
+
 	template <typename T> 
 	bool operator == (const T& other) const
 		/// Equality operator
 	{
-		T value;
-		_pHolder->convert(value);
-		return value == other;
+		return convert<T>() == other;
 	}
 
-	bool operator == (const char* other) const
-		/// Equality operator
-	{
-		std::string value;
-		_pHolder->convert(value);
-		return value == other;
-	}
+	bool operator == (const char* other) const;
+		/// Equality operator specialization for const char*
 
 	template <typename T> 
 	bool operator != (const T& other) const
 		/// Inequality operator
 	{
-		T value;
-		_pHolder->convert(value);
-		return value != other;
+		return convert<T>() != other;
 	}
 
-	bool operator != (const char* other) const
-		/// Inequality operator
-	{
-		std::string value;
-		_pHolder->convert(value);
-		return value != other;
-	}
+	bool operator != (const char* other) const;
+		/// Inequality operator  specialization for const char*
 
 	bool isArray() const;
 		/// Returns true if DynamicAny represents a vector
@@ -219,24 +296,37 @@ public:
 	bool isStruct() const;
 		/// Returns true if DynamicAny represents a struct
 
-	DynamicAny& operator[](std::vector<DynamicAny>::size_type n);
+	DynamicAny& operator [] (std::vector<DynamicAny>::size_type n);
 		/// Index operator, only use on DynamicAnys where isArray
 		/// returns true! In all other cases a BadCastException is thrown!
 
-	const DynamicAny& operator[](std::vector<DynamicAny>::size_type n) const;
+	const DynamicAny& operator [] (std::vector<DynamicAny>::size_type n) const;
 		/// const Index operator, only use on DynamicAnys where isArray
 		/// returns true! In all other cases a BadCastException is thrown!
 
-	DynamicAny& operator[](const std::string& name);
+	DynamicAny& operator [] (const std::string& name);
 		/// Index operator by name, only use on DynamicAnys where isStruct
 		/// returns true! In all other cases a BadCastException is thrown!
 
-	const DynamicAny& operator[](const std::string& name) const;
+	const DynamicAny& operator [] (const std::string& name) const;
 		/// Index operator by name, only use on DynamicAnys where isStruct
 		/// returns true! In all other cases a BadCastException is thrown!
 
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
+
+	bool isInteger() const;
+		/// Returns true if stored value is integer.
+
+	bool isSigned() const;
+		/// Returns true if stored value is signed.
+
+	bool isNumeric() const;
+		/// Returns true if stored value is numeric.
+		/// Returns false for numeric strings (e.g. "123" is string, not number)
+
+	bool isString() const;
+		/// Returns true if stored value is std::string.
 
 	static DynamicAny parse(const std::string& val);
 		/// Parses the string which must be in JSON format
@@ -253,9 +343,69 @@ private:
 	static DynamicAny parseArray(const std::string& val, std::string::size_type& pos);
 	static std::string parseString(const std::string& val, std::string::size_type& pos);
 	static void skipWhiteSpace(const std::string& val, std::string::size_type& pos);
-private:
+
+	template <typename T>
+	T add(const DynamicAny& other) const
+	{
+		return convert<T>() + other.convert<T>();
+	}
+
+	template <typename T>
+	T subtract(const DynamicAny& other) const
+	{
+		return convert<T>() - other.convert<T>();
+	}
+	
+	template <typename T>
+	T multiply(const DynamicAny& other) const
+	{
+		return convert<T>() * other.convert<T>();
+	}
+
+	template <typename T>
+	T divide(const DynamicAny& other) const
+	{
+		return convert<T>() / other.convert<T>();
+	}
+
 	DynamicAnyHolder* _pHolder;
 };
+
+
+inline void DynamicAny::swap(DynamicAny& ptr)
+{
+	std::swap(_pHolder, ptr._pHolder);
+}
+
+
+inline const std::type_info& DynamicAny::type() const
+{
+	return _pHolder->type();
+}
+
+
+inline DynamicAny DynamicAny::operator + (const char* other) const
+{
+	return convert<std::string>() + other;
+}
+
+
+inline DynamicAny& DynamicAny::operator += (const char*other)
+{
+	return *this = convert<std::string>() + other;
+}
+
+
+inline bool DynamicAny::operator == (const char* other) const
+{
+	return convert<std::string>() == other;
+}
+
+
+inline bool DynamicAny::operator != (const char* other) const
+{
+	return convert<std::string>() != other;
+}
 
 
 inline bool DynamicAny::isArray() const
@@ -267,6 +417,30 @@ inline bool DynamicAny::isArray() const
 inline bool DynamicAny::isStruct() const
 {
 	return _pHolder->isStruct();
+}
+
+
+inline bool DynamicAny::isInteger() const
+{
+	return _pHolder->isInteger();
+}
+
+
+inline bool DynamicAny::isSigned() const
+{
+	return _pHolder->isSigned();
+}
+
+
+inline bool DynamicAny::isNumeric() const
+{
+	return _pHolder->isNumeric();
+}
+
+
+inline bool DynamicAny::isString() const
+{
+	return _pHolder->isString();
 }
 
 

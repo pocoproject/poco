@@ -357,6 +357,26 @@ public:
 		return true;
 	}
 
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 	DynamicAny& operator[](const std::string& name)
 	{
 		return _val.operator[](name);

@@ -120,6 +120,23 @@ void DynamicAnyTest::testInt8()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -191,6 +208,23 @@ void DynamicAnyTest::testInt16()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -262,6 +296,23 @@ void DynamicAnyTest::testInt32()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -333,6 +384,23 @@ void DynamicAnyTest::testInt64()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -404,6 +472,23 @@ void DynamicAnyTest::testUInt8()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -475,6 +560,23 @@ void DynamicAnyTest::testUInt16()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -546,6 +648,23 @@ void DynamicAnyTest::testUInt32()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -617,6 +736,23 @@ void DynamicAnyTest::testUInt64()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -830,6 +966,23 @@ void DynamicAnyTest::testFloat()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1.0f;
+	assert (a3 == 33.0f);
+	a3 = a1 - 1.0f;
+	assert (a3 == 31.0f);
+	a3 += 1.0f;
+	assert (a3 == 32.0f);
+	a3 -= 1.0f;
+	assert (a3 == 31.0f);
+	a3 = a1 / 2.0f;
+	assert (a3 == 16.0f);
+	a3 = a1 * 2.0f;
+	assert (a3 == 64.0f);
+	a3 /= 2.0f;
+	assert (a3 == 32.0f);
+	a3 *= 2.0f;
+	assert (a3 == 64.0f);
 }
 
 
@@ -901,6 +1054,24 @@ void DynamicAnyTest::testDouble()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	
+	DynamicAny a3 = a1 + 1.0;
+	assert (a3 == 33.0);
+	a3 = a1 - 1.0;
+	assert (a3 == 31.0);
+	a3 += 1.0;
+	assert (a3 == 32.0);
+	a3 -= 1.0;
+	assert (a3 == 31.0);
+	a3 = a1 / 2.0;
+	assert (a3 == 16.0);
+	a3 = a1 * 2.0;
+	assert (a3 == 64.0);
+	a3 /= 2.0;
+	assert (a3 == 32.0);
+	a3 *= 2.0;
+	assert (a3 == 64.0);
 }
 
 
@@ -967,6 +1138,17 @@ void DynamicAnyTest::testString()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a4(123);
+	std::string s("456");
+	DynamicAny a5 = a4 + s;
+	assert (a5 == "123456");
+	a4 += s;
+	assert (a4 == "123456");
+	DynamicAny a6 = a4 + "789";
+	assert (a6 == "123456789");
+	a4 += "789";
+	assert (a4 == "123456789");
 }
 
 
@@ -1038,6 +1220,23 @@ void DynamicAnyTest::testLong()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -1109,6 +1308,23 @@ void DynamicAnyTest::testULong()
 	catch (Poco::BadCastException&)
 	{
 	}
+
+	DynamicAny a3 = a1 + 1;
+	assert (a3 == 33);
+	a3 = a1 - 1;
+	assert (a3 == 31);
+	a3 += 1;
+	assert (a3 == 32);
+	a3 -= 1;
+	assert (a3 == 31);
+	a3 = a1 / 2;
+	assert (a3 == 16);
+	a3 = a1 * 2;
+	assert (a3 == 64);
+	a3 /= 2;
+	assert (a3 == 32);
+	a3 *= 2;
+	assert (a3 == 64);
 }
 
 
@@ -1119,7 +1335,7 @@ void DynamicAnyTest::testConversionOperator()
 	assert (i == 42);
 	
 	any = 123;
-	std::string s = any;//'s(any)' bombs on gcc 3.4.4
+	std::string s = any;
 	assert (s == "123");
 
 	any = 321;
@@ -1128,6 +1344,89 @@ void DynamicAnyTest::testConversionOperator()
 
 	any = "456";
 	assert (any == "456");
+
+	DynamicAny any2 = 52;
+	DynamicAny any3 = any + any2;
+}
+
+
+void DynamicAnyTest::testArithmeticOperators()
+{
+	DynamicAny any1 = 1;
+	DynamicAny any2 = 2;
+	DynamicAny any3 = any1 + any2;
+	assert (any3 == 3);
+
+	any1 = 3;
+	any2 = 5;
+	any3 = any2 - any1;
+	assert (any3 == 2);
+	any3 -= 1;
+	assert (any3 == 1);
+
+	any1 = 3;
+	any2 = 5;
+	any3 = any1 * any2;
+	assert (any3 == 15);
+	any3 *= 3;
+	assert (any3 == 45);
+
+	any1 = 3;
+	any2 = 9;
+	any3 = any2 / any1;
+	assert (any3 == 3);
+	any3 /= 3;
+	assert (any3 == 1);
+
+	any1 = 1.0f;
+	any2 = .5f;
+	any3 = .0f;
+	any3 = any1 + any2;
+	assert (any3 == 1.5f);
+	any3 += .5f;
+	assert (any3 == 2.0f);
+
+	any1 = 1.0;
+	any2 = .5;
+	any3 = 0.0;
+	any3 = any1 + any2;
+	assert (any3 == 1.5);
+	any3 += .5;
+	assert (any3 == 2.0);
+
+	any1 = 1;
+	any2 = "2";
+	any3 = any1 + any2;
+	assert (any3 == 3);
+	any2 = "4";
+	any3 += any2;
+	assert (any3 == 7);
+
+	any1 = "123";
+	any2 = "456";
+	any3 = any1 + any2;
+	assert (any3 == "123456");
+	any2 = "789";
+	any3 += any2;
+	assert (any3 == "123456789");
+
+	try	{ any3 = any1 - any2; fail ("must fail"); } 
+	catch (InvalidArgumentException&){}
+
+	try	{ any3 -= any2;	fail ("must fail");	} 
+	catch (InvalidArgumentException&){}
+
+	try	{ any3 = any1 * any2; fail ("must fail"); } 
+	catch (InvalidArgumentException&){}
+
+	try { any3 *= any2;	fail ("must fail");	} 
+	catch (InvalidArgumentException&){}
+
+	try { any3 = any1 / any2; fail ("must fail"); } 
+	catch (InvalidArgumentException&){}
+
+	try { any3 /= any2; fail ("must fail");	} 
+	catch (InvalidArgumentException&){}
 }
 
 
@@ -1779,6 +2078,7 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testULong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testConversionOperator);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testArithmeticOperators);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsInt);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsFloat);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testCtor);
