@@ -1345,8 +1345,9 @@ void DynamicAnyTest::testConversionOperator()
 	any = "456";
 	assert (any == "456");
 
-	DynamicAny any2 = 52;
-	DynamicAny any3 = any + any2;
+	DynamicAny any2 = "1.5";
+	double d = any2;
+	assert (d == 1.5);
 }
 
 
