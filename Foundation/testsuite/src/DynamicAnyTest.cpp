@@ -1427,6 +1427,30 @@ void DynamicAnyTest::testArithmeticOperators()
 
 	try { any3 /= any2; fail ("must fail");	} 
 	catch (InvalidArgumentException&){}
+
+	any1 = 10;
+	
+	assert (any1++ == 10);
+	assert (any1 == 11);
+	assert (++any1 == 12);
+
+	assert (any1-- == 12);
+	assert (any1 == 11);
+	assert (--any1 == 10);
+
+	any1 = 1.23;
+
+	try { ++any1; fail ("must fail"); } 
+	catch (InvalidArgumentException&){}
+	
+	try { any1++; fail ("must fail"); } 
+	catch (InvalidArgumentException&){}
+
+	try { --any1; fail ("must fail"); } 
+	catch (InvalidArgumentException&){}
+	
+	try { any1--; fail ("must fail"); } 
+	catch (InvalidArgumentException&){}
 }
 
 

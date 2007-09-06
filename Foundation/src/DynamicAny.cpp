@@ -209,6 +209,43 @@ DynamicAny& DynamicAny::operator /= (const DynamicAny& other)
 }
 
 
+DynamicAny& DynamicAny::operator ++ ()
+{
+	if (!isInteger())
+		throw InvalidArgumentException("Invalid operation for this data type.");
+
+	return *this = *this + 1;
+}
+
+DynamicAny DynamicAny::operator ++ (int)
+{
+	if (!isInteger())
+		throw InvalidArgumentException("Invalid operation for this data type.");
+
+	DynamicAny tmp(*this);
+	*this += 1;
+	return tmp;
+}
+
+DynamicAny& DynamicAny::operator -- ()
+{
+	if (!isInteger())
+		throw InvalidArgumentException("Invalid operation for this data type.");
+
+	return *this = *this - 1;
+}
+
+DynamicAny DynamicAny::operator -- (int)
+{
+	if (!isInteger())
+		throw InvalidArgumentException("Invalid operation for this data type.");
+
+	DynamicAny tmp(*this);
+	*this -= 1;
+	return tmp;
+}
+
+
 DynamicAny& DynamicAny::operator [] (std::vector<DynamicAny>::size_type n)
 {
 	DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder = dynamic_cast<DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);

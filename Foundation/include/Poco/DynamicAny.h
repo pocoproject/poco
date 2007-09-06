@@ -78,6 +78,9 @@ class Foundation_API DynamicAny
 	/// 
 	/// 	- for integral and floating point numeric values, following operations are supported:
 	/// 	  '+', '+=', '-', '-=', '*', '*=' , '/' and '/=' 
+	///
+	/// 	- for integral values, following operations are supported:
+	///		  prefix and postfix increment (++) and decement (--)
 	/// 
 	/// 	- for all other types, InvalidArgumentException is thrown upon attempt of an arithmetic operation
 	/// 
@@ -196,6 +199,18 @@ public:
 
 	DynamicAny operator + (const char* other) const;
 		/// Addition operator specialization for const char*
+
+	DynamicAny& operator ++ ();
+		/// Pre-increment operator
+
+	DynamicAny operator ++ (int);
+		/// Post-increment operator
+
+	DynamicAny& operator -- ();
+		/// Pre-decrement operator
+
+	DynamicAny operator -- (int);
+		/// Post-decrement operator
 
 	template <typename T> 
 	DynamicAny& operator += (const T& other)
