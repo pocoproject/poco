@@ -77,9 +77,9 @@ class Foundation_API DynamicAny
 	/// 	- for std::string and const char* values, only '+' and '+=' operations are supported
 	/// 
 	/// 	- for integral and floating point numeric values, following operations are supported:
-	///			'+', '+=', '-', '-=', '*', '*=' , '/' and '/=' 
+	/// 	  '+', '+=', '-', '-=', '*', '*=' , '/' and '/=' 
 	/// 
-	///		- for all other types, InvalidArgumentException is thrown upon attempt of an arithmetic operation
+	/// 	- for all other types, InvalidArgumentException is thrown upon attempt of an arithmetic operation
 	/// 
 	/// A DynamicAny can be created from and converted to a value of any type for which a specialization of 
 	/// DynamicAnyHolderImpl is available. For supported types, see DynamicAnyHolder documentation.
@@ -182,7 +182,7 @@ public:
 	}
 	
 	DynamicAny& operator = (const DynamicAny& other);
-		/// Assignment operator  specialization for DynamicAny
+		/// Assignment operator specialization for DynamicAny
 
 	template <typename T> 
 	DynamicAny operator + (const T& other) const
@@ -228,7 +228,7 @@ public:
 	}
 
 	DynamicAny& operator -= (const DynamicAny& other);
-		/// Subtraction asignment specialization operator for DynamicAny
+		/// Subtraction asignment operator specialization for DynamicAny
 
 	template <typename T> 
 	DynamicAny operator * (const T& other) const
