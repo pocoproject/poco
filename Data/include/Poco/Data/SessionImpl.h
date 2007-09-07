@@ -74,7 +74,7 @@ public:
 
 	virtual void rollback() = 0;
 		/// Aborts a transaction.
-		
+
 	virtual void close() = 0;
 		/// Closes the connection.
 

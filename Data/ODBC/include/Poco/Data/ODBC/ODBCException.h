@@ -88,9 +88,9 @@ public:
 		ODBCException(exc),
 		_error(exc._error)
 	{
-	}									
+	}
 
-	~HandleException() throw()															
+	~HandleException() throw()
 	{
 	}
 
@@ -102,7 +102,6 @@ public:
 
 	const char* name() const throw()
 	{
-		
 		return "ODBC handle exception";
 	}
 
@@ -140,8 +139,8 @@ private:
 };
 
 
-typedef HandleException<SQLHENV, SQL_HANDLE_ENV> EnvironmentException;
-typedef HandleException<SQLHDBC, SQL_HANDLE_DBC> ConnectionException;
+typedef HandleException<SQLHENV, SQL_HANDLE_ENV>   EnvironmentException;
+typedef HandleException<SQLHDBC, SQL_HANDLE_DBC>   ConnectionException;
 typedef HandleException<SQLHSTMT, SQL_HANDLE_STMT> StatementException;
 typedef HandleException<SQLHDESC, SQL_HANDLE_DESC> DescriptorException;
 
