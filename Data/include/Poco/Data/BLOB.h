@@ -319,6 +319,26 @@ public:
 		return false;
 	}
 
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 	void convert(std::string& val) const
 	{
 		val.assign(_val.begin(), _val.end());
