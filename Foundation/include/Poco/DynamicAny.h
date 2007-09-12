@@ -177,28 +177,28 @@ public:
 
 	template <typename T> 
 	DynamicAny& operator = (const T& other)
-		/// Assignment operator
+		/// Assignment operator for assigning POD to DynamicAny
 	{
 		DynamicAny tmp(other);
 		swap(tmp);
 		return *this;
 	}
-	
+
 	DynamicAny& operator = (const DynamicAny& other);
 		/// Assignment operator specialization for DynamicAny
 
 	template <typename T> 
-	DynamicAny operator + (const T& other) const
-		/// Addition operator
+	const DynamicAny operator + (const T& other) const
+		/// Addition operator for adding POD to DynamicAny
 	{
 		return convert<T>() + other;
 	}
 
-	DynamicAny operator + (const DynamicAny& other) const;
+	const DynamicAny operator + (const DynamicAny& other) const;
 		/// Addition operator specialization for DynamicAny
 
-	DynamicAny operator + (const char* other) const;
-		/// Addition operator specialization for const char*
+	const DynamicAny operator + (const char* other) const;
+		/// Addition operator specialization for adding const char* to DynamicAny
 
 	DynamicAny& operator ++ ();
 		/// Pre-increment operator
@@ -214,7 +214,7 @@ public:
 
 	template <typename T> 
 	DynamicAny& operator += (const T& other)
-		/// Addition asignment operator
+		/// Addition asignment operator for addition/assignment of POD to DynamicAny.
 	{
 		return *this = convert<T>() + other;
 	}
@@ -226,13 +226,13 @@ public:
 		/// Addition asignment operator specialization for const char*
 
 	template <typename T> 
-	DynamicAny operator - (const T& other) const
-		/// Subtraction operator
+	const DynamicAny operator - (const T& other) const
+		/// Subtraction operator for subtracting POD from DynamicAny
 	{
 		return convert<T>() - other;
 	}
 
-	DynamicAny operator - (const DynamicAny& other) const;
+	const DynamicAny operator - (const DynamicAny& other) const;
 		/// Subtraction operator specialization for DynamicAny
 
 	template <typename T> 
@@ -246,13 +246,13 @@ public:
 		/// Subtraction asignment operator specialization for DynamicAny
 
 	template <typename T> 
-	DynamicAny operator * (const T& other) const
-		/// Multiplication operator
+	const DynamicAny operator * (const T& other) const
+		/// Multiplication operator for multiplying DynamicAny with POD
 	{
 		return convert<T>() * other;
 	}
 
-	DynamicAny operator * (const DynamicAny& other) const;
+	const DynamicAny operator * (const DynamicAny& other) const;
 		/// Multiplication operator specialization for DynamicAny
 
 	template <typename T> 
@@ -266,13 +266,13 @@ public:
 		/// Multiplication asignment operator specialization for DynamicAny
 
 	template <typename T> 
-	DynamicAny operator / (const T& other) const
-		/// Division operator
+	const DynamicAny operator / (const T& other) const
+		/// Division operator for dividing DynamicAny with POD
 	{
 		return convert<T>() / other;
 	}
 
-	DynamicAny operator / (const DynamicAny& other) const;
+	const DynamicAny operator / (const DynamicAny& other) const;
 		/// Division operator specialization for DynamicAny
 
 	template <typename T> 
@@ -295,12 +295,18 @@ public:
 	bool operator == (const char* other) const;
 		/// Equality operator specialization for const char*
 
+	bool operator == (const DynamicAny& other) const;
+		/// Equality operator specialization for DynamicAny
+
 	template <typename T> 
 	bool operator != (const T& other) const
 		/// Inequality operator
 	{
 		return convert<T>() != other;
 	}
+
+	bool operator != (const DynamicAny& other) const;
+		/// Inequality operator  specialization for DynamicAny
 
 	bool operator != (const char* other) const;
 		/// Inequality operator  specialization for const char*
@@ -387,6 +393,15 @@ private:
 };
 
 
+///
+/// inlines
+///
+
+
+///
+/// DynamicAny members
+///
+
 inline void DynamicAny::swap(DynamicAny& ptr)
 {
 	std::swap(_pHolder, ptr._pHolder);
@@ -399,7 +414,7 @@ inline const std::type_info& DynamicAny::type() const
 }
 
 
-inline DynamicAny DynamicAny::operator + (const char* other) const
+inline const DynamicAny DynamicAny::operator + (const char* other) const
 {
 	return convert<std::string>() + other;
 }
@@ -411,9 +426,21 @@ inline DynamicAny& DynamicAny::operator += (const char*other)
 }
 
 
+inline bool DynamicAny::operator == (const DynamicAny& other) const
+{
+	return convert<std::string>() == other.convert<std::string>();
+}
+
+
 inline bool DynamicAny::operator == (const char* other) const
 {
 	return convert<std::string>() == other;
+}
+
+
+inline bool DynamicAny::operator != (const DynamicAny& other) const
+{
+	return convert<std::string>() != other.convert<std::string>();
 }
 
 
@@ -456,6 +483,98 @@ inline bool DynamicAny::isNumeric() const
 inline bool DynamicAny::isString() const
 {
 	return _pHolder->isString();
+}
+
+
+///
+/// DynamicAny non-member functions
+///
+
+template <typename T> 
+inline const DynamicAny operator + (const T& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to POD
+{
+	return da.convert<T>() + other;
+}
+
+
+inline const DynamicAny operator + (const char* other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to const char*
+{
+	std::string tmp = other;
+	return other + da.convert<std::string>();
+}
+
+
+template <typename T> 
+inline const DynamicAny operator - (const T& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from POD
+{
+	DynamicAny tmp = other;
+	return tmp - da.convert<T>();
+}
+
+
+template <typename T> 
+inline const DynamicAny operator * (const T& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying POD with DynamicAny
+{
+	return da.convert<T>() * other;
+}
+
+
+template <typename T> 
+inline const DynamicAny operator / (const T& other, const DynamicAny& da)
+	/// Division operator for dividing POD with DynamicAny
+{
+	DynamicAny tmp = other;
+	return tmp / da.convert<T>();
+}
+
+
+template <typename T> 
+inline T& operator += (T& other, const DynamicAny& da)
+	/// Addition asignment operator for addition/assignment of DynamicAny to POD.
+{
+	return other += da.convert<T>();
+}
+
+
+template <typename T> 
+inline T& operator -= (T& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtraction/assignment of DynamicAny to POD.
+{
+	return other -= da.convert<T>();
+}
+
+
+template <typename T> 
+inline T& operator *= (T& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplication/assignment of DynamicAny to POD.
+{
+	return other *= da.convert<T>();
+}
+
+
+template <typename T> 
+inline T& operator /= (T& other, const DynamicAny& da)
+	/// Division asignment operator for division/assignment of DynamicAny to POD.
+{
+	return other /= da.convert<T>();
+}
+
+
+inline bool operator == (const std::string& other, const DynamicAny& da)
+	/// Equality operator for DynamicAny comparison to std::string
+{
+	return da.convert<std::string>() == other;
+}
+
+
+inline bool operator != (const std::string& other, const DynamicAny& da)
+	/// Equality operator for DynamicAny comparison to std::string
+{
+	return da.convert<std::string>() != other;
 }
 
 

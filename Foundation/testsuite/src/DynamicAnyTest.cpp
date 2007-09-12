@@ -1327,16 +1327,20 @@ void DynamicAnyTest::testULong()
 	assert (a3 == 64);
 }
 
-
+	
 void DynamicAnyTest::testConversionOperator()
 {
 	DynamicAny any("42");
 	int i = any;
 	assert (i == 42);
-	
+	assert (any == i);
+
 	any = 123;
 	std::string s = any;
 	assert (s == "123");
+	assert (s == any);
+	assert (any == s);
+	assert ("123" == any);
 
 	any = 321;
 	s = any.convert<std::string>();
@@ -1344,10 +1348,29 @@ void DynamicAnyTest::testConversionOperator()
 
 	any = "456";
 	assert (any == "456");
+	assert ("456" == any);
 
 	DynamicAny any2 = "1.5";
 	double d = any2;
 	assert (d == 1.5);
+	assert (any2 == d);
+}
+
+
+void DynamicAnyTest::testComparisonOperators()
+{
+	DynamicAny any1 = 1;
+	DynamicAny any2 = "1";
+	assert (any1 == any2);
+	assert (any1 == 1);
+	assert (any1 == "1");
+	assert ("1" == any1);
+
+	any1 = "2";
+	assert (any1 != any2);
+	assert (any1 != 1);
+	assert (any1 != "1");
+	assert ("1" != any1);
 }
 
 
@@ -1357,27 +1380,42 @@ void DynamicAnyTest::testArithmeticOperators()
 	DynamicAny any2 = 2;
 	DynamicAny any3 = any1 + any2;
 	assert (any3 == 3);
+	int i = 1;
+	i += any1;
+	assert (2 == i);
 
 	any1 = 3;
+	assert ((5 - any1) == 2);
 	any2 = 5;
 	any3 = any2 - any1;
 	assert (any3 == 2);
 	any3 -= 1;
 	assert (any3 == 1);
+	i = 5;
+	i -= any1;
+	assert (2 == i);
 
 	any1 = 3;
+	assert ((5 * any1) == 15);
 	any2 = 5;
 	any3 = any1 * any2;
 	assert (any3 == 15);
 	any3 *= 3;
 	assert (any3 == 45);
+	i = 5;
+	i *= any1;
+	assert (15 == i);
 
 	any1 = 3;
+	assert ((9 / any1) == 3);
 	any2 = 9;
 	any3 = any2 / any1;
 	assert (any3 == 3);
 	any3 /= 3;
 	assert (any3 == 1);
+	i = 9;
+	i /= any1;
+	assert (3 == i);
 
 	any1 = 1.0f;
 	any2 = .5f;
@@ -1402,6 +1440,7 @@ void DynamicAnyTest::testArithmeticOperators()
 	any2 = "4";
 	any3 += any2;
 	assert (any3 == 7);
+	assert (1 + any3 == 8);
 
 	any1 = "123";
 	any2 = "456";
@@ -1410,6 +1449,7 @@ void DynamicAnyTest::testArithmeticOperators()
 	any2 = "789";
 	any3 += any2;
 	assert (any3 == "123456789");
+	assert (("xyz" + any3) == "xyz123456789");
 
 	try	{ any3 = any1 - any2; fail ("must fail"); } 
 	catch (InvalidArgumentException&){}
@@ -2054,8 +2094,9 @@ void DynamicAnyTest::testGetIdxMustThrow(DynamicAny& a1, std::vector<DynamicAny>
 {
 	try
 	{
-		DynamicAny& val1 = a1[n];
+		DynamicAny& val1 = a1[n]; 
 		fail("bad cast - must throw");
+		val1 = 0; // silence the compiler
 	}
 	catch (Poco::BadCastException&)
 	{
@@ -2064,8 +2105,9 @@ void DynamicAnyTest::testGetIdxMustThrow(DynamicAny& a1, std::vector<DynamicAny>
 	try
 	{
 		const DynamicAny& c1 = a1;
-		const DynamicAny& cval1 = c1[n];
+		const DynamicAny& cval1 = c1[n]; 
 		fail("bad const cast - must throw");
+		assert (cval1 == c1); // silence the compiler
 	}
 	catch (Poco::BadCastException&)
 	{
@@ -2103,6 +2145,7 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testULong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testConversionOperator);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testComparisonOperators);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testArithmeticOperators);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsInt);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLimitsFloat);

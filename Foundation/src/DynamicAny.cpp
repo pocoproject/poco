@@ -77,7 +77,7 @@ DynamicAny& DynamicAny::operator = (const DynamicAny& other)
 }
 
 
-DynamicAny DynamicAny::operator + (const DynamicAny& other) const
+const DynamicAny DynamicAny::operator + (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -113,7 +113,7 @@ DynamicAny& DynamicAny::operator += (const DynamicAny& other)
 }
 
 
-DynamicAny DynamicAny::operator - (const DynamicAny& other) const
+const DynamicAny DynamicAny::operator - (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -145,7 +145,7 @@ DynamicAny& DynamicAny::operator -= (const DynamicAny& other)
 }
 
 
-DynamicAny DynamicAny::operator * (const DynamicAny& other) const
+const DynamicAny DynamicAny::operator * (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -177,7 +177,7 @@ DynamicAny& DynamicAny::operator *= (const DynamicAny& other)
 }
 
 
-DynamicAny DynamicAny::operator / (const DynamicAny& other) const
+const DynamicAny DynamicAny::operator / (const DynamicAny& other) const
 {
 	if (isInteger())
 	{

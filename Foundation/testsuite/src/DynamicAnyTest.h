@@ -63,6 +63,7 @@ public:
 	void testULong();
 	void testString();
 	void testConversionOperator();
+	void testComparisonOperators();
 	void testArithmeticOperators();
 	void testLimitsInt();
 	void testLimitsFloat();
@@ -96,6 +97,7 @@ private:
 		assert (val1 == expectedResult);
 
 		const Poco::DynamicAny& c1 = a1;
+		assert (a1 == c1); // silence the compiler
 		const Poco::DynamicAny& cval1 = a1[n];
 		assert (cval1 == expectedResult);
 	}
