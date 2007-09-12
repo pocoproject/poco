@@ -46,8 +46,7 @@ public:
 	TypeListTest(const std::string& name);
 	~TypeListTest();
 
-	void testTypeListMacro();
-	void testTypeListTemplate();
+	void testTypeList();
 	void setUp();
 	void tearDown();
 

@@ -66,6 +66,7 @@ public:
 	void testTuple18();
 	void testTuple19();
 	void testTuple20();
+	void testTupleOrder();
 	void testMemOverhead();
 	void setUp();
 	void tearDown();
@@ -73,6 +74,14 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+
+	template <class T>
+	void testTupleStrictWeak(const T& t1, const T& t2, const T& t3)
+	{
+		assert (t1 < t2 && !(t2 < t1)); // antisymmetric
+		assert (t1 < t2 && t2 < t3 && t1 < t3); // transitive
+		assert (!(t1 < t1)); // irreflexive
+	}
 };
 
 
