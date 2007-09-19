@@ -1,7 +1,7 @@
 //
 // ODBCStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCStatementImpl.cpp#5 $
+// $Id: //poco/Main/Data/ODBC/src/ODBCStatementImpl.cpp#8 $
 //
 // Library: ODBC
 // Package: ODBC
@@ -323,12 +323,16 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 {
 	if (Utility::isError(rc))
 	{
-		std::ostringstream os;
-		os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
-		os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
-		std::string str(msg); str += os.str();
-
-		throw StatementException(_stmt, str);
+		if (rc != SQL_NO_DATA)
+		{
+			std::ostringstream os;
+			os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
+			os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
+			std::string str(msg); str += os.str();
+		
+			throw StatementException(_stmt, str);
+		}
+		else throw NoDataException();
 	}
 }
 
