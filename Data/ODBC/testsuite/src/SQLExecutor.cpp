@@ -2152,7 +2152,7 @@ void SQLExecutor::nulls()
 
 void SQLExecutor::rowIterator()
 {
-	std::string funct = "internalExtraction()";
+	std::string funct = "rowIterator()";
 	std::vector<Tuple<int, double, std::string> > v;
 	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
 	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
@@ -2178,4 +2178,64 @@ void SQLExecutor::rowIterator()
 	std::ostringstream osCopy;
 	std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(osCopy));
 	assert (osLoop.str() == osCopy.str());
+}
+
+
+void SQLExecutor::stdVectorBool()
+{
+	std::string funct = "stdVectorBool()";
+
+	bool b = false;
+	try { *_pSession << "INSERT INTO BoolTest VALUES (?)", use(b), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	b = true;
+	*_pSession << "SELECT * FROM BoolTest", into(b), now;
+	assert (false == b);
+	*_pSession << "DELETE FROM BoolTest", now;
+
+	b = true;
+	try { *_pSession << "INSERT INTO BoolTest VALUES (?)", use(b), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	b = false;
+	*_pSession << "SELECT * FROM BoolTest", into(b), now;
+	assert (true == b);
+	*_pSession << "DELETE FROM BoolTest", now;
+
+	std::vector<bool> v;
+	v.push_back(true);
+	v.push_back(false);
+	v.push_back(false);
+	v.push_back(true);
+
+	try { *_pSession << "INSERT INTO BoolTest VALUES (?)", use(v), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	v.clear();
+	*_pSession << "SELECT * FROM BoolTest", into(v), now;
+
+	assert (4 == v.size());
+	std::vector<bool>::iterator it = v.begin();
+	std::vector<bool>::iterator end = v.end();
+	int t = 0;
+	for (; it != end; ++it)
+		t += *it ? 1 : 0;
+	assert (2 == t);
+
+	try { *_pSession << "SELECT * FROM BoolTest WHERE b = ?", out(v), now; fail("must fail"); }
+	catch (BindingException&) { }
+
+	try { *_pSession << "SELECT * FROM BoolTest WHERE b = ?", io(v), now; fail("must fail"); }
+	catch (BindingException&) { }
+
+	RecordSet rset(*_pSession, "SELECT * FROM BoolTest");
+
+	t = 0;
+	for (int i = 0; i < 4; ++i)
+		t += rset.value<bool>(0, i) ? 1 : 0;
+	assert (2 == t);
 }

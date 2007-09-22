@@ -48,8 +48,6 @@ namespace ODBC {
 
 
 const TypeInfo Utility::_dataTypes;
-const SQLSMALLINT Utility::boolDataType = (sizeof(bool) <= sizeof(char)) ? SQL_C_TINYINT :
-	(sizeof(bool) == sizeof(short)) ? SQL_C_SHORT : SQL_C_LONG;
 
 
 Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)

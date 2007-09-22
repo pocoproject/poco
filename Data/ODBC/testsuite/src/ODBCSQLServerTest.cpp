@@ -1070,6 +1070,21 @@ void ODBCSQLServerTest::testRowIterator()
 }
 
 
+void ODBCSQLServerTest::testStdVectorBool()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateBoolTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->stdVectorBool();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1188,6 +1203,14 @@ void ODBCSQLServerTest::recreateNullsTable(const std::string& notNull)
 		notNull), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
+}
+
+void ODBCSQLServerTest::recreateBoolTable()
+{
+	dropObject("TABLE", "BoolTest");
+	try { *_pSession << "CREATE TABLE BoolTest (b BIT)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateBoolTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateBoolTable()"); }
 }
 
 
@@ -1338,6 +1361,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNull);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRowIterator);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStdVectorBool);
 
 		return pSuite;
 	}

@@ -55,6 +55,7 @@ public:
 	void testBLOB();
 	void testBLOBStreams();
 	void testColumnVector();
+	void testColumnVectorBool();
 	void testColumnDeque();
 	void testColumnList();
 	void testRow();

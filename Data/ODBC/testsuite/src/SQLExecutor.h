@@ -132,6 +132,7 @@ public:
 	void nulls();
 	void notNulls(const std::string& sqlState = "23502");
 	void rowIterator();
+	void stdVectorBool();
 
 private:
 	Poco::Data::Session* _pSession;

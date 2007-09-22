@@ -168,7 +168,7 @@ protected:
 	const MetaColumn& metaColumn(const std::string& name) const;
 		/// Returns the type for the column with specified name.
 
-	 bool isNull(std::size_t col, std::size_t row);
+	 bool isNull(std::size_t col, std::size_t row) const;
 		/// Returns true if the current row value at column pos is null.
 
 private:
@@ -272,7 +272,7 @@ inline Statement::Storage Statement::storage() const
 }
 
 
-inline bool Statement::isNull(std::size_t col, std::size_t row)
+inline bool Statement::isNull(std::size_t col, std::size_t row) const
 {
 	return _ptr->isNull(col, row);
 }

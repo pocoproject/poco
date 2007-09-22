@@ -101,6 +101,8 @@ void ODBCColumn::init()
 	setNullable(SQL_NULLABLE == _columnDesc.isNullable);
 	switch(_columnDesc.dataType)
 	{
+	case SQL_BIT:
+		setType(MetaColumn::FDT_BOOL); break;
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:

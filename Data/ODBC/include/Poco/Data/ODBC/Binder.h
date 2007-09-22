@@ -280,7 +280,7 @@ inline void Binder::bind(std::size_t pos, const double& val, Direction dir)
 
 inline void Binder::bind(std::size_t pos, const bool& val, Direction dir)
 {
-	bindImpl(pos, val, Utility::boolDataType, dir);
+	bindImpl(pos, val, SQL_C_BIT, dir);
 }
 
 

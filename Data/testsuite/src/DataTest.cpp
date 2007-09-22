@@ -423,6 +423,68 @@ void DataTest::testColumnVector()
 }
 
 
+void DataTest::testColumnVectorBool()
+{
+	MetaColumn mc(0, "mc", MetaColumn::FDT_BOOL);
+
+	std::vector<bool>* pData = new std::vector<bool>;
+	pData->push_back(true);
+	pData->push_back(false);
+	pData->push_back(true);
+	pData->push_back(false);
+	pData->push_back(true);
+	
+	Column<bool> c(mc, pData);
+
+	assert (c.rowCount() == 5);
+	assert (c[0] == true);
+	assert (c[1] == false);
+	assert (c[2] == true);
+	assert (c[3] == false);
+	assert (c[4] == true);
+	assert (c.type() == MetaColumn::FDT_BOOL);
+
+	try
+	{
+		bool b = c[100];
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+
+	Column<bool> c1 = c;
+
+	assert (c1.rowCount() == 5);
+	assert (c1[0] == true);
+	assert (c1[1] == false);
+	assert (c1[2] == true);
+	assert (c1[3] == false);
+	assert (c1[4] == true);
+
+	Column<bool> c2(c1);
+
+	assert (c2.rowCount() == 5);
+	assert (c2[0] == true);
+	assert (c2[1] == false);
+	assert (c2[2] == true);
+	assert (c2[3] == false);
+	assert (c2[4] == true);
+
+	std::vector<bool> vi;
+	vi.assign(c.begin(), c.end());
+	assert (vi.size() == 5);
+	assert (vi[0] == true);
+	assert (vi[1] == false);
+	assert (vi[2] == true);
+	assert (vi[3] == false);
+	assert (vi[4] == true);
+
+	c.reset();
+	assert (c.rowCount() == 0);
+	assert (c1.rowCount() == 0);
+	assert (c2.rowCount() == 0);
+}
+
+
 void DataTest::testColumnDeque()
 {
 	typedef std::deque<int> ContainerType;
@@ -824,6 +886,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testBLOB);
 	CppUnit_addTest(pSuite, DataTest, testBLOBStreams);
 	CppUnit_addTest(pSuite, DataTest, testColumnVector);
+	CppUnit_addTest(pSuite, DataTest, testColumnVectorBool);
 	CppUnit_addTest(pSuite, DataTest, testColumnDeque);
 	CppUnit_addTest(pSuite, DataTest, testColumnList);
 	CppUnit_addTest(pSuite, DataTest, testRow);

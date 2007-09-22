@@ -118,7 +118,7 @@ public:
 		std::size_t s = rExtractions.size();
 		if (0 == s || pos >= s)
 			throw RangeException(format("Invalid column index: %z", pos));
-		
+
 		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos].get());
 
 		if (pExtraction)
@@ -180,25 +180,25 @@ public:
 		/// Returns the data value at named column, row location.
 
 	template <typename C>
-	DynamicAny nvl(const std::string& name, const C& deflt)
+	const C& nvl(const std::string& name, const C& deflt) const
 		/// Returns the value in the named column of the current row
 		/// if the value is not NULL, or deflt otherwise.
 	{
 		if (isNull(name))
-			return DynamicAny(deflt);
+			return deflt;
 		else
-			return value(name);
+			return value<C>(name, _currentRow);
 	}
 
 	template <typename C>
-	DynamicAny nvl(std::size_t index, const C& deflt)
+	const C& nvl(std::size_t index, const C& deflt) const
 		/// Returns the value in the given column of the current row
 		/// if the value is not NULL, or deflt otherwise.
 	{
 		if (isNull(index))
-			return DynamicAny(deflt);
+			return deflt;
 		else
-			return value(index);
+			return value<C>(index, _currentRow);
 	}
 
 	const RowIterator& begin();
@@ -267,7 +267,7 @@ public:
 		/// Returns column precision for the column with specified name.
 		/// Valid for floating point fields only (zero for other data types).
 
-	bool isNull(const std::string& name);
+	bool isNull(const std::string& name) const;
 		/// Returns true if column value of the current row is null.
 
 private:
@@ -394,7 +394,7 @@ inline std::size_t RecordSet::columnPrecision(const std::string& name)const
 }
 
 
-inline bool RecordSet::isNull(const std::string& name)
+inline bool RecordSet::isNull(const std::string& name) const
 {
 	return isNull(metaColumn(name).position(), _currentRow);
 }

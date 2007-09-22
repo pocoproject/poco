@@ -171,8 +171,13 @@ public:
 	void extract(std::size_t pos)
 	{
 		AbstractExtractor* pExt = getExtractor();
-		_rResult.push_back(_default);
-		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
+
+		// for vector specialization, a temporary must be used to
+		// allow for extraction of bool values
+		T tmp = _default;
+		TypeHandler<T>::extract(pos, tmp, _default, pExt);
+		_rResult.push_back(tmp);
+		
 		_nulls.push_back(pExt->isNull(pos));
 	}
 

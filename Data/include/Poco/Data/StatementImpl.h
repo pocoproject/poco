@@ -299,7 +299,7 @@ private:
 			addExtract(createExtract<T, std::deque<T> >(mc));
 	}
 
-	bool isNull(std::size_t col, std::size_t row);
+	bool isNull(std::size_t col, std::size_t row) const;
 		/// Returns true if the value in [col, row] is null.
 		
 	StatementImpl(const StatementImpl& stmt);
@@ -406,7 +406,7 @@ inline bool StatementImpl::isStoredProcedure() const
 }
 
 
-inline bool StatementImpl::isNull(std::size_t col, std::size_t row)
+inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
 {
 	try 
 	{

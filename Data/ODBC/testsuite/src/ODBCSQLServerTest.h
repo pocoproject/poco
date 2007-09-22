@@ -127,6 +127,7 @@ public:
 
 	void testNull();
 	void testRowIterator();
+	void testStdVectorBool();
 
 	void setUp();
 	void tearDown();
@@ -149,6 +150,7 @@ private:
 	void recreateVectorTable();
 	void recreateVectorsTable();
 	void recreateNullsTable(const std::string& notNull = "");
+	void recreateBoolTable();
 
 	static bool init(const std::string& driver, const std::string& dsn);
 	static bool canConnect(const std::string& driver, const std::string& dsn);

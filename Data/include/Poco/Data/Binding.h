@@ -164,6 +164,79 @@ private:
 };
 
 
+template <>
+class Binding<std::vector<bool> >: public AbstractBinding
+	/// Specialization for std::vector<bool>.
+	/// This specialization is necessary due to the nature of std::vector<bool>.
+	/// For details, see the standard library implementation of std::vector<bool> 
+	/// or
+	/// S. Meyers: "Effective STL" (Copyright Addison-Wesley 2001),
+	/// Item 18: "Avoid using vector<bool>."
+	/// 
+	/// The workaround employed here is using std::deque<bool> as an
+	/// internal replacement container. 
+	/// 
+	/// IMPORTANT:
+	/// Only IN binding is supported.
+{
+public:
+	explicit Binding(const std::vector<bool>& val, const std::string& name = "", Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_deq(_val.begin(), _val.end()),
+		_begin(_deq.begin()), 
+		_end(_deq.end())
+		/// Creates the Binding.
+	{
+		if (PD_IN != direction)
+			throw BindingException("Only IN direction is legal for std:vector<bool> binding.");
+
+		if (numOfRowsHandled() == 0)
+			throw BindingException("It is illegal to bind to an empty data collection");
+	}
+
+	~Binding()
+		/// Destroys the Binding.
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return TypeHandler<bool>::size();
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return _val.size();
+	}
+
+	bool canBind() const
+	{
+		return _begin != _end;
+	}
+
+	void bind(std::size_t pos)
+	{
+		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(canBind());
+		TypeHandler<bool>::bind(pos, *_begin, getBinder(), getDirection());
+		++_begin;
+	}
+
+	void reset()
+	{
+		_begin = _deq.begin();
+		_end   = _deq.end();
+	}
+
+private:
+	const std::vector<bool>&         _val;
+	std::deque<bool>                 _deq;
+	std::deque<bool>::const_iterator _begin;
+	std::deque<bool>::const_iterator _end;
+};
+
+
 template <class T>
 class Binding<std::list<T> >: public AbstractBinding
 	/// Specialization for std::list.

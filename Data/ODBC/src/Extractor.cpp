@@ -358,7 +358,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 bool Extractor::extract(std::size_t pos, bool& val)
 {
 	if (Preparation::DE_MANUAL == _dataExtraction)
-		return extractManualImpl(pos, val, Utility::boolDataType);
+		return extractManualImpl(pos, val, SQL_C_BIT);
 	else
 		return extractBoundImpl(pos, val);
 }

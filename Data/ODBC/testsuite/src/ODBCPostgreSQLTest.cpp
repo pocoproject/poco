@@ -972,6 +972,28 @@ void ODBCPostgreSQLTest::testRowIterator()
 }
 
 
+void ODBCPostgreSQLTest::testStdVectorBool()
+{
+
+// psqlODBC driver returns string for bool fields
+// even when field is explicitly cast to boolean,
+// so this functionality seems to be untestable with it
+
+#ifdef POCO_ODBC_USE_MAMMOTH_NG
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateBoolTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->stdVectorBool();
+		i += 2;
+	}
+#endif // POCO_ODBC_USE_MAMMOTH_NG
+}
+
+
 void ODBCPostgreSQLTest::configurePLPgSQL()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1107,6 +1129,15 @@ void ODBCPostgreSQLTest::recreateNullsTable(const std::string& notNull)
 		notNull), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
+}
+
+
+void ODBCPostgreSQLTest::recreateBoolTable()
+{
+	dropObject("TABLE", "BoolTest");
+	try { *_pSession << "CREATE TABLE BoolTest (b BOOLEAN)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateBoolTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateBoolTable()"); }
 }
 
 
@@ -1285,6 +1316,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNull);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRowIterator);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStdVectorBool);
 
 		return pSuite;
 	}

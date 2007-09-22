@@ -224,7 +224,7 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 	case NULL_UINT32:    bindNull(pos, SQL_C_ULONG); break;
 	case NULL_INT64:     bindNull(pos, SQL_C_SBIGINT); break;
 	case NULL_UINT64:    bindNull(pos, SQL_C_UBIGINT); break;
-	case NULL_BOOL:      bindNull(pos, Utility::boolDataType); break;
+	case NULL_BOOL:      bindNull(pos, SQL_C_BIT); break;
 	case NULL_FLOAT:     bindNull(pos, SQL_C_FLOAT); break;
 	case NULL_DOUBLE:    bindNull(pos, SQL_C_DOUBLE); break;
 	case NULL_STRING:    bindNull(pos, SQL_C_CHAR); break;

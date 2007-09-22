@@ -289,6 +289,7 @@ void StatementImpl::makeExtractors(Poco::UInt32 count)
 		switch (mc.type())
 		{
 			case MetaColumn::FDT_BOOL:
+				addInternalExtract<bool>(mc); break;
 			case MetaColumn::FDT_INT8:  
 				addInternalExtract<Int8>(mc); break;
 			case MetaColumn::FDT_UINT8:  

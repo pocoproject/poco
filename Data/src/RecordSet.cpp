@@ -80,7 +80,7 @@ DynamicAny RecordSet::value(std::size_t col, std::size_t row) const
 {
 	switch (columnType(col))
 	{
-		case MetaColumn::FDT_BOOL:
+		case MetaColumn::FDT_BOOL:      return value<bool>(col, row);
 		case MetaColumn::FDT_INT8:      return value<Int8>(col, row);
 		case MetaColumn::FDT_UINT8:     return value<UInt8>(col, row);
 		case MetaColumn::FDT_INT16:     return value<Int16>(col, row);
@@ -104,7 +104,7 @@ DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
 {
 	switch (columnType(name))
 	{
-		case MetaColumn::FDT_BOOL:
+		case MetaColumn::FDT_BOOL:      return value<bool>(name, row);
 		case MetaColumn::FDT_INT8:      return value<Int8>(name, row);
 		case MetaColumn::FDT_UINT8:     return value<UInt8>(name, row);
 		case MetaColumn::FDT_INT16:     return value<Int16>(name, row);
