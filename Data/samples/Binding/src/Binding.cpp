@@ -15,9 +15,6 @@
 // prior written permission from Applied Informatics.
 //
 
-
-#include "Poco/SharedPtr.h"
-#include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include <vector>
@@ -62,7 +59,7 @@ int main(int argc, char** argv)
 		use(person.name),
 		use(person.address),
 		use(person.age);
-		
+	
 	insert.execute();
 	
 	person.name    = "Lisa Simpson";
@@ -84,7 +81,7 @@ int main(int argc, char** argv)
 		select.execute();
 		std::cout << person.name << " " << person.address << " " << person.age << std::endl;
 	}
-	
+
 	// another query - store the result in a container
 	std::vector<std::string> names;
 	session << "SELECT Name FROM Person",
@@ -95,6 +92,7 @@ int main(int argc, char** argv)
 	{
 		std::cout << *it << std::endl;
 	}
-	
+
 	return 0;
 }
+

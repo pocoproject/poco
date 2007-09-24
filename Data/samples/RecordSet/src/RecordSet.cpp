@@ -65,19 +65,16 @@ int main(int argc, char** argv)
 	// print all column names
 	for (std::size_t col = 0; col < cols; ++col)
 	{
-		std::cout << rs.columnName(col) << std::endl;
+		std::cout << rs.columnName(col) << "\t\t";
 	}
-	// iterate over all rows and columns
-	bool more = rs.moveFirst();
-	while (more)
-	{
-		for (std::size_t col = 0; col < cols; ++col)
-		{
-			std::cout << rs[col].convert<std::string>() << " ";
-		}
-		std::cout << std::endl;
-		more = rs.moveNext();
-	}
+
+	std::cout << std::endl;
+	std::cout << "-----------------------------------" << std::endl;
+
+	// iterate over all rows and print the data
+	RecordSet::Iterator it = rs.begin();
+	RecordSet::Iterator end = rs.end();
+	for (; it != end; ++it) std::cout << *it;
 
 	return 0;
 }
