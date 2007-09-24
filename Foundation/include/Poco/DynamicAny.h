@@ -564,6 +564,160 @@ inline T& operator /= (T& other, const DynamicAny& da)
 }
 
 
+inline bool operator == (Poco::Int8 other, const DynamicAny& da)
+	/// Equality operator for Poco::Int8 comparison to DynamicAny
+{
+	return da.convert<Poco::Int8>() == other;
+}
+
+
+inline bool operator != (Poco::Int8 other, const DynamicAny& da)
+	/// Inequality operator for Poco::Int8 comparison to DynamicAny
+{
+	return da.convert<Poco::Int8>() != other;
+}
+
+
+inline bool operator == (Poco::UInt8 other, const DynamicAny& da)
+	/// Equality operator for Poco::UInt8 comparison to DynamicAny
+{
+	return da.convert<Poco::UInt8>() == other;
+}
+
+
+inline bool operator != (Poco::UInt8 other, const DynamicAny& da)
+	/// Inequality operator for Poco::UInt8 comparison to DynamicAny
+{
+	return da.convert<Poco::UInt8>() != other;
+}
+
+
+inline bool operator == (Poco::Int16 other, const DynamicAny& da)
+	/// Equality operator for Poco::Int8 comparison to DynamicAny
+{
+	return da.convert<Poco::Int16>() == other;
+}
+
+
+inline bool operator != (Poco::Int16 other, const DynamicAny& da)
+	/// Inequality operator for Poco::Int8 comparison to DynamicAny
+{
+	return da.convert<Poco::Int16>() != other;
+}
+
+
+inline bool operator == (Poco::UInt16 other, const DynamicAny& da)
+	/// Equality operator for Poco::UInt16 comparison to DynamicAny
+{
+	return da.convert<Poco::UInt16>() == other;
+}
+
+
+inline bool operator != (Poco::UInt16 other, const DynamicAny& da)
+	/// Inequality operator for Poco::UInt16 comparison to DynamicAny
+{
+	return da.convert<Poco::UInt16>() != other;
+}
+
+
+inline bool operator == (Poco::Int32 other, const DynamicAny& da)
+	/// Equality operator for Poco::Int32 comparison to DynamicAny
+{
+	return da.convert<Poco::Int32>() == other;
+}
+
+
+inline bool operator != (Poco::Int32 other, const DynamicAny& da)
+	/// Inequality operator for Poco::Int32 comparison to DynamicAny
+{
+	return da.convert<Poco::Int32>() != other;
+}
+
+
+inline bool operator == (Poco::UInt32 other, const DynamicAny& da)
+	/// Equality operator for Poco::UInt32 comparison to DynamicAny
+{
+	return da.convert<Poco::UInt32>() == other;
+}
+
+
+inline bool operator != (Poco::UInt32 other, const DynamicAny& da)
+	/// Inequality operator for Poco::UInt32 comparison to DynamicAny
+{
+	return da.convert<Poco::UInt32>() != other;
+}
+
+
+inline bool operator == (Poco::Int64 other, const DynamicAny& da)
+	/// Equality operator for Poco::Int64 comparison to DynamicAny
+{
+	return da.convert<Poco::Int64>() == other;
+}
+
+
+inline bool operator != (Poco::Int64 other, const DynamicAny& da)
+	/// Inequality operator for Poco::Int64 comparison to DynamicAny
+{
+	return da.convert<Poco::Int64>() != other;
+}
+
+
+inline bool operator == (Poco::UInt64 other, const DynamicAny& da)
+	/// Equality operator for Poco::UInt64 comparison to DynamicAny
+{
+	return da.convert<Poco::UInt64>() == other;
+}
+
+
+inline bool operator != (Poco::UInt64 other, const DynamicAny& da)
+	/// Inequality operator for Poco::UInt64 comparison to DynamicAny
+{
+	return da.convert<Poco::UInt64>() != other;
+}
+
+
+inline bool operator == (double other, const DynamicAny& da)
+	/// Equality operator for double comparison to DynamicAny
+{
+	return da.convert<double>() == other;
+}
+
+
+inline bool operator != (double other, const DynamicAny& da)
+	/// Inequality operator for double comparison to DynamicAny
+{
+	return da.convert<double>() != other;
+}
+
+
+inline bool operator == (float other, const DynamicAny& da)
+	/// Equality operator for float comparison to DynamicAny
+{
+	return da.convert<float>() == other;
+}
+
+
+inline bool operator != (float other, const DynamicAny& da)
+	/// Inequality operator for float comparison to DynamicAny
+{
+	return da.convert<float>() != other;
+}
+
+
+inline bool operator == (bool other, const DynamicAny& da)
+	/// Equality operator for bool comparison to DynamicAny
+{
+	return da.convert<bool>() == other;
+}
+
+
+inline bool operator != (bool other, const DynamicAny& da)
+	/// Inequality operator for bool comparison to DynamicAny
+{
+	return da.convert<bool>() != other;
+}
+
+
 inline bool operator == (const std::string& other, const DynamicAny& da)
 	/// Equality operator for DynamicAny comparison to std::string
 {
@@ -572,9 +726,23 @@ inline bool operator == (const std::string& other, const DynamicAny& da)
 
 
 inline bool operator != (const std::string& other, const DynamicAny& da)
-	/// Equality operator for DynamicAny comparison to std::string
+	/// Inequality operator for DynamicAny comparison to std::string
 {
 	return da.convert<std::string>() != other;
+}
+
+
+inline bool operator == (const char* other, const DynamicAny& da)
+	/// Equality operator for DynamicAny comparison to std::string
+{
+	return da.convert<std::string>() == std::string(other);
+}
+
+
+inline bool operator != (const char* other, const DynamicAny& da)
+	/// Inequality operator for DynamicAny comparison to std::string
+{
+	return da.convert<std::string>() != std::string(other);
 }
 
 

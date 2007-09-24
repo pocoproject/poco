@@ -1363,14 +1363,51 @@ void DynamicAnyTest::testComparisonOperators()
 	DynamicAny any2 = "1";
 	assert (any1 == any2);
 	assert (any1 == 1);
+	assert (1 == any1);
 	assert (any1 == "1");
 	assert ("1" == any1);
+
+	any1 = 1L;
+	assert (any1 == any2);
+	assert (any1 == 1L);
+	assert (1L == any1);
+	assert (any1 == "1");
+	assert ("1" == any1);
+	assert (any1 != 2L);
+	assert (2L != any1);
+	assert (any1 != "2");
+	assert ("2" != any1);
+
+	any1 = 0x31;
+	assert (any1 == '1');
+	assert ('1' == any1);
 
 	any1 = "2";
 	assert (any1 != any2);
 	assert (any1 != 1);
+	assert (1 != any1);
 	assert (any1 != "1");
 	assert ("1" != any1);
+
+	any1 = 1.5;
+	assert (any1 == 1.5);
+	assert (1.5 == any1);
+	assert (any1 == "1.5");
+	assert ("1.5" == any1);
+	assert (any1 != 2.5);
+	assert (2.5 != any1);
+	assert (any1 != "2.5");
+	assert ("2.5" != any1);
+
+	any1 = 1.5f;
+	assert (any1 == 1.5f);
+	assert (1.5f == any1);
+	assert (any1 == "1.5");
+	assert ("1.5" == any1);
+	assert (any1 != 2.5f);
+	assert (2.5f != any1);
+	assert (any1 != "2.5");
+	assert ("2.5" != any1);
 }
 
 
