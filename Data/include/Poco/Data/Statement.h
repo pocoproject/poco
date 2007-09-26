@@ -174,7 +174,6 @@ protected:
 private:
 	typedef Poco::SharedPtr<StatementImpl> StatementImplPtr;
 
-	bool _executed;
 	StatementImplPtr _ptr;
 };
 

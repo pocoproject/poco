@@ -48,22 +48,19 @@ namespace Data {
 
 
 Statement::Statement(StatementImpl* pImpl):
-	_executed(false),
 	_ptr(pImpl)
 {
 	poco_check_ptr (pImpl);
 }
 
 
-Statement::Statement(Session& session):
-	_executed(false)
+Statement::Statement(Session& session)
 {
 	reset(session);
 }
 
 
 Statement::Statement(const Statement& stmt):
-	_executed(stmt._executed),
 	_ptr(stmt._ptr)
 {
 }
@@ -85,7 +82,6 @@ Statement& Statement::operator = (const Statement& stmt)
 void Statement::swap(Statement& other)
 {
 	std::swap(_ptr, other._ptr);
-	std::swap(_executed, other._executed);
 }
 
 
@@ -95,7 +91,7 @@ Poco::UInt32 Statement::execute()
 	{
 		_ptr->reset();
 	}
-	_executed = true;
+
 	return _ptr->execute();
 }
 
