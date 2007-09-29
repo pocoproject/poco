@@ -994,6 +994,21 @@ void ODBCPostgreSQLTest::testStdVectorBool()
 }
 
 
+void ODBCPostgreSQLTest::testAsync()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->asynchronous();
+		i += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::configurePLPgSQL()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1317,6 +1332,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNull);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRowIterator);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStdVectorBool);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAsync);
 
 		return pSuite;
 	}

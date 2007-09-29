@@ -44,6 +44,8 @@
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/Range.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/ActiveMethod.h"
+#include "Poco/ActiveResult.h"
 
 
 namespace Poco {
@@ -60,15 +62,67 @@ class Data_API Statement
 	/// A Statement is used to execute SQL statements. 
 	/// It does not contain code of its own.
 	/// Its main purpose is to forward calls to the concrete StatementImpl stored inside.
+	/// Statement execution can be synchronous or asynchronous.
+	/// Synchronous ececution is achieved through execute() call, while asynchronous is
+	/// achieved through executeAsync() method call.
+	/// An asynchronously executing statement should not be copied during the execution. 
+	/// Copying is not prohibited, however the benefits of the asynchronous call shall 
+	/// be lost for that particular call since the synchronizing call shall internally be 
+	/// called in the copy constructor.
+	/// 
+	/// For example, in the following case, although the execution is asyncronous, the
+	/// synchronization part happens in the copy constructor, so the asynchronous nature 
+	/// of the statement is lost for the end user:
+	/// 
+	///		Statement stmt = (session << "SELECT * FROM Table", async, now);
+	/// 
+	/// while in this case it is preserved:
+	/// 
+	///		Statement stmt = session << "SELECT * FROM Table", async, now;
+	/// 
+	/// There are two ways to preserve the asynchronous nature of a statement:
+	/// 
+	/// 1) Call executeAsync() method directly:
+	///
+	///		Statement stmt = session << "SELECT * FROM Table"; // no execution yet
+	///		stmt.executeAsync(); // asynchronous execution
+	///		// do something else ...
+	///		stmt.wait(); // synchronize
+	///
+	/// 2) Ensure asynchronous execution through careful syntax constructs:
+	/// 
+	///		Statement stmt(session);
+	///		stmt = session << "SELECT * FROM Table", async, now;
+	///		// do something else ...
+	///		stmt.wait(); // synchronize
+	///
+	/// Note:
+	///
+	/// Once set as asynchronous through 'async' manipulator, statement remains
+	/// asynchronous for all subsequent execution calls, both execute() and executeAsync().
+	/// However, calling executAsync() on a synchronous statement shall execute 
+	/// asynchronously but without altering the underlying statement's synchronous nature.
+	///
+	/// Once asyncronous, a statement can be reverted back to synchronous state in two ways:
+	/// 
+	///	1) By calling setAsync(false)
+	///	2) By means of 'sync' or 'reset' manipulators
+	///
+	/// See individual functions documentation for more details.
+	///
 {
 public:
 	typedef void (*Manipulator)(Statement&);
+	typedef Poco::UInt32 ResultType;
+	typedef ActiveResult<ResultType> Result;
+	typedef SharedPtr<Result> ResultPtr;
+	typedef ActiveMethod<ResultType, void, StatementImpl> AsyncExecMethod;
 
 	enum Storage
 	{
+		STORAGE_DEQUE   = StatementImpl::STORAGE_DEQUE_IMPL,
 		STORAGE_VECTOR  = StatementImpl::STORAGE_VECTOR_IMPL,
 		STORAGE_LIST    = StatementImpl::STORAGE_LIST_IMPL,
-		STORAGE_DEQUE   = StatementImpl::STORAGE_DEQUE_IMPL,
 		STORAGE_UNKNOWN = StatementImpl::STORAGE_UNKNOWN_IMPL
 	};
 
@@ -93,7 +147,10 @@ public:
 		/// Destroys the Statement.
 
 	Statement(const Statement& stmt);
-		/// Copy constructor
+		/// Copy constructor. 
+		/// If the statement has been executed asynchronously and has not been
+		/// synchronized prior to copy operation (i.e. is copied while executing), 
+		/// this constructor shall synchronize it.
 
 	Statement& operator = (const Statement& stmt);
 		/// Assignment operator.
@@ -103,7 +160,7 @@ public:
 
 	template <typename T> 
 	Statement& operator << (const T& t)
-		/// Concatenates the send data to a string version of the SQL statement.
+		/// Concatenates data with the SQL statement string.
 	{
 		_ptr->add(t);
 		return *this;
@@ -121,7 +178,7 @@ public:
 	Statement& operator , (const Limit& extrLimit);
 		/// Sets a limit on the maximum number of rows a select is allowed to return.
 		///
-		/// Set per default to Limit::LIMIT_UNLIMITED which disables the limit.
+		/// Set per default to zero to Limit::LIMIT_UNLIMITED, which disables the limit.
 
 	Statement& operator , (const Range& extrRange);
 		/// Sets a an etxraction Range on the maximum number of rows a select is allowed to return.
@@ -131,13 +188,43 @@ public:
 	std::string toString() const;
 		/// Creates a string from the accumulated SQL statement
 
-	Poco::UInt32 execute();
-		/// Executes the whole statement. Stops when either a limit is hit or the whole statement was executed.
-		/// Returns the number of rows extracted from the Database.
+	ResultType execute();
+		/// Executes the statement synchronously or asynchronously. 
+		/// Stops when either a limit is hit or the whole statement was executed.
+		/// Returns the number of rows extracted from the database.
+		/// If isAsync() returns  true, the statement is executed asynchronously 
+		/// and the return value from this function is zero.
+		/// The number of extracted rows from the query can be obtained by calling 
+		/// wait().
+
+	const Result& executeAsync();
+		/// Executes the statement asynchronously. 
+		/// Stops when either a limit is hit or the whole statement was executed.
+		/// Returns immediately. For statements returning data, the number of rows extracted is 
+		/// available by calling wait() method on either the returned value or the statement itself.
+		/// When executed on otherwise synchronous statement, this method does not alter the
+		/// statement's synchronous nature.
+
+	void setAsync(bool async);
+		/// Sets the asynchronous flag. If this flag is true, executeAsync() is called 
+		/// from the now() manipulator. This setting does not affect the statement's
+		/// capability to be executed synchronously by directly calling execute().
+
+	bool isAsync() const;
+		/// Returns true if statement was marked for asynchronous execution.
+
+	Statement::ResultType wait(long milliseconds = WAIT_FOREVER);
+		/// Waits for the execution completion for asynchronous statements or
+		/// returns immediately for synchronous ones. The return value for 
+		/// asynchronous statement is the execution result (i.e. number of 
+		/// rows retrieved). For synchronous statements, the return value is zero.
+
+	bool initialized();
+		/// Returns true if the statement was initialized (i.e. not executed yet).
 
 	bool done();
-		/// Returns if the statement was completely executed or if a previously set limit stopped it
-		/// and there is more work to do. When no limit is set, it will always - after calling execute() - return true.
+		/// Returns true if the statement was completely executed or false if a range limit stopped it
+		/// and there is more work to do. When no limit is set, it will always return true after calling execute().
 
 	Statement& reset(Session& session);
 		/// Resets the Statement so that it can be filled with a new SQL command.
@@ -174,25 +261,59 @@ protected:
 private:
 	typedef Poco::SharedPtr<StatementImpl> StatementImplPtr;
 
-	StatementImplPtr _ptr;
+	static const int WAIT_FOREVER = -1;
+
+	StatementImplPtr  _ptr;
+
+	// asynchronous execution related members
+	bool              _isAsync;
+	mutable ResultPtr _pResult;
+	FastMutex         _mutex;
+	AsyncExecMethod   _asyncExec;
 };
 
 
 //
 // Manipulators
 //
+
 void Data_API now(Statement& statement);
+	/// Enforces immediate execution of the statement.
+	/// If _isAsync flag has been set, execution is invoked asynchronously.
 
-void Data_API vector(Statement& statement);
 
-void Data_API list(Statement& statement);
+void Data_API sync(Statement& statement);
+	/// Sets the _isAsync flag to false, signalling synchronous execution.
+	/// Synchronous execution is default, so specifying this manipulator
+	/// only makes sense if async() was called for the statement before.
+
+
+void Data_API async(Statement& statement);
+	/// Sets the _isAsync flag to true, signalling asynchronous execution.
+
 
 void Data_API deque(Statement& statement);
+	/// Sets the internal storage to std::deque.
+	/// std::deque is default storage, so specifying this manipulator
+	/// only makes sense if list() or deque() were called for the statement before.
+
+
+void Data_API vector(Statement& statement);
+	/// Sets the internal storage to std::vector.
+	
+
+void Data_API list(Statement& statement);
+	/// Sets the internal storage to std::list.
+
+
+void Data_API reset(Statement& statement);
+	/// Sets all internal settings to their respective default values.
 
 
 //
 // inlines
 //
+
 inline Statement& Statement::operator , (Manipulator manip)
 {
 	manip(*this);
@@ -271,9 +392,39 @@ inline Statement::Storage Statement::storage() const
 }
 
 
+inline bool Statement::canModifyStorage()
+{
+	return (0 == extractionCount()) && (initialized() || done());
+}
+
+
+inline bool Statement::initialized()
+{
+	return _ptr->getState() == StatementImpl::ST_INITIALIZED;
+}
+
+
+inline bool Statement::done()
+{
+	return _ptr->getState() == StatementImpl::ST_DONE;
+}
+
+
 inline bool Statement::isNull(std::size_t col, std::size_t row) const
 {
 	return _ptr->isNull(col, row);
+}
+
+
+inline void Statement::setAsync(bool async)
+{
+	_isAsync = async;
+}
+
+
+inline bool Statement::isAsync() const
+{
+	return _isAsync;
 }
 
 

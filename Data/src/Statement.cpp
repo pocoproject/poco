@@ -40,6 +40,7 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Any.h"
 #include "Poco/Tuple.h"
+#include "Poco/ActiveMethod.h"
 #include <algorithm>
 
 
@@ -48,21 +49,30 @@ namespace Data {
 
 
 Statement::Statement(StatementImpl* pImpl):
-	_ptr(pImpl)
+	_ptr(pImpl),
+	_isAsync(false),
+	_asyncExec(_ptr, &StatementImpl::execute)
 {
 	poco_check_ptr (pImpl);
 }
 
 
-Statement::Statement(Session& session)
+Statement::Statement(Session& session):
+	_asyncExec(_ptr, &StatementImpl::execute)
 {
 	reset(session);
 }
 
 
 Statement::Statement(const Statement& stmt):
-	_ptr(stmt._ptr)
+	_ptr(stmt._ptr),
+	_isAsync(stmt._isAsync),
+	_pResult(stmt._pResult),
+	_asyncExec(_ptr, &StatementImpl::execute)
 {
+	// if executing asynchronously, wait
+	if (stmt._pResult) 
+		stmt._pResult->wait();
 }
 
 
@@ -82,31 +92,56 @@ Statement& Statement::operator = (const Statement& stmt)
 void Statement::swap(Statement& other)
 {
 	std::swap(_ptr, other._ptr);
+	std::swap(_isAsync, other._isAsync);
+	std::swap(_asyncExec, other._asyncExec);
+	std::swap(_pResult, other._pResult);
 }
 
 
-Poco::UInt32 Statement::execute()
+Statement::ResultType Statement::execute()
 {
-	if (done())
+	if (!isAsync())
 	{
-		_ptr->reset();
+		if (done()) _ptr->reset();
+		return _ptr->execute();
 	}
-
-	return _ptr->execute();
+	else
+	{
+		executeAsync();
+		return 0;
+	}
 }
 
 
-bool Statement::done()
+const Statement::Result& Statement::executeAsync()
 {
-	return _ptr->getState() == StatementImpl::ST_DONE;
+	FastMutex::ScopedLock lock(_mutex);
+	bool isDone = done();
+	if (initialized() || isDone)
+	{
+		if (isDone) _ptr->reset();
+		_pResult = new Result(_asyncExec());
+		poco_check_ptr (_pResult);
+		return *_pResult;
+	}
+	else
+		throw InvalidAccessException("Statement still executing.");
 }
 
 
-bool Statement::canModifyStorage()
+Statement::ResultType Statement::wait(long milliseconds)
 {
-	return 0 == extractionCount() &&
-		(_ptr->getState() == StatementImpl::ST_INITIALIZED ||
-		_ptr->getState() == StatementImpl::ST_RESET);
+	if (!_pResult) return 0;
+
+	if (WAIT_FOREVER != milliseconds)
+		_pResult->wait(milliseconds);
+	else
+		_pResult->wait();
+
+	if (_pResult->exception())
+		throw *_pResult->exception();
+
+	return _pResult->data();
 }
 
 
@@ -142,6 +177,18 @@ void now(Statement& statement)
 }
 
 
+void sync(Statement& statement)
+{
+	statement.setAsync(false);
+}
+
+
+void async(Statement& statement)
+{
+	statement.setAsync(true);
+}
+
+
 void vector(Statement& statement)
 {
 	if (!statement.canModifyStorage())
@@ -166,6 +213,16 @@ void deque(Statement& statement)
 		throw InvalidAccessException("Storage not modifiable.");
 
 	statement.setStorage("deque");
+}
+
+
+void reset(Statement& statement)
+{
+	if (!statement.canModifyStorage())
+		throw InvalidAccessException("Storage not modifiable.");
+
+	statement.setStorage("deque");
+	statement.setAsync(false);
 }
 
 

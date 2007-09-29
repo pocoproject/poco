@@ -1082,6 +1082,21 @@ void ODBCOracleTest::testRowIterator()
 }
 
 
+void ODBCOracleTest::testAsync()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->asynchronous();
+		i += 2;
+	}
+}
+
+
 void ODBCOracleTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1369,6 +1384,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNull);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testRowIterator);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAsync);
 
 		return pSuite;
 	}

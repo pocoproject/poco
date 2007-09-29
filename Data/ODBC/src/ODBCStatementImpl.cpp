@@ -212,6 +212,7 @@ void ODBCStatementImpl::putData()
 void ODBCStatementImpl::clear()
 {
 	SQLRETURN rc = SQLCloseCursor(_stmt);
+	_stepCalled = false;
 	if (Utility::isError(rc))
 	{
 		StatementError err(_stmt);

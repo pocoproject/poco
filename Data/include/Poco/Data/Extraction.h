@@ -352,7 +352,7 @@ private:
 };
 
 
-template <class T, class C = std::vector<T> >
+template <class T, class C = std::deque<T> >
 class InternalExtraction: public Extraction<C>
 	/// Container Data Type specialization extension for extraction of values from a query result set.
 	///

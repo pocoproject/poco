@@ -51,6 +51,11 @@ namespace
 	class ActiveObject
 	{
 	public:
+		typedef ActiveMethod<int, int, ActiveObject>   IntIntType;
+		typedef ActiveMethod<void, int, ActiveObject>  VoidIntType;
+		typedef ActiveMethod<void, void, ActiveObject> VoidVoidType;
+		typedef ActiveMethod<int, void, ActiveObject>  IntVoidType;
+
 		ActiveObject():
 			testMethod(this, &ActiveObject::testMethodImpl),
 			testVoid(this,&ActiveObject::testVoidOutImpl),
@@ -63,13 +68,13 @@ namespace
 		{
 		}
 		
-		ActiveMethod<int, int, ActiveObject> testMethod;
+		IntIntType testMethod;
 
-		ActiveMethod<void, int, ActiveObject> testVoid;
+		VoidIntType testVoid;
 
-		ActiveMethod<void, void, ActiveObject> testVoidInOut;
+		VoidVoidType testVoidInOut;
 
-		ActiveMethod<int, void, ActiveObject> testVoidIn;
+		IntVoidType testVoidIn;
 		
 		void cont()
 		{
@@ -127,6 +132,46 @@ void ActiveMethodTest::testWait()
 	assert (result.available());
 	assert (result.data() == 123);
 	assert (!result.failed());
+}
+
+
+void ActiveMethodTest::testCopy()
+{
+	ActiveObject activeObj;
+
+	ActiveObject::IntIntType ii = activeObj.testMethod;
+	ActiveResult<int> rii = ii(123);
+	assert (!rii.available());
+	activeObj.cont();
+	rii.wait();
+	assert (rii.available());
+	assert (rii.data() == 123);
+	assert (!rii.failed());
+
+	ActiveObject::VoidIntType  vi = activeObj.testVoid;
+	ActiveResult<void> rvi = vi(123);
+	assert (!rvi.available());
+	activeObj.cont();
+	rvi.wait();
+	assert (rvi.available());
+	assert (!rvi.failed());
+
+	ActiveObject::VoidVoidType vv = activeObj.testVoidInOut;
+	ActiveResult<void> rvv = vv();
+	assert (!rvv.available());
+	activeObj.cont();
+	rvv.wait();
+	assert (rvv.available());
+	assert (!rvv.failed());
+
+	ActiveObject::IntVoidType  iv = activeObj.testVoidIn;
+	ActiveResult<int> riv = iv();
+	assert (!riv.available());
+	activeObj.cont();
+	riv.wait();
+	assert (riv.available());
+	assert (riv.data() == 123);
+	assert (!riv.failed());
 }
 
 
@@ -226,6 +271,7 @@ CppUnit::Test* ActiveMethodTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ActiveMethodTest");
 
 	CppUnit_addTest(pSuite, ActiveMethodTest, testWait);
+	CppUnit_addTest(pSuite, ActiveMethodTest, testCopy);
 	CppUnit_addTest(pSuite, ActiveMethodTest, testWaitInterval);
 	CppUnit_addTest(pSuite, ActiveMethodTest, testTryWait);
 	CppUnit_addTest(pSuite, ActiveMethodTest, testFailure);

@@ -906,6 +906,21 @@ void ODBCSQLiteTest::testRowIterator()
 }
 
 
+void ODBCSQLiteTest::testAsync()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->asynchronous();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1153,6 +1168,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testNull);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testRowIterator);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAsync);
 
 		return pSuite;
 	}

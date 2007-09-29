@@ -64,7 +64,7 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 	Poco::toUpperInPlace(sqliteType);
 	
 	if (sqliteType.npos != sqliteType.find("INT"))
-		return MetaColumn::FDT_INT32;
+		return MetaColumn::FDT_INT64;
 	else if (sqliteType.empty() || 
 		sqliteType.npos != sqliteType.find("CHAR") ||
 		sqliteType.npos != sqliteType.find("CLOB") ||

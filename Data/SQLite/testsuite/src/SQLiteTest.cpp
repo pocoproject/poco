@@ -54,6 +54,8 @@ using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
 using Poco::Data::SQLite::InvalidSQLStatementException;
+using Poco::Int64;
+
 
 struct Person
 {
@@ -496,13 +498,16 @@ void SQLiteTest::testLimitPrepare()
 	Statement stmt = (tmp << "SELECT * FROM Strings", into(retData), limit(50));
 	assert (retData.size() == 0);
 	assert (!stmt.done());
-	stmt.execute();
+	Poco::UInt32 rows = stmt.execute();
+	assert (50 == rows);
 	assert (!stmt.done());
 	assert (retData.size() == 50);
-	stmt.execute();
+	rows = stmt.execute();
+	assert (50 == rows);
 	assert (stmt.done());
 	assert (retData.size() == 100);
-	stmt.execute(); // will restart execution!
+	rows = stmt.execute(); // will restart execution!
+	assert (50 == rows);
 	assert (!stmt.done());
 	assert (retData.size() == 150);
 	for (int x = 0; x < 150; ++x)
@@ -1030,28 +1035,6 @@ void SQLiteTest::testBLOB()
 }
 
 
-void SQLiteTest::testBLOBStmt()
-{
-	// the following test will fail becuase we use a temporary object as parameter to use
-	/*
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
-	tmp << "DROP TABLE IF EXISTS Person", now;
-	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Image BLOB)", now;
-	BLOB img("0123456789", 10);
-	int count = 0;
-	Statement ins = (tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :img)", use("lastname"), use("firstname"), use("Address"), use(BLOB("0123456789", 10)));
-	ins.execute();
-	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
-	assert (count == 1);
-	BLOB res;
-	poco_assert (res.size() == 0);
-	Statement stmt = (tmp << "SELECT Image FROM Person WHERE LastName == :ln", use("lastname"), into(res));
-	stmt.execute();
-	poco_assert (res == img);
-	*/
-}
-
-
 void SQLiteTest::testTuple10()
 {
 	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
@@ -1537,10 +1520,13 @@ void SQLiteTest::testInternalExtraction()
 	assert (3 == rset2.columnCount());
 	assert (4 == rset2.rowCount());
 
-	int a = rset.value<int>(0,2);
+	Int64 a = rset.value<Int64>(0,2);
 	assert (3 == a);
 
-	int b = rset2.value<int>("InT0",2);
+	int c = rset2.value(0);
+	assert (1 == c);
+
+	Int64 b = rset2.value<Int64>("InT0",2);
 	assert (3 == b);
 
 	double d = rset.value<double>(1,0);
@@ -1549,18 +1535,18 @@ void SQLiteTest::testInternalExtraction()
 	std::string s = rset.value<std::string>(2,1);
 	assert ("4" == s);
 	
-	typedef std::vector<int> IntVec;
+	typedef std::deque<Int64> IntDeq;
 	
-	const Column<int, IntVec>& col = rset.column<int, IntVec>(0);
+	const Column<Int64>& col = rset.column<Int64, IntDeq>(0);
 	assert (col[0] == 1);
 
-	try { rset.column<int, IntVec>(100); fail ("must fail"); }
+	try { rset.column<Int64, IntDeq>(100); fail ("must fail"); }
 	catch (RangeException&) { }
 
-	const Column<int, IntVec>& col1 = rset.column<int, IntVec>(0);
+	const Column<Int64>& col1 = rset.column<Int64, IntDeq>(0);
 	assert ("int0" == col1.name());
-	Column<int>::Iterator it = col1.begin();
-	Column<int>::Iterator itEnd = col1.end();
+	Column<Int64>::Iterator it = col1.begin();
+	Column<Int64>::Iterator itEnd = col1.end();
 	int counter = 1;
 	for (; it != itEnd; ++it, ++counter)
 		assert (counter == *it);
@@ -1572,7 +1558,7 @@ void SQLiteTest::testInternalExtraction()
 	stmt = (tmp << "DELETE FROM Vectors", now);
 	rset = stmt;
 
-	try { rset.column<int, IntVec>(0); fail ("must fail"); }
+	try { rset.column<Int64, IntDeq>(0); fail ("must fail"); }
 	catch (RangeException&) { }
 }
 
@@ -1701,6 +1687,51 @@ void SQLiteTest::testRowIterator()
 }
 
 
+void SQLiteTest::testAsync()
+{
+	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	tmp << "DROP TABLE IF EXISTS Strings", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
+	
+	int rowCount = 500;
+	std::vector<int> data(rowCount);
+	Statement stmt = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
+	Statement::Result result = stmt.executeAsync();
+	assert (!stmt.isAsync());
+	result.wait();
+	
+	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
+	assert (stmt.isAsync());
+	stmt.wait();
+
+	assert (stmt.execute() == 0);
+	assert (stmt.isAsync());
+	try {
+		result = stmt.executeAsync();
+		fail ("must fail");
+	} catch (InvalidAccessException&)
+	{
+		stmt.wait();
+		result = stmt.executeAsync();
+	}
+
+	assert (stmt.wait() == rowCount);
+	assert (result.data() == rowCount);
+	stmt.setAsync(false);
+	assert (!stmt.isAsync());
+	assert (stmt.execute() == rowCount);
+
+	stmt = tmp << "SELECT * FROM Strings", into(data), sync, now;
+	assert (!stmt.isAsync());
+	assert (stmt.wait() == 0);
+	assert (stmt.execute() == rowCount);
+	result = stmt.executeAsync();
+	assert (!stmt.isAsync());
+	result.wait();
+	assert (result.data() == rowCount);
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -1750,7 +1781,6 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testSingleSelect);
 	CppUnit_addTest(pSuite, SQLiteTest, testEmptyDB);
 	CppUnit_addTest(pSuite, SQLiteTest, testBLOB);
-	CppUnit_addTest(pSuite, SQLiteTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple9);
@@ -1775,6 +1805,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
 	CppUnit_addTest(pSuite, SQLiteTest, testNull);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
+	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 
 	return pSuite;
 }

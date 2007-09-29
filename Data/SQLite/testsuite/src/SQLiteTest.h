@@ -85,7 +85,6 @@ public:
 	void testEmptyDB();
 
 	void testBLOB();
-	void testBLOBStmt();
 
 	void testTuple1();
 	void testTupleVector1();
@@ -112,6 +111,7 @@ public:
 	void testPrimaryKeyConstraint();
 	void testNull();
 	void testRowIterator();
+	void testAsync();
 
 	void setUp();
 	void tearDown();

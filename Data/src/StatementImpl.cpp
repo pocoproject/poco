@@ -99,9 +99,7 @@ Poco::UInt32 StatementImpl::execute()
 Poco::UInt32 StatementImpl::executeWithLimit()
 {
 	poco_assert (_state != ST_DONE);
-
 	compile();
-
 	Poco::UInt32 count = 0;
 	do
 	{
@@ -111,8 +109,7 @@ Poco::UInt32 StatementImpl::executeWithLimit()
 			next();
 			++count;
 		}
-	}
-	while (canBind());
+	} while (canBind());
 
 	if (!canBind() && (!hasNext() || _extrLimit.value() == 0))
 		_state = ST_DONE;
@@ -126,9 +123,7 @@ Poco::UInt32 StatementImpl::executeWithLimit()
 Poco::UInt32 StatementImpl::executeWithoutLimit()
 {
 	poco_assert (_state != ST_DONE);
-	
 	compile();
-
 	Poco::UInt32 count = 0;
 	do
 	{
@@ -138,8 +133,7 @@ Poco::UInt32 StatementImpl::executeWithoutLimit()
 			next();
 			++count;
 		}
-	}
-	while (canBind());
+	} while (canBind());
 
 	_state = ST_DONE;
 	return count;
@@ -268,12 +262,12 @@ void StatementImpl::resetExtraction()
 
 void StatementImpl::setStorage(const std::string& storage)
 {
-	if (0 == icompare(VECTOR, storage))
+	if (0 == icompare(DEQUE, storage))
+		_storage = STORAGE_DEQUE_IMPL;
+	else if (0 == icompare(VECTOR, storage))
 		_storage = STORAGE_VECTOR_IMPL; 
 	else if (0 == icompare(LIST, storage))
 		_storage = STORAGE_LIST_IMPL;
-	else if (0 == icompare(DEQUE, storage))
-		_storage = STORAGE_DEQUE_IMPL;
 	else if (0 == icompare(UNKNOWN, storage))
 		_storage = STORAGE_UNKNOWN_IMPL;
 	else

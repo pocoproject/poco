@@ -127,6 +127,8 @@ public:
 	void testNull();
 	void testRowIterator();
 
+	void testAsync();
+
 	void setUp();
 	void tearDown();
 

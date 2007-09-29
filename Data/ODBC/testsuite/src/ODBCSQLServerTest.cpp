@@ -1085,6 +1085,21 @@ void ODBCSQLServerTest::testStdVectorBool()
 }
 
 
+void ODBCSQLServerTest::testAsync()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->asynchronous();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1362,6 +1377,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNull);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRowIterator);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStdVectorBool);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAsync);
 
 		return pSuite;
 	}

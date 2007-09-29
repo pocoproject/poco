@@ -47,6 +47,7 @@ public:
 	~ActiveMethodTest();
 
 	void testWait();
+	void testCopy();
 	void testWaitInterval();
 	void testTryWait();
 	void testFailure();

@@ -1067,6 +1067,21 @@ void ODBCDB2Test::testRowIterator()
 }
 
 
+void ODBCDB2Test::testAsync()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->asynchronous();
+		i += 2;
+	}
+}
+
+
 void ODBCDB2Test::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1322,6 +1337,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNull);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testRowIterator);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testAsync);
 
 		return pSuite;
 	}

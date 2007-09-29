@@ -300,15 +300,21 @@ SQLSMALLINT Binder::toODBCDirection(Direction dir) const
 
 void Binder::synchronize()
 {
-	TimestampMap::iterator itTS = _timestamps.begin();
-	TimestampMap::iterator itTSEnd = _timestamps.end();
-	for(; itTS != itTSEnd; ++itTS) 
-		Utility::dateTimeSync(*itTS->second, *itTS->first);
+	if (_timestamps.size())
+	{
+		TimestampMap::iterator itTS = _timestamps.begin();
+		TimestampMap::iterator itTSEnd = _timestamps.end();
+		for(; itTS != itTSEnd; ++itTS) 
+			Utility::dateTimeSync(*itTS->second, *itTS->first);
+	}
 
-	StringMap::iterator itStr = _strings.begin();
-	StringMap::iterator itStrEnd = _strings.end();
-	for(; itStr != itStrEnd; ++itStr)
-		itStr->second->assign(itStr->first, strlen(itStr->first));
+	if (_strings.size())
+	{
+		StringMap::iterator itStr = _strings.begin();
+		StringMap::iterator itStrEnd = _strings.end();
+		for(; itStr != itStrEnd; ++itStr)
+			itStr->second->assign(itStr->first, strlen(itStr->first));
+	}
 }
 
 

@@ -51,7 +51,7 @@ SessionPool::SessionPool(const std::string& sessionKey, const std::string& conne
 	_maxSessions(maxSessions),
 	_idleTime(idleTime),
 	_nSessions(0),
-	_janitorTimer(idleTime, idleTime/4)
+	_janitorTimer(1000*idleTime, 1000*idleTime/4)
 {
 	Poco::TimerCallback<SessionPool> callback(*this, &SessionPool::onJanitorTimer);
 	_janitorTimer.start(callback);

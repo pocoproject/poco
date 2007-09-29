@@ -87,7 +87,11 @@ class Data_API SessionPool
 	///     ...
 {
 public:
-	SessionPool(const std::string& sessionKey, const std::string& connectionString, int minSessions = 1, int maxSessions = 32, int idleTime = 60);
+	SessionPool(const std::string& sessionKey, 
+		const std::string& connectionString, 
+		int minSessions = 1, 
+		int maxSessions = 32, 
+		int idleTime = 60);
 		/// Creates the SessionPool for sessions with the given sessionKey
 		/// and connectionString.
 		///

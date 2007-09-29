@@ -129,6 +129,8 @@ public:
 	void testRowIterator();
 	void testStdVectorBool();
 
+	void testAsync();
+
 	void setUp();
 	void tearDown();
 

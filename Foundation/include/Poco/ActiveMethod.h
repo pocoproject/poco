@@ -115,10 +115,27 @@ public:
 		return result;
 	}
 		
+	ActiveMethod(const ActiveMethod& other):
+		_pOwner(other._pOwner),
+		_method(other._method)
+	{
+	}
+
+	ActiveMethod& operator = (const ActiveMethod& other)
+	{
+		ActiveMethod tmp(other);
+		swap(tmp);
+		return *this;
+	}
+
+	void swap(ActiveMethod& other)
+	{
+		std::swap(_pOwner, other._pOwner);
+		std::swap(_method, other._method);
+	}
+
 private:
 	ActiveMethod();
-	ActiveMethod(const ActiveMethod&);
-	ActiveMethod& operator = (const ActiveMethod&);
 
 	OwnerType* _pOwner;
 	Callback   _method;
@@ -190,10 +207,27 @@ public:
 		return result;
 	}
 		
+	ActiveMethod(const ActiveMethod& other):
+		_pOwner(other._pOwner),
+		_method(other._method)
+	{
+	}
+
+	ActiveMethod& operator = (const ActiveMethod& other)
+	{
+		ActiveMethod tmp(other);
+		swap(tmp);
+		return *this;
+	}
+
+	void swap(ActiveMethod& other)
+	{
+		std::swap(_pOwner, other._pOwner);
+		std::swap(_method, other._method);
+	}
+
 private:
 	ActiveMethod();
-	ActiveMethod(const ActiveMethod&);
-	ActiveMethod& operator = (const ActiveMethod&);
 
 	OwnerType* _pOwner;
 	Callback   _method;

@@ -1952,7 +1952,7 @@ void SQLExecutor::internalExtraction()
 		i = rset.value("str0", 2);
 		assert (5 == i);
 		
-		const Column<int>& col = rset.column<int, std::vector<int> >(0);
+		const Column<int>& col = rset.column<int, std::deque<int> >(0);
 		Column<int>::Iterator it = col.begin();
 		Column<int>::Iterator end = col.end();
 		for (int i = 1; it != end; ++it, ++i)
@@ -2238,4 +2238,47 @@ void SQLExecutor::stdVectorBool()
 	for (int i = 0; i < 4; ++i)
 		t += rset.value<bool>(0, i) ? 1 : 0;
 	assert (2 == t);
+}
+
+
+void SQLExecutor::asynchronous()
+{
+	Session tmp = *_pSession;
+
+	int rowCount = 500;
+	std::vector<int> data(rowCount);
+	Statement stmt = (tmp << "INSERT INTO Strings VALUES(?)", use(data));
+	Statement::Result result = stmt.executeAsync();
+	assert (!stmt.isAsync());
+	result.wait();
+	
+	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
+	assert (stmt.isAsync());
+	stmt.wait();
+	assert (stmt.execute() == 0);
+	
+	try {
+		result = stmt.executeAsync();
+		fail ("must fail");
+	} catch (InvalidAccessException&)
+	{
+		assert (stmt.isAsync());
+		stmt.wait();
+		result = stmt.executeAsync();
+	}
+
+	assert (stmt.wait() == rowCount);
+	assert (result.data() == rowCount);
+	stmt.setAsync(false);
+	assert (!stmt.isAsync());
+	assert (stmt.execute() == rowCount);
+
+	stmt = tmp << "SELECT * FROM Strings", into(data), sync, now;
+	assert (!stmt.isAsync());
+	assert (stmt.wait() == 0);
+	assert (stmt.execute() == rowCount);
+	result = stmt.executeAsync();
+	assert (!stmt.isAsync());
+	result.wait();
+	assert (result.data() == rowCount);
 }

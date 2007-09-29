@@ -52,7 +52,7 @@ namespace Poco {
 namespace Data {
 
 
-template <class T, class C = std::vector<T> >
+template <class T, class C = std::deque<T> >
 class Column
 	/// Column class is column data container.
 	/// Data (a pointer to container) is assigned to the class 

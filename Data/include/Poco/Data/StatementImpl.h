@@ -79,15 +79,15 @@ public:
 
 	enum Storage
 	{
+		STORAGE_DEQUE_IMPL,
 		STORAGE_VECTOR_IMPL,
 		STORAGE_LIST_IMPL,
-		STORAGE_DEQUE_IMPL,
 		STORAGE_UNKNOWN_IMPL
 	};
 
+	static const std::string DEQUE;
 	static const std::string VECTOR;
 	static const std::string LIST;
-	static const std::string DEQUE;
 	static const std::string UNKNOWN;
 
 	StatementImpl(SessionImpl& rSession);
@@ -97,7 +97,7 @@ public:
 		/// Destroys the StatementImpl.
 
 	template <typename T> void add(const T& t)
-		/// Appends SQl statement (fragments).
+		/// Appends SQL statement (fragments).
 	{
 		_ostr << t;
 	}
@@ -272,31 +272,31 @@ private:
 		/// overrides the session setting for storage, otherwise the
 		/// session setting is used.
 		/// If neither this statement nor the session have the storage
-		/// type set, std::vector is the default container type used.
+		/// type set, std::deque is the default container type used.
 	{
 		std::string storage;
 	
 		switch (_storage)
 		{
+		case STORAGE_DEQUE_IMPL:  
+			storage = DEQUE; break;
 		case STORAGE_VECTOR_IMPL: 
 			storage = VECTOR; break;
 		case STORAGE_LIST_IMPL:   
 			storage = LIST; break;
-		case STORAGE_DEQUE_IMPL:  
-			storage = DEQUE; break;
 		case STORAGE_UNKNOWN_IMPL:
 			storage = AnyCast<std::string>(session().getProperty("storage")); 
 			break;
 		}
 
-		if (storage.empty()) storage = VECTOR;
+		if (storage.empty()) storage = DEQUE;
 
-		if (0 == icompare(VECTOR, storage))
+		if (0 == icompare(DEQUE, storage))
+			addExtract(createExtract<T, std::deque<T> >(mc));
+		else if (0 == icompare(VECTOR, storage))
 			addExtract(createExtract<T, std::vector<T> >(mc));
 		else if (0 == icompare(LIST, storage))
 			addExtract(createExtract<T, std::list<T> >(mc));
-		else if (0 == icompare(DEQUE, storage))
-			addExtract(createExtract<T, std::deque<T> >(mc));
 	}
 
 	bool isNull(std::size_t col, std::size_t row) const;

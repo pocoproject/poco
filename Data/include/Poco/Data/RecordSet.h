@@ -144,11 +144,11 @@ public:
 		switch (storage())
 		{
 		case STORAGE_VECTOR:
-		case STORAGE_UNKNOWN:
 			return column<T, std::vector<T> >(col).value(row);
 		case STORAGE_LIST:
 			return column<T, std::list<T> >(col).value(row);
 		case STORAGE_DEQUE:
+		case STORAGE_UNKNOWN:
 			return column<T, std::deque<T> >(col).value(row);
 		default:
 			throw IllegalStateException("Invalid storage setting.");
@@ -162,11 +162,11 @@ public:
 		switch (storage())
 		{
 		case STORAGE_VECTOR:
-		case STORAGE_UNKNOWN:
 			return column<T, std::vector<T> >(name).value(row);
 		case STORAGE_LIST:
 			return column<T, std::list<T> >(name).value(row);
 		case STORAGE_DEQUE:
+		case STORAGE_UNKNOWN:
 			return column<T, std::deque<T> >(name).value(row);
 		default:
 			throw IllegalStateException("Invalid storage setting.");
