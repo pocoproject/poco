@@ -1700,6 +1700,21 @@ void SQLiteTest::testAsync()
 	assert (!stmt.isAsync());
 	result.wait();
 	
+	Statement stmt1 = (tmp << "SELECT * FROM Strings", into(data), async, now);
+	assert (stmt1.isAsync());
+	assert (stmt1.wait() == rowCount);
+
+	stmt1.execute();
+	try {
+		stmt1.execute();
+		fail ("must fail");
+	} catch (InvalidAccessException&)
+	{
+		stmt1.wait();
+		stmt1.execute();
+		stmt1.wait();
+	}
+
 	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
 	assert (stmt.isAsync());
 	stmt.wait();
@@ -1729,6 +1744,29 @@ void SQLiteTest::testAsync()
 	assert (!stmt.isAsync());
 	result.wait();
 	assert (result.data() == rowCount);
+
+	assert (0 == rowCount % 10);
+	int step = (int) (rowCount/10);
+	data.clear();
+	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
+	assert (data.size() == 0);
+	assert (!stmt2.done());
+	Statement::ResultType rows = 0;
+	
+	for (int i = 0; !stmt2.done(); i += step)
+	{
+		stmt2.execute();
+		rows = stmt2.wait();
+		assert (step == rows);
+		assert (step + i == data.size());
+	}
+	assert (stmt2.done());
+	assert (rowCount == data.size());
+
+	stmt2 = tmp << "SELECT * FROM Strings", reset;
+	assert (!stmt2.isAsync());
+	assert ("deque" == stmt2.getStorage());
+	assert (stmt2.execute() == rowCount);
 }
 
 

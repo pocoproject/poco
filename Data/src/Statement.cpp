@@ -70,9 +70,6 @@ Statement::Statement(const Statement& stmt):
 	_pResult(stmt._pResult),
 	_asyncExec(_ptr, &StatementImpl::execute)
 {
-	// if executing asynchronously, wait
-	if (stmt._pResult) 
-		stmt._pResult->wait();
 }
 
 
@@ -100,32 +97,41 @@ void Statement::swap(Statement& other)
 
 Statement::ResultType Statement::execute()
 {
-	if (!isAsync())
+	Mutex::ScopedLock lock(_mutex);
+	bool isDone = done();
+	if (initialized() || paused() || isDone)
 	{
-		if (done()) _ptr->reset();
-		return _ptr->execute();
-	}
-	else
-	{
-		executeAsync();
-		return 0;
-	}
+		if (!isAsync())
+		{
+			if (isDone) _ptr->reset();
+			return _ptr->execute();
+		}
+		else
+		{
+			doAsyncExec();
+			return 0;
+		}
+	} else
+		throw InvalidAccessException("Statement still executing.");
 }
 
 
 const Statement::Result& Statement::executeAsync()
 {
-	FastMutex::ScopedLock lock(_mutex);
-	bool isDone = done();
-	if (initialized() || isDone)
-	{
-		if (isDone) _ptr->reset();
-		_pResult = new Result(_asyncExec());
-		poco_check_ptr (_pResult);
-		return *_pResult;
-	}
+	Mutex::ScopedLock lock(_mutex);
+	if (initialized() || paused() || done())
+		return doAsyncExec();
 	else
 		throw InvalidAccessException("Statement still executing.");
+}
+
+
+const Statement::Result& Statement::doAsyncExec()
+{
+	if (done()) _ptr->reset();
+	_pResult = new Result(_asyncExec());
+	poco_check_ptr (_pResult);
+	return *_pResult;
 }
 
 

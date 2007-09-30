@@ -115,6 +115,8 @@ Poco::UInt32 StatementImpl::executeWithLimit()
 		_state = ST_DONE;
 	else if (hasNext() && _extrLimit.value() == count && _extrLimit.isHardLimit())
 		throw LimitException("HardLimit reached. We got more data than we asked for");
+	else
+		_state = ST_PAUSED;
 
 	return count;
 }

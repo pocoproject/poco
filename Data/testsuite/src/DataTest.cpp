@@ -384,7 +384,7 @@ void DataTest::testColumnVector()
 
 	try
 	{
-		int i = c[100];
+		int i; i = c[100]; // to silence gcc
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -446,7 +446,7 @@ void DataTest::testColumnVectorBool()
 
 	try
 	{
-		bool b = c[100];
+		bool b; b = c[100]; // to silence gcc
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -522,7 +522,7 @@ void DataTest::testColumnDeque()
 
 	try
 	{
-		int i = c[100];
+		int i; i = c[100]; // to silence gcc
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -598,7 +598,7 @@ void DataTest::testColumnList()
 
 	try
 	{
-		int i = c[100];
+		int i; i = c[100]; // to silence gcc
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -658,13 +658,13 @@ void DataTest::testRow()
 
 	try
 	{
-		int i = row[5];
+		int i; i = row[5]; // to silence gcc
 		fail ("must fail");
 	}catch (RangeException&) {}
 
 	try
 	{
-		int i = row["a bad name"];
+		int i; i = row["a bad name"]; // to silence gcc
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 

@@ -73,6 +73,7 @@ public:
 		ST_INITIALIZED,
 		ST_COMPILED,
 		ST_BOUND,
+		ST_PAUSED,
 		ST_DONE,
 		ST_RESET
 	};

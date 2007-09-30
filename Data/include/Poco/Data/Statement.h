@@ -44,6 +44,7 @@
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/Range.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Mutex.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/ActiveResult.h"
 
@@ -205,7 +206,7 @@ public:
 		/// When executed on otherwise synchronous statement, this method does not alter the
 		/// statement's synchronous nature.
 
-	void setAsync(bool async);
+	void setAsync(bool async = true);
 		/// Sets the asynchronous flag. If this flag is true, executeAsync() is called 
 		/// from the now() manipulator. This setting does not affect the statement's
 		/// capability to be executed synchronously by directly calling execute().
@@ -221,6 +222,10 @@ public:
 
 	bool initialized();
 		/// Returns true if the statement was initialized (i.e. not executed yet).
+
+	bool paused();
+		/// Returns true if the statement was paused (a range limit stopped it
+		/// and there is more work to do).
 
 	bool done();
 		/// Returns true if the statement was completely executed or false if a range limit stopped it
@@ -263,12 +268,15 @@ private:
 
 	static const int WAIT_FOREVER = -1;
 
+	const Result& doAsyncExec();
+		/// Asynchronously executes the statement.
+
 	StatementImplPtr  _ptr;
 
 	// asynchronous execution related members
 	bool              _isAsync;
 	mutable ResultPtr _pResult;
-	FastMutex         _mutex;
+	Mutex             _mutex;
 	AsyncExecMethod   _asyncExec;
 };
 
@@ -401,6 +409,12 @@ inline bool Statement::canModifyStorage()
 inline bool Statement::initialized()
 {
 	return _ptr->getState() == StatementImpl::ST_INITIALIZED;
+}
+
+
+inline bool Statement::paused()
+{
+	return _ptr->getState() == StatementImpl::ST_PAUSED;
 }
 
 
