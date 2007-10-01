@@ -38,22 +38,22 @@
 #include "Poco/Timezone.h"
 #include "Poco/Timespan.h"
 #include <algorithm>
+#include <ctime>
 
 
 namespace Poco {
 
 
-LocalDateTime::LocalDateTime():
-	_tzd(Timezone::tzd())
+LocalDateTime::LocalDateTime()
 {
-	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+	determineTzd(true);
 }
 
 
 LocalDateTime::LocalDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond):
-	_dateTime(year, month, day, hour, minute, second, millisecond, microsecond),
-	_tzd(Timezone::tzd())
+	_dateTime(year, month, day, hour, minute, second, millisecond, microsecond)
 {
+	determineTzd();
 }
 
 
@@ -65,10 +65,9 @@ LocalDateTime::LocalDateTime(int tzd, int year, int month, int day, int hour, in
 
 
 LocalDateTime::LocalDateTime(double julianDay):
-	_dateTime(julianDay),
-	_tzd(Timezone::tzd())
+	_dateTime(julianDay)
 {
-	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+	determineTzd(true);
 }
 
 
@@ -76,15 +75,14 @@ LocalDateTime::LocalDateTime(int tzd, double julianDay):
 	_dateTime(julianDay),
 	_tzd(tzd)
 {
-	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+	adjustForTzd();
 }
 
 
 LocalDateTime::LocalDateTime(const DateTime& dateTime):
-	_dateTime(dateTime),
-	_tzd(Timezone::tzd())
+	_dateTime(dateTime)
 {
-	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+	determineTzd(true);
 }
 
 
@@ -92,7 +90,7 @@ LocalDateTime::LocalDateTime(int tzd, const DateTime& dateTime):
 	_dateTime(dateTime),
 	_tzd(tzd)
 {
-	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+	adjustForTzd();
 }
 
 
@@ -101,7 +99,7 @@ LocalDateTime::LocalDateTime(int tzd, const DateTime& dateTime, bool adjust):
 	_tzd(tzd)
 {
 	if (adjust)
-		_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+		adjustForTzd();
 }
 
 
@@ -116,6 +114,7 @@ LocalDateTime::LocalDateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff 
 	_dateTime(utcTime, diff),
 	_tzd(tzd)
 {
+	adjustForTzd();
 }
 
 	
@@ -123,7 +122,7 @@ LocalDateTime::~LocalDateTime()
 {
 }
 
-	
+
 LocalDateTime& LocalDateTime::operator = (const LocalDateTime& dateTime)
 {
 	if (&dateTime != this)
@@ -138,7 +137,10 @@ LocalDateTime& LocalDateTime::operator = (const LocalDateTime& dateTime)
 LocalDateTime& LocalDateTime::operator = (const Timestamp& timestamp)
 {
 	if (timestamp != this->timestamp())
+	{
 		_dateTime = timestamp;
+		determineTzd(true);
+	}
 
 	return *this;
 }
@@ -146,17 +148,16 @@ LocalDateTime& LocalDateTime::operator = (const Timestamp& timestamp)
 
 LocalDateTime& LocalDateTime::operator = (double julianDay)
 {
-	_tzd      = Timezone::tzd();
 	_dateTime = julianDay;
-	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+	determineTzd(true);
 	return *this;
 }
 
-	
+
 LocalDateTime& LocalDateTime::assign(int year, int month, int day, int hour, int minute, int second, int millisecond, int microseconds)
 {
 	_dateTime.assign(year, month, day, hour, minute, second, millisecond, microseconds);
-	_tzd = Timezone::tzd();
+	determineTzd(false);
 	return *this;
 }
 
@@ -173,7 +174,7 @@ LocalDateTime& LocalDateTime::assign(int tzd, double julianDay)
 {
 	_tzd      = tzd;
 	_dateTime = julianDay;
-	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
+	adjustForTzd();
 	return *this;
 }
 
@@ -229,13 +230,19 @@ bool LocalDateTime::operator >= (const LocalDateTime& dateTime) const
 
 LocalDateTime LocalDateTime::operator + (const Timespan& span) const
 {
-	return LocalDateTime(_dateTime.utcTime(), span.totalMicroseconds(), _tzd);	
+	// First calculate the adjusted UTC time, then calculate the
+	// locally adjusted time by constructing a new LocalDateTime.
+	DateTime tmp(utcTime(), span.totalMicroseconds());
+	return LocalDateTime(tmp);
 }
 
 
 LocalDateTime LocalDateTime::operator - (const Timespan& span) const
 {
-	return LocalDateTime(_dateTime.utcTime(), -span.totalMicroseconds(), _tzd);	
+	// First calculate the adjusted UTC time, then calculate the
+	// locally adjusted time by constructing a new LocalDateTime.
+	DateTime tmp(utcTime(), -span.totalMicroseconds());
+	return LocalDateTime(tmp);
 }
 
 
@@ -247,16 +254,44 @@ Timespan LocalDateTime::operator - (const LocalDateTime& dateTime) const
 
 LocalDateTime& LocalDateTime::operator += (const Timespan& span)
 {
-	_dateTime += span;
+	// Use the same trick as in operator+. Create a UTC time, adjust
+	// it for the span, and convert back to LocalDateTime. This will
+	// recalculate the tzd correctly in the case where the addition
+	// crosses a DST boundary.
+	*this = DateTime(utcTime(), span.totalMicroseconds());
 	return *this;
 }
 
 
 LocalDateTime& LocalDateTime::operator -= (const Timespan& span)
 {
-	_dateTime -= span;
+	// Use the same trick as in operator-. Create a UTC time, adjust
+	// it for the span, and convert back to LocalDateTime. This will
+	// recalculate the tzd correctly in the case where the subtraction
+	// crosses a DST boundary.
+	*this = DateTime(utcTime(), -span.totalMicroseconds());
 	return *this;
 }
 
 
+void LocalDateTime::determineTzd (bool adjust)
+{
+	std::time_t local;
+	std::tm     broken;
+
+	broken.tm_year  = (_dateTime.year() - 1900);
+	broken.tm_mon   = (_dateTime.month() - 1);
+	broken.tm_mday  = _dateTime.day();
+	broken.tm_hour  = _dateTime.hour();
+	broken.tm_min   = _dateTime.minute();
+	broken.tm_sec   = _dateTime.second();
+	broken.tm_isdst = -1;
+	local = std::mktime(&broken);
+
+	_tzd = (Timezone::utcOffset() + ((broken.tm_isdst == 1) ? 3600 : 0));
+	if (adjust)
+		adjustForTzd();
+}
+
 } // namespace Poco
+

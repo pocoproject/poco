@@ -56,6 +56,7 @@ public:
 	void testArithmetics1();
 	void testArithmetics2();
 	void testSwap();
+	void testTimezone();
 
 	void setUp();
 	void tearDown();

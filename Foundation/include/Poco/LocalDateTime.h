@@ -64,6 +64,14 @@ class Foundation_API LocalDateTime
 	/// class for better performance. The relational operators
 	/// normalize the dates/times involved to UTC before carrying out
 	/// the comparison.
+	///
+	/// The time zone differential is based on the input date and
+	/// time and current time zone. A number of constructors accept
+	/// an explicit time zone differential parameter. These should
+	/// not be used since daylight savings time processing is impossible
+	/// since the time zone is unknown. Each of the constructors
+	/// accepting a tzd parameter have been marked as deprecated and
+	/// may be removed in a future revision.
 {
 public:
 	LocalDateTime();
@@ -81,6 +89,7 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
+	//@ deprecated
 	LocalDateTime(int tzd, int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond);
 		/// Creates a DateTime for the given Gregorian date and time in the
 		/// time zone denoted by the time zone differential in tzd.
@@ -98,11 +107,13 @@ public:
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the time zone differential of the current time zone.
 
+	//@ deprecated
 	LocalDateTime(int tzd, const DateTime& dateTime);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the given time zone differential. Adjusts dateTime
 		/// for the given time zone differential.
 
+	//@ deprecated
 	LocalDateTime(int tzd, const DateTime& dateTime, bool adjust);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the given time zone differential. If adjust is true, 
@@ -111,6 +122,7 @@ public:
 	LocalDateTime(double julianDay);
 		/// Creates a LocalDateTime for the given Julian day in the local time zone.
 
+	//@ deprecated
 	LocalDateTime(int tzd, double julianDay);
 		/// Creates a LocalDateTime for the given Julian day in the time zone
 		/// denoted by the time zone differential in tzd.
@@ -141,6 +153,7 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
+	//@ deprecated
 	LocalDateTime& assign(int tzd, int year, int month, int day, int hour, int minute, int second, int millisecond, int microseconds);
 		/// Assigns a Gregorian local date and time in the time zone denoted by
 		/// the time zone differential in tzd.
@@ -154,6 +167,7 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
+	//@ deprecated
 	LocalDateTime& assign(int tzd, double julianDay);
 		/// Assigns a Julian day in the time zone denoted by the
 		/// time zone differential in tzd.
@@ -245,6 +259,13 @@ public:
 
 protected:
 	LocalDateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff, int tzd);
+	void determineTzd (bool adjust = false);
+		/// Recalculate the tzd based on the _dateTime member based
+		/// on the current timezone using the Standard C runtime functions.
+		/// If adjust is true, then adjustForTzd() is called after the
+		/// differential is calculated.
+	void adjustForTzd();
+		/// Adjust the _dateTime member based on the _tzd member.
 	
 private:
 	DateTime _dateTime;
@@ -361,6 +382,12 @@ inline Timestamp LocalDateTime::timestamp() const
 inline Timestamp::UtcTimeVal LocalDateTime::utcTime() const
 {
 	return _dateTime.utcTime() - ((Timestamp::TimeDiff) _tzd)*10000000;
+}
+
+
+inline void LocalDateTime::adjustForTzd()
+{
+	_dateTime += Timespan(((Timestamp::TimeDiff) _tzd)*Timespan::SECONDS);
 }
 
 
