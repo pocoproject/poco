@@ -680,16 +680,6 @@ void DataTest::testRow()
 	assert (row[4] == 4);
 	assert (row["field4"] == 4);
 
-	assert (row.namesToString() == std::string("field0\tfield1\tfield2\tfield3\tfield4") + Row::EOL);
-	std::ostringstream os;
-	os << row;
-	assert (os.str() == std::string("0\t1\t2\t3\t4") + Row::EOL);
-	row.separator(",");
-	assert (row.namesToString() == std::string("field0,field1,field2,field3,field4") + Row::EOL);
-	os.str("");
-	os << row;
-	assert (os.str() == std::string("0,1,2,3,4") + Row::EOL);
-
 	Row row2;
 
 	row2.append("field0", 5);
@@ -866,6 +856,25 @@ void DataTest::testRowStrictWeak(const Row& row1, const Row& row2, const Row& ro
 }
 
 
+void DataTest::testRowFormat()
+{
+	Row row1;
+	row1.append("field0", 0);
+	row1.append("field1", 1);
+	row1.append("field2", 2);
+	row1.append("field3", 3);
+	row1.append("field4", 4);
+
+	std::ostringstream os;
+	os << "field0\tfield1\tfield2\tfield3\tfield4" << RowFormatter::EOL;
+	assert (row1.namesToString() == os.str());
+
+	os.str("");
+	os << "0\t1\t2\t3\t4" << RowFormatter::EOL;
+	assert (row1.valuesToString() == os.str());
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -891,6 +900,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testColumnList);
 	CppUnit_addTest(pSuite, DataTest, testRow);
 	CppUnit_addTest(pSuite, DataTest, testRowSort);
+	CppUnit_addTest(pSuite, DataTest, testRowFormat);
 
 	return pSuite;
 }

@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/RowFormatter.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/Tuple.h"
 #include "Poco/SharedPtr.h"
@@ -80,6 +81,7 @@ class Data_API Row
 public:
 	typedef std::vector<std::string> NameVec;
 	typedef SharedPtr<std::vector<std::string> > NameVecPtr;
+	typedef std::vector<DynamicAny> ValueVec;
 
 	enum ComparisonType
 	{
@@ -93,7 +95,7 @@ public:
 	Row();
 		/// Creates the Row.
 
-	explicit Row(NameVecPtr pNames);
+	explicit Row(NameVecPtr pNames, RowFormatter* pFormatter = 0);
 		/// Creates the Row.
 
 	~Row();
@@ -199,8 +201,10 @@ public:
 	NameVecPtr names();
 		/// Returns the shared pointer to names vector.
 
+	const ValueVec& values();
+		/// Returns the const reference to values vector.
+
 private:
-	typedef std::vector<DynamicAny> ValueVec;
 	typedef Tuple<std::size_t, ComparisonType> SortTuple;
 	typedef std::vector<SortTuple> SortMap;
 		/// The type for map holding fields used for sorting criteria.
@@ -212,10 +216,10 @@ private:
 	bool isEqualSize(const Row& other) const;
 	bool isEqualType(const Row& other) const;
 
-	std::string         _separator;
-	NameVecPtr          _pNames;
-	ValueVec            _values;
-	SortMap             _sortFields;
+	NameVecPtr _pNames;
+	ValueVec   _values;
+	SortMap    _sortFields;
+	mutable SharedPtr<RowFormatter> _pFormatter;
 };
 
 
@@ -238,15 +242,15 @@ inline void Row::reset()
 }
 
 
-inline void Row::separator(const std::string& sep)
-{
-	_separator = sep;
-}
-
-
 inline Row::NameVecPtr Row::names()
 {
 	return _pNames;
+}
+
+
+inline const Row::ValueVec& Row::values()
+{
+	return _values;
 }
 
 

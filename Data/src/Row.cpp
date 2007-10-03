@@ -42,14 +42,6 @@ namespace Poco {
 namespace Data {
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
-const std::string Row::EOL = "\r\n";
-#else
-const std::string Row::EOL = "\n";
-#endif
-
-
-
 std::ostream& operator << (std::ostream &os, const Row& row)
 {
       os << row.valuesToString();
@@ -57,16 +49,23 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 }
 
 
-Row::Row(): _separator("\t"), _pNames(0)
+Row::Row(): 
+	_pNames(0),
+	_pFormatter(new RowFormatter(this))
 {
 }
 
 
-Row::Row(NameVecPtr pNames): _separator("\t"), _pNames(pNames)
+Row::Row(NameVecPtr pNames, RowFormatter* pFormatter): 
+	_pNames(pNames),
+	_pFormatter(pFormatter)
 {
 	if (!_pNames)
 		throw NullPointerException();
 
+	if (!_pFormatter) _pFormatter = new RowFormatter(this);
+	else _pFormatter->setRow(this);
+	
 	_values.resize(_pNames->size());
 	addSortField(0);
 }
@@ -319,17 +318,8 @@ bool Row::operator < (const Row& other) const
 
 const std::string Row::valuesToString() const
 {
-	std::string strValues;
-	ValueVec::const_iterator it = _values.begin();
-	ValueVec::const_iterator end = _values.end();
-	for (; it != end; ++it)
-	{
-		strValues.append(it->convert<std::string>());
-		strValues.append(_separator);
-	}
-	strValues.replace(strValues.find_last_of(_separator), _separator.length(), EOL);
-
-	return strValues;
+	std::string values;
+	return _pFormatter->formatValues(values);
 }
 
 
@@ -338,17 +328,8 @@ const std::string Row::namesToString() const
 	if (!_pNames)
 		throw NullPointerException();
 
-	std::string strNames;
-	NameVec::const_iterator it = _pNames->begin();
-	NameVec::const_iterator end = _pNames->end();
-	for (; it != end; ++it)
-	{
-		strNames.append(*it);
-		strNames.append(_separator);
-	}
-	strNames.replace(strNames.find_last_of(_separator), _separator.length(), EOL);
-
-	return strNames;
+	std::string names;
+	return _pFormatter->formatNames(names);
 }
 
 

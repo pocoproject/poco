@@ -1,9 +1,13 @@
 //
-// DataTest.h
+// RowFormatter.h
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.h#6 $
+// $Id: //poco/Main/Data/include/Poco/Data/RowFormatter.h#1 $
 //
-// Definition of the DataTest class.
+// Library: Data
+// Package: DataCore
+// Module:  RowFormatter
+//
+// Definition of the RowFormatter class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,54 +36,68 @@
 //
 
 
-#ifndef DataTest_INCLUDED
-#define DataTest_INCLUDED
+#ifndef Data_RowFormatter_INCLUDED
+#define Data_RowFormatter_INCLUDED
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/BinaryReader.h"
-#include "Poco/BinaryWriter.h"
-#include "Poco/Data/Row.h"
-#include "CppUnit/TestCase.h"
 
 
-class DataTest: public CppUnit::TestCase
+namespace Poco {
+namespace Data {
+
+
+class Row;
+
+
+class Data_API RowFormatter
+	/// Row formatter is a rudimentary formatting class providing
+	/// basic row formatting. This class will separate field names and
+	/// filed values by a tab ('\t') and append the platform specific
+	/// end of line at the end of each row. For custom formatting
+	/// strategies, inherit from this class and override formatNames()
+	/// and formaValues() member functions.
 {
 public:
-	DataTest(const std::string& name);
-	~DataTest();
+	static const std::string EOL;
 
-	void testSession();
-	void testFeatures();
-	void testProperties();
-	void testBLOB();
-	void testBLOBStreams();
-	void testColumnVector();
-	void testColumnVectorBool();
-	void testColumnDeque();
-	void testColumnList();
-	void testRow();
-	void testRowSort();
-	void testRowFormat();
+	RowFormatter(Row* pRow = 0);
+		/// Creates the RowFormatter.
 
-	void setUp();
-	void tearDown();
+	virtual ~RowFormatter();
+		/// Destroys the RowFormatter.
 
-	static CppUnit::Test* suite();
+	void setRow(Row* pRow);
+		/// Assigns the row to this formatter.
+
+	virtual std::string& formatNames(std::string& names);
+		/// Formats the row field names.
+
+	virtual std::string& formatValues(std::string& values);
+		/// Formats the row values.
 
 private:
-	void testRowStrictWeak(const Poco::Data::Row& row1, 
-		const Poco::Data::Row& row2, 
-		const Poco::Data::Row& row3);
-		/// Strict weak ordering requirement for sorted containers
-		/// as described in Josuttis "The Standard C++ Library"
-		/// chapter 6.5. pg. 176.
-		/// For this to pass, the following condition must be satisifed: 
-		/// row1 < row2 < row3
+	RowFormatter(const RowFormatter&);
+	RowFormatter& operator = (const RowFormatter&);
 
-	void writeToBLOB(Poco::BinaryWriter& writer);
-	void readFromBLOB(Poco::BinaryReader& reader);
+	Row*        _pRow;
+	std::string _separator;
 };
 
 
-#endif // DataTest_INCLUDED
+///
+/// inlines
+///
+
+
+inline void RowFormatter::setRow(Row* pRow)
+{
+	poco_check_ptr (pRow);
+	_pRow = pRow;
+}
+
+
+} } // namespace Poco::Data
+
+
+#endif // Data_RowFormatter_INCLUDED

@@ -298,6 +298,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\RowFormatter.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\RowIterator.h"
 					>
 				</File>
@@ -391,6 +395,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Row.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RowFormatter.cpp"
 					>
 				</File>
 				<File
