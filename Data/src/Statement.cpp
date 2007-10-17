@@ -50,15 +50,14 @@ namespace Data {
 
 Statement::Statement(StatementImpl* pImpl):
 	_ptr(pImpl),
-	_isAsync(false),
-	_asyncExec(_ptr, &StatementImpl::execute)
+	_async(false)
 {
 	poco_check_ptr (pImpl);
 }
 
 
 Statement::Statement(Session& session):
-	_asyncExec(_ptr, &StatementImpl::execute)
+	_async(false)
 {
 	reset(session);
 }
@@ -66,9 +65,9 @@ Statement::Statement(Session& session):
 
 Statement::Statement(const Statement& stmt):
 	_ptr(stmt._ptr),
-	_isAsync(stmt._isAsync),
+	_async(stmt._async),
 	_pResult(stmt._pResult),
-	_asyncExec(_ptr, &StatementImpl::execute)
+	_pAsyncExec(stmt._pAsyncExec)
 {
 }
 
@@ -89,9 +88,17 @@ Statement& Statement::operator = (const Statement& stmt)
 void Statement::swap(Statement& other)
 {
 	std::swap(_ptr, other._ptr);
-	std::swap(_isAsync, other._isAsync);
-	std::swap(_asyncExec, other._asyncExec);
+	std::swap(_async, other._async);
+	std::swap(_pAsyncExec, other._pAsyncExec);
 	std::swap(_pResult, other._pResult);
+}
+
+
+Statement& Statement::reset(Session& session)
+{
+	Statement stmt(session.createStatementImpl());
+	swap(stmt);
+	return *this;
 }
 
 
@@ -129,9 +136,20 @@ const Statement::Result& Statement::executeAsync()
 const Statement::Result& Statement::doAsyncExec()
 {
 	if (done()) _ptr->reset();
-	_pResult = new Result(_asyncExec());
+	if (!_pAsyncExec)
+		_pAsyncExec = new AsyncExecMethod(_ptr, &StatementImpl::execute);
+	poco_check_ptr (_pAsyncExec);
+	_pResult = new Result((*_pAsyncExec)());
 	poco_check_ptr (_pResult);
 	return *_pResult;
+}
+
+
+void Statement::setAsync(bool async)
+{
+	_async = async;
+	if (_async && !_pAsyncExec)
+		_pAsyncExec = new AsyncExecMethod(_ptr, &StatementImpl::execute);
 }
 
 
@@ -148,14 +166,6 @@ Statement::ResultType Statement::wait(long milliseconds)
 		throw *_pResult->exception();
 
 	return _pResult->data();
-}
-
-
-Statement& Statement::reset(Session& session)
-{
-	Statement stmt(session.createStatementImpl());
-	swap(stmt);
-	return *this;
 }
 
 

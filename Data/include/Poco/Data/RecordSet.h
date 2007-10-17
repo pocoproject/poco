@@ -279,6 +279,8 @@ private:
 	{
 		typedef const InternalExtraction<T,C>* ExtractionVecPtr;
 
+		bool typeFound = false;
+
 		const AbstractExtractionVec& rExtractions = extractions();
 		AbstractExtractionVec::const_iterator it = rExtractions.begin();
 		AbstractExtractionVec::const_iterator end = rExtractions.end();
@@ -289,13 +291,17 @@ private:
 
 			if (pExtraction)
 			{
+				typeFound = true;
 				const Column<T,C>& col = pExtraction->column();
 				if (0 == Poco::icompare(name, col.name()))
 					return col.position();
 			}
 		}
 
-		throw NotFoundException(format("Unknown column name: %s", name));
+		if (typeFound)
+			throw NotFoundException(format("Column name: %s", name));
+		else
+			throw NotFoundException(format("Column type: %s, name: %s", typeid(C).name(), name));
 	}
 
 	std::size_t    _currentRow;

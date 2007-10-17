@@ -114,10 +114,12 @@ class Data_API Statement
 {
 public:
 	typedef void (*Manipulator)(Statement&);
-	typedef Poco::UInt32 ResultType;
-	typedef ActiveResult<ResultType> Result;
-	typedef SharedPtr<Result> ResultPtr;
+
+	typedef Poco::UInt32                                  ResultType;
+	typedef ActiveResult<ResultType>                      Result;
+	typedef SharedPtr<Result>                             ResultPtr;
 	typedef ActiveMethod<ResultType, void, StatementImpl> AsyncExecMethod;
+	typedef SharedPtr<AsyncExecMethod>                    AsyncExecMethodPtr;
 
 	enum Storage
 	{
@@ -203,7 +205,7 @@ public:
 		/// Stops when either a limit is hit or the whole statement was executed.
 		/// Returns immediately. For statements returning data, the number of rows extracted is 
 		/// available by calling wait() method on either the returned value or the statement itself.
-		/// When executed on otherwise synchronous statement, this method does not alter the
+		/// When executed on a synchronous statement, this method does not alter the
 		/// statement's synchronous nature.
 
 	void setAsync(bool async = true);
@@ -271,13 +273,13 @@ private:
 	const Result& doAsyncExec();
 		/// Asynchronously executes the statement.
 
-	StatementImplPtr  _ptr;
+	StatementImplPtr _ptr;
 
 	// asynchronous execution related members
-	bool              _isAsync;
-	mutable ResultPtr _pResult;
-	Mutex             _mutex;
-	AsyncExecMethod   _asyncExec;
+	bool               _async;
+	mutable ResultPtr  _pResult;
+	Mutex              _mutex;
+	AsyncExecMethodPtr _pAsyncExec;
 };
 
 
@@ -430,15 +432,9 @@ inline bool Statement::isNull(std::size_t col, std::size_t row) const
 }
 
 
-inline void Statement::setAsync(bool async)
-{
-	_isAsync = async;
-}
-
-
 inline bool Statement::isAsync() const
 {
-	return _isAsync;
+	return _async;
 }
 
 
