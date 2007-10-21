@@ -311,6 +311,34 @@ public:
 	bool operator != (const char* other) const;
 		/// Inequality operator  specialization for const char*
 
+	template <typename T> 
+	bool operator < (const T& other) const
+		/// Less than operator
+	{
+		return convert<T>() < other;
+	}
+
+	template <typename T> 
+	bool operator <= (const T& other) const
+		/// Less than or equal operator
+	{
+		return convert<T>() <= other;
+	}
+
+	template <typename T> 
+	bool operator > (const T& other) const
+		/// Greater than operator
+	{
+		return convert<T>() > other;
+	}
+
+	template <typename T> 
+	bool operator >= (const T& other) const
+		/// Greater than or equal operator
+	{
+		return convert<T>() >= other;
+	}
+
 	bool isArray() const;
 		/// Returns true if DynamicAny represents a vector
 
@@ -568,6 +596,34 @@ inline const bool operator != (const char& other, const DynamicAny& da)
 }
 
 
+inline const bool operator < (const char& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with char
+{
+	return other < da.convert<char>();
+}
+
+
+inline const bool operator <= (const char& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with char
+{
+	return other <= da.convert<char>();
+}
+
+
+inline const bool operator > (const char& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with char
+{
+	return other > da.convert<char>();
+}
+
+
+inline const bool operator >= (const char& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with char
+{
+	return other >= da.convert<char>();
+}
+
+
 inline const Poco::Int8 operator + (const Poco::Int8& other, const DynamicAny& da)
 	/// Addition operator for adding DynamicAny to Poco::Int8
 {
@@ -635,6 +691,34 @@ inline const bool operator != (const Poco::Int8& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::Int8
 {
 	return other != da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator < (const Poco::Int8& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::Int8
+{
+	return other < da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator <= (const Poco::Int8& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::Int8
+{
+	return other <= da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator > (const Poco::Int8& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::Int8
+{
+	return other > da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator >= (const Poco::Int8& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::Int8
+{
+	return other >= da.convert<Poco::Int8>();
 }
 
 
@@ -708,6 +792,34 @@ inline const bool operator != (const Poco::UInt8& other, const DynamicAny& da)
 }
 
 
+inline const bool operator < (const Poco::UInt8& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::UInt8
+{
+	return other < da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator <= (const Poco::UInt8& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::UInt8
+{
+	return other <= da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator > (const Poco::UInt8& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::UInt8
+{
+	return other > da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator >= (const Poco::UInt8& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt8
+{
+	return other >= da.convert<Poco::UInt8>();
+}
+
+
 inline const Poco::Int16 operator + (const Poco::Int16& other, const DynamicAny& da)
 	/// Addition operator for adding DynamicAny to Poco::Int16
 {
@@ -775,6 +887,34 @@ inline const bool operator != (const Poco::Int16& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::Int16
 {
 	return other != da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator < (const Poco::Int16& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::Int16
+{
+	return other < da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator <= (const Poco::Int16& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::Int16
+{
+	return other <= da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator > (const Poco::Int16& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::Int16
+{
+	return other > da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator >= (const Poco::Int16& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::Int16
+{
+	return other >= da.convert<Poco::Int16>();
 }
 
 
@@ -848,6 +988,34 @@ inline const bool operator != (const Poco::UInt16& other, const DynamicAny& da)
 }
 
 
+inline const bool operator < (const Poco::UInt16& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::UInt16
+{
+	return other < da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator <= (const Poco::UInt16& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::UInt16
+{
+	return other <= da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator > (const Poco::UInt16& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::UInt16
+{
+	return other > da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator >= (const Poco::UInt16& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt16
+{
+	return other >= da.convert<Poco::UInt16>();
+}
+
+
 inline const Poco::Int32 operator + (const Poco::Int32& other, const DynamicAny& da)
 	/// Addition operator for adding DynamicAny to Poco::Int32
 {
@@ -915,6 +1083,34 @@ inline const bool operator != (const Poco::Int32& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::Int32
 {
 	return other != da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator < (const Poco::Int32& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::Int32
+{
+	return other < da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator <= (const Poco::Int32& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::Int32
+{
+	return other <= da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator > (const Poco::Int32& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::Int32
+{
+	return other > da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator >= (const Poco::Int32& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::Int32
+{
+	return other >= da.convert<Poco::Int32>();
 }
 
 
@@ -988,6 +1184,34 @@ inline const bool operator != (const Poco::UInt32& other, const DynamicAny& da)
 }
 
 
+inline const bool operator < (const Poco::UInt32& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::UInt32
+{
+	return other < da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator <= (const Poco::UInt32& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::UInt32
+{
+	return other <= da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator > (const Poco::UInt32& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::UInt32
+{
+	return other > da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator >= (const Poco::UInt32& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt32
+{
+	return other >= da.convert<Poco::UInt32>();
+}
+
+
 inline const Poco::Int64 operator + (const Poco::Int64& other, const DynamicAny& da)
 	/// Addition operator for adding DynamicAny to Poco::Int64
 {
@@ -1055,6 +1279,34 @@ inline const bool operator != (const Poco::Int64& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::Int64
 {
 	return other != da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator < (const Poco::Int64& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::Int64
+{
+	return other < da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator <= (const Poco::Int64& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::Int64
+{
+	return other <= da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator > (const Poco::Int64& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::Int64
+{
+	return other > da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator >= (const Poco::Int64& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::Int64
+{
+	return other >= da.convert<Poco::Int64>();
 }
 
 
@@ -1128,6 +1380,34 @@ inline const bool operator != (const Poco::UInt64& other, const DynamicAny& da)
 }
 
 
+inline const bool operator < (const Poco::UInt64& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::UInt64
+{
+	return other < da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator <= (const Poco::UInt64& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::UInt64
+{
+	return other <= da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator > (const Poco::UInt64& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::UInt64
+{
+	return other > da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator >= (const Poco::UInt64& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt64
+{
+	return other >= da.convert<Poco::UInt64>();
+}
+
+
 inline const float operator + (const float& other, const DynamicAny& da)
 	/// Addition operator for adding DynamicAny to float
 {
@@ -1198,6 +1478,34 @@ inline const bool operator != (const float& other, const DynamicAny& da)
 }
 
 
+inline const bool operator < (const float& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with float
+{
+	return other < da.convert<float>();
+}
+
+
+inline const bool operator <= (const float& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with float
+{
+	return other <= da.convert<float>();
+}
+
+
+inline const bool operator > (const float& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with float
+{
+	return other > da.convert<float>();
+}
+
+
+inline const bool operator >= (const float& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with float
+{
+	return other >= da.convert<float>();
+}
+
+
 inline const double operator + (const double& other, const DynamicAny& da)
 	/// Addition operator for adding DynamicAny to double
 {
@@ -1265,6 +1573,34 @@ inline const bool operator != (const double& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with double
 {
 	return other != da.convert<double>();
+}
+
+
+inline const bool operator < (const double& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with double
+{
+	return other < da.convert<double>();
+}
+
+
+inline const bool operator <= (const double& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with double
+{
+	return other <= da.convert<double>();
+}
+
+
+inline const bool operator > (const double& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with double
+{
+	return other > da.convert<double>();
+}
+
+
+inline const bool operator >= (const double& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with double
+{
+	return other >= da.convert<double>();
 }
 
 
@@ -1380,6 +1716,34 @@ inline const bool operator != (const long& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with long
 {
 	return other != da.convert<long>();
+}
+
+
+inline const bool operator < (const long& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with long
+{
+	return other < da.convert<long>();
+}
+
+
+inline const bool operator <= (const long& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with long
+{
+	return other <= da.convert<long>();
+}
+
+
+inline const bool operator > (const long& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with long
+{
+	return other > da.convert<long>();
+}
+
+
+inline const bool operator >= (const long& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with long
+{
+	return other >= da.convert<long>();
 }
 
 
