@@ -53,6 +53,7 @@ using Poco::AnyCast;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
+using Poco::NotFoundException;
 using Poco::Data::SQLite::InvalidSQLStatementException;
 using Poco::Int64;
 
@@ -1649,9 +1650,17 @@ void SQLiteTest::testNull()
 	assert (rs.moveNext());
 	assert (!rs.isNull("i"));
 	assert (rs["i"] == 2);
+	Poco::Int64 i64 = 0;
+	assert (rs.nvl("i", i64) == 2);
+	assert (rs.nvl("i", 123) == 2);
+
 	assert (rs.isNull("r"));
+	assert (rs.nvl("r", 123) == 123);
+	assert (rs.nvl("r", 1.5) == 1.5);
+
 	assert (rs.isNull("v"));
 	assert (rs["v"] == "");
+	assert (rs.nvl("v", s) == "123");
 }
 
 

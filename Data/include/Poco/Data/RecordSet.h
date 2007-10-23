@@ -179,26 +179,24 @@ public:
 	DynamicAny value(const std::string& name, std::size_t row) const;
 		/// Returns the data value at named column, row location.
 
-	template <typename C>
-	const C& nvl(const std::string& name, const C& deflt) const
+	DynamicAny nvl(const std::string& name, const DynamicAny& deflt) const
 		/// Returns the value in the named column of the current row
 		/// if the value is not NULL, or deflt otherwise.
 	{
 		if (isNull(name))
 			return deflt;
 		else
-			return value<C>(name, _currentRow);
+			return value(name, _currentRow);
 	}
 
-	template <typename C>
-	const C& nvl(std::size_t index, const C& deflt) const
+	DynamicAny nvl(std::size_t index, const DynamicAny& deflt) const
 		/// Returns the value in the given column of the current row
 		/// if the value is not NULL, or deflt otherwise.
 	{
-		if (isNull(index))
+		if (isNull(index, _currentRow))
 			return deflt;
 		else
-			return value<C>(index, _currentRow);
+			return value(index, _currentRow);
 	}
 
 	const RowIterator& begin();
@@ -301,7 +299,7 @@ private:
 		if (typeFound)
 			throw NotFoundException(format("Column name: %s", name));
 		else
-			throw NotFoundException(format("Column type: %s, name: %s", typeid(C).name(), name));
+			throw NotFoundException(format("Column type: %s, name: %s", std::string(typeid(T).name()), name));
 	}
 
 	std::size_t    _currentRow;
