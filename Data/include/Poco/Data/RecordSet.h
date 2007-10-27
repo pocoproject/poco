@@ -179,25 +179,13 @@ public:
 	DynamicAny value(const std::string& name, std::size_t row) const;
 		/// Returns the data value at named column, row location.
 
-	DynamicAny nvl(const std::string& name, const DynamicAny& deflt) const
+	DynamicAny nvl(const std::string& name, const DynamicAny& deflt) const;
 		/// Returns the value in the named column of the current row
 		/// if the value is not NULL, or deflt otherwise.
-	{
-		if (isNull(name))
-			return deflt;
-		else
-			return value(name, _currentRow);
-	}
 
-	DynamicAny nvl(std::size_t index, const DynamicAny& deflt) const
+	DynamicAny nvl(std::size_t index, const DynamicAny& deflt) const;
 		/// Returns the value in the given column of the current row
 		/// if the value is not NULL, or deflt otherwise.
-	{
-		if (isNull(index, _currentRow))
-			return deflt;
-		else
-			return value(index, _currentRow);
-	}
 
 	const RowIterator& begin();
 		/// Moves the row cursor to the first row and returns the pointer to row.

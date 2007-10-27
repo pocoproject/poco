@@ -203,4 +203,22 @@ bool RecordSet::moveLast()
 }
 
 
+DynamicAny RecordSet::nvl(const std::string& name, const DynamicAny& deflt) const
+{
+	if (isNull(name))
+		return deflt;
+	else
+		return value(name, _currentRow);
+}
+
+
+DynamicAny RecordSet::nvl(std::size_t index, const DynamicAny& deflt) const
+{
+	if (isNull(index, _currentRow))
+		return deflt;
+	else
+		return value(index, _currentRow);
+}
+
+
 } } // namespace Poco::Data
