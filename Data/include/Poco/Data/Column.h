@@ -93,8 +93,9 @@ public:
 	void swap(Column& other)
 		/// Swaps the column with another one.
 	{
-		std::swap(_metaColumn, other._metaColumn);
-		std::swap(_pData, other._pData);
+		using std::swap;
+		swap(_metaColumn, other._metaColumn);
+		swap(_pData, other._pData);
 	}
 
 	Container& data()
@@ -238,9 +239,10 @@ public:
 	void swap(Column& other)
 		/// Swaps the column with another one.
 	{
-		std::swap(_metaColumn, other._metaColumn);
-		std::swap(_pData, other._pData);
-		std::swap(_deque, other._deque);
+		using std::swap;
+		swap(_metaColumn, other._metaColumn);
+		swap(_pData, other._pData);
+		swap(_deque, other._deque);
 	}
 
 	Container& data()
@@ -373,8 +375,9 @@ public:
 	void swap(Column& other)
 		/// Swaps the column with another one.
 	{
-		std::swap(_metaColumn, other._metaColumn);
-		std::swap(_pData, other._pData);
+		using std::swap;
+		swap(_metaColumn, other._metaColumn);
+		swap(_pData, other._pData);
 	}
 
 	List& data()
@@ -480,6 +483,13 @@ private:
 	MetaColumn _metaColumn;
 	Poco::SharedPtr<List> _pData;
 };
+
+
+template <typename T, typename C>
+inline void swap(Column<T,C>& c1, Column<T,C>& c2)
+{
+	c1.swap(c2);
+}
 
 
 } } // namespace Poco::Data

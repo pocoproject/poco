@@ -196,6 +196,11 @@ void DataTest::testBLOB()
 	assert (blobNumStr.content() != blobChrStr.content());
 	assert (&blobNumStr.content() != &blobChrStr.content());
 	assert (blobNumStr == blobChrVec);
+
+	Poco::Data::swap(blobNumStr, blobChrVec);
+	assert (blobNumStr == blobChrVec);
+	std::swap(blobNumStr, blobChrVec);
+	assert (blobNumStr == blobChrVec);
 }
 
 
@@ -420,6 +425,47 @@ void DataTest::testColumnVector()
 	assert (c.rowCount() == 0);
 	assert (c1.rowCount() == 0);
 	assert (c2.rowCount() == 0);
+
+	std::vector<int>* pV1 = new std::vector<int>;
+	pV1->push_back(1);
+	pV1->push_back(2);
+	pV1->push_back(3);
+	pV1->push_back(4);
+	pV1->push_back(5);
+	std::vector<int>* pV2 = new std::vector<int>;
+	pV2->push_back(5);
+	pV2->push_back(4);
+	pV2->push_back(3);
+	pV2->push_back(2);
+	pV2->push_back(1);
+	Column<int, std::vector<int> > c3(mc, pV1);
+	Column<int, std::vector<int> > c4(mc, pV2);
+	
+	Poco::Data::swap(c3, c4);
+	assert (c3[0] == 5);
+	assert (c3[1] == 4);
+	assert (c3[2] == 3);
+	assert (c3[3] == 2);
+	assert (c3[4] == 1);
+
+	assert (c4[0] == 1);
+	assert (c4[1] == 2);
+	assert (c4[2] == 3);
+	assert (c4[3] == 4);
+	assert (c4[4] == 5);
+
+	std::swap(c3, c4);
+	assert (c3[0] == 1);
+	assert (c3[1] == 2);
+	assert (c3[2] == 3);
+	assert (c3[3] == 4);
+	assert (c3[4] == 5);
+
+	assert (c4[0] == 5);
+	assert (c4[1] == 4);
+	assert (c4[2] == 3);
+	assert (c4[3] == 2);
+	assert (c4[4] == 1);
 }
 
 
@@ -558,6 +604,47 @@ void DataTest::testColumnDeque()
 	assert (c.rowCount() == 0);
 	assert (c1.rowCount() == 0);
 	assert (c2.rowCount() == 0);
+
+	ContainerType* pV1 = new ContainerType;
+	pV1->push_back(1);
+	pV1->push_back(2);
+	pV1->push_back(3);
+	pV1->push_back(4);
+	pV1->push_back(5);
+	ContainerType* pV2 = new ContainerType;
+	pV2->push_back(5);
+	pV2->push_back(4);
+	pV2->push_back(3);
+	pV2->push_back(2);
+	pV2->push_back(1);
+	Column<int> c3(mc, pV1);
+	Column<int> c4(mc, pV2);
+	
+	Poco::Data::swap(c3, c4);
+	assert (c3[0] == 5);
+	assert (c3[1] == 4);
+	assert (c3[2] == 3);
+	assert (c3[3] == 2);
+	assert (c3[4] == 1);
+
+	assert (c4[0] == 1);
+	assert (c4[1] == 2);
+	assert (c4[2] == 3);
+	assert (c4[3] == 4);
+	assert (c4[4] == 5);
+
+	std::swap(c3, c4);
+	assert (c3[0] == 1);
+	assert (c3[1] == 2);
+	assert (c3[2] == 3);
+	assert (c3[3] == 4);
+	assert (c3[4] == 5);
+
+	assert (c4[0] == 5);
+	assert (c4[1] == 4);
+	assert (c4[2] == 3);
+	assert (c4[3] == 2);
+	assert (c4[4] == 1);
 }
 
 
@@ -632,6 +719,47 @@ void DataTest::testColumnList()
 	assert (c.rowCount() == 0);
 	assert (c1.rowCount() == 0);
 	assert (c2.rowCount() == 0);
+
+	ContainerType* pV1 = new ContainerType;
+	pV1->push_back(1);
+	pV1->push_back(2);
+	pV1->push_back(3);
+	pV1->push_back(4);
+	pV1->push_back(5);
+	ContainerType* pV2 = new ContainerType;
+	pV2->push_back(5);
+	pV2->push_back(4);
+	pV2->push_back(3);
+	pV2->push_back(2);
+	pV2->push_back(1);
+	Column<int, ContainerType> c3(mc, pV1);
+	Column<int, ContainerType> c4(mc, pV2);
+	
+	Poco::Data::swap(c3, c4);
+	assert (c3[0] == 5);
+	assert (c3[1] == 4);
+	assert (c3[2] == 3);
+	assert (c3[3] == 2);
+	assert (c3[4] == 1);
+
+	assert (c4[0] == 1);
+	assert (c4[1] == 2);
+	assert (c4[2] == 3);
+	assert (c4[3] == 4);
+	assert (c4[4] == 5);
+
+	std::swap(c3, c4);
+	assert (c3[0] == 1);
+	assert (c3[1] == 2);
+	assert (c3[2] == 3);
+	assert (c3[3] == 4);
+	assert (c3[4] == 5);
+
+	assert (c4[0] == 5);
+	assert (c4[1] == 4);
+	assert (c4[2] == 3);
+	assert (c4[3] == 2);
+	assert (c4[4] == 1);
 }
 
 

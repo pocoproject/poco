@@ -206,7 +206,25 @@ inline void BLOB::compact()
 }
 
 
+inline void swap(BLOB& b1, BLOB& b2)
+{
+	b1.swap(b2);
+}
+
+
 } } // namespace Poco::Data
+
+
+namespace std
+{
+	template<>
+	inline void swap<Poco::Data::BLOB>(Poco::Data::BLOB& b1, 
+		Poco::Data::BLOB& b2)
+		/// Full template specalization of std:::swap for BLOB
+	{
+		b1.swap(b2);
+	}
+}
 
 
 //

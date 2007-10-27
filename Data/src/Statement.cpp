@@ -87,10 +87,12 @@ Statement& Statement::operator = (const Statement& stmt)
 
 void Statement::swap(Statement& other)
 {
-	std::swap(_ptr, other._ptr);
-	std::swap(_async, other._async);
-	std::swap(_pAsyncExec, other._pAsyncExec);
-	std::swap(_pResult, other._pResult);
+	using std::swap;
+	
+	swap(_ptr, other._ptr);
+	swap(_async, other._async);
+	swap(_pAsyncExec, other._pAsyncExec);
+	swap(_pResult, other._pResult);
 }
 
 
