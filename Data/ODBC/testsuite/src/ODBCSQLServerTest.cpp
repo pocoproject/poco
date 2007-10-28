@@ -1257,7 +1257,11 @@ bool ODBCSQLServerTest::canConnect(const std::string& driver, const std::string&
 		{
 			std::cout << "DSN found: " << itDSN->first 
 				<< " (" << itDSN->second << ')' << std::endl;
-			format(_dbConnString, "DSN=%s", dsn);
+			format(_dbConnString, 
+				"DSN=%s;"
+				"UID=test;"
+				"PWD=test;"
+				"DATABASE=test;", dsn);
 			return true;
 		}
 	}

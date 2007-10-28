@@ -55,7 +55,8 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_rConnection(rSession.dbc()),
 	_stmt(rSession.dbc()),
 	_stepCalled(false),
-	_nextResponse(0)
+	_nextResponse(0),
+	_prepared(false)
 {
 	if (session().getFeature("autoBind"))
 	{
@@ -120,15 +121,28 @@ void ODBCStatementImpl::compileImpl()
 	// these calls must occur before.
 	fixupBinding(); doBind(false, true);
 
-	bool dataAvailable = hasData();
-	if (dataAvailable && !extractions().size()) 
+	makeInternalExtractors();
+	doPrepare();
+}
+
+
+void ODBCStatementImpl::makeInternalExtractors()
+{
+	if (hasData() && !extractions().size()) 
 	{
 		fillColumns();
 		makeExtractors(columnsReturned());
+		fixupExtraction();
 	}
+}
 
-	if (Preparation::DE_BOUND == ext && dataAvailable)
+
+void ODBCStatementImpl::doPrepare()
+{
+	if (!_prepared && session().getFeature("autoExtract") && hasData())
 	{
+		poco_check_ptr (_pPreparation);
+
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
@@ -139,6 +153,7 @@ void ODBCStatementImpl::compileImpl()
 			pos += (*it)->numOfColumnsHandled();
 			delete pAP;
 		}
+		_prepared = true;
 	}
 }
 
@@ -240,6 +255,11 @@ bool ODBCStatementImpl::hasNext()
 {
 	if (hasData())
 	{
+		if (!extractions().size()) 
+			makeInternalExtractors();
+
+		if (!_prepared) doPrepare();
+
 		if (_stepCalled) 
 			return _stepCalled = nextRowReady();
 
@@ -344,15 +364,6 @@ void ODBCStatementImpl::fillColumns()
 
 	for (int i = 0; i < colCount; ++i)
 		_columnPtrs.push_back(new ODBCColumn(_stmt, i));
-}
-
-
-bool ODBCStatementImpl::isStoredProcedure() const
-{
-	std::string str = toString();
-	if (trimInPlace(str).size() < 2) return false;
-
-	return ('{' == str[0] && '}' == str[str.size()-1]);
 }
 
 

@@ -118,6 +118,16 @@ private:
 	void doBind(bool clear = true, bool reset = false);
 		/// Binds parameters.
 
+	void makeInternalExtractors();
+		/// Creates internal extractors if none were supplied from the user.
+
+	void doPrepare();
+		/// Prepares placeholders for data returned by statement.
+		/// It is called during statement compilation for SQL statements
+		/// returning data. For stored procedures returning datasets, 
+		/// it is called upon the first check for data availability 
+		/// (see hasNext() function).
+
 	bool hasData() const;
 		/// Returns true if statement returns data.
 
@@ -132,12 +142,6 @@ private:
 
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");
-	
-	bool isStoredProcedure() const;
-		/// Returns true if this statement is stored procedure.
-		/// Only the ODBC CALL escape sequence is supported.
-		/// The function checks whether trimmed statement 
-		/// text begins with '{' and ends with '}';
 
 	const SQLHDBC&               _rConnection;
 	const StatementHandle        _stmt;
@@ -147,6 +151,7 @@ private:
 	bool                         _stepCalled;
 	int                          _nextResponse;
 	ColumnPtrVec                 _columnPtrs;
+	bool                         _prepared;
 };
 
 
@@ -177,7 +182,7 @@ inline Poco::UInt32 ODBCStatementImpl::columnsReturned() const
 inline bool ODBCStatementImpl::hasData() const
 {
 	poco_assert_dbg (_pPreparation);
-	return (_pPreparation->columns(!isStoredProcedure()) > 0);
+	return (_pPreparation->columns() > 0);
 }
 
 

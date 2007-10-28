@@ -69,9 +69,9 @@ Preparation::~Preparation()
 }
 
 
-std::size_t Preparation::columns(bool resize) const
+std::size_t Preparation::columns() const
 {
-	if (_pValues.empty() && resize)
+	if (_pValues.empty())
 	{
 		SQLSMALLINT nCol = 0;
 		if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 
@@ -142,6 +142,24 @@ void Preparation::prepare(std::size_t pos, const Poco::Any&)
 		default: 
 			throw DataFormatException("Unsupported data type.");
 	}
+}
+
+
+std::size_t Preparation::maxDataSize(std::size_t pos) const
+{
+	poco_assert (pos >= 0 && pos < _pValues.size());
+
+	std::size_t sz = 0;
+	std::size_t maxsz = getMaxFieldSize();
+
+	try 
+	{
+		sz = ODBCColumn(_rStmt, pos).length();
+	}
+	catch (StatementException&) { }
+
+	if (!sz || sz > maxsz) sz = maxsz;
+	return sz;
 }
 
 

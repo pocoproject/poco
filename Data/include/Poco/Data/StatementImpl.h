@@ -235,6 +235,9 @@ protected:
 		/// When connector-specific behavior is desired, it should be overriden 
 		/// by the statement implementation.
 
+	void fixupExtraction();
+		/// Sets the AbstractExtractor at the extractors.
+
 private:
 	void compile();
 		/// Compiles the statement, if not yet compiled. doesn't bind yet
@@ -247,9 +250,6 @@ private:
 
 	Poco::UInt32 executeWithoutLimit();
 		/// Executes without an upper limit set.
-
-	void fixupExtraction();
-		/// Sets the AbstractExtractor at the extractors.
 
 	void resetExtraction();
 		/// Resets binding so it can be reused again.

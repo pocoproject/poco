@@ -119,7 +119,7 @@ public:
 		_end(val.end())
 		/// Creates the Binding.
 	{
-		if (numOfRowsHandled() == 0)
+		if (PD_IN == direction && numOfRowsHandled() == 0)
 			throw BindingException("It is illegal to bind to an empty data collection");
 	}
 
@@ -249,7 +249,7 @@ public:
 		_end(val.end())
 		/// Creates the Binding.
 	{
-		if (numOfRowsHandled() == 0)
+		if (PD_IN == direction && numOfRowsHandled() == 0)
 			throw BindingException("It is illegal to bind to an empty data collection");
 	}
 
@@ -306,7 +306,7 @@ public:
 		_end(val.end())
 		/// Creates the Binding.
 	{
-		if (numOfRowsHandled() == 0)
+		if (PD_IN == direction && numOfRowsHandled() == 0)
 			throw BindingException("It is illegal to bind to an empty data collection");
 	}
 
@@ -363,7 +363,7 @@ public:
 		_end(val.end())
 		/// Creates the Binding.
 	{
-		if (numOfRowsHandled() == 0)
+		if (PD_IN == direction && numOfRowsHandled() == 0)
 			throw BindingException("It is illegal to bind to an empty data collection");
 	}
 
@@ -420,7 +420,7 @@ public:
 		_end(val.end())
 		/// Creates the Binding.
 	{
-		if (numOfRowsHandled() == 0)
+		if (PD_IN == direction && numOfRowsHandled() == 0)
 			throw BindingException("It is illegal to bind to an empty data collection");
 	}
 
@@ -477,7 +477,7 @@ public:
 		_end(val.end())
 		/// Creates the Binding.
 	{
-		if (numOfRowsHandled() == 0)
+		if (PD_IN == direction && numOfRowsHandled() == 0)
 			throw BindingException("It is illegal to bind to an empty data collection");
 	}
 
@@ -534,7 +534,7 @@ public:
 		_end(val.end())
 		/// Creates the Binding.
 	{
-		if (numOfRowsHandled() == 0)
+		if (PD_IN == direction && numOfRowsHandled() == 0)
 			throw BindingException("It is illegal to bind to an empty data collection");
 	}
 
@@ -579,7 +579,8 @@ private:
 };
 
 
-template <typename T> Binding<T>* use(const T& t, const std::string& name = "")
+template <typename T> 
+Binding<T>* use(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN);
@@ -588,7 +589,8 @@ template <typename T> Binding<T>* use(const T& t, const std::string& name = "")
 }
 
 
-template <typename T> Binding<T>* in(const T& t, const std::string& name = "")
+template <typename T> 
+Binding<T>* in(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN);
@@ -597,7 +599,8 @@ template <typename T> Binding<T>* in(const T& t, const std::string& name = "")
 }
 
 
-template <typename T> Binding<T>* out(const T& t, const std::string& name = "")
+template <typename T> 
+Binding<T>* out(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_OUT);
@@ -606,7 +609,8 @@ template <typename T> Binding<T>* out(const T& t, const std::string& name = "")
 }
 
 
-template <typename T> Binding<T>* io(const T& t, const std::string& name = "")
+template <typename T> 
+Binding<T>* io(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN_OUT);

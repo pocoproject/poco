@@ -632,14 +632,16 @@ private:
 };
 
 
-template <typename T> Extraction<T>* into(T& t)
-	/// Convenience function to allow for a more compact creation of a default extraction object
+template <typename T> 
+Extraction<T>* into(T& t)
+	/// Convenience function to allow for a more compact creation of an extraction object
 {
 	return new Extraction<T>(t);
 }
 
 
-template <typename T> Extraction<T>* into(T& t, const T& def)
+template <typename T> 
+Extraction<T>* into(T& t, const T& def)
 	/// Convenience function to allow for a more compact creation of an extraction object with the given default
 {
 	return new Extraction<T>(t, def);

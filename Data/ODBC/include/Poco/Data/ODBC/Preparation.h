@@ -150,9 +150,9 @@ public:
 	void prepare(std::size_t pos, const Poco::Any&);
 		/// Prepares an Any.
 
-	std::size_t columns(bool resize = true) const;
+	std::size_t columns() const;
 		/// Returns the number of columns.
-		/// Resizes the internal storage iff resize is true.
+		/// Resizes the internal storage iff the size is zero.
 
 	Poco::Any& operator [] (std::size_t pos);
 		/// Returns reference to column data.
@@ -334,25 +334,6 @@ inline void Preparation::prepare(std::size_t pos, const Poco::DateTime&)
 	prepareRaw<SQL_TIMESTAMP_STRUCT>(pos, 
 		SQL_C_TYPE_TIMESTAMP, 
 		sizeof(SQL_TIMESTAMP_STRUCT));
-}
-
-
-inline std::size_t Preparation::maxDataSize(std::size_t pos) const
-{
-	poco_assert (pos >= 0 && pos < _pValues.size());
-
-	std::size_t sz = 0;
-	std::size_t maxsz = getMaxFieldSize();
-
-	try 
-	{
-		sz = ODBCColumn(_rStmt, pos).length();
-	}
-	catch (StatementException&) 
-	{
-	}
-	if (!sz || sz > maxsz) sz = maxsz;
-	return sz;
 }
 
 

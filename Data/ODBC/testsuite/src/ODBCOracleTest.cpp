@@ -40,6 +40,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
@@ -998,6 +999,45 @@ void ODBCOracleTest::testStoredFunction()
 		assert(-1 == i);
 		dropObject("FUNCTION", "storedFunction");
 
+		recreatePersonTable();
+		typedef Tuple<std::string, std::string, std::string, int> Person;
+		std::vector<Person> people;
+		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+
+		*_pSession << "CREATE OR REPLACE "
+			"FUNCTION storedCursorFunction(ageLimit IN NUMBER) RETURN SYS_REFCURSOR IS "
+			" ret SYS_REFCURSOR; "
+			" BEGIN "
+			" OPEN ret FOR "
+			" SELECT * "
+			" FROM Person "
+			" WHERE Age < ageLimit " 
+			" ORDER BY Age DESC; "
+			" RETURN ret; "
+			" END storedCursorFunction;" , now;
+
+		people.clear();
+		int age = 13;
+		
+		*_pSession << "{call storedCursorFunction(?)}", in(age), into(people), now;
+		
+		assert (2 == people.size());
+		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+
+		Statement stmt = ((*_pSession << "{call storedCursorFunction(?)}", in(age), now));
+		RecordSet rs(stmt);
+		assert (rs["LastName"] == "Simpson");
+		assert (rs["FirstName"] == "Bart");
+		assert (rs["Address"] == "Springfield");
+		assert (rs["Age"] == 12);
+
+		dropObject("TABLE", "Person");
+		dropObject("FUNCTION", "storedCursorFunction");
+
 		*_pSession << "CREATE OR REPLACE "
 			"FUNCTION storedFunction(inParam IN NUMBER) RETURN NUMBER IS "
 			" BEGIN RETURN(inParam*inParam); "
@@ -1092,6 +1132,7 @@ void ODBCOracleTest::testAsync()
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
 		_pExecutor->asynchronous();
+
 		i += 2;
 	}
 }

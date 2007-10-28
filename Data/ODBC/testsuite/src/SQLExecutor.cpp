@@ -2245,7 +2245,7 @@ void SQLExecutor::asynchronous()
 {
 	Session tmp = *_pSession;
 
-	int rowCount = 500;
+	int rowCount = 2000;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(?)", use(data));
 	Statement::Result result = stmt.executeAsync();
@@ -2256,31 +2256,37 @@ void SQLExecutor::asynchronous()
 	assert (stmt1.isAsync());
 	assert (stmt1.wait() == rowCount);
 
+	// +++ if this part of the test case fails, increase the rowCount until achieved
+	//  that first execute is still executing when the second one is called
 	stmt1.execute();
 	try {
 		stmt1.execute();
-		fail ("must fail");
+		fail ("execute() must fail");
 	} catch (InvalidAccessException&)
 	{
 		stmt1.wait();
 		stmt1.execute();
 		stmt1.wait();
 	}
+	// ---
 
 	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
 	assert (stmt.isAsync());
 	stmt.wait();
 	assert (stmt.execute() == 0);
 	
+	// +++ if this part of the test case fails, increase the rowCount until achieved
+	//  that first execute is still executing when the second one is called
 	try {
 		result = stmt.executeAsync();
-		fail ("must fail");
+		fail ("executeAsync() must fail");
 	} catch (InvalidAccessException&)
 	{
 		assert (stmt.isAsync());
 		stmt.wait();
 		result = stmt.executeAsync();
 	}
+	// ---
 
 	assert (stmt.wait() == rowCount);
 	assert (result.data() == rowCount);
