@@ -1,7 +1,7 @@
 //
 // ExpireLRUCacheTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ExpireLRUCacheTest.h#5 $
+// $Id: //poco/Main/Foundation/testsuite/src/ExpireLRUCacheTest.h#6 $
 //
 // Tests for ExpireLRUCache
 //
@@ -48,6 +48,7 @@ public:
 	void testClear();
 	void testExpire0();
 	void testExpireN();
+	void testAccessExpireN();
 	void testCacheSize0();
 	void testCacheSize1();
 	void testCacheSize2();
