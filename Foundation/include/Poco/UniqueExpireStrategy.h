@@ -1,7 +1,7 @@
 //
 // UniqueExpireStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UniqueExpireStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/UniqueExpireStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Cache
@@ -146,7 +146,7 @@ public:
 		}
 	}
 
-private:
+protected:
 	Keys      _keys;     /// For faster replacement of keys, the iterator points to the _keyIndex map
 	TimeIndex _keyIndex; /// Maps time to key value
 };
