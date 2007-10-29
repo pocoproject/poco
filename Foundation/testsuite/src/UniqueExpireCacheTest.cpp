@@ -1,7 +1,7 @@
 //
 // UniqueExpireCacheTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/UniqueExpireCacheTest.cpp#4 $
+// $Id: //poco/Main/Foundation/testsuite/src/UniqueExpireCacheTest.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,7 +35,9 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/UniqueExpireCache.h"
+#include "Poco/UniqueAccessExpireCache.h"
 #include "Poco/ExpirationDecorator.h"
+#include "Poco/AccessExpirationDecorator.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Thread.h"
 
@@ -58,6 +60,7 @@ struct IntVal
 	}
 };
 
+typedef AccessExpirationDecorator<int> DIntVal;
 
 #define DURSLEEP 250
 #define DURHALFSLEEP DURSLEEP / 2
@@ -93,10 +96,65 @@ void UniqueExpireCacheTest::testClear()
 }
 
 
+void UniqueExpireCacheTest::testAccessClear()
+{
+	UniqueAccessExpireCache<int, DIntVal> aCache;
+	aCache.add(1, DIntVal(2, DURSLEEP));
+	aCache.add(3, DIntVal(4, DURSLEEP));
+	aCache.add(5, DIntVal(6, DURSLEEP));
+	assert (aCache.has(1));
+	assert (aCache.has(3));
+	assert (aCache.has(5));
+	assert (aCache.get(1)->value() == 2);
+	assert (aCache.get(3)->value() == 4);
+	assert (aCache.get(5)->value() == 6);
+	aCache.clear();
+	assert (!aCache.has(1));
+	assert (!aCache.has(3));
+	assert (!aCache.has(5));
+}
+
+
+void UniqueExpireCacheTest::testAccessUpdate()
+{
+	UniqueAccessExpireCache<int, DIntVal> aCache;
+	aCache.add(1, DIntVal(2, DURSLEEP));
+	aCache.add(3, DIntVal(4, DURSLEEP));
+	aCache.add(5, DIntVal(6, DURSLEEP));
+	assert (aCache.has(1));
+	assert (aCache.has(3));
+	assert (aCache.has(5));
+	assert (aCache.get(1)->value() == 2);
+	Thread::sleep(DURSLEEP/2);
+	assert (aCache.get(1)->value() == 2);
+	Thread::sleep(DURSLEEP/2);
+	assert (aCache.get(1)->value() == 2);
+	Thread::sleep(DURSLEEP/2);
+	assert (aCache.get(1)->value() == 2);
+	assert (!aCache.has(3));
+	assert (!aCache.has(5));
+	Thread::sleep(DURSLEEP*2);
+	
+	assert (!aCache.has(1));
+	assert (!aCache.has(3));
+	assert (!aCache.has(5));
+	aCache.remove(666); //must work too
+}
+
+
 void UniqueExpireCacheTest::testExpire0()
 {
 	UniqueExpireCache<int, IntVal> aCache;
 	aCache.add(1, IntVal(2, 0));
+	assert (!aCache.has(1));
+}
+
+
+
+void UniqueExpireCacheTest::testAccessExpire0()
+{
+	UniqueAccessExpireCache<int, DIntVal> aCache;
+	aCache.add(1, DIntVal(2, Timespan(0, 0)));
 	assert (!aCache.has(1));
 }
 
@@ -165,6 +223,18 @@ void UniqueExpireCacheTest::testDuplicateAdd()
 }
 
 
+void UniqueExpireCacheTest::testAccessDuplicateAdd()
+{
+	UniqueAccessExpireCache<int, DIntVal> aCache;
+	aCache.add(1, DIntVal(2, DURSLEEP)); // 1
+	assert (aCache.has(1));
+	assert (aCache.get(1)->value() == 2);
+	aCache.add(1, DIntVal(3, DURSLEEP));
+	assert (aCache.has(1));
+	assert (aCache.get(1)->value() == 3);
+}
+
+
 void UniqueExpireCacheTest::testExpirationDecorator()
 {
 	typedef ExpirationDecorator<int> ExpireInt;
@@ -193,9 +263,13 @@ CppUnit::Test* UniqueExpireCacheTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UniqueExpireCacheTest");
 
 	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testClear);
+	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testAccessClear);
+	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testAccessUpdate);
 	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testExpire0);
+	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testAccessExpire0);
 	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testExpireN);
 	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testDuplicateAdd);
+	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testAccessDuplicateAdd);
 	CppUnit_addTest(pSuite, UniqueExpireCacheTest, testExpirationDecorator);
 
 	return pSuite;

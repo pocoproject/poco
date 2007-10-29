@@ -1,7 +1,7 @@
 //
 // UniqueExpireLRUCacheTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/UniqueExpireLRUCacheTest.cpp#2 $
+// $Id: //poco/Main/Foundation/testsuite/src/UniqueExpireLRUCacheTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,6 +35,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/UniqueExpireLRUCache.h"
+#include "Poco/UniqueAccessExpireLRUCache.h"
+#include "Poco/AccessExpirationDecorator.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Thread.h"
 
@@ -56,6 +58,10 @@ struct IntVal
 		return validUntil;
 	}
 };
+
+
+typedef AccessExpirationDecorator<int> DIntVal;
+
 
 #define DURSLEEP 250
 #define DURHALFSLEEP DURSLEEP / 2
@@ -90,6 +96,25 @@ void UniqueExpireLRUCacheTest::testClear()
 	assert (!aCache.has(5));
 }
 
+
+
+void UniqueExpireLRUCacheTest::testAccessClear()
+{
+	UniqueAccessExpireLRUCache<int, DIntVal> aCache;
+	aCache.add(1, DIntVal(2, DURSLEEP));
+	aCache.add(3, DIntVal(4, DURSLEEP));
+	aCache.add(5, DIntVal(6, DURSLEEP));
+	assert (aCache.has(1));
+	assert (aCache.has(3));
+	assert (aCache.has(5));
+	assert (aCache.get(1)->value() == 2);
+	assert (aCache.get(3)->value() == 4);
+	assert (aCache.get(5)->value() == 6);
+	aCache.clear();
+	assert (!aCache.has(1));
+	assert (!aCache.has(3));
+	assert (!aCache.has(5));
+}
 
 void UniqueExpireLRUCacheTest::testExpire0()
 {
@@ -309,6 +334,7 @@ CppUnit::Test* UniqueExpireLRUCacheTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UniqueExpireLRUCacheTest");
 
 	CppUnit_addTest(pSuite, UniqueExpireLRUCacheTest, testClear);
+	CppUnit_addTest(pSuite, UniqueExpireLRUCacheTest, testAccessClear);
 	CppUnit_addTest(pSuite, UniqueExpireLRUCacheTest, testExpire0);
 	CppUnit_addTest(pSuite, UniqueExpireLRUCacheTest, testExpireN);
 	CppUnit_addTest(pSuite, UniqueExpireLRUCacheTest, testCacheSize0);
