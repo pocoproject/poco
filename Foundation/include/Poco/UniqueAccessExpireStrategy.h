@@ -44,66 +44,133 @@
 #include "Poco/AbstractStrategy.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #include "Poco/EventArgs.h"
 #include "Poco/UniqueExpireStrategy.h"
 #include <set>
 #include <map>
 #include <stdio.h>
 
-namespace Poco
+
+namespace Poco {
+
+
+
+template < 
+	class TKey,
+	class TValue
+>
+class UniqueAccessExpireStrategy: public AbstractStrategy<TKey, TValue>
+	/// An UniqueExpireStrategy implements time based expiration of cache entries. In contrast
+	/// to ExpireStrategy which only allows to set a per cache expiration value, it allows to define 
+	/// expiration per CacheEntry.
+	/// Each TValue object must thus offer the following method:
+	///    
+	///    const Poco::Timestamp& getExpiration() const;
+	///    
+	/// which returns the absolute timepoint when the entry will be invalidated.
 {
-	template <class TKey, class TValue>
-	class UniqueAccessExpireCache;
-	
-	template <class TKey, class TValue>
-	class UniqueAccessExpireStrategy : public Poco::UniqueExpireStrategy <TKey, TValue>
+public:
+	typedef std::pair<TKey, Timespan> KeyExpire;
+	typedef std::multimap<Timestamp, KeyExpire>     TimeIndex;
+	typedef typename TimeIndex::iterator       IndexIterator;
+	typedef typename TimeIndex::const_iterator ConstIndexIterator;
+	typedef std::map<TKey, IndexIterator>      Keys;
+	typedef typename Keys::iterator            Iterator;
+
+public:
+	UniqueAccessExpireStrategy()
+		/// Create an unique expire strategy.
 	{
-		public:
-			typedef std::map<TKey, SharedPtr<TValue > > 	DataHolder;
-			typedef typename DataHolder::iterator       	DataIterator;
+	}
 
-			typedef std::multimap<Poco::Timestamp, TKey>	TimeIndex;
-			typedef typename TimeIndex::iterator			IndexIterator;
-			typedef typename TimeIndex::const_iterator		ConstIndexIterator;
-			typedef std::map<TKey, IndexIterator>			Keys;
-			typedef typename Keys::iterator					Iterator;
+	~UniqueAccessExpireStrategy()
+	{
+	}
 
-			UniqueAccessExpireStrategy (const Poco::UniqueAccessExpireCache<TKey, TValue>* cache)
-				: _cache (cache)
+	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
+	{
+		// the expire value defines how many millisecs in the future the
+		// value will expire, even insert negative values!
+		Timestamp expire;
+		expire += args.value().getExpiration().totalMicroseconds();
+		
+		IndexIterator it = _keyIndex.insert(std::make_pair(expire, std::make_pair(args.key(), args.value().getExpiration())));
+		std::pair<Iterator, bool> stat = _keys.insert(std::make_pair(args.key(), it));
+		if (!stat.second)
+		{
+			_keyIndex.erase(stat.first->second);
+			stat.first->second = it;
+		}
+	}
+
+	void onRemove(const void*, const TKey& key)
+	{
+		Iterator it = _keys.find(key);
+		if (it != _keys.end())
+		{
+			_keyIndex.erase(it->second);
+			_keys.erase(it);
+		}
+	}
+
+	void onGet(const void*, const TKey& key)
+	{
+		// get updates the expiration time stamp
+		Iterator it = _keys.find(key);
+		if (it != _keys.end())
+		{
+			KeyExpire ke = it->second->second;
+			// gen new absolute expire value
+			Timestamp expire;
+			expire += ke.second.totalMicroseconds();
+			// delete old index
+			_keyIndex.erase(it->second);
+			IndexIterator itt = _keyIndex.insert(std::make_pair(expire, ke));
+			// update iterator
+			it->second = itt;
+		}
+	}
+
+	void onClear(const void*, const EventArgs& args)
+	{
+		_keys.clear();
+		_keyIndex.clear();
+	}
+
+	void onIsValid(const void*, ValidArgs<TKey>& args)
+	{
+		Iterator it = _keys.find(args.key());
+		if (it != _keys.end())
+		{
+			Timestamp now;
+			if (it->second->first <= now)
 			{
+				args.invalidate();
 			}
-			
-			virtual void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
-			{
-				const Timestamp& expire = args.value().getExpiration();
-				Timestamp now;
-				IndexIterator it = this->_keyIndex.insert(std::make_pair(now + (expire.epochMicroseconds () * 1000), args.key()));
-				std::pair<Iterator, bool> stat = this->_keys.insert(std::make_pair(args.key(), it));
-				if (!stat.second)
-				{
-					this->_keyIndex.erase(stat.first->second);
-					stat.first->second = it;
-				}
-			}
+		}
+	}
 
-			virtual void onGet (const void*, const TKey& key)
-			{
-				Iterator it = this->_keys.find (key);
-				if (it != this->_keys.end ()) {
-					DataIterator itd = _cache->_data.find (key);
-					if (itd != _cache->_data.end ()) {
-						this->_keyIndex.erase(it->second); 
-						const Timestamp& expire = itd->second->getExpiration ();
-						Poco::Timestamp now;
-						IndexIterator itIdx = this->_keyIndex.insert (typename TimeIndex::value_type (now + (expire.epochMicroseconds () * 1000), key));
-						it->second = itIdx;
-					}
-				}
-			}
+	void onReplace(const void*, std::set<TKey>& elemsToRemove)
+	{
+		// Note: replace only informs the cache which elements
+		// it would like to remove!
+		// it does not remove them on its own!
+		IndexIterator it = _keyIndex.begin();
+		Timestamp now;
+		while (it != _keyIndex.end() && it->first < now)
+		{
+			elemsToRemove.insert(it->second.first);
+			++it;
+		}
+	}
 
-		protected:
-			const Poco::UniqueAccessExpireCache<TKey, TValue>* _cache;
-	};
+protected:
+	Keys      _keys;     /// For faster replacement of keys, the iterator points to the _keyIndex map
+	TimeIndex _keyIndex; /// Maps time to key value
+};
+
+
 } // namespace Poco
 
 #endif

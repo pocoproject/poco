@@ -1,7 +1,7 @@
 //
 // UniqueExpireLRUCache.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UniqueExpireLRUCache.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/UniqueExpireLRUCache.h#3 $
 //
 // Library: Foundation
 // Package: Cache
@@ -55,13 +55,16 @@ template <
 >
 class UniqueExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >
 	/// A UniqueExpireLRUCache combines LRU caching and time based per entry expire caching.
-	/// Once can define for each cache entry a seperate timepoint
+	/// One can define for each cache entry a seperate timepoint
 	/// but also limit the size of the cache (per default: 1024).
 	/// Each TValue object must thus offer the following method:
 	///    
 	///    const Poco::Timestamp& getExpiration() const;
 	///    
 	/// which returns the absolute timepoint when the entry will be invalidated.
+	/// Accessing an object will NOT update this absolute expire timepoint.
+	/// You can use the Poco::ExpirationDecorator to add the getExpiration
+	/// method to values that do not have a getExpiration function.
 {
 public:
 	UniqueExpireLRUCache(long cacheSize = 1024): 

@@ -1,13 +1,13 @@
 //
-// UniqueAccessExpireCache.h
+// UniqueAccessExpireLRUCache.h
 //
-// $Id$
+// $Id: //poco/Main/Foundation/include/Poco/UniqueAccessExpireLRUCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
-// Module:  UniqueAccessExpireCache
+// Module:  UniqueAccessExpireLRUCache
 //
-// Definition of the UniqueAccessExpireCache class.
+// Definition of the UniqueAccessExpireLRUCache class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,22 +36,27 @@
 //
 
 
-#ifndef  Foundation_UniqueAccessExpireCache_INCLUDED
-#define  Foundation_UniqueAccessExpireCache_INCLUDED
+#ifndef  Foundation_UniqueAccessExpireLRUCache_INCLUDED
+#define  Foundation_UniqueAccessExpireLRUCache_INCLUDED
 
 
 #include "Poco/AbstractCache.h"
+#include "Poco/StrategyCollection.h"
 #include "Poco/UniqueAccessExpireStrategy.h"
+#include "Poco/LRUStrategy.h"
 
 
 namespace Poco {
 
 
-template <class TKey, class TValue> 
-class UniqueAccessExpireCache: public AbstractCache<TKey, TValue, UniqueAccessExpireStrategy<TKey, TValue> >
-	/// An UniqueAccessExpireCache caches entries for a given time span. In contrast
-	/// to ExpireCache which only allows to set a per cache expiration value, it allows to define 
-	/// expiration per CacheEntry.
+template < 
+	class TKey,
+	class TValue
+>
+class UniqueAccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >
+	/// A UniqueAccessExpireLRUCache combines LRU caching and time based per entry expire caching.
+	/// One can define for each cache entry a seperate timepoint
+	/// but also limit the size of the cache (per default: 1024).
 	/// Each TValue object must thus offer the following method:
 	///    
 	///    const Poco::Timespan& getExpiration() const;
@@ -61,29 +66,26 @@ class UniqueAccessExpireCache: public AbstractCache<TKey, TValue, UniqueAccessEx
 	/// Accessing an object will update this absolute expire timepoint.
 	/// You can use the Poco::AccessExpirationDecorator to add the getExpiration
 	/// method to values that do not have a getExpiration function.
-	///
-	/// Be careful when using an UniqueAccessExpireCache. A cache is often used
-	/// like cache.has(x) followed by cache.get x). Note that it could happen
-	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
-	/// the entry gets invalid, thus leading to an empty SharedPtr being returned 
-	/// when "get" is invoked.
 {
 public:
-	UniqueAccessExpireCache():
-		AbstractCache<TKey, TValue, UniqueAccessExpireStrategy<TKey, TValue> >(UniqueAccessExpireStrategy<TKey, TValue>())
+	UniqueAccessExpireLRUCache(long cacheSize = 1024): 
+		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >(StrategyCollection<TKey, TValue>())
 	{
+		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));
+		this->_strategy.pushBack(new UniqueAccessExpireStrategy<TKey, TValue>());
 	}
 
-	~UniqueAccessExpireCache()
+	~UniqueAccessExpireLRUCache()
 	{
 	}
 
 private:
-	UniqueAccessExpireCache(const UniqueAccessExpireCache& aCache);
-	UniqueAccessExpireCache& operator = (const UniqueAccessExpireCache& aCache);
+	UniqueAccessExpireLRUCache(const UniqueAccessExpireLRUCache& aCache);
+	UniqueAccessExpireLRUCache& operator = (const UniqueAccessExpireLRUCache& aCache);
 };
 
 
 } // namespace Poco
+
 
 #endif
