@@ -4608,6 +4608,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\AccessExpirationDecorator.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\AccessExpireCache.h"
 					>
 				</File>
@@ -4649,6 +4653,18 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\StrategyCollection.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\UniqueAccessExpireCache.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\UniqueAccessExpireLRUCache.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\UniqueAccessExpireStrategy.h"
 					>
 				</File>
 				<File
