@@ -1,7 +1,7 @@
 //
 // ExpireCache.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ExpireCache.h#4 $
+// $Id: //poco/Main/Foundation/include/Poco/ExpireCache.h#5 $
 //
 // Library: Foundation
 // Package: Cache
@@ -49,7 +49,11 @@ namespace Poco {
 
 template <class TKey, class TValue> 
 class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >
-	/// An ExpireCache caches entries for a fixed time period (per default 10 minutes)
+	/// An ExpireCache caches entries for a fixed time period (per default 10 minutes).
+	/// Entries expire independently of the access pattern, i.e. after a constant time.
+	/// If you require your objects to expire after they were not accessed for a given time
+	/// period use a Poco::AccessExpireCache.
+	///
 	/// Be careful when using an ExpireCache. A cache is often used
 	/// like cache.has(x) followed by cache.get x). Note that it could happen
 	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
