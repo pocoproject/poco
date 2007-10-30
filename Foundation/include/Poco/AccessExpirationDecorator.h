@@ -1,7 +1,7 @@
 //
 // AccessExpirationDecorator.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AccessExpirationDecorator.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/AccessExpirationDecorator.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -55,21 +55,21 @@ class AccessExpirationDecorator
 public:
 	AccessExpirationDecorator():
 		_value(),
-		_expiresAt()
+		_span()
 	{
 	}
 
 	AccessExpirationDecorator(const TArgs& p, const Poco::Timespan::TimeDiff& diffInMs):
 			/// Creates an element that will expire in diff milliseconds
 		_value(p),
-		_expiresAt(diffInMs*1000)
+		_span(diffInMs*1000)
 	{
 	}
 
 	AccessExpirationDecorator(const TArgs& p, const Poco::Timespan& timeSpan):
 		/// Creates an element that will expire after the given timeSpan
 		_value(p),
-		_expiresAt(timeSpan)
+		_span(timeSpan)
 	{
 	}
 
@@ -78,9 +78,9 @@ public:
 	{
 	}
 	
-	const Poco::Timespan& getExpiration() const
+	const Poco::Timespan& getTimeout() const
 	{
-		return _expiresAt;
+		return _span;
 	}
 
 	const TArgs& value() const
@@ -95,7 +95,7 @@ public:
 
 private:
 	TArgs     _value;
-	Timespan _expiresAt;
+	Timespan  _span;
 };
 
 

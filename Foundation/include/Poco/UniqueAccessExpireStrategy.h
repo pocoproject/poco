@@ -1,7 +1,7 @@
 //
 // UniqueAccessExpireStrategy.h
 //
-// $Id$
+// $Id: //poco/Main/Foundation/include/Poco/UniqueAccessExpireStrategy.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -66,9 +66,9 @@ class UniqueAccessExpireStrategy: public AbstractStrategy<TKey, TValue>
 	/// expiration per CacheEntry.
 	/// Each TValue object must thus offer the following method:
 	///    
-	///    const Poco::Timestamp& getExpiration() const;
+	///    const Poco::Timestamp& getTimeout() const;
 	///    
-	/// which returns the absolute timepoint when the entry will be invalidated.
+	/// which returns the timespan for how long an object will be valid without being accessed.
 {
 public:
 	typedef std::pair<TKey, Timespan> KeyExpire;
@@ -93,9 +93,9 @@ public:
 		// the expire value defines how many millisecs in the future the
 		// value will expire, even insert negative values!
 		Timestamp expire;
-		expire += args.value().getExpiration().totalMicroseconds();
+		expire += args.value().getTimeout().totalMicroseconds();
 		
-		IndexIterator it = _keyIndex.insert(std::make_pair(expire, std::make_pair(args.key(), args.value().getExpiration())));
+		IndexIterator it = _keyIndex.insert(std::make_pair(expire, std::make_pair(args.key(), args.value().getTimeout())));
 		std::pair<Iterator, bool> stat = _keys.insert(std::make_pair(args.key(), it));
 		if (!stat.second)
 		{

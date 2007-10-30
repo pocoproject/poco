@@ -1,7 +1,7 @@
 //
 // UniqueAccessExpireCache.h
 //
-// $Id$
+// $Id: //poco/Main/Foundation/include/Poco/UniqueAccessExpireCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -54,10 +54,10 @@ class UniqueAccessExpireCache: public AbstractCache<TKey, TValue, UniqueAccessEx
 	/// expiration per CacheEntry.
 	/// Each TValue object must thus offer the following method:
 	///    
-	///    const Poco::Timespan& getExpiration() const;
+	///    const Poco::Timespan& getTimeout() const;
 	///    
 	/// which returns the relative timespan for how long the entry should be valid without being accessed!
-	/// The absolute expire timepoint is calculated as now() + getExpiration().
+	/// The absolute expire timepoint is calculated as now() + getTimeout().
 	/// Accessing an object will update this absolute expire timepoint.
 	/// You can use the Poco::AccessExpirationDecorator to add the getExpiration
 	/// method to values that do not have a getExpiration function.
