@@ -918,6 +918,43 @@ void ODBCOracleTest::testStoredProcedure()
 		assert(-1 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
+		recreatePersonTable();
+		typedef Tuple<std::string, std::string, std::string, int> Person;
+		std::vector<Person> people;
+		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+
+		*_pSession << "CREATE OR REPLACE "
+			"PROCEDURE storedCursorProcedure(ret OUT SYS_REFCURSOR, ageLimit IN NUMBER) IS "
+			" BEGIN "
+			" OPEN ret FOR "
+			" SELECT * "
+			" FROM Person "
+			" WHERE Age < ageLimit " 
+			" ORDER BY Age DESC; "
+			" END storedCursorProcedure;" , now;
+
+		people.clear();
+		int age = 13;
+		
+		*_pSession << "{call storedCursorProcedure(?)}", in(age), into(people), now;
+		
+		assert (2 == people.size());
+		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+
+		Statement stmt = ((*_pSession << "{call storedCursorProcedure(?)}", in(age), now));
+		RecordSet rs(stmt);
+		assert (rs["LastName"] == "Simpson");
+		assert (rs["FirstName"] == "Bart");
+		assert (rs["Address"] == "Springfield");
+		assert (rs["Age"] == 12);
+
+		dropObject("TABLE", "Person");
+		dropObject("PROCEDURE", "storedCursorProcedure");
+
 		*_pSession << "CREATE OR REPLACE "
 			"PROCEDURE storedProcedure(inParam IN NUMBER, outParam OUT NUMBER) IS "
 			" BEGIN outParam := inParam*inParam; "
@@ -1131,7 +1168,7 @@ void ODBCOracleTest::testAsync()
 		recreateIntsTable();
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->asynchronous();
+		_pExecutor->asynchronous(2000);
 
 		i += 2;
 	}
@@ -1279,7 +1316,10 @@ bool ODBCOracleTest::canConnect(const std::string& driver, const std::string& ds
 		{
 			std::cout << "DSN found: " << itDSN->first 
 				<< " (" << itDSN->second << ')' << std::endl;
-			format(_dbConnString, "DSN=%s", dsn);
+			format(_dbConnString,
+				"DSN=%s;"
+				"UID=Scott;"
+				"PWD=Tiger;", dsn);
 			return true;
 		}
 	}

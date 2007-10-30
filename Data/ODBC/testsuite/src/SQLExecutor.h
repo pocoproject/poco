@@ -134,7 +134,7 @@ public:
 	void rowIterator();
 	void stdVectorBool();
 
-	void asynchronous();
+	void asynchronous(int rowCount = 500);
 
 private:
 	Poco::Data::Session* _pSession;

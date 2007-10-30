@@ -1003,7 +1003,7 @@ void ODBCPostgreSQLTest::testAsync()
 		recreateIntsTable();
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->asynchronous();
+		_pExecutor->asynchronous(2000);
 		i += 2;
 	}
 }

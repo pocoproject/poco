@@ -2241,11 +2241,10 @@ void SQLExecutor::stdVectorBool()
 }
 
 
-void SQLExecutor::asynchronous()
+void SQLExecutor::asynchronous(int rowCount)
 {
 	Session tmp = *_pSession;
 
-	int rowCount = 2000;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(?)", use(data));
 	Statement::Result result = stmt.executeAsync();
