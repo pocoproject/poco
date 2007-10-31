@@ -35,6 +35,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
+#include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
@@ -58,6 +60,9 @@ using ODBC::StatementException;
 using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
+using Poco::Any;
+using Poco::AnyCast;
+using Poco::DynamicAny;
 using Poco::DateTime;
 using Poco::NotFoundException;
 
@@ -957,6 +962,60 @@ void ODBCPostgreSQLTest::testStoredFunction()
 }
 
 
+void ODBCPostgreSQLTest::testStoredFunctionAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	*_pSession << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
+			"BEGIN "
+			" RETURN $1 * $1; "
+			"END;'"
+			"LANGUAGE 'plpgsql'" , now;
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		Any i = 2;
+		Any result = 0;
+		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		assert(4 == AnyCast<int>(result));
+
+		k += 2;
+	}
+
+	dropObject("FUNCTION", "storedFunction(INTEGER)");
+}
+
+
+void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	*_pSession << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
+			"BEGIN "
+			" RETURN $1 * $1; "
+			"END;'"
+			"LANGUAGE 'plpgsql'" , now;
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		DynamicAny i = 2;
+		DynamicAny result = 0;
+		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		assert(4 == result);
+
+		k += 2;
+	}
+
+	dropObject("FUNCTION", "storedFunction(INTEGER)");
+}
+
+
 void ODBCPostgreSQLTest::testRowIterator()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1370,6 +1429,8 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunction);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionAny);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionDynamicAny);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNull);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRowIterator);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStdVectorBool);

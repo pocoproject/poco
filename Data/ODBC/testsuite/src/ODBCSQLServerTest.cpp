@@ -35,12 +35,15 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
+#include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -57,6 +60,9 @@ using ODBC::StatementException;
 using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
+using Poco::Any;
+using Poco::AnyCast;
+using Poco::DynamicAny;
 using Poco::DateTime;
 using Poco::NotFoundException;
 
@@ -970,6 +976,138 @@ Deprecated types are not supported as output parameters.  Use current large obje
 }
 
 
+void ODBCSQLServerTest::testStoredCursorProcedure()
+{
+	/*TODO: Support for returning recordsets from MS SQL Server is currently limited.
+	        In order for it to work, nothing else but the recordset (not even output parameters)
+			can be returned.
+			To achieve full functionality, SQLMoreResults functionality probably must be incorporated
+			into the framework.
+	*/
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		recreatePersonTable();
+		typedef Tuple<std::string, std::string, std::string, int> Person;
+		std::vector<Person> people;
+		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+
+		dropObject("PROCEDURE", "storedCursorProcedure");
+		*_pSession << "CREATE PROCEDURE storedCursorProcedure(@ageLimit int) AS "
+			"BEGIN "
+			" SELECT * "
+			" FROM Person "
+			" WHERE Age < @ageLimit " 
+			" ORDER BY Age DESC; "
+			"END;"
+		, now;
+
+		people.clear();
+		int age = 13;
+		
+		*_pSession << "{call storedCursorProcedure(?)}", in(age), into(people), now;
+		
+		assert (2 == people.size());
+		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+
+		Statement stmt = ((*_pSession << "{call storedCursorProcedure(?)}", in(age), now));
+		RecordSet rs(stmt);
+		assert (rs["LastName"] == "Simpson");
+		assert (rs["FirstName"] == "Bart");
+		assert (rs["Address"] == "Springfield");
+		assert (rs["Age"] == 12);
+
+		dropObject("TABLE", "Person");
+		dropObject("PROCEDURE", "storedCursorProcedure");
+
+		k += 2;
+	}
+}
+
+
+void ODBCSQLServerTest::testStoredProcedureAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		Any i = 2;
+		Any j = 0;
+
+		*_pSession << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+			"BEGIN "
+			"SET @outParam = @inParam*@inParam; "
+			"END;"
+		, now;
+
+		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		assert(4 == AnyCast<int>(j));
+		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+
+		*_pSession << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+			"BEGIN "
+			"SET @ioParam = @ioParam*@ioParam; "
+			"END;"
+		, now;
+
+		i = 2;
+		*_pSession << "{call storedProcedure(?)}", io(i), now;
+		assert(4 == AnyCast<int>(i));
+		dropObject("PROCEDURE", "storedProcedure");
+
+		k += 2;
+	}
+}
+
+
+void ODBCSQLServerTest::testStoredProcedureDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		
+		DynamicAny i = 2;
+		DynamicAny j = 0;
+
+		*_pSession << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+			"BEGIN "
+			"SET @outParam = @inParam*@inParam; "
+			"END;"
+		, now;
+
+		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		assert(4 == j);
+		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+
+		*_pSession << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+			"BEGIN "
+			"SET @ioParam = @ioParam*@ioParam; "
+			"END;"
+		, now;
+
+		i = 2;
+		*_pSession << "{call storedProcedure(?)}", io(i), now;
+		assert(4 == i);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		k += 2;
+	}
+}
+
+
 void ODBCSQLServerTest::testStoredFunction()
 {
 	for (int k = 0; k < 8;)
@@ -1052,6 +1190,63 @@ void ODBCSQLServerTest::testStoredFunction()
 
 		k += 2;
 	}
+}
+
+
+void ODBCSQLServerTest::testStoredCursorFunction()
+{
+	/* TODO (see comments about errors below - probably needs SQLMoreResults to function properly)
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		recreatePersonTable();
+		typedef Tuple<std::string, std::string, std::string, int> Person;
+		std::vector<Person> people;
+		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+
+		dropObject("PROCEDURE", "storedCursorFunction");
+		*_pSession << "CREATE PROCEDURE storedCursorFunction(@ageLimit int) AS "
+			"BEGIN "
+			" SELECT * "
+			" FROM Person "
+			" WHERE Age < @ageLimit " 
+			" ORDER BY Age DESC; "
+			" RETURN @ageLimit; "
+			"END;"
+		, now;
+
+		people.clear();
+		int age = 13;
+		int result = 0;
+
+		*_pSession << "{? = call storedCursorFunction(?)}", out(result), in(age), into(people), now;
+		
+		assert (result == age); //fails (result == 0)
+		assert (2 == people.size());
+		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+
+		result = 0;
+		Statement stmt = ((*_pSession << "{? = call storedCursorFunction(?)}", out(result), in(age), now));
+		RecordSet rs(stmt);
+		assert (rs["LastName"] == "Simpson");
+		assert (rs["FirstName"] == "Bart");
+		assert (rs["Address"] == "Springfield");
+		assert (rs["Age"] == 12);
+
+		dropObject("TABLE", "Person");//fails ([Microsoft][ODBC SQL Server Driver]Connection is busy with results for another hstmt")
+		dropObject("PROCEDURE", "storedCursorFunction");
+
+		k += 2;
+	}
+	*/
 }
 
 
@@ -1416,7 +1611,11 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedure);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredCursorProcedure);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureAny);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredFunction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredCursorFunction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNull);

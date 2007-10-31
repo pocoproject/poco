@@ -946,6 +946,38 @@ void ODBCMySQLTest::testAsync()
 }
 
 
+void ODBCMySQLTest::testAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateAnysTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->any();
+
+		i += 2;
+	}
+}
+
+
+void ODBCMySQLTest::testDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateAnysTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->dynamicAny();
+
+		i += 2;
+	}
+}
+
+
 void ODBCMySQLTest::dropObject(const std::string& type, const std::string& name)
 {
 	*_pSession << format("DROP %s IF EXISTS %s", type, name), now;
@@ -1024,6 +1056,15 @@ void ODBCMySQLTest::recreateVectorsTable()
 	try { *_pSession << "CREATE TABLE Vectors (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
+}
+
+
+void ODBCMySQLTest::recreateAnysTable()
+{
+	dropObject("TABLE", "Anys");
+	try { *_pSession << "CREATE TABLE Anys (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30))", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
 
 
@@ -1185,6 +1226,8 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testNull);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testRowIterator);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAsync);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testAny);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testDynamicAny);
 
 		return pSuite;
 	}

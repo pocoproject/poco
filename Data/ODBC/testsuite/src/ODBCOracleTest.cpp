@@ -36,6 +36,8 @@
 #include "Poco/String.h"
 #include "Poco/Tuple.h"
 #include "Poco/Format.h"
+#include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
@@ -58,6 +60,9 @@ using ODBC::StatementException;
 using ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
+using Poco::Any;
+using Poco::AnyCast;
+using Poco::DynamicAny;
 using Poco::DateTime;
 using Poco::NotFoundException;
 
@@ -918,43 +923,6 @@ void ODBCOracleTest::testStoredProcedure()
 		assert(-1 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
-		recreatePersonTable();
-		typedef Tuple<std::string, std::string, std::string, int> Person;
-		std::vector<Person> people;
-		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
-		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
-		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
-		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
-
-		*_pSession << "CREATE OR REPLACE "
-			"PROCEDURE storedCursorProcedure(ret OUT SYS_REFCURSOR, ageLimit IN NUMBER) IS "
-			" BEGIN "
-			" OPEN ret FOR "
-			" SELECT * "
-			" FROM Person "
-			" WHERE Age < ageLimit " 
-			" ORDER BY Age DESC; "
-			" END storedCursorProcedure;" , now;
-
-		people.clear();
-		int age = 13;
-		
-		*_pSession << "{call storedCursorProcedure(?)}", in(age), into(people), now;
-		
-		assert (2 == people.size());
-		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
-		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
-
-		Statement stmt = ((*_pSession << "{call storedCursorProcedure(?)}", in(age), now));
-		RecordSet rs(stmt);
-		assert (rs["LastName"] == "Simpson");
-		assert (rs["FirstName"] == "Bart");
-		assert (rs["Address"] == "Springfield");
-		assert (rs["Age"] == 12);
-
-		dropObject("TABLE", "Person");
-		dropObject("PROCEDURE", "storedCursorProcedure");
-
 		*_pSession << "CREATE OR REPLACE "
 			"PROCEDURE storedProcedure(inParam IN NUMBER, outParam OUT NUMBER) IS "
 			" BEGIN outParam := inParam*inParam; "
@@ -1015,6 +983,128 @@ void ODBCOracleTest::testStoredProcedure()
 }
 
 
+void ODBCOracleTest::testStoredProcedureAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		Any i = 2;
+		Any j = 0;
+
+		*_pSession << "CREATE OR REPLACE "
+				"PROCEDURE storedProcedure(inParam IN NUMBER, outParam OUT NUMBER) IS "
+				" BEGIN outParam := inParam*inParam; "
+				"END storedProcedure;" , now;
+
+		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		assert(4 == AnyCast<int>(j));
+		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+
+		*_pSession << "CREATE OR REPLACE "
+			"PROCEDURE storedProcedure(ioParam IN OUT NUMBER) IS "
+			" BEGIN ioParam := ioParam*ioParam; "
+			" END storedProcedure;" , now;
+
+		i = 2;
+		*_pSession << "{call storedProcedure(?)}", io(i), now;
+		assert(4 == AnyCast<int>(i));
+		dropObject("PROCEDURE", "storedProcedure");
+
+		k += 2;
+	}
+}
+
+
+void ODBCOracleTest::testStoredProcedureDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		
+		DynamicAny i = 2;
+		DynamicAny j = 0;
+
+		*_pSession << "CREATE OR REPLACE "
+				"PROCEDURE storedProcedure(inParam IN NUMBER, outParam OUT NUMBER) IS "
+				" BEGIN outParam := inParam*inParam; "
+				"END storedProcedure;" , now;
+
+		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		assert(4 == j);
+		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+
+		*_pSession << "CREATE OR REPLACE "
+			"PROCEDURE storedProcedure(ioParam IN OUT NUMBER) IS "
+			" BEGIN ioParam := ioParam*ioParam; "
+			" END storedProcedure;" , now;
+
+		i = 2;
+		*_pSession << "{call storedProcedure(?)}", io(i), now;
+		assert(4 == i);
+		dropObject("PROCEDURE", "storedProcedure");
+
+		k += 2;
+	}
+}
+
+
+void ODBCOracleTest::testStoredCursorProcedure()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		recreatePersonTable();
+		typedef Tuple<std::string, std::string, std::string, int> Person;
+		std::vector<Person> people;
+		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+
+		*_pSession << "CREATE OR REPLACE "
+			"PROCEDURE storedCursorProcedure(ret OUT SYS_REFCURSOR, ageLimit IN NUMBER) IS "
+			" BEGIN "
+			" OPEN ret FOR "
+			" SELECT * "
+			" FROM Person "
+			" WHERE Age < ageLimit " 
+			" ORDER BY Age DESC; "
+			" END storedCursorProcedure;" , now;
+
+		people.clear();
+		int age = 13;
+		
+		*_pSession << "{call storedCursorProcedure(?)}", in(age), into(people), now;
+		
+		assert (2 == people.size());
+		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+
+		Statement stmt = ((*_pSession << "{call storedCursorProcedure(?)}", in(age), now));
+		RecordSet rs(stmt);
+		assert (rs["LastName"] == "Simpson");
+		assert (rs["FirstName"] == "Bart");
+		assert (rs["Address"] == "Springfield");
+		assert (rs["Age"] == 12);
+
+		dropObject("TABLE", "Person");
+		dropObject("PROCEDURE", "storedCursorProcedure");
+
+		k += 2;
+	}
+}
+
+
 void ODBCOracleTest::testStoredFunction()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1036,44 +1126,6 @@ void ODBCOracleTest::testStoredFunction()
 		assert(-1 == i);
 		dropObject("FUNCTION", "storedFunction");
 
-		recreatePersonTable();
-		typedef Tuple<std::string, std::string, std::string, int> Person;
-		std::vector<Person> people;
-		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
-		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
-		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
-		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
-
-		*_pSession << "CREATE OR REPLACE "
-			"FUNCTION storedCursorFunction(ageLimit IN NUMBER) RETURN SYS_REFCURSOR IS "
-			" ret SYS_REFCURSOR; "
-			" BEGIN "
-			" OPEN ret FOR "
-			" SELECT * "
-			" FROM Person "
-			" WHERE Age < ageLimit " 
-			" ORDER BY Age DESC; "
-			" RETURN ret; "
-			" END storedCursorFunction;" , now;
-
-		people.clear();
-		int age = 13;
-		
-		*_pSession << "{call storedCursorFunction(?)}", in(age), into(people), now;
-		
-		assert (2 == people.size());
-		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
-		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
-
-		Statement stmt = ((*_pSession << "{call storedCursorFunction(?)}", in(age), now));
-		RecordSet rs(stmt);
-		assert (rs["LastName"] == "Simpson");
-		assert (rs["FirstName"] == "Bart");
-		assert (rs["Address"] == "Springfield");
-		assert (rs["Age"] == 12);
-
-		dropObject("TABLE", "Person");
-		dropObject("FUNCTION", "storedCursorFunction");
 
 		*_pSession << "CREATE OR REPLACE "
 			"FUNCTION storedFunction(inParam IN NUMBER) RETURN NUMBER IS "
@@ -1141,6 +1193,59 @@ void ODBCOracleTest::testStoredFunction()
 	assert(inParam == outParam);
 	assert(ret == outParam);
 	dropObject("PROCEDURE", "storedFunction");
+}
+
+
+void ODBCOracleTest::testStoredCursorFunction()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int k = 0; k < 8;)
+	{
+		_pSession->setFeature("autoBind", bindValues[k]);
+		_pSession->setFeature("autoExtract", bindValues[k+1]);
+
+		recreatePersonTable();
+		typedef Tuple<std::string, std::string, std::string, int> Person;
+		std::vector<Person> people;
+		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+
+		*_pSession << "CREATE OR REPLACE "
+			"FUNCTION storedCursorFunction(ageLimit IN NUMBER) RETURN SYS_REFCURSOR IS "
+			" ret SYS_REFCURSOR; "
+			" BEGIN "
+			" OPEN ret FOR "
+			" SELECT * "
+			" FROM Person "
+			" WHERE Age < ageLimit " 
+			" ORDER BY Age DESC; "
+			" RETURN ret; "
+			" END storedCursorFunction;" , now;
+
+		people.clear();
+		int age = 13;
+		
+		*_pSession << "{call storedCursorFunction(?)}", in(age), into(people), now;
+		
+		assert (2 == people.size());
+		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+
+		Statement stmt = ((*_pSession << "{call storedCursorFunction(?)}", in(age), now));
+		RecordSet rs(stmt);
+		assert (rs["LastName"] == "Simpson");
+		assert (rs["FirstName"] == "Bart");
+		assert (rs["Address"] == "Springfield");
+		assert (rs["Age"] == 12);
+
+		dropObject("TABLE", "Person");
+		dropObject("FUNCTION", "storedCursorFunction");
+		
+		k += 2;
+	}
 }
 
 
@@ -1501,7 +1606,11 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredCursorProcedure);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureAny);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredCursorFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNull);

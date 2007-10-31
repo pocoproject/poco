@@ -120,6 +120,8 @@ public:
 	void testInternalStorageType();
 
 	void testStoredProcedure();
+	void testStoredProcedureAny();
+	void testStoredProcedureDynamicAny();
 	void testStoredFunction();
 
 	void testNull();

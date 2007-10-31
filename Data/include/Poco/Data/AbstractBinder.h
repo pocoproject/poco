@@ -96,60 +96,60 @@ public:
 	virtual ~AbstractBinder();
 		/// Destroys the AbstractBinder.
 
-	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int8.
 
-	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir = PD_IN) = 0;
 		/// Binds an UInt8.
 
-	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int16.
 
-	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir = PD_IN) = 0;
 		/// Binds an UInt16.
 
-	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int32.
 
-	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir = PD_IN) = 0;
 		/// Binds an UInt32.
 		
-	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int64.
 
-	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir = PD_IN) = 0;
 		/// Binds an UInt64.
 
 #ifndef POCO_LONG_IS_64_BIT
-	virtual void bind(std::size_t pos, const long& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN) = 0;
 		/// Binds a long.
 #endif
 
-	virtual void bind(std::size_t pos, const bool& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const bool& val, Direction dir = PD_IN) = 0;
 		/// Binds a boolean.
 
-	virtual void bind(std::size_t pos, const float& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const float& val, Direction dir = PD_IN) = 0;
 		/// Binds a float.
 
-	virtual void bind(std::size_t pos, const double& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const double& val, Direction dir = PD_IN) = 0;
 		/// Binds a double.
 
-	virtual void bind(std::size_t pos, const char& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const char& val, Direction dir = PD_IN) = 0;
 		/// Binds a single character.
 
-	virtual void bind(std::size_t pos, const char* const &pVal, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const char* const &pVal, Direction dir = PD_IN) = 0;
 		/// Binds a const char ptr.
 
-	virtual void bind(std::size_t pos, const std::string& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN) = 0;
 		/// Binds a string.
 
-	virtual void bind(std::size_t pos, const BLOB& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const BLOB& val, Direction dir = PD_IN) = 0;
 		/// Binds a BLOB.
 
-	virtual void bind(std::size_t pos, const DateTime& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN) = 0;
 		/// Binds a DateTime.
 
-	virtual void bind(std::size_t pos, const NullData& val, Direction dir) = 0;
+	virtual void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN) = 0;
 		/// Binds a null.
 
 	void bind(std::size_t pos, const Any& val, Direction dir = PD_IN);

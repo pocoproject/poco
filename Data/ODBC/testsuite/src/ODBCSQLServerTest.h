@@ -120,7 +120,11 @@ public:
 	void testTupleVector();
 
 	void testStoredProcedure();
+	void testStoredCursorProcedure();
+	void testStoredProcedureAny();
+	void testStoredProcedureDynamicAny();
 	void testStoredFunction();
+	void testStoredCursorFunction();
 
 	void testInternalExtraction();
 	void testInternalStorageType();

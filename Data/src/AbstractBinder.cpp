@@ -57,9 +57,6 @@ AbstractBinder::~AbstractBinder()
 
 void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 {
-	if (PD_IN != dir)
-		throw InvalidAccessException("Only IN direction is allowed.");
-
 	if(val.type() == typeid(Int32))
 		bind(pos, RefAnyCast<Int32>(val), dir);
 	else if(val.type() == typeid(std::string))
@@ -101,9 +98,6 @@ void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 
 void AbstractBinder::bind(std::size_t pos, const DynamicAny& val, Direction dir)
 {
-	if (PD_IN != dir)
-		throw InvalidAccessException("Only IN direction is allowed.");
-
 	if(val.type() == typeid(Int32))
 		bind(pos, val.extract<Int32>(), dir);
 	else if(val.type() == typeid(std::string))

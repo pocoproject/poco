@@ -45,7 +45,7 @@
 
 
 // uncomment to use Mammoth ODBCng driver
-#define POCO_ODBC_USE_MAMMOTH_NG
+//#define POCO_ODBC_USE_MAMMOTH_NG
 
 
 class ODBCPostgreSQLTest: public CppUnit::TestCase
@@ -129,6 +129,9 @@ public:
 	void testInternalStorageType();
 
 	void testStoredFunction();
+	void testStoredFunctionAny();
+	void testStoredFunctionDynamicAny();
+
 	void testNull();
 	void testRowIterator();
 	void testStdVectorBool();

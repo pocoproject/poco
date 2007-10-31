@@ -120,7 +120,11 @@ public:
 	void testInternalStorageType();
 
 	void testStoredProcedure();
+	void testStoredCursorProcedure();
 	void testStoredFunction();
+	void testStoredCursorFunction();
+	void testStoredProcedureAny();
+	void testStoredProcedureDynamicAny();
 
 	void testNull();
 	void testRowIterator();
