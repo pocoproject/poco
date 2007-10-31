@@ -1,7 +1,7 @@
 //
 // AccessExpireStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AccessExpireStrategy.h#1 $
+// $Id: //poco/Main/Foundation/include/Poco/AccessExpireStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -42,7 +42,7 @@
 
 #include "Poco/KeyValueArgs.h"
 #include "Poco/ValidArgs.h"
-#include "Poco/AbstractStrategy.h"
+#include "Poco/ExpireStrategy.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Timestamp.h"
 #include "Poco/EventArgs.h"
