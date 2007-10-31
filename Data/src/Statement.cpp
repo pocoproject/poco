@@ -49,7 +49,7 @@ namespace Data {
 
 
 Statement::Statement(StatementImpl* pImpl):
-	_ptr(pImpl),
+	_pImpl(pImpl),
 	_async(false)
 {
 	poco_check_ptr (pImpl);
@@ -64,7 +64,7 @@ Statement::Statement(Session& session):
 
 
 Statement::Statement(const Statement& stmt):
-	_ptr(stmt._ptr),
+	_pImpl(stmt._pImpl),
 	_async(stmt._async),
 	_pResult(stmt._pResult),
 	_pAsyncExec(stmt._pAsyncExec)
@@ -89,7 +89,7 @@ void Statement::swap(Statement& other)
 {
 	using std::swap;
 	
-	swap(_ptr, other._ptr);
+	swap(_pImpl, other._pImpl);
 	swap(_async, other._async);
 	swap(_pAsyncExec, other._pAsyncExec);
 	swap(_pResult, other._pResult);
@@ -112,8 +112,8 @@ Statement::ResultType Statement::execute()
 	{
 		if (!isAsync())
 		{
-			if (isDone) _ptr->reset();
-			return _ptr->execute();
+			if (isDone) _pImpl->reset();
+			return _pImpl->execute();
 		}
 		else
 		{
@@ -137,9 +137,9 @@ const Statement::Result& Statement::executeAsync()
 
 const Statement::Result& Statement::doAsyncExec()
 {
-	if (done()) _ptr->reset();
+	if (done()) _pImpl->reset();
 	if (!_pAsyncExec)
-		_pAsyncExec = new AsyncExecMethod(_ptr, &StatementImpl::execute);
+		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
 	poco_check_ptr (_pAsyncExec);
 	_pResult = new Result((*_pAsyncExec)());
 	poco_check_ptr (_pResult);
@@ -151,7 +151,7 @@ void Statement::setAsync(bool async)
 {
 	_async = async;
 	if (_async && !_pAsyncExec)
-		_pAsyncExec = new AsyncExecMethod(_ptr, &StatementImpl::execute);
+		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
 }
 
 

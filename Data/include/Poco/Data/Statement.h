@@ -165,7 +165,7 @@ public:
 	Statement& operator << (const T& t)
 		/// Concatenates data with the SQL statement string.
 	{
-		_ptr->add(t);
+		_pImpl->add(t);
 		return *this;
 	}
 
@@ -273,7 +273,7 @@ private:
 	const Result& doAsyncExec();
 		/// Asynchronously executes the statement.
 
-	StatementImplPtr _ptr;
+	StatementImplPtr _pImpl;
 
 	// asynchronous execution related members
 	bool               _async;
@@ -333,72 +333,72 @@ inline Statement& Statement::operator , (Manipulator manip)
 
 inline Statement& Statement::operator , (AbstractBinding* info)
 {
-	_ptr->addBinding(info);
+	_pImpl->addBinding(info);
 	return *this;
 }
 
 
 inline Statement& Statement::operator , (AbstractExtraction* extract)
 {
-	_ptr->addExtract(extract);
+	_pImpl->addExtract(extract);
 	return *this;
 }
 
 
 inline Statement& Statement::operator , (const Limit& extrLimit)
 {
-	_ptr->setExtractionLimit(extrLimit);
+	_pImpl->setExtractionLimit(extrLimit);
 	return *this;
 }
 
 
 inline Statement& Statement::operator , (const Range& extrRange)
 {
-	_ptr->setExtractionLimit(extrRange.lower());
-	_ptr->setExtractionLimit(extrRange.upper());
+	_pImpl->setExtractionLimit(extrRange.lower());
+	_pImpl->setExtractionLimit(extrRange.upper());
 	return *this;
 }
 
 
 inline std::string Statement::toString() const
 {
-	return _ptr->toString();
+	return _pImpl->toString();
 }
 
 
 inline const AbstractExtractionVec& Statement::extractions() const
 {
-	return _ptr->extractions();
+	return _pImpl->extractions();
 }
 
 
 inline const MetaColumn& Statement::metaColumn(std::size_t pos) const
 {
-	return _ptr->metaColumn(static_cast<UInt32>(pos));
+	return _pImpl->metaColumn(static_cast<UInt32>(pos));
 }
 
 
 inline const MetaColumn& Statement::metaColumn(const std::string& name) const
 {
-	return _ptr->metaColumn(name);
+	return _pImpl->metaColumn(name);
 }
 
 
 inline void Statement::setStorage(const std::string& storage)
 {
-	_ptr->setStorage(storage);
+	_pImpl->setStorage(storage);
 }
 
 
 inline std::size_t Statement::extractionCount() const
 {
-	return _ptr->extractionCount();
+	return _pImpl->extractionCount();
 }
 
 
 inline Statement::Storage Statement::storage() const
 {
-	return static_cast<Storage>(_ptr->getStorage());
+	return static_cast<Storage>(_pImpl->getStorage());
 }
 
 
@@ -410,25 +410,25 @@ inline bool Statement::canModifyStorage()
 
 inline bool Statement::initialized()
 {
-	return _ptr->getState() == StatementImpl::ST_INITIALIZED;
+	return _pImpl->getState() == StatementImpl::ST_INITIALIZED;
 }
 
 
 inline bool Statement::paused()
 {
-	return _ptr->getState() == StatementImpl::ST_PAUSED;
+	return _pImpl->getState() == StatementImpl::ST_PAUSED;
 }
 
 
 inline bool Statement::done()
 {
-	return _ptr->getState() == StatementImpl::ST_DONE;
+	return _pImpl->getState() == StatementImpl::ST_DONE;
 }
 
 
 inline bool Statement::isNull(std::size_t col, std::size_t row) const
 {
-	return _ptr->isNull(col, row);
+	return _pImpl->isNull(col, row);
 }
 
 
