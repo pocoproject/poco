@@ -131,6 +131,9 @@ public:
 
 	void testAsync();
 
+	void testAny();
+	void testDynamicAny();
+
 	void setUp();
 	void tearDown();
 
@@ -151,6 +154,7 @@ private:
 	void recreateTuplesTable();
 	void recreateVectorTable();
 	void recreateVectorsTable();
+	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateBoolTable();
 

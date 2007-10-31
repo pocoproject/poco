@@ -48,6 +48,7 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/DateTime.h"
 #include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
 #include "Poco/Exception.h"
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -97,6 +98,11 @@ public:
 	bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
 
+#ifndef POCO_LONG_IS_64_BIT
+	bool extract(std::size_t pos, long& val);
+		/// Extracts a long.
+#endif
+
 	bool extract(std::size_t pos, bool& val);
 		/// Extracts a boolean.
 
@@ -120,6 +126,9 @@ public:
 	
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
+
+	bool extract(std::size_t pos, Poco::DynamicAny& val);
+		/// Extracts a DynamicAny.
 
 	void setDataExtraction(Preparation::DataExtraction ext);
 		/// Set data extraction mode.
@@ -158,6 +167,7 @@ private:
 		if (isNull(pos)) return false;
 
 		poco_assert (typeid(T) == _rPreparation[pos].type());
+
 		val = *AnyCast<T>(&_rPreparation[pos]); 
 		return true;
 	}
@@ -191,6 +201,63 @@ private:
 		}
 
 		return true;
+	}
+
+	template <typename T>
+	bool extractImpl(std::size_t pos, T& val)
+		/// Utility function for extraction of Any and DynamicAny.
+	{
+		ODBCColumn column(_rStmt, pos);
+
+		switch (column.type())
+		{
+			case MetaColumn::FDT_INT8:
+			{ Poco::Int8 i = 0; extract(pos, i); val = i; return true; }
+
+			case MetaColumn::FDT_UINT8:
+			{ Poco::UInt8 i = 0; extract(pos, i); val = i; return true;	}
+
+			case MetaColumn::FDT_INT16:
+			{ Poco::Int16 i = 0; extract(pos, i); val = i; return true;	}
+
+			case MetaColumn::FDT_UINT16:
+			{ Poco::UInt16 i = 0; extract(pos, i); val = i; return true; }
+
+			case MetaColumn::FDT_INT32:
+			{ Poco::Int32 i = 0; extract(pos, i); val = i; return true;	}
+
+			case MetaColumn::FDT_UINT32:
+			{ Poco::UInt32 i = 0; extract(pos, i); val = i; return true; }
+
+			case MetaColumn::FDT_INT64:
+			{ Poco::Int64 i = 0; extract(pos, i); val = i; return true;	}
+
+			case MetaColumn::FDT_UINT64:
+			{ Poco::UInt64 i = 0; extract(pos, i); val = i; return true; }
+
+			case MetaColumn::FDT_BOOL:
+			{ bool b; extract(pos, b); val = b; return true; }
+
+			case MetaColumn::FDT_FLOAT:
+			{ float f; extract(pos, f); val = f; return true; }
+
+			case MetaColumn::FDT_DOUBLE:
+			{ double d; extract(pos, d); val = d; return true; }
+
+			case MetaColumn::FDT_STRING:
+			{ std::string s; extract(pos, s); val = s; return true;	}
+
+			case MetaColumn::FDT_BLOB:
+			{ Poco::Data::BLOB b; extract(pos, b); val = b; return true; }
+
+			case MetaColumn::FDT_TIMESTAMP:
+			{ Poco::DateTime b; extract(pos, b); val = b; return true; }
+
+			default: 
+				throw DataFormatException("Unsupported data type.");
+		}
+
+		return false;
 	}
 
 	bool isNullLengthIndicator(SQLLEN val) const;

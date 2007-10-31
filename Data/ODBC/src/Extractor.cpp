@@ -265,6 +265,17 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+bool Extractor::extract(std::size_t pos, long& val)
+{
+	if (Preparation::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_SLONG);
+	else
+		return extractBoundImpl(pos, val);
+}
+#endif
+
+
 bool Extractor::extract(std::size_t pos, double& val)
 {
 	if (Preparation::DE_MANUAL == _dataExtraction)
@@ -384,57 +395,13 @@ bool Extractor::extract(std::size_t pos, char& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Any& val)
 {
-	ODBCColumn column(_rStmt, pos);
+	return extractImpl(pos, val);
+}
 
-	switch (column.type())
-	{
-		case MetaColumn::FDT_INT8:
-		{ Poco::Int8 i = 0; extract(pos, i); val = i; return true; }
 
-		case MetaColumn::FDT_UINT8:
-		{ Poco::UInt8 i = 0; extract(pos, i); val = i; return true;	}
-
-		case MetaColumn::FDT_INT16:
-		{ Poco::Int16 i = 0; extract(pos, i); val = i; return true;	}
-
-		case MetaColumn::FDT_UINT16:
-		{ Poco::UInt16 i = 0; extract(pos, i); val = i; return true; }
-
-		case MetaColumn::FDT_INT32:
-		{ Poco::Int32 i = 0; extract(pos, i); val = i; return true;	}
-
-		case MetaColumn::FDT_UINT32:
-		{ Poco::UInt32 i = 0; extract(pos, i); val = i; return true; }
-
-		case MetaColumn::FDT_INT64:
-		{ Poco::Int64 i = 0; extract(pos, i); val = i; return true;	}
-
-		case MetaColumn::FDT_UINT64:
-		{ Poco::UInt64 i = 0; extract(pos, i); val = i; return true; }
-
-		case MetaColumn::FDT_BOOL:
-		{ bool b; extract(pos, b); val = b; return true; }
-
-		case MetaColumn::FDT_FLOAT:
-		{ float f; extract(pos, f); val = f; return true; }
-
-		case MetaColumn::FDT_DOUBLE:
-		{ double d; extract(pos, d); val = d; return true; }
-
-		case MetaColumn::FDT_STRING:
-		{ std::string s; extract(pos, s); val = s; return true;	}
-
-		case MetaColumn::FDT_BLOB:
-		{ Poco::Data::BLOB b; extract(pos, b); val = b; return true; }
-
-		case MetaColumn::FDT_TIMESTAMP:
-		{ Poco::DateTime b; extract(pos, b); val = b; return true; }
-
-		default: 
-			throw DataFormatException("Unsupported data type.");
-	}
-
-	return false;
+bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
+{
+	return extractImpl(pos, val);
 }
 
 

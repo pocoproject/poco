@@ -48,6 +48,8 @@ namespace Poco {
 
 
 class DateTime;
+class Any;
+class DynamicAny;
 
 
 namespace Data {
@@ -91,6 +93,11 @@ public:
 	virtual bool extract(std::size_t pos, Poco::UInt64& val) = 0;
 		/// Extracts an UInt64. Returns false if null was received.
 
+#ifndef POCO_LONG_IS_64_BIT
+	virtual bool extract(std::size_t pos, long& val) = 0;
+		/// Extracts a long. Returns false if null was received.
+#endif
+
 	virtual bool extract(std::size_t pos, bool& val) = 0;
 		/// Extracts a boolean. Returns false if null was received.
 
@@ -111,6 +118,12 @@ public:
 
 	virtual bool extract(std::size_t pos, DateTime& val) = 0;
 		/// Extracts a DateTime. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, Any& val) = 0;
+		/// Extracts a Any. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, DynamicAny& val) = 0;
+		/// Extracts a DynamicAny. Returns false if null was received.
 
 	virtual bool isNull(std::size_t pos) = 0;
 		/// Returns true if the current row value at pos column is null.

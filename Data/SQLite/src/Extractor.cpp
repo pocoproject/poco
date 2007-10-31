@@ -81,6 +81,17 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+bool Extractor::extract(std::size_t pos, long& val)
+{
+	if (isNull(pos))
+		return false;
+	val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+#endif
+
+
 bool Extractor::extract(std::size_t pos, double& val)
 {
 	if (isNull(pos))
@@ -206,108 +217,13 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Any& val)
 {
-	if (isNull(pos)) return false;
+	return extractImpl(pos, val);
+}
 
-	bool ret = false;
 
-	switch (Utility::getColumnType(_pStmt, pos))
-	{
-	case MetaColumn::FDT_BOOL:
-	{
-		bool i = false;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_INT8:
-	{
-		Poco::Int8 i = 0;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_UINT8:
-	{
-		Poco::UInt8 i = 0;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_INT16:
-	{
-		Poco::Int16 i = 0;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_UINT16:
-	{
-		Poco::UInt16 i = 0;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_INT32:
-	{
-		Poco::Int32 i = 0;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_UINT32:
-	{
-		Poco::UInt32 i = 0;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_INT64:
-	{
-		Poco::Int64 i = 0;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_UINT64:
-	{
-		Poco::UInt64 i = 0;
-		ret = extract(pos, i); 
-		val = i;
-		break;
-	}
-	case MetaColumn::FDT_STRING:
-	{
-		std::string s;
-		ret = extract(pos, s); 
-		val = s;
-		break;
-	}
-	case MetaColumn::FDT_DOUBLE:
-	{
-		double d(0.0);
-		ret = extract(pos, d); 
-		val = d;
-		break;
-	}
-	case MetaColumn::FDT_FLOAT:
-	{
-		float f(0.0);
-		ret = extract(pos, f); 
-		val = f;
-		break;
-	}
-	case MetaColumn::FDT_BLOB:
-	{
-		BLOB b;
-		ret = extract(pos, b); 
-		val = b;
-		break;
-	}
-	default:
-		throw Poco::Data::UnknownTypeException("Unknown type during extraction");
-	}
-
-	return ret;
+bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
+{
+	return extractImpl(pos, val);
 }
 
 

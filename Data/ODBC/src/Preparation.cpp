@@ -96,6 +96,18 @@ Poco::Any& Preparation::operator [] (std::size_t pos)
 
 void Preparation::prepare(std::size_t pos, const Poco::Any&)
 {
+	prepareImpl(pos);
+}
+
+
+void Preparation::prepare(std::size_t pos, const Poco::DynamicAny&)
+{
+	prepareImpl(pos);
+}
+
+
+void Preparation::prepareImpl(std::size_t pos)
+{
 	ODBCColumn col(_rStmt, pos);
 
 	switch (col.type())
@@ -131,7 +143,7 @@ void Preparation::prepare(std::size_t pos, const Poco::Any&)
 			return preparePOD<float>(pos, SQL_C_FLOAT);
 
 		case MetaColumn::FDT_DOUBLE:
-			return preparePOD<float>(pos, SQL_C_DOUBLE);
+			return preparePOD<double>(pos, SQL_C_DOUBLE);
 
 		case MetaColumn::FDT_STRING:
 			return prepareRaw<char>(pos, SQL_C_CHAR, maxDataSize(pos));

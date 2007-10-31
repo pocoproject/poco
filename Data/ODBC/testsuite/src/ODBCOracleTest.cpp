@@ -1175,6 +1175,38 @@ void ODBCOracleTest::testAsync()
 }
 
 
+void ODBCOracleTest::testAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateAnysTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->any();
+
+		i += 2;
+	}
+}
+
+
+void ODBCOracleTest::testDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateAnysTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->dynamicAny();
+
+		i += 2;
+	}
+}
+
+
 void ODBCOracleTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1273,6 +1305,15 @@ void ODBCOracleTest::recreateVectorsTable()
 	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 NUMBER, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
+}
+
+
+void ODBCOracleTest::recreateAnysTable()
+{
+	dropObject("TABLE", "Anys");
+	try { *_pSession << "CREATE TABLE Anys (int0 INTEGER, flt0 NUMBER, str0 VARCHAR(30))", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
 
 
@@ -1466,6 +1507,8 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNull);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testRowIterator);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAsync);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAny);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testDynamicAny);
 
 		return pSuite;
 	}

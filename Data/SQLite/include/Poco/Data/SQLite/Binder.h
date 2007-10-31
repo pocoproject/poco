@@ -43,6 +43,7 @@
 #include "Poco/Data/SQLite/SQLite.h"
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
 
 
 struct sqlite3_stmt;
@@ -86,6 +87,11 @@ public:
 
 	void bind(std::size_t pos, const Poco::UInt64 &val, Direction dir = PD_IN);
 		/// Binds an UInt64.
+
+#ifndef POCO_LONG_IS_64_BIT
+	void bind(std::size_t pos, const long &val, Direction dir = PD_IN);
+		/// Binds a long
+#endif
 
 	void bind(std::size_t pos, const bool &val, Direction dir = PD_IN);
 		/// Binds a boolean.
@@ -166,6 +172,15 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt64 &val, Direction dir
 	Poco::Int64 tmp = static_cast<Poco::Int64>(val);
 	bind(pos, tmp, dir);
 }
+
+
+#ifndef POCO_LONG_IS_64_BIT
+inline void Binder::bind(std::size_t pos, const long &val, Direction dir)
+{
+	long tmp = static_cast<long>(val);
+	bind(pos, tmp, dir);
+}
+#endif
 
 
 inline void Binder::bind(std::size_t pos, const bool &val, Direction dir)

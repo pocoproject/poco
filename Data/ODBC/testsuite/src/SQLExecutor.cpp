@@ -36,6 +36,7 @@
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
@@ -66,6 +67,7 @@ using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
+using Poco::DynamicAny;
 using Poco::DateTime;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
@@ -2324,4 +2326,50 @@ void SQLExecutor::asynchronous(int rowCount)
 	assert (!stmt2.isAsync());
 	assert ("deque" == stmt2.getStorage());
 	assert (stmt2.execute() == rowCount);
+}
+
+void SQLExecutor::any()
+{
+	Any i = 42;
+	Any f = 42.5;
+	Any s = std::string("42");
+
+	Session tmp = *_pSession;
+
+	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
+
+	int count = 0;
+	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
+	assert (1 == count);
+
+	i = 0;
+	f = 0.0;
+	s = std::string("");
+	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
+	assert (AnyCast<int>(i) == 42);
+	assert (AnyCast<double>(f) == 42.5);
+	assert (AnyCast<std::string>(s) == "42");
+}
+
+
+void SQLExecutor::dynamicAny()
+{
+	DynamicAny i = 42;
+	DynamicAny f = 42.5;
+	DynamicAny s = "42";
+
+	Session tmp = *_pSession;
+	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
+
+	int count = 0;
+	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
+	assert (1 == count);
+
+	i = 0;
+	f = 0.0;
+	s = std::string("");
+	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
+	assert (42 == i);
+	assert (42.5 == f);
+	assert ("42" == s);
 }

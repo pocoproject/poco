@@ -1009,6 +1009,38 @@ void ODBCPostgreSQLTest::testAsync()
 }
 
 
+void ODBCPostgreSQLTest::testAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateAnysTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->any();
+
+		i += 2;
+	}
+}
+
+
+void ODBCPostgreSQLTest::testDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateAnysTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->dynamicAny();
+
+		i += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::configurePLPgSQL()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1132,6 +1164,15 @@ void ODBCPostgreSQLTest::recreateVectorsTable()
 	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
+}
+
+
+void ODBCPostgreSQLTest::recreateAnysTable()
+{
+	dropObject("TABLE", "Anys");
+	try { *_pSession << "CREATE TABLE Anys (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
 
 
@@ -1333,6 +1374,8 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRowIterator);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStdVectorBool);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAsync);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAny);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDynamicAny);
 
 		return pSuite;
 	}

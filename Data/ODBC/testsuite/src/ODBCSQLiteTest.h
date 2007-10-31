@@ -124,6 +124,9 @@ public:
 
 	void testAsync();
 
+	void testAny();
+	void testDynamicAny();
+
 	void setUp();
 	void tearDown();
 
@@ -143,6 +146,7 @@ private:
 	void recreateFloatsTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
+	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
 
 	static bool init(const std::string& driver, const std::string& dsn);

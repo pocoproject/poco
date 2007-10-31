@@ -41,8 +41,12 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
+#include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/AbstractExtractor.h"
+#include "Poco/Data/MetaColumn.h"
+#include "Poco/Data/DataException.h"
 #include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
 #include <vector>
 #include <utility>
 
@@ -93,6 +97,11 @@ public:
 	bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
 
+#ifndef POCO_LONG_IS_64_BIT
+	bool extract(std::size_t pos, long& val);
+		/// Extracts a long.
+#endif
+
 	bool extract(std::size_t pos, bool& val);
 		/// Extracts a boolean.
 
@@ -117,6 +126,9 @@ public:
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
 
+	bool extract(std::size_t pos, Poco::DynamicAny& val);
+		/// Extracts a DynamicAny.
+
 	bool isNull(std::size_t pos);
 		/// Returns true if the current row value at pos column is null.
 		/// Because of the loss of information about null-ness of the 
@@ -135,6 +147,121 @@ public:
 		/// Clears the cached nulls indicator vector.
 
 private:
+	template <typename T>
+	bool extractImpl(std::size_t pos, T& val)
+		/// Utility function for extraction of Any and DynamicAny.
+	{
+		if (isNull(pos)) return false;
+
+		bool ret = false;
+
+		switch (Utility::getColumnType(_pStmt, pos))
+		{
+		case MetaColumn::FDT_BOOL:
+		{
+			bool i = false;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_INT8:
+		{
+			Poco::Int8 i = 0;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_UINT8:
+		{
+			Poco::UInt8 i = 0;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_INT16:
+		{
+			Poco::Int16 i = 0;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_UINT16:
+		{
+			Poco::UInt16 i = 0;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_INT32:
+		{
+			Poco::Int32 i = 0;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_UINT32:
+		{
+			Poco::UInt32 i = 0;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_INT64:
+		{
+			Poco::Int64 i = 0;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_UINT64:
+		{
+			Poco::UInt64 i = 0;
+			ret = extract(pos, i); 
+			val = i;
+			break;
+		}
+		case MetaColumn::FDT_STRING:
+		{
+			std::string s;
+			ret = extract(pos, s); 
+			val = s;
+			break;
+		}
+		case MetaColumn::FDT_DOUBLE:
+		{
+			double d(0.0);
+			ret = extract(pos, d); 
+			val = d;
+			break;
+		}
+		case MetaColumn::FDT_FLOAT:
+		{
+			float f(0.0);
+			ret = extract(pos, f); 
+			val = f;
+			break;
+		}
+		case MetaColumn::FDT_BLOB:
+		{
+			BLOB b;
+			ret = extract(pos, b); 
+			val = b;
+			break;
+		}
+		case MetaColumn::FDT_TIMESTAMP:
+		{
+			DateTime dt;
+			ret = extract(pos, dt); 
+			val = dt;
+			break;
+		}
+		default:
+			throw Poco::Data::UnknownTypeException("Unknown type during extraction");
+		}
+
+		return ret;
+	}
+
 	sqlite3_stmt* _pStmt;
 	NullIndVec _nulls;
 };

@@ -47,6 +47,8 @@
 namespace Poco {
 
 class DateTime;
+class Any;
+class DynamicAny;
 
 namespace Data {
 
@@ -118,6 +120,11 @@ public:
 	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir) = 0;
 		/// Binds an UInt64.
 
+#ifndef POCO_LONG_IS_64_BIT
+	virtual void bind(std::size_t pos, const long& val, Direction dir) = 0;
+		/// Binds a long.
+#endif
+
 	virtual void bind(std::size_t pos, const bool& val, Direction dir) = 0;
 		/// Binds a boolean.
 
@@ -144,6 +151,12 @@ public:
 
 	virtual void bind(std::size_t pos, const NullData& val, Direction dir) = 0;
 		/// Binds a null.
+
+	void bind(std::size_t pos, const Any& val, Direction dir = PD_IN);
+		/// Binds an Any.
+	
+	void bind(std::size_t pos, const DynamicAny& val, Direction dir = PD_IN);
+		/// Binds a DynamicAny.
 
 	static bool isOutBound(Direction dir);
 		/// Returns true if direction is out bound;

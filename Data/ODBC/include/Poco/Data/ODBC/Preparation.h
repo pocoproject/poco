@@ -47,6 +47,7 @@
 #include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <vector>
@@ -126,6 +127,11 @@ public:
 	void prepare(std::size_t pos, Poco::UInt64);
 		/// Prepares an UInt64.
 
+#ifndef POCO_LONG_IS_64_BIT
+	void prepare(std::size_t pos, long);
+		/// Prepares a long.
+#endif
+
 	void prepare(std::size_t pos, bool);
 		/// Prepares a boolean.
 
@@ -149,6 +155,9 @@ public:
 
 	void prepare(std::size_t pos, const Poco::Any&);
 		/// Prepares an Any.
+
+	void prepare(std::size_t pos, const Poco::DynamicAny&);
+		/// Prepares a DynamicAny.
 
 	std::size_t columns() const;
 		/// Returns the number of columns.
@@ -181,6 +190,9 @@ public:
 		/// Returns data extraction mode.
 
 private:
+	void prepareImpl(std::size_t pos);
+		/// Utility function to prepare Any and DynamicAny
+
 	template <typename T>
 	void preparePOD(std::size_t pos, SQLSMALLINT valueType)
 	{
@@ -291,6 +303,14 @@ inline void Preparation::prepare(std::size_t pos, Poco::UInt64)
 {
 	preparePOD<Poco::UInt64>(pos, SQL_C_UBIGINT);
 }
+
+
+#ifndef POCO_LONG_IS_64_BIT
+inline void Preparation::prepare(std::size_t pos, long)
+{
+	preparePOD<long>(pos, SQL_C_SLONG);
+}
+#endif
 
 
 inline void Preparation::prepare(std::size_t pos, bool)

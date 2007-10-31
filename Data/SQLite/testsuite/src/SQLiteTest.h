@@ -113,6 +113,9 @@ public:
 	void testRowIterator();
 	void testAsync();
 
+	void testAny();
+	void testDynamicAny();
+
 	void setUp();
 	void tearDown();
 

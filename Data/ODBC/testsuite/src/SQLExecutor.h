@@ -135,6 +135,9 @@ public:
 	void stdVectorBool();
 
 	void asynchronous(int rowCount = 500);
+	
+	void any();
+	void dynamicAny();
 
 private:
 	Poco::Data::Session* _pSession;

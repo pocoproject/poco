@@ -110,6 +110,11 @@ public:
 	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir = PD_IN);
 		/// Binds an UInt64.
 
+#ifndef POCO_LONG_IS_64_BIT
+	void bind(std::size_t pos, const long& val, Direction dir = PD_IN);
+		/// Binds a long.
+#endif
+
 	void bind(std::size_t pos, const bool& val, Direction dir = PD_IN);
 		/// Binds a boolean.
 
@@ -205,13 +210,13 @@ private:
 		/// For in-bound purposes only.
 
 	const StatementHandle& _rStmt;
-	LengthVec _lengthIndicator;
-	ParamMap _inParams;
-	ParamMap _outParams;
-	ParameterBinding _paramBinding;
-	TimestampMap _timestamps;
-	StringMap _strings;
-	const TypeInfo* _pTypeInfo;
+	LengthVec              _lengthIndicator;
+	ParamMap               _inParams;
+	ParamMap               _outParams;
+	ParameterBinding       _paramBinding;
+	TimestampMap           _timestamps;
+	StringMap              _strings;
+	const TypeInfo*        _pTypeInfo;
 };
 
 
@@ -264,6 +269,14 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir
 {
 	bindImpl(pos, val, SQL_C_UBIGINT, dir);
 }
+
+
+#ifndef POCO_LONG_IS_64_BIT
+inline void Binder::bind(std::size_t pos, const long& val, Direction dir)
+{
+	bindImpl(pos, val, SQL_C_SLONG, dir);
+}
+#endif
 
 
 inline void Binder::bind(std::size_t pos, const float& val, Direction dir)

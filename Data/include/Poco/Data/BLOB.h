@@ -367,6 +367,11 @@ public:
 		return new DynamicAnyHolderImpl(_val);
 	}
 	
+	const Data::BLOB& value() const
+	{
+		return _val;
+	}
+
 private:
 	Data::BLOB _val;
 };

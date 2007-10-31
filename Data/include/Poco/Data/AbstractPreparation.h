@@ -50,6 +50,7 @@ namespace Poco {
 
 class DateTime;
 class Any;
+class DynamicAny;
 
 
 namespace Data {
@@ -95,6 +96,11 @@ public:
 	virtual void prepare(std::size_t pos, Poco::UInt64) = 0;
 		/// Prepares an UInt64.
 
+#ifndef POCO_LONG_IS_64_BIT
+	virtual void prepare(std::size_t pos, long) = 0;
+		/// Prepares a long.
+#endif
+
 	virtual void prepare(std::size_t pos, bool) = 0;
 		/// Prepares a boolean.
 
@@ -118,6 +124,9 @@ public:
 
 	virtual void prepare(std::size_t pos, const Any&) = 0;
 		/// Prepares an Any.
+
+	virtual void prepare(std::size_t pos, const DynamicAny&) = 0;
+		/// Prepares a DynamicAny.
 };
 
 

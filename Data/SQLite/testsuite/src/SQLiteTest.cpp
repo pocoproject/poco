@@ -50,6 +50,7 @@ using namespace Poco::Data;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
+using Poco::DynamicAny;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
@@ -1779,6 +1780,58 @@ void SQLiteTest::testAsync()
 }
 
 
+void SQLiteTest::testAny()
+{
+	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	tmp << "DROP TABLE IF EXISTS Anys", now;
+	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+
+	Any i = Int64(42);
+	Any f = double(42.5);
+	Any s = std::string("42");
+
+	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
+
+	int count = 0;
+	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
+	assert (1 == count);
+
+	i = 0;
+	f = 0.0;
+	s = std::string("");
+	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
+	assert (AnyCast<Int64>(i) == 42);
+	assert (AnyCast<double>(f) == 42.5);
+	assert (AnyCast<std::string>(s) == "42");
+}
+
+
+void SQLiteTest::testDynamicAny()
+{
+	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	tmp << "DROP TABLE IF EXISTS Anys", now;
+	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+
+	DynamicAny i = Int64(42);
+	DynamicAny f = double(42.5);
+	DynamicAny s = std::string("42");
+
+	tmp << "INSERT INTO Anys VALUES (?, ?, ?)", use(i), use(f), use(s), now;
+
+	int count = 0;
+	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
+	assert (1 == count);
+
+	i = 0;
+	f = 0.0;
+	s = std::string("");
+	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
+	assert (42 == i);
+	assert (42.5 == f);
+	assert ("42" == s);
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -1853,6 +1906,8 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNull);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
+	CppUnit_addTest(pSuite, SQLiteTest, testAny);
+	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);
 
 	return pSuite;
 }

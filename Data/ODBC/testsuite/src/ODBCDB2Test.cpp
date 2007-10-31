@@ -1082,6 +1082,38 @@ void ODBCDB2Test::testAsync()
 }
 
 
+void ODBCDB2Test::testAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateAnysTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->any();
+
+		i += 2;
+	}
+}
+
+
+void ODBCDB2Test::testDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateAnysTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->dynamicAny();
+
+		i += 2;
+	}
+}
+
+
 void ODBCDB2Test::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -1179,6 +1211,15 @@ void ODBCDB2Test::recreateVectorsTable()
 	try { *_pSession << "CREATE TABLE Vectors (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
+}
+
+
+void ODBCDB2Test::recreateAnysTable()
+{
+	dropObject("TABLE", "Anys");
+	try { *_pSession << "CREATE TABLE Anys (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
 
 
@@ -1338,6 +1379,8 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNull);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testRowIterator);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testAsync);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testAny);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testDynamicAny);
 
 		return pSuite;
 	}
