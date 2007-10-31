@@ -90,6 +90,13 @@ void Preparation::prepare(std::size_t pos, Poco::UInt64)
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+void Preparation::prepare(std::size_t pos, long)
+{
+}
+#endif
+
+
 void Preparation::prepare(std::size_t pos, bool)
 {
 }
@@ -126,6 +133,11 @@ void Preparation::prepare(std::size_t pos, const Poco::DateTime&)
 
 
 void Preparation::prepare(std::size_t pos, const Poco::Any&)
+{
+}
+
+
+void Preparation::prepare(std::size_t pos, const Poco::DynamicAny&)
 {
 }
 

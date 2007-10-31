@@ -120,7 +120,7 @@ public:
 		/// Extracts a DateTime. Returns false if null was received.
 
 	virtual bool extract(std::size_t pos, Any& val) = 0;
-		/// Extracts a Any. Returns false if null was received.
+		/// Extracts an Any. Returns false if null was received.
 
 	virtual bool extract(std::size_t pos, DynamicAny& val) = 0;
 		/// Extracts a DynamicAny. Returns false if null was received.

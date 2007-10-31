@@ -56,52 +56,60 @@ public:
 		/// Destroys the Preparation.
 
 	void prepare(std::size_t pos, Poco::Int8);
-		/// Extracts an Int8.
+		/// Prepares an Int8.
 
 	void prepare(std::size_t pos, Poco::UInt8);
-		/// Extracts an UInt8.
+		/// Prepares an UInt8.
 
 	void prepare(std::size_t pos, Poco::Int16);
-		/// Extracts an Int16.
+		/// Prepares an Int16.
 
 	void prepare(std::size_t pos, Poco::UInt16);
-		/// Extracts an UInt16.
+		/// Prepares an UInt16.
 
 	void prepare(std::size_t pos, Poco::Int32);
-		/// Extracts an Int32.
+		/// Prepares an Int32.
 
 	void prepare(std::size_t pos, Poco::UInt32);
-		/// Extracts an UInt32.
+		/// Prepares an UInt32.
 
 	void prepare(std::size_t pos, Poco::Int64);
-		/// Extracts an Int64.
+		/// Prepares an Int64.
 
 	void prepare(std::size_t pos, Poco::UInt64);
-		/// Extracts an UInt64.
+		/// Prepares an UInt64.
+
+#ifndef POCO_LONG_IS_64_BIT
+	void prepare(std::size_t pos, long);
+		/// Prepares a long.
+#endif
 
 	void prepare(std::size_t pos, bool);
-		/// Extracts a boolean.
+		/// Prepares a boolean.
 
 	void prepare(std::size_t pos, float);
-		/// Extracts a float.
+		/// Prepares a float.
 
 	void prepare(std::size_t pos, double);
-		/// Extracts a double.
+		/// Prepares a double.
 
 	void prepare(std::size_t pos, char);
-		/// Extracts a single character.
+		/// Prepares a single character.
 
 	void prepare(std::size_t pos, const std::string&);
-		/// Extracts a string.
+		/// Prepares a string.
 
 	void prepare(std::size_t pos, const Poco::Data::BLOB&);
-		/// Extracts a BLOB.
+		/// Prepares a BLOB.
 
 	void prepare(std::size_t pos, const Poco::DateTime&);
-		/// Extracts a DateTime.
+		/// Prepares a DateTime.
 
 	void prepare(std::size_t pos, const Poco::Any&);
-		/// Extracts an Any.
+		/// Prepares an Any.
+
+	void prepare(std::size_t pos, const Poco::DynamicAny&);
+		/// Prepares a DynamicAny.
 };
 
 

@@ -78,6 +78,17 @@ public:
 	bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
 
+	bool extract(std::size_t pos, Poco::Any& val);
+		/// Extracts an Any.
+
+	bool extract(std::size_t pos, Poco::DynamicAny& val);
+		/// Extracts a DynamicAny.
+
+#ifndef POCO_LONG_IS_64_BIT
+	bool extract(std::size_t pos, long& val);
+		/// Extracts a long.
+#endif
+
 	bool extract(std::size_t pos, bool& val);
 		/// Extracts a boolean.
 
