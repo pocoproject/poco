@@ -122,6 +122,17 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, false);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, false);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, false);
+
+
+	tableCreateString = "CREATE TABLE Test "
+		"(First VARCHAR(30),"
+		"Second INTEGER,"
+		"Third FLOAT)";
+
+	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 }
 
 
@@ -1100,6 +1111,22 @@ void ODBCPostgreSQLTest::testDynamicAny()
 }
 
 
+void ODBCPostgreSQLTest::testMultipleResults()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->multipleResults();
+
+		i += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::configurePLPgSQL()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1437,6 +1464,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAny);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDynamicAny);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultipleResults);
 
 		return pSuite;
 	}

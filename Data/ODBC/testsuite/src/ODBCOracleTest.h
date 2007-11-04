@@ -166,6 +166,8 @@ private:
 	static SessionPtr  _pSession;
 	static ExecPtr     _pExecutor;
 	static const bool  bindValues[8];
+	static const std::string MULTI_INSERT;
+	static const std::string MULTI_SELECT;
 };
 
 

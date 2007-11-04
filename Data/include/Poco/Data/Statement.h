@@ -177,6 +177,8 @@ public:
 
 	Statement& operator , (AbstractExtraction* extract);
 		/// Registers objects used for extracting data at the Statement.
+		/// the position argument is used by connectors that support multilple
+		/// recordsets to specify which recordset this extraction belongs to.
 
 	Statement& operator , (const Limit& extrLimit);
 		/// Sets a limit on the maximum number of rows a select is allowed to return.

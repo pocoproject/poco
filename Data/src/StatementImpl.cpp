@@ -66,8 +66,10 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_rSession(rSession),
 	_storage(STORAGE_UNKNOWN_IMPL),
 	_ostr(),
-	_bindings()
+	_bindings(),
+	_curDataSet(0)
 {
+	_extractors.resize(1);
 }
 
 
@@ -329,6 +331,27 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 	}
 
 	throw NotFoundException(format("Invalid column name: %s", name));
+}
+
+
+Poco::UInt32 StatementImpl::activateNextDataSet()
+{
+	if (_curDataSet + 1 < dataSetCount())
+		return ++_curDataSet;
+	else
+		throw InvalidAccessException("End of data sets reached.");
+}
+
+
+void StatementImpl::addExtract(AbstractExtraction* pExtraction)
+{
+	poco_check_ptr (pExtraction);
+
+	Poco::UInt32 pos = pExtraction->position();
+	if (pos >= _extractors.size()) 
+		_extractors.resize(pos + 1);
+
+	_extractors[pos].push_back(pExtraction);
 }
 
 

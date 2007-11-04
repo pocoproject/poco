@@ -57,6 +57,14 @@ Preparation::Preparation(const StatementHandle& rStmt,
 }
 
 
+Preparation::Preparation(const Preparation& other): 
+	_rStmt(other._rStmt),
+	_maxFieldSize(other._maxFieldSize),
+	_dataExtraction(other._dataExtraction)
+{
+}
+
+
 Preparation::~Preparation()
 {
 	std::vector<SQLLEN*>::iterator itLen = _pLengths.begin();

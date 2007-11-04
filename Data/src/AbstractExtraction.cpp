@@ -41,9 +41,11 @@ namespace Poco {
 namespace Data {
 
 
-AbstractExtraction::AbstractExtraction(Poco::UInt32 limit): 
+AbstractExtraction::AbstractExtraction(Poco::UInt32 limit,
+	Poco::UInt32 position): 
 	_pExtractor(0), 
-	_limit(limit)
+	_limit(limit),
+	_position(position)
 {
 }
 

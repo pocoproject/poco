@@ -39,7 +39,9 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractPrepare.h"
+#include <limits>
 #include <sql.h>
+#undef max
 
 
 namespace Poco {
@@ -88,18 +90,10 @@ void ODBCStatementImpl::compileImpl()
 	_stepCalled = false;
 	_nextResponse = 0;
 
-	std::string statement(toString());
-	if (statement.empty())
-		throw ODBCException("Empty statements are illegal");
+	if (_preparations.size())
+		PreparationVec().swap(_preparations);
 
-	Preparation::DataExtraction ext = session().getFeature("autoExtract") ? 
-		Preparation::DE_BOUND : Preparation::DE_MANUAL;
-	
-	std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
-	_pPreparation = new Preparation(_stmt, 
-		statement, 
-		maxFieldSize,
-		ext);
+	addPreparation();
 
 	Binder::ParameterBinding bind = session().getFeature("autoBind") ? 
 		Binder::PB_IMMEDIATE : Binder::PB_AT_EXEC;
@@ -112,7 +106,6 @@ void ODBCStatementImpl::compileImpl()
 	}catch (NotSupportedException&) { }
 
 	_pBinder = new Binder(_stmt, bind, pDT);
-	_pExtractor = new Extractor(_stmt, *_pPreparation);
 	
 	// This is a hack to conform to some ODBC drivers behavior (e.g. MS SQLServer) with 
 	// stored procedure calls: driver refuses to report the number of columns, unless all 
@@ -137,22 +130,46 @@ void ODBCStatementImpl::makeInternalExtractors()
 }
 
 
+void ODBCStatementImpl::addPreparation()
+{
+	if (0 == _preparations.size())
+	{
+		std::string statement(toString());
+		if (statement.empty())
+			throw ODBCException("Empty statements are illegal");
+
+		Preparation::DataExtraction ext = session().getFeature("autoExtract") ? 
+			Preparation::DE_BOUND : Preparation::DE_MANUAL;
+		
+		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+
+		_preparations.push_back(new Preparation(_stmt, statement, maxFieldSize, ext));
+	}
+	else
+		_preparations.push_back(new Preparation(*_preparations[0]));
+
+	_extractors.push_back(new Extractor(_stmt, *_preparations.back()));
+}
+
+
 void ODBCStatementImpl::doPrepare()
 {
-	if (!_prepared && session().getFeature("autoExtract") && hasData())
+	if (session().getFeature("autoExtract") && hasData())
 	{
-		poco_check_ptr (_pPreparation);
+		Poco::UInt32 curDataSet = currentDataSet();
+		poco_check_ptr (_preparations[curDataSet]);
 
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
-			AbstractPrepare* pAP = (*it)->createPrepareObject(_pPreparation, pos);
+			AbstractPrepare* pAP = (*it)->createPrepareObject(_preparations[curDataSet], pos);
 			pAP->prepare();
 			pos += (*it)->numOfColumnsHandled();
 			delete pAP;
 		}
+
 		_prepared = true;
 	}
 }
@@ -263,14 +280,32 @@ bool ODBCStatementImpl::hasNext()
 		if (_stepCalled) 
 			return _stepCalled = nextRowReady();
 
-		_stepCalled = true;
-		_pExtractor->reset();
-		_nextResponse = SQLFetch(_stmt);
+		makeStep();
 
 		if (!nextRowReady())
-			return false;
-		else
-		if (Utility::isError(_nextResponse))
+		{
+			try
+			{
+				activateNextDataSet();
+			} catch (InvalidAccessException&)
+			{
+				return false;
+			}
+
+			addPreparation();
+			doPrepare();
+			fixupExtraction();
+
+			try
+			{
+				checkError(SQLMoreResults(_stmt));
+			} catch (NoDataException&) 
+			{
+				return false;
+			}
+			makeStep();
+		}
+		else if (Utility::isError(_nextResponse))
 			checkError(_nextResponse, "SQLFetch()");
 
 		return true;
@@ -280,12 +315,18 @@ bool ODBCStatementImpl::hasNext()
 }
 
 
+void ODBCStatementImpl::makeStep()
+{
+	_extractors[currentDataSet()]->reset();
+	_nextResponse = SQLFetch(_stmt);
+	_stepCalled = true;
+}
+
+
 void ODBCStatementImpl::next()
 {
 	if (nextRowReady())
 	{
-		poco_assert (columnsExtracted() == _pPreparation->columns());
-
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();

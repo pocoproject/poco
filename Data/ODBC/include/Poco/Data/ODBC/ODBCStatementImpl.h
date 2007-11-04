@@ -107,9 +107,14 @@ protected:
 		/// Returns the SQL string as modified by the driver.
 
 private:
-	typedef Poco::Data::AbstractBindingVec Bindings;
+	typedef Poco::Data::AbstractBindingVec    Bindings;
+	typedef Poco::SharedPtr<Binder>           BinderPtr;
 	typedef Poco::Data::AbstractExtractionVec Extractions;
-
+	typedef Poco::SharedPtr<Preparation>      PreparationPtr;
+	typedef std::vector<PreparationPtr>       PreparationVec;
+	typedef Poco::SharedPtr<Extractor>        ExtractorPtr;
+	typedef std::vector<ExtractorPtr>         ExtractorVec;
+	
 	static const std::string INVALID_CURSOR_STATE;
 
 	void clear();
@@ -131,6 +136,9 @@ private:
 	bool hasData() const;
 		/// Returns true if statement returns data.
 
+	void makeStep();
+		/// Fetches the next row of data.
+
 	bool nextRowReady() const;
 		/// Returns true if there is a row fetched but not yet extracted.
 
@@ -140,18 +148,19 @@ private:
 
 	void getData();
 
+	void addPreparation();
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
-	const SQLHDBC&               _rConnection;
-	const StatementHandle        _stmt;
-	Poco::SharedPtr<Preparation> _pPreparation;
-	Poco::SharedPtr<Binder>      _pBinder;
-	Poco::SharedPtr<Extractor>   _pExtractor;
-	bool                         _stepCalled;
-	int                          _nextResponse;
-	ColumnPtrVec                 _columnPtrs;
-	bool                         _prepared;
+	const SQLHDBC&        _rConnection;
+	const StatementHandle _stmt;
+	PreparationVec        _preparations;
+	BinderPtr             _pBinder;
+	ExtractorVec          _extractors;
+	bool                  _stepCalled;
+	int                   _nextResponse;
+	ColumnPtrVec          _columnPtrs;
+	bool                  _prepared;
 };
 
 
@@ -160,8 +169,9 @@ private:
 //
 inline AbstractExtractor& ODBCStatementImpl::extractor()
 {
-	poco_assert_dbg (_pExtractor);
-	return *_pExtractor;
+	poco_assert_dbg (currentDataSet() < _extractors.size());
+	poco_assert_dbg (_extractors[currentDataSet()]);
+	return *_extractors[currentDataSet()];
 }
 
 
@@ -174,15 +184,15 @@ inline AbstractBinder& ODBCStatementImpl::binder()
 
 inline Poco::UInt32 ODBCStatementImpl::columnsReturned() const
 {
-	poco_assert_dbg (_pPreparation);
-	return (Poco::UInt32) _pPreparation->columns();
+	poco_assert_dbg (currentDataSet() < _preparations.size());
+	poco_assert_dbg (_preparations[currentDataSet()]);
+	return (Poco::UInt32) _preparations[currentDataSet()]->columns();
 }
 
 
 inline bool ODBCStatementImpl::hasData() const
 {
-	poco_assert_dbg (_pPreparation);
-	return (_pPreparation->columns() > 0);
+	return (columnsReturned() > 0);
 }
 
 

@@ -100,6 +100,9 @@ public:
 		DataExtraction dataExtraction = DE_BOUND);
 		/// Creates the Preparation.
 
+	Preparation(const Preparation& other);
+		/// Copy constructs the Preparation.
+
 	~Preparation();
 		/// Destroys the Preparation.
 
@@ -190,6 +193,9 @@ public:
 		/// Returns data extraction mode.
 
 private:
+	Preparation();
+	Preparation& operator = (const Preparation&);
+
 	void prepareImpl(std::size_t pos);
 		/// Utility function to prepare Any and DynamicAny
 
@@ -246,11 +252,11 @@ private:
 		}
 	}
 
-	const StatementHandle& _rStmt;
+	const StatementHandle&          _rStmt;
 	mutable std::vector<Poco::Any*> _pValues;
-	mutable std::vector<SQLLEN*> _pLengths;
-	std::size_t _maxFieldSize;
-	DataExtraction _dataExtraction;
+	mutable std::vector<SQLLEN*>    _pLengths;
+	std::size_t                     _maxFieldSize;
+	DataExtraction                  _dataExtraction;
 };
 
 

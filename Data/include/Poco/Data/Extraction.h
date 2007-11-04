@@ -63,13 +63,23 @@ class Extraction: public AbstractExtraction
 	/// Concrete Data Type specific extraction of values from a query result set.
 {
 public:
-	Extraction(T& result): _rResult(result), _default(), _extracted(false)
-		/// Creates an Extraction object, uses an empty object T as default value
+	Extraction(T& result, Poco::UInt32 position = 0):
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(), 
+		_extracted(false)
+		/// Creates an Extraction object at specified position.
+		/// Uses an empty object T as default value.
 	{
 	}
 
-	Extraction(T& result, const T& def): _rResult(result), _default(def), _extracted(false)
-		/// Creates an Extraction object, uses the provided def object as default value
+	Extraction(T& result, const T& def, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(def), 
+		_extracted(false)
+		/// Creates an Extraction object at specified position.
+		/// Uses the provided def object as default value.
 	{
 	}
 
@@ -130,11 +140,17 @@ class Extraction<std::vector<T> >: public AbstractExtraction
 	/// Vector Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::vector<T>& result): _rResult(result), _default()
+	Extraction(std::vector<T>& result, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default()
 	{
 	}
 
-	Extraction(std::vector<T>& result, const T& def): _rResult(result), _default(def)
+	Extraction(std::vector<T>& result, const T& def, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(def)
 	{
 	}
 
@@ -209,11 +225,17 @@ class Extraction<std::list<T> >: public AbstractExtraction
 	/// List Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::list<T>& result): _rResult(result), _default()
+	Extraction(std::list<T>& result, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default()
 	{
 	}
 
-	Extraction(std::list<T>& result, const T& def): _rResult(result), _default(def)
+	Extraction(std::list<T>& result, const T& def, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(def)
 	{
 	}
 
@@ -283,11 +305,17 @@ class Extraction<std::deque<T> >: public AbstractExtraction
 	/// Deque Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::deque<T>& result): _rResult(result), _default()
+	Extraction(std::deque<T>& result, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default()
 	{
 	}
 
-	Extraction(std::deque<T>& result, const T& def): _rResult(result), _default(def)
+	Extraction(std::deque<T>& result, const T& def, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(def)
 	{
 	}
 
@@ -365,11 +393,10 @@ class InternalExtraction: public Extraction<C>
 	/// InternalExtraction objects can not be copied or assigned.
 {
 public:
-	explicit InternalExtraction(C& result, Column<T,C>* pColumn): 
-		Extraction<C>(result), 
+	explicit InternalExtraction(C& result, Column<T,C>* pColumn, Poco::UInt32 position = 0): 
+		Extraction<C>(result, T(), position), 
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.
-		
 	{
 	}
 
@@ -420,11 +447,17 @@ class Extraction<std::set<T> >: public AbstractExtraction
 	/// Set Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::set<T>& result): _rResult(result), _default()
+	Extraction(std::set<T>& result, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default()
 	{
 	}
 
-	Extraction(std::set<T>& result, const T& def): _rResult(result), _default(def)
+	Extraction(std::set<T>& result, const T& def, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(def)
 	{
 	}
 
@@ -474,11 +507,17 @@ class Extraction<std::multiset<T> >: public AbstractExtraction
 	/// Multiset Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::multiset<T>& result): _rResult(result), _default()
+	Extraction(std::multiset<T>& result, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default()
 	{
 	}
 
-	Extraction(std::multiset<T>& result, const T& def): _rResult(result), _default(def)
+	Extraction(std::multiset<T>& result, const T& def, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(def)
 	{
 	}
 
@@ -528,11 +567,17 @@ class Extraction<std::map<K, V> >: public AbstractExtraction
 	/// Map Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::map<K, V>& result): _rResult(result), _default()
+	Extraction(std::map<K, V>& result, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default()
 	{
 	}
 
-	Extraction(std::map<K, V>& result, const V& def): _rResult(result), _default(def)
+	Extraction(std::map<K, V>& result, const V& def, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(def)
 	{
 	}
 
@@ -583,11 +628,17 @@ class Extraction<std::multimap<K, V> >: public AbstractExtraction
 	/// Multimap Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::multimap<K, V>& result): _rResult(result), _default()
+	Extraction(std::multimap<K, V>& result, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default()
 	{
 	}
 
-	Extraction(std::multimap<K, V>& result, const V& def): _rResult(result), _default(def)
+	Extraction(std::multimap<K, V>& result, const V& def, Poco::UInt32 position = 0): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+		_rResult(result), 
+		_default(def)
 	{
 	}
 
@@ -633,18 +684,18 @@ private:
 
 
 template <typename T> 
-Extraction<T>* into(T& t)
+Extraction<T>* into(T& t, Poco::UInt32 pos = 0)
 	/// Convenience function to allow for a more compact creation of an extraction object
 {
-	return new Extraction<T>(t);
+	return new Extraction<T>(t, pos);
 }
 
 
 template <typename T> 
-Extraction<T>* into(T& t, const T& def)
+Extraction<T>* into(T& t, Poco::UInt32 pos, const T& def)
 	/// Convenience function to allow for a more compact creation of an extraction object with the given default
 {
-	return new Extraction<T>(t, def);
+	return new Extraction<T>(t, def, pos);
 }
 
 

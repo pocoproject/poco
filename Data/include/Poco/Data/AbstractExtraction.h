@@ -62,7 +62,8 @@ class Data_API AbstractExtraction: public Poco::RefCountedObject
 	/// retrieved via an AbstractExtractor.
 {
 public:
-	AbstractExtraction(Poco::UInt32 limit = Limit::LIMIT_UNLIMITED);
+	AbstractExtraction(Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
+		Poco::UInt32 position = 0);
 		/// Creates the AbstractExtraction. A limit value equal to EXTRACT_UNLIMITED (0xffffffffu) 
 		/// means that we extract as much data as possible during one execute.
 		/// Otherwise the limit value is used to partition data extracting to a limited amount of rows.
@@ -75,6 +76,9 @@ public:
 
 	AbstractExtractor* getExtractor() const;
 		/// Retrieves the extractor object
+
+	Poco::UInt32 position() const;
+		/// Returns the extraction position.
 
 	virtual std::size_t numOfColumnsHandled() const = 0;
 		/// Returns the number of columns that the extraction handles.
@@ -98,7 +102,7 @@ public:
 		/// Resets the extractor so that it can be re-used.
 
 	virtual AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const = 0;
-		/// Creates a Prepare object for the etxracting object
+		/// Creates a Prepare object for the extracting object
 
 	void setLimit(Poco::UInt32 limit);
 		/// Sets the limit.
@@ -117,11 +121,13 @@ public:
 private:
 	AbstractExtractor* _pExtractor;
 	Poco::UInt32       _limit;
+	Poco::UInt32       _position;
 };
 
 
 typedef Poco::AutoPtr<AbstractExtraction> AbstractExtractionPtr;
 typedef std::vector<AbstractExtractionPtr> AbstractExtractionVec;
+typedef std::vector<AbstractExtractionVec> AbstractExtractionVecVec;
 
 
 //
@@ -154,6 +160,12 @@ inline Poco::UInt32 AbstractExtraction::getLimit() const
 inline bool AbstractExtraction::isNull(std::size_t row) const
 {
 	throw NotImplementedException("Check for null values not implemented.");
+}
+
+
+inline Poco::UInt32 AbstractExtraction::position() const
+{
+	return _position;
 }
 
 

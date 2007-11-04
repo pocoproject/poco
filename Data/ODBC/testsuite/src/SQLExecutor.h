@@ -64,12 +64,19 @@ public:
 		DataBinding bindMode, 
 		DataExtraction extractMode,
 		bool doTime=true);
-		/// This function uses "bare bone" ODBC API calls (i.e. calls are not 
+
+	void bareboneODBCMultiResultTest(const std::string& dbConnString, 
+		const std::string& tableCreateString, 
+		SQLExecutor::DataBinding bindMode, 
+		SQLExecutor::DataExtraction extractMode,
+		const std::string& insert = MULTI_INSERT,
+		const std::string& select = MULTI_SELECT);
+		/// These functions use "bare bone" ODBC API calls (i.e. calls are not 
 		/// "wrapped" in PocoData framework structures).
-		/// The purpose of the function is to verify that driver behaves
+		/// The purpose of the functions is to verify that a driver behaves
 		/// correctly as well as to determine its capabilities 
 		/// (e.g. SQLGetData() restrictions relaxation policy, if any). 
-		/// If this test passes, subsequent tests failures are likely ours.
+		/// If these test pass, subsequent tests failures are likely ours.
 
 	void simpleAccess();
 	void complexType();
@@ -139,7 +146,12 @@ public:
 	void any();
 	void dynamicAny();
 
+	void multipleResults();
+
 private:
+	static const std::string MULTI_INSERT;
+	static const std::string MULTI_SELECT;
+
 	Poco::Data::Session* _pSession;
 };
 

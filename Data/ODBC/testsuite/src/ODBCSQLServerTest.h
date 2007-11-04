@@ -138,6 +138,8 @@ public:
 	void testAny();
 	void testDynamicAny();
 
+	void testMultipleResults();
+
 	void setUp();
 	void tearDown();
 

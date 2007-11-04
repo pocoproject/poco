@@ -56,6 +56,14 @@
 #include <iterator>
 
 
+#define print_odbc_error(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		StatementException se(h); \
+		std::cout << se.toString() << std::endl; \
+	}
+
+
 using namespace Poco::Data;
 using ODBC::Utility;
 using ODBC::Preparation;
@@ -168,6 +176,21 @@ private:
 
 
 } } // namespace Poco::Data
+
+
+const std::string SQLExecutor::MULTI_INSERT = 
+	"INSERT INTO Test VALUES ('1', 2, 3.5);"
+	"INSERT INTO Test VALUES ('2', 3, 4.5);"
+	"INSERT INTO Test VALUES ('3', 4, 5.5);"
+	"INSERT INTO Test VALUES ('4', 5, 6.5);"
+	"INSERT INTO Test VALUES ('5', 6, 7.5);";
+
+const std::string SQLExecutor::MULTI_SELECT =
+	"SELECT * FROM Test WHERE First = '1';"
+	"SELECT * FROM Test WHERE First = '2';"
+	"SELECT * FROM Test WHERE First = '3';"
+	"SELECT * FROM Test WHERE First = '4';"
+	"SELECT * FROM Test WHERE First = '5';";
 
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession): 
@@ -528,6 +551,177 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 			rc = SQLCloseCursor(hstmt);
 			assert (SQL_SUCCEEDED(rc));
+
+			sql = "DROP TABLE Test";
+			pStr = (POCO_SQLCHAR*) sql.c_str();
+			rc = SQLExecDirect(hstmt, pStr, (SQLINTEGER) sql.length());
+			assert (SQL_SUCCEEDED(rc));
+
+			rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			assert (SQL_SUCCEEDED(rc));
+
+		// Connection end
+		rc = SQLDisconnect(hdbc);
+		assert (SQL_SUCCEEDED(rc));
+		rc = SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+		assert (SQL_SUCCEEDED(rc));
+
+	// Environment end
+	rc = SQLFreeHandle(SQL_HANDLE_ENV, henv);
+	assert (SQL_SUCCEEDED(rc));
+}
+
+
+void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString, 
+	const std::string& tableCreateString, 
+	SQLExecutor::DataBinding bindMode, 
+	SQLExecutor::DataExtraction extractMode,
+	const std::string& insert,
+	const std::string& select)
+{
+	SQLRETURN rc;
+	SQLHENV henv = SQL_NULL_HENV;
+	SQLHDBC hdbc = SQL_NULL_HDBC;
+	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+
+	// Environment begin
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	assert (SQL_SUCCEEDED(rc));
+	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
+	assert (SQL_SUCCEEDED(rc));
+
+		// Connection begin
+		rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
+		assert (SQL_SUCCEEDED(rc));
+
+		POCO_SQLCHAR connectOutput[512] = {0};
+		SQLSMALLINT result;
+		rc = SQLDriverConnect(hdbc
+			, NULL
+			,(POCO_SQLCHAR*) dbConnString.c_str()
+			,(SQLSMALLINT) SQL_NTS
+			, connectOutput
+			, sizeof(connectOutput)
+			, &result
+			, SQL_DRIVER_NOPROMPT);
+		assert (SQL_SUCCEEDED(rc));
+
+			// Statement begin
+			rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+			assert (SQL_SUCCEEDED(rc));
+
+			std::string sql = "DROP TABLE Test";
+			POCO_SQLCHAR* pStr = (POCO_SQLCHAR*) sql.c_str();
+			SQLExecDirect(hstmt, pStr, (SQLINTEGER) sql.length());
+			//no return code check - ignore drop errors
+
+			// create table and go
+			sql = tableCreateString;
+			pStr = (POCO_SQLCHAR*) sql.c_str();
+			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
+			assert (SQL_SUCCEEDED(rc));
+
+			rc = SQLExecute(hstmt);
+			assert (SQL_SUCCEEDED(rc));
+
+			// insert multiple rows
+			pStr = (POCO_SQLCHAR*) insert.c_str();
+			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) insert.length());
+			assert (SQL_SUCCEEDED(rc));
+			rc = SQLExecute(hstmt);
+			assert (SQL_SUCCEEDED(rc));
+			do
+			{
+				SQLINTEGER rowCount = 0;
+				SQLRowCount(hstmt, &rowCount);
+				assert (1 == rowCount);
+
+			} while (SQL_NO_DATA != SQLMoreResults(hstmt));
+
+			// select multiple rows
+			pStr = (POCO_SQLCHAR*) select.c_str();
+			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) select.length());
+			assert (SQL_SUCCEEDED(rc));
+
+			char chr[5] = { 0 };
+			SQLLEN lengths[3] = { 0 };
+			int second = 0;
+			float third = 0.0f;
+			
+			if (SQLExecutor::DE_BOUND == extractMode)
+			{
+				rc = SQLBindCol(hstmt, 
+					(SQLUSMALLINT) 1, 
+					SQL_C_CHAR, 
+					(SQLPOINTER) chr, 
+					(SQLINTEGER) 4, 
+					&lengths[0]);
+				assert (SQL_SUCCEEDED(rc));
+
+				rc = SQLBindCol(hstmt, 
+					(SQLUSMALLINT) 2, 
+					SQL_C_SLONG, 
+					(SQLPOINTER) &second, 
+					(SQLINTEGER) 0, 
+					&lengths[1]);
+				assert (SQL_SUCCEEDED(rc));
+
+				rc = SQLBindCol(hstmt, 
+					(SQLUSMALLINT) 3, 
+					SQL_C_FLOAT, 
+					(SQLPOINTER) &third, 
+					(SQLINTEGER) 0, 
+					&lengths[2]);
+				assert (SQL_SUCCEEDED(rc));
+			}
+			
+			rc = SQLExecute(hstmt);
+			print_odbc_error (rc, hstmt);
+			assert (SQL_SUCCEEDED(rc));
+
+			char one = 0x31;
+			int two = 2;
+			float three = 3.5;
+
+			do
+			{
+				rc = SQLFetch(hstmt);
+				print_odbc_error (rc, hstmt);
+				assert (SQL_SUCCEEDED(rc));
+
+				if (SQLExecutor::DE_MANUAL == extractMode)
+				{
+					rc = SQLGetData(hstmt, 
+						(SQLUSMALLINT) 1, 
+						SQL_C_CHAR, 
+						chr, 
+						4,
+						&lengths[0]);
+					assert (SQL_SUCCEEDED(rc));
+
+					rc = SQLGetData(hstmt, 
+						(SQLUSMALLINT) 2, 
+						SQL_C_SLONG, 
+						&second, 
+						0,
+						&lengths[1]);
+					assert (SQL_SUCCEEDED(rc));
+
+					rc = SQLGetData(hstmt, 
+						(SQLUSMALLINT) 3, 
+						SQL_C_FLOAT, 
+						&third, 
+						0,
+						&lengths[2]);
+					assert (SQL_SUCCEEDED(rc));
+				}
+
+				assert (one++ == chr[0]);
+				assert (two++ == second);
+				assert (three == third);
+				three += 1.0;
+
+			} while (SQL_NO_DATA != SQLMoreResults(hstmt));
 
 			sql = "DROP TABLE Test";
 			pStr = (POCO_SQLCHAR*) sql.c_str();
@@ -2373,3 +2567,27 @@ void SQLExecutor::dynamicAny()
 	assert (42.5 == f);
 	assert ("42" == s);
 }
+
+
+void SQLExecutor::multipleResults()
+{
+	typedef Tuple<std::string, std::string, std::string, int> Person;
+	std::vector<Person> people;
+	people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+	people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+	people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+	*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+
+	Person Homer, Lisa, Bart;
+
+	*_pSession << "SELECT * FROM Person WHERE FirstName = 'Homer'; "
+		"SELECT * FROM Person WHERE FirstName = 'Bart'; "
+		"SELECT * FROM Person WHERE FirstName = 'Lisa'; "
+		, into(Homer, 0), into(Bart, 1), into(Lisa, 2)
+		, now;
+
+	assert (Person("Simpson", "Homer", "Springfield", 42) == Homer);
+	assert (Person("Simpson", "Bart", "Springfield", 12) == Bart);
+	assert (Person("Simpson", "Lisa", "Springfield", 10) == Lisa);
+}
+

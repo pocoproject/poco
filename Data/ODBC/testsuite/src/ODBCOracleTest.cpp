@@ -73,6 +73,17 @@ std::string                 ODBCOracleTest::_dbConnString;
 ODBC::Utility::DriverMap    ODBCOracleTest::_drivers;
 const bool                  ODBCOracleTest::bindValues[8] = 
 	{true, true, true, false, false, true, false, false};
+const std::string ODBCOracleTest::MULTI_INSERT = 
+	"BEGIN "
+	"INSERT INTO Test VALUES ('1', 2, 3.5);"
+	"INSERT INTO Test VALUES ('2', 3, 4.5);"
+	"INSERT INTO Test VALUES ('3', 4, 5.5);"
+	"INSERT INTO Test VALUES ('4', 5, 6.5);"
+	"INSERT INTO Test VALUES ('5', 6, 7.5);"
+	"END;";
+
+const std::string ODBCOracleTest::MULTI_SELECT =
+	"{CALL multiResultsProcedure()}";
 
 
 ODBCOracleTest::ODBCOracleTest(const std::string& name): 
@@ -113,6 +124,50 @@ void ODBCOracleTest::testBarebone()
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+
+	tableCreateString = "CREATE TABLE Test "
+		"(First VARCHAR(30),"
+		"Second INTEGER,"
+		"Third NUMBER)";
+
+	*_pSession << "CREATE OR REPLACE "
+			"PROCEDURE multiResultsProcedure(tmp1 OUT SYS_REFCURSOR, "
+			"tmp2 OUT SYS_REFCURSOR,"
+			"tmp3 OUT SYS_REFCURSOR,"
+			"tmp4 OUT SYS_REFCURSOR,"
+			"tmp5 OUT SYS_REFCURSOR) IS "
+			"BEGIN "
+			"OPEN tmp1 FOR SELECT * FROM Test WHERE First = '1';"
+			"OPEN tmp2 FOR SELECT * FROM Test WHERE First = '2';"
+			"OPEN tmp3 FOR SELECT * FROM Test WHERE First = '3';"
+			"OPEN tmp4 FOR SELECT * FROM Test WHERE First = '4';"
+			"OPEN tmp5 FOR SELECT * FROM Test WHERE First = '5';"
+			"END multiResultsProcedure;" , now;
+
+	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
+		tableCreateString, 
+		SQLExecutor::PB_IMMEDIATE, 
+		SQLExecutor::DE_MANUAL,
+		MULTI_INSERT,
+		MULTI_SELECT);
+	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
+		tableCreateString, 
+		SQLExecutor::PB_IMMEDIATE, 
+		SQLExecutor::DE_BOUND,
+		MULTI_INSERT,
+		MULTI_SELECT);
+	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
+		tableCreateString, 
+		SQLExecutor::PB_AT_EXEC, 
+		SQLExecutor::DE_MANUAL,
+		MULTI_INSERT,
+		MULTI_SELECT);
+	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
+		tableCreateString, 
+		SQLExecutor::PB_AT_EXEC, 
+		SQLExecutor::DE_BOUND,
+		MULTI_INSERT,
+		MULTI_SELECT);
 }
 
 

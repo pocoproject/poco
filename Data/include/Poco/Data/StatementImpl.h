@@ -103,10 +103,10 @@ public:
 		_ostr << t;
 	}
 
-	void addBinding(AbstractBinding* info);
+	void addBinding(AbstractBinding* pBinding);
 		/// Registers the Binding at the StatementImpl.
 
-	void addExtract(AbstractExtraction* info);
+	void addExtract(AbstractExtraction* pExtraction);
 		/// Registers objects used for extracting data at the StatementImpl.
 
 	void setExtractionLimit(const Limit& extrLimit);
@@ -136,6 +136,9 @@ public:
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the statement.
+
+	std::size_t dataSetCount() const;
+		/// Returns the number of data sets associated with the statement.
 
 protected:
 	virtual Poco::UInt32 columnsReturned() const = 0;
@@ -238,6 +241,12 @@ protected:
 	void fixupExtraction();
 		/// Sets the AbstractExtractor at the extractors.
 
+	Poco::UInt32 currentDataSet() const;
+		/// Returns the current data set.
+
+	Poco::UInt32 activateNextDataSet();
+		/// Returns the next data set, or -1 if the last data set was reached.
+
 private:
 	void compile();
 		/// Compiles the statement, if not yet compiled. doesn't bind yet
@@ -252,7 +261,7 @@ private:
 		/// Executes without an upper limit set.
 
 	void resetExtraction();
-		/// Resets binding so it can be reused again.
+		/// Resets extraction so it can be reused again.
 
 	template <class T, class C>
 	InternalExtraction<T,C>* createExtract(const MetaColumn& mc)
@@ -306,15 +315,16 @@ private:
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
 
-	State                 _state;
-	Limit                 _extrLimit;
-	Poco::UInt32          _lowerLimit;
-	int                   _columnsExtracted;
-	SessionImpl&          _rSession;
-	Storage               _storage;
-	std::ostringstream    _ostr;
-	AbstractBindingVec    _bindings;
-	AbstractExtractionVec _extractors;
+	State                    _state;
+	Limit                    _extrLimit;
+	Poco::UInt32             _lowerLimit;
+	int                      _columnsExtracted;
+	SessionImpl&             _rSession;
+	Storage                  _storage;
+	std::ostringstream       _ostr;
+	AbstractBindingVec       _bindings;
+	AbstractExtractionVecVec _extractors;
+	Poco::UInt32             _curDataSet;
 
 	friend class Statement; 
 };
@@ -323,15 +333,11 @@ private:
 //
 // inlines
 //
-inline void StatementImpl::addBinding(AbstractBinding* info)
+inline void StatementImpl::addBinding(AbstractBinding* pBinding)
 {
-	_bindings.push_back(info);
-}
+	poco_check_ptr (pBinding);
 
-
-inline void StatementImpl::addExtract(AbstractExtraction* info)
-{
-	_extractors.push_back(info);
+	_bindings.push_back(pBinding);
 }
 
 
@@ -355,13 +361,15 @@ inline AbstractBindingVec& StatementImpl::bindings()
 
 inline const AbstractExtractionVec& StatementImpl::extractions() const
 {
-	return _extractors;
+	poco_assert (_curDataSet < _extractors.size());
+	return _extractors[_curDataSet];
 }
 
 
 inline AbstractExtractionVec& StatementImpl::extractions()
 {
-	return _extractors;
+	poco_assert (_curDataSet < _extractors.size());
+	return _extractors[_curDataSet];
 }
 
 
@@ -401,6 +409,12 @@ inline std::size_t StatementImpl::extractionCount() const
 }
 
 
+inline std::size_t StatementImpl::dataSetCount() const
+{
+	return _extractors.size();
+}
+
+
 inline bool StatementImpl::isStoredProcedure() const
 {
 	return false;
@@ -416,6 +430,12 @@ inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
 	{ 
 		throw RangeException(ex.what()); 
 	}
+}
+
+
+inline Poco::UInt32 StatementImpl::currentDataSet() const
+{
+	return _curDataSet;
 }
 
 
