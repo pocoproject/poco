@@ -1,7 +1,7 @@
 //
 // AccessExpireStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AccessExpireStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/AccessExpireStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Cache
@@ -61,7 +61,7 @@ class AccessExpireStrategy: public ExpireStrategy<TKey, TValue>
 	/// An AccessExpireStrategy implements time and access based expiration of cache entries
 {
 public:
-	AccessExpireStrategy(Timestamp::TimeDiff expireTimeInMilliSec): ExpireStrategy(expireTimeInMilliSec)
+	AccessExpireStrategy(Timestamp::TimeDiff expireTimeInMilliSec): ExpireStrategy<TKey, TValue>(expireTimeInMilliSec)
 		/// Create an expire strategy. Note that the smallest allowed caching time is 25ms.
 		/// Anything lower than that is not useful with current operating systems.
 	{
@@ -74,13 +74,13 @@ public:
 	void onGet(const void*, const TKey& key)
 	{
 		// get triggers an update to the expiration time
-		Iterator it = _keys.find(key);
-		if (it != _keys.end())
+		typename ExpireStrategy<TKey, TValue>::Iterator it = this->_keys.find(key);
+		if (it != this->_keys.end())
 		{
-			_keyIndex.erase(it->second);
+			this->_keyIndex.erase(it->second);
 			Timestamp now;
-			IndexIterator itIdx =
-				_keyIndex.insert(typename TimeIndex::value_type(now, key));
+			typename ExpireStrategy<TKey, TValue>::IndexIterator itIdx =
+				this->_keyIndex.insert(typename ExpireStrategy<TKey, TValue>::TimeIndex::value_type(now, key));
 			it->second = itIdx;
 		}
 	}
