@@ -62,6 +62,7 @@ Preparation::Preparation(const Preparation& other):
 	_maxFieldSize(other._maxFieldSize),
 	_dataExtraction(other._dataExtraction)
 {
+	resize();
 }
 
 
@@ -79,18 +80,20 @@ Preparation::~Preparation()
 
 std::size_t Preparation::columns() const
 {
-	if (_pValues.empty())
-	{
-		SQLSMALLINT nCol = 0;
-		if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 
-			0 != nCol)
-		{
-			_pValues.resize(nCol, 0);
-			_pLengths.resize(nCol, 0);
-		}
-	}
-
+	if (_pValues.empty()) resize();
 	return _pValues.size();
+}
+
+
+void Preparation::resize() const
+{
+	SQLSMALLINT nCol = 0;
+	if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 
+		0 != nCol)
+	{
+		_pValues.resize(nCol, 0);
+		_pLengths.resize(nCol, 0);
+	}
 }
 
 

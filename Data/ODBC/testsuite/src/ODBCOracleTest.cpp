@@ -131,17 +131,17 @@ void ODBCOracleTest::testBarebone()
 		"Third NUMBER)";
 
 	*_pSession << "CREATE OR REPLACE "
-			"PROCEDURE multiResultsProcedure(tmp1 OUT SYS_REFCURSOR, "
-			"tmp2 OUT SYS_REFCURSOR,"
-			"tmp3 OUT SYS_REFCURSOR,"
-			"tmp4 OUT SYS_REFCURSOR,"
-			"tmp5 OUT SYS_REFCURSOR) IS "
+			"PROCEDURE multiResultsProcedure(ret1 OUT SYS_REFCURSOR, "
+			"ret2 OUT SYS_REFCURSOR,"
+			"ret3 OUT SYS_REFCURSOR,"
+			"ret4 OUT SYS_REFCURSOR,"
+			"ret5 OUT SYS_REFCURSOR) IS "
 			"BEGIN "
-			"OPEN tmp1 FOR SELECT * FROM Test WHERE First = '1';"
-			"OPEN tmp2 FOR SELECT * FROM Test WHERE First = '2';"
-			"OPEN tmp3 FOR SELECT * FROM Test WHERE First = '3';"
-			"OPEN tmp4 FOR SELECT * FROM Test WHERE First = '4';"
-			"OPEN tmp5 FOR SELECT * FROM Test WHERE First = '5';"
+			"OPEN ret1 FOR SELECT * FROM Test WHERE First = '1';"
+			"OPEN ret2 FOR SELECT * FROM Test WHERE First = '2';"
+			"OPEN ret3 FOR SELECT * FROM Test WHERE First = '3';"
+			"OPEN ret4 FOR SELECT * FROM Test WHERE First = '4';"
+			"OPEN ret5 FOR SELECT * FROM Test WHERE First = '5';"
 			"END multiResultsProcedure;" , now;
 
 	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
@@ -1109,7 +1109,7 @@ void ODBCOracleTest::testStoredProcedureDynamicAny()
 }
 
 
-void ODBCOracleTest::testStoredCursorProcedure()
+void ODBCOracleTest::testCursorStoredProcedure()
 {
 	if (!_pSession) fail ("Test not available.");
 
@@ -1251,7 +1251,7 @@ void ODBCOracleTest::testStoredFunction()
 }
 
 
-void ODBCOracleTest::testStoredCursorFunction()
+void ODBCOracleTest::testCursorStoredFunction()
 {
 	if (!_pSession) fail ("Test not available.");
 
@@ -1365,6 +1365,39 @@ void ODBCOracleTest::testDynamicAny()
 		i += 2;
 	}
 }
+
+
+void ODBCOracleTest::testMultipleResults()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	
+	std::string sql = "CREATE OR REPLACE "
+		"PROCEDURE multiResultsProcedure(paramAge1 IN NUMBER,"
+		" paramAge2 IN NUMBER,"
+		" ret1 OUT SYS_REFCURSOR, "
+		" ret2 OUT SYS_REFCURSOR,"
+		" ret3 OUT SYS_REFCURSOR) IS "
+		"BEGIN "
+		" OPEN ret1 FOR SELECT * FROM Person WHERE Age = paramAge1;"
+		" OPEN ret2 FOR SELECT Age FROM Person WHERE FirstName = 'Bart';"
+		" OPEN ret3 FOR SELECT * FROM Person WHERE Age = paramAge2;"
+		"END multiResultsProcedure;";
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		*_pSession << sql, now;
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->multipleResults("{call multiResultsProcedure(?, ?)}");
+
+		i += 2;
+	}
+}
+
+
+
 
 
 void ODBCOracleTest::dropObject(const std::string& type, const std::string& name)
@@ -1593,14 +1626,16 @@ bool ODBCOracleTest::init(const std::string& driver, const std::string& dsn)
 	
 	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
 
+#ifdef POCO_OS_FAMILY_WINDOWS
 	// Workaround:
 	//
-	// Barebone ODBC test is called initially for Oracle only.
+	// Barebone ODBC test is called automatically on startup for Oracle.
 	// The test framework does not exit cleanly if
 	// Oracle tests are enabled (i.e. Oracle driver is found) 
 	// but no tests are executed.
 	// The exact reason for this behavior is unknown at this time.
 	testBarebone();
+#endif
 
 	return true;
 }
@@ -1661,11 +1696,11 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredCursorProcedure);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
-		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredCursorFunction);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNull);
@@ -1673,6 +1708,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDynamicAny);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testMultipleResults);
 
 		return pSuite;
 	}

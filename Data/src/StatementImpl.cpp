@@ -346,7 +346,6 @@ Poco::UInt32 StatementImpl::activateNextDataSet()
 void StatementImpl::addExtract(AbstractExtraction* pExtraction)
 {
 	poco_check_ptr (pExtraction);
-
 	Poco::UInt32 pos = pExtraction->position();
 	if (pos >= _extractors.size()) 
 		_extractors.resize(pos + 1);

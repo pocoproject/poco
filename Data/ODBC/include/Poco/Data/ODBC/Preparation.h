@@ -199,6 +199,9 @@ private:
 	void prepareImpl(std::size_t pos);
 		/// Utility function to prepare Any and DynamicAny
 
+	void resize() const;
+		/// Resize the values and lengths vectors.
+
 	template <typename T>
 	void preparePOD(std::size_t pos, SQLSMALLINT valueType)
 	{

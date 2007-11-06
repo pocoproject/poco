@@ -120,9 +120,9 @@ public:
 	void testInternalStorageType();
 
 	void testStoredProcedure();
-	void testStoredCursorProcedure();
+	void testCursorStoredProcedure();
 	void testStoredFunction();
-	void testStoredCursorFunction();
+	void testCursorStoredFunction();
 	void testStoredProcedureAny();
 	void testStoredProcedureDynamicAny();
 
@@ -133,6 +133,8 @@ public:
 
 	void testAny();
 	void testDynamicAny();
+
+	void testMultipleResults();
 
 	void setUp();
 	void tearDown();

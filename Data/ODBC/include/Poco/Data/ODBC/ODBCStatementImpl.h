@@ -126,6 +126,9 @@ private:
 	void makeInternalExtractors();
 		/// Creates internal extractors if none were supplied from the user.
 
+	bool isStoredProcedure() const;
+		/// Returns true if SQL is a stored procedure call.
+
 	void doPrepare();
 		/// Prepares placeholders for data returned by statement.
 		/// It is called during statement compilation for SQL statements

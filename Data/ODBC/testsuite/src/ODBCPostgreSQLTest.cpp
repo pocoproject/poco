@@ -123,7 +123,8 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, false);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, false);
 
-
+//neither pSQL ODBC nor Mammoth drivers support multiple results properly
+/*
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
@@ -133,6 +134,7 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
 	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+*/
 }
 
 
@@ -1113,6 +1115,8 @@ void ODBCPostgreSQLTest::testDynamicAny()
 
 void ODBCPostgreSQLTest::testMultipleResults()
 {
+//neither pSQL ODBC nor Mammoth drivers support multiple results properly
+/*
 	if (!_pSession) fail ("Test not available.");
 
 	for (int i = 0; i < 8;)
@@ -1124,6 +1128,7 @@ void ODBCPostgreSQLTest::testMultipleResults()
 
 		i += 2;
 	}
+*/
 }
 
 

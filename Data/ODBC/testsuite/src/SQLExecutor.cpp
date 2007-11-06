@@ -56,12 +56,13 @@
 #include <iterator>
 
 
-#define print_odbc_error(r, h) \
+#define poco_odbc_check(r, h) \
 	if (!SQL_SUCCEEDED(r))	\
 	{ \
 		StatementException se(h); \
 		std::cout << se.toString() << std::endl; \
-	}
+	} \
+	assert (SQL_SUCCEEDED(r));
 
 
 using namespace Poco::Data;
@@ -218,13 +219,13 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 	// Environment begin
 	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
-	assert (SQL_SUCCEEDED(rc));
+	poco_odbc_check (rc, hstmt);
 	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
-	assert (SQL_SUCCEEDED(rc));
+	poco_odbc_check (rc, hstmt);
 
 		// Connection begin
 		rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 
 		POCO_SQLCHAR connectOutput[512] = {0};
 		SQLSMALLINT result;
@@ -236,14 +237,14 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			, sizeof(connectOutput)
 			, &result
 			, SQL_DRIVER_NOPROMPT);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 
 		// retrieve datetime type information for this DBMS
 		rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 
 		rc = SQLGetTypeInfo(hstmt, SQL_TIMESTAMP);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 		SQLINTEGER dateTimeColSize = 0;
 		SQLSMALLINT dateTimeDecDigits = 0;
 		
@@ -252,19 +253,19 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 		if (SQL_SUCCEEDED(rc))
 		{
 			rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &dateTimeColSize, sizeof(SQLINTEGER), 0);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 			rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &dateTimeDecDigits, sizeof(SQLSMALLINT), 0);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 		}
 		else if (SQL_NO_DATA == rc)
 			std::cerr << "Warning: no data type info returned by driver." << std::endl;
 
 		rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 
 			// Statement begin
 			rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			std::string sql = "DROP TABLE Test";
 			POCO_SQLCHAR* pStr = (POCO_SQLCHAR*) sql.c_str();
@@ -275,15 +276,15 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			sql = tableCreateString;
 			pStr = (POCO_SQLCHAR*) sql.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			rc = SQLExecute(hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			sql = "INSERT INTO Test VALUES (?,?,?,?,?,?)";
 			pStr = (POCO_SQLCHAR*) sql.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			std::string str[3] = { "111", "222", "333" };
 			int fourth = 4;
@@ -314,7 +315,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				(SQLPOINTER) str[0].c_str(), 
 				size, 
 				&li);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			size = (SQLINTEGER) str[1].size();
 			if (SQLExecutor::PB_AT_EXEC == bindMode)
@@ -330,7 +331,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				(SQLPOINTER) str[1].c_str(), 
 				size, 
 				&li);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			size = (SQLINTEGER) str[2].size();
 			if (SQLExecutor::PB_AT_EXEC == bindMode)
@@ -347,7 +348,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				(SQLPOINTER) str[2].data(), 
 				size, 
 				&li);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			rc = SQLBindParameter(hstmt, 
 				(SQLUSMALLINT) 4, 
@@ -359,7 +360,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				(SQLPOINTER) &fourth, 
 				0, 
 				0);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			rc = SQLBindParameter(hstmt, 
 				(SQLUSMALLINT) 5, 
@@ -371,7 +372,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				(SQLPOINTER) &fifth, 
 				0, 
 				0);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			rc = SQLBindParameter(hstmt, 
 				(SQLUSMALLINT) 6, 
@@ -383,7 +384,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				(SQLPOINTER) &sixth, 
 				0, 
 				0);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			size = 0;
 			if (SQLExecutor::PB_AT_EXEC == bindMode)
@@ -414,12 +415,12 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					++i;
 				}while (SQL_NEED_DATA == (rc = SQLParamData(hstmt, &pParam)));
 			}
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			sql = "SELECT * FROM Test";
 			pStr = (POCO_SQLCHAR*) sql.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			char chr[3][5] = {{ 0 }};
 			SQLLEN lengths[6] = { 0 };
@@ -435,7 +436,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLPOINTER) chr[0], 
 					(SQLINTEGER) 4, 
 					&lengths[0]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLBindCol(hstmt, 
 					(SQLUSMALLINT) 2, 
@@ -443,7 +444,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLPOINTER) chr[1], 
 					(SQLINTEGER) 4, 
 					&lengths[1]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLBindCol(hstmt, 
 					(SQLUSMALLINT) 3, 
@@ -451,7 +452,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLPOINTER) chr[2], 
 					(SQLINTEGER) 4, 
 					&lengths[2]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLBindCol(hstmt, 
 					(SQLUSMALLINT) 4, 
@@ -459,7 +460,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLPOINTER) &fourth, 
 					(SQLINTEGER) 0, 
 					&lengths[3]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLBindCol(hstmt, 
 					(SQLUSMALLINT) 5, 
@@ -467,7 +468,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLPOINTER) &fifth, 
 					(SQLINTEGER) 0, 
 					&lengths[4]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLBindCol(hstmt, 
 					(SQLUSMALLINT) 6, 
@@ -475,13 +476,13 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					(SQLPOINTER) &sixth, 
 					(SQLINTEGER) 0, 
 					&lengths[5]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 			}
 			
 			rc = SQLExecute(hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 			rc = SQLFetch(hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			if (SQLExecutor::DE_MANUAL == extractMode)
 			{
@@ -491,7 +492,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					chr[0], 
 					4,
 					&lengths[0]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLGetData(hstmt, 
 					(SQLUSMALLINT) 2, 
@@ -499,7 +500,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					chr[1], 
 					4,
 					&lengths[1]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLGetData(hstmt, 
 					(SQLUSMALLINT) 3, 
@@ -507,7 +508,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					chr[2], 
 					3,
 					&lengths[2]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLGetData(hstmt, 
 					(SQLUSMALLINT) 4, 
@@ -515,7 +516,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					&fourth, 
 					0,
 					&lengths[3]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLGetData(hstmt, 
 					(SQLUSMALLINT) 5, 
@@ -523,7 +524,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					&fifth, 
 					0,
 					&lengths[4]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLGetData(hstmt, 
 					(SQLUSMALLINT) 6, 
@@ -531,7 +532,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					&sixth, 
 					0,
 					&lengths[5]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 			}
 
 			assert (0 == strncmp("111", chr[0], 3));
@@ -550,25 +551,25 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			}
 
 			rc = SQLCloseCursor(hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			sql = "DROP TABLE Test";
 			pStr = (POCO_SQLCHAR*) sql.c_str();
 			rc = SQLExecDirect(hstmt, pStr, (SQLINTEGER) sql.length());
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 		// Connection end
 		rc = SQLDisconnect(hdbc);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 		rc = SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 
 	// Environment end
 	rc = SQLFreeHandle(SQL_HANDLE_ENV, henv);
-	assert (SQL_SUCCEEDED(rc));
+	poco_odbc_check (rc, hstmt);
 }
 
 
@@ -586,13 +587,13 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 
 	// Environment begin
 	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
-	assert (SQL_SUCCEEDED(rc));
+	poco_odbc_check (rc, hstmt);
 	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
-	assert (SQL_SUCCEEDED(rc));
+	poco_odbc_check (rc, hstmt);
 
 		// Connection begin
 		rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 
 		POCO_SQLCHAR connectOutput[512] = {0};
 		SQLSMALLINT result;
@@ -604,11 +605,11 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 			, sizeof(connectOutput)
 			, &result
 			, SQL_DRIVER_NOPROMPT);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 
 			// Statement begin
 			rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			std::string sql = "DROP TABLE Test";
 			POCO_SQLCHAR* pStr = (POCO_SQLCHAR*) sql.c_str();
@@ -619,17 +620,17 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 			sql = tableCreateString;
 			pStr = (POCO_SQLCHAR*) sql.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			rc = SQLExecute(hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			// insert multiple rows
 			pStr = (POCO_SQLCHAR*) insert.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) insert.length());
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 			rc = SQLExecute(hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 			do
 			{
 				SQLINTEGER rowCount = 0;
@@ -638,10 +639,49 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 
 			} while (SQL_NO_DATA != SQLMoreResults(hstmt));
 
+			// make sure all five rows made it in
+			sql = "select count(*) from Test";
+			int count = 0;
+			SQLLEN length = 0;
+			pStr = (POCO_SQLCHAR*) sql.c_str();
+			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
+			poco_odbc_check (rc, hstmt);
+			if (SQLExecutor::DE_BOUND == extractMode)
+			{
+				rc = SQLBindCol(hstmt, 
+						(SQLUSMALLINT) 1, 
+						SQL_C_SLONG, 
+						(SQLPOINTER) &count, 
+						(SQLINTEGER) 0, 
+						&length);
+				poco_odbc_check (rc, hstmt);
+			}
+
+			rc = SQLExecute(hstmt);
+			poco_odbc_check (rc, hstmt);
+
+			rc = SQLFetch(hstmt);
+			poco_odbc_check (rc, hstmt);
+
+			if (SQLExecutor::DE_MANUAL == extractMode)
+			{
+				rc = SQLGetData(hstmt, 
+					(SQLUSMALLINT) 1, 
+					SQL_C_SLONG, 
+					&count, 
+					0,
+					&length);
+				poco_odbc_check (rc, hstmt);
+			}
+			assert (5 == count);
+
+			rc = SQLCloseCursor(hstmt);
+			poco_odbc_check (rc, hstmt);
+
 			// select multiple rows
 			pStr = (POCO_SQLCHAR*) select.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) select.length());
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			char chr[5] = { 0 };
 			SQLLEN lengths[3] = { 0 };
@@ -656,7 +696,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 					(SQLPOINTER) chr, 
 					(SQLINTEGER) 4, 
 					&lengths[0]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLBindCol(hstmt, 
 					(SQLUSMALLINT) 2, 
@@ -664,7 +704,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 					(SQLPOINTER) &second, 
 					(SQLINTEGER) 0, 
 					&lengths[1]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				rc = SQLBindCol(hstmt, 
 					(SQLUSMALLINT) 3, 
@@ -672,22 +712,21 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 					(SQLPOINTER) &third, 
 					(SQLINTEGER) 0, 
 					&lengths[2]);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 			}
 			
 			rc = SQLExecute(hstmt);
-			print_odbc_error (rc, hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			char one = 0x31;
 			int two = 2;
 			float three = 3.5;
+			count = 0;
 
 			do
 			{
 				rc = SQLFetch(hstmt);
-				print_odbc_error (rc, hstmt);
-				assert (SQL_SUCCEEDED(rc));
+				poco_odbc_check (rc, hstmt);
 
 				if (SQLExecutor::DE_MANUAL == extractMode)
 				{
@@ -697,7 +736,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 						chr, 
 						4,
 						&lengths[0]);
-					assert (SQL_SUCCEEDED(rc));
+					poco_odbc_check (rc, hstmt);
 
 					rc = SQLGetData(hstmt, 
 						(SQLUSMALLINT) 2, 
@@ -705,7 +744,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 						&second, 
 						0,
 						&lengths[1]);
-					assert (SQL_SUCCEEDED(rc));
+					poco_odbc_check (rc, hstmt);
 
 					rc = SQLGetData(hstmt, 
 						(SQLUSMALLINT) 3, 
@@ -713,7 +752,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 						&third, 
 						0,
 						&lengths[2]);
-					assert (SQL_SUCCEEDED(rc));
+					poco_odbc_check (rc, hstmt);
 				}
 
 				assert (one++ == chr[0]);
@@ -721,25 +760,28 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 				assert (three == third);
 				three += 1.0;
 
+				++count;
 			} while (SQL_NO_DATA != SQLMoreResults(hstmt));
+
+			assert (5 == count);
 
 			sql = "DROP TABLE Test";
 			pStr = (POCO_SQLCHAR*) sql.c_str();
 			rc = SQLExecDirect(hstmt, pStr, (SQLINTEGER) sql.length());
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 			rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-			assert (SQL_SUCCEEDED(rc));
+			poco_odbc_check (rc, hstmt);
 
 		// Connection end
 		rc = SQLDisconnect(hdbc);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 		rc = SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-		assert (SQL_SUCCEEDED(rc));
+		poco_odbc_check (rc, hstmt);
 
 	// Environment end
 	rc = SQLFreeHandle(SQL_HANDLE_ENV, henv);
-	assert (SQL_SUCCEEDED(rc));
+	poco_odbc_check (rc, hstmt);
 }
 
 
@@ -2569,7 +2611,7 @@ void SQLExecutor::dynamicAny()
 }
 
 
-void SQLExecutor::multipleResults()
+void SQLExecutor::multipleResults(const std::string& sql)
 {
 	typedef Tuple<std::string, std::string, std::string, int> Person;
 	std::vector<Person> people;
@@ -2578,16 +2620,22 @@ void SQLExecutor::multipleResults()
 	people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
 	*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
 
-	Person Homer, Lisa, Bart;
+	Person pHomer, pLisa;
+	int aHomer(42), aLisa(10), aBart(0);
 
-	*_pSession << "SELECT * FROM Person WHERE FirstName = 'Homer'; "
-		"SELECT * FROM Person WHERE FirstName = 'Bart'; "
-		"SELECT * FROM Person WHERE FirstName = 'Lisa'; "
-		, into(Homer, 0), into(Bart, 1), into(Lisa, 2)
+	try {
+	*_pSession << sql
+		, into(pHomer), use(aHomer)
+		, into(aBart, 1)
+		, into(pLisa, 2), use(aLisa)
 		, now;
+	} catch (StatementException& ex)
+	{
+		std::cout << ex.toString() << std::endl;
+	}
 
-	assert (Person("Simpson", "Homer", "Springfield", 42) == Homer);
-	assert (Person("Simpson", "Bart", "Springfield", 12) == Bart);
-	assert (Person("Simpson", "Lisa", "Springfield", 10) == Lisa);
+	assert (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
+	assert (12 == aBart);
+	assert (Person("Simpson", "Lisa", "Springfield", 10) == pLisa);
 }
 

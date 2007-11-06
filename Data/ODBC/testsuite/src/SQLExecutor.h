@@ -146,7 +146,10 @@ public:
 	void any();
 	void dynamicAny();
 
-	void multipleResults();
+	void multipleResults(const std::string& sql = 
+		"SELECT * FROM Person WHERE Age = ?; "
+		"SELECT Age FROM Person WHERE FirstName = 'Bart'; "
+		"SELECT * FROM Person WHERE Age = ?; ");
 
 private:
 	static const std::string MULTI_INSERT;

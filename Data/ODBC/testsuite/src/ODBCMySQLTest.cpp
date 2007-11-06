@@ -108,6 +108,9 @@ void ODBCMySQLTest::testBareboneODBC()
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, false);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, false);
 
+/*
+MySQL supports batch statements as of 3.51.18
+http://bugs.mysql.com/bug.php?id=7445
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
@@ -118,6 +121,7 @@ void ODBCMySQLTest::testBareboneODBC()
 	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
 	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+*/
 }
 
 
@@ -989,6 +993,27 @@ void ODBCMySQLTest::testDynamicAny()
 }
 
 
+void ODBCMySQLTest::testMultipleResults()
+{
+/*
+MySQL supports batch statements as of 3.51.18
+http://bugs.mysql.com/bug.php?id=7445
+
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->multipleResults();
+
+		i += 2;
+	}
+*/
+}
+
+
 void ODBCMySQLTest::dropObject(const std::string& type, const std::string& name)
 {
 	*_pSession << format("DROP %s IF EXISTS %s", type, name), now;
@@ -1239,6 +1264,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAny);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testDynamicAny);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
 
 		return pSuite;
 	}

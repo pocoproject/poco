@@ -600,7 +600,7 @@ Binding<T>* in(const T& t, const std::string& name = "")
 
 
 template <typename T> 
-Binding<T>* out(const T& t, const std::string& name = "")
+Binding<T>* out(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_OUT);
@@ -610,7 +610,7 @@ Binding<T>* out(const T& t, const std::string& name = "")
 
 
 template <typename T> 
-Binding<T>* io(const T& t, const std::string& name = "")
+Binding<T>* io(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN_OUT);

@@ -284,25 +284,17 @@ bool ODBCStatementImpl::hasNext()
 
 		if (!nextRowReady())
 		{
-			try
-			{
-				activateNextDataSet();
-			} catch (InvalidAccessException&)
-			{
-				return false;
-			}
+			try { activateNextDataSet(); } 
+			catch (InvalidAccessException&)
+			{ return false;	}
+
+			try { checkError(SQLMoreResults(_stmt)); } 
+			catch (NoDataException&) 
+			{ return false;	}
 
 			addPreparation();
 			doPrepare();
 			fixupExtraction();
-
-			try
-			{
-				checkError(SQLMoreResults(_stmt));
-			} catch (NoDataException&) 
-			{
-				return false;
-			}
 			makeStep();
 		}
 		else if (Utility::isError(_nextResponse))
@@ -405,6 +397,15 @@ void ODBCStatementImpl::fillColumns()
 
 	for (int i = 0; i < colCount; ++i)
 		_columnPtrs.push_back(new ODBCColumn(_stmt, i));
+}
+
+
+bool ODBCStatementImpl::isStoredProcedure() const 	 
+{ 	 
+	std::string str = toString(); 	 
+	if (trimInPlace(str).size() < 2) return false; 	 
+
+	return ('{' == str[0] && '}' == str[str.size()-1]); 	 
 }
 
 
