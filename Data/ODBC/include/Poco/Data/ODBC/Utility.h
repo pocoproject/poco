@@ -42,6 +42,8 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/TypeInfo.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/DateTime.h"
 #include <sstream>
 #include <map>
@@ -95,8 +97,20 @@ public:
 	static int sqlDataType(int cDataType);
 		/// Returns SQL data type corresponding to supplied C data type.
 
+	static void dateSync(Date& dt, const SQL_DATE_STRUCT& ts);
+		/// Transfers data from ODBC SQL_DATE_STRUCT to Poco::DateTime.
+
+	static void timeSync(Time& dt, const SQL_TIME_STRUCT& ts);
+		/// Transfers data from ODBC SQL_TIME_STRUCT to Poco::DateTime.
+
 	static void dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts);
 		/// Transfers data from ODBC SQL_TIMESTAMP_STRUCT to Poco::DateTime.
+
+	static void dateSync(SQL_DATE_STRUCT& ts, const Date& dt);
+	/// Transfers data from Poco::Data::Date to ODBC SQL_DATE_STRUCT.
+
+	static void timeSync(SQL_TIME_STRUCT& ts, const Time& dt);
+		/// Transfers data from Poco::Data::Time to ODBC SQL_TIME_STRUCT.
 
 	static void dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt);
 		/// Transfers data from Poco::DateTime to ODBC SQL_TIMESTAMP_STRUCT.
@@ -125,6 +139,18 @@ inline int Utility::cDataType(int sqlDataType)
 inline int Utility::sqlDataType(int cDataType)
 {
 	return _dataTypes.sqlDataType(cDataType);
+}
+
+
+inline void Utility::dateSync(Date& dt, const SQL_DATE_STRUCT& ts)
+{
+	dt.assign(ts.year, ts.month, ts.day);
+}
+
+
+inline void Utility::timeSync(Time& dt, const SQL_TIME_STRUCT& ts)
+{
+	dt.assign(ts.hour, ts.minute, ts.second);
 }
 
 

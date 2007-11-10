@@ -114,19 +114,6 @@ void ODBCOracleTest::testBarebone()
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
-		"Second VARCHAR(30),"
-		"Third BLOB,"
-		"Fourth INTEGER,"
-		"Fifth NUMBER,"
-		"Sixth DATE)";
-
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
-
-	tableCreateString = "CREATE TABLE Test "
-		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third NUMBER)";
 
@@ -490,6 +477,31 @@ void ODBCOracleTest::testPrepare()
 }
 
 
+void ODBCOracleTest::testStep()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::cout << std::endl << "Oracle" << std::endl;
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		std::string mode = bindValues[i+1] ? "auto" : "manual";
+		std::cout << "Extraction: " << mode << std::endl;
+		_pExecutor->doStep(1000, 1);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 10);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 100);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 1000);
+
+		i += 2;
+	}
+}
+
+
 void ODBCOracleTest::testSetSimple()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -823,6 +835,21 @@ void ODBCOracleTest::testBLOBStmt()
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
 		_pExecutor->blobStmt();
+		i += 2;
+	}
+}
+
+
+void ODBCOracleTest::testDate()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonDateTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->date();
 		i += 2;
 	}
 }
@@ -1447,9 +1474,18 @@ void ODBCOracleTest::recreatePersonBLOBTable()
 void ODBCOracleTest::recreatePersonDateTimeTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATE)", now; }
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
+}
+
+
+void ODBCOracleTest::recreatePersonDateTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 }
 
 
@@ -1669,6 +1705,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStep);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSetComplexUnique);
@@ -1690,6 +1727,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testDate);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDouble);

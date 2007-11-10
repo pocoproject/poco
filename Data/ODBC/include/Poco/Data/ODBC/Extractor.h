@@ -121,6 +121,12 @@ public:
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
 
+	bool extract(std::size_t pos, Poco::Data::Date& val);
+		/// Extracts a Date.
+
+	bool extract(std::size_t pos, Poco::Data::Time& val);
+		/// Extracts a Time.
+
 	bool extract(std::size_t pos, Poco::DateTime& val);
 		/// Extracts a DateTime.
 	
@@ -265,10 +271,10 @@ private:
 		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value, 
 		/// while SQL_NULL_DATA (#define'd as -1 literal) remains 32-bit.
 
-	const StatementHandle& _rStmt;
-	Preparation& _rPreparation;
+	const StatementHandle&      _rStmt;
+	Preparation&                _rPreparation;
 	Preparation::DataExtraction _dataExtraction;
-	std::vector<SQLLEN> _lengths;
+	std::vector<SQLLEN>         _lengths;
 };
 
 

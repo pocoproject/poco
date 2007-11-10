@@ -85,6 +85,7 @@ public:
 	void testLimitPrepare();
 	void testLimitZero();
 	void testPrepare();
+	void testStep();
 
 	void testSetSimple();
 	void testSetComplex();
@@ -109,6 +110,7 @@ public:
 	void testBLOB();
 	void testBLOBStmt();
 
+	void testDate();
 	void testDateTime();
 	void testFloat();
 	void testDouble();
@@ -151,6 +153,7 @@ private:
 	void dropObject(const std::string& type, const std::string& name);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
+	void recreatePersonDateTable();
 	void recreatePersonDateTimeTable();
 	void recreateStringsTable();
 	void recreateIntsTable();

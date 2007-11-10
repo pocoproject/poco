@@ -38,8 +38,11 @@
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Common.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
@@ -78,6 +81,7 @@ using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::DateTime;
+using Poco::Stopwatch;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 using Poco::BadCastException;
@@ -1405,7 +1409,6 @@ void SQLExecutor::limitPrepare()
 }
 
 
-
 void SQLExecutor::prepare()
 {
 	std::string funct = "prepare()";
@@ -1424,6 +1427,30 @@ void SQLExecutor::prepare()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == 0);
+}
+
+
+void SQLExecutor::doStep(Poco::UInt32 dataSize, Poco::UInt32 stepSize)
+{
+	std::string funct = "step()";
+	std::vector<int> data(dataSize, 1);
+	
+	Statement stmt((*_pSession << "INSERT INTO Strings VALUES (?)", use(data)));
+	stmt.execute();
+
+	data.clear();
+	assert (0 == data.size());
+	Stopwatch sw;
+	sw.start();
+	try { *_pSession << "SELECT * FROM Strings", into(data), step(stepSize), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	sw.stop();
+
+	std::cout << stepSize << '/' << sw.elapsed() / 1000.0 << " [ms]" << std::endl;
+
+	assert (dataSize == data.size());
+	assert (1 == data[data.size()-1]);
 }
 
 
@@ -2076,6 +2103,83 @@ void SQLExecutor::dateTime()
 
 	res = rset["Born"].convert<DateTime>();
 	assert (res == born);
+}
+
+
+void SQLExecutor::date()
+{
+	std::string funct = "date()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+
+	Date bornDate(1965, 6, 18);
+	int count = 0;
+	try { *_pSession << "INSERT INTO PERSON VALUES (?,?,?,?)", 
+		use(lastName), 
+		use(firstName), 
+		use(address), 
+		use(bornDate), 
+		now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	Date d;
+	Time t;
+	try { *_pSession << "SELECT BornDate FROM Person", into(d), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (d == bornDate);
+
+	Statement stmt = (*_pSession << "SELECT BornDate FROM Person", now);
+	RecordSet rset(stmt);
+
+	DateTime dt1 = rset["BornDate"].convert<DateTime>();
+
+	Date d2(dt1);
+	assert (d2 == bornDate);
+}
+
+
+void SQLExecutor::time()
+{
+	std::string funct = "time()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+
+	Time bornTime (5, 35, 1);
+	int count = 0;
+	try { *_pSession << "INSERT INTO PERSON VALUES (?,?,?,?)", 
+		use(lastName), 
+		use(firstName), 
+		use(address), 
+		use(bornTime), 
+		now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	Date d;
+	Time t;
+	try { *_pSession << "SELECT BornTime FROM Person", into(t), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (t == bornTime);
+
+	Statement stmt = (*_pSession << "SELECT BornTime FROM Person", now);
+	RecordSet rset(stmt);
+
+	DateTime dt2 = rset["BornTime"].convert<DateTime>();
+	Time t2(dt2);
+	assert (t2 == bornTime);
 }
 
 

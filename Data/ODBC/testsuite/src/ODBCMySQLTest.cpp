@@ -95,19 +95,6 @@ void ODBCMySQLTest::testBareboneODBC()
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
-	tableCreateString = "CREATE TABLE Test "
-		"(First VARCHAR(30),"
-		"Second VARCHAR(30),"
-		"Third VARBINARY(30),"
-		"Fourth INTEGER,"
-		"Fifth FLOAT,"
-		"Sixth DATE)";
-
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, false);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, false);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, false);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, false);
-
 /*
 MySQL supports batch statements as of 3.51.18
 http://bugs.mysql.com/bug.php?id=7445
@@ -431,6 +418,31 @@ void ODBCMySQLTest::testPrepare()
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
 		_pExecutor->prepare();
+		i += 2;
+	}
+}
+
+
+void ODBCMySQLTest::testStep()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::cout << std::endl << "MySQL" << std::endl;
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		std::string mode = bindValues[i+1] ? "auto" : "manual";
+		std::cout << "Extraction: " << mode << std::endl;
+		_pExecutor->doStep(1000, 1);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 10);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 100);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 1000);
+
 		i += 2;
 	}
 }
@@ -774,6 +786,36 @@ void ODBCMySQLTest::testBLOBStmt()
 }
 
 
+void ODBCMySQLTest::testDate()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonDateTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->date();
+		i += 2;
+	}
+}
+
+
+void ODBCMySQLTest::testTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTimeTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->time();
+		i += 2;
+	}
+}
+
+
 void ODBCMySQLTest::testDateTime()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1038,6 +1080,24 @@ void ODBCMySQLTest::recreatePersonBLOBTable()
 }
 
 
+void ODBCMySQLTest::recreatePersonDateTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
+}
+
+
+void ODBCMySQLTest::recreatePersonTimeTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
+}
+
+
 void ODBCMySQLTest::recreatePersonDateTimeTable()
 {
 	dropObject("TABLE", "Person");
@@ -1229,6 +1289,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testStep);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplexUnique);
@@ -1250,6 +1311,8 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testDate);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testTime);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testDouble);

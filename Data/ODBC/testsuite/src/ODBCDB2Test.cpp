@@ -435,6 +435,31 @@ void ODBCDB2Test::testPrepare()
 }
 
 
+void ODBCDB2Test::testStep()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::cout << std::endl << "DB2" << std::endl;
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		std::string mode = bindValues[i+1] ? "auto" : "manual";
+		std::cout << "Extraction: " << mode << std::endl;
+		_pExecutor->doStep(1000, 1);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 10);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 100);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 1000);
+
+		i += 2;
+	}
+}
+
+
 void ODBCDB2Test::testSetSimple()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -768,6 +793,36 @@ void ODBCDB2Test::testBLOBStmt()
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
 		_pExecutor->blobStmt();
+		i += 2;
+	}
+}
+
+
+void ODBCDB2Test::testDate()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonDateTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->date();
+		i += 2;
+	}
+}
+
+
+void ODBCDB2Test::testTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTimeTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->time();
 		i += 2;
 	}
 }
@@ -1260,6 +1315,24 @@ void ODBCDB2Test::recreatePersonBLOBTable()
 }
 
 
+void ODBCDB2Test::recreatePersonDateTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
+}
+
+
+void ODBCDB2Test::recreatePersonTimeTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
+}
+
+
 void ODBCDB2Test::recreatePersonDateTimeTable()
 {
 	dropObject("TABLE", "Person");
@@ -1453,6 +1526,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testPrepare);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testStep);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetComplexUnique);
@@ -1474,6 +1548,8 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOB);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testDate);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testTime);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testDateTime);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testFloat);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testDouble);

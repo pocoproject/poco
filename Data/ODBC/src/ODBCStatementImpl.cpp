@@ -41,8 +41,11 @@
 #include "Poco/Data/AbstractPrepare.h"
 #include <limits>
 #include <sql.h>
-#undef max
 
+#ifdef POCO_OS_FAMILY_WINDOWS
+	#undef max
+	#pragma warning(disable:4312)// 'type cast' : conversion from 'Poco::UInt32' to 'SQLPOINTER' of greater size
+#endif
 
 namespace Poco {
 namespace Data {
@@ -61,19 +64,10 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_prepared(false)
 {
 	if (session().getFeature("autoBind"))
-	{
-		SQLSetStmtAttr(_stmt, 
-			SQL_ATTR_PARAM_BIND_TYPE, 
-			(SQLPOINTER) SQL_PARAM_BIND_BY_COLUMN, 
-			0);
-	}
-	else
-	{
-		SQLSetStmtAttr(_stmt, 
-			SQL_ATTR_ROW_ARRAY_SIZE, 
-			(SQLPOINTER) 1, 
-			0);
-	}
+		SQLSetStmtAttr(_stmt, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) SQL_PARAM_BIND_BY_COLUMN, 0);
+
+	Poco::UInt32 step = getStep();
+	SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) step, 0);
 }
 
 
@@ -315,7 +309,7 @@ void ODBCStatementImpl::makeStep()
 }
 
 
-void ODBCStatementImpl::next()
+Poco::UInt32 ODBCStatementImpl::next()
 {
 	if (nextRowReady())
 	{
@@ -334,6 +328,8 @@ void ODBCStatementImpl::next()
 		throw StatementException(_stmt,
 			std::string("Iterator Error: trying to access the next value"));
 	}
+
+	return 1u;
 }
 
 

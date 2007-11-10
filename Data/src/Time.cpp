@@ -1,9 +1,11 @@
 //
-// DataTest.h
+// Time.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.h#6 $
+// $Id: //poco/Main/Data/src/Time.cpp#5 $
 //
-// Definition of the DataTest class.
+// Library: Data
+// Package: DataCore
+// Module:  Time
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,55 +34,76 @@
 //
 
 
-#ifndef DataTest_INCLUDED
-#define DataTest_INCLUDED
+#include "Poco/Data/Time.h"
+#include "Poco/DateTime.h"
 
 
-#include "Poco/Data/Data.h"
-#include "Poco/BinaryReader.h"
-#include "Poco/BinaryWriter.h"
-#include "Poco/Data/Row.h"
-#include "CppUnit/TestCase.h"
+using Poco::DateTime;
 
 
-class DataTest: public CppUnit::TestCase
+namespace Poco {
+namespace Data {
+
+
+Time::Time()
 {
-public:
-	DataTest(const std::string& name);
-	~DataTest();
-
-	void testSession();
-	void testFeatures();
-	void testProperties();
-	void testBLOB();
-	void testBLOBStreams();
-	void testColumnVector();
-	void testColumnVectorBool();
-	void testColumnDeque();
-	void testColumnList();
-	void testRow();
-	void testRowSort();
-	void testRowFormat();
-	void testDateAndTime();
-
-	void setUp();
-	void tearDown();
-
-	static CppUnit::Test* suite();
-
-private:
-	void testRowStrictWeak(const Poco::Data::Row& row1, 
-		const Poco::Data::Row& row2, 
-		const Poco::Data::Row& row3);
-		/// Strict weak ordering requirement for sorted containers
-		/// as described in Josuttis "The Standard C++ Library"
-		/// chapter 6.5. pg. 176.
-		/// For this to pass, the following condition must be satisifed: 
-		/// row1 < row2 < row3
-
-	void writeToBLOB(Poco::BinaryWriter& writer);
-	void readFromBLOB(Poco::BinaryReader& reader);
-};
+	DateTime dt;
+	assign(dt.hour(), dt.minute(), dt.second());
+}
 
 
-#endif // DataTest_INCLUDED
+Time::Time(int hour, int minute, int second)
+{
+	assign(hour, minute, second);
+}
+
+
+Time::Time(const DateTime& dt)
+{
+	assign(dt.hour(), dt.minute(), dt.second());
+}
+
+
+Time::~Time()
+{
+}
+
+
+void Time::assign(int hour, int minute, int second)
+{
+	if (hour < 0 || hour > 23) 
+		throw InvalidArgumentException("Hour must be between 0 and 23.");
+
+	if (minute < 0 || minute > 59) 
+		throw InvalidArgumentException("Minute must be between 0 and 59.");
+
+	if (second < 0 || second > 59) 
+		throw InvalidArgumentException("Second must be between 0 and 59.");
+
+	_hour = hour;
+	_minute = minute;
+	_second = second;
+}
+
+
+bool Time::operator < (const Time& time)
+{
+	int hour = time.hour();
+
+	if (_hour < hour) return true;
+	else if (_hour > hour) return false;
+	else // hours equal
+	{
+		int minute = time.minute();
+		if (_minute < minute) return true;
+		else 
+		if (_minute > minute) return false;
+		else // minutes equal
+		if (_second < time.second()) return true;
+	}
+
+	return false;
+}
+
+
+} } // namespace Poco::Data

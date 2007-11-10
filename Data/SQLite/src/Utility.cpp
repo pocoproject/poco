@@ -49,6 +49,10 @@ namespace Data {
 namespace SQLite {
 
 
+const std::string Utility::SQLITE_DATE_FORMAT = "%Y-%m-%d";
+const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
+
+
 std::string Utility::lastError(sqlite3 *pDB)
 {
 	return std::string(sqlite3_errmsg(pDB));
@@ -76,6 +80,8 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 		return MetaColumn::FDT_DOUBLE;
 	else if (sqliteType.npos != sqliteType.find("BLOB"))
 		return MetaColumn::FDT_BLOB;
+	else if (sqliteType.npos != sqliteType.find("DATE"))
+		return MetaColumn::FDT_TIMESTAMP;
 
 	throw Poco::NotFoundException();
 }

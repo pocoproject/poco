@@ -120,6 +120,12 @@ public:
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
 
+	bool extract(std::size_t pos, Poco::Data::Date& val);
+		/// Extracts a Date.
+
+	bool extract(std::size_t pos, Poco::Data::Time& val);
+		/// Extracts a Time.
+
 	bool extract(std::size_t pos, Poco::DateTime& val);
 		/// Extracts a DateTime.
 
@@ -246,6 +252,20 @@ private:
 			BLOB b;
 			ret = extract(pos, b); 
 			val = b;
+			break;
+		}
+		case MetaColumn::FDT_DATE:
+		{
+			Date d;
+			ret = extract(pos, d); 
+			val = d;
+			break;
+		}
+		case MetaColumn::FDT_TIME:
+		{
+			Time t;
+			ret = extract(pos, t); 
+			val = t;
 			break;
 		}
 		case MetaColumn::FDT_TIMESTAMP:

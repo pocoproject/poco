@@ -57,6 +57,9 @@ class SQLite_API Utility
 	/// Various utility functions for SQLite, mostly return code handling
 {
 public:
+	static const std::string SQLITE_DATE_FORMAT;
+	static const std::string SQLITE_TIME_FORMAT;
+
 	static std::string lastError(sqlite3* pDb);
 		/// Retreives the last error code from sqlite and converts it to a string
 

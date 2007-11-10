@@ -38,9 +38,12 @@
 #include "Poco/Data/BLOBStream.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/Column.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Connector.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
+#include "Poco/DateTime.h"
 #include "Poco/Types.h"
 #include "Poco/Exception.h"
 #include <cstring>
@@ -56,9 +59,11 @@ using Poco::BinaryWriter;
 using Poco::UInt32;
 using Poco::Int64;
 using Poco::UInt64;
+using Poco::DateTime;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::NotFoundException;
+using Poco::InvalidArgumentException;
 
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
@@ -1003,6 +1008,74 @@ void DataTest::testRowFormat()
 }
 
 
+void DataTest::testDateAndTime()
+{
+	DateTime dt;
+	Date d(dt);
+	Time t(dt);
+
+	assert (dt.year() == d.year());
+	assert (dt.month() == d.month());
+	assert (dt.day() == d.day());
+
+	assert (dt.hour() == t.hour());
+	assert (dt.minute() == t.minute());
+	assert (dt.second() == t.second());
+
+	Date d1(2007, 6, 15);
+	d1.assign(d.year() - 1, d.month(), d.day());
+	assert (d1 < d); assert (d1 != d);
+	d1.assign(d.year(), d.month() - 1, d.day());
+	assert (d1 < d); assert (d1 != d);
+	d1.assign(d.year(), d.month(), d.day() - 1);
+	assert (d1 < d); assert (d1 != d);
+	d1.assign(d.year() + 1, d.month(), d.day());
+	assert (d1 > d); assert (d1 != d);
+	d1.assign(d.year(), d.month() + 1, d.day());
+	assert (d1 > d); assert (d1 != d);
+	d1.assign(d.year(), d.month(), d.day() + 1);
+	assert (d1 > d); assert (d1 != d);
+	d1.assign(d.year(), d.month(), d.day());
+	assert (d1 == d);
+
+	try { d1.assign(-1, 1, 1); fail ("must fail"); }
+	catch (InvalidArgumentException&) { }
+	try { d1.assign(1, 0, 1); fail ("must fail"); }
+	catch (InvalidArgumentException&) { }
+	try { d1.assign(1, 1, 0); fail ("must fail"); }
+	catch (InvalidArgumentException&) { }
+
+	Time t1(12, 30, 15);
+	t1.assign(t.hour() - 1, t.minute(), t.second());
+	assert (t1 < t); assert (t1 != t);
+	t1.assign(t.hour(), t.minute() - 1, t.second());
+	assert (t1 < t); assert (t1 != t);
+	t1.assign(t.hour(), t.minute(), t.second() - 1);
+	assert (t1 < t); assert (t1 != t);
+	t1.assign(t.hour() + 1, t.minute(), t.second());
+	assert (t1 > t); assert (t1 != t);
+	t1.assign(t.hour(), t.minute() + 1, t.second());
+	assert (t1 > t); assert (t1 != t);
+	t1.assign(t.hour(), t.minute(), t.second() + 1);
+	assert (t1 > t); assert (t1 != t);
+	t1.assign(t.hour(), t.minute(), t.second());
+	assert (t1 == t);
+
+	try { t1.assign(-1, 0, 0); fail ("must fail"); }
+	catch (InvalidArgumentException&) { }
+	try { t1.assign(0, -1, 0); fail ("must fail"); }
+	catch (InvalidArgumentException&) { }
+	try { t1.assign(0, 0, -1); fail ("must fail"); }
+	catch (InvalidArgumentException&) { }
+
+	d1 = dt;
+	assert (d1 == dt);
+
+	t1 = dt;
+	assert (t1 == dt);
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1029,6 +1102,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testRow);
 	CppUnit_addTest(pSuite, DataTest, testRowSort);
 	CppUnit_addTest(pSuite, DataTest, testRowFormat);
+	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 
 	return pSuite;
 }

@@ -36,6 +36,8 @@
 
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/Session.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTime.h"
 
@@ -94,6 +96,8 @@ DynamicAny RecordSet::value(std::size_t col, std::size_t row) const
 		case MetaColumn::FDT_DOUBLE:    return value<double>(col, row);
 		case MetaColumn::FDT_STRING:    return value<std::string>(col, row);
 		case MetaColumn::FDT_BLOB:      return value<BLOB>(col, row);
+		case MetaColumn::FDT_DATE:      return value<Date>(col, row);
+		case MetaColumn::FDT_TIME:      return value<Time>(col, row);
 		case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(col, row);
 		default:
 			throw UnknownTypeException("Data type not supported.");
@@ -118,6 +122,8 @@ DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
 		case MetaColumn::FDT_DOUBLE:    return value<double>(name, row);
 		case MetaColumn::FDT_STRING:    return value<std::string>(name, row);
 		case MetaColumn::FDT_BLOB:      return value<BLOB>(name, row);
+		case MetaColumn::FDT_DATE:      return value<Date>(name, row);
+		case MetaColumn::FDT_TIME:      return value<Time>(name, row);
 		case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(name, row);
 		default:
 			throw UnknownTypeException("Data type not supported.");

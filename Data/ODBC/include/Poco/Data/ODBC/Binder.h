@@ -42,6 +42,8 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/AbstractBinder.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/ODBC/Handle.h"
 #include "Poco/Data/ODBC/Parameter.h"
@@ -133,6 +135,12 @@ public:
 	void bind(std::size_t pos, const BLOB& val, Direction dir);
 		/// Binds a BLOB. In-bound only.
 
+	void bind(std::size_t pos, const Date& val, Direction dir);
+		/// Binds a Date.
+
+	void bind(std::size_t pos, const Time& val, Direction dir);
+		/// Binds a Time.
+
 	void bind(std::size_t pos, const DateTime& val, Direction dir);
 		/// Binds a DateTime.
 
@@ -153,9 +161,11 @@ public:
 		/// holders back into the externally supplied buffers.
 
 private:
-	typedef std::vector<SQLLEN*> LengthVec;
+	typedef std::vector<SQLLEN*>              LengthVec;
+	typedef std::map<char*, std::string*>     StringMap;
+	typedef std::map<SQL_DATE_STRUCT*, Date*> DateMap;
+	typedef std::map<SQL_TIME_STRUCT*, Time*> TimeMap;
 	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*> TimestampMap;
-	typedef std::map<char*, std::string*> StringMap;
 
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
@@ -214,6 +224,8 @@ private:
 	ParamMap               _inParams;
 	ParamMap               _outParams;
 	ParameterBinding       _paramBinding;
+	DateMap                _dates;
+	TimeMap                _times;
 	TimestampMap           _timestamps;
 	StringMap              _strings;
 	const TypeInfo*        _pTypeInfo;

@@ -127,6 +127,16 @@ void Preparation::prepare(std::size_t pos, const Poco::Data::BLOB&)
 }
 
 
+void Preparation::prepare(std::size_t pos, const Poco::Data::Date&)
+{
+}
+
+
+void Preparation::prepare(std::size_t pos, const Poco::Data::Time&)
+{
+}
+
+
 void Preparation::prepare(std::size_t pos, const Poco::DateTime&)
 {
 }

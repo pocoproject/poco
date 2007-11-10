@@ -44,6 +44,10 @@
 #include "SQLExecutor.h"
 
 
+// uncomment to use native SQL Server ODBC driver
+// #define POCO_ODBC_USE_SQL_NATIVE
+
+
 class ODBCSQLServerTest: public CppUnit::TestCase
 	/// SQLServer ODBC test class
 	/// Tested:
@@ -87,6 +91,7 @@ public:
 	void testLimitPrepare();
 	void testLimitZero();
 	void testPrepare();
+	void testStep();
 
 	void testSetSimple();
 	void testSetComplex();

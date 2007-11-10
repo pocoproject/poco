@@ -444,6 +444,31 @@ void ODBCSQLiteTest::testPrepare()
 }
 
 
+void ODBCSQLiteTest::testStep()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::cout << std::endl << "SQLite" << std::endl;
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		std::string mode = bindValues[i+1] ? "auto" : "manual";
+		std::cout << "Extraction: " << mode << std::endl;
+		_pExecutor->doStep(1000, 1);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 10);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 100);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 1000);
+
+		i += 2;
+	}
+}
+
+
 void ODBCSQLiteTest::testSetSimple()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1179,6 +1204,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testStep);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplexUnique);

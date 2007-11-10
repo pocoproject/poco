@@ -175,6 +175,72 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
 }
 
 
+void Binder::bind(std::size_t pos, const Date& val, Direction dir)
+{
+	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
+	SQLLEN* pLenIn = new SQLLEN;
+	*pLenIn  = size;
+
+	_lengthIndicator.push_back(pLenIn);
+
+	SQL_DATE_STRUCT* pDS = new SQL_DATE_STRUCT;
+	Utility::dateSync(*pDS, val);
+	
+	_dates.insert(DateMap::value_type(pDS, const_cast<Date*>(&val)));
+
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	getColSizeAndPrecision(pos, SQL_TYPE_DATE, colSize, decDigits);
+
+	if (Utility::isError(SQLBindParameter(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		toODBCDirection(dir), 
+		SQL_C_DATE, 
+		SQL_DATE, 
+		colSize,
+		decDigits,
+		(SQLPOINTER) pDS, 
+		0, 
+		_lengthIndicator.back())))
+	{
+		throw StatementException(_rStmt, "SQLBindParameter(BLOB)");
+	}
+}
+
+
+void Binder::bind(std::size_t pos, const Time& val, Direction dir)
+{
+	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
+	SQLLEN* pLenIn = new SQLLEN;
+	*pLenIn  = size;
+
+	_lengthIndicator.push_back(pLenIn);
+
+	SQL_TIME_STRUCT* pTS = new SQL_TIME_STRUCT;
+	Utility::timeSync(*pTS, val);
+	
+	_times.insert(TimeMap::value_type(pTS, const_cast<Time*>(&val)));
+
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	getColSizeAndPrecision(pos, SQL_TYPE_TIME, colSize, decDigits);
+
+	if (Utility::isError(SQLBindParameter(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		toODBCDirection(dir), 
+		SQL_C_TIME, 
+		SQL_TIME, 
+		colSize,
+		decDigits,
+		(SQLPOINTER) pTS, 
+		0, 
+		_lengthIndicator.back())))
+	{
+		throw StatementException(_rStmt, "SQLBindParameter(BLOB)");
+	}
+}
+
+
 void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 {
 	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
@@ -229,6 +295,8 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 	case NULL_DOUBLE:    bindNull(pos, SQL_C_DOUBLE); break;
 	case NULL_STRING:    bindNull(pos, SQL_C_CHAR); break;
 	case NULL_BLOB:      bindNull(pos, SQL_C_BINARY); break;
+	case NULL_DATE:      bindNull(pos, SQL_C_DATE); break;
+	case NULL_TIME:      bindNull(pos, SQL_C_TIME); break;
 	case NULL_TIMESTAMP: bindNull(pos, SQL_C_TIMESTAMP); break;
 
 	default: 
@@ -300,6 +368,22 @@ SQLSMALLINT Binder::toODBCDirection(Direction dir) const
 
 void Binder::synchronize()
 {
+	if (_dates.size())
+	{
+		DateMap::iterator itTS = _dates.begin();
+		DateMap::iterator itTSEnd = _dates.end();
+		for(; itTS != itTSEnd; ++itTS) 
+			Utility::dateSync(*itTS->second, *itTS->first);
+	}
+
+	if (_times.size())
+	{
+		TimeMap::iterator itTS = _times.begin();
+		TimeMap::iterator itTSEnd = _times.end();
+		for(; itTS != itTSEnd; ++itTS) 
+			Utility::timeSync(*itTS->second, *itTS->first);
+	}
+
 	if (_timestamps.size())
 	{
 		TimestampMap::iterator itTS = _timestamps.begin();

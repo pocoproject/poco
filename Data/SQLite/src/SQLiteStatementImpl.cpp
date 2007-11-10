@@ -196,7 +196,7 @@ bool SQLiteStatementImpl::hasNext()
 }
 
 
-void SQLiteStatementImpl::next()
+Poco::UInt32 SQLiteStatementImpl::next()
 {
 	if (SQLITE_ROW == _nextResponse)
 	{
@@ -222,6 +222,8 @@ void SQLiteStatementImpl::next()
 		int rc = _nextResponse;
 		Utility::throwException(rc, std::string("Iterator Error: trying to access the next value"));
 	}
+
+	return 1u;
 }
 
 

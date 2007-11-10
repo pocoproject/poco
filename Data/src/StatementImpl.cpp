@@ -40,6 +40,8 @@
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/Extraction.h"
 #include "Poco/Data/BLOB.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
@@ -67,7 +69,8 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_storage(STORAGE_UNKNOWN_IMPL),
 	_ostr(),
 	_bindings(),
-	_curDataSet(0)
+	_curDataSet(0),
+	_step(1u)
 {
 	_extractors.resize(1);
 }
@@ -107,10 +110,7 @@ Poco::UInt32 StatementImpl::executeWithLimit()
 	{
 		bind();
 		while (hasNext() && count < _extrLimit.value())
-		{
-			next();
-			++count;
-		}
+			count += next();
 	} while (canBind());
 
 	if (!canBind() && (!hasNext() || _extrLimit.value() == 0))
@@ -132,11 +132,7 @@ Poco::UInt32 StatementImpl::executeWithoutLimit()
 	do
 	{
 		bind();
-		while (hasNext())
-		{
-			next();
-			++count;
-		}
+		while (hasNext()) count += next();
 	} while (canBind());
 
 	_state = ST_DONE;
@@ -312,6 +308,10 @@ void StatementImpl::makeExtractors(Poco::UInt32 count)
 				addInternalExtract<std::string>(mc); break;
 			case MetaColumn::FDT_BLOB:   
 				addInternalExtract<BLOB>(mc); break;
+			case MetaColumn::FDT_DATE:
+				addInternalExtract<Date>(mc); break;
+			case MetaColumn::FDT_TIME:
+				addInternalExtract<Time>(mc); break;
 			case MetaColumn::FDT_TIMESTAMP:
 				addInternalExtract<DateTime>(mc); break;
 			default:

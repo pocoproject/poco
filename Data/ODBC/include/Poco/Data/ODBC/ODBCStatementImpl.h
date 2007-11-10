@@ -84,8 +84,9 @@ protected:
 	bool hasNext();
 		/// Returns true if a call to next() will return data.
 
-	void next();
-		/// Retrieves the next row from the resultset.
+	Poco::UInt32 next();
+		/// Retrieves the next row or set of rows from the resultset.
+		/// Returns the number of rows retrieved.
 		/// Will throw, if the resultset is empty.
 
 	bool canBind() const;

@@ -43,6 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/Range.h"
+#include "Poco/Data/Step.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #include "Poco/ActiveMethod.h"
@@ -186,9 +187,15 @@ public:
 		/// Set per default to zero to Limit::LIMIT_UNLIMITED, which disables the limit.
 
 	Statement& operator , (const Range& extrRange);
-		/// Sets a an etxraction Range on the maximum number of rows a select is allowed to return.
+		/// Sets a an extraction range for the maximum number of rows a select is allowed to return.
 		///
 		/// Set per default to Limit::LIMIT_UNLIMITED which disables the range.
+
+	Statement& operator , (const Step& extrStep);
+		/// Sets a an extraction step (the number of rows a select is allowed to return 
+		/// on every fetch attempt).
+		///
+		/// Set per default to Step::DEFAULT_STEP (1 row at a time).
 
 	std::string toString() const;
 		/// Creates a string from the accumulated SQL statement
@@ -358,6 +365,13 @@ inline Statement& Statement::operator , (const Range& extrRange)
 {
 	_pImpl->setExtractionLimit(extrRange.lower());
 	_pImpl->setExtractionLimit(extrRange.upper());
+	return *this;
+}
+
+
+inline Statement& Statement::operator , (const Step& extrStep)
+{
+	_pImpl->setStep(extrStep.value());
 	return *this;
 }
 

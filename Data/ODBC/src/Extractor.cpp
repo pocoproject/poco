@@ -96,6 +96,34 @@ bool Extractor::extractBoundImpl<Poco::Data::BLOB>(std::size_t pos, Poco::Data::
 
 
 template<>
+bool Extractor::extractBoundImpl<Poco::Data::Date>(std::size_t pos, Poco::Data::Date& val)
+{
+	if (isNull(pos)) return false;
+
+	std::size_t dataSize = _rPreparation.actualDataSize(pos);
+	checkDataSize(dataSize);
+	SharedPtr<SQL_DATE_STRUCT>& sp = RefAnyCast<SharedPtr<SQL_DATE_STRUCT> >(_rPreparation[pos]);
+	
+	Utility::dateSync(val, *sp);
+	return true;
+}
+
+
+template<>
+bool Extractor::extractBoundImpl<Poco::Data::Time>(std::size_t pos, Poco::Data::Time& val)
+{
+	if (isNull(pos)) return false;
+
+	std::size_t dataSize = _rPreparation.actualDataSize(pos);
+	checkDataSize(dataSize);
+	SharedPtr<SQL_TIME_STRUCT>& sp = RefAnyCast<SharedPtr<SQL_TIME_STRUCT> >(_rPreparation[pos]);
+	
+	Utility::timeSync(val, *sp);
+	return true;
+}
+
+
+template<>
 bool Extractor::extractBoundImpl<Poco::DateTime>(std::size_t pos, Poco::DateTime& val)
 {
 	if (isNull(pos)) return false;
@@ -220,6 +248,60 @@ bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
 
 
 template<>
+bool Extractor::extractManualImpl<Poco::Data::Date>(std::size_t pos, 
+	Poco::Data::Date& val, 
+	SQLSMALLINT cType)
+{
+	SQL_DATE_STRUCT ds;
+	resizeLengths(pos);
+
+	SQLRETURN rc = SQLGetData(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		cType, //C data type
+		&ds, //returned value
+		sizeof(ds), //buffer length
+		&_lengths[pos]); //length indicator
+	
+	if (Utility::isError(rc))
+		throw StatementException(_rStmt, "SQLGetData()");
+
+	if (isNullLengthIndicator(_lengths[pos])) 
+		return false;
+	else 
+		Utility::dateSync(val, ds);
+
+	return true;
+}
+
+
+template<>
+bool Extractor::extractManualImpl<Poco::Data::Time>(std::size_t pos, 
+	Poco::Data::Time& val, 
+	SQLSMALLINT cType)
+{
+	SQL_TIME_STRUCT ts;
+	resizeLengths(pos);
+
+	SQLRETURN rc = SQLGetData(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		cType, //C data type
+		&ts, //returned value
+		sizeof(ts), //buffer length
+		&_lengths[pos]); //length indicator
+	
+	if (Utility::isError(rc))
+		throw StatementException(_rStmt, "SQLGetData()");
+
+	if (isNullLengthIndicator(_lengths[pos])) 
+		return false;
+	else 
+		Utility::timeSync(val, ts);
+
+	return true;
+}
+
+
+template<>
 bool Extractor::extractManualImpl<Poco::DateTime>(std::size_t pos, 
 	Poco::DateTime& val, 
 	SQLSMALLINT cType)
@@ -298,6 +380,24 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
 	if (Preparation::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_BINARY);
+	else
+		return extractBoundImpl(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Data::Date& val)
+{
+	if (Preparation::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_DATE);
+	else
+		return extractBoundImpl(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Data::Time& val)
+{
+	if (Preparation::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_TIME);
 	else
 		return extractBoundImpl(pos, val);
 }

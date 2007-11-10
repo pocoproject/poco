@@ -104,6 +104,7 @@ public:
 	void limitPrepare();
 	void limitZero();
 	void prepare();
+	void doStep(Poco::UInt32 dataSize, Poco::UInt32 stepSize);
 
 	void setSimple();
 	void setComplex();
@@ -129,6 +130,8 @@ public:
 	void blobStmt();
 
 	void dateTime();
+	void date();
+	void time();
 	void floats();
 	void doubles();
 	void tuples();

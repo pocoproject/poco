@@ -1,9 +1,11 @@
 //
-// DataTest.h
+// Date.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.h#6 $
+// $Id: //poco/Main/Data/src/Date.cpp#5 $
 //
-// Definition of the DataTest class.
+// Library: Data
+// Package: DataCore
+// Module:  Date
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,55 +34,79 @@
 //
 
 
-#ifndef DataTest_INCLUDED
-#define DataTest_INCLUDED
+#include "Poco/Data/Date.h"
+#include "Poco/DateTime.h"
+#include "Poco/NumberFormatter.h"
 
 
-#include "Poco/Data/Data.h"
-#include "Poco/BinaryReader.h"
-#include "Poco/BinaryWriter.h"
-#include "Poco/Data/Row.h"
-#include "CppUnit/TestCase.h"
+using Poco::DateTime;
+using Poco::NumberFormatter;
 
 
-class DataTest: public CppUnit::TestCase
+namespace Poco {
+namespace Data {
+
+
+Date::Date()
 {
-public:
-	DataTest(const std::string& name);
-	~DataTest();
-
-	void testSession();
-	void testFeatures();
-	void testProperties();
-	void testBLOB();
-	void testBLOBStreams();
-	void testColumnVector();
-	void testColumnVectorBool();
-	void testColumnDeque();
-	void testColumnList();
-	void testRow();
-	void testRowSort();
-	void testRowFormat();
-	void testDateAndTime();
-
-	void setUp();
-	void tearDown();
-
-	static CppUnit::Test* suite();
-
-private:
-	void testRowStrictWeak(const Poco::Data::Row& row1, 
-		const Poco::Data::Row& row2, 
-		const Poco::Data::Row& row3);
-		/// Strict weak ordering requirement for sorted containers
-		/// as described in Josuttis "The Standard C++ Library"
-		/// chapter 6.5. pg. 176.
-		/// For this to pass, the following condition must be satisifed: 
-		/// row1 < row2 < row3
-
-	void writeToBLOB(Poco::BinaryWriter& writer);
-	void readFromBLOB(Poco::BinaryReader& reader);
-};
+	DateTime dt;
+	assign(dt.year(), dt.month(), dt.day());
+}
 
 
-#endif // DataTest_INCLUDED
+Date::Date(int year, int month, int day)
+{
+	assign(year, month, day);
+}
+
+
+Date::Date(const DateTime& dt)
+{
+	assign(dt.year(), dt.month(), dt.day());
+}
+
+
+Date::~Date()
+{
+}
+
+
+void Date::assign(int year, int month, int day)
+{
+	if (year < 0 || year > 9999)
+		throw InvalidArgumentException("Year must be between 0 and 9999");
+
+	if (month < 1 || month > 12)
+		throw InvalidArgumentException("Month must be between 1 and 12");
+
+	if (day < 1 || day > DateTime::daysOfMonth(year, month))
+		throw InvalidArgumentException("Month must be between 1 and " + 
+			NumberFormatter::format(DateTime::daysOfMonth(year, month)));
+
+	_year = year;
+	_month = month;
+	_day = day;
+}
+
+
+bool Date::operator < (const Date& date)
+{
+	int year = date.year();
+
+	if (_year < year) return true;
+	else if (_year > year) return false;
+	else // years equal
+	{
+		int month = date.month();
+		if (_month < month) return true;
+		else 
+		if (_month > month) return false;
+		else // months equal
+		if (_day < date.day()) return true;
+	}
+
+	return false;
+}
+
+
+} } // namespace Poco::Data

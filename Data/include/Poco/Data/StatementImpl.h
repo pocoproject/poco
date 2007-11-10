@@ -133,6 +133,12 @@ public:
 	Storage getStorage() const;
 		/// Returns the storage type for this statement.
 
+	void setStep(Poco::UInt32 step);
+		/// Sets the step for this statement;
+
+	Poco::UInt32 getStep() const;
+		/// Returns the step type for this statement.
+
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the statement.
@@ -157,8 +163,9 @@ protected:
 		/// several consecutive calls to hasNext without data getting lost, 
 		/// ie. hasNext(); hasNext(); next() must be equal to hasNext(); next();
 
-	virtual void next() = 0;
-		/// Retrieves the next row from the resultset.
+	virtual Poco::UInt32 next() = 0;
+		/// Retrieves the next row or set of rows from the resultset and
+		/// returns the number of rows retreved.
 		///
 		/// Will throw, if the resultset is empty.
 		/// Expects the statement to be compiled and bound
@@ -325,6 +332,7 @@ private:
 	AbstractBindingVec       _bindings;
 	AbstractExtractionVecVec _extractors;
 	Poco::UInt32             _curDataSet;
+	Poco::UInt32             _step;
 
 	friend class Statement; 
 };
@@ -400,6 +408,18 @@ inline void StatementImpl::setStorage(Storage storage)
 inline StatementImpl::Storage StatementImpl::getStorage() const
 {
 	return _storage;
+}
+
+
+inline void StatementImpl::setStep(Poco::UInt32 step)
+{
+	_step = step;
+}
+
+
+inline Poco::UInt32 StatementImpl::getStep() const
+{
+	return _step;
 }
 
 

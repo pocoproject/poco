@@ -103,7 +103,7 @@ bool TestStatementImpl::hasNext()
 }
 
 
-void TestStatementImpl::next()
+Poco::UInt32 TestStatementImpl::next()
 {
 	Poco::Data::AbstractExtractionVec::iterator it    = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
@@ -113,6 +113,8 @@ void TestStatementImpl::next()
 		(*it)->extract(pos);
 		pos += (*it)->numOfColumnsHandled();
 	}
+
+	return 1u;
 }
 
 

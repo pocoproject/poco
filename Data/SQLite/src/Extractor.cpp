@@ -36,6 +36,8 @@
 
 #include "Poco/Data/SQLite/Extractor.h"
 #include "Poco/Data/SQLite/Utility.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTimeParser.h"
@@ -201,6 +203,28 @@ bool Extractor::extract(std::size_t pos, char& val)
 {
 	if (isNull(pos)) return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Date& val)
+{
+	std::string str;
+	extract(pos, str);
+	int tzd;
+	DateTime dt = DateTimeParser::parse(Utility::SQLITE_DATE_FORMAT, str, tzd);
+	val = dt;
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Time& val)
+{
+	std::string str;
+	extract(pos, str);
+	int tzd;
+	DateTime dt = DateTimeParser::parse(Utility::SQLITE_TIME_FORMAT, str, tzd);
+	val = dt;
 	return true;
 }
 

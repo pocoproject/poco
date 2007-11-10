@@ -155,6 +155,19 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 	return true;
 }
 
+bool Extractor::extract(std::size_t pos, Poco::Data::Date& val)
+{
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Data::Time& val)
+{
+	return true;
+}
+
+
+
 bool Extractor::extract(std::size_t pos, Poco::DateTime& val)
 {
 	return true;

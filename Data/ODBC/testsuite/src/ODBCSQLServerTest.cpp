@@ -439,6 +439,31 @@ void ODBCSQLServerTest::testPrepare()
 }
 
 
+void ODBCSQLServerTest::testStep()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::cout << std::endl << "MS SQL Server" << std::endl;
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		std::string mode = bindValues[i+1] ? "auto" : "manual";
+		std::cout << "Extraction: " << mode << std::endl;
+		_pExecutor->doStep(1000, 1);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 10);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 100);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 1000);
+
+		i += 2;
+	}
+}
+
+
 void ODBCSQLServerTest::testSetSimple()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1518,8 +1543,11 @@ bool ODBCSQLServerTest::init(const std::string& driver, const std::string& dsn)
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
 #ifdef POCO_OS_FAMILY_WINDOWS
+#ifdef POCO_ODBC_USE_SQL_NATIVE
+	if (init("SQL Native Client", "PocoDataSQLServerTest"))
+#else
 	if (init("SQL Server", "PocoDataSQLServerTest"))
-	//if (init("SQL Native Client", "PocoDataSQLServerTest"))
+#endif
 #else
 	if (init("FreeTDS", "PocoDataSQLServerTest"))
 #endif
@@ -1548,6 +1576,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStep);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplexUnique);

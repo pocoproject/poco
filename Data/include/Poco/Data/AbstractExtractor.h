@@ -55,6 +55,8 @@ class DynamicAny;
 namespace Data {
 
 
+class Date;
+class Time;
 class BLOB;
 
 
@@ -118,6 +120,12 @@ public:
 
 	virtual bool extract(std::size_t pos, DateTime& val) = 0;
 		/// Extracts a DateTime. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, Date& val) = 0;
+		/// Extracts a Date. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, Time& val) = 0;
+		/// Extracts a Time. Returns false if null was received.
 
 	virtual bool extract(std::size_t pos, Any& val) = 0;
 		/// Extracts an Any. Returns false if null was received.

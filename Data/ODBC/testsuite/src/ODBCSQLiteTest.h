@@ -84,6 +84,7 @@ public:
 	void testLimitPrepare();
 	void testLimitZero();
 	void testPrepare();
+	void testStep();
 
 	void testSetSimple();
 	void testSetComplex();

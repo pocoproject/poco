@@ -34,6 +34,8 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Common.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
@@ -42,6 +44,8 @@
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
+#include "Poco/DynamicAny.h"
+#include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
@@ -51,6 +55,7 @@ using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
+using Poco::DateTime;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
@@ -1499,6 +1504,42 @@ void SQLiteTest::testTupleVector1()
 }
 
 
+void SQLiteTest::testDateTime()
+{
+	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	tmp << "DROP TABLE IF EXISTS DateTimes", now;
+	tmp << "CREATE TABLE DateTimes (dt0 DATE)", now;
+
+	DateTime dt(1965, 6, 18, 5, 35, 1);
+	tmp << "INSERT INTO DateTimes VALUES (?)", use(dt), now;
+
+	DateTime rdt;
+	assert (rdt != dt);
+	tmp << "SELECT * FROM DateTimes", into(rdt), now;
+	assert (rdt == dt);
+
+	tmp << "DELETE FROM DateTimes", now;
+
+	Date d(dt);
+	tmp << "INSERT INTO DateTimes VALUES (?)", use(d), now;
+
+	Date rd;
+	assert (rd != d);
+	tmp << "SELECT * FROM DateTimes", into(rd), now;
+	assert (rd == d);
+
+	tmp << "DELETE FROM DateTimes", now;
+
+	Time t(dt);
+	tmp << "INSERT INTO DateTimes VALUES (?)", use(t), now;
+
+	Time rt;
+	assert (rt != t);
+	tmp << "SELECT * FROM DateTimes", into(rt), now;
+	assert (rt == t);
+}
+
+
 void SQLiteTest::testInternalExtraction()
 {
 	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
@@ -1901,6 +1942,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector2);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple1);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector1);
+	CppUnit_addTest(pSuite, SQLiteTest, testDateTime);
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
 	CppUnit_addTest(pSuite, SQLiteTest, testNull);

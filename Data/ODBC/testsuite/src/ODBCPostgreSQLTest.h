@@ -93,6 +93,7 @@ public:
 	void testLimitPrepare();
 	void testLimitZero();
 	void testPrepare();
+	void testStep();
 
 	void testSetSimple();
 	void testSetComplex();
@@ -118,6 +119,8 @@ public:
 	void testBLOBStmt();
 
 	void testDateTime();
+	void testDate();
+	void testTime();
 
 	void testFloat();
 	void testDouble();
@@ -157,6 +160,8 @@ private:
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
 	void recreatePersonDateTimeTable();
+	void recreatePersonDateTable();
+	void recreatePersonTimeTable();
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();

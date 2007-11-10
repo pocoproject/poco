@@ -46,6 +46,8 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/BLOB.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
@@ -62,6 +64,8 @@ namespace Data {
 namespace ODBC {
 
 
+class Date;
+class Time;
 class BLOB;
 
 
@@ -152,6 +156,12 @@ public:
 
 	void prepare(std::size_t pos, const Poco::Data::BLOB&);
 		/// Prepares a BLOB.
+
+	void prepare(std::size_t pos, const Poco::Data::Date&);
+		/// Prepares a Date.
+
+	void prepare(std::size_t pos, const Poco::Data::Time&);
+		/// Prepares a Time.
 
 	void prepare(std::size_t pos, const Poco::DateTime&);
 		/// Prepares a DateTime.
@@ -355,6 +365,22 @@ inline void Preparation::prepare(std::size_t pos, const std::string&)
 inline void Preparation::prepare(std::size_t pos, const Poco::Data::BLOB&)
 {
 	prepareRaw<char>(pos, SQL_C_BINARY, maxDataSize(pos));
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const Poco::Data::Date&)
+{
+	prepareRaw<SQL_DATE_STRUCT>(pos, 
+		SQL_C_TYPE_DATE, 
+		sizeof(SQL_DATE_STRUCT));
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const Poco::Data::Time&)
+{
+	prepareRaw<SQL_TIME_STRUCT>(pos, 
+		SQL_C_TYPE_TIME, 
+		sizeof(SQL_TIME_STRUCT));
 }
 
 

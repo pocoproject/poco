@@ -132,6 +132,16 @@ void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
 }
 
 
+void Binder::bind(std::size_t pos, const Date& val, Direction dir)
+{
+}
+
+
+void Binder::bind(std::size_t pos, const Time& val, Direction dir)
+{
+}
+
+
 void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 {
 }

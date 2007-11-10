@@ -127,14 +127,30 @@ void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 	double msec = ts.fraction/1000000;
 	double usec = 1000 * (msec - floor(msec));
 
-	dt.assign(ts.year, 
-		ts.month, 
-		ts.day, 
-		ts.hour, 
-		ts.minute, 
-		ts.second, 
+	dt.assign(ts.year,
+		ts.month,
+		ts.day,
+		ts.hour,
+		ts.minute,
+		ts.second,
 		(int) floor(msec),
 		(int) floor(usec));
+}
+
+
+void Utility::dateSync(SQL_DATE_STRUCT& ds, const Date& d)
+{
+	ds.year = d.year();
+	ds.month = d.month();
+	ds.day = d.day();
+}
+
+
+void Utility::timeSync(SQL_TIME_STRUCT& ts, const Time& t)
+{
+	ts.hour = t.hour();
+	ts.minute = t.minute();
+	ts.second = t.second();
 }
 
 

@@ -102,6 +102,12 @@ public:
 	void prepare(std::size_t pos, const Poco::Data::BLOB&);
 		/// Prepares a BLOB.
 
+	void prepare(std::size_t pos, const Poco::Data::Date&);
+		/// Prepares a Date.
+
+	void prepare(std::size_t pos, const Poco::Data::Time&);
+		/// Prepares a Time.
+
 	void prepare(std::size_t pos, const Poco::DateTime&);
 		/// Prepares a DateTime.
 

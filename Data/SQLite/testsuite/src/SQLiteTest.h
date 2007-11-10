@@ -107,6 +107,8 @@ public:
 	void testTuple10();
 	void testTupleVector10();
 
+	void testDateTime();
+
 	void testInternalExtraction();
 	void testPrimaryKeyConstraint();
 	void testNull();

@@ -451,6 +451,31 @@ void ODBCPostgreSQLTest::testPrepare()
 }
 
 
+void ODBCPostgreSQLTest::testStep()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::cout << std::endl << "PostgreSQL" << std::endl;
+	for (int i = 0; i < 8;)
+	{
+		recreateIntsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		std::string mode = bindValues[i+1] ? "auto" : "manual";
+		std::cout << "Extraction: " << mode << std::endl;
+		_pExecutor->doStep(1000, 1);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 10);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 100);
+		recreateIntsTable();
+		_pExecutor->doStep(1000, 1000);
+
+		i += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::testSetSimple()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -791,6 +816,36 @@ void ODBCPostgreSQLTest::testDateTime()
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
 		_pExecutor->dateTime();
+		i += 2;
+	}
+}
+
+
+void ODBCPostgreSQLTest::testDate()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonDateTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->date();
+		i += 2;
+	}
+}
+
+
+void ODBCPostgreSQLTest::testTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTimeTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->time();
 		i += 2;
 	}
 }
@@ -1210,6 +1265,24 @@ void ODBCPostgreSQLTest::recreatePersonDateTimeTable()
 }
 
 
+void ODBCPostgreSQLTest::recreatePersonDateTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
+}
+
+
+void ODBCPostgreSQLTest::recreatePersonTimeTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
+}
+
+
 void ODBCPostgreSQLTest::recreateIntsTable()
 {
 	dropObject("TABLE", "Strings");
@@ -1432,6 +1505,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testPrepare);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStep);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetComplexUnique);
@@ -1453,6 +1527,8 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDate);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTime);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDouble);

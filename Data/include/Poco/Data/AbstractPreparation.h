@@ -56,6 +56,8 @@ class DynamicAny;
 namespace Data {
 
 
+class Date;
+class Time;
 class BLOB;
 
 
@@ -121,6 +123,12 @@ public:
 
 	virtual void prepare(std::size_t pos, const DateTime&) = 0;
 		/// Prepares a DateTime.
+
+	virtual void prepare(std::size_t pos, const Date&) = 0;
+		/// Prepares a Date.
+
+	virtual void prepare(std::size_t pos, const Time&) = 0;
+		/// Prepares a Time.
 
 	virtual void prepare(std::size_t pos, const Any&) = 0;
 		/// Prepares an Any.

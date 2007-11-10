@@ -1,9 +1,13 @@
 //
-// DataTest.h
+// Step.h
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.h#6 $
+// $Id: //poco/Main/Data/include/Poco/Data/Step.h#7 $
 //
-// Definition of the DataTest class.
+// Library: Data
+// Package: DataCore
+// Module:  Step
+//
+// Definition of the Step class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,55 +36,59 @@
 //
 
 
-#ifndef DataTest_INCLUDED
-#define DataTest_INCLUDED
+#ifndef Data_Step_INCLUDED
+#define Data_Step_INCLUDED
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/BinaryReader.h"
-#include "Poco/BinaryWriter.h"
-#include "Poco/Data/Row.h"
-#include "CppUnit/TestCase.h"
 
 
-class DataTest: public CppUnit::TestCase
+namespace Poco {
+namespace Data {
+
+
+class Data_API Step
+	/// Step stores information how many rows should be returned at evry advance through the recordset.
 {
 public:
-	DataTest(const std::string& name);
-	~DataTest();
+	enum
+	{
+		DEFAULT_STEP = 1u
+	};
 
-	void testSession();
-	void testFeatures();
-	void testProperties();
-	void testBLOB();
-	void testBLOBStreams();
-	void testColumnVector();
-	void testColumnVectorBool();
-	void testColumnDeque();
-	void testColumnList();
-	void testRow();
-	void testRowSort();
-	void testRowFormat();
-	void testDateAndTime();
+	Step(Poco::UInt32 value = 1u);
+		/// Creates the Step. 
+		///
+		/// Value contains the step and defaults to DEFAULT_STEP.
 
-	void setUp();
-	void tearDown();
+	~Step();
+		/// Destroys the Step.
 
-	static CppUnit::Test* suite();
+	Poco::UInt32 value() const;
+		/// Returns the value of the limit
 
 private:
-	void testRowStrictWeak(const Poco::Data::Row& row1, 
-		const Poco::Data::Row& row2, 
-		const Poco::Data::Row& row3);
-		/// Strict weak ordering requirement for sorted containers
-		/// as described in Josuttis "The Standard C++ Library"
-		/// chapter 6.5. pg. 176.
-		/// For this to pass, the following condition must be satisifed: 
-		/// row1 < row2 < row3
-
-	void writeToBLOB(Poco::BinaryWriter& writer);
-	void readFromBLOB(Poco::BinaryReader& reader);
+	Poco::UInt32 _value;
 };
 
 
-#endif // DataTest_INCLUDED
+//
+// inlines
+//
+inline Poco::UInt32 Step::value() const
+{
+	return _value;
+}
+
+
+template <typename T> 
+Step step(T step)
+{
+	return Step(static_cast<Poco::UInt32>(step));
+}
+
+
+} } // namespace Poco::Data
+
+
+#endif // Data_Step_INCLUDED

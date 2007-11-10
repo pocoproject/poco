@@ -114,6 +114,12 @@ public:
 	void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir);
 		/// Binds a BLOB.
 
+	void bind(std::size_t pos, const Date& val, Direction dir);
+		/// Binds a Date.
+
+	void bind(std::size_t pos, const Time& val, Direction dir);
+		/// Binds a Time.
+
 	void bind(std::size_t pos, const DateTime& val, Direction dir);
 		/// Binds a DateTime.
 

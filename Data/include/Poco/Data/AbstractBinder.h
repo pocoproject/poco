@@ -52,6 +52,8 @@ class DynamicAny;
 
 namespace Data {
 
+class Date;
+class Time;
 class BLOB;
 
 enum NullData
@@ -70,6 +72,8 @@ enum NullData
 	NULL_DOUBLE,
 	NULL_STRING,
 	NULL_BLOB,
+	NULL_DATE,
+	NULL_TIME,
 	NULL_TIMESTAMP
 };
 
@@ -148,6 +152,12 @@ public:
 
 	virtual void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN) = 0;
 		/// Binds a DateTime.
+
+	virtual void bind(std::size_t pos, const Date& val, Direction dir = PD_IN) = 0;
+		/// Binds a Date.
+
+	virtual void bind(std::size_t pos, const Time& val, Direction dir = PD_IN) = 0;
+		/// Binds a Time.
 
 	virtual void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN) = 0;
 		/// Binds a null.
