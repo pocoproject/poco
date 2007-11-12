@@ -197,6 +197,9 @@
 					RelativePath=".\include\Poco\Data\DataException.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Date.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Extraction.h">
 				</File>
 				<File
@@ -242,6 +245,12 @@
 					RelativePath=".\include\Poco\Data\StatementImpl.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Step.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\Time.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\TypeHandler.h">
 				</File>
 			</Filter>
@@ -277,6 +286,9 @@
 				</File>
 				<File
 					RelativePath=".\src\DataException.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Date.cpp">
 				</File>
 				<File
 					RelativePath=".\src\Limit.cpp">
@@ -316,6 +328,12 @@
 				</File>
 				<File
 					RelativePath=".\src\StatementImpl.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Step.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Time.cpp">
 				</File>
 			</Filter>
 		</Filter>
