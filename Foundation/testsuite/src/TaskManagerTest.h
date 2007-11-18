@@ -57,6 +57,7 @@ public:
 	void testError();
 	void testCustom();
 	void testMultiTasks();
+	void testCustomThreadPool();
 
 	void setUp();
 	void tearDown();

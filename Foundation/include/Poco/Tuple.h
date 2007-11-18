@@ -78,7 +78,7 @@ struct Tuple
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -191,7 +191,7 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,N
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -301,7 +301,7 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,NullT
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -408,7 +408,7 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,NullTypeL
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -512,7 +512,7 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -613,7 +613,7 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -711,7 +711,7 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -806,7 +806,7 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -898,7 +898,7 @@ struct Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -987,7 +987,7 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1073,7 +1073,7 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9, NullTypeList>
 {
 	typedef typename TypeListType<T0, T1,T2,T3,T4,T5,T6,T7,T8,T9>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1156,7 +1156,7 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7,T8, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7,T8>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1236,7 +1236,7 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6,T7, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6,T7>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1313,7 +1313,7 @@ struct Tuple<T0, T1,T2,T3,T4,T5,T6, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5,T6>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1387,7 +1387,7 @@ struct Tuple<T0, T1,T2,T3,T4,T5, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4,T5>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1458,7 +1458,7 @@ struct Tuple<T0, T1,T2,T3,T4, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3,T4>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1526,7 +1526,7 @@ struct Tuple<T0, T1,T2,T3, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2,T3>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1591,7 +1591,7 @@ struct Tuple<T0, T1,T2, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1,T2>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1653,7 +1653,7 @@ struct Tuple<T0, T1, NullTypeList>
 {
 	typedef typename TypeListType<T0,T1>::HeadType Type;
 
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};
@@ -1711,7 +1711,7 @@ struct Tuple<T0, NullTypeList>
 {
 	typedef TypeList<T0, NullTypeList> Type;
 	
-	enum
+	enum TupleLengthType
 	{
 		length = Type::length
 	};

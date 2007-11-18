@@ -75,6 +75,7 @@ public:
 	{
 		_pObject = ra._pObject;
 		_method  = ra._method;
+		return *this;
 	}
 
 	void run()

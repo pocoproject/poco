@@ -33,11 +33,13 @@
 #include "TaskManagerTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Exception.h"
 #include "Poco/TaskManager.h"
 #include "Poco/Task.h"
 #include "Poco/TaskNotification.h"
 #include "Poco/NotificationCenter.h"
 #include "Poco/Thread.h"
+#include "Poco/ThreadPool.h"
 #include "Poco/Event.h"
 #include "Poco/Observer.h"
 #include "Poco/Exception.h"
@@ -54,9 +56,11 @@ using Poco::TaskFailedNotification;
 using Poco::TaskProgressNotification;
 using Poco::TaskCustomNotification;
 using Poco::Thread;
+using Poco::ThreadPool;
 using Poco::Event;
 using Poco::Observer;
 using Poco::Exception;
+using Poco::NoThreadAvailableException;
 using Poco::SystemException;
 using Poco::NullPointerException;
 using Poco::AutoPtr;
@@ -460,6 +464,36 @@ void TaskManagerTest::testMultiTasks()
 }
 
 
+void TaskManagerTest::testCustomThreadPool()
+{
+	ThreadPool  tp(2, 5, 120);
+	TaskManager tm(tp);
+
+	// fill up the thread pool
+	for (int i=0; i<tp.capacity(); ++i)
+	{
+		tm.start(new SimpleTask);
+	}
+	assert (tp.allocated() == tp.capacity());
+	assert (tm.count() == tp.allocated());
+
+	// the next one should fail
+	try
+	{
+		tm.start(new SimpleTask);
+		failmsg("thread pool exhausted - must throw exception");
+	}
+	catch (NoThreadAvailableException const&)
+	{
+	}
+	catch (...)
+	{
+		failmsg("wrong exception thrown");
+	}
+
+	assert (tm.count() == tp.allocated());
+}
+
 void TaskManagerTest::setUp()
 {
 }
@@ -479,6 +513,7 @@ CppUnit::Test* TaskManagerTest::suite()
 	CppUnit_addTest(pSuite, TaskManagerTest, testError);
 	CppUnit_addTest(pSuite, TaskManagerTest, testMultiTasks);
 	CppUnit_addTest(pSuite, TaskManagerTest, testCustom);
+	CppUnit_addTest(pSuite, TaskManagerTest, testCustomThreadPool);
 
 	return pSuite;
 }
