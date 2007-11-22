@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_ODBC_Extractor_INCLUDED
-#define DataConnectors_ODBC_Extractor_INCLUDED
+#ifndef Data_ODBC_Extractor_INCLUDED
+#define Data_ODBC_Extractor_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -146,7 +146,7 @@ public:
 		/// Returns true if the current row value at pos column is null.
 
 	void reset();
-		/// Resets the internally cached null value indicators. 
+		/// Resets the internally cached length indicators. 
 
 private:
 	static const int CHUNK_SIZE = 1024;
@@ -317,4 +317,4 @@ inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
 } } } // namespace Poco::Data::ODBC
 
 
-#endif // DataConnectors_ODBC_Extractor_INCLUDED
+#endif // Data_ODBC_Extractor_INCLUDED

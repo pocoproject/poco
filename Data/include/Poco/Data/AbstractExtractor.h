@@ -138,7 +138,6 @@ public:
 
 	virtual void reset();
 		/// Resets any information internally cached by the extractor.
-		/// (e.g. info about underlying DB null values)
 };
 
 

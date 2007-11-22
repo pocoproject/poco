@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_ODBC_Connector_INCLUDED
-#define DataConnectors_ODBC_Connector_INCLUDED
+#ifndef Data_ODBC_Connector_INCLUDED
+#define Data_ODBC_Connector_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -76,4 +76,4 @@ public:
 } } } // namespace Poco::Data::ODBC
 
 
-#endif // DataConnectors_ODBC_Connector_INCLUDED
+#endif // Data_ODBC_Connector_INCLUDED

@@ -31,13 +31,13 @@
 
 
 #include "ODBCMySQLTest.h"
+#include "ODBCTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
 #include "Poco/Exception.h"
-#include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/ODBC/Connector.h"
@@ -59,16 +59,33 @@ using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-ODBCMySQLTest::SessionPtr  ODBCMySQLTest::_pSession = 0;
-ODBCMySQLTest::ExecPtr ODBCMySQLTest::_pExecutor = 0;
-std::string                ODBCMySQLTest::_dbConnString;
-ODBCMySQLTest::Drivers     ODBCMySQLTest::_drivers;
-const bool                 ODBCMySQLTest::bindValues[8] = 
-	{true, true, true, false, false, true, false, false};
+#ifdef POCO_OS_FAMILY_WINDOWS
+	#define MYSQL_ODBC_DRIVER "MySQL ODBC 3.51 Driver"
+#else
+	#define MYSQL_ODBC_DRIVER "MySQL"
+#endif
+#define MYSQL_DSN "PocoDataMySQLTest"
+#define MYSQL_SERVER "localhost"
+#define MYSQL_DB "test"
+#define MYSQL_UID "root"
+#define MYSQL_PWD "mysql"
+
+
+ODBCTest::SessionPtr ODBCMySQLTest::_pSession;
+ODBCTest::ExecPtr    ODBCMySQLTest::_pExecutor;
+std::string          ODBCMySQLTest::_driver = MYSQL_ODBC_DRIVER;
+std::string          ODBCMySQLTest::_dsn = MYSQL_DSN;
+std::string          ODBCMySQLTest::_uid = MYSQL_UID;
+std::string          ODBCMySQLTest::_pwd = MYSQL_PWD;
+std::string          ODBCMySQLTest::_connectString = "DRIVER=" MYSQL_ODBC_DRIVER ";"
+	"DATABASE=" MYSQL_DB ";"
+	"SERVER=" MYSQL_SERVER ";"
+	"UID=" MYSQL_UID ";"
+	"PWD=" MYSQL_PWD ";";
 
 
 ODBCMySQLTest::ODBCMySQLTest(const std::string& name): 
-	CppUnit::TestCase(name)
+	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
 
@@ -90,10 +107,10 @@ void ODBCMySQLTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
 /*
 MySQL supports batch statements as of 3.51.18
@@ -104,633 +121,11 @@ http://bugs.mysql.com/bug.php?id=7445
 		"Second INTEGER,"
 		"Third FLOAT)";
 
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 */
-}
-
-
-void ODBCMySQLTest::testSimpleAccess()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccess();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testComplexType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexType();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testSimpleAccessVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessVector();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testComplexTypeVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testInsertVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testInsertEmptyVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testSimpleAccessList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessList();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testComplexTypeList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeList();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testInsertList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertList();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testInsertEmptyList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyList();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testSimpleAccessDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessDeque();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testComplexTypeDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testInsertDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testInsertEmptyDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testInsertSingleBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulk();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testInsertSingleBulkVec()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulkVec();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testLimit()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limits();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testLimitZero()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitZero();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testLimitOnce()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	recreateIntsTable();
-	_pExecutor->limitOnce();
-	
-}
-
-
-void ODBCMySQLTest::testLimitPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitPrepare();
-		i += 2;
-	}
-}
-
-
-
-void ODBCMySQLTest::testPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->prepare();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::cout << std::endl << "MySQL" << std::endl;
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		std::string mode = bindValues[i+1] ? "auto" : "manual";
-		std::cout << "Extraction: " << mode << std::endl;
-		_pExecutor->doStep(1000, 1);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 10);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 100);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 1000);
-
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testSetComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplexUnique();
-		i += 2;
-	}
-}
-
-void ODBCMySQLTest::testMultiSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testMultiSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetComplex();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testMapComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplexUnique();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testMultiMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiMapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testSelectIntoSingle()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingle();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testSelectIntoSingleStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleStep();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testSelectIntoSingleFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleFail();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testLowerLimitOk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitOk();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testSingleSelect()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->singleSelect();
-		i += 2;
-	}	
-}
-
-
-void ODBCMySQLTest::testLowerLimitFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitFail();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testCombinedLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCMySQLTest::testRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->ranges();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testCombinedIllegalLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedIllegalLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCMySQLTest::testIllegalRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->illegalRange();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testEmptyDB()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->emptyDB();
-		i += 2;
-	}
 }
 
 
@@ -755,8 +150,8 @@ void ODBCMySQLTest::testBLOB()
 	for (int i = 0; i < 8;)
 	{
 		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->blob(maxFldSize);
 		i += 2;
 	}
@@ -771,156 +166,6 @@ void ODBCMySQLTest::testBLOB()
 }
 
 
-void ODBCMySQLTest::testBLOBStmt()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blobStmt();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testDate()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonDateTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->date();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testTime()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTimeTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->time();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testDateTime()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonDateTimeTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dateTime();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testFloat()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->floats();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testDouble()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->doubles();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testTuple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tuples();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testTupleVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tupleVector();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testInternalExtraction()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalExtraction();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testInternalStorageType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalStorageType();
-		i += 2;
-	}
-}
-
-
 void ODBCMySQLTest::testNull()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -929,8 +174,8 @@ void ODBCMySQLTest::testNull()
 	for (int i = 0; i < 8;)
 	{
 		recreateNullsTable("NOT NULL");
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->notNulls("HYT00");
 		i += 2;
 	}
@@ -939,8 +184,8 @@ void ODBCMySQLTest::testNull()
 	for (int i = 0; i < 8;)
 	{
 		recreateNullsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->nulls();
 		i += 2;
 	}
@@ -973,68 +218,6 @@ void ODBCMySQLTest::testStoredFunction()
 }
 
 
-void ODBCMySQLTest::testRowIterator()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->rowIterator();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testAsync()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->asynchronous();
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->any();
-
-		i += 2;
-	}
-}
-
-
-void ODBCMySQLTest::testDynamicAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dynamicAny();
-
-		i += 2;
-	}
-}
-
-
 void ODBCMySQLTest::testMultipleResults()
 {
 /*
@@ -1046,8 +229,8 @@ http://bugs.mysql.com/bug.php?id=7445
 	for (int i = 0; i < 8;)
 	{
 		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->multipleResults();
 
 		i += 2;
@@ -1176,95 +359,14 @@ void ODBCMySQLTest::recreateNullsTable(const std::string& notNull)
 }
 
 
-bool ODBCMySQLTest::canConnect(const std::string& driver, const std::string& dsn)
-{
-	Utility::DriverMap::iterator itDrv = _drivers.begin();
-	for (; itDrv != _drivers.end(); ++itDrv)
-	{
-		if (((itDrv->first).find(driver) != std::string::npos))
-		{
-			std::cout << "Driver found: " << itDrv->first 
-				<< " (" << itDrv->second << ')' << std::endl;
-			break;
-		}
-	}
-
-	if (_drivers.end() == itDrv) 
-	{
-		std::cout << driver << " driver NOT found, tests not available." << std::endl;
-		return false;
-	}
-
-	Utility::DSNMap dataSources;
-	Utility::dataSources(dataSources);
-	Utility::DSNMap::iterator itDSN = dataSources.begin();
-	for (; itDSN != dataSources.end(); ++itDSN)
-	{
-		if (itDSN->first == dsn && itDSN->second == driver)
-		{
-			std::cout << "DSN found: " << itDSN->first 
-				<< " (" << itDSN->second << ')' << std::endl;
-			format(_dbConnString, "DSN=%s", dsn);
-			return true;
-		}
-	}
-
-	// DSN not found, try connect without it
-	format(_dbConnString, "DRIVER=%s;"
-		"DATABASE=test;"
-		"SERVER=localhost;"
-		"UID=root;"
-		"PWD=mysql;", driver);
-
-	return true;
-}
-
-
-void ODBCMySQLTest::setUp()
-{
-}
-
-
-void ODBCMySQLTest::tearDown()
-{
-	dropObject("TABLE", "Person");
-	dropObject("TABLE", "Strings");
-	dropObject("TABLE", "Tuples");
-}
-
-
-bool ODBCMySQLTest::init(const std::string& driver, const std::string& dsn)
-{
-	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn)) return false;
-	
-	ODBC::Connector::registerConnector();
-	try
-	{
-		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
-	}catch (ConnectionException& ex)
-	{
-		std::cout << ex.toString() << std::endl;
-		return false;
-	}
-
-	if (_pSession && _pSession->isConnected()) 
-		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
-	
-	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
-
-	return true;
-}
-
-
 CppUnit::Test* ODBCMySQLTest::suite()
 {
-#ifdef POCO_OS_FAMILY_WINDOWS
-	if (init("MySQL ODBC 3.51 Driver", "PocoDataMySQLTest"))
-#else
-	if (init("MySQL", "PocoDataMySQLTest"))
-#endif
+	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
 	{
+		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
+
+		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession);
+
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCMySQLTest");
 
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBareboneODBC);

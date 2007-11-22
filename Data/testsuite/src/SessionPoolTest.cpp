@@ -33,7 +33,6 @@
 #include "SessionPoolTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Poco/Data/Common.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Thread.h"
 #include "Connector.h"

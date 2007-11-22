@@ -38,11 +38,14 @@
 //
 
 
-#ifndef ODBC_ODBC_INCLUDED
-#define ODBC_ODBC_INCLUDED
+#ifndef Data_ODBC_ODBC_INCLUDED
+#define Data_ODBC_ODBC_INCLUDED
 
 
 #include "Poco/Foundation.h"
+#ifdef POCO_OS_FAMILY_WINDOWS
+#include <windows.h>
+#endif
 
 
 //
@@ -67,7 +70,8 @@
 #endif
 
 
-#define POCO_SQLCHAR SQLCHAR
+
+#include "Poco/Data/ODBC/Unicode.h"
 
 
 //

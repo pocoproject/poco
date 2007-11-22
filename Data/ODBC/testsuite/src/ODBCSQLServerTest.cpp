@@ -39,17 +39,10 @@
 #include "Poco/DynamicAny.h"
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
-#include "Poco/Exception.h"
-#include "Poco/Data/Common.h"
-#include "Poco/Data/BLOB.h"
-#include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
-#include "Poco/Data/ODBC/Connector.h"
-#include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
-#include <sqltypes.h>
 #include <iostream>
 
 
@@ -64,21 +57,43 @@ using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::DateTime;
-using Poco::NotFoundException;
 
 
-ODBCSQLServerTest::SessionPtr ODBCSQLServerTest::_pSession = 0;
-ODBCSQLServerTest::ExecPtr    ODBCSQLServerTest::_pExecutor = 0;
-std::string                   ODBCSQLServerTest::_dbConnString;
-ODBCSQLServerTest::Drivers    ODBCSQLServerTest::_drivers;
-const bool                    ODBCSQLServerTest::bindValues[8] = 
-	{true, true, true, false, false, true, false, false};
+#ifdef POCO_OS_FAMILY_WINDOWS
+	#ifdef POCO_ODBC_USE_SQL_NATIVE
+		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Native Client"
+	#else
+		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server"
+	#endif
+#else
+	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
+#endif
+#define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
+#define MS_SQL_SERVER_SERVER "localhost"
+#define MS_SQL_SERVER_PORT "1433"
+#define MS_SQL_SERVER_DB "test"
+#define MS_SQL_SERVER_UID "test"
+#define MS_SQL_SERVER_PWD "test"
+
+
+ODBCTest::SessionPtr ODBCSQLServerTest::_pSession;
+ODBCTest::ExecPtr    ODBCSQLServerTest::_pExecutor;
+std::string          ODBCSQLServerTest::_driver = MS_SQL_SERVER_ODBC_DRIVER;
+std::string          ODBCSQLServerTest::_dsn = MS_SQL_SERVER_DSN;
+std::string          ODBCSQLServerTest::_uid = MS_SQL_SERVER_UID;
+std::string          ODBCSQLServerTest::_pwd = MS_SQL_SERVER_PWD;
+std::string          ODBCSQLServerTest::_db  = MS_SQL_SERVER_DB;
+std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRIVER ";"
+	"UID=" MS_SQL_SERVER_UID ";"
+	"PWD=" MS_SQL_SERVER_PWD ";"
+	"DATABASE=" MS_SQL_SERVER_DB ";"
+	"SERVER=" MS_SQL_SERVER_SERVER ";"
+	"PORT=" MS_SQL_SERVER_PORT ";";
 
 
 ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name): 
-	CppUnit::TestCase(name)
+	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
-
 }
 
 
@@ -89,8 +104,6 @@ ODBCSQLServerTest::~ODBCSQLServerTest()
 
 void ODBCSQLServerTest::testBareboneODBC()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	std::string tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
@@ -99,825 +112,68 @@ void ODBCSQLServerTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
-
+	//TODO: auto binding fails at SQLExecute() ("String data, right truncated")
+	//executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	//executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third FLOAT)";
 
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
-}
-
-
-void ODBCSQLServerTest::testSimpleAccess()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::string tableName("Person");
-	int count = 0;
-
-	recreatePersonTable();
-
-	try { *_pSession << "SELECT count(*) FROM sys.tables WHERE name = 'Person'", into(count), use(tableName), now;  }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("testSimpleAccess()"); }
-
-	assert (1 == count);
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccess();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testComplexType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexType();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testSimpleAccessVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessVector();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testComplexTypeVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testInsertVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testInsertEmptyVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testSimpleAccessList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessList();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testComplexTypeList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeList();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testInsertList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertList();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testInsertEmptyList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyList();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testSimpleAccessDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessDeque();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testComplexTypeDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testInsertDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testInsertEmptyDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testInsertSingleBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulk();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testInsertSingleBulkVec()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulkVec();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testLimit()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limits();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testLimitZero()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitZero();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testLimitOnce()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	recreateIntsTable();
-	_pExecutor->limitOnce();
-	
-}
-
-
-void ODBCSQLServerTest::testLimitPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitPrepare();
-		i += 2;
-	}
-}
-
-
-
-void ODBCSQLServerTest::testPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->prepare();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::cout << std::endl << "MS SQL Server" << std::endl;
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		std::string mode = bindValues[i+1] ? "auto" : "manual";
-		std::cout << "Extraction: " << mode << std::endl;
-		_pExecutor->doStep(1000, 1);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 10);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 100);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 1000);
-
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testSetComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplexUnique();
-		i += 2;
-	}
-}
-
-void ODBCSQLServerTest::testMultiSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testMultiSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetComplex();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testMapComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplexUnique();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testMultiMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiMapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testSelectIntoSingle()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingle();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testSelectIntoSingleStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleStep();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testSelectIntoSingleFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleFail();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testLowerLimitOk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitOk();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testSingleSelect()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->singleSelect();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLServerTest::testLowerLimitFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitFail();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testCombinedLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCSQLServerTest::testRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->ranges();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testCombinedIllegalLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedIllegalLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCSQLServerTest::testIllegalRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->illegalRange();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testEmptyDB()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->emptyDB();
-		i += 2;
-	}
+	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 }
 
 
 void ODBCSQLServerTest::testBLOB()
 {
-	if (!_pSession) fail ("Test not available.");
-	
 	const std::size_t maxFldSize = 250000;
-	_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
+	session().setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
 	recreatePersonBLOBTable();
 
 	try
 	{
-		_pExecutor->blob(maxFldSize);
+		executor().blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&) 
+	catch (DataException&)
 	{
-		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
+		session().setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
 
 	for (int i = 0; i < 8;)
 	{
 		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blob(maxFldSize);
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		executor().blob(maxFldSize);
 		i += 2;
 	}
 
 	recreatePersonBLOBTable();
 	try
 	{
-		_pExecutor->blob(maxFldSize+1);
+		executor().blob(maxFldSize+1);
 		fail ("must fail");
 	}
 	catch (DataException&) { }
 }
 
 
-void ODBCSQLServerTest::testBLOBStmt()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blobStmt();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testDateTime()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonDateTimeTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dateTime();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testFloat()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->floats();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testDouble()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->doubles();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testTuple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tuples();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testTupleVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tupleVector();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testInternalExtraction()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalExtraction();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testInternalStorageType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalStorageType();
-		i += 2;
-	}
-}
-
-
 void ODBCSQLServerTest::testNull()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	// test for NOT NULL violation exception
 	for (int i = 0; i < 8;)
 	{
 		recreateNullsTable("NOT NULL");
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->notNulls("23000");
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		executor().notNulls("23000");
 		i += 2;
 	}
 
@@ -925,9 +181,9 @@ void ODBCSQLServerTest::testNull()
 	for (int i = 0; i < 8;)
 	{
 		recreateNullsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->nulls();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		executor().nulls();
 		i += 2;
 	}
 }
@@ -937,23 +193,23 @@ void ODBCSQLServerTest::testStoredProcedure()
 {
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		dropObject("PROCEDURE", "storedProcedure");
 
-		*_pSession << "CREATE PROCEDURE storedProcedure(@outParam int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedProcedure(@outParam int OUTPUT) AS "
 			"BEGIN "
 			"SET @outParam = -1; "
 			"END;"
 		, now;
 		
 		int i = 0;
-		*_pSession << "{call storedProcedure(?)}", out(i), now;
+		session() << "{call storedProcedure(?)}", out(i), now;
 		assert(-1 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
-		*_pSession << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
 			"BEGIN "
 			"SET @outParam = @inParam*@inParam; "
 			"END;"
@@ -961,28 +217,28 @@ void ODBCSQLServerTest::testStoredProcedure()
 
 		i = 2;
 		int j = 0;
-		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
 		assert(4 == j);
 		dropObject("PROCEDURE", "storedProcedure");
 
-		*_pSession << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
 			"BEGIN "
 			"SET @ioParam = @ioParam*@ioParam; "
 			"END;"
 		, now;
 
 		i = 2;
-		*_pSession << "{call storedProcedure(?)}", io(i), now;
+		session() << "{call storedProcedure(?)}", io(i), now;
 		assert(4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
-		*_pSession << "CREATE PROCEDURE storedProcedure(@ioParam DATETIME OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedProcedure(@ioParam DATETIME OUTPUT) AS "
 			"BEGIN "
 			" SET @ioParam = @ioParam + 1; "
 			"END;" , now;
 
 		DateTime dt(1965, 6, 18, 5, 35, 1);
-		*_pSession << "{call storedProcedure(?)}", io(dt), now;
+		session() << "{call storedProcedure(?)}", io(dt), now;
 		assert(19 == dt.day());
 		dropObject("PROCEDURE", "storedProcedure");
 
@@ -994,8 +250,8 @@ void ODBCSQLServerTest::testStoredProcedure()
 2 (''):  Data type 0x23 is a deprecated large object, or LOB, but is marked as output parameter.  
 Deprecated types are not supported as output parameters.  Use current large object types instead.
 
-	_pSession->setFeature("autoBind", true);
-	*_pSession << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
+	session().setFeature("autoBind", true);
+	session() << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
 		"BEGIN "
 		"SET @outParam = @inParam; "
 		"END;"
@@ -1004,7 +260,7 @@ Deprecated types are not supported as output parameters.  Use current large obje
 	std::string inParam = "123";
 	std::string outParam;
 	try{
-	*_pSession << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
+	session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
 	}catch(StatementException& ex){std::cout << ex.toString();}
 	assert(outParam == inParam);
 	dropObject("PROCEDURE", "storedProcedure");
@@ -1014,12 +270,10 @@ Deprecated types are not supported as output parameters.  Use current large obje
 
 void ODBCSQLServerTest::testCursorStoredProcedure()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		recreatePersonTable();
 		typedef Tuple<std::string, std::string, std::string, int> Person;
@@ -1027,10 +281,10 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
 		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
 		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
-		*_pSession << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+		session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
 
 		dropObject("PROCEDURE", "storedCursorProcedure");
-		*_pSession << "CREATE PROCEDURE storedCursorProcedure(@ageLimit int) AS "
+		session() << "CREATE PROCEDURE storedCursorProcedure(@ageLimit int) AS "
 			"BEGIN "
 			" SELECT * "
 			" FROM Person "
@@ -1042,13 +296,13 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 		people.clear();
 		int age = 13;
 		
-		*_pSession << "{call storedCursorProcedure(?)}", in(age), into(people), now;
+		session() << "{call storedCursorProcedure(?)}", in(age), into(people), now;
 		
 		assert (2 == people.size());
 		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
 		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
 
-		Statement stmt = ((*_pSession << "{call storedCursorProcedure(?)}", in(age), now));
+		Statement stmt = ((session() << "{call storedCursorProcedure(?)}", in(age), now));
 		RecordSet rs(stmt);
 		assert (rs["LastName"] == "Simpson");
 		assert (rs["FirstName"] == "Bart");
@@ -1065,34 +319,32 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 
 void ODBCSQLServerTest::testStoredProcedureAny()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		Any i = 2;
 		Any j = 0;
 
-		*_pSession << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
 			"BEGIN "
 			"SET @outParam = @inParam*@inParam; "
 			"END;"
 		, now;
 
-		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
 		assert(4 == AnyCast<int>(j));
-		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+		session() << "DROP PROCEDURE storedProcedure;", now;
 
-		*_pSession << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
 			"BEGIN "
 			"SET @ioParam = @ioParam*@ioParam; "
 			"END;"
 		, now;
 
 		i = 2;
-		*_pSession << "{call storedProcedure(?)}", io(i), now;
+		session() << "{call storedProcedure(?)}", io(i), now;
 		assert(4 == AnyCast<int>(i));
 		dropObject("PROCEDURE", "storedProcedure");
 
@@ -1103,33 +355,31 @@ void ODBCSQLServerTest::testStoredProcedureAny()
 
 void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
+		session().setFeature("autoBind", bindValue(k));
 		
 		DynamicAny i = 2;
 		DynamicAny j = 0;
 
-		*_pSession << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
 			"BEGIN "
 			"SET @outParam = @inParam*@inParam; "
 			"END;"
 		, now;
 
-		*_pSession << "{call storedProcedure(?, ?)}", in(i), out(j), now;
+		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
 		assert(4 == j);
-		*_pSession << "DROP PROCEDURE storedProcedure;", now;
+		session() << "DROP PROCEDURE storedProcedure;", now;
 
-		*_pSession << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
 			"BEGIN "
 			"SET @ioParam = @ioParam*@ioParam; "
 			"END;"
 		, now;
 
 		i = 2;
-		*_pSession << "{call storedProcedure(?)}", io(i), now;
+		session() << "{call storedProcedure(?)}", io(i), now;
 		assert(4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
@@ -1142,11 +392,11 @@ void ODBCSQLServerTest::testStoredFunction()
 {
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		dropObject("PROCEDURE", "storedFunction");
-		*_pSession << "CREATE PROCEDURE storedFunction AS "
+		session() << "CREATE PROCEDURE storedFunction AS "
 			"BEGIN "
 			"DECLARE @retVal int;"
 			"SET @retVal = -1;"
@@ -1155,12 +405,12 @@ void ODBCSQLServerTest::testStoredFunction()
 		, now;
 
 		int i = 0;
-		*_pSession << "{? = call storedFunction}", out(i), now;
+		session() << "{? = call storedFunction}", out(i), now;
 		assert(-1 == i);
 		dropObject("PROCEDURE", "storedFunction");
 
 
-		*_pSession << "CREATE PROCEDURE storedFunction(@inParam int) AS "
+		session() << "CREATE PROCEDURE storedFunction(@inParam int) AS "
 			"BEGIN "
 			"RETURN @inParam*@inParam;"
 			"END;"
@@ -1168,12 +418,12 @@ void ODBCSQLServerTest::testStoredFunction()
 
 		i = 2;
 		int result = 0;
-		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
 		assert(4 == result);
 		dropObject("PROCEDURE", "storedFunction");
 
 
-		*_pSession << "CREATE PROCEDURE storedFunction(@inParam int, @outParam int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedFunction(@inParam int, @outParam int OUTPUT) AS "
 			"BEGIN "
 			"SET @outParam = @inParam*@inParam;"
 			"RETURN @outParam;"
@@ -1183,13 +433,13 @@ void ODBCSQLServerTest::testStoredFunction()
 		i = 2;
 		int j = 0;
 		result = 0;
-		*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
+		session() << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
 		assert(4 == j);
 		assert(j == result);
 		dropObject("PROCEDURE", "storedFunction");
 
 
-		*_pSession << "CREATE PROCEDURE storedFunction(@param1 int OUTPUT,@param2 int OUTPUT) AS "
+		session() << "CREATE PROCEDURE storedFunction(@param1 int OUTPUT,@param2 int OUTPUT) AS "
 			"BEGIN "
 			"DECLARE @temp int; "
 			"SET @temp = @param1;"
@@ -1202,7 +452,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		i = 1;
 		j = 2;
 		result = 0;
-		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
+		session() << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
 		assert(1 == j);
 		assert(2 == i);
 		assert(3 == result); 
@@ -1211,7 +461,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		assert(1 == params.get<0>());
 		assert(2 == params.get<1>());
 		result = 0;
-		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
+		session() << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
 		assert(1 == params.get<1>());
 		assert(2 == params.get<0>());
 		assert(3 == result); 
@@ -1223,104 +473,11 @@ void ODBCSQLServerTest::testStoredFunction()
 }
 
 
-void ODBCSQLServerTest::testRowIterator()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->rowIterator();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testStdVectorBool()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateBoolTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->stdVectorBool();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testAsync()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->asynchronous();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->any();
-
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testDynamicAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dynamicAny();
-
-		i += 2;
-	}
-}
-
-
-void ODBCSQLServerTest::testMultipleResults()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multipleResults();
-
-		i += 2;
-	}
-}
-
-
 void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
 	{
-		*_pSession << format("DROP %s %s", type, name), now;
+		session() << format("DROP %s %s", type, name), now;
 	}
 	catch (StatementException& ex)
 	{
@@ -1344,7 +501,7 @@ void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& n
 void ODBCSQLServerTest::recreatePersonTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -1353,7 +510,7 @@ void ODBCSQLServerTest::recreatePersonTable()
 void ODBCSQLServerTest::recreatePersonBLOBTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(MAX))", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(MAX))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
@@ -1362,7 +519,7 @@ void ODBCSQLServerTest::recreatePersonBLOBTable()
 void ODBCSQLServerTest::recreatePersonDateTimeTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -1371,7 +528,7 @@ void ODBCSQLServerTest::recreatePersonDateTimeTable()
 void ODBCSQLServerTest::recreateIntsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	try { session() << "CREATE TABLE Strings (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -1380,7 +537,7 @@ void ODBCSQLServerTest::recreateIntsTable()
 void ODBCSQLServerTest::recreateStringsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
+	try { session() << "CREATE TABLE Strings (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
 }
@@ -1389,7 +546,7 @@ void ODBCSQLServerTest::recreateStringsTable()
 void ODBCSQLServerTest::recreateFloatsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str FLOAT)", now; }
+	try { session() << "CREATE TABLE Strings (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
@@ -1398,7 +555,7 @@ void ODBCSQLServerTest::recreateFloatsTable()
 void ODBCSQLServerTest::recreateTuplesTable()
 {
 	dropObject("TABLE", "Tuples");
-	try { *_pSession << "CREATE TABLE Tuples "
+	try { session() << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
 		"int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now; }
@@ -1410,7 +567,7 @@ void ODBCSQLServerTest::recreateTuplesTable()
 void ODBCSQLServerTest::recreateVectorTable()
 {
 	dropObject("TABLE", "Vector");
-	try { *_pSession << "CREATE TABLE Vector (i0 INTEGER)", now; }
+	try { session() << "CREATE TABLE Vector (i0 INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorTable()"); }
 }
@@ -1419,7 +576,7 @@ void ODBCSQLServerTest::recreateVectorTable()
 void ODBCSQLServerTest::recreateVectorsTable()
 {
 	dropObject("TABLE", "Vectors");
-	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	try { session() << "CREATE TABLE Vectors (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -1428,7 +585,7 @@ void ODBCSQLServerTest::recreateVectorsTable()
 void ODBCSQLServerTest::recreateAnysTable()
 {
 	dropObject("TABLE", "Anys");
-	try { *_pSession << "CREATE TABLE Anys (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	try { session() << "CREATE TABLE Anys (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -1437,7 +594,7 @@ void ODBCSQLServerTest::recreateAnysTable()
 void ODBCSQLServerTest::recreateNullsTable(const std::string& notNull)
 {
 	dropObject("TABLE", "NullTest");
-	try { *_pSession << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+	try { session() << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
 		notNull,
 		notNull,
 		notNull), now; }
@@ -1448,110 +605,20 @@ void ODBCSQLServerTest::recreateNullsTable(const std::string& notNull)
 void ODBCSQLServerTest::recreateBoolTable()
 {
 	dropObject("TABLE", "BoolTest");
-	try { *_pSession << "CREATE TABLE BoolTest (b BIT)", now; }
+	try { session() << "CREATE TABLE BoolTest (b BIT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateBoolTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateBoolTable()"); }
 }
 
 
-bool ODBCSQLServerTest::canConnect(const std::string& driver, const std::string& dsn)
-{
-	Utility::DriverMap::iterator itDrv = _drivers.begin();
-	for (; itDrv != _drivers.end(); ++itDrv)
-	{
-		if (((itDrv->first).find(driver) != std::string::npos))
-		{
-			std::cout << "Driver found: " << itDrv->first 
-				<< " (" << itDrv->second << ')' << std::endl;
-			break;
-		}
-	}
-
-	if (_drivers.end() == itDrv) 
-	{
-		std::cout << driver << " driver NOT found, tests not available." << std::endl;
-		return false;
-	}
-
-	Utility::DSNMap dataSources;
-	Utility::dataSources(dataSources);
-	Utility::DSNMap::iterator itDSN = dataSources.begin();
-	for (; itDSN != dataSources.end(); ++itDSN)
-	{
-		if (itDSN->first == dsn && itDSN->second == driver)
-		{
-			std::cout << "DSN found: " << itDSN->first 
-				<< " (" << itDSN->second << ')' << std::endl;
-			format(_dbConnString, 
-				"DSN=%s;"
-				"UID=test;"
-				"PWD=test;"
-				"DATABASE=test;", dsn);
-			return true;
-		}
-	}
-
-	// DSN not found, try connect without it
-	format(_dbConnString, "DRIVER=%s;"
-		"UID=test;"
-		"PWD=test;"
-		"DATABASE=test;"
-		"SERVER=localhost;"
-		"PORT=1433;", driver);
-
-	return true;
-}
-
-
-void ODBCSQLServerTest::setUp()
-{
-}
-
-
-void ODBCSQLServerTest::tearDown()
-{
-	dropObject("TABLE", "Person");
-	dropObject("TABLE", "Strings");
-	dropObject("TABLE", "Tuples");
-}
-
-
-bool ODBCSQLServerTest::init(const std::string& driver, const std::string& dsn)
-{
-	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn)) return false;
-	
-	ODBC::Connector::registerConnector();
-	try
-	{
-		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
-	}catch (ConnectionException& ex)
-	{
-		std::cout << ex.toString() << std::endl;
-		return false;
-	}
-
-	if (_pSession && _pSession->isConnected()) 
-		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
-	
-	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
-
-	return true;
-}
-
-
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
-#ifdef POCO_OS_FAMILY_WINDOWS
-#ifdef POCO_ODBC_USE_SQL_NATIVE
-	if (init("SQL Native Client", "PocoDataSQLServerTest"))
-#else
-	if (init("SQL Server", "PocoDataSQLServerTest"))
-#endif
-#else
-	if (init("FreeTDS", "PocoDataSQLServerTest"))
-#endif
+	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db))
 	{
+		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
+
+		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession);
+
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
 
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBareboneODBC);

@@ -51,7 +51,7 @@ Preparation::Preparation(const StatementHandle& rStmt,
 	_maxFieldSize(maxFieldSize),
 	_dataExtraction(dataExtraction)
 {
-	POCO_SQLCHAR* pStr = (POCO_SQLCHAR*) statement.c_str();
+	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
 	if (Utility::isError(SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
 		throw StatementException(_rStmt);
 }
@@ -161,6 +161,15 @@ void Preparation::prepareImpl(std::size_t pos)
 
 		case MetaColumn::FDT_BLOB:
 			return prepareRaw<char>(pos, SQL_C_BINARY, maxDataSize(pos));
+
+		case MetaColumn::FDT_DATE:
+			return prepareRaw<Date>(pos, SQL_C_TYPE_DATE, sizeof(SQL_DATE_STRUCT));
+
+		case MetaColumn::FDT_TIME:
+			return prepareRaw<Time>(pos, SQL_C_TYPE_TIME, sizeof(SQL_TIME_STRUCT));
+
+		case MetaColumn::FDT_TIMESTAMP:
+			return prepareRaw<Time>(pos, SQL_C_TYPE_TIMESTAMP, sizeof(SQL_TIMESTAMP_STRUCT));
 
 		default: 
 			throw DataFormatException("Unsupported data type.");

@@ -53,12 +53,12 @@ const TypeInfo Utility::_dataTypes;
 Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 {
 	static const EnvironmentHandle henv;
-	const int length = sizeof(POCO_SQLCHAR) * 512;
+	const int length = sizeof(SQLCHAR) * 512;
 
-	POCO_SQLCHAR desc[length];
+	SQLCHAR desc[length];
 	memset(desc, 0, length);
 	SQLSMALLINT len1 = length;
-	POCO_SQLCHAR attr[length];
+	SQLCHAR attr[length];
 	memset(attr, 0, length);
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
@@ -89,13 +89,13 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 {
 	static const EnvironmentHandle henv;
-	const int length = sizeof(POCO_SQLCHAR) * 512;
-	const int dsnLength = sizeof(POCO_SQLCHAR) * (SQL_MAX_DSN_LENGTH + 1);
+	const int length = sizeof(SQLCHAR) * 512;
+	const int dsnLength = sizeof(SQLCHAR) * (SQL_MAX_DSN_LENGTH + 1);
 
-	POCO_SQLCHAR dsn[dsnLength];
+	SQLCHAR dsn[dsnLength];
 	memset(dsn, 0, dsnLength);
-	SQLSMALLINT len1 = sizeof(POCO_SQLCHAR) * SQL_MAX_DSN_LENGTH;
-	POCO_SQLCHAR desc[length];
+	SQLSMALLINT len1 = sizeof(SQLCHAR) * SQL_MAX_DSN_LENGTH;
+	SQLCHAR desc[length];
 	memset(desc, 0, length);
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;

@@ -17,9 +17,8 @@ $(error No ODBC library found. Please install unixODBC or iODBC and try again)
 endif
 
 objects = ODBCTestSuite Driver \
-	ODBCDB2Test ODBCMySQLTest ODBCOracleTest \
-	ODBCPostgreSQLTest ODBCSQLiteTest ODBCSQLServerTest \
-	SQLExecutor
+	ODBCDB2Test ODBCMySQLTest ODBCOracleTest ODBCPostgreSQLTest \
+	ODBCSQLiteTest ODBCSQLServerTest ODBCTest SQLExecutor
 
 target         = testrunner
 target_version = 1

@@ -37,18 +37,14 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/Session.h"
-#include "Poco/Data/ODBC/Utility.h"
-#include "Poco/SharedPtr.h"
-#include "CppUnit/TestCase.h"
-#include "SQLExecutor.h"
+#include "ODBCTest.h"
 
 
 // uncomment to use Mammoth ODBCng driver
-#define POCO_ODBC_USE_MAMMOTH_NG
+//#define POCO_ODBC_USE_MAMMOTH_NG
 
 
-class ODBCPostgreSQLTest: public CppUnit::TestCase
+class ODBCPostgreSQLTest: public ODBCTest
 	/// PostgreSQL ODBC test class
 	/// Tested:
 	/// 
@@ -67,95 +63,15 @@ public:
 
 	void testBareboneODBC();
 
-	void testSimpleAccess();
-	void testComplexType();
-
-	void testSimpleAccessVector();
-	void testComplexTypeVector();
-	void testInsertVector();
-	void testInsertEmptyVector();
-
-	void testSimpleAccessList();
-	void testComplexTypeList();
-	void testInsertList();
-	void testInsertEmptyList();
-
-	void testSimpleAccessDeque();
-	void testComplexTypeDeque();
-	void testInsertDeque();
-	void testInsertEmptyDeque();
-
-	void testInsertSingleBulk();
-	void testInsertSingleBulkVec();
-
-	void testLimit();
-	void testLimitOnce();
-	void testLimitPrepare();
-	void testLimitZero();
-	void testPrepare();
-	void testStep();
-
-	void testSetSimple();
-	void testSetComplex();
-	void testSetComplexUnique();
-	void testMultiSetSimple();
-	void testMultiSetComplex();
-	void testMapComplex();
-	void testMapComplexUnique();
-	void testMultiMapComplex();
-	void testSelectIntoSingle();
-	void testSelectIntoSingleStep();
-	void testSelectIntoSingleFail();
-	void testLowerLimitOk();
-	void testLowerLimitFail();
-	void testCombinedLimits();
-	void testCombinedIllegalLimits();
-	void testRange();
-	void testIllegalRange();
-	void testSingleSelect();
-	void testEmptyDB();
-
 	void testBLOB();
-	void testBLOBStmt();
-
-	void testDateTime();
-	void testDate();
-	void testTime();
-
-	void testFloat();
-	void testDouble();
-
-	void testTuple();
-	void testTupleVector();
-
-	void testInternalExtraction();
-	void testInternalStorageType();
 
 	void testStoredFunction();
 	void testStoredFunctionAny();
 	void testStoredFunctionDynamicAny();
 
-	void testNull();
-	void testRowIterator();
-	void testStdVectorBool();
-
-	void testAsync();
-
-	void testAny();
-	void testDynamicAny();
-
-	void testMultipleResults();
-
-	void setUp();
-	void tearDown();
-
 	static CppUnit::Test* suite();
 
 private:
-	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
-	typedef Poco::SharedPtr<Poco::Data::Session> SessionPtr;
-	typedef Poco::SharedPtr<SQLExecutor>         ExecPtr;
-
 	void dropObject(const std::string& type, const std::string& name);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
@@ -170,9 +86,6 @@ private:
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull="");
 	void recreateBoolTable();
-
-	static bool init(const std::string& driver, const std::string& dsn);
-	static bool canConnect(const std::string& driver, const std::string& dsn);
 	
 	void configurePLPgSQL();
 		/// Configures PL/pgSQL in the database. A reasonable defaults
@@ -182,17 +95,19 @@ private:
 		/// modify the function and recompile.
 		/// Alternative is direct database configuration for PL/pgSQL usage.
 
-	static Drivers     _drivers;
-	static std::string _dbConnString;
-	static SessionPtr  _pSession;
-	static ExecPtr     _pExecutor;
-	static const bool  bindValues[8];
-
-	static const std::string libDir;
+	static const std::string _libDir;
 		/// Varible determining the location of the library directory
 		/// on the database installation system.
 		/// Used to enable PLpgSQL language programmaticaly when
 		/// it is not enabled.
+
+	static SessionPtr  _pSession;
+	static ExecPtr     _pExecutor;
+	static std::string _driver;
+	static std::string _dsn;
+	static std::string _uid;
+	static std::string _pwd;
+	static std::string _connectString;
 };
 
 

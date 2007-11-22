@@ -36,7 +36,6 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
-#include "Poco/Data/Common.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/ODBC/Connector.h"
@@ -57,16 +56,23 @@ using Poco::format;
 using Poco::NotFoundException;
 
 
-ODBCSQLiteTest::SessionPtr  ODBCSQLiteTest::_pSession = 0;
-ODBCSQLiteTest::ExecPtr ODBCSQLiteTest::_pExecutor = 0;
-std::string                 ODBCSQLiteTest::_dbConnString;
-ODBCSQLiteTest::Drivers     ODBCSQLiteTest::_drivers;
-const bool                  ODBCSQLiteTest::bindValues[8] = 
-	{true, true, true, false, false, true, false, false};
+#define SQLITE_ODBC_DRIVER "SQLite3 ODBC Driver"
+#define SQLITE_DSN "PocoDataSQLiteTest"
+#define SQLITE_DB "dummy.db"
+
+
+ODBCTest::SessionPtr ODBCSQLiteTest::_pSession;
+ODBCTest::ExecPtr    ODBCSQLiteTest::_pExecutor;
+std::string          ODBCSQLiteTest::_driver = SQLITE_ODBC_DRIVER;
+std::string          ODBCSQLiteTest::_dsn = SQLITE_DSN;
+std::string          ODBCSQLiteTest::_uid = "";
+std::string          ODBCSQLiteTest::_pwd = "";
+std::string          ODBCSQLiteTest::_connectString = "Driver=" SQLITE_ODBC_DRIVER 
+	";Database=" SQLITE_DB ";";
 
 
 ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name): 
-	CppUnit::TestCase(name)
+	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
 
@@ -78,8 +84,6 @@ ODBCSQLiteTest::~ODBCSQLiteTest()
 
 void ODBCSQLiteTest::testBareboneODBC()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	std::string tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
@@ -88,10 +92,10 @@ void ODBCSQLiteTest::testBareboneODBC()
 		"Fifth REAL,"
 		"Sixth TIMESTAMP)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
@@ -101,10 +105,10 @@ void ODBCSQLiteTest::testBareboneODBC()
 		"Fifth REAL,"
 		"Sixth DATETIME)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
@@ -114,779 +118,10 @@ void ODBCSQLiteTest::testBareboneODBC()
 		"Fifth REAL,"
 		"Sixth DATE)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
-}
-
-
-void ODBCSQLiteTest::testSimpleAccess()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::string tableName("Person");
-	std::string result;
-
-	_pSession->setFeature("autoBind", false);
-
-	recreatePersonTable();
-
-	try { *_pSession << "SELECT name FROM sqlite_master WHERE tbl_name=?", into(result), use(tableName), now; }
-	catch(StatementException& ex) {	std::cout << ex.toString() << std::endl; }
-
-	assert (result == tableName);
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccess();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testComplexType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexType();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testSimpleAccessVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessVector();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testComplexTypeVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testInsertVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testInsertEmptyVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testSimpleAccessList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessList();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testComplexTypeList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeList();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testInsertList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertList();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testInsertEmptyList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyList();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testSimpleAccessDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessDeque();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testComplexTypeDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testInsertDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testInsertEmptyDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testInsertSingleBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulk();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testInsertSingleBulkVec()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulkVec();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testLimit()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limits();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testLimitZero()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitZero();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testLimitOnce()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	recreateIntsTable();
-	_pExecutor->limitOnce();
-	
-}
-
-
-void ODBCSQLiteTest::testLimitPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitPrepare();
-		i += 2;
-	}
-}
-
-
-
-void ODBCSQLiteTest::testPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->prepare();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::cout << std::endl << "SQLite" << std::endl;
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		std::string mode = bindValues[i+1] ? "auto" : "manual";
-		std::cout << "Extraction: " << mode << std::endl;
-		_pExecutor->doStep(1000, 1);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 10);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 100);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 1000);
-
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testSetComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplexUnique();
-		i += 2;
-	}
-}
-
-void ODBCSQLiteTest::testMultiSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testMultiSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetComplex();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testMapComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplexUnique();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testMultiMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiMapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testSelectIntoSingle()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingle();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testSelectIntoSingleStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleStep();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testSelectIntoSingleFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleFail();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testLowerLimitOk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitOk();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testSingleSelect()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->singleSelect();
-		i += 2;
-	}	
-}
-
-
-void ODBCSQLiteTest::testLowerLimitFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitFail();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testCombinedLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCSQLiteTest::testRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->ranges();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testCombinedIllegalLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedIllegalLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCSQLiteTest::testIllegalRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->illegalRange();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testEmptyDB()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->emptyDB();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testBLOB()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blob();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testBLOBStmt()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blobStmt();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testDateTime()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonDateTimeTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dateTime();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testFloat()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->floats();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testDouble()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->doubles();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testTuple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tuples();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testTupleVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tupleVector();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testInternalExtraction()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalExtraction();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testInternalStorageType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalStorageType();
-		i += 2;
-	}
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 }
 
 
@@ -898,81 +133,9 @@ void ODBCSQLiteTest::testNull()
 	for (int i = 0; i < 8;)
 	{
 		recreateNullsTable("NOT NULL");
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->notNulls("HY000");
-		i += 2;
-	}
-
-	// test for null insertion
-	for (int i = 0; i < 8;)
-	{
-		recreateNullsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->nulls();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testRowIterator()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->rowIterator();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testAsync()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->asynchronous();
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->any();
-
-		i += 2;
-	}
-}
-
-
-void ODBCSQLiteTest::testDynamicAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dynamicAny();
-
 		i += 2;
 	}
 }
@@ -982,7 +145,7 @@ void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name
 {
 	try
 	{
-		*_pSession << format("DROP %s %s", type, name), now;
+		session() << format("DROP %s %s", type, name), now;
 	}
 	catch (StatementException& ex)
 	{
@@ -1006,7 +169,7 @@ void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name
 void ODBCSQLiteTest::recreatePersonTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR2(30), FirstName VARCHAR2(30), Address VARCHAR2(30), Age INTEGER)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -1015,7 +178,7 @@ void ODBCSQLiteTest::recreatePersonTable()
 void ODBCSQLiteTest::recreatePersonBLOBTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
@@ -1024,7 +187,7 @@ void ODBCSQLiteTest::recreatePersonBLOBTable()
 void ODBCSQLiteTest::recreatePersonDateTimeTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -1033,7 +196,7 @@ void ODBCSQLiteTest::recreatePersonDateTimeTable()
 void ODBCSQLiteTest::recreateIntsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	try { session() << "CREATE TABLE Strings (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -1042,7 +205,7 @@ void ODBCSQLiteTest::recreateIntsTable()
 void ODBCSQLiteTest::recreateStringsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
+	try { session() << "CREATE TABLE Strings (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
 }
@@ -1051,7 +214,7 @@ void ODBCSQLiteTest::recreateStringsTable()
 void ODBCSQLiteTest::recreateFloatsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str REAL)", now; }
+	try { session() << "CREATE TABLE Strings (str REAL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
@@ -1060,7 +223,7 @@ void ODBCSQLiteTest::recreateFloatsTable()
 void ODBCSQLiteTest::recreateTuplesTable()
 {
 	dropObject("TABLE", "Tuples");
-	try { *_pSession << "CREATE TABLE Tuples "
+	try { session() << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
 		"int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now; }
@@ -1072,7 +235,7 @@ void ODBCSQLiteTest::recreateTuplesTable()
 void ODBCSQLiteTest::recreateVectorsTable()
 {
 	dropObject("TABLE", "Vectors");
-	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now; }
+	try { session() << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -1081,7 +244,7 @@ void ODBCSQLiteTest::recreateVectorsTable()
 void ODBCSQLiteTest::recreateAnysTable()
 {
 	dropObject("TABLE", "Anys");
-	try { *_pSession << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now; }
+	try { session() << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -1090,7 +253,7 @@ void ODBCSQLiteTest::recreateAnysTable()
 void ODBCSQLiteTest::recreateNullsTable(const std::string& notNull)
 {
 	dropObject("TABLE", "NullTest");
-	try { *_pSession << format("CREATE TABLE NullTest (i INTEGER %s, r REAL %s, v VARCHAR(30) %s)",
+	try { session() << format("CREATE TABLE NullTest (i INTEGER %s, r REAL %s, v VARCHAR(30) %s)",
 		notNull,
 		notNull,
 		notNull), now; }
@@ -1099,87 +262,14 @@ void ODBCSQLiteTest::recreateNullsTable(const std::string& notNull)
 }
 
 
-bool ODBCSQLiteTest::canConnect(const std::string& driver, const std::string& dsn)
-{
-	Utility::DriverMap::iterator itDrv = _drivers.begin();
-	for (; itDrv != _drivers.end(); ++itDrv)
-	{
-		if (((itDrv->first).find(driver) != std::string::npos))
-		{
-			std::cout << "Driver found: " << itDrv->first 
-				<< " (" << itDrv->second << ')' << std::endl;
-			break;
-		}
-	}
-
-	if (_drivers.end() == itDrv) 
-	{
-		std::cout << driver << " driver NOT found, tests not available." << std::endl;
-		return false;
-	}
-
-	Utility::DSNMap dataSources;
-	Utility::dataSources(dataSources);
-	Utility::DSNMap::iterator itDSN = dataSources.begin();
-	for (; itDSN != dataSources.end(); ++itDSN)
-	{
-		if (itDSN->first == dsn && itDSN->second == driver)
-		{
-			std::cout << "DSN found: " << itDSN->first 
-				<< " (" << itDSN->second << ')' << std::endl;
-			format(_dbConnString, "DSN=%s", dsn);
-			return true;
-		}
-	}
-
-	// DSN not found, try connect without it
-	format(_dbConnString, "Driver=%s;Database=dummy.db;", driver);
-
-	return true;
-}
-
-
-void ODBCSQLiteTest::setUp()
-{
-}
-
-
-void ODBCSQLiteTest::tearDown()
-{
-	dropObject("TABLE", "Person");
-	dropObject("TABLE", "Strings");
-	dropObject("TABLE", "Tuples");
-}
-
-
-bool ODBCSQLiteTest::init(const std::string& driver, const std::string& dsn)
-{
-	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn)) return false;
-	
-	ODBC::Connector::registerConnector();
-	try
-	{
-		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
-	}catch (ConnectionException& ex)
-	{
-		std::cout << ex.toString() << std::endl;
-		return false;
-	}
-
-	if (_pSession && _pSession->isConnected()) 
-		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
-	
-	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
-
-	return true;
-}
-
-
 CppUnit::Test* ODBCSQLiteTest::suite()
 {
-	if (init("SQLite3 ODBC Driver", "PocoDataSQLiteTest"))
+	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
 	{
+		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
+
+		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession);
+
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLiteTest");
 
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);

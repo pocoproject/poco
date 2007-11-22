@@ -72,13 +72,13 @@ public:
 	~Date();
 		/// Destroys the Date.
 
-	Poco::UInt32 year() const;
+	int year() const;
 		/// Returns the year.
 
-	Poco::UInt32 month() const;
+	int month() const;
 		/// Returns the month.
 
-	Poco::UInt32 day() const;
+	int day() const;
 		/// Returns the day.
 
 	void assign(int year, int month, int day);
@@ -109,19 +109,19 @@ private:
 //
 // inlines
 //
-inline Poco::UInt32 Date::year() const
+inline int Date::year() const
 {
 	return _year;
 }
 
 
-inline Poco::UInt32 Date::month() const
+inline int Date::month() const
 {
 	return _month;
 }
 
 
-inline Poco::UInt32 Date::day() const
+inline int Date::day() const
 {
 	return _day;
 }

@@ -33,57 +33,96 @@
 #include "ODBCPostgreSQLTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Poco/String.h"
+#include "ODBCTest.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
-#include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
-#include "Poco/Exception.h"
-#include "Poco/Data/Common.h"
-#include "Poco/Data/BLOB.h"
-#include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/ODBC/Connector.h"
-#include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
-#include "Poco/Data/ODBC/ODBCStatementImpl.h"
-#include <sqltypes.h>
 #include <iostream>
 
 
 using namespace Poco::Data;
-using ODBC::Utility;
-using ODBC::ODBCException;
 using ODBC::ConnectionException;
 using ODBC::StatementException;
 using ODBC::StatementDiagnostics;
 using Poco::format;
-using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::DateTime;
-using Poco::NotFoundException;
 
 
-ODBCPostgreSQLTest::SessionPtr  ODBCPostgreSQLTest::_pSession = 0;
-ODBCPostgreSQLTest::ExecPtr ODBCPostgreSQLTest::_pExecutor = 0;
-std::string                     ODBCPostgreSQLTest::_dbConnString;
-ODBCPostgreSQLTest::Drivers     ODBCPostgreSQLTest::_drivers;
-const bool                      ODBCPostgreSQLTest::bindValues[8] = 
-	{true, true, true, false, false, true, false, false};
+#ifdef POCO_ODBC_USE_MAMMOTH_NG
+	#define POSTGRESQL_ODBC_DRIVER "Mammoth ODBCng Beta"
+#elif defined (POCO_OS_FAMILY_WINDOWS) && defined (POCO_WIN32_UTF8)
+	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL Unicode"
+#else
+	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI"
+#endif
+#define POSTGRESQL_DSN "PocoDataPgSQLTest"
+#define POSTGRESQL_SERVER "localhost"
+#define POSTGRESQL_PORT "5432"
+#define POSTGRESQL_DB "postgres"
+#define POSTGRESQL_UID "postgres"
+#define POSTGRESQL_PWD "postgres"
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-const std::string ODBCPostgreSQLTest::libDir = "C:\\\\Program Files\\\\PostgreSQL\\\\8.2\\\\lib\\\\";
+const std::string ODBCPostgreSQLTest::_libDir = "C:\\\\Program Files\\\\PostgreSQL\\\\8.2\\\\lib\\\\";
 #else
-const std::string ODBCPostgreSQLTest::libDir = "/usr/local/pgsql/lib/";
+const std::string ODBCPostgreSQLTest::_libDir = "/usr/local/pgsql/lib/";
 #endif
 
 
+ODBCTest::SessionPtr ODBCPostgreSQLTest::_pSession;
+ODBCTest::ExecPtr    ODBCPostgreSQLTest::_pExecutor;
+std::string          ODBCPostgreSQLTest::_driver = POSTGRESQL_ODBC_DRIVER;
+std::string          ODBCPostgreSQLTest::_dsn = POSTGRESQL_DSN;
+std::string          ODBCPostgreSQLTest::_uid = POSTGRESQL_UID;
+std::string          ODBCPostgreSQLTest::_pwd = POSTGRESQL_PWD;
+std::string ODBCPostgreSQLTest::_connectString = 
+	"DRIVER=" POSTGRESQL_ODBC_DRIVER ";"
+	"DATABASE=" POSTGRESQL_DB ";"
+	"SERVER=" POSTGRESQL_SERVER ";"
+	"PORT=" POSTGRESQL_PORT ";"
+	"UID=" POSTGRESQL_UID ";"
+	"PWD=" POSTGRESQL_PWD ";"
+	"SSLMODE=prefer;"
+	"LowerCaseIdentifier=0;"
+	"UseServerSidePrepare=0;"
+	"ByteaAsLongVarBinary=1;"
+	"BI=0;"
+	"TrueIsMinus1=0;"
+	"DisallowPremature=0;"
+	"UpdatableCursors=0;"
+	"LFConversion=1;"
+	"CancelAsFreeStmt=0;"
+	"Parse=0;"
+	"BoolsAsChar=1;"
+	"UnknownsAsLongVarchar=0;"
+	"TextAsLongVarchar=1;"
+	"UseDeclareFetch=0;"
+	"Ksqo=1;"
+	"Optimizer=1;"
+	"CommLog=0;"
+	"Debug=0;"
+	"MaxLongVarcharSize=8190;"
+	"MaxVarcharSize=254;"
+	"UnknownSizes=0;"
+	"Socket=8192;"
+	"Fetch=100;"
+	"ConnSettings=;"
+	"ShowSystemTables=0;"
+	"RowVersioning=0;"
+	"ShowOidColumn=0;"
+	"FakeOidIndex=0;"
+	"ReadOnly=0;";
+
+
 ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name): 
-	CppUnit::TestCase(name)
+	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
 
@@ -95,8 +134,6 @@ ODBCPostgreSQLTest::~ODBCPostgreSQLTest()
 
 void ODBCPostgreSQLTest::testBareboneODBC()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	std::string tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
@@ -105,10 +142,10 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth TIMESTAMP)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
@@ -118,10 +155,10 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATE)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, false);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, false);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, false);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, false);
+	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, false);
+	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, false);
+	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, false);
+	executor().bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, false);
 
 //neither pSQL ODBC nor Mammoth drivers support multiple results properly
 /*
@@ -130,838 +167,37 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 		"Second INTEGER,"
 		"Third FLOAT)";
 
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCMultiResultTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 */
 }
 
 
-void ODBCPostgreSQLTest::testSimpleAccess()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::string tableName("Person");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccess();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testComplexType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexType();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testSimpleAccessVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessVector();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testComplexTypeVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeVector();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testInsertVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testInsertEmptyVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testSimpleAccessList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessList();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testComplexTypeList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeList();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testInsertList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertList();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testInsertEmptyList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyList();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testSimpleAccessDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessDeque();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testComplexTypeDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testInsertDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testInsertEmptyDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testInsertSingleBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulk();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testInsertSingleBulkVec()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulkVec();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testLimit()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limits();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testLimitZero()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitZero();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testLimitOnce()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	recreateIntsTable();
-	_pExecutor->limitOnce();
-	
-}
-
-
-void ODBCPostgreSQLTest::testLimitPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitPrepare();
-		i += 2;
-	}
-}
-
-
-
-void ODBCPostgreSQLTest::testPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->prepare();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::cout << std::endl << "PostgreSQL" << std::endl;
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		std::string mode = bindValues[i+1] ? "auto" : "manual";
-		std::cout << "Extraction: " << mode << std::endl;
-		_pExecutor->doStep(1000, 1);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 10);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 100);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 1000);
-
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testSetComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplexUnique();
-		i += 2;
-	}
-}
-
-void ODBCPostgreSQLTest::testMultiSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testMultiSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetComplex();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testMapComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplexUnique();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testMultiMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiMapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testSelectIntoSingle()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingle();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testSelectIntoSingleStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleStep();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testSelectIntoSingleFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleFail();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testLowerLimitOk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitOk();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testSingleSelect()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->singleSelect();
-		i += 2;
-	}	
-}
-
-
-void ODBCPostgreSQLTest::testLowerLimitFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitFail();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testCombinedLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCPostgreSQLTest::testRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->ranges();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testCombinedIllegalLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedIllegalLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCPostgreSQLTest::testIllegalRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->illegalRange();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testEmptyDB()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->emptyDB();
-		i += 2;
-	}
-}
-
 
 void ODBCPostgreSQLTest::testBLOB()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	const std::size_t maxFldSize = 1000000;
-	_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
+	session().setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
 	recreatePersonBLOBTable();
 
 	try
 	{
-		_pExecutor->blob(maxFldSize);
+		executor().blob(maxFldSize);
 		fail ("must fail");
 	}
 	catch (DataException&) 
 	{
-		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
+		session().setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
 
 	for (int i = 0; i < 8;)
 	{
 		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blob(1000000);
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testBLOBStmt()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blobStmt();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testDateTime()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonDateTimeTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dateTime();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testDate()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonDateTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->date();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testTime()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTimeTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->time();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testFloat()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->floats();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testDouble()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->doubles();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testTuple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tuples();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testTupleVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tupleVector();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testInternalExtraction()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalExtraction();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testInternalStorageType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalStorageType();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testNull()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	// test for NOT NULL violation exception
-	for (int i = 0; i < 8;)
-	{
-		recreateNullsTable("NOT NULL");
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->notNulls();
-		i += 2;
-	}
-
-	// test for null insertion
-	for (int i = 0; i < 8;)
-	{
-		recreateNullsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->nulls();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		executor().blob(1000000);
 		i += 2;
 	}
 }
@@ -971,57 +207,87 @@ void ODBCPostgreSQLTest::testStoredFunction()
 {
 	configurePLPgSQL();
 
+	std::string func("testStoredFunction()");
+
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
-		*_pSession << "CREATE FUNCTION storedFunction() RETURNS INTEGER AS '"
-			"BEGIN "
-			" return -1; "
-			"END;'"
-			"LANGUAGE 'plpgsql'", now;
+		dropObject("FUNCTION", "storedFunction()");
+		try 
+		{
+			session() << "CREATE FUNCTION storedFunction() RETURNS INTEGER AS '"
+				"BEGIN "
+				" return -1; "
+				"END;'"
+				"LANGUAGE 'plpgsql'", now;
+		}
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (func); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (func); }
 
 		int i = 0;
-		*_pSession << "{? = call storedFunction()}", out(i), now;
+		session() << "{? = call storedFunction()}", out(i), now;
 		assert(-1 == i);
 		dropObject("FUNCTION", "storedFunction()");
 
-		*_pSession << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
-			"BEGIN "
-			" RETURN $1 * $1; "
-			"END;'"
-			"LANGUAGE 'plpgsql'" , now;
+		try 
+		{
+			session() << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
+				"BEGIN "
+				" RETURN $1 * $1; "
+				"END;'"
+				"LANGUAGE 'plpgsql'" , now;
+		}
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (func); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (func); }
 
 		i = 2;
 		int result = 0;
-		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
 		assert(4 == result);
 		dropObject("FUNCTION", "storedFunction(INTEGER)");
 
-
-		*_pSession << "CREATE FUNCTION storedFunction(TIMESTAMP) RETURNS TIMESTAMP AS '"
-			"BEGIN "
-			" RETURN $1; "
-			"END;'"
-			"LANGUAGE 'plpgsql'" , now;
+		dropObject("FUNCTION", "storedFunction(TIMESTAMP)");
+		try 
+		{
+			session() << "CREATE FUNCTION storedFunction(TIMESTAMP) RETURNS TIMESTAMP AS '"
+				"BEGIN "
+				" RETURN $1; "
+				"END;'"
+				"LANGUAGE 'plpgsql'" , now;
+		}
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (func); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (func); }
 
 		DateTime dtIn(1965, 6, 18, 5, 35, 1);
 		DateTime dtOut;
-		*_pSession << "{? = call storedFunction(?)}", out(dtOut), in(dtIn), now;
+		session() << "{? = call storedFunction(?)}", out(dtOut), in(dtIn), now;
 		assert(dtOut == dtIn);
 		dropObject("FUNCTION", "storedFunction(TIMESTAMP)");
 
-		*_pSession << "CREATE FUNCTION storedFunction(TEXT,TEXT) RETURNS TEXT AS '"
-			"BEGIN "
-			" RETURN $1 || '', '' || $2 || ''!'';"
-			"END;'"
-			"LANGUAGE 'plpgsql'" , now;
+		dropObject("FUNCTION", "storedFunction(TEXT, TEXT)");
+		try 
+		{
+			session() << "CREATE FUNCTION storedFunction(TEXT,TEXT) RETURNS TEXT AS '"
+				"BEGIN "
+				" RETURN $1 || '', '' || $2 || ''!'';"
+				"END;'"
+				"LANGUAGE 'plpgsql'" , now; 
+		}
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (func); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (func); }
 		
 		std::string param1 = "Hello";
 		std::string param2 = "world";
 		std::string ret;
-		*_pSession << "{? = call storedFunction(?,?)}", out(ret), in(param1), in(param2), now;
+		try 
+		{
+			session() << "{? = call storedFunction(?,?)}", out(ret), in(param1), in(param2), now; 
+		}
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (func); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (func); }
+
 		assert(ret == "Hello, world!");
 		dropObject("FUNCTION", "storedFunction(TEXT, TEXT)");
 
@@ -1032,9 +298,7 @@ void ODBCPostgreSQLTest::testStoredFunction()
 
 void ODBCPostgreSQLTest::testStoredFunctionAny()
 {
-	if (!_pSession) fail ("Test not available.");
-
-	*_pSession << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
+	session() << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
 			"BEGIN "
 			" RETURN $1 * $1; "
 			"END;'"
@@ -1042,12 +306,12 @@ void ODBCPostgreSQLTest::testStoredFunctionAny()
 
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		Any i = 2;
 		Any result = 0;
-		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
 		assert(4 == AnyCast<int>(result));
 
 		k += 2;
@@ -1059,9 +323,7 @@ void ODBCPostgreSQLTest::testStoredFunctionAny()
 
 void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 {
-	if (!_pSession) fail ("Test not available.");
-
-	*_pSession << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
+	session() << "CREATE FUNCTION storedFunction(INTEGER) RETURNS INTEGER AS '"
 			"BEGIN "
 			" RETURN $1 * $1; "
 			"END;'"
@@ -1069,12 +331,12 @@ void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		DynamicAny i = 2;
 		DynamicAny result = 0;
-		*_pSession << "{? = call storedFunction(?)}", out(result), in(i), now;
+		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
 		assert(4 == result);
 
 		k += 2;
@@ -1084,121 +346,16 @@ void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 }
 
 
-void ODBCPostgreSQLTest::testRowIterator()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->rowIterator();
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testStdVectorBool()
-{
-
-// psqlODBC driver returns string for bool fields
-// even when field is explicitly cast to boolean,
-// so this functionality seems to be untestable with it
-
-#ifdef POCO_ODBC_USE_MAMMOTH_NG
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateBoolTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->stdVectorBool();
-		i += 2;
-	}
-#endif // POCO_ODBC_USE_MAMMOTH_NG
-}
-
-
-void ODBCPostgreSQLTest::testAsync()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->asynchronous(2000);
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->any();
-
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testDynamicAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dynamicAny();
-
-		i += 2;
-	}
-}
-
-
-void ODBCPostgreSQLTest::testMultipleResults()
-{
-//neither pSQL ODBC nor Mammoth drivers support multiple results properly
-/*
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multipleResults();
-
-		i += 2;
-	}
-*/
-}
-
-
 void ODBCPostgreSQLTest::configurePLPgSQL()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	try
 	{
-		*_pSession << format("CREATE FUNCTION plpgsql_call_handler () "
+		session() << format("CREATE FUNCTION plpgsql_call_handler () "
 			"RETURNS OPAQUE "
 			"AS '%splpgsql.dll' "
-			"LANGUAGE 'C';", libDir), now;
+			"LANGUAGE 'C';", _libDir), now;
 		
-		*_pSession << "CREATE LANGUAGE 'plpgsql' "
+		session() << "CREATE LANGUAGE 'plpgsql' "
 			"HANDLER plpgsql_call_handler "
 			"LANCOMPILER 'PL/pgSQL'", now;
 
@@ -1216,7 +373,7 @@ void ODBCPostgreSQLTest::dropObject(const std::string& type, const std::string& 
 {
 	try
 	{
-		*_pSession << format("DROP %s %s", type, name), now;
+		session() << format("DROP %s %s", type, name), now;
 	}
 	catch (StatementException& ex)
 	{
@@ -1240,7 +397,7 @@ void ODBCPostgreSQLTest::dropObject(const std::string& type, const std::string& 
 void ODBCPostgreSQLTest::recreatePersonTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -1249,7 +406,7 @@ void ODBCPostgreSQLTest::recreatePersonTable()
 void ODBCPostgreSQLTest::recreatePersonBLOBTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BYTEA)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BYTEA)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
@@ -1259,7 +416,7 @@ void ODBCPostgreSQLTest::recreatePersonBLOBTable()
 void ODBCPostgreSQLTest::recreatePersonDateTimeTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born TIMESTAMP)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -1268,7 +425,7 @@ void ODBCPostgreSQLTest::recreatePersonDateTimeTable()
 void ODBCPostgreSQLTest::recreatePersonDateTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornDate DATE)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTable()"); }
 }
@@ -1277,7 +434,7 @@ void ODBCPostgreSQLTest::recreatePersonDateTable()
 void ODBCPostgreSQLTest::recreatePersonTimeTable()
 {
 	dropObject("TABLE", "Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), BornTime TIME)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTimeTable()"); }
 }
@@ -1286,7 +443,7 @@ void ODBCPostgreSQLTest::recreatePersonTimeTable()
 void ODBCPostgreSQLTest::recreateIntsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	try { session() << "CREATE TABLE Strings (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -1295,7 +452,7 @@ void ODBCPostgreSQLTest::recreateIntsTable()
 void ODBCPostgreSQLTest::recreateStringsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
+	try { session() << "CREATE TABLE Strings (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
 }
@@ -1304,7 +461,7 @@ void ODBCPostgreSQLTest::recreateStringsTable()
 void ODBCPostgreSQLTest::recreateFloatsTable()
 {
 	dropObject("TABLE", "Strings");
-	try { *_pSession << "CREATE TABLE Strings (str FLOAT)", now; }
+	try { session() << "CREATE TABLE Strings (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
@@ -1313,7 +470,7 @@ void ODBCPostgreSQLTest::recreateFloatsTable()
 void ODBCPostgreSQLTest::recreateTuplesTable()
 {
 	dropObject("TABLE", "Tuples");
-	try { *_pSession << "CREATE TABLE Tuples "
+	try { session() << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
 		"int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now; }
@@ -1325,7 +482,7 @@ void ODBCPostgreSQLTest::recreateTuplesTable()
 void ODBCPostgreSQLTest::recreateVectorsTable()
 {
 	dropObject("TABLE", "Vectors");
-	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	try { session() << "CREATE TABLE Vectors (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -1334,7 +491,7 @@ void ODBCPostgreSQLTest::recreateVectorsTable()
 void ODBCPostgreSQLTest::recreateAnysTable()
 {
 	dropObject("TABLE", "Anys");
-	try { *_pSession << "CREATE TABLE Anys (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	try { session() << "CREATE TABLE Anys (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -1343,7 +500,7 @@ void ODBCPostgreSQLTest::recreateAnysTable()
 void ODBCPostgreSQLTest::recreateNullsTable(const std::string& notNull)
 {
 	dropObject("TABLE", "NullTest");
-	try { *_pSession << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+	try { session() << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
 		notNull,
 		notNull,
 		notNull), now; }
@@ -1355,132 +512,20 @@ void ODBCPostgreSQLTest::recreateNullsTable(const std::string& notNull)
 void ODBCPostgreSQLTest::recreateBoolTable()
 {
 	dropObject("TABLE", "BoolTest");
-	try { *_pSession << "CREATE TABLE BoolTest (b BOOLEAN)", now; }
+	try { session() << "CREATE TABLE BoolTest (b BOOLEAN)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateBoolTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateBoolTable()"); }
 }
 
 
-bool ODBCPostgreSQLTest::canConnect(const std::string& driver, const std::string& dsn)
-{
-	Utility::DriverMap::iterator itDrv = _drivers.begin();
-	for (; itDrv != _drivers.end(); ++itDrv)
-	{
-		if (((itDrv->first).find(driver) != std::string::npos))
-		{
-			std::cout << "Driver found: " << itDrv->first 
-				<< " (" << itDrv->second << ')' << std::endl;
-			break;
-		}
-	}
-
-	if (_drivers.end() == itDrv) 
-	{
-		std::cout << driver << " driver NOT found, tests not available." << std::endl;
-		return false;
-	}
-
-	Utility::DSNMap dataSources;
-	Utility::dataSources(dataSources);
-	Utility::DSNMap::iterator itDSN = dataSources.begin();
-	for (; itDSN != dataSources.end(); ++itDSN)
-	{
-		if (itDSN->first == dsn && itDSN->second == driver)
-		{
-			std::cout << "DSN found: " << itDSN->first 
-				<< " (" << itDSN->second << ')' << std::endl;
-			format(_dbConnString, "DSN=%s", dsn);
-			return true;
-		}
-	}
-
-	// DSN not found, try connect without it
-	format(_dbConnString, "DRIVER=%s;"
-		"DATABASE=postgres;"
-		"SERVER=localhost;"
-		"PORT=5432;"
-		"UID=postgres;"
-		"PWD=postgres;"
-		"SSLMODE=prefer;"
-		"LowerCaseIdentifier=0;"
-		"UseServerSidePrepare=0;"
-		"ByteaAsLongVarBinary=1;"
-		"BI=0;"
-		"TrueIsMinus1=0;"
-		"DisallowPremature=0;"
-		"UpdatableCursors=0;"
-		"LFConversion=1;"
-		"CancelAsFreeStmt=0;"
-		"Parse=0;"
-		"BoolsAsChar=1;"
-		"UnknownsAsLongVarchar=0;"
-		"TextAsLongVarchar=1;"
-		"UseDeclareFetch=0;"
-		"Ksqo=1;"
-		"Optimizer=1;"
-		"CommLog=0;"
-		"Debug=0;"
-		"MaxLongVarcharSize=8190;"
-		"MaxVarcharSize=254;"
-		"UnknownSizes=0;"
-		"Socket=8192;"
-		"Fetch=100;"
-		"ConnSettings=;"
-		"ShowSystemTables=0;"
-		"RowVersioning=0;"
-		"ShowOidColumn=0;"
-		"FakeOidIndex=0;"
-		"ReadOnly=0;", driver);
-
-	return true;
-}
-
-
-void ODBCPostgreSQLTest::setUp()
-{
-}
-
-
-void ODBCPostgreSQLTest::tearDown()
-{
-	dropObject("TABLE", "Person");
-	dropObject("TABLE", "Strings");
-	dropObject("TABLE", "Tuples");
-}
-
-
-bool ODBCPostgreSQLTest::init(const std::string& driver, const std::string& dsn)
-{
-	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn)) return false;
-	
-	ODBC::Connector::registerConnector();
-	try
-	{
-		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
-	}catch (ConnectionException& ex)
-	{
-		std::cout << ex.toString() << std::endl;
-		return false;
-	}
-
-	if (_pSession && _pSession->isConnected()) 
-		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
-
-	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
-
-	return true;
-}
-
-
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
-#ifndef POCO_ODBC_USE_MAMMOTH_NG
-	if (init("PostgreSQL ANSI", "PocoDataPostgreSQLTest"))
-#else
-	if (init("Mammoth ODBCng Beta", "Mammoth ODBCng Beta"))
-#endif
+	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
 	{
+		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
+
+		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession);
+
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCPostgreSQLTest");
 
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBareboneODBC);
@@ -1541,11 +586,17 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionDynamicAny);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNull);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRowIterator);
+#ifdef POCO_ODBC_USE_MAMMOTH_NG
+// psqlODBC driver returns string for bool fields
+// even when field is explicitly cast to boolean,
+// so this functionality seems to be untestable with it
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStdVectorBool);
+#endif
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAny);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDynamicAny);
-		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultipleResults);
+		//neither pSQL ODBC nor Mammoth drivers support multiple results properly
+		//CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultipleResults);
 
 		return pSuite;
 	}

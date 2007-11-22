@@ -41,6 +41,42 @@
 #include "Poco/Data/ODBC/Utility.h"
 
 
+#define poco_odbc_check_env(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		Poco::Data::ODBC::EnvironmentException ee(h); \
+		std::cout << ee.toString() << std::endl; \
+	} \
+	assert (SQL_SUCCEEDED(r));
+
+
+#define poco_odbc_check_dbc(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		Poco::Data::ODBC::ConnectionException ce(h); \
+		std::cout << ce.toString() << std::endl; \
+	} \
+	assert (SQL_SUCCEEDED(r));
+
+
+#define poco_odbc_check_stmt(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		Poco::Data::ODBC::StatementException se(h); \
+		std::cout << se.toString() << std::endl; \
+	} \
+	assert (SQL_SUCCEEDED(r));
+
+
+#define poco_odbc_check_desc(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		Poco::Data::ODBC::DescriptorException de(h); \
+		std::cout << de.toString() << std::endl; \
+	} \
+	assert (SQL_SUCCEEDED(r));
+
+
 class SQLExecutor: public CppUnit::TestCase
 {
 public:

@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_Diagnostics_INCLUDED
-#define ODBC_Diagnostics_INCLUDED
+#ifndef Data_ODBC_Diagnostics_INCLUDED
+#define Data_ODBC_Diagnostics_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -65,14 +65,14 @@ public:
 	static const unsigned int SQL_STATE_SIZE = SQL_SQLSTATE_SIZE + 1;
 	static const unsigned int SQL_MESSAGE_LENGTH = SQL_MAX_MESSAGE_LENGTH + 1;
 	static const unsigned int SQL_NAME_LENGTH = 128;
-	static const std::string DATA_TRUNCATED;
+	static const std::string  DATA_TRUNCATED;
 
 	struct DiagnosticFields
 	{
 		/// SQLGetDiagRec fields
-		POCO_SQLCHAR _sqlState[SQL_STATE_SIZE];
-		POCO_SQLCHAR _message[SQL_MESSAGE_LENGTH];
-		SQLINTEGER   _nativeError;
+		SQLCHAR    _sqlState[SQL_STATE_SIZE];
+		SQLCHAR    _message[SQL_MESSAGE_LENGTH];
+		SQLINTEGER _nativeError;
 	};
 
 	typedef std::vector<DiagnosticFields> FieldVec;
@@ -237,8 +237,8 @@ private:
 	Diagnostics();
 
 	/// SQLGetDiagField fields
-	POCO_SQLCHAR _connectionName[SQL_NAME_LENGTH];
-	POCO_SQLCHAR _serverName[SQL_NAME_LENGTH];
+	SQLCHAR _connectionName[SQL_NAME_LENGTH];
+	SQLCHAR _serverName[SQL_NAME_LENGTH];
 
 	/// Diagnostics container
 	FieldVec _fields;

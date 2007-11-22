@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_Utility_INCLUDED
-#define ODBC_Utility_INCLUDED
+#ifndef Data_ODBC_Utility_INCLUDED
+#define Data_ODBC_Utility_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -47,9 +47,6 @@
 #include "Poco/DateTime.h"
 #include <sstream>
 #include <map>
-#ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
-#endif
 #include <sqltypes.h>
 
 

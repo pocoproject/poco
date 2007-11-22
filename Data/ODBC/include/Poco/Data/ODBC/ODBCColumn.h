@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_ODBCColumn_INCLUDED
-#define ODBC_ODBCColumn_INCLUDED
+#ifndef Data_ODBC_ODBCColumn_INCLUDED
+#define Data_ODBC_ODBCColumn_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -79,7 +79,7 @@ private:
 
 	struct ColumnDescription
 	{
-		POCO_SQLCHAR name[NAME_BUFFER_LENGTH];
+		SQLCHAR name[NAME_BUFFER_LENGTH];
 		SQLSMALLINT  nameBufferLength;
 		SQLSMALLINT  dataType;
 		SQLULEN      size;
@@ -90,7 +90,7 @@ private:
 	void init();
 	void getDescription();
 
-	Poco::Int32            _dataLength;
+	SQLLEN                 _dataLength;
 	const StatementHandle& _rStmt;
 	ColumnDescription      _columnDesc;
 };

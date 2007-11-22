@@ -39,13 +39,18 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractPrepare.h"
+#include "Poco/Exception.h"
 #include <limits>
-#include <sql.h>
+
 
 #ifdef POCO_OS_FAMILY_WINDOWS
 	#undef max
 	#pragma warning(disable:4312)// 'type cast' : conversion from 'Poco::UInt32' to 'SQLPOINTER' of greater size
 #endif
+
+
+using Poco::DataFormatException;
+
 
 namespace Poco {
 namespace Data {
@@ -117,7 +122,15 @@ void ODBCStatementImpl::makeInternalExtractors()
 {
 	if (hasData() && !extractions().size()) 
 	{
-		fillColumns();
+		try
+		{
+			fillColumns();
+		} catch (DataFormatException&)
+		{
+			if (isStoredProcedure()) return;
+			throw;
+		}
+		
 		makeExtractors(columnsReturned());
 		fixupExtraction();
 	}
@@ -219,9 +232,9 @@ void ODBCStatementImpl::putData()
 {
 	SQLPOINTER pParam = 0;
 	SQLINTEGER dataSize = 0;
-	SQLRETURN rc = SQLParamData(_stmt, &pParam);
+	SQLRETURN rc;
 
-	do
+	while (SQL_NEED_DATA == (rc = SQLParamData(_stmt, &pParam)))
 	{
 		poco_assert_dbg (pParam);
 		dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
@@ -229,7 +242,7 @@ void ODBCStatementImpl::putData()
 		if (Utility::isError(SQLPutData(_stmt, pParam, dataSize))) 
 			throw StatementException(_stmt, "SQLPutData()");
 
-	}while (SQL_NEED_DATA == (rc = SQLParamData(_stmt, &pParam)));
+	}
 
 	checkError(rc, "SQLParamData()");
 }
@@ -337,9 +350,6 @@ std::string ODBCStatementImpl::nativeSQL()
 {
 	std::string statement = toString();
 
-	//Hopefully, double the original statement length is enough.
-	//If it is not, the total available length is indicated in the retlen parameter,
-	//which is in turn used to resize the buffer and request the native SQL again.
 	SQLINTEGER length = (SQLINTEGER) statement.size() * 2;
 
 	char* pNative = 0;
@@ -351,9 +361,9 @@ std::string ODBCStatementImpl::nativeSQL()
 		memset(pNative, 0, retlen);
 		length = retlen;
 		if (Utility::isError(SQLNativeSql(_rConnection,
-			(POCO_SQLCHAR*) statement.c_str(),
+			(SQLCHAR*) statement.c_str(),
 			(SQLINTEGER) statement.size(),
-			(POCO_SQLCHAR*) pNative,
+			(SQLCHAR*) pNative,
 			length,
 			&retlen)))
 		{

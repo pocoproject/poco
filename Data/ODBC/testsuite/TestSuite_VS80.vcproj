@@ -229,6 +229,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ODBCTest.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\SQLExecutor.h"
 					>
 				</File>
@@ -262,6 +266,10 @@
 				</File>
 				<File
 					RelativePath=".\src\ODBCSQLServerTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ODBCTest.cpp"
 					>
 				</File>
 				<File

@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TypeHandler", "TypeHandler\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RecordSet", "RecordSet\RecordSet_vs80.vcproj", "{56F66D36-F11E-4AA1-AD37-4518A253059D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tuple", "Tuple\Tuple_vs80.vcproj", "{79D784CB-663C-444E-BCB2-1A1166D19DFB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tuple", "Tuple\Tuple_vs80.vcproj", "{08C81227-3322-4DBD-A83F-55CCC933A5F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +27,10 @@ Global
 		{56F66D36-F11E-4AA1-AD37-4518A253059D}.debug_shared|Win32.Build.0 = debug_shared|Win32
 		{56F66D36-F11E-4AA1-AD37-4518A253059D}.release_shared|Win32.ActiveCfg = release_shared|Win32
 		{56F66D36-F11E-4AA1-AD37-4518A253059D}.release_shared|Win32.Build.0 = release_shared|Win32
-		{79D784CB-663C-444E-BCB2-1A1166D19DFB}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
-		{79D784CB-663C-444E-BCB2-1A1166D19DFB}.debug_shared|Win32.Build.0 = debug_shared|Win32
-		{79D784CB-663C-444E-BCB2-1A1166D19DFB}.release_shared|Win32.ActiveCfg = release_shared|Win32
-		{79D784CB-663C-444E-BCB2-1A1166D19DFB}.release_shared|Win32.Build.0 = release_shared|Win32
+		{08C81227-3322-4DBD-A83F-55CCC933A5F7}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{08C81227-3322-4DBD-A83F-55CCC933A5F7}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{08C81227-3322-4DBD-A83F-55CCC933A5F7}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{08C81227-3322-4DBD-A83F-55CCC933A5F7}.release_shared|Win32.Build.0 = release_shared|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

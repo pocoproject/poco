@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_Error_INCLUDED
-#define ODBC_Error_INCLUDED
+#ifndef Data_ODBC_Error_INCLUDED
+#define Data_ODBC_Error_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"

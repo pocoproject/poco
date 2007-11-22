@@ -254,10 +254,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\Common.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Data\Connector.h"
 					>
 				</File>

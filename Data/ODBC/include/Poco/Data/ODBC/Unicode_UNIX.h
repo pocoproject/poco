@@ -1,13 +1,13 @@
 //
-// EnvironmentHandle.h
+// Unicode.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/EnvironmentHandle.h#3 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Unicode_UNIX.h#4 $
 //
 // Library: ODBC
 // Package: ODBC
-// Module:  EnvironmentHandle
+// Module:  Unicode_UNIX
 //
-// Definition of EnvironmentHandle.
+// Definition of Unicode_UNIX.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,15 +36,8 @@
 //
 
 
-#ifndef Data_ODBC_EnvironmentHandle_INCLUDED
-#define Data_ODBC_EnvironmentHandle_INCLUDED
-
-
-#include "Poco/Data/ODBC/ODBC.h"
-#ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
-#endif
-#include <sqltypes.h>
+#ifndef Data_ODBC_Unicode_UNIX_INCLUDED
+#define Data_ODBC_Unicode_UNIX_INCLUDED
 
 
 namespace Poco {
@@ -52,65 +45,52 @@ namespace Data {
 namespace ODBC {
 
 
-class ODBC_API EnvironmentHandle
-/// ODBC environment handle class
+inline void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, Poco::Buffer<SQLWCHAR>& target)
+	/// Utility function for conversion from ASCII to UTF-16
 {
-public:
-	EnvironmentHandle();
-		/// Creates the EnvironmentHandle.
+	/*TODO
+	int len = length;
+	if (SQL_NTS == len) 
+		len = (int) std::strlen((const char *) pSQLChar);
 
-	~EnvironmentHandle();
-		/// Destroys the EnvironmentHandle.
-
-	operator const SQLHENV& () const;
-		/// Const conversion operator into reference to native type.
-
-	const SQLHENV& handle() const;
-		/// Returns const reference to handle.
-
-private:
-	operator SQLHENV& ();
-		/// Conversion operator into reference to native type.
-
-	SQLHENV& handle();
-		/// Returns reference to handle.
-
-	EnvironmentHandle(const EnvironmentHandle&);
-	const EnvironmentHandle& operator=(const EnvironmentHandle&);
-
-	SQLHENV _henv;
-	bool _isOwner;
-};
-
-
-///
-/// inlines
-///
-inline EnvironmentHandle::operator const SQLHENV& () const
-{
-	return handle();
+	UnicodeConverter::toUTF16((const char *) pSQLChar, len, target);
+	*/
 }
 
 
-inline const SQLHENV& EnvironmentHandle::handle() const
+inline void makeUTF16(SQLCHAR* pSQLChar, SQLSMALLINT length, Poco::Buffer<SQLWCHAR>& target)
+	/// Utility function for conversion from ASCII to UTF-16.
 {
-	return _henv;
+	/*TODO
+	makeUTF16(pSQLChar, (SQLINTEGER) length, target);
+	*/
 }
 
 
-inline EnvironmentHandle::operator SQLHENV& ()
+inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLINTEGER targetLength)
 {
-	return handle();
+	/*TODO
+	std::string result;
+	UnicodeConverter::toUTF8(buffer.begin(), length, result);
+	
+	std::memset(pTarget, 0, targetLength);
+	std::strncpy((char*) pTarget, result.c_str(), result.size() < targetLength ? result.size() : targetLength);
+	*/
 }
 
 
-inline SQLHENV& EnvironmentHandle::handle()
+inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLSMALLINT targetLength)
 {
-	return _henv;
+	/*TODO
+	makeUTF8(buffer, length, pTarget, (SQLINTEGER) targetLength);
+	*/
 }
+
+
+#endif // POCO_ODBC_UNICODE
 
 
 } } } // namespace Poco::Data::ODBC
 
 
-#endif
+#endif // Data_ODBC_Unicode_UNIX_INCLUDED

@@ -99,6 +99,7 @@ public:
 	void reset ()
 	{
 		_bound = false;
+		getBinder()->reset();
 	}
 
 private:

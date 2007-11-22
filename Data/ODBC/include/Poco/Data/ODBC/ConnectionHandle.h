@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_ConnectionHandle_INCLUDED
-#define ODBC_ConnectionHandle_INCLUDED
+#ifndef Data_ODBC_ConnectionHandle_INCLUDED
+#define Data_ODBC_ConnectionHandle_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"

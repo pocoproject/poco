@@ -153,30 +153,31 @@ void TypeInfo::fillTypeInfo(SQLHDBC pHDBC)
 					"NUM_PREC_RADIX", 0,
 					"INTERVAL_PRECISION", 0);
 
-				rc = SQLGetData(hstmt, 1, SQL_C_CHAR, typeName, sizeof(typeName), 0);
+				SQLLEN ind = 0;
+				rc = SQLGetData(hstmt, 1, SQL_C_CHAR, typeName, sizeof(typeName), &ind);
 				ti.set<0>(typeName);
-				rc = SQLGetData(hstmt, 2, SQL_C_SSHORT, &ti.get<1>(), sizeof(SQLSMALLINT), 0);
-				rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &ti.get<2>(), sizeof(SQLINTEGER), 0);
-				rc = SQLGetData(hstmt, 4, SQL_C_CHAR, literalPrefix, sizeof(literalPrefix), 0);
+				rc = SQLGetData(hstmt, 2, SQL_C_SSHORT, &ti.get<1>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 3, SQL_C_SLONG, &ti.get<2>(), sizeof(SQLINTEGER), &ind);
+				rc = SQLGetData(hstmt, 4, SQL_C_CHAR, literalPrefix, sizeof(literalPrefix), &ind);
 				ti.set<3>(literalPrefix);
-				rc = SQLGetData(hstmt, 5, SQL_C_CHAR, literalSuffix, sizeof(literalSuffix), 0);
+				rc = SQLGetData(hstmt, 5, SQL_C_CHAR, literalSuffix, sizeof(literalSuffix), &ind);
 				ti.set<4>(literalSuffix);
-				rc = SQLGetData(hstmt, 6, SQL_C_CHAR, createParams, sizeof(createParams), 0);
+				rc = SQLGetData(hstmt, 6, SQL_C_CHAR, createParams, sizeof(createParams), &ind);
 				ti.set<5>(createParams);
-				rc = SQLGetData(hstmt, 7, SQL_C_SSHORT, &ti.get<6>(), sizeof(SQLSMALLINT), 0); 
-				rc = SQLGetData(hstmt, 8, SQL_C_SSHORT, &ti.get<7>(), sizeof(SQLSMALLINT), 0); 
-				rc = SQLGetData(hstmt, 9, SQL_C_SSHORT, &ti.get<8>(), sizeof(SQLSMALLINT), 0); 
-				rc = SQLGetData(hstmt, 10, SQL_C_SSHORT, &ti.get<9>(), sizeof(SQLSMALLINT), 0); 
-				rc = SQLGetData(hstmt, 11, SQL_C_SSHORT, &ti.get<10>(), sizeof(SQLSMALLINT), 0);
-				rc = SQLGetData(hstmt, 12, SQL_C_SSHORT, &ti.get<11>(), sizeof(SQLSMALLINT), 0);
-				rc = SQLGetData(hstmt, 13, SQL_C_CHAR, localTypeName, sizeof(localTypeName), 0);
+				rc = SQLGetData(hstmt, 7, SQL_C_SSHORT, &ti.get<6>(), sizeof(SQLSMALLINT), &ind); 
+				rc = SQLGetData(hstmt, 8, SQL_C_SSHORT, &ti.get<7>(), sizeof(SQLSMALLINT), &ind); 
+				rc = SQLGetData(hstmt, 9, SQL_C_SSHORT, &ti.get<8>(), sizeof(SQLSMALLINT), &ind); 
+				rc = SQLGetData(hstmt, 10, SQL_C_SSHORT, &ti.get<9>(), sizeof(SQLSMALLINT), &ind); 
+				rc = SQLGetData(hstmt, 11, SQL_C_SSHORT, &ti.get<10>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 12, SQL_C_SSHORT, &ti.get<11>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 13, SQL_C_CHAR, localTypeName, sizeof(localTypeName), &ind);
 				ti.set<12>(localTypeName);
-				rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &ti.get<13>(), sizeof(SQLSMALLINT), 0);
-				rc = SQLGetData(hstmt, 15, SQL_C_SSHORT, &ti.get<14>(), sizeof(SQLSMALLINT), 0);
-				rc = SQLGetData(hstmt, 16, SQL_C_SSHORT, &ti.get<15>(), sizeof(SQLSMALLINT), 0);
-				rc = SQLGetData(hstmt, 17, SQL_C_SSHORT, &ti.get<16>(), sizeof(SQLSMALLINT), 0);
-				rc = SQLGetData(hstmt, 18, SQL_C_SLONG, &ti.get<17>(), sizeof(SQLINTEGER), 0);
-				rc = SQLGetData(hstmt, 19, SQL_C_SSHORT, &ti.get<18>(), sizeof(SQLSMALLINT), 0);
+				rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &ti.get<13>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 15, SQL_C_SSHORT, &ti.get<14>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 16, SQL_C_SSHORT, &ti.get<15>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 17, SQL_C_SSHORT, &ti.get<16>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 18, SQL_C_SLONG, &ti.get<17>(), sizeof(SQLINTEGER), &ind);
+				rc = SQLGetData(hstmt, 19, SQL_C_SSHORT, &ti.get<18>(), sizeof(SQLSMALLINT), &ind);
 
 				_typeInfo.push_back(ti);
 			}

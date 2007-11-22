@@ -81,12 +81,12 @@ void SessionImpl::begin()
 
 void SessionImpl::open()
 {
-	POCO_SQLCHAR connectOutput[512] = {0};
+	SQLCHAR connectOutput[512] = {0};
 	SQLSMALLINT result;
 
 	if (Utility::isError(SQLDriverConnect(_db
 		, NULL
-		,(POCO_SQLCHAR*) _connect.c_str()
+		,(SQLCHAR*) _connect.c_str()
 		,(SQLSMALLINT) SQL_NTS
 		, connectOutput
 		, sizeof(connectOutput)

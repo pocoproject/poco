@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_ODBC_ODBCStatementImpl_INCLUDED
-#define DataConnectors_ODBC_ODBCStatementImpl_INCLUDED
+#ifndef Data_ODBC_ODBCStatementImpl_INCLUDED
+#define Data_ODBC_ODBCStatementImpl_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -220,4 +220,4 @@ inline const MetaColumn& ODBCStatementImpl::metaColumn(Poco::UInt32 pos) const
 } } } // namespace Poco::Data::ODBC
 
 
-#endif // DataConnectors_ODBC_ODBCStatementImpl_INCLUDED
+#endif // Data_ODBC_ODBCStatementImpl_INCLUDED

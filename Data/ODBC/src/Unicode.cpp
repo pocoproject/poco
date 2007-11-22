@@ -1,13 +1,11 @@
 //
-// Common.h
+// Unicode.cpp
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Common.h#4 $
+// $Id: //poco/Main/Data/ODBC/src/Unicode.cpp#3 $
 //
-// Library: Data
-// Package: DataCore
-// Module:  Common
-//
-// This header includes a bunch of Poco Data headers needed frequently.
+// Library: ODBC
+// Package: ODBC
+// Module:  Unicode
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,15 +34,11 @@
 //
 
 
-#ifndef Data_Common_INCLUDED
-#define Data_Common_INCLUDED
+#include "Poco/Data/ODBC/ODBC.h"
 
 
-// Standard include files
-#include "Poco/Data/Binding.h"
-#include "Poco/Data/Extraction.h"
-#include "Poco/Data/Limit.h"
-#include "Poco/Data/SessionFactory.h"
-
-
-#endif // Data_Common_INCLUDED
+#if defined(POCO_ODBC_UNICODE_WINDOWS)
+#include "Unicode_WIN32.cpp"
+#elif defined(POCO_ODBC_UNICODE_UNIX)
+#include "Unicode_UNIX.cpp"
+#endif

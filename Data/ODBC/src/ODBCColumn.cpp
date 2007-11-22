@@ -90,7 +90,7 @@ void ODBCColumn::init()
 			0,
 			0,
 			0,
-			reinterpret_cast<long int*>(&_dataLength))))
+			&_dataLength)))
 	{
 		throw StatementException(_rStmt);
 	}

@@ -72,13 +72,13 @@ public:
 	~Time();
 		/// Destroys the Time.
 
-	Poco::UInt32 hour() const;
+	int hour() const;
 		/// Returns the hour.
 
-	Poco::UInt32 minute() const;
+	int minute() const;
 		/// Returns the minute.
 
-	Poco::UInt32 second() const;
+	int second() const;
 		/// Returns the second.
 
 	void assign(int hour, int minute, int second);
@@ -109,15 +109,21 @@ private:
 //
 // inlines
 //
-inline Poco::UInt32 Time::hour() const
+inline int Time::hour() const
 {
 	return _hour;
 }
 
 
-inline Poco::UInt32 Time::minute() const
+inline int Time::minute() const
 {
 	return _minute;
+}
+
+
+inline  int Time::second() const
+{
+	return _second;
 }
 
 
@@ -125,12 +131,6 @@ inline Time& Time::operator = (const DateTime& dt)
 {
 	assign(dt.hour(), dt.minute(), dt.second());
 	return *this;
-}
-
-
-inline Poco::UInt32 Time::second() const
-{
-	return _second;
 }
 
 

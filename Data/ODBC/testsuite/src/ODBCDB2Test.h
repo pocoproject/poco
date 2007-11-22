@@ -37,14 +37,10 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/Session.h"
-#include "Poco/Data/ODBC/Utility.h"
-#include "Poco/SharedPtr.h"
-#include "CppUnit/TestCase.h"
-#include "SQLExecutor.h"
+#include "ODBCTest.h"
 
 
-class ODBCDB2Test: public CppUnit::TestCase
+class ODBCDB2Test: public ODBCTest
 	/// IBM DB2 UDB ODBC test class
 	/// Tested:
 	/// 
@@ -58,95 +54,16 @@ public:
 
 	void testBareboneODBC();
 
-	void testSimpleAccess();
-	void testComplexType();
-
-	void testSimpleAccessVector();
-	void testComplexTypeVector();
-	void testInsertVector();
-	void testInsertEmptyVector();
-
-	void testSimpleAccessList();
-	void testComplexTypeList();
-	void testInsertList();
-	void testInsertEmptyList();
-
-	void testSimpleAccessDeque();
-	void testComplexTypeDeque();
-	void testInsertDeque();
-	void testInsertEmptyDeque();
-
-	void testInsertSingleBulk();
-	void testInsertSingleBulkVec();
-
-	void testLimit();
-	void testLimitOnce();
-	void testLimitPrepare();
-	void testLimitZero();
-	void testPrepare();
-	void testStep();
-
-	void testSetSimple();
-	void testSetComplex();
-	void testSetComplexUnique();
-	void testMultiSetSimple();
-	void testMultiSetComplex();
-	void testMapComplex();
-	void testMapComplexUnique();
-	void testMultiMapComplex();
-	void testSelectIntoSingle();
-	void testSelectIntoSingleStep();
-	void testSelectIntoSingleFail();
-	void testLowerLimitOk();
-	void testLowerLimitFail();
-	void testCombinedLimits();
-	void testCombinedIllegalLimits();
-	void testRange();
-	void testIllegalRange();
-	void testSingleSelect();
-	void testEmptyDB();
-
 	void testBLOB();
-	void testBLOBStmt();
-
-	void testDate();
-	void testTime();
-	void testDateTime();
-
-	void testFloat();
-	void testDouble();
-
-	void testTuple();
-	void testTupleVector();
-
-	void testInternalExtraction();
-	void testInternalStorageType();
-
+	
 	void testStoredProcedure();
 	void testStoredProcedureAny();
 	void testStoredProcedureDynamicAny();
 	void testStoredFunction();
 
-	void testNull();
-	void testRowIterator();
-
-	void testAsync();
-
-	void testAny();
-	void testDynamicAny();
-
-	void testMultipleResults();
-
-	void setUp();
-	void tearDown();
-
 	static CppUnit::Test* suite();
 
 private:
-	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
-	typedef Poco::SharedPtr<Poco::Data::Session> SessionPtr;
-	typedef Poco::SharedPtr<SQLExecutor>         ExecPtr;
-
 	void dropObject(const std::string& type, const std::string& tableName);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
@@ -161,14 +78,13 @@ private:
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
 
-	static bool init(const std::string& driver, const std::string& dsn);
-	static bool canConnect(const std::string& driver, const std::string& dsn);
-
-	static Drivers     _drivers;
-	static std::string _dbConnString;
-	static SessionPtr  _pSession;
-	static ExecPtr     _pExecutor;
-	static const bool  bindValues[8];
+	static ODBCTest::SessionPtr  _pSession;
+	static ODBCTest::ExecPtr     _pExecutor;
+	static std::string _driver;
+	static std::string _dsn;
+	static std::string _uid;
+	static std::string _pwd;
+	static std::string _connectString;
 };
 
 

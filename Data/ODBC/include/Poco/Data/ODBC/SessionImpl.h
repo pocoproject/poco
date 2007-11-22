@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_ODBC_SessionImpl_INCLUDED
-#define DataConnectors_ODBC_SessionImpl_INCLUDED
+#ifndef Data_ODBC_SessionImpl_INCLUDED
+#define Data_ODBC_SessionImpl_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -65,8 +65,8 @@ public:
 	SessionImpl(const std::string& fileName, 
 		Poco::Any maxFieldSize = std::size_t(1024), 
 		bool enforceCapability=false,
-		bool autoBind=false,
-		bool autoExtract=false);
+		bool autoBind = true,
+		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database
 
 	~SessionImpl();
@@ -261,4 +261,4 @@ inline bool SessionImpl::isAutoExtract(const std::string& name)
 } } } // namespace Poco::Data::ODBC
 
 
-#endif // DataConnectors_ODBC_SessionImpl_INCLUDED
+#endif // Data_ODBC_SessionImpl_INCLUDED

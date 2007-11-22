@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_DataTypes_INCLUDED
-#define ODBC_DataTypes_INCLUDED
+#ifndef Data_ODBC_DataTypes_INCLUDED
+#define Data_ODBC_DataTypes_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"

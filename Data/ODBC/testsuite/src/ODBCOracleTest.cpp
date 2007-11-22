@@ -39,17 +39,9 @@
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
-#include "Poco/Exception.h"
-#include "Poco/Data/Common.h"
-#include "Poco/Data/BLOB.h"
 #include "Poco/Data/RecordSet.h"
-#include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/ODBC/Connector.h"
-#include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
-#include "Poco/Data/ODBC/ODBCStatementImpl.h"
-#include <sqltypes.h>
 #include <iostream>
 
 
@@ -64,15 +56,53 @@ using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::DateTime;
-using Poco::NotFoundException;
 
 
-ODBCOracleTest::SessionPtr  ODBCOracleTest::_pSession = 0;
-ODBCOracleTest::ExecPtr ODBCOracleTest::_pExecutor = 0;
-std::string                 ODBCOracleTest::_dbConnString;
-ODBC::Utility::DriverMap    ODBCOracleTest::_drivers;
-const bool                  ODBCOracleTest::bindValues[8] = 
-	{true, true, true, false, false, true, false, false};
+#define ORACLE_ODBC_DRIVER "Oracle in XE"
+#define ORACLE_DSN "PocoDataOracleTest"
+#define ORACLE_SERVER "localhost"
+#define ORACLE_PORT "1521"
+#define ORACLE_SID "XE"
+#define ORACLE_UID "scott"
+#define ORACLE_PWD "tiger"
+
+
+ODBCTest::SessionPtr ODBCOracleTest::_pSession;
+ODBCTest::ExecPtr    ODBCOracleTest::_pExecutor;
+std::string          ODBCOracleTest::_driver = ORACLE_ODBC_DRIVER;
+std::string          ODBCOracleTest::_dsn = ORACLE_DSN;
+std::string          ODBCOracleTest::_uid = ORACLE_UID;
+std::string          ODBCOracleTest::_pwd = ORACLE_PWD;
+std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRIVER "};"
+	"UID=" ORACLE_UID ";"
+	"PWD=" ORACLE_PWD ";"
+	"TLO=O;" //?
+	"FBS=60000;" // fetch buffer size (bytes), default 60000
+	"FWC=F;" // force SQL_WCHAR support (T/F), default F
+	"CSR=F;" // close cursor (T/F), default F
+	"MDI=Me;" // metadata (SQL_ATTR_METADATA_ID) ID default (T/F), default T
+	"MTS=T;" //?
+	"DPM=F;" // disable SQLDescribeParam (T/F), default F
+	"NUM=NLS;" // numeric settings (NLS implies Globalization Support)
+	"BAM=IfAllSuccessful;" // batch autocommit, (IfAllSuccessful/UpToFirstFailure/AllSuccessful), default IfAllSuccessful
+	"BTD=F;" // bind timestamp as date (T/F), default F
+	"RST=T;" // resultsets (T/F), default T
+	"LOB=T;" // LOB writes (T/F), default T
+	"FDL=0;" // failover delay (default 10)
+	"FRC=0;" // failover retry count (default 10)
+	"QTO=T;" // query timout option (T/F), default T
+	"FEN=F;" // failover (T/F), default T
+	"XSM=Default;" // schema field (Default/Database/Owner), default Default
+	"EXC=F;" // EXEC syntax (T/F), default F
+	"APA=T;" // thread safety (T/F), default T
+	"DBA=W;" // write access
+	"DBQ=" ORACLE_SID ";" // TNS service name
+	"SERVER="
+	"(DESCRIPTION="
+	" (ADDRESS=(PROTOCOL=TCP)(HOST=" ORACLE_SERVER " )(PORT=" ORACLE_PORT "))"
+	" (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=" ORACLE_SID "))"
+	");";
+
 const std::string ODBCOracleTest::MULTI_INSERT = 
 	"BEGIN "
 	"INSERT INTO Test VALUES ('1', 2, 3.5);"
@@ -87,7 +117,7 @@ const std::string ODBCOracleTest::MULTI_SELECT =
 
 
 ODBCOracleTest::ODBCOracleTest(const std::string& name): 
-	CppUnit::TestCase(name)
+	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
 
@@ -107,16 +137,16 @@ void ODBCOracleTest::testBarebone()
 		"Fifth NUMBER,"
 		"Sixth TIMESTAMP)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
+	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third NUMBER)";
-
+/*
 	*_pSession << "CREATE OR REPLACE "
 			"PROCEDURE multiResultsProcedure(ret1 OUT SYS_REFCURSOR, "
 			"ret2 OUT SYS_REFCURSOR,"
@@ -131,846 +161,78 @@ void ODBCOracleTest::testBarebone()
 			"OPEN ret5 FOR SELECT * FROM Test WHERE First = '5';"
 			"END multiResultsProcedure;" , now;
 
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
+	_pExecutor->bareboneODBCMultiResultTest(_connectString, 
 		tableCreateString, 
 		SQLExecutor::PB_IMMEDIATE, 
 		SQLExecutor::DE_MANUAL,
 		MULTI_INSERT,
 		MULTI_SELECT);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
+	_pExecutor->bareboneODBCMultiResultTest(_connectString, 
 		tableCreateString, 
 		SQLExecutor::PB_IMMEDIATE, 
 		SQLExecutor::DE_BOUND,
 		MULTI_INSERT,
 		MULTI_SELECT);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
+	_pExecutor->bareboneODBCMultiResultTest(_connectString, 
 		tableCreateString, 
 		SQLExecutor::PB_AT_EXEC, 
 		SQLExecutor::DE_MANUAL,
 		MULTI_INSERT,
 		MULTI_SELECT);
-	_pExecutor->bareboneODBCMultiResultTest(_dbConnString, 
+	_pExecutor->bareboneODBCMultiResultTest(_connectString, 
 		tableCreateString, 
 		SQLExecutor::PB_AT_EXEC, 
 		SQLExecutor::DE_BOUND,
 		MULTI_INSERT,
 		MULTI_SELECT);
-}
-
-
-void ODBCOracleTest::testSimpleAccess()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::string tableName("Person");
-	int count = 0;
-
-	recreatePersonTable();
-
-	*_pSession << "SELECT count(*) FROM sys.all_all_tables WHERE table_name = upper(?)", into(count), use(tableName), now;
-	assert (1 == count);
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccess();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testComplexType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexType();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testSimpleAccessVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessVector();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testComplexTypeVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testInsertVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testInsertEmptyVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyVector();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testSimpleAccessList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessList();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testComplexTypeList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeList();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testInsertList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertList();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testInsertEmptyList()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyList();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testSimpleAccessDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->simpleAccessDeque();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testComplexTypeDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->complexTypeDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testInsertDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testInsertEmptyDeque()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateStringsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertEmptyDeque();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testInsertSingleBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulk();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testInsertSingleBulkVec()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->insertSingleBulkVec();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testLimit()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limits();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testLimitZero()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitZero();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testLimitOnce()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	recreateIntsTable();
-	_pExecutor->limitOnce();
-	
-}
-
-
-void ODBCOracleTest::testLimitPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->limitPrepare();
-		i += 2;
-	}
-}
-
-
-
-void ODBCOracleTest::testPrepare()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->prepare();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	std::cout << std::endl << "Oracle" << std::endl;
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		std::string mode = bindValues[i+1] ? "auto" : "manual";
-		std::cout << "Extraction: " << mode << std::endl;
-		_pExecutor->doStep(1000, 1);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 10);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 100);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 1000);
-
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testSetComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->setComplexUnique();
-		i += 2;
-	}
-}
-
-void ODBCOracleTest::testMultiSetSimple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetSimple();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testMultiSetComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiSetComplex();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testMapComplexUnique()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->mapComplexUnique();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testMultiMapComplex()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multiMapComplex();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testSelectIntoSingle()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingle();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testSelectIntoSingleStep()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleStep();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testSelectIntoSingleFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->selectIntoSingleFail();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testLowerLimitOk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitOk();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testSingleSelect()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->singleSelect();
-		i += 2;
-	}	
-}
-
-
-void ODBCOracleTest::testLowerLimitFail()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->lowerLimitFail();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testCombinedLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCOracleTest::testRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->ranges();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testCombinedIllegalLimits()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->combinedIllegalLimits();
-		i += 2;
-	}
-}
-
-
-
-void ODBCOracleTest::testIllegalRange()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->illegalRange();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testEmptyDB()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->emptyDB();
-		i += 2;
-	}
+		*/
 }
 
 
 void ODBCOracleTest::testBLOB()
 {
-	if (!_pSession) fail ("Test not available.");
-	
 	const std::size_t maxFldSize = 1000000;
-	_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
+	session().setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
 	recreatePersonBLOBTable();
 
 	try
 	{
-		_pExecutor->blob(maxFldSize);
+		executor().blob(maxFldSize);
 		fail ("must fail");
 	}
 	catch (DataException&) 
 	{
-		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
+		session().setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
 
 	for (int i = 0; i < 8;)
 	{
 		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blob(maxFldSize);
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		executor().blob(maxFldSize);
 		i += 2;
 	}
 
 	recreatePersonBLOBTable();
 	try
 	{
-		_pExecutor->blob(maxFldSize+1);
+		executor().blob(maxFldSize+1);
 		fail ("must fail");
 	}
 	catch (DataException&) { }
 }
 
 
-void ODBCOracleTest::testBLOBStmt()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonBLOBTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blobStmt();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testDate()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonDateTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->date();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testDateTime()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreatePersonDateTimeTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dateTime();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testFloat()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->floats();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testDouble()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateFloatsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->doubles();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testTuple()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tuples();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testTupleVector()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateTuplesTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->tupleVector();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testInternalExtraction()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalExtraction();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testInternalStorageType()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->internalStorageType();
-		i += 2;
-	}
-}
-
-
 void ODBCOracleTest::testNull()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	// test for NOT NULL violation exception
 	for (int i = 0; i < 8;)
 	{
 		recreateNullsTable("NOT NULL");
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->notNulls("HY000");
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		executor().notNulls("HY000");
 		i += 2;
 	}
 
@@ -978,9 +240,9 @@ void ODBCOracleTest::testNull()
 	for (int i = 0; i < 8;)
 	{
 		recreateNullsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->nulls();
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		executor().nulls();
 		i += 2;
 	}
 }
@@ -988,12 +250,10 @@ void ODBCOracleTest::testNull()
 
 void ODBCOracleTest::testStoredProcedure()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		*_pSession << "CREATE OR REPLACE "
 			"PROCEDURE storedProcedure(outParam OUT NUMBER) IS "
@@ -1041,7 +301,7 @@ void ODBCOracleTest::testStoredProcedure()
 
 	
 	//strings only work with auto-binding
-	_pSession->setFeature("autoBind", true);
+	session().setFeature("autoBind", true);
 
 	*_pSession << "CREATE OR REPLACE "
 		"PROCEDURE storedProcedure(inParam IN VARCHAR2, outParam OUT VARCHAR2) IS "
@@ -1067,12 +327,10 @@ void ODBCOracleTest::testStoredProcedure()
 
 void ODBCOracleTest::testStoredProcedureAny()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		Any i = 2;
 		Any j = 0;
@@ -1103,11 +361,9 @@ void ODBCOracleTest::testStoredProcedureAny()
 
 void ODBCOracleTest::testStoredProcedureDynamicAny()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
+		session().setFeature("autoBind", bindValue(k));
 		
 		DynamicAny i = 2;
 		DynamicAny j = 0;
@@ -1138,12 +394,10 @@ void ODBCOracleTest::testStoredProcedureDynamicAny()
 
 void ODBCOracleTest::testCursorStoredProcedure()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		recreatePersonTable();
 		typedef Tuple<std::string, std::string, std::string, int> Person;
@@ -1189,12 +443,10 @@ void ODBCOracleTest::testCursorStoredProcedure()
 
 void ODBCOracleTest::testStoredFunction()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		try{
 		*_pSession << "CREATE OR REPLACE "
@@ -1260,7 +512,7 @@ void ODBCOracleTest::testStoredFunction()
 		k += 2;
 	}
 
-	_pSession->setFeature("autoBind", true);
+	session().setFeature("autoBind", true);
 
 	*_pSession << "CREATE OR REPLACE "
 		"FUNCTION storedFunction(inParam IN VARCHAR2, outParam OUT VARCHAR2) RETURN VARCHAR2 IS "
@@ -1280,12 +532,10 @@ void ODBCOracleTest::testStoredFunction()
 
 void ODBCOracleTest::testCursorStoredFunction()
 {
-	if (!_pSession) fail ("Test not available.");
-
 	for (int k = 0; k < 8;)
 	{
-		_pSession->setFeature("autoBind", bindValues[k]);
-		_pSession->setFeature("autoExtract", bindValues[k+1]);
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
 
 		recreatePersonTable();
 		typedef Tuple<std::string, std::string, std::string, int> Person;
@@ -1331,74 +581,8 @@ void ODBCOracleTest::testCursorStoredFunction()
 }
 
 
-void ODBCOracleTest::testRowIterator()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateVectorsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->rowIterator();
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testAsync()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->asynchronous(2000);
-
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->any();
-
-		i += 2;
-	}
-}
-
-
-void ODBCOracleTest::testDynamicAny()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	for (int i = 0; i < 8;)
-	{
-		recreateAnysTable();
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->dynamicAny();
-
-		i += 2;
-	}
-}
-
-
 void ODBCOracleTest::testMultipleResults()
 {
-	if (!_pSession) fail ("Test not available.");
-
-	
 	std::string sql = "CREATE OR REPLACE "
 		"PROCEDURE multiResultsProcedure(paramAge1 IN NUMBER,"
 		" paramAge2 IN NUMBER,"
@@ -1415,16 +599,13 @@ void ODBCOracleTest::testMultipleResults()
 	{
 		recreatePersonTable();
 		*_pSession << sql, now;
-		_pSession->setFeature("autoBind", bindValues[i]);
-		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->multipleResults("{call multiResultsProcedure(?, ?)}");
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		executor().multipleResults("{call multiResultsProcedure(?, ?)}");
 
 		i += 2;
 	}
 }
-
-
-
 
 
 void ODBCOracleTest::dropObject(const std::string& type, const std::string& name)
@@ -1558,129 +739,14 @@ void ODBCOracleTest::recreateNullsTable(const std::string& notNull)
 }
 
 
-bool ODBCOracleTest::canConnect(const std::string& driver, const std::string& dsn)
-{
-	Utility::DriverMap::iterator itDrv = _drivers.begin();
-	for (; itDrv != _drivers.end(); ++itDrv)
-	{
-		if (((itDrv->first).find(driver) != std::string::npos))
-		{
-			std::cout << "Driver found: " << itDrv->first 
-				<< " (" << itDrv->second << ')' << std::endl;
-			break;
-		}
-	}
-
-	if (_drivers.end() == itDrv) 
-	{
-		std::cout << driver << " driver NOT found, tests not available." << std::endl;
-		return false;
-	}
-
-	Utility::DSNMap dataSources;
-	Utility::dataSources(dataSources);
-	Utility::DSNMap::iterator itDSN = dataSources.begin();
-	for (; itDSN != dataSources.end(); ++itDSN)
-	{
-		if (itDSN->first == dsn && itDSN->second == driver)
-		{
-			std::cout << "DSN found: " << itDSN->first 
-				<< " (" << itDSN->second << ')' << std::endl;
-			format(_dbConnString,
-				"DSN=%s;"
-				"UID=Scott;"
-				"PWD=Tiger;", dsn);
-			return true;
-		}
-	}
-
-	// DSN not found, try connect without it
-	format(_dbConnString, "DRIVER={%s};"
-		"UID=Scott;"
-		"PWD=Tiger;"
-		"TLO=O;"
-		"FBS=60000;"
-		"FWC=F;"
-		"CSR=F;"
-		"MDI=Me;"
-		"MTS=T;"
-		"DPM=F;"
-		"NUM=NLS;"
-		"BAM=IfAllSuccessful;"
-		"BTD=F;"
-		"RST=T;"
-		"LOB=T;"
-		"FDL=10;"
-		"FRC=10;"
-		"QTO=T;"
-		"FEN=T;"
-		"XSM=Default;"
-		"EXC=F;"
-		"APA=T;"
-		"DBA=W;"
-		"DBQ=XE;"
-		"SERVER="
-		"(DESCRIPTION="
-		" (ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))"
-		" (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=XE))"
-		");", driver);
-
-	return true;
-}
-
-
-void ODBCOracleTest::setUp()
-{
-}
-
-
-void ODBCOracleTest::tearDown()
-{
-	dropObject("TABLE", "Person");
-	dropObject("TABLE", "Strings");
-	dropObject("TABLE", "Tuples");
-}
-
-
-bool ODBCOracleTest::init(const std::string& driver, const std::string& dsn)
-{
-	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn)) return false;
-	
-	ODBC::Connector::registerConnector();
-	try
-	{
-		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
-	}catch (ConnectionException& ex)
-	{
-		std::cout << ex.toString() << std::endl;
-		return false;
-	}
-
-	if (_pSession && _pSession->isConnected()) 
-		std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
-	
-	_pExecutor = new SQLExecutor(driver + " SQL Executor", _pSession);
-
-#ifdef POCO_OS_FAMILY_WINDOWS
-	// Workaround:
-	//
-	// Barebone ODBC test is called automatically on startup for Oracle.
-	// The test framework does not exit cleanly if
-	// Oracle tests are enabled (i.e. Oracle driver is found) 
-	// but no tests are executed.
-	// The exact reason for this behavior is unknown at this time.
-	testBarebone();
-#endif
-
-	return true;
-}
-
-
 CppUnit::Test* ODBCOracleTest::suite()
 {
-	if (init("Oracle in XE", "PocoDataOracleTest"))
+	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
 	{
+		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
+
+		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession);
+
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCOracleTest");
 
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBareboneODBC);

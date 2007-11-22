@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_ODBC_Preparation_INCLUDED
-#define DataConnectors_ODBC_Preparation_INCLUDED
+#ifndef Data_ODBC_Preparation_INCLUDED
+#define Data_ODBC_Preparation_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -46,8 +46,6 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/BLOB.h"
-#include "Poco/Data/Date.h"
-#include "Poco/Data/Time.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
@@ -61,11 +59,15 @@
 
 namespace Poco {
 namespace Data {
-namespace ODBC {
 
 
 class Date;
 class Time;
+
+
+namespace ODBC {
+
+
 class BLOB;
 
 
@@ -428,4 +430,4 @@ inline Preparation::DataExtraction Preparation::getDataExtraction() const
 } } } // namespace Poco::Data::ODBC
 
 
-#endif // DataConnectors_ODBC_Preparation_INCLUDED
+#endif // Data_ODBC_Preparation_INCLUDED

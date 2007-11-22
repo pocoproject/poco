@@ -168,6 +168,9 @@ public:
 	void bind(std::size_t pos, const DynamicAny& val, Direction dir = PD_IN);
 		/// Binds a DynamicAny.
 
+	virtual void reset();
+		/// Resets a binder. No-op by default. Implement for binders that cache data.
+
 	static bool isOutBound(Direction dir);
 		/// Returns true if direction is out bound;
 
@@ -179,6 +182,12 @@ public:
 //
 // inlines
 //
+inline void AbstractBinder::reset()
+{
+	//no-op
+}
+
+
 inline bool AbstractBinder::isOutBound(Direction dir)
 {
 	return PD_OUT == dir || PD_IN_OUT == dir;

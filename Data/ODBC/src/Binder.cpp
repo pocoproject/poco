@@ -92,10 +92,10 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 //On Linux, PostgreSQL driver segfaults on SQLGetDescField, so this is disabled for now
 #ifdef POCO_OS_FAMILY_WINDOWS
 			SQLHDESC hIPD = 0;
-			if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, 0, 0)))
+			if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, SQL_IS_POINTER, 0)))
 			{
 				SQLUINTEGER sz = 0;
-				if (!Utility::isError(SQLGetDescField(hIPD, (SQLSMALLINT) pos + 1, SQL_DESC_LENGTH, &sz, sizeof(sz), 0)) && 
+				if (!Utility::isError(SQLGetDescField(hIPD, (SQLSMALLINT) pos + 1, SQL_DESC_LENGTH, &sz, SQL_IS_UINTEGER, 0)) && 
 					sz > 0)
 				{
 					size = sz;
@@ -399,6 +399,18 @@ void Binder::synchronize()
 		for(; itStr != itStrEnd; ++itStr)
 			itStr->second->assign(itStr->first, strlen(itStr->first));
 	}
+}
+
+
+void Binder::reset()
+{
+	LengthVec().swap(_lengthIndicator);
+	_inParams.clear();
+	_outParams.clear();
+	_dates.clear();
+	_times.clear();
+	_timestamps.clear();
+	_strings.clear();
 }
 
 

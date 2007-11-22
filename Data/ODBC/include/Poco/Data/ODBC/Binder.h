@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_ODBC_Binder_INCLUDED
-#define DataConnectors_ODBC_Binder_INCLUDED
+#ifndef Data_ODBC_Binder_INCLUDED
+#define Data_ODBC_Binder_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -159,6 +159,9 @@ public:
 	void synchronize();
 		/// Transfers the results of non-POD outbound parameters from internal 
 		/// holders back into the externally supplied buffers.
+
+	void reset();
+		/// Clears the cached storage.
 
 private:
 	typedef std::vector<SQLLEN*>              LengthVec;
@@ -330,4 +333,4 @@ inline Binder::ParameterBinding Binder::getDataBinding() const
 } } } // namespace Poco::Data::ODBC
 
 
-#endif // DataConnectors_ODBC_Binder_INCLUDED
+#endif // Data_ODBC_Binder_INCLUDED
