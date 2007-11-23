@@ -59,9 +59,6 @@ SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 {
 	if (isString(pCharAttr, cbCharAttrMax))
 	{
-		if (0 != cbCharAttrMax % 2)
-			--cbCharAttrMax; // must be even for unicode
-
 		Buffer<SQLWCHAR> buffer(stringLength(pCharAttr, cbCharAttrMax));
 
 		SQLRETURN rc = SQLColAttributeW(hstmt,
@@ -138,14 +135,11 @@ SQLRETURN SQLDescribeCol(SQLHSTMT hstmt,
 	SQLSMALLINT* pibScale,
 	SQLSMALLINT* pfNullable)
 {
-	if (0 != cbColNameMax % 2)
-		--cbColNameMax; // must be even for unicode
-
 	Buffer<SQLWCHAR> buffer(cbColNameMax);
 	SQLRETURN rc = SQLDescribeColW(hstmt,
 		icol,
 		(SQLWCHAR*) buffer.begin(),
-		cbColNameMax,
+		(SQLSMALLINT) buffer.size(),
 		pcbColName,
 		pfSqlType,
 		pcbColDef,
@@ -190,15 +184,12 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC hdbc,
 {
 	if (isString(rgbValue, cbValueMax))
 	{
-		if (0 != cbValueMax % 2)
-			--cbValueMax; // must be even for unicode
-
 		Buffer<SQLWCHAR> buffer(stringLength(rgbValue, cbValueMax));
 
 		SQLRETURN rc = SQLGetConnectAttrW(hdbc,
 				fAttribute,
 				buffer.begin(),
-				cbValueMax,
+				(SQLINTEGER) buffer.size() * sizeof(SQLWCHAR),
 				pcbValue);
 
 		makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
@@ -231,9 +222,6 @@ SQLRETURN SQLSetDescField(SQLHDESC hdesc,
 {
 	if (isString(rgbValue, cbValueMax))
 	{
-		if (0 != cbValueMax % 2)
-			--cbValueMax; // must be even for unicode
-
 		Buffer<SQLWCHAR> str(cbValueMax);
 		makeUTF16((SQLCHAR*) rgbValue, cbValueMax, str);
 
@@ -261,16 +249,13 @@ SQLRETURN SQLGetDescField(SQLHDESC hdesc,
 {
 	if (isString(rgbValue, cbValueMax))
 	{
-		if (0 != cbValueMax % 2)
-			--cbValueMax; // must be even for unicode
-
 		Buffer<SQLWCHAR> buffer(stringLength(rgbValue, cbValueMax));
 
 		SQLRETURN rc = SQLGetDescFieldW(hdesc,
 			iRecord,
 			iField,
 			buffer.begin(),
-			cbValueMax,
+			(SQLINTEGER) buffer.size() * sizeof(SQLWCHAR),
 			pcbValue);
 
 		makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
@@ -313,9 +298,6 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT fHandleType,
 {
 	if (isString(rgbDiagInfo, cbDiagInfoMax))
 	{
-		if (0 != cbDiagInfoMax % 2)
-			--cbDiagInfoMax; // must be even for unicode
-
 		Buffer<SQLWCHAR> buffer(stringLength(rgbDiagInfo, cbDiagInfoMax));
 
 		SQLRETURN rc = SQLGetDiagFieldW(fHandleType,
@@ -323,7 +305,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT fHandleType,
 			iRecord,
 			fDiagField,
 			buffer.begin(),
-			cbDiagInfoMax,
+			(SQLSMALLINT) buffer.size() * sizeof(SQLWCHAR),
 			pcbDiagInfo);
 
 		makeUTF8(buffer, *pcbDiagInfo, rgbDiagInfo, cbDiagInfoMax);
@@ -352,10 +334,6 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT fHandleType,
 {
 	const SQLINTEGER stateLen = SQL_SQLSTATE_SIZE + 1;
 	Buffer<SQLWCHAR> bufState(stateLen);
-
-	if (0 != cbErrorMsgMax % 2)
-			--cbErrorMsgMax; // must be even for unicode
-
 	Buffer<SQLWCHAR> bufErr(cbErrorMsgMax);
 
 	SQLRETURN rc = SQLGetDiagRecW(fHandleType,
@@ -364,7 +342,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT fHandleType,
 		bufState.begin(),
 		pfNativeError,
 		bufErr.begin(),
-		cbErrorMsgMax,
+		(SQLSMALLINT) bufErr.size(),
 		pcbErrorMsg);
 
 	makeUTF8(bufState, stateLen, szSqlState, stateLen);
@@ -441,15 +419,12 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT hstmt,
 {
 	if (isString(rgbValue, cbValueMax))
 	{
-		if (0 != cbValueMax % 2)
-			--cbValueMax; // must be even for unicode
-
 		Buffer<SQLWCHAR> buffer(stringLength(rgbValue, cbValueMax));
 
 		return SQLGetStmtAttrW(hstmt,
 			fAttribute,
 			(SQLPOINTER) buffer.begin(),
-			(SQLINTEGER) buffer.size(),
+			(SQLINTEGER) buffer.size() * sizeof(SQLWCHAR),
 			pcbValue);
 	}
 
@@ -487,9 +462,6 @@ SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 {
 	if (cbInfoValueMax)
 	{
-		if (0 != cbInfoValueMax % 2)
-			--cbInfoValueMax; // must be even for unicode
-
 		Buffer<SQLWCHAR> buffer(cbInfoValueMax);
 
 		SQLRETURN rc = SQLGetInfoW(hdbc,
@@ -499,6 +471,8 @@ SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 			pcbInfoValue);
 
 		makeUTF8(buffer, *pcbInfoValue, rgbInfoValue, cbInfoValueMax);
+		
+		return rc;
 	}
 
 	return SQLGetInfoW(hdbc, fInfoType, rgbInfoValue, cbInfoValueMax, pcbInfoValue);
