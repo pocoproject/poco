@@ -72,7 +72,8 @@ template<>
 bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 {
 	std::size_t dataSize = _rPreparation.actualDataSize(pos);
-	SharedPtr<char>& sp = RefAnyCast<SharedPtr<char> >(_rPreparation[pos]);
+	char*& sp = RefAnyCast<char*>(_rPreparation[pos]);
+	poco_check_ptr (sp);
 	std::size_t len = strlen(sp);
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
@@ -86,7 +87,8 @@ bool Extractor::extractBoundImpl<Poco::Data::BLOB>(std::size_t pos, Poco::Data::
 {
 	std::size_t dataSize = _rPreparation.actualDataSize(pos);
 	checkDataSize(dataSize);
-	SharedPtr<char>& sp = RefAnyCast<SharedPtr<char> >(_rPreparation[pos]);
+	char*& sp = RefAnyCast<char*>(_rPreparation[pos]);
+	poco_check_ptr (sp);
 	val.assignRaw(sp, dataSize);
 	return true;
 }

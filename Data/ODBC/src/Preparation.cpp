@@ -76,6 +76,10 @@ Preparation::~Preparation()
 	std::vector<Poco::Any*>::iterator itVal = _pValues.begin();
 	std::vector<Poco::Any*>::iterator itValEnd = _pValues.end();
 	for (; itVal != itValEnd; ++itVal) delete *itVal;
+
+	std::vector<char*>::iterator itChr = _charPtrs.begin();
+	std::vector<char*>::iterator itChrEnd = _charPtrs.end();
+	for (; itChr != itChrEnd; ++itChr)	delete [] *itChr;
 }
 
 
@@ -93,11 +97,11 @@ void Preparation::prepareRaw(std::size_t pos, SQLSMALLINT valueType, std::size_t
 	poco_assert (pos > 0 && pos <= _pValues.size());
 
 	char* pChr = new char[size]; 
+	_charPtrs.push_back(pChr);
 	poco_assert_dbg (pChr);
 	memset(pChr, 0, size);
 
-	SharedPtr<char> sp = pChr; 
-	_pValues[pos-1] = new Any(sp);
+	_pValues[pos-1] = new Any(pChr);
 	_pLengths[pos-1] = new SQLLEN;
 	*_pLengths[pos-1] = (SQLLEN) size;
 

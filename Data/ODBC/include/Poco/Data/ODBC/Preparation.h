@@ -209,6 +209,7 @@ private:
 	std::vector<SQLLEN*> _pLengths;
 	std::size_t _maxFieldSize;
 	DataExtraction _dataExtraction;
+	std::vector<char*> _charPtrs;
 };
 
 
