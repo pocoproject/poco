@@ -50,69 +50,69 @@ Preparation::~Preparation()
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::Int8)
+void Preparation::prepare(std::size_t pos, Poco::Int8&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::UInt8)
+void Preparation::prepare(std::size_t pos, Poco::UInt8&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::Int16)
+void Preparation::prepare(std::size_t pos, Poco::Int16&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::UInt16)
+void Preparation::prepare(std::size_t pos, Poco::UInt16&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::Int32)
+void Preparation::prepare(std::size_t pos, Poco::Int32&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::UInt32)
+void Preparation::prepare(std::size_t pos, Poco::UInt32&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::Int64)
+void Preparation::prepare(std::size_t pos, Poco::Int64&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::UInt64)
+void Preparation::prepare(std::size_t pos, Poco::UInt64&)
 {
 }
 
 
 #ifndef POCO_LONG_IS_64_BIT
-void Preparation::prepare(std::size_t pos, long)
+void Preparation::prepare(std::size_t pos, long&)
 {
 }
 #endif
 
 
-void Preparation::prepare(std::size_t pos, bool)
+void Preparation::prepare(std::size_t pos, bool&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, float)
+void Preparation::prepare(std::size_t pos, float&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, double)
+void Preparation::prepare(std::size_t pos, double&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, char)
+void Preparation::prepare(std::size_t pos, char&)
 {
 }
 

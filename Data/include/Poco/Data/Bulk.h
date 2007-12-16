@@ -1,13 +1,13 @@
 //
-// DataException.h
+// BulkExtraction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/DataException.h#8 $
+// $Id: //poco/Main/Data/include/Poco/Data/Bulk.h#9 $
 //
 // Library: Data
 // Package: DataCore
-// Module:  DataException
+// Module:  Bulk
 //
-// Definition of the DataException class.
+// Definition of the BulkExtraction class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,34 +36,74 @@
 //
 
 
-#ifndef Data_DataException_INCLUDED
-#define Data_DataException_INCLUDED
+#ifndef Data_Bulk_INCLUDED
+#define Data_Bulk_INCLUDED
 
 
-#include "Poco/Data/Data.h"
-#include "Poco/Exception.h"
+#include "Poco/Data/Limit.h"
 
 
 namespace Poco {
 namespace Data {
 
 
-POCO_DECLARE_EXCEPTION(Data_API, DataException, Poco::IOException)
-POCO_DECLARE_EXCEPTION(Data_API, RowDataMissingException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, UnknownDataBaseException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, UnknownTypeException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, ExecutionException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, BindingException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, ExtractException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, LimitException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, NotSupportedException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, SessionUnavailableException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, SessionPoolExhaustedException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, NoDataException, DataException)
-POCO_DECLARE_EXCEPTION(Data_API, LengthExceededException, DataException)
+class Data_API Bulk
+{
+public:
+	Bulk(const Limit& limit);
+		/// Creates the Bulk.
+
+	Bulk(Poco::UInt32 value);
+		/// Creates the Bulk.
+
+	~Bulk();
+		/// Destroys the bulk.
+
+	const Limit& limit() const;
+		/// Returns the limit asociated with this bulk object.
+
+	Poco::UInt32 size() const;
+		/// Returns the value of the limit asociated with 
+		/// this bulk object.
+	
+private:
+	Bulk();
+
+	Limit _limit;
+};
+
+
+///
+/// inlines
+///
+inline const Limit& Bulk::limit() const 
+{ 
+	return _limit; 
+}
+
+
+inline Poco::UInt32 Bulk::size() const 
+{ 
+	return _limit.value(); 
+}
+
+
+template <typename T>
+inline Bulk bulk(const T& limit)
+	/// Convenience function for creation of bulk.
+{
+	return Bulk(limit);
+}
+
+
+inline void bulk()
+	/// Dummy bulk function. Used for bulk binding creation
+	/// (see BulkBinding.h).
+{
+}
 
 
 } } // namespace Poco::Data
 
 
-#endif // Data_DataException_INCLUDED
+#endif // Data_Bulk_INCLUDED

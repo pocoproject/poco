@@ -52,8 +52,21 @@ namespace Poco {
 namespace Data {
 
 
+class AbstractTypeHandler
+	/// Parent class for type handlers. 
+	/// The reason for this class is to prevent instantiations of type handlers.
+	/// For documentation on type handlers, see TypeHandler class.
+{
+protected:
+	AbstractTypeHandler();
+	~AbstractTypeHandler();
+	AbstractTypeHandler(const AbstractTypeHandler&);
+	AbstractTypeHandler& operator = (const AbstractTypeHandler&);
+};
+
+
 template <class T>
-class TypeHandler
+class TypeHandler: public AbstractTypeHandler
 	/// Converts Rows to a Type and the other way around. Provide template specializations to support your own complex types.
 	///
 	/// Take as example the following (simplified) class:
@@ -66,7 +79,7 @@ class TypeHandler
 	///        [....] // public set/get methods, a default constructor, optional < operator (for set, multiset) or function operator (for map, multimap)
 	///    };
 	///
-	/// The TypeHandler must provide a costum bind, size, prepare and extract method:
+	/// The TypeHandler must provide a custom bind, size, prepare and extract method:
 	///    
 	///    template <>
 	///    class TypeHandler<struct Person>
@@ -132,19 +145,16 @@ public:
 	static void extract(std::size_t pos, T& obj, const T& defVal, AbstractExtractor* pExt)
 	{
 		poco_assert_dbg (pExt != 0);
-		if (!pExt->extract(pos, obj))
-			obj = defVal;
+		if (!pExt->extract(pos, obj)) obj = defVal;
 	}
 
-	static void prepare(std::size_t pos, const T& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, T& obj, AbstractPreparation* pPrepare)
 	{
 		poco_assert_dbg (pPrepare != 0);
 		pPrepare->prepare(pos, obj);
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator = (const TypeHandler&);
 };
@@ -204,7 +214,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<19>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -280,8 +290,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -336,7 +344,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<18>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -409,8 +417,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -463,7 +469,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<17>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -533,8 +539,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -585,7 +589,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<16>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -652,8 +656,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -702,7 +704,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<15>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -766,8 +768,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -814,7 +814,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<14>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -875,8 +875,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -921,7 +919,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<13>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -979,8 +977,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1023,7 +1019,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<12>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1078,8 +1074,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1120,7 +1114,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<11>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1172,8 +1166,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1212,7 +1204,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<10>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1261,8 +1253,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1290,7 +1280,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<9>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1336,8 +1326,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1364,7 +1352,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<8>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1407,8 +1395,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1434,7 +1420,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<7>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1474,8 +1460,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1500,7 +1484,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<6>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1537,8 +1521,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1562,7 +1544,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<5>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1596,8 +1578,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1620,7 +1600,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<4>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1651,8 +1631,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1674,7 +1652,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<3>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1702,8 +1680,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1724,7 +1700,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<2>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1749,8 +1725,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1770,7 +1744,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<1>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1792,8 +1766,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };
@@ -1812,7 +1784,7 @@ public:
 		pBinder->bind(pos++, tuple.template get<0>(), dir);
 	}
 
-	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
 	{
 		poco_assert (pPrepare != 0);
 		pPrepare->prepare(pos++, tuple.template get<0>());
@@ -1832,8 +1804,6 @@ public:
 	}
 
 private:
-	TypeHandler();
-	~TypeHandler();
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator=(const TypeHandler&);
 };

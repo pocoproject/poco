@@ -81,6 +81,7 @@ public:
 	};
 
 	Binder(const StatementHandle& rStmt,
+		std::size_t maxFieldSize,
 		ParameterBinding dataBinding = PB_IMMEDIATE,
 		TypeInfo* pDataTypes = 0);
 		/// Creates the Binder.
@@ -91,61 +92,118 @@ public:
 	void bind(std::size_t pos, const Poco::Int8& val, Direction dir);
 		/// Binds an Int8.
 
+	void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir);
+		/// Binds an Int8 vector.
+
 	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir);
 		/// Binds an UInt8.
 
+	void bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir);
+		/// Binds an UInt8 vector.
+
 	void bind(std::size_t pos, const Poco::Int16& val, Direction dir);
 		/// Binds an Int16.
+	
+	void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir);
+		/// Binds an Int16 vector.
 
 	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir);
 		/// Binds an UInt16.
 
+	void bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir);
+		/// Binds an UInt16 vector.
+
 	void bind(std::size_t pos, const Poco::Int32& val, Direction dir);
 		/// Binds an Int32.
+
+	void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir);
+		/// Binds an Int32 vector.
 
 	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir);
 		/// Binds an UInt32.
 
+	void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir);
+		/// Binds an UInt32 vector.
+
 	void bind(std::size_t pos, const Poco::Int64& val, Direction dir);
 		/// Binds an Int64.
+
+	void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir);
+		/// Binds an Int64 vector.
 
 	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir);
 		/// Binds an UInt64.
 
+	void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir);
+		/// Binds an UInt64 vector.
+
 #ifndef POCO_LONG_IS_64_BIT
 	void bind(std::size_t pos, const long& val, Direction dir);
 		/// Binds a long.
+
+	void bind(std::size_t pos, const std::vector<long>& val, Direction dir);
+		/// Binds a long vector.
 #endif
 
 	void bind(std::size_t pos, const bool& val, Direction dir);
 		/// Binds a boolean.
 
+	void bind(std::size_t pos, const std::vector<bool>& val, Direction dir);
+		/// Binds a boolean vector.
+
 	void bind(std::size_t pos, const float& val, Direction dir);
 		/// Binds a float.
+
+	void bind(std::size_t pos, const std::vector<float>& val, Direction dir);
+		/// Binds a float vector.
 
 	void bind(std::size_t pos, const double& val, Direction dir);
 		/// Binds a double.
 
+	void bind(std::size_t pos, const std::vector<double>& val, Direction dir);
+		/// Binds a double vector.
+
 	void bind(std::size_t pos, const char& val, Direction dir);
 		/// Binds a single character.
+
+	void bind(std::size_t pos, const std::vector<char>& val, Direction dir);
+		/// Binds a character vector.
 
 	void bind(std::size_t pos, const std::string& val, Direction dir);
 		/// Binds a string.
 
+	void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir);
+		/// Binds a string vector.
+
 	void bind(std::size_t pos, const BLOB& val, Direction dir);
 		/// Binds a BLOB. In-bound only.
+
+	void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir);
+		/// Binds a BLOB vector. In-bound only.
 
 	void bind(std::size_t pos, const Date& val, Direction dir);
 		/// Binds a Date.
 
+	void bind(std::size_t pos, const std::vector<Date>& val, Direction dir);
+		/// Binds a Date vector.
+
 	void bind(std::size_t pos, const Time& val, Direction dir);
 		/// Binds a Time.
+
+	void bind(std::size_t pos, const std::vector<Time>& val, Direction dir);
+		/// Binds a Time vector.
 
 	void bind(std::size_t pos, const DateTime& val, Direction dir);
 		/// Binds a DateTime.
 
+	void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir);
+		/// Binds a DateTime vector.
+
 	void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null. In-bound only.
+
+	void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir);
+		/// Binds a null vector. In-bound only.
 
 	void setDataBinding(ParameterBinding binding);
 		/// Set data binding type.
@@ -164,16 +222,22 @@ public:
 		/// Clears the cached storage.
 
 private:
-	typedef std::vector<SQLLEN*>              LengthVec;
-	typedef std::map<char*, std::string*>     StringMap;
-	typedef std::map<SQL_DATE_STRUCT*, Date*> DateMap;
-	typedef std::map<SQL_TIME_STRUCT*, Time*> TimeMap;
-	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*> TimestampMap;
+	typedef std::vector<SQLLEN*>                            LengthVec;
+	typedef std::vector<std::vector<SQLLEN> >               LengthVecVec;
+	typedef std::vector<char*>                              CharPtrVec;
+	typedef std::vector<bool*>                              BoolPtrVec;
+	typedef std::vector<std::vector<SQL_DATE_STRUCT> >      DateVec;
+	typedef std::vector<std::vector<SQL_TIME_STRUCT> >      TimeVec;
+	typedef std::vector<std::vector<SQL_TIMESTAMP_STRUCT> > DateTimeVec;
+	typedef std::map<char*, std::string*>                   StringMap;
+	typedef std::map<SQL_DATE_STRUCT*, Date*>               DateMap;
+	typedef std::map<SQL_TIME_STRUCT*, Time*>               TimeMap;
+	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*>      TimestampMap;
 
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
 
-	void bind(std::size_t pos, const char* const &pVal, Direction dir);
+	void bind(std::size_t pos, const char* const& pVal, Direction dir);
 		/// Binds a const char ptr. 
 		/// This is a private no-op in this implementation
 		/// due to security risk.
@@ -185,11 +249,11 @@ private:
 	template <typename T>
 	void bindImpl(std::size_t pos, T& val, SQLSMALLINT cDataType, Direction dir)
 	{
-		_lengthIndicator.push_back(0);
-
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
+
+		_lengthIndicator.push_back(0);
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
@@ -198,13 +262,49 @@ private:
 			Utility::sqlDataType(cDataType), 
 			colSize,
 			decDigits,
-			(SQLPOINTER) &val, 
-			0, 
-			0)))
+			(SQLPOINTER) &val, 0, 0)))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
 	}
+
+	template <typename T>
+	void bindImplVec(std::size_t pos, const std::vector<T>& val, SQLSMALLINT cDataType, Direction dir)
+	{
+		if (PB_IMMEDIATE != _paramBinding)
+			throw InvalidAccessException("std::vector can only be bound immediately.");
+
+		std::size_t length = val.size();
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
+		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
+		setParamSetSize(pos, length);
+
+		if (_vecLengthIndicator.size() <= pos)
+		{
+			_vecLengthIndicator.resize(pos + 1);
+			_vecLengthIndicator[pos].resize(length, sizeof(T));
+		}
+
+		if (Utility::isError(SQLBindParameter(_rStmt, 
+			(SQLUSMALLINT) pos + 1, 
+			toODBCDirection(dir), 
+			cDataType, 
+			Utility::sqlDataType(cDataType), 
+			colSize,
+			decDigits,
+			(SQLPOINTER) &val[0], 
+			0, 
+			&_vecLengthIndicator[pos][0])))
+		{
+			throw StatementException(_rStmt, "SQLBindParameter()");
+		}
+	}
+
+	void bindImplVecBool(std::size_t pos, 
+		const std::vector<bool>& val, 
+		SQLSMALLINT cDataType, 
+		Direction dir);
 
 	void getColSizeAndPrecision(std::size_t pos, 
 		SQLSMALLINT cDataType, 
@@ -218,20 +318,40 @@ private:
 		/// to discover the required values are unsuccesfully exhausted, the values 
 		/// are both set to zero and no exception is thrown.
 
-	void bindNull(std::size_t pos, SQLSMALLINT cDataType);
-		/// Utility function for binding null values.
-		/// For in-bound purposes only.
+	void setParamSetSize(std::size_t pos, std::size_t length);
+		/// Sets the parameter set size. Used for column-wise binding.
+
+	void getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size);
+		/// Fills the column or parameter size into the 'size' argument.
+		/// Does nothing if neither can be obtained from the driver, so
+		/// size should be set to some default value prior to calling this 
+		/// function in order to avoid undefined size value.
+
+	void freeMemory();
+		/// Frees all dynamically allocated memory resources.
 
 	const StatementHandle& _rStmt;
-	LengthVec              _lengthIndicator;
-	ParamMap               _inParams;
-	ParamMap               _outParams;
-	ParameterBinding       _paramBinding;
-	DateMap                _dates;
-	TimeMap                _times;
-	TimestampMap           _timestamps;
-	StringMap              _strings;
-	const TypeInfo*        _pTypeInfo;
+
+	LengthVec        _lengthIndicator;
+	LengthVecVec     _vecLengthIndicator;
+
+	ParamMap         _inParams;
+	ParamMap         _outParams;
+	ParameterBinding _paramBinding;
+	
+	DateMap          _dates;
+	TimeMap          _times;
+	TimestampMap     _timestamps;
+	StringMap        _strings;
+
+	DateVec          _dateVec;
+	TimeVec          _timeVec;
+	DateTimeVec      _dateTimeVec;
+	CharPtrVec       _charPtrs;
+	BoolPtrVec       _boolPtrs;
+	const TypeInfo*  _pTypeInfo;
+	SQLINTEGER       _paramSetSize;
+	std::size_t      _maxFieldSize;
 };
 
 
@@ -244,9 +364,21 @@ inline void Binder::bind(std::size_t pos, const Poco::Int8& val, Direction dir)
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_STINYINT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::UInt8& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_UTINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_UTINYINT, dir);
 }
 
 
@@ -256,9 +388,21 @@ inline void Binder::bind(std::size_t pos, const Poco::Int16& val, Direction dir)
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_SSHORT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_USHORT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_USHORT, dir);
 }
 
 
@@ -268,9 +412,21 @@ inline void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir)
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_SLONG, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_ULONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_ULONG, dir);
 }
 
 
@@ -280,9 +436,21 @@ inline void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir)
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_SBIGINT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_UBIGINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_UBIGINT, dir);
 }
 
 
@@ -290,6 +458,12 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir
 inline void Binder::bind(std::size_t pos, const long& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_SLONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<long>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_SLONG, dir);
 }
 #endif
 
@@ -300,9 +474,21 @@ inline void Binder::bind(std::size_t pos, const float& val, Direction dir)
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<float>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_FLOAT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const double& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_DOUBLE, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<double>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_DOUBLE, dir);
 }
 
 
@@ -312,9 +498,21 @@ inline void Binder::bind(std::size_t pos, const bool& val, Direction dir)
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<bool>& val, Direction dir)
+{
+	bindImplVecBool(pos, val, SQL_C_BIT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const char& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_STINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<char>& val, Direction dir)
+{
+	bindImplVec(pos, val, SQL_C_STINYINT, dir);
 }
 
 

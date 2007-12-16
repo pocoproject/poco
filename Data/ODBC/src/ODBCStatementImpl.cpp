@@ -40,11 +40,9 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractPrepare.h"
 #include "Poco/Exception.h"
-#include <limits>
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-	#undef max
 	#pragma warning(disable:4312)// 'type cast' : conversion from 'Poco::UInt32' to 'SQLPOINTER' of greater size
 #endif
 
@@ -68,11 +66,6 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_nextResponse(0),
 	_prepared(false)
 {
-	if (session().getFeature("autoBind"))
-		SQLSetStmtAttr(_stmt, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) SQL_PARAM_BIND_BY_COLUMN, 0);
-
-	Poco::UInt32 step = getStep();
-	SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) step, 0);
 }
 
 
@@ -104,7 +97,9 @@ void ODBCStatementImpl::compileImpl()
 		pDT = AnyCast<TypeInfo*>(dti);
 	}catch (NotSupportedException&) { }
 
-	_pBinder = new Binder(_stmt, bind, pDT);
+	std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+	
+	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT);
 	
 	// This is a hack to conform to some ODBC drivers behavior (e.g. MS SQLServer) with 
 	// stored procedure calls: driver refuses to report the number of columns, unless all 
@@ -169,6 +164,16 @@ void ODBCStatementImpl::doPrepare()
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
+
+		if (it != itEnd && (*it)->isBulk())
+		{
+			Poco::UInt32 limit = getExtractionLimit();
+			if (limit == Limit::LIMIT_UNLIMITED) 
+				throw InvalidArgumentException("Bulk operation not allowed without limit.");
+			checkError(SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) limit, 0),
+					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
+		}
+
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
 			AbstractPrepare* pAP = (*it)->createPrepareObject(_preparations[curDataSet], pos);
@@ -199,17 +204,17 @@ void ODBCStatementImpl::doBind(bool clear, bool reset)
 	{
 		Bindings::iterator it    = binds.begin();
 		Bindings::iterator itEnd = binds.end();
-		for (std::size_t pos = 0; it != itEnd && (*it)->canBind(); ++it)
-		{
-			(*it)->bind(pos);
-			pos += (*it)->numOfColumnsHandled();
-		}
 
 		if (reset)
 		{
 			it = binds.begin();
-			for (; it != itEnd && (*it)->canBind(); ++it)
-				(*it)->reset();
+			for (; it != itEnd; ++it) (*it)->reset();
+		}
+
+		for (std::size_t pos = 0; it != itEnd && (*it)->canBind(); ++it)
+		{
+			(*it)->bind(pos);
+			pos += (*it)->numOfColumnsHandled();
 		}
 	}
 }
@@ -292,12 +297,11 @@ bool ODBCStatementImpl::hasNext()
 		if (!nextRowReady())
 		{
 			try { activateNextDataSet(); } 
-			catch (InvalidAccessException&)
+			catch (NoDataException&)
 			{ return false;	}
 
-			try { checkError(SQLMoreResults(_stmt)); } 
-			catch (NoDataException&) 
-			{ return false;	}
+			if (SQL_NO_DATA == SQLMoreResults(_stmt)) 
+				return false;
 
 			addPreparation();
 			doPrepare();
@@ -324,14 +328,20 @@ void ODBCStatementImpl::makeStep()
 
 Poco::UInt32 ODBCStatementImpl::next()
 {
+	std::size_t count = 0;
+
 	if (nextRowReady())
 	{
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
+		std::size_t prevCount = 0;
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
-			(*it)->extract(pos);
+			count = (*it)->extract(pos);
+			if (prevCount && count != prevCount)
+				throw IllegalStateException("Different extraction counts");
+			prevCount = count;
 			pos += (*it)->numOfColumnsHandled();
 		}
 		_stepCalled = false;
@@ -342,7 +352,9 @@ Poco::UInt32 ODBCStatementImpl::next()
 			std::string("Iterator Error: trying to access the next value"));
 	}
 
-	return 1u;
+	return static_cast<Poco::UInt32>(count);
+
+	return 0;
 }
 
 
@@ -412,6 +424,17 @@ bool ODBCStatementImpl::isStoredProcedure() const
 	if (trimInPlace(str).size() < 2) return false; 	 
 
 	return ('{' == str[0] && '}' == str[str.size()-1]); 	 
+}
+
+
+const MetaColumn& ODBCStatementImpl::metaColumn(Poco::UInt32 pos) const
+{
+	std::size_t sz = _columnPtrs.size();
+
+	if (0 == sz || pos > sz - 1)
+		throw InvalidAccessException(format("Invalid column number: %u", pos));
+
+	return *_columnPtrs[pos];
 }
 
 

@@ -33,12 +33,12 @@
 #include "SQLiteTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#include "Poco/Data/Common.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/TypeHandler.h"
@@ -117,7 +117,7 @@ public:
 		pBinder->bind(pos++, obj.age, dir);
 	}
 
-	static void prepare(std::size_t pos, const Person& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, Person& obj, AbstractPreparation* pPrepare)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
 		poco_assert_dbg (pPrepare != 0);

@@ -141,6 +141,19 @@ void ODBCSQLiteTest::testNull()
 }
 
 
+void ODBCSQLiteTest::testBulk()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreateMiscTable();
+	_pExecutor->doBulkStringIntFloat(100);
+	recreateMiscTable();
+	_pExecutor->doBulkPerformance(1000);
+}
+
+
 void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -262,6 +275,23 @@ void ODBCSQLiteTest::recreateNullsTable(const std::string& notNull)
 }
 
 
+void ODBCSQLiteTest::recreateMiscTable()
+{
+	dropObject("TABLE", "MiscTest");
+	try 
+	{ 
+		// SQLite fails with BLOB bulk operations
+		session() << "CREATE TABLE MiscTest "
+			"(First VARCHAR(30),"
+			//"Second BLOB,"
+			"Third INTEGER,"
+			"Fourth REAL,"
+			"Fifth DATETIME)", now; 
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
+}
+
+
 CppUnit::Test* ODBCSQLiteTest::suite()
 {
 	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
@@ -294,7 +324,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testPrepare);
-		CppUnit_addTest(pSuite, ODBCSQLiteTest, testStep);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplexUnique);

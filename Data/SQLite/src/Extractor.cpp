@@ -251,7 +251,7 @@ bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
 }
 
 
-bool Extractor::isNull(std::size_t pos)
+bool Extractor::isNull(std::size_t pos, std::size_t)
 {
 	if (pos >= _nulls.size())
 		_nulls.resize(pos + 1);

@@ -59,7 +59,6 @@ const std::string StatementImpl::LIST = "list";
 const std::string StatementImpl::DEQUE = "deque";
 const std::string StatementImpl::UNKNOWN = "unknown";
 
-
 StatementImpl::StatementImpl(SessionImpl& rSession):
 	_state(ST_INITIALIZED),
 	_extrLimit(upperLimit((Poco::UInt32) Limit::LIMIT_UNLIMITED, false)),
@@ -70,7 +69,8 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_ostr(),
 	_bindings(),
 	_curDataSet(0),
-	_step(1u)
+	_bulkBinding(BULK_UNDEFINED),
+	_bulkExtraction(BULK_UNDEFINED)
 {
 	_extractors.resize(1);
 }
@@ -94,9 +94,8 @@ Poco::UInt32 StatementImpl::execute()
 		lim = executeWithLimit();
 		
 	if (lim < _lowerLimit)
-	{
 		throw LimitException("Did not receive enough data.");
-	}
+
 	return lim;
 }
 
@@ -106,16 +105,17 @@ Poco::UInt32 StatementImpl::executeWithLimit()
 	poco_assert (_state != ST_DONE);
 	compile();
 	Poco::UInt32 count = 0;
+	Poco::UInt32 limit = _extrLimit.value();
 	do
 	{
 		bind();
-		while (hasNext() && count < _extrLimit.value())
+		while (count < limit && hasNext()) 
 			count += next();
-	} while (canBind());
-
-	if (!canBind() && (!hasNext() || _extrLimit.value() == 0))
+	} while (count < limit && canBind());
+	
+	if (!canBind() && (!hasNext() || limit == 0))
 		_state = ST_DONE;
-	else if (hasNext() && _extrLimit.value() == count && _extrLimit.isHardLimit())
+	else if (hasNext() && limit == count && _extrLimit.isHardLimit())
 		throw LimitException("HardLimit reached. We got more data than we asked for");
 	else
 		_state = ST_PAUSED;
@@ -176,12 +176,8 @@ void StatementImpl::bind()
 	{
 		if (!hasNext())
 		{
-			if (canBind())
-			{
-				bindImpl();
-			}
-			else
-				_state = ST_DONE;
+			if (canBind()) bindImpl();
+			else _state = ST_DONE;
 		}
 	}
 }
@@ -200,6 +196,17 @@ void StatementImpl::setExtractionLimit(const Limit& extrLimit)
 		_extrLimit = extrLimit;
 	else
 		_lowerLimit = extrLimit.value();
+}
+
+
+void StatementImpl::setBulkExtraction(const Bulk& b)
+{
+	Poco::UInt32 limit = getExtractionLimit();
+	if (Limit::LIMIT_UNLIMITED != limit && b.size() != limit)
+		throw InvalidArgumentException("Can not set limit for statement.");
+
+	setExtractionLimit(b.limit());
+	_bulkExtraction = BULK_EXTRACTION;
 }
 
 
@@ -339,7 +346,7 @@ Poco::UInt32 StatementImpl::activateNextDataSet()
 	if (_curDataSet + 1 < dataSetCount())
 		return ++_curDataSet;
 	else
-		throw InvalidAccessException("End of data sets reached.");
+		throw NoDataException("End of data sets reached.");
 }
 
 

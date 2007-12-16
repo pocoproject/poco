@@ -41,40 +41,29 @@
 
 
 #include "Poco/Data/Data.h"
+#include <vector>
 #include <cstddef>
 
 
 namespace Poco {
 
+
 class DateTime;
 class Any;
 class DynamicAny;
 
+
 namespace Data {
+
 
 class Date;
 class Time;
 class BLOB;
 
+
 enum NullData
 {
-	NULL_GENERIC = 0,
-	NULL_INT8,
-	NULL_UINT8,
-	NULL_INT16,
-	NULL_UINT16,
-	NULL_INT32,
-	NULL_UINT32,
-	NULL_INT64,
-	NULL_UINT64,
-	NULL_BOOL,
-	NULL_FLOAT,
-	NULL_DOUBLE,
-	NULL_STRING,
-	NULL_BLOB,
-	NULL_DATE,
-	NULL_TIME,
-	NULL_TIMESTAMP
+	NULL_GENERIC = 0
 };
 
 
@@ -82,8 +71,7 @@ static const NullData null = NULL_GENERIC;
 
 
 class Data_API AbstractBinder
-	/// Interface for Binding data types to placeholders. The default placeholder format 
-	/// in the SQL query is ":name".
+	/// Interface for Binding data types to placeholders.
 {
 public:
 	enum Direction
@@ -103,64 +91,121 @@ public:
 	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int8.
 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN);
+		/// Binds an Int8 vector.
+
 	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir = PD_IN) = 0;
 		/// Binds an UInt8.
+
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir = PD_IN);
+		/// Binds an UInt8 vector.
 
 	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int16.
 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir = PD_IN);
+		/// Binds an Int16 vector.
+
 	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir = PD_IN) = 0;
 		/// Binds an UInt16.
+
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir = PD_IN);
+		/// Binds an UInt16 vector.
 
 	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int32.
 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir = PD_IN);
+		/// Binds an Int32 vector.
+
 	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir = PD_IN) = 0;
 		/// Binds an UInt32.
+
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN);
+		/// Binds an UInt32 vector.
 		
 	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int64.
 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN);
+		/// Binds an Int64 vector.
+
 	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir = PD_IN) = 0;
 		/// Binds an UInt64.
+
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN);
+		/// Binds an UInt64 vector.
 
 #ifndef POCO_LONG_IS_64_BIT
 	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN) = 0;
 		/// Binds a long.
+
+	virtual void bind(std::size_t pos, const std::vector<long>& val, Direction dir = PD_IN);
+		/// Binds a long vector.
 #endif
 
 	virtual void bind(std::size_t pos, const bool& val, Direction dir = PD_IN) = 0;
 		/// Binds a boolean.
 
+	virtual void bind(std::size_t pos, const std::vector<bool>& val, Direction dir = PD_IN);
+		/// Binds a boolean vector.
+
 	virtual void bind(std::size_t pos, const float& val, Direction dir = PD_IN) = 0;
 		/// Binds a float.
+
+	virtual void bind(std::size_t pos, const std::vector<float>& val, Direction dir = PD_IN);
+		/// Binds a float vector.
 
 	virtual void bind(std::size_t pos, const double& val, Direction dir = PD_IN) = 0;
 		/// Binds a double.
 
+	virtual void bind(std::size_t pos, const std::vector<double>& val, Direction dir = PD_IN);
+		/// Binds a double vector.
+
 	virtual void bind(std::size_t pos, const char& val, Direction dir = PD_IN) = 0;
 		/// Binds a single character.
 
-	virtual void bind(std::size_t pos, const char* const &pVal, Direction dir = PD_IN) = 0;
+	virtual void bind(std::size_t pos, const std::vector<char>& val, Direction dir = PD_IN);
+		/// Binds a character vector.
+
+	virtual void bind(std::size_t pos, const char* const& pVal, Direction dir = PD_IN) = 0;
 		/// Binds a const char ptr.
 
 	virtual void bind(std::size_t pos, const std::string& val, Direction dir = PD_IN) = 0;
 		/// Binds a string.
 
+	virtual void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir = PD_IN);
+		/// Binds a string vector.
+
 	virtual void bind(std::size_t pos, const BLOB& val, Direction dir = PD_IN) = 0;
 		/// Binds a BLOB.
+
+	virtual void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir = PD_IN);
+		/// Binds a BLOB vector.
 
 	virtual void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN) = 0;
 		/// Binds a DateTime.
 
+	virtual void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir = PD_IN);
+		/// Binds a DateTime vector.
+
 	virtual void bind(std::size_t pos, const Date& val, Direction dir = PD_IN) = 0;
 		/// Binds a Date.
+
+	virtual void bind(std::size_t pos, const std::vector<Date>& val, Direction dir = PD_IN);
+		/// Binds a Date vector.
 
 	virtual void bind(std::size_t pos, const Time& val, Direction dir = PD_IN) = 0;
 		/// Binds a Time.
 
+	virtual void bind(std::size_t pos, const std::vector<Time>& val, Direction dir = PD_IN);
+		/// Binds a Time vector.
+
 	virtual void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN) = 0;
 		/// Binds a null.
+
+	virtual void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir = PD_IN);
+		/// Binds a null vector.
 
 	void bind(std::size_t pos, const Any& val, Direction dir = PD_IN);
 		/// Binds an Any.

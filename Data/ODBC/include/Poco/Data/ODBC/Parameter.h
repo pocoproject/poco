@@ -82,8 +82,6 @@ public:
 private:
 	Parameter();
 
-	static const int BUFFER_LENGTH = 2048;
-
 	void init();
 
 	SQLSMALLINT _dataType;

@@ -346,6 +346,19 @@ void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 }
 
 
+void ODBCPostgreSQLTest::testBulk()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreateMiscTable();
+	_pExecutor->doBulkStringIntFloat(100);
+	recreateMiscTable();
+	_pExecutor->doBulkPerformance(1000);
+}
+
+
 void ODBCPostgreSQLTest::configurePLPgSQL()
 {
 	try
@@ -518,6 +531,24 @@ void ODBCPostgreSQLTest::recreateBoolTable()
 }
 
 
+void ODBCPostgreSQLTest::recreateMiscTable()
+{
+	dropObject("TABLE", "MiscTest");
+	try 
+	{ 
+		// pgSQL fails with BLOB bulk operations
+		// Mammoth does not bind columns properly
+		session() << "CREATE TABLE MiscTest "
+			"(First VARCHAR(30),"
+			//"Second BYTEA,"
+			"Third INTEGER,"
+			"Fourth FLOAT,"
+			"Fifth TIMESTAMP)", now; 
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
+}
+
+
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
 	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
@@ -550,7 +581,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testPrepare);
-		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStep);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSetComplexUnique);

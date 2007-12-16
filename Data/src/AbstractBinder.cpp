@@ -35,10 +35,13 @@
 
 
 #include "Poco/Data/AbstractBinder.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
+#include "Poco/Data/BLOB.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/DateTime.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
-#include "Poco/Data/BLOB.h"
 
 
 namespace Poco {
@@ -55,40 +58,162 @@ AbstractBinder::~AbstractBinder()
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+	
+void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+#ifndef POCO_LONG_IS_64_BIT
+void AbstractBinder::bind(std::size_t pos, const std::vector<long>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+#endif
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<bool>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<float>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<double>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<char>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<std::string>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<Date>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<Time>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<NullData>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 {
-	if(val.type() == typeid(Int32))
+	const std::type_info& type = val.type();
+
+	if(type == typeid(Int32))
 		bind(pos, RefAnyCast<Int32>(val), dir);
-	else if(val.type() == typeid(std::string))
+	else if(type == typeid(std::string))
 		bind(pos, RefAnyCast<std::string>(val), dir);
-	else if (val.type() == typeid(bool))
+	else if (type == typeid(bool))
 		bind(pos, RefAnyCast<bool>(val), dir);
-	else if(val.type() == typeid(char))
+	else if(type == typeid(char))
 		bind(pos, RefAnyCast<char>(val), dir);
-	else if(val.type() == typeid(Int8))
+	else if(type == typeid(Int8))
 		bind(pos, RefAnyCast<Int8>(val), dir);
-	else if(val.type() == typeid(UInt8))
+	else if(type == typeid(UInt8))
 		bind(pos, RefAnyCast<UInt8>(val), dir);
-	else if(val.type() == typeid(Int16))
+	else if(type == typeid(Int16))
 		bind(pos, RefAnyCast<Int16>(val), dir);
-	else if(val.type() == typeid(UInt16))
+	else if(type == typeid(UInt16))
 		bind(pos, RefAnyCast<UInt16>(val), dir);
-	else if(val.type() == typeid(UInt32))
+	else if(type == typeid(UInt32))
 		bind(pos, RefAnyCast<UInt32>(val), dir);
-	else if(val.type() == typeid(Int64))
+	else if(type == typeid(Int64))
 		bind(pos, RefAnyCast<Int64>(val), dir);
-	else if(val.type() == typeid(UInt64))
+	else if(type == typeid(UInt64))
 		bind(pos, RefAnyCast<UInt64>(val), dir);
-	else if(val.type() == typeid(float))
+	else if(type == typeid(float))
 		bind(pos, RefAnyCast<float>(val), dir);
-	else if(val.type() == typeid(double))
+	else if(type == typeid(double))
 		bind(pos, RefAnyCast<double>(val), dir);
-	else if(val.type() == typeid(DateTime))
+	else if(type == typeid(DateTime))
 		bind(pos, RefAnyCast<DateTime>(val), dir);
-	else if(val.type() == typeid(BLOB))
+	else if(type == typeid(Date))
+		bind(pos, RefAnyCast<Date>(val), dir);
+	else if(type == typeid(Time))
+		bind(pos, RefAnyCast<Time>(val), dir);
+	else if(type == typeid(BLOB))
 		bind(pos, RefAnyCast<BLOB>(val), dir);
 #ifndef POCO_LONG_IS_64_BIT
-	else if(val.type() == typeid(long))
+	else if(type == typeid(long))
 		bind(pos, RefAnyCast<long>(val), dir);
 #endif
 	else
@@ -98,38 +223,44 @@ void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 
 void AbstractBinder::bind(std::size_t pos, const DynamicAny& val, Direction dir)
 {
-	if(val.type() == typeid(Int32))
+	const std::type_info& type = val.type();
+
+	if(type == typeid(Int32))
 		bind(pos, val.extract<Int32>(), dir);
-	else if(val.type() == typeid(std::string))
+	else if(type == typeid(std::string))
 		bind(pos, val.extract<std::string>(), dir);
-	else if (val.type() == typeid(bool))
+	else if (type == typeid(bool))
 		bind(pos, val.extract<bool>(), dir);
-	else if(val.type() == typeid(char))
+	else if(type == typeid(char))
 		bind(pos, val.extract<char>(), dir);
-	else if(val.type() == typeid(Int8))
+	else if(type == typeid(Int8))
 		bind(pos, val.extract<Int8>(), dir);
-	else if(val.type() == typeid(UInt8))
+	else if(type == typeid(UInt8))
 		bind(pos, val.extract<UInt8>(), dir);
-	else if(val.type() == typeid(Int16))
+	else if(type == typeid(Int16))
 		bind(pos, val.extract<Int16>(), dir);
-	else if(val.type() == typeid(UInt16))
+	else if(type == typeid(UInt16))
 		bind(pos, val.extract<UInt16>(), dir);
-	else if(val.type() == typeid(UInt32))
+	else if(type == typeid(UInt32))
 		bind(pos, val.extract<UInt32>(), dir);
-	else if(val.type() == typeid(Int64))
+	else if(type == typeid(Int64))
 		bind(pos, val.extract<Int64>(), dir);
-	else if(val.type() == typeid(UInt64))
+	else if(type == typeid(UInt64))
 		bind(pos, val.extract<UInt64>(), dir);
-	else if(val.type() == typeid(float))
+	else if(type == typeid(float))
 		bind(pos, val.extract<float>(), dir);
-	else if(val.type() == typeid(double))
+	else if(type == typeid(double))
 		bind(pos, val.extract<double>(), dir);
-	else if(val.type() == typeid(DateTime))
+	else if(type == typeid(DateTime))
 		bind(pos, val.extract<DateTime>(), dir);
-	else if(val.type() == typeid(BLOB))
+	else if(type == typeid(Date))
+		bind(pos, val.extract<Date>(), dir);
+	else if(type == typeid(Time))
+		bind(pos, val.extract<Time>(), dir);
+	else if(type == typeid(BLOB))
 		bind(pos, val.extract<BLOB>(), dir);
 #ifndef POCO_LONG_IS_64_BIT
-	else if(val.type() == typeid(long))
+	else if(type == typeid(long))
 		bind(pos, val.extract<long>(), dir);
 #endif
 	else

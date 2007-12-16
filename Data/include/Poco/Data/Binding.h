@@ -113,7 +113,9 @@ class Binding<std::vector<T> >: public AbstractBinding
 	/// Specialization for std::vector.
 {
 public:
-	explicit Binding(const std::vector<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+	explicit Binding(const std::vector<T>& val, 
+		const std::string& name = "", 
+		Direction direction = PD_IN): 
 		AbstractBinding(name, direction), 
 		_val(val), 
 		_begin(val.begin()), 
@@ -148,6 +150,7 @@ public:
 	{
 		poco_assert_dbg(getBinder() != 0);
 		poco_assert_dbg(canBind());
+		
 		TypeHandler<T>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
 	}
@@ -181,7 +184,9 @@ class Binding<std::vector<bool> >: public AbstractBinding
 	/// Only IN binding is supported.
 {
 public:
-	explicit Binding(const std::vector<bool>& val, const std::string& name = "", Direction direction = PD_IN): 
+	explicit Binding(const std::vector<bool>& val, 
+		const std::string& name = "", 
+		Direction direction = PD_IN): 
 		AbstractBinding(name, direction), 
 		_val(val), 
 		_deq(_val.begin(), _val.end()),
@@ -203,7 +208,7 @@ public:
 
 	std::size_t numOfColumnsHandled() const
 	{
-		return TypeHandler<bool>::size();
+		return 1u;
 	}
 
 	std::size_t numOfRowsHandled() const
@@ -222,6 +227,7 @@ public:
 		poco_assert_dbg(canBind());
 		TypeHandler<bool>::bind(pos, *_begin, getBinder(), getDirection());
 		++_begin;
+
 	}
 
 	void reset()
@@ -584,9 +590,7 @@ template <typename T>
 Binding<T>* use(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN);
-	poco_check_ptr (pB);
-	return pB;
+	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
 
 
@@ -594,9 +598,7 @@ template <typename T>
 Binding<T>* in(const T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN);
-	poco_check_ptr (pB);
-	return pB;
+	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
 
 
@@ -604,9 +606,7 @@ template <typename T>
 Binding<T>* out(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_OUT);
-	poco_check_ptr (pB);
-	return pB;
+	return new Binding<T>(t, name, AbstractBinding::PD_OUT);
 }
 
 
@@ -614,9 +614,7 @@ template <typename T>
 Binding<T>* io(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	Binding<T>* pB = new Binding<T>(t, name, AbstractBinding::PD_IN_OUT);
-	poco_check_ptr (pB);
-	return pB;
+	return new Binding<T>(t, name, AbstractBinding::PD_IN_OUT);
 }
 
 

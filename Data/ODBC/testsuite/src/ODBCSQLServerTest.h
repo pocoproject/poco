@@ -89,6 +89,7 @@ private:
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateBoolTable();
+	void recreateMiscTable();
 
 	static SessionPtr  _pSession;
 	static ExecPtr     _pExecutor;

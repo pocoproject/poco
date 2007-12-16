@@ -45,6 +45,7 @@
 #include "Poco/Data/Prepare.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Data/Column.h"
+#include "Poco/Data/Position.h"
 #include "Poco/Data/DataException.h"
 #include <set>
 #include <vector>
@@ -63,8 +64,8 @@ class Extraction: public AbstractExtraction
 	/// Concrete Data Type specific extraction of values from a query result set.
 {
 public:
-	Extraction(T& result, Poco::UInt32 position = 0):
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(T& result, const Position& pos = Position(0)):
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(), 
 		_extracted(false)
@@ -73,8 +74,8 @@ public:
 	{
 	}
 
-	Extraction(T& result, const T& def, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(T& result, const T& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(def), 
 		_extracted(false)
@@ -108,13 +109,14 @@ public:
 		return _null;
 	}
 
-	void extract(std::size_t pos)
+	std::size_t extract(std::size_t pos)
 	{
 		if (_extracted) throw ExtractException("value already extracted");
 		_extracted = true;
 		AbstractExtractor* pExt = getExtractor();
 		TypeHandler<T>::extract(pos, _rResult, _default, pExt);
 		_null = pExt->isNull(pos);
+		return 1u;
 	}
 
 	void reset()
@@ -122,14 +124,14 @@ public:
 		_extracted = false;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
-		return new Prepare<T>(pPrep, pos, _default);
+		return new Prepare<T>(pPrep, pos, _rResult);
 	}
 
 private:
 	T&   _rResult;
-	T    _default;   // copy the default
+	T    _default;
 	bool _extracted;
 	bool _null;
 };
@@ -140,18 +142,21 @@ class Extraction<std::vector<T> >: public AbstractExtraction
 	/// Vector Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::vector<T>& result, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::vector<T>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default()
+
 	{
+		_rResult.clear();
 	}
 
-	Extraction(std::vector<T>& result, const T& def, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::vector<T>& result, const T& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(def)
 	{
+		_rResult.clear();
 	}
 
 	virtual ~Extraction()
@@ -184,24 +189,20 @@ public:
 		}
 	}
 
-	void extract(std::size_t pos)
+	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor* pExt = getExtractor();
-
-		// for vector specialization, a temporary must be used to
-		// allow for extraction of bool values
-		T tmp = _default;
-		TypeHandler<T>::extract(pos, tmp, _default, pExt);
-		_rResult.push_back(tmp);
-		
+		_rResult.push_back(_default);
+		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(pExt->isNull(pos));
+		return 1u;
 	}
 
 	virtual void reset()
 	{
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<T>(pPrep, pos, _default);
 	}
@@ -215,8 +216,93 @@ protected:
 
 private:
 	std::vector<T>&  _rResult;
-	T                _default; // copy the default
+	T                _default;
 	std::deque<bool> _nulls;
+};
+
+
+template <>
+class Extraction<std::vector<bool> >: public AbstractExtraction
+	/// Vector bool specialization for extraction of values from a query result set.
+{
+public:
+	Extraction(std::vector<bool>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(result), 
+		_default()
+	{
+		_rResult.clear();
+	}
+
+	Extraction(std::vector<bool>& result, const bool& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(result), 
+		_default(def)
+	{
+		_rResult.clear();
+	}
+
+	virtual ~Extraction()
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return TypeHandler<bool>::size();
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return _rResult.size();
+	}
+
+	std::size_t numOfRowsAllowed() const
+	{
+		return getLimit();
+	}
+
+	bool isNull(std::size_t row) const
+	{
+		try
+		{
+			return _nulls.at(row);
+		}catch (std::out_of_range& ex)
+		{ 
+			throw RangeException(ex.what()); 
+		}
+	}
+
+	std::size_t extract(std::size_t pos)
+	{
+		AbstractExtractor* pExt = getExtractor();
+
+		bool tmp = _default;
+		TypeHandler<bool>::extract(pos, tmp, _default, pExt);
+		_rResult.push_back(tmp);
+		_nulls.push_back(pExt->isNull(pos));
+		return 1u;
+	}
+
+	virtual void reset()
+	{
+	}
+
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	{
+		return new Prepare<bool>(pPrep, pos, _default);
+	}
+
+protected:
+
+	const std::vector<bool>& result() const
+	{
+		return _rResult;
+	}
+
+private:
+	std::vector<bool>& _rResult;
+	bool               _default;
+	std::deque<bool>   _nulls;
 };
 
 
@@ -225,18 +311,20 @@ class Extraction<std::list<T> >: public AbstractExtraction
 	/// List Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::list<T>& result, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::list<T>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default()
 	{
+		_rResult.clear();
 	}
 
-	Extraction(std::list<T>& result, const T& def, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::list<T>& result, const T& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(def)
 	{
+		_rResult.clear();
 	}
 
 	virtual ~Extraction()
@@ -269,19 +357,20 @@ public:
 		}
 	}
 
-	void extract(std::size_t pos)
+	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor* pExt = getExtractor();
 		_rResult.push_back(_default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(pExt->isNull(pos));
+		return 1u;
 	}
 
 	virtual void reset()
 	{
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<T>(pPrep, pos, _default);
 	}
@@ -295,7 +384,7 @@ protected:
 
 private:
 	std::list<T>&    _rResult;
-	T                _default; // copy the default
+	T                _default;
 	std::deque<bool> _nulls;
 };
 
@@ -305,18 +394,20 @@ class Extraction<std::deque<T> >: public AbstractExtraction
 	/// Deque Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::deque<T>& result, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::deque<T>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default()
 	{
+		_rResult.clear();
 	}
 
-	Extraction(std::deque<T>& result, const T& def, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::deque<T>& result, const T& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(def)
 	{
+		_rResult.clear();
 	}
 
 	virtual ~Extraction()
@@ -349,19 +440,20 @@ public:
 		}
 	}
 
-	void extract(std::size_t pos)
+	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor* pExt = getExtractor();
 		_rResult.push_back(_default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(pExt->isNull(pos));
+		return 1u;
 	}
 
 	virtual void reset()
 	{
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<T>(pPrep, pos, _default);
 	}
@@ -375,7 +467,7 @@ protected:
 
 private:
 	std::deque<T>&   _rResult;
-	T                _default; // copy the default
+	T                _default;
 	std::deque<bool> _nulls;
 };
 
@@ -393,8 +485,8 @@ class InternalExtraction: public Extraction<C>
 	/// InternalExtraction objects can not be copied or assigned.
 {
 public:
-	explicit InternalExtraction(C& result, Column<T,C>* pColumn, Poco::UInt32 position = 0): 
-		Extraction<C>(result, T(), position), 
+	explicit InternalExtraction(C& result, Column<T,C>* pColumn, const Position& pos = Position(0)): 
+		Extraction<C>(result, T(), pos), 
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.
 	{
@@ -447,18 +539,22 @@ class Extraction<std::set<T> >: public AbstractExtraction
 	/// Set Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::set<T>& result, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	typedef typename std::set<T>::iterator Iterator;
+
+	Extraction(std::set<T>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default()
 	{
+		_rResult.clear();
 	}
 
-	Extraction(std::set<T>& result, const T& def, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::set<T>& result, const T& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(def)
 	{
+		_rResult.clear();
 	}
 
 	~Extraction()
@@ -480,25 +576,26 @@ public:
 		return getLimit();
 	}
 
-	void extract(std::size_t pos)
+	std::size_t extract(std::size_t pos)
 	{
 		T tmp;
 		TypeHandler<T>::extract(pos, tmp, _default, getExtractor());
 		_rResult.insert(tmp);
+		return 1u;
 	}
 
 	void reset()
 	{
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<T>(pPrep, pos, _default);
 	}
 
 private:
 	std::set<T>& _rResult;
-	T            _default; // copy the default
+	T            _default;
 };
 
 
@@ -507,18 +604,20 @@ class Extraction<std::multiset<T> >: public AbstractExtraction
 	/// Multiset Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::multiset<T>& result, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::multiset<T>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default()
 	{
+		_rResult.clear();
 	}
 
-	Extraction(std::multiset<T>& result, const T& def, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::multiset<T>& result, const T& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(def)
 	{
+		_rResult.clear();
 	}
 
 	~Extraction()
@@ -540,25 +639,26 @@ public:
 		return getLimit();
 	}
 
-	void extract(std::size_t pos)
+	std::size_t extract(std::size_t pos)
 	{
 		T tmp;
 		TypeHandler<T>::extract(pos, tmp, _default, getExtractor());
 		_rResult.insert(tmp);
+		return 1u;
 	}
 
 	void reset()
 	{
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<T>(pPrep, pos, _default);
 	}
 
 private:
 	std::multiset<T>& _rResult;
-	T                 _default; // copy the default
+	T                 _default;
 };
 
 
@@ -567,18 +667,20 @@ class Extraction<std::map<K, V> >: public AbstractExtraction
 	/// Map Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::map<K, V>& result, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::map<K, V>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default()
 	{
+		_rResult.clear();
 	}
 
-	Extraction(std::map<K, V>& result, const V& def, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::map<K, V>& result, const V& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(def)
 	{
+		_rResult.clear();
 	}
 
 	~Extraction()
@@ -600,18 +702,19 @@ public:
 		return getLimit();
 	}
 
-	void extract(std::size_t pos)
+	std::size_t extract(std::size_t pos)
 	{
 		V tmp;
 		TypeHandler<V>::extract(pos, tmp, _default, getExtractor());
 		_rResult.insert(std::make_pair(tmp(), tmp));
+		return 1u;
 	}
 
 	void reset()
 	{
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<V>(pPrep, pos, _default);
 	}
@@ -619,7 +722,7 @@ public:
 
 private:
 	std::map<K, V>& _rResult;
-	V               _default; // copy the default
+	V               _default;
 };
 
 
@@ -628,18 +731,20 @@ class Extraction<std::multimap<K, V> >: public AbstractExtraction
 	/// Multimap Data Type specialization for extraction of values from a query result set.
 {
 public:
-	Extraction(std::multimap<K, V>& result, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::multimap<K, V>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default()
 	{
+		_rResult.clear();
 	}
 
-	Extraction(std::multimap<K, V>& result, const V& def, Poco::UInt32 position = 0): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, position),
+	Extraction(std::multimap<K, V>& result, const V& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
 		_rResult(result), 
 		_default(def)
 	{
+		_rResult.clear();
 	}
 
 	~Extraction()
@@ -661,38 +766,40 @@ public:
 		return getLimit();
 	}
 
-	void extract(std::size_t pos)
+	std::size_t extract(std::size_t pos)
 	{
 		V tmp;
 		TypeHandler<V>::extract(pos, tmp, _default, getExtractor());
 		_rResult.insert(std::make_pair(tmp(), tmp));
+		return 1u;
 	}
 
 	void reset()
 	{
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<V>(pPrep, pos, _default);
 	}
 
 private:
 	std::multimap<K, V>& _rResult;
-	V                    _default; // copy the default
+	V                    _default;
 };
 
 
 template <typename T> 
-Extraction<T>* into(T& t, Poco::UInt32 pos = 0)
+Extraction<T>* into(T& t, const Position& pos = 0)
 	/// Convenience function to allow for a more compact creation of an extraction object
+	/// with multiple recordset support.
 {
 	return new Extraction<T>(t, pos);
 }
 
 
 template <typename T> 
-Extraction<T>* into(T& t, Poco::UInt32 pos, const T& def)
+Extraction<T>* into(T& t, const Position& pos, const T& def)
 	/// Convenience function to allow for a more compact creation of an extraction object with the given default
 {
 	return new Extraction<T>(t, def, pos);

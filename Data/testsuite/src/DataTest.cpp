@@ -65,6 +65,7 @@ using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::NotFoundException;
 using Poco::InvalidArgumentException;
+using Poco::NotImplementedException;
 
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
@@ -1026,16 +1027,34 @@ void DataTest::testDateAndTime()
 	Date d1(2007, 6, 15);
 	d1.assign(d.year() - 1, d.month(), d.day());
 	assert (d1 < d); assert (d1 != d);
-	d1.assign(d.year(), d.month() - 1, d.day());
+	if (d.month() > 1)
+		d1.assign(d.year(), d.month() - 1, d.day());
+	else
+		d1.assign(d.year() - 1, 12, d.day());
+	
 	assert (d1 < d); assert (d1 != d);
-	d1.assign(d.year(), d.month(), d.day() - 1);
-	assert (d1 < d); assert (d1 != d);
+
+	if (d.day() > 1)
+	{
+		d1.assign(d.year(), d.month(), d.day() - 1);
+		assert (d1 < d); assert (d1 != d);
+	}
+
 	d1.assign(d.year() + 1, d.month(), d.day());
 	assert (d1 > d); assert (d1 != d);
-	d1.assign(d.year(), d.month() + 1, d.day());
+	
+	if (d.month() < 12)
+		d1.assign(d.year(), d.month() + 1, d.day());
+	else
+		d1.assign(d.year() + 1, 1, d.day());
 	assert (d1 > d); assert (d1 != d);
-	d1.assign(d.year(), d.month(), d.day() + 1);
-	assert (d1 > d); assert (d1 != d);
+
+	if (d.day() < dt.daysOfMonth(dt.year(), dt.month()))
+	{
+		d1.assign(d.year(), d.month(), d.day() + 1);
+		assert (d1 > d); assert (d1 != d);
+	}
+	
 	d1.assign(d.year(), d.month(), d.day());
 	assert (d1 == d);
 

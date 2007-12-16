@@ -407,27 +407,16 @@ void ODBCTest::testPrepare()
 }
 
 
-void ODBCTest::testStep()
+void ODBCTest::testBulk()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	for (int i = 0; i < 8;)
-	{
-		recreateIntsTable();
-		_pSession->setFeature("autoBind", bindValue(i));
-		_pSession->setFeature("autoExtract", bindValue(i+1));
-		std::string mode = bindValue(i+1) ? "auto" : "manual";
-		std::cout << "Extraction: " << mode << std::endl;
-		_pExecutor->doStep(1000, 1);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 10);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 100);
-		recreateIntsTable();
-		_pExecutor->doStep(1000, 1000);
-
-		i += 2;
-	}
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreateMiscTable();
+	_pExecutor->doBulk(100);
+	recreateMiscTable();
+	_pExecutor->doBulkPerformance(1000);
 }
 
 

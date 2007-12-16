@@ -1,13 +1,13 @@
 //
-// Step.h
+// PositionExtraction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Step.h#7 $
+// $Id: //poco/Main/Data/include/Poco/Data/Position.h#9 $
 //
 // Library: Data
 // Package: DataCore
-// Module:  Step
+// Module:  Position
 //
-// Definition of the Step class.
+// Definition of the PositionExtraction class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,59 +36,56 @@
 //
 
 
-#ifndef Data_Step_INCLUDED
-#define Data_Step_INCLUDED
+#ifndef Data_Position_INCLUDED
+#define Data_Position_INCLUDED
 
 
-#include "Poco/Data/Data.h"
+#include "Poco/Data/Limit.h"
 
 
 namespace Poco {
 namespace Data {
 
 
-class Data_API Step
-	/// Step stores information how many rows should be returned at evry advance through the recordset.
+class Data_API Position
+	/// Utility class wrapping unsigned integer. Used to
+	/// indicate the recordset position in batch SQL statements.
 {
 public:
-	enum
-	{
-		DEFAULT_STEP = 1u
-	};
+	Position(Poco::UInt32 value);
+		/// Creates the Position.
 
-	Step(Poco::UInt32 value = 1u);
-		/// Creates the Step. 
-		///
-		/// Value contains the step and defaults to DEFAULT_STEP.
-
-	~Step();
-		/// Destroys the Step.
+	~Position();
+		/// Destroys the Position.
 
 	Poco::UInt32 value() const;
-		/// Returns the value of the limit
-
+		/// Returns the position value.
+	
 private:
+	Position();
+
 	Poco::UInt32 _value;
 };
 
 
-//
-// inlines
-//
-inline Poco::UInt32 Step::value() const
-{
-	return _value;
+///
+/// inlines
+///
+inline Poco::UInt32 Position::value() const 
+{ 
+	return _value; 
 }
 
 
-template <typename T> 
-Step step(T step)
+template <typename T>
+inline Position from(const T& value)
+	/// Convenience function for creation of position.
 {
-	return Step(static_cast<Poco::UInt32>(step));
+	return Position(value);
 }
 
 
 } } // namespace Poco::Data
 
 
-#endif // Data_Step_INCLUDED
+#endif // Data_Position_INCLUDED

@@ -77,6 +77,12 @@ public:
 	bool isLowerLimit() const;
 		/// Returns true if the limit is a lower limit, otherwise it is an upperLimit
 
+	bool operator == (const Limit& other) const;
+		/// Equality operator.
+
+	bool operator != (const Limit& other) const;
+		/// Inequality operator.
+
 private:
 	Poco::UInt32 _value;
 	bool         _hardLimit;
@@ -102,6 +108,22 @@ inline bool Limit::isHardLimit() const
 inline bool Limit::isLowerLimit() const
 {
 	return _isLowerLimit;
+}
+
+
+inline bool Limit::operator == (const Limit& other) const
+{
+	return other._value == _value &&
+		other._hardLimit == _hardLimit &&
+		other._isLowerLimit == _isLowerLimit;
+}
+
+
+inline bool Limit::operator != (const Limit& other) const
+{
+	return other._value != _value ||
+		other._hardLimit != _hardLimit ||
+		other._isLowerLimit != _isLowerLimit;
 }
 
 

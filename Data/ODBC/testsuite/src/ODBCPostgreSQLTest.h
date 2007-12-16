@@ -64,6 +64,7 @@ public:
 	void testBareboneODBC();
 
 	void testBLOB();
+	void testBulk();
 
 	void testStoredFunction();
 	void testStoredFunctionAny();
@@ -86,7 +87,8 @@ private:
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull="");
 	void recreateBoolTable();
-	
+	void recreateMiscTable();
+
 	void configurePLPgSQL();
 		/// Configures PL/pgSQL in the database. A reasonable defaults
 		/// for the interpreter location on WIN32 and POSIX platforms are 

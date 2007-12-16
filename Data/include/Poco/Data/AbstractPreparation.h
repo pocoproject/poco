@@ -42,6 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/RefCountedObject.h"
+#include <vector>
 #include <cstddef>
 
 
@@ -64,78 +65,169 @@ class BLOB;
 class Data_API AbstractPreparation: public Poco::RefCountedObject
 	/// Interface used for database preparation where we first have to register all data types (and memory output locations)
 	/// before extracting data, i.e. extract works as two-pase extract: first we call prepare once, then extract n-times.
-	/// Only some database connectors will need to implement this interface.
-	/// Note that the values in the interface serve only the purpose of type distinction.
+	/// There are cases (bulk operations using std::vector storage) when extract is called only once.
+	/// The value passed to a prepare() call is not be used by the prepare, serving only as an indication of the data type
+	/// being prepared. 
+	/// Implementing this interface is not mandatory for a connector. Connectors that only extract data after SQL execution 
+	/// (e.g. SQLite) do not need this functionality at all.
 {
 public:
-	AbstractPreparation();
+	AbstractPreparation(Poco::UInt32 length = 1u);
 		/// Creates the AbstractPreparation.
 
 	virtual ~AbstractPreparation();
 		/// Destroys the AbstractPreparation.
 
-	virtual void prepare(std::size_t pos, Poco::Int8) = 0;
+	virtual void prepare(std::size_t pos, Poco::Int8&) = 0;
 		/// Prepares an Int8.
 
-	virtual void prepare(std::size_t pos, Poco::UInt8) = 0;
+	virtual void prepare(std::size_t pos, std::vector<Poco::Int8>& val);
+		/// Prepares an Int8 vector.
+
+	virtual void prepare(std::size_t pos, Poco::UInt8&) = 0;
 		/// Prepares an UInt8.
 
-	virtual void prepare(std::size_t pos, Poco::Int16) = 0;
+	virtual void prepare(std::size_t pos, std::vector<Poco::UInt8>& val);
+		/// Prepares an UInt8 vector.
+
+	virtual void prepare(std::size_t pos, Poco::Int16&) = 0;
 		/// Prepares an Int16.
 
-	virtual void prepare(std::size_t pos, Poco::UInt16) = 0;
+	virtual void prepare(std::size_t pos, std::vector<Poco::Int16>& val);
+		/// Prepares an Int16 vector.
+
+	virtual void prepare(std::size_t pos, Poco::UInt16&) = 0;
 		/// Prepares an UInt16.
 
-	virtual void prepare(std::size_t pos, Poco::Int32) = 0;
+	virtual void prepare(std::size_t pos, std::vector<Poco::UInt16>& val);
+		/// Prepares an UInt16 vector.
+
+	virtual void prepare(std::size_t pos, Poco::Int32&) = 0;
 		/// Prepares an Int32.
 
-	virtual void prepare(std::size_t pos, Poco::UInt32) = 0;
+	virtual void prepare(std::size_t pos, std::vector<Poco::Int32>& val);
+		/// Prepares an Int32 vector.
+
+	virtual void prepare(std::size_t pos, Poco::UInt32&) = 0;
 		/// Prepares an UInt32.
 
-	virtual void prepare(std::size_t pos, Poco::Int64) = 0;
+	virtual void prepare(std::size_t pos, std::vector<Poco::UInt32>& val);
+		/// Prepares an UInt32 vector.
+
+	virtual void prepare(std::size_t pos, Poco::Int64&) = 0;
 		/// Prepares an Int64.
 
-	virtual void prepare(std::size_t pos, Poco::UInt64) = 0;
+	virtual void prepare(std::size_t pos, std::vector<Poco::Int64>& val);
+		/// Prepares an Int64 vector.
+
+	virtual void prepare(std::size_t pos, Poco::UInt64&) = 0;
 		/// Prepares an UInt64.
 
+	virtual void prepare(std::size_t pos, std::vector<Poco::UInt64>& val);
+		/// Prepares an UInt64 vector.
+
 #ifndef POCO_LONG_IS_64_BIT
-	virtual void prepare(std::size_t pos, long) = 0;
+	virtual void prepare(std::size_t pos, long&) = 0;
 		/// Prepares a long.
+
+	virtual void prepare(std::size_t pos, std::vector<long>& val);
+		/// Prepares a long vector.
 #endif
 
-	virtual void prepare(std::size_t pos, bool) = 0;
+	virtual void prepare(std::size_t pos, bool&) = 0;
 		/// Prepares a boolean.
 
-	virtual void prepare(std::size_t pos, float) = 0;
+	virtual void prepare(std::size_t pos, std::vector<bool>& val);
+		/// Prepares a boolean vector.
+
+	virtual void prepare(std::size_t pos, float&) = 0;
 		/// Prepares a float.
 
-	virtual void prepare(std::size_t pos, double) = 0;
+	virtual void prepare(std::size_t pos, std::vector<float>& val);
+		/// Prepares a float vector.
+
+	virtual void prepare(std::size_t pos, double&) = 0;
 		/// Prepares a double.
 
-	virtual void prepare(std::size_t pos, char) = 0;
+	virtual void prepare(std::size_t pos, std::vector<double>& val);
+		/// Prepares a double vector.
+
+	virtual void prepare(std::size_t pos, char&) = 0;
 		/// Prepares a single character.
 
-	virtual void prepare(std::size_t pos, const std::string& ) = 0;
+	virtual void prepare(std::size_t pos, std::vector<char>& val);
+		/// Prepares a character vector.
+
+	virtual void prepare(std::size_t pos, const std::string&) = 0;
 		/// Prepares a string.
+
+	virtual void prepare(std::size_t pos, const std::vector<std::string>& val);
+		/// Prepares a string vector.
 
 	virtual void prepare(std::size_t pos, const BLOB&) = 0;
 		/// Prepares a BLOB.
 
+	virtual void prepare(std::size_t pos, const std::vector<BLOB>& val);
+		/// Prepares a BLOB vector.
+
 	virtual void prepare(std::size_t pos, const DateTime&) = 0;
 		/// Prepares a DateTime.
+
+	virtual void prepare(std::size_t pos, const std::vector<DateTime>& val);
+		/// Prepares a DateTime vector.
 
 	virtual void prepare(std::size_t pos, const Date&) = 0;
 		/// Prepares a Date.
 
+	virtual void prepare(std::size_t pos, const std::vector<Date>& val);
+		/// Prepares a Date vector.
+
 	virtual void prepare(std::size_t pos, const Time&) = 0;
 		/// Prepares a Time.
+
+	virtual void prepare(std::size_t pos, const std::vector<Time>& val);
+		/// Prepares a Time vector.
 
 	virtual void prepare(std::size_t pos, const Any&) = 0;
 		/// Prepares an Any.
 
+	virtual void prepare(std::size_t pos, const std::vector<Any>& val);
+		/// Prepares an Any vector.
+
 	virtual void prepare(std::size_t pos, const DynamicAny&) = 0;
 		/// Prepares a DynamicAny.
+
+	virtual void prepare(std::size_t pos, const std::vector<DynamicAny>& val);
+		/// Prepares a DynamicAny vector.
+
+	void setLength(Poco::UInt32 length);
+		/// Sets the length of prepared data.
+		/// Needed only for data lengths greater than 1 (i.e. for
+		/// bulk operations).
+
+	Poco::UInt32 getLength() const;
+		/// Returns the length of prepared data. Defaults to 1.
+		/// The length is greater than one for bulk operations.
+
+private:
+	Poco::UInt32 _length;
 };
+
+
+///
+/// inlines
+///
+inline void AbstractPreparation::setLength(Poco::UInt32 length)
+{
+	_length = length;
+}
+
+
+inline Poco::UInt32 AbstractPreparation::getLength() const
+{
+	return _length;
+}
+
 
 
 } } // namespace Poco::Data

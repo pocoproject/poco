@@ -51,10 +51,10 @@ POCO_IMPLEMENT_EXCEPTION(BindingException, DataException, "Binding error")
 POCO_IMPLEMENT_EXCEPTION(ExtractException, DataException, "Extraction error")
 POCO_IMPLEMENT_EXCEPTION(LimitException, DataException, "Limit error")
 POCO_IMPLEMENT_EXCEPTION(NotSupportedException, DataException, "Feature or property not supported")
-POCO_IMPLEMENT_EXCEPTION(NotImplementedException, DataException, "Feature or property not implemented")
 POCO_IMPLEMENT_EXCEPTION(SessionUnavailableException, DataException, "Session is unavailable")
 POCO_IMPLEMENT_EXCEPTION(SessionPoolExhaustedException, DataException, "No more sessions available from the session pool")
 POCO_IMPLEMENT_EXCEPTION(NoDataException, DataException, "No data found")
+POCO_IMPLEMENT_EXCEPTION(LengthExceededException, DataException, "Data too long")
 
 
 } } // namespace Poco::Data

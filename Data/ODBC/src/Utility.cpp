@@ -138,11 +138,33 @@ void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 }
 
 
+void Utility::dateTimeSync(std::vector<Poco::DateTime>& dt, const std::vector<SQL_TIMESTAMP_STRUCT>& ts)
+{
+	std::size_t size = ts.size();
+	if (dt.size() != size) dt.resize(size);
+	std::vector<Poco::DateTime>::iterator dIt = dt.begin();
+	std::vector<SQL_TIMESTAMP_STRUCT>::const_iterator it = ts.begin();
+	std::vector<SQL_TIMESTAMP_STRUCT>::const_iterator end = ts.end();
+	for (; it != end; ++it, ++dIt) dateTimeSync(*dIt, *it);
+}
+
+
 void Utility::dateSync(SQL_DATE_STRUCT& ds, const Date& d)
 {
 	ds.year = d.year();
 	ds.month = d.month();
 	ds.day = d.day();
+}
+
+
+void Utility::dateSync(std::vector<SQL_DATE_STRUCT>& ds, const std::vector<Date>& d)
+{
+	std::size_t size = d.size();
+	if (ds.size() != size) ds.resize(size);
+	std::vector<SQL_DATE_STRUCT>::iterator dIt = ds.begin();
+	std::vector<Date>::const_iterator it = d.begin();
+	std::vector<Date>::const_iterator end = d.end();
+	for (; it != end; ++it, ++dIt) dateSync(*dIt, *it);
 }
 
 
@@ -154,6 +176,17 @@ void Utility::timeSync(SQL_TIME_STRUCT& ts, const Time& t)
 }
 
 
+void Utility::timeSync(std::vector<SQL_TIME_STRUCT>& ts, const std::vector<Time>& t)
+{
+	std::size_t size = t.size();
+	if (ts.size() != size) ts.resize(size);
+	std::vector<SQL_TIME_STRUCT>::iterator tIt = ts.begin();
+	std::vector<Time>::const_iterator it = t.begin();
+	std::vector<Time>::const_iterator end = t.end();
+	for (; it != end; ++it, ++tIt) timeSync(*tIt, *it);
+}
+
+
 void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 {
 	ts.year = dt.year();
@@ -162,7 +195,42 @@ void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 	ts.hour = dt.hour();
 	ts.minute = dt.minute();
 	ts.second = dt.second();
-	ts.fraction = (dt.millisecond() * 1000000) + (dt.microsecond() * 1000);
+	// Fraction support is limited to milliseconds due to MS SQL Server limitation
+	// see http://support.microsoft.com/kb/263872
+	ts.fraction = (dt.millisecond() * 1000000);// + (dt.microsecond() * 1000);
+}
+
+
+void Utility::dateTimeSync(std::vector<SQL_TIMESTAMP_STRUCT>& ts, const std::vector<Poco::DateTime>& dt)
+{
+	std::size_t size = dt.size();
+	if (ts.size() != size) ts.resize(size);
+	std::vector<SQL_TIMESTAMP_STRUCT>::iterator tIt = ts.begin();
+	std::vector<Poco::DateTime>::const_iterator it = dt.begin();
+	std::vector<Poco::DateTime>::const_iterator end = dt.end();
+	for (; it != end; ++it, ++tIt) dateTimeSync(*tIt, *it);
+}
+
+
+void Utility::dateSync(std::vector<Date>& d, const std::vector<SQL_DATE_STRUCT>& ds)
+{
+	std::size_t size = ds.size();
+	if (d.size() != size) d.resize(size);
+	std::vector<Date>::iterator dIt = d.begin();
+	std::vector<SQL_DATE_STRUCT>::const_iterator it = ds.begin();
+	std::vector<SQL_DATE_STRUCT>::const_iterator end = ds.end();
+	for (; it != end; ++it, ++dIt) dateSync(*dIt, *it);
+}
+
+
+void Utility::timeSync(std::vector<Time>& t, const std::vector<SQL_TIME_STRUCT>& ts)
+{
+	std::size_t size = ts.size();
+	if (t.size() != size) t.resize(size);
+	std::vector<Time>::iterator dIt = t.begin();
+	std::vector<SQL_TIME_STRUCT>::const_iterator it = ts.begin();
+	std::vector<SQL_TIME_STRUCT>::const_iterator end = ts.end();
+	for (; it != end; ++it, ++dIt) timeSync(*dIt, *it);
 }
 
 

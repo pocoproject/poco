@@ -38,6 +38,7 @@
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/Extraction.h"
 #include "Poco/Data/Session.h"
+#include "Poco/Data/Bulk.h"
 #include "Poco/Any.h"
 #include "Poco/Tuple.h"
 #include "Poco/ActiveMethod.h"
@@ -189,58 +190,84 @@ const std::string& Statement::getStorage() const
 }
 
 
-void now(Statement& statement)
+Statement& Statement::operator , (Manipulator manip)
 {
-	statement.execute();
+	manip(*this);
+	return *this;
 }
 
 
-void sync(Statement& statement)
+Statement& Statement::operator , (AbstractBinding* pBind)
 {
-	statement.setAsync(false);
+	if (pBind->isBulk())
+	{
+		if(_pImpl->bulkBindingAllowed())
+			_pImpl->setBulkBinding();
+		else
+			throw InvalidAccessException("Bulk and non-bulk binding modes can not be mixed.");
+	}
+	else _pImpl->forbidBulk();
+
+	_pImpl->addBinding(pBind);
+	return *this;
 }
 
 
-void async(Statement& statement)
+Statement& Statement::operator , (AbstractExtraction* pExtract)
 {
-	statement.setAsync(true);
+	if (pExtract->isBulk())
+	{
+		if(_pImpl->bulkExtractionAllowed())
+		{
+			Bulk b(pExtract->getLimit());
+			_pImpl->setBulkExtraction(b);
+		}
+		else
+			throw InvalidAccessException("Bulk and non-bulk extraction modes can not be mixed.");
+	}
+	else _pImpl->forbidBulk();
+
+	_pImpl->addExtract(pExtract);
+	return *this;
 }
 
 
-void vector(Statement& statement)
+Statement& Statement::operator , (const Limit& extrLimit)
 {
-	if (!statement.canModifyStorage())
-		throw InvalidAccessException("Storage not modifiable.");
+	if (_pImpl->isBulkExtraction() && _pImpl->extractionLimit() != extrLimit)
+		throw InvalidArgumentException("Limit for bulk extraction already set.");
 
-	statement.setStorage("vector");
+	_pImpl->setExtractionLimit(extrLimit);
+	return *this;
 }
 
 
-void list(Statement& statement)
+Statement& Statement::operator , (const Range& extrRange)
 {
-	if (!statement.canModifyStorage())
-		throw InvalidAccessException("Storage not modifiable.");
+	if (_pImpl->isBulkExtraction())
+		throw InvalidAccessException("Can not set range for bulk extraction.");
 
-	statement.setStorage("list");
+	_pImpl->setExtractionLimit(extrRange.lower());
+	_pImpl->setExtractionLimit(extrRange.upper());
+	return *this;
 }
 
 
-void deque(Statement& statement)
+Statement& Statement::operator , (const Bulk& bulk)
 {
-	if (!statement.canModifyStorage())
-		throw InvalidAccessException("Storage not modifiable.");
+	if (0 == _pImpl->extractions().size() && 
+		0 == _pImpl->bindings().size() &&
+		_pImpl->bulkExtractionAllowed() &&
+		_pImpl->bulkBindingAllowed())
+	{
+		Limit l(_pImpl->getExtractionLimit(), false, false);
+		_pImpl->setBulkExtraction(bulk);
+		_pImpl->setBulkBinding();
+	}
+	else
+		throw InvalidAccessException("Can not set bulk operations.");
 
-	statement.setStorage("deque");
-}
-
-
-void reset(Statement& statement)
-{
-	if (!statement.canModifyStorage())
-		throw InvalidAccessException("Storage not modifiable.");
-
-	statement.setStorage("deque");
-	statement.setAsync(false);
+	return *this;
 }
 
 

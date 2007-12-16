@@ -571,7 +571,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testPrepare);
-		CppUnit_addTest(pSuite, ODBCDB2Test, testStep);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testBulk);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetComplexUnique);

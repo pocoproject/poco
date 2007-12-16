@@ -1,11 +1,11 @@
 //
-// Step.cpp
+// Bulk.cpp
 //
-// $Id: //poco/Main/Data/src/Step.cpp#5 $
+// $Id: //poco/Main/Data/src/Bulk.cpp#7 $
 //
 // Library: Data
 // Package: DataCore
-// Module:  Step
+// Module:  Bulk
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,20 +34,24 @@
 //
 
 
-#include "Poco/Data/Step.h"
+#include "Poco/Data/Bulk.h"
 
 
 namespace Poco {
 namespace Data {
 
 
-Step::Step(Poco::UInt32 value):
-	_value(value)
+Bulk::Bulk(const Limit& limit): _limit(limit.value(), false, false)
 {
 }
 
 
-Step::~Step()
+Bulk::Bulk(Poco::UInt32 value): _limit(value, false, false)
+{
+}
+
+
+Bulk::~Bulk()
 {
 }
 

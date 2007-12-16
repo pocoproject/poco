@@ -55,45 +55,45 @@ public:
 	~Preparation();
 		/// Destroys the Preparation.
 
-	void prepare(std::size_t pos, Poco::Int8);
+	void prepare(std::size_t pos, Poco::Int8&);
 		/// Prepares an Int8.
 
-	void prepare(std::size_t pos, Poco::UInt8);
+	void prepare(std::size_t pos, Poco::UInt8&);
 		/// Prepares an UInt8.
 
-	void prepare(std::size_t pos, Poco::Int16);
+	void prepare(std::size_t pos, Poco::Int16&);
 		/// Prepares an Int16.
 
-	void prepare(std::size_t pos, Poco::UInt16);
+	void prepare(std::size_t pos, Poco::UInt16&);
 		/// Prepares an UInt16.
 
-	void prepare(std::size_t pos, Poco::Int32);
+	void prepare(std::size_t pos, Poco::Int32&);
 		/// Prepares an Int32.
 
-	void prepare(std::size_t pos, Poco::UInt32);
+	void prepare(std::size_t pos, Poco::UInt32&);
 		/// Prepares an UInt32.
 
-	void prepare(std::size_t pos, Poco::Int64);
+	void prepare(std::size_t pos, Poco::Int64&);
 		/// Prepares an Int64.
 
-	void prepare(std::size_t pos, Poco::UInt64);
+	void prepare(std::size_t pos, Poco::UInt64&);
 		/// Prepares an UInt64.
 
 #ifndef POCO_LONG_IS_64_BIT
-	void prepare(std::size_t pos, long);
+	void prepare(std::size_t pos, long&);
 		/// Prepares a long.
 #endif
 
-	void prepare(std::size_t pos, bool);
+	void prepare(std::size_t pos, bool&);
 		/// Prepares a boolean.
 
-	void prepare(std::size_t pos, float);
+	void prepare(std::size_t pos, float&);
 		/// Prepares a float.
 
-	void prepare(std::size_t pos, double);
+	void prepare(std::size_t pos, double&);
 		/// Prepares a double.
 
-	void prepare(std::size_t pos, char);
+	void prepare(std::size_t pos, char&);
 		/// Prepares a single character.
 
 	void prepare(std::size_t pos, const std::string&);

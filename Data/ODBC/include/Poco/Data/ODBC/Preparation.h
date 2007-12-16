@@ -76,8 +76,9 @@ class ODBC_API Preparation : public AbstractPreparation
 	/// with respective memory output locations before extracting data. 
 	/// Extraction works in two-phases: first prepare is called once, then extract n-times.
 	/// In ODBC, SQLBindCol/SQLFetch is the preferred method of data retrieval (SQLGetData is available, 
-	/// however with numerous driver implementation dependent limitations). In order to fit this functionality 
-	/// into Poco DataConnectors framework, every ODBC SQL statement instantiates its own Preparation object. 
+	/// however with numerous driver implementation dependent limitations and inferior performance). 
+	/// In order to fit this functionality into Poco DataConnectors framework, every ODBC SQL statement 
+	/// instantiates its own Preparation object. 
 	/// This is done once per statement execution (from StatementImpl::bindImpl()).
 	///
 	/// Preparation object is used to :
@@ -94,10 +95,24 @@ class ODBC_API Preparation : public AbstractPreparation
 	/// 
 {
 public:
+	typedef std::vector<char*> CharArray;
+
 	enum DataExtraction
 	{
 		DE_MANUAL,
 		DE_BOUND
+	};
+
+	static const std::size_t INVALID_ROW;
+
+	enum DataType
+	{
+		DT_BOOL,
+		DT_CHAR,
+		DT_CHAR_ARRAY,
+		DT_DATE,
+		DT_TIME,
+		DT_DATETIME
 	};
 
 	Preparation(const StatementHandle& rStmt, 
@@ -112,67 +127,127 @@ public:
 	~Preparation();
 		/// Destroys the Preparation.
 
-	void prepare(std::size_t pos, Poco::Int8);
+	void prepare(std::size_t pos, Poco::Int8& val);
 		/// Prepares an Int8.
 
-	void prepare(std::size_t pos, Poco::UInt8);
+	void prepare(std::size_t pos, std::vector<Poco::Int8>& val);
+		/// Prepares an Int8 vector.
+
+	void prepare(std::size_t pos, Poco::UInt8& val);
 		/// Prepares an UInt8.
 
-	void prepare(std::size_t pos, Poco::Int16);
+	void prepare(std::size_t pos, std::vector<Poco::UInt8>& val);
+		/// Prepares an UInt8 vector.
+
+	void prepare(std::size_t pos, Poco::Int16& val);
 		/// Prepares an Int16.
 
-	void prepare(std::size_t pos, Poco::UInt16);
+	void prepare(std::size_t pos, std::vector<Poco::Int16>& val);
+		/// Prepares an Int16 vector.
+
+	void prepare(std::size_t pos, Poco::UInt16& val);
 		/// Prepares an UInt16.
 
-	void prepare(std::size_t pos, Poco::Int32);
+	void prepare(std::size_t pos, std::vector<Poco::UInt16>& val);
+		/// Prepares an UInt16 vector.
+
+	void prepare(std::size_t pos, Poco::Int32& val);
 		/// Prepares an Int32.
 
-	void prepare(std::size_t pos, Poco::UInt32);
+	void prepare(std::size_t pos, std::vector<Poco::Int32>& val);
+		/// Prepares an Int32 vector.
+
+	void prepare(std::size_t pos, Poco::UInt32& val);
 		/// Prepares an UInt32.
 
-	void prepare(std::size_t pos, Poco::Int64);
+	void prepare(std::size_t pos, std::vector<Poco::UInt32>& val);
+		/// Prepares an UInt32 vector.
+
+	void prepare(std::size_t pos, Poco::Int64& val);
 		/// Prepares an Int64.
 
-	void prepare(std::size_t pos, Poco::UInt64);
+	void prepare(std::size_t pos, std::vector<Poco::Int64>& val);
+		/// Prepares an Int64 vector.
+
+	void prepare(std::size_t pos, Poco::UInt64& val);
 		/// Prepares an UInt64.
 
+	void prepare(std::size_t pos, std::vector<Poco::UInt64>& val);
+		/// Prepares an UInt64 vector.
+
 #ifndef POCO_LONG_IS_64_BIT
-	void prepare(std::size_t pos, long);
+	void prepare(std::size_t pos, long& val);
 		/// Prepares a long.
+
+	void prepare(std::size_t pos, std::vector<long>& val);
+		/// Prepares a long vector.
 #endif
 
-	void prepare(std::size_t pos, bool);
+	void prepare(std::size_t pos, bool& val);
 		/// Prepares a boolean.
 
-	void prepare(std::size_t pos, float);
+	void prepare(std::size_t pos, std::vector<bool>& val);
+		/// Prepares a boolean vector.
+
+	void prepare(std::size_t pos, float& val);
 		/// Prepares a float.
 
-	void prepare(std::size_t pos, double);
+	void prepare(std::size_t pos, std::vector<float>& val);
+		/// Prepares a float vector.
+
+	void prepare(std::size_t pos, double& val);
 		/// Prepares a double.
 
-	void prepare(std::size_t pos, char);
+	void prepare(std::size_t pos, std::vector<double>& val);
+		/// Prepares a double vector.
+
+	void prepare(std::size_t pos, char& val);
 		/// Prepares a single character.
 
-	void prepare(std::size_t pos, const std::string&);
+	void prepare(std::size_t pos, std::vector<char>& val);
+		/// Prepares a single character vector.
+
+	void prepare(std::size_t pos, const std::string& val);
 		/// Prepares a string.
 
-	void prepare(std::size_t pos, const Poco::Data::BLOB&);
+	void prepare(std::size_t pos, const std::vector<std::string>& val);
+		/// Prepares a string vector.
+
+	void prepare(std::size_t pos, const Poco::Data::BLOB& val);
 		/// Prepares a BLOB.
 
-	void prepare(std::size_t pos, const Poco::Data::Date&);
+	void prepare(std::size_t pos, const std::vector<Poco::Data::BLOB>& val);
+		/// Prepares a BLOB vector.
+
+	void prepare(std::size_t pos, const Poco::Data::Date& val);
 		/// Prepares a Date.
 
-	void prepare(std::size_t pos, const Poco::Data::Time&);
+	void prepare(std::size_t pos, const std::vector<Poco::Data::Date>& val);
+		/// Prepares a Date vector.
+
+	void prepare(std::size_t pos, const Poco::Data::Time& val);
 		/// Prepares a Time.
 
-	void prepare(std::size_t pos, const Poco::DateTime&);
+	void prepare(std::size_t pos, const std::vector<Poco::Data::Time>& val);
+		/// Prepares a Time vector.
+
+	void prepare(std::size_t pos, const Poco::DateTime& val);
 		/// Prepares a DateTime.
 
-	void prepare(std::size_t pos, const Poco::Any&);
+	void prepare(std::size_t pos, const std::vector<Poco::DateTime>& val);
+		/// Prepares a DateTime vector.
+
+	void prepare(std::size_t pos, const Poco::Any& val);
 		/// Prepares an Any.
 
-	void prepare(std::size_t pos, const Poco::DynamicAny&);
+	void prepare(std::size_t pos, const std::vector<Poco::Any>& val);
+		/// Prepares an Any vector.
+
+	void prepare(std::size_t pos, const Poco::DynamicAny& val);
 		/// Prepares a DynamicAny.
+
+	void prepare(std::size_t pos, const std::vector<Poco::DynamicAny>& val);
+		/// Prepares a DynamicAny vector.
 
 	std::size_t columns() const;
 		/// Returns the number of columns.
@@ -192,11 +267,15 @@ public:
 		/// Returned length for variable length fields is the one 
 		/// supported by this implementation, not the underlying DB.
 
-	int actualDataSize(std::size_t pos) const;
-		/// Returns the returned length. This is usually
-		/// equal to the column size, except for variable length fields
-		/// (BLOB and variable length strings).
+	std::size_t actualDataSize(std::size_t col, std::size_t row = INVALID_ROW) const;
+		/// Returns the returned length for the column and row specified. 
+		/// This is usually equal to the column size, except for 
+		/// variable length fields (BLOB and variable length strings).
 		/// For null values, the return value is -1 (SQL_NO_DATA)
+
+	std::size_t bulkSize(std::size_t col = 0) const;
+		/// Returns bulk size. Column argument is optional
+		/// since all columns must be the same size.
 
 	void setDataExtraction(DataExtraction ext);
 		/// Set data extraction mode.
@@ -205,201 +284,486 @@ public:
 		/// Returns data extraction mode.
 
 private:
+	typedef std::vector<Poco::Any> ValueVec;
+	typedef std::vector<SQLLEN>    LengthVec;
+	typedef std::vector<LengthVec> LengthLengthVec;
+	typedef std::map<std::size_t, DataType> IndexMap;
+
 	Preparation();
 	Preparation& operator = (const Preparation&);
 
-	void prepareImpl(std::size_t pos);
-		/// Utility function to prepare Any and DynamicAny
+	template <typename T>
+	void prepareImpl(std::size_t pos, const std::vector<T>* pVal = 0)
+		/// Utility function to prepare Any and DynamicAny.
+	{
+		ODBCColumn col(_rStmt, pos);
+
+		switch (col.type())
+		{
+			case MetaColumn::FDT_INT8:
+				if (pVal)
+					return prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, pVal->size());
+				else
+					return prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT); 
+
+			case MetaColumn::FDT_UINT8:
+				if (pVal)
+					return prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, pVal->size());
+				else
+					return prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT);
+
+			case MetaColumn::FDT_INT16:
+				if (pVal)
+					return prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT, pVal->size());
+				else
+					return prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT);
+
+			case MetaColumn::FDT_UINT16:
+				if (pVal)
+					return prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, pVal->size());
+				else
+					return prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT);
+
+			case MetaColumn::FDT_INT32:
+				if (pVal)
+					return prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG, pVal->size());
+				else
+					return prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG);
+
+			case MetaColumn::FDT_UINT32:
+				if (pVal)
+					return prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, pVal->size());
+				else
+					return prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG);
+
+			case MetaColumn::FDT_INT64:
+				if (pVal)
+					return prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT, pVal->size());
+				else
+					return prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT);
+
+			case MetaColumn::FDT_UINT64:
+				if (pVal)
+					return prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, pVal->size());
+				else
+					return prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT);
+
+			case MetaColumn::FDT_BOOL:
+				if (pVal)
+					return prepareVariableLen<bool>(pos, SQL_C_BIT, pVal->size(), DT_BOOL);
+				else
+					return prepareFixedSize<bool>(pos, SQL_C_BIT);
+
+			case MetaColumn::FDT_FLOAT:
+				if (pVal)
+					return prepareFixedSize<float>(pos, SQL_C_FLOAT, pVal->size());
+				else
+					return prepareFixedSize<float>(pos, SQL_C_FLOAT);
+
+			case MetaColumn::FDT_DOUBLE:
+				if (pVal)
+					return prepareFixedSize<double>(pos, SQL_C_DOUBLE, pVal->size());
+				else
+					return prepareFixedSize<double>(pos, SQL_C_DOUBLE);
+
+			case MetaColumn::FDT_STRING:
+				if (pVal)
+					return prepareVariableLenArray(pos, SQL_C_CHAR, maxDataSize(pos), pVal->size(), DT_CHAR_ARRAY);
+				else
+					return prepareVariableLen<char>(pos, SQL_C_CHAR, maxDataSize(pos), DT_CHAR);
+
+			case MetaColumn::FDT_BLOB:
+				if (pVal)
+					return prepareVariableLenArray(pos, SQL_C_BINARY, maxDataSize(pos), pVal->size(), DT_CHAR_ARRAY);
+				else
+					return prepareVariableLen<char>(pos, SQL_C_BINARY, maxDataSize(pos), DT_CHAR);
+
+			case MetaColumn::FDT_DATE:
+				if (pVal)
+					return prepareFixedSize<Date>(pos, SQL_C_TYPE_DATE, pVal->size());
+				else
+					return prepareFixedSize<Date>(pos, SQL_C_TYPE_DATE);
+
+			case MetaColumn::FDT_TIME:
+				if (pVal)
+					return prepareFixedSize<Time>(pos, SQL_C_TYPE_TIME, pVal->size());
+				else
+					return prepareFixedSize<Time>(pos, SQL_C_TYPE_TIME);
+
+			case MetaColumn::FDT_TIMESTAMP:
+				if (pVal)
+					return prepareFixedSize<DateTime>(pos, SQL_C_TYPE_TIMESTAMP, pVal->size());
+				else
+					return prepareFixedSize<DateTime>(pos, SQL_C_TYPE_TIMESTAMP);
+
+			default: 
+				throw DataFormatException("Unsupported data type.");
+		}
+	}
 
 	void resize() const;
 		/// Resize the values and lengths vectors.
 
 	template <typename T>
-	void preparePOD(std::size_t pos, SQLSMALLINT valueType)
+	void prepareFixedSize(std::size_t pos, SQLSMALLINT valueType)
+		/// Utility function for preparation of fixed length columns.
 	{
 		poco_assert (DE_BOUND == _dataExtraction);
-		poco_assert (pos >= 0 && pos < _pValues.size());
-
 		std::size_t dataSize = sizeof(T);
 
-		_pValues[pos] = new Poco::Any(T());
-		_pLengths[pos] = new SQLLEN;
-		*_pLengths[pos] = 0;
+		poco_assert (pos < _values.size());
+		_values[pos] = Poco::Any(T());
 
-		T* pVal = AnyCast<T>(_pValues[pos]);
-
-		poco_assert_dbg (pVal);
-
+		T* pVal = AnyCast<T>(&_values[pos]);
 		if (Utility::isError(SQLBindCol(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			valueType, 
-			(SQLPOINTER) pVal, 
+			(SQLPOINTER) pVal,  
 			(SQLINTEGER) dataSize, 
-			_pLengths[pos])))
+			&_lengths[pos])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");
 		}
 	}
 
 	template <typename T>
-	void prepareRaw(std::size_t pos, SQLSMALLINT valueType, std::size_t size)
+	void prepareFixedSize(std::size_t pos, SQLSMALLINT valueType, std::size_t length)
+		/// Utility function for preparation of fixed length columns that are
+		/// bound to a std::vector.
 	{
 		poco_assert (DE_BOUND == _dataExtraction);
-		poco_assert (pos >= 0 && pos < _pValues.size());
+		std::size_t dataSize = sizeof(T);
 
-		T* pChr = new T[size]; 
-		poco_assert_dbg (pChr);
-		memset(pChr, 0, size);
+		poco_assert (pos < _values.size());
+		poco_assert (length);
+		_values[pos] = Poco::Any(std::vector<T>(length));
+		_lengths[pos] = 0;
+		poco_assert (0 == _lenLengths[pos].size());
+		_lenLengths[pos].resize(length);
 
-		SharedPtr<T> sp = pChr; 
-		_pValues[pos] = new Any(sp);
-		_pLengths[pos] = new SQLLEN;
-		*_pLengths[pos] = (SQLLEN) size;
-
+		std::vector<T>& cache = RefAnyCast<std::vector<T> >(_values[pos]);
+		
 		if (Utility::isError(SQLBindCol(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			valueType, 
-			(SQLPOINTER) pChr, 
-			(SQLINTEGER) size, 
-			_pLengths[pos])))
+			(SQLPOINTER) &cache[0], 
+			(SQLINTEGER) dataSize, 
+			&_lenLengths[pos][0])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");
 		}
 	}
 
-	const StatementHandle&          _rStmt;
-	mutable std::vector<Poco::Any*> _pValues;
-	mutable std::vector<SQLLEN*>    _pLengths;
-	std::size_t                     _maxFieldSize;
-	DataExtraction                  _dataExtraction;
+	template <typename T>
+	void prepareVariableLen(std::size_t pos, SQLSMALLINT valueType, std::size_t size, DataType dt)
+		/// Utility function for preparation of variable length columns and bool vectors.
+	{
+		poco_assert (DE_BOUND == _dataExtraction);
+		poco_assert (pos < _values.size());
+
+		T* pCache = new T[size]; 
+		poco_assert_dbg (pCache);
+		std::memset(pCache, 0, size);
+
+		_values[pos] = Any(pCache);
+		_lengths[pos] = (SQLLEN) size;
+		_varLengthArrays.insert(IndexMap::value_type(pos, dt));
+
+		if (Utility::isError(SQLBindCol(_rStmt, 
+			(SQLUSMALLINT) pos + 1, 
+			valueType, 
+			(SQLPOINTER) pCache, 
+			(SQLINTEGER) size, 
+			&_lengths[pos])))
+		{
+			throw StatementException(_rStmt, "SQLBindCol()");
+		}
+	}
+
+
+	void prepareVariableLenArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length, DataType dt);
+		/// Utility function for preparation of variable length character and BLOB columns.
+
+
+	void freeMemory() const;
+		/// Utility function. Releases memory allocated for variable length columns.
+
+	template <typename T>
+	void deleteCachedArray(std::size_t pos) const
+	{
+		T* p = Poco::AnyCast<T>(&_values[pos]);
+		delete [] p;
+	}
+
+	const StatementHandle&  _rStmt;
+	mutable ValueVec        _values;
+	mutable LengthVec       _lengths;
+	mutable LengthLengthVec _lenLengths;
+	mutable IndexMap        _varLengthArrays;
+	std::size_t             _maxFieldSize;
+	DataExtraction          _dataExtraction;
 };
 
 
 //
 // inlines
 //
-inline void Preparation::prepare(std::size_t pos, Poco::Int8)
+inline void Preparation::prepare(std::size_t pos, Poco::Int8&)
 {
-	preparePOD<Poco::Int8>(pos, SQL_C_STINYINT);
+	prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT);
 }
 
 
-inline void Preparation::prepare(std::size_t pos, Poco::UInt8)
+inline void Preparation::prepare(std::size_t pos, std::vector<Poco::Int8>& val)
 {
-	preparePOD<Poco::UInt8>(pos, SQL_C_UTINYINT);
+	prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, val.size());
 }
 
 
-inline void Preparation::prepare(std::size_t pos, Poco::Int16)
+inline void Preparation::prepare(std::size_t pos, Poco::UInt8&)
 {
-	preparePOD<Poco::Int16>(pos, SQL_C_SSHORT);
+	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT);
 }
 
 
-inline void Preparation::prepare(std::size_t pos, Poco::UInt16)
+inline void Preparation::prepare(std::size_t pos, std::vector<Poco::UInt8>& val)
 {
-	preparePOD<Poco::UInt16>(pos, SQL_C_USHORT);
+	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, val.size());
 }
 
 
-inline void Preparation::prepare(std::size_t pos, Poco::Int32)
+inline void Preparation::prepare(std::size_t pos, Poco::Int16&)
 {
-	preparePOD<Poco::Int32>(pos, SQL_C_SLONG);
+	prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT);
 }
 
 
-inline void Preparation::prepare(std::size_t pos, Poco::UInt32)
+inline void Preparation::prepare(std::size_t pos, std::vector<Poco::Int16>& val)
 {
-	preparePOD<Poco::UInt32>(pos, SQL_C_ULONG);
+	prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT, val.size());
 }
 
 
-inline void Preparation::prepare(std::size_t pos, Poco::Int64)
+inline void Preparation::prepare(std::size_t pos, Poco::UInt16&)
 {
-	preparePOD<Poco::Int64>(pos, SQL_C_SBIGINT);
+	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT);
 }
 
 
-inline void Preparation::prepare(std::size_t pos, Poco::UInt64)
+inline void Preparation::prepare(std::size_t pos, std::vector<Poco::UInt16>& val)
 {
-	preparePOD<Poco::UInt64>(pos, SQL_C_UBIGINT);
+	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, Poco::Int32&)
+{
+	prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::vector<Poco::Int32>& val)
+{
+	prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, Poco::UInt32&)
+{
+	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::vector<Poco::UInt32>& val)
+{
+	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, Poco::Int64&)
+{
+	prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::vector<Poco::Int64>& val)
+{
+	prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, Poco::UInt64&)
+{
+	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::vector<Poco::UInt64>& val)
+{
+	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, val.size());
 }
 
 
 #ifndef POCO_LONG_IS_64_BIT
-inline void Preparation::prepare(std::size_t pos, long)
+inline void Preparation::prepare(std::size_t pos, long&)
 {
-	preparePOD<long>(pos, SQL_C_SLONG);
+	prepareFixedSize<long>(pos, SQL_C_SLONG);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::vector<long>& val)
+{
+	prepareFixedSize<long>(pos, SQL_C_SLONG, val.size());
 }
 #endif
 
 
-inline void Preparation::prepare(std::size_t pos, bool)
+inline void Preparation::prepare(std::size_t pos, bool&)
 {
-	preparePOD<bool>(pos, SQL_C_BIT);
+	prepareFixedSize<bool>(pos, SQL_C_BIT);
 }
 
 
-inline void Preparation::prepare(std::size_t pos, float)
+inline void Preparation::prepare(std::size_t pos, std::vector<bool>& val)
 {
-	preparePOD<float>(pos, SQL_C_FLOAT);
+	prepareVariableLen<bool>(pos, SQL_C_BIT, val.size(), DT_BOOL);
 }
 
 
-inline void Preparation::prepare(std::size_t pos, double)
+inline void Preparation::prepare(std::size_t pos, float&)
 {
-	preparePOD<double>(pos, SQL_C_DOUBLE);
+	prepareFixedSize<float>(pos, SQL_C_FLOAT);
 }
 
 
-inline void Preparation::prepare(std::size_t pos, char)
+inline void Preparation::prepare(std::size_t pos, std::vector<float>& val)
 {
-	preparePOD<char>(pos, SQL_C_STINYINT);
+	prepareFixedSize<float>(pos, SQL_C_FLOAT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, double&)
+{
+	prepareFixedSize<double>(pos, SQL_C_DOUBLE);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::vector<double>& val)
+{
+	prepareFixedSize<double>(pos, SQL_C_DOUBLE, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, char&)
+{
+	prepareFixedSize<char>(pos, SQL_C_STINYINT);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::vector<char>& val)
+{
+	prepareFixedSize<char>(pos, SQL_C_STINYINT, val.size());
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const std::string&)
 {
-	prepareRaw<char>(pos, SQL_C_CHAR, maxDataSize(pos));
+	prepareVariableLen<char>(pos, SQL_C_CHAR, maxDataSize(pos), DT_CHAR);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::vector<std::string>& val)
+{
+	prepareVariableLenArray(pos, SQL_C_CHAR, maxDataSize(pos), val.size(), DT_CHAR_ARRAY);
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const Poco::Data::BLOB&)
 {
-	prepareRaw<char>(pos, SQL_C_BINARY, maxDataSize(pos));
+	prepareVariableLen<char>(pos, SQL_C_BINARY, maxDataSize(pos), DT_CHAR);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::Data::BLOB>& val)
+{
+	prepareVariableLenArray(pos, SQL_C_BINARY, maxDataSize(pos), val.size(), DT_CHAR_ARRAY);
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const Poco::Data::Date&)
 {
-	prepareRaw<SQL_DATE_STRUCT>(pos, 
-		SQL_C_TYPE_DATE, 
-		sizeof(SQL_DATE_STRUCT));
+	prepareFixedSize<SQL_DATE_STRUCT>(pos, SQL_C_TYPE_DATE);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::Data::Date>& val)
+{
+	prepareFixedSize<SQL_DATE_STRUCT>(pos, SQL_C_TYPE_DATE, val.size());
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const Poco::Data::Time&)
 {
-	prepareRaw<SQL_TIME_STRUCT>(pos, 
-		SQL_C_TYPE_TIME, 
-		sizeof(SQL_TIME_STRUCT));
+	prepareFixedSize<SQL_TIME_STRUCT>(pos, SQL_C_TYPE_TIME);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::Data::Time>& val)
+{
+	prepareFixedSize<SQL_TIME_STRUCT>(pos, SQL_C_TYPE_TIME, val.size());
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const Poco::DateTime&)
 {
-	prepareRaw<SQL_TIMESTAMP_STRUCT>(pos, 
-		SQL_C_TYPE_TIMESTAMP, 
-		sizeof(SQL_TIMESTAMP_STRUCT));
+	prepareFixedSize<SQL_TIMESTAMP_STRUCT>(pos, SQL_C_TYPE_TIMESTAMP);
 }
 
 
-inline int Preparation::actualDataSize(std::size_t pos) const
+inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::DateTime>& val)
 {
-	poco_assert (pos >= 0 && pos < _pValues.size());
-	poco_assert (_pLengths[pos]);
+	prepareFixedSize<SQL_TIMESTAMP_STRUCT>(pos, SQL_C_TYPE_TIMESTAMP, val.size());
+}
 
-	return *_pLengths[pos];
+
+inline void Preparation::prepare(std::size_t pos, const Poco::Any& val)
+{
+	prepareImpl<Poco::Any>(pos);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::Any>& val)
+{
+	prepareImpl<Poco::Any>(pos, &val);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const Poco::DynamicAny& val)
+{
+	prepareImpl<Poco::DynamicAny>(pos);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::DynamicAny>& val)
+{
+	prepareImpl<Poco::DynamicAny>(pos, &val);
+}
+
+
+inline std::size_t Preparation::actualDataSize(std::size_t col, std::size_t row) const
+{
+	poco_assert (col < _values.size());
+
+	if (INVALID_ROW == row) return _lengths[col];
+	else return _lenLengths[col].at(row);
+}
+
+
+inline std::size_t Preparation::bulkSize(std::size_t col) const
+{
+	poco_assert (col < _lenLengths.size());
+
+	return _lenLengths[col].size();
 }
 
 
@@ -424,6 +788,14 @@ inline void Preparation::setDataExtraction(Preparation::DataExtraction ext)
 inline Preparation::DataExtraction Preparation::getDataExtraction() const
 {
 	return _dataExtraction;
+}
+
+
+inline Poco::Any& Preparation::operator [] (std::size_t pos)
+{
+	poco_assert (pos < _values.size());
+	
+	return _values[pos];
 }
 
 

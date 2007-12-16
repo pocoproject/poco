@@ -43,6 +43,9 @@ namespace Data {
 namespace ODBC {
 
 
+const std::size_t Preparation::INVALID_ROW = std::numeric_limits<std::size_t>::max();
+
+
 Preparation::Preparation(const StatementHandle& rStmt, 
 	const std::string& statement, 
 	std::size_t maxFieldSize,
@@ -68,118 +71,73 @@ Preparation::Preparation(const Preparation& other):
 
 Preparation::~Preparation()
 {
-	std::vector<SQLLEN*>::iterator itLen = _pLengths.begin();
-	std::vector<SQLLEN*>::iterator itLenEnd = _pLengths.end();
-	for (; itLen != itLenEnd; ++itLen) delete *itLen;
+	freeMemory();
+}
 
-	std::vector<Poco::Any*>::iterator itVal = _pValues.begin();
-	std::vector<Poco::Any*>::iterator itValEnd = _pValues.end();
-	for (; itVal != itValEnd; ++itVal) delete *itVal;
+
+void Preparation::freeMemory() const
+{
+	IndexMap::iterator it = _varLengthArrays.begin();
+	IndexMap::iterator end = _varLengthArrays.end();
+	for (; it != end; ++it)	
+	{
+		switch (it->second)
+		{
+		case DT_BOOL:
+			deleteCachedArray<bool>(it->first);
+			break;
+		
+		case DT_CHAR:
+			deleteCachedArray<char>(it->first);
+			break;
+
+		case DT_CHAR_ARRAY:
+			std::free(AnyCast<char>(&_values[it->first]));
+			break;
+
+		case DT_DATE:
+			deleteCachedArray<SQL_DATE_STRUCT>(it->first);
+			break;
+
+		case DT_TIME:
+			deleteCachedArray<SQL_TIME_STRUCT>(it->first);
+			break;
+
+		case DT_DATETIME:
+			deleteCachedArray<SQL_TIMESTAMP_STRUCT>(it->first);
+			break;
+		}
+	}
 }
 
 
 std::size_t Preparation::columns() const
 {
-	if (_pValues.empty()) resize();
-	return _pValues.size();
+	if (_values.empty()) resize();
+	return _values.size();
 }
 
 
 void Preparation::resize() const
 {
 	SQLSMALLINT nCol = 0;
-	if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 
-		0 != nCol)
+	if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 0 != nCol)
 	{
-		_pValues.resize(nCol, 0);
-		_pLengths.resize(nCol, 0);
-	}
-}
-
-
-Poco::Any& Preparation::operator [] (std::size_t pos)
-{
-	poco_assert (pos >= 0 && pos < _pValues.size());
-	
-	return *_pValues[pos];
-}
-
-
-void Preparation::prepare(std::size_t pos, const Poco::Any&)
-{
-	prepareImpl(pos);
-}
-
-
-void Preparation::prepare(std::size_t pos, const Poco::DynamicAny&)
-{
-	prepareImpl(pos);
-}
-
-
-void Preparation::prepareImpl(std::size_t pos)
-{
-	ODBCColumn col(_rStmt, pos);
-
-	switch (col.type())
-	{
-		case MetaColumn::FDT_INT8:
-			return preparePOD<Poco::Int8>(pos, SQL_C_STINYINT); 
-
-		case MetaColumn::FDT_UINT8:
-			return preparePOD<Poco::UInt8>(pos, SQL_C_UTINYINT);
-
-		case MetaColumn::FDT_INT16:
-			return preparePOD<Poco::Int16>(pos, SQL_C_SSHORT);
-
-		case MetaColumn::FDT_UINT16:
-			return preparePOD<Poco::UInt16>(pos, SQL_C_USHORT);
-
-		case MetaColumn::FDT_INT32:
-			return preparePOD<Poco::Int32>(pos, SQL_C_SLONG);
-
-		case MetaColumn::FDT_UINT32:
-			return preparePOD<Poco::UInt32>(pos, SQL_C_ULONG);
-
-		case MetaColumn::FDT_INT64:
-			return preparePOD<Poco::Int64>(pos, SQL_C_SBIGINT);
-
-		case MetaColumn::FDT_UINT64:
-			return preparePOD<Poco::UInt64>(pos, SQL_C_UBIGINT);
-
-		case MetaColumn::FDT_BOOL:
-			return preparePOD<bool>(pos, SQL_C_BIT);
-
-		case MetaColumn::FDT_FLOAT:
-			return preparePOD<float>(pos, SQL_C_FLOAT);
-
-		case MetaColumn::FDT_DOUBLE:
-			return preparePOD<double>(pos, SQL_C_DOUBLE);
-
-		case MetaColumn::FDT_STRING:
-			return prepareRaw<char>(pos, SQL_C_CHAR, maxDataSize(pos));
-
-		case MetaColumn::FDT_BLOB:
-			return prepareRaw<char>(pos, SQL_C_BINARY, maxDataSize(pos));
-
-		case MetaColumn::FDT_DATE:
-			return prepareRaw<Date>(pos, SQL_C_TYPE_DATE, sizeof(SQL_DATE_STRUCT));
-
-		case MetaColumn::FDT_TIME:
-			return prepareRaw<Time>(pos, SQL_C_TYPE_TIME, sizeof(SQL_TIME_STRUCT));
-
-		case MetaColumn::FDT_TIMESTAMP:
-			return prepareRaw<Time>(pos, SQL_C_TYPE_TIMESTAMP, sizeof(SQL_TIMESTAMP_STRUCT));
-
-		default: 
-			throw DataFormatException("Unsupported data type.");
+		_values.resize(nCol, 0);
+		_lengths.resize(nCol, 0);
+		_lenLengths.resize(nCol);
+		if(_varLengthArrays.size())
+		{
+			freeMemory();
+			_varLengthArrays.clear();
+		}
 	}
 }
 
 
 std::size_t Preparation::maxDataSize(std::size_t pos) const
 {
-	poco_assert (pos >= 0 && pos < _pValues.size());
+	poco_assert_dbg (pos < _values.size());
 
 	std::size_t sz = 0;
 	std::size_t maxsz = getMaxFieldSize();
@@ -192,6 +150,32 @@ std::size_t Preparation::maxDataSize(std::size_t pos) const
 
 	if (!sz || sz > maxsz) sz = maxsz;
 	return sz;
+}
+
+
+void Preparation::prepareVariableLenArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length, DataType dt)
+{
+	poco_assert_dbg (DE_BOUND == _dataExtraction);
+	poco_assert_dbg (pos < _values.size());
+	poco_assert_dbg (pos < _lengths.size());
+	poco_assert_dbg (pos < _lenLengths.size());
+
+	char* pArray = (char*) std::calloc(length * size, sizeof(char));
+
+	_values[pos] = Any(pArray);
+	_lengths[pos] = 0;
+	_lenLengths[pos].resize(length);
+	_varLengthArrays.insert(IndexMap::value_type(pos, dt));
+
+	if (Utility::isError(SQLBindCol(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		valueType, 
+		(SQLPOINTER) pArray, 
+		(SQLINTEGER) size, 
+		&_lenLengths[pos][0])))
+	{
+		throw StatementException(_rStmt, "SQLBindCol()");
+	}
 }
 
 

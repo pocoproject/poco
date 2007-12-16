@@ -43,7 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/Range.h"
-#include "Poco/Data/Step.h"
+#include "Poco/Data/Bulk.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #include "Poco/ActiveMethod.h"
@@ -171,15 +171,24 @@ public:
 	}
 
 	Statement& operator , (Manipulator manip);
-		/// Handles manipulators, such as now.
+		/// Handles manipulators, such as now, async, etc.
 
 	Statement& operator , (AbstractBinding* info);
-		/// Registers the Binding at the Statement
+		/// Registers the Binding at the Statement.
 
 	Statement& operator , (AbstractExtraction* extract);
 		/// Registers objects used for extracting data at the Statement.
-		/// the position argument is used by connectors that support multilple
-		/// recordsets to specify which recordset this extraction belongs to.
+
+	Statement& operator , (const Bulk& bulk);
+		/// Sets the bulk execution mode (both binding and extraction) for this 
+		/// statement.Statement must not have any extracors or binders set at the 
+		/// time when this operator is applied. 
+		/// Failure to adhere to the above constraint shall result in 
+		/// InvalidAccessException.
+		/// Additionally, any binding buffers passed to the statement later 
+		/// through use() or in() must be of the same size (determined by size 
+		/// of the bulk passed to this function). Since they are resized automatically
+		/// by the framework, the extraction buffers do not have to adhere to this.
 
 	Statement& operator , (const Limit& extrLimit);
 		/// Sets a limit on the maximum number of rows a select is allowed to return.
@@ -191,14 +200,8 @@ public:
 		///
 		/// Set per default to Limit::LIMIT_UNLIMITED which disables the range.
 
-	Statement& operator , (const Step& extrStep);
-		/// Sets a an extraction step (the number of rows a select is allowed to return 
-		/// on every fetch attempt).
-		///
-		/// Set per default to Step::DEFAULT_STEP (1 row at a time).
-
 	std::string toString() const;
-		/// Creates a string from the accumulated SQL statement
+		/// Creates a string from the accumulated SQL statement.
 
 	ResultType execute();
 		/// Executes the statement synchronously or asynchronously. 
@@ -296,84 +299,76 @@ private:
 // Manipulators
 //
 
-void Data_API now(Statement& statement);
+inline void Data_API now(Statement& statement)
 	/// Enforces immediate execution of the statement.
 	/// If _isAsync flag has been set, execution is invoked asynchronously.
+{
+	statement.execute();
+}
 
 
-void Data_API sync(Statement& statement);
+inline void Data_API sync(Statement& statement)
 	/// Sets the _isAsync flag to false, signalling synchronous execution.
 	/// Synchronous execution is default, so specifying this manipulator
 	/// only makes sense if async() was called for the statement before.
+{
+	statement.setAsync(false);
+}
 
 
-void Data_API async(Statement& statement);
-	/// Sets the _isAsync flag to true, signalling asynchronous execution.
+inline void Data_API async(Statement& statement)
+	/// Sets the _async flag to true, signalling asynchronous execution.
+{
+	statement.setAsync(true);
+}
 
 
-void Data_API deque(Statement& statement);
+inline void Data_API deque(Statement& statement)
 	/// Sets the internal storage to std::deque.
 	/// std::deque is default storage, so specifying this manipulator
 	/// only makes sense if list() or deque() were called for the statement before.
+{
+	if (!statement.canModifyStorage())
+		throw InvalidAccessException("Storage not modifiable.");
+
+	statement.setStorage("deque");
+}
 
 
-void Data_API vector(Statement& statement);
+inline void Data_API vector(Statement& statement)
 	/// Sets the internal storage to std::vector.
-	
+{
+	if (!statement.canModifyStorage())
+		throw InvalidAccessException("Storage not modifiable.");
 
-void Data_API list(Statement& statement);
+	statement.setStorage("vector");
+}
+
+
+inline void Data_API list(Statement& statement)
 	/// Sets the internal storage to std::list.
+{
+	if (!statement.canModifyStorage())
+		throw InvalidAccessException("Storage not modifiable.");
+
+	statement.setStorage("list");
+}
 
 
-void Data_API reset(Statement& statement);
+inline void Data_API reset(Statement& statement)
 	/// Sets all internal settings to their respective default values.
+{
+	if (!statement.canModifyStorage())
+		throw InvalidAccessException("Storage not modifiable.");
+
+	statement.setStorage("deque");
+	statement.setAsync(false);
+}
 
 
 //
 // inlines
 //
-
-inline Statement& Statement::operator , (Manipulator manip)
-{
-	manip(*this);
-	return *this;
-}
-
-
-inline Statement& Statement::operator , (AbstractBinding* info)
-{
-	_pImpl->addBinding(info);
-	return *this;
-}
-
-
-inline Statement& Statement::operator , (AbstractExtraction* extract)
-{
-	_pImpl->addExtract(extract);
-	return *this;
-}
-
-
-inline Statement& Statement::operator , (const Limit& extrLimit)
-{
-	_pImpl->setExtractionLimit(extrLimit);
-	return *this;
-}
-
-
-inline Statement& Statement::operator , (const Range& extrRange)
-{
-	_pImpl->setExtractionLimit(extrRange.lower());
-	_pImpl->setExtractionLimit(extrRange.upper());
-	return *this;
-}
-
-
-inline Statement& Statement::operator , (const Step& extrStep)
-{
-	_pImpl->setStep(extrStep.value());
-	return *this;
-}
 
 
 inline std::string Statement::toString() const
@@ -458,6 +453,7 @@ inline void swap(Statement& s1, Statement& s2)
 {
 	s1.swap(s2);
 }
+
 
 
 } } // namespace Poco::Data

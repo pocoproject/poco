@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include <vector>
 #include <cstddef>
 
 
@@ -74,67 +75,127 @@ public:
 	virtual bool extract(std::size_t pos, Poco::Int8& val) = 0;
 		/// Extracts an Int8. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<Poco::Int8>& val);
+		/// Extracts an Int8 vector.
+
 	virtual bool extract(std::size_t pos, Poco::UInt8& val) = 0;
 		/// Extracts an UInt8. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<Poco::UInt8>& val);
+		/// Extracts an UInt8vector .
 
 	virtual bool extract(std::size_t pos, Poco::Int16& val) = 0;
 		/// Extracts an Int16. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<Poco::Int16>& val);
+		/// Extracts an Int16 vector.
+
 	virtual bool extract(std::size_t pos, Poco::UInt16& val) = 0;
 		/// Extracts an UInt16. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<Poco::UInt16>& val);
+		/// Extracts an UInt16 vector.
 
 	virtual bool extract(std::size_t pos, Poco::Int32& val) = 0;
 		/// Extracts an Int32. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<Poco::Int32>& val);
+		/// Extracts an Int32 vector.
+
 	virtual bool extract(std::size_t pos, Poco::UInt32& val) = 0;
 		/// Extracts an UInt32. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<Poco::UInt32>& val);
+		/// Extracts an UInt32 vector.
 
 	virtual bool extract(std::size_t pos, Poco::Int64& val) = 0;
 		/// Extracts an Int64. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<Poco::Int64>& val);
+		/// Extracts an Int64 vector.
+
 	virtual bool extract(std::size_t pos, Poco::UInt64& val) = 0;
 		/// Extracts an UInt64. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<Poco::UInt64>& val);
+		/// Extracts an UInt64 vector.
 
 #ifndef POCO_LONG_IS_64_BIT
 	virtual bool extract(std::size_t pos, long& val) = 0;
 		/// Extracts a long. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<long>& val);
+		/// Extracts a long vector.
 #endif
 
 	virtual bool extract(std::size_t pos, bool& val) = 0;
 		/// Extracts a boolean. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<bool>& val);
+		/// Extracts a boolean vector.
+
 	virtual bool extract(std::size_t pos, float& val) = 0;
 		/// Extracts a float. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<float>& val);
+		/// Extracts a float vector.
 
 	virtual bool extract(std::size_t pos, double& val) = 0;
 		/// Extracts a double. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<double>& val);
+		/// Extracts a double vector.
+
 	virtual bool extract(std::size_t pos, char& val) = 0;
 		/// Extracts a single character. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<char>& val);
+		/// Extracts a character vector.
 
 	virtual bool extract(std::size_t pos, std::string& val) = 0;
 		/// Extracts a string. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<std::string>& val);
+		/// Extracts a string vector.
+
 	virtual bool extract(std::size_t pos, BLOB& val) = 0;
 		/// Extracts a BLOB. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<BLOB>& val);
+		/// Extracts a BLOB vector.
 
 	virtual bool extract(std::size_t pos, DateTime& val) = 0;
 		/// Extracts a DateTime. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<DateTime>& val);
+		/// Extracts a DateTime vector.
+
 	virtual bool extract(std::size_t pos, Date& val) = 0;
 		/// Extracts a Date. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<Date>& val);
+		/// Extracts a Date vector.
 
 	virtual bool extract(std::size_t pos, Time& val) = 0;
 		/// Extracts a Time. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, std::vector<Time>& val);
+		/// Extracts a Time vector.
+
 	virtual bool extract(std::size_t pos, Any& val) = 0;
 		/// Extracts an Any. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<Any>& val);
+		/// Extracts an Any vector.
 
 	virtual bool extract(std::size_t pos, DynamicAny& val) = 0;
 		/// Extracts a DynamicAny. Returns false if null was received.
 
-	virtual bool isNull(std::size_t pos) = 0;
-		/// Returns true if the current row value at pos column is null.
+	virtual bool extract(std::size_t pos, std::vector<DynamicAny>& val);
+		/// Extracts a DynamicAny vector.
+
+	virtual bool isNull(std::size_t col, std::size_t row = -1) = 0;
+		/// Returns true if the value at [col,row] position is null.
 
 	virtual void reset();
 		/// Resets any information internally cached by the extractor.

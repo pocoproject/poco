@@ -112,9 +112,8 @@ void ODBCSQLServerTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	//TODO: auto binding fails at SQLExecute() ("String data, right truncated")
-	//executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	//executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
 	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
@@ -611,6 +610,23 @@ void ODBCSQLServerTest::recreateBoolTable()
 }
 
 
+void ODBCSQLServerTest::recreateMiscTable()
+{
+	dropObject("TABLE", "MiscTest");
+	try 
+	{ 
+		session() << "CREATE TABLE MiscTest "
+			"(First VARCHAR(30),"
+			"Second VARBINARY(30),"
+			"Third INTEGER,"
+			"Fourth FLOAT,"
+			"Fifth DATETIME,"
+			"Sixth BIT)", now; 
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
+}
+
+
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
 	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db))
@@ -643,7 +659,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
-		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStep);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplexUnique);

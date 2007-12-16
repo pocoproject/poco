@@ -206,17 +206,6 @@ inline bool ODBCStatementImpl::nextRowReady() const
 }
 
 
-inline const MetaColumn& ODBCStatementImpl::metaColumn(Poco::UInt32 pos) const
-{
-	std::size_t sz = _columnPtrs.size();
-
-	if (0 == sz || pos > sz - 1)
-		throw InvalidAccessException(format("Invalid column number: %u", pos));
-
-	return *_columnPtrs[pos];
-}
-
-
 } } } // namespace Poco::Data::ODBC
 
 

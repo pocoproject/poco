@@ -77,64 +77,124 @@ public:
 	bool extract(std::size_t pos, Poco::Int8& val);
 		/// Extracts an Int8.
 
+	bool extract(std::size_t pos, std::vector<Poco::Int8>& val);
+		/// Extracts an Int8 vector.
+
 	bool extract(std::size_t pos, Poco::UInt8& val);
 		/// Extracts an UInt8.
+
+	bool extract(std::size_t pos, std::vector<Poco::UInt8>& val);
+		/// Extracts an UInt8 vector.
 
 	bool extract(std::size_t pos, Poco::Int16& val);
 		/// Extracts an Int16.
 
+	bool extract(std::size_t pos, std::vector<Poco::Int16>& val);
+		/// Extracts an Int16 vector.
+
 	bool extract(std::size_t pos, Poco::UInt16& val);
 		/// Extracts an UInt16.
+
+	bool extract(std::size_t pos, std::vector<Poco::UInt16>& val);
+		/// Extracts an UInt16 vector.
 
 	bool extract(std::size_t pos, Poco::Int32& val);
 		/// Extracts an Int32.
 
+	bool extract(std::size_t pos, std::vector<Poco::Int32>& val);
+		/// Extracts an Int32 vector.
+
 	bool extract(std::size_t pos, Poco::UInt32& val);
 		/// Extracts an UInt32.
+
+	bool extract(std::size_t pos, std::vector<Poco::UInt32>& val);
+		/// Extracts an UInt32 vector.
 
 	bool extract(std::size_t pos, Poco::Int64& val);
 		/// Extracts an Int64.
 
+	bool extract(std::size_t pos, std::vector<Poco::Int64>& val);
+		/// Extracts an Int64 vector.
+
 	bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
+
+	bool extract(std::size_t pos, std::vector<Poco::UInt64>& val);
+		/// Extracts an UInt64 vector.
 
 #ifndef POCO_LONG_IS_64_BIT
 	bool extract(std::size_t pos, long& val);
 		/// Extracts a long.
+
+	bool extract(std::size_t pos, std::vector<long>& val);
+		/// Extracts a long vector.
 #endif
 
 	bool extract(std::size_t pos, bool& val);
 		/// Extracts a boolean.
 
+	bool extract(std::size_t pos, std::vector<bool>& val);
+		/// Extracts a boolean vector.
+
 	bool extract(std::size_t pos, float& val);
 		/// Extracts a float.
+
+	bool extract(std::size_t pos, std::vector<float>& val);
+		/// Extracts a float vector.
 
 	bool extract(std::size_t pos, double& val);
 		/// Extracts a double.
 
+	bool extract(std::size_t pos, std::vector<double>& val);
+		/// Extracts a double vector.
+
 	bool extract(std::size_t pos, char& val);
 		/// Extracts a single character.
+
+	bool extract(std::size_t pos, std::vector<char>& val);
+		/// Extracts a single character vector.
 
 	bool extract(std::size_t pos, std::string& val);
 		/// Extracts a string.
 
+	bool extract(std::size_t pos, std::vector<std::string>& val);
+		/// Extracts a string vector.
+
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
+
+	bool extract(std::size_t pos, std::vector<Poco::Data::BLOB>& val);
+		/// Extracts a BLOB vector.
 
 	bool extract(std::size_t pos, Poco::Data::Date& val);
 		/// Extracts a Date.
 
+	bool extract(std::size_t pos, std::vector<Poco::Data::Date>& val);
+		/// Extracts a Date vector.
+
 	bool extract(std::size_t pos, Poco::Data::Time& val);
 		/// Extracts a Time.
 
+	bool extract(std::size_t pos, std::vector<Poco::Data::Time>& val);
+		/// Extracts a Time vector.
+
 	bool extract(std::size_t pos, Poco::DateTime& val);
 		/// Extracts a DateTime.
+
+	bool extract(std::size_t pos, std::vector<Poco::DateTime>& val);
+		/// Extracts a DateTime vector.
 	
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
 
+	bool extract(std::size_t pos, std::vector<Poco::Any>& val);
+		/// Extracts an Any vector.
+
 	bool extract(std::size_t pos, Poco::DynamicAny& val);
 		/// Extracts a DynamicAny.
+
+	bool extract(std::size_t pos, std::vector<Poco::DynamicAny>& val);
+		/// Extracts a DynamicAny vector.
 
 	void setDataExtraction(Preparation::DataExtraction ext);
 		/// Set data extraction mode.
@@ -142,8 +202,8 @@ public:
 	Preparation::DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
-	bool isNull(std::size_t pos);
-		/// Returns true if the current row value at pos column is null.
+	bool isNull(std::size_t col, std::size_t row = Preparation::INVALID_ROW);
+		/// Returns true if the value at [col,row] is null.
 
 	void reset();
 		/// Resets the internally cached length indicators. 
@@ -171,10 +231,17 @@ private:
 	bool extractBoundImpl(std::size_t pos, T& val)
 	{
 		if (isNull(pos)) return false;
-
-		poco_assert (typeid(T) == _rPreparation[pos].type());
-
+		poco_assert_dbg (typeid(T) == _rPreparation[pos].type());
 		val = *AnyCast<T>(&_rPreparation[pos]); 
+		return true;
+	}
+
+	template<typename T>
+	bool extractBoundImplVec(std::size_t pos, std::vector<T>& val)
+	{
+		poco_assert_dbg (typeid(std::vector<T>) == _rPreparation[pos].type());
+		std::vector<T>& v = RefAnyCast<std::vector<T> >(_rPreparation[pos]);
+		val.assign(v.begin(), v.end());
 		return true;
 	}
 
@@ -271,6 +338,8 @@ private:
 		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value, 
 		/// while SQL_NULL_DATA (#define'd as -1 literal) remains 32-bit.
 
+	SQLINTEGER columnSize(std::size_t pos) const;
+
 	const StatementHandle&      _rStmt;
 	Preparation&                _rPreparation;
 	Preparation::DataExtraction _dataExtraction;
@@ -281,8 +350,6 @@ private:
 ///
 /// inlines
 ///
-
-
 inline void Extractor::setDataExtraction(Preparation::DataExtraction ext)
 {
 	_rPreparation.setDataExtraction(_dataExtraction = ext);
@@ -311,6 +378,12 @@ inline void Extractor::resizeLengths(std::size_t pos)
 inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
 {
 	return SQL_NULL_DATA == (int) val;
+}
+
+
+inline SQLINTEGER Extractor::columnSize(std::size_t pos) const
+{
+	return (SQLINTEGER) ODBCColumn(_rStmt, pos).length();
 }
 
 

@@ -97,19 +97,37 @@ public:
 	static void dateSync(Date& dt, const SQL_DATE_STRUCT& ts);
 		/// Transfers data from ODBC SQL_DATE_STRUCT to Poco::DateTime.
 
+	static void dateSync(std::vector<Date>& d, const std::vector<SQL_DATE_STRUCT>& ds);
+		/// Transfers data from ODBC SQL_DATE_STRUCT vector to Poco::DateTime vector.
+
 	static void timeSync(Time& dt, const SQL_TIME_STRUCT& ts);
 		/// Transfers data from ODBC SQL_TIME_STRUCT to Poco::DateTime.
+
+	static void timeSync(std::vector<Time>& t, const std::vector<SQL_TIME_STRUCT>& ts);
+		/// Transfers data from ODBC SQL_TIME_STRUCT vector to Poco::DateTime vector.
 
 	static void dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts);
 		/// Transfers data from ODBC SQL_TIMESTAMP_STRUCT to Poco::DateTime.
 
+	static void dateTimeSync(std::vector<Poco::DateTime>& dt, const std::vector<SQL_TIMESTAMP_STRUCT>& ts);
+		/// Transfers data from ODBC SQL_TIMESTAMP_STRUCT vector to Poco::DateTime vector.
+
 	static void dateSync(SQL_DATE_STRUCT& ts, const Date& dt);
-	/// Transfers data from Poco::Data::Date to ODBC SQL_DATE_STRUCT.
+		/// Transfers data from Poco::Data::Date to ODBC SQL_DATE_STRUCT.
+
+	static void dateSync(std::vector<SQL_DATE_STRUCT>& ds, const std::vector<Date>& d);
+		/// Transfers data from Poco::Data::Date vector to ODBC SQL_DATE_STRUCT vector.
 
 	static void timeSync(SQL_TIME_STRUCT& ts, const Time& dt);
 		/// Transfers data from Poco::Data::Time to ODBC SQL_TIME_STRUCT.
 
+	static void timeSync(std::vector<SQL_TIME_STRUCT>& ts, const std::vector<Time>& t);
+		/// Transfers data from Poco::Data::Time vector to ODBC SQL_TIME_STRUCT vector.
+
 	static void dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt);
+		/// Transfers data from Poco::DateTime to ODBC SQL_TIMESTAMP_STRUCT.
+
+	static void dateTimeSync(std::vector<SQL_TIMESTAMP_STRUCT>& ts, const std::vector<Poco::DateTime>& dt);
 		/// Transfers data from Poco::DateTime to ODBC SQL_TIMESTAMP_STRUCT.
 
 private:
@@ -139,15 +157,15 @@ inline int Utility::sqlDataType(int cDataType)
 }
 
 
-inline void Utility::dateSync(Date& dt, const SQL_DATE_STRUCT& ts)
+inline void Utility::dateSync(Date& d, const SQL_DATE_STRUCT& ts)
 {
-	dt.assign(ts.year, ts.month, ts.day);
+	d.assign(ts.year, ts.month, ts.day);
 }
 
 
-inline void Utility::timeSync(Time& dt, const SQL_TIME_STRUCT& ts)
+inline void Utility::timeSync(Time& t, const SQL_TIME_STRUCT& ts)
 {
-	dt.assign(ts.hour, ts.minute, ts.second);
+	t.assign(ts.hour, ts.minute, ts.second);
 }
 
 

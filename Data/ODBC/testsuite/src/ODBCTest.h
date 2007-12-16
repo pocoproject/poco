@@ -91,7 +91,7 @@ public:
 	virtual void testLimitPrepare();
 	virtual void testLimitZero();
 	virtual void testPrepare();
-	virtual void testStep();
+	virtual void testBulk();
 
 	virtual void testSetSimple();
 	virtual void testSetComplex();
@@ -165,6 +165,7 @@ protected:
 	virtual void recreateAnysTable() { /* no-op */ };
 	virtual void recreateNullsTable(const std::string& notNull="") { /* no-op */ };
 	virtual void recreateBoolTable() { /* no-op */ };
+	virtual void recreateMiscTable() { /* no-op */ };
 
 	static SessionPtr init(const std::string& driver,
 		std::string& dsn,
@@ -182,8 +183,8 @@ protected:
 
 	bool bindValue(int i);
 
-	Poco::Data::Session&           session();
-	SQLExecutor&                   executor();
+	Poco::Data::Session& session();
+	SQLExecutor& executor();
 
 	const std::string& dsn();
 	const std::string& uid();

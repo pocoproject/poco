@@ -116,7 +116,7 @@ public:
 	bool extract(std::size_t pos, Poco::DateTime& val);
 		/// Extracts a DateTime.
 
-	bool isNull(std::size_t pos);
+	bool isNull(std::size_t col, std::size_t row = -1);
 		/// Returns true if the current row value at pos column is null.
 
 	void reset();
@@ -128,7 +128,7 @@ inline void Extractor::reset()
 }
 
 
-inline bool Extractor::isNull(std::size_t pos)
+inline bool Extractor::isNull(std::size_t col, std::size_t row)
 {
 	return false;
 }

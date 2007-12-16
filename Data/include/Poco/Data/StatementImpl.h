@@ -44,6 +44,7 @@
 #include "Poco/Data/AbstractBinding.h"
 #include "Poco/Data/AbstractExtraction.h"
 #include "Poco/Data/Range.h"
+#include "Poco/Data/Bulk.h"
 #include "Poco/Data/Column.h"
 #include "Poco/Data/Extraction.h"
 #include "Poco/Data/SessionImpl.h"
@@ -84,6 +85,14 @@ public:
 		STORAGE_VECTOR_IMPL,
 		STORAGE_LIST_IMPL,
 		STORAGE_UNKNOWN_IMPL
+	};
+
+	enum BulkType
+	{
+		BULK_UNDEFINED,
+		BULK_BINDING,
+		BULK_EXTRACTION,
+		BULK_FORBIDDEN
 	};
 
 	static const std::string DEQUE;
@@ -133,12 +142,6 @@ public:
 	Storage getStorage() const;
 		/// Returns the storage type for this statement.
 
-	void setStep(Poco::UInt32 step);
-		/// Sets the step for this statement;
-
-	Poco::UInt32 getStep() const;
-		/// Returns the step type for this statement.
-
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the statement.
@@ -168,7 +171,7 @@ protected:
 		/// returns the number of rows retreved.
 		///
 		/// Will throw, if the resultset is empty.
-		/// Expects the statement to be compiled and bound
+		/// Expects the statement to be compiled and bound.
 
 	virtual bool canBind() const = 0;
 		/// Returns if another bind is possible.
@@ -254,6 +257,12 @@ protected:
 	Poco::UInt32 activateNextDataSet();
 		/// Returns the next data set, or -1 if the last data set was reached.
 
+	Poco::UInt32 getExtractionLimit();
+		/// Returns the extraction limit value.
+
+	const Limit& extractionLimit() const;
+		/// Returns the extraction limit.
+
 private:
 	void compile();
 		/// Compiles the statement, if not yet compiled. doesn't bind yet
@@ -319,6 +328,31 @@ private:
 	bool isNull(std::size_t col, std::size_t row) const;
 		/// Returns true if the value in [col, row] is null.
 		
+	void forbidBulk();
+		/// Forbids bulk operations.
+
+	void setBulkBinding();
+		/// Sets the bulk binding flag.
+
+	void setBulkExtraction(const Bulk& l);
+		/// Sets the bulk extraction flag and extraction limit.
+
+	bool bulkBindingAllowed() const;
+		/// Returns true if statement can be set to bind data in bulk.
+		/// Once bulk binding is set for a statement, it can be
+		/// neither altered nor mixed with non-bulk mode binding.
+
+	bool bulkExtractionAllowed() const;
+		/// Returns true if statement can be set to extract data in bulk.
+		/// Once bulk extraction is set for a statement, it can be
+		/// neither altered nor mixed with non-bulk mode extraction.
+
+	bool isBulkBinding() const;
+		/// Returns true if statement is set to bind data in bulk.
+
+	bool isBulkExtraction() const;
+		/// Returns true if statement is set to extract data in bulk.
+
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
 
@@ -332,7 +366,8 @@ private:
 	AbstractBindingVec       _bindings;
 	AbstractExtractionVecVec _extractors;
 	Poco::UInt32             _curDataSet;
-	Poco::UInt32             _step;
+	BulkType                 _bulkBinding;
+	BulkType                 _bulkExtraction;
 
 	friend class Statement; 
 };
@@ -411,18 +446,6 @@ inline StatementImpl::Storage StatementImpl::getStorage() const
 }
 
 
-inline void StatementImpl::setStep(Poco::UInt32 step)
-{
-	_step = step;
-}
-
-
-inline Poco::UInt32 StatementImpl::getStep() const
-{
-	return _step;
-}
-
-
 inline std::size_t StatementImpl::extractionCount() const
 {
 	return extractions().size();
@@ -456,6 +479,57 @@ inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
 inline Poco::UInt32 StatementImpl::currentDataSet() const
 {
 	return _curDataSet;
+}
+
+
+inline Poco::UInt32 StatementImpl::getExtractionLimit()
+{
+	return _extrLimit.value();
+}
+
+
+inline const Limit& StatementImpl::extractionLimit() const
+{
+	return _extrLimit;
+}
+
+
+inline void StatementImpl::forbidBulk()
+{
+	_bulkBinding = BULK_FORBIDDEN;
+	_bulkExtraction = BULK_FORBIDDEN;
+}
+
+
+inline void StatementImpl::setBulkBinding()
+{
+	_bulkBinding = BULK_BINDING;
+}
+
+
+inline bool StatementImpl::bulkBindingAllowed() const
+{
+	return BULK_UNDEFINED == _bulkBinding ||
+		BULK_BINDING == _bulkBinding;
+}
+
+
+inline bool StatementImpl::bulkExtractionAllowed() const
+{
+	return BULK_UNDEFINED == _bulkExtraction ||
+		BULK_EXTRACTION == _bulkExtraction;
+}
+
+
+inline bool StatementImpl::isBulkBinding() const
+{
+	return BULK_BINDING == _bulkBinding;
+}
+
+
+inline bool StatementImpl::isBulkExtraction() const
+{
+	return BULK_EXTRACTION == _bulkExtraction;
 }
 
 

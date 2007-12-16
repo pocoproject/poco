@@ -140,7 +140,10 @@ public:
 	void limitPrepare();
 	void limitZero();
 	void prepare();
-	void doStep(Poco::UInt32 dataSize, Poco::UInt32 stepSize);
+	void doBulk(Poco::UInt32 size);
+	void doBulkPerformance(Poco::UInt32 size);
+	void doBulkNoBool(Poco::UInt32 size);
+	void doBulkStringIntFloat(Poco::UInt32 size);
 
 	void setSimple();
 	void setComplex();
@@ -194,8 +197,17 @@ private:
 	static const std::string MULTI_INSERT;
 	static const std::string MULTI_SELECT;
 
+	Poco::Data::Session& session();
+
 	Poco::Data::Session* _pSession;
 };
+
+
+inline Poco::Data::Session& SQLExecutor::session()
+{
+	poco_check_ptr (_pSession);
+	return *_pSession;
+}
 
 
 #endif // SQLExecutor_INCLUDED

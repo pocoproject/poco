@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/AbstractExtractor.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -48,6 +49,128 @@ AbstractExtractor::AbstractExtractor()
 
 AbstractExtractor::~AbstractExtractor()
 {
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::Int8>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::UInt8>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::Int16>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::UInt16>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::Int32>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::UInt32>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::Int64>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::UInt64>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+#ifndef POCO_LONG_IS_64_BIT
+bool AbstractExtractor::extract(std::size_t pos, std::vector<long>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+#endif
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<bool>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<float>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<double>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<char>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<std::string>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<BLOB>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<DateTime>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Date>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Time>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Any>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::vector<DynamicAny>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
 }
 
 

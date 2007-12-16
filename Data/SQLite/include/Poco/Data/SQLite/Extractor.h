@@ -135,7 +135,7 @@ public:
 	bool extract(std::size_t pos, Poco::DynamicAny& val);
 		/// Extracts a DynamicAny.
 
-	bool isNull(std::size_t pos);
+	bool isNull(std::size_t pos, std::size_t row = -1);
 		/// Returns true if the current row value at pos column is null.
 		/// Because of the loss of information about null-ness of the 
 		/// underlying database values due to the nature of SQLite engine, 
@@ -148,6 +148,8 @@ public:
 		/// bool value in the pair is true if the null indicator has 
 		/// been set and the second bool value in the pair is true if
 		/// the column is actually null.
+		/// The row argument, needed for connectors with bulk capabilities,
+		/// is ignored in this implementation.
 
 	void reset();
 		/// Clears the cached nulls indicator vector.

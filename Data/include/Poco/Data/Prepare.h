@@ -44,11 +44,7 @@
 #include "Poco/Data/AbstractPrepare.h"
 #include "Poco/Data/TypeHandler.h"
 #include <cstddef>
-#include <map>
-#include <set>
 #include <vector>
-#include <list>
-#include <deque>
 
 
 namespace Poco {
@@ -60,7 +56,10 @@ class Prepare: public AbstractPrepare
 	/// Class for calling the appropriate AbstractPreparation method.
 {
 public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const T& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
+	Prepare(AbstractPreparation* pPrepare, std::size_t pos, T& val): 
+		AbstractPrepare(pPrepare), 
+		_pos(pos), 
+		_val(val)
 		/// Creates the Prepare.
 	{
 	}
@@ -78,16 +77,21 @@ public:
 
 private:
 	std::size_t _pos;
-	const T&    _val;
+	T&          _val;
 };
 
 
 template<typename T>
 class Prepare<std::vector<T> >: public AbstractPrepare
-	/// Class for calling the appropriate AbstractPreparation method.
+	/// Prepare specialization for std::vector.
+	/// This specialization is needed for bulk operations to enforce
+	/// the whole vector preparation, rather than only individual contained values.
 {
 public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const T& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
+	Prepare(AbstractPreparation* pPrepare, std::size_t pos, std::vector<T>& val = std::vector<T>()): 
+		AbstractPrepare(pPrepare), 
+		_pos(pos), 
+		_val(val)
 		/// Creates the Prepare.
 	{
 	}
@@ -100,174 +104,12 @@ public:
 	void prepare()
 		/// Prepares data.
 	{
-		TypeHandler<T>::prepare(_pos, _val, preparation());
+		TypeHandler<std::vector<T> >::prepare(_pos, _val, preparation());
 	}
 
 private:
-	std::size_t _pos;
-	const T&    _val;
-};
-
-
-template<typename T>
-class Prepare<std::list<T> >: public AbstractPrepare
-	/// Class for calling the appropriate AbstractPreparation method.
-{
-public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const T& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
-		/// Creates the Prepare.
-	{
-	}
-
-	~Prepare()
-		/// Destroys the Prepare.
-	{
-	}
-
-	void prepare()
-		/// Prepares data.
-	{
-		TypeHandler<T>::prepare(_pos, _val, preparation());
-	}
-
-private:
-	std::size_t _pos;
-	const T&    _val;
-};
-
-
-template<typename T>
-class Prepare<std::deque<T> >: public AbstractPrepare
-	/// Class for calling the appropriate AbstractPreparation method.
-{
-public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const T& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
-		/// Creates the Prepare.
-	{
-	}
-
-	~Prepare()
-		/// Destroys the Prepare.
-	{
-	}
-
-	void prepare()
-		/// Prepares data.
-	{
-		TypeHandler<T>::prepare(_pos, _val, preparation());
-	}
-
-private:
-	std::size_t _pos;
-	const T&    _val;
-};
-
-
-template<typename T>
-class Prepare<std::set<T> >: public AbstractPrepare
-	/// Class for calling the appropriate AbstractPreparation method.
-{
-public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const T& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
-		/// Creates the Prepare.
-	{
-	}
-
-	~Prepare()
-		/// Destroys the Prepare.
-	{
-	}
-
-	void prepare()
-		/// Prepares data.
-	{
-		TypeHandler<T>::prepare(_pos, _val, preparation());
-	}
-
-private:
-	std::size_t _pos;
-	const T&    _val;
-};
-
-
-template<typename T>
-class Prepare<std::multiset<T> >: public AbstractPrepare
-	/// Class for calling the appropriate AbstractPreparation method.
-{
-public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const T& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
-		/// Creates the Prepare.
-	{
-	}
-
-	~Prepare()
-		/// Destroys the Prepare.
-	{
-	}
-
-	void prepare()
-		/// Prepares data.
-	{
-		TypeHandler<T>::prepare(_pos, _val, preparation());
-	}
-
-private:
-	std::size_t _pos;
-	const T&    _val;
-};
-
-
-template<typename K, typename V>
-class Prepare<std::map<K, V> >: public AbstractPrepare
-	/// Class for calling the appropriate AbstractPreparation method.
-{
-public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const V& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
-		/// Creates the Prepare.
-	{
-	}
-
-	~Prepare()
-		/// Destroys the Prepare.
-	{
-	}
-
-	void prepare()
-		/// Prepares data.
-	{
-		TypeHandler<V>::prepare(_pos, _val, preparation());
-	}
-
-private:
-	std::size_t _pos;
-	const V&    _val;
-};
-
-
-template<typename K, typename V>
-class Prepare<std::multimap<K, V> >: public AbstractPrepare
-	/// Class for calling the appropriate AbstractPreparation method.
-{
-public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, const V& val): AbstractPrepare(pPrepare), _pos(pos), _val(val)
-		/// Creates the Prepare.
-	{
-	}
-
-	~Prepare()
-		/// Destroys the Prepare.
-	{
-	}
-
-	void prepare()
-		/// Prepares data.
-	{
-		TypeHandler<V>::prepare(_pos, _val, preparation());
-	}
-
-private:
-	std::size_t _pos;
-	const V&    _val;
+	std::size_t     _pos;
+	std::vector<T>& _val;
 };
 
 

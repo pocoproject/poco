@@ -63,7 +63,7 @@ class Data_API AbstractExtraction: public Poco::RefCountedObject
 {
 public:
 	AbstractExtraction(Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
-		Poco::UInt32 position = 0);
+		Poco::UInt32 position = 0, bool bulk = false);
 		/// Creates the AbstractExtraction. A limit value equal to EXTRACT_UNLIMITED (0xffffffffu) 
 		/// means that we extract as much data as possible during one execute.
 		/// Otherwise the limit value is used to partition data extracting to a limited amount of rows.
@@ -95,13 +95,14 @@ public:
 	virtual std::size_t numOfRowsAllowed() const = 0;
 		/// Returns the upper limit on number of rows that the extraction will handle.
 
-	virtual void extract(std::size_t pos) = 0;
+	virtual std::size_t extract(std::size_t pos) = 0;
 		/// Extracts a value from the param, starting at the given column position.
+		/// Returns the number of rows extracted.
 
 	virtual void reset() = 0;
 		/// Resets the extractor so that it can be re-used.
 
-	virtual AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) const = 0;
+	virtual AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) = 0;
 		/// Creates a Prepare object for the extracting object
 
 	void setLimit(Poco::UInt32 limit);
@@ -118,10 +119,14 @@ public:
 		/// null values and be able to later provide information about them.
 		/// Here, this function throws NotImplementedException.
 
+	bool isBulk() const;
+		/// Returns true if this is bulk extraction.
+
 private:
 	AbstractExtractor* _pExtractor;
 	Poco::UInt32       _limit;
 	Poco::UInt32       _position;
+	bool               _bulk;
 };
 
 
@@ -166,6 +171,12 @@ inline bool AbstractExtraction::isNull(std::size_t row) const
 inline Poco::UInt32 AbstractExtraction::position() const
 {
 	return _position;
+}
+
+
+inline bool AbstractExtraction::isBulk() const
+{
+	return _bulk;
 }
 
 

@@ -391,7 +391,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
-		CppUnit_addTest(pSuite, ODBCMySQLTest, testStep);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplexUnique);

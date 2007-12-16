@@ -41,13 +41,136 @@ namespace Poco {
 namespace Data {
 
 
-AbstractPreparation::AbstractPreparation()
+AbstractPreparation::AbstractPreparation(Poco::UInt32 length): 
+	_length(length)
 {
 }
 
 
 AbstractPreparation::~AbstractPreparation()
 {
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, std::vector<Poco::Int8>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, std::vector<Poco::UInt8>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, std::vector<Poco::Int16>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, std::vector<Poco::UInt16>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, std::vector<Poco::Int32>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, std::vector<Poco::UInt32>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, std::vector<Poco::Int64>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, std::vector<Poco::UInt64>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+#ifndef POCO_LONG_IS_64_BIT
+void AbstractPreparation::prepare(std::size_t pos, std::vector<long>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+#endif
+
+
+ void AbstractPreparation::prepare(std::size_t pos, std::vector<bool>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, std::vector<float>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, std::vector<double>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, std::vector<char>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, const std::vector<std::string>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, const std::vector<BLOB>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, const std::vector<DateTime>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, const std::vector<Date>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, const std::vector<Time>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+ void AbstractPreparation::prepare(std::size_t pos, const std::vector<Any>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
+}
+
+
+void AbstractPreparation::prepare(std::size_t pos, const std::vector<DynamicAny>& val)
+{
+	throw NotImplementedException("std::vector preparation must be implemented.");
 }
 
 

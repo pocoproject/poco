@@ -64,7 +64,7 @@ public:
 		PD_IN_OUT = AbstractBinder::PD_IN_OUT
 	};
 
-	AbstractBinding(const std::string& name = "", Direction direction = PD_IN);
+	AbstractBinding(const std::string& name = "", Direction direction = PD_IN, Poco::UInt32 bulkSize = 0);
 		/// Creates the AbstractBinding.
 
 	virtual ~AbstractBinding();
@@ -86,7 +86,7 @@ public:
 		/// Returns the number of rows that the binding handles.
 		///
 		/// The trivial case will be one single row but 
-		/// for collection data types (ie vector) it can be larger.
+		/// for collection data types it can be larger.
 
 	virtual bool canBind() const = 0;
 		/// Returns true if we have enough data to bind
@@ -103,10 +103,17 @@ public:
 	const std::string& name() const;
 		/// Returns the name for this binding.
 
+	bool isBulk() const;
+		/// Returns true if extraction is bulk.
+
+	Poco::UInt32 bulkSize() const;
+		/// Returns the size of the bulk binding.
+
 private:
 	AbstractBinder* _pBinder;
-	std::string _name;
-	Direction _direction;
+	std::string     _name;
+	Direction       _direction;
+	Poco::UInt32    _bulkSize;
 };
 
 
@@ -132,6 +139,18 @@ inline const std::string& AbstractBinding::name() const
 inline AbstractBinder::Direction AbstractBinding::getDirection() const
 {
 	return (AbstractBinder::Direction) _direction;
+}
+
+
+inline bool AbstractBinding::isBulk() const
+{
+	return _bulkSize > 0;
+}
+
+
+inline Poco::UInt32 AbstractBinding::bulkSize() const
+{
+	return _bulkSize;
 }
 
 
