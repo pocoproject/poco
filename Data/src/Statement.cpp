@@ -201,6 +201,9 @@ Statement& Statement::operator , (AbstractBinding* pBind)
 {
 	if (pBind->isBulk())
 	{
+		if (!_pImpl->isBulkSupported())
+			throw InvalidAccessException("Bulk not supported by this session.");
+
 		if(_pImpl->bulkBindingAllowed())
 			_pImpl->setBulkBinding();
 		else
@@ -217,6 +220,9 @@ Statement& Statement::operator , (AbstractExtraction* pExtract)
 {
 	if (pExtract->isBulk())
 	{
+		if (!_pImpl->isBulkSupported())
+			throw InvalidAccessException("Bulk not supported by this session.");
+
 		if(_pImpl->bulkExtractionAllowed())
 		{
 			Bulk b(pExtract->getLimit());
@@ -255,6 +261,9 @@ Statement& Statement::operator , (const Range& extrRange)
 
 Statement& Statement::operator , (const Bulk& bulk)
 {
+	if (!_pImpl->isBulkSupported())
+			throw InvalidAccessException("Bulk not supported by this session.");
+
 	if (0 == _pImpl->extractions().size() && 
 		0 == _pImpl->bindings().size() &&
 		_pImpl->bulkExtractionAllowed() &&

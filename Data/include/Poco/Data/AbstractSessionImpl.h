@@ -81,12 +81,21 @@ public:
 		/// Storage type can be reconfigured at runtime both globally (for the
 		/// duration of the session) and locally (for a single statement execution only). 
 		/// See StatementImpl for details on how this property is used at runtime.
+		/// Bulk feature determines whether the session is capable of bulk operations.
+		/// Connectors that are capable of it must set this feature prior to attempting 
+		/// bulk operations.
 	{
 		addProperty("storage", 
 			&AbstractSessionImpl<C>::setStorage, 
 			&AbstractSessionImpl<C>::getStorage);
 
 		setProperty("storage", std::string("deque"));
+
+		addFeature("bulk", 
+			&AbstractSessionImpl<C>::setBulk, 
+			&AbstractSessionImpl<C>::getBulk);
+
+		setFeature("bulk", false);
 	}
 
 	~AbstractSessionImpl()
@@ -172,6 +181,18 @@ public:
 		return _storage;
 	}
 
+	void setBulk(const std::string& name, bool bulk)
+		/// Sets the storage type.
+	{
+		_bulk = bulk;
+	}
+		
+	bool getBulk(const std::string& name="")
+		/// Returns the storage type
+	{
+		return _bulk;
+	}
+
 protected:
 	void addFeature(const std::string& name, FeatureSetter setter, FeatureGetter getter)
 		/// Adds a feature to the map of supported features.
@@ -216,6 +237,7 @@ private:
 	FeatureMap  _features;
 	PropertyMap _properties;
 	std::string _storage;
+	bool        _bulk;
 };
 
 

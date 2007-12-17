@@ -89,10 +89,20 @@ public:
 
 	enum BulkType
 	{
-		BULK_UNDEFINED,
-		BULK_BINDING,
-		BULK_EXTRACTION,
-		BULK_FORBIDDEN
+		BULK_UNDEFINED,     
+			/// Bulk mode not defined yet.
+		BULK_BINDING,       
+			/// Binding in bulk mode.
+			/// If extraction is present in the same statement, 
+			/// it must also be bulk.
+		BULK_EXTRACTION,    
+			/// Extraction in bulk mode.
+			/// If binding is present in the same statement, 
+			/// it must also be bulk.
+		BULK_FORBIDDEN,     
+			/// Bulk forbidden. 
+			/// Happens when the statement has already been 
+			/// configured as non-bulk.
 	};
 
 	static const std::string DEQUE;
@@ -336,6 +346,9 @@ private:
 
 	void setBulkExtraction(const Bulk& l);
 		/// Sets the bulk extraction flag and extraction limit.
+	
+	void resetBulk();
+		/// Resets the bulk extraction and binding flag.
 
 	bool bulkBindingAllowed() const;
 		/// Returns true if statement can be set to bind data in bulk.
@@ -352,6 +365,9 @@ private:
 
 	bool isBulkExtraction() const;
 		/// Returns true if statement is set to extract data in bulk.
+
+	bool isBulkSupported() const;
+		/// Returns true if connector and session support bulk operation.
 
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
@@ -530,6 +546,20 @@ inline bool StatementImpl::isBulkBinding() const
 inline bool StatementImpl::isBulkExtraction() const
 {
 	return BULK_EXTRACTION == _bulkExtraction;
+}
+
+	
+inline void StatementImpl::resetBulk()
+{
+	_bulkExtraction = BULK_UNDEFINED;
+	_bulkBinding = BULK_UNDEFINED;\
+	setExtractionLimit(Limit(Limit::LIMIT_UNLIMITED, false, false));
+}
+
+
+inline bool StatementImpl::isBulkSupported() const
+{
+	return _rSession.getFeature("bulk");
 }
 
 

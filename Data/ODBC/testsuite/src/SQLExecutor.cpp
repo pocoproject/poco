@@ -1502,7 +1502,7 @@ void SQLExecutor::doBulk(Poco::UInt32 size)
 
 	try 
 	{
-		session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?,?)", 
+		session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?,?)",
 			use(strings, bulk), 
 			use(blobs, bulk), 
 			use(ints, bulk),

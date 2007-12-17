@@ -93,17 +93,6 @@ public:
 	bool isTransaction();
 		/// Returns true iff a transaction is in progress.
 
-	void setEnforceCapability(const std::string&, bool val);
-		/// Configures session to enforce driver capability check 
-		/// after connection.
-		/// If capability check is enforced and driver is not capable, 
-		/// connection is terminated.
-		/// Since some drivers do not cooperate, the default behavior 
-		/// is not checking capability.
-
-	bool getEnforceCapability(const std::string& name="");
-		/// Returns the driver capability check configuration value.
-
 	bool canTransact();
 		/// Returns true if connection is transaction-capable.
 
@@ -149,13 +138,6 @@ private:
 	void open();
 		/// Opens a connection to the Database
 
-	bool isCapable(int function = 0);
-		/// Returns true if driver supports specified function, or if
-		/// specified function is zero, all required functions.
-		/// Called upon succesful connection if _enforceCapability is true.
-		/// This function code should be updated whenever a new 
-		/// ODBC API call is introduced anywhere in ODBC data connector.
-		
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
 	std::string _connect;
@@ -219,18 +201,6 @@ inline void SessionImpl::setDataTypeInfo(const std::string& rName, const Poco::A
 inline Poco::Any SessionImpl::dataTypeInfo(const std::string& rName)
 {
 	return &_dataTypes;
-}
-
-
-inline void SessionImpl::setEnforceCapability(const std::string&, bool val)
-{
-	_enforceCapability = val;
-}
-
-
-inline bool SessionImpl::getEnforceCapability(const std::string&)
-{
-	return _enforceCapability;
 }
 
 

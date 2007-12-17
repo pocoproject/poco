@@ -58,6 +58,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 	_autoBind(autoBind),
 	_autoExtract(autoExtract)
 {
+	setFeature("bulk", true);
 	open();
 }
 
@@ -103,10 +104,6 @@ void SessionImpl::open()
 		&SessionImpl::setDataTypeInfo, 
 		&SessionImpl::dataTypeInfo);
 
-	addFeature("enforceCapability", 
-		&SessionImpl::setEnforceCapability, 
-		&SessionImpl::getEnforceCapability);
-
 	addFeature("autoCommit", 
 		&SessionImpl::autoCommit, 
 		&SessionImpl::isAutoCommit);
@@ -122,13 +119,6 @@ void SessionImpl::open()
 	addProperty("maxFieldSize",
 		&SessionImpl::setMaxFieldSize,
 		&SessionImpl::getMaxFieldSize);
-
-	if (_enforceCapability && !isCapable())
-	{
-		close();
-		throw ODBCException("Connection closed "
-			"(capability enforcement required but not all required functions supported).");
-	}
 
 	SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
 
@@ -209,45 +199,6 @@ void SessionImpl::close()
 	}catch (ConnectionException&) { }
 
 	SQLDisconnect(_db);
-}
-
-
-bool SessionImpl::isCapable(int function)
-{
-	SQLUSMALLINT exists[FUNCTIONS] = {0};
-
-	if (Utility::isError(SQLGetFunctions(_db, SQL_API_ODBC3_ALL_FUNCTIONS, exists)))
-	{
-		throw ConnectionException(_db,
-			"SQLGetFunctions(SQL_API_ODBC3_ALL_FUNCTIONS)");
-	}
-
-	if (0 != function) return 0 != exists[function];
-	else return 
-		exists[SQL_API_SQLBINDPARAMETER]  &&
-		exists[SQL_API_SQLBINDCOL]        &&
-		exists[SQL_API_SQLGETDATA]        &&
-		exists[SQL_API_SQLPUTDATA]        &&
-		exists[SQL_API_SQLPARAMDATA]      &&
-		exists[SQL_API_SQLDESCRIBECOL]    &&
-		exists[SQL_API_SQLDESCRIBEPARAM]  &&
-		exists[SQL_API_SQLGETINFO]        &&
-		exists[SQL_API_SQLGETTYPEINFO]    &&
-		exists[SQL_API_SQLGETDIAGREC]     &&
-		exists[SQL_API_SQLGETDIAGFIELD]   &&
-		exists[SQL_API_SQLPREPARE]        &&
-		exists[SQL_API_SQLEXECUTE]        &&
-		exists[SQL_API_SQLEXECDIRECT]     &&
-		exists[SQL_API_SQLFETCH]          &&
-		exists[SQL_API_SQLNUMRESULTCOLS]  &&
-		exists[SQL_API_SQLALLOCHANDLE]    &&
-		exists[SQL_API_SQLFREEHANDLE]     &&
-		exists[SQL_API_SQLCLOSECURSOR]    &&
-		exists[SQL_API_SQLSETCONNECTATTR] &&
-		exists[SQL_API_SQLSETSTMTATTR]    &&
-		exists[SQL_API_SQLENDTRAN]        &&
-		exists[SQL_API_SQLNATIVESQL]      &&
-		exists[SQL_API_SQLCOLATTRIBUTE];
 }
 
 
