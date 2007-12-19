@@ -165,6 +165,19 @@ void ODBCDB2Test::testBLOB()
 }
 
 
+void ODBCDB2Test::testBulk()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreateMiscTable();
+	_pExecutor->doBulkStringIntFloat(100);
+	recreateMiscTable();
+	_pExecutor->doBulkPerformance(1000);
+}
+
+
 void ODBCDB2Test::testStoredProcedure()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -536,6 +549,23 @@ void ODBCDB2Test::recreateNullsTable(const std::string& notNull)
 		notNull), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
+}
+
+
+void ODBCDB2Test::recreateMiscTable()
+{
+	dropObject("TABLE", "MiscTest");
+	try 
+	{ 
+		// DB2 fails with BLOB
+		session() << "CREATE TABLE MiscTest "
+			"(First VARCHAR(30),"
+			//"Second BLOB,"
+			"Third INTEGER,"
+			"Fourth FLOAT,"
+			"Fifth TIMESTAMP)", now; 
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
 
 

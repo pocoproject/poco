@@ -80,11 +80,23 @@ public:
 	bool extract(std::size_t pos, std::vector<Poco::Int8>& val);
 		/// Extracts an Int8 vector.
 
+	bool extract(std::size_t pos, std::deque<Poco::Int8>& val);
+		/// Extracts an Int8 deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Int8>& val);
+		/// Extracts an Int8 list.
+
 	bool extract(std::size_t pos, Poco::UInt8& val);
 		/// Extracts an UInt8.
 
 	bool extract(std::size_t pos, std::vector<Poco::UInt8>& val);
 		/// Extracts an UInt8 vector.
+
+	bool extract(std::size_t pos, std::deque<Poco::UInt8>& val);
+		/// Extracts an UInt8 deque.
+
+	bool extract(std::size_t pos, std::list<Poco::UInt8>& val);
+		/// Extracts an UInt8 list.
 
 	bool extract(std::size_t pos, Poco::Int16& val);
 		/// Extracts an Int16.
@@ -92,11 +104,23 @@ public:
 	bool extract(std::size_t pos, std::vector<Poco::Int16>& val);
 		/// Extracts an Int16 vector.
 
+	bool extract(std::size_t pos, std::deque<Poco::Int16>& val);
+		/// Extracts an Int16 deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Int16>& val);
+		/// Extracts an Int16 list.
+
 	bool extract(std::size_t pos, Poco::UInt16& val);
 		/// Extracts an UInt16.
 
 	bool extract(std::size_t pos, std::vector<Poco::UInt16>& val);
 		/// Extracts an UInt16 vector.
+
+	bool extract(std::size_t pos, std::deque<Poco::UInt16>& val);
+		/// Extracts an UInt16 deque.
+
+	bool extract(std::size_t pos, std::list<Poco::UInt16>& val);
+		/// Extracts an UInt16 list.
 
 	bool extract(std::size_t pos, Poco::Int32& val);
 		/// Extracts an Int32.
@@ -104,11 +128,23 @@ public:
 	bool extract(std::size_t pos, std::vector<Poco::Int32>& val);
 		/// Extracts an Int32 vector.
 
+	bool extract(std::size_t pos, std::deque<Poco::Int32>& val);
+		/// Extracts an Int32 deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Int32>& val);
+		/// Extracts an Int32 list.
+
 	bool extract(std::size_t pos, Poco::UInt32& val);
 		/// Extracts an UInt32.
 
 	bool extract(std::size_t pos, std::vector<Poco::UInt32>& val);
 		/// Extracts an UInt32 vector.
+
+	bool extract(std::size_t pos, std::deque<Poco::UInt32>& val);
+		/// Extracts an UInt32 deque.
+
+	bool extract(std::size_t pos, std::list<Poco::UInt32>& val);
+		/// Extracts an UInt32 list.
 
 	bool extract(std::size_t pos, Poco::Int64& val);
 		/// Extracts an Int64.
@@ -116,11 +152,23 @@ public:
 	bool extract(std::size_t pos, std::vector<Poco::Int64>& val);
 		/// Extracts an Int64 vector.
 
+	bool extract(std::size_t pos, std::deque<Poco::Int64>& val);
+		/// Extracts an Int64 deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Int64>& val);
+		/// Extracts an Int64 list.
+
 	bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
 
 	bool extract(std::size_t pos, std::vector<Poco::UInt64>& val);
 		/// Extracts an UInt64 vector.
+
+	bool extract(std::size_t pos, std::deque<Poco::UInt64>& val);
+		/// Extracts an UInt64 deque.
+
+	bool extract(std::size_t pos, std::list<Poco::UInt64>& val);
+		/// Extracts an UInt64 list.
 
 #ifndef POCO_LONG_IS_64_BIT
 	bool extract(std::size_t pos, long& val);
@@ -128,6 +176,12 @@ public:
 
 	bool extract(std::size_t pos, std::vector<long>& val);
 		/// Extracts a long vector.
+
+	bool extract(std::size_t pos, std::deque<long>& val);
+		/// Extracts a long deque.
+
+	bool extract(std::size_t pos, std::list<long>& val);
+		/// Extracts a long list.
 #endif
 
 	bool extract(std::size_t pos, bool& val);
@@ -136,11 +190,23 @@ public:
 	bool extract(std::size_t pos, std::vector<bool>& val);
 		/// Extracts a boolean vector.
 
+	bool extract(std::size_t pos, std::deque<bool>& val);
+		/// Extracts a boolean deque.
+
+	bool extract(std::size_t pos, std::list<bool>& val);
+		/// Extracts a boolean list.
+
 	bool extract(std::size_t pos, float& val);
 		/// Extracts a float.
 
 	bool extract(std::size_t pos, std::vector<float>& val);
 		/// Extracts a float vector.
+
+	bool extract(std::size_t pos, std::deque<float>& val);
+		/// Extracts a float deque.
+
+	bool extract(std::size_t pos, std::list<float>& val);
+		/// Extracts a float list.
 
 	bool extract(std::size_t pos, double& val);
 		/// Extracts a double.
@@ -148,11 +214,23 @@ public:
 	bool extract(std::size_t pos, std::vector<double>& val);
 		/// Extracts a double vector.
 
+	bool extract(std::size_t pos, std::deque<double>& val);
+		/// Extracts a double deque.
+
+	bool extract(std::size_t pos, std::list<double>& val);
+		/// Extracts a double list.
+
 	bool extract(std::size_t pos, char& val);
 		/// Extracts a single character.
 
 	bool extract(std::size_t pos, std::vector<char>& val);
 		/// Extracts a single character vector.
+
+	bool extract(std::size_t pos, std::deque<char>& val);
+		/// Extracts a single character deque.
+
+	bool extract(std::size_t pos, std::list<char>& val);
+		/// Extracts a single character list.
 
 	bool extract(std::size_t pos, std::string& val);
 		/// Extracts a string.
@@ -160,11 +238,23 @@ public:
 	bool extract(std::size_t pos, std::vector<std::string>& val);
 		/// Extracts a string vector.
 
+	bool extract(std::size_t pos, std::deque<std::string>& val);
+		/// Extracts a string deque.
+
+	bool extract(std::size_t pos, std::list<std::string>& val);
+		/// Extracts a string list.
+
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
 
 	bool extract(std::size_t pos, std::vector<Poco::Data::BLOB>& val);
 		/// Extracts a BLOB vector.
+
+	bool extract(std::size_t pos, std::deque<Poco::Data::BLOB>& val);
+		/// Extracts a BLOB deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Data::BLOB>& val);
+		/// Extracts a BLOB list.
 
 	bool extract(std::size_t pos, Poco::Data::Date& val);
 		/// Extracts a Date.
@@ -172,17 +262,35 @@ public:
 	bool extract(std::size_t pos, std::vector<Poco::Data::Date>& val);
 		/// Extracts a Date vector.
 
+	bool extract(std::size_t pos, std::deque<Poco::Data::Date>& val);
+		/// Extracts a Date deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Data::Date>& val);
+		/// Extracts a Date list.
+
 	bool extract(std::size_t pos, Poco::Data::Time& val);
 		/// Extracts a Time.
 
 	bool extract(std::size_t pos, std::vector<Poco::Data::Time>& val);
 		/// Extracts a Time vector.
 
+	bool extract(std::size_t pos, std::deque<Poco::Data::Time>& val);
+		/// Extracts a Time deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Data::Time>& val);
+		/// Extracts a Time list.
+
 	bool extract(std::size_t pos, Poco::DateTime& val);
 		/// Extracts a DateTime.
 
 	bool extract(std::size_t pos, std::vector<Poco::DateTime>& val);
 		/// Extracts a DateTime vector.
+
+	bool extract(std::size_t pos, std::deque<Poco::DateTime>& val);
+		/// Extracts a DateTime deque.
+
+	bool extract(std::size_t pos, std::list<Poco::DateTime>& val);
+		/// Extracts a DateTime list.
 	
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
@@ -190,11 +298,23 @@ public:
 	bool extract(std::size_t pos, std::vector<Poco::Any>& val);
 		/// Extracts an Any vector.
 
+	bool extract(std::size_t pos, std::deque<Poco::Any>& val);
+		/// Extracts an Any deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Any>& val);
+		/// Extracts an Any list.
+
 	bool extract(std::size_t pos, Poco::DynamicAny& val);
 		/// Extracts a DynamicAny.
 
 	bool extract(std::size_t pos, std::vector<Poco::DynamicAny>& val);
 		/// Extracts a DynamicAny vector.
+
+	bool extract(std::size_t pos, std::deque<Poco::DynamicAny>& val);
+		/// Extracts a DynamicAny deque.
+
+	bool extract(std::size_t pos, std::list<Poco::DynamicAny>& val);
+		/// Extracts a DynamicAny list.
 
 	void setDataExtraction(Preparation::DataExtraction ext);
 		/// Set data extraction mode.
@@ -236,11 +356,12 @@ private:
 		return true;
 	}
 
-	template<typename T>
-	bool extractBoundImplVec(std::size_t pos, std::vector<T>& val)
+	template<typename C>
+	bool extractBoundImplContainer(std::size_t pos, C& val)
 	{
-		poco_assert_dbg (typeid(std::vector<T>) == _rPreparation[pos].type());
-		std::vector<T>& v = RefAnyCast<std::vector<T> >(_rPreparation[pos]);
+		typedef typename C::value_type Type;
+		poco_assert_dbg (typeid(std::vector<Type>) == _rPreparation[pos].type());
+		std::vector<Type>& v = RefAnyCast<std::vector<Type> >(_rPreparation[pos]);
 		val.assign(v.begin(), v.end());
 		return true;
 	}

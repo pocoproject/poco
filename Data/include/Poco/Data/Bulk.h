@@ -103,6 +103,9 @@ inline void bulk()
 }
 
 
+typedef void (*BulkFnType)();
+
+
 } } // namespace Poco::Data
 
 

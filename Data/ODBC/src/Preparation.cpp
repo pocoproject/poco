@@ -95,6 +95,10 @@ void Preparation::freeMemory() const
 			std::free(AnyCast<char>(&_values[it->first]));
 			break;
 
+		case DT_BOOL_ARRAY:
+			std::free(AnyCast<bool>(&_values[it->first]));
+			break;
+
 		case DT_DATE:
 			deleteCachedArray<SQL_DATE_STRUCT>(it->first);
 			break;
@@ -153,7 +157,7 @@ std::size_t Preparation::maxDataSize(std::size_t pos) const
 }
 
 
-void Preparation::prepareVariableLenArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length, DataType dt)
+void Preparation::prepareCharArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length)
 {
 	poco_assert_dbg (DE_BOUND == _dataExtraction);
 	poco_assert_dbg (pos < _values.size());
@@ -165,13 +169,39 @@ void Preparation::prepareVariableLenArray(std::size_t pos, SQLSMALLINT valueType
 	_values[pos] = Any(pArray);
 	_lengths[pos] = 0;
 	_lenLengths[pos].resize(length);
-	_varLengthArrays.insert(IndexMap::value_type(pos, dt));
+	_varLengthArrays.insert(IndexMap::value_type(pos, DT_CHAR_ARRAY));
 
 	if (Utility::isError(SQLBindCol(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 
 		valueType, 
 		(SQLPOINTER) pArray, 
 		(SQLINTEGER) size, 
+		&_lenLengths[pos][0])))
+	{
+		throw StatementException(_rStmt, "SQLBindCol()");
+	}
+}
+
+
+void Preparation::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::size_t length)
+{
+	poco_assert_dbg (DE_BOUND == _dataExtraction);
+	poco_assert_dbg (pos < _values.size());
+	poco_assert_dbg (pos < _lengths.size());
+	poco_assert_dbg (pos < _lenLengths.size());
+
+	bool* pArray = (bool*) std::calloc(length, sizeof(bool));
+
+	_values[pos] = Any(pArray);
+	_lengths[pos] = 0;
+	_lenLengths[pos].resize(length);
+	_varLengthArrays.insert(IndexMap::value_type(pos, DT_BOOL_ARRAY));
+
+	if (Utility::isError(SQLBindCol(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		valueType, 
+		(SQLPOINTER) pArray, 
+		(SQLINTEGER) sizeof(bool), 
 		&_lenLengths[pos][0])))
 	{
 		throw StatementException(_rStmt, "SQLBindCol()");

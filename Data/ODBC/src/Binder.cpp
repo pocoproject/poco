@@ -158,63 +158,6 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<std::string>& val, Direction dir)
-{
-	if (isOutBound(dir) || !isInBound(dir))
-		throw NotImplementedException("String vector parameter type can only be inbound.");
-
-	if (PB_IMMEDIATE != _paramBinding)
-		throw InvalidAccessException("std::vector can only be bound immediately.");
-
-	if (0 == val.size())
-		throw InvalidArgumentException("Empty vector not allowed.");
-
-	setParamSetSize(pos, val.size());
-
-	SQLINTEGER size = 0;
-	getColumnOrParameterSize(pos, size);
-	poco_assert (size > 0);
-
-	if (_vecLengthIndicator.size() <= pos)
-	{
-		_vecLengthIndicator.resize(pos + 1);
-		_vecLengthIndicator[pos].resize(val.size(), SQL_NTS);
-	}
-
-	if (_charPtrs.size() <= pos)
-		_charPtrs.resize(pos + 1, 0);
-
-	_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(char));
-	
-	std::size_t strSize;
-	std::size_t offset = 0;
-	std::vector<std::string>::const_iterator it = val.begin();
-	std::vector<std::string>::const_iterator end = val.end();
-	for (; it != end; ++it)
-	{
-		strSize = it->size();
-		if (strSize > size)	
-			throw LengthExceededException("SQLBindParameter(std::vector<std::string>)");
-		std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
-		offset += size;
-	}
-
-	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		toODBCDirection(dir), 
-		SQL_C_CHAR, 
-		SQL_LONGVARCHAR, 
-		(SQLUINTEGER) size - 1,
-		0,
-		_charPtrs[pos], 
-		(SQLINTEGER) size, 
-		&_vecLengthIndicator[pos][0])))
-	{
-		throw StatementException(_rStmt, "SQLBindParameter(std::vector<std::string>)");
-	}
-}
-
-
 void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
 {
 	if (isOutBound(dir) || !isInBound(dir))
@@ -245,78 +188,6 @@ void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
 		_lengthIndicator.back())))
 	{
 		throw StatementException(_rStmt, "SQLBindParameter(BLOB)");
-	}
-}
-
-
-void Binder::bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir)
-{
-	if (isOutBound(dir) || !isInBound(dir))
-		throw NotImplementedException("BLOB vector parameter type can only be inbound.");
-
-	if (PB_IMMEDIATE != _paramBinding)
-		throw InvalidAccessException("std::vector can only be bound immediately.");
-
-	if (0 == val.size())
-		throw InvalidArgumentException("Empty vector not allowed.");
-
-	setParamSetSize(pos, val.size());
-
-	SQLINTEGER size = 0;
-	getColumnOrParameterSize(pos, size);
-	poco_assert (size > 0);
-
-	if (size == _maxFieldSize)
-	{
-		std::size_t maxSize = 0;
-		std::vector<BLOB>::const_iterator it = val.begin();
-		std::vector<BLOB>::const_iterator end = val.end();
-		for (; it != end; ++it)
-		{
-			std::size_t sz = it->size();
-			if (sz < _maxFieldSize && sz > maxSize)
-				maxSize = sz;
-		}
-		if (maxSize) size = maxSize;
-	}
-
-	if (_vecLengthIndicator.size() <= pos)
-	{
-		_vecLengthIndicator.resize(pos + 1);
-		_vecLengthIndicator[pos].resize(val.size(), SQL_NTS);
-	}
-
-	if (_charPtrs.size() <= pos)
-		_charPtrs.resize(pos + 1, 0);
-
-	_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(char));
-	poco_check_ptr (_charPtrs[pos]);
-
-	std::size_t blobSize;
-	std::size_t offset = 0;
-	std::vector<BLOB>::const_iterator it = val.begin();
-	std::vector<BLOB>::const_iterator end = val.end();
-	for (; it != end; ++it)
-	{
-		blobSize = it->size();
-		if (blobSize > size)	
-			throw LengthExceededException("SQLBindParameter(std::vector<BLOB>)");
-		std::memcpy(_charPtrs[pos] + offset, it->rawContent(), blobSize);
-		offset += size;
-	}
-
-	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		SQL_PARAM_INPUT, 
-		SQL_C_BINARY, 
-		SQL_LONGVARBINARY, 
-		(SQLUINTEGER) size,
-		0,
-		_charPtrs[pos], 
-		(SQLINTEGER) size, 
-		&_vecLengthIndicator[pos][0])))
-	{
-		throw StatementException(_rStmt, "SQLBindParameter(std::vector<BLOB>)");
 	}
 }
 
@@ -354,50 +225,6 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Date>& val, Direction dir)
-{
-	if (isOutBound(dir) || !isInBound(dir))
-		throw NotImplementedException("Date vector parameter type can only be inbound.");
-
-	if (PB_IMMEDIATE != _paramBinding)
-		throw InvalidAccessException("std::vector can only be bound immediately.");
-
-	if (0 == val.size())
-		throw InvalidArgumentException("Empty vector not allowed.");
-
-	setParamSetSize(pos, val.size());
-
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
-
-	if (_vecLengthIndicator.size() <= pos)
-	{
-		_vecLengthIndicator.resize(pos + 1);
-		_vecLengthIndicator[pos].resize(val.size(), size);
-	}
-
-	if (_dateVec.size() <= pos) _dateVec.resize(pos + 1);
-	Utility::dateSync(_dateVec[pos], val);
-
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_TYPE_DATE, colSize, decDigits);
-
-	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		toODBCDirection(dir), 
-		SQL_C_DATE, 
-		SQL_DATE, 
-		colSize,
-		decDigits,
-		(SQLPOINTER) &_dateVec[pos][0], 
-		0, 
-		&_vecLengthIndicator[pos][0])))
-	{
-		throw StatementException(_rStmt, "SQLBindParameter(Date[])");
-	}
-}
-
-
 void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 {
 	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
@@ -427,50 +254,6 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 		_lengthIndicator.back())))
 	{
 		throw StatementException(_rStmt, "SQLBindParameter(Time)");
-	}
-}
-
-
-void Binder::bind(std::size_t pos, const std::vector<Time>& val, Direction dir)
-{
-	if (isOutBound(dir) || !isInBound(dir))
-		throw NotImplementedException("Time vector parameter type can only be inbound.");
-
-	if (PB_IMMEDIATE != _paramBinding)
-		throw InvalidAccessException("std::vector can only be bound immediately.");
-
-	if (0 == val.size())
-		throw InvalidArgumentException("Empty vector not allowed.");
-
-	setParamSetSize(pos, val.size());
-
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
-
-	if (_vecLengthIndicator.size() <= pos)
-	{
-		_vecLengthIndicator.resize(pos + 1);
-		_vecLengthIndicator[pos].resize(val.size(), size);
-	}
-
-	if (_timeVec.size() <= pos)	_timeVec.resize(pos + 1);
-	Utility::timeSync(_timeVec[pos], val);
-
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_TYPE_TIME, colSize, decDigits);
-
-	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		toODBCDirection(dir), 
-		SQL_C_TIME, 
-		SQL_TIME, 
-		colSize,
-		decDigits,
-		(SQLPOINTER) &_timeVec[pos][0], 
-		0, 
-		&_vecLengthIndicator[pos][0])))
-	{
-		throw StatementException(_rStmt, "SQLBindParameter(Time[])");
 	}
 }
 
@@ -508,50 +291,6 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir)
-{
-	if (isOutBound(dir) || !isInBound(dir))
-		throw NotImplementedException("DateTime vector parameter type can only be inbound.");
-
-	if (PB_IMMEDIATE != _paramBinding)
-		throw InvalidAccessException("std::vector can only be bound immediately.");
-
-	if (0 == val.size())
-		throw InvalidArgumentException("Empty vector not allowed.");
-
-	setParamSetSize(pos, val.size());
-
-	SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
-
-	if (_vecLengthIndicator.size() <= pos)
-	{
-		_vecLengthIndicator.resize(pos + 1);
-		_vecLengthIndicator[pos].resize(val.size(), size);
-	}
-
-	if (_dateTimeVec.size() <= pos)	_dateTimeVec.resize(pos + 1);
-	Utility::dateTimeSync(_dateTimeVec[pos], val);
-
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_TYPE_TIME, colSize, decDigits);
-
-	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		toODBCDirection(dir), 
-		SQL_C_TIMESTAMP, 
-		SQL_TIMESTAMP, 
-		colSize,
-		decDigits,
-		(SQLPOINTER) &_dateTimeVec[pos][0], 
-		0, 
-		&_vecLengthIndicator[pos][0])))
-	{
-		throw StatementException(_rStmt, "SQLBindParameter(Time[])");
-	}
-}
-
-
 void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 {
 	if (isOutBound(dir) || !isInBound(dir))
@@ -578,90 +317,6 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 		0, 
 		0, 
 		_lengthIndicator.back())))
-	{
-		throw StatementException(_rStmt, "SQLBindParameter()");
-	}
-}
-
-
-void Binder::bind(std::size_t pos, const std::vector<NullData>& val, Direction dir)
-{
-	if (isOutBound(dir) || !isInBound(dir))
-		throw NotImplementedException("DateTime vector parameter type can only be inbound.");
-
-	if (PB_IMMEDIATE != _paramBinding)
-		throw InvalidAccessException("std::vector can only be bound immediately.");
-
-	if (0 == val.size())
-		throw InvalidArgumentException("Empty vector not allowed.");
-
-	setParamSetSize(pos, val.size());
-
-	SQLINTEGER size = SQL_NULL_DATA;
-
-	if (_vecLengthIndicator.size() <= pos)
-	{
-		_vecLengthIndicator.resize(pos + 1);
-		_vecLengthIndicator[pos].resize(val.size(), size);
-	}
-
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_TYPE_TIME, colSize, decDigits);
-
-	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		SQL_PARAM_INPUT, 
-		SQL_C_STINYINT, 
-		Utility::sqlDataType(SQL_C_STINYINT), 
-		colSize,
-		decDigits,
-		0, 
-		0, 
-		&_vecLengthIndicator[pos][0])))
-	{
-		throw StatementException(_rStmt, "SQLBindParameter()");
-	}
-}
-
-
-void Binder::bindImplVecBool(std::size_t pos, const std::vector<bool>& val, SQLSMALLINT cDataType, Direction dir)
-{
-	if (PB_IMMEDIATE != _paramBinding)
-		throw InvalidAccessException("std::vector can only be bound immediately.");
-
-	std::size_t length = val.size();
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
-
-	setParamSetSize(pos, val.size());
-
-	if (_vecLengthIndicator.size() <= pos)
-	{
-		_vecLengthIndicator.resize(pos + 1);
-		_vecLengthIndicator[pos].resize(length, sizeof(bool));
-	}
-
-	if (_boolPtrs.size() <= pos)
-		_boolPtrs.resize(pos + 1);
-
-	_boolPtrs[pos] = new bool[val.size()];
-
-	std::vector<bool>::const_iterator it = val.begin();
-	std::vector<bool>::const_iterator end = val.end();
-	for (int i = 0; it != end; ++it, ++i) _boolPtrs[pos][i] = *it;
-
-	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		toODBCDirection(dir), 
-		cDataType, 
-		Utility::sqlDataType(cDataType), 
-		colSize,
-		decDigits,
-		(SQLPOINTER) &_boolPtrs[pos][0], 
-		0, 
-		&_vecLengthIndicator[pos][0])))
 	{
 		throw StatementException(_rStmt, "SQLBindParameter()");
 	}
@@ -831,13 +486,13 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 	}
 
 	if (colSize > 0 && paramSize > 0)
-		size = colSize < paramSize ? colSize : paramSize;
+		size = colSize < paramSize ? static_cast<SQLINTEGER>(colSize) : static_cast<SQLINTEGER>(paramSize);
 	else if (colSize > 0)
-		size = colSize;
+		size = static_cast<SQLINTEGER>(colSize);
 	else if (paramSize > 0)
-		size = paramSize;
+		size = static_cast<SQLINTEGER>(paramSize);
 
-	if (size > _maxFieldSize) size = _maxFieldSize;
+	if (size > _maxFieldSize) size = static_cast<SQLINTEGER>(_maxFieldSize);
 }
 
 

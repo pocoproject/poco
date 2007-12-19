@@ -63,12 +63,10 @@ namespace Data {
 
 class Date;
 class Time;
+class BLOB;
 
 
 namespace ODBC {
-
-
-class BLOB;
 
 
 class ODBC_API Preparation : public AbstractPreparation
@@ -108,6 +106,7 @@ public:
 	enum DataType
 	{
 		DT_BOOL,
+		DT_BOOL_ARRAY,
 		DT_CHAR,
 		DT_CHAR_ARRAY,
 		DT_DATE,
@@ -133,11 +132,23 @@ public:
 	void prepare(std::size_t pos, std::vector<Poco::Int8>& val);
 		/// Prepares an Int8 vector.
 
+	void prepare(std::size_t pos, std::deque<Poco::Int8>& val);
+		/// Prepares an Int8 deque.
+
+	void prepare(std::size_t pos, std::list<Poco::Int8>& val);
+		/// Prepares an Int8 list.
+
 	void prepare(std::size_t pos, Poco::UInt8& val);
 		/// Prepares an UInt8.
 
 	void prepare(std::size_t pos, std::vector<Poco::UInt8>& val);
 		/// Prepares an UInt8 vector.
+
+	void prepare(std::size_t pos, std::deque<Poco::UInt8>& val);
+		/// Prepares an UInt8 deque.
+
+	void prepare(std::size_t pos, std::list<Poco::UInt8>& val);
+		/// Prepares an UInt8 list.
 
 	void prepare(std::size_t pos, Poco::Int16& val);
 		/// Prepares an Int16.
@@ -145,11 +156,23 @@ public:
 	void prepare(std::size_t pos, std::vector<Poco::Int16>& val);
 		/// Prepares an Int16 vector.
 
+	void prepare(std::size_t pos, std::deque<Poco::Int16>& val);
+		/// Prepares an Int16 deque.
+
+	void prepare(std::size_t pos, std::list<Poco::Int16>& val);
+		/// Prepares an Int16 list.
+
 	void prepare(std::size_t pos, Poco::UInt16& val);
 		/// Prepares an UInt16.
 
 	void prepare(std::size_t pos, std::vector<Poco::UInt16>& val);
 		/// Prepares an UInt16 vector.
+
+	void prepare(std::size_t pos, std::deque<Poco::UInt16>& val);
+		/// Prepares an UInt16 deque.
+
+	void prepare(std::size_t pos, std::list<Poco::UInt16>& val);
+		/// Prepares an UInt16 list.
 
 	void prepare(std::size_t pos, Poco::Int32& val);
 		/// Prepares an Int32.
@@ -157,11 +180,23 @@ public:
 	void prepare(std::size_t pos, std::vector<Poco::Int32>& val);
 		/// Prepares an Int32 vector.
 
+	void prepare(std::size_t pos, std::deque<Poco::Int32>& val);
+		/// Prepares an Int32 deque.
+
+	void prepare(std::size_t pos, std::list<Poco::Int32>& val);
+		/// Prepares an Int32 list.
+
 	void prepare(std::size_t pos, Poco::UInt32& val);
 		/// Prepares an UInt32.
 
 	void prepare(std::size_t pos, std::vector<Poco::UInt32>& val);
 		/// Prepares an UInt32 vector.
+
+	void prepare(std::size_t pos, std::deque<Poco::UInt32>& val);
+		/// Prepares an UInt32 deque.
+
+	void prepare(std::size_t pos, std::list<Poco::UInt32>& val);
+		/// Prepares an UInt32 list.
 
 	void prepare(std::size_t pos, Poco::Int64& val);
 		/// Prepares an Int64.
@@ -169,11 +204,23 @@ public:
 	void prepare(std::size_t pos, std::vector<Poco::Int64>& val);
 		/// Prepares an Int64 vector.
 
+	void prepare(std::size_t pos, std::deque<Poco::Int64>& val);
+		/// Prepares an Int64 deque.
+
+	void prepare(std::size_t pos, std::list<Poco::Int64>& val);
+		/// Prepares an Int64 list.
+
 	void prepare(std::size_t pos, Poco::UInt64& val);
 		/// Prepares an UInt64.
 
 	void prepare(std::size_t pos, std::vector<Poco::UInt64>& val);
 		/// Prepares an UInt64 vector.
+
+	void prepare(std::size_t pos, std::deque<Poco::UInt64>& val);
+		/// Prepares an UInt64 deque.
+
+	void prepare(std::size_t pos, std::list<Poco::UInt64>& val);
+		/// Prepares an UInt64 list.
 
 #ifndef POCO_LONG_IS_64_BIT
 	void prepare(std::size_t pos, long& val);
@@ -181,6 +228,12 @@ public:
 
 	void prepare(std::size_t pos, std::vector<long>& val);
 		/// Prepares a long vector.
+
+	void prepare(std::size_t pos, std::deque<long>& val);
+		/// Prepares a long deque.
+
+	void prepare(std::size_t pos, std::list<long>& val);
+		/// Prepares a long list.
 #endif
 
 	void prepare(std::size_t pos, bool& val);
@@ -189,11 +242,23 @@ public:
 	void prepare(std::size_t pos, std::vector<bool>& val);
 		/// Prepares a boolean vector.
 
+	void prepare(std::size_t pos, std::deque<bool>& val);
+		/// Prepares a boolean deque.
+
+	void prepare(std::size_t pos, std::list<bool>& val);
+		/// Prepares a boolean list.
+
 	void prepare(std::size_t pos, float& val);
 		/// Prepares a float.
 
 	void prepare(std::size_t pos, std::vector<float>& val);
 		/// Prepares a float vector.
+
+	void prepare(std::size_t pos, std::deque<float>& val);
+		/// Prepares a float deque.
+
+	void prepare(std::size_t pos, std::list<float>& val);
+		/// Prepares a float list.
 
 	void prepare(std::size_t pos, double& val);
 		/// Prepares a double.
@@ -201,11 +266,23 @@ public:
 	void prepare(std::size_t pos, std::vector<double>& val);
 		/// Prepares a double vector.
 
+	void prepare(std::size_t pos, std::deque<double>& val);
+		/// Prepares a double deque.
+
+	void prepare(std::size_t pos, std::list<double>& val);
+		/// Prepares a double list.
+
 	void prepare(std::size_t pos, char& val);
 		/// Prepares a single character.
 
 	void prepare(std::size_t pos, std::vector<char>& val);
 		/// Prepares a single character vector.
+
+	void prepare(std::size_t pos, std::deque<char>& val);
+		/// Prepares a single character deque.
+
+	void prepare(std::size_t pos, std::list<char>& val);
+		/// Prepares a single character list.
 
 	void prepare(std::size_t pos, const std::string& val);
 		/// Prepares a string.
@@ -213,11 +290,23 @@ public:
 	void prepare(std::size_t pos, const std::vector<std::string>& val);
 		/// Prepares a string vector.
 
+	void prepare(std::size_t pos, const std::deque<std::string>& val);
+		/// Prepares a string deque.
+
+	void prepare(std::size_t pos, const std::list<std::string>& val);
+		/// Prepares a string list.
+
 	void prepare(std::size_t pos, const Poco::Data::BLOB& val);
 		/// Prepares a BLOB.
 
 	void prepare(std::size_t pos, const std::vector<Poco::Data::BLOB>& val);
 		/// Prepares a BLOB vector.
+
+	void prepare(std::size_t pos, const std::deque<Poco::Data::BLOB>& val);
+		/// Prepares a BLOB deque.
+
+	void prepare(std::size_t pos, const std::list<Poco::Data::BLOB>& val);
+		/// Prepares a BLOB list.
 
 	void prepare(std::size_t pos, const Poco::Data::Date& val);
 		/// Prepares a Date.
@@ -225,11 +314,23 @@ public:
 	void prepare(std::size_t pos, const std::vector<Poco::Data::Date>& val);
 		/// Prepares a Date vector.
 
+	void prepare(std::size_t pos, const std::deque<Poco::Data::Date>& val);
+		/// Prepares a Date deque.
+
+	void prepare(std::size_t pos, const std::list<Poco::Data::Date>& val);
+		/// Prepares a Date list.
+
 	void prepare(std::size_t pos, const Poco::Data::Time& val);
 		/// Prepares a Time.
 
 	void prepare(std::size_t pos, const std::vector<Poco::Data::Time>& val);
 		/// Prepares a Time vector.
+
+	void prepare(std::size_t pos, const std::deque<Poco::Data::Time>& val);
+		/// Prepares a Time deque.
+
+	void prepare(std::size_t pos, const std::list<Poco::Data::Time>& val);
+		/// Prepares a Time list.
 
 	void prepare(std::size_t pos, const Poco::DateTime& val);
 		/// Prepares a DateTime.
@@ -237,17 +338,35 @@ public:
 	void prepare(std::size_t pos, const std::vector<Poco::DateTime>& val);
 		/// Prepares a DateTime vector.
 
+	void prepare(std::size_t pos, const std::deque<Poco::DateTime>& val);
+		/// Prepares a DateTime deque.
+
+	void prepare(std::size_t pos, const std::list<Poco::DateTime>& val);
+		/// Prepares a DateTime list.
+
 	void prepare(std::size_t pos, const Poco::Any& val);
 		/// Prepares an Any.
 
 	void prepare(std::size_t pos, const std::vector<Poco::Any>& val);
 		/// Prepares an Any vector.
 
+	void prepare(std::size_t pos, const std::deque<Poco::Any>& val);
+		/// Prepares an Any deque.
+
+	void prepare(std::size_t pos, const std::list<Poco::Any>& val);
+		/// Prepares an Any list.
+
 	void prepare(std::size_t pos, const Poco::DynamicAny& val);
 		/// Prepares a DynamicAny.
 
 	void prepare(std::size_t pos, const std::vector<Poco::DynamicAny>& val);
 		/// Prepares a DynamicAny vector.
+
+	void prepare(std::size_t pos, const std::deque<Poco::DynamicAny>& val);
+		/// Prepares a DynamicAny deque.
+
+	void prepare(std::size_t pos, const std::list<Poco::DynamicAny>& val);
+		/// Prepares a DynamicAny list.
 
 	std::size_t columns() const;
 		/// Returns the number of columns.
@@ -292,8 +411,8 @@ private:
 	Preparation();
 	Preparation& operator = (const Preparation&);
 
-	template <typename T>
-	void prepareImpl(std::size_t pos, const std::vector<T>* pVal = 0)
+	template <typename C>
+	void prepareImpl(std::size_t pos, const C* pVal = 0)
 		/// Utility function to prepare Any and DynamicAny.
 	{
 		ODBCColumn col(_rStmt, pos);
@@ -350,7 +469,7 @@ private:
 
 			case MetaColumn::FDT_BOOL:
 				if (pVal)
-					return prepareVariableLen<bool>(pos, SQL_C_BIT, pVal->size(), DT_BOOL);
+					return prepareBoolArray(pos, SQL_C_BIT, pVal->size());
 				else
 					return prepareFixedSize<bool>(pos, SQL_C_BIT);
 
@@ -368,13 +487,13 @@ private:
 
 			case MetaColumn::FDT_STRING:
 				if (pVal)
-					return prepareVariableLenArray(pos, SQL_C_CHAR, maxDataSize(pos), pVal->size(), DT_CHAR_ARRAY);
+					return prepareCharArray(pos, SQL_C_CHAR, maxDataSize(pos), pVal->size());
 				else
 					return prepareVariableLen<char>(pos, SQL_C_CHAR, maxDataSize(pos), DT_CHAR);
 
 			case MetaColumn::FDT_BLOB:
 				if (pVal)
-					return prepareVariableLenArray(pos, SQL_C_BINARY, maxDataSize(pos), pVal->size(), DT_CHAR_ARRAY);
+					return prepareCharArray(pos, SQL_C_BINARY, maxDataSize(pos), pVal->size());
 				else
 					return prepareVariableLen<char>(pos, SQL_C_BINARY, maxDataSize(pos), DT_CHAR);
 
@@ -436,13 +555,14 @@ private:
 
 		poco_assert (pos < _values.size());
 		poco_assert (length);
-		_values[pos] = Poco::Any(std::vector<T>(length));
+		_values[pos] = Poco::Any(std::vector<T>());
 		_lengths[pos] = 0;
 		poco_assert (0 == _lenLengths[pos].size());
 		_lenLengths[pos].resize(length);
 
 		std::vector<T>& cache = RefAnyCast<std::vector<T> >(_values[pos]);
-		
+		cache.resize(length);
+
 		if (Utility::isError(SQLBindCol(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
 			valueType, 
@@ -456,13 +576,12 @@ private:
 
 	template <typename T>
 	void prepareVariableLen(std::size_t pos, SQLSMALLINT valueType, std::size_t size, DataType dt)
-		/// Utility function for preparation of variable length columns and bool vectors.
+		/// Utility function for preparation of variable length columns.
 	{
 		poco_assert (DE_BOUND == _dataExtraction);
 		poco_assert (pos < _values.size());
 
 		T* pCache = new T[size]; 
-		poco_assert_dbg (pCache);
 		std::memset(pCache, 0, size);
 
 		_values[pos] = Any(pCache);
@@ -481,9 +600,11 @@ private:
 	}
 
 
-	void prepareVariableLenArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length, DataType dt);
-		/// Utility function for preparation of variable length character and BLOB columns.
+	void prepareCharArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length);
+		/// Utility function for preparation of bulk variable length character and BLOB columns.
 
+	void prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::size_t length);
+		/// Utility function for preparation of bulk bool columns.
 
 	void freeMemory() const;
 		/// Utility function. Releases memory allocated for variable length columns.
@@ -520,6 +641,18 @@ inline void Preparation::prepare(std::size_t pos, std::vector<Poco::Int8>& val)
 }
 
 
+inline void Preparation::prepare(std::size_t pos, std::deque<Poco::Int8>& val)
+{
+	prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<Poco::Int8>& val)
+{
+	prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, val.size());
+}
+
+
 inline void Preparation::prepare(std::size_t pos, Poco::UInt8&)
 {
 	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT);
@@ -527,6 +660,18 @@ inline void Preparation::prepare(std::size_t pos, Poco::UInt8&)
 
 
 inline void Preparation::prepare(std::size_t pos, std::vector<Poco::UInt8>& val)
+{
+	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::deque<Poco::UInt8>& val)
+{
+	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<Poco::UInt8>& val)
 {
 	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, val.size());
 }
@@ -544,6 +689,18 @@ inline void Preparation::prepare(std::size_t pos, std::vector<Poco::Int16>& val)
 }
 
 
+inline void Preparation::prepare(std::size_t pos, std::deque<Poco::Int16>& val)
+{
+	prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<Poco::Int16>& val)
+{
+	prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT, val.size());
+}
+
+
 inline void Preparation::prepare(std::size_t pos, Poco::UInt16&)
 {
 	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT);
@@ -551,6 +708,18 @@ inline void Preparation::prepare(std::size_t pos, Poco::UInt16&)
 
 
 inline void Preparation::prepare(std::size_t pos, std::vector<Poco::UInt16>& val)
+{
+	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::deque<Poco::UInt16>& val)
+{
+	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<Poco::UInt16>& val)
 {
 	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, val.size());
 }
@@ -568,6 +737,18 @@ inline void Preparation::prepare(std::size_t pos, std::vector<Poco::Int32>& val)
 }
 
 
+inline void Preparation::prepare(std::size_t pos, std::deque<Poco::Int32>& val)
+{
+	prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<Poco::Int32>& val)
+{
+	prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG, val.size());
+}
+
+
 inline void Preparation::prepare(std::size_t pos, Poco::UInt32&)
 {
 	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG);
@@ -575,6 +756,18 @@ inline void Preparation::prepare(std::size_t pos, Poco::UInt32&)
 
 
 inline void Preparation::prepare(std::size_t pos, std::vector<Poco::UInt32>& val)
+{
+	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::deque<Poco::UInt32>& val)
+{
+	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<Poco::UInt32>& val)
 {
 	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, val.size());
 }
@@ -592,6 +785,18 @@ inline void Preparation::prepare(std::size_t pos, std::vector<Poco::Int64>& val)
 }
 
 
+inline void Preparation::prepare(std::size_t pos, std::deque<Poco::Int64>& val)
+{
+	prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<Poco::Int64>& val)
+{
+	prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT, val.size());
+}
+
+
 inline void Preparation::prepare(std::size_t pos, Poco::UInt64&)
 {
 	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT);
@@ -599,6 +804,18 @@ inline void Preparation::prepare(std::size_t pos, Poco::UInt64&)
 
 
 inline void Preparation::prepare(std::size_t pos, std::vector<Poco::UInt64>& val)
+{
+	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::deque<Poco::UInt64>& val)
+{
+	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<Poco::UInt64>& val)
 {
 	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, val.size());
 }
@@ -615,6 +832,18 @@ inline void Preparation::prepare(std::size_t pos, std::vector<long>& val)
 {
 	prepareFixedSize<long>(pos, SQL_C_SLONG, val.size());
 }
+
+
+inline void Preparation::prepare(std::size_t pos, std::deque<long>& val)
+{
+	prepareFixedSize<long>(pos, SQL_C_SLONG, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<long>& val)
+{
+	prepareFixedSize<long>(pos, SQL_C_SLONG, val.size());
+}
 #endif
 
 
@@ -626,7 +855,19 @@ inline void Preparation::prepare(std::size_t pos, bool&)
 
 inline void Preparation::prepare(std::size_t pos, std::vector<bool>& val)
 {
-	prepareVariableLen<bool>(pos, SQL_C_BIT, val.size(), DT_BOOL);
+	prepareBoolArray(pos, SQL_C_BIT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::deque<bool>& val)
+{
+	prepareBoolArray(pos, SQL_C_BIT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<bool>& val)
+{
+	prepareBoolArray(pos, SQL_C_BIT, val.size());
 }
 
 
@@ -637,6 +878,18 @@ inline void Preparation::prepare(std::size_t pos, float&)
 
 
 inline void Preparation::prepare(std::size_t pos, std::vector<float>& val)
+{
+	prepareFixedSize<float>(pos, SQL_C_FLOAT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::deque<float>& val)
+{
+	prepareFixedSize<float>(pos, SQL_C_FLOAT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<float>& val)
 {
 	prepareFixedSize<float>(pos, SQL_C_FLOAT, val.size());
 }
@@ -654,6 +907,18 @@ inline void Preparation::prepare(std::size_t pos, std::vector<double>& val)
 }
 
 
+inline void Preparation::prepare(std::size_t pos, std::deque<double>& val)
+{
+	prepareFixedSize<double>(pos, SQL_C_DOUBLE, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<double>& val)
+{
+	prepareFixedSize<double>(pos, SQL_C_DOUBLE, val.size());
+}
+
+
 inline void Preparation::prepare(std::size_t pos, char&)
 {
 	prepareFixedSize<char>(pos, SQL_C_STINYINT);
@@ -661,6 +926,18 @@ inline void Preparation::prepare(std::size_t pos, char&)
 
 
 inline void Preparation::prepare(std::size_t pos, std::vector<char>& val)
+{
+	prepareFixedSize<char>(pos, SQL_C_STINYINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::deque<char>& val)
+{
+	prepareFixedSize<char>(pos, SQL_C_STINYINT, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, std::list<char>& val)
 {
 	prepareFixedSize<char>(pos, SQL_C_STINYINT, val.size());
 }
@@ -674,7 +951,19 @@ inline void Preparation::prepare(std::size_t pos, const std::string&)
 
 inline void Preparation::prepare(std::size_t pos, const std::vector<std::string>& val)
 {
-	prepareVariableLenArray(pos, SQL_C_CHAR, maxDataSize(pos), val.size(), DT_CHAR_ARRAY);
+	prepareCharArray(pos, SQL_C_CHAR, maxDataSize(pos), val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::deque<std::string>& val)
+{
+	prepareCharArray(pos, SQL_C_CHAR, maxDataSize(pos), val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::list<std::string>& val)
+{
+	prepareCharArray(pos, SQL_C_CHAR, maxDataSize(pos), val.size());
 }
 
 
@@ -686,7 +975,19 @@ inline void Preparation::prepare(std::size_t pos, const Poco::Data::BLOB&)
 
 inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::Data::BLOB>& val)
 {
-	prepareVariableLenArray(pos, SQL_C_BINARY, maxDataSize(pos), val.size(), DT_CHAR_ARRAY);
+	prepareCharArray(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::deque<Poco::Data::BLOB>& val)
+{
+	prepareCharArray(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::list<Poco::Data::BLOB>& val)
+{
+	prepareCharArray(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
 }
 
 
@@ -697,6 +998,18 @@ inline void Preparation::prepare(std::size_t pos, const Poco::Data::Date&)
 
 
 inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::Data::Date>& val)
+{
+	prepareFixedSize<SQL_DATE_STRUCT>(pos, SQL_C_TYPE_DATE, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::deque<Poco::Data::Date>& val)
+{
+	prepareFixedSize<SQL_DATE_STRUCT>(pos, SQL_C_TYPE_DATE, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::list<Poco::Data::Date>& val)
 {
 	prepareFixedSize<SQL_DATE_STRUCT>(pos, SQL_C_TYPE_DATE, val.size());
 }
@@ -714,6 +1027,18 @@ inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::Data::
 }
 
 
+inline void Preparation::prepare(std::size_t pos, const std::deque<Poco::Data::Time>& val)
+{
+	prepareFixedSize<SQL_TIME_STRUCT>(pos, SQL_C_TYPE_TIME, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::list<Poco::Data::Time>& val)
+{
+	prepareFixedSize<SQL_TIME_STRUCT>(pos, SQL_C_TYPE_TIME, val.size());
+}
+
+
 inline void Preparation::prepare(std::size_t pos, const Poco::DateTime&)
 {
 	prepareFixedSize<SQL_TIMESTAMP_STRUCT>(pos, SQL_C_TYPE_TIMESTAMP);
@@ -726,27 +1051,63 @@ inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::DateTi
 }
 
 
+inline void Preparation::prepare(std::size_t pos, const std::deque<Poco::DateTime>& val)
+{
+	prepareFixedSize<SQL_TIMESTAMP_STRUCT>(pos, SQL_C_TYPE_TIMESTAMP, val.size());
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::list<Poco::DateTime>& val)
+{
+	prepareFixedSize<SQL_TIMESTAMP_STRUCT>(pos, SQL_C_TYPE_TIMESTAMP, val.size());
+}
+
+
 inline void Preparation::prepare(std::size_t pos, const Poco::Any& val)
 {
-	prepareImpl<Poco::Any>(pos);
+	prepareImpl<std::vector<Poco::Any> >(pos);
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::Any>& val)
 {
-	prepareImpl<Poco::Any>(pos, &val);
+	prepareImpl<std::vector<Poco::Any> >(pos, &val);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::deque<Poco::Any>& val)
+{
+	prepareImpl<std::deque<Poco::Any> >(pos, &val);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::list<Poco::Any>& val)
+{
+	prepareImpl<std::list<Poco::Any> >(pos, &val);
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const Poco::DynamicAny& val)
 {
-	prepareImpl<Poco::DynamicAny>(pos);
+	prepareImpl<std::vector<Poco::DynamicAny> >(pos);
 }
 
 
 inline void Preparation::prepare(std::size_t pos, const std::vector<Poco::DynamicAny>& val)
 {
-	prepareImpl<Poco::DynamicAny>(pos, &val);
+	prepareImpl<std::vector<Poco::DynamicAny> >(pos, &val);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::deque<Poco::DynamicAny>& val)
+{
+	prepareImpl<std::deque<Poco::DynamicAny> >(pos, &val);
+}
+
+
+inline void Preparation::prepare(std::size_t pos, const std::list<Poco::DynamicAny>& val)
+{
+	prepareImpl<std::list<Poco::DynamicAny> >(pos, &val);
 }
 
 

@@ -790,7 +790,15 @@ private:
 
 
 template <typename T> 
-Extraction<T>* into(T& t, const Position& pos = 0)
+Extraction<T>* into(T& t)
+	/// Convenience function to allow for a more compact creation of an extraction object.
+{
+	return new Extraction<T>(t);
+}
+
+
+template <typename T> 
+Extraction<T>* into(T& t, const Position& pos)
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with multiple recordset support.
 {

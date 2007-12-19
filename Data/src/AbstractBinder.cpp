@@ -64,9 +64,33 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::Int8>& val, D
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::UInt8>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
@@ -76,9 +100,33 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::Int16>& val, 
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::Int16>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::UInt16>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
@@ -88,9 +136,33 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::Int32>& val, 
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
@@ -99,10 +171,34 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::Int64>& val, 
 	throw NotImplementedException("std::vector binder must be implemented.");
 }
 
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
 	
 void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+	
+void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+	
+void AbstractBinder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
@@ -110,6 +206,18 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val,
 void AbstractBinder::bind(std::size_t pos, const std::vector<long>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<long>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<long>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 #endif
 
@@ -120,9 +228,33 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<bool>& val, Directi
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::deque<bool>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<bool>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<float>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<float>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<float>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
@@ -132,9 +264,33 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<double>& val, Direc
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::deque<double>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<double>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<char>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<char>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<char>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
@@ -144,9 +300,33 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<std::string>& val, 
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::deque<std::string>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<std::string>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<BLOB>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<BLOB>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
@@ -156,9 +336,33 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<DateTime>& val, Dir
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::deque<DateTime>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<DateTime>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<Date>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<Date>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Date>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
@@ -168,9 +372,33 @@ void AbstractBinder::bind(std::size_t pos, const std::vector<Time>& val, Directi
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::deque<Time>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<Time>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<NullData>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<NullData>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<NullData>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 

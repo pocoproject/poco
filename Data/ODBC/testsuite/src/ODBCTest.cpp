@@ -413,8 +413,31 @@ void ODBCTest::testBulk()
 
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
+
 	recreateMiscTable();
-	_pExecutor->doBulk(100);
+	_pExecutor->doBulk<std::vector<int>,
+		std::vector<std::string>,
+		std::vector<BLOB>,
+		std::vector<double>,
+		std::vector<DateTime>,
+		std::vector<bool> >(100);
+
+	recreateMiscTable();
+	_pExecutor->doBulk<std::deque<int>,
+		std::deque<std::string>,
+		std::deque<BLOB>,
+		std::deque<double>,
+		std::deque<DateTime>,
+		std::deque<bool> >(100);
+
+	recreateMiscTable();
+	_pExecutor->doBulk<std::list<int>,
+		std::list<std::string>,
+		std::list<BLOB>,
+		std::list<double>,
+		std::list<DateTime>,
+		std::list<bool> >(100);
+
 	recreateMiscTable();
 	_pExecutor->doBulkPerformance(1000);
 }

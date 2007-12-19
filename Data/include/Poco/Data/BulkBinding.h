@@ -44,7 +44,10 @@
 #include "Poco/Data/AbstractBinding.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/TypeHandler.h"
+#include "Poco/Data/Bulk.h"
 #include <vector>
+#include <deque>
+#include <list>
 #include <cstddef>
 
 
@@ -65,7 +68,7 @@ public:
 		/// Creates the BulkBinding.
 	{
 		if (0 == _val.size())
-			throw InvalidArgumentException("Zero size containers not allowed.");
+			throw BindingException("Zero size containers not allowed.");
 	}
 
 	~BulkBinding()
@@ -107,11 +110,9 @@ private:
 };
 
 
-typedef void (*BulkFnType)();
-
 template <typename T> 
 BulkBinding<std::vector<T> >* use(const std::vector<T>& t, BulkFnType, const std::string& name = "")
-	/// Convenience function for a more compact BulkBinding creation.
+	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
 	return new BulkBinding<std::vector<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
 }
@@ -119,9 +120,41 @@ BulkBinding<std::vector<T> >* use(const std::vector<T>& t, BulkFnType, const std
 
 template <typename T> 
 BulkBinding<std::vector<T> >* in(const std::vector<T>& t, BulkFnType, const std::string& name = "")
-	/// Convenience function for a more compact BulkBinding creation.
+	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
 	return new BulkBinding<std::vector<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+}
+
+
+template <typename T> 
+BulkBinding<std::deque<T> >* use(const std::deque<T>& t, BulkFnType, const std::string& name = "")
+	/// Convenience function for a more compact BulkBinding creation for std::deque.
+{
+	return new BulkBinding<std::deque<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+}
+
+
+template <typename T> 
+BulkBinding<std::deque<T> >* in(const std::deque<T>& t, BulkFnType, const std::string& name = "")
+	/// Convenience function for a more compact BulkBinding creation for std::deque.
+{
+	return new BulkBinding<std::deque<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+}
+
+
+template <typename T> 
+BulkBinding<std::list<T> >* use(const std::list<T>& t, BulkFnType, const std::string& name = "")
+	/// Convenience function for a more compact BulkBinding creation for std::list.
+{
+	return new BulkBinding<std::list<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
+}
+
+
+template <typename T> 
+BulkBinding<std::list<T> >* in(const std::list<T>& t, BulkFnType, const std::string& name = "")
+	/// Convenience function for a more compact BulkBinding creation for std::list.
+{
+	return new BulkBinding<std::list<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
 }
 
 

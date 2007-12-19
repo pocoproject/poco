@@ -56,6 +56,7 @@
 #include <vector>
 #include <list>
 #include <deque>
+#include <string>
 #include <sstream>
 
 
@@ -116,7 +117,8 @@ public:
 	virtual ~StatementImpl();
 		/// Destroys the StatementImpl.
 
-	template <typename T> void add(const T& t)
+	template <typename T> 
+	void add(const T& t)
 		/// Appends SQL statement (fragments).
 	{
 		_ostr << t;
@@ -275,7 +277,7 @@ protected:
 
 private:
 	void compile();
-		/// Compiles the statement, if not yet compiled. doesn't bind yet
+		/// Compiles the statement, if not yet compiled.
 
 	void bind();
 		/// Binds the statement, if not yet bound.

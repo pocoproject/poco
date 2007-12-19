@@ -97,38 +97,92 @@ public:
 	static void dateSync(Date& dt, const SQL_DATE_STRUCT& ts);
 		/// Transfers data from ODBC SQL_DATE_STRUCT to Poco::DateTime.
 
-	static void dateSync(std::vector<Date>& d, const std::vector<SQL_DATE_STRUCT>& ds);
-		/// Transfers data from ODBC SQL_DATE_STRUCT vector to Poco::DateTime vector.
+	template <typename T, typename F>
+	static void dateSync(T& d, const F& ds)
+		/// Transfers data from ODBC SQL_DATE_STRUCT container to Poco::DateTime container.
+	{
+		std::size_t size = ds.size();
+		if (d.size() != size) d.resize(size);
+		typename T::iterator dIt = d.begin();
+		typename F::const_iterator it = ds.begin();
+		typename F::const_iterator end = ds.end();
+		for (; it != end; ++it, ++dIt) dateSync(*dIt, *it);
+	}
 
 	static void timeSync(Time& dt, const SQL_TIME_STRUCT& ts);
 		/// Transfers data from ODBC SQL_TIME_STRUCT to Poco::DateTime.
 
-	static void timeSync(std::vector<Time>& t, const std::vector<SQL_TIME_STRUCT>& ts);
-		/// Transfers data from ODBC SQL_TIME_STRUCT vector to Poco::DateTime vector.
+	template <typename T, typename F>
+	static void timeSync(T& t, const F& ts)
+		/// Transfers data from ODBC SQL_TIME_STRUCT container to Poco::DateTime container.
+	{
+		std::size_t size = ts.size();
+		if (t.size() != size) t.resize(size);
+		typename T::iterator dIt = t.begin();
+		typename F::const_iterator it = ts.begin();
+		typename F::const_iterator end = ts.end();
+		for (; it != end; ++it, ++dIt) timeSync(*dIt, *it);
+	}
 
 	static void dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts);
 		/// Transfers data from ODBC SQL_TIMESTAMP_STRUCT to Poco::DateTime.
 
-	static void dateTimeSync(std::vector<Poco::DateTime>& dt, const std::vector<SQL_TIMESTAMP_STRUCT>& ts);
-		/// Transfers data from ODBC SQL_TIMESTAMP_STRUCT vector to Poco::DateTime vector.
+	template <typename T, typename F>
+	static void dateTimeSync(T& dt, const F& ts)
+		/// Transfers data from ODBC SQL_TIMESTAMP_STRUCT container to Poco::DateTime container.
+	{
+		std::size_t size = ts.size();
+		if (dt.size() != size) dt.resize(size);
+		typename T::iterator dIt = dt.begin();
+		typename F::const_iterator it = ts.begin();
+		typename F::const_iterator end = ts.end();
+		for (; it != end; ++it, ++dIt) dateTimeSync(*dIt, *it);
+	}
 
 	static void dateSync(SQL_DATE_STRUCT& ts, const Date& dt);
 		/// Transfers data from Poco::Data::Date to ODBC SQL_DATE_STRUCT.
 
-	static void dateSync(std::vector<SQL_DATE_STRUCT>& ds, const std::vector<Date>& d);
-		/// Transfers data from Poco::Data::Date vector to ODBC SQL_DATE_STRUCT vector.
+	template <typename C>
+	static void dateSync(std::vector<SQL_DATE_STRUCT>& ds, const C& d)
+		/// Transfers data from Poco::Data::Date vector to ODBC SQL_DATE_STRUCT container.
+	{
+		std::size_t size = d.size();
+		if (ds.size() != size) ds.resize(size);
+		std::vector<SQL_DATE_STRUCT>::iterator dIt = ds.begin();
+		typename C::const_iterator it = d.begin();
+		typename C::const_iterator end = d.end();
+		for (; it != end; ++it, ++dIt) dateSync(*dIt, *it);
+	}
 
 	static void timeSync(SQL_TIME_STRUCT& ts, const Time& dt);
 		/// Transfers data from Poco::Data::Time to ODBC SQL_TIME_STRUCT.
 
-	static void timeSync(std::vector<SQL_TIME_STRUCT>& ts, const std::vector<Time>& t);
-		/// Transfers data from Poco::Data::Time vector to ODBC SQL_TIME_STRUCT vector.
+	template <typename C>
+	static void timeSync(std::vector<SQL_TIME_STRUCT>& ts, const C& t)
+		/// Transfers data from Poco::Data::Time container to ODBC SQL_TIME_STRUCT vector.
+	{
+		std::size_t size = t.size();
+		if (ts.size() != size) ts.resize(size);
+		std::vector<SQL_TIME_STRUCT>::iterator tIt = ts.begin();
+		typename C::const_iterator it = t.begin();
+		typename C::const_iterator end = t.end();
+		for (; it != end; ++it, ++tIt) timeSync(*tIt, *it);
+	}
 
 	static void dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt);
 		/// Transfers data from Poco::DateTime to ODBC SQL_TIMESTAMP_STRUCT.
 
-	static void dateTimeSync(std::vector<SQL_TIMESTAMP_STRUCT>& ts, const std::vector<Poco::DateTime>& dt);
+	template <typename C>
+	static void dateTimeSync(std::vector<SQL_TIMESTAMP_STRUCT>& ts, const C& dt)
 		/// Transfers data from Poco::DateTime to ODBC SQL_TIMESTAMP_STRUCT.
+	{
+		std::size_t size = dt.size();
+		if (ts.size() != size) ts.resize(size);
+		std::vector<SQL_TIMESTAMP_STRUCT>::iterator tIt = ts.begin();
+		typename C::const_iterator it = dt.begin();
+		typename C::const_iterator end = dt.end();
+		for (; it != end; ++it, ++tIt) dateTimeSync(*tIt, *it);
+	}
 
 private:
 	static const TypeInfo _dataTypes;

@@ -182,6 +182,15 @@
 					RelativePath=".\src\BLOBStream.cpp">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Bulk.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\BulkBinding.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\BulkExtraction.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Column.h">
 				</File>
 				<File
@@ -207,6 +216,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\MetaColumn.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\Position.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Prepare.h">
@@ -245,9 +257,6 @@
 					RelativePath=".\include\Poco\Data\StatementImpl.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\Step.h">
-				</File>
-				<File
 					RelativePath=".\include\Poco\Data\Time.h">
 				</File>
 				<File
@@ -282,6 +291,9 @@
 					RelativePath=".\include\Poco\Data\BLOBStream.h">
 				</File>
 				<File
+					RelativePath=".\src\Bulk.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Connector.cpp">
 				</File>
 				<File
@@ -295,6 +307,9 @@
 				</File>
 				<File
 					RelativePath=".\src\MetaColumn.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Position.cpp">
 				</File>
 				<File
 					RelativePath=".\src\Range.cpp">
@@ -328,9 +343,6 @@
 				</File>
 				<File
 					RelativePath=".\src\StatementImpl.cpp">
-				</File>
-				<File
-					RelativePath=".\src\Step.cpp">
 				</File>
 				<File
 					RelativePath=".\src\Time.cpp">

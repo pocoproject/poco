@@ -37,8 +37,12 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/Session.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/Data/Session.h"
+#include "Poco/Data/BulkExtraction.h"
+#include "Poco/Data/BulkBinding.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Exception.h"
 
 
 #define poco_odbc_check_env(r, h) \
@@ -140,7 +144,144 @@ public:
 	void limitPrepare();
 	void limitZero();
 	void prepare();
-	void doBulk(Poco::UInt32 size);
+
+	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
+	void doBulk(Poco::UInt32 size)
+	{
+		std::string funct = "doBulk()";
+		C1 ints;
+		C2 strings;
+		C3 blobs;
+		C4 floats;
+		C5 dateTimes(size);
+		C6 bools;
+		
+		for (int i = 0; i < size; ++i)
+		{
+			ints.push_back(i);
+			strings.push_back(std::string("xyz" + Poco::NumberFormatter::format(i)));
+			blobs.push_back(std::string("abc") + Poco::NumberFormatter::format(i));
+			floats.push_back(i + .5);
+			bools.push_back(0 == i % 2);
+		}
+
+		try 
+		{
+			session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?,?)", 
+				use(strings), 
+				use(blobs), 
+				use(ints),
+				use(floats),
+				use(dateTimes),
+				use(bools), now;
+		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+		try { session() << "DELETE FROM MiscTest", now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+		try 
+		{
+			session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?,?)",
+				use(strings, bulk), 
+				use(blobs, bulk), 
+				use(ints, bulk),
+				use(floats, bulk),
+				use(dateTimes, bulk),
+				use(bools, bulk), now;
+		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		
+		ints.clear();
+		strings.clear();
+		blobs.clear();
+		floats.clear();
+		dateTimes.clear();
+		bools.clear();
+		
+		try 
+		{ 
+			session() << "SELECT * FROM MiscTest ORDER BY Third", 
+				into(strings), 
+				into(blobs), 
+				into(ints), 
+				into(floats),
+				into(dateTimes),
+				into(bools),
+				now; 
+		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		
+		std::string number = Poco::NumberFormatter::format(size - 1);
+		assert (size == ints.size());
+		assert (0 == ints.front());
+		assert (size - 1 == ints.back());
+		assert (std::string("xyz0") == strings.front());
+		assert (std::string("xyz") + number == strings.back());
+		assert (BLOB("abc0") == blobs.front());
+		BLOB blob("abc");
+		blob.appendRaw(number.c_str(), number.size());
+		assert (blob == blobs.back());
+		assert (.5 == floats.front());
+		assert (floats.size() - 1 + .5 == floats.back());
+		assert (bools.front());
+		assert ((0 == ((bools.size() - 1) % 2) == bools.back()));
+
+		ints.clear();
+
+		try 
+		{ 
+			session() << "SELECT First FROM MiscTest", into(ints, bulk(size)), limit(size+1), now; 
+			fail ("must fail");
+		}
+		catch(Poco::InvalidArgumentException&){ }
+
+		try 
+		{ 
+			session() << "SELECT First FROM MiscTest", into(ints), bulk(size), now; 
+			fail ("must fail");
+		}
+		catch(Poco::InvalidAccessException&){ }
+
+		ints.clear();
+		strings.clear();
+		strings.resize(size);
+		blobs.clear();
+		floats.clear();
+		floats.resize(size);
+		dateTimes.clear();
+		bools.clear();
+		bools.resize(size);
+		
+		try 
+		{ 
+			session() << "SELECT First, Second, Third, Fourth, Fifth, Sixth FROM MiscTest ORDER BY Third", 
+				into(strings, bulk),
+				into(blobs, bulk(size)),
+				into(ints, bulk(size)),
+				into(floats, bulk),
+				into(dateTimes, bulk(size)),
+				into(bools, bulk),
+				now; 
+		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+		assert (size == ints.size());
+		assert (0 == ints.front());
+		assert (size - 1 == ints.back());
+		assert (std::string("xyz0") == strings.front());
+		assert (std::string("xyz") + number == strings.back());
+		assert (BLOB("abc0") == blobs.front());
+		blob.assignRaw("abc", 3);
+		blob.appendRaw(number.c_str(), number.size());
+		assert (blob == blobs.back());
+		assert (.5 == floats.front());
+		assert (floats.size() - 1 + .5 == floats.back());
+		assert (bools.front());
+		assert ((0 == ((bools.size() - 1) % 2) == bools.back()));
+	}
+
 	void doBulkPerformance(Poco::UInt32 size);
 	void doBulkNoBool(Poco::UInt32 size);
 	void doBulkStringIntFloat(Poco::UInt32 size);
