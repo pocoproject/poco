@@ -82,6 +82,7 @@ private:
 	void recreateVectorsTable();
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
+	void recreateMiscTable();
 
 	static ODBCTest::SessionPtr  _pSession;
 	static ODBCTest::ExecPtr     _pExecutor;

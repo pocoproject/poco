@@ -92,12 +92,18 @@ void Preparation::freeMemory() const
 			break;
 
 		case DT_CHAR_ARRAY:
-			std::free(AnyCast<char>(&_values[it->first]));
+		{
+			char* pc = AnyCast<char>(&_values[it->first]);
+			if (pc) std::free(pc);
 			break;
+		}
 
 		case DT_BOOL_ARRAY:
-			std::free(AnyCast<bool>(&_values[it->first]));
+		{
+			bool* pb = AnyCast<bool>(&_values[it->first]);
+			if (pb)	std::free(pb);
 			break;
+		}
 
 		case DT_DATE:
 			deleteCachedArray<SQL_DATE_STRUCT>(it->first);
@@ -154,6 +160,18 @@ std::size_t Preparation::maxDataSize(std::size_t pos) const
 
 	if (!sz || sz > maxsz) sz = maxsz;
 	return sz;
+}
+
+
+std::size_t Preparation::actualDataSize(std::size_t col, std::size_t row) const
+{
+	SQLLEN size = (INVALID_ROW == row) ? _lengths.at(col) :
+		_lenLengths.at(col).at(row);
+
+	// workaround for drivers returning negative length
+	if (size < 0 && SQL_NULL_DATA != size) size *= -1;
+
+	return size;
 }
 
 

@@ -50,7 +50,7 @@ namespace Poco {
 namespace Data {
 
 
-template <class T>
+template <class C>
 class BulkExtraction: public AbstractExtraction
 	/// Specialization for bulk extraction of values from a query result set.
 	/// Bulk extraction support is provided only for following STL containers:
@@ -59,10 +59,19 @@ class BulkExtraction: public AbstractExtraction
 	/// - std::list
 {
 public:
-	BulkExtraction(T& result, Poco::UInt32 limit, Poco::UInt32 position = 0): 
-		AbstractExtraction(limit, position, true),
+	BulkExtraction(C& result, Poco::UInt32 limit): 
+		AbstractExtraction(limit, 0, true),
 		_rResult(result), 
-		_default()
+		_default(1)
+	{
+		if (static_cast<Poco::UInt32>(result.size()) != limit)
+			result.resize(limit);
+	}
+
+	BulkExtraction(C& result, const C& def, Poco::UInt32 limit): 
+		AbstractExtraction(limit, 0, true),
+		_rResult(result), 
+		_default(def)
 	{
 		if (static_cast<Poco::UInt32>(result.size()) != limit)
 			result.resize(limit);
@@ -74,7 +83,7 @@ public:
 
 	std::size_t numOfColumnsHandled() const
 	{
-		return TypeHandler<T>::size();
+		return TypeHandler<C>::size();
 	}
 
 	std::size_t numOfRowsHandled() const
@@ -101,9 +110,9 @@ public:
 	std::size_t extract(std::size_t col)
 	{
 		AbstractExtractor* pExt = getExtractor();
-		TypeHandler<T>::extract(col, _rResult, _default, pExt);
-		typename T::iterator it = _rResult.begin();
-		typename T::iterator end = _rResult.end();
+		TypeHandler<C>::extract(col, _rResult, _default, pExt);
+		typename C::iterator it = _rResult.begin();
+		typename C::iterator end = _rResult.end();
 		for (int row = 0; it !=end; ++it, ++row)
 			_nulls.push_back(pExt->isNull(col, row));
 
@@ -119,19 +128,84 @@ public:
 		Poco::UInt32 limit = getLimit();
 		if (limit != _rResult.size()) _rResult.resize(limit);
 		pPrep->setLength(limit);
-		return new Prepare<T>(pPrep, col, _rResult);
+		return new Prepare<C>(pPrep, col, _rResult);
 	}
 
 protected:
-	const T& result() const
+	const C& result() const
 	{
 		return _rResult;
 	}
 
 private:
-	T&               _rResult;
-	T                _default; // copy the default
+	C&               _rResult;
+	C                _default;
 	std::deque<bool> _nulls;
+};
+
+
+template <class C>
+class InternalBulkExtraction: public BulkExtraction<C>
+	/// Container Data Type specialization extension for extraction of values from a query result set.
+	///
+	/// This class is intended for PocoData internal use - it is used by StatementImpl 
+	/// to automaticaly create internal BulkExtraction in cases when statement returns data and no external storage
+	/// was supplied. It is later used by RecordSet to retrieve the fetched data after statement execution.
+	/// It takes ownership of the Column pointer supplied as constructor argument. Column object, in turn
+	/// owns the data vector pointer.
+	///
+	/// InternalBulkExtraction objects can not be copied or assigned.
+{
+public:
+	typedef typename C::value_type T;
+
+	explicit InternalBulkExtraction(C& result, Column<T,C>* pColumn, Poco::UInt32 limit): 
+		BulkExtraction<C>(result, _default, limit), 
+		_pColumn(pColumn)
+		/// Creates InternalBulkExtraction.
+	{
+	}
+
+	~InternalBulkExtraction()
+		/// Destroys InternalBulkExtraction.
+	{
+		delete _pColumn;
+	}
+
+	void reset()
+	{
+		_pColumn->reset();
+	}	
+
+	const T& value(int index) const
+	{
+		try
+		{ 
+			return BulkExtraction<C>::result().at(index); 
+		}
+		catch (std::out_of_range& ex)
+		{ 
+			throw RangeException(ex.what()); 
+		}
+	}
+
+	bool isNull(std::size_t row) const
+	{
+		return BulkExtraction<C>::isNull(row);
+	}
+
+	const Column<T,C>& column() const
+	{
+		return *_pColumn;
+	}
+
+private:
+	InternalBulkExtraction();
+	InternalBulkExtraction(const InternalBulkExtraction&);
+	InternalBulkExtraction& operator = (const InternalBulkExtraction&);
+
+	Column<T,C>* _pColumn;
+	C            _default;
 };
 
 

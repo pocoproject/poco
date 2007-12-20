@@ -54,7 +54,6 @@ public:
 
 	void testBareboneODBC();
 	void testNull();
-	void testBulk();
 
 	static CppUnit::Test* suite();
 

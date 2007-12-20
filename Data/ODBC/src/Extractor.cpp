@@ -155,7 +155,7 @@ bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::BLOB> >(std::s
 	char** pc = AnyCast<char*>(&_rPreparation[pos]);
 	poco_assert_dbg (pc);
 	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = columnSize(pos);
+	std::size_t colWidth = _rPreparation.maxDataSize(pos);
 	std::vector<Poco::Data::BLOB>::iterator it = values.begin();
 	std::vector<Poco::Data::BLOB>::iterator end = values.end();
 	for (int row = 0; it != end; ++it, ++row)
@@ -172,7 +172,7 @@ bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::BLOB> >(std::si
 	char** pc = AnyCast<char*>(&_rPreparation[pos]);
 	poco_assert_dbg (pc);
 	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = columnSize(pos);
+	std::size_t colWidth = _rPreparation.maxDataSize(pos);
 	std::deque<Poco::Data::BLOB>::iterator it = values.begin();
 	std::deque<Poco::Data::BLOB>::iterator end = values.end();
 	for (int row = 0; it != end; ++it, ++row)
@@ -189,7 +189,7 @@ bool Extractor::extractBoundImplContainer<std::list<Poco::Data::BLOB> >(std::siz
 	char** pc = AnyCast<char*>(&_rPreparation[pos]);
 	poco_assert_dbg (pc);
 	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = columnSize(pos);
+	std::size_t colWidth = _rPreparation.maxDataSize(pos);
 	std::list<Poco::Data::BLOB>::iterator it = values.begin();
 	std::list<Poco::Data::BLOB>::iterator end = values.end();
 	for (int row = 0; it != end; ++it, ++row)

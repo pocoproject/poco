@@ -175,7 +175,6 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 }
 
 
-
 void ODBCPostgreSQLTest::testBLOB()
 {
 	const std::size_t maxFldSize = 1000000;
@@ -343,19 +342,6 @@ void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 	}
 
 	dropObject("FUNCTION", "storedFunction(INTEGER)");
-}
-
-
-void ODBCPostgreSQLTest::testBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	_pSession->setFeature("autoBind", true);
-	_pSession->setFeature("autoExtract", true);
-	recreateMiscTable();
-	_pExecutor->doBulkStringIntFloat(100);
-	recreateMiscTable();
-	_pExecutor->doBulkPerformance(1000);
 }
 
 
@@ -540,7 +526,7 @@ void ODBCPostgreSQLTest::recreateMiscTable()
 		// Mammoth does not bind columns properly
 		session() << "CREATE TABLE MiscTest "
 			"(First VARCHAR(30),"
-			//"Second BYTEA,"
+			"Second BYTEA,"
 			"Third INTEGER,"
 			"Fourth FLOAT,"
 			"Fifth TIMESTAMP)", now; 
@@ -602,6 +588,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDate);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTime);

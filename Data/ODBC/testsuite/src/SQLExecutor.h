@@ -146,9 +146,9 @@ public:
 	void prepare();
 
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
-	void doBulk(Poco::UInt32 size)
+	void doBulkWithBool(Poco::UInt32 size)
 	{
-		std::string funct = "doBulk()";
+		std::string funct = "doBulkWithBool()";
 		C1 ints;
 		C2 strings;
 		C3 blobs;
@@ -283,8 +283,128 @@ public:
 	}
 
 	void doBulkPerformance(Poco::UInt32 size);
-	void doBulkNoBool(Poco::UInt32 size);
-	void doBulkStringIntFloat(Poco::UInt32 size);
+
+	template <typename C1, typename C2, typename C3, typename C4, typename C5>
+	void doBulk(Poco::UInt32 size)
+	{
+		std::string funct = "doBulk()";
+		C1 ints;
+		C2 strings;
+		C3 blobs;
+		C4 floats;
+		C5 dateTimes(size);
+		
+		for (int i = 0; i < size; ++i)
+		{
+			ints.push_back(i);
+			strings.push_back(std::string("xyz" + Poco::NumberFormatter::format(i)));
+			blobs.push_back(std::string("abc") + Poco::NumberFormatter::format(i));
+			floats.push_back(i + .5);
+		}
+
+		try 
+		{
+			session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?)", 
+				use(strings), 
+				use(blobs), 
+				use(ints),
+				use(floats),
+				use(dateTimes), now;
+		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+		try { session() << "DELETE FROM MiscTest", now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+		try 
+		{
+			session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?)", 
+				use(strings, bulk), 
+				use(blobs, bulk), 
+				use(ints, bulk),
+				use(floats, bulk),
+				use(dateTimes, bulk), now;
+		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		
+		ints.clear();
+		strings.clear();
+		blobs.clear();
+		floats.clear();
+		dateTimes.clear();
+		
+		try 
+		{ 
+			session() << "SELECT * FROM MiscTest ORDER BY First", 
+				into(strings), 
+				into(blobs), 
+				into(ints), 
+				into(floats),
+				into(dateTimes),
+				now; 
+		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		
+		std::string number = Poco::NumberFormatter::format(size - 1);
+		assert (size == ints.size());
+		assert (0 == ints.front());
+		assert (size - 1 == ints.back());
+		assert (std::string("xyz0") == strings.front());
+		assert (std::string("xyz") + number == strings.back());
+		assert (BLOB("abc0") == blobs.front());
+		BLOB blob("abc");
+		blob.appendRaw(number.c_str(), number.size());
+		assert (blob == blobs.back());
+		assert (.5 == floats.front());
+		assert (floats.size() - 1 + .5 == floats.back());
+
+		ints.clear();
+
+		try 
+		{ 
+			session() << "SELECT First FROM MiscTest", into(ints, bulk(size)), limit(size+1), now; 
+			fail ("must fail");
+		}
+		catch(Poco::InvalidArgumentException&){ }
+
+		try 
+		{ 
+			session() << "SELECT First FROM MiscTest", into(ints), bulk(size), now; 
+			fail ("must fail");
+		}
+		catch(Poco::InvalidAccessException&){ }
+
+		ints.clear();
+		strings.clear();
+		blobs.clear();
+		floats.clear();
+		dateTimes.clear();
+		
+		try 
+		{ 
+			session() << "SELECT * FROM MiscTest ORDER BY First", 
+				into(strings, bulk(size)),
+				into(blobs, bulk(size)),
+				into(ints, bulk(size)),
+				into(floats, bulk(size)),
+				into(dateTimes, bulk(size)),
+				now; 
+		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		
+		assert (size == ints.size());
+		assert (0 == ints.front());
+		assert (size - 1 == ints.back());
+		assert (std::string("xyz0") == strings.front());
+		assert (std::string("xyz") + number == strings.back());
+		assert (BLOB("abc0") == blobs.front());
+		blob.assignRaw("abc", 3);
+		blob.appendRaw(number.c_str(), number.size());
+		assert (blob == blobs.back());
+		assert (.5 == floats.front());
+		assert (floats.size() - 1 + .5 == floats.back());
+	}
 
 	void setSimple();
 	void setComplex();
@@ -307,6 +427,32 @@ public:
 	void emptyDB();
 
 	void blob(int bigSize = 1024);
+
+	template <typename C1, typename C2>
+	void blobContainer(int size)
+	{
+		std::string funct = "blobContainer()";
+		C1 lastName(size, "lastname");
+		C1 firstName(size, "firstname");
+		C1 address(size, "Address");
+		C2 img(size, BLOB("0123456789", 10));
+		int count = 0;
+		try { session() << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(img), now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		try { session() << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		assert (count == size);
+
+		C2 res;
+		try { session() << "SELECT Image FROM Person", into(res), now; }
+		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+		assert (res.size() == img.size());
+		assert (res == img);
+	}
+
 	void blobStmt();
 
 	void dateTime();

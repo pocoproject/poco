@@ -101,11 +101,17 @@ void Binder::freeMemory()
 
 	StringMap::iterator itStr = _strings.begin();
 	StringMap::iterator itStrEnd = _strings.end();
-	for(; itStr != itStrEnd; ++itStr) std::free(itStr->first);
+	for(; itStr != itStrEnd; ++itStr) 
+	{
+		if (itStr->first) std::free(itStr->first);
+	}
 
 	CharPtrVec::iterator itChr = _charPtrs.begin();
 	CharPtrVec::iterator endChr = _charPtrs.end();
-	for (; itChr != endChr; ++itChr) std::free(*itChr);
+	for (; itChr != endChr; ++itChr) 
+	{
+		if (*itChr) std::free(*itChr);
+	}
 
 	BoolPtrVec::iterator itBool = _boolPtrs.begin();
 	BoolPtrVec::iterator endBool = _boolPtrs.end();
@@ -406,6 +412,8 @@ void Binder::reset()
 	_dateTimeVec.clear();
 	_charPtrs.clear();
 	_boolPtrs.clear();
+	_containers.clear();
+	_paramSetSize = 0;
 }
 
 
@@ -504,12 +512,8 @@ void Binder::setParamSetSize(std::size_t pos, std::size_t length)
 			Utility::isError(SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) length, SQL_IS_UINTEGER)))
 				throw StatementException(_rStmt, "SQLSetStmtAttr()");
 
-		if (Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, &_paramSetSize, 0, 0)))
-			throw StatementException(_rStmt, "SQLGetStmtAttr()");
+		_paramSetSize = static_cast<SQLINTEGER>(length);
 	}
-
-	if (_paramSetSize != length)
-		throw InvalidArgumentException("Invalid parameter array length.");
 }
 
 

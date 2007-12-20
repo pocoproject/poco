@@ -504,7 +504,10 @@ inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
 
 inline SQLINTEGER Extractor::columnSize(std::size_t pos) const
 {
-	return (SQLINTEGER) ODBCColumn(_rStmt, pos).length();
+	std::size_t size = ODBCColumn(_rStmt, pos).length();
+	std::size_t maxSize = _rPreparation.maxDataSize(pos);
+	if (size > maxSize) size = maxSize;
+	return (SQLINTEGER) size;
 }
 
 

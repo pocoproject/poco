@@ -359,6 +359,20 @@ void ODBCMySQLTest::recreateNullsTable(const std::string& notNull)
 }
 
 
+void ODBCMySQLTest::recreateMiscTable()
+{
+	dropObject("TABLE", "MiscTest");
+	try { *_pSession << "CREATE TABLE MiscTest "
+		"(First VARCHAR(30),"
+		"Second VARBINARY(30),"
+		"Third INTEGER,"
+		"Fourth FLOAT,"
+		"Fifth DATETIME)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
+}
+
+
 CppUnit::Test* ODBCMySQLTest::suite()
 {
 	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
@@ -391,7 +405,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
-		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
+		//CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplexUnique);
@@ -412,6 +426,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testDate);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testTime);

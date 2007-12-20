@@ -188,6 +188,42 @@ void ODBCSQLServerTest::testNull()
 }
 
 
+void ODBCSQLServerTest::testBulk()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	recreateMiscTable();
+	_pExecutor->doBulkWithBool<std::vector<int>,
+		std::vector<std::string>,
+		std::vector<BLOB>,
+		std::vector<double>,
+		std::vector<DateTime>,
+		std::vector<bool> >(100);
+
+	recreateMiscTable();
+	_pExecutor->doBulkWithBool<std::deque<int>,
+		std::deque<std::string>,
+		std::deque<BLOB>,
+		std::deque<double>,
+		std::deque<DateTime>,
+		std::deque<bool> >(100);
+
+	recreateMiscTable();
+	_pExecutor->doBulkWithBool<std::list<int>,
+		std::list<std::string>,
+		std::list<BLOB>,
+		std::list<double>,
+		std::list<DateTime>,
+		std::list<bool> >(100);
+
+	recreateMiscTable();
+	_pExecutor->doBulkPerformance(1000);
+}
+
+
 void ODBCSQLServerTest::testStoredProcedure()
 {
 	for (int k = 0; k < 8;)
@@ -680,6 +716,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);

@@ -63,6 +63,7 @@ public:
 
 	void testBLOB();
 	void testNull();
+	void testBulk();
 
 	void testStoredProcedure();
 	void testCursorStoredProcedure();

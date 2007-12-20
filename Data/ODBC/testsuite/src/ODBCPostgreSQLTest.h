@@ -64,7 +64,6 @@ public:
 	void testBareboneODBC();
 
 	void testBLOB();
-	void testBulk();
 
 	void testStoredFunction();
 	void testStoredFunctionAny();

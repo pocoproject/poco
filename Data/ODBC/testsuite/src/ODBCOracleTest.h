@@ -56,7 +56,6 @@ public:
 	void testBareboneODBC();
 
 	void testBLOB();
-	void testBulk();
 
 	void testMultipleResults();
 

@@ -472,7 +472,7 @@ private:
 };
 
 
-template <class T, class C = std::deque<T> >
+template <class C>
 class InternalExtraction: public Extraction<C>
 	/// Container Data Type specialization extension for extraction of values from a query result set.
 	///
@@ -485,6 +485,8 @@ class InternalExtraction: public Extraction<C>
 	/// InternalExtraction objects can not be copied or assigned.
 {
 public:
+	typedef typename C::value_type T;
+
 	explicit InternalExtraction(C& result, Column<T,C>* pColumn, const Position& pos = Position(0)): 
 		Extraction<C>(result, T(), pos), 
 		_pColumn(pColumn)

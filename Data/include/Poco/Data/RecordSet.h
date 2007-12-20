@@ -111,7 +111,7 @@ public:
 	const Column<T,C>& column(std::size_t pos) const
 		/// Returns the reference to column at specified location.
 	{
-		typedef const InternalExtraction<T,C>* ExtractionVecPtr;
+		typedef const InternalExtraction<C>* ExtractionVecPtr;
 
 		const AbstractExtractionVec& rExtractions = extractions();
 
@@ -263,7 +263,7 @@ private:
 	std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.
 	{
-		typedef const InternalExtraction<T,C>* ExtractionVecPtr;
+		typedef const InternalExtraction<C>* ExtractionVecPtr;
 
 		bool typeFound = false;
 

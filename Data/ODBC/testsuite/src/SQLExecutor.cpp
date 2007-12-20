@@ -588,7 +588,8 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				assert (5 == sixth.hour);
 				assert (34 == sixth.minute);
 				assert (59 == sixth.second);
-				assert (997000000 == sixth.fraction);
+				if (sixth.fraction)//MySQL does not support fraction
+					assert (997000000 == sixth.fraction);
 			}
 
 			rc = SQLCloseCursor(hstmt);
@@ -1581,205 +1582,6 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 }
 
 
-void SQLExecutor::doBulkNoBool(Poco::UInt32 size)
-{
-	std::string funct = "doBulk()";
-	std::vector<int> ints(size, 1);
-	std::vector<std::string> strings(size);
-	std::vector<BLOB> blobs(size);
-	std::vector<double> floats(size);
-	std::vector<DateTime> dateTimes(size);
-	
-	for (int i = 0; i < size; ++i)
-	{
-		ints[i] = i;
-		strings[i] = "xyz" + NumberFormatter::format(i);
-		blobs[i] = "abc" + NumberFormatter::format(i);
-		floats[i] = i + .5;
-	}
-
-	try 
-	{
-		session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?)", 
-			use(strings), 
-			use(blobs), 
-			use(ints),
-			use(floats),
-			use(dateTimes), now;
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	try { session() << "DELETE FROM MiscTest", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	try 
-	{
-		session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?)", 
-			use(strings, bulk), 
-			use(blobs, bulk), 
-			use(ints, bulk),
-			use(floats, bulk),
-			use(dateTimes, bulk), now;
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	
-	ints.clear();
-	strings.clear();
-	blobs.clear();
-	floats.clear();
-	
-	try 
-	{ 
-		session() << "SELECT * FROM MiscTest ORDER BY First", 
-			into(strings), 
-			into(blobs), 
-			into(ints), 
-			into(floats),
-			into(dateTimes),
-			now; 
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	
-	std::string number = NumberFormatter::format(size - 1);
-	assert (size == ints.size());
-	assert (0 == ints[0]);
-	assert (ints.size() - 1 == ints[ints.size() - 1]);
-	assert (std::string("xyz0") == strings[0]);
-	assert (std::string("xyz") + number == strings[strings.size()-1]);
-	assert (BLOB("abc0") == blobs[0]);
-	BLOB blob("abc");
-	blob.appendRaw(number.c_str(), number.size());
-	assert (blob == blobs[blobs.size()-1]);
-	assert (.5 == floats[0]);
-	assert (floats.size() - 1 + .5 == floats[floats.size() - 1]);
-
-	ints.clear();
-
-	try 
-	{ 
-		session() << "SELECT First FROM MiscTest", into(ints, bulk(size)), limit(size+1), now; 
-		fail ("must fail");
-	}
-	catch(InvalidArgumentException&){ }
-
-	try 
-	{ 
-		session() << "SELECT First FROM MiscTest", into(ints), bulk(size), now; 
-		fail ("must fail");
-	}
-	catch(InvalidAccessException&){ }
-
-	ints.clear();
-	strings.clear();
-	blobs.clear();
-	floats.clear();
-	
-	try 
-	{ 
-		session() << "SELECT * FROM MiscTest ORDER BY First", 
-			into(strings, bulk(size)),
-			into(blobs, bulk(size)),
-			into(ints, bulk(size)),
-			into(floats, bulk(size)),
-			into(dateTimes, bulk(size)),
-			now; 
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	
-	assert (size == ints.size());
-	assert (0 == ints[0]);
-	assert (ints.size() - 1 == ints[ints.size()-1]);
-	assert (std::string("xyz0") == strings[0]);
-	assert (std::string("xyz") + number == strings[strings.size()-1]);
-	assert (BLOB("abc0") == blobs[0]);
-	blob.assignRaw("abc", 3);
-	blob.appendRaw(number.c_str(), number.size());
-	assert (blob == blobs[blobs.size()-1]);
-	assert (.5 == floats[0]);
-	assert (floats.size() - 1 + .5 == floats[floats.size() - 1]);
-}
-
-
-void SQLExecutor::doBulkStringIntFloat(Poco::UInt32 size)
-{
-	std::string funct = "doBulk()";
-	std::vector<int> ints(size, 1);
-	std::vector<double> floats(size, .5);
-	std::vector<std::string> strings(size, "xwyz");
-	std::vector<DateTime> dateTimes(size);
-
-	try 
-	{ 
-		session() << "INSERT INTO MiscTest VALUES (?,?,?,?)", 
-			use(strings), 
-			use(ints), 
-			use(floats), 
-			use(dateTimes), now;
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	try { session() << "DELETE FROM MiscTest", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	try 
-	{ 
-		session() << "INSERT INTO MiscTest VALUES (?,?,?,?)", 
-			use(strings, bulk), 
-			use(ints, bulk), 
-			use(floats, bulk), 
-			use(dateTimes, bulk), now; 
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	ints.clear();
-	strings.clear();
-	try 
-	{ 
-		session() << "SELECT * FROM MiscTest", 
-			into(strings), 
-			into(ints), 
-			into(floats), 
-			into(dateTimes), now; 
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	assert (size == ints.size());
-	assert (1 == ints[ints.size()-1]);
-
-	ints.clear();
-
-	try 
-	{ 
-		session() << "SELECT * FROM MiscTest", into(ints, bulk(size)), limit(size+1), now; 
-		fail ("must fail");
-	}
-	catch(InvalidArgumentException&){ }
-
-	try 
-	{ 
-		session() << "SELECT * FROM MiscTest", into(ints), bulk(size), now; 
-		fail ("must fail");
-	}
-	catch(InvalidAccessException&){ }
-
-	ints.clear();
-	try 
-	{ 
-		session() << "SELECT * FROM MiscTest", 
-			into(strings, bulk(size)), 
-			into(ints, bulk(size)), 
-			into(floats, bulk(size)), 
-			into(dateTimes, bulk(size)), now; 
-	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	assert (size == ints.size());
-	assert (1 == ints[ints.size()-1]);
-}
-
-
 void SQLExecutor::setSimple()
 {
 	std::string funct = "setSimple()";
@@ -2750,7 +2552,7 @@ void SQLExecutor::notNulls(const std::string& sqlState)
 	}catch (StatementException& se) 
 	{ 
 		//make sure we're failing for the right reason
-		//default sqlState value is "23502", but some drivers report "HY???" codes
+		//default sqlState value is "23502"; some drivers report "HY???" codes
 		assert (sqlState == se.diagnostics().sqlState(0));
 	}
 }

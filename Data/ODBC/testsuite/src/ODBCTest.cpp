@@ -415,28 +415,26 @@ void ODBCTest::testBulk()
 	_pSession->setFeature("autoExtract", true);
 
 	recreateMiscTable();
+	
 	_pExecutor->doBulk<std::vector<int>,
 		std::vector<std::string>,
 		std::vector<BLOB>,
 		std::vector<double>,
-		std::vector<DateTime>,
-		std::vector<bool> >(100);
+		std::vector<DateTime> >(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulk<std::deque<int>,
 		std::deque<std::string>,
 		std::deque<BLOB>,
 		std::deque<double>,
-		std::deque<DateTime>,
-		std::deque<bool> >(100);
+		std::deque<DateTime> >(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulk<std::list<int>,
 		std::list<std::string>,
 		std::list<BLOB>,
 		std::list<double>,
-		std::list<DateTime>,
-		std::list<bool> >(100);
+		std::list<DateTime> >(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulkPerformance(1000);
@@ -739,6 +737,23 @@ void ODBCTest::testBLOB()
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->blob();
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testBLOBContainer()
+{
+	for (int i = 0; i < 8;)
+	{
+		session().setFeature("autoBind", bindValue(i));
+		session().setFeature("autoExtract", bindValue(i+1));
+		recreatePersonBLOBTable();
+		_pExecutor->blobContainer<std::vector<std::string>, std::vector<BLOB> >(10);
+		recreatePersonBLOBTable();
+		_pExecutor->blobContainer<std::deque<std::string>, std::deque<BLOB> >(10);
+		recreatePersonBLOBTable();
+		_pExecutor->blobContainer<std::list<std::string>, std::list<BLOB> >(10);
 		i += 2;
 	}
 }

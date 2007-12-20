@@ -428,8 +428,8 @@ private:
 
 	template <typename C>
 	void bindImplContainer(std::size_t pos, const C& val, SQLSMALLINT cDataType, Direction dir)
-		/// Utility function.
-		/// Creates, fills and stores the reference to the replacement (std::vector) container
+		/// Utility function - a "stand-in" for non-vector containers.
+		/// Creates, fills and stores the reference to the replacement std::vector container
 		/// for std::deque and std::list. Calls std::vector binding.
 	{
 		typedef typename C::value_type Type;
@@ -507,7 +507,11 @@ private:
 		poco_assert (size > 0);
 
 		if (size == _maxFieldSize)
+		{
 			getMinValueSize(val, size);
+			// accomodate for terminating zero
+			if (size != _maxFieldSize) ++size;
+		}
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
@@ -563,16 +567,19 @@ private:
 		setParamSetSize(pos, val.size());
 
 		SQLINTEGER size = 0;
-		getColumnOrParameterSize(pos, size);
-		poco_assert (size > 0);
-
-		if (size == _maxFieldSize)
-			getMinValueSize(val, size);
 
 		if (_vecLengthIndicator.size() <= pos)
-		{
 			_vecLengthIndicator.resize(pos + 1);
-			_vecLengthIndicator[pos].resize(val.size(), SQL_NTS);
+			
+		_vecLengthIndicator[pos].resize(val.size());
+		std::vector<SQLLEN>::iterator lIt = _vecLengthIndicator[pos].begin();
+		std::vector<SQLLEN>::iterator lEnd = _vecLengthIndicator[pos].end();
+		typename C::const_iterator cIt = val.begin();
+		for (; lIt != lEnd; ++lIt, ++cIt) 
+		{
+			SQLLEN sz = static_cast<SQLLEN>(cIt->size());
+			if (sz > size) size = sz;
+			*lIt = sz;
 		}
 
 		if (_charPtrs.size() <= pos)
@@ -583,14 +590,14 @@ private:
 
 		std::size_t blobSize;
 		std::size_t offset = 0;
-		typename C::const_iterator it = val.begin();
-		typename C::const_iterator end = val.end();
-		for (; it != end; ++it)
+		cIt = val.begin();
+		typename C::const_iterator cEnd = val.end();
+		for (; cIt != cEnd; ++cIt)
 		{
-			blobSize = it->size();
+			blobSize = cIt->size();
 			if (blobSize > size)	
 				throw LengthExceededException("SQLBindParameter(std::vector<BLOB>)");
-			std::memcpy(_charPtrs[pos] + offset, it->rawContent(), blobSize);
+			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize);
 			offset += size;
 		}
 

@@ -141,19 +141,6 @@ void ODBCSQLiteTest::testNull()
 }
 
 
-void ODBCSQLiteTest::testBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	_pSession->setFeature("autoBind", true);
-	_pSession->setFeature("autoExtract", true);
-	recreateMiscTable();
-	_pExecutor->doBulkStringIntFloat(100);
-	recreateMiscTable();
-	_pExecutor->doBulkPerformance(1000);
-}
-
-
 void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -324,7 +311,6 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testPrepare);
-		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSetComplexUnique);
@@ -345,6 +331,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testFloat);

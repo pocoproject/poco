@@ -47,6 +47,7 @@
 #include "Poco/Data/Bulk.h"
 #include "Poco/Data/Column.h"
 #include "Poco/Data/Extraction.h"
+#include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/SessionImpl.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -291,12 +292,22 @@ private:
 	void resetExtraction();
 		/// Resets extraction so it can be reused again.
 
-	template <class T, class C>
-	InternalExtraction<T,C>* createExtract(const MetaColumn& mc)
+	template <class C>
+	InternalExtraction<C>* createExtract(const MetaColumn& mc)
 	{
+		typedef typename C::value_type T;
 		C* pData = new C;
 		Column<T,C>* pCol = new Column<T,C>(mc, pData);
-		return new InternalExtraction<T,C>(*pData, pCol);
+		return new InternalExtraction<C>(*pData, pCol);
+	}
+
+	template <class C>
+	InternalBulkExtraction<C>* createBulkExtract(const MetaColumn& mc)
+	{
+		typedef typename C::value_type T;
+		C* pData = new C;
+		Column<T,C>* pCol = new Column<T,C>(mc, pData);
+		return new InternalBulkExtraction<C>(*pData, pCol, getExtractionLimit());
 	}
 
 	template <class T>
@@ -330,11 +341,26 @@ private:
 		if (storage.empty()) storage = DEQUE;
 
 		if (0 == icompare(DEQUE, storage))
-			addExtract(createExtract<T, std::deque<T> >(mc));
+		{
+			if (!isBulkExtraction())
+				addExtract(createExtract<std::deque<T> >(mc));
+			else
+				addExtract(createBulkExtract<std::deque<T> >(mc));
+		}
 		else if (0 == icompare(VECTOR, storage))
-			addExtract(createExtract<T, std::vector<T> >(mc));
+		{
+			if (!isBulkExtraction())
+				addExtract(createExtract<std::vector<T> >(mc));
+			else
+				addExtract(createBulkExtract<std::vector<T> >(mc));
+		}
 		else if (0 == icompare(LIST, storage))
-			addExtract(createExtract<T, std::list<T> >(mc));
+		{
+			if (!isBulkExtraction())
+				addExtract(createExtract<std::list<T> >(mc));
+			else
+				addExtract(createBulkExtract<std::list<T> >(mc));
+		}
 	}
 
 	bool isNull(std::size_t col, std::size_t row) const;

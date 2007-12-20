@@ -1111,15 +1111,6 @@ inline void Preparation::prepare(std::size_t pos, const std::list<Poco::DynamicA
 }
 
 
-inline std::size_t Preparation::actualDataSize(std::size_t col, std::size_t row) const
-{
-	poco_assert (col < _values.size());
-
-	if (INVALID_ROW == row) return _lengths[col];
-	else return _lenLengths[col].at(row);
-}
-
-
 inline std::size_t Preparation::bulkSize(std::size_t col) const
 {
 	poco_assert (col < _lenLengths.size());
@@ -1154,9 +1145,7 @@ inline Preparation::DataExtraction Preparation::getDataExtraction() const
 
 inline Poco::Any& Preparation::operator [] (std::size_t pos)
 {
-	poco_assert (pos < _values.size());
-	
-	return _values[pos];
+	return _values.at(pos);
 }
 
 

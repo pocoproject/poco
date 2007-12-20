@@ -165,19 +165,6 @@ void ODBCDB2Test::testBLOB()
 }
 
 
-void ODBCDB2Test::testBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	_pSession->setFeature("autoBind", true);
-	_pSession->setFeature("autoExtract", true);
-	recreateMiscTable();
-	_pExecutor->doBulkStringIntFloat(100);
-	recreateMiscTable();
-	_pExecutor->doBulkPerformance(1000);
-}
-
-
 void ODBCDB2Test::testStoredProcedure()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -557,10 +544,9 @@ void ODBCDB2Test::recreateMiscTable()
 	dropObject("TABLE", "MiscTest");
 	try 
 	{ 
-		// DB2 fails with BLOB
 		session() << "CREATE TABLE MiscTest "
 			"(First VARCHAR(30),"
-			//"Second BLOB,"
+			"Second BLOB,"
 			"Third INTEGER,"
 			"Fourth FLOAT,"
 			"Fifth TIMESTAMP)", now; 
@@ -622,6 +608,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOB);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testDate);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTime);

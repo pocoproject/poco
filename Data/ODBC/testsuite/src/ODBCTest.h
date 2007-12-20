@@ -114,6 +114,7 @@ public:
 	virtual void testEmptyDB();
 
 	virtual void testBLOB();
+	virtual void testBLOBContainer();
 	virtual void testBLOBStmt();
 
 	virtual void testDateTime();

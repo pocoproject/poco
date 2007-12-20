@@ -113,6 +113,70 @@ private:
 };
 
 
+template<typename T>
+class Prepare<std::deque<T> >: public AbstractPrepare
+	/// Prepare specialization for std::deque.
+	/// This specialization is needed for bulk operations to enforce
+	/// the whole deque preparation, rather than only individual contained values.
+{
+public:
+	Prepare(AbstractPreparation* pPrepare, std::size_t pos, std::deque<T>& val = std::deque<T>()): 
+		AbstractPrepare(pPrepare), 
+		_pos(pos), 
+		_val(val)
+		/// Creates the Prepare.
+	{
+	}
+
+	~Prepare()
+		/// Destroys the Prepare.
+	{
+	}
+
+	void prepare()
+		/// Prepares data.
+	{
+		TypeHandler<std::deque<T> >::prepare(_pos, _val, preparation());
+	}
+
+private:
+	std::size_t     _pos;
+	std::deque<T>&  _val;
+};
+
+
+template<typename T>
+class Prepare<std::list<T> >: public AbstractPrepare
+	/// Prepare specialization for std::list.
+	/// This specialization is needed for bulk operations to enforce
+	/// the whole list preparation, rather than only individual contained values.
+{
+public:
+	Prepare(AbstractPreparation* pPrepare, std::size_t pos, std::list<T>& val = std::list<T>()): 
+		AbstractPrepare(pPrepare), 
+		_pos(pos), 
+		_val(val)
+		/// Creates the Prepare.
+	{
+	}
+
+	~Prepare()
+		/// Destroys the Prepare.
+	{
+	}
+
+	void prepare()
+		/// Prepares data.
+	{
+		TypeHandler<std::list<T> >::prepare(_pos, _val, preparation());
+	}
+
+private:
+	std::size_t   _pos;
+	std::list<T>& _val;
+};
+
+
 } } // namespace Poco::Data
 
 

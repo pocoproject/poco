@@ -224,19 +224,6 @@ void ODBCOracleTest::testBLOB()
 }
 
 
-void ODBCOracleTest::testBulk()
-{
-	if (!_pSession) fail ("Test not available.");
-
-	_pSession->setFeature("autoBind", true);
-	_pSession->setFeature("autoExtract", true);
-	recreateMiscTable();
-	_pExecutor->doBulkNoBool(100);
-	recreateMiscTable();
-	_pExecutor->doBulkPerformance(1000);
-}
-
-
 void ODBCOracleTest::testNull()
 {
 	// test for NOT NULL violation exception
@@ -821,6 +808,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOB);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDate);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);
