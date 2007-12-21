@@ -17,7 +17,7 @@ $(error No ODBC library found. Please install unixODBC or iODBC and try again)
 endif
 
 objects = Binder ConnectionHandle Connector EnvironmentHandle \
-	Extractor ODBCColumn ODBCException ODBCStatementImpl \
+	Extractor ODBCMetaColumn ODBCException ODBCStatementImpl \
 	Parameter Preparation SessionImpl TypeInfo Unicode Utility 
 
 target         = PocoODBC

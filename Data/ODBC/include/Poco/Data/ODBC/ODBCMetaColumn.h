@@ -1,13 +1,13 @@
 //
-// ODBCColumn.h
+// ODBCMetaColumn.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCColumn.h#3 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCMetaColumn.h#3 $
 //
 // Library: ODBC
 // Package: ODBC
-// Module:  ODBCColumn
+// Module:  ODBCMetaColumn
 //
-// Definition of ODBCColumn.
+// Definition of ODBCMetaColumn.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -56,14 +56,14 @@ namespace Data {
 namespace ODBC {
 
 
-class ODBC_API ODBCColumn: public MetaColumn
+class ODBC_API ODBCMetaColumn: public MetaColumn
 {
 public:
-	explicit ODBCColumn(const StatementHandle& rStmt, std::size_t position);
-		/// Creates the ODBCColumn.
+	explicit ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position);
+		/// Creates the ODBCMetaColumn.
 		
-	~ODBCColumn();
-		/// Destroys the ODBCColumn.
+	~ODBCMetaColumn();
+		/// Destroys the ODBCMetaColumn.
 
 	std::size_t dataLength() const;
 		/// A numeric value that is either the maximum or actual character length of a character 
@@ -73,7 +73,7 @@ public:
 		/// This information is returned from the SQL_DESC_LENGTH record field of the IRD.
 
 private:
-	ODBCColumn();
+	ODBCMetaColumn();
 
 	static const int NAME_BUFFER_LENGTH = 2048;
 
@@ -99,7 +99,7 @@ private:
 ///
 /// inlines
 ///
-inline std::size_t ODBCColumn::dataLength() const
+inline std::size_t ODBCMetaColumn::dataLength() const
 {
 	return _dataLength;
 }

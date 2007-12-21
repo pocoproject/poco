@@ -269,12 +269,30 @@ Statement& Statement::operator , (const Bulk& bulk)
 		_pImpl->bulkExtractionAllowed() &&
 		_pImpl->bulkBindingAllowed())
 	{
-		Limit l(_pImpl->getExtractionLimit(), false, false);
 		_pImpl->setBulkExtraction(bulk);
 		_pImpl->setBulkBinding();
 	}
 	else
 		throw InvalidAccessException("Can not set bulk operations.");
+
+	return *this;
+}
+
+
+Statement& Statement::operator , (BulkFnType)
+{
+	const Limit& limit(_pImpl->extractionLimit());
+	if (limit.isHardLimit() || 
+		limit.isLowerLimit() || 
+		Limit::LIMIT_UNLIMITED == limit.value())
+	{
+		throw InvalidAccessException("Bulk is only allowed with limited extraction,"
+			"non-hard and zero-based limits.");
+	}
+
+	Bulk bulk(limit);
+	_pImpl->setBulkExtraction(bulk);
+	_pImpl->setBulkBinding();
 
 	return *this;
 }

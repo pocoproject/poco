@@ -295,18 +295,16 @@ private:
 	template <class C>
 	InternalExtraction<C>* createExtract(const MetaColumn& mc)
 	{
-		typedef typename C::value_type T;
 		C* pData = new C;
-		Column<T,C>* pCol = new Column<T,C>(mc, pData);
+		Column<C>* pCol = new Column<C>(mc, pData);
 		return new InternalExtraction<C>(*pData, pCol);
 	}
 
 	template <class C>
 	InternalBulkExtraction<C>* createBulkExtract(const MetaColumn& mc)
 	{
-		typedef typename C::value_type T;
 		C* pData = new C;
-		Column<T,C>* pCol = new Column<T,C>(mc, pData);
+		Column<C>* pCol = new Column<C>(mc, pData);
 		return new InternalBulkExtraction<C>(*pData, pCol, getExtractionLimit());
 	}
 

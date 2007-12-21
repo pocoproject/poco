@@ -92,6 +92,7 @@ public:
 	virtual void testLimitZero();
 	virtual void testPrepare();
 	virtual void testBulk();
+	virtual void testBulkPerformance();
 
 	virtual void testSetSimple();
 	virtual void testSetComplex();
@@ -128,6 +129,7 @@ public:
 	virtual void testTupleVector();
 
 	virtual void testInternalExtraction();
+	virtual void testInternalBulkExtraction();
 	virtual void testInternalStorageType();
 
 	virtual void testStoredProcedure() { /* no-op */ };

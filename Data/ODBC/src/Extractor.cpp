@@ -35,7 +35,7 @@
 
 
 #include "Poco/Data/ODBC/Extractor.h"
-#include "Poco/Data/ODBC/ODBCColumn.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/BLOB.h"

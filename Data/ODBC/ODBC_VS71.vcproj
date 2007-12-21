@@ -176,7 +176,7 @@
 					RelativePath=".\include\Poco\Data\Odbc\ODBC.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\ODBCColumn.h">
+					RelativePath=".\include\Poco\Data\ODBC\ODBCMetaColumn.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Odbc\ODBCException.h">
@@ -228,7 +228,7 @@
 					RelativePath=".\src\Extractor.cpp">
 				</File>
 				<File
-					RelativePath=".\src\ODBCColumn.cpp">
+					RelativePath=".\src\ODBCMetaColumn.cpp">
 				</File>
 				<File
 					RelativePath=".\src\ODBCException.cpp">

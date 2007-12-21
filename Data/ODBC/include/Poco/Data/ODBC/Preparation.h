@@ -42,7 +42,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/Handle.h"
-#include "Poco/Data/ODBC/ODBCColumn.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/BLOB.h"
@@ -415,7 +415,7 @@ private:
 	void prepareImpl(std::size_t pos, const C* pVal = 0)
 		/// Utility function to prepare Any and DynamicAny.
 	{
-		ODBCColumn col(_rStmt, pos);
+		ODBCMetaColumn col(_rStmt, pos);
 
 		switch (col.type())
 		{

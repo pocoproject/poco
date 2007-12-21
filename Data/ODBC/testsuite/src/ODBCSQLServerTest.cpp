@@ -218,9 +218,6 @@ void ODBCSQLServerTest::testBulk()
 		std::list<double>,
 		std::list<DateTime>,
 		std::list<bool> >(100);
-
-	recreateMiscTable();
-	_pExecutor->doBulkPerformance(1000);
 }
 
 
@@ -696,6 +693,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplexUnique);
@@ -729,6 +727,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNull);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRowIterator);

@@ -435,6 +435,15 @@ void ODBCTest::testBulk()
 		std::list<BLOB>,
 		std::list<double>,
 		std::list<DateTime> >(100);
+}
+
+
+void ODBCTest::testBulkPerformance()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
 
 	recreateMiscTable();
 	_pExecutor->doBulkPerformance(1000);
@@ -891,6 +900,17 @@ void ODBCTest::testInternalExtraction()
 		_pExecutor->internalExtraction();
 		i += 2;
 	}
+}
+
+
+void ODBCTest::testInternalBulkExtraction()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonTable();
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	_pExecutor->internalBulkExtraction();
 }
 
 

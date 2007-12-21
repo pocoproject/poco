@@ -406,6 +406,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
 		//CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
+		//CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplexUnique);
@@ -438,6 +439,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalExtraction);
+		//CppUnit_addTest(pSuite, ODBCOracleTest, testInternalBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testNull);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testRowIterator);

@@ -42,6 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Extraction.h"
+#include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/BLOB.h"
@@ -100,18 +101,19 @@ public:
 	std::size_t columnCount() const;
 		/// Returns the number of rows in the recordset.
 
-	template <class T, class C>
-	const Column<T,C>& column(const std::string& name) const
+	template <class C, class E>
+	const Column<C>& column(const std::string& name) const
 		/// Returns the reference to the first Column with the specified name.
 	{
-		return column<T,C>(columnPosition<T,C>(name));
+		return column<C,E>(columnPosition<C,E>(name));
 	}
 
-	template <class T, class C>
-	const Column<T,C>& column(std::size_t pos) const
+	template <class C, class E>
+	const Column<C>& column(std::size_t pos) const
 		/// Returns the reference to column at specified location.
 	{
-		typedef const InternalExtraction<C>* ExtractionVecPtr;
+		typedef typename C::value_type T;
+		typedef const E* ExtractionVecPtr;
 
 		const AbstractExtractionVec& rExtractions = extractions();
 
@@ -143,15 +145,33 @@ public:
 	{
 		switch (storage())
 		{
-		case STORAGE_VECTOR:
-			return column<T, std::vector<T> >(col).value(row);
-		case STORAGE_LIST:
-			return column<T, std::list<T> >(col).value(row);
-		case STORAGE_DEQUE:
-		case STORAGE_UNKNOWN:
-			return column<T, std::deque<T> >(col).value(row);
-		default:
-			throw IllegalStateException("Invalid storage setting.");
+			case STORAGE_VECTOR:
+			{
+				typedef std::vector<T> C;
+				if (isBulkExtraction())
+					return column<C, InternalBulkExtraction<C> >(col).value(row);
+				else
+					return column<C, InternalExtraction<C> >(col).value(row);
+			}
+			case STORAGE_LIST:
+			{
+				typedef std::list<T> C;
+				if (isBulkExtraction())
+					return column<C, InternalBulkExtraction<C> >(col).value(row);
+				else
+					return column<C, InternalExtraction<C> >(col).value(row);
+			}
+			case STORAGE_DEQUE:
+			case STORAGE_UNKNOWN:
+			{
+				typedef std::deque<T> C;
+				if (isBulkExtraction())
+					return column<C, InternalBulkExtraction<C> >(col).value(row);
+				else
+					return column<C, InternalExtraction<C> >(col).value(row);
+			}
+			default:
+				throw IllegalStateException("Invalid storage setting.");
 		}
 	}
 
@@ -161,15 +181,33 @@ public:
 	{
 		switch (storage())
 		{
-		case STORAGE_VECTOR:
-			return column<T, std::vector<T> >(name).value(row);
-		case STORAGE_LIST:
-			return column<T, std::list<T> >(name).value(row);
-		case STORAGE_DEQUE:
-		case STORAGE_UNKNOWN:
-			return column<T, std::deque<T> >(name).value(row);
-		default:
-			throw IllegalStateException("Invalid storage setting.");
+			case STORAGE_VECTOR:
+			{
+				typedef std::vector<T> C;
+				if (isBulkExtraction())
+					return column<C, InternalBulkExtraction<C> >(name).value(row);
+				else
+					return column<C, InternalExtraction<C> >(name).value(row);
+			}
+			case STORAGE_LIST:
+			{
+				typedef std::list<T> C;
+				if (isBulkExtraction())
+					return column<C, InternalBulkExtraction<C> >(name).value(row);
+				else
+					return column<C, InternalExtraction<C> >(name).value(row);
+			}
+			case STORAGE_DEQUE:
+			case STORAGE_UNKNOWN:
+			{
+				typedef std::deque<T> C;
+				if (isBulkExtraction())
+					return column<C, InternalBulkExtraction<C> >(name).value(row);
+				else
+					return column<C, InternalExtraction<C> >(name).value(row);
+			}
+			default:
+				throw IllegalStateException("Invalid storage setting.");
 		}
 	}
 
@@ -259,11 +297,12 @@ public:
 private:
 	RecordSet();
 
-	template<class T, class C>
+	template<class C, class E>
 	std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.
 	{
-		typedef const InternalExtraction<C>* ExtractionVecPtr;
+		typedef typename C::value_type T;
+		typedef const E* ExtractionVecPtr;
 
 		bool typeFound = false;
 
@@ -278,7 +317,7 @@ private:
 			if (pExtraction)
 			{
 				typeFound = true;
-				const Column<T,C>& col = pExtraction->column();
+				const Column<C>& col = pExtraction->column();
 				if (0 == Poco::icompare(name, col.name()))
 					return col.position();
 			}

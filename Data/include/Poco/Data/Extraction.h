@@ -480,14 +480,14 @@ class InternalExtraction: public Extraction<C>
 	/// to automaticaly create internal Extraction in cases when statement returns data and no external storage
 	/// was supplied. It is later used by RecordSet to retrieve the fetched data after statement execution.
 	/// It takes ownership of the Column pointer supplied as constructor argument. Column object, in turn
-	/// owns the data vector pointer.
+	/// owns the data container pointer.
 	///
 	/// InternalExtraction objects can not be copied or assigned.
 {
 public:
 	typedef typename C::value_type T;
 
-	explicit InternalExtraction(C& result, Column<T,C>* pColumn, const Position& pos = Position(0)): 
+	explicit InternalExtraction(C& result, Column<C>* pColumn, const Position& pos = Position(0)): 
 		Extraction<C>(result, T(), pos), 
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.
@@ -522,7 +522,7 @@ public:
 		return Extraction<C>::isNull(row);
 	}
 
-	const Column<T,C>& column() const
+	const Column<C>& column() const
 	{
 		return *_pColumn;
 	}
@@ -532,7 +532,7 @@ private:
 	InternalExtraction(const InternalExtraction&);
 	InternalExtraction& operator = (const InternalExtraction&);
 
-	Column<T,C>* _pColumn;
+	Column<C>* _pColumn;
 };
 
 

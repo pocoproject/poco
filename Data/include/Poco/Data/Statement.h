@@ -181,14 +181,19 @@ public:
 
 	Statement& operator , (const Bulk& bulk);
 		/// Sets the bulk execution mode (both binding and extraction) for this 
-		/// statement.Statement must not have any extracors or binders set at the 
+		/// statement.Statement must not have any extractors or binders set at the 
 		/// time when this operator is applied. 
 		/// Failure to adhere to the above constraint shall result in 
 		/// InvalidAccessException.
-		/// Additionally, any binding buffers passed to the statement later 
-		/// through use() or in() must be of the same size (determined by size 
-		/// of the bulk passed to this function). Since they are resized automatically
-		/// by the framework, the extraction buffers do not have to adhere to this.
+
+	Statement& operator , (BulkFnType);
+		/// Sets the bulk execution mode (both binding and extraction) for this 
+		/// statement.Statement must not have any extractors or binders set at the 
+		/// time when this operator is applied. 
+		/// Additionally, this function requires limit to be set in order to
+		/// determine the bulk size.
+		/// Failure to adhere to the above constraints shall result in 
+		/// InvalidAccessException.
 
 	Statement& operator , (const Limit& extrLimit);
 		/// Sets a limit on the maximum number of rows a select is allowed to return.
@@ -276,6 +281,9 @@ protected:
 
 	 bool isNull(std::size_t col, std::size_t row) const;
 		/// Returns true if the current row value at column pos is null.
+
+	 bool isBulkExtraction() const;
+		/// Returns true if this statement extracts data in bulk.
 
 private:
 	typedef Poco::SharedPtr<StatementImpl> StatementImplPtr;
@@ -440,6 +448,12 @@ inline bool Statement::done()
 inline bool Statement::isNull(std::size_t col, std::size_t row) const
 {
 	return _pImpl->isNull(col, row);
+}
+
+
+inline bool Statement::isBulkExtraction() const
+{
+	return _pImpl->isBulkExtraction();
 }
 
 

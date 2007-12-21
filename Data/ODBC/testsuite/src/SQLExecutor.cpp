@@ -2422,9 +2422,9 @@ void SQLExecutor::internalExtraction()
 		i = rset.value("str0", 2);
 		assert (5 == i);
 		
-		const Column<int>& col = rset.column<int, std::deque<int> >(0);
-		Column<int>::Iterator it = col.begin();
-		Column<int>::Iterator end = col.end();
+		const Column<std::deque<int> >& col = rset.column<std::deque<int>, InternalExtraction<std::deque<int> > >(0);
+		Column<std::deque<int> >::Iterator it = col.begin();
+		Column<std::deque<int> >::Iterator end = col.end();
 		for (int i = 1; it != end; ++it, ++i)
 			assert (*it == i);
 
@@ -2456,7 +2456,7 @@ void SQLExecutor::internalExtraction()
 		s = rset.value("cnt", 0).convert<std::string>();
 		assert ("4" == s);
 
-		try { rset.column<int, std::vector<int> >(100); fail ("must fail"); }
+		try { rset.column<std::deque<int>, InternalExtraction<std::deque<int> > >(100); fail ("must fail"); }
 		catch (RangeException&) { }
 
 		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
@@ -2465,8 +2465,67 @@ void SQLExecutor::internalExtraction()
 		stmt = (session() << "DELETE FROM Vectors", now);
 		rset = stmt;
 
-		try { rset.column<int, std::vector<int> >(0); fail ("must fail"); }
+		try { rset.column<std::deque<int>, InternalExtraction<std::deque<int> > >(0); fail ("must fail"); }
 		catch (RangeException&) { }
+	}
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+}
+
+
+void SQLExecutor::internalBulkExtraction()
+{
+	std::string funct = "internalBulkExtraction()";
+	int size = 100;
+	std::vector<std::string> lastName(size);
+	std::vector<std::string> firstName(size);
+	std::vector<std::string> address(size);
+	std::vector<int> age(size);
+
+	for (int i = 0; i < size; ++i)
+	{
+		lastName[i] = "LN" + NumberFormatter::format(i);
+		firstName[i] = "FN" + NumberFormatter::format(i);
+		address[i] = "Addr" + NumberFormatter::format(i);
+		age[i] = i;
+	}
+
+	try 
+	{ 
+		session() << "INSERT INTO Person VALUES (?,?,?,?)", 
+			use(lastName, bulk), 
+			use(firstName, bulk), 
+			use(address, bulk), 
+			use(age, bulk), 
+			now; 
+	}
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	try 
+	{ 
+		Statement stmt = (session() << "SELECT * FROM Person", bulk(size), now);
+		RecordSet rset(stmt); 
+		assert (size == rset.rowCount());
+		assert ("LN0" == rset["LastName"]);
+		assert (0 == rset["Age"]);
+		rset.moveLast();
+		assert (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
+		assert (size - 1 == rset["Age"]);
+	}
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	try 
+	{ 
+		Statement stmt = (session() << "SELECT * FROM Person", limit(size), bulk, now);
+		RecordSet rset(stmt); 
+		assert (size == rset.rowCount());
+		assert ("LN0" == rset["LastName"]);
+		assert (0 == rset["Age"]);
+		rset.moveLast();
+		assert (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
+		assert (size - 1 == rset["Age"]);
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }

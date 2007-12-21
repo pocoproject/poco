@@ -160,13 +160,12 @@ private:
 };
 
 
-template <class C>
-class TypeHandler<std::deque<C> >: public AbstractTypeHandler
+template <class T>
+class TypeHandler<std::deque<T> >: public AbstractTypeHandler
 	/// Specialization of type handler for std::deque.
-	/// Used by bulk extraction.
 {
 public:
-	static void bind(std::size_t pos, const std::deque<C>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	static void bind(std::size_t pos, const std::deque<T>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert_dbg (pBinder != 0);
 		pBinder->bind(pos, obj, dir);
@@ -177,21 +176,14 @@ public:
 		return 1;
 	}
 
-	static void extract(std::size_t pos, std::deque<C>& obj, const std::deque<C>& defVal, AbstractExtractor* pExt)
+	static void extract(std::size_t pos, std::deque<T>& obj, const T& defVal, AbstractExtractor* pExt)
 	{
 		poco_assert_dbg (pExt != 0);
-		if (!pExt->extract(pos, obj)) 
-		{
-			if (defVal.size() == 1)
-				obj.assign(obj.size(), defVal.front());
-			else if (defVal.size() > 1)
-				obj.assign(defVal.begin(), defVal.end());
-			else
-				throw InvalidArgumentException("Size of default value container must not be zero.");
-		}
+		if (!pExt->extract(pos, obj))
+			obj.assign(obj.size(), defVal);
 	}
 
-	static void prepare(std::size_t pos, std::deque<C>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, std::deque<T>& obj, AbstractPreparation* pPrepare)
 	{
 		poco_assert_dbg (pPrepare != 0);
 		pPrepare->prepare(pos, obj);
@@ -203,15 +195,12 @@ private:
 };
 
 
-template <class C>
-class TypeHandler<std::vector<C> >: public AbstractTypeHandler
+template <class T>
+class TypeHandler<std::vector<T> >: public AbstractTypeHandler
 	/// Specialization of type handler for std::vector.
-	/// Used by bulk extraction.
 {
 public:
-	typedef typename std::vector<C>::value_type T;
-
-	static void bind(std::size_t pos, const std::vector<C>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	static void bind(std::size_t pos, const std::vector<T>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert_dbg (pBinder != 0);
 		pBinder->bind(pos, obj, dir);
@@ -222,21 +211,14 @@ public:
 		return 1;
 	}
 
-	static void extract(std::size_t pos, std::vector<C>& obj, const std::vector<C>& defVal, AbstractExtractor* pExt)
+	static void extract(std::size_t pos, std::vector<T>& obj, const T& defVal, AbstractExtractor* pExt)
 	{
 		poco_assert_dbg (pExt != 0);
-		if (!pExt->extract(pos, obj)) 
-		{
-			if (defVal.size() == 1)
-				obj.assign(obj.size(), defVal.front());
-			else if (defVal.size() > 1)
-				obj.assign(defVal.begin(), defVal.end());
-			else
-				throw InvalidArgumentException("Size of default value container must not be zero.");
-		}
+		if (!pExt->extract(pos, obj))
+			obj.assign(obj.size(), defVal);
 	}
 
-	static void prepare(std::size_t pos, std::vector<C>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, std::vector<T>& obj, AbstractPreparation* pPrepare)
 	{
 		poco_assert_dbg (pPrepare != 0);
 		pPrepare->prepare(pos, obj);
@@ -248,13 +230,12 @@ private:
 };
 
 
-template <class C>
-class TypeHandler<std::list<C> >: public AbstractTypeHandler
+template <class T>
+class TypeHandler<std::list<T> >: public AbstractTypeHandler
 	/// Specialization of type handler for std::list.
-	/// Used by bulk extraction.
 {
 public:
-	static void bind(std::size_t pos, const std::list<C>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	static void bind(std::size_t pos, const std::list<T>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert_dbg (pBinder != 0);
 		pBinder->bind(pos, obj, dir);
@@ -265,21 +246,14 @@ public:
 		return 1;
 	}
 
-	static void extract(std::size_t pos, std::list<C>& obj, const std::list<C>& defVal, AbstractExtractor* pExt)
+	static void extract(std::size_t pos, std::list<T>& obj, const T& defVal, AbstractExtractor* pExt)
 	{
 		poco_assert_dbg (pExt != 0);
-		if (!pExt->extract(pos, obj)) 
-		{
-			if (defVal.size() == 1)
-				obj.assign(obj.size(), defVal.front());
-			else if (defVal.size() > 1)
-				obj.assign(defVal.begin(), defVal.end());
-			else
-				throw InvalidArgumentException("Size of default value container must not be zero.");
-		}
+		if (!pExt->extract(pos, obj))
+			obj.assign(obj.size(), defVal);
 	}
 
-	static void prepare(std::size_t pos, std::list<C>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, std::list<T>& obj, AbstractPreparation* pPrepare)
 	{
 		poco_assert_dbg (pPrepare != 0);
 		pPrepare->prepare(pos, obj);

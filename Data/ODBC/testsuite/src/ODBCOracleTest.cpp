@@ -788,6 +788,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testPrepare);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBulk);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSetComplexUnique);
@@ -823,6 +824,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNull);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testRowIterator);

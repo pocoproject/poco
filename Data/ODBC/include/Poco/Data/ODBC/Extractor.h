@@ -43,7 +43,7 @@
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/ODBC/Preparation.h"
-#include "Poco/Data/ODBC/ODBCColumn.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/DateTime.h"
@@ -401,7 +401,7 @@ private:
 	bool extractImpl(std::size_t pos, T& val)
 		/// Utility function for extraction of Any and DynamicAny.
 	{
-		ODBCColumn column(_rStmt, pos);
+		ODBCMetaColumn column(_rStmt, pos);
 
 		switch (column.type())
 		{
@@ -504,7 +504,7 @@ inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
 
 inline SQLINTEGER Extractor::columnSize(std::size_t pos) const
 {
-	std::size_t size = ODBCColumn(_rStmt, pos).length();
+	std::size_t size = ODBCMetaColumn(_rStmt, pos).length();
 	std::size_t maxSize = _rPreparation.maxDataSize(pos);
 	if (size > maxSize) size = maxSize;
 	return (SQLINTEGER) size;

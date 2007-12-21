@@ -444,7 +444,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 
 	try
 	{
-		ODBCColumn c(_rStmt, pos);
+		ODBCMetaColumn c(_rStmt, pos);
 		colSize = (SQLINTEGER) c.length();
 		decDigits = (SQLSMALLINT) c.precision();
 		return;
@@ -465,7 +465,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 
 	try
 	{
-		ODBCColumn col(_rStmt, pos);
+		ODBCMetaColumn col(_rStmt, pos);
 		colSize = col.length();
 	}
 	catch (StatementException&) { }

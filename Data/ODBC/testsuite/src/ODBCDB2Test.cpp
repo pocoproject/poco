@@ -588,6 +588,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testPrepare);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBulk);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetComplex);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSetComplexUnique);
@@ -618,6 +619,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTuple);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testInternalBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testStoredProcedureAny);

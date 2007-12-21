@@ -96,14 +96,14 @@ inline Bulk bulk(const T& limit)
 }
 
 
-inline void bulk()
+inline void bulk(char)
 	/// Dummy bulk function. Used for bulk binding creation
-	/// (see BulkBinding.h).
+	/// (see BulkBinding) and bulk extraction signalling to Statement.
 {
 }
 
 
-typedef void (*BulkFnType)();
+typedef void (*BulkFnType)(char);
 
 
 } } // namespace Poco::Data

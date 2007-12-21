@@ -45,7 +45,7 @@
 #include "Poco/Data/ODBC/Binder.h"
 #include "Poco/Data/ODBC/Extractor.h"
 #include "Poco/Data/ODBC/Preparation.h"
-#include "Poco/Data/ODBC/ODBCColumn.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/Column.h"
 #include "Poco/SharedPtr.h"
@@ -66,7 +66,7 @@ class ODBC_API ODBCStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for ODBC
 {
 public:
-	typedef std::vector<ODBCColumn*> ColumnPtrVec;
+	typedef std::vector<ODBCMetaColumn*> ColumnPtrVec;
 
 	ODBCStatementImpl(SessionImpl& rSession);
 		/// Creates the ODBCStatementImpl.

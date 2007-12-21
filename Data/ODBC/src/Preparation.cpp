@@ -35,7 +35,7 @@
 
 
 #include "Poco/Data/ODBC/Preparation.h"
-#include "Poco/Data/ODBC/ODBCColumn.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 
 
 namespace Poco {
@@ -154,7 +154,7 @@ std::size_t Preparation::maxDataSize(std::size_t pos) const
 
 	try 
 	{
-		sz = ODBCColumn(_rStmt, pos).length();
+		sz = ODBCMetaColumn(_rStmt, pos).length();
 	}
 	catch (StatementException&) { }
 

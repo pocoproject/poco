@@ -59,16 +59,18 @@ class BulkExtraction: public AbstractExtraction
 	/// - std::list
 {
 public:
+	typedef typename C::value_type T;
+
 	BulkExtraction(C& result, Poco::UInt32 limit): 
 		AbstractExtraction(limit, 0, true),
 		_rResult(result), 
-		_default(1)
+		_default()
 	{
 		if (static_cast<Poco::UInt32>(result.size()) != limit)
 			result.resize(limit);
 	}
 
-	BulkExtraction(C& result, const C& def, Poco::UInt32 limit): 
+	BulkExtraction(C& result, const T& def, Poco::UInt32 limit): 
 		AbstractExtraction(limit, 0, true),
 		_rResult(result), 
 		_default(def)
@@ -139,7 +141,7 @@ protected:
 
 private:
 	C&               _rResult;
-	C                _default;
+	T                _default;
 	std::deque<bool> _nulls;
 };
 
@@ -152,15 +154,15 @@ class InternalBulkExtraction: public BulkExtraction<C>
 	/// to automaticaly create internal BulkExtraction in cases when statement returns data and no external storage
 	/// was supplied. It is later used by RecordSet to retrieve the fetched data after statement execution.
 	/// It takes ownership of the Column pointer supplied as constructor argument. Column object, in turn
-	/// owns the data vector pointer.
+	/// owns the data container pointer.
 	///
 	/// InternalBulkExtraction objects can not be copied or assigned.
 {
 public:
 	typedef typename C::value_type T;
 
-	explicit InternalBulkExtraction(C& result, Column<T,C>* pColumn, Poco::UInt32 limit): 
-		BulkExtraction<C>(result, _default, limit), 
+	explicit InternalBulkExtraction(C& result, Column<C>* pColumn, Poco::UInt32 limit): 
+		BulkExtraction<C>(result, T(), limit), 
 		_pColumn(pColumn)
 		/// Creates InternalBulkExtraction.
 	{
@@ -194,7 +196,7 @@ public:
 		return BulkExtraction<C>::isNull(row);
 	}
 
-	const Column<T,C>& column() const
+	const Column<C>& column() const
 	{
 		return *_pColumn;
 	}
@@ -204,8 +206,7 @@ private:
 	InternalBulkExtraction(const InternalBulkExtraction&);
 	InternalBulkExtraction& operator = (const InternalBulkExtraction&);
 
-	Column<T,C>* _pColumn;
-	C            _default;
+	Column<C>* _pColumn;
 };
 
 

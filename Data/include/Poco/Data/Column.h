@@ -52,7 +52,7 @@ namespace Poco {
 namespace Data {
 
 
-template <class T, class C = std::deque<T> >
+template <class C>
 class Column
 	/// Column class is column data container.
 	/// Data (a pointer to container) is assigned to the class 
@@ -65,8 +65,9 @@ public:
 	typedef typename Container::const_iterator Iterator;
 	typedef typename Container::const_reverse_iterator RIterator;
 	typedef typename Container::size_type Size;
+	typedef typename Container::value_type Type;
 
-	Column(const MetaColumn& metaColumn, C* pData): _metaColumn(metaColumn), _pData(pData)
+	Column(const MetaColumn& metaColumn, Container* pData): _metaColumn(metaColumn), _pData(pData)
 		/// Creates the Column.
 	{
 		poco_check_ptr (_pData);
@@ -104,7 +105,7 @@ public:
 		return *_pData;
 	}
 
-	const T& value(std::size_t row) const
+	const Type& value(std::size_t row) const
 		/// Returns the field value in specified row.
 	{
 		try
@@ -117,7 +118,7 @@ public:
 		}
 	}
 
-	const T& operator [] (std::size_t row) const
+	const Type& operator [] (std::size_t row) const
 		/// Returns the field value in specified row.
 	{
 		return value(row);
@@ -132,7 +133,7 @@ public:
 	void reset()
 		/// Clears and shrinks the storage.
 	{
-		C().swap(*_pData);
+		Container().swap(*_pData);
 	}
 
 	const std::string& name() const
@@ -187,7 +188,7 @@ private:
 
 
 template <>
-class Column<bool, std::vector<bool> >
+class Column<std::vector<bool> >
 	/// The std::vector<bool> specialization for the Column class.
 	/// 
 	/// This specialization is necessary due to the nature of std::vector<bool>.
@@ -339,7 +340,7 @@ private:
 
 
 template <class T>
-class Column<T, std::list<T> >
+class Column<std::list<T> >
 	/// Column specialization for std::list
 {
 public:
@@ -485,8 +486,8 @@ private:
 };
 
 
-template <typename T, typename C>
-inline void swap(Column<T,C>& c1, Column<T,C>& c2)
+template <typename C>
+inline void swap(Column<C>& c1, Column<C>& c2)
 {
 	c1.swap(c2);
 }

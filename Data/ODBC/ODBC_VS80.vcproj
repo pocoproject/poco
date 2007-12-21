@@ -246,11 +246,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\ODBCColumn.h"
+					RelativePath=".\include\Poco\Data\ODBC\ODBCException.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\ODBCException.h"
+					RelativePath=".\include\Poco\Data\ODBC\ODBCMetaColumn.h"
 					>
 				</File>
 				<File
@@ -314,11 +314,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\ODBCColumn.cpp"
+					RelativePath=".\src\ODBCException.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\ODBCException.cpp"
+					RelativePath=".\src\ODBCMetaColumn.cpp"
 					>
 				</File>
 				<File

@@ -380,7 +380,7 @@ void DataTest::testColumnVector()
 	pData->push_back(4);
 	pData->push_back(5);
 	
-	Column<int, std::vector<int> > c(mc, pData);
+	Column<std::vector<int> > c(mc, pData);
 
 	assert (c.rowCount() == 5);
 	assert (c[0] == 1);
@@ -401,7 +401,7 @@ void DataTest::testColumnVector()
 	}
 	catch (RangeException&) { }
 
-	Column<int, std::vector<int> > c1 = c;
+	Column<std::vector<int> > c1 = c;
 
 	assert (c1.rowCount() == 5);
 	assert (c1[0] == 1);
@@ -410,7 +410,7 @@ void DataTest::testColumnVector()
 	assert (c1[3] == 4);
 	assert (c1[4] == 5);
 
-	Column<int, std::vector<int> > c2(c1);
+	Column<std::vector<int> > c2(c1);
 
 	assert (c2.rowCount() == 5);
 	assert (c2[0] == 1);
@@ -445,8 +445,8 @@ void DataTest::testColumnVector()
 	pV2->push_back(3);
 	pV2->push_back(2);
 	pV2->push_back(1);
-	Column<int, std::vector<int> > c3(mc, pV1);
-	Column<int, std::vector<int> > c4(mc, pV2);
+	Column<std::vector<int> > c3(mc, pV1);
+	Column<std::vector<int> > c4(mc, pV2);
 	
 	Poco::Data::swap(c3, c4);
 	assert (c3[0] == 5);
@@ -487,7 +487,7 @@ void DataTest::testColumnVectorBool()
 	pData->push_back(false);
 	pData->push_back(true);
 	
-	Column<bool, std::vector<bool> > c(mc, pData);
+	Column<std::vector<bool> > c(mc, pData);
 
 	assert (c.rowCount() == 5);
 	assert (c[0] == true);
@@ -504,7 +504,7 @@ void DataTest::testColumnVectorBool()
 	}
 	catch (RangeException&) { }
 
-	Column<bool, std::vector<bool> > c1 = c;
+	Column<std::vector<bool> > c1 = c;
 
 	assert (c1.rowCount() == 5);
 	assert (c1[0] == true);
@@ -513,7 +513,7 @@ void DataTest::testColumnVectorBool()
 	assert (c1[3] == false);
 	assert (c1[4] == true);
 
-	Column<bool, std::vector<bool> > c2(c1);
+	Column<std::vector<bool> > c2(c1);
 
 	assert (c2.rowCount() == 5);
 	assert (c2[0] == true);
@@ -541,7 +541,7 @@ void DataTest::testColumnVectorBool()
 void DataTest::testColumnDeque()
 {
 	typedef std::deque<int> ContainerType;
-	typedef Column<int> ColumnType;
+	typedef Column<ContainerType> ColumnType;
 
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 
@@ -624,8 +624,8 @@ void DataTest::testColumnDeque()
 	pV2->push_back(3);
 	pV2->push_back(2);
 	pV2->push_back(1);
-	Column<int> c3(mc, pV1);
-	Column<int> c4(mc, pV2);
+	Column<ContainerType> c3(mc, pV1);
+	Column<ContainerType> c4(mc, pV2);
 	
 	Poco::Data::swap(c3, c4);
 	assert (c3[0] == 5);
@@ -658,7 +658,7 @@ void DataTest::testColumnDeque()
 void DataTest::testColumnList()
 {
 	typedef std::list<int> ContainerType;
-	typedef Column<int, ContainerType> ColumnType;
+	typedef Column<ContainerType> ColumnType;
 
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 
@@ -739,8 +739,8 @@ void DataTest::testColumnList()
 	pV2->push_back(3);
 	pV2->push_back(2);
 	pV2->push_back(1);
-	Column<int, ContainerType> c3(mc, pV1);
-	Column<int, ContainerType> c4(mc, pV2);
+	Column<ContainerType> c3(mc, pV1);
+	Column<ContainerType> c4(mc, pV2);
 	
 	Poco::Data::swap(c3, c4);
 	assert (c3[0] == 5);

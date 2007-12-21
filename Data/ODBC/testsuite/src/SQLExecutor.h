@@ -38,6 +38,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
@@ -51,7 +52,7 @@
 		Poco::Data::ODBC::EnvironmentException ee(h); \
 		std::cout << ee.toString() << std::endl; \
 	} \
-	assert (SQL_SUCCEEDED(r));
+	assert (SQL_SUCCEEDED(r))
 
 
 #define poco_odbc_check_dbc(r, h) \
@@ -60,7 +61,7 @@
 		Poco::Data::ODBC::ConnectionException ce(h); \
 		std::cout << ce.toString() << std::endl; \
 	} \
-	assert (SQL_SUCCEEDED(r));
+	assert (SQL_SUCCEEDED(r))
 
 
 #define poco_odbc_check_stmt(r, h) \
@@ -69,7 +70,7 @@
 		Poco::Data::ODBC::StatementException se(h); \
 		std::cout << se.toString() << std::endl; \
 	} \
-	assert (SQL_SUCCEEDED(r));
+	assert (SQL_SUCCEEDED(r))
 
 
 #define poco_odbc_check_desc(r, h) \
@@ -78,7 +79,17 @@
 		Poco::Data::ODBC::DescriptorException de(h); \
 		std::cout << de.toString() << std::endl; \
 	} \
-	assert (SQL_SUCCEEDED(r));
+	assert (SQL_SUCCEEDED(r))
+
+
+#define poco_data_using_statements using Poco::Data::now; \
+		using Poco::Data::into; \
+		using Poco::Data::use; \
+		using Poco::Data::bulk; \
+		using Poco::Data::limit; \
+		using Poco::Data::BLOB; \
+		using Poco::Data::ODBC::ConnectionException; \
+		using Poco::Data::ODBC::StatementException
 
 
 class SQLExecutor: public CppUnit::TestCase
@@ -148,6 +159,8 @@ public:
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
 	void doBulkWithBool(Poco::UInt32 size)
 	{
+		poco_data_using_statements;
+
 		std::string funct = "doBulkWithBool()";
 		C1 ints;
 		C2 strings;
@@ -287,13 +300,15 @@ public:
 	template <typename C1, typename C2, typename C3, typename C4, typename C5>
 	void doBulk(Poco::UInt32 size)
 	{
+		poco_data_using_statements;
+
 		std::string funct = "doBulk()";
 		C1 ints;
 		C2 strings;
 		C3 blobs;
 		C4 floats;
 		C5 dateTimes(size);
-		
+	
 		for (int i = 0; i < size; ++i)
 		{
 			ints.push_back(i);
@@ -431,6 +446,8 @@ public:
 	template <typename C1, typename C2>
 	void blobContainer(int size)
 	{
+		poco_data_using_statements;
+
 		std::string funct = "blobContainer()";
 		C1 lastName(size, "lastname");
 		C1 firstName(size, "firstname");
@@ -464,6 +481,7 @@ public:
 	void tupleVector();
 
 	void internalExtraction();
+	void internalBulkExtraction();
 	void internalStorageType();
 	void nulls();
 	void notNulls(const std::string& sqlState = "23502");

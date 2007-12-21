@@ -1,11 +1,11 @@
 //
-// ODBCColumn.cpp
+// ODBCMetaColumn.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCColumn.cpp#5 $
+// $Id: //poco/Main/Data/ODBC/src/ODBCMetaColumn.cpp#5 $
 //
 // Library: ODBC
 // Package: ODBC
-// Module:  ODBCColumn
+// Module:  ODBCMetaColumn
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,7 +34,7 @@
 //
 
 
-#include "Poco/Data/ODBC/ODBCColumn.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
 
 
@@ -43,7 +43,7 @@ namespace Data {
 namespace ODBC {
 
 
-ODBCColumn::ODBCColumn(const StatementHandle& rStmt, std::size_t position) : 
+ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) : 
 	MetaColumn(position),
 	_rStmt(rStmt)
 {
@@ -51,12 +51,12 @@ ODBCColumn::ODBCColumn(const StatementHandle& rStmt, std::size_t position) :
 }
 
 	
-ODBCColumn::~ODBCColumn()
+ODBCMetaColumn::~ODBCMetaColumn()
 {
 }
 
 
-void ODBCColumn::getDescription()
+void ODBCMetaColumn::getDescription()
 {
 	memset(_columnDesc.name, 0, NAME_BUFFER_LENGTH);
 	_columnDesc.nameBufferLength = 0;
@@ -80,7 +80,7 @@ void ODBCColumn::getDescription()
 }
 
 
-void ODBCColumn::init()
+void ODBCMetaColumn::init()
 {
 	getDescription();
 
