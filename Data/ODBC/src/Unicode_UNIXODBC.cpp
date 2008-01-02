@@ -1,7 +1,7 @@
 //
 // Unicode.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Unicode_UNIX.cpp#3 $
+// $Id: //poco/Main/Data/ODBC/src/Unicode_UNIXODBC.cpp#3 $
 //
 // Library: ODBC
 // Package: ODBC
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
+#include "Poco/Data/ODBC/Unicode_UNIX.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 
@@ -109,19 +110,19 @@ SQLRETURN SQLConnect(SQLHDBC hdbc,
 	SQLCHAR*    szAuthStr,
 	SQLSMALLINT cbAuthStr)
 {
-	Buffer<SQLWCHAR> sqlDSN(cbDSN);
+	std::string sqlDSN;
 	makeUTF16(szDSN, cbDSN, sqlDSN);
 
-	Buffer<SQLWCHAR> sqlUID(cbUID);
+	std::string sqlUID;
 	makeUTF16(szUID, cbUID, sqlUID);
 
-	Buffer<SQLWCHAR> sqlPWD(cbAuthStr);
+	std::string sqlPWD;
 	makeUTF16(szAuthStr, cbAuthStr, sqlPWD);
 	
 	return SQLConnectW(hdbc, 
-		sqlDSN.begin(), cbDSN, 
-		sqlUID.begin(),	cbUID, 
-		sqlPWD.begin(), cbAuthStr);
+		(SQLWCHAR*) sqlDSN.c_str(), cbDSN, 
+		(SQLWCHAR*) sqlUID.c_str(),	cbUID, 
+		(SQLWCHAR*) sqlPWD.c_str(), cbAuthStr);
 }
 
 
@@ -169,10 +170,10 @@ SQLRETURN SQLExecDirect(SQLHSTMT hstmt,
 	SQLCHAR*   szSqlStr,
 	SQLINTEGER cbSqlStr)
 {
-	Buffer<SQLWCHAR> sqlStr(cbSqlStr);
+	std::string sqlStr;
 	makeUTF16(szSqlStr, cbSqlStr, sqlStr);
 
-	return SQLExecDirectW(hstmt, sqlStr.begin(), cbSqlStr);
+	return SQLExecDirectW(hstmt, (SQLWCHAR*) sqlStr.c_str(), cbSqlStr);
 }
 
 
@@ -222,13 +223,13 @@ SQLRETURN SQLSetDescField(SQLHDESC hdesc,
 {
 	if (isString(rgbValue, cbValueMax))
 	{
-		Buffer<SQLWCHAR> str(cbValueMax);
+		std::string str;
 		makeUTF16((SQLCHAR*) rgbValue, cbValueMax, str);
 
 		return SQLSetDescFieldW(hdesc,
 			iRecord, 
 			iField,
-			(SQLPOINTER) str.begin(), 
+			(SQLPOINTER) str.c_str(), 
 			(SQLINTEGER) str.size() * sizeof(SQLWCHAR));
 	}
 
@@ -356,10 +357,10 @@ SQLRETURN SQLPrepare(SQLHSTMT hstmt,
 	SQLCHAR*   szSqlStr,
 	SQLINTEGER cbSqlStr)
 {
-	Buffer<SQLWCHAR> sqlStr(cbSqlStr);
+	std::string sqlStr;
 	makeUTF16(szSqlStr, cbSqlStr, sqlStr);
 
-	return SQLPrepareW(hstmt, sqlStr.begin(), (SQLINTEGER) sqlStr.size());
+	return SQLPrepareW(hstmt, (SQLWCHAR*) sqlStr.c_str(), (SQLINTEGER) sqlStr.size());
 }
 
 
@@ -370,12 +371,12 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC hdbc,
 {
 	if (isString(rgbValue, cbValue))
 	{
-		Buffer<SQLWCHAR> str(cbValue);
+		std::string str;
 		makeUTF16((SQLCHAR*) rgbValue, cbValue, str);
 
 		return SQLSetConnectAttrW(hdbc,
 			fAttribute,
-			str.begin(), 
+			(SQLWCHAR*) str.c_str(), 
 			(SQLINTEGER) str.size() * sizeof(SQLWCHAR));
 	}
 
@@ -398,12 +399,12 @@ SQLRETURN SQLSetStmtAttr(SQLHSTMT hstmt,
 {
 	if (isString(rgbValue, cbValueMax))
 	{
-		Buffer<SQLWCHAR> str(cbValueMax);
+		std::string str;
 		makeUTF16((SQLCHAR*) rgbValue, cbValueMax, str);
 
 		return SQLSetStmtAttrW(hstmt,
 			fAttribute,
-			str.begin(),
+			(SQLWCHAR*) str.c_str(),
 			(SQLINTEGER) str.size());
 	}
 
@@ -577,13 +578,13 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 	if (SQL_NTS == len) 
 		len = (SQLSMALLINT) std::strlen((const char*) szConnStrIn) + 1;
 
-	Buffer<SQLWCHAR> connStrIn(len);
+	std::string connStrIn;
 	makeUTF16(szConnStrIn, len, connStrIn);
 	
 	Buffer<SQLWCHAR> out(cbConnStrOutMax);
 	SQLRETURN rc = SQLDriverConnectW(hdbc,
 		hwnd,
-		connStrIn.begin(),
+		(SQLWCHAR*) connStrIn.c_str(),
 		(SQLSMALLINT) connStrIn.size(),
 		out.begin(),
 		cbConnStrOutMax,
@@ -603,13 +604,13 @@ SQLRETURN SQLBrowseConnect(SQLHDBC hdbc,
 	SQLSMALLINT  cbConnStrOutMax,
 	SQLSMALLINT* pcbConnStrOut)
 {
-	Buffer<SQLWCHAR> str(cbConnStrIn);
+	std::string str;
 	makeUTF16(szConnStrIn, cbConnStrIn, str);
 
 	Buffer<SQLWCHAR> bufConnStrOut(cbConnStrOutMax);
 
 	SQLRETURN rc = SQLBrowseConnectW(hdbc,
-		str.begin(),
+		(SQLWCHAR*) str.c_str(),
 		(SQLSMALLINT) str.size(),
 		bufConnStrOut.begin(),
 		(SQLSMALLINT) bufConnStrOut.size(),
@@ -660,13 +661,13 @@ SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 	SQLINTEGER  cbSqlStrMax,
 	SQLINTEGER* pcbSqlStr)
 {
-	Buffer<SQLWCHAR> str(cbSqlStrIn);
+	std::string str;
 	makeUTF16(szSqlStrIn, cbSqlStrIn, str);
 
 	Buffer<SQLWCHAR> bufSQLOut(cbSqlStrMax);
 
 	SQLRETURN rc = SQLNativeSqlW(hdbc,
-		str.begin(),
+		(SQLWCHAR*) str.c_str(),
 		(SQLINTEGER) str.size(),
 		bufSQLOut.begin(),
 		(SQLINTEGER) bufSQLOut.size(),

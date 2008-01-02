@@ -278,7 +278,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\Unicode_UNIX.h"
+					RelativePath=".\include\Poco\Data\ODBC\Unicode_UNIXODBC.h"
 					>
 				</File>
 				<File
@@ -346,7 +346,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Unicode_UNIX.cpp"
+					RelativePath=".\src\Unicode_UNIXODBC.cpp"
 					>
 					<FileConfiguration
 						Name="debug_shared|Win32"

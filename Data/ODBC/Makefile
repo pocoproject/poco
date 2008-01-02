@@ -10,8 +10,10 @@ include $(POCO_BASE)/build/rules/global
 
 ifeq (0, $(shell test -e /usr/lib/libodbc.so; echo $$?))
 SYSLIBS += -lodbc -lodbcinst
+COMMONFLAGS += -DPOCO_UNIXODBC
 else ifeq (0, $(shell test -e /usr/lib/libiodbc.so; echo $$?))
 SYSLIBS += -liodbc -liodbcinst
+COMMONFLAGS += -DPOCO_IODBC
 else
 $(error No ODBC library found. Please install unixODBC or iODBC and try again)
 endif

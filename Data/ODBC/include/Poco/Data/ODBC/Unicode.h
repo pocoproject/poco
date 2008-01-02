@@ -57,7 +57,11 @@
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
 	#define POCO_ODBC_UNICODE_WINDOWS
 #elif defined(POCO_OS_FAMILY_UNIX) && defined(UNICODE)
-	#define POCO_ODBC_UNICODE_UNIX
+	#ifdef POCO_UNIXODBC
+		#define POCO_ODBC_UNICODE_UNIXODBC
+	#elif defined(POCO_IODBC)
+		#error "iODBC Unicode not supported"
+	#endif
 #endif
 
 
@@ -374,7 +378,7 @@ inline SQLINTEGER stringLength(SQLPOINTER pValue, SQLINTEGER length)
 }
 
 
-#if !defined(POCO_ODBC_UNICODE_WINDOWS) && !defined(POCO_ODBC_UNICODE_UNIX)
+#if !defined(POCO_ODBC_UNICODE_WINDOWS) && !defined(POCO_ODBC_UNICODE_UNIXODBC)
 
 
 ///

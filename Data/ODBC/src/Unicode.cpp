@@ -39,6 +39,6 @@
 
 #if defined(POCO_ODBC_UNICODE_WINDOWS)
 #include "Unicode_WIN32.cpp"
-#elif defined(POCO_ODBC_UNICODE_UNIX)
-#include "Unicode_UNIX.cpp"
+#elif defined(POCO_ODBC_UNICODE_UNIXODBC)
+#include "Unicode_UNIXODBC.cpp"
 #endif
