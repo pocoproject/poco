@@ -68,7 +68,7 @@ void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target)
 	TextConverter converter(utf8Encoding, utf16Encoding);
 
 	if (0 != converter.convert(pSQLChar, len, target))
-		throw SyntaxException("Error converting UTF-8 to UTF-16");
+		throw DataFormatException("Error converting UTF-8 to UTF-16");
 }
 
 
@@ -80,7 +80,7 @@ void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQ
 
 	std::string result;
 	if (0 != converter.convert(buffer.begin(), length * sizeof(SQLWCHAR), result))
-		throw SyntaxException("Error converting UTF-16 to UTF-8");
+		throw DataFormatException("Error converting UTF-16 to UTF-8");
 	
 	std::memset(pTarget, 0, targetLength);
 	std::strncpy((char*) pTarget, result.c_str(), result.size() < targetLength ? result.size() : targetLength);

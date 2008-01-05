@@ -46,22 +46,22 @@ namespace ODBC {
 
 
 void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target);
-	/// Utility function for conversion from ASCII to UTF-16
+	/// Utility function for conversion from UTF-8 to UTF-16
 
 
 inline void makeUTF16(SQLCHAR* pSQLChar, SQLSMALLINT length, std::string& target)
-	/// Utility function for conversion from ASCII to UTF-16.
+	/// Utility function for conversion from UTF-8 to UTF-16.
 {
 	makeUTF16(pSQLChar, (SQLINTEGER) length, target);
 }
 
 
 inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLINTEGER targetLength);
-	/// Utility function for conversion from UTF-16 to ASCII.
+	/// Utility function for conversion from UTF-16 to UTF-8.
 
 
 inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLSMALLINT targetLength)
-	/// Utility function for conversion from UTF-16 to ASCII.
+	/// Utility function for conversion from UTF-16 to UTF-8.
 {
 	makeUTF8(buffer, length, pTarget, (SQLINTEGER) targetLength);
 }
