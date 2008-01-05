@@ -55,25 +55,30 @@ namespace Data {
 template <class C>
 class Column
 	/// Column class is column data container.
-	/// Data (a pointer to container) is assigned to the class 
-	/// through either constructor or set() member function.
-	/// Construction with null pointer is not allowed.
+	/// Data (a pointer to underlying STL container) is assigned to the class 
+	/// at construction time. Construction with null pointer is not allowed.
 	/// This class owns the data assigned to it and deletes the storage on destruction.
 {
 public:
-	typedef C Container;
-	typedef typename Container::const_iterator Iterator;
-	typedef typename Container::const_reverse_iterator RIterator;
-	typedef typename Container::size_type Size;
-	typedef typename Container::value_type Type;
+	typedef C                                  Container;
+	typedef Poco::SharedPtr<C>                 ContainerPtr;
+	typedef typename C::const_iterator         Iterator;
+	typedef typename C::const_reverse_iterator RIterator;
+	typedef typename C::size_type              Size;
+	typedef typename C::value_type             Type;
 
-	Column(const MetaColumn& metaColumn, Container* pData): _metaColumn(metaColumn), _pData(pData)
+	Column(const MetaColumn& metaColumn, Container* pData): 
+		_metaColumn(metaColumn),
+		_pData(pData)
 		/// Creates the Column.
 	{
-		poco_check_ptr (_pData);
+		if (!_pData)
+			throw NullPointerException("Container pointer must point to valid storage.");
 	}
 
-	Column(const Column& col): _metaColumn(col._metaColumn), _pData(col._pData)
+	Column(const Column& col): 
+		_metaColumn(col._metaColumn), 
+		_pData(col._pData)
 		/// Creates the Column.
 	{
 	}
@@ -182,8 +187,8 @@ public:
 private:
 	Column();
 
-	MetaColumn _metaColumn;
-	Poco::SharedPtr<Container> _pData;
+	MetaColumn   _metaColumn;
+	ContainerPtr _pData;
 };
 
 
@@ -202,10 +207,11 @@ class Column<std::vector<bool> >
 	/// column data.
 {
 public:
-	typedef std::vector<bool> Container;
-	typedef Container::const_iterator Iterator;
+	typedef std::vector<bool>                 Container;
+	typedef Poco::SharedPtr<Container>        ContainerPtr;
+	typedef Container::const_iterator         Iterator;
 	typedef Container::const_reverse_iterator RIterator;
-	typedef Container::size_type Size;
+	typedef Container::size_type              Size;
 
 	Column(const MetaColumn& metaColumn, Container* pData): 
 		_metaColumn(metaColumn), 
@@ -333,8 +339,8 @@ public:
 private:
 	Column();
 
-	MetaColumn _metaColumn;
-	Poco::SharedPtr<Container> _pData;
+	MetaColumn               _metaColumn;
+	ContainerPtr             _pData;
 	mutable std::deque<bool> _deque;
 };
 
@@ -344,18 +350,23 @@ class Column<std::list<T> >
 	/// Column specialization for std::list
 {
 public:
-	typedef std::list<T> List;
-	typedef typename List::const_iterator Iterator;
-	typedef typename List::const_reverse_iterator RIterator;
-	typedef typename List::size_type Size;
+	typedef std::list<T>                               Container;
+	typedef Poco::SharedPtr<Container>                 ContainerPtr;
+	typedef typename Container::const_iterator         Iterator;
+	typedef typename Container::const_reverse_iterator RIterator;
+	typedef typename Container::size_type              Size;
 
-	Column(const MetaColumn& metaColumn, std::list<T>* pData): _metaColumn(metaColumn), _pData(pData)
+	Column(const MetaColumn& metaColumn, std::list<T>* pData): 
+		_metaColumn(metaColumn), 
+		_pData(pData)
 		/// Creates the Column.
 	{
 		poco_check_ptr (_pData);
 	}
 
-	Column(const Column& col): _metaColumn(col._metaColumn), _pData(col._pData)
+	Column(const Column& col):
+		_metaColumn(col._metaColumn),
+		_pData(col._pData)
 		/// Creates the Column.
 	{
 	}
@@ -381,7 +392,7 @@ public:
 		swap(_pData, other._pData);
 	}
 
-	List& data()
+	Container& data()
 		/// Returns reference to contained data.
 	{
 		return *_pData;
@@ -481,8 +492,8 @@ public:
 private:
 	Column();
 
-	MetaColumn _metaColumn;
-	Poco::SharedPtr<List> _pData;
+	MetaColumn   _metaColumn;
+	ContainerPtr _pData;
 };
 
 

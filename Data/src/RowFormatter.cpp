@@ -35,26 +35,24 @@
 
 
 #include "Poco/Data/RowFormatter.h"
-#include "Poco/Data/Row.h"
 #include "Poco/Exception.h"
+#include <iomanip>
 
 
 namespace Poco {
 namespace Data {
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
-const std::string RowFormatter::EOL = "\r\n";
-#elif (POCO_OS == POCO_OS_MAC_OS_X)
-const std::string RowFormatter::EOL = "\r";
-#else
-const std::string RowFormatter::EOL = "\n";
-#endif
+RowFormatter::RowFormatter(std::streamsize width):
+	_width(width)
+{
+}
 
 
-RowFormatter::RowFormatter(Row* pRow): 
-	_pRow(pRow), 
-	_separator("\t")
+RowFormatter::RowFormatter(const std::string& prefix, const std::string& postfix):
+	_width(DEFAULT_COLUMN_WIDTH),
+	_prefix(prefix), 
+	_postfix(postfix)
 {
 }
 
@@ -64,40 +62,44 @@ RowFormatter::~RowFormatter()
 }
 
 
-std::string& RowFormatter::formatNames(std::string& names)
+std::string& RowFormatter::formatNames(const NameVecPtr pNames, std::string& formattedNames) const
 {
-	if (!_pRow)
-		throw NullPointerException("Null row.");
+	std::ostringstream str;
+	std::string line(_width * pNames->size(), '-');
 
-	Row::NameVec::const_iterator it = _pRow->names()->begin();
-	Row::NameVec::const_iterator end = _pRow->names()->end();
+	NameVec::const_iterator it = pNames->begin();
+	NameVec::const_iterator end = pNames->end();
 	for (; it != end; ++it)
 	{
-		names.append(*it);
-		names.append(_separator);
+		str << std::left << std::setw(_width) << *it;
 	}
-	names.replace(names.find_last_of(_separator), _separator.length(), EOL);
+	str << std::endl << line << std::endl;
 
-	return names;
+	return formattedNames = str.str();
 }
 
 
-std::string& RowFormatter::formatValues(std::string& values)
+std::string& RowFormatter::formatValues(const ValueVec& vals, std::string& formattedValues) const
 {
-	if (!_pRow)
-		throw NullPointerException("Null row.");
+	std::ostringstream str;
 
-	Row::ValueVec::const_iterator it = _pRow->values().begin();
-	Row::ValueVec::const_iterator end = _pRow->values().end();
+	ValueVec::const_iterator it = vals.begin();
+	ValueVec::const_iterator end = vals.end();
 	for (; it != end; ++it)
 	{
-		values.append(it->convert<std::string>());
-		values.append(_separator);
+		if (it->isNumeric())
+		{
+			str << std::right 
+				<< std::fixed
+				<< std::setprecision(2);
+		}
+		else str << std::left;
+
+		str << std::setw(_width) << it->convert<std::string>();
 	}
-	values.replace(values.find_last_of(_separator), _separator.length(), EOL);
+	str << std::endl;
 
-	return values;
+	return formattedValues = str.str();
 }
-
 
 } } // namespace Poco::Data

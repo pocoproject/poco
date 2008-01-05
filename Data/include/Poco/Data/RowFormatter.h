@@ -41,47 +41,64 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/DynamicAny.h"
+#include <sstream>
+#include <vector>
 
 
 namespace Poco {
 namespace Data {
 
 
-class Row;
-
-
 class Data_API RowFormatter
 	/// Row formatter is a rudimentary formatting class providing
-	/// basic row formatting. This class will separate field names and
-	/// filed values by a tab ('\t') and append the platform specific
-	/// end of line at the end of each row. For custom formatting
+	/// basic row formatting. For custom formatting
 	/// strategies, inherit from this class and override formatNames()
-	/// and formaValues() member functions.
+	/// and formatValues() member functions.
 {
 public:
-	static const std::string EOL;
+	typedef std::vector<std::string>             NameVec;
+	typedef SharedPtr<std::vector<std::string> > NameVecPtr;
+	typedef std::vector<DynamicAny>              ValueVec;
 
-	RowFormatter(Row* pRow = 0);
-		/// Creates the RowFormatter.
+	static const int DEFAULT_COLUMN_WIDTH = 16;
+
+	RowFormatter(std::streamsize width);
+		/// Creates the RowFormatter and sets the column width to specified value.
+
+	RowFormatter(const std::string& prefix = "", const std::string& postfix = "");
+		/// Creates the RowFormatter and sets the prefix and postfix to specified values.
 
 	virtual ~RowFormatter();
 		/// Destroys the RowFormatter.
 
-	void setRow(Row* pRow);
-		/// Assigns the row to this formatter.
+	const std::string& prefix() const;
+		/// Returns prefix string;
 
-	virtual std::string& formatNames(std::string& names);
+	virtual std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) const;
 		/// Formats the row field names.
 
-	virtual std::string& formatValues(std::string& values);
+	virtual std::string& formatValues(const ValueVec& vals, std::string& formattedValues) const;
 		/// Formats the row values.
 
-private:
-	RowFormatter(const RowFormatter&);
-	RowFormatter& operator = (const RowFormatter&);
+	const std::string& postfix() const;
+		/// Returns postfix string;
 
-	Row*        _pRow;
-	std::string _separator;
+	void setWidth(std::streamsize width);
+		/// Sets the column width.
+
+	std::streamsize getWidth() const;
+		/// Returns the column width.
+
+protected:
+	void setPrefix(const std::string& prefix);
+	void setPostfix(const std::string& postfix);
+
+private:
+	std::streamsize _width;
+	std::string     _prefix;
+	std::string     _postfix;
 };
 
 
@@ -89,11 +106,39 @@ private:
 /// inlines
 ///
 
-
-inline void RowFormatter::setRow(Row* pRow)
+inline void RowFormatter::setWidth(std::streamsize width)
 {
-	poco_check_ptr (pRow);
-	_pRow = pRow;
+	_width = width;
+}
+
+
+inline std::streamsize RowFormatter::getWidth() const
+{
+	return _width;
+}
+
+
+inline void RowFormatter::setPrefix(const std::string& prefix)
+{
+	_prefix = prefix;
+}
+
+
+inline void RowFormatter::setPostfix(const std::string& postfix)
+{
+	_postfix = postfix;
+}
+
+
+inline const std::string& RowFormatter::prefix() const
+{
+	return _prefix;
+}
+
+
+inline const std::string& RowFormatter::postfix() const
+{
+	return _postfix;
 }
 
 

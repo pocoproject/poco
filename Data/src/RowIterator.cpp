@@ -48,9 +48,16 @@ namespace Data {
 const int RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
-RowIterator::RowIterator(RecordSet& recordSet, bool positionEnd): 
-	_recordSet(recordSet),
-	_position((0 == recordSet.rowCount()) || positionEnd ? POSITION_END : 0)
+RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd): 
+	_pRecordSet(pRecordSet),
+	_position((0 == pRecordSet->rowCount()) || positionEnd ? POSITION_END : 0)
+{
+}
+
+
+RowIterator::RowIterator(const RowIterator& other):
+	_pRecordSet(other._pRecordSet),
+	_position(other._position)
 {
 }
 
@@ -60,26 +67,54 @@ RowIterator::~RowIterator()
 }
 
 
-void RowIterator::increment()
+RowIterator& RowIterator::operator = (const RowIterator& other)
+{
+	RowIterator tmp(other);
+	swap(tmp);
+	return *this;
+}
+
+
+void RowIterator::swap(RowIterator& other)
+{
+	using std::swap;
+	
+	swap(_pRecordSet, other._pRecordSet);
+	swap(_position, other._position);
+}
+
+
+void RowIterator::increment() const
 {
 	if (POSITION_END == _position)
 		throw RangeException("End of iterator reached.");
 
-	if (_position < _recordSet.rowCount() - 1)
+	if (_position < _pRecordSet->rowCount() - 1)
 		++_position;
 	else
 		_position = POSITION_END;
 }
 
 
-void RowIterator::decrement()
+void RowIterator::decrement() const
 {
 	if (0 == _position)
 		throw RangeException("Beginning of iterator reached.");
 	else if (POSITION_END == _position)
-		_position = _recordSet.rowCount() - 1;
+		_position = _pRecordSet->rowCount() - 1;
 	else
 		--_position;
+}
+
+
+void RowIterator::setPosition(std::size_t pos) const
+{
+	if (pos < _pRecordSet->rowCount())
+		_position = pos;
+	else if (pos == _pRecordSet->rowCount())
+		_position = POSITION_END;
+	else
+		throw RangeException("Invalid position argument.");
 }
 
 
@@ -88,7 +123,7 @@ Row& RowIterator::operator * () const
 	if (POSITION_END == _position)
 		throw InvalidAccessException("End of iterator reached.");
 
-	return _recordSet.row(_position);
+	return _pRecordSet->row(_position);
 }
 
 
@@ -97,37 +132,54 @@ Row* RowIterator::operator -> () const
 	if (POSITION_END == _position)
 		throw InvalidAccessException("End of iterator reached.");
 
-	return &_recordSet.row(_position);
+	return &_pRecordSet->row(_position);
 }
 
 
-std::size_t RowIterator::operator ++ ()
+const RowIterator& RowIterator::operator ++ () const
 {
 	increment();
-	return _position;
+	return *this;
 }
 
 
-std::size_t RowIterator::operator ++ (int)
+RowIterator RowIterator::operator ++ (int) const
 {
-	std::size_t oldPos = _position;
+	RowIterator old(*this);
 	increment();
-	return oldPos;
+	return old;
 }
 
 
-std::size_t RowIterator::operator -- ()
+const RowIterator& RowIterator::operator -- () const
 {
 	decrement();
-	return _position;
+	return *this;
 }
 
 
-std::size_t RowIterator::operator -- (int)
+RowIterator RowIterator::operator -- (int) const
 {
-	std::size_t oldPos = _position;
+	RowIterator old(*this);
 	decrement();
-	return oldPos;
+	return old;
+}
+
+
+RowIterator RowIterator::operator + (std::size_t diff) const
+{
+	RowIterator ri(*this);
+	ri.setPosition(_position + diff);
+	return ri;
+}
+
+
+RowIterator RowIterator::operator - (std::size_t diff) const
+{
+	if (diff > _position) throw RangeException("Invalid position argument.");
+	RowIterator ri(*this);
+	ri.setPosition(_position - diff);
+	return ri;
 }
 
 

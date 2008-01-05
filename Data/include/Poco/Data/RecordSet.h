@@ -45,10 +45,12 @@
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
+#include "Poco/Data/RowFormatter.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/String.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/Exception.h"
+#include <ostream>
 
 
 namespace Poco {
@@ -79,15 +81,21 @@ class Data_API RecordSet: private Statement
 {
 public:
 	typedef std::map<std::size_t, Row*> RowMap;
-	typedef RowIterator Iterator;
+	typedef const RowIterator           ConstIterator;
+	typedef RowIterator                 Iterator;
 
 	using Statement::isNull;
 
 	explicit RecordSet(const Statement& rStatement);
 		/// Creates the RecordSet.
 
-	explicit RecordSet(Session& rSession, const std::string& query);
+	explicit RecordSet(Session& rSession, 
+		const std::string& query,
+		RowFormatter* pRowFormatter = 0);
 		/// Creates the RecordSet.
+
+	RecordSet(const RecordSet& other);
+		/// Copy-creates the recordset.
 
 	~RecordSet();
 		/// Destroys the RecordSet.
@@ -101,37 +109,35 @@ public:
 	std::size_t columnCount() const;
 		/// Returns the number of rows in the recordset.
 
-	template <class C, class E>
+	template <class C>
 	const Column<C>& column(const std::string& name) const
 		/// Returns the reference to the first Column with the specified name.
 	{
-		return column<C,E>(columnPosition<C,E>(name));
+		if (isBulkExtraction())
+		{
+			typedef InternalBulkExtraction<C> E;
+			return columnImpl<C,E>(name);
+		}
+		else
+		{
+			typedef InternalExtraction<C> E;
+			return columnImpl<C,E>(name);
+		}
 	}
 
-	template <class C, class E>
+	template <class C>
 	const Column<C>& column(std::size_t pos) const
-		/// Returns the reference to column at specified location.
+		/// Returns the reference to column at specified position.
 	{
-		typedef typename C::value_type T;
-		typedef const E* ExtractionVecPtr;
-
-		const AbstractExtractionVec& rExtractions = extractions();
-
-		std::size_t s = rExtractions.size();
-		if (0 == s || pos >= s)
-			throw RangeException(format("Invalid column index: %z", pos));
-
-		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos].get());
-
-		if (pExtraction)
+		if (isBulkExtraction())
 		{
-			return pExtraction->column();
+			typedef InternalBulkExtraction<C> E;
+			return columnImpl<C,E>(pos);
 		}
-		else 
+		else
 		{
-			throw Poco::BadCastException(format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
-				pos,
-				std::string(typeid(T).name())));
+			typedef InternalExtraction<C> E;
+			return columnImpl<C,E>(pos);
 		}
 	}
 
@@ -148,27 +154,18 @@ public:
 			case STORAGE_VECTOR:
 			{
 				typedef std::vector<T> C;
-				if (isBulkExtraction())
-					return column<C, InternalBulkExtraction<C> >(col).value(row);
-				else
-					return column<C, InternalExtraction<C> >(col).value(row);
+				return column<C>(col).value(row);
 			}
 			case STORAGE_LIST:
 			{
 				typedef std::list<T> C;
-				if (isBulkExtraction())
-					return column<C, InternalBulkExtraction<C> >(col).value(row);
-				else
-					return column<C, InternalExtraction<C> >(col).value(row);
+				return column<C>(col).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
 				typedef std::deque<T> C;
-				if (isBulkExtraction())
-					return column<C, InternalBulkExtraction<C> >(col).value(row);
-				else
-					return column<C, InternalExtraction<C> >(col).value(row);
+				return column<C>(col).value(row);
 			}
 			default:
 				throw IllegalStateException("Invalid storage setting.");
@@ -184,27 +181,18 @@ public:
 			case STORAGE_VECTOR:
 			{
 				typedef std::vector<T> C;
-				if (isBulkExtraction())
-					return column<C, InternalBulkExtraction<C> >(name).value(row);
-				else
-					return column<C, InternalExtraction<C> >(name).value(row);
+				return column<C>(name).value(row);
 			}
 			case STORAGE_LIST:
 			{
 				typedef std::list<T> C;
-				if (isBulkExtraction())
-					return column<C, InternalBulkExtraction<C> >(name).value(row);
-				else
-					return column<C, InternalExtraction<C> >(name).value(row);
+				return column<C>(name).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
 				typedef std::deque<T> C;
-				if (isBulkExtraction())
-					return column<C, InternalBulkExtraction<C> >(name).value(row);
-				else
-					return column<C, InternalExtraction<C> >(name).value(row);
+				return column<C>(name).value(row);
 			}
 			default:
 				throw IllegalStateException("Invalid storage setting.");
@@ -225,8 +213,17 @@ public:
 		/// Returns the value in the given column of the current row
 		/// if the value is not NULL, or deflt otherwise.
 
-	const RowIterator& begin();
-		/// Moves the row cursor to the first row and returns the pointer to row.
+	ConstIterator& begin() const;
+		/// Returns the const row iterator.
+
+	ConstIterator& end() const;
+		/// Returns the const row iterator.
+
+	Iterator begin();
+		/// Returns the row iterator.
+
+	Iterator end();
+		/// Returns the row iterator.
 
 	bool moveFirst();
 		/// Moves the row cursor to the first row.
@@ -246,9 +243,6 @@ public:
 		///
 		/// Returns true if the row is available, or false
 		/// if there are no more rows available.
-
-	const RowIterator& end();
-		/// Moves the row cursor to the last row and returns null pointer.
 
 	bool moveLast();
 		/// Moves the row cursor to the last row.
@@ -294,6 +288,34 @@ public:
 	bool isNull(const std::string& name) const;
 		/// Returns true if column value of the current row is null.
 
+	void setFormatter(Row::FormatterPtr pRowFormatter);
+		/// Sets the row formatter for this recordset.
+		/// Row formatter is null pointer by default, indicating
+		/// use of default formatter for output formatting.
+		/// This function allows for custom formatters to be 
+		/// supplied by users. After setting a user supplied formatter,
+		/// to revert back to the default one, call this function with
+		/// zero argument.
+
+	std::ostream& copyNames(std::ostream& os) const;
+		/// Copies the column names to the target output stream.
+		/// Copied string is formatted by the current RowFormatter.
+
+	std::ostream& copyValues(std::ostream& os, 
+		std::size_t offset = 0, 
+		std::size_t length = RowIterator::POSITION_END) const;
+		/// Copies the data values to the supplied output stream.
+		/// The data set to be copied is starting at the specified offset 
+		/// from the recordset beginning. The number of rows to be copied
+		/// is specified by length argument.
+		/// An invalid combination of offset/length arguments shall
+		/// cause RangeException to be thrown.
+		/// Copied string is formatted by the current RowFormatter.
+
+	std::ostream& copy(std::ostream& os) const;
+		/// Copies the column names and values to the target output stream.
+		/// Copied strings are formatted by the current RowFormatter.
+
 private:
 	RecordSet();
 
@@ -329,16 +351,58 @@ private:
 			throw NotFoundException(format("Column type: %s, name: %s", std::string(typeid(T).name()), name));
 	}
 
-	std::size_t    _currentRow;
-	RowIterator*   _pBegin;
-	RowIterator*   _pEnd;
-	RowMap         _rowMap;
+	template <class C, class E>
+	const Column<C>& columnImpl(const std::string& name) const
+		/// Returns the reference to the first Column with the specified name.
+	{
+		return columnImpl<C,E>(columnPosition<C,E>(name));
+	}
+
+	template <class C, class E>
+	const Column<C>& columnImpl(std::size_t pos) const
+		/// Returns the reference to column at specified position.
+	{
+		typedef typename C::value_type T;
+		typedef const E* ExtractionVecPtr;
+
+		const AbstractExtractionVec& rExtractions = extractions();
+
+		std::size_t s = rExtractions.size();
+		if (0 == s || pos >= s)
+			throw RangeException(format("Invalid column index: %z", pos));
+
+		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos].get());
+
+		if (pExtraction)
+		{
+			return pExtraction->column();
+		}
+		else 
+		{
+			throw Poco::BadCastException(format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
+				pos,
+				std::string(typeid(T).name())));
+		}
+	}
+
+	std::size_t       _currentRow;
+	RowIterator*      _pBegin;
+	RowIterator*      _pEnd;
+	RowMap            _rowMap;
+	Row::FormatterPtr _pRowFormatter;
 };
 
 
 ///
 /// inlines
 ///
+
+inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs)
+{
+      return rs.copy(os);
+}
+
+
 inline std::size_t RecordSet::rowCount() const
 {
 	poco_assert (extractions().size());
@@ -431,12 +495,40 @@ inline bool RecordSet::isNull(const std::string& name) const
 }
 
 
-inline const RowIterator& RecordSet::end()
+inline RecordSet::ConstIterator& RecordSet::begin() const
 {
-	if (!_pEnd)
-		_pEnd = new RowIterator(*this, true);
+	return *_pBegin;
+}
 
+
+inline RecordSet::ConstIterator& RecordSet::end() const
+{
 	return *_pEnd;
+}
+
+
+inline RecordSet::Iterator RecordSet::begin()
+{
+	return *_pBegin;
+}
+
+
+inline RecordSet::Iterator RecordSet::end()
+{
+	return *_pEnd;
+}
+
+
+inline void RecordSet::setFormatter(Row::FormatterPtr pRowFormatter)
+{
+	_pRowFormatter = pRowFormatter;
+}
+
+
+inline std::ostream& RecordSet::copyNames(std::ostream& os) const
+{
+	os << (*_pBegin)->namesToString();
+	return os;
 }
 
 

@@ -52,17 +52,30 @@ namespace Data {
 RecordSet::RecordSet(const Statement& rStatement): 
 	Statement(rStatement),
 	_currentRow(0),
-	_pBegin(0),
-	_pEnd(0)
+	_pBegin(new RowIterator(this)),
+	_pEnd(new RowIterator(this, true))
 {
 }
 
 
-RecordSet::RecordSet(Session& rSession, const std::string& query): 
+RecordSet::RecordSet(Session& rSession, 
+	const std::string& query, 
+	RowFormatter* pRowFormatter): 
 	Statement((rSession << query, now)),
 	_currentRow(0),
-	_pBegin(0),
-	_pEnd(0)
+	_pBegin(new RowIterator(this)),
+	_pEnd(new RowIterator(this, true)),
+	_pRowFormatter(pRowFormatter)
+{
+}
+
+
+RecordSet::RecordSet(const RecordSet& other):
+	Statement(other.impl().duplicate()),
+	_currentRow(other._currentRow),
+	_pBegin(new RowIterator(this)),
+	_pEnd(new RowIterator(this, true)),
+	_pRowFormatter(other._pRowFormatter)
 {
 }
 
@@ -74,8 +87,7 @@ RecordSet::~RecordSet()
 
 	RowMap::iterator it = _rowMap.begin();
 	RowMap::iterator end = _rowMap.end();
-	for (; it != end; ++it)
-		delete it->second;
+	for (; it != end; ++it)	delete it->second;
 }
 
 
@@ -131,15 +143,6 @@ DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
 }
 
 
-const RowIterator& RecordSet::begin()
-{
-	if (!_pBegin)
-		_pBegin = new RowIterator(*this);
-
-	return *_pBegin;
-}
-
-
 Row& RecordSet::row(std::size_t pos)
 {
 	if (pos > rowCount() - 1)
@@ -147,27 +150,31 @@ Row& RecordSet::row(std::size_t pos)
 
 	RowMap::iterator it = _rowMap.find(pos);
 	Row* pRow = 0;
+	std::size_t columns = columnCount();
 	if (it == _rowMap.end())
 	{
 		if (_rowMap.size())//reuse first row column names to save some memory 
 		{
-			pRow = new Row(_rowMap.begin()->second->names());
-			for (std::size_t i = 0; i < columnCount(); ++i)
-				pRow->set(i, value(i, pos));
+			pRow = new Row(_rowMap.begin()->second->names(), &_pRowFormatter);
+			for (std::size_t col = 0; col < columns; ++col)
+				pRow->set(col, value(col, pos));
 		}
 		else 
 		{
 			pRow = new Row;
-			for (std::size_t i = 0; i < columnCount(); ++i)
-				pRow->append(metaColumn(static_cast<UInt32>(pos)).name(), value(i, pos));
+			if (_pRowFormatter) pRow->setFormatter(&_pRowFormatter);
+			for (std::size_t col = 0; col < columns; ++col)
+				pRow->append(metaColumn(static_cast<UInt32>(col)).name(), value(col, pos));
 		}
 
 		_rowMap.insert(RowMap::value_type(pos, pRow));
 	}
-	else
+	else 
+	{
 		pRow = it->second;
+		poco_check_ptr (pRow);
+	}
 
-	poco_check_ptr (pRow);
 	return *pRow;
 }
 
@@ -225,6 +232,32 @@ DynamicAny RecordSet::nvl(std::size_t index, const DynamicAny& deflt) const
 		return deflt;
 	else
 		return value(index, _currentRow);
+}
+
+
+std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::size_t length) const
+{
+	if (length == RowIterator::POSITION_END) 
+	{
+		if (0 != offset) throw RangeException("Invalid range.");
+		length = rowCount();
+	}
+
+	RowIterator itBegin = *_pBegin + offset;
+	RowIterator itEnd = itBegin + length;
+	std::copy(itBegin, itEnd, std::ostream_iterator<Row>(os));
+	return os;
+}
+
+
+std::ostream& RecordSet::copy(std::ostream& os) const
+{
+	const RowFormatter& ri = (*_pBegin)->getFormatter();
+	os << ri.prefix();
+	copyNames(os);
+	copyValues(os);
+	os << ri.postfix();
+	return os;
 }
 
 

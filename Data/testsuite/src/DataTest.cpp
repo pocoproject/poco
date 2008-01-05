@@ -49,6 +49,7 @@
 #include "Poco/Exception.h"
 #include <cstring>
 #include <sstream>
+#include <iomanip>
 #include <set>
 
 
@@ -1000,12 +1001,25 @@ void DataTest::testRowFormat()
 	row1.append("field3", 3);
 	row1.append("field4", 4);
 
+	RowFormatter rf;
+	std::streamsize sz = rf.getWidth();
+
+	std::string line(sz * 5, '-');
 	std::ostringstream os;
-	os << "field0\tfield1\tfield2\tfield3\tfield4" << RowFormatter::EOL;
+	os << std::left << std::setw(sz) << "field0"
+		<< std::setw(sz) << "field1"
+		<< std::setw(sz) << "field2"
+		<< std::setw(sz) << "field3"
+		<< std::setw(sz) << "field4" << std::endl 
+		<< line << std::endl;
 	assert (row1.namesToString() == os.str());
 
 	os.str("");
-	os << "0\t1\t2\t3\t4" << RowFormatter::EOL;
+	os << std::right << std::setw(sz) << "0"
+		<< std::setw(sz) << "1"
+		<< std::setw(sz) << "2"
+		<< std::setw(sz) << "3"
+		<< std::setw(sz) << "4" << std::endl;
 	assert (row1.valuesToString() == os.str());
 }
 

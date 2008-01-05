@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/Row.h"
+#include "Poco/Data/RowFormatter.h"
 #include "Poco/Exception.h"
 
 
@@ -51,21 +52,19 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 
 Row::Row(): 
 	_pNames(0),
-	_pFormatter(new RowFormatter(this))
+	_pFormatter(new RowFormatter)
 {
 }
 
 
-Row::Row(NameVecPtr pNames, RowFormatter* pFormatter): 
-	_pNames(pNames),
-	_pFormatter(pFormatter)
+Row::Row(NameVecPtr pNames, FormatterPtr* pFormatter): 
+	_pNames(pNames)
 {
-	if (!_pNames)
-		throw NullPointerException();
-
-	if (!_pFormatter) _pFormatter = new RowFormatter(this);
-	else _pFormatter->setRow(this);
+	if (!_pNames) throw NullPointerException();
 	
+	if (pFormatter && *pFormatter) _pFormatter = *pFormatter;
+	else _pFormatter = new RowFormatter;
+
 	_values.resize(_pNames->size());
 	addSortField(0);
 }
@@ -316,20 +315,21 @@ bool Row::operator < (const Row& other) const
 }
 
 
-const std::string Row::valuesToString() const
+void Row::setFormatter(FormatterPtr* pFormatter)
 {
-	std::string values;
-	return _pFormatter->formatValues(values);
+	if (pFormatter && *pFormatter) 
+		_pFormatter = *pFormatter;
+	else 
+		_pFormatter = new RowFormatter;
 }
 
 
-const std::string Row::namesToString() const
+const std::string& Row::namesToString() const
 {
 	if (!_pNames)
 		throw NullPointerException();
 
-	std::string names;
-	return _pFormatter->formatNames(names);
+	return _pFormatter->formatNames(names(), _nameStr);
 }
 
 

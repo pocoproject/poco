@@ -1580,16 +1580,16 @@ void SQLiteTest::testInternalExtraction()
 	
 	typedef std::deque<Int64> IntDeq;
 	
-	const Column<Int64>& col = rset.column<Int64, IntDeq>(0);
+	const Column<IntDeq>& col = rset.column<IntDeq>(0);
 	assert (col[0] == 1);
 
-	try { rset.column<Int64, IntDeq>(100); fail ("must fail"); }
+	try { rset.column<IntDeq>(100); fail ("must fail"); }
 	catch (RangeException&) { }
 
-	const Column<Int64>& col1 = rset.column<Int64, IntDeq>(0);
+	const Column<IntDeq>& col1 = rset.column<IntDeq>(0);
 	assert ("int0" == col1.name());
-	Column<Int64>::Iterator it = col1.begin();
-	Column<Int64>::Iterator itEnd = col1.end();
+	Column<IntDeq>::Iterator it = col1.begin();
+	Column<IntDeq>::Iterator itEnd = col1.end();
 	int counter = 1;
 	for (; it != itEnd; ++it, ++counter)
 		assert (counter == *it);
@@ -1601,7 +1601,7 @@ void SQLiteTest::testInternalExtraction()
 	stmt = (tmp << "DELETE FROM Vectors", now);
 	rset = stmt;
 
-	try { rset.column<Int64, IntDeq>(0); fail ("must fail"); }
+	try { rset.column<IntDeq>(0); fail ("must fail"); }
 	catch (RangeException&) { }
 }
 
@@ -1723,8 +1723,8 @@ void SQLiteTest::testRowIterator()
 	RecordSet rset(ses, "SELECT * FROM Vectors");
 
 	std::ostringstream osLoop;
-	RecordSet::Iterator it = rset.begin();
-	RecordSet::Iterator end = rset.end();
+	RecordSet::ConstIterator it = rset.begin();
+	RecordSet::ConstIterator end = rset.end();
 	for (int i = 1; it != end; ++it, ++i) 
 	{
 		assert (it->get(0) == i);

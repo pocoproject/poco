@@ -47,7 +47,7 @@
 #include "Poco/SharedPtr.h"
 #include <vector>
 #include <string>
-#include <sstream>
+#include <ostream>
 
 
 namespace Poco {
@@ -79,9 +79,10 @@ class Data_API Row
 	/// The stream operator is provided for Row data type as a free-standing function.
 {
 public:
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<std::vector<std::string> > NameVecPtr;
-	typedef std::vector<DynamicAny> ValueVec;
+	typedef RowFormatter::NameVec    NameVec;
+	typedef RowFormatter::NameVecPtr NameVecPtr;
+	typedef RowFormatter::ValueVec   ValueVec;
+	typedef SharedPtr<RowFormatter>  FormatterPtr;
 
 	enum ComparisonType
 	{
@@ -90,12 +91,10 @@ public:
 		COMPARE_AS_STRING
 	};
 
-	static const std::string EOL;
-
 	Row();
 		/// Creates the Row.
 
-	explicit Row(NameVecPtr pNames, RowFormatter* pFormatter = 0);
+	explicit Row(NameVecPtr pNames, FormatterPtr* pFormatter = 0);
 		/// Creates the Row.
 
 	~Row();
@@ -181,13 +180,11 @@ public:
 	void resetSort();
 		/// Resets the sorting criteria to field 0 only.
 
-	const std::string namesToString() const;
-		/// Converts the row names to string, inserting separator
-		/// string between fields and end-of-line at the end.
+	const std::string& namesToString() const;
+		/// Converts the row names to string.
 
-	const std::string valuesToString() const;
-		/// Converts the row values to string, inserting separator
-		/// string between fields and end-of-line at the end.
+	const std::string& valuesToString() const;
+		/// Converts the row values to string.
 
 	bool operator == (const Row& other) const;
 		/// Equality operator.
@@ -198,11 +195,18 @@ public:
 	bool operator < (const Row& other) const;
 		/// Less-then operator.
 
-	NameVecPtr names();
+	const NameVecPtr names() const;
 		/// Returns the shared pointer to names vector.
 
-	const ValueVec& values();
+	const ValueVec& values() const;
 		/// Returns the const reference to values vector.
+
+	void setFormatter(FormatterPtr* pFormatter);
+		/// Sets the formatter for this row and takes the
+		/// shared ownership of it.
+
+	const RowFormatter& getFormatter() const;
+		/// Returns the reference to the formatter.
 
 private:
 	typedef Tuple<std::size_t, ComparisonType> SortTuple;
@@ -212,14 +216,19 @@ private:
 		/// corresponds to adding order rather than field's position in the row.
 		/// That requirement rules out use of std::map due to its sorted nature.
 
+	ValueVec& values();
+		/// Returns the reference to values vector.
+
 	std::size_t getPosition(const std::string& name);
 	bool isEqualSize(const Row& other) const;
 	bool isEqualType(const Row& other) const;
 
-	NameVecPtr _pNames;
-	ValueVec   _values;
-	SortMap    _sortFields;
-	mutable SharedPtr<RowFormatter> _pFormatter;
+	NameVecPtr           _pNames;
+	ValueVec             _values;
+	SortMap              _sortFields;
+	FormatterPtr         _pFormatter;
+	mutable std::string  _nameStr;
+	mutable std::string  _valueStr;
 };
 
 
@@ -242,13 +251,19 @@ inline void Row::reset()
 }
 
 
-inline Row::NameVecPtr Row::names()
+inline const Row::NameVecPtr Row::names() const
 {
 	return _pNames;
 }
 
 
-inline const Row::ValueVec& Row::values()
+inline const Row::ValueVec& Row::values() const
+{
+	return _values;
+}
+
+
+inline Row::ValueVec& Row::values()
 {
 	return _values;
 }
@@ -263,6 +278,18 @@ inline DynamicAny& Row::operator [] (std::size_t col)
 inline DynamicAny& Row::operator [] (const std::string& name)
 {
 	return get(getPosition(name));
+}
+
+
+inline const RowFormatter& Row::getFormatter() const
+{
+	return *_pFormatter;
+}
+
+
+inline const std::string& Row::valuesToString() const
+{
+	return _pFormatter->formatValues(values(), _valueStr);
 }
 
 

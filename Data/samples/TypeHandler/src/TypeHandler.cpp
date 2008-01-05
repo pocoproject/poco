@@ -65,7 +65,7 @@ public:
 		TypeHandler<int>::extract(pos++, person.age, deflt.age, pExtr);
 	}
 	
-	static void prepare(std::size_t pos, const Person& person, AbstractPreparation* pPrep)
+	static void prepare(std::size_t pos, Person& person, AbstractPreparation* pPrep)
 	{
 		TypeHandler<std::string>::prepare(pos++, person.name, pPrep);
 		TypeHandler<std::string>::prepare(pos++, person.address, pPrep);

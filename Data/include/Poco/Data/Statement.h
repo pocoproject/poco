@@ -270,6 +270,8 @@ public:
 		/// with the statement.
 
 protected:
+	typedef Poco::AutoPtr<StatementImpl> StatementImplPtr;
+
 	const AbstractExtractionVec& extractions() const;
 		/// Returns the extractions vector.
 
@@ -285,9 +287,10 @@ protected:
 	 bool isBulkExtraction() const;
 		/// Returns true if this statement extracts data in bulk.
 
-private:
-	typedef Poco::SharedPtr<StatementImpl> StatementImplPtr;
+	StatementImplPtr impl() const;
+		/// Returns pointer to statement implementation.
 
+private:
 	static const int WAIT_FOREVER = -1;
 
 	const Result& doAsyncExec();
@@ -377,6 +380,12 @@ inline void Data_API reset(Statement& statement)
 //
 // inlines
 //
+
+
+inline Statement::StatementImplPtr Statement::impl() const
+{
+	return _pImpl;
+}
 
 
 inline std::string Statement::toString() const
