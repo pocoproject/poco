@@ -60,7 +60,7 @@ using Poco::DateTime;
 
 #define ORACLE_ODBC_DRIVER "Oracle in XE"
 #define ORACLE_DSN "PocoDataOracleTest"
-#define ORACLE_SERVER "localhost"
+#define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
 #define ORACLE_SID "XE"
 #define ORACLE_UID "scott"

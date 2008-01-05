@@ -56,13 +56,13 @@ using Poco::DateTime;
 
 #ifdef POCO_ODBC_USE_MAMMOTH_NG
 	#define POSTGRESQL_ODBC_DRIVER "Mammoth ODBCng Beta"
-#elif defined (POCO_OS_FAMILY_WINDOWS) && defined (POCO_WIN32_UTF8)
+#elif defined (POCO_ODBC_UNICODE)
 	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL Unicode"
 #else
 	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI"
 #endif
 #define POSTGRESQL_DSN "PocoDataPgSQLTest"
-#define POSTGRESQL_SERVER "localhost"
+#define POSTGRESQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define POSTGRESQL_PORT "5432"
 #define POSTGRESQL_DB "postgres"
 #define POSTGRESQL_UID "postgres"

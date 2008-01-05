@@ -2422,7 +2422,7 @@ void SQLExecutor::internalExtraction()
 		i = rset.value("str0", 2);
 		assert (5 == i);
 		
-		const Column<std::deque<int> >& col = rset.column<std::deque<int>, InternalExtraction<std::deque<int> > >(0);
+		const Column<std::deque<int> >& col = rset.column<std::deque<int> >(0);
 		Column<std::deque<int> >::Iterator it = col.begin();
 		Column<std::deque<int> >::Iterator end = col.end();
 		for (int i = 1; it != end; ++it, ++i)
@@ -2456,7 +2456,7 @@ void SQLExecutor::internalExtraction()
 		s = rset.value("cnt", 0).convert<std::string>();
 		assert ("4" == s);
 
-		try { rset.column<std::deque<int>, InternalExtraction<std::deque<int> > >(100); fail ("must fail"); }
+		try { rset.column<std::deque<int> >(100); fail ("must fail"); }
 		catch (RangeException&) { }
 
 		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
@@ -2465,7 +2465,7 @@ void SQLExecutor::internalExtraction()
 		stmt = (session() << "DELETE FROM Vectors", now);
 		rset = stmt;
 
-		try { rset.column<std::deque<int>, InternalExtraction<std::deque<int> > >(0); fail ("must fail"); }
+		try { rset.column<std::deque<int> >(0); fail ("must fail"); }
 		catch (RangeException&) { }
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }

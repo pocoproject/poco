@@ -5,6 +5,12 @@
 #
 # Makefile for Poco ODBC
 #
+# For Unicode support, add following to COMMONFLAGS:
+#
+# -DUNICODE
+#
+# Unicode is supported only for UnixODBC
+#
 
 include $(POCO_BASE)/build/rules/global
 

@@ -44,11 +44,14 @@
 #include "SQLExecutor.h"
 
 
+#define POCO_ODBC_TEST_DATABASE_SERVER "localhost"
+
+
 class ODBCTest: public CppUnit::TestCase
 {
 public:
-	typedef Poco::SharedPtr<Poco::Data::Session>           SessionPtr;
-	typedef Poco::SharedPtr<SQLExecutor>                   ExecPtr;
+	typedef Poco::SharedPtr<Poco::Data::Session> SessionPtr;
+	typedef Poco::SharedPtr<SQLExecutor>         ExecPtr;
 
 	ODBCTest(const std::string& name,
 		SessionPtr pSession,

@@ -65,7 +65,7 @@ using Poco::NotFoundException;
 
 #define DB2_ODBC_DRIVER "IBM DB2 ODBC DRIVER - DB2COPY1"
 #define DB2_DSN "PocoDataDB2Test"
-#define DB2_SERVER "localhost"
+#define DB2_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define DB2_PORT "50000"
 #define DB2_DB "POCOTEST"
 #define DB2_UID "db2admin"

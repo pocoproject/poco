@@ -65,7 +65,7 @@ using Poco::NotFoundException;
 	#define MYSQL_ODBC_DRIVER "MySQL"
 #endif
 #define MYSQL_DSN "PocoDataMySQLTest"
-#define MYSQL_SERVER "localhost"
+#define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MYSQL_DB "test"
 #define MYSQL_UID "root"
 #define MYSQL_PWD "mysql"

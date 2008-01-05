@@ -45,51 +45,26 @@ namespace Data {
 namespace ODBC {
 
 
-inline void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target)
-	/// Utility function for conversion from UTF-8 to UTF-16
-{
-	int len = length;
-	if (SQL_NTS == len) 
-		len = (int) std::strlen((const char *) pSQLChar);
-
-	UTF8Encoding utf8Encoding;
-	UTF16Encoding utf16Encoding;
-	TextConverter converter(utf8Encoding, utf16Encoding);
-
-	if (0 != converter.convert(pSQLChar, len, target))
-		throw SyntaxException("Error converting UTF-8 to UTF-16");
-}
+void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target);
+	/// Utility function for conversion from ASCII to UTF-16
 
 
 inline void makeUTF16(SQLCHAR* pSQLChar, SQLSMALLINT length, std::string& target)
-	/// Utility function for conversion from UTF-8 to UTF-16.
+	/// Utility function for conversion from ASCII to UTF-16.
 {
 	makeUTF16(pSQLChar, (SQLINTEGER) length, target);
 }
 
 
-inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLINTEGER targetLength)
-{
-	UTF8Encoding utf8Encoding;
-	UTF16Encoding utf16Encoding;
-	TextConverter converter(utf16Encoding, utf8Encoding);
-
-	std::string result;
-	if (0 != converter.convert(buffer.begin(), length, result))
-		throw SyntaxException("Error converting UTF-16 to UTF-8");
-	
-	std::memset(pTarget, 0, targetLength);
-	std::strncpy((char*) pTarget, result.c_str(), result.size() < targetLength ? result.size() : targetLength);
-}
+inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLINTEGER targetLength);
+	/// Utility function for conversion from UTF-16 to ASCII.
 
 
 inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLSMALLINT targetLength)
+	/// Utility function for conversion from UTF-16 to ASCII.
 {
 	makeUTF8(buffer, length, pTarget, (SQLINTEGER) targetLength);
 }
-
-
-#endif // POCO_ODBC_UNICODE
 
 
 } } } // namespace Poco::Data::ODBC

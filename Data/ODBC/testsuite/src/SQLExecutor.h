@@ -44,6 +44,7 @@
 #include "Poco/Data/BulkBinding.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
+#include <iostream>
 
 
 #define poco_odbc_check_env(r, h) \

@@ -69,7 +69,7 @@ using Poco::DateTime;
 	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
 #endif
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
-#define MS_SQL_SERVER_SERVER "localhost"
+#define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MS_SQL_SERVER_PORT "1433"
 #define MS_SQL_SERVER_DB "test"
 #define MS_SQL_SERVER_UID "test"

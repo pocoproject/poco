@@ -176,10 +176,10 @@
 					RelativePath=".\include\Poco\Data\Odbc\ODBC.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\ODBCMetaColumn.h">
+					RelativePath=".\include\Poco\Data\Odbc\ODBCException.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\Odbc\ODBCException.h">
+					RelativePath=".\include\Poco\Data\ODBC\ODBCMetaColumn.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Odbc\ODBCStatementImpl.h">
@@ -200,10 +200,34 @@
 					RelativePath=".\include\Poco\Data\ODBC\Unicode.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\Unicode_UNIX.h">
+					RelativePath=".\include\Poco\Data\ODBC\Unicode_UNIXODBC.h">
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\ODBC\Unicode_WIN32.h">
+					<FileConfiguration
+						Name="debug_shared|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_shared|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Odbc\Utility.h">
@@ -228,10 +252,10 @@
 					RelativePath=".\src\Extractor.cpp">
 				</File>
 				<File
-					RelativePath=".\src\ODBCMetaColumn.cpp">
+					RelativePath=".\src\ODBCException.cpp">
 				</File>
 				<File
-					RelativePath=".\src\ODBCException.cpp">
+					RelativePath=".\src\ODBCMetaColumn.cpp">
 				</File>
 				<File
 					RelativePath=".\src\ODBCStatementImpl.cpp">
@@ -252,7 +276,7 @@
 					RelativePath=".\src\Unicode.cpp">
 				</File>
 				<File
-					RelativePath=".\src\Unicode_UNIX.cpp">
+					RelativePath=".\src\Unicode_UNIXODBC.cpp">
 					<FileConfiguration
 						Name="debug_shared|Win32"
 						ExcludedFromBuild="TRUE">

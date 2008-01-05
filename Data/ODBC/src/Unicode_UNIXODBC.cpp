@@ -35,12 +35,19 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Unicode_UNIX.h"
+#include "Poco/Data/ODBC/Unicode_UNIXODBC.h"
+#include "Poco/TextConverter.h"
+#include "Poco/UTF8Encoding.h"
+#include "Poco/UTF16Encoding.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include <iostream>
 
 
 using Poco::Buffer;
+using Poco::UTF8Encoding;
+using Poco::UTF16Encoding;
+using Poco::TextConverter;
 using Poco::InvalidArgumentException;
 using Poco::NotImplementedException;
 
@@ -48,6 +55,36 @@ using Poco::NotImplementedException;
 namespace Poco {
 namespace Data {
 namespace ODBC {
+
+
+void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target)
+{
+	int len = length;
+	if (SQL_NTS == len) 
+		len = (int) std::strlen((const char *) pSQLChar);
+
+	UTF8Encoding utf8Encoding;
+	UTF16Encoding utf16Encoding;
+	TextConverter converter(utf8Encoding, utf16Encoding);
+
+	if (0 != converter.convert(pSQLChar, len, target))
+		throw SyntaxException("Error converting UTF-8 to UTF-16");
+}
+
+
+void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLINTEGER targetLength)
+{
+	UTF8Encoding utf8Encoding;
+	UTF16Encoding utf16Encoding;
+	TextConverter converter(utf16Encoding, utf8Encoding);
+
+	std::string result;
+	if (0 != converter.convert(buffer.begin(), length * sizeof(SQLWCHAR), result))
+		throw SyntaxException("Error converting UTF-16 to UTF-8");
+	
+	std::memset(pTarget, 0, targetLength);
+	std::strncpy((char*) pTarget, result.c_str(), result.size() < targetLength ? result.size() : targetLength);
+}
 
 
 SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
