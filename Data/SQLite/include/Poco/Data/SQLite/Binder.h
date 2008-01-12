@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_SQLite_Binder_INCLUDED
-#define DataConnectors_SQLite_Binder_INCLUDED
+#ifndef Data_SQLite_Binder_INCLUDED
+#define Data_SQLite_Binder_INCLUDED
 
 
 #include "Poco/Data/SQLite/SQLite.h"
@@ -180,15 +180,6 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt64 &val, Direction dir
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
-inline void Binder::bind(std::size_t pos, const long &val, Direction dir)
-{
-	long tmp = static_cast<long>(val);
-	bind(pos, tmp, dir);
-}
-#endif
-
-
 inline void Binder::bind(std::size_t pos, const bool &val, Direction dir)
 {
 	Poco::Int32 tmp = (val ? 1 : 0);
@@ -220,4 +211,4 @@ inline void Binder::bind(std::size_t pos, const char* const &pVal, Direction dir
 } } } // namespace Poco::Data::SQLite
 
 
-#endif // DataConnectors_SQLite_Binder_INCLUDED
+#endif // Data_SQLite_Binder_INCLUDED

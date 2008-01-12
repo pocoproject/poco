@@ -35,7 +35,7 @@
 
 
 #include "Poco/Data/Row.h"
-#include "Poco/Data/RowFormatter.h"
+#include "Poco/Data/SimpleRowFormatter.h"
 #include "Poco/Exception.h"
 
 
@@ -52,18 +52,17 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 
 Row::Row(): 
 	_pNames(0),
-	_pFormatter(new RowFormatter)
+	_pFormatter(new SimpleRowFormatter)
 {
 }
 
 
-Row::Row(NameVecPtr pNames, FormatterPtr* pFormatter): 
+Row::Row(NameVecPtr pNames, const RowFormatterPtr& pFormatter): 
 	_pNames(pNames)
 {
 	if (!_pNames) throw NullPointerException();
 	
-	if (pFormatter && *pFormatter) _pFormatter = *pFormatter;
-	else _pFormatter = new RowFormatter;
+	setFormatter(pFormatter);
 
 	_values.resize(_pNames->size());
 	addSortField(0);
@@ -315,12 +314,12 @@ bool Row::operator < (const Row& other) const
 }
 
 
-void Row::setFormatter(FormatterPtr* pFormatter)
+void Row::setFormatter(const RowFormatterPtr& pFormatter)
 {
-	if (pFormatter && *pFormatter) 
-		_pFormatter = *pFormatter;
+	if (pFormatter)
+		_pFormatter = pFormatter;
 	else 
-		_pFormatter = new RowFormatter;
+		_pFormatter = new SimpleRowFormatter;
 }
 
 

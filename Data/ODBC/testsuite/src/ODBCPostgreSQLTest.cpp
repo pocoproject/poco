@@ -1,4 +1,4 @@
-//
+	//
 // ODBCPostgreSQLTest.cpp
 //
 // $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCPostgreSQLTest.cpp#5 $
@@ -534,6 +534,31 @@ void ODBCPostgreSQLTest::recreateMiscTable()
 }
 
 
+void ODBCPostgreSQLTest::recreateLogTable()
+{
+	dropObject("TABLE", "T_POCO_LOG");
+	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+
+	try 
+	{ 
+		std::string sql = "CREATE TABLE %s "
+			"(Source VARCHAR,"
+			"Name VARCHAR,"
+			"ProcessId INTEGER,"
+			"Thread VARCHAR, "
+			"ThreadId INTEGER," 
+			"Priority INTEGER,"
+			"Text VARCHAR,"
+			"DateTime TIMESTAMP)"; 
+
+		session() << sql, "T_POCO_LOG", now; 
+		session() << sql, "T_POCO_LOG_ARCHIVE", now; 
+
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
+}
+
+
 CppUnit::Test* ODBCPostgreSQLTest::suite()
 {
 	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
@@ -559,6 +584,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexTypeDeque);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertDeque);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertEmptyDeque);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAffectedRows);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertSingleBulkVec);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLimit);
@@ -624,6 +650,8 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDynamicAny);
 		//neither pSQL ODBC nor Mammoth drivers support multiple results properly
 		//CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultipleResults);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLChannel);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLLogger);
 
 		return pSuite;
 	}

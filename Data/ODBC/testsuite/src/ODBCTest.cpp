@@ -306,6 +306,21 @@ void ODBCTest::testInsertEmptyDeque()
 }
 
 
+void ODBCTest::testAffectedRows()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->affectedRows();
+		i += 2;
+	}	
+}
+
+
 void ODBCTest::testInsertSingleBulk()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1042,6 +1057,38 @@ void ODBCTest::testMultipleResults()
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->multipleResults();
+
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testSQLChannel()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateLogTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->sqlChannel(_rConnectString);
+
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testSQLLogger()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateLogTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->sqlLogger(_rConnectString);
 
 		i += 2;
 	}

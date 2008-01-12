@@ -20,6 +20,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/Session.h"
+#include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowFormatter.h"
 #include "Poco/Data/SQLite/Connector.h"
@@ -88,19 +89,30 @@ int main(int argc, char** argv)
 	Session session("SQLite", "sample.db");
 
 	// drop sample table, if it exists
-	session << "DROP TABLE IF EXISTS Person", now;
+	session << "DROP TABLE IF EXISTS Simpsons", now;
 	
 	// (re)create table
-	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3))", now;
+	session << "CREATE TABLE Simpsons (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3))", now;
 	
 	// insert some rows
-	session << "INSERT INTO Person VALUES('Homer Simpson', 'Springfield', 42)", now;
-	session << "INSERT INTO Person VALUES('Marge Simpson', 'Springfield', 38)", now;
-	session << "INSERT INTO Person VALUES('Bart Simpson', 'Springfield', 12)", now;
-	session << "INSERT INTO Person VALUES('Lisa Simpson', 'Springfield', 10)", now;
+	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42)", now;
+	session << "INSERT INTO Simpsons VALUES('Marge Simpson', 'Springfield', 38)", now;
+	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12)", now;
+	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10)", now;
 		
-	// create a recordset and print the column names and data as HTML table
-	std::cout << RecordSet(session, "SELECT * FROM Person", new HTMLTableFormatter);
+	// create a statement and print the column names and data as HTML table
+	HTMLTableFormatter tf;
+	Statement stmt = (session << "SELECT * FROM Simpsons", format(tf), now);
+	RecordSet rs(stmt);
+	std::cout << rs << std::endl;
+
+	// Note: The code above is divided into individual steps for clarity purpose.
+	// The four lines can be reduced to the following single line of code:
+	std::cout << RecordSet(session, "SELECT * FROM Simpsons", new HTMLTableFormatter);
+
+	// simple formatting example (uses the default SimpleRowFormatter provided by framework)
+	std::cout << std::endl << "Simple formatting:" << std::endl << std::endl;
+	std::cout << RecordSet(session, "SELECT * FROM Simpsons");
 
 	return 0;
 }

@@ -248,6 +248,9 @@
 					RelativePath=".\include\Poco\Data\SessionImpl.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\SimpleRowFormatter.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Statement.h">
 				</File>
 				<File
@@ -336,6 +339,9 @@
 					RelativePath=".\src\SessionImpl.cpp">
 				</File>
 				<File
+					RelativePath=".\src\SimpleRowFormatter.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Statement.cpp">
 				</File>
 				<File
@@ -376,6 +382,30 @@
 				</File>
 				<File
 					RelativePath=".\src\SessionPool.cpp">
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Logging"
+			Filter="">
+			<Filter
+				Name="Header Files"
+				Filter="">
+				<File
+					RelativePath=".\include\Poco\Data\ArchiveStrategy.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\SQLChannel.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				Filter="">
+				<File
+					RelativePath=".\src\ArchiveStrategy.cpp">
+				</File>
+				<File
+					RelativePath=".\src\SQLChannel.cpp">
 				</File>
 			</Filter>
 		</Filter>

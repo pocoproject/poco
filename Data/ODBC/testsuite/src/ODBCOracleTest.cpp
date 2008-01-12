@@ -755,6 +755,31 @@ void ODBCOracleTest::recreateMiscTable()
 }
 
 
+void ODBCOracleTest::recreateLogTable()
+{
+	dropObject("TABLE", "T_POCO_LOG");
+	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+
+	try 
+	{ 
+		std::string sql = "CREATE TABLE %s "
+			"(Source VARCHAR(100),"
+			"Name VARCHAR(100),"
+			"ProcessId INTEGER,"
+			"Thread VARCHAR(100), "
+			"ThreadId INTEGER," 
+			"Priority INTEGER,"
+			"Text VARCHAR(100),"
+			"DateTime TIMESTAMP)"; 
+
+		session() << sql, "T_POCO_LOG", now; 
+		session() << sql, "T_POCO_LOG_ARCHIVE", now; 
+
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
+}
+
+
 CppUnit::Test* ODBCOracleTest::suite()
 {
 	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
@@ -780,6 +805,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeDeque);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertDeque);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertEmptyDeque);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAffectedRows);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertSingleBulkVec);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testLimit);
@@ -832,6 +858,8 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDynamicAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testMultipleResults);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLChannel);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLLogger);
 
 		return pSuite;
 	}

@@ -138,7 +138,8 @@ public:
 		/// Create a string version of the SQL statement.
 
 	Poco::UInt32 execute();
-		/// Executes a statement. Returns the number of rows extracted.
+		/// Executes a statement. Returns the number of rows extracted for statements
+		/// returning data or number of rows affected for all other statements (insert, update, delete).
 
 	void reset();
 		/// Resets the statement, so that we can reuse all bindings and re-execute again.
@@ -161,10 +162,14 @@ public:
 
 	std::size_t dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
-
+		
 protected:
 	virtual Poco::UInt32 columnsReturned() const = 0;
 		/// Returns number of columns returned by query. 
+
+	virtual Poco::UInt32 affectedRowCount() const = 0;
+		/// Returns the number of affected rows.
+		/// Used to find out the number of rows affected by insert, delete or update.
 
 	virtual const MetaColumn& metaColumn(Poco::UInt32 pos) const = 0;
 		/// Returns column meta data.
@@ -395,6 +400,9 @@ private:
 	bool isBulkSupported() const;
 		/// Returns true if connector and session support bulk operation.
 
+	void formatSQL(std::vector<Any>& arguments);
+		/// Formats the SQL string by filling in placeholders with values from supplied vector.
+
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
 
@@ -421,7 +429,6 @@ private:
 inline void StatementImpl::addBinding(AbstractBinding* pBinding)
 {
 	poco_check_ptr (pBinding);
-
 	_bindings.push_back(pBinding);
 }
 

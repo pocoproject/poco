@@ -125,6 +125,23 @@ void ODBCSQLiteTest::testBareboneODBC()
 }
 
 
+void ODBCSQLiteTest::testAffectedRows()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		// see SQLiteStatementImpl::affectedRows() documentation for explanation
+		// why "WHERE 1" is necessary here
+		_pExecutor->affectedRows("WHERE 1");
+		i += 2;
+	}	
+}
+
+
 void ODBCSQLiteTest::testNull()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -279,6 +296,31 @@ void ODBCSQLiteTest::recreateMiscTable()
 }
 
 
+void ODBCSQLiteTest::recreateLogTable()
+{
+	dropObject("TABLE", "T_POCO_LOG");
+	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+
+	try 
+	{ 
+		std::string sql = "CREATE TABLE %s "
+			"(Source VARCHAR,"
+			"Name VARCHAR,"
+			"ProcessId INTEGER,"
+			"Thread VARCHAR, "
+			"ThreadId INTEGER," 
+			"Priority INTEGER,"
+			"Text VARCHAR,"
+			"DateTime DATETIME)";
+
+		session() << sql, "T_POCO_LOG", now; 
+		session() << sql, "T_POCO_LOG_ARCHIVE", now; 
+
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
+}
+
+
 CppUnit::Test* ODBCSQLiteTest::suite()
 {
 	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString))
@@ -304,6 +346,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexTypeDeque);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertDeque);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertEmptyDeque);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAffectedRows);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertSingleBulkVec);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testLimit);
@@ -345,6 +388,8 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAny);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLChannel);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLLogger);
 
 		return pSuite;
 	}

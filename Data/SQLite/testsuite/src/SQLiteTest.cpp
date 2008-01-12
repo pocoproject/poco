@@ -38,6 +38,7 @@
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
@@ -46,6 +47,10 @@
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
+#include "Poco/Logger.h"
+#include "Poco/Message.h"
+#include "Poco/Thread.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
@@ -56,6 +61,10 @@ using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::DateTime;
+using Poco::Logger;
+using Poco::Message;
+using Poco::AutoPtr;
+using Poco::Thread;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
@@ -174,7 +183,7 @@ SQLiteTest::~SQLiteTest()
 
 void SQLiteTest::testSimpleAccess()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	assert (tmp.isConnected());
 	std::string tableName("Person");
 	std::string lastName("lastname");
@@ -205,7 +214,7 @@ void SQLiteTest::testSimpleAccess()
 
 void SQLiteTest::testInsertCharPointer()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::string tableName("Person");
 	std::string lastName("lastname");
 	std::string firstName("firstname");
@@ -229,7 +238,7 @@ void SQLiteTest::testInsertCharPointer()
 
 void SQLiteTest::testInsertCharPointer2()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::string tableName("Person");
 	std::string lastName("lastname");
 	std::string firstName("firstname");
@@ -255,7 +264,7 @@ void SQLiteTest::testInsertCharPointer2()
 
 void SQLiteTest::testComplexType()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
 	tmp << "DROP TABLE IF EXISTS Person", now;
@@ -276,7 +285,7 @@ void SQLiteTest::testComplexType()
 
 void SQLiteTest::testSimpleAccessVector()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::vector<std::string> lastNames;
 	std::vector<std::string> firstNames;
 	std::vector<std::string> addresses;
@@ -313,7 +322,7 @@ void SQLiteTest::testSimpleAccessVector()
 
 void SQLiteTest::testComplexTypeVector()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::vector<Person> people;
 	people.push_back(Person("LN1", "FN1", "ADDR1", 1));
 	people.push_back(Person("LN2", "FN2", "ADDR2", 2));
@@ -332,7 +341,7 @@ void SQLiteTest::testComplexTypeVector()
 
 void SQLiteTest::testInsertVector()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::vector<std::string> str;
 	str.push_back("s1");
 	str.push_back("s2");
@@ -357,7 +366,7 @@ void SQLiteTest::testInsertVector()
 
 void SQLiteTest::testInsertEmptyVector()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::vector<std::string> str;
 
 	tmp << "DROP TABLE IF EXISTS Strings", now;
@@ -373,9 +382,41 @@ void SQLiteTest::testInsertEmptyVector()
 }
 
 
+void SQLiteTest::testAffectedRows()
+{
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	std::vector<std::string> str;
+	str.push_back("s1");
+	str.push_back("s2");
+	str.push_back("s3");
+	str.push_back("s3");
+	int count = 100;
+	tmp << "DROP TABLE IF EXISTS Strings", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Strings (str VARCHAR(30))", now;
+
+	Statement stmt1((tmp << "INSERT INTO Strings VALUES(:str)", use(str)));
+	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 0);
+	assert (4 == stmt1.execute());
+	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 4);
+
+	Statement stmt2(tmp << "UPDATE Strings SET str = 's4' WHERE str = 's3'");
+	assert (2 == stmt2.execute());
+
+	Statement stmt3(tmp << "DELETE FROM Strings WHERE str = 's1'");
+	assert (1 == stmt3.execute());
+
+	// see SQLiteStatementImpl::affectedRows() documentation for explanation
+	// why "WHERE 1" is necessary here
+	Statement stmt4(tmp << "DELETE FROM Strings WHERE 1");
+	assert (3 == stmt4.execute());
+}
+
+
 void SQLiteTest::testInsertSingleBulk()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	int x = 0;
@@ -384,7 +425,7 @@ void SQLiteTest::testInsertSingleBulk()
 	for (x = 0; x < 100; ++x)
 	{
 		int i = stmt.execute();
-		assert (i == 0);
+		assert (1 == i);
 	}
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
@@ -396,7 +437,7 @@ void SQLiteTest::testInsertSingleBulk()
 
 void SQLiteTest::testInsertSingleBulkVec()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -421,7 +462,7 @@ void SQLiteTest::testInsertSingleBulkVec()
 
 void SQLiteTest::testLimit()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -443,7 +484,7 @@ void SQLiteTest::testLimit()
 
 void SQLiteTest::testLimitZero()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -461,7 +502,7 @@ void SQLiteTest::testLimitZero()
 
 void SQLiteTest::testLimitOnce()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -491,7 +532,7 @@ void SQLiteTest::testLimitOnce()
 
 void SQLiteTest::testLimitPrepare()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -500,7 +541,9 @@ void SQLiteTest::testLimitPrepare()
 		data.push_back(x);
 	}
 
-	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
+	Statement stmtIns = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
+	assert (100 == stmtIns.execute());
+
 	std::vector<int> retData;
 	Statement stmt = (tmp << "SELECT * FROM Strings", into(retData), limit(50));
 	assert (retData.size() == 0);
@@ -527,7 +570,7 @@ void SQLiteTest::testLimitPrepare()
 
 void SQLiteTest::testPrepare()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -548,7 +591,7 @@ void SQLiteTest::testPrepare()
 
 void SQLiteTest::testSetSimple()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::set<std::string> lastNames;
 	std::set<std::string> firstNames;
 	std::set<std::string> addresses;
@@ -585,7 +628,7 @@ void SQLiteTest::testSetSimple()
 
 void SQLiteTest::testSetComplex()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::set<Person> people;
 	people.insert(Person("LN1", "FN1", "ADDR1", 1));
 	people.insert(Person("LN2", "FN2", "ADDR2", 2));
@@ -604,7 +647,7 @@ void SQLiteTest::testSetComplex()
 
 void SQLiteTest::testSetComplexUnique()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::vector<Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	people.push_back(p1);
@@ -630,7 +673,7 @@ void SQLiteTest::testSetComplexUnique()
 
 void SQLiteTest::testMultiSetSimple()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multiset<std::string> lastNames;
 	std::multiset<std::string> firstNames;
 	std::multiset<std::string> addresses;
@@ -667,7 +710,7 @@ void SQLiteTest::testMultiSetSimple()
 
 void SQLiteTest::testMultiSetComplex()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multiset<Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	people.insert(p1);
@@ -692,7 +735,7 @@ void SQLiteTest::testMultiSetComplex()
 
 void SQLiteTest::testMapComplex()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::map<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -713,7 +756,7 @@ void SQLiteTest::testMapComplex()
 
 void SQLiteTest::testMapComplexUnique()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -737,7 +780,7 @@ void SQLiteTest::testMapComplexUnique()
 
 void SQLiteTest::testMultiMapComplex()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -761,7 +804,7 @@ void SQLiteTest::testMultiMapComplex()
 
 void SQLiteTest::testSelectIntoSingle()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -781,7 +824,7 @@ void SQLiteTest::testSelectIntoSingle()
 
 void SQLiteTest::testSelectIntoSingleStep()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -806,7 +849,7 @@ void SQLiteTest::testSelectIntoSingleStep()
 
 void SQLiteTest::testSelectIntoSingleFail()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -832,7 +875,7 @@ void SQLiteTest::testSelectIntoSingleFail()
 
 void SQLiteTest::testLowerLimitOk()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -858,7 +901,7 @@ void SQLiteTest::testLowerLimitOk()
 
 void SQLiteTest::testSingleSelect()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -883,7 +926,7 @@ void SQLiteTest::testSingleSelect()
 
 void SQLiteTest::testLowerLimitFail()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -909,7 +952,7 @@ void SQLiteTest::testLowerLimitFail()
 
 void SQLiteTest::testCombinedLimits()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -932,7 +975,7 @@ void SQLiteTest::testCombinedLimits()
 
 void SQLiteTest::testRange()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -954,7 +997,7 @@ void SQLiteTest::testRange()
 
 void SQLiteTest::testCombinedIllegalLimits()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -981,7 +1024,7 @@ void SQLiteTest::testCombinedIllegalLimits()
 
 void SQLiteTest::testIllegalRange()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -1007,7 +1050,7 @@ void SQLiteTest::testIllegalRange()
 
 void SQLiteTest::testEmptyDB()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
@@ -1027,7 +1070,7 @@ void SQLiteTest::testBLOB()
 	std::string lastName("lastname");
 	std::string firstName("firstname");
 	std::string address("Address");
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Image BLOB)", now;
 	BLOB img("0123456789", 10);
@@ -1044,7 +1087,7 @@ void SQLiteTest::testBLOB()
 
 void SQLiteTest::testTuple10()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1063,7 +1106,7 @@ void SQLiteTest::testTuple10()
 
 void SQLiteTest::testTupleVector10()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1092,7 +1135,7 @@ void SQLiteTest::testTupleVector10()
 
 void SQLiteTest::testTuple9()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1111,7 +1154,7 @@ void SQLiteTest::testTuple9()
 
 void SQLiteTest::testTupleVector9()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1140,7 +1183,7 @@ void SQLiteTest::testTupleVector9()
 
 void SQLiteTest::testTuple8()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1159,7 +1202,7 @@ void SQLiteTest::testTuple8()
 
 void SQLiteTest::testTupleVector8()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1188,7 +1231,7 @@ void SQLiteTest::testTupleVector8()
 
 void SQLiteTest::testTuple7()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER)", now;
@@ -1206,7 +1249,7 @@ void SQLiteTest::testTuple7()
 
 void SQLiteTest::testTupleVector7()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER)", now;
@@ -1234,7 +1277,7 @@ void SQLiteTest::testTupleVector7()
 
 void SQLiteTest::testTuple6()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER)", now;
@@ -1252,7 +1295,7 @@ void SQLiteTest::testTuple6()
 
 void SQLiteTest::testTupleVector6()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER)", now;
@@ -1280,7 +1323,7 @@ void SQLiteTest::testTupleVector6()
 
 void SQLiteTest::testTuple5()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER)", now;
@@ -1298,7 +1341,7 @@ void SQLiteTest::testTuple5()
 
 void SQLiteTest::testTupleVector5()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER)", now;
@@ -1326,7 +1369,7 @@ void SQLiteTest::testTupleVector5()
 
 void SQLiteTest::testTuple4()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER)", now;
@@ -1344,7 +1387,7 @@ void SQLiteTest::testTuple4()
 
 void SQLiteTest::testTupleVector4()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER)", now;
@@ -1372,7 +1415,7 @@ void SQLiteTest::testTupleVector4()
 
 void SQLiteTest::testTuple3()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
@@ -1390,7 +1433,7 @@ void SQLiteTest::testTuple3()
 
 void SQLiteTest::testTupleVector3()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
@@ -1418,7 +1461,7 @@ void SQLiteTest::testTupleVector3()
 
 void SQLiteTest::testTuple2()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples (int0 INTEGER, int1 INTEGER)", now;
 
@@ -1435,7 +1478,7 @@ void SQLiteTest::testTuple2()
 
 void SQLiteTest::testTupleVector2()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples (int0 INTEGER, int1 INTEGER)", now;
 
@@ -1462,7 +1505,7 @@ void SQLiteTest::testTupleVector2()
 
 void SQLiteTest::testTuple1()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples (int0 INTEGER)", now;
 
@@ -1479,7 +1522,7 @@ void SQLiteTest::testTuple1()
 
 void SQLiteTest::testTupleVector1()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples (int0 INTEGER)", now;
 
@@ -1506,7 +1549,7 @@ void SQLiteTest::testTupleVector1()
 
 void SQLiteTest::testDateTime()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS DateTimes", now;
 	tmp << "CREATE TABLE DateTimes (dt0 DATE)", now;
 
@@ -1542,7 +1585,7 @@ void SQLiteTest::testDateTime()
 
 void SQLiteTest::testInternalExtraction()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Vectors", now;
 	tmp << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
@@ -1608,7 +1651,7 @@ void SQLiteTest::testInternalExtraction()
 
 void SQLiteTest::testPrimaryKeyConstraint()
 {
-	Session ses (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session ses (SQLite::Connector::KEY, "dummy.db");
 	ses << "DROP TABLE IF EXISTS LogTest", now;
 	ses << "CREATE TABLE LogTest (Id INTEGER PRIMARY KEY, Time INTEGER, Value INTEGER)", now;
 	const double value = -200000000000.0;
@@ -1638,7 +1681,7 @@ void SQLiteTest::testPrimaryKeyConstraint()
 
 void SQLiteTest::testNull()
 {
-	Session ses (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session ses (SQLite::Connector::KEY, "dummy.db");
 	ses << "DROP TABLE IF EXISTS NullTest", now;
 
 	ses << "CREATE TABLE NullTest (i INTEGER NOT NULL)", now;
@@ -1708,7 +1751,7 @@ void SQLiteTest::testNull()
 
 void SQLiteTest::testRowIterator()
 {
-	Session ses (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session ses (SQLite::Connector::KEY, "dummy.db");
 	ses << "DROP TABLE IF EXISTS Vectors", now;
 	ses << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
@@ -1740,7 +1783,7 @@ void SQLiteTest::testRowIterator()
 
 void SQLiteTest::testAsync()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	
@@ -1750,7 +1793,8 @@ void SQLiteTest::testAsync()
 	Statement::Result result = stmt.executeAsync();
 	assert (!stmt.isAsync());
 	result.wait();
-	
+	assert (500 == result.data());
+
 	Statement stmt1 = (tmp << "SELECT * FROM Strings", into(data), async, now);
 	assert (stmt1.isAsync());
 	assert (stmt1.wait() == rowCount);
@@ -1823,7 +1867,7 @@ void SQLiteTest::testAsync()
 
 void SQLiteTest::testAny()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Anys", now;
 	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
@@ -1849,7 +1893,7 @@ void SQLiteTest::testAny()
 
 void SQLiteTest::testDynamicAny()
 {
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Anys", now;
 	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
@@ -1870,6 +1914,115 @@ void SQLiteTest::testDynamicAny()
 	assert (42 == i);
 	assert (42.5 == f);
 	assert ("42" == s);
+}
+
+
+void SQLiteTest::testSQLChannel()
+{
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS T_POCO_LOG", now;
+	tmp << "CREATE TABLE T_POCO_LOG (Source VARCHAR,"
+		"Name VARCHAR,"
+		"ProcessId INTEGER,"
+		"Thread VARCHAR, "
+		"ThreadId INTEGER," 
+		"Priority INTEGER,"
+		"Text VARCHAR,"
+		"DateTime DATE)", now;
+
+	tmp << "DROP TABLE IF EXISTS T_POCO_LOG_ARCHIVE", now;
+	tmp << "CREATE TABLE T_POCO_LOG_ARCHIVE (Source VARCHAR,"
+		"Name VARCHAR,"
+		"ProcessId INTEGER,"
+		"Thread VARCHAR, "
+		"ThreadId INTEGER," 
+		"Priority INTEGER,"
+		"Text VARCHAR,"
+		"DateTime DATE)", now;
+
+	AutoPtr<SQLChannel> pChannel = new SQLChannel(SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
+	pChannel->setProperty("keep", "2 seconds");
+
+	Message msgInf("InformationSource", "a Informational async message", Message::PRIO_INFORMATION);
+	pChannel->log(msgInf);
+	Message msgWarn("WarningSource", "b Warning async message", Message::PRIO_WARNING);
+	pChannel->log(msgWarn);
+	pChannel->wait();
+
+	pChannel->setProperty("async", "false");
+	Message msgInfS("InformationSource", "c Informational sync message", Message::PRIO_INFORMATION);
+	pChannel->log(msgInfS);
+	Message msgWarnS("WarningSource", "d Warning sync message", Message::PRIO_WARNING);
+	pChannel->log(msgWarnS);
+
+	RecordSet rs(tmp, "SELECT * FROM T_POCO_LOG ORDER by Text");
+	assert (4 == rs.rowCount());
+	assert ("InformationSource" == rs["Source"]);
+	assert ("a Informational async message" == rs["Text"]);
+	rs.moveNext();
+	assert ("WarningSource" == rs["Source"]);
+	assert ("b Warning async message" == rs["Text"]);
+	rs.moveNext();
+	assert ("InformationSource" == rs["Source"]);
+	assert ("c Informational sync message" == rs["Text"]);
+	rs.moveNext();
+	assert ("WarningSource" == rs["Source"]);
+	assert ("d Warning sync message" == rs["Text"]);
+
+	Thread::sleep(3000);
+
+	Message msgInfA("InformationSource", "e Informational sync message", Message::PRIO_INFORMATION);
+	pChannel->log(msgInfA);
+	Message msgWarnA("WarningSource", "f Warning sync message", Message::PRIO_WARNING);
+	pChannel->log(msgWarnA);
+
+	RecordSet rs1(tmp, "SELECT * FROM T_POCO_LOG_ARCHIVE");
+	assert (4 == rs1.rowCount());
+
+	pChannel->setProperty("keep", "");
+	assert ("forever" == pChannel->getProperty("keep"));
+	RecordSet rs2(tmp, "SELECT * FROM T_POCO_LOG ORDER by Text");
+	assert (2 == rs2.rowCount());
+	assert ("InformationSource" == rs2["Source"]);
+	assert ("e Informational sync message" == rs2["Text"]);
+	rs2.moveNext();
+	assert ("WarningSource" == rs2["Source"]);
+	assert ("f Warning sync message" == rs2["Text"]);
+}
+
+
+void SQLiteTest::testSQLLogger()
+{
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS T_POCO_LOG", now;
+	tmp << "CREATE TABLE T_POCO_LOG (Source VARCHAR,"
+		"Name VARCHAR,"
+		"ProcessId INTEGER,"
+		"Thread VARCHAR, "
+		"ThreadId INTEGER," 
+		"Priority INTEGER,"
+		"Text VARCHAR,"
+		"DateTime DATE)", now;
+
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel(SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
+		Logger& root = Logger::root();
+		root.setChannel(pChannel.get());
+		root.setLevel(Message::PRIO_INFORMATION);
+		
+		root.information("Informational message");
+		root.warning("Warning message");
+		root.debug("Debug message");
+	}
+
+	Thread::sleep(100);
+	RecordSet rs(tmp, "SELECT * FROM T_POCO_LOG ORDER by DateTime");
+	assert (2 == rs.rowCount());
+	assert ("TestSQLChannel" == rs["Source"]);
+	assert ("Informational message" == rs["Text"]);
+	rs.moveNext();
+	assert ("TestSQLChannel" == rs["Source"]);
+	assert ("Warning message" == rs["Text"]);
 }
 
 
@@ -1895,6 +2048,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testComplexTypeVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertEmptyVector);
+	CppUnit_addTest(pSuite, SQLiteTest, testAffectedRows);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertSingleBulk);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertSingleBulkVec);
 	CppUnit_addTest(pSuite, SQLiteTest, testLimit);
@@ -1950,6 +2104,8 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);
 	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);
+	CppUnit_addTest(pSuite, SQLiteTest, testSQLChannel);
+	CppUnit_addTest(pSuite, SQLiteTest, testSQLLogger);
 
 	return pSuite;
 }

@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_SQLite_SQLiteStatementImpl_INCLUDED
-#define DataConnectors_SQLite_SQLiteStatementImpl_INCLUDED
+#ifndef Data_SQLite_SQLiteStatementImpl_INCLUDED
+#define Data_SQLite_SQLiteStatementImpl_INCLUDED
 
 
 #include "Poco/Data/SQLite/SQLite.h"
@@ -71,6 +71,17 @@ protected:
 	Poco::UInt32 columnsReturned() const;
 		/// Returns number of columns returned by query.
 
+	Poco::UInt32 affectedRowCount() const;
+		/// Returns the number of affected rows.
+		/// Used to find out the number of rows affected by insert, delete or update.
+		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT. 
+		/// Changes associated with creating and dropping tables are not counted.
+		/// SQLite implements the command "DELETE FROM table" without a WHERE clause by 
+		/// dropping and recreating the table. Because of this optimization, the change count 
+		/// for "DELETE FROM table" will be zero regardless of the number of elements that 
+		/// were originally in the table. To get an accurate count of the number of rows deleted, 
+		/// use "DELETE FROM table WHERE 1".
+
 	const MetaColumn& metaColumn(Poco::UInt32 pos) const;
 		/// Returns column meta data.
 
@@ -100,16 +111,20 @@ private:
 	void clear();
 		/// Removes the _pStmt
 
-	typedef Poco::Data::AbstractBindingVec Bindings;
-	typedef Poco::Data::AbstractExtractionVec Extractions;
+	typedef Poco::SharedPtr<Binder>             BinderPtr;
+	typedef Poco::SharedPtr<Extractor>          ExtractorPtr;
+	typedef Poco::Data::AbstractBindingVec      Bindings;
+	typedef Poco::Data::AbstractExtractionVec   Extractions;
+	typedef std::vector<Poco::Data::MetaColumn> MetaColumnVec;
 
 	sqlite3*      _pDB;
 	sqlite3_stmt* _pStmt;
 	bool          _stepCalled;
 	int           _nextResponse;
-	Poco::SharedPtr<Binder>    _pBinder;
-	Poco::SharedPtr<Extractor> _pExtractor;
-	std::vector<Poco::Data::MetaColumn> _columns;
+	BinderPtr     _pBinder;
+	ExtractorPtr  _pExtractor;
+	MetaColumnVec _columns;
+	Poco::UInt32  _affectedRowCount;
 };
 
 
@@ -131,4 +146,4 @@ inline AbstractBinder& SQLiteStatementImpl::binder()
 } } } // namespace Poco::Data::SQLite
 
 
-#endif // DataConnectors_SQLite_SQLiteStatementImpl_INCLUDED
+#endif // Data_SQLite_SQLiteStatementImpl_INCLUDED

@@ -41,6 +41,7 @@
 #include "Poco/Data/Column.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
+#include "Poco/Data/SimpleRowFormatter.h"
 #include "Connector.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
@@ -91,6 +92,17 @@ void DataTest::testSession()
 	std::string str;
 	Statement stmt = (sess << "SELECT * FROM Strings", into(str), limit(50));
 	stmt.execute();
+}
+
+
+void DataTest::testStatementFormatting()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	Statement stmt = (sess << "SELECT %s%c%s,%d,%u,%f,%s FROM Person WHERE Name LIKE 'Simp%%'", 
+		"'",'a',"'",-1, 1u, 1.5, "42", now);
+	
+	assert ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
 }
 
 
@@ -1001,8 +1013,8 @@ void DataTest::testRowFormat()
 	row1.append("field3", 3);
 	row1.append("field4", 4);
 
-	RowFormatter rf;
-	std::streamsize sz = rf.getWidth();
+	SimpleRowFormatter rf;
+	std::streamsize sz = rf.getColumnWidth();
 
 	std::string line(sz * 5, '-');
 	std::ostringstream os;
@@ -1125,6 +1137,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DataTest");
 
 	CppUnit_addTest(pSuite, DataTest, testSession);
+	CppUnit_addTest(pSuite, DataTest, testStatementFormatting);
 	CppUnit_addTest(pSuite, DataTest, testFeatures);
 	CppUnit_addTest(pSuite, DataTest, testProperties);
 	CppUnit_addTest(pSuite, DataTest, testBLOB);

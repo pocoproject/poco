@@ -78,6 +78,7 @@ private:
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateMiscTable();
+	void recreateLogTable();
 
 	static ODBCTest::SessionPtr  _pSession;
 	static ODBCTest::ExecPtr     _pExecutor;

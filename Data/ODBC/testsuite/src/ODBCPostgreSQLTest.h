@@ -87,6 +87,7 @@ private:
 	void recreateNullsTable(const std::string& notNull="");
 	void recreateBoolTable();
 	void recreateMiscTable();
+	void recreateLogTable();
 
 	void configurePLPgSQL();
 		/// Configures PL/pgSQL in the database. A reasonable defaults

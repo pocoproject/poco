@@ -53,7 +53,8 @@ SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqli
 	_pDB(pDB),
 	_pStmt(0),
 	_stepCalled(false),
-	_nextResponse(0)
+	_nextResponse(0),
+	_affectedRowCount(0)
 {
 }
 
@@ -136,7 +137,7 @@ bool SQLiteStatementImpl::canBind() const
 
 void SQLiteStatementImpl::bindImpl()
 {
-	_stepCalled      = false;
+	_stepCalled = false;
 	_nextResponse = 0;
 	if (_pStmt == 0) return;
 
@@ -150,6 +151,8 @@ void SQLiteStatementImpl::bindImpl()
 
 	Bindings::iterator it    = binds.begin();
 	Bindings::iterator itEnd = binds.end();
+	if (it != itEnd)
+		_affectedRowCount = (*it)->numOfRowsHandled();
 	for (; it != itEnd && (*it)->canBind(); ++it)
 	{
 		(*it)->bind(pos);
@@ -161,6 +164,7 @@ void SQLiteStatementImpl::bindImpl()
 void SQLiteStatementImpl::clear()
 {
 	_columns.clear();
+	_affectedRowCount = 0;
 
 	if (_pStmt)
 	{
@@ -222,7 +226,7 @@ Poco::UInt32 SQLiteStatementImpl::next()
 		int rc = _nextResponse;
 		Utility::throwException(rc, std::string("Iterator Error: trying to access the next value"));
 	}
-
+	
 	return 1u;
 }
 
@@ -237,6 +241,12 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(Poco::UInt32 pos) const
 {
 	poco_assert (pos >= 0 && pos <= _columns.size());
 	return _columns[pos];
+}
+
+
+Poco::UInt32 SQLiteStatementImpl::affectedRowCount() const
+{
+	return _affectedRowCount ? _affectedRowCount : sqlite3_changes(_pDB);
 }
 
 

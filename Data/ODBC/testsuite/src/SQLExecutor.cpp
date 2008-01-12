@@ -40,6 +40,10 @@
 #include "Poco/DateTime.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/Thread.h"
+#include "Poco/Logger.h"
+#include "Poco/Message.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
@@ -49,6 +53,7 @@
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
+#include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -76,6 +81,10 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 using Poco::Stopwatch;
 using Poco::NumberFormatter;
+using Poco::AutoPtr;
+using Poco::Thread;
+using Poco::Logger;
+using Poco::Message;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 using Poco::InvalidArgumentException;
@@ -1234,6 +1243,35 @@ void SQLExecutor::insertEmptyDeque()
 }
 
 
+void SQLExecutor::affectedRows(const std::string& whereClause)
+{
+	std::vector<std::string> str;
+	str.push_back("s1");
+	str.push_back("s2");
+	str.push_back("s3");
+	str.push_back("s3");
+	int count = 100;
+
+	Statement stmt1((session() << "INSERT INTO Strings VALUES(?)", use(str)));
+	session() << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 0);
+	assert (4 == stmt1.execute());
+	session() << "SELECT COUNT(*) FROM Strings", into(count), now;
+	assert (count == 4);
+
+	Statement stmt2(session() << "UPDATE Strings SET str = 's4' WHERE str = 's3'");
+	assert (2 == stmt2.execute());
+
+	Statement stmt3(session() << "DELETE FROM Strings WHERE str = 's1'");
+	assert (1 == stmt3.execute());
+
+	std::string sql;
+	format(sql, "DELETE FROM Strings %s", whereClause);
+	Statement stmt4(session() << sql);
+	assert (3 == stmt4.execute());
+}
+
+
 void SQLExecutor::insertSingleBulk()
 {
 	std::string funct = "insertSingleBulk()";
@@ -1243,7 +1281,7 @@ void SQLExecutor::insertSingleBulk()
 	for (x = 0; x < 100; ++x)
 	{
 		int i = stmt.execute();
-		assert (i == 0);
+		assert (1 == i);
 	}
 	int count = 0;
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
@@ -1414,7 +1452,11 @@ void SQLExecutor::limitPrepare()
 		data.push_back(x);
 	}
 
-	try { session() << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	try 
+	{ 
+		Statement stmt = (session() << "INSERT INTO Strings VALUES (?)", use(data)); 
+		assert (100 == stmt.execute());
+	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
@@ -2931,4 +2973,88 @@ void SQLExecutor::multipleResults(const std::string& sql)
 	assert (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
 	assert (12 == aBart);
 	assert (Person("Simpson", "Lisa", "Springfield", 10) == pLisa);
+}
+
+
+void SQLExecutor::sqlChannel(const std::string& connect)
+{
+	try
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel(ODBC::Connector::KEY, connect, "TestSQLChannel");
+		pChannel->setProperty("keep", "2 seconds");
+
+		Message msgInf("InformationSource", "a Informational async message", Message::PRIO_INFORMATION);
+		pChannel->log(msgInf);
+		Message msgWarn("WarningSource", "b Warning async message", Message::PRIO_WARNING);
+		pChannel->log(msgWarn);
+		pChannel->wait();
+
+		pChannel->setProperty("async", "false");
+		Message msgInfS("InformationSource", "c Informational sync message", Message::PRIO_INFORMATION);
+		pChannel->log(msgInfS);
+		Message msgWarnS("WarningSource", "d Warning sync message", Message::PRIO_WARNING);
+		pChannel->log(msgWarnS);
+
+		RecordSet rs(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
+		assert (4 == rs.rowCount());
+		assert ("InformationSource" == rs["Source"]);
+		assert ("a Informational async message" == rs["Text"]);
+		rs.moveNext();
+		assert ("WarningSource" == rs["Source"]);
+		assert ("b Warning async message" == rs["Text"]);
+		rs.moveNext();
+		assert ("InformationSource" == rs["Source"]);
+		assert ("c Informational sync message" == rs["Text"]);
+		rs.moveNext();
+		assert ("WarningSource" == rs["Source"]);
+		assert ("d Warning sync message" == rs["Text"]);
+
+		Thread::sleep(3000);
+
+		Message msgInfA("InformationSource", "e Informational sync message", Message::PRIO_INFORMATION);
+		pChannel->log(msgInfA);
+		Message msgWarnA("WarningSource", "f Warning sync message", Message::PRIO_WARNING);
+		pChannel->log(msgWarnA);
+
+		RecordSet rs1(session(), "SELECT * FROM T_POCO_LOG_ARCHIVE");
+		assert (4 == rs1.rowCount());
+
+		pChannel->setProperty("keep", "");
+		assert ("forever" == pChannel->getProperty("keep"));
+		RecordSet rs2(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
+		assert (2 == rs2.rowCount());
+		assert ("InformationSource" == rs2["Source"]);
+		assert ("e Informational sync message" == rs2["Text"]);
+		rs2.moveNext();
+		assert ("WarningSource" == rs2["Source"]);
+		assert ("f Warning sync message" == rs2["Text"]);
+	} 
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlChannel()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlChannel()"); }
+}
+
+
+void SQLExecutor::sqlLogger(const std::string& connect)
+{
+	try
+	{
+		Logger& root = Logger::root();
+		root.setChannel(new SQLChannel(ODBC::Connector::KEY, connect, "TestSQLChannel"));
+		root.setLevel(Message::PRIO_INFORMATION);
+		
+		root.information("a Informational message");
+		root.warning("b Warning message");
+		root.debug("Debug message");
+
+		Thread::sleep(100);
+		RecordSet rs(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
+		assert (2 == rs.rowCount());
+		assert ("TestSQLChannel" == rs["Source"]);
+		assert ("a Informational message" == rs["Text"]);
+		rs.moveNext();
+		assert ("TestSQLChannel" == rs["Source"]);
+		assert ("b Warning message" == rs["Text"]);
+	} 
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlChannel()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlChannel()"); }
 }

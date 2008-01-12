@@ -53,6 +53,7 @@ public:
 	~ODBCSQLiteTest();
 
 	void testBareboneODBC();
+	void testAffectedRows();
 	void testNull();
 
 	static CppUnit::Test* suite();
@@ -70,6 +71,7 @@ private:
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateMiscTable();
+	void recreateLogTable();
 
 	static ODBCTest::SessionPtr _pSession;
 	static ODBCTest::ExecPtr    _pExecutor;

@@ -96,6 +96,8 @@ Poco::UInt32 StatementImpl::execute()
 	if (lim < _lowerLimit)
 		throw LimitException("Did not receive enough data.");
 
+	if (0 == lim) lim = affectedRowCount();
+
 	return lim;
 }
 
@@ -358,6 +360,14 @@ void StatementImpl::addExtract(AbstractExtraction* pExtraction)
 		_extractors.resize(pos + 1);
 
 	_extractors[pos].push_back(pExtraction);
+}
+
+
+void StatementImpl::formatSQL(std::vector<Any>& arguments)
+{
+	std::string sql;
+	Poco::format(sql, _ostr.str(), arguments);
+	_ostr.str("");	_ostr << sql;
 }
 
 

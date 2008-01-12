@@ -134,14 +134,22 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	}
 	else if (isInBound(dir))
 	{
-		pVal = (SQLPOINTER) val.c_str();
+		if (size) pVal = (SQLPOINTER) val.c_str();
 		_inParams.insert(ParamMap::value_type(pVal, size));
 	}
 	else
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
 
 	SQLLEN* pLenIn = new SQLLEN;
-	*pLenIn = SQL_NTS;
+	if (0 != size) *pLenIn = SQL_NTS;
+	else 
+	{
+		*pLenIn = SQL_NULL_DATA;
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
+		getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
+		size = colSize;
+	}
 
 	if (PB_AT_EXEC == _paramBinding)
 		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
@@ -175,7 +183,16 @@ void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
 	_inParams.insert(ParamMap::value_type(pVal, size));
 
 	SQLLEN* pLenIn = new SQLLEN;
-	*pLenIn  = size;
+	
+	if (0 != size) *pLenIn  = size;
+	else 
+	{
+		*pLenIn = SQL_NULL_DATA;
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
+		getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
+		size = colSize;
+	}
 
 	if (PB_AT_EXEC == _paramBinding)
 		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);

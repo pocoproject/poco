@@ -42,6 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/RefCountedObject.h"
 #include "Poco/DynamicAny.h"
 #include <sstream>
 #include <vector>
@@ -52,20 +53,29 @@ namespace Data {
 
 
 class Data_API RowFormatter
-	/// Row formatter is a rudimentary formatting class providing
-	/// basic row formatting. For custom formatting
-	/// strategies, inherit from this class and override formatNames()
+	/// Row formatter is an abstract class providing definition for row formatting functionality.
+	/// For custom formatting strategies, inherit from this class and override formatNames()
 	/// and formatValues() member functions.
+	///
+	/// Row formatter can be either passed to the RecordSet at construction time,
+	/// like in the following example:
+	///
+	/// RecordSet rs(session. "SELECT * FROM Table", new MyRowFormater);
+	///
+	/// or it can be supplied to the statement as in the following example:
+	///
+	/// MyRowFormatter rf
+	/// session << "SELECT * FROM Table", format(rf);
+	///
+	/// If no formatter is externally supplied to the statement, the SimpleRowFormatter is used.
+	/// Statement always has the ownership of the row formatter and shares
+	/// it with rows through RecordSet.
+	///
 {
 public:
 	typedef std::vector<std::string>             NameVec;
 	typedef SharedPtr<std::vector<std::string> > NameVecPtr;
 	typedef std::vector<DynamicAny>              ValueVec;
-
-	static const int DEFAULT_COLUMN_WIDTH = 16;
-
-	RowFormatter(std::streamsize width);
-		/// Creates the RowFormatter and sets the column width to specified value.
 
 	RowFormatter(const std::string& prefix = "", const std::string& postfix = "");
 		/// Creates the RowFormatter and sets the prefix and postfix to specified values.
@@ -73,30 +83,23 @@ public:
 	virtual ~RowFormatter();
 		/// Destroys the RowFormatter.
 
+	virtual std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) const = 0;
+		/// Formats the row field names.
+
+	virtual std::string& formatValues(const ValueVec& vals, std::string& formattedValues) const = 0;
+		/// Formats the row values.
+
 	const std::string& prefix() const;
 		/// Returns prefix string;
 
-	virtual std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) const;
-		/// Formats the row field names.
-
-	virtual std::string& formatValues(const ValueVec& vals, std::string& formattedValues) const;
-		/// Formats the row values.
-
 	const std::string& postfix() const;
 		/// Returns postfix string;
-
-	void setWidth(std::streamsize width);
-		/// Sets the column width.
-
-	std::streamsize getWidth() const;
-		/// Returns the column width.
 
 protected:
 	void setPrefix(const std::string& prefix);
 	void setPostfix(const std::string& postfix);
 
 private:
-	std::streamsize _width;
 	std::string     _prefix;
 	std::string     _postfix;
 };
@@ -105,17 +108,6 @@ private:
 ///
 /// inlines
 ///
-
-inline void RowFormatter::setWidth(std::streamsize width)
-{
-	_width = width;
-}
-
-
-inline std::streamsize RowFormatter::getWidth() const
-{
-	return _width;
-}
 
 
 inline void RowFormatter::setPrefix(const std::string& prefix)
@@ -140,6 +132,18 @@ inline const std::string& RowFormatter::postfix() const
 {
 	return _postfix;
 }
+
+
+template <typename T>
+inline T* format(const T& formatter)
+	/// Utility function used to pass formatter to the statement.
+	/// Statement takes the ownership of the formatter.
+{
+	return new T(formatter);
+}
+
+
+typedef SharedPtr<RowFormatter> RowFormatterPtr;
 
 
 } } // namespace Poco::Data

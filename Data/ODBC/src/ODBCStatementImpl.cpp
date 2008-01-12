@@ -64,7 +64,8 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_stmt(rSession.dbc()),
 	_stepCalled(false),
 	_nextResponse(0),
-	_prepared(false)
+	_prepared(false),
+	_affectedRowCount(0)
 {
 }
 
@@ -205,6 +206,9 @@ void ODBCStatementImpl::doBind(bool clear, bool reset)
 		Bindings::iterator it    = binds.begin();
 		Bindings::iterator itEnd = binds.end();
 
+		if (it != itEnd && 0 == _affectedRowCount)
+			_affectedRowCount = static_cast<Poco::UInt32>((*it)->numOfRowsHandled());
+
 		if (reset)
 		{
 			it = binds.begin();
@@ -257,6 +261,8 @@ void ODBCStatementImpl::clear()
 {
 	SQLRETURN rc = SQLCloseCursor(_stmt);
 	_stepCalled = false;
+	_affectedRowCount = 0;
+
 	if (Utility::isError(rc))
 	{
 		StatementError err(_stmt);
@@ -435,6 +441,19 @@ const MetaColumn& ODBCStatementImpl::metaColumn(Poco::UInt32 pos) const
 		throw InvalidAccessException(format("Invalid column number: %u", pos));
 
 	return *_columnPtrs[pos];
+}
+
+
+Poco::UInt32 ODBCStatementImpl::affectedRowCount() const
+{
+	if (0 == _affectedRowCount)
+	{
+		SQLLEN rows;
+		if (!Utility::isError(SQLRowCount(_stmt, &rows)))
+			_affectedRowCount = static_cast<Poco::UInt32>(rows);
+	}
+
+	return _affectedRowCount;
 }
 
 

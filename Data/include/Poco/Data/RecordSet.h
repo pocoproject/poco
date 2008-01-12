@@ -45,7 +45,6 @@
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
-#include "Poco/Data/RowFormatter.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/String.h"
 #include "Poco/DynamicAny.h"
@@ -85,6 +84,7 @@ public:
 	typedef RowIterator                 Iterator;
 
 	using Statement::isNull;
+	using Statement::setRowFormatter;
 
 	explicit RecordSet(const Statement& rStatement);
 		/// Creates the RecordSet.
@@ -288,15 +288,6 @@ public:
 	bool isNull(const std::string& name) const;
 		/// Returns true if column value of the current row is null.
 
-	void setFormatter(Row::FormatterPtr pRowFormatter);
-		/// Sets the row formatter for this recordset.
-		/// Row formatter is null pointer by default, indicating
-		/// use of default formatter for output formatting.
-		/// This function allows for custom formatters to be 
-		/// supplied by users. After setting a user supplied formatter,
-		/// to revert back to the default one, call this function with
-		/// zero argument.
-
 	std::ostream& copyNames(std::ostream& os) const;
 		/// Copies the column names to the target output stream.
 		/// Copied string is formatted by the current RowFormatter.
@@ -346,9 +337,9 @@ private:
 		}
 
 		if (typeFound)
-			throw NotFoundException(format("Column name: %s", name));
+			throw NotFoundException(Poco::format("Column name: %s", name));
 		else
-			throw NotFoundException(format("Column type: %s, name: %s", std::string(typeid(T).name()), name));
+			throw NotFoundException(Poco::format("Column type: %s, name: %s", std::string(typeid(T).name()), name));
 	}
 
 	template <class C, class E>
@@ -369,7 +360,7 @@ private:
 
 		std::size_t s = rExtractions.size();
 		if (0 == s || pos >= s)
-			throw RangeException(format("Invalid column index: %z", pos));
+			throw RangeException(Poco::format("Invalid column index: %z", pos));
 
 		ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(rExtractions[pos].get());
 
@@ -379,17 +370,16 @@ private:
 		}
 		else 
 		{
-			throw Poco::BadCastException(format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
+			throw Poco::BadCastException(Poco::format("Type cast failed!\nColumn: %z\nTarget type:\t%s",  
 				pos,
 				std::string(typeid(T).name())));
 		}
 	}
 
-	std::size_t       _currentRow;
-	RowIterator*      _pBegin;
-	RowIterator*      _pEnd;
-	RowMap            _rowMap;
-	Row::FormatterPtr _pRowFormatter;
+	std::size_t  _currentRow;
+	RowIterator* _pBegin;
+	RowIterator* _pEnd;
+	RowMap       _rowMap;
 };
 
 
@@ -516,12 +506,6 @@ inline RecordSet::Iterator RecordSet::begin()
 inline RecordSet::Iterator RecordSet::end()
 {
 	return *_pEnd;
-}
-
-
-inline void RecordSet::setFormatter(Row::FormatterPtr pRowFormatter)
-{
-	_pRowFormatter = pRowFormatter;
 }
 
 

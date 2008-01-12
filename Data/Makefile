@@ -9,12 +9,12 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = AbstractBinder AbstractBinding AbstractExtraction \
-	AbstractExtractor AbstractPreparation AbstractPrepare Bulk \
-	Connector BLOB BLOBStream DataException Date Limit MetaColumn \
+	AbstractExtractor AbstractPreparation AbstractPrepare ArchiveStrategy \
+	Bulk Connector BLOB BLOBStream DataException Date Limit MetaColumn \
 	PooledSessionHolder PooledSessionImpl Position \
 	Range RecordSet Row RowFormatter RowIterator \
-	Session SessionFactory SessionImpl \
-	SessionPool Statement StatementCreator StatementImpl Time
+	SimpleRowFormatter Session SessionFactory SessionImpl \
+	SessionPool SQLChannel Statement StatementCreator StatementImpl Time
 
 target         = PocoData
 target_version = $(LIBVERSION)

@@ -660,6 +660,31 @@ void ODBCSQLServerTest::recreateMiscTable()
 }
 
 
+void ODBCSQLServerTest::recreateLogTable()
+{
+	dropObject("TABLE", "T_POCO_LOG");
+	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+
+	try 
+	{ 
+		std::string sql = "CREATE TABLE %s "
+			"(Source VARCHAR(max),"
+			"Name VARCHAR(max),"
+			"ProcessId INTEGER,"
+			"Thread VARCHAR(max), "
+			"ThreadId INTEGER," 
+			"Priority INTEGER,"
+			"Text VARCHAR(max),"
+			"DateTime DATETIME)";
+
+		session() << sql, "T_POCO_LOG", now; 
+		session() << sql, "T_POCO_LOG_ARCHIVE", now; 
+
+	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
+}
+
+
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
 	if (_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db))
@@ -685,6 +710,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexTypeDeque);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertDeque);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertEmptyDeque);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAffectedRows);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertSingleBulkVec);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testLimit);
@@ -736,6 +762,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDynamicAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultipleResults);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLChannel);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLLogger);
 
 		return pSuite;
 	}

@@ -78,6 +78,10 @@ protected:
 	Poco::UInt32 columnsReturned() const;
 		/// Returns number of columns returned by query.
 
+	Poco::UInt32 affectedRowCount() const;
+		/// Returns the number of affected rows.
+		/// Used to find out the number of rows affected by insert or update.
+
 	const MetaColumn& metaColumn(Poco::UInt32 pos) const;
 		/// Returns column meta data.
 
@@ -165,6 +169,7 @@ private:
 	int                   _nextResponse;
 	ColumnPtrVec          _columnPtrs;
 	bool                  _prepared;
+	mutable Poco::UInt32  _affectedRowCount;
 };
 
 

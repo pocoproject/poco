@@ -54,7 +54,7 @@ public:
 	void testComplexTypeVector();
 	void testInsertVector();
 	void testInsertEmptyVector();
-
+	void testAffectedRows();
 	void testInsertSingleBulk();
 	void testInsertSingleBulkVec();
 
@@ -117,6 +117,9 @@ public:
 
 	void testAny();
 	void testDynamicAny();
+
+	void testSQLChannel();
+	void testSQLLogger();
 
 	void setUp();
 	void tearDown();

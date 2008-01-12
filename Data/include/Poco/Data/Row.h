@@ -82,7 +82,6 @@ public:
 	typedef RowFormatter::NameVec    NameVec;
 	typedef RowFormatter::NameVecPtr NameVecPtr;
 	typedef RowFormatter::ValueVec   ValueVec;
-	typedef SharedPtr<RowFormatter>  FormatterPtr;
 
 	enum ComparisonType
 	{
@@ -94,7 +93,7 @@ public:
 	Row();
 		/// Creates the Row.
 
-	explicit Row(NameVecPtr pNames, FormatterPtr* pFormatter = 0);
+	Row(NameVecPtr pNames, const RowFormatterPtr& pFormatter = 0);
 		/// Creates the Row.
 
 	~Row();
@@ -201,7 +200,7 @@ public:
 	const ValueVec& values() const;
 		/// Returns the const reference to values vector.
 
-	void setFormatter(FormatterPtr* pFormatter);
+	void setFormatter(const RowFormatterPtr& pFormatter);
 		/// Sets the formatter for this row and takes the
 		/// shared ownership of it.
 
@@ -226,7 +225,7 @@ private:
 	NameVecPtr           _pNames;
 	ValueVec             _values;
 	SortMap              _sortFields;
-	FormatterPtr         _pFormatter;
+	RowFormatterPtr      _pFormatter;
 	mutable std::string  _nameStr;
 	mutable std::string  _valueStr;
 };

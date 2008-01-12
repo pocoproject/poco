@@ -99,7 +99,9 @@ public:
 	void reset ()
 	{
 		_bound = false;
-		getBinder()->reset();
+		AbstractBinder* pBinder = getBinder();
+		poco_check_ptr (pBinder);
+		pBinder->reset();
 	}
 
 private:

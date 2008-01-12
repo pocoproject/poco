@@ -143,9 +143,10 @@ class Data_API Session
 	///     ses << "INSERT INTO Person (LastName, Age) VALUES(:ln, :age)", use(nameVec), use(ageVec);
 	///
 	/// The size of all use parameters MUST be the same, otherwise an exception is thrown. Furthermore,
-	/// the amount of use clauses must match the number of wildcards in the query (to be more precisely: 
-	/// each binding has a numberOfColumnsHandled() value which is per default 1. The sum of all these values must match the wildcard count in the query.
-	/// But this is only important if you have written your own TypeHandler specializations).
+	/// the amount of use clauses must match the number of wildcards in the query (to be more precise: 
+	/// each binding has a numberOfColumnsHandled() value which defaults to 1. The sum of all these values 
+	/// must match the wildcard count in the query.
+	/// However, this is only important if you have written your own TypeHandler specializations.
 	/// If you plan to map complex object types to tables see the TypeHandler documentation.
 	/// For now, we simply assume we have written one TypeHandler for Person objects. Instead of having n different vectors,
 	/// we have one collection:
@@ -159,6 +160,17 @@ class Data_API Session
 	///
 	///     std::vector<Person> people;
 	///     ses << "SELECT * FROM PERSON", into(people);
+	/// 
+	/// Mixing constants or variables with manipulators is allowed provided there are corresponding placeholders for the constants provided in
+	/// the SQL string, such as in following example:
+	///
+	///     std::vector<Person> people;
+	///     ses << "SELECT * FROM %s", into(people), "PERSON";
+	/// 
+	/// Formatting only kicks in if there are values to be injected into the SQL string, otherwise it is skipped.
+	/// If the formatting will occur and the percent sign is part of the query itself, it can be passed to the query by entering it twice (%%).
+	/// However, if no formatting is used, one percent sign is sufficient as the string will be passed unaltered.
+	/// For complete list of supported data types with their respective specifications, see the documentation for format in Foundation.
 {
 public:
 	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
@@ -172,7 +184,7 @@ public:
 		/// Creates a session by copying another one.
 
 	Session& operator = (const Session&);
-		/// Assignement operator.
+		/// Assignment operator.
 
 	~Session();
 		/// Destroys the Session.

@@ -68,7 +68,9 @@ Statement::Statement(const Statement& stmt):
 	_pImpl(stmt._pImpl),
 	_async(stmt._async),
 	_pResult(stmt._pResult),
-	_pAsyncExec(stmt._pAsyncExec)
+	_pAsyncExec(stmt._pAsyncExec),
+	_arguments(stmt._arguments),
+	_pRowFormatter(stmt._pRowFormatter)
 {
 }
 
@@ -94,6 +96,8 @@ void Statement::swap(Statement& other)
 	swap(_async, other._async);
 	swap(_pAsyncExec, other._pAsyncExec);
 	swap(_pResult, other._pResult);
+	_arguments.swap(other._arguments);
+	swap(_pRowFormatter, other._pRowFormatter);
 }
 
 
@@ -111,6 +115,12 @@ Statement::ResultType Statement::execute()
 	bool isDone = done();
 	if (initialized() || paused() || isDone)
 	{
+		if (_arguments.size()) 
+		{
+			_pImpl->formatSQL(_arguments);
+			_arguments.clear();
+		}
+
 		if (!isAsync())
 		{
 			if (isDone) _pImpl->reset();
@@ -141,9 +151,7 @@ const Statement::Result& Statement::doAsyncExec()
 	if (done()) _pImpl->reset();
 	if (!_pAsyncExec)
 		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
-	poco_check_ptr (_pAsyncExec);
 	_pResult = new Result((*_pAsyncExec)());
-	poco_check_ptr (_pResult);
 	return *_pResult;
 }
 

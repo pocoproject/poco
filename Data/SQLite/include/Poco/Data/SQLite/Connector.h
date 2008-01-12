@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_SQLite_Connector_INCLUDED
-#define DataConnectors_SQLite_Connector_INCLUDED
+#ifndef Data_SQLite_Connector_INCLUDED
+#define Data_SQLite_Connector_INCLUDED
 
 
 #include "Poco/Data/SQLite/SQLite.h"
@@ -60,7 +60,10 @@ public:
 		/// Creates the Connector.
 
 	~Connector();
-	/// Destroys the Connector.
+		/// Destroys the Connector.
+
+	const std::string& name() const;
+		/// Returns the name associated with this connector.
 
 	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString);
 		/// Creates a SQLite SessionImpl object and initializes it with the given connectionString.
@@ -73,7 +76,16 @@ public:
 };
 
 
+///
+/// inlines
+///
+inline const std::string& Connector::name() const
+{
+	return KEY;
+}
+
+
 } } } // namespace Poco::Data::SQLite
 
 
-#endif // DataConnectors_SQLite_Connector_INCLUDED
+#endif // Data_SQLite_Connector_INCLUDED

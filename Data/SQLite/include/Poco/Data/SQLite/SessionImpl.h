@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_SQLite_SessionImpl_INCLUDED
-#define DataConnectors_SQLite_SessionImpl_INCLUDED
+#ifndef Data_SQLite_SessionImpl_INCLUDED
+#define Data_SQLite_SessionImpl_INCLUDED
 
 
 #include "Poco/Data/SQLite/SQLite.h"
@@ -113,4 +113,4 @@ inline 	bool SessionImpl::isTransaction()
 } } } // namespace Poco::Data::SQLite
 
 
-#endif // DataConnectors_SQLite_SessionImpl_INCLUDED
+#endif // Data_SQLite_SessionImpl_INCLUDED

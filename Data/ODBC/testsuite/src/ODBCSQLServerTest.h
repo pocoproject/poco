@@ -91,6 +91,7 @@ private:
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateBoolTable();
 	void recreateMiscTable();
+	void recreateLogTable();
 
 	static SessionPtr  _pSession;
 	static ExecPtr     _pExecutor;

@@ -58,11 +58,11 @@ SessionFactory& SessionFactory::instance()
 }
 
 
-void SessionFactory::add(const std::string& key, Connector* pIn)
+void SessionFactory::add(Connector* pIn)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	SessionInfo info(pIn);
-	std::pair<Connectors::iterator, bool> res = _connectors.insert(std::make_pair(key, info));
+	std::pair<Connectors::iterator, bool> res = _connectors.insert(std::make_pair(pIn->name(), info));
 	if (!res.second)
 	{
 		res.first->second.cnt++;

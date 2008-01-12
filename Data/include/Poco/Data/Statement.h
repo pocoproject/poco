@@ -44,10 +44,13 @@
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/Range.h"
 #include "Poco/Data/Bulk.h"
+#include "Poco/Data/Row.h"
+#include "Poco/Data/SimpleRowFormatter.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/ActiveResult.h"
+#include "Poco/Format.h"
 
 
 namespace Poco {
@@ -68,35 +71,6 @@ class Data_API Statement
 	/// Synchronous ececution is achieved through execute() call, while asynchronous is
 	/// achieved through executeAsync() method call.
 	/// An asynchronously executing statement should not be copied during the execution. 
-	/// Copying is not prohibited, however the benefits of the asynchronous call shall 
-	/// be lost for that particular call since the synchronizing call shall internally be 
-	/// called in the copy constructor.
-	/// 
-	/// For example, in the following case, although the execution is asyncronous, the
-	/// synchronization part happens in the copy constructor, so the asynchronous nature 
-	/// of the statement is lost for the end user:
-	/// 
-	///		Statement stmt = (session << "SELECT * FROM Table", async, now);
-	/// 
-	/// while in this case it is preserved:
-	/// 
-	///		Statement stmt = session << "SELECT * FROM Table", async, now;
-	/// 
-	/// There are two ways to preserve the asynchronous nature of a statement:
-	/// 
-	/// 1) Call executeAsync() method directly:
-	///
-	///		Statement stmt = session << "SELECT * FROM Table"; // no execution yet
-	///		stmt.executeAsync(); // asynchronous execution
-	///		// do something else ...
-	///		stmt.wait(); // synchronize
-	///
-	/// 2) Ensure asynchronous execution through careful syntax constructs:
-	/// 
-	///		Statement stmt(session);
-	///		stmt = session << "SELECT * FROM Table", async, now;
-	///		// do something else ...
-	///		stmt.wait(); // synchronize
 	///
 	/// Note:
 	///
@@ -112,6 +86,10 @@ class Data_API Statement
 	///
 	/// See individual functions documentation for more details.
 	///
+	/// Statement owns the RowFormatter, which can be provided externaly through setFormatter()
+	/// member function.
+	/// If no formatter is externally supplied to the statement, the SimpleRowFormatter is lazy
+	/// created and used.
 {
 public:
 	typedef void (*Manipulator)(Statement&);
@@ -121,6 +99,8 @@ public:
 	typedef SharedPtr<Result>                             ResultPtr;
 	typedef ActiveMethod<ResultType, void, StatementImpl> AsyncExecMethod;
 	typedef SharedPtr<AsyncExecMethod>                    AsyncExecMethodPtr;
+
+	static const int WAIT_FOREVER = -1;
 
 	enum Storage
 	{
@@ -200,28 +180,83 @@ public:
 		///
 		/// Set per default to zero to Limit::LIMIT_UNLIMITED, which disables the limit.
 
+	Statement& operator , (RowFormatter* pRowFformatter);
+		/// Sets the row formatter for the statement.
+
 	Statement& operator , (const Range& extrRange);
 		/// Sets a an extraction range for the maximum number of rows a select is allowed to return.
 		///
 		/// Set per default to Limit::LIMIT_UNLIMITED which disables the range.
 
-	std::string toString() const;
+	Statement& operator , (char value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (Poco::UInt8 value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (Poco::Int8 value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (Poco::UInt16 value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (Poco::Int16 value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (Poco::UInt32 value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (Poco::Int32 value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+#ifndef POCO_LONG_IS_64_BIT
+	Statement& operator , (long value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (unsigned long value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+#endif
+	Statement& operator , (Poco::UInt64 value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (Poco::Int64 value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (double value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (float value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (bool value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (const std::string& value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	Statement& operator , (const char* value);
+		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
+
+	const std::string& toString() const;
 		/// Creates a string from the accumulated SQL statement.
 
 	ResultType execute();
 		/// Executes the statement synchronously or asynchronously. 
 		/// Stops when either a limit is hit or the whole statement was executed.
-		/// Returns the number of rows extracted from the database.
+		/// Returns the number of rows extracted from the database (for statements
+		/// returning data) or number of rows affected (for all other statements).
 		/// If isAsync() returns  true, the statement is executed asynchronously 
 		/// and the return value from this function is zero.
-		/// The number of extracted rows from the query can be obtained by calling 
-		/// wait().
+		/// The result of execution (i.e. number of returned or affected rows) can be 
+		/// obtained by calling wait() on the statement at a later point in time.
 
 	const Result& executeAsync();
 		/// Executes the statement asynchronously. 
 		/// Stops when either a limit is hit or the whole statement was executed.
-		/// Returns immediately. For statements returning data, the number of rows extracted is 
-		/// available by calling wait() method on either the returned value or the statement itself.
+		/// Returns immediately. Calling wait() (on either the result returned from this 
+		/// call or the statement itself) returns the number of rows extracted or number 
+		/// of rows affected by the statement execution.
 		/// When executed on a synchronous statement, this method does not alter the
 		/// statement's synchronous nature.
 
@@ -269,6 +304,10 @@ public:
 		/// Returns the number of extraction storage buffers associated
 		/// with the statement.
 
+	void setRowFormatter(RowFormatter* pRowFormatter);
+		/// Sets the row formatter for this statement.
+		/// Statement takes the ownership of the formatter.
+
 protected:
 	typedef Poco::AutoPtr<StatementImpl> StatementImplPtr;
 
@@ -290,19 +329,30 @@ protected:
 	StatementImplPtr impl() const;
 		/// Returns pointer to statement implementation.
 
-private:
-	static const int WAIT_FOREVER = -1;
+	const RowFormatterPtr& getRowFormatter();
+		/// Returns the row formatter for this statement.
 
+private:
 	const Result& doAsyncExec();
 		/// Asynchronously executes the statement.
+
+	template <typename T>
+	Statement& commaImpl (const T& val)
+	{
+		_arguments.push_back(val);
+		return *this;
+	}
 
 	StatementImplPtr _pImpl;
 
 	// asynchronous execution related members
-	bool               _async;
-	mutable ResultPtr  _pResult;
-	Mutex              _mutex;
-	AsyncExecMethodPtr _pAsyncExec;
+	bool                _async;
+	mutable ResultPtr   _pResult;
+	Mutex               _mutex;
+	AsyncExecMethodPtr  _pAsyncExec;
+	std::vector<Any>    _arguments;
+	RowFormatterPtr     _pRowFormatter;
+	mutable std::string _stmtString;
 };
 
 
@@ -381,6 +431,110 @@ inline void Data_API reset(Statement& statement)
 // inlines
 //
 
+inline Statement& Statement::operator , (RowFormatter* pRowFformatter)
+{
+	_pRowFormatter = pRowFformatter;
+	return *this;
+}
+
+
+inline Statement& Statement::operator , (char value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (Poco::UInt8 value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (Poco::Int8 value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (Poco::UInt16 value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (Poco::Int16 value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (Poco::UInt32 value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (Poco::Int32 value)
+{
+	return commaImpl(value);
+}
+
+
+#ifndef POCO_LONG_IS_64_BIT
+inline Statement& Statement::operator , (long value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (unsigned long value)
+{
+	return commaImpl(value);
+}
+#endif
+
+
+inline Statement& Statement::operator , (Poco::UInt64 value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (Poco::Int64 value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (double value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (float value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (bool value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (const std::string& value)
+{
+	return commaImpl(value);
+}
+
+
+inline Statement& Statement::operator , (const char* value)
+{
+	return commaImpl(std::string(value));
+}
+
 
 inline Statement::StatementImplPtr Statement::impl() const
 {
@@ -388,11 +542,10 @@ inline Statement::StatementImplPtr Statement::impl() const
 }
 
 
-inline std::string Statement::toString() const
+inline const std::string& Statement::toString() const
 {
-	return _pImpl->toString();
+	return _stmtString = _pImpl->toString();
 }
-
 
 inline const AbstractExtractionVec& Statement::extractions() const
 {
@@ -469,6 +622,19 @@ inline bool Statement::isBulkExtraction() const
 inline bool Statement::isAsync() const
 {
 	return _async;
+}
+
+
+inline void Statement::setRowFormatter(RowFormatter* pRowFormatter)
+{
+	_pRowFormatter = pRowFormatter;
+}
+
+
+inline const RowFormatterPtr& Statement::getRowFormatter()
+{
+	if (!_pRowFormatter) _pRowFormatter = new SimpleRowFormatter;
+	return _pRowFormatter;
 }
 
 

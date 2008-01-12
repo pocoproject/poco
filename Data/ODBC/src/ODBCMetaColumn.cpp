@@ -107,6 +107,7 @@ void ODBCMetaColumn::init()
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
 	case -9:// SQL Server NVARCHAR
+	case -10:// PostgreSQL VARCHAR (without size specified)
 		setType(MetaColumn::FDT_STRING); break;
 	case SQL_TINYINT:
 		setType(MetaColumn::FDT_INT8); break;

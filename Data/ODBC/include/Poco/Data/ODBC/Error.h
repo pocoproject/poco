@@ -92,7 +92,7 @@ public:
 			return str;
 
 		std::string s;
-		format(s, 
+		Poco::format(s, 
 			"===========================\n"
 			"ODBC Diagnostic record #%d:\n"
 			"===========================\n"
@@ -112,7 +112,7 @@ public:
 	{
 		std::string str;
 
-		format(str, 
+		Poco::format(str, 
 			"Connection:%s\nServer:%s\n",
 			_diagnostics.connectionName(),
 			_diagnostics.serverName());

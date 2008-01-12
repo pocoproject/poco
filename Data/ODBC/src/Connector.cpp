@@ -65,7 +65,7 @@ Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::strin
 
 void Connector::registerConnector()
 {
-	Poco::Data::SessionFactory::instance().add(KEY, new Connector());
+	Poco::Data::SessionFactory::instance().add(new Connector());
 }
 
 

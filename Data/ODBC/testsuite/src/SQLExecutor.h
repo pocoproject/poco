@@ -148,6 +148,8 @@ public:
 	void insertDeque();
 	void insertEmptyDeque();
 
+	void affectedRows(const std::string& whereClause = "");
+
 	void insertSingleBulk();
 	void insertSingleBulkVec();
 
@@ -498,6 +500,9 @@ public:
 		"SELECT * FROM Person WHERE Age = ?; "
 		"SELECT Age FROM Person WHERE FirstName = 'Bart'; "
 		"SELECT * FROM Person WHERE Age = ?; ");
+
+	void sqlChannel(const std::string& connect);
+	void sqlLogger(const std::string& connect);
 
 private:
 	static const std::string MULTI_INSERT;

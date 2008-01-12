@@ -74,8 +74,8 @@ public:
 	static SessionFactory& instance();
 		/// returns the static instance of the singleton.
 
-	void add(const std::string& key, Connector* pIn);
-		/// Registers a Connector under the given key at the factory. If a registration for that
+	void add(Connector* pIn);
+		/// Registers a Connector under its key at the factory. If a registration for that
 		/// key is already active, the first registration will be kept, only its reference count will be increased.
 		/// Always takes ownership of parameter pIn.
 

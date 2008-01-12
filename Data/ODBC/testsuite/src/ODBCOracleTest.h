@@ -85,9 +85,11 @@ private:
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateMiscTable();
+	void recreateLogTable();
 
-	static ODBCTest::SessionPtr  _pSession;
-	static ODBCTest::ExecPtr     _pExecutor;
+	static ODBCTest::SessionPtr _pSession;
+	static ODBCTest::ExecPtr    _pExecutor;
+	
 	static std::string _driver;
 	static std::string _dsn;
 	static std::string _uid;

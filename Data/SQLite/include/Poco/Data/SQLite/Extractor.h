@@ -36,8 +36,8 @@
 //
 
 
-#ifndef DataConnectors_SQLite_Extractor_INCLUDED
-#define DataConnectors_SQLite_Extractor_INCLUDED
+#ifndef Data_SQLite_Extractor_INCLUDED
+#define Data_SQLite_Extractor_INCLUDED
 
 
 #include "Poco/Data/SQLite/SQLite.h"
@@ -301,4 +301,4 @@ inline void Extractor::reset()
 } } } // namespace Poco::Data::SQLite
 
 
-#endif // DataConnectors_SQLite_Extractor_INCLUDED
+#endif // Data_SQLite_Extractor_INCLUDED

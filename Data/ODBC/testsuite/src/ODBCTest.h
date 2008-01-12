@@ -37,10 +37,11 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
+#include "CppUnit/TestCase.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/SharedPtr.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/Exception.h"
 #include "SQLExecutor.h"
 
 
@@ -85,6 +86,8 @@ public:
 	virtual void testComplexTypeDeque();
 	virtual void testInsertDeque();
 	virtual void testInsertEmptyDeque();
+
+	virtual void testAffectedRows();
 
 	virtual void testInsertSingleBulk();
 	virtual void testInsertSingleBulkVec();
@@ -135,13 +138,13 @@ public:
 	virtual void testInternalBulkExtraction();
 	virtual void testInternalStorageType();
 
-	virtual void testStoredProcedure() { /* no-op */ };
-	virtual void testStoredProcedureAny() { /* no-op */ };
-	virtual void testStoredProcedureDynamicAny() { /* no-op */ };
+	virtual void testStoredProcedure();
+	virtual void testStoredProcedureAny();
+	virtual void testStoredProcedureDynamicAny();
 
-	virtual void testStoredFunction() { /* no-op */ };
-	virtual void testStoredFunctionAny() { /* no-op */ };
-	virtual void testStoredFunctionDynamicAny() { /* no-op */ };
+	virtual void testStoredFunction();
+	virtual void testStoredFunctionAny();
+	virtual void testStoredFunctionDynamicAny();
 
 	virtual void testNull();
 	virtual void testRowIterator();
@@ -154,24 +157,29 @@ public:
 
 	virtual void testMultipleResults();
 
+	virtual void testSQLChannel();
+
+	virtual void testSQLLogger();
+
 protected:
 	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
 
-	virtual void dropObject(const std::string& type, const std::string& name) { /* no-op */ };
-	virtual void recreatePersonTable() { /* no-op */ };
-	virtual void recreatePersonBLOBTable() { /* no-op */ };
-	virtual void recreatePersonDateTimeTable() { /* no-op */ };
-	virtual void recreatePersonDateTable() { /* no-op */ };
-	virtual void recreatePersonTimeTable() { /* no-op */ };
-	virtual void recreateStringsTable() { /* no-op */ };
-	virtual void recreateIntsTable() { /* no-op */ };
-	virtual void recreateFloatsTable() { /* no-op */ };
-	virtual void recreateTuplesTable() { /* no-op */ };
-	virtual void recreateVectorsTable() { /* no-op */ };
-	virtual void recreateAnysTable() { /* no-op */ };
-	virtual void recreateNullsTable(const std::string& notNull="") { /* no-op */ };
-	virtual void recreateBoolTable() { /* no-op */ };
-	virtual void recreateMiscTable() { /* no-op */ };
+	virtual void dropObject(const std::string& type, const std::string& name);
+	virtual void recreatePersonTable();
+	virtual void recreatePersonBLOBTable();
+	virtual void recreatePersonDateTimeTable();
+	virtual void recreatePersonDateTable();
+	virtual void recreatePersonTimeTable();
+	virtual void recreateStringsTable();
+	virtual void recreateIntsTable();
+	virtual void recreateFloatsTable();
+	virtual void recreateTuplesTable();
+	virtual void recreateVectorsTable();
+	virtual void recreateAnysTable();
+	virtual void recreateNullsTable(const std::string& notNull="");
+	virtual void recreateBoolTable();
+	virtual void recreateMiscTable();
+	virtual void recreateLogTable();
 
 	static SessionPtr init(const std::string& driver,
 		std::string& dsn,
@@ -209,9 +217,142 @@ private:
 };
 
 
-///
-/// inlines
-///
+//
+// inlines
+//
+
+inline void ODBCTest::testStoredProcedure() 
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredProcedure()");
+}
+
+
+inline void ODBCTest::testStoredProcedureAny() 
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredProcedureAny()");
+}
+
+
+inline void ODBCTest::testStoredProcedureDynamicAny() 
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredProcedureDynamicAny()");
+}
+
+
+inline void ODBCTest::testStoredFunction() 
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredFunction()");
+}
+
+
+inline void ODBCTest::testStoredFunctionAny() 
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionAny()");
+}
+
+
+inline void ODBCTest::testStoredFunctionDynamicAny() 
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+}
+
+
+inline void ODBCTest::dropObject(const std::string& type, const std::string& name)
+{
+	throw Poco::NotImplementedException("ODBCTest::dropObject()");
+}
+
+
+inline void ODBCTest::recreatePersonTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+}
+
+
+inline void ODBCTest::recreatePersonBLOBTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+}
+
+
+inline void ODBCTest::recreatePersonDateTimeTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+}
+
+
+inline void ODBCTest::recreatePersonDateTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+}
+
+
+inline void ODBCTest::recreatePersonTimeTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+}
+
+
+inline void ODBCTest::recreateStringsTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateStringsTable()");
+}
+
+
+inline void ODBCTest::recreateIntsTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateIntsTable()");
+}
+
+
+inline void ODBCTest::recreateFloatsTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateFloatsTable()");
+}
+
+
+inline void ODBCTest::recreateTuplesTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateTuplesTable()");
+}
+
+
+inline void ODBCTest::recreateVectorsTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateVectorsTable()");
+}
+
+
+inline void ODBCTest::recreateAnysTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateAnysTable()");
+}
+
+
+inline void ODBCTest::recreateNullsTable(const std::string&)
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateNullsTable()");
+}
+
+
+inline void ODBCTest::recreateBoolTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateBoolTable()");
+}
+
+
+inline void ODBCTest::recreateMiscTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateMiscTable()");
+}
+
+
+inline void ODBCTest::recreateLogTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreateLogTable()");
+}
+
+
 inline bool ODBCTest::bindValue(int i) 
 { 
 	poco_assert (i < 8);

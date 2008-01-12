@@ -50,6 +50,7 @@ public:
 	~DataTest();
 
 	void testSession();
+	void testStatementFormatting();
 	void testFeatures();
 	void testProperties();
 	void testBLOB();
