@@ -61,6 +61,7 @@ public:
 
 	void testChar();
 	void testInt();
+	void testBool();
 	void testAnyInt();
 	void testFloatFix();
 	void testFloatSci();
