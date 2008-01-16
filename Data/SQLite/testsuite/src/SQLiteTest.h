@@ -47,6 +47,7 @@ public:
 	~SQLiteTest();
 
 	void testSimpleAccess();
+	void testNullCharPointer();
 	void testInsertCharPointer();
 	void testInsertCharPointer2();
 	void testComplexType();
@@ -120,6 +121,9 @@ public:
 
 	void testSQLChannel();
 	void testSQLLogger();
+
+	void testExternalBindingAndExtraction();
+	void testBindingCount();
 
 	void setUp();
 	void tearDown();

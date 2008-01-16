@@ -52,6 +52,7 @@
 #include "Poco/Thread.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
+#include "Poco/RefCountedObject.h"
 #include <iostream>
 
 
@@ -69,7 +70,9 @@ using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
 using Poco::NotFoundException;
-using Poco::Data::SQLite::InvalidSQLStatementException;
+using Poco::NullPointerException;
+using Poco::Data::SQLite::ConstraintViolationException;
+using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int64;
 
 
@@ -212,6 +215,48 @@ void SQLiteTest::testSimpleAccess()
 }
 
 
+void SQLiteTest::testNullCharPointer()
+{
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	std::string lastName("lastname");
+	int age = 100;
+	int count = 100;
+	std::string result;
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", 
+		bind(lastName), 
+		bind("firstname"), 
+		bind("Address"), 
+		bind(0), now;
+
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+	tmp << "SELECT LastName FROM PERSON", into(result), now;
+	assert (lastName == result);
+	tmp << "SELECT Age FROM PERSON", into(age), now;
+	assert (0 == age);
+
+	try
+	{
+		const char* pc = 0;
+		tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)",
+			bind("lastname"), 
+			bind("firstname"), 
+			bind("Address"), bind(pc), now;
+			fail ("must fail");
+	} catch (NullPointerException&)	{ }
+
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+	tmp << "SELECT LastName FROM PERSON", into(result), now;
+	assert (lastName == result);
+	tmp << "SELECT Age FROM PERSON", into(age), now;
+	assert (0 == age);
+}
+
+
 void SQLiteTest::testInsertCharPointer()
 {
 	Session tmp (SQLite::Connector::KEY, "dummy.db");
@@ -225,7 +270,25 @@ void SQLiteTest::testInsertCharPointer()
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
 
-	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use("lastname"), use("firstname"), use("Address"), use(133132), now;
+	const char* pc = 0;
+	try
+	{
+		tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", bind(pc), now;
+		fail ("must fail");
+	} catch (NullPointerException&)	{ }
+
+	pc = (const char*) std::calloc(9, sizeof(char));
+	poco_check_ptr (pc);
+	std::strncpy((char*) pc, "lastname", 8);
+	Statement stmt = (tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", 
+		bind(pc), 
+		bind("firstname"), 
+		bind("Address"), 
+		bind(133132));
+	
+	free((void*) pc); pc = 0;
+	assert (1 == stmt.execute());
+
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);
 	tmp << "SELECT LastName FROM PERSON", into(result), now;
@@ -249,7 +312,11 @@ void SQLiteTest::testInsertCharPointer2()
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
 
-	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use("lastname"), use("firstname"), use("Address"), use(133132), now;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", 
+		bind("lastname"), 
+		bind("firstname", "FN"), 
+		bind("Address", "Addr"), 
+		bind(133132), now;
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);
 	Statement stmt1 = (tmp << "SELECT LastName FROM PERSON", into(result));
@@ -1080,7 +1147,8 @@ void SQLiteTest::testBLOB()
 	assert (count == 1);
 	BLOB res;
 	poco_assert (res.size() == 0);
-	tmp << "SELECT Image FROM Person WHERE LastName == :ln", use("lastname"), into(res), now;
+
+	tmp << "SELECT Image FROM Person WHERE LastName == :ln", bind("lastname"), into(res), now;
 	poco_assert (res == img);
 }
 
@@ -1664,7 +1732,7 @@ void SQLiteTest::testPrimaryKeyConstraint()
 	{
 		try
 		{
-			ses << "INSERT INTO LogTest (Id, [Time], Value) VALUES (:id, :time, :value)", use(id), use(timeIn), use(value), now; //lint !e1058
+			ses << "INSERT INTO LogTest (Id, [Time], Value) VALUES (:id, :time, :value)", use(id), bind(timeIn), bind(value), now; //lint !e1058
 			if (i > 0)
 				fail("must fail");
 		}
@@ -1690,7 +1758,7 @@ void SQLiteTest::testNull()
 	{
 		ses << "INSERT INTO NullTest VALUES(:i)", use(null), now;
 		fail ("must fail");
-	}catch (InvalidSQLStatementException&) { }
+	}catch (ConstraintViolationException&) { }
 
 	ses << "DROP TABLE IF EXISTS NullTest", now;
 	ses << "CREATE TABLE NullTest (i INTEGER, r REAL, v VARCHAR)", now;
@@ -2026,6 +2094,65 @@ void SQLiteTest::testSQLLogger()
 }
 
 
+void SQLiteTest::testExternalBindingAndExtraction()
+{
+	AbstractExtractionVecVec extractionVec;
+	AbstractExtractionVec extraction;
+	AbstractBindingVec binding;
+
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
+
+	tmp << "DROP TABLE IF EXISTS Ints", now;
+	tmp << "CREATE TABLE Ints (int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
+
+	int x = 1, y = 2, z = 3;
+	binding.push_back(use(x));
+	binding.push_back(use(y));
+	binding.push_back(use(z));
+
+	tmp << "INSERT INTO Ints VALUES (?,?,?)", use(binding), now;
+
+	Poco::Int64 a = 0, b = 0, c = 0;
+	extraction.push_back(into(a));
+	extraction.push_back(into(b));
+	extraction.push_back(into(c));
+	tmp << "SELECT * FROM Ints", into(extraction), now;
+	assert (a == x);
+	assert (b == y);
+	assert (c == z);
+
+	a = 0, b = 0, c = 0;
+	extractionVec.push_back(extraction);
+	tmp << "SELECT * FROM Ints", into(extractionVec), now;
+	assert (a == x);
+	assert (b == y);
+	assert (c == z);
+}
+
+
+void SQLiteTest::testBindingCount()
+{
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
+
+	tmp << "DROP TABLE IF EXISTS Ints", now;
+	tmp << "CREATE TABLE Ints (int0 INTEGER)", now;
+
+	int i = 42;
+	try	{ tmp << "INSERT INTO Ints VALUES (?)", now; } 
+	catch (ParameterCountMismatchException&) { }
+
+	try	{ tmp << "INSERT INTO Ints VALUES (?)", bind(42), bind(42), now; }
+	catch (ParameterCountMismatchException&) { }
+	tmp << "INSERT INTO Ints VALUES (?)", use(i), now;
+	
+	i = 0;
+	try	{ tmp << "SELECT int0 from Ints where int0 = ?", into(i), now; }
+	catch (ParameterCountMismatchException&) { }
+	tmp << "SELECT int0 from Ints where int0 = ?", bind(42), into(i), now;
+	assert (42 == i);
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -2041,6 +2168,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteTest");
 
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccess);
+	CppUnit_addTest(pSuite, SQLiteTest, testNullCharPointer);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer2);
 	CppUnit_addTest(pSuite, SQLiteTest, testComplexType);
@@ -2106,6 +2234,8 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);
 	CppUnit_addTest(pSuite, SQLiteTest, testSQLChannel);
 	CppUnit_addTest(pSuite, SQLiteTest, testSQLLogger);
+	CppUnit_addTest(pSuite, SQLiteTest, testExternalBindingAndExtraction);
+	CppUnit_addTest(pSuite, SQLiteTest, testBindingCount);
 
 	return pSuite;
 }
