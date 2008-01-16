@@ -816,6 +816,20 @@ Extraction<T>* into(T& t, const Position& pos, const T& def)
 }
 
 
+inline AbstractExtractionVecVec& into(AbstractExtractionVecVec& evv)
+	/// Convenience dummy function (for syntax purposes only).
+{
+	return evv;
+}
+
+
+inline AbstractExtractionVec& into(AbstractExtractionVec& ev)
+	/// Convenience dummy function (for syntax purposes only).
+{
+	return ev;
+}
+
+
 } } // namespace Poco::Data
 
 

@@ -46,6 +46,8 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <vector>
+#include <list>
+#include <deque>
 #include <cstddef>
 
 
@@ -119,6 +121,8 @@ private:
 
 typedef Poco::AutoPtr<AbstractBinding> AbstractBindingPtr;
 typedef std::vector<AbstractBindingPtr> AbstractBindingVec;
+typedef std::deque<AbstractBindingPtr> AbstractBindingDeq;
+typedef std::list<AbstractBindingPtr> AbstractBindingLst;
 
 
 //

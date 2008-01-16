@@ -2897,6 +2897,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	assert (stmt2.execute() == rowCount);
 }
 
+
 void SQLExecutor::any()
 {
 	Any i = 42;

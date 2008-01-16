@@ -363,6 +363,26 @@ void StatementImpl::addExtract(AbstractExtraction* pExtraction)
 }
 
 
+void StatementImpl::removeBind(const std::string& name)
+{
+	bool found = false;
+
+	AbstractBindingVec::iterator it = _bindings.begin();
+	for (; it != _bindings.end();)
+	{
+		if ((*it)->name() == name) 
+		{
+			it = _bindings.erase(it);
+			found = true;
+		}
+		else ++it;
+	}
+
+	if (!found)
+		throw NotFoundException(name);
+}
+
+
 void StatementImpl::formatSQL(std::vector<Any>& arguments)
 {
 	std::string sql;

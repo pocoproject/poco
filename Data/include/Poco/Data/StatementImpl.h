@@ -125,11 +125,15 @@ public:
 		_ostr << t;
 	}
 
-	void addBinding(AbstractBinding* pBinding);
-		/// Registers the Binding at the StatementImpl.
+	void addBind(AbstractBinding* pBinding);
+		/// Registers the Binding with the StatementImpl.
+
+	void removeBind(const std::string& name);
+		/// Unregisters all the bindings having specified name with the StatementImpl.
+		/// Bindings are released and, if this class was the sole owner, deleted.
 
 	void addExtract(AbstractExtraction* pExtraction);
-		/// Registers objects used for extracting data at the StatementImpl.
+		/// Registers objects used for extracting data with the StatementImpl.
 
 	void setExtractionLimit(const Limit& extrLimit);
 		/// Changes the extractionLimit to extrLimit. Per default no limit (EXTRACT_UNLIMITED) is set.
@@ -426,7 +430,7 @@ private:
 //
 // inlines
 //
-inline void StatementImpl::addBinding(AbstractBinding* pBinding)
+inline void StatementImpl::addBind(AbstractBinding* pBinding)
 {
 	poco_check_ptr (pBinding);
 	_bindings.push_back(pBinding);

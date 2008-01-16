@@ -46,6 +46,8 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <vector>
+#include <deque>
+#include <list>
 #include <cstddef>
 
 
@@ -133,6 +135,10 @@ private:
 typedef Poco::AutoPtr<AbstractExtraction> AbstractExtractionPtr;
 typedef std::vector<AbstractExtractionPtr> AbstractExtractionVec;
 typedef std::vector<AbstractExtractionVec> AbstractExtractionVecVec;
+typedef std::deque<AbstractExtractionPtr> AbstractExtractionDeq;
+typedef std::vector<AbstractExtractionDeq> AbstractExtractionDeqVec;
+typedef std::list<AbstractExtractionPtr> AbstractExtractionLst;
+typedef std::vector<AbstractExtractionLst> AbstractExtractionLstVec;
 
 
 //

@@ -63,6 +63,7 @@ public:
 	void testRowSort();
 	void testRowFormat();
 	void testDateAndTime();
+	void testExternalBindingAndExtraction();
 
 	void setUp();
 	void tearDown();

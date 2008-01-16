@@ -205,7 +205,7 @@ Statement& Statement::operator , (Manipulator manip)
 }
 
 
-Statement& Statement::operator , (AbstractBinding* pBind)
+Statement& Statement::addBind(AbstractBinding* pBind, bool duplicate)
 {
 	if (pBind->isBulk())
 	{
@@ -219,12 +219,13 @@ Statement& Statement::operator , (AbstractBinding* pBind)
 	}
 	else _pImpl->forbidBulk();
 
-	_pImpl->addBinding(pBind);
+	if (duplicate) pBind->duplicate();
+	_pImpl->addBind(pBind);
 	return *this;
 }
 
 
-Statement& Statement::operator , (AbstractExtraction* pExtract)
+Statement& Statement::addExtract(AbstractExtraction* pExtract, bool duplicate)
 {
 	if (pExtract->isBulk())
 	{
@@ -241,6 +242,7 @@ Statement& Statement::operator , (AbstractExtraction* pExtract)
 	}
 	else _pImpl->forbidBulk();
 
+	if (duplicate) pExtract->duplicate();
 	_pImpl->addExtract(pExtract);
 	return *this;
 }

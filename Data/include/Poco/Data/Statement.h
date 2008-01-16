@@ -153,12 +153,82 @@ public:
 	Statement& operator , (Manipulator manip);
 		/// Handles manipulators, such as now, async, etc.
 
-	Statement& operator , (AbstractBinding* info);
-		/// Registers the Binding at the Statement.
+	Statement& operator , (AbstractBinding* bind);
+		/// Registers the Binding with the Statement by calling addBind().
+		/// Statement takes the ownership of the bind in an AutoPtr.
+		/// To prevent bind destruction upon statement destruction, pass an 
+		/// AutoPtr<AbstractBinding>::duplicate() to this function.
+		/// This function is primarily intended to be a destination for 
+		/// use() and bind() utility functions return value, so it is 
+		/// recommended to call addBind() directly instead.
+
+	Statement& addBind(AbstractBinding* pBind, bool duplicate = true);
+		/// Registers a single binding with the statement.
+		/// To allow the binding to outlive the statement destruction,
+		/// duplicate must be true.
+
+	void removeBind(const std::string& name);
+		/// Removes the all the bindings with specified name from the statement.
+
+	Statement& operator , (AbstractBindingVec& bindVec);
+		/// Registers the Binding vector with the Statement.
 
 	Statement& operator , (AbstractExtraction* extract);
-		/// Registers objects used for extracting data at the Statement.
+		/// Registers objects used for extracting data with the Statement by 
+		/// calling addExtract().
+		/// Statement takes the ownership of the extract in an AutoPtr.
+		/// To prevent extract destruction upon statement destruction, pass an 
+		/// AutoPtr<AbstractExtraction>::duplicate() to this function.
+		/// This function is primarily intended to be a destination for 
+		/// into() utility function return value, so it is recommended to call 
+		/// addExtract() directly instead.
 
+	Statement& addExtract(AbstractExtraction* pExtract, bool duplicate = true);
+		/// Registers a single extraction with the statement.
+		/// To allow the extraction to outlive the statement destruction,
+		/// duplicate must be true.
+
+	Statement& operator , (AbstractExtractionVec& extVec);
+		/// Registers the extraction vector with the Statement.
+		/// The vector is registered at position 0 (i.e. for the first returned data set).
+
+	Statement& operator , (AbstractExtractionVecVec& extVecVec);
+		/// Registers the vector of extraction vectors with the Statement.
+
+	template <typename C>
+	Statement& addBinding(C& bindingCont, bool reset)
+		/// Registers binding container with the Statement.
+	{
+		if (reset) _pImpl->resetBinding();
+		typename C::iterator itAB = bindingCont.begin();
+		typename C::iterator itABEnd = bindingCont.end();
+		for (; itAB != itABEnd; ++itAB)	addBind(itAB->duplicate());
+		return *this;
+	}
+
+	template <typename C>
+	Statement& addExtraction(C& val, bool reset)
+		/// Registers extraction container with the Statement.
+	{
+		if (reset) _pImpl->resetExtraction();
+		typename C::iterator itAE = val.begin();
+		typename C::iterator itAEEnd = val.end();
+		for (; itAE != itAEEnd; ++itAE)	addExtract(itAE->duplicate());
+		return *this;
+	}
+
+	template <typename C>
+	Statement& addExtractions(C& val)
+		/// Registers container of extraction containers with the Statement.
+	{
+		_pImpl->resetExtraction();
+		typename C::iterator itAEV = val.begin();
+		typename C::iterator itAEVEnd = val.end();
+		for (; itAEV != itAEVEnd; ++itAEV) addExtraction(*itAEV, false);
+		return *this;
+	}
+
+	
 	Statement& operator , (const Bulk& bulk);
 		/// Sets the bulk execution mode (both binding and extraction) for this 
 		/// statement.Statement must not have any extractors or binders set at the 
@@ -337,7 +407,7 @@ private:
 		/// Asynchronously executes the statement.
 
 	template <typename T>
-	Statement& commaImpl (const T& val)
+	Statement& commaPODImpl(const T& val)
 	{
 		_arguments.push_back(val);
 		return *this;
@@ -440,99 +510,135 @@ inline Statement& Statement::operator , (RowFormatter* pRowFformatter)
 
 inline Statement& Statement::operator , (char value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (Poco::UInt8 value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (Poco::Int8 value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (Poco::UInt16 value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (Poco::Int16 value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (Poco::UInt32 value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (Poco::Int32 value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 #ifndef POCO_LONG_IS_64_BIT
 inline Statement& Statement::operator , (long value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (unsigned long value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 #endif
 
 
 inline Statement& Statement::operator , (Poco::UInt64 value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (Poco::Int64 value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (double value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (float value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (bool value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (const std::string& value)
 {
-	return commaImpl(value);
+	return commaPODImpl(value);
 }
 
 
 inline Statement& Statement::operator , (const char* value)
 {
-	return commaImpl(std::string(value));
+	return commaPODImpl(std::string(value));
+}
+
+
+inline void Statement::removeBind(const std::string& name)
+{
+	_pImpl->removeBind(name);
+}
+
+
+inline Statement& Statement::operator , (AbstractBinding* pBind)
+{
+	return addBind(pBind, false);
+}
+
+
+inline Statement& Statement::operator , (AbstractBindingVec& bindVec)
+{
+	return addBinding(bindVec, false);
+}
+
+
+inline Statement& Statement::operator , (AbstractExtraction* pExtract)
+{
+	return addExtract(pExtract, false);
+}
+
+
+inline Statement& Statement::operator , (AbstractExtractionVec& extVec)
+{
+	return addExtraction(extVec, false);
+}
+
+
+inline Statement& Statement::operator , (AbstractExtractionVecVec& extVecVec)
+{
+	return addExtractions(extVecVec);
 }
 
 

@@ -44,6 +44,7 @@
 #include "Poco/Data/AbstractBinding.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/TypeHandler.h"
+#include "Poco/SharedPtr.h"
 #include <vector>
 #include <list>
 #include <deque>
@@ -58,14 +59,28 @@ namespace Data {
 
 template <class T>
 class Binding: public AbstractBinding
-	/// A Binding maps a value to a column.
+	/// Binding maps a value or multiple values (see Binding specializations for STL containers as
+	/// well as type handlers) to database column(s). Values to be bound can be either mapped 
+	/// directly (by reference) or a copy can be created, depending on the value of the copy argument.
+	/// To pass a reference to a variable, it is recommended to pass it to the intermediate
+	/// utility function use(), which will create the proper binding. In cases when a reference 
+	/// is passed to binding, the storage it refers to must be valid at the statement execution time.
+	/// To pass a copy of a variable, constant or string literal, use utility function bind().
+	/// Variables can be passed as either copies or references (i.e. using either use() or bind()).
+	/// Constants, however, can only be passed as copies. this is best achieved using bind() utility 
+	/// function. An attempt to pass a constant by reference shall result in compile-time error.
 {
 public:
-	explicit Binding(const T& val, const std::string& name = "", Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
-		_val(val), 
+	explicit Binding(T& val,
+		const std::string& name = "", 
+		Direction direction = PD_IN, 
+		bool copy = false): 
+		AbstractBinding(name, direction),
+		_pVal(copy ? new T(val) : 0),
+		_val(copy ? *_pVal : val), 
 		_bound(false)
-		/// Creates the Binding.
+		/// Creates the Binding using the passed reference as bound value.
+		/// If copy is true, a copy of the value referred to is created.
 	{
 	}
 
@@ -105,8 +120,66 @@ public:
 	}
 
 private:
-	const T& _val;
-	bool     _bound;
+	SharedPtr<T> _pVal;
+	const T&     _val;
+	bool         _bound;
+};
+
+
+template <>
+class Binding<const char*>: public AbstractBinding
+	/// Binding const char* specialization wraps char pointer into string.
+{
+public:
+	explicit Binding(const char* pVal, 
+		const std::string& name = "",
+		Direction direction = PD_IN,
+		bool copy = true): 
+		AbstractBinding(name, direction), 
+		_val(pVal ? pVal : throw NullPointerException() ),
+		_bound(false)
+		/// Creates the Binding by copying the passed string.
+	{
+	}
+
+	~Binding()
+		/// Destroys the Binding.
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return 1u;
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return 1u;
+	}
+
+	bool canBind() const
+	{
+		return !_bound;
+	}
+
+	void bind(std::size_t pos)
+	{
+		poco_assert_dbg(getBinder() != 0);
+		TypeHandler<std::string>::bind(pos, _val, getBinder(), getDirection());
+		_bound = true;
+	}
+
+	void reset ()
+	{
+		_bound = false;
+		AbstractBinder* pBinder = getBinder();
+		poco_check_ptr (pBinder);
+		pBinder->reset();
+	}
+
+private:
+	std::string _val;
+	bool        _bound;
 };
 
 
@@ -115,13 +188,15 @@ class Binding<std::vector<T> >: public AbstractBinding
 	/// Specialization for std::vector.
 {
 public:
-	explicit Binding(const std::vector<T>& val, 
+	explicit Binding(std::vector<T>& val, 
 		const std::string& name = "", 
-		Direction direction = PD_IN): 
-		AbstractBinding(name, direction), 
-		_val(val), 
-		_begin(val.begin()), 
-		_end(val.end())
+		Direction direction = PD_IN,
+		bool copy = false): 
+		AbstractBinding(name, direction),
+		_pVal(copy ? new std::vector<T>(val) : 0),
+		_val(copy ? *_pVal : val), 
+		_begin(_val.begin()), 
+		_end(_val.end())
 		/// Creates the Binding.
 	{
 		if (PD_IN == direction && numOfRowsHandled() == 0)
@@ -164,9 +239,14 @@ public:
 	}
 
 private:
-	const std::vector<T>&                   _val;
-	typename std::vector<T>::const_iterator _begin;
-	typename std::vector<T>::const_iterator _end;
+	typedef std::vector<T>                Type;
+	typedef SharedPtr<Type>               TypePtr;
+	typedef typename Type::const_iterator Iterator;
+
+	TypePtr     _pVal;
+	const Type& _val;
+	Iterator    _begin;
+	Iterator    _end;
 };
 
 
@@ -251,11 +331,15 @@ class Binding<std::list<T> >: public AbstractBinding
 	/// Specialization for std::list.
 {
 public:
-	explicit Binding(const std::list<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+	explicit Binding(std::list<T>& val,
+		const std::string& name = "",
+		Direction direction = PD_IN,
+		bool copy = false): 
 		AbstractBinding(name, direction), 
-		_val(val), 
-		_begin(val.begin()), 
-		_end(val.end())
+		_pVal(copy ? new std::list<T>(val) : 0),
+		_val(copy ? *_pVal : val), 
+		_begin(_val.begin()), 
+		_end(_val.end())
 		/// Creates the Binding.
 	{
 		if (PD_IN == direction && numOfRowsHandled() == 0)
@@ -297,9 +381,14 @@ public:
 	}
 
 private:
-	const std::list<T>&                   _val;
-	typename std::list<T>::const_iterator _begin;
-	typename std::list<T>::const_iterator _end;
+	typedef std::list<T>                  Type;
+	typedef SharedPtr<Type>               TypePtr;
+	typedef typename Type::const_iterator Iterator;
+
+	TypePtr     _pVal;
+	const Type& _val;
+	Iterator    _begin;
+	Iterator    _end;
 };
 
 
@@ -308,11 +397,15 @@ class Binding<std::deque<T> >: public AbstractBinding
 	/// Specialization for std::deque.
 {
 public:
-	explicit Binding(const std::deque<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+	explicit Binding(std::deque<T>& val,
+		const std::string& name = "",
+		Direction direction = PD_IN,
+		bool copy = false): 
 		AbstractBinding(name, direction), 
-		_val(val), 
-		_begin(val.begin()), 
-		_end(val.end())
+		_pVal(copy ? new std::deque<T>(val) : 0),
+		_val(copy ? *_pVal : val), 
+		_begin(_val.begin()), 
+		_end(_val.end())
 		/// Creates the Binding.
 	{
 		if (PD_IN == direction && numOfRowsHandled() == 0)
@@ -354,9 +447,14 @@ public:
 	}
 
 private:
-	const std::deque<T>&                   _val;
-	typename std::deque<T>::const_iterator _begin;
-	typename std::deque<T>::const_iterator _end;
+	typedef std::deque<T>                 Type;
+	typedef SharedPtr<Type>               TypePtr;
+	typedef typename Type::const_iterator Iterator;
+
+	TypePtr     _pVal;
+	const Type& _val;
+	Iterator    _begin;
+	Iterator    _end;
 };
 
 
@@ -365,11 +463,15 @@ class Binding<std::set<T> >: public AbstractBinding
 	/// Specialization for std::set.
 {
 public:
-	explicit Binding(const std::set<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+	explicit Binding(std::set<T>& val,
+		const std::string& name = "",
+		Direction direction = PD_IN,
+		bool copy = false): 
 		AbstractBinding(name, direction), 
-		_val(val), 
-		_begin(val.begin()), 
-		_end(val.end())
+		_pVal(copy ? new std::set<T>(val) : 0),
+		_val(copy ? *_pVal : val), 
+		_begin(_val.begin()), 
+		_end(_val.end())
 		/// Creates the Binding.
 	{
 		if (PD_IN == direction && numOfRowsHandled() == 0)
@@ -411,9 +513,14 @@ public:
 	}
 
 private:
-	const std::set<T>&                   _val;
-	typename std::set<T>::const_iterator _begin;
-	typename std::set<T>::const_iterator _end;
+	typedef std::set<T>                   Type;
+	typedef SharedPtr<Type>               TypePtr;
+	typedef typename Type::const_iterator Iterator;
+
+	TypePtr     _pVal;
+	const Type& _val;
+	Iterator    _begin;
+	Iterator    _end;
 };
 
 
@@ -422,11 +529,15 @@ class Binding<std::multiset<T> >: public AbstractBinding
 	/// Specialization for std::multiset.
 {
 public:
-	explicit Binding(const std::multiset<T>& val, const std::string& name = "", Direction direction = PD_IN): 
+	explicit Binding(std::multiset<T>& val,
+		const std::string& name = "",
+		Direction direction = PD_IN,
+		bool copy = false): 
 		AbstractBinding(name, direction), 
-		_val(val), 
-		_begin(val.begin()), 
-		_end(val.end())
+		_pVal(copy ? new std::multiset<T>(val) : 0),
+		_val(copy ? *_pVal : val), 
+		_begin(_val.begin()), 
+		_end(_val.end())
 		/// Creates the Binding.
 	{
 		if (PD_IN == direction && numOfRowsHandled() == 0)
@@ -468,9 +579,14 @@ public:
 	}
 
 private:
-	const std::multiset<T>&                   _val;
-	typename std::multiset<T>::const_iterator _begin;
-	typename std::multiset<T>::const_iterator _end;
+	typedef std::multiset<T>              Type;
+	typedef SharedPtr<Type>               TypePtr;
+	typedef typename Type::const_iterator Iterator;
+
+	TypePtr     _pVal;
+	const Type& _val;
+	Iterator    _begin;
+	Iterator    _end;
 };
 
 
@@ -479,11 +595,15 @@ class Binding<std::map<K, V> >: public AbstractBinding
 	/// Specialization for std::map.
 {
 public:
-	explicit Binding(const std::map<K, V>& val, const std::string& name = "", Direction direction = PD_IN): 
+	explicit Binding(std::map<K, V>& val,
+		const std::string& name = "",
+		Direction direction = PD_IN,
+		bool copy = false): 
 		AbstractBinding(name, direction), 
-		_val(val), 
-		_begin(val.begin()), 
-		_end(val.end())
+		_pVal(copy ? new std::map<K, V>(val) : 0),
+		_val(copy ? *_pVal : val), 
+		_begin(_val.begin()), 
+		_end(_val.end())
 		/// Creates the Binding.
 	{
 		if (PD_IN == direction && numOfRowsHandled() == 0)
@@ -525,9 +645,14 @@ public:
 	}
 
 private:
-	const std::map<K, V>&                   _val;
-	typename std::map<K, V>::const_iterator _begin;
-	typename std::map<K, V>::const_iterator _end;
+	typedef std::map<K, V>                Type;
+	typedef SharedPtr<Type>               TypePtr;
+	typedef typename Type::const_iterator Iterator;
+
+	TypePtr     _pVal;
+	const Type& _val;
+	Iterator    _begin;
+	Iterator    _end;
 };
 
 
@@ -536,11 +661,15 @@ class Binding<std::multimap<K, V> >: public AbstractBinding
 	/// Specialization for std::multimap.
 {
 public:
-	explicit Binding(const std::multimap<K, V>& val, const std::string& name = "", Direction direction = PD_IN): 
+	explicit Binding(std::multimap<K, V>& val,
+		const std::string& name = "",
+		Direction direction = PD_IN,
+		bool copy = false): 
 		AbstractBinding(name, direction), 
-		_val(val), 
-		_begin(val.begin()), 
-		_end(val.end())
+		_pVal(copy ? new std::multimap<K, V>(val) : 0),
+		_val(copy ? *_pVal : val), 
+		_begin(_val.begin()), 
+		_end(_val.end())
 		/// Creates the Binding.
 	{
 		if (PD_IN == direction && numOfRowsHandled() == 0)
@@ -582,30 +711,49 @@ public:
 	}
 
 private:
-	const std::multimap<K, V>&                   _val;
-	typename std::multimap<K, V>::const_iterator _begin;
-	typename std::multimap<K, V>::const_iterator _end;
+	typedef std::multimap<K, V>           Type;
+	typedef SharedPtr<Type>               TypePtr;
+	typedef typename Type::const_iterator Iterator;
+
+	TypePtr     _pVal;
+	const Type& _val;
+	Iterator    _begin;
+	Iterator    _end;
 };
 
 
 template <typename T> 
-Binding<T>* use(const T& t, const std::string& name = "")
+inline Binding<T>* use(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
 
 
+inline Binding<NullData>* use(const NullData& t, const std::string& name = "")
+	/// NullData overload.
+{
+	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
+}
+
+
 template <typename T> 
-Binding<T>* in(const T& t, const std::string& name = "")
+inline Binding<T>* in(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
 
 
+inline Binding<NullData>* in(const NullData& t, const std::string& name = "")
+	/// NullData overload.
+{
+	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
+}
+
+
 template <typename T> 
-Binding<T>* out(T& t, const std::string& name = "")
+inline Binding<T>* out(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	return new Binding<T>(t, name, AbstractBinding::PD_OUT);
@@ -613,10 +761,58 @@ Binding<T>* out(T& t, const std::string& name = "")
 
 
 template <typename T> 
-Binding<T>* io(T& t, const std::string& name = "")
+inline Binding<T>* io(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	return new Binding<T>(t, name, AbstractBinding::PD_IN_OUT);
+}
+
+
+inline AbstractBindingVec& use(AbstractBindingVec& bv)
+	/// Convenience dummy function (for syntax purposes only).
+{
+	return bv;
+}
+
+
+inline AbstractBindingVec& in(AbstractBindingVec& bv)
+	/// Convenience dummy function (for syntax purposes only).
+{
+	return bv;
+}
+
+
+inline AbstractBindingVec& out(AbstractBindingVec& bv)
+	/// Convenience dummy function (for syntax purposes only).
+{
+	return bv;
+}
+
+
+inline AbstractBindingVec& io(AbstractBindingVec& bv)
+	/// Convenience dummy function (for syntax purposes only).
+{
+	return bv;
+}
+
+
+template <typename T> 
+inline Binding<T>* bind(T t, 
+	const std::string& name = "",
+	AbstractBinding::Direction direction = AbstractBinding::PD_IN)
+	/// Convenience function for a more compact Binding creation.
+	/// This funtion differs from use() in its value copy semantics.
+{
+	return new Binding<T>(t, name, direction, true);
+}
+
+
+template <typename T> 
+inline Binding<T>* bind(T t, AbstractBinding::Direction direction)
+	/// Convenience function for a more compact Binding creation.
+	/// This funtion differs from use() in its value copy semantics.
+{
+	return bind(t, "", direction);
 }
 
 
