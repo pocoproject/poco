@@ -63,6 +63,7 @@ POCO_IMPLEMENT_EXCEPTION(SchemaDiffersException, SQLiteException, "The database 
 POCO_IMPLEMENT_EXCEPTION(RowTooBigException, SQLiteException, "Too much data for one row of a table")
 POCO_IMPLEMENT_EXCEPTION(ConstraintViolationException, SQLiteException, "Abort due to constraint violation")
 POCO_IMPLEMENT_EXCEPTION(DataTypeMismatchException, SQLiteException, "Data type mismatch")
+POCO_IMPLEMENT_EXCEPTION(ParameterCountMismatchException, SQLiteException, "Parameter count mismatch")
 POCO_IMPLEMENT_EXCEPTION(InvalidLibraryUseException, SQLiteException, "Library used incorrectly")
 POCO_IMPLEMENT_EXCEPTION(OSFeaturesMissingException, SQLiteException, "Uses OS features not supported on host")
 POCO_IMPLEMENT_EXCEPTION(AuthorizationDeniedException, SQLiteException, "Authorization denied")

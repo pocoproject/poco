@@ -79,7 +79,7 @@ void SQLiteStatementImpl::compileImpl()
 
 	while (rc == SQLITE_OK && !pStmt && !queryFound)
 	{
-		rc = sqlite3_prepare(_pDB, pSql, -1, &pStmt, &pLeftover);
+		rc = sqlite3_prepare_v2(_pDB, pSql, -1, &pStmt, &pLeftover);
 		if (rc != SQLITE_OK)
 		{
 			if (pStmt) 
@@ -143,7 +143,12 @@ void SQLiteStatementImpl::bindImpl()
 
 	// bind
 	Bindings& binds = bindings();
-	if (binds.empty()) return;
+	int pc = sqlite3_bind_parameter_count(_pStmt);
+	if (binds.empty() && 0 == pc) return;
+	else if (binds.empty() && pc > 0)
+		throw ParameterCountMismatchException();
+	else if (!binds.empty() && binds.size() * (*binds.begin())->numOfColumnsHandled() != pc)
+		throw ParameterCountMismatchException();
 
 	std::size_t pos = 1; // sqlite starts with 1 not 0!
 

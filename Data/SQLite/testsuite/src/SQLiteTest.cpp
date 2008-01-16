@@ -44,6 +44,7 @@
 #include <iostream>
 #include "Poco/File.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Data/SQLite/SQLiteException.h"
 
 
 using namespace Poco::Data;
@@ -53,6 +54,7 @@ using Poco::AnyCast;
 using Poco::InvalidAccessException;
 using Poco::RangeException;
 using Poco::BadCastException;
+using Poco::Data::SQLite::ParameterCountMismatchException;
 
 
 struct Person
@@ -1577,6 +1579,29 @@ void SQLiteTest::testInternalExtraction()
 }
 
 
+void SQLiteTest::testBindingCount()
+{
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
+
+	tmp << "DROP TABLE IF EXISTS Ints", now;
+	tmp << "CREATE TABLE Ints (int0 INTEGER)", now;
+
+	int i = 42;
+	try	{ tmp << "INSERT INTO Ints VALUES (?)", now; } 
+	catch (ParameterCountMismatchException&) { }
+
+	try	{ tmp << "INSERT INTO Ints VALUES (?)", use(i), use(i), now; }
+	catch (ParameterCountMismatchException&) { }
+	tmp << "INSERT INTO Ints VALUES (?)", use(i), now;
+	
+	int j = 0;
+	try	{ tmp << "SELECT int0 from Ints where int0 = ?", into(i), now; }
+	catch (ParameterCountMismatchException&) { }
+	tmp << "SELECT int0 from Ints where int0 = ?", use(i), into(j), now;
+	assert (42 == j);
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -1648,6 +1673,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple1);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector1);
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
+	CppUnit_addTest(pSuite, SQLiteTest, testBindingCount);
 
 	return pSuite;
 }

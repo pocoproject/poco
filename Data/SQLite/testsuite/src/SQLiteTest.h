@@ -109,6 +109,7 @@ public:
 	void testTupleVector10();
 
 	void testInternalExtraction();
+	void testBindingCount();
 
 	void setUp();
 	void tearDown();
