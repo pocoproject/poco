@@ -207,6 +207,18 @@
 			Name="Source Files"
 			>
 			<File
+				RelativePath=".\src\ApacheCodeWriter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\CodeWriter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\OSPCodeWriter.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Page.cpp"
 				>
 			</File>
@@ -214,12 +226,32 @@
 				RelativePath=".\src\PageCompiler.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\src\PageReader.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			>
 			<File
+				RelativePath=".\src\ApacheCodeWriter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\CodeWriter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\OSPCodeWriter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Page.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\PageReader.h"
 				>
 			</File>
 		</Filter>

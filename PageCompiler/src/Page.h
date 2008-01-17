@@ -1,9 +1,9 @@
 //
 // Page.h
 //
-// $Id: //poco/Main/PageCompiler/src/Page.h#1 $
+// $Id: //poco/Main/PageCompiler/src/Page.h#2 $
 //
-// Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,9 +35,7 @@
 
 
 #include "Poco/Net/NameValueCollection.h"
-#include <vector>
-#include <istream>
-#include <ostream>
+#include <sstream>
 
 
 class Page: public Poco::Net::NameValueCollection
@@ -45,76 +43,74 @@ class Page: public Poco::Net::NameValueCollection
 	/// handler code and declarations, as well as page attributes.
 {
 public:
-	Page(const std::string& basePath);
+	Page();
 		/// Creates a Page.
 	
 	~Page();
 		/// Destroys the Page.
 
-	const std::string& headerDecls() const;
+	std::stringstream& headerDecls();
 		/// Returns the user-specified declarations for the header file.
 
-	const std::string& implDecls() const;
+	const std::stringstream& headerDecls() const;
+		/// Returns the user-specified declarations for the header file.
+
+	std::stringstream& implDecls();
 		/// Returns the user-specified declarations for the source file.
 
-	const std::string& handler() const;
+	const std::stringstream& implDecls() const;
+		/// Returns the user-specified declarations for the source file.
+
+	std::stringstream& handler();
 		/// Returns the request handler code.
 
-	void parse(std::istream& istr);	
-		/// Parses a HTML file containing server page directives.
-
-protected:
-	enum ParsingState
-	{
-		STATE_MARKUP,
-		STATE_IMPLDECL,
-		STATE_HDRDECL,
-		STATE_BLOCK,
-		STATE_EXPR,
-		STATE_COMMENT,
-		STATE_ATTR
-	};
-
-	virtual void handleAttribute(const std::string& name, const std::string& value, std::ostream& handlerStream);
-	void include(const std::string& path, std::ostream& handlerStream);
-	void parse(std::istream& pageStream, std::ostream& handlerStream);
-	void addHeaderDecls(const std::string& decls);
-	void addImplDecls(const std::string& decls);
-	void addAttrs(const std::string& attrs);
-	void parseAttributes(std::ostream& handlerStream);
-	void nextToken(std::istream& istr, std::string& token);
-	std::string where();
-
-	static const std::string MARKUP_BEGIN;
-	static const std::string MARKUP_END;
-	static const std::string EXPR_BEGIN;
-	static const std::string EXPR_END;
-
+	const std::stringstream& handler() const;
+		/// Returns the request handler code.
+		
 private:
-	std::string _headerDecls;
-	std::string _implDecls;
-	std::string _handler;
-	std::string _attrs;
-	std::vector<std::string> _paths;
+	Page(const Page&);
+	Page& operator = (const Page&);
+
+	std::stringstream _headerDecls;
+	std::stringstream _implDecls;
+	std::stringstream _handler;
 };
 
 
 //
 // inlines
 //
-inline const std::string& Page::headerDecls() const
+inline std::stringstream& Page::headerDecls()
 {
 	return _headerDecls;
 }
 
 
-inline const std::string& Page::implDecls() const
+inline const std::stringstream& Page::headerDecls() const
+{
+	return _headerDecls;
+}
+
+
+inline std::stringstream& Page::implDecls()
 {
 	return _implDecls;
 }
 
 
-inline const std::string& Page::handler() const
+inline const std::stringstream& Page::implDecls() const
+{
+	return _implDecls;
+}
+
+
+inline std::stringstream& Page::handler()
+{
+	return _handler;
+}
+
+
+inline const std::stringstream& Page::handler() const
 {
 	return _handler;
 }

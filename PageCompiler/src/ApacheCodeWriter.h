@@ -1,7 +1,7 @@
 //
-// Page.cpp
+// ApacheCodeWriter.h
 //
-// $Id: //poco/Main/PageCompiler/src/Page.cpp#2 $
+// $Id: //poco/Main/PageCompiler/src/ApacheCodeWriter.h#1 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,14 +30,30 @@
 //
 
 
-#include "Page.h"
+#ifndef ApacheCodeWriter_INCLUDED
+#define ApacheCodeWriter_INCLUDED
 
 
-Page::Page()
+#include "CodeWriter.h"
+
+
+class ApacheCodeWriter: public CodeWriter
+	/// Code generator for ApacheConnector request handlers.
 {
-}
+public:
+	ApacheCodeWriter(const Page& page, const std::string& clazz);
+		/// Creates the CodeWriter, using the given Page.
+
+	~ApacheCodeWriter();
+		/// Destroys the PageReader.
+
+protected:
+	virtual void writeHeaderIncludes(std::ostream& ostr);
+	virtual void writeFactoryClass(std::ostream& ostr);
+	virtual void writeImplIncludes(std::ostream& ostr);
+	virtual void writeFactory(std::ostream& ostr);
+	virtual void writeManifest(std::ostream& ostr);
+};
 
 
-Page::~Page()
-{
-}
+#endif // CodeWriter_INCLUDED

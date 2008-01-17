@@ -1,14 +1,16 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/PageCompiler/Makefile#1 $
+# $Id: //poco/Main/PageCompiler/Makefile#3 $
 #
 # Makefile for Poco C++ Server Page Compiler
 #
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Page PageCompiler
+objects = Page PageReader \
+	CodeWriter ApacheCodeWriter OSPCodeWriter \
+	PageCompiler
 
 target         = cpspc
 target_version = 1

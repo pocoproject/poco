@@ -1,11 +1,11 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/Main/PageCompiler/src/PageCompiler.cpp#1 $
+// $Id: //poco/Main/PageCompiler/src/PageCompiler.cpp#2 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
-// Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -46,9 +46,14 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/LineEndingConverter.h"
 #include "Page.h"
+#include "PageReader.h"
+#include "CodeWriter.h"
+#include "ApacheCodeWriter.h"
+#include "OSPCodeWriter.h"
 #include <cctype>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 
 using Poco::Util::Application;
@@ -187,10 +192,11 @@ protected:
 
 	void compile(const std::string& path)
 	{
-		Page page(path);
+		Page page;
 
 		FileInputStream srcStream(path);
-		page.parse(srcStream);
+		PageReader pageReader(page, path);
+		pageReader.parse(srcStream);
 
 		Path p(path);
 		config().setString("inputFileName", p.getFileName());
@@ -211,6 +217,8 @@ protected:
 			clazz[0] = std::toupper(clazz[0]);
 		}			
 
+		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
+
 		p.setExtension("h");
 		std::string headerPath = p.toString();
 		std::string headerFileName = p.getFileName();
@@ -218,7 +226,8 @@ protected:
 		config().setString("outputFilePath", headerPath);
 		FileOutputStream headerStream(headerPath);
 		OutputLineEndingConverter headerLEC(headerStream);
-		writeHeader(headerLEC, page, clazz, p.getFileName());
+		writeFileHeader(headerLEC);
+		pCodeWriter->writeHeader(headerLEC, p.getFileName());
 
 		p.setExtension("cpp");
 		std::string implPath = p.toString();
@@ -226,10 +235,11 @@ protected:
 		config().setString("outputFilePath", implPath);
 		FileOutputStream implStream(implPath);
 		OutputLineEndingConverter implLEC(implStream);
-		writeImpl(implLEC, page, clazz, headerFileName);
+		writeFileHeader(implLEC);
+		pCodeWriter->writeImpl(implLEC, headerFileName);
 	}
 
-	void writeHeader(std::ostream& ostr, Page& page, const std::string& clazz, const std::string& headerFileName)
+	void writeFileHeader(std::ostream& ostr)
 	{
 		std::string fileHeader = config().getString("PageCompiler.fileHeader", "");
 		if (!fileHeader.empty())
@@ -237,272 +247,16 @@ protected:
 			ostr << fileHeader << std::endl;
 			ostr << "\n\n";
 		}
-		Path p(headerFileName);
-		std::string guard(p.getBaseName());
-		guard += "_INCLUDED";
-		ostr << "#ifndef " << guard << "\n";
-		ostr << "#define " << guard << "\n";
-		ostr << "\n\n";
-		ostr << "#include \"Poco/Net/HTTPRequestHandler.h\"\n";
+	}
 
+	CodeWriter* createCodeWriter(const Page& page, const std::string& clazz)
+	{
 		if (_generateOSPCode)
-		{
-			ostr << "#include \"Poco/OSP/Web/WebRequestHandlerFactory.h\"\n";
-			ostr << "#include \"Poco/OSP/BundleContext.h\"\n";
-		}
+			return new OSPCodeWriter(page, clazz);
 		else if (_generateApacheCode)
-		{
-			ostr << "#include \"Poco/Net/HTTPRequestHandlerFactory.h\"\n";
-		}
-
-		ostr << "\n\n";
-		
-		const std::string& decls = page.headerDecls();
-		if (!decls.empty())
-		{
-			ostr << decls;
-			ostr << "\n\n";
-		}
-		
-		beginNamespace(ostr, page);
-
-		std::string base(page.get("page.baseClass", "Poco::Net::HTTPRequestHandler"));
-		std::string ctorArg;
-		if (_generateOSPCode)
-			ctorArg = "Poco::OSP::BundleContext::Ptr";
+			return new ApacheCodeWriter(page, clazz);
 		else
-			ctorArg = page.get("page.ctorArg", "");
-
-		std::string exprt(page.get("page.export", ""));
-		if (!exprt.empty()) exprt += ' ';
-
-		ostr << "class " << exprt << clazz << ": public " << base << "\n";
-		ostr << "{\n";
-		ostr << "public:\n";
-		if (!ctorArg.empty())
-		{
-			ostr << "\t" << clazz << "(" << ctorArg << ");\n";
-			ostr << "\n";
-		}
-		ostr << "\tvoid handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);\n";
-		
-		if (_generateOSPCode)
-			writeOSPHeader(ostr);
-
-		ostr << "};\n";
-
-		if (_generateOSPCode)
-		{
-			ostr << "\n\n";
-			writeFactoryHeader(ostr, page, clazz, "Poco::OSP::Web::WebRequestHandlerFactory");
-		}
-		else if (_generateApacheCode)
-		{
-			ostr << "\n\n";
-			writeFactoryHeader(ostr, page, clazz, "Poco::Net::HTTPRequestHandlerFactory");
-		}
-
-		endNamespace(ostr, page);
-
-		ostr << "\n\n";
-		ostr << "#endif // " << guard << "\n";
-	}
-
-	void writeImpl(std::ostream& ostr, Page& page, const std::string& clazz, const std::string& headerFileName)
-	{
-		std::string fileHeader = config().getString("PageCompiler.fileHeader", "");
-		if (!fileHeader.empty())
-		{
-			ostr << fileHeader << std::endl;
-			ostr << "\n\n";
-		}
-		ostr << "#include \"" << headerFileName << "\"\n";
-		ostr << "#include \"Poco/Net/HTTPServerRequest.h\"\n";
-		ostr << "#include \"Poco/Net/HTTPServerResponse.h\"\n";
-		ostr << "#include \"Poco/Net/HTMLForm.h\"\n";
-
-		if (_generateOSPCode)
-		{
-			if (page.has("page.session"))
-			{
-				ostr << "#include \"Poco/OSP/Web/WebSession.h\"\n";
-				ostr << "#include \"Poco/OSP/Web/WebSessionManager.h\"\n";
-				ostr << "#include \"Poco/OSP/ServiceRegistry.h\"\n";
-			}
-		}
-		else if (_generateApacheCode)
-		{
-			ostr << "#include \"Poco/ClassLibrary.h\"\n";
-		}
-
-		ostr << "\n\n";
-
-		const std::string& decls = page.implDecls();
-		if (!decls.empty())
-		{
-			ostr << decls;
-			ostr << "\n\n";
-		}
-
-		beginNamespace(ostr, page);
-
-		Path p(headerFileName);
-		std::string base(page.get("page.baseClass", "Poco::Net::HTTPRequestHandler"));
-		std::string ctorArg(page.get("page.ctorArg", ""));
-
-		if (_generateOSPCode)
-		{
-			ostr << clazz << "::" << clazz << "(Poco::OSP::BundleContext::Ptr pContext):\n";
-			ostr << "\t_pContext(pContext)\n";
-			ostr << "{\n}\n";
-			ostr << "\n\n";
-		}
-		else if (!ctorArg.empty())
-		{
-			ostr << clazz << "::" << clazz << "(" << ctorArg << " arg):\n";
-			ostr << "\t" << base << "(arg)\n";
-			ostr << "{\n}\n";
-			ostr << "\n\n";
-		}
-
-		ostr << "void " << clazz << "::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)\n";
-		ostr << "{\n";
-
-		if (_generateOSPCode && page.has("page.session"))
-		{
-			writeOSPSession(ostr, page);
-		}	
-
-		if (page.get("page.form", "true") != "false")
-		{
-			std::string partHandler(page.get("page.formPartHandler", ""));
-			if (!partHandler.empty())
-			{
-				ostr << "\t" << partHandler << " cpspPartHandler(*this);\n";
-			}
-			ostr << "\tPoco::Net::HTMLForm form(request, request.stream()";
-			if (!partHandler.empty())
-			{
-				ostr << ", cpspPartHandler";
-			}
-			ostr << ");\n";
-		}
-
-		std::string contentType(page.get("page.contentType", "text/html"));
-		std::string chunked(page.get("page.chunked", "true"));
-
-		if (chunked != "false")
-		{
-			ostr << "\tresponse.setChunkedTransferEncoding(true);\n";
-		}
-
-		ostr << "\tresponse.setContentType(\"" << contentType << "\");\n";
-		ostr << "\n";
-
-		ostr << "\tstd::ostream& ostr = response.send();\n";
-		ostr << page.handler();
-
-		ostr << "}\n";
-
-		if (_generateOSPCode)
-		{
-			ostr << "\n\n";
-			writeFactoryImpl(ostr, page, clazz, "context()");
-		}
-		else if (_generateApacheCode)
-		{
-			ostr << "\n\n";
-			writeFactoryImpl(ostr, page, clazz, "");
-		}
-
-		endNamespace(ostr, page);
-
-		if (_generateApacheCode)
-			writeManifest(ostr, page, clazz);
-	}
-
-	void beginNamespace(std::ostream& ostr, Page& page)
-	{
-		std::string ns = page.get("page.namespace", "");
-		if (!ns.empty())
-		{
-			StringTokenizer tok(ns, ":", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-			for (StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
-			{
-				ostr << "namespace " << *it << " {\n";
-			}
-			ostr << "\n\n";
-		}
-	}
-
-	void endNamespace(std::ostream& ostr, Page& page)
-	{
-		std::string ns = page.get("page.namespace", "");
-		if (!ns.empty())
-		{
-			ostr << "\n\n";
-			StringTokenizer tok(ns, ":", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-			for (StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
-			{
-				ostr << "} ";
-			}
-			ostr << "// namespace " << ns << "\n";
-		}
-	}
-
-	void writeOSPSession(std::ostream& ostr, Page& page)
-	{
-		ostr << "\tPoco::OSP::Web::WebSession::Ptr session;\n";
-		ostr << "\t{\n";
-		ostr << "\t\tPoco::OSP::ServiceRef::Ptr pWebSessionManagerRef = context()->registry().findByName(Poco::OSP::Web::WebSessionManager::SERVICE_NAME);\n";
-		ostr << "\t\tif (pWebSessionManagerRef)\n";
-		ostr << "\t\t{\n";
-		ostr << "\t\t\tPoco::OSP::Web::WebSessionManager::Ptr pWebSessionManager = pWebSessionManagerRef->castedInstance<Poco::OSP::Web::WebSessionManager>();\n";
-		ostr << "\t\t\tsession = pWebSessionManager->find(\"" << page.get("page.session") << "\", request);\n";
-		ostr << "\t\t\tif (session.isNull())\n";
-		ostr << "\t\t\t\tsession = pWebSessionManager->get(\"" << page.get("page.session") << "\", request, " << page.get("page.sessionTimeout", "30") << ", context());\n";
-		ostr << "\t\t}\n";
-		ostr << "\t}\n";
-	}
-
-	void writeOSPHeader(std::ostream& ostr)
-	{
-		ostr << "\n";
-		ostr << "protected:\n";
-		ostr << "\tPoco::OSP::BundleContext::Ptr context() const\n";
-		ostr << "\t{\n";
-		ostr << "\t\treturn _pContext;\n";
-		ostr << "\t}\n";
-		ostr << "\n";
-		ostr << "private:\n";
-		ostr << "\tPoco::OSP::BundleContext::Ptr _pContext;\n";
-	}
-
-	void writeFactoryHeader(std::ostream& ostr, Page& page, const std::string& clazz, const std::string& base)
-	{
-		ostr << "class " << clazz << "Factory: public " << base << "\n";
-		ostr << "{\n";
-		ostr << "public:\n";
-		ostr << "\tPoco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);\n";
-		ostr << "};\n";
-	}
-
-	void writeFactoryImpl(std::ostream& ostr, Page& page, const std::string& clazz, const std::string& arg)
-	{
-		ostr << "Poco::Net::HTTPRequestHandler* " << clazz << "Factory::createRequestHandler(const Poco::Net::HTTPServerRequest& request)\n";
-		ostr << "{\n";
-		ostr << "\treturn new " << clazz << "(" << arg << ");\n";
-		ostr << "}\n";
-	}
-
-	void writeManifest(std::ostream& ostr, Page& page, const std::string& clazz)
-	{
-		std::string ns = page.get("page.namespace", "");
-		if (!ns.empty()) ns += "::";
-		ostr << "\n\n";
-		ostr << "POCO_BEGIN_MANIFEST(Poco::Net::HTTPRequestHandlerFactory)\n";
-		ostr << "\tPOCO_EXPORT_CLASS(" << ns << clazz << "Factory)\n";
-		ostr << "POCO_END_MANIFEST\n";
+			return new CodeWriter(page, clazz);
 	}
 
 private:

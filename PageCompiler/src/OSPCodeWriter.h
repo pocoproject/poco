@@ -1,7 +1,7 @@
 //
-// Page.cpp
+// OSPCodeWriter.h
 //
-// $Id: //poco/Main/PageCompiler/src/Page.cpp#2 $
+// $Id: //poco/Main/PageCompiler/src/OSPCodeWriter.h#1 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,14 +30,33 @@
 //
 
 
-#include "Page.h"
+#ifndef OSPCodeWriter_INCLUDED
+#define OSPCodeWriter_INCLUDED
 
 
-Page::Page()
+#include "CodeWriter.h"
+
+
+class OSPCodeWriter: public CodeWriter
+	/// Code generator for OSP Web request handlers.
 {
-}
+public:
+	OSPCodeWriter(const Page& page, const std::string& clazz);
+		/// Creates the CodeWriter, using the given Page.
+
+	~OSPCodeWriter();
+		/// Destroys the PageReader.
+
+protected:
+	virtual void writeHeaderIncludes(std::ostream& ostr);
+	virtual void writeHandlerClass(std::ostream& ostr);
+	virtual void writeHandlerMembers(std::ostream& ostr);
+	virtual void writeFactoryClass(std::ostream& ostr);
+	virtual void writeImplIncludes(std::ostream& ostr);
+	virtual void writeConstructor(std::ostream& ostr);
+	virtual void writeFactory(std::ostream& ostr);
+	virtual void writeSession(std::ostream& ostr);
+};
 
 
-Page::~Page()
-{
-}
+#endif // CodeWriter_INCLUDED
