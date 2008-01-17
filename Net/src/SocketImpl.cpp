@@ -799,77 +799,77 @@ void SocketImpl::error(int code, const std::string& arg)
 	switch (code)
 	{
 	case POCO_ESYSNOTREADY:
-		throw NetException("Net subsystem not ready");
+		throw NetException("Net subsystem not ready", code);
 	case POCO_ENOTINIT:
-		throw NetException("Net subsystem not initialized");
+		throw NetException("Net subsystem not initialized", code);
 	case POCO_EINTR:
-		throw IOException("Interrupted");
+		throw IOException("Interrupted", code);
 	case POCO_EACCES:
-		throw IOException("Permission denied");
+		throw IOException("Permission denied", code);
 	case POCO_EFAULT:
-		throw IOException("Bad address");
+		throw IOException("Bad address", code);
 	case POCO_EINVAL:
-		throw InvalidArgumentException();
+		throw InvalidArgumentException(code);
 	case POCO_EMFILE:
-		throw IOException("Too many open files");
+		throw IOException("Too many open files", code);
 	case POCO_EWOULDBLOCK:
-		throw IOException("Operation would block");
+		throw IOException("Operation would block", code);
 	case POCO_EINPROGRESS:
-		throw IOException("Operation now in progress");
+		throw IOException("Operation now in progress", code);
 	case POCO_EALREADY:
-		throw IOException("Operation already in progress");
+		throw IOException("Operation already in progress", code);
 	case POCO_ENOTSOCK:
-		throw IOException("Socket operation attempted on non-socket");
+		throw IOException("Socket operation attempted on non-socket", code);
 	case POCO_EDESTADDRREQ:
-		throw NetException("Destination address required");
+		throw NetException("Destination address required", code);
 	case POCO_EMSGSIZE:
-		throw NetException("Message too long");
+		throw NetException("Message too long", code);
 	case POCO_EPROTOTYPE:
-		throw NetException("Wrong protocol type");
+		throw NetException("Wrong protocol type", code);
 	case POCO_ENOPROTOOPT:
-		throw NetException("Protocol not available");
+		throw NetException("Protocol not available", code);
 	case POCO_EPROTONOSUPPORT:
-		throw NetException("Protocol not supported");
+		throw NetException("Protocol not supported", code);
 	case POCO_ESOCKTNOSUPPORT:
-		throw NetException("Socket type not supported");
+		throw NetException("Socket type not supported", code);
 	case POCO_ENOTSUP:
-		throw NetException("Operation not supported");
+		throw NetException("Operation not supported", code);
 	case POCO_EPFNOSUPPORT:
-		throw NetException("Protocol family not supported");
+		throw NetException("Protocol family not supported", code);
 	case POCO_EAFNOSUPPORT:
-		throw NetException("Address family not supported");
+		throw NetException("Address family not supported", code);
 	case POCO_EADDRINUSE:
-		throw NetException("Address already in use", arg);
+		throw NetException("Address already in use", arg, code);
 	case POCO_EADDRNOTAVAIL:
-		throw NetException("Cannot assign requested address", arg);
+		throw NetException("Cannot assign requested address", arg, code);
 	case POCO_ENETDOWN:
-		throw NetException("Network is down");
+		throw NetException("Network is down", code);
 	case POCO_ENETUNREACH:
-		throw NetException("Network is unreachable");
+		throw NetException("Network is unreachable", code);
 	case POCO_ENETRESET:
-		throw NetException("Network dropped connection on reset");
+		throw NetException("Network dropped connection on reset", code);
 	case POCO_ECONNABORTED:
-		throw ConnectionAbortedException();
+		throw ConnectionAbortedException(code);
 	case POCO_ECONNRESET:
-		throw ConnectionResetException();
+		throw ConnectionResetException(code);
 	case POCO_ENOBUFS:
-		throw IOException("No buffer space available");
+		throw IOException("No buffer space available", code);
 	case POCO_EISCONN:
-		throw NetException("Socket is already connected");
+		throw NetException("Socket is already connected", code);
 	case POCO_ENOTCONN:
-		throw NetException("Socket is not connected");
+		throw NetException("Socket is not connected", code);
 	case POCO_ESHUTDOWN:
-		throw NetException("Cannot send after socket shutdown");
+		throw NetException("Cannot send after socket shutdown", code);
 	case POCO_ETIMEDOUT:
-		throw TimeoutException();
+		throw TimeoutException(code);
 	case POCO_ECONNREFUSED:
-		throw ConnectionRefusedException(arg);
+		throw ConnectionRefusedException(arg, code);
 	case POCO_EHOSTDOWN:
-		throw NetException("Host is down");
+		throw NetException("Host is down", code);
 	case POCO_EHOSTUNREACH:
-		throw NetException("No route to host");
+		throw NetException("No route to host", code);
 	default:
-		throw IOException(NumberFormatter::format(code) + arg);
+		throw IOException(NumberFormatter::format(code) + arg, code);
 	}
 }
 

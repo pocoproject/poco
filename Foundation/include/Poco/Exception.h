@@ -52,13 +52,13 @@ class Foundation_API Exception: public std::exception
 	/// in the Poco class library.
 {
 public:
-	Exception(const std::string& msg);
+	Exception(const std::string& msg, int code = 0);
 		/// Creates an exception.
 
-	Exception(const std::string& msg, const std::string& arg);
+	Exception(const std::string& msg, const std::string& arg, int code = 0);
 		/// Creates an exception.
 
-	Exception(const std::string& msg, const Exception& nested);
+	Exception(const std::string& msg, const Exception& nested, int code = 0);
 		/// Creates an exception and stores a clone
 		/// of the nested exception.
 
@@ -88,6 +88,9 @@ public:
 			
 	const std::string& message() const;
 		/// Returns the message text.
+			
+	int code() const;
+		/// Returns the exception code if defined.
 		
 	std::string displayText() const;
 		/// Returns a string consisting of the
@@ -107,12 +110,13 @@ public:
 		/// throwing it again.
 
 protected:
-	Exception();
+	Exception(int code = 0);
 		/// Standard constructor.
 		
 private:
 	std::string _msg;
 	Exception*  _pNested;
+	int			_code;
 };
 
 
@@ -131,6 +135,12 @@ inline const std::string& Exception::message() const
 }
 
 
+inline int Exception::code() const
+{
+	return _code;
+}
+
+
 //
 // Macros for quickly declaring and implementing exception classes.
 // Unfortunately, we cannot use a template here because character
@@ -138,62 +148,62 @@ inline const std::string& Exception::message() const
 // are not allowed as template arguments.
 //
 #define POCO_DECLARE_EXCEPTION(API, CLS, BASE) \
-	class API CLS: public BASE											\
-	{																	\
-	public:																\
-		CLS();															\
-		CLS(const std::string& msg);									\
-		CLS(const std::string& msg, const std::string& arg);			\
-		CLS(const std::string& msg, const Poco::Exception& exc);		\
-		CLS(const CLS& exc);											\
-		~CLS() throw();													\
-		CLS& operator = (const CLS& exc);								\
-		const char* name() const throw();								\
-		const char* className() const throw();							\
-		Poco::Exception* clone() const;									\
-		void rethrow() const;											\
+	class API CLS: public BASE														\
+	{																				\
+	public:																			\
+		CLS(int code = 0);															\
+		CLS(const std::string& msg, int code = 0);									\
+		CLS(const std::string& msg, const std::string& arg, int code = 0);			\
+		CLS(const std::string& msg, const Poco::Exception& exc, int code = 0);		\
+		CLS(const CLS& exc);														\
+		~CLS() throw();																\
+		CLS& operator = (const CLS& exc);											\
+		const char* name() const throw();											\
+		const char* className() const throw();										\
+		Poco::Exception* clone() const;												\
+		void rethrow() const;														\
 	};
 
 
-#define POCO_IMPLEMENT_EXCEPTION(CLS, BASE, NAME) \
-	CLS::CLS()																			\
-	{																					\
-	}																					\
-	CLS::CLS(const std::string& msg): BASE(msg)											\
-	{																					\
-	}																					\
-	CLS::CLS(const std::string& msg, const std::string& arg): BASE(msg, arg)			\
-	{																					\
-	}																					\
-	CLS::CLS(const std::string& msg, const Poco::Exception& exc): BASE(msg, exc)		\
-	{																					\
-	}																					\
-	CLS::CLS(const CLS& exc): BASE(exc)													\
-	{																					\
-	}																					\
-	CLS::~CLS() throw()																	\
-	{																					\
-	}																					\
-	CLS& CLS::operator = (const CLS& exc)												\
-	{																					\
-		BASE::operator = (exc);															\
-		return *this;																	\
-	}																					\
-	const char* CLS::name() const throw()												\
-	{																					\
-		return NAME;																	\
-	}																					\
-	const char* CLS::className() const throw()											\
-	{																					\
-		return typeid(*this).name();													\
-	}																					\
-	Poco::Exception* CLS::clone() const													\
-	{																					\
-		return new CLS(*this);															\
-	}																					\
-	void CLS::rethrow() const															\
-	{																					\
-		throw *this;																	\
+#define POCO_IMPLEMENT_EXCEPTION(CLS, BASE, NAME)													\
+	CLS::CLS(int code): BASE(code)																	\
+	{																								\
+	}																								\
+	CLS::CLS(const std::string& msg, int code): BASE(msg, code)										\
+	{																								\
+	}																								\
+	CLS::CLS(const std::string& msg, const std::string& arg, int code): BASE(msg, arg, code)		\
+	{																								\
+	}																								\
+	CLS::CLS(const std::string& msg, const Poco::Exception& exc, int code): BASE(msg, exc, code)	\
+	{																								\
+	}																								\
+	CLS::CLS(const CLS& exc): BASE(exc)																\
+	{																								\
+	}																								\
+	CLS::~CLS() throw()																				\
+	{																								\
+	}																								\
+	CLS& CLS::operator = (const CLS& exc)															\
+	{																								\
+		BASE::operator = (exc);																		\
+		return *this;																				\
+	}																								\
+	const char* CLS::name() const throw()															\
+	{																								\
+		return NAME;																				\
+	}																								\
+	const char* CLS::className() const throw()														\
+	{																								\
+		return typeid(*this).name();																\
+	}																								\
+	Poco::Exception* CLS::clone() const																\
+	{																								\
+		return new CLS(*this);																		\
+	}																								\
+	void CLS::rethrow() const																		\
+	{																								\
+		throw *this;																				\
 	}
 
 
