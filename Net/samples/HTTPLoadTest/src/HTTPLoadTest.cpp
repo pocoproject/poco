@@ -126,7 +126,7 @@ public:
 				sw.stop();
 				_success += HTTPResponse::HTTP_OK == res.getStatus() ? 1 : 0;
 				if (_cookies) res.getCookies(cookies);
-				usec = sw.elapsed();
+				usec = int(sw.elapsed());
 
 				if (_verbose)
 				{

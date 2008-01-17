@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Binding", "Binding\Binding_vs90.vcproj", "{F2972327-DCA7-49BB-B55D-66C554CF1205}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TypeHandler", "TypeHandler\TypeHandler_vs90.vcproj", "{822AEE4A-48B6-4B45-AB04-5C3C21C365C5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RecordSet", "RecordSet\RecordSet_vs90.vcproj", "{56F66D36-F11E-4AA1-AD37-4518A253059D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tuple", "Tuple\Tuple_vs90.vcproj", "{08C81227-3322-4DBD-A83F-55CCC933A5F7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RowFormatter", "RowFormatter\RowFormatter_vs90.vcproj", "{2613C7FF-A9A1-4376-9CD7-07F694501498}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Win32 = debug_shared|Win32
+		release_shared|Win32 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2972327-DCA7-49BB-B55D-66C554CF1205}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{F2972327-DCA7-49BB-B55D-66C554CF1205}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{F2972327-DCA7-49BB-B55D-66C554CF1205}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{F2972327-DCA7-49BB-B55D-66C554CF1205}.release_shared|Win32.Build.0 = release_shared|Win32
+		{822AEE4A-48B6-4B45-AB04-5C3C21C365C5}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{822AEE4A-48B6-4B45-AB04-5C3C21C365C5}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{822AEE4A-48B6-4B45-AB04-5C3C21C365C5}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{822AEE4A-48B6-4B45-AB04-5C3C21C365C5}.release_shared|Win32.Build.0 = release_shared|Win32
+		{56F66D36-F11E-4AA1-AD37-4518A253059D}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{56F66D36-F11E-4AA1-AD37-4518A253059D}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{56F66D36-F11E-4AA1-AD37-4518A253059D}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{56F66D36-F11E-4AA1-AD37-4518A253059D}.release_shared|Win32.Build.0 = release_shared|Win32
+		{08C81227-3322-4DBD-A83F-55CCC933A5F7}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{08C81227-3322-4DBD-A83F-55CCC933A5F7}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{08C81227-3322-4DBD-A83F-55CCC933A5F7}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{08C81227-3322-4DBD-A83F-55CCC933A5F7}.release_shared|Win32.Build.0 = release_shared|Win32
+		{2613C7FF-A9A1-4376-9CD7-07F694501498}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{2613C7FF-A9A1-4376-9CD7-07F694501498}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{2613C7FF-A9A1-4376-9CD7-07F694501498}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{2613C7FF-A9A1-4376-9CD7-07F694501498}.release_shared|Win32.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
