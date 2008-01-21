@@ -66,8 +66,6 @@ class ODBC_API ODBCStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for ODBC
 {
 public:
-	typedef std::vector<ODBCMetaColumn*> ColumnPtrVec;
-
 	ODBCStatementImpl(SessionImpl& rSession);
 		/// Creates the ODBCStatementImpl.
 
@@ -96,8 +94,12 @@ protected:
 	bool canBind() const;
 		/// Returns true if a valid statement is set and we can bind.
 
-	void compileImpl();
-		/// Compiles the statement, doesn't bind yet
+	bool compileImpl();
+		/// Compiles the statement, doesn't bind yet. 
+		/// Does nothing if the statement has already been compiled.
+		/// In this implementation, batch statements are compiled in a single step.
+		/// Therefore, this function always return false indicating no need for
+		/// subsequent compilation.
 
 	void bindImpl();
 		/// Binds all parameters and executes the statement.
@@ -119,6 +121,8 @@ private:
 	typedef std::vector<PreparationPtr>       PreparationVec;
 	typedef Poco::SharedPtr<Extractor>        ExtractorPtr;
 	typedef std::vector<ExtractorPtr>         ExtractorVec;
+	typedef std::vector<ODBCMetaColumn*>      ColumnPtrVec;
+	typedef std::vector<ColumnPtrVec>         ColumnPtrVecVec;
 	
 	static const std::string INVALID_CURSOR_STATE;
 
@@ -167,9 +171,10 @@ private:
 	ExtractorVec          _extractors;
 	bool                  _stepCalled;
 	int                   _nextResponse;
-	ColumnPtrVec          _columnPtrs;
+	ColumnPtrVecVec       _columnPtrs;
 	bool                  _prepared;
 	mutable Poco::UInt32  _affectedRowCount;
+	bool                  _compiled;
 };
 
 

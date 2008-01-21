@@ -43,6 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/RefCountedObject.h"
 #include <vector>
 #include <list>
 #include <deque>

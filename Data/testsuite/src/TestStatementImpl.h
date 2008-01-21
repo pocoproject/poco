@@ -83,7 +83,7 @@ protected:
 	bool canBind() const;
 		/// Returns true if a valid statement is set and we can bind.
 
-	void compileImpl();
+	bool compileImpl();
 		/// Compiles the statement, doesn't bind yet
 
 	void bindImpl();

@@ -136,14 +136,16 @@ public:
 		/// Registers objects used for extracting data with the StatementImpl.
 
 	void setExtractionLimit(const Limit& extrLimit);
-		/// Changes the extractionLimit to extrLimit. Per default no limit (EXTRACT_UNLIMITED) is set.
+		/// Changes the extractionLimit to extrLimit. 
+		/// Per default no limit (EXTRACT_UNLIMITED) is set.
 
 	std::string toString() const;
 		/// Create a string version of the SQL statement.
 
 	Poco::UInt32 execute();
-		/// Executes a statement. Returns the number of rows extracted for statements
-		/// returning data or number of rows affected for all other statements (insert, update, delete).
+		/// Executes a statement. Returns the number of rows 
+		/// extracted for statements returning data or number of rows 
+		/// affected for all other statements (insert, update, delete).
 
 	void reset();
 		/// Resets the statement, so that we can reuse all bindings and re-execute again.
@@ -198,8 +200,16 @@ protected:
 	virtual bool canBind() const = 0;
 		/// Returns if another bind is possible.
 
-	virtual void compileImpl() = 0;
+	virtual bool compileImpl() = 0;
 		/// Compiles the statement, doesn't bind yet.
+		/// Returns true if compilation was succesful.
+		/// This function will be called at least twice, so
+		/// for connectors requiring one call only, this function
+		/// should always return false and internall protect itself
+		/// against multiple calls.
+		/// This design is to conform to the connectors (e.g. SQLite)
+		/// that handle batches of statements as a sequence of independent
+		/// statements, each with its own prepare/bind/execute operations.
 
 	virtual void bindImpl() = 0;
 		/// Binds parameters.
@@ -240,11 +250,11 @@ protected:
 		///    session is queried for container type setting. If the
 		///    session container type setting is found, it is used.
 		/// 3. If neither session nor statement have the internal
-		///    container type set, std::vector is used.
+		///    container type set, std::deque is used.
 		///
 		/// Supported internal extraction container types are:
-		/// - std::vector (default)
-		/// - std::deque
+		/// - std::deque (default)
+		/// - std::vector
 		/// - std::list
 
 	SessionImpl& session();
@@ -277,7 +287,15 @@ protected:
 		/// Returns the current data set.
 
 	Poco::UInt32 activateNextDataSet();
-		/// Returns the next data set, or -1 if the last data set was reached.
+		/// Returns the next data set index, or throws NoDataException if the last 
+		/// data set was reached.
+
+	Poco::UInt32 activatePreviousDataSet();
+		/// Returns the previous data set index, or throws NoDataException if the last 
+		/// data set was reached.
+
+	bool hasMoreDataSets() const;
+		/// Returns true if there are data sets not activated yet.
 
 	Poco::UInt32 getExtractionLimit();
 		/// Returns the extraction limit value.
@@ -286,17 +304,22 @@ protected:
 		/// Returns the extraction limit.
 
 private:
-	void compile();
+	bool compile();
 		/// Compiles the statement, if not yet compiled.
+		/// Returns true if more compile calls are needed.
 
 	void bind();
 		/// Binds the statement, if not yet bound.
 
 	Poco::UInt32 executeWithLimit();
-		/// Executes with an upper limit set.
+		/// Executes with an upper limit set. Returns the number of rows 
+		/// extracted for statements returning data or number of rows 
+		/// affected for all other statements (insert, update, delete).
 
 	Poco::UInt32 executeWithoutLimit();
-		/// Executes without an upper limit set.
+		/// Executes without an upper limit set. Returns the number of rows 
+		/// extracted for statements returning data or number of rows 
+		/// affected for all other statements (insert, update, delete).
 
 	void resetExtraction();
 		/// Resets extraction so it can be reused again.
@@ -306,7 +329,7 @@ private:
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
-		return new InternalExtraction<C>(*pData, pCol);
+		return new InternalExtraction<C>(*pData, pCol, currentDataSet());
 	}
 
 	template <class C>
@@ -314,7 +337,7 @@ private:
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
-		return new InternalBulkExtraction<C>(*pData, pCol, getExtractionLimit());
+		return new InternalBulkExtraction<C>(*pData, pCol, getExtractionLimit(), currentDataSet());
 	}
 
 	template <class T>
@@ -413,7 +436,7 @@ private:
 	State                    _state;
 	Limit                    _extrLimit;
 	Poco::UInt32             _lowerLimit;
-	int                      _columnsExtracted;
+	std::vector<int>         _columnsExtracted;
 	SessionImpl&             _rSession;
 	Storage                  _storage;
 	std::ostringstream       _ostr;
@@ -471,7 +494,8 @@ inline AbstractExtractionVec& StatementImpl::extractions()
 
 inline int StatementImpl::columnsExtracted() const
 {
-	return _columnsExtracted;
+	poco_assert (_curDataSet < _columnsExtracted.size());
+	return _columnsExtracted[_curDataSet];
 }
 
 
@@ -597,6 +621,12 @@ inline void StatementImpl::resetBulk()
 inline bool StatementImpl::isBulkSupported() const
 {
 	return _rSession.getFeature("bulk");
+}
+
+
+inline bool StatementImpl::hasMoreDataSets() const
+{
+	return currentDataSet() + 1 < dataSetCount();
 }
 
 

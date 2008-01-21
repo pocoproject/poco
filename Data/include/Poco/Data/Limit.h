@@ -51,7 +51,7 @@ class Data_API Limit
 	/// Limit stores information how many rows a query should return.
 {
 public:
-	enum
+	enum Type
 	{
 		LIMIT_UNLIMITED = 0xffffffffu
 	};

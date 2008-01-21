@@ -489,11 +489,12 @@ void SQLiteTest::testInsertSingleBulk()
 	int x = 0;
 	Statement stmt((tmp << "INSERT INTO Strings VALUES(:str)", use(x)));
 
-	for (x = 0; x < 100; ++x)
+	for (int i = 0; x < 100; ++x)
 	{
-		int i = stmt.execute();
+		i = stmt.execute();
 		assert (1 == i);
 	}
+
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Strings", into(count), now;
 	assert (count == 100);
@@ -2140,16 +2141,61 @@ void SQLiteTest::testBindingCount()
 	int i = 42;
 	try	{ tmp << "INSERT INTO Ints VALUES (?)", now; } 
 	catch (ParameterCountMismatchException&) { }
-
-	try	{ tmp << "INSERT INTO Ints VALUES (?)", bind(42), bind(42), now; }
-	catch (ParameterCountMismatchException&) { }
 	tmp << "INSERT INTO Ints VALUES (?)", use(i), now;
-	
+
 	i = 0;
 	try	{ tmp << "SELECT int0 from Ints where int0 = ?", into(i), now; }
 	catch (ParameterCountMismatchException&) { }
 	tmp << "SELECT int0 from Ints where int0 = ?", bind(42), into(i), now;
 	assert (42 == i);
+
+	tmp << "DROP TABLE IF EXISTS Ints", now;
+	tmp << "CREATE TABLE Ints (int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
+
+	try	{ tmp << "INSERT INTO Ints VALUES (?,?,?)", bind(42), bind(42), now; }
+	catch (ParameterCountMismatchException&) { }
+}
+
+
+void SQLiteTest::testMultipleResults()
+{
+	Session tmp (SQLite::Connector::KEY, "dummy.db");
+
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE Person (LastName VARCHAR(30),"
+		"FirstName VARCHAR(30),"
+		"Address VARCHAR(30),"
+		"Age INTEGER)", now;
+
+	typedef Tuple<std::string, std::string, std::string, Poco::UInt32> Person;
+	std::vector<Person> people, people2;
+	people.push_back(Person("Simpson", "Homer", "Springfield", 42));
+	people.push_back(Person("Simpson", "Bart", "Springfield", 12));
+	people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+
+	Person pHomer;
+	int aHomer = 42, aLisa = 10;
+	Poco::UInt32 aBart = 0;
+
+	Poco::UInt32 pos1 = 1;
+	int pos2 = 2;
+
+	Statement stmt(tmp);
+	stmt << "INSERT INTO Person VALUES (?, ?, ?, ?);"
+		"SELECT * FROM Person WHERE Age = ?; "
+		"SELECT Age FROM Person WHERE FirstName = 'Bart'; "
+		"SELECT * FROM Person WHERE Age = ? OR Age = ? ORDER BY Age;"
+		, use(people)
+		, into(pHomer, from(0)), use(aHomer)
+		, into(aBart, pos1)
+		, into(people2, from(pos2)), use(aLisa), use(aHomer);
+
+	assert (7 == stmt.execute());
+	assert (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
+	assert (12 == aBart);
+	assert (2 == people2.size());
+	assert (Person("Simpson", "Lisa", "Springfield", 10) == people2[0]);
+	assert (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
 }
 
 
@@ -2236,6 +2282,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testSQLLogger);
 	CppUnit_addTest(pSuite, SQLiteTest, testExternalBindingAndExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testBindingCount);
+	CppUnit_addTest(pSuite, SQLiteTest, testMultipleResults);
 
 	return pSuite;
 }

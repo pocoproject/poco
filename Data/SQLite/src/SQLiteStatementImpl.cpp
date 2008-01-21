@@ -54,8 +54,11 @@ SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqli
 	_pStmt(0),
 	_stepCalled(false),
 	_nextResponse(0),
-	_affectedRowCount(0)
+	_affectedRowCount(0),
+	_canBind(false),
+	_isExtracted(false)
 {
+	_columns.resize(1);
 }
 
 
@@ -65,29 +68,33 @@ SQLiteStatementImpl::~SQLiteStatementImpl()
 }
 
 
-void SQLiteStatementImpl::compileImpl()
+bool SQLiteStatementImpl::compileImpl()
 {
-	if (_pStmt) return;
+	if (_pLeftover && _pLeftover->empty()) 
+	{
+		_pLeftover = 0;
+		return false;
+	}
+	else if (!_pLeftover)
+		_bindBegin = bindings().begin();
 
 	std::string statement(toString());
-	if (statement.empty())
+	sqlite3_stmt* pStmt = 0;
+	const char* pSql = _pLeftover ? _pLeftover->c_str() : statement.c_str();
+
+	if (0 == std::strlen(pSql))
 		throw InvalidSQLStatementException("Empty statements are illegal");
 
-	sqlite3_stmt* pStmt = 0;
-	const char* pSql = statement.c_str(); // The SQL to be executed
 	int rc = SQLITE_OK;
 	const char* pLeftover = 0;
 	bool queryFound = false;
 
-	while (rc == SQLITE_OK && !pStmt && !queryFound)
+	do
 	{
 		rc = sqlite3_prepare_v2(_pDB, pSql, -1, &pStmt, &pLeftover);
 		if (rc != SQLITE_OK)
 		{
-			if (pStmt) 
-			{
-				sqlite3_finalize(pStmt);
-			}
+			if (pStmt) sqlite3_finalize(pStmt);
 			pStmt = 0;
 			std::string errMsg = sqlite3_errmsg(_pDB);
 			Utility::throwException(rc, errMsg);
@@ -106,32 +113,45 @@ void SQLiteStatementImpl::compileImpl()
 				queryFound = true;
 			}
 		}
-	}
+	} while (rc == SQLITE_OK && !pStmt && !queryFound);
 
+	//Finalization call in clear() invalidates the pointer, so the value is remembered here.
+	//For last statement in a batch (or a single statement), pLeftover == "", so the next call
+	// to compileImpl() shall return false immediately when there are no more statements left.
+	std::string leftOver(pLeftover);
 	clear();
 	_pStmt = pStmt;
+	_pLeftover = new std::string(leftOver);
+	trimInPlace(*_pLeftover);
 
-	// prepare binding
 	_pBinder = new Binder(_pStmt);
 	_pExtractor = new Extractor(_pStmt);
 
+	if (SQLITE_DONE == _nextResponse && _isExtracted)
+	{
+		//if this is not the first compile and there has already been extraction
+		//during previous step, switch to the next set if there is one provided
+		if (hasMoreDataSets())
+		{
+			activateNextDataSet();
+			_isExtracted = false;
+		}
+	}
+
 	int colCount = sqlite3_column_count(_pStmt);
 
-	for (int i = 0; i < colCount; ++i)
+	if (colCount)
 	{
-		MetaColumn mc(i, sqlite3_column_name(_pStmt, i), Utility::getColumnType(_pStmt, i));
-		_columns.push_back(mc);
+		Poco::UInt32 curDataSet = currentDataSet();
+		if (curDataSet >= _columns.size()) _columns.resize(curDataSet + 1);
+		for (int i = 0; i < colCount; ++i)
+		{
+			MetaColumn mc(i, sqlite3_column_name(_pStmt, i), Utility::getColumnType(_pStmt, i));
+			_columns[curDataSet].push_back(mc);
+		}
 	}
-}
 
-
-bool SQLiteStatementImpl::canBind() const
-{
-	bool ret = false;
-	if (!bindings().empty() && _pStmt)
-		ret = (*bindings().begin())->canBind();
-
-	return ret;
+	return true;
 }
 
 
@@ -143,32 +163,61 @@ void SQLiteStatementImpl::bindImpl()
 
 	sqlite3_reset(_pStmt);
 
-	// bind
-	Bindings& binds = bindings();
-	int pc = sqlite3_bind_parameter_count(_pStmt);
-	if (binds.empty() && 0 == pc) return;
-	else if (binds.empty() && pc > 0)
-		throw ParameterCountMismatchException();
-	else if (!binds.empty() && binds.size() * (*binds.begin())->numOfColumnsHandled() != pc)
-		throw ParameterCountMismatchException();
-	
-	std::size_t pos = 1; // sqlite starts with 1 not 0!
-
-	Bindings::iterator it    = binds.begin();
-	Bindings::iterator itEnd = binds.end();
-	if (it != itEnd)
-		_affectedRowCount = (*it)->numOfRowsHandled();
-	for (; it != itEnd && (*it)->canBind(); ++it)
+	int paramCount = sqlite3_bind_parameter_count(_pStmt);
+	BindIt bindEnd = bindings().end();
+	if (0 == paramCount || bindEnd == _bindBegin) 
 	{
-		(*it)->bind(pos);
-		pos += (*it)->numOfColumnsHandled();
+		_canBind = false;
+		return;
+	}
+
+	int availableCount = 0;
+	Bindings::difference_type bindCount = 0;
+	Bindings::iterator it = _bindBegin;
+	for (; it != bindEnd; ++it)
+	{
+		availableCount += (*it)->numOfColumnsHandled();
+		if (availableCount <= paramCount) ++bindCount;
+		else break;
+	}
+
+	Bindings::difference_type remainingBindCount = bindEnd - _bindBegin;
+	if (bindCount < remainingBindCount)
+	{
+		bindEnd = _bindBegin + bindCount;
+		_canBind = true;
+	}
+	else if (bindCount > remainingBindCount)
+		throw ParameterCountMismatchException();
+
+	if (_bindBegin != bindings().end())
+	{
+		_affectedRowCount = (*_bindBegin)->numOfRowsHandled();
+
+		Bindings::iterator oldBegin = _bindBegin;
+		for (std::size_t pos = 1; _bindBegin != bindEnd && (*_bindBegin)->canBind(); ++_bindBegin)
+		{
+			if (_affectedRowCount != (*_bindBegin)->numOfRowsHandled())
+				throw BindingException("Size mismatch in Bindings. All Bindings MUST have the same size");
+
+			(*_bindBegin)->bind(pos);
+			pos += (*_bindBegin)->numOfColumnsHandled();
+		}
+
+		if ((*oldBegin)->canBind())
+		{
+			//container binding will come back for more, so we must rewind
+			_bindBegin = oldBegin;
+			_canBind = true;
+		}
+		else _canBind = false;
 	}
 }
 
 
 void SQLiteStatementImpl::clear()
 {
-	_columns.clear();
+	_columns[currentDataSet()].clear();
 	_affectedRowCount = 0;
 
 	if (_pStmt)
@@ -176,6 +225,8 @@ void SQLiteStatementImpl::clear()
 		sqlite3_finalize(_pStmt);
 		_pStmt=0;
 	}
+	_pLeftover = 0;
+	_canBind = false;
 }
 
 
@@ -194,12 +245,11 @@ bool SQLiteStatementImpl::hasNext()
 
 	_stepCalled   = true;
 	_nextResponse = sqlite3_step(_pStmt);
-	_pExtractor->reset();//to clear the cached null indicators
 
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
-	{
 		Utility::throwException(_nextResponse);
-	}
+
+	_pExtractor->reset();//clear the cached null indicators
 
 	return (_nextResponse == SQLITE_ROW);
 }
@@ -212,13 +262,14 @@ Poco::UInt32 SQLiteStatementImpl::next()
 		poco_assert (columnsReturned() == sqlite3_column_count(_pStmt));
 
 		Extractions& extracts = extractions();
-		Extractions::iterator it    = extracts.begin();
+		Extractions::iterator it = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
 		std::size_t pos = 0; // sqlite starts with pos 0 for results!
 		for (; it != itEnd; ++it)
 		{
 			(*it)->extract(pos);
 			pos += (*it)->numOfColumnsHandled();
+			_isExtracted = true;
 		}
 		_stepCalled = false;
 	}
@@ -238,14 +289,15 @@ Poco::UInt32 SQLiteStatementImpl::next()
 
 Poco::UInt32 SQLiteStatementImpl::columnsReturned() const
 {
-	return (Poco::UInt32) _columns.size();
+	return (Poco::UInt32) _columns[currentDataSet()].size();
 }
 
 
 const MetaColumn& SQLiteStatementImpl::metaColumn(Poco::UInt32 pos) const
 {
-	poco_assert (pos >= 0 && pos <= _columns.size());
-	return _columns[pos];
+	Poco::UInt32 curDataSet = currentDataSet();
+	poco_assert (pos >= 0 && pos <= _columns[curDataSet].size());
+	return _columns[curDataSet][pos];
 }
 
 

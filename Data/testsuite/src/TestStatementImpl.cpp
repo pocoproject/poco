@@ -50,12 +50,13 @@ TestStatementImpl::~TestStatementImpl()
 }
 
 
-void TestStatementImpl::compileImpl()
+bool TestStatementImpl::compileImpl()
 {
 	// prepare binding
 	_ptrBinder    = new Binder;
 	_ptrExtractor = new Extractor;
 	_ptrPrepare   = new Preparation;
+	return false;
 }
 
 

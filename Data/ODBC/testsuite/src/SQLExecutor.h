@@ -499,7 +499,7 @@ public:
 	void multipleResults(const std::string& sql = 
 		"SELECT * FROM Person WHERE Age = ?; "
 		"SELECT Age FROM Person WHERE FirstName = 'Bart'; "
-		"SELECT * FROM Person WHERE Age = ?; ");
+		"SELECT * FROM Person WHERE Age = ? OR Age = ? ORDER BY Age;");
 
 	void sqlChannel(const std::string& connect);
 	void sqlLogger(const std::string& connect);

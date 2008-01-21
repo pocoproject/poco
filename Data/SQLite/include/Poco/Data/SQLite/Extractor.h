@@ -285,7 +285,7 @@ private:
 	}
 
 	sqlite3_stmt* _pStmt;
-	NullIndVec _nulls;
+	NullIndVec    _nulls;
 };
 
 

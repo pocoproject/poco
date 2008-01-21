@@ -95,8 +95,15 @@ protected:
 	bool canBind() const;
 		/// Returns true if a valid statement is set and we can bind.
 
-	void compileImpl();
-		/// Compiles the statement, doesn't bind yet
+	bool compileImpl();
+		/// Compiles the statement, doesn't bind yet.
+		/// Returns true if the statement was succesfully compiled.
+		/// The way SQLite handles batches of statmeents is by compiling
+		/// one at a time and returning a pointer to the next one.
+		/// The remainder of the statement is remebered in a string
+		/// buffer pointed to by _pLeftover member. Non-zero _pLeftover
+		/// pointing to an empty string means no more statements left
+		/// to compile.
 
 	void bindImpl();
 		/// Binds parameters
@@ -116,15 +123,22 @@ private:
 	typedef Poco::Data::AbstractBindingVec      Bindings;
 	typedef Poco::Data::AbstractExtractionVec   Extractions;
 	typedef std::vector<Poco::Data::MetaColumn> MetaColumnVec;
+	typedef std::vector<MetaColumnVec>          MetaColumnVecVec;
+	typedef Poco::SharedPtr<std::string>        StrPtr;
+	typedef Bindings::iterator                  BindIt;
 
-	sqlite3*      _pDB;
-	sqlite3_stmt* _pStmt;
-	bool          _stepCalled;
-	int           _nextResponse;
-	BinderPtr     _pBinder;
-	ExtractorPtr  _pExtractor;
-	MetaColumnVec _columns;
-	Poco::UInt32  _affectedRowCount;
+	sqlite3*         _pDB;
+	sqlite3_stmt*    _pStmt;
+	bool             _stepCalled;
+	int              _nextResponse;
+	BinderPtr        _pBinder;
+	ExtractorPtr     _pExtractor;
+	MetaColumnVecVec _columns;
+	Poco::UInt32     _affectedRowCount;
+	StrPtr           _pLeftover;
+	BindIt           _bindBegin;
+	bool             _canBind;
+	bool             _isExtracted;
 };
 
 
@@ -140,6 +154,12 @@ inline AbstractExtractor& SQLiteStatementImpl::extractor()
 inline AbstractBinder& SQLiteStatementImpl::binder()
 {
 	return *_pBinder;
+}
+
+
+inline bool SQLiteStatementImpl::canBind() const
+{
+	return _canBind;
 }
 
 

@@ -101,8 +101,13 @@ public:
 		/// Extracts a value from the param, starting at the given column position.
 		/// Returns the number of rows extracted.
 
-	virtual void reset() = 0;
+	virtual void reset();
 		/// Resets the extractor so that it can be re-used.
+		/// Does nothing in this implementation.
+		/// Implementations should override it for different behavior.
+
+	virtual bool canExtract() const;
+		/// Returns true. Implementations should override it for different behavior.
 
 	virtual AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) = 0;
 		/// Creates a Prepare object for the extracting object
@@ -183,6 +188,17 @@ inline Poco::UInt32 AbstractExtraction::position() const
 inline bool AbstractExtraction::isBulk() const
 {
 	return _bulk;
+}
+
+
+inline void AbstractExtraction::reset()
+{
+}
+
+
+inline bool AbstractExtraction::canExtract() const
+{
+	return true;
 }
 
 

@@ -101,17 +101,11 @@ void Binder::freeMemory()
 
 	StringMap::iterator itStr = _strings.begin();
 	StringMap::iterator itStrEnd = _strings.end();
-	for(; itStr != itStrEnd; ++itStr) 
-	{
-		if (itStr->first) std::free(itStr->first);
-	}
+	for(; itStr != itStrEnd; ++itStr) std::free(itStr->first);
 
 	CharPtrVec::iterator itChr = _charPtrs.begin();
 	CharPtrVec::iterator endChr = _charPtrs.end();
-	for (; itChr != endChr; ++itChr) 
-	{
-		if (*itChr) std::free(*itChr);
-	}
+	for (; itChr != endChr; ++itChr) std::free(*itChr);
 
 	BoolPtrVec::iterator itBool = _boolPtrs.begin();
 	BoolPtrVec::iterator endBool = _boolPtrs.end();

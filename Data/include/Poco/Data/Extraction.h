@@ -124,6 +124,11 @@ public:
 		_extracted = false;
 	}
 
+	bool canExtract() const
+	{
+		return !_extracted;
+	}
+
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<T>(pPrep, pos, _rResult);
@@ -196,10 +201,6 @@ public:
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(pExt->isNull(pos));
 		return 1u;
-	}
-
-	virtual void reset()
-	{
 	}
 
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
@@ -283,10 +284,6 @@ public:
 		return 1u;
 	}
 
-	virtual void reset()
-	{
-	}
-
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<bool>(pPrep, pos, _default);
@@ -366,10 +363,6 @@ public:
 		return 1u;
 	}
 
-	virtual void reset()
-	{
-	}
-
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<T>(pPrep, pos, _default);
@@ -447,10 +440,6 @@ public:
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(pExt->isNull(pos));
 		return 1u;
-	}
-
-	virtual void reset()
-	{
 	}
 
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
@@ -586,10 +575,6 @@ public:
 		return 1u;
 	}
 
-	void reset()
-	{
-	}
-
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<T>(pPrep, pos, _default);
@@ -647,10 +632,6 @@ public:
 		TypeHandler<T>::extract(pos, tmp, _default, getExtractor());
 		_rResult.insert(tmp);
 		return 1u;
-	}
-
-	void reset()
-	{
 	}
 
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
@@ -712,15 +693,10 @@ public:
 		return 1u;
 	}
 
-	void reset()
-	{
-	}
-
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
 	{
 		return new Prepare<V>(pPrep, pos, _default);
 	}
-
 
 private:
 	std::map<K, V>& _rResult;
@@ -774,10 +750,6 @@ public:
 		TypeHandler<V>::extract(pos, tmp, _default, getExtractor());
 		_rResult.insert(std::make_pair(tmp(), tmp));
 		return 1u;
-	}
-
-	void reset()
-	{
 	}
 
 	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)

@@ -285,7 +285,6 @@ public:
 
 	Statement& operator , (unsigned long value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
-
 #endif
 	Statement& operator , (Poco::UInt64 value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
@@ -372,7 +371,20 @@ public:
 
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
-		/// with the statement.
+		/// with the current data set.
+
+	std::size_t dataSetCount() const;
+		/// Returns the number of data sets associated with the statement.
+
+	std::size_t nextDataSet();
+		/// Returns the index of the next data set.
+
+	std::size_t previousDataSet();
+		/// Returns the index of the previous data set.
+
+	bool hasMoreDataSets() const;
+		/// Returns false if the current data set index points to the last
+		/// data set. Otherwise, it returns true.
 
 	void setRowFormatter(RowFormatter* pRowFormatter);
 		/// Sets the row formatter for this statement.
@@ -680,6 +692,30 @@ inline void Statement::setStorage(const std::string& storage)
 inline std::size_t Statement::extractionCount() const
 {
 	return _pImpl->extractionCount();
+}
+
+
+inline std::size_t Statement::dataSetCount() const
+{
+	return _pImpl->dataSetCount();
+}
+
+
+inline std::size_t Statement::nextDataSet()
+{
+	return _pImpl->activateNextDataSet();
+}
+
+
+inline std::size_t Statement::previousDataSet()
+{
+	return _pImpl->activatePreviousDataSet();
+}
+
+
+inline bool Statement::hasMoreDataSets() const
+{
+	return _pImpl->hasMoreDataSets();
 }
 
 

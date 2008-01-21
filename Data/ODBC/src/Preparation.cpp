@@ -94,14 +94,14 @@ void Preparation::freeMemory() const
 		case DT_CHAR_ARRAY:
 		{
 			char* pc = AnyCast<char>(&_values[it->first]);
-			if (pc) std::free(pc);
+			std::free(pc);
 			break;
 		}
 
 		case DT_BOOL_ARRAY:
 		{
 			bool* pb = AnyCast<bool>(&_values[it->first]);
-			if (pb)	std::free(pb);
+			std::free(pb);
 			break;
 		}
 

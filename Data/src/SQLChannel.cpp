@@ -131,7 +131,6 @@ void SQLChannel::logAsync(const Message& msg)
 
 void SQLChannel::logSync(const Message& msg)
 {
-	//if (isArchiving()) archive();
 	if (_pArchiveStrategy) _pArchiveStrategy->archive();
 
 	_source = msg.getSource();
@@ -289,7 +288,8 @@ void SQLChannel::initLogStatement()
 
 void SQLChannel::registerChannel()
 {
-	Poco::LoggingFactory::defaultFactory().registerChannelClass("SQLChannel", new Poco::Instantiator<SQLChannel, Poco::Channel>);
+	Poco::LoggingFactory::defaultFactory().registerChannelClass("SQLChannel", 
+		new Poco::Instantiator<SQLChannel, Poco::Channel>);
 }
 
 

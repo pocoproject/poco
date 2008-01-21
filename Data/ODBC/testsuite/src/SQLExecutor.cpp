@@ -2950,30 +2950,30 @@ void SQLExecutor::multipleResults(const std::string& sql)
 	typedef Tuple<std::string, std::string, std::string, Poco::UInt32> Person;
 	std::vector<Person> people;
 	people.push_back(Person("Simpson", "Homer", "Springfield", 42));
-	people.push_back(Person("Simpson", "Bart", "Springfield", 12));
-	people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
+	people.push_back(Person("Simpson", "Marge", "Springfield", 38));
+	people.push_back(Person("Simpson", "Bart", "Springfield", 10));
+	people.push_back(Person("Simpson", "Lisa", "Springfield", 8));
+	people.push_back(Person("Simpson", "Maggie", "Springfield", 3));
 	session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
 
-	Person pHomer, pLisa;
-	int aHomer = 42, aLisa = 10;
+	Person pHomer;
+	int aHomer = 42, aLisa = 8;
 	Poco::UInt32 aBart = 0;
 
 	Poco::UInt32 pos1 = 1;
 	int pos2 = 2;
-	try {
-	session() << sql
-		, into(pHomer, from(0)), use(aHomer)
+	std::vector<Person> people2;
+	Statement stmt(session());
+	stmt << sql, into(pHomer, from(0)), use(aHomer)
 		, into(aBart, pos1)
-		, into(pLisa, pos2), use(aLisa)
-		, now;
-	} catch (StatementException& ex)
-	{
-		std::cout << ex.toString() << std::endl;
-	}
+		, into(people2, from(pos2)), use(aLisa), use(aHomer);
 
+	assert (4 == stmt.execute());
 	assert (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
-	assert (12 == aBart);
-	assert (Person("Simpson", "Lisa", "Springfield", 10) == pLisa);
+	assert (10 == aBart);
+	assert (2 == people2.size());
+	assert (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
+	assert (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
 }
 
 

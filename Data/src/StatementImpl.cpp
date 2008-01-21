@@ -63,16 +63,15 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_state(ST_INITIALIZED),
 	_extrLimit(upperLimit((Poco::UInt32) Limit::LIMIT_UNLIMITED, false)),
 	_lowerLimit(0),
-	_columnsExtracted(0),
 	_rSession(rSession),
 	_storage(STORAGE_UNKNOWN_IMPL),
 	_ostr(),
-	_bindings(),
 	_curDataSet(0),
 	_bulkBinding(BULK_UNDEFINED),
 	_bulkExtraction(BULK_UNDEFINED)
 {
 	_extractors.resize(1);
+	_columnsExtracted.resize(1, 0);
 }
 
 
@@ -88,15 +87,20 @@ Poco::UInt32 StatementImpl::execute()
 	if (_lowerLimit > _extrLimit.value())
 		throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
 
+	compile();
+	do
+	{
+		if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
+			lim += executeWithoutLimit();
+		else
+			lim += executeWithLimit();
+	} while (compile());
+
 	if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
-		lim = executeWithoutLimit();
-	else
-		lim = executeWithLimit();
-		
+		_state = ST_DONE;
+
 	if (lim < _lowerLimit)
 		throw LimitException("Did not receive enough data.");
-
-	if (0 == lim) lim = affectedRowCount();
 
 	return lim;
 }
@@ -105,48 +109,51 @@ Poco::UInt32 StatementImpl::execute()
 Poco::UInt32 StatementImpl::executeWithLimit()
 {
 	poco_assert (_state != ST_DONE);
-	compile();
 	Poco::UInt32 count = 0;
 	Poco::UInt32 limit = _extrLimit.value();
+
 	do
 	{
 		bind();
 		while (count < limit && hasNext()) 
 			count += next();
 	} while (count < limit && canBind());
-	
-	if (!canBind() && (!hasNext() || limit == 0))
+
+	if (!canBind() && (!hasNext() || limit == 0)) 
 		_state = ST_DONE;
 	else if (hasNext() && limit == count && _extrLimit.isHardLimit())
-		throw LimitException("HardLimit reached. We got more data than we asked for");
-	else
+		throw LimitException("HardLimit reached (retrieved more data than requested).");
+	else 
 		_state = ST_PAUSED;
 
-	return count;
+	return count ? count : affectedRowCount();
 }
 
 
 Poco::UInt32 StatementImpl::executeWithoutLimit()
 {
 	poco_assert (_state != ST_DONE);
-	compile();
 	Poco::UInt32 count = 0;
+
 	do
 	{
 		bind();
 		while (hasNext()) count += next();
 	} while (canBind());
 
-	_state = ST_DONE;
-	return count;
+	return count ? count : affectedRowCount();
 }
 
 
-void StatementImpl::compile()
+bool StatementImpl::compile()
 {
-	if (_state == ST_INITIALIZED)
+	bool retval = false;
+
+	if (_state == ST_INITIALIZED || 
+		_state == ST_RESET || 
+		_state == ST_BOUND)
 	{
-		compileImpl();
+		retval = compileImpl();
 		_state = ST_COMPILED;
 
 		if (!extractions().size() && !isStoredProcedure())
@@ -158,12 +165,8 @@ void StatementImpl::compile()
 		fixupExtraction();
 		fixupBinding();
 	}
-	else if (_state == ST_RESET)
-	{
-		resetBinding();
-		resetExtraction();
-		_state = ST_COMPILED;
-	}
+
+	return retval;
 }
 
 
@@ -187,8 +190,9 @@ void StatementImpl::bind()
 
 void StatementImpl::reset()
 {
+	resetBinding();
+	resetExtraction();
 	_state = ST_RESET;
-	compile();
 }
 
 
@@ -217,12 +221,15 @@ void StatementImpl::fixupExtraction()
 	Poco::Data::AbstractExtractionVec::iterator it    = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
 	AbstractExtractor& ex = extractor();
-	_columnsExtracted = 0;
+	
+	if (_curDataSet >= _columnsExtracted.size()) 
+		_columnsExtracted.resize(_curDataSet + 1, 0);
+	
 	for (; it != itEnd; ++it)
 	{
 		(*it)->setExtractor(&ex);
 		(*it)->setLimit(_extrLimit.value()),
-		_columnsExtracted += (int)(*it)->numOfColumnsHandled();
+		_columnsExtracted[_curDataSet] += (int)(*it)->numOfColumnsHandled();
 	}
 }
 
@@ -234,16 +241,8 @@ void StatementImpl::fixupBinding()
 	AbstractBindingVec::iterator itEnd = bindings().end();
 	AbstractBinder& bin = binder();
 	std::size_t numRows = 0;
-	if (it != itEnd)
-		numRows = (*it)->numOfRowsHandled();
-	for (; it != itEnd; ++it)
-	{
-		if (numRows != (*it)->numOfRowsHandled())
-		{
-			throw BindingException("Size mismatch in Bindings. All Bindings MUST have the same size");
-		}
-		(*it)->setBinder(&bin);
-	}
+	if (it != itEnd) numRows = (*it)->numOfRowsHandled();
+	for (; it != itEnd; ++it) (*it)->setBinder(&bin);
 }
 
 
@@ -251,10 +250,7 @@ void StatementImpl::resetBinding()
 {
 	AbstractBindingVec::iterator it    = bindings().begin();
 	AbstractBindingVec::iterator itEnd = bindings().end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->reset();
-	}
+	for (; it != itEnd; ++it) (*it)->reset();
 }
 
 
@@ -262,10 +258,10 @@ void StatementImpl::resetExtraction()
 {
 	Poco::Data::AbstractExtractionVec::iterator it = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->reset();
-	}
+	for (; it != itEnd; ++it) (*it)->reset();
+
+	poco_assert (_curDataSet < _columnsExtracted.size());
+	_columnsExtracted[_curDataSet] = 0;
 }
 
 
@@ -349,6 +345,15 @@ Poco::UInt32 StatementImpl::activateNextDataSet()
 		return ++_curDataSet;
 	else
 		throw NoDataException("End of data sets reached.");
+}
+
+
+Poco::UInt32 StatementImpl::activatePreviousDataSet()
+{
+	if (_curDataSet > 0)
+		return --_curDataSet;
+	else
+		throw NoDataException("Beginning of data sets reached.");
 }
 
 

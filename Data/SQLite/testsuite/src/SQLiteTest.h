@@ -124,6 +124,7 @@ public:
 
 	void testExternalBindingAndExtraction();
 	void testBindingCount();
+	void testMultipleResults();
 
 	void setUp();
 	void tearDown();

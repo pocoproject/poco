@@ -75,6 +75,14 @@ class Data_API RecordSet: private Statement
 	///     select.execute();
 	///     RecordSet rs(select);
 	///
+	/// The shorter way to do the above is following:
+	///
+	///     RecordSet rs(session, "SELECT * FROM Person"[, new SimpleRowFormatter]);
+	///
+	/// The third (optional) argument passed to the Recordset constructor is a RowFormatter
+	/// implementation. The formatter is used in conjunction with << operator for recordset
+	/// data formating.
+	/// 
 	/// The number of rows in the RecordSet can be limited by specifying
 	/// a limit for the Statement.
 {

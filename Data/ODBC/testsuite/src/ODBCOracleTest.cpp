@@ -586,13 +586,14 @@ void ODBCOracleTest::testMultipleResults()
 	std::string sql = "CREATE OR REPLACE "
 		"PROCEDURE multiResultsProcedure(paramAge1 IN NUMBER,"
 		" paramAge2 IN NUMBER,"
+		" paramAge3 IN NUMBER,"
 		" ret1 OUT SYS_REFCURSOR, "
 		" ret2 OUT SYS_REFCURSOR,"
 		" ret3 OUT SYS_REFCURSOR) IS "
 		"BEGIN "
 		" OPEN ret1 FOR SELECT * FROM Person WHERE Age = paramAge1;"
 		" OPEN ret2 FOR SELECT Age FROM Person WHERE FirstName = 'Bart';"
-		" OPEN ret3 FOR SELECT * FROM Person WHERE Age = paramAge2;"
+		" OPEN ret3 FOR SELECT * FROM Person WHERE Age = paramAge2 OR Age = paramAge3 ORDER BY Age;"
 		"END multiResultsProcedure;";
 
 	for (int i = 0; i < 8;)

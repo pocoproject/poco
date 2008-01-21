@@ -61,8 +61,8 @@ class BulkExtraction: public AbstractExtraction
 public:
 	typedef typename C::value_type T;
 
-	BulkExtraction(C& result, Poco::UInt32 limit): 
-		AbstractExtraction(limit, 0, true),
+	BulkExtraction(C& result, Poco::UInt32 limit, const Position& pos = Position(0)): 
+		AbstractExtraction(limit, pos.value(), true),
 		_rResult(result), 
 		_default()
 	{
@@ -70,8 +70,8 @@ public:
 			result.resize(limit);
 	}
 
-	BulkExtraction(C& result, const T& def, Poco::UInt32 limit): 
-		AbstractExtraction(limit, 0, true),
+	BulkExtraction(C& result, const T& def, Poco::UInt32 limit, const Position& pos = Position(0)): 
+		AbstractExtraction(limit, pos.value(), true),
 		_rResult(result), 
 		_default(def)
 	{
@@ -161,8 +161,11 @@ class InternalBulkExtraction: public BulkExtraction<C>
 public:
 	typedef typename C::value_type T;
 
-	explicit InternalBulkExtraction(C& result, Column<C>* pColumn, Poco::UInt32 limit): 
-		BulkExtraction<C>(result, T(), limit), 
+	explicit InternalBulkExtraction(C& result,
+		Column<C>* pColumn,
+		Poco::UInt32 limit,
+		const Position& pos = Position(0)): 
+		BulkExtraction<C>(result, T(), limit, pos), 
 		_pColumn(pColumn)
 		/// Creates InternalBulkExtraction.
 	{
@@ -211,62 +214,62 @@ private:
 
 
 template <typename T> 
-BulkExtraction<std::vector<T> >* into(std::vector<T>& t, const Bulk& bulk)
+BulkExtraction<std::vector<T> >* into(std::vector<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
 {
-	return new BulkExtraction<std::vector<T> >(t, bulk.size());
+	return new BulkExtraction<std::vector<T> >(t, bulk.size(), pos);
 }
 
 
 template <typename T> 
-BulkExtraction<std::vector<T> >* into(std::vector<T>& t, BulkFnType)
+BulkExtraction<std::vector<T> >* into(std::vector<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
 {
 	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
-	return new BulkExtraction<std::vector<T> >(t, size);
+	return new BulkExtraction<std::vector<T> >(t, size, pos);
 }
 
 
 template <typename T> 
-BulkExtraction<std::deque<T> >* into(std::deque<T>& t, const Bulk& bulk)
+BulkExtraction<std::deque<T> >* into(std::deque<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
 {
-	return new BulkExtraction<std::deque<T> >(t, bulk.size());
+	return new BulkExtraction<std::deque<T> >(t, bulk.size(), pos);
 }
 
 
 template <typename T> 
-BulkExtraction<std::deque<T> >* into(std::deque<T>& t, BulkFnType)
+BulkExtraction<std::deque<T> >* into(std::deque<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
 {
 	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
-	return new BulkExtraction<std::deque<T> >(t, size);
+	return new BulkExtraction<std::deque<T> >(t, size, pos);
 }
 
 
 template <typename T> 
-BulkExtraction<std::list<T> >* into(std::list<T>& t, const Bulk& bulk)
+BulkExtraction<std::list<T> >* into(std::list<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.
 {
-	return new BulkExtraction<std::list<T> >(t, bulk.size());
+	return new BulkExtraction<std::list<T> >(t, bulk.size(), pos);
 }
 
 
 template <typename T> 
-BulkExtraction<std::list<T> >* into(std::list<T>& t, BulkFnType)
+BulkExtraction<std::list<T> >* into(std::list<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.
 {
 	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
-	return new BulkExtraction<std::list<T> >(t, size);
+	return new BulkExtraction<std::list<T> >(t, size, pos);
 }
 
 

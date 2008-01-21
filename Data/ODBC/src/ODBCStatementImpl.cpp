@@ -65,21 +65,30 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_stepCalled(false),
 	_nextResponse(0),
 	_prepared(false),
-	_affectedRowCount(0)
+	_affectedRowCount(0),
+	_compiled(false)
 {
 }
 
 
 ODBCStatementImpl::~ODBCStatementImpl()
 {
-	ColumnPtrVec::iterator it = _columnPtrs.begin();
-	ColumnPtrVec::iterator itEnd = _columnPtrs.end();
-	for(; it != itEnd; ++it) delete *it;
+	ColumnPtrVecVec::iterator it = _columnPtrs.begin();
+	ColumnPtrVecVec::iterator end = _columnPtrs.end();
+	for(; it != end; ++it)
+	{
+		ColumnPtrVec::iterator itC = it->begin();
+		ColumnPtrVec::iterator endC = it->end();
+		for(; itC != endC; ++itC) delete *itC;
+	}
 }
 
 
-void ODBCStatementImpl::compileImpl()
+bool ODBCStatementImpl::compileImpl()
 {
+	if (_compiled) return false;
+
+	clear();
 	_stepCalled = false;
 	_nextResponse = 0;
 
@@ -111,6 +120,9 @@ void ODBCStatementImpl::compileImpl()
 
 	makeInternalExtractors();
 	doPrepare();
+
+	 _compiled = true;
+	 return false;
 }
 
 
@@ -302,9 +314,8 @@ bool ODBCStatementImpl::hasNext()
 
 		if (!nextRowReady())
 		{
-			try { activateNextDataSet(); } 
-			catch (NoDataException&)
-			{ return false;	}
+			if (hasMoreDataSets()) activateNextDataSet();
+			else return false;	
 
 			if (SQL_NO_DATA == SQLMoreResults(_stmt)) 
 				return false;
@@ -418,9 +429,12 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 void ODBCStatementImpl::fillColumns()
 {
 	Poco::UInt32 colCount = columnsReturned();
+	Poco::UInt32 curDataSet = currentDataSet();
+	if (curDataSet >= _columnPtrs.size())
+		_columnPtrs.resize(curDataSet + 1);
 
 	for (int i = 0; i < colCount; ++i)
-		_columnPtrs.push_back(new ODBCMetaColumn(_stmt, i));
+		_columnPtrs[curDataSet].push_back(new ODBCMetaColumn(_stmt, i));
 }
 
 
@@ -435,12 +449,15 @@ bool ODBCStatementImpl::isStoredProcedure() const
 
 const MetaColumn& ODBCStatementImpl::metaColumn(Poco::UInt32 pos) const
 {
-	std::size_t sz = _columnPtrs.size();
+	Poco::UInt32 curDataSet = currentDataSet();
+	poco_assert_dbg (curDataSet < _columnPtrs.size());
+
+	std::size_t sz = _columnPtrs[curDataSet].size();
 
 	if (0 == sz || pos > sz - 1)
 		throw InvalidAccessException(format("Invalid column number: %u", pos));
 
-	return *_columnPtrs[pos];
+	return *_columnPtrs[curDataSet][pos];
 }
 
 
