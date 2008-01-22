@@ -198,18 +198,13 @@ protected:
 		/// Expects the statement to be compiled and bound.
 
 	virtual bool canBind() const = 0;
-		/// Returns if another bind is possible.
+		/// Returns true if another bind is possible.
 
-	virtual bool compileImpl() = 0;
+	virtual bool canCompile() const = 0;
+		/// Returns true if another compile is possible.
+
+	virtual void compileImpl() = 0;
 		/// Compiles the statement, doesn't bind yet.
-		/// Returns true if compilation was succesful.
-		/// This function will be called at least twice, so
-		/// for connectors requiring one call only, this function
-		/// should always return false and internall protect itself
-		/// against multiple calls.
-		/// This design is to conform to the connectors (e.g. SQLite)
-		/// that handle batches of statements as a sequence of independent
-		/// statements, each with its own prepare/bind/execute operations.
 
 	virtual void bindImpl() = 0;
 		/// Binds parameters.
@@ -304,9 +299,8 @@ protected:
 		/// Returns the extraction limit.
 
 private:
-	bool compile();
-		/// Compiles the statement, if not yet compiled.
-		/// Returns true if more compile calls are needed.
+	void compile();
+		/// Compiles the statement.
 
 	void bind();
 		/// Binds the statement, if not yet bound.

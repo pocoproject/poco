@@ -94,12 +94,12 @@ protected:
 	bool canBind() const;
 		/// Returns true if a valid statement is set and we can bind.
 
-	bool compileImpl();
+	bool canCompile() const;
+		/// Returns true if another compile is possible.
+
+	void compileImpl();
 		/// Compiles the statement, doesn't bind yet. 
 		/// Does nothing if the statement has already been compiled.
-		/// In this implementation, batch statements are compiled in a single step.
-		/// Therefore, this function always return false indicating no need for
-		/// subsequent compilation.
 
 	void bindImpl();
 		/// Binds all parameters and executes the statement.
@@ -174,7 +174,7 @@ private:
 	ColumnPtrVecVec       _columnPtrs;
 	bool                  _prepared;
 	mutable Poco::UInt32  _affectedRowCount;
-	bool                  _compiled;
+	bool                  _canCompile;
 };
 
 
@@ -213,6 +213,12 @@ inline bool ODBCStatementImpl::hasData() const
 inline bool ODBCStatementImpl::nextRowReady() const
 {
 	return (!Utility::isError(_nextResponse));
+}
+
+
+inline bool ODBCStatementImpl::canCompile() const
+{
+	return _canCompile;
 }
 
 

@@ -95,15 +95,16 @@ protected:
 	bool canBind() const;
 		/// Returns true if a valid statement is set and we can bind.
 
-	bool compileImpl();
+	bool canCompile() const;
+		/// Returns true if statement can compile.
+
+	void compileImpl();
 		/// Compiles the statement, doesn't bind yet.
 		/// Returns true if the statement was succesfully compiled.
 		/// The way SQLite handles batches of statmeents is by compiling
 		/// one at a time and returning a pointer to the next one.
-		/// The remainder of the statement is remebered in a string
-		/// buffer pointed to by _pLeftover member. Non-zero _pLeftover
-		/// pointing to an empty string means no more statements left
-		/// to compile.
+		/// The remainder of the statement is kept in a string
+		/// buffer pointed to by _pLeftover member.
 
 	void bindImpl();
 		/// Binds parameters
@@ -139,6 +140,7 @@ private:
 	BindIt           _bindBegin;
 	bool             _canBind;
 	bool             _isExtracted;
+	bool             _canCompile;
 };
 
 
@@ -160,6 +162,12 @@ inline AbstractBinder& SQLiteStatementImpl::binder()
 inline bool SQLiteStatementImpl::canBind() const
 {
 	return _canBind;
+}
+
+
+inline bool SQLiteStatementImpl::canCompile() const
+{
+	return _canCompile;
 }
 
 

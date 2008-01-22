@@ -40,7 +40,8 @@ namespace Test {
 
 
 TestStatementImpl::TestStatementImpl(SessionImpl& rSession):
-	Poco::Data::StatementImpl(rSession)
+	Poco::Data::StatementImpl(rSession),
+	_compiled(false)
 {
 }
 
@@ -50,13 +51,13 @@ TestStatementImpl::~TestStatementImpl()
 }
 
 
-bool TestStatementImpl::compileImpl()
+void TestStatementImpl::compileImpl()
 {
 	// prepare binding
 	_ptrBinder    = new Binder;
 	_ptrExtractor = new Extractor;
 	_ptrPrepare   = new Preparation;
-	return false;
+	_compiled = true;
 }
 
 

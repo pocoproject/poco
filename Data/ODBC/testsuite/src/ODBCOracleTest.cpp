@@ -602,7 +602,7 @@ void ODBCOracleTest::testMultipleResults()
 		*_pSession << sql, now;
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		executor().multipleResults("{call multiResultsProcedure(?, ?)}");
+		executor().multipleResults("{call multiResultsProcedure(?, ?, ?)}");
 
 		i += 2;
 	}

@@ -87,14 +87,14 @@ Poco::UInt32 StatementImpl::execute()
 	if (_lowerLimit > _extrLimit.value())
 		throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
 
-	compile();
 	do
 	{
+		compile();
 		if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
 			lim += executeWithoutLimit();
 		else
 			lim += executeWithLimit();
-	} while (compile());
+	} while (canCompile());
 
 	if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
 		_state = ST_DONE;
@@ -145,15 +145,13 @@ Poco::UInt32 StatementImpl::executeWithoutLimit()
 }
 
 
-bool StatementImpl::compile()
+void StatementImpl::compile()
 {
-	bool retval = false;
-
 	if (_state == ST_INITIALIZED || 
 		_state == ST_RESET || 
 		_state == ST_BOUND)
 	{
-		retval = compileImpl();
+		compileImpl();
 		_state = ST_COMPILED;
 
 		if (!extractions().size() && !isStoredProcedure())
@@ -165,8 +163,6 @@ bool StatementImpl::compile()
 		fixupExtraction();
 		fixupBinding();
 	}
-
-	return retval;
 }
 
 

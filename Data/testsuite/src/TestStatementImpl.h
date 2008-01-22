@@ -83,7 +83,10 @@ protected:
 	bool canBind() const;
 		/// Returns true if a valid statement is set and we can bind.
 
-	bool compileImpl();
+	bool canCompile() const;
+		/// Returns true if statement was not compiled.
+
+	void compileImpl();
 		/// Compiles the statement, doesn't bind yet
 
 	void bindImpl();
@@ -96,9 +99,10 @@ protected:
 		/// Returns the concrete binder used by the statement.
 
 private:
-	Poco::SharedPtr<Binder>    _ptrBinder;
-	Poco::SharedPtr<Extractor> _ptrExtractor;
+	Poco::SharedPtr<Binder>      _ptrBinder;
+	Poco::SharedPtr<Extractor>   _ptrExtractor;
 	Poco::SharedPtr<Preparation> _ptrPrepare;
+	bool                         _compiled; 
 };
 
 
@@ -120,6 +124,12 @@ inline AbstractBinder& TestStatementImpl::binder()
 inline Poco::UInt32 TestStatementImpl::affectedRowCount() const
 {
 	return 0;
+}
+
+
+inline bool TestStatementImpl::canCompile() const
+{
+	return !_compiled;
 }
 
 

@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/DataConnectors/ODBC/Makefile#2 $
+# $Id: //poco/Main/Data/ODBC/Makefile#2 $
 #
 # Makefile for Poco ODBC
 #

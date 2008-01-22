@@ -56,7 +56,8 @@ SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqli
 	_nextResponse(0),
 	_affectedRowCount(0),
 	_canBind(false),
-	_isExtracted(false)
+	_isExtracted(false),
+	_canCompile(true)
 {
 	_columns.resize(1);
 }
@@ -68,15 +69,9 @@ SQLiteStatementImpl::~SQLiteStatementImpl()
 }
 
 
-bool SQLiteStatementImpl::compileImpl()
+void SQLiteStatementImpl::compileImpl()
 {
-	if (_pLeftover && _pLeftover->empty()) 
-	{
-		_pLeftover = 0;
-		return false;
-	}
-	else if (!_pLeftover)
-		_bindBegin = bindings().begin();
+	if (!_pLeftover) _bindBegin = bindings().begin();
 
 	std::string statement(toString());
 	sqlite3_stmt* pStmt = 0;
@@ -119,10 +114,15 @@ bool SQLiteStatementImpl::compileImpl()
 	//For last statement in a batch (or a single statement), pLeftover == "", so the next call
 	// to compileImpl() shall return false immediately when there are no more statements left.
 	std::string leftOver(pLeftover);
+	trimInPlace(leftOver);
 	clear();
 	_pStmt = pStmt;
-	_pLeftover = new std::string(leftOver);
-	trimInPlace(*_pLeftover);
+	if (!leftOver.empty())
+	{
+		_pLeftover = new std::string(leftOver);
+		_canCompile = true;
+	}
+	else _canCompile = false;
 
 	_pBinder = new Binder(_pStmt);
 	_pExtractor = new Extractor(_pStmt);
@@ -150,8 +150,6 @@ bool SQLiteStatementImpl::compileImpl()
 			_columns[curDataSet].push_back(mc);
 		}
 	}
-
-	return true;
 }
 
 
@@ -226,7 +224,6 @@ void SQLiteStatementImpl::clear()
 		_pStmt=0;
 	}
 	_pLeftover = 0;
-	_canBind = false;
 }
 
 

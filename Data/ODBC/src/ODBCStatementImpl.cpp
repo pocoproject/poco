@@ -66,7 +66,7 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_nextResponse(0),
 	_prepared(false),
 	_affectedRowCount(0),
-	_compiled(false)
+	_canCompile(true)
 {
 }
 
@@ -84,11 +84,10 @@ ODBCStatementImpl::~ODBCStatementImpl()
 }
 
 
-bool ODBCStatementImpl::compileImpl()
+void ODBCStatementImpl::compileImpl()
 {
-	if (_compiled) return false;
+	if (!_canCompile) return;
 
-	clear();
 	_stepCalled = false;
 	_nextResponse = 0;
 
@@ -121,8 +120,7 @@ bool ODBCStatementImpl::compileImpl()
 	makeInternalExtractors();
 	doPrepare();
 
-	 _compiled = true;
-	 return false;
+	 _canCompile = false;
 }
 
 
