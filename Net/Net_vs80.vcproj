@@ -1185,6 +1185,10 @@
 					RelativePath=".\include\Poco\Net\RemoteSyslogListener.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SMTPChannel.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -1195,6 +1199,10 @@
 				</File>
 				<File
 					RelativePath=".\src\RemoteSyslogListener.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SMTPChannel.cpp"
 					>
 				</File>
 			</Filter>

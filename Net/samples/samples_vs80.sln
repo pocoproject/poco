@@ -20,6 +20,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ping", "Ping\Ping_vs80.vcpr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPFormServer", "HTTPFormServer\HTTPFormServer_vs80.vcproj", "{5363487F-1F23-4F9E-B6A7-5471B0F2373F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SMTPLogger", "SMTPLogger\SMTPLogger_vs80.vcproj", "{5194085E-A629-4021-B908-BA02101B5B9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|Win32 = debug_shared|Win32
@@ -66,6 +68,10 @@ Global
 		{5363487F-1F23-4F9E-B6A7-5471B0F2373F}.debug_shared|Win32.Build.0 = debug_shared|Win32
 		{5363487F-1F23-4F9E-B6A7-5471B0F2373F}.release_shared|Win32.ActiveCfg = release_shared|Win32
 		{5363487F-1F23-4F9E-B6A7-5471B0F2373F}.release_shared|Win32.Build.0 = release_shared|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.release_shared|Win32.Build.0 = release_shared|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

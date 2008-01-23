@@ -29,7 +29,7 @@ objects = \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
-	RemoteSyslogChannel RemoteSyslogListener \
+	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
 	AsyncSocketChannel
 
 target         = PocoNet
