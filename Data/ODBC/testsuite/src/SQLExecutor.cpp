@@ -249,7 +249,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 		rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 		poco_odbc_check_stmt (rc, hstmt);
 
-		rc = SQLGetTypeInfo(hstmt, SQL_TIMESTAMP);
+		rc = SQLGetTypeInfo(hstmt, SQL_TYPE_TIMESTAMP);
 		poco_odbc_check_stmt (rc, hstmt);
 		
 		rc = SQLFetch(hstmt);
@@ -268,7 +268,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			assert (sizeof(SQL_TIMESTAMP_STRUCT) <= dateTimeColSize);
 		}
 		else if (SQL_NO_DATA == rc)
-			std::cerr << '[' << name() << ']' << " Warning: no SQL_TIMESTAMP data type info returned by driver." << std::endl;
+			std::cerr << '[' << name() << ']' << " Warning: no SQL_TYPE_TIMESTAMP data type info returned by driver." << std::endl;
 
 		rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 		poco_odbc_check_stmt (rc, hstmt);
@@ -399,13 +399,13 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					dateTimeDecDigits = decimalDigits;
 			}
 			else
-				std::cerr << '[' << name() << ']' << " Warning: could not get SQL_TIMESTAMP parameter description." << std::endl;
+				std::cerr << '[' << name() << ']' << " Warning: could not get SQL_TYPE_TIMESTAMP parameter description." << std::endl;
 
 			rc = SQLBindParameter(hstmt, 
 				(SQLUSMALLINT) 6, 
 				SQL_PARAM_INPUT, 
-				SQL_C_TIMESTAMP, 
-				SQL_TIMESTAMP, 
+				SQL_C_TYPE_TIMESTAMP, 
+				SQL_TYPE_TIMESTAMP, 
 				dateTimeColSize,
 				dateTimeDecDigits,
 				(SQLPOINTER) &sixth, 
@@ -502,7 +502,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 				rc = SQLBindCol(hstmt, 
 					(SQLUSMALLINT) 6, 
-					SQL_C_TIMESTAMP, 
+					SQL_C_TYPE_TIMESTAMP, 
 					(SQLPOINTER) &sixth, 
 					(SQLINTEGER) 0, 
 					&lengths[5]);
@@ -576,7 +576,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 				rc = SQLGetData(hstmt, 
 					(SQLUSMALLINT) 6, 
-					SQL_C_TIMESTAMP, 
+					SQL_C_TYPE_TIMESTAMP, 
 					&sixth, 
 					0,
 					&lengths[5]);

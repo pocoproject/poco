@@ -771,7 +771,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Data::BLOB>& val)
 bool Extractor::extract(std::size_t pos, Poco::Data::Date& val)
 {
 	if (Preparation::DE_MANUAL == _dataExtraction)
-		return extractManualImpl(pos, val, SQL_C_DATE);
+		return extractManualImpl(pos, val, SQL_C_TYPE_DATE);
 	else
 		return extractBoundImpl(pos, val);
 }
@@ -807,7 +807,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Data::Date>& val)
 bool Extractor::extract(std::size_t pos, Poco::Data::Time& val)
 {
 	if (Preparation::DE_MANUAL == _dataExtraction)
-		return extractManualImpl(pos, val, SQL_C_TIME);
+		return extractManualImpl(pos, val, SQL_C_TYPE_TIME);
 	else
 		return extractBoundImpl(pos, val);
 }
@@ -843,7 +843,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Data::Time>& val)
 bool Extractor::extract(std::size_t pos, Poco::DateTime& val)
 {
 	if (Preparation::DE_MANUAL == _dataExtraction)
-		return extractManualImpl(pos, val, SQL_C_TIMESTAMP);
+		return extractManualImpl(pos, val, SQL_C_TYPE_TIMESTAMP);
 	else
 		return extractBoundImpl(pos, val);
 }

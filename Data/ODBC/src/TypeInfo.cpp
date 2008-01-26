@@ -76,9 +76,9 @@ void TypeInfo::fillCTypes()
 	_cDataTypes.insert(ValueType(SQL_BINARY, SQL_C_BINARY));
 	_cDataTypes.insert(ValueType(SQL_VARBINARY, SQL_C_BINARY));
 	_cDataTypes.insert(ValueType(SQL_LONGVARBINARY, SQL_C_BINARY));
-	_cDataTypes.insert(ValueType(SQL_TYPE_DATE, SQL_C_DATE));
-	_cDataTypes.insert(ValueType(SQL_TYPE_TIME, SQL_C_TIME));
-	_cDataTypes.insert(ValueType(SQL_TYPE_TIMESTAMP, SQL_C_TIMESTAMP));
+	_cDataTypes.insert(ValueType(SQL_TYPE_DATE, SQL_C_TYPE_DATE));
+	_cDataTypes.insert(ValueType(SQL_TYPE_TIME, SQL_C_TYPE_TIME));
+	_cDataTypes.insert(ValueType(SQL_TYPE_TIMESTAMP, SQL_C_TYPE_TIMESTAMP));
 }
 
 
@@ -100,9 +100,9 @@ void TypeInfo::fillSQLTypes()
 	_sqlDataTypes.insert(ValueType(SQL_C_FLOAT, SQL_REAL));
 	_sqlDataTypes.insert(ValueType(SQL_C_DOUBLE, SQL_DOUBLE));
 	_sqlDataTypes.insert(ValueType(SQL_C_BINARY, SQL_LONGVARBINARY));
-	_sqlDataTypes.insert(ValueType(SQL_C_DATE, SQL_TYPE_DATE));
-	_sqlDataTypes.insert(ValueType(SQL_C_TIME, SQL_TYPE_TIME));
-	_sqlDataTypes.insert(ValueType(SQL_C_TIMESTAMP, SQL_TYPE_TIMESTAMP));
+	_sqlDataTypes.insert(ValueType(SQL_C_TYPE_DATE, SQL_TYPE_DATE));
+	_sqlDataTypes.insert(ValueType(SQL_C_TYPE_TIME, SQL_TYPE_TIME));
+	_sqlDataTypes.insert(ValueType(SQL_C_TYPE_TIMESTAMP, SQL_TYPE_TIMESTAMP));
 }
 
 
