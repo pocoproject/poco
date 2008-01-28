@@ -1,7 +1,7 @@
 //
 // Attr.cpp
 //
-// $Id: //poco/Main/XML/src/Attr.cpp#10 $
+// $Id: //poco/svn/XML/src/Attr.cpp#2 $
 //
 // Library: XML
 // Package: DOM

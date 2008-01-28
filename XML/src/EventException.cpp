@@ -1,7 +1,7 @@
 //
 // EventException.cpp
 //
-// $Id: //poco/Main/XML/src/EventException.cpp#10 $
+// $Id: //poco/svn/XML/src/EventException.cpp#2 $
 //
 // Library: XML
 // Package: DOM

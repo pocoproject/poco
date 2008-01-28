@@ -1,7 +1,7 @@
 //
 // XMLWriterTest.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/XMLWriterTest.cpp#10 $
+// $Id: //poco/svn/XML/testsuite/src/XMLWriterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -234,6 +234,18 @@ void XMLWriterTest::testData()
 }
 
 
+void XMLWriterTest::testEmptyData()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL);
+	writer.startDocument();
+	writer.dataElement("", "", "d", "", "a1", "v1", "a2", "v2", "a3", "v3");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<d a1=\"v1\" a2=\"v2\" a3=\"v3\"/>");
+}
+
+
 void XMLWriterTest::testDataPretty()
 {
 	std::ostringstream str;
@@ -246,6 +258,21 @@ void XMLWriterTest::testDataPretty()
 	writer.endDocument();
 	std::string xml = str.str();
 	assert (xml == "<r>\n\t<d a1=\"v1\" a2=\"v2\" a3=\"v3\">data</d>\n</r>\n");
+}
+
+
+void XMLWriterTest::testEmptyDataPretty()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
+	writer.setNewLine("\n");
+	writer.startDocument();
+	writer.startElement("", "", "r");
+	writer.dataElement("", "", "d", "", "a1", "v1", "a2", "v2", "a3", "v3");
+	writer.endElement("", "", "r");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<r>\n\t<d a1=\"v1\" a2=\"v2\" a3=\"v3\"/>\n</r>\n");
 }
 
 
@@ -294,6 +321,20 @@ void XMLWriterTest::testCharacters()
 	writer.endDocument();
 	std::string xml = str.str();
 	assert (xml == "<r>some &quot;chars&quot; that &lt;must&gt; be &amp; escaped</r>");
+}
+
+
+void XMLWriterTest::testEmptyCharacters()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL);
+	writer.startDocument();
+	writer.startElement("", "", "r");
+	writer.characters("");
+	writer.endElement("", "", "r");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<r/>");
 }
 
 
@@ -496,6 +537,22 @@ void XMLWriterTest::testWellformedNamespace()
 }
 
 
+void XMLWriterTest::testEmpty()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL);
+	writer.startDocument();
+	writer.startElement("", "", "foo");
+	writer.startElement("", "", "bar");
+	writer.emptyElement("", "", "empty");
+	writer.endElement("", "", "bar");
+	writer.endElement("", "", "foo");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<foo><bar><empty/></bar></foo>");
+}
+
+
 void XMLWriterTest::setUp()
 {
 }
@@ -521,10 +578,13 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testDTDEntity);
 	CppUnit_addTest(pSuite, XMLWriterTest, testAttributes);
 	CppUnit_addTest(pSuite, XMLWriterTest, testData);
+	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyData);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDataPretty);
+	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyDataPretty);
 	CppUnit_addTest(pSuite, XMLWriterTest, testComment);
 	CppUnit_addTest(pSuite, XMLWriterTest, testPI);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCharacters);
+	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCDATA);
 	CppUnit_addTest(pSuite, XMLWriterTest, testRawCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDefaultNamespace);
@@ -537,6 +597,7 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testWellformed);
 	CppUnit_addTest(pSuite, XMLWriterTest, testWellformedNested);
 	CppUnit_addTest(pSuite, XMLWriterTest, testWellformedNamespace);
+	CppUnit_addTest(pSuite, XMLWriterTest, testEmpty);
 
 	return pSuite;
 }

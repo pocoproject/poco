@@ -1,7 +1,7 @@
 //
 // NamespaceStrategy.cpp
 //
-// $Id: //poco/Main/XML/src/NamespaceStrategy.cpp#14 $
+// $Id: //poco/svn/XML/src/NamespaceStrategy.cpp#2 $
 //
 // Library: XML
 // Package: XML

@@ -1,7 +1,7 @@
 //
 // Comment.cpp
 //
-// $Id: //poco/Main/XML/src/Comment.cpp#10 $
+// $Id: //poco/svn/XML/src/Comment.cpp#2 $
 //
 // Library: XML
 // Package: DOM

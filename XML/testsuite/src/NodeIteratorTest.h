@@ -1,7 +1,7 @@
 //
 // NodeIteratorTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/NodeIteratorTest.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/NodeIteratorTest.h#1 $
 //
 // Definition of the NodeIteratorTest class.
 //

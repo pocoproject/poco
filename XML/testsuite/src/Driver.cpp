@@ -1,7 +1,7 @@
 //
 // Driver.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/Driver.cpp#9 $
+// $Id: //poco/svn/XML/testsuite/src/Driver.cpp#1 $
 //
 // Console-based test driver for Poco XML.
 //

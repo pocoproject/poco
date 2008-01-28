@@ -1,7 +1,7 @@
 //
 // DOMTestSuite.h
 //
-// $Id: //poco/Main/XML/testsuite/src/DOMTestSuite.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/DOMTestSuite.h#1 $
 //
 // Definition of the DOMTestSuite class.
 //

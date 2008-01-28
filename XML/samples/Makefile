@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/XML/samples/Makefile#6 $
+# $Id: //poco/svn/XML/samples/Makefile#1 $
 #
 # Makefile for Poco XML Samples
 #

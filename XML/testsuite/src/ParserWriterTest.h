@@ -1,7 +1,7 @@
 //
 // ParserWriterTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/ParserWriterTest.h#9 $
+// $Id: //poco/svn/XML/testsuite/src/ParserWriterTest.h#1 $
 //
 // Definition of the ParserWriterTest class.
 //

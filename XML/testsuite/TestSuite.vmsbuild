@@ -1,7 +1,7 @@
 #
 # TestSuite.vmsbuild
 #
-# $Id: //poco/Main/XML/testsuite/TestSuite.vmsbuild#5 $
+# $Id: //poco/svn/XML/testsuite/TestSuite.vmsbuild#1 $
 #
 EXE=TestRunner
 AttributesImplTest

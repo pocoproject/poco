@@ -1,7 +1,7 @@
 #
 # XML.vmsbuild
 #
-# $Id: //poco/Main/XML/XML.vmsbuild#5 $
+# $Id: //poco/svn/XML/XML.vmsbuild#1 $
 #
 DEF=HAVE_EXPAT_CONFIG_H,XML_NS,XML_DTD
 LIB=PocoXML

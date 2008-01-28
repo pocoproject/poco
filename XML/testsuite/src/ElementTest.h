@@ -1,7 +1,7 @@
 //
 // ElementTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/ElementTest.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/ElementTest.h#1 $
 //
 // Definition of the ElementTest class.
 //

@@ -1,7 +1,7 @@
 //
 // XMLStream.h
 //
-// $Id: //poco/Main/XML/include/Poco/XML/XMLStream.h#2 $
+// $Id: //poco/svn/XML/include/Poco/XML/XMLStream.h#2 $
 //
 // Library: XML
 // Package: XML

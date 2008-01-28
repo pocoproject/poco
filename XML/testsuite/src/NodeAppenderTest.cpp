@@ -1,7 +1,7 @@
 //
 // NodeAppenderTest.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/NodeAppenderTest.cpp#1 $
+// $Id: //poco/svn/XML/testsuite/src/NodeAppenderTest.cpp#1 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.

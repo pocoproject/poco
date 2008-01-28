@@ -1,7 +1,7 @@
 //
 // SAXException.cpp
 //
-// $Id: //poco/Main/XML/src/SAXException.cpp#11 $
+// $Id: //poco/svn/XML/src/SAXException.cpp#2 $
 //
 // Library: XML
 // Package: SAX

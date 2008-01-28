@@ -1,7 +1,7 @@
 //
 // SAXException.h
 //
-// $Id: //poco/Main/XML/include/Poco/SAX/SAXException.h#2 $
+// $Id: //poco/svn/XML/include/Poco/SAX/SAXException.h#2 $
 //
 // Library: XML
 // Package: SAX

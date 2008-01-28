@@ -1,7 +1,7 @@
 //
 // SAXParserTest.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/SAXParserTest.cpp#10 $
+// $Id: //poco/svn/XML/testsuite/src/SAXParserTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -307,6 +307,24 @@ void SAXParserTest::testEncoding()
 }
 
 
+void SAXParserTest::testCharacters()
+{
+	static const XMLString xml("<textnode> TEXT &amp; AMPERSAND </textnode>");
+	SAXParser parser;
+	parser.setFeature(XMLReader::FEATURE_NAMESPACES, false);
+	std::string result = parse(parser, XMLWriter::CANONICAL, xml);
+	assert (result == xml);
+}
+
+
+void SAXParserTest::testParseMemory()
+{
+	SAXParser parser;
+	std::string xml = parseMemory(parser, XMLWriter::CANONICAL, ATTRIBUTES);
+	assert (xml == ATTRIBUTES);
+}
+
+
 void SAXParserTest::setUp()
 {
 }
@@ -327,6 +345,19 @@ std::string SAXParserTest::parse(XMLReader& reader, int options, const std::stri
 	reader.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
 	InputSource source(istr);
 	reader.parse(&source);
+	return ostr.str();
+}
+
+
+std::string SAXParserTest::parseMemory(XMLReader& reader, int options, const std::string& data)
+{
+	std::istringstream istr(data);
+	std::ostringstream ostr;
+	XMLWriter writer(ostr, options);
+	reader.setContentHandler(&writer);
+	reader.setDTDHandler(&writer);
+	reader.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
+	reader.parseMemoryNP(data.data(), data.size());
 	return ostr.str();
 }
 
@@ -355,6 +386,8 @@ CppUnit::Test* SAXParserTest::suite()
 	CppUnit_addTest(pSuite, SAXParserTest, testUndeclaredNoNamespace);
 	CppUnit_addTest(pSuite, SAXParserTest, testRSS);
 	CppUnit_addTest(pSuite, SAXParserTest, testEncoding);
+	CppUnit_addTest(pSuite, SAXParserTest, testParseMemory);
+	CppUnit_addTest(pSuite, SAXParserTest, testCharacters);
 
 	return pSuite;
 }

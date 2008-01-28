@@ -1,7 +1,7 @@
 //
 // Name.h
 //
-// $Id: //poco/Main/XML/include/Poco/XML/Name.h#2 $
+// $Id: //poco/svn/XML/include/Poco/XML/Name.h#2 $
 //
 // Library: XML
 // Package: XML

@@ -1,7 +1,7 @@
 //
 // CDATASection.cpp
 //
-// $Id: //poco/Main/XML/src/CDATASection.cpp#10 $
+// $Id: //poco/svn/XML/src/CDATASection.cpp#2 $
 //
 // Library: XML
 // Package: DOM

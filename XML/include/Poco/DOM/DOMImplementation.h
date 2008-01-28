@@ -1,7 +1,7 @@
 //
 // DOMImplementation.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/DOMImplementation.h#3 $
+// $Id: //poco/svn/XML/include/Poco/DOM/DOMImplementation.h#2 $
 //
 // Library: XML
 // Package: DOM

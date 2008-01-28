@@ -1,7 +1,7 @@
 //
 // TreeWalker.cpp
 //
-// $Id: //poco/Main/XML/src/TreeWalker.cpp#10 $
+// $Id: //poco/svn/XML/src/TreeWalker.cpp#2 $
 //
 // Library: XML
 // Package: DOM

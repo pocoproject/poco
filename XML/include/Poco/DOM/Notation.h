@@ -1,7 +1,7 @@
 //
 // Notation.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/Notation.h#2 $
+// $Id: //poco/svn/XML/include/Poco/DOM/Notation.h#2 $
 //
 // Library: XML
 // Package: DOM

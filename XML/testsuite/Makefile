@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/XML/testsuite/Makefile#6 $
+# $Id: //poco/svn/XML/testsuite/Makefile#1 $
 #
 # Makefile for Poco XML testsuite
 #

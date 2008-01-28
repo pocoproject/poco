@@ -1,7 +1,7 @@
 //
 // DOMWriter.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/DOMWriter.h#4 $
+// $Id: //poco/svn/XML/include/Poco/DOM/DOMWriter.h#2 $
 //
 // Library: XML
 // Package: DOM

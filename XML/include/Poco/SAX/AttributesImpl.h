@@ -1,7 +1,7 @@
 //
 // AttributesImpl.h
 //
-// $Id: //poco/Main/XML/include/Poco/SAX/AttributesImpl.h#2 $
+// $Id: //poco/svn/XML/include/Poco/SAX/AttributesImpl.h#2 $
 //
 // Library: XML
 // Package: SAX

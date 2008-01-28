@@ -1,7 +1,7 @@
 //
 // NamespaceSupportTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/NamespaceSupportTest.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/NamespaceSupportTest.h#1 $
 //
 // Definition of the NamespaceSupportTest class.
 //

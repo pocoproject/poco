@@ -1,7 +1,7 @@
 //
 // EventTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/EventTest.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/EventTest.h#1 $
 //
 // Definition of the EventTest class.
 //

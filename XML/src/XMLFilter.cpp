@@ -1,7 +1,7 @@
 //
 // XMLFilter.cpp
 //
-// $Id: //poco/Main/XML/src/XMLFilter.cpp#10 $
+// $Id: //poco/svn/XML/src/XMLFilter.cpp#2 $
 //
 // Library: XML
 // Package: SAX

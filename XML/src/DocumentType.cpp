@@ -1,7 +1,7 @@
 //
 // DocumentType.cpp
 //
-// $Id: //poco/Main/XML/src/DocumentType.cpp#10 $
+// $Id: //poco/svn/XML/src/DocumentType.cpp#2 $
 //
 // Library: XML
 // Package: DOM

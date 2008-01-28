@@ -1,7 +1,7 @@
 //
 // ElementsByTagNameList.cpp
 //
-// $Id: //poco/Main/XML/src/ElementsByTagNameList.cpp#11 $
+// $Id: //poco/svn/XML/src/ElementsByTagNameList.cpp#2 $
 //
 // Library: XML
 // Package: DOM

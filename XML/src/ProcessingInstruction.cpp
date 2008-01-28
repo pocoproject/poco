@@ -1,7 +1,7 @@
 //
 // ProcessingInstruction.cpp
 //
-// $Id: //poco/Main/XML/src/ProcessingInstruction.cpp#10 $
+// $Id: //poco/svn/XML/src/ProcessingInstruction.cpp#2 $
 //
 // Library: XML
 // Package: DOM

@@ -1,7 +1,7 @@
 //
 // SAXTestSuite.h
 //
-// $Id: //poco/Main/XML/testsuite/src/SAXTestSuite.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/SAXTestSuite.h#1 $
 //
 // Definition of the SAXTestSuite class.
 //

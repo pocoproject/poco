@@ -1,7 +1,7 @@
 //
 // NamespaceStrategy.h
 //
-// $Id: //poco/Main/XML/include/Poco/XML/NamespaceStrategy.h#2 $
+// $Id: //poco/svn/XML/include/Poco/XML/NamespaceStrategy.h#2 $
 //
 // Library: XML
 // Package: XML

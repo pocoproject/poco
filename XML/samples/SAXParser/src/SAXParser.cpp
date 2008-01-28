@@ -1,7 +1,7 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/Main/XML/samples/SAXParser/src/SAXParser.cpp#9 $
+// $Id: //poco/svn/XML/samples/SAXParser/src/SAXParser.cpp#1 $
 //
 // This sample demonstrates the SAXParser class.
 //

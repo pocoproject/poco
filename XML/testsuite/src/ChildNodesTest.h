@@ -1,7 +1,7 @@
 //
 // ChildNodesTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/ChildNodesTest.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/ChildNodesTest.h#1 $
 //
 // Definition of the ChildNodesTest class.
 //

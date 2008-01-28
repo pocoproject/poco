@@ -1,7 +1,7 @@
 //
 // Event.cpp
 //
-// $Id: //poco/Main/XML/src/Event.cpp#10 $
+// $Id: //poco/svn/XML/src/Event.cpp#2 $
 //
 // Library: XML
 // Package: DOM

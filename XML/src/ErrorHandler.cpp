@@ -1,7 +1,7 @@
 //
 // ErrorHandler.cpp
 //
-// $Id: //poco/Main/XML/src/ErrorHandler.cpp#10 $
+// $Id: //poco/svn/XML/src/ErrorHandler.cpp#2 $
 //
 // Library: XML
 // Package: SAX

@@ -1,7 +1,7 @@
 //
 // Element.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/Element.h#3 $
+// $Id: //poco/svn/XML/include/Poco/DOM/Element.h#2 $
 //
 // Library: XML
 // Package: DOM

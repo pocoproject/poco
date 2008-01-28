@@ -1,7 +1,7 @@
 //
 // ChildNodesList.cpp
 //
-// $Id: //poco/Main/XML/src/ChildNodesList.cpp#10 $
+// $Id: //poco/svn/XML/src/ChildNodesList.cpp#2 $
 //
 // Library: XML
 // Package: DOM

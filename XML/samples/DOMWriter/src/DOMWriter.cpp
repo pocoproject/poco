@@ -1,7 +1,7 @@
 //
 // DOMWriter.cpp
 //
-// $Id: //poco/Main/XML/samples/DOMWriter/src/DOMWriter.cpp#10 $
+// $Id: //poco/svn/XML/samples/DOMWriter/src/DOMWriter.cpp#1 $
 //
 // This sample demonstrates the DOMWriter class and how to
 // build DOM documents in memory.

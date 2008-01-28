@@ -1,7 +1,7 @@
 //
 // ContentHandler.h
 //
-// $Id: //poco/Main/XML/include/Poco/SAX/ContentHandler.h#2 $
+// $Id: //poco/svn/XML/include/Poco/SAX/ContentHandler.h#3 $
 //
 // Library: XML
 // Package: SAX
@@ -160,19 +160,20 @@ public:
 		/// The application must not attempt to read from the array outside of the specified
 		/// range.
 		/// 
-		/// Individual characters may consist of more than one Java char value. There
-		/// are two important cases where this happens, because characters can't be
+		/// Individual characters may consist of more than one XMLChar value. There
+		/// are three important cases where this happens, because characters can't be
 		/// represented in just sixteen bits. In one case, characters are represented
 		/// in a Surrogate Pair, using two special Unicode values. Such characters are
 		/// in the so-called "Astral Planes", with a code point above U+FFFF. A second
 		/// case involves composite characters, such as a base character combining with
-		/// one or more accent characters.
+		/// one or more accent characters. And most important, if XMLChar is a plain
+		/// char, characters are encoded in UTF-8.
 		/// 
 		/// Your code should not assume that algorithms using char-at-a-time idioms
 		/// will be working in character units; in some cases they will split characters.
 		/// This is relevant wherever XML permits arbitrary characters, such as attribute
 		/// values, processing instruction data, and comments as well as in data reported
-		/// from this method. It's also generally relevant whenever Java code manipulates
+		/// from this method. It's also generally relevant whenever C++ code manipulates
 		/// internationalized text; the issue isn't unique to XML.
 		/// 
 		/// Note that some parsers will report whitespace in element content using the

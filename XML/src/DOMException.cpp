@@ -1,7 +1,7 @@
 //
 // DOMException.cpp
 //
-// $Id: //poco/Main/XML/src/DOMException.cpp#11 $
+// $Id: //poco/svn/XML/src/DOMException.cpp#2 $
 //
 // Library: XML
 // Package: DOM

@@ -1,7 +1,7 @@
 //
 // EventListener.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/EventListener.h#2 $
+// $Id: //poco/svn/XML/include/Poco/DOM/EventListener.h#2 $
 //
 // Library: XML
 // Package: DOM

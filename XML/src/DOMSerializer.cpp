@@ -1,7 +1,7 @@
 //
 // DOMSerializer.cpp
 //
-// $Id: //poco/Main/XML/src/DOMSerializer.cpp#10 $
+// $Id: //poco/svn/XML/src/DOMSerializer.cpp#2 $
 //
 // Library: XML
 // Package: DOM

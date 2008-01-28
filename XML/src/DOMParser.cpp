@@ -1,7 +1,7 @@
 //
 // DOMParser.cpp
 //
-// $Id: //poco/Main/XML/src/DOMParser.cpp#11 $
+// $Id: //poco/svn/XML/src/DOMParser.cpp#2 $
 //
 // Library: XML
 // Package: DOM

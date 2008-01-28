@@ -1,7 +1,7 @@
 //
 // AttributesImpl.cpp
 //
-// $Id: //poco/Main/XML/src/AttributesImpl.cpp#11 $
+// $Id: //poco/svn/XML/src/AttributesImpl.cpp#2 $
 //
 // Library: XML
 // Package: SAX

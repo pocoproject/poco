@@ -1,7 +1,7 @@
 //
 // DocumentFragment.cpp
 //
-// $Id: //poco/Main/XML/src/DocumentFragment.cpp#10 $
+// $Id: //poco/svn/XML/src/DocumentFragment.cpp#2 $
 //
 // Library: XML
 // Package: DOM

@@ -1,7 +1,7 @@
 //
 // DeclHandler.cpp
 //
-// $Id: //poco/Main/XML/src/DeclHandler.cpp#10 $
+// $Id: //poco/svn/XML/src/DeclHandler.cpp#2 $
 //
 // Library: XML
 // Package: SAX

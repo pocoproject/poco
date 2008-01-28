@@ -1,7 +1,7 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/WinDriver.cpp#8 $
+// $Id: //poco/svn/XML/testsuite/src/WinDriver.cpp#1 $
 //
 // Windows test driver for Poco XML.
 //

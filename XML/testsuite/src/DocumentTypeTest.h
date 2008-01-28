@@ -1,7 +1,7 @@
 //
 // DocumentTypeTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/DocumentTypeTest.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/DocumentTypeTest.h#1 $
 //
 // Definition of the DocumentTypeTest class.
 //

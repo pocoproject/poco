@@ -1,7 +1,7 @@
 //
 // XMLTestSuite.h
 //
-// $Id: //poco/Main/XML/testsuite/src/XMLTestSuite.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/XMLTestSuite.h#1 $
 //
 // Definition of the XMLTestSuite class.
 //

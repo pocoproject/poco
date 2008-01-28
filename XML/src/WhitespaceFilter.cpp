@@ -1,7 +1,7 @@
 //
 // WhitespaceFilter.cpp
 //
-// $Id: //poco/Main/XML/src/WhitespaceFilter.cpp#10 $
+// $Id: //poco/svn/XML/src/WhitespaceFilter.cpp#2 $
 //
 // Library: XML
 // Package: SAX

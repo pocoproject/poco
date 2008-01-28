@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/XML/samples/PrettyPrint/Makefile#6 $
+# $Id: //poco/svn/XML/samples/PrettyPrint/Makefile#1 $
 #
 # Makefile for Poco PrettyPrint
 #

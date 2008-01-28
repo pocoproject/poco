@@ -1,7 +1,7 @@
 //
 // NodeAppender.cpp
 //
-// $Id: //poco/Main/XML/src/NodeAppender.cpp#1 $
+// $Id: //poco/svn/XML/src/NodeAppender.cpp#2 $
 //
 // Library: XML
 // Package: DOM

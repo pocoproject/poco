@@ -1,7 +1,7 @@
 //
 // XMLException.h
 //
-// $Id: //poco/Main/XML/include/Poco/XML/XMLException.h#2 $
+// $Id: //poco/svn/XML/include/Poco/XML/XMLException.h#2 $
 //
 // Library: XML
 // Package: XML

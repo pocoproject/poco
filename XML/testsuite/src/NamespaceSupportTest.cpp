@@ -1,7 +1,7 @@
 //
 // NamespaceSupportTest.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/NamespaceSupportTest.cpp#9 $
+// $Id: //poco/svn/XML/testsuite/src/NamespaceSupportTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

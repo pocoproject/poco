@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/XML/samples/DOMWriter/Makefile#6 $
+# $Id: //poco/svn/XML/samples/DOMWriter/Makefile#1 $
 #
 # Makefile for Poco DOMWriter
 #

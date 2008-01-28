@@ -1,7 +1,7 @@
 //
 // LocatorImpl.cpp
 //
-// $Id: //poco/Main/XML/src/LocatorImpl.cpp#10 $
+// $Id: //poco/svn/XML/src/LocatorImpl.cpp#2 $
 //
 // Library: XML
 // Package: SAX

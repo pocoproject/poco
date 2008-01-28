@@ -1,7 +1,7 @@
 //
 // Comment.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/Comment.h#2 $
+// $Id: //poco/svn/XML/include/Poco/DOM/Comment.h#2 $
 //
 // Library: XML
 // Package: DOM

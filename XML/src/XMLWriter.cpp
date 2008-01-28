@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/Main/XML/src/XMLWriter.cpp#14 $
+// $Id: //poco/svn/XML/src/XMLWriter.cpp#3 $
 //
 // Library: XML
 // Package: XML
@@ -209,6 +209,8 @@ void XMLWriter::endDocument()
 	if (_elementCount == 0)
 		throw XMLException("No document element");
 
+	poco_assert_dbg (!_unclosedStartTag);
+
 	_elementCount = 0;
 	_depth        = -1;
 }
@@ -243,7 +245,7 @@ void XMLWriter::endFragment()
 
 void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname)
 {
-	AttributesImpl attributes;
+	static const AttributesImpl attributes;
 	startElement(namespaceURI, localName, qname, attributes);
 }
 
@@ -282,7 +284,7 @@ void XMLWriter::endElement(const XMLString& namespaceURI, const XMLString& local
 
 void XMLWriter::emptyElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname)
 {
-	AttributesImpl attributes;
+	static const AttributesImpl attributes;
 	emptyElement(namespaceURI, localName, qname, attributes);
 }
 
@@ -296,11 +298,15 @@ void XMLWriter::emptyElement(const XMLString& namespaceURI, const XMLString& loc
 	prettyPrint();
 	writeStartElement(namespaceURI, localName, qname, attributes);
 	_contentWritten = false;
+	writeMarkup("/");
+	closeStartTag();
 }
 
 
 void XMLWriter::characters(const XMLChar ch[], int start, int length)
 {
+	if (length == 0) return;
+
 	if (_unclosedStartTag) closeStartTag();
 	_contentWritten = _contentWritten || length > 0;
 	if (_inCDATA)

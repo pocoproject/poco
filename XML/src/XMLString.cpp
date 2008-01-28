@@ -1,7 +1,7 @@
 //
 // XMLString.cpp
 //
-// $Id: //poco/Main/XML/src/XMLString.cpp#10 $
+// $Id: //poco/svn/XML/src/XMLString.cpp#2 $
 //
 // Library: XML
 // Package: XML

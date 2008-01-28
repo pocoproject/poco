@@ -1,7 +1,7 @@
 //
 // NamespaceSupport.cpp
 //
-// $Id: //poco/Main/XML/src/NamespaceSupport.cpp#10 $
+// $Id: //poco/svn/XML/src/NamespaceSupport.cpp#2 $
 //
 // Library: XML
 // Package: SAX

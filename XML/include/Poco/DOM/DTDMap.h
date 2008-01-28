@@ -1,7 +1,7 @@
 //
 // DTDMap.h
 //
-// $Id: //poco/Main/XML/include/Poco/DOM/DTDMap.h#2 $
+// $Id: //poco/svn/XML/include/Poco/DOM/DTDMap.h#2 $
 //
 // Library: XML
 // Package: DOM

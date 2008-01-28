@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/XML/samples/SAXParser/Makefile#6 $
+# $Id: //poco/svn/XML/samples/SAXParser/Makefile#1 $
 #
 # Makefile for Poco SAXParser
 #

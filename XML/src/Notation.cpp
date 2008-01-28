@@ -1,7 +1,7 @@
 //
 // Notation.cpp
 //
-// $Id: //poco/Main/XML/src/Notation.cpp#10 $
+// $Id: //poco/svn/XML/src/Notation.cpp#2 $
 //
 // Library: XML
 // Package: DOM

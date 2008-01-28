@@ -1,7 +1,7 @@
 //
 // SAXTestSuite.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/SAXTestSuite.cpp#8 $
+// $Id: //poco/svn/XML/testsuite/src/SAXTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

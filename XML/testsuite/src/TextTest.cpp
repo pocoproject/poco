@@ -1,7 +1,7 @@
 //
 // TextTest.cpp
 //
-// $Id: //poco/Main/XML/testsuite/src/TextTest.cpp#9 $
+// $Id: //poco/svn/XML/testsuite/src/TextTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

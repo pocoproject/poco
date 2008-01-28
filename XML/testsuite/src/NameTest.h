@@ -1,7 +1,7 @@
 //
 // NameTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/NameTest.h#9 $
+// $Id: //poco/svn/XML/testsuite/src/NameTest.h#1 $
 //
 // Definition of the NameTest class.
 //

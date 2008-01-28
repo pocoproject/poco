@@ -1,7 +1,7 @@
 //
 // AttributesImplTest.h
 //
-// $Id: //poco/Main/XML/testsuite/src/AttributesImplTest.h#8 $
+// $Id: //poco/svn/XML/testsuite/src/AttributesImplTest.h#1 $
 //
 // Definition of the AttributesImplTest class.
 //

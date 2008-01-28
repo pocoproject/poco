@@ -1,7 +1,7 @@
 //
 // EntityResolverImpl.cpp
 //
-// $Id: //poco/Main/XML/src/EntityResolverImpl.cpp#13 $
+// $Id: //poco/svn/XML/src/EntityResolverImpl.cpp#2 $
 //
 // Library: XML
 // Package: SAX
