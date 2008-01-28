@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/config/ARM-Linux#8 $
+# $Id: //poco/svn/build/config/ARM-Linux#2 $
 #
 # ARM-Linux
 #
@@ -16,18 +16,19 @@ STLPORT_INCLUDE    = /usr/local/include/stlport
 STLPORT_LIB        = /usr/local/lib
 OPENSSL_INCLUDE    = /usr/local/arm/2.95.3/include
 OPENSSL_LIB        = /usr/local/arm/2.95.3/lib
+TOOL               = arm-linux
 
 #
 # Define Tools
 #
-CC      = arm-linux-gcc
-CXX     = arm-linux-g++
+CC      = $(TOOL)-gcc
+CXX     = $(TOOL)-g++
 LINK    = $(CXX)
-LIB     = arm-linux-ar -cr
-RANLIB  = arm-linux-ranlib
+LIB     = $(TOOL)-ar -cr
+RANLIB  = $(TOOL)-ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-STRIP   = arm-linux-strip
+STRIP   = $(TOOL)-strip
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
@@ -73,4 +74,4 @@ SYSFLAGS = -I$(STLPORT_INCLUDE) -I$(OPENSSL_INCLUDE) -D_XOPEN_SOURCE=500 -D_BSD_
 #
 # System Specific Libraries
 #
-SYSLIBS  = -L$(STLPORT_LIB) -L$(OPENSSL_LIB) -lstlport_arm-linux-gcc -lpthread -ldl
+SYSLIBS  = -L$(STLPORT_LIB) -L$(OPENSSL_LIB) -lstlport_arm-linux-gcc -lpthread -ldl -lrt
