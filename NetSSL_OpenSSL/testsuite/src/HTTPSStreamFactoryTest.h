@@ -1,7 +1,7 @@
 //
 // HTTPSStreamFactoryTest.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.h#7 $
+// $Id: //poco/svn/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.h#1 $
 //
 // Definition of the HTTPSStreamFactoryTest class.
 //

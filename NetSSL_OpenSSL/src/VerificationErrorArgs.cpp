@@ -1,7 +1,7 @@
 //
 // VerificationErrorArgs.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/VerificationErrorArgs.cpp#8 $
+// $Id: //poco/svn/NetSSL_OpenSSL/src/VerificationErrorArgs.cpp#1 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore

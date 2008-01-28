@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#8 $
+// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#1 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient

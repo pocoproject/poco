@@ -1,7 +1,7 @@
 //
 // InvalidCertificateHandler.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/InvalidCertificateHandler.h#6 $
+// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/InvalidCertificateHandler.h#1 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore

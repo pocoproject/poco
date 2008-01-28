@@ -1,7 +1,7 @@
 //
 // HTTPSServerTest.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.h#7 $
+// $Id: //poco/svn/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.h#1 $
 //
 // Definition of the HTTPSServerTest class.
 //

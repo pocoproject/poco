@@ -1,7 +1,7 @@
 //
 // HTTPSServerTest.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.cpp#8 $
+// $Id: //poco/svn/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

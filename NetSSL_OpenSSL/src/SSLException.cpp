@@ -1,7 +1,7 @@
 //
 // SSLException.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/SSLException.cpp#9 $
+// $Id: //poco/svn/NetSSL_OpenSSL/src/SSLException.cpp#1 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore

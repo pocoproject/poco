@@ -1,7 +1,7 @@
 //
 // NetSSL.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#7 $
+// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#1 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore

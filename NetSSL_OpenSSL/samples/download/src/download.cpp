@@ -1,7 +1,7 @@
 //
 // download.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/samples/download/src/download.cpp#6 $
+// $Id: //poco/svn/NetSSL_OpenSSL/samples/download/src/download.cpp#1 $
 //
 // This sample demonstrates the URIStreamOpener class.
 //

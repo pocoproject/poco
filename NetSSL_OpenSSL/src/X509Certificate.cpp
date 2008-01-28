@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/X509Certificate.cpp#8 $
+// $Id: //poco/svn/NetSSL_OpenSSL/src/X509Certificate.cpp#1 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
