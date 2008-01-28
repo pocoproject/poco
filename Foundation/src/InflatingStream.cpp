@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/InflatingStream.cpp#16 $
+// $Id: //poco/svn/Foundation/src/InflatingStream.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams

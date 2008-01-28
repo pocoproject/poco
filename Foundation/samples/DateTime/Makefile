@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/DateTime/Makefile#5 $
+# $Id: //poco/svn/Foundation/samples/DateTime/Makefile#1 $
 #
 # Makefile for Poco DateTime
 #

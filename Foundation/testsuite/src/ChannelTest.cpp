@@ -1,7 +1,7 @@
 //
 // ChannelTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ChannelTest.cpp#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/ChannelTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

@@ -1,7 +1,7 @@
 //
 // Delegate.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Delegate.h#7 $
+// $Id: //poco/svn/Foundation/include/Poco/Delegate.h#2 $
 //
 // Library: Foundation
 // Package: Events

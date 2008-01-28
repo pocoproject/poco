@@ -1,7 +1,7 @@
 //
 // DynamicFactoryTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DynamicFactoryTest.cpp#6 $
+// $Id: //poco/svn/Foundation/testsuite/src/DynamicFactoryTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

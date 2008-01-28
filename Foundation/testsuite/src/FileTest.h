@@ -1,7 +1,7 @@
 //
 // FileTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FileTest.h#11 $
+// $Id: //poco/svn/Foundation/testsuite/src/FileTest.h#2 $
 //
 // Definition of the FileTest class.
 //

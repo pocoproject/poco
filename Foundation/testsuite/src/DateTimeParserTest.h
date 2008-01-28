@@ -1,7 +1,7 @@
 //
 // DateTimeParserTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DateTimeParserTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/DateTimeParserTest.h#2 $
 //
 // Definition of the DateTimeParserTest class.
 //

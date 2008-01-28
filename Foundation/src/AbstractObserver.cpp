@@ -1,7 +1,7 @@
 //
 // AbstractObserver.cpp
 //
-// $Id: //poco/Main/Foundation/src/AbstractObserver.cpp#1 $
+// $Id: //poco/svn/Foundation/src/AbstractObserver.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications

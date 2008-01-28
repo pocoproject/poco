@@ -1,7 +1,7 @@
 //
 // LoggerTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LoggerTest.h#10 $
+// $Id: //poco/svn/Foundation/testsuite/src/LoggerTest.h#2 $
 //
 // Definition of the LoggerTest class.
 //

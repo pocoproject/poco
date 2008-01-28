@@ -1,7 +1,7 @@
 //
 // TestPlugin.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TestPlugin.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/TestPlugin.h#2 $
 //
 // Definition of the TestPlugin class.
 //

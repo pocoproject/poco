@@ -1,7 +1,7 @@
 //
 // ActiveStarter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ActiveStarter.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/ActiveStarter.h#2 $
 //
 // Library: Foundation
 // Package: Threading

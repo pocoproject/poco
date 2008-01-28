@@ -1,7 +1,7 @@
 //
 // ActiveDispatcherTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ActiveDispatcherTest.cpp#6 $
+// $Id: //poco/svn/Foundation/testsuite/src/ActiveDispatcherTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.

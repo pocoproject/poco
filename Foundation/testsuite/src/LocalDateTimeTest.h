@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LocalDateTimeTest.h#5 $
+// $Id: //poco/svn/Foundation/testsuite/src/LocalDateTimeTest.h#2 $
 //
 // Definition of the LocalDateTimeTest class.
 //

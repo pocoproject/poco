@@ -1,7 +1,7 @@
 //
 // ThreadTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ThreadTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/ThreadTest.h#2 $
 //
 // Definition of the ThreadTest class.
 //

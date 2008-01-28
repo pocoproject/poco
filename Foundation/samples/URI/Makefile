@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/URI/Makefile#5 $
+# $Id: //poco/svn/Foundation/samples/URI/Makefile#1 $
 #
 # Makefile for Poco URI
 #

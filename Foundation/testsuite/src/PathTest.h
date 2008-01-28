@@ -1,7 +1,7 @@
 //
 // PathTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/PathTest.h#11 $
+// $Id: //poco/svn/Foundation/testsuite/src/PathTest.h#2 $
 //
 // Definition of the PathTest class.
 //

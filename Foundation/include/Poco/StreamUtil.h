@@ -1,7 +1,7 @@
 //
 // StreamUtil.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/StreamUtil.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/StreamUtil.h#2 $
 //
 // Library: Foundation
 // Package: Streams

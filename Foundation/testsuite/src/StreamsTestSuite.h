@@ -1,7 +1,7 @@
 //
 // StreamsTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/StreamsTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/StreamsTestSuite.h#2 $
 //
 // Definition of the StreamsTestSuite class.
 //

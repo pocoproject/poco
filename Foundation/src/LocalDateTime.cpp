@@ -1,7 +1,7 @@
 //
 // LocalDateTime.cpp
 //
-// $Id: //poco/Main/Foundation/src/LocalDateTime.cpp#12 $
+// $Id: //poco/svn/Foundation/src/LocalDateTime.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -141,7 +141,6 @@ LocalDateTime& LocalDateTime::operator = (const Timestamp& timestamp)
 		_dateTime = timestamp;
 		determineTzd(true);
 	}
-
 	return *this;
 }
 
@@ -274,7 +273,7 @@ LocalDateTime& LocalDateTime::operator -= (const Timespan& span)
 }
 
 
-void LocalDateTime::determineTzd (bool adjust)
+void LocalDateTime::determineTzd(bool adjust)
 {
 	std::time_t local;
 	std::tm     broken;
@@ -292,6 +291,7 @@ void LocalDateTime::determineTzd (bool adjust)
 	if (adjust)
 		adjustForTzd();
 }
+
 
 } // namespace Poco
 

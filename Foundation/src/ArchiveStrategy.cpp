@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.cpp
 //
-// $Id: //poco/Main/Foundation/src/ArchiveStrategy.cpp#8 $
+// $Id: //poco/svn/Foundation/src/ArchiveStrategy.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging

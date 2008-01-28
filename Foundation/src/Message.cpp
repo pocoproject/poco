@@ -1,7 +1,7 @@
 //
 // Message.cpp
 //
-// $Id: //poco/Main/Foundation/src/Message.cpp#13 $
+// $Id: //poco/svn/Foundation/src/Message.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -66,15 +66,15 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 }
 
 
-Message::Message(const Message& msg)
+Message::Message(const Message& msg):
+	_source(msg._source),
+	_text(msg._text),
+	_prio(msg._prio),
+	_time(msg._time),
+	_tid(msg._tid),
+	_thread(msg._thread),
+	_pid(msg._pid)
 {
-	_source = msg._source;
-	_text   = msg._text;
-	_prio   = msg._prio;
-	_time   = msg._time;
-	_thread = msg._thread;
-	_tid    = msg._tid;
-	_pid    = msg._pid;
 	if (msg._pMap)
 		_pMap = new StringMap(*msg._pMap);
 	else
@@ -82,15 +82,15 @@ Message::Message(const Message& msg)
 }
 
 
-Message::Message(const Message& msg, const std::string& text)
+Message::Message(const Message& msg, const std::string& text):
+	_source(msg._source),
+	_text(text),
+	_prio(msg._prio),
+	_time(msg._time),
+	_tid(msg._tid),
+	_thread(msg._thread),
+	_pid(msg._pid)
 {
-	_source = msg._source;
-	_text   = text;
-	_prio   = msg._prio;
-	_time   = msg._time;
-	_thread = msg._thread;
-	_tid    = msg._tid;
-	_pid    = msg._pid;
 	if (msg._pMap)
 		_pMap = new StringMap(*msg._pMap);
 	else
@@ -134,6 +134,7 @@ void Message::swap(Message& msg)
 	swap(_text, msg._text);
 	swap(_prio, msg._prio);
 	swap(_time, msg._time);
+	swap(_tid, msg._tid);
 	swap(_thread, msg._thread);
 	swap(_pid, msg._pid);
 	swap(_pMap, msg._pMap);
@@ -161,12 +162,6 @@ void Message::setPriority(Priority prio)
 void Message::setTime(const Timestamp& t)
 {
 	_time = t;
-}
-
-
-const Timestamp& Message::getTime() const
-{
-	return _time;
 }
 
 

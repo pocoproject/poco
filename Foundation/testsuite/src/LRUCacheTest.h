@@ -1,7 +1,7 @@
 //
 // LRUCacheTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LRUCacheTest.h#5 $
+// $Id: //poco/svn/Foundation/testsuite/src/LRUCacheTest.h#2 $
 //
 // Tests for LRUCache
 //

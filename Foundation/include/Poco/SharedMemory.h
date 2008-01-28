@@ -1,7 +1,7 @@
 //
 // SharedMemory.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedMemory.h#6 $
+// $Id: //poco/svn/Foundation/include/Poco/SharedMemory.h#2 $
 //
 // Library: Foundation
 // Package: Processes

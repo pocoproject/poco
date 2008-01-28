@@ -1,7 +1,7 @@
 //
 // DateTimeFormatterTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DateTimeFormatterTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/DateTimeFormatterTest.h#2 $
 //
 // Definition of the DateTimeFormatterTest class.
 //

@@ -1,7 +1,7 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/Main/Foundation/src/Exception.cpp#19 $
+// $Id: //poco/svn/Foundation/src/Exception.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -66,11 +66,12 @@ Exception::Exception(const std::string& msg, const Exception& nested, int code):
 }
 
 
-Exception::Exception(const Exception& exc): std::exception(exc)
+Exception::Exception(const Exception& exc):
+	std::exception(exc),
+	_msg(exc._msg),
+	_code(exc._code)
 {
-	_msg = exc._msg;
 	_pNested = exc._pNested ? exc._pNested->clone() : 0;
-	_code = exc._code;
 }
 
 	
@@ -85,9 +86,9 @@ Exception& Exception::operator = (const Exception& exc)
 	if (&exc != this)
 	{
 		delete _pNested;
-		_msg = exc._msg;
+		_msg     = exc._msg;
 		_pNested = exc._pNested ? exc._pNested->clone() : 0;
-		_code = exc._code;
+		_code    = exc._code;
 	}
 	return *this;
 }

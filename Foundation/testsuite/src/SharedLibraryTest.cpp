@@ -1,7 +1,7 @@
 //
 // SharedLibraryTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SharedLibraryTest.cpp#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/SharedLibraryTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

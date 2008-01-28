@@ -1,7 +1,7 @@
 //
 // Windows1252Encoding.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Windows1252Encoding.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/Windows1252Encoding.h#2 $
 //
 // Library: Foundation
 // Package: Text

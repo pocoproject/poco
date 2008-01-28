@@ -1,7 +1,7 @@
 //
 // StringTokenizer.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/StringTokenizer.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/StringTokenizer.h#2 $
 //
 // Library: Foundation
 // Package: Core

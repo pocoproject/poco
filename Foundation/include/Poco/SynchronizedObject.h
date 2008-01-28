@@ -1,7 +1,7 @@
 //
 // SynchronizedObject.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SynchronizedObject.h#4 $
+// $Id: //poco/svn/Foundation/include/Poco/SynchronizedObject.h#2 $
 //
 // Library: Foundation
 // Package: Threading

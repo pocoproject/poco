@@ -1,7 +1,7 @@
 //
 // SharedLibrary_HPUX.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SharedLibrary_HPUX.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/SharedLibrary_HPUX.h#2 $
 //
 // Library: Foundation
 // Package: SharedLibrary

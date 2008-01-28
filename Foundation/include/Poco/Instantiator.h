@@ -1,7 +1,7 @@
 //
 // Instantiator.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Instantiator.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/Instantiator.h#2 $
 //
 // Library: Foundation
 // Package: Core

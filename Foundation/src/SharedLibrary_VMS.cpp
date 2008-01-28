@@ -1,7 +1,7 @@
 //
 // SharedLibrary_VMS.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedLibrary_VMS.cpp#11 $
+// $Id: //poco/svn/Foundation/src/SharedLibrary_VMS.cpp#2 $
 //
 // Library: Foundation
 // Package: SharedLibrary

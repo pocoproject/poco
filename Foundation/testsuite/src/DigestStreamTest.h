@@ -1,7 +1,7 @@
 //
 // DigestStreamTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DigestStreamTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/DigestStreamTest.h#2 $
 //
 // Definition of the DigestStreamTest class.
 //

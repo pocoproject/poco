@@ -1,7 +1,7 @@
 //
 // Base64Test.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/Base64Test.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/Base64Test.h#2 $
 //
 // Definition of the Base64Test class.
 //

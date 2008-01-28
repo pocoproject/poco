@@ -1,7 +1,7 @@
 //
 // NamedEvent_UNIX.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NamedEvent_UNIX.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/NamedEvent_UNIX.h#2 $
 //
 // Library: Foundation
 // Package: Processes

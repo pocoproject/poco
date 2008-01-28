@@ -1,7 +1,7 @@
 //
 // Mutex_POSIX.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Mutex_POSIX.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/Mutex_POSIX.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the MutexImpl and FastMutexImpl classes for POSIX Threads.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -57,6 +57,7 @@ protected:
 	~MutexImpl();
 	void lockImpl();
 	bool tryLockImpl();
+	bool tryLockImpl(long milliseconds);
 	void unlockImpl();
 	
 private:

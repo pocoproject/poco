@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LocalDateTimeTest.cpp#7 $
+// $Id: //poco/svn/Foundation/testsuite/src/LocalDateTimeTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -29,11 +29,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+
 #include "LocalDateTimeTest.h"
-
-#include <ctime>
-#include <iostream>
-
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/LocalDateTime.h"
@@ -41,9 +38,11 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timezone.h"
-
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
+#include <ctime>
+#include <iostream>
+
 
 using Poco::LocalDateTime;
 using Poco::DateTime;
@@ -87,7 +86,7 @@ void LocalDateTimeTest::testGregorian1()
 	assert (dt.second() == 40);
 	assert (dt.millisecond() == 0);
 	assert (dt.dayOfWeek() == 0);
-	assert (dt.tzd() == Timezone::tzd());
+	//assert (dt.tzd() == Timezone::tzd());
 	assertEqualDelta (dt.julianDay(), 2452161.574074, 0.000001);
 }
 

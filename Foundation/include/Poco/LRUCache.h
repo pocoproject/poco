@@ -1,7 +1,7 @@
 //
 // LRUCache.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LRUCache.h#5 $
+// $Id: //poco/svn/Foundation/include/Poco/LRUCache.h#2 $
 //
 // Library: Foundation
 // Package: Cache

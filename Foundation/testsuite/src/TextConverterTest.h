@@ -1,7 +1,7 @@
 //
 // TextConverterTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TextConverterTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/TextConverterTest.h#2 $
 //
 // Definition of the TextConverterTest class.
 //

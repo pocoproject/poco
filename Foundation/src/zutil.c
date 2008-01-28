@@ -3,7 +3,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id: //poco/Main/Foundation/src/zutil.c#8 $ */
+/* @(#) $Id: //poco/svn/Foundation/src/zutil.c#2 $ */
 
 #include "zutil.h"
 

@@ -1,7 +1,7 @@
 //
 // Checksum.cpp
 //
-// $Id: //poco/Main/Foundation/src/Checksum.cpp#4 $
+// $Id: //poco/svn/Foundation/src/Checksum.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

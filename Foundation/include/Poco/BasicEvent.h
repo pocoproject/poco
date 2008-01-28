@@ -1,7 +1,7 @@
 //
 // BasicEvent.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BasicEvent.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/BasicEvent.h#2 $
 //
 // Library: Foundation
 // Package: Events

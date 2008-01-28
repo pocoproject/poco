@@ -1,7 +1,7 @@
 //
 // TeeStreamTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TeeStreamTest.h#4 $
+// $Id: //poco/svn/Foundation/testsuite/src/TeeStreamTest.h#2 $
 //
 // Definition of the TeeStreamTest class.
 //

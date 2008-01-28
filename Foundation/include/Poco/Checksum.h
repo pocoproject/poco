@@ -1,7 +1,7 @@
 //
 // Checksum.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Checksum.h#5 $
+// $Id: //poco/svn/Foundation/include/Poco/Checksum.h#2 $
 //
 // Library: Foundation
 // Package: Core

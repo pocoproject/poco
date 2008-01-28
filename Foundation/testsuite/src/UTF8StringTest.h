@@ -1,7 +1,7 @@
 //
 // UTF8StringTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/UTF8StringTest.h#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/UTF8StringTest.h#2 $
 //
 // Definition of the UTF8StringTest class.
 //

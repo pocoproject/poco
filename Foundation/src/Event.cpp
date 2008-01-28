@@ -1,7 +1,7 @@
 //
 // Event.cpp
 //
-// $Id: //poco/Main/Foundation/src/Event.cpp#11 $
+// $Id: //poco/svn/Foundation/src/Event.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading

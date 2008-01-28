@@ -1,7 +1,7 @@
 //
 // TextTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TextTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/TextTestSuite.h#2 $
 //
 // Definition of the TextTestSuite class.
 //

@@ -1,7 +1,7 @@
 //
 // NullStreamTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NullStreamTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/NullStreamTest.h#2 $
 //
 // Definition of the NullStreamTest class.
 //

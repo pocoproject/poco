@@ -1,7 +1,7 @@
 //
 // SplitterChannel.cpp
 //
-// $Id: //poco/Main/Foundation/src/SplitterChannel.cpp#12 $
+// $Id: //poco/svn/Foundation/src/SplitterChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging

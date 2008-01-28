@@ -1,7 +1,7 @@
 //
 // SharedMemoryTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SharedMemoryTest.cpp#6 $
+// $Id: //poco/svn/Foundation/testsuite/src/SharedMemoryTest.cpp#2 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.

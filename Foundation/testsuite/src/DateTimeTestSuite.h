@@ -1,7 +1,7 @@
 //
 // DateTimeTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DateTimeTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/DateTimeTestSuite.h#2 $
 //
 // Definition of the DateTimeTestSuite class.
 //

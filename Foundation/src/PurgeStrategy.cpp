@@ -1,7 +1,7 @@
 //
 // PurgeStrategy.cpp
 //
-// $Id: //poco/Main/Foundation/src/PurgeStrategy.cpp#7 $
+// $Id: //poco/svn/Foundation/src/PurgeStrategy.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging

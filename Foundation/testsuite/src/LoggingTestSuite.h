@@ -1,7 +1,7 @@
 //
 // LoggingTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LoggingTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/LoggingTestSuite.h#2 $
 //
 // Definition of the LoggingTestSuite class.
 //

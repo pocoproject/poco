@@ -1,7 +1,7 @@
 //
 // TestChannel.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TestChannel.h#10 $
+// $Id: //poco/svn/Foundation/testsuite/src/TestChannel.h#2 $
 //
 // Definition of the TestChannel class.
 //

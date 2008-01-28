@@ -1,7 +1,7 @@
 //
 // CompareFunctions.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/CompareFunctions.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/CompareFunctions.h#2 $
 //
 // Library: Foundation
 // Package: Events

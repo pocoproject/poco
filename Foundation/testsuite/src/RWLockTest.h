@@ -1,7 +1,7 @@
 //
 // RWLockTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/RWLockTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/RWLockTest.h#2 $
 //
 // Definition of the RWLockTest class.
 //

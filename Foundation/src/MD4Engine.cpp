@@ -1,7 +1,7 @@
 //
 // MD4Engine.cpp
 //
-// $Id: //poco/Main/Foundation/src/MD4Engine.cpp#13 $
+// $Id: //poco/svn/Foundation/src/MD4Engine.cpp#2 $
 //
 // Library: Foundation
 // Package: Crypt

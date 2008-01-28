@@ -1,7 +1,7 @@
 //
 // NamedTuple.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NamedTuple.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/NamedTuple.h#2 $
 //
 // Library: Foundation
 // Package: Core

@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/grep/Makefile#5 $
+# $Id: //poco/svn/Foundation/samples/grep/Makefile#1 $
 #
 # Makefile for Poco grep
 #

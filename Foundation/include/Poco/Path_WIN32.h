@@ -1,7 +1,7 @@
 //
 // Path_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Path_WIN32.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/Path_WIN32.h#2 $
 //
 // Library: Foundation
 // Package: Filesystem

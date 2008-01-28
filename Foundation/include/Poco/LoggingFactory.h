@@ -1,7 +1,7 @@
 //
 // LoggingFactory.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LoggingFactory.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/LoggingFactory.h#2 $
 //
 // Library: Foundation
 // Package: Logging

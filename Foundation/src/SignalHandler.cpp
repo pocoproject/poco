@@ -1,7 +1,7 @@
 //
 // SignalHandler.cpp
 //
-// $Id: //poco/Main/Foundation/src/SignalHandler.cpp#10 $
+// $Id: //poco/svn/Foundation/src/SignalHandler.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading

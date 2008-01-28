@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAny.h#10 $
+// $Id: //poco/svn/Foundation/include/Poco/DynamicAny.h#2 $
 //
 // Library: Foundation
 // Package: Core

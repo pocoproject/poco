@@ -1,7 +1,7 @@
 //
 // DynamicFactory.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicFactory.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/DynamicFactory.h#2 $
 //
 // Library: Foundation
 // Package: Core

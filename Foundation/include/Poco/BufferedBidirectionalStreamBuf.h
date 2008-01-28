@@ -1,7 +1,7 @@
 //
 // BufferedBidirectionalStreamBuf.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#6 $
+// $Id: //poco/svn/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#2 $
 //
 // Library: Foundation
 // Package: Streams

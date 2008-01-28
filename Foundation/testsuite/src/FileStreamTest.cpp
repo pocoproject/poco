@@ -1,7 +1,7 @@
 //
 // FileStreamTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FileStreamTest.cpp#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/FileStreamTest.cpp#2 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.

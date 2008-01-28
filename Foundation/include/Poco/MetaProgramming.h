@@ -1,7 +1,7 @@
 //
 // TypeChecks.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/MetaProgramming.h#1 $
+// $Id: //poco/svn/Foundation/include/Poco/MetaProgramming.h#2 $
 //
 // Library: Foundation
 // Package: Core

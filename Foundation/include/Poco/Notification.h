@@ -1,7 +1,7 @@
 //
 // Notification.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Notification.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/Notification.h#2 $
 //
 // Library: Foundation
 // Package: Notifications

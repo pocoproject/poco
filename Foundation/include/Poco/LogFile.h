@@ -1,7 +1,7 @@
 //
 // LogFile.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LogFile.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/LogFile.h#2 $
 //
 // Library: Foundation
 // Package: Logging

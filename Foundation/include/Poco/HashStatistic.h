@@ -1,7 +1,7 @@
 //
 // HashStatistic.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HashStatistic.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/HashStatistic.h#2 $
 //
 // Library: Foundation
 // Package: Hashing

@@ -1,7 +1,7 @@
 //
 // HMACEngineTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HMACEngineTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/HMACEngineTest.h#2 $
 //
 // Definition of the HMACEngineTest class.
 //

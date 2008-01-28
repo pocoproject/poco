@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/Makefile#45 $
+# $Id: //poco/svn/Foundation/Makefile#2 $
 #
 # Makefile for Poco Foundation
 #

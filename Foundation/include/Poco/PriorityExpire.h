@@ -1,7 +1,7 @@
 //
 // PriorityExpire.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/PriorityExpire.h#6 $
+// $Id: //poco/svn/Foundation/include/Poco/PriorityExpire.h#2 $
 //
 // Library: Foundation
 // Package: Events

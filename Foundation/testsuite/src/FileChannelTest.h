@@ -1,7 +1,7 @@
 //
 // FileChannelTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FileChannelTest.h#11 $
+// $Id: //poco/svn/Foundation/testsuite/src/FileChannelTest.h#2 $
 //
 // Definition of the FileChannelTest class.
 //

@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DynamicAnyHolder.h#11 $
+// $Id: //poco/svn/Foundation/include/Poco/DynamicAnyHolder.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -161,7 +161,7 @@ protected:
 		/// This function is meant for converting signed integral data types to
 		/// unsigned data types. Negative values can not be converted and if one is 
 		/// encountered, RangeException is thrown. 
-		/// If uper limit is within the target data type limits, the conversion is performed.
+		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
 		poco_static_assert (std::numeric_limits<T>::is_specialized);

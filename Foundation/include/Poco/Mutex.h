@@ -1,7 +1,7 @@
 //
 // Mutex.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Mutex.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/Mutex.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the Mutex and FastMutex classes.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Exception.h"
 #include "Poco/ScopedLock.h"
 
 
@@ -76,11 +77,29 @@ public:
 	void lock();
 		/// Locks the mutex. Blocks if the mutex
 		/// is held by another thread.
+		
+	void lock(long milliseconds);
+		/// Locks the mutex. Blocks up to the given number of milliseconds
+		/// if the mutex is held by another thread. Throws a TimeoutException
+		/// if the mutex can not be locked within the given timeout.
+		///
+		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
+		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
 	bool tryLock();
 		/// Tries to lock the mutex. Returns false immediately
 		/// if the mutex is already held by another thread.
 		/// Returns true if the mutex was successfully locked.
+
+	bool tryLock(long milliseconds);
+		/// Locks the mutex. Blocks up to the given number of milliseconds
+		/// if the mutex is held by another thread.
+		/// Returns true if the mutex was successfully locked.
+		///
+		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
+		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
 	void unlock();
 		/// Unlocks the mutex so that it can be acquired by
@@ -114,10 +133,28 @@ public:
 		/// Locks the mutex. Blocks if the mutex
 		/// is held by another thread.
 
+	void lock(long milliseconds);
+		/// Locks the mutex. Blocks up to the given number of milliseconds
+		/// if the mutex is held by another thread. Throws a TimeoutException
+		/// if the mutex can not be locked within the given timeout.
+		///
+		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
+		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
+
 	bool tryLock();
 		/// Tries to lock the mutex. Returns false immediately
 		/// if the mutex is already held by another thread.
 		/// Returns true if the mutex was successfully locked.
+
+	bool tryLock(long milliseconds);
+		/// Locks the mutex. Blocks up to the given number of milliseconds
+		/// if the mutex is held by another thread.
+		/// Returns true if the mutex was successfully locked.
+		///
+		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
+		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
 	void unlock();
 		/// Unlocks the mutex so that it can be acquired by
@@ -138,9 +175,22 @@ inline void Mutex::lock()
 }
 
 
+inline void Mutex::lock(long milliseconds)
+{
+	if (!tryLockImpl(milliseconds))
+		throw TimeoutException();
+}
+
+
 inline bool Mutex::tryLock()
 {
 	return tryLockImpl();
+}
+
+
+inline bool Mutex::tryLock(long milliseconds)
+{
+	return tryLockImpl(milliseconds);
 }
 
 
@@ -156,9 +206,22 @@ inline void FastMutex::lock()
 }
 
 
+inline void FastMutex::lock(long milliseconds)
+{
+	if (!tryLockImpl(milliseconds))
+		throw TimeoutException();
+}
+
+
 inline bool FastMutex::tryLock()
 {
 	return tryLockImpl();
+}
+
+
+inline bool FastMutex::tryLock(long milliseconds)
+{
+	return tryLockImpl(milliseconds);
 }
 
 

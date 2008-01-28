@@ -1,7 +1,7 @@
 //
 // UTF8String.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UTF8String.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/UTF8String.h#2 $
 //
 // Library: Foundation
 // Package: Text

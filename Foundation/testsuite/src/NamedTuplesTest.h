@@ -1,7 +1,7 @@
 //
 // NamedTuplesTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NamedTuplesTest.h#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/NamedTuplesTest.h#2 $
 //
 // Definition of the NamedTuplesTest class.
 //

@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.cpp
 //
-// $Id: //poco/Main/Foundation/src/DynamicAnyHolder.cpp#3 $
+// $Id: //poco/svn/Foundation/src/DynamicAnyHolder.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -64,5 +64,6 @@ void appendJSONString(std::string& val, const DynamicAny& any)
 		val.append(1, '\'');
 	}
 }
+
 
 } // namespace Poco

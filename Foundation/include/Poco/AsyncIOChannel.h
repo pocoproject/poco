@@ -1,7 +1,7 @@
 //
 // AsyncIOChannel.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AsyncIOChannel.h#1 $
+// $Id: //poco/svn/Foundation/include/Poco/AsyncIOChannel.h#2 $
 //
 // Library: Foundation
 // Package: AsyncIO

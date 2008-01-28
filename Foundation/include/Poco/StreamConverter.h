@@ -1,7 +1,7 @@
 //
 // StreamConverter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/StreamConverter.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/StreamConverter.h#2 $
 //
 // Library: Foundation
 // Package: Text

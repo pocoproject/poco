@@ -1,7 +1,7 @@
 //
 // CryptTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/CryptTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/CryptTestSuite.h#2 $
 //
 // Definition of the CryptTestSuite class.
 //

@@ -1,7 +1,7 @@
 //
 // Bugcheck.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Bugcheck.h#5 $
+// $Id: //poco/svn/Foundation/include/Poco/Bugcheck.h#2 $
 //
 // Library: Foundation
 // Package: Core

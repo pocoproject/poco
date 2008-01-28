@@ -1,7 +1,7 @@
 //
 // UnicodeConverter.cpp
 //
-// $Id: //poco/Main/Foundation/src/UnicodeConverter.cpp#9 $
+// $Id: //poco/svn/Foundation/src/UnicodeConverter.cpp#2 $
 //
 // Library: Foundation
 // Package: Text

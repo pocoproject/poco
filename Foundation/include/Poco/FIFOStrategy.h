@@ -1,7 +1,7 @@
 //
 // FIFOStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FIFOStrategy.h#4 $
+// $Id: //poco/svn/Foundation/include/Poco/FIFOStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Events

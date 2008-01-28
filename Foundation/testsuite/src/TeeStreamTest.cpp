@@ -1,7 +1,7 @@
 //
 // TeeStreamTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TeeStreamTest.cpp#5 $
+// $Id: //poco/svn/Foundation/testsuite/src/TeeStreamTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

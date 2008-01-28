@@ -1,7 +1,7 @@
 //
 // RotateStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/RotateStrategy.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/RotateStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Logging

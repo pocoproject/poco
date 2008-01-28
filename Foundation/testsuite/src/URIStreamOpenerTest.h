@@ -1,7 +1,7 @@
 //
 // URIStreamOpenerTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/URIStreamOpenerTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/URIStreamOpenerTest.h#2 $
 //
 // Definition of the URIStreamOpenerTest class.
 //

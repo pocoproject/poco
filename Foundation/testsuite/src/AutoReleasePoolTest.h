@@ -1,7 +1,7 @@
 //
 // AutoReleasePoolTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/AutoReleasePoolTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/AutoReleasePoolTest.h#2 $
 //
 // Definition of the AutoReleasePoolTest class.
 //

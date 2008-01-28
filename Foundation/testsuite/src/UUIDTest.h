@@ -1,7 +1,7 @@
 //
 // UUIDTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/UUIDTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/UUIDTest.h#2 $
 //
 // Definition of the UUIDTest class.
 //

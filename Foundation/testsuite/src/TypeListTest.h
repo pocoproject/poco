@@ -1,7 +1,7 @@
 //
 // TypeListTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TypeListTest.h#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/TypeListTest.h#2 $
 //
 // Definition of the TypeListTest class.
 //

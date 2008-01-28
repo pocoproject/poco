@@ -1,13 +1,13 @@
 //
 // Mutex.cpp
 //
-// $Id: //poco/Main/Foundation/src/Mutex.cpp#10 $
+// $Id: //poco/svn/Foundation/src/Mutex.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization

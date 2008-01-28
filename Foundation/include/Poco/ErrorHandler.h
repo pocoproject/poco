@@ -1,7 +1,7 @@
 //
 // ErrorHandler.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ErrorHandler.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/ErrorHandler.h#2 $
 //
 // Library: Foundation
 // Package: Threading

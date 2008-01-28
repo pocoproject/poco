@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/Main/Foundation/samples/URI/src/URI.cpp#9 $
+// $Id: //poco/svn/Foundation/samples/URI/src/URI.cpp#1 $
 //
 // This sample demonstrates the URI class.
 //

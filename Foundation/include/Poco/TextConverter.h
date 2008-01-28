@@ -1,7 +1,7 @@
 //
 // TextConverter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/TextConverter.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/TextConverter.h#2 $
 //
 // Library: Foundation
 // Package: Text

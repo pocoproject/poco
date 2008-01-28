@@ -1,7 +1,7 @@
 //
 // Thread.cpp
 //
-// $Id: //poco/Main/Foundation/src/Thread.cpp#14 $
+// $Id: //poco/svn/Foundation/src/Thread.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading

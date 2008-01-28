@@ -1,7 +1,7 @@
 //
 // ClassLoaderTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ClassLoaderTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/ClassLoaderTest.h#2 $
 //
 // Definition of the ClassLoaderTest class.
 //

@@ -1,7 +1,7 @@
 //
 // Token.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Token.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/Token.h#2 $
 //
 // Library: Foundation
 // Package: Streams

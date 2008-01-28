@@ -3,7 +3,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id: //poco/Main/Foundation/include/Poco/zconf.h#2 $ */
+/* @(#) $Id: //poco/svn/Foundation/include/Poco/zconf.h#2 $ */
 
 #ifndef ZCONF_H
 #define ZCONF_H

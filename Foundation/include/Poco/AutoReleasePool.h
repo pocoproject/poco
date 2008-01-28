@@ -1,7 +1,7 @@
 //
 // AutoReleasePool.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AutoReleasePool.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/AutoReleasePool.h#2 $
 //
 // Library: Foundation
 // Package: Core

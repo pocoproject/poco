@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UUIDGenerator.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/UUIDGenerator.h#2 $
 //
 // Library: Foundation
 // Package: UUID

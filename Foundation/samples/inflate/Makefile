@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/inflate/Makefile#5 $
+# $Id: //poco/svn/Foundation/samples/inflate/Makefile#1 $
 #
 # Makefile for Poco inflate
 #

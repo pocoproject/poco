@@ -1,7 +1,7 @@
 //
 // FPEnvironment.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FPEnvironment.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/FPEnvironment.h#2 $
 //
 // Library: Foundation
 // Package: Core

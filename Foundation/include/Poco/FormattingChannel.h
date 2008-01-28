@@ -1,7 +1,7 @@
 //
 // FormattingChannel.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FormattingChannel.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/FormattingChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging

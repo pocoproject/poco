@@ -1,7 +1,7 @@
 //
 // URITest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/URITest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/URITest.h#2 $
 //
 // Definition of the URITest class.
 //

@@ -1,7 +1,7 @@
 //
 // ZLibTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ZLibTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/ZLibTest.h#2 $
 //
 // Definition of the ZLibTest class.
 //

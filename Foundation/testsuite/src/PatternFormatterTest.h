@@ -1,7 +1,7 @@
 //
 // PatternFormatterTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/PatternFormatterTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/PatternFormatterTest.h#2 $
 //
 // Definition of the PatternFormatterTest class.
 //

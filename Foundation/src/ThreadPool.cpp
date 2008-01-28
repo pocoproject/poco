@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/Main/Foundation/src/ThreadPool.cpp#20 $
+// $Id: //poco/svn/Foundation/src/ThreadPool.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading

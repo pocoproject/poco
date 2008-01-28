@@ -1,7 +1,7 @@
 //
 // SHA1EngineTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SHA1EngineTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/SHA1EngineTest.h#2 $
 //
 // Definition of the SHA1EngineTest class.
 //

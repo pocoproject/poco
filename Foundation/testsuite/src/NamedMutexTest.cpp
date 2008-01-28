@@ -1,7 +1,7 @@
 //
 // NamedMutexTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NamedMutexTest.cpp#6 $
+// $Id: //poco/svn/Foundation/testsuite/src/NamedMutexTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

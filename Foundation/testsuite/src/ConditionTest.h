@@ -1,7 +1,7 @@
 //
 // ConditionTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ConditionTest.h#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/ConditionTest.h#2 $
 //
 // Definition of the ConditionTest class.
 //

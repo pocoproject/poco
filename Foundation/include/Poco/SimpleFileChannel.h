@@ -1,7 +1,7 @@
 //
 // SimpleFileChannel.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SimpleFileChannel.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/SimpleFileChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging

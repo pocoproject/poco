@@ -1,7 +1,7 @@
 //
 // ByteOrder.cpp
 //
-// $Id: //poco/Main/Foundation/src/ByteOrder.cpp#6 $
+// $Id: //poco/svn/Foundation/src/ByteOrder.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

@@ -1,7 +1,7 @@
 //
 // DigestEngine.cpp
 //
-// $Id: //poco/Main/Foundation/src/DigestEngine.cpp#10 $
+// $Id: //poco/svn/Foundation/src/DigestEngine.cpp#2 $
 //
 // Library: Foundation
 // Package: Crypt

@@ -1,7 +1,7 @@
 //
 // DummyDelegate.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DummyDelegate.h#3 $
+// $Id: //poco/svn/Foundation/testsuite/src/DummyDelegate.h#2 $
 //
 // Definition of DummyDelegate class.
 //

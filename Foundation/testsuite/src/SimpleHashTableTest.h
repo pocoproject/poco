@@ -1,7 +1,7 @@
 //
 // SimpleHashTableTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SimpleHashTableTest.h#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/SimpleHashTableTest.h#2 $
 //
 // Definition of the SimpleHashTableTest class.
 //

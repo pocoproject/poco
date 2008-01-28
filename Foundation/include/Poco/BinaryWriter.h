@@ -1,7 +1,7 @@
 //
 // BinaryWriter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BinaryWriter.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/BinaryWriter.h#2 $
 //
 // Library: Foundation
 // Package: Streams

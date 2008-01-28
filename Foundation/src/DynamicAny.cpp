@@ -1,7 +1,7 @@
 //
 // DynamicAny.cpp
 //
-// $Id: //poco/Main/Foundation/src/DynamicAny.cpp#5 $
+// $Id: //poco/svn/Foundation/src/DynamicAny.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -302,7 +302,7 @@ DynamicAny DynamicAny::parse(const std::string& val, std::string::size_type& pos
 	skipWhiteSpace(val, pos);
 	if (pos < val.size())
 	{
-		switch(val[pos])
+		switch (val[pos])
 		{
 		case '{':
 			return parseObject(val, pos);
@@ -323,7 +323,7 @@ DynamicAny DynamicAny::parseObject(const std::string& val, std::string::size_typ
 	++pos;
 	skipWhiteSpace(val, pos);
 	DynamicStruct aStruct;
-	while(val[pos] != '}' && pos < val.size())
+	while (val[pos] != '}' && pos < val.size())
 	{
 		std::string key = parseString(val, pos);
 		skipWhiteSpace(val, pos);
@@ -352,7 +352,7 @@ DynamicAny DynamicAny::parseArray(const std::string& val, std::string::size_type
 	++pos;
 	skipWhiteSpace(val, pos);
 	std::vector<DynamicAny> result;
-	while(val[pos] != ']' && pos < val.size())
+	while (val[pos] != ']' && pos < val.size())
 	{
 		result.push_back(parse(val, pos));
 		skipWhiteSpace(val, pos);
@@ -382,7 +382,6 @@ std::string DynamicAny::parseString(const std::string& val, std::string::size_ty
 		++pos;
 	}
 	
-
 	std::string::size_type stop = std::string::npos;
 	if (inString)
 	{
@@ -409,6 +408,7 @@ std::string DynamicAny::parseString(const std::string& val, std::string::size_ty
 	pos = stop;
 	return result;
 }
+
 
 void DynamicAny::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
 {

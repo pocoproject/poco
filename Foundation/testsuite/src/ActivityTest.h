@@ -1,7 +1,7 @@
 //
 // ActivityTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ActivityTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/ActivityTest.h#2 $
 //
 // Definition of the ActivityTest class.
 //

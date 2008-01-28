@@ -1,7 +1,7 @@
 //
 // Notification.cpp
 //
-// $Id: //poco/Main/Foundation/src/Notification.cpp#10 $
+// $Id: //poco/svn/Foundation/src/Notification.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications

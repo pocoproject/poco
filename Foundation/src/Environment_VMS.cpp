@@ -1,7 +1,7 @@
 //
 // Environment_VMS.cpp
 //
-// $Id: //poco/Main/Foundation/src/Environment_VMS.cpp#11 $
+// $Id: //poco/svn/Foundation/src/Environment_VMS.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

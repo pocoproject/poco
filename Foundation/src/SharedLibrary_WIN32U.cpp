@@ -1,7 +1,7 @@
 //
 // SharedLibrary_WIN32U.cpp
 //
-// $Id: //poco/Main/Foundation/src/SharedLibrary_WIN32U.cpp#2 $
+// $Id: //poco/svn/Foundation/src/SharedLibrary_WIN32U.cpp#2 $
 //
 // Library: Foundation
 // Package: SharedLibrary

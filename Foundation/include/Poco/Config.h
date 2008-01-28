@@ -1,7 +1,7 @@
 //
 // Config.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Config.h#5 $
+// $Id: //poco/svn/Foundation/include/Poco/Config.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -9,7 +9,7 @@
 //
 // Feature configuration for the POCO libraries.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -54,6 +54,10 @@
 
 // Define if std::wstring is not available
 // #define POCO_NO_WSTRING
+
+
+// Define to disable shared memory
+// #define POCO_NO_SHAREDMEMORY
 
 
 #endif // Foundation_Config_INCLUDED

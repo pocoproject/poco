@@ -1,7 +1,7 @@
 //
 // Formatter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Formatter.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/Formatter.h#2 $
 //
 // Library: Foundation
 // Package: Logging

@@ -1,7 +1,7 @@
 //
 // CountingStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/CountingStream.cpp#13 $
+// $Id: //poco/svn/Foundation/src/CountingStream.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams

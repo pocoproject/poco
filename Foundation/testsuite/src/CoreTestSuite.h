@@ -1,7 +1,7 @@
 //
 // CoreTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/CoreTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/CoreTestSuite.h#2 $
 //
 // Definition of the CoreTestSuite class.
 //

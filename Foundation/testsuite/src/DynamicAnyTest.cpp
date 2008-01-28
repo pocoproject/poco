@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DynamicAnyTest.cpp#11 $
+// $Id: //poco/svn/Foundation/testsuite/src/DynamicAnyTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

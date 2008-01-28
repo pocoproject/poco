@@ -1,7 +1,7 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/Main/Foundation/src/Debugger.cpp#15 $
+// $Id: //poco/svn/Foundation/src/Debugger.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

@@ -1,7 +1,7 @@
 //
 // HexBinaryDecoder.cpp
 //
-// $Id: //poco/Main/Foundation/src/HexBinaryDecoder.cpp#11 $
+// $Id: //poco/svn/Foundation/src/HexBinaryDecoder.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams

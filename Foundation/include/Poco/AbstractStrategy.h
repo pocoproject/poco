@@ -1,7 +1,7 @@
 //
 // AbstractStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AbstractStrategy.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/AbstractStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Cache

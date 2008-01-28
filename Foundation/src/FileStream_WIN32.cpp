@@ -1,7 +1,7 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/FileStream_WIN32.cpp#8 $
+// $Id: //poco/svn/Foundation/src/FileStream_WIN32.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams

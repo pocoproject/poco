@@ -1,7 +1,7 @@
 //
 // FPETest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FPETest.h#10 $
+// $Id: //poco/svn/Foundation/testsuite/src/FPETest.h#2 $
 //
 // Definition of the FPETest class.
 //

@@ -1,7 +1,7 @@
 //
 // Bugcheck.cpp
 //
-// $Id: //poco/Main/Foundation/src/Bugcheck.cpp#11 $
+// $Id: //poco/svn/Foundation/src/Bugcheck.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

@@ -1,7 +1,7 @@
 //
 // TaskManagerTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TaskManagerTest.cpp#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/TaskManagerTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -470,7 +470,7 @@ void TaskManagerTest::testCustomThreadPool()
 	TaskManager tm(tp);
 
 	// fill up the thread pool
-	for (int i=0; i<tp.capacity(); ++i)
+	for (int i=0; i < tp.capacity(); ++i)
 	{
 		tm.start(new SimpleTask);
 	}
@@ -492,6 +492,8 @@ void TaskManagerTest::testCustomThreadPool()
 	}
 
 	assert (tm.count() == tp.allocated());
+	
+	tp.joinAll();
 }
 
 void TaskManagerTest::setUp()

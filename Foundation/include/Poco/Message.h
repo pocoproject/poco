@@ -1,7 +1,7 @@
 //
 // Message.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Message.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/Message.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -184,6 +184,12 @@ inline const std::string& Message::getText() const
 inline Message::Priority Message::getPriority() const
 {
 	return _prio;
+}
+
+
+inline const Timestamp& Message::getTime() const
+{
+	return _time;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // NDCTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NDCTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/NDCTest.h#2 $
 //
 // Definition of the NDCTest class.
 //

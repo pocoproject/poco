@@ -1,7 +1,7 @@
 //
 // AsyncIOChannelTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/AsyncIOChannelTest.h#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/AsyncIOChannelTest.h#2 $
 //
 // Definition of the AsyncIOChannelTest class.
 //

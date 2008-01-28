@@ -1,7 +1,7 @@
 //
 // Event.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Event.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/Event.h#2 $
 //
 // Library: Foundation
 // Package: Threading

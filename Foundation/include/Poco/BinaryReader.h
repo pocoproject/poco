@@ -1,7 +1,7 @@
 //
 // BinaryReader.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BinaryReader.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/BinaryReader.h#2 $
 //
 // Library: Foundation
 // Package: Streams

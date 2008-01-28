@@ -1,7 +1,7 @@
 //
 // AccessExpirationDecorator.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AccessExpirationDecorator.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/AccessExpirationDecorator.h#2 $
 //
 // Library: Foundation
 // Package: Events

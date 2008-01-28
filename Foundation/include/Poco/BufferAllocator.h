@@ -1,7 +1,7 @@
 //
 // BufferAllocator.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/BufferAllocator.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/BufferAllocator.h#2 $
 //
 // Library: Foundation
 // Package: Streams

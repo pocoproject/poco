@@ -1,7 +1,7 @@
 //
 // SharedPtrTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SharedPtrTest.cpp#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/SharedPtrTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

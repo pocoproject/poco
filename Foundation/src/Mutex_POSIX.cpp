@@ -1,13 +1,13 @@
 //
 // Mutex_POSIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/Mutex_POSIX.cpp#11 $
+// $Id: //poco/svn/Foundation/src/Mutex_POSIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,6 +35,19 @@
 
 
 #include "Poco/Mutex_POSIX.h"
+#include "Poco/Timestamp.h"
+#if !defined(POCO_NO_SYS_SELECT_H)
+#include <sys/select.h>
+#endif
+#include <unistd.h>
+#include <sys/time.h>
+
+
+#if defined(_POSIX_TIMEOUTS) && (_POSIX_TIMEOUTS - 200112L) >= 0L
+#if defined(_POSIX_THREADS) && (_POSIX_THREADS - 200112L) >= 0L
+#define POCO_HAVE_MUTEX_TIMEOUT
+#endif
+#endif
 
 
 namespace Poco {
@@ -79,6 +92,48 @@ MutexImpl::MutexImpl(bool fast)
 MutexImpl::~MutexImpl()
 {
 	pthread_mutex_destroy(&_mutex);
+}
+
+
+bool MutexImpl::tryLockImpl(long milliseconds)
+{
+#if defined(POCO_HAVE_MUTEX_TIMEOUT)
+	struct timespec abstime;
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	abstime.tv_sec  = tv.tv_sec + milliseconds / 1000;
+	abstime.tv_nsec = tv.tv_usec*1000 + (milliseconds % 1000)*1000000;
+	if (abstime.tv_nsec >= 1000000000)
+	{
+		abstime.tv_nsec -= 1000000000;
+		abstime.tv_sec++;
+	}
+	int rc = pthread_mutex_timedlock(&_mutex, &abstime);
+	if (rc == 0)
+		return true;
+	else if (rc == ETIMEDOUT)
+		return false;
+	else
+		throw SystemException("cannot lock mutex");
+#else
+	const int sleepMillis = 5;
+	Timestamp now;
+	Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
+	do
+	{
+		int rc = pthread_mutex_trylock(&_mutex);
+		if (rc == 0)
+			return true;
+		else if (rc != EBUSY)
+			throw SystemException("cannot lock mutex");
+		struct timeval tv;
+		tv.tv_sec  = 0;
+		tv.tv_usec = sleepMillis * 1000;
+		select(0, NULL, NULL, NULL, &tv); 	
+	}
+	while (!now.isElapsed(diff));
+	return false;
+#endif
 }
 
 

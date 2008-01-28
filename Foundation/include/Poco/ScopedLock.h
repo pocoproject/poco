@@ -1,7 +1,7 @@
 //
 // ScopedLock.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/ScopedLock.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/ScopedLock.h#2 $
 //
 // Library: Foundation
 // Package: Threading

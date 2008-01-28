@@ -1,7 +1,7 @@
 //
 // SimpleHashTableTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SimpleHashTableTest.cpp#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/SimpleHashTableTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

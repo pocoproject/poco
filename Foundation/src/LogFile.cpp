@@ -1,7 +1,7 @@
 //
 // LogFile.cpp
 //
-// $Id: //poco/Main/Foundation/src/LogFile.cpp#8 $
+// $Id: //poco/svn/Foundation/src/LogFile.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging

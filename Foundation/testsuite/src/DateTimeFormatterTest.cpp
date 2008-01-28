@@ -1,7 +1,7 @@
 //
 // DateTimeFormatterTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/DateTimeFormatterTest.cpp#11 $
+// $Id: //poco/svn/Foundation/testsuite/src/DateTimeFormatterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

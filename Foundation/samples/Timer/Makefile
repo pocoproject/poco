@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/Timer/Makefile#5 $
+# $Id: //poco/svn/Foundation/samples/Timer/Makefile#1 $
 #
 # Makefile for Poco Timer
 #

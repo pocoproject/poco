@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/Main/Foundation/samples/hmacmd5/hmacmd5.vmsbuild#5 $
+# $Id: //poco/svn/Foundation/samples/hmacmd5/hmacmd5.vmsbuild#1 $
 #
 EXE=hmacmd5
 hmacmd5

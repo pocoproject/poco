@@ -1,7 +1,7 @@
 //
 // FileStream_POSIX.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FileStream_POSIX.h#5 $
+// $Id: //poco/svn/Foundation/include/Poco/FileStream_POSIX.h#2 $
 //
 // Library: Foundation
 // Package: Streams

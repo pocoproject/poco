@@ -1,7 +1,7 @@
 //
 // PipeImpl_POSIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/PipeImpl_POSIX.cpp#5 $
+// $Id: //poco/svn/Foundation/src/PipeImpl_POSIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes

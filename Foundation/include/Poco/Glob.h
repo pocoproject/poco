@@ -1,7 +1,7 @@
 //
 // Glob.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Glob.h#4 $
+// $Id: //poco/svn/Foundation/include/Poco/Glob.h#2 $
 //
 // Library: Foundation
 // Package: Filesystem

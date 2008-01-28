@@ -1,7 +1,7 @@
 //
 // StringTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/StringTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/StringTest.h#2 $
 //
 // Definition of the StringTest class.
 //

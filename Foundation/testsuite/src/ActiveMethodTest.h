@@ -1,7 +1,7 @@
 //
 // ActiveMethodTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ActiveMethodTest.h#10 $
+// $Id: //poco/svn/Foundation/testsuite/src/ActiveMethodTest.h#2 $
 //
 // Definition of the ActiveMethodTest class.
 //

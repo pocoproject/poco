@@ -1,7 +1,7 @@
 //
 // FPEnvironment_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FPEnvironment_WIN32.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/FPEnvironment_WIN32.h#2 $
 //
 // Library: Foundation
 // Package: Core

@@ -1,7 +1,7 @@
 //
 // AutoPtr.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AutoPtr.h#7 $
+// $Id: //poco/svn/Foundation/include/Poco/AutoPtr.h#2 $
 //
 // Library: Foundation
 // Package: Core

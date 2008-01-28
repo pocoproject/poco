@@ -1,7 +1,7 @@
 //
 // FormatTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FormatTest.h#3 $
+// $Id: //poco/svn/Foundation/testsuite/src/FormatTest.h#2 $
 //
 // Definition of the FormatTest class.
 //

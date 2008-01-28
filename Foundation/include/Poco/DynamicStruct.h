@@ -51,7 +51,7 @@ namespace Poco {
 
 
 class Foundation_API DynamicStruct
-	/// DynamicStruct allows to define a named collection of DynamicAnys
+	/// DynamicStruct allows to define a named collection of DynamicAny objects.
 {
 public:
 	typedef std::map<std::string, DynamicAny> Data;
@@ -67,10 +67,10 @@ public:
 	virtual ~DynamicStruct();
 		/// Destroys the DynamicStruct.
 
-	DynamicAny& operator[](const std::string& name);
+	DynamicAny& operator [] (const std::string& name);
 		/// Returns the DynamicAny with the given name, creates an entry if not found.
 
-	const DynamicAny& operator[](const std::string& name) const;
+	const DynamicAny& operator [] (const std::string& name) const;
 		/// Returns the DynamicAny with the given name, throws a
 		/// NotFoundException if the data member is not found.
 
@@ -132,9 +132,12 @@ private:
 };
 
 
-inline DynamicAny& DynamicStruct::operator[](const std::string& name)
+//
+// inlines
+//
+inline DynamicAny& DynamicStruct::operator [] (const std::string& name)
 {
-	return _data.operator [](name);
+	return _data[name];
 }
 
 
@@ -217,7 +220,7 @@ inline DynamicStruct::Data::size_type DynamicStruct::size() const
 
 
 template <>
-class DynamicAnyHolderImpl<DynamicStruct >: public DynamicAnyHolder
+class DynamicAnyHolderImpl<DynamicStruct>: public DynamicAnyHolder
 {
 public:
 	DynamicAnyHolderImpl(const DynamicStruct& val): _val(val)
@@ -317,9 +320,7 @@ public:
 			val.append(" : ");
 			appendJSONString(val, it->second);
 		}
-
-		val.append(" }");
-		
+		val.append(" }");	
 	}
 
 	void convert(Poco::DateTime&) const
@@ -377,14 +378,14 @@ public:
 		return false;
 	}
 
-	DynamicAny& operator[](const std::string& name)
+	DynamicAny& operator [] (const std::string& name)
 	{
-		return _val.operator[](name);
+		return _val[name];
 	}
 
-	const DynamicAny& operator[](const std::string& name) const
+	const DynamicAny& operator [] (const std::string& name) const
 	{
-		return _val.operator[](name);
+		return _val[name];
 	}
 
 private:

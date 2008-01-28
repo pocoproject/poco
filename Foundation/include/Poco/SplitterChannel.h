@@ -1,7 +1,7 @@
 //
 // SplitterChannel.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SplitterChannel.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/SplitterChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging

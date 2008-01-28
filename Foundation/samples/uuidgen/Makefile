@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/uuidgen/Makefile#5 $
+# $Id: //poco/svn/Foundation/samples/uuidgen/Makefile#1 $
 #
 # Makefile for Poco uuidgen
 #

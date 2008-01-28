@@ -1,7 +1,7 @@
 //
 // TeeStream.cpp
 //
-// $Id: //poco/Main/Foundation/src/TeeStream.cpp#6 $
+// $Id: //poco/svn/Foundation/src/TeeStream.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams

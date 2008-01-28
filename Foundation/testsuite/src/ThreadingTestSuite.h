@@ -1,7 +1,7 @@
 //
 // ThreadingTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ThreadingTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/ThreadingTestSuite.h#2 $
 //
 // Definition of the ThreadingTestSuite class.
 //

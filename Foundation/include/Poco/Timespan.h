@@ -1,7 +1,7 @@
 //
 // Timespan.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Timespan.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/Timespan.h#2 $
 //
 // Library: Foundation
 // Package: DateTime

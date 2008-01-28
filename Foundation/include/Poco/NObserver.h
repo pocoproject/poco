@@ -1,7 +1,7 @@
 //
 // NObserver.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NObserver.h#1 $
+// $Id: //poco/svn/Foundation/include/Poco/NObserver.h#2 $
 //
 // Library: Foundation
 // Package: Notifications

@@ -1,7 +1,7 @@
 //
 // HexBinaryDecoder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HexBinaryDecoder.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/HexBinaryDecoder.h#2 $
 //
 // Library: Foundation
 // Package: Streams

@@ -1,7 +1,7 @@
 //
 // FileStream_WIN32.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FileStream_WIN32.h#5 $
+// $Id: //poco/svn/Foundation/include/Poco/FileStream_WIN32.h#2 $
 //
 // Library: Foundation
 // Package: Streams

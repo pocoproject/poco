@@ -1,7 +1,7 @@
 //
 // TimespanTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/TimespanTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/TimespanTest.h#2 $
 //
 // Definition of the TimespanTest class.
 //

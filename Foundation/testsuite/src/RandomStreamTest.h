@@ -1,7 +1,7 @@
 //
 // RandomStreamTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/RandomStreamTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/RandomStreamTest.h#2 $
 //
 // Definition of the RandomStreamTest class.
 //

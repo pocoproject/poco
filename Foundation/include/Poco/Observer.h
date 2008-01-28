@@ -1,7 +1,7 @@
 //
 // Observer.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Observer.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/Observer.h#2 $
 //
 // Library: Foundation
 // Package: Notifications

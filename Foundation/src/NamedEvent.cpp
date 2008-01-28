@@ -1,7 +1,7 @@
 //
 // NamedEvent.cpp
 //
-// $Id: //poco/Main/Foundation/src/NamedEvent.cpp#9 $
+// $Id: //poco/svn/Foundation/src/NamedEvent.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes

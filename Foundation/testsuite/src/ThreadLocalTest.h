@@ -1,7 +1,7 @@
 //
 // ThreadLocalTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ThreadLocalTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/ThreadLocalTest.h#2 $
 //
 // Definition of the ThreadLocalTest class.
 //

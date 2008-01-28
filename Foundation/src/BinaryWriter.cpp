@@ -1,7 +1,7 @@
 //
 // BinaryWriter.cpp
 //
-// $Id: //poco/Main/Foundation/src/BinaryWriter.cpp#13 $
+// $Id: //poco/svn/Foundation/src/BinaryWriter.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams

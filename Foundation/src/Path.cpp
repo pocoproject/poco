@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/Main/Foundation/src/Path.cpp#21 $
+// $Id: //poco/svn/Foundation/src/Path.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem

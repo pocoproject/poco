@@ -1,7 +1,7 @@
 #
 # buildfiles.vms
 #
-# $Id: //poco/Main/Foundation/testsuite/testsuite.vmsbuild#12 $
+# $Id: //poco/svn/Foundation/testsuite/testsuite.vmsbuild#1 $
 #
 EXE=TestRunner
 ActiveMethodTest

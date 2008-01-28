@@ -1,7 +1,7 @@
 //
 // NumberParser.cpp
 //
-// $Id: //poco/Main/Foundation/src/NumberParser.cpp#13 $
+// $Id: //poco/svn/Foundation/src/NumberParser.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

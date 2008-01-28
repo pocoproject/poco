@@ -1,7 +1,7 @@
 //
 // NumberParserTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NumberParserTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/NumberParserTest.h#2 $
 //
 // Definition of the NumberParserTest class.
 //

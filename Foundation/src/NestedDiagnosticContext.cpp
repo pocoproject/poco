@@ -1,7 +1,7 @@
 //
 // NestedDiagnosticContext.cpp
 //
-// $Id: //poco/Main/Foundation/src/NestedDiagnosticContext.cpp#10 $
+// $Id: //poco/svn/Foundation/src/NestedDiagnosticContext.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

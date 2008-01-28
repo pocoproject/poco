@@ -1,7 +1,7 @@
 //
 // SimpleFileChannel.cpp
 //
-// $Id: //poco/Main/Foundation/src/SimpleFileChannel.cpp#7 $
+// $Id: //poco/svn/Foundation/src/SimpleFileChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging

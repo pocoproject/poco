@@ -1,7 +1,7 @@
 //
 // UTF16Encoding.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UTF16Encoding.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/UTF16Encoding.h#2 $
 //
 // Library: Foundation
 // Package: Text

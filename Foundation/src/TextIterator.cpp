@@ -1,7 +1,7 @@
 //
 // TextIterator.cpp
 //
-// $Id: //poco/Main/Foundation/src/TextIterator.cpp#12 $
+// $Id: //poco/svn/Foundation/src/TextIterator.cpp#2 $
 //
 // Library: Foundation
 // Package: Text

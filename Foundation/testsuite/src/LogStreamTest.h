@@ -1,7 +1,7 @@
 //
 // LogStreamTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LogStreamTest.h#2 $
+// $Id: //poco/svn/Foundation/testsuite/src/LogStreamTest.h#2 $
 //
 // Definition of the LogStreamTest class.
 //

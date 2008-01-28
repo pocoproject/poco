@@ -1,7 +1,7 @@
 //
 // NamedEvent_VMS.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NamedEvent_VMS.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/NamedEvent_VMS.h#2 $
 //
 // Library: Foundation
 // Package: Processes

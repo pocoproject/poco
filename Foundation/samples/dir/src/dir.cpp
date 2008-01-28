@@ -1,7 +1,7 @@
 //
 // dir.cpp
 //
-// $Id: //poco/Main/Foundation/samples/dir/src/dir.cpp#10 $
+// $Id: //poco/svn/Foundation/samples/dir/src/dir.cpp#1 $
 //
 // This sample demonstrates the DirectoryIterator, File and Path classes.
 //

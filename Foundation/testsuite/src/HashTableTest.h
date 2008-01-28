@@ -1,7 +1,7 @@
 //
 // HashTableTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashTableTest.h#2 $
+// $Id: //poco/svn/Foundation/testsuite/src/HashTableTest.h#2 $
 //
 // Definition of the HashTableTest class.
 //

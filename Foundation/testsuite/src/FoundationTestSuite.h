@@ -1,7 +1,7 @@
 //
 // FoundationTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FoundationTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/FoundationTestSuite.h#2 $
 //
 // Definition of the FoundationTestSuite class.
 //

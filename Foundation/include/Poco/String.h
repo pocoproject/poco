@@ -1,7 +1,7 @@
 //
 // String.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/String.h#8 $
+// $Id: //poco/svn/Foundation/include/Poco/String.h#2 $
 //
 // Library: Foundation
 // Package: Core

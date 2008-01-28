@@ -1,7 +1,7 @@
 //
 // SharedLibraryTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SharedLibraryTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/SharedLibraryTest.h#2 $
 //
 // Definition of the SharedLibraryTest class.
 //

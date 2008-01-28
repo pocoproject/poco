@@ -1,7 +1,7 @@
 //
 // FilesystemTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FilesystemTestSuite.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/FilesystemTestSuite.h#2 $
 //
 // Definition of the FilesystemTestSuite class.
 //

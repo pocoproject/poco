@@ -1,7 +1,7 @@
 //
 // Environment_WIN32U.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Environment_WIN32U.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/Environment_WIN32U.h#2 $
 //
 // Library: Foundation
 // Package: Core

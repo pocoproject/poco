@@ -1,7 +1,7 @@
 //
 // Latin9Encoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/Latin9Encoding.cpp#12 $
+// $Id: //poco/svn/Foundation/src/Latin9Encoding.cpp#2 $
 //
 // Library: Foundation
 // Package: Text

@@ -1,7 +1,7 @@
 //
 // Tuple.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Tuple.h#6 $
+// $Id: //poco/svn/Foundation/include/Poco/Tuple.h#2 $
 //
 // Library: Foundation
 // Package: Core

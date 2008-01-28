@@ -1,7 +1,7 @@
 //
 // Activity.cpp
 //
-// $Id: //poco/Main/Foundation/samples/Activity/src/Activity.cpp#9 $
+// $Id: //poco/svn/Foundation/samples/Activity/src/Activity.cpp#1 $
 //
 // This sample demonstrates the Activity class.
 //

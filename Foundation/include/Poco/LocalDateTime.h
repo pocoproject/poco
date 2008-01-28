@@ -1,7 +1,7 @@
 //
 // LocalDateTime.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LocalDateTime.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/LocalDateTime.h#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -259,11 +259,13 @@ public:
 
 protected:
 	LocalDateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff, int tzd);
-	void determineTzd (bool adjust = false);
+		
+	void determineTzd(bool adjust = false);
 		/// Recalculate the tzd based on the _dateTime member based
 		/// on the current timezone using the Standard C runtime functions.
 		/// If adjust is true, then adjustForTzd() is called after the
 		/// differential is calculated.
+		
 	void adjustForTzd();
 		/// Adjust the _dateTime member based on the _tzd member.
 	

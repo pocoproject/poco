@@ -1,7 +1,7 @@
 //
 // ByteOrderTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/ByteOrderTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/ByteOrderTest.h#2 $
 //
 // Definition of the ByteOrderTest class.
 //

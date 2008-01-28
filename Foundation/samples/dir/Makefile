@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/dir/Makefile#5 $
+# $Id: //poco/svn/Foundation/samples/dir/Makefile#1 $
 #
 # Makefile for Poco dir
 #

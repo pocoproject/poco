@@ -1,7 +1,7 @@
 //
 // UnicodeConverter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/UnicodeConverter.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/UnicodeConverter.h#2 $
 //
 // Library: Foundation
 // Package: Text

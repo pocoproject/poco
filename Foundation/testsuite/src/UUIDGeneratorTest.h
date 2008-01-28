@@ -1,7 +1,7 @@
 //
 // UUIDGeneratorTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/UUIDGeneratorTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/UUIDGeneratorTest.h#2 $
 //
 // Definition of the UUIDGeneratorTest class.
 //

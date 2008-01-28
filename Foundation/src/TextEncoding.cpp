@@ -1,7 +1,7 @@
 //
 // TextEncoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/TextEncoding.cpp#13 $
+// $Id: //poco/svn/Foundation/src/TextEncoding.cpp#2 $
 //
 // Library: Foundation
 // Package: Text

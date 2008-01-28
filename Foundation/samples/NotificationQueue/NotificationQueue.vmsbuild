@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/Main/Foundation/samples/NotificationQueue/NotificationQueue.vmsbuild#5 $
+# $Id: //poco/svn/Foundation/samples/NotificationQueue/NotificationQueue.vmsbuild#1 $
 #
 EXE=NotificationQueue
 NotificationQueue

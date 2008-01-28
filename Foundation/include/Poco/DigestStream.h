@@ -1,7 +1,7 @@
 //
 // DigestStream.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DigestStream.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/DigestStream.h#2 $
 //
 // Library: Foundation
 // Package: Crypt

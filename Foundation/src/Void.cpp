@@ -1,7 +1,7 @@
 //
 // Void.cpp
 //
-// $Id: //poco/Main/Foundation/src/Void.cpp#4 $
+// $Id: //poco/svn/Foundation/src/Void.cpp#2 $
 //
 // Library: Foundation
 // Package: Core

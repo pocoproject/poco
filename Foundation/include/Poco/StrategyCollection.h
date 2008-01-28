@@ -1,7 +1,7 @@
 //
 // StrategyCollection.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/StrategyCollection.h#5 $
+// $Id: //poco/svn/Foundation/include/Poco/StrategyCollection.h#2 $
 //
 // Library: Foundation
 // Package: Cache

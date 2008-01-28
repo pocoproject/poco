@@ -1,7 +1,7 @@
 //
 // HashingTestSuite.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashingTestSuite.h#1 $
+// $Id: //poco/svn/Foundation/testsuite/src/HashingTestSuite.h#2 $
 //
 // Definition of the HashingTestSuite class.
 //

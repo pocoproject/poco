@@ -1,7 +1,7 @@
 //
 // HashMapTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/HashMapTest.cpp#2 $
+// $Id: //poco/svn/Foundation/testsuite/src/HashMapTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

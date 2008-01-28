@@ -1,7 +1,7 @@
 //
 // LinearHashTableTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LinearHashTableTest.h#2 $
+// $Id: //poco/svn/Foundation/testsuite/src/LinearHashTableTest.h#2 $
 //
 // Definition of the LinearHashTableTest class.
 //

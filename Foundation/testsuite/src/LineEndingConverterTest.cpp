@@ -1,7 +1,7 @@
 //
 // LineEndingConverterTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LineEndingConverterTest.cpp#5 $
+// $Id: //poco/svn/Foundation/testsuite/src/LineEndingConverterTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

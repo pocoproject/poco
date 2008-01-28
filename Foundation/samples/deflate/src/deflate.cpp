@@ -1,7 +1,7 @@
 //
 // deflate.cpp
 //
-// $Id: //poco/Main/Foundation/samples/deflate/src/deflate.cpp#9 $
+// $Id: //poco/svn/Foundation/samples/deflate/src/deflate.cpp#1 $
 //
 // This sample demonstrates the DeflatingOutputStream and StreamCopier classes.
 //

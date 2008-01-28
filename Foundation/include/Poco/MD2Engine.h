@@ -1,7 +1,7 @@
 //
 // MD2Engine.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/MD2Engine.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/MD2Engine.h#2 $
 //
 // Library: Foundation
 // Package: Crypt

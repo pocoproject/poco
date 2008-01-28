@@ -1,7 +1,7 @@
 //
 // MD5Engine.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/MD5Engine.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/MD5Engine.h#2 $
 //
 // Library: Foundation
 // Package: Crypt

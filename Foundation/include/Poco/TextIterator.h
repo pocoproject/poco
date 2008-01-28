@@ -1,7 +1,7 @@
 //
 // TextIterator.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/TextIterator.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/TextIterator.h#2 $
 //
 // Library: Foundation
 // Package: Text

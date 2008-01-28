@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/Main/Foundation/src/Timer.cpp#12 $
+// $Id: //poco/svn/Foundation/src/Timer.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -60,18 +60,30 @@ Timer::~Timer()
 
 void Timer::start(const AbstractTimerCallback& method)
 {
-	start(method, ThreadPool::defaultPool());
+	start(method, Thread::PRIO_NORMAL, ThreadPool::defaultPool());
+}
+
+
+void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority)
+{
+	start(method, priority, ThreadPool::defaultPool());
 }
 
 
 void Timer::start(const AbstractTimerCallback& method, ThreadPool& threadPool)
+{
+	start(method, Thread::PRIO_NORMAL, threadPool);
+}
+
+
+void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority, ThreadPool& threadPool)
 {
 	poco_assert (!_pCallback);
 
 	FastMutex::ScopedLock lock(_mutex);	
 	_pCallback = method.clone();
 	_wakeUp.reset();
-	threadPool.start(*this);
+	threadPool.startWithPriority(priority, *this);
 }
 
 

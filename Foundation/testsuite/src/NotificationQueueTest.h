@@ -1,7 +1,7 @@
 //
 // NotificationQueueTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/NotificationQueueTest.h#10 $
+// $Id: //poco/svn/Foundation/testsuite/src/NotificationQueueTest.h#2 $
 //
 // Definition of the NotificationQueueTest class.
 //

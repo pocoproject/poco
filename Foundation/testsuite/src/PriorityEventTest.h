@@ -1,7 +1,7 @@
 //
 // PriorityEventTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/PriorityEventTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/PriorityEventTest.h#2 $
 //
 // Definition of the PriorityEventTest class.
 //

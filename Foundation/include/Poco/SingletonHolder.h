@@ -1,7 +1,7 @@
 //
 // SingletonHolder.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/SingletonHolder.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/SingletonHolder.h#2 $
 //
 // Library: Foundation
 // Package: Core

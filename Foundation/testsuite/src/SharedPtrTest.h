@@ -1,7 +1,7 @@
 //
 // SharedPtrTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/SharedPtrTest.h#5 $
+// $Id: //poco/svn/Foundation/testsuite/src/SharedPtrTest.h#2 $
 //
 // Definition of the SharedPtrTest class.
 //

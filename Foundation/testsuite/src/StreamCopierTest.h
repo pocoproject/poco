@@ -1,7 +1,7 @@
 //
 // StreamCopierTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/StreamCopierTest.h#9 $
+// $Id: //poco/svn/Foundation/testsuite/src/StreamCopierTest.h#2 $
 //
 // Definition of the StreamCopierTest class.
 //

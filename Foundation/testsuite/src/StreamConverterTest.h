@@ -1,7 +1,7 @@
 //
 // StreamConverterTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/StreamConverterTest.h#8 $
+// $Id: //poco/svn/Foundation/testsuite/src/StreamConverterTest.h#2 $
 //
 // Definition of the StreamConverterTest class.
 //

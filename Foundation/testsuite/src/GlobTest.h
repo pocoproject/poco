@@ -1,7 +1,7 @@
 //
 // GlobTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/GlobTest.h#5 $
+// $Id: //poco/svn/Foundation/testsuite/src/GlobTest.h#2 $
 //
 // Definition of the GlobTest class.
 //

@@ -1,7 +1,7 @@
 //
 // LogStream.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/LogStream.h#3 $
+// $Id: //poco/svn/Foundation/include/Poco/LogStream.h#2 $
 //
 // Library: Foundation
 // Package: Logging

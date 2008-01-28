@@ -1,7 +1,7 @@
 //
 // Process_VMS.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Process_VMS.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/Process_VMS.h#2 $
 //
 // Library: Foundation
 // Package: Processes

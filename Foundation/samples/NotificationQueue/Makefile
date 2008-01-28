@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Foundation/samples/NotificationQueue/Makefile#5 $
+# $Id: //poco/svn/Foundation/samples/NotificationQueue/Makefile#1 $
 #
 # Makefile for Poco NotificationQueue
 #

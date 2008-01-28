@@ -1,7 +1,7 @@
 //
 // UTF16Encoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/UTF16Encoding.cpp#13 $
+// $Id: //poco/svn/Foundation/src/UTF16Encoding.cpp#2 $
 //
 // Library: Foundation
 // Package: Text

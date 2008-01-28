@@ -1,7 +1,7 @@
 //
 // FPEnvironment_DUMMY.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/FPEnvironment_DUMMY.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/FPEnvironment_DUMMY.h#2 $
 //
 // Library: Foundation
 // Package: Core
