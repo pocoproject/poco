@@ -39,7 +39,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib"
+				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib unicows.lib"
 				OutputFile="..\bin\PocoUtild.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -104,7 +104,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib PocoXML.lib"
+				AdditionalDependencies="PocoFoundation.lib PocoXML.lib unicows.lib"
 				OutputFile="..\bin\PocoUtil.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"

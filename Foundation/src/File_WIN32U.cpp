@@ -1,7 +1,7 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_WIN32U.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/File_WIN32U.cpp#7 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -192,6 +192,17 @@ bool FileImpl::isDirectoryImpl() const
 bool FileImpl::isLinkImpl() const
 {
 	return false;
+}
+
+
+bool FileImpl::isHiddenImpl() const
+{
+	poco_assert (!_path.empty());
+
+	DWORD attr = GetFileAttributesW(_upath.c_str());
+	if (attr == 0xFFFFFFFF)
+		handleLastErrorImpl(_path);
+	return (attr & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
 
 

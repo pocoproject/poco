@@ -1,7 +1,7 @@
 //
 // TaskManagerTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TaskManagerTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TaskManagerTest.h#2 $
 //
 // Definition of the TaskManagerTest class.
 //
@@ -57,6 +57,7 @@ public:
 	void testError();
 	void testCustom();
 	void testMultiTasks();
+	void testCustomThreadPool();
 
 	void setUp();
 	void tearDown();

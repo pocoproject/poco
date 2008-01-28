@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#4 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#5 $
 //
 // Library: Net
 // Package: Sockets
@@ -54,13 +54,15 @@ namespace Net {
 
 
 SocketImpl::SocketImpl():
-	_sockfd(POCO_INVALID_SOCKET)
+	_sockfd(POCO_INVALID_SOCKET),
+	_blocking(true)
 {
 }
 
 
 SocketImpl::SocketImpl(poco_socket_t sockfd):
-	_sockfd(sockfd)
+	_sockfd(sockfd),
+	_blocking(true)
 {
 }
 
@@ -718,6 +720,7 @@ void SocketImpl::setBlocking(bool flag)
 {
 	int arg = flag ? 0 : 1;
 	ioctl(FIONBIO, arg);
+	_blocking = flag;
 }
 
 

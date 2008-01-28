@@ -1,7 +1,7 @@
 //
 // TuplesTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TuplesTest.cpp#3 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TuplesTest.cpp#4 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,6 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Tuple.h"
 #include "Poco/Void.h"
+#include <algorithm>
 
 
 using Poco::TypeList;
@@ -475,6 +476,45 @@ void TuplesTest::testTuple20()
 }
 
 
+void TuplesTest::testTupleOrder()
+{
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+		std::string, int, bool, float, char, long, double, short, std::string, int> TupleType;
+
+	TupleType aTuple;
+	assert (aTuple.length == 20);
+	
+	TupleType aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14, 32700, "2", 2, "1", 1, true, 3.14f, 'c', 999, 33.14, 32700, "2", 2);
+	assert (aTuple != aTuple2);
+	aTuple = aTuple2;
+	assert (aTuple == aTuple2);
+	aTuple2.get<1>()++;
+	assert (aTuple < aTuple2);
+
+	TupleType aTuple3;
+	aTuple3 = aTuple2;
+	aTuple3.get<1>()++;
+	assert (aTuple2 < aTuple3);
+
+	testTupleStrictWeak(aTuple, aTuple2, aTuple3);
+
+	std::vector<TupleType> tv;
+	tv.push_back(aTuple3);
+	tv.push_back(aTuple);
+	tv.push_back(aTuple2);
+
+	assert (tv[0] == aTuple3);
+	assert (tv[1] == aTuple);
+	assert (tv[2] == aTuple2);
+
+	std::sort(tv.begin(), tv.end());
+	
+	assert (tv[0] == aTuple);
+	assert (tv[1] == aTuple2);
+	assert (tv[2] == aTuple3);
+}
+
+
 void TuplesTest::testMemOverhead()
 {
 	Tuple<short> small(0);
@@ -520,6 +560,7 @@ CppUnit::Test* TuplesTest::suite()
 	CppUnit_addTest(pSuite, TuplesTest, testTuple18);
 	CppUnit_addTest(pSuite, TuplesTest, testTuple19);
 	CppUnit_addTest(pSuite, TuplesTest, testTuple20);
+	CppUnit_addTest(pSuite, TuplesTest, testTupleOrder);
 	CppUnit_addTest(pSuite, TuplesTest, testMemOverhead);
 
 	return pSuite;

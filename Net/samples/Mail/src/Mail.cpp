@@ -1,7 +1,7 @@
 //
 // Mail.cpp
 //
-// $Id: //poco/1.3/Net/samples/Mail/src/Mail.cpp#1 $
+// $Id: //poco/1.3/Net/samples/Mail/src/Mail.cpp#2 $
 //
 // This sample demonstrates the MailMessage and SMTPClientSession classes.
 //
@@ -75,12 +75,12 @@ int main(int argc, char** argv)
 		MailMessage message;
 		message.setSender(sender);
 		message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, recipient));
-		message.setSubject("Hello from the C++ Portable Components");
+		message.setSubject("Hello from the POCO C++ Libraries");
 		std::string content;
 		content += "Hello ";
 		content += recipient;
 		content += ",\r\n\r\n";
-		content += "This is a greeting from the C++ Portable Components.\r\n\r\n";
+		content += "This is a greeting from the POCO C++ Libraries.\r\n\r\n";
 		std::string logo(reinterpret_cast<const char*>(PocoLogo), sizeof(PocoLogo));
 		message.addContent(new StringPartSource(content));
 		message.addAttachment("logo", new StringPartSource(logo, "image/gif"));

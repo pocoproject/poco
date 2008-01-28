@@ -1,7 +1,7 @@
 //
 // Socket.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/Socket.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/Socket.h#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -272,6 +272,11 @@ public:
 		/// Sets the socket in blocking mode if flag is true,
 		/// disables blocking mode if flag is false.
 
+	bool getBlocking() const;
+		/// Returns the blocking mode of the socket.
+		/// This method will only work if the blocking modes of 
+		/// the socket are changed via the setBlocking method!
+
 	SocketAddress address() const;
 		/// Returns the IP address and port number of the socket.
 		
@@ -540,6 +545,12 @@ inline bool Socket::getOOBInline() const
 inline void Socket::setBlocking(bool flag)
 {
 	_pImpl->setBlocking(flag);
+}
+
+
+inline bool Socket::getBlocking() const
+{
+	return _pImpl->getBlocking();
 }
 
 

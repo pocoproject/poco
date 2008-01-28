@@ -1,7 +1,7 @@
 //
 // URIStreamOpener.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/URIStreamOpener.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/URIStreamOpener.h#2 $
 //
 // Library: Foundation
 // Package: URI
@@ -62,6 +62,11 @@ class Foundation_API URIStreamOpener
 	/// A FileStreamFactory is automatically registered for file URIs.
 {
 public:
+	enum
+	{
+		MAX_REDIRECTS = 10
+	};
+	
 	URIStreamOpener();
 		/// Creates the URIStreamOpener and registers a FileStreamFactory
 		/// for file URIs.
@@ -133,6 +138,7 @@ public:
 
 protected:
 	std::istream* openFile(const Path& path) const;
+	std::istream* openURI(const std::string& scheme, const URI& uri) const;
 
 private:
 	URIStreamOpener(const URIStreamOpener&);

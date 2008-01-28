@@ -1,7 +1,7 @@
 //
 // HTTPLoadTest.cpp
 //
-// $Id: //poco/1.3/Net/samples/HTTPLoadTest/src/HTTPLoadTest.cpp#1 $
+// $Id: //poco/1.3/Net/samples/HTTPLoadTest/src/HTTPLoadTest.cpp#3 $
 //
 // This sample demonstrates the HTTPClientSession class.
 //
@@ -45,6 +45,8 @@
 #include "Poco/Runnable.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/NumberParser.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/NullStream.h"
 #include "Poco/Exception.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/Option.h"
@@ -74,14 +76,17 @@ using Poco::NumberParser;
 using Poco::Path;
 using Poco::URI;
 using Poco::Exception;
+using Poco::StreamCopier;
+using Poco::NullOutputStream;
+
 
 class HTTPClient : public Runnable
 {
 public:
 	HTTPClient(const URI& uri, int repetitions, bool cookies=false, bool verbose=false):
 	  _uri(uri), 
-	  _cookies(cookies), 
 	  _verbose(verbose), 
+	  _cookies(cookies), 
 	  _repetitions(repetitions), 
 	  _usec(0), 
 	  _success(0)
@@ -123,10 +128,12 @@ public:
 				sw.restart();
 				session.sendRequest(req);
 				std::istream& rs = session.receiveResponse(res);
+				NullOutputStream nos;
+				StreamCopier::copyStream(rs, nos);
 				sw.stop();
 				_success += HTTPResponse::HTTP_OK == res.getStatus() ? 1 : 0;
 				if (_cookies) res.getCookies(cookies);
-				usec = sw.elapsed();
+				usec = int(sw.elapsed());
 
 				if (_verbose)
 				{
@@ -218,10 +225,10 @@ class HTTPLoadTest: public Application
 public:
 	HTTPLoadTest(): 
 		_helpRequested(false), 
-		_repetitions(1), 
-		_threads(1), 
 		_verbose(false), 
-		_cookies(false)
+		_cookies(false),
+		_repetitions(1), 
+		_threads(1)
 	{
 	}
 

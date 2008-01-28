@@ -1,7 +1,7 @@
 //
 // SAXParserTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/SAXParserTest.h#1 $
+// $Id: //poco/1.3/XML/testsuite/src/SAXParserTest.h#2 $
 //
 // Definition of the SAXParserTest class.
 //
@@ -67,11 +67,14 @@ public:
 	void testUndeclaredNoNamespace();
 	void testRSS();
 	void testEncoding();
+	void testParseMemory();
+	void testCharacters();
 
 	void setUp();
 	void tearDown();
 
 	std::string parse(Poco::XML::XMLReader& reader, int options, const std::string& data);
+	std::string parseMemory(Poco::XML::XMLReader& reader, int options, const std::string& data);
 
 	static CppUnit::Test* suite();
 

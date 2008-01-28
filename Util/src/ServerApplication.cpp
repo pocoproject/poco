@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#4 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#5 $
 //
 // Library: Util
 // Package: Application
@@ -53,7 +53,7 @@
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
 #endif
 
@@ -146,7 +146,7 @@ void ServerApplication::ServiceControlHandler(DWORD control)
 }
 
 
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
 #else
 void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
@@ -154,7 +154,9 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 {
 	ServerApplication& app = static_cast<ServerApplication&>(Application::instance());
 
-#if defined(POCO_WIN32_UTF8)
+	app.config().setBool("application.runAsService", true);
+
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	_serviceStatusHandle = RegisterServiceCtrlHandlerW(L"", ServiceControlHandler);
 #else
 	_serviceStatusHandle = RegisterServiceCtrlHandler("", ServiceControlHandler);
@@ -173,7 +175,7 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 
 	try
 	{
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		std::vector<std::string> args;
 		for (DWORD i = 0; i < argc; ++i)
 		{
@@ -230,7 +232,6 @@ int ServerApplication::run(int argc, char** argv)
 {
 	if (!hasConsole() && isService())
 	{
-		config().setBool("application.runAsService", true);
 		return 0;
 	}
 	else 
@@ -264,12 +265,11 @@ int ServerApplication::run(int argc, char** argv)
 }
 
 
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 int ServerApplication::run(int argc, wchar_t** argv)
 {
 	if (!hasConsole() && isService())
 	{
-		config().setBool("application.runAsService", true);
 		return 0;
 	}
 	else 
@@ -306,7 +306,7 @@ int ServerApplication::run(int argc, wchar_t** argv)
 
 bool ServerApplication::isService()
 {
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	SERVICE_TABLE_ENTRYW svcDispatchTable[2];
 	svcDispatchTable[0].lpServiceName = L"";
 	svcDispatchTable[0].lpServiceProc = ServiceMain;

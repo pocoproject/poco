@@ -1,7 +1,7 @@
 //
 // Application.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/Application.h#6 $
+// $Id: //poco/1.3/Util/include/Poco/Util/Application.h#7 $
 //
 // Library: Util
 // Package: Application
@@ -148,7 +148,7 @@ public:
 		/// Initializes the application and all registered subsystems,
 		/// using the given command line arguments.
 
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	void init(int argc, wchar_t* argv[]);
 		/// Initializes the application and all registered subsystems,
 		/// using the given command line arguments.
@@ -445,7 +445,7 @@ inline Poco::Timespan Application::uptime() const
 //
 // Macro to implement main()
 //
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	#define POCO_APP_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)		\
 	{										\

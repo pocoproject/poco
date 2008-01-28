@@ -1,7 +1,7 @@
 //
 // HTMLFormTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTMLFormTest.cpp#2 $
+// $Id: //poco/1.3/Net/testsuite/src/HTMLFormTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -111,11 +111,12 @@ void HTMLFormTest::testWriteUrl()
 	form.set("field2", "value 2");
 	form.set("field3", "value=3");
 	form.set("field4", "value&4");
+	form.set("field5", "value+5");
 	
 	std::ostringstream ostr;
 	form.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
+	assert (s == "field1=value1&field2=value%202&field3=value%3D3&field4=value%264&field5=value%2B5");
 }
 
 

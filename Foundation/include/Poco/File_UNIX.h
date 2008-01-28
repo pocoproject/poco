@@ -1,7 +1,7 @@
 //
 // File_UNIX.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/File_UNIX.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/File_UNIX.h#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -64,6 +64,7 @@ protected:
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
 	bool isLinkImpl() const;
+	bool isHiddenImpl() const;
 	Timestamp createdImpl() const;
 	Timestamp getLastModifiedImpl() const;
 	void setLastModifiedImpl(const Timestamp& ts);

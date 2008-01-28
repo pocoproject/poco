@@ -1,7 +1,7 @@
 //
 // SSLInitializer.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLInitializer.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLInitializer.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -87,7 +87,9 @@ void SSLInitializer::initialize()
 		int nMutexes = CRYPTO_num_locks();
 		_mutexes = new FastMutex[nMutexes];
 		CRYPTO_set_locking_callback(&SSLInitializer::lock);
+#ifndef POCO_OS_FAMILY_WINDOWS // SF# 1828231: random unhandled exceptions when linking with ssl
 		CRYPTO_set_id_callback(&SSLInitializer::id);
+#endif
 		CRYPTO_set_dynlock_create_callback(&SSLInitializer::dynlockCreate);
 		CRYPTO_set_dynlock_lock_callback(&SSLInitializer::dynlock);
 		CRYPTO_set_dynlock_destroy_callback(&SSLInitializer::dynlockDestroy);

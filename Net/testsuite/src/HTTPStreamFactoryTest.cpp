@@ -1,7 +1,7 @@
 //
 // HTTPStreamFactoryTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPStreamFactoryTest.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/HTTPStreamFactoryTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,6 +36,7 @@
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/URI.h"
+#include "Poco/URIStreamOpener.h"
 #include "Poco/StreamCopier.h"
 #include "HTTPTestServer.h"
 #include <sstream>
@@ -88,10 +89,11 @@ void HTTPStreamFactoryTest::testEmptyPath()
 void HTTPStreamFactoryTest::testRedirect()
 {
 	HTTPTestServer server;
-	HTTPStreamFactory factory;
+	Poco::URIStreamOpener opener;
+	opener.registerStreamFactory("http", new HTTPStreamFactory);
 	URI uri("http://localhost/redirect");
 	uri.setPort(server.port());
-	std::auto_ptr<std::istream> pStr(factory.open(uri));
+	std::auto_ptr<std::istream> pStr(opener.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
 	assert (ostr.str() == HTTPTestServer::LARGE_BODY);

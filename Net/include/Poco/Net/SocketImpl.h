@@ -1,7 +1,7 @@
 //
 // SocketImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketImpl.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SocketImpl.h#4 $
 //
 // Library: Net
 // Package: Sockets
@@ -323,9 +323,14 @@ public:
 	bool getBroadcast();
 		/// Returns the value of the SO_BROADCAST socket option.
 
-	void setBlocking(bool flag);
+	virtual void setBlocking(bool flag);
 		/// Sets the socket in blocking mode if flag is true,
 		/// disables blocking mode if flag is false.
+
+	virtual bool getBlocking() const;
+		/// Returns the blocking mode of the socket.
+		/// This method will only work if the blocking modes of 
+		/// the socket are changed via the setBlocking method!
 
 	int socketError();
 		/// Returns the value of the SO_ERROR socket option.
@@ -409,6 +414,7 @@ private:
 	Poco::Timespan _recvTimeout;
 	Poco::Timespan _sndTimeout;
 #endif
+	bool          _blocking;
 	
 	friend class Socket;
 	friend class SecureSocketImpl;
@@ -443,6 +449,12 @@ inline int SocketImpl::lastError()
 inline void SocketImpl::invalidate()
 {
 	_sockfd = POCO_INVALID_SOCKET;
+}
+
+
+inline bool SocketImpl::getBlocking() const
+{
+	return _blocking;
 }
 
 

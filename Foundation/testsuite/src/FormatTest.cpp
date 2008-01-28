@@ -1,7 +1,7 @@
 //
 // FormatTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/FormatTest.cpp#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FormatTest.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
@@ -46,6 +46,7 @@
 #include "FormatTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Any.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
 
@@ -211,12 +212,44 @@ void FormatTest::testInt()
 }
 
 
+void FormatTest::testBool()
+{
+	bool b = true;
+	std::string s = format("%b", b);
+	assert (s == "1");
+
+	b = false;
+	s = format("%b", b);
+	assert (s == "0");
+
+	std::vector<Poco::Any> bv;
+	bv.push_back(false);
+	bv.push_back(true);
+	bv.push_back(false);
+	bv.push_back(true);
+	bv.push_back(false);
+	bv.push_back(true);
+	bv.push_back(false);
+	bv.push_back(true);
+	bv.push_back(false);
+	bv.push_back(true);
+
+	s.clear();
+	format(s, "%b%b%b%b%b%b%b%b%b%b", bv);
+	assert (s == "0101010101");
+}
+
+
 void FormatTest::testAnyInt()
 {
 	char c = 42;
 	std::string s(format("%?i", c));
 	assert (s == "42");
 	
+	bool b = true;
+	s = format("%?i", b);
+	assert (s == "1");
+
 	signed char sc = -42;
 	s = format("%?i", sc);
 	assert (s == "-42");
@@ -361,6 +394,7 @@ CppUnit::Test* FormatTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FormatTest");
 
 	CppUnit_addTest(pSuite, FormatTest, testChar);
+	CppUnit_addTest(pSuite, FormatTest, testBool);
 	CppUnit_addTest(pSuite, FormatTest, testInt);
 	CppUnit_addTest(pSuite, FormatTest, testAnyInt);
 	CppUnit_addTest(pSuite, FormatTest, testFloatFix);

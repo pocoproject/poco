@@ -1,5 +1,48 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.3.2 (2008-01-30)
+==========================
+
+Foundation, XML, Net, Util:
+- added POCO_NO_SHAREDMEMORY to Config.h
+- POCO_NO_WSTRING now really disables all wide string related calls
+- added template specialization for string hashfunction (performance)
+- XML parser performance improvements (SAX parser is now up to 40 % faster
+- added parseMemoryNP() to XMLReader and friends
+- URIStreamOpener improvement: redirect logic is now in URIStreamOpener.
+  this enables support for redirects from http to https.
+- added support for temporary redirects and useproxy return code
+- added getBlocking() to Socket	  		
+- added File::isHidden()
+- better WIN64 support (AMD64 and IA64 platforms are recognized)
+- added support for timed lock operations to [Fast]Mutex
+- SharedLibrary: dlopen() is called with RTLD_GLOBAL instead of RTLD_LOCAL 
+  (see http://gcc.gnu.org/faq.html#dso)
+- Poco::Timer threads can now run with a specified priority
+- added testcase for SF# 1774351
+- fixed SF# 1784772: Message::swap omits _tid mem
+- fixed SF# 1790894: IPAddress(addr,family) doesn't fail on invalid address
+- fixed SF# 1804395: Constructor argument name wrong
+- fixed SF# 1806807: XMLWriter::characters should ignore empty strings
+- fixed SF# 1806994: property application.runAsService set too late
+- fixed SF# 1828908: HTMLForm does not encode '+'
+- fixed SF# 1831871: Windows configuration file line endings not correct.
+- fixed SF# 1845545: TCP server hangs on shutdown
+- fixed SF# 1846734: Option::validator() does not behave according to doc
+- fixed SF# 1856567: Assertion in DateTimeParser::tryParse()
+- fixed SF# 1864832: HTTP server sendFile() uses incorrect date
+- HTTPServerResponseImpl now always sets the Date header automatically
+  in the constructor.
+- fixed SF# 1787667: DateTimeFormatter and time related classes
+  (also SF# 1800031: The wrong behavior of time related classes)
+- fixed SF# 1829700: TaskManager::_taskList contains tasks that never started
+- fixed SF# 1834127: Anonymous enums in Tuple.h result in invalid C++
+- fixed SF# 1834130: RunnableAdapter::operator= not returning a value
+- fixed SF# 1873924: Add exception code to NetException
+- fixed SF# 1873929: SMTPClientSession support for name in sender field
+- logging performance improvements (PatternFormatter)
+
+
 Release 1.3.1 (2007-08-08)
 ==========================
 
@@ -775,4 +818,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#12 $
+$Id: //poco/1.3/dist/CHANGELOG#15 $

@@ -1,7 +1,7 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Platform.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Platform.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -148,7 +148,7 @@
 	#else
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#endif
-#elif defined(__x86_64__)
+#elif defined(__x86_64__) || defined(_M_X64)
 	#define POCO_ARCH POCO_ARCH_AMD64
 	#define POCO_ARCH_LITTLE_ENDIAN 1
 #elif defined(__mips__) || defined(__mips) || defined(__MIPS__) || defined(_M_MRX000)

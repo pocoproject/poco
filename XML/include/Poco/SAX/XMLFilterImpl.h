@@ -1,7 +1,7 @@
 //
 // XMLFilterImpl.h
 //
-// $Id: //poco/1.3/XML/include/Poco/SAX/XMLFilterImpl.h#1 $
+// $Id: //poco/1.3/XML/include/Poco/SAX/XMLFilterImpl.h#2 $
 //
 // Library: XML
 // Package: SAX
@@ -94,6 +94,7 @@ public:
 	void* getProperty(const XMLString& propertyId) const;
 	void parse(InputSource* pSource);
 	void parse(const XMLString& systemId);
+	void parseMemoryNP(const char* xml, std::size_t size);
 
 	// EntityResolver
 	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId);

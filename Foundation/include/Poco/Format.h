@@ -1,7 +1,7 @@
 //
 // Format.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Format.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/Format.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -82,6 +82,7 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///
 	/// Following are valid type specifications and their meaning:
 	///
+	///   * b boolean (true = 1, false = 0)
 	///   * c character
 	///   * d signed decimal integer
 	///   * i signed decimal integer

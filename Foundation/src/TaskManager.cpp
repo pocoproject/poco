@@ -1,7 +1,7 @@
 //
 // TaskManager.cpp
 //
-// $Id: //poco/1.3/Foundation/src/TaskManager.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/TaskManager.cpp#2 $
 //
 // Library: Foundation
 // Package: Tasks
@@ -64,12 +64,24 @@ TaskManager::~TaskManager()
 
 void TaskManager::start(Task* pTask)
 {
+	TaskPtr pAutoTask(pTask); // take ownership immediately
 	FastMutex::ScopedLock lock(_mutex);
 
-	pTask->setOwner(this);
-	pTask->setState(Task::TASK_STARTING);
-	_taskList.push_back(TaskPtr(pTask));
-	_threadPool.start(*pTask, pTask->name());
+	pAutoTask->setOwner(this);
+	pAutoTask->setState(Task::TASK_STARTING);
+	_taskList.push_back(pAutoTask);
+	try
+	{
+		_threadPool.start(*pAutoTask, pAutoTask->name());
+	}
+	catch (...)
+	{
+		// Make sure that we don't act like we own the task since
+		// we never started it.  If we leave the task on our task
+		// list, the size of the list is incorrect.
+		_taskList.pop_back();
+		throw;
+	}
 }
 
 

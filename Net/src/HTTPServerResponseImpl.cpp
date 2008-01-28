@@ -1,7 +1,7 @@
 //
 // HTTPServerResponseImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPServerResponseImpl.cpp#1 $
+// $Id: //poco/1.3/Net/src/HTTPServerResponseImpl.cpp#2 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -47,6 +47,8 @@
 #include "Poco/CountingStream.h"
 #include "Poco/Exception.h"
 #include "Poco/FileStream.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
 
 
 using Poco::File;
@@ -54,6 +56,8 @@ using Poco::Timestamp;
 using Poco::NumberFormatter;
 using Poco::StreamCopier;
 using Poco::OpenFileException;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
 
 
 namespace Poco {
@@ -64,6 +68,8 @@ HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPServerSession& session):
 	_session(session),
 	_pStream(0)
 {
+	Timestamp now;
+	setDate(now);
 }
 
 
@@ -114,7 +120,7 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 	File f(path);
 	Timestamp dateTime    = f.getLastModified();
 	File::FileSize length = f.getSize();
-	setDate(dateTime);
+	set("Last-Modified", DateTimeFormatter::format(dateTime, DateTimeFormat::HTTP_FORMAT));
 	setContentLength(static_cast<int>(length));
 	setContentType(mediaType);
 	setChunkedTransferEncoding(false);

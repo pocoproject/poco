@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="TestSuite"
 	ProjectGUID="{C9ACF028-17A1-44C2-8C09-DFD3BD9E7D45}"
 	Keyword="Win32Proj"
@@ -246,7 +246,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib winmm.lib"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib PocoXMLmt.lib winmm.lib"
 				OutputFile="bin/TestSuitemt.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -334,7 +334,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib winmm.lib"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib PocoXMLmtd.lib winmm.lib"
 				OutputFile="bin/TestSuitemtd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"

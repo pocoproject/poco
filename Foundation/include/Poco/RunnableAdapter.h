@@ -1,7 +1,7 @@
 //
 // RunnableAdapter.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/RunnableAdapter.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/RunnableAdapter.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -75,6 +75,7 @@ public:
 	{
 		_pObject = ra._pObject;
 		_method  = ra._method;
+		return *this;
 	}
 
 	void run()

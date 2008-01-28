@@ -1,7 +1,7 @@
 //
 // PropertyFileConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/PropertyFileConfiguration.cpp#4 $
+// $Id: //poco/1.3/Util/src/PropertyFileConfiguration.cpp#5 $
 //
 // Library: Util
 // Package: Configuration
@@ -39,6 +39,7 @@
 #include "Poco/String.h"
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
+#include "Poco/LineEndingConverter.h"
 #include <cctype>
 
 
@@ -109,7 +110,9 @@ void PropertyFileConfiguration::save(const std::string& path) const
 	Poco::FileOutputStream ostr(path);
 	if (ostr.good())
 	{
-		save(ostr);
+		Poco::OutputLineEndingConverter lec(ostr);
+		save(lec);
+		lec.flush();
 		ostr.flush();
 		if (!ostr.good()) throw Poco::WriteFileException(path);
 	}

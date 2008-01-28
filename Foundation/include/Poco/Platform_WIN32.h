@@ -1,7 +1,7 @@
 //
 // Platform_WIN32.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Platform_WIN32.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/Platform_WIN32.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -79,6 +79,13 @@
 	#pragma warning(disable:4996) // VC++ 8.0 deprecation warnings
 	#pragma warning(disable:4351) // new behavior: elements of array '...' will be default initialized
 	#pragma warning(disable:4675) // resolved overload was found by argument-dependent lookup
+#endif
+
+
+#if defined(__INTEL_COMPILER)
+	#pragma warning(disable:1738) // base class dllexport/dllimport specification differs from that of the derived class
+	#pragma warning(disable:1478) // function ... was declared "deprecated"
+	#pragma warning(disable:1744) // field of class type without a DLL interface used in a class with a DLL interface
 #endif
 
 

@@ -1,7 +1,7 @@
 //
 // TypeListTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TypeListTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TypeListTest.h#2 $
 //
 // Definition of the TypeListTest class.
 //
@@ -46,8 +46,7 @@ public:
 	TypeListTest(const std::string& name);
 	~TypeListTest();
 
-	void testTypeListMacro();
-	void testTypeListTemplate();
+	void testTypeList();
 	void setUp();
 	void tearDown();
 

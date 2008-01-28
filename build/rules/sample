@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/rules/sample#2 $
+# $Id: //poco/1.3/build/rules/sample#3 $
 #
 # sample
 #
@@ -86,7 +86,7 @@ OBJPATH_DEBUG_SHARED   = $(OBJPATH)/debug_shared$(OSARCH_POSTFIX)
 #
 # Build Include directory List
 #
-INCLUDE = -I$(INCPATH)
+INCLUDE = -Iinclude -I$(INCPATH)
 
 #
 # Build Library Directory List

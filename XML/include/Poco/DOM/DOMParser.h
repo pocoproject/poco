@@ -1,7 +1,7 @@
 //
 // DOMParser.h
 //
-// $Id: //poco/1.3/XML/include/Poco/DOM/DOMParser.h#1 $
+// $Id: //poco/1.3/XML/include/Poco/DOM/DOMParser.h#2 $
 //
 // Library: XML
 // Package: DOM
@@ -104,6 +104,9 @@ public:
 
 	Document* parseString(const std::string& xml);
 		/// Parse an XML document from a string.
+
+	Document* parseMemory(const char* xml, std::size_t size);
+		/// Parse an XML document from memory.
 
 	EntityResolver* getEntityResolver() const;
 		/// Returns the entity resolver used by the underlying SAXParser.

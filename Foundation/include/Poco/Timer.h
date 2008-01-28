@@ -1,7 +1,7 @@
 //
 // Timer.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Timer.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Timer.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -44,6 +44,7 @@
 #include "Poco/Runnable.h"
 #include "Poco/Mutex.h"
 #include "Poco/Event.h"
+#include "Poco/Thread.h"
 
 
 namespace Poco {
@@ -92,8 +93,22 @@ public:
 		///
 		/// The timer thread is taken from the global default thread pool.
 
+	void start(const AbstractTimerCallback& method, Thread::Priority priority);
+		/// Starts the timer in a thread with the given priority.
+		/// Create the TimerCallback as follows:
+		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
+		///     timer.start(callback);
+		///
+		/// The timer thread is taken from the global default thread pool.
+
 	void start(const AbstractTimerCallback& method, ThreadPool& threadPool);
 		/// Starts the timer.
+		/// Create the TimerCallback as follows:
+		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
+		///     timer.start(callback);
+
+	void start(const AbstractTimerCallback& method, Thread::Priority priority, ThreadPool& threadPool);
+		/// Starts the timer in a thread with the given priority.
 		/// Create the TimerCallback as follows:
 		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
 		///     timer.start(callback);

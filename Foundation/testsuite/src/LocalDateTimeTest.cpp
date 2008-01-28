@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/LocalDateTimeTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/LocalDateTimeTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -38,6 +38,10 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timezone.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
+#include <ctime>
+#include <iostream>
 
 
 using Poco::LocalDateTime;
@@ -68,7 +72,9 @@ void LocalDateTimeTest::testGregorian1()
 	assert (dt.second() == 0);
 	assert (dt.millisecond() == 0);
 	assert (dt.dayOfWeek() == 4);
-	assert (dt.tzd() == Timezone::tzd());
+	// REMOVED: this fails when the current DST offset differs from
+	//          the one on 1970-1-1
+	//assert (dt.tzd() == Timezone::tzd());
 	assert (dt.julianDay() == 2440587.5);
 	
 	dt.assign(2001, 9, 9, 1, 46, 40);
@@ -80,7 +86,7 @@ void LocalDateTimeTest::testGregorian1()
 	assert (dt.second() == 40);
 	assert (dt.millisecond() == 0);
 	assert (dt.dayOfWeek() == 0);
-	assert (dt.tzd() == Timezone::tzd());
+	//assert (dt.tzd() == Timezone::tzd());
 	assertEqualDelta (dt.julianDay(), 2452161.574074, 0.000001);
 }
 
@@ -371,6 +377,93 @@ void LocalDateTimeTest::testSwap()
 }
 
 
+void LocalDateTimeTest::testTimezone()
+{
+	std::time_t   tINCREMENT = (30 * 24 * 60 * 60); // 30 days
+	Timespan      tsINCREMENT(30*Timespan::DAYS);
+	LocalDateTime now;
+	std::time_t   t = std::time(NULL);
+	std::tm       then;
+	bool          foundDST = false;
+
+	then = *std::localtime(&t);
+	if (then.tm_isdst >= 0)
+	{
+		std::string tzNow, tzThen;
+		char tzBuf[12];
+		int iterations = 0;
+		std::strftime(&tzBuf[0], sizeof(tzBuf), "%z", &then);
+		tzNow = tzThen = tzBuf;
+		while (iterations < 14)
+		{
+			// Add one month until the timezone changes or we roll
+			// over 13 months.
+			t += tINCREMENT;
+			then = *std::localtime(&t);
+			std::strftime(&tzBuf[0], sizeof(tzBuf), "%z", &then);
+			tzThen = tzBuf;
+			foundDST = (tzNow == tzThen);
+			if (foundDST)
+			{
+				break;
+			}
+			++iterations;
+		}
+		if (foundDST)
+		{
+			// We found a timezone change that was induced by changing
+			// the month, so we crossed a DST boundary. Now we can
+			// actually do the test...
+			//
+			// Start with the current time and add 30 days for 13
+			// iterations. Do this with both a LocalDateTime object and
+			// a ANSI C time_t. Then create a LocalDateTime based on the
+			// time_t and verify that the time_t calculated value is equal
+			// to the LocalDateTime value. The comparision operator
+			// verifies the _dateTime and _tzd members.
+			LocalDateTime dt2;
+			t = std::time(NULL);
+			for (iterations = 0; iterations < 14; ++iterations)
+			{
+				t += tINCREMENT;
+				dt2 += tsINCREMENT;
+				then = *std::localtime(&t);
+
+				// This is the tricky part. We have to use the constructor
+				// from a UTC DateTime object that is constructed from the
+				// time_t. The LocalDateTime constructor with integer
+				// arguments, LocalDateTime(yr, mon, day, ...), assumes that
+				// the time is already adjusted with respect to the time
+				// zone. The DateTime conversion constructor, however, does
+				// not. So we want to construct from the UTC time.
+				//
+				// The second tricky part is that we want to use the
+				// sub-second information from the LocalDateTime object
+				// since ANSI C time routines are not sub-second accurate.
+				then = *std::gmtime(&t);
+				LocalDateTime calcd(DateTime((then.tm_year + 1900),
+											 (then.tm_mon + 1),
+											 then.tm_mday,
+											 then.tm_hour,
+											 then.tm_min,
+											 then.tm_sec,
+											 dt2.millisecond(),
+											 dt2.microsecond()));
+				assert (dt2 == calcd);
+			}
+		}
+	}
+
+	if (!foundDST)
+	{
+		std::cerr
+			<< __FILE__ << ":" << __LINE__
+			<< " - failed to locate DST boundary, timezone test skipped."
+			<< std::endl;
+	}
+}
+
+
 void LocalDateTimeTest::setUp()
 {
 }
@@ -395,6 +488,7 @@ CppUnit::Test* LocalDateTimeTest::suite()
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testArithmetics1);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testArithmetics2);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testSwap);
+	CppUnit_addTest(pSuite, LocalDateTimeTest, testTimezone);
 
 	return pSuite;
 }

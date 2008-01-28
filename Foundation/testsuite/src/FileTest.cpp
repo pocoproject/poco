@@ -1,7 +1,7 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/FileTest.cpp#3 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FileTest.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -208,6 +208,7 @@ void FileTest::testCreateFile()
 	File f("testfile.dat");
 	bool created = f.createFile();
 	assert (created);
+	assert (!f.isHidden());
 	created = f.createFile();
 	assert (!created);
 }

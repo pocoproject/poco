@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DateTimeParser.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/DateTimeParser.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -154,7 +154,10 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 	}
 	if (month == 0) month = 1;
 	if (day == 0) day = 1;
-	dateTime.assign(year, month, day, hour, minute, second, millis);
+	if (DateTime::isValid(year, month, day, hour, minute, second, millis))
+		dateTime.assign(year, month, day, hour, minute, second, millis);
+	else 
+		throw SyntaxException("date/time component out of range");
 	timeZoneDifferential = tzd;
 }
 

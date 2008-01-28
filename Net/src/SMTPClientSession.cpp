@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#2 $
+// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#3 $
 //
 // Library: Net
 // Package: Mail
@@ -133,10 +133,20 @@ void SMTPClientSession::close()
 void SMTPClientSession::sendMessage(const MailMessage& message)
 {
 	std::string response;
-	std::string sender("<");
-	sender.append(message.getSender());
-	sender.append(">");
-	int status = sendCommand("MAIL FROM:", sender, response);
+	int status = 0;
+	const std::string& fromField = message.getSender();
+	std::string::size_type emailPos = fromField.find('<');
+	if (emailPos == std::string::npos)
+	{
+		std::string sender("<");
+		sender.append(fromField);
+		sender.append(">");
+		status = sendCommand("MAIL FROM:", sender, response);
+	}
+	else
+	{
+		status = sendCommand("MAIL FROM:", fromField.substr(emailPos, fromField.size() - emailPos), response);
+	}
 	if (!isPositiveCompletion(status)) throw SMTPException("Cannot send message", response);
 	for (MailMessage::Recipients::const_iterator it = message.recipients().begin(); it != message.recipients().end(); ++it)
 	{

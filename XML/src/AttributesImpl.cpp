@@ -1,7 +1,7 @@
 //
 // AttributesImpl.cpp
 //
-// $Id: //poco/1.3/XML/src/AttributesImpl.cpp#1 $
+// $Id: //poco/1.3/XML/src/AttributesImpl.cpp#2 $
 //
 // Library: XML
 // Package: SAX
@@ -43,18 +43,23 @@ namespace XML {
 
 AttributesImpl::AttributesImpl()
 {
+	_empty.specified = false;
+	_empty.type = "CDATA";
 }
 
 
 AttributesImpl::AttributesImpl(const Attributes& attributes)
 {
+	_empty.specified = false;
+	_empty.type = "CDATA";
 	setAttributes(attributes);
 }
 
 
-AttributesImpl::AttributesImpl(const AttributesImpl& attributes)
+AttributesImpl::AttributesImpl(const AttributesImpl& attributes):
+	_attributes(attributes._attributes),
+	_empty(attributes._empty)
 {
-	setAttributes(attributes);
 }
 
 
@@ -96,114 +101,6 @@ int AttributesImpl::getIndex(const XMLString& namespaceURI, const XMLString& loc
 		++i;
 	}
 	return -1;
-}
-
-
-int AttributesImpl::getLength() const
-{
-	return (int) _attributes.size();
-}
-
-
-XMLString AttributesImpl::getLocalName(int i) const
-{
-	poco_assert (i < _attributes.size());
-	return _attributes[i].localName;
-}
-
-
-XMLString AttributesImpl::getQName(int i) const
-{
-	poco_assert (i < _attributes.size());
-	return _attributes[i].qname;
-}
-
-
-XMLString AttributesImpl::getType(int i) const
-{
-	poco_assert (i < _attributes.size());
-	return _attributes[i].type;
-}
-
-
-XMLString AttributesImpl::getType(const XMLString& qname) const
-{
-	Attribute* pAttr = find(qname);
-	if (pAttr)
-		return pAttr->type;
-	else
-		return XMLString();
-}
-
-
-XMLString AttributesImpl::getType(const XMLString& namespaceURI, const XMLString& localName) const
-{
-	Attribute* pAttr = find(namespaceURI, localName);
-	if (pAttr)
-		return pAttr->type;
-	else
-		return XMLString();
-}
-
-
-XMLString AttributesImpl::getValue(int i) const
-{
-	poco_assert (i < _attributes.size());
-	return _attributes[i].value;
-}
-
-
-XMLString AttributesImpl::getValue(const XMLString& qname) const
-{
-	Attribute* pAttr = find(qname);
-	if (pAttr)
-		return pAttr->value;
-	else
-		return XMLString();
-}
-
-
-XMLString AttributesImpl::getValue(const XMLString& namespaceURI, const XMLString& localName) const
-{
-	Attribute* pAttr = find(namespaceURI, localName);
-	if (pAttr)
-		return pAttr->value;
-	else
-		return XMLString();
-}
-
-
-XMLString AttributesImpl::getURI(int i) const
-{
-	poco_assert (i < _attributes.size());
-	return _attributes[i].namespaceURI;
-}
-
-
-bool AttributesImpl::isSpecified(int i) const
-{
-	poco_assert (i < _attributes.size());
-	return _attributes[i].specified;
-}
-
-
-bool AttributesImpl::isSpecified(const XMLString& qname) const
-{
-	Attribute* pAttr = find(qname);
-	if (pAttr)
-		return pAttr->specified;
-	else
-		return false;
-}
-
-
-bool AttributesImpl::isSpecified(const XMLString& namespaceURI, const XMLString& localName) const
-{
-	Attribute* pAttr = find(namespaceURI, localName);
-	if (pAttr)
-		return pAttr->specified;
-	else
-		return false;
 }
 
 
@@ -343,6 +240,12 @@ void AttributesImpl::removeAttribute(const XMLString& namespaceURI, const XMLStr
 void AttributesImpl::clear()
 {
 	_attributes.clear();
+}
+
+
+void AttributesImpl::reserve(std::size_t capacity)
+{
+	_attributes.reserve(capacity);
 }
 
 

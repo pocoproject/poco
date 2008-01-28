@@ -1,7 +1,7 @@
 //
 // PatternFormatter.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/PatternFormatter.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/PatternFormatter.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -132,7 +132,11 @@ public:
 protected:
 	static const std::string& getPriorityName(int);
 		/// Returns a string for the given priority value.
-		
+	
+	static void fmt(std::string& str, int value);
+	static void fmt(std::string& str, int value, int width);
+	static void fmt0(std::string& str, int value, int width);
+	
 private:
 	bool        _localTime;
 	std::string _pattern;

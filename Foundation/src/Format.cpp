@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Format.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/Format.cpp#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -160,6 +160,8 @@ namespace
 			str << AnyCast<Int64>(any);
 		else if (any.type() == typeid(UInt64))
 			str << AnyCast<UInt64>(any);
+		else if (any.type() == typeid(bool))
+			str << AnyCast<bool>(any);
 	}
 
 
@@ -176,6 +178,9 @@ namespace
 			prepareFormat(str, type);
 			switch (type)
 			{
+			case 'b':
+				str << AnyCast<bool>(*itVal++);
+				break;
 			case 'c':
 				str << AnyCast<char>(*itVal++);
 				break;

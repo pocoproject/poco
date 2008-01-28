@@ -1,7 +1,7 @@
 //
 // Mutex_WIN32.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Mutex_WIN32.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Mutex_WIN32.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Mutex_WIN32.h"
+#include "Poco/Timestamp.h"
 
 
 namespace Poco {
@@ -51,6 +52,29 @@ MutexImpl::MutexImpl()
 MutexImpl::~MutexImpl()
 {
 	DeleteCriticalSection(&_cs);
+}
+
+
+bool MutexImpl::tryLockImpl(long milliseconds)
+{
+	const int sleepMillis = 5;
+	Timestamp now;
+	Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
+	do
+	{
+		try
+		{
+			if (TryEnterCriticalSection(&_cs) == TRUE)
+				return true;
+		}
+		catch (...)
+		{
+			throw SystemException("cannot lock mutex");
+		}
+		Sleep(sleepMillis);
+	}
+	while (!now.isElapsed(diff));
+	return false;
 }
 
 

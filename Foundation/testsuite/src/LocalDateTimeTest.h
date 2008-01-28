@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/LocalDateTimeTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/LocalDateTimeTest.h#2 $
 //
 // Definition of the LocalDateTimeTest class.
 //
@@ -56,6 +56,7 @@ public:
 	void testArithmetics1();
 	void testArithmetics2();
 	void testSwap();
+	void testTimezone();
 
 	void setUp();
 	void tearDown();

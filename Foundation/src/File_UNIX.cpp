@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -185,6 +185,16 @@ bool FileImpl::isLinkImpl() const
 	else
 		handleLastErrorImpl(_path);
 	return false;
+}
+
+
+bool FileImpl::isHiddenImpl() const
+{
+	poco_assert (!_path.empty());
+	Path p(_path);
+	p.makeFile();
+
+	return p.getFileName()[0] == '.';
 }
 
 

@@ -20,7 +20,7 @@ endif
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML Util Net NetSSL_OpenSSL Data Data/SQLite Data/ODBC
+COMPONENTS = Foundation XML Util Net NetSSL_OpenSSL
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
@@ -39,13 +39,13 @@ install: libexecs
 	done
 	find $(POCO_BUILD)/lib -name "libPoco*" -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec
-.PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests
-.PHONY: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
+.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec
+.PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests
+.PHONY: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples
 
-libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec
-tests: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests
-samples: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
+libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec
+tests: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests
+samples: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples
 
 Foundation-libexec: 
 	$(MAKE) -C $(POCO_BASE)/Foundation
@@ -91,24 +91,3 @@ NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit
 	
 NetSSL_OpenSSL-samples: NetSSL_OpenSSL-libexec 
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples
-
-Data-libexec:  Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/Data
-
-Data-tests: Data-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/testsuite
-	
-Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/samples
-
-Data/SQLite-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite
-
-Data/SQLite-tests: Data/SQLite-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite
-
-Data/ODBC-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC
-
-Data/ODBC-tests: Data/ODBC-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite

@@ -1,7 +1,7 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Debugger.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Debugger.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -47,7 +47,7 @@
 	#include <lib$routines.h>
 	#include <ssdef.h>
 #endif
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
 #endif
 
@@ -85,7 +85,7 @@ void Debugger::message(const std::string& msg)
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 	if (IsDebuggerPresent())
 	{
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		std::wstring umsg;
 		UnicodeConverter::toUTF16(msg, umsg);
 		umsg += '\n';

@@ -1,7 +1,7 @@
 //
 // File.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/File.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/File.h#4 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -129,7 +129,16 @@ public:
 		
 	bool isDirectory() const;
 		/// Returns true iff the file is a directory.
-		
+
+	bool isHidden() const;
+		/// Returns true if the file is hidden.
+		///
+		/// On Windows platforms, the file's hidden
+		/// attribute is set for this to be true.
+		///
+		/// On Unix platforms, the file name must
+		/// begin with a period for this to be true.
+
 	Timestamp created() const;
 		/// Returns the creation date of the file.
 

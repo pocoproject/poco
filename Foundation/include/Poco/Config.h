@@ -1,7 +1,7 @@
 //
 // Config.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Config.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/Config.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -54,6 +54,10 @@
 
 // Define if std::wstring is not available
 // #define POCO_NO_WSTRING
+
+
+// Define to disable shared memory
+// #define POCO_NO_SHAREDMEMORY
 
 
 #endif // Foundation_Config_INCLUDED

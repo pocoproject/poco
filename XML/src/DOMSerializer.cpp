@@ -1,7 +1,7 @@
 //
 // DOMSerializer.cpp
 //
-// $Id: //poco/1.3/XML/src/DOMSerializer.cpp#1 $
+// $Id: //poco/1.3/XML/src/DOMSerializer.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -196,6 +196,12 @@ void DOMSerializer::parse(InputSource* pSource)
 void DOMSerializer::parse(const XMLString& systemId)
 {
 	throw XMLException("The DOMSerializer cannot parse from a system identifier");
+}
+
+
+void DOMSerializer::parseMemoryNP(const char* xml, std::size_t size)
+{
+	throw XMLException("The DOMSerializer cannot parse from memory");
 }
 
 

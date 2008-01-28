@@ -1,7 +1,7 @@
 //
 // DOMParser.cpp
 //
-// $Id: //poco/1.3/XML/src/DOMParser.cpp#1 $
+// $Id: //poco/1.3/XML/src/DOMParser.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -135,9 +135,23 @@ Document* DOMParser::parse(InputSource* pInputSource)
 
 Document* DOMParser::parseString(const std::string& xml)
 {
-	std::istringstream istr(xml);
-	InputSource src(istr);
-	return parse(&src);
+	return parseMemory(xml.data(), xml.size());
+}
+
+
+Document* DOMParser::parseMemory(const char* xml, std::size_t size)
+{
+	if (_whitespace)
+	{
+		DOMBuilder builder(_saxParser, _pNamePool);
+		return builder.parseMemoryNP(xml, size);
+	}
+	else
+	{
+		WhitespaceFilter filter(&_saxParser);
+		DOMBuilder builder(filter, _pNamePool);
+		return builder.parseMemoryNP(xml, size);
+	}
 }
 
 

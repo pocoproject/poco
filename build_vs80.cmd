@@ -45,21 +45,6 @@ cd NetSSL_OpenSSL
 devenv /useenv /rebuild debug_shared NetSSL_OpenSSL_vs80.sln
 devenv /useenv /rebuild release_shared NetSSL_OpenSSL_vs80.sln
 cd %POCOBASE%
-
-cd Data
-devenv /useenv /rebuild debug_shared Data_vs80.sln
-devenv /useenv /rebuild release_shared Data_vs80.sln
-cd %POCOBASE%
-
-cd Data/SQLite
-devenv /useenv /rebuild debug_shared SQLite_vs80.sln
-devenv /useenv /rebuild release_shared SQLite_vs80.sln
-cd %POCOBASE%
-
-cd Data/ODBC
-devenv /useenv /rebuild debug_shared ODBC_vs80.sln
-devenv /useenv /rebuild release_shared ODBC_vs80.sln
-cd %POCOBASE%
 		
 cd Foundation/samples
 devenv /useenv /rebuild debug_shared samples_vs80.sln
@@ -82,11 +67,6 @@ devenv /useenv /rebuild release_shared samples_vs80.sln
 cd %POCOBASE%
 		
 cd NetSSL_OpenSSL/samples
-devenv /useenv /rebuild debug_shared samples_vs80.sln
-devenv /useenv /rebuild release_shared samples_vs80.sln
-cd %POCOBASE%
-		
-cd Data/samples
 devenv /useenv /rebuild debug_shared samples_vs80.sln
 devenv /useenv /rebuild release_shared samples_vs80.sln
 cd %POCOBASE%

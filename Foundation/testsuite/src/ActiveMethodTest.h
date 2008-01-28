@@ -1,7 +1,7 @@
 //
 // ActiveMethodTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ActiveMethodTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ActiveMethodTest.h#2 $
 //
 // Definition of the ActiveMethodTest class.
 //
@@ -47,9 +47,13 @@ public:
 	~ActiveMethodTest();
 
 	void testWait();
+	void testCopy();
 	void testWaitInterval();
 	void testTryWait();
 	void testFailure();
+	void testVoidOut();
+	void testVoidInOut();
+	void testVoidIn();
 
 	void setUp();
 	void tearDown();

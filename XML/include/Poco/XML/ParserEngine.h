@@ -1,7 +1,7 @@
 //
 // ParserEngine.h
 //
-// $Id: //poco/1.3/XML/include/Poco/XML/ParserEngine.h#1 $
+// $Id: //poco/1.3/XML/include/Poco/XML/ParserEngine.h#2 $
 //
 // Library: XML
 // Package: XML
@@ -163,6 +163,9 @@ public:
 	
 	void parse(InputSource* pInputSource);
 		/// Parse an XML document from the given InputSource.
+		
+	void parse(const char* pBuffer, std::size_t size);
+		/// Parses an XML document from the given buffer.
 	
 	// Locator
 	XMLString getPublicId() const;
