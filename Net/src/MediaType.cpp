@@ -1,7 +1,7 @@
 //
 // MediaType.cpp
 //
-// $Id: //poco/Main/Net/src/MediaType.cpp#8 $
+// $Id: //poco/svn/Net/src/MediaType.cpp#2 $
 //
 // Library: Net
 // Package: Messages

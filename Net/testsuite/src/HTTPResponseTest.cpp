@@ -1,7 +1,7 @@
 //
 // HTTPResponseTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/HTTPResponseTest.cpp#7 $
+// $Id: //poco/svn/Net/testsuite/src/HTTPResponseTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

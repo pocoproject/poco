@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Net/samples/HTTPLoadTest/Makefile#1 $
+# $Id: //poco/svn/Net/samples/HTTPLoadTest/Makefile#1 $
 #
 # Makefile for Poco HTTPLoadTest
 #

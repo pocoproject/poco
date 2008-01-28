@@ -1,7 +1,7 @@
 //
 // RawSocketTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/RawSocketTest.h#3 $
+// $Id: //poco/svn/Net/testsuite/src/RawSocketTest.h#2 $
 //
 // Definition of the RawSocketTest class.
 //

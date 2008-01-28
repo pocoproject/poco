@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/Main/Net/src/IPAddress.cpp#17 $
+// $Id: //poco/svn/Net/src/IPAddress.cpp#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -224,7 +224,15 @@ public:
 	static IPv4AddressImpl* parse(const std::string& addr)
 	{
 		if (addr.empty()) return 0;		
-#if defined(_WIN32)
+#if defined(_WIN32) 
+		struct in_addr ia;
+		ia.s_addr = inet_addr(addr.c_str());
+		if (ia.s_addr == INADDR_NONE && addr != "255.255.255.255")
+			return 0;
+		else
+			return new IPv4AddressImpl(&ia);
+#else
+#if __GNUC__ < 3
 		struct in_addr ia;
 		ia.s_addr = inet_addr(addr.c_str());
 		if (ia.s_addr == INADDR_NONE && addr != "255.255.255.255")
@@ -237,6 +245,7 @@ public:
 			return new IPv4AddressImpl(&ia);
 		else
 			return 0;
+#endif
 #endif
 	}
 	
@@ -517,6 +526,7 @@ IPAddress::IPAddress(const std::string& addr, Family family): _pImpl(0)
 		_pImpl = IPv6AddressImpl::parse(addr);
 #endif
 	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	if (!_pImpl) throw InvalidAddressException(addr);
 }
 
 

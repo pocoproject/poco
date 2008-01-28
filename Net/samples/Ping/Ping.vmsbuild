@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/Main/Net/samples/Ping/Ping.vmsbuild#1 $
+# $Id: //poco/svn/Net/samples/Ping/Ping.vmsbuild#1 $
 #
 EXE=Ping
 Ping

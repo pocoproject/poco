@@ -1,7 +1,7 @@
 //
 // ICMPSocketTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/ICMPSocketTest.cpp#4 $
+// $Id: //poco/svn/Net/testsuite/src/ICMPSocketTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

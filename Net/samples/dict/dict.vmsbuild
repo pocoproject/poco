@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/Main/Net/samples/dict/dict.vmsbuild#1 $
+# $Id: //poco/svn/Net/samples/dict/dict.vmsbuild#1 $
 #
 EXE=dict
 dict

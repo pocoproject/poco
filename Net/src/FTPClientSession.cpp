@@ -1,7 +1,7 @@
 //
 // FTPClientSession.cpp
 //
-// $Id: //poco/Main/Net/src/FTPClientSession.cpp#8 $
+// $Id: //poco/svn/Net/src/FTPClientSession.cpp#2 $
 //
 // Library: Net
 // Package: FTP

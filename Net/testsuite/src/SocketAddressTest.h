@@ -1,7 +1,7 @@
 //
 // SocketAddressTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/SocketAddressTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/SocketAddressTest.h#2 $
 //
 // Definition of the SocketAddressTest class.
 //

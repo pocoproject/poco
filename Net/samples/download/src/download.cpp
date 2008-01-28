@@ -1,7 +1,7 @@
 //
 // download.cpp
 //
-// $Id: //poco/Main/Net/samples/download/src/download.cpp#5 $
+// $Id: //poco/svn/Net/samples/download/src/download.cpp#1 $
 //
 // This sample demonstrates the URIStreamOpener class.
 //

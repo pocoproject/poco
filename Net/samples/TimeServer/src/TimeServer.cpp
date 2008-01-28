@@ -1,7 +1,7 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/Main/Net/samples/TimeServer/src/TimeServer.cpp#7 $
+// $Id: //poco/svn/Net/samples/TimeServer/src/TimeServer.cpp#1 $
 //
 // This sample demonstrates the TCPServer and ServerSocket classes.
 //

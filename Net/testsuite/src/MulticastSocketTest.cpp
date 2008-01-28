@@ -1,7 +1,7 @@
 //
 // MulticastSocketTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/MulticastSocketTest.cpp#6 $
+// $Id: //poco/svn/Net/testsuite/src/MulticastSocketTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

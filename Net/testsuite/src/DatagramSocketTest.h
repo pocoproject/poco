@@ -1,7 +1,7 @@
 //
 // DatagramSocketTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/DatagramSocketTest.h#5 $
+// $Id: //poco/svn/Net/testsuite/src/DatagramSocketTest.h#2 $
 //
 // Definition of the DatagramSocketTest class.
 //

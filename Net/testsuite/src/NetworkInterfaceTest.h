@@ -1,7 +1,7 @@
 //
 // NetworkInterfaceTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/NetworkInterfaceTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/NetworkInterfaceTest.h#2 $
 //
 // Definition of the NetworkInterfaceTest class.
 //

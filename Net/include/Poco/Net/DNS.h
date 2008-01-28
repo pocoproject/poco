@@ -1,7 +1,7 @@
 //
 // DNS.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/DNS.h#2 $
+// $Id: //poco/svn/Net/include/Poco/Net/DNS.h#2 $
 //
 // Library: Net
 // Package: NetCore

@@ -1,7 +1,7 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/Main/Net/src/SocketAddress.cpp#13 $
+// $Id: //poco/svn/Net/src/SocketAddress.cpp#2 $
 //
 // Library: Net
 // Package: NetCore

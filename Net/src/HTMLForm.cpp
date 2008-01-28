@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/Main/Net/src/HTMLForm.cpp#17 $
+// $Id: //poco/svn/Net/src/HTMLForm.cpp#3 $
 //
 // Library: Net
 // Package: HTML
@@ -319,9 +319,9 @@ void HTMLForm::writeUrl(std::ostream& ostr)
 	{
 		if (it != begin()) ostr << "&";
 		std::string name;
-		URI::encode(it->first, "=&", name);
+		URI::encode(it->first, "=&+", name);
 		std::string value;
-		URI::encode(it->second, "=&", value);
+		URI::encode(it->second, "=&+", value);
 		ostr << name << "=" << value;
 	}
 }

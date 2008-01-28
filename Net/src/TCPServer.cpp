@@ -1,7 +1,7 @@
 //
 // TCPServer.cpp
 //
-// $Id: //poco/Main/Net/src/TCPServer.cpp#10 $
+// $Id: //poco/svn/Net/src/TCPServer.cpp#3 $
 //
 // Library: Net
 // Package: TCPServer
@@ -54,7 +54,7 @@ TCPServer::TCPServer(TCPServerConnectionFactory* pFactory, const ServerSocket& s
 	_socket(socket),
 	_pDispatcher(new TCPServerDispatcher(pFactory, Poco::ThreadPool::defaultPool(), pParams)),
 	_thread(threadName(socket)),
-	_stopped(false)
+	_stopped(true)
 {
 }
 
@@ -63,7 +63,7 @@ TCPServer::TCPServer(TCPServerConnectionFactory* pFactory, Poco::ThreadPool& thr
 	_socket(socket),
 	_pDispatcher(new TCPServerDispatcher(pFactory, threadPool, pParams)),
 	_thread(threadName(socket)),
-	_stopped(false)
+	_stopped(true)
 {
 }
 
@@ -83,8 +83,9 @@ const TCPServerParams& TCPServer::params() const
 
 void TCPServer::start()
 {
-	poco_assert (!_stopped);
+	poco_assert (_stopped);
 
+	_stopped = false;
 	_thread.start(*this);
 }
 

@@ -1,7 +1,7 @@
 //
 // AsyncSocketChannel.cpp
 //
-// $Id: //poco/Main/Net/src/AsyncSocketChannel.cpp#1 $
+// $Id: //poco/svn/Net/src/AsyncSocketChannel.cpp#2 $
 //
 // Library: Net
 // Package: AsyncIO

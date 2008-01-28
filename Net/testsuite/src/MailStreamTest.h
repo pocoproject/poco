@@ -1,7 +1,7 @@
 //
 // MailStreamTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/MailStreamTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/MailStreamTest.h#2 $
 //
 // Definition of the MailStreamTest class.
 //

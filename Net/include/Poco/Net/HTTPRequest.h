@@ -1,7 +1,7 @@
 //
 // HTTPRequest.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPRequest.h#3 $
+// $Id: //poco/svn/Net/include/Poco/Net/HTTPRequest.h#2 $
 //
 // Library: Net
 // Package: HTTP

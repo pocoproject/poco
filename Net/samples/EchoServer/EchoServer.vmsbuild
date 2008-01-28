@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/Main/Net/samples/EchoServer/EchoServer.vmsbuild#1 $
+# $Id: //poco/svn/Net/samples/EchoServer/EchoServer.vmsbuild#1 $
 #
 EXE=EchoServer
 EchoServer

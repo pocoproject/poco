@@ -1,7 +1,7 @@
 #
 # TestSuite.vmsbuild
 #
-# $Id: //poco/Main/Net/testsuite/TestSuite.vmsbuild#1 $
+# $Id: //poco/svn/Net/testsuite/TestSuite.vmsbuild#1 $
 #
 EXE=TestRunner
 NetTestSuite

@@ -1,7 +1,7 @@
 //
 // UDPEchoServer.h
 //
-// $Id: //poco/Main/Net/testsuite/src/UDPEchoServer.h#6 $
+// $Id: //poco/svn/Net/testsuite/src/UDPEchoServer.h#2 $
 //
 // Definition of the UDPEchoServer class.
 //

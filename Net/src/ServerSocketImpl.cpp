@@ -1,7 +1,7 @@
 //
 // ServerSocketImpl.cpp
 //
-// $Id: //poco/Main/Net/src/ServerSocketImpl.cpp#5 $
+// $Id: //poco/svn/Net/src/ServerSocketImpl.cpp#2 $
 //
 // Library: Net
 // Package: Sockets

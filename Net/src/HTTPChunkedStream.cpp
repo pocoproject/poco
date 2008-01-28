@@ -1,7 +1,7 @@
 //
 // HTTPChunkedStream.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPChunkedStream.cpp#16 $
+// $Id: //poco/svn/Net/src/HTTPChunkedStream.cpp#2 $
 //
 // Library: Net
 // Package: HTTP

@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Net/samples/Mail/Makefile#2 $
+# $Id: //poco/svn/Net/samples/Mail/Makefile#1 $
 #
 # Makefile for Poco Mail
 #

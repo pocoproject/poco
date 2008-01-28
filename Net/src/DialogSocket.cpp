@@ -1,7 +1,7 @@
 //
 // DialogSocket.cpp
 //
-// $Id: //poco/Main/Net/src/DialogSocket.cpp#10 $
+// $Id: //poco/svn/Net/src/DialogSocket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets

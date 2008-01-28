@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Net/samples/Ping/Makefile#2 $
+# $Id: //poco/svn/Net/samples/Ping/Makefile#1 $
 #
 # Makefile for Poco ping
 #

@@ -1,7 +1,7 @@
 //
 // MailMessageTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/MailMessageTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/MailMessageTest.h#2 $
 //
 // Definition of the MailMessageTest class.
 //

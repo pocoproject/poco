@@ -1,7 +1,7 @@
 //
 // SyslogTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/SyslogTest.h#1 $
+// $Id: //poco/svn/Net/testsuite/src/SyslogTest.h#2 $
 //
 // Definition of the SyslogTest class.
 //

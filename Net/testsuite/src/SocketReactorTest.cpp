@@ -1,7 +1,7 @@
 //
 // SocketReactorTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/SocketReactorTest.cpp#9 $
+// $Id: //poco/svn/Net/testsuite/src/SocketReactorTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

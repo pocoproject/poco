@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/Main/Net/samples/httpget/httpget.vmsbuild#1 $
+# $Id: //poco/svn/Net/samples/httpget/httpget.vmsbuild#1 $
 #
 EXE=httpget
 httpget

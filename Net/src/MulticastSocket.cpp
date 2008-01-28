@@ -1,7 +1,7 @@
 //
 // MulticastSocket.cpp
 //
-// $Id: //poco/Main/Net/src/MulticastSocket.cpp#11 $
+// $Id: //poco/svn/Net/src/MulticastSocket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets

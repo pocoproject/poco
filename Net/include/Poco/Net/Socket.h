@@ -1,7 +1,7 @@
 //
 // Socket.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/Socket.h#2 $
+// $Id: //poco/svn/Net/include/Poco/Net/Socket.h#2 $
 //
 // Library: Net
 // Package: Sockets

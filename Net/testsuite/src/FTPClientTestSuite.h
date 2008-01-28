@@ -1,7 +1,7 @@
 //
 // FTPClientTestSuite.h
 //
-// $Id: //poco/Main/Net/testsuite/src/FTPClientTestSuite.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/FTPClientTestSuite.h#2 $
 //
 // Definition of the FTPClientTestSuite class.
 //

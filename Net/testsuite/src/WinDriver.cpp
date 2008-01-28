@@ -1,7 +1,7 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/WinDriver.cpp#4 $
+// $Id: //poco/svn/Net/testsuite/src/WinDriver.cpp#2 $
 //
 // Windows test driver for Poco Net.
 //

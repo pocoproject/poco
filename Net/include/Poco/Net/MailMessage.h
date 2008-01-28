@@ -1,7 +1,7 @@
 //
 // MailMessage.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/MailMessage.h#3 $
+// $Id: //poco/svn/Net/include/Poco/Net/MailMessage.h#3 $
 //
 // Library: Net
 // Package: Mail
@@ -107,6 +107,10 @@ public:
 	void setSender(const std::string& sender);
 		/// Sets the sender of the message (which
 		/// ends up in the From header field).
+		///
+		/// The sender must either be a valid email
+		/// address, or a real name followed by
+		/// an email address enclosed in < and >.
 		
 	const std::string& getSender() const;
 		/// Returns the sender of the message (taken

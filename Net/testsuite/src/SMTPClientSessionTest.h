@@ -1,7 +1,7 @@
 //
 // SMTPClientSessionTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/SMTPClientSessionTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/SMTPClientSessionTest.h#2 $
 //
 // Definition of the SMTPClientSessionTest class.
 //

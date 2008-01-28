@@ -1,7 +1,7 @@
 //
 // dict.cpp
 //
-// $Id: //poco/Main/Net/samples/dict/src/dict.cpp#6 $
+// $Id: //poco/svn/Net/samples/dict/src/dict.cpp#1 $
 //
 // This sample demonstrates the StreamSocket and SocketStream classes.
 //

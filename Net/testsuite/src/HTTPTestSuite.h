@@ -1,7 +1,7 @@
 //
 // HTTPTestSuite.h
 //
-// $Id: //poco/Main/Net/testsuite/src/HTTPTestSuite.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/HTTPTestSuite.h#2 $
 //
 // Definition of the HTTPTestSuite class.
 //

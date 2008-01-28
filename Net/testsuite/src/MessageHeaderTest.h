@@ -1,7 +1,7 @@
 //
 // MessageHeaderTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/MessageHeaderTest.h#6 $
+// $Id: //poco/svn/Net/testsuite/src/MessageHeaderTest.h#2 $
 //
 // Definition of the MessageHeaderTest class.
 //

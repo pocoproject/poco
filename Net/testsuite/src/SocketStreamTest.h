@@ -1,7 +1,7 @@
 //
 // SocketStreamTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/SocketStreamTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/SocketStreamTest.h#2 $
 //
 // Definition of the SocketStreamTest class.
 //

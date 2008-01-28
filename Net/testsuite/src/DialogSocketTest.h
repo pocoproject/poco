@@ -1,7 +1,7 @@
 //
 // DialogSocketTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/DialogSocketTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/DialogSocketTest.h#2 $
 //
 // Definition of the DialogSocketTest class.
 //

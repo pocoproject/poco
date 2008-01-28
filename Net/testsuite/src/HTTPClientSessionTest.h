@@ -1,7 +1,7 @@
 //
 // HTTPClientSessionTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/HTTPClientSessionTest.h#5 $
+// $Id: //poco/svn/Net/testsuite/src/HTTPClientSessionTest.h#2 $
 //
 // Definition of the HTTPClientSessionTest class.
 //

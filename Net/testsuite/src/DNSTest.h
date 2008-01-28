@@ -1,7 +1,7 @@
 //
 // DNSTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/DNSTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/DNSTest.h#2 $
 //
 // Definition of the DNSTest class.
 //

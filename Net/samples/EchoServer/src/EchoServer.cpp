@@ -1,7 +1,7 @@
 //
 // EchoServer.cpp
 //
-// $Id: //poco/Main/Net/samples/EchoServer/src/EchoServer.cpp#7 $
+// $Id: //poco/svn/Net/samples/EchoServer/src/EchoServer.cpp#1 $
 //
 // This sample demonstrates the SocketReactor and SocketAcceptor classes.
 //

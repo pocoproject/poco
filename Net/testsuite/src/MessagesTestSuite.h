@@ -1,7 +1,7 @@
 //
 // MessagesTestSuite.h
 //
-// $Id: //poco/Main/Net/testsuite/src/MessagesTestSuite.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/MessagesTestSuite.h#2 $
 //
 // Definition of the MessagesTestSuite class.
 //

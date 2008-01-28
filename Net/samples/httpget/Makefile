@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Net/samples/httpget/Makefile#2 $
+# $Id: //poco/svn/Net/samples/httpget/Makefile#1 $
 #
 # Makefile for Poco httpget
 #

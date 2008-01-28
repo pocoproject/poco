@@ -1,7 +1,7 @@
 //
 // SocketTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/SocketTest.cpp#8 $
+// $Id: //poco/svn/Net/testsuite/src/SocketTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

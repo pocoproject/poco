@@ -1,7 +1,7 @@
 //
 // HTTPSessionFactory.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPSessionFactory.cpp#11 $
+// $Id: //poco/svn/Net/src/HTTPSessionFactory.cpp#2 $
 //
 // Library: Net
 // Package: HTTPClient

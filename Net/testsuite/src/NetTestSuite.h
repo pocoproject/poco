@@ -1,7 +1,7 @@
 //
 // NetTestSuite.h
 //
-// $Id: //poco/Main/Net/testsuite/src/NetTestSuite.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/NetTestSuite.h#2 $
 //
 // Definition of the NetTestSuite class.
 //

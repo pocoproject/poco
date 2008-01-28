@@ -1,7 +1,7 @@
 //
 // SocketReactor.cpp
 //
-// $Id: //poco/Main/Net/src/SocketReactor.cpp#5 $
+// $Id: //poco/svn/Net/src/SocketReactor.cpp#2 $
 //
 // Library: Net
 // Package: Reactor

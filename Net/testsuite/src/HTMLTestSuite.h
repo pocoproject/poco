@@ -1,7 +1,7 @@
 //
 // HTMLTestSuite.h
 //
-// $Id: //poco/Main/Net/testsuite/src/HTMLTestSuite.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/HTMLTestSuite.h#2 $
 //
 // Definition of the HTMLTestSuite class.
 //

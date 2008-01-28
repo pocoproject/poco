@@ -1,7 +1,7 @@
 //
 // ICMPEventArgs.cpp
 //
-// $Id: //poco/Main/Net/src/ICMPEventArgs.cpp#6 $
+// $Id: //poco/svn/Net/src/ICMPEventArgs.cpp#2 $
 //
 // Library: Net
 // Package: ICMP

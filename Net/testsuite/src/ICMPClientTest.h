@@ -1,7 +1,7 @@
 //
 // ICMPClientTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/ICMPClientTest.h#4 $
+// $Id: //poco/svn/Net/testsuite/src/ICMPClientTest.h#2 $
 //
 // Definition of the ICMPClientTest class.
 //

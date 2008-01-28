@@ -1,7 +1,7 @@
 //
 // SMTPChannel.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/SMTPChannel.h#4 $
+// $Id: //poco/svn/Net/include/Poco/Net/SMTPChannel.h#1 $
 //
 // Library: Net
 // Package: Logging

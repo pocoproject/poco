@@ -1,7 +1,7 @@
 //
 // EchoServer.h
 //
-// $Id: //poco/Main/Net/testsuite/src/EchoServer.h#5 $
+// $Id: //poco/svn/Net/testsuite/src/EchoServer.h#2 $
 //
 // Definition of the EchoServer class.
 //

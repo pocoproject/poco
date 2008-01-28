@@ -1,7 +1,7 @@
 //
 // PartSource.cpp
 //
-// $Id: //poco/Main/Net/src/PartSource.cpp#7 $
+// $Id: //poco/svn/Net/src/PartSource.cpp#2 $
 //
 // Library: Net
 // Package: Messages

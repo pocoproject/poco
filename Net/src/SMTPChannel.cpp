@@ -1,7 +1,7 @@
 //
 // SMTPChannel.cpp
 //
-// $Id: //poco/Main/Net/src/SMTPChannel.cpp#3 $
+// $Id: //poco/svn/Net/src/SMTPChannel.cpp#2 $
 //
 // Library: Net
 // Package: Logging
@@ -153,7 +153,8 @@ void SMTPChannel::log(const Message& msg)
 		session.login();
 		session.sendMessage(message);
 		session.close();
-	} catch(Exception&) 
+	} 
+	catch (Exception&) 
 	{ 
 		if (_throw) throw; 
 	}
@@ -162,29 +163,47 @@ void SMTPChannel::log(const Message& msg)
 	
 void SMTPChannel::setProperty(const std::string& name, const std::string& value)
 {
-	if (name == PROP_MAILHOST) _mailHost = value;
-	else if (name == PROP_SENDER) _sender = value;
-	else  if (name == PROP_RECIPIENT) _recipient = value;
-	else  if (name == PROP_LOCAL) _local = isTrue(value);
-	else  if (name == PROP_ATTACHMENT) _attachment = value;
-	else  if (name == PROP_TYPE) _type = value;
-	else  if (name == PROP_DELETE) _delete = isTrue(value);
-	else  if (name == PROP_THROW) _throw = isTrue(value);
-	else Channel::setProperty(name, value);
+	if (name == PROP_MAILHOST) 
+		_mailHost = value;
+	else if (name == PROP_SENDER) 
+		_sender = value;
+	else if (name == PROP_RECIPIENT) 
+		_recipient = value;
+	else if (name == PROP_LOCAL) 
+		_local = isTrue(value);
+	else if (name == PROP_ATTACHMENT) 
+		_attachment = value;
+	else if (name == PROP_TYPE) 
+		_type = value;
+	else if (name == PROP_DELETE) 
+		_delete = isTrue(value);
+	else if (name == PROP_THROW) 
+		_throw = isTrue(value);
+	else 
+		Channel::setProperty(name, value);
 }
 
 	
 std::string SMTPChannel::getProperty(const std::string& name) const
 {
-	if (name == PROP_MAILHOST) return _mailHost;
-	else if (name == PROP_SENDER) return _sender;
-	else if (name == PROP_RECIPIENT) return _recipient;
-	else if (name == PROP_LOCAL) return _local ? "true" : "false";
-	else if (name == PROP_ATTACHMENT) return _attachment;
-	else if (name == PROP_TYPE) return _type;
-	else if (name == PROP_DELETE) return _delete ? "true" : "false";
-	else if (name == PROP_THROW) return _throw ? "true" : "false";
-	else return Channel::getProperty(name);
+	if (name == PROP_MAILHOST) 
+		return _mailHost;
+	else if (name == PROP_SENDER) 
+		return _sender;
+	else if (name == PROP_RECIPIENT) 
+		return _recipient;
+	else if (name == PROP_LOCAL) 
+		return _local ? "true" : "false";
+	else if (name == PROP_ATTACHMENT) 
+		return _attachment;
+	else if (name == PROP_TYPE) 
+		return _type;
+	else if (name == PROP_DELETE) 
+		return _delete ? "true" : "false";
+	else if (name == PROP_THROW) 
+		return _throw ? "true" : "false";
+	else
+		return Channel::getProperty(name);
 }
 
 

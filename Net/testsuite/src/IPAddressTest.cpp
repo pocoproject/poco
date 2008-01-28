@@ -1,7 +1,7 @@
 //
 // IPAddressTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/IPAddressTest.cpp#6 $
+// $Id: //poco/svn/Net/testsuite/src/IPAddressTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

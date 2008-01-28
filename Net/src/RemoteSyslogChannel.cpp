@@ -1,7 +1,7 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/Main/Net/src/RemoteSyslogChannel.cpp#3 $
+// $Id: //poco/svn/Net/src/RemoteSyslogChannel.cpp#2 $
 //
 // Library: Net
 // Package: Logging

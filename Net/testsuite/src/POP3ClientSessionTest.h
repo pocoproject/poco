@@ -1,7 +1,7 @@
 //
 // POP3ClientSessionTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/POP3ClientSessionTest.h#5 $
+// $Id: //poco/svn/Net/testsuite/src/POP3ClientSessionTest.h#2 $
 //
 // Definition of the POP3ClientSessionTest class.
 //

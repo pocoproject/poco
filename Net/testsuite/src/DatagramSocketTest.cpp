@@ -1,7 +1,7 @@
 //
 // DatagramSocketTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/DatagramSocketTest.cpp#9 $
+// $Id: //poco/svn/Net/testsuite/src/DatagramSocketTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

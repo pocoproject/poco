@@ -1,7 +1,7 @@
 //
 // NameValueCollectionTest.h
 //
-// $Id: //poco/Main/Net/testsuite/src/NameValueCollectionTest.h#5 $
+// $Id: //poco/svn/Net/testsuite/src/NameValueCollectionTest.h#2 $
 //
 // Definition of the NameValueCollectionTest class.
 //

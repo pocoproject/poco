@@ -1,7 +1,7 @@
 //
 // QuotedPrintableDecoder.cpp
 //
-// $Id: //poco/Main/Net/src/QuotedPrintableDecoder.cpp#10 $
+// $Id: //poco/svn/Net/src/QuotedPrintableDecoder.cpp#2 $
 //
 // Library: Net
 // Package: Messages

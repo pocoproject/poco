@@ -1,7 +1,7 @@
 //
 // HTTPCredentialsTest.cpp
 //
-// $Id: //poco/Main/Net/testsuite/src/HTTPCredentialsTest.cpp#5 $
+// $Id: //poco/svn/Net/testsuite/src/HTTPCredentialsTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

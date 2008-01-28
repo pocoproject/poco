@@ -1,7 +1,7 @@
 //
 // StringPartSource.cpp
 //
-// $Id: //poco/Main/Net/src/StringPartSource.cpp#7 $
+// $Id: //poco/svn/Net/src/StringPartSource.cpp#2 $
 //
 // Library: Net
 // Package: Messages

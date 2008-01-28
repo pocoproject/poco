@@ -1,7 +1,7 @@
 //
 // Ping.cpp
 //
-// $Id: //poco/Main/Net/samples/Ping/src/Ping.cpp#6 $
+// $Id: //poco/svn/Net/samples/Ping/src/Ping.cpp#1 $
 //
 // This sample demonstrates the Application class.
 //

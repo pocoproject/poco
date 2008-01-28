@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/Main/Net/src/NetworkInterface.cpp#21 $
+// $Id: //poco/svn/Net/src/NetworkInterface.cpp#2 $
 //
 // Library: Net
 // Package: Sockets

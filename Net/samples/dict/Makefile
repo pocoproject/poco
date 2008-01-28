@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Net/samples/dict/Makefile#2 $
+# $Id: //poco/svn/Net/samples/dict/Makefile#1 $
 #
 # Makefile for Poco dict
 #

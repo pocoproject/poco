@@ -1,7 +1,7 @@
 //
 // RemoteSyslogListener.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/RemoteSyslogListener.h#4 $
+// $Id: //poco/svn/Net/include/Poco/Net/RemoteSyslogListener.h#2 $
 //
 // Library: Net
 // Package: Logging

@@ -1,7 +1,7 @@
 //
 // ICMPClient.cpp
 //
-// $Id: //poco/Main/Net/src/ICMPClient.cpp#5 $
+// $Id: //poco/svn/Net/src/ICMPClient.cpp#2 $
 //
 // Library: Net
 // Package: ICMP
