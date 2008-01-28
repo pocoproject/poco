@@ -1,7 +1,7 @@
 //
 // FilesystemConfigurationTest.h
 //
-// $Id: //poco/Main/Util/testsuite/src/FilesystemConfigurationTest.h#4 $
+// $Id: //poco/svn/Util/testsuite/src/FilesystemConfigurationTest.h#1 $
 //
 // Definition of the FilesystemConfigurationTest class.
 //

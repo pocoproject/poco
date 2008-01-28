@@ -1,7 +1,7 @@
 //
 // LoggingSubsystem.cpp
 //
-// $Id: //poco/Main/Util/src/LoggingSubsystem.cpp#8 $
+// $Id: //poco/svn/Util/src/LoggingSubsystem.cpp#1 $
 //
 // Library: Util
 // Package: Application

@@ -1,7 +1,7 @@
 #
 # Util.vmsbuild
 #
-# $Id: //poco/Main/Util/Util.vmsbuild#2 $
+# $Id: //poco/svn/Util/Util.vmsbuild#1 $
 #
 LIB=PocoUtil
 AbstractConfiguration 

@@ -1,7 +1,7 @@
 //
 // MapConfiguration.cpp
 //
-// $Id: //poco/Main/Util/src/MapConfiguration.cpp#6 $
+// $Id: //poco/svn/Util/src/MapConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration

@@ -1,7 +1,7 @@
 //
 // AbstractConfigurationTest.h
 //
-// $Id: //poco/Main/Util/testsuite/src/AbstractConfigurationTest.h#5 $
+// $Id: //poco/svn/Util/testsuite/src/AbstractConfigurationTest.h#1 $
 //
 // Definition of the AbstractConfigurationTest class.
 //

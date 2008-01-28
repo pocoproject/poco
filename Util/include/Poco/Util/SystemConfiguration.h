@@ -1,7 +1,7 @@
 //
 // SystemConfiguration.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/SystemConfiguration.h#3 $
+// $Id: //poco/svn/Util/include/Poco/Util/SystemConfiguration.h#1 $
 //
 // Library: Util
 // Package: Configuration

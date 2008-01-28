@@ -1,7 +1,7 @@
 //
 // ConfigurationMapperTest.h
 //
-// $Id: //poco/Main/Util/testsuite/src/ConfigurationMapperTest.h#5 $
+// $Id: //poco/svn/Util/testsuite/src/ConfigurationMapperTest.h#1 $
 //
 // Definition of the ConfigurationMapperTest class.
 //

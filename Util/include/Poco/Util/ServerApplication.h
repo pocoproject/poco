@@ -1,7 +1,7 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/ServerApplication.h#5 $
+// $Id: //poco/svn/Util/include/Poco/Util/ServerApplication.h#1 $
 //
 // Library: Util
 // Package: Application
@@ -141,7 +141,7 @@ public:
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
 
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	int run(int argc, wchar_t** argv);
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
@@ -170,7 +170,7 @@ private:
 	};
 	static BOOL __stdcall ConsoleCtrlHandler(DWORD ctrlType);
 	static void __stdcall ServiceControlHandler(DWORD control);
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	static void __stdcall ServiceMain(DWORD argc, LPWSTR* argv);
 #else
 	static void __stdcall ServiceMain(DWORD argc, LPTSTR* argv);

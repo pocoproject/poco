@@ -1,7 +1,7 @@
 //
 // WinRegistryTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/WinRegistryTest.cpp#7 $
+// $Id: //poco/svn/Util/testsuite/src/WinRegistryTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

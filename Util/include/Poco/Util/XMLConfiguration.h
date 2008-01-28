@@ -1,7 +1,7 @@
 //
 // XMLConfiguration.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/XMLConfiguration.h#2 $
+// $Id: //poco/svn/Util/include/Poco/Util/XMLConfiguration.h#1 $
 //
 // Library: Util
 // Package: Configuration

@@ -1,7 +1,7 @@
 //
 // ConfigurationMapperTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/ConfigurationMapperTest.cpp#5 $
+// $Id: //poco/svn/Util/testsuite/src/ConfigurationMapperTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

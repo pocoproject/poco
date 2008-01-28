@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/Main/Util/src/Application.cpp#28 $
+// $Id: //poco/svn/Util/src/Application.cpp#1 $
 //
 // Library: Util
 // Package: Application
@@ -58,7 +58,7 @@
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/SignalHandler.h"
 #endif
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
 #endif
 
@@ -156,7 +156,7 @@ void Application::init(int argc, char* argv[])
 }
 
 
-#if defined(POCO_WIN32_UTF8)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 void Application::init(int argc, wchar_t* argv[])
 {
 	std::vector<std::string> args;
@@ -398,7 +398,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 			appPath = Path(Path::current(), _command);
 	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-	#if defined(POCO_WIN32_UTF8)
+	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		wchar_t path[1024];
 		int n = GetModuleFileNameW(0, path, sizeof(path)/sizeof(wchar_t));
 		if (n > 0)

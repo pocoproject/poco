@@ -1,7 +1,7 @@
 //
 // IniFileConfiguration.cpp
 //
-// $Id: //poco/Main/Util/src/IniFileConfiguration.cpp#9 $
+// $Id: //poco/svn/Util/src/IniFileConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration

@@ -1,7 +1,7 @@
 //
 // ConfigurationMapper.cpp
 //
-// $Id: //poco/Main/Util/src/ConfigurationMapper.cpp#6 $
+// $Id: //poco/svn/Util/src/ConfigurationMapper.cpp#1 $
 //
 // Library: Util
 // Package: Configuration

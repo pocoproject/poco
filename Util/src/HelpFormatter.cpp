@@ -1,7 +1,7 @@
 //
 // HelpFormatter.cpp
 //
-// $Id: //poco/Main/Util/src/HelpFormatter.cpp#8 $
+// $Id: //poco/svn/Util/src/HelpFormatter.cpp#1 $
 //
 // Library: Util
 // Package: Options

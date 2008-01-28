@@ -1,7 +1,7 @@
 //
 // ConfigurationTestSuite.h
 //
-// $Id: //poco/Main/Util/testsuite/src/ConfigurationTestSuite.h#4 $
+// $Id: //poco/svn/Util/testsuite/src/ConfigurationTestSuite.h#1 $
 //
 // Definition of the ConfigurationTestSuite class.
 //

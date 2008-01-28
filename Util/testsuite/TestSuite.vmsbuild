@@ -1,7 +1,7 @@
 #
 # TestSuite.vmsbuild
 #
-# $Id: //poco/Main/Util/testsuite/TestSuite.vmsbuild#3 $
+# $Id: //poco/svn/Util/testsuite/TestSuite.vmsbuild#1 $
 #
 EXE=TestRunner
 AbstractConfigurationTest 

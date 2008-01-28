@@ -1,7 +1,7 @@
 //
 // WindowsTestSuite.h
 //
-// $Id: //poco/Main/Util/testsuite/src/WindowsTestSuite.h#4 $
+// $Id: //poco/svn/Util/testsuite/src/WindowsTestSuite.h#1 $
 //
 // Definition of the WindowsTestSuite class.
 //

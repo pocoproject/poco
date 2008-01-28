@@ -1,7 +1,7 @@
 //
 // WinRegistryConfiguration.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/WinRegistryConfiguration.h#2 $
+// $Id: //poco/svn/Util/include/Poco/Util/WinRegistryConfiguration.h#1 $
 //
 // Library: Util
 // Package: Windows

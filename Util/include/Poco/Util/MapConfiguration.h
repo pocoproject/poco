@@ -1,7 +1,7 @@
 //
 // MapConfiguration.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/MapConfiguration.h#2 $
+// $Id: //poco/svn/Util/include/Poco/Util/MapConfiguration.h#1 $
 //
 // Library: Util
 // Package: Configuration

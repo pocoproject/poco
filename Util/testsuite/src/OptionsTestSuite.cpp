@@ -1,7 +1,7 @@
 //
 // OptionsTestSuite.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/OptionsTestSuite.cpp#5 $
+// $Id: //poco/svn/Util/testsuite/src/OptionsTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

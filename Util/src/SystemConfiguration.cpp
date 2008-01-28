@@ -1,7 +1,7 @@
 //
 // SystemConfiguration.cpp
 //
-// $Id: //poco/Main/Util/src/SystemConfiguration.cpp#6 $
+// $Id: //poco/svn/Util/src/SystemConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration

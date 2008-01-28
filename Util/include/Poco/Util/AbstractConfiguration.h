@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/AbstractConfiguration.h#2 $
+// $Id: //poco/svn/Util/include/Poco/Util/AbstractConfiguration.h#1 $
 //
 // Library: Util
 // Package: Configuration

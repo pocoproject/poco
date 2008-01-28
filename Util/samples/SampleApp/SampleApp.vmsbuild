@@ -1,7 +1,7 @@
 #
 # sample.vmsbuild
 #
-# $Id: //poco/Main/Util/samples/SampleApp/SampleApp.vmsbuild#2 $
+# $Id: //poco/svn/Util/samples/SampleApp/SampleApp.vmsbuild#1 $
 #
 EXE=SampleApp
 SampleApp

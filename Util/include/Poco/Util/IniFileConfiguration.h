@@ -1,7 +1,7 @@
 //
 // IniFileConfiguration.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/IniFileConfiguration.h#2 $
+// $Id: //poco/svn/Util/include/Poco/Util/IniFileConfiguration.h#1 $
 //
 // Library: Util
 // Package: Configuration

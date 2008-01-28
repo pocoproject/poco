@@ -1,7 +1,7 @@
 //
 // WindowsTestSuite.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/WindowsTestSuite.cpp#5 $
+// $Id: //poco/svn/Util/testsuite/src/WindowsTestSuite.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

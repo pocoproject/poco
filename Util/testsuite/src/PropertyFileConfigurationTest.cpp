@@ -1,7 +1,7 @@
 //
 // PropertyFileConfigurationTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/PropertyFileConfigurationTest.cpp#5 $
+// $Id: //poco/svn/Util/testsuite/src/PropertyFileConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

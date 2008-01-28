@@ -1,7 +1,7 @@
 //
 // LoggingConfiguratorTest.h
 //
-// $Id: //poco/Main/Util/testsuite/src/LoggingConfiguratorTest.h#4 $
+// $Id: //poco/svn/Util/testsuite/src/LoggingConfiguratorTest.h#1 $
 //
 // Definition of the LoggingConfiguratorTest class.
 //

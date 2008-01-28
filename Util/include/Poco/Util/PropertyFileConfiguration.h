@@ -1,7 +1,7 @@
 //
 // PropertyFileConfiguration.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/PropertyFileConfiguration.h#2 $
+// $Id: //poco/svn/Util/include/Poco/Util/PropertyFileConfiguration.h#1 $
 //
 // Library: Util
 // Package: Configuration

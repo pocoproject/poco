@@ -1,7 +1,7 @@
 //
 // ConfigurationViewTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/ConfigurationViewTest.cpp#6 $
+// $Id: //poco/svn/Util/testsuite/src/ConfigurationViewTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

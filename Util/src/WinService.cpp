@@ -1,7 +1,7 @@
 //
 // WinService.cpp
 //
-// $Id: //poco/Main/Util/src/WinService.cpp#10 $
+// $Id: //poco/svn/Util/src/WinService.cpp#1 $
 //
 // Library: Util
 // Package: Windows

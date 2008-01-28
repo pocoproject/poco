@@ -1,7 +1,7 @@
 //
 // SystemConfigurationTest.cpp
 //
-// $Id: //poco/Main/Util/testsuite/src/SystemConfigurationTest.cpp#5 $
+// $Id: //poco/svn/Util/testsuite/src/SystemConfigurationTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

@@ -1,7 +1,7 @@
 //
 // Option.cpp
 //
-// $Id: //poco/Main/Util/src/Option.cpp#10 $
+// $Id: //poco/svn/Util/src/Option.cpp#2 $
 //
 // Library: Util
 // Package: Options
@@ -107,14 +107,14 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 }
 
 
-Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argOptional):
+Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argRequired):
 	_shortName(shortName),
 	_fullName(fullName),
 	_description(description),
 	_required(required),
 	_repeatable(false),
 	_argName(argName),
-	_argRequired(argOptional),
+	_argRequired(argRequired),
 	_pValidator(0),
 	_pCallback(0),
 	_pConfig(0)
@@ -243,7 +243,6 @@ Option& Option::validator(Validator* pValidator)
 {
 	if (_pValidator) _pValidator->release();
 	_pValidator = pValidator;
-	if (_pValidator) _pValidator->duplicate();
 	return *this;
 }
 

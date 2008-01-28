@@ -1,7 +1,7 @@
 //
 // Subsystem.cpp
 //
-// $Id: //poco/Main/Util/src/Subsystem.cpp#8 $
+// $Id: //poco/svn/Util/src/Subsystem.cpp#1 $
 //
 // Library: Util
 // Package: Application

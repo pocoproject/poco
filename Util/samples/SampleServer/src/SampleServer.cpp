@@ -1,7 +1,7 @@
 //
 // SampleServer.cpp
 //
-// $Id: //poco/Main/Util/samples/SampleServer/src/SampleServer.cpp#9 $
+// $Id: //poco/svn/Util/samples/SampleServer/src/SampleServer.cpp#1 $
 //
 // This sample demonstrates the ServerApplication class.
 //

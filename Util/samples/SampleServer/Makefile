@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Util/samples/SampleServer/Makefile#3 $
+# $Id: //poco/svn/Util/samples/SampleServer/Makefile#1 $
 #
 # Makefile for Poco SampleServer
 #

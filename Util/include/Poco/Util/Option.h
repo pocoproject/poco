@@ -1,7 +1,7 @@
 //
 // Option.h
 //
-// $Id: //poco/Main/Util/include/Poco/Util/Option.h#5 $
+// $Id: //poco/svn/Util/include/Poco/Util/Option.h#2 $
 //
 // Library: Util
 // Package: Options
@@ -104,7 +104,7 @@ public:
 	Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required = false);
 		/// Creates an option with the given properties.
 
-	Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argOptional = false);
+	Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argRequired = false);
 		/// Creates an option with the given properties.
 
 	~Option();
