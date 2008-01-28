@@ -65,6 +65,7 @@ protected:
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
 	bool isLinkImpl() const;
+	bool isHiddenImpl() const;
 	Timestamp createdImpl() const;
 	Timestamp getLastModifiedImpl() const;
 	void setLastModifiedImpl(const Timestamp& ts);

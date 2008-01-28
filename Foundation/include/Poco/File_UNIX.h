@@ -63,6 +63,7 @@ protected:
 	bool canExecuteImpl() const;
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
+	bool isHiddenImpl() const;
 	bool isLinkImpl() const;
 	Timestamp createdImpl() const;
 	Timestamp getLastModifiedImpl() const;
