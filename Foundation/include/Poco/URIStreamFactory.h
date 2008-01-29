@@ -1,7 +1,7 @@
 //
 // URIStreamFactory.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/URIStreamFactory.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/URIStreamFactory.h#3 $
 //
 // Library: Foundation
 // Package: URI
@@ -66,6 +66,9 @@ public:
 		///
 		/// If the stream cannot be opened for whatever reason,
 		/// an appropriate IOException must be thrown.
+		///
+		/// If opening the stream results in a redirect, a
+		/// URIRedirection exception should be thrown.
 
 protected:
 	virtual ~URIStreamFactory();
@@ -77,6 +80,37 @@ private:
 	
 	friend class URIStreamOpener;
 };
+
+
+class Foundation_API URIRedirection
+	/// An instance of URIRedirection is thrown by a URIStreamFactory::open()
+	/// if opening the original URI resulted in a redirection response
+	/// (such as a MOVED PERMANENTLY in HTTP).
+{
+public:
+	URIRedirection(const std::string& uri);
+	URIRedirection(const URIRedirection& redir);
+	
+	URIRedirection& operator = (const URIRedirection& redir);
+	void swap(URIRedirection& redir);
+	
+	const std::string& uri() const;
+		/// Returns the new URI.
+	
+private:
+	URIRedirection();
+	
+	std::string _uri;
+};
+
+
+//
+// inlines
+//
+inline const std::string& URIRedirection::uri() const
+{
+	return _uri;
+}
 
 
 } // namespace Poco

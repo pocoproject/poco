@@ -1,7 +1,7 @@
 //
 // XMLReader.h
 //
-// $Id: //poco/svn/XML/include/Poco/SAX/XMLReader.h#2 $
+// $Id: //poco/svn/XML/include/Poco/SAX/XMLReader.h#3 $
 //
 // Library: XML
 // Package: SAX
@@ -198,6 +198,10 @@ public:
 
 	virtual void parse(const XMLString& systemId) = 0;
 		/// Parse an XML document from a system identifier.
+		/// See also parse(InputSource*).
+		
+	virtual void parseMemoryNP(const char* xml, std::size_t size) = 0;
+		/// Parse an XML document from memory.
 		/// See also parse(InputSource*).
 
 	// SAX Features

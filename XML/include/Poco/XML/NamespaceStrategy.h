@@ -1,7 +1,7 @@
 //
 // NamespaceStrategy.h
 //
-// $Id: //poco/svn/XML/include/Poco/XML/NamespaceStrategy.h#2 $
+// $Id: //poco/svn/XML/include/Poco/XML/NamespaceStrategy.h#3 $
 //
 // Library: XML
 // Package: XML
@@ -43,6 +43,7 @@
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
 #include "Poco/SAX/NamespaceSupport.h"
+#include "Poco/SAX/AttributesImpl.h"
 
 
 namespace Poco {
@@ -73,8 +74,6 @@ protected:
 	static void splitName(const XMLChar* qname, XMLString& uri, XMLString& localName, XMLString& prefix);
 
 	static const XMLString NOTHING;
-	static const XMLString CDATA;
-	static const XMLString COLON;
 };
 
 
@@ -88,6 +87,10 @@ public:
 	
 	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
 	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+	
+private:
+	XMLString _name;
+	AttributesImpl _attrs;
 };
 
 
@@ -101,6 +104,11 @@ public:
 	
 	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
 	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+
+private:
+	XMLString _uri;
+	XMLString _local;
+	AttributesImpl _attrs;
 };
 
 
@@ -114,6 +122,12 @@ public:
 	
 	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
 	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+	
+private:
+	XMLString _uri;
+	XMLString _local;
+	XMLString _qname;
+	AttributesImpl _attrs;
 };
 
 

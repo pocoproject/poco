@@ -1,7 +1,7 @@
 //
 // AttributesImpl.h
 //
-// $Id: //poco/svn/XML/include/Poco/SAX/AttributesImpl.h#2 $
+// $Id: //poco/svn/XML/include/Poco/SAX/AttributesImpl.h#3 $
 //
 // Library: XML
 // Package: SAX
@@ -58,6 +58,18 @@ class XML_API AttributesImpl: public Attributes
 	///     2. to construct or modify an Attributes object in a SAX2 driver or filter.
 {
 public:
+	struct Attribute
+	{
+		XMLString localName;
+		XMLString namespaceURI;
+		XMLString qname;
+		XMLString value;
+		XMLString type;
+		bool      specified;
+	};
+	typedef std::vector<Attribute> AttributeVec;
+	typedef AttributeVec::const_iterator iterator;
+
 	AttributesImpl();
 		/// Creates the AttributesImpl.
 		
@@ -76,15 +88,15 @@ public:
 	int getIndex(const XMLString& name) const;
 	int getIndex(const XMLString& namespaceURI, const XMLString& localName) const;
 	int getLength() const;
-	XMLString getLocalName(int i) const;
-	XMLString getQName(int i) const;
-	XMLString getType(int i) const;
-	XMLString getType(const XMLString& qname) const;
-	XMLString getType(const XMLString& namespaceURI, const XMLString& localName) const;
-	XMLString getValue(int i) const;
-	XMLString getValue(const XMLString& qname) const;
-	XMLString getValue(const XMLString& namespaceURI, const XMLString& localName) const;
-	XMLString getURI(int i) const;
+	const XMLString& getLocalName(int i) const;
+	const XMLString& getQName(int i) const;
+	const XMLString& getType(int i) const;
+	const XMLString& getType(const XMLString& qname) const;
+	const XMLString& getType(const XMLString& namespaceURI, const XMLString& localName) const;
+	const XMLString& getValue(int i) const;
+	const XMLString& getValue(const XMLString& qname) const;
+	const XMLString& getValue(const XMLString& namespaceURI, const XMLString& localName) const;
+	const XMLString& getURI(int i) const;
 
 	bool isSpecified(int i) const;
 		/// Returns true unless the attribute value was provided by DTD defaulting.
@@ -122,6 +134,11 @@ public:
 	void addAttribute(const XMLChar* namespaceURI, const XMLChar* localName, const XMLChar* qname, const XMLChar* type, const XMLChar* value, bool specified);
 		/// Adds an attribute to the end of the list.
 
+	Attribute& addAttribute();
+		/// Add an (empty) attribute to the end of the list.
+		/// For internal use only.
+		/// The returned Attribute element must be filled by the caller.
+
 	void removeAttribute(int i);
 		/// Removes an attribute.
 
@@ -133,6 +150,9 @@ public:
 
 	void clear();
 		/// Removes all attributes.
+		
+	void reserve(std::size_t capacity);
+		/// Reserves capacity in the internal vector.
 
 	void setLocalName(int i, const XMLString& localName);
 		/// Sets the local name of an attribute.
@@ -146,18 +166,6 @@ public:
 	void setURI(int i, const XMLString& namespaceURI);
 		/// Sets the namespace URI of an attribute.
 
-	struct Attribute
-	{
-		XMLString localName;
-		XMLString namespaceURI;
-		XMLString qname;
-		XMLString value;
-		XMLString type;
-		bool      specified;
-	};
-	typedef std::vector<Attribute> AttributeVec;
-	typedef AttributeVec::const_iterator iterator;
-
 	iterator begin() const;
 		/// Iterator support.
 		
@@ -170,6 +178,7 @@ protected:
 
 private:
 	AttributeVec _attributes;
+	Attribute _empty;
 };
 
 
@@ -185,6 +194,121 @@ inline AttributesImpl::iterator AttributesImpl::begin() const
 inline AttributesImpl::iterator AttributesImpl::end() const
 {
 	return _attributes.end();
+}
+
+
+inline AttributesImpl::Attribute& AttributesImpl::addAttribute()
+{
+	_attributes.push_back(_empty);
+	return _attributes.back();
+}
+
+
+inline int AttributesImpl::getLength() const
+{
+	return (int) _attributes.size();
+}
+
+
+inline const XMLString& AttributesImpl::getLocalName(int i) const
+{
+	poco_assert (i < _attributes.size());
+	return _attributes[i].localName;
+}
+
+
+inline const XMLString& AttributesImpl::getQName(int i) const
+{
+	poco_assert (i < _attributes.size());
+	return _attributes[i].qname;
+}
+
+
+inline const XMLString& AttributesImpl::getType(int i) const
+{
+	poco_assert (i < _attributes.size());
+	return _attributes[i].type;
+}
+
+
+inline const XMLString& AttributesImpl::getType(const XMLString& qname) const
+{
+	Attribute* pAttr = find(qname);
+	if (pAttr)
+		return pAttr->type;
+	else
+		return _empty.type;
+}
+
+
+inline const XMLString& AttributesImpl::getType(const XMLString& namespaceURI, const XMLString& localName) const
+{
+	Attribute* pAttr = find(namespaceURI, localName);
+	if (pAttr)
+		return pAttr->type;
+	else
+		return _empty.type;
+}
+
+
+inline const XMLString& AttributesImpl::getValue(int i) const
+{
+	poco_assert (i < _attributes.size());
+	return _attributes[i].value;
+}
+
+
+inline const XMLString& AttributesImpl::getValue(const XMLString& qname) const
+{
+	Attribute* pAttr = find(qname);
+	if (pAttr)
+		return pAttr->value;
+	else
+		return _empty.value;
+}
+
+
+inline const XMLString& AttributesImpl::getValue(const XMLString& namespaceURI, const XMLString& localName) const
+{
+	Attribute* pAttr = find(namespaceURI, localName);
+	if (pAttr)
+		return pAttr->value;
+	else
+		return _empty.value;
+}
+
+
+inline const XMLString& AttributesImpl::getURI(int i) const
+{
+	poco_assert (i < _attributes.size());
+	return _attributes[i].namespaceURI;
+}
+
+
+inline bool AttributesImpl::isSpecified(int i) const
+{
+	poco_assert (i < _attributes.size());
+	return _attributes[i].specified;
+}
+
+
+inline bool AttributesImpl::isSpecified(const XMLString& qname) const
+{
+	Attribute* pAttr = find(qname);
+	if (pAttr)
+		return pAttr->specified;
+	else
+		return false;
+}
+
+
+inline bool AttributesImpl::isSpecified(const XMLString& namespaceURI, const XMLString& localName) const
+{
+	Attribute* pAttr = find(namespaceURI, localName);
+	if (pAttr)
+		return pAttr->specified;
+	else
+		return false;
 }
 
 

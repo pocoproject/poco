@@ -1,7 +1,7 @@
 //
 // ExpireCacheTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/ExpireCacheTest.cpp#2 $
+// $Id: //poco/svn/Foundation/testsuite/src/ExpireCacheTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -196,6 +196,19 @@ void ExpireCacheTest::testAccessExpireN()
 	assert (!aCache.has(3));
 }
 
+
+void ExpireCacheTest::testExpireWithHas()
+{
+	// 3-1 represents the cache sorted by age, elements get replaced at the end of the list
+	// 3-1|5 -> 5 gets removed
+	ExpireCache<int, int> aCache(DURSLEEP);
+	aCache.add(1, 2); // 1
+	assert (aCache.has(1));
+	Thread::sleep(DURWAIT);
+	assert (!aCache.has(1));
+}
+
+
 void ExpireCacheTest::setUp()
 {
 }
@@ -215,6 +228,7 @@ CppUnit::Test* ExpireCacheTest::suite()
 	CppUnit_addTest(pSuite, ExpireCacheTest, testExpireN);
 	CppUnit_addTest(pSuite, ExpireCacheTest, testDuplicateAdd);
 	CppUnit_addTest(pSuite, ExpireCacheTest, testAccessExpireN);
+	CppUnit_addTest(pSuite, ExpireCacheTest, testExpireWithHas);
 
 	return pSuite;
 }

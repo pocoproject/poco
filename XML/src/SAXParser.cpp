@@ -1,7 +1,7 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/svn/XML/src/SAXParser.cpp#2 $
+// $Id: //poco/svn/XML/src/SAXParser.cpp#3 $
 //
 // Library: XML
 // Package: SAX
@@ -228,9 +228,14 @@ void SAXParser::parse(const XMLString& systemId)
 
 void SAXParser::parseString(const std::string& xml)
 {
-	std::istringstream istr(xml);
-	InputSource src(istr);
-	parse(&src);
+	parseMemoryNP(xml.data(), xml.size());
+}
+
+
+void SAXParser::parseMemoryNP(const char* xml, std::size_t size)
+{
+	setupParse();
+	_engine.parse(xml, size);
 }
 
 

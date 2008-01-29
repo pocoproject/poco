@@ -1,7 +1,7 @@
 //
 // UniqueExpireStrategy.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/UniqueExpireStrategy.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/UniqueExpireStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Cache
@@ -130,6 +130,8 @@ public:
 				args.invalidate();
 			}
 		}
+		else //not found: probably removed by onReplace
+			args.invalidate();
 	}
 
 	void onReplace(const void*, std::set<TKey>& elemsToRemove)

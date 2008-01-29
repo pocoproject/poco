@@ -1,7 +1,7 @@
 //
 // Attributes.h
 //
-// $Id: //poco/svn/XML/include/Poco/SAX/Attributes.h#2 $
+// $Id: //poco/svn/XML/include/Poco/SAX/Attributes.h#3 $
 //
 // Library: XML
 // Package: SAX
@@ -83,13 +83,13 @@ public:
 		///
 		/// Once you know the number of attributes, you can iterate through the list.
 		
-	virtual XMLString getLocalName(int i) const = 0;
+	virtual const XMLString& getLocalName(int i) const = 0;
 		/// Look up a local attribute name by index.
 
-	virtual XMLString getQName(int i) const = 0;
+	virtual const XMLString& getQName(int i) const = 0;
 		/// Look up a qualified attribute name by index.
 
-	virtual XMLString getType(int i) const = 0;
+	virtual const XMLString& getType(int i) const = 0;
 		/// Look up an attribute type by index.
 		///
 		/// The attribute type is one of the strings "CDATA", "ID", "IDREF", "IDREFS", "NMTOKEN", 
@@ -102,33 +102,33 @@ public:
 		/// For an enumerated attribute that is not a notation, the parser will report the type 
 		/// as "NMTOKEN".
 
-	virtual XMLString getType(const XMLString& qname) const = 0;
+	virtual const XMLString& getType(const XMLString& qname) const = 0;
 		/// Look up an attribute type by a qualified name.
 		///
 		/// See getType(int) for a description of the possible types.
 
-	virtual XMLString getType(const XMLString& namespaceURI, const XMLString& localName) const = 0;
+	virtual const XMLString& getType(const XMLString& namespaceURI, const XMLString& localName) const = 0;
 		/// Look up an attribute type by a namespace name.
 		///
 		/// See getType(int) for a description of the possible types.
 
-	virtual XMLString getValue(int i) const = 0;
+	virtual const XMLString& getValue(int i) const = 0;
 		/// Look up an attribute value by index.
 		///
 		/// If the attribute value is a list of tokens (IDREFS, ENTITIES, or NMTOKENS), the tokens 
 		/// will be concatenated into a single string with each token separated by a single space.
 
-	virtual XMLString getValue(const XMLString& qname) const = 0;
+	virtual const XMLString& getValue(const XMLString& qname) const = 0;
 		/// Look up an attribute value by a qualified name.
 		///
 		/// See getValue(int) for a description of the possible values.
 
-	virtual XMLString getValue(const XMLString& uri, const XMLString& localName) const = 0;
+	virtual const XMLString& getValue(const XMLString& uri, const XMLString& localName) const = 0;
 		/// Look up an attribute value by a namespace name.
 		///
 		/// See getValue(int) for a description of the possible values.
 
-	virtual XMLString getURI(int i) const = 0;
+	virtual const XMLString& getURI(int i) const = 0;
 		/// Look up a namespace URI by index.
 
 protected:

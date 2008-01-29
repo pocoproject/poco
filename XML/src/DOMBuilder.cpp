@@ -1,7 +1,7 @@
 //
 // DOMBuilder.cpp
 //
-// $Id: //poco/svn/XML/src/DOMBuilder.cpp#2 $
+// $Id: //poco/svn/XML/src/DOMBuilder.cpp#3 $
 //
 // Library: XML
 // Package: DOM
@@ -126,6 +126,28 @@ Document* DOMBuilder::parse(InputSource* pInputSource)
 }
 
 
+Document* DOMBuilder::parseMemoryNP(const char* xml, std::size_t size)
+{
+	setupParse();
+	_pDocument->suspendEvents();
+	try
+	{
+		_xmlReader.parseMemoryNP(xml, size);
+	}
+	catch (...)
+	{
+		_pDocument->release();
+		_pDocument = 0;
+		_pParent   = 0;
+		_pPrevious = 0;
+		throw;
+	}
+	_pDocument->resumeEvents();
+	_pDocument->collectGarbage();
+	return _pDocument;
+}
+
+
 void DOMBuilder::setupParse()
 {
 	_pDocument  = new Document(_pNamePool);
@@ -191,13 +213,11 @@ void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, 
 	AutoPtr<Element> pElem = _namespaces ? _pDocument->createElementNS(uri, qname.empty() ? localName : qname) : _pDocument->createElement(qname);
 
 	const AttributesImpl& attrs = dynamic_cast<const AttributesImpl&>(attributes);
+	Attr* pPrevAttr = 0;
 	for (AttributesImpl::iterator it = attrs.begin(); it != attrs.end(); ++it)
 	{
 		AutoPtr<Attr> pAttr = new Attr(_pDocument, 0, it->namespaceURI, it->localName, it->qname, it->value, it->specified);
-		if (_namespaces) 
-			pElem->setAttributeNodeNS(pAttr);
-		else
-			pElem->setAttributeNode(pAttr);
+		pPrevAttr = pElem->addAttributeNodeNP(pPrevAttr, pAttr);
 	}
 	appendNode(pElem);
 	_pParent = pElem;

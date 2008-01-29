@@ -1,7 +1,7 @@
 //
 // Element.cpp
 //
-// $Id: //poco/svn/XML/src/Element.cpp#2 $
+// $Id: //poco/svn/XML/src/Element.cpp#3 $
 //
 // Library: XML
 // Package: DOM
@@ -170,6 +170,27 @@ Attr* Element::removeAttributeNode(Attr* oldAttr)
 	oldAttr->autoRelease();
 
 	return oldAttr;
+}
+
+
+Attr* Element::addAttributeNodeNP(Attr* oldAttr, Attr* newAttr)
+{
+	newAttr->_pParent = this;
+	if (oldAttr)
+	{
+		oldAttr->_pNext = newAttr;
+	}
+	else if (_pFirstAttr)
+	{
+		newAttr->_pNext = _pFirstAttr;
+		_pFirstAttr = newAttr;
+	}
+	else
+	{
+		_pFirstAttr = newAttr;
+	}
+	newAttr->duplicate();
+	return newAttr;
 }
 
 

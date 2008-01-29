@@ -1,7 +1,7 @@
 //
 // XMLFilterImpl.cpp
 //
-// $Id: //poco/svn/XML/src/XMLFilterImpl.cpp#2 $
+// $Id: //poco/svn/XML/src/XMLFilterImpl.cpp#3 $
 //
 // Library: XML
 // Package: SAX
@@ -183,6 +183,13 @@ void XMLFilterImpl::parse(const XMLString& systemId)
 {
 	setupParse();
 	_pParent->parse(systemId);
+}
+
+
+void XMLFilterImpl::parseMemoryNP(const char* xml, std::size_t size)
+{
+	setupParse();
+	_pParent->parseMemoryNP(xml, size);
 }
 
 

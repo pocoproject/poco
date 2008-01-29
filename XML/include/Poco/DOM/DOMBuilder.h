@@ -1,7 +1,7 @@
 //
 // DOMBuilder.h
 //
-// $Id: //poco/svn/XML/include/Poco/DOM/DOMBuilder.h#2 $
+// $Id: //poco/svn/XML/include/Poco/DOM/DOMBuilder.h#3 $
 //
 // Library: XML
 // Package: DOM
@@ -80,6 +80,9 @@ public:
 
 	virtual Document* parse(InputSource* pInputSource);
 		/// Parse an XML document from a location identified by an InputSource.
+
+	virtual Document* parseMemoryNP(const char* xml, std::size_t size);
+		/// Parses an XML document from memory.
 
 protected:
 	// DTDHandler

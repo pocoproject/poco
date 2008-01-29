@@ -1,7 +1,7 @@
 //
 // DOMSerializer.h
 //
-// $Id: //poco/svn/XML/include/Poco/DOM/DOMSerializer.h#2 $
+// $Id: //poco/svn/XML/include/Poco/DOM/DOMSerializer.h#3 $
 //
 // Library: XML
 // Package: DOM
@@ -106,6 +106,10 @@ protected:
 		/// so this method simply throws an XMLException when invoked.
 		
 	void parse(const XMLString& systemId);
+		/// The DOMSerializer cannot parse from a system identifier,
+		/// so this method simply throws an XMLException when invoked.
+
+	void parseMemoryNP(const char* xml, std::size_t size);
 		/// The DOMSerializer cannot parse from a system identifier,
 		/// so this method simply throws an XMLException when invoked.
 

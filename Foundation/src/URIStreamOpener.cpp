@@ -1,7 +1,7 @@
 //
 // URIStreamOpener.cpp
 //
-// $Id: //poco/svn/Foundation/src/URIStreamOpener.cpp#2 $
+// $Id: //poco/svn/Foundation/src/URIStreamOpener.cpp#3 $
 //
 // Library: Foundation
 // Package: URI
@@ -68,11 +68,7 @@ std::istream* URIStreamOpener::open(const URI& uri) const
 		scheme = "file";
 	else
 		scheme = uri.getScheme();
-	FactoryMap::const_iterator it = _map.find(scheme);
-	if (it != _map.end())
-		return it->second->open(uri);
-	else
-		throw UnknownURISchemeException(scheme);
+	return openURI(scheme, uri);
 }
 
 
@@ -86,7 +82,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 		std::string scheme(uri.getScheme());
 		FactoryMap::const_iterator it = _map.find(scheme);
 		if (it != _map.end())
-			return it->second->open(uri);
+			return openURI(scheme, uri);
 	}
 	catch (Exception&)
 	{
@@ -108,7 +104,7 @@ std::istream* URIStreamOpener::open(const std::string& basePathOrURI, const std:
 		if (it != _map.end())
 		{
 			uri.resolve(pathOrURI);
-			return it->second->open(uri);
+			return openURI(scheme, uri);
 		}
 	}
 	catch (Exception&)
@@ -169,6 +165,34 @@ std::istream* URIStreamOpener::openFile(const Path& path) const
 	return factory.open(path);
 }
 
+
+std::istream* URIStreamOpener::openURI(const std::string& scheme, const URI& uri) const
+{
+	std::string actualScheme(scheme);
+	URI actualURI(uri);
+	int redirects = 0;
+	
+	while (redirects < MAX_REDIRECTS)
+	{
+		try
+		{
+			FactoryMap::const_iterator it = _map.find(actualScheme);
+			if (it != _map.end())
+				return it->second->open(actualURI);
+			else if (redirects > 0)
+				throw UnknownURISchemeException(actualURI.toString() + std::string("; redirected from ") + uri.toString());
+			else
+				throw UnknownURISchemeException(actualURI.toString());
+		}
+		catch (URIRedirection& redir)
+		{
+			actualURI = redir.uri();
+			actualScheme = actualURI.getScheme();
+			++redirects;
+		}
+	}
+	throw IOException("Too many redirects while opening URI", uri.toString());
+}
 
 
 } // namespace Poco

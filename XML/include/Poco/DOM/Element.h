@@ -1,7 +1,7 @@
 //
 // Element.h
 //
-// $Id: //poco/svn/XML/include/Poco/DOM/Element.h#2 $
+// $Id: //poco/svn/XML/include/Poco/DOM/Element.h#3 $
 //
 // Library: XML
 // Package: DOM
@@ -100,6 +100,13 @@ public:
 	Attr* setAttributeNode(Attr* newAttr);
 		/// Adds a new attribute. If an attribute with that name is already
 		/// present in the element, it is replaced by the new one.
+
+	Attr* addAttributeNodeNP(Attr* oldAttr, Attr* newAttr);
+		/// For internal use only.
+		/// Adds a new attribute after oldAttr.
+		/// If oldAttr is 0, newAttr is set as first attribute.
+		/// Returns newAttr.
+		/// Does not fire any events.
 
 	Attr* removeAttributeNode(Attr* oldAttr);
 		/// Removes the specified attribute.

@@ -1,7 +1,7 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/svn/XML/src/ParserEngine.cpp#2 $
+// $Id: //poco/svn/XML/src/ParserEngine.cpp#3 $
 //
 // Library: XML
 // Package: XML
@@ -244,6 +244,21 @@ void ParserEngine::parse(InputSource* pInputSource)
 	else if (pInputSource->getByteStream())
 		parseByteInputStream(*pInputSource->getByteStream());
 	else throw XMLException("Input source has no stream");
+	if (_pContentHandler) _pContentHandler->endDocument();
+	popContext();
+}
+
+
+void ParserEngine::parse(const char* pBuffer, std::size_t size)
+{
+	init();
+	resetContext();
+	InputSource src;
+	pushContext(_parser, &src);
+	if (_pContentHandler) _pContentHandler->setDocumentLocator(this);
+	if (_pContentHandler) _pContentHandler->startDocument();
+	if (!XML_Parse(_parser, pBuffer, static_cast<int>(size), 1))
+		handleError(XML_GetErrorCode(_parser));
 	if (_pContentHandler) _pContentHandler->endDocument();
 	popContext();
 }

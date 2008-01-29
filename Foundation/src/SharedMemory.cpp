@@ -1,7 +1,7 @@
 //
 // SharedMemory.cpp
 //
-// $Id: //poco/svn/Foundation/src/SharedMemory.cpp#2 $
+// $Id: //poco/svn/Foundation/src/SharedMemory.cpp#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -42,7 +42,9 @@
 
 #include "Poco/SharedMemory.h"
 #include "Poco/Exception.h"
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_NO_SHAREDMEMORY)
+#include "SharedMemory_DUMMY.cpp"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "SharedMemory_WIN32.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "SharedMemory_POSIX.cpp"

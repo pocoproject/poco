@@ -1,7 +1,7 @@
 //
 // SAXParser.h
 //
-// $Id: //poco/svn/XML/include/Poco/SAX/SAXParser.h#2 $
+// $Id: //poco/svn/XML/include/Poco/SAX/SAXParser.h#3 $
 //
 // Library: XML
 // Package: SAX
@@ -98,6 +98,7 @@ public:
 	void* getProperty(const XMLString& propertyId) const;
 	void parse(InputSource* pSource);
 	void parse(const XMLString& systemId);
+	void parseMemoryNP(const char* xml, std::size_t size);
 	
 	/// Extensions
 	void parseString(const std::string& xml);

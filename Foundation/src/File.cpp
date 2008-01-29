@@ -1,7 +1,7 @@
 //
 // File.cpp
 //
-// $Id: //poco/svn/Foundation/src/File.cpp#2 $
+// $Id: //poco/svn/Foundation/src/File.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -157,6 +157,12 @@ bool File::isDirectory() const
 bool File::isLink() const
 {
 	return isLinkImpl();
+}
+
+
+bool File::isHidden() const
+{
+	return isHiddenImpl();
 }
 
 

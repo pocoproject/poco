@@ -1,7 +1,7 @@
 //
 // File_VMS.cpp
 //
-// $Id: //poco/svn/Foundation/src/File_VMS.cpp#2 $
+// $Id: //poco/svn/Foundation/src/File_VMS.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -169,6 +169,12 @@ bool FileImpl::isDirectoryImpl() const
 
 
 bool FileImpl::isLinkImpl() const
+{
+	return false;
+}
+
+
+bool FileImpl::isHiddenImpl() const
 {
 	return false;
 }

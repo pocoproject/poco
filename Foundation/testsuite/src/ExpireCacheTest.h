@@ -1,7 +1,7 @@
 //
 // ExpireCacheTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/ExpireCacheTest.h#2 $
+// $Id: //poco/svn/Foundation/testsuite/src/ExpireCacheTest.h#3 $
 //
 // Tests for ExpireCache
 //
@@ -50,6 +50,7 @@ public:
 	void testExpire0();
 	void testExpireN();
 	void testAccessExpireN();
+	void testExpireWithHas();
 
 	
 	void setUp();
