@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/config/Linux#5 $
+# $Id$
 #
 # CYGWIN
 #
@@ -42,7 +42,7 @@ SHAREDLIBLINKEXT = .dll
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
+CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       =
