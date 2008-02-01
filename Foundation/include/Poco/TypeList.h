@@ -1,7 +1,7 @@
 //
 // TypeList.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/TypeList.h#2 $
+// $Id: //poco/svn/Foundation/include/Poco/TypeList.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -126,10 +126,11 @@ struct TypeList
 
 	bool operator < (const TypeList& tl) const
 	{
-		bool smaller = (head < tl.head);
-		if (smaller)
-			return smaller;
-		return tail < tl.tail;
+		if (head < tl.head)
+			return true;
+		else if (head == tl.head)
+			return tail < tl.tail;
+		return false;
 	}
 
 	void swap(TypeList& tl)
