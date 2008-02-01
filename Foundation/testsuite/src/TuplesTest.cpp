@@ -1,7 +1,7 @@
 //
 // TuplesTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TuplesTest.cpp#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TuplesTest.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,6 +36,7 @@
 #include "Poco/Tuple.h"
 #include "Poco/Void.h"
 #include <algorithm>
+#include <map>
 
 
 using Poco::TypeList;
@@ -512,6 +513,45 @@ void TuplesTest::testTupleOrder()
 	assert (tv[0] == aTuple);
 	assert (tv[1] == aTuple2);
 	assert (tv[2] == aTuple3);
+
+	std::map<TupleType, int> tm;
+	std::pair<std::map<TupleType, int>::iterator, bool> mIt = tm.insert(std::map<TupleType, int>::value_type(aTuple2, 2));
+	assert (mIt.second);
+	mIt = tm.insert(std::map<TupleType, int>::value_type(aTuple, 1));
+	assert (mIt.second);
+	mIt = tm.insert(std::map<TupleType, int>::value_type(aTuple3, 3));
+	assert (mIt.second);
+
+	std::map<TupleType, int>::iterator fIt = tm.find(aTuple2);
+	assert (2 == fIt->second);
+
+	typedef Tuple<std::string, std::string, std::string, std::string> StrTup;
+	typedef std::map<StrTup, int> StrTupMap;
+
+	StrTup st1("123", "456", "789", "101112");
+	StrTup st2("123", "456", "101112", "789");
+	StrTup st3("123", "789", "789", "101112");
+	StrTup st4("123", "101112", "456", "789");
+
+	testTupleStrictWeak(st2, st1, st3);
+
+	StrTupMap strMap;
+	strMap.insert(StrTupMap::value_type(st1, 1));
+	strMap.insert(StrTupMap::value_type(st2, 2));
+	strMap.insert(StrTupMap::value_type(st3, 3));
+	strMap.insert(StrTupMap::value_type(st4, 4));
+
+	assert (1 == strMap[st1]);
+	assert (2 == strMap[st2]);
+	assert (3 == strMap[st3]);
+	assert (4 == strMap[st4]);
+
+	StrTupMap::iterator it = strMap.begin();
+	assert (st4 == it->first); ++it;
+	assert (st2 == it->first); ++it;
+	assert (st1 == it->first); ++it;
+	assert (st3 == it->first); ++it;
+	assert (it == strMap.end());
 }
 
 
