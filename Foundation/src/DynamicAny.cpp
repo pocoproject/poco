@@ -246,26 +246,6 @@ DynamicAny DynamicAny::operator -- (int)
 }
 
 
-DynamicAny& DynamicAny::operator [] (std::vector<DynamicAny>::size_type n)
-{
-	DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder = dynamic_cast<DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
-	if (pHolder)
-		return pHolder->operator[](n);
-	else
-		throw BadCastException();
-}
-
-
-const DynamicAny& DynamicAny::operator [] (std::vector<DynamicAny>::size_type n) const
-{
-	const DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder = dynamic_cast<const DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
-	if (pHolder)
-		return pHolder->operator[](n);
-	else
-		throw BadCastException();
-}
-
-
 DynamicAny& DynamicAny::operator [] (const std::string& name)
 {
 	DynamicAnyHolderImpl<DynamicStruct>* pHolder = dynamic_cast<DynamicAnyHolderImpl<DynamicStruct> *>(_pHolder);

@@ -345,19 +345,45 @@ public:
 	bool isStruct() const;
 		/// Returns true if DynamicAny represents a struct
 
-	DynamicAny& operator [] (std::vector<DynamicAny>::size_type n);
+	template <typename T>
+	DynamicAny& operator [] (T n)
 		/// Index operator, only use on DynamicAnys where isArray
 		/// returns true! In all other cases a BadCastException is thrown!
+	{
+		DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder =
+			dynamic_cast<DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
+		if (pHolder)
+			return pHolder->operator[](n);
+		else
+			throw BadCastException();
+	}
 
-	const DynamicAny& operator [] (std::vector<DynamicAny>::size_type n) const;
+	template <typename T>
+	const DynamicAny& operator [] (T n) const
 		/// const Index operator, only use on DynamicAnys where isArray
 		/// returns true! In all other cases a BadCastException is thrown!
+	{
+		const DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder =
+			dynamic_cast<const DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
+		if (pHolder)
+			return pHolder->operator[](n);
+		else
+			throw BadCastException();
+	}
 
 	DynamicAny& operator [] (const std::string& name);
 		/// Index operator by name, only use on DynamicAnys where isStruct
 		/// returns true! In all other cases a BadCastException is thrown!
 
 	const DynamicAny& operator [] (const std::string& name) const;
+		/// Index operator by name, only use on DynamicAnys where isStruct
+		/// returns true! In all other cases a BadCastException is thrown!
+
+	DynamicAny& operator [] (const char* name);
+		/// Index operator by name, only use on DynamicAnys where isStruct
+		/// returns true! In all other cases a BadCastException is thrown!
+
+	const DynamicAny& operator [] (const char* name) const;
 		/// Index operator by name, only use on DynamicAnys where isStruct
 		/// returns true! In all other cases a BadCastException is thrown!
 
@@ -439,6 +465,18 @@ inline void DynamicAny::swap(DynamicAny& ptr)
 inline const std::type_info& DynamicAny::type() const
 {
 	return _pHolder->type();
+}
+
+
+inline DynamicAny& DynamicAny::operator [] (const char* name)
+{
+	return operator [] (std::string(name));
+}
+
+
+inline const DynamicAny& DynamicAny::operator [] (const char* name) const
+{
+	return operator [] (std::string(name));
 }
 
 
