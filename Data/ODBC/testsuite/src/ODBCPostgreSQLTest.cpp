@@ -48,6 +48,21 @@
 #include <iostream>
 
 
+#ifdef POCO_ODBC_USE_MAMMOTH_NG
+	#define POSTGRESQL_ODBC_DRIVER "Mammoth ODBCng Beta"
+#elif defined (POCO_ODBC_UNICODE)
+	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL Unicode"
+#else
+	#define POSTGRESQL_ODBC_DRIVER "PostgreSQL ANSI"
+#endif
+#define POSTGRESQL_DSN "PocoDataPgSQLTest"
+#define POSTGRESQL_SERVER "localhost"
+#define POSTGRESQL_PORT "5432"
+#define POSTGRESQL_DB "postgres"
+#define POSTGRESQL_UID "postgres"
+#define POSTGRESQL_PWD "postgres"
+
+
 using namespace Poco::Data;
 using Poco::Data::ODBC::Utility;
 using Poco::Data::ODBC::ConnectionException;
@@ -78,6 +93,7 @@ ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name):
 		Utility::dataSources(_dataSources);
 		checkODBCSetup();
 	}
+
 	if (!_pSession && !_dbConnString.empty() && !beenHere)
 	{
 		try
@@ -130,12 +146,8 @@ void ODBCPostgreSQLTest::testSimpleAccess()
 	if (!_pSession) fail ("Test not available.");
 
 	std::string tableName("Person");
-	int count = 0;
 
 	recreatePersonTable();
-
-	//*_pSession << "SELECT count(*) FROM sys.all_all_tables WHERE table_name = upper(?)", into(count), use(tableName), now;
-	//assert (1 == count);
 
 	for (int i = 0; i < 8;)
 	{
@@ -864,8 +876,51 @@ void ODBCPostgreSQLTest::checkODBCSetup()
 
 		if (!dsnFound) 
 		{
-			std::cout << "PostgreSQL DSN NOT found, tests will fail." << std::endl;
-			return;
+			if (!_pSession && _dbConnString.empty())
+			{
+				std::cout << "PostgreSQL DSN NOT found, will attempt to connect without it." << std::endl;
+				_dbConnString = "DRIVER=" POSTGRESQL_ODBC_DRIVER ";"
+					"DATABASE=" POSTGRESQL_DB ";"
+					"SERVER=" POSTGRESQL_SERVER ";"
+					"PORT=" POSTGRESQL_PORT ";"
+					"UID=" POSTGRESQL_UID ";"
+					"PWD=" POSTGRESQL_PWD ";"
+					"SSLMODE=prefer;"
+					"LowerCaseIdentifier=0;"
+					"UseServerSidePrepare=0;"
+					"ByteaAsLongVarBinary=1;"
+					"BI=0;"
+					"TrueIsMinus1=0;"
+					"DisallowPremature=0;"
+					"UpdatableCursors=0;"
+					"LFConversion=1;"
+					"CancelAsFreeStmt=0;"
+					"Parse=0;"
+					"BoolsAsChar=1;"
+					"UnknownsAsLongVarchar=0;"
+					"TextAsLongVarchar=1;"
+					"UseDeclareFetch=0;"
+					"Ksqo=1;"
+					"Optimizer=1;"
+					"CommLog=0;"
+					"Debug=0;"
+					"MaxLongVarcharSize=8190;"
+					"MaxVarcharSize=254;"
+					"UnknownSizes=0;"
+					"Socket=8192;"
+					"Fetch=100;"
+					"ConnSettings=;"
+					"ShowSystemTables=0;"
+					"RowVersioning=0;"
+					"ShowOidColumn=0;"
+					"FakeOidIndex=0;"
+					"ReadOnly=0;";
+			}
+			else if (!_dbConnString.empty())
+			{
+				std::cout << "PostgreSQL tests not available." << std::endl;
+				return;
+			}
 		}
 	}
 

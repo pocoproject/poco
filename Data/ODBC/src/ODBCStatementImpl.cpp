@@ -120,7 +120,7 @@ void ODBCStatementImpl::compileImpl()
 
 	if (Preparation::DE_BOUND == ext && dataAvailable)
 	{
-		std::size_t pos = 1;
+		std::size_t pos = 0;
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
@@ -150,7 +150,7 @@ void ODBCStatementImpl::bindImpl()
 	Bindings& binds = bindings();
 	if (!binds.empty())
 	{
-		std::size_t pos = 1;
+		std::size_t pos = 0;
 
 		Bindings::iterator it    = binds.begin();
 		Bindings::iterator itEnd = binds.end();
@@ -246,7 +246,7 @@ void ODBCStatementImpl::next()
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
-		std::size_t pos = 1;
+		std::size_t pos = 0;
 		for (; it != itEnd; ++it)
 		{
 			(*it)->extract(pos);

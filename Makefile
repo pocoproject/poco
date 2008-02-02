@@ -64,8 +64,7 @@ Foundation-tests: Foundation-libexec cppunit
 Foundation-samples: Foundation-libexec 
 	$(MAKE) -C $(POCO_BASE)/Foundation/samples
 
-XML-libexec:  Foundation
--libexec
+XML-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/XML
 
 XML-tests: XML-libexec cppunit
@@ -74,9 +73,7 @@ XML-tests: XML-libexec cppunit
 XML-samples: XML-libexec 
 	$(MAKE) -C $(POCO_BASE)/XML/samples
 
-Util-libexec:  Foundation
--libexec XML
--libexec
+Util-libexec:  Foundation-libexec XML-libexec
 	$(MAKE) -C $(POCO_BASE)/Util
 
 Util-tests: Util-libexec cppunit
@@ -85,23 +82,16 @@ Util-tests: Util-libexec cppunit
 Util-samples: Util-libexec 
 	$(MAKE) -C $(POCO_BASE)/Util/samples
 
-Net-libexec:  Foundation
--libexec
+Net-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Net
 
 Net-tests: Net-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Net/testsuite
 	
-Net-samples: Net-libexec  Foundation
--libexec XML
--libexec Util
--libexec
+Net-samples: Net-libexec  Foundation-libexec XML-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Net/samples
 
-NetSSL_OpenSSL-libexec:  Foundation
--libexec Net
--libexec Util
--libexec
+NetSSL_OpenSSL-libexec:  Foundation-libexec Net-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL
 
 NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit

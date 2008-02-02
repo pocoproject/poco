@@ -90,7 +90,7 @@ void ODBCColumn::init()
 			0,
 			0,
 			0,
-			reinterpret_cast<long int*>(&_dataLength))))
+			&_dataLength)))
 	{
 		throw StatementException(_rStmt);
 	}
@@ -104,6 +104,8 @@ void ODBCColumn::init()
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
+	case -9:// SQL Server NVARCHAR
+	case -10:// PostgreSQL VARCHAR (without size specified)
 		setType(MetaColumn::FDT_STRING); break;
 	case SQL_TINYINT:
 		setType(MetaColumn::FDT_INT8); break;

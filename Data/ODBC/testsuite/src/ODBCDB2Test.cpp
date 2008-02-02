@@ -57,6 +57,15 @@ using Poco::format;
 using Poco::NotFoundException;
 
 
+#define DB2_ODBC_DRIVER "IBM DB2 ODBC DRIVER - DB2COPY1"
+#define DB2_DSN "PocoDataDB2Test"
+#define DB2_SERVER "localhost"
+#define DB2_PORT "50000"
+#define DB2_DB "POCOTEST"
+#define DB2_UID "db2admin"
+#define DB2_PWD "db2admin"
+
+
 const bool ODBCDB2Test::bindValues[8] = {true, true, true, false, false, true, false, false};
 Poco::SharedPtr<Poco::Data::Session> ODBCDB2Test::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> ODBCDB2Test::_pExecutor = 0;
@@ -875,8 +884,22 @@ void ODBCDB2Test::checkODBCSetup()
 
 		if (!dsnFound) 
 		{
-			std::cout << "DB2 DSN NOT found, tests will fail." << std::endl;
-			return;
+			if (!_pSession && _dbConnString.empty())
+			{
+				std::cout << "DB2 DSN NOT found, will attempt to connect without it." << std::endl;
+				_dbConnString = "Driver=" DB2_ODBC_DRIVER ";"
+					"Database=" DB2_DB ";"
+					"Hostname=" DB2_SERVER ";"
+					"Port=" DB2_PORT ";"
+					"Protocol=TCPIP;"
+					"Uid=" DB2_UID ";"
+					"Pwd=" DB2_PWD ";";
+			}
+			else if (!_dbConnString.empty())
+			{
+				std::cout << "DB2 tests not available." << std::endl;
+				return;
+			}
 		}
 	}
 

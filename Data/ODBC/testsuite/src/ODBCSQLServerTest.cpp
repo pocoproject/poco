@@ -57,6 +57,23 @@ using Poco::format;
 using Poco::NotFoundException;
 
 
+#ifdef POCO_OS_FAMILY_WINDOWS
+	#ifdef POCO_ODBC_USE_SQL_NATIVE
+		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Native Client"
+	#else
+		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server"
+	#endif
+#else
+	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
+#endif
+#define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
+#define MS_SQL_SERVER_SERVER "localhost"
+#define MS_SQL_SERVER_PORT "1433"
+#define MS_SQL_SERVER_DB "test"
+#define MS_SQL_SERVER_UID "test"
+#define MS_SQL_SERVER_PWD "test"
+
+
 const bool ODBCSQLServerTest::bindValues[8] = {true, true, true, false, false, true, false, false};
 Poco::SharedPtr<Poco::Data::Session> ODBCSQLServerTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> ODBCSQLServerTest::_pExecutor = 0;
@@ -885,8 +902,21 @@ void ODBCSQLServerTest::checkODBCSetup()
 
 		if (!dsnFound) 
 		{
-			std::cout << "SQL Server DSN NOT found, tests will fail." << std::endl;
-			return;
+			if (!_pSession && _dbConnString.empty())
+			{
+				std::cout << "MS SQL Server DSN NOT found, will attempt to connect without it." << std::endl;
+				_dbConnString = "DRIVER=" MS_SQL_SERVER_ODBC_DRIVER ";"
+					"UID=" MS_SQL_SERVER_UID ";"
+					"PWD=" MS_SQL_SERVER_PWD ";"
+					"DATABASE=" MS_SQL_SERVER_DB ";"
+					"SERVER=" MS_SQL_SERVER_SERVER ";"
+					"PORT=" MS_SQL_SERVER_PORT ";";
+			}
+			else if (!_dbConnString.empty())
+			{
+				std::cout << "MS SQL Server tests not available." << std::endl;
+				return;
+			}
 		}
 	}
 

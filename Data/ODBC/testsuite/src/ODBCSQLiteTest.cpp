@@ -831,8 +831,16 @@ void ODBCSQLiteTest::checkODBCSetup()
 
 		if (!driverFound) 
 		{
-			std::cout << "SQLite3 driver NOT found, tests will fail." << std::endl;
-			return;
+			if (!_pSession && _dbConnString.empty())
+			{
+				std::cout << "SQLite3 DSN NOT found, will attempt to connect without it." << std::endl;
+				_dbConnString = "Driver=SQLite3 ODBC Driver;Database=dummy.db;";
+			}
+			else if (!_dbConnString.empty())
+			{
+				std::cout << "SQLite3 tests not available." << std::endl;
+				return;
+			}
 		}
 	}
 

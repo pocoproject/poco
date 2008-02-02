@@ -48,6 +48,15 @@
 #include <iostream>
 
 
+#define ORACLE_ODBC_DRIVER "Oracle in XE"
+#define ORACLE_DSN "PocoDataOracleTest"
+#define ORACLE_SERVER "localhost"
+#define ORACLE_PORT "1521"
+#define ORACLE_SID "XE"
+#define ORACLE_UID "scott"
+#define ORACLE_PWD "tiger"
+
+
 using namespace Poco::Data;
 using Poco::Data::ODBC::Utility;
 using Poco::Data::ODBC::ConnectionException;
@@ -873,8 +882,45 @@ void ODBCOracleTest::checkODBCSetup()
 
 		if (!dsnFound) 
 		{
-			std::cout << "Oracle DSN NOT found, tests will fail." << std::endl;
-			return;
+			if (!_pSession && _dbConnString.empty())
+			{
+				std::cout << "Oracle DSN NOT found, will attempt to connect without it." << std::endl;
+				_dbConnString = "DRIVER={" ORACLE_ODBC_DRIVER "};"
+					"UID=" ORACLE_UID ";"
+					"PWD=" ORACLE_PWD ";"
+					"TLO=O;" //?
+					"FBS=60000;" // fetch buffer size (bytes), default 60000
+					"FWC=F;" // force SQL_WCHAR support (T/F), default F
+					"CSR=F;" // close cursor (T/F), default F
+					"MDI=Me;" // metadata (SQL_ATTR_METADATA_ID) ID default (T/F), default T
+					"MTS=T;" //?
+					"DPM=F;" // disable SQLDescribeParam (T/F), default F
+					"NUM=NLS;" // numeric settings (NLS implies Globalization Support)
+					"BAM=IfAllSuccessful;" // batch autocommit, (IfAllSuccessful/UpToFirstFailure/AllSuccessful), default IfAllSuccessful
+					"BTD=F;" // bind timestamp as date (T/F), default F
+					"RST=T;" // resultsets (T/F), default T
+					"LOB=T;" // LOB writes (T/F), default T
+					"FDL=0;" // failover delay (default 10)
+					"FRC=0;" // failover retry count (default 10)
+					"QTO=T;" // query timout option (T/F), default T
+					"FEN=F;" // failover (T/F), default T
+					"XSM=Default;" // schema field (Default/Database/Owner), default Default
+					"EXC=F;" // EXEC syntax (T/F), default F
+					"APA=T;" // thread safety (T/F), default T
+					"DBA=W;" // write access
+					"DBQ=" ORACLE_SID ";" // TNS service name
+					"SERVER="
+					"(DESCRIPTION="
+					" (ADDRESS=(PROTOCOL=TCP)(HOST=" ORACLE_SERVER " )(PORT=" ORACLE_PORT "))"
+					" (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=" ORACLE_SID "))"
+					");";
+
+			}
+			else if (!_dbConnString.empty())
+			{
+				std::cout << "Oracle tests not available." << std::endl;
+				return;
+			}
 		}
 	}
 

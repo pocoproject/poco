@@ -381,7 +381,7 @@ void DataTest::testColumn()
 
 	try
 	{
-		int i = c[100];
+		int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }

@@ -338,7 +338,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
 			assert (SQL_SUCCEEDED(rc));
 
-			char chr[3][5] = { 0 };
+			char chr[3][5] = {{ 0 }};
 			SQLLEN lengths[5] = { 0 };
 			fourth = 0;
 			fifth = 0.0f;
@@ -629,7 +629,6 @@ void SQLExecutor::insertEmptyVector()
 {
 	std::string funct = "insertEmptyVector()";
 	std::vector<std::string> str;
-	int count = 100;
 
 	try
 	{
@@ -749,7 +748,6 @@ void SQLExecutor::limits()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	int count = 0;
 	std::vector<int> retData;
 	try { *_pSession << "SELECT * FROM Strings", into(retData), limit(50), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -775,7 +773,6 @@ void SQLExecutor::limitZero()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	int count = 0;
 	std::vector<int> retData;
 	try { *_pSession << "SELECT * FROM Strings", into(retData), limit(0), now; }// stupid test, but at least we shouldn't crash
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -797,7 +794,6 @@ void SQLExecutor::limitOnce()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	int count = 0;
 	std::vector<int> retData;
 	Statement stmt = (*_pSession << "SELECT * FROM Strings", into(retData), limit(50), now);
 	assert (!stmt.done());
@@ -829,7 +825,6 @@ void SQLExecutor::limitPrepare()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	int count = 0;
 	std::vector<int> retData;
 	Statement stmt = (*_pSession << "SELECT * FROM Strings", into(retData), limit(50));
 	assert (retData.size() == 0);
@@ -847,7 +842,6 @@ void SQLExecutor::limitPrepare()
 
 	try { stmt.execute(); }// will restart execution!
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	size_t s = retData.size();
 	assert (!stmt.done());
 	assert (retData.size() == 150);
 	for (int x = 0; x < 150; ++x)

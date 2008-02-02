@@ -112,7 +112,7 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 		memset(pChar, 0, CHUNK_SIZE);
 		len = 0;
 		rc = SQLGetData(_rStmt, 
-			(SQLUSMALLINT) pos, 
+			(SQLUSMALLINT) pos + 1, 
 			cType, //C data type
 			pChar, //returned value
 			CHUNK_SIZE, //buffer length
@@ -160,7 +160,7 @@ bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
 		memset(pChar, 0, CHUNK_SIZE);
 		len = 0;
 		rc = SQLGetData(_rStmt, 
-			(SQLUSMALLINT) pos, 
+			(SQLUSMALLINT) pos + 1, 
 			cType, //C data type
 			pChar, //returned value
 			CHUNK_SIZE, //buffer length

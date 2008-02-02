@@ -113,7 +113,7 @@ void DynamicAnyTest::testInt8()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -184,7 +184,7 @@ void DynamicAnyTest::testInt16()
 	
 	try
 	{
-		Int32 value2 = a1.extract<Int32>();
+		Int32 value2; value2 = a1.extract<Int32>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -255,7 +255,7 @@ void DynamicAnyTest::testInt32()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -326,7 +326,7 @@ void DynamicAnyTest::testInt64()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -397,7 +397,7 @@ void DynamicAnyTest::testUInt8()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -468,7 +468,7 @@ void DynamicAnyTest::testUInt16()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -539,7 +539,7 @@ void DynamicAnyTest::testUInt32()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -610,7 +610,7 @@ void DynamicAnyTest::testUInt64()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -681,7 +681,7 @@ void DynamicAnyTest::testBool()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -752,7 +752,7 @@ void DynamicAnyTest::testChar()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -823,7 +823,7 @@ void DynamicAnyTest::testFloat()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -894,7 +894,7 @@ void DynamicAnyTest::testDouble()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -960,7 +960,7 @@ void DynamicAnyTest::testString()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1031,7 +1031,7 @@ void DynamicAnyTest::testLong()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1102,7 +1102,7 @@ void DynamicAnyTest::testULong()
 	
 	try
 	{
-		Int16 value2 = a1.extract<Int16>();
+		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)

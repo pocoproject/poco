@@ -85,32 +85,32 @@ Preparation::~Preparation()
 
 Poco::Any& Preparation::operator [] (std::size_t pos)
 {
-	poco_assert (pos > 0 && pos <= _pValues.size());
+	poco_assert (pos >= 0 && pos < _pValues.size());
 	
-	return *_pValues[pos-1];
+	return *_pValues[pos];
 }
 
 
 void Preparation::prepareRaw(std::size_t pos, SQLSMALLINT valueType, std::size_t size)
 {
 	poco_assert (DE_BOUND == _dataExtraction);
-	poco_assert (pos > 0 && pos <= _pValues.size());
+	poco_assert (pos >= 0 && pos < _pValues.size());
 
 	char* pChr = new char[size]; 
 	_charPtrs.push_back(pChr);
 	poco_assert_dbg (pChr);
 	memset(pChr, 0, size);
 
-	_pValues[pos-1] = new Any(pChr);
-	_pLengths[pos-1] = new SQLLEN;
-	*_pLengths[pos-1] = (SQLLEN) size;
+	_pValues[pos] = new Any(pChr);
+	_pLengths[pos] = new SQLLEN;
+	*_pLengths[pos] = (SQLLEN) size;
 
 	if (Utility::isError(SQLBindCol(_rStmt, 
-		(SQLUSMALLINT) pos, 
+		(SQLUSMALLINT) pos + 1, 
 		valueType, 
 		(SQLPOINTER) pChr, 
 		(SQLINTEGER) size, 
-		_pLengths[pos-1])))
+		_pLengths[pos])))
 	{
 		throw StatementException(_rStmt, "SQLBindCol()");
 	}
@@ -167,6 +167,27 @@ void Preparation::prepare(std::size_t pos, const Poco::Any&)
 	}
 
 	prepareRaw(pos, SQL_C_BINARY, maxDataSize(pos));
+}
+
+
+std::size_t Preparation::maxDataSize(std::size_t pos) const
+{
+	poco_assert (pos >= 0 && pos < _pValues.size());
+
+	std::size_t sz = 0;
+	std::size_t maxsz = getMaxFieldSize();
+
+	try 
+	{
+		ODBCColumn col(_rStmt, pos);
+		sz = col.length();
+		if (ODBCColumn::FDT_STRING == col.type()) ++sz;
+	}
+	catch (StatementException&) 
+	{
+	}
+	if (!sz || sz > maxsz) sz = maxsz;
+	return sz;
 }
 
 

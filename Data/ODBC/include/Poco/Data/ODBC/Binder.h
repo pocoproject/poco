@@ -166,7 +166,7 @@ private:
 		}
 
 		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos, 
+			(SQLUSMALLINT) pos + 1, 
 			SQL_PARAM_INPUT, 
 			cDataType, 
 			sqlDataType, 

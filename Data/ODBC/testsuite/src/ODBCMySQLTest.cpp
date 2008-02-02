@@ -48,6 +48,18 @@
 #include <iostream>
 
 
+#ifdef POCO_OS_FAMILY_WINDOWS
+	#define MYSQL_ODBC_DRIVER "MySQL ODBC 3.51 Driver"
+#else
+	#define MYSQL_ODBC_DRIVER "MySQL"
+#endif
+#define MYSQL_DSN "PocoDataMySQLTest"
+#define MYSQL_SERVER "localhost"
+#define MYSQL_DB "test"
+#define MYSQL_UID "root"
+#define MYSQL_PWD "mysql"
+
+
 using namespace Poco::Data;
 using Poco::Data::ODBC::Utility;
 using Poco::Data::ODBC::ConnectionException;
@@ -128,16 +140,6 @@ void ODBCMySQLTest::testBareboneODBC()
 void ODBCMySQLTest::testSimpleAccess()
 {
 	if (!_pSession) fail ("Test not available.");
-
-	int count = 0;
-
-	//recreatePersonTable();
-
-	//try { *_pSession << "SELECT count(*) FROM sys.tables WHERE name = 'Person'", into(count), use(tableName), now;  }
-	//catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
-	//catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("testSimpleAccess()"); }
-
-	//assert (1 == count);
 
 	for (int i = 0; i < 8;)
 	{
@@ -874,8 +876,20 @@ void ODBCMySQLTest::checkODBCSetup()
 
 		if (!dsnFound) 
 		{
-			std::cout << "SQL Server DSN NOT found, tests will fail." << std::endl;
-			return;
+			if (!_pSession && _dbConnString.empty())
+			{
+				std::cout << "MySQL DSN NOT found, will attempt to connect without it." << std::endl;
+				_dbConnString = "DRIVER=" MYSQL_ODBC_DRIVER ";"
+					"DATABASE=" MYSQL_DB ";"
+					"SERVER=" MYSQL_SERVER ";"
+					"UID=" MYSQL_UID ";"
+					"PWD=" MYSQL_PWD ";";
+			}
+			else if (!_dbConnString.empty())
+			{
+				std::cout << "MySQL tests not available." << std::endl;
+				return;
+			}
 		}
 	}
 

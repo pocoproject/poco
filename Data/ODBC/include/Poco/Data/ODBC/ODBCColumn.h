@@ -90,7 +90,7 @@ private:
 	void init();
 	void getDescription();
 
-	Poco::Int32            _dataLength;
+	SQLLEN                 _dataLength;
 	const StatementHandle& _rStmt;
 	ColumnDescription      _columnDesc;
 };
