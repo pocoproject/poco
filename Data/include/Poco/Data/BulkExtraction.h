@@ -43,6 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/AbstractExtraction.h"
 #include "Poco/Data/Bulk.h"
+#include "Poco/Data/Prepare.h"
 #include <vector>
 
 
@@ -130,6 +131,7 @@ public:
 		Poco::UInt32 limit = getLimit();
 		if (limit != _rResult.size()) _rResult.resize(limit);
 		pPrep->setLength(limit);
+		pPrep->setBulk(true);
 		return new Prepare<C>(pPrep, col, _rResult);
 	}
 

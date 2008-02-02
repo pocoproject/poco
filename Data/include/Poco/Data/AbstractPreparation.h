@@ -331,8 +331,15 @@ public:
 		/// Returns the length of prepared data. Defaults to 1.
 		/// The length is greater than one for bulk operations.
 
+	void setBulk(bool bulkPrep = true);
+		/// Sets bulk operation flag (always false at object creation time)
+
+	bool isBulk() const;
+		/// Returns bulk operation flag.
+
 private:
 	Poco::UInt32 _length;
+	bool         _bulk;
 };
 
 
@@ -350,6 +357,17 @@ inline Poco::UInt32 AbstractPreparation::getLength() const
 	return _length;
 }
 
+
+inline void AbstractPreparation::setBulk(bool bulkPrep)
+{
+	_bulk = bulkPrep;
+}
+
+
+inline bool AbstractPreparation::isBulk() const
+{
+	return _bulk;
+}
 
 
 } } // namespace Poco::Data

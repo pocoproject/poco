@@ -154,11 +154,16 @@ std::size_t Preparation::maxDataSize(std::size_t pos) const
 
 	try 
 	{
-		sz = ODBCMetaColumn(_rStmt, pos).length();
+		ODBCMetaColumn mc(_rStmt, pos);
+		sz = mc.length();
+
+		// accomodate for terminating zero (non-bulk only!)
+		if (!isBulk() && ODBCMetaColumn::FDT_STRING == mc.type()) ++sz;
 	}
 	catch (StatementException&) { }
 
 	if (!sz || sz > maxsz) sz = maxsz;
+
 	return sz;
 }
 

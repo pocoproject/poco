@@ -42,7 +42,8 @@ namespace Data {
 
 
 AbstractPreparation::AbstractPreparation(Poco::UInt32 length): 
-	_length(length)
+	_length(length),
+	_bulk(false)
 {
 }
 
