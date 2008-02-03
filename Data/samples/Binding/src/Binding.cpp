@@ -1,7 +1,7 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/1.3/Data/samples/Binding/src/Binding.cpp#1 $
+// $Id: //poco/1.3/Data/samples/Binding/src/Binding.cpp#2 $
 //
 // This sample demonstrates the Data library.
 //
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 	};
 	
 	Statement insert(session);
-	insert << "INSERT INTO Person VALUES(:name, :address, :age)",
+	insert << "INSERT INTO Person VALUES(?, ?, ?)",
 		use(person.name),
 		use(person.address),
 		use(person.age);

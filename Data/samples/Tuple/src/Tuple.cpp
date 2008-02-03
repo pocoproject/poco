@@ -1,7 +1,7 @@
 //
 // Tuple.cpp
 //
-// $Id: //poco/1.3/Data/samples/Tuple/src/Tuple.cpp#1 $
+// $Id: //poco/1.3/Data/samples/Tuple/src/Tuple.cpp#2 $
 //
 // This sample demonstrates the Data library.
 //
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 	people.push_back(Person("Lisa Simpson",	"Springfield", 10));
 	
 	Statement insert(session);
-	insert << "INSERT INTO Person VALUES(:name, :address, :age)",
+	insert << "INSERT INTO Person VALUES(?, ?, ?)",
 		use(people), now;
 	
 	people.clear();
