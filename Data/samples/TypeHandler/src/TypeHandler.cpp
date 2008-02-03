@@ -1,7 +1,7 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/Main/Data/samples/TypeHandler/src/TypeHandler.cpp#2 $
+// $Id: //poco/Main/Data/samples/TypeHandler/src/TypeHandler.cpp#3 $
 //
 // This sample demonstrates the Data library.
 //
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 	};
 	
 	Statement insert(session);
-	insert << "INSERT INTO Person VALUES(:name, :address, :age)",
+	insert << "INSERT INTO Person VALUES(?, ?, ?)",
 		use(person);
 		
 	insert.execute();

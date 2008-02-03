@@ -1,7 +1,7 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/Main/Data/samples/Binding/src/Binding.cpp#1 $
+// $Id: //poco/Main/Data/samples/Binding/src/Binding.cpp#2 $
 //
 // This sample demonstrates the Data library.
 //
@@ -14,6 +14,7 @@
 // copied or duplicated in any form, in whole or in part, without
 // prior written permission from Applied Informatics.
 //
+
 
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SQLite/Connector.h"
@@ -55,7 +56,7 @@ int main(int argc, char** argv)
 	};
 	
 	Statement insert(session);
-	insert << "INSERT INTO Person VALUES(:name, :address, :age)",
+	insert << "INSERT INTO Person VALUES(?, ?, ?)",
 		use(person.name),
 		use(person.address),
 		use(person.age);
