@@ -1092,27 +1092,43 @@ void DataTest::testDateAndTime()
 	catch (InvalidArgumentException&) { }
 
 	Time t1(12, 30, 15);
-	t1.assign(t.hour() - 1, t.minute(), t.second());
-	assert (t1 < t); assert (t1 != t);
-	t1.assign(t.hour(), t.minute() - 1, t.second());
-	assert (t1 < t); assert (t1 != t);
-	t1.assign(t.hour(), t.minute(), t.second() - 1);
-	assert (t1 < t); assert (t1 != t);
+	
+	if (t.hour() > 1)
+	{
+		t1.assign(t.hour() - 1, t.minute(), t.second());
+		assert (t1 < t); assert (t1 != t);
+	}
+
+	if (t.minute() > 1)
+	{
+		t1.assign(t.hour(), t.minute() - 1, t.second());
+		assert (t1 < t); assert (t1 != t);
+	}
+	
+	if (t.second() > 1)
+	{
+		t1.assign(t.hour(), t.minute(), t.second() - 1);
+		assert (t1 < t); assert (t1 != t);
+	}
+
 	if (t.hour() < 23) 
 	{
 		t1.assign(t.hour() + 1, t.minute(), t.second());
 		assert (t1 > t); assert (t1 != t);
 	}
+
 	if (t.minute() < 59)
 	{
 		t1.assign(t.hour(), t.minute() + 1, t.second());
 		assert (t1 > t); assert (t1 != t);
 	}
+
 	if (t.second() < 59)
 	{
 		t1.assign(t.hour(), t.minute(), t.second() + 1);
 		assert (t1 > t); assert (t1 != t);
 	}
+
 	t1.assign(t.hour(), t.minute(), t.second());
 	assert (t1 == t);
 
