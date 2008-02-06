@@ -403,7 +403,7 @@ private:
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
-		setParamSetSize(pos, length);
+		setParamSetSize(length);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
@@ -455,7 +455,7 @@ private:
 		SQLSMALLINT decDigits = 0;
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
 
-		setParamSetSize(pos, val.size());
+		setParamSetSize(val.size());
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
@@ -500,7 +500,7 @@ private:
 		if (0 == val.size())
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(pos, val.size());
+		setParamSetSize(val.size());
 
 		SQLINTEGER size = 0;
 		getColumnOrParameterSize(pos, size);
@@ -564,7 +564,7 @@ private:
 		if (0 == val.size())
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(pos, val.size());
+		setParamSetSize(val.size());
 
 		SQLINTEGER size = 0;
 
@@ -628,7 +628,7 @@ private:
 		if (0 == val.size())
 			throw InvalidArgumentException("Empty vector not allowed.");
 
-		setParamSetSize(pos, val.size());
+		setParamSetSize(val.size());
 
 		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
 
@@ -672,7 +672,7 @@ private:
 		if (0 == val.size())
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(pos, val.size());
+		setParamSetSize(val.size());
 
 		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
 
@@ -716,7 +716,7 @@ private:
 		if (0 == val.size())
 			throw InvalidArgumentException("Empty Containers not allowed.");
 
-		setParamSetSize(pos, val.size());
+		setParamSetSize(val.size());
 
 		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
 
@@ -760,7 +760,7 @@ private:
 		if (0 == val.size())
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(pos, val.size());
+		setParamSetSize(val.size());
 
 		SQLINTEGER size = SQL_NULL_DATA;
 
@@ -801,7 +801,7 @@ private:
 		/// to discover the required values are unsuccesfully exhausted, the values 
 		/// are both set to zero and no exception is thrown.
 
-	void setParamSetSize(std::size_t pos, std::size_t length);
+	void setParamSetSize(std::size_t length);
 		/// Sets the parameter set size. Used for column-wise binding.
 
 	void getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size);

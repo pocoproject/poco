@@ -515,7 +515,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 }
 
 
-void Binder::setParamSetSize(std::size_t pos, std::size_t length)
+void Binder::setParamSetSize(std::size_t length)
 {
 	if (0 == _paramSetSize)
 	{

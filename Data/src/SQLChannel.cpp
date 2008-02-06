@@ -142,7 +142,14 @@ void SQLChannel::logSync(const Message& msg)
 	_dateTime = msg.getTime();
 	if (_source.empty()) _source = _name;
 
-	_pLogStatement->execute();
+	try
+	{
+		_pLogStatement->execute();
+	}
+	catch (Exception&)
+	{
+		if (_throw) throw;
+	}
 }
 
 	
