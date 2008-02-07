@@ -74,6 +74,7 @@ public:
 
 	AbstractSessionImpl()
 		/// Creates the AbstractSessionImpl.
+		/// 
 		/// Adds "storage" property and sets the default internal storage container 
 		/// type to std::deque.
 		/// The storage is created by statements automatically whenever a query 
@@ -81,6 +82,8 @@ public:
 		/// Storage type can be reconfigured at runtime both globally (for the
 		/// duration of the session) and locally (for a single statement execution only). 
 		/// See StatementImpl for details on how this property is used at runtime.
+		/// 
+		/// Adds bulk feature and sets it to false.
 		/// Bulk feature determines whether the session is capable of bulk operations.
 		/// Connectors that are capable of it must set this feature prior to attempting 
 		/// bulk operations.
@@ -182,13 +185,13 @@ public:
 	}
 
 	void setBulk(const std::string& name, bool bulk)
-		/// Sets the storage type.
+		/// Sets the execution type.
 	{
 		_bulk = bulk;
 	}
 		
 	bool getBulk(const std::string& name="")
-		/// Returns the storage type
+		/// Returns the execution type
 	{
 		return _bulk;
 	}

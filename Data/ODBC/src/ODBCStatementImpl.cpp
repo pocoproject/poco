@@ -337,6 +337,7 @@ void ODBCStatementImpl::makeStep()
 {
 	_extractors[currentDataSet()]->reset();
 	_nextResponse = SQLFetch(_stmt);
+	checkError(_nextResponse);
 	_stepCalled = true;
 }
 
@@ -408,18 +409,16 @@ std::string ODBCStatementImpl::nativeSQL()
 
 void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 {
+	if (SQL_NO_DATA == rc) return;
+
 	if (Utility::isError(rc))
 	{
-		if (rc != SQL_NO_DATA)
-		{
-			std::ostringstream os;
-			os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
-			os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
-			std::string str(msg); str += os.str();
+		std::ostringstream os;
+		os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
+		os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
+		std::string str(msg); str += os.str();
 		
-			throw StatementException(_stmt, str);
-		}
-		else throw NoDataException();
+		throw StatementException(_stmt, str);
 	}
 }
 
