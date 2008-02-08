@@ -286,7 +286,7 @@ void SQLiteTest::testInsertCharPointer()
 		bind("Address"), 
 		bind(133132));
 	
-	free((void*) pc); pc = 0;
+	std::free((void*) pc); pc = 0;
 	assert (1 == stmt.execute());
 
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
@@ -296,7 +296,6 @@ void SQLiteTest::testInsertCharPointer()
 	tmp << "SELECT Age FROM PERSON", into(count), now;
 	assert (count == age);
 }
-
 
 
 void SQLiteTest::testInsertCharPointer2()
@@ -314,8 +313,8 @@ void SQLiteTest::testInsertCharPointer2()
 
 	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", 
 		bind("lastname"), 
-		bind("firstname", "FN"), 
-		bind("Address", "Addr"), 
+		bind("firstname"), 
+		bind("Address"), 
 		bind(133132), now;
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);

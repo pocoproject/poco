@@ -430,7 +430,6 @@ void ODBCTest::testBulk()
 	_pSession->setFeature("autoExtract", true);
 
 	recreateMiscTable();
-	
 	_pExecutor->doBulk<std::vector<int>,
 		std::vector<std::string>,
 		std::vector<BLOB>,

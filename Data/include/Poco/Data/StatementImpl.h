@@ -101,7 +101,7 @@ public:
 			/// Extraction in bulk mode.
 			/// If binding is present in the same statement, 
 			/// it must also be bulk.
-		BULK_FORBIDDEN,     
+		BULK_FORBIDDEN     
 			/// Bulk forbidden. 
 			/// Happens when the statement has already been 
 			/// configured as non-bulk.

@@ -753,18 +753,18 @@ inline Binding<NullData>* in(const NullData& t, const std::string& name = "")
 
 
 template <typename T> 
-inline Binding<T>* out(T& t, const std::string& name = "")
+inline Binding<T>* out(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
-	return new Binding<T>(t, name, AbstractBinding::PD_OUT);
+	return new Binding<T>(t, "", AbstractBinding::PD_OUT);
 }
 
 
 template <typename T> 
-inline Binding<T>* io(T& t, const std::string& name = "")
+inline Binding<T>* io(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
-	return new Binding<T>(t, name, AbstractBinding::PD_IN_OUT);
+	return new Binding<T>(t, "", AbstractBinding::PD_IN_OUT);
 }
 
 
@@ -797,22 +797,20 @@ inline AbstractBindingVec& io(AbstractBindingVec& bv)
 
 
 template <typename T> 
-inline Binding<T>* bind(T t, 
-	const std::string& name = "",
-	AbstractBinding::Direction direction = AbstractBinding::PD_IN)
+inline Binding<T>* bind(T t, const std::string& name)
 	/// Convenience function for a more compact Binding creation.
 	/// This funtion differs from use() in its value copy semantics.
 {
-	return new Binding<T>(t, name, direction, true);
+	return new Binding<T>(t, name, AbstractBinding::PD_IN, true);
 }
 
 
 template <typename T> 
-inline Binding<T>* bind(T t, AbstractBinding::Direction direction)
+inline Binding<T>* bind(T t)
 	/// Convenience function for a more compact Binding creation.
 	/// This funtion differs from use() in its value copy semantics.
 {
-	return bind(t, "", direction);
+	return bind(t, "");
 }
 
 
