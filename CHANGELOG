@@ -1,6 +1,14 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.2 (2008-01-30)
+Release 1.3.3 ()
+==========================
+
+Foundation, XML, Net, Util:
+
+Data:
+- fixed SF# 1891132: Poco::Data::StatementImpl::executeWithLimit is not correct
+
+Release 1.3.2 (2008-02-04)
 ==========================
 
 Foundation, XML, Net, Util:
@@ -42,6 +50,12 @@ Foundation, XML, Net, Util:
 - fixed SF# 1873929: SMTPClientSession support for name in sender field
 - logging performance improvements (PatternFormatter)
 
+Data:
+- fixed SF# 1724388: ODBC Diagnostics
+- fixed SF# 1804797: ODBC Statement multiple execution fails
+- fixed SF# 1803435: SessionPool onJanitorTimer called too often?
+- fixed SF# 1851997: Undefined Behavior in ODBC::Preparation
+- updated SQlite to 3.5.5
 
 Release 1.3.1 (2007-08-08)
 ==========================
