@@ -91,20 +91,21 @@ Poco::UInt32 StatementImpl::executeWithLimit()
 	compile();
 
 	Poco::UInt32 count = 0;
+	Poco::UInt32 limit = _extrLimit.value();
 	do
 	{
 		bind();
-		while (hasNext() && count < _extrLimit.value())
+		while (hasNext() && count < limit)
 		{
 			next();
 			++count;
 		}
 	}
-	while (canBind());
+	while (canBind() && count < limit);
 
-	if (!canBind() && (!hasNext() || _extrLimit.value() == 0))
+	if (!canBind() && (!hasNext() || 0 == limit))
 		_state = ST_DONE;
-	else if (hasNext() && _extrLimit.value() == count && _extrLimit.isHardLimit())
+	else if (hasNext() && limit == count && _extrLimit.isHardLimit())
 		throw LimitException("HardLimit reached. We got more data than we asked for");
 
 	return count;

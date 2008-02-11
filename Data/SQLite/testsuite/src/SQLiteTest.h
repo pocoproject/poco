@@ -47,8 +47,6 @@ public:
 	~SQLiteTest();
 
 	void testSimpleAccess();
-	void testInsertCharPointer();
-	void testInsertCharPointer2();
 	void testComplexType();
 	void testSimpleAccessVector();
 	void testComplexTypeVector();

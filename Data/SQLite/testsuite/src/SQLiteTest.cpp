@@ -131,7 +131,6 @@ public:
 		std::string lastName;
 		std::string firstName;
 		std::string address;
-		int age = 0;
 		if (!pExt->extract(pos++, obj.lastName))
 			obj.lastName = defVal.lastName;
 		if (!pExt->extract(pos++, obj.firstName))
@@ -190,56 +189,6 @@ void SQLiteTest::testSimpleAccess()
 	assert (count == age);
 	tmp.close();
 	assert (!tmp.isConnected());
-}
-
-
-void SQLiteTest::testInsertCharPointer()
-{
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
-	std::string tableName("Person");
-	std::string lastName("lastname");
-	std::string firstName("firstname");
-	std::string address("Address");
-	int age = 133132;
-	int count = 0;
-	std::string result;
-	tmp << "DROP TABLE IF EXISTS Person", now;
-	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
-
-	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use("lastname"), use("firstname"), use("Address"), use(133132), now;
-	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
-	assert (count == 1);
-	tmp << "SELECT LastName FROM PERSON", into(result), now;
-	assert (lastName == result);
-	tmp << "SELECT Age FROM PERSON", into(count), now;
-	assert (count == age);
-}
-
-
-
-void SQLiteTest::testInsertCharPointer2()
-{
-	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
-	std::string tableName("Person");
-	std::string lastName("lastname");
-	std::string firstName("firstname");
-	std::string address("Address");
-	int age = 133132;
-	int count = 0;
-	std::string result;
-	tmp << "DROP TABLE IF EXISTS Person", now;
-	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
-
-	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use("lastname"), use("firstname"), use("Address"), use(133132), now;
-	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
-	assert (count == 1);
-	Statement stmt1 = (tmp << "SELECT LastName FROM PERSON", into(result));
-	stmt1.execute();
-	assert (lastName == result);
-	count = 0;
-	Statement stmt2 = (tmp << "SELECT Age FROM PERSON", into(count));
-	stmt2.execute();
-	assert (count == age);
 }
 
 
@@ -350,7 +299,6 @@ void SQLiteTest::testInsertEmptyVector()
 	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
 	std::vector<std::string> str;
 
-	int count = 100;
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str VARCHAR(30))", now;
 	try
@@ -422,7 +370,7 @@ void SQLiteTest::testLimit()
 	}
 
 	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
-	int count = 0;
+
 	std::vector<int> retData;
 	tmp << "SELECT * FROM Strings", into(retData), limit(50), now;
 	assert (retData.size() == 50);
@@ -445,7 +393,7 @@ void SQLiteTest::testLimitZero()
 	}
 
 	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
-	int count = 0;
+
 	std::vector<int> retData;
 	tmp << "SELECT * FROM Strings", into(retData), limit(0), now; // stupid test, but at least we shouldn't crash
 	assert (retData.size() == 0);
@@ -464,7 +412,7 @@ void SQLiteTest::testLimitOnce()
 	}
 
 	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
-	int count = 0;
+
 	std::vector<int> retData;
 	Statement stmt = (tmp << "SELECT * FROM Strings", into(retData), limit(50), now);
 	assert (!stmt.done());
@@ -495,7 +443,7 @@ void SQLiteTest::testLimitPrepare()
 	}
 
 	tmp << "INSERT INTO Strings VALUES(:str)", use(data), now;
-	int count = 0;
+
 	std::vector<int> retData;
 	Statement stmt = (tmp << "SELECT * FROM Strings", into(retData), limit(50));
 	assert (retData.size() == 0);
@@ -1617,8 +1565,6 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteTest");
 
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccess);
-	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer);
-	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer2);
 	CppUnit_addTest(pSuite, SQLiteTest, testComplexType);
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccessVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testComplexTypeVector);
