@@ -1,13 +1,13 @@
 //
 // XMLConfiguration.cpp
 //
-// $Id: //poco/svn/Util/src/XMLConfiguration.cpp#1 $
+// $Id: //poco/1.3/Util/src/XMLConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration
 // Module:  XMLConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -39,6 +39,10 @@
 #include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Attr.h"
+#include "Poco/DOM/DOMWriter.h"
+#include "Poco/DOM/DOMException.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/XML/XMLWriter.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
@@ -140,6 +144,24 @@ void XMLConfiguration::load(const Poco::XML::Node* pNode)
 }
 
 
+void XMLConfiguration::save(const std::string& path)
+{
+	Poco::XML::DOMWriter writer;
+	writer.setNewLine("\n");
+	writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
+	writer.writeNode(path, _pDocument);
+}
+
+
+void XMLConfiguration::save(std::ostream& ostr)
+{
+	Poco::XML::DOMWriter writer;
+	writer.setNewLine("\n");
+	writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
+	writer.writeNode(ostr, _pDocument);
+}
+
+
 bool XMLConfiguration::getRaw(const std::string& key, std::string& value) const
 {
 	const Poco::XML::Node* pNode = findNode(key);
@@ -154,7 +176,28 @@ bool XMLConfiguration::getRaw(const std::string& key, std::string& value) const
 
 void XMLConfiguration::setRaw(const std::string& key, const std::string& value)
 {
-	throw Poco::NotImplementedException("Setting a property in an XMLConfiguration");
+    Poco::XML::Node* pNode = const_cast<Poco::XML::Node*>(findNode(key));
+
+	if (pNode)
+	{
+        unsigned short nodeType = pNode->nodeType();
+        if (Poco::XML::Node::ATTRIBUTE_NODE == nodeType)
+        {
+            pNode->setNodeValue(value);
+        }
+        else if (Poco::XML::Node::ELEMENT_NODE == nodeType)
+        {
+            Poco::XML::Node* pChildNode = pNode->firstChild();
+            if (pChildNode)
+            {
+                if (Poco::XML::Node::TEXT_NODE == pChildNode->nodeType())
+                {
+                    pChildNode->setNodeValue(value);
+                }
+            }
+        }
+	}
+    else throw NotFoundException("Node not found in XMLConfiguration", key);
 }
 
 

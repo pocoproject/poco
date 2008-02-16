@@ -1,9 +1,9 @@
 //
 // XMLConfigurationTest.cpp
 //
-// $Id: //poco/svn/Util/testsuite/src/XMLConfigurationTest.cpp#1 $
+// $Id: //poco/Main/Util/testsuite/src/XMLConfigurationTest.cpp#5 $
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-200, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -95,13 +95,34 @@ void XMLConfigurationTest::testLoad()
 	assert (keys.size() == 2);
 	assert (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop4[1]") != keys.end());
+
+    pConf->setString("prop1", "value1_changed");
+	assert (pConf->getString("prop1") == "value1_changed");
+
+    pConf->setString("prop2", "value2_changed");
+	assert (pConf->getString("prop2") == "value2_changed");
+
+    pConf->setString("prop3.prop4[@attr]", "value3_changed");
+	assert (pConf->getString("prop3.prop4[@attr]") == "value3_changed");
+
+    pConf->setString("prop3.prop4[1][@attr]", "value4_changed");
+	assert (pConf->getString("prop3.prop4[1][@attr]") == "value4_changed");
+
+    pConf->setString("prop5", "value5_changed");
+	assert (pConf->getString("prop5") == "value5_changed");
 	
+    pConf->setString("prop5[0]", "value5_changed");
+	assert (pConf->getString("prop5[0]") == "value5_changed");
+
+    pConf->setString("prop5[1]", "value5_changed");
+	assert (pConf->getString("prop5[1]") == "value5_changed");
+
 	try
 	{
 		pConf->setString("foo", "bar");
-		fail("Not supported - must throw");
+		fail("node not found - must throw");
 	}
-	catch (NotImplementedException&)
+	catch (NotFoundException&)
 	{
 	}
 	

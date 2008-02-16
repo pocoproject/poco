@@ -9,7 +9,7 @@
 //
 // Definition of the XMLConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -46,6 +46,7 @@
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/InputSource.h"
 #include <istream>
+#include <ostream>
 
 
 namespace Poco {
@@ -87,8 +88,9 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	/// Enumerating attributes is not supported.
 	/// Calling keys("prop3.prop4") will return an empty range. 
 	///
-	/// Setting properties is not supported. An attempt to set a property results
-	/// in a NotImplementedException being thrown.
+	/// Setting properties is supported, with the restriction that only
+	/// the value of existing properties can be changed. 
+	/// There is currently no way to programmatically add properties.
 {
 public:
 	XMLConfiguration();
@@ -131,6 +133,14 @@ public:
 	void load(const Poco::XML::Node* pNode);
 		/// Loads the XML document containing the configuration data
 		/// from the given XML node.
+
+	void save(std::ostream& ostr);
+		/// Writes the XML document containing the configuration data
+		/// to the given stream.
+		
+	void save(const std::string& path);
+		/// Writes the XML document containing the configuration data
+		/// to the given file.
 
 protected:
 	bool getRaw(const std::string& key, std::string& value) const;
