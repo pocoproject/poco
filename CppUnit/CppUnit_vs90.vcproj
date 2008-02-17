@@ -82,7 +82,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				ShowProgress="0"
-				OutputFile="..\bin\CppUnitd.dll"
+				OutputFile="..\bin\$(ProjectName)d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
@@ -181,7 +181,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\bin\CppUnit.dll"
+				OutputFile="..\bin\$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
@@ -280,7 +280,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\CppUnitmtd.lib"
+				OutputFile="..\lib\$(ProjectName)mtd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -364,7 +364,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\CppUnitmt.lib"
+				OutputFile="..\lib\$(ProjectName)mt.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

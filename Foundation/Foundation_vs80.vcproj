@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Foundation"
 	ProjectGUID="{8164D41D-B053-405B-826C-CF37AC0EF176}"
 	RootNamespace="Foundation"
@@ -69,14 +69,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib"
-				OutputFile="..\bin\PocoFoundationd.dll"
+				OutputFile="..\bin\Poco$(ProjectName)d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\bin\PocoFoundationd.pdb"
+				ProgramDatabaseFile="..\bin\Poco$(Projectname)d.pdb"
 				SubSystem="1"
 				OptimizeForWindows98="1"
-				ImportLibrary="..\lib\PocoFoundationd.lib"
+				ImportLibrary="..\lib\Poco$(ProjectName)d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -162,7 +162,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iphlpapi.lib"
-				OutputFile="..\bin\PocoFoundation.dll"
+				OutputFile="..\bin\Poco$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="false"
@@ -171,7 +171,7 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="..\lib\PocoFoundation.lib"
+				ImportLibrary="..\lib\Poco$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -256,7 +256,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoFoundationmt.lib"
+				OutputFile="..\lib\Poco$(ProjectName)mt.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -327,7 +327,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoFoundationmtd.lib"
+				OutputFile="..\lib\Poco$(ProjectName)mtd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

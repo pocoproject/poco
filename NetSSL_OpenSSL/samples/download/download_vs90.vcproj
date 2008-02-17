@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib PocoNetd.lib PocoNetSSLd.lib PocoUtild.lib"
-				OutputFile="bin/downloadd.exe"
+				OutputFile="bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="true"
@@ -153,7 +153,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundation.lib PocoXML.lib PocoNet.lib PocoNetSSL.lib PocoUtil.lib"
-				OutputFile="bin/download.exe"
+				OutputFile="bin/$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="false"

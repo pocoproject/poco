@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib PocoFoundationd.lib"
-				OutputFile="bin/TestSuited.exe"
+				OutputFile="bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"
@@ -156,7 +156,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="CppUnit.lib WinTestRunner.lib PocoFoundation.lib"
-				OutputFile="bin/TestSuite.exe"
+				OutputFile="bin/$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="false"
@@ -246,8 +246,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib iphlpapi.lib winmm.lib"
-				OutputFile="bin/TestSuitemt.exe"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib iphlpapi.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\release_static\WinTestRunner.res"
+				OutputFile="bin/$(ProjectName)mt.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="false"
@@ -334,8 +334,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib iphlpapi.lib winmm.lib"
-				OutputFile="bin/TestSuitemtd.exe"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib iphlpapi.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\debug_static\WinTestRunner.res"
+				OutputFile="bin/$(ProjectName)mtd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"

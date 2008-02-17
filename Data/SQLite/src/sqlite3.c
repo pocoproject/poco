@@ -19,6 +19,15 @@
 **
 ** This amalgamation was generated on 2008-01-31 16:37:58 UTC.
 */
+
+/* +++ Added for Poco::Data::SQLite Windows build. */
+#if defined(_MSC_VER)
+	#pragma warning( disable : 4018) /* conversion from 'double' to 'int', possible loss of data */
+	#pragma warning( disable : 4244) /* signed/unsigned mismatch */
+	#define _CRT_SECURE_NO_WARNINGS
+#endif
+/* --- Added for Poco::Data::SQLite Windows build. */
+
 #define SQLITE_CORE 1
 #define SQLITE_AMALGAMATION 1
 #ifndef SQLITE_PRIVATE

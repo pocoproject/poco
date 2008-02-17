@@ -69,15 +69,15 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib"
-				OutputFile="..\bin\PocoUtild.dll"
+				OutputFile="..\bin\Poco$(ProjectName)d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\bin\PocoUtild.pdb"
+				ProgramDatabaseFile="..\bin\Poco$(ProjectName)d.pdb"
 				SubSystem="1"
 				OptimizeForWindows98="1"
-				ImportLibrary="..\lib\PocoUtild.lib"
+				ImportLibrary="..\lib\Poco$(ProjectName)d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -163,7 +163,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundation.lib PocoXML.lib"
-				OutputFile="..\bin\PocoUtil.dll"
+				OutputFile="..\bin\Poco$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
@@ -173,7 +173,7 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="..\lib\PocoUtil.lib"
+				ImportLibrary="..\lib\Poco$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -259,7 +259,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoUtilmt.lib"
+				OutputFile="..\lib\Poco$(ProjectName)mt.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -331,7 +331,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoUtilmtd.lib"
+				OutputFile="..\lib\Poco$(ProjectName)mtd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

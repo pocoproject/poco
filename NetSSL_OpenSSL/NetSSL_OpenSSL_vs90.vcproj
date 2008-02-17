@@ -196,8 +196,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory=".\obj\debug_static"
+			IntermediateDirectory=".\obj\debug_static"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -265,8 +265,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory=".\obj\release_static"
+			IntermediateDirectory=".\obj\release_static"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>

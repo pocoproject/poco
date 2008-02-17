@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="WinTestRunner"
 	ProjectGUID="{BA620CC4-0E7D-4B9D-88E2-6DBE5C51FCBD}"
 	Keyword="MFCProj"
@@ -82,7 +82,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="cppunit.lib winmm.lib"
-				OutputFile="..\..\bin\WinTestRunner.dll"
+				OutputFile="..\..\bin\$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -186,7 +186,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="cppunitd.lib winmm.lib"
 				ShowProgress="0"
-				OutputFile="..\..\bin\WinTestRunnerd.dll"
+				OutputFile="..\..\bin\$(ProjectName)d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -289,7 +289,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\WinTestRunnermtd.lib"
+				OutputFile="..\..\lib\$(ProjectName)mtd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -374,7 +374,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\WinTestRunnermt.lib"
+				OutputFile="..\..\lib\$(ProjectName)mt.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

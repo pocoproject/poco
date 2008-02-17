@@ -69,15 +69,15 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationd.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="..\bin\PocoNetd.dll"
+				OutputFile="..\bin\Poco$(ProjectName)d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\bin\PocoNetd.pdb"
+				ProgramDatabaseFile="..\bin\Poco$(ProjectName)d.pdb"
 				SubSystem="1"
 				OptimizeForWindows98="1"
-				ImportLibrary="..\lib\PocoNetd.lib"
+				ImportLibrary="..\lib\Poco$(ProjectName)d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -163,7 +163,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundation.lib ws2_32.lib iphlpapi.lib"
-				OutputFile="..\bin\PocoNet.dll"
+				OutputFile="..\bin\Poco$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
@@ -173,7 +173,7 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="..\lib\PocoNet.lib"
+				ImportLibrary="..\lib\Poco$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -258,7 +258,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetmt.lib"
+				OutputFile="..\lib\Poco$(ProjectName)mt.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -278,8 +278,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static|Win32"
-			OutputDirectory="obj\debug_static"
-			IntermediateDirectory="obj\debug_static"
+			OutputDirectory=".\obj\debug_static"
+			IntermediateDirectory=".\obj\debug_static"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -329,7 +329,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetmtd.lib"
+				OutputFile="..\lib\Poco$(ProjectName)mtd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

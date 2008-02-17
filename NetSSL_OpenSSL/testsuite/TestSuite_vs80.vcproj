@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="TestSuite"
 	ProjectGUID="{B2B88092-5BCE-4AC0-941E-88167138B4A7}"
 	Keyword="Win32Proj"
@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib PocoFoundationd.lib PocoNetd.lib PocoNetSSLd.lib PocoUtild.lib"
-				OutputFile="bin/TestSuited.exe"
+				OutputFile="bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"
@@ -156,7 +156,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="CppUnit.lib WinTestRunner.lib PocoFoundation.lib PocoNet.lib PocoNetSSL.lib PocoUtil.lib"
-				OutputFile="bin/TestSuite.exe"
+				OutputFile="bin/$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="false"
@@ -193,8 +193,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\debug_static"
+			IntermediateDirectory="obj\debug_static"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
@@ -243,8 +243,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib PocoNetmtd.lib PocoNetSSLmtd.lib PocoUtilmtd.lib libeay32mtd.lib ssleay32mtd.lib PocoXMLmtd.lib winmm.lib"
-				OutputFile="bin/TestSuitemtd.exe"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib PocoNetmtd.lib PocoNetSSLmtd.lib PocoUtilmtd.lib libeay32mtd.lib ssleay32mtd.lib ws2_32.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\debug_static\WinTestRunner.res"
+				OutputFile="bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"
@@ -279,8 +279,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\release_static"
+			IntermediateDirectory="obj\release_static"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
@@ -332,8 +332,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib PocoXMLmt.lib PocoNetmt.lib PocoNetSSLmt.lib PocoUtilmt.lib libeay32mt.lib ssleay32mt.lib winmm.lib"
-				OutputFile="bin/TestSuitemt.exe"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib PocoNetmt.lib PocoNetSSLmt.lib PocoUtilmt.lib libeay32mtd.lib ssleay32mtd.lib ws2_32.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\release_static\WinTestRunner.res"
+				OutputFile="bin/$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="false"
