@@ -46,7 +46,7 @@ namespace Poco {
 
 
 FileStreamBuf::FileStreamBuf():
-	BufferedBidirectionalStreamBuf(BUFFER_SIZE, 0),
+	BufferedBidirectionalStreamBuf(BUFFER_SIZE, std::ios::in | std::ios::out),
 	_handle(INVALID_HANDLE_VALUE),
 	_pos(0)
 {
