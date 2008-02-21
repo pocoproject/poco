@@ -51,6 +51,10 @@ ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
 POCO_HOST_OSNAME = CYGWIN
 endif
 
+ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
+POCO_HOST_OSNAME = MinGW
+endif
+
 #
 # If POCO_CONFIG is not set, use the OS name as configuration name
 #
@@ -189,7 +193,7 @@ LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY)
 ifeq ($(strip $(STRIP)),)
 STRIPCMD = 
 else
-STRIPCMD = $(STRIP) $@
+STRIPCMD = $(STRIP) $@*
 endif
 
 #
