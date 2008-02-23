@@ -66,9 +66,9 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -mno-cygwin -D_WIN32 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DFoundation_Config_INCLUDED
+SYSFLAGS = -mno-cygwin -D_WIN32 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DFoundation_Config_INCLUDED -I/usr/local/include -I/usr/include
 
 #
 # System Specific Libraries
 #
-SYSLIBS  = -liphlpapi -lws2_32 -lssl -lcrypto -lws2_32 -lgdi32
+SYSLIBS  = -L/usr/local/lib -L/usr/lib -liphlpapi -lws2_32 -lssl -lcrypto -lws2_32 -lgdi32
