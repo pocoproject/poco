@@ -43,12 +43,12 @@ samples="samples"
 flags=""
 # parse arguments
 while [ "$1" != "" ] ; do
-	val=`expr -- $1 : '--config=\(.*\)'`
+	val=`expr $1 : '--config=\(.*\)'`
 	if [ "$val" != "" ] ; then
 		config=$val;
 	fi
 	
-	val=`expr -- $1 : '--prefix=\(.*\)'`
+	val=`expr $1 : '--prefix=\(.*\)'`
 	if [ "$val" != "" ] ; then
 		prefix=$val
 	fi
@@ -72,12 +72,19 @@ while [ "$1" != "" ] ; do
 	shift
 done
 
+# autodetect build environment
+# ...special cases for CYGWIN or MinGW
 if [ "$config" = "" ] ; then
 	config=`uname`
-	cyg=`expr -- $config : '\(CYGWIN\).*'`
+	cyg=`expr $config : '\(CYGWIN\).*'`
 	if [ "$cyg" = "CYGWIN" ] ; then
 		config=CYGWIN
-	fi
+    else
+        ming=`expr $config : '\(MINGW\).*'`
+        if [ "$ming" = "MINGW" ] ; then
+            config=MinGW
+        fi
+    fi
 fi
 
 if [ ! -f "$base/build/config/$config" ] ; then

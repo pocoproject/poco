@@ -23,7 +23,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	RegularExpression RefCountedObject Runnable RotateStrategy Condition \
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel Stopwatch StreamChannel StreamConverter StreamCopier \
-	StreamTokenizer String StringTokenizer SynchronizedObject SyslogChannel \
+	StreamTokenizer String StringTokenizer SynchronizedObject \
 	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
 	TemporaryFile TextConverter TextEncoding TextIterator Thread ThreadLocal \
 	ThreadPool ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
@@ -36,6 +36,12 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	pcre_chartables pcre_compile pcre_globals pcre_maketables pcre_study \
 	pcre_tables pcre_try_flipped pcre_ucp_searchfuncs pcre_valid_utf8 \
 	pcre_exec pcre_ord2utf8 pcre_newline pcre_fullinfo pcre_xclass
+
+ifeq ($(POCO_CONFIG),MinGW)
+	objects += EventLogChannel WindowsConsoleChannel
+else
+	objects += SyslogChannel
+endif
 
 target         = PocoFoundation
 target_version = $(LIBVERSION)

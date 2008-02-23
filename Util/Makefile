@@ -16,6 +16,10 @@ objects = AbstractConfiguration Application ConfigurationMapper \
 	XMLConfiguration FilesystemConfiguration ServerApplication \
 	Validator IntValidator RegExpValidator OptionCallback
 
+ifeq ($(POCO_CONFIG),MinGW)
+	objects += WinService 
+endif
+
 target         = PocoUtil
 target_version = $(LIBVERSION)
 target_libs    = PocoFoundation PocoXML

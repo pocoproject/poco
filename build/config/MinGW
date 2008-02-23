@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE = SHARED
+LINKMODE = BOTH
 POCO_TARGET_OSNAME = MinGW
 POCO_TARGET_OSARCH = ia32
 
@@ -36,24 +36,26 @@ MKDIR   = mkdir -p
 SHAREDLIBEXT     = .dll
 SHAREDLIBLINKEXT = .dll
 
+BINEXT          = .exe
+
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          =
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = 
+CXXFLAGS        =
 CXXFLAGS32      =
 CXXFLAGS64      =
-LINKFLAGS       =
+LINKFLAGS       = -Wl,--allow-multiple-definition
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
-SHAREDOPT_CC    = 
-SHAREDOPT_CXX   = 
-SHAREDOPT_LINK  = 
+SHAREDOPT_CC    =
+SHAREDOPT_CXX   =
+SHAREDOPT_LINK  = -shared
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
@@ -64,9 +66,9 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -mno-cygwin -D_WIN32 -DPOCO_NO_FPENVIRONMENT
+SYSFLAGS = -mno-cygwin -D_WIN32 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DFoundation_Config_INCLUDED
 
 #
 # System Specific Libraries
 #
-SYSLIBS  = -liphlpapi
+SYSLIBS  = -liphlpapi -lws2_32 -lssl -lcrypto -lws2_32 -lgdi32
