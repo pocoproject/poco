@@ -78,7 +78,7 @@ namespace
 			
 			std::istream& istr = request.stream();
 			std::ostream& ostr = response.send();
-			std::streamsize n = StreamCopier::copyStream(istr, ostr);
+			StreamCopier::copyStream(istr, ostr);
 		}
 	};
 	

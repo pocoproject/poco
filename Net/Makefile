@@ -30,7 +30,7 @@ objects = \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
-	AsyncSocketChannel
+	AsyncSocketChannel SocketIOChannel
 
 target         = PocoNet
 target_version = $(LIBVERSION)

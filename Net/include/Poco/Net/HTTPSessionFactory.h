@@ -44,7 +44,6 @@
 #include "Poco/Mutex.h"
 #include "Poco/URI.h"
 #include "Poco/SingletonHolder.h"
-#include "Poco/SharedPtr.h"
 #include <map>
 
 

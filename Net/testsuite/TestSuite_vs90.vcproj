@@ -965,6 +965,34 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="IO"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\SocketIOChannelTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SocketIOChannelTestSuite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\SocketIOChannelTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SocketIOChannelTestSuite.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
