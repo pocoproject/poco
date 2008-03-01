@@ -6,6 +6,7 @@
 	ProjectGUID="{8164D41D-B053-405B-826C-CF37AC0EF176}"
 	RootNamespace="Foundation"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -4771,6 +4772,46 @@
 				</File>
 				<File
 					RelativePath=".\src\AsyncStreamChannel.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="IO"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\ActiveIOChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\IOChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\IOChannelConfig.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\IOChannelStream.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\IOChannel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\IOChannelConfig.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\IOChannelStream.cpp"
 					>
 				</File>
 			</Filter>

@@ -106,7 +106,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 	
-	ActiveResultType operator () (const ArgType& arg)
+	ActiveResultType operator () (const ArgType& arg = ArgType())
 		/// Invokes the ActiveMethod.
 	{
 		ActiveResultType result(new ActiveResultHolder<ResultType>());
