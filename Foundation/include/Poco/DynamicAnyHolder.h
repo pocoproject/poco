@@ -106,8 +106,8 @@ protected:
 		poco_static_assert (std::numeric_limits<F>::is_signed);
 		poco_static_assert (std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit(from, to); 
-		checkLowerLimit(from, to);
+		checkUpperLimit<F,T>(from); 
+		checkLowerLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -124,7 +124,7 @@ protected:
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (!std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit(from, to); 
+		checkUpperLimit<F,T>(from); 
 		to = static_cast<T>(from);
 	}
 
@@ -142,7 +142,7 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimit(from, to); 
+		checkUpperLimit<F,T>(from); 
 		to = static_cast<T>(from);
 	}
 
@@ -158,20 +158,20 @@ protected:
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit(from, to); 
+		checkUpperLimit<F,T>(from); 
 		to = static_cast<T>(from);
 	}
 
 private:
 	template <typename F, typename T>
-	void checkUpperLimit(const F& from, T& to) const
+	void checkUpperLimit(const F& from) const
 	{
 		if (from > std::numeric_limits<T>::max()) 
 			throw RangeException("Value too large.");
 	}
 
 	template <typename F, typename T>
-	void checkLowerLimit(const F& from, T& to) const
+	void checkLowerLimit(const F& from) const
 	{
 		if (from < std::numeric_limits<T>::min()) 
 			throw RangeException("Value too small.");
