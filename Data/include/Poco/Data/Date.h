@@ -182,62 +182,62 @@ public:
 		return typeid(Data::Date);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16&) const
 	{
 		throw Poco::BadCastException();
 	}
 	
-	void convert(Int32& val) const
+	void convert(Int32&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16&) const
 	{
 		throw Poco::BadCastException();
 	}
 	
-	void convert(UInt32& val) const
+	void convert(UInt32&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(bool& val) const
+	void convert(bool&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(float& val) const
+	void convert(float&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(double& val) const
+	void convert(double&) const
 	{
 		throw Poco::BadCastException();
 	}
 
-	void convert(char& val) const
+	void convert(char&) const
 	{
 		throw Poco::BadCastException();
 	}

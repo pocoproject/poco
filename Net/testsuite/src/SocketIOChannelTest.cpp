@@ -167,7 +167,7 @@ void SocketIOChannelTest::testActiveChannelStream()
 	ActiveIOChannel<SocketIOChannel> activeChannel(network);
 	ActiveResult<int> result1 = activeChannel.write(str1);
 	result1.wait();
-	ActiveResult<std::string> result2 = activeChannel.read(0);
+	ActiveResult<std::string> result2 = activeChannel.read();
 	result2.wait();
 	assert("1234567890" == result2.data());
 }
@@ -250,7 +250,7 @@ void SocketIOChannelTest::testActiveChannelDatagram()
 	ActiveIOChannel<SocketIOChannel> activeChannel(network);
 	ActiveResult<int> result1 = activeChannel.write(str1);
 	result1.wait();
-	ActiveResult<std::string> result2 = activeChannel.read(0);
+	ActiveResult<std::string> result2 = activeChannel.read();
 	result2.wait();
 	assert("1234567890" == result2.data());
 }
