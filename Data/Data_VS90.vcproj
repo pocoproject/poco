@@ -379,6 +379,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\AutoTransaction.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Binding.h"
 					>
 				</File>
@@ -524,6 +528,10 @@
 				</File>
 				<File
 					RelativePath=".\src\AbstractPrepare.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AutoTransaction.cpp"
 					>
 				</File>
 				<File
