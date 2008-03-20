@@ -54,7 +54,7 @@
 #include <set>
 
 
-using namespace Poco::Data;
+using namespace Poco::Data::Keywords;
 
 
 using Poco::BinaryReader;
@@ -68,6 +68,24 @@ using Poco::RangeException;
 using Poco::NotFoundException;
 using Poco::InvalidArgumentException;
 using Poco::NotImplementedException;
+using Poco::Data::Session;
+using Poco::Data::SessionFactory;
+using Poco::Data::Statement;
+using Poco::Data::NotSupportedException;
+using Poco::Data::BLOB;
+using Poco::Data::BLOBInputStream;
+using Poco::Data::BLOBOutputStream;
+using Poco::Data::MetaColumn;
+using Poco::Data::Column;
+using Poco::Data::Row;
+using Poco::Data::SimpleRowFormatter;
+using Poco::Data::Date;
+using Poco::Data::Time;
+using Poco::Data::AbstractExtraction;
+using Poco::Data::AbstractExtractionVec;
+using Poco::Data::AbstractExtractionVecVec;
+using Poco::Data::AbstractBinding;
+using Poco::Data::AbstractBindingVec;
 
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)

@@ -38,8 +38,12 @@
 #include "Connector.h"
 
 
-using namespace Poco::Data;
+using namespace Poco::Data::Keywords;
 using Poco::Thread;
+using Poco::Data::Session;
+using Poco::Data::SessionPool;
+using Poco::Data::SessionPoolExhaustedException;
+using Poco::Data::SessionUnavailableException;
 
 
 SessionPoolTest::SessionPoolTest(const std::string& name): CppUnit::TestCase(name)

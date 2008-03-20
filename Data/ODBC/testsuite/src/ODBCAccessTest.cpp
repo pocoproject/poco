@@ -47,24 +47,25 @@
 #include <iostream>
 
 
-using namespace Poco::Data;
-using ODBC::Utility;
-using ODBC::ConnectionException;
-using ODBC::StatementException;
-using ODBC::StatementDiagnostics;
+using namespace Poco::Data::Keywords;
+using Poco::Data::Session;
+using Poco::Data::ODBC::Utility;
+using Poco::Data::ODBC::ConnectionException;
+using Poco::Data::ODBC::StatementException;
+using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::NotFoundException;
 
 
-Session*                 ODBCAccessTest::_pSession = 0;
-std::string              ODBCAccessTest::_dbConnString;
-ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
+Session*    ODBCAccessTest::_pSession = 0;
+std::string ODBCAccessTest::_dbConnString;
+Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
 
 
 ODBCAccessTest::ODBCAccessTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	ODBC::Connector::registerConnector();
+	Poco::Data::ODBC::Connector::registerConnector();
 }
 
 
@@ -204,10 +205,10 @@ bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn)) return false;
 
-	ODBC::Connector::registerConnector();
+	Poco::Data::ODBC::Connector::registerConnector();
 	try
 	{
-		_pSession = new Session(ODBC::Connector::KEY, _dbConnString);
+		_pSession = new Session(Poco::Data::ODBC::Connector::KEY, _dbConnString);
 	}catch (ConnectionException& ex)
 	{
 		std::cout << ex.toString() << std::endl;

@@ -42,6 +42,9 @@ namespace Poco {
 namespace Data {
 
 
+using namespace Keywords;
+
+
 Range::Range(Poco::UInt32 lowValue, Poco::UInt32 upValue, bool hardLimit): 
 	_lower(lowerLimit(lowValue)),
 	_upper(upperLimit(upValue, hardLimit))

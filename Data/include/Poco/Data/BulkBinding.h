@@ -110,6 +110,9 @@ private:
 };
 
 
+namespace Keywords {
+
+
 template <typename T> 
 BulkBinding<std::vector<T> >* use(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
@@ -156,6 +159,9 @@ BulkBinding<std::list<T> >* in(const std::list<T>& t, BulkFnType, const std::str
 {
 	return new BulkBinding<std::list<T> >(t, static_cast<Poco::UInt32>(t.size()), name);
 }
+
+
+} // namespace Keywords
 
 
 } } // namespace Poco::Data

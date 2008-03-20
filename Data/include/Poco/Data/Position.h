@@ -77,12 +77,18 @@ inline Poco::UInt32 Position::value() const
 }
 
 
+namespace Keywords {
+
+
 template <typename T>
 inline Position from(const T& value)
 	/// Convenience function for creation of position.
 {
 	return Position(value);
 }
+
+
+} // namespace Keywords
 
 
 } } // namespace Poco::Data

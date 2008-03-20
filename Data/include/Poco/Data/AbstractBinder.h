@@ -63,7 +63,13 @@ enum NullData
 };
 
 
+namespace Keywords {
+
+
 static const NullData null = NULL_GENERIC;
+
+
+} // namespace Keywords
 
 
 class Data_API AbstractBinder

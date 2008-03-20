@@ -83,11 +83,11 @@
 	assert (SQL_SUCCEEDED(r))
 
 
-#define poco_data_using_statements using Poco::Data::now; \
-		using Poco::Data::into; \
-		using Poco::Data::use; \
-		using Poco::Data::bulk; \
-		using Poco::Data::limit; \
+#define poco_data_using_statements using Poco::Data::Keywords::now; \
+		using Poco::Data::Keywords::into; \
+		using Poco::Data::Keywords::use; \
+		using Poco::Data::Keywords::bulk; \
+		using Poco::Data::Keywords::limit; \
 		using Poco::Data::BLOB; \
 		using Poco::Data::ODBC::ConnectionException; \
 		using Poco::Data::ODBC::StatementException

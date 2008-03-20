@@ -56,7 +56,20 @@
 #include <iostream>
 
 
-using namespace Poco::Data;
+using namespace Poco::Data::Keywords;
+using Poco::Data::Session;
+using Poco::Data::Statement;
+using Poco::Data::RecordSet;
+using Poco::Data::Column;
+using Poco::Data::Row;
+using Poco::Data::SQLChannel;
+using Poco::Data::LimitException;
+using Poco::Data::BLOB;
+using Poco::Data::Date;
+using Poco::Data::Time;
+using Poco::Data::AbstractExtractionVec;
+using Poco::Data::AbstractExtractionVecVec;
+using Poco::Data::AbstractBindingVec;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
@@ -174,19 +187,19 @@ private:
 
 SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
 {
-	SQLite::Connector::registerConnector();
+	Poco::Data::SQLite::Connector::registerConnector();
 }
 
 
 SQLiteTest::~SQLiteTest()
 {
-	SQLite::Connector::unregisterConnector();
+	Poco::Data::SQLite::Connector::unregisterConnector();
 }
 
 
 void SQLiteTest::testSimpleAccess()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	assert (tmp.isConnected());
 	std::string tableName("Person");
 	std::string lastName("lastname");
@@ -217,7 +230,7 @@ void SQLiteTest::testSimpleAccess()
 
 void SQLiteTest::testNullCharPointer()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::string lastName("lastname");
 	int age = 100;
 	int count = 100;
@@ -259,7 +272,7 @@ void SQLiteTest::testNullCharPointer()
 
 void SQLiteTest::testInsertCharPointer()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::string tableName("Person");
 	std::string lastName("lastname");
 	std::string firstName("firstname");
@@ -300,7 +313,7 @@ void SQLiteTest::testInsertCharPointer()
 
 void SQLiteTest::testInsertCharPointer2()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::string tableName("Person");
 	std::string lastName("lastname");
 	std::string firstName("firstname");
@@ -330,7 +343,7 @@ void SQLiteTest::testInsertCharPointer2()
 
 void SQLiteTest::testComplexType()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
 	tmp << "DROP TABLE IF EXISTS Person", now;
@@ -351,7 +364,7 @@ void SQLiteTest::testComplexType()
 
 void SQLiteTest::testSimpleAccessVector()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::vector<std::string> lastNames;
 	std::vector<std::string> firstNames;
 	std::vector<std::string> addresses;
@@ -388,7 +401,7 @@ void SQLiteTest::testSimpleAccessVector()
 
 void SQLiteTest::testComplexTypeVector()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::vector<Person> people;
 	people.push_back(Person("LN1", "FN1", "ADDR1", 1));
 	people.push_back(Person("LN2", "FN2", "ADDR2", 2));
@@ -407,7 +420,7 @@ void SQLiteTest::testComplexTypeVector()
 
 void SQLiteTest::testInsertVector()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::vector<std::string> str;
 	str.push_back("s1");
 	str.push_back("s2");
@@ -432,7 +445,7 @@ void SQLiteTest::testInsertVector()
 
 void SQLiteTest::testInsertEmptyVector()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::vector<std::string> str;
 
 	tmp << "DROP TABLE IF EXISTS Strings", now;
@@ -450,7 +463,7 @@ void SQLiteTest::testInsertEmptyVector()
 
 void SQLiteTest::testAffectedRows()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::vector<std::string> str;
 	str.push_back("s1");
 	str.push_back("s2");
@@ -482,7 +495,7 @@ void SQLiteTest::testAffectedRows()
 
 void SQLiteTest::testInsertSingleBulk()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	int x = 0;
@@ -504,7 +517,7 @@ void SQLiteTest::testInsertSingleBulk()
 
 void SQLiteTest::testInsertSingleBulkVec()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -529,7 +542,7 @@ void SQLiteTest::testInsertSingleBulkVec()
 
 void SQLiteTest::testLimit()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -551,7 +564,7 @@ void SQLiteTest::testLimit()
 
 void SQLiteTest::testLimitZero()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -569,7 +582,7 @@ void SQLiteTest::testLimitZero()
 
 void SQLiteTest::testLimitOnce()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -599,7 +612,7 @@ void SQLiteTest::testLimitOnce()
 
 void SQLiteTest::testLimitPrepare()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -637,7 +650,7 @@ void SQLiteTest::testLimitPrepare()
 
 void SQLiteTest::testPrepare()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	std::vector<int> data;
@@ -658,7 +671,7 @@ void SQLiteTest::testPrepare()
 
 void SQLiteTest::testSetSimple()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::set<std::string> lastNames;
 	std::set<std::string> firstNames;
 	std::set<std::string> addresses;
@@ -695,7 +708,7 @@ void SQLiteTest::testSetSimple()
 
 void SQLiteTest::testSetComplex()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::set<Person> people;
 	people.insert(Person("LN1", "FN1", "ADDR1", 1));
 	people.insert(Person("LN2", "FN2", "ADDR2", 2));
@@ -714,7 +727,7 @@ void SQLiteTest::testSetComplex()
 
 void SQLiteTest::testSetComplexUnique()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::vector<Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	people.push_back(p1);
@@ -740,7 +753,7 @@ void SQLiteTest::testSetComplexUnique()
 
 void SQLiteTest::testMultiSetSimple()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multiset<std::string> lastNames;
 	std::multiset<std::string> firstNames;
 	std::multiset<std::string> addresses;
@@ -777,7 +790,7 @@ void SQLiteTest::testMultiSetSimple()
 
 void SQLiteTest::testMultiSetComplex()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multiset<Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	people.insert(p1);
@@ -802,7 +815,7 @@ void SQLiteTest::testMultiSetComplex()
 
 void SQLiteTest::testMapComplex()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::map<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -823,7 +836,7 @@ void SQLiteTest::testMapComplex()
 
 void SQLiteTest::testMapComplexUnique()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -847,7 +860,7 @@ void SQLiteTest::testMapComplexUnique()
 
 void SQLiteTest::testMultiMapComplex()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -871,7 +884,7 @@ void SQLiteTest::testMultiMapComplex()
 
 void SQLiteTest::testSelectIntoSingle()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -891,7 +904,7 @@ void SQLiteTest::testSelectIntoSingle()
 
 void SQLiteTest::testSelectIntoSingleStep()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -916,7 +929,7 @@ void SQLiteTest::testSelectIntoSingleStep()
 
 void SQLiteTest::testSelectIntoSingleFail()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -942,7 +955,7 @@ void SQLiteTest::testSelectIntoSingleFail()
 
 void SQLiteTest::testLowerLimitOk()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -968,7 +981,7 @@ void SQLiteTest::testLowerLimitOk()
 
 void SQLiteTest::testSingleSelect()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -993,7 +1006,7 @@ void SQLiteTest::testSingleSelect()
 
 void SQLiteTest::testLowerLimitFail()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -1019,7 +1032,7 @@ void SQLiteTest::testLowerLimitFail()
 
 void SQLiteTest::testCombinedLimits()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -1042,7 +1055,7 @@ void SQLiteTest::testCombinedLimits()
 
 void SQLiteTest::testRange()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -1064,7 +1077,7 @@ void SQLiteTest::testRange()
 
 void SQLiteTest::testCombinedIllegalLimits()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -1091,7 +1104,7 @@ void SQLiteTest::testCombinedIllegalLimits()
 
 void SQLiteTest::testIllegalRange()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	std::multimap<std::string, Person> people;
 	Person p1("LN1", "FN1", "ADDR1", 1);
 	Person p2("LN2", "FN2", "ADDR2", 2);
@@ -1117,7 +1130,7 @@ void SQLiteTest::testIllegalRange()
 
 void SQLiteTest::testEmptyDB()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
@@ -1137,7 +1150,7 @@ void SQLiteTest::testBLOB()
 	std::string lastName("lastname");
 	std::string firstName("firstname");
 	std::string address("Address");
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Image BLOB)", now;
 	BLOB img("0123456789", 10);
@@ -1155,7 +1168,7 @@ void SQLiteTest::testBLOB()
 
 void SQLiteTest::testTuple10()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1174,7 +1187,7 @@ void SQLiteTest::testTuple10()
 
 void SQLiteTest::testTupleVector10()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1203,7 +1216,7 @@ void SQLiteTest::testTupleVector10()
 
 void SQLiteTest::testTuple9()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1222,7 +1235,7 @@ void SQLiteTest::testTuple9()
 
 void SQLiteTest::testTupleVector9()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1251,7 +1264,7 @@ void SQLiteTest::testTupleVector9()
 
 void SQLiteTest::testTuple8()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1270,7 +1283,7 @@ void SQLiteTest::testTuple8()
 
 void SQLiteTest::testTupleVector8()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
@@ -1299,7 +1312,7 @@ void SQLiteTest::testTupleVector8()
 
 void SQLiteTest::testTuple7()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER)", now;
@@ -1317,7 +1330,7 @@ void SQLiteTest::testTuple7()
 
 void SQLiteTest::testTupleVector7()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER)", now;
@@ -1345,7 +1358,7 @@ void SQLiteTest::testTupleVector7()
 
 void SQLiteTest::testTuple6()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER)", now;
@@ -1363,7 +1376,7 @@ void SQLiteTest::testTuple6()
 
 void SQLiteTest::testTupleVector6()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER)", now;
@@ -1391,7 +1404,7 @@ void SQLiteTest::testTupleVector6()
 
 void SQLiteTest::testTuple5()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER)", now;
@@ -1409,7 +1422,7 @@ void SQLiteTest::testTuple5()
 
 void SQLiteTest::testTupleVector5()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER)", now;
@@ -1437,7 +1450,7 @@ void SQLiteTest::testTupleVector5()
 
 void SQLiteTest::testTuple4()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER)", now;
@@ -1455,7 +1468,7 @@ void SQLiteTest::testTuple4()
 
 void SQLiteTest::testTupleVector4()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER)", now;
@@ -1483,7 +1496,7 @@ void SQLiteTest::testTupleVector4()
 
 void SQLiteTest::testTuple3()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
@@ -1501,7 +1514,7 @@ void SQLiteTest::testTuple3()
 
 void SQLiteTest::testTupleVector3()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples "
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
@@ -1529,7 +1542,7 @@ void SQLiteTest::testTupleVector3()
 
 void SQLiteTest::testTuple2()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples (int0 INTEGER, int1 INTEGER)", now;
 
@@ -1546,7 +1559,7 @@ void SQLiteTest::testTuple2()
 
 void SQLiteTest::testTupleVector2()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples (int0 INTEGER, int1 INTEGER)", now;
 
@@ -1573,7 +1586,7 @@ void SQLiteTest::testTupleVector2()
 
 void SQLiteTest::testTuple1()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples (int0 INTEGER)", now;
 
@@ -1590,7 +1603,7 @@ void SQLiteTest::testTuple1()
 
 void SQLiteTest::testTupleVector1()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Tuples", now;
 	tmp << "CREATE TABLE Tuples (int0 INTEGER)", now;
 
@@ -1617,7 +1630,7 @@ void SQLiteTest::testTupleVector1()
 
 void SQLiteTest::testDateTime()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS DateTimes", now;
 	tmp << "CREATE TABLE DateTimes (dt0 DATE)", now;
 
@@ -1653,7 +1666,7 @@ void SQLiteTest::testDateTime()
 
 void SQLiteTest::testInternalExtraction()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Vectors", now;
 	tmp << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
@@ -1719,7 +1732,7 @@ void SQLiteTest::testInternalExtraction()
 
 void SQLiteTest::testPrimaryKeyConstraint()
 {
-	Session ses (SQLite::Connector::KEY, "dummy.db");
+	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	ses << "DROP TABLE IF EXISTS LogTest", now;
 	ses << "CREATE TABLE LogTest (Id INTEGER PRIMARY KEY, Time INTEGER, Value INTEGER)", now;
 	const double value = -200000000000.0;
@@ -1749,7 +1762,7 @@ void SQLiteTest::testPrimaryKeyConstraint()
 
 void SQLiteTest::testNull()
 {
-	Session ses (SQLite::Connector::KEY, "dummy.db");
+	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	ses << "DROP TABLE IF EXISTS NullTest", now;
 
 	ses << "CREATE TABLE NullTest (i INTEGER NOT NULL)", now;
@@ -1819,7 +1832,7 @@ void SQLiteTest::testNull()
 
 void SQLiteTest::testRowIterator()
 {
-	Session ses (SQLite::Connector::KEY, "dummy.db");
+	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	ses << "DROP TABLE IF EXISTS Vectors", now;
 	ses << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
@@ -1851,7 +1864,7 @@ void SQLiteTest::testRowIterator()
 
 void SQLiteTest::testAsync()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 	
@@ -1935,7 +1948,7 @@ void SQLiteTest::testAsync()
 
 void SQLiteTest::testAny()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Anys", now;
 	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
@@ -1961,7 +1974,7 @@ void SQLiteTest::testAny()
 
 void SQLiteTest::testDynamicAny()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Anys", now;
 	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
@@ -1987,7 +2000,7 @@ void SQLiteTest::testDynamicAny()
 
 void SQLiteTest::testSQLChannel()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS T_POCO_LOG", now;
 	tmp << "CREATE TABLE T_POCO_LOG (Source VARCHAR,"
 		"Name VARCHAR,"
@@ -2008,7 +2021,7 @@ void SQLiteTest::testSQLChannel()
 		"Text VARCHAR,"
 		"DateTime DATE)", now;
 
-	AutoPtr<SQLChannel> pChannel = new SQLChannel(SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
+	AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
 	pChannel->setProperty("keep", "2 seconds");
 
 	Message msgInf("InformationSource", "a Informational async message", Message::PRIO_INFORMATION);
@@ -2061,7 +2074,7 @@ void SQLiteTest::testSQLChannel()
 
 void SQLiteTest::testSQLLogger()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS T_POCO_LOG", now;
 	tmp << "CREATE TABLE T_POCO_LOG (Source VARCHAR,"
 		"Name VARCHAR,"
@@ -2073,7 +2086,7 @@ void SQLiteTest::testSQLLogger()
 		"DateTime DATE)", now;
 
 	{
-		AutoPtr<SQLChannel> pChannel = new SQLChannel(SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
+		AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
 		Logger& root = Logger::root();
 		root.setChannel(pChannel.get());
 		root.setLevel(Message::PRIO_INFORMATION);
@@ -2100,7 +2113,7 @@ void SQLiteTest::testExternalBindingAndExtraction()
 	AbstractExtractionVec extraction;
 	AbstractBindingVec binding;
 
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 
 	tmp << "DROP TABLE IF EXISTS Ints", now;
 	tmp << "CREATE TABLE Ints (int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
@@ -2132,7 +2145,7 @@ void SQLiteTest::testExternalBindingAndExtraction()
 
 void SQLiteTest::testBindingCount()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 
 	tmp << "DROP TABLE IF EXISTS Ints", now;
 	tmp << "CREATE TABLE Ints (int0 INTEGER)", now;
@@ -2158,7 +2171,7 @@ void SQLiteTest::testBindingCount()
 
 void SQLiteTest::testMultipleResults()
 {
-	Session tmp (SQLite::Connector::KEY, "dummy.db");
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE Person (LastName VARCHAR(30),"

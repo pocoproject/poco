@@ -85,6 +85,9 @@ inline const Limit& Range::upper() const
 }
 
 
+namespace Keywords {
+
+
 template <typename T> 
 Limit limit(T lim, bool hard = false)
 	/// Creates an upperLimit
@@ -112,6 +115,9 @@ Range range(T low, T upp, bool hard = false)
 {
 	return Range(static_cast<Poco::UInt32>(low), static_cast<Poco::UInt32>(upp), hard);
 }
+
+
+} // namespace Keywords
 
 
 } } // namespace Poco::Data

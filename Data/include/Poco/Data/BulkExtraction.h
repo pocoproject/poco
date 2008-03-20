@@ -215,6 +215,9 @@ private:
 };
 
 
+namespace Keywords {
+
+
 template <typename T> 
 BulkExtraction<std::vector<T> >* into(std::vector<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
@@ -273,6 +276,9 @@ BulkExtraction<std::list<T> >* into(std::list<T>& t, BulkFnType, const Position&
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
 	return new BulkExtraction<std::list<T> >(t, size, pos);
 }
+
+
+} // namespace Keywords
 
 
 } } // namespace Poco::Data

@@ -48,6 +48,9 @@ namespace Poco {
 namespace Data {
 
 
+using namespace Keywords;
+
+
 const std::string SQLChannel::PROP_CONNECTOR("connector");
 const std::string SQLChannel::PROP_CONNECT("connect");
 const std::string SQLChannel::PROP_NAME("name");

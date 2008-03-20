@@ -51,12 +51,14 @@
 #include <iostream>
 
 
-using namespace Poco::Data;
-using ODBC::Utility;
-using ODBC::ODBCException;
-using ODBC::ConnectionException;
-using ODBC::StatementException;
-using ODBC::StatementDiagnostics;
+using namespace Poco::Data::Keywords;
+using Poco::Data::Session;
+using Poco::Data::BLOB;
+using Poco::Data::ODBC::Utility;
+using Poco::Data::ODBC::ODBCException;
+using Poco::Data::ODBC::ConnectionException;
+using Poco::Data::ODBC::StatementException;
+using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
@@ -1165,10 +1167,10 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
 	
-	ODBC::Connector::registerConnector();
+	Poco::Data::ODBC::Connector::registerConnector();
 	try
 	{
-		return new Session(ODBC::Connector::KEY, dbConnString);
+		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString);
 	}catch (ConnectionException& ex)
 	{
 		std::cout << ex.toString() << std::endl;

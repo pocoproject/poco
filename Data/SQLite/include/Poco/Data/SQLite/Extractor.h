@@ -45,6 +45,7 @@
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/Constants.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include <vector>
@@ -135,7 +136,7 @@ public:
 	bool extract(std::size_t pos, Poco::DynamicAny& val);
 		/// Extracts a DynamicAny.
 
-	bool isNull(std::size_t pos, std::size_t row = -1);
+	bool isNull(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW);
 		/// Returns true if the current row value at pos column is null.
 		/// Because of the loss of information about null-ness of the 
 		/// underlying database values due to the nature of SQLite engine, 

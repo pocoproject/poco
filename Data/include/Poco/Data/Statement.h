@@ -438,6 +438,9 @@ private:
 };
 
 
+namespace Keywords {
+
+
 //
 // Manipulators
 //
@@ -507,6 +510,9 @@ inline void Data_API reset(Statement& statement)
 	statement.setStorage("deque");
 	statement.setAsync(false);
 }
+
+
+} // namespace Keywords
 
 
 //

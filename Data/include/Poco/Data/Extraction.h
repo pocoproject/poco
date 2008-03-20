@@ -763,6 +763,9 @@ private:
 };
 
 
+namespace Keywords {
+
+
 template <typename T> 
 inline Extraction<T>* into(T& t)
 	/// Convenience function to allow for a more compact creation of an extraction object.
@@ -800,6 +803,9 @@ inline AbstractExtractionVec& into(AbstractExtractionVec& ev)
 {
 	return ev;
 }
+
+
+} // namespace Keywords
 
 
 } } // namespace Poco::Data

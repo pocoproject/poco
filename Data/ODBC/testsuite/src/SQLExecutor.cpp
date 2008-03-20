@@ -66,13 +66,24 @@
 #include <iterator>
 
 
-using namespace Poco::Data;
-using ODBC::Utility;
-using ODBC::Preparation;
-using ODBC::ConnectionException;
-using ODBC::StatementException;
-using ODBC::DataTruncatedException;
-using ODBC::StatementDiagnostics;
+using namespace Poco::Data::Keywords;
+using Poco::Data::Session;
+using Poco::Data::Statement;
+using Poco::Data::RecordSet;
+using Poco::Data::Column;
+using Poco::Data::Row;
+using Poco::Data::SQLChannel;
+using Poco::Data::LimitException;
+using Poco::Data::BindingException;
+using Poco::Data::BLOB;
+using Poco::Data::Date;
+using Poco::Data::Time;
+using Poco::Data::ODBC::Utility;
+using Poco::Data::ODBC::Preparation;
+using Poco::Data::ODBC::ConnectionException;
+using Poco::Data::ODBC::StatementException;
+using Poco::Data::ODBC::DataTruncatedException;
+using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::Tuple;
 using Poco::Any;
@@ -2981,7 +2992,7 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 {
 	try
 	{
-		AutoPtr<SQLChannel> pChannel = new SQLChannel(ODBC::Connector::KEY, connect, "TestSQLChannel");
+		AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::ODBC::Connector::KEY, connect, "TestSQLChannel");
 		pChannel->setProperty("keep", "2 seconds");
 
 		Message msgInf("InformationSource", "a Informational async message", Message::PRIO_INFORMATION);
@@ -3040,7 +3051,7 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 	try
 	{
 		Logger& root = Logger::root();
-		root.setChannel(new SQLChannel(ODBC::Connector::KEY, connect, "TestSQLChannel"));
+		root.setChannel(new SQLChannel(Poco::Data::ODBC::Connector::KEY, connect, "TestSQLChannel"));
 		root.setLevel(Message::PRIO_INFORMATION);
 		
 		root.information("a Informational message");

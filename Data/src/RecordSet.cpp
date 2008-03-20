@@ -42,6 +42,7 @@
 #include "Poco/DateTime.h"
 
 
+using namespace Poco::Data::Keywords;
 using Poco::DateTime;
 
 

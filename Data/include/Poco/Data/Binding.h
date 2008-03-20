@@ -722,6 +722,9 @@ private:
 };
 
 
+namespace Keywords {
+
+
 template <typename T> 
 inline Binding<T>* use(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
@@ -812,6 +815,9 @@ inline Binding<T>* bind(T t)
 {
 	return bind(t, "");
 }
+
+
+} // namespace Keywords
 
 
 } } // namespace Poco::Data

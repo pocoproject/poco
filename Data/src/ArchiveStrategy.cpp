@@ -41,6 +41,9 @@ namespace Poco {
 namespace Data {
 
 
+using namespace Keywords;
+
+
 //
 // ArchiveStrategy
 //

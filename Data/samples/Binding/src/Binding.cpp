@@ -22,7 +22,9 @@
 #include <iostream>
 
 
-using namespace Poco::Data;
+using namespace Poco::Data::Keywords;
+using Poco::Data::Session;
+using Poco::Data::Statement;
 
 
 struct Person

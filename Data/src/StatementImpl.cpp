@@ -54,10 +54,14 @@ namespace Poco {
 namespace Data {
 
 
+using namespace Keywords;
+
+
 const std::string StatementImpl::VECTOR = "vector";
 const std::string StatementImpl::LIST = "list";
 const std::string StatementImpl::DEQUE = "deque";
 const std::string StatementImpl::UNKNOWN = "unknown";
+
 
 StatementImpl::StatementImpl(SessionImpl& rSession):
 	_state(ST_INITIALIZED),

@@ -88,6 +88,9 @@ inline Poco::UInt32 Bulk::size() const
 }
 
 
+namespace Keywords {
+
+
 template <typename T>
 inline Bulk bulk(const T& limit)
 	/// Convenience function for creation of bulk.
@@ -101,6 +104,9 @@ inline void bulk(char)
 	/// (see BulkBinding) and bulk extraction signalling to Statement.
 {
 }
+
+
+} // namespace Keywords
 
 
 typedef void (*BulkFnType)(char);
