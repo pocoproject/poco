@@ -55,6 +55,13 @@ ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
 
+ifeq ($(findstring SunOS,$(POCO_HOST_OSNAME)),SunOS)
+POCO_HOST_ALL_OSNAME = $(shell uname -a)
+ifeq ($(findstring Nexenta,$(POCO_HOST_ALL_OSNAME)),Nexenta)
+POCO_HOST_OSNAME = Nexenta
+endif
+endif
+
 #
 # If POCO_CONFIG is not set, use the OS name as configuration name
 #
