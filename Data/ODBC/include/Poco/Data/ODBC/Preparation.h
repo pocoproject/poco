@@ -40,6 +40,7 @@
 #define Data_ODBC_Preparation_INCLUDED
 
 
+#include "Poco/Data/Constants.h"
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/Handle.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
@@ -100,8 +101,6 @@ public:
 		DE_MANUAL,
 		DE_BOUND
 	};
-
-	static const std::size_t INVALID_ROW;
 
 	enum DataType
 	{
@@ -386,7 +385,7 @@ public:
 		/// Returned length for variable length fields is the one 
 		/// supported by this implementation, not the underlying DB.
 
-	std::size_t actualDataSize(std::size_t col, std::size_t row = INVALID_ROW) const;
+	std::size_t actualDataSize(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) const;
 		/// Returns the returned length for the column and row specified. 
 		/// This is usually equal to the column size, except for 
 		/// variable length fields (BLOB and variable length strings).

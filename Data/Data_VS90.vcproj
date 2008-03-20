@@ -415,6 +415,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Constants.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Data.h"
 					>
 				</File>

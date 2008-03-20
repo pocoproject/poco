@@ -40,6 +40,7 @@
 #define Data_ODBC_Extractor_INCLUDED
 
 
+#include "Poco/Data/Constants.h"
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/ODBC/Preparation.h"
@@ -52,7 +53,7 @@
 #include "Poco/Exception.h"
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+	#include <windows.h>
 #endif
 #include <sqltypes.h>
 
@@ -322,7 +323,7 @@ public:
 	Preparation::DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
-	bool isNull(std::size_t col, std::size_t row = Preparation::INVALID_ROW);
+	bool isNull(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW);
 		/// Returns true if the value at [col,row] is null.
 
 	void reset();

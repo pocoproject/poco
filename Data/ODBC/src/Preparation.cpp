@@ -43,9 +43,6 @@ namespace Data {
 namespace ODBC {
 
 
-const std::size_t Preparation::INVALID_ROW = std::numeric_limits<std::size_t>::max();
-
-
 Preparation::Preparation(const StatementHandle& rStmt, 
 	const std::string& statement, 
 	std::size_t maxFieldSize,
@@ -170,7 +167,7 @@ std::size_t Preparation::maxDataSize(std::size_t pos) const
 
 std::size_t Preparation::actualDataSize(std::size_t col, std::size_t row) const
 {
-	SQLLEN size = (INVALID_ROW == row) ? _lengths.at(col) :
+	SQLLEN size = (POCO_DATA_INVALID_ROW == row) ? _lengths.at(col) :
 		_lenLengths.at(col).at(row);
 
 	// workaround for drivers returning negative length

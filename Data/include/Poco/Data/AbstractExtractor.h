@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/Constants.h"
 #include <vector>
 #include <deque>
 #include <list>
@@ -317,7 +318,7 @@ public:
 	virtual bool extract(std::size_t pos, std::list<DynamicAny>& val);
 		/// Extracts a DynamicAny list.
 
-	virtual bool isNull(std::size_t col, std::size_t row = -1) = 0;
+	virtual bool isNull(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) = 0;
 		/// Returns true if the value at [col,row] position is null.
 
 	virtual void reset();
