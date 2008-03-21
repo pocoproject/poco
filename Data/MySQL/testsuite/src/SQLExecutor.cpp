@@ -1479,3 +1479,38 @@ void SQLExecutor::internalExtraction()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 }
+
+
+void SQLExecutor::doNull()
+{
+	std::string funct = "null()";
+	
+    *_pSession << "INSERT INTO Vectors VALUES (null, null, null)", now;
+
+    int count = 0;
+    try { *_pSession << "SELECT COUNT(*) FROM Vectors", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	int i0 = 0;
+	Statement stmt1 = (*_pSession << "SELECT i0 FROM Vectors", into(i0, -1));
+    try { stmt1.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (i0 == -1);
+
+	float flt0 = 0;
+    Statement stmt2 = (*_pSession << "SELECT flt0 FROM Vectors", into(flt0, 3.25f));
+    try { stmt2.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (flt0 == 3.25);
+
+	std::string str0("string");
+    Statement stmt3 = (*_pSession << "SELECT str0 FROM Vectors", into(str0, std::string("DEFAULT")));
+    try { stmt3.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (str0 == "DEFAULT");
+}

@@ -127,14 +127,13 @@ bool Extractor::extract(std::size_t pos, char& val)
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
 	if (_metadata.columnsReturned() <= pos)
-	{
-		return false;
-	}
+        throw MySQLException("Extractor: attempt to extract more paremeters, than query result contain");
+
+    if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
+        return false;
 
 	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_STRING)
-	{
-		return false;
-	}
+		throw MySQLException("Extractor: not a string");
 
 	val.assign(_metadata.rawData(pos), _metadata.length(pos));
 	return true;
@@ -144,14 +143,14 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
 	if (_metadata.columnsReturned() <= pos)
-	{
-		return false;
-	}
+        throw MySQLException("Extractor: attempt to extract more paremeters, than query result contain");
+
+    if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
+        return false;
 
 	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
-	{
-		return false;
-	}
+		throw MySQLException("Extractor: not a blob");
+
 
 	val.assignRaw(_metadata.rawData(pos), _metadata.length(pos));
 	return true;
@@ -161,12 +160,17 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, size_t length)
 {
 	MYSQL_BIND bind = {0};
+    my_bool isNull = 0;
 
+    bind.is_null       = &isNull;
 	bind.buffer_type   = type;
 	bind.buffer        = buffer;
 	bind.buffer_length = static_cast<unsigned long>(length);
 
-	return _stmt.fetchColumn(pos, &bind);
+	if (!_stmt.fetchColumn(pos, &bind))
+        return false;
+
+    return isNull == 0;
 }
 
 

@@ -164,8 +164,10 @@ namespace
 		default:
 			return Poco::Data::MetaColumn::FDT_UNKNOWN;
 		}
+
+		return Poco::Data::MetaColumn::FDT_UNKNOWN;
 	}	
-}
+} // namespace
 
 
 namespace Poco {
@@ -178,6 +180,7 @@ void ResultMetadata::reset()
 	_row.resize(0);
 	_buffer.resize(0);
 	_lengths.resize(0);
+    _isNull.resize(0);
 }
 
 void ResultMetadata::init(MYSQL_STMT* stmt)
@@ -215,6 +218,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	_buffer.resize(commonSize);
 	_row.resize(count);
 	_lengths.resize(count);
+    _isNull.resize(count);
 
 	size_t offset = 0;
 
@@ -226,6 +230,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 		_row[i].buffer_length = static_cast<unsigned int>(_columns[i].length());
 		_row[i].buffer        = &_buffer[0] + offset;
 		_row[i].length        = &_lengths[i];
+        _row[i].is_null       = &_isNull[i];
 		
 		offset += _row[i].buffer_length;
 	}}
@@ -246,14 +251,19 @@ MYSQL_BIND* ResultMetadata::row()
 	return &_row[0];
 }
 
-size_t ResultMetadata::length(size_t pos)
+size_t ResultMetadata::length(size_t pos) const
 {
 	return _lengths[pos];
 }
 
-const char* ResultMetadata::rawData(size_t pos)
+const char* ResultMetadata::rawData(size_t pos) const 
 {
 	return reinterpret_cast<const char*>(_row[pos].buffer);
 }
 
-}}}
+bool ResultMetadata::isNull(size_t pos) const 
+{
+    return (_isNull[pos] != 0);
+}
+
+}}} // namespace Poco::Data::MySQL

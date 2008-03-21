@@ -487,6 +487,15 @@ void MySQLTest::testInternalExtraction()
 }
 
 
+void MySQLTest::testNull()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateVectorsTable();
+	_pExecutor->doNull();
+}
+
+
 void MySQLTest::dropTable(const std::string& tableName)
 {
 	try
@@ -622,6 +631,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
 	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
+	CppUnit_addTest(pSuite, MySQLTest, testNull);
 
 	return pSuite;
 }

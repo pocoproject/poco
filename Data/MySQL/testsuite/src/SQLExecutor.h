@@ -108,6 +108,7 @@ public:
 	void tupleVector();
 
 	void internalExtraction();
+	void doNull();
 
 private:
 	Poco::Data::Session* _pSession;

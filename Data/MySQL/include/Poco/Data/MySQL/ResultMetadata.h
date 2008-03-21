@@ -65,20 +65,23 @@ public:
 		/// Returns the reference to the specified metacolumn.
 
 	MYSQL_BIND* row();
-		///
+		/// Returns pointer to native row.
 
-	size_t length(size_t pos);
-		///
+	std::size_t length(std::size_t pos) const;
+		/// Returns the length.
 
-	const char* rawData(size_t pos);
-		///
+	const char* rawData(std::size_t pos) const;
+		/// Returns raw data.
+
+	bool isNull(std::size_t pos) const;
+		/// Returns true if value at pos is null.
 
 private:
-
 	std::vector<MetaColumn>    _columns;
 	std::vector<MYSQL_BIND>    _row;
 	std::vector<char>          _buffer;
 	std::vector<unsigned long> _lengths;
+    std::vector<my_bool>       _isNull;
 };
 
 }}}

@@ -105,6 +105,7 @@ public:
 	void testTupleVector();
 
 	void testInternalExtraction();
+	void testNull();
 
 	void setUp();
 	void tearDown();
