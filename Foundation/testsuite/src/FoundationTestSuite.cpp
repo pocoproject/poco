@@ -48,7 +48,6 @@
 #include "EventTestSuite.h"
 #include "CacheTestSuite.h"
 #include "HashingTestSuite.h"
-#include "AsyncIOTestSuite.h"
 
 
 CppUnit::Test* FoundationTestSuite::suite()
@@ -72,7 +71,6 @@ CppUnit::Test* FoundationTestSuite::suite()
 	pSuite->addTest(EventTestSuite::suite());
 	pSuite->addTest(CacheTestSuite::suite());
 	pSuite->addTest(HashingTestSuite::suite());
-	pSuite->addTest(AsyncIOTestSuite::suite());
 
 	return pSuite;
 }
