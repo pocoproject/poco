@@ -25,7 +25,7 @@ objects = \
 	MailTestSuite MailMessageTest MailStreamTest \
 	SMTPClientSessionTest POP3ClientSessionTest \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
-	SyslogTest SocketIOChannelTestSuite SocketIOChannelTest
+	SyslogTest
 
 target         = testrunner
 target_version = 1

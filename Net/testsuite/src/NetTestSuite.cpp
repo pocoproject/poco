@@ -44,7 +44,6 @@
 #include "MailTestSuite.h"
 #include "ICMPClientTestSuite.h"
 #include "SyslogTest.h"
-#include "SocketIOChannelTest.h"
 
 
 CppUnit::Test* NetTestSuite::suite()
@@ -64,7 +63,6 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(MailTestSuite::suite());
 	pSuite->addTest(ICMPClientTestSuite::suite());
 	pSuite->addTest(SyslogTest::suite());
-	pSuite->addTest(SocketIOChannelTest::suite());
 
 	return pSuite;
 }
