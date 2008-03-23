@@ -37,8 +37,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	HashingTestSuite HashTableTest SimpleHashTableTest LinearHashTableTest \
 	HashSetTest HashMapTest SharedMemoryTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest \
-	TuplesTest NamedTuplesTest TypeListTest DynamicAnyTest FileStreamTest \
-	AsyncIOTestSuite AsyncIOChannelTest
+	TuplesTest NamedTuplesTest TypeListTest DynamicAnyTest FileStreamTest
 
 target         = testrunner
 target_version = 1
