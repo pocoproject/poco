@@ -1188,46 +1188,6 @@
 				</File>
 			</Filter>
 		</Filter>
-		<Filter
-			Name="AsyncIO"
-			>
-			<Filter
-				Name="Header Files"
-				>
-				<File
-					RelativePath=".\include\Poco\Net\AsyncSocketChannel.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				>
-				<File
-					RelativePath=".\src\AsyncSocketChannel.cpp"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="IO"
-			>
-			<Filter
-				Name="Header Files"
-				>
-				<File
-					RelativePath=".\include\Poco\Net\SocketIOChannel.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				>
-				<File
-					RelativePath=".\src\SocketIOChannel.cpp"
-					>
-				</File>
-			</Filter>
-		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
