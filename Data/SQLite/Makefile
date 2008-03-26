@@ -8,7 +8,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SYSFLAGS += -DTHREADSAFE -DNO_TCL -DSQLITE_DISABLE_LFS
+SYSFLAGS += -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK \
+	-DSQLITE_OMIT_COMPLETE -DSQLITE_OMIT_TCL_VARIABLE
 
 objects = Binder Extractor SessionImpl Connector \
 	SQLiteException SQLiteStatementImpl Utility \

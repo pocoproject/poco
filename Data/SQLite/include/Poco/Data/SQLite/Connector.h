@@ -73,6 +73,10 @@ public:
 
 	static void unregisterConnector();
 		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.
+
+	static void enableSharedCache(bool flag = true);
+		/// Enables or disables SQlite shared cache mode
+		/// (see http://www.sqlite.org/sharedcache.html for a discussion).
 };
 
 
