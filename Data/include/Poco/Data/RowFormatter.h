@@ -134,6 +134,9 @@ inline const std::string& RowFormatter::postfix() const
 }
 
 
+namespace Keywords {
+
+
 template <typename T>
 inline T* format(const T& formatter)
 	/// Utility function used to pass formatter to the statement.
@@ -141,6 +144,9 @@ inline T* format(const T& formatter)
 {
 	return new T(formatter);
 }
+
+
+} // namespace Keywords
 
 
 typedef SharedPtr<RowFormatter> RowFormatterPtr;
