@@ -155,7 +155,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib winmm.lib iphlpapi.lib"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib winmm.lib iphlpapi.lib ..\..\CppUnit\WinTestRunner\obj\debug_static\WinTestRunner.res"
 				OutputFile="bin/TestSuitemtd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -215,7 +215,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib winmm.lib iphlpapi.lib"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib winmm.lib iphlpapi.lib ..\..\CppUnit\WinTestRunner\obj\release_static\WinTestRunner.res"
 				OutputFile="bin/TestSuitemt.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -1206,30 +1206,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SimpleHashTableTest.cpp">
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="AsyncIO"
-			Filter="">
-			<Filter
-				Name="Header Files"
-				Filter="">
-				<File
-					RelativePath=".\src\AsyncIOChannelTest.h">
-				</File>
-				<File
-					RelativePath=".\src\AsyncIOTestSuite.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				Filter="">
-				<File
-					RelativePath=".\src\AsyncIOChannelTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\AsyncIOTestSuite.cpp">
 				</File>
 			</Filter>
 		</Filter>

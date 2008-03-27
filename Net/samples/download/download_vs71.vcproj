@@ -38,7 +38,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib PocoNetd.lib PocoUtild.lib"
-				OutputFile="bin/downloadd.exe"
+				OutputFile="bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="TRUE"
@@ -98,7 +98,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundation.lib PocoXML.lib PocoNet.lib PocoUtil.lib"
-				OutputFile="bin/download.exe"
+				OutputFile="bin/$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="FALSE"
@@ -153,6 +153,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationmtd.lib PocoXMLmtd.lib PocoNetmtd.lib PocoUtilmtd.lib ws2_32.lib"
+				OutputFile="bin/$(ProjectName)mtd.exe"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="bin/downloadmtd.pdb"/>
@@ -196,6 +197,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationmt.lib PocoXMLmt.lib PocoNetmt.lib PocoUtilmt.lib ws2_32.lib"
+				OutputFile="bin/$(ProjectName)mt.exe"
 				AdditionalLibraryDirectories="..\..\..\lib"/>
 			<Tool
 				Name="VCMIDLTool"/>

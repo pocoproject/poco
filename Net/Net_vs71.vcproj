@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationd.lib ws2_32.lib iphlpapi.lib unicows.lib"
-				OutputFile="..\bin\PocoNetd.dll"
+				OutputFile="..\bin\Poco$(ProjectName)d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\lib"
@@ -105,7 +105,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundation.lib ws2_32.lib iphlpapi.lib unicows.lib"
-				OutputFile="..\bin\PocoNet.dll"
+				OutputFile="..\bin\Poco$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\lib"
@@ -166,7 +166,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetmtd.lib"/>
+				OutputFile="..\lib\Poco$(ProjectName)mtd.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -201,7 +201,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;Net_EXPORTS;POCO_STATIC"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;Net_EXPORTS;POCO_STATIC"
 				GeneratePreprocessedFile="0"
 				KeepComments="FALSE"
 				StringPooling="TRUE"
@@ -219,7 +219,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetmt.lib"/>
+				OutputFile="..\lib\Poco$(ProjectName)mt.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -921,24 +921,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SMTPChannel.cpp">
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="AsyncIO"
-			Filter="">
-			<Filter
-				Name="Header Files"
-				Filter="">
-				<File
-					RelativePath=".\include\Poco\Net\AsyncSocketChannel.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				Filter="">
-				<File
-					RelativePath=".\src\AsyncSocketChannel.cpp">
 				</File>
 			</Filter>
 		</Filter>

@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib unicows.lib"
-				OutputFile="..\bin\PocoUtild.dll"
+				OutputFile="..\bin\Poco$(ProjectName)d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\lib"
@@ -105,7 +105,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundation.lib PocoXML.lib unicows.lib"
-				OutputFile="..\bin\PocoUtil.dll"
+				OutputFile="..\bin\Poco$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\lib"
@@ -166,7 +166,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoUtilmtd.lib"/>
+				OutputFile="..\lib\Poco$(ProjectName)mtd.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -201,7 +201,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\XML\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;Util_EXPORTS;POCO_STATIC"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;Util_EXPORTS;POCO_STATIC"
 				GeneratePreprocessedFile="0"
 				KeepComments="FALSE"
 				StringPooling="TRUE"
@@ -219,7 +219,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoUtilmt.lib"/>
+				OutputFile="..\lib\Poco$(ProjectName)mt.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

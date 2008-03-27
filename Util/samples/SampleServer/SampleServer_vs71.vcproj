@@ -38,7 +38,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib PocoUtild.lib"
-				OutputFile="bin/SampleServerd.exe"
+				OutputFile="bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="TRUE"
@@ -156,7 +156,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationmtd.lib PocoXMLmtd.lib PocoUtilmtd.lib advapi32.lib"
-				OutputFile="bin/SampleServermtd.exe"
+				OutputFile="bin/$(ProjectName)mtd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="TRUE"
@@ -216,7 +216,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationmt.lib PocoXMLmt.lib PocoUtilmt.lib advapi32.lib"
-				OutputFile="bin/SampleServermt.exe"
+				OutputFile="bin/$(ProjectName)mt.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="FALSE"

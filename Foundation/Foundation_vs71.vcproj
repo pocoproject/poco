@@ -39,8 +39,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib unicows.lib"
-				OutputFile="..\bin\PocoFoundationd.dll"
+				AdditionalDependencies="iphlpapi.lib"
+				OutputFile="..\bin\Poco$(ProjectName)d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
@@ -103,8 +103,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iphlpapi.lib unicows.lib"
-				OutputFile="..\bin\PocoFoundation.dll"
+				AdditionalDependencies="iphlpapi.lib"
+				OutputFile="..\bin\Poco$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="FALSE"
@@ -164,7 +164,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoFoundationmtd.lib"/>
+				OutputFile="..\lib\Poco$(ProjectName)mtd.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -217,7 +217,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoFoundationmt.lib"/>
+				OutputFile="..\lib\Poco$(ProjectName)mt.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -3644,42 +3644,6 @@
 				</File>
 				<File
 					RelativePath=".\src\HashStatistic.cpp">
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="AsyncIO"
-			Filter="">
-			<Filter
-				Name="Header Files"
-				Filter="">
-				<File
-					RelativePath=".\include\Poco\AsyncIOChannel.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\AsyncIOCommand.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\AsyncIOEvent.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\AsyncStreamChannel.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				Filter="">
-				<File
-					RelativePath=".\src\AsyncIOChannel.cpp">
-				</File>
-				<File
-					RelativePath=".\src\AsyncIOCommand.cpp">
-				</File>
-				<File
-					RelativePath=".\src\AsyncIOEvent.cpp">
-				</File>
-				<File
-					RelativePath=".\src\AsyncStreamChannel.cpp">
 				</File>
 			</Filter>
 		</Filter>
