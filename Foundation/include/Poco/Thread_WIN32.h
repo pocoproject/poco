@@ -42,7 +42,6 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Runnable.h"
-#include "Poco/Mutex.h"
 #include "Poco/UnWindows.h"
 
 
@@ -118,7 +117,6 @@ private:
 	HANDLE       _thread;
 	int          _prio;
 	std::size_t  _stackSize;
-	Mutex        _mutex;
 
 	static DWORD _currentKey;
 };

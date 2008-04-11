@@ -83,8 +83,6 @@ void ThreadImpl::setPriorityImpl(int prio)
 
 void ThreadImpl::startImpl(Runnable& target)
 {
-	Mutex::ScopedLock lock(_mutex);
-
 	if (isRunningImpl())
 		throw SystemException("thread already running");
 
@@ -96,8 +94,6 @@ void ThreadImpl::startImpl(Runnable& target)
 
 void ThreadImpl::startImpl(Callback target, void* pData)
 {
-	Mutex::ScopedLock lock(_mutex);
-
 	if (isRunningImpl())
 		throw SystemException("thread already running");
 

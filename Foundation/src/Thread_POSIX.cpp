@@ -118,7 +118,7 @@ void ThreadImpl::startImpl(Runnable& target)
 		pthread_attr_setstacksize(&attributes, _pData->stackSize);
 
 	_pData->pRunnableTarget = &target;
-	if (pthread_create(&_pData->thread, &attributes, entry, this))
+	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 	{
 		_pData->pRunnableTarget = 0;
 		throw SystemException("cannot start thread");
@@ -151,7 +151,7 @@ void ThreadImpl::startImpl(Callback target, void* pData)
 	_pData->pCallbackTarget->callback = target;
 	_pData->pCallbackTarget->pData = pData;
 
-	if (pthread_create(&_pData->thread, &attributes, entry, this))
+	if (pthread_create(&_pData->thread, &attributes, functionEntry, this))
 	{
 		_pData->pCallbackTarget->callback = 0;
 		_pData->pCallbackTarget->pData = 0;
@@ -199,7 +199,7 @@ ThreadImpl* ThreadImpl::currentImpl()
 }
 
 
-void* ThreadImpl::entry(void* pThread)
+void* ThreadImpl::runnableEntry(void* pThread)
 {
 	pthread_setspecific(_currentKey, pThread);
 
@@ -216,10 +216,7 @@ void* ThreadImpl::entry(void* pThread)
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
-		if (pData->pRunnableTarget)
-			pData->pRunnableTarget->run();
-		else
-			pData->pCallbackTarget->callback(pData->pCallbackTarget->pData);
+		pData->pRunnableTarget->run();
 	}
 	catch (Exception& exc)
 	{
@@ -233,13 +230,47 @@ void* ThreadImpl::entry(void* pThread)
 	{
 		ErrorHandler::handle();
 	}
-	if (pData->pRunnableTarget)
-		pData->pRunnableTarget = 0;
-	else
+
+	pData->pRunnableTarget = 0;
+	pData->done.set();
+	return 0;
+}
+
+
+void* ThreadImpl::functionEntry(void* pThread)
+{
+	pthread_setspecific(_currentKey, pThread);
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	sigset_t sset;
+	sigemptyset(&sset);
+	sigaddset(&sset, SIGQUIT);
+	sigaddset(&sset, SIGTERM);
+	sigaddset(&sset, SIGPIPE); 
+	pthread_sigmask(SIG_BLOCK, &sset, 0);
+#endif
+
+	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
+	try
 	{
-		pData->pCallbackTarget->callback = 0;
-		pData->pCallbackTarget->pData = 0;
+		pData->pCallbackTarget->callback(pData->pCallbackTarget->pData);
 	}
+	catch (Exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		ErrorHandler::handle();
+	}
+
+	pData->pCallbackTarget->callback = 0;
+	pData->pCallbackTarget->pData = 0;
 
 	pData->done.set();
 	return 0;

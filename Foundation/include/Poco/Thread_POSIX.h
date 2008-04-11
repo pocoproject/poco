@@ -98,7 +98,8 @@ public:
 	static ThreadImpl* currentImpl();
 
 protected:
-	static void* entry(void* pThread);
+	static void* runnableEntry(void* pThread);
+	static void* functionEntry(void* pThread);
 	static int mapPrio(int prio);
 
 private:
@@ -123,7 +124,7 @@ private:
 	};
 
 	AutoPtr<ThreadData> _pData;
-	
+
 	static pthread_key_t _currentKey;
 	static bool          _haveCurrentKey;
 	
