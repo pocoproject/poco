@@ -51,6 +51,24 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
+	typedef void (*Callback)(void*);
+
+#if defined(_DLL)
+	typedef DWORD (WINAPI *Entry)(LPVOID);
+#else
+	typedef unsigned (__stdcall *Entry)(void*);
+#endif
+
+	struct CallbackData
+	{
+		CallbackData(): callback(0), pData(0)
+		{
+		}
+
+		Callback  callback;
+		void*     pData; 
+	};
+
 	enum Priority
 	{
 		PRIO_LOWEST_IMPL  = THREAD_PRIORITY_LOWEST,
@@ -65,7 +83,10 @@ public:
 
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
+	void setStackSizeImpl(std::size_t size);
+	std::size_t getStackSizeImpl() const;
 	void startImpl(Runnable& target);
+	void startImpl(Callback target, void* pData = 0);
 
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -76,15 +97,26 @@ public:
 
 protected:
 #if defined(_DLL)
-	static DWORD WINAPI entry(LPVOID pThread);
+	static DWORD WINAPI runnableEntry(LPVOID pThread);
 #else
-	static unsigned __stdcall entry(void* pThread);
+	static unsigned __stdcall runnableEntry(void* pThread);
 #endif
 
+#if defined(_DLL)
+	static DWORD WINAPI functionEntry(LPVOID pThread);
+#else
+	static unsigned __stdcall functionEntry(void* pThread);
+#endif
+
+	void createImpl(Entry ent, void* pData);
+	void threadCleanup();
+
 private:
-	Runnable* _pTarget;
-	HANDLE    _thread;
-	int       _prio;
+	Runnable*    _pRunnableTarget;
+	CallbackData _callbackTarget;
+	HANDLE       _thread;
+	int          _prio;
+	std::size_t  _stackSize;
 
 	static DWORD _currentKey;
 };
@@ -108,6 +140,18 @@ inline void ThreadImpl::sleepImpl(long milliseconds)
 inline void ThreadImpl::yieldImpl()
 {
 	Sleep(0);
+}
+
+
+inline void ThreadImpl::setStackSizeImpl(std::size_t size)
+{
+	_stackSize = size;
+}
+
+
+inline std::size_t ThreadImpl::getStackSizeImpl() const
+{
+	return _stackSize;
 }
 
 

@@ -59,6 +59,8 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
+	typedef void (*Callback)(void*);
+
 	enum Priority
 	{
 		PRIO_LOWEST_IMPL,
@@ -68,13 +70,25 @@ public:
 		PRIO_HIGHEST_IMPL
 	};
 
+	struct CallbackData: public RefCountedObject
+	{
+		CallbackData(): callback(0), pData(0)
+		{
+		}
+
+		Callback  callback;
+		void*     pData; 
+	};
+
 	ThreadImpl();				
 	~ThreadImpl();
 
-	Runnable& targetImpl() const;
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
+	void setStackSizeImpl(std::size_t size);
+	std::size_t getStackSizeImpl() const;
 	void startImpl(Runnable& target);
+	void startImpl(Callback target, void* pData = 0);
 
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -91,19 +105,23 @@ private:
 	struct ThreadData: public RefCountedObject
 	{
 		ThreadData():
-			pTarget(0),
+			pRunnableTarget(0),
+			pCallbackTarget(0),
 			thread(0),
 			prio(PRIO_NORMAL_IMPL),
-			done(false)
+			done(false),
+			stackSize(0)
 		{
 		}
 
-		Runnable* pTarget;
-		pthread_t thread;
-		int       prio;
-		Event     done;
+		Runnable*     pRunnableTarget;
+		AutoPtr<CallbackData> pCallbackTarget;
+		pthread_t     thread;
+		int           prio;
+		Event         done;
+		std::size_t   stackSize;
 	};
-	
+
 	AutoPtr<ThreadData> _pData;
 	
 	static pthread_key_t _currentKey;
@@ -142,9 +160,28 @@ inline void ThreadImpl::sleepImpl(long milliseconds)
 }
 
 
+inline bool ThreadImpl::isRunningImpl() const
+{
+	return _pData->pRunnableTarget != 0 ||
+		(_pData->pCallbackTarget.get() != 0 && _pData->pCallbackTarget->callback != 0);
+}
+
+
 inline void ThreadImpl::yieldImpl()
 {
 	sched_yield();
+}
+
+
+inline void ThreadImpl::setStackSizeImpl(std::size_t size)
+{
+	_pData->stackSize = size;
+}
+
+
+inline std::size_t ThreadImpl::getStackSizeImpl() const
+{
+	return _pData->stackSize;
 }
 
 

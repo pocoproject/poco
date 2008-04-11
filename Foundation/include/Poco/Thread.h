@@ -68,6 +68,8 @@ class Foundation_API Thread: private ThreadImpl
 	/// The name of a thread can be changed at any time.
 {
 public:	
+	using ThreadImpl::Callback;
+
 	enum Priority
 		/// Thread priorities.
 	{
@@ -108,8 +110,21 @@ public:
 	Priority getPriority() const;
 		/// Returns the thread's priority.
 
+	void setStackSize(std::size_t size);
+		/// Sets the thread's stack size in bytes.
+		/// Setting the stack size to 0 will use the default stack size.
+		/// Typically, the real stack size is rounded up to the nearest
+		/// page size multiple.
+
+	std::size_t getStackSize() const;
+		/// Returns the thread's stack size in bytes.
+		/// If the default stack size is used, 0 is returned.
+
 	void start(Runnable& target);
 		/// Starts the thread with the given target.
+
+	void start(Callback target, void* pData = 0);
+		/// Starts the thread with the given target and parameter.
 
 	void join();
 		/// Waits until the thread completes execution.	
@@ -213,6 +228,18 @@ inline void Thread::yield()
 inline Thread* Thread::current()
 {
 	return static_cast<Thread*>(currentImpl());
+}
+
+
+inline void Thread::setStackSize(std::size_t size)
+{
+	setStackSizeImpl(size);
+}
+
+
+inline std::size_t Thread::getStackSize() const
+{
+	return getStackSizeImpl();
 }
 
 

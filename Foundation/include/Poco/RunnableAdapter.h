@@ -5,7 +5,7 @@
 //
 // Library: Foundation
 // Package: Threading
-// Module:  Thread
+// Module:  RunnableAdapter
 //
 // Definition of the RunnableAdapter template class.
 //
@@ -59,11 +59,15 @@ class RunnableAdapter: public Runnable
 public:
 	typedef void (C::*Callback)();
 	
-	RunnableAdapter(C& object, Callback method): _pObject(&object), _method(method)
+	RunnableAdapter(C& object, Callback method):
+		_pObject(&object),
+		_method(method)
 	{
 	}
 	
-	RunnableAdapter(const RunnableAdapter& ra): _pObject(ra._pObject), _method(ra._method)
+	RunnableAdapter(const RunnableAdapter& ra):
+		_pObject(ra._pObject),
+		_method(ra._method)
 	{
 	}
 

@@ -27,7 +27,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	StreamTokenizer String StringTokenizer SynchronizedObject \
 	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
 	TemporaryFile TextConverter TextEncoding TextIterator Thread ThreadLocal \
-	ThreadPool ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
+	ThreadPool ThreadTarget ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \
 	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Format \
 	Pipe PipeImpl PipeStream SharedMemory FileStream Unicode UTF8String \

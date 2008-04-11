@@ -39,7 +39,6 @@
 #include "Poco/ErrorHandler.h"
 #include <signal.h>
 
-
 //
 // Block SIGPIPE in main thread.
 //
@@ -87,7 +86,7 @@ ThreadImpl::ThreadImpl():
 			
 ThreadImpl::~ThreadImpl()
 {
-	if (_pData->pTarget)
+	if (isRunningImpl())
 		pthread_detach(_pData->thread);
 }
 
@@ -97,7 +96,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 	if (prio != _pData->prio)
 	{
 		_pData->prio = prio;
-		if (_pData->pTarget)
+		if (isRunningImpl())
 		{
 			struct sched_param par;
 			par.sched_priority = mapPrio(_pData->prio);
@@ -110,12 +109,52 @@ void ThreadImpl::setPriorityImpl(int prio)
 
 void ThreadImpl::startImpl(Runnable& target)
 {
-	if (_pData->pTarget) throw SystemException("thread already running");
+	if (_pData->pRunnableTarget) throw SystemException("thread already running");
 
-	_pData->pTarget = &target;
-	if (pthread_create(&_pData->thread, NULL, entry, this))
+	pthread_attr_t attributes;
+	pthread_attr_init(&attributes);
+
+	if (_pData->stackSize != 0)
+		pthread_attr_setstacksize(&attributes, _pData->stackSize);
+
+	_pData->pRunnableTarget = &target;
+	if (pthread_create(&_pData->thread, &attributes, entry, this))
 	{
-		_pData->pTarget = 0;
+		_pData->pRunnableTarget = 0;
+		throw SystemException("cannot start thread");
+	}
+
+	if (_pData->prio != PRIO_NORMAL_IMPL)
+	{
+		struct sched_param par;
+		par.sched_priority = mapPrio(_pData->prio);
+		if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+			throw SystemException("cannot set thread priority");
+	}
+}
+
+
+void ThreadImpl::startImpl(Callback target, void* pData)
+{
+	if (_pData->pCallbackTarget && _pData->pCallbackTarget->callback)
+		throw SystemException("thread already running");
+
+	pthread_attr_t attributes;
+	pthread_attr_init(&attributes);
+
+	if (_pData->stackSize != 0)
+		pthread_attr_setstacksize(&attributes, _pData->stackSize);
+
+	if (0 == _pData->pCallbackTarget.get())
+		_pData->pCallbackTarget = new CallbackData;
+
+	_pData->pCallbackTarget->callback = target;
+	_pData->pCallbackTarget->pData = pData;
+
+	if (pthread_create(&_pData->thread, &attributes, entry, this))
+	{
+		_pData->pCallbackTarget->callback = 0;
+		_pData->pCallbackTarget->pData = 0;
 		throw SystemException("cannot start thread");
 	}
 
@@ -151,12 +190,6 @@ bool ThreadImpl::joinImpl(long milliseconds)
 }
 
 
-bool ThreadImpl::isRunningImpl() const
-{
-	return _pData->pTarget != 0;
-}
-
-
 ThreadImpl* ThreadImpl::currentImpl()
 {
 	if (_haveCurrentKey)
@@ -183,7 +216,10 @@ void* ThreadImpl::entry(void* pThread)
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
-		pData->pTarget->run();
+		if (pData->pRunnableTarget)
+			pData->pRunnableTarget->run();
+		else
+			pData->pCallbackTarget->callback(pData->pCallbackTarget->pData);
 	}
 	catch (Exception& exc)
 	{
@@ -197,7 +233,14 @@ void* ThreadImpl::entry(void* pThread)
 	{
 		ErrorHandler::handle();
 	}
-	pData->pTarget = 0;
+	if (pData->pRunnableTarget)
+		pData->pRunnableTarget = 0;
+	else
+	{
+		pData->pCallbackTarget->callback = 0;
+		pData->pCallbackTarget->pData = 0;
+	}
+
 	pData->done.set();
 	return 0;
 }

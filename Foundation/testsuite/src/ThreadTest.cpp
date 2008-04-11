@@ -35,11 +35,13 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
+#include "Poco/ThreadTarget.h"
 #include "Poco/Event.h"
-
+#include <iostream>
 
 using Poco::Thread;
 using Poco::Runnable;
+using Poco::ThreadTarget;
 using Poco::Event;
 
 
@@ -74,11 +76,33 @@ public:
 		_event.set();
 	}
 	
+	static void staticFunc()
+	{
+		++_staticVar;
+	}
+
+	static int _staticVar;
+
 private:
 	bool _ran;
 	std::string _threadName;
 	Event _event;
 };
+
+
+int MyRunnable::_staticVar = 0;
+
+
+void freeFunc()
+{
+	++MyRunnable::_staticVar;
+}
+
+
+void freeFunc(void* pData)
+{
+	MyRunnable::_staticVar += *reinterpret_cast<int*>(pData);
+}
 
 
 ThreadTest::ThreadTest(const std::string& name): CppUnit::TestCase(name)
@@ -195,6 +219,75 @@ void ThreadTest::testJoin()
 }
 
 
+void ThreadTest::testThreadTarget()
+{
+	ThreadTarget te(&MyRunnable::staticFunc);
+	Thread thread;
+
+	assert (!thread.isRunning());
+
+	int tmp = MyRunnable::_staticVar;
+	thread.start(te);
+	thread.join();
+	assert (tmp + 1 == MyRunnable::_staticVar);
+
+	ThreadTarget te1(freeFunc);
+	assert (!thread.isRunning());
+
+	tmp = MyRunnable::_staticVar;
+	thread.start(te1);
+	thread.join();
+	assert (tmp + 1 == MyRunnable::_staticVar);
+}
+
+
+void ThreadTest::testThreadFunction()
+{
+	Thread thread;
+
+	assert (!thread.isRunning());
+
+	int tmp = MyRunnable::_staticVar;
+	thread.start(freeFunc, &tmp);
+	thread.join();
+	assert (tmp * 2 == MyRunnable::_staticVar);
+
+	assert (!thread.isRunning());
+
+	tmp = MyRunnable::_staticVar = 0;
+	thread.start(freeFunc, &tmp);
+	thread.join();
+	assert (0 == MyRunnable::_staticVar);
+}
+
+
+void ThreadTest::testThreadStackSize()
+{
+	Thread thread;
+	assert (0 == thread.getStackSize());
+	thread.setStackSize(50000000);
+	assert (50000000 == thread.getStackSize());
+	int tmp = MyRunnable::_staticVar;
+	thread.start(freeFunc, &tmp);
+	thread.join();
+	assert (tmp * 2 == MyRunnable::_staticVar);
+
+	thread.setStackSize(1);
+	assert (1 == thread.getStackSize());	
+	tmp = MyRunnable::_staticVar;
+	thread.start(freeFunc, &tmp);
+	thread.join();
+	assert (tmp * 2 == MyRunnable::_staticVar);
+
+	thread.setStackSize(0);
+	assert (0 == thread.getStackSize());
+	tmp = MyRunnable::_staticVar;
+	thread.start(freeFunc, &tmp);
+	thread.join();
+	assert (tmp * 2 == MyRunnable::_staticVar);
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -214,6 +307,9 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testCurrent);
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
 	CppUnit_addTest(pSuite, ThreadTest, testJoin);
+	CppUnit_addTest(pSuite, ThreadTest, testThreadTarget);
+	CppUnit_addTest(pSuite, ThreadTest, testThreadFunction);
+	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
 
 	return pSuite;
 }

@@ -1683,6 +1683,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\ThreadEntry.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ThreadLocal.cpp"
 					>
 				</File>
@@ -1812,6 +1816,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Thread_WIN32.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ThreadEntry.h"
 					>
 				</File>
 				<File
