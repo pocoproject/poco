@@ -457,7 +457,7 @@ inline Poco::Timespan Application::uptime() const
 		catch (Poco::Exception& exc)		\
 		{									\
 			pApp->logger().log(exc);		\
-			return Application::EXIT_CONFIG;\
+			return Poco::Util::Application::EXIT_CONFIG;\
 		}									\
 		return pApp->run();					\
 	}
@@ -473,7 +473,7 @@ inline Poco::Timespan Application::uptime() const
 		catch (Poco::Exception& exc)		\
 		{									\
 			pApp->logger().log(exc);		\
-			return Application::EXIT_CONFIG;\
+			return Poco::Util::Application::EXIT_CONFIG;\
 		}									\
 		return pApp->run();					\
 	}
