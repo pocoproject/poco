@@ -107,6 +107,43 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
+void ThreadImpl::setOSPriorityImpl(int prio)
+{
+	if (prio != _pData->osPrio)
+	{
+		if (_pData->pRunnableTarget || _pData->pCallbackTarget)
+		{
+			struct sched_param par;
+			par.sched_priority = prio;
+			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+				throw SystemException("cannot set thread priority");
+		}
+		_pData->prio   = reverseMapPrio(prio);
+		_pData->osPrio = prio;
+	}
+}
+
+
+int ThreadImpl::getMinOSPriorityImpl()
+{
+#if defined(__VMS) || defined(__digital__)
+	return PRI_OTHER_MIN;
+#else
+	return sched_get_priority_min(SCHED_OTHER);
+#endif
+}
+
+
+int ThreadImpl::getMaxOSPriorityImpl()
+{
+#if defined(__VMS) || defined(__digital__)
+	return PRI_OTHER_MAX;
+#else
+	return sched_get_priority_max(SCHED_OTHER);
+#endif
+}
+
+
 void ThreadImpl::startImpl(Runnable& target)
 {
 	if (_pData->pRunnableTarget) throw SystemException("thread already running");
@@ -303,6 +340,24 @@ int ThreadImpl::mapPrio(int prio)
 		poco_bugcheck_msg("invalid thread priority");
 	}
 	return -1; // just to satisfy compiler - we'll never get here anyway
+}
+
+
+int ThreadImpl::reverseMapPrio(int prio)
+{
+	int pmin = getMinOSPriorityImpl();
+	int pmax = getMaxOSPriorityImpl();
+	int normal = pmin + (pmax - pmin)/2;
+	if (prio == pmax)
+		return PRIO_HIGHEST_IMPL;
+	if (prio > normal)
+		return PRIO_HIGH_IMPL;
+	else if (prio == normal)
+		return PRIO_NORMAL_IMPL;
+	else if (prio > pmin)
+		return PRIO_LOW_IMPL;
+	else
+		return PRIO_LOWEST_IMPL;
 }
 
 

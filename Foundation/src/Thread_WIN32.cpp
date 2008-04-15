@@ -81,6 +81,12 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
+void ThreadImpl::setOSPriorityImpl(int prio)
+{
+	setPriorityImpl(prio);
+}
+
+
 void ThreadImpl::startImpl(Runnable& target)
 {
 	if (isRunningImpl())

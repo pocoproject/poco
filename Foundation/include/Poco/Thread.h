@@ -110,6 +110,23 @@ public:
 	Priority getPriority() const;
 		/// Returns the thread's priority.
 
+	void setOSPriority(int prio);
+		/// Sets the thread's priority, using an operating system specific
+		/// priority value. Use getMinOSPriority() and getMaxOSPriority() to
+		/// obtain mininum and maximum priority values.
+		
+	int getOSPriority() const;
+		/// Returns the thread's priority, expressed as an operating system
+		/// specific priority value.
+		
+	static int getMinOSPriority();
+		/// Returns the mininum operating system-specific priority value,
+		/// which can be passed to setOSPriority().
+		
+	static int getMaxOSPriority();
+		/// Returns the maximum operating system-specific priority value,
+		/// which can be passed to setOSPriority().
+
 	void setStackSize(std::size_t size);
 		/// Sets the thread's stack size in bytes.
 		/// Setting the stack size to 0 will use the default stack size.
@@ -228,6 +245,30 @@ inline void Thread::yield()
 inline Thread* Thread::current()
 {
 	return static_cast<Thread*>(currentImpl());
+}
+
+
+inline void Thread::setOSPriority(int prio)
+{
+	setOSPriorityImpl(prio);	
+}
+
+	
+inline int Thread::getOSPriority() const
+{
+	return getOSPriorityImpl();
+}
+
+	
+inline int Thread::getMinOSPriority()
+{
+	return ThreadImpl::getMinOSPriorityImpl();
+}
+
+	
+inline int Thread::getMaxOSPriority()
+{
+	return ThreadImpl::getMaxOSPriorityImpl();
 }
 
 

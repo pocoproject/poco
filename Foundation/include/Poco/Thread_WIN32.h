@@ -83,6 +83,10 @@ public:
 
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
+	void setOSPriorityImpl(int prio);
+	int getOSPriorityImpl() const;
+	static int getMinOSPriorityImpl();
+	static int getMaxOSPriorityImpl();
 	void setStackSizeImpl(std::size_t size);
 	std::size_t getStackSizeImpl() const;
 	void startImpl(Runnable& target);
@@ -128,6 +132,24 @@ private:
 inline int ThreadImpl::getPriorityImpl() const
 {
 	return _prio;
+}
+
+
+inline int ThreadImpl::getOSPriorityImpl() const
+{
+	return _prio;
+}
+
+
+inline int ThreadImpl::getMinOSPriorityImpl()
+{
+	return PRIO_LOWEST_IMPL;
+}
+
+
+inline int ThreadImpl::getMaxOSPriorityImpl()
+{
+	return PRIO_HIGHEST_IMPL;
 }
 
 

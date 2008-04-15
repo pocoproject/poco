@@ -85,6 +85,10 @@ public:
 
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
+	void setOSPriorityImpl(int prio);
+	int getOSPriorityImpl() const;
+	static int getMinOSPriorityImpl();
+	static int getMaxOSPriorityImpl();
 	void setStackSizeImpl(std::size_t size);
 	std::size_t getStackSizeImpl() const;
 	void startImpl(Runnable& target);
@@ -101,6 +105,7 @@ protected:
 	static void* runnableEntry(void* pThread);
 	static void* functionEntry(void* pThread);
 	static int mapPrio(int prio);
+	static int reverseMapPrio(int osPrio);
 
 private:
 	struct ThreadData: public RefCountedObject
@@ -119,6 +124,7 @@ private:
 		AutoPtr<CallbackData> pCallbackTarget;
 		pthread_t     thread;
 		int           prio;
+		int           osPrio;
 		Event         done;
 		std::size_t   stackSize;
 	};
@@ -141,6 +147,12 @@ private:
 inline int ThreadImpl::getPriorityImpl() const
 {
 	return _pData->prio;
+}
+
+
+inline int ThreadImpl::getOSPriorityImpl() const
+{
+	return _pData->osPrio;
 }
 
 
