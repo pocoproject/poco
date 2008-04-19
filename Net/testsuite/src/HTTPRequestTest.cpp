@@ -150,7 +150,7 @@ void HTTPRequestTest::testInvalid1()
 	try
 	{
 		request.read(istr);
-		fail("inavalid request - must throw");
+		fail("invalid request - must throw");
 	}
 	catch (MessageException&)
 	{
@@ -168,7 +168,7 @@ void HTTPRequestTest::testInvalid2()
 	try
 	{
 		request.read(istr);
-		fail("inavalid request - must throw");
+		fail("invalid request - must throw");
 	}
 	catch (MessageException&)
 	{
@@ -184,7 +184,7 @@ void HTTPRequestTest::testInvalid3()
 	try
 	{
 		request.read(istr);
-		fail("inavalid request - must throw");
+		fail("invalid request - must throw");
 	}
 	catch (MessageException&)
 	{
