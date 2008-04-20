@@ -89,6 +89,13 @@ public:
 	int capacity() const;
 		/// Returns the maximum capacity of threads.
 
+	void setStackSize(int stackSize);
+		/// Sets the stack size for threads.
+		/// New stack size applies only for newly created threads.
+
+	int getStackSize() const;
+		/// Returns the stack size used to create new threads.
+
 	int used() const;
 		/// Returns the number of currently used threads.
 
@@ -159,9 +166,24 @@ private:
 	int _idleTime;
 	int _serial;
 	int _age;
+	int _stackSize;
 	ThreadVec _threads;
 	mutable FastMutex _mutex;
 };
+
+
+// inlines
+
+inline void ThreadPool::setStackSize(int stackSize)
+{
+	_stackSize = stackSize;
+}
+
+
+inline int ThreadPool::getStackSize() const
+{
+	return _stackSize;
+}
 
 
 } // namespace Poco

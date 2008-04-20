@@ -50,7 +50,7 @@ namespace Poco {
 class PooledThread: public Runnable
 {
 public:
-	PooledThread(const std::string& name);
+	PooledThread(const std::string& name, int stackSize = POCO_THREAD_STACK_SIZE);
 	~PooledThread();
 
 	void start();
@@ -66,17 +66,17 @@ public:
 private:
 	volatile bool        _idle;
 	volatile std::time_t _idleTime;
-	Runnable*       _pTarget;
-	std::string     _name;
-	Thread          _thread;
-	Event           _targetReady;
-	Event           _targetCompleted;
-	Event           _started;
-	FastMutex       _mutex;
+	Runnable*            _pTarget;
+	std::string          _name;
+	Thread               _thread;
+	Event                _targetReady;
+	Event                _targetCompleted;
+	Event                _started;
+	FastMutex            _mutex;
 };
 
 
-PooledThread::PooledThread(const std::string& name): 
+PooledThread::PooledThread(const std::string& name, int stackSize): 
 	_idle(true), 
 	_idleTime(0), 
 	_pTarget(0), 
@@ -84,6 +84,8 @@ PooledThread::PooledThread(const std::string& name):
 	_thread(name),
 	_targetCompleted(false)
 {
+	poco_assert_dbg (stackSize >= 0);
+	_thread.setStackSize(stackSize);
 	_idleTime = time(NULL);
 }
 
@@ -255,7 +257,8 @@ ThreadPool::ThreadPool(const std::string& name, int minCapacity, int maxCapacity
 	_maxCapacity(maxCapacity), 
 	_idleTime(idleTime),
 	_serial(0),
-	_age(0)
+	_age(0),
+	_stackSize(0)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
@@ -452,7 +455,7 @@ PooledThread* ThreadPool::createThread()
 {
 	std::ostringstream name;
 	name << _name << "[#" << ++_serial << "]";
-	return new PooledThread(name.str());
+	return new PooledThread(name.str(), _stackSize);
 }
 
 
@@ -474,6 +477,8 @@ public:
 		if (!_pPool)
 		{
 			_pPool = new ThreadPool("default");
+			if (POCO_THREAD_STACK_SIZE > 0)
+				_pPool->setStackSize(POCO_THREAD_STACK_SIZE);
 		}
 		return _pPool;
 	}

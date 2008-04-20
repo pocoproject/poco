@@ -89,8 +89,8 @@ public:
 	int getOSPriorityImpl() const;
 	static int getMinOSPriorityImpl();
 	static int getMaxOSPriorityImpl();
-	void setStackSizeImpl(std::size_t size);
-	std::size_t getStackSizeImpl() const;
+	void setStackSizeImpl(int size);
+	int getStackSizeImpl() const;
 	void startImpl(Runnable& target);
 	void startImpl(Callback target, void* pData = 0);
 
@@ -116,7 +116,7 @@ private:
 			thread(0),
 			prio(PRIO_NORMAL_IMPL),
 			done(false),
-			stackSize(0)
+			stackSize(POCO_THREAD_STACK_SIZE)
 		{
 		}
 
@@ -186,13 +186,7 @@ inline void ThreadImpl::yieldImpl()
 }
 
 
-inline void ThreadImpl::setStackSizeImpl(std::size_t size)
-{
-	_pData->stackSize = size;
-}
-
-
-inline std::size_t ThreadImpl::getStackSizeImpl() const
+inline int ThreadImpl::getStackSizeImpl() const
 {
 	return _pData->stackSize;
 }

@@ -144,15 +144,28 @@ int ThreadImpl::getMaxOSPriorityImpl()
 }
 
 
+void ThreadImpl::setStackSizeImpl(int size)
+{
+	if (size !=0 && size < PTHREAD_STACK_MIN)
+		size = PTHREAD_STACK_MIN;
+
+	_pData->stackSize = size;
+}
+
+
 void ThreadImpl::startImpl(Runnable& target)
 {
-	if (_pData->pRunnableTarget) throw SystemException("thread already running");
+	if (_pData->pRunnableTarget)
+		throw SystemException("thread already running");
 
 	pthread_attr_t attributes;
 	pthread_attr_init(&attributes);
 
 	if (_pData->stackSize != 0)
-		pthread_attr_setstacksize(&attributes, _pData->stackSize);
+	{
+		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
+			throw SystemException("cannot set thread stack size");
+	}
 
 	_pData->pRunnableTarget = &target;
 	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
@@ -180,7 +193,10 @@ void ThreadImpl::startImpl(Callback target, void* pData)
 	pthread_attr_init(&attributes);
 
 	if (_pData->stackSize != 0)
-		pthread_attr_setstacksize(&attributes, _pData->stackSize);
+	{
+		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
+			throw SystemException("can not set thread stack size");
+	}
 
 	if (0 == _pData->pCallbackTarget.get())
 		_pData->pCallbackTarget = new CallbackData;

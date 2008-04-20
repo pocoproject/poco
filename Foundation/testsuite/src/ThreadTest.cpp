@@ -263,17 +263,24 @@ void ThreadTest::testThreadFunction()
 
 void ThreadTest::testThreadStackSize()
 {
+	int stackSize = 50000000;
+
 	Thread thread;
 	assert (0 == thread.getStackSize());
-	thread.setStackSize(50000000);
-	assert (50000000 == thread.getStackSize());
+	thread.setStackSize(stackSize);
+	assert (stackSize == thread.getStackSize());
 	int tmp = MyRunnable::_staticVar;
 	thread.start(freeFunc, &tmp);
 	thread.join();
 	assert (tmp * 2 == MyRunnable::_staticVar);
 
-	thread.setStackSize(1);
-	assert (1 == thread.getStackSize());	
+	stackSize = 1;
+	thread.setStackSize(stackSize);
+#ifdef POCO_OS_FAMILY_UNIX
+	assert (PTHREAD_STACK_MIN == thread.getStackSize());
+#else
+	assert (stackSize == thread.getStackSize());
+#endif
 	tmp = MyRunnable::_staticVar;
 	thread.start(freeFunc, &tmp);
 	thread.join();

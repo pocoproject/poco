@@ -127,13 +127,13 @@ public:
 		/// Returns the maximum operating system-specific priority value,
 		/// which can be passed to setOSPriority().
 
-	void setStackSize(std::size_t size);
+	void setStackSize(int size);
 		/// Sets the thread's stack size in bytes.
 		/// Setting the stack size to 0 will use the default stack size.
 		/// Typically, the real stack size is rounded up to the nearest
 		/// page size multiple.
 
-	std::size_t getStackSize() const;
+	int getStackSize() const;
 		/// Returns the thread's stack size in bytes.
 		/// If the default stack size is used, 0 is returned.
 
@@ -272,13 +272,13 @@ inline int Thread::getMaxOSPriority()
 }
 
 
-inline void Thread::setStackSize(std::size_t size)
+inline void Thread::setStackSize(int size)
 {
 	setStackSizeImpl(size);
 }
 
 
-inline std::size_t Thread::getStackSize() const
+inline int Thread::getStackSize() const
 {
 	return getStackSizeImpl();
 }

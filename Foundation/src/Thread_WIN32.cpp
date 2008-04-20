@@ -50,7 +50,7 @@ ThreadImpl::ThreadImpl():
 	_pRunnableTarget(0),
 	_thread(0),
 	_prio(PRIO_NORMAL_IMPL),
-	_stackSize(0)
+	_stackSize(POCO_THREAD_STACK_SIZE)
 {
 	if (_currentKey == TLS_OUT_OF_INDEXES)
 	{

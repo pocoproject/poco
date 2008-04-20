@@ -87,8 +87,8 @@ public:
 	int getOSPriorityImpl() const;
 	static int getMinOSPriorityImpl();
 	static int getMaxOSPriorityImpl();
-	void setStackSizeImpl(std::size_t size);
-	std::size_t getStackSizeImpl() const;
+	void setStackSizeImpl(int size);
+	int getStackSizeImpl() const;
 	void startImpl(Runnable& target);
 	void startImpl(Callback target, void* pData = 0);
 
@@ -120,7 +120,7 @@ private:
 	CallbackData _callbackTarget;
 	HANDLE       _thread;
 	int          _prio;
-	std::size_t  _stackSize;
+	int          _stackSize;
 
 	static DWORD _currentKey;
 };
@@ -165,13 +165,13 @@ inline void ThreadImpl::yieldImpl()
 }
 
 
-inline void ThreadImpl::setStackSizeImpl(std::size_t size)
+inline void ThreadImpl::setStackSizeImpl(int size)
 {
 	_stackSize = size;
 }
 
 
-inline std::size_t ThreadImpl::getStackSizeImpl() const
+inline int ThreadImpl::getStackSizeImpl() const
 {
 	return _stackSize;
 }

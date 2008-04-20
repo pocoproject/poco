@@ -51,7 +51,7 @@ class Foundation_API Runnable
 	/// must be implemented by classes that provide
 	/// an entry point for a thread.
 {
-public:	
+public:
 	Runnable();
 	virtual ~Runnable();
 	
