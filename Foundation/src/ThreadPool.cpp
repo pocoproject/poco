@@ -233,12 +233,16 @@ void PooledThread::run()
 }
 
 
-ThreadPool::ThreadPool(int minCapacity, int maxCapacity, int idleTime): 
+ThreadPool::ThreadPool(int minCapacity,
+	int maxCapacity,
+	int idleTime,
+	int stackSize): 
 	_minCapacity(minCapacity), 
 	_maxCapacity(maxCapacity), 
 	_idleTime(idleTime),
 	_serial(0),
-	_age(0)
+	_age(0),
+	_stackSize(stackSize)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
@@ -251,14 +255,18 @@ ThreadPool::ThreadPool(int minCapacity, int maxCapacity, int idleTime):
 }
 
 
-ThreadPool::ThreadPool(const std::string& name, int minCapacity, int maxCapacity, int idleTime):
+ThreadPool::ThreadPool(const std::string& name,
+	int minCapacity,
+	int maxCapacity,
+	int idleTime,
+	int stackSize):
 	_name(name),
 	_minCapacity(minCapacity), 
 	_maxCapacity(maxCapacity), 
 	_idleTime(idleTime),
 	_serial(0),
 	_age(0),
-	_stackSize(0)
+	_stackSize(stackSize)
 {
 	poco_assert (minCapacity >= 1 && maxCapacity >= minCapacity && idleTime > 0);
 
