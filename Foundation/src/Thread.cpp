@@ -91,7 +91,7 @@ void Thread::start(Runnable& target)
 }
 
 
-void Thread::start(Callback target, void* pData)
+void Thread::start(Callable target, void* pData)
 {
 	startImpl(target, pData);
 }

@@ -68,7 +68,7 @@ class Foundation_API Thread: private ThreadImpl
 	/// The name of a thread can be changed at any time.
 {
 public:	
-	using ThreadImpl::Callback;
+	using ThreadImpl::Callable;
 
 	enum Priority
 		/// Thread priorities.
@@ -140,7 +140,7 @@ public:
 	void start(Runnable& target);
 		/// Starts the thread with the given target.
 
-	void start(Callback target, void* pData = 0);
+	void start(Callable target, void* pData = 0);
 		/// Starts the thread with the given target and parameter.
 
 	void join();

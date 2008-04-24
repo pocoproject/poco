@@ -51,7 +51,7 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
-	typedef void (*Callback)(void*);
+	typedef void (*Callable)(void*);
 
 #if defined(_DLL)
 	typedef DWORD (WINAPI *Entry)(LPVOID);
@@ -65,7 +65,7 @@ public:
 		{
 		}
 
-		Callback  callback;
+		Callable  callback;
 		void*     pData; 
 	};
 
@@ -90,7 +90,7 @@ public:
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
 	void startImpl(Runnable& target);
-	void startImpl(Callback target, void* pData = 0);
+	void startImpl(Callable target, void* pData = 0);
 
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -107,9 +107,9 @@ protected:
 #endif
 
 #if defined(_DLL)
-	static DWORD WINAPI functionEntry(LPVOID pThread);
+	static DWORD WINAPI callableEntry(LPVOID pThread);
 #else
-	static unsigned __stdcall functionEntry(void* pThread);
+	static unsigned __stdcall callableEntry(void* pThread);
 #endif
 
 	void createImpl(Entry ent, void* pData);

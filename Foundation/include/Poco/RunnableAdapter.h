@@ -54,7 +54,7 @@ class RunnableAdapter: public Runnable
 	/// Usage:
 	///    RunnableAdapter<MyClass> ra(myObject, &MyObject::doSomething));
 	///    Thread thr;
-	///    thr.Start(ra);
+	///    thr.start(ra);
 {
 public:
 	typedef void (C::*Callback)();

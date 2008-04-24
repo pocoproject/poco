@@ -98,7 +98,7 @@ void ThreadImpl::startImpl(Runnable& target)
 }
 
 
-void ThreadImpl::startImpl(Callback target, void* pData)
+void ThreadImpl::startImpl(Callable target, void* pData)
 {
 	if (isRunningImpl())
 		throw SystemException("thread already running");
@@ -106,7 +106,7 @@ void ThreadImpl::startImpl(Callback target, void* pData)
 	_callbackTarget.callback = target;
 	_callbackTarget.pData = pData;
 
-	createImpl(functionEntry, this);
+	createImpl(callableEntry, this);
 }
 
 
@@ -213,9 +213,9 @@ unsigned __stdcall ThreadImpl::runnableEntry(void* pThread)
 
 
 #if defined(_DLL)
-DWORD WINAPI ThreadImpl::functionEntry(LPVOID pThread)
+DWORD WINAPI ThreadImpl::callableEntry(LPVOID pThread)
 #else
-unsigned __stdcall ThreadImpl::functionEntry(void* pThread)
+unsigned __stdcall ThreadImpl::callableEntry(void* pThread)
 #endif
 {
 	TlsSetValue(_currentKey, pThread);

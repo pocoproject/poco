@@ -184,7 +184,7 @@ void ThreadImpl::startImpl(Runnable& target)
 }
 
 
-void ThreadImpl::startImpl(Callback target, void* pData)
+void ThreadImpl::startImpl(Callable target, void* pData)
 {
 	if (_pData->pCallbackTarget && _pData->pCallbackTarget->callback)
 		throw SystemException("thread already running");
@@ -204,7 +204,7 @@ void ThreadImpl::startImpl(Callback target, void* pData)
 	_pData->pCallbackTarget->callback = target;
 	_pData->pCallbackTarget->pData = pData;
 
-	if (pthread_create(&_pData->thread, &attributes, functionEntry, this))
+	if (pthread_create(&_pData->thread, &attributes, callableEntry, this))
 	{
 		_pData->pCallbackTarget->callback = 0;
 		_pData->pCallbackTarget->pData = 0;
@@ -290,7 +290,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 }
 
 
-void* ThreadImpl::functionEntry(void* pThread)
+void* ThreadImpl::callableEntry(void* pThread)
 {
 	pthread_setspecific(_currentKey, pThread);
 

@@ -59,7 +59,7 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
-	typedef void (*Callback)(void*);
+	typedef void (*Callable)(void*);
 
 	enum Priority
 	{
@@ -76,7 +76,7 @@ public:
 		{
 		}
 
-		Callback  callback;
+		Callable  callback;
 		void*     pData; 
 	};
 
@@ -92,7 +92,7 @@ public:
 	void setStackSizeImpl(int size);
 	int getStackSizeImpl() const;
 	void startImpl(Runnable& target);
-	void startImpl(Callback target, void* pData = 0);
+	void startImpl(Callable target, void* pData = 0);
 
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -103,7 +103,7 @@ public:
 
 protected:
 	static void* runnableEntry(void* pThread);
-	static void* functionEntry(void* pThread);
+	static void* callableEntry(void* pThread);
 	static int mapPrio(int prio);
 	static int reverseMapPrio(int osPrio);
 
