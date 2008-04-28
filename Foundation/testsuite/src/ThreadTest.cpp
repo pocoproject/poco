@@ -38,6 +38,11 @@
 #include "Poco/ThreadTarget.h"
 #include "Poco/Event.h"
 #include <iostream>
+#if defined(__sun) && defined(__SVR4)
+#define __EXTENSIONS__
+#include <limits.h>
+#endif
+
 
 using Poco::Thread;
 using Poco::Runnable;

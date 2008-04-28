@@ -47,6 +47,7 @@
 #include <vector>
 #include <map>
 #include <cstddef>
+#include <cstring>
 
 
 namespace Poco {
@@ -79,7 +80,7 @@ public:
 		/// Creates the HashTable.
 	{
 		_entries = new HashEntryMap*[initialSize];
-		memset(_entries, '\0', sizeof(HashEntryMap*)*initialSize);
+		std::memset(_entries, '\0', sizeof(HashEntryMap*)*initialSize);
 	}
 
 	HashTable(const HashTable& ht):
@@ -314,7 +315,7 @@ public:
 			UInt32 oldSize = _maxCapacity;
 			_maxCapacity = newSize;
 			_entries = new HashEntryMap*[_maxCapacity];
-			memset(_entries, '\0', sizeof(HashEntryMap*)*_maxCapacity);
+			std::memset(_entries, '\0', sizeof(HashEntryMap*)*_maxCapacity);
 
 			if (_size == 0)
 			{

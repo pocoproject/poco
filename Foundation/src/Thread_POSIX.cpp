@@ -38,6 +38,11 @@
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
 #include <signal.h>
+#if defined(__sun) && defined(__SVR4)
+#define __EXTENSIONS__
+#include <limits.h>
+#endif
+
 
 //
 // Block SIGPIPE in main thread.

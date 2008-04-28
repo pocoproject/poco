@@ -38,6 +38,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <cstring>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>

@@ -49,6 +49,7 @@
 
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include <ios>
 #include <sstream>
 #include <cctype>
 #include <cstddef>
