@@ -43,7 +43,7 @@ CFLAGS64        =
 CXXFLAGS        = -mt -features=tmplife
 CXXFLAGS32      =
 CXXFLAGS64      =
-LINKFLAGS       = -mt
+LINKFLAGS       = -mt -L$(STDCXX_BASE)/lib -R$(STDCXX_BASE)/lib
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =
@@ -52,11 +52,11 @@ STATICOPT_LINK  = -Bstatic
 SHAREDOPT_CC    = -KPIC
 SHAREDOPT_CXX   = -KPIC
 SHAREDOPT_LINK  = -Bdynamic
-DEBUGOPT_CC     = -g -xdebugformat=stabs -xs -D_DEBUG=$(DEBUGLEVEL)
-DEBUGOPT_CXX    = -g -xdebugformat=stabs -xs -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_CC     = -g -xdebugformat=stabs -xs -D_DEBUG=$(DEBUGLEVEL) -I$(STDCXX_BASE)/include
+DEBUGOPT_CXX    = -g -xdebugformat=stabs -xs -D_DEBUG=$(DEBUGLEVEL) -I$(STDCXX_BASE)/include
 DEBUGOPT_LINK   = -g -xdebugformat=stabs -xs
-RELEASEOPT_CC   = -xO3 -g0 -xregs=no%frameptr -xdebugformat=stabs -xs -DNDEBUG -library=no%Cstd
-RELEASEOPT_CXX  = -xO3 -g0 -xregs=no%frameptr -xdebugformat=stabs -xs -DNDEBUG -library=no%Cstd
+RELEASEOPT_CC   = -xO3 -g0 -xregs=no%frameptr -xdebugformat=stabs -xs -DNDEBUG -library=no%Cstd -I$(STDCXX_BASE)/include
+RELEASEOPT_CXX  = -xO3 -g0 -xregs=no%frameptr -xdebugformat=stabs -xs -DNDEBUG -library=no%Cstd -I$(STDCXX_BASE)/include
 RELEASEOPT_LINK =
 
 #
