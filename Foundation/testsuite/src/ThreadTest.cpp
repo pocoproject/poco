@@ -281,7 +281,7 @@ void ThreadTest::testThreadStackSize()
 
 	stackSize = 1;
 	thread.setStackSize(stackSize);
-#ifdef POCO_OS_FAMILY_UNIX
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_OS_CYGWIN)
 	assert (PTHREAD_STACK_MIN == thread.getStackSize());
 #else
 	assert (stackSize == thread.getStackSize());
