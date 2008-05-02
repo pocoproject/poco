@@ -1,7 +1,7 @@
 //
 // HTTPSession.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/HTTPSession.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPSession.h#5 $
 //
 // Library: Net
 // Package: HTTP
@@ -140,6 +140,9 @@ protected:
 
 	int receive(char* buffer, int length);
 		/// Reads up to length bytes.
+		
+	int buffered() const;
+		/// Returns the number of bytes in the buffer.
 
 	StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
@@ -205,6 +208,12 @@ inline StreamSocket& HTTPSession::socket()
 inline const Poco::Exception* HTTPSession::networkException() const
 {
 	return _pException;
+}
+
+
+inline int HTTPSession::buffered() const
+{
+	return static_cast<int>(_pEnd - _pCurrent);
 }
 
 
