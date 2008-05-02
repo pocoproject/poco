@@ -18,6 +18,11 @@
 #     Use the given install directory for make install.
 #     Default is /usr/local
 #
+#   --stdcxx-base=<apache_stdcxx_install_prefix>
+#     If (and only if) the $POCO_BASE/build/config selected with --config
+#     uses the Apache stdcxx library, then apache_stdcxx_install_prefix
+#     specifies the base directory of where stdcxx is installed.
+#
 #   --no-tests
 #     Do not build testsuites.
 #
@@ -51,6 +56,11 @@ while [ "$1" != "" ] ; do
 	val=`expr $1 : '--prefix=\(.*\)'`
 	if [ "$val" != "" ] ; then
 		prefix=$val
+	fi
+	
+	val=`expr $1 : '--stdcxx-base=\(.*\)'`
+	if [ "$val" != "" ] ; then
+		stdcxx_base=$val
 	fi
 	
 	if [ "$1" = "--no-samples" ] ; then
@@ -109,12 +119,18 @@ echo "POCO_BASE = $base" >>$build/config.make
 echo "POCO_BUILD = $build" >>$build/config.make
 echo "POCO_PREFIX = $prefix" >>$build/config.make
 echo "POCO_FLAGS = $flags" >>$build/config.make
+if [ "$stdcxx_base" != "" ] ; then
+	echo "STDCXX_BASE = $stdcxx_base" >>$build/config.make
+fi
 
 echo "export POCO_CONFIG" >>$build/config.make
 echo "export POCO_BASE" >>$build/config.make
 echo "export POCO_BUILD" >>$build/config.make
 echo "export POCO_PREFIX" >>$build/config.make
 echo "export POCO_FLAGS" >>$build/config.make
+if [ "$stdcxx_base" != "" ] ; then
+	echo "export STDCXX_BASE" >>$build/config.make
+fi
 
 echo ".PHONY: poco" >>$build/config.make
 echo "poco: libexecs $tests $samples" >>$build/config.make
