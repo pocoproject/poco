@@ -91,6 +91,12 @@ void Thread::start(Runnable& target)
 }
 
 
+void Thread::start(Callable target, void* pData)
+{
+	startImpl(target, pData);
+}
+
+
 void Thread::join()
 {
 	joinImpl();

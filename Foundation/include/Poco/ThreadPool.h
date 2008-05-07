@@ -69,14 +69,21 @@ class Foundation_API ThreadPool
 	/// from the pool.
 {
 public:
-	ThreadPool(int minCapacity = 2, int maxCapacity = 16, int idleTime = 60);
-	ThreadPool(const std::string& name, int minCapacity = 2, int maxCapacity = 16, int idleTime = 60);
+	ThreadPool(int minCapacity = 2,
+		int maxCapacity = 16,
+		int idleTime = 60,
+		int stackSize = POCO_THREAD_STACK_SIZE);
+	ThreadPool(const std::string& name,
+		int minCapacity = 2,
+		int maxCapacity = 16,
+		int idleTime = 60,
+		int stackSize = POCO_THREAD_STACK_SIZE);
 		/// Creates a thread pool with minCapacity threads.
 		/// If required, up to maxCapacity threads are created
 		/// a NoThreadAvailableException exception is thrown.
 		/// If a thread is running idle for more than idleTime seconds,
 		/// and more than minCapacity threads are running, the thread
-		/// is killed.
+		/// is killed. Threads are created with given stack size.
 
 	~ThreadPool();
 		/// Currently running threads will remain active
@@ -88,6 +95,13 @@ public:
 
 	int capacity() const;
 		/// Returns the maximum capacity of threads.
+
+	void setStackSize(int stackSize);
+		/// Sets the stack size for threads.
+		/// New stack size applies only for newly created threads.
+
+	int getStackSize() const;
+		/// Returns the stack size used to create new threads.
 
 	int used() const;
 		/// Returns the number of currently used threads.
@@ -159,9 +173,24 @@ private:
 	int _idleTime;
 	int _serial;
 	int _age;
+	int _stackSize;
 	ThreadVec _threads;
 	mutable FastMutex _mutex;
 };
+
+
+// inlines
+
+inline void ThreadPool::setStackSize(int stackSize)
+{
+	_stackSize = stackSize;
+}
+
+
+inline int ThreadPool::getStackSize() const
+{
+	return _stackSize;
+}
 
 
 } // namespace Poco

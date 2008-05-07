@@ -68,6 +68,8 @@ class Foundation_API Thread: private ThreadImpl
 	/// The name of a thread can be changed at any time.
 {
 public:	
+	using ThreadImpl::Callable;
+
 	enum Priority
 		/// Thread priorities.
 	{
@@ -108,8 +110,38 @@ public:
 	Priority getPriority() const;
 		/// Returns the thread's priority.
 
+	void setOSPriority(int prio);
+		/// Sets the thread's priority, using an operating system specific
+		/// priority value. Use getMinOSPriority() and getMaxOSPriority() to
+		/// obtain mininum and maximum priority values.
+		
+	int getOSPriority() const;
+		/// Returns the thread's priority, expressed as an operating system
+		/// specific priority value.
+		
+	static int getMinOSPriority();
+		/// Returns the mininum operating system-specific priority value,
+		/// which can be passed to setOSPriority().
+		
+	static int getMaxOSPriority();
+		/// Returns the maximum operating system-specific priority value,
+		/// which can be passed to setOSPriority().
+
+	void setStackSize(int size);
+		/// Sets the thread's stack size in bytes.
+		/// Setting the stack size to 0 will use the default stack size.
+		/// Typically, the real stack size is rounded up to the nearest
+		/// page size multiple.
+
+	int getStackSize() const;
+		/// Returns the thread's stack size in bytes.
+		/// If the default stack size is used, 0 is returned.
+
 	void start(Runnable& target);
 		/// Starts the thread with the given target.
+
+	void start(Callable target, void* pData = 0);
+		/// Starts the thread with the given target and parameter.
 
 	void join();
 		/// Waits until the thread completes execution.	
@@ -213,6 +245,42 @@ inline void Thread::yield()
 inline Thread* Thread::current()
 {
 	return static_cast<Thread*>(currentImpl());
+}
+
+
+inline void Thread::setOSPriority(int prio)
+{
+	setOSPriorityImpl(prio);	
+}
+
+	
+inline int Thread::getOSPriority() const
+{
+	return getOSPriorityImpl();
+}
+
+	
+inline int Thread::getMinOSPriority()
+{
+	return ThreadImpl::getMinOSPriorityImpl();
+}
+
+	
+inline int Thread::getMaxOSPriority()
+{
+	return ThreadImpl::getMaxOSPriorityImpl();
+}
+
+
+inline void Thread::setStackSize(int size)
+{
+	setStackSizeImpl(size);
+}
+
+
+inline int Thread::getStackSize() const
+{
+	return getStackSizeImpl();
 }
 
 

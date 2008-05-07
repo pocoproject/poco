@@ -59,6 +59,8 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
+	typedef void (*Callable)(void*);
+
 	enum Priority
 	{
 		PRIO_LOWEST_IMPL,
@@ -68,13 +70,29 @@ public:
 		PRIO_HIGHEST_IMPL
 	};
 
+	struct CallbackData: public RefCountedObject
+	{
+		CallbackData(): callback(0), pData(0)
+		{
+		}
+
+		Callable  callback;
+		void*     pData; 
+	};
+
 	ThreadImpl();				
 	~ThreadImpl();
 
-	Runnable& targetImpl() const;
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
+	void setOSPriorityImpl(int prio);
+	int getOSPriorityImpl() const;
+	static int getMinOSPriorityImpl();
+	static int getMaxOSPriorityImpl();
+	void setStackSizeImpl(int size);
+	int getStackSizeImpl() const;
 	void startImpl(Runnable& target);
+	void startImpl(Callable target, void* pData = 0);
 
 	void joinImpl();
 	bool joinImpl(long milliseconds);
@@ -84,28 +102,35 @@ public:
 	static ThreadImpl* currentImpl();
 
 protected:
-	static void* entry(void* pThread);
+	static void* runnableEntry(void* pThread);
+	static void* callableEntry(void* pThread);
 	static int mapPrio(int prio);
+	static int reverseMapPrio(int osPrio);
 
 private:
 	struct ThreadData: public RefCountedObject
 	{
 		ThreadData():
-			pTarget(0),
+			pRunnableTarget(0),
+			pCallbackTarget(0),
 			thread(0),
 			prio(PRIO_NORMAL_IMPL),
-			done(false)
+			done(false),
+			stackSize(POCO_THREAD_STACK_SIZE)
 		{
 		}
 
-		Runnable* pTarget;
-		pthread_t thread;
-		int       prio;
-		Event     done;
+		Runnable*     pRunnableTarget;
+		AutoPtr<CallbackData> pCallbackTarget;
+		pthread_t     thread;
+		int           prio;
+		int           osPrio;
+		Event         done;
+		std::size_t   stackSize;
 	};
-	
+
 	AutoPtr<ThreadData> _pData;
-	
+
 	static pthread_key_t _currentKey;
 	static bool          _haveCurrentKey;
 	
@@ -122,6 +147,12 @@ private:
 inline int ThreadImpl::getPriorityImpl() const
 {
 	return _pData->prio;
+}
+
+
+inline int ThreadImpl::getOSPriorityImpl() const
+{
+	return _pData->osPrio;
 }
 
 
@@ -142,9 +173,22 @@ inline void ThreadImpl::sleepImpl(long milliseconds)
 }
 
 
+inline bool ThreadImpl::isRunningImpl() const
+{
+	return _pData->pRunnableTarget != 0 ||
+		(_pData->pCallbackTarget.get() != 0 && _pData->pCallbackTarget->callback != 0);
+}
+
+
 inline void ThreadImpl::yieldImpl()
 {
 	sched_yield();
+}
+
+
+inline int ThreadImpl::getStackSizeImpl() const
+{
+	return _pData->stackSize;
 }
 
 

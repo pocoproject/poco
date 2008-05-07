@@ -9,7 +9,7 @@
 //
 // Feature configuration for the POCO libraries.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -58,6 +58,11 @@
 
 // Define to disable shared memory
 // #define POCO_NO_SHAREDMEMORY
+
+
+// Define to desired default thread stack size
+// Zero means OS default
+#define POCO_THREAD_STACK_SIZE 0
 
 
 #endif // Foundation_Config_INCLUDED

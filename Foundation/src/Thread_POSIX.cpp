@@ -38,6 +38,10 @@
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
 #include <signal.h>
+#if defined(__sun) && defined(__SVR4)
+#define __EXTENSIONS__
+#include <limits.h>
+#endif
 
 
 //
@@ -87,7 +91,7 @@ ThreadImpl::ThreadImpl():
 			
 ThreadImpl::~ThreadImpl()
 {
-	if (_pData->pTarget)
+	if (isRunningImpl())
 		pthread_detach(_pData->thread);
 }
 
@@ -97,7 +101,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 	if (prio != _pData->prio)
 	{
 		_pData->prio = prio;
-		if (_pData->pTarget)
+		if (isRunningImpl())
 		{
 			struct sched_param par;
 			par.sched_priority = mapPrio(_pData->prio);
@@ -108,14 +112,111 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
+void ThreadImpl::setOSPriorityImpl(int prio)
+{
+	if (prio != _pData->osPrio)
+	{
+		if (_pData->pRunnableTarget || _pData->pCallbackTarget)
+		{
+			struct sched_param par;
+			par.sched_priority = prio;
+			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+				throw SystemException("cannot set thread priority");
+		}
+		_pData->prio   = reverseMapPrio(prio);
+		_pData->osPrio = prio;
+	}
+}
+
+
+int ThreadImpl::getMinOSPriorityImpl()
+{
+#if defined(__VMS) || defined(__digital__)
+	return PRI_OTHER_MIN;
+#else
+	return sched_get_priority_min(SCHED_OTHER);
+#endif
+}
+
+
+int ThreadImpl::getMaxOSPriorityImpl()
+{
+#if defined(__VMS) || defined(__digital__)
+	return PRI_OTHER_MAX;
+#else
+	return sched_get_priority_max(SCHED_OTHER);
+#endif
+}
+
+
+void ThreadImpl::setStackSizeImpl(int size)
+{
+#ifdef POCO_OS_CYGWIN
+	_pData->stackSize = 0;
+#else
+ 	if (size !=0 && size < PTHREAD_STACK_MIN)
+ 		size = PTHREAD_STACK_MIN;
+
+ 	_pData->stackSize = size;
+#endif
+}
+
+
 void ThreadImpl::startImpl(Runnable& target)
 {
-	if (_pData->pTarget) throw SystemException("thread already running");
+	if (_pData->pRunnableTarget)
+		throw SystemException("thread already running");
 
-	_pData->pTarget = &target;
-	if (pthread_create(&_pData->thread, NULL, entry, this))
+	pthread_attr_t attributes;
+	pthread_attr_init(&attributes);
+
+	if (_pData->stackSize != 0)
 	{
-		_pData->pTarget = 0;
+		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
+			throw SystemException("cannot set thread stack size");
+	}
+
+	_pData->pRunnableTarget = &target;
+	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
+	{
+		_pData->pRunnableTarget = 0;
+		throw SystemException("cannot start thread");
+	}
+
+	if (_pData->prio != PRIO_NORMAL_IMPL)
+	{
+		struct sched_param par;
+		par.sched_priority = mapPrio(_pData->prio);
+		if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
+			throw SystemException("cannot set thread priority");
+	}
+}
+
+
+void ThreadImpl::startImpl(Callable target, void* pData)
+{
+	if (_pData->pCallbackTarget && _pData->pCallbackTarget->callback)
+		throw SystemException("thread already running");
+
+	pthread_attr_t attributes;
+	pthread_attr_init(&attributes);
+
+	if (_pData->stackSize != 0)
+	{
+		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
+			throw SystemException("can not set thread stack size");
+	}
+
+	if (0 == _pData->pCallbackTarget.get())
+		_pData->pCallbackTarget = new CallbackData;
+
+	_pData->pCallbackTarget->callback = target;
+	_pData->pCallbackTarget->pData = pData;
+
+	if (pthread_create(&_pData->thread, &attributes, callableEntry, this))
+	{
+		_pData->pCallbackTarget->callback = 0;
+		_pData->pCallbackTarget->pData = 0;
 		throw SystemException("cannot start thread");
 	}
 
@@ -151,12 +252,6 @@ bool ThreadImpl::joinImpl(long milliseconds)
 }
 
 
-bool ThreadImpl::isRunningImpl() const
-{
-	return _pData->pTarget != 0;
-}
-
-
 ThreadImpl* ThreadImpl::currentImpl()
 {
 	if (_haveCurrentKey)
@@ -166,7 +261,7 @@ ThreadImpl* ThreadImpl::currentImpl()
 }
 
 
-void* ThreadImpl::entry(void* pThread)
+void* ThreadImpl::runnableEntry(void* pThread)
 {
 	pthread_setspecific(_currentKey, pThread);
 
@@ -183,7 +278,7 @@ void* ThreadImpl::entry(void* pThread)
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
-		pData->pTarget->run();
+		pData->pRunnableTarget->run();
 	}
 	catch (Exception& exc)
 	{
@@ -197,7 +292,48 @@ void* ThreadImpl::entry(void* pThread)
 	{
 		ErrorHandler::handle();
 	}
-	pData->pTarget = 0;
+
+	pData->pRunnableTarget = 0;
+	pData->done.set();
+	return 0;
+}
+
+
+void* ThreadImpl::callableEntry(void* pThread)
+{
+	pthread_setspecific(_currentKey, pThread);
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	sigset_t sset;
+	sigemptyset(&sset);
+	sigaddset(&sset, SIGQUIT);
+	sigaddset(&sset, SIGTERM);
+	sigaddset(&sset, SIGPIPE); 
+	pthread_sigmask(SIG_BLOCK, &sset, 0);
+#endif
+
+	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
+	try
+	{
+		pData->pCallbackTarget->callback(pData->pCallbackTarget->pData);
+	}
+	catch (Exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		ErrorHandler::handle();
+	}
+
+	pData->pCallbackTarget->callback = 0;
+	pData->pCallbackTarget->pData = 0;
+
 	pData->done.set();
 	return 0;
 }
@@ -229,6 +365,24 @@ int ThreadImpl::mapPrio(int prio)
 		poco_bugcheck_msg("invalid thread priority");
 	}
 	return -1; // just to satisfy compiler - we'll never get here anyway
+}
+
+
+int ThreadImpl::reverseMapPrio(int prio)
+{
+	int pmin = getMinOSPriorityImpl();
+	int pmax = getMaxOSPriorityImpl();
+	int normal = pmin + (pmax - pmin)/2;
+	if (prio == pmax)
+		return PRIO_HIGHEST_IMPL;
+	if (prio > normal)
+		return PRIO_HIGH_IMPL;
+	else if (prio == normal)
+		return PRIO_NORMAL_IMPL;
+	else if (prio > pmin)
+		return PRIO_LOW_IMPL;
+	else
+		return PRIO_LOWEST_IMPL;
 }
 
 

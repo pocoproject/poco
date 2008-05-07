@@ -57,7 +57,8 @@ ThreadPoolTest::~ThreadPoolTest()
 void ThreadPoolTest::testThreadPool()
 {
 	ThreadPool pool(2, 3, 3);
-	
+	pool.setStackSize(1);
+
 	assert (pool.allocated() == 2);
 	assert (pool.used() == 0);
 	assert (pool.capacity() == 3);

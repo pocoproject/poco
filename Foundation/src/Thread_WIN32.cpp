@@ -46,7 +46,11 @@ namespace Poco {
 DWORD ThreadImpl::_currentKey = TLS_OUT_OF_INDEXES;
 
 
-ThreadImpl::ThreadImpl(): _pTarget(0), _thread(0), _prio(PRIO_NORMAL_IMPL)
+ThreadImpl::ThreadImpl():
+	_pRunnableTarget(0),
+	_thread(0),
+	_prio(PRIO_NORMAL_IMPL),
+	_stackSize(POCO_THREAD_STACK_SIZE)
 {
 	if (_currentKey == TLS_OUT_OF_INDEXES)
 	{
@@ -77,17 +81,43 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
+void ThreadImpl::setOSPriorityImpl(int prio)
+{
+	setPriorityImpl(prio);
+}
+
+
 void ThreadImpl::startImpl(Runnable& target)
 {
-	if (_thread) throw SystemException("thread already running");
+	if (isRunningImpl())
+		throw SystemException("thread already running");
 
-	_pTarget = &target;
+	_pRunnableTarget = &target;
+
+	createImpl(runnableEntry, this);
+}
+
+
+void ThreadImpl::startImpl(Callable target, void* pData)
+{
+	if (isRunningImpl())
+		throw SystemException("thread already running");
+
+	_callbackTarget.callback = target;
+	_callbackTarget.pData = pData;
+
+	createImpl(callableEntry, this);
+}
+
+
+void ThreadImpl::createImpl(Entry ent, void* pData)
+{
 #if defined(_DLL)
 	DWORD threadId;
-	_thread = CreateThread(NULL, 0, entry, this, 0, &threadId);
+	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &threadId);
 #else
 	unsigned threadId;
-	_thread = (HANDLE) _beginthreadex(NULL, 0, entry, this, 0, &threadId);
+	_thread = (HANDLE) _beginthreadex(NULL, _stackSize, runnableEntry, this, 0, &threadId);
 #endif
 	if (!_thread)
 		throw SystemException("cannot create thread");
@@ -103,6 +133,7 @@ void ThreadImpl::joinImpl()
 	switch (WaitForSingleObject(_thread, INFINITE))
 	{
 	case WAIT_OBJECT_0:
+		threadCleanup();
 		return;
 	default:
 		throw SystemException("cannot join thread");
@@ -119,6 +150,7 @@ bool ThreadImpl::joinImpl(long milliseconds)
 	case WAIT_TIMEOUT:
 		return false;
 	case WAIT_OBJECT_0:
+		threadCleanup();
 		return true;
 	default:
 		throw SystemException("cannot join thread");
@@ -137,6 +169,13 @@ bool ThreadImpl::isRunningImpl() const
 }
 
 
+void ThreadImpl::threadCleanup()
+{
+	if (!_thread) return;
+	if (CloseHandle(_thread)) _thread = 0;
+}
+
+
 ThreadImpl* ThreadImpl::currentImpl()
 {
 	if (_currentKey == TLS_OUT_OF_INDEXES)
@@ -147,15 +186,43 @@ ThreadImpl* ThreadImpl::currentImpl()
 
 
 #if defined(_DLL)
-DWORD WINAPI ThreadImpl::entry(LPVOID pThread)
+DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
 #else
-unsigned __stdcall ThreadImpl::entry(void* pThread)
+unsigned __stdcall ThreadImpl::runnableEntry(void* pThread)
 #endif
 {
 	TlsSetValue(_currentKey, pThread);
 	try
 	{
-		reinterpret_cast<ThreadImpl*>(pThread)->_pTarget->run();
+		reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
+	}
+	catch (Exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		ErrorHandler::handle();
+	}
+	return 0;
+}
+
+
+#if defined(_DLL)
+DWORD WINAPI ThreadImpl::callableEntry(LPVOID pThread)
+#else
+unsigned __stdcall ThreadImpl::callableEntry(void* pThread)
+#endif
+{
+	TlsSetValue(_currentKey, pThread);
+	try
+	{
+		ThreadImpl* pTI = reinterpret_cast<ThreadImpl*>(pThread);
+		pTI->_callbackTarget.callback(pTI->_callbackTarget.pData);
 	}
 	catch (Exception& exc)
 	{

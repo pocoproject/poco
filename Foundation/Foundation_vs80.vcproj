@@ -1692,6 +1692,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ThreadTarget.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Timer.cpp"
 					>
 				</File>
@@ -1821,6 +1825,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\ThreadPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ThreadTarget.h"
 					>
 				</File>
 				<File
