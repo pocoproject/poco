@@ -194,8 +194,8 @@ public:
 	{
 		Other* pOther = dynamic_cast<Other*>(_ptr);
 		if (pOther)
-			return SharedPtr<Other>(_pCounter, pOther);
-		return SharedPtr<Other>();
+			return SharedPtr<Other, RC>(_pCounter, pOther);
+		return SharedPtr<Other, RC>();
 	}
 
 	template <class Other> 
