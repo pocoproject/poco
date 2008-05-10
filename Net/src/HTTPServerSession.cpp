@@ -70,7 +70,7 @@ bool HTTPServerSession::hasMoreRequests()
 	{
 		if (_maxKeepAliveRequests > 0) 
 			--_maxKeepAliveRequests;
-		return socket().poll(_keepAliveTimeout, Socket::SELECT_READ);
+		return buffered() > 0 || socket().poll(_keepAliveTimeout, Socket::SELECT_READ);
 	}
 	else return false;
 }
