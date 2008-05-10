@@ -385,7 +385,7 @@ private:
 	RC* _pCounter;
 	C*  _ptr;
 
-	template <class Other, class RC> friend class SharedPtr;
+	template <class OtherC, class OtherRC> friend class SharedPtr;
 };
 
 
