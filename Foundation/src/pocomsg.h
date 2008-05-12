@@ -37,7 +37,7 @@
 // Categories
 //
 //
-//  Values are 32 bit values laid out as follows:
+//  Values are 32 bit values layed out as follows:
 //
 //   3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
 //   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
@@ -77,7 +77,7 @@
 //
 // MessageText:
 //
-// Fatal
+//  Fatal
 //
 #define POCO_CTG_FATAL                   0x00000001L
 
@@ -86,7 +86,7 @@
 //
 // MessageText:
 //
-// Critical
+//  Critical
 //
 #define POCO_CTG_CRITICAL                0x00000002L
 
@@ -95,7 +95,7 @@
 //
 // MessageText:
 //
-// Error
+//  Error
 //
 #define POCO_CTG_ERROR                   0x00000003L
 
@@ -104,7 +104,7 @@
 //
 // MessageText:
 //
-// Warning
+//  Warning
 //
 #define POCO_CTG_WARNING                 0x00000004L
 
@@ -113,7 +113,7 @@
 //
 // MessageText:
 //
-// Notice
+//  Notice
 //
 #define POCO_CTG_NOTICE                  0x00000005L
 
@@ -122,7 +122,7 @@
 //
 // MessageText:
 //
-// Information
+//  Information
 //
 #define POCO_CTG_INFORMATION             0x00000006L
 
@@ -131,7 +131,7 @@
 //
 // MessageText:
 //
-// Debug
+//  Debug
 //
 #define POCO_CTG_DEBUG                   0x00000007L
 
@@ -140,7 +140,7 @@
 //
 // MessageText:
 //
-// Trace
+//  Trace
 //
 #define POCO_CTG_TRACE                   0x00000008L
 
@@ -152,7 +152,7 @@
 //
 // MessageText:
 //
-// %1
+//  %1
 //
 #define POCO_MSG_LOG                     0x00001000L
 
