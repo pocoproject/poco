@@ -1683,15 +1683,15 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\ThreadEntry.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\ThreadLocal.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\ThreadPool.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThreadTarget.cpp"
 					>
 				</File>
 				<File
@@ -1819,15 +1819,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\ThreadEntry.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\ThreadLocal.h"
 					>
 				</File>
 				<File
 					RelativePath=".\include\Poco\ThreadPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\ThreadTarget.h"
 					>
 				</File>
 				<File

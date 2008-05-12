@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebWidgets", "WebWidgets_VS90.vcproj", "{8962DAD7-4F7B-46D0-A451-8D3476606890}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_VS90.vcproj", "{09255B72-C314-4E57-BCF8-73698222F042}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Win32 = debug_shared|Win32
+		release_shared|Win32 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8962DAD7-4F7B-46D0-A451-8D3476606890}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{8962DAD7-4F7B-46D0-A451-8D3476606890}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{8962DAD7-4F7B-46D0-A451-8D3476606890}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{8962DAD7-4F7B-46D0-A451-8D3476606890}.release_shared|Win32.Build.0 = release_shared|Win32
+		{09255B72-C314-4E57-BCF8-73698222F042}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{09255B72-C314-4E57-BCF8-73698222F042}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{09255B72-C314-4E57-BCF8-73698222F042}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{09255B72-C314-4E57-BCF8-73698222F042}.release_shared|Win32.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
