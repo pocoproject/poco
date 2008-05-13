@@ -168,9 +168,11 @@ public:
 		/// the stored value, otherwise a BadCastException
 		/// is thrown.
 	{
-		DynamicAnyHolderImpl<T>* pHolder = dynamic_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
-		if (pHolder)
+		if (_pHolder && _pHolder->type() == typeid(T))
+		{
+			DynamicAnyHolderImpl<T>* pHolder = static_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
 			return pHolder->value();
+		}
 		else
 			throw BadCastException();
 	}
