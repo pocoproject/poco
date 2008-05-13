@@ -46,6 +46,7 @@
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/MetaProgramming.h"
+#include "Poco/Bugcheck.h"
 #include <vector>
 #include <list>
 #include <deque>
@@ -1356,14 +1357,30 @@ template <typename T>
 inline Binding<T>* use(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
+	// if this test fails with an error, you tried to pass a const ref value to bind
+	// This check is here to avoid passing in local variables (like use(1) )
+	// Resolve this either by using bind (which will copy the value) or
+	// if you are sure that the const ref will still exist when execute is called (which can be a lot later!)
+	// then - and only then - use the "useRef" keyword instead
+	poco_static_assert (!IsConst<T>::VALUE);
 	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
+
 
 
 inline Binding<NullData>* use(const NullData& t, const std::string& name = "")
 	/// NullData overload.
 {
 	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
+}
+
+
+
+template <typename T> 
+inline Binding<T>* useRef(T& t, const std::string& name = "")
+	/// Convenience function for a more compact Binding creation.
+{
+	return new Binding<T>(t, name, AbstractBinding::PD_IN);
 }
 
 
