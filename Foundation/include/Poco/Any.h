@@ -164,6 +164,12 @@ private:
 	template <typename ValueType>
 	friend ValueType* UnsafeAnyCast(Any*);
 
+	template <typename ValueType>
+	friend ValueType& RefAnyCast(Any&);
+
+	template <typename ValueType>
+	friend const ValueType& RefAnyCast(const Any&);
+
 	Placeholder* _content;
 };
 
@@ -208,7 +214,8 @@ ValueType AnyCast(const Any& operand)
 	/// these cases.
 {
 	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-	if (!result) throw BadCastException("Failed to convert between const Any types");
+	if (!result)
+		throw BadCastException("Failed to convert between const Any types");
 	return *result;
 }
 
@@ -232,16 +239,16 @@ ValueType AnyCast(Any& operand)
 
 
 template <typename ValueType>
-const ValueType& RefAnyCast(const Any & operand)
+const ValueType& RefAnyCast(const Any& operand)
 	/// AnyCast operator used to return a const reference to the internal data. 
 	///
 	/// Example Usage: 
 	///	 const MyType& tmp = RefAnyCast<MyType>(anAny);
 {
-	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-	if (!result)
+	if (operand.type() == typeid(ValueType))
+		return static_cast<Any::Holder<ValueType>*>(operand._content)->_held;
+	else
 		throw BadCastException("RefAnyCast: Failed to convert between const Any types");
-	return *result;
 }
 
 
@@ -252,10 +259,10 @@ ValueType& RefAnyCast(Any& operand)
 	/// Example Usage: 
 	///	 MyType& tmp = RefAnyCast<MyType>(anAny);
 {
-	ValueType* result = AnyCast<ValueType>(&operand);
-	if (!result)
+	if (operand.type() == typeid(ValueType))
+		return static_cast<Any::Holder<ValueType>*>(operand._content)->_held;
+	else
 		throw BadCastException("RefAnyCast: Failed to convert between Any types");
-	return *result;
 }
 
 
