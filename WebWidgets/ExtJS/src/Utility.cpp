@@ -451,6 +451,8 @@ bool Utility::writeJSEventPlusServerCallback(std::ostream& out, const std::strin
 {
 	// rather simple way to support more than one delegate
 	// TODO: there sure is a more efficient way to do this
+	out << "'" << eventName << "':";
+	
 	std::ostringstream invoke;
 	invoke << "invoke:function(" << JS_EVENTARGNAME << "){";
 	out << "{fn:function(" << JS_EVENTARGNAME << "){var all={";
@@ -497,6 +499,7 @@ std::string Utility::createFunctionCode(const std::string& eventName, const std:
 		}
 		 
 	}
+	uri << "'";
 	// now add the callback code
 	std::ostringstream function;
 	function << "function(" << JS_EVENTARGNAME << "){var uri=" << uri.str() << ";";
