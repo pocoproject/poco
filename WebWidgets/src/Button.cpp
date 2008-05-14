@@ -1,7 +1,7 @@
 //
 // Button.cpp
 //
-// $Id: //poco/Main/WebWidgets/src/Button.cpp#8 $
+// $Id: //poco/Main/WebWidgets/src/Button.cpp#9 $
 //
 // Library: WebWidgets
 // Package: Controls
@@ -75,15 +75,23 @@ Button::Button(const std::string& name):
 {
 	init();
 }
-	
-	
+
+
+Button::Button(const std::string& name, const std::string& txt):
+	Control(name, typeid(Button))
+{
+	init();
+	setText(txt);
+}
+
+
 Button::Button():
 	Control(typeid(Button))
 {
 	init();
 }
 
-	
+
 Button::~Button()
 {
 }
@@ -101,8 +109,7 @@ void Button::init(Cell::Ptr ptrCell)
 void Button::init()
 {
 	ButtonCell* pCell = new ButtonCell(this);
-	pCell->buttonClicked = delegate(*this, &Button::fireButtonClicked);
-	setCell(pCell);
+	init(pCell);
 }
 
 

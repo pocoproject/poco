@@ -43,6 +43,7 @@
 #include "Poco/WebWidgets/TextFieldCell.h"
 #include "Poco/WebWidgets/ComboBoxCell.h"
 #include "Poco/WebWidgets/ButtonCell.h"
+#include "Poco/WebWidgets/DateFieldCell.h"
 #include "Poco/NumberFormatter.h"
 
 

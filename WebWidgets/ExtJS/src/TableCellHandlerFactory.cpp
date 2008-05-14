@@ -41,6 +41,7 @@
 #include "Poco/WebWidgets/ComboBoxCell.h"
 #include "Poco/WebWidgets/ButtonCell.h"
 #include "Poco/WebWidgets/NumberFieldCell.h"
+#include "Poco/WebWidgets/DateFieldCell.h"
 
 
 namespace Poco {
@@ -83,6 +84,10 @@ TableCellHandlerFactory::TableCellHandlerFactory()
 	{
 		TableCellHandler<ImageButtonCell>::Ptr pHandle(new TableCellHandler<ImageButtonCell>(false, true));
 		registerFactory(typeid(ImageButtonCell), pHandle);
+	}
+	{
+		TableCellHandler<DateFieldCell>::Ptr pHandle(new TableCellHandler<DateFieldCell>(true, true));
+		registerFactory(typeid(DateFieldCell), pHandle);
 	}
 }
 

@@ -1,7 +1,7 @@
 //
 // Button.h
 //
-// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/Button.h#7 $
+// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/Button.h#8 $
 //
 // Library: WebWidgets
 // Package: Controls
@@ -63,6 +63,9 @@ public:
 
 	Button(const std::string& name);
 		/// Creates a Button with the given name.
+
+	Button(const std::string& name, const std::string& lblTxt);
+		/// Creates a Button with the given name and lblTxt.
 
 	Button();
 		/// Creates an anonymous Button.

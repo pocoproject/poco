@@ -44,6 +44,7 @@
 #include "Poco/WebWidgets/ExtJS/AbstractTableCellHandler.h"
 #include "Poco/WebWidgets/ExtJS/CellInitializer.h"
 #include "Poco/WebWidgets/ImageButtonCell.h"
+#include "Poco/WebWidgets/DateFieldCell.h"
 #include "Poco/NumberFormatter.h"
 #include <vector>
 #include <map>
@@ -380,6 +381,67 @@ protected:
 
 private:
 	const ImageButtonCell* _pClass;
+};
+
+
+
+template<>
+class TableCellHandler<DateFieldCell>: public AbstractTableCellHandler
+	/// TableCellHandler
+{
+public:
+	TableCellHandler(bool useEditor, bool useRenderer):
+		AbstractTableCellHandler(useEditor, useRenderer)
+	{
+	}
+	
+
+	void addFixed(const std::string& name, const std::string& fixedContent)
+		/// Adds a variable with a given fixed string content. The content will not be wrapped
+		/// with ' ' but will be written as is
+	{
+	}
+
+
+	void writeData(const void* pAny, std::ostream& out)
+		/// Writes the content of the table used to dynamically
+		/// initialize Table Columns
+	{
+	}
+
+	void writeDynamicData(std::ostream& out)
+	{
+		out << "Ext.util.Format.dateRenderer('";
+		const std::string& pocoDateFormat = _pClass->getFormat();
+		out << Utility::convertPocoDateToPHPDate(pocoDateFormat) << "')";
+	}
+
+	AbstractTableCellHandler* clone() const
+	{
+		return new TableCellHandler(*this);
+	}
+
+	void init(const Cell* pCell)
+	{
+		_pClass = dynamic_cast<const DateFieldCell*>(pCell);
+		poco_check_ptr (_pClass);
+	}
+
+protected:
+	virtual ~TableCellHandler()
+		/// Destroys the TableCellHandler.
+	{
+	}
+
+
+	TableCellHandler(const TableCellHandler& other):
+		AbstractTableCellHandler(other.useEditor(), other.useRenderer()),
+		_pClass(other._pClass)
+	{
+	}
+
+private:
+	const DateFieldCell* _pClass;
 };
 
 
