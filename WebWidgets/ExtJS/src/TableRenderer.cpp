@@ -80,31 +80,24 @@ void TableRenderer::renderBody(const Renderable* pRenderable, const RenderContex
 
 void TableRenderer::renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr)
 {
-	Utility::writeRenderableProperties(pTable, ostr);
 	WebApplication& app = WebApplication::instance();
 	Renderable::ID id = app.getCurrentPage()->id();
-	// add an afterEdit handler
-	// event handlers can be defined in the constructor after the listeners member
-	//{
-	//   'afterEdit' : {
-	//       fn: function(obj){obj.row, obj.column, obj.value, tableId}
-	//},
-	
-	std::ostringstream uri;
-	uri << "'" <<app.getURI().toString();
-	uri << ";"; //mark as AJAX request
-	uri << RequestHandler::KEY_ID << "=" << id << "&";
-	uri << Table::FIELD_COL << "='+obj.column+'&";
-	uri << Table::FIELD_ROW << "='+obj.row+'&" << Table::FIELD_VAL << "='+obj.value";
-	//obj.commitChanges... hides the red triangle
-	ostr << ", listeners: {'afteredit':{fn:function(obj){var uri=" << uri.str() << ";obj.grid.getStore().commitChanges();";
-	ostr << "Ext.Ajax.request({url:uri,";
-	ostr << "failure:function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');}});}}},";
+	Utility::writeRenderableProperties(pTable, ostr);
+	static const std::string afterEdit("afterEdit");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_COL, "+obj.column"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, "+obj.row"));
+	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.value"));
+	JavaScriptEvent<int> ev;
+	ev.add(jsDelegate("function(obj){obj.grid.getStore().commitChanges();}"));
+	ostr << ",listeners:{";
+	Utility::writeJSEventPlusServerCallback(ostr, afterEdit, ev.jsDelegates(), addParams);
+	ostr << "},";
 	
 	renderColumns(pTable, context, ostr);
 	ostr << ",clicksToEdit:1,store:";
 	renderStore(pTable, ostr);
-	app.registerAjaxProcessor(Poco::NumberFormatter::format(id), const_cast<Table*>(pTable));
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pTable), const_cast<Table*>(pTable));
 }
 
 

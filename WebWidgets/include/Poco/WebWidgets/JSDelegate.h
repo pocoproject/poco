@@ -51,46 +51,34 @@ class WebWidgets_API JSDelegate
 	/// A JSDelegate adds a javascript method call to a JavaScriptEvent
 {
 public:
-	JSDelegate(const std::string& fct, const std::string& file);
+	JSDelegate(const std::string& jsCode);
 		/// Creates the JSDelegate.
 
 	virtual ~JSDelegate();
 		/// Destroys the JSDelegate.
 
-	const std::string& functionName() const;
-		/// The JavaScript function to call. It is assumed that the 
-		/// function takes one parameter, which is of type JavaScript EventArgs
-
-	const std::string& jsFile() const;
-		/// The javascript file we need to import so that
-		/// the function is available
+	const std::string& jsCode() const;
+		/// The javascript code that should be executed
 
 	bool operator<(const JSDelegate& del) const;
 
 private:
-	std::string _functionName;
-	std::string _jsFile;
+	std::string _jsCode;
 };
 
 
-inline const std::string& JSDelegate::functionName() const
+inline const std::string& JSDelegate::jsCode() const
 {
-	return _functionName;
+	return _jsCode;
 }
 
 
-inline const std::string& JSDelegate::jsFile() const
+static JSDelegate jsDelegate(const std::string& jsCode);
+
+
+inline JSDelegate jsDelegate(const std::string& jsCode)
 {
-	return _jsFile;
-}
-
-
-static JSDelegate jsDelegate(const std::string& fct, const std::string& file);
-
-
-inline JSDelegate jsDelegate(const std::string& fct, const std::string& file)
-{
-	return JSDelegate(fct, file);
+	return JSDelegate(jsCode);
 }
 
 

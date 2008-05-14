@@ -81,7 +81,7 @@ public:
 	void testTableComboBox();
 	void testTableButton();
 	void testTableImageButton();
-
+	void testJSEvent();
 	void setUp();
 	void tearDown();
 

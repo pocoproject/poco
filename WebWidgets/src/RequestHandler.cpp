@@ -55,6 +55,7 @@ namespace WebWidgets {
 
 
 const std::string RequestHandler::KEY_ID("id");
+const std::string RequestHandler::KEY_EVID("evId");
 
 
 RequestHandler::RequestHandler(WebApplication& app):

@@ -88,10 +88,12 @@
 #include "Poco/WebWidgets/TabView.h"
 #include "Poco/WebWidgets/ListBoxCell.h"
 #include "Poco/WebWidgets/Table.h"
-
+#include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 
 #include "Poco/String.h"
 #include "Poco/DateTimeFormat.h"
+#include <sstream>
 
 
 namespace Poco {
@@ -376,6 +378,131 @@ Form::Ptr Utility::insideForm(const View* pChild)
 Form::Ptr Utility::insideForm(const Cell* pChild)
 {
 	return Utility::insideForm(pChild->getOwner());
+}
+
+
+bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates)
+{
+	//'click' : {
+	//	fn: this.onClick,
+	//	scope: this,
+	//	delay: 100
+	//}
+	if (delegates.empty())
+		return false;
+		
+	out << "'" << eventName << "':";
+		
+	if (delegates.size() == 1)
+		out << "{fn:" << delegates.begin()->jsCode() << "}";
+	else
+	{
+		// rather simple way to support more than one delegate
+		// TODO: there sure is a more efficient way to do this
+		std::ostringstream invoke;
+		invoke << "invoke:function(" << JS_EVENTARGNAME << "){";
+		out << "{fn:function(" << JS_EVENTARGNAME << "){var all={";
+		writeCodeForDelegate(invoke, out, delegates);
+		invoke << "}";
+		out << invoke.str() << "};"; //closes all
+		
+		out << "all.invoke(" << JS_EVENTARGNAME << ");";
+		out << "}"; //closes fn
+		out << "}"; //closes function
+	}	
+
+	return true;
+}
+
+
+void Utility::writeCodeForDelegate(std::ostream& invoke, std::ostream& out, const std::set<JSDelegate>& jsDels)
+{
+	int cnt(0);
+	std::set<JSDelegate>::const_iterator it = jsDels.begin();
+	for (; it != jsDels.end(); ++it)
+	{
+		writeCodeForDelegate(invoke, out, *it, cnt);
+		++cnt;
+	}
+}
+
+
+void Utility::writeCodeForDelegate(std::ostream& invoke, std::ostream& out, const JSDelegate& jsDel, int cnt)
+{
+	std::string code(Poco::trim(jsDel.jsCode()));
+	if (code.find("function") == 0)
+	{
+		// inline function definition
+		out << "d" << cnt << ":" << code << ",";
+		invoke << "this.d" << cnt << "(" << JS_EVENTARGNAME << ");";
+	}
+	else
+	{
+		out << "d" << cnt << ":function(" << JS_EVENTARGNAME << "){" << code;
+		if (!code.empty() && code[code.size()-1] != ';')
+			out << ";";
+		 out << "},";
+		invoke << "this.d" << cnt << "(" << JS_EVENTARGNAME << ");";
+	}
+}
+
+
+bool Utility::writeJSEventPlusServerCallback(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates, const std::map<std::string, std::string>& addServerParams)
+{
+	// rather simple way to support more than one delegate
+	// TODO: there sure is a more efficient way to do this
+	std::ostringstream invoke;
+	invoke << "invoke:function(" << JS_EVENTARGNAME << "){";
+	out << "{fn:function(" << JS_EVENTARGNAME << "){var all={";
+	writeCodeForDelegate(invoke, out, delegates);
+	//write server callback
+	writeCodeForDelegate(invoke, out, jsDelegate(createFunctionCode(eventName, addServerParams)), static_cast<int>(delegates.size()));
+	invoke << "}";
+	out << invoke.str() << "};"; //closes all
+	
+	out << "all.invoke(" << JS_EVENTARGNAME << ");";
+	out << "}"; //closes fn
+	out << "}"; //closes function
+	return true;
+}
+
+
+std::string Utility::createFunctionCode(const std::string& eventName, const std::map<std::string, std::string>& addParams)
+{
+	WebApplication& app = WebApplication::instance();
+	Renderable::ID id = app.getCurrentPage()->id();
+	std::ostringstream uri;
+	uri << "'" << app.getURI().toString();
+	uri << ";"; //mark as AJAX request
+	uri << RequestHandler::KEY_ID << "=" << id << "&";
+	uri << RequestHandler::KEY_EVID << "=" << eventName;
+	// add optional params
+	std::map<std::string, std::string>::const_iterator it = addParams.begin();
+	for (; it != addParams.end(); ++it)
+	{
+		uri << "&" << it->first;
+		if (it->second.empty())
+		{
+		}
+		else
+		{
+			if (it->second[0] == '+')
+			{
+				// a variable was added
+				uri << "='" << 	it->second << "+'";
+			}
+			else
+				uri << "=" << it->second;
+					
+		}
+		 
+	}
+	// now add the callback code
+	std::ostringstream function;
+	function << "function(" << JS_EVENTARGNAME << "){var uri=" << uri.str() << ";";
+	function << "Ext.Ajax.request({url:uri,";
+	function << "failure:function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');}});}";
+	return function.str();
 }
 
 

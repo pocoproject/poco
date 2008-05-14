@@ -42,7 +42,7 @@
 
 #include "Poco/WebWidgets/Control.h"
 #include "Poco/WebWidgets/Event.h"
-#include "Poco/BasicEvent.h"
+#include "Poco/WebWidgets/JavaScriptEvent.h"
 
 
 namespace Poco {
@@ -59,7 +59,7 @@ public:
 	typedef Poco::AutoPtr<Button> Ptr;
 	typedef Event<Button> ButtonEvent;
 
-	Poco::BasicEvent<ButtonEvent> buttonClicked;
+	JavaScriptEvent<ButtonEvent> buttonClicked;
 
 	Button(const std::string& name);
 		/// Creates a Button with the given name.

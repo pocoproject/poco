@@ -67,6 +67,7 @@
 #include "Poco/WebWidgets/ImageButtonCell.h"
 #include "Poco/WebWidgets/TextEditCell.h"
 #include "Poco/WebWidgets/SimpleTableModel.h"
+#include "Poco/WebWidgets/JSDelegate.h"
 #include "Poco/TeeStream.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
@@ -1315,6 +1316,36 @@ void ExtJSTest::testTableImageButton()
 }
 
 
+void ExtJSTest::testJSEvent()
+{
+	Button::Ptr pBut(new Button());
+	pBut->buttonClicked.add(jsDelegate("someFunction(obj)"));
+	pBut->buttonClicked.add(jsDelegate("function(obj){alert('Click');}"));
+	std::ostringstream out;
+	Utility::writeJSEvent(out, "clicked", pBut->buttonClicked.jsDelegates());
+	std::string result(out.str());
+	static const std::string expected("'clicked':"
+										"{"
+											"fn:function(obj){"
+												"var all={"
+													"d0:function(obj){"
+														"alert('Click');"
+														"},"
+													"d1:function(obj){"
+														"someFunction(obj);"
+														"},"
+													"invoke:function(obj){"
+														"this.d0(obj);"
+														"this.d1(obj);"
+														"}"
+													"};"
+												"all.invoke(obj);"
+											"}"
+										"}");
+	assert (result == expected);
+}
+
+
 void ExtJSTest::setUp()
 {
 }
@@ -1365,6 +1396,7 @@ CppUnit::Test* ExtJSTest::suite()
 	CppUnit_addTest(pSuite, ExtJSTest, testTableComboBox);
 	CppUnit_addTest(pSuite, ExtJSTest, testTableButton);
 	CppUnit_addTest(pSuite, ExtJSTest, testTableImageButton);
+	CppUnit_addTest(pSuite, ExtJSTest, testJSEvent);
 
 	return pSuite;
 }

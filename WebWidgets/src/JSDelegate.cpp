@@ -41,9 +41,8 @@ namespace Poco {
 namespace WebWidgets {
 
 
-JSDelegate::JSDelegate(const std::string& fct, const std::string& file):
-	_functionName(fct),
-	_jsFile(file)
+JSDelegate::JSDelegate(const std::string& code):
+	_jsCode(code)
 {
 }
 
@@ -55,13 +54,7 @@ JSDelegate::~JSDelegate()
 
 bool JSDelegate::operator<(const JSDelegate& del) const
 {
-	if (_functionName < del._functionName)
-		return true;
-
-	if (_functionName > del._functionName)
-		return false;
-
-	return _jsFile < del._jsFile;
+	return (_jsCode < del._jsCode);
 }
 
 

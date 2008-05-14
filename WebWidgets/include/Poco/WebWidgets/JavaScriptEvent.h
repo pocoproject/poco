@@ -51,8 +51,11 @@ namespace Poco {
 namespace WebWidgets {
 
 
+static const std::string JS_EVENTARGNAME("obj"); /// each javascript method receives one single param which is named JS_EVENTARGNAME
+
+
 template <class TArgs> 
-class WebWidgets_API JavaScriptEvent: public Poco::AbstractEvent < 
+class JavaScriptEvent: public Poco::AbstractEvent < 
 	TArgs, Poco::DefaultStrategy<TArgs, Poco::AbstractDelegate<TArgs>, Poco::p_less<Poco::AbstractDelegate<TArgs> > >,
 	Poco::AbstractDelegate<TArgs> 
 >

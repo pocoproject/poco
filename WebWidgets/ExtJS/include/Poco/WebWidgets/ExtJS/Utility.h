@@ -43,7 +43,10 @@
 #include "Poco/WebWidgets/ExtJS/ExtJS.h"
 #include "Poco/WebWidgets/Form.h"
 #include "Poco/WebWidgets/LookAndFeel.h"
+#include "Poco/WebWidgets/JavaScriptEvent.h"
 #include <ostream>
+#include <set>
+#include <map>
 
 
 namespace Poco {
@@ -96,8 +99,21 @@ public:
 
 	static std::string convertPocoDateToPHPDate(const std::string& dateTimeFmt);
 		/// Converts a poco date time format string to its PHP/extjs equivalent
+		
+	static bool writeJSEvent(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates);
+		/// writes all JS Delegates for a single named JSEvent. 
+		/// Returns true if data was written, false if no delegates were present and no event handler was written.
+		
+	static bool writeJSEventPlusServerCallback(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates, const std::map<std::string, std::string>& addServerParams);
+		/// writes all JS Delegates for a single named JSEvent. adds a callback to the server
+		/// Returns true if data was written, false if no delegates were present and no event handler was written.
+		/// an addParam that should be treated as a variable must start with the '+' character!
+	
 
 private:
+	static void writeCodeForDelegate(std::ostream& invoke, std::ostream& jsOut, const std::set<JSDelegate>& jsDels);
+	static void writeCodeForDelegate(std::ostream& invoke, std::ostream& jsOut, const JSDelegate& jsDel, int cnt);
+	static std::string createFunctionCode(const std::string& eventName, const std::map<std::string, std::string>& addParams);
 	static void convertPocoDateToPHPDate(char in, std::string& result);
 	static void convertPHPDateToPocoDate(char in, std::string& result);
 	static void escapeCharForPHP(char in, std::string& result);
