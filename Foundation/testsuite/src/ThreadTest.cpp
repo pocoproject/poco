@@ -37,9 +37,10 @@
 #include "Poco/Runnable.h"
 #include "Poco/ThreadTarget.h"
 #include "Poco/Event.h"
-#include <iostream>
 #if defined(__sun) && defined(__SVR4)
-#define __EXTENSIONS__
+#	if !defined(__EXTENSIONS__)
+#		define __EXTENSIONS__
+#	endif
 #include <limits.h>
 #endif
 
@@ -281,7 +282,7 @@ void ThreadTest::testThreadStackSize()
 
 	stackSize = 1;
 	thread.setStackSize(stackSize);
-#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_OS_CYGWIN)
+#if defined(POCO_OS_FAMILY_UNIX) && !(POCO_OS == POCO_OS_CYGWIN)
 	assert (PTHREAD_STACK_MIN == thread.getStackSize());
 #else
 	assert (stackSize == thread.getStackSize());

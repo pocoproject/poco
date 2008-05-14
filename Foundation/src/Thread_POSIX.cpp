@@ -39,8 +39,10 @@
 #include "Poco/ErrorHandler.h"
 #include <signal.h>
 #if defined(__sun) && defined(__SVR4)
-#define __EXTENSIONS__
-#include <limits.h>
+#	if !defined(__EXTENSIONS__)
+#		define __EXTENSIONS__
+#	endif
+#	include <limits.h>
 #endif
 
 
@@ -151,14 +153,14 @@ int ThreadImpl::getMaxOSPriorityImpl()
 
 void ThreadImpl::setStackSizeImpl(int size)
 {
-#ifdef POCO_OS_CYGWIN
+#if (POCO_OS == POCO_OS_CYGWIN)
 	_pData->stackSize = 0;
 #else
  	if (size !=0 && size < PTHREAD_STACK_MIN)
  		size = PTHREAD_STACK_MIN;
 
  	_pData->stackSize = size;
-#endif
+#endif // (POCO_OS == POCO_OS_CYGWIN)
 }
 
 
