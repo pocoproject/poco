@@ -1388,14 +1388,14 @@ template <typename T>
 inline Binding<T>* in(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	return new Binding<T>(t, name, AbstractBinding::PD_IN);
+	return use(t, name);
 }
 
 
 inline Binding<NullData>* in(const NullData& t, const std::string& name = "")
 	/// NullData overload.
 {
-	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
+	return use(t, name);
 }
 
 
@@ -1403,6 +1403,7 @@ template <typename T>
 inline Binding<T>* out(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
+	poco_static_assert (!IsConst<T>::VALUE);
 	return new Binding<T>(t, "", AbstractBinding::PD_OUT);
 }
 
@@ -1411,6 +1412,7 @@ template <typename T>
 inline Binding<T>* io(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
+	poco_static_assert (!IsConst<T>::VALUE);
 	return new Binding<T>(t, "", AbstractBinding::PD_IN_OUT);
 }
 

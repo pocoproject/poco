@@ -109,6 +109,17 @@ struct IsConst<const T>
 };
 
 
+template <typename T, int i>
+struct IsConst<const T[i]>
+	/// Specialization for const char arrays
+{
+	enum 
+	{
+		VALUE = 1
+	};
+};
+
+
 template <typename T>
 struct TypeWrapper
 	/// Use the type wrapper if you want to dedecouple constness and references from template types
