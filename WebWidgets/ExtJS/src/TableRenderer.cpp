@@ -41,6 +41,7 @@
 #include "Poco/WebWidgets/Table.h"
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/WebWidgets/DateFormatter.h"
 #include <sstream>
 
 
@@ -95,7 +96,12 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	ostr << "},";
 	
 	renderColumns(pTable, context, ostr);
-	ostr << ",clicksToEdit:1,store:";
+	ostr << ",clicksToEdit:1";
+	if (pTable->getWidth() > 0)
+		ostr << ",width:" << pTable->getWidth();
+	if (pTable->getHeight() > 0)
+		ostr << ",height:" << pTable->getHeight();
+	ostr << ",store:";
 	renderStore(pTable, ostr);
 	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pTable), const_cast<Table*>(pTable));
 }
@@ -185,7 +191,7 @@ void TableRenderer::renderDataModel(const Table* pTable, std::ostream& ostr)
 			if (col != 0)
 				ostr << ",";
 
-			//FIXME: how do we distinguish if we want to write something as text or GUIElement?
+			// how do we distinguish if we want to write something as text or GUIElement?
 			// Example: Checkbutton can be written as text "true"/"false" or as a CheckButton
 			// we use the Cell: if we have a Cell set -> complex Type otherwise text
 			// -> already handled by the renderer!
@@ -201,7 +207,13 @@ void TableRenderer::renderDataModel(const Table* pTable, std::ostream& ostr)
 				if (isString)
 					ostr << "'" << RefAnyCast<std::string>(aVal) << "'";
 				else if (ptrCell)
-					ostr  << tc[col]->getCell()->getFormatter()->format(aVal);
+				{
+					//date must be written as string
+					if (typeid(Poco::DateTime) == aVal.type())
+						ostr << "'" << tc[col]->getCell()->getFormatter()->format(aVal) << "'";
+					else
+						ostr  << tc[col]->getCell()->getFormatter()->format(aVal);
+				}
 				else
 					; //FIXME: 
 			}

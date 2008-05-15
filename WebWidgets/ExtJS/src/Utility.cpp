@@ -479,10 +479,13 @@ std::string Utility::createFunctionCode(const std::string& eventName, const std:
 	uri << RequestHandler::KEY_ID << "=" << id << "&";
 	uri << RequestHandler::KEY_EVID << "=" << eventName;
 	// add optional params
+	bool commaAtEnd = false;
+	std::size_t cnt(1);
 	std::map<std::string, std::string>::const_iterator it = addParams.begin();
-	for (; it != addParams.end(); ++it)
+	for (; it != addParams.end(); ++it, ++cnt)
 	{
-		uri << "&" << it->first;
+		uri << "&" << Utility::safe(it->first);
+		commaAtEnd = false;
 		if (it->second.empty())
 		{
 		}
@@ -491,15 +494,21 @@ std::string Utility::createFunctionCode(const std::string& eventName, const std:
 			if (it->second[0] == '+')
 			{
 				// a variable was added
-				uri << "='" << 	it->second << "+'";
+				uri << "='" << 	it->second;
+				if (cnt < addParams.size())
+				{
+					uri << "+'";
+				}
+				commaAtEnd = true;
 			}
 			else
-				uri << "=" << it->second;
+				uri << "=" << Utility::safe(it->second);
 					
 		}
 		 
 	}
-	uri << "'";
+	if (!commaAtEnd)
+		uri << "'";
 	// now add the callback code
 	std::ostringstream function;
 	function << "function(" << JS_EVENTARGNAME << "){var uri=" << uri.str() << ";";

@@ -83,6 +83,12 @@ public:
 
 	const std::string& getHeader() const;
 		/// Returns the header of the column
+		
+	void setEditable(bool editable = true);
+		/// Sets whether the Cell's contents can be edited.
+
+	bool isEditable() const;
+		/// Returns true iff the Cell is editable.
 
 
 protected:
@@ -141,6 +147,18 @@ inline const std::string& TableColumn::getHeader() const
 	return _header;
 }
 
+
+inline void TableColumn::setEditable(bool editable)
+{
+	_pCell->setEditable(editable);
+}
+
+
+inline bool TableColumn::isEditable() const
+{
+	return _pCell->isEditable();
+}
+	
 
 } } // namespace Poco::WebWidgets
 

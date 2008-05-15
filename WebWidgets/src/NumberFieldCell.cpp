@@ -35,6 +35,7 @@
 
 
 #include "Poco/WebWidgets/NumberFieldCell.h"
+#include "Poco/WebWidgets/IntFormatter.h"
 
 
 namespace Poco {
@@ -44,6 +45,7 @@ namespace WebWidgets {
 NumberFieldCell::NumberFieldCell(View* pOwner):
 	TextFieldCell(pOwner, typeid(NumberFieldCell))
 {
+	this->setFormatter(new IntFormatter());
 }
 
 
