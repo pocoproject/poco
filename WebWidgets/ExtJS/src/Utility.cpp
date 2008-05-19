@@ -485,9 +485,14 @@ std::string Utility::createURI(const std::map<std::string, std::string>& addPara
 	WebApplication& app = WebApplication::instance();
 	Renderable::ID id = app.getCurrentPage()->id();
 	std::ostringstream uri;
-	uri << "'" << app.getURI().toString() << "?";
-	uri << RequestHandler::KEY_TYPE << "=" << RequestHandler::VAL_AJAX; //mark as AJAX request
-	uri << "&" << RequestHandler::KEY_ID << "=" << id;
+	std::string theUri(app.getURI().toString());
+	if (theUri.empty())
+		theUri = "/";
+	else if (theUri[theUri.length()-1] != '/')
+		theUri.append("/");
+	uri << "'" << theUri;
+	uri << ";"; //mark as AJAX request
+	uri << RequestHandler::KEY_ID << "=" << id;
 	// add optional params
 	bool commaAtEnd = false;
 	std::size_t cnt(1);

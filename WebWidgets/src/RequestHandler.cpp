@@ -56,8 +56,6 @@ namespace WebWidgets {
 
 const std::string RequestHandler::KEY_ID("id");
 const std::string RequestHandler::KEY_EVID("evId");
-const std::string RequestHandler::VAL_AJAX("ajax");
-const std::string RequestHandler::KEY_TYPE("appinf");
 
 
 RequestHandler::RequestHandler(WebApplication& app):
@@ -74,28 +72,21 @@ RequestHandler::~RequestHandler()
 void RequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 {
 	_app.attachToThread();
-	Poco::Net::HTMLForm form(request, request.stream());
-	if (!form.empty())
+	Poco::Net::NameValueCollection args;
+	parseRequest(request, args);
+	if (args.empty())
 	{
-		Poco::Net::NameValueCollection::ConstIterator it = form.find(KEY_TYPE);
-		if (it != form.end())
+		Poco::Net::HTMLForm form(request, request.stream());
+		if (!form.empty())
 		{
-			if (it->second == VAL_AJAX)
-			{
-				form.erase(KEY_TYPE);
-				handleAjaxRequest(request, response, form);
-			}
-			else
-			{
-				form.erase(KEY_TYPE);
-				handleForm(form);
-			}
-		}
-		else
 			handleForm(form);
+		}
+		handlePageRequest(request, response);
 	}
 	else
-		handlePageRequest(request, response);
+	{
+		handleAjaxRequest(request, response, args);
+	}
 }
 
 
