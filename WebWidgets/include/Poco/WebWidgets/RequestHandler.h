@@ -59,6 +59,8 @@ class WebWidgets_API RequestHandler: public Poco::Net::HTTPRequestHandler
 public:
 	static const std::string KEY_ID; /// key for form param contains id
 	static const std::string KEY_EVID; /// form param containing the event name
+	static const std::string VAL_AJAX; /// value to detect an AJAX request
+	static const std::string KEY_TYPE; /// key identifying the type of request
 
 	RequestHandler(WebApplication& app);
 		/// Creates the RequestHandler, using the given WebApplication.

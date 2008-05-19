@@ -107,6 +107,12 @@ public:
 	{
 		return _jsHandlers;
 	}
+	
+	void setJSDelegates(const std::set<JSDelegate>& all)
+		/// Overwrites all JSDelegates
+	{
+		_jsHandlers = all;
+	}
 
 private:
 	std::set<JSDelegate> _jsHandlers;

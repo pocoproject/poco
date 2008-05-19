@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/TextFieldCell.h"
+#include "Poco/WebWidgets/IntFormatter.h"
 
 
 namespace Poco {
@@ -53,7 +54,7 @@ class WebWidgets_API NumberFieldCell: public TextFieldCell
 public:
 	typedef Poco::AutoPtr<NumberFieldCell> Ptr;
 
-	NumberFieldCell(View* pOwner);
+	NumberFieldCell(View* pOwner, Formatter::Ptr pF = new IntFormatter());
 		/// Creates the NumberFieldCell.
 
 	virtual ~NumberFieldCell();

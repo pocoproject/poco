@@ -57,7 +57,7 @@ void CollapsibleRenderer::writeProperties(const Frame* pFrame, std::ostream& ost
 {
 	const Collapsible* pC = static_cast<const Collapsible*>(pFrame);
 	FrameRenderer::writeProperties(pFrame, ostr);
-	ostr << ",collapsible:true,titleCollapse:true, header:true,collapsed:" << (pC->getCollapse()?"true":"false");
+	ostr << ",collapsible:true,titleCollapse:true, collapsed:" << (pC->getCollapse()?"true":"false");
 }
 
 

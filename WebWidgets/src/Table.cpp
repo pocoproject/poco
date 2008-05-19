@@ -35,6 +35,7 @@
 
 
 #include "Poco/WebWidgets/Table.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/NumberParser.h"
 
 
@@ -45,6 +46,8 @@ namespace WebWidgets {
 const std::string Table::FIELD_COL("col");
 const std::string Table::FIELD_ROW("row");
 const std::string Table::FIELD_VAL("val");
+const std::string Table::EV_CELLCLICKED("click");
+const std::string Table::EV_CELLVALUECHANGED("edit");
 
 
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
@@ -126,19 +129,25 @@ void Table::handleForm(const std::string& field, const std::string& value)
 		handleRow(value);
 	else if (field == FIELD_VAL)
 		handleVal(value);
+	else if (field == RequestHandler::KEY_EVID)
+		_ev = value;
 }
 
 
 void Table::handleRequest(const Poco::Net::HTTPServerRequest& req)
 {
-	apply();
+	if (_ev == EV_CELLVALUECHANGED)
+		handleValueChanged();
+	else if (_ev == EV_CELLCLICKED)
+		handleCellClicked();
 	_col = -1;
 	_row = -1;
-	_val.clear();;
+	_val.clear();
+	_ev.clear();
 }
 
 
-void Table::apply()
+void Table::handleValueChanged()
 {
 	if (_col < 0 || _row < 0 || _col >= getColumnCount())
 		throw InvalidArgumentException("col/row out of range");
@@ -153,6 +162,16 @@ void Table::apply()
 	}
 	else
 		setValue(Poco::Any(_val), _row, _col);
+}
+
+
+
+void Table::handleCellClicked()
+{
+	if (_col < 0 || _row < 0 || _col >= getColumnCount())
+		throw InvalidArgumentException("col/row out of range");
+	CellClick ev(_row, _col);
+	cellClicked(this, ev);
 }
 
 
@@ -175,5 +194,33 @@ void Table::handleVal(const std::string& val)
 	// we do the conversion later in apply
 	_val = val;
 }
+
+
+void Table::setValue(const Poco::Any& val, std::size_t row, std::size_t col)
+{
+	Poco::Any oldValue;
+	if (getRowCount() > row)
+		oldValue = getValue(row, col); 
+	CellValueChange ev(row, col, oldValue, val);
+	_pModel->setValue(val, row, col);
+	cellValueChanged(this, ev);
+}
+
+
+Table::CellClick::CellClick(std::size_t r, std::size_t c):
+	row(r),
+	col(c)
+{
+}
+
+
+Table::CellValueChange::CellValueChange(std::size_t r, std::size_t c, const Poco::Any& old, const Poco::Any& n):
+	row(r),
+	col(c),
+	oldValue(old),
+	newValue(n)
+{
+}
+
 
 } } // namespace Poco::WebWidgets

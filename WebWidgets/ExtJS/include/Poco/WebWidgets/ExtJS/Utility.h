@@ -104,16 +104,24 @@ public:
 		/// writes all JS Delegates for a single named JSEvent. 
 		/// Returns true if data was written, false if no delegates were present and no event handler was written.
 		
-	static bool writeJSEventPlusServerCallback(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates, const std::map<std::string, std::string>& addServerParams);
+	static bool writeJSEventPlusServerCallback(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates, const std::map<std::string, std::string>& addServerParams, bool reloadPage);
 		/// writes all JS Delegates for a single named JSEvent. adds a callback to the server
 		/// Returns true if data was written, false if no delegates were present and no event handler was written.
 		/// an addParam that should be treated as a variable must start with the '+' character!
 	
+	static std::string createURI(const std::map<std::string, std::string>& addParams);
+		/// Creates the url from the function parameters, writes a js fucntion with method signature function(obj)
+		
+	static std::string createCallbackFunctionCode(const std::string& signature, const std::map<std::string, std::string>& addParams, bool reloadPage);
+		/// Creates the url from the function parameters, writes a js fucntion with the given method signature
+		
+	static bool writeServerCallback(std::ostream& out, const std::string& eventName, const std::string& signature, const std::map<std::string, std::string>& addServerParams, bool reloadPage);
+		/// Writes a server callback for the given ExtJS eventName and server Params
+		// signature contaisn the function declaration (i.e.: function(p1,p2))
 
 private:
 	static void writeCodeForDelegate(std::ostream& invoke, std::ostream& jsOut, const std::set<JSDelegate>& jsDels);
 	static void writeCodeForDelegate(std::ostream& invoke, std::ostream& jsOut, const JSDelegate& jsDel, int cnt);
-	static std::string createFunctionCode(const std::string& eventName, const std::map<std::string, std::string>& addParams);
 	static void convertPocoDateToPHPDate(char in, std::string& result);
 	static void convertPHPDateToPocoDate(char in, std::string& result);
 	static void escapeCharForPHP(char in, std::string& result);

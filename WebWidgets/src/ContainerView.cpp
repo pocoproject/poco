@@ -93,15 +93,30 @@ void ContainerView::remove(View::Ptr pView)
 
 View::Ptr ContainerView::findChild(const std::string& name) const
 {
-	for (ConstIterator it = begin(); it != end(); ++it)
 	{
-		if (*it && (*it)->getName() == name)
+		for (ConstIterator it = begin(); it != end(); ++it)
 		{
-			return *it;
+			if (*it && (*it)->getName() == name)
+			{
+				return *it;
+			}
 		}
 	}
-
-	return View::findChild(name);
+	
+	{
+		View::Ptr result;
+		for (ConstIterator it = begin(); it != end(); ++it)
+		{
+			if (*it)
+			{
+				result = (*it)->findChild(name);
+			}
+			if (result)
+				return result;
+		}
+		
+		return View::findChild(name);
+	}
 }
 
 

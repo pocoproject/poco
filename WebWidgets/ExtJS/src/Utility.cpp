@@ -447,18 +447,20 @@ void Utility::writeCodeForDelegate(std::ostream& invoke, std::ostream& out, cons
 }
 
 
-bool Utility::writeJSEventPlusServerCallback(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates, const std::map<std::string, std::string>& addServerParams)
+bool Utility::writeJSEventPlusServerCallback(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates, const std::map<std::string, std::string>& addServerParams, bool reloadPage)
 {
 	// rather simple way to support more than one delegate
 	// TODO: there sure is a more efficient way to do this
-	out << "'" << eventName << "':";
+	
+	out << eventName << ":";
+	static const std::string defSignature("function("+JS_EVENTARGNAME+")");
 	
 	std::ostringstream invoke;
 	invoke << "invoke:function(" << JS_EVENTARGNAME << "){";
 	out << "{fn:function(" << JS_EVENTARGNAME << "){var all={";
 	writeCodeForDelegate(invoke, out, delegates);
 	//write server callback
-	writeCodeForDelegate(invoke, out, jsDelegate(createFunctionCode(eventName, addServerParams)), static_cast<int>(delegates.size()));
+	writeCodeForDelegate(invoke, out, jsDelegate(createCallbackFunctionCode(defSignature, addServerParams, reloadPage)), static_cast<int>(delegates.size()));
 	invoke << "}";
 	out << invoke.str() << "};"; //closes all
 	
@@ -469,15 +471,23 @@ bool Utility::writeJSEventPlusServerCallback(std::ostream& out, const std::strin
 }
 
 
-std::string Utility::createFunctionCode(const std::string& eventName, const std::map<std::string, std::string>& addParams)
+bool Utility::writeServerCallback(std::ostream& out, const std::string& eventName, const std::string& signature, const std::map<std::string, std::string>& addServerParams, bool reloadPage)
+{
+	std::string fctCode(createCallbackFunctionCode(signature, addServerParams, reloadPage));
+	out << eventName << ":";
+	out << fctCode;
+	return true;
+}
+
+
+std::string Utility::createURI(const std::map<std::string, std::string>& addParams)
 {
 	WebApplication& app = WebApplication::instance();
 	Renderable::ID id = app.getCurrentPage()->id();
 	std::ostringstream uri;
-	uri << "'" << app.getURI().toString();
-	uri << ";"; //mark as AJAX request
-	uri << RequestHandler::KEY_ID << "=" << id << "&";
-	uri << RequestHandler::KEY_EVID << "=" << eventName;
+	uri << "'" << app.getURI().toString() << "?";
+	uri << RequestHandler::KEY_TYPE << "=" << RequestHandler::VAL_AJAX; //mark as AJAX request
+	uri << "&" << RequestHandler::KEY_ID << "=" << id;
 	// add optional params
 	bool commaAtEnd = false;
 	std::size_t cnt(1);
@@ -509,11 +519,29 @@ std::string Utility::createFunctionCode(const std::string& eventName, const std:
 	}
 	if (!commaAtEnd)
 		uri << "'";
+	return uri.str();
+	
+}
+
+
+std::string Utility::createCallbackFunctionCode(const std::string& signature, const std::map<std::string, std::string>& addParams, bool reloadPage)
+{
+	poco_assert_dbg (!signature.empty());
+	poco_assert_dbg(signature.find("function") != std::string::npos);
+	poco_assert_dbg(signature.find("{") == std::string::npos);
+	std::string uri(createURI(addParams));
 	// now add the callback code
 	std::ostringstream function;
-	function << "function(" << JS_EVENTARGNAME << "){var uri=" << uri.str() << ";";
+	function << signature;
+	function << "{var uri=" << uri << ";";
 	function << "Ext.Ajax.request({url:uri,";
-	function << "failure:function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');}});}";
+	if (reloadPage)
+	{
+		function << "success:function(){window.location.reload();},";
+		function << "failure:function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');window.location.reload();}});}";
+	}
+	else
+		function << "failure:function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');}});}";
 	return function.str();
 }
 

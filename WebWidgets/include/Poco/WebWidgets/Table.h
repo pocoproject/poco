@@ -45,6 +45,7 @@
 #include "Poco/WebWidgets/TableModel.h"
 #include "Poco/WebWidgets/TableColumn.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
+#include "Poco/WebWidgets/JavaScriptEvent.h"
 #include <vector>
 
 
@@ -62,6 +63,30 @@ public:
 	static const std::string FIELD_COL;
 	static const std::string FIELD_ROW;
 	static const std::string FIELD_VAL;
+	static const std::string EV_CELLCLICKED;
+	static const std::string EV_CELLVALUECHANGED;
+	
+	struct CellClick
+	{
+		std::size_t row;
+		std::size_t col;
+		
+		CellClick(std::size_t row, std::size_t col);
+	};
+	
+	struct CellValueChange
+	{
+		std::size_t row;
+		std::size_t col;
+		const Poco::Any oldValue;
+		const Poco::Any newValue;
+		CellValueChange(std::size_t row, std::size_t col, const Poco::Any& oldValue, const Poco::Any& newValue);
+	};
+	
+	JavaScriptEvent<Table::CellClick> cellClicked;
+	
+	JavaScriptEvent<Table::CellValueChange> cellValueChanged;
+	
 	
 	Table(const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates an anonymous Table.
@@ -94,8 +119,11 @@ public:
 		/// Handles a complete HTTP request submitted by the client.
 
 private:
-	void apply();
+	void handleValueChanged();
 		///Applies the update to the table
+		
+	void handleCellClicked();
+		///handles cell clicked
 
 	void handleCol(const std::string& val);
 	void handleRow(const std::string& val);
@@ -119,6 +147,7 @@ private:
 	int             _col;
 	int             _row;
 	std::string     _val;
+	std::string     _ev;
 };
 
 
@@ -140,12 +169,6 @@ inline const Poco::Any& Table::getValue(std::size_t row, std::size_t col) const
 inline std::size_t Table::getRowCount() const
 {
 	return _pModel->getRowCount();
-}
-
-
-inline void Table::setValue(const Poco::Any& val, std::size_t row, std::size_t col)
-{
-	_pModel->setValue(val, row, col);
 }
 
 

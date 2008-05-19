@@ -42,10 +42,10 @@ namespace Poco {
 namespace WebWidgets {
 
 
-NumberFieldCell::NumberFieldCell(View* pOwner):
+NumberFieldCell::NumberFieldCell(View* pOwner, Formatter::Ptr pF):
 	TextFieldCell(pOwner, typeid(NumberFieldCell))
 {
-	this->setFormatter(new IntFormatter());
+	this->setFormatter(pF);
 }
 
 

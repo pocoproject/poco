@@ -84,26 +84,40 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	WebApplication& app = WebApplication::instance();
 	Renderable::ID id = app.getCurrentPage()->id();
 	Utility::writeRenderableProperties(pTable, ostr);
-	static const std::string afterEdit("afterEdit");
+	static const std::string afterEdit("afteredit");
+	static const std::string cellClicked("cellclick");
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(Table::FIELD_COL, "+obj.column"));
 	addParams.insert(std::make_pair(Table::FIELD_ROW, "+obj.row"));
 	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.value"));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLVALUECHANGED));
 	JavaScriptEvent<int> ev;
+	ev.setJSDelegates(pTable->cellValueChanged.jsDelegates());
 	ev.add(jsDelegate("function(obj){obj.grid.getStore().commitChanges();}"));
 	ostr << ",listeners:{";
-	Utility::writeJSEventPlusServerCallback(ostr, afterEdit, ev.jsDelegates(), addParams);
-	ostr << "},";
+	Utility::writeJSEventPlusServerCallback(ostr, afterEdit, ev.jsDelegates(), addParams, pTable->cellValueChanged.hasLocalHandlers());
+	
+	//cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
+	//hm, more than one param in the eventhanlder of cellclick, writeJSEvent creates a fucntion(obj) wrapper
+	//FIXME: no support for custom javascript yet
+	addParams.clear();
+	addParams.insert(std::make_pair(Table::FIELD_COL, "+columnIndex"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, "+rowIndex"));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLCLICKED));
+	ostr << ",";
+	Utility::writeServerCallback(ostr,cellClicked, "function(aGrid, rowIndex,columnIndex,e)",addParams, pTable->cellClicked.hasLocalHandlers());
+	
+	ostr << "},"; //close listeners
 	
 	renderColumns(pTable, context, ostr);
-	ostr << ",clicksToEdit:1";
+	ostr << ",clicksToEdit:1,stripeRows:true";
 	if (pTable->getWidth() > 0)
 		ostr << ",width:" << pTable->getWidth();
 	if (pTable->getHeight() > 0)
 		ostr << ",height:" << pTable->getHeight();
 	ostr << ",store:";
 	renderStore(pTable, ostr);
-	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pTable), const_cast<Table*>(pTable));
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(id), const_cast<Table*>(pTable));
 }
 
 
