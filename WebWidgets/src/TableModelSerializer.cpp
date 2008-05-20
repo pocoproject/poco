@@ -1,13 +1,11 @@
 //
-// TableModel.h
+// TableModelSerializer.cpp
 //
-// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/TableModel.h#4 $
+// $Id: //poco/Main/WebWidgets/src/TableModelSerializer.cpp#3 $
 //
 // Library: WebWidgets
 // Package: Views
-// Module:  TableModel
-//
-// Definition of the TableModel class.
+// Module:  TableModelSerializer
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,67 +34,21 @@
 //
 
 
-#ifndef WebWidgets_TableModel_INCLUDED
-#define WebWidgets_TableModel_INCLUDED
-
-
-#include "Poco/WebWidgets/WebWidgets.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/AutoPtr.h"
-#include "Poco/Any.h"
+#include "Poco/WebWidgets/TableModelSerializer.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 
 
-class WebWidgets_API TableModel: public Poco::RefCountedObject
-	/// TableModel defines the interface for data retrieval for a Table
+TableModelSerializer::TableModelSerializer()
 {
-public:
-	typedef Poco::AutoPtr<TableModel> Ptr;
-
-	TableModel(std::size_t colCnt);
-		/// Creates the TableModel with the given number of columns.
-
-	std::size_t getColumnCount() const;
-		/// Returns the number of columns
-
-	virtual const Poco::Any& getValue(std::size_t row, std::size_t col) const = 0;
-		///Returns the value at pos(row, col) or an empty Any if no data is stored there
-
-	virtual std::size_t getRowCount() const = 0;
-		/// Returns the total number of rows
-
-	virtual void setValue(const Poco::Any& val, std::size_t row, std::size_t col) = 0;
-		/// Sets the value at pos(row, col)
-
-	virtual void deleteRow(std::size_t row) = 0;
-		/// Removes the row from the TableModel
-		
-	virtual void clear() = 0;
-		/// Deletes all rows from the TableModel	
-
-protected:
-	virtual ~TableModel();
-		/// Destroys the TableModel.
-
-private:
-	std::size_t _colCnt;
-};
+}
 
 
-//
-// Inlines
-//
-
-inline std::size_t TableModel::getColumnCount() const
+TableModelSerializer::~TableModelSerializer()
 {
-	return _colCnt;
 }
 
 
 } } // namespace Poco::WebWidgets
-
-
-#endif // WebWidgets_TableModel_INCLUDED

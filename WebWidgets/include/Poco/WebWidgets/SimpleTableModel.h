@@ -70,6 +70,9 @@ public:
 
 	void deleteRow(std::size_t row);
 		/// Removes the row from the TableModel
+		
+	void clear();
+		/// Deletes all rows from the TableModel	
 	
 protected:
 	virtual ~SimpleTableModel();
@@ -103,6 +106,12 @@ inline void SimpleTableModel::setValue(const Poco::Any& val, std::size_t row, st
 inline void SimpleTableModel::deleteRow(std::size_t row)
 {
 	throw Poco::NotImplementedException("");
+}
+
+
+inline void SimpleTableModel::clear()
+{
+	_data.clear();
 }
 
 

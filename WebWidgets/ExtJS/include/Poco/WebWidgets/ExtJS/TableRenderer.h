@@ -62,6 +62,9 @@ class ExtJS_API TableRenderer: public Poco::WebWidgets::Renderer
 	/// TableRenderer renders a button
 {
 public:
+	static const std::string EV_CELLCLICKED;
+	static const std::string EV_AFTEREDIT;
+	
 	TableRenderer();
 		/// Creates the TableRenderer.
 
@@ -73,6 +76,14 @@ public:
 
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.
+		
+	static void addCellValueChangedServerCallback(Table* pTable, const std::string& onSuccess=std::string(), const std::string& onFailure=std::string());
+		/// Adds a javascript callback to inform the WebServer that the client has changed a value in the Table
+		/// The Extjs handler offers a method signature of "function(obj)" where obj is a complex element containing members (column, row, value)
+		
+	static void addCellClickedServerCallback(Table* pTable, const std::string& onSuccess=std::string(), const std::string& onFailure=std::string());
+		/// Adds a javascript callback to inform the WebServer that the client has changed a value in the Table
+		/// Method signature is cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
 
 protected:
 	static void renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr);

@@ -92,8 +92,10 @@
 #include "Poco/WebWidgets/RequestHandler.h"
 
 #include "Poco/String.h"
+#include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include <sstream>
+#include <cctype>
 
 
 namespace Poco {
@@ -381,7 +383,7 @@ Form::Ptr Utility::insideForm(const Cell* pChild)
 }
 
 
-bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates)
+bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates)
 {
 	//'click' : {
 	//	fn: this.onClick,
@@ -398,15 +400,30 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 	else
 	{
 		// rather simple way to support more than one delegate
-		// TODO: there sure is a more efficient way to do this
 		std::ostringstream invoke;
-		invoke << "invoke:function(" << JS_EVENTARGNAME << "){";
-		out << "{fn:function(" << JS_EVENTARGNAME << "){var all={";
-		writeCodeForDelegate(invoke, out, delegates);
+		int maxParams = detectMaxParamCount(delegates);
+		std::string fct(createFunctionSignature(maxParams));
+		out << "{fn:" << fct << "{var all={";
+		// the invoke function calls all the other functions sequentially
+		invoke << "invoke:" << fct <<"{";
+		std::list<JSDelegate>::const_iterator it = delegates.begin();
+		int cnt(0);
+		for (; it != delegates.end(); ++it)
+		{
+			std::string fctName("d");
+			fctName.append(Poco::NumberFormatter::format(cnt));
+			if (cnt > 0)
+			{
+				out << ",";
+			}
+			out << fctName << ":" << it->jsCode() << ","; //always write comma because invoke is written as the last method
+			invoke << "this." << createFunctionSignature(fctName, maxParams) << ";";
+		}
+		
 		invoke << "}";
 		out << invoke.str() << "};"; //closes all
 		
-		out << "all.invoke(" << JS_EVENTARGNAME << ");";
+		out << "all." << createFunctionSignature("invoke", maxParams) << ";";
 		out << "}"; //closes fn
 		out << "}"; //closes function
 	}	
@@ -415,75 +432,11 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 }
 
 
-void Utility::writeCodeForDelegate(std::ostream& invoke, std::ostream& out, const std::set<JSDelegate>& jsDels)
-{
-	int cnt(0);
-	std::set<JSDelegate>::const_iterator it = jsDels.begin();
-	for (; it != jsDels.end(); ++it)
-	{
-		writeCodeForDelegate(invoke, out, *it, cnt);
-		++cnt;
-	}
-}
 
 
-void Utility::writeCodeForDelegate(std::ostream& invoke, std::ostream& out, const JSDelegate& jsDel, int cnt)
-{
-	std::string code(Poco::trim(jsDel.jsCode()));
-	if (code.find("function") == 0)
-	{
-		// inline function definition
-		out << "d" << cnt << ":" << code << ",";
-		invoke << "this.d" << cnt << "(" << JS_EVENTARGNAME << ");";
-	}
-	else
-	{
-		out << "d" << cnt << ":function(" << JS_EVENTARGNAME << "){" << code;
-		if (!code.empty() && code[code.size()-1] != ';')
-			out << ";";
-		 out << "},";
-		invoke << "this.d" << cnt << "(" << JS_EVENTARGNAME << ");";
-	}
-}
-
-
-bool Utility::writeJSEventPlusServerCallback(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates, const std::map<std::string, std::string>& addServerParams, bool reloadPage)
-{
-	// rather simple way to support more than one delegate
-	// TODO: there sure is a more efficient way to do this
-	
-	out << eventName << ":";
-	static const std::string defSignature("function("+JS_EVENTARGNAME+")");
-	
-	std::ostringstream invoke;
-	invoke << "invoke:function(" << JS_EVENTARGNAME << "){";
-	out << "{fn:function(" << JS_EVENTARGNAME << "){var all={";
-	writeCodeForDelegate(invoke, out, delegates);
-	//write server callback
-	writeCodeForDelegate(invoke, out, jsDelegate(createCallbackFunctionCode(defSignature, addServerParams, reloadPage)), static_cast<int>(delegates.size()));
-	invoke << "}";
-	out << invoke.str() << "};"; //closes all
-	
-	out << "all.invoke(" << JS_EVENTARGNAME << ");";
-	out << "}"; //closes fn
-	out << "}"; //closes function
-	return true;
-}
-
-
-bool Utility::writeServerCallback(std::ostream& out, const std::string& eventName, const std::string& signature, const std::map<std::string, std::string>& addServerParams, bool reloadPage)
-{
-	std::string fctCode(createCallbackFunctionCode(signature, addServerParams, reloadPage));
-	out << eventName << ":";
-	out << fctCode;
-	return true;
-}
-
-
-std::string Utility::createURI(const std::map<std::string, std::string>& addParams)
+std::string Utility::createURI(const std::map<std::string, std::string>& addParams, Renderable::ID id)
 {
 	WebApplication& app = WebApplication::instance();
-	Renderable::ID id = app.getCurrentPage()->id();
 	std::ostringstream uri;
 	std::string theUri(app.getURI().toString());
 	if (theUri.empty())
@@ -529,25 +482,100 @@ std::string Utility::createURI(const std::map<std::string, std::string>& addPara
 }
 
 
-std::string Utility::createCallbackFunctionCode(const std::string& signature, const std::map<std::string, std::string>& addParams, bool reloadPage)
+std::string Utility::createCallbackFunctionCode(const std::string& signature, const std::map<std::string, std::string>& addParams, Renderable::ID id, bool reloadPage)
+{
+	static const std::string onSuccessReload("function(){window.location.reload();}");
+	static const std::string onFailureReload("function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');window.location.reload();}");
+	static const std::string onSuccess;
+	static const std::string onFailure("function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');}");
+	if (reloadPage)
+		return createCallbackFunctionCode(signature, addParams, id, onSuccessReload, onFailureReload);
+	return createCallbackFunctionCode(signature, addParams, id, onSuccess, onFailure);
+}
+
+
+
+std::string Utility::createCallbackFunctionCode(const std::string& signature, const std::map<std::string, std::string>& addParams, Renderable::ID id, const std::string& onSuccess, const std::string& onFailure)
 {
 	poco_assert_dbg (!signature.empty());
 	poco_assert_dbg(signature.find("function") != std::string::npos);
 	poco_assert_dbg(signature.find("{") == std::string::npos);
-	std::string uri(createURI(addParams));
+	std::string uri(createURI(addParams, id));
 	// now add the callback code
 	std::ostringstream function;
 	function << signature;
 	function << "{var uri=" << uri << ";";
-	function << "Ext.Ajax.request({url:uri,";
-	if (reloadPage)
-	{
-		function << "success:function(){window.location.reload();},";
-		function << "failure:function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');window.location.reload();}});}";
-	}
-	else
-		function << "failure:function(){Ext.MessageBox.alert('Status','Failed to write changes back to server.');}});}";
+	function << "Ext.Ajax.request({url:uri";
+	if (!onSuccess.empty())
+		function << ",success:" << onSuccess;
+	if (!onFailure.empty())
+		function << ",failure:" << onFailure;
+	function << "});}";
 	return function.str();
+}
+
+
+int Utility::detectMaxParamCount(const std::list<JSDelegate>& delegates)
+{
+	int cnt = 0;
+	std::list<JSDelegate>::const_iterator it = delegates.begin();
+	for (; it != delegates.end(); ++it)
+	{
+		//count all , between ()
+		int tmpCnt(0);
+		const std::string& code = it->jsCode();
+		std::string::size_type pos = code.find('(');
+		if (pos != std::string::npos)
+		{
+			++pos; //skip (
+			skipWhiteSpace(code, pos);
+			bool stop = false;
+			while(!stop && pos < code.size())
+			{
+				if (code[pos] == ')')
+					stop = true;
+				else if (code[pos] == ',')
+					++tmpCnt;
+				++pos;
+			}
+		}
+		if (tmpCnt > cnt)
+			cnt = tmpCnt;
+	}
+	if (cnt > 0) // we counted ','
+		++cnt; // we want var count
+	return cnt;
+}
+
+
+void Utility::skipWhiteSpace(const std::string& code, std::string::size_type& pos)
+{
+	while (pos < code.size() && std::isspace(code[pos]))
+		++pos;
+}
+
+
+std::string Utility::createFunctionSignature(int paramCnt)
+{
+	static const std::string fct("function");
+	return createFunctionSignature(fct, paramCnt);
+}
+
+
+std::string Utility::createFunctionSignature(const std::string& fctName, int paramCnt)
+{
+	std::string result(fctName);
+	result.append("(");	
+	while (paramCnt > 0)
+	{
+		result.append("p");
+		result.append(Poco::NumberFormatter::format(paramCnt));
+		--paramCnt;
+		if (paramCnt > 0)
+			result.append(",");
+	}
+	result.append(")");
+	return result;
 }
 
 

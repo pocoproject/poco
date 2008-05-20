@@ -134,8 +134,7 @@ void RequestHandler::handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Po
 	}
 	try
 	{
-		pProc->handleRequest(request);
-		response.send();
+		pProc->handleRequestAndResponse(request, response);
 	}
 	catch(...)
 	{

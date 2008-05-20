@@ -1,13 +1,13 @@
 //
-// TableModel.h
+// ArrayTableSerializer.h
 //
-// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/TableModel.h#4 $
+// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/ArrayTableSerializer.h#4 $
 //
-// Library: WebWidgets
-// Package: Views
-// Module:  TableModel
+// Library: ExtJS
+// Package: Core
+// Module:  ArrayTableSerializer
 //
-// Definition of the TableModel class.
+// Definition of the ArrayTableSerializer class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,67 +36,40 @@
 //
 
 
-#ifndef WebWidgets_TableModel_INCLUDED
-#define WebWidgets_TableModel_INCLUDED
+#ifndef ExtJS_ArrayTableSerializer_INCLUDED
+#define ExtJS_ArrayTableSerializer_INCLUDED
 
 
-#include "Poco/WebWidgets/WebWidgets.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/AutoPtr.h"
+#include "Poco/WebWidgets/ExtJS/ExtJS.h"
+#include "Poco/WebWidgets/TableModelSerializer.h"
 #include "Poco/Any.h"
 
 
 namespace Poco {
 namespace WebWidgets {
+namespace ExtJS {
 
 
-class WebWidgets_API TableModel: public Poco::RefCountedObject
-	/// TableModel defines the interface for data retrieval for a Table
+class ExtJS_API ArrayTableSerializer: public Poco::WebWidgets::TableModelSerializer
+	/// ArrayTableSerializer serializes a Table in JSON format
 {
 public:
-	typedef Poco::AutoPtr<TableModel> Ptr;
+	typedef Poco::AutoPtr<ArrayTableSerializer> Ptr;
 
-	TableModel(std::size_t colCnt);
-		/// Creates the TableModel with the given number of columns.
+	ArrayTableSerializer();
+		/// Creates the ArrayTableSerializer with the given number of columns.
 
-	std::size_t getColumnCount() const;
-		/// Returns the number of columns
-
-	virtual const Poco::Any& getValue(std::size_t row, std::size_t col) const = 0;
-		///Returns the value at pos(row, col) or an empty Any if no data is stored there
-
-	virtual std::size_t getRowCount() const = 0;
-		/// Returns the total number of rows
-
-	virtual void setValue(const Poco::Any& val, std::size_t row, std::size_t col) = 0;
-		/// Sets the value at pos(row, col)
-
-	virtual void deleteRow(std::size_t row) = 0;
-		/// Removes the row from the TableModel
+	virtual ~ArrayTableSerializer();
+		/// Destroys the ArrayTableSerializer.
 		
-	virtual void clear() = 0;
-		/// Deletes all rows from the TableModel	
-
-protected:
-	virtual ~TableModel();
-		/// Destroys the TableModel.
-
-private:
-	std::size_t _colCnt;
+	void serialize(std::ostream& ostr, const Poco::WebWidgets::Table* pTable, std::size_t rowBegin = 0, std::size_t rowCnt = 0);
+		/// Serializes the table starting with row 0. A rowCnt of 0 means serialize all rows
+		
+	const std::string& contentType() const;
 };
 
 
-//
-// Inlines
-//
-
-inline std::size_t TableModel::getColumnCount() const
-{
-	return _colCnt;
-}
+} } } // namespace Poco::WebWidgets::ExtJS
 
 
-} } // namespace Poco::WebWidgets
-
-
-#endif // WebWidgets_TableModel_INCLUDED
+#endif // ExtJS_ArrayTableSerializer_INCLUDED

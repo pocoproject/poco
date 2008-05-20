@@ -61,6 +61,8 @@ public:
 		/// The javascript code that should be executed
 
 	bool operator<(const JSDelegate& del) const;
+	
+	bool operator ==(const JSDelegate& del) const;
 
 private:
 	std::string _jsCode;
@@ -70,6 +72,12 @@ private:
 inline const std::string& JSDelegate::jsCode() const
 {
 	return _jsCode;
+}
+
+
+inline bool JSDelegate::operator ==(const JSDelegate& del) const
+{
+	return jsCode() == del.jsCode();
 }
 
 

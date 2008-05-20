@@ -46,6 +46,7 @@
 namespace Poco {
 namespace Net {
 	class HTTPServerRequest;
+	class HTTPServerResponse;
 } }
 
 
@@ -63,6 +64,10 @@ public:
 	
 	virtual void handleRequest(const Poco::Net::HTTPServerRequest& request) = 0;
 		/// Handles a complete HTTP request submitted by the client.
+		
+	virtual void handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) = 0;
+		/// Handles a complete HTTP request submitted by the client. Also takes care of handing the response,
+		/// e.g. if one wants to send back data.
 
 protected:
 	RequestProcessor();

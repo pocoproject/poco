@@ -35,6 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ExtJS/TableCellHandler.h"
+#include "Poco/WebWidgets/ExtJS/ArrayTableSerializer.h"
 #include "Poco/WebWidgets/Page.h"
 #include "Poco/WebWidgets/Renderer.h"
 #include "Poco/WebWidgets/RenderContext.h"
@@ -1170,7 +1171,7 @@ void ExtJSTest::testTable()
 	Table::TableColumns tc;
 	tc.push_back(new TableColumn(0, "StaticText"));
 	tc.push_back(new TableColumn(new CheckButtonCell(0, "Const", true), "CheckButton"));
-	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2));
+	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2), new ArrayTableSerializer());
 	pTable->setValue(std::string("one"), 0,0);
 	pTable->setValue(std::string("two"), 1,0);
 	pTable->setValue(std::string("three"), 2,0);
@@ -1201,7 +1202,7 @@ void ExtJSTest::testTableEdit()
 	Table::TableColumns tc;
 	tc.push_back(new TableColumn(new TextFieldCell(0), "DynText"));
 	tc.push_back(new TableColumn(new CheckButtonCell(0, "Const", true), "CheckButton"));
-	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2));
+	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2), new ArrayTableSerializer());
 	pTable->setValue(std::string("one"), 0,0);
 	pTable->setValue(std::string("two"), 1,0);
 	pTable->setValue(std::string("three"), 2,0);
@@ -1236,7 +1237,7 @@ void ExtJSTest::testTableComboBox()
 	pCom->insert(std::string("3"));
 	tc.push_back(new TableColumn(pCom, "DynText"));
 	tc.push_back(new TableColumn(new CheckButtonCell(0, "Const", true), "CheckButton"));
-	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2));
+	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2), new ArrayTableSerializer());
 	pTable->setValue(std::string("1"), 0,0);
 	pTable->setValue(std::string("2"), 1,0);
 	pTable->setValue(std::string("3"), 2,0);
@@ -1267,7 +1268,7 @@ void ExtJSTest::testTableButton()
 	Table::TableColumns tc;
 	tc.push_back(new TableColumn(new ButtonCell(0), "ButtonText"));
 	tc.push_back(new TableColumn(new CheckButtonCell(0, "Const", true), "CheckButton"));
-	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2));
+	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2), new ArrayTableSerializer());
 	pTable->setValue(std::string("one"), 0,0);
 	pTable->setValue(std::string("two"), 1,0);
 	pTable->setValue(std::string("three"), 2,0);
@@ -1298,7 +1299,7 @@ void ExtJSTest::testTableImageButton()
 	Table::TableColumns tc;
 	tc.push_back(new TableColumn(new ImageButtonCell(0,new Image(Poco::URI("dummy.jpg")))));
 	tc.push_back(new TableColumn(new CheckButtonCell(0, "Const", true), "CheckButton"));
-	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2));
+	Table::Ptr pTable = new Table(tc, new SimpleTableModel(2), new ArrayTableSerializer());
 	pTable->setValue(std::string("Sunset.jpg"), 0,0);
 	pTable->setValue(std::string("Sunset.jpg"), 1,0);
 	pTable->setValue(std::string("Sunset.jpg"), 2,0);

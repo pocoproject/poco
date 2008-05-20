@@ -46,6 +46,7 @@
 #include "Poco/WebWidgets/TableColumn.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
 #include "Poco/WebWidgets/JavaScriptEvent.h"
+#include "Poco/WebWidgets/TableModelSerializer.h"
 #include <vector>
 
 
@@ -63,8 +64,10 @@ public:
 	static const std::string FIELD_COL;
 	static const std::string FIELD_ROW;
 	static const std::string FIELD_VAL;
+	static const std::string FIELD_CNT;
 	static const std::string EV_CELLCLICKED;
 	static const std::string EV_CELLVALUECHANGED;
+	static const std::string EV_LOADDATA;
 	
 	struct CellClick
 	{
@@ -88,10 +91,10 @@ public:
 	JavaScriptEvent<Table::CellValueChange> cellValueChanged;
 	
 	
-	Table(const TableColumns& tc, TableModel::Ptr pModel);
+	Table(const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer);
 		/// Creates an anonymous Table.
 		
-	Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel);
+	Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer);
 		/// Creates a Table with the given name.
 
 	std::size_t getColumnCount() const;
@@ -105,6 +108,9 @@ public:
 
 	void setValue(const Poco::Any& val, std::size_t row, std::size_t col);
 		/// Sets the value at pos(row, col)
+		
+	void clear();
+		/// Clears the content of the table
 
 	const Table::TableColumns& getColumns() const;
 		/// Returns the columns of the table
@@ -117,6 +123,10 @@ public:
 	
 	void handleRequest(const Poco::Net::HTTPServerRequest& request);
 		/// Handles a complete HTTP request submitted by the client.
+		
+	void handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
+		/// Handles a complete HTTP request submitted by the client. Also takes care of handing the response,
+		/// e.g. if one wants to send back data.
 
 private:
 	void handleValueChanged();
@@ -128,11 +138,12 @@ private:
 	void handleCol(const std::string& val);
 	void handleRow(const std::string& val);
 	void handleVal(const std::string& val);
+	void handleCnt(const std::string& val);
 protected:
-	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
+	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer);
 		/// Creates a Table and assigns it the given name.
 		
-	Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
+	Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer);
 		/// Creates a Table.
 		
 	~Table();
@@ -146,8 +157,10 @@ private:
 	TableColumns    _columns;
 	int             _col;
 	int             _row;
+	int             _cnt;
 	std::string     _val;
 	std::string     _ev;
+	TableModelSerializer::Ptr _pSer;
 };
 
 
@@ -169,6 +182,12 @@ inline const Poco::Any& Table::getValue(std::size_t row, std::size_t col) const
 inline std::size_t Table::getRowCount() const
 {
 	return _pModel->getRowCount();
+}
+
+
+inline void Table::clear()
+{
+	return _pModel->clear();
 }
 
 

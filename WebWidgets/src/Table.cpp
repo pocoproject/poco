@@ -37,6 +37,7 @@
 #include "Poco/WebWidgets/Table.h"
 #include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/NumberParser.h"
+#include "Poco/Net/HTTPServerResponse.h"
 
 
 namespace Poco {
@@ -46,53 +47,67 @@ namespace WebWidgets {
 const std::string Table::FIELD_COL("col");
 const std::string Table::FIELD_ROW("row");
 const std::string Table::FIELD_VAL("val");
+const std::string Table::FIELD_CNT("cnt");
 const std::string Table::EV_CELLCLICKED("click");
 const std::string Table::EV_CELLVALUECHANGED("edit");
+const std::string Table::EV_LOADDATA("load");
 
 
-Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
+Table::Table(const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer):
 	View(typeid(Table)),
 	_pModel(pModel),
 	_columns(tc),
 	_col(-1),
 	_row(-1),
-	_val()
+	_cnt(-1),
+	_val(),
+	_ev(),
+	_pSer(pSer)
 {
 	checkValidConfig();
 }
 
 	
-Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel):
+Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer):
 	View(name, typeid(Table)),
 	_pModel(pModel),
 	_columns(tc),
 	_col(-1),
 	_row(-1),
-	_val()
+	_cnt(-1),
+	_val(),
+	_ev(),
+	_pSer(pSer)
 {
 	checkValidConfig();
 }
 
 
-Table::Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel):
+Table::Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer):
 	View(name, type),
 	_pModel(pModel),
 	_columns(tc),
 	_col(-1),
 	_row(-1),
-	_val()
+	_cnt(-1),
+	_val(),
+	_ev(),
+	_pSer(pSer)
 {
 	checkValidConfig();
 }
 
 
-Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel):
+Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer):
 	View(type),
 	_pModel(pModel),
 	_columns(tc),
 	_col(-1),
 	_row(-1),
-	_val()
+	_cnt(-1),
+	_val(),
+	_ev(),
+	_pSer(pSer)
 {
 	checkValidConfig();
 }
@@ -118,6 +133,7 @@ void Table::checkValidConfig()
 		if ((*it))
 			adoptChild((*it));;
 	}
+	poco_check_ptr (_pSer);
 }
 
 
@@ -129,6 +145,8 @@ void Table::handleForm(const std::string& field, const std::string& value)
 		handleRow(value);
 	else if (field == FIELD_VAL)
 		handleVal(value);
+	else if (field == FIELD_CNT)
+		handleCnt(value);
 	else if (field == RequestHandler::KEY_EVID)
 		_ev = value;
 }
@@ -142,9 +160,35 @@ void Table::handleRequest(const Poco::Net::HTTPServerRequest& req)
 		handleCellClicked();
 	_col = -1;
 	_row = -1;
+	_cnt = -1;
 	_val.clear();
 	_ev.clear();
 }
+
+
+void Table::handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+{
+	// RequestHandler has already called all the handeForm stuff
+	if (_ev == EV_LOADDATA)
+	{
+		/// serialize the Table back
+		/// check for cnt and start if only a segment was requested
+		response.setChunkedTransferEncoding(true);
+		response.setContentType(_pSer->contentType());
+		std::ostream& out = response.send();
+		if (_row < 0)
+			_row = 0;
+		if (_cnt < 0)
+			_cnt = 0;
+		_pSer->serialize(out, this, _row, _cnt);
+	}
+	else
+	{
+		handleRequest(request);
+		response.send();
+	}
+}
+
 
 
 void Table::handleValueChanged()
@@ -193,6 +237,12 @@ void Table::handleVal(const std::string& val)
 	// so we cannot get the formatter for the row
 	// we do the conversion later in apply
 	_val = val;
+}
+
+
+void Table::handleCnt(const std::string& val)
+{
+	_cnt = Poco::NumberParser::parse(val);
 }
 
 

@@ -214,6 +214,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\ExtJS\ArrayTableSerializer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\ExtJS\ButtonCellRenderer.h"
 					>
 				</File>
@@ -359,6 +363,10 @@
 				>
 				<File
 					RelativePath=".\src\AbstractTableCellHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ArrayTableSerializer.cpp"
 					>
 				</File>
 				<File

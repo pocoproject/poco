@@ -36,6 +36,7 @@
 
 #include "Poco/WebWidgets/Cell.h"
 #include "Poco/WebWidgets/StringFormatter.h"
+#include "Poco/Net//HTTPServerResponse.h"
 
 
 namespace Poco {
@@ -176,6 +177,13 @@ void Cell::handleForm(const std::string& field, const std::string& value)
 
 void Cell::handleRequest(const Poco::Net::HTTPServerRequest& request)
 {
+}
+
+
+void Cell::handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+{
+	handleRequest(request);
+	response.send();
 }
 
 

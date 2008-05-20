@@ -45,7 +45,7 @@
 #include "Poco/WebWidgets/LookAndFeel.h"
 #include "Poco/WebWidgets/JavaScriptEvent.h"
 #include <ostream>
-#include <set>
+#include <list>
 #include <map>
 
 
@@ -100,32 +100,55 @@ public:
 	static std::string convertPocoDateToPHPDate(const std::string& dateTimeFmt);
 		/// Converts a poco date time format string to its PHP/extjs equivalent
 		
-	static bool writeJSEvent(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates);
+	static bool writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates);
 		/// writes all JS Delegates for a single named JSEvent. 
 		/// Returns true if data was written, false if no delegates were present and no event handler was written.
 		
-	static bool writeJSEventPlusServerCallback(std::ostream& out, const std::string& eventName, const std::set<JSDelegate>& delegates, const std::map<std::string, std::string>& addServerParams, bool reloadPage);
-		/// writes all JS Delegates for a single named JSEvent. adds a callback to the server
-		/// Returns true if data was written, false if no delegates were present and no event handler was written.
-		/// an addParam that should be treated as a variable must start with the '+' character!
-	
-	static std::string createURI(const std::map<std::string, std::string>& addParams);
-		/// Creates the url from the function parameters, writes a js fucntion with method signature function(obj)
+
+	static std::string createURI(const std::map<std::string, std::string>& addParams, Renderable::ID id);
+		/// Creates the url from the function parameters, adds the id parameter automatically
+		/// a WebApplication must be set!
 		
-	static std::string createCallbackFunctionCode(const std::string& signature, const std::map<std::string, std::string>& addParams, bool reloadPage);
-		/// Creates the url from the function parameters, writes a js fucntion with the given method signature
+	static std::string createCallbackFunctionCode(const std::string& signature, 
+		const std::map<std::string, std::string>& addParams, 
+		Renderable::ID id, 
+		bool reloadPage);
+		/// Creates the url from the function parameters, writes a js function with the given method signature.
+		/// Sets onSuccess and onFailure to reload the page if reloadPage is set
 		
-	static bool writeServerCallback(std::ostream& out, const std::string& eventName, const std::string& signature, const std::map<std::string, std::string>& addServerParams, bool reloadPage);
-		/// Writes a server callback for the given ExtJS eventName and server Params
-		// signature contaisn the function declaration (i.e.: function(p1,p2))
+	static std::string createCallbackFunctionCode(const std::string& signature, 
+		const std::map<std::string, std::string>& addParams, 
+		Renderable::ID id, 
+		const std::string& onSuccess, 
+		const std::string& onFailure);
+		/// Creates the url from the function parameters, writes a js function with the given method signature
+		
+		
+	template <typename T>
+	static void addServerCallback(JavaScriptEvent<T>& ev, 
+								const std::string& signature, 
+								const std::map<std::string, std::string>& addServerParams, 
+								Renderable::ID id,
+								const std::string& onSuccessJS,
+								const std::string& onFailureJS)
+	{
+		std::string code(createCallbackFunctionCode(signature, addServerParams, id, onSuccessJS, onFailureJS));
+		ev.add(jsDelegate(code));
+		
+	}
 
 private:
-	static void writeCodeForDelegate(std::ostream& invoke, std::ostream& jsOut, const std::set<JSDelegate>& jsDels);
-	static void writeCodeForDelegate(std::ostream& invoke, std::ostream& jsOut, const JSDelegate& jsDel, int cnt);
 	static void convertPocoDateToPHPDate(char in, std::string& result);
 	static void convertPHPDateToPocoDate(char in, std::string& result);
 	static void escapeCharForPHP(char in, std::string& result);
 	static LookAndFeel::Ptr createDefault();
+	static int detectMaxParamCount(const std::list<JSDelegate>& delegates);
+	
+	static void skipWhiteSpace(const std::string& code, std::string::size_type& pos);
+	static std::string createFunctionSignature(int paramCnt);
+		/// Creates an anonmyous JS function with the given param count
+		
+	static std::string createFunctionSignature(const std::string& fctName, int paramCnt);
 
 private:
 	Utility();

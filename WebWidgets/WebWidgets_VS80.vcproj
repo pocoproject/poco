@@ -650,6 +650,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\TableModelSerializer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\TabView.h"
 					>
 				</File>
@@ -711,6 +715,10 @@
 				</File>
 				<File
 					RelativePath=".\src\TableModel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TableModelSerializer.cpp"
 					>
 				</File>
 				<File

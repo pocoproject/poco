@@ -50,6 +50,10 @@ namespace WebWidgets {
 namespace ExtJS {
 
 
+const std::string TableRenderer::EV_CELLCLICKED("cellclick");
+const std::string TableRenderer::EV_AFTEREDIT("afteredit");
+
+
 TableRenderer::TableRenderer()
 {
 }
@@ -79,33 +83,47 @@ void TableRenderer::renderBody(const Renderable* pRenderable, const RenderContex
 }
 
 
-void TableRenderer::renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr)
+void TableRenderer::addCellValueChangedServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
 {
-	WebApplication& app = WebApplication::instance();
-	Renderable::ID id = app.getCurrentPage()->id();
-	Utility::writeRenderableProperties(pTable, ostr);
-	static const std::string afterEdit("afteredit");
-	static const std::string cellClicked("cellclick");
+	poco_check_ptr (pTable);
+	static const std::string signature("function(obj)");
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(Table::FIELD_COL, "+obj.column"));
 	addParams.insert(std::make_pair(Table::FIELD_ROW, "+obj.row"));
 	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.value"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLVALUECHANGED));
-	JavaScriptEvent<int> ev;
-	ev.setJSDelegates(pTable->cellValueChanged.jsDelegates());
-	ev.add(jsDelegate("function(obj){obj.grid.getStore().commitChanges();}"));
-	ostr << ",listeners:{";
-	Utility::writeJSEventPlusServerCallback(ostr, afterEdit, ev.jsDelegates(), addParams, pTable->cellValueChanged.hasLocalHandlers());
-	
-	//cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
-	//hm, more than one param in the eventhanlder of cellclick, writeJSEvent creates a fucntion(obj) wrapper
-	//FIXME: no support for custom javascript yet
-	addParams.clear();
-	addParams.insert(std::make_pair(Table::FIELD_COL, "+columnIndex"));
-	addParams.insert(std::make_pair(Table::FIELD_ROW, "+rowIndex"));
+	Utility::addServerCallback(pTable->cellValueChanged, signature, addParams, pTable->id(), onSuccess, onFailure);
+	pTable->cellValueChanged.add(jsDelegate("function(obj){obj.grid.getStore().commitChanges();}"));
+}
+
+
+
+
+void TableRenderer::addCellClickedServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
+{
+	poco_check_ptr (pTable);
+	static const std::string signature("function(theGrid,row,col,e)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_COL, "+col"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, "+row"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLCLICKED));
-	ostr << ",";
-	Utility::writeServerCallback(ostr,cellClicked, "function(aGrid, rowIndex,columnIndex,e)",addParams, pTable->cellClicked.hasLocalHandlers());
+	Utility::addServerCallback(pTable->cellClicked, signature, addParams, pTable->id(), onSuccess, onFailure);
+}
+
+
+void TableRenderer::renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr)
+{
+	WebApplication& app = WebApplication::instance();
+	Renderable::ID id = pTable->id();
+	Utility::writeRenderableProperties(pTable, ostr);
+
+	ostr << ",listeners:{";
+	bool written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, pTable->cellValueChanged.jsDelegates());
+	if (written)
+		ostr << ",";
+	
+	
+	Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
 	
 	ostr << "},"; //close listeners
 	
@@ -240,6 +258,7 @@ void TableRenderer::renderDataModel(const Table* pTable, std::ostream& ostr)
 
 void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 {
+
 	//new Ext.data.SimpleStore({
 	//	fields: [
 	//	   {name: 'company'},
@@ -248,13 +267,14 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	//	   {name: 'pctChange', type: 'float'},
 	//	   {name: 'lastChange', type: 'date', dateFormat: 'n/j h:ia'}
 	//	],
-	//	data: [...]
+	//  proxy: new Ext.data.HttpProxy({url:'/myuri;...'}),
+	//  reader: new Ext.data.ArrayReader()
 	//});
 
 	// we don't know the type, we just have a formatter, the name is always the idx!
 	// we use the formatter later to set a renderer for a different type than string
 	const Table::TableColumns& columns = pTable->getColumns();
-	ostr << "new Ext.data.SimpleStore({fields:[";
+	ostr << "new Ext.data.SimpleStore({autoLoad:true,fields:[";
 	Table::TableColumns::const_iterator it = columns.begin();
 	int i = 0;
 	for (; it != columns.end(); ++it, ++i)
@@ -264,9 +284,16 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 		ostr << "{name:'" << i << "'}";
 	}
 	ostr << "],"; // close fields
+	ostr << "proxy: new Ext.data.HttpProxy({url:";
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID,Table::EV_LOADDATA));
+	
+	std::string url(Utility::createURI(addParams, pTable->id()));
+	ostr << url << "}),";
+	ostr << "reader: new Ext.data.ArrayReader()";
 	//Write data
-	ostr << "data:";
-	renderDataModel(pTable, ostr);
+	/*ostr << "data:";
+	renderDataModel(pTable, ostr);*/
 	ostr << "})";
 }
 

@@ -46,12 +46,11 @@
 #include "Poco/DefaultStrategy.h"
 #include "Poco/AbstractDelegate.h"
 #include "Poco/CompareFunctions.h"
+#include <list>
+
 
 namespace Poco {
 namespace WebWidgets {
-
-
-static const std::string JS_EVENTARGNAME("obj"); /// each javascript method receives one single param which is named JS_EVENTARGNAME
 
 
 template <class TArgs> 
@@ -64,6 +63,8 @@ class JavaScriptEvent: public Poco::AbstractEvent <
 	/// which will be embedded into the WebPage when the Parser generates the site.
 {
 public:
+	typedef typename std::list<JSDelegate> JSDelegates;
+	
 	JavaScriptEvent()
 		/// Creates the JavaScriptEvent.
 	{
@@ -90,32 +91,31 @@ public:
 		/// Adds a javascript delegate to the event.
 	{
 		FastMutex::ScopedLock lock(this->_mutex);
-		_jsHandlers.insert(aDelegate);
+		_jsHandlers.push_back(aDelegate);
 	}
 	
 	void remove (const JSDelegate& aDelegate)
-		/// Removes a javascript delegate from the event. If the delegate is equal to an
-		/// already existing one is determined by the < operator.
+		/// Removes a javascript delegate from the event. 
 		/// If the observer is not found, the unregister will be ignored
 	{
 		FastMutex::ScopedLock lock(this->_mutex);
-		_jsHandlers.erase(aDelegate);
+		_jsHandlers.remove(aDelegate);
 	}
 
-	const std::set<JSDelegate>& jsDelegates() const
+	const JSDelegates& jsDelegates() const
 		/// Returns all delegates currently registered
 	{
 		return _jsHandlers;
 	}
 	
-	void setJSDelegates(const std::set<JSDelegate>& all)
+	void setJSDelegates(const JSDelegates& all)
 		/// Overwrites all JSDelegates
 	{
 		_jsHandlers = all;
 	}
 
 private:
-	std::set<JSDelegate> _jsHandlers;
+	JSDelegates _jsHandlers;
 };
 
 
