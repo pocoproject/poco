@@ -62,7 +62,7 @@ DigestBuf::DigestBuf(DigestEngine& eng, std::istream& istr):
 
 
 DigestBuf::DigestBuf(DigestEngine& eng, std::ostream& ostr): 
-	BufferedStreamBuf(BUFFER_SIZE, std::ios::in), 
+	BufferedStreamBuf(BUFFER_SIZE, std::ios::out), 
 	_eng(eng), 
 	_pIstr(0), 
 	_pOstr(&ostr)
