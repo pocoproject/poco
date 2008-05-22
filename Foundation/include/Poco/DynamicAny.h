@@ -66,8 +66,8 @@ class Foundation_API DynamicAny
 	///
 	/// Boolean conversion is performed as follows:
 	///
-	/// A string value "false" (not case sensitive) or "0" can be converted to a boolean value false, any other string 
-	/// not being false by the above criteria evaluates to true (e.g: "hi" -> true).
+	/// A string value "false" (not case sensitive), "0" or "" (empty string) can be converted to a boolean value false,
+	/// any other string not being false by the above criteria evaluates to true (e.g: "hi" -> true).
 	/// Integer 0 values are false, everything else is true.
 	/// Floating point values equal to the minimal FP representation on a given platform are false, everything else is true.
 	///
@@ -186,10 +186,15 @@ public:
 		return *this;
 	}
 
+	bool operator ! ()
+	{
+		return !convert<bool>();
+	}
+
 	DynamicAny& operator = (const DynamicAny& other);
 		/// Assignment operator specialization for DynamicAny
 
-	template <typename T> 
+	template <typename T>
 	const DynamicAny operator + (const T& other) const
 		/// Addition operator for adding POD to DynamicAny
 	{

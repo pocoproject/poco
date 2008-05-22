@@ -1154,6 +1154,13 @@ void DynamicAnyTest::testString()
 	assert (a6 == "123456789");
 	a4 += "789";
 	assert (a4 == "123456789");
+
+	a4 = "";
+	assert(!a4);
+	a4 = "0";
+	assert(!a4);
+	a4 = "FaLsE";
+	assert(!a4);
 }
 
 

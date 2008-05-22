@@ -2214,12 +2214,15 @@ public:
 	void convert(bool& val) const
 	{
 		static const std::string VAL_FALSE("false");
-		static const std::string VAL_INTFALSE("0");
+		static const std::string VAL_INT_FALSE("0");
 
-		if (_val == VAL_INTFALSE || (icompare(_val, VAL_FALSE) == 0))
+		if (_val.empty() ||
+			_val == VAL_INT_FALSE ||
+			(icompare(_val, VAL_FALSE) == 0))
+		{
 			val = false;
-		else
-			val = true;
+		}
+		else val = true;
 	}
 
 	void convert(float& val) const
