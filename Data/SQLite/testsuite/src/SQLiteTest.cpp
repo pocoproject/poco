@@ -197,6 +197,54 @@ SQLiteTest::~SQLiteTest()
 }
 
 
+void SQLiteTest::testBinding()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (tmp.isConnected());
+	std::string tableName("Simpsons");
+	std::string lastName("Simpson");
+	std::string firstName("Bart");
+	std::string address("Springfield");
+	int age = 12;
+	
+	std::string& rLastName(lastName);
+	std::string& rFirstName(firstName);
+	std::string& rAddress(address);
+	int& rAge = age;
+
+	const std::string& crLastName(lastName);
+	const std::string& crFirstName(firstName);
+	const std::string& crAddress(address);
+	const int& crAge = age;
+
+	int count = 0;
+	std::string result;
+
+	tmp << "DROP TABLE IF EXISTS Simpsons", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Simpsons (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
+	assert (result == tableName);
+
+	// following will not compile:
+	//tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use("Simpson"), use("Bart"), use("Springfield"), use(age), now;
+	//tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use(lastName), use(firstName), use(address), use(12), now;
+	//tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", useRef(lastName), useRef(firstName), useRef(address), useRef(12), now;
+
+	// following will compile (and may work), but is not really a smart way to go
+	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", useRef("Simpson"), useRef("Bart"), useRef("Springfield"), useRef(age), now;
+
+	// these are fine
+	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", use(rLastName), use(rFirstName), use(rAddress), use(rAge), now;
+	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", useRef(crLastName), useRef(crFirstName), useRef(crAddress), useRef(crAge), now;
+	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", bind("Simpson"), bind("Bart"), bind("Springfield"), bind(12), now;
+	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", bind(rLastName), bind(rFirstName), bind(rAddress), bind(rAge), now;
+	tmp << "INSERT INTO Simpsons VALUES(?, ?, ?, ?)", bind(crLastName), bind(crFirstName), bind(crAddress), bind(crAge), now;
+
+	tmp << "SELECT COUNT(*) FROM Simpsons", into(count), now;
+	assert (6 == count);
+}
+
+
 void SQLiteTest::testSimpleAccess()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -2225,6 +2273,7 @@ CppUnit::Test* SQLiteTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteTest");
 
+	CppUnit_addTest(pSuite, SQLiteTest, testBinding);
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccess);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullCharPointer);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertCharPointer);

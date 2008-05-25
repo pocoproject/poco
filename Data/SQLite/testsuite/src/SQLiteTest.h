@@ -46,6 +46,7 @@ public:
 	SQLiteTest(const std::string& name);
 	~SQLiteTest();
 
+	void testBinding();
 	void testSimpleAccess();
 	void testNullCharPointer();
 	void testInsertCharPointer();
