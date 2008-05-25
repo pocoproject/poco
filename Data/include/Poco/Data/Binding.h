@@ -379,7 +379,7 @@ public:
 		const std::string& name = "", 
 		Direction direction = PD_IN): 
 		AbstractBinding(name, direction),
-		_pVal(new std::vector<T>(val))
+		_pVal(new std::vector<T>(val)),
 		_begin(), 
 		_end()
 		/// Creates the Binding.
@@ -660,7 +660,7 @@ public:
 		const std::string& name = "",
 		Direction direction = PD_IN): 
 		AbstractBinding(name, direction), 
-		_pVal(new std::list<T>(val))
+		_pVal(new std::list<T>(val)),
 		_begin(), 
 		_end()
 		/// Creates the Binding.
