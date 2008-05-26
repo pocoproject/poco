@@ -60,6 +60,7 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
     //    ['3m Co',71.72,0.02,0.03,'9/1 12:00am'],
     //    ['Alcoa Inc',29.01,0.42,1.47,'9/1 12:00am']
 	//]
+	// render the row-index as last column
 	const TableModel& tm = pTable->getModel();
 	const Table::TableColumns& tc = pTable->getColumns();
 
@@ -110,6 +111,8 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
 					; //FIXME: 
 			}
 		}
+		// the last column contains the rowIndx
+		ostr << "," << row;
 		ostr << "]";
 	}
 	ostr << "]";

@@ -52,6 +52,7 @@ namespace ExtJS {
 
 const std::string TableRenderer::EV_CELLCLICKED("cellclick");
 const std::string TableRenderer::EV_AFTEREDIT("afteredit");
+const std::string TableRenderer::HIDDEN_INDEX_ROW("hidIdx");
 
 
 TableRenderer::TableRenderer()
@@ -87,9 +88,13 @@ void TableRenderer::addCellValueChangedServerCallback(Table* pTable, const std::
 {
 	poco_check_ptr (pTable);
 	static const std::string signature("function(obj)");
+	//extract the true row index from the last column!
+	std::string origRow("+obj.record.get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(Table::FIELD_COL, "+obj.column"));
-	addParams.insert(std::make_pair(Table::FIELD_ROW, "+obj.row"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
 	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.value"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLVALUECHANGED));
 	Utility::addServerCallback(pTable->cellValueChanged, signature, addParams, pTable->id(), onSuccess, onFailure);
@@ -103,9 +108,13 @@ void TableRenderer::addCellClickedServerCallback(Table* pTable, const std::strin
 {
 	poco_check_ptr (pTable);
 	static const std::string signature("function(theGrid,row,col,e)");
+	//extract the true row index from the last column!
+	std::string origRow("+theGrid.getStore().getAt(row).get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(Table::FIELD_COL, "+col"));
-	addParams.insert(std::make_pair(Table::FIELD_ROW, "+row"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLCLICKED));
 	Utility::addServerCallback(pTable->cellClicked, signature, addParams, pTable->id(), onSuccess, onFailure);
 }
@@ -128,7 +137,9 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	ostr << "},"; //close listeners
 	
 	renderColumns(pTable, context, ostr);
-	ostr << ",clicksToEdit:1,stripeRows:true";
+	// forbid reordering of columns, otherwise col index will not match the col index at the server
+	// sorting is allowed though, i.e row matching is active
+	ostr << ",clicksToEdit:1,stripeRows:true,enableColumnHide:false,enableColumnMove:false";
 	if (pTable->getWidth() > 0)
 		ostr << ",width:" << pTable->getWidth();
 	if (pTable->getHeight() > 0)
@@ -154,6 +165,12 @@ void TableRenderer::renderColumns(const Table* pTable, const RenderContext& cont
 
 		renderColumn(pTable, *(*it), i, context, ostr);
 	}
+	// must be last column, so we don't need row/col correction!
+	// the last column is required to be able to handle sorting on the client side and to 
+	// match client-row indizes to server-row indizes
+	// we use the very first entry as dummy data index
+	ostr << ",{id:'" << HIDDEN_INDEX_ROW << "',header:'" << HIDDEN_INDEX_ROW << "',dataIndex:'" << i << "',";
+	ostr << "hidden:true}";
 	ostr << "]";
 }
 
@@ -198,64 +215,6 @@ void TableRenderer::renderColumn(const Table* pTable, const TableColumn& tc, int
 }
 
 
-void TableRenderer::renderDataModel(const Table* pTable, std::ostream& ostr)
-{
-	//[
-    //[    ['3m Co',71.72,0.02,0.03,'9/1 12:00am'],
-    //[    ['Alcoa Inc',29.01,0.42,1.47,'9/1 12:00am']
-	//]
-	const TableModel& tm = pTable->getModel();
-	const Table::TableColumns& tc = pTable->getColumns();
-
-	poco_assert_dbg (tc.size() == tm.getColumnCount());
-
-	std::size_t colCnt = tm.getColumnCount();
-	std::size_t rowCnt = tm.getRowCount();
-	ostr << "[";
-	for (std::size_t row = 0; row < rowCnt; ++row)
-	{
-		if (row != 0)
-			ostr << ",[";
-		else
-			ostr << "[";
-		for (std::size_t col = 0; col < colCnt; ++col)
-		{
-			if (col != 0)
-				ostr << ",";
-
-			// how do we distinguish if we want to write something as text or GUIElement?
-			// Example: Checkbutton can be written as text "true"/"false" or as a CheckButton
-			// we use the Cell: if we have a Cell set -> complex Type otherwise text
-			// -> already handled by the renderer!
-			const Poco::Any& aVal = tm.getValue(row, col);
-			
-			if (aVal.empty())
-				ostr << "''";
-			else
-			{
-				//FIXME: we have no type nfo at all, assume string for everything
-				bool isString = (typeid(std::string) == aVal.type());
-				Cell::Ptr ptrCell = tc[col]->getCell();
-				if (isString)
-					ostr << "'" << RefAnyCast<std::string>(aVal) << "'";
-				else if (ptrCell)
-				{
-					//date must be written as string
-					if (typeid(Poco::DateTime) == aVal.type())
-						ostr << "'" << tc[col]->getCell()->getFormatter()->format(aVal) << "'";
-					else
-						ostr  << tc[col]->getCell()->getFormatter()->format(aVal);
-				}
-				else
-					; //FIXME: 
-			}
-		}
-		ostr << "]";
-	}
-	ostr << "]";
-}
-
-
 void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 {
 
@@ -283,6 +242,7 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 			ostr << ",";
 		ostr << "{name:'" << i << "'}";
 	}
+	ostr << ",{name:'" << i << "'}";
 	ostr << "],"; // close fields
 	ostr << "proxy: new Ext.data.HttpProxy({url:";
 	std::map<std::string, std::string> addParams;

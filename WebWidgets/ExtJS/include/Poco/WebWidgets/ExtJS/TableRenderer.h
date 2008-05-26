@@ -64,6 +64,7 @@ class ExtJS_API TableRenderer: public Poco::WebWidgets::Renderer
 public:
 	static const std::string EV_CELLCLICKED;
 	static const std::string EV_AFTEREDIT;
+	static const std::string HIDDEN_INDEX_ROW;
 	
 	TableRenderer();
 		/// Creates the TableRenderer.
@@ -94,9 +95,6 @@ protected:
 
 	static void renderColumn(const Table* pTable, const TableColumn& tc, int idx, const RenderContext& context, std::ostream& ostr);
 		/// Renders a single colum
-
-	static void renderDataModel(const Table* pTable, std::ostream& ostr);
-		/// Renders the data matrix
 
 	static void renderStore(const Table* pTable, std::ostream& ostr);
 		/// Renders the data store of the table
