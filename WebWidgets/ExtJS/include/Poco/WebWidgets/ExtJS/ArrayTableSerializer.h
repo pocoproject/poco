@@ -41,31 +41,30 @@
 
 
 #include "Poco/WebWidgets/ExtJS/ExtJS.h"
-#include "Poco/WebWidgets/TableModelSerializer.h"
-#include "Poco/Any.h"
 
 
 namespace Poco {
 namespace WebWidgets {
+
+	class Table;
+	
 namespace ExtJS {
 
 
-class ExtJS_API ArrayTableSerializer: public Poco::WebWidgets::TableModelSerializer
+class ExtJS_API ArrayTableSerializer
 	/// ArrayTableSerializer serializes a Table in JSON format
 {
 public:
-	typedef Poco::AutoPtr<ArrayTableSerializer> Ptr;
-
+	static void serialize(std::ostream& ostr, const Poco::WebWidgets::Table* pTable, std::size_t rowBegin = 0, std::size_t rowCnt = 0);
+		/// Serializes the table starting with row 0. A rowCnt of 0 means serialize all rows
+		
+	static const std::string& contentType();
+private:
 	ArrayTableSerializer();
 		/// Creates the ArrayTableSerializer with the given number of columns.
 
-	virtual ~ArrayTableSerializer();
+	~ArrayTableSerializer();
 		/// Destroys the ArrayTableSerializer.
-		
-	void serialize(std::ostream& ostr, const Poco::WebWidgets::Table* pTable, std::size_t rowBegin = 0, std::size_t rowCnt = 0);
-		/// Serializes the table starting with row 0. A rowCnt of 0 means serialize all rows
-		
-	const std::string& contentType() const;
 };
 
 

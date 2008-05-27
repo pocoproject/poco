@@ -44,6 +44,7 @@
 #include "Poco/WebWidgets/Type.h"
 #include "Poco/WebWidgets/Renderer.h"
 #include "Poco/WebWidgets/Cell.h"
+#include "Poco/WebWidgets/Table.h"
 #include <map>
 
 
@@ -51,7 +52,6 @@
 namespace Poco {
 namespace WebWidgets {
 
-	class Table;
 	class TableColumn;
 	class TableModel;
 
@@ -98,6 +98,8 @@ protected:
 
 	static void renderStore(const Table* pTable, std::ostream& ostr);
 		/// Renders the data store of the table
+		
+	static void onBeforeLoad(void* pSender, Table::LoadData& ld);
 };
 
 

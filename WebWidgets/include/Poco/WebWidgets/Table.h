@@ -46,7 +46,8 @@
 #include "Poco/WebWidgets/TableColumn.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
 #include "Poco/WebWidgets/JavaScriptEvent.h"
-#include "Poco/WebWidgets/TableModelSerializer.h"
+#include "Poco/FIFOEvent.h"
+#include "Poco/Net/HTTPServerResponse.h"
 #include <vector>
 
 
@@ -86,15 +87,26 @@ public:
 		CellValueChange(std::size_t row, std::size_t col, const Poco::Any& oldValue, const Poco::Any& newValue);
 	};
 	
+	struct LoadData
+	{
+		Poco::Net::HTTPServerResponse* pResponse;
+		Table* pTable;
+		int firstRow;
+		int rowCnt;
+		LoadData(Poco::Net::HTTPServerResponse* pResponse, Table* pTable, int firstRow, int rowCnt);
+	};
+	
 	JavaScriptEvent<Table::CellClick> cellClicked;
 	
 	JavaScriptEvent<Table::CellValueChange> cellValueChanged;
 	
+	FIFOEvent<LoadData> beforeLoad; /// thrown whenever a load is requested, internal event to which the TableRenderer must register
 	
-	Table(const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer);
+	
+	Table(const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates an anonymous Table.
 		
-	Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer);
+	Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates a Table with the given name.
 
 	std::size_t getColumnCount() const;
@@ -140,10 +152,10 @@ private:
 	void handleVal(const std::string& val);
 	void handleCnt(const std::string& val);
 protected:
-	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer);
+	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates a Table and assigns it the given name.
 		
-	Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer);
+	Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates a Table.
 		
 	~Table();
@@ -160,7 +172,6 @@ private:
 	int             _cnt;
 	std::string     _val;
 	std::string     _ev;
-	TableModelSerializer::Ptr _pSer;
 };
 
 

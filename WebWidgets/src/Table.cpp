@@ -53,7 +53,7 @@ const std::string Table::EV_CELLVALUECHANGED("edit");
 const std::string Table::EV_LOADDATA("load");
 
 
-Table::Table(const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer):
+Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
 	View(typeid(Table)),
 	_pModel(pModel),
 	_columns(tc),
@@ -61,14 +61,13 @@ Table::Table(const TableColumns& tc, TableModel::Ptr pModel, TableModelSerialize
 	_row(-1),
 	_cnt(-1),
 	_val(),
-	_ev(),
-	_pSer(pSer)
+	_ev()
 {
 	checkValidConfig();
 }
 
 	
-Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer):
+Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel):
 	View(name, typeid(Table)),
 	_pModel(pModel),
 	_columns(tc),
@@ -76,14 +75,13 @@ Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pM
 	_row(-1),
 	_cnt(-1),
 	_val(),
-	_ev(),
-	_pSer(pSer)
+	_ev()
 {
 	checkValidConfig();
 }
 
 
-Table::Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer):
+Table::Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel):
 	View(name, type),
 	_pModel(pModel),
 	_columns(tc),
@@ -91,14 +89,13 @@ Table::Table(const std::string& name, const std::type_info& type, const TableCol
 	_row(-1),
 	_cnt(-1),
 	_val(),
-	_ev(),
-	_pSer(pSer)
+	_ev()
 {
 	checkValidConfig();
 }
 
 
-Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel, TableModelSerializer::Ptr pSer):
+Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel):
 	View(type),
 	_pModel(pModel),
 	_columns(tc),
@@ -106,8 +103,7 @@ Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr
 	_row(-1),
 	_cnt(-1),
 	_val(),
-	_ev(),
-	_pSer(pSer)
+	_ev()
 {
 	checkValidConfig();
 }
@@ -133,7 +129,6 @@ void Table::checkValidConfig()
 		if ((*it))
 			adoptChild((*it));;
 	}
-	poco_check_ptr (_pSer);
 }
 
 
@@ -173,14 +168,18 @@ void Table::handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request
 	{
 		/// serialize the Table back
 		/// check for cnt and start if only a segment was requested
-		response.setChunkedTransferEncoding(true);
-		response.setContentType(_pSer->contentType());
-		std::ostream& out = response.send();
+
 		if (_row < 0)
 			_row = 0;
 		if (_cnt < 0)
 			_cnt = 0;
-		_pSer->serialize(out, this, _row, _cnt);
+		LoadData ld(&response, this, _row, _cnt);
+		_col = -1;
+		_row = -1;
+		_cnt = -1;
+		_val.clear();
+		_ev.clear();
+		beforeLoad.notify(this, ld);
 	}
 	else
 	{
@@ -268,6 +267,15 @@ Table::CellValueChange::CellValueChange(std::size_t r, std::size_t c, const Poco
 	col(c),
 	oldValue(old),
 	newValue(n)
+{
+}
+
+
+Table::LoadData::LoadData(Poco::Net::HTTPServerResponse* pR, Table* pT, int row, int cnt):
+	pResponse(pR),
+	pTable(pT),
+	firstRow(row),
+	rowCnt(cnt)
 {
 }
 

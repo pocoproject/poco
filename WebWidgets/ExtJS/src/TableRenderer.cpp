@@ -38,10 +38,12 @@
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ExtJS/TableCellHandlerFactory.h"
+#include "Poco/WebWidgets/ExtJS/ArrayTableSerializer.h"
 #include "Poco/WebWidgets/Table.h"
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/WebWidgets/DateFormatter.h"
+#include "Poco/Delegate.h"
 #include <sstream>
 
 
@@ -146,7 +148,9 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 		ostr << ",height:" << pTable->getHeight();
 	ostr << ",store:";
 	renderStore(pTable, ostr);
-	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(id), const_cast<Table*>(pTable));
+	Table* pT = const_cast<Table*>(pTable);
+	pT->beforeLoad += Poco::delegate(&TableRenderer::onBeforeLoad);
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(id), pT);
 }
 
 
@@ -257,6 +261,14 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	ostr << "})";
 }
 
+
+void TableRenderer::onBeforeLoad(void* pSender, Table::LoadData& ld)
+{
+	ld.pResponse->setChunkedTransferEncoding(true);
+	ld.pResponse->setContentType(ArrayTableSerializer::contentType());
+	std::ostream& out = ld.pResponse->send();
+	ArrayTableSerializer::serialize(out, ld.pTable, ld.firstRow, ld.rowCnt);
+}
 
 
 } } } // namespace Poco::WebWidgets::ExtJS

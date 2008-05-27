@@ -44,16 +44,6 @@ namespace WebWidgets {
 namespace ExtJS {
 
 
-ArrayTableSerializer::ArrayTableSerializer()
-{
-}
-
-
-ArrayTableSerializer::~ArrayTableSerializer()
-{
-}
-
-
 void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, std::size_t rowBegin, std::size_t rowCntUser)
 {
 	//[
@@ -119,7 +109,7 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
 }
 
 
-const std::string& ArrayTableSerializer::contentType() const
+const std::string& ArrayTableSerializer::contentType()
 {
 	static const std::string ct("text/javascript");
 	return ct;
