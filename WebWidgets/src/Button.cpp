@@ -115,7 +115,7 @@ void Button::init()
 
 void Button::fireButtonClicked(void* pSender)
 {
-	ButtonEvent clickedEvent(Button::Ptr(this, true));
+	ButtonEvent clickedEvent(this);
 	buttonClicked(this, clickedEvent);
 }
 

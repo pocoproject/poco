@@ -119,7 +119,12 @@ void LayoutRenderer::visitChildren(const Layout* pLayout, const RenderContext& c
 		if (it != pLayout->begin())
 			ostr << ",";
 		if (*it)
+		{
+			//horizontallayout works only when children are panels
+			ostr << "{xtype:'panel',items:";
 			(*it)->renderHead(context, ostr);
+			ostr << "}";
+		}
 		else
 			ostr << "{}";
 		

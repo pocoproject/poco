@@ -35,10 +35,16 @@
 
 
 #include "Poco/WebWidgets/ComboBoxCell.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 
 
 namespace Poco {
 namespace WebWidgets {
+
+
+const std::string ComboBoxCell::FIELD_VAL("val");
+const std::string ComboBoxCell::EV_LOAD("load");
+const std::string ComboBoxCell::EV_SELECTED("sel");
 
 
 ComboBoxCell::ComboBoxCell(View* pOwner):
@@ -65,6 +71,44 @@ void ComboBoxCell::erase(const Any& elem)
 			return;
 		}
 		++it;
+	}
+}
+
+
+void ComboBoxCell::handleForm(const std::string& field, const std::string& value)
+{
+	if (field == FIELD_VAL)
+	{
+		Formatter::Ptr pForm(getFormatter());
+		if (pForm)
+		{
+			setSelected(pForm->parse(value));
+		}
+	}
+	else if (field == RequestHandler::KEY_EVID)
+		_ev = value;
+}
+
+
+void ComboBoxCell::handleRequest(const Poco::Net::HTTPServerRequest& request)
+{
+	//ev selected already handled in handleForm
+}
+
+
+
+void ComboBoxCell::handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+{
+	// RequestHandler has already called all the handeForm stuff
+	if (_ev == EV_LOAD)
+	{
+		Poco::Net::HTTPServerResponse* pResponse = &response;
+		beforeLoad.notify(this, pResponse);
+	}
+	else
+	{
+		handleRequest(request);
+		response.send();
 	}
 }
 

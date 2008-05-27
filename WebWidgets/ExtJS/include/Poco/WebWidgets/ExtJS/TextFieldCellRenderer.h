@@ -68,7 +68,7 @@ public:
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.
 
-	static void writeCellProperties(const TextFieldCell* pCell, std::ostream& ostr, bool writeValue=true);
+	static void writeCellProperties(const TextFieldCell* pCell, std::ostream& ostr, bool writeValue=true, bool writeListeners = true);
 		/// Writes cell properties
 };
 

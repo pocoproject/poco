@@ -59,7 +59,11 @@ PageRenderer::~PageRenderer()
 
 void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
 {
-	static const std::string STRO_HTML("<html>");	static const std::string STRO_HEAD ("<head>");	static const std::string STRO_TITLE ("<title>");	static const std::string STRC_HEAD ("</head>");	static const std::string STRC_TITLE ("</title>");
+	static const std::string STRO_HTML("<html>");
+	static const std::string STRO_HEAD ("<head>");
+	static const std::string STRO_TITLE ("<title>");
+	static const std::string STRC_HEAD ("</head>");
+	static const std::string STRC_TITLE ("</title>");
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::Page));
 	const Page* pPage = static_cast<const Poco::WebWidgets::Page*>(pRenderable);
@@ -70,11 +74,13 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	ostr << pPage->getName();
 	ostr << STRC_TITLE;
 	//include javascript files: TODO: use ResourceManager
-	ostr << "<script type=\"text/javascript\" src=\"ext-base.js\"></script>";	ostr << "<script type=\"text/javascript\" src=\"ext-all.js\"></script>";
+	ostr << "<script type=\"text/javascript\" src=\"ext-base.js\"></script>";
+	ostr << "<script type=\"text/javascript\" src=\"ext-all.js\"></script>";
 	ostr << "<script type=\"text/javascript\" src=\"DDView.js\"></script>";
 	ostr << "<script type=\"text/javascript\" src=\"MultiSelect.js\"></script>";
 	ostr << "<link rel=\"stylesheet\" type=\"text/css\" href=\"resources/css/ext-all.css\">";
 	ostr << "<link rel=\"stylesheet\" type=\"text/css\" href=\"MultiSelect.css\">";
+	ostr << "<style type=\"text/css\">.lbl {font:normal 12px tahoma, verdana, helvetica}</style>";
 	if (!pPage->empty())
 	{
 		//start inline javascript block

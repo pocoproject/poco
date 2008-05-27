@@ -42,6 +42,8 @@
 
 #include "Poco/WebWidgets/TextField.h"
 #include "Poco/WebWidgets/ComboBoxCell.h"
+#include "Poco/WebWidgets/Event.h"
+#include "Poco/WebWidgets/JavaScriptEvent.h"
 #include <vector>
 
 
@@ -58,6 +60,10 @@ class WebWidgets_API ComboBox: public TextField
 public:
 	typedef Poco::AutoPtr<ComboBox> Ptr;
 
+	typedef Event<ComboBox> ComboBoxEvent;
+	
+	JavaScriptEvent<ComboBoxEvent> selected; /// thrown whenever a new element is selected
+	
 	ComboBox();
 		/// Creates the ComboBox.
 
@@ -78,6 +84,17 @@ public:
 
 	void setElements(const std::vector<Any>& elems);
 		/// Initializes the combo box with the provided elements
+	
+	template <typename T>	
+	void setElements(const std::vector<T>& elems)
+		/// Initializes the combo box with the provided elements
+	{
+		std::vector<Any> result;
+		typename std::vector<T>::const_iterator it = elems.begin();
+		for (; it != elems.end(); ++it)
+			result.push_back(*it);
+		setElements(result);
+	}
 
 	const std::vector<Any>& getElements() const;
 		/// Returns all elements
@@ -106,6 +123,9 @@ protected:
 
 	~ComboBox();
 		/// Destroys the ComboBox.
+		
+	void fireSelected(void* pSender);
+		/// Fires the selected event.
 };
 
 

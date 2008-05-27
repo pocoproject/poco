@@ -79,7 +79,7 @@ void TextFieldCellRenderer::renderBody(const Renderable* pRenderable, const Rend
 }
 
 
-void TextFieldCellRenderer::writeCellProperties(const TextFieldCell* pCell, std::ostream& ostr, bool writeValue)
+void TextFieldCellRenderer::writeCellProperties(const TextFieldCell* pCell, std::ostream& ostr, bool writeValue, bool writeListeners)
 {
 	Utility::writeCellProperties(pCell, ostr);
 
@@ -97,10 +97,13 @@ void TextFieldCellRenderer::writeCellProperties(const TextFieldCell* pCell, std:
 	if (pCell->getMaxLength() > 0)
 		ostr << ",maxLength:" << pCell->getMaxLength();
 
-	//tooltip is not supported by textField, add listeners
-	std::string tooltip (pCell->getToolTip());
-	if (!tooltip.empty())
-		ostr << ",listeners:{render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}}";
+	if (writeListeners)
+	{
+		//tooltip is not supported by textField, add listeners
+		std::string tooltip (pCell->getToolTip());
+		if (!tooltip.empty())
+			ostr << ",listeners:{render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}}";
+	}
 }
 
 

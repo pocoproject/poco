@@ -42,33 +42,47 @@ namespace Poco {
 namespace WebWidgets {
 
 
-
 ComboBox::ComboBox(const std::string& name, const std::type_info& type):
 	TextField(name, type, new ComboBoxCell(this))
 {
+	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
+	pCell->selected = delegate(*this, &ComboBox::fireSelected);
 }
 
 
 ComboBox::ComboBox(const std::type_info& type):
 	TextField(type, new ComboBoxCell(this))
 {
+	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
+	pCell->selected = delegate(*this, &ComboBox::fireSelected);
 }
 
 
 ComboBox::ComboBox(const std::string& name):
 	TextField(name, typeid(ComboBox), new ComboBoxCell(this))
 {
+	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
+	pCell->selected = delegate(*this, &ComboBox::fireSelected);
 }
 
 
 ComboBox::ComboBox():
 	TextField(typeid(ComboBox), new ComboBoxCell(this))
 {
+	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
+	pCell->selected = delegate(*this, &ComboBox::fireSelected);
 }
 
 
 ComboBox::~ComboBox()
 {
+}
+
+
+void ComboBox::fireSelected(void* pSender)
+{
+	ComboBoxEvent sel(this);
+	selected(this, sel);
 }
 
 

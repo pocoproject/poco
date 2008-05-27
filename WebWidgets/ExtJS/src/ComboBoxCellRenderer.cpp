@@ -39,11 +39,20 @@
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ComboBoxCell.h"
+#include "Poco/WebWidgets/ComboBox.h"
+#include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Delegate.h"
+#include <map>
 
 
 namespace Poco {
 namespace WebWidgets {
 namespace ExtJS {
+
+
+const std::string ComboBoxCellRenderer::EV_SELECTED("select");
 
 
 ComboBoxCellRenderer::ComboBoxCellRenderer()
@@ -56,20 +65,80 @@ ComboBoxCellRenderer::~ComboBoxCellRenderer()
 }
 
 
+void ComboBoxCellRenderer::addSelectedServerCallback(ComboBox* pCombo, const std::string& onSuccess, const std::string& onFailure)
+{
+	//select : ( Ext.form.ComboBox combo, Ext.data.Record record, Number index )
+	static const std::string signature("function(combo,rec, idx)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+rec.get('d')"));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ComboBoxCell::EV_SELECTED));
+	Utility::addServerCallback(pCombo->selected, signature, addParams, pCombo->id(), onSuccess, onFailure);
+}
+
 
 void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
 {
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::ComboBoxCell));
-	const ComboBoxCell* pCell = static_cast<const Poco::WebWidgets::ComboBoxCell*>(pRenderable);
+	ComboBoxCell* pCell = const_cast<ComboBoxCell*>(static_cast<const Poco::WebWidgets::ComboBoxCell*>(pRenderable));
+	ComboBox* pOwner = dynamic_cast<ComboBox*>(pCell->getOwner());
+	poco_check_ptr (pOwner);
 	ostr << "new Ext.form.ComboBox({";
 
-	TextFieldCellRenderer::writeCellProperties(pCell, ostr);
-	ostr << ", store: new Ext.data.SimpleStore({fields:['d'], data:[";
+	TextFieldCellRenderer::writeCellProperties(pCell, ostr, true, false);
+	ostr << ",store:new Ext.data.SimpleStore({autoLoad:true,fields:['d'],";
+	ostr << "proxy:new Ext.data.HttpProxy({url:";
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID,ComboBoxCell::EV_LOAD));
+	
+	std::string url(Utility::createURI(addParams, pOwner->id()));
+	ostr << url << "}),";
+	ostr << "reader:new Ext.data.ArrayReader()})";
+	ostr << ",displayField:'d',typeAhead:true,triggerAction:'all'";
+	
+	std::string tooltip (pCell->getToolTip());
+		
+	if (!pOwner->selected.jsDelegates().empty())
+	{
+		ostr << ",listeners:{";
+		Utility::writeJSEvent(ostr, EV_SELECTED, pOwner->selected.jsDelegates());
+		if (!tooltip.empty())
+			ostr << ",render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}";
+		ostr << "}";
+	}
+	else if (!tooltip.empty())
+	{
+		ostr << ",listeners:{";
+		ostr << "render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}}";
+	}
+	
+
+	ostr << "})";
+	pCell->beforeLoad += Poco::delegate(&ComboBoxCellRenderer::onLoad);
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pOwner->id()), pCell);
+}
+
+
+void ComboBoxCellRenderer::onLoad(void* pSender, Poco::Net::HTTPServerResponse* &pResponse)
+{
+	poco_check_ptr (pSender);
+	poco_check_ptr (pResponse);
+	ComboBoxCell* pCell = reinterpret_cast<ComboBoxCell*>(pSender);
+	poco_check_ptr (pCell);
+	pResponse->setChunkedTransferEncoding(true);
+	pResponse->setContentType("text/javascript");
+	std::ostream& out = pResponse->send();
+	serialize (pCell, out);
+}
+
+
+void ComboBoxCellRenderer::serialize(const ComboBoxCell* pCell, std::ostream& ostr)
+{
 	//now serialize data
 	std::vector<Any>::const_iterator it = pCell->begin();
 	std::vector<Any>::const_iterator itEnd = pCell->end();
 	Formatter::Ptr ptrFormatter = pCell->getFormatter();
+	ostr << "[";
 	for (; it != itEnd; ++it)
 	{
 		if (it != pCell->begin())
@@ -79,9 +148,7 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 		else
 			ostr << "['" << RefAnyCast<std::string>(*it) << "']";
 	}
-	ostr << "]})";
-	ostr << ",displayField:'d',typeAhead:true,mode:'local',triggerAction:'all'";
-	ostr << "})";
+	ostr << "]";
 }
 
 

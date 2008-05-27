@@ -70,6 +70,15 @@ TextField::TextField(const std::type_info& type):
 }
 
 
+
+TextField::TextField(const std::string& name, const std::string& txt):
+	Control(name, typeid(TextField))
+{
+	init();
+	setString(txt);
+}
+
+
 TextField::TextField(const std::string& name):
 	Control(name, typeid(TextField))
 {

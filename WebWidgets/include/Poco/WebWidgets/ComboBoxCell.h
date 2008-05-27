@@ -41,6 +41,9 @@
 
 
 #include "Poco/WebWidgets/TextFieldCell.h"
+#include "Poco/WebWidgets/Delegate.h"
+#include "Poco/FIFOEvent.h"
+#include "Poco/Net/HTTPServerResponse.h"
 #include <vector>
 
 
@@ -53,6 +56,13 @@ class WebWidgets_API ComboBoxCell: public TextFieldCell
 {
 public:
 	typedef Poco::AutoPtr<ComboBoxCell> Ptr;
+	
+	static const std::string EV_SELECTED;
+	static const std::string EV_LOAD;
+	static const std::string FIELD_VAL;
+	
+	Delegate selected;
+	FIFOEvent<Poco::Net::HTTPServerResponse*> beforeLoad; /// thrown whenever a load is requested
 
 	ComboBoxCell(View* pOwner);
 		/// Creates the ComboBoxCell.
@@ -89,6 +99,15 @@ public:
 
 	const Any& getSelected() const;
 		/// Returns the selected element, excpetion if none was selected
+		
+	void handleForm(const std::string& field, const std::string& value);
+	
+	void handleRequest(const Poco::Net::HTTPServerRequest& request);
+		/// Handles a complete HTTP request submitted by the client.
+		
+	void handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
+		/// Handles a complete HTTP request submitted by the client. Also takes care of handling the response,
+		/// e.g. if one wants to send back data.
 
 protected:
 	~ComboBoxCell();
@@ -96,6 +115,7 @@ protected:
 
 private:
 	std::vector<Any> _elements;
+	std::string      _ev;
 };
 
 
@@ -152,6 +172,7 @@ inline void ComboBoxCell::setSelected(const Any& elem)
 	/// Selects the element.
 {
 	setValue(elem);
+	selected(this);
 }
 
 

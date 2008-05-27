@@ -142,6 +142,7 @@ const std::string& Utility::getTmpID()
 
 void Utility::writeRenderableProperties(const Renderable* pRend, std::ostream& ostr)
 {
+	poco_assert_dbg (pRend != 0);
 	ostr << "id:'" << pRend->id() << "'";
 }
 
@@ -156,11 +157,12 @@ void Utility::writeRenderableProperties(const std::string& id, std::ostream& ost
 void Utility::writeCellProperties(const Cell* pCell, std::ostream& ostr, bool writeId)
 {
 	if (writeId)
-		writeRenderableProperties(pCell, ostr);
+		writeRenderableProperties(pCell->getOwner(), ostr);
 	//don't support label for cell, keep this separate
 	ostr << ",hideLabel:true";
 	if (!pCell->isEnabled())
-	ostr << ",disabled:true";
+		ostr << ",disabled:true";
+	
 	View* pOwner = pCell->getOwner();
 	if (pOwner)
 	{
@@ -170,6 +172,8 @@ void Utility::writeCellProperties(const Cell* pCell, std::ostream& ostr, bool wr
 			ostr << ",width:" << pOwner->getWidth();
 		if (pOwner->getHeight() != 0)
 			ostr << ",height:" << pOwner->getHeight();
+		if (!pOwner->isVisible())
+			ostr << ",hidden:true";	
 	}
 }
 

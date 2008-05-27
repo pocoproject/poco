@@ -61,7 +61,11 @@ void LabelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::Label));
 	const Label* pLabel = static_cast<const Poco::WebWidgets::Label*>(pRenderable);
 
-	ostr << "{xtype:'label', text:'" << Utility::safe(pLabel->getText()) << "'}";
+	//ostr << "{xtype:'label', text:'" << Utility::safe(pLabel->getText()) << "'}";
+	ostr << "new Ext.form.Label({text:'" << Utility::safe(pLabel->getText()) << "',cls:'lbl'";
+	if (pLabel->getWidth() > 0)
+		ostr << ",width:" << pLabel->getWidth();
+	ostr << "})";
 }
 
 

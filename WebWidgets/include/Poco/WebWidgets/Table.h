@@ -125,7 +125,7 @@ public:
 		/// Handles a complete HTTP request submitted by the client.
 		
 	void handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
-		/// Handles a complete HTTP request submitted by the client. Also takes care of handing the response,
+		/// Handles a complete HTTP request submitted by the client. Also takes care of handling the response,
 		/// e.g. if one wants to send back data.
 
 private:

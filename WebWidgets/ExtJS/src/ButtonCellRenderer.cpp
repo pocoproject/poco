@@ -85,7 +85,21 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 		//ostr << "handler: function(){Ext.getCmp('" << pForm->id() << "').getForm().submit({url:'" << pForm->getURI().toString() << "',waitMsg:'Loading'});},";
 		ostr << "handler: function(){Ext.getCmp('" << pForm->id() << "').getForm().submit();},";
 	}
-	Utility::writeCellProperties(pButtonCell, ostr, writeId);
+	if (writeId)
+		Utility::writeRenderableProperties(pButtonCell, ostr);
+	if (!pButtonCell->isEnabled())
+		ostr << ",disabled:true";
+	View* pOwner = pButtonCell->getOwner();
+	if (pOwner)
+	{
+		if (!pOwner->getName().empty())
+			ostr << ",name:'" << pOwner->getName() << "'";
+		if (pOwner->getWidth() != 0)
+			ostr << ",minWidth:" << pOwner->getWidth();
+		if (!pOwner->isVisible())
+			ostr << ",hidden:true";
+	}
+
 	std::string toolTip(pButtonCell->getToolTip());
 	if (!toolTip.empty())
 		ostr << ",tooltip:'" << Utility::safe(toolTip) << "'";

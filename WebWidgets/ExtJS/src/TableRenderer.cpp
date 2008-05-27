@@ -244,13 +244,13 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	}
 	ostr << ",{name:'" << i << "'}";
 	ostr << "],"; // close fields
-	ostr << "proxy: new Ext.data.HttpProxy({url:";
+	ostr << "proxy:new Ext.data.HttpProxy({url:";
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID,Table::EV_LOADDATA));
 	
 	std::string url(Utility::createURI(addParams, pTable->id()));
 	ostr << url << "}),";
-	ostr << "reader: new Ext.data.ArrayReader()";
+	ostr << "reader:new Ext.data.ArrayReader()";
 	//Write data
 	/*ostr << "data:";
 	renderDataModel(pTable, ostr);*/

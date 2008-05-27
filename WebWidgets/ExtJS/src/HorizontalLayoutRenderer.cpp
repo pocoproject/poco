@@ -62,7 +62,8 @@ void HorizontalLayoutRenderer::renderHead(const Renderable* pRenderable, const R
 	const HorizontalLayout* pLayout = static_cast<const Poco::WebWidgets::HorizontalLayout*>(pRenderable);
 	std::ostringstream layoutConfig;
 	layoutConfig << "{columns:" << pLayout->size() << "}";
-	std::string layout("column");
+
+	static std::string layout("column");
 	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str());
 }
 

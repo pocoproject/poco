@@ -190,7 +190,6 @@ void Table::handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request
 }
 
 
-
 void Table::handleValueChanged()
 {
 	if (_col < 0 || _row < 0 || _col >= getColumnCount())

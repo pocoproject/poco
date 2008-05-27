@@ -58,6 +58,9 @@ public:
 
 	Poco::BasicEvent<TextFieldEvent> textChanged;
 
+	TextField(const std::string& name, const std::string& text);
+		/// Creates a TextField with the given name and content.
+		
 	TextField(const std::string& name);
 		/// Creates a TextField with the given name.
 
