@@ -38,11 +38,18 @@
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ButtonCell.h"
+#include "Poco/WebWidgets/Button.h"
+#include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/NumberFormatter.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 namespace ExtJS {
+
+
+const std::string ButtonCellRenderer::EV_CLICK("click");
 
 
 ButtonCellRenderer::ButtonCellRenderer()
@@ -89,7 +96,7 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 		Utility::writeRenderableProperties(pButtonCell, ostr);
 	if (!pButtonCell->isEnabled())
 		ostr << ",disabled:true";
-	View* pOwner = pButtonCell->getOwner();
+	Button* pOwner = dynamic_cast<Button*>(pButtonCell->getOwner());
 	if (pOwner)
 	{
 		if (!pOwner->getName().empty())
@@ -98,11 +105,21 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 			ostr << ",minWidth:" << pOwner->getWidth();
 		if (!pOwner->isVisible())
 			ostr << ",hidden:true";
+		if (!pOwner->buttonClicked.jsDelegates().empty())
+		{
+			ostr << ",listeners:{";
+			Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates());
+			ostr << "}";
+		}
 	}
+	
+	
 
 	std::string toolTip(pButtonCell->getToolTip());
 	if (!toolTip.empty())
 		ostr << ",tooltip:'" << Utility::safe(toolTip) << "'";
+		
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pButtonCell->id()), const_cast<ButtonCell*>(pButtonCell));
 }
 
 
@@ -117,6 +134,17 @@ void ButtonCellRenderer::renderButton(const ButtonCell* pCell, const std::string
 void ButtonCellRenderer::writeConfigData(const Cell* pCell, const RenderContext& context, std::ostream& ostr)
 {
 	ostr << "'" << Utility::safe(pCell->getString()) << "'";
+}
+
+
+
+void ButtonCellRenderer::addClickServerCallback(Button* pButton, const std::string& onSuccess, const std::string& onFailure)
+{
+	//click : ( Button this, EventObject e )
+	static const std::string signature("function(but,e)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ButtonCell::EV_BUTTONCLICKED));
+	Utility::addServerCallback(pButton->buttonClicked, signature, addParams, pButton->getCell()->id(), onSuccess, onFailure);
 }
 
 

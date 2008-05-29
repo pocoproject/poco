@@ -102,20 +102,15 @@ public:
 		
 	void handleForm(const std::string& field, const std::string& value);
 	
-	void handleRequest(const Poco::Net::HTTPServerRequest& request);
-		/// Handles a complete HTTP request submitted by the client.
+	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
+		/// Handles a complete AJAX request submitted by the client.
 		
-	void handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
-		/// Handles a complete HTTP request submitted by the client. Also takes care of handling the response,
-		/// e.g. if one wants to send back data.
-
 protected:
 	~ComboBoxCell();
 		/// Destroys the ComboBoxCell.
 
 private:
 	std::vector<Any> _elements;
-	std::string      _ev;
 };
 
 

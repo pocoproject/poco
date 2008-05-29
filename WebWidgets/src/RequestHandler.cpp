@@ -126,15 +126,9 @@ void RequestHandler::handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Po
 		return;
 	}
 
-	for (;it != args.end(); ++it)
-	{
-		const std::string& key = it->first;
-		const std::string& val = it->second;
-		pProc->handleForm(key, val);
-	}
 	try
 	{
-		pProc->handleRequestAndResponse(request, response);
+		pProc->handleAjaxRequest(args, response);
 	}
 	catch(...)
 	{

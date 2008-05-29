@@ -56,12 +56,7 @@ const std::string Table::EV_LOADDATA("load");
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
 	View(typeid(Table)),
 	_pModel(pModel),
-	_columns(tc),
-	_col(-1),
-	_row(-1),
-	_cnt(-1),
-	_val(),
-	_ev()
+	_columns(tc)
 {
 	checkValidConfig();
 }
@@ -70,12 +65,7 @@ Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
 Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel):
 	View(name, typeid(Table)),
 	_pModel(pModel),
-	_columns(tc),
-	_col(-1),
-	_row(-1),
-	_cnt(-1),
-	_val(),
-	_ev()
+	_columns(tc)
 {
 	checkValidConfig();
 }
@@ -84,12 +74,7 @@ Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pM
 Table::Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel):
 	View(name, type),
 	_pModel(pModel),
-	_columns(tc),
-	_col(-1),
-	_row(-1),
-	_cnt(-1),
-	_val(),
-	_ev()
+	_columns(tc)
 {
 	checkValidConfig();
 }
@@ -98,12 +83,7 @@ Table::Table(const std::string& name, const std::type_info& type, const TableCol
 Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel):
 	View(type),
 	_pModel(pModel),
-	_columns(tc),
-	_col(-1),
-	_row(-1),
-	_cnt(-1),
-	_val(),
-	_ev()
+	_columns(tc)
 {
 	checkValidConfig();
 }
@@ -134,113 +114,61 @@ void Table::checkValidConfig()
 
 void Table::handleForm(const std::string& field, const std::string& value)
 {
-	if (field == FIELD_COL)
-		handleCol(value);
-	else if (field == FIELD_ROW)
-		handleRow(value);
-	else if (field == FIELD_VAL)
-		handleVal(value);
-	else if (field == FIELD_CNT)
-		handleCnt(value);
-	else if (field == RequestHandler::KEY_EVID)
-		_ev = value;
+	// Form fields from a table?
 }
 
 
-void Table::handleRequest(const Poco::Net::HTTPServerRequest& req)
+void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
 {
-	if (_ev == EV_CELLVALUECHANGED)
-		handleValueChanged();
-	else if (_ev == EV_CELLCLICKED)
-		handleCellClicked();
-	_col = -1;
-	_row = -1;
-	_cnt = -1;
-	_val.clear();
-	_ev.clear();
-}
-
-
-void Table::handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
-{
-	// RequestHandler has already called all the handeForm stuff
-	if (_ev == EV_LOADDATA)
+	static const std::string strZero("0");
+	static const std::string strMin1("-1");
+	const std::string& ev = args[RequestHandler::KEY_EVID];
+	const std::string& strRow = args.get(FIELD_ROW, strMin1);
+	const std::string& strCol = args.get(FIELD_COL, strMin1);
+	const std::string& strCnt = args.get(FIELD_CNT, strZero);
+	int row(-1);
+	int cnt(-1);
+	int col(-1);
+	Poco::NumberParser::tryParse(strRow, row);
+	Poco::NumberParser::tryParse(strCol, col);
+	Poco::NumberParser::tryParse(strCnt, cnt);
+	if (ev == EV_LOADDATA)
 	{
 		/// serialize the Table back
-		/// check for cnt and start if only a segment was requested
-
-		if (_row < 0)
-			_row = 0;
-		if (_cnt < 0)
-			_cnt = 0;
-		LoadData ld(&response, this, _row, _cnt);
-		_col = -1;
-		_row = -1;
-		_cnt = -1;
-		_val.clear();
-		_ev.clear();
+		/// check for cnt and start if only a segment was requested	
+		if (row < 0)
+			row = 0;
+		if (cnt < 0)
+			cnt = 0;
+		LoadData ld(&response, this, row, cnt);
 		beforeLoad.notify(this, ld);
 	}
-	else
+	else if (ev == EV_CELLCLICKED)
 	{
-		handleRequest(request);
+		if (col < 0 || row < 0 || col >= getColumnCount())
+			throw InvalidArgumentException("col/row out of range");
+		CellClick ev(row, col);
+		cellClicked(this, ev);
 		response.send();
 	}
-}
-
-
-void Table::handleValueChanged()
-{
-	if (_col < 0 || _row < 0 || _col >= getColumnCount())
-		throw InvalidArgumentException("col/row out of range");
-	Cell::Ptr pCell = getColumns()[_col]->getCell();
-	Formatter::Ptr pForm;
-	if (pCell)
-		pForm = pCell->getFormatter();
-	if (pForm)
+	else if (ev == EV_CELLVALUECHANGED)
 	{
-		Poco::Any any = pForm->parse(_val);
-		setValue(any, _row, _col);
+		if (col < 0 || row < 0 || col >= getColumnCount())
+			throw InvalidArgumentException("col/row out of range");
+		const std::string& val = args.get(FIELD_VAL);
+		Cell::Ptr pCell = getColumns()[col]->getCell();
+		Formatter::Ptr pForm;
+		if (pCell)
+			pForm = pCell->getFormatter();
+		if (pForm)
+		{
+			Poco::Any any = pForm->parse(val);
+			setValue(any, row, col);
+		}
+		else
+			setValue(Poco::Any(val), row, col);
+		response.send();
 	}
-	else
-		setValue(Poco::Any(_val), _row, _col);
-}
-
-
-
-void Table::handleCellClicked()
-{
-	if (_col < 0 || _row < 0 || _col >= getColumnCount())
-		throw InvalidArgumentException("col/row out of range");
-	CellClick ev(_row, _col);
-	cellClicked(this, ev);
-}
-
-
-void Table::handleCol(const std::string& val)
-{
-	_col = Poco::NumberParser::parse(val);
-}
-
-
-void Table::handleRow(const std::string& val)
-{
-	_row = Poco::NumberParser::parse(val);
-}
-
-
-void Table::handleVal(const std::string& val)
-{
-	// we have no guarantee that _col is set at this timepoint
-	// so we cannot get the formatter for the row
-	// we do the conversion later in apply
-	_val = val;
-}
-
-
-void Table::handleCnt(const std::string& val)
-{
-	_cnt = Poco::NumberParser::parse(val);
 }
 
 

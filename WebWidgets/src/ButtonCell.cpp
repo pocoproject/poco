@@ -42,6 +42,9 @@ namespace Poco {
 namespace WebWidgets {
 
 
+const std::string ButtonCell::EV_BUTTONCLICKED("click");;
+
+
 ButtonCell::ButtonCell(View* pOwner, const std::type_info& type):
 	Cell(pOwner, type)
 {

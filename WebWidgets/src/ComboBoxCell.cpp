@@ -77,37 +77,31 @@ void ComboBoxCell::erase(const Any& elem)
 
 void ComboBoxCell::handleForm(const std::string& field, const std::string& value)
 {
-	if (field == FIELD_VAL)
+	Formatter::Ptr pForm(getFormatter());
+	if (pForm)
 	{
-		Formatter::Ptr pForm(getFormatter());
-		if (pForm)
-		{
-			setSelected(pForm->parse(value));
-		}
+		setSelected(pForm->parse(value));
 	}
-	else if (field == RequestHandler::KEY_EVID)
-		_ev = value;
 }
 
 
-void ComboBoxCell::handleRequest(const Poco::Net::HTTPServerRequest& request)
-{
-	//ev selected already handled in handleForm
-}
-
-
-
-void ComboBoxCell::handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+void ComboBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
 {
 	// RequestHandler has already called all the handeForm stuff
-	if (_ev == EV_LOAD)
+	const std::string& ev = args[RequestHandler::KEY_EVID];
+	if (ev == EV_LOAD)
 	{
 		Poco::Net::HTTPServerResponse* pResponse = &response;
 		beforeLoad.notify(this, pResponse);
 	}
-	else
+	else if (ev == EV_SELECTED)
 	{
-		handleRequest(request);
+		Formatter::Ptr pForm(getFormatter());
+		if (pForm)
+		{
+			setSelected(pForm->parse(args[FIELD_VAL]));
+		}
+
 		response.send();
 	}
 }

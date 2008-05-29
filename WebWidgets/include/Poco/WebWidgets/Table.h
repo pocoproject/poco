@@ -133,24 +133,9 @@ public:
 	void handleForm(const std::string& field, const std::string& value);
 		/// Handles a form field submitted by the client.
 	
-	void handleRequest(const Poco::Net::HTTPServerRequest& request);
-		/// Handles a complete HTTP request submitted by the client.
-		
-	void handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
-		/// Handles a complete HTTP request submitted by the client. Also takes care of handling the response,
-		/// e.g. if one wants to send back data.
+	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
+		/// Handles a complete AJAX request submitted by the client.
 
-private:
-	void handleValueChanged();
-		///Applies the update to the table
-		
-	void handleCellClicked();
-		///handles cell clicked
-
-	void handleCol(const std::string& val);
-	void handleRow(const std::string& val);
-	void handleVal(const std::string& val);
-	void handleCnt(const std::string& val);
 protected:
 	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates a Table and assigns it the given name.
@@ -167,11 +152,6 @@ protected:
 private:
 	TableModel::Ptr _pModel;
 	TableColumns    _columns;
-	int             _col;
-	int             _row;
-	int             _cnt;
-	std::string     _val;
-	std::string     _ev;
 };
 
 

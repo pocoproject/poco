@@ -161,16 +161,10 @@ public:
 		///
 		/// The default implementation does nothing.
 	
-	virtual void handleRequest(const Poco::Net::HTTPServerRequest& request);
-		/// Handles a complete HTTP request submitted by the client.
+	virtual void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
+		/// Handles a complete AJAX request submitted by the client.
 		///
-		/// The default implementation does nothing.
-		
-	virtual void handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
-		/// Handles a complete HTTP request submitted by the client. Also takes care of handing the response,
-		/// e.g. if one wants to send back data.
-		///
-		/// The default implementation does nothing (except calling handleRequest and response.send()).
+		/// The default implementation does nothing and sends an HTTP Status 200 OK
 
 protected:
 	Cell(View* pOwner, const std::type_info& type);

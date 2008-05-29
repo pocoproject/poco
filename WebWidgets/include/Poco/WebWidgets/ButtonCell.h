@@ -54,6 +54,8 @@ class WebWidgets_API ButtonCell: public Cell
 public:
 	typedef Poco::AutoPtr<ButtonCell> Ptr;
 
+	static const std::string EV_BUTTONCLICKED;
+	
 	Delegate buttonClicked;
 
 	ButtonCell(View* pOwner);

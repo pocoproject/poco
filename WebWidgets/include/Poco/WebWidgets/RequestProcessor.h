@@ -45,7 +45,7 @@
 
 namespace Poco {
 namespace Net {
-	class HTTPServerRequest;
+	class NameValueCollection;
 	class HTTPServerResponse;
 } }
 
@@ -62,12 +62,8 @@ public:
 	virtual void handleForm(const std::string& field, const std::string& value) = 0;
 		/// Handles a form field submitted by the client.
 	
-	virtual void handleRequest(const Poco::Net::HTTPServerRequest& request) = 0;
-		/// Handles a complete HTTP request submitted by the client.
-		
-	virtual void handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) = 0;
-		/// Handles a complete HTTP request submitted by the client. Also takes care of handing the response,
-		/// e.g. if one wants to send back data.
+	virtual void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response) = 0;
+		/// Handles a complete AJAX request submitted by the client.
 
 protected:
 	RequestProcessor();

@@ -175,14 +175,8 @@ void Cell::handleForm(const std::string& field, const std::string& value)
 }
 
 
-void Cell::handleRequest(const Poco::Net::HTTPServerRequest& request)
+void Cell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
 {
-}
-
-
-void Cell::handleRequestAndResponse(const Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
-{
-	handleRequest(request);
 	response.send();
 }
 

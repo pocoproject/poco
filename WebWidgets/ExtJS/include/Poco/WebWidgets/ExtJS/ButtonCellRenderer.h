@@ -47,6 +47,7 @@ namespace Poco {
 namespace WebWidgets {
 
 	class ButtonCell;
+	class Button;
 
 namespace ExtJS {
 
@@ -55,6 +56,8 @@ class ExtJS_API ButtonCellRenderer: public CellRenderer
 	/// ButtonCellRenderer renders a button
 {
 public:
+	static const std::string EV_CLICK;
+	
 	ButtonCellRenderer();
 		/// Creates the ButtonCellRenderer.
 
@@ -71,6 +74,10 @@ public:
 
 	static void renderButton(const ButtonCell* pCell, const std::string& content, bool writeId, bool submitButton, std::ostream& ostr, bool showText = true);
 		/// Renders button properties
+		
+	static void addClickServerCallback(Button* pCombo, const std::string& onSuccess, const std::string& onFailure);
+		/// Adds a server callback for the buttonClicked event. The JS method signature for click is
+		/// click : ( Button this, EventObject e )
 
 protected:
 	virtual ~ButtonCellRenderer();

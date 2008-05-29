@@ -68,7 +68,7 @@ ComboBoxCellRenderer::~ComboBoxCellRenderer()
 void ComboBoxCellRenderer::addSelectedServerCallback(ComboBox* pCombo, const std::string& onSuccess, const std::string& onFailure)
 {
 	//select : ( Ext.form.ComboBox combo, Ext.data.Record record, Number index )
-	static const std::string signature("function(combo,rec, idx)");
+	static const std::string signature("function(combo,rec,idx)");
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+rec.get('d')"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ComboBoxCell::EV_SELECTED));
