@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/ContainerView.h"
+#include "Poco/WebWidgets/JavaScriptEvent.h"
 
 
 namespace Poco {
@@ -53,6 +54,12 @@ class WebWidgets_API Page: public ContainerView
 public:
 	typedef Poco::AutoPtr<Page> Ptr;
 	
+	JavaScriptEvent<Page*> beforeRender; 
+		/// event thrown before GUI rendering. 
+		
+	JavaScriptEvent<Page*> afterRender; 
+		/// event thrown after GUI rendering. 
+		
 	Page();
 		/// Creates an anonymous Page.
 		
@@ -61,6 +68,7 @@ public:
 	
 	// View
 	void setText(const std::string& text);
+	
 	std::string getText() const;
 	
 protected:

@@ -53,6 +53,9 @@ class ExtJS_API PageRenderer: public Poco::WebWidgets::Renderer
 	/// PageRenderer renders an html page
 {
 public:
+	static const std::string EV_BEFORERENDER;
+	static const std::string EV_AFTERRENDER;
+	
 	PageRenderer();
 		/// Creates the PageRenderer.
 

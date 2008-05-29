@@ -47,6 +47,10 @@ namespace WebWidgets {
 namespace ExtJS {
 
 
+const std::string PageRenderer::EV_BEFORERENDER("beforerender");
+const std::string PageRenderer::EV_AFTERRENDER("afterrender");
+
+
 PageRenderer::PageRenderer()
 {
 }
@@ -89,6 +93,19 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		ostr << "Ext.QuickTips.init();";
 		// always nest a panel around, so we can get rid of dynamic casts to check for parent type
 		ostr << "new Ext.Panel({renderTo:'p" << pPage->id() << "',border:false,bodyBorder:false";
+		if (!pPage->beforeRender.jsDelegates().empty() || !pPage->afterRender.jsDelegates().empty())
+		{
+			ostr << ",listeners:{";
+			bool written = Utility::writeJSEvent(ostr, EV_BEFORERENDER, pPage->beforeRender.jsDelegates());
+			JavaScriptEvent<Page*>::JSDelegates js = pPage->afterRender.jsDelegates();
+			js.push_front(jsDelegate("function(){Ext.WindowMgr.each( function(w) {w.show(this);});}"));
+			if (written && !js.empty())
+			{
+				ostr << ",";
+			}
+			Utility::writeJSEvent(ostr, EV_AFTERRENDER, js);
+			ostr << "}";
+		}
 		if (pPage->getHeight() > 0)
 			ostr << ",height:" << pPage->getHeight();
 		else
@@ -113,7 +130,7 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		//close the panel
 		ostr << "]});";
 		//auto-show all windows
-		ostr << "Ext.WindowMgr.each( function(w) {w.show(this);});";
+		//ostr << "Ext.WindowMgr.each( function(w) {w.show(this);});";
 		//close onReady
 		ostr << "});";
 		//close inline JS block
