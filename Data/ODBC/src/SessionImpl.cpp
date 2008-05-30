@@ -85,7 +85,7 @@ void SessionImpl::open()
 	SQLCHAR connectOutput[512] = {0};
 	SQLSMALLINT result;
 
-	if (Utility::isError(SQLDriverConnect(_db
+	if (Utility::isError(Poco::Data::ODBC::SQLDriverConnect(_db
 		, NULL
 		,(SQLCHAR*) _connect.c_str()
 		,(SQLSMALLINT) SQL_NTS
@@ -120,7 +120,7 @@ void SessionImpl::open()
 		&SessionImpl::setMaxFieldSize,
 		&SessionImpl::getMaxFieldSize);
 
-	SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
+	Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
 
 	if (!canTransact()) autoCommit("", true);
 }
@@ -129,7 +129,7 @@ void SessionImpl::open()
 bool SessionImpl::canTransact()
 {
 	SQLUSMALLINT ret;
-	checkError(SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, 0, 0), 
+	checkError(Poco::Data::ODBC::SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, 0, 0), 
 		"Failed to obtain transaction capability info.");
 
 	return (SQL_TC_NONE != ret);
@@ -138,7 +138,7 @@ bool SessionImpl::canTransact()
 
 void SessionImpl::autoCommit(const std::string&, bool val)
 {
-	checkError(SQLSetConnectAttr(_db, 
+	checkError(Poco::Data::ODBC::SQLSetConnectAttr(_db, 
 		SQL_ATTR_AUTOCOMMIT, 
 		val ? (SQLPOINTER) SQL_AUTOCOMMIT_ON : 
 			(SQLPOINTER) SQL_AUTOCOMMIT_OFF, 
@@ -150,7 +150,7 @@ bool SessionImpl::isAutoCommit(const std::string&)
 {
 	Poco::UInt32 value = 0;
 
-	checkError(SQLGetConnectAttr(_db,
+	checkError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
 		SQL_ATTR_AUTOCOMMIT,
 		&value,
 		0,
@@ -164,7 +164,7 @@ bool SessionImpl::isConnected()
 {
 	Poco::UInt32 value = 0;
 
-	if (Utility::isError(SQLGetConnectAttr(_db,
+	if (Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
 		SQL_ATTR_CONNECTION_DEAD,
 		&value,
 		0,
@@ -179,7 +179,7 @@ bool SessionImpl::isTransaction()
 {
 	Poco::UInt32 value = 0;
 
-	checkError(SQLGetConnectAttr(_db,
+	checkError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
 		SQL_ATTR_AUTOCOMMIT,
 		&value,
 		0,
@@ -206,7 +206,7 @@ int SessionImpl::maxStatementLength()
 {
 	SQLUINTEGER info;
 	SQLRETURN rc = 0;
-	if (Utility::isError(rc = SQLGetInfo(_db,
+	if (Utility::isError(rc = Poco::Data::ODBC::SQLGetInfo(_db,
 		SQL_MAXIMUM_STATEMENT_LENGTH,
 		(SQLPOINTER) &info,
 		0,

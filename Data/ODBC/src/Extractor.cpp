@@ -74,7 +74,7 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 
 	std::size_t dataSize = _rPreparation.actualDataSize(pos);
 	char* sp = AnyCast<char*>(_rPreparation[pos]);
-	std::size_t len = strlen(sp);
+	std::size_t len = std::strlen(sp);
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
 	val.assign(sp, dataSize);
@@ -377,7 +377,7 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 
 	do
 	{
-		memset(pChar, 0, CHUNK_SIZE);
+		std::memset(pChar, 0, CHUNK_SIZE);
 		len = 0;
 		rc = SQLGetData(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 
@@ -433,7 +433,7 @@ bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
 
 	do
 	{
-		memset(pChar, 0, CHUNK_SIZE);
+		std::memset(pChar, 0, CHUNK_SIZE);
 		len = 0;
 		rc = SQLGetData(_rStmt, 
 			(SQLUSMALLINT) pos + 1, 

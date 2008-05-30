@@ -467,7 +467,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			SQLLEN lengths[6] = { 0 };
 			fourth = 0;
 			fifth = 0.0f;
-			memset(&sixth, 0, sizeof(sixth));
+			std::memset(&sixth, 0, sizeof(sixth));
 
 			if (SQLExecutor::DE_BOUND == extractMode)
 			{
@@ -594,9 +594,9 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				poco_odbc_check_stmt (rc, hstmt);
 			}
 
-			assert (0 == strncmp(str[0].c_str(), chr[0], str[0].size()));
-			assert (0 == strncmp(str[1].c_str(), chr[1], str[1].size()));
-			assert (0 == strncmp(str[2].c_str(), chr[2], str[2].size()));
+			assert (0 == std::strncmp(str[0].c_str(), chr[0], str[0].size()));
+			assert (0 == std::strncmp(str[1].c_str(), chr[1], str[1].size()));
+			assert (0 == std::strncmp(str[2].c_str(), chr[2], str[2].size()));
 			assert (4 == fourth);
 			assert (1.5 == fifth);
 

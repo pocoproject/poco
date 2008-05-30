@@ -52,7 +52,7 @@ Preparation::Preparation(const StatementHandle& rStmt,
 	_dataExtraction(dataExtraction)
 {
 	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
-	if (Utility::isError(SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
+	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
 		throw StatementException(_rStmt);
 }
 

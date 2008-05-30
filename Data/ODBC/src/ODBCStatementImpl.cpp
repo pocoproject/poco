@@ -181,7 +181,7 @@ void ODBCStatementImpl::doPrepare()
 			Poco::UInt32 limit = getExtractionLimit();
 			if (limit == Limit::LIMIT_UNLIMITED) 
 				throw InvalidArgumentException("Bulk operation not allowed without limit.");
-			checkError(SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) limit, 0),
+			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) limit, 0),
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
 		}
 
@@ -386,7 +386,7 @@ std::string ODBCStatementImpl::nativeSQL()
 	{
 		delete [] pNative;
 		pNative = new char[retlen];
-		memset(pNative, 0, retlen);
+		std::memset(pNative, 0, retlen);
 		length = retlen;
 		if (Utility::isError(SQLNativeSql(_rConnection,
 			(SQLCHAR*) statement.c_str(),

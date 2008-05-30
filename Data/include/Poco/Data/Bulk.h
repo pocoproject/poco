@@ -91,15 +91,14 @@ inline Poco::UInt32 Bulk::size() const
 namespace Keywords {
 
 
-template <typename T>
-inline Bulk bulk(const T& limit)
+inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false))
 	/// Convenience function for creation of bulk.
 {
 	return Bulk(limit);
 }
 
 
-inline void bulk(char)
+inline void bulk()
 	/// Dummy bulk function. Used for bulk binding creation
 	/// (see BulkBinding) and bulk extraction signalling to Statement.
 {
@@ -109,7 +108,7 @@ inline void bulk(char)
 } // namespace Keywords
 
 
-typedef void (*BulkFnType)(char);
+typedef void (*BulkFnType)();
 
 
 } } // namespace Poco::Data

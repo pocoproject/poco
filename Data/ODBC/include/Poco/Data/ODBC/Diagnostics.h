@@ -82,8 +82,8 @@ public:
 	explicit Diagnostics(H& rHandle): _rHandle(rHandle)
 		/// Creates and initializes the Diagnostics.
 	{
-		memset(_connectionName, 0, sizeof(_connectionName));
-		memset(_serverName, 0, sizeof(_serverName));
+		std::memset(_connectionName, 0, sizeof(_connectionName));
+		std::memset(_serverName, 0, sizeof(_serverName));
 		diagnostics();
 	}
 
@@ -192,13 +192,13 @@ public:
 				{
 					std::size_t len = sizeof(_connectionName) > none.length() ? 
 						none.length() : sizeof(_connectionName) - 1;
-					memcpy(_connectionName, none.c_str(), len);
+					std::memcpy(_connectionName, none.c_str(), len);
 				}
 				else if (0 == _connectionName[0]) 
 				{
 					std::size_t len = sizeof(_connectionName) > na.length() ? 
 						na.length() : sizeof(_connectionName) - 1;
-					memcpy(_connectionName, na.c_str(), len);
+					std::memcpy(_connectionName, na.c_str(), len);
 				}
 				
 				if (Utility::isError(SQLGetDiagField(handleType, 
@@ -211,20 +211,20 @@ public:
 				{
 					std::size_t len = sizeof(_serverName) > none.length() ? 
 						none.length() : sizeof(_serverName) - 1;
-					memcpy(_serverName, none.c_str(), len);
+					std::memcpy(_serverName, none.c_str(), len);
 				}
 				else if (0 == _serverName[0]) 
 				{
 					std::size_t len = sizeof(_serverName) > na.length() ? 
 						na.length() : sizeof(_serverName) - 1;
-					memcpy(_serverName, na.c_str(), len);
+					std::memcpy(_serverName, na.c_str(), len);
 				}
 			}
 
 			_fields.push_back(df);
 
-			memset(df._sqlState, 0, SQL_STATE_SIZE);
-			memset(df._message, 0, SQL_MESSAGE_LENGTH);
+			std::memset(df._sqlState, 0, SQL_STATE_SIZE);
+			std::memset(df._message, 0, SQL_MESSAGE_LENGTH);
 			df._nativeError = 0;
 
 			++count;

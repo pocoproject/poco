@@ -403,7 +403,7 @@ void Binder::synchronize()
 		StringMap::iterator it = _strings.begin();
 		StringMap::iterator end = _strings.end();
 		for(; it != end; ++it)
-			it->second->assign(it->first, strlen(it->first));
+			it->second->assign(it->first, std::strlen(it->first));
 	}
 }
 
@@ -519,8 +519,8 @@ void Binder::setParamSetSize(std::size_t length)
 {
 	if (0 == _paramSetSize)
 	{
-		if (Utility::isError(SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, SQL_IS_UINTEGER)) ||  
-			Utility::isError(SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) length, SQL_IS_UINTEGER)))
+		if (Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, SQL_IS_UINTEGER)) ||  
+			Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) length, SQL_IS_UINTEGER)))
 				throw StatementException(_rStmt, "SQLSetStmtAttr()");
 
 		_paramSetSize = static_cast<SQLINTEGER>(length);

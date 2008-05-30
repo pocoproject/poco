@@ -56,7 +56,7 @@ public:
 		LIMIT_UNLIMITED = 0xffffffffu
 	};
 	
-	Limit(Poco::UInt32 value, bool hardLimit, bool isLowerLimit);
+	Limit(Poco::UInt32 value, bool hardLimit = false, bool isLowerLimit = false);
 		/// Creates the Limit. 
 		///
 		/// Value contains the upper row hint, if hardLimit is set to true, the limit acts as a hard

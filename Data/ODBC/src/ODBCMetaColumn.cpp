@@ -58,14 +58,14 @@ ODBCMetaColumn::~ODBCMetaColumn()
 
 void ODBCMetaColumn::getDescription()
 {
-	memset(_columnDesc.name, 0, NAME_BUFFER_LENGTH);
+	std::memset(_columnDesc.name, 0, NAME_BUFFER_LENGTH);
 	_columnDesc.nameBufferLength = 0;
 	_columnDesc.dataType = 0;
 	_columnDesc.size = 0;
 	_columnDesc.decimalDigits = 0;
 	_columnDesc.isNullable = 0;
 
-	if (Utility::isError(SQLDescribeCol(_rStmt, 
+	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt, 
 		(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
 		_columnDesc.name, 
 		NAME_BUFFER_LENGTH,
@@ -84,7 +84,7 @@ void ODBCMetaColumn::init()
 {
 	getDescription();
 
-	if (Utility::isError(SQLColAttribute(_rStmt,
+	if (Utility::isError(Poco::Data::ODBC::SQLColAttribute(_rStmt,
 			(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
 			SQL_DESC_LENGTH,
 			0,

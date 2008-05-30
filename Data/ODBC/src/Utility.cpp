@@ -56,14 +56,14 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	const int length = sizeof(SQLCHAR) * 512;
 
 	SQLCHAR desc[length];
-	memset(desc, 0, length);
+	std::memset(desc, 0, length);
 	SQLSMALLINT len1 = length;
 	SQLCHAR attr[length];
-	memset(attr, 0, length);
+	std::memset(attr, 0, length);
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	while (!Utility::isError(rc = SQLDrivers(henv, 
+	while (!Utility::isError(rc = Poco::Data::ODBC::SQLDrivers(henv, 
 		SQL_FETCH_NEXT,
 		desc,
 		length,
@@ -74,8 +74,8 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	{
 		driverMap.insert(DSNMap::value_type(std::string((char *) desc), 
 			std::string((char *) attr)));
-		memset(desc, 0, length);
-		memset(attr, 0, length);
+		std::memset(desc, 0, length);
+		std::memset(attr, 0, length);
 		len2 = length;
 	}
 
@@ -93,14 +93,14 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 	const int dsnLength = sizeof(SQLCHAR) * (SQL_MAX_DSN_LENGTH + 1);
 
 	SQLCHAR dsn[dsnLength];
-	memset(dsn, 0, dsnLength);
+	std::memset(dsn, 0, dsnLength);
 	SQLSMALLINT len1 = sizeof(SQLCHAR) * SQL_MAX_DSN_LENGTH;
 	SQLCHAR desc[length];
-	memset(desc, 0, length);
+	std::memset(desc, 0, length);
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	while (!Utility::isError(rc = SQLDataSources(henv, 
+	while (!Utility::isError(rc = Poco::Data::ODBC::SQLDataSources(henv, 
 		SQL_FETCH_NEXT,
 		dsn,
 		SQL_MAX_DSN_LENGTH,
@@ -110,8 +110,8 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 		&len2)))
 	{
 		dsnMap.insert(DSNMap::value_type(std::string((char *) dsn), std::string((char *) desc)));
-		memset(dsn, 0, dsnLength);
-		memset(desc, 0, length);
+		std::memset(dsn, 0, dsnLength);
+		std::memset(desc, 0, length);
 		len2 = length;
 	}
 
@@ -125,7 +125,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 {
 	double msec = ts.fraction/1000000;
-	double usec = 1000 * (msec - floor(msec));
+	double usec = 1000 * (msec - std::floor(msec));
 
 	dt.assign(ts.year,
 		ts.month,
@@ -133,8 +133,8 @@ void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 		ts.hour,
 		ts.minute,
 		ts.second,
-		(int) floor(msec),
-		(int) floor(usec));
+		(int) std::floor(msec),
+		(int) std::floor(usec));
 }
 
 
