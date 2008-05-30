@@ -54,16 +54,22 @@ public:
 	typedef Poco::AutoPtr<Panel> Ptr;
 
 	Panel();
-		/// Creates an unnamed Panel.
+		/// Creates an unnamed Panel without a child
 
 	Panel(const std::string& name);
-		/// Creates the Panel.
+		/// Creates the Panel without a child and without a title
+		
+	Panel(const std::string& name, const std::string& title);
+		/// Creates the Panel without a child
 
 	Panel(View::Ptr pChild);
-		/// Creates an unnamed Panel.
+		/// Creates an unnamed Panel with its child
 
 	Panel(const std::string& name, View::Ptr pChild);
-		/// Creates the Panel.
+		/// Creates the Panel with its child
+		
+	Panel(const std::string& name, const std::string& title, View::Ptr pChild);
+		/// Creates the Panel with its child	
 
 	void setChild(View::Ptr pChild);
 		/// Sets the child of the panel
@@ -79,14 +85,36 @@ public:
 		/// Returns modal mode
 
 	View::Ptr findChild(const std::string& name) const;
+	
+	void showCloseIcon(bool val);
+		/// Per default the panel has a close icon in the upper right corner.
+		/// Set val to false to hide it
+		
+	bool hasCloseIcon() const;
+		/// Returns if the closeicon is shown
+		
+	void setText(const std::string& text);
+		/// Sets the title of this View.
+		
+	std::string getText() const;
+		/// Returns the title of this View.
+		
+	void setTitle(const std::string& text);
+		/// Sets the title of this View.
+		
+	const std::string& getTitle() const;
+		/// Returns the title of this View.	
+		
 
 protected:
 	~Panel();
 		/// Destroys the Panel.
 
 private:
-	View::Ptr _pChild;
-	bool      _modal;
+	View::Ptr   _pChild;
+	std::string _title;
+	bool        _modal;
+	bool        _showCloseIcon;
 };
 
 
@@ -109,6 +137,42 @@ inline void Panel::setModal(bool val)
 inline bool Panel::getModal() const
 {
 	return _modal;
+}
+
+
+inline void Panel::showCloseIcon(bool val)
+{
+	_showCloseIcon = val;
+}
+
+		
+inline bool Panel::hasCloseIcon() const
+{
+	return _showCloseIcon;
+}
+
+
+inline void Panel::setText(const std::string& text)
+{
+	setTitle(text);
+}
+
+		
+inline std::string Panel::getText() const
+{
+	return getTitle();
+}
+
+
+inline void Panel::setTitle(const std::string& text)
+{
+	_title = text;
+}
+
+		
+inline const std::string& Panel::getTitle() const
+{
+	return _title;
 }
 
 

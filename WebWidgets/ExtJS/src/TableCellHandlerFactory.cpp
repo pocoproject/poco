@@ -86,7 +86,7 @@ TableCellHandlerFactory::TableCellHandlerFactory()
 		registerFactory(typeid(ImageButtonCell), pHandle);
 	}
 	{
-		TableCellHandler<DateFieldCell>::Ptr pHandle(new TableCellHandler<DateFieldCell>(true, false));
+		TableCellHandler<DateFieldCell>::Ptr pHandle(new TableCellHandler<DateFieldCell>(true, true));
 		registerFactory(typeid(DateFieldCell), pHandle);
 	}
 }

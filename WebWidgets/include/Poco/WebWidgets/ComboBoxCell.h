@@ -78,6 +78,17 @@ public:
 
 	std::vector<Any>::iterator end();
 		/// Iterator to all elements
+		
+	template <typename T>	
+	void setElements(const std::vector<T>& elems)
+		/// Initializes the combo box cell with the provided elements
+	{
+		std::vector<Any> result;
+		typename std::vector<T>::const_iterator it = elems.begin();
+		for (; it != elems.end(); ++it)
+			result.push_back(*it);
+		setElements(result);
+	}	
 
 	void setElements(const std::vector<Any>& elems);
 		/// Initializes the combo box with the provided elements

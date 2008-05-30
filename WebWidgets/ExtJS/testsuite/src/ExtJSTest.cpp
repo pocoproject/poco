@@ -1319,32 +1319,63 @@ void ExtJSTest::testTableImageButton()
 void ExtJSTest::testJSEvent()
 {
 	Button::Ptr pBut(new Button());
-	pBut->buttonClicked.add(jsDelegate("someFunction(obj)"));
-	pBut->buttonClicked.add(jsDelegate("function(obj){alert('Click');}"));
+	pBut->buttonClicked.add(jsDelegate("someFunction")); 
+	pBut->buttonClicked.add(jsDelegate("someFunction2(obj)")); 
+	pBut->buttonClicked.add(jsDelegate("hello(obj){alert('Click');}")); //hello must get renamed to function
 	std::ostringstream out;
 	Utility::writeJSEvent(out, "clicked", pBut->buttonClicked.jsDelegates());
 	std::string result(out.str());
 	static const std::string expected("'clicked':"
 										"{"
-											"fn:function(obj){"
+											"fn:function(p1){"
 												"var all={"
-													"d0:function(obj){"
+													"d0:someFunction,"
+													"d1:someFunction2,"
+													"d2:function(obj){"
 														"alert('Click');"
 														"},"
-													"d1:function(obj){"
-														"someFunction(obj);"
-														"},"
-													"invoke:function(obj){"
-														"this.d0(obj);"
-														"this.d1(obj);"
+													"invoke:function(p1){"
+														"this.d0(p1);"
+														"this.d1(p1);"
+														"this.d2(p1);"
 														"}"
 													"};"
-												"all.invoke(obj);"
+												"all.invoke(p1);"
 											"}"
 										"}");
 	assert (result == expected);
 }
 
+
+void ExtJSTest::testJSEvent2()
+{
+	Button::Ptr pBut(new Button());
+	pBut->buttonClicked.add(jsDelegate("someFunction")); 
+	pBut->buttonClicked.add(jsDelegate("someFunction2(obj,o2)")); 
+	pBut->buttonClicked.add(jsDelegate("hello(obj){alert('Click');}")); //hello must get renamed to function
+	std::ostringstream out;
+	Utility::writeJSEvent(out, "clicked", pBut->buttonClicked.jsDelegates());
+	std::string result(out.str());
+	static const std::string expected("'clicked':"
+										"{"
+											"fn:function(p2,p1){"
+												"var all={"
+													"d0:someFunction,"
+													"d1:someFunction2,"
+													"d2:function(obj){"
+														"alert('Click');"
+														"},"
+													"invoke:function(p2,p1){"
+														"this.d0(p2,p1);"
+														"this.d1(p2,p1);"
+														"this.d2(p2,p1);"
+														"}"
+													"};"
+												"all.invoke(p2,p1);"
+											"}"
+										"}");
+	assert (result == expected);
+}
 
 void ExtJSTest::setUp()
 {
@@ -1397,6 +1428,7 @@ CppUnit::Test* ExtJSTest::suite()
 	CppUnit_addTest(pSuite, ExtJSTest, testTableButton);
 	CppUnit_addTest(pSuite, ExtJSTest, testTableImageButton);
 	CppUnit_addTest(pSuite, ExtJSTest, testJSEvent);
+	CppUnit_addTest(pSuite, ExtJSTest, testJSEvent2);
 
 	return pSuite;
 }

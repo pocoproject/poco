@@ -92,6 +92,7 @@
 #include "Poco/WebWidgets/RequestHandler.h"
 
 #include "Poco/String.h"
+#include "Poco/StringTokenizer.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include <sstream>
@@ -412,16 +413,40 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 		invoke << "invoke:" << fct <<"{";
 		std::list<JSDelegate>::const_iterator it = delegates.begin();
 		int cnt(0);
-		for (; it != delegates.end(); ++it)
+		for (; it != delegates.end(); ++it, ++cnt)
 		{
-			std::string fctName("d");
-			fctName.append(Poco::NumberFormatter::format(cnt));
-			if (cnt > 0)
+			std::string myFctName("d");
+			myFctName.append(Poco::NumberFormatter::format(cnt));
+			out << myFctName << ":";
+			
+			std::string fctName;
+			std::vector<std::string> params;
+			std::string code;
+			analyzeFunction(*it, fctName, params, code);
+			if (fctName == "function")
 			{
-				out << ",";
+				// an inline definition, we must have code
+				if (!code.empty())
+				{
+					writeFunction(out, fctName, params, code);
+				}
 			}
-			out << fctName << ":" << it->jsCode() << ","; //always write comma because invoke is written as the last method
-			invoke << "this." << createFunctionSignature(fctName, maxParams) << ";";
+			else
+			{
+				if (code.empty())
+				{
+					// a reference to another js function
+					//maybe the user defined params too -> ignore them
+					out << fctName;
+				}
+				else
+				{
+					// we have code, so rename the function to function :-)
+					writeFunction(out, "function", params, code);
+				}
+			}
+			out << ","; //always write comma because invoke is written as the last method
+			invoke << "this." << createFunctionSignature(myFctName, maxParams) << ";";
 		}
 		
 		invoke << "}";
@@ -436,6 +461,27 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 }
 
 
+void Utility::writeFunction(std::ostream& out, const std::string& fctName, const std::vector<std::string> &params, const std::string& code)
+{
+	out << fctName << "(";
+	std::vector<std::string>::const_iterator it = params.begin();
+	for (; it != params.end(); ++it)
+	{
+		if (it != params.begin())
+			out << ",";
+		out << *it;
+	}
+	out << ")";
+	bool openWritten = false;
+	if (code.find('{') != 0)
+	{
+		out << "{";
+		openWritten = true;
+	}
+	out << code;
+	if (openWritten)
+		out << "}";
+}
 
 
 std::string Utility::createURI(const std::map<std::string, std::string>& addParams, Renderable::ID id)
@@ -526,37 +572,53 @@ int Utility::detectMaxParamCount(const std::list<JSDelegate>& delegates)
 	for (; it != delegates.end(); ++it)
 	{
 		//count all , between ()
+		
 		int tmpCnt(0);
-		const std::string& code = it->jsCode();
-		std::string::size_type pos = code.find('(');
-		if (pos != std::string::npos)
-		{
-			++pos; //skip (
-			skipWhiteSpace(code, pos);
-			bool stop = false;
-			while(!stop && pos < code.size())
-			{
-				if (code[pos] == ')')
-					stop = true;
-				else if (code[pos] == ',')
-					++tmpCnt;
-				++pos;
-			}
-		}
+		std::string tmp;
+		std::string tmp2;
+		std::vector<std::string> params;
+		analyzeFunction(*it, tmp, params, tmp2);
+		tmpCnt = (int)params.size();
 		if (tmpCnt > cnt)
 			cnt = tmpCnt;
 	}
-	if (cnt > 0) // we counted ','
-		++cnt; // we want var count
+	
 	return cnt;
 }
 
 
-void Utility::skipWhiteSpace(const std::string& code, std::string::size_type& pos)
+void Utility::analyzeFunction(const JSDelegate& delegate, std::string& fctName, std::vector<std::string>& paramNames, std::string& code)
 {
-	while (pos < code.size() && std::isspace(code[pos]))
+	// 3 cases:
+	//	function(...){...}
+	//  myname(....) {}
+	// myname  //external call
+	const std::string& jsCode = delegate.jsCode();
+	fctName.clear();
+	paramNames.clear();
+	code.clear();
+		
+	std::string::size_type pos = jsCode.find(')');
+	std::string fctHeader = jsCode.substr(0, pos);
+	if (pos != std::string::npos)
+	{
 		++pos;
+		code = jsCode.substr(pos);
+		Poco::trimInPlace(code);
+	}
+		
+	Poco::StringTokenizer tok(fctHeader, "(,", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	if (tok.count() > 0)
+	{
+		
+		Poco::StringTokenizer::Iterator it = tok.begin();
+		fctName = *it;
+		++it;
+		for (; it != tok.end(); ++it)
+			paramNames.push_back(*it);
+	}
 }
+
 
 
 std::string Utility::createFunctionSignature(int paramCnt)

@@ -87,7 +87,6 @@ void ComboBoxCell::handleForm(const std::string& field, const std::string& value
 
 void ComboBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
 {
-	// RequestHandler has already called all the handeForm stuff
 	const std::string& ev = args[RequestHandler::KEY_EVID];
 	if (ev == EV_LOAD)
 	{

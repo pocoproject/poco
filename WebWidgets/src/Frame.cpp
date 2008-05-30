@@ -43,21 +43,32 @@ namespace WebWidgets {
 
 Frame::Frame():
 	View(typeid(Frame)),
-	_pChild()
+	_pChild(),
+	_title()
 {
 }
 
 
 Frame::Frame(const std::string& name):
 	View(name, typeid(Frame)),
-	_pChild()
+	_pChild(),
+	_title()
+{
+}
+
+
+Frame::Frame(const std::string& name, const std::string& title):
+	View(name, typeid(Frame)),
+	_pChild(),
+	_title(title)
 {
 }
 
 
 Frame::Frame(View::Ptr pChild):
 	View(typeid(Frame)),
-	_pChild()
+	_pChild(),
+	_title()
 {
 	setChild(pChild);
 }
@@ -65,7 +76,17 @@ Frame::Frame(View::Ptr pChild):
 
 Frame::Frame(const std::string& name, View::Ptr pChild):
 	View(name, typeid(Frame)),
-	_pChild()
+	_pChild(),
+	_title()
+{
+	setChild(pChild);
+}
+
+
+Frame::Frame(const std::string& name, const std::string& title, View::Ptr pChild):
+	View(name, typeid(Frame)),
+	_pChild(),
+	_title(title)
 {
 	setChild(pChild);
 }
@@ -73,21 +94,24 @@ Frame::Frame(const std::string& name, View::Ptr pChild):
 
 Frame::Frame(const std::type_info& type):
 	View(type),
-	_pChild()
+	_pChild(),
+	_title()
 {
 }
 
 
 Frame::Frame(const std::string& name, const std::type_info& type):
 	View(name, type),
-	_pChild()
+	_pChild(),
+	_title()
 {
 }
 
 
 Frame::Frame(View::Ptr pChild, const std::type_info& type):
 	View(type),
-	_pChild()
+	_pChild(),
+	_title()
 {
 	setChild(pChild);
 }
@@ -95,7 +119,8 @@ Frame::Frame(View::Ptr pChild, const std::type_info& type):
 
 Frame::Frame(const std::string& name, View::Ptr pChild, const std::type_info& type):
 	View(name, typeid(Frame)),
-	_pChild()
+	_pChild(),
+	_title()
 {
 	setChild(pChild);
 }

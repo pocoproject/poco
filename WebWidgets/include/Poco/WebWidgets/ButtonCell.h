@@ -63,6 +63,8 @@ public:
 
 	// Cell
 	void handleForm(const std::string& field, const std::string& value);
+	
+	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
 
 protected:
 	~ButtonCell();

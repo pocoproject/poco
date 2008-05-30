@@ -81,7 +81,9 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::ComboBoxCell));
 	ComboBoxCell* pCell = const_cast<ComboBoxCell*>(static_cast<const Poco::WebWidgets::ComboBoxCell*>(pRenderable));
-	ComboBox* pOwner = dynamic_cast<ComboBox*>(pCell->getOwner());
+	//two scenarios: owner is either a ComboBox or a TableColumn!
+	View* pOwner = pCell->getOwner();
+	ComboBox* pComboOwner = dynamic_cast<ComboBox*>(pOwner);
 	poco_check_ptr (pOwner);
 	ostr << "new Ext.form.ComboBox({";
 
@@ -98,10 +100,10 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	
 	std::string tooltip (pCell->getToolTip());
 		
-	if (!pOwner->selected.jsDelegates().empty())
+	if (pComboOwner && !pComboOwner->selected.jsDelegates().empty())
 	{
 		ostr << ",listeners:{";
-		Utility::writeJSEvent(ostr, EV_SELECTED, pOwner->selected.jsDelegates());
+		Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected.jsDelegates());
 		if (!tooltip.empty())
 			ostr << ",render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}";
 		ostr << "}";

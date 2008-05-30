@@ -64,13 +64,15 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 
 	Utility::writeRenderableProperties(pRenderable, ostr);
 	if (!pPanel->getName().empty())
-		ostr << ",title:'" << pPanel->getName() << "'";
+		ostr << ",title:'" << pPanel->getTitle() << "'";
 	if (pPanel->getWidth() > 0)
 		ostr << ",width:" << pPanel->getWidth();
 	if (pPanel->getHeight() > 0)
 		ostr << ",height:" << pPanel->getHeight();
 	if (pPanel->getModal())
 		ostr << ",modal:true";
+	if (!pPanel->hasCloseIcon())
+		ostr << ",closable:false";	
 
 	// minimizable set to true only fires a minimize event, without an event handler attached
 	// it is pretty useless, instead use collapsible

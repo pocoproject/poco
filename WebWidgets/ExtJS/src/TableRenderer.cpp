@@ -97,7 +97,11 @@ void TableRenderer::addCellValueChangedServerCallback(Table* pTable, const std::
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(Table::FIELD_COL, "+obj.column"));
 	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
-	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.value"));
+	//problem: I need the displayed string from teh renderer, not the value!
+	// date fields cause problems here, and I only habe one cellclick event per table not per column!
+	// from the tabel get the TableCOlumn, from thsi get the renderer for the given col and render obj.value
+	// {(var r=obj.grid.getColumnModel().getRenderer(obj.col))?r(obj.value);:obj.value;} hm, no working
+	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.value")); 
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLVALUECHANGED));
 	Utility::addServerCallback(pTable->cellValueChanged, signature, addParams, pTable->id(), onSuccess, onFailure);
 	pTable->cellValueChanged.add(jsDelegate("function(obj){obj.grid.getStore().commitChanges();}"));
@@ -207,12 +211,12 @@ void TableRenderer::renderColumn(const Table* pTable, const TableColumn& tc, int
 			ostr << ",editor:";
 			tc.getCell()->renderHead(context, ostr);
 		}
+	
 		if (pHandler->useRenderer())
 		{
 			ostr << ",renderer:";
 			pHandler->writeDynamicData(ostr);
 		}
-		
 	}
 
 	ostr << "}";
@@ -244,7 +248,14 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	{
 		if (i != 0)
 			ostr << ",";
-		ostr << "{name:'" << i << "'}";
+		if ((*it)->getCell()->type() == typeid(Poco::WebWidgets::DateFieldCell))
+		{
+			Poco::WebWidgets::DateFieldCell::Ptr pDf = (*it)->getCell().cast<Poco::WebWidgets::DateFieldCell>();
+			
+			ostr << "{name:'" << i << "',type:'date',dateFormat:'" << Utility::convertPocoDateToPHPDate(pDf->getFormat()) << "'}";
+		}
+		else
+			ostr << "{name:'" << i << "'}";
 	}
 	ostr << ",{name:'" << i << "'}";
 	ostr << "],"; // close fields

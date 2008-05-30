@@ -59,12 +59,18 @@ public:
 
 	Frame(const std::string& name);
 		/// Creates the Frame.
+		
+	Frame(const std::string& name, const std::string& title);
+		/// Creates the Frame.
 
 	Frame(View::Ptr pChild);
 		/// Creates an unnamed Frame.
 
 	Frame(const std::string& name, View::Ptr pChild);
 		/// Creates the Frame.
+		
+	Frame(const std::string& name, const std::string& title, View::Ptr pChild);
+		/// Creates the Frame.	
 
 	void setChild(View::Ptr pChild);
 		/// Sets the child of the panel

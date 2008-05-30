@@ -82,6 +82,7 @@ public:
 	void testTableButton();
 	void testTableImageButton();
 	void testJSEvent();
+	void testJSEvent2();
 	void setUp();
 	void tearDown();
 

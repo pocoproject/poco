@@ -44,7 +44,9 @@ namespace WebWidgets {
 Panel::Panel():
 	View(typeid(Panel)),
 	_pChild(),
-	_modal(false)
+	_title(),
+	_modal(false),
+	_showCloseIcon(true)
 {
 }
 
@@ -52,7 +54,19 @@ Panel::Panel():
 Panel::Panel(const std::string& name):
 	View(name, typeid(Panel)),
 	_pChild(),
-	_modal(false)
+	_title(),
+	_modal(false),
+	_showCloseIcon(true)
+{
+}
+
+
+Panel::Panel(const std::string& name, const std::string& title):
+	View(name, typeid(Panel)),
+	_pChild(),
+	_title(title),
+	_modal(false),
+	_showCloseIcon(true)
 {
 }
 
@@ -60,7 +74,9 @@ Panel::Panel(const std::string& name):
 Panel::Panel(View::Ptr pChild):
 	View(typeid(Panel)),
 	_pChild(),
-	_modal(false)
+	_title(),
+	_modal(false),
+	_showCloseIcon(true)
 {
 	setChild(pChild);
 }
@@ -69,7 +85,20 @@ Panel::Panel(View::Ptr pChild):
 Panel::Panel(const std::string& name, View::Ptr pChild):
 	View(name, typeid(Panel)),
 	_pChild(),
-	_modal(false)
+	_title(),
+	_modal(false),
+	_showCloseIcon(true)
+{
+	setChild(pChild);
+}
+
+
+Panel::Panel(const std::string& name, const std::string& title, View::Ptr pChild):
+	View(name, typeid(Panel)),
+	_pChild(),
+	_title(title),
+	_modal(false),
+	_showCloseIcon(true)
 {
 	setChild(pChild);
 }

@@ -36,6 +36,8 @@
 
 #include "Poco/WebWidgets/ButtonCell.h"
 #include "Poco/WebWidgets/Button.h"
+#include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/Net/HTTPServerResponse.h"
 
 
 namespace Poco {
@@ -65,6 +67,18 @@ ButtonCell::~ButtonCell()
 void ButtonCell::handleForm(const std::string& field, const std::string& value)
 {
 	buttonClicked(this);
+}
+
+
+void ButtonCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
+{
+	const std::string& ev = args[RequestHandler::KEY_EVID];
+	if (ev == EV_BUTTONCLICKED)
+	{
+		buttonClicked(this);
+	}
+	
+	response.send();
 }
 
 

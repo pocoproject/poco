@@ -144,12 +144,15 @@ private:
 	static LookAndFeel::Ptr createDefault();
 	static int detectMaxParamCount(const std::list<JSDelegate>& delegates);
 	
-	static void skipWhiteSpace(const std::string& code, std::string::size_type& pos);
+	static void analyzeFunction(const JSDelegate& delegate, std::string& fctName, std::vector<std::string>& paramNames, std::string& code);
+		// Code contains { ... }
+	
 	static std::string createFunctionSignature(int paramCnt);
 		/// Creates an anonmyous JS function with the given param count
 		
 	static std::string createFunctionSignature(const std::string& fctName, int paramCnt);
 
+	static void writeFunction(std::ostream& out, const std::string& fctName, const std::vector<std::string> &params, const std::string& code);
 private:
 	Utility();
 	~Utility();
