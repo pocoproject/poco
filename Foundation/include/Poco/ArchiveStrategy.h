@@ -44,6 +44,7 @@
 #include "Poco/LogFile.h"
 #include "Poco/File.h"
 #include "Poco/DateTimeFormatter.h"
+#include "Poco/NumberFormatter.h"
 
 
 namespace Poco {
@@ -98,7 +99,7 @@ public:
 
 template <class DT>
 class ArchiveByTimestampStrategy: public ArchiveStrategy
-	/// A timestamp (YYYYMMDDhhmmss) is appended to archived
+	/// A timestamp (YYYYMMDDhhmmssiii) is appended to archived
 	/// log files.
 {
 public:
@@ -111,15 +112,55 @@ public:
 	}
 	
 	LogFile* archive(LogFile* pFile)
+		/// Archives the file by appending the current timestamp to the
+		/// file name. If the new file name exists, additionally a monotonic
+		/// increasing number is appended to the log file name.
 	{
 		std::string path = pFile->path();
 		delete pFile;
 		std::string archPath = path;
 		archPath.append(".");
-		archPath.append(DateTimeFormatter::format(DT().timestamp(), "%Y%m%d%H%M%S"));
-		moveFile(path, archPath);
+		archPath.append(DateTimeFormatter::format(DT().timestamp(), "%Y%m%d%H%M%S%i"));
+		
+		if (exists(archPath)) archiveByNumber(archPath);
+		else moveFile(path, archPath);
+
 		return new LogFile(path);
 	}
+
+private:
+
+	void archiveByNumber(const std::string& basePath)
+		/// A monotonic increasing number is appended to the
+		/// log file name. The most recent archived file
+		/// always has the number zero.
+	{
+		int n = -1;
+		std::string path;
+		do
+		{
+			path = basePath;
+			path.append(".");
+			path.append(NumberFormatter::format(++n));
+		}
+		while (exists(path));
+		
+		while (n >= 0)
+		{
+			std::string oldPath = basePath;
+			if (n > 0)
+			{
+				oldPath.append(".");
+				oldPath.append(NumberFormatter::format(n - 1));
+			}
+			std::string newPath = basePath;
+			newPath.append(".");
+			newPath.append(NumberFormatter::format(n));
+			moveFile(oldPath, newPath);
+			--n;
+		}
+	}
+
 };
 
 
