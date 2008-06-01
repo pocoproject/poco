@@ -1067,15 +1067,12 @@ void DataTest::testDateAndTime()
 	assert (dt.hour() == t.hour());
 	assert (dt.minute() == t.minute());
 	assert (dt.second() == t.second());
-
+	
 	Date d1(2007, 6, 15);
 	d1.assign(d.year() - 1, d.month(), d.day());
 	assert (d1 < d); assert (d1 != d);
-	if (d.month() > 1)
-		d1.assign(d.year(), d.month() - 1, d.day());
-	else
-		d1.assign(d.year() - 1, 12, d.day());
-	
+
+	d1.assign(d.year() - 1, 12, d.day());
 	assert (d1 < d); assert (d1 != d);
 
 	if (d.day() > 1)
@@ -1087,10 +1084,7 @@ void DataTest::testDateAndTime()
 	d1.assign(d.year() + 1, d.month(), d.day());
 	assert (d1 > d); assert (d1 != d);
 	
-	if (d.month() < 12)
-		d1.assign(d.year(), d.month() + 1, d.day());
-	else
-		d1.assign(d.year() + 1, 1, d.day());
+	d1.assign(d.year() + 1, 1, d.day());
 	assert (d1 > d); assert (d1 != d);
 
 	if (d.day() < dt.daysOfMonth(dt.year(), dt.month()))

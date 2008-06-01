@@ -40,6 +40,7 @@
 #define Data_Bulk_INCLUDED
 
 
+#include "Poco/Void.h"
 #include "Poco/Data/Limit.h"
 
 
@@ -98,7 +99,7 @@ inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false
 }
 
 
-inline void bulk()
+inline void bulk(Void)
 	/// Dummy bulk function. Used for bulk binding creation
 	/// (see BulkBinding) and bulk extraction signalling to Statement.
 {
@@ -108,7 +109,7 @@ inline void bulk()
 } // namespace Keywords
 
 
-typedef void (*BulkFnType)();
+typedef void (*BulkFnType)(Void);
 
 
 } } // namespace Poco::Data
