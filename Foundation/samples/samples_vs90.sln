@@ -20,6 +20,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grep", "grep\grep_vs90.vcpr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Logger", "Logger\Logger_vs90.vcproj", "{E7CE21A7-3D50-485E-9B68-E1BEC97ED2E3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LogRotation", "LogRotation\LogRotation_vs90.vcproj", "{748FFA39-8C89-4968-9CF3-54A28A364F27}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NotificationQueue", "NotificationQueue\NotificationQueue_vs90.vcproj", "{DB9948BB-A40E-4010-8E5E-DDCDFC1B8EFD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dir", "dir\dir_vs90.vcproj", "{AA18CF6F-3B7F-4A92-9464-4DC07A758E2C}"
@@ -124,6 +126,14 @@ Global
 		{E7CE21A7-3D50-485E-9B68-E1BEC97ED2E3}.release_shared|Win32.Build.0 = release_shared|Win32
 		{E7CE21A7-3D50-485E-9B68-E1BEC97ED2E3}.release_static|Win32.ActiveCfg = release_static|Win32
 		{E7CE21A7-3D50-485E-9B68-E1BEC97ED2E3}.release_static|Win32.Build.0 = release_static|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_static|Win32.ActiveCfg = debug_static|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_static|Win32.Build.0 = debug_static|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_shared|Win32.Build.0 = release_shared|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_static|Win32.ActiveCfg = release_static|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_static|Win32.Build.0 = release_static|Win32
 		{DB9948BB-A40E-4010-8E5E-DDCDFC1B8EFD}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
 		{DB9948BB-A40E-4010-8E5E-DDCDFC1B8EFD}.debug_shared|Win32.Build.0 = debug_shared|Win32
 		{DB9948BB-A40E-4010-8E5E-DDCDFC1B8EFD}.debug_static|Win32.ActiveCfg = debug_static|Win32

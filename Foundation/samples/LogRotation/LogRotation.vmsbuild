@@ -1,0 +1,8 @@
+#
+# sample.vmsbuild
+#
+# $Id: //poco/svn/Foundation/samples/LogRotation/LogRotation.vmsbuild#1 $
+#
+EXE=Logrotation
+LogRotation
+<SourceFilesHere>

@@ -19,6 +19,7 @@ projects:
 	$(MAKE) -C inflate $(MAKECMDGOALS)
 	$(MAKE) -C DateTime $(MAKECMDGOALS)
 	$(MAKE) -C Logger $(MAKECMDGOALS)
+	$(MAKE) -C LogRotation $(MAKECMDGOALS)
 	$(MAKE) -C grep $(MAKECMDGOALS)
 	$(MAKE) -C dir $(MAKECMDGOALS)
 	$(MAKE) -C md5 $(MAKECMDGOALS)
