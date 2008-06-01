@@ -51,6 +51,7 @@ public:
 	void testBugcheck();
 	void testFPE();
 	void testEnvironment();
+	void testBuffer();
 
 	void setUp();
 	void tearDown();

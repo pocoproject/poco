@@ -37,13 +37,17 @@
 #include "Poco/Exception.h"
 #include "Poco/Environment.h"
 #include "Poco/Thread.h"
+#include "Poco/Buffer.h"
 #include <iostream>
+#include <vector>
+#include <memory.h>
 
 
 using Poco::Bugcheck;
 using Poco::Exception;
 using Poco::Environment;
 using Poco::Thread;
+using Poco::Buffer;
 
 
 //
@@ -142,6 +146,27 @@ void CoreTest::testEnvironment()
 }
 
 
+void CoreTest::testBuffer()
+{
+	std::size_t s = 10;
+	Buffer<int> b(s);
+	std::vector<int> v;
+	for (int i = 0; i < s; ++i)
+		v.push_back(i);
+
+	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+
+	assert (s == b.size());
+	for (int i = 0; i < s; ++i)
+		assert (b[i] == i);
+
+#if ENABLE_BUGCHECK_TEST
+	try { int i = b[s]; fail ("must fail"); }
+	catch (Exception&) { }
+#endif
+}
+
+
 void CoreTest::setUp()
 {
 }
@@ -160,6 +185,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testFixedLength);
 	CppUnit_addTest(pSuite, CoreTest, testBugcheck);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
+	CppUnit_addTest(pSuite, CoreTest, testBuffer);
 
 	return pSuite;
 }

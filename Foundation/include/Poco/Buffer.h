@@ -102,14 +102,14 @@ public:
 	
 	T& operator [] (std::size_t index)
 	{
-		poco_assert (index >= 0 && index < _size);
+		poco_assert (index < _size);
 		
 		return _ptr[index];
 	}
 
 	const T& operator [] (std::size_t index) const
 	{
-		poco_assert (index >= 0 && index < _size);
+		poco_assert (index < _size);
 		
 		return _ptr[index];
 	}

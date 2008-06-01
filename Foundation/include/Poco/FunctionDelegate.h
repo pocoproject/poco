@@ -49,7 +49,7 @@ namespace Poco {
 
 template <class TArgs, bool hasSender = true, bool senderIsConst = true> 
 class FunctionDelegate: public AbstractDelegate<TArgs>
-	/// Wraps a C style function (or a C++ static fucntion) to be used as
+	/// Wraps a C style function (or a C++ static function) to be used as
 	/// a delegate
 {
 public:
