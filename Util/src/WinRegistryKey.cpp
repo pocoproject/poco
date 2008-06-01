@@ -365,7 +365,7 @@ std::string WinRegistryKey::key() const
 
 std::string WinRegistryKey::key(const std::string& valueName) const
 {
-	std::string& result = key();
+	std::string result = key();
 	if (!valueName.empty())
 	{
 		result += '\\';
