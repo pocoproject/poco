@@ -112,14 +112,23 @@ void ODBCColumn::init()
 	case SQL_SMALLINT:
 		setType(MetaColumn::FDT_INT16); break;
 	case SQL_INTEGER:
-	case SQL_DECIMAL:
 		setType(MetaColumn::FDT_INT32); break;
 	case SQL_BIGINT:
 		setType(MetaColumn::FDT_INT64); break;
-	case SQL_NUMERIC:
+	
 	case SQL_DOUBLE:
 	case SQL_FLOAT:
 		setType(MetaColumn::FDT_DOUBLE); break;
+	
+	case SQL_NUMERIC:
+	case SQL_DECIMAL:
+		if (0 == _columnDesc.decimalDigits)
+			setType(MetaColumn::FDT_INT32);
+		else
+			setType(MetaColumn::FDT_DOUBLE);
+		
+		break;
+	
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
 	case SQL_BINARY:
