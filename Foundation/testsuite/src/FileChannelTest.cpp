@@ -363,7 +363,7 @@ void FileChannelTest::testCompress()
 }
 
 
-void FileChannelTest::testPurgeAge()
+void FileChannelTest::purgeAge(const std::string& pa)
 {
 	std::string name = filename();
 	try
@@ -371,7 +371,7 @@ void FileChannelTest::testPurgeAge()
 		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
 		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
-		pChannel->setProperty(FileChannel::PROP_PURGEAGE, "5 seconds");
+		pChannel->setProperty(FileChannel::PROP_PURGEAGE, pa);
 		pChannel->open();
 		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
 		for (int i = 0; i < 200; ++i)
@@ -402,7 +402,7 @@ void FileChannelTest::testPurgeAge()
 }
 
 
-void FileChannelTest::testPurgeCount()
+void FileChannelTest::noPurgeAge(const std::string& npa)
 {
 	std::string name = filename();
 	try
@@ -410,7 +410,54 @@ void FileChannelTest::testPurgeCount()
 		AutoPtr<FileChannel> pChannel = new FileChannel(name);
 		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
 		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
-		pChannel->setProperty(FileChannel::PROP_PURGECOUNT, "2");
+		pChannel->setProperty(FileChannel::PROP_PURGEAGE, npa);
+		pChannel->open();
+		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+		for (int i = 0; i < 200; ++i)
+		{
+			pChannel->log(msg);
+		}
+		File f0(name + ".0");
+		assert (f0.exists());
+		File f1(name + ".1");
+		assert (f1.exists());
+		File f2(name + ".2");
+		assert (f2.exists());
+		
+		Thread::sleep(5000);
+		for (int i = 0; i < 50; ++i)
+		{
+			pChannel->log(msg);
+		}
+		
+		assert (f2.exists());
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
+void FileChannelTest::testPurgeAge()
+{
+	purgeAge("5 seconds");
+	noPurgeAge("0 seconds");
+	noPurgeAge("");
+}
+
+
+void FileChannelTest::purgeCount(const std::string& pc)
+{
+	std::string name = filename();
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
+		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
+		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
+		pChannel->setProperty(FileChannel::PROP_PURGECOUNT, pc);
 		pChannel->open();
 		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
 		for (int i = 0; i < 200; ++i)
@@ -431,6 +478,46 @@ void FileChannelTest::testPurgeCount()
 		throw;
 	}
 	remove(name);
+}
+
+
+void FileChannelTest::noPurgeCount(const std::string& npc)
+{
+	std::string name = filename();
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
+		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
+		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
+		pChannel->setProperty(FileChannel::PROP_PURGECOUNT, npc);
+		pChannel->open();
+		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+		for (int i = 0; i < 200; ++i)
+		{
+			pChannel->log(msg);
+			Thread::sleep(50);
+		}
+		File f0(name + ".0");
+		assert (f0.exists());
+		File f1(name + ".1");
+		assert (f1.exists());
+		File f2(name + ".2");
+		assert (f2.exists());
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
+void FileChannelTest::testPurgeCount()
+{
+	purgeCount("2");
+	noPurgeCount("");
+	noPurgeCount("0");
 }
 
 

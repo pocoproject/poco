@@ -296,6 +296,14 @@ void FileChannel::setCompress(const std::string& compress)
 
 void FileChannel::setPurgeAge(const std::string& age)
 {
+	if (age.empty())
+	{
+		delete _pPurgeStrategy;
+		_pPurgeStrategy = 0;
+		_purgeAge.clear();
+		return;
+	}
+
 	std::string::const_iterator it  = age.begin();
 	std::string::const_iterator end = age.end();
 	int n = 0;
@@ -320,7 +328,12 @@ void FileChannel::setPurgeAge(const std::string& age)
 		throw InvalidArgumentException("purgeAge", age);
 		
 	delete _pPurgeStrategy;
-	_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
+	
+	if (0 == n || age.empty())
+		_pPurgeStrategy = 0;
+	else
+		_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
+
 	_purgeAge = age;
 }
 
@@ -335,7 +348,12 @@ void FileChannel::setPurgeCount(const std::string& count)
 	while (it != end && std::isspace(*it)) ++it;
 
 	delete _pPurgeStrategy;
-	_pPurgeStrategy = new PurgeByCountStrategy(n);
+
+	if (0 == n || count.empty())
+		_pPurgeStrategy = 0;
+	else
+		_pPurgeStrategy = new PurgeByCountStrategy(n);
+
 	_purgeCount = count;
 }
 
