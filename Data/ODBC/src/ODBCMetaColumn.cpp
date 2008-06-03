@@ -103,38 +103,57 @@ void ODBCMetaColumn::init()
 	{
 	case SQL_BIT:
 		setType(MetaColumn::FDT_BOOL); break;
+	
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
 	case -9:// SQL Server NVARCHAR
 	case -10:// PostgreSQL VARCHAR (without size specified)
 		setType(MetaColumn::FDT_STRING); break;
+	
 	case SQL_TINYINT:
 		setType(MetaColumn::FDT_INT8); break;
+	
 	case SQL_SMALLINT:
 		setType(MetaColumn::FDT_INT16); break;
+	
 	case SQL_INTEGER:
-	case SQL_DECIMAL:
 		setType(MetaColumn::FDT_INT32); break;
+	
 	case SQL_BIGINT:
 		setType(MetaColumn::FDT_INT64); break;
-	case SQL_NUMERIC:
+	
 	case SQL_DOUBLE:
 	case SQL_FLOAT:
 		setType(MetaColumn::FDT_DOUBLE); break;
+	
+	case SQL_NUMERIC:
+	case SQL_DECIMAL:
+		if (0 == _columnDesc.decimalDigits)
+			setType(MetaColumn::FDT_INT32);
+		else
+			setType(MetaColumn::FDT_DOUBLE);
+		
+		break;
+	
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
+	
 	case SQL_BINARY:
 	case SQL_VARBINARY:
 	case SQL_LONGVARBINARY:
 	case -98:// IBM DB2 non-standard type
 		setType(MetaColumn::FDT_BLOB); break;
+	
 	case SQL_TYPE_DATE:
 		setType(MetaColumn::FDT_DATE); break;
+	
 	case SQL_TYPE_TIME:
 		setType(MetaColumn::FDT_TIME); break;
+	
 	case SQL_TYPE_TIMESTAMP:
 		setType(MetaColumn::FDT_TIMESTAMP); break;
+	
 	default:
 		throw DataFormatException("Unsupported data type.");
 	}

@@ -716,7 +716,7 @@ void ODBCOracleTest::recreateTuplesTable()
 void ODBCOracleTest::recreateVectorsTable()
 {
 	dropObject("TABLE", "Vectors");
-	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 NUMBER, str0 VARCHAR(30))", now; }
+	try { *_pSession << "CREATE TABLE Vectors (int0 INTEGER, flt0 NUMBER(5,2), str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }

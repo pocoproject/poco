@@ -63,7 +63,7 @@ void TypeInfo::fillCTypes()
 	_cDataTypes.insert(ValueType(SQL_CHAR, SQL_C_CHAR));
 	_cDataTypes.insert(ValueType(SQL_VARCHAR, SQL_C_CHAR));
 	_cDataTypes.insert(ValueType(SQL_LONGVARCHAR, SQL_C_CHAR));
-	_cDataTypes.insert(ValueType(SQL_DECIMAL, SQL_C_SLONG));
+	_cDataTypes.insert(ValueType(SQL_DECIMAL, SQL_C_DOUBLE));
 	_cDataTypes.insert(ValueType(SQL_NUMERIC, SQL_C_DOUBLE));
 	_cDataTypes.insert(ValueType(SQL_BIT, SQL_C_BIT));
 	_cDataTypes.insert(ValueType(SQL_TINYINT, SQL_C_STINYINT));
