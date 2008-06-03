@@ -56,7 +56,7 @@ namespace WebWidgets {
 
 
 class WebWidgets_API Table: public View, public RequestProcessor
-	/// A Table widget.
+	/// A Table widget. Uses per default single cell selection.
 {
 public:
 	typedef Poco::AutoPtr<Table> Ptr;
@@ -79,6 +79,7 @@ public:
 	};
 	
 	struct CellValueChange
+		/// Data sent with a cellValueChanged event. 
 	{
 		std::size_t row;
 		std::size_t col;
@@ -102,6 +103,14 @@ public:
 	
 	FIFOEvent<LoadData> beforeLoad; /// thrown whenever a load is requested, internal event to which the TableRenderer must register
 	
+	enum SelectionModel
+		/// The selection model used for the table
+	{
+		SM_CELL = 0,
+		SM_ROW
+	};
+		
+	
 	
 	Table(const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates an anonymous Table.
@@ -120,6 +129,12 @@ public:
 
 	void setValue(const Poco::Any& val, std::size_t row, std::size_t col);
 		/// Sets the value at pos(row, col)
+		
+	void setSelectionModel(SelectionModel sm);
+		/// Sets the selectionmodel.
+		
+	SelectionModel getSelectionModel() const;
+		/// Returns the selection model
 		
 	void clear();
 		/// Clears the content of the table
@@ -152,6 +167,7 @@ protected:
 private:
 	TableModel::Ptr _pModel;
 	TableColumns    _columns;
+	SelectionModel  _sm;
 };
 
 
@@ -191,6 +207,18 @@ inline const Table::TableColumns& Table::getColumns() const
 inline const TableModel& Table::getModel() const
 {
 	return *_pModel;
+}
+
+
+inline void Table::setSelectionModel(Table::SelectionModel sm)
+{
+	_sm = sm;
+}
+
+		
+inline Table::SelectionModel Table::getSelectionModel() const
+{
+	return _sm;
 }
 
 

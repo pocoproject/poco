@@ -56,7 +56,8 @@ const std::string Table::EV_LOADDATA("load");
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
 	View(typeid(Table)),
 	_pModel(pModel),
-	_columns(tc)
+	_columns(tc),
+	_sm(SM_CELL)
 {
 	checkValidConfig();
 }
@@ -65,7 +66,8 @@ Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
 Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pModel):
 	View(name, typeid(Table)),
 	_pModel(pModel),
-	_columns(tc)
+	_columns(tc),
+	_sm(SM_CELL)
 {
 	checkValidConfig();
 }
@@ -74,7 +76,8 @@ Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pM
 Table::Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel):
 	View(name, type),
 	_pModel(pModel),
-	_columns(tc)
+	_columns(tc),
+	_sm(SM_CELL)
 {
 	checkValidConfig();
 }
@@ -83,7 +86,8 @@ Table::Table(const std::string& name, const std::type_info& type, const TableCol
 Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel):
 	View(type),
 	_pModel(pModel),
-	_columns(tc)
+	_columns(tc),
+	_sm(SM_CELL)
 {
 	checkValidConfig();
 }
@@ -147,6 +151,7 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 	{
 		if (col < 0 || row < 0 || col >= getColumnCount())
 			throw InvalidArgumentException("col/row out of range");
+
 		CellClick ev(row, col);
 		cellClicked(this, ev);
 		response.send();

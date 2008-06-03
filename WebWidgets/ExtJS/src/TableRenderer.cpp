@@ -72,8 +72,16 @@ void TableRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::Table));
 	const Table* pTable = static_cast<const Poco::WebWidgets::Table*>(pRenderable);
-
-	ostr << "new Ext.grid.EditorGridPanel({";
+	const Table::TableColumns& cols = pTable->getColumns();
+	bool editable = false;
+	for (Table::TableColumns::const_iterator it = cols.begin(); it != cols.end() && !editable; ++it)
+	{
+		editable |= (*it)->isEditable();
+	}
+	if (editable)
+		ostr << "new Ext.grid.EditorGridPanel({";
+	else
+		ostr << "new Ext.grid.GridPanel({";
 
 	TableRenderer::renderProperties(pTable, context, ostr);
 
@@ -131,9 +139,16 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	WebApplication& app = WebApplication::instance();
 	Renderable::ID id = pTable->id();
 	Utility::writeRenderableProperties(pTable, ostr);
-
+	const Table::TableColumns& cols = pTable->getColumns();
+	bool editable = false;
+	for (Table::TableColumns::const_iterator it = cols.begin(); it != cols.end() && !editable; ++it)
+	{
+		editable |= (*it)->isEditable();
+	}
 	ostr << ",listeners:{";
-	bool written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, pTable->cellValueChanged.jsDelegates());
+	bool written = false;
+	if (editable)
+		written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, pTable->cellValueChanged.jsDelegates());
 	if (written)
 		ostr << ",";
 	
@@ -145,7 +160,9 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	renderColumns(pTable, context, ostr);
 	// forbid reordering of columns, otherwise col index will not match the col index at the server
 	// sorting is allowed though, i.e row matching is active
-	ostr << ",clicksToEdit:1,stripeRows:true,enableColumnHide:false,enableColumnMove:false";
+	ostr << ",clicksToEdit:1,stripeRows:true,enableColumnHide:false,enableColumnMove:false,loadMask:true";
+	if (pTable->getSelectionModel() == Table::SM_ROW)
+		ostr << ",selModel:new Ext.grid.RowSelectionModel()";
 	if (pTable->getWidth() > 0)
 		ostr << ",width:" << pTable->getWidth();
 	if (pTable->getHeight() > 0)

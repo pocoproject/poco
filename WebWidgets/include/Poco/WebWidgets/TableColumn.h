@@ -65,7 +65,6 @@ public:
 	bool isSortable() const;
 		/// Returns if the column is sortable
 
-
 	void setSortable(bool val);
 		/// Sets if the column is sortable
 
