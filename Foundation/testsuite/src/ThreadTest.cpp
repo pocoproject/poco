@@ -269,9 +269,12 @@ void ThreadTest::testThreadFunction()
 
 void ThreadTest::testThreadStackSize()
 {
-	int stackSize = 50000000;
+	// some platforms (e.g. Fedora Core9/g++ 4.3.0) ignore set stack size value
+	// so some asserts will fail here
 
+	int stackSize = 50000000;
 	Thread thread;
+
 	assert (0 == thread.getStackSize());
 	thread.setStackSize(stackSize);
 	assert (stackSize == thread.getStackSize());
@@ -282,11 +285,11 @@ void ThreadTest::testThreadStackSize()
 
 	stackSize = 1;
 	thread.setStackSize(stackSize);
-#if defined(POCO_OS_FAMILY_UNIX) && !(POCO_OS == POCO_OS_CYGWIN)
+#ifdef PTHREAD_STACK_MIN
 	assert (PTHREAD_STACK_MIN == thread.getStackSize());
 #else
 	assert (stackSize == thread.getStackSize());
-#endif
+#endif // PTHREAD_STACK_MIN
 	tmp = MyRunnable::_staticVar;
 	thread.start(freeFunc, &tmp);
 	thread.join();

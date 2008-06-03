@@ -153,14 +153,14 @@ int ThreadImpl::getMaxOSPriorityImpl()
 
 void ThreadImpl::setStackSizeImpl(int size)
 {
-#if (POCO_OS == POCO_OS_CYGWIN)
+#ifndef PTHREAD_STACK_MIN
 	_pData->stackSize = 0;
 #else
  	if (size !=0 && size < PTHREAD_STACK_MIN)
  		size = PTHREAD_STACK_MIN;
 
  	_pData->stackSize = size;
-#endif // (POCO_OS == POCO_OS_CYGWIN)
+#endif // PTHREAD_STACK_MIN
 }
 
 
