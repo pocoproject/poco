@@ -161,8 +161,10 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	// forbid reordering of columns, otherwise col index will not match the col index at the server
 	// sorting is allowed though, i.e row matching is active
 	ostr << ",clicksToEdit:1,stripeRows:true,enableColumnHide:false,enableColumnMove:false,loadMask:true";
-	if (pTable->getSelectionModel() == Table::SM_ROW)
-		ostr << ",selModel:new Ext.grid.RowSelectionModel()";
+	if (pTable->getSelectionModel() == Table::SM_SINGLEROW)
+		ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:true})";
+	else if (pTable->getSelectionModel() == Table::SM_MULTIROW)
+		ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:false})";
 	if (pTable->getWidth() > 0)
 		ostr << ",width:" << pTable->getWidth();
 	if (pTable->getHeight() > 0)

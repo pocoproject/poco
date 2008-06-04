@@ -107,7 +107,8 @@ public:
 		/// The selection model used for the table
 	{
 		SM_CELL = 0,
-		SM_ROW
+		SM_SINGLEROW,
+		SM_MULTIROW
 	};
 		
 	
