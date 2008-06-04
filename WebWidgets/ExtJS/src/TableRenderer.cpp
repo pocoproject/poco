@@ -43,8 +43,10 @@
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/WebWidgets/DateFormatter.h"
+#include "Poco/WebWidgets/JSDelegate.h"
 #include "Poco/Delegate.h"
 #include <sstream>
+#include <list>
 
 
 namespace Poco {
@@ -54,6 +56,7 @@ namespace ExtJS {
 
 const std::string TableRenderer::EV_CELLCLICKED("cellclick");
 const std::string TableRenderer::EV_AFTEREDIT("afteredit");
+const std::string TableRenderer::EV_AFTERLOAD("load");
 const std::string TableRenderer::HIDDEN_INDEX_ROW("hidIdx");
 
 
@@ -117,6 +120,16 @@ void TableRenderer::addCellValueChangedServerCallback(Table* pTable, const std::
 
 
 
+void TableRenderer::addAfterLoadServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
+{
+	poco_check_ptr (pTable);
+	static const std::string signature("function(aStore, recs, op)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_AFTERLOAD));
+	Utility::addServerCallback(pTable->afterLoad, signature, addParams, pTable->id(), onSuccess, onFailure);
+}
+
+
 
 void TableRenderer::addCellClickedServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
 {
@@ -151,7 +164,6 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 		written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, pTable->cellValueChanged.jsDelegates());
 	if (written)
 		ostr << ",";
-	
 	
 	Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
 	
@@ -282,12 +294,13 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID,Table::EV_LOADDATA));
 	
+	
 	std::string url(Utility::createURI(addParams, pTable->id()));
 	ostr << url << "}),";
 	ostr << "reader:new Ext.data.ArrayReader()";
-	//Write data
-	/*ostr << "data:";
-	renderDataModel(pTable, ostr);*/
+	ostr << ",listeners:{";
+	Utility::writeJSEvent(ostr, EV_AFTERLOAD, pTable->afterLoad.jsDelegates());
+	ostr << "}";
 	ostr << "})";
 }
 

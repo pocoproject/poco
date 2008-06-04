@@ -51,6 +51,7 @@ const std::string Table::FIELD_CNT("cnt");
 const std::string Table::EV_CELLCLICKED("click");
 const std::string Table::EV_CELLVALUECHANGED("edit");
 const std::string Table::EV_LOADDATA("load");
+const std::string Table::EV_AFTERLOAD("afterload");
 
 
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
@@ -173,6 +174,11 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 		else
 			setValue(Poco::Any(val), row, col);
 		response.send();
+	}
+	else if (ev == EV_AFTERLOAD)
+	{
+		Table* pTable = this;
+		afterLoad(this, pTable);
 	}
 }
 

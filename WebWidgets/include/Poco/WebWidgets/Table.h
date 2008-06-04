@@ -69,8 +69,9 @@ public:
 	static const std::string EV_CELLCLICKED;
 	static const std::string EV_CELLVALUECHANGED;
 	static const std::string EV_LOADDATA;
+	static const std::string EV_AFTERLOAD;
 	
-	struct CellClick
+	struct WebWidgets_API CellClick
 	{
 		std::size_t row;
 		std::size_t col;
@@ -78,7 +79,7 @@ public:
 		CellClick(std::size_t row, std::size_t col);
 	};
 	
-	struct CellValueChange
+	struct WebWidgets_API CellValueChange
 		/// Data sent with a cellValueChanged event. 
 	{
 		std::size_t row;
@@ -100,6 +101,8 @@ public:
 	JavaScriptEvent<Table::CellClick> cellClicked;
 	
 	JavaScriptEvent<Table::CellValueChange> cellValueChanged;
+	
+	JavaScriptEvent<Table*> afterLoad; // thrown after data was loaded
 	
 	FIFOEvent<LoadData> beforeLoad; /// thrown whenever a load is requested, internal event to which the TableRenderer must register
 	
@@ -151,7 +154,7 @@ public:
 	
 	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
 		/// Handles a complete AJAX request submitted by the client.
-
+	
 protected:
 	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates a Table and assigns it the given name.
@@ -221,6 +224,7 @@ inline Table::SelectionModel Table::getSelectionModel() const
 {
 	return _sm;
 }
+
 
 
 } } // namespace Poco::WebWidgets

@@ -64,6 +64,7 @@ class ExtJS_API TableRenderer: public Poco::WebWidgets::Renderer
 public:
 	static const std::string EV_CELLCLICKED;
 	static const std::string EV_AFTEREDIT;
+	static const std::string EV_AFTERLOAD;
 	static const std::string HIDDEN_INDEX_ROW;
 	
 	TableRenderer();
@@ -85,6 +86,10 @@ public:
 	static void addCellClickedServerCallback(Table* pTable, const std::string& onSuccess=std::string(), const std::string& onFailure=std::string());
 		/// Adds a javascript callback to inform the WebServer that the client has changed a value in the Table
 		/// Method signature is cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
+		
+	static void addAfterLoadServerCallback(Table* pTable, const std::string& onSuccess=std::string(), const std::string& onFailure=std::string());
+		/// Adds a javascript callback to inform the WebServer that the client has finished loading data
+		/// Method signature is ( Store this, Ext.data.Record[] records, Object options )
 
 protected:
 	static void renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr);
