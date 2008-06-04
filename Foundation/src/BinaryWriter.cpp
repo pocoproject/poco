@@ -36,6 +36,7 @@
 
 #include "Poco/BinaryWriter.h"
 #include "Poco/ByteOrder.h"
+#include <cstring>
 
 
 namespace Poco {

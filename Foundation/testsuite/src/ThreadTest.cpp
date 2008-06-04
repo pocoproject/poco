@@ -281,7 +281,7 @@ void ThreadTest::testThreadStackSize()
 
 	stackSize = 1;
 	thread.setStackSize(stackSize);
-#if !defined(_WIN32) && !(POCO_OS == POCO_OS_CYGWIN)
+#ifdef PTHREAD_STACK_MIN
 	assert (PTHREAD_STACK_MIN == thread.getStackSize());
 #else
 	assert (stackSize == thread.getStackSize());

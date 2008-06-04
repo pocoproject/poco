@@ -45,6 +45,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <utime.h>
+#include <cstring>
 
 
 namespace Poco {

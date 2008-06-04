@@ -42,6 +42,7 @@
 #include "Poco/NotificationStrategy.h"
 #include <map>
 #include <list>
+#include <memory>
 
 
 namespace Poco {

@@ -40,7 +40,7 @@
 #include "Poco/Buffer.h"
 #include <iostream>
 #include <vector>
-#include <memory.h>
+#include <cstring>
 
 
 using Poco::Bugcheck;

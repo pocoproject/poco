@@ -47,6 +47,7 @@
 #include <vector>
 #include <map>
 #include <cstddef>
+#include <cstring>
 
 
 namespace Poco {
