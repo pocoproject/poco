@@ -55,6 +55,7 @@ namespace ExtJS {
 
 
 const std::string TableRenderer::EV_CELLCLICKED("cellclick");
+const std::string TableRenderer::EV_ROWCLICKED("rowselect");
 const std::string TableRenderer::EV_AFTEREDIT("afteredit");
 const std::string TableRenderer::EV_AFTERLOAD("load");
 const std::string TableRenderer::HIDDEN_INDEX_ROW("hidIdx");
@@ -148,6 +149,25 @@ void TableRenderer::addCellClickedServerCallback(Table* pTable, const std::strin
 }
 
 
+
+void TableRenderer::addRowClickedServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
+{
+	poco_check_ptr (pTable);
+	poco_assert (pTable->getSelectionModel() != Table::SM_CELL);
+	
+	/// Method signature is rowselect : ( SelectionModel this, Number rowIndex, Ext.Data.Record r )
+	static const std::string signature("function(sm,row,r)");
+	//extract the true row index from the last column!
+	std::string origRow("+r.get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_ROWCLICKED));
+	Utility::addServerCallback(pTable->rowClicked, signature, addParams, pTable->id(), onSuccess, onFailure);
+}
+
+
 void TableRenderer::renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr)
 {
 	WebApplication& app = WebApplication::instance();
@@ -167,7 +187,9 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	if (written)
 		ostr << ",";
 	
-	Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
+	written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
+			
+	
 	
 	ostr << "},"; //close listeners
 	
@@ -175,10 +197,20 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	// forbid reordering of columns, otherwise col index will not match the col index at the server
 	// sorting is allowed though, i.e row matching is active
 	ostr << ",clicksToEdit:1,stripeRows:true,enableColumnHide:false,enableColumnMove:false,loadMask:true";
-	if (pTable->getSelectionModel() == Table::SM_SINGLEROW)
-		ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:true})";
-	else if (pTable->getSelectionModel() == Table::SM_MULTIROW)
-		ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:false})";
+	if (pTable->getSelectionModel() != Table::SM_CELL)
+	{
+		if (pTable->getSelectionModel() == Table::SM_SINGLEROW)
+			ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:true";
+		else if (pTable->getSelectionModel() == Table::SM_MULTIROW)
+			ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:false";
+		if (!pTable->rowClicked.jsDelegates().empty())
+		{
+			ostr << ",listeners:{";
+			Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates());
+			ostr << "}";
+		}
+		ostr << "})"; //close selModel
+	}
 	if (pTable->getWidth() > 0)
 		ostr << ",width:" << pTable->getWidth();
 	if (pTable->getHeight() > 0)

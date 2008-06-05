@@ -89,14 +89,15 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 	{
 		ostr << "type:'submit',";
 		Form::Ptr pForm = Utility::insideForm(pButtonCell);
-		//ostr << "handler: function(){Ext.getCmp('" << pForm->id() << "').getForm().submit({url:'" << pForm->getURI().toString() << "',waitMsg:'Loading'});},";
 		ostr << "handler: function(){Ext.getCmp('" << pForm->id() << "').getForm().submit();},";
 	}
+	Button* pOwner = dynamic_cast<Button*>(pButtonCell->getOwner());
+	poco_check_ptr (pOwner);
 	if (writeId)
-		Utility::writeRenderableProperties(pButtonCell, ostr);
+		Utility::writeRenderableProperties(pOwner, ostr);
 	if (!pButtonCell->isEnabled())
 		ostr << ",disabled:true";
-	Button* pOwner = dynamic_cast<Button*>(pButtonCell->getOwner());
+	
 	if (pOwner)
 	{
 		if (!pOwner->getName().empty())

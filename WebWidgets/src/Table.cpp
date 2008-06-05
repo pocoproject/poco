@@ -49,6 +49,7 @@ const std::string Table::FIELD_ROW("row");
 const std::string Table::FIELD_VAL("val");
 const std::string Table::FIELD_CNT("cnt");
 const std::string Table::EV_CELLCLICKED("click");
+const std::string Table::EV_ROWCLICKED("row");
 const std::string Table::EV_CELLVALUECHANGED("edit");
 const std::string Table::EV_LOADDATA("load");
 const std::string Table::EV_AFTERLOAD("afterload");
@@ -155,6 +156,15 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 
 		CellClick ev(row, col);
 		cellClicked(this, ev);
+		response.send();
+	}
+	else if (ev == EV_ROWCLICKED)
+	{
+		if (row < 0 )
+			throw InvalidArgumentException("row out of range");
+
+		std::size_t theRow(row);
+		rowClicked(this, theRow);
 		response.send();
 	}
 	else if (ev == EV_CELLVALUECHANGED)
