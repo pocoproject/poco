@@ -46,11 +46,13 @@ namespace WebWidgets {
 Poco::ThreadLocal<WebApplication*> WebApplication::_pInstance;
 
 
-WebApplication::WebApplication(const Poco::URI& uri):
+WebApplication::WebApplication(const Poco::URI& uri,ResourceManager::Ptr pRM):
+	_pResource(pRM),
 	_pLookAndFeel(),
 	_pCurrentPage(),
 	_uri(uri)
 {
+	poco_check_ptr (pRM);
 	attachToThread();
 }
 

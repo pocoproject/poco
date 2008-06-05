@@ -1,11 +1,13 @@
 //
-// Page.cpp
+// ResourceManager.cpp
 //
-// $Id: //poco/Main/WebWidgets/src/Page.cpp#2 $
+// $Id: //poco/Main/WebWidgets/src/ResourceManager.cpp#4 $
 //
 // Library: WebWidgets
-// Package: Views
-// Module:  Page
+// Package: Core
+// Module:  ResourceManager
+//
+// Definition of the ResourceManager class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,60 +36,34 @@
 //
 
 
-#include "Poco/WebWidgets/Page.h"
+#include "Poco/WebWidgets/ResourceManager.h"
+#include "Poco/Path.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 
 
-Page::Page():
-	ContainerView(typeid(Page)),
-	_text(),
-	_rm()
+ResourceManager::ResourceManager()
 {
+}
+
+
+ResourceManager::~ResourceManager()
+{
+}
+
+
+void ResourceManager::appendJSInclude(const Poco::Path& aPath)
+{
+	_js.push_back(aPath.toString(Path::PATH_UNIX));
 }
 
 	
-Page::Page(const std::string& name):
-	ContainerView(name, typeid(Page)),
-	_text(),
-	_rm()
+void ResourceManager::appendCSSInclude(const Poco::Path& aPath)
 {
-}
-
-
-Page::Page(const std::string& name, const std::type_info& type):
-	ContainerView(name, type),
-	_text(),
-	_rm()
-{
+	_css.push_back(aPath.toString(Path::PATH_UNIX));
 }
 
 	
-Page::Page(const std::type_info& type):
-	ContainerView(type),
-	_text(),
-	_rm()
-{
-}
-
-
-Page::~Page()
-{
-}
-
-
-void Page::setText(const std::string& text)
-{
-	_text = text;
-}
-
-
-std::string Page::getText() const
-{
-	return _text;
-}
-
-
 } } // namespace Poco::WebWidgets

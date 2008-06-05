@@ -134,6 +134,27 @@ void Utility::initialize(LookAndFeel::Ptr ptr)
 }
 
 
+void Utility::initialize(ResourceManager::Ptr ptr, const Poco::Path& extJSDir)
+{
+	Poco::Path aDir(extJSDir);
+	aDir.makeDirectory();
+	aDir.setFileName("ext-base.js");
+	ptr->appendJSInclude(aDir);
+	aDir.setFileName("ext-all.js");
+	ptr->appendJSInclude(aDir);
+	aDir.setFileName("DDView.js");
+	ptr->appendJSInclude(aDir);
+	aDir.setFileName("MultiSelect.js");
+	ptr->appendJSInclude(aDir);
+	
+	Poco::Path cssAll("resources/css/ext-all.css");
+	cssAll.makeFile();
+	
+	ptr->appendCSSInclude(Poco::Path(extJSDir, cssAll));
+	ptr->appendCSSInclude(Poco::Path(extJSDir, "MultiSelect.css"));
+}
+
+
 const std::string& Utility::getTmpID()
 {
 	static const std::string tmp("tmp");

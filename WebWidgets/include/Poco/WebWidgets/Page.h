@@ -42,6 +42,7 @@
 
 #include "Poco/WebWidgets/ContainerView.h"
 #include "Poco/WebWidgets/JavaScriptEvent.h"
+#include "Poco/WebWidgets/ResourceManager.h"
 
 
 namespace Poco {
@@ -71,6 +72,12 @@ public:
 	
 	std::string getText() const;
 	
+	ResourceManager& resourceManager();
+		/// Returns the ResourceManager
+		
+	const ResourceManager& resourceManager() const;
+		/// Returns the ResourceManager
+	
 protected:
 	Page(const std::string& name, const std::type_info& type);
 		/// Creates a Page and assigns it the given name.
@@ -82,8 +89,25 @@ protected:
 		/// Destroys the Page.
 		
 private:
-	std::string _text;
+	std::string     _text;
+	ResourceManager _rm;
 };
+
+
+//
+// Inlines
+//
+
+inline ResourceManager& Page::resourceManager()
+{
+	return _rm;
+}
+
+		
+inline const ResourceManager& Page::resourceManager() const
+{
+	return _rm;
+}
 
 
 } } // namespace Poco::WebWidgets

@@ -68,6 +68,7 @@
 #include "Poco/WebWidgets/TextEditCell.h"
 #include "Poco/WebWidgets/SimpleTableModel.h"
 #include "Poco/WebWidgets/JSDelegate.h"
+#include "Poco/WebWidgets/ResourceManager.h"
 #include "Poco/TeeStream.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
@@ -92,7 +93,9 @@ ExtJSTest::~ExtJSTest()
 
 void ExtJSTest::testPage()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());
+	Utility::initialize(pRM, Poco::Path());
+	WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -119,7 +122,9 @@ void ExtJSTest::testPage()
 
 void ExtJSTest::testPage2()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());
+	Utility::initialize(pRM, Poco::Path());
+	WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -152,7 +157,9 @@ void ExtJSTest::testPage2()
 
 void ExtJSTest::testButton()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());
+	Utility::initialize(pRM, Poco::Path());
+	WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -194,7 +201,9 @@ void ExtJSTest::testButton()
 
 void ExtJSTest::testFormTextField()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());
+	Utility::initialize(pRM, Poco::Path());
+	WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -241,7 +250,7 @@ void ExtJSTest::testFormTextField()
 
 void ExtJSTest::testFormTimeField()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -276,7 +285,7 @@ void ExtJSTest::testFormTimeField()
 
 void ExtJSTest::testFormDateField()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -314,7 +323,7 @@ void ExtJSTest::testFormDateField()
 
 void ExtJSTest::testFormPassword()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -348,7 +357,7 @@ void ExtJSTest::testFormPassword()
 
 void ExtJSTest::testFormNumberField()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -383,7 +392,7 @@ void ExtJSTest::testFormNumberField()
 
 void ExtJSTest::testFormComboBox()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -426,7 +435,7 @@ void ExtJSTest::testFormComboBox()
 
 void ExtJSTest::testFormImageButton()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -475,7 +484,7 @@ void ExtJSTest::testFormImageButton()
 
 void ExtJSTest::testFormTextEdit()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -522,7 +531,7 @@ void ExtJSTest::testFormTextEdit()
 
 void ExtJSTest::testFormCheckButton()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -554,7 +563,7 @@ void ExtJSTest::testFormCheckButton()
 
 void ExtJSTest::testFormRadioButton()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -586,7 +595,7 @@ void ExtJSTest::testFormRadioButton()
 
 void ExtJSTest::testFormGridLayout()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -619,7 +628,7 @@ void ExtJSTest::testFormGridLayout()
 
 void ExtJSTest::testFormHorizontalLayout()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -652,7 +661,7 @@ void ExtJSTest::testFormHorizontalLayout()
 
 void ExtJSTest::testFormVerticalLayout()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -685,7 +694,7 @@ void ExtJSTest::testFormVerticalLayout()
 
 void ExtJSTest::testFormFrameGridLayout()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -720,7 +729,7 @@ void ExtJSTest::testFormFrameGridLayout()
 
 void ExtJSTest::testFormFrameHorizontalLayout()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -755,7 +764,7 @@ void ExtJSTest::testFormFrameHorizontalLayout()
 
 void ExtJSTest::testFormFrameVerticalLayout()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -790,7 +799,7 @@ void ExtJSTest::testFormFrameVerticalLayout()
 
 void ExtJSTest::testFormGridLayoutNullElements()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -823,7 +832,7 @@ void ExtJSTest::testFormGridLayoutNullElements()
 
 void ExtJSTest::testFormImage()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -859,7 +868,7 @@ void ExtJSTest::testFormImage()
 
 void ExtJSTest::testTabView()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -903,7 +912,7 @@ void ExtJSTest::testTabView()
 
 void ExtJSTest::testCollapsible()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -937,7 +946,7 @@ void ExtJSTest::testCollapsible()
 
 void ExtJSTest::testCollapsible2()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -972,7 +981,7 @@ void ExtJSTest::testCollapsible2()
 
 void ExtJSTest::testPanel()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -1011,7 +1020,7 @@ void ExtJSTest::testPanel()
 
 void ExtJSTest::testRootPanel()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -1047,7 +1056,7 @@ void ExtJSTest::testRootPanel()
 
 void ExtJSTest::testNestedPanels()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -1087,7 +1096,7 @@ void ExtJSTest::testNestedPanels()
 
 void ExtJSTest::testListBox()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -1159,7 +1168,7 @@ void ExtJSTest::testFunction()
 
 void ExtJSTest::testTable()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -1190,7 +1199,7 @@ void ExtJSTest::testTable()
 
 void ExtJSTest::testTableEdit()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -1221,7 +1230,7 @@ void ExtJSTest::testTableEdit()
 
 void ExtJSTest::testTableComboBox()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -1256,7 +1265,7 @@ void ExtJSTest::testTableComboBox()
 
 void ExtJSTest::testTableButton()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);
@@ -1287,7 +1296,7 @@ void ExtJSTest::testTableButton()
 
 void ExtJSTest::testTableImageButton()
 {
-	WebApplication webApp(Poco::URI("/"));
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
 	LookAndFeel::Ptr laf(new LookAndFeel());
 	webApp.setLookAndFeel(laf);
 	RenderContext context(*laf, webApp);

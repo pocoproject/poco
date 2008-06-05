@@ -22,7 +22,7 @@ objects = Renderable Renderer RenderContext LookAndFeel Type Event Delegate \
 	TableModel TableColumn SimpleTableModel \
 	PasswordField PasswordFieldCell TimeField TimeFieldCell \
 	WebApplication RequestProcessor RequestHandler \
-	SubmitButton SubmitButtonCell
+	SubmitButton SubmitButtonCell ResourceManager
 
 target         = PocoWebWidgets
 target_version = $(LIBVERSION)

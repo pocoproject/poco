@@ -43,6 +43,8 @@
 #include "Poco/WebWidgets/ExtJS/ExtJS.h"
 #include "Poco/WebWidgets/Form.h"
 #include "Poco/WebWidgets/LookAndFeel.h"
+#include "Poco/WebWidgets/ResourceManager.h"
+#include "Poco/Path.h"
 #include "Poco/WebWidgets/JavaScriptEvent.h"
 #include <ostream>
 #include <list>
@@ -65,6 +67,9 @@ class ExtJS_API Utility
 public:
 	static void initialize(LookAndFeel::Ptr ptr);
 		/// Initializes the LookAndFeel object to use ExtJS renderers
+		
+	static void initialize(ResourceManager::Ptr ptr, const Poco::Path& extJSDir);
+		/// Initializes the ResourceManager object to include ExtJS resources
 
 	static LookAndFeel& getDefaultRenderers();
 		/// Returns the defaultrenderers;

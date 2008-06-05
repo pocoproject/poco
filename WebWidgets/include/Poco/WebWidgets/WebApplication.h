@@ -43,6 +43,7 @@
 #include "Poco/WebWidgets/WebWidgets.h"
 #include "Poco/WebWidgets/Page.h"
 #include "Poco/WebWidgets/LookAndFeel.h"
+#include "Poco/WebWidgets/ResourceManager.h"
 #include "Poco/ThreadLocal.h"
 #include "Poco/URI.h"
 #include <map>
@@ -62,7 +63,7 @@ class WebWidgets_API WebApplication
 	/// WebApplication class
 {
 public:
-	WebApplication(const Poco::URI& uri);
+	WebApplication(const Poco::URI& uri, ResourceManager::Ptr pRM);
 		/// Creates the WebApplication.
 
 	virtual ~WebApplication();
@@ -79,6 +80,12 @@ public:
 
 	Page::Ptr getCurrentPage() const;
 		/// Returns the currently active page.
+		
+	void setResourceManager(ResourceManager::Ptr pRM);
+		/// Sets the ResourceManager
+		
+	ResourceManager::Ptr getResourceManager() const;
+		/// Gets the ResourceManager
 
 	void registerFormProcessor(const std::string& fieldName, RequestProcessor* pProc);
 		/// Registers a RequestProcessor for a given form field.
@@ -111,6 +118,7 @@ private:
 	
 	typedef std::map<std::string, RequestProcessor* > RequestProcessorMap;
 	
+	ResourceManager::Ptr _pResource;
 	LookAndFeel::Ptr _pLookAndFeel;
 	Page::Ptr _pCurrentPage;
 	Poco::URI _uri;
@@ -140,6 +148,19 @@ inline const Poco::URI& WebApplication::getURI() const
 	return _uri;
 }
 
+
+inline void WebApplication::setResourceManager(ResourceManager::Ptr pRM)
+{
+	poco_check_ptr (pRM);
+	_pResource = pRM;
+}
+
+		
+inline ResourceManager::Ptr WebApplication::getResourceManager() const
+{
+	return _pResource;
+}
+		
 
 } } // namespace Poco::WebWidgets
 

@@ -266,6 +266,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\ResourceManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\Type.h"
 					>
 				</File>
@@ -327,6 +331,10 @@
 				</File>
 				<File
 					RelativePath=".\src\RequestProcessor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ResourceManager.cpp"
 					>
 				</File>
 				<File

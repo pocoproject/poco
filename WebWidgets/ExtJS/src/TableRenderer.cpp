@@ -79,7 +79,8 @@ void TableRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	bool editable = false;
 	for (Table::TableColumns::const_iterator it = cols.begin(); it != cols.end() && !editable; ++it)
 	{
-		editable |= (*it)->isEditable();
+		if ((*it) && (*it)->getCell())
+			editable |= (*it)->isEditable();
 	}
 	if (editable)
 		ostr << "new Ext.grid.EditorGridPanel({";
@@ -156,7 +157,8 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	bool editable = false;
 	for (Table::TableColumns::const_iterator it = cols.begin(); it != cols.end() && !editable; ++it)
 	{
-		editable |= (*it)->isEditable();
+		if ((*it) && (*it)->getCell())
+			editable |= (*it)->isEditable();
 	}
 	ostr << ",listeners:{";
 	bool written = false;
@@ -279,7 +281,7 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	{
 		if (i != 0)
 			ostr << ",";
-		if ((*it)->getCell()->type() == typeid(Poco::WebWidgets::DateFieldCell))
+		if ((*it)->getCell() && (*it)->getCell()->type() == typeid(Poco::WebWidgets::DateFieldCell))
 		{
 			Poco::WebWidgets::DateFieldCell::Ptr pDf = (*it)->getCell().cast<Poco::WebWidgets::DateFieldCell>();
 			

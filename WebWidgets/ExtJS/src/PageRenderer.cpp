@@ -73,18 +73,41 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	const Page* pPage = static_cast<const Poco::WebWidgets::Page*>(pRenderable);
 	poco_assert_dbg (WebApplication::instance().getCurrentPage().get() == pPage);
 	const LookAndFeel& laf = context.lookAndFeel();
+	ResourceManager::Ptr pRM = context.application().getResourceManager();
 
 	ostr << STRO_HTML << STRO_HEAD << STRO_TITLE;
 	ostr << pPage->getName();
 	ostr << STRC_TITLE;
-	//include javascript files: TODO: use ResourceManager
-	ostr << "<script type=\"text/javascript\" src=\"ext-base.js\"></script>";
-	ostr << "<script type=\"text/javascript\" src=\"ext-all.js\"></script>";
-	ostr << "<script type=\"text/javascript\" src=\"DDView.js\"></script>";
-	ostr << "<script type=\"text/javascript\" src=\"MultiSelect.js\"></script>";
-	ostr << "<link rel=\"stylesheet\" type=\"text/css\" href=\"resources/css/ext-all.css\">";
-	ostr << "<link rel=\"stylesheet\" type=\"text/css\" href=\"MultiSelect.css\">";
+	//include javascript files: 
+	const ResourceManager::Includes& jsIncl = pRM->jsIncludes();
+	ResourceManager::Includes::const_iterator itJS = jsIncl.begin();
+	for (; itJS != jsIncl.end(); ++itJS)
+	{
+		ostr << "<script type=\"text/javascript\" src=\"" << (*itJS) << "\"></script>";
+	}
+	const ResourceManager::Includes& myJSIncl = pPage->resourceManager().jsIncludes();
+	ResourceManager::Includes::const_iterator itMyJS = myJSIncl.begin();
+	for (; itMyJS != myJSIncl.end(); ++itMyJS)
+	{
+		ostr << "<script type=\"text/javascript\" src=\"" << (*itMyJS) << "\"></script>";
+	}
+	
+	// write css includes
+	const ResourceManager::Includes& cssIncl = pRM->cssIncludes();
+	ResourceManager::Includes::const_iterator itCSS = cssIncl.begin();
+	for (; itCSS != cssIncl.end(); ++itCSS)
+	{
+		ostr << "<link rel=\"stylesheet\" type=\"text/css\" href=\"" << (*itCSS) << "\">";
+	}
+	const ResourceManager::Includes& myCSSIncl = pPage->resourceManager().cssIncludes();
+	ResourceManager::Includes::const_iterator itMyCSS = myCSSIncl.begin();
+	for (; itMyCSS != myCSSIncl.end(); ++itMyCSS)
+	{
+		ostr << "<link rel=\"stylesheet\" type=\"text/css\" href=\"" << (*itMyCSS) << "\">";
+	}
+	// extra css  for label
 	ostr << "<style type=\"text/css\">.lbl {font:normal 12px tahoma, verdana, helvetica}</style>";
+	
 	if (!pPage->empty())
 	{
 		//start inline javascript block
@@ -97,14 +120,10 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		{
 			ostr << ",listeners:{";
 			bool written = Utility::writeJSEvent(ostr, EV_BEFORERENDER, pPage->beforeRender.jsDelegates());
-			//auto-show all windows
-			JavaScriptEvent<Page*>::JSDelegates js = pPage->afterRender.jsDelegates();
-			js.push_front(jsDelegate("function(){Ext.WindowMgr.each( function(w) {w.show(this);});}"));
-			if (written && !js.empty())
-			{
+			if (written)
 				ostr << ",";
-			}
-			Utility::writeJSEvent(ostr, EV_AFTERRENDER, js);
+
+			Utility::writeJSEvent(ostr, EV_AFTERRENDER, pPage->afterRender.jsDelegates());
 			ostr << "}";
 		}
 		if (pPage->getHeight() > 0)
