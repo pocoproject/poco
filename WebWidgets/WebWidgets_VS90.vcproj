@@ -284,6 +284,10 @@
 					RelativePath=".\include\Poco\WebWidgets\WebWidgets.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\Poco\WebWidgets\WebWidgetsException.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -346,6 +350,10 @@
 				</File>
 				<File
 					RelativePath=".\src\WebApplication.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WebWidgetsException.cpp"
 					>
 				</File>
 			</Filter>

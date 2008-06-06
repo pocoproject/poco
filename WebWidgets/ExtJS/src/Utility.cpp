@@ -142,13 +142,13 @@ void Utility::initialize(ResourceManager::Ptr ptr, const Poco::Path& extJSDir)
 	ptr->appendJSInclude(Poco::Path(aDir, "ext-base.js"));
 	ptr->appendJSInclude(Poco::Path(aDir, "ext-all.js"));
 	ptr->appendJSInclude(Poco::Path(aDir, "DDView.js"));
-	ptr->appendJSInclude(Poco::Path(aDir, "MultiSelect.js"));
+	ptr->appendJSInclude(Poco::Path(aDir, "Multiselect.js"));
 	
 	Poco::Path cssAll("resources/css/ext-all.css");
 	cssAll.makeFile();
 	
 	ptr->appendCSSInclude(Poco::Path(aDir, cssAll));
-	ptr->appendCSSInclude(Poco::Path(aDir, "MultiSelect.css"));
+	ptr->appendCSSInclude(Poco::Path(aDir, "Multiselect.css"));
 }
 
 

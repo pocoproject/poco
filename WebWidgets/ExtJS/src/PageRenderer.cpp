@@ -114,6 +114,15 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		ostr << "<script type=\"text/javascript\">";
 		ostr << "Ext.onReady(function() {";
 		ostr << "Ext.QuickTips.init();";
+		ostr << "Ext.Ajax.on({'requestexception':function(conn, resp, obj){";
+		ostr <<				"Ext.Msg.show({";
+		ostr <<					"title:'Server Error',";
+		ostr <<					"msg:resp.statusText,";
+		ostr <<					"buttons:Ext.Msg.OK,";
+		ostr <<					"icon:Ext.MessageBox.ERROR";
+		ostr <<				"});";
+		ostr <<			"}});";
+	
 		// always nest a panel around, so we can get rid of dynamic casts to check for parent type
 		ostr << "new Ext.Panel({renderTo:'p" << pPage->id() << "',border:false,bodyBorder:false";
 		if (!pPage->beforeRender.jsDelegates().empty() || !pPage->afterRender.jsDelegates().empty())

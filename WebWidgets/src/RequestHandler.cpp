@@ -41,6 +41,7 @@
 #include "Poco/WebWidgets/Page.h"
 #include "Poco/WebWidgets/RenderContext.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
+#include "Poco/WebWidgets/WebWidgetsException.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/URI.h"
@@ -130,9 +131,27 @@ void RequestHandler::handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Po
 	{
 		pProc->handleAjaxRequest(args, response);
 	}
+	catch(WebWidgetsException& e)
+	{
+		Poco::Net::HTTPResponse::HTTPStatus code = Poco::Net::HTTPResponse::HTTP_BAD_REQUEST;
+		if (e.code() > code && e.code() <= Poco::Net::HTTPResponse::HTTP_EXPECTATION_FAILED)
+			code = (Poco::Net::HTTPResponse::HTTPStatus)e.code();
+		response.setStatusAndReason(code, e.displayText());
+		response.send();
+	}
+	catch(Poco::Exception& e)
+	{
+		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.displayText());
+		response.send();
+	}
+	catch(std::exception& e)
+	{
+		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
+		response.send();
+	}
 	catch(...)
 	{
-		response.setStatus(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "Unknown exception");
 		response.send();
 	}
 }
