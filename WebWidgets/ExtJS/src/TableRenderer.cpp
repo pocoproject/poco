@@ -263,6 +263,8 @@ void TableRenderer::renderColumn(const Table* pTable, const TableColumn& tc, int
 		ostr << ",width:" << tc.getWidth();
 	if (tc.isSortable())
 		ostr << ",sortable:true";
+	else
+		ostr << ",menuDisabled:true";
 	
 	static TableCellHandlerFactory& fty = TableCellHandlerFactory::instance();
 
