@@ -222,7 +222,7 @@ LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY)
 ifeq ($(strip $(STRIP)),)
 STRIPCMD = 
 else
-STRIPCMD = $(STRIP) $@*
+STRIPCMD = $(STRIP) $@$(BINEXT)
 endif
 
 #

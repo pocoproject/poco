@@ -33,7 +33,7 @@
 #include "UtilTestSuite.h"
 #include "ConfigurationTestSuite.h"
 #include "OptionsTestSuite.h"
-#if defined(_WIN32)
+#if defined(_MFC_VER)
 #include "WindowsTestSuite.h"
 #endif
 
@@ -44,7 +44,7 @@ CppUnit::Test* UtilTestSuite::suite()
 
 	pSuite->addTest(ConfigurationTestSuite::suite());
 	pSuite->addTest(OptionsTestSuite::suite());
-#if defined(_WIN32)
+#if defined(_MFC_VER)
 	pSuite->addTest(WindowsTestSuite::suite());
 #endif
 
