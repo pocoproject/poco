@@ -88,7 +88,14 @@ public:
 
 	bool isEditable() const;
 		/// Returns true iff the Cell is editable.
+		
+	void setCustomRenderer(const std::string& jsCode);
+		/// Allows to set custom JavaScript code that renders the values of the columns
+		/// This code depends on the rendering library used during run-time!
 
+	const std::string& getCustomRenderer() const;
+		/// Returns the custom JavaScript code used to render the values of this column.
+		/// Empty string if none set
 
 protected:
 	virtual ~TableColumn();
@@ -98,6 +105,7 @@ private:
 	Cell::Ptr   _pCell;
 	bool        _sortable;
 	std::string _header;
+	std::string _customRenderer;
 };
 
 
@@ -158,6 +166,18 @@ inline bool TableColumn::isEditable() const
 	return _pCell->isEditable();
 }
 	
+
+inline void TableColumn::setCustomRenderer(const std::string& jsCode)
+{
+	_customRenderer = jsCode;
+}
+
+
+inline const std::string& TableColumn::getCustomRenderer() const
+{
+	return _customRenderer;
+}
+
 
 } } // namespace Poco::WebWidgets
 

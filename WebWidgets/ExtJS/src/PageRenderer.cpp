@@ -41,6 +41,7 @@
 #include "Poco/WebWidgets/LookAndFeel.h"
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/NumberFormatter.h"
 
 
 namespace Poco {
@@ -71,8 +72,11 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	static const std::string STRC_TITLE ("</title>");
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::Page));
-	const Page* pPage = static_cast<const Poco::WebWidgets::Page*>(pRenderable);
-	poco_assert_dbg (WebApplication::instance().getCurrentPage().get() == pPage);
+	Page* pPage = const_cast<Page*>(static_cast<const Poco::WebWidgets::Page*>(pRenderable));
+	pPage->pageRequested.notify(this, pPage);
+	
+	poco_assert_dbg (context.application().getCurrentPage().get() == pPage);
+	
 	const LookAndFeel& laf = context.lookAndFeel();
 	ResourceManager::Ptr pRM = context.application().getResourceManager();
 
@@ -173,7 +177,7 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	}
 
 	ostr << STRC_HEAD;
-	
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pPage->id()), pPage);
 }
 
 

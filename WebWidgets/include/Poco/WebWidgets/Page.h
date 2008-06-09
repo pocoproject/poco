@@ -46,6 +46,8 @@
 #include "Poco/WebWidgets/RequestProcessor.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/BasicEvent.h"
+
 
 namespace Poco {
 namespace WebWidgets {
@@ -65,6 +67,9 @@ public:
 		
 	JavaScriptEvent<Page*> afterRender; 
 		/// event thrown after GUI rendering. 
+		
+	Poco::BasicEvent<Page*> pageRequested;
+		/// Thrown whenever the page is requested, before code is generated
 		
 	Page();
 		/// Creates an anonymous Page.

@@ -295,8 +295,11 @@ void TableRenderer::renderColumn(const Table* pTable, const TableColumn& tc, int
 			ostr << ",editor:";
 			tc.getCell()->renderHead(context, ostr);
 		}
-	
-		if (pHandler->useRenderer())
+		if (!tc.getCustomRenderer().empty())
+		{
+			ostr << ",renderer:" << tc.getCustomRenderer();
+		}
+		else if (pHandler->useRenderer())
 		{
 			ostr << ",renderer:";
 			pHandler->writeDynamicData(ostr);
