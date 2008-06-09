@@ -41,11 +41,15 @@
 
 
 #include "Poco/WebWidgets/ExtJS/ExtJS.h"
+#include "Poco/WebWidgets/JSDelegate.h"
 #include "Poco/WebWidgets/Renderer.h"
 
 
 namespace Poco {
 namespace WebWidgets {
+
+	class Page;
+	
 namespace ExtJS {
 
 
@@ -67,6 +71,14 @@ public:
 
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.
+		
+protected:
+	static Poco::WebWidgets::JSDelegate createBeforeRenderCallback(const Page* pPage);
+		/// JS signature: beforerender : ( Ext.Component this )
+	
+	static Poco::WebWidgets::JSDelegate createAfterRenderCallback(const Page* pPage);
+		/// JS signature: show : ( Ext.Component this )
+
 };
 
 

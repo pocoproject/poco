@@ -53,6 +53,14 @@ namespace Poco {
 namespace WebWidgets {
 
 
+enum ServerCallback
+{
+	SC_NO = 0,
+	SC_YES,
+	SC_ONLOCALHANDLERS
+};
+
+	
 template <class TArgs> 
 class JavaScriptEvent: public Poco::AbstractEvent < 
 	TArgs, Poco::DefaultStrategy<TArgs, Poco::AbstractDelegate<TArgs>, Poco::p_less<Poco::AbstractDelegate<TArgs> > >,
@@ -61,11 +69,17 @@ class JavaScriptEvent: public Poco::AbstractEvent <
 	/// Event class used to handle JavaScriptEvents. Allows to register two different types
 	/// of delegates. The standard delegates, as known from Poco::BasicEvent and JSDelegates
 	/// which will be embedded into the WebPage when the Parser generates the site.
+	/// Per default a server callback happens only when local listeners are registered.
 {
 public:
 	typedef typename std::list<JSDelegate> JSDelegates;
 	
-	JavaScriptEvent()
+	JavaScriptEvent():
+		_jsHandlers(),
+		_serverCallback(SC_ONLOCALHANDLERS),
+		_callbackPos(0),
+		_onSuccess(),
+		_onFailure()
 		/// Creates the JavaScriptEvent.
 	{
 	}
@@ -113,9 +127,73 @@ public:
 	{
 		_jsHandlers = all;
 	}
+	
+	void setServerCallback(ServerCallback sc, const std::string& onSuccess = "", const std::string& onFailure = "")
+		/// Sets the server callback. onSuccess and onFailure must either be a JavaScript function pointer or a complete
+		/// anonymous function. The server callback position will be set after the currently defined jsHandlers.
+		/// If you want to set the server callback as the very first jsHandler, call setServerCallback before
+		/// any event->add.
+		/// Note that with most renderers you should not worry about the position of the server callback due to its 
+		/// asynchronous nature! If you require to execute JS code after the server callback, you must use onSuccess or
+		/// onFailure!
+	{
+		FastMutex::ScopedLock lock(this->_mutex);
+		_serverCallback = sc;
+		_callbackPos = _jsHandlers.size();
+		_onSuccess = onSuccess;
+		_onFailure = onFailure;
+	}
+	
+	bool willDoServerCallback() const
+		/// Checks if servercallback is set to true or to DEPENDS and if localHandlers exist
+	{
+		return (_serverCallback == SC_YES || (_serverCallback == SC_ONLOCALHANDLERS && hasLocalHandlers()));
+	}
 
+	ServerCallback getServerCallback() const
+		/// Returns the server callback value
+	{
+			return _serverCallback;
+	}
+	
+	std::size_t getServerCallbackPos() const
+		/// Returns how many jsHandlers are executed before the serverCallback
+	{
+		return _callbackPos;
+	}
+	
+	void setServerCallbackPos(std::size_t pos) const
+		/// Sets how many jsHandlers are executed before the serverCallback. Set to 0 to guarantee that the server callback is the first
+	{
+		_callbackPos = pos;
+	}
+	
+	const std::string& getOnSuccess() const
+		/// Returns the onSuccess value
+		
+	{
+		return _onSuccess;
+	}
+	
+	const std::string& getOnFailure() const
+		/// Returns the onFailure value
+	{
+		return _onFailure;
+	}
+	
+	bool hasJavaScriptCode() const
+		/// Returns true if any JSCode (incl, the server callback) is attached to this event
+	{
+		return (willDoServerCallback() || !_jsHandlers.empty());
+	}
+	
+	
 private:
-	JSDelegates _jsHandlers;
+	JSDelegates    _jsHandlers;
+	ServerCallback _serverCallback; /// Set to SC_YES if a server callback should be done always
+	std::size_t    _callbackPos;    /// Sets when the server callback should happen (the number defines how many jsHandlers are executed before the server callback)
+	std::string    _onSuccess;      /// code to execute when the server callback succeeds
+	std::string    _onFailure;      /// code to execute when the server callback fails
 };
 
 

@@ -91,25 +91,33 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 		Form::Ptr pForm = Utility::insideForm(pButtonCell);
 		ostr << "handler: function(){Ext.getCmp('" << pForm->id() << "').getForm().submit();},";
 	}
-	Button* pOwner = dynamic_cast<Button*>(pButtonCell->getOwner());
-	poco_check_ptr (pOwner);
+	View* pView = pButtonCell->getOwner();
+	poco_check_ptr (pView);
+	Button* pOwner = dynamic_cast<Button*>(pView);
+	// a buttoncell inside  a table will have no parent of type button!
+	
 	if (writeId)
-		Utility::writeRenderableProperties(pOwner, ostr);
+		Utility::writeRenderableProperties(pView, ostr);
 	if (!pButtonCell->isEnabled())
 		ostr << ",disabled:true";
 	
+	if (!pView->getName().empty())
+		ostr << ",name:'" << pOwner->getName() << "'";
+	if (pView->getWidth() != 0)
+		ostr << ",minWidth:" << pOwner->getWidth();
+	if (!pView->isVisible())
+		ostr << ",hidden:true";
+		
 	if (pOwner)
 	{
-		if (!pOwner->getName().empty())
-			ostr << ",name:'" << pOwner->getName() << "'";
-		if (pOwner->getWidth() != 0)
-			ostr << ",minWidth:" << pOwner->getWidth();
-		if (!pOwner->isVisible())
-			ostr << ",hidden:true";
-		if (!pOwner->buttonClicked.jsDelegates().empty())
+		if (pOwner->buttonClicked.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
-			Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates());
+			if (pOwner->buttonClicked.willDoServerCallback())
+				Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates(),
+										createClickServerCallback(pOwner), pOwner->buttonClicked.getServerCallbackPos());
+			else
+				Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates());
 			ostr << "}";
 		}
 	}
@@ -120,7 +128,7 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 	if (!toolTip.empty())
 		ostr << ",tooltip:'" << Utility::safe(toolTip) << "'";
 		
-	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pButtonCell->id()), const_cast<ButtonCell*>(pButtonCell));
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pView->id()), const_cast<ButtonCell*>(pButtonCell));
 }
 
 
@@ -139,13 +147,13 @@ void ButtonCellRenderer::writeConfigData(const Cell* pCell, const RenderContext&
 
 
 
-void ButtonCellRenderer::addClickServerCallback(Button* pButton, const std::string& onSuccess, const std::string& onFailure)
+JSDelegate ButtonCellRenderer::createClickServerCallback(const Button* pButton)
 {
 	//click : ( Button this, EventObject e )
 	static const std::string signature("function(but,e)");
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ButtonCell::EV_BUTTONCLICKED));
-	Utility::addServerCallback(pButton->buttonClicked, signature, addParams, pButton->getCell()->id(), onSuccess, onFailure);
+	return Utility::createServerCallback(signature, addParams, pButton->id(), pButton->buttonClicked.getOnSuccess(), pButton->buttonClicked.getOnFailure());
 }
 
 

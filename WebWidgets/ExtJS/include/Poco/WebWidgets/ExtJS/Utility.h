@@ -109,6 +109,8 @@ public:
 		/// writes all JS Delegates for a single named JSEvent. 
 		/// Returns true if data was written, false if no delegates were present and no event handler was written.
 		
+	static bool writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates, const Poco::WebWidgets::JSDelegate& serverCallback, std::size_t serverCallPos);
+		/// writes all JS Delegates for a single named JSEvent. plus the server callbacb, Always returns true.
 
 	static std::string createURI(const std::map<std::string, std::string>& addParams, Renderable::ID id);
 		/// Creates the url from the function parameters, adds the id parameter automatically
@@ -141,6 +143,13 @@ public:
 		ev.add(jsDelegate(code));
 		
 	}
+	
+	static Poco::WebWidgets::JSDelegate createServerCallback(
+								const std::string& signature, 
+								const std::map<std::string, std::string>& addServerParams, 
+								Renderable::ID id,
+								const std::string& onSuccessJS,
+								const std::string& onFailureJS);
 
 private:
 	static void convertPocoDateToPHPDate(char in, std::string& result);

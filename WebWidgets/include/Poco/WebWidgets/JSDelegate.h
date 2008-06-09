@@ -63,6 +63,9 @@ public:
 	bool operator<(const JSDelegate& del) const;
 	
 	bool operator ==(const JSDelegate& del) const;
+	
+	bool operator !=(const JSDelegate& del) const;
+	
 
 private:
 	std::string _jsCode;
@@ -75,9 +78,21 @@ inline const std::string& JSDelegate::jsCode() const
 }
 
 
+inline bool JSDelegate::operator<(const JSDelegate& del) const
+{
+	return (_jsCode < del._jsCode);
+}
+
+
 inline bool JSDelegate::operator ==(const JSDelegate& del) const
 {
 	return jsCode() == del.jsCode();
+}
+
+
+inline bool JSDelegate::operator !=(const JSDelegate& del) const
+{
+	return jsCode() != del.jsCode();
 }
 
 

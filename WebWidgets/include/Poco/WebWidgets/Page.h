@@ -43,17 +43,22 @@
 #include "Poco/WebWidgets/ContainerView.h"
 #include "Poco/WebWidgets/JavaScriptEvent.h"
 #include "Poco/WebWidgets/ResourceManager.h"
-
+#include "Poco/WebWidgets/RequestProcessor.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/HTTPServerResponse.h"
 
 namespace Poco {
 namespace WebWidgets {
 
 
-class WebWidgets_API Page: public ContainerView
+class WebWidgets_API Page: public ContainerView, public RequestProcessor
 	/// A Page displays a HTML Page
 {
 public:
 	typedef Poco::AutoPtr<Page> Ptr;
+	
+	static const std::string EV_BEFORERENDER;
+	static const std::string EV_AFTERRENDER;
 	
 	JavaScriptEvent<Page*> beforeRender; 
 		/// event thrown before GUI rendering. 
@@ -77,6 +82,12 @@ public:
 		
 	const ResourceManager& resourceManager() const;
 		/// Returns the ResourceManager
+		
+	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
+		/// Handles a complete AJAX request submitted by the client.
+		
+	void handleForm(const std::string& field, const std::string& value);
+		/// Dummy implementation
 	
 protected:
 	Page(const std::string& name, const std::type_info& type);
@@ -107,6 +118,11 @@ inline ResourceManager& Page::resourceManager()
 inline const ResourceManager& Page::resourceManager() const
 {
 	return _rm;
+}
+
+
+inline void Page::handleForm(const std::string& , const std::string& )
+{
 }
 
 

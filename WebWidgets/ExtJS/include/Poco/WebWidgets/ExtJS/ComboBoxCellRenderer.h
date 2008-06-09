@@ -42,6 +42,7 @@
 
 #include "Poco/WebWidgets/ExtJS/ExtJS.h"
 #include "Poco/WebWidgets/Renderer.h"
+#include "Poco/WebWidgets/JSDelegate.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
 
@@ -72,14 +73,14 @@ public:
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.
 		
-	static void addSelectedServerCallback(ComboBox* pCombo, const std::string& onSuccess, const std::string& onFailure);
-		/// Adds a server callback for the selected event. The method signature for select is
-		/// select : ( Ext.form.ComboBox combo, Ext.data.Record record, Number index )
-		
 private:
 	static void onLoad(void* pSender, Poco::Net::HTTPServerResponse* &pResponse);
 	
 	static void serialize(const ComboBoxCell* pCell, std::ostream& out);
+	
+	static Poco::WebWidgets::JSDelegate createSelectedServerCallback(const ComboBox* pCombo);
+		/// Adds a server callback for the selected event. The method signature for select is
+		/// select : ( Ext.form.ComboBox combo, Ext.data.Record record, Number index )
 };
 
 

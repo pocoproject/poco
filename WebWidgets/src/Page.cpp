@@ -35,10 +35,15 @@
 
 
 #include "Poco/WebWidgets/Page.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 
 
 namespace Poco {
 namespace WebWidgets {
+
+
+const std::string Page::EV_BEFORERENDER("beforeRender");
+const std::string Page::EV_AFTERRENDER("afterRender");
 
 
 Page::Page():
@@ -87,6 +92,24 @@ void Page::setText(const std::string& text)
 std::string Page::getText() const
 {
 	return _text;
+}
+
+
+
+void Page::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
+{
+	const std::string& ev = args[RequestHandler::KEY_EVID];
+	Page* pPage = this;
+	if (ev == EV_BEFORERENDER)
+	{
+		beforeRender.notify(this, pPage);
+	}
+	else if (ev == EV_AFTERRENDER)
+	{
+		afterRender.notify(this, pPage);
+	}
+	
+	response.send();
 }
 
 

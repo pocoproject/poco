@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/ExtJS/CellRenderer.h"
+#include "Poco/WebWidgets/JSDelegate.h"
 
 
 namespace Poco {
@@ -75,13 +76,15 @@ public:
 	static void renderButton(const ButtonCell* pCell, const std::string& content, bool writeId, bool submitButton, std::ostream& ostr, bool showText = true);
 		/// Renders button properties
 		
-	static void addClickServerCallback(Button* pCombo, const std::string& onSuccess="", const std::string& onFailure="");
+	static Poco::WebWidgets::JSDelegate createClickServerCallback(const Button* pCombo);
 		/// Adds a server callback for the buttonClicked event. The JS method signature for click is
 		/// click : ( Button this, EventObject e )
-
+		
 protected:
 	virtual ~ButtonCellRenderer();
 		/// Destroys the ButtonCellRenderer.
+		
+	
 };
 
 

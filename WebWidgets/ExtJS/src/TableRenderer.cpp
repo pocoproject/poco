@@ -99,9 +99,8 @@ void TableRenderer::renderBody(const Renderable* pRenderable, const RenderContex
 }
 
 
-void TableRenderer::addCellValueChangedServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
+Poco::WebWidgets::JSDelegate TableRenderer::createCellValueChangedServerCallback(const Table* pTable)
 {
-	poco_check_ptr (pTable);
 	static const std::string signature("function(obj)");
 	//extract the true row index from the last column!
 	std::string origRow("+obj.record.get('");
@@ -112,28 +111,27 @@ void TableRenderer::addCellValueChangedServerCallback(Table* pTable, const std::
 	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
 	//problem: I need the displayed string from teh renderer, not the value!
 	// date fields cause problems here, and I only habe one cellclick event per table not per column!
-	// from the tabel get the TableCOlumn, from thsi get the renderer for the given col and render obj.value
+	// from the table get the TableColumn, from this get the renderer for the given col and render obj.value
 	// {(var r=obj.grid.getColumnModel().getRenderer(obj.column))?r(obj.value);:obj.value;}, hm renderer exists for everthing
 	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.grid.getColumnModel().getRenderer(obj.column)(obj.value)")); 
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLVALUECHANGED));
-	Utility::addServerCallback(pTable->cellValueChanged, signature, addParams, pTable->id(), onSuccess, onFailure);
-	pTable->cellValueChanged.add(jsDelegate("function(obj){obj.grid.getStore().commitChanges();}"));
+	const std::string& success = pTable->cellValueChanged.getOnSuccess();
+
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->cellValueChanged.getOnSuccess(), pTable->cellValueChanged.getOnFailure());
 }
 
 
-
-void TableRenderer::addAfterLoadServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
+Poco::WebWidgets::JSDelegate TableRenderer::createAfterLoadServerCallback(const Table* pTable)
 {
 	poco_check_ptr (pTable);
 	static const std::string signature("function(aStore, recs, op)");
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_AFTERLOAD));
-	Utility::addServerCallback(pTable->afterLoad, signature, addParams, pTable->id(), onSuccess, onFailure);
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->afterLoad.getOnSuccess(), pTable->afterLoad.getOnFailure());
 }
 
 
-
-void TableRenderer::addCellClickedServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
+Poco::WebWidgets::JSDelegate TableRenderer::createCellClickedServerCallback(const Table* pTable)
 {
 	poco_check_ptr (pTable);
 	static const std::string signature("function(theGrid,row,col,e)");
@@ -145,12 +143,11 @@ void TableRenderer::addCellClickedServerCallback(Table* pTable, const std::strin
 	addParams.insert(std::make_pair(Table::FIELD_COL, "+col"));
 	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLCLICKED));
-	Utility::addServerCallback(pTable->cellClicked, signature, addParams, pTable->id(), onSuccess, onFailure);
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->cellClicked.getOnSuccess(), pTable->cellClicked.getOnFailure());
 }
 
 
-
-void TableRenderer::addRowClickedServerCallback(Table* pTable, const std::string& onSuccess, const std::string& onFailure)
+Poco::WebWidgets::JSDelegate TableRenderer::createRowClickedServerCallback(const Table* pTable)
 {
 	poco_check_ptr (pTable);
 	poco_assert (pTable->getSelectionModel() != Table::SM_CELL);
@@ -164,7 +161,7 @@ void TableRenderer::addRowClickedServerCallback(Table* pTable, const std::string
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_ROWCLICKED));
-	Utility::addServerCallback(pTable->rowClicked, signature, addParams, pTable->id(), onSuccess, onFailure);
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->rowClicked.getOnSuccess(), pTable->rowClicked.getOnFailure());
 }
 
 
@@ -183,11 +180,26 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	ostr << ",listeners:{";
 	bool written = false;
 	if (editable)
-		written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, pTable->cellValueChanged.jsDelegates());
+	{
+		JSDelegate jsDel("function(obj){obj.grid.getStore().commitChanges();}");
+		std::list<JSDelegate> modList(pTable->cellValueChanged.jsDelegates());
+		modList.push_back(jsDel);
+		if (pTable->cellValueChanged.willDoServerCallback())
+			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList, 
+					TableRenderer::createCellValueChangedServerCallback(pTable), 
+					pTable->cellValueChanged.getServerCallbackPos());
+		else					
+			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList);
+	}
 	if (written)
 		ostr << ",";
 	
-	written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
+	if (pTable->cellClicked.willDoServerCallback())
+		written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates(),
+										TableRenderer::createCellClickedServerCallback(pTable),
+										pTable->cellClicked.getServerCallbackPos());
+	else
+		written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
 			
 	
 	
@@ -203,10 +215,15 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 			ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:true";
 		else if (pTable->getSelectionModel() == Table::SM_MULTIROW)
 			ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:false";
-		if (!pTable->rowClicked.jsDelegates().empty())
+		if (pTable->rowClicked.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
-			Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates());
+			if (pTable->rowClicked.willDoServerCallback())
+				Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates(),
+										TableRenderer::createRowClickedServerCallback(pTable),
+										pTable->rowClicked.getServerCallbackPos());
+			else
+				Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates());
 			ostr << "}";
 		}
 		ostr << "})"; //close selModel
@@ -334,9 +351,16 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	std::string url(Utility::createURI(addParams, pTable->id()));
 	ostr << url << "}),";
 	ostr << "reader:new Ext.data.ArrayReader()";
-	ostr << ",listeners:{";
-	Utility::writeJSEvent(ostr, EV_AFTERLOAD, pTable->afterLoad.jsDelegates());
-	ostr << "}";
+	if (pTable->afterLoad.hasJavaScriptCode())
+	{
+		ostr << ",listeners:{";
+		if (pTable->afterLoad.willDoServerCallback())
+			Utility::writeJSEvent(ostr, EV_AFTERLOAD, pTable->afterLoad.jsDelegates(), createAfterLoadServerCallback(pTable), pTable->afterLoad.getServerCallbackPos());
+		else
+			Utility::writeJSEvent(ostr, EV_AFTERLOAD, pTable->afterLoad.jsDelegates());
+		ostr << "}";
+	}
+	
 	ostr << "})";
 }
 

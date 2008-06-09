@@ -40,6 +40,7 @@
 #include "Poco/WebWidgets/RenderContext.h"
 #include "Poco/WebWidgets/LookAndFeel.h"
 #include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 
 
 namespace Poco {
@@ -125,14 +126,20 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	
 		// always nest a panel around, so we can get rid of dynamic casts to check for parent type
 		ostr << "new Ext.Panel({renderTo:'p" << pPage->id() << "',border:false,bodyBorder:false";
-		if (!pPage->beforeRender.jsDelegates().empty() || !pPage->afterRender.jsDelegates().empty())
+		if (pPage->beforeRender.hasJavaScriptCode() || pPage->afterRender.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
-			bool written = Utility::writeJSEvent(ostr, EV_BEFORERENDER, pPage->beforeRender.jsDelegates());
+			bool written = false;
+			if (pPage->beforeRender.willDoServerCallback())
+				written = Utility::writeJSEvent(ostr, EV_BEFORERENDER, pPage->beforeRender.jsDelegates(), createBeforeRenderCallback(pPage), pPage->beforeRender.getServerCallbackPos());
+			else
+				written = Utility::writeJSEvent(ostr, EV_BEFORERENDER, pPage->beforeRender.jsDelegates());
 			if (written)
 				ostr << ",";
-
-			Utility::writeJSEvent(ostr, EV_AFTERRENDER, pPage->afterRender.jsDelegates());
+			if (pPage->afterRender.willDoServerCallback())
+				Utility::writeJSEvent(ostr, EV_AFTERRENDER, pPage->afterRender.jsDelegates(), createAfterRenderCallback(pPage), pPage->afterRender.getServerCallbackPos());
+			else
+				Utility::writeJSEvent(ostr, EV_AFTERRENDER, pPage->afterRender.jsDelegates());
 			ostr << "}";
 		}
 		if (pPage->getHeight() > 0)
@@ -187,6 +194,26 @@ void PageRenderer::renderBody(const Renderable* pRenderable, const RenderContext
 	}
 	ostr << "</body>";
 	ostr << "</html>";
+}
+
+
+Poco::WebWidgets::JSDelegate PageRenderer::createBeforeRenderCallback(const Page* pPage)
+{
+	// JS signature: beforerender : ( Ext.Component this )
+	static const std::string signature("function(p)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Page::EV_BEFORERENDER));
+	return Utility::createServerCallback(signature, addParams, pPage->id(), pPage->beforeRender.getOnSuccess(), pPage->beforeRender.getOnFailure());
+}
+
+
+Poco::WebWidgets::JSDelegate PageRenderer::createAfterRenderCallback(const Page* pPage)
+{
+	// JS signature: show : ( Ext.Component this )
+	static const std::string signature("function(p)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Page::EV_AFTERRENDER));
+	return Utility::createServerCallback(signature, addParams, pPage->id(), pPage->afterRender.getOnSuccess(), pPage->afterRender.getOnFailure());
 }
 
 

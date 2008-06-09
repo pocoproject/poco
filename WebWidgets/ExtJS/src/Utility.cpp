@@ -479,6 +479,27 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 }
 
 
+bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates, const Poco::WebWidgets::JSDelegate& serverCallback, std::size_t serverCallPos)
+{
+	// TODO: we can optimize here a bit by avoiding the copy
+	std::list<JSDelegate> dels;
+	std::list<JSDelegate>::const_iterator it = dels.begin();
+	bool written = false;
+	for (; it != dels.end(); ++it, --serverCallPos)
+	{
+		if (serverCallPos == 0)
+		{
+			dels.push_back(serverCallback);
+			written = true;
+		}
+		dels.push_back(*it);
+	}
+	if (!written)
+		dels.push_back(serverCallback);
+	return writeJSEvent(out, eventName, dels);
+}
+
+
 void Utility::writeFunction(std::ostream& out, const std::string& fctName, const std::vector<std::string> &params, const std::string& code)
 {
 	out << fctName << "(";
@@ -582,6 +603,18 @@ std::string Utility::createCallbackFunctionCode(const std::string& signature, co
 	return function.str();
 }
 
+
+Poco::WebWidgets::JSDelegate Utility::createServerCallback(
+								const std::string& signature, 
+								const std::map<std::string, std::string>& addServerParams, 
+								Renderable::ID id,
+								const std::string& onSuccessJS,
+								const std::string& onFailureJS)
+	{
+		std::string code(createCallbackFunctionCode(signature, addServerParams, id, onSuccessJS, onFailureJS));
+		 return (jsDelegate(code));
+		
+	}
 
 int Utility::detectMaxParamCount(const std::list<JSDelegate>& delegates)
 {

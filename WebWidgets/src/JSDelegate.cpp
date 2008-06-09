@@ -52,10 +52,4 @@ JSDelegate::~JSDelegate()
 }
 
 
-bool JSDelegate::operator<(const JSDelegate& del) const
-{
-	return (_jsCode < del._jsCode);
-}
-
-
 } } // namespace Poco::WebWidgets

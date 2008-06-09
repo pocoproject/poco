@@ -65,14 +65,14 @@ ComboBoxCellRenderer::~ComboBoxCellRenderer()
 }
 
 
-void ComboBoxCellRenderer::addSelectedServerCallback(ComboBox* pCombo, const std::string& onSuccess, const std::string& onFailure)
+JSDelegate ComboBoxCellRenderer::createSelectedServerCallback(const ComboBox* pCombo)
 {
 	//select : ( Ext.form.ComboBox combo, Ext.data.Record record, Number index )
 	static const std::string signature("function(combo,rec,idx)");
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+rec.get('d')"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ComboBoxCell::EV_SELECTED));
-	Utility::addServerCallback(pCombo->selected, signature, addParams, pCombo->id(), onSuccess, onFailure);
+	return Utility::createServerCallback(signature, addParams, pCombo->id(), pCombo->selected.getOnSuccess(), pCombo->selected.getOnFailure());
 }
 
 
@@ -100,10 +100,13 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	
 	std::string tooltip (pCell->getToolTip());
 		
-	if (pComboOwner && !pComboOwner->selected.jsDelegates().empty())
+	if (pComboOwner && pComboOwner->selected.hasJavaScriptCode())
 	{
 		ostr << ",listeners:{";
-		Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected.jsDelegates());
+		if (pComboOwner->selected.willDoServerCallback())
+			Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected.jsDelegates(), createSelectedServerCallback(pComboOwner), pComboOwner->selected.getServerCallbackPos());
+		else
+			Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected.jsDelegates());
 		if (!tooltip.empty())
 			ostr << ",render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}";
 		ostr << "}";

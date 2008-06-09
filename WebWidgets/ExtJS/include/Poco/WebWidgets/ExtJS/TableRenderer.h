@@ -79,24 +79,6 @@ public:
 
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.
-		
-	static void addCellValueChangedServerCallback(Table* pTable, const std::string& onSuccess=std::string(), const std::string& onFailure=std::string());
-		/// Adds a javascript callback to inform the WebServer that the client has changed a value in the Table
-		/// The Extjs handler offers a method signature of "function(obj)" where obj is a complex element containing members (column, row, value)
-		
-	static void addCellClickedServerCallback(Table* pTable, const std::string& onSuccess=std::string(), const std::string& onFailure=std::string());
-		/// Adds a javascript callback to inform the WebServer that the client has clicked on a cell in the Table
-		/// Method signature is cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
-		
-	static void addRowClickedServerCallback(Table* pTable, const std::string& onSuccess=std::string(), const std::string& onFailure=std::string());
-		/// Adds a javascript callback to inform the WebServer that the client has clicke don a row
-		/// This event will only be added if the Table uses a Row selection model!
-		/// Single cell selection will trigger an exception!
-		/// Method signature is rowselect : ( SelectionModel this, Number rowIndex, Ext.Data.Record r )
-		
-	static void addAfterLoadServerCallback(Table* pTable, const std::string& onSuccess=std::string(), const std::string& onFailure=std::string());
-		/// Adds a javascript callback to inform the WebServer that the client has finished loading data
-		/// Method signature is ( Store this, Ext.data.Record[] records, Object options )
 
 protected:
 	static void renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr);
@@ -112,6 +94,24 @@ protected:
 		/// Renders the data store of the table
 		
 	static void onBeforeLoad(void* pSender, Table::LoadData& ld);
+	
+	static Poco::WebWidgets::JSDelegate createCellValueChangedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has changed a value in the Table
+		/// The Extjs handler offers a method signature of "function(obj)" where obj is a complex element containing members (column, row, value)
+		
+	static Poco::WebWidgets::JSDelegate createCellClickedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has clicked on a cell in the Table
+		/// Method signature is cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
+		
+	static Poco::WebWidgets::JSDelegate createRowClickedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has clicke don a row
+		/// This event will only be added if the Table uses a Row selection model!
+		/// Single cell selection will trigger an exception!
+		/// Method signature is rowselect : ( SelectionModel this, Number rowIndex, Ext.Data.Record r )
+		
+	static Poco::WebWidgets::JSDelegate createAfterLoadServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has finished loading data
+		/// Method signature is ( Store this, Ext.data.Record[] records, Object options )
 };
 
 
