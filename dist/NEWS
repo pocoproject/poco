@@ -1,0 +1,55 @@
+Release 1.3 (2007-05-07)
+========================
+
+This release contains major improvements and new features.
+
+Summary of Changes:
+- HashMap and HashSet classes (Foundation)
+- Tuple class template (Foundation)
+- SharedMemory class (Foundation)
+- FileStream, FileInputStream, FileOutputStream classes that
+  support Unicode (UTF-8) filenames on Windows (Foundation)
+- improvements and bugfixes in the Net library, mostly HTTP
+- DynamicAny class (Foundation)
+- improvements to NetworkInterface class (Net)
+- Condition class, implementing POSIX condition variable-style
+  thread synchronization (Foundation)
+- upgraded to PCRE 7.1 (Foundation)
+- improved Unicode/UTF-8 support
+- NodeAppender class for faster DOM tree creation (XML)
+- Checksum class (Foundation)
+- lots of bugfixes and other improvements - please see the
+  CHANGELOG for details
+
+Incompatible Changes and Transition Issues:
+The HashFunction class template has been changed in an incompatible
+way. The member function formerly named hash() is now the function
+call operator. If you have defined your own HashFunction classes,
+you have to update your code. Sorry for the inconvenience.
+
+On Windows, POCO now builds with Unicode/UTF-8 support 
+(POCO_WIN32_UTF8) enabled by default. If you need the previous
+behavior, remove the corresponding #define from Poco/Config.h
+
+
+Release 1.2 (2006-08-29)
+========================
+
+This release contains major improvements and new features.
+Summary of changes (please see CHANGELOG for details):
+- namespaces and header locations have changed
+- improvements to command line options handling
+- improvements to HTTP server and client classes
+- support for raw sockets and ICMP
+- improvements to DateTime, bugfixes in Timezone
+- improvements to Logging (including a new LogStream class)
+- HashTable classes in Foundation
+- ThreadPool now supports thread priorities
+- ActiveMethod now supports start policies; improved exception support
+- typesafe sprintf-like formatting
+- Process::launch() now supports I/O redirection to pipes
+- improvements to the build system (configure; make; make install is now supported)
+- various other bugfixes and enchancements
+
+--
+$Id: //poco/1.3/dist/NEWS#5 $

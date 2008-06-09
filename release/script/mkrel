@@ -65,13 +65,3 @@ echo "Building release $release"
 
 rm -rf releases/poco-$release.*
 $POCO_BASE/release/script/mkrelease $release $relspec
-
-#
-# Copy archive
-#
-echo "Uploading archive..."
-if [ $cygwin ] ; then
-  $POCO_BASE/release/script/upload $version releases/poco-$release.zip
-else
-  $POCO_BASE/release/script/upload $version releases/poco-$release.tar.*
-fi
