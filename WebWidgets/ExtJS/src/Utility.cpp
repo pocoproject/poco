@@ -483,9 +483,9 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 {
 	// TODO: we can optimize here a bit by avoiding the copy
 	std::list<JSDelegate> dels;
-	std::list<JSDelegate>::const_iterator it = dels.begin();
+	std::list<JSDelegate>::const_iterator it = delegates.begin();
 	bool written = false;
-	for (; it != dels.end(); ++it, --serverCallPos)
+	for (; it != delegates.end(); ++it, --serverCallPos)
 	{
 		if (serverCallPos == 0)
 		{
