@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/svn/Net/src/DNS.cpp#2 $
+// $Id: //poco/Main/Net/src/DNS.cpp#9 $
 //
 // Library: Net
 // Package: NetCore
@@ -82,7 +82,7 @@ DNS::DNSCache DNS::_cache;
 Poco::FastMutex DNS::_mutex;
 
 
-const HostEntry& DNS::hostByName(const std::string& hostname)
+HostEntry DNS::hostByName(const std::string& hostname)
 {
 	FastMutex::ScopedLock lock(_mutex);
 	
@@ -118,7 +118,7 @@ const HostEntry& DNS::hostByName(const std::string& hostname)
 }
 
 
-const HostEntry& DNS::hostByAddress(const IPAddress& address)
+HostEntry DNS::hostByAddress(const IPAddress& address)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
@@ -158,7 +158,7 @@ const HostEntry& DNS::hostByAddress(const IPAddress& address)
 }
 
 
-const HostEntry& DNS::resolve(const std::string& address)
+HostEntry DNS::resolve(const std::string& address)
 {
 	IPAddress ip;
 	if (IPAddress::tryParse(address, ip))
@@ -170,7 +170,7 @@ const HostEntry& DNS::resolve(const std::string& address)
 
 IPAddress DNS::resolveOne(const std::string& address)
 {
-	const HostEntry& entry = resolve(address);
+	HostEntry entry = resolve(address);
 	if (!entry.addresses().empty())
 		return entry.addresses()[0];
 	else
@@ -178,7 +178,7 @@ IPAddress DNS::resolveOne(const std::string& address)
 }
 
 
-const HostEntry& DNS::thisHost()
+HostEntry DNS::thisHost()
 {
 	return hostByName(Environment::nodeName());
 }
