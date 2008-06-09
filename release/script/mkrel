@@ -1,0 +1,77 @@
+#! /bin/sh
+#
+# $Id: //poco/1.3/release/script/mkrel#3 $
+#
+# mkrel
+#
+# Create a release for distribution.
+# This is a wrapper for mkrelease that syncs to the
+# Perforce head revision, reads the current
+# version from $POCO_BASE/VERSION and requires a release
+# specification (loaded from $POCO_BASE/release/spec/*.release)
+# as argument.
+#
+# usage: mkrel [<specfile>]
+#
+
+if [ "$POCO_BASE" = "" ] ; then
+  echo "Error: POCO_BASE not set."
+  exit 1
+fi
+
+cd $POCO_BASE
+
+if [ ! -f VERSION ] ; then
+  echo "Error: No VERSION file found."
+  exit 2
+fi
+
+case `uname` in
+  CYGWIN*) cygwin=1
+            ;;
+        *) cygwin=""
+            ;;
+esac
+
+if [ "$1" != "" ] ; then
+  relspec="-f release/spec/$1.release"
+  reltag="-$1"
+else
+  relspec=""
+  reltag=""
+fi
+
+if [ $cygwin ] ; then
+  export PWD=`cygpath -w $POCO_BASE`
+fi
+
+#
+# Sync files
+#
+echo "Syncing files..."
+if [ -d ".svn" ] ; then
+  svn up
+else
+  p4 sync ./...
+fi
+
+read version <$POCO_BASE/VERSION
+release=$version$reltag
+
+#
+# Build release
+#
+echo "Building release $release"
+
+rm -rf releases/poco-$release.*
+$POCO_BASE/release/script/mkrelease $release $relspec
+
+#
+# Copy archive
+#
+echo "Uploading archive..."
+if [ $cygwin ] ; then
+  $POCO_BASE/release/script/upload $version releases/poco-$release.zip
+else
+  $POCO_BASE/release/script/upload $version releases/poco-$release.tar.*
+fi
