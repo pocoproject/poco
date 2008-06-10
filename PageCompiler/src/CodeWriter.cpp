@@ -1,7 +1,7 @@
 //
 // CodeWriter.cpp
 //
-// $Id: //poco/Main/PageCompiler/src/CodeWriter.cpp#1 $
+// $Id: //poco/1.3/PageCompiler/src/CodeWriter.cpp#1 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -234,6 +234,10 @@ void CodeWriter::writeHandler(std::ostream& ostr)
 {
 	ostr << "void " << _class << "::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)\n";
 	ostr << "{\n";
+	if (_page.has("page.precondition"))
+	{
+		ostr << "\tif (!(" << _page.get("page.precondition") << ")) return;\n\n";
+	}
 	writeSession(ostr);
 	writeForm(ostr);
 	writeRequest(ostr);
@@ -289,4 +293,5 @@ void CodeWriter::writeRequest(std::ostream& ostr)
 	ostr << "\tresponse.setContentType(\"" << contentType << "\");\n";
 	ostr << "\n";
 	ostr << "\tstd::ostream& ostr = response.send();\n";
+	ostr << "\tif (request.getMethod() == Poco::Net::HTTPRequest::HTTP_HEAD) return;\n";
 }

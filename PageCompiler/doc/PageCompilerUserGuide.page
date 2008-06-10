@@ -2,7 +2,8 @@ POCO C++ Server Page Compiler User Guide
 PageCompiler
 
 !!!Introduction
-PageCompiler is a command line tool that translates HTML files (and other kinds of files), into
+PageCompiler is a command line tool that translates HTML files (and other kinds of files, such as
+cascading style sheet files), into
 C++ code, more precisely, subclasses of Poco::Net::HTTPRequestHandler.
 The source files can contain special directives that allow it to include C++ code into
 the source file. The syntax of this directives is based on the syntax used for 
@@ -179,6 +180,53 @@ Allows you to specify whether the response is sent using chunked transfer encodi
 Defaults to <[true]>.
 Set the value to <[false]> to disable chunked transfer encoding.
 
+!precondition
+
+Allows the specification of a precondition, which must be a C++ expression
+valid in the context of the request handler. This can be used to implement
+authentication.
+
+Example:
+
+    <%@ page
+        class="AuthSamplePage"
+        precondition="checkCredentials(request, response)"
+    %>
+
+    <%!
+	bool checkCredentials(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+	{
+		bool isAuthenticated = false;
+		if (request.hasCredentials())
+		{
+			std::string scheme;
+			std::string authInfo;
+			request.getCredentials(scheme, authInfo);
+			if (scheme == Poco::Net::HTTPBasicCredentials::SCHEME)
+			{
+				Poco::Net::HTTPBasicCredentials cred(request);
+				isAuthenticated = (cred.getUsername() == "joeuser" && cred.getPassword() == "s3cr3t");
+			}
+		}
+		if (!isAuthenticated)
+		{
+			response.requireAuthentication("Restricted Area");
+			response.send();
+		}
+		return isAuthenticated;
+	}
+    %>
+    <html>
+    <head>
+    <title>Restricted Area</title>
+    </head>
+    <body>
+    <h1>Restricted Area</h1>
+    </body>
+    </html>
+----    
+   
+    
 !session (OSP only)
 
 For use with the POCO Open Service Platform only.
