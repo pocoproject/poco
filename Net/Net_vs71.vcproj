@@ -201,7 +201,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;Net_EXPORTS;POCO_STATIC"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;Net_EXPORTS;POCO_STATIC"
 				GeneratePreprocessedFile="0"
 				KeepComments="FALSE"
 				StringPooling="TRUE"
