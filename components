@@ -8,3 +8,5 @@ Data/SQLite
 Data/ODBC
 ApacheConnector
 CppUnit
+WebWidgets
+WebWidgets/ExtJS

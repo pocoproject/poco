@@ -35,7 +35,7 @@
 
 
 #include "Poco/WebWidgets/WebWidgetsException.h"
-
+#include <typeinfo>
 
 namespace Poco {
 namespace WebWidgets {

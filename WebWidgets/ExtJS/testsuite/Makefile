@@ -9,10 +9,10 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = ExtJSTestSuite Driver \
-	<SourceFilesHere>
+	ExtJSTest
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoExtJS PocoFoundation CppUnit
+target_libs    = PocoExtJS PocoWebWidgets PocoNet PocoXML PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec

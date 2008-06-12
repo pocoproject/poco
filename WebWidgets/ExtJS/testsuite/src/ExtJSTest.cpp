@@ -1153,7 +1153,7 @@ void ExtJSTest::testFunction()
 	ptrBut2->setToolTip("click here to disable");
 	ptrFrm->add(ptrBut2);
 	TableCellHandler<CheckButtonCell>::Ptr pHandle(new TableCellHandler<CheckButtonCell>("Ext.form.Checkbox", false, true));
-	pHandle->addDynamic("checked", &CheckButtonCell::getBool);
+	pHandle->addDynamic<bool>("checked", &CheckButtonCell::getBool);
 	pHandle->addFixed("dummy", "dummy");
 	std::ostringstream str;
 	pHandle->writeData(ptrBut->cell<CheckButtonCell>(), str);

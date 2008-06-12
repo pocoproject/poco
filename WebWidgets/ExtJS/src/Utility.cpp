@@ -312,7 +312,7 @@ void Utility::convertPocoDateToPHPDate(char in, std::string& result)
 		'`',	'a',	'M',	'u',	'd',	'j',	'f',	'g',	'h',	'u',	'j',	'k',	'l',	'm',	'n',	'm',
 		'p',	'q',	'r',	's',	't',	'u',	'v',	'D',	'x',	'y',	'P',	'{',	'|',	'}',	'~',	'\x7F'};
 
-	
+	//sometimes char is signed: keep this warning
 	if (in < 0 || in > 127)
 	{
 		result.append(1, in);
@@ -336,6 +336,7 @@ void Utility::escapeCharForPHP(char in, std::string& result)
 		'0', '1', '0', '1', '1', '0', '0', '1', '1', '1', '1', '0', '1', '1', '1', '1',
 		'0', '0', '0', '1', '1', '1', '0', '1', '0', '1', '1', '0', '0', '0', '0', '0'};
 
+	//sometimes char is signed: keep this warning
 	if (in < 0 || in > 127)
 	{
 		result.append(1, in);
@@ -362,6 +363,7 @@ void Utility::convertPHPDateToPocoDate(char in, std::string& result)
 		'`',	'a',	'b',	'c',	'd',	'e',	'f',	'g',	'h',	'i',	'j',	'k',	'l',	'm',	'n',	'o',
 		'p',	'q',	'r',	's',	't',	'u',	'v',	'w',	'x',	'y',	'z',	'{',	'|',	'}',	'~',	'\x7F'};
 
+	//sometimes char is signed: keep this warning
 	if (in < 0 || in > 127)
 	{
 		result.append(1, in);

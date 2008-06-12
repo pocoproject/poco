@@ -8,7 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Renderable Renderer RenderContext LookAndFeel Type Event Delegate \
+objects = Renderable Renderer RenderContext LookAndFeel Type Delegate \
 	Formatter IntFormatter DoubleFormatter \
 	View ContainerView Control Cell Button ButtonCell TextField TextFieldCell \
 	Label Form Table Page BoolFormatter DataRetriever \
@@ -22,7 +22,8 @@ objects = Renderable Renderer RenderContext LookAndFeel Type Event Delegate \
 	TableModel TableColumn SimpleTableModel \
 	PasswordField PasswordFieldCell TimeField TimeFieldCell \
 	WebApplication RequestProcessor RequestHandler \
-	SubmitButton SubmitButtonCell ResourceManager
+	SubmitButton SubmitButtonCell ResourceManager \
+	StringFormatter WebWidgetsException JSDelegate
 
 target         = PocoWebWidgets
 target_version = $(LIBVERSION)

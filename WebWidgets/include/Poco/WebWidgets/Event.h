@@ -53,7 +53,7 @@ class Event
 	/// This class holds arguments for events.
 {
 public:
-	Event(typename V* pView):
+	Event(V* pView):
 		/// Creates an Event for the given View.
 		_pView(pView)
 	{
@@ -86,7 +86,7 @@ public:
 		return *_pView;
 	}
 	
-	typename V* viewPtr() const
+	V* viewPtr() const
 		/// Returns the View that was the source of the event.
 	{
 		return _pView;
@@ -96,7 +96,7 @@ public:
 private:
 	Event();
 
-	typename V* _pView;
+	V* _pView;
 };
 
 

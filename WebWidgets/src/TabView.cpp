@@ -37,7 +37,7 @@
 #include "Poco/WebWidgets/TabView.h"
 
 
-#define NO_VIEW_SELECTED -1
+#define NO_VIEW_SELECTED 0xffffffffu
 
 
 namespace Poco {

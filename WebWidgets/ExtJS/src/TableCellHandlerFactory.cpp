@@ -53,32 +53,32 @@ TableCellHandlerFactory::TableCellHandlerFactory()
 {
 	{
 		TableCellHandler<CheckButtonCell>::Ptr pHandle(new TableCellHandler<CheckButtonCell>("Ext.form.Checkbox", true, true));
-		pHandle->addDynamic("checked", &CheckButtonCell::getBool);
+		pHandle->addDynamic<bool>("checked", &CheckButtonCell::getBool);
 		registerFactory(typeid(CheckButtonCell), pHandle);
 	}
 	{
 		TableCellHandler<TextEditCell>::Ptr pHandle(new TableCellHandler<TextEditCell>("Ext.form.TextArea", true, true));
-		pHandle->addDynamic("value", &TextEditCell::getString);
+		pHandle->addDynamic<std::string>("value", &TextEditCell::getString);
 		registerFactory(typeid(TextEditCell), pHandle);
 	}
 	{
 		TableCellHandler<TextFieldCell>::Ptr pHandle(new TableCellHandler<TextFieldCell>("Ext.form.TextField", true, false));
-		pHandle->addDynamic("value", &TextFieldCell::getString);
+		pHandle->addDynamic<std::string>("value", &TextFieldCell::getString);
 		registerFactory(typeid(TextFieldCell), pHandle);
 	}
 	{
 		TableCellHandler<NumberFieldCell>::Ptr pHandle(new TableCellHandler<NumberFieldCell>("Ext.form.NumberField", true, false));
-		pHandle->addDynamic("value", &NumberFieldCell::getString);
+		pHandle->addDynamic<std::string>("value", &NumberFieldCell::getString);
 		registerFactory(typeid(NumberFieldCell), pHandle);
 	}
 	{
 		TableCellHandler<ComboBoxCell>::Ptr pHandle(new TableCellHandler<ComboBoxCell>("Ext.form.ComboBox", true, false));
-		pHandle->addDynamic("value", &ComboBoxCell::getString);
+		pHandle->addDynamic<std::string>("value", &ComboBoxCell::getString);
 		registerFactory(typeid(ComboBoxCell), pHandle);
 	}
 	{
 		TableCellHandler<ButtonCell>::Ptr pHandle(new TableCellHandler<ButtonCell>("Ext.Button", false, true));
-		pHandle->addDynamic("text", &ButtonCell::getString);
+		pHandle->addDynamic<std::string>("text", &ButtonCell::getString);
 		registerFactory(typeid(ButtonCell), pHandle);
 	}
 	{

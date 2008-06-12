@@ -97,7 +97,7 @@ public:
 		write<Ret>((pObj->*_func)(), out);
 	}
 
-	AbstractFunction* clone() const
+	AbstractFunction<Class>* clone() const
 	{
 		return new Function(_func);
 	}
@@ -122,7 +122,7 @@ public:
 		write<Ret>((pObj->*_func)(), out);
 	}
 
-	AbstractFunction* clone() const
+	AbstractFunction<Class>* clone() const
 	{
 		return new Function(_func);
 	}
@@ -145,7 +145,7 @@ public:
 		out << _str;
 	}
 
-	AbstractFunction* clone() const
+	AbstractFunction<Class>* clone() const
 	{
 		return new StaticContentFunction(_str);
 	}
