@@ -9,32 +9,48 @@
 # Usage:
 # configure [<options>...]
 #
-# Options:
-#   --config=<config_name>   
-#     Use the given build configuration
-#     See $POCO_BASE/build/config for possible configs
+# Specify --help to display supported options.
 #
-#   --prefix=<install_prefix>
-#     Use the given install directory for make install.
-#     Default is /usr/local
-#
-#   --stdcxx-base=<apache_stdcxx_install_prefix>
-#     If (and only if) the $POCO_BASE/build/config selected with --config
-#     uses the Apache stdcxx library, then apache_stdcxx_install_prefix
-#     specifies the base directory of where stdcxx is installed.
-#
-#   --no-tests
-#     Do not build testsuites.
-#
-#   --no-samples
-#     Do not build samples.
-#
-#   --no-wstring
-#     Compile with -DPOCO_NO_WSTRING.
-#
-#   --no-fpenvironment
-#     Compile with -DPOCO_NO_FPENVIRONMENT
-#
+
+helpfile=/tmp/config.help
+cat <<ENDHELP >$helpfile
+usage: configure {options}
+Configure the POCO C++ Libraries.
+
+Options:
+  --help
+    Display this help screen.
+
+  --config=<config_name>   
+    Use the given build configuration.
+    See $POCO_BASE/build/config for possible configs.
+
+  --prefix=<install_prefix>
+    Use the given install directory for make install.
+    Default is /usr/local.
+
+  --stdcxx-base=<apache_stdcxx_install_prefix>
+    If (and only if) the $POCO_BASE/build/config selected with --config
+    uses the Apache stdcxx library, then apache_stdcxx_install_prefix
+    specifies the base directory where stdcxx is installed.
+
+  --no-tests
+    Do not build testsuites.
+
+  --no-samples
+    Do not build samples.
+
+  --no-wstring
+    Compile with -DPOCO_NO_WSTRING.
+    Useful if your C++ compiler does not support std::wstring
+    (such as uclibc-based systems).
+
+  --no-fpenvironment
+    Compile with -DPOCO_NO_FPENVIRONMENT.
+    Useful if your C++ compiler has incomplete floating-point support
+    (such as uclibc-based systems).
+    
+ENDHELP
 
 # save cwd
 build=`pwd`
@@ -79,8 +95,16 @@ while [ "$1" != "" ] ; do
 		flags="$flags -DPOCO_NO_FPENVIRONMENT"
 	fi
 	
+	if [ "$1" = "--help" ] ; then
+		cat $helpfile
+		rm -f $helpfile
+		exit 0
+	fi
+	
 	shift
 done
+
+rm -f $helpfile
 
 # autodetect build environment
 # ...special cases for CYGWIN or MinGW
