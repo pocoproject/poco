@@ -12,8 +12,9 @@
 # Specify --help to display supported options.
 #
 
-helpfile=/tmp/config.help
-cat <<ENDHELP >$helpfile
+showhelp ()
+{
+cat << ENDHELP 
 usage: configure {options}
 Configure the POCO C++ Libraries.
 
@@ -23,14 +24,14 @@ Options:
 
   --config=<config_name>   
     Use the given build configuration.
-    See $POCO_BASE/build/config for possible configs.
+    See $base/build/config for possible configs.
 
   --prefix=<install_prefix>
     Use the given install directory for make install.
     Default is /usr/local.
 
   --stdcxx-base=<apache_stdcxx_install_prefix>
-    If (and only if) the $POCO_BASE/build/config selected with --config
+    If (and only if) the $base/build/config selected with --config
     uses the Apache stdcxx library, then apache_stdcxx_install_prefix
     specifies the base directory where stdcxx is installed.
 
@@ -51,7 +52,7 @@ Options:
     (such as uclibc-based systems).
     
 ENDHELP
-
+}
 # save cwd
 build=`pwd`
 # get directory where we are located
@@ -96,15 +97,12 @@ while [ "$1" != "" ] ; do
 	fi
 	
 	if [ "$1" = "--help" ] ; then
-		cat $helpfile
-		rm -f $helpfile
+		showhelp
 		exit 0
 	fi
 	
 	shift
 done
-
-rm -f $helpfile
 
 # autodetect build environment
 # ...special cases for CYGWIN or MinGW
