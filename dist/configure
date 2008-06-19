@@ -12,9 +12,9 @@
 # Specify --help to display supported options.
 #
 
-showhelp() 
+showhelp ()
 {
-cat << ENDHELP
+cat << ENDHELP 
 usage: configure {options}
 Configure the POCO C++ Libraries.
 
@@ -24,7 +24,9 @@ Options:
 
   --config=<config_name>   
     Use the given build configuration.
-    See $base/build/config for possible configs.
+    Available configurations are:
+
+`ls -C $base/build/config/`
 
   --prefix=<install_prefix>
     Use the given install directory for make install.
@@ -53,7 +55,6 @@ Options:
     
 ENDHELP
 }
-
 # save cwd
 build=`pwd`
 # get directory where we are located
@@ -121,9 +122,13 @@ if [ "$config" = "" ] ; then
 fi
 
 if [ ! -f "$base/build/config/$config" ] ; then
-	echo "Unknown configuration: $config"
-	echo "Please use the --config option to specify another build configuration"
-	exit 1
+        echo "Unknown configuration: $config"
+        echo "Please use the --config=<config_name> option."
+        echo "The <config_name> can be one of the following:"
+        echo ""
+        echo "`ls -C $base/build/config/`"
+        echo ""
+        exit 1
 fi
 
 if [ "$prefix" = "" ] ; then
