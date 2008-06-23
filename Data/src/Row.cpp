@@ -64,7 +64,12 @@ Row::Row(NameVecPtr pNames, const RowFormatterPtr& pFormatter):
 	
 	setFormatter(pFormatter);
 
-	_values.resize(_pNames->size());
+	// It would be logical for row to be started with empty values
+	// however, Row sortability at all times is an invariant, hence 
+	// we must start with all zeros here. If null values are later
+	// retrieved from DB, the DynamicAny::empty() call
+	// should be used to empty the corresponding Row value
+	_values.resize(_pNames->size(), 0);
 	addSortField(0);
 }
 
