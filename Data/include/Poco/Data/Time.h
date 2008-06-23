@@ -310,6 +310,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	Data::Time _val;
 };
 

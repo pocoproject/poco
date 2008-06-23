@@ -83,6 +83,7 @@ public:
 	void testJSONDeserializeStruct();
 	void testJSONDeserializeComplex();
 	void testDate();
+	void testEmpty();
 
 	void setUp();
 	void tearDown();

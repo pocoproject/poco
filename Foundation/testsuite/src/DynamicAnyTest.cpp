@@ -2224,6 +2224,33 @@ void DynamicAnyTest::testGetIdxMustThrow(DynamicAny& a1, std::vector<DynamicAny>
 }
 
 
+void DynamicAnyTest::testEmpty()
+{
+	DynamicAny da;
+	assert (da.isEmpty());
+	da = "123";
+	int i = da.convert<int>();
+	assert (123 == i);
+	std::string s = da.extract<std::string>();
+	assert ("123" == s);
+	assert (!da.isEmpty());
+	da.empty();
+	assert (da.isEmpty());
+
+	try
+	{
+		int i = da;
+		fail ("must fail");
+	} catch (InvalidAccessException&) { }
+
+	try
+	{
+		int i = da.extract<int>();
+		fail ("must fail");
+	} catch (InvalidAccessException&) { }
+}
+
+
 void DynamicAnyTest::setUp()
 {
 }
@@ -2274,6 +2301,7 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testJSONDeserializeStruct);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testJSONDeserializeComplex);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testDate);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testEmpty);
 
 	return pSuite;
 }

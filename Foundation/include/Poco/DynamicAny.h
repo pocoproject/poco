@@ -53,6 +53,9 @@ class Foundation_API DynamicAny
 	/// DynamicAny puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent 
 	/// unexpected data loss, particularly when performing narrowing or signedness conversions of numeric data types.
 	///
+	/// An attempt to convert or extract from a non-initialized (“empty”) DynamicAny variable shall result
+	/// in an exception being thrown.
+	///
 	/// Loss of signedness is not allowed for numeric values. This means that if an attempt is made to convert 
 	/// the internal value which is a negative signed integer to an unsigned integer type storage, a RangeException is thrown. 
 	/// Overflow is not allowed, so if the internal value is a larger number than the target numeric type size can accomodate, 
@@ -89,7 +92,7 @@ class Foundation_API DynamicAny
 {
 public:
 	DynamicAny();
-		/// Creates a DynamicAny holding an int with value 0.
+		/// Creates an empty DynamicAny.
 
 	template <typename T> 
 	DynamicAny(const T &val):
@@ -123,7 +126,11 @@ public:
 		/// into the result variable.
 		/// Throws a NotImplementedException if conversion is
 		/// not available for the given type.
+		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
+		if (!_pHolder)
+			throw InvalidAccessException("Can not convert empty value.");
+
 		_pHolder->convert(val);
 	}
 	
@@ -139,7 +146,11 @@ public:
 		/// into the result variable.
 		/// Throws a NotImplementedException if conversion is
 		/// not available for the given type.
+		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
+		if (!_pHolder)
+			throw InvalidAccessException("Can not convert empty value.");
+
 		T result;
 		_pHolder->convert(result);
 		return result;
@@ -154,7 +165,11 @@ public:
 		/// into the result variable.
 		/// Throws a NotImplementedException if conversion is
 		/// not available for the given type.
+		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
+		if (!_pHolder)
+			throw InvalidAccessException("Can not convert empty value.");
+
 		T result;
 		_pHolder->convert(result);
 		return result;
@@ -167,12 +182,15 @@ public:
 		/// Must be instantiated with the exact type of
 		/// the stored value, otherwise a BadCastException
 		/// is thrown.
+		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
 		if (_pHolder && _pHolder->type() == typeid(T))
 		{
-			DynamicAnyHolderImpl<T>* pHolder = static_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
-			return pHolder->value();
+			DynamicAnyHolderImpl<T>* pHolderImpl = static_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
+			return pHolderImpl->value();
 		}
+		else if (!_pHolder)
+			throw InvalidAccessException("Can not extract empty value.");
 		else
 			throw BadCastException();
 	}
@@ -397,6 +415,12 @@ public:
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
 
+	void empty();
+		/// Empties DynamicAny.
+
+	bool isEmpty() const;
+		/// Returns true if empty.
+
 	bool isInteger() const;
 		/// Returns true if stored value is integer.
 
@@ -520,6 +544,19 @@ inline bool DynamicAny::operator != (const DynamicAny& other) const
 inline bool DynamicAny::operator != (const char* other) const
 {
 	return convert<std::string>() != other;
+}
+
+
+inline void DynamicAny::empty()
+{
+	delete _pHolder;
+	_pHolder = 0;
+}
+
+
+inline bool DynamicAny::isEmpty() const
+{
+	return 0 == _pHolder;
 }
 
 

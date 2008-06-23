@@ -76,9 +76,6 @@ class Foundation_API DynamicAnyHolder
 	/// std::vector<DynamicAny> and DynamicStruct.
 {
 public:
-	DynamicAnyHolder();
-		/// Creates the DynamicAnyHolder.
-
 	virtual ~DynamicAnyHolder();
 		/// Destroys the DynamicAnyHolder.
 
@@ -88,36 +85,38 @@ public:
 	virtual const std::type_info& type() const = 0;
 		/// Returns the type information of the stored content.
 
-	virtual void convert(Int8& val) const = 0;
-	virtual void convert(Int16& val) const = 0;
-	virtual void convert(Int32& val) const = 0;
-	virtual void convert(Int64& val) const = 0;
-	virtual void convert(UInt8& val) const = 0;
-	virtual void convert(UInt16& val) const = 0;
-	virtual void convert(UInt32& val) const = 0;
-	virtual void convert(UInt64& val) const = 0;
-	virtual void convert(DateTime& val) const = 0;
-	virtual void convert(LocalDateTime& val) const = 0;
-	virtual void convert(Timestamp& val) const = 0;
-	virtual bool isArray() const = 0;
-	virtual bool isStruct() const = 0;
-	virtual bool isInteger() const = 0;
-	virtual bool isSigned() const = 0;
-	virtual bool isNumeric() const = 0;
-	virtual bool isString() const = 0;
-
+	virtual void convert(Int8& val) const;
+	virtual void convert(Int16& val) const;
+	virtual void convert(Int32& val) const;
+	virtual void convert(Int64& val) const;
+	virtual void convert(UInt8& val) const;
+	virtual void convert(UInt16& val) const;
+	virtual void convert(UInt32& val) const;
+	virtual void convert(UInt64& val) const;
+	virtual void convert(DateTime& val) const;
+	virtual void convert(LocalDateTime& val) const;
+	virtual void convert(Timestamp& val) const;
 #ifndef POCO_LONG_IS_64_BIT
 	void convert(long& val) const;
 	void convert(unsigned long& val) const;
 #endif
+	virtual void convert(bool& val) const;
+	virtual void convert(float& val) const;
+	virtual void convert(double& val) const;
+	virtual void convert(char& val) const;
+	virtual void convert(std::string& val) const;
 
-	virtual void convert(bool& val) const = 0;
-	virtual void convert(float& val) const = 0;
-	virtual void convert(double& val) const = 0;
-	virtual void convert(char& val) const = 0;
-	virtual void convert(std::string& val) const = 0;
+	virtual bool isArray() const;
+	virtual bool isStruct() const;
+	virtual bool isInteger() const;
+	virtual bool isSigned() const;
+	virtual bool isNumeric() const;
+	virtual bool isString() const;
 
 protected:
+	DynamicAnyHolder();
+		/// Creates the DynamicAnyHolder.
+
 	template <typename F, typename T>
 	void convertToSmaller(const F& from, T& to) const
 		/// This function is meant to convert signed numeric values from
@@ -244,6 +243,73 @@ private:
 //
 // inlines
 //
+
+inline void DynamicAnyHolder::convert(Int8& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for Int8");
+}
+
+
+inline void DynamicAnyHolder::convert(Int16& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for Int16");
+}
+
+
+inline void DynamicAnyHolder::convert(Int32& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for Int32");
+}
+
+
+inline void DynamicAnyHolder::convert(Int64& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for Int64");
+}
+
+
+inline void DynamicAnyHolder::convert(UInt8& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for UInt8");
+}
+
+
+inline void DynamicAnyHolder::convert(UInt16& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for UInt16");
+}
+
+
+inline void DynamicAnyHolder::convert(UInt32& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for UInt32");
+}
+
+
+inline void DynamicAnyHolder::convert(UInt64& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for UInt64");
+}
+
+
+inline void DynamicAnyHolder::convert(DateTime& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for DateTime");
+}
+
+
+inline void DynamicAnyHolder::convert(LocalDateTime& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for LocalDateTime");
+}
+
+
+inline void DynamicAnyHolder::convert(Timestamp& val) const
+{
+		throw NotImplementedException("No DynamicAnyHolder specialization for Timestamp");
+}
+
+
 #ifndef POCO_LONG_IS_64_BIT
 inline void DynamicAnyHolder::convert(long& val) const
 {
@@ -260,6 +326,61 @@ inline void DynamicAnyHolder::convert(unsigned long& val) const
 	val = tmp;
 }
 #endif
+
+inline void DynamicAnyHolder::convert(bool& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for bool");
+}
+
+inline void DynamicAnyHolder::convert(float& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for float");
+}
+
+inline void DynamicAnyHolder::convert(double& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for double");
+}
+
+inline void DynamicAnyHolder::convert(char& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for char");
+}
+
+inline void DynamicAnyHolder::convert(std::string& val) const
+{
+	throw NotImplementedException("No DynamicAnyHolder specialization for std::string");
+}
+
+inline bool DynamicAnyHolder::isArray() const
+{
+	return false;
+}
+
+inline bool DynamicAnyHolder::isStruct() const
+{
+	return false;
+}
+
+inline bool DynamicAnyHolder::isInteger() const
+{
+	return false;
+}
+
+inline bool DynamicAnyHolder::isSigned() const
+{
+	return false;
+}
+
+inline bool DynamicAnyHolder::isNumeric() const
+{
+	return false;
+}
+
+inline bool DynamicAnyHolder::isString() const
+{
+	return false;
+}
 
 
 template <typename T>
@@ -280,10 +401,6 @@ class DynamicAnyHolderImpl: public DynamicAnyHolder
 	/// returning a const reference to the actual stored value.
 {
 public:
-	DynamicAnyHolderImpl()
-	{
-	}
-
 	~DynamicAnyHolderImpl()
 	{
 	}
@@ -313,100 +430,8 @@ public:
 		return type() == typeid(std::string);
 	}
 
-	void convert(Int8&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(Int16&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(Int32&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(Int64&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-	
-	void convert(UInt8&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(UInt16&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(UInt32&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(UInt64&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(bool&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(float&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(double&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(char&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(std::string&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(DateTime&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	DynamicAnyHolder* clone() const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	bool isArray() const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
-
-	bool isStruct() const
-	{
-		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
-	}
+private:
+	DynamicAnyHolderImpl();
 };
 
 
@@ -548,6 +573,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	Int8 _val;
 };
 
@@ -692,6 +718,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	Int16 _val;
 };
 
@@ -836,6 +863,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	Int32 _val;
 };
 
@@ -980,6 +1008,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	Int64 _val;
 };
 
@@ -1124,6 +1153,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	UInt8 _val;
 };
 
@@ -1268,6 +1298,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	UInt16 _val;
 };
 
@@ -1412,6 +1443,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	UInt32 _val;
 };
 
@@ -1562,6 +1594,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	UInt64 _val;
 };
 
@@ -1704,6 +1737,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	bool _val;
 };
 
@@ -1849,6 +1883,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	float _val;
 };
 
@@ -2000,6 +2035,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	double _val;
 };
 
@@ -2142,6 +2178,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	char _val;
 };
 
@@ -2317,6 +2354,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	std::string _val;
 };
 
@@ -2464,6 +2502,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	long _val;
 };
 
@@ -2608,6 +2647,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	unsigned long _val;
 };
 
@@ -2694,8 +2734,8 @@ public:
 
 	void convert(std::string& val) const
 	{
-		// Serialize in JSON format: note: although this a vector<T>, the code only 
-		// supports vector<DynamicAny>. We can't make this a total specialization,
+		// Serialize in JSON format: note: although this is a vector<T>, the code only 
+		// supports vector<DynamicAny>. Total specialization is not possible
 		// because of the cyclic dependency between DynamicAny and DynamicAnyHolder
 
 		// JSON format definition: [ n times: elem ',' ], no ',' for last elem
@@ -2718,17 +2758,17 @@ public:
 
 	void convert(DateTime&) const
 	{
-		throw BadCastException("vector -> DateTime");
+		throw BadCastException("Cannot cast collection type to non-collection type");
 	}
 
 	void convert(LocalDateTime&) const
 	{
-		throw BadCastException("vector -> LocalDateTime");
+		throw BadCastException("Cannot cast collection type to non-collection type");
 	}
 
 	void convert(Timestamp&) const
 	{
-		throw BadCastException("vector -> Timestamp");
+		throw BadCastException("Cannot cast collection type to non-collection type");
 	}
 
 	DynamicAnyHolder* clone() const
@@ -2782,6 +2822,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	std::vector<T> _val;
 };
 
@@ -2924,6 +2965,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	DateTime _val;
 };
 
@@ -3066,6 +3108,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	LocalDateTime _val;
 };
 
@@ -3208,6 +3251,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	Timestamp _val;
 };
 

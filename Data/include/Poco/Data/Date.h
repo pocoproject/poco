@@ -306,6 +306,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	Data::Date _val;
 };
 

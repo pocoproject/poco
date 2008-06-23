@@ -373,6 +373,7 @@ public:
 	}
 
 private:
+	DynamicAnyHolderImpl();
 	Data::BLOB _val;
 };
 

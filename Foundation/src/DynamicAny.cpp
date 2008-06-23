@@ -43,8 +43,7 @@
 namespace Poco {
 
 
-DynamicAny::DynamicAny():
-	_pHolder(new DynamicAnyHolderImpl<int>(0))
+DynamicAny::DynamicAny(): _pHolder(0)
 {
 }
 
