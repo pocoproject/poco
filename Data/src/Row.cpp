@@ -45,8 +45,8 @@ namespace Data {
 
 std::ostream& operator << (std::ostream &os, const Row& row)
 {
-      os << row.valuesToString();
-      return os;
+	os << row.valuesToString();
+	return os;
 }
 
 
@@ -182,14 +182,18 @@ void Row::replaceSortField(std::size_t oldPos, std::size_t newPos)
 
 	ComparisonType ct;
 
-	if ((_values[newPos].type() == typeid(Poco::Int8))   ||
-		(_values[newPos].type() == typeid(Poco::UInt8))  ||
-		(_values[newPos].type() == typeid(Poco::Int16))  ||
-		(_values[newPos].type() == typeid(Poco::UInt16)) ||
-		(_values[newPos].type() == typeid(Poco::Int32))  ||
-		(_values[newPos].type() == typeid(Poco::UInt32)) ||
-		(_values[newPos].type() == typeid(Poco::Int64))  ||
-		(_values[newPos].type() == typeid(Poco::UInt64)) ||
+	if (_values[newPos].isEmpty())
+	{
+		throw IllegalStateException("Empty value not sortable.");
+	}
+	else if ((_values[newPos].type() == typeid(Poco::Int8)) ||
+		(_values[newPos].type() == typeid(Poco::UInt8))     ||
+		(_values[newPos].type() == typeid(Poco::Int16))     ||
+		(_values[newPos].type() == typeid(Poco::UInt16))    ||
+		(_values[newPos].type() == typeid(Poco::Int32))     ||
+		(_values[newPos].type() == typeid(Poco::UInt32))    ||
+		(_values[newPos].type() == typeid(Poco::Int64))     ||
+		(_values[newPos].type() == typeid(Poco::UInt64))    ||
 		(_values[newPos].type() == typeid(bool)))
 	{
 		ct = COMPARE_AS_INTEGER;

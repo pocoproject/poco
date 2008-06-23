@@ -2228,6 +2228,15 @@ void DynamicAnyTest::testEmpty()
 {
 	DynamicAny da;
 	assert (da.isEmpty());
+	assert (da.type() == typeid(void));
+	assert (!da.isArray());
+	assert (!da.isInteger());
+	assert (!da.isNumeric());
+	assert (!da.isSigned());
+	assert (!da.isString());
+	assert (!(da == da));
+	assert (!(da != da));
+
 	da = "123";
 	int i = da.convert<int>();
 	assert (123 == i);
@@ -2236,6 +2245,14 @@ void DynamicAnyTest::testEmpty()
 	assert (!da.isEmpty());
 	da.empty();
 	assert (da.isEmpty());
+	assert (da.type() == typeid(void));
+	assert (!da.isArray());
+	assert (!da.isInteger());
+	assert (!da.isNumeric());
+	assert (!da.isSigned());
+	assert (!da.isString());
+	assert (!(da == da));
+	assert (!(da != da));
 
 	try
 	{

@@ -495,7 +495,7 @@ inline void DynamicAny::swap(DynamicAny& ptr)
 
 inline const std::type_info& DynamicAny::type() const
 {
-	return _pHolder->type();
+	return _pHolder ? _pHolder->type() : typeid(void);
 }
 
 
@@ -525,6 +525,7 @@ inline DynamicAny& DynamicAny::operator += (const char*other)
 
 inline bool DynamicAny::operator == (const DynamicAny& other) const
 {
+	if (isEmpty() || other.isEmpty()) return false;
 	return convert<std::string>() == other.convert<std::string>();
 }
 
@@ -537,6 +538,7 @@ inline bool DynamicAny::operator == (const char* other) const
 
 inline bool DynamicAny::operator != (const DynamicAny& other) const
 {
+	if (isEmpty() || other.isEmpty()) return false;
 	return convert<std::string>() != other.convert<std::string>();
 }
 
@@ -562,37 +564,37 @@ inline bool DynamicAny::isEmpty() const
 
 inline bool DynamicAny::isArray() const
 {
-	return _pHolder->isArray();
+	return _pHolder ? _pHolder->isArray() : false;
 }
 
 
 inline bool DynamicAny::isStruct() const
 {
-	return _pHolder->isStruct();
+	return _pHolder ? _pHolder->isStruct() : false;
 }
 
 
 inline bool DynamicAny::isInteger() const
 {
-	return _pHolder->isInteger();
+	return _pHolder ? _pHolder->isInteger() : false;
 }
 
 
 inline bool DynamicAny::isSigned() const
 {
-	return _pHolder->isSigned();
+	return _pHolder ? _pHolder->isSigned() : false;
 }
 
 
 inline bool DynamicAny::isNumeric() const
 {
-	return _pHolder->isNumeric();
+	return _pHolder ? _pHolder->isNumeric() : false;
 }
 
 
 inline bool DynamicAny::isString() const
 {
-	return _pHolder->isString();
+	return _pHolder ? _pHolder->isString() : false;
 }
 
 

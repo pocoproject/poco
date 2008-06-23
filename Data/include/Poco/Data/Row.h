@@ -192,7 +192,7 @@ public:
 		/// Inequality operator.
 
 	bool operator < (const Row& other) const;
-		/// Less-then operator.
+		/// Less-than operator.
 
 	const NameVecPtr names() const;
 		/// Returns the shared pointer to names vector.
