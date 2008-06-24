@@ -62,8 +62,9 @@ void HorizontalLayoutRenderer::renderHead(const Renderable* pRenderable, const R
 	const HorizontalLayout* pLayout = static_cast<const Poco::WebWidgets::HorizontalLayout*>(pRenderable);
 	std::ostringstream layoutConfig;
 	layoutConfig << "{columns:" << pLayout->size() << "}";
-
-	static std::string layout("column");
+	
+	static std::string layout("table");
+	//static std::string layout("column"); -> this works with firefox but faila with IE7!
 	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str());
 }
 
