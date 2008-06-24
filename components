@@ -1,3 +1,4 @@
+CppUnit
 Foundation
 XML
 Util
@@ -7,6 +8,5 @@ Data
 Data/SQLite
 Data/ODBC
 ApacheConnector
-CppUnit
 WebWidgets
 WebWidgets/ExtJS

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="LogRotation"
-	ProjectGUID="{E7CE21A7-3D50-485E-9B68-E1BEC97ED2E3}"
+	ProjectGUID="{748FFA39-8C89-4968-9CF3-54A28A364F27}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="0"
 	>
@@ -374,6 +374,4 @@
 			</File>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
 </VisualStudioProject>

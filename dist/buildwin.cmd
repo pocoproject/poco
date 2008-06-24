@@ -110,112 +110,65 @@ set DEBUG_SHARED=1
 set RELEASE_STATIC=1
 set RELEASE_SHARED=1)))))
 
-cd CppUnit
-if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared CppUnit_%VS_VERSION%.sln)
-if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared CppUnit_%VS_VERSION%.sln)
-if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static CppUnit_%VS_VERSION%.sln)
-if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static CppUnit_%VS_VERSION%.sln)
-cd %POCOBASE%
+rem root level components
+for /f %%G in ('findstr /R /V "./." components') do (
+ if exist %%G (
+  cd %%G
+  echo.
+  echo ========== Building %%G ==========
+  if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%G_%VS_VERSION%.sln)
+  if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%G_%VS_VERSION%.sln)
+  if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%G_%VS_VERSION%.sln)
+  if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%G_%VS_VERSION%.sln)
+  cd %POCOBASE%
+ )
+)
 
-cd Foundation
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared Foundation_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared Foundation_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static Foundation_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static Foundation_%VS_VERSION%.sln
-cd %POCOBASE%
-
-cd XML
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared XML_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared XML_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static XML_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static XML_%VS_VERSION%.sln
-cd %POCOBASE%
-
-cd Util
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared Util_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared Util_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static Util_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static Util_%VS_VERSION%.sln
-cd %POCOBASE%
-
-cd Net
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared Net_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared Net_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static Net_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static Net_%VS_VERSION%.sln
-cd %POCOBASE%
-
-cd NetSSL_OpenSSL
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared NetSSL_OpenSSL_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared NetSSL_OpenSSL_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static NetSSL_OpenSSL_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static NetSSL_OpenSSL_%VS_VERSION%.sln
-cd %POCOBASE%
-
-cd Data
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared Data_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared Data_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static Data_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static Data_%VS_VERSION%.sln
-cd %POCOBASE%
-
-cd Data/SQLite
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared SQLite_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared SQLite_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static SQLite_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static SQLite_%VS_VERSION%.sln
-cd %POCOBASE%
-
-cd Data/ODBC
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared ODBC_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared ODBC_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static ODBC_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static ODBC_%VS_VERSION%.sln
-cd %POCOBASE%
+rem lower level components
+for /f %%G in ('findstr /R "./." components') do (
+ if exist %%G (
+  cd %%G
+   for /f "tokens=1,2 delims=/" %%Q in ("%%G") do (
+    echo.
+    echo ========== Building %%R ==========
+    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%R_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%R_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%R_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%R_%VS_VERSION%.sln)
+  )
+  cd %POCOBASE%
+ )
+)
 
 if "%SAMPLES%"=="no" goto :EOF
 
-cd Foundation/samples
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
-cd %POCOBASE%
-		
-cd XML/samples
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
-cd %POCOBASE%
-		
-cd Util/samples
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
-cd %POCOBASE%
-		
-cd Net/samples
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
-cd %POCOBASE%
-		
-cd NetSSL_OpenSSL/samples
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
-cd %POCOBASE%
+rem root level component samples
+for /f %%G in ('findstr /R /V "./." components') do (
+ if exist %%G/samples (
+  cd %%G/samples
+  echo.
+  echo ========== Building %%G/samples ==========
+  if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
+  if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
+  if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
+  if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
+  cd %POCOBASE%
+ )
+)
 
-cd Data/samples
-if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
-if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
-if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
-if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
-cd %POCOBASE%
+rem lower level component samples
+for /f %%G in ('findstr /R "./." components') do (
+ if exist %%G/samples (
+  cd %%G/samples
+  echo.
+  echo ========== Building %%G/samples ==========
+  if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
+  if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
+  if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
+  if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
+  cd %POCOBASE%
+ )
+)
 
 goto :EOF
 
