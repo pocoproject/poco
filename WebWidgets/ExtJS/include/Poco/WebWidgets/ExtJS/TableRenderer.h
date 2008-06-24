@@ -66,6 +66,7 @@ public:
 	static const std::string EV_ROWCLICKED;
 	static const std::string EV_AFTEREDIT;
 	static const std::string EV_AFTERLOAD;
+	static const std::string EV_RENDER;
 	static const std::string HIDDEN_INDEX_ROW;
 	
 	TableRenderer();
@@ -79,22 +80,7 @@ public:
 
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.
-
-protected:
-	static void renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr);
-		/// Renders Table properties
-
-	static void renderColumns(const Table* pTable, const RenderContext& context, std::ostream& ostr);
-		/// Renders the columns of the table
-
-	static void renderColumn(const Table* pTable, const TableColumn& tc, int idx, const RenderContext& context, std::ostream& ostr);
-		/// Renders a single colum
-
-	static void renderStore(const Table* pTable, std::ostream& ostr);
-		/// Renders the data store of the table
 		
-	static void onBeforeLoad(void* pSender, Table::LoadData& ld);
-	
 	static Poco::WebWidgets::JSDelegate createCellValueChangedServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has changed a value in the Table
 		/// The Extjs handler offers a method signature of "function(obj)" where obj is a complex element containing members (column, row, value)
@@ -112,6 +98,25 @@ protected:
 	static Poco::WebWidgets::JSDelegate createAfterLoadServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has finished loading data
 		/// Method signature is ( Store this, Ext.data.Record[] records, Object options )
+		
+	static Poco::WebWidgets::JSDelegate createRenderServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has finished rendering
+		/// Method signature is ( Grid this, config)	
+
+protected:
+	static void renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr);
+		/// Renders Table properties
+
+	static void renderColumns(const Table* pTable, const RenderContext& context, std::ostream& ostr);
+		/// Renders the columns of the table
+
+	static void renderColumn(const Table* pTable, const TableColumn& tc, int idx, const RenderContext& context, std::ostream& ostr);
+		/// Renders a single colum
+
+	static void renderStore(const Table* pTable, std::ostream& ostr);
+		/// Renders the data store of the table
+		
+	static void onBeforeLoad(void* pSender, Table::LoadData& ld);
 };
 
 

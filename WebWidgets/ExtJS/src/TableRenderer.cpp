@@ -58,6 +58,7 @@ const std::string TableRenderer::EV_CELLCLICKED("cellclick");
 const std::string TableRenderer::EV_ROWCLICKED("rowselect");
 const std::string TableRenderer::EV_AFTEREDIT("afteredit");
 const std::string TableRenderer::EV_AFTERLOAD("load");
+const std::string TableRenderer::EV_RENDER("render");
 const std::string TableRenderer::HIDDEN_INDEX_ROW("hidIdx");
 
 
@@ -131,6 +132,17 @@ Poco::WebWidgets::JSDelegate TableRenderer::createAfterLoadServerCallback(const 
 }
 
 
+
+Poco::WebWidgets::JSDelegate TableRenderer::createRenderServerCallback(const Table* pTable)
+{
+	poco_check_ptr (pTable);
+	static const std::string signature("function(grid, cfg)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_RENDER));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->afterRender.getOnSuccess(), pTable->afterRender.getOnFailure());
+}
+
+
 Poco::WebWidgets::JSDelegate TableRenderer::createCellClickedServerCallback(const Table* pTable)
 {
 	poco_check_ptr (pTable);
@@ -191,17 +203,30 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 		else					
 			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList);
 	}
-	if (written)
-		ostr << ",";
 	
-	if (pTable->cellClicked.willDoServerCallback())
-		written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates(),
+	if (pTable->cellClicked.hasJavaScriptCode())
+	{
+		if (written)
+			ostr << ",";
+		if (pTable->cellClicked.willDoServerCallback())
+			written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates(),
 										TableRenderer::createCellClickedServerCallback(pTable),
 										pTable->cellClicked.getServerCallbackPos());
-	else
-		written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
-			
+		else
+			written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
+	}
 	
+	if (pTable->afterRender.hasJavaScriptCode())
+	{
+		if (written)
+			ostr << ",";
+		if (pTable->afterRender.willDoServerCallback())
+			written = Utility::writeJSEvent(ostr, EV_RENDER, pTable->afterRender.jsDelegates(),
+										TableRenderer::createRenderServerCallback(pTable),
+										pTable->afterRender.getServerCallbackPos());
+		else
+			written = Utility::writeJSEvent(ostr, EV_RENDER, pTable->afterRender.jsDelegates());
+	}
 	
 	ostr << "},"; //close listeners
 	
@@ -209,6 +234,9 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	// forbid reordering of columns, otherwise col index will not match the col index at the server
 	// sorting is allowed though, i.e row matching is active
 	ostr << ",clicksToEdit:1,stripeRows:true,enableColumnHide:false,enableColumnMove:false,loadMask:true";
+	if (pTable->getDragAndDrop())
+		ostr << ",enableDragDrop:true";
+		
 	if (pTable->getSelectionModel() != Table::SM_CELL)
 	{
 		if (pTable->getSelectionModel() == Table::SM_SINGLEROW)
@@ -232,8 +260,41 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 		ostr << ",width:" << pTable->getWidth();
 	if (pTable->getHeight() > 0)
 		ostr << ",height:" << pTable->getHeight();
+	ostr << ",viewConfig: {";
+	ostr <<		"tpl: new Ext.XTemplate('<div class=\"cell\"></div>'),";
+	ostr <<		"getRowClass: function(rec, idx, p, store) {return 'cell';}";
+	ostr <<		"}";
 	ostr << ",store:";
+	ostr << "(tmpLocal=";
 	renderStore(pTable, ostr);
+	ostr << ")";
+	
+	// bbar: new Ext.PagingToolbar({
+	 //           pageSize: 25,
+	 //           store: store,
+	 //           displayInfo: true,
+	 //           displayMsg: 'Displaying topics {0} - {1} of {2}',
+	 //           emptyMsg: "No topics to display",
+	 //           items:[
+	 //               '-', {
+	 //               pressed: true,
+	 //               enableToggle:true,
+	 //               text: 'Show Preview',
+	 //               cls: 'x-btn-text-icon details',
+	 //               toggleHandler: toggleDetails
+	 //           }]
+	 //       })
+	 if (pTable->getPagingSize() > 0)
+	 {
+		ostr << ",remoteSort:true";
+		ostr << ",bbar:new Ext.PagingToolbar({";
+		ostr <<		"pageSize:" << pTable->getPagingSize() << ",";
+		ostr <<		"displayInfo:true,";
+		ostr <<		"displayMsg: 'Displaying topics {0} - {1} of {2}',";
+		ostr <<		"emptyMsg:'No topics to display',";
+		ostr <<		"store:tmpLocal})";
+	 }
+	 
 	Table* pT = const_cast<Table*>(pTable);
 	pT->beforeLoad += Poco::delegate(&TableRenderer::onBeforeLoad);
 	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(id), pT);

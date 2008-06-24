@@ -53,13 +53,16 @@ const std::string Table::EV_ROWCLICKED("row");
 const std::string Table::EV_CELLVALUECHANGED("edit");
 const std::string Table::EV_LOADDATA("load");
 const std::string Table::EV_AFTERLOAD("afterload");
+const std::string Table::EV_RENDER("render");
 
 
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
 	View(typeid(Table)),
 	_pModel(pModel),
 	_columns(tc),
-	_sm(SM_CELL)
+	_sm(SM_CELL),
+	_dragAndDrop(false),
+	_maxRowsPerPage(0)
 {
 	checkValidConfig();
 }
@@ -69,7 +72,9 @@ Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pM
 	View(name, typeid(Table)),
 	_pModel(pModel),
 	_columns(tc),
-	_sm(SM_CELL)
+	_sm(SM_CELL),
+	_dragAndDrop(false),
+	_maxRowsPerPage(0)
 {
 	checkValidConfig();
 }
@@ -79,7 +84,9 @@ Table::Table(const std::string& name, const std::type_info& type, const TableCol
 	View(name, type),
 	_pModel(pModel),
 	_columns(tc),
-	_sm(SM_CELL)
+	_sm(SM_CELL),
+	_dragAndDrop(false),
+	_maxRowsPerPage(0)
 {
 	checkValidConfig();
 }
@@ -89,7 +96,9 @@ Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr
 	View(type),
 	_pModel(pModel),
 	_columns(tc),
-	_sm(SM_CELL)
+	_sm(SM_CELL),
+	_dragAndDrop(false),
+	_maxRowsPerPage(0)
 {
 	checkValidConfig();
 }
@@ -189,6 +198,11 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 	{
 		Table* pTable = this;
 		afterLoad(this, pTable);
+	}
+	else if (ev == EV_RENDER)
+	{
+		Table* pTable = this;
+		afterRender(this, pTable);
 	}
 }
 

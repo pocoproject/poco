@@ -75,6 +75,7 @@ void RequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::
 	_app.attachToThread();
 	Poco::Net::NameValueCollection args;
 	parseRequest(request, args);
+	
 	if (args.empty())
 	{
 		Poco::Net::HTMLForm form(request, request.stream());
@@ -86,6 +87,16 @@ void RequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::
 	}
 	else
 	{
+		Poco::Net::HTMLForm form(request, request.stream());
+		// we provide the form data transparently to the ajax request handler
+		// by simply adding it to the args already received via AJAX URI
+		Poco::Net::NameValueCollection::ConstIterator it = form.begin();
+		for (;it != form.end(); ++it)
+		{
+			const std::string& key = it->first;
+			const std::string& value = it->second;
+			args.add(key, value);
+		}
 		handleAjaxRequest(request, response, args);
 	}
 }

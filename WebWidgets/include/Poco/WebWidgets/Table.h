@@ -71,6 +71,7 @@ public:
 	static const std::string EV_CELLVALUECHANGED;
 	static const std::string EV_LOADDATA;
 	static const std::string EV_AFTERLOAD;
+	static const std::string EV_RENDER;
 	
 	struct WebWidgets_API CellClick
 	{
@@ -107,6 +108,8 @@ public:
 	
 	JavaScriptEvent<Table*> afterLoad; // thrown after data was loaded
 	
+	JavaScriptEvent<Table*> afterRender; // thrown after rendering
+	
 	FIFOEvent<LoadData> beforeLoad; /// thrown whenever a load is requested, internal event to which the TableRenderer must register
 	
 	enum SelectionModel
@@ -116,8 +119,7 @@ public:
 		SM_SINGLEROW,
 		SM_MULTIROW
 	};
-		
-	
+
 	
 	Table(const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates an anonymous Table.
@@ -157,7 +159,19 @@ public:
 	
 	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
 		/// Handles a complete AJAX request submitted by the client.
-	
+		
+	void setDragAndDrop(bool val);
+		/// Sets drag adn drop support
+		
+	bool getDragAndDrop() const;
+		/// Returns if drag and drop is enabled
+		
+	void setPaging(int maxRowsPerPage);
+		/// Enables paging if maxRowsPerPage > 0
+		
+	int getPagingSize() const;
+		/// Returns the paging size
+		
 protected:
 	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates a Table and assigns it the given name.
@@ -175,6 +189,8 @@ private:
 	TableModel::Ptr _pModel;
 	TableColumns    _columns;
 	SelectionModel  _sm;
+	bool            _dragAndDrop;
+	int             _maxRowsPerPage;
 };
 
 
@@ -228,6 +244,29 @@ inline Table::SelectionModel Table::getSelectionModel() const
 	return _sm;
 }
 
+
+inline void Table::setDragAndDrop(bool val)
+{
+	_dragAndDrop = val;
+}
+
+		
+inline bool Table::getDragAndDrop() const
+{
+	return _dragAndDrop;
+}
+
+
+inline void Table::setPaging(int maxRowsPerPage)
+{
+	_maxRowsPerPage = maxRowsPerPage;
+}
+
+
+inline int Table::getPagingSize() const
+{
+	return _maxRowsPerPage;
+}
 
 
 } } // namespace Poco::WebWidgets

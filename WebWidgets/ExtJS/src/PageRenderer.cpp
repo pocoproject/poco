@@ -51,6 +51,7 @@ namespace ExtJS {
 
 const std::string PageRenderer::EV_BEFORERENDER("beforerender");
 const std::string PageRenderer::EV_AFTERRENDER("show"); //don't use afterrender which fires before all the children are rendered!
+const std::string PageRenderer::VAR_LOCALTMP("tmpLocal");
 
 
 PageRenderer::PageRenderer()
@@ -117,7 +118,9 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	{
 		//start inline javascript block
 		ostr << "<script type=\"text/javascript\">";
+
 		ostr << "Ext.onReady(function() {";
+		ostr << "var " << VAR_LOCALTMP << ";"; // tmp variable needed for table renderer
 		ostr << "Ext.QuickTips.init();";
 		ostr << "Ext.Ajax.on({'requestexception':function(conn, resp, obj){";
 		ostr <<				"Ext.Msg.show({";
