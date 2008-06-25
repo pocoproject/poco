@@ -33,6 +33,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+#include "Poco/Platform.h"
+
 
 #if POCO_OS == POCO_OS_SOLARIS
 #undef _XOPEN_SOURCE
