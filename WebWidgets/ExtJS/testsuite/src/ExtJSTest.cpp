@@ -1386,6 +1386,82 @@ void ExtJSTest::testJSEvent2()
 	assert (result == expected);
 }
 
+
+void ExtJSTest::testButtonRename()
+{
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
+	LookAndFeel::Ptr laf(new LookAndFeel());
+	webApp.setLookAndFeel(laf);
+	RenderContext context(*laf, webApp);
+	Utility::initialize(laf);
+
+	Page::Ptr ptr = new Page("test");
+	webApp.setCurrentPage(ptr);
+	Button::Ptr pBut(new Button("but1", "Not Clicked"));
+	ptr->add(pBut);
+	{
+		std::ostringstream ostr;
+		ostr << "function() {";
+		ostr <<		"var but=Ext.getCmp('" << pBut->id() << "');";
+		ostr <<		"if (but.getText() == 'Clicked') ";
+		ostr <<			"but.setText('Not Clicked');";
+		ostr <<		"else ";
+		ostr <<			"but.setText('Clicked');";
+		ostr <<	"}";
+		pBut->buttonClicked.add(jsDelegate(ostr.str())); 
+	}
+	std::ostringstream ostr;
+	std::ofstream fstr("testButtonRename.html");
+	TeeOutputStream out(ostr);
+	out.addStream(fstr);
+	ptr->renderHead(context, out);
+	ptr->renderBody(context, out);
+	std::string result = ostr.str();
+}
+
+
+void ExtJSTest::testPanelShowHide()
+{
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
+	LookAndFeel::Ptr laf(new LookAndFeel());
+	webApp.setLookAndFeel(laf);
+	RenderContext context(*laf, webApp);
+	Utility::initialize(laf);
+
+	Page::Ptr ptr = new Page("test");
+	webApp.setCurrentPage(ptr);
+	Button::Ptr pBut(new Button("but1", "Show"));
+	ptr->add(pBut);
+	Panel::Ptr pWin(new Panel("p","Test Panel"));
+	pWin->setChild(new Label("lbl1", "Just some dummy text"));
+	pWin->show(false);
+	ptr->add(pWin);
+	{
+		std::ostringstream ostr;
+		ostr << "function() {";
+		ostr <<		"var but=Ext.getCmp('" << pBut->id() << "');";
+		ostr <<		"var win=Ext.getCmp('" << pWin->id() << "');";
+		ostr <<		"if (but.getText()=='Show'){";
+		ostr <<			"but.setText('Hide');";
+		ostr <<			"win.show();";
+		ostr <<		"}else{";
+		ostr <<			"but.setText('Show');";
+		ostr <<			"win.hide();";
+		ostr <<		"}";
+		ostr <<	"}";
+		pBut->buttonClicked.add(jsDelegate(ostr.str())); 
+	}
+	
+	std::ostringstream ostr;
+	std::ofstream fstr("testPanelShowHide.html");
+	TeeOutputStream out(ostr);
+	out.addStream(fstr);
+	ptr->renderHead(context, out);
+	ptr->renderBody(context, out);
+	std::string result = ostr.str();
+}
+
+
 void ExtJSTest::setUp()
 {
 }
@@ -1438,6 +1514,8 @@ CppUnit::Test* ExtJSTest::suite()
 	CppUnit_addTest(pSuite, ExtJSTest, testTableImageButton);
 	CppUnit_addTest(pSuite, ExtJSTest, testJSEvent);
 	CppUnit_addTest(pSuite, ExtJSTest, testJSEvent2);
+	CppUnit_addTest(pSuite, ExtJSTest, testButtonRename);
+	CppUnit_addTest(pSuite, ExtJSTest, testPanelShowHide);
 
 	return pSuite;
 }

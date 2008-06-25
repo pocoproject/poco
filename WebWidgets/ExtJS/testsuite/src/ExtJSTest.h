@@ -83,6 +83,8 @@ public:
 	void testTableImageButton();
 	void testJSEvent();
 	void testJSEvent2();
+	void testButtonRename();
+	void testPanelShowHide();
 	void setUp();
 	void tearDown();
 

@@ -194,7 +194,7 @@ void PageRenderer::renderBody(const Renderable* pRenderable, const RenderContext
 	ostr << "<body>";
 	if (!pPage->empty())
 	{
-		//process all children: JS is a JavaScript library, we NEVER write to the body
+		//process all children: ExtJS is a JavaScript library, we NEVER write to the body
 		ostr << "<div id=\"p" << pPage->id() << "\" />";
 		// also a tmp id for temporary storage!
 		ostr << "<div id=\"" << Utility::getTmpID() << "\" />";

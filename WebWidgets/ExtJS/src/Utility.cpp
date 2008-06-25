@@ -138,9 +138,12 @@ void Utility::initialize(ResourceManager::Ptr ptr, const Poco::Path& extJSDir)
 {
 	Poco::Path aDir(extJSDir);
 	aDir.makeDirectory();
-
 	ptr->appendJSInclude(Poco::Path(aDir, "ext-base.js"));
+#ifdef _DEBUG
+	ptr->appendJSInclude(Poco::Path(aDir, "ext-all-debug.js"));
+#else	
 	ptr->appendJSInclude(Poco::Path(aDir, "ext-all.js"));
+#endif
 	ptr->appendJSInclude(Poco::Path(aDir, "DDView.js"));
 	ptr->appendJSInclude(Poco::Path(aDir, "Multiselect.js"));
 	
