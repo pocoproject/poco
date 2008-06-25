@@ -67,6 +67,8 @@ public:
 	static const std::string EV_AFTEREDIT;
 	static const std::string EV_AFTERLOAD;
 	static const std::string EV_RENDER;
+	static const std::string EV_MOUSEUP;
+	static const std::string EV_MOUSEDOWN;
 	static const std::string HIDDEN_INDEX_ROW;
 	
 	TableRenderer();
@@ -102,6 +104,14 @@ public:
 	static Poco::WebWidgets::JSDelegate createRenderServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has finished rendering
 		/// Method signature is ( Grid this, config)	
+		
+	static Poco::WebWidgets::JSDelegate createMouseUpServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has release a mouse button
+		/// Method signature is ( Ext.EventObject e)
+		
+	static Poco::WebWidgets::JSDelegate createMouseDownServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has pressed a mouse button
+		/// Method signature is ( Ext.EventObject e)	
 
 protected:
 	static void renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr);

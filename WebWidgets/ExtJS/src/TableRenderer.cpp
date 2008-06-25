@@ -59,6 +59,8 @@ const std::string TableRenderer::EV_ROWCLICKED("rowselect");
 const std::string TableRenderer::EV_AFTEREDIT("afteredit");
 const std::string TableRenderer::EV_AFTERLOAD("load");
 const std::string TableRenderer::EV_RENDER("render");
+const std::string TableRenderer::EV_MOUSEUP("mouseup");
+const std::string TableRenderer::EV_MOUSEDOWN("mousedown");
 const std::string TableRenderer::HIDDEN_INDEX_ROW("hidIdx");
 
 
@@ -177,6 +179,26 @@ Poco::WebWidgets::JSDelegate TableRenderer::createRowClickedServerCallback(const
 }
 
 
+Poco::WebWidgets::JSDelegate TableRenderer::createMouseUpServerCallback(const Table* pTable)
+{
+	poco_check_ptr (pTable);
+	static const std::string signature("function(e)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_MOUSEUP));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->mouseUp.getOnSuccess(), pTable->mouseUp.getOnFailure());
+}
+
+
+Poco::WebWidgets::JSDelegate TableRenderer::createMouseDownServerCallback(const Table* pTable)
+{
+	poco_check_ptr (pTable);
+	static const std::string signature("function(e)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_MOUSEDOWN));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->mouseDown.getOnSuccess(), pTable->mouseDown.getOnFailure());
+}
+
+
 void TableRenderer::renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr)
 {
 	WebApplication& app = WebApplication::instance();
@@ -226,6 +248,30 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 										pTable->afterRender.getServerCallbackPos());
 		else
 			written = Utility::writeJSEvent(ostr, EV_RENDER, pTable->afterRender.jsDelegates());
+	}
+	
+	if (pTable->mouseUp.hasJavaScriptCode())
+	{
+		if (written)
+			ostr << ",";
+		if (pTable->mouseUp.willDoServerCallback())
+			written = Utility::writeJSEvent(ostr, EV_MOUSEUP, pTable->mouseUp.jsDelegates(),
+										TableRenderer::createMouseUpServerCallback(pTable),
+										pTable->mouseUp.getServerCallbackPos());
+		else
+			written = Utility::writeJSEvent(ostr, EV_MOUSEUP, pTable->mouseUp.jsDelegates());
+	}
+	
+	if (pTable->mouseDown.hasJavaScriptCode())
+	{
+		if (written)
+			ostr << ",";
+		if (pTable->mouseDown.willDoServerCallback())
+			written = Utility::writeJSEvent(ostr, EV_MOUSEDOWN, pTable->mouseDown.jsDelegates(),
+										TableRenderer::createMouseDownServerCallback(pTable),
+										pTable->mouseDown.getServerCallbackPos());
+		else
+			written = Utility::writeJSEvent(ostr, EV_MOUSEDOWN, pTable->mouseDown.jsDelegates());
 	}
 	
 	ostr << "},"; //close listeners

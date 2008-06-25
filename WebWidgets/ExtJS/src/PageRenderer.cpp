@@ -113,12 +113,13 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	}
 	// extra css  for label
 	ostr << "<style type=\"text/css\">.lbl {font:normal 12px tahoma, verdana, helvetica}</style>";
+	ostr << "<style type=\"text/css\">.x-form-cb-label {font:normal 12px tahoma, verdana, helvetica}</style>";
 	
 	if (!pPage->empty())
 	{
 		//start inline javascript block
 		ostr << "<script type=\"text/javascript\">";
-
+		ostr << "var global={};"; //global var to store values!
 		ostr << "Ext.onReady(function() {";
 		ostr << "var " << VAR_LOCALTMP << ";"; // tmp variable needed for table renderer
 		ostr << "Ext.QuickTips.init();";

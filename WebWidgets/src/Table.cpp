@@ -54,6 +54,8 @@ const std::string Table::EV_CELLVALUECHANGED("edit");
 const std::string Table::EV_LOADDATA("load");
 const std::string Table::EV_AFTERLOAD("afterload");
 const std::string Table::EV_RENDER("render");
+const std::string Table::EV_MOUSEUP("mouseup");
+const std::string Table::EV_MOUSEDOWN("mousedown");
 
 
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
@@ -203,6 +205,16 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 	{
 		Table* pTable = this;
 		afterRender(this, pTable);
+	}
+	else if (ev == EV_MOUSEUP)
+	{
+		Table* pTable = this;
+		mouseUp(this, pTable);
+	}
+	else if (ev == EV_MOUSEDOWN)
+	{
+		Table* pTable = this;
+		mouseDown(this, pTable);
 	}
 }
 
