@@ -61,15 +61,15 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 //
 // Parameters for barebone-test
-#define MYSQL_USER "wmcloader"
+#define MYSQL_USER "root"
 #define MYSQL_PWD  ""
 #define MYSQL_HOST "localhost"
 #define MYSQL_PORT 3306
-#define MYSQL_DB   "robot"
+#define MYSQL_DB   "test"
 
 //
 // Connection string to POCO
-std::string MySQLTest::_dbConnString = "user=wmcloader;password=;db=robot;compress=true;auto-reconnect=true";
+std::string MySQLTest::_dbConnString = "user=root;password=;db=test;compress=true;auto-reconnect=true";
 
 
 MySQLTest::MySQLTest(const std::string& name): 
