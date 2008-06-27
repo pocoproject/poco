@@ -49,7 +49,9 @@ const std::string Table::FIELD_ROW("row");
 const std::string Table::FIELD_VAL("val");
 const std::string Table::FIELD_CNT("cnt");
 const std::string Table::EV_CELLCLICKED("click");
+const std::string Table::EV_BEFORECELLCLICKED("beforeclick");
 const std::string Table::EV_ROWCLICKED("row");
+const std::string Table::EV_BEFOREROWCLICKED("beforerow");
 const std::string Table::EV_CELLVALUECHANGED("edit");
 const std::string Table::EV_LOADDATA("load");
 const std::string Table::EV_AFTERLOAD("afterload");
@@ -169,6 +171,15 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 		cellClicked(this, ev);
 		response.send();
 	}
+	else if (ev == EV_BEFORECELLCLICKED)
+	{
+		if (col < 0 || row < 0 || col >= getColumnCount())
+			throw InvalidArgumentException("col/row out of range");
+
+		CellClick ev(row, col);
+		beforeCellClicked(this, ev);
+		response.send();
+	}
 	else if (ev == EV_ROWCLICKED)
 	{
 		if (row < 0 )
@@ -176,6 +187,15 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 
 		std::size_t theRow(row);
 		rowClicked(this, theRow);
+		response.send();
+	}
+	else if (ev == EV_BEFOREROWCLICKED)
+	{
+		if (row < 0 )
+			throw InvalidArgumentException("row out of range");
+
+		std::size_t theRow(row);
+		beforeRowClicked(this, theRow);
 		response.send();
 	}
 	else if (ev == EV_CELLVALUECHANGED)

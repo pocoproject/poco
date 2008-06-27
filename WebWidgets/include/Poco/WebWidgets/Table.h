@@ -67,7 +67,9 @@ public:
 	static const std::string FIELD_VAL;
 	static const std::string FIELD_CNT;
 	static const std::string EV_CELLCLICKED;
+	static const std::string EV_BEFORECELLCLICKED;
 	static const std::string EV_ROWCLICKED;
+	static const std::string EV_BEFOREROWCLICKED;
 	static const std::string EV_CELLVALUECHANGED;
 	static const std::string EV_LOADDATA;
 	static const std::string EV_AFTERLOAD;
@@ -104,7 +106,11 @@ public:
 	
 	JavaScriptEvent<std::size_t> rowClicked; /// fires the row clicked event
 	
+	JavaScriptEvent<std::size_t> beforeRowClicked; /// fires the before row clicked event
+	
 	JavaScriptEvent<Table::CellClick> cellClicked; /// fires the cellClicked event
+	
+	JavaScriptEvent<Table::CellClick> beforeCellClicked; /// fires when the mouse is pressed down on a cell
 	
 	JavaScriptEvent<Table::CellValueChange> cellValueChanged;
 	

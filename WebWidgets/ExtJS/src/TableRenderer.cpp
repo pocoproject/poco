@@ -56,6 +56,8 @@ namespace ExtJS {
 
 const std::string TableRenderer::EV_CELLCLICKED("cellclick");
 const std::string TableRenderer::EV_ROWCLICKED("rowselect");
+const std::string TableRenderer::EV_BEFORECELLCLICKED("cellmousedown");
+const std::string TableRenderer::EV_BEFOREROWCLICKED("rowmousedown");
 const std::string TableRenderer::EV_AFTEREDIT("afteredit");
 const std::string TableRenderer::EV_AFTERLOAD("load");
 const std::string TableRenderer::EV_RENDER("render");
@@ -161,6 +163,22 @@ Poco::WebWidgets::JSDelegate TableRenderer::createCellClickedServerCallback(cons
 }
 
 
+Poco::WebWidgets::JSDelegate TableRenderer::createBeforeCellClickedServerCallback(const Table* pTable)
+{
+	poco_check_ptr (pTable);
+	static const std::string signature("function(theGrid,row,col,e)");
+	//extract the true row index from the last column!
+	std::string origRow("+theGrid.getStore().getAt(row).get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_COL, "+col"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_BEFORECELLCLICKED));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->beforeCellClicked.getOnSuccess(), pTable->beforeCellClicked.getOnFailure());
+}
+
+
 Poco::WebWidgets::JSDelegate TableRenderer::createRowClickedServerCallback(const Table* pTable)
 {
 	poco_check_ptr (pTable);
@@ -176,6 +194,24 @@ Poco::WebWidgets::JSDelegate TableRenderer::createRowClickedServerCallback(const
 	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_ROWCLICKED));
 	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->rowClicked.getOnSuccess(), pTable->rowClicked.getOnFailure());
+}
+
+
+Poco::WebWidgets::JSDelegate TableRenderer::createBeforeRowClickedServerCallback(const Table* pTable)
+{
+	poco_check_ptr (pTable);
+	poco_assert (pTable->getSelectionModel() != Table::SM_CELL);
+	
+	/// Method signature is rowselect : ( SelectionModel this, Number rowIndex, Ext.Data.Record r )
+	static const std::string signature("function(sm,row,r)");
+	//extract the true row index from the last column!
+	std::string origRow("+r.get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_BEFOREROWCLICKED));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->beforeRowClicked.getOnSuccess(), pTable->beforeRowClicked.getOnFailure());
 }
 
 
@@ -238,6 +274,18 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 			written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
 	}
 	
+	if (pTable->beforeCellClicked.hasJavaScriptCode())
+	{
+		if (written)
+			ostr << ",";
+		if (pTable->beforeCellClicked.willDoServerCallback())
+			written = Utility::writeJSEvent(ostr, EV_BEFORECELLCLICKED, pTable->beforeCellClicked.jsDelegates(),
+										TableRenderer::createBeforeCellClickedServerCallback(pTable),
+										pTable->beforeCellClicked.getServerCallbackPos());
+		else
+			written = Utility::writeJSEvent(ostr, EV_BEFORECELLCLICKED, pTable->beforeCellClicked.jsDelegates());
+	}
+	
 	if (pTable->afterRender.hasJavaScriptCode())
 	{
 		if (written)
@@ -289,15 +337,27 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 			ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:true";
 		else if (pTable->getSelectionModel() == Table::SM_MULTIROW)
 			ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:false";
-		if (pTable->rowClicked.hasJavaScriptCode())
+		if (pTable->rowClicked.hasJavaScriptCode() || pTable->beforeRowClicked.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
 			if (pTable->rowClicked.willDoServerCallback())
-				Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates(),
+				written = Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates(),
 										TableRenderer::createRowClickedServerCallback(pTable),
 										pTable->rowClicked.getServerCallbackPos());
 			else
-				Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates());
+				written = Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates());
+				
+			if (pTable->beforeRowClicked.hasJavaScriptCode())
+			{
+				if (written)
+					ostr << ",";
+				if (pTable->beforeRowClicked.willDoServerCallback())
+					written = Utility::writeJSEvent(ostr, EV_BEFOREROWCLICKED, pTable->beforeRowClicked.jsDelegates(),
+										TableRenderer::createBeforeRowClickedServerCallback(pTable),
+										pTable->beforeRowClicked.getServerCallbackPos());
+				else
+					written = Utility::writeJSEvent(ostr, EV_BEFOREROWCLICKED, pTable->beforeRowClicked.jsDelegates());	
+			}
 			ostr << "}";
 		}
 		ostr << "})"; //close selModel

@@ -64,6 +64,8 @@ class ExtJS_API TableRenderer: public Poco::WebWidgets::Renderer
 public:
 	static const std::string EV_CELLCLICKED;
 	static const std::string EV_ROWCLICKED;
+	static const std::string EV_BEFORECELLCLICKED;
+	static const std::string EV_BEFOREROWCLICKED;
 	static const std::string EV_AFTEREDIT;
 	static const std::string EV_AFTERLOAD;
 	static const std::string EV_RENDER;
@@ -92,6 +94,16 @@ public:
 		/// Method signature is cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
 		
 	static Poco::WebWidgets::JSDelegate createRowClickedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has clicke don a row
+		/// This event will only be added if the Table uses a Row selection model!
+		/// Single cell selection will trigger an exception!
+		/// Method signature is rowselect : ( SelectionModel this, Number rowIndex, Ext.Data.Record r )
+		
+	static Poco::WebWidgets::JSDelegate createBeforeCellClickedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has clicked on a cell in the Table
+		/// Method signature is cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
+		
+	static Poco::WebWidgets::JSDelegate createBeforeRowClickedServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has clicke don a row
 		/// This event will only be added if the Table uses a Row selection model!
 		/// Single cell selection will trigger an exception!
