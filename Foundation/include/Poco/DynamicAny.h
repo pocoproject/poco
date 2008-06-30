@@ -42,6 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/DynamicAnyHolder.h"
+#include "Poco/Format.h"
 #include <typeinfo>
 
 
@@ -95,7 +96,7 @@ public:
 		/// Creates an empty DynamicAny.
 
 	template <typename T> 
-	DynamicAny(const T &val):
+	DynamicAny(const T& val):
 		_pHolder(new DynamicAnyHolderImpl<T>(val))
 		/// Creates the DynamicAny from the given value.
 	{
@@ -159,7 +160,10 @@ public:
 	template <typename T>
 	operator T () const
 		/// Safe conversion operator for implicit type
-		/// conversions.
+		/// conversions. If the requested type T is same as the 
+		/// type being held, the operation performed is direct 
+		/// extraction, otherwise it is the conversion of the value
+		/// from type currently held to the one requested.
 		///
 		/// Throws a RangeException if the value does not fit
 		/// into the result variable.
@@ -168,11 +172,16 @@ public:
 		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
 		if (!_pHolder)
-			throw InvalidAccessException("Can not convert empty value.");
+				throw InvalidAccessException("Can not convert empty value.");
 
-		T result;
-		_pHolder->convert(result);
-		return result;
+		if (typeid(T) == _pHolder->type())
+			return extract<T>();
+		else
+		{
+			T result;
+			_pHolder->convert(result);
+			return result;
+		}
 	}
 
 	template <typename T>
@@ -192,7 +201,9 @@ public:
 		else if (!_pHolder)
 			throw InvalidAccessException("Can not extract empty value.");
 		else
-			throw BadCastException();
+			throw BadCastException(format("Can not convert %s to %s.",
+				_pHolder->type().name(),
+				typeid(T).name()));
 	}
 
 	template <typename T> 
@@ -373,44 +384,36 @@ public:
 	template <typename T>
 	DynamicAny& operator [] (T n)
 		/// Index operator, only use on DynamicAnys where isArray
-		/// returns true! In all other cases a BadCastException is thrown!
+		/// returns true! In all other cases InvalidAccessException is thrown.
 	{
-		DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder =
-			dynamic_cast<DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
-		if (pHolder)
-			return pHolder->operator[](n);
-		else
-			throw BadCastException();
+		return holderImpl<std::vector<DynamicAny>,
+			InvalidAccessException>("Not an array.")->operator[](n);
 	}
 
 	template <typename T>
 	const DynamicAny& operator [] (T n) const
 		/// const Index operator, only use on DynamicAnys where isArray
-		/// returns true! In all other cases a BadCastException is thrown!
+		/// returns true! In all other cases InvalidAccessException is thrown.
 	{
-		const DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder =
-			dynamic_cast<const DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
-		if (pHolder)
-			return pHolder->operator[](n);
-		else
-			throw BadCastException();
+		return const_cast<const DynamicAny&>(holderImpl<std::vector<DynamicAny>,
+			InvalidAccessException>("Not an array.")->operator[](n));
 	}
 
 	DynamicAny& operator [] (const std::string& name);
 		/// Index operator by name, only use on DynamicAnys where isStruct
-		/// returns true! In all other cases a BadCastException is thrown!
+		/// returns true! In all other cases InvalidAccessException is thrown.
 
 	const DynamicAny& operator [] (const std::string& name) const;
 		/// Index operator by name, only use on DynamicAnys where isStruct
-		/// returns true! In all other cases a BadCastException is thrown!
+		/// returns true! In all other cases InvalidAccessException is thrown.
 
 	DynamicAny& operator [] (const char* name);
 		/// Index operator by name, only use on DynamicAnys where isStruct
-		/// returns true! In all other cases a BadCastException is thrown!
+		/// returns true! In all other cases InvalidAccessException is thrown.
 
 	const DynamicAny& operator [] (const char* name) const;
 		/// Index operator by name, only use on DynamicAnys where isStruct
-		/// returns true! In all other cases a BadCastException is thrown!
+		/// returns true! In all other cases InvalidAccessException is thrown.
 
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
@@ -472,6 +475,17 @@ private:
 	T divide(const DynamicAny& other) const
 	{
 		return convert<T>() / other.convert<T>();
+	}
+
+	template <typename T, typename E>
+	DynamicAnyHolderImpl<T>* holderImpl(const std::string errorMessage = "") const
+	{
+		if (_pHolder && _pHolder->type() == typeid(T))
+			return static_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
+		else if (!_pHolder)
+			throw InvalidAccessException("Can not access empty value.");
+		else
+			throw E(errorMessage);
 	}
 
 	DynamicAnyHolder* _pHolder;

@@ -874,6 +874,13 @@ void DataTest::testRow()
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 
+	try
+	{
+		row4.addSortField(1);
+		fail ("must fail - field 1 is empty");
+	}
+	catch (InvalidAccessException&) { }
+
 	row4.set("field0", 0);
 	row4.set("field1", 1);
 	row4.set("field2", 2);

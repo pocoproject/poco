@@ -47,6 +47,32 @@
 using namespace Poco;
 
 
+class Dummy
+{
+public:
+	Dummy(): _val(0)
+	{
+	}
+
+	Dummy(int val): _val(val)
+	{
+	}
+
+	operator int () const
+	{
+		return _val;
+	}
+
+	bool operator == (int i)
+	{
+		return i == _val;
+	}
+
+private:
+	int _val;
+};
+
+
 DynamicAnyTest::DynamicAnyTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -1339,7 +1365,29 @@ void DynamicAnyTest::testULong()
 	assert (a3 == 64);
 }
 
-	
+
+void DynamicAnyTest::testUDT()
+{
+	Dummy d0;
+	assert (d0 == 0);
+
+	Dummy d(1);
+	DynamicAny da = d;
+	assert (da.extract<Dummy>() == 1);
+
+	Dummy d1 = d;
+	DynamicAny da1 = d1;
+	assert (da1.extract<Dummy>() == 1);
+
+	try
+	{
+		float f = da1;
+		fail ("must fail");
+	}
+	catch (BadCastException&) { }
+}
+
+
 void DynamicAnyTest::testConversionOperator()
 {
 	DynamicAny any("42");
@@ -2207,7 +2255,7 @@ void DynamicAnyTest::testGetIdxMustThrow(DynamicAny& a1, std::vector<DynamicAny>
 		fail("bad cast - must throw");
 		val1 = 0; // silence the compiler
 	}
-	catch (Poco::BadCastException&)
+	catch (Poco::InvalidAccessException&)
 	{
 	}
 
@@ -2218,7 +2266,7 @@ void DynamicAnyTest::testGetIdxMustThrow(DynamicAny& a1, std::vector<DynamicAny>
 		fail("bad const cast - must throw");
 		assert (cval1 == c1); // silence the compiler
 	}
-	catch (Poco::BadCastException&)
+	catch (Poco::InvalidAccessException&)
 	{
 	}
 }
@@ -2294,9 +2342,10 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testChar);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testFloat);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testDouble);
-	CppUnit_addTest(pSuite, DynamicAnyTest, testString);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testULong);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testString);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testUDT);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testConversionOperator);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testComparisonOperators);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testArithmeticOperators);

@@ -182,66 +182,6 @@ public:
 		return typeid(Data::Date);
 	}
 
-	void convert(Int8&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(Int16&) const
-	{
-		throw Poco::BadCastException();
-	}
-	
-	void convert(Int32&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(Int64&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(UInt8&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(UInt16&) const
-	{
-		throw Poco::BadCastException();
-	}
-	
-	void convert(UInt32&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(UInt64&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(bool&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(float&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(double&) const
-	{
-		throw Poco::BadCastException();
-	}
-
-	void convert(char&) const
-	{
-		throw Poco::BadCastException();
-	}
-
 	void convert(Poco::Timestamp& val) const
 	{
 		DateTime dt;
@@ -257,36 +197,6 @@ public:
 	void convert(Poco::LocalDateTime& val) const
 	{
 		val.assign(_val.year(), _val.month(), _val.day());
-	}
-
-	bool isArray() const
-	{
-		return false;
-	}
-
-	virtual bool isStruct() const
-	{
-		return false;
-	}
-
-	bool isInteger() const
-	{
-		return false;
-	}
-
-	bool isSigned() const
-	{
-		return false;
-	}
-
-	bool isNumeric() const
-	{
-		return false;
-	}
-
-	bool isString() const
-	{
-		return false;
 	}
 
 	void convert(std::string& val) const

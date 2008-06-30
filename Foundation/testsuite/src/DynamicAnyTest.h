@@ -62,6 +62,7 @@ public:
 	void testLong();
 	void testULong();
 	void testString();
+	void testUDT();
 	void testConversionOperator();
 	void testComparisonOperators();
 	void testArithmeticOperators();
@@ -84,6 +85,7 @@ public:
 	void testJSONDeserializeComplex();
 	void testDate();
 	void testEmpty();
+
 
 	void setUp();
 	void tearDown();

@@ -110,6 +110,12 @@ set DEBUG_SHARED=1
 set RELEASE_STATIC=1
 set RELEASE_SHARED=1)))))
 
+echo Building:
+if %DEBUG_SHARED%==1   (echo debug_shared)
+if %RELEASE_SHARED%==1 (echo release_shared)
+if %DEBUG_STATIC%==1   (echo debug_static)
+if %RELEASE_STATIC%==1 (echo release_static)
+
 rem root level components
 for /f %%G in ('findstr /R /V "./." components') do (
  if exist %%G (
@@ -139,6 +145,7 @@ for /f %%G in ('findstr /R "./." components') do (
   cd %POCOBASE%
  )
 )
+
 
 if "%SAMPLES%"=="no" goto :EOF
 

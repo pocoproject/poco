@@ -40,7 +40,7 @@ SHAREDLIBLINKEXT = .so
 CFLAGS          = -mt -Isrc
 CFLAGS32        =
 CFLAGS64        = -xarch=v9
-CXXFLAGS        = -mt -library=stlport4
+CXXFLAGS        = -mt -library=stlport4 -erroff=hidevf
 CXXFLAGS32      =
 CXXFLAGS64      = -xarch=v9
 LINKFLAGS       = -mt -library=stlport4

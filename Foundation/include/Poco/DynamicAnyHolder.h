@@ -71,47 +71,125 @@ void Foundation_API appendJSONString(std::string& val, const DynamicAny& any);
 class Foundation_API DynamicAnyHolder
 	/// Interface for a data holder used by the DynamicAny class. 
 	/// Provides methods to convert between data types.
-	/// Only data types for which a convert method exists are supported, which are
-	/// all C++ built-in types with addition of std::string, DateTime, LocalDateTime, Timestamp,
-	/// std::vector<DynamicAny> and DynamicStruct.
+	/// Only data types for which DynamicAnyHolder specialization exists are supported.
+	/// 
+	/// Provided are specializations for all C++ built-in types with addition of 
+	/// std::string, DateTime, LocalDateTime, Timestamp, std::vector<DynamicAny> and DynamicStruct.
+	///
+	/// Additional types can be supported by adding specializations. When implementing specializations,
+	/// the only condition is that they reside in Poco namespace and implement the pure virtual functions
+	/// clone() and type().
+	///
+	/// Those conversions that are not implemented shall fail back to this base
+	/// class implementation. All the convert() function overloads in this class
+	/// throw BadCastException.
 {
 public:
 	virtual ~DynamicAnyHolder();
 		/// Destroys the DynamicAnyHolder.
 
-	virtual DynamicAnyHolder* clone() const = 0;
-		/// Deep-copies the DynamicAnyHolder.
+	virtual DynamicAnyHolder* clone() const;
+		/// Throws NotImplementedException. Implementation should
+		/// deep-copy the DynamicAnyHolder.
 		
-	virtual const std::type_info& type() const = 0;
-		/// Returns the type information of the stored content.
+	virtual const std::type_info& type() const;
+		/// Throws NotImplementedException. Implementation should
+		/// return the type information for the stored content.
 
 	virtual void convert(Int8& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(Int16& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(Int32& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(Int64& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(UInt8& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(UInt16& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(UInt32& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(UInt64& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(DateTime& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(LocalDateTime& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(Timestamp& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 #ifndef POCO_LONG_IS_64_BIT
 	void convert(long& val) const;
+		/// Calls convert(Int32).
+
 	void convert(unsigned long& val) const;
+		/// Calls convert(UInt32).
 #endif
 	virtual void convert(bool& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(float& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(double& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(char& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 	virtual void convert(std::string& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
 
 	virtual bool isArray() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
 	virtual bool isStruct() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
 	virtual bool isInteger() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
 	virtual bool isSigned() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
 	virtual bool isNumeric() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
+
 	virtual bool isString() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to suport the diagnostic.
 
 protected:
 	DynamicAnyHolder();
@@ -244,69 +322,80 @@ private:
 // inlines
 //
 
+inline DynamicAnyHolder* DynamicAnyHolder::clone() const
+{
+	throw NotImplementedException("Not implemented: DynamicAnyHolder::clone()");
+}
+
+
+inline const std::type_info& DynamicAnyHolder::type() const
+{
+	throw NotImplementedException("Not implemented: DynamicAnyHolder::type()");
+}
+
 inline void DynamicAnyHolder::convert(Int8& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for Int8");
+	throw BadCastException("Can not convert to Int8");
 }
 
 
 inline void DynamicAnyHolder::convert(Int16& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for Int16");
+	throw BadCastException("Can not convert to Int16");
 }
 
 
 inline void DynamicAnyHolder::convert(Int32& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for Int32");
+	throw BadCastException("Can not convert to Int32");
 }
 
 
 inline void DynamicAnyHolder::convert(Int64& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for Int64");
+	throw BadCastException("Can not convert to Int64");
 }
 
 
 inline void DynamicAnyHolder::convert(UInt8& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for UInt8");
+	throw BadCastException("Can not convert to UInt8");
 }
 
 
 inline void DynamicAnyHolder::convert(UInt16& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for UInt16");
+	throw BadCastException("Can not convert to UInt16");
 }
 
 
 inline void DynamicAnyHolder::convert(UInt32& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for UInt32");
+	throw BadCastException("Can not convert to UInt32");
 }
 
 
 inline void DynamicAnyHolder::convert(UInt64& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for UInt64");
+	throw BadCastException("Can not convert to UInt64");
 }
 
 
 inline void DynamicAnyHolder::convert(DateTime& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for DateTime");
+	throw BadCastException("Can not convert to DateTime");
 }
 
 
 inline void DynamicAnyHolder::convert(LocalDateTime& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for LocalDateTime");
+	throw BadCastException("Can not convert to LocalDateTime");
 }
 
 
 inline void DynamicAnyHolder::convert(Timestamp& val) const
 {
-		throw NotImplementedException("No DynamicAnyHolder specialization for Timestamp");
+	throw BadCastException("Can not convert to Timestamp");
 }
 
 
@@ -327,35 +416,42 @@ inline void DynamicAnyHolder::convert(unsigned long& val) const
 }
 #endif
 
+
 inline void DynamicAnyHolder::convert(bool& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for bool");
+	throw BadCastException("Can not convert to bool");
 }
+
 
 inline void DynamicAnyHolder::convert(float& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for float");
+	throw BadCastException("Can not convert to float");
 }
+
 
 inline void DynamicAnyHolder::convert(double& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for double");
+	throw BadCastException("Can not convert to double");
 }
+
 
 inline void DynamicAnyHolder::convert(char& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for char");
+	throw BadCastException("Can not convert to char");
 }
+
 
 inline void DynamicAnyHolder::convert(std::string& val) const
 {
-	throw NotImplementedException("No DynamicAnyHolder specialization for std::string");
+	throw BadCastException("Can not convert to std::string");
 }
+
 
 inline bool DynamicAnyHolder::isArray() const
 {
 	return false;
 }
+
 
 inline bool DynamicAnyHolder::isStruct() const
 {
@@ -367,15 +463,18 @@ inline bool DynamicAnyHolder::isInteger() const
 	return false;
 }
 
+
 inline bool DynamicAnyHolder::isSigned() const
 {
 	return false;
 }
 
+
 inline bool DynamicAnyHolder::isNumeric() const
 {
 	return false;
 }
+
 
 inline bool DynamicAnyHolder::isString() const
 {
@@ -386,52 +485,54 @@ inline bool DynamicAnyHolder::isString() const
 template <typename T>
 class DynamicAnyHolderImpl: public DynamicAnyHolder
 	/// Template based implementation of a DynamicAnyHolder. 
-	/// Conversion work happens in the template specializations of this class.
+	/// This class provides type storage for user-defined types
+	/// that do not have DynamicAnyHolderImpl specialization.
 	///
-	/// DynamicAny can be used for any type for which a specialization for
-	/// DynamicAnyHolderImpl is available.
+	/// The actual conversion work happens in the template specializations
+	/// of this class.
 	///
 	/// DynamicAnyHolderImpl throws following exceptions:
-	///		NotImplementedException (if the specialization for a type does not exist)
+	///		BadCastException (if the requested conversion is not implemented)
 	///		RangeException (if an attempt is made to assign a numeric value outside of the target min/max limits
 	///		SyntaxException (if an attempt is made to convert a string containing non-numeric characters to number)
 	///
-	/// All specializations must additionally implement a public member function:
+	/// In order to support efficient direct extraction of the held value,
+	/// all specializations must additionally implement a public member function:
+	///
 	///     const T& value() const
+	///
 	/// returning a const reference to the actual stored value.
 {
 public:
+	DynamicAnyHolderImpl(const T& val): _val(val)
+	{
+	}
+
 	~DynamicAnyHolderImpl()
 	{
 	}
-	
+
 	const std::type_info& type() const
 	{
 		return typeid(T);
 	}
 
-	bool isInteger() const
+	DynamicAnyHolder* clone() const
 	{
-		return std::numeric_limits<T>::is_integer;
+		return new DynamicAnyHolderImpl(_val);
 	}
 
-	bool isSigned() const
+	const T& value() const
 	{
-		return std::numeric_limits<T>::is_signed;
-	}
-
-	bool isNumeric() const
-	{
-		return std::numeric_limits<T>::is_specialized;
-	}
-
-	bool isString() const
-	{
-		return type() == typeid(std::string);
+		return _val;
 	}
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
+	T _val;
 };
 
 
@@ -517,21 +618,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("Int8 -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("Int8 -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("Int8 -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -574,6 +660,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	Int8 _val;
 };
 
@@ -662,21 +751,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("Int16 -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("Int16 -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("Int16 -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -719,6 +793,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	Int16 _val;
 };
 
@@ -807,21 +884,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("Int32 -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("Int32 -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("Int32 -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -864,6 +926,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	Int32 _val;
 };
 
@@ -1009,6 +1074,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	Int64 _val;
 };
 
@@ -1097,21 +1165,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("UInt8 -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("Unt8 -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("UInt8 -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1154,6 +1207,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	UInt8 _val;
 };
 
@@ -1242,21 +1298,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("UInt16 -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("UInt16 -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("UInt16 -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1299,6 +1340,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	UInt16 _val;
 };
 
@@ -1387,21 +1431,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("UInt32 -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("UInt32 -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("UInt32 -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1444,6 +1473,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	UInt32 _val;
 };
 
@@ -1595,6 +1627,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	UInt64 _val;
 };
 
@@ -1681,21 +1716,6 @@ public:
 		val = (_val ? "true" : "false");
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("bool -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("bool -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("bool -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1738,6 +1758,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	bool _val;
 };
 
@@ -1827,21 +1850,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("float -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("float -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("float -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1884,6 +1892,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	float _val;
 };
 
@@ -1979,21 +1990,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("double -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("double -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("double -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -2036,6 +2032,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	double _val;
 };
 
@@ -2122,21 +2121,6 @@ public:
 		val = std::string(1, _val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("char -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("char -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("char -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -2179,6 +2163,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	char _val;
 };
 
@@ -2355,6 +2342,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	std::string _val;
 };
 
@@ -2446,21 +2436,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("long -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("long -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("long -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -2503,6 +2478,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	long _val;
 };
 
@@ -2591,21 +2569,6 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime&) const
-	{
-		throw BadCastException("unsigned long -> DateTime");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("unsigned long -> LocalDateTime");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("unsigned long -> Timestamp");
-	}
-
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -2648,6 +2611,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	unsigned long _val;
 };
 
@@ -2672,66 +2638,6 @@ public:
 		return typeid(std::vector<T>);
 	}
 
-	void convert(Int8& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(Int16& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-	
-	void convert(Int32& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(Int64& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(UInt8& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(UInt16& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-	
-	void convert(UInt32& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(UInt64& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(bool& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(float& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(double& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(char& val) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
 	void convert(std::string& val) const
 	{
 		// Serialize in JSON format: note: although this is a vector<T>, the code only 
@@ -2754,21 +2660,6 @@ public:
 			appendJSONString(val, *it);
 		}
 		val.append(" ]");
-	}
-
-	void convert(DateTime&) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(LocalDateTime&) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
-	}
-
-	void convert(Timestamp&) const
-	{
-		throw BadCastException("Cannot cast collection type to non-collection type");
 	}
 
 	DynamicAnyHolder* clone() const
@@ -2823,6 +2714,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	std::vector<T> _val;
 };
 
@@ -2864,44 +2758,9 @@ public:
 		val = _val.timestamp().epochMicroseconds();
 	}
 
-	void convert(UInt8& val) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(UInt16& val) const
-	{
-		throw BadCastException();
-	}
-	
-	void convert(UInt32& val) const
-	{
-		throw BadCastException();
-	}
-
 	void convert(UInt64& val) const
 	{
 		val = _val.timestamp().epochMicroseconds();
-	}
-
-	void convert(bool&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(float&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(double&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(char&) const
-	{
-		throw BadCastException();
 	}
 
 	void convert(std::string& val) const
@@ -2966,6 +2825,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	DateTime _val;
 };
 
@@ -2987,64 +2849,14 @@ public:
 		return typeid(LocalDateTime);
 	}
 
-	void convert(Int8& val) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(Int16& val) const
-	{
-		throw BadCastException();
-	}
-	
-	void convert(Int32& val) const
-	{
-		throw BadCastException();
-	}
-
 	void convert(Int64& val) const
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
 
-	void convert(UInt8& val) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(UInt16& val) const
-	{
-		throw BadCastException();
-	}
-	
-	void convert(UInt32& val) const
-	{
-		throw BadCastException();
-	}
-
 	void convert(UInt64& val) const
 	{
 		val = _val.timestamp().epochMicroseconds();
-	}
-
-	void convert(bool&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(float&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(double&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(char&) const
-	{
-		throw BadCastException();
 	}
 
 	void convert(std::string& val) const
@@ -3109,6 +2921,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	LocalDateTime _val;
 };
 
@@ -3130,64 +2945,14 @@ public:
 		return typeid(Timestamp);
 	}
 
-	void convert(Int8& val) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(Int16& val) const
-	{
-		throw BadCastException();
-	}
-	
-	void convert(Int32& val) const
-	{
-		throw BadCastException();
-	}
-
 	void convert(Int64& val) const
 	{
 		val = _val.epochMicroseconds();
 	}
 
-	void convert(UInt8& val) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(UInt16& val) const
-	{
-		throw BadCastException();
-	}
-	
-	void convert(UInt32& val) const
-	{
-		throw BadCastException();
-	}
-
 	void convert(UInt64& val) const
 	{
 		val = _val.epochMicroseconds();
-	}
-
-	void convert(bool&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(float&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(double&) const
-	{
-		throw BadCastException();
-	}
-
-	void convert(char&) const
-	{
-		throw BadCastException();
 	}
 
 	void convert(std::string& val) const
@@ -3252,6 +3017,9 @@ public:
 
 private:
 	DynamicAnyHolderImpl();
+	DynamicAnyHolderImpl(const DynamicAnyHolderImpl&);
+	DynamicAnyHolderImpl& operator = (const DynamicAnyHolderImpl&);
+
 	Timestamp _val;
 };
 

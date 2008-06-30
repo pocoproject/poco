@@ -247,21 +247,14 @@ DynamicAny DynamicAny::operator -- (int)
 
 DynamicAny& DynamicAny::operator [] (const std::string& name)
 {
-	DynamicAnyHolderImpl<DynamicStruct>* pHolder = dynamic_cast<DynamicAnyHolderImpl<DynamicStruct> *>(_pHolder);
-	if (pHolder)
-		return pHolder->operator[](name);
-	else
-		throw BadCastException();
+	return holderImpl<DynamicStruct, InvalidAccessException>("Not an array.")->operator[](name);
 }
 
 
 const DynamicAny& DynamicAny::operator [] (const std::string& name) const
 {
-	const DynamicAnyHolderImpl<DynamicStruct>* pHolder = dynamic_cast<const DynamicAnyHolderImpl<DynamicStruct>* >(_pHolder);
-	if (pHolder)
-		return pHolder->operator[](name);
-	else
-		throw BadCastException();
+	return const_cast<const DynamicAny&>(holderImpl<DynamicStruct,
+		InvalidAccessException>("Not an array.")->operator[](name));
 }
 
 

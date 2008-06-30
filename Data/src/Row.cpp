@@ -64,13 +64,17 @@ Row::Row(NameVecPtr pNames, const RowFormatterPtr& pFormatter):
 	
 	setFormatter(pFormatter);
 
-	// It would be logical for row to be started with empty values
-	// however, Row sortability at all times is an invariant, hence 
-	// we must start with all zeros here. If null values are later
-	// retrieved from DB, the DynamicAny::empty() call
-	// should be used to empty the corresponding Row value
-	_values.resize(_pNames->size(), 0);
-	addSortField(0);
+	NameVec::size_type sz = _pNames->size();
+	if (sz)
+	{
+		_values.resize(sz);
+		// Row sortability at all times is an invariant, hence 
+		// we must start with a zero here. If null value is later
+		// retrieved from DB, the DynamicAny::empty() call
+		// should be used to empty the corresponding Row value.
+		_values[0] = 0;
+		addSortField(0);
+	}
 }
 
 
@@ -122,7 +126,11 @@ void Row::addSortField(std::size_t pos)
 	}
 
 	ComparisonType ct;
-	if ((_values[pos].type() == typeid(Poco::Int8))   ||
+	if (_values[pos].isEmpty())
+	{
+		throw InvalidAccessException("Empty value not sortable.");
+	}
+	else if ((_values[pos].type() == typeid(Poco::Int8))   ||
 		(_values[pos].type() == typeid(Poco::UInt8))  ||
 		(_values[pos].type() == typeid(Poco::Int16))  ||
 		(_values[pos].type() == typeid(Poco::UInt16)) ||
@@ -184,7 +192,7 @@ void Row::replaceSortField(std::size_t oldPos, std::size_t newPos)
 
 	if (_values[newPos].isEmpty())
 	{
-		throw IllegalStateException("Empty value not sortable.");
+		throw InvalidAccessException("Empty value not sortable.");
 	}
 	else if ((_values[newPos].type() == typeid(Poco::Int8)) ||
 		(_values[newPos].type() == typeid(Poco::UInt8))     ||
