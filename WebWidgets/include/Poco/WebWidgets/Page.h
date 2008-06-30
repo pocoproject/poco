@@ -93,6 +93,14 @@ public:
 		
 	void handleForm(const std::string& field, const std::string& value);
 		/// Dummy implementation
+		
+	void addDynamicFunction(const std::string& jsCode);
+		/// Adds a JavaScript function to the page. Static functions should be written to a JS file
+		/// and included via the ResourceManager, only dynamic fucntions (ie. functions that are generated
+		/// during run-time) should be included here
+		
+	const std::vector<std::string>& dynamicFunctions() const;
+		/// Returns all dynamic functions
 	
 protected:
 	Page(const std::string& name, const std::type_info& type);
@@ -107,6 +115,7 @@ protected:
 private:
 	std::string     _text;
 	ResourceManager _rm;
+	std::vector<std::string> _jsCode;
 };
 
 
@@ -128,6 +137,18 @@ inline const ResourceManager& Page::resourceManager() const
 
 inline void Page::handleForm(const std::string& , const std::string& )
 {
+}
+
+
+inline void Page::addDynamicFunction(const std::string& jsCode)
+{
+	_jsCode.push_back(jsCode);
+}
+
+		
+inline const std::vector<std::string>& Page::dynamicFunctions() const
+{
+	return _jsCode;
 }
 
 

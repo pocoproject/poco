@@ -120,6 +120,13 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		//start inline javascript block
 		ostr << "<script type=\"text/javascript\">";
 		ostr << "var global={};"; //global var to store values!
+		const std::vector<std::string>& fcts = pPage->dynamicFunctions();
+		std::vector<std::string>::const_iterator itF = fcts.begin();
+		for (; itF != fcts.end(); ++itF)
+		{
+			ostr << *itF << std::endl;
+		}
+		
 		ostr << "Ext.onReady(function() {";
 		ostr << "var " << VAR_LOCALTMP << ";"; // tmp variable needed for table renderer
 		ostr << "Ext.QuickTips.init();";
