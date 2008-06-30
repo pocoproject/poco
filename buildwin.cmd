@@ -118,7 +118,7 @@ if %RELEASE_STATIC%==1 (echo release_static)
 
 rem root level components
 for /f %%G in ('findstr /R /V "./." components') do (
- if exist %%G (
+ if exist %%G\%%G_%VS_VERSION%.sln (
   cd %%G
   echo.
   echo ========== Building %%G ==========
@@ -135,13 +135,15 @@ for /f %%G in ('findstr /R "./." components') do (
  if exist %%G (
   cd %%G
    for /f "tokens=1,2 delims=/" %%Q in ("%%G") do (
-    echo.
-    echo ========== Building %%R ==========
-    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%R_%VS_VERSION%.sln)
-    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%R_%VS_VERSION%.sln)
-    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%R_%VS_VERSION%.sln)
-    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%R_%VS_VERSION%.sln)
-  )
+    if exist %%R_%VS_VERSION%.sln (
+     echo.
+     echo ========== Building %%G ==========
+     if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%R_%VS_VERSION%.sln)
+     if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%R_%VS_VERSION%.sln)
+     if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%R_%VS_VERSION%.sln)
+     if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%R_%VS_VERSION%.sln)
+    )
+   )
   cd %POCOBASE%
  )
 )
@@ -151,8 +153,8 @@ if "%SAMPLES%"=="no" goto :EOF
 
 rem root level component samples
 for /f %%G in ('findstr /R /V "./." components') do (
- if exist %%G/samples (
-  cd %%G/samples
+ if exist %%G\samples\samples_%VS_VERSION%.sln (
+  cd %%G\samples
   echo.
   echo ========== Building %%G/samples ==========
   if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
@@ -165,8 +167,8 @@ for /f %%G in ('findstr /R /V "./." components') do (
 
 rem lower level component samples
 for /f %%G in ('findstr /R "./." components') do (
- if exist %%G/samples (
-  cd %%G/samples
+ if exist %%G\samples\samples_%VS_VERSION%.sln (
+  cd %%G\samples
   echo.
   echo ========== Building %%G/samples ==========
   if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
