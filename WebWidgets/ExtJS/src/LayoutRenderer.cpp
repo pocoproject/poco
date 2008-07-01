@@ -41,6 +41,7 @@
 #include "Poco/WebWidgets/VerticalLayout.h"
 #include "Poco/WebWidgets/Frame.h"
 #include "Poco/WebWidgets/Panel.h"
+#include <sstream>
 
 
 namespace Poco {
@@ -58,7 +59,7 @@ LayoutRenderer::~LayoutRenderer()
 }
 
 
-void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, const std::string& htmlPadding)
+void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, int horPad, int vertPad)
 {
 	poco_assert_dbg(pLayout != 0);
 	Renderable::ID id(0);
@@ -68,12 +69,12 @@ void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext
 		// the parent is not a panel 
 		// assume that the direct parent is a panel
 		ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, htmlPadding);
+		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, horPad, vertPad);
 		ostr << "})";
 	}
 	else
 	{
-		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, htmlPadding);
+		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, horPad, vertPad);
 	}
 }
 
@@ -84,7 +85,7 @@ void LayoutRenderer::renderBody(const Renderable* pRenderable, const RenderConte
 }
 
 
-void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, const std::string& htmlPadding)
+void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, int horPad, int vertPad)
 {
 	poco_assert_dbg(pLayout != 0);
 	bool writeComma = false;
@@ -107,28 +108,66 @@ void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext
 		ostr << ",items:[";
 	else
 		ostr << "items:[";
-	visitChildren(pLayout, cols, htmlPadding, context, ostr);
+	visitChildren(pLayout, cols, horPad, vertPad, context, ostr);
 	ostr << "]";
 }
 
 
-void LayoutRenderer::visitChildren(const Layout* pLayout, int cols, const std::string& htmlPadding, const RenderContext& context, std::ostream& ostr)
+void LayoutRenderer::visitChildren(const Layout* pLayout, int cols, int horPad, int vertPad, const RenderContext& context, std::ostream& ostr)
 {
 	ContainerView::ConstIterator it = pLayout->begin();
 	int cnt(0);
-	const VerticalLayout* pVert = dynamic_cast<const VerticalLayout*>(pLayout);
+	std::string padHor;
+	
+	if (horPad > 0)
+	{
+		std::ostringstream pad;
+		pad << "<p class=\"lbl\" style=\"margin-left:" << (horPad-4) << "px\">&nbsp;</p>"; // -4 fixes size of &nbsp;
+		padHor = pad.str();
+	}
+	
+	std::string padVert;
+	if (vertPad > 0)
+	{
+		std::ostringstream pad;
+		pad << "<p style=\"margin-top:" << vertPad << "px\"></p>";
+		padVert = pad.str();
+	}
 	
 	for (; it != pLayout->end(); ++it, ++cnt)
 	{
 		if (it != pLayout->begin())
 		{
 			ostr << ",";
-			if (!htmlPadding.empty() && (cnt % cols != 0 || pVert))
+			if (cnt < cols && !padHor.empty())
 			{
-				// if padding, insert an additional empty html element that defines padding
 				ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-				ostr << "html:'" << htmlPadding << "'}),";
+				ostr << "html:'" << padHor << "'}),";
 				++cnt;
+			}
+			else
+			{
+				if (cnt >= cols)
+				{
+					if (cnt % cols == 0) //first row
+					{
+						if (!padVert.empty())
+						{
+							//insert a complete line!
+							for (int i= 0; i < cols; ++i)
+							{
+								ostr << "new Ext.Panel({border:false,bodyBorder:false,";
+								ostr << "html:'" << padVert << "'}),";
+							}
+						} // else no hor padding for first row!
+					}
+					else if (!padHor.empty())
+					{
+						ostr << "new Ext.Panel({border:false,bodyBorder:false,";
+						ostr << "html:'" << padHor << "'}),";
+						++cnt;
+					}
+				}
 			}
 		}
 		if (*it)

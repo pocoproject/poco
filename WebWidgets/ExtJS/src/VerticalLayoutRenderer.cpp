@@ -65,16 +65,11 @@ void VerticalLayoutRenderer::renderHead(const Renderable* pRenderable, const Ren
 	std::string padding;
 	if (padVal > 0)
 	{
-		std::ostringstream pad;
-		// or style=\"background:#deecfd;padding-left:10px\"
-		// or transparent gif: <img src=\"resources/images/default/s.gif\" width=\"10\" height=\"1\" alt=\"\">'
-		pad << "<p style=\"padding-top:" << padVal << "px\">&nbsp;</p>";
-		padding = pad.str();
 	}
 	// a vertical layout is a table with one column
 	std::string layoutConfig("{columns:1}");
 	std::string layout("table");
-	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig, 1, padding);
+	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig, 1, 0, padVal);
 }
 
 

@@ -64,25 +64,15 @@ void GridLayoutRenderer::renderHead(const Renderable* pRenderable, const RenderC
 	int padHorVal = pLayout->getHorizontalPadding();
 	int padVertVal = pLayout->getVerticalPadding();
 	std::string padding;
-	if (padHorVal > 0 || padVertVal > 0)
+	if (padHorVal > 0)
 	{
-		std::ostringstream pad;
-		// or style=\"background:#deecfd;padding-left:10px\"
-		// or transparent gif: <img src=\"resources/images/default/s.gif\" width=\"10\" height=\"1\" alt=\"\">'
-		pad << "<p style=\"";
-		if (padHorVal > 0)
-			pad << "padding-left:" << padHorVal << "px; ";
-		if (padVertVal > 0)
-			pad << "padding-top:" << padVertVal << "px ";
-		pad << "\">&nbsp;</p>";
-		padding = pad.str();
 		cols = 2 * cols - 1;
 	}
 	std::ostringstream layoutConfig;
 	layoutConfig << "{columns:" << cols << "}";
 	std::string layout("table");
 	// when padding is used we can no longer use LayoutRenderer
-	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str(), (int)cols, padding);
+	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str(), (int)cols, padHorVal, padVertVal);
 }
 
 

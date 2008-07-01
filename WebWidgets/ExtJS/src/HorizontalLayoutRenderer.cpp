@@ -63,21 +63,16 @@ void HorizontalLayoutRenderer::renderHead(const Renderable* pRenderable, const R
 	std::ostringstream layoutConfig;
 	std::size_t cols = pLayout->size();
 	int padVal = pLayout->getPadding();
-	std::string padding;
+
 	if (padVal > 0)
 	{
-		std::ostringstream pad;
-		// or style=\"background:#deecfd;padding-left:10px\"
-		// or transparent gif: <img src=\"resources/images/default/s.gif\" width=\"10\" height=\"1\" alt=\"\">'
-		pad << "<p style=\"padding-left:" << padVal << "px\">&nbsp;</p>";
-		padding = pad.str();
 		cols = 2 * cols - 1;
 	}
 	layoutConfig << "{columns:" << cols << "}";
 	
 	static std::string layout("table");
 	//static std::string layout("column"); -> this works with firefox but fails with IE7!
-	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str(), (int)cols, padding);
+	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str(), (int)cols, padVal, 0);
 }
 
 

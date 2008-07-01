@@ -1472,7 +1472,7 @@ void ExtJSTest::testHorizontalLayout()
 
 	Page::Ptr ptr = new Page("test");
 	webApp.setCurrentPage(ptr);
-	HorizontalLayout::Ptr pHor(new HorizontalLayout(10));
+	HorizontalLayout::Ptr pHor(new HorizontalLayout(1));
 	pHor->add(new Button("b1", "But1"));
 	pHor->add(new Button("b2", "But2"));
 	pHor->add(new Button("b3", "But3"));
