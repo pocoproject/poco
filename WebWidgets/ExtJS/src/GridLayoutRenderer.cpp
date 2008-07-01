@@ -60,10 +60,29 @@ void GridLayoutRenderer::renderHead(const Renderable* pRenderable, const RenderC
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::GridLayout));
 	const GridLayout* pLayout = static_cast<const Poco::WebWidgets::GridLayout*>(pRenderable);
+	std::size_t cols = pLayout->columns();
+	int padHorVal = pLayout->getHorizontalPadding();
+	int padVertVal = pLayout->getVerticalPadding();
+	std::string padding;
+	if (padHorVal > 0 || padVertVal > 0)
+	{
+		std::ostringstream pad;
+		// or style=\"background:#deecfd;padding-left:10px\"
+		// or transparent gif: <img src=\"resources/images/default/s.gif\" width=\"10\" height=\"1\" alt=\"\">'
+		pad << "<p style=\"";
+		if (padHorVal > 0)
+			pad << "padding-left:" << padHorVal << "px; ";
+		if (padVertVal > 0)
+			pad << "padding-top:" << padVertVal << "px ";
+		pad << "\">&nbsp;</p>";
+		padding = pad.str();
+		cols = 2 * cols - 1;
+	}
 	std::ostringstream layoutConfig;
-	layoutConfig << "{columns:" << pLayout->columns() << "}";
+	layoutConfig << "{columns:" << cols << "}";
 	std::string layout("table");
-	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str());
+	// when padding is used we can no longer use LayoutRenderer
+	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str(), (int)cols, padding);
 }
 
 

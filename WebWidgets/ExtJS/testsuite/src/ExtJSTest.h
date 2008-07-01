@@ -85,6 +85,9 @@ public:
 	void testJSEvent2();
 	void testButtonRename();
 	void testPanelShowHide();
+	void testHorizontalLayout();
+	void testVerticalLayout();
+	void testGridLayout();
 	void setUp();
 	void tearDown();
 

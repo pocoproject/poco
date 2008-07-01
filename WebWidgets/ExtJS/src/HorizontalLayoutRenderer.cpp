@@ -61,11 +61,23 @@ void HorizontalLayoutRenderer::renderHead(const Renderable* pRenderable, const R
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::HorizontalLayout));
 	const HorizontalLayout* pLayout = static_cast<const Poco::WebWidgets::HorizontalLayout*>(pRenderable);
 	std::ostringstream layoutConfig;
-	layoutConfig << "{columns:" << pLayout->size() << "}";
+	std::size_t cols = pLayout->size();
+	int padVal = pLayout->getPadding();
+	std::string padding;
+	if (padVal > 0)
+	{
+		std::ostringstream pad;
+		// or style=\"background:#deecfd;padding-left:10px\"
+		// or transparent gif: <img src=\"resources/images/default/s.gif\" width=\"10\" height=\"1\" alt=\"\">'
+		pad << "<p style=\"padding-left:" << padVal << "px\">&nbsp;</p>";
+		padding = pad.str();
+		cols = 2 * cols - 1;
+	}
+	layoutConfig << "{columns:" << cols << "}";
 	
 	static std::string layout("table");
-	//static std::string layout("column"); -> this works with firefox but faila with IE7!
-	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str());
+	//static std::string layout("column"); -> this works with firefox but fails with IE7!
+	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str(), (int)cols, padding);
 }
 
 

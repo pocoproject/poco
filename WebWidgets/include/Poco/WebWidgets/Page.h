@@ -71,6 +71,9 @@ public:
 	Poco::BasicEvent<Page*> pageRequested;
 		/// Thrown whenever the page is requested, before code is generated
 		
+	Poco::BasicEvent<Page*> afterPageRequested;
+		/// Thrown whenever the page is requested, after code is generated
+		
 	Page();
 		/// Creates an anonymous Page.
 		

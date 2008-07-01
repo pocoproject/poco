@@ -53,13 +53,34 @@ class WebWidgets_API VerticalLayout: public Layout
 public:
 	typedef Poco::AutoPtr<VerticalLayout> Ptr;
 
-	VerticalLayout();
+	VerticalLayout(int pad = 0);
 		/// Creates the VerticalLayout.
+		
+	int getPadding() const;
+		/// Returns the padding value, a value <= 0 means no padding which is the default.
+		
+	void setPadding(int pad);
+		/// Sets the padding value, a value <= 0 means no padding which is the default.
 
 protected:
 	~VerticalLayout();
 		/// Destroys the VerticalLayout.
+
+private:
+	int _padding;		
 };
+
+
+inline int VerticalLayout::getPadding() const
+{
+	return _padding;
+}
+		
+		
+inline void VerticalLayout::setPadding(int pad)
+{
+	_padding = pad;
+}
 
 
 } } // namespace Poco::WebWidgets

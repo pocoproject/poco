@@ -189,6 +189,7 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 
 	ostr << STRC_HEAD;
 	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pPage->id()), pPage);
+	pPage->afterPageRequested.notify(this, pPage);
 }
 
 

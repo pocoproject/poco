@@ -45,6 +45,8 @@ GridLayout::GridLayout(std::size_t colCnt, std::size_t rowCnt):
 	Layout(typeid(GridLayout)),
 	_colCnt(colCnt),
 	_rowCnt(rowCnt),
+	_horPadding(0),
+	_vertPadding(0),
 	_lastIdx(0)
 {
 	poco_assert (_colCnt > 0);

@@ -77,6 +77,18 @@ public:
 
 	void minimize();
 		/// Minimizes the rowCount (i.e. empty lines at the end of the grid are truncated
+		
+	void setHorizontalPadding(int hor);
+		/// Sets horizontal padding. A value <= 0 means no padding which is also the default.
+		
+	void setVerticalPadding(int vert);
+		/// Sets vertical padding. A value <= 0 means no padding which is also the default.	
+		
+	int getHorizontalPadding() const;
+		/// Gets horizontal padding. A value <= 0 means no padding which is also the default.
+		
+	int getVerticalPadding() const;
+		/// Gets vertical padding. A value <= 0 means no padding which is also the default.		
 
 protected:
 	~GridLayout();
@@ -91,6 +103,8 @@ protected:
 private:
 	const std::size_t _colCnt;
 	const std::size_t _rowCnt;
+	int _horPadding;
+	int _vertPadding;
 	std::size_t _lastIdx;
 };
 
@@ -127,6 +141,30 @@ inline std::size_t GridLayout::maxRows() const
 inline void GridLayout::add(View::Ptr pView)
 {
 	set(pView, _lastIdx/_colCnt, _lastIdx%_colCnt);
+}
+
+
+inline void GridLayout::setHorizontalPadding(int hor)
+{
+	_horPadding = hor;
+}
+
+		
+inline void GridLayout::setVerticalPadding(int vert)
+{
+	_vertPadding = vert;
+}
+
+		
+inline int GridLayout::getHorizontalPadding() const
+{
+	return _horPadding;
+}
+
+		
+inline int GridLayout::getVerticalPadding() const
+{
+	return _vertPadding;
 }
 
 

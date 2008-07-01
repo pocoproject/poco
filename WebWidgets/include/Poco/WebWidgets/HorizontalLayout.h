@@ -53,13 +53,34 @@ class WebWidgets_API HorizontalLayout: public Layout
 public:
 	typedef Poco::AutoPtr<HorizontalLayout> Ptr;
 
-	HorizontalLayout();
+	HorizontalLayout(int pad=0);
 		/// Creates the HorizontalLayout.
 
+	int getPadding() const;
+		/// Returns the padding value, a value <= 0 means no padding which is the default.
+		
+	void setPadding(int pad);
+		/// Sets the padding value, a value <= 0 means no padding which is the default.
+		
 protected:
 	~HorizontalLayout();
 		/// Destroys the HorizontalLayout.
+		
+private:
+	int _padding;
 };
+
+
+inline int HorizontalLayout::getPadding() const
+{
+	return _padding;
+}
+		
+		
+inline void HorizontalLayout::setPadding(int pad)
+{
+	_padding = pad;
+}
 
 
 } } // namespace Poco::WebWidgets

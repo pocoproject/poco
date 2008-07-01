@@ -41,8 +41,9 @@ namespace Poco {
 namespace WebWidgets {
 
 
-HorizontalLayout::HorizontalLayout():
-	Layout(typeid(HorizontalLayout))
+HorizontalLayout::HorizontalLayout(int pad):
+	Layout(typeid(HorizontalLayout)),
+	_padding(pad)
 {
 }
 

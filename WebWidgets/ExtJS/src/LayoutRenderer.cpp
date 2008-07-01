@@ -38,6 +38,7 @@
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/Layout.h"
+#include "Poco/WebWidgets/VerticalLayout.h"
 #include "Poco/WebWidgets/Frame.h"
 #include "Poco/WebWidgets/Panel.h"
 
@@ -57,7 +58,7 @@ LayoutRenderer::~LayoutRenderer()
 }
 
 
-void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig)
+void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, const std::string& htmlPadding)
 {
 	poco_assert_dbg(pLayout != 0);
 	Renderable::ID id(0);
@@ -67,12 +68,12 @@ void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext
 		// the parent is not a panel 
 		// assume that the direct parent is a panel
 		ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-		renderParameters(pLayout, context, ostr, layoutId, layoutConfig);
+		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, htmlPadding);
 		ostr << "})";
 	}
 	else
 	{
-		renderParameters(pLayout, context, ostr, layoutId, layoutConfig);
+		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, htmlPadding);
 	}
 }
 
@@ -83,7 +84,7 @@ void LayoutRenderer::renderBody(const Renderable* pRenderable, const RenderConte
 }
 
 
-void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig)
+void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, const std::string& htmlPadding)
 {
 	poco_assert_dbg(pLayout != 0);
 	bool writeComma = false;
@@ -106,24 +107,36 @@ void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext
 		ostr << ",items:[";
 	else
 		ostr << "items:[";
-	visitChildren(pLayout, context, ostr);
+	visitChildren(pLayout, cols, htmlPadding, context, ostr);
 	ostr << "]";
 }
 
 
-void LayoutRenderer::visitChildren(const Layout* pLayout, const RenderContext& context, std::ostream& ostr)
+void LayoutRenderer::visitChildren(const Layout* pLayout, int cols, const std::string& htmlPadding, const RenderContext& context, std::ostream& ostr)
 {
 	ContainerView::ConstIterator it = pLayout->begin();
-	for (; it != pLayout->end(); ++it)
+	int cnt(0);
+	const VerticalLayout* pVert = dynamic_cast<const VerticalLayout*>(pLayout);
+	
+	for (; it != pLayout->end(); ++it, ++cnt)
 	{
 		if (it != pLayout->begin())
+		{
 			ostr << ",";
+			if (!htmlPadding.empty() && (cnt % cols != 0 || pVert))
+			{
+				// if padding, insert an additional empty html element that defines padding
+				ostr << "new Ext.Panel({border:false,bodyBorder:false,";
+				ostr << "html:'" << htmlPadding << "'}),";
+				++cnt;
+			}
+		}
 		if (*it)
 		{
 			//horizontallayout works only when children are panels
-			ostr << "{xtype:'panel',items:";
+			ostr << "new Ext.Panel({border:false,bodyBorder:false,items:";
 			(*it)->renderHead(context, ostr);
-			ostr << "}";
+			ostr << "})";
 		}
 		else
 			ostr << "{}";
