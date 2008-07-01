@@ -71,7 +71,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\bin\Poco(ProjectName)d.pdb"
+				ProgramDatabaseFile="..\bin\Poco$(ProjectName)d.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"

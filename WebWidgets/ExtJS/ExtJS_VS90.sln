@@ -3,6 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtJS", "ExtJS_VS90.vcproj", "{19FA461F-7419-4653-8A6B-B93002F7DB14}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_VS90.vcproj", "{AB43A995-70FA-4297-BD01-6C88938AA86D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{19FA461F-7419-4653-8A6B-B93002F7DB14} = {19FA461F-7419-4653-8A6B-B93002F7DB14}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
