@@ -1,4 +1,5 @@
 @echo off
+setlocal
 
 rem
 rem buildwin.cmd
@@ -116,57 +117,55 @@ if %RELEASE_SHARED%==1 (echo release_shared)
 if %DEBUG_STATIC%==1   (echo debug_static)
 if %RELEASE_STATIC%==1 (echo release_static)
 
-rem root level components
-for /f %%G in ('findstr /R /V "./." components') do (
- if exist %%G\%%G_%VS_VERSION%.sln (
-  cd %%G
-  echo.
-  echo ========== Building %%G ==========
-  if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%G_%VS_VERSION%.sln)
-  if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%G_%VS_VERSION%.sln)
-  if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%G_%VS_VERSION%.sln)
-  if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%G_%VS_VERSION%.sln)
-  cd %POCOBASE%
- )
-)
-
-rem lower level components
-for /f %%G in ('findstr /R "./." components') do (
+rem build for up to 4 levels deep
+for /f %%G in ('findstr /R "." components') do (
  if exist %%G (
   cd %%G
-   for /f "tokens=1,2 delims=/" %%Q in ("%%G") do (
-    if exist %%R_%VS_VERSION%.sln (
-     echo.
-     echo ========== Building %%G ==========
-     if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%R_%VS_VERSION%.sln)
-     if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%R_%VS_VERSION%.sln)
-     if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%R_%VS_VERSION%.sln)
-     if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%R_%VS_VERSION%.sln)
-    )
+  for /f "tokens=1,2,3,4 delims=/" %%Q in ("%%G") do (
+   if exist %%Q_%VS_VERSION%.sln (
+    echo.
+    echo ========== Building %%G ==========
+    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%Q_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%Q_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%Q_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%Q_%VS_VERSION%.sln)
    )
+
+   if exist %%R_%VS_VERSION%.sln (
+    echo.
+    echo ========== Building %%G ==========
+    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%R_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%R_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%R_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%R_%VS_VERSION%.sln)
+   )
+   
+   if exist %%S_%VS_VERSION%.sln (
+    echo.
+    echo ========== Building %%G ==========
+    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%S_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%S_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%S_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%S_%VS_VERSION%.sln)
+   )
+
+   if exist %%T_%VS_VERSION%.sln (
+    echo.
+    echo ========== Building %%G ==========
+    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%T_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%T_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%T_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%T_%VS_VERSION%.sln)
+   )
+  )
   cd %POCOBASE%
  )
 )
-
 
 if "%SAMPLES%"=="no" goto :EOF
 
 rem root level component samples
-for /f %%G in ('findstr /R /V "./." components') do (
- if exist %%G\samples\samples_%VS_VERSION%.sln (
-  cd %%G\samples
-  echo.
-  echo ========== Building %%G/samples ==========
-  if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
-  if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
-  if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
-  if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
-  cd %POCOBASE%
- )
-)
-
-rem lower level component samples
-for /f %%G in ('findstr /R "./." components') do (
+for /f %%G in ('findstr /R "." components') do (
  if exist %%G\samples\samples_%VS_VERSION%.sln (
   cd %%G\samples
   echo.
@@ -186,3 +185,5 @@ echo Usage:
 echo ------
 echo buildwin  VS_VERSION         ACTION             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
 echo "buildwin {71|80|90} [build|rebuild|clean] [static|shared|both] [release|debug|both] [yes|no]"
+
+endlocal
