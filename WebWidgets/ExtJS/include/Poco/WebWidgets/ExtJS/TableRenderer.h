@@ -125,6 +125,9 @@ public:
 		/// Adds a javascript callback to inform the WebServer that the client has pressed a mouse button
 		/// Method signature is ( Ext.EventObject e)	
 
+	static std::string createDnDGroupName(const Table* pTable);
+		/// Creates a DND name for the table
+		
 protected:
 	static void renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr);
 		/// Renders Table properties

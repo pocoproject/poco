@@ -329,7 +329,7 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	// sorting is allowed though, i.e row matching is active
 	ostr << ",clicksToEdit:1,stripeRows:true,enableColumnHide:false,enableColumnMove:false,loadMask:true";
 	if (pTable->getDragAndDrop())
-		ostr << ",enableDragDrop:true";
+		ostr << ",enableDragDrop:true,ddGroup:'" << createDnDGroupName(pTable) << "'";
 		
 	if (pTable->getSelectionModel() != Table::SM_CELL)
 	{
@@ -404,6 +404,13 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	Table* pT = const_cast<Table*>(pTable);
 	pT->beforeLoad += Poco::delegate(&TableRenderer::onBeforeLoad);
 	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(id), pT);
+}
+
+
+std::string TableRenderer::createDnDGroupName(const Table* pTable)
+{
+	poco_check_ptr (pTable);
+	return "ddgrid" + Poco::NumberFormatter::format(pTable->id());
 }
 
 
