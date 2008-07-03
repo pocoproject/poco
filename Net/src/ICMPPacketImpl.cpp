@@ -73,7 +73,7 @@ ICMPPacketImpl::ICMPPacketImpl(int dataSize):
 
 ICMPPacketImpl::~ICMPPacketImpl()
 {
-	delete _pPacket;
+	delete [] _pPacket;
 }
 
 
