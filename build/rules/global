@@ -44,6 +44,27 @@ endif
 export POCO_BUILD
 
 #
+# POCO_BASE/POCO_BUILD/cwd sanity checks
+#
+# Ensure that the current working directory is either
+# under $POCO_BASE or under $POCO_PROJECT
+# Also, if we're building under $POCO_BASE, disarm
+# $PROJECT_BASE
+#
+cwd = $(shell pwd)
+inpoco = $(shell echo | awk '{print index("$(cwd)","$(POCO_BASE)")}')
+inproj = $(shell echo | awk '{print index("$(cwd)","$(PROJECT_BASE)")}')
+
+ifeq ($(inpoco),1)
+PROJECT_BASE = $(POCO_BASE)
+else
+ifeq ($(inproj),1)
+else
+$(error Current working directory not under $$POCO_PROJECT)
+endif
+endif
+
+#
 # Determine OS
 #
 POCO_HOST_OSNAME = $(shell uname)
@@ -54,6 +75,7 @@ endif
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
+POCO_HOST_OSARCH = $(subst /,-,$(shell uname -m | tr ' ' _))
 
 
 # Begin Sun platforms
