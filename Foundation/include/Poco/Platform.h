@@ -133,7 +133,8 @@
 #define POCO_ARCH_SPARC   0x08
 #define POCO_ARCH_AMD64   0x09
 #define POCO_ARCH_ARM     0x0a
-
+#define POCO_ARCH_M68K    0x0b
+#define POCO_ARCH_S390    0x0c
 
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
 	#define POCO_ARCH POCO_ARCH_ALPHA
@@ -175,6 +176,12 @@
 	#else
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#endif
+#elif defined(__m68k__)
+    #define POCO_ARCH POCO_ARCH_M68K
+    #define POCO_ARCH_BIG_ENDIAN 1
+#elif defined(__s390__)
+    #define POCO_ARCH POCO_ARCH_S390
+    #define POCO_ARCH_BIG_ENDIAN 1
 #endif
 
 
