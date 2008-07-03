@@ -114,8 +114,9 @@ void AsyncChannel::close()
 	if (_thread.isRunning())
 	{
 		while (!_queue.empty()) Thread::sleep(100);
-		_queue.wakeUpAll();
-		_thread.join();
+		
+		do { _queue.wakeUpAll(); }
+		while (!_thread.tryJoin(100));
 	}
 }
 
