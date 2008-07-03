@@ -283,14 +283,17 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 					pTable->cellValueChanged.getServerCallbackPos());
 		else					
 			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList);
-		if (written)
-			ostr << ",";
-		if (pTable->beforeCellValueChanged.willDoServerCallback())
-			written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, modList, 
-					TableRenderer::createBeforeCellValueChangedServerCallback(pTable), 
-					pTable->beforeCellValueChanged.getServerCallbackPos());
-		else					
-			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList);	
+		if (pTable->beforeCellValueChanged.hasJavaScriptCode())
+		{	
+			if (written)
+				ostr << ",";
+			if (pTable->beforeCellValueChanged.willDoServerCallback())
+				written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, modList, 
+						TableRenderer::createBeforeCellValueChangedServerCallback(pTable), 
+						pTable->beforeCellValueChanged.getServerCallbackPos());
+			else					
+				written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, modList);	
+		}
 	}
 	
 	if (pTable->cellClicked.hasJavaScriptCode())
