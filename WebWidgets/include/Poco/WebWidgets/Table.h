@@ -71,6 +71,7 @@ public:
 	static const std::string EV_ROWCLICKED;
 	static const std::string EV_BEFOREROWCLICKED;
 	static const std::string EV_CELLVALUECHANGED;
+	static const std::string EV_BEFORECELLVALUECHANGED;
 	static const std::string EV_LOADDATA;
 	static const std::string EV_AFTERLOAD;
 	static const std::string EV_RENDER;
@@ -113,6 +114,8 @@ public:
 	JavaScriptEvent<Table::CellClick> beforeCellClicked; /// fires when the mouse is pressed down on a cell
 	
 	JavaScriptEvent<Table::CellValueChange> cellValueChanged;
+	
+	JavaScriptEvent<Table::CellValueChange> beforeCellValueChanged;
 	
 	JavaScriptEvent<Table*> afterLoad; // thrown after data was loaded
 	

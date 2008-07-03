@@ -53,6 +53,7 @@ const std::string Table::EV_BEFORECELLCLICKED("beforeclick");
 const std::string Table::EV_ROWCLICKED("row");
 const std::string Table::EV_BEFOREROWCLICKED("beforerow");
 const std::string Table::EV_CELLVALUECHANGED("edit");
+const std::string Table::EV_BEFORECELLVALUECHANGED("beforeedit");
 const std::string Table::EV_LOADDATA("load");
 const std::string Table::EV_AFTERLOAD("afterload");
 const std::string Table::EV_RENDER("render");

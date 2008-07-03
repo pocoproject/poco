@@ -58,6 +58,7 @@ const std::string TableRenderer::EV_CELLCLICKED("cellclick");
 const std::string TableRenderer::EV_ROWCLICKED("rowselect");
 const std::string TableRenderer::EV_BEFORECELLCLICKED("cellmousedown");
 const std::string TableRenderer::EV_BEFOREROWCLICKED("rowmousedown");
+const std::string TableRenderer::EV_BEFORECELLVALUECHANGED("validateedit");
 const std::string TableRenderer::EV_AFTEREDIT("afteredit");
 const std::string TableRenderer::EV_AFTERLOAD("load");
 const std::string TableRenderer::EV_RENDER("render");
@@ -122,7 +123,29 @@ Poco::WebWidgets::JSDelegate TableRenderer::createCellValueChangedServerCallback
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLVALUECHANGED));
 	const std::string& success = pTable->cellValueChanged.getOnSuccess();
 
-	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->cellValueChanged.getOnSuccess(), pTable->cellValueChanged.getOnFailure());
+	return Utility::createServerCallback(signature, addParams, pTable->id(), success, pTable->cellValueChanged.getOnFailure());
+}
+
+
+
+Poco::WebWidgets::JSDelegate TableRenderer::createBeforeCellValueChangedServerCallback(const Table* pTable)
+{static const std::string signature("function(obj)");
+	//extract the true row index from the last column!
+	std::string origRow("+obj.record.get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_COL, "+obj.column"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
+	//problem: I need the displayed string from teh renderer, not the value!
+	// date fields cause problems here, and I only habe one cellclick event per table not per column!
+	// from the table get the TableColumn, from this get the renderer for the given col and render obj.value
+	// {(var r=obj.grid.getColumnModel().getRenderer(obj.column))?r(obj.value);:obj.value;}, hm renderer exists for everthing
+	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.grid.getColumnModel().getRenderer(obj.column)(obj.value)")); 
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_BEFORECELLVALUECHANGED));
+	const std::string& success = pTable->beforeCellValueChanged.getOnSuccess();
+
+	return Utility::createServerCallback(signature, addParams, pTable->id(), success, pTable->beforeCellValueChanged.getOnFailure());
 }
 
 
@@ -260,6 +283,14 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 					pTable->cellValueChanged.getServerCallbackPos());
 		else					
 			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList);
+		if (written)
+			ostr << ",";
+		if (pTable->beforeCellValueChanged.willDoServerCallback())
+			written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, modList, 
+					TableRenderer::createBeforeCellValueChangedServerCallback(pTable), 
+					pTable->beforeCellValueChanged.getServerCallbackPos());
+		else					
+			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList);	
 	}
 	
 	if (pTable->cellClicked.hasJavaScriptCode())

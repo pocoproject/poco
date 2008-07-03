@@ -67,6 +67,7 @@ public:
 	static const std::string EV_BEFORECELLCLICKED;
 	static const std::string EV_BEFOREROWCLICKED;
 	static const std::string EV_AFTEREDIT;
+	static const std::string EV_BEFORECELLVALUECHANGED;
 	static const std::string EV_AFTERLOAD;
 	static const std::string EV_RENDER;
 	static const std::string EV_MOUSEUP;
@@ -88,6 +89,12 @@ public:
 	static Poco::WebWidgets::JSDelegate createCellValueChangedServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has changed a value in the Table
 		/// The Extjs handler offers a method signature of "function(obj)" where obj is a complex element containing members (column, row, value)
+		
+	static Poco::WebWidgets::JSDelegate createBeforeCellValueChangedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has changed a value in the Table
+		/// The Extjs handler offers a method signature of "function(obj)" where obj is a complex element 
+		/// containing members (grid, record, column, row, value, cancel)!
+		/// obj.cancel must be set to false to forbid the edit
 		
 	static Poco::WebWidgets::JSDelegate createCellClickedServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has clicked on a cell in the Table
