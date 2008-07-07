@@ -47,7 +47,7 @@ export POCO_BUILD
 # POCO_BASE/POCO_BUILD/cwd sanity checks
 #
 # Ensure that the current working directory is either
-# under $POCO_BASE or under $POCO_PROJECT
+# under $POCO_BASE or under $PROJECT_BASE
 # Also, if we're building under $POCO_BASE, disarm
 # $PROJECT_BASE
 #
@@ -60,7 +60,7 @@ PROJECT_BASE = $(POCO_BASE)
 else
 ifeq ($(inproj),1)
 else
-$(error Current working directory not under $$POCO_PROJECT)
+$(error Current working directory not under $$PROJECT_BASE)
 endif
 endif
 
