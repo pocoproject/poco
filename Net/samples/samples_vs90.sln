@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TimeServer", "TimeServer\TimeServer_vs90.vcproj", "{1DDAE25B-2263-45B2-8931-C36AD28A0362}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPTimeServer", "HTTPTimeServer\HTTPTimeServer_vs90.vcproj", "{7C4285ED-F0BC-4CBA-B1F0-61FCB7FA26C4}"
@@ -19,6 +19,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ping", "Ping\Ping_vs90.vcproj", "{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPFormServer", "HTTPFormServer\HTTPFormServer_vs90.vcproj", "{5363487F-1F23-4F9E-B6A7-5471B0F2373F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SMTPLogger", "SMTPLogger\SMTPLogger_vs90.vcproj", "{5194085E-A629-4021-B908-BA02101B5B9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -108,6 +110,14 @@ Global
 		{5363487F-1F23-4F9E-B6A7-5471B0F2373F}.release_shared|Win32.Build.0 = release_shared|Win32
 		{5363487F-1F23-4F9E-B6A7-5471B0F2373F}.release_static|Win32.ActiveCfg = release_static|Win32
 		{5363487F-1F23-4F9E-B6A7-5471B0F2373F}.release_static|Win32.Build.0 = release_static|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.debug_static|Win32.ActiveCfg = debug_static|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.debug_static|Win32.Build.0 = debug_static|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.release_shared|Win32.Build.0 = release_shared|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.release_static|Win32.ActiveCfg = release_static|Win32
+		{5194085E-A629-4021-B908-BA02101B5B9B}.release_static|Win32.Build.0 = release_static|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
