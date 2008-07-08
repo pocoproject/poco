@@ -67,7 +67,7 @@ public:
 	{
 		AUTH_NONE,
 		AUTH_CRAM_MD5,
-		AUTH_LOGIN,
+		AUTH_LOGIN
 	};
 
 	SMTPClientSession(const StreamSocket& socket);
