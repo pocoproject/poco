@@ -45,6 +45,7 @@ TableColumn::TableColumn(Cell::Ptr pCellFormat):
 	View(typeid(TableColumn)),
 	_pCell(pCellFormat),
 	_sortable(false),
+	_hidden(false),
 	_header()
 {
 	if (_pCell)
@@ -56,6 +57,7 @@ TableColumn::TableColumn(Cell::Ptr pCellFormat, const std::string& name, int wid
 	View(typeid(TableColumn)),
 	_pCell(pCellFormat),
 	_sortable(sortable),
+	_hidden(false),
 	_header(name)
 {
 	setWidth(width);

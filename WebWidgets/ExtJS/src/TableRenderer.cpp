@@ -490,6 +490,8 @@ void TableRenderer::renderColumn(const Table* pTable, const TableColumn& tc, int
 		ostr << ",sortable:true";
 	else
 		ostr << ",menuDisabled:true";
+	if (tc.isHidden())
+		ostr << ",hidden:true";
 	
 	static TableCellHandlerFactory& fty = TableCellHandlerFactory::instance();
 

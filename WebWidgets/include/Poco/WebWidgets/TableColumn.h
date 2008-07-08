@@ -96,6 +96,12 @@ public:
 	const std::string& getCustomRenderer() const;
 		/// Returns the custom JavaScript code used to render the values of this column.
 		/// Empty string if none set
+		
+	void setHidden(bool hide);
+		/// Hides/Shows a tablecolumn
+		
+	bool isHidden() const;
+		/// Returns the hidden status of the TableColumn
 
 protected:
 	virtual ~TableColumn();
@@ -104,6 +110,7 @@ protected:
 private:
 	Cell::Ptr   _pCell;
 	bool        _sortable;
+	bool        _hidden;
 	std::string _header;
 	std::string _customRenderer;
 };
@@ -179,6 +186,18 @@ inline const std::string& TableColumn::getCustomRenderer() const
 }
 
 
+inline void TableColumn::setHidden(bool hide)
+{
+	_hidden = hide;
+}
+
+		
+inline bool TableColumn::isHidden() const
+{
+	return _hidden;
+}
+	
+	
 } } // namespace Poco::WebWidgets
 
 
