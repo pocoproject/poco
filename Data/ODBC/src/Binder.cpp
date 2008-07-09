@@ -435,15 +435,20 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 {
 	// Not all drivers are equally willing to cooperate in this matter.
 	// Hence the funky flow control.
-	try
+	DynamicAny tmp;
+	bool found(false);
+	if (_pTypeInfo)
 	{
-		if (_pTypeInfo)
+		found = _pTypeInfo->getSafeInfo(cDataType, "COLUMN_SIZE", tmp);
+		if (found)
+			colSize = tmp;
+		found = _pTypeInfo->getSafeInfo(cDataType, "MINIMUM_SCALE", tmp);
+		if (found)
 		{
-			colSize = _pTypeInfo->getInfo(cDataType, "COLUMN_SIZE");
-			decDigits = _pTypeInfo->getInfo(cDataType, "MINIMUM_SCALE");
+			decDigits = tmp;
 			return;
 		}
-	} catch (NotFoundException&) { }
+	}
 
 	try
 	{

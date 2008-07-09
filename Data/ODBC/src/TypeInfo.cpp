@@ -202,6 +202,23 @@ DynamicAny TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
 }
 
 
+bool TypeInfo::getSafeInfo(SQLSMALLINT type, const std::string& param, DynamicAny& result) const
+{
+	TypeInfoVec::const_iterator it = _typeInfo.begin();
+	TypeInfoVec::const_iterator end = _typeInfo.end();
+	for (; it != end; ++it)
+	{
+		if (type == it->get<1>())
+		{
+			result = (*it)[param];
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+
 int TypeInfo::cDataType(int sqlDataType) const
 {
 	DataTypeMap::const_iterator it = _cDataTypes.find(sqlDataType);
