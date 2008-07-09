@@ -52,6 +52,7 @@
 namespace Poco {
 	namespace Net {
 		class HTMLForm;
+		class HTTPServerRequest;
 	}
 namespace WebWidgets {
 
@@ -102,7 +103,7 @@ public:
 	RequestProcessor* getAjaxProcessor(const std::string& id);
 		/// Returns the AjaxProcessor or null
 
-	void attachToThread();
+	void attachToThread(Poco::Net::HTTPServerRequest& request);
 		/// Attaches the WebApplication to the current thread, so that a
 		/// call to WebApplication::instance() within this thread will return 
 		/// exactly this WebApplication instance.
@@ -112,6 +113,9 @@ public:
 
 	static WebApplication& instance();
 		/// Returns the singleton for the current thread
+		
+	static std::string clientHostName();
+		/// Returns the host name of the caller
 private:
 	WebApplication(const WebApplication&);
 	WebApplication& operator = (const WebApplication&);
@@ -125,6 +129,7 @@ private:
 	RequestProcessorMap _requestProcessorMap;
 	RequestProcessorMap _ajaxProcessorMap;
 	static Poco::ThreadLocal<WebApplication*> _pInstance;
+	static Poco::ThreadLocal<std::string> _clientMachine;
 };
 
 

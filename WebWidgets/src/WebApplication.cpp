@@ -37,6 +37,7 @@
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
 #include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/HTTPServerRequest.h"
 
 
 namespace Poco {
@@ -44,6 +45,7 @@ namespace WebWidgets {
 
 
 Poco::ThreadLocal<WebApplication*> WebApplication::_pInstance;
+Poco::ThreadLocal<std::string> WebApplication::_clientMachine;
 
 
 WebApplication::WebApplication(const Poco::URI& uri,ResourceManager::Ptr pRM):
@@ -53,7 +55,8 @@ WebApplication::WebApplication(const Poco::URI& uri,ResourceManager::Ptr pRM):
 	_uri(uri)
 {
 	poco_check_ptr (pRM);
-	attachToThread();
+	*_pInstance = this;
+	*_clientMachine = "";
 }
 
 
@@ -76,9 +79,10 @@ void WebApplication::setCurrentPage(Page::Ptr pPage)
 }
 
 
-void WebApplication::attachToThread()
+void WebApplication::attachToThread(Poco::Net::HTTPServerRequest& request)
 {
 	*_pInstance = this;
+	*_clientMachine = request.getHost();
 }
 
 
@@ -87,6 +91,12 @@ WebApplication& WebApplication::instance()
 	WebApplication* pWebApp = *_pInstance;
 	poco_check_ptr (pWebApp);
 	return *pWebApp;
+}
+
+
+std::string WebApplication::clientHostName()
+{
+	return *_clientMachine;
 }
 
 

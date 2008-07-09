@@ -45,6 +45,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/URI.h"
+#include "Poco/ThreadLocal.h"
 #include <sstream>
 
 
@@ -57,6 +58,7 @@ namespace WebWidgets {
 
 const std::string RequestHandler::KEY_ID("id");
 const std::string RequestHandler::KEY_EVID("evId");
+
 
 
 RequestHandler::RequestHandler(WebApplication& app):
@@ -72,7 +74,7 @@ RequestHandler::~RequestHandler()
 
 void RequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 {
-	_app.attachToThread();
+	_app.attachToThread(request);
 	Poco::Net::NameValueCollection args;
 	parseRequest(request, args);
 	
