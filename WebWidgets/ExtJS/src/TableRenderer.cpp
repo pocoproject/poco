@@ -64,6 +64,8 @@ const std::string TableRenderer::EV_AFTERLOAD("load");
 const std::string TableRenderer::EV_RENDER("render");
 const std::string TableRenderer::EV_MOUSEUP("mouseup");
 const std::string TableRenderer::EV_MOUSEDOWN("mousedown");
+const std::string TableRenderer::EV_KEYDOWN("keydown");
+const std::string TableRenderer::EV_KEYPRESSED("keypress");
 const std::string TableRenderer::HIDDEN_INDEX_ROW("hidIdx");
 
 
@@ -258,6 +260,27 @@ Poco::WebWidgets::JSDelegate TableRenderer::createMouseDownServerCallback(const 
 }
 
 
+Poco::WebWidgets::JSDelegate TableRenderer::createKeyDownServerCallback(const Table* pTable)
+{
+	poco_check_ptr (pTable);
+	static const std::string signature("function(e)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_KEYDOWN));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->keyDown.getOnSuccess(), pTable->keyDown.getOnFailure());
+}
+
+
+
+Poco::WebWidgets::JSDelegate TableRenderer::createKeyPressedServerCallback(const Table* pTable)
+{
+	poco_check_ptr (pTable);
+	static const std::string signature("function(e)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_KEYPRESSED));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->keyPressed.getOnSuccess(), pTable->keyPressed.getOnFailure());
+}
+
+
 void TableRenderer::renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr)
 {
 	WebApplication& app = WebApplication::instance();
@@ -288,11 +311,31 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 			if (written)
 				ostr << ",";
 			if (pTable->beforeCellValueChanged.willDoServerCallback())
-				written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, modList, 
+				written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, pTable->beforeCellValueChanged.jsDelegates(), 
 						TableRenderer::createBeforeCellValueChangedServerCallback(pTable), 
 						pTable->beforeCellValueChanged.getServerCallbackPos());
 			else					
-				written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, modList);	
+				written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, pTable->beforeCellValueChanged.jsDelegates());	
+		}
+		if (pTable->keyDown.hasJavaScriptCode())
+		{
+			if (written) ostr << ",";
+			if (pTable->keyDown.willDoServerCallback())
+				written = Utility::writeJSEvent(ostr, EV_KEYDOWN, pTable->keyDown.jsDelegates(), 
+						TableRenderer::createKeyDownServerCallback(pTable), 
+						pTable->keyDown.getServerCallbackPos());
+			else					
+				written = Utility::writeJSEvent(ostr, EV_KEYDOWN, pTable->keyDown.jsDelegates());	
+		}
+		if (pTable->keyPressed.hasJavaScriptCode())
+		{
+			if (written) ostr << ",";
+			if (pTable->keyPressed.willDoServerCallback())
+				written = Utility::writeJSEvent(ostr, EV_KEYPRESSED, pTable->keyPressed.jsDelegates(), 
+						TableRenderer::createKeyPressedServerCallback(pTable), 
+						pTable->keyPressed.getServerCallbackPos());
+			else					
+				written = Utility::writeJSEvent(ostr, EV_KEYPRESSED, pTable->keyPressed.jsDelegates());	
 		}
 	}
 	

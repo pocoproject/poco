@@ -59,6 +59,8 @@ const std::string Table::EV_AFTERLOAD("afterload");
 const std::string Table::EV_RENDER("render");
 const std::string Table::EV_MOUSEUP("mouseup");
 const std::string Table::EV_MOUSEDOWN("mousedown");
+const std::string Table::EV_KEYDOWN("keydown");
+const std::string Table::EV_KEYPRESSED("keypressed");
 
 
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):

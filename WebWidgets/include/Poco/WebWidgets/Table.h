@@ -77,6 +77,8 @@ public:
 	static const std::string EV_RENDER;
 	static const std::string EV_MOUSEUP;
 	static const std::string EV_MOUSEDOWN;
+	static const std::string EV_KEYDOWN;
+	static const std::string EV_KEYPRESSED;
 	
 	struct WebWidgets_API CellClick
 	{
@@ -124,6 +126,10 @@ public:
 	JavaScriptEvent<Table*> mouseUp; // thrown after mouse was released over the table
 	
 	JavaScriptEvent<Table*> mouseDown; // thrown when mouse was pressed over the table
+	
+	JavaScriptEvent<Table*> keyDown; // thrown when a key is pressed down
+	
+	JavaScriptEvent<Table*> keyPressed; // thrown when a key was released
 	
 	FIFOEvent<LoadData> beforeLoad; /// thrown whenever a load is requested, internal event to which the TableRenderer must register
 	

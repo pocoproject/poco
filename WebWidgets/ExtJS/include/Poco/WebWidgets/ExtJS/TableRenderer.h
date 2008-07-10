@@ -72,6 +72,8 @@ public:
 	static const std::string EV_RENDER;
 	static const std::string EV_MOUSEUP;
 	static const std::string EV_MOUSEDOWN;
+	static const std::string EV_KEYDOWN;
+	static const std::string EV_KEYPRESSED;
 	static const std::string HIDDEN_INDEX_ROW;
 	
 	TableRenderer();
@@ -130,6 +132,14 @@ public:
 		
 	static Poco::WebWidgets::JSDelegate createMouseDownServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has pressed a mouse button
+		/// Method signature is ( Ext.EventObject e)
+		
+	static Poco::WebWidgets::JSDelegate createKeyDownServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has a key down
+		/// Method signature is ( Ext.EventObject e)
+		
+	static Poco::WebWidgets::JSDelegate createKeyPressedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has pressed a key
 		/// Method signature is ( Ext.EventObject e)	
 
 	static std::string createDnDGroupName(const Table* pTable);
