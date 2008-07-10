@@ -40,17 +40,15 @@
 #define WebWidgets_RequestHandler_INCLUDED
 
 
-#include "Poco/WebWidgets/WebWidgets.h"
+#include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/HTMLForm.h"
+#include "Poco/SharedPtr.h"
 
 
 namespace Poco {
 namespace WebWidgets {
-
-
-class WebApplication;
 
 
 class WebWidgets_API RequestHandler: public Poco::Net::HTTPRequestHandler
@@ -60,7 +58,7 @@ public:
 	static const std::string KEY_ID; /// key for form param contains id
 	static const std::string KEY_EVID; /// form param containing the event name
 
-	RequestHandler(WebApplication& app);
+	RequestHandler(Poco::SharedPtr<WebApplication> pApp);
 		/// Creates the RequestHandler, using the given WebApplication.
 
 	virtual ~RequestHandler();
@@ -70,15 +68,45 @@ public:
 	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
 
 protected:
+	RequestHandler();
+		/// Creates the RequestHandler, without any app
+		
 	void handlePageRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
 	void handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Poco::Net::NameValueCollection& args);
 	void handleForm(const Poco::Net::HTMLForm& form);
 	static void parseRequest(const Poco::Net::HTTPServerRequest& request, Poco::Net::NameValueCollection& nvc);
 	static void parseRequest(const std::string& path, Poco::Net::NameValueCollection& nvc);
 	
+	Poco::SharedPtr<WebApplication> app();
+		/// Returns the application
+		
+	Poco::SharedPtr<WebApplication> app() const;
+		/// Returns the application
+		
+	void setApp(Poco::SharedPtr<WebApplication> pApp);
+		/// Sets the application at the requesthandler	
+	
 private:
-	WebApplication& _app;
+	Poco::SharedPtr<WebApplication> _pApp;
 };
+
+
+inline Poco::SharedPtr<WebApplication> RequestHandler::app()
+{
+	return _pApp;
+}
+
+		
+inline Poco::SharedPtr<WebApplication> RequestHandler::app() const
+{
+	return _pApp;
+}
+
+
+inline void RequestHandler::setApp(Poco::SharedPtr<WebApplication> pApp)
+{
+	_pApp = pApp;
+}
 
 
 } } // namespace Poco::WebWidgets

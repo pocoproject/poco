@@ -60,9 +60,14 @@ const std::string RequestHandler::KEY_ID("id");
 const std::string RequestHandler::KEY_EVID("evId");
 
 
+RequestHandler::RequestHandler():
+	_pApp()
+{
+}
 
-RequestHandler::RequestHandler(WebApplication& app):
-	_app(app)
+
+RequestHandler::RequestHandler(Poco::SharedPtr<WebApplication> app):
+	_pApp(app)
 {
 }
 
@@ -74,7 +79,7 @@ RequestHandler::~RequestHandler()
 
 void RequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 {
-	_app.attachToThread(request);
+	_pApp->attachToThread(request);
 	Poco::Net::NameValueCollection args;
 	parseRequest(request, args);
 	
@@ -109,8 +114,8 @@ void RequestHandler::handlePageRequest(Poco::Net::HTTPServerRequest& request, Po
 	response.setChunkedTransferEncoding(true);
 	response.setContentType("text/html");
 	std::ostream& str = response.send();
-	RenderContext renderContext(*_app.getLookAndFeel(), _app);
-	Page::Ptr pPage = _app.getCurrentPage();
+	RenderContext renderContext(*_pApp->getLookAndFeel(), *_pApp);
+	Page::Ptr pPage = _pApp->getCurrentPage();
 	if (pPage)
 	{
 		pPage->renderHead(renderContext, str);
@@ -132,7 +137,7 @@ void RequestHandler::handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Po
 	const std::string id = it->second;
 
 	it = args.begin();
-	RequestProcessor* pProc = _app.getAjaxProcessor(id);
+	RequestProcessor* pProc = _pApp->getAjaxProcessor(id);
 	if (!pProc)
 	{
 		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "no requestprocessor found");
@@ -172,7 +177,7 @@ void RequestHandler::handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Po
 
 void RequestHandler::handleForm(const Poco::Net::HTMLForm& form)
 {
-	_app.handleForm(form);
+	_pApp->handleForm(form);
 }
 
 
