@@ -63,7 +63,7 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	ostr << "new Ext.Window({";
 
 	Utility::writeRenderableProperties(pRenderable, ostr);
-	if (!pPanel->getName().empty())
+	if (!pPanel->getName().empty() && pPanel->showHeader())
 		ostr << ",title:'" << pPanel->getTitle() << "'";
 	if (pPanel->getWidth() > 0)
 		ostr << ",width:" << pPanel->getWidth();
@@ -82,7 +82,11 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	
 	// minimizable set to true only fires a minimize event, without an event handler attached
 	// it is pretty useless, instead use collapsible
-	ostr << ",header:true,maximizable:true,collapsible:true";
+	if (pPanel->showHeader())
+		ostr << ",header:true,maximizable:true,collapsible:true";
+	else
+		ostr << ",header:false";
+
 	// a panel has exactly one child
 	// if this child is a layout we are fine otherwise we have to generate the items array
 	View::Ptr pChild = pPanel->getChild();

@@ -105,6 +105,12 @@ public:
 	const std::string& getTitle() const;
 		/// Returns the title of this View.	
 		
+	void showHeader(bool show);
+		/// Shows the header of the Panel
+		
+	bool showHeader() const;
+		/// Returns if the header of the Panel is shown
+		
 
 protected:
 	~Panel();
@@ -115,6 +121,7 @@ private:
 	std::string _title;
 	bool        _modal;
 	bool        _showCloseIcon;
+	bool        _showHeader;
 };
 
 
@@ -173,6 +180,18 @@ inline void Panel::setTitle(const std::string& text)
 inline const std::string& Panel::getTitle() const
 {
 	return _title;
+}
+
+
+inline void Panel::showHeader(bool show)
+{
+	_showHeader = show;
+}
+
+		
+inline bool Panel::showHeader() const
+{
+	return _showHeader;
 }
 
 

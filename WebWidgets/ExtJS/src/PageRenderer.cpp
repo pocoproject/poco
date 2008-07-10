@@ -130,6 +130,7 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		ostr << "Ext.onReady(function() {";
 		ostr << "var " << VAR_LOCALTMP << ";"; // tmp variable needed for table renderer
 		ostr << "Ext.QuickTips.init();";
+		ostr <<	"Ext.Ajax.timeout=60000;"; // increase the timeout to 60 secs
 		ostr << "Ext.Ajax.on({'requestexception':function(conn, resp, obj){";
 		ostr <<				"Ext.Msg.show({";
 		ostr <<					"title:'Server Error',";
