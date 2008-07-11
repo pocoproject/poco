@@ -5,12 +5,6 @@
 #
 # Makefile for Poco ODBC
 #
-# For Unicode support, add following to COMMONFLAGS:
-#
-# -DUNICODE
-#
-# Unicode is supported only for UnixODBC
-#
 
 include $(POCO_BASE)/build/rules/global
 
@@ -30,9 +24,9 @@ endif
 endif
 endif
 
-objects = Binder ConnectionHandle Connector EnvironmentHandle \
-	Extractor ODBCMetaColumn ODBCException ODBCStatementImpl \
-	Parameter Preparation SessionImpl TypeInfo Unicode Utility 
+objects = Binder ConnectionHandle Connector DataTypes EnvironmentHandle \
+	Extractor ODBCColumn ODBCException ODBCStatementImpl \
+	Parameter Preparation SessionImpl Utility 
 
 target         = PocoODBC
 target_version = $(LIBVERSION)
