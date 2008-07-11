@@ -145,17 +145,13 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		if (pPage->beforeRender.hasJavaScriptCode() || pPage->afterRender.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
-			bool written = false;
-			if (pPage->beforeRender.willDoServerCallback())
-				written = Utility::writeJSEvent(ostr, EV_BEFORERENDER, pPage->beforeRender.jsDelegates(), createBeforeRenderCallback(pPage), pPage->beforeRender.getServerCallbackPos());
-			else
-				written = Utility::writeJSEvent(ostr, EV_BEFORERENDER, pPage->beforeRender.jsDelegates());
-			if (written)
-				ostr << ",";
-			if (pPage->afterRender.willDoServerCallback())
-				Utility::writeJSEvent(ostr, EV_AFTERRENDER, pPage->afterRender.jsDelegates(), createAfterRenderCallback(pPage), pPage->afterRender.getServerCallbackPos());
-			else
-				Utility::writeJSEvent(ostr, EV_AFTERRENDER, pPage->afterRender.jsDelegates());
+			bool written = Utility::writeJSEvent(ostr, EV_BEFORERENDER, pPage->beforeRender, &PageRenderer::createBeforeRenderCallback, pPage);
+			if (pPage->afterRender.hasJavaScriptCode())
+			{
+				if (written)
+					ostr << ",";
+				Utility::writeJSEvent(ostr, EV_AFTERRENDER, pPage->afterRender, &PageRenderer::createAfterRenderCallback, pPage);
+			}
 			ostr << "}";
 		}
 		if (pPage->getHeight() > 0)

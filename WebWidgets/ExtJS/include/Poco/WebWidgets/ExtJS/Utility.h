@@ -104,14 +104,31 @@ public:
 
 	static std::string convertPocoDateToPHPDate(const std::string& dateTimeFmt);
 		/// Converts a poco date time format string to its PHP/extjs equivalent
-		
-	static bool writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates);
+	
+	template <typename T, typename CreateServerCallbackFct, typename Param>
+	static bool writeJSEvent(std::ostream& out, const std::string& eventName, const JavaScriptEvent<T>& ev, CreateServerCallbackFct fct, const Param* p)
+	{
+		if (!ev.hasJavaScriptCode())
+			return false;
+		if (ev.willDoServerCallback())
+			return writeJSEvent(out, eventName, ev.jsDelegates(), (*fct)(p), ev.getServerCallbackPos(), ev.getDelayTime(), ev.getGroupEvents());
+		return  writeJSEvent(out, eventName, ev.jsDelegates(), ev.getDelayTime(), ev.getGroupEvents());
+	}
+
+
+	static bool writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates, int delayTime, bool group);
 		/// writes all JS Delegates for a single named JSEvent. 
 		/// Returns true if data was written, false if no delegates were present and no event handler was written.
 		
-	static bool writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates, const Poco::WebWidgets::JSDelegate& serverCallback, std::size_t serverCallPos);
+	static bool writeJSEvent(std::ostream& out, 
+							const std::string& eventName, 
+							const std::list<JSDelegate>& delegates, 
+							const Poco::WebWidgets::JSDelegate& serverCallback, 
+							std::size_t serverCallPos,
+							int delayTime, 
+							bool group);
 		/// writes all JS Delegates for a single named JSEvent. plus the server callbacb, Always returns true.
-
+		
 	static std::string createURI(const std::map<std::string, std::string>& addParams, Renderable::ID id);
 		/// Creates the url from the function parameters, adds the id parameter automatically
 		/// a WebApplication must be set!

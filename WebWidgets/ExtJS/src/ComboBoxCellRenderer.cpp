@@ -103,10 +103,7 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	if (pComboOwner && pComboOwner->selected.hasJavaScriptCode())
 	{
 		ostr << ",listeners:{";
-		if (pComboOwner->selected.willDoServerCallback())
-			Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected.jsDelegates(), createSelectedServerCallback(pComboOwner), pComboOwner->selected.getServerCallbackPos());
-		else
-			Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected.jsDelegates());
+		Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected, &ComboBoxCellRenderer::createSelectedServerCallback, pComboOwner);
 		if (!tooltip.empty())
 			ostr << ",render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}";
 		ostr << "}";

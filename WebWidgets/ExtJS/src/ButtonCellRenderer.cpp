@@ -113,11 +113,13 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 		if (pOwner->buttonClicked.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
+			Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked, &ButtonCellRenderer::createClickServerCallback, pOwner);
+			/*
 			if (pOwner->buttonClicked.willDoServerCallback())
 				Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates(),
 										createClickServerCallback(pOwner), pOwner->buttonClicked.getServerCallbackPos());
 			else
-				Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates());
+				Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates());*/
 			ostr << "}";
 		}
 	}

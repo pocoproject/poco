@@ -187,13 +187,45 @@ public:
 		return (willDoServerCallback() || !_jsHandlers.empty());
 	}
 	
+	void setDelayTime(int millisecs)
+		/// Sets the delay time for the javascript callback
+	{
+		_delayTime = millisecs;
+	}
 	
+	int getDelayTime() const
+		/// Returns the delay time in milliseconds for the javascript callback
+	{
+		return _delayTime;
+	}
+	
+	bool getGroupEvents() const
+		/// Returns if events should be grouped together within the given _delayTime.
+		/// Every event that occurs within the tiem frame replaces the previous scheduled event
+		/// and restart the _delayTime wait.
+	{
+		return _group;
+	}
+	
+	void setGroupEvents(bool group)
+		/// Sets if events should be grouped together within the given _delayTime.
+		/// Every event that occurs within the tiem frame replaces the previous scheduled event
+		/// and restart the _delayTime wait.
+	{
+		_group = group;
+	}
+		
 private:
 	JSDelegates    _jsHandlers;
 	ServerCallback _serverCallback; /// Set to SC_YES if a server callback should be done always
 	std::size_t    _callbackPos;    /// Sets when the server callback should happen (the number defines how many jsHandlers are executed before the server callback)
 	std::string    _onSuccess;      /// code to execute when the server callback succeeds
 	std::string    _onFailure;      /// code to execute when the server callback fails
+	int            _delayTime;		/// delay Time in millisecs
+	bool           _group;			
+		/// defines if events should be grouped together. 
+		/// Requires a _delayTime greater zero, replaces an event within the delaytime with its newer version
+		/// Only effective for Javascript side of the event!
 };
 
 

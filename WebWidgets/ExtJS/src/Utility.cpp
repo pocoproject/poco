@@ -414,7 +414,7 @@ Form::Ptr Utility::insideForm(const Cell* pChild)
 }
 
 
-bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates)
+bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates, int delayTime, bool group)
 {
 	//'click' : {
 	//	fn: this.onClick,
@@ -424,17 +424,17 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 	if (delegates.empty())
 		return false;
 		
-	out << "'" << eventName << "':";
+	out << "'" << eventName << "':{";
 		
 	if (delegates.size() == 1)
-		out << "{fn:" << delegates.begin()->jsCode() << "}";
+		out << "fn:" << delegates.begin()->jsCode() << "";
 	else
 	{
 		// rather simple way to support more than one delegate
 		std::ostringstream invoke;
 		int maxParams = detectMaxParamCount(delegates);
 		std::string fct(createFunctionSignature(maxParams));
-		out << "{fn:" << fct << "{var all={";
+		out << "fn:" << fct << "{var all={";
 		// the invoke function calls all the other functions sequentially
 		invoke << "invoke:" << fct <<"{";
 		std::list<JSDelegate>::const_iterator it = delegates.begin();
@@ -480,20 +480,33 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 		
 		out << "all." << createFunctionSignature("invoke", maxParams) << ";";
 		out << "}"; //closes fn
-		out << "}"; //closes function
+		
 	}	
-
+	if (delayTime > 0)
+	{
+		if (!group)
+			out << ",delay:" << delayTime;
+		else
+			out << ",buffer:" << delayTime;
+	}
+	out << "}"; //closes outer fn
 	return true;
 }
 
 
-bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, const std::list<JSDelegate>& delegates, const Poco::WebWidgets::JSDelegate& serverCallback, std::size_t serverCallPos)
+bool Utility::writeJSEvent(std::ostream& out, 
+					const std::string& eventName, 
+					const std::list<JSDelegate>& delegates, 
+					const Poco::WebWidgets::JSDelegate& serverCallback, 
+					std::size_t serverCallPos,
+					int delayTime, 
+					bool group)
 {
 	// TODO: we can optimize here a bit by avoiding the copy
 	std::list<JSDelegate> dels;
 	std::list<JSDelegate>::const_iterator it = delegates.begin();
 	bool written = false;
-	for (; it != delegates.end(); ++it, --serverCallPos)
+	for (; it != delegates.end() && !written; ++it, --serverCallPos)
 	{
 		if (serverCallPos == 0)
 		{
@@ -504,7 +517,7 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 	}
 	if (!written)
 		dels.push_back(serverCallback);
-	return writeJSEvent(out, eventName, dels);
+	return writeJSEvent(out, eventName, dels, delayTime, group);
 }
 
 

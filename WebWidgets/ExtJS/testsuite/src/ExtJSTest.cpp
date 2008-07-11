@@ -1332,7 +1332,7 @@ void ExtJSTest::testJSEvent()
 	pBut->buttonClicked.add(jsDelegate("someFunction2(obj)")); 
 	pBut->buttonClicked.add(jsDelegate("hello(obj){alert('Click');}")); //hello must get renamed to function
 	std::ostringstream out;
-	Utility::writeJSEvent(out, "clicked", pBut->buttonClicked.jsDelegates());
+	Utility::writeJSEvent(out, "clicked", pBut->buttonClicked.jsDelegates(),0, false);
 	std::string result(out.str());
 	static const std::string expected("'clicked':"
 										"{"
@@ -1363,7 +1363,7 @@ void ExtJSTest::testJSEvent2()
 	pBut->buttonClicked.add(jsDelegate("someFunction2(obj,o2)")); 
 	pBut->buttonClicked.add(jsDelegate("hello(obj){alert('Click');}")); //hello must get renamed to function
 	std::ostringstream out;
-	Utility::writeJSEvent(out, "clicked", pBut->buttonClicked.jsDelegates());
+	Utility::writeJSEvent(out, "clicked", pBut->buttonClicked.jsDelegates(),0, false);
 	std::string result(out.str());
 	static const std::string expected("'clicked':"
 										"{"

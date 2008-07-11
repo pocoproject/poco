@@ -303,100 +303,62 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 		if (pTable->cellValueChanged.willDoServerCallback())
 			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList, 
 					TableRenderer::createCellValueChangedServerCallback(pTable), 
-					pTable->cellValueChanged.getServerCallbackPos());
+					pTable->cellValueChanged.getServerCallbackPos(), pTable->cellValueChanged.getDelayTime(), pTable->cellValueChanged.getGroupEvents());
 		else					
-			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList);
+			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList, pTable->cellValueChanged.getDelayTime(), pTable->cellValueChanged.getGroupEvents());
 		if (pTable->beforeCellValueChanged.hasJavaScriptCode())
 		{	
-			if (written)
-				ostr << ",";
-			if (pTable->beforeCellValueChanged.willDoServerCallback())
-				written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, pTable->beforeCellValueChanged.jsDelegates(), 
-						TableRenderer::createBeforeCellValueChangedServerCallback(pTable), 
-						pTable->beforeCellValueChanged.getServerCallbackPos());
-			else					
-				written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, pTable->beforeCellValueChanged.jsDelegates());	
+			if (written) ostr << ",";
+			written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, pTable->beforeCellValueChanged, 
+						&TableRenderer::createBeforeCellValueChangedServerCallback, pTable);
 		}
 		if (pTable->keyDown.hasJavaScriptCode())
 		{
 			if (written) ostr << ",";
-			if (pTable->keyDown.willDoServerCallback())
-				written = Utility::writeJSEvent(ostr, EV_KEYDOWN, pTable->keyDown.jsDelegates(), 
-						TableRenderer::createKeyDownServerCallback(pTable), 
-						pTable->keyDown.getServerCallbackPos());
-			else					
-				written = Utility::writeJSEvent(ostr, EV_KEYDOWN, pTable->keyDown.jsDelegates());	
+			written = Utility::writeJSEvent(ostr, EV_KEYDOWN, pTable->keyDown,
+						&TableRenderer::createKeyDownServerCallback, pTable);
 		}
 		if (pTable->keyPressed.hasJavaScriptCode())
 		{
 			if (written) ostr << ",";
-			if (pTable->keyPressed.willDoServerCallback())
-				written = Utility::writeJSEvent(ostr, EV_KEYPRESSED, pTable->keyPressed.jsDelegates(), 
-						TableRenderer::createKeyPressedServerCallback(pTable), 
-						pTable->keyPressed.getServerCallbackPos());
-			else					
-				written = Utility::writeJSEvent(ostr, EV_KEYPRESSED, pTable->keyPressed.jsDelegates());	
+			written = Utility::writeJSEvent(ostr, EV_KEYPRESSED, pTable->keyPressed,
+						&TableRenderer::createKeyPressedServerCallback, pTable);
 		}
 	}
 	
 	if (pTable->cellClicked.hasJavaScriptCode())
 	{
-		if (written)
-			ostr << ",";
-		if (pTable->cellClicked.willDoServerCallback())
-			written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates(),
-										TableRenderer::createCellClickedServerCallback(pTable),
-										pTable->cellClicked.getServerCallbackPos());
-		else
-			written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked.jsDelegates());
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->cellClicked,
+										&TableRenderer::createCellClickedServerCallback, pTable);
 	}
 	
 	if (pTable->beforeCellClicked.hasJavaScriptCode())
 	{
-		if (written)
-			ostr << ",";
-		if (pTable->beforeCellClicked.willDoServerCallback())
-			written = Utility::writeJSEvent(ostr, EV_BEFORECELLCLICKED, pTable->beforeCellClicked.jsDelegates(),
-										TableRenderer::createBeforeCellClickedServerCallback(pTable),
-										pTable->beforeCellClicked.getServerCallbackPos());
-		else
-			written = Utility::writeJSEvent(ostr, EV_BEFORECELLCLICKED, pTable->beforeCellClicked.jsDelegates());
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_BEFORECELLCLICKED, pTable->beforeCellClicked,
+										&TableRenderer::createBeforeCellClickedServerCallback ,pTable);
 	}
 	
 	if (pTable->afterRender.hasJavaScriptCode())
 	{
-		if (written)
-			ostr << ",";
-		if (pTable->afterRender.willDoServerCallback())
-			written = Utility::writeJSEvent(ostr, EV_RENDER, pTable->afterRender.jsDelegates(),
-										TableRenderer::createRenderServerCallback(pTable),
-										pTable->afterRender.getServerCallbackPos());
-		else
-			written = Utility::writeJSEvent(ostr, EV_RENDER, pTable->afterRender.jsDelegates());
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_RENDER, pTable->afterRender,
+										&TableRenderer::createRenderServerCallback, pTable);
 	}
 	
 	if (pTable->mouseUp.hasJavaScriptCode())
 	{
-		if (written)
-			ostr << ",";
-		if (pTable->mouseUp.willDoServerCallback())
-			written = Utility::writeJSEvent(ostr, EV_MOUSEUP, pTable->mouseUp.jsDelegates(),
-										TableRenderer::createMouseUpServerCallback(pTable),
-										pTable->mouseUp.getServerCallbackPos());
-		else
-			written = Utility::writeJSEvent(ostr, EV_MOUSEUP, pTable->mouseUp.jsDelegates());
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_MOUSEUP, pTable->mouseUp,
+										&TableRenderer::createMouseUpServerCallback, pTable);
 	}
 	
 	if (pTable->mouseDown.hasJavaScriptCode())
 	{
-		if (written)
-			ostr << ",";
-		if (pTable->mouseDown.willDoServerCallback())
-			written = Utility::writeJSEvent(ostr, EV_MOUSEDOWN, pTable->mouseDown.jsDelegates(),
-										TableRenderer::createMouseDownServerCallback(pTable),
-										pTable->mouseDown.getServerCallbackPos());
-		else
-			written = Utility::writeJSEvent(ostr, EV_MOUSEDOWN, pTable->mouseDown.jsDelegates());
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_MOUSEDOWN, pTable->mouseDown,
+										&TableRenderer::createMouseDownServerCallback, pTable);
 	}
 	
 	ostr << "},"; //close listeners
@@ -417,23 +379,14 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 		if (pTable->rowClicked.hasJavaScriptCode() || pTable->beforeRowClicked.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
-			if (pTable->rowClicked.willDoServerCallback())
-				written = Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates(),
-										TableRenderer::createRowClickedServerCallback(pTable),
-										pTable->rowClicked.getServerCallbackPos());
-			else
-				written = Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked.jsDelegates());
+			written = Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked,
+										&TableRenderer::createRowClickedServerCallback, pTable);
 				
 			if (pTable->beforeRowClicked.hasJavaScriptCode())
 			{
-				if (written)
-					ostr << ",";
-				if (pTable->beforeRowClicked.willDoServerCallback())
-					written = Utility::writeJSEvent(ostr, EV_BEFOREROWCLICKED, pTable->beforeRowClicked.jsDelegates(),
-										TableRenderer::createBeforeRowClickedServerCallback(pTable),
-										pTable->beforeRowClicked.getServerCallbackPos());
-				else
-					written = Utility::writeJSEvent(ostr, EV_BEFOREROWCLICKED, pTable->beforeRowClicked.jsDelegates());	
+				if (written) ostr << ",";
+				written = Utility::writeJSEvent(ostr, EV_BEFOREROWCLICKED, pTable->beforeRowClicked,
+										&TableRenderer::createBeforeRowClickedServerCallback, pTable);	
 			}
 			ostr << "}";
 		}
@@ -610,10 +563,7 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	if (pTable->afterLoad.hasJavaScriptCode())
 	{
 		ostr << ",listeners:{";
-		if (pTable->afterLoad.willDoServerCallback())
-			Utility::writeJSEvent(ostr, EV_AFTERLOAD, pTable->afterLoad.jsDelegates(), createAfterLoadServerCallback(pTable), pTable->afterLoad.getServerCallbackPos());
-		else
-			Utility::writeJSEvent(ostr, EV_AFTERLOAD, pTable->afterLoad.jsDelegates());
+			Utility::writeJSEvent(ostr, EV_AFTERLOAD, pTable->afterLoad, &TableRenderer::createAfterLoadServerCallback, pTable);
 		ostr << "}";
 	}
 	
