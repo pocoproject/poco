@@ -40,15 +40,17 @@
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/AutoTransaction.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
-#include <iostream>
 
 
 using namespace Poco::Data::Keywords;
 using Poco::Data::DataException;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
+using Poco::Data::AutoTransaction;
+using Poco::Data::Session;
 using Poco::Data::ODBC::Utility;
 using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
@@ -612,6 +614,60 @@ void ODBCOracleTest::testMultipleResults()
 }
 
 
+void ODBCOracleTest::testAutoTransaction()
+{
+	Session localSession("ODBC", _connectString);
+	bool ac = session().getFeature("autoCommit");
+	int count = 0;
+
+	recreateIntsTable();
+
+	session().setFeature("autoCommit", true);
+	session() << "INSERT INTO Strings VALUES (1)", now;
+	localSession << "SELECT count(*) FROM Strings", into(count), now;
+	assert (1 == count);
+	session() << "INSERT INTO Strings VALUES (2)", now;
+	localSession << "SELECT count(*) FROM Strings", into(count), now;
+	assert (2 == count);
+	session() << "INSERT INTO Strings VALUES (3)", now;
+	localSession << "SELECT count(*) FROM Strings", into(count), now;
+	assert (3 == count);
+
+	session() << "DELETE FROM Strings", now;
+	localSession << "SELECT count(*) FROM Strings", into(count), now;
+	assert (0 == count);
+
+	session().setFeature("autoCommit", false);
+	
+	try
+	{
+		AutoTransaction at(session());
+		session() << "INSERT INTO Strings VALUES (1)", now;
+		session() << "INSERT INTO Strings VALUES (2)", now;
+		session() << "BAD QUERY", now;
+	} catch (Poco::Exception&) {}
+
+	session() << "SELECT count(*) FROM Strings", into(count), now;
+	assert (0 == count);
+
+	AutoTransaction at(session());
+
+	session() << "INSERT INTO Strings VALUES (1)", now;
+	session() << "INSERT INTO Strings VALUES (2)", now;
+	session() << "INSERT INTO Strings VALUES (3)", now;
+
+	localSession << "SELECT count(*) FROM Strings", into(count), now;
+	assert (0 == count);
+
+	at.commit();
+
+	localSession << "SELECT count(*) FROM Strings", into(count), now;
+	assert (3 == count);
+
+	session().setFeature("autoCommit", ac);
+}
+
+
 void ODBCOracleTest::dropObject(const std::string& type, const std::string& name)
 {
 	try
@@ -864,6 +920,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoTransaction);
 
 		return pSuite;
 	}

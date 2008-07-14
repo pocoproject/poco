@@ -65,6 +65,7 @@ public:
 	void testCursorStoredFunction();
 	void testStoredProcedureAny();
 	void testStoredProcedureDynamicAny();
+	void testAutoTransaction();
 
 	void testNull();
 	static CppUnit::Test* suite();
