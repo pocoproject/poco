@@ -61,6 +61,8 @@ const std::string Table::EV_MOUSEUP("mouseup");
 const std::string Table::EV_MOUSEDOWN("mousedown");
 const std::string Table::EV_KEYDOWN("keydown");
 const std::string Table::EV_KEYPRESSED("keypressed");
+const std::string Table::EV_ROWSELECTED("rowselected");
+const std::string Table::EV_CELLSELECTED("cellselected");
 
 
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
@@ -219,25 +221,85 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 			setValue(Poco::Any(val), row, col);
 		response.send();
 	}
+	else if (ev == EV_BEFORECELLVALUECHANGED)
+	{
+		const std::string& val = args.get(FIELD_VAL);
+		Poco::Any oldValue;
+		if (getColumnCount() > col)
+			oldValue = getValue(row, col);
+			
+		Cell::Ptr pCell = getColumns()[col]->getCell();
+		Formatter::Ptr pForm;
+		if (pCell)
+			pForm = pCell->getFormatter();
+		
+		if (pForm)
+		{
+			Poco::Any newValue = pForm->parse(val);
+			CellValueChange cvc(row, col, oldValue, newValue);	
+			beforeCellValueChanged(this, cvc);
+		}
+		else
+		{
+			Poco::Any newValue(val);
+			CellValueChange cvc(row, col, oldValue, newValue);	
+			beforeCellValueChanged(this, cvc);
+		}
+		response.send();
+	}
 	else if (ev == EV_AFTERLOAD)
 	{
 		Table* pTable = this;
 		afterLoad(this, pTable);
+		response.send();
 	}
 	else if (ev == EV_RENDER)
 	{
 		Table* pTable = this;
 		afterRender(this, pTable);
+		response.send();
 	}
 	else if (ev == EV_MOUSEUP)
 	{
 		Table* pTable = this;
 		mouseUp(this, pTable);
+		response.send();
 	}
 	else if (ev == EV_MOUSEDOWN)
 	{
 		Table* pTable = this;
 		mouseDown(this, pTable);
+		response.send();
+	}
+	else if (ev == EV_KEYDOWN)
+	{
+		Table* pTable = this;
+		keyDown(this, pTable);
+		response.send();
+	}
+	else if (ev == EV_KEYPRESSED)
+	{
+		Table* pTable = this;
+		keyPressed(this, pTable);
+		response.send();
+	}
+	else if (ev == EV_CELLSELECTED)
+	{
+		if (col < 0 || row < 0 || col >= getColumnCount())
+			throw InvalidArgumentException("col/row out of range");
+
+		CellClick ev(row, col);
+		cellSelected(this, ev);
+		response.send();
+	}
+	else if (ev == EV_ROWSELECTED)
+	{
+		if (row < 0 )
+			throw InvalidArgumentException("row out of range");
+
+		std::size_t theRow(row);
+		rowSelected(this, theRow);
+		response.send();
 	}
 }
 
@@ -248,7 +310,8 @@ void Table::setValue(const Poco::Any& val, std::size_t row, std::size_t col)
 	if (getRowCount() > row)
 		oldValue = getValue(row, col); 
 	CellValueChange ev(row, col, oldValue, val);
-	_pModel->setValue(val, row, col);
+	beforeCellValueChanged(this,ev);
+	_pModel->setValue(ev.newValue, row, col);
 	cellValueChanged(this, ev);
 }
 

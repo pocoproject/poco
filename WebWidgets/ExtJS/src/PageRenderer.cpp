@@ -177,7 +177,8 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		}
 		//close the panel
 		ostr << "]});";
-		
+		if (!pPage->getPostRenderCode().empty())
+			ostr << pPage->getPostRenderCode();
 		//close onReady
 		ostr << "});";
 		//close inline JS block

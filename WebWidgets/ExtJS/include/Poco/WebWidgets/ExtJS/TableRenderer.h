@@ -74,6 +74,8 @@ public:
 	static const std::string EV_MOUSEDOWN;
 	static const std::string EV_KEYDOWN;
 	static const std::string EV_KEYPRESSED;
+	static const std::string EV_ROWSELECTED;
+	static const std::string EV_CELLSELECTED;
 	static const std::string HIDDEN_INDEX_ROW;
 	
 	TableRenderer();
@@ -98,6 +100,16 @@ public:
 		/// containing members (grid, record, column, row, value, cancel)!
 		/// obj.cancel must be set to false to forbid the edit
 		
+	static Poco::WebWidgets::JSDelegate createCellSelectedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has selected a cell
+		/// The Extjs handler offers a method signature of
+		///    cellselect : ( SelectionModel this, Number rowIndex, Number colIndex )
+		
+	static Poco::WebWidgets::JSDelegate createRowSelectedServerCallback(const Table* pTable);
+		/// Adds a javascript callback to inform the WebServer that the client has selected a row
+		/// The Extjs handler offers a method signature of
+		///    rowselect : ( SelectionModel this, Number rowIndex, Ext.data.Record r )
+		
 	static Poco::WebWidgets::JSDelegate createCellClickedServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has clicked on a cell in the Table
 		/// Method signature is cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
@@ -106,7 +118,7 @@ public:
 		/// Adds a javascript callback to inform the WebServer that the client has clicke don a row
 		/// This event will only be added if the Table uses a Row selection model!
 		/// Single cell selection will trigger an exception!
-		/// Method signature is rowselect : ( SelectionModel this, Number rowIndex, Ext.Data.Record r )
+		/// Method signature is rowclick : ( Grid this, Number rowIndex, Ext.EventObject e )
 		
 	static Poco::WebWidgets::JSDelegate createBeforeCellClickedServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has clicked on a cell in the Table

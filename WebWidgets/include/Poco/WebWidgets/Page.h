@@ -104,6 +104,16 @@ public:
 		
 	const std::vector<std::string>& dynamicFunctions() const;
 		/// Returns all dynamic functions
+		
+	void setPostRenderCode(const std::string& js);
+		/// Adds Javascript code that should be executed after the page code was written. The difference to afterRender
+		/// is that afterRender is a JS Event executed from within the rendering pipeline of the browser
+		/// (ie. changes to the GUI might block the browser indefinitely) whereas
+		/// post render code is executed immediately after the JS code that generates the GUI
+		/// (ie. it is not necessarily rendered, no data loaded but thread-safe!)
+		
+	const std::string& getPostRenderCode() const;
+		/// Returns post rnedre code. Can be an empty string
 	
 protected:
 	Page(const std::string& name, const std::type_info& type);
@@ -119,6 +129,7 @@ private:
 	std::string     _text;
 	ResourceManager _rm;
 	std::vector<std::string> _jsCode;
+	std::string     _postRenderCode;
 };
 
 
@@ -152,6 +163,18 @@ inline void Page::addDynamicFunction(const std::string& jsCode)
 inline const std::vector<std::string>& Page::dynamicFunctions() const
 {
 	return _jsCode;
+}
+
+
+inline void Page::setPostRenderCode(const std::string& js)
+{
+	_postRenderCode = js;
+}
+
+		
+inline const std::string& Page::getPostRenderCode() const
+{
+	return _postRenderCode;
 }
 
 

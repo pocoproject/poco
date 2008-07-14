@@ -79,6 +79,8 @@ public:
 	static const std::string EV_MOUSEDOWN;
 	static const std::string EV_KEYDOWN;
 	static const std::string EV_KEYPRESSED;
+	static const std::string EV_ROWSELECTED;
+	static const std::string EV_CELLSELECTED;
 	
 	struct WebWidgets_API CellClick
 	{
@@ -106,6 +108,10 @@ public:
 		int rowCnt;
 		LoadData(Poco::Net::HTTPServerResponse* pResponse, Table* pTable, int firstRow, int rowCnt);
 	};
+	
+	JavaScriptEvent<std::size_t> rowSelected; /// fires the row selected event
+	
+	JavaScriptEvent<Table::CellClick> cellSelected; /// fires the cell selected event
 	
 	JavaScriptEvent<std::size_t> rowClicked; /// fires the row clicked event
 	

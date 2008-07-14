@@ -55,7 +55,7 @@ namespace ExtJS {
 
 
 const std::string TableRenderer::EV_CELLCLICKED("cellclick");
-const std::string TableRenderer::EV_ROWCLICKED("rowselect");
+const std::string TableRenderer::EV_ROWCLICKED("rowclick");
 const std::string TableRenderer::EV_BEFORECELLCLICKED("cellmousedown");
 const std::string TableRenderer::EV_BEFOREROWCLICKED("rowmousedown");
 const std::string TableRenderer::EV_BEFORECELLVALUECHANGED("validateedit");
@@ -66,6 +66,8 @@ const std::string TableRenderer::EV_MOUSEUP("mouseup");
 const std::string TableRenderer::EV_MOUSEDOWN("mousedown");
 const std::string TableRenderer::EV_KEYDOWN("keydown");
 const std::string TableRenderer::EV_KEYPRESSED("keypress");
+const std::string TableRenderer::EV_ROWSELECTED("rowselect");
+const std::string TableRenderer::EV_CELLSELECTED("cellselect");
 const std::string TableRenderer::HIDDEN_INDEX_ROW("hidIdx");
 
 
@@ -172,6 +174,40 @@ Poco::WebWidgets::JSDelegate TableRenderer::createRenderServerCallback(const Tab
 }
 
 
+
+Poco::WebWidgets::JSDelegate TableRenderer::createCellSelectedServerCallback(const Table* pTable)
+{
+	// cellselect : ( SelectionModel this, Number rowIndex, Number colIndex )
+	poco_check_ptr (pTable);
+	static const std::string signature("function(selMod,row,col)");
+	//extract the true row index from the last column!
+	std::string origRow("+selMode.getSelectedCell().record.get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_COL, "+col"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLSELECTED));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->cellSelected.getOnSuccess(), pTable->cellSelected.getOnFailure());
+}
+
+
+Poco::WebWidgets::JSDelegate TableRenderer::createRowSelectedServerCallback(const Table* pTable)
+{
+	// rowselect : ( SelectionModel this, Number rowIndex, Ext.data.Record r )
+	poco_check_ptr (pTable);
+	static const std::string signature("function(selMod,row,rec)");
+	//extract the true row index from the last column!
+	std::string origRow("+rec.get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_ROWSELECTED));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->rowSelected.getOnSuccess(), pTable->rowSelected.getOnFailure());
+}
+
+
 Poco::WebWidgets::JSDelegate TableRenderer::createCellClickedServerCallback(const Table* pTable)
 {
 	poco_check_ptr (pTable);
@@ -207,9 +243,8 @@ Poco::WebWidgets::JSDelegate TableRenderer::createBeforeCellClickedServerCallbac
 Poco::WebWidgets::JSDelegate TableRenderer::createRowClickedServerCallback(const Table* pTable)
 {
 	poco_check_ptr (pTable);
-	poco_assert (pTable->getSelectionModel() != Table::SM_CELL);
 	
-	/// Method signature is rowselect : ( SelectionModel this, Number rowIndex, Ext.Data.Record r )
+	/// Method signature is rowclick : ( Grid this, Number rowIndex, Ext.EventObject e )
 	static const std::string signature("function(sm,row,r)");
 	//extract the true row index from the last column!
 	std::string origRow("+r.get('");
@@ -297,33 +332,28 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	bool written = false;
 	if (editable)
 	{
-		JSDelegate jsDel("function(obj){obj.grid.getStore().commitChanges();}");
-		std::list<JSDelegate> modList(pTable->cellValueChanged.jsDelegates());
-		modList.push_back(jsDel);
-		if (pTable->cellValueChanged.willDoServerCallback())
-			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList, 
-					TableRenderer::createCellValueChangedServerCallback(pTable), 
-					pTable->cellValueChanged.getServerCallbackPos(), pTable->cellValueChanged.getDelayTime(), pTable->cellValueChanged.getGroupEvents());
-		else					
-			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, modList, pTable->cellValueChanged.getDelayTime(), pTable->cellValueChanged.getGroupEvents());
+		if (pTable->cellValueChanged.hasJavaScriptCode())
+			written = Utility::writeJSEvent(ostr, EV_AFTEREDIT, pTable->cellValueChanged, &TableRenderer::createCellValueChangedServerCallback, pTable);
+			
 		if (pTable->beforeCellValueChanged.hasJavaScriptCode())
 		{	
 			if (written) ostr << ",";
 			written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, pTable->beforeCellValueChanged, 
 						&TableRenderer::createBeforeCellValueChangedServerCallback, pTable);
 		}
-		if (pTable->keyDown.hasJavaScriptCode())
-		{
-			if (written) ostr << ",";
-			written = Utility::writeJSEvent(ostr, EV_KEYDOWN, pTable->keyDown,
-						&TableRenderer::createKeyDownServerCallback, pTable);
-		}
-		if (pTable->keyPressed.hasJavaScriptCode())
-		{
-			if (written) ostr << ",";
-			written = Utility::writeJSEvent(ostr, EV_KEYPRESSED, pTable->keyPressed,
-						&TableRenderer::createKeyPressedServerCallback, pTable);
-		}
+	}
+	
+	if (pTable->keyDown.hasJavaScriptCode())
+	{
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_KEYDOWN, pTable->keyDown,
+					&TableRenderer::createKeyDownServerCallback, pTable);
+	}
+	if (pTable->keyPressed.hasJavaScriptCode())
+	{
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_KEYPRESSED, pTable->keyPressed,
+					&TableRenderer::createKeyPressedServerCallback, pTable);
 	}
 	
 	if (pTable->cellClicked.hasJavaScriptCode())
@@ -338,6 +368,20 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 		if (written) ostr << ",";
 		written = Utility::writeJSEvent(ostr, EV_BEFORECELLCLICKED, pTable->beforeCellClicked,
 										&TableRenderer::createBeforeCellClickedServerCallback ,pTable);
+	}
+	
+	if (pTable->rowClicked.hasJavaScriptCode())
+	{
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_CELLCLICKED, pTable->rowClicked,
+										&TableRenderer::createRowClickedServerCallback, pTable);
+	}
+	
+	if (pTable->beforeRowClicked.hasJavaScriptCode())
+	{
+		if (written) ostr << ",";
+		written = Utility::writeJSEvent(ostr, EV_BEFORECELLCLICKED, pTable->beforeRowClicked,
+										&TableRenderer::createBeforeRowClickedServerCallback ,pTable);
 	}
 	
 	if (pTable->afterRender.hasJavaScriptCode())
@@ -376,18 +420,25 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 			ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:true";
 		else if (pTable->getSelectionModel() == Table::SM_MULTIROW)
 			ostr << ",selModel:new Ext.grid.RowSelectionModel({singleSelect:false";
-		if (pTable->rowClicked.hasJavaScriptCode() || pTable->beforeRowClicked.hasJavaScriptCode())
+		if (pTable->rowSelected.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
-			written = Utility::writeJSEvent(ostr, EV_ROWCLICKED, pTable->rowClicked,
-										&TableRenderer::createRowClickedServerCallback, pTable);
-				
-			if (pTable->beforeRowClicked.hasJavaScriptCode())
-			{
-				if (written) ostr << ",";
-				written = Utility::writeJSEvent(ostr, EV_BEFOREROWCLICKED, pTable->beforeRowClicked,
-										&TableRenderer::createBeforeRowClickedServerCallback, pTable);	
-			}
+			written = Utility::writeJSEvent(ostr, EV_ROWSELECTED, pTable->rowSelected,
+										&TableRenderer::createRowSelectedServerCallback, pTable);
+			ostr << "}";
+		}
+		ostr << "})"; //close selModel
+	}
+	else
+	{
+		// a cell selection model is the default but if we want to add js listeners we have to 
+		// define it
+		ostr << ",selModel:new Ext.grid.CellSelectionModel({";
+		if (pTable->cellSelected.hasJavaScriptCode())
+		{
+			ostr << "listeners:{";
+			written = Utility::writeJSEvent(ostr, EV_CELLSELECTED, pTable->cellSelected,
+										&TableRenderer::createCellSelectedServerCallback, pTable);
 			ostr << "}";
 		}
 		ostr << "})"; //close selModel
