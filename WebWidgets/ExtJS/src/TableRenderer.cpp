@@ -246,9 +246,9 @@ Poco::WebWidgets::JSDelegate TableRenderer::createRowClickedServerCallback(const
 	poco_check_ptr (pTable);
 	
 	/// Method signature is rowclick : ( Grid this, Number rowIndex, Ext.EventObject e )
-	static const std::string signature("function(sm,row,r)");
+	static const std::string signature("function(gr,row,e)");
 	//extract the true row index from the last column!
-	std::string origRow("+r.get('");
+	std::string origRow("+gr.getStore().getAt(row).get('");
 	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
 	origRow.append("')");
 	std::map<std::string, std::string> addParams;
