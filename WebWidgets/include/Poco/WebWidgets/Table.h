@@ -81,6 +81,7 @@ public:
 	static const std::string EV_KEYPRESSED;
 	static const std::string EV_ROWSELECTED;
 	static const std::string EV_CELLSELECTED;
+	static const std::string EV_STARTCELLVALUECHANGE;
 	
 	struct WebWidgets_API CellClick
 	{
@@ -121,9 +122,11 @@ public:
 	
 	JavaScriptEvent<Table::CellClick> beforeCellClicked; /// fires when the mouse is pressed down on a cell
 	
-	JavaScriptEvent<Table::CellValueChange> cellValueChanged;
+	JavaScriptEvent<Table::CellValueChange> cellValueChanged; /// triggered after data is written to the table
 	
-	JavaScriptEvent<Table::CellValueChange> beforeCellValueChanged;
+	JavaScriptEvent<Table::CellValueChange> beforeCellValueChanged;	/// triggered before data is written to the table
+	
+	JavaScriptEvent<Table::CellClick> startCellValueChange; /// triggered before a beforeCellValueChanged
 	
 	JavaScriptEvent<Table*> afterLoad; // thrown after data was loaded
 	

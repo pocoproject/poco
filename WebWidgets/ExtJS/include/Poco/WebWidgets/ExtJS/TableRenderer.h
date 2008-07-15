@@ -76,6 +76,7 @@ public:
 	static const std::string EV_KEYPRESSED;
 	static const std::string EV_ROWSELECTED;
 	static const std::string EV_CELLSELECTED;
+	static const std::string EV_STARTCELLVALUECHANGE;
 	static const std::string HIDDEN_INDEX_ROW;
 	
 	TableRenderer();
@@ -99,6 +100,11 @@ public:
 		/// The Extjs handler offers a method signature of "function(obj)" where obj is a complex element 
 		/// containing members (grid, record, column, row, value, cancel)!
 		/// obj.cancel must be set to false to forbid the edit
+		
+	static Poco::WebWidgets::JSDelegate createStartCellValueChangeServerCallback(const Table* pTable);
+			/// Adds a javascript callback to inform the WebServer that the client has entered edit mode in the Table
+			/// The Extjs handler offers a method signature of "function(obj)" where obj is a complex element 
+			/// containing members (grid, record, column, row, value, cancel)!
 		
 	static Poco::WebWidgets::JSDelegate createCellSelectedServerCallback(const Table* pTable);
 		/// Adds a javascript callback to inform the WebServer that the client has selected a cell

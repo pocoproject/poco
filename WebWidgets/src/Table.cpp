@@ -63,6 +63,7 @@ const std::string Table::EV_KEYDOWN("keydown");
 const std::string Table::EV_KEYPRESSED("keypressed");
 const std::string Table::EV_ROWSELECTED("rowselected");
 const std::string Table::EV_CELLSELECTED("cellselected");
+const std::string Table::EV_STARTCELLVALUECHANGE("startedit");
 
 
 Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
@@ -299,6 +300,15 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 
 		std::size_t theRow(row);
 		rowSelected(this, theRow);
+		response.send();
+	}
+	else if (ev == EV_STARTCELLVALUECHANGE)
+	{
+		if (col < 0 || row < 0 || col >= getColumnCount())
+			throw InvalidArgumentException("col/row out of range");
+
+		CellClick ev(row, col);
+		startCellValueChange(this, ev);
 		response.send();
 	}
 }

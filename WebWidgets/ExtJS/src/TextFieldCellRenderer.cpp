@@ -82,8 +82,8 @@ void TextFieldCellRenderer::renderBody(const Renderable* pRenderable, const Rend
 void TextFieldCellRenderer::writeCellProperties(const TextFieldCell* pCell, std::ostream& ostr, bool writeValue, bool writeListeners)
 {
 	Utility::writeCellProperties(pCell, ostr);
-	
-	ostr << ",selectOnFocus:true";
+	if (pCell->getEditMode() == Cell::EM_SELECTCONTENT)
+		ostr << ",selectOnFocus:true";
 
 	if (writeValue&& !pCell->getValue().empty())
 	{

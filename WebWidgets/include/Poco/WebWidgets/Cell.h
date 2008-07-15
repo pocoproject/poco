@@ -65,6 +65,13 @@ class WebWidgets_API Cell: public Renderable, public RequestProcessor
 {
 public:
 	typedef Poco::AutoPtr<Cell> Ptr;
+	
+	enum EditMode
+		/// Confgures edit mode for cells
+	{
+		EM_SELECTCONTENT = 0,
+		EM_CURSORATENDOFVALUE
+	};
 
 	void enable(bool enabled = true);
 		/// Enables (if enabled == true) or disables the Cell.
@@ -155,6 +162,12 @@ public:
 	bool isEditable() const;
 		/// Returns true iff the Cell is editable.
 		
+	void setEditMode(Cell::EditMode em);
+		/// Sets the edit mode
+		
+	Cell::EditMode getEditMode() const;	
+		/// Returns the edit mode	
+		
 	// RequestProcessor
 	virtual void handleForm(const std::string& field, const std::string& value);
 		/// Handles a form field submitted by the client.
@@ -180,13 +193,14 @@ protected:
 		/// Returns the owner of this Cell.
 		
 private:
-	View* _pOwner;
-	bool _enabled;
-	bool _editable;
-	std::string _toolTip;
-	Poco::Any _value;
+	EditMode       _em;
+	View*          _pOwner;
+	bool           _enabled;
+	bool           _editable;
+	std::string    _toolTip;
+	Poco::Any      _value;
 	Formatter::Ptr _pFormatter;
-	int _rowIndex;
+	int            _rowIndex;
 };
 
 
@@ -252,6 +266,18 @@ inline View& Cell::owner() const
 inline int Cell::getRowIndex() const
 {
 	return _rowIndex;
+}
+
+
+inline void Cell::setEditMode(Cell::EditMode em)
+{
+	_em = em;
+}
+
+		
+inline Cell::EditMode Cell::getEditMode() const
+{
+	return _em;
 }
 
 

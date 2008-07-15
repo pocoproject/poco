@@ -59,6 +59,7 @@ const std::string TableRenderer::EV_ROWCLICKED("rowclick");
 const std::string TableRenderer::EV_BEFORECELLCLICKED("cellmousedown");
 const std::string TableRenderer::EV_BEFOREROWCLICKED("rowmousedown");
 const std::string TableRenderer::EV_BEFORECELLVALUECHANGED("validateedit");
+const std::string TableRenderer::EV_STARTCELLVALUECHANGE("beforeedit");
 const std::string TableRenderer::EV_AFTEREDIT("afteredit");
 const std::string TableRenderer::EV_AFTERLOAD("load");
 const std::string TableRenderer::EV_RENDER("render");
@@ -316,6 +317,31 @@ Poco::WebWidgets::JSDelegate TableRenderer::createKeyPressedServerCallback(const
 }
 
 
+Poco::WebWidgets::JSDelegate TableRenderer::createStartCellValueChangeServerCallback(const Table* pTable)
+{
+	// beforeedit : ( Object e )
+	//  * grid - This grid
+	//	* record - The record being edited
+    //	* field - The field name being edited
+    //	* value - The value for the field being edited.
+    //	* row - The grid row index
+    //	* column - The grid column index
+    //	* cancel - Set this to true to cancel the edit or return false from your handler.
+
+	poco_check_ptr (pTable);
+	static const std::string signature("function(e)");
+	//extract the true row index from the last column!
+	std::string origRow("+e.grid.getStore().getAt(row).get('");
+	origRow.append(Poco::NumberFormatter::format(static_cast<Poco::UInt32>(pTable->getColumnCount())));
+	origRow.append("')");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(Table::FIELD_COL, "+col"));
+	addParams.insert(std::make_pair(Table::FIELD_ROW, origRow));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_STARTCELLVALUECHANGE));
+	return Utility::createServerCallback(signature, addParams, pTable->id(), pTable->startCellValueChange.getOnSuccess(), pTable->startCellValueChange.getOnFailure());
+}
+
+
 void TableRenderer::renderProperties(const Table* pTable, const RenderContext& context, std::ostream& ostr)
 {
 	WebApplication& app = WebApplication::instance();
@@ -340,6 +366,13 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 			if (written) ostr << ",";
 			written = Utility::writeJSEvent(ostr, EV_BEFORECELLVALUECHANGED, pTable->beforeCellValueChanged, 
 						&TableRenderer::createBeforeCellValueChangedServerCallback, pTable);
+		}
+		
+		if (pTable->startCellValueChange.hasJavaScriptCode())
+		{	
+			if (written) ostr << ",";
+			written = Utility::writeJSEvent(ostr, EV_STARTCELLVALUECHANGE, pTable->startCellValueChange, 
+						&TableRenderer::createStartCellValueChangeServerCallback, pTable);
 		}
 	}
 	

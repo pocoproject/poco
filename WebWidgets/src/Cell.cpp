@@ -45,6 +45,7 @@ namespace WebWidgets {
 
 Cell::Cell(View* pOwner, const std::type_info& type):
 	Renderable(type),
+	_em(EM_SELECTCONTENT),
 	_pOwner(pOwner),
 	_enabled(true),
 	_editable(true),
@@ -58,6 +59,7 @@ Cell::Cell(View* pOwner, const std::type_info& type):
 
 Cell::Cell(const std::type_info& type):
 	Renderable(type),
+	_em(EM_SELECTCONTENT),
 	_pOwner(0),
 	_enabled(true),
 	_editable(true),

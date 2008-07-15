@@ -89,6 +89,12 @@ public:
 	bool isEditable() const;
 		/// Returns true iff the Cell is editable.
 		
+	void setEditMode(Cell::EditMode em);
+		/// Sets the edit mode of the cell
+		
+	Cell::EditMode getEditMode() const;
+		/// Returns the edit mode of the cell
+		
 	void setCustomRenderer(const std::string& jsCode);
 		/// Allows to set custom JavaScript code that renders the values of the columns
 		/// This code depends on the rendering library used during run-time!
@@ -171,6 +177,19 @@ inline void TableColumn::setEditable(bool editable)
 inline bool TableColumn::isEditable() const
 {
 	return _pCell->isEditable();
+}
+
+
+inline void TableColumn::setEditMode(Cell::EditMode em)
+{
+	_pCell->setEditMode(em);
+}
+
+		
+inline Cell::EditMode TableColumn::getEditMode() const
+
+{
+	return _pCell->getEditMode();
 }
 	
 
