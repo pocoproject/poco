@@ -202,7 +202,7 @@ DynamicAny TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
 }
 
 
-bool TypeInfo::getSafeInfo(SQLSMALLINT type, const std::string& param, DynamicAny& result) const
+bool TypeInfo::tryGetInfo(SQLSMALLINT type, const std::string& param, DynamicAny& result) const
 {
 	TypeInfoVec::const_iterator it = _typeInfo.begin();
 	TypeInfoVec::const_iterator end = _typeInfo.end();

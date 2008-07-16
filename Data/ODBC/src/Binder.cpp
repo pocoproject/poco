@@ -439,10 +439,9 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	bool found(false);
 	if (_pTypeInfo)
 	{
-		found = _pTypeInfo->getSafeInfo(cDataType, "COLUMN_SIZE", tmp);
-		if (found)
-			colSize = tmp;
-		found = _pTypeInfo->getSafeInfo(cDataType, "MINIMUM_SCALE", tmp);
+		found = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
+		if (found) colSize = tmp;
+		found = _pTypeInfo->tryGetInfo(cDataType, "MINIMUM_SCALE", tmp);
 		if (found)
 		{
 			decDigits = tmp;

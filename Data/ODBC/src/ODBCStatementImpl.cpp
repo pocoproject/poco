@@ -110,13 +110,6 @@ void ODBCStatementImpl::compileImpl()
 	
 	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT);
 	
-	// This is a hack to conform to some ODBC drivers behavior (e.g. MS SQLServer) with 
-	// stored procedure calls: driver refuses to report the number of columns, unless all 
-	// parameters for the stored procedure are bound. Since number of columns is essential 
-	// information for the internal extraction creation, in order to allow for querying it,
-	// these calls must occur before.
-	fixupBinding(); doBind(false, true);
-
 	makeInternalExtractors();
 	doPrepare();
 
@@ -207,9 +200,9 @@ bool ODBCStatementImpl::canBind() const
 }
 
 
-void ODBCStatementImpl::doBind(bool clear, bool reset)
+void ODBCStatementImpl::doBind()
 {
-	if (clear) this->clear();
+	this->clear();
 	Bindings& binds = bindings();
 	if (!binds.empty())
 	{
@@ -218,12 +211,6 @@ void ODBCStatementImpl::doBind(bool clear, bool reset)
 
 		if (it != itEnd && 0 == _affectedRowCount)
 			_affectedRowCount = static_cast<Poco::UInt32>((*it)->numOfRowsHandled());
-
-		if (reset)
-		{
-			it = binds.begin();
-			for (; it != itEnd; ++it) (*it)->reset();
-		}
 
 		for (std::size_t pos = 0; it != itEnd && (*it)->canBind(); ++it)
 		{

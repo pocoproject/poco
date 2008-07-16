@@ -129,7 +129,7 @@ private:
 	void clear();
 		/// Closes the cursor and resets indicator variables.
 	
-	void doBind(bool clear = true, bool reset = false);
+	void doBind();
 		/// Binds parameters.
 
 	void makeInternalExtractors();

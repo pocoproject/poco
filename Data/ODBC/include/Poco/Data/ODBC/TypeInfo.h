@@ -110,9 +110,9 @@ public:
 	DynamicAny getInfo(SQLSMALLINT type, const std::string& param) const;
 		/// Returns information about specified data type as specified by parameter 'type'.
 		/// The requested information is specified by parameter 'param'.
-		/// Will fail with a Poco::NotFoundException if the param is not found
+		/// Will fail with a Poco::NotFoundException thrown if the param is not found
 		
-	bool getSafeInfo(SQLSMALLINT type, const std::string& param, DynamicAny& result) const;
+	bool tryGetInfo(SQLSMALLINT type, const std::string& param, DynamicAny& result) const;
 		/// Returns information about specified data type as specified by parameter 'type' in param result.
 		/// The requested information is specified by parameter 'param'.
 		/// Will return false if the param is not found. The value of result will be not changed in this case.
