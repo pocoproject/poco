@@ -101,7 +101,6 @@ std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRI
 	"EXC=F;" // EXEC syntax (T/F), default F
 	"APA=T;" // thread safety (T/F), default T
 	"DBA=W;" // write access
-	"DBQ=" ORACLE_SID ";" // TNS service name
 	"SERVER="
 	"(DESCRIPTION="
 	" (ADDRESS=(PROTOCOL=TCP)(HOST=" ORACLE_SERVER " )(PORT=" ORACLE_PORT "))"
