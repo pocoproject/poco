@@ -79,6 +79,7 @@ std::string          ODBCOracleTest::_dsn = ORACLE_DSN;
 std::string          ODBCOracleTest::_uid = ORACLE_UID;
 std::string          ODBCOracleTest::_pwd = ORACLE_PWD;
 std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRIVER "};"
+	"DBQ=" ORACLE_SERVER ":" ORACLE_PORT "/" ORACLE_SID ";"
 	"UID=" ORACLE_UID ";"
 	"PWD=" ORACLE_PWD ";"
 	"TLO=O;" //?
@@ -100,12 +101,7 @@ std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRI
 	"XSM=Default;" // schema field (Default/Database/Owner), default Default
 	"EXC=F;" // EXEC syntax (T/F), default F
 	"APA=T;" // thread safety (T/F), default T
-	"DBA=W;" // write access
-	"SERVER="
-	"(DESCRIPTION="
-	" (ADDRESS=(PROTOCOL=TCP)(HOST=" ORACLE_SERVER " )(PORT=" ORACLE_PORT "))"
-	" (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=" ORACLE_SID "))"
-	");";
+	"DBA=W;"; // write access
 
 const std::string ODBCOracleTest::MULTI_INSERT = 
 	"BEGIN "
