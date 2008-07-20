@@ -39,8 +39,8 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/BLOB.h"
+#include "Poco/Buffer.h"
 #include "Poco/Exception.h"
-#include <memory>
 
 
 namespace Poco {
@@ -102,8 +102,8 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 	std::size_t totalSize = 0;
 
 	SQLLEN len;
-	std::auto_ptr<char> apChar(new char[CHUNK_SIZE]);
-	char* pChar = apChar.get();
+	Poco::Buffer<char> apChar(CHUNK_SIZE);
+	char* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 	val.clear();
 
@@ -150,8 +150,8 @@ bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
 	std::size_t totalSize = 0;
 
 	SQLLEN len;
-	std::auto_ptr<char> apChar(new char[CHUNK_SIZE]);
-	char* pChar = apChar.get();
+	Poco::Buffer<char> apChar(CHUNK_SIZE);
+	char* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 	val.clear();
 
