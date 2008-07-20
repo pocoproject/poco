@@ -39,6 +39,7 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/BLOB.h"
+#include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 
 
@@ -368,58 +369,49 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 	std::size_t totalSize = 0;
 	
 	SQLLEN len;
-	char* pChar = 0;
-	try 
-	{
-		pChar = new char[CHUNK_SIZE];
-		SQLRETURN rc = 0;
-		
-		val.clear();
-		resizeLengths(pos);
+	Poco::Buffer<char> apChar(CHUNK_SIZE);
+	char* pChar = apChar.begin();
+	SQLRETURN rc = 0;
+	
+	val.clear();
+	resizeLengths(pos);
 
-		do
+	do
+	{
+		std::memset(pChar, 0, CHUNK_SIZE);
+		len = 0;
+		rc = SQLGetData(_rStmt, 
+			(SQLUSMALLINT) pos + 1, 
+			cType, //C data type
+			pChar, //returned value
+			CHUNK_SIZE, //buffer length
+			&len); //length indicator
+
+		if (SQL_NO_DATA != rc && Utility::isError(rc))
+			throw StatementException(_rStmt, "SQLGetData()");
+
+		if (SQL_NO_TOTAL == len)//unknown length, throw
+			throw UnknownDataLengthException("Could not determine returned data length.");
+
+		if (isNullLengthIndicator(len))
 		{
-			std::memset(pChar, 0, CHUNK_SIZE);
-			len = 0;
-			rc = SQLGetData(_rStmt, 
-				(SQLUSMALLINT) pos + 1, 
-				cType, //C data type
-				pChar, //returned value
-				CHUNK_SIZE, //buffer length
-				&len); //length indicator
+			_lengths[pos] = len;
+			return false;
+		}
 
-			if (SQL_NO_DATA != rc && Utility::isError(rc))
-				throw StatementException(_rStmt, "SQLGetData()");
+		if (SQL_NO_DATA == rc || !len)
+			break;
 
-			if (SQL_NO_TOTAL == len)//unknown length, throw
-				throw UnknownDataLengthException("Could not determine returned data length.");
+		_lengths[pos] += len;
+		fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
+		totalSize += fetchedSize;
+		if (totalSize <= maxSize) 
+			val.append(pChar, fetchedSize);
+		else 
+			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+	}while (true);
 
-			if (isNullLengthIndicator(len))
-			{
-				_lengths[pos] = len;
-				return false;
-			}
-
-			if (SQL_NO_DATA == rc || !len)
-				break;
-
-			_lengths[pos] += len;
-			fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
-			totalSize += fetchedSize;
-			if (totalSize <= maxSize) 
-				val.append(pChar, fetchedSize);
-			else 
-				throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
-		}while (true);
-
-		delete[] pChar;
-		return true;
-
-	} catch (...)
-	{
-		delete[] pChar;
-		throw;
-	}
+	return true;
 }
 
 
@@ -433,57 +425,48 @@ bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos,
 	std::size_t totalSize = 0;
 
 	SQLLEN len;
-	char* pChar = 0;
-	try 
+	Poco::Buffer<char> apChar(CHUNK_SIZE);
+	char* pChar = apChar.begin();
+	SQLRETURN rc = 0;
+	
+	val.clear();
+	resizeLengths(pos);
+
+	do
 	{
-		pChar = new char[CHUNK_SIZE];
-		SQLRETURN rc = 0;
+		std::memset(pChar, 0, CHUNK_SIZE);
+		len = 0;
+		rc = SQLGetData(_rStmt, 
+			(SQLUSMALLINT) pos + 1, 
+			cType, //C data type
+			pChar, //returned value
+			CHUNK_SIZE, //buffer length
+			&len); //length indicator
 		
-		val.clear();
-		resizeLengths(pos);
+		_lengths[pos] += len;
 
-		do
-		{
-			std::memset(pChar, 0, CHUNK_SIZE);
-			len = 0;
-			rc = SQLGetData(_rStmt, 
-				(SQLUSMALLINT) pos + 1, 
-				cType, //C data type
-				pChar, //returned value
-				CHUNK_SIZE, //buffer length
-				&len); //length indicator
-			
-			_lengths[pos] += len;
+		if (SQL_NO_DATA != rc && Utility::isError(rc))
+			throw StatementException(_rStmt, "SQLGetData()");
 
-			if (SQL_NO_DATA != rc && Utility::isError(rc))
-				throw StatementException(_rStmt, "SQLGetData()");
+		if (SQL_NO_TOTAL == len)//unknown length, throw
+			throw UnknownDataLengthException("Could not determine returned data length.");
 
-			if (SQL_NO_TOTAL == len)//unknown length, throw
-				throw UnknownDataLengthException("Could not determine returned data length.");
+		if (isNullLengthIndicator(len))
+			return false;
 
-			if (isNullLengthIndicator(len))
-				return false;
+		if (SQL_NO_DATA == rc || !len)
+			break;
 
-			if (SQL_NO_DATA == rc || !len)
-				break;
+		fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
+		totalSize += fetchedSize;
+		if (totalSize <= maxSize) 
+			val.appendRaw(pChar, fetchedSize);
+		else 
+			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
 
-			fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
-			totalSize += fetchedSize;
-			if (totalSize <= maxSize) 
-				val.appendRaw(pChar, fetchedSize);
-			else 
-				throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+	}while (true);
 
-		}while (true);
-
-		delete[] pChar;
-		return true;
-
-	} catch (...)
-	{
-		delete[] pChar;
-		throw;
-	}
+	return true;
 }
 
 
