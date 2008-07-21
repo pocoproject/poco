@@ -114,7 +114,7 @@ std::string Control::getToolTip() const
 
 void Control::renderHead(const RenderContext& context, std::ostream& str) const
 {
-	if (isVisible())
+	//also render invisible stuff if (isVisible())
 	{
 		_pCell->renderHead(context, str);
 	}
@@ -123,7 +123,7 @@ void Control::renderHead(const RenderContext& context, std::ostream& str) const
 
 void Control::renderBody(const RenderContext& context, std::ostream& str) const
 {
-	if (isVisible())
+	//also render invisible stuff if (isVisible())
 	{
 		_pCell->renderBody(context, str);
 	}
