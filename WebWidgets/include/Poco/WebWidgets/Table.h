@@ -202,6 +202,12 @@ public:
 	int getPagingSize() const;
 		/// Returns the paging size
 		
+	void autoEdit(bool val);
+		/// Enables/disables autoedit. autoedit works only with cell based selection!
+		
+	bool autoEdit() const;
+		// Returns if autoEdit is on/off
+		
 protected:
 	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates a Table and assigns it the given name.
@@ -220,6 +226,7 @@ private:
 	TableColumns    _columns;
 	SelectionModel  _sm;
 	bool            _dragAndDrop;
+	bool            _autoEdit;
 	int             _maxRowsPerPage;
 };
 
@@ -296,6 +303,18 @@ inline void Table::setPaging(int maxRowsPerPage)
 inline int Table::getPagingSize() const
 {
 	return _maxRowsPerPage;
+}
+
+
+inline void Table::autoEdit(bool val)
+{
+	_autoEdit = val;
+}
+
+		
+inline bool Table::autoEdit() const
+{
+	return _autoEdit;
 }
 
 

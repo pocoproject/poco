@@ -94,8 +94,14 @@ void TableRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 		if ((*it) && (*it)->getCell())
 			editable |= (*it)->isEditable();
 	}
+	
 	if (editable)
-		ostr << "new Ext.grid.EditorGridPanel({";
+	{
+		if (pTable->autoEdit())
+			ostr << "new Ext.grid.AppinfTable({autoEdit:true,";
+		else
+			ostr << "new Ext.grid.EditorGridPanel({";
+	}
 	else
 		ostr << "new Ext.grid.GridPanel({";
 

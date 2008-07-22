@@ -72,6 +72,7 @@ Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
 	_columns(tc),
 	_sm(SM_CELL),
 	_dragAndDrop(false),
+	_autoEdit(false),
 	_maxRowsPerPage(0)
 {
 	checkValidConfig();
