@@ -37,7 +37,7 @@ Ext.grid.AppinfTable = Ext.extend(Ext.grid.EditorGridPanel, {
 		}
 		else
 			this.charThatStartedEdit = null;
-	},
+	}
 });
 
 Ext.reg('appinfgrid', Ext.grid.AppinfTable);
@@ -120,6 +120,6 @@ Ext.override(Ext.grid.AppinfTable, {
             }
         }
         this.view.focusCell(ed.row, ed.col);
-    },
+    }
 });
 	 
