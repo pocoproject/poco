@@ -96,12 +96,15 @@ void GridLayout::minimize()
 	if (vec.empty())
 		return;
 	const std::size_t pos = vec.size() - 1;
-	std::size_t i = pos;
-	for (; i >= 0; --i)
+	std::size_t i = vec.size();
+	
+	do
 	{
+		--i;
 		if (vec[i])
 			break;
 	}
+	while (i > 0);
 	if (i < pos)
 	{
 		// pos to cnt
