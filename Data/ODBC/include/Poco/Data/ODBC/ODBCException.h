@@ -45,6 +45,7 @@
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Format.h"
 
 
 namespace Poco {
@@ -62,76 +63,101 @@ template <class H, SQLSMALLINT handleType>
 class HandleException: public ODBCException
 {															
 public:														
-	HandleException(const H& handle): _error(handle)
+	HandleException(const H& handle):
+		ODBCException(errorString(handle)),
+		_error(handle)
+		/// Creates HandleException
 	{
 	}
 
 	HandleException(const H& handle, const std::string& msg): 
-		ODBCException(msg), 
+		ODBCException(msg, errorString(handle)), 
 		_error(handle)
+		/// Creates HandleException
 	{
 	}							
 
 	HandleException(const H& handle, const std::string& msg, const std::string& arg): 
 		ODBCException(msg, arg), 
 		_error(handle)
+		/// Creates HandleException
 	{
 	}
 
 	HandleException(const H& handle, const std::string& msg, const Poco::Exception& exc): 
 		ODBCException(msg, exc),
 		_error(handle)
+		/// Creates HandleException
 	{
 	}
 
 	HandleException(const HandleException& exc): 
 		ODBCException(exc),
 		_error(exc._error)
+		/// Creates HandleException
 	{
 	}
 
 	~HandleException() throw()
+		/// Destroys HandleException
 	{
 	}
 
 	HandleException& operator = (const HandleException& exc)
+		/// Assignment operator
 	{
 		HandleException::operator = (exc);
 		return *this;
 	}
 
 	const char* name() const throw()
+		/// Returns the name of the exception
 	{
 		return "ODBC handle exception";
 	}
 
 	const char* className() const throw()
+		/// Returns the HandleException class name.
 	{
 		return typeid(*this).name();
 	}
 
 	Poco::Exception* clone() const
+		/// Clones the HandleException
 	{
 		return new HandleException(*this);
 	}
 
 	void rethrow() const
+		/// Re-throws the HandleException.
 	{
 		throw *this;
 	}
 
 	const Diagnostics<H, handleType>& diagnostics()
+		/// Returns error diagnostics.
 	{
 		return _error.diagnostics();
 	}
 
 	std::string toString() const
+		/// Returns the formatted error diagnostics for the handle.
+		/// Since it relies on the object being fully constructed at
+		/// the time of its usage, this function should not be used
+		/// by the constructor to pass diagnostic string to the parent. 
 	{
-		std::stringstream os;
-		os << "ODBC Error: " << what() << std::endl 
-			<< "===================" << std::endl 
-			<< _error.toString() << std::endl ;
-		return os.str();
+		return Poco::format("ODBC Error: %s\n===================\n%s\n",
+			std::string(what()),
+			_error.toString());
+	}
+
+	static std::string errorString(const H& handle)
+		/// Returns the error diagnostics for the handle.
+		/// This function is used by the constructor to pass diagnostic
+		/// string to the parent. It can also be used as a "shortcut" to
+		/// error information during troubleshooting.
+	{
+		return Error<H, handleType>(handle).toString();
 	}
 
 private:
