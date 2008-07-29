@@ -273,11 +273,6 @@ MYSQL_BIND* Binder::getBindArray() const
 
 void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer, int length)
 {
-	if (pos > 1024) 
-	{
-		throw StatementException("too many bind parameters");
-	}
-
 	if (pos >= _bindArray.size())
 	{
 		size_t s = _bindArray.size();
