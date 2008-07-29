@@ -2682,10 +2682,10 @@ void SQLExecutor::nulls()
 	assert (1 == rs.rowCount());
 	rs.moveFirst();
 	assert (rs.isNull("i"));
-	assert (rs["i"] == 0);
+	assert (rs["i"] != 0);
 	assert (rs.isNull("r"));
 	assert (rs.isNull("v"));
-	assert (rs["v"] == "");
+	assert (rs["v"] != "");
 	try { session() << "DELETE FROM NullTest", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2721,14 +2721,57 @@ void SQLExecutor::nulls()
 	assert (rs["i"] == 1);
 	assert (!rs.isNull("r"));
 	assert (rs.isNull("v"));
-	assert (rs["v"] == "");
+	assert (rs["v"] != "");
 
 	assert (rs.moveNext());
 	assert (!rs.isNull("i"));
 	assert (rs["i"] == 2);
 	assert (rs.isNull("r"));
 	assert (rs.isNull("v"));
-	assert (rs["v"] == "");
+	assert (rs["v"] != "");
+
+	try { session() << "DELETE FROM NullTest", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	try { session() << "INSERT INTO NullTest (v) VALUES (?)", bind(""), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	bool esin = session().getFeature("emptyStringIsNull");
+	session().setFeature("emptyStringIsNull", true);
+
+	try
+	{
+		session().setFeature("forceEmptyString", true);
+		fail ("must fail");
+	} catch (InvalidAccessException&) { }
+
+	bool fes = session().getFeature("forceEmptyString");
+	session().setFeature("forceEmptyString", false);
+
+	RecordSet rs1(session(), "SELECT v FROM NullTest");
+	assert (1 == rs1.rowCount());
+	rs1.moveFirst();
+	assert (rs1.isNull("v"));
+	assert (!(rs["v"] == ""));
+
+	session().setFeature("emptyStringIsNull", false);
+	session().setFeature("forceEmptyString", true);
+	RecordSet rs2(session(), "SELECT v FROM NullTest");
+	assert (1 == rs2.rowCount());
+	rs2.moveFirst();
+	assert (!rs2.isNull("v"));
+	assert ((rs2["v"] == ""));
+
+	try
+	{
+		session().setFeature("emptyStringIsNull", true);
+		fail ("must fail");
+	} catch (InvalidAccessException&) { }
+
+	session().setFeature("emptyStringIsNull", esin);
+	session().setFeature("forceEmptyString", fes);
 }
 
 

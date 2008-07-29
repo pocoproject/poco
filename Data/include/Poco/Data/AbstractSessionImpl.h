@@ -72,7 +72,10 @@ public:
 	typedef Poco::Any (C::*PropertyGetter)(const std::string&);
 		/// The getter method for a property.
 
-	AbstractSessionImpl()
+	AbstractSessionImpl(): _storage(std::string("deque")),
+		_bulk(false),
+		_emptyStringIsNull(false),
+		_forceEmptyString(false)
 		/// Creates the AbstractSessionImpl.
 		/// 
 		/// Adds "storage" property and sets the default internal storage container 
@@ -83,22 +86,41 @@ public:
 		/// duration of the session) and locally (for a single statement execution only). 
 		/// See StatementImpl for details on how this property is used at runtime.
 		/// 
-		/// Adds bulk feature and sets it to false.
+		/// Adds "bulk" feature and sets it to false.
 		/// Bulk feature determines whether the session is capable of bulk operations.
 		/// Connectors that are capable of it must set this feature prior to attempting 
 		/// bulk operations.
+		///
+		/// Adds "emptyStringIsNull" feature and sets it to false. This feature should be
+		/// set to true in order to modify the behavior of the databases that distinguish
+		/// between zero-length character strings as nulls. Setting this feature to true 
+		/// shall disregard any difference between empty character strings and nulls,
+		/// causing the framework to treat them the same (i.e. behave like Oracle).		
+		///
+		/// Adds "forceEmptyString" feature and sets it to false. This feature should be set
+		/// to true in order to force the databases that do not distinguish empty strings from
+		/// nulls (e.g. Oracle) to always report empty string.
+		///
+		/// The "emptyStringIsNull" and "forceEmptyString" features are mutually exclusive.
+		/// While these features can not both be true at the same time, they can both be false,
+		/// resulting in default underlying database behavior.
+		///
 	{
 		addProperty("storage", 
 			&AbstractSessionImpl<C>::setStorage, 
 			&AbstractSessionImpl<C>::getStorage);
 
-		setProperty("storage", std::string("deque"));
-
 		addFeature("bulk", 
 			&AbstractSessionImpl<C>::setBulk, 
 			&AbstractSessionImpl<C>::getBulk);
 
-		setFeature("bulk", false);
+		addFeature("emptyStringIsNull", 
+			&AbstractSessionImpl<C>::setEmptyStringIsNull,
+			&AbstractSessionImpl<C>::getEmptyStringIsNull);
+
+		addFeature("forceEmptyString", 
+			&AbstractSessionImpl<C>::setForceEmptyString,
+			&AbstractSessionImpl<C>::getForceEmptyString);
 	}
 
 	~AbstractSessionImpl()
@@ -196,6 +218,47 @@ public:
 		return _bulk;
 	}
 
+	void setEmptyStringIsNull(const std::string& name, bool emptyStringIsNull)
+		/// Sets the behavior regarding empty variable length strings.
+		/// Those are treated as NULL by Oracle and as empty string by
+		/// most other databases.
+		/// When this feature is true, empty strings are treated as NULL.
+	{
+		if (emptyStringIsNull && _forceEmptyString)
+			throw InvalidAccessException("Features mutually exclusive");
+
+		_emptyStringIsNull = emptyStringIsNull;
+	}
+		
+	bool getEmptyStringIsNull(const std::string& name="")
+		/// Returns the setting for the behavior regarding empty variable
+		/// length strings. See setEmptyStringIsNull(const std::string&, bool)
+		/// and this class documentation for feature rationale and details.
+	{
+		return _emptyStringIsNull;
+	}
+
+	void setForceEmptyString(const std::string& name, bool forceEmptyString)
+		/// Sets the behavior regarding empty variable length strings.
+		/// Those are treated as NULL by Oracle and as empty string by
+		/// most other databases.
+		/// When this feature is true, both empty strings and NULL values
+		/// are reported as empty strings.
+	{
+		if (forceEmptyString && _emptyStringIsNull)
+			throw InvalidAccessException("Features mutually exclusive");
+
+		_forceEmptyString = forceEmptyString;
+	}
+		
+	bool getForceEmptyString(const std::string& name="")
+		/// Returns the setting for the behavior regarding empty variable
+		/// length strings. See setForceEmptyString(const std::string&, bool)
+		/// and this class documentation for feature rationale and details.
+	{
+		return _forceEmptyString;
+	}
+
 protected:
 	void addFeature(const std::string& name, FeatureSetter setter, FeatureGetter getter)
 		/// Adds a feature to the map of supported features.
@@ -241,6 +304,8 @@ private:
 	PropertyMap _properties;
 	std::string _storage;
 	bool        _bulk;
+	bool        _emptyStringIsNull;
+	bool        _forceEmptyString;
 };
 
 

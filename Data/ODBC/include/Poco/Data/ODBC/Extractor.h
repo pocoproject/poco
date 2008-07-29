@@ -47,6 +47,8 @@
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/DateTime.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
@@ -398,6 +400,15 @@ private:
 		return true;
 	}
 
+	template <typename T, typename NT>
+	bool extAny(std::size_t pos, T& val)
+	{
+		NT i;
+		extract(pos, i);
+		val = i;
+		return true;
+	}
+
 	template <typename T>
 	bool extractImpl(std::size_t pos, T& val)
 		/// Utility function for extraction of Any and DynamicAny.
@@ -407,46 +418,52 @@ private:
 		switch (column.type())
 		{
 			case MetaColumn::FDT_INT8:
-			{ Poco::Int8 i = 0; extract(pos, i); val = i; return true; }
+			{ return extAny<T, Poco::Int8>(pos, val); }
 
 			case MetaColumn::FDT_UINT8:
-			{ Poco::UInt8 i = 0; extract(pos, i); val = i; return true;	}
+			{ return extAny<T, Poco::UInt8>(pos, val); }
 
 			case MetaColumn::FDT_INT16:
-			{ Poco::Int16 i = 0; extract(pos, i); val = i; return true;	}
+			{ return extAny<T, Poco::Int16>(pos, val); }
 
 			case MetaColumn::FDT_UINT16:
-			{ Poco::UInt16 i = 0; extract(pos, i); val = i; return true; }
+			{ return extAny<T, Poco::UInt16>(pos, val); }
 
 			case MetaColumn::FDT_INT32:
-			{ Poco::Int32 i = 0; extract(pos, i); val = i; return true;	}
+			{ return extAny<T, Poco::Int32>(pos, val);	}
 
 			case MetaColumn::FDT_UINT32:
-			{ Poco::UInt32 i = 0; extract(pos, i); val = i; return true; }
+			{ return extAny<T, Poco::UInt32>(pos, val); }
 
 			case MetaColumn::FDT_INT64:
-			{ Poco::Int64 i = 0; extract(pos, i); val = i; return true;	}
+			{ return extAny<T, Poco::Int64>(pos, val); }
 
 			case MetaColumn::FDT_UINT64:
-			{ Poco::UInt64 i = 0; extract(pos, i); val = i; return true; }
+			{ return extAny<T, Poco::UInt64>(pos, val); }
 
 			case MetaColumn::FDT_BOOL:
-			{ bool b; extract(pos, b); val = b; return true; }
+			{ return extAny<T, bool>(pos, val); }
 
 			case MetaColumn::FDT_FLOAT:
-			{ float f; extract(pos, f); val = f; return true; }
+			{ return extAny<T, float>(pos, val); }
 
 			case MetaColumn::FDT_DOUBLE:
-			{ double d; extract(pos, d); val = d; return true; }
+			{ return extAny<T, double>(pos, val); }
 
 			case MetaColumn::FDT_STRING:
-			{ std::string s; extract(pos, s); val = s; return true;	}
+			{ return extAny<T, std::string>(pos, val); }
 
 			case MetaColumn::FDT_BLOB:
-			{ Poco::Data::BLOB b; extract(pos, b); val = b; return true; }
+			{ return extAny<T, Poco::Data::BLOB>(pos, val); }
+
+			case MetaColumn::FDT_DATE:
+			{ return extAny<T, Poco::Data::Date>(pos, val); }
+
+			case MetaColumn::FDT_TIME:
+			{ return extAny<T, Poco::Data::Time>(pos, val); }
 
 			case MetaColumn::FDT_TIMESTAMP:
-			{ Poco::DateTime b; extract(pos, b); val = b; return true; }
+			{ return extAny<T, Poco::DateTime>(pos, val); }
 
 			default: 
 				throw DataFormatException("Unsupported data type.");

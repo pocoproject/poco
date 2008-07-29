@@ -117,7 +117,9 @@ public:
 		typename C::iterator it = _rResult.begin();
 		typename C::iterator end = _rResult.end();
 		for (int row = 0; it !=end; ++it, ++row)
-			_nulls.push_back(pExt->isNull(col, row));
+		{
+			_nulls.push_back(isValueNull(*it, pExt->isNull(col, row)));
+		}
 
 		return _rResult.size();
 	}

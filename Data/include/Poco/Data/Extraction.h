@@ -115,7 +115,8 @@ public:
 		_extracted = true;
 		AbstractExtractor* pExt = getExtractor();
 		TypeHandler<T>::extract(pos, _rResult, _default, pExt);
-		_null = pExt->isNull(pos);
+		_null = isValueNull<T>(_rResult, pExt->isNull(pos));
+		
 		return 1u;
 	}
 
@@ -199,7 +200,7 @@ public:
 		AbstractExtractor* pExt = getExtractor();
 		_rResult.push_back(_default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
-		_nulls.push_back(pExt->isNull(pos));
+		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
 	}
 
@@ -359,7 +360,7 @@ public:
 		AbstractExtractor* pExt = getExtractor();
 		_rResult.push_back(_default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
-		_nulls.push_back(pExt->isNull(pos));
+		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
 	}
 
@@ -438,7 +439,7 @@ public:
 		AbstractExtractor* pExt = getExtractor();
 		_rResult.push_back(_default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
-		_nulls.push_back(pExt->isNull(pos));
+		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
 	}
 

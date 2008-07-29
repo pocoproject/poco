@@ -128,22 +128,17 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	}
 	else if (isInBound(dir))
 	{
-		if (size) pVal = (SQLPOINTER) val.c_str();
+		pVal = (SQLPOINTER) val.c_str();
 		_inParams.insert(ParamMap::value_type(pVal, size));
 	}
 	else
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
 
 	SQLLEN* pLenIn = new SQLLEN;
-	if (0 != size) *pLenIn = SQL_NTS;
-	else 
-	{
-		*pLenIn = SQL_NULL_DATA;
-		SQLINTEGER colSize = 0;
-		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
-		size = colSize;
-	}
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
+	*pLenIn = SQL_NTS;
 
 	if (PB_AT_EXEC == _paramBinding)
 		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
@@ -155,7 +150,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		toODBCDirection(dir), 
 		SQL_C_CHAR, 
 		SQL_LONGVARCHAR, 
-		(SQLUINTEGER) size,
+		(SQLUINTEGER) colSize,
 		0,
 		pVal, 
 		(SQLINTEGER) size, 
@@ -177,16 +172,7 @@ void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
 	_inParams.insert(ParamMap::value_type(pVal, size));
 
 	SQLLEN* pLenIn = new SQLLEN;
-	
-	if (0 != size) *pLenIn  = size;
-	else 
-	{
-		*pLenIn = SQL_NULL_DATA;
-		SQLINTEGER colSize = 0;
-		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
-		size = colSize;
-	}
+	*pLenIn  = size;
 
 	if (PB_AT_EXEC == _paramBinding)
 		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
@@ -200,7 +186,7 @@ void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
 		SQL_LONGVARBINARY, 
 		(SQLUINTEGER) size,
 		0,
-		pVal, 
+		pVal,
 		(SQLINTEGER) size, 
 		_lengthIndicator.back())))
 	{

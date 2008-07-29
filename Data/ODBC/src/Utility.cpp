@@ -80,7 +80,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	}
 
 	if (SQL_NO_DATA != rc) 
-		throw EnvironmentError(henv);
+		throw EnvironmentException(henv);
 
 	return driverMap;
 }
@@ -116,7 +116,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 	}
 
 	if (SQL_NO_DATA != rc) 
-		throw EnvironmentError(henv);
+		throw EnvironmentException(henv);
 
 	return dsnMap;
 }

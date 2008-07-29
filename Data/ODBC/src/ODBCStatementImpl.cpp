@@ -242,12 +242,19 @@ void ODBCStatementImpl::putData()
 
 	while (SQL_NEED_DATA == (rc = SQLParamData(_stmt, &pParam)))
 	{
-		poco_assert_dbg (pParam);
-		dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
+		if (pParam)
+		{
+			dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
 		
-		if (Utility::isError(SQLPutData(_stmt, pParam, dataSize))) 
-			throw StatementException(_stmt, "SQLPutData()");
-
+			if (Utility::isError(SQLPutData(_stmt, pParam, dataSize))) 
+				throw StatementException(_stmt, "SQLPutData()");
+		}
+		else // if pParam is null pointer, do a dummy call
+		{
+			char dummy = 0;
+			if (Utility::isError(SQLPutData(_stmt, &dummy, 0))) 
+				throw StatementException(_stmt, "SQLPutData()");
+		}
 	}
 
 	checkError(rc, "SQLParamData()");

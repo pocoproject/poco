@@ -42,9 +42,6 @@
 #include "Poco/Data/AbstractBinder.h"
 #include <iostream>
 
-//using namespace Poco::Data::Keywords;
-//using Poco::Data::NullData;
-   
 namespace Poco {
 namespace Data {
            
@@ -124,7 +121,7 @@ public:
     }
 
     bool operator < (const Nullable<T>& other) const
-        /// Compares two Nullable 
+        /// Compares two Nullable objects
     {
         if (_isNull < other._isNull)
             return true;
@@ -132,13 +129,13 @@ public:
     }
 
     operator T& ()
-        /// Get referens to value
+        /// Get reference to the value
     {
         return _value;
     }
 
     operator const T& () const
-        /// Get const referens to value
+        /// Get const reference to the value
     {
         return _value;
     }

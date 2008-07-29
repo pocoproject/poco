@@ -47,13 +47,27 @@ AbstractExtraction::AbstractExtraction(Poco::UInt32 limit,
 	_pExtractor(0), 
 	_limit(limit),
 	_position(position),
-	_bulk(bulk)
+	_bulk(bulk),
+	_emptyStringIsNull(false),
+	_forceEmptyString(false)
 {
 }
 
 
 AbstractExtraction::~AbstractExtraction()
 {
+}
+
+
+template <>
+bool AbstractExtraction::isValueNull(const std::string& str, bool deflt)
+{
+	if (getForceEmptyString()) return false;
+
+	if (getEmptyStringIsNull() && str.empty())
+		return true;
+
+	return deflt;
 }
 
 

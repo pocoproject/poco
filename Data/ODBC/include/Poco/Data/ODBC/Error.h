@@ -63,7 +63,7 @@ class Error
 	/// as well as individual diagnostic records.
 {
 public:
-	explicit Error(H handle) : _diagnostics(handle)
+	explicit Error(const H& handle) : _diagnostics(handle)
 		/// Creates the Error.
 	{
 	}

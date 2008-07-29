@@ -245,6 +245,43 @@ DynamicAny DynamicAny::operator -- (int)
 }
 
 
+bool DynamicAny::operator == (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() == other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator == (const char* other) const
+{
+	if (isEmpty()) return false;
+	return convert<std::string>() == other;
+}
+
+
+bool DynamicAny::operator != (const DynamicAny& other) const
+{
+	if (isEmpty() && other.isEmpty()) return false;
+	else if (isEmpty() || other.isEmpty()) return true;
+
+	return convert<std::string>() != other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator != (const char* other) const
+{
+	if (isEmpty()) return true;
+	return convert<std::string>() != other;
+}
+
+
+void DynamicAny::empty()
+{
+	delete _pHolder;
+	_pHolder = 0;
+}
+
+
 DynamicAny& DynamicAny::operator [] (const std::string& name)
 {
 	return holderImpl<DynamicStruct, InvalidAccessException>("Not an array.")->operator[](name);

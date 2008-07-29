@@ -2302,6 +2302,29 @@ void DynamicAnyTest::testEmpty()
 	assert (!(da == da));
 	assert (!(da != da));
 
+	assert (da != "");
+	assert ("" != da);
+	assert (!(da == ""));
+	assert (!("" == da));
+	
+
+	testEmptyComparisons<unsigned char>();
+	testEmptyComparisons<char>();
+	testEmptyComparisons<Poco::UInt8>();
+	testEmptyComparisons<Poco::Int8>();
+	testEmptyComparisons<Poco::UInt16>();
+	testEmptyComparisons<Poco::Int16>();
+	testEmptyComparisons<Poco::UInt32>();
+	testEmptyComparisons<Poco::Int32>();
+	testEmptyComparisons<Poco::UInt64>();
+	testEmptyComparisons<Poco::Int64>();
+#ifdef POCO_LONG_IS_64_BIT
+	testEmptyComparisons<unsigned long>();
+	testEmptyComparisons<long>();
+#endif
+	testEmptyComparisons<float>();
+	testEmptyComparisons<double>();
+
 	try
 	{
 		int i = da;

@@ -93,6 +93,8 @@ RecordSet::~RecordSet()
 
 DynamicAny RecordSet::value(std::size_t col, std::size_t row) const
 {
+	if (isNull(col, row)) return DynamicAny();
+
 	switch (columnType(col))
 	{
 		case MetaColumn::FDT_BOOL:      return value<bool>(col, row);
@@ -119,6 +121,8 @@ DynamicAny RecordSet::value(std::size_t col, std::size_t row) const
 
 DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
 {
+	if (isNull(metaColumn(name).position(), row)) return DynamicAny();
+
 	switch (columnType(name))
 	{
 		case MetaColumn::FDT_BOOL:      return value<bool>(name, row);

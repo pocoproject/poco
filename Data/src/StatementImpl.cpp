@@ -364,6 +364,12 @@ void StatementImpl::addExtract(AbstractExtraction* pExtraction)
 	if (pos >= _extractors.size()) 
 		_extractors.resize(pos + 1);
 
+	pExtraction->setEmptyStringIsNull(
+		_rSession.getFeature("emptyStringIsNull"));
+
+	pExtraction->setForceEmptyString(
+		_rSession.getFeature("forceEmptyString"));
+
 	_extractors[pos].push_back(pExtraction);
 }
 

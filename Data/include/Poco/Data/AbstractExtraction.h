@@ -129,11 +129,44 @@ public:
 	bool isBulk() const;
 		/// Returns true if this is bulk extraction.
 
+	void setEmptyStringIsNull(bool emptyStringIsNull);
+		/// Sets the empty string handling flag.
+
+	bool getEmptyStringIsNull() const;
+		/// Returns the empty string handling flag.
+
+	void setForceEmptyString(bool forceEmptyString);
+		/// Sets the force empty string flag.
+
+	bool getForceEmptyString() const;
+		/// Returns the force empty string flag.
+
+	template <typename T>
+	bool isValueNull(const T& str, bool deflt)
+		/// Utility function to determine the nullness of the value.
+		/// This generic version always returns default value
+		/// (i.e. does nothing). 
+		///
+	{
+		return deflt;
+	}
+
+	template <>
+	bool isValueNull(const std::string& str, bool deflt);
+		/// Specialization for const reference to std::string.
+		///
+		/// Returns true when folowing conditions are met:
+		///
+		/// - string is empty 
+		/// - getEmptyStringIsNull() returns true
+
 private:
 	AbstractExtractor* _pExtractor;
 	Poco::UInt32       _limit;
 	Poco::UInt32       _position;
 	bool               _bulk;
+	bool               _emptyStringIsNull;
+	bool               _forceEmptyString;
 };
 
 
@@ -199,6 +232,30 @@ inline void AbstractExtraction::reset()
 inline bool AbstractExtraction::canExtract() const
 {
 	return true;
+}
+
+
+inline void AbstractExtraction::setEmptyStringIsNull(bool emptyStringIsNull)
+{
+	_emptyStringIsNull = emptyStringIsNull;
+}
+
+
+inline bool AbstractExtraction::getEmptyStringIsNull() const
+{
+	return _emptyStringIsNull;
+}
+
+
+inline void AbstractExtraction::setForceEmptyString(bool forceEmptyString)
+{
+	_forceEmptyString = forceEmptyString;
+}
+
+
+inline bool AbstractExtraction::getForceEmptyString() const
+{
+	return _forceEmptyString;
 }
 
 

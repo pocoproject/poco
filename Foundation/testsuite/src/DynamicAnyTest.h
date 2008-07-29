@@ -159,6 +159,26 @@ private:
 		try { TS i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 	}
+
+	template <typename T>
+	void testEmptyComparisons()
+	{
+		DynamicAny da;
+		T val = 0;
+
+		assert (da != val);
+		assert (val != da);
+		assert (!(val == da));
+		assert (!(da == val));
+		assert (!(da < val));
+		assert (!(val < da));
+		assert (!(da > val));
+		assert (!(val > da));
+		assert (!(da <= val));
+		assert (!(val <= da));
+		assert (!(da >= val));
+		assert (!(val >= da));
+	}
 };
 
 
