@@ -59,7 +59,6 @@ AbstractExtraction::~AbstractExtraction()
 }
 
 
-template <>
 bool AbstractExtraction::isValueNull(const std::string& str, bool deflt)
 {
 	if (getForceEmptyString()) return false;

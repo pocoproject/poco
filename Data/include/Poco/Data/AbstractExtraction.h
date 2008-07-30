@@ -145,15 +145,15 @@ public:
 	bool isValueNull(const T& str, bool deflt)
 		/// Utility function to determine the nullness of the value.
 		/// This generic version always returns default value
-		/// (i.e. does nothing). 
+		/// (i.e. does nothing). The std::string overload does
+		/// the actual work.
 		///
 	{
 		return deflt;
 	}
 
-	template <>
 	bool isValueNull(const std::string& str, bool deflt);
-		/// Specialization for const reference to std::string.
+		/// Overload for const reference to std::string.
 		///
 		/// Returns true when folowing conditions are met:
 		///
