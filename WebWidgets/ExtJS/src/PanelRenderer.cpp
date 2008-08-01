@@ -76,7 +76,9 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	if (pPanel->getModal())
 		ostr << ",modal:true";
 	if (!pPanel->hasCloseIcon())
-		ostr << ",closable:false";	
+		ostr << ",closable:false";
+	else
+		ostr << ",closeAction:'hide'";
 	if (pPanel->isVisible())
 		ostr << ",renderTo:Ext.getBody()";
 	
