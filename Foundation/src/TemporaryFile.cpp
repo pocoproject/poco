@@ -60,7 +60,8 @@ public:
 			try
 			{
 				File f(*it);
-				f.remove(true);
+				if (f.exists())
+					f.remove(true);
 			}
 			catch (Exception&)
 			{
@@ -93,7 +94,8 @@ TemporaryFile::~TemporaryFile()
 	{
 		try
 		{
-			remove(true);
+			if (exists())
+				remove(true);
 		}
 		catch (Exception&)
 		{
