@@ -163,7 +163,7 @@ private:
 	template <typename T>
 	void testEmptyComparisons()
 	{
-		DynamicAny da;
+		Poco::DynamicAny da;
 		T val = 0;
 
 		assert (da != val);
