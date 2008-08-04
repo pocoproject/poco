@@ -155,7 +155,7 @@ protected:
 	static void appendHex(std::string& str, UInt8 n);
 	static void appendHex(std::string& str, UInt16 n);
 	static void appendHex(std::string& str, UInt32 n);
-	static int nibble(char hex);
+	static UInt8 nibble(char hex);
 	void fromNetwork();
 	void toNetwork();
 
