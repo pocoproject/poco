@@ -205,7 +205,7 @@ Timestamp FileImpl::createdImpl() const
 
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
-		return Timestamp::fromEpochTime(st.st_mtime);
+		return Timestamp::fromEpochTime(st.st_birthtime);
 	else
 		handleLastErrorImpl(_path);
 	return 0;
