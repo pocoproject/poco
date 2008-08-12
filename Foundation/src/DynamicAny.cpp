@@ -275,6 +275,48 @@ bool DynamicAny::operator != (const char* other) const
 }
 
 
+bool DynamicAny::operator < (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() < other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator <= (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() <= other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator > (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() > other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator >= (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() >= other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator || (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<bool>() || other.convert<bool>();
+}
+
+
+bool DynamicAny::operator && (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<bool>() && other.convert<bool>();
+}
+
+
 void DynamicAny::empty()
 {
 	delete _pHolder;

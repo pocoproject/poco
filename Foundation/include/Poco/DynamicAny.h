@@ -215,10 +215,8 @@ public:
 		return *this;
 	}
 
-	bool operator ! ()
-	{
-		return !convert<bool>();
-	}
+	const bool operator ! () const;
+		/// Logical NOT operator.
 
 	DynamicAny& operator = (const DynamicAny& other);
 		/// Assignment operator specialization for DynamicAny
@@ -256,10 +254,10 @@ public:
 	}
 
 	DynamicAny& operator += (const DynamicAny& other);
-		/// Addition asignment operator specialization for DynamicAny
+		/// Addition asignment operator overload for DynamicAny
 
 	DynamicAny& operator += (const char* other);
-		/// Addition asignment operator specialization for const char*
+		/// Addition asignment operator overload for const char*
 
 	template <typename T> 
 	const DynamicAny operator - (const T& other) const
@@ -269,7 +267,7 @@ public:
 	}
 
 	const DynamicAny operator - (const DynamicAny& other) const;
-		/// Subtraction operator specialization for DynamicAny
+		/// Subtraction operator overload for DynamicAny
 
 	template <typename T> 
 	DynamicAny& operator -= (const T& other)
@@ -279,7 +277,7 @@ public:
 	}
 
 	DynamicAny& operator -= (const DynamicAny& other);
-		/// Subtraction asignment operator specialization for DynamicAny
+		/// Subtraction asignment operator overload for DynamicAny
 
 	template <typename T> 
 	const DynamicAny operator * (const T& other) const
@@ -289,7 +287,7 @@ public:
 	}
 
 	const DynamicAny operator * (const DynamicAny& other) const;
-		/// Multiplication operator specialization for DynamicAny
+		/// Multiplication operator overload for DynamicAny
 
 	template <typename T> 
 	DynamicAny& operator *= (const T& other)
@@ -299,7 +297,7 @@ public:
 	}
 
 	DynamicAny& operator *= (const DynamicAny& other);
-		/// Multiplication asignment operator specialization for DynamicAny
+		/// Multiplication asignment operator overload for DynamicAny
 
 	template <typename T> 
 	const DynamicAny operator / (const T& other) const
@@ -309,7 +307,7 @@ public:
 	}
 
 	const DynamicAny operator / (const DynamicAny& other) const;
-		/// Division operator specialization for DynamicAny
+		/// Division operator overload for DynamicAny
 
 	template <typename T> 
 	DynamicAny& operator /= (const T& other)
@@ -330,10 +328,10 @@ public:
 	}
 
 	bool operator == (const char* other) const;
-		/// Equality operator specialization for const char*
+		/// Equality operator overload for const char*
 
 	bool operator == (const DynamicAny& other) const;
-		/// Equality operator specialization for DynamicAny
+		/// Equality operator overload for DynamicAny
 
 	template <typename T> 
 	bool operator != (const T& other) const
@@ -344,10 +342,10 @@ public:
 	}
 
 	bool operator != (const DynamicAny& other) const;
-		/// Inequality operator  specialization for DynamicAny
+		/// Inequality operator overload for DynamicAny
 
 	bool operator != (const char* other) const;
-		/// Inequality operator  specialization for const char*
+		/// Inequality operator overload for const char*
 
 	template <typename T> 
 	bool operator < (const T& other) const
@@ -357,6 +355,9 @@ public:
 		return convert<T>() < other;
 	}
 
+	bool operator < (const DynamicAny& other) const;
+		/// Less than operator overload for DynamicAny
+
 	template <typename T> 
 	bool operator <= (const T& other) const
 		/// Less than or equal operator
@@ -364,6 +365,9 @@ public:
 		if (isEmpty()) return false;
 		return convert<T>() <= other;
 	}
+
+	bool operator <= (const DynamicAny& other) const;
+		/// Less than or equal operator overload for DynamicAny
 
 	template <typename T> 
 	bool operator > (const T& other) const
@@ -373,6 +377,9 @@ public:
 		return convert<T>() > other;
 	}
 
+	bool operator > (const DynamicAny& other) const;
+		/// Greater than operator overload for DynamicAny
+
 	template <typename T> 
 	bool operator >= (const T& other) const
 		/// Greater than or equal operator
@@ -380,6 +387,31 @@ public:
 		if (isEmpty()) return false;
 		return convert<T>() >= other;
 	}
+
+	bool operator >= (const DynamicAny& other) const;
+		/// Greater than or equal operator overload for DynamicAny
+
+	template <typename T>
+	bool operator || (const T& other) const
+		/// Logical OR operator
+	{
+		if (isEmpty()) return false;
+		return convert<bool>() || other;
+	}
+
+	bool operator || (const DynamicAny& other) const;
+		/// Logical OR operator operator overload for DynamicAny
+
+	template <typename T>
+	bool operator && (const T& other) const
+		/// Logical AND operator
+	{
+		if (isEmpty()) return false;
+		return convert<bool>() && other;
+	}
+
+	bool operator && (const DynamicAny& other) const;
+		/// Logical AND operator operator overload for DynamicAny
 
 	bool isArray() const;
 		/// Returns true if DynamicAny represents a vector
@@ -540,6 +572,12 @@ inline const DynamicAny DynamicAny::operator + (const char* other) const
 inline DynamicAny& DynamicAny::operator += (const char*other)
 {
 	return *this = convert<std::string>() + other;
+}
+
+
+inline const bool DynamicAny::operator ! () const
+{
+	return !convert<bool>();
 }
 
 
