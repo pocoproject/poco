@@ -382,6 +382,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testFilter);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testNull);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testRowIterator);

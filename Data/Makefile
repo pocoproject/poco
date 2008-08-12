@@ -8,11 +8,11 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = AbstractBinder AbstractBinding AbstractExtraction \
-	AbstractExtractor AbstractPreparation AbstractPrepare ArchiveStrategy \
+objects = AbstractBinder AbstractBinding AbstractExtraction AbstractExtractor \
+	AbstractPreparation AbstractPrepare ArchiveStrategy AutoTransaction \
 	Bulk Connector BLOB BLOBStream DataException Date Limit MetaColumn \
 	PooledSessionHolder PooledSessionImpl Position \
-	Range RecordSet Row RowFormatter RowIterator \
+	Range RecordSet Row RowFilter RowFormatter RowIterator \
 	SimpleRowFormatter Session SessionFactory SessionImpl \
 	SessionPool SQLChannel Statement StatementCreator StatementImpl Time
 

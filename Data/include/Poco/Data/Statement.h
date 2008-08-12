@@ -792,7 +792,6 @@ inline void swap(Statement& s1, Statement& s2)
 }
 
 
-
 } } // namespace Poco::Data
 
 

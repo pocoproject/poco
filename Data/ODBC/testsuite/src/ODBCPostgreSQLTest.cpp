@@ -629,6 +629,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testFilter);
 //On Linux, PostgreSQL driver returns SQL_NEED_DATA on SQLExecute (see ODBCStatementImpl::bindImpl() )
 //this behavior is not expected and not handled for automatic binding
 #ifdef POCO_OS_FAMILY_WINDOWS

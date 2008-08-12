@@ -55,6 +55,7 @@ public:
 	void testBareboneODBC();
 
 	void testBLOB();
+	void testFilter();
 
 	void testStoredProcedure();
 	void testStoredProcedureAny();

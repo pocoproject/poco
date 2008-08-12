@@ -240,6 +240,21 @@ http://bugs.mysql.com/bug.php?id=7445
 }
 
 
+void ODBCMySQLTest::testFilter()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->filter("SELECT * FROM Vectors ORDER BY i0 ASC", "i0");
+		i += 2;
+	}
+}
+
+
 void ODBCMySQLTest::dropObject(const std::string& type, const std::string& name)
 {
 	*_pSession << format("DROP %s IF EXISTS %s", type, name), now;
@@ -466,6 +481,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testFilter);
 		//CppUnit_addTest(pSuite, ODBCOracleTest, testInternalBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testNull);

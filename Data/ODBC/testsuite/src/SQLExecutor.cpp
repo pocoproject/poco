@@ -51,6 +51,7 @@
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowIterator.h"
+#include "Poco/Data/RowFilter.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
 #include "Poco/Data/SQLChannel.h"
@@ -72,6 +73,8 @@ using Poco::Data::Statement;
 using Poco::Data::RecordSet;
 using Poco::Data::Column;
 using Poco::Data::Row;
+using Poco::Data::RowFilter;
+using Poco::Data::RowIterator;
 using Poco::Data::SQLChannel;
 using Poco::Data::LimitException;
 using Poco::Data::BindingException;
@@ -2526,6 +2529,86 @@ void SQLExecutor::internalExtraction()
 }
 
 
+void SQLExecutor::filter(const std::string& query, const std::string& intFldName)
+{
+	std::string funct = "filter()";
+	std::vector<Tuple<int, double, std::string> > v;
+	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
+	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
+	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
+	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
+
+	try { session() << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	try 
+	{ 
+		Statement stmt = (session() << query, now);
+		RecordSet rset(stmt);
+		assert (rset.totalRowCount() == 4);
+		RowFilter::Ptr pRF = new RowFilter(&rset);
+		assert (pRF->isEmpty());
+		pRF->add(intFldName, RowFilter::VALUE_EQUAL, 1);
+		assert (!pRF->isEmpty());
+
+		DynamicAny da;
+		try 
+		{
+			da = rset.value(0, 1);
+			fail ("must fail");
+		} catch (InvalidAccessException&) 
+		{
+			da = rset.value(0, 1, false);
+			assert (2 == da);
+			da = rset.value(0, 0);
+			assert (1 == da);
+		}
+
+		assert (rset.rowCount() == 1);
+		assert (rset.moveFirst());
+		assert (1 == rset[intFldName]);
+		assert (!rset.moveNext());
+		pRF->add("flt0", RowFilter::VALUE_LESS_THAN_OR_EQUAL, 3.5f);
+		assert (rset.rowCount() == 3);
+		assert (rset.moveNext());
+		assert (2.5 == rset["flt0"]);
+		assert (rset.moveNext());
+		assert (3.5 == rset["flt0"]);
+		assert (!rset.moveNext());
+		pRF->add("str0", RowFilter::VALUE_EQUAL, 6);
+		assert (rset.rowCount() == 4);
+		assert (rset.moveLast());
+		assert ("6" == rset["str0"]);
+		pRF->remove("flt0");
+		assert (rset.rowCount() == 2);
+		assert (rset.moveFirst());
+		assert ("3" == rset["str0"]);
+		assert (rset.moveNext());
+		assert ("6" == rset["str0"]);
+		pRF->remove(intFldName);
+		pRF->remove("str0");
+		assert (pRF->isEmpty());
+		pRF->add("str0", "!=", 3);
+		assert (rset.rowCount() == 3);
+
+		RowFilter::Ptr pRF1 = new RowFilter(pRF, RowFilter::OP_AND);
+		pRF1->add(intFldName, "==", 2);
+		assert (rset.rowCount() == 1);
+		pRF1->add(intFldName, "<", 2);
+		assert (rset.rowCount() == 1);
+		pRF1->add(intFldName, ">", 3);
+		assert (rset.rowCount() == 2);
+		pRF->removeFilter(pRF1);
+		pRF->remove("str0");
+		assert (pRF->isEmpty());
+		assert (rset.rowCount() == 4);
+	}
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+}
+
+
 void SQLExecutor::internalBulkExtraction()
 {
 	std::string funct = "internalBulkExtraction()";
@@ -2665,7 +2748,8 @@ void SQLExecutor::notNulls(const std::string& sqlState)
 	{ 
 		//make sure we're failing for the right reason
 		//default sqlState value is "23502"; some drivers report "HY???" codes
-		assert (sqlState == se.diagnostics().sqlState(0));
+		if (se.diagnostics().fields().size())
+			assert (sqlState == se.diagnostics().sqlState(0));
 	}
 }
 
@@ -2686,12 +2770,18 @@ void SQLExecutor::nulls()
 	assert (rs.isNull("r"));
 	assert (rs.isNull("v"));
 	assert (rs["v"] != "");
+	assert (rs.nvl<int>("i") == 0);
+	assert (rs.nvl("i", -1) == -1);
+	assert (rs.nvl<double>("r") == double());
+	assert (rs.nvl("r", -1.5) == -1.5);
+	assert (rs.nvl<std::string>("v") == "");
+	assert (rs.nvl("v", "123") == "123");
 	try { session() << "DELETE FROM NullTest", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	int i = 1;
-	double f = 1.2;
+	double f = 1.5;
 	std::string s = "123";
 
 	try { session() << "INSERT INTO NullTest (i, r, v) VALUES (?,?,?)", use(i), use(f), use(s), now; }
@@ -2705,7 +2795,12 @@ void SQLExecutor::nulls()
 	assert (!rs.isNull("v"));
 	assert (!rs.isNull("r"));
 	assert (rs["v"] == "123");
-	
+	assert (rs.nvl<int>("i") == 1);
+	assert (rs.nvl("i", -1) == 1);
+	assert (rs.nvl<double>("r") == 1.5);
+	assert (rs.nvl("r", -1.5) == 1.5);
+	assert (rs.nvl<std::string>("v") == "123");
+	assert (rs.nvl("v", "456") == "123");
 	try { session() << "UPDATE NullTest SET v = ? WHERE i = ?", use(null), use(i), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2803,6 +2898,19 @@ void SQLExecutor::rowIterator()
 	std::ostringstream osCopy;
 	std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(osCopy));
 	assert (osLoop.str() == osCopy.str());
+
+	RowFilter::Ptr pRF = new RowFilter(&rset);
+	assert (pRF->isEmpty());
+	pRF->add("str0", RowFilter::VALUE_EQUAL, 1);
+	assert (!pRF->isEmpty());
+	it = rset.begin();
+	end = rset.end();
+	for (int i = 1; it != end; ++it, ++i) 
+	{
+		assert (it->get(0) == i);
+		assert (1 == i);
+	}
+
 }
 
 

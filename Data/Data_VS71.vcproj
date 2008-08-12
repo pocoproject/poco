@@ -334,6 +334,9 @@
 					RelativePath=".\include\Poco\Data\Row.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\RowFilter.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\RowFormatter.h">
 				</File>
 				<File
@@ -423,6 +426,9 @@
 				</File>
 				<File
 					RelativePath=".\src\Row.cpp">
+				</File>
+				<File
+					RelativePath=".\src\RowFilter.cpp">
 				</File>
 				<File
 					RelativePath=".\src\RowFormatter.cpp">

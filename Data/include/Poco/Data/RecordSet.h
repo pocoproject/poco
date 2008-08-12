@@ -56,7 +56,7 @@ namespace Poco {
 namespace Data {
 
 
-class Session;
+class RowFilter;
 
 
 class Data_API RecordSet: private Statement
@@ -112,7 +112,16 @@ public:
 		/// Assignment operator.
 
 	std::size_t rowCount() const;
-		/// Returns the number of rows in the recordset.
+		/// Returns the number of rows in the RecordSet.
+		/// The number of rows reported is dependent on filtering.
+		/// Due to the need for filter conditions checking,
+		/// this function may suffer significant performance penalty
+		/// for large recordsets, so it should be used judiciously.
+		/// Use totalRowCount() to obtain the total number of rows.
+
+	std::size_t totalRowCount() const;
+		/// Returns the total number of rows in the RecordSet.
+		/// The number of rows reported is independent of filtering.
 
 	std::size_t columnCount() const;
 		/// Returns the number of rows in the recordset.
@@ -154,9 +163,12 @@ public:
 		/// Rows are lazy-created and cached.
 
 	template <class T>
-	const T& value(std::size_t col, std::size_t row) const
+	const T& value(std::size_t col, std::size_t row, bool useFilter = true) const
 		/// Returns the reference to data value at [col, row] location.
 	{
+		if (useFilter && isFiltered() && !isAllowed(row))
+			throw InvalidAccessException("Row not allowed");
+
 		switch (storage())
 		{
 			case STORAGE_VECTOR:
@@ -181,9 +193,12 @@ public:
 	}
 
 	template <class T>
-	const T& value(const std::string& name, std::size_t row) const
+	const T& value(const std::string& name, std::size_t row, bool useFilter = true) const
 		/// Returns the reference to data value at named column, row location.
 	{
+		if (useFilter && isFiltered() && !isAllowed(row))
+			throw InvalidAccessException("Row not allowed");
+
 		switch (storage())
 		{
 			case STORAGE_VECTOR:
@@ -207,19 +222,33 @@ public:
 		}
 	}
 
-	DynamicAny value(std::size_t col, std::size_t row) const;
+	DynamicAny value(std::size_t col, std::size_t row, bool checkFiltering = true) const;
 		/// Returns the data value at column, row location.
 
-	DynamicAny value(const std::string& name, std::size_t row) const;
+	DynamicAny value(const std::string& name, std::size_t row, bool checkFiltering = true) const;
 		/// Returns the data value at named column, row location.
 
-	DynamicAny nvl(const std::string& name, const DynamicAny& deflt) const;
+	template <typename T>
+	DynamicAny nvl(const std::string& name, const T& deflt = T()) const
 		/// Returns the value in the named column of the current row
 		/// if the value is not NULL, or deflt otherwise.
-
-	DynamicAny nvl(std::size_t index, const DynamicAny& deflt) const;
+	{
+		if (isNull(name))
+			return DynamicAny(deflt);
+		else
+			return value(name, _currentRow);
+	}
+	
+	template <typename T>
+	DynamicAny nvl(std::size_t index, const T& deflt = T()) const
 		/// Returns the value in the given column of the current row
 		/// if the value is not NULL, or deflt otherwise.
+	{
+		if (isNull(index, _currentRow))
+			return DynamicAny(deflt);
+		else
+			return value(index, _currentRow);
+	}
 
 	ConstIterator& begin() const;
 		/// Returns the const row iterator.
@@ -315,6 +344,9 @@ public:
 		/// Copies the column names and values to the target output stream.
 		/// Copied strings are formatted by the current RowFormatter.
 
+	bool isFiltered() const;
+		/// Returns true if recordset is filtered.
+
 private:
 	RecordSet();
 
@@ -384,10 +416,25 @@ private:
 		}
 	}
 
+	bool isAllowed(std::size_t row) const;
+		/// Returns true if the specified row is allowed by the
+		/// currently active filter.
+
+	void filter(RowFilter* pFilter);
+		/// Sets the filter for the RecordSet.
+
+	
+	RowFilter* getFilter();
+		/// Returns the filter associated with the RecordSet.
+
 	std::size_t  _currentRow;
 	RowIterator* _pBegin;
 	RowIterator* _pEnd;
 	RowMap       _rowMap;
+	RowFilter*   _pFilter;
+
+	friend class RowIterator;
+	friend class RowFilter;
 };
 
 
@@ -397,11 +444,11 @@ private:
 
 inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs)
 {
-      return rs.copy(os);
+	return rs.copy(os);
 }
 
 
-inline std::size_t RecordSet::rowCount() const
+inline std::size_t RecordSet::totalRowCount() const
 {
 	poco_assert (extractions().size());
 	return extractions()[0].get()->numOfRowsHandled();
@@ -523,6 +570,42 @@ inline std::ostream& RecordSet::copyNames(std::ostream& os) const
 	return os;
 }
 
+
+inline RowFilter* RecordSet::getFilter()
+{
+	return _pFilter;
+}
+
+/* TODO
+namespace Keywords {
+
+
+inline const std::string& select(const std::string& str)
+{
+	return str;
+}
+
+
+inline const RecordSet& from(const RecordSet& rs)
+{
+	return rs;
+}
+
+
+inline RecordSet from(const Statement& stmt)
+{
+	return RecordSet(stmt);
+}
+
+
+inline const std::string& where(const std::string& str)
+{
+	return str;
+}
+
+
+} // namespace Keywords
+*/
 
 } } // namespace Poco::Data
 

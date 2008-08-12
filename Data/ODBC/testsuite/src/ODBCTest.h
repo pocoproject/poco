@@ -135,6 +135,7 @@ public:
 	virtual void testTupleVector();
 
 	virtual void testInternalExtraction();
+	virtual void testFilter();
 	virtual void testInternalBulkExtraction();
 	virtual void testInternalStorageType();
 

@@ -484,6 +484,10 @@ public:
 	void tupleVector();
 
 	void internalExtraction();
+	void filter(const std::string& query = 
+		"SELECT * FROM Vectors ORDER BY int0 ASC",
+		const std::string& intFldName = "int0");
+
 	void internalBulkExtraction();
 	void internalStorageType();
 	void nulls();

@@ -36,6 +36,7 @@
 
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/Session.h"
+#include "Poco/Data/RowFilter.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/Data/DataException.h"
@@ -54,7 +55,8 @@ RecordSet::RecordSet(const Statement& rStatement):
 	Statement(rStatement),
 	_currentRow(0),
 	_pBegin(new RowIterator(this)),
-	_pEnd(new RowIterator(this, true))
+	_pEnd(new RowIterator(this, true)),
+	_pFilter(0)
 {
 }
 
@@ -65,7 +67,8 @@ RecordSet::RecordSet(Session& rSession,
 	Statement((rSession << query, now)),
 	_currentRow(0),
 	_pBegin(new RowIterator(this)),
-	_pEnd(new RowIterator(this, true))
+	_pEnd(new RowIterator(this, true)),
+	_pFilter(0)
 {
 	if (pRowFormatter) setRowFormatter(pRowFormatter);
 }
@@ -75,7 +78,8 @@ RecordSet::RecordSet(const RecordSet& other):
 	Statement(other.impl().duplicate()),
 	_currentRow(other._currentRow),
 	_pBegin(new RowIterator(this)),
-	_pEnd(new RowIterator(this, true))
+	_pEnd(new RowIterator(this, true)),
+	_pFilter(other._pFilter)
 {
 }
 
@@ -84,34 +88,38 @@ RecordSet::~RecordSet()
 {
 	delete _pBegin;
 	delete _pEnd;
+	if(_pFilter) _pFilter->release();
 
 	RowMap::iterator it = _rowMap.begin();
 	RowMap::iterator end = _rowMap.end();
-	for (; it != end; ++it)	delete it->second;
+	for (; it != end; ++it) delete it->second;
 }
 
 
-DynamicAny RecordSet::value(std::size_t col, std::size_t row) const
+DynamicAny RecordSet::value(std::size_t col, std::size_t row, bool useFilter) const
 {
+	if (useFilter && isFiltered() && !isAllowed(row))
+		throw InvalidAccessException("Row not allowed");
+
 	if (isNull(col, row)) return DynamicAny();
 
 	switch (columnType(col))
 	{
-		case MetaColumn::FDT_BOOL:      return value<bool>(col, row);
-		case MetaColumn::FDT_INT8:      return value<Int8>(col, row);
-		case MetaColumn::FDT_UINT8:     return value<UInt8>(col, row);
-		case MetaColumn::FDT_INT16:     return value<Int16>(col, row);
-		case MetaColumn::FDT_UINT16:    return value<UInt16>(col, row);
-		case MetaColumn::FDT_INT32:	    return value<Int32>(col, row);
-		case MetaColumn::FDT_UINT32:    return value<UInt32>(col, row);
-		case MetaColumn::FDT_INT64:     return value<Int64>(col, row);
-		case MetaColumn::FDT_UINT64:    return value<UInt64>(col, row);
-		case MetaColumn::FDT_FLOAT:     return value<float>(col, row);
-		case MetaColumn::FDT_DOUBLE:    return value<double>(col, row);
-		case MetaColumn::FDT_STRING:    return value<std::string>(col, row);
-		case MetaColumn::FDT_BLOB:      return value<BLOB>(col, row);
-		case MetaColumn::FDT_DATE:      return value<Date>(col, row);
-		case MetaColumn::FDT_TIME:      return value<Time>(col, row);
+		case MetaColumn::FDT_BOOL:      return value<bool>(col, row, useFilter);
+		case MetaColumn::FDT_INT8:      return value<Int8>(col, row, useFilter);
+		case MetaColumn::FDT_UINT8:     return value<UInt8>(col, row, useFilter);
+		case MetaColumn::FDT_INT16:     return value<Int16>(col, row, useFilter);
+		case MetaColumn::FDT_UINT16:    return value<UInt16>(col, row, useFilter);
+		case MetaColumn::FDT_INT32:	    return value<Int32>(col, row, useFilter);
+		case MetaColumn::FDT_UINT32:    return value<UInt32>(col, row, useFilter);
+		case MetaColumn::FDT_INT64:     return value<Int64>(col, row, useFilter);
+		case MetaColumn::FDT_UINT64:    return value<UInt64>(col, row, useFilter);
+		case MetaColumn::FDT_FLOAT:     return value<float>(col, row, useFilter);
+		case MetaColumn::FDT_DOUBLE:    return value<double>(col, row, useFilter);
+		case MetaColumn::FDT_STRING:    return value<std::string>(col, row, useFilter);
+		case MetaColumn::FDT_BLOB:      return value<BLOB>(col, row, useFilter);
+		case MetaColumn::FDT_DATE:      return value<Date>(col, row, useFilter);
+		case MetaColumn::FDT_TIME:      return value<Time>(col, row, useFilter);
 		case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(col, row);
 		default:
 			throw UnknownTypeException("Data type not supported.");
@@ -119,28 +127,31 @@ DynamicAny RecordSet::value(std::size_t col, std::size_t row) const
 }
 
 
-DynamicAny RecordSet::value(const std::string& name, std::size_t row) const
+DynamicAny RecordSet::value(const std::string& name, std::size_t row, bool useFilter) const
 {
+	if (useFilter && isFiltered() && !isAllowed(row))
+		throw InvalidAccessException("Row not allowed");
+
 	if (isNull(metaColumn(name).position(), row)) return DynamicAny();
 
 	switch (columnType(name))
 	{
-		case MetaColumn::FDT_BOOL:      return value<bool>(name, row);
-		case MetaColumn::FDT_INT8:      return value<Int8>(name, row);
-		case MetaColumn::FDT_UINT8:     return value<UInt8>(name, row);
-		case MetaColumn::FDT_INT16:     return value<Int16>(name, row);
-		case MetaColumn::FDT_UINT16:    return value<UInt16>(name, row);
-		case MetaColumn::FDT_INT32:	    return value<Int32>(name, row);
-		case MetaColumn::FDT_UINT32:    return value<UInt32>(name, row);
-		case MetaColumn::FDT_INT64:     return value<Int64>(name, row);
-		case MetaColumn::FDT_UINT64:    return value<UInt64>(name, row);
-		case MetaColumn::FDT_FLOAT:     return value<float>(name, row);
-		case MetaColumn::FDT_DOUBLE:    return value<double>(name, row);
-		case MetaColumn::FDT_STRING:    return value<std::string>(name, row);
-		case MetaColumn::FDT_BLOB:      return value<BLOB>(name, row);
-		case MetaColumn::FDT_DATE:      return value<Date>(name, row);
-		case MetaColumn::FDT_TIME:      return value<Time>(name, row);
-		case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(name, row);
+		case MetaColumn::FDT_BOOL:      return value<bool>(name, row, useFilter);
+		case MetaColumn::FDT_INT8:      return value<Int8>(name, row, useFilter);
+		case MetaColumn::FDT_UINT8:     return value<UInt8>(name, row, useFilter);
+		case MetaColumn::FDT_INT16:     return value<Int16>(name, row, useFilter);
+		case MetaColumn::FDT_UINT16:    return value<UInt16>(name, row, useFilter);
+		case MetaColumn::FDT_INT32:	    return value<Int32>(name, row, useFilter);
+		case MetaColumn::FDT_UINT32:    return value<UInt32>(name, row, useFilter);
+		case MetaColumn::FDT_INT64:     return value<Int64>(name, row, useFilter);
+		case MetaColumn::FDT_UINT64:    return value<UInt64>(name, row, useFilter);
+		case MetaColumn::FDT_FLOAT:     return value<float>(name, row, useFilter);
+		case MetaColumn::FDT_DOUBLE:    return value<double>(name, row, useFilter);
+		case MetaColumn::FDT_STRING:    return value<std::string>(name, row, useFilter);
+		case MetaColumn::FDT_BLOB:      return value<BLOB>(name, row, useFilter);
+		case MetaColumn::FDT_DATE:      return value<Date>(name, row, useFilter);
+		case MetaColumn::FDT_TIME:      return value<Time>(name, row, useFilter);
+		case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(name, row, useFilter);
 		default:
 			throw UnknownTypeException("Data type not supported.");
 	}
@@ -183,11 +194,48 @@ Row& RecordSet::row(std::size_t pos)
 }
 
 
+std::size_t RecordSet::rowCount() const
+{
+	poco_assert (extractions().size());
+	std::size_t rc = totalRowCount();
+	if (!isFiltered()) return rc;
+
+	std::size_t counter = 0;
+	for (int row = 0; row < rc; ++row)
+	{
+		if (isAllowed(row)) ++counter;
+	}
+
+	return counter;
+}
+
+
+bool RecordSet::isAllowed(std::size_t row) const
+{
+	if (!isFiltered()) return true;
+	return _pFilter->isAllowed(row);
+}
+
+
 bool RecordSet::moveFirst()
 {
-	if (rowCount() > 0)
+	if (totalRowCount() > 0)
 	{
-		_currentRow = 0;
+		if (!isFiltered())
+		{
+			_currentRow = 0;
+			return true;
+		}
+
+		std::size_t currentRow = _currentRow;
+		currentRow = 0;
+		while (!isAllowed(currentRow))
+		{
+			if (currentRow >= totalRowCount() - 1) return false;
+			++currentRow;
+		}
+
+		_currentRow = currentRow;
 		return true;
 	}
 	else return false;
@@ -196,46 +244,54 @@ bool RecordSet::moveFirst()
 
 bool RecordSet::moveNext()
 {
-	if (_currentRow >= rowCount() - 1) return false;
-	++_currentRow;
+	std::size_t currentRow = _currentRow;
+	do
+	{
+		if (currentRow >= totalRowCount() - 1) return false;
+		++currentRow;
+	} while (isFiltered() && !isAllowed(currentRow));
+
+	_currentRow = currentRow;
 	return true;
 }
 
 
 bool RecordSet::movePrevious()
 {
-	if (0 == _currentRow) return false;
-	--_currentRow;
+	std::size_t currentRow = _currentRow;
+	do
+	{
+		if (currentRow <= 0) return false;
+		--currentRow;
+	} while (isFiltered() && !isAllowed(currentRow));
+
+	_currentRow = currentRow;
 	return true;
 }
 
 
 bool RecordSet::moveLast()
 {
-	if (rowCount() > 0)
+	if (totalRowCount() > 0)
 	{
-		_currentRow = rowCount() - 1;
+		std::size_t currentRow = _currentRow;
+		currentRow = totalRowCount() - 1;
+		if (!isFiltered())
+		{
+			_currentRow = currentRow;
+			return true;
+		}
+
+		while (!isAllowed(currentRow))
+		{
+			if (currentRow <= 0) return false;
+			--currentRow;
+		}
+
+		_currentRow = currentRow;
 		return true;
 	}
 	else return false;
-}
-
-
-DynamicAny RecordSet::nvl(const std::string& name, const DynamicAny& deflt) const
-{
-	if (isNull(name))
-		return deflt;
-	else
-		return value(name, _currentRow);
-}
-
-
-DynamicAny RecordSet::nvl(std::size_t index, const DynamicAny& deflt) const
-{
-	if (isNull(index, _currentRow))
-		return deflt;
-	else
-		return value(index, _currentRow);
 }
 
 
@@ -262,6 +318,20 @@ std::ostream& RecordSet::copy(std::ostream& os) const
 	copyValues(os);
 	os << ri.postfix();
 	return os;
+}
+
+
+void RecordSet::filter(RowFilter* pFilter)
+{
+	if (_pFilter) _pFilter->release();
+	_pFilter = pFilter;
+	if(_pFilter) _pFilter->duplicate();
+}
+
+
+bool RecordSet::isFiltered() const
+{
+	return _pFilter && !_pFilter->isEmpty();
 }
 
 

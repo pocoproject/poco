@@ -757,6 +757,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalExtraction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFilter);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInternalStorageType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNull);

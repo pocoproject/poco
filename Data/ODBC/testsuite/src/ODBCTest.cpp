@@ -919,6 +919,21 @@ void ODBCTest::testInternalExtraction()
 }
 
 
+void ODBCTest::testFilter()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateVectorsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->filter();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testInternalBulkExtraction()
 {
 	if (!_pSession) fail ("Test not available.");

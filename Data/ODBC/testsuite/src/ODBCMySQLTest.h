@@ -65,6 +65,7 @@ public:
 	void testNull();
 	
 	void testMultipleResults();
+	void testFilter();
 
 	static CppUnit::Test* suite();
 

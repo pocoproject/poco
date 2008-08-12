@@ -43,6 +43,7 @@
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include <cstring>
 #ifdef POCO_OS_FAMILY_WINDOWS
 	#include <windows.h>
 #endif

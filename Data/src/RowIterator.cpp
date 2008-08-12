@@ -50,7 +50,7 @@ const int RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd): 
 	_pRecordSet(pRecordSet),
-	_position((0 == pRecordSet->rowCount()) || positionEnd ? POSITION_END : 0)
+	_position((0 == pRecordSet->totalRowCount()) || positionEnd ? POSITION_END : 0)
 {
 }
 
@@ -89,10 +89,19 @@ void RowIterator::increment() const
 	if (POSITION_END == _position)
 		throw RangeException("End of iterator reached.");
 
-	if (_position < _pRecordSet->rowCount() - 1)
+	if (_position < _pRecordSet->totalRowCount() - 1)
 		++_position;
 	else
 		_position = POSITION_END;
+
+	if (_pRecordSet->getFilter() && POSITION_END != _position)
+	{
+		while (!_pRecordSet->isAllowed(_position))
+		{
+			increment();
+			if (POSITION_END == _position) break;
+		}
+	}
 }
 
 
@@ -101,17 +110,52 @@ void RowIterator::decrement() const
 	if (0 == _position)
 		throw RangeException("Beginning of iterator reached.");
 	else if (POSITION_END == _position)
-		_position = _pRecordSet->rowCount() - 1;
+		_position = _pRecordSet->totalRowCount() - 1;
 	else
 		--_position;
+
+	if (_pRecordSet->getFilter() && 0 != _position)
+	{
+		while (!_pRecordSet->isAllowed(_position))
+		{
+			decrement();
+			if (0 == _position) break;
+		}
+	}
 }
 
 
 void RowIterator::setPosition(std::size_t pos) const
 {
-	if (pos < _pRecordSet->rowCount())
+	if (_position == pos) return;
+
+	if (_pRecordSet->getFilter())
+	{
+		std::size_t start = _position;
+		if (_position > pos)
+		{
+			std::size_t end = _position - pos;
+			for (; start > end; --start)
+			{
+				if (pos) --pos;
+				else throw RangeException("Invalid position argument.");
+			}
+		}
+		else
+		{
+			std::size_t end = pos - _position;
+			for (; start < end; ++start)
+			{
+				if (_pRecordSet->totalRowCount() != pos) ++pos;
+				else throw RangeException("Invalid position argument.");
+			}
+		}
+			
+	}
+
+	if (pos < _pRecordSet->totalRowCount())
 		_position = pos;
-	else if (pos == _pRecordSet->rowCount())
+	else if (pos == _pRecordSet->totalRowCount())
 		_position = POSITION_END;
 	else
 		throw RangeException("Invalid position argument.");
