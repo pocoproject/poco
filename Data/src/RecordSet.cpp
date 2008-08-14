@@ -168,9 +168,13 @@ Row& RecordSet::row(std::size_t pos)
 	std::size_t columns = columnCount();
 	if (it == _rowMap.end())
 	{
-		if (_rowMap.size())//reuse first row column names to save some memory 
+		if (_rowMap.size())
 		{
-			pRow = new Row(_rowMap.begin()->second->names(), getRowFormatter());
+			//reuse first row column names and sorting fields to save some memory 
+			pRow = new Row(_rowMap.begin()->second->names(),
+				_rowMap.begin()->second->getSortMap(),
+				getRowFormatter());
+
 			for (std::size_t col = 0; col < columns; ++col)
 				pRow->set(col, value(col, pos));
 		}

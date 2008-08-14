@@ -47,6 +47,7 @@
 #include "Poco/BinaryWriter.h"
 #include "Poco/DateTime.h"
 #include "Poco/Types.h"
+#include "Poco/DynamicAny.h"
 #include "Poco/Exception.h"
 #include <cstring>
 #include <sstream>
@@ -63,7 +64,9 @@ using Poco::UInt32;
 using Poco::Int64;
 using Poco::UInt64;
 using Poco::DateTime;
+using Poco::DynamicAny;
 using Poco::InvalidAccessException;
+using Poco::IllegalStateException;
 using Poco::RangeException;
 using Poco::NotFoundException;
 using Poco::InvalidArgumentException;
@@ -876,10 +879,15 @@ void DataTest::testRow()
 
 	try
 	{
+		row4.set("field1", DynamicAny());
 		row4.addSortField(1);
+		row4.removeSortField(0);
 		fail ("must fail - field 1 is empty");
 	}
-	catch (InvalidAccessException&) { }
+	catch (IllegalStateException&)
+	{
+		row4.removeSortField(1);
+	}
 
 	row4.set("field0", 0);
 	row4.set("field1", 1);
@@ -1018,6 +1026,59 @@ void DataTest::testRowSort()
 	assert (row6 == *it3);
 	++it3;
 	assert (row5 == *it3);
+
+	Row row8;
+	row8.append("0", "2");
+	row8.append("1", "2");
+	row8.append("2", "0");
+	row8.append("3", "3");
+	row8.append("4", "4");
+	row8.addSortField("1");
+
+	Row row9;
+	row9.append("0", "1");
+	row9.append("1", "0");
+	row9.append("2", "1");
+	row9.append("3", "3");
+	row9.append("4", "4");
+	row9.addSortField("1");
+
+	Row row10;
+	row10.append("0", "0");
+	row10.append("1", "1");
+	row10.append("2", "2");
+	row10.append("3", "3");
+	row10.append("4", "4");
+	row10.addSortField("1");
+
+	testRowStrictWeak(row10, row9, row8);
+
+
+	Row row11;
+	row11.append("0", 2.5);
+	row11.append("1", 2.5);
+	row11.append("2", 0.5);
+	row11.append("3", 3.5);
+	row11.append("4", 4.5);
+	row11.addSortField("1");
+
+	Row row12;
+	row12.append("0", 1.5);
+	row12.append("1", 0.5);
+	row12.append("2", 1.5);
+	row12.append("3", 3.5);
+	row12.append("4", 4.5);
+	row12.addSortField("1");
+
+	Row row13;
+	row13.append("0", 0.5);
+	row13.append("1", 1.5);
+	row13.append("2", 2.5);
+	row13.append("3", 3.5);
+	row13.append("4", 4.5);
+	row13.addSortField("1");
+
+	testRowStrictWeak(row13, row12, row11);
 }
 
 

@@ -85,15 +85,31 @@ public:
 
 	enum ComparisonType
 	{
+		COMPARE_AS_EMPTY,
 		COMPARE_AS_INTEGER,
 		COMPARE_AS_FLOAT,
 		COMPARE_AS_STRING
 	};
 
+	typedef Tuple<std::size_t, ComparisonType> SortTuple;
+	typedef std::vector<SortTuple>             SortMap;
+		/// The type for map holding fields used for sorting criteria.
+		/// Fields are added sequentially and have precedence that
+		/// corresponds to field adding sequence order (rather than field's 
+		/// position in the row).
+		/// This requirement rules out use of std::map due to its sorted nature.
+	typedef SharedPtr<SortMap> SortMapPtr;
+
 	Row();
 		/// Creates the Row.
 
-	Row(NameVecPtr pNames, const RowFormatterPtr& pFormatter = 0);
+	Row(NameVecPtr pNames,
+		const RowFormatterPtr& pFormatter = 0);
+		/// Creates the Row.
+
+	Row(NameVecPtr pNames,
+		const SortMapPtr& pSortMap,
+		const RowFormatterPtr& pFormatter = 0);
 		/// Creates the Row.
 
 	~Row();
@@ -113,8 +129,7 @@ public:
 		/// Appends the value to the row.
 	{
 		if (!_pNames) _pNames = new NameVec;
-		DynamicAny da = val;
-		_values.push_back(da);
+		_values.push_back(val);
 		_pNames->push_back(name);
 		if (1 == _values.size()) addSortField(0);
 	}
@@ -200,20 +215,26 @@ public:
 	const ValueVec& values() const;
 		/// Returns the const reference to values vector.
 
-	void setFormatter(const RowFormatterPtr& pFormatter);
+	void setFormatter(const RowFormatterPtr& pFormatter = 0);
 		/// Sets the formatter for this row and takes the
 		/// shared ownership of it.
 
 	const RowFormatter& getFormatter() const;
 		/// Returns the reference to the formatter.
 
+	void setSortMap(const SortMapPtr& pSortMap = 0);
+		/// Adds the sorting fields entry and takes the
+		/// shared ownership of it.
+
+	const SortMapPtr& getSortMap() const;
+		/// Returns the reference to the sorting fields.
+
 private:
-	typedef Tuple<std::size_t, ComparisonType> SortTuple;
-	typedef std::vector<SortTuple> SortMap;
-		/// The type for map holding fields used for sorting criteria.
-		/// Fields are added sequentially and have precedence that
-		/// corresponds to adding order rather than field's position in the row.
-		/// That requirement rules out use of std::map due to its sorted nature.
+	void init(const SortMapPtr& pSortMap, const RowFormatterPtr& pFormatter);
+
+	void checkEmpty(std::size_t pos, const DynamicAny& val);
+		/// Check if row contains only empty values and throws IllegalStateException
+		/// if that is the case.
 
 	ValueVec& values();
 		/// Returns the reference to values vector.
@@ -224,7 +245,7 @@ private:
 
 	NameVecPtr           _pNames;
 	ValueVec             _values;
-	SortMap              _sortFields;
+	SortMapPtr           _pSortMap;
 	RowFormatterPtr      _pFormatter;
 	mutable std::string  _nameStr;
 	mutable std::string  _valueStr;
@@ -283,6 +304,12 @@ inline DynamicAny& Row::operator [] (const std::string& name)
 inline const RowFormatter& Row::getFormatter() const
 {
 	return *_pFormatter;
+}
+
+
+inline const Row::SortMapPtr& Row::getSortMap() const
+{
+	return _pSortMap;
 }
 
 

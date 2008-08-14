@@ -52,26 +52,43 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 
 Row::Row(): 
 	_pNames(0),
+	_pSortMap(new SortMap),
 	_pFormatter(new SimpleRowFormatter)
 {
 }
 
 
-Row::Row(NameVecPtr pNames, const RowFormatterPtr& pFormatter): 
-	_pNames(pNames)
+Row::Row(NameVecPtr pNames,
+	const RowFormatterPtr& pFormatter): _pNames(pNames)
 {
 	if (!_pNames) throw NullPointerException();
-	
+	init(0, pFormatter);
+}
+
+
+Row::Row(NameVecPtr pNames,
+	const SortMapPtr& pSortMap,
+	const RowFormatterPtr& pFormatter): _pNames(pNames)
+{
+	if (!_pNames) throw NullPointerException();
+	init(pSortMap, pFormatter);
+}
+
+
+void Row::init(const SortMapPtr& pSortMap, const RowFormatterPtr& pFormatter)
+{
 	setFormatter(pFormatter);
+	setSortMap(pSortMap);
 
 	NameVec::size_type sz = _pNames->size();
 	if (sz)
 	{
 		_values.resize(sz);
-		// Row sortability at all times is an invariant, hence 
-		// we must start with a zero here. If null value is later
-		// retrieved from DB, the DynamicAny::empty() call
-		// should be used to empty the corresponding Row value.
+		// Row sortability in the strict weak ordering sense is 
+		// an invariant, hence we must start with a zero here.
+		// If null value is later retrieved from DB, the 
+		// DynamicAny::empty() call should be used to empty
+		// the corresponding Row value.
 		_values[0] = 0;
 		addSortField(0);
 	}
@@ -113,22 +130,39 @@ std::size_t Row::getPosition(const std::string& name)
 }
 
 
+void Row::checkEmpty(std::size_t pos, const DynamicAny& val)
+{
+	bool empty = true;
+	SortMap::const_iterator it = _pSortMap->begin();
+	SortMap::const_iterator end = _pSortMap->end();
+	for (std::size_t cnt = 0; it != end; ++it, ++cnt)
+	{
+		if (cnt != pos)
+			empty = empty && _values[it->get<0>()].isEmpty();
+	}
+
+	if (empty && val.isEmpty())
+		throw IllegalStateException("All values are empty.");
+}
+
+
 void Row::addSortField(std::size_t pos)
 {
 	poco_assert (pos <= _values.size());
 
-	SortMap::iterator it = _sortFields.begin();
-	SortMap::iterator end = _sortFields.end();
+	checkEmpty(std::numeric_limits<std::size_t>::max(), _values[pos]);
+
+	SortMap::iterator it = _pSortMap->begin();
+	SortMap::iterator end = _pSortMap->end();
 	for (; it != end; ++it)
 	{
-		if (it->get<0>() == pos)
-			throw InvalidAccessException("Field already in comparison set.");
+		if (it->get<0>() == pos) return; 
 	}
 
 	ComparisonType ct;
 	if (_values[pos].isEmpty())
 	{
-		throw InvalidAccessException("Empty value not sortable.");
+		ct = COMPARE_AS_EMPTY;
 	}
 	else if ((_values[pos].type() == typeid(Poco::Int8))   ||
 		(_values[pos].type() == typeid(Poco::UInt8))  ||
@@ -152,7 +186,7 @@ void Row::addSortField(std::size_t pos)
 		ct = COMPARE_AS_STRING;
 	}
 
-	_sortFields.push_back(SortTuple(pos, ct));
+	_pSortMap->push_back(SortTuple(pos, ct));
 }
 
 
@@ -164,13 +198,15 @@ void Row::addSortField(const std::string& name)
 
 void Row::removeSortField(std::size_t pos)
 {
-	SortMap::iterator it = _sortFields.begin();
-	SortMap::iterator end = _sortFields.end();
+	checkEmpty(pos, DynamicAny());
+
+	SortMap::iterator it = _pSortMap->begin();
+	SortMap::iterator end = _pSortMap->end();
 	for (; it != end; ++it)
 	{
 		if (it->get<0>() == pos)
 		{
-			_sortFields.erase(it);
+			_pSortMap->erase(it);
 			return;
 		}
 	}
@@ -192,7 +228,7 @@ void Row::replaceSortField(std::size_t oldPos, std::size_t newPos)
 
 	if (_values[newPos].isEmpty())
 	{
-		throw InvalidAccessException("Empty value not sortable.");
+		ct = COMPARE_AS_EMPTY;
 	}
 	else if ((_values[newPos].type() == typeid(Poco::Int8)) ||
 		(_values[newPos].type() == typeid(Poco::UInt8))     ||
@@ -216,8 +252,8 @@ void Row::replaceSortField(std::size_t oldPos, std::size_t newPos)
 		ct = COMPARE_AS_STRING;
 	}
 
-	SortMap::iterator it = _sortFields.begin();
-	SortMap::iterator end = _sortFields.end();
+	SortMap::iterator it = _pSortMap->begin();
+	SortMap::iterator end = _pSortMap->end();
 	for (; it != end; ++it)
 	{
 		if (it->get<0>() == oldPos)
@@ -239,7 +275,7 @@ void Row::replaceSortField(const std::string& oldName, const std::string& newNam
 
 void Row::resetSort()
 {
-	_sortFields.clear();
+	_pSortMap->clear();
 	if (_values.size())	addSortField(0);
 }
 
@@ -289,15 +325,18 @@ bool Row::operator != (const Row& other) const
 
 bool Row::operator < (const Row& other) const
 {
-	if (_sortFields != other._sortFields)
+	if (*_pSortMap != *other._pSortMap)
 		throw InvalidAccessException("Rows compared have different sorting criteria.");
 
-	SortMap::const_iterator it = _sortFields.begin();
-	SortMap::const_iterator end = _sortFields.end();
+	SortMap::const_iterator it = _pSortMap->begin();
+	SortMap::const_iterator end = _pSortMap->end();
 	for (; it != end; ++it)
 	{
 		switch (it->get<1>())
 		{
+		case COMPARE_AS_EMPTY:
+			return false;
+
 		case COMPARE_AS_INTEGER:
 			if (_values[it->get<0>()].convert<Poco::Int64>() < 
 				other._values[it->get<0>()].convert<Poco::Int64>())
@@ -311,7 +350,7 @@ bool Row::operator < (const Row& other) const
 			if (_values[it->get<0>()].convert<double>() < 
 				other._values[it->get<0>()].convert<double>())
 				return true;
-			else if (_values[it->get<0>()].convert<double>() < 
+			else if (_values[it->get<0>()].convert<double>() !=
 				other._values[it->get<0>()].convert<double>())
 				return false;
 			break;
@@ -320,10 +359,13 @@ bool Row::operator < (const Row& other) const
 			if (_values[it->get<0>()].convert<std::string>() < 
 				other._values[it->get<0>()].convert<std::string>())
 				return true;
-			else if (_values[it->get<0>()].convert<std::string>() < 
+			else if (_values[it->get<0>()].convert<std::string>() !=
 				other._values[it->get<0>()].convert<std::string>())
 				return false;
 			break;
+
+		default:
+			throw IllegalStateException("Unknown comparison criteria.");
 		}
 	}
 
@@ -333,10 +375,19 @@ bool Row::operator < (const Row& other) const
 
 void Row::setFormatter(const RowFormatterPtr& pFormatter)
 {
-	if (pFormatter)
+	if (pFormatter.get())
 		_pFormatter = pFormatter;
 	else 
 		_pFormatter = new SimpleRowFormatter;
+}
+
+
+void Row::setSortMap(const SortMapPtr& pSortMap)
+{
+	if (pSortMap.get())
+		_pSortMap = pSortMap;
+	else 
+		_pSortMap = new SortMap;
 }
 
 
