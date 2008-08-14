@@ -459,6 +459,10 @@
 			<Filter
 				Name="Header Files"
 				Filter="">
+
+				<File
+					RelativePath=".\include\Poco\Util\Units.h">
+				</File>
 				<File
 					RelativePath=".\include\Poco\Util\Util.h">
 				</File>

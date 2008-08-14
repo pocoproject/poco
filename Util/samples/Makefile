@@ -11,3 +11,4 @@ clean all: projects
 projects:
 	$(MAKE) -C SampleApp $(MAKECMDGOALS)
 	$(MAKE) -C SampleServer $(MAKECMDGOALS)
+	$(MAKE) -C Units $(MAKECMDGOALS)

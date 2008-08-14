@@ -4,6 +4,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleApp", "SampleApp\Samp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleServer", "SampleServer\SampleServer_vs80.vcproj", "{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Units", "Units\Units_vs80.vcproj", "{68D2608B-1915-4985-A671-1BA101959FA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|Win32 = debug_shared|Win32
@@ -28,6 +30,14 @@ Global
 		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_shared|Win32.Build.0 = release_shared|Win32
 		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_static|Win32.ActiveCfg = release_static|Win32
 		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_static|Win32.Build.0 = release_static|Win32
+		{68D2608B-1915-4985-A671-1BA101959FA6}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{68D2608B-1915-4985-A671-1BA101959FA6}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{68D2608B-1915-4985-A671-1BA101959FA6}.debug_static|Win32.ActiveCfg = debug_static|Win32
+		{68D2608B-1915-4985-A671-1BA101959FA6}.debug_static|Win32.Build.0 = debug_static|Win32
+		{68D2608B-1915-4985-A671-1BA101959FA6}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{68D2608B-1915-4985-A671-1BA101959FA6}.release_shared|Win32.Build.0 = release_shared|Win32
+		{68D2608B-1915-4985-A671-1BA101959FA6}.release_static|Win32.ActiveCfg = release_static|Win32
+		{68D2608B-1915-4985-A671-1BA101959FA6}.release_static|Win32.Build.0 = release_static|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
