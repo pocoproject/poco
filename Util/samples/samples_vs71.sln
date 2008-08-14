@@ -7,6 +7,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleServer", "SampleServe
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Units", "Units\Units_vs71.vcproj", "{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug_shared = debug_shared
@@ -25,6 +29,14 @@ Global
 		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.release_shared.Build.0 = release_shared|Win32
 		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.release_static.ActiveCfg = release_static|Win32
 		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.release_static.Build.0 = release_static|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_shared.ActiveCfg = debug_shared|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_shared.Build.0 = debug_shared|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_static.ActiveCfg = debug_static|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_static.Build.0 = debug_static|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_shared.ActiveCfg = release_shared|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_shared.Build.0 = release_shared|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_static.ActiveCfg = release_static|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_static.Build.0 = release_static|Win32
 		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_shared.ActiveCfg = debug_shared|Win32
 		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_shared.Build.0 = debug_shared|Win32
 		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_static.ActiveCfg = debug_static|Win32
