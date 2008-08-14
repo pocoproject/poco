@@ -112,10 +112,3 @@ int main()
 
 	return 0;
 }
-/*
-int main()
-{
-	typedef units::compose< units::units::m, units::pow<units::units::s, -1> > meters_per_second;
-	meters_per_second ms(100);
-}
-*/

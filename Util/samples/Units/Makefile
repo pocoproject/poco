@@ -12,6 +12,6 @@ objects = Units
 
 target         = Units
 target_version = 1
-target_libs    = PocoUtil PocoFoundation
+target_libs    = 
 
 include $(POCO_BASE)/build/rules/exec
