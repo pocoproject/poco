@@ -44,7 +44,7 @@
 //	Copyright (C) Calum Grant 2007
 //
 //	Home page: http://calumgrant.net/units
-//	File location: http://calumgrant.net/units/Units.hpp
+//	File location: http://calumgrant.net/units/units.hpp
 //
 //	Copying permitted under the terms of the Boost software license.
 //
