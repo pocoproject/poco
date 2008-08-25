@@ -50,7 +50,7 @@ const int RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd): 
 	_pRecordSet(pRecordSet),
-	_position((0 == pRecordSet->totalRowCount()) || positionEnd ? POSITION_END : 0)
+	_position(positionEnd ? POSITION_END : 0)
 {
 }
 

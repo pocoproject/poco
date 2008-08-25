@@ -424,7 +424,7 @@ private:
 		/// Sets the filter for the RecordSet.
 
 	
-	RowFilter* getFilter();
+	const RowFilter* getFilter() const;
 		/// Returns the filter associated with the RecordSet.
 
 	std::size_t  _currentRow;
@@ -571,10 +571,11 @@ inline std::ostream& RecordSet::copyNames(std::ostream& os) const
 }
 
 
-inline RowFilter* RecordSet::getFilter()
+inline const RowFilter* RecordSet::getFilter() const
 {
 	return _pFilter;
 }
+
 
 /* TODO
 namespace Keywords {

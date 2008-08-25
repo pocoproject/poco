@@ -66,8 +66,10 @@ public:
 	static const int POSITION_END;
 		/// End position indicator.
 
-	RowIterator(RecordSet* pRecordSet, bool positionEnd = false);
-		/// Creates the RowIterator and positions it at the beginning.
+	RowIterator(RecordSet* pRecordSet, bool positionEnd);
+		/// Creates the RowIterator and positions it at the end of
+		/// the recordset if positionEnd is true. Otherwise, it is
+		/// positioned at the beginning.
 
 	RowIterator(const RowIterator& other);
 		/// Creates a copy of other RowIterator.

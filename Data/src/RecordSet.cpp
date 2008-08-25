@@ -54,7 +54,7 @@ namespace Data {
 RecordSet::RecordSet(const Statement& rStatement): 
 	Statement(rStatement),
 	_currentRow(0),
-	_pBegin(new RowIterator(this)),
+	_pBegin(new RowIterator(this, 0 == extractionCount())),
 	_pEnd(new RowIterator(this, true)),
 	_pFilter(0)
 {
@@ -66,7 +66,7 @@ RecordSet::RecordSet(Session& rSession,
 	RowFormatter* pRowFormatter): 
 	Statement((rSession << query, now)),
 	_currentRow(0),
-	_pBegin(new RowIterator(this)),
+	_pBegin(new RowIterator(this, 0 == extractionCount())),
 	_pEnd(new RowIterator(this, true)),
 	_pFilter(0)
 {
@@ -77,7 +77,7 @@ RecordSet::RecordSet(Session& rSession,
 RecordSet::RecordSet(const RecordSet& other):
 	Statement(other.impl().duplicate()),
 	_currentRow(other._currentRow),
-	_pBegin(new RowIterator(this)),
+	_pBegin(new RowIterator(this, 0 == extractionCount())),
 	_pEnd(new RowIterator(this, true)),
 	_pFilter(other._pFilter)
 {
@@ -163,7 +163,7 @@ Row& RecordSet::row(std::size_t pos)
 	if (pos > rowCount() - 1)
 		throw RangeException("Invalid recordset row requested.");
 
-	RowMap::iterator it = _rowMap.find(pos);
+	RowMap::const_iterator it = _rowMap.find(pos);
 	Row* pRow = 0;
 	std::size_t columns = columnCount();
 	if (it == _rowMap.end())
