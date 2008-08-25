@@ -38,6 +38,7 @@
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ImageButtonCell.h"
+#include "Poco/WebWidgets/ImageButton.h"
 
 
 namespace Poco {
@@ -95,11 +96,20 @@ void ImageButtonCellRenderer::writeHTML(const ImageButtonCell* pButtonCell, bool
 	std::string tooltip = ptrImg->getToolTip();
 	if (!tooltip.empty())
 		ostr << " alt=\"" << Utility::safe(tooltip) << "\"";
+	const Poco::WebWidgets::ImageButton* pOwner = static_cast<const Poco::WebWidgets::ImageButton*>(pButtonCell->getOwner());
+	poco_check_ptr (pOwner);
+	if (pOwner->buttonClicked.hasJavaScriptCode())
+	{
+		ostr << " onclick=\"";
+		//FIXME: this will only work without params!
+		Utility::writeFunctionCode(ostr, "fct", pOwner->buttonClicked, &ButtonCellRenderer::createClickServerCallback, pOwner);
+		ostr << "\"";
+	}
 	ostr << " type=\"image\"/>";
 	ostr << "</div>";
-	std::string txt(pButtonCell->getOwner()->getText());
+	std::string txt(pOwner->getText());
 	if (showTxt && !txt.empty())
-		ostr << "<div>" << Utility::safe(pButtonCell->getOwner()->getText()) << "</div>";
+		ostr << "<div><center>" << Utility::safe(pButtonCell->getOwner()->getText()) << "</center></div>";
 	ostr << "</div>'";
 }
 

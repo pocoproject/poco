@@ -168,7 +168,32 @@ public:
 								const std::string& onSuccessJS,
 								const std::string& onFailureJS);
 
+	template <typename T, typename CreateServerCallbackFct, typename Param>								
+	static bool writeFunctionCode(std::ostream& out, const std::string& varName, const JavaScriptEvent<T>& ev, CreateServerCallbackFct fct, const Param* p)
+	{
+		if (!ev.hasJavaScriptCode())
+			return false;
+		if (ev.willDoServerCallback())
+			return writeFunctionCode(out, varName, ev.jsDelegates(), (*fct)(p), ev.getServerCallbackPos());
+		return  writeFunctionCode(out, varName, ev.jsDelegates());
+	}
+
 private:
+	static bool writeFunctionCode(std::ostream& out, 
+							const std::string& varName,
+							const std::list<JSDelegate>& delegates, 
+							const Poco::WebWidgets::JSDelegate& serverCallback, 
+							std::size_t serverCallPos);
+							
+	static bool writeFunctionCode(std::ostream& out, 
+							const std::string& varName,
+							const std::list<JSDelegate>& delegates);
+							
+	static std::list<JSDelegate> Utility::insertServerCallback(const std::list<JSDelegate>& delegates, 
+					const Poco::WebWidgets::JSDelegate& serverCallback, 
+					std::size_t serverCallPos);
+
+
 	static void convertPocoDateToPHPDate(char in, std::string& result);
 	static void convertPHPDateToPocoDate(char in, std::string& result);
 	static void escapeCharForPHP(char in, std::string& result);

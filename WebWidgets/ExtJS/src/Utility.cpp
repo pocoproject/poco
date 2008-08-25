@@ -428,58 +428,15 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 	out << "'" << eventName << "':{";
 		
 	if (delegates.size() == 1)
-		out << "fn:" << delegates.begin()->jsCode() << "";
+		out << "fn:" << delegates.begin()->jsCode();
 	else
 	{
 		// rather simple way to support more than one delegate
 		std::ostringstream invoke;
 		int maxParams = detectMaxParamCount(delegates);
 		std::string fct(createFunctionSignature(maxParams));
-		out << "fn:" << fct << "{var all={";
-		// the invoke function calls all the other functions sequentially
-		invoke << "invoke:" << fct <<"{";
-		std::list<JSDelegate>::const_iterator it = delegates.begin();
-		int cnt(0);
-		for (; it != delegates.end(); ++it, ++cnt)
-		{
-			std::string myFctName("d");
-			myFctName.append(Poco::NumberFormatter::format(cnt));
-			out << myFctName << ":";
-			
-			std::string fctName;
-			std::vector<std::string> params;
-			std::string code;
-			analyzeFunction(*it, fctName, params, code);
-			if (fctName == "function")
-			{
-				// an inline definition, we must have code
-				if (!code.empty())
-				{
-					writeFunction(out, fctName, params, code);
-				}
-			}
-			else
-			{
-				if (code.empty())
-				{
-					// a reference to another js function
-					//maybe the user defined params too -> ignore them
-					out << fctName;
-				}
-				else
-				{
-					// we have code, so rename the function to function :-)
-					writeFunction(out, "function", params, code);
-				}
-			}
-			out << ","; //always write comma because invoke is written as the last method
-			invoke << "this." << createFunctionSignature(myFctName, maxParams) << ";";
-		}
-		
-		invoke << "}";
-		out << invoke.str() << "};"; //closes all
-		
-		out << "all." << createFunctionSignature("invoke", maxParams) << ";";
+		out << "fn:" << fct << "{";
+		writeFunctionCode(out, "all", delegates);
 		out << "}"; //closes fn
 		
 	}	
@@ -495,6 +452,89 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 }
 
 
+bool Utility::writeFunctionCode(std::ostream& out, 
+							const std::string& varName,
+							const std::list<JSDelegate>& delegates, 
+							const Poco::WebWidgets::JSDelegate& serverCallback, 
+							std::size_t serverCallPos)
+{
+	return writeFunctionCode(out, varName, insertServerCallback(delegates, serverCallback, serverCallPos));
+}
+
+							
+bool Utility::writeFunctionCode(std::ostream& out, 
+							const std::string& varName,
+							const std::list<JSDelegate>& delegates)
+{
+	if (delegates.empty())
+		return false;
+		
+	if (delegates.size() == 1)
+	{
+		out << delegates.begin()->jsCode();
+		return true;
+	}
+		
+	// rather simple way to support more than one delegate
+	std::ostringstream invoke;
+	int maxParams = detectMaxParamCount(delegates);
+	out << "var " << varName << "={";
+	// the invoke function calls all the other functions sequentially
+	std::string fct(createFunctionSignature(maxParams));
+	invoke << "invoke:" << fct <<"{";
+	std::list<JSDelegate>::const_iterator it = delegates.begin();
+	int cnt(0);
+	for (; it != delegates.end(); ++it, ++cnt)
+	{
+		std::string myFctName("d");
+		myFctName.append(Poco::NumberFormatter::format(cnt));
+		out << myFctName << ":";
+		
+		std::string fctName;
+		std::vector<std::string> params;
+		std::string code;
+		analyzeFunction(*it, fctName, params, code);
+		if (fctName == "function")
+		{
+			// an inline definition, we must have code
+			if (!code.empty())
+			{
+				writeFunction(out, fctName, params, code);
+			}
+		}
+		else
+		{
+			if (code.empty())
+			{
+				// a reference to another js function
+				//maybe the user defined params too -> ignore them
+				// more likely the user defined constant values!
+				if (params.empty())
+					out << fctName;
+				else
+				{
+					params.clear();
+					writeFunction(out, "function", params, it->jsCode());
+				}
+			}
+			else
+			{
+				// we have code, so rename the function to function :-)
+				writeFunction(out, "function", params, code);
+			}
+		}
+		out << ","; //always write comma because invoke is written as the last method
+		invoke << "this." << createFunctionSignature(myFctName, maxParams) << ";";
+	}
+	
+	invoke << "}";
+	out << invoke.str() << "};"; //closes varName
+	//FIXME: this will only work with no args when not called from writeJSEvent
+	out << varName << "." << createFunctionSignature("invoke", maxParams) << ";";
+	return true;
+}
+
+
 bool Utility::writeJSEvent(std::ostream& out, 
 					const std::string& eventName, 
 					const std::list<JSDelegate>& delegates, 
@@ -502,6 +542,14 @@ bool Utility::writeJSEvent(std::ostream& out,
 					std::size_t serverCallPos,
 					int delayTime, 
 					bool group)
+{
+	return writeJSEvent(out, eventName, insertServerCallback(delegates, serverCallback, serverCallPos), delayTime, group);
+}
+
+
+std::list<JSDelegate> Utility::insertServerCallback(const std::list<JSDelegate>& delegates, 
+					const Poco::WebWidgets::JSDelegate& serverCallback, 
+					std::size_t serverCallPos)
 {
 	// TODO: we can optimize here a bit by avoiding the copy
 	std::list<JSDelegate> dels;
@@ -518,7 +566,8 @@ bool Utility::writeJSEvent(std::ostream& out,
 	}
 	if (!written)
 		dels.push_back(serverCallback);
-	return writeJSEvent(out, eventName, dels, delayTime, group);
+		
+	return dels;
 }
 
 
