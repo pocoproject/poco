@@ -84,20 +84,21 @@ void ImageButtonCellRenderer::renderHead(const Renderable* pRenderable, const Re
 void ImageButtonCellRenderer::writeHTML(const ImageButtonCell* pButtonCell, bool showTxt, std::ostream& ostr)
 {
 	Image::Ptr ptrImg = pButtonCell->getImage();
+	const Poco::WebWidgets::ImageButton* pOwner = static_cast<const Poco::WebWidgets::ImageButton*>(pButtonCell->getOwner());
+	poco_check_ptr (pOwner);
 	ostr << "'<div>";
 	ostr << "<div>";
 	ostr << "<input src=\"" << Utility::safe(ptrImg->getURI().toString()) << "\"";
-	if (!ptrImg->getName().empty())
-		ostr << " name=\"" << ptrImg->getName() << "\"";
-	if (ptrImg->getWidth() > 0)
-		ostr << " width=\"" << ptrImg->getWidth() << "\"";
-	if (ptrImg->getHeight() > 0)
-		ostr << " height=\"" << ptrImg->getHeight() << "\"";
-	std::string tooltip = ptrImg->getToolTip();
+	if (!pOwner->getName().empty())
+		ostr << " name=\"" << pOwner->getName() << "\"";
+	if (pOwner->getWidth() > 0)
+		ostr << " width=\"" << pOwner->getWidth() << "\"";
+	if (pOwner->getHeight() > 0)
+		ostr << " height=\"" << pOwner->getHeight() << "\"";
+	std::string tooltip = pOwner->getToolTip();
 	if (!tooltip.empty())
 		ostr << " alt=\"" << Utility::safe(tooltip) << "\"";
-	const Poco::WebWidgets::ImageButton* pOwner = static_cast<const Poco::WebWidgets::ImageButton*>(pButtonCell->getOwner());
-	poco_check_ptr (pOwner);
+
 	if (pOwner->buttonClicked.hasJavaScriptCode())
 	{
 		ostr << " onclick=\"";
