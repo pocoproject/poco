@@ -56,11 +56,14 @@ class WebWidgets_API SubmitButton: public Button
 public:
 	typedef Poco::AutoPtr<SubmitButton> Ptr;
 
-	SubmitButton(const std::string& name);
-		/// Creates a SubmitButton with the given name.
-
 	SubmitButton();
 		/// Creates an anonymous SubmitButton.
+		
+	SubmitButton(const std::string& name);
+		/// Creates a SubmitButton with the given name.
+		
+	SubmitButton(const std::string& name, const std::string& lblTxt);
+		/// Creates a SubmitButton with the given name and label text.
 
 protected:
 	SubmitButton(const std::string& name, const std::type_info& type);

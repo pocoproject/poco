@@ -1542,6 +1542,35 @@ void ExtJSTest::testGridLayout()
 }
 
 
+void ExtJSTest::testGridLayout2()
+{
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
+	LookAndFeel::Ptr laf(new LookAndFeel());
+	webApp.setLookAndFeel(laf);
+	RenderContext context(*laf, webApp);
+	Utility::initialize(laf);
+
+	Page::Ptr ptr = new Page("test");
+	webApp.setCurrentPage(ptr);
+	GridLayout::Ptr pHor(new GridLayout(5,2));
+	pHor->setHorizontalPadding(30);
+	pHor->setVerticalPadding(15);
+	pHor->add(new Label("", "txt"));
+	pHor->add(new Button("b1", "But1"));
+	pHor->add(new Button("b2", "But2"));
+	pHor->add(new Button("b3", "But3"));
+	pHor->add(new Button("b4", "But4"));
+	ptr->add(pHor);
+	std::ostringstream ostr;
+	std::ofstream fstr("testGridLayout.html");
+	TeeOutputStream out(ostr);
+	out.addStream(fstr);
+	ptr->renderHead(context, out);
+	ptr->renderBody(context, out);
+	std::string result = ostr.str();
+}
+
+
 void ExtJSTest::setUp()
 {
 }
@@ -1598,6 +1627,7 @@ CppUnit::Test* ExtJSTest::suite()
 	CppUnit_addTest(pSuite, ExtJSTest, testPanelShowHide);
 	CppUnit_addTest(pSuite, ExtJSTest, testHorizontalLayout);
 	CppUnit_addTest(pSuite, ExtJSTest, testGridLayout);
+	CppUnit_addTest(pSuite, ExtJSTest, testGridLayout2);
 	CppUnit_addTest(pSuite, ExtJSTest, testVerticalLayout);
 
 	return pSuite;

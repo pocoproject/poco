@@ -42,6 +42,7 @@
 
 #include "Poco/WebWidgets/TextFieldCell.h"
 #include "Poco/WebWidgets/TimeField.h"
+#include "Poco/DateTime.h"
 
 
 namespace Poco {
@@ -65,8 +66,15 @@ public:
 
 	void setFormat(TimeField::Format fmt);
 		/// Sets the time format
+		
+	void setTime(const Poco::DateTime& dt);
+		/// Sets the date
+
+	const Poco::DateTime& getTime() const;
+		/// returns the time if set, otherwise an exception, use getValue().empty() to check if it is valid
 
 private:
+	std::string       _format;
 	TimeField::Format _fmt;
 };
 
@@ -77,9 +85,15 @@ inline TimeField::Format TimeFieldCell::getFormat() const
 }
 
 
-inline void TimeFieldCell::setFormat(TimeField::Format fmt)
+inline void TimeFieldCell::setTime(const Poco::DateTime& dt)
 {
-	_fmt = fmt;
+	setValue(dt);
+}
+
+
+inline const Poco::DateTime& TimeFieldCell::getTime() const
+{
+	return RefAnyCast<Poco::DateTime>(getValue());
 }
 
 

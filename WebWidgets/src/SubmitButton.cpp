@@ -66,6 +66,13 @@ SubmitButton::SubmitButton(const std::type_info& type):
 }
 
 
+SubmitButton::SubmitButton(const std::string& name, const std::string& lbl):
+	Button(name, typeid(SubmitButton), new SubmitButtonCell(this))
+{
+	setText(lbl);
+}
+
+
 SubmitButton::SubmitButton(const std::string& name):
 	Button(name, typeid(SubmitButton), new SubmitButtonCell(this))
 {

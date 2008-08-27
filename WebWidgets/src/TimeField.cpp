@@ -43,26 +43,34 @@ namespace WebWidgets {
 
 
 TimeField::TimeField(const std::string& name, const std::type_info& type):
-	TextField(name, type, new TimeFieldCell(this))
+	TextField(name, type, new TimeFieldCell(this)),
+	_pMyCell(0)
 {
+	_pMyCell = cell<TimeFieldCell>();
 }
 
 
 TimeField::TimeField(const std::type_info& type):
-	TextField(type, new TimeFieldCell(this))
+	TextField(type, new TimeFieldCell(this)),
+	_pMyCell(0)
 {
+	_pMyCell = cell<TimeFieldCell>();
 }
 
 
 TimeField::TimeField(const std::string& name):
-	TextField(name, typeid(TimeField), new TimeFieldCell(this))
+	TextField(name, typeid(TimeField), new TimeFieldCell(this)),
+	_pMyCell(0)
 {
+	_pMyCell = cell<TimeFieldCell>();
 }
 
 
 TimeField::TimeField():
-	TextField(typeid(TimeField), new TimeFieldCell(this))
+	TextField(typeid(TimeField), new TimeFieldCell(this)),
+	_pMyCell(0)
 {
+	_pMyCell = cell<TimeFieldCell>();
 }
 
 
@@ -73,13 +81,25 @@ TimeField::~TimeField()
 
 TimeField::Format TimeField::getFormat() const
 {
-	return cell<TimeFieldCell>()->getFormat();
+	return _pMyCell->getFormat();
 }
 
 
 void TimeField::setFormat(TimeField::Format fmt)
 {
-	cell<TimeFieldCell>()->setFormat(fmt);
+	_pMyCell->setFormat(fmt);
+}
+
+
+void TimeField::setTime(const Poco::DateTime& dt)
+{
+	_pMyCell->setTime(dt);
+}
+
+
+const Poco::DateTime& TimeField::getTime() const
+{
+	return _pMyCell->getTime();
 }
 
 

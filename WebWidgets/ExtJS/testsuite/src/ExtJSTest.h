@@ -88,6 +88,7 @@ public:
 	void testHorizontalLayout();
 	void testVerticalLayout();
 	void testGridLayout();
+	void testGridLayout2();
 	void setUp();
 	void tearDown();
 

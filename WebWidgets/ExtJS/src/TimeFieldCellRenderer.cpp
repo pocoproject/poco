@@ -94,7 +94,7 @@ void TimeFieldCellRenderer::writeCellProperties(const TimeFieldCell* pCell, std:
 	else if (fmt == TimeField::FMT_AMPM_WITHSECONDS)
 		ostr << ",format:" << fmtAmPms;
 	else
-		; // this is the default
+		; // this is the default	
 }
 
 

@@ -115,8 +115,6 @@ void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext
 
 void LayoutRenderer::visitChildren(const Layout* pLayout, int cols, int horPad, int vertPad, const RenderContext& context, std::ostream& ostr)
 {
-	ContainerView::ConstIterator it = pLayout->begin();
-	int cnt(0);
 	std::string padHor;
 	
 	if (horPad > 0)
@@ -133,10 +131,11 @@ void LayoutRenderer::visitChildren(const Layout* pLayout, int cols, int horPad, 
 		pad << "<p style=\"margin-top:" << vertPad << "px\"></p>";
 		padVert = pad.str();
 	}
-	
+	ContainerView::ConstIterator it = pLayout->begin();
+	int cnt(0);	
 	for (; it != pLayout->end(); ++it, ++cnt)
 	{
-		if (it != pLayout->begin())
+		if (cnt > 0)
 		{
 			ostr << ",";
 			if (cnt < cols && !padHor.empty())

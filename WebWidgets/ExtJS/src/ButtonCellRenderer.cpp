@@ -114,17 +114,9 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 		{
 			ostr << ",listeners:{";
 			Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked, &ButtonCellRenderer::createClickServerCallback, pOwner);
-			/*
-			if (pOwner->buttonClicked.willDoServerCallback())
-				Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates(),
-										createClickServerCallback(pOwner), pOwner->buttonClicked.getServerCallbackPos());
-			else
-				Utility::writeJSEvent(ostr, EV_CLICK, pOwner->buttonClicked.jsDelegates());*/
 			ostr << "}";
 		}
 	}
-	
-	
 
 	std::string toolTip(pButtonCell->getToolTip());
 	if (!toolTip.empty())

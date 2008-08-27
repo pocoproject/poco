@@ -148,4 +148,10 @@ void TextField::fireTextChanged(void* pSender)
 }
 
 
+const std::string& TextField::getContent() const
+{
+	return RefAnyCast<std::string>(this->getCell()->getValue());
+}
+
+
 } } // namespace Poco::WebWidgets

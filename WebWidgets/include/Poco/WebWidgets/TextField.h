@@ -83,7 +83,13 @@ public:
 
 	void fireTextChanged(void* pSender);
 		/// Fires the textChanged event.
+		
+	const std::string& getContent() const;
+		/// returns the text content of the TextField. Same value as returned by getText(),getString()
 
+	void setContent(const std::string& txt);
+		/// Sets the content
+		
 protected:
 	TextField(const std::string& name, const std::type_info& type);
 		/// Creates a TextField and assigns it the given name.
@@ -106,6 +112,12 @@ protected:
 	void init(Cell::Ptr pCell);
 		/// Common init code for all ctors.
 };
+
+
+inline void TextField::setContent(const std::string& txt)
+{
+	setString(txt);
+}
 
 
 } } // namespace Poco::WebWidgets

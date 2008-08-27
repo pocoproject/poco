@@ -44,8 +44,12 @@
 
 
 namespace Poco {
+	class DateTime;
 namespace WebWidgets {
 
+
+	class TimeFieldCell;
+	
 
 class WebWidgets_API TimeField: public TextField
 	/// A TimeField
@@ -72,6 +76,13 @@ public:
 
 	void setFormat(TimeField::Format fmt);
 		/// Sets the time format
+		
+	void setTime(const Poco::DateTime& dt);
+		/// Sets the date
+
+	const Poco::DateTime& getTime() const;
+		/// returns the time if set, otherwise an exception, use getValue().empty() to check if it is valid
+		
 
 protected:
 	TimeField(const std::string& name, const std::type_info& type);
@@ -83,6 +94,8 @@ protected:
 	~TimeField();
 		/// Destroys the TimeField.
 
+private:
+	TimeFieldCell* _pMyCell;
 };
 
 

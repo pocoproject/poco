@@ -87,7 +87,7 @@ void ImageButtonCellRenderer::writeHTML(const ImageButtonCell* pButtonCell, bool
 	const Poco::WebWidgets::ImageButton* pOwner = static_cast<const Poco::WebWidgets::ImageButton*>(pButtonCell->getOwner());
 	poco_check_ptr (pOwner);
 	ostr << "'<div>";
-	ostr << "<div>";
+	ostr << "<div><center>";
 	ostr << "<input src=\"" << Utility::safe(ptrImg->getURI().toString()) << "\"";
 	if (!pOwner->getName().empty())
 		ostr << " name=\"" << pOwner->getName() << "\"";
@@ -107,7 +107,7 @@ void ImageButtonCellRenderer::writeHTML(const ImageButtonCell* pButtonCell, bool
 		ostr << "\"";
 	}
 	ostr << " type=\"image\"/>";
-	ostr << "</div>";
+	ostr << "</center></div>";
 	std::string txt(pOwner->getText());
 	if (showTxt && !txt.empty())
 		ostr << "<div><center>" << Utility::safe(pButtonCell->getOwner()->getText()) << "</center></div>";

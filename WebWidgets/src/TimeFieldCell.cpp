@@ -35,6 +35,7 @@
 
 
 #include "Poco/WebWidgets/TimeFieldCell.h"
+#include "Poco/WebWidgets/DateFormatter.h"
 
 
 namespace Poco {
@@ -43,13 +44,34 @@ namespace WebWidgets {
 
 TimeFieldCell::TimeFieldCell(View* pOwner):
 	TextFieldCell(pOwner, typeid(TimeFieldCell)),
+	_format("%h:%M %A"),
 	_fmt(TimeField::FMT_AMPM)
 {
+	setFormatter(new DateFormatter(_format));
 }
 
 
 TimeFieldCell::~TimeFieldCell()
 {
+}
+
+
+
+void TimeFieldCell::setFormat(TimeField::Format fmt)
+{
+	if (_fmt != fmt)
+	{
+		_fmt = fmt;
+		if (_fmt == TimeField::FMT_AMPM)
+			_format = "%h:%M %A";
+		else if (_fmt == TimeField::FMT_24H)
+			_format = "%H:%M";
+		else if (_fmt == TimeField::FMT_AMPM_WITHSECONDS)
+			_format = "%h:%M:%S %A";
+		else if (_fmt == TimeField::FMT_24H_WITHSECONDS)
+			_format = "%H:%M:%S";
+		setFormatter(new DateFormatter(_format));	
+	}
 }
 
 

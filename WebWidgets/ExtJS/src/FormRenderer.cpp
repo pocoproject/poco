@@ -63,7 +63,7 @@ void FormRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 
 	ostr << "new Ext.FormPanel({id:'" << pForm->id() << "',";
 
-	ostr << "onSubmit:Ext.emptyFn,submit:function(){this.getEl().dom.submit();},";
+	//ostr << "onSubmit:Ext.emptyFn,submit:function(){this.getEl().dom.submit();},";
 	if (pForm->getMethod() == Form::METHOD_POST)
 		ostr << "method:'POST',";
 	ostr << "title:'" << pForm->getName() << "',autoHeight:true,autoWidth:true,url:'" << pForm->getURI().toString() << "',frame:true,items:[";
