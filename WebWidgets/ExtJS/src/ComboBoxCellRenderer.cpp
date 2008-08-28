@@ -118,6 +118,10 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	ostr << "})";
 	pCell->beforeLoad += Poco::delegate(&ComboBoxCellRenderer::onLoad);
 	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pOwner->id()), pCell);
+	if (!pOwner->getName().empty())
+	{
+		WebApplication::instance().registerFormProcessor(pOwner->getName(), const_cast<ComboBoxCell*>(pCell));
+	}
 }
 
 

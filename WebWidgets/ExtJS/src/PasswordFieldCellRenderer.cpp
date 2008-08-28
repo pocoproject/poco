@@ -39,6 +39,7 @@
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/PasswordFieldCell.h"
+#include "Poco/WebWidgets/WebApplication.h"
 
 
 namespace Poco {
@@ -67,6 +68,10 @@ void PasswordFieldCellRenderer::renderHead(const Renderable* pRenderable, const 
 
 	TextFieldCellRenderer::writeCellProperties(pCell, ostr);
 	ostr << "})";
+	if (pCell->getOwner() && !pCell->getOwner()->getName().empty())
+	{
+		WebApplication::instance().registerFormProcessor(pCell->getOwner()->getName(), const_cast<PasswordFieldCell*>(pCell));
+	}
 }
 
 

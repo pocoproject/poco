@@ -41,9 +41,11 @@
 #include "Poco/WebWidgets/Page.h"
 #include "Poco/WebWidgets/RenderContext.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
+#include "Poco/WebWidgets/SubmitButtonCell.h"
 #include "Poco/WebWidgets/WebWidgetsException.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/NumberParser.h"
 #include "Poco/URI.h"
 #include "Poco/ThreadLocal.h"
 #include <sstream>
@@ -89,6 +91,11 @@ void RequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::
 		if (!form.empty())
 		{
 			handleForm(form);
+		}
+		Poco::Net::NameValueCollection::ConstIterator it = form.find(Form::FORM_ID);
+		if (it != form.end())
+		{
+			_pApp->notifySubmitButton(Poco::NumberParser::parse(it->second));
 		}
 		handlePageRequest(request, response);
 	}
@@ -144,7 +151,12 @@ void RequestHandler::handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Po
 		response.send();
 		return;
 	}
-
+	SubmitButtonCell* pCell = dynamic_cast<SubmitButtonCell*>(pProc);
+	if (pCell) // hide click event from submitbuttons
+	{
+		response.send();
+		return;
+	}
 	try
 	{
 		pProc->handleAjaxRequest(args, response);

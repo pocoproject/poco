@@ -67,13 +67,14 @@ void FormRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	if (pForm->getMethod() == Form::METHOD_POST)
 		ostr << "method:'POST',";
 	ostr << "title:'" << pForm->getName() << "',autoHeight:true,autoWidth:true,url:'" << pForm->getURI().toString() << "',frame:true,items:[";
+	//we need to add a hidden entry that contains the Form::FORM_ID plus its id
+	ostr << "new Ext.form.Hidden({name:'" << Form::FORM_ID << "', value:" << pForm->id() << "})";
 	
 	ContainerView::ConstIterator it = pForm->begin();
 	ContainerView::ConstIterator itEnd = pForm->end();
 	for (; it != itEnd; ++it)
 	{
-		if (it != pForm->begin())
-			ostr << ",";
+		ostr << ",";
 		// it points to a view pointer
 		(*it)->renderHead(context, ostr);
 		

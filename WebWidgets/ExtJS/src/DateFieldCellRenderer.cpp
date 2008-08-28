@@ -39,6 +39,7 @@
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/DateFieldCell.h"
+#include "Poco/WebWidgets/WebApplication.h"
 
 
 namespace Poco {
@@ -67,6 +68,10 @@ void DateFieldCellRenderer::renderHead(const Renderable* pRenderable, const Rend
 	DateFieldCellRenderer::writeCellProperties(pCell, ostr);
 
 	ostr << "})";
+	if (pCell->getOwner() && !pCell->getOwner()->getName().empty())
+	{
+		WebApplication::instance().registerFormProcessor(pCell->getOwner()->getName(), const_cast<DateFieldCell*>(pCell));
+	}
 }
 
 

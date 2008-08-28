@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/WebWidgets.h"
+#include "Poco/WebWidgets/Form.h"
 #include "Poco/WebWidgets/Page.h"
 #include "Poco/WebWidgets/LookAndFeel.h"
 #include "Poco/WebWidgets/ResourceManager.h"
@@ -58,6 +59,7 @@ namespace WebWidgets {
 
 
 class RequestProcessor;
+class SubmitButtonCell;
 
 
 class WebWidgets_API WebApplication
@@ -116,11 +118,20 @@ public:
 		
 	static std::string clientHostName();
 		/// Returns the host name of the caller
+		
+	void notifySubmitButton(Renderable::ID formId);
+		/// triggers the click event of the submitbutton
+		/// required because click event and POST happens in parallel
+		/// and we want click to be triggered after POST
+private:
+	static Form::Ptr insideForm(const View* pChild);
+	
 private:
 	WebApplication(const WebApplication&);
 	WebApplication& operator = (const WebApplication&);
 	
 	typedef std::map<std::string, RequestProcessor* > RequestProcessorMap;
+	typedef std::map<Renderable::ID, SubmitButtonCell*> SubmitButtons;
 	
 	ResourceManager::Ptr _pResource;
 	LookAndFeel::Ptr _pLookAndFeel;
@@ -128,6 +139,7 @@ private:
 	Poco::URI _uri;
 	RequestProcessorMap _requestProcessorMap;
 	RequestProcessorMap _ajaxProcessorMap;
+	SubmitButtons       _submitButtons;
 	static Poco::ThreadLocal<WebApplication*> _pInstance;
 	static Poco::ThreadLocal<std::string> _clientMachine;
 };

@@ -54,6 +54,8 @@ class WebWidgets_API Form: public ContainerView
 public:
 	typedef Poco::AutoPtr<Form> Ptr;
 	
+	static const std::string FORM_ID;
+	
 	Form(const Poco::URI& uri);
 		/// Creates an anonymous Form.
 

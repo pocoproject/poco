@@ -41,6 +41,7 @@ namespace Poco {
 namespace WebWidgets {
 
 
+const std::string Form::FORM_ID("__form__");
 const std::string Form::METHOD_GET("GET");
 const std::string Form::METHOD_POST("POST");
 const std::string Form::ENCODING_URL("application/x-www-form-urlencoded");

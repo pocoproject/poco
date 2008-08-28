@@ -36,8 +36,11 @@
 
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
+#include "Poco/WebWidgets/SubmitButtonCell.h"
+#include "Poco/WebWidgets/WebWidgetsException.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/NumberFormatter.h"
 
 
 namespace Poco {
@@ -119,6 +122,16 @@ RequestProcessor* WebApplication::getFormProcessor(const std::string& fieldName)
 
 void WebApplication::registerAjaxProcessor(const std::string& id, RequestProcessor* pProc)
 {
+	SubmitButtonCell* pCell = dynamic_cast<SubmitButtonCell*>(pProc);
+	if (pCell)
+	{
+		Form::Ptr pForm = insideForm(pCell->getOwner());
+		if (!pForm)
+			throw Poco::WebWidgets::WebWidgetsException("submitButton without outer Form detected");
+		std::pair<SubmitButtons::iterator, bool> res = _submitButtons.insert(std::make_pair(pForm->id(), pCell));
+		if (!res.second)
+			res.first->second = pCell;
+	}	
 	std::pair<RequestProcessorMap::iterator, bool> res = _ajaxProcessorMap.insert(std::make_pair(id, pProc));
 	if (!res.second)
 		res.first->second = pProc;
@@ -155,6 +168,33 @@ void WebApplication::handleForm(const Poco::Net::HTMLForm& form)
 		itR->second->handleForm(itR->first, empty);
 	}
 	_requestProcessorMap.clear();
+}
+
+
+void WebApplication::notifySubmitButton(Renderable::ID id)
+{
+	SubmitButtons::iterator it = _submitButtons.find(id);
+	if (it == _submitButtons.end())
+		throw WebWidgetsException("failed to find submitButton with id " + Poco::NumberFormatter::format(id));
+		
+	it->second->buttonClicked(this);
+	_submitButtons.erase(it);
+}
+
+
+
+Form::Ptr WebApplication::insideForm(const View* pChild)
+{
+	Form::Ptr ptr;
+
+	while (pChild && !ptr)
+	{
+		View::Ptr ptrView = pChild->parent();
+		ptr = ptrView.cast<Form>();
+		pChild = ptrView;
+	}
+
+	return ptr;
 }
 
 
