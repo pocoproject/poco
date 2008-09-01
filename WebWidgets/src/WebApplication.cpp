@@ -41,6 +41,7 @@
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
 
 
 namespace Poco {
@@ -77,8 +78,11 @@ void WebApplication::setLookAndFeel(LookAndFeel::Ptr pLookAndFeel)
 void WebApplication::setCurrentPage(Page::Ptr pPage)
 {
 	_pCurrentPage = pPage;
-	_requestProcessorMap.clear();
+	_formMap.clear();
 	_ajaxProcessorMap.clear();
+	_submitButtons.clear();
+	while (!_forms.empty())
+		_forms.pop();
 }
 
 
@@ -103,20 +107,47 @@ std::string WebApplication::clientHostName()
 }
 
 
+void WebApplication::beginForm(const Form& form)
+{
+	if (!_forms.empty())
+		throw WebWidgetsException("nested forms not allowed");
+	_forms.push(form.id());
+	_formMap.insert(std::make_pair(form.id(), RequestProcessorMap()));
+}
+		
+
 void WebApplication::registerFormProcessor(const std::string& fieldName, RequestProcessor* pProc)
 {
-	std::pair<RequestProcessorMap::iterator, bool> res = _requestProcessorMap.insert(std::make_pair(fieldName, pProc));
-	if (!res.second)
-		res.first->second = pProc;
+	// per default we register everyting that has a name as form processor
+	if (!_forms.empty())
+	{
+		FormMap::iterator itForm = _formMap.find(_forms.top());
+		poco_assert (itForm != _formMap.end());
+		std::pair<RequestProcessorMap::iterator, bool> res = itForm->second.insert(std::make_pair(fieldName, pProc));
+		if (!res.second)
+			res.first->second = pProc;
+	}
 }
 
 
-RequestProcessor* WebApplication::getFormProcessor(const std::string& fieldName)
+RequestProcessor* WebApplication::getFormProcessor(Renderable::ID formId, const std::string& fieldName)
 {
-	RequestProcessorMap::iterator it = _requestProcessorMap.find(fieldName);
-	if (it == _requestProcessorMap.end())
+	FormMap::iterator itForm = _formMap.find(formId);
+	if (itForm == _formMap.end())
+		return 0;
+		
+	RequestProcessorMap::iterator it = itForm->second.find(fieldName);
+	if (it == itForm->second.end())
 		return 0;
 	return it->second;
+}
+
+
+void WebApplication::endForm(const Form& form)
+{
+	poco_assert_dbg (_forms.size() == 1);
+	poco_assert_dbg (_forms.top() == form.id());
+	_forms.pop();
 }
 
 
@@ -125,10 +156,9 @@ void WebApplication::registerAjaxProcessor(const std::string& id, RequestProcess
 	SubmitButtonCell* pCell = dynamic_cast<SubmitButtonCell*>(pProc);
 	if (pCell)
 	{
-		Form::Ptr pForm = insideForm(pCell->getOwner());
-		if (!pForm)
+		if (_forms.empty())
 			throw Poco::WebWidgets::WebWidgetsException("submitButton without outer Form detected");
-		std::pair<SubmitButtons::iterator, bool> res = _submitButtons.insert(std::make_pair(pForm->id(), pCell));
+		std::pair<SubmitButtons::iterator, bool> res = _submitButtons.insert(std::make_pair(_forms.top(), pCell));
 		if (!res.second)
 			res.first->second = pCell;
 	}	
@@ -149,25 +179,31 @@ RequestProcessor* WebApplication::getAjaxProcessor(const std::string& id)
 
 void WebApplication::handleForm(const Poco::Net::HTMLForm& form)
 {
-	Poco::Net::NameValueCollection::ConstIterator it = form.begin();
+	Renderable::ID formID = Poco::NumberParser::parse(form.get(Form::FORM_ID));
+	FormMap::iterator itForm = _formMap.find(formID);
+	if (itForm == _formMap.end())
+		throw Poco::NotFoundException("unknown form id");
+		
+	Poco::Net::NameValueCollection::ConstIterator it = form.begin();	
+	RequestProcessorMap& processors = itForm->second;
 	for (;it != form.end(); ++it)
 	{
 		const std::string& key = it->first;
-		RequestProcessorMap::iterator itR = _requestProcessorMap.find(key);
-		if (itR != _requestProcessorMap.end())
+		RequestProcessorMap::iterator itR = processors.find(key);
+		if (itR != processors.end())
 		{
 			itR->second->handleForm(key, it->second);
-			_requestProcessorMap.erase(itR);
+			processors.erase(itR);
 		}
 	}
 	//those that are not included are either deselected or empty
-	RequestProcessorMap::iterator itR = _requestProcessorMap.begin();
+	RequestProcessorMap::iterator itR = processors.begin();
 	std::string empty;
-	for (; itR != _requestProcessorMap.end(); ++itR)
+	for (; itR != processors.end(); ++itR)
 	{
 		itR->second->handleForm(itR->first, empty);
 	}
-	_requestProcessorMap.clear();
+	processors.clear();
 }
 
 
@@ -179,22 +215,6 @@ void WebApplication::notifySubmitButton(Renderable::ID id)
 		
 	it->second->buttonClicked(this);
 	_submitButtons.erase(it);
-}
-
-
-
-Form::Ptr WebApplication::insideForm(const View* pChild)
-{
-	Form::Ptr ptr;
-
-	while (pChild && !ptr)
-	{
-		View::Ptr ptrView = pChild->parent();
-		ptr = ptrView.cast<Form>();
-		pChild = ptrView;
-	}
-
-	return ptr;
 }
 
 

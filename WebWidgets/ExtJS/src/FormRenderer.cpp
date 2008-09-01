@@ -37,6 +37,7 @@
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/Form.h"
 #include "Poco/WebWidgets/Button.h"
+#include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/NumberFormatter.h"
 
 
@@ -60,7 +61,8 @@ void FormRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::Form));
 	const Form* pForm = static_cast<const Poco::WebWidgets::Form*>(pRenderable);
-
+	WebApplication& theApp = WebApplication::instance();
+	theApp.beginForm(*pForm);
 	ostr << "new Ext.FormPanel({id:'" << pForm->id() << "',";
 
 	//ostr << "onSubmit:Ext.emptyFn,submit:function(){this.getEl().dom.submit();},";
@@ -80,7 +82,7 @@ void FormRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		
 	}
 	ostr << "]})";
-	//ostr << varName << ".render('p" << pForm->id() << "');";
+	theApp.endForm(*pForm);
 }
 
 

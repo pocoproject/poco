@@ -48,13 +48,16 @@
 #include "Poco/ThreadLocal.h"
 #include "Poco/URI.h"
 #include <map>
+#include <stack>
 
 
 namespace Poco {
+
 	namespace Net {
 		class HTMLForm;
 		class HTTPServerRequest;
 	}
+	
 namespace WebWidgets {
 
 
@@ -89,14 +92,21 @@ public:
 		
 	ResourceManager::Ptr getResourceManager() const;
 		/// Gets the ResourceManager
-
+		
+	void beginForm(const Form& form);
+		// Notifies the WebApplication that a form starts
+		
 	void registerFormProcessor(const std::string& fieldName, RequestProcessor* pProc);
 		/// Registers a RequestProcessor for a given form field.
+		/// beginForm should have been called soemtimes earlier
+		
+	void endForm(const Form& form);
+		/// Closes the form
 
 	void handleForm(const Poco::Net::HTMLForm& form);
-		///Handles a form
+		///Handles a form. beginForm must be called earlier
 
-	RequestProcessor* getFormProcessor(const std::string& fieldName);
+	RequestProcessor* getFormProcessor(Renderable::ID formId, const std::string& fieldName);
 		/// Returns the requestprocessor or null
 		
 	void registerAjaxProcessor(const std::string& id, RequestProcessor* pProc);
@@ -123,8 +133,6 @@ public:
 		/// triggers the click event of the submitbutton
 		/// required because click event and POST happens in parallel
 		/// and we want click to be triggered after POST
-private:
-	static Form::Ptr insideForm(const View* pChild);
 	
 private:
 	WebApplication(const WebApplication&);
@@ -132,16 +140,19 @@ private:
 	
 	typedef std::map<std::string, RequestProcessor* > RequestProcessorMap;
 	typedef std::map<Renderable::ID, SubmitButtonCell*> SubmitButtons;
+	typedef std::map<Renderable::ID, RequestProcessorMap> FormMap;
+	typedef std::stack<Renderable::ID> OpenForms;
 	
-	ResourceManager::Ptr _pResource;
-	LookAndFeel::Ptr _pLookAndFeel;
-	Page::Ptr _pCurrentPage;
-	Poco::URI _uri;
-	RequestProcessorMap _requestProcessorMap;
-	RequestProcessorMap _ajaxProcessorMap;
-	SubmitButtons       _submitButtons;
+	ResourceManager::Ptr                      _pResource;
+	LookAndFeel::Ptr                          _pLookAndFeel;
+	Page::Ptr                                 _pCurrentPage;
+	Poco::URI                                 _uri;
+	FormMap                                   _formMap;
+	OpenForms                                 _forms;
+	RequestProcessorMap                       _ajaxProcessorMap;
+	SubmitButtons                             _submitButtons;
 	static Poco::ThreadLocal<WebApplication*> _pInstance;
-	static Poco::ThreadLocal<std::string> _clientMachine;
+	static Poco::ThreadLocal<std::string>     _clientMachine;
 };
 
 
