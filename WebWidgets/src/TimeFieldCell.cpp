@@ -70,6 +70,8 @@ void TimeFieldCell::setFormat(TimeField::Format fmt)
 			_format = "%h:%M:%S %A";
 		else if (_fmt == TimeField::FMT_24H_WITHSECONDS)
 			_format = "%H:%M:%S";
+		else if (_fmt ==  TimeField::FMT_12H)
+			_format = "%H:%M";
 		setFormatter(new DateFormatter(_format));	
 	}
 }

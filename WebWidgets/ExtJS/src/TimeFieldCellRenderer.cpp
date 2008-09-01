@@ -87,12 +87,15 @@ void TimeFieldCellRenderer::writeCellProperties(const TimeFieldCell* pCell, std:
 	static const std::string fmt24h("'H:i'");
 	static const std::string fmt24hs("'H:i:s'");
 	static const std::string fmtAmPms("'h:i:s A'");
+	static const std::string fmt12h("'h:i'");
 	if (fmt == TimeField::FMT_24H)
 		ostr << ",format:" << fmt24h;
 	else if (fmt == TimeField::FMT_24H_WITHSECONDS)
 		ostr << ",format:" << fmt24hs;
 	else if (fmt == TimeField::FMT_AMPM_WITHSECONDS)
 		ostr << ",format:" << fmtAmPms;
+	else if (fmt == TimeField::FMT_12H)
+		ostr << ",format:" << fmt12h << ",minValue:'00:00', maxValue:'11:59'";
 	else
 		; // this is the default	
 }

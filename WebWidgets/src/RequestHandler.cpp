@@ -90,14 +90,43 @@ void RequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::
 		Poco::Net::HTMLForm form(request, request.stream());
 		if (!form.empty())
 		{
-			handleForm(form);
+			try
+			{
+				handleForm(form);
+				Poco::Net::NameValueCollection::ConstIterator it = form.find(Form::FORM_ID);
+				if (it != form.end())
+				{
+					_pApp->notifySubmitButton(Poco::NumberParser::parse(it->second));
+				}
+				response.send();
+			}
+			catch(WebWidgetsException& e)
+			{
+				Poco::Net::HTTPResponse::HTTPStatus code = Poco::Net::HTTPResponse::HTTP_BAD_REQUEST;
+				if (e.code() > code && e.code() <= Poco::Net::HTTPResponse::HTTP_EXPECTATION_FAILED)
+					code = (Poco::Net::HTTPResponse::HTTPStatus)e.code();
+				response.setStatusAndReason(code, e.displayText());
+				response.send();
+			}
+			catch(Poco::Exception& e)
+			{
+				response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.displayText());
+				response.send();
+			}
+			catch(std::exception& e)
+			{
+				response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
+				response.send();
+			}
+			catch(...)
+			{
+				response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "Unknown exception");
+				response.send();
+			}
+			
 		}
-		Poco::Net::NameValueCollection::ConstIterator it = form.find(Form::FORM_ID);
-		if (it != form.end())
-		{
-			_pApp->notifySubmitButton(Poco::NumberParser::parse(it->second));
-		}
-		handlePageRequest(request, response);
+		else
+			handlePageRequest(request, response);
 	}
 	else
 	{

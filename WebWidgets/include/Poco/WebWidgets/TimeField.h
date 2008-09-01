@@ -60,6 +60,7 @@ public:
 	enum Format
 	{
 		FMT_AMPM = 0,
+		FMT_12H,
 		FMT_24H,
 		FMT_AMPM_WITHSECONDS,
 		FMT_24H_WITHSECONDS
