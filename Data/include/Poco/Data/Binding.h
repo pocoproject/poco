@@ -1350,6 +1350,120 @@ private:
 };
 
 
+
+template <class K, class V>
+class Binding<std::pair<K, V> >: public AbstractBinding
+	/// Specialization for std::multimap.
+{
+public:
+	explicit Binding(std::pair<K, V>& val,
+		const std::string& name = "",
+		Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_val(val), 
+		_bound(false)
+		/// Creates the Binding.
+	{
+		reset();
+	}
+
+	~Binding()
+		/// Destroys the Binding.
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return TypeHandler<K>::size() + TypeHandler<V>::size();
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return 1;
+	}
+
+	bool canBind() const
+	{
+		return !_bound;
+	}
+
+	void bind(std::size_t pos)
+	{
+		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(canBind());
+		TypeHandler<K>::bind(pos, _val.first, getBinder(), getDirection());
+		TypeHandler<V>::bind(pos+1, _val.second, getBinder(), getDirection());
+		_bound = true;
+	}
+
+	void reset()
+	{
+		_bound = false;
+	}
+
+private:
+	std::pair<K, V>& _val;
+	bool             _bound;
+};
+
+
+template <class K, class V>
+class CopyBinding<std::pair<K, V> >: public AbstractBinding
+	/// Specialization for std::multimap.
+{
+public:
+	explicit CopyBinding(std::pair<K, V>& val,
+		const std::string& name = "",
+		Direction direction = PD_IN): 
+		AbstractBinding(name, direction), 
+		_pVal(new std::pair<K, V>(val)),
+		_bound(false)
+		/// Creates the Binding.
+	{
+		reset();
+	}
+
+	~CopyBinding()
+		/// Destroys the Binding.
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return TypeHandler<K>::size() + TypeHandler<V>::size();
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return 1;
+	}
+
+	bool canBind() const
+	{
+		return !_bound;
+	}
+
+	void bind(std::size_t pos)
+	{
+		poco_assert_dbg(getBinder() != 0);
+		poco_assert_dbg(canBind());
+		TypeHandler<K>::bind(pos, _pVal->first, getBinder(), getDirection());
+		TypeHandler<V>::bind(pos+1, _pVal->second, getBinder(), getDirection());
+		_bound = true;;
+	}
+
+	void reset()
+	{
+		_bound = false;
+	}
+
+private:
+	typedef typename TypeWrapper<std::pair<K, V> >::TYPE ValueType;
+	SharedPtr<ValueType> _pVal;
+	bool         _bound;
+};
+
+
 namespace Keywords {
 
 

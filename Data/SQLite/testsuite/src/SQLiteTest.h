@@ -119,6 +119,7 @@ public:
 
 	void testAny();
 	void testDynamicAny();
+	void testPair();
 
 	void testSQLChannel();
 	void testSQLLogger();

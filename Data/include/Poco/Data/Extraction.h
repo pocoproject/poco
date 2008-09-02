@@ -764,6 +764,61 @@ private:
 };
 
 
+
+template <class K, class V>
+class Extraction<std::pair<K, V> >: public AbstractExtraction
+	/// Map Data Type specialization for extraction of values from a query result set.
+{
+public:
+	Extraction(std::pair<K, V>& result, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(result), 
+		_default()
+	{
+	}
+
+	Extraction(std::pair<K, V>& result, const std::pair<K, V>& def, const Position& pos = Position(0)): 
+		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(result), 
+		_default(def)
+	{
+	}
+
+	~Extraction()
+	{
+	}
+
+	std::size_t numOfColumnsHandled() const
+	{
+		return TypeHandler<K>::size() + TypeHandler<V>::size();
+	}
+
+	std::size_t numOfRowsHandled() const
+	{
+		return 1;
+	}
+
+	std::size_t numOfRowsAllowed() const
+	{
+		return getLimit();
+	}
+
+	std::size_t extract(std::size_t pos)
+	{
+		TypeHandler<std::pair<K, V> >::extract(pos, _rResult, _default, getExtractor());
+		return 1u;
+	}
+
+	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	{
+		return new Prepare<V>(pPrep, pos, _default);
+	}
+
+private:
+	std::pair<K, V>& _rResult;
+	std::pair<K, V>  _default;
+};
+
 namespace Keywords {
 
 

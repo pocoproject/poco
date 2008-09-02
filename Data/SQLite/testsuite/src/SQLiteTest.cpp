@@ -2046,6 +2046,42 @@ void SQLiteTest::testDynamicAny()
 }
 
 
+
+
+void SQLiteTest::testPair()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (tmp.isConnected());
+	std::string tableName("Simpsons");
+	std::pair<std::string, int> junior = std::make_pair("Junior", 12);
+	std::pair<std::string, int> senior = std::make_pair("Senior", 99);
+	
+
+	int count = 0;
+	std::string result;
+
+	tmp << "DROP TABLE IF EXISTS Simpsons", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Simpsons (LastName VARCHAR(30), Age INTEGER(3))", now;
+	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
+	assert (result == tableName);
+
+
+	// these are fine
+	tmp << "INSERT INTO Simpsons VALUES(?, ?)", use(junior), now;
+	tmp << "INSERT INTO Simpsons VALUES(?, ?)", useRef(senior), now;
+
+	tmp << "SELECT COUNT(*) FROM Simpsons", into(count), now;
+	assert (2 == count);
+	
+	std::vector<std::pair<std::string, int> > ret;
+	tmp << "SELECT * FROM Simpsons", into(ret), range(2,2), now;
+	assert (ret[0].second == 12 || ret[1].second == 12);
+	assert (ret[0].second == 99 || ret[1].second == 99);
+	assert (ret[0].first == "Junior" || ret[1].first == "Junior");
+	assert (ret[0].first == "Senior" || ret[1].first == "Senior");
+	
+}
+
 void SQLiteTest::testSQLChannel()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -2344,6 +2380,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testExternalBindingAndExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testBindingCount);
 	CppUnit_addTest(pSuite, SQLiteTest, testMultipleResults);
+	CppUnit_addTest(pSuite, SQLiteTest, testPair);
 
 	return pSuite;
 }

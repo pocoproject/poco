@@ -1763,6 +1763,44 @@ private:
 	TypeHandler& operator=(const TypeHandler&);
 };
 
+
+
+template <class K, class V>
+class TypeHandler<std::pair<K, V> >: public AbstractTypeHandler
+{
+public:
+	static void bind(std::size_t pos, const std::pair<K, V>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	{
+		TypeHandler<K>::bind(pos, obj.first, pBinder, dir);
+		pos += TypeHandler<K>::size();
+		TypeHandler<V>::bind(pos, obj.second, pBinder, dir);
+	}
+
+	static std::size_t size()
+	{
+		return TypeHandler<K>::size() + TypeHandler<V>::size();
+	}
+
+	static void extract(std::size_t pos, std::pair<K, V>& obj, const std::pair<K, V>& defVal, AbstractExtractor* pExt)
+	{
+		TypeHandler<K>::extract(pos, obj.first, defVal.first, pExt);
+		pos += TypeHandler<K>::size();
+		TypeHandler<V>::extract(pos, obj.second, defVal.second, pExt);
+	}
+
+	static void prepare(std::size_t pos, std::pair<K, V>& obj, AbstractPreparation* pPrepare)
+	{
+		TypeHandler<K>::prepare(pos, obj.first, pPrepare);
+		pos += TypeHandler<K>::size();
+		TypeHandler<V>::prepare(pos, obj.second, pPrepare);
+	}
+
+private:
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator = (const TypeHandler&);
+};
+
+
 } } // namespace Poco::Data
 
 
