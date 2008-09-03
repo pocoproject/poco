@@ -54,8 +54,8 @@ NumberField::NumberField(const std::type_info& type):
 }
 
 
-NumberField::NumberField(const std::string& name):
-	TextField(name, typeid(NumberField), new NumberFieldCell(this))
+NumberField::NumberField(const std::string& name, Formatter::Ptr pF):
+	TextField(name, typeid(NumberField), new NumberFieldCell(this, pF))
 {
 }
 

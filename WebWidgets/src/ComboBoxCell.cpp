@@ -43,7 +43,8 @@ namespace WebWidgets {
 
 
 const std::string ComboBoxCell::FIELD_VAL("val");
-const std::string ComboBoxCell::EV_LOAD("load");
+const std::string ComboBoxCell::EV_LOAD("beforeLoad");
+const std::string ComboBoxCell::EV_AFTERLOAD("afterLoad");
 const std::string ComboBoxCell::EV_SELECTED("sel");
 
 
@@ -92,6 +93,7 @@ void ComboBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args,
 	{
 		Poco::Net::HTTPServerResponse* pResponse = &response;
 		beforeLoad.notify(this, pResponse);
+		// response is handled in beofreLoad callback
 	}
 	else if (ev == EV_SELECTED)
 	{
@@ -101,6 +103,11 @@ void ComboBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args,
 			setSelected(pForm->parse(args[FIELD_VAL]));
 		}
 
+		response.send();
+	}
+	else if (ev == EV_AFTERLOAD)
+	{
+		afterLoad(this);
 		response.send();
 	}
 }

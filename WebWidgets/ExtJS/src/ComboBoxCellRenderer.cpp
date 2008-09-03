@@ -53,6 +53,7 @@ namespace ExtJS {
 
 
 const std::string ComboBoxCellRenderer::EV_SELECTED("select");
+const std::string ComboBoxCellRenderer::EV_AFTERLOAD("load");
 
 
 ComboBoxCellRenderer::ComboBoxCellRenderer()
@@ -76,6 +77,16 @@ JSDelegate ComboBoxCellRenderer::createSelectedServerCallback(const ComboBox* pC
 }
 
 
+Poco::WebWidgets::JSDelegate ComboBoxCellRenderer::createAfterLoadServerCallback(const ComboBox* pCombo)
+{
+	poco_check_ptr (pCombo);
+	static const std::string signature("function(aStore, recs, op)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ComboBoxCell::EV_AFTERLOAD));
+	return Utility::createServerCallback(signature, addParams, pCombo->id(), pCombo->afterLoad.getOnSuccess(), pCombo->afterLoad.getOnFailure());
+}
+
+
 void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
 {
 	poco_assert_dbg (pRenderable != 0);
@@ -95,25 +106,31 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	
 	std::string url(Utility::createURI(addParams, pOwner->id()));
 	ostr << url << "}),";
-	ostr << "reader:new Ext.data.ArrayReader()})";
+	ostr << "reader:new Ext.data.ArrayReader()";
+	if (pComboOwner && pComboOwner->afterLoad.hasJavaScriptCode())
+	{
+		ostr << ",listeners:{";
+		Utility::writeJSEvent(ostr, EV_AFTERLOAD, pComboOwner->afterLoad, &ComboBoxCellRenderer::createAfterLoadServerCallback, pComboOwner);
+		ostr << "}";
+	}
+	ostr << "})"; // end SimpleStore
 	ostr << ",displayField:'d',typeAhead:true,triggerAction:'all'";
 	
 	std::string tooltip (pCell->getToolTip());
 		
-	if (pComboOwner && pComboOwner->selected.hasJavaScriptCode())
+	if (pComboOwner && (pComboOwner->selected.hasJavaScriptCode() || !tooltip.empty()))
 	{
 		ostr << ",listeners:{";
-		Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected, &ComboBoxCellRenderer::createSelectedServerCallback, pComboOwner);
+		bool written = Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected, &ComboBoxCellRenderer::createSelectedServerCallback, pComboOwner);
+
 		if (!tooltip.empty())
-			ostr << ",render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}";
+		{
+			if (written)
+				ostr << ",";
+			ostr << "render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}";
+		}
 		ostr << "}";
 	}
-	else if (!tooltip.empty())
-	{
-		ostr << ",listeners:{";
-		ostr << "render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}}";
-	}
-	
 
 	ostr << "})";
 	pCell->beforeLoad += Poco::delegate(&ComboBoxCellRenderer::onLoad);

@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/TextField.h"
+#include "Poco/WebWidgets/IntFormatter.h"
 
 
 namespace Poco {
@@ -56,7 +57,7 @@ public:
 	NumberField();
 		/// Creates an anonymous NumberField.
 
-	NumberField(const std::string& name);
+	NumberField(const std::string& name, Formatter::Ptr pF = new IntFormatter());
 		/// Creates a named NumberField.
 
 protected:

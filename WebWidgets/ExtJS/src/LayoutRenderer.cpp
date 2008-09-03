@@ -69,6 +69,7 @@ void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext
 		// the parent is not a panel 
 		// assume that the direct parent is a panel
 		ostr << "new Ext.Panel({border:false,bodyBorder:false,";
+		ostr << "id:'" << pLayout->id() << "',";
 		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, horPad, vertPad);
 		ostr << "})";
 	}
@@ -172,9 +173,9 @@ void LayoutRenderer::visitChildren(const Layout* pLayout, int cols, int horPad, 
 		if (*it)
 		{
 			//horizontallayout works only when children are panels
-			ostr << "new Ext.Panel({border:false,bodyBorder:false,items:";
+			ostr << "new Ext.Panel({border:false,bodyBorder:false,items:[";
 			(*it)->renderHead(context, ostr);
-			ostr << "})";
+			ostr << "]})";
 		}
 		else
 			ostr << "{}";

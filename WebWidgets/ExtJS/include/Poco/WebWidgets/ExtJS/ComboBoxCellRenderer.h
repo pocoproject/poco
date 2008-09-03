@@ -60,6 +60,7 @@ class ExtJS_API ComboBoxCellRenderer: public Poco::WebWidgets::Renderer
 {
 public:
 	static const std::string EV_SELECTED;
+	static const std::string EV_AFTERLOAD;
 	
 	ComboBoxCellRenderer();
 		/// Creates the ComboBoxCellRenderer.
@@ -72,7 +73,7 @@ public:
 
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.
-		
+	
 private:
 	static void onLoad(void* pSender, Poco::Net::HTTPServerResponse* &pResponse);
 	
@@ -81,6 +82,9 @@ private:
 	static Poco::WebWidgets::JSDelegate createSelectedServerCallback(const ComboBox* pCombo);
 		/// Adds a server callback for the selected event. The method signature for select is
 		/// select : ( Ext.form.ComboBox combo, Ext.data.Record record, Number index )
+		
+	static Poco::WebWidgets::JSDelegate createAfterLoadServerCallback(const ComboBox* pCombo);
+		/// Create a server callback for afterLoad of ComboBox list 
 };
 
 

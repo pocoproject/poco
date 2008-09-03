@@ -64,6 +64,8 @@ public:
 	
 	JavaScriptEvent<ComboBoxEvent> selected; /// thrown whenever a new element is selected
 	
+	JavaScriptEvent<ComboBoxEvent> afterLoad; // thrown after data was loaded
+	
 	ComboBox();
 		/// Creates the ComboBox.
 

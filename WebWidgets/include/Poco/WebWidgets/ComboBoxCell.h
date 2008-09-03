@@ -59,9 +59,12 @@ public:
 	
 	static const std::string EV_SELECTED;
 	static const std::string EV_LOAD;
+	static const std::string EV_AFTERLOAD;
 	static const std::string FIELD_VAL;
 	
 	Delegate selected;
+	Delegate afterLoad;
+	
 	FIFOEvent<Poco::Net::HTTPServerResponse*> beforeLoad; /// thrown whenever a load is requested
 
 	ComboBoxCell(View* pOwner);
