@@ -128,6 +128,9 @@ protected:
 		
 	void fireSelected(void* pSender);
 		/// Fires the selected event.
+		
+	void fireAfterLoad(void* pSender);
+		/// Fires the afterLoad event.
 };
 
 

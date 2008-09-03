@@ -47,6 +47,7 @@ ComboBox::ComboBox(const std::string& name, const std::type_info& type):
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
 	pCell->selected = delegate(*this, &ComboBox::fireSelected);
+	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
 
@@ -83,6 +84,13 @@ void ComboBox::fireSelected(void* pSender)
 {
 	ComboBoxEvent sel(this);
 	selected(this, sel);
+}
+
+
+void ComboBox::fireAfterLoad(void* pSender)
+{
+	ComboBoxEvent sel(this);
+	afterLoad(this, sel);
 }
 
 

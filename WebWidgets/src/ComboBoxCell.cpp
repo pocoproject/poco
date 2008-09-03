@@ -43,7 +43,7 @@ namespace WebWidgets {
 
 
 const std::string ComboBoxCell::FIELD_VAL("val");
-const std::string ComboBoxCell::EV_LOAD("beforeLoad");
+const std::string ComboBoxCell::EV_LOAD("doLoad");
 const std::string ComboBoxCell::EV_AFTERLOAD("afterLoad");
 const std::string ComboBoxCell::EV_SELECTED("sel");
 
