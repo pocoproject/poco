@@ -70,6 +70,8 @@ void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext
 		// assume that the direct parent is a panel
 		ostr << "new Ext.Panel({border:false,bodyBorder:false,";
 		ostr << "id:'" << pLayout->id() << "',";
+		if (!pLayout->isVisible())
+			ostr << "hidden:true,";
 		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, horPad, vertPad);
 		ostr << "})";
 	}
