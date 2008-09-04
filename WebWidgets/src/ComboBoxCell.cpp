@@ -113,4 +113,14 @@ void ComboBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args,
 }
 
 
+void ComboBoxCell::setSelected(const Any& elem)
+{
+	Poco::Any old;
+	if (hasSelected())
+		old = getSelected();
+	OldNewValue aPair = std::make_pair(old, elem);
+	setValue(elem);
+	selected(this, aPair);
+}
+
 } } // namespace Poco::WebWidgets

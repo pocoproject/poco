@@ -61,8 +61,9 @@ public:
 	typedef Poco::AutoPtr<ComboBox> Ptr;
 
 	typedef Event<ComboBox> ComboBoxEvent;
+	typedef ComboBoxCell::OldNewValue SelectEvent; /// a pair of old, then new value
 	
-	JavaScriptEvent<ComboBoxEvent> selected; /// thrown whenever a new element is selected
+	JavaScriptEvent<const SelectEvent> selected; /// thrown whenever a new element is selected
 	
 	JavaScriptEvent<ComboBoxEvent> afterLoad; // thrown after data was loaded
 	
@@ -126,11 +127,12 @@ protected:
 	~ComboBox();
 		/// Destroys the ComboBox.
 		
-	void fireSelected(void* pSender);
+	void fireSelected(const void* pSender, const SelectEvent& oldNewPair);
 		/// Fires the selected event.
 		
 	void fireAfterLoad(void* pSender);
 		/// Fires the afterLoad event.
+		
 };
 
 

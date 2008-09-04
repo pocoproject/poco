@@ -36,6 +36,7 @@
 
 #include "Poco/WebWidgets/ComboBox.h"
 #include "Poco/WebWidgets/ComboBoxCell.h"
+#include "Poco/Delegate.h"
 
 
 namespace Poco {
@@ -46,7 +47,7 @@ ComboBox::ComboBox(const std::string& name, const std::type_info& type):
 	TextField(name, type, new ComboBoxCell(this))
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
-	pCell->selected = delegate(*this, &ComboBox::fireSelected);
+	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
 	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
@@ -55,7 +56,8 @@ ComboBox::ComboBox(const std::type_info& type):
 	TextField(type, new ComboBoxCell(this))
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
-	pCell->selected = delegate(*this, &ComboBox::fireSelected);
+	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
 
@@ -63,7 +65,8 @@ ComboBox::ComboBox(const std::string& name):
 	TextField(name, typeid(ComboBox), new ComboBoxCell(this))
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
-	pCell->selected = delegate(*this, &ComboBox::fireSelected);
+	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
 
@@ -71,7 +74,8 @@ ComboBox::ComboBox():
 	TextField(typeid(ComboBox), new ComboBoxCell(this))
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
-	pCell->selected = delegate(*this, &ComboBox::fireSelected);
+	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
 
@@ -80,10 +84,9 @@ ComboBox::~ComboBox()
 }
 
 
-void ComboBox::fireSelected(void* pSender)
+void ComboBox::fireSelected(const void* pSender, const ComboBoxCell::OldNewValue& oldNewPair)
 {
-	ComboBoxEvent sel(this);
-	selected(this, sel);
+	selected(this, oldNewPair);
 }
 
 

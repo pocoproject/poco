@@ -56,13 +56,15 @@ class WebWidgets_API ComboBoxCell: public TextFieldCell
 {
 public:
 	typedef Poco::AutoPtr<ComboBoxCell> Ptr;
+	typedef std::pair<Poco::Any, Poco::Any> OldNewValue;
+	
 	
 	static const std::string EV_SELECTED;
 	static const std::string EV_LOAD;
 	static const std::string EV_AFTERLOAD;
 	static const std::string FIELD_VAL;
 	
-	Delegate selected;
+	FIFOEvent<const OldNewValue> selected; /// thrown whenever a new element is selected
 	Delegate afterLoad;
 	
 	FIFOEvent<Poco::Net::HTTPServerResponse*> beforeLoad; /// thrown whenever a load is requested
@@ -174,14 +176,6 @@ inline const std::vector<Any>& ComboBoxCell::getElements() const
 inline void ComboBoxCell::insert(const Any& elem)
 {
 	_elements.push_back(elem);
-}
-
-
-inline void ComboBoxCell::setSelected(const Any& elem)
-	/// Selects the element.
-{
-	setValue(elem);
-	selected(this);
 }
 
 
