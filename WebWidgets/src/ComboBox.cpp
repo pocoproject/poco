@@ -48,6 +48,7 @@ ComboBox::ComboBox(const std::string& name, const std::type_info& type):
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
 	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->beforeSelect += Poco::delegate(this, &ComboBox::fireBeforeSelect);
 	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
@@ -57,6 +58,7 @@ ComboBox::ComboBox(const std::type_info& type):
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
 	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->beforeSelect += Poco::delegate(this, &ComboBox::fireBeforeSelect);
 	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
@@ -66,6 +68,7 @@ ComboBox::ComboBox(const std::string& name):
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
 	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->beforeSelect += Poco::delegate(this, &ComboBox::fireBeforeSelect);
 	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
@@ -75,6 +78,7 @@ ComboBox::ComboBox():
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
 	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->beforeSelect += Poco::delegate(this, &ComboBox::fireBeforeSelect);
 	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
 }
 
@@ -87,6 +91,12 @@ ComboBox::~ComboBox()
 void ComboBox::fireSelected(const void* pSender, const ComboBoxCell::OldNewValue& oldNewPair)
 {
 	selected(this, oldNewPair);
+}
+
+
+void ComboBox::fireBeforeSelect(const void* pSender, const Poco::Any& newValue)
+{
+	beforeSelect(this, newValue);
 }
 
 

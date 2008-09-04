@@ -53,6 +53,7 @@ namespace ExtJS {
 
 
 const std::string ComboBoxCellRenderer::EV_SELECTED("select");
+const std::string ComboBoxCellRenderer::EV_BEFORESELECT("beforeselect");
 const std::string ComboBoxCellRenderer::EV_AFTERLOAD("load");
 
 
@@ -74,6 +75,18 @@ JSDelegate ComboBoxCellRenderer::createSelectedServerCallback(const ComboBox* pC
 	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+rec.get('d')"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ComboBoxCell::EV_SELECTED));
 	return Utility::createServerCallback(signature, addParams, pCombo->id(), pCombo->selected.getOnSuccess(), pCombo->selected.getOnFailure());
+}
+
+
+Poco::WebWidgets::JSDelegate ComboBoxCellRenderer::createBeforeSelectServerCallback(const ComboBox* pCombo)
+{
+	// beforeselect : ( Ext.form.ComboBox combo, Ext.data.Record record, Number index )
+	// return false to forbid it
+	static const std::string signature("function(combo,rec,idx)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+rec.get('d')"));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ComboBoxCell::EV_BEFORESELECT));
+	return Utility::createServerCallback(signature, addParams, pCombo->id(), pCombo->beforeSelect.getOnSuccess(), pCombo->beforeSelect.getOnFailure());
 }
 
 
@@ -118,11 +131,16 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	
 	std::string tooltip (pCell->getToolTip());
 		
-	if (pComboOwner && (pComboOwner->selected.hasJavaScriptCode() || !tooltip.empty()))
+	if (pComboOwner && (pComboOwner->selected.hasJavaScriptCode() || !tooltip.empty() || pComboOwner->beforeSelect.hasJavaScriptCode()))
 	{
 		ostr << ",listeners:{";
 		bool written = Utility::writeJSEvent(ostr, EV_SELECTED, pComboOwner->selected, &ComboBoxCellRenderer::createSelectedServerCallback, pComboOwner);
-
+		if (pComboOwner->beforeSelect.hasJavaScriptCode())
+		{
+			if (written)
+				ostr << ",";
+			written = Utility::writeJSEvent(ostr, EV_BEFORESELECT, pComboOwner->beforeSelect, &ComboBoxCellRenderer::createBeforeSelectServerCallback, pComboOwner);
+		}
 		if (!tooltip.empty())
 		{
 			if (written)

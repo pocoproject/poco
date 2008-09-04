@@ -46,6 +46,7 @@ const std::string ComboBoxCell::FIELD_VAL("val");
 const std::string ComboBoxCell::EV_LOAD("doLoad");
 const std::string ComboBoxCell::EV_AFTERLOAD("afterLoad");
 const std::string ComboBoxCell::EV_SELECTED("sel");
+const std::string ComboBoxCell::EV_BEFORESELECT("befSel");
 
 
 ComboBoxCell::ComboBoxCell(View* pOwner):
@@ -105,6 +106,13 @@ void ComboBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args,
 
 		response.send();
 	}
+	else if (ev == EV_BEFORESELECT)
+	{
+		Formatter::Ptr pForm(getFormatter());
+		Poco::Any newVal = pForm->parse(args[FIELD_VAL]);
+		beforeSelect(this, newVal);
+		response.send();
+	}
 	else if (ev == EV_AFTERLOAD)
 	{
 		afterLoad(this);
@@ -115,6 +123,8 @@ void ComboBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args,
 
 void ComboBoxCell::setSelected(const Any& elem)
 {
+	//don't throw beforeSelect here: it's a web only event
+	//(otherwise we get two beforeSelect events)
 	Poco::Any old;
 	if (hasSelected())
 		old = getSelected();

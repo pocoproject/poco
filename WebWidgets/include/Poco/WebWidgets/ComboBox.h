@@ -63,7 +63,9 @@ public:
 	typedef Event<ComboBox> ComboBoxEvent;
 	typedef ComboBoxCell::OldNewValue SelectEvent; /// a pair of old, then new value
 	
-	JavaScriptEvent<const SelectEvent> selected; /// thrown whenever a new element is selected
+	JavaScriptEvent<const Poco::Any> beforeSelect; /// thrown before a new element is selected
+	
+	JavaScriptEvent<const SelectEvent> selected; /// thrown after a new element is selected
 	
 	JavaScriptEvent<ComboBoxEvent> afterLoad; // thrown after data was loaded
 	
@@ -129,6 +131,9 @@ protected:
 		
 	void fireSelected(const void* pSender, const SelectEvent& oldNewPair);
 		/// Fires the selected event.
+		
+	void fireBeforeSelect(const void* pSender, const Poco::Any& newValue);
+		/// Fires the beforeSelect event.
 		
 	void fireAfterLoad(void* pSender);
 		/// Fires the afterLoad event.

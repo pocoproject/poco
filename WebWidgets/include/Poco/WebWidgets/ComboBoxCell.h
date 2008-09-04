@@ -60,12 +60,15 @@ public:
 	
 	
 	static const std::string EV_SELECTED;
+	static const std::string EV_BEFORESELECT;
 	static const std::string EV_LOAD;
 	static const std::string EV_AFTERLOAD;
 	static const std::string FIELD_VAL;
 	
-	FIFOEvent<const OldNewValue> selected; /// thrown whenever a new element is selected
-	Delegate afterLoad;
+	FIFOEvent<const Poco::Any>   beforeSelect; /// thrown before a new element is selected
+	FIFOEvent<const OldNewValue> selected; /// thrown after a new element is selected
+	
+	Delegate                     afterLoad;
 	
 	FIFOEvent<Poco::Net::HTTPServerResponse*> beforeLoad; /// thrown whenever a load is requested
 
