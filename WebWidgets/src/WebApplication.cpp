@@ -214,7 +214,6 @@ void WebApplication::notifySubmitButton(Renderable::ID id)
 		throw WebWidgetsException("failed to find submitButton with id " + Poco::NumberFormatter::format(id));
 		
 	it->second->buttonClicked(this);
-	_submitButtons.erase(it);
 }
 
 
