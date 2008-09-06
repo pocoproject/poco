@@ -383,6 +383,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ArrayTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\AutoPtrTest.cpp"
 					>
 				</File>
@@ -468,6 +472,10 @@
 				>
 				<File
 					RelativePath=".\src\AnyTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ArrayTest.h"
 					>
 				</File>
 				<File

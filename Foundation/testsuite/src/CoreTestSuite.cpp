@@ -33,6 +33,7 @@
 #include "CoreTestSuite.h"
 #include "CoreTest.h"
 #include "AutoPtrTest.h"
+#include "ArrayTest.h"
 #include "SharedPtrTest.h"
 #include "AutoReleasePoolTest.h"
 #include "ByteOrderTest.h"
@@ -58,7 +59,8 @@ CppUnit::Test* CoreTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("CoreTestSuite");
 
 	pSuite->addTest(CoreTest::suite());
-	pSuite->addTest(AutoPtrTest::suite());
+	pSuite->addTest(ArrayTest::suite());
+	pSuite->addTest(AutoPtrTest::suite());	
 	pSuite->addTest(SharedPtrTest::suite());
 	pSuite->addTest(AutoReleasePoolTest::suite());
 	pSuite->addTest(ByteOrderTest::suite());

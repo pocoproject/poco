@@ -260,6 +260,9 @@
 					RelativePath=".\src\AnyTest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\ArrayTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\AutoPtrTest.cpp">
 				</File>
 				<File
@@ -325,6 +328,9 @@
 				Filter="">
 				<File
 					RelativePath=".\src\AnyTest.h">
+				</File>
+				<File
+					RelativePath=".\src\ArrayTest.h">
 				</File>
 				<File
 					RelativePath=".\src\AutoPtrTest.h">

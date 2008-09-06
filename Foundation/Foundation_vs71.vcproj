@@ -555,6 +555,9 @@
 					RelativePath=".\include\Poco\Any.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Array.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\AutoPtr.h">
 				</File>
 				<File
