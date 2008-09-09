@@ -106,14 +106,19 @@ public:
 		/// Returns all dynamic functions
 		
 	void setPostRenderCode(const std::string& js);
-		/// Adds Javascript code that should be executed after the page code was written. The difference to afterRender
+		/// Sets Javascript code that should be executed after the page code was written. The difference to afterRender
 		/// is that afterRender is a JS Event executed from within the rendering pipeline of the browser
 		/// (ie. changes to the GUI might block the browser indefinitely) whereas
 		/// post render code is executed immediately after the JS code that generates the GUI
 		/// (ie. it is not necessarily rendered, no data loaded but thread-safe!)
+		/// Old post render code gets deleted by this function.
+		/// To preverse old code use appendPostRenderCode.
 		
 	const std::string& getPostRenderCode() const;
-		/// Returns post rnedre code. Can be an empty string
+		/// Returns post render code. Can be an empty string
+		
+	void appendPostRenderCode(const std::string& js);
+		/// Appends Javascript code that should be executed after the page code was written.
 	
 protected:
 	Page(const std::string& name, const std::type_info& type);
@@ -175,6 +180,12 @@ inline void Page::setPostRenderCode(const std::string& js)
 inline const std::string& Page::getPostRenderCode() const
 {
 	return _postRenderCode;
+}
+
+
+inline void Page::appendPostRenderCode(const std::string& js)
+{
+	_postRenderCode.append(js);
 }
 
 
