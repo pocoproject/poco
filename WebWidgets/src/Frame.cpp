@@ -44,7 +44,8 @@ namespace WebWidgets {
 Frame::Frame():
 	View(typeid(Frame)),
 	_pChild(),
-	_title()
+	_title(),
+	_collapsible(false)
 {
 }
 
@@ -52,7 +53,8 @@ Frame::Frame():
 Frame::Frame(const std::string& name):
 	View(name, typeid(Frame)),
 	_pChild(),
-	_title()
+	_title(),
+	_collapsible(false)
 {
 }
 
@@ -60,7 +62,8 @@ Frame::Frame(const std::string& name):
 Frame::Frame(const std::string& name, const std::string& title):
 	View(name, typeid(Frame)),
 	_pChild(),
-	_title(title)
+	_title(title),
+	_collapsible(false)
 {
 }
 
@@ -68,7 +71,8 @@ Frame::Frame(const std::string& name, const std::string& title):
 Frame::Frame(View::Ptr pChild):
 	View(typeid(Frame)),
 	_pChild(),
-	_title()
+	_title(),
+	_collapsible(false)
 {
 	setChild(pChild);
 }
@@ -77,7 +81,8 @@ Frame::Frame(View::Ptr pChild):
 Frame::Frame(const std::string& name, View::Ptr pChild):
 	View(name, typeid(Frame)),
 	_pChild(),
-	_title()
+	_title(),
+	_collapsible(false)
 {
 	setChild(pChild);
 }
@@ -86,7 +91,8 @@ Frame::Frame(const std::string& name, View::Ptr pChild):
 Frame::Frame(const std::string& name, const std::string& title, View::Ptr pChild):
 	View(name, typeid(Frame)),
 	_pChild(),
-	_title(title)
+	_title(title),
+	_collapsible(false)
 {
 	setChild(pChild);
 }
@@ -95,7 +101,8 @@ Frame::Frame(const std::string& name, const std::string& title, View::Ptr pChild
 Frame::Frame(const std::type_info& type):
 	View(type),
 	_pChild(),
-	_title()
+	_title(),
+	_collapsible(false)
 {
 }
 
@@ -103,7 +110,8 @@ Frame::Frame(const std::type_info& type):
 Frame::Frame(const std::string& name, const std::type_info& type):
 	View(name, type),
 	_pChild(),
-	_title()
+	_title(),
+	_collapsible(false)
 {
 }
 
@@ -111,7 +119,8 @@ Frame::Frame(const std::string& name, const std::type_info& type):
 Frame::Frame(View::Ptr pChild, const std::type_info& type):
 	View(type),
 	_pChild(),
-	_title()
+	_title(),
+	_collapsible(false)
 {
 	setChild(pChild);
 }
@@ -120,7 +129,8 @@ Frame::Frame(View::Ptr pChild, const std::type_info& type):
 Frame::Frame(const std::string& name, View::Ptr pChild, const std::type_info& type):
 	View(name, typeid(Frame)),
 	_pChild(),
-	_title()
+	_title(),
+	_collapsible(false)
 {
 	setChild(pChild);
 }

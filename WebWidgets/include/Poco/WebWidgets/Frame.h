@@ -91,6 +91,12 @@ public:
 
 	const std::string& getTitle() const;
 		/// Returns the title of the Frame
+		
+	void setCollapsible(bool val);
+		/// En/Disable collapsible
+	
+	bool collapsible() const;
+		/// Returns collapsible property
 
 protected:
 	Frame(const std::type_info& type);
@@ -109,8 +115,9 @@ protected:
 		/// Destroys the Frame.
 
 private:
-	View::Ptr _pChild;
+	View::Ptr   _pChild;
 	std::string _title;
+	bool        _collapsible;
 };
 
 
@@ -145,6 +152,18 @@ inline std::string Frame::getText() const
 inline const std::string& Frame::getTitle() const
 {
 	return _title;
+}
+
+
+inline void Frame::setCollapsible(bool val)
+{
+	_collapsible = val;
+}
+
+	
+inline bool Frame::collapsible() const
+{
+	return _collapsible;
 }
 
 
