@@ -61,8 +61,14 @@ void ImageRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::Image));
 	const Image* pImage = static_cast<const Poco::WebWidgets::Image*>(pRenderable);
 	ostr << "new Ext.Panel({border:false,bodyBorder:false,";
+	ostr << "id:'" << pImage->id() << "',";
 	ostr << "html:";
 	writeHTML(pImage, ostr);
+	ostr << ",closeAction:'hide'";
+	if (!pImage->isVisible())
+	{
+		ostr << ",hidden:true";
+	}
 	ostr << "})";
 }
 

@@ -174,7 +174,7 @@ void RequestHandler::handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Po
 
 	it = args.begin();
 	RequestProcessor* pProc = _pApp->getAjaxProcessor(id);
-	poco_assert_dbg (pProc);
+	//poco_assert_dbg (pProc);
 	if (!pProc)
 	{
 		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "no requestprocessor found");
