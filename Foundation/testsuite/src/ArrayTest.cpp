@@ -71,7 +71,7 @@ void ArrayTest::testConstruction()
 
 	typedef Poco::Array<double,6> DArray;
 	typedef Poco::Array<int,6> IArray;
-	IArray ia = { 1, 2, 3, 4, 5, 6 };
+	IArray ia = {{1, 2, 3, 4, 5, 6 }};
 	DArray da;
 	da = ia;
 	da.assign(42);
@@ -130,7 +130,7 @@ void ArrayTest::testContainer()
 {
 	const int SIZE = 2;
 	typedef Poco::Array<int,SIZE> Array;
-	Array a = { 1, 2 };
+	Array a = {{1, 2}};
 	assert(a[0] == 1);
 	assert(a[1] == 2);
 
