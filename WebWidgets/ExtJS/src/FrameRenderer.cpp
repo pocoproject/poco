@@ -101,6 +101,8 @@ void FrameRenderer::writeProperties(const Frame* pFrame, std::ostream& ostr)
 		ostr << ",title:'" << pFrame->getTitle() << "'";
 	if (pFrame->collapsible())
 		ostr << ",collapsible:true";
+	if (pFrame->collapsed())
+		ostr << ",collapsed:true";
 }
 
 

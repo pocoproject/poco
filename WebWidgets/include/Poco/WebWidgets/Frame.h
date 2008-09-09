@@ -97,6 +97,12 @@ public:
 	
 	bool collapsible() const;
 		/// Returns collapsible property
+		
+	void setCollapsed(bool coll);
+		/// How should the Frame be rendered initially?
+		
+	bool collapsed() const;
+		/// Returns how the Frame should be rendered initially
 
 protected:
 	Frame(const std::type_info& type);
@@ -118,6 +124,7 @@ private:
 	View::Ptr   _pChild;
 	std::string _title;
 	bool        _collapsible;
+	bool        _collapsed;
 };
 
 
@@ -164,6 +171,18 @@ inline void Frame::setCollapsible(bool val)
 inline bool Frame::collapsible() const
 {
 	return _collapsible;
+}
+
+
+inline void Frame::setCollapsed(bool coll)
+{
+	_collapsed = coll;
+}
+
+		
+inline bool Frame::collapsed() const
+{
+	return _collapsed;
 }
 
 
