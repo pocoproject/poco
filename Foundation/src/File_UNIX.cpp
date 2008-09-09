@@ -97,7 +97,7 @@ bool FileImpl::canReadImpl() const
 {
 	poco_assert (!_path.empty());
 
-	if(getegid() == 0)
+	if(geteuid() == 0)
 		return true;
 
 	struct stat st;
@@ -119,7 +119,7 @@ bool FileImpl::canWriteImpl() const
 {
 	poco_assert (!_path.empty());
 
-	if(getegid() == 0)
+	if(geteuid() == 0)
 		return true;
 
 	struct stat st;
