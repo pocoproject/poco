@@ -57,12 +57,21 @@ public:
 	std::string format(const Poco::Any& value) const;		
 	Poco::Any parse(const std::string& value) const;
 	
+	int precision() const;
+		/// Returns the precision
+		
 protected:
 	~DoubleFormatter();
 	
 private:
 	int _precision;
 };
+
+
+inline int DoubleFormatter::precision() const
+{
+	return _precision;
+}
 
 
 } } // namespace Poco::WebWidgets

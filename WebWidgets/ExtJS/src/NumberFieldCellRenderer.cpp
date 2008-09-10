@@ -40,6 +40,8 @@
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/NumberFieldCell.h"
 #include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/WebWidgets/IntFormatter.h"
+#include "Poco/WebWidgets/DoubleFormatter.h"
 
 
 namespace Poco {
@@ -63,8 +65,15 @@ void NumberFieldCellRenderer::renderHead(const Renderable* pRenderable, const Re
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::NumberFieldCell));
 	const NumberFieldCell* pCell = static_cast<const Poco::WebWidgets::NumberFieldCell*>(pRenderable);
-
+	Formatter::Ptr pForm = pCell->getFormatter();
+	IntFormatter::Ptr pIntForm = pForm.cast<IntFormatter>();
+	DoubleFormatter::Ptr pDoubleForm = pForm.cast<DoubleFormatter>();
 	ostr << "new Ext.form.NumberField({";
+	if (pIntForm)
+		ostr << "decimalPrecision:0,";
+	else if (pDoubleForm)
+		ostr << "decimalPrecision:" << pDoubleForm->precision() << ",";
+	
 
 	TextFieldCellRenderer::writeCellProperties(pCell, ostr);
 	ostr << "})";
