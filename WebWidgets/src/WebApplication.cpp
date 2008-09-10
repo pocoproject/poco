@@ -37,6 +37,7 @@
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
 #include "Poco/WebWidgets/SubmitButtonCell.h"
+#include "Poco/WebWidgets/SubmitButton.h"
 #include "Poco/WebWidgets/WebWidgetsException.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/HTTPServerRequest.h"
@@ -213,7 +214,14 @@ void WebApplication::notifySubmitButton(Renderable::ID id)
 	if (it == _submitButtons.end())
 		throw WebWidgetsException("failed to find submitButton with id " + Poco::NumberFormatter::format(id));
 		
-	it->second->buttonClicked(this);
+	View* pOwner = it->second->getOwner();
+	poco_assert (pOwner);
+	SubmitButton* pSubmit = dynamic_cast<SubmitButton*>(pOwner);
+	if (pSubmit)
+	{
+		Button::ButtonEvent clickedEvent(pSubmit);
+		pSubmit->buttonClicked.notify(pSubmit, clickedEvent);
+	}
 }
 
 

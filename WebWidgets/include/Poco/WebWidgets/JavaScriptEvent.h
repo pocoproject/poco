@@ -43,7 +43,7 @@
 #include "Poco/WebWidgets/WebWidgets.h"
 #include "Poco/WebWidgets/JSDelegate.h"
 #include "Poco/AbstractEvent.h"
-#include "Poco/DefaultStrategy.h"
+#include "Poco/FIFOStrategy.h"
 #include "Poco/AbstractDelegate.h"
 #include "Poco/CompareFunctions.h"
 #include <list>
@@ -63,11 +63,11 @@ enum ServerCallback
 	
 template <class TArgs> 
 class JavaScriptEvent: public Poco::AbstractEvent < 
-	TArgs, Poco::DefaultStrategy<TArgs, Poco::AbstractDelegate<TArgs>, Poco::p_less<Poco::AbstractDelegate<TArgs> > >,
+	TArgs, Poco::FIFOStrategy<TArgs, Poco::AbstractDelegate<TArgs>, Poco::p_less<Poco::AbstractDelegate<TArgs> > >,
 	Poco::AbstractDelegate<TArgs> 
 >
 	/// Event class used to handle JavaScriptEvents. Allows to register two different types
-	/// of delegates. The standard delegates, as known from Poco::BasicEvent and JSDelegates
+	/// of delegates. The standard delegates, as known from Poco::FIFOEvent and JSDelegates
 	/// which will be embedded into the WebPage when the Parser generates the site.
 	/// Per default a server callback happens only when local listeners are registered.
 {

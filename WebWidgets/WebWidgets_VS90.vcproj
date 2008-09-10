@@ -209,6 +209,10 @@
 				Name="Header Files"
 				>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\AjaxDelegate.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\Alignment.h"
 					>
 				</File>
@@ -292,6 +296,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\AjaxDelegate.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\Cell.cpp"
 					>

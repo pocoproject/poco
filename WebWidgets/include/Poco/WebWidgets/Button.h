@@ -42,6 +42,7 @@
 
 #include "Poco/WebWidgets/Control.h"
 #include "Poco/WebWidgets/Event.h"
+#include "Poco/WebWidgets/AjaxDelegate.h"
 #include "Poco/WebWidgets/JavaScriptEvent.h"
 
 
@@ -59,6 +60,8 @@ public:
 	typedef Poco::AutoPtr<Button> Ptr;
 	typedef Event<Button> ButtonEvent;
 
+	JavaScriptEvent<AjaxParameters> ajaxButtonClicked;
+	
 	JavaScriptEvent<ButtonEvent> buttonClicked;
 
 	Button(const std::string& name);
@@ -70,6 +73,9 @@ public:
 	Button();
 		/// Creates an anonymous Button.
 
+	void fireAjaxButtonClicked(void* pSender, AjaxParameters& params);
+		/// Fires the ajaxButtonClicked event.
+		
 	void fireButtonClicked(void* pSender);
 		/// Fires the buttonClicked event.
 

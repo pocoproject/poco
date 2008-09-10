@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/Cell.h"
+#include "Poco/WebWidgets/AjaxDelegate.h"
 #include "Poco/WebWidgets/Delegate.h"
 
 
@@ -55,6 +56,8 @@ public:
 	typedef Poco::AutoPtr<ButtonCell> Ptr;
 
 	static const std::string EV_BUTTONCLICKED;
+	
+	AjaxDelegate ajaxButtonClicked;
 	
 	Delegate buttonClicked;
 

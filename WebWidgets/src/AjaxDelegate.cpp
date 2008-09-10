@@ -1,11 +1,11 @@
 //
-// ButtonCell.cpp
+// AjaxDelegate.cpp
 //
-// $Id: //poco/Main/WebWidgets/src/ButtonCell.cpp#3 $
+// $Id: //poco/Main/WebWidgets/src/AjaxDelegate.cpp#2 $
 //
 // Library: WebWidgets
-// Package: Controls
-// Module:  ButtonCell
+// Package: Core
+// Module:  AjaxDelegate
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,55 +34,105 @@
 //
 
 
-#include "Poco/WebWidgets/ButtonCell.h"
-#include "Poco/WebWidgets/Button.h"
-#include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/WebWidgets/AjaxDelegate.h"
+#include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include <algorithm>
 
 
 namespace Poco {
 namespace WebWidgets {
 
 
-const std::string ButtonCell::EV_BUTTONCLICKED("click");;
-
-
-ButtonCell::ButtonCell(View* pOwner, const std::type_info& type):
-	Cell(pOwner, type)
+AjaxParameters::AjaxParameters(const Poco::Net::NameValueCollection& a, Poco::Net::HTTPServerResponse& r):
+	args(a),
+	response(r),
+	handled(false)
 {
 }
 
 
-ButtonCell::ButtonCell(View* pOwner):
-	Cell(pOwner, typeid(ButtonCell))
+//
+// AjaxDelegate
+//
+
+
+AjaxDelegate::AjaxDelegate():
+	_pImpl(0)
 {
 }
-				
 
-ButtonCell::~ButtonCell()
+	
+AjaxDelegate::AjaxDelegate(const AjaxDelegate& delegate):
+	_pImpl(delegate._pImpl)
+{
+	if (_pImpl) 
+		_pImpl->duplicate();
+}
+
+	
+AjaxDelegate::AjaxDelegate(BasicAjaxDelegateImpl* pImpl):
+	_pImpl(pImpl)
 {
 }
 
-
-void ButtonCell::handleForm(const std::string& field, const std::string& value)
+			
+AjaxDelegate::~AjaxDelegate()
 {
-	//buttonClicked(this);
+	if (_pImpl) 
+		_pImpl->release();
 }
 
-
-void ButtonCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
+	
+void AjaxDelegate::swap(AjaxDelegate& delegate)
 {
-	const std::string& ev = args[RequestHandler::KEY_EVID];
-	if (ev == EV_BUTTONCLICKED)
+	std::swap(_pImpl, delegate._pImpl);
+}
+
+	
+AjaxDelegate& AjaxDelegate::operator = (const AjaxDelegate& delegate)
+{
+	AjaxDelegate tmp(delegate);
+	swap(tmp);
+	return *this;
+}
+
+	
+void AjaxDelegate::operator () (void* pSender, const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response, bool& handled) const
+{
+	if (_pImpl) 
 	{
-		bool handled(false);
-		ajaxButtonClicked(this, args, response, handled);
-		if (!handled)
-			response.send();
-		buttonClicked(this);
+		AjaxParameters params(args, response);
+		_pImpl->invoke(pSender, params);
+		handled = params.handled;
 	}
-	else
-		response.send();
+}
+
+
+AjaxDelegate::operator void* () const
+{
+	return _pImpl;
+}
+
+
+bool AjaxDelegate::operator ! () const
+{
+	return _pImpl == 0;
+}
+
+
+//
+// BasicAjaxDelegateImpl
+//
+
+
+BasicAjaxDelegateImpl::BasicAjaxDelegateImpl()
+{
+}
+
+
+BasicAjaxDelegateImpl::~BasicAjaxDelegateImpl()
+{
 }
 
 
