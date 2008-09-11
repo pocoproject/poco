@@ -88,6 +88,9 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 		ostr << ",header:true,maximizable:true,collapsible:true";
 	else
 		ostr << ",header:false";
+	
+	if (!pPanel->enabled())	
+		ostr << ",disabled:true";
 
 	// a panel has exactly one child
 	// if this child is a layout we are fine otherwise we have to generate the items array

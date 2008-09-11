@@ -111,7 +111,9 @@ public:
 	bool showHeader() const;
 		/// Returns if the header of the Panel is shown
 		
-
+	void enable(bool val);
+	
+	bool enabled() const;
 protected:
 	~Panel();
 		/// Destroys the Panel.
@@ -122,6 +124,7 @@ private:
 	bool        _modal;
 	bool        _showCloseIcon;
 	bool        _showHeader;
+	bool        _enabled;
 };
 
 
@@ -192,6 +195,18 @@ inline void Panel::showHeader(bool show)
 inline bool Panel::showHeader() const
 {
 	return _showHeader;
+}
+
+
+inline void Panel::enable(bool val)
+{
+	_enabled = val;
+}
+
+	
+inline bool Panel::enabled() const
+{
+	return _enabled;
 }
 
 

@@ -47,7 +47,8 @@ Panel::Panel():
 	_title(),
 	_modal(false),
 	_showCloseIcon(true),
-	_showHeader(true)
+	_showHeader(true),
+	_enabled(true)
 {
 }
 
@@ -58,7 +59,8 @@ Panel::Panel(const std::string& name):
 	_title(),
 	_modal(false),
 	_showCloseIcon(true),
-	_showHeader(true)
+	_showHeader(true),
+	_enabled(true)
 {
 }
 
@@ -69,7 +71,8 @@ Panel::Panel(const std::string& name, const std::string& title):
 	_title(title),
 	_modal(false),
 	_showCloseIcon(true),
-	_showHeader(true)
+	_showHeader(true),
+	_enabled(true)
 {
 }
 
@@ -80,7 +83,8 @@ Panel::Panel(View::Ptr pChild):
 	_title(),
 	_modal(false),
 	_showCloseIcon(true),
-	_showHeader(true)
+	_showHeader(true),
+	_enabled(true)
 {
 	setChild(pChild);
 }
@@ -92,7 +96,8 @@ Panel::Panel(const std::string& name, View::Ptr pChild):
 	_title(),
 	_modal(false),
 	_showCloseIcon(true),
-	_showHeader(true)
+	_showHeader(true),
+	_enabled(true)
 {
 	setChild(pChild);
 }
@@ -104,7 +109,8 @@ Panel::Panel(const std::string& name, const std::string& title, View::Ptr pChild
 	_title(title),
 	_modal(false),
 	_showCloseIcon(true),
-	_showHeader(true)
+	_showHeader(true),
+	_enabled(true)
 {
 	setChild(pChild);
 }
