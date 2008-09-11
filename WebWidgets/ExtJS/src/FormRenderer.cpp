@@ -70,7 +70,7 @@ void FormRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	//ostr << "onSubmit:Ext.emptyFn,submit:function(){this.getEl().dom.submit();},";
 	if (pForm->getMethod() == Form::METHOD_POST)
 		ostr << "method:'POST',";
-	ostr << "title:'" << pForm->getName() << "',autoHeight:true,autoWidth:true,url:'" << pForm->getURI().toString() << "',frame:true,items:[";
+	ostr << "title:'" << pForm->getName() << "',autoHeight:true,autoWidth:true,autoScroll:true,url:'" << pForm->getURI().toString() << "',frame:true,items:[";
 	//we need to add a hidden entry that contains the Form::FORM_ID plus its id
 	ostr << "new Ext.form.Hidden({name:'" << Form::FORM_ID << "', value:" << pForm->id() << "})";
 	
