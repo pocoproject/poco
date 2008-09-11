@@ -92,7 +92,7 @@ void FrameRenderer::renderBody(const Renderable* pRenderable, const RenderContex
 void FrameRenderer::writeProperties(const Frame* pFrame, std::ostream& ostr)
 {
 	Utility::writeRenderableProperties(pFrame, ostr);
-	ostr << ",frame:true,header:true";
+	ostr << ",frame:true,header:true,autoScroll:true";
 	if (pFrame->getWidth() > 0)
 		ostr << ",width:" << pFrame->getWidth();
 	if (pFrame->getHeight() > 0)

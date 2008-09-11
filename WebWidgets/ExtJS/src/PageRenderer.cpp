@@ -141,7 +141,7 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		ostr <<			"}});";
 	
 		// always nest a panel around, so we can get rid of dynamic casts to check for parent type
-		ostr << "new Ext.Panel({renderTo:'p" << pPage->id() << "',border:false,bodyBorder:false";
+		ostr << "new Ext.Panel({renderTo:'p" << pPage->id() << "',border:false,bodyBorder:false,autoScroll:true";
 		if (pPage->beforeRender.hasJavaScriptCode() || pPage->afterRender.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
@@ -154,6 +154,7 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 			}
 			ostr << "}";
 		}
+
 		if (pPage->getHeight() > 0)
 			ostr << ",height:" << pPage->getHeight();
 		else
@@ -161,7 +162,7 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		if (pPage->getWidth() > 0)
 			ostr << ",width:" << pPage->getWidth();
 		else
-			ostr << ",width:Ext.lib.Dom.getViewWidth()";
+			ostr << ",width:Ext.lib.Dom.getViewWidth()-20";
 		
 		ostr << ",items:[";
 
