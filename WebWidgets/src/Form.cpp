@@ -155,7 +155,8 @@ void Form::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::N
 		response.setChunkedTransferEncoding(true);
 		serializeJSONImpl(response.send());
 	}
-	response.send();
+	else
+		response.send();
 }
 
 
