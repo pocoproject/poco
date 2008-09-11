@@ -61,6 +61,7 @@
 #include "Poco/WebWidgets/ExtJS/ListBoxCellRenderer.h"
 #include "Poco/WebWidgets/ExtJS/TableRenderer.h"
 #include "Poco/WebWidgets/ExtJS/ProgressIndicatorRenderer.h"
+#include "Poco/WebWidgets/ExtJS/HTMLRenderer.h"
 
 #include "Poco/WebWidgets/Label.h"
 #include "Poco/WebWidgets/Page.h"
@@ -85,6 +86,7 @@
 #include "Poco/WebWidgets/RadioButtonCell.h"
 #include "Poco/WebWidgets/HorizontalLayout.h"
 #include "Poco/WebWidgets/VerticalLayout.h"
+#include "Poco/WebWidgets/HTML.h"
 #include "Poco/WebWidgets/Image.h"
 #include "Poco/WebWidgets/TabView.h"
 #include "Poco/WebWidgets/ListBoxCell.h"
@@ -134,6 +136,7 @@ void Utility::initialize(LookAndFeel::Ptr ptr)
 	ptr->registerRenderer(typeid(TabView), new TabViewRenderer());
 	ptr->registerRenderer(typeid(Table), new TableRenderer());
 	ptr->registerRenderer(typeid(ProgressIndicator), new ProgressIndicatorRenderer());
+	ptr->registerRenderer(typeid(HTML),new HTMLRenderer());	
 }
 
 
