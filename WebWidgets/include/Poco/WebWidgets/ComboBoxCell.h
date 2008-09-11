@@ -124,6 +124,8 @@ public:
 	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
 		/// Handles a complete AJAX request submitted by the client.
 		
+	bool serializeJSON(std::ostream& out, const std::string& name);	
+		
 protected:
 	~ComboBoxCell();
 		/// Destroys the ComboBoxCell.

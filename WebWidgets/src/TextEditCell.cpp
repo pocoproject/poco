@@ -73,4 +73,15 @@ void TextEditCell::handleForm(const std::string& field, const std::string& value
 }
 
 
+bool TextEditCell::serializeJSON(std::ostream& out, const std::string& name)
+{
+	out << name;
+	if (this->hasValue())
+	{
+		out << ":'" << getFormatter()->format(getValue()) << "'";
+	}
+	return true;
+}
+
+
 } } // namespace Poco::WebWidgets

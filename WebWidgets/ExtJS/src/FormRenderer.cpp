@@ -38,7 +38,9 @@
 #include "Poco/WebWidgets/Form.h"
 #include "Poco/WebWidgets/Button.h"
 #include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/NumberFormatter.h"
+#include <sstream>
 
 
 namespace Poco {
@@ -83,6 +85,7 @@ void FormRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 	}
 	ostr << "]})";
 	theApp.endForm(*pForm);
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pForm->id()), const_cast<Form*>(pForm));
 }
 
 
@@ -95,6 +98,20 @@ std::string FormRenderer::formVariableName(const Form* pForm)
 {
 	static const std::string prefix("f");
 	return prefix + Poco::NumberFormatter::format(pForm->id());
+}
+
+
+Poco::WebWidgets::JSDelegate FormRenderer::createReloadFunction(const std::string& fctName, const Form* pForm)
+{
+	std::ostringstream out;
+	out << "function ";
+	out << fctName << "(){" << std::endl;
+	out <<		"var theForm = Ext.getCmp('" << pForm->id() << "');" << std::endl;
+	out <<		"var uri = '" << pForm->getURI().toString() << "/;" << RequestHandler::KEY_EVID << "=" << Form::EV_RELOAD << "&";
+	out <<	RequestHandler::KEY_ID << "=" << pForm->id() << "';" << std::endl;
+	out <<		"theForm.load({url:uri,method:'GET'});" << std::endl; // success, failure handlers
+	out <<	"}" << std::endl;
+	return jsDelegate(out.str());
 }
 
 

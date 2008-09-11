@@ -57,9 +57,7 @@ public:
 
 	static const std::string EV_BUTTONCLICKED;
 	
-	AjaxDelegate ajaxButtonClicked;
-	
-	Delegate buttonClicked;
+	AjaxDelegate buttonClicked;
 
 	ButtonCell(View* pOwner);
 		/// Creates a ButtonCell.
@@ -68,6 +66,8 @@ public:
 	void handleForm(const std::string& field, const std::string& value);
 	
 	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
+	
+	bool serializeJSON(std::ostream& out, const std::string& name);
 
 protected:
 	~ButtonCell();
@@ -77,6 +77,12 @@ protected:
 		/// Creates a ButtonCell.
 
 };
+
+
+inline bool ButtonCell::serializeJSON(std::ostream& out, const std::string& name)
+{
+	return false;
+}
 
 
 } } // namespace Poco::WebWidgets

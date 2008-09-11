@@ -73,6 +73,8 @@ public:
 	const Poco::DateTime& getTime() const;
 		/// returns the time if set, otherwise an exception, use getValue().empty() to check if it is valid
 
+	bool serializeJSON(std::ostream& out, const std::string& name);
+	
 private:
 	std::string       _format;
 	TimeField::Format _fmt;

@@ -59,6 +59,8 @@ public:
 
 	virtual ~NumberFieldCell();
 		/// Destroys the NumberFieldCell.
+		
+	bool serializeJSON(std::ostream& out, const std::string& name);	
 };
 
 

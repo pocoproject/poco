@@ -97,6 +97,9 @@ public:
 	void handleForm(const std::string& field, const std::string& value);
 		/// Dummy implementation
 		
+	bool serializeJSON(std::ostream& out, const std::string& name);
+		/// Dummy implementation
+		
 	void addDynamicFunction(const std::string& jsCode);
 		/// Adds a JavaScript function to the page. Static functions should be written to a JS file
 		/// and included via the ResourceManager, only dynamic fucntions (ie. functions that are generated
@@ -186,6 +189,12 @@ inline const std::string& Page::getPostRenderCode() const
 inline void Page::appendPostRenderCode(const std::string& js)
 {
 	_postRenderCode.append(js);
+}
+
+
+inline bool Page::serializeJSON(std::ostream&, const std::string&)
+{
+	return false;
 }
 
 

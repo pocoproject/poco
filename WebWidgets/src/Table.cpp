@@ -352,4 +352,10 @@ Table::LoadData::LoadData(Poco::Net::HTTPServerResponse* pR, Table* pT, int row,
 }
 
 
+bool Table::serializeJSON(std::ostream& out, const std::string& name)
+{
+	return false;
+}
+
+
 } } // namespace Poco::WebWidgets

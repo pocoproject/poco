@@ -73,6 +73,8 @@ public:
 	const Poco::DateTime& getDate() const;
 		/// returns the date if set, otherwise an exception, use getValue().empty() to check if it is valid
 
+	bool serializeJSON(std::ostream& out, const std::string& name);
+	
 private:
 	std::string _format;
 };

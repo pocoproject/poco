@@ -73,6 +73,9 @@ public:
 
 	// Cell
 	void handleForm(const std::string& field, const std::string& value);
+	
+	
+	bool serializeJSON(std::ostream& out, const std::string& name);
 
 protected:
 	~ToggleButtonCell();

@@ -102,6 +102,8 @@ public:
 		/// the Formatter. If no Formatter has been set, sets the value
 		/// to the given string.
 		
+	bool hasValue() const;
+		
 	void setString(const std::string& value);	
 		/// Sets the value for this Cell to the given string.
 		
@@ -278,6 +280,12 @@ inline void Cell::setEditMode(Cell::EditMode em)
 inline Cell::EditMode Cell::getEditMode() const
 {
 	return _em;
+}
+
+
+inline bool Cell::hasValue() const
+{
+	return !getValue().empty();
 }
 
 

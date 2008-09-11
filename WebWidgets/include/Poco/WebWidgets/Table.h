@@ -208,6 +208,8 @@ public:
 	bool autoEdit() const;
 		// Returns if autoEdit is on/off
 		
+	bool serializeJSON(std::ostream& out, const std::string& name);	
+		
 protected:
 	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
 		/// Creates a Table and assigns it the given name.

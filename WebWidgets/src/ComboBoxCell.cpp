@@ -36,6 +36,7 @@
 
 #include "Poco/WebWidgets/ComboBoxCell.h"
 #include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/DateTime.h"
 
 
 namespace Poco {
@@ -132,5 +133,21 @@ void ComboBoxCell::setSelected(const Any& elem)
 	setValue(elem);
 	selected(this, aPair);
 }
+
+
+bool ComboBoxCell::serializeJSON(std::ostream& out, const std::string& name)
+{
+	out << name;
+	if (hasSelected())
+	{
+		const Poco::Any& sel = getSelected();
+		if (sel.type() == typeid(std::string) || sel.type() == typeid(Poco::DateTime))
+			out << ":'" << getFormatter()->format(sel) << "'";
+		else
+			out << ":" << getFormatter()->format(sel);
+	}
+	return true;	
+}
+
 
 } } // namespace Poco::WebWidgets

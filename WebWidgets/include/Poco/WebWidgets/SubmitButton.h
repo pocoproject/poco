@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/Button.h"
+#include "Poco/FIFOEvent.h"
 
 
 namespace Poco {
@@ -55,6 +56,8 @@ class WebWidgets_API SubmitButton: public Button
 {
 public:
 	typedef Poco::AutoPtr<SubmitButton> Ptr;
+	
+	FIFOEvent<SubmitButton*> afterSubmit; /// thrown whenever all form values are assigned and the submit is done
 
 	SubmitButton();
 		/// Creates an anonymous SubmitButton.

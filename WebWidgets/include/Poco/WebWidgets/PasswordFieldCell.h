@@ -58,6 +58,8 @@ public:
 
 	virtual ~PasswordFieldCell();
 		/// Destroys the PasswordFieldCell.
+		
+	bool serializeJSON(std::ostream& out, const std::string& name);
 };
 
 

@@ -113,20 +113,19 @@ void WebApplication::beginForm(const Form& form)
 	if (!_forms.empty())
 		throw WebWidgetsException("nested forms not allowed");
 	_forms.push(form.id());
-	_formMap.insert(std::make_pair(form.id(), RequestProcessorMap()));
+	_formMap.insert(std::make_pair(form.id(), const_cast<Form*>(&form)));
 }
-		
+
 
 void WebApplication::registerFormProcessor(const std::string& fieldName, RequestProcessor* pProc)
 {
-	// per default we register everyting that has a name as form processor
+	// per default we register everything that has a name as form processor
 	if (!_forms.empty())
 	{
 		FormMap::iterator itForm = _formMap.find(_forms.top());
 		poco_assert (itForm != _formMap.end());
-		std::pair<RequestProcessorMap::iterator, bool> res = itForm->second.insert(std::make_pair(fieldName, pProc));
-		if (!res.second)
-			res.first->second = pProc;
+		
+		itForm->second->registerFormProcessor(fieldName, pProc);
 	}
 }
 
@@ -137,10 +136,7 @@ RequestProcessor* WebApplication::getFormProcessor(Renderable::ID formId, const 
 	if (itForm == _formMap.end())
 		return 0;
 		
-	RequestProcessorMap::iterator it = itForm->second.find(fieldName);
-	if (it == itForm->second.end())
-		return 0;
-	return it->second;
+	return itForm->second->getFormProcessor(fieldName);
 }
 
 
@@ -184,27 +180,8 @@ void WebApplication::handleForm(const Poco::Net::HTMLForm& form)
 	FormMap::iterator itForm = _formMap.find(formID);
 	if (itForm == _formMap.end())
 		throw Poco::NotFoundException("unknown form id");
-		
-	Poco::Net::NameValueCollection::ConstIterator it = form.begin();	
-	RequestProcessorMap& processors = itForm->second;
-	for (;it != form.end(); ++it)
-	{
-		const std::string& key = it->first;
-		RequestProcessorMap::iterator itR = processors.find(key);
-		if (itR != processors.end())
-		{
-			itR->second->handleForm(key, it->second);
-			processors.erase(itR);
-		}
-	}
-	//those that are not included are either deselected or empty
-	RequestProcessorMap::iterator itR = processors.begin();
-	std::string empty;
-	for (; itR != processors.end(); ++itR)
-	{
-		itR->second->handleForm(itR->first, empty);
-	}
-	processors.clear();
+	
+	itForm->second->handleForm(form);
 }
 
 
@@ -219,8 +196,7 @@ void WebApplication::notifySubmitButton(Renderable::ID id)
 	SubmitButton* pSubmit = dynamic_cast<SubmitButton*>(pOwner);
 	if (pSubmit)
 	{
-		Button::ButtonEvent clickedEvent(pSubmit);
-		pSubmit->buttonClicked.notify(pSubmit, clickedEvent);
+		pSubmit->afterSubmit.notify(pSubmit, pSubmit);
 	}
 }
 

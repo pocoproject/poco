@@ -101,8 +101,7 @@ void Button::init(Cell::Ptr ptrCell)
 {
 	ButtonCell::Ptr pCell = ptrCell.cast<ButtonCell>();
 	poco_check_ptr (pCell);
-	pCell->buttonClicked = delegate(*this, &Button::fireButtonClicked);
-	pCell->ajaxButtonClicked = ajaxDelegate(*this, &Button::fireAjaxButtonClicked);
+	pCell->buttonClicked = ajaxDelegate(*this, &Button::fireButtonClicked);
 	setCell(pCell);
 }
 
@@ -114,16 +113,9 @@ void Button::init()
 }
 
 
-void Button::fireAjaxButtonClicked(void* pSender, AjaxParameters& params)
+void Button::fireButtonClicked(void* pSender, AjaxParameters& params)
 {
-	ajaxButtonClicked(pSender, params);
-}
-
-
-void Button::fireButtonClicked(void* pSender)
-{
-	ButtonEvent clickedEvent(this);
-	buttonClicked(this, clickedEvent);
+	buttonClicked(pSender, params);
 }
 
 

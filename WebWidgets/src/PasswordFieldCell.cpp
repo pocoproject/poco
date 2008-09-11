@@ -52,4 +52,15 @@ PasswordFieldCell::~PasswordFieldCell()
 }
 
 
+bool PasswordFieldCell::serializeJSON(std::ostream& out, const std::string& name)
+{
+	out << name;
+	if (this->hasValue())
+	{
+		out << ":'" << getFormatter()->format(getValue()) << "'";
+	}
+	return true;
+}
+
+
 } } // namespace Poco::WebWidgets

@@ -35,6 +35,7 @@
 
 
 #include "Poco/WebWidgets/ListBoxCell.h"
+#include "Poco/DateTime.h"
 
 
 namespace Poco {
@@ -165,6 +166,21 @@ const Any& ListBoxCell::getSelected() const
 		if (it->second) return it->first;
 
 	throw Poco::NotFoundException("No element selected");
+}
+
+
+bool ListBoxCell::serializeJSON(std::ostream& out, const std::string& name)
+{
+	out << name;
+	if (hasSelected())
+	{
+		const Poco::Any& sel = getSelected();
+		if (sel.type() == typeid(std::string) || sel.type() == typeid(Poco::DateTime))
+			out << ":'" << getFormatter()->format(sel) << "'";
+		else
+			out << ":" << getFormatter()->format(sel);
+	}
+	return true;
 }
 
 

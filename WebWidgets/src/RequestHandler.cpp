@@ -181,12 +181,7 @@ void RequestHandler::handleAjaxRequest(Poco::Net::HTTPServerRequest& request, Po
 		response.send();
 		return;
 	}
-	SubmitButtonCell* pCell = dynamic_cast<SubmitButtonCell*>(pProc);
-	if (pCell) // hide click event from submitbuttons
-	{
-		response.send();
-		return;
-	}
+	
 	try
 	{
 		pProc->handleAjaxRequest(args, response);

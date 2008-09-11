@@ -140,7 +140,7 @@ private:
 	
 	typedef std::map<std::string, RequestProcessor* > RequestProcessorMap;
 	typedef std::map<Renderable::ID, SubmitButtonCell*> SubmitButtons;
-	typedef std::map<Renderable::ID, RequestProcessorMap> FormMap;
+	typedef std::map<Renderable::ID, Form*> FormMap;
 	typedef std::stack<Renderable::ID> OpenForms;
 	
 	ResourceManager::Ptr                      _pResource;

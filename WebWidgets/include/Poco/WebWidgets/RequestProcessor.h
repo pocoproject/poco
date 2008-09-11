@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/WebWidgets.h"
+#include <ostream>
 
 
 namespace Poco {
@@ -65,6 +66,8 @@ public:
 	virtual void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response) = 0;
 		/// Handles a complete AJAX request submitted by the client.
 
+	virtual bool serializeJSON(std::ostream& out, const std::string& name) = 0;
+		/// Serializes a form field to the client.
 protected:
 	RequestProcessor();
 		/// Creates the RequestProcessor.

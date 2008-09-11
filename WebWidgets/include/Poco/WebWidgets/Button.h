@@ -58,11 +58,8 @@ class WebWidgets_API Button: public Control
 {
 public:
 	typedef Poco::AutoPtr<Button> Ptr;
-	typedef Event<Button> ButtonEvent;
-
-	JavaScriptEvent<AjaxParameters> ajaxButtonClicked;
 	
-	JavaScriptEvent<ButtonEvent> buttonClicked;
+	JavaScriptEvent<AjaxParameters> buttonClicked;
 
 	Button(const std::string& name);
 		/// Creates a Button with the given name.
@@ -73,11 +70,8 @@ public:
 	Button();
 		/// Creates an anonymous Button.
 
-	void fireAjaxButtonClicked(void* pSender, AjaxParameters& params);
+	void fireButtonClicked(void* pSender, AjaxParameters& params);
 		/// Fires the ajaxButtonClicked event.
-		
-	void fireButtonClicked(void* pSender);
-		/// Fires the buttonClicked event.
 
 protected:
 	Button(const std::string& name, const std::type_info& type);

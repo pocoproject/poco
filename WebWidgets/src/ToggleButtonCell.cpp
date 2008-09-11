@@ -85,4 +85,16 @@ void ToggleButtonCell::setChecked(bool checked)
 	}
 }
 
+
+bool ToggleButtonCell::serializeJSON(std::ostream& out, const std::string& name)
+{
+	//FIXME: this is extjs specific
+	out << name << ":";
+	if (isChecked())
+		out << "'on'";
+	else
+		out << "'off'";
+	return true;
+}
+
 } } // namespace Poco::WebWidgets

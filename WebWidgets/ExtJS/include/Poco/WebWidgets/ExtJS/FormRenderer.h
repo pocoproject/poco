@@ -43,10 +43,11 @@
 #include "Poco/WebWidgets/ExtJS/ExtJS.h"
 #include "Poco/WebWidgets/Renderer.h"
 #include "Poco/WebWidgets/Form.h"
-
+#include "Poco/WebWidgets/JSDelegate.h"
 
 namespace Poco {
 namespace WebWidgets {
+	class Form;
 namespace ExtJS {
 
 
@@ -68,6 +69,10 @@ public:
 
 	static std::string formVariableName(const Form* pForm);
 		/// Creates the variable name for the form
+		
+	static Poco::WebWidgets::JSDelegate createReloadFunction(const std::string& fctName, const Form* pForm);
+		/// Creates a function with the given fctName (can be empty) that reloads the form
+		/// E.g.: add the returned JSDelegate to pReload->buttonClicked
 };
 
 

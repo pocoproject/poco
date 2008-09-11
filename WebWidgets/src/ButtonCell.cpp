@@ -76,10 +76,9 @@ void ButtonCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, P
 	if (ev == EV_BUTTONCLICKED)
 	{
 		bool handled(false);
-		ajaxButtonClicked(this, args, response, handled);
+		buttonClicked(this, args, response, handled);
 		if (!handled)
 			response.send();
-		buttonClicked(this);
 	}
 	else
 		response.send();

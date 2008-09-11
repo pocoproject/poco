@@ -41,20 +41,34 @@
 
 
 #include "Poco/WebWidgets/ContainerView.h"
+#include "Poco/WebWidgets/RequestProcessor.h"
 #include "Poco/URI.h"
+#include "Poco/FIFOEvent.h"
+#include <map>
 
 
 namespace Poco {
+	namespace Net {
+		class HTMLForm;
+	}
 namespace WebWidgets {
 
 
-class WebWidgets_API Form: public ContainerView
+class WebWidgets_API Form: public ContainerView, public RequestProcessor
 	/// A Form represents a HTML form.
 {
 public:
 	typedef Poco::AutoPtr<Form> Ptr;
 	
-	static const std::string FORM_ID;
+	static const std::string FORM_ID; /// form name to 
+	static const std::string EV_RELOAD; /// event name for reloading the form
+	static const std::string METHOD_GET;
+	static const std::string METHOD_POST;
+	
+	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
+	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
+	
+	Poco::FIFOEvent<Form*> beforeReload; /// triggered before a Form is reloaded so that you can update form fields with recent values
 	
 	Form(const Poco::URI& uri);
 		/// Creates an anonymous Form.
@@ -76,12 +90,26 @@ public:
 
 	const Poco::URI& getURI() const;
 		/// Returns the URL of the form
-
-	static const std::string METHOD_GET;
-	static const std::string METHOD_POST;
 	
-	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
-	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
+	void handleForm(const std::string& field, const std::string& value);
+		/// Handles a form field submitted by the client.
+		
+	void handleForm(const Poco::Net::HTMLForm& form);
+		/// Handles a complete form submit
+	
+	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
+		/// Handles a complete AJAX request submitted by the client.
+	
+	bool serializeJSON(std::ostream& out, const std::string&);
+	
+	void serializeJSONImpl(std::ostream& out);
+	
+	RequestProcessor* getFormProcessor(const std::string& name);
+		/// Returns the requestprocessor or null
+		
+	void registerFormProcessor(const std::string& name, RequestProcessor* pProc);
+		/// Registers a RequestProcessor for a request.
+	
 			
 protected:
 	Form(const std::string& name, const std::type_info& type, const Poco::URI& uri);
@@ -94,9 +122,11 @@ protected:
 		/// Destroys the Form.
 		
 private:
-	std::string _method;
-	std::string _encoding;
-	Poco::URI   _uri;
+	typedef std::map<std::string, RequestProcessor* > RequestProcessorMap;
+	std::string         _method;
+	std::string         _encoding;
+	Poco::URI           _uri;
+	RequestProcessorMap _namedChildren;
 };
 
 
@@ -118,6 +148,13 @@ inline const std::string& Form::getEncoding() const
 inline const Poco::URI& Form::getURI() const
 {
 	return _uri;
+}
+
+
+inline bool Form::serializeJSON(std::ostream& out, const std::string&)
+{
+	serializeJSONImpl(out);
+	return true;
 }
 
 
