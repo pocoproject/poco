@@ -338,6 +338,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\ExtJS\TemplateRenderer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\ExtJS\TextEditCellRenderer.h"
 					>
 				</File>
@@ -483,6 +487,10 @@
 				</File>
 				<File
 					RelativePath=".\src\TabViewRenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TemplateRenderer.cpp"
 					>
 				</File>
 				<File
