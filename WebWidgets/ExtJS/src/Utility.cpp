@@ -62,6 +62,7 @@
 #include "Poco/WebWidgets/ExtJS/TableRenderer.h"
 #include "Poco/WebWidgets/ExtJS/ProgressIndicatorRenderer.h"
 #include "Poco/WebWidgets/ExtJS/HTMLRenderer.h"
+#include "Poco/WebWidgets/ExtJS/DynamicCodeLoaderRenderer.h"
 
 #include "Poco/WebWidgets/Label.h"
 #include "Poco/WebWidgets/Page.h"
@@ -77,6 +78,7 @@
 #include "Poco/WebWidgets/TextFieldCell.h"
 #include "Poco/WebWidgets/TimeFieldCell.h"
 #include "Poco/WebWidgets/DateFieldCell.h"
+#include "Poco/WebWidgets/DynamicCodeLoader.h"
 #include "Poco/WebWidgets/PasswordFieldCell.h"
 #include "Poco/WebWidgets/NumberFieldCell.h"
 #include "Poco/WebWidgets/ComboBoxCell.h"
@@ -137,6 +139,7 @@ void Utility::initialize(LookAndFeel::Ptr ptr)
 	ptr->registerRenderer(typeid(Table), new TableRenderer());
 	ptr->registerRenderer(typeid(ProgressIndicator), new ProgressIndicatorRenderer());
 	ptr->registerRenderer(typeid(HTML),new HTMLRenderer());	
+	ptr->registerRenderer(typeid(DynamicCodeLoader),new DynamicCodeLoaderRenderer());	
 }
 
 

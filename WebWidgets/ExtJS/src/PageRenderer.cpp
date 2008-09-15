@@ -127,6 +127,29 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 			ostr << *itF << std::endl;
 		}
 		
+		const std::set<DynamicCodeLoader::Ptr>& dcls = pPage->dynamicCodeLoaders();
+		if (!dcls.empty())
+		{
+			ostr <<	"function loadScriptDynamically(sId, source){" << std::endl;
+			ostr <<		"if (!source) return;" << std::endl;
+			ostr <<		"var oHead = document.getElementsByTagName('HEAD').item(0);" << std::endl;
+			ostr <<		"var oScript = document.createElement('script');" << std::endl;
+			ostr <<		"oScript.language = 'javascript';" << std::endl;
+			ostr <<		"oScript.type = 'text/javascript';" << std::endl;
+			ostr <<		"oScript.id = sId;" << std::endl;
+			ostr <<		"oScript.defer = true;" << std::endl;
+			ostr <<		"oScript.text = source.responseText;" << std::endl;
+			ostr <<		"oHead.appendChild(oScript);" << std::endl;
+			ostr <<	"}" << std::endl;
+		}
+		std::set<DynamicCodeLoader::Ptr>::const_iterator itDC = dcls.begin();
+		for (; itDC != dcls.end(); ++itDC)
+		{
+			(*itDC)->renderHead(context, ostr);
+		}
+		
+		
+		
 		ostr << "Ext.onReady(function() {";
 		ostr << "var " << VAR_LOCALTMP << ";"; // tmp variable needed for table renderer
 		ostr << "Ext.QuickTips.init();";

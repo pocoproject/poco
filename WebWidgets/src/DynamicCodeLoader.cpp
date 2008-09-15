@@ -1,11 +1,11 @@
 //
-// PasswordFieldCell.cpp
+// DynamicCodeLoader.cpp
 //
-// $Id: //poco/Main/WebWidgets/src/PasswordFieldCell.cpp#1 $
+// $Id: //poco/Main/WebWidgets/src/DynamicCodeLoader.cpp#2 $
 //
 // Library: WebWidgets
-// Package: Controls
-// Module:  PasswordFieldCell
+// Package: Core
+// Module:  DynamicCodeLoader
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,31 +34,61 @@
 //
 
 
-#include "Poco/WebWidgets/PasswordFieldCell.h"
+#include "Poco/WebWidgets/DynamicCodeLoader.h"
+#include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/HTTPServerResponse.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 
 
-PasswordFieldCell::PasswordFieldCell(View* pOwner):
-	TextFieldCell(pOwner, typeid(PasswordFieldCell))
+const std::string DynamicCodeLoader::EV_LOAD("dynload");
+
+
+DynamicCodeLoader::DynamicCodeLoader(View* pParent, const Poco::URI& uri, const std::string& fctName, View::Ptr pView):
+	Renderable(typeid(DynamicCodeLoader)),
+	_pParent(pParent),
+	_uri(uri),
+	_fctName(fctName),
+	_loaderFct("load"),
+	_pView(pView)
+{
+	poco_check_ptr (_pView);
+	poco_assert (!_fctName.empty());
+	_loaderFct.append(_fctName);
+}
+
+
+DynamicCodeLoader::~DynamicCodeLoader()
 {
 }
 
 
-PasswordFieldCell::~PasswordFieldCell()
+void DynamicCodeLoader::handleForm(const std::string& field, const std::string& value)
 {
 }
 
-
-bool PasswordFieldCell::serializeJSON(std::ostream& out, const std::string& name)
+	
+void DynamicCodeLoader::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
 {
-	out << name << ":";
-	if (this->hasValue())
+	const std::string& ev = args[RequestHandler::KEY_EVID];
+	if (ev == EV_LOAD)
 	{
-		out << "'" << getFormatter()->format(getValue()) << "'";
+		/// send the JS presentation of the page
+		response.setContentType("text/javascript");
+		response.setChunkedTransferEncoding(true);
+		serializeJSON(response.send(),"");
 	}
+	else
+		response.send();
+}
+
+		
+bool DynamicCodeLoader::serializeJSON(std::ostream& out, const std::string& name)
+{
+	out << _code;
 	return true;
 }
 

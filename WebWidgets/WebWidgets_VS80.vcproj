@@ -234,6 +234,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\DynamicCodeLoader.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\Event.h"
 					>
 				</File>
@@ -315,6 +319,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Delegate.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\DynamicCodeLoader.cpp"
 					>
 				</File>
 				<File

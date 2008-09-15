@@ -246,6 +246,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\ExtJS\DynamicCodeLoaderRenderer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\ExtJS\ExtJS.h"
 					>
 				</File>
@@ -395,6 +399,10 @@
 				</File>
 				<File
 					RelativePath=".\src\DateFieldCellRenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\DynamicCodeLoaderRenderer.cpp"
 					>
 				</File>
 				<File

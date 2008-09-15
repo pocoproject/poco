@@ -1,11 +1,13 @@
 //
-// PasswordFieldCell.cpp
+// DynamicCodeLoaderRenderer.h
 //
-// $Id: //poco/Main/WebWidgets/src/PasswordFieldCell.cpp#1 $
+// $Id: //poco/Main/WebWidgets/ExtJS/include/Poco/WebWidgets/ExtJS/DynamicCodeLoaderRenderer.h#2 $
 //
-// Library: WebWidgets
-// Package: Controls
-// Module:  PasswordFieldCell
+// Library: ExtJS
+// Package: Core
+// Module:  DynamicCodeLoaderRenderer
+//
+// Definition of the DynamicCodeLoaderRenderer class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,33 +36,38 @@
 //
 
 
-#include "Poco/WebWidgets/PasswordFieldCell.h"
+#ifndef ExtJS_DynamicCodeLoaderRenderer_INCLUDED
+#define ExtJS_DynamicCodeLoaderRenderer_INCLUDED
+
+
+#include "Poco/WebWidgets/ExtJS/ExtJS.h"
+#include "Poco/WebWidgets/Renderer.h"
 
 
 namespace Poco {
 namespace WebWidgets {
+namespace ExtJS {
 
 
-PasswordFieldCell::PasswordFieldCell(View* pOwner):
-	TextFieldCell(pOwner, typeid(PasswordFieldCell))
+class ExtJS_API DynamicCodeLoaderRenderer: public Poco::WebWidgets::Renderer
+	/// DynamicCodeLoaderRenderer renders a vertical Layout
 {
-}
+public:
+	DynamicCodeLoaderRenderer();
+		/// Creates the DynamicCodeLoaderRenderer.
+
+	virtual ~DynamicCodeLoaderRenderer();
+		/// Destroys the DynamicCodeLoaderRenderer.
+
+	void renderHead(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
+		/// Emits code for the page header to the given output stream.
+		
+	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
+		/// Emits code for the page body to the given output stream.	
+};
 
 
-PasswordFieldCell::~PasswordFieldCell()
-{
-}
+} } } // namespace Poco::WebWidgets::ExtJS
 
 
-bool PasswordFieldCell::serializeJSON(std::ostream& out, const std::string& name)
-{
-	out << name << ":";
-	if (this->hasValue())
-	{
-		out << "'" << getFormatter()->format(getValue()) << "'";
-	}
-	return true;
-}
-
-
-} } // namespace Poco::WebWidgets
+#endif // ExtJS_DynamicCodeLoaderRenderer_INCLUDED

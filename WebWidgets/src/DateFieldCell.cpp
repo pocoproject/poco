@@ -65,10 +65,10 @@ void DateFieldCell::setFormat(const std::string& dateFormat)
 
 bool DateFieldCell::serializeJSON(std::ostream& out, const std::string& name)
 {
-	out << name;
+	out << name << ":";
 	if (this->hasValue())
 	{
-		out << ":'" << getFormatter()->format(getValue()) << "'";
+		out << "'" << getFormatter()->format(getValue()) << "'";
 	}
 	return true;
 }

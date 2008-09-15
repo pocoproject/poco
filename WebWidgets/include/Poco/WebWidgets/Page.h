@@ -44,9 +44,12 @@
 #include "Poco/WebWidgets/JavaScriptEvent.h"
 #include "Poco/WebWidgets/ResourceManager.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
+#include "Poco/WebWidgets/DynamicCodeLoader.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/BasicEvent.h"
+#include <set>
+#include <vector>
 
 
 namespace Poco {
@@ -122,6 +125,10 @@ public:
 		
 	void appendPostRenderCode(const std::string& js);
 		/// Appends Javascript code that should be executed after the page code was written.
+		
+	void addDynamicCodeLoader(DynamicCodeLoader::Ptr pLoader);
+	
+	const std::set<DynamicCodeLoader::Ptr>& dynamicCodeLoaders() const;
 	
 protected:
 	Page(const std::string& name, const std::type_info& type);
@@ -137,6 +144,7 @@ private:
 	std::string     _text;
 	ResourceManager _rm;
 	std::vector<std::string> _jsCode;
+	std::set<DynamicCodeLoader::Ptr> _codeLoaders;
 	std::string     _postRenderCode;
 };
 
@@ -195,6 +203,18 @@ inline void Page::appendPostRenderCode(const std::string& js)
 inline bool Page::serializeJSON(std::ostream&, const std::string&)
 {
 	return false;
+}
+
+
+inline void Page::addDynamicCodeLoader(DynamicCodeLoader::Ptr pLoader)
+{
+	if (pLoader) _codeLoaders.insert(pLoader);
+}
+
+
+inline const std::set<DynamicCodeLoader::Ptr>& Page::dynamicCodeLoaders() const
+{
+	return _codeLoaders;
 }
 
 
