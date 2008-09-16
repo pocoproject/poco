@@ -240,6 +240,10 @@
 					RelativePath=".\include\Poco\WebWidgets\Event.h"
 					>
 				</File>
+				File
+					RelativePath=".\include\Poco\WebWidgets\Getter.h"
+					>
+				</File>
 				<File
 					RelativePath=".\include\Poco\WebWidgets\JavaScriptEvent.h"
 					>

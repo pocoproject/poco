@@ -43,7 +43,7 @@ namespace WebWidgets {
 
 
 Template::Template(const std::string& templateStr):
-	Renderable(typeid(Template)),
+	View(typeid(Template)),
 	_templateStr(templateStr),
 	_maxWildCard(0),
 	_values()
@@ -54,7 +54,7 @@ Template::Template(const std::string& templateStr):
 
 	
 Template::Template(const std::string& templateStr, const std::vector<Poco::Any>& values):
-	Renderable(typeid(Template)),
+	View(typeid(Template)),
 	_templateStr(templateStr),
 	_maxWildCard(values.size()),
 	_values()
@@ -68,7 +68,7 @@ Template::Template(const std::string& templateStr, const std::vector<Poco::Any>&
 
 
 Template::Template(const std::string& templateStr, const std::type_info& type):
-	Renderable(type),
+	View(type),
 	_templateStr(templateStr),
 	_values()
 {
@@ -103,8 +103,8 @@ std::size_t Template::detectMaxWildCard() const
 				else
 				{
 					// we read %123%
-					if (curVal > maxVal)
-						maxVal = curVal;
+					if (curVal+1 > maxVal)
+						maxVal = curVal+1;
 					// we remain within inPercent
 					curVal = 0;
 					cnt = 0;
@@ -119,8 +119,8 @@ std::size_t Template::detectMaxWildCard() const
 			else
 			{
 				inPercent = false;
-				if (curVal > maxVal)
-					maxVal = curVal;
+				if (curVal+1 > maxVal)
+					maxVal = curVal+1;
 				// we remain within inPercent
 				curVal = 0;
 				cnt = 0;
@@ -177,11 +177,13 @@ void Template::parse(const RenderContext& ctx, std::ostream& out) const
 			}
 			else
 			{
+				// we read neither percent nor number
 				inPercent = false;
 				if (cnt > 0)
 					write(ctx, out, _values[curVal]);
 				else	
 					out << "%";
+				out.put(c);
 				curVal = 0;
 				cnt = 0;
 			}
@@ -246,6 +248,7 @@ void Template::bind(std::size_t num, const char* pVal)
 
 void Template::bind(std::size_t num, Renderable* pVal)
 {
+	poco_check_ptr (pVal);
 	_values[num] = pVal;
 }
 
@@ -253,9 +256,20 @@ void Template::bind(std::size_t num, Renderable* pVal)
 void Template::bind(std::size_t num, const Any& val)
 {
 	const std::type_info& type = val.type();
-	Renderable* pRend = AnyCast<Renderable*>(val);
-	if (pRend)
-		bind(num, pRend);
+	if (type == typeid(Renderable*))
+	{
+		Any cpy = val;
+		Renderable* pRend = AnyCast<Renderable*>(cpy);
+		if (pRend)
+			bind(num, pRend);
+	}
+	else if (type == typeid(Renderable::Ptr))
+	{
+		Any cpy = val;
+		Renderable::Ptr pRend = AnyCast<Renderable::Ptr>(cpy);
+		if (pRend)
+			bindPtr(num, pRend);
+	}
 	else if (type == typeid(std::string))
 		bind(num, RefAnyCast<std::string>(val));
 	else if (type == typeid(const char*))
@@ -268,6 +282,42 @@ void Template::bind(std::size_t num, const Any& val)
 		bind(num, AnyCast<double>(val));
 	else if (type == typeid(bool))
 		bind(num, AnyCast<bool>(val));
+	else if (type == typeid(std::vector<Poco::Any>))
+		bind(num, RefAnyCast<std::vector<Poco::Any> >(val));
+	else if (type == typeid(Poco::AutoPtr<Renderable>))
+		bindPtr(num, RefAnyCast<Poco::AutoPtr<Renderable> >(val));
+	else if (type == typeid(Poco::AutoPtr<Getter>))
+		bindPtr(num, RefAnyCast<Poco::AutoPtr<Getter> >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<Poco::Any> >))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<Poco::Any> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<float> >))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<float> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<double> >))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<double> >>(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<char> >))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<char> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<bool> >))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<bool> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<Renderable::Ptr> >))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<Renderable::Ptr> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<std::string> >))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<std::string> > >(val));	
+	else if (type == typeid(Poco::SharedPtr<std::vector<Getter::Ptr> >))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<Getter::Ptr> > >(val));
+	else if (type == typeid(Poco::SharedPtr<int>))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<int> >(val));
+	else if (type == typeid(Poco::SharedPtr<float>))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<float> >(val));
+	else if (type == typeid(Poco::SharedPtr<double>))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<double> >(val));
+	else if (type == typeid(Poco::SharedPtr<char>))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<char> >(val));
+	else if (type == typeid(Poco::SharedPtr<bool>))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<bool> >(val));
+	else if (type == typeid(Poco::SharedPtr<std::string>))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::string> >(val));
+	else if (type == typeid(Poco::SharedPtr<Poco::Any>))
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<Poco::Any> >(val));															
 	else /* if (type == typeid(char)) */
 		bind(num, AnyCast<char>(val));
 }
@@ -278,9 +328,20 @@ void Template::write(const RenderContext& ctx, std::ostream& out, const Any& val
 	if (val.empty())
 		return;
 	const std::type_info& type = val.type();
-	Renderable* pRend = AnyCast<Renderable*>(val);
-	if (pRend)
-		pRend->renderHead(ctx, out);
+	if (type == typeid(Renderable*))
+	{
+		Any cpy = val;
+		Renderable* pRend = AnyCast<Renderable*>(cpy);
+		if (pRend)
+			pRend->renderHead(ctx, out);
+	}
+	else if (type == typeid(Renderable::Ptr))
+	{
+		Any cpy = val;
+		Renderable::Ptr pRend = AnyCast<Renderable::Ptr>(cpy);
+		if (pRend)
+			pRend->renderHead(ctx, out);
+	}
 	else if (type == typeid(std::string))
 		out << RefAnyCast<std::string>(val);
 	else if (type == typeid(int))
@@ -291,8 +352,149 @@ void Template::write(const RenderContext& ctx, std::ostream& out, const Any& val
 		out << AnyCast<double>(val);
 	else if (type == typeid(bool))
 		out << (AnyCast<bool>(val)?"true":"false");
+	else if (type == typeid(SharedPtr<std::string>))
+		out << *AnyCast<SharedPtr<std::string> >(val);
+	else if (type == typeid(SharedPtr<int>))
+		out << *AnyCast<SharedPtr<int> >(val);
+	else if (type == typeid(SharedPtr<float>))
+		out << *AnyCast<SharedPtr<float> >(val);
+	else if (type == typeid(SharedPtr<double>))
+		out << *AnyCast<SharedPtr<double> >(val);
+	else if (type == typeid(SharedPtr<bool>))
+		out << (*AnyCast<SharedPtr<bool> >(val)?"true":"false");	
+	else if (type == typeid(Getter::Ptr))
+	{
+		Getter::Ptr pGet =AnyCast<Getter::Ptr>(val); 
+		write(ctx, out, pGet->get());
+	}
+	else if (type == typeid(std::vector<Poco::Any>))
+		writeVector(ctx, out, RefAnyCast<std::vector<Poco::Any> >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<Poco::Any> >))
+		writeVector(ctx, out, *RefAnyCast<Poco::SharedPtr<std::vector<Poco::Any> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<float> >))
+		writeVector(ctx, out, *RefAnyCast<Poco::SharedPtr<std::vector<float> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<double> >))
+		writeVector(ctx, out, *RefAnyCast<Poco::SharedPtr<std::vector<double> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<char> >))
+		writeVector(ctx, out, *RefAnyCast<Poco::SharedPtr<std::vector<char> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<bool> >))
+		writeVector(ctx, out, *RefAnyCast<Poco::SharedPtr<std::vector<bool> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<Renderable::Ptr> >))
+		writeVector(ctx, out, *RefAnyCast<Poco::SharedPtr<std::vector<Renderable::Ptr> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<std::string> >))
+		writeVector(ctx, out, *RefAnyCast<Poco::SharedPtr<std::vector<std::string> > >(val));
+	else if (type == typeid(Poco::SharedPtr<std::vector<Getter::Ptr> >))
+		writeVector(ctx, out, *RefAnyCast<Poco::SharedPtr<std::vector<Getter::Ptr> > >(val));	
 	else /* if (type == typeid(char)) */
 		out <<	AnyCast<char>(val);
+}
+
+
+void Template::bind(std::size_t num, const std::vector<Poco::Any>& val)
+{
+	_values[num] = val;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::AutoPtr<Renderable> pRend)
+{
+	_values[num] = pRend;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::AutoPtr<Getter> pRend)
+{
+	_values[num] = pRend;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::vector<Poco::Any> > pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::vector<float> > pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::vector<double> > pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::vector<char> > pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::vector<bool> > pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::vector<Renderable::Ptr> > pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::vector<std::string> > pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::vector<Getter::Ptr> > pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<int> pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<float> pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<double> pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<char> pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<bool> pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<std::string> pVal)
+{
+	_values[num] = pVal;
+}
+
+
+void Template::bindPtr(std::size_t num, Poco::SharedPtr<Poco::Any> pVal)
+{
+	_values[num] = pVal;
 }
 
 

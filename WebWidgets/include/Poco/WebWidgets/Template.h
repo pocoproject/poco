@@ -40,7 +40,8 @@
 #define WebWidgets_Template_INCLUDED
 
 
-#include "Poco/WebWidgets/Renderable.h"
+#include "Poco/WebWidgets/View.h"
+#include "Poco/WebWidgets/Getter.h"
 #include "Poco/FIFOEvent.h"
 #include "Poco/Any.h"
 #include <ostream>
@@ -53,10 +54,11 @@ namespace WebWidgets {
 class RenderContext;
 
 
-class WebWidgets_API Template: public Renderable
+class WebWidgets_API Template: public View
 	/// A JavaScript template class: Defines a template string which contains wildcards of the form %0, %1 %2 ...
 	/// You can bind values to the wildcards. Values must be of type:
 	///  - string, int, double, float, char, bool,  Poco::WebWidgets::Renderable, DateTime
+	/// properties inherited by View (like width, height) are ignored
 {
 public:
 	typedef Poco::AutoPtr<Template> Ptr;
@@ -73,6 +75,25 @@ public:
 	{
 		bind(num, val);
 	}
+	
+	template<typename T>
+	void setValue(std::size_t num, Poco::AutoPtr<T> val)
+	{
+		bindPtr(num, val);
+	}
+	
+	template<typename T>
+	void setValue(std::size_t num, Poco::SharedPtr<T> val)
+	{
+		bindPtr(num, val);
+	}
+	
+	template<typename T>
+	const T& getValue(std::size_t num) const
+	{
+		return Poco::RefAnyCast<T>(_values[num]);
+	}
+	
 		
 	const std::string& templateStr() const;
 		/// Returns the templatestr
@@ -92,6 +113,8 @@ protected:
 	
 	std::size_t detectMaxWildCard() const;
 	
+	void bind(std::size_t num, const std::vector<Poco::Any>& val);
+	
 	void bind(std::size_t num, int val);
 	void bind(std::size_t num, float val);
 	void bind(std::size_t num, double val);
@@ -101,12 +124,40 @@ protected:
 	void bind(std::size_t num, const char* pVal);
 	void bind(std::size_t num, Renderable* pVal);
 	void bind(std::size_t num, const Any& val);
+	void bindPtr(std::size_t num, Poco::AutoPtr<Renderable> pRend);
+	void bindPtr(std::size_t num, Poco::AutoPtr<Getter> pRend);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::vector<Poco::Any> > pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::vector<float> > pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::vector<double> > pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::vector<char> > pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::vector<bool> > pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::vector<Renderable::Ptr> > pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::vector<std::string> > pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::vector<Getter::Ptr> > pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<int> pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<float> pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<double> pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<char> pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<bool> pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<std::string> pVal);
+	void bindPtr(std::size_t num, Poco::SharedPtr<Poco::Any> pVal);
 	void write(const RenderContext& ctx, std::ostream& out, const Any& val) const;
+	
+	template<typename T>
+	void writeVector(const RenderContext& ctx, std::ostream& out, const std::vector<T>& val) const
+	{
+		for (std::size_t i = 0; i < val.size(); ++i)
+		{
+			if (i > 0)
+				out << ",";
+			write(ctx, out, val[i]);
+		}
+	}
 	
 private:
 	std::string            _templateStr;
 	std::size_t            _maxWildCard;
-	std::vector<Poco::Any> _values;	
+	std::vector<Poco::Any> _values;
 };
 
 
