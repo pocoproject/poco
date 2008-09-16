@@ -90,8 +90,7 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pLoader->id()), pL);
 	
 	// the js file: only do when not already set
-	if (!pLoader->getViewCode().empty())
-		return;
+	// bug: this optimization breaks logout/login stuff!
 	
 	std::ostringstream out;
 	View::Ptr pView = pLoader->view();
