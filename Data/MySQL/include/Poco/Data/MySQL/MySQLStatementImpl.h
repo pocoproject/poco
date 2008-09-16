@@ -39,6 +39,7 @@
 #ifndef Data_MySQL_MySQLStatementImpl_INCLUDED
 #define Data_MySQL_MySQLStatementImpl_INCLUDED
 
+
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/Binder.h"
@@ -59,7 +60,6 @@ class MySQL_API MySQLStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for MySQL
 {
 public:
-
 	MySQLStatementImpl(SessionHandle& h);
 		/// Creates the MySQLStatementImpl.
 		
@@ -67,7 +67,6 @@ public:
 		/// Destroys the MySQLStatementImpl.
 		
 protected:
-
 	virtual Poco::UInt32 columnsReturned() const;
 		/// Returns number of columns returned by query.		
 	

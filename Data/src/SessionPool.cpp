@@ -1,7 +1,7 @@
 //
 // SessionPool.cpp
 //
-// $Id: //poco/1.3/Data/src/SessionPool.cpp#2 $
+// $Id: //poco/1.3/Data/src/SessionPool.cpp#3 $
 //
 // Library: Data
 // Package: SessionPooling

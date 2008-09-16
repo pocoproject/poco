@@ -229,4 +229,4 @@ bool SessionImpl::isTransaction()
 }
 
 
-}}}
+} } } // namespace Poco::Data::MySQL

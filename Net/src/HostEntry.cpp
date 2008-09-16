@@ -43,17 +43,12 @@ namespace Poco {
 namespace Net {
 
 
-//
-// HostEntryImpl
-//
-
-
-HostEntryImpl::HostEntryImpl()
+HostEntry::HostEntry()
 {
 }
 
 	
-HostEntryImpl::HostEntryImpl(struct hostent* entry)
+HostEntry::HostEntry(struct hostent* entry)
 {
 	poco_check_ptr (entry);
 	
@@ -82,7 +77,7 @@ HostEntryImpl::HostEntryImpl(struct hostent* entry)
 #if defined(_WIN32) && defined(POCO_HAVE_IPv6)
 
 
-HostEntryImpl::HostEntryImpl(struct addrinfo* ainfo)
+HostEntry::HostEntry(struct addrinfo* ainfo)
 {
 	poco_check_ptr (ainfo);
 	
@@ -99,52 +94,36 @@ HostEntryImpl::HostEntryImpl(struct addrinfo* ainfo)
 #endif
 
 
-HostEntryImpl::~HostEntryImpl()
-{
-}
-
-
-//
-// HostEntry
-//
-
-
-HostEntry::HostEntry():
-	_pImpl(new HostEntryImpl)
-{
-}
-
-	
-HostEntry::HostEntry(struct hostent* entry):
-	_pImpl(new HostEntryImpl(entry))
-{
-}
-
-
-#if defined(_WIN32) && defined(POCO_HAVE_IPv6)
-HostEntry::HostEntry(struct addrinfo* info):
-	_pImpl(new HostEntryImpl(info))
-{
-}
-#endif
-
-
-HostEntry::~HostEntry()
-{
-}
-
-
 HostEntry::HostEntry(const HostEntry& entry):
-	_pImpl(entry._pImpl)
+	_name(entry._name),
+	_aliases(entry._aliases),
+	_addresses(entry._addresses)
 {
 }
 
 
 HostEntry& HostEntry::operator = (const HostEntry& entry)
 {
-	HostEntry tmp(entry);
-	tmp.swap(*this);
+	if (&entry != this)
+	{
+		_name          = entry._name;
+		_aliases       = entry._aliases;
+		_addresses     = entry._addresses;
+	}
 	return *this;
+}
+
+
+void HostEntry::swap(HostEntry& hostEntry)
+{
+	std::swap(_name, hostEntry._name);
+	std::swap(_aliases, hostEntry._aliases);
+	std::swap(_addresses, hostEntry._addresses);
+}
+
+
+HostEntry::~HostEntry()
+{
 }
 
 

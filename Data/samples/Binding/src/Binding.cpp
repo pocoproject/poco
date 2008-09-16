@@ -1,7 +1,7 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/1.3/Data/samples/Binding/src/Binding.cpp#2 $
+// $Id: //poco/1.3/Data/samples/Binding/src/Binding.cpp#3 $
 //
 // This sample demonstrates the Data library.
 //

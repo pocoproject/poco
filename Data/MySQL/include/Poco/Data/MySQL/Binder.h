@@ -39,11 +39,13 @@
 #ifndef Data_MySQL_Binder_INCLUDED
 #define Data_MySQL_Binder_INCLUDED
 
+
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <mysql.h>
+
 
 namespace Poco {
 namespace Data {
@@ -54,7 +56,6 @@ class MySQL_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
 public:
-
 	Binder();
 		/// Creates the Binder.
 		
@@ -110,7 +111,6 @@ public:
 		/// Return array
 
 private:
-
 	virtual void bind(std::size_t, const char* const&)
 		/// Binds a const char ptr. 
 		/// This is a private no-op in this implementation
@@ -122,7 +122,6 @@ private:
 		/// Common bind implementation
 
 private:
-
 	std::vector<MYSQL_BIND> _bindArray;
 };
 

@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -35,21 +35,89 @@
 
 
 #include "Poco/Net/X509Certificate.h"
+#include "Poco/Net/SSLException.h"
+#include "Poco/Net/SSLManager.h"
+#include "Poco/Net/SecureSocketImpl.h"
+#include <openssl/pem.h>
 
 
 namespace Poco {
 namespace Net {
 
 
-X509Certificate::X509Certificate(X509* pCert):_pCert(pCert)
+X509Certificate::X509Certificate(const std::string& file):
+	_issuerName(),
+	_subjectName(),
+	_pCert(0),
+	_file(file)
+{
+	BIO *fp=BIO_new(BIO_s_file());
+	const char* pFN = file.c_str();
+	BIO_read_filename(fp, (void*)pFN);
+	if (!fp)
+		throw Poco::PathNotFoundException("Failed to open " + file);
+	try
+	{
+		_pCert = PEM_read_bio_X509(fp,0,0,0);
+	}
+	catch(...)
+	{
+		BIO_free(fp);
+		throw;
+	}
+	if (!_pCert)
+		throw SSLException("Faild to load certificate from " + file);
+	initialize();
+}
+
+
+X509Certificate::X509Certificate(X509* pCert):
+	_issuerName(),
+	_subjectName(),
+	_pCert(pCert),
+	_file()
 {
 	poco_check_ptr(_pCert);
 	initialize();
 }
 
 
+X509Certificate::X509Certificate(const X509Certificate& cert):
+	_issuerName(cert._issuerName),
+	_subjectName(cert._subjectName),
+	_pCert(cert._pCert),
+	_file(cert._file)
+{
+	if (!_file.empty())
+		_pCert = X509_dup(_pCert);
+}
+
+
+X509Certificate& X509Certificate::operator=(const X509Certificate& cert)
+{
+	if (this != &cert)
+	{
+		X509Certificate c(cert);
+		swap(c);
+	}
+	return *this;
+}
+
+
+void X509Certificate::swap(X509Certificate& cert)
+{
+	using std::swap;
+	swap(cert._file, _file);
+	swap(cert._issuerName, _issuerName);
+	swap(cert._subjectName, _subjectName);
+	swap(cert._pCert, _pCert);
+}
+
+
 X509Certificate::~X509Certificate()
 {
+	if (!_file.empty() && _pCert)
+		X509_free(_pCert);
 }
 
 
@@ -60,6 +128,13 @@ void X509Certificate::initialize()
 	_issuerName = data;
 	X509_NAME_oneline(X509_get_subject_name(_pCert), data, 256);
 	_subjectName = data;
+}
+
+
+bool X509Certificate::verify(const std::string& hostName, Poco::SharedPtr<Context> ptr)
+{
+	X509* pCert = X509_dup(_pCert);
+	return (X509_V_OK == SecureSocketImpl::postConnectionCheck(ptr, pCert, hostName));
 }
 
 

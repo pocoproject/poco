@@ -1,7 +1,7 @@
 //
 // ThreadPool.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ThreadPool.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/ThreadPool.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -179,8 +179,9 @@ private:
 };
 
 
+//
 // inlines
-
+//
 inline void ThreadPool::setStackSize(int stackSize)
 {
 	_stackSize = stackSize;

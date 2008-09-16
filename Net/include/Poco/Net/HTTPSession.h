@@ -1,7 +1,7 @@
 //
 // HTTPSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPSession.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPSession.h#4 $
 //
 // Library: Net
 // Package: HTTP

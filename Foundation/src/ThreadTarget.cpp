@@ -7,7 +7,7 @@
 // Package: Threading
 // Module:  ThreadTarget
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,7 +35,6 @@
 
 
 #include "Poco/ThreadTarget.h"
-
 
 
 namespace Poco {

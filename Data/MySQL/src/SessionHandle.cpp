@@ -116,4 +116,4 @@ void SessionHandle::query(const char* str)
 }
 
 
-}}} // Poco::Data::MySQL
+} } } // namespace Poco::Data::MySQL

@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#4 $
 //
 // Library: Foundation
 // Package: Core

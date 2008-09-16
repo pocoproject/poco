@@ -1,7 +1,7 @@
 //
 // MySQLTest.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/testsuite/src/MySQLTest.cpp#4 $
+// $Id: //poco/1.3/Data/MySQL/testsuite/src/MySQLTest.cpp#1 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -43,14 +43,17 @@
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <iostream>
 
+
 using namespace Poco::Data;
 using Poco::Data::MySQL::ConnectionException;
 using Poco::Data::MySQL::StatementException;
 using Poco::format;
 using Poco::NotFoundException;
 
+
 Poco::SharedPtr<Poco::Data::Session> MySQLTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
+
 
 // Parameters for barebone-test
 #define MYSQL_USER "root"
@@ -58,6 +61,7 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 #define MYSQL_HOST "localhost"
 #define MYSQL_PORT 3306
 #define MYSQL_DB   "test"
+
 
 // Connection string to POCO
 std::string MySQLTest::_dbConnString = "user=root;password=;db=test;compress=true;auto-reconnect=true";
@@ -361,7 +365,6 @@ void MySQLTest::testCombinedLimits()
 	recreatePersonTable();
 	_pExecutor->combinedLimits();
 }
-
 
 
 void MySQLTest::testRange()

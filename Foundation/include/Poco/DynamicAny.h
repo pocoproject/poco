@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/DynamicAny.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/DynamicAny.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -64,13 +64,26 @@ class Foundation_API DynamicAny
 	/// String truncation is allowed -- it is possible to convert between string and character when string length is 
 	/// greater than 1. An empty string gets converted to the char '\0', a non-empty string is truncated to the first character. 
 	///
-	/// Bolean conversion are performed as follows:
+	/// Boolean conversion is performed as follows:
 	///
 	/// A string value "false" (not case sensitive) or "0" can be converted to a boolean value false, any other string 
 	/// not being false by the above criteria evaluates to true (e.g: "hi" -> true).
 	/// Integer 0 values are false, everything else is true.
 	/// Floating point values equal to the minimal FP representation on a given platform are false, everything else is true.
 	///
+	/// Arithmetic operations with POD types as well as between DynamicAny's are supported, subject to following
+	/// limitations:
+	/// 
+	/// 	- for std::string and const char* values, only '+' and '+=' operations are supported
+	/// 
+	/// 	- for integral and floating point numeric values, following operations are supported:
+	/// 	  '+', '+=', '-', '-=', '*', '*=' , '/' and '/=' 
+	///
+	/// 	- for integral values, following operations are supported:
+	///		  prefix and postfix increment (++) and decement (--)
+	/// 
+	/// 	- for all other types, InvalidArgumentException is thrown upon attempt of an arithmetic operation
+	/// 
 	/// A DynamicAny can be created from and converted to a value of any type for which a specialization of 
 	/// DynamicAnyHolderImpl is available. For supported types, see DynamicAnyHolder documentation.
 {
@@ -133,7 +146,7 @@ public:
 	}
 	
 	template <typename T>
-	operator T() const
+	operator T () const
 		/// Safe conversion operator for implicit type
 		/// conversions.
 		///
@@ -146,7 +159,7 @@ public:
 		_pHolder->convert(result);
 		return result;
 	}
-	
+
 	template <typename T>
 	const T& extract() const
 		/// Returns a const reference to the actual value.
@@ -162,63 +175,1565 @@ public:
 			throw BadCastException();
 	}
 
-	DynamicAny& operator = (const DynamicAny& other)
-		/// Assignment operator
-	{
-		DynamicAny tmp(other);
-		swap(tmp);
-		return *this;
-	}
-
 	template <typename T> 
 	DynamicAny& operator = (const T& other)
-		/// Assignment operator
+		/// Assignment operator for assigning POD to DynamicAny
 	{
 		DynamicAny tmp(other);
 		swap(tmp);
 		return *this;
 	}
-	
-	template <typename T> 
-	bool operator == (const T& other)
-		/// Equality operator
-	{
-		T value;
-		_pHolder->convert(value);
-		return value == other;
-	}
 
-	bool operator == (const char* other)
-		/// Equality operator
-	{
-		std::string value;
-		_pHolder->convert(value);
-		return value == other;
-	}
+	DynamicAny& operator = (const DynamicAny& other);
+		/// Assignment operator specialization for DynamicAny
 
 	template <typename T> 
-	bool operator != (const T& other)
-		/// Inequality operator
+	const DynamicAny operator + (const T& other) const
+		/// Addition operator for adding POD to DynamicAny
 	{
-		T value;
-		_pHolder->convert(value);
-		return value != other;
+		return convert<T>() + other;
 	}
 
-	bool operator != (const char* other)
-		/// Inequality operator
+	const DynamicAny operator + (const DynamicAny& other) const;
+		/// Addition operator specialization for DynamicAny
+
+	const DynamicAny operator + (const char* other) const;
+		/// Addition operator specialization for adding const char* to DynamicAny
+
+	DynamicAny& operator ++ ();
+		/// Pre-increment operator
+
+	DynamicAny operator ++ (int);
+		/// Post-increment operator
+
+	DynamicAny& operator -- ();
+		/// Pre-decrement operator
+
+	DynamicAny operator -- (int);
+		/// Post-decrement operator
+
+	template <typename T> 
+	DynamicAny& operator += (const T& other)
+		/// Addition asignment operator for addition/assignment of POD to DynamicAny.
 	{
-		std::string value;
-		_pHolder->convert(value);
-		return value != other;
+		return *this = convert<T>() + other;
 	}
 
-    const std::type_info& type() const;
+	DynamicAny& operator += (const DynamicAny& other);
+		/// Addition asignment operator specialization for DynamicAny
+
+	DynamicAny& operator += (const char* other);
+		/// Addition asignment operator specialization for const char*
+
+	template <typename T> 
+	const DynamicAny operator - (const T& other) const
+		/// Subtraction operator for subtracting POD from DynamicAny
+	{
+		return convert<T>() - other;
+	}
+
+	const DynamicAny operator - (const DynamicAny& other) const;
+		/// Subtraction operator specialization for DynamicAny
+
+	template <typename T> 
+	DynamicAny& operator -= (const T& other)
+		/// Subtraction asignment operator
+	{
+		return *this = convert<T>() - other;
+	}
+
+	DynamicAny& operator -= (const DynamicAny& other);
+		/// Subtraction asignment operator specialization for DynamicAny
+
+	template <typename T> 
+	const DynamicAny operator * (const T& other) const
+		/// Multiplication operator for multiplying DynamicAny with POD
+	{
+		return convert<T>() * other;
+	}
+
+	const DynamicAny operator * (const DynamicAny& other) const;
+		/// Multiplication operator specialization for DynamicAny
+
+	template <typename T> 
+	DynamicAny& operator *= (const T& other)
+		/// Multiplication asignment operator
+	{
+		return *this = convert<T>() * other;
+	}
+
+	DynamicAny& operator *= (const DynamicAny& other);
+		/// Multiplication asignment operator specialization for DynamicAny
+
+	template <typename T> 
+	const DynamicAny operator / (const T& other) const
+		/// Division operator for dividing DynamicAny with POD
+	{
+		return convert<T>() / other;
+	}
+
+	const DynamicAny operator / (const DynamicAny& other) const;
+		/// Division operator specialization for DynamicAny
+
+	template <typename T> 
+	DynamicAny& operator /= (const T& other)
+		/// Division asignment operator
+	{
+		return *this = convert<T>() / other;
+	}
+
+	DynamicAny& operator /= (const DynamicAny& other);
+		/// Division asignment operator specialization for DynamicAny
+
+	template <typename T> 
+	bool operator == (const T& other) const
+		/// Equality operator
+	{
+		return convert<T>() == other;
+	}
+
+	bool operator == (const char* other) const;
+		/// Equality operator specialization for const char*
+
+	bool operator == (const DynamicAny& other) const;
+		/// Equality operator specialization for DynamicAny
+
+	template <typename T> 
+	bool operator != (const T& other) const
+		/// Inequality operator
+	{
+		return convert<T>() != other;
+	}
+
+	bool operator != (const DynamicAny& other) const;
+		/// Inequality operator  specialization for DynamicAny
+
+	bool operator != (const char* other) const;
+		/// Inequality operator  specialization for const char*
+
+	template <typename T> 
+	bool operator < (const T& other) const
+		/// Less than operator
+	{
+		return convert<T>() < other;
+	}
+
+	template <typename T> 
+	bool operator <= (const T& other) const
+		/// Less than or equal operator
+	{
+		return convert<T>() <= other;
+	}
+
+	template <typename T> 
+	bool operator > (const T& other) const
+		/// Greater than operator
+	{
+		return convert<T>() > other;
+	}
+
+	template <typename T> 
+	bool operator >= (const T& other) const
+		/// Greater than or equal operator
+	{
+		return convert<T>() >= other;
+	}
+
+	bool isArray() const;
+		/// Returns true if DynamicAny represents a vector
+
+	template <typename T>
+	DynamicAny& operator [] (T n)
+		/// Index operator, only use on DynamicAnys where isArray
+		/// returns true! In all other cases a BadCastException is thrown!
+	{
+		DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder =
+			dynamic_cast<DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
+		if (pHolder)
+			return pHolder->operator[](n);
+		else
+			throw BadCastException();
+	}
+
+	template <typename T>
+	const DynamicAny& operator [] (T n) const
+		/// const Index operator, only use on DynamicAnys where isArray
+		/// returns true! In all other cases a BadCastException is thrown!
+	{
+		const DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder =
+			dynamic_cast<const DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
+		if (pHolder)
+			return pHolder->operator[](n);
+		else
+			throw BadCastException();
+	}
+
+	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
+
+	bool isInteger() const;
+		/// Returns true if stored value is integer.
+
+	bool isSigned() const;
+		/// Returns true if stored value is signed.
+
+	bool isNumeric() const;
+		/// Returns true if stored value is numeric.
+		/// Returns false for numeric strings (e.g. "123" is string, not number)
+
+	bool isString() const;
+		/// Returns true if stored value is std::string.
 	
 private:
+	template <typename T>
+	T add(const DynamicAny& other) const
+	{
+		return convert<T>() + other.convert<T>();
+	}
+
+	template <typename T>
+	T subtract(const DynamicAny& other) const
+	{
+		return convert<T>() - other.convert<T>();
+	}
+	
+	template <typename T>
+	T multiply(const DynamicAny& other) const
+	{
+		return convert<T>() * other.convert<T>();
+	}
+
+	template <typename T>
+	T divide(const DynamicAny& other) const
+	{
+		return convert<T>() / other.convert<T>();
+	}
+
 	DynamicAnyHolder* _pHolder;
 };
+
+
+///
+/// inlines
+///
+
+
+///
+/// DynamicAny members
+///
+
+inline void DynamicAny::swap(DynamicAny& ptr)
+{
+	std::swap(_pHolder, ptr._pHolder);
+}
+
+
+inline const std::type_info& DynamicAny::type() const
+{
+	return _pHolder->type();
+}
+
+
+inline const DynamicAny DynamicAny::operator + (const char* other) const
+{
+	return convert<std::string>() + other;
+}
+
+
+inline DynamicAny& DynamicAny::operator += (const char*other)
+{
+	return *this = convert<std::string>() + other;
+}
+
+
+inline bool DynamicAny::operator == (const DynamicAny& other) const
+{
+	return convert<std::string>() == other.convert<std::string>();
+}
+
+
+inline bool DynamicAny::operator == (const char* other) const
+{
+	return convert<std::string>() == other;
+}
+
+
+inline bool DynamicAny::operator != (const DynamicAny& other) const
+{
+	return convert<std::string>() != other.convert<std::string>();
+}
+
+
+inline bool DynamicAny::operator != (const char* other) const
+{
+	return convert<std::string>() != other;
+}
+
+
+inline bool DynamicAny::isArray() const
+{
+	return _pHolder->isArray();
+}
+
+
+inline bool DynamicAny::isInteger() const
+{
+	return _pHolder->isInteger();
+}
+
+
+inline bool DynamicAny::isSigned() const
+{
+	return _pHolder->isSigned();
+}
+
+
+inline bool DynamicAny::isNumeric() const
+{
+	return _pHolder->isNumeric();
+}
+
+
+inline bool DynamicAny::isString() const
+{
+	return _pHolder->isString();
+}
+
+
+///
+/// DynamicAny non-member functions
+///
+
+inline const DynamicAny operator + (const char* other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to const char*
+{
+	std::string tmp = other;
+	return tmp + da.convert<std::string>();
+}
+
+
+inline const char operator + (const char& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to char
+{
+	return other + da.convert<char>();
+}
+
+
+inline const char operator - (const char& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from char
+{
+	return other - da.convert<char>();
+}
+
+
+inline const char operator * (const char& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with char
+{
+	return other * da.convert<char>();
+}
+
+
+inline const char operator / (const char& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with char
+{
+	return other / da.convert<char>();
+}
+
+
+inline char operator += (char& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to char
+{
+	return other += da.convert<char>();
+}
+
+
+inline char operator -= (char& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from char
+{
+	return other -= da.convert<char>();
+}
+
+
+inline char operator *= (char& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with char
+{
+	return other *= da.convert<char>();
+}
+
+
+inline char operator /= (char& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with char
+{
+	return other /= da.convert<char>();
+}
+
+
+inline const bool operator == (const char& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with char
+{
+	return other == da.convert<char>();
+}
+
+
+inline const bool operator != (const char& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with char
+{
+	return other != da.convert<char>();
+}
+
+
+inline const bool operator < (const char& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with char
+{
+	return other < da.convert<char>();
+}
+
+
+inline const bool operator <= (const char& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with char
+{
+	return other <= da.convert<char>();
+}
+
+
+inline const bool operator > (const char& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with char
+{
+	return other > da.convert<char>();
+}
+
+
+inline const bool operator >= (const char& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with char
+{
+	return other >= da.convert<char>();
+}
+
+
+inline const Poco::Int8 operator + (const Poco::Int8& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to Poco::Int8
+{
+	return other + da.convert<Poco::Int8>();
+}
+
+
+inline const Poco::Int8 operator - (const Poco::Int8& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from Poco::Int8
+{
+	return other - da.convert<Poco::Int8>();
+}
+
+
+inline const Poco::Int8 operator * (const Poco::Int8& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with Poco::Int8
+{
+	return other * da.convert<Poco::Int8>();
+}
+
+
+inline const Poco::Int8 operator / (const Poco::Int8& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with Poco::Int8
+{
+	return other / da.convert<Poco::Int8>();
+}
+
+
+inline Poco::Int8 operator += (Poco::Int8& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to Poco::Int8
+{
+	return other += da.convert<Poco::Int8>();
+}
+
+
+inline Poco::Int8 operator -= (Poco::Int8& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from Poco::Int8
+{
+	return other -= da.convert<Poco::Int8>();
+}
+
+
+inline Poco::Int8 operator *= (Poco::Int8& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with Poco::Int8
+{
+	return other *= da.convert<Poco::Int8>();
+}
+
+
+inline Poco::Int8 operator /= (Poco::Int8& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with Poco::Int8
+{
+	return other /= da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator == (const Poco::Int8& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with Poco::Int8
+{
+	return other == da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator != (const Poco::Int8& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with Poco::Int8
+{
+	return other != da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator < (const Poco::Int8& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::Int8
+{
+	return other < da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator <= (const Poco::Int8& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::Int8
+{
+	return other <= da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator > (const Poco::Int8& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::Int8
+{
+	return other > da.convert<Poco::Int8>();
+}
+
+
+inline const bool operator >= (const Poco::Int8& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::Int8
+{
+	return other >= da.convert<Poco::Int8>();
+}
+
+
+inline const Poco::UInt8 operator + (const Poco::UInt8& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to Poco::UInt8
+{
+	return other + da.convert<Poco::UInt8>();
+}
+
+
+inline const Poco::UInt8 operator - (const Poco::UInt8& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from Poco::UInt8
+{
+	return other - da.convert<Poco::UInt8>();
+}
+
+
+inline const Poco::UInt8 operator * (const Poco::UInt8& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with Poco::UInt8
+{
+	return other * da.convert<Poco::UInt8>();
+}
+
+
+inline const Poco::UInt8 operator / (const Poco::UInt8& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with Poco::UInt8
+{
+	return other / da.convert<Poco::UInt8>();
+}
+
+
+inline Poco::UInt8 operator += (Poco::UInt8& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to Poco::UInt8
+{
+	return other += da.convert<Poco::UInt8>();
+}
+
+
+inline Poco::UInt8 operator -= (Poco::UInt8& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from Poco::UInt8
+{
+	return other -= da.convert<Poco::UInt8>();
+}
+
+
+inline Poco::UInt8 operator *= (Poco::UInt8& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with Poco::UInt8
+{
+	return other *= da.convert<Poco::UInt8>();
+}
+
+
+inline Poco::UInt8 operator /= (Poco::UInt8& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with Poco::UInt8
+{
+	return other /= da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator == (const Poco::UInt8& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with Poco::UInt8
+{
+	return other == da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator != (const Poco::UInt8& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with Poco::UInt8
+{
+	return other != da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator < (const Poco::UInt8& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::UInt8
+{
+	return other < da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator <= (const Poco::UInt8& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::UInt8
+{
+	return other <= da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator > (const Poco::UInt8& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::UInt8
+{
+	return other > da.convert<Poco::UInt8>();
+}
+
+
+inline const bool operator >= (const Poco::UInt8& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt8
+{
+	return other >= da.convert<Poco::UInt8>();
+}
+
+
+inline const Poco::Int16 operator + (const Poco::Int16& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to Poco::Int16
+{
+	return other + da.convert<Poco::Int16>();
+}
+
+
+inline const Poco::Int16 operator - (const Poco::Int16& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from Poco::Int16
+{
+	return other - da.convert<Poco::Int16>();
+}
+
+
+inline const Poco::Int16 operator * (const Poco::Int16& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with Poco::Int16
+{
+	return other * da.convert<Poco::Int16>();
+}
+
+
+inline const Poco::Int16 operator / (const Poco::Int16& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with Poco::Int16
+{
+	return other / da.convert<Poco::Int16>();
+}
+
+
+inline Poco::Int16 operator += (Poco::Int16& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to Poco::Int16
+{
+	return other += da.convert<Poco::Int16>();
+}
+
+
+inline Poco::Int16 operator -= (Poco::Int16& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from Poco::Int16
+{
+	return other -= da.convert<Poco::Int16>();
+}
+
+
+inline Poco::Int16 operator *= (Poco::Int16& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with Poco::Int16
+{
+	return other *= da.convert<Poco::Int16>();
+}
+
+
+inline Poco::Int16 operator /= (Poco::Int16& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with Poco::Int16
+{
+	return other /= da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator == (const Poco::Int16& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with Poco::Int16
+{
+	return other == da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator != (const Poco::Int16& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with Poco::Int16
+{
+	return other != da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator < (const Poco::Int16& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::Int16
+{
+	return other < da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator <= (const Poco::Int16& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::Int16
+{
+	return other <= da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator > (const Poco::Int16& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::Int16
+{
+	return other > da.convert<Poco::Int16>();
+}
+
+
+inline const bool operator >= (const Poco::Int16& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::Int16
+{
+	return other >= da.convert<Poco::Int16>();
+}
+
+
+inline const Poco::UInt16 operator + (const Poco::UInt16& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to Poco::UInt16
+{
+	return other + da.convert<Poco::UInt16>();
+}
+
+
+inline const Poco::UInt16 operator - (const Poco::UInt16& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from Poco::UInt16
+{
+	return other - da.convert<Poco::UInt16>();
+}
+
+
+inline const Poco::UInt16 operator * (const Poco::UInt16& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with Poco::UInt16
+{
+	return other * da.convert<Poco::UInt16>();
+}
+
+
+inline const Poco::UInt16 operator / (const Poco::UInt16& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with Poco::UInt16
+{
+	return other / da.convert<Poco::UInt16>();
+}
+
+
+inline Poco::UInt16 operator += (Poco::UInt16& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to Poco::UInt16
+{
+	return other += da.convert<Poco::UInt16>();
+}
+
+
+inline Poco::UInt16 operator -= (Poco::UInt16& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from Poco::UInt16
+{
+	return other -= da.convert<Poco::UInt16>();
+}
+
+
+inline Poco::UInt16 operator *= (Poco::UInt16& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with Poco::UInt16
+{
+	return other *= da.convert<Poco::UInt16>();
+}
+
+
+inline Poco::UInt16 operator /= (Poco::UInt16& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with Poco::UInt16
+{
+	return other /= da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator == (const Poco::UInt16& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with Poco::UInt16
+{
+	return other == da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator != (const Poco::UInt16& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with Poco::UInt16
+{
+	return other != da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator < (const Poco::UInt16& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::UInt16
+{
+	return other < da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator <= (const Poco::UInt16& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::UInt16
+{
+	return other <= da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator > (const Poco::UInt16& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::UInt16
+{
+	return other > da.convert<Poco::UInt16>();
+}
+
+
+inline const bool operator >= (const Poco::UInt16& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt16
+{
+	return other >= da.convert<Poco::UInt16>();
+}
+
+
+inline const Poco::Int32 operator + (const Poco::Int32& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to Poco::Int32
+{
+	return other + da.convert<Poco::Int32>();
+}
+
+
+inline const Poco::Int32 operator - (const Poco::Int32& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from Poco::Int32
+{
+	return other - da.convert<Poco::Int32>();
+}
+
+
+inline const Poco::Int32 operator * (const Poco::Int32& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with Poco::Int32
+{
+	return other * da.convert<Poco::Int32>();
+}
+
+
+inline const Poco::Int32 operator / (const Poco::Int32& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with Poco::Int32
+{
+	return other / da.convert<Poco::Int32>();
+}
+
+
+inline Poco::Int32 operator += (Poco::Int32& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to Poco::Int32
+{
+	return other += da.convert<Poco::Int32>();
+}
+
+
+inline Poco::Int32 operator -= (Poco::Int32& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from Poco::Int32
+{
+	return other -= da.convert<Poco::Int32>();
+}
+
+
+inline Poco::Int32 operator *= (Poco::Int32& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with Poco::Int32
+{
+	return other *= da.convert<Poco::Int32>();
+}
+
+
+inline Poco::Int32 operator /= (Poco::Int32& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with Poco::Int32
+{
+	return other /= da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator == (const Poco::Int32& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with Poco::Int32
+{
+	return other == da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator != (const Poco::Int32& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with Poco::Int32
+{
+	return other != da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator < (const Poco::Int32& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::Int32
+{
+	return other < da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator <= (const Poco::Int32& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::Int32
+{
+	return other <= da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator > (const Poco::Int32& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::Int32
+{
+	return other > da.convert<Poco::Int32>();
+}
+
+
+inline const bool operator >= (const Poco::Int32& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::Int32
+{
+	return other >= da.convert<Poco::Int32>();
+}
+
+
+inline const Poco::UInt32 operator + (const Poco::UInt32& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to Poco::UInt32
+{
+	return other + da.convert<Poco::UInt32>();
+}
+
+
+inline const Poco::UInt32 operator - (const Poco::UInt32& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from Poco::UInt32
+{
+	return other - da.convert<Poco::UInt32>();
+}
+
+
+inline const Poco::UInt32 operator * (const Poco::UInt32& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with Poco::UInt32
+{
+	return other * da.convert<Poco::UInt32>();
+}
+
+
+inline const Poco::UInt32 operator / (const Poco::UInt32& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with Poco::UInt32
+{
+	return other / da.convert<Poco::UInt32>();
+}
+
+
+inline Poco::UInt32 operator += (Poco::UInt32& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to Poco::UInt32
+{
+	return other += da.convert<Poco::UInt32>();
+}
+
+
+inline Poco::UInt32 operator -= (Poco::UInt32& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from Poco::UInt32
+{
+	return other -= da.convert<Poco::UInt32>();
+}
+
+
+inline Poco::UInt32 operator *= (Poco::UInt32& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with Poco::UInt32
+{
+	return other *= da.convert<Poco::UInt32>();
+}
+
+
+inline Poco::UInt32 operator /= (Poco::UInt32& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with Poco::UInt32
+{
+	return other /= da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator == (const Poco::UInt32& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with Poco::UInt32
+{
+	return other == da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator != (const Poco::UInt32& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with Poco::UInt32
+{
+	return other != da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator < (const Poco::UInt32& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::UInt32
+{
+	return other < da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator <= (const Poco::UInt32& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::UInt32
+{
+	return other <= da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator > (const Poco::UInt32& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::UInt32
+{
+	return other > da.convert<Poco::UInt32>();
+}
+
+
+inline const bool operator >= (const Poco::UInt32& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt32
+{
+	return other >= da.convert<Poco::UInt32>();
+}
+
+
+inline const Poco::Int64 operator + (const Poco::Int64& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to Poco::Int64
+{
+	return other + da.convert<Poco::Int64>();
+}
+
+
+inline const Poco::Int64 operator - (const Poco::Int64& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from Poco::Int64
+{
+	return other - da.convert<Poco::Int64>();
+}
+
+
+inline const Poco::Int64 operator * (const Poco::Int64& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with Poco::Int64
+{
+	return other * da.convert<Poco::Int64>();
+}
+
+
+inline const Poco::Int64 operator / (const Poco::Int64& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with Poco::Int64
+{
+	return other / da.convert<Poco::Int64>();
+}
+
+
+inline Poco::Int64 operator += (Poco::Int64& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to Poco::Int64
+{
+	return other += da.convert<Poco::Int64>();
+}
+
+
+inline Poco::Int64 operator -= (Poco::Int64& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from Poco::Int64
+{
+	return other -= da.convert<Poco::Int64>();
+}
+
+
+inline Poco::Int64 operator *= (Poco::Int64& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with Poco::Int64
+{
+	return other *= da.convert<Poco::Int64>();
+}
+
+
+inline Poco::Int64 operator /= (Poco::Int64& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with Poco::Int64
+{
+	return other /= da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator == (const Poco::Int64& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with Poco::Int64
+{
+	return other == da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator != (const Poco::Int64& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with Poco::Int64
+{
+	return other != da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator < (const Poco::Int64& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::Int64
+{
+	return other < da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator <= (const Poco::Int64& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::Int64
+{
+	return other <= da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator > (const Poco::Int64& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::Int64
+{
+	return other > da.convert<Poco::Int64>();
+}
+
+
+inline const bool operator >= (const Poco::Int64& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::Int64
+{
+	return other >= da.convert<Poco::Int64>();
+}
+
+
+inline const Poco::UInt64 operator + (const Poco::UInt64& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to Poco::UInt64
+{
+	return other + da.convert<Poco::UInt64>();
+}
+
+
+inline const Poco::UInt64 operator - (const Poco::UInt64& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from Poco::UInt64
+{
+	return other - da.convert<Poco::UInt64>();
+}
+
+
+inline const Poco::UInt64 operator * (const Poco::UInt64& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with Poco::UInt64
+{
+	return other * da.convert<Poco::UInt64>();
+}
+
+
+inline const Poco::UInt64 operator / (const Poco::UInt64& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with Poco::UInt64
+{
+	return other / da.convert<Poco::UInt64>();
+}
+
+
+inline Poco::UInt64 operator += (Poco::UInt64& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to Poco::UInt64
+{
+	return other += da.convert<Poco::UInt64>();
+}
+
+
+inline Poco::UInt64 operator -= (Poco::UInt64& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from Poco::UInt64
+{
+	return other -= da.convert<Poco::UInt64>();
+}
+
+
+inline Poco::UInt64 operator *= (Poco::UInt64& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with Poco::UInt64
+{
+	return other *= da.convert<Poco::UInt64>();
+}
+
+
+inline Poco::UInt64 operator /= (Poco::UInt64& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with Poco::UInt64
+{
+	return other /= da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator == (const Poco::UInt64& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with Poco::UInt64
+{
+	return other == da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator != (const Poco::UInt64& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with Poco::UInt64
+{
+	return other != da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator < (const Poco::UInt64& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with Poco::UInt64
+{
+	return other < da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator <= (const Poco::UInt64& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with Poco::UInt64
+{
+	return other <= da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator > (const Poco::UInt64& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with Poco::UInt64
+{
+	return other > da.convert<Poco::UInt64>();
+}
+
+
+inline const bool operator >= (const Poco::UInt64& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt64
+{
+	return other >= da.convert<Poco::UInt64>();
+}
+
+
+inline const float operator + (const float& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to float
+{
+	return other + da.convert<float>();
+}
+
+
+inline const float operator - (const float& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from float
+{
+	return other - da.convert<float>();
+}
+
+
+inline const float operator * (const float& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with float
+{
+	return other * da.convert<float>();
+}
+
+
+inline const float operator / (const float& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with float
+{
+	return other / da.convert<float>();
+}
+
+
+inline float operator += (float& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to float
+{
+	return other += da.convert<float>();
+}
+
+
+inline float operator -= (float& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from float
+{
+	return other -= da.convert<float>();
+}
+
+
+inline float operator *= (float& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with float
+{
+	return other *= da.convert<float>();
+}
+
+
+inline float operator /= (float& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with float
+{
+	return other /= da.convert<float>();
+}
+
+
+inline const bool operator == (const float& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with float
+{
+	return other == da.convert<float>();
+}
+
+
+inline const bool operator != (const float& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with float
+{
+	return other != da.convert<float>();
+}
+
+
+inline const bool operator < (const float& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with float
+{
+	return other < da.convert<float>();
+}
+
+
+inline const bool operator <= (const float& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with float
+{
+	return other <= da.convert<float>();
+}
+
+
+inline const bool operator > (const float& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with float
+{
+	return other > da.convert<float>();
+}
+
+
+inline const bool operator >= (const float& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with float
+{
+	return other >= da.convert<float>();
+}
+
+
+inline const double operator + (const double& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to double
+{
+	return other + da.convert<double>();
+}
+
+
+inline const double operator - (const double& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from double
+{
+	return other - da.convert<double>();
+}
+
+
+inline const double operator * (const double& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with double
+{
+	return other * da.convert<double>();
+}
+
+
+inline const double operator / (const double& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with double
+{
+	return other / da.convert<double>();
+}
+
+
+inline double operator += (double& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to double
+{
+	return other += da.convert<double>();
+}
+
+
+inline double operator -= (double& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from double
+{
+	return other -= da.convert<double>();
+}
+
+
+inline double operator *= (double& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with double
+{
+	return other *= da.convert<double>();
+}
+
+
+inline double operator /= (double& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with double
+{
+	return other /= da.convert<double>();
+}
+
+
+inline const bool operator == (const double& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with double
+{
+	return other == da.convert<double>();
+}
+
+
+inline const bool operator != (const double& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with double
+{
+	return other != da.convert<double>();
+}
+
+
+inline const bool operator < (const double& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with double
+{
+	return other < da.convert<double>();
+}
+
+
+inline const bool operator <= (const double& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with double
+{
+	return other <= da.convert<double>();
+}
+
+
+inline const bool operator > (const double& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with double
+{
+	return other > da.convert<double>();
+}
+
+
+inline const bool operator >= (const double& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with double
+{
+	return other >= da.convert<double>();
+}
+
+
+inline const bool operator == (const bool& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with bool
+{
+	return other == da.convert<bool>();
+}
+
+
+inline const bool operator != (const bool& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with bool
+{
+	return other != da.convert<bool>();
+}
+
+
+inline const bool operator == (const std::string& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with std::string
+{
+	return other == da.convert<std::string>();
+}
+
+
+inline const bool operator != (const std::string& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with std::string
+{
+	return other != da.convert<std::string>();
+}
+
+
+inline const bool operator == (const char* other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with const char*
+{
+	return da.convert<std::string>() == other;
+}
+
+
+inline const bool operator != (const char* other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with const char*
+{
+	return da.convert<std::string>() != other;
+}
+
+
+#ifndef POCO_LONG_IS_64_BIT
+
+
+inline const long operator + (const long& other, const DynamicAny& da)
+	/// Addition operator for adding DynamicAny to long
+{
+	return other + da.convert<long>();
+}
+
+
+inline const long operator - (const long& other, const DynamicAny& da)
+	/// Subtraction operator for subtracting DynamicAny from long
+{
+	return other - da.convert<long>();
+}
+
+
+inline const long operator * (const long& other, const DynamicAny& da)
+	/// Multiplication operator for multiplying DynamicAny with long
+{
+	return other * da.convert<long>();
+}
+
+
+inline const long operator / (const long& other, const DynamicAny& da)
+	/// Division operator for dividing DynamicAny with long
+{
+	return other / da.convert<long>();
+}
+
+
+inline long operator += (long& other, const DynamicAny& da)
+	/// Addition asignment operator for adding DynamicAny to long
+{
+	return other += da.convert<long>();
+}
+
+
+inline long operator -= (long& other, const DynamicAny& da)
+	/// Subtraction asignment operator for subtracting DynamicAny from long
+{
+	return other -= da.convert<long>();
+}
+
+
+inline long operator *= (long& other, const DynamicAny& da)
+	/// Multiplication asignment operator for multiplying DynamicAny with long
+{
+	return other *= da.convert<long>();
+}
+
+
+inline long operator /= (long& other, const DynamicAny& da)
+	/// Division asignment operator for dividing DynamicAny with long
+{
+	return other /= da.convert<long>();
+}
+
+
+inline const bool operator == (const long& other, const DynamicAny& da)
+	/// Equality operator for comparing DynamicAny with long
+{
+	return other == da.convert<long>();
+}
+
+
+inline const bool operator != (const long& other, const DynamicAny& da)
+	/// Inequality operator for comparing DynamicAny with long
+{
+	return other != da.convert<long>();
+}
+
+
+inline const bool operator < (const long& other, const DynamicAny& da)
+	/// Less than operator for comparing DynamicAny with long
+{
+	return other < da.convert<long>();
+}
+
+
+inline const bool operator <= (const long& other, const DynamicAny& da)
+	/// Less than or equal operator for comparing DynamicAny with long
+{
+	return other <= da.convert<long>();
+}
+
+
+inline const bool operator > (const long& other, const DynamicAny& da)
+	/// Greater than operator for comparing DynamicAny with long
+{
+	return other > da.convert<long>();
+}
+
+
+inline const bool operator >= (const long& other, const DynamicAny& da)
+	/// Greater than or equal operator for comparing DynamicAny with long
+{
+	return other >= da.convert<long>();
+}
+
+
+#endif // POCO_LONG_IS_64_BIT
 
 
 } // namespace Poco

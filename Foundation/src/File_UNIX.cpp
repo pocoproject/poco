@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#8 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -97,7 +97,7 @@ bool FileImpl::canReadImpl() const
 {
 	poco_assert (!_path.empty());
 
-	if(geteuid() == 0)
+	if (geteuid() == 0)
 		return true;
 
 	struct stat st;
@@ -119,7 +119,7 @@ bool FileImpl::canWriteImpl() const
 {
 	poco_assert (!_path.empty());
 
-	if(geteuid() == 0)
+	if (geteuid() == 0)
 		return true;
 
 	struct stat st;

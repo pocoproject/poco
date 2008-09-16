@@ -1,7 +1,7 @@
 //
 // AsyncChannel.cpp
 //
-// $Id: //poco/1.3/Foundation/src/AsyncChannel.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/AsyncChannel.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -115,7 +115,10 @@ void AsyncChannel::close()
 	{
 		while (!_queue.empty()) Thread::sleep(100);
 		
-		do { _queue.wakeUpAll(); }
+		do 
+		{
+			_queue.wakeUpAll(); 
+		}
 		while (!_thread.tryJoin(100));
 	}
 }

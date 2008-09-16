@@ -39,18 +39,20 @@
 #ifndef Data_MySQL_Connector_INCLUDED
 #define Data_MySQL_Connector_INCLUDED
 
+
 #include "MySQL.h"
 #include "Poco/Data/Connector.h"
+
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
 
+
 class MySQL_API Connector: public Poco::Data::Connector
 	/// Connector instantiates MySQL SessionImpl objects.
 {
 public:
-
 	static std::string KEY;
 
 	Connector();
@@ -63,10 +65,10 @@ public:
 		/// Creates a MySQL SessionImpl object and initializes it with the given connectionString.
 		
 	static void registerConnector();
-		/// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
+		/// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.
 		
 	static void unregisterConnector();
-		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
+		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.
 };
 
 

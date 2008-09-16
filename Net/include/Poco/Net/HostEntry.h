@@ -43,59 +43,11 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketDefs.h"
 #include "Poco/Net/IPAddress.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/AutoPtr.h"
 #include <vector>
 
 
 namespace Poco {
 namespace Net {
-
-
-class Net_API HostEntryImpl: public Poco::RefCountedObject
-	/// This class stores information about a host
-	/// such as host name, alias names and a list
-	/// of IP addresses.
-	///
-	/// This class is used internally by HostEntry and is not
-	/// intended for public use.
-{
-protected:
-	typedef std::vector<std::string> AliasList;
-	typedef std::vector<IPAddress>   AddressList;
-	
-	HostEntryImpl();
-		/// Creates an empty HostEntry.
-		
-	HostEntryImpl(struct hostent* entry);
-		/// Creates the HostEntry from the data in a hostent structure.
-
-#if defined(_WIN32) && defined(POCO_HAVE_IPv6)
-	HostEntryImpl(struct addrinfo* info);
-		/// Creates the HostEntry from the data in a Windows addrinfo structure.
-#endif
-
-	~HostEntryImpl();
-		/// Destroys the HostEntryImpl.
-
-	const std::string& name() const;
-		/// Returns the canonical host name.
-
-	const AliasList& aliases() const;
-		/// Returns a vector containing alias names for
-		/// the host name.
-
-	const AddressList& addresses() const;
-		/// Returns a vector containing the IPAddresses
-		/// for the host.
-
-private:
-	std::string _name;
-	AliasList   _aliases;
-	AddressList _addresses;
-	
-	friend class HostEntry;
-};
 
 
 class Net_API HostEntry
@@ -104,8 +56,8 @@ class Net_API HostEntry
 	/// of IP addresses.
 {
 public:
-	typedef HostEntryImpl::AliasList   AliasList;
-	typedef HostEntryImpl::AddressList AddressList;
+	typedef std::vector<std::string> AliasList;
+	typedef std::vector<IPAddress>   AddressList;
 	
 	HostEntry();
 		/// Creates an empty HostEntry.
@@ -142,52 +94,30 @@ public:
 		/// for the host.
 
 private:
-	Poco::AutoPtr<HostEntryImpl> _pImpl;
+	std::string _name;
+	AliasList   _aliases;
+	AddressList _addresses;
 };
 
 
 //
 // inlines
 //
-inline const std::string& HostEntryImpl::name() const
+inline const std::string& HostEntry::name() const
 {
 	return _name;
 }
 
 
-inline const HostEntryImpl::AliasList& HostEntryImpl::aliases() const
+inline const HostEntry::AliasList& HostEntry::aliases() const
 {
 	return _aliases;
 }
 
 
-inline const HostEntryImpl::AddressList& HostEntryImpl::addresses() const
-{
-	return _addresses;
-}
-
-
-inline const std::string& HostEntry::name() const
-{
-	return _pImpl->name();
-}
-
-
-inline const HostEntry::AliasList& HostEntry::aliases() const
-{
-	return _pImpl->aliases();
-}
-
-
 inline const HostEntry::AddressList& HostEntry::addresses() const
 {
-	return _pImpl->addresses();
-}
-
-
-inline void HostEntry::swap(HostEntry& other)
-{
-	_pImpl.swap(other._pImpl);
+	return _addresses;
 }
 
 

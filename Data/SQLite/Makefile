@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Data/SQLite/Makefile#3 $
+# $Id: //poco/1.3/Data/SQLite/Makefile#5 $
 #
 # Makefile for Poco SQLite
 #

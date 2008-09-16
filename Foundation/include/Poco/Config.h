@@ -1,7 +1,7 @@
 //
 // Config.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Config.h#6 $
+// $Id: //poco/1.3/Foundation/include/Poco/Config.h#8 $
 //
 // Library: Foundation
 // Package: Core

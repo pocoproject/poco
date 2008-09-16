@@ -256,6 +256,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoFoundationmt.lib"
 			/>
 			<Tool
@@ -327,6 +328,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoFoundationmtd.lib"
 			/>
 			<Tool

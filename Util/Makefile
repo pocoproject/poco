@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Util/Makefile#1 $
+# $Id: //poco/1.3/Util/Makefile#2 $
 #
 # Makefile for Poco Util
 #

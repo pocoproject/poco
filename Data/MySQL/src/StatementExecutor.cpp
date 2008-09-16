@@ -192,4 +192,4 @@ bool StatementExecutor::fetchColumn(size_t n, MYSQL_BIND *bind)
 }
 
 
-}}}
+} } } // namespace Poco::Data::MySQL

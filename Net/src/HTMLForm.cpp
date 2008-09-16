@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.3/Net/src/HTMLForm.cpp#4 $
+// $Id: //poco/1.3/Net/src/HTMLForm.cpp#5 $
 //
 // Library: Net
 // Package: HTML
@@ -124,6 +124,7 @@ void HTMLForm::addPart(const std::string& name, PartSource* pSource)
 
 void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
 {
+	clear();
 	if (request.getMethod() == HTTPRequest::HTTP_POST)
 	{
 		std::string mediaType;

@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DynamicAnyHolder.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/DynamicAnyHolder.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -35,6 +35,7 @@
 
 
 #include "Poco/DynamicAnyHolder.h"
+#include "Poco/DynamicAny.h"
 
 
 namespace Poco {

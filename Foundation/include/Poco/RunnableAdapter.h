@@ -1,7 +1,7 @@
 //
 // RunnableAdapter.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/RunnableAdapter.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/RunnableAdapter.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -55,6 +55,9 @@ class RunnableAdapter: public Runnable
 	///    RunnableAdapter<MyClass> ra(myObject, &MyObject::doSomething));
 	///    Thread thr;
 	///    thr.Start(ra);
+	///
+	/// For using a freestanding or static member function as a thread
+	/// target, please see the ThreadTarget class.
 {
 public:
 	typedef void (C::*Callback)();

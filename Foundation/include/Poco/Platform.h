@@ -1,7 +1,7 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Platform.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Platform.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -135,6 +135,7 @@
 #define POCO_ARCH_ARM     0x0a
 #define POCO_ARCH_M68K    0x0b
 #define POCO_ARCH_S390    0x0c
+
 
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
 	#define POCO_ARCH POCO_ARCH_ALPHA

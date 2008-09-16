@@ -1,7 +1,7 @@
 //
 // SQLiteTest.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/testsuite/src/SQLiteTest.cpp#3 $
+// $Id: //poco/1.3/Data/SQLite/testsuite/src/SQLiteTest.cpp#4 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

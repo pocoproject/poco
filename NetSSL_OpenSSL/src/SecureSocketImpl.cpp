@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#4 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#5 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -371,11 +371,35 @@ long SecureSocketImpl::postConnectionCheck(bool server, SSL* pSSL, const std::st
 	static std::string locHost("127.0.0.1");
 
 	SSLManager& mgr = SSLManager::instance();
-	Context::VerificationMode mode = server? mgr.defaultServerContext()->verificationMode() : mgr.defaultClientContext()->verificationMode();
+	SSLManager::ContextPtr pContext = server? mgr.defaultServerContext(): mgr.defaultClientContext();
+	Context::VerificationMode mode = pContext->verificationMode();
 	if (hostName == locHost && mode != Context::VERIFY_STRICT)
 		return X509_V_OK;
 
 	X509* cert = 0;
+	X509_NAME* subj = 0;
+
+	if (mode == Context::VERIFY_NONE) // should we allow none on the client side?
+	{
+		return X509_V_OK;
+	}
+
+	cert = SSL_get_peer_certificate(pSSL);
+	return postConnectionCheck(pContext, cert, hostName);
+}
+
+
+long SecureSocketImpl::postConnectionCheck(SSLManager::ContextPtr pContext, X509* pCert, const std::string& hostName)
+{
+	static std::string locHost("127.0.0.1");
+
+	SSLManager& mgr = SSLManager::instance();
+	bool server = pContext->serverContext();
+	Context::VerificationMode mode = pContext->verificationMode();
+	if (hostName == locHost && mode != Context::VERIFY_STRICT)
+		return X509_V_OK;
+
+	X509* cert = pCert;
 	X509_NAME* subj = 0;
 	char* host = const_cast<char*>(hostName.c_str());
 	
@@ -385,8 +409,6 @@ long SecureSocketImpl::postConnectionCheck(bool server, SSL* pSSL, const std::st
 	{
 		return X509_V_OK;
 	}
-
-	cert = SSL_get_peer_certificate(pSSL);
 	
 	// note: the check is used by the client, so as long we don't set None at the client we reject
 	// cases where no certificate/incomplete info is presented by the server

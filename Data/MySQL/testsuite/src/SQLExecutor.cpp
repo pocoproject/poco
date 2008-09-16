@@ -1,7 +1,7 @@
 //
 // SQLExecutor.cpp
 //
-// $Id: //poco/Main/DataConnectors/ODBC/testsuite/src/SQLExecutor.cpp#14 $
+// $Id: //poco/1.3/Data/MySQL/testsuite/src/SQLExecutor.cpp#1 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -43,11 +43,9 @@
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
-
 #ifdef _WIN32
 #include <Winsock2.h>
 #endif 
-
 #include <mysql.h>
 #include <iostream>
 
@@ -676,7 +674,6 @@ void SQLExecutor::limitPrepare()
 		assert(data[x%100] == retData[x]);
 	}
 }
-
 
 
 void SQLExecutor::prepare()

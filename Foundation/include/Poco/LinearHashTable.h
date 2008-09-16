@@ -1,7 +1,7 @@
 //
 // LinearHashTable.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/LinearHashTable.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/LinearHashTable.h#5 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -89,7 +89,7 @@ public:
 	typedef typename Bucket::iterator    BucketIterator;
 	typedef typename BucketVec::iterator BucketVecIterator;
 
-	class ConstIterator
+	class ConstIterator: public std::iterator<std::forward_iterator_tag, Value>
 	{
 	public:
 		ConstIterator()

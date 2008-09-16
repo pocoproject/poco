@@ -54,7 +54,6 @@ class MySQL_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 	/// Implements SessionImpl interface
 {
 public:
-
 	SessionImpl(const std::string& connectionString);
 		/// Creates the SessionImpl. Opens a connection to the database
 		///
@@ -99,7 +98,6 @@ public:
 		/// Get insert id
 
 private:
-
 	SessionHandle _mysql;
 	bool          _connected;
 	int           _inTransaction;
@@ -109,7 +107,6 @@ private:
 //
 // inlines
 //
-
 inline void SessionImpl::setInsertId(const std::string&, const Poco::Any&)
 {
 }

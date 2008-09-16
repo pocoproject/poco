@@ -1,7 +1,7 @@
 //
 // ODBCTestSuite.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCTestSuite.cpp#2 $
+// $Id: //poco/1.3/Data/MySQL/testsuite/src/MySQLTestSuite.cpp#1 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,6 +32,7 @@
 
 #include "MySQLTestSuite.h"
 #include "MySQLTest.h"
+
 
 CppUnit::Test* MySQLTestSuite::suite()
 {

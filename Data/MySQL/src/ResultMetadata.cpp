@@ -37,6 +37,7 @@
 #include "Poco/Data/MySQL/ResultMetadata.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 
+
 namespace
 {
 	class ResultMetadataHandle
@@ -174,6 +175,7 @@ namespace Poco {
 namespace Data {
 namespace MySQL {
 
+
 void ResultMetadata::reset()
 {
 	_columns.resize(0);
@@ -182,6 +184,7 @@ void ResultMetadata::reset()
 	_lengths.resize(0);
     _isNull.resize(0);
 }
+
 
 void ResultMetadata::init(MYSQL_STMT* stmt)
 {
@@ -201,7 +204,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	size_t commonSize = 0;
 	_columns.reserve(count);
 
-	{for (size_t i = 0; i < count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
 		_columns.push_back(MetaColumn(
 			i,                               // position
@@ -213,7 +216,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 			));
 
 		commonSize += _columns[i].length();
-	}}
+	}
 
 	_buffer.resize(commonSize);
 	_row.resize(count);
@@ -222,7 +225,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 
 	size_t offset = 0;
 
-	{for (size_t i = 0; i < count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
 		memset(&_row[i], 0, sizeof(MYSQL_BIND));
 
@@ -233,37 +236,44 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
         _row[i].is_null       = &_isNull[i];
 		
 		offset += _row[i].buffer_length;
-	}}
+	}
 }
+
 
 Poco::UInt32 ResultMetadata::columnsReturned() const
 {
 	return static_cast<Poco::UInt32>(_columns.size());
 }
 
+
 const MetaColumn& ResultMetadata::metaColumn(Poco::UInt32 pos) const
 {
 	return _columns[pos];
 }
+
 
 MYSQL_BIND* ResultMetadata::row()
 {
 	return &_row[0];
 }
 
+
 size_t ResultMetadata::length(size_t pos) const
 {
 	return _lengths[pos];
 }
+
 
 const char* ResultMetadata::rawData(size_t pos) const 
 {
 	return reinterpret_cast<const char*>(_row[pos].buffer);
 }
 
+
 bool ResultMetadata::isNull(size_t pos) const 
 {
     return (_isNull[pos] != 0);
 }
 
-}}} // namespace Poco::Data::MySQL
+
+} } } // namespace Poco::Data::MySQL

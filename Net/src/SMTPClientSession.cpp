@@ -1,13 +1,13 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#3 $
+// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#4 $
 //
 // Library: Net
 // Package: Mail
 // Module:  SMTPClientSession
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -42,8 +42,25 @@
 #include "Poco/Net/SocketStream.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Environment.h"
+#include "Poco/Net/NetworkInterface.h"
+#include "Poco/HMACEngine.h"
+#include "Poco/MD5Engine.h"
+#include "Poco/DigestStream.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/Base64Decoder.h"
+#include <sstream>
+#include <fstream>
+#include <iostream>
 
 
+using Poco::DigestEngine;
+using Poco::HMACEngine;
+using Poco::MD5Engine;
+using Poco::DigestOutputStream;
+using Poco::StreamCopier;
+using Poco::Base64Encoder;
+using Poco::Base64Decoder;
 using Poco::Environment;
 
 
@@ -89,10 +106,9 @@ Poco::Timespan SMTPClientSession::getTimeout() const
 }
 
 
-void SMTPClientSession::login(const std::string& hostname)
+void SMTPClientSession::login(const std::string& hostname, std::string& response)
 {
 	open();
-	std::string response;
 	int status = sendCommand("EHLO", hostname, response);
 	if (isPermanentNegative(status))
 		status = sendCommand("HELO", hostname, response);
@@ -100,9 +116,124 @@ void SMTPClientSession::login(const std::string& hostname)
 }
 
 
+void SMTPClientSession::login(const std::string& hostname)
+{
+	std::string response;
+	login(hostname, response);
+}
+
+
 void SMTPClientSession::login()
 {
 	login(Environment::nodeName());
+}
+
+
+void SMTPClientSession::loginUsingCRAM_MD5(const std::string& username, const std::string& password)
+{
+	int status = 0;
+	std::string response;
+	
+	status = sendCommand("AUTH CRAM-MD5", response);
+	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate CRAM-MD5", response);
+	std::string challengeBase64 = response.substr(4);
+	
+	std::istringstream istr(challengeBase64);
+	Base64Decoder decoder(istr);
+	std::string challenge;
+	decoder >> challenge;
+	
+	HMACEngine<MD5Engine> hmac(password);
+	hmac.update(challenge);
+	
+	const DigestEngine::Digest& digest = hmac.digest();
+	std::string digestString(DigestEngine::digestToHex(digest));
+	
+	std::string challengeResponse = username + " " + digestString;
+	
+	std::ostringstream challengeResponseBase64;
+	Base64Encoder encoder(challengeResponseBase64);
+	encoder << challengeResponse;
+	encoder.close();
+	
+	status = sendCommand(challengeResponseBase64.str(), response);
+  	if (!isPositiveCompletion(status)) throw SMTPException("Login using CRAM-MD5 failed", response);  
+}
+
+
+void SMTPClientSession::loginUsingLogin(const std::string& username, const std::string& password)
+{
+	int status = 0;
+	std::string response;
+	
+	status = sendCommand("AUTH LOGIN", response);
+	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate LOGIN", response);
+	
+	std::ostringstream usernameBase64;
+	Base64Encoder usernameEncoder(usernameBase64);
+	usernameEncoder << username;
+	usernameEncoder.close();
+	
+	std::ostringstream passwordBase64;
+	Base64Encoder passwordEncoder(passwordBase64);
+	passwordEncoder << password;
+	passwordEncoder.close();
+	
+	//Server request for username/password not defined could be either
+	//S: login:
+	//C: user_login
+	//S: password:
+	//C: user_password
+	//or
+	//S: password:
+	//C: user_password
+	//S: login:
+	//C: user_login
+	if (response == "334 VXNlcm5hbWU6") // username first (md5("Username:"))
+	{
+		status = sendCommand(usernameBase64.str(), response);
+		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN user name failed", response);
+		
+		status = sendCommand(passwordBase64.str(), response);
+		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN password failed", response);  
+	}
+	else if (response == "334 UGFzc3dvcmQ6") // password first (md5("Password:"))
+	{
+		status = sendCommand(passwordBase64.str(), response);
+		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN password failed", response);  
+		
+		status = sendCommand(usernameBase64.str(), response);
+		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN user name failed", response);
+	}
+  
+}
+
+
+void SMTPClientSession::login(LoginMethod loginMethod, const std::string& username, const std::string& password)
+{
+	std::string response;
+	login(Environment::nodeName(), response);
+	
+	if (loginMethod == AUTH_CRAM_MD5)
+	{
+		if (response.find("CRAM-MD5", 0) != std::string::npos)
+		{
+			loginUsingCRAM_MD5(username, password);
+		}
+		else throw SMTPException("The mail service does not support CRAM-MD5 authentication", response);
+	}
+	else if (loginMethod == AUTH_LOGIN)
+	{
+		if (response.find("LOGIN", 0) != std::string::npos)
+		{
+			loginUsingLogin(username, password);
+		}
+		else throw SMTPException("The mail service does not support LOGIN authentication", response);
+	}
+	else if (loginMethod != AUTH_NONE)
+	{
+		throw SMTPException("The autentication method is not supported");
+	}
 }
 
 

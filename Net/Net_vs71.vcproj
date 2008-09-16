@@ -166,6 +166,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoNetmtd.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -219,6 +220,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoNetmt.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>

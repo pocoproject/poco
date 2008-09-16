@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ArchiveStrategy.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/ArchiveStrategy.h#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -9,7 +9,7 @@
 //
 // Definition of the ArchiveStrategy class and subclasses.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -129,7 +129,6 @@ public:
 	}
 
 private:
-
 	void archiveByNumber(const std::string& basePath)
 		/// A monotonic increasing number is appended to the
 		/// log file name. The most recent archived file
@@ -160,7 +159,6 @@ private:
 			--n;
 		}
 	}
-
 };
 
 

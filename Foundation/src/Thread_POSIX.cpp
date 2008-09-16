@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#5 $
 //
 // Library: Foundation
 // Package: Threading
@@ -341,13 +341,8 @@ void* ThreadImpl::callableEntry(void* pThread)
 
 int ThreadImpl::mapPrio(int prio)
 {
-#if defined(__VMS) || defined(__digital__)
-	static const int pmin = PRI_OTHER_MIN;
-	static const int pmax = PRI_OTHER_MAX;
-#else
-	static const int pmin = sched_get_priority_min(SCHED_OTHER);
-	static const int pmax = sched_get_priority_max(SCHED_OTHER);
-#endif
+	int pmin = getMinOSPriorityImpl();
+	int pmax = getMaxOSPriorityImpl();
 
 	switch (prio)
 	{

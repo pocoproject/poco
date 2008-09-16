@@ -1,7 +1,7 @@
 //
 // ODBCMySQLTest.h
 //
-// $Id: //poco/1.3/Data/MySQL/testsuite/src/ODBCMySQLTest.h#2 $
+// $Id: //poco/1.3/Data/MySQL/testsuite/src/MySQLTest.h#1 $
 //
 // Definition of the MySQLTest class.
 //
@@ -51,7 +51,6 @@ class MySQLTest: public CppUnit::TestCase
 	/// ----------------+---------------------------+------------------------------------------
 	/// 03.51.12.00		| MySQL 5.0.27-community-nt	| MS Windows XP Professional x64 v.2003/SP1
 	///
-
 {
 public:
 	MySQLTest(const std::string& name);

@@ -1,7 +1,7 @@
 //
 // XMLString.h
 //
-// $Id: //poco/1.3/XML/include/Poco/XML/XMLString.h#1 $
+// $Id: //poco/1.3/XML/include/Poco/XML/XMLString.h#2 $
 //
 // Library: XML
 // Package: XML
@@ -75,6 +75,8 @@ namespace XML {
 	XMLString toXMLString(const std::string& str);
 		/// Converts an UTF-8 encoded string into an
 		/// XMLString
+		
+	#define XML_LIT(lit) L##lit
 
 #elif defined(XML_UNICODE)
 
@@ -95,6 +97,8 @@ namespace XML {
 	{
 		return str;
 	}
+	
+	#define XML_LIT(lit) lit
 
 #endif
 

@@ -59,7 +59,7 @@ class Net_API DNS
 	/// An internal DNS cache is used to speed up name lookups.
 {
 public:
-	static HostEntry hostByName(const std::string& hostname);
+	static const HostEntry& hostByName(const std::string& hostname);
 		/// Returns a HostEntry object containing the DNS information
 		/// for the host with the given name.
 		///
@@ -73,7 +73,7 @@ public:
 		///
 		/// Throws an IOException in case of any other error.
 		
-	static HostEntry hostByAddress(const IPAddress& address);
+	static const HostEntry& hostByAddress(const IPAddress& address);
 		/// Returns a HostEntry object containing the DNS information
 		/// for the host with the given IP address.
 		///
@@ -84,7 +84,7 @@ public:
 		///
 		/// Throws an IOException in case of any other error.
 
-	static HostEntry resolve(const std::string& address);
+	static const HostEntry& resolve(const std::string& address);
 		/// Returns a HostEntry object containing the DNS information
 		/// for the host with the given IP address or host name.
 		///
@@ -102,7 +102,7 @@ public:
 		/// Convenience method that calls resolve(address) and returns 
 		/// the first address from the HostInfo.
 
-	static HostEntry thisHost();
+	static const HostEntry& thisHost();
 		/// Returns a HostEntry object containing the DNS information
 		/// for this host.
 		///

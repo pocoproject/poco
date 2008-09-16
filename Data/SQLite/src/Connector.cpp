@@ -1,7 +1,7 @@
 //
 // Connector.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Connector.cpp#1 $
+// $Id: //poco/1.3/Data/SQLite/src/Connector.cpp#3 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -37,6 +37,7 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SessionFactory.h"
+#include "sqlite3.h"
 
 
 namespace Poco {
@@ -72,6 +73,12 @@ void Connector::registerConnector()
 void Connector::unregisterConnector()
 {
 	Poco::Data::SessionFactory::instance().remove(KEY);
+}
+
+
+void Connector::enableSharedCache(bool flag)
+{
+	sqlite3_enable_shared_cache(flag ? 1 : 0);
 }
 
 

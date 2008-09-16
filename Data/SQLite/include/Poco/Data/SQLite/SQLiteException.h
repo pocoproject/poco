@@ -1,7 +1,7 @@
 //
 // SQLiteException.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SQLiteException.h#2 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SQLiteException.h#3 $
 //
 // Library: SQLite
 // Package: SQLite

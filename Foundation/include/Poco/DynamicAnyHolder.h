@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/DynamicAnyHolder.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/DynamicAnyHolder.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -43,8 +43,15 @@
 #include "Poco/Foundation.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
+#include "Poco/DateTime.h"
+#include "Poco/Timestamp.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
 #include "Poco/Exception.h"
+#include <vector>
 #include <typeinfo>
 #undef min
 #undef max
@@ -54,11 +61,15 @@
 namespace Poco {
 
 
+class DynamicAny;
+
+
 class Foundation_API DynamicAnyHolder
 	/// Interface for a data holder used by the DynamicAny class. 
 	/// Provides methods to convert between data types.
 	/// Only data types for which a convert method exists are supported, which are
-	/// all C++ built-in types with addition of std::string.
+	/// all C++ built-in types with addition of std::string, DateTime, LocalDateTime, Timestamp,
+	/// and std::vector<DynamicAny>.
 {
 public:
 	DynamicAnyHolder();
@@ -81,6 +92,14 @@ public:
 	virtual void convert(UInt16& val) const = 0;
 	virtual void convert(UInt32& val) const = 0;
 	virtual void convert(UInt64& val) const = 0;
+	virtual void convert(DateTime& val) const = 0;
+	virtual void convert(LocalDateTime& val) const = 0;
+	virtual void convert(Timestamp& val) const = 0;
+	virtual bool isArray() const = 0;
+	virtual bool isInteger() const = 0;
+	virtual bool isSigned() const = 0;
+	virtual bool isNumeric() const = 0;
+	virtual bool isString() const = 0;
 
 #ifndef POCO_LONG_IS_64_BIT
 	void convert(long& val) const;
@@ -96,7 +115,7 @@ public:
 protected:
 	template <typename F, typename T>
 	void convertToSmaller(const F& from, T& to) const
-		/// This function is meant to convert signed integral values from
+		/// This function is meant to convert signed numeric values from
 		/// larger to smaller type. It checks the upper and lower bound and
 		/// if from value is within limits of type T (i.e. check calls do not throw), 
 		/// it is converted.
@@ -106,8 +125,12 @@ protected:
 		poco_static_assert (std::numeric_limits<F>::is_signed);
 		poco_static_assert (std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit<F,T>(from); 
-		checkLowerLimit<F,T>(from);
+		if (std::numeric_limits<F>::is_integer)
+			checkUpperLimit(from, to); 
+		else
+			checkUpperLimitFloat(from, to); 
+
+		checkLowerLimit(from, to);
 		to = static_cast<T>(from);
 	}
 
@@ -124,7 +147,7 @@ protected:
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (!std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit(from, to); 
 		to = static_cast<T>(from);
 	}
 
@@ -133,7 +156,7 @@ protected:
 		/// This function is meant for converting signed integral data types to
 		/// unsigned data types. Negative values can not be converted and if one is 
 		/// encountered, RangeException is thrown. 
-		/// If uper limit is within the target data type limits, the converiosn is performed.
+		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
 		poco_static_assert (std::numeric_limits<T>::is_specialized);
@@ -142,7 +165,26 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit(from, to); 
+		to = static_cast<T>(from);
+	}
+
+	template <typename F, typename T>
+	void convertSignedFloatToUnsigned(const F& from, T& to) const
+		/// This function is meant for converting floating point data types to
+		/// unsigned integral data types. Negative values can not be converted and if one is 
+		/// encountered, RangeException is thrown. 
+		/// If uper limit is within the target data type limits, the conversion is performed.
+	{
+		poco_static_assert (std::numeric_limits<F>::is_specialized);
+		poco_static_assert (std::numeric_limits<T>::is_specialized);
+		poco_static_assert (!std::numeric_limits<F>::is_integer);
+		poco_static_assert (std::numeric_limits<T>::is_integer);
+		poco_static_assert (!std::numeric_limits<T>::is_signed);
+
+		if (from < 0)
+			throw RangeException("Value too small.");
+		checkUpperLimitFloat(from, to); 
 		to = static_cast<T>(from);
 	}
 
@@ -151,27 +193,42 @@ protected:
 		/// This function is meant for converting unsigned integral data types to
 		/// unsigned data types. Negative values can not be converted and if one is 
 		/// encountered, RangeException is thrown. 
-		/// If uper limit is within the target data type limits, the converiosn is performed.
+		/// If upper limit is within the target data type limits, the converiosn is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
 		poco_static_assert (std::numeric_limits<T>::is_specialized);
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit(from, to); 
 		to = static_cast<T>(from);
 	}
 
 private:
 	template <typename F, typename T>
-	void checkUpperLimit(const F& from) const
+	void checkUpperLimit(const F& from, T& to) const
 	{
-		if (from > std::numeric_limits<T>::max()) 
+		if ((sizeof(T) < sizeof(F)) &&
+			(from > static_cast<F>(std::numeric_limits<T>::max())))
+		{
+			throw RangeException("Value too large.");
+		}
+		else
+		if (static_cast<T>(from) > std::numeric_limits<T>::max()) 
+		{
+			throw RangeException("Value too large.");
+		}
+	}
+
+	template <typename F, typename T>
+	void checkUpperLimitFloat(const F& from, T& to) const
+	{
+		if (from > std::numeric_limits<T>::max())
 			throw RangeException("Value too large.");
 	}
 
 	template <typename F, typename T>
-	void checkLowerLimit(const F& from) const
+	void checkLowerLimit(const F& from, T& to) const
 	{
 		if (from < std::numeric_limits<T>::min()) 
 			throw RangeException("Value too small.");
@@ -231,6 +288,26 @@ public:
 		return typeid(T);
 	}
 
+	bool isInteger() const
+	{
+		return std::numeric_limits<T>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<T>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<T>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return type() == typeid(std::string);
+	}
+
 	void convert(Int8&) const
 	{
 		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
@@ -271,22 +348,22 @@ public:
 		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
 	}
 
-	void convert(bool& val) const
+	void convert(bool&) const
 	{
 		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
 	}
 
-	void convert(float& val) const
+	void convert(float&) const
 	{
 		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
 	}
 
-	void convert(double& val) const
+	void convert(double&) const
 	{
 		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
 	}
 
-	void convert(char& val) const
+	void convert(char&) const
 	{
 		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
 	}
@@ -296,7 +373,27 @@ public:
 		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
 	}
 
+	void convert(DateTime&) const
+	{
+		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
+	}
+
 	DynamicAnyHolder* clone() const
+	{
+		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
+	}
+
+	bool isArray() const
 	{
 		throw NotImplementedException("No DynamicAnyHolder specialization for type", typeid(T).name());
 	}
@@ -385,6 +482,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("Int8 -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("Int8 -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("Int8 -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -393,6 +505,31 @@ public:
 	const Int8& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<Int8>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<Int8>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<Int8>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -484,6 +621,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("Int16 -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("Int16 -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("Int16 -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -492,6 +644,31 @@ public:
 	const Int16& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<Int16>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<Int16>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<Int16>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -583,6 +760,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("Int32 -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("Int32 -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("Int32 -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -591,6 +783,31 @@ public:
 	const Int32& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<Int32>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<Int32>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<Int32>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -682,6 +899,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime& dt) const
+	{
+		dt = Timestamp(_val);
+	}
+
+	void convert(LocalDateTime& ldt) const
+	{
+		ldt = Timestamp(_val);
+	}
+
+	void convert(Timestamp& val) const
+	{
+		val = Timestamp(_val);
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -690,6 +922,31 @@ public:
 	const Int64& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<Int64>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<Int64>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<Int64>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -781,6 +1038,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("UInt8 -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("Unt8 -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("UInt8 -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -789,6 +1061,31 @@ public:
 	const UInt8& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<UInt8>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<UInt8>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<UInt8>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -880,6 +1177,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("UInt16 -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("UInt16 -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("UInt16 -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -888,6 +1200,31 @@ public:
 	const UInt16& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<UInt16>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<UInt16>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<UInt16>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -979,6 +1316,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("UInt32 -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("UInt32 -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("UInt32 -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -987,6 +1339,31 @@ public:
 	const UInt32& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<UInt32>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<UInt32>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<UInt32>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -1078,6 +1455,27 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime& dt) const
+	{
+		Int64 val;
+		convertUnsignedToSigned(_val, val);
+		dt = Timestamp(val);
+	}
+
+	void convert(LocalDateTime& ldt) const
+	{
+		Int64 val;
+		convertUnsignedToSigned(_val, val);
+		ldt = Timestamp(val);
+	}
+
+	void convert(Timestamp& val) const
+	{
+		Int64 tmp;
+		convertUnsignedToSigned(_val, tmp);
+		val = Timestamp(tmp);
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1086,6 +1484,31 @@ public:
 	const UInt64& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<UInt64>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<UInt64>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<UInt64>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -1175,6 +1598,21 @@ public:
 		val = (_val ? "true" : "false");
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("bool -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("bool -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("bool -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1183,6 +1621,31 @@ public:
 	const bool& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<bool>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<bool>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<bool>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -1229,22 +1692,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -1275,6 +1738,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("float -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("float -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("float -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1283,6 +1761,31 @@ public:
 	const float& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<float>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<float>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<float>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -1329,22 +1832,22 @@ public:
 
 	void convert(UInt8& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(UInt16& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 	
 	void convert(UInt32& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(UInt64& val) const
 	{
-		convertSignedToUnsigned(_val, val);
+		convertSignedFloatToUnsigned(_val, val);
 	}
 
 	void convert(bool& val) const
@@ -1381,6 +1884,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("double -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("double -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("double -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1389,6 +1907,31 @@ public:
 	const double& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<double>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<double>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<double>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -1478,6 +2021,21 @@ public:
 		val = std::string(1, _val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("char -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("char -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("char -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1486,6 +2044,31 @@ public:
 	const char& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<char>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<char>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<char>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -1593,6 +2176,33 @@ public:
 		val = _val;
 	}
 
+	void convert(DateTime& val) const
+	{
+		int tzd = 0;
+		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, _val, val, tzd))
+			throw BadCastException("string -> DateTime");
+	}
+
+	void convert(LocalDateTime& ldt) const
+	{
+		int tzd = 0;
+		DateTime tmp;
+		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, _val, tmp, tzd))
+			throw BadCastException("string -> LocalDateTime");
+
+		ldt = LocalDateTime(tzd, tmp, false);
+	}
+
+	void convert(Timestamp& ts) const
+	{
+		int tzd = 0;
+		DateTime tmp;
+		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, _val, tmp, tzd))
+			throw BadCastException("string -> Timestamp");
+
+		ts = tmp.timestamp();
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1601,6 +2211,31 @@ public:
 	const std::string& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return true;
 	}
 
 private:
@@ -1695,6 +2330,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("long -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("long -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("long -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1703,6 +2353,31 @@ public:
 	const long& value() const
 	{
 		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<long>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<long>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<long>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
 	}
 
 private:
@@ -1794,6 +2469,21 @@ public:
 		val = NumberFormatter::format(_val);
 	}
 
+	void convert(DateTime&) const
+	{
+		throw BadCastException("unsigned long -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("unsigned long -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("unsigned long -> Timestamp");
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
@@ -1804,12 +2494,595 @@ public:
 		return _val;
 	}
 
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<unsigned long>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<unsigned long>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<unsigned long>::is_specialized;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
 private:
 	unsigned long _val;
 };
 
 
 #endif // 64bit
+
+
+template <typename T>
+class DynamicAnyHolderImpl<std::vector<T> >: public DynamicAnyHolder
+{
+public:
+	DynamicAnyHolderImpl(const std::vector<T>& val): _val(val)
+	{
+	}
+
+	~DynamicAnyHolderImpl()
+	{
+	}
+	
+	const std::type_info& type() const
+	{
+		return typeid(std::vector<T>);
+	}
+
+	void convert(Int8& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(Int16& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+	
+	void convert(Int32& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(Int64& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(UInt8& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(UInt16& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+	
+	void convert(UInt32& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(UInt64& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(bool& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(float& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(double& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(char& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(std::string& val) const
+	{
+		throw BadCastException("Cannot cast collection type to non-collection type");
+	}
+
+	void convert(DateTime&) const
+	{
+		throw BadCastException("vector -> DateTime");
+	}
+
+	void convert(LocalDateTime&) const
+	{
+		throw BadCastException("vector -> LocalDateTime");
+	}
+
+	void convert(Timestamp&) const
+	{
+		throw BadCastException("vector -> Timestamp");
+	}
+
+	DynamicAnyHolder* clone() const
+	{
+		return new DynamicAnyHolderImpl(_val);
+	}
+	
+	const std::vector<T>& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return true;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+	T& operator[](typename std::vector<T>::size_type n)
+	{
+		return _val.operator[](n);
+	}
+
+	const T& operator[](typename std::vector<T>::size_type n) const
+	{
+		return _val.operator[](n);
+	}
+
+private:
+	std::vector<T> _val;
+};
+
+
+template <>
+class DynamicAnyHolderImpl<DateTime>: public DynamicAnyHolder
+{
+public:
+	DynamicAnyHolderImpl(const DateTime& val): _val(val)
+	{
+	}
+
+	~DynamicAnyHolderImpl()
+	{
+	}
+	
+	const std::type_info& type() const
+	{
+		return typeid(DateTime);
+	}
+
+	void convert(Int8& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int16& val) const
+	{
+		throw BadCastException();
+	}
+	
+	void convert(Int32& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int64& val) const
+	{
+		val = _val.timestamp().epochMicroseconds();
+	}
+
+	void convert(UInt8& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt16& val) const
+	{
+		throw BadCastException();
+	}
+	
+	void convert(UInt32& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt64& val) const
+	{
+		val = _val.timestamp().epochMicroseconds();
+	}
+
+	void convert(bool&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(float&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(double&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(char&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(std::string& val) const
+	{
+		val = DateTimeFormatter::format(_val, Poco::DateTimeFormat::ISO8601_FORMAT);
+	}
+
+	void convert(DateTime& val) const
+	{
+		val = _val;
+	}
+
+	void convert(LocalDateTime& ldt) const
+	{
+		ldt = _val.timestamp();
+	}
+
+	void convert(Timestamp& ts) const
+	{
+		ts = _val.timestamp();
+	}
+
+	DynamicAnyHolder* clone() const
+	{
+		return new DynamicAnyHolderImpl(_val);
+	}
+	
+	const DateTime& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+private:
+	DateTime _val;
+};
+
+
+template <>
+class DynamicAnyHolderImpl<LocalDateTime>: public DynamicAnyHolder
+{
+public:
+	DynamicAnyHolderImpl(const LocalDateTime& val): _val(val)
+	{
+	}
+
+	~DynamicAnyHolderImpl()
+	{
+	}
+	
+	const std::type_info& type() const
+	{
+		return typeid(LocalDateTime);
+	}
+
+	void convert(Int8& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int16& val) const
+	{
+		throw BadCastException();
+	}
+	
+	void convert(Int32& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int64& val) const
+	{
+		val = _val.timestamp().epochMicroseconds();
+	}
+
+	void convert(UInt8& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt16& val) const
+	{
+		throw BadCastException();
+	}
+	
+	void convert(UInt32& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt64& val) const
+	{
+		val = _val.timestamp().epochMicroseconds();
+	}
+
+	void convert(bool&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(float&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(double&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(char&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(std::string& val) const
+	{
+		val = DateTimeFormatter::format(_val, Poco::DateTimeFormat::ISO8601_FORMAT);
+	}
+
+	void convert(DateTime& val) const
+	{
+		val = _val.timestamp();
+	}
+
+	void convert(LocalDateTime& ldt) const
+	{
+		ldt = _val;
+	}
+
+	void convert(Timestamp& ts) const
+	{
+		ts = _val.timestamp();
+	}
+
+	DynamicAnyHolder* clone() const
+	{
+		return new DynamicAnyHolderImpl(_val);
+	}
+	
+	const LocalDateTime& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+private:
+	LocalDateTime _val;
+};
+
+
+template <>
+class DynamicAnyHolderImpl<Timestamp>: public DynamicAnyHolder
+{
+public:
+	DynamicAnyHolderImpl(const Timestamp& val): _val(val)
+	{
+	}
+
+	~DynamicAnyHolderImpl()
+	{
+	}
+	
+	const std::type_info& type() const
+	{
+		return typeid(Timestamp);
+	}
+
+	void convert(Int8& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int16& val) const
+	{
+		throw BadCastException();
+	}
+	
+	void convert(Int32& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(Int64& val) const
+	{
+		val = _val.epochMicroseconds();
+	}
+
+	void convert(UInt8& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt16& val) const
+	{
+		throw BadCastException();
+	}
+	
+	void convert(UInt32& val) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(UInt64& val) const
+	{
+		val = _val.epochMicroseconds();
+	}
+
+	void convert(bool&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(float&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(double&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(char&) const
+	{
+		throw BadCastException();
+	}
+
+	void convert(std::string& val) const
+	{
+		val = DateTimeFormatter::format(_val, Poco::DateTimeFormat::ISO8601_FORMAT);
+	}
+
+	void convert(DateTime& val) const
+	{
+		val = _val;
+	}
+
+	void convert(LocalDateTime& ldt) const
+	{
+		ldt = _val;
+	}
+
+	void convert(Timestamp& ts) const
+	{
+		ts = _val;
+	}
+
+	DynamicAnyHolder* clone() const
+	{
+		return new DynamicAnyHolderImpl(_val);
+	}
+	
+	const Timestamp& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+private:
+	Timestamp _val;
+};
 
 
 } // namespace Poco

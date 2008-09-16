@@ -106,17 +106,16 @@ public:
 		/// Extracts a BLOB.
 
 private:
-
 	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, size_t length = 0);
 
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
 
 private:
-
 	StatementExecutor& _stmt;
 	ResultMetadata& _metadata;
 };
+
 
 } } } // namespace Poco::Data::MySQL
 

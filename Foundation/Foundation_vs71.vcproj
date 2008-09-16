@@ -164,6 +164,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoFoundationmtd.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -217,6 +218,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoFoundationmt.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>

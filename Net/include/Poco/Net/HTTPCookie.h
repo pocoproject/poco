@@ -1,7 +1,7 @@
 //
 // HTTPCookie.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPCookie.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPCookie.h#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -157,6 +157,12 @@ public:
 		/// Returns the maximum age in seconds for
 		/// the cookie.
 		
+	void setHttpOnly(bool flag = true);
+		/// Sets the HttpOnly flag for the cookie.
+		
+	bool getHttpOnly() const;
+		/// Returns true iff the cookie's HttpOnly flag is set.
+		
 	std::string toString() const;
 		/// Returns a string representation of the cookie,
 		/// suitable for use in a Set-Cookie header.
@@ -170,6 +176,7 @@ private:
 	std::string _path;
 	bool        _secure;
 	int         _maxAge;
+	bool        _httpOnly;
 };
 
 
@@ -221,6 +228,12 @@ inline bool HTTPCookie::getSecure() const
 inline int HTTPCookie::getMaxAge() const
 {
 	return _maxAge;
+}
+
+
+inline bool HTTPCookie::getHttpOnly() const
+{
+	return _httpOnly;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // HTTPSClientSessionTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -42,6 +42,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Exception.h"
 #include "HTTPSTestServer.h"
@@ -347,6 +348,22 @@ void HTTPSClientSessionTest::testProxy()
 }
 
 
+void HTTPSClientSessionTest::testConnectNB()
+{
+	SecureStreamSocket sock;
+	sock.connectNB(SocketAddress("server.com", 443));
+	char buf[512];
+	std::string msg("GET / HTTP/1.0\r\n\r\n");
+	sock.sendBytes(msg.c_str(), (int)msg.length());
+	Socket::SocketList read;
+	Socket::SocketList write;
+	Socket::SocketList exec;
+	read.push_back(sock);
+	Socket::select(read, write, exec, Poco::Timespan(30, 0) );
+	int rc = sock.receiveBytes(buf, 512);
+	assert (rc > 0);
+}
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -373,6 +390,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeClose);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testConnectNB);
 
 	return pSuite;
 }

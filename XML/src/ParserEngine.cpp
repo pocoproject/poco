@@ -1,7 +1,7 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/1.3/XML/src/ParserEngine.cpp#4 $
+// $Id: //poco/1.3/XML/src/ParserEngine.cpp#5 $
 //
 // Library: XML
 // Package: XML
@@ -720,7 +720,7 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 	if (it != pThis->_encodings.end())
 		knownEncoding = it->second;
 	else
-		knownEncoding = Poco::TextEncoding::find(encoding);
+		knownEncoding = Poco::TextEncoding::find(fromXMLString(encoding));
 
 	if (knownEncoding)
 	{

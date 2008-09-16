@@ -1,7 +1,7 @@
 //
 // ODBCColumn.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/ODBCColumn.h#2 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/ODBCColumn.h#3 $
 //
 // Library: ODBC
 // Package: ODBC

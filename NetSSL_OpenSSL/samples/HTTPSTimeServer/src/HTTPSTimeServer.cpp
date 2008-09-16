@@ -1,7 +1,7 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#2 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -100,7 +100,7 @@ public:
 		response.setContentType("text/html");
 
 		std::ostream& ostr = response.send();
-		ostr << "<html><head><title>HTTPTimeServer powered by C++ Portable Components</title>";
+		ostr << "<html><head><title>HTTPTimeServer powered by POCO C++ Libraries</title>";
 		ostr << "<meta http-equiv=\"refresh\" content=\"1\"></head>";
 		ostr << "<body><p style=\"text-align: center; font-size: 48px;\">";
 		ostr << dt;

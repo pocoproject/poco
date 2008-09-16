@@ -1,7 +1,7 @@
 //
 // DynamicAny.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,6 +36,7 @@
 
 #include "Poco/DynamicAny.h"
 #include <algorithm>
+#include <cctype>
 
 
 namespace Poco {
@@ -67,15 +68,180 @@ DynamicAny::~DynamicAny()
 }
 
 
-void DynamicAny::swap(DynamicAny& ptr)
+DynamicAny& DynamicAny::operator = (const DynamicAny& other)
 {
-	std::swap(_pHolder, ptr._pHolder);
+	DynamicAny tmp(other);
+	swap(tmp);
+	return *this;
 }
 
 
-const std::type_info& DynamicAny::type() const
+const DynamicAny DynamicAny::operator + (const DynamicAny& other) const
 {
-    return _pHolder->type();
+	if (isInteger())
+	{
+		if(isSigned())
+			return add<Poco::Int64>(other);
+		else
+			return add<Poco::UInt64>(other);
+	}
+	else if (isNumeric())
+		return add<double>(other);
+	else if (isString())
+		return add<std::string>(other);
+	else
+		throw InvalidArgumentException("Invalid operation for this data type.");
+}
+
+
+DynamicAny& DynamicAny::operator += (const DynamicAny& other)
+{
+	if (isInteger())
+	{
+		if(isSigned())
+			return *this = add<Poco::Int64>(other);
+		else
+			return *this = add<Poco::UInt64>(other);
+	}
+	else if (isNumeric())
+		return *this = add<double>(other);
+	else if (isString())
+		return *this = add<std::string>(other);
+	else
+		throw InvalidArgumentException("Invalid operation for this data type.");
+}
+
+
+const DynamicAny DynamicAny::operator - (const DynamicAny& other) const
+{
+	if (isInteger())
+	{
+		if(isSigned())
+			return subtract<Poco::Int64>(other);
+		else
+			return subtract<Poco::UInt64>(other);
+	}
+	else if (isNumeric())
+		return subtract<double>(other);
+	else
+		throw InvalidArgumentException("Invalid operation for this data type.");
+}
+
+
+DynamicAny& DynamicAny::operator -= (const DynamicAny& other)
+{
+	if (isInteger())
+	{
+		if(isSigned())
+			return *this = subtract<Poco::Int64>(other);
+		else
+			return *this = subtract<Poco::UInt64>(other);
+	}
+	else if (isNumeric())
+		return *this = subtract<double>(other);
+	else
+		throw InvalidArgumentException("Invalid operation for this data type.");
+}
+
+
+const DynamicAny DynamicAny::operator * (const DynamicAny& other) const
+{
+	if (isInteger())
+	{
+		if(isSigned())
+			return multiply<Poco::Int64>(other);
+		else
+			return multiply<Poco::UInt64>(other);
+	}
+	else if (isNumeric())
+		return multiply<double>(other);
+	else
+		throw InvalidArgumentException("Invalid operation for this data type.");
+}
+
+
+DynamicAny& DynamicAny::operator *= (const DynamicAny& other)
+{
+	if (isInteger())
+	{
+		if(isSigned())
+			return *this = multiply<Poco::Int64>(other);
+		else
+			return *this = multiply<Poco::UInt64>(other);
+	}
+	else if (isNumeric())
+		return *this = multiply<double>(other);
+	else
+		throw InvalidArgumentException("Invalid operation for this data type.");
+}
+
+
+const DynamicAny DynamicAny::operator / (const DynamicAny& other) const
+{
+	if (isInteger())
+	{
+		if(isSigned())
+			return divide<Poco::Int64>(other);
+		else
+			return divide<Poco::UInt64>(other);
+	}
+	else if (isNumeric())
+		return divide<double>(other);
+	else
+		throw InvalidArgumentException("Invalid operation for this data type.");
+}
+
+
+DynamicAny& DynamicAny::operator /= (const DynamicAny& other)
+{
+	if (isInteger())
+	{
+		if(isSigned())
+			return *this = divide<Poco::Int64>(other);
+		else
+			return *this = divide<Poco::UInt64>(other);
+	}
+	else if (isNumeric())
+		return *this = divide<double>(other);
+	else
+		throw InvalidArgumentException("Invalid operation for this data type.");
+}
+
+
+DynamicAny& DynamicAny::operator ++ ()
+{
+	if (!isInteger())
+		throw InvalidArgumentException("Invalid operation for this data type.");
+
+	return *this = *this + 1;
+}
+
+DynamicAny DynamicAny::operator ++ (int)
+{
+	if (!isInteger())
+		throw InvalidArgumentException("Invalid operation for this data type.");
+
+	DynamicAny tmp(*this);
+	*this += 1;
+	return tmp;
+}
+
+DynamicAny& DynamicAny::operator -- ()
+{
+	if (!isInteger())
+		throw InvalidArgumentException("Invalid operation for this data type.");
+
+	return *this = *this - 1;
+}
+
+DynamicAny DynamicAny::operator -- (int)
+{
+	if (!isInteger())
+		throw InvalidArgumentException("Invalid operation for this data type.");
+
+	DynamicAny tmp(*this);
+	*this -= 1;
+	return tmp;
 }
 
 

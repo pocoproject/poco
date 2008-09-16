@@ -1,7 +1,7 @@
 //
 // SQLExecutor.h
 //
-// $Id: //poco/1.3/Data/MySQL/testsuite/src/SQLExecutor.h#2 $
+// $Id: //poco/1.3/Data/MySQL/testsuite/src/SQLExecutor.h#1 $
 //
 // Definition of the SQLExecutor class.
 //
@@ -38,6 +38,7 @@
 
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/Session.h"
+
 
 class SQLExecutor: public CppUnit::TestCase
 {

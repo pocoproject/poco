@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#3 $
 //
 // Library: Net
 // Package: Mail
@@ -9,7 +9,7 @@
 //
 // Definition of the SMTPClientSession class.
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -63,6 +63,13 @@ public:
 		SMTP_PORT = 25
 	};
 
+	enum LoginMethod
+	{
+		AUTH_NONE,
+		AUTH_CRAM_MD5,
+		AUTH_LOGIN,
+	};
+
 	SMTPClientSession(const StreamSocket& socket);
 		/// Creates the SMTPClientSession using
 		/// the given socket, which must be connected
@@ -94,6 +101,10 @@ public:
 	void login();
 		/// Calls login(hostname) with the current host name.
 
+	void login(LoginMethod loginMethod, const std::string& username, const std::string& password);
+		/// Logs in to the SMTP server using the given authentication method and the given
+		/// credentials.
+		
 	void open();
 		/// Reads the initial response from the SMTP server.
 		///
@@ -148,6 +159,11 @@ protected:
 	static bool isPositiveIntermediate(int status);
 	static bool isTransientNegative(int status);
 	static bool isPermanentNegative(int status);
+
+	void login(const std::string& hostname, std::string& response);
+	void loginUsingCRAM_MD5(const std::string& username, const std::string& password);
+	void loginUsingLogin(const std::string& username, const std::string& password);
+	void loginUsingPlain(const std::string& username, const std::string& password);
 
 private:
 	DialogSocket _socket;

@@ -1,7 +1,7 @@
 //
 // RecordSet.cpp
 //
-// $Id: //poco/1.3/Data/samples/RecordSet/src/RecordSet.cpp#1 $
+// $Id: //poco/1.3/Data/samples/RecordSet/src/RecordSet.cpp#2 $
 //
 // This sample demonstrates the Data library.
 //

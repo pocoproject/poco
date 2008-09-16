@@ -1,7 +1,7 @@
 //
 // Connector.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Connector.h#1 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Connector.h#2 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -70,6 +70,10 @@ public:
 
 	static void unregisterConnector();
 		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.
+
+	static void enableSharedCache(bool flag = true);
+		/// Enables or disables SQlite shared cache mode
+		/// (see http://www.sqlite.org/sharedcache.html for a discussion).
 };
 
 

@@ -39,19 +39,21 @@
 #ifndef Data_MySQL_ResultMetadata_INCLUDED
 #define Data_MySQL_ResultMetadata_INCLUDED
 
+
 #include <mysql.h>
 #include <vector>
 #include "Poco/Data/MetaColumn.h"
+
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
 
+
 class ResultMetadata
 	/// MySQL result metadata
 {
 public:
-
 	void reset();
 		/// Resets the metadata.
 
@@ -84,6 +86,8 @@ private:
     std::vector<my_bool>       _isNull;
 };
 
-}}}
+
+} } } // namespace Poco::Data::MySQL
+
 
 #endif //Data_MySQL_ResultMetadata_INCLUDED

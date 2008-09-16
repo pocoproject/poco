@@ -39,14 +39,16 @@
 #ifndef Data_MySQL_StatementHandle_INCLUDED
 #define Data_MySQL_StatementHandle_INCLUDED
 
+
 #include <mysql.h>
 #include "Poco/Data/MySQL/MySQLException.h"
-
 #include <vector>
+
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
+
 
 class StatementExecutor
 	/// MySQL statement executor.
@@ -90,12 +92,10 @@ public:
 		/// Cast operator to native handle type.
 
 private:
-
 	StatementExecutor(const StatementExecutor&);
 	StatementExecutor& operator=(const StatementExecutor&);
 
 private:
-
 	MYSQL_STMT* h;
 	int _state;
 	std::string _query;
@@ -105,14 +105,13 @@ private:
 //
 // inlines
 //
-
 inline StatementExecutor::operator MYSQL_STMT* ()
 {
 	return h;
 }
 
 
-}}}
+} } } // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_StatementHandle_INCLUDED
