@@ -1,7 +1,7 @@
 //
 // NumberParser.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/NumberParser.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/NumberParser.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -108,7 +108,7 @@ public:
 		/// Parses a double value in decimal floating point notation
 		/// from the given string. 
 		/// Throws a SyntaxException if the string does not hold a floating-point 
-		/// number in hexadecimal notation.
+		/// number in decimal notation.
 		
 	static bool tryParseFloat(const std::string& s, double& value);
 		/// Parses a double value in decimal floating point notation

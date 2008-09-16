@@ -1,7 +1,7 @@
 //
 // Activity.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Activity.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Activity.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -124,7 +124,7 @@ public:
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		
-		if (_stopped)
+		if (!_running)
 		{
 			_done.reset();
 			_stopped = false;
