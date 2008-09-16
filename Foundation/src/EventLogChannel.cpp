@@ -1,7 +1,7 @@
 //
 // EventLogChannel.cpp
 //
-// $Id: //poco/svn/Foundation/src/EventLogChannel.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/EventLogChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -236,38 +236,28 @@ void EventLogChannel::setUpRegistry() const
 	{
 #if defined(POCO_WIN32_UTF8)
 		std::wstring path;
-		std::wstring libName = L"PocoMsg.dll";
-		path = findLibrary(libName.c_str());
-
-		if (path.empty())
-		{
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				libName = L"PocoFoundationd.dll";
-				path = findLibrary(libName.c_str());
+				path = findLibrary(L"PocoFoundationd.dll");
 			#else
-				libName = L"PocoFoundation.dll";
-				path = findLibrary(libName.c_str());
+				path = findLibrary(L"PocoFoundation.dll");
 			#endif
 		#endif
-		}	
+		
+		if (path.empty())
+			path = findLibrary(L"PocoMsg.dll");
 #else
 		std::string path;
-		std::string libName = "PocoMsg.dll";
-		path = findLibrary(libName.c_str());
-
-		if (path.empty())
-		{
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				libName = "PocoFoundationd.dll";
-				path = findLibrary(libName.c_str());
+				path = findLibrary("PocoFoundationd.dll");
 			#else
-				libName = "PocoFoundation.dll";
-				path = findLibrary(libName.c_str());
+				path = findLibrary("PocoFoundation.dll");
 			#endif
 		#endif
-		}	
+		
+		if (path.empty())
+			path = findLibrary("PocoMsg.dll");
 #endif
 		
 		if (!path.empty())
@@ -275,8 +265,8 @@ void EventLogChannel::setUpRegistry() const
 			DWORD count = 8;
 			DWORD types = 7;
 #if defined(POCO_WIN32_UTF8)
-			RegSetValueExW(hKey, L"CategoryMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) path.size() + 1);
-			RegSetValueExW(hKey, L"EventMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) path.size() + 1);
+			RegSetValueExW(hKey, L"CategoryMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) sizeof(wchar_t)*(path.size() + 1));
+			RegSetValueExW(hKey, L"EventMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) sizeof(wchar_t)*(path.size() + 1));
 			RegSetValueExW(hKey, L"CategoryCount", 0, REG_DWORD, (const BYTE*) &count, (DWORD) sizeof(count));
 			RegSetValueExW(hKey, L"TypesSupported", 0, REG_DWORD, (const BYTE*) &types, (DWORD) sizeof(types));
 #else
@@ -284,16 +274,6 @@ void EventLogChannel::setUpRegistry() const
 			RegSetValueEx(hKey, "EventMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) path.size() + 1);
 			RegSetValueEx(hKey, "CategoryCount", 0, REG_DWORD, (const BYTE*) &count, (DWORD) sizeof(count));
 			RegSetValueEx(hKey, "TypesSupported", 0, REG_DWORD, (const BYTE*) &types, (DWORD) sizeof(types));
-#endif
-		}
-		else
-		{
-			std::string uLibName;
-#if defined(POCO_WIN32_UTF8)
-			UnicodeConverter::toUTF8(libName, uLibName);
-			throw NotFoundException(uLibName);
-#else
-			throw NotFoundException(libName);
 #endif
 		}
 	}
