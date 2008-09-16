@@ -164,7 +164,7 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		ostr <<			"}});";
 	
 		// always nest a panel around, so we can get rid of dynamic casts to check for parent type
-		ostr << "new Ext.Panel({renderTo:'p" << pPage->id() << "',border:false,bodyBorder:false,autoScroll:true";
+		ostr << "new Ext.Panel({renderTo:'p" << pPage->id() << "',border:false,bodyBorder:false,autoScroll:true,id:'" << pPage->id() << "'";
 		if (pPage->beforeRender.hasJavaScriptCode() || pPage->afterRender.hasJavaScriptCode())
 		{
 			ostr << ",listeners:{";
