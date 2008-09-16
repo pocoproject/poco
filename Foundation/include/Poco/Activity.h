@@ -124,7 +124,7 @@ public:
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		
-		if (_stopped)
+		if (!_running)
 		{
 			_done.reset();
 			_stopped = false;
