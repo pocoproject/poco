@@ -124,6 +124,7 @@ void HTMLForm::addPart(const std::string& name, PartSource* pSource)
 
 void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
 {
+	clear();
 	if (request.getMethod() == HTTPRequest::HTTP_POST)
 	{
 		std::string mediaType;

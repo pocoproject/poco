@@ -258,6 +258,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\Poco$(ProjectName)mt.lib"
 			/>
 			<Tool
@@ -329,6 +330,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\Poco$(ProjectName)mtd.lib"
 			/>
 			<Tool

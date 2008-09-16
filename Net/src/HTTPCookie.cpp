@@ -1,7 +1,7 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/svn/Net/src/HTTPCookie.cpp#2 $
+// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -63,7 +63,8 @@ namespace Net {
 HTTPCookie::HTTPCookie():
 	_version(0),
 	_secure(false),
-	_maxAge(-1)
+	_maxAge(-1),
+	_httpOnly(false)
 {
 }
 
@@ -72,7 +73,8 @@ HTTPCookie::HTTPCookie(const std::string& name):
 	_version(0),
 	_name(name),
 	_secure(false),
-	_maxAge(-1)
+	_maxAge(-1),
+	_httpOnly(false)
 {
 }
 
@@ -80,7 +82,8 @@ HTTPCookie::HTTPCookie(const std::string& name):
 HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 	_version(0),
 	_secure(false),
-	_maxAge(-1)
+	_maxAge(-1),
+	_httpOnly(false)
 {
 	for (NameValueCollection::ConstIterator it = nvc.begin(); it != nvc.end(); ++it)
 	{
@@ -117,6 +120,10 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 		{
 			setVersion(NumberParser::parse(value));
 		}
+		else if (icompare(name, "HttpOnly") == 0)
+		{
+			setHttpOnly(true);
+		}
 		else
 		{
 			setName(name);
@@ -131,7 +138,8 @@ HTTPCookie::HTTPCookie(const std::string& name, const std::string& value):
 	_name(name),
 	_value(value),
 	_secure(false),
-	_maxAge(-1)
+	_maxAge(-1),
+	_httpOnly(false)
 {
 }
 
@@ -144,7 +152,8 @@ HTTPCookie::HTTPCookie(const HTTPCookie& cookie):
 	_domain(cookie._domain),
 	_path(cookie._path),
 	_secure(cookie._secure),
-	_maxAge(cookie._maxAge)
+	_maxAge(cookie._maxAge),
+	_httpOnly(cookie._httpOnly)
 {
 }
 
@@ -158,14 +167,15 @@ HTTPCookie& HTTPCookie::operator = (const HTTPCookie& cookie)
 {
 	if (&cookie != this)
 	{
-		_version = cookie._version;
-		_name    = cookie._name;
-		_value   = cookie._value;
-		_comment = cookie._comment;
-		_domain  = cookie._domain;
-		_path    = cookie._path;
-		_secure  = cookie._secure;
-		_maxAge  = cookie._maxAge;
+		_version  = cookie._version;
+		_name     = cookie._name;
+		_value    = cookie._value;
+		_comment  = cookie._comment;
+		_domain   = cookie._domain;
+		_path     = cookie._path;
+		_secure   = cookie._secure;
+		_maxAge   = cookie._maxAge;
+		_httpOnly = cookie._httpOnly;
 	}
 	return *this;
 }
@@ -219,6 +229,12 @@ void HTTPCookie::setMaxAge(int maxAge)
 }
 
 
+void HTTPCookie::setHttpOnly(bool flag)
+{
+	_httpOnly = flag;
+}
+
+
 std::string HTTPCookie::toString() const
 {
 	std::string result(_name);
@@ -247,6 +263,10 @@ std::string HTTPCookie::toString() const
 		if (_secure)
 		{
 			result.append("; secure");
+		}
+		if (_httpOnly)
+		{
+			result.append("; HttpOnly");
 		}
 	}
 	else
@@ -282,6 +302,10 @@ std::string HTTPCookie::toString() const
 		if (_secure)
 		{
 			result.append("; secure");
+		}
+		if (_httpOnly)
+		{
+			result.append("; HttpOnly");
 		}
 		result.append("; Version=\"1\"");
 	}

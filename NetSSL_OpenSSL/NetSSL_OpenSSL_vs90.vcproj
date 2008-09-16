@@ -245,6 +245,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoNetSSLmtd.lib"
 			/>
 			<Tool
@@ -318,6 +319,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoNetSSLmt.lib"
 			/>
 			<Tool

@@ -1,7 +1,7 @@
 //
 // HTTPCookieTest.cpp
 //
-// $Id: //poco/svn/Net/testsuite/src/HTTPCookieTest.cpp#2 $
+// $Id: //poco/1.3/Net/testsuite/src/HTTPCookieTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -63,6 +63,9 @@ void HTTPCookieTest::testCookie()
 	assert (cookie.toString() == "name=value; domain=appinf.com; path=/");
 	cookie.setSecure(true);
 	assert (cookie.toString() == "name=value; domain=appinf.com; path=/; secure");
+	cookie.setHttpOnly(true);
+	assert (cookie.toString() == "name=value; domain=appinf.com; path=/; secure; HttpOnly");
+	cookie.setHttpOnly(false);
 	
 	cookie.setVersion(1);
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; secure; Version=\"1\"");
@@ -70,6 +73,9 @@ void HTTPCookieTest::testCookie()
 	cookie.setSecure(false);
 	cookie.setMaxAge(100);
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; Version=\"1\"");
+	
+	cookie.setHttpOnly(true);
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
 }
 
 

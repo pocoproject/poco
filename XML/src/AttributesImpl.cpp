@@ -1,7 +1,7 @@
 //
 // AttributesImpl.cpp
 //
-// $Id: //poco/svn/XML/src/AttributesImpl.cpp#3 $
+// $Id: //poco/1.3/XML/src/AttributesImpl.cpp#2 $
 //
 // Library: XML
 // Package: SAX
@@ -44,14 +44,14 @@ namespace XML {
 AttributesImpl::AttributesImpl()
 {
 	_empty.specified = false;
-	_empty.type = "CDATA";
+	_empty.type = XML_LIT("CDATA");
 }
 
 
 AttributesImpl::AttributesImpl(const Attributes& attributes)
 {
 	_empty.specified = false;
-	_empty.type = "CDATA";
+	_empty.type = XML_LIT("CDATA");
 	setAttributes(attributes);
 }
 

@@ -1,7 +1,7 @@
 //
 // NamespaceStrategy.cpp
 //
-// $Id: //poco/svn/XML/src/NamespaceStrategy.cpp#3 $
+// $Id: //poco/1.3/XML/src/NamespaceStrategy.cpp#2 $
 //
 // Library: XML
 // Package: XML
@@ -82,13 +82,13 @@ void NamespaceStrategy::splitName(const XMLChar* qname, XMLString& uri, XMLStrin
 		if (*p)
 			prefix.assign(++p);
 		else
-			prefix.assign("");
+			prefix.assign(XML_LIT(""));
 	}
 	else 
 	{
-		uri.assign("");
+		uri.assign(XML_LIT(""));
 		localName = qname;
-		prefix.assign("");
+		prefix.assign(XML_LIT(""));
 	}	
 }
 
