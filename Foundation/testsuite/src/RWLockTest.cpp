@@ -1,7 +1,7 @@
 //
 // RWLockTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/RWLockTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/RWLockTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -60,13 +60,20 @@ public:
 			for (int k = 0; k < 100; ++k)
 			{
 				if (_counter != lastCount) _ok = false;
+				Thread::yield();
 			}
 			_lock.unlock();
 			_lock.writeLock();
 			for (int k = 0; k < 100; ++k)
+			{
 				--_counter;
+				Thread::yield();
+			}
 			for (int k = 0; k < 100; ++k)
+			{
 				++_counter;
+				Thread::yield();
+			}
 			++_counter;
 			if (_counter <= lastCount) _ok = false;
 			_lock.unlock();
@@ -102,13 +109,20 @@ public:
 			for (int k = 0; k < 100; ++k)
 			{
 				if (_counter != lastCount) _ok = false;
+				Thread::yield();
 			}
 			_lock.unlock();
 			while (!_lock.tryWriteLock()) Thread::yield();
 			for (int k = 0; k < 100; ++k)
+			{
 				--_counter;
+				Thread::yield();
+			}
 			for (int k = 0; k < 100; ++k)
+			{
 				++_counter;
+				Thread::yield();
+			}
 			++_counter;
 			if (_counter <= lastCount) _ok = false;
 			_lock.unlock();
