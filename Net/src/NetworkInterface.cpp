@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#6 $
+// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#7 $
 //
 // Library: Net
 // Package: Sockets
@@ -93,7 +93,7 @@ NetworkInterfaceImpl::NetworkInterfaceImpl():
 
 NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, int index):
 	_name(name),
-	_displayName(name),
+	_displayName(displayName),
 	_address(address),
 	_index(index)
 {
@@ -126,7 +126,7 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 
 NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
 	_name(name),
-	_displayName(name),
+	_displayName(displayName),
 	_address(address),
 	_subnetMask(subnetMask),
 	_broadcastAddress(broadcastAddress),
@@ -399,14 +399,14 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 					IPAddress addr(pAddress->FirstUnicastAddress->Address.lpSockaddr, pAddress->FirstUnicastAddress->Address.iSockaddrLength);
 					std::string name(pAddress->AdapterName);
 					std::string displayName;
-#if POCO_WIN32_UTF8
-					Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
+#ifdef POCO_WIN32_UTF8
+					Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
 #else
 					char displayNameBuffer[1024];
-					int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
+					int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->Description, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
 					if (rc) displayName = displayNameBuffer;
 #endif
-					result.push_back(NetworkInterface(std::string(name, displayName, addr, pAddress->Ipv6IfIndex));
+					result.push_back(NetworkInterface(name, displayName, addr, pAddress->Ipv6IfIndex));
 					pAddress = pAddress->Next;
 				}
 			}
@@ -422,7 +422,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #endif
 
 	// Add IPv4 loopback interface (not returned by GetAdaptersInfo)
-	result.push_back(NetworkInterface("Loopback", IPAddress("127.0.0.1"), IPAddress("255.0.0.0"), IPAddress(), -1));
+	result.push_back(NetworkInterface("Loopback", "Loopback Interface", IPAddress("127.0.0.1"), IPAddress("255.0.0.0"), IPAddress(), -1));
 	// On Windows 2000 we use GetAdaptersInfo.
 	PIP_ADAPTER_INFO pAdapterInfo;
 	PIP_ADAPTER_INFO pInfo = 0;
@@ -454,14 +454,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 					IPAddress broadcastAddress(address);
 					broadcastAddress.mask(subnetMask, IPAddress("255.255.255.255"));
 					std::string name(pInfo->AdapterName);
-					std::string displayName;
-#if POCO_WIN32_UTF8
-					Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
-#else
-					char displayNameBuffer[1024];
-					int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
-					if (rc) displayName = displayNameBuffer;
-#endif					
+					std::string displayName(pInfo->Description);
 					result.push_back(NetworkInterface(name, displayName, address, subnetMask, broadcastAddress));
 				}
 				pInfo = pInfo->Next;

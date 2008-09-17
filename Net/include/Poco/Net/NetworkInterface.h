@@ -1,7 +1,7 @@
 //
 // NetworkInterface.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#4 $
+// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#5 $
 //
 // Library: Net
 // Package: Sockets
@@ -94,9 +94,11 @@ public:
 	const std::string& displayName() const;
 		/// Returns the interface display name.
 		///
-		/// On Windows platforms, this is the user-friendly interface
-		/// name (e.g., "Local Area Connection"). On other platforms,
-		/// this is the same as name().
+		/// On Windows platforms, this is currently the network adapter
+		/// name. This may change to the "friendly name" of the network
+		/// connection in a future version, however. 
+		///
+		/// On other platforms this is the same as name().
 		
 	const IPAddress& address() const;
 		/// Returns the IP address bound to the interface.
