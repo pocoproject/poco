@@ -1,7 +1,7 @@
 //
 // RWLock_WIN32.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/RWLock_WIN32.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/RWLock_WIN32.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -67,6 +67,7 @@ private:
 	HANDLE   _readEvent;
 	HANDLE   _writeEvent;
 	unsigned _readers;
+	unsigned _writersWaiting;
 	unsigned _writers;
 };
 
