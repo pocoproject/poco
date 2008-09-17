@@ -38,14 +38,19 @@
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
 #include "Poco/WebWidgets/TextFieldCell.h"
+#include "Poco/WebWidgets/TextField.h"
 #include "Poco/WebWidgets/Control.h"
 #include "Poco/WebWidgets/Form.h"
 #include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 namespace ExtJS {
+
+
+const std::string TextFieldCellRenderer::EV_TEXTCHANGED("change");
 
 
 TextFieldCellRenderer::TextFieldCellRenderer()
@@ -103,9 +108,42 @@ void TextFieldCellRenderer::writeCellProperties(const TextFieldCell* pCell, std:
 	{
 		//tooltip is not supported by textField, add listeners
 		std::string tooltip (pCell->getToolTip());
-		if (!tooltip.empty())
-			ostr << ",listeners:{render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}}";
+		View* pOwner = pCell->getOwner();
+		TextField* pText = dynamic_cast<TextField*>(pOwner);
+			
+		if (!tooltip.empty() || (pText && pText->textChanged.hasJavaScriptCode()))
+		{
+			ostr << ",listeners:{";
+			bool comma = false;
+			if (!tooltip.empty())
+			{
+				comma = true;
+				ostr << "render:function(c){Ext.QuickTips.register({target:c.getEl(),text:'" << Utility::safe(tooltip) << "'});}";
+			}
+			if (pText && pText->textChanged.hasJavaScriptCode())
+			{
+				if (comma)
+					ostr << ",";
+				Utility::writeJSEvent(ostr, EV_TEXTCHANGED, pText->textChanged, &TextFieldCellRenderer::createTextChangedServerCallback, pText);
+			}
+			
+			
+			ostr << "}"; // close listeners
+		}
+		
 	}
+}
+
+
+Poco::WebWidgets::JSDelegate TextFieldCellRenderer::createTextChangedServerCallback(const TextField* pText)
+{
+	// change : ( Ext.form.Field field, Mixed newVal, Mixed oldVal )
+	static const std::string signature("function(field,newVal,oldVal)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(TextFieldCell::FIELD_OLDVAL, "+oldVal"));
+	addParams.insert(std::make_pair(TextFieldCell::FIELD_NEWVAL, "+newVal"));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, TextFieldCell::EV_TEXTCHANGED));
+	return Utility::createServerCallback(signature, addParams, pText->id(), pText->textChanged.getOnSuccess(), pText->textChanged.getOnFailure());
 }
 
 

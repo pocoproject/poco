@@ -42,7 +42,8 @@
 
 #include "Poco/WebWidgets/Control.h"
 #include "Poco/WebWidgets/Event.h"
-#include "Poco/BasicEvent.h"
+#include "Poco/WebWidgets/JavaScriptEvent.h"
+#include "Poco/WebWidgets/TextFieldCell.h"
 
 
 namespace Poco {
@@ -54,9 +55,10 @@ class WebWidgets_API TextField: public Control
 {
 public:
 	typedef Poco::AutoPtr<TextField> Ptr;
-	typedef Event<TextField> TextFieldEvent;
-
-	Poco::BasicEvent<TextFieldEvent> textChanged;
+	
+	typedef TextFieldCell::ValueChange ValueChange;
+	
+	JavaScriptEvent<TextFieldCell::ValueChange> textChanged;
 
 	TextField(const std::string& name, const std::string& text);
 		/// Creates a TextField with the given name and content.
@@ -81,7 +83,7 @@ public:
 		/// Returns the maximum length of the text field, or -1
 		/// if the length is unlimited.
 
-	void fireTextChanged(void* pSender);
+	void fireTextChanged(TextFieldCell::ValueChange& vc);
 		/// Fires the textChanged event.
 		
 	const std::string& getContent() const;

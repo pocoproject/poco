@@ -42,6 +42,7 @@
 
 #include "Poco/WebWidgets/Cell.h"
 #include "Poco/WebWidgets/Delegate.h"
+#include "Poco/FIFOEvent.h"
 
 
 namespace Poco {
@@ -53,8 +54,23 @@ class WebWidgets_API TextFieldCell: public Cell
 {
 public:
 	typedef Poco::AutoPtr<TextFieldCell> Ptr;
+	
+	static const std::string FIELD_OLDVAL;
+	static const std::string FIELD_NEWVAL;
+	static const std::string EV_TEXTCHANGED;
+	
+	struct WebWidgets_API ValueChange
+		/// Data sent with a textChanged event. 
+	{
+		Formatter::Ptr pFormatter;
+		const Poco::Any oldValue;
+		const Poco::Any newValue;
+		ValueChange(Formatter::Ptr pFormatter, const Poco::Any& oldValue, const Poco::Any& newValue);
+		bool differ() const;
+			/// Returns true if oldValue and newValue are different
+	};
 
-	Delegate textChanged;
+	FIFOEvent<ValueChange> textChanged;
 
 	TextFieldCell(View* pOwner);
 		/// Creates a TextFieldCell.

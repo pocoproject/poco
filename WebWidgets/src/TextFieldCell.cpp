@@ -42,6 +42,11 @@ namespace Poco {
 namespace WebWidgets {
 
 
+const std::string TextFieldCell::FIELD_OLDVAL("oldVal");
+const std::string TextFieldCell::FIELD_NEWVAL("newVal");
+const std::string TextFieldCell::EV_TEXTCHANGED("txtchanged");
+
+
 TextFieldCell::TextFieldCell(View* pOwner):
 	Cell(pOwner, typeid(TextFieldCell)),
 	_maxLength(-1)
@@ -79,8 +84,10 @@ void TextFieldCell::handleForm(const std::string& field, const std::string& valu
 {
 	if (getValue().empty() || value != getString())
 	{
+		Poco::Any newValue = getFormatter()->parse(value);
+		ValueChange vc(getFormatter(), getValue(), newValue);
 		setValue(value);
-		textChanged(this);
+		textChanged.notify(this, vc);
 	}
 }
 
@@ -93,6 +100,28 @@ bool TextFieldCell::serializeJSON(std::ostream& out, const std::string& name)
 		out << "'" << getFormatter()->format(getValue()) << "'";
 	}
 	return true;
+}
+
+
+TextFieldCell::ValueChange::ValueChange(Formatter::Ptr pF, const Poco::Any& oV, const Poco::Any& nV):
+	pFormatter(pF),
+	oldValue(oV),
+	newValue(nV)
+{
+	poco_check_ptr (pFormatter);
+}
+
+
+bool TextFieldCell::ValueChange::differ() const
+{
+	if (oldValue.empty() && newValue.empty())
+		return false;
+	
+	if (oldValue.empty() || newValue.empty())
+		return true;
+	
+	// both are valid
+	return (pFormatter->format(oldValue) != pFormatter->format(newValue));
 }
 
 

@@ -36,6 +36,7 @@
 
 #include "Poco/WebWidgets/TextField.h"
 #include "Poco/WebWidgets/TextFieldCell.h"
+#include "Poco/Delegate.h"
 
 
 namespace Poco {
@@ -125,7 +126,7 @@ int TextField::getMaxLength() const
 void TextField::init()
 {
 	TextFieldCell* pCell = new TextFieldCell(this);
-	pCell->textChanged = delegate(*this, &TextField::fireTextChanged);
+	pCell->textChanged += Poco::delegate(this, &TextField::fireTextChanged);
 	setCell(pCell);
 }
 
@@ -136,15 +137,14 @@ void TextField::init(Cell::Ptr ptrCell)
 	TextFieldCell::Ptr ptr = ptrCell.cast<TextFieldCell>();
 	poco_check_ptr (ptr);
 
-	ptr->textChanged = delegate(*this, &TextField::fireTextChanged);
+	ptr->textChanged += Poco::delegate(this, &TextField::fireTextChanged);
 	setCell(ptrCell);
 }
 
 
-void TextField::fireTextChanged(void* pSender)
+void TextField::fireTextChanged(ValueChange& vc)
 {
-	TextFieldEvent changedEvent(this);
-	textChanged(this, changedEvent);
+	textChanged(this, vc);
 }
 
 

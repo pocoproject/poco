@@ -42,12 +42,14 @@
 
 #include "Poco/WebWidgets/ExtJS/ExtJS.h"
 #include "Poco/WebWidgets/Renderer.h"
+#include "Poco/WebWidgets/JSDelegate.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 
 class TextFieldCell;
+class TextField;
 
 namespace ExtJS {
 
@@ -56,6 +58,8 @@ class ExtJS_API TextFieldCellRenderer: public Poco::WebWidgets::Renderer
 	/// TextFieldCellRenderer renders a text input field
 {
 public:
+	static const std::string EV_TEXTCHANGED;
+	
 	TextFieldCellRenderer();
 		/// Creates the TextFieldCellRenderer.
 
@@ -70,6 +74,11 @@ public:
 
 	static void writeCellProperties(const TextFieldCell* pCell, std::ostream& ostr, bool writeValue=true, bool writeListeners = true);
 		/// Writes cell properties
+		
+	static Poco::WebWidgets::JSDelegate createTextChangedServerCallback(const TextField* pText);
+		/// Adds a server callback for the change event. The method signature is
+		/// change : ( Ext.form.Field field, Mixed newVal, Mixed oldVal )
+		
 };
 
 
