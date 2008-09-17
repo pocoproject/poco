@@ -1,7 +1,7 @@
 //
 // File_WIN32.cpp
 //
-// $Id: //poco/svn/Foundation/src/File_WIN32.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/File_WIN32.cpp#8 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -339,7 +339,7 @@ bool FileImpl::createFileImpl()
 		CloseHandle(hFile);
 		return true;
 	}
-	else if (GetLastError() == ERROR_ALREADY_EXISTS)
+	else if (GetLastError() == ERROR_FILE_EXISTS)
 		return false;
 	else
 		handleLastErrorImpl(_path);
