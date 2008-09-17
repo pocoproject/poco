@@ -1,7 +1,7 @@
 //
 // ODBCTestSuite.h
 //
-// $Id: //poco/1.3/Data/MySQL/testsuite/src/MySQLTestSuite.h#1 $
+// $Id: //poco/1.3/Data/MySQL/testsuite/src/MySQLTestSuite.h#2 $
 //
 // Definition of the ODBCTestSuite class.
 //

@@ -1,7 +1,7 @@
 //
 // DataTypes.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/DataTypes.cpp#3 $
+// $Id: //poco/1.3/Data/ODBC/src/DataTypes.cpp#4 $
 //
 // Library: ODBC
 // Package: ODBC

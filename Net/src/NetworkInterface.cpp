@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#4 $
+// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#6 $
 //
 // Library: Net
 // Package: Sockets
@@ -39,6 +39,9 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/RefCountedObject.h"
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#include "Poco/UnicodeConverter.h"
+#endif
 #include <cstring>
 
 
@@ -59,11 +62,12 @@ class NetworkInterfaceImpl: public Poco::RefCountedObject
 {
 public:
 	NetworkInterfaceImpl();
-	NetworkInterfaceImpl(const std::string& name, const IPAddress& address, int index = -1);
-	NetworkInterfaceImpl(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, int index = -1);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
 
 	int index() const;		
 	const std::string& name() const;
+	const std::string& displayName() const;
 	const IPAddress& address() const;
 	const IPAddress& subnetMask() const;
 	const IPAddress& broadcastAddress() const;
@@ -73,6 +77,7 @@ protected:
 
 private:	
 	std::string _name;
+	std::string _displayName;
 	IPAddress   _address;
 	IPAddress   _subnetMask;
 	IPAddress   _broadcastAddress;
@@ -86,8 +91,9 @@ NetworkInterfaceImpl::NetworkInterfaceImpl():
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const IPAddress& address, int index):
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, int index):
 	_name(name),
+	_displayName(name),
 	_address(address),
 	_index(index)
 {
@@ -118,8 +124,9 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const IPAddr
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
 	_name(name),
+	_displayName(name),
 	_address(address),
 	_subnetMask(subnetMask),
 	_broadcastAddress(broadcastAddress),
@@ -142,6 +149,12 @@ inline int NetworkInterfaceImpl::index() const
 inline const std::string& NetworkInterfaceImpl::name() const
 {
 	return _name;
+}
+
+
+inline const std::string& NetworkInterfaceImpl::displayName() const
+{
+	return _displayName;
 }
 
 
@@ -184,14 +197,14 @@ NetworkInterface::NetworkInterface(const NetworkInterface& interface):
 }
 
 
-NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, int index):
-	_pImpl(new NetworkInterfaceImpl(name, address, index))
+NetworkInterface::NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, int index):
+	_pImpl(new NetworkInterfaceImpl(name, displayName, address, index))
 {
 }
 
 
-NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
-	_pImpl(new NetworkInterfaceImpl(name, address, subnetMask, broadcastAddress, index))
+NetworkInterface::NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
+	_pImpl(new NetworkInterfaceImpl(name, displayName, address, subnetMask, broadcastAddress, index))
 {
 }
 
@@ -226,6 +239,12 @@ int NetworkInterface::index() const
 const std::string& NetworkInterface::name() const
 {
 	return _pImpl->name();
+}
+
+
+const std::string& NetworkInterface::displayName() const
+{
+	return _pImpl->displayName();
 }
 
 
@@ -292,7 +311,7 @@ NetworkInterface NetworkInterface::forName(const std::string& name, bool require
 		throw InterfaceNotFoundException(addr.toString(), "interface has no IP address");
 	int index = 0;
 #endif
-	return NetworkInterface(name, addr, index);
+	return NetworkInterface(name, name, addr, index);
 #endif
 }
 
@@ -378,7 +397,16 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 				if (pAddress->FirstUnicastAddress)
 				{
 					IPAddress addr(pAddress->FirstUnicastAddress->Address.lpSockaddr, pAddress->FirstUnicastAddress->Address.iSockaddrLength);
-					result.push_back(NetworkInterface(std::string(pAddress->AdapterName), addr, pAddress->Ipv6IfIndex));
+					std::string name(pAddress->AdapterName);
+					std::string displayName;
+#if POCO_WIN32_UTF8
+					Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
+#else
+					char displayNameBuffer[1024];
+					int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
+					if (rc) displayName = displayNameBuffer;
+#endif
+					result.push_back(NetworkInterface(std::string(name, displayName, addr, pAddress->Ipv6IfIndex));
 					pAddress = pAddress->Next;
 				}
 			}
@@ -425,7 +453,16 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 					IPAddress subnetMask(std::string(pInfo->IpAddressList.IpMask.String));
 					IPAddress broadcastAddress(address);
 					broadcastAddress.mask(subnetMask, IPAddress("255.255.255.255"));
-					result.push_back(NetworkInterface(std::string(pInfo->AdapterName), address, subnetMask, broadcastAddress));
+					std::string name(pInfo->AdapterName);
+					std::string displayName;
+#if POCO_WIN32_UTF8
+					Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
+#else
+					char displayNameBuffer[1024];
+					int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
+					if (rc) displayName = displayNameBuffer;
+#endif					
+					result.push_back(NetworkInterface(name, displayName, address, subnetMask, broadcastAddress));
 				}
 				pInfo = pInfo->Next;
 			}
@@ -475,14 +512,20 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 		{
 			if (ifap->ifa_addr->sa_family == AF_INET)
 			{
+				std::string name(ifap->ifa_name);
 				IPAddress addr(&reinterpret_cast<struct sockaddr_in*>(ifap->ifa_addr)->sin_addr, sizeof(struct in_addr));
-				result.push_back(NetworkInterface(std::string(ifap->ifa_name), addr));
+				IPAddress subnetMask(&reinterpret_cast<struct sockaddr_in*>(ifap->ifa_netmask)->sin_addr, sizeof(struct in_addr));
+				IPAddress broadcastAddr;
+				if (ifap->ifa_flags & IFF_BROADCAST)
+					broadcastAddr = IPAddress(&reinterpret_cast<struct sockaddr_in*>(ifap->ifa_dstaddr)->sin_addr, sizeof(struct in_addr));
+				result.push_back(NetworkInterface(name, name, addr, subnetMask, broadcastAddr));
 			}
 #if defined(POCO_HAVE_IPv6)
 			else if (ifap->ifa_addr->sa_family == AF_INET6)
 			{
 				IPAddress addr(&reinterpret_cast<struct sockaddr_in6*>(ifap->ifa_addr)->sin6_addr, sizeof(struct in6_addr));
-				result.push_back(NetworkInterface(std::string(ifap->ifa_name), addr, if_nametoindex(ifap->ifa_name)));
+				std::string name(ifap->ifa_name);
+				result.push_back(NetworkInterface(name, name, addr, if_nametoindex(ifap->ifa_name)));
 			}
 #endif
 		}
@@ -564,7 +607,8 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #else
 				int index = -1;
 #endif
-				result.push_back(NetworkInterface(std::string(ifr->ifr_name), addr, index));
+				std::string name(ifr->ifr_name);
+				result.push_back(NetworkInterface(name, name, addr, index));
 			}
 			ptr += sizeof(struct ifreq);
 		}
@@ -659,7 +703,8 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #else
 				int index = -1;
 #endif
-				result.push_back(NetworkInterface(std::string(ifr->ifr_name), addr, index));
+				std::string name(ifr->ifr_name);
+				result.push_back(NetworkInterface(name, name, addr, index));
 			}
 			len += sizeof(ifr->ifr_name);
 			ptr += len;

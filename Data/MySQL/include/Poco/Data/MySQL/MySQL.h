@@ -1,7 +1,7 @@
 //
 // MySQL.h
 //
-// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQL.h#1 $
+// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQL.h#2 $
 //
 // Library: Data
 // Package: MySQL

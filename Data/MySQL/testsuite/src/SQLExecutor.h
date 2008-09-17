@@ -1,7 +1,7 @@
 //
 // SQLExecutor.h
 //
-// $Id: //poco/1.3/Data/MySQL/testsuite/src/SQLExecutor.h#1 $
+// $Id: //poco/1.3/Data/MySQL/testsuite/src/SQLExecutor.h#2 $
 //
 // Definition of the SQLExecutor class.
 //

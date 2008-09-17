@@ -1,7 +1,7 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/1.3/Data/samples/TypeHandler/src/TypeHandler.cpp#3 $
+// $Id: //poco/1.3/Data/samples/TypeHandler/src/TypeHandler.cpp#4 $
 //
 // This sample demonstrates the Data library.
 //

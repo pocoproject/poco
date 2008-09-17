@@ -1,7 +1,7 @@
 //
 // MySQLTest.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/testsuite/src/MySQLTest.cpp#1 $
+// $Id: //poco/1.3/Data/MySQL/testsuite/src/MySQLTest.cpp#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
