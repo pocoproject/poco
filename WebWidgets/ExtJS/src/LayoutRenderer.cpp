@@ -59,30 +59,6 @@ LayoutRenderer::~LayoutRenderer()
 }
 
 
-void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, int horPad, int vertPad)
-{
-	poco_assert_dbg(pLayout != 0);
-	Renderable::ID id(0);
-	View::Ptr ptrParent = pLayout->parent();
-	if (!(ptrParent && (ptrParent.cast<Frame>() || ptrParent.cast<Panel>())))
-	{
-		// the parent is not a panel 
-		// assume that the direct parent is a panel
-		ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-		ostr << "id:'" << pLayout->id() << "',";
-		if (!pLayout->isVisible())
-			ostr << "hidden:true,";
-		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, horPad, vertPad);
-		ostr << "})";
-	}
-	else
-	{
-		renderParameters(pLayout, context, ostr, layoutId, layoutConfig, cols, horPad, vertPad);
-	}
-}
-
-
-
 void LayoutRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
 {
 	const Layout* pLayout = static_cast<const Layout*>(pRenderable);
@@ -95,92 +71,64 @@ void LayoutRenderer::renderBody(const Renderable* pRenderable, const RenderConte
 }
 
 
-void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, int horPad, int vertPad)
+void LayoutRenderer::renderLayout(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, std::size_t cols, int padHorVal, int padVertVal)
 {
-	poco_assert_dbg(pLayout != 0);
-	bool writeComma = false;
-	if (pLayout->getWidth() > 0)
-		ostr << "width:" << pLayout->getWidth() << ",";
-	if (!layoutId.empty())
+	poco_assert_dbg (pLayout != 0);
+	
+	Renderable::ID id(0);
+	View::Ptr ptrParent = pLayout->parent();
+	bool parentIsNotPanel = !(ptrParent && (ptrParent.cast<Frame>() || ptrParent.cast<Panel>()));
+	if (parentIsNotPanel)
 	{
-		ostr << "layout:'" << layoutId << "'";
-		writeComma = true;
+		// the parent is not a panel 
+		// assume that the direct parent is a panel
+		ostr << "new Ext.Panel({border:false,bodyBorder:false,";
+		ostr << "id:'" << pLayout->id() << "',";
+		if (!pLayout->isVisible())
+			ostr << "hidden:true,";
 	}
-	if (!layoutConfig.empty())
-	{
-		if (writeComma)
-			ostr << ",layoutConfig:" << layoutConfig;
-		else
-			ostr << ",layoutConfig:" << layoutConfig;
-		writeComma = true;
-	}
-	if (writeComma)
-		ostr << ",items:[";
-	else
-		ostr << "items:[";
-	visitChildren(pLayout, cols, horPad, vertPad, context, ostr);
-	ostr << "]";
+	
+	renderParameters(pLayout, context, ostr, cols, padHorVal, padVertVal);
+	
+	if (parentIsNotPanel)
+		ostr << "})";
 }
 
 
-void LayoutRenderer::visitChildren(const Layout* pLayout, int cols, int horPad, int vertPad, const RenderContext& context, std::ostream& ostr)
+void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, std::size_t cols, int padHorVal, int padVertVal)
 {
-	std::string padHor;
+	poco_assert_dbg(pLayout != 0);
+	if (padHorVal < 0)
+		padHorVal = 0;
+	if (padVertVal < 0)
+		padVertVal = 0;
+		
+	if (pLayout->getWidth() > 0)
+		ostr << "width:" << pLayout->getWidth() << ",";
 	
-	if (horPad > 0)
+	ostr << "layout:'table'";
+	ostr << ",layoutConfig:" << "{columns:" << cols << "}";
+
+	if (padHorVal > 0 || padVertVal > 0)
 	{
-		std::ostringstream pad;
-		pad << "<p class=\"lbl\" style=\"margin-left:" << (horPad-4) << "px\">&nbsp;</p>"; // -4 fixes size of &nbsp;
-		padHor = pad.str();
+		ostr << ",defaults:{";
+		ostr <<		"bodyStyle:'";
+		ostr <<			"padding:" << padVertVal << "px " << padHorVal << "px";
+		ostr <<		"'";
+		ostr <<	"}";
 	}
 	
-	std::string padVert;
-	if (vertPad > 0)
-	{
-		std::ostringstream pad;
-		pad << "<p style=\"margin-top:" << vertPad << "px\"></p>";
-		padVert = pad.str();
-	}
+	ostr << ",items:[";
+		
 	ContainerView::ConstIterator it = pLayout->begin();
 	int cnt(0);	
-	for (; it != pLayout->end(); ++it, ++cnt)
+	for (; it != pLayout->end(); ++it)
 	{
-		if (cnt > 0)
-		{
+		if (it != pLayout->begin())
 			ostr << ",";
-			if (cnt < cols && !padHor.empty())
-			{
-				ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-				ostr << "html:'" << padHor << "'}),";
-				++cnt;
-			}
-			else
-			{
-				if (cnt >= cols)
-				{
-					if (cnt % cols == 0) //first row
-					{
-						if (!padVert.empty())
-						{
-							//insert a complete line!
-							for (int i= 0; i < cols; ++i)
-							{
-								ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-								ostr << "html:'" << padVert << "'}),";
-							}
-						} // else no hor padding for first row!
-					}
-					else if (!padHor.empty())
-					{
-						ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-						ostr << "html:'" << padHor << "'}),";
-						++cnt;
-					}
-				}
-			}
-		}
 		if (*it)
 		{
+			
 			//horizontallayout works only when children are panels
 			ostr << "new Ext.Panel({border:false,bodyBorder:false,items:[";
 			(*it)->renderHead(context, ostr);
@@ -188,9 +136,8 @@ void LayoutRenderer::visitChildren(const Layout* pLayout, int cols, int horPad, 
 		}
 		else
 			ostr << "{}";
-		
 	}
+	ostr << "]";
 }
-
 
 } } } // namespace Poco::WebWidgets::ExtJS

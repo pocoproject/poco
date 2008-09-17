@@ -37,6 +37,8 @@
 #include "Poco/WebWidgets/ExtJS/GridLayoutRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/GridLayout.h"
+#include "Poco/WebWidgets/Frame.h"
+#include "Poco/WebWidgets/Panel.h"
 #include <sstream>
 
 
@@ -60,19 +62,8 @@ void GridLayoutRenderer::renderHead(const Renderable* pRenderable, const RenderC
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::GridLayout));
 	const GridLayout* pLayout = static_cast<const Poco::WebWidgets::GridLayout*>(pRenderable);
-	std::size_t cols = pLayout->columns();
-	int padHorVal = pLayout->getHorizontalPadding();
-	int padVertVal = pLayout->getVerticalPadding();
-	std::string padding;
-	if (padHorVal > 0)
-	{
-		cols = 2 * cols - 1;
-	}
-	std::ostringstream layoutConfig;
-	layoutConfig << "{columns:" << cols << "}";
-	std::string layout("table");
-	// when padding is used we can no longer use LayoutRenderer
-	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str(), (int)cols, padHorVal, padVertVal);
+	
+	renderLayout(pLayout, context, ostr, pLayout->columns(), pLayout->getHorizontalPadding(), pLayout->getVerticalPadding());
 }
 
 

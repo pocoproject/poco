@@ -61,15 +61,7 @@ void VerticalLayoutRenderer::renderHead(const Renderable* pRenderable, const Ren
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::VerticalLayout));
 	const VerticalLayout* pLayout = static_cast<const Poco::WebWidgets::VerticalLayout*>(pRenderable);
 
-	int padVal = pLayout->getPadding();
-	std::string padding;
-	if (padVal > 0)
-	{
-	}
-	// a vertical layout is a table with one column
-	std::string layoutConfig("{columns:1}");
-	std::string layout("table");
-	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig, 1, 0, padVal);
+	renderLayout(pLayout, context, ostr, 1, 0, pLayout->getPadding());
 }
 
 

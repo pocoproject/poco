@@ -66,16 +66,9 @@ public:
 		/// Emits code for the page body to the given output stream.
 
 protected:
-	void renderLayoutHead(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, int horPad, int vertPad);
-		/// layoutId contains the id for the layout parameter (e.g. table for GridLayoutRenderer)
-		/// layoutConfig contains the string for the layoutConfig parameter (e.g. {columns:3})
-		/// htmlPadding contains the optional padding string to use, e.g.:'<p class=\"lbl\" style=\"padding-left:10px\">&nbsp;</p>'
+	void renderLayout(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, std::size_t cols, int padHorVal, int padVertVal);
 
-	void renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, const std::string& layoutId, const std::string& layoutConfig, int cols, int horPad, int vertPad);
-		/// Render the config parameters
-
-	void visitChildren(const Layout* pLayout, int cols, int horPad, int vertPad, const RenderContext& context, std::ostream& ostr);
-		/// Visits children
+	void renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, std::size_t cols, int padHorVal, int padVertVal);
 };
 
 

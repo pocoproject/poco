@@ -60,19 +60,8 @@ void HorizontalLayoutRenderer::renderHead(const Renderable* pRenderable, const R
 	poco_assert_dbg (pRenderable != 0);
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::HorizontalLayout));
 	const HorizontalLayout* pLayout = static_cast<const Poco::WebWidgets::HorizontalLayout*>(pRenderable);
-	std::ostringstream layoutConfig;
-	std::size_t cols = pLayout->size();
-	int padVal = pLayout->getPadding();
-
-	if (padVal > 0)
-	{
-		cols = 2 * cols - 1;
-	}
-	layoutConfig << "{columns:" << cols << "}";
 	
-	static std::string layout("table");
-	//static std::string layout("column"); -> this works with firefox but fails with IE7!
-	LayoutRenderer::renderLayoutHead(pLayout, context, ostr, layout, layoutConfig.str(), (int)cols, padVal, 0);
+	renderLayout(pLayout, context, ostr, pLayout->size(), pLayout->getPadding(), 0);
 }
 
 

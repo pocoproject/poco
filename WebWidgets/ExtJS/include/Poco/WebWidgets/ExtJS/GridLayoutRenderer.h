@@ -45,6 +45,7 @@
 
 namespace Poco {
 namespace WebWidgets {
+	class GridLayout;
 namespace ExtJS {
 
 
@@ -60,6 +61,8 @@ public:
 
 	void renderHead(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page header to the given output stream.
+		
+	void renderParameters(const GridLayout* pLayout, const RenderContext& context, std::ostream& ostr);
 };
 
 
