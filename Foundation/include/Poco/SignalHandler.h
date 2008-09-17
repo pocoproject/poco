@@ -1,7 +1,7 @@
 //
 // SignalHandler.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/SignalHandler.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/SignalHandler.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -88,6 +88,9 @@ class Foundation_API SignalHandler
 	///
 	/// The best way to deal with a SignalException is to log as much context
 	/// information as possible, to aid in debugging, and then to exit.
+	///
+	/// The SignalHandler can be disabled globally by compiling POCO and client
+	/// code with the POCO_NO_SIGNAL_HANDLER macro defined.
 {
 public:
 	SignalHandler();
@@ -129,10 +132,14 @@ private:
 };
 
 
+#ifndef POCO_NO_SIGNAL_HANDLER
 #define poco_throw_on_signal \
 	Poco::SignalHandler _poco_signalHandler; \
 	int _poco_signal = sigsetjmp(_poco_signalHandler.jumpBuffer(), 1); \
 	if (_poco_signal) _poco_signalHandler.throwSignalException(_poco_signal);
+#else
+#define poco_throw_on_signal
+#endif
 
 
 } // namespace Poco

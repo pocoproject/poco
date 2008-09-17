@@ -1,7 +1,7 @@
 //
 // SignalHandler.cpp
 //
-// $Id: //poco/1.3/Foundation/src/SignalHandler.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/SignalHandler.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -93,6 +93,7 @@ void SignalHandler::throwSignalException(int sig)
 
 void SignalHandler::install()
 {
+#ifndef POCO_NO_SIGNAL_HANDLER
 	struct sigaction sa;
 	sa.sa_handler = handleSignal;
 	sa.sa_flags   = 0;
@@ -101,6 +102,7 @@ void SignalHandler::install()
 	sigaction(SIGBUS,  &sa, 0);
 	sigaction(SIGSEGV, &sa, 0);
 	sigaction(SIGSYS,  &sa, 0);
+#endif
 }
 
 
