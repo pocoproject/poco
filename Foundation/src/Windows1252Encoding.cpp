@@ -1,7 +1,7 @@
 //
 // Windows1252Encoding.cpp
 //
-// $Id: //poco/svn/Foundation/src/Windows1252Encoding.cpp#2 $
+// $Id: //poco/Main/Foundation/src/Windows1252Encoding.cpp#7 $
 //
 // Library: Foundation
 // Package: Text
