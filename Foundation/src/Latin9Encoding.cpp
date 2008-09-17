@@ -1,7 +1,7 @@
 //
 // Latin9Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Latin9Encoding.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Latin9Encoding.cpp#4 $
 //
 // Library: Foundation
 // Package: Text
@@ -106,13 +106,13 @@ const TextEncoding::CharacterMap& Latin9Encoding::characterMap() const
 
 int Latin9Encoding::convert(const unsigned char* bytes) const
 {
-	return *bytes;
+	return _charMap[*bytes];
 }
 
 
 int Latin9Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
-	if (ch >= 0 && ch <= 255)
+	if (ch >= 0 && ch <= 255 && _charMap[ch] == ch)
 	{
 		if (bytes && length >= 1)
 			*bytes = ch;
