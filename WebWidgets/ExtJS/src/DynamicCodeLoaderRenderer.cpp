@@ -35,10 +35,12 @@
 
 
 #include "Poco/WebWidgets/ExtJS/DynamicCodeLoaderRenderer.h"
+#include "Poco/WebWidgets/ExtJS/PanelRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/VerticalLayout.h"
 #include "Poco/WebWidgets/DynamicCodeLoader.h"
 #include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/WebWidgets/Panel.h"
 #include "Poco/NumberFormatter.h"
 #include <sstream>
 
@@ -64,6 +66,8 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	// - first a load method in the header which loads a js file
 	// - second, the js file which must be set as code at the DynamicCodeLoader
 	const DynamicCodeLoader* pLoader = static_cast<const DynamicCodeLoader*>(pRenderable);
+	View::Ptr pView = pLoader->view();
+	Panel::Ptr pPanel = pView.cast<Panel>();
 	poco_assert_dbg (pLoader != 0);
 	str <<	"var " << pLoader->loaderFunctionName() << "Loaded = false;" << std::endl;
 	str <<	"function " << pLoader->loaderFunctionName() << "(){" << std::endl;
@@ -74,7 +78,10 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	str <<		RequestHandler::KEY_ID << "=" << pLoader->id() << "'," << std::endl;
 	str <<			"success: function(response){" << std::endl;
 	str <<				"loadScriptDynamically('script" << pLoader->id() << "', response);" << std::endl;
-	str <<				"var parent = Ext.getCmp('" << pLoader->parent()->id() << "');" << std::endl;
+	if (pPanel)
+		str <<			"var parent = Ext.getCmp('" << pPanel->id() << "');" << std::endl;
+	else
+		str <<			"var parent = Ext.getCmp('" << pLoader->parent()->id() << "');" << std::endl;
 	str <<				"var child = " << pLoader->functionName() << "();" << std::endl;
 	str <<				"parent.add(child);" << std::endl;
 	if (!pLoader->getSuccessCall().empty())
@@ -93,16 +100,21 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	// bug: this optimization breaks logout/login stuff!
 	
 	std::ostringstream out;
-	View::Ptr pView = pLoader->view();
+	
 	out <<	"function " << pLoader->functionName() << "(){";
 	out <<		"return ";
-				pView->renderHead(context, out);
+	// only render the child when we have a panel
+	if (pPanel)
+	{
+		AutoPtr<PanelRenderer> pRend = new PanelRenderer();
+		pRend->renderAsPanelChild(pPanel, context, out);
+	}
+	else
+		pView->renderHead(context, out);
 	out <<		";"; // close return
 	out <<	"}";
 	
 	pL->setViewCode(out.str());
-	
-	
 }
 
 

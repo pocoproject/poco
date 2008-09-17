@@ -46,6 +46,7 @@
 
 namespace Poco {
 namespace WebWidgets {
+	class Panel;
 namespace ExtJS {
 
 
@@ -61,6 +62,11 @@ public:
 
 	void renderHead(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page header to the given output stream.
+		
+	void renderHeadWithoutChildren(const Panel* pPanel, const RenderContext& context, std::ostream& ostr);
+		/// Emits code for the page header to the given output stream.
+		
+	void renderAsPanelChild(const Panel* pPanel, const RenderContext& context, std::ostream& ostr);	
 
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.

@@ -61,8 +61,9 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::Panel));
 	const Panel* pPanel = static_cast<const Poco::WebWidgets::Panel*>(pRenderable);
 	ostr << "new Ext.Window({";
-
+	
 	Utility::writeRenderableProperties(pRenderable, ostr);
+	ostr <<		",manager: winGrp";
 	if (!pPanel->getName().empty() && pPanel->showHeader())
 		ostr << ",title:'" << pPanel->getTitle() << "'";
 	if (pPanel->getWidth() > 0)
@@ -79,8 +80,9 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 		ostr << ",closable:false";
 	else
 		ostr << ",closeAction:'hide'";
-	if (pPanel->isVisible())
+	if (pPanel->isVisible())	
 		ostr << ",renderTo:Ext.getBody()";
+	
 	
 	// minimizable set to true only fires a minimize event, without an event handler attached
 	// it is pretty useless, instead use collapsible
@@ -114,8 +116,80 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 }
 
 
+void PanelRenderer::renderHeadWithoutChildren(const Panel* pPanel, const RenderContext& context, std::ostream& ostr)
+{
+	ostr << "new Ext.Window({";
+	
+	Utility::writeRenderableProperties(pPanel, ostr);
+	ostr <<		",manager: winGrp";
+	if (!pPanel->getName().empty() && pPanel->showHeader())
+		ostr << ",title:'" << pPanel->getTitle() << "'";
+	if (pPanel->getWidth() > 0)
+		ostr << ",width:" << pPanel->getWidth();
+	else
+		ostr << ",width:100"; // required!
+	if (pPanel->getHeight() > 0)
+		ostr << ",height:" << pPanel->getHeight();
+	else
+		ostr << ",height:100"; // required!
+	if (pPanel->getModal())
+		ostr << ",modal:true";
+	if (!pPanel->hasCloseIcon())
+		ostr << ",closable:false";
+	else
+		ostr << ",closeAction:'hide'";
+	if (pPanel->isVisible())	
+		ostr << ",renderTo:Ext.getBody()";
+	
+	
+	// minimizable set to true only fires a minimize event, without an event handler attached
+	// it is pretty useless, instead use collapsible
+	if (pPanel->showHeader())
+		ostr << ",header:true,maximizable:true,collapsible:true";
+	else
+		ostr << ",header:false";
+	
+	if (!pPanel->enabled())	
+		ostr << ",disabled:true";
+
+	ostr << "})";
+}
+
+
+
+void PanelRenderer::renderAsPanelChild(const Panel* pPanel, const RenderContext& context, std::ostream& ostr)
+{
+	ostr << "new Ext.Panel({";
+
+	ostr << "border:false,bodyBorder:false,autoScroll:true";
+	View::Ptr pChild = pPanel->getChild();
+	if (pChild)
+	{
+		Layout::Ptr pLayout = pChild.cast<Layout>();
+		if (pLayout)
+		{
+			ostr << ",";
+			pLayout->renderHead(context, ostr);
+		}
+		else
+		{
+			ostr << ",items:[";
+			pChild->renderHead(context, ostr);
+			ostr << "]";
+		}
+	}
+	ostr << "})";
+}
+
+
+
 void PanelRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
 {
+	const Panel* pPanel = static_cast<const Poco::WebWidgets::Panel*>(pRenderable);
+	View::Ptr pChild = pPanel->getChild();
+	ostr << "<div id=\"p" << pPanel->id() << "\" />";
+	if (pChild)
+		pChild->renderBody(context, ostr);
 }
 
 

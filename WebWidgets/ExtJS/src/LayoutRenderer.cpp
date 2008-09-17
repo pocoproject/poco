@@ -85,6 +85,13 @@ void LayoutRenderer::renderLayoutHead(const Layout* pLayout, const RenderContext
 
 void LayoutRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
 {
+	const Layout* pLayout = static_cast<const Layout*>(pRenderable);
+	ContainerView::ConstIterator it = pLayout->begin();
+	int cnt(0);	
+	for (; it != pLayout->end(); ++it)
+	{
+		(*it)->renderBody(context, ostr);
+	}
 }
 
 

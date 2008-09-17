@@ -36,7 +36,9 @@
 
 #include "Poco/WebWidgets/ExtJS/PageRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
+#include "Poco/WebWidgets/ExtJS/PanelRenderer.h"
 #include "Poco/WebWidgets/Page.h"
+#include "Poco/WebWidgets/Panel.h"
 #include "Poco/WebWidgets/RenderContext.h"
 #include "Poco/WebWidgets/LookAndFeel.h"
 #include "Poco/WebWidgets/WebApplication.h"
@@ -120,6 +122,8 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		//start inline javascript block
 		ostr << "<script type=\"text/javascript\">";
 		ostr << "var global={};"; //global var to store values!
+		ostr << "var winGrp = new Ext.WindowGroup();";
+		ostr <<	"winGrp.zseed = 5000;";
 		const std::vector<std::string>& fcts = pPage->dynamicFunctions();
 		std::vector<std::string>::const_iterator itF = fcts.begin();
 		for (; itF != fcts.end(); ++itF)
@@ -188,10 +192,30 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 			ostr << ",width:Ext.lib.Dom.getViewWidth()-20";
 		
 		ostr << ",items:[";
-
+		// write an empty hull for the dynamiccodeloadres: solves z-seed problem
+		std::set<DynamicCodeLoader::Ptr>::const_iterator itDCL = dcls.begin();
+		AutoPtr<PanelRenderer> pPanelRenderer(new PanelRenderer());
+		bool writeComma = false;
+		for (; itDCL != dcls.end(); ++itDCL)
+		{
+			View::Ptr pView = (*itDCL)->view();
+			AutoPtr<Panel> pPanel = pView.cast<Panel>();
+			if (pPanel)
+			{
+				if (writeComma)
+				{
+					ostr << ",";
+				}
+				pPanelRenderer->renderHeadWithoutChildren(pPanel, context, ostr);
+				writeComma = true;
+			}
+		}
 		//process all children
 		ContainerView::ConstIterator it = pPage->begin();
 		ContainerView::ConstIterator itEnd = pPage->end();
+		if (!dcls.empty() && it != itEnd)
+			ostr << ",";
+		
 		for (; it != itEnd; ++it)
 		{
 			if (it != pPage->begin())
@@ -226,9 +250,21 @@ void PageRenderer::renderBody(const Renderable* pRenderable, const RenderContext
 	if (!pPage->empty())
 	{
 		//process all children: ExtJS is a JavaScript library, we NEVER write to the body
+		// except for Panel!
 		ostr << "<div id=\"p" << pPage->id() << "\" />";
 		// also a tmp id for temporary storage!
 		ostr << "<div id=\"" << Utility::getTmpID() << "\" />";
+		/*
+		ContainerView::ConstIterator it = pPage->begin();
+		ContainerView::ConstIterator itEnd = pPage->end();
+		for (; it != itEnd; ++it)
+		{
+			if (it != pPage->begin())
+				ostr << ",";
+
+			(*it)->renderBody(context, ostr);
+		}
+		*/
 	}
 	ostr << "</body>";
 	ostr << "</html>";
