@@ -1,7 +1,7 @@
 //
 // Stopwatch.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Stopwatch.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Stopwatch.h#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -93,16 +93,22 @@ private:
 //
 inline void Stopwatch::start()
 {
-	_start.update();
-	_running = true;
+	if (!_running)
+	{
+		_start.update();
+		_running = true;
+	}
 }
 
 
 inline void Stopwatch::stop()
 {
-	Timestamp current;
-	_elapsed += current - _start;
-	_running = false;
+	if (_running)
+	{
+		Timestamp current;
+		_elapsed += current - _start;
+		_running = false;
+	}
 }
 
 
