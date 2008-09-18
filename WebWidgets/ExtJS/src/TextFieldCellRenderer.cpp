@@ -143,8 +143,8 @@ Poco::WebWidgets::JSDelegate TextFieldCellRenderer::createTextChangedServerCallb
 	// change : ( Ext.form.Field field, Mixed newVal, Mixed oldVal )
 	static const std::string signature("function(field,newVal,oldVal)");
 	std::map<std::string, std::string> addParams;
-	addParams.insert(std::make_pair(TextFieldCell::FIELD_OLDVAL, "+oldVal"));
-	addParams.insert(std::make_pair(TextFieldCell::FIELD_NEWVAL, "+newVal"));
+	addParams.insert(std::make_pair(TextFieldCell::FIELD_OLDVAL, "+escape(oldVal)"));
+	addParams.insert(std::make_pair(TextFieldCell::FIELD_NEWVAL, "+escape(newVal)"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, TextFieldCell::EV_TEXTCHANGED));
 	return Utility::createServerCallback(signature, addParams, pText->id(), pText->textChanged.getOnSuccess(), pText->textChanged.getOnFailure());
 }

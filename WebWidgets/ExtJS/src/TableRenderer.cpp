@@ -130,7 +130,7 @@ Poco::WebWidgets::JSDelegate TableRenderer::createCellValueChangedServerCallback
 	// date fields cause problems here, and I only habe one cellclick event per table not per column!
 	// from the table get the TableColumn, from this get the renderer for the given col and render obj.value
 	// {(var r=obj.grid.getColumnModel().getRenderer(obj.column))?r(obj.value);:obj.value;}, hm renderer exists for everthing
-	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.grid.getColumnModel().getRenderer(obj.column)(obj.value)")); 
+	addParams.insert(std::make_pair(Table::FIELD_VAL, "+escape(obj.grid.getColumnModel().getRenderer(obj.column)(obj.value))")); 
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_CELLVALUECHANGED));
 	const std::string& success = pTable->cellValueChanged.getOnSuccess();
 
@@ -152,7 +152,7 @@ Poco::WebWidgets::JSDelegate TableRenderer::createBeforeCellValueChangedServerCa
 	// date fields cause problems here, and I only habe one cellclick event per table not per column!
 	// from the table get the TableColumn, from this get the renderer for the given col and render obj.value
 	// {(var r=obj.grid.getColumnModel().getRenderer(obj.column))?r(obj.value);:obj.value;}, hm renderer exists for everthing
-	addParams.insert(std::make_pair(Table::FIELD_VAL, "+obj.grid.getColumnModel().getRenderer(obj.column)(obj.value)")); 
+	addParams.insert(std::make_pair(Table::FIELD_VAL, "+escape(obj.grid.getColumnModel().getRenderer(obj.column)(obj.value))")); 
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, Table::EV_BEFORECELLVALUECHANGED));
 	const std::string& success = pTable->beforeCellValueChanged.getOnSuccess();
 
