@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/WinRegistryKey.h#2 $
+// $Id: //poco/1.3/Util/include/Poco/Util/WinRegistryKey.h#3 $
 //
 // Library: Util
 // Package: Windows
@@ -67,14 +67,22 @@ public:
 		REGT_DWORD = 4
 	};
 
-	WinRegistryKey(const std::string& key);
+	WinRegistryKey(const std::string& key, bool readOnly = false);
 		/// Creates the WinRegistryKey.
 		///
 		/// The key must start with one of the root key names
 		/// like HKEY_CLASSES_ROOT, e.g. HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services.
+		///
+		/// If readOnly is true, then only read access to the registry
+		/// is available and any attempt to write to the registry will
+		/// result in an exception.
 
-	WinRegistryKey(HKEY hRootKey, const std::string& subKey);
+	WinRegistryKey(HKEY hRootKey, const std::string& subKey, bool readOnly = false);
 		/// Creates the WinRegistryKey.
+		///
+		/// If readOnly is true, then only read access to the registry
+		/// is available and any attempt to write to the registry will
+		/// result in an exception.
 
 	~WinRegistryKey();
 		/// Destroys the WinRegistryKey.
@@ -117,7 +125,7 @@ public:
 		/// Throws a NotFoundException if the value does not exist.
 
 	void deleteKey();
-		/// Deletes the key. The key must not have subkeys.
+		/// Recursively deletes the key and all subkeys.
 
 	bool exists();
 		/// Returns true iff the key exists.
@@ -133,6 +141,9 @@ public:
 
 	void values(Values& vals);
 		/// Appends all value names to vals;
+		
+	bool isReadOnly() const;
+		/// Returns true iff the key has been opened for read-only access only.
 
 protected:
 	void open();
@@ -150,7 +161,17 @@ private:
 	HKEY        _hRootKey;
 	std::string _subKey;
 	HKEY        _hKey;
+	bool        _readOnly;
 };
+
+
+//
+// inlines
+//
+inline bool WinRegistryKey::isReadOnly() const
+{
+	return _readOnly;
+}
 
 
 } } // namespace Poco::Util

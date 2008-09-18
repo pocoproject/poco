@@ -1,7 +1,7 @@
 //
 // WinConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/WinConfigurationTest.cpp#2 $
+// $Id: //poco/1.3/Util/testsuite/src/WinConfigurationTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -55,18 +55,25 @@ WinConfigurationTest::~WinConfigurationTest()
 
 void WinConfigurationTest::testConfiguration()
 {
-	AutoPtr<WinRegistryConfiguration> reg = new WinRegistryConfiguration("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
-	reg->setString("name1", "value1");
-	assert (reg->getString("name1") == "value1");
-	reg->setInt("name1", 1); // overwrite should also change type
-	assert (reg->getInt("name1") == 1);
-	reg->setString("name2", "value2");
-	assert (reg->getString("name2") == "value2");
-	assert (reg->hasProperty("name1"));
-	assert (reg->hasProperty("name2"));
+	AutoPtr<WinRegistryConfiguration> pReg = new WinRegistryConfiguration("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
+	pReg->setString("name1", "value1");
+	assert (pReg->getString("name1") == "value1");
+	pReg->setInt("name1", 1); // overwrite should also change type
+	assert (pReg->getInt("name1") == 1);
+	pReg->setString("name2", "value2");
+	assert (pReg->getString("name2") == "value2");
+	assert (pReg->hasProperty("name1"));
+	assert (pReg->hasProperty("name2"));
 	
-	std::string dfl = reg->getString("nonexistent", "default");
+	std::string dfl = pReg->getString("nonexistent", "default");
 	assert (dfl == "default");
+	
+	AutoPtr<Poco::Util::AbstractConfiguration> pView = pReg->createView("config");
+	dfl = pView->getString("sub.foo", "default");
+	assert (dfl == "default");
+	
+	pView->setString("sub.foo", "bar");
+	assert (pView->getString("sub.foo", "default") == "bar");
 }
 
 
