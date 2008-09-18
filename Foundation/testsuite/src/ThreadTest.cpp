@@ -1,7 +1,7 @@
 //
 // ThreadTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ThreadTest.cpp#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ThreadTest.cpp#5 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -273,7 +273,7 @@ void ThreadTest::testThreadStackSize()
 	Thread thread;
 	assert (0 == thread.getStackSize());
 	thread.setStackSize(stackSize);
-	assert (stackSize == thread.getStackSize());
+	assert (stackSize <= thread.getStackSize());
 	int tmp = MyRunnable::_staticVar;
 	thread.start(freeFunc, &tmp);
 	thread.join();
@@ -284,7 +284,7 @@ void ThreadTest::testThreadStackSize()
 #ifdef PTHREAD_STACK_MIN
 	assert (PTHREAD_STACK_MIN == thread.getStackSize());
 #else
-	assert (stackSize == thread.getStackSize());
+	assert (stackSize >= thread.getStackSize());
 #endif
 	tmp = MyRunnable::_staticVar;
 	thread.start(freeFunc, &tmp);

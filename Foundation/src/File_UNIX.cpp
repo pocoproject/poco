@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#11 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -209,7 +209,7 @@ Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) && defined(st_birthtime) // st_birthtime is available only on 10.5
 	struct stat64 st;
 	if (stat64(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_birthtime);

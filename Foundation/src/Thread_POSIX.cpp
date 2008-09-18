@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#6 $
 //
 // Library: Foundation
 // Package: Threading
@@ -154,9 +154,16 @@ void ThreadImpl::setStackSizeImpl(int size)
 #ifndef PTHREAD_STACK_MIN
 	_pData->stackSize = 0;
 #else
- 	if (size != 0 && size < PTHREAD_STACK_MIN)
- 		size = PTHREAD_STACK_MIN;
-
+ 	if (size != 0)
+ 	{
+#if defined(__APPLE__)
+		// we must round up to a multiple of the memory page size
+		const int PAGE_SIZE = 4096;
+		size = ((size + PAGE_SIZE - 1)/PAGE_SIZE)*PAGE_SIZE;
+#endif
+ 		if (size < PTHREAD_STACK_MIN)
+ 			size = PTHREAD_STACK_MIN;
+	}
  	_pData->stackSize = size;
 #endif
 }
