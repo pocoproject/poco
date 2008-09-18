@@ -1,7 +1,7 @@
 //
 // Unicode.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Unicode.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Unicode.h#2 $
 //
 // Library: Foundation
 // Package: Text

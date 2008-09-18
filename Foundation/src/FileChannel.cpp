@@ -1,7 +1,7 @@
 //
 // FileChannel.cpp
 //
-// $Id: //poco/svn/Foundation/src/FileChannel.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/FileChannel.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -130,6 +130,10 @@ void FileChannel::log(const Message& msg)
 		{
 			_pFile = new LogFile(_path);
 		}
+		// we must call mustRotate() again to give the
+		// RotateByIntervalStrategy a chance to write its timestamp
+		// to the new file.
+		_pRotateStrategy->mustRotate(_pFile);
 	}
 	_pFile->write(msg.getText());
 }
@@ -240,6 +244,8 @@ void FileChannel::setRotation(const std::string& rotation)
 		pStrategy = new RotateByIntervalStrategy(Timespan(30*Timespan::DAYS));
 	else if (unit == "seconds") // for testing only
 		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::SECONDS));
+	else if (unit == "minutes")
+		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::MINUTES));
 	else if (unit == "hours")
 		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::HOURS));
 	else if (unit == "days")
@@ -296,14 +302,6 @@ void FileChannel::setCompress(const std::string& compress)
 
 void FileChannel::setPurgeAge(const std::string& age)
 {
-	if (age.empty())
-	{
-		delete _pPurgeStrategy;
-		_pPurgeStrategy = 0;
-		_purgeAge.clear();
-		return;
-	}
-
 	std::string::const_iterator it  = age.begin();
 	std::string::const_iterator end = age.end();
 	int n = 0;
@@ -328,12 +326,7 @@ void FileChannel::setPurgeAge(const std::string& age)
 		throw InvalidArgumentException("purgeAge", age);
 		
 	delete _pPurgeStrategy;
-	
-	if (0 == n || age.empty())
-		_pPurgeStrategy = 0;
-	else
-		_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
-
+	_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
 	_purgeAge = age;
 }
 
@@ -348,12 +341,7 @@ void FileChannel::setPurgeCount(const std::string& count)
 	while (it != end && std::isspace(*it)) ++it;
 
 	delete _pPurgeStrategy;
-
-	if (0 == n || count.empty())
-		_pPurgeStrategy = 0;
-	else
-		_pPurgeStrategy = new PurgeByCountStrategy(n);
-
+	_pPurgeStrategy = new PurgeByCountStrategy(n);
 	_purgeCount = count;
 }
 
