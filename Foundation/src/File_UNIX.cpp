@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#8 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#10 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -209,9 +209,19 @@ Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
 
+#if defined(__APPLE__)
+	struct stat64 st;
+	if (stat64(_path.c_str(), &st) == 0)
+		return Timestamp::fromEpochTime(st.st_birthtime);
+#elif defined(__FreeBSD__)
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
-		return Timestamp::fromEpochTime(st.st_mtime);
+		return Timestamp::fromEpochTime(st.st_birthtime);
+#else
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+		return Timestamp::fromEpochTime(st.st_ctime);
+#endif 
 	else
 		handleLastErrorImpl(_path);
 	return 0;

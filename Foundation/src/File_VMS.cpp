@@ -1,7 +1,7 @@
 //
 // File_VMS.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_VMS.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/File_VMS.cpp#4 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -186,7 +186,7 @@ Timestamp FileImpl::createdImpl() const
 
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
-		return Timestamp(st.st_mtime);
+		return Timestamp(st.st_ctime);
 	else
 		handleLastErrorImpl(_path);
 	return 0;

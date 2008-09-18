@@ -1,7 +1,7 @@
 //
 // FileChannel.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileChannel.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/FileChannel.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -130,6 +130,10 @@ void FileChannel::log(const Message& msg)
 		{
 			_pFile = new LogFile(_path);
 		}
+		// we must call mustRotate() again to give the
+		// RotateByIntervalStrategy a chance to write its timestamp
+		// to the new file.
+		_pRotateStrategy->mustRotate(_pFile);
 	}
 	_pFile->write(msg.getText());
 }
@@ -240,6 +244,8 @@ void FileChannel::setRotation(const std::string& rotation)
 		pStrategy = new RotateByIntervalStrategy(Timespan(30*Timespan::DAYS));
 	else if (unit == "seconds") // for testing only
 		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::SECONDS));
+	else if (unit == "minutes")
+		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::MINUTES));
 	else if (unit == "hours")
 		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::HOURS));
 	else if (unit == "days")

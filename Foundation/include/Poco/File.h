@@ -1,7 +1,7 @@
 //
 // File.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/File.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/File.h#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -141,6 +141,12 @@ public:
 
 	Timestamp created() const;
 		/// Returns the creation date of the file.
+		///
+		/// Not all platforms or filesystems (e.g. Linux and most Unix
+		/// platforms with the exception of FreeBSD and Mac OS X)
+		/// maintain the creation date of a file.
+		/// On such platforms, created() returns
+		/// the time of the last inode modification.
 
 	Timestamp getLastModified() const;
 		/// Returns the modification date of the file.

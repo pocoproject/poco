@@ -1,7 +1,7 @@
 //
 // RotateStrategy.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/RotateStrategy.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/RotateStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -149,6 +149,11 @@ private:
 class Foundation_API RotateByIntervalStrategy: public RotateStrategy
 	/// The file is rotated when the log file 
 	/// exceeds a given age.
+	///
+	/// For this to work reliably across all platforms and file systems
+	/// (there are severe issues on most platforms finding out the real
+	/// creation date of a file), the creation date of the file is
+	/// written into the log file as the first entry.
 {
 public:
 	RotateByIntervalStrategy(const Timespan& span);
@@ -157,6 +162,8 @@ public:
 
 private:
 	Timespan _span;
+	Timestamp _lastRotate;
+	static const std::string ROTATE_TEXT;
 };
 
 

@@ -1,7 +1,7 @@
 //
 // Unicode.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Unicode.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Unicode.h#2 $
 //
 // Library: Foundation
 // Package: Text
@@ -174,7 +174,18 @@ public:
 		UCP_CUNEIFORM,
 		UCP_NKO,
 		UCP_PHAGS_PA,
-		UCP_PHOENICIAN
+		UCP_PHOENICIAN,
+		UCP_CARIAN,
+		UCP_CHAM,
+		UCP_KAYAH_LI,
+		UCP_LEPCHA,
+		UCP_LYCIAN,
+		UCP_LYDIAN,
+		UCP_OL_CHIKI,
+		UCP_REJANG,
+		UCP_SAURASHTRA,
+		UCP_SUNDANESE,
+		UCP_VAI
 	};
 	
 	struct CharacterProperties

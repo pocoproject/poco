@@ -1,7 +1,7 @@
 //
 // FileChannel.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/FileChannel.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/FileChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -87,6 +87,8 @@ class Foundation_API FileChannel: public Channel
 	///   * daily:         the file is rotated daily
 	///   * weekly:        the file is rotated every seven days
 	///   * monthly:       the file is rotated every 30 days
+	///   * <n> minutes:   the file is rotated every <n> minutes, 
+	///                    where <n> is an integer greater than zero.
 	///   * <n> hours:     the file is rotated every <n> hours, where
 	///                    <n> is an integer greater than zero.
 	///   * <n> days:      the file is rotated every <n> days, where
@@ -102,6 +104,14 @@ class Foundation_API FileChannel: public Channel
 	///                    <n> Kilobytes.
 	///   * <n> M:         the file is rotated when its size exceeds
 	///                    <n> Megabytes.
+	///
+	/// NOTE: For periodic log file rotation (daily, weekly, monthly, etc.),
+	/// the date and time of log file creation or last rotation is
+	/// written into the first line of the log file. This is because
+	/// there is no reliable way to find out the real creation date of
+	/// a file on many platforms (e.g., most Unix platforms do not
+	/// provide the creation date, and Windows has its own issues
+	/// with its "File System Tunneling Capabilities").
 	///
 	/// Using the "archive" property it is possible to specify
 	/// how archived log files are named. The following values
