@@ -1712,7 +1712,7 @@
 					RelativePath=".\src\pcre_try_flipped.c">
 				</File>
 				<File
-					RelativePath=".\src\pcre_ucp_searchfuncs.c">
+					RelativePath=".\src\pcre_ucd.c">
 				</File>
 				<File
 					RelativePath=".\src\pcre_valid_utf8.c">
@@ -1749,12 +1749,6 @@
 				</File>
 				<File
 					RelativePath=".\src\ucp.h">
-				</File>
-				<File
-					RelativePath=".\src\ucpinternal.h">
-				</File>
-				<File
-					RelativePath=".\src\ucptable.h">
 				</File>
 			</Filter>
 		</Filter>

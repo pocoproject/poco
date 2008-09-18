@@ -2184,14 +2184,6 @@
 					RelativePath=".\src\ucp.h"
 					>
 				</File>
-				<File
-					RelativePath=".\src\ucpinternal.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ucptable.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -2257,7 +2249,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\pcre_ucp_searchfuncs.c"
+					RelativePath=".\src\pcre_ucd.c"
 					>
 				</File>
 				<File
