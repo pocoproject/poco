@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/rules/lib#2 $
+# $Id: //poco/1.3/build/rules/lib#3 $
 #
 # lib
 #
@@ -41,6 +41,10 @@ clean:
 	$(RM) $(OBJPATH)
 	$(RM) $(LIB_RELEASE_STATIC) $(LIB_DEBUG_STATIC) $(LIB_RELEASE_SHARED) $(LIB_DEBUG_SHARED)
 
+distclean: clean
+	$(RM) obj
+	$(RM) .dep
+	
 static_debug:   libdirs $(LIB_DEBUG_STATIC)
 static_release: libdirs $(LIB_RELEASE_STATIC)
 shared_debug:   libdirs $(LIB_DEBUG_SHARED)
