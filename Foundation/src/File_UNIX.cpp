@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/svn/Foundation/src/File_UNIX.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#10 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -38,7 +38,6 @@
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include <algorithm>
-#include <cstring>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -46,6 +45,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <utime.h>
+#include <cstring>
 
 
 namespace Poco {
@@ -97,7 +97,7 @@ bool FileImpl::canReadImpl() const
 {
 	poco_assert (!_path.empty());
 
-	if(geteuid() == 0)
+	if (geteuid() == 0)
 		return true;
 
 	struct stat st;
@@ -119,7 +119,7 @@ bool FileImpl::canWriteImpl() const
 {
 	poco_assert (!_path.empty());
 
-	if(geteuid() == 0)
+	if (geteuid() == 0)
 		return true;
 
 	struct stat st;
@@ -209,9 +209,19 @@ Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
 
+#if defined(__APPLE__)
+	struct stat64 st;
+	if (stat64(_path.c_str(), &st) == 0)
+		return Timestamp::fromEpochTime(st.st_birthtime);
+#elif defined(__FreeBSD__)
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+		return Timestamp::fromEpochTime(st.st_birthtime);
+#else
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_ctime);
+#endif 
 	else
 		handleLastErrorImpl(_path);
 	return 0;

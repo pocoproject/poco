@@ -1,7 +1,7 @@
 //
 // Environment_VMS.cpp
 //
-// $Id: //poco/svn/Foundation/src/Environment_VMS.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Environment_VMS.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -43,6 +43,19 @@
 #include <syidef.h>
 #include <iledef.h>
 #include <lnmdef.h>
+#include <ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <net/if.h>
+#include <inet.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <net/if_arp.h>
+#include <unistd.h>
+
+
+#define MAXHOSTNAMELEN 64
 
 
 namespace Poco {
@@ -105,6 +118,30 @@ std::string EnvironmentImpl::osArchitectureImpl()
 std::string EnvironmentImpl::nodeNameImpl()
 {
 	return getsyi(SYI$_NODENAME);
+}
+
+
+void EnvironmentImpl::nodeIdImpl(NodeId& id)
+{
+	char name[MAXHOSTNAMELEN];
+	if (gethostname(name, sizeof(name)))
+		throw SystemException("cannot get host name");
+
+	struct hostent* pHost = gethostbyname(name);
+	if (!pHost) throw SystemException("cannot get host IP address");
+
+	int s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (s == -1) throw SystemException("cannot open socket");
+
+	struct arpreq ar;
+	std::memset(&ar, 0, sizeof(ar));
+	struct sockaddr_in* pAddr = reinterpret_cast<struct sockaddr_in*>(&ar.arp_pa);
+	pAddr->sin_family = AF_INET;
+	std::memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
+	int rc = ioctl(s, SIOCGARP, &ar);
+	close(s);
+	if (rc < 0) throw SystemException("cannot get MAC address");
+	std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
 }
 
 

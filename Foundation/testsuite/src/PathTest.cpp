@@ -1,7 +1,7 @@
 //
 // PathTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/PathTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/PathTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -822,7 +822,7 @@ void PathTest::testParseWindows4()
 	
 	try
 	{
-		p.parse("ü:\\", Path::PATH_WINDOWS);
+		p.parse("~:\\", Path::PATH_WINDOWS);
 		fail("bad path - must throw exception");
 	}
 	catch (PathSyntaxException&)
