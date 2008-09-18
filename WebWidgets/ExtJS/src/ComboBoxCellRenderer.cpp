@@ -126,8 +126,15 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 		Utility::writeJSEvent(ostr, EV_AFTERLOAD, pComboOwner->afterLoad, &ComboBoxCellRenderer::createAfterLoadServerCallback, pComboOwner);
 		ostr << "}";
 	}
+	
 	ostr << "})"; // end SimpleStore
-	ostr << ",displayField:'d',typeAhead:true,triggerAction:'all'";
+	
+	ostr << ",displayField:'d',editable:false"; // editable always false due to ie bug!
+	if (!pComboOwner)
+		ostr << ",lazyRender:true";
+	else
+		ostr << ",typeAhead:true";
+	//ostr << ",typeAhead:true,triggerAction:'all'";
 	
 	std::string tooltip (pCell->getToolTip());
 		
