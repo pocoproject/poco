@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/svn/Foundation/src/Thread_POSIX.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#6 $
 //
 // Library: Foundation
 // Package: Threading
@@ -156,11 +156,18 @@ void ThreadImpl::setStackSizeImpl(int size)
 #ifndef PTHREAD_STACK_MIN
 	_pData->stackSize = 0;
 #else
- 	if (size !=0 && size < PTHREAD_STACK_MIN)
- 		size = PTHREAD_STACK_MIN;
-
+ 	if (size != 0)
+ 	{
+#if defined(__APPLE__)
+		// we must round up to a multiple of the memory page size
+		const int PAGE_SIZE = 4096;
+		size = ((size + PAGE_SIZE - 1)/PAGE_SIZE)*PAGE_SIZE;
+#endif
+ 		if (size < PTHREAD_STACK_MIN)
+ 			size = PTHREAD_STACK_MIN;
+	}
  	_pData->stackSize = size;
-#endif // PTHREAD_STACK_MIN
+#endif
 }
 
 
@@ -343,13 +350,8 @@ void* ThreadImpl::callableEntry(void* pThread)
 
 int ThreadImpl::mapPrio(int prio)
 {
-#if defined(__VMS) || defined(__digital__)
-	static const int pmin = PRI_OTHER_MIN;
-	static const int pmax = PRI_OTHER_MAX;
-#else
-	static const int pmin = sched_get_priority_min(SCHED_OTHER);
-	static const int pmax = sched_get_priority_max(SCHED_OTHER);
-#endif
+	int pmin = getMinOSPriorityImpl();
+	int pmax = getMaxOSPriorityImpl();
 
 	switch (prio)
 	{
