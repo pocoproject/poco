@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/UUIDGenerator.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/UUIDGenerator.h#3 $
 //
 // Library: Foundation
 // Package: UUID
@@ -45,6 +45,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Random.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Environment.h"
 
 
 namespace Poco {
@@ -100,12 +101,12 @@ protected:
 	void getNode();
 
 private:
-	FastMutex _mutex;
-	Random    _random;
-	Timestamp _lastTime;
-	int       _ticks;
-	UInt8     _node[6];
-	bool      _haveNode;
+	FastMutex           _mutex;
+	Random              _random;
+	Timestamp           _lastTime;
+	int                 _ticks;
+	Environment::NodeId _node;
+	bool                _haveNode;
 	
 	UUIDGenerator(const UUIDGenerator&);
 	UUIDGenerator& operator = (const UUIDGenerator&);

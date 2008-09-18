@@ -1,7 +1,7 @@
 //
 // Environment_WIN32.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_WIN32.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Environment_WIN32.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -38,6 +38,7 @@
 #include "Poco/Exception.h"
 #include <sstream>
 #include "Poco/UnWindows.h"
+#include <iphlpapi.h>
 
 
 namespace Poco {
@@ -141,6 +142,52 @@ std::string EnvironmentImpl::nodeNameImpl()
 	DWORD size = sizeof(name);
 	if (GetComputerNameA(name, &size) == 0) throw SystemException("Cannot get computer name");
 	return std::string(name);
+}
+
+
+void EnvironmentImpl::nodeIdImpl(NodeId& id)
+{
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = 0;
+	ULONG len    = sizeof(IP_ADAPTER_INFO);
+	pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+	// Make an initial call to GetAdaptersInfo to get
+	// the necessary size into len
+	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
+	if (rc == ERROR_BUFFER_OVERFLOW) 
+	{
+		delete [] reinterpret_cast<char*>(pAdapterInfo);
+		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
+	}
+	else if (rc != ERROR_SUCCESS)
+	{
+		throw SystemException("cannot get network adapter list");
+	}
+	try
+	{
+		bool found = false;
+		if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR) 
+		{
+			pAdapter = pAdapterInfo;
+			while (pAdapter && !found) 
+			{
+				if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
+				{
+					std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
+					found = true;
+				}
+				pAdapter = pAdapter->Next;
+			}
+		}
+		else throw SystemException("cannot get network adapter list");
+		if (!found) throw SystemException("no Ethernet adapter found");
+	}
+	catch (Exception&)
+	{
+		delete [] reinterpret_cast<char*>(pAdapterInfo);
+		throw;
+	}
+	delete [] reinterpret_cast<char*>(pAdapterInfo);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -118,3 +118,135 @@ std::string EnvironmentImpl::nodeNameImpl()
 
 
 } // namespace Poco
+
+
+//
+// nodeIdImpl
+//
+#if defined(POCO_OS_FAMILY_BSD) || POCO_OS == POCO_OS_QNX
+//
+// BSD variants
+//
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <ifaddrs.h>
+#include <net/if_dl.h>
+
+
+namespace Poco {
+
+
+void EnvironmentImpl::nodeIdImpl(NodeId& id)
+{
+	struct ifaddrs* ifaphead;
+	int rc = getifaddrs(&ifaphead);
+	if (rc) throw SystemException("cannot get network adapter list");
+
+	bool foundAdapter = false;
+	for (struct ifaddrs* ifap = ifaphead; ifap; ifap = ifap->ifa_next) 
+	{
+		if (ifap->ifa_addr && ifap->ifa_addr->sa_family == AF_LINK) 
+		{
+			struct sockaddr_dl* sdl = reinterpret_cast<struct sockaddr_dl*>(ifap->ifa_addr);
+			caddr_t ap = (caddr_t) (sdl->sdl_data + sdl->sdl_nlen);
+			int alen = sdl->sdl_alen;
+			if (ap && alen > 0) 
+			{
+				std::memcpy(&id, ap, sizeof(id));
+				foundAdapter = true;
+				break;
+			}
+		}
+	}
+	freeifaddrs(ifaphead);
+	if (!foundAdapter) throw SystemException("cannot determine MAC address (no suitable network adapter found)");
+}
+
+
+} // namespace Poco
+
+
+#elif defined(__CYGWIN__) || POCO_OS == POCO_OS_LINUX
+//
+// Linux, Cygwin
+//
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <net/if.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+
+namespace Poco {
+
+
+void EnvironmentImpl::nodeIdImpl(NodeId& id)
+{
+	struct ifreq ifr;
+
+	int s = socket(PF_INET, SOCK_DGRAM, 0);
+	if (s == -1) throw SystemException("cannot open socket");
+
+	strcpy(ifr.ifr_name, "eth0");
+	int rc = ioctl(s, SIOCGIFHWADDR, &ifr);
+	close(s);
+	if (rc < 0) throw SystemException("cannot get MAC address");
+	struct sockaddr* sa = reinterpret_cast<struct sockaddr*>(&ifr.ifr_addr);
+	std::memcpy(&id, sa->sa_data, sizeof(id));
+}
+
+
+} // namespace Poco
+
+
+#elif defined(POCO_OS_FAMILY_UNIX)
+//
+// General Unix
+//
+#include <sys/ioctl.h>
+#if defined(sun) || defined(__sun)
+#include <sys/sockio.h>
+#endif
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <net/if.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <net/if.h>
+#include <net/if_arp.h>
+#include <unistd.h>
+
+
+namespace Poco {
+
+
+void EnvironmentImpl::nodeIdImpl(NodeId& id)
+{
+	char name[MAXHOSTNAMELEN];
+	if (gethostname(name, sizeof(name)))
+		throw SystemException("cannot get host name");
+
+	struct hostent* pHost = gethostbyname(name);
+	if (!pHost) throw SystemException("cannot get host IP address");
+
+	int s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (s == -1) throw SystemException("cannot open socket");
+
+	struct arpreq ar;
+	std::memset(&ar, 0, sizeof(ar));
+	struct sockaddr_in* pAddr = reinterpret_cast<struct sockaddr_in*>(&ar.arp_pa);
+	pAddr->sin_family = AF_INET;
+	std::memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
+	int rc = ioctl(s, SIOCGARP, &ar);
+	close(s);
+	if (rc < 0) throw SystemException("cannot get MAC address");
+	std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
+}
+
+
+} // namespace Poco
+
+
+#endif

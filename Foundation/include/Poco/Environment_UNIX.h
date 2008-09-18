@@ -1,7 +1,7 @@
 //
 // Environment_UNIX.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Environment_UNIX.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Environment_UNIX.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -51,6 +51,8 @@ namespace Poco {
 class Foundation_API EnvironmentImpl
 {
 public:
+	typedef UInt8 NodeId[6]; /// Ethernet address.
+
 	static std::string getImpl(const std::string& name);	
 	static bool hasImpl(const std::string& name);	
 	static void setImpl(const std::string& name, const std::string& value);
@@ -58,6 +60,7 @@ public:
 	static std::string osVersionImpl();
 	static std::string osArchitectureImpl();
 	static std::string nodeNameImpl();
+	static void nodeIdImpl(NodeId& id);
 
 private:
 	typedef std::map<std::string, std::string> StringMap;

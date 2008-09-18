@@ -1,7 +1,7 @@
 //
 // Environment.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Environment.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Environment.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -51,6 +51,8 @@ class Foundation_API Environment
 	/// and some general system information.
 {
 public:
+	typedef UInt8 NodeId[6]; /// Ethernet address.
+	
 	static std::string get(const std::string& name);
 		/// Returns the value of the environment variable
 		/// with the given name. Throws a NotFoundException
@@ -80,6 +82,18 @@ public:
 		
 	static std::string nodeName();
 		/// Returns the node (or host) name.
+		
+	static void nodeId(NodeId& id);
+		/// Returns the Ethernet address of the first Ethernet
+		/// adapter found on the system.
+		///
+		/// Throws a SystemException if no Ethernet adapter is available.
+		
+	static std::string nodeId();
+		/// Returns the Ethernet address (format "xx:xx:xx:xx:xx:xx")
+		/// of the first Ethernet adapter found on the system.
+		///
+		/// Throws a SystemException if no Ethernet adapter is available.
 };
 
 
