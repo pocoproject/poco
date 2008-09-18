@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/Context.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -64,17 +64,21 @@ Context::Context(
 	_pSSLContext = SSL_CTX_new(SSLv23_method());
 	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPasswdCallback);
 
-	File aFile(caLocation);
+	
 	int errCode = 0;
-	if (aFile.isDirectory())
-		errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, caLocation.c_str());
-	else
-		errCode = SSL_CTX_load_verify_locations(_pSSLContext, caLocation.c_str(), 0);
-	if (errCode != 1)
+	if (!caLocation.empty())
 	{
-		SSL_CTX_free(_pSSLContext);
-		_pSSLContext = 0;
-		throw SSLContextException(std::string("Failed to load CA file/directory from ") + caLocation);
+		File aFile(caLocation);
+		if (aFile.isDirectory())
+			errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, caLocation.c_str());
+		else
+			errCode = SSL_CTX_load_verify_locations(_pSSLContext, caLocation.c_str(), 0);
+		if (errCode != 1)
+		{
+			SSL_CTX_free(_pSSLContext);
+			_pSSLContext = 0;
+			throw SSLContextException(std::string("Failed to load CA file/directory from ") + caLocation);
+		}
 	}
 
 	if (loadCAFromDefaultPath)
@@ -87,22 +91,24 @@ Context::Context(
 			throw SSLContextException(std::string("Failed to load CA file/directory from default location"));
 		}
 	}
-
-	errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, privateKeyFile.c_str());
-	if (errCode != 1)
+	if (!privateKeyFile.empty())
 	{
-		SSL_CTX_free(_pSSLContext);
-		_pSSLContext = 0;
-		throw SSLContextException(std::string("Error loading certificate from file ") + privateKeyFile);
-	}
-	File tmp(privateKeyFile);
-	poco_assert (tmp.exists());
-	errCode = SSL_CTX_use_PrivateKey_file(_pSSLContext, privateKeyFile.c_str(), SSL_FILETYPE_PEM);
-	if (errCode != 1)
-	{
-		SSL_CTX_free(_pSSLContext);
-		_pSSLContext = 0;
-		throw SSLContextException(std::string("Error loading private key from file ") + privateKeyFile);
+		errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, privateKeyFile.c_str());
+		if (errCode != 1)
+		{
+			SSL_CTX_free(_pSSLContext);
+			_pSSLContext = 0;
+			throw SSLContextException(std::string("Error loading certificate from file ") + privateKeyFile);
+		}
+		File tmp(privateKeyFile);
+		poco_assert (tmp.exists());
+		errCode = SSL_CTX_use_PrivateKey_file(_pSSLContext, privateKeyFile.c_str(), SSL_FILETYPE_PEM);
+		if (errCode != 1)
+		{
+			SSL_CTX_free(_pSSLContext);
+			_pSSLContext = 0;
+			throw SSLContextException(std::string("Error loading private key from file ") + privateKeyFile);
+		}
 	}
 	int flags = (int)verMode;
 	if (verMode == VERIFY_STRICT || verMode == VERIFY_ONCE)

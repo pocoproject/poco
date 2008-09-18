@@ -1,7 +1,7 @@
 //
 // Context.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/Context.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/SharedPtr.h"
 #include <openssl/ssl.h>
 
 
@@ -52,6 +53,7 @@ class NetSSL_API Context
 	/// This class encapsulates an SSL Context.
 {
 public:
+	typedef Poco::SharedPtr<Context> Ptr;
 	enum VerificationMode 
 	{
 		VERIFY_NONE    = SSL_VERIFY_NONE, 
@@ -80,10 +82,13 @@ public:
 		/// Destroys the Context.
 
 	SSL_CTX* sslContext() const;
+		/// Returns the OpenSSL SSL Context object.
 
 	Context::VerificationMode verificationMode() const;
+		/// Returns the verification mode.
 
 	bool serverContext() const;
+		/// Returns true iff the context is for a server.
 
 private:
 	SSL_CTX*                  _pSSLContext;

@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -41,6 +41,8 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/Net/Context.h"
+#include "Poco/SharedPtr.h"
 #include <openssl/ssl.h>
 
 
@@ -52,8 +54,17 @@ class NetSSL_API X509Certificate
 	/// This class represents an X509 Certificate.
 {
 public:
+	X509Certificate(const std::string& file);
+		/// Loads the X509Certificate from the file
+
 	X509Certificate(X509* pCert);
 		/// Creates the X509Certificate.
+
+	X509Certificate(const X509Certificate&);
+
+	X509Certificate& operator=(const X509Certificate&);
+
+	void swap(X509Certificate& cert);
 
 	~X509Certificate();
 		/// Destroys the X509Certificate.
@@ -66,6 +77,9 @@ public:
 		
 	const X509* certificate() const;
 		/// Returns the OpenSSL certificate.
+
+	bool verify(const std::string& hostName, Poco::SharedPtr<Context> ptr);
+		/// Verifies the validity of the certificate against the hostname.
 		
 private:
 	void initialize();
@@ -75,6 +89,7 @@ private:
 	std::string _issuerName;
 	std::string _subjectName;
 	X509*       _pCert;
+	std::string _file;
 };
 
 

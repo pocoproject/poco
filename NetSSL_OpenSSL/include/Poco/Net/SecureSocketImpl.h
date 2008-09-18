@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -42,6 +42,7 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/SocketImpl.h"
+#include "Poco/Net/SSLManager.h"
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 
@@ -163,6 +164,8 @@ public:
 		/// establishing, we must inform the socket that is only used as a proxy
 		/// that works as a tunnel to the given endPoint.
 		/// Only call this method on disconnected sockets.
+
+	static long postConnectionCheck(SSLManager::ContextPtr pContext, X509* pCert, const std::string& hostName);
 
 protected:
 	void setSockfd(poco_socket_t sock);
