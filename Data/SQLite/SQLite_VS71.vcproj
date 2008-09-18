@@ -34,7 +34,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -99,7 +100,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -161,7 +163,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -214,7 +217,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
