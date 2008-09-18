@@ -39,12 +39,16 @@
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/ToggleButtonCell.h"
+#include "Poco/WebWidgets/ToggleButton.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 namespace ExtJS {
 
+
+const std::string ToggleButtonCellRenderer::EV_CHECKED("check");
 
 ToggleButtonCellRenderer::ToggleButtonCellRenderer()
 {
@@ -70,12 +74,44 @@ void ToggleButtonCellRenderer::renderProperties(const ToggleButtonCell* pToggleB
 	Utility::writeCellProperties(pToggleButtonCell, ostr);
 	//tooltip is not supported by togglebutton
 	std::string tooltip (pToggleButtonCell->getToolTip());
-	if (!tooltip.empty())
-		ostr << ",listeners:{render:function(c){c.getEl().dom.qtip='" << Utility::safe(tooltip) << "'; c.getEl().dom.qclass = 'x-form-tip';}}";
+	View* pOwner = pToggleButtonCell->getOwner();
+	ToggleButton* pButton = dynamic_cast<ToggleButton*>(pOwner);
+			
+	if (!tooltip.empty() || (pButton && pButton->checked.hasJavaScriptCode()))
+	{
+		ostr << ",listeners:{";
+		bool comma = false;
+		if (!tooltip.empty())
+		{
+			comma = true;
+			ostr << "render:function(c){c.getEl().dom.qtip='" << Utility::safe(tooltip) << "'; c.getEl().dom.qclass = 'x-form-tip';}";
+		}
+		if (pButton && pButton->checked.hasJavaScriptCode())
+		{
+			if (comma)
+				ostr << ",";
+			Utility::writeJSEvent(ostr, EV_CHECKED, pButton->checked, &ToggleButtonCellRenderer::createCheckedServerCallback, pButton);
+		}
+		
+		
+		ostr << "}"; // close listeners
+	}
+	
 	if (pToggleButtonCell->getOwner() && !pToggleButtonCell->getOwner()->getName().empty())
 	{
 		WebApplication::instance().registerFormProcessor(pToggleButtonCell->getOwner()->getName(), const_cast<ToggleButtonCell*>(pToggleButtonCell));
 	}
+}
+
+
+Poco::WebWidgets::JSDelegate ToggleButtonCellRenderer::createCheckedServerCallback(const ToggleButton* pButton)
+{
+	// check : ( Ext.form.Checkbox this, Boolean checked ) 
+	static const std::string signature("function(box, bChecked)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(ToggleButtonCell::FIELD_VAL, "+(bChecked?'true':'false')"));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ToggleButtonCell::EV_CHECKED));
+	return Utility::createServerCallback(signature, addParams, pButton->id(), pButton->checked.getOnSuccess(), pButton->checked.getOnFailure());
 }
 
 

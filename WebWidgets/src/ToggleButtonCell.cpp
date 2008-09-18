@@ -43,6 +43,10 @@ namespace Poco {
 namespace WebWidgets {
 
 
+const std::string ToggleButtonCell::FIELD_VAL("val");
+const std::string ToggleButtonCell::EV_CHECKED("checked");
+
+
 ToggleButtonCell::ToggleButtonCell(View* pOwner, const std::string& label, bool checked):
 	Cell(pOwner, typeid(ToggleButtonCell)),
 	_label(label)

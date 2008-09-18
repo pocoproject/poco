@@ -41,12 +41,14 @@
 
 
 #include "Poco/WebWidgets/ExtJS/CellRenderer.h"
+#include "Poco/WebWidgets/JSDelegate.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 
 	class ToggleButtonCell;
+	class ToggleButton;
 
 namespace ExtJS {
 
@@ -55,14 +57,19 @@ class ExtJS_API ToggleButtonCellRenderer: public Poco::WebWidgets::Renderer
 	/// Abstract ToggleButtonCellRenderer renders a ToggleButton
 {
 public:
+	static const std::string EV_CHECKED;
+	
 	void writeConfigData(const Cell* pCell, const RenderContext& context, std::ostream& ostr);
 		/// writes ConfigData, is a simple boolean containing isChecked
 
 	static void renderProperties(const ToggleButtonCell* pCell, std::ostream& ostr);
 		/// Renders button properties
 
-	
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
+	
+	static Poco::WebWidgets::JSDelegate createCheckedServerCallback(const ToggleButton* pButton);
+		/// Adds a server callback for the change event. The method signature is
+		/// check : ( Ext.form.Checkbox this, Boolean checked ) 
 
 protected:
 	ToggleButtonCellRenderer();

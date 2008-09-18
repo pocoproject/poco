@@ -53,6 +53,9 @@ class WebWidgets_API ToggleButtonCell: public Cell
 {
 public:
 	typedef Poco::AutoPtr<ToggleButtonCell> Ptr;
+	
+	static const std::string FIELD_VAL;
+	static const std::string EV_CHECKED;
 
 	Delegate checked;
 
