@@ -72,7 +72,7 @@ JSDelegate ComboBoxCellRenderer::createSelectedServerCallback(const ComboBox* pC
 	//select : ( Ext.form.ComboBox combo, Ext.data.Record record, Number index )
 	static const std::string signature("function(combo,rec,idx)");
 	std::map<std::string, std::string> addParams;
-	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+rec.get('d')"));
+	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+escape(rec.get('d'))"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ComboBoxCell::EV_SELECTED));
 	return Utility::createServerCallback(signature, addParams, pCombo->id(), pCombo->selected.getOnSuccess(), pCombo->selected.getOnFailure());
 }
@@ -84,7 +84,7 @@ Poco::WebWidgets::JSDelegate ComboBoxCellRenderer::createBeforeSelectServerCallb
 	// return false to forbid it
 	static const std::string signature("function(combo,rec,idx)");
 	std::map<std::string, std::string> addParams;
-	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+rec.get('d')"));
+	addParams.insert(std::make_pair(ComboBoxCell::FIELD_VAL, "+escape(rec.get('d'))"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ComboBoxCell::EV_BEFORESELECT));
 	return Utility::createServerCallback(signature, addParams, pCombo->id(), pCombo->beforeSelect.getOnSuccess(), pCombo->beforeSelect.getOnFailure());
 }
