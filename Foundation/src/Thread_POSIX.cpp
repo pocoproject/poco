@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#7 $
 //
 // Library: Foundation
 // Package: Threading
@@ -39,8 +39,10 @@
 #include "Poco/ErrorHandler.h"
 #include <signal.h>
 #if defined(__sun) && defined(__SVR4)
-#define __EXTENSIONS__
-#include <limits.h>
+#	if !defined(__EXTENSIONS__)
+#		define __EXTENSIONS__
+#	endif
+#	include <limits.h>
 #endif
 
 
