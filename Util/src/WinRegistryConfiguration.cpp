@@ -1,7 +1,7 @@
 //
 // WinRegistryConfiguration.cpp
 //
-// $Id: //poco/svn/Util/src/WinRegistryConfiguration.cpp#1 $
+// $Id: //poco/1.3/Util/src/WinRegistryConfiguration.cpp#3 $
 //
 // Library: Util
 // Package: Windows
@@ -62,7 +62,7 @@ bool WinRegistryConfiguration::getRaw(const std::string& key, std::string& value
 {
 	std::string keyName;
 	std::string fullPath = _rootPath + ConvertToRegFormat(key, keyName);
-	WinRegistryKey aKey(fullPath);
+	WinRegistryKey aKey(fullPath, true);
 	bool exists = aKey.exists(keyName);
 	if (exists)
 	{
@@ -112,7 +112,7 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 	{
 		std::string keyName;
 		std::string fullPath = _rootPath+ConvertToRegFormat(key, keyName);
-		WinRegistryKey aKey(fullPath);
+		WinRegistryKey aKey(fullPath, true);
 		aKey.values(range);
 		aKey.subKeys(range);
 	}

@@ -1,7 +1,7 @@
 //
 // UtilTestSuite.cpp
 //
-// $Id: //poco/svn/Util/testsuite/src/UtilTestSuite.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/UtilTestSuite.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,7 +33,7 @@
 #include "UtilTestSuite.h"
 #include "ConfigurationTestSuite.h"
 #include "OptionsTestSuite.h"
-#if defined(_MFC_VER)
+#if defined(_MSC_VER)
 #include "WindowsTestSuite.h"
 #endif
 
@@ -44,7 +44,7 @@ CppUnit::Test* UtilTestSuite::suite()
 
 	pSuite->addTest(ConfigurationTestSuite::suite());
 	pSuite->addTest(OptionsTestSuite::suite());
-#if defined(_MFC_VER)
+#if defined(_MSC_VER)
 	pSuite->addTest(WindowsTestSuite::suite());
 #endif
 

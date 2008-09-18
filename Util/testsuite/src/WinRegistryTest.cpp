@@ -1,7 +1,7 @@
 //
 // WinRegistryTest.cpp
 //
-// $Id: //poco/svn/Util/testsuite/src/WinRegistryTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/WinRegistryTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,6 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Environment.h"
+#include "Poco/Exception.h"
 
 
 using Poco::Util::WinRegistryKey;
@@ -54,7 +55,11 @@ WinRegistryTest::~WinRegistryTest()
 void WinRegistryTest::testRegistry()
 {
 	WinRegistryKey regKey("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
-	regKey.deleteKey();
+	if (regKey.exists())
+	{
+		regKey.deleteKey();
+	}
+	assert (!regKey.exists());
 	regKey.setString("name1", "value1");
 	assert (regKey.getString("name1") == "value1");
 	regKey.setString("name1", "Value1");
@@ -64,7 +69,19 @@ void WinRegistryTest::testRegistry()
 	assert (regKey.exists("name1"));
 	assert (regKey.exists("name2"));
 	assert (regKey.exists());
-
+	
+	WinRegistryKey regKeyRO("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test", true);
+	assert (regKeyRO.getString("name1") == "Value1");
+	try
+	{
+		regKeyRO.setString("name1", "newValue1");
+	}
+	catch (Poco::Exception& exc)
+	{
+		std::string msg = exc.displayText();
+	}
+	assert (regKey.getString("name1") == "Value1");
+	
 	WinRegistryKey::Values vals;
 	regKey.values(vals);
 	assert (vals.size() == 2);
