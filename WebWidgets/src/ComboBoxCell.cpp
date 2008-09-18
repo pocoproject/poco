@@ -146,6 +146,8 @@ bool ComboBoxCell::serializeJSON(std::ostream& out, const std::string& name)
 		else
 			out << getFormatter()->format(sel);
 	}
+	else 
+		out << "''";
 	return true;	
 }
 

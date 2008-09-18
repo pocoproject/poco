@@ -99,6 +99,8 @@ bool TextFieldCell::serializeJSON(std::ostream& out, const std::string& name)
 	{
 		out << "'" << getFormatter()->format(getValue()) << "'";
 	}
+	else 
+		out << "''";
 	return true;
 }
 

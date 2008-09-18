@@ -171,7 +171,7 @@ const Any& ListBoxCell::getSelected() const
 
 bool ListBoxCell::serializeJSON(std::ostream& out, const std::string& name)
 {
-	out << name;
+	out << name << ":";
 	if (hasSelected())
 	{
 		const Poco::Any& sel = getSelected();
@@ -180,6 +180,8 @@ bool ListBoxCell::serializeJSON(std::ostream& out, const std::string& name)
 		else
 			out << ":" << getFormatter()->format(sel);
 	}
+	else 
+		out << "''";
 	return true;
 }
 
