@@ -92,6 +92,8 @@ public:
 	// Cell
 	void handleForm(const std::string& field, const std::string& value);
 	
+	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
+	
 	bool serializeJSON(std::ostream& out, const std::string& name);
 
 protected:

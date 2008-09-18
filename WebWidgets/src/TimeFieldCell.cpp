@@ -77,7 +77,6 @@ void TimeFieldCell::setFormat(TimeField::Format fmt)
 }
 
 
-
 bool TimeFieldCell::serializeJSON(std::ostream& out, const std::string& name)
 {
 	out << name << ":";

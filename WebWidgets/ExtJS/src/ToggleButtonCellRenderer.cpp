@@ -41,6 +41,7 @@
 #include "Poco/WebWidgets/ToggleButtonCell.h"
 #include "Poco/WebWidgets/ToggleButton.h"
 #include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/NumberFormatter.h"
 
 
 namespace Poco {
@@ -100,6 +101,10 @@ void ToggleButtonCellRenderer::renderProperties(const ToggleButtonCell* pToggleB
 	if (pToggleButtonCell->getOwner() && !pToggleButtonCell->getOwner()->getName().empty())
 	{
 		WebApplication::instance().registerFormProcessor(pToggleButtonCell->getOwner()->getName(), const_cast<ToggleButtonCell*>(pToggleButtonCell));
+	}
+	if (pButton)
+	{
+		WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pButton->id()), const_cast<ToggleButtonCell*>(pToggleButtonCell));
 	}
 }
 

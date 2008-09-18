@@ -36,6 +36,7 @@
 
 #include "Poco/WebWidgets/TextFieldCell.h"
 #include "Poco/WebWidgets/TextField.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 
 
 namespace Poco {
@@ -86,9 +87,23 @@ void TextFieldCell::handleForm(const std::string& field, const std::string& valu
 	{
 		Poco::Any newValue = getFormatter()->parse(value);
 		ValueChange vc(getFormatter(), getValue(), newValue);
-		setValue(value);
+		setValue(newValue);
 		textChanged.notify(this, vc);
 	}
+}
+
+
+void TextFieldCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
+{
+	const std::string& ev = args[RequestHandler::KEY_EVID];
+	if (ev == EV_TEXTCHANGED)
+	{
+		Formatter::Ptr pForm = getFormatter();
+		handleForm("", args[FIELD_NEWVAL]);
+		response.send();
+	}
+	else
+		response.send();
 }
 
 

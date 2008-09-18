@@ -36,6 +36,7 @@
 
 #include "Poco/WebWidgets/ToggleButtonCell.h"
 #include "Poco/WebWidgets/BoolFormatter.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/String.h"
 
 
@@ -99,6 +100,23 @@ bool ToggleButtonCell::serializeJSON(std::ostream& out, const std::string& name)
 	else
 		out << "'off'";
 	return true;
+}
+
+
+void ToggleButtonCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
+{
+	const std::string& ev = args[RequestHandler::KEY_EVID];
+	if (ev == EV_CHECKED)
+	{
+		bool check = false;
+		if (args[FIELD_VAL] == "true")
+			check = true;
+		setChecked(check);
+
+		response.send();
+	}
+	else
+		response.send();
 }
 
 } } // namespace Poco::WebWidgets

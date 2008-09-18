@@ -43,6 +43,7 @@
 #include "Poco/WebWidgets/Form.h"
 #include "Poco/WebWidgets/WebApplication.h"
 #include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/NumberFormatter.h"
 
 
 namespace Poco {
@@ -131,6 +132,8 @@ void TextFieldCellRenderer::writeCellProperties(const TextFieldCell* pCell, std:
 			ostr << "}"; // close listeners
 		}
 		
+		if (pOwner)
+			WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pOwner->id()), const_cast<TextFieldCell*>(pCell));
 	}
 }
 
