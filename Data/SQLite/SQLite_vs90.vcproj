@@ -6,6 +6,7 @@
 	ProjectGUID="{1B29820D-375F-11DB-837B-00123FC423B5}"
 	RootNamespace="SQLite"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -55,6 +56,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
+				DisableSpecificWarnings="4996;4244;4018"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -96,9 +98,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -148,6 +147,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
+				DisableSpecificWarnings="4996;4244;4018"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -191,9 +191,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

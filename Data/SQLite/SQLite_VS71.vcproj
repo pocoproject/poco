@@ -34,7 +34,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -99,7 +100,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4996;4244;4018"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -152,13 +154,13 @@
 					RelativePath=".\include\Poco\Data\SQLite\Binder.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\SQLite\Connector.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\SQLite\Extractor.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\SQLite\SessionImpl.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\Data\SQLite\Connector.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\SQLite\SQLite.h">
@@ -180,13 +182,13 @@
 					RelativePath=".\src\Binder.cpp">
 				</File>
 				<File
+					RelativePath=".\src\Connector.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Extractor.cpp">
 				</File>
 				<File
 					RelativePath=".\src\SessionImpl.cpp">
-				</File>
-				<File
-					RelativePath=".\src\Connector.cpp">
 				</File>
 				<File
 					RelativePath=".\src\SQLiteException.cpp">

@@ -1,7 +1,7 @@
 //
 // BLOB.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/BLOB.h#6 $
+// $Id: //poco/1.3/Data/include/Poco/Data/BLOB.h#7 $
 //
 // Library: Data
 // Package: DataCore
@@ -298,9 +298,49 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
+	void convert(Poco::DateTime& val) const
+	{
+		throw Poco::BadCastException();
+	}
+
+	void convert(Poco::LocalDateTime& val) const
+	{
+		throw Poco::BadCastException();
+	}
+
+	void convert(Poco::Timestamp& val) const
+	{
+		throw Poco::BadCastException();
+	}
+
 	DynamicAnyHolder* clone() const
 	{
 		return new DynamicAnyHolderImpl(_val);
+	}
+	
+	bool isArray() const
+	{
+		return false;
+	}
+	
+	bool isInteger() const
+	{
+		return false;
+	}
+	
+	bool isSigned() const
+	{
+		return false;
+	}
+	
+	bool isNumeric() const
+	{
+		return false;
+	}
+	
+	bool isString() const
+	{
+		return false;
 	}
 	
 private:
