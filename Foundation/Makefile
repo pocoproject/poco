@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Foundation/Makefile#4 $
+# $Id: //poco/1.3/Foundation/Makefile#5 $
 #
 # Makefile for Poco Foundation
 #
@@ -34,7 +34,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	adler32 compress crc32  deflate gzio infback inffast inflate inftrees  \
 	trees zutil \
 	pcre_chartables pcre_compile pcre_globals pcre_maketables pcre_study \
-	pcre_tables pcre_try_flipped pcre_ucp_searchfuncs pcre_valid_utf8 \
+	pcre_tables pcre_try_flipped pcre_ucd pcre_valid_utf8 \
 	pcre_exec pcre_ord2utf8 pcre_newline pcre_fullinfo pcre_xclass
 
 ifeq ($(POCO_CONFIG),MinGW)

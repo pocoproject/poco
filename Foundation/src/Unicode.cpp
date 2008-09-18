@@ -1,7 +1,7 @@
 //
 // Unicode.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Unicode.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/Unicode.cpp#2 $
 //
 // Library: Foundation
 // Package: Text
@@ -39,6 +39,7 @@
 
 extern "C"
 {
+#include "pcre_config.h"
 #include "pcre_internal.h"
 }
 
@@ -48,12 +49,10 @@ namespace Poco {
 
 void Unicode::properties(int ch, CharacterProperties& props)
 {
-	int type;
-	int script;
-	int category = _pcre_ucp_findprop(static_cast<unsigned>(ch), &type, &script);
-	props.category = static_cast<CharacterCategory>(category);
-	props.type     = static_cast<CharacterType>(type);
-	props.script   = static_cast<Script>(script);
+	const ucd_record* ucd = GET_UCD(ch);
+	props.category = static_cast<CharacterCategory>(_pcre_ucp_gentype[ucd->chartype]);
+	props.type     = static_cast<CharacterType>(ucd->chartype);
+	props.script   = static_cast<Script>(ucd->script);
 }
 
 	
@@ -76,7 +75,7 @@ bool Unicode::isUpper(int ch)
 int Unicode::toLower(int ch)
 {
 	if (isUpper(ch))
-		return static_cast<int>(_pcre_ucp_othercase(static_cast<unsigned>(ch)));
+		return static_cast<int>(UCD_OTHERCASE(static_cast<unsigned>(ch)));
 	else
 		return ch;
 }
@@ -85,7 +84,7 @@ int Unicode::toLower(int ch)
 int Unicode::toUpper(int ch)
 {
 	if (isLower(ch))
-		return static_cast<int>(_pcre_ucp_othercase(static_cast<unsigned>(ch)));
+		return static_cast<int>(UCD_OTHERCASE(static_cast<unsigned>(ch)));
 	else
 		return ch;
 }

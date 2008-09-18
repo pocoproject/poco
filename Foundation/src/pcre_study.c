@@ -6,7 +6,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2007 University of Cambridge
+           Copyright (c) 1997-2008 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 supporting functions. */
 
 
+#include "pcre_config.h"
 #include "pcre_internal.h"
 
 
@@ -213,6 +214,14 @@ do
       tcode += 1 + LINK_SIZE;
       break;
 
+      /* SKIPZERO skips the bracket. */
+
+      case OP_SKIPZERO:
+      tcode++;
+      do tcode += GET(tcode,1); while (*tcode == OP_ALT);
+      tcode += 1 + LINK_SIZE;
+      break;
+
       /* Single-char * or ? sets the bit and tries the next item */
 
       case OP_STAR:
@@ -337,6 +346,7 @@ do
       switch(tcode[1])
         {
         case OP_ANY:
+        case OP_ALLANY:
         return SSB_FAIL;
 
         case OP_NOT_DIGIT:
@@ -491,7 +501,7 @@ Returns:    pointer to a pcre_extra block, with study_data filled in and the
             NULL on error or if no optimization possible
 */
 
-PCRE_EXP_DEFN pcre_extra *
+PCRE_EXP_DEFN pcre_extra * PCRE_CALL_CONVENTION
 pcre_study(const pcre *external_re, int options, const char **errorptr)
 {
 uschar start_bits[32];
@@ -523,7 +533,8 @@ code = (uschar *)re + re->name_table_offset +
 a multiline pattern that matches only at "line starts", no further processing
 at present. */
 
-if ((re->options & (PCRE_ANCHORED|PCRE_FIRSTSET|PCRE_STARTLINE)) != 0)
+if ((re->options & PCRE_ANCHORED) != 0 ||
+    (re->flags & (PCRE_FIRSTSET|PCRE_STARTLINE)) != 0)
   return NULL;
 
 /* Set the character tables in the block that is passed around */

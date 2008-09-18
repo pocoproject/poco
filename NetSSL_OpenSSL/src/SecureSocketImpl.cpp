@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#5 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -290,7 +290,8 @@ void SecureSocketImpl::close()
 int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	poco_assert (sockfd() != POCO_INVALID_SOCKET);
-	poco_check_ptr (_pSSL);
+	if (!_pSSL)
+		throw SSLException("Cannot write to closed/uninitialized socket");
 
 	int rc;
 	do
@@ -309,8 +310,8 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
-	poco_assert (sockfd() != POCO_INVALID_SOCKET);
-	poco_check_ptr (_pSSL);	
+	if (sockfd() == POCO_INVALID_SOCKET || !_pSSL)
+		throw SSLException("Cannot read from closed/uninitialized socket");
 
 	int rc;
 	bool renegotiating = false;
