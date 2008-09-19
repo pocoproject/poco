@@ -112,7 +112,7 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	ostr << "new Ext.form.ComboBox({";
 
 	TextFieldCellRenderer::writeCellProperties(pCell, ostr, true, false);
-	ostr << ",store:new Ext.data.SimpleStore({autoLoad:true,fields:['d'],";
+	ostr << ",store:new Ext.data.SimpleStore({fields:['d'],"; //autoLoad:true,
 	ostr << "proxy:new Ext.data.HttpProxy({url:";
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID,ComboBoxCell::EV_LOAD));
@@ -132,9 +132,8 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	ostr << ",displayField:'d',editable:false"; // editable always false due to ie bug!
 	if (!pComboOwner)
 		ostr << ",lazyRender:true";
-	else
-		ostr << ",typeAhead:true";
-	//ostr << ",typeAhead:true,triggerAction:'all'";
+	
+	ostr << ",triggerAction:'all'";
 	
 	std::string tooltip (pCell->getToolTip());
 		
