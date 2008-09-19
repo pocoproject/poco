@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: //poco/1.3/release/script/mkrelease#2 $
+# $Id: //poco/1.3/release/script/mkrelease#3 $
 #
 # mkrelease
 #
@@ -207,18 +207,19 @@ cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
 
 install: libexecs
-	mkdir -p $(INSTALLDIR)/include/Poco
-	mkdir -p $(INSTALLDIR)/lib
-	mkdir -p $(INSTALLDIR)/bin
+	install -d $(INSTALLDIR)/include/Poco
+	install -d $(INSTALLDIR)/lib
+	install -d $(INSTALLDIR)/bin
 	for comp in $(COMPONENTS) ; do \
 		if [ -d "$(POCO_BASE)/$$comp/include" ] ; then \
 			cp -Rf $(POCO_BASE)/$$comp/include/* $(INSTALLDIR)/include/ ; \
 		fi ; \
 		if [ -d "$(POCO_BUILD)/$$comp/bin" ] ; then \
-			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -Rf {} $(INSTALLDIR)/bin \; ; \
+			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec install {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "libPoco*" -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec install {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 ENDOFSCRIPT
 
