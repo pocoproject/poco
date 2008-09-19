@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/DynamicAny.h#6 $
+// $Id: //poco/1.3/Foundation/include/Poco/DynamicAny.h#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -42,6 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/DynamicAnyHolder.h"
+#include "Poco/Format.h"
 #include <typeinfo>
 
 
@@ -52,6 +53,9 @@ class Foundation_API DynamicAny
 	/// DynamicAny allows to store data of different types and to convert between these types transparently.
 	/// DynamicAny puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent 
 	/// unexpected data loss, particularly when performing narrowing or signedness conversions of numeric data types.
+	///
+	/// An attempt to convert or extract from a non-initialized (empty) DynamicAny variable shall result
+	/// in an exception being thrown.
 	///
 	/// Loss of signedness is not allowed for numeric values. This means that if an attempt is made to convert 
 	/// the internal value which is a negative signed integer to an unsigned integer type storage, a RangeException is thrown. 
@@ -66,8 +70,8 @@ class Foundation_API DynamicAny
 	///
 	/// Boolean conversion is performed as follows:
 	///
-	/// A string value "false" (not case sensitive) or "0" can be converted to a boolean value false, any other string 
-	/// not being false by the above criteria evaluates to true (e.g: "hi" -> true).
+	/// A string value "false" (not case sensitive), "0" or "" (empty string) can be converted to a boolean value false,
+	/// any other string not being false by the above criteria evaluates to true (e.g: "hi" -> true).
 	/// Integer 0 values are false, everything else is true.
 	/// Floating point values equal to the minimal FP representation on a given platform are false, everything else is true.
 	///
@@ -89,10 +93,10 @@ class Foundation_API DynamicAny
 {
 public:
 	DynamicAny();
-		/// Creates a DynamicAny holding an int with value 0.
+		/// Creates an empty DynamicAny.
 
 	template <typename T> 
-	DynamicAny(const T &val):
+	DynamicAny(const T& val):
 		_pHolder(new DynamicAnyHolderImpl<T>(val))
 		/// Creates the DynamicAny from the given value.
 	{
@@ -123,7 +127,11 @@ public:
 		/// into the result variable.
 		/// Throws a NotImplementedException if conversion is
 		/// not available for the given type.
+		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
+		if (!_pHolder)
+			throw InvalidAccessException("Can not convert empty value.");
+
 		_pHolder->convert(val);
 	}
 	
@@ -139,7 +147,11 @@ public:
 		/// into the result variable.
 		/// Throws a NotImplementedException if conversion is
 		/// not available for the given type.
+		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
+		if (!_pHolder)
+			throw InvalidAccessException("Can not convert empty value.");
+
 		T result;
 		_pHolder->convert(result);
 		return result;
@@ -148,16 +160,28 @@ public:
 	template <typename T>
 	operator T () const
 		/// Safe conversion operator for implicit type
-		/// conversions.
+		/// conversions. If the requested type T is same as the 
+		/// type being held, the operation performed is direct 
+		/// extraction, otherwise it is the conversion of the value
+		/// from type currently held to the one requested.
 		///
 		/// Throws a RangeException if the value does not fit
 		/// into the result variable.
 		/// Throws a NotImplementedException if conversion is
 		/// not available for the given type.
+		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
-		T result;
-		_pHolder->convert(result);
-		return result;
+		if (!_pHolder)
+				throw InvalidAccessException("Can not convert empty value.");
+
+		if (typeid(T) == _pHolder->type())
+			return extract<T>();
+		else
+		{
+			T result;
+			_pHolder->convert(result);
+			return result;
+		}
 	}
 
 	template <typename T>
@@ -167,13 +191,22 @@ public:
 		/// Must be instantiated with the exact type of
 		/// the stored value, otherwise a BadCastException
 		/// is thrown.
+		/// Throws InvalidAccessException if DynamicAny is empty.
 	{
-		DynamicAnyHolderImpl<T>* pHolder = dynamic_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
-		if (pHolder)
-			return pHolder->value();
+		if (_pHolder && _pHolder->type() == typeid(T))
+		{
+			DynamicAnyHolderImpl<T>* pHolderImpl = static_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
+			return pHolderImpl->value();
+		}
+		else if (!_pHolder)
+			throw InvalidAccessException("Can not extract empty value.");
 		else
-			throw BadCastException();
+			throw BadCastException(format("Can not convert %s to %s.",
+				_pHolder->type().name(),
+				typeid(T).name()));
 	}
+
+
 
 	template <typename T> 
 	DynamicAny& operator = (const T& other)
@@ -184,32 +217,35 @@ public:
 		return *this;
 	}
 
+	bool operator ! () const;
+		/// Logical NOT operator.
+
 	DynamicAny& operator = (const DynamicAny& other);
 		/// Assignment operator specialization for DynamicAny
 
-	template <typename T> 
-	DynamicAny operator + (const T& other) const
+	template <typename T>
+	const DynamicAny operator + (const T& other) const
 		/// Addition operator for adding POD to DynamicAny
 	{
 		return convert<T>() + other;
 	}
 
-	DynamicAny operator + (const DynamicAny& other) const;
+	const DynamicAny operator + (const DynamicAny& other) const;
 		/// Addition operator specialization for DynamicAny
 
-	DynamicAny operator + (const char* other) const;
+	const DynamicAny operator + (const char* other) const;
 		/// Addition operator specialization for adding const char* to DynamicAny
 
 	DynamicAny& operator ++ ();
 		/// Pre-increment operator
 
-	DynamicAny operator ++ (int);
+	const DynamicAny operator ++ (int);
 		/// Post-increment operator
 
 	DynamicAny& operator -- ();
 		/// Pre-decrement operator
 
-	DynamicAny operator -- (int);
+	const DynamicAny operator -- (int);
 		/// Post-decrement operator
 
 	template <typename T> 
@@ -220,20 +256,20 @@ public:
 	}
 
 	DynamicAny& operator += (const DynamicAny& other);
-		/// Addition asignment operator specialization for DynamicAny
+		/// Addition asignment operator overload for DynamicAny
 
 	DynamicAny& operator += (const char* other);
-		/// Addition asignment operator specialization for const char*
+		/// Addition asignment operator overload for const char*
 
 	template <typename T> 
-	DynamicAny operator - (const T& other) const
+	const DynamicAny operator - (const T& other) const
 		/// Subtraction operator for subtracting POD from DynamicAny
 	{
 		return convert<T>() - other;
 	}
 
-	DynamicAny operator - (const DynamicAny& other) const;
-		/// Subtraction operator specialization for DynamicAny
+	const DynamicAny operator - (const DynamicAny& other) const;
+		/// Subtraction operator overload for DynamicAny
 
 	template <typename T> 
 	DynamicAny& operator -= (const T& other)
@@ -243,17 +279,17 @@ public:
 	}
 
 	DynamicAny& operator -= (const DynamicAny& other);
-		/// Subtraction asignment operator specialization for DynamicAny
+		/// Subtraction asignment operator overload for DynamicAny
 
 	template <typename T> 
-	DynamicAny operator * (const T& other) const
+	const DynamicAny operator * (const T& other) const
 		/// Multiplication operator for multiplying DynamicAny with POD
 	{
 		return convert<T>() * other;
 	}
 
-	DynamicAny operator * (const DynamicAny& other) const;
-		/// Multiplication operator specialization for DynamicAny
+	const DynamicAny operator * (const DynamicAny& other) const;
+		/// Multiplication operator overload for DynamicAny
 
 	template <typename T> 
 	DynamicAny& operator *= (const T& other)
@@ -263,17 +299,17 @@ public:
 	}
 
 	DynamicAny& operator *= (const DynamicAny& other);
-		/// Multiplication asignment operator specialization for DynamicAny
+		/// Multiplication asignment operator overload for DynamicAny
 
 	template <typename T> 
-	DynamicAny operator / (const T& other) const
+	const DynamicAny operator / (const T& other) const
 		/// Division operator for dividing DynamicAny with POD
 	{
 		return convert<T>() / other;
 	}
 
-	DynamicAny operator / (const DynamicAny& other) const;
-		/// Division operator specialization for DynamicAny
+	const DynamicAny operator / (const DynamicAny& other) const;
+		/// Division operator overload for DynamicAny
 
 	template <typename T> 
 	DynamicAny& operator /= (const T& other)
@@ -289,55 +325,95 @@ public:
 	bool operator == (const T& other) const
 		/// Equality operator
 	{
+		if (isEmpty()) return false;
 		return convert<T>() == other;
 	}
 
 	bool operator == (const char* other) const;
-		/// Equality operator specialization for const char*
+		/// Equality operator overload for const char*
 
 	bool operator == (const DynamicAny& other) const;
-		/// Equality operator specialization for DynamicAny
+		/// Equality operator overload for DynamicAny
 
 	template <typename T> 
 	bool operator != (const T& other) const
 		/// Inequality operator
 	{
+		if (isEmpty()) return true;
 		return convert<T>() != other;
 	}
 
 	bool operator != (const DynamicAny& other) const;
-		/// Inequality operator  specialization for DynamicAny
+		/// Inequality operator overload for DynamicAny
 
 	bool operator != (const char* other) const;
-		/// Inequality operator  specialization for const char*
+		/// Inequality operator overload for const char*
 
 	template <typename T> 
 	bool operator < (const T& other) const
 		/// Less than operator
 	{
+		if (isEmpty()) return false;
 		return convert<T>() < other;
 	}
+
+	bool operator < (const DynamicAny& other) const;
+		/// Less than operator overload for DynamicAny
 
 	template <typename T> 
 	bool operator <= (const T& other) const
 		/// Less than or equal operator
 	{
+		if (isEmpty()) return false;
 		return convert<T>() <= other;
 	}
+
+	bool operator <= (const DynamicAny& other) const;
+		/// Less than or equal operator overload for DynamicAny
 
 	template <typename T> 
 	bool operator > (const T& other) const
 		/// Greater than operator
 	{
+		if (isEmpty()) return false;
 		return convert<T>() > other;
 	}
+
+	bool operator > (const DynamicAny& other) const;
+		/// Greater than operator overload for DynamicAny
 
 	template <typename T> 
 	bool operator >= (const T& other) const
 		/// Greater than or equal operator
 	{
+		if (isEmpty()) return false;
 		return convert<T>() >= other;
 	}
+
+	bool operator >= (const DynamicAny& other) const;
+		/// Greater than or equal operator overload for DynamicAny
+
+	template <typename T>
+	bool operator || (const T& other) const
+		/// Logical OR operator
+	{
+		if (isEmpty()) return false;
+		return convert<bool>() || other;
+	}
+
+	bool operator || (const DynamicAny& other) const;
+		/// Logical OR operator operator overload for DynamicAny
+
+	template <typename T>
+	bool operator && (const T& other) const
+		/// Logical AND operator
+	{
+		if (isEmpty()) return false;
+		return convert<bool>() && other;
+	}
+
+	bool operator && (const DynamicAny& other) const;
+		/// Logical AND operator operator overload for DynamicAny
 
 	bool isArray() const;
 		/// Returns true if DynamicAny represents a vector
@@ -345,31 +421,29 @@ public:
 	template <typename T>
 	DynamicAny& operator [] (T n)
 		/// Index operator, only use on DynamicAnys where isArray
-		/// returns true! In all other cases a BadCastException is thrown!
+		/// returns true! In all other cases InvalidAccessException is thrown.
 	{
-		DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder =
-			dynamic_cast<DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
-		if (pHolder)
-			return pHolder->operator[](n);
-		else
-			throw BadCastException();
+		return holderImpl<std::vector<DynamicAny>,
+			InvalidAccessException>("Not an array.")->operator[](n);
 	}
 
 	template <typename T>
 	const DynamicAny& operator [] (T n) const
 		/// const Index operator, only use on DynamicAnys where isArray
-		/// returns true! In all other cases a BadCastException is thrown!
+		/// returns true! In all other cases InvalidAccessException is thrown.
 	{
-		const DynamicAnyHolderImpl<std::vector<DynamicAny> >* pHolder =
-			dynamic_cast<const DynamicAnyHolderImpl<std::vector<DynamicAny> > *>(_pHolder);
-		if (pHolder)
-			return pHolder->operator[](n);
-		else
-			throw BadCastException();
+		return const_cast<const DynamicAny&>(holderImpl<std::vector<DynamicAny>,
+			InvalidAccessException>("Not an array.")->operator[](n));
 	}
 
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
+
+	void empty();
+		/// Empties DynamicAny.
+
+	bool isEmpty() const;
+		/// Returns true if empty.
 
 	bool isInteger() const;
 		/// Returns true if stored value is integer.
@@ -409,6 +483,17 @@ private:
 		return convert<T>() / other.convert<T>();
 	}
 
+	template <typename T, typename E>
+	DynamicAnyHolderImpl<T>* holderImpl(const std::string errorMessage = "") const
+	{
+		if (_pHolder && _pHolder->type() == typeid(T))
+			return static_cast<DynamicAnyHolderImpl<T>*>(_pHolder);
+		else if (!_pHolder)
+			throw InvalidAccessException("Can not access empty value.");
+		else
+			throw E(errorMessage);
+	}
+
 	DynamicAnyHolder* _pHolder;
 };
 
@@ -429,11 +514,11 @@ inline void DynamicAny::swap(DynamicAny& ptr)
 
 inline const std::type_info& DynamicAny::type() const
 {
-	return _pHolder->type();
+	return _pHolder ? _pHolder->type() : typeid(void);
 }
 
 
-inline DynamicAny DynamicAny::operator + (const char* other) const
+inline const DynamicAny DynamicAny::operator + (const char* other) const
 {
 	return convert<std::string>() + other;
 }
@@ -445,64 +530,52 @@ inline DynamicAny& DynamicAny::operator += (const char*other)
 }
 
 
-inline bool DynamicAny::operator == (const DynamicAny& other) const
+inline bool DynamicAny::operator ! () const
 {
-	return convert<std::string>() == other.convert<std::string>();
+	return !convert<bool>();
 }
 
 
-inline bool DynamicAny::operator == (const char* other) const
+inline bool DynamicAny::isEmpty() const
 {
-	return convert<std::string>() == other;
-}
-
-
-inline bool DynamicAny::operator != (const DynamicAny& other) const
-{
-	return convert<std::string>() != other.convert<std::string>();
-}
-
-
-inline bool DynamicAny::operator != (const char* other) const
-{
-	return convert<std::string>() != other;
+	return 0 == _pHolder;
 }
 
 
 inline bool DynamicAny::isArray() const
 {
-	return _pHolder->isArray();
+	return _pHolder ? _pHolder->isArray() : false;
 }
 
 
 inline bool DynamicAny::isInteger() const
 {
-	return _pHolder->isInteger();
+	return _pHolder ? _pHolder->isInteger() : false;
 }
 
 
 inline bool DynamicAny::isSigned() const
 {
-	return _pHolder->isSigned();
+	return _pHolder ? _pHolder->isSigned() : false;
 }
 
 
 inline bool DynamicAny::isNumeric() const
 {
-	return _pHolder->isNumeric();
+	return _pHolder ? _pHolder->isNumeric() : false;
 }
 
 
 inline bool DynamicAny::isString() const
 {
-	return _pHolder->isString();
+	return _pHolder ? _pHolder->isString() : false;
 }
 
 
 ///
 /// DynamicAny non-member functions
 ///
-inline DynamicAny operator + (const char* other, const DynamicAny& da)
+inline const DynamicAny operator + (const char* other, const DynamicAny& da)
 	/// Addition operator for adding DynamicAny to const char*
 {
 	std::string tmp = other;
@@ -569,6 +642,7 @@ inline char operator /= (char& other, const DynamicAny& da)
 inline bool operator == (const char& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with char
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<char>();
 }
 
@@ -576,6 +650,7 @@ inline bool operator == (const char& other, const DynamicAny& da)
 inline bool operator != (const char& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with char
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<char>();
 }
 
@@ -583,6 +658,7 @@ inline bool operator != (const char& other, const DynamicAny& da)
 inline bool operator < (const char& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with char
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<char>();
 }
 
@@ -590,6 +666,7 @@ inline bool operator < (const char& other, const DynamicAny& da)
 inline bool operator <= (const char& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with char
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<char>();
 }
 
@@ -597,6 +674,7 @@ inline bool operator <= (const char& other, const DynamicAny& da)
 inline bool operator > (const char& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with char
 {
+	if (da.isEmpty())return false;
 	return other > da.convert<char>();
 }
 
@@ -604,6 +682,7 @@ inline bool operator > (const char& other, const DynamicAny& da)
 inline bool operator >= (const char& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with char
 {
+	if (da.isEmpty())return false;
 	return other >= da.convert<char>();
 }
 
@@ -667,6 +746,7 @@ inline Poco::Int8 operator /= (Poco::Int8& other, const DynamicAny& da)
 inline bool operator == (const Poco::Int8& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with Poco::Int8
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<Poco::Int8>();
 }
 
@@ -674,6 +754,7 @@ inline bool operator == (const Poco::Int8& other, const DynamicAny& da)
 inline bool operator != (const Poco::Int8& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::Int8
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<Poco::Int8>();
 }
 
@@ -681,6 +762,7 @@ inline bool operator != (const Poco::Int8& other, const DynamicAny& da)
 inline bool operator < (const Poco::Int8& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with Poco::Int8
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<Poco::Int8>();
 }
 
@@ -688,6 +770,7 @@ inline bool operator < (const Poco::Int8& other, const DynamicAny& da)
 inline bool operator <= (const Poco::Int8& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with Poco::Int8
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<Poco::Int8>();
 }
 
@@ -695,6 +778,7 @@ inline bool operator <= (const Poco::Int8& other, const DynamicAny& da)
 inline bool operator > (const Poco::Int8& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with Poco::Int8
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<Poco::Int8>();
 }
 
@@ -702,6 +786,7 @@ inline bool operator > (const Poco::Int8& other, const DynamicAny& da)
 inline bool operator >= (const Poco::Int8& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with Poco::Int8
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<Poco::Int8>();
 }
 
@@ -765,6 +850,7 @@ inline Poco::UInt8 operator /= (Poco::UInt8& other, const DynamicAny& da)
 inline bool operator == (const Poco::UInt8& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with Poco::UInt8
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<Poco::UInt8>();
 }
 
@@ -772,6 +858,7 @@ inline bool operator == (const Poco::UInt8& other, const DynamicAny& da)
 inline bool operator != (const Poco::UInt8& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::UInt8
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<Poco::UInt8>();
 }
 
@@ -779,6 +866,7 @@ inline bool operator != (const Poco::UInt8& other, const DynamicAny& da)
 inline bool operator < (const Poco::UInt8& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with Poco::UInt8
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<Poco::UInt8>();
 }
 
@@ -786,6 +874,7 @@ inline bool operator < (const Poco::UInt8& other, const DynamicAny& da)
 inline bool operator <= (const Poco::UInt8& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with Poco::UInt8
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<Poco::UInt8>();
 }
 
@@ -793,6 +882,7 @@ inline bool operator <= (const Poco::UInt8& other, const DynamicAny& da)
 inline bool operator > (const Poco::UInt8& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with Poco::UInt8
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<Poco::UInt8>();
 }
 
@@ -800,6 +890,7 @@ inline bool operator > (const Poco::UInt8& other, const DynamicAny& da)
 inline bool operator >= (const Poco::UInt8& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt8
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<Poco::UInt8>();
 }
 
@@ -863,6 +954,7 @@ inline Poco::Int16 operator /= (Poco::Int16& other, const DynamicAny& da)
 inline bool operator == (const Poco::Int16& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with Poco::Int16
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<Poco::Int16>();
 }
 
@@ -870,6 +962,7 @@ inline bool operator == (const Poco::Int16& other, const DynamicAny& da)
 inline bool operator != (const Poco::Int16& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::Int16
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<Poco::Int16>();
 }
 
@@ -877,6 +970,7 @@ inline bool operator != (const Poco::Int16& other, const DynamicAny& da)
 inline bool operator < (const Poco::Int16& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with Poco::Int16
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<Poco::Int16>();
 }
 
@@ -884,6 +978,7 @@ inline bool operator < (const Poco::Int16& other, const DynamicAny& da)
 inline bool operator <= (const Poco::Int16& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with Poco::Int16
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<Poco::Int16>();
 }
 
@@ -891,6 +986,7 @@ inline bool operator <= (const Poco::Int16& other, const DynamicAny& da)
 inline bool operator > (const Poco::Int16& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with Poco::Int16
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<Poco::Int16>();
 }
 
@@ -898,6 +994,7 @@ inline bool operator > (const Poco::Int16& other, const DynamicAny& da)
 inline bool operator >= (const Poco::Int16& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with Poco::Int16
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<Poco::Int16>();
 }
 
@@ -961,6 +1058,7 @@ inline Poco::UInt16 operator /= (Poco::UInt16& other, const DynamicAny& da)
 inline bool operator == (const Poco::UInt16& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with Poco::UInt16
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<Poco::UInt16>();
 }
 
@@ -968,6 +1066,7 @@ inline bool operator == (const Poco::UInt16& other, const DynamicAny& da)
 inline bool operator != (const Poco::UInt16& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::UInt16
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<Poco::UInt16>();
 }
 
@@ -975,6 +1074,7 @@ inline bool operator != (const Poco::UInt16& other, const DynamicAny& da)
 inline bool operator < (const Poco::UInt16& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with Poco::UInt16
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<Poco::UInt16>();
 }
 
@@ -982,6 +1082,7 @@ inline bool operator < (const Poco::UInt16& other, const DynamicAny& da)
 inline bool operator <= (const Poco::UInt16& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with Poco::UInt16
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<Poco::UInt16>();
 }
 
@@ -989,6 +1090,7 @@ inline bool operator <= (const Poco::UInt16& other, const DynamicAny& da)
 inline bool operator > (const Poco::UInt16& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with Poco::UInt16
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<Poco::UInt16>();
 }
 
@@ -996,6 +1098,7 @@ inline bool operator > (const Poco::UInt16& other, const DynamicAny& da)
 inline bool operator >= (const Poco::UInt16& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt16
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<Poco::UInt16>();
 }
 
@@ -1059,6 +1162,7 @@ inline Poco::Int32 operator /= (Poco::Int32& other, const DynamicAny& da)
 inline bool operator == (const Poco::Int32& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with Poco::Int32
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<Poco::Int32>();
 }
 
@@ -1066,6 +1170,7 @@ inline bool operator == (const Poco::Int32& other, const DynamicAny& da)
 inline bool operator != (const Poco::Int32& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::Int32
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<Poco::Int32>();
 }
 
@@ -1073,6 +1178,7 @@ inline bool operator != (const Poco::Int32& other, const DynamicAny& da)
 inline bool operator < (const Poco::Int32& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with Poco::Int32
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<Poco::Int32>();
 }
 
@@ -1080,6 +1186,7 @@ inline bool operator < (const Poco::Int32& other, const DynamicAny& da)
 inline bool operator <= (const Poco::Int32& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with Poco::Int32
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<Poco::Int32>();
 }
 
@@ -1087,6 +1194,7 @@ inline bool operator <= (const Poco::Int32& other, const DynamicAny& da)
 inline bool operator > (const Poco::Int32& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with Poco::Int32
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<Poco::Int32>();
 }
 
@@ -1094,6 +1202,7 @@ inline bool operator > (const Poco::Int32& other, const DynamicAny& da)
 inline bool operator >= (const Poco::Int32& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with Poco::Int32
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<Poco::Int32>();
 }
 
@@ -1157,6 +1266,7 @@ inline Poco::UInt32 operator /= (Poco::UInt32& other, const DynamicAny& da)
 inline bool operator == (const Poco::UInt32& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with Poco::UInt32
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<Poco::UInt32>();
 }
 
@@ -1164,6 +1274,7 @@ inline bool operator == (const Poco::UInt32& other, const DynamicAny& da)
 inline bool operator != (const Poco::UInt32& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::UInt32
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<Poco::UInt32>();
 }
 
@@ -1171,6 +1282,7 @@ inline bool operator != (const Poco::UInt32& other, const DynamicAny& da)
 inline bool operator < (const Poco::UInt32& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with Poco::UInt32
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<Poco::UInt32>();
 }
 
@@ -1178,6 +1290,7 @@ inline bool operator < (const Poco::UInt32& other, const DynamicAny& da)
 inline bool operator <= (const Poco::UInt32& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with Poco::UInt32
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<Poco::UInt32>();
 }
 
@@ -1185,6 +1298,7 @@ inline bool operator <= (const Poco::UInt32& other, const DynamicAny& da)
 inline bool operator > (const Poco::UInt32& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with Poco::UInt32
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<Poco::UInt32>();
 }
 
@@ -1192,6 +1306,7 @@ inline bool operator > (const Poco::UInt32& other, const DynamicAny& da)
 inline bool operator >= (const Poco::UInt32& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt32
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<Poco::UInt32>();
 }
 
@@ -1255,6 +1370,7 @@ inline Poco::Int64 operator /= (Poco::Int64& other, const DynamicAny& da)
 inline bool operator == (const Poco::Int64& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with Poco::Int64
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<Poco::Int64>();
 }
 
@@ -1262,6 +1378,7 @@ inline bool operator == (const Poco::Int64& other, const DynamicAny& da)
 inline bool operator != (const Poco::Int64& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::Int64
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<Poco::Int64>();
 }
 
@@ -1269,6 +1386,7 @@ inline bool operator != (const Poco::Int64& other, const DynamicAny& da)
 inline bool operator < (const Poco::Int64& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with Poco::Int64
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<Poco::Int64>();
 }
 
@@ -1276,6 +1394,7 @@ inline bool operator < (const Poco::Int64& other, const DynamicAny& da)
 inline bool operator <= (const Poco::Int64& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with Poco::Int64
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<Poco::Int64>();
 }
 
@@ -1283,6 +1402,7 @@ inline bool operator <= (const Poco::Int64& other, const DynamicAny& da)
 inline bool operator > (const Poco::Int64& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with Poco::Int64
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<Poco::Int64>();
 }
 
@@ -1290,6 +1410,7 @@ inline bool operator > (const Poco::Int64& other, const DynamicAny& da)
 inline bool operator >= (const Poco::Int64& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with Poco::Int64
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<Poco::Int64>();
 }
 
@@ -1353,6 +1474,7 @@ inline Poco::UInt64 operator /= (Poco::UInt64& other, const DynamicAny& da)
 inline bool operator == (const Poco::UInt64& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with Poco::UInt64
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<Poco::UInt64>();
 }
 
@@ -1360,6 +1482,7 @@ inline bool operator == (const Poco::UInt64& other, const DynamicAny& da)
 inline bool operator != (const Poco::UInt64& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with Poco::UInt64
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<Poco::UInt64>();
 }
 
@@ -1367,6 +1490,7 @@ inline bool operator != (const Poco::UInt64& other, const DynamicAny& da)
 inline bool operator < (const Poco::UInt64& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with Poco::UInt64
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<Poco::UInt64>();
 }
 
@@ -1374,6 +1498,7 @@ inline bool operator < (const Poco::UInt64& other, const DynamicAny& da)
 inline bool operator <= (const Poco::UInt64& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with Poco::UInt64
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<Poco::UInt64>();
 }
 
@@ -1381,6 +1506,7 @@ inline bool operator <= (const Poco::UInt64& other, const DynamicAny& da)
 inline bool operator > (const Poco::UInt64& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with Poco::UInt64
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<Poco::UInt64>();
 }
 
@@ -1388,6 +1514,7 @@ inline bool operator > (const Poco::UInt64& other, const DynamicAny& da)
 inline bool operator >= (const Poco::UInt64& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with Poco::UInt64
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<Poco::UInt64>();
 }
 
@@ -1451,6 +1578,7 @@ inline float operator /= (float& other, const DynamicAny& da)
 inline bool operator == (const float& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with float
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<float>();
 }
 
@@ -1458,6 +1586,7 @@ inline bool operator == (const float& other, const DynamicAny& da)
 inline bool operator != (const float& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with float
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<float>();
 }
 
@@ -1465,6 +1594,7 @@ inline bool operator != (const float& other, const DynamicAny& da)
 inline bool operator < (const float& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with float
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<float>();
 }
 
@@ -1472,6 +1602,7 @@ inline bool operator < (const float& other, const DynamicAny& da)
 inline bool operator <= (const float& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with float
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<float>();
 }
 
@@ -1479,6 +1610,7 @@ inline bool operator <= (const float& other, const DynamicAny& da)
 inline bool operator > (const float& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with float
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<float>();
 }
 
@@ -1486,6 +1618,7 @@ inline bool operator > (const float& other, const DynamicAny& da)
 inline bool operator >= (const float& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with float
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<float>();
 }
 
@@ -1549,6 +1682,7 @@ inline double operator /= (double& other, const DynamicAny& da)
 inline bool operator == (const double& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with double
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<double>();
 }
 
@@ -1556,6 +1690,7 @@ inline bool operator == (const double& other, const DynamicAny& da)
 inline bool operator != (const double& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with double
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<double>();
 }
 
@@ -1563,6 +1698,7 @@ inline bool operator != (const double& other, const DynamicAny& da)
 inline bool operator < (const double& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with double
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<double>();
 }
 
@@ -1570,6 +1706,7 @@ inline bool operator < (const double& other, const DynamicAny& da)
 inline bool operator <= (const double& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with double
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<double>();
 }
 
@@ -1577,6 +1714,7 @@ inline bool operator <= (const double& other, const DynamicAny& da)
 inline bool operator > (const double& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with double
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<double>();
 }
 
@@ -1584,6 +1722,7 @@ inline bool operator > (const double& other, const DynamicAny& da)
 inline bool operator >= (const double& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with double
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<double>();
 }
 
@@ -1591,6 +1730,7 @@ inline bool operator >= (const double& other, const DynamicAny& da)
 inline bool operator == (const bool& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with bool
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<bool>();
 }
 
@@ -1598,6 +1738,7 @@ inline bool operator == (const bool& other, const DynamicAny& da)
 inline bool operator != (const bool& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with bool
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<bool>();
 }
 
@@ -1605,6 +1746,7 @@ inline bool operator != (const bool& other, const DynamicAny& da)
 inline bool operator == (const std::string& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with std::string
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<std::string>();
 }
 
@@ -1612,6 +1754,7 @@ inline bool operator == (const std::string& other, const DynamicAny& da)
 inline bool operator != (const std::string& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with std::string
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<std::string>();
 }
 
@@ -1619,6 +1762,7 @@ inline bool operator != (const std::string& other, const DynamicAny& da)
 inline bool operator == (const char* other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with const char*
 {
+	if (da.isEmpty()) return false;
 	return da.convert<std::string>() == other;
 }
 
@@ -1626,6 +1770,7 @@ inline bool operator == (const char* other, const DynamicAny& da)
 inline bool operator != (const char* other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with const char*
 {
+	if (da.isEmpty()) return true;
 	return da.convert<std::string>() != other;
 }
 
@@ -1692,6 +1837,7 @@ inline long operator /= (long& other, const DynamicAny& da)
 inline bool operator == (const long& other, const DynamicAny& da)
 	/// Equality operator for comparing DynamicAny with long
 {
+	if (da.isEmpty()) return false;
 	return other == da.convert<long>();
 }
 
@@ -1699,6 +1845,7 @@ inline bool operator == (const long& other, const DynamicAny& da)
 inline bool operator != (const long& other, const DynamicAny& da)
 	/// Inequality operator for comparing DynamicAny with long
 {
+	if (da.isEmpty()) return true;
 	return other != da.convert<long>();
 }
 
@@ -1706,6 +1853,7 @@ inline bool operator != (const long& other, const DynamicAny& da)
 inline bool operator < (const long& other, const DynamicAny& da)
 	/// Less than operator for comparing DynamicAny with long
 {
+	if (da.isEmpty()) return false;
 	return other < da.convert<long>();
 }
 
@@ -1713,6 +1861,7 @@ inline bool operator < (const long& other, const DynamicAny& da)
 inline bool operator <= (const long& other, const DynamicAny& da)
 	/// Less than or equal operator for comparing DynamicAny with long
 {
+	if (da.isEmpty()) return false;
 	return other <= da.convert<long>();
 }
 
@@ -1720,6 +1869,7 @@ inline bool operator <= (const long& other, const DynamicAny& da)
 inline bool operator > (const long& other, const DynamicAny& da)
 	/// Greater than operator for comparing DynamicAny with long
 {
+	if (da.isEmpty()) return false;
 	return other > da.convert<long>();
 }
 
@@ -1727,6 +1877,7 @@ inline bool operator > (const long& other, const DynamicAny& da)
 inline bool operator >= (const long& other, const DynamicAny& da)
 	/// Greater than or equal operator for comparing DynamicAny with long
 {
+	if (da.isEmpty()) return false;
 	return other >= da.convert<long>();
 }
 

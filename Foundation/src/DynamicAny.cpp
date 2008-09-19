@@ -1,7 +1,7 @@
 //
 // DynamicAny.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -42,8 +42,7 @@
 namespace Poco {
 
 
-DynamicAny::DynamicAny():
-	_pHolder(new DynamicAnyHolderImpl<int>(0))
+DynamicAny::DynamicAny(): _pHolder(0)
 {
 }
 
@@ -76,7 +75,7 @@ DynamicAny& DynamicAny::operator = (const DynamicAny& other)
 }
 
 
-DynamicAny DynamicAny::operator + (const DynamicAny& other) const
+const DynamicAny DynamicAny::operator + (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -112,7 +111,7 @@ DynamicAny& DynamicAny::operator += (const DynamicAny& other)
 }
 
 
-DynamicAny DynamicAny::operator - (const DynamicAny& other) const
+const DynamicAny DynamicAny::operator - (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -144,7 +143,7 @@ DynamicAny& DynamicAny::operator -= (const DynamicAny& other)
 }
 
 
-DynamicAny DynamicAny::operator * (const DynamicAny& other) const
+const DynamicAny DynamicAny::operator * (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -176,7 +175,7 @@ DynamicAny& DynamicAny::operator *= (const DynamicAny& other)
 }
 
 
-DynamicAny DynamicAny::operator / (const DynamicAny& other) const
+const DynamicAny DynamicAny::operator / (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -216,8 +215,7 @@ DynamicAny& DynamicAny::operator ++ ()
 	return *this = *this + 1;
 }
 
-
-DynamicAny DynamicAny::operator ++ (int)
+const DynamicAny DynamicAny::operator ++ (int)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -227,7 +225,6 @@ DynamicAny DynamicAny::operator ++ (int)
 	return tmp;
 }
 
-
 DynamicAny& DynamicAny::operator -- ()
 {
 	if (!isInteger())
@@ -236,8 +233,7 @@ DynamicAny& DynamicAny::operator -- ()
 	return *this = *this - 1;
 }
 
-
-DynamicAny DynamicAny::operator -- (int)
+const DynamicAny DynamicAny::operator -- (int)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -245,6 +241,85 @@ DynamicAny DynamicAny::operator -- (int)
 	DynamicAny tmp(*this);
 	*this -= 1;
 	return tmp;
+}
+
+
+bool DynamicAny::operator == (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() == other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator == (const char* other) const
+{
+	if (isEmpty()) return false;
+	return convert<std::string>() == other;
+}
+
+
+bool DynamicAny::operator != (const DynamicAny& other) const
+{
+	if (isEmpty() && other.isEmpty()) return false;
+	else if (isEmpty() || other.isEmpty()) return true;
+
+	return convert<std::string>() != other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator != (const char* other) const
+{
+	if (isEmpty()) return true;
+	return convert<std::string>() != other;
+}
+
+
+bool DynamicAny::operator < (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() < other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator <= (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() <= other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator > (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() > other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator >= (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<std::string>() >= other.convert<std::string>();
+}
+
+
+bool DynamicAny::operator || (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<bool>() || other.convert<bool>();
+}
+
+
+bool DynamicAny::operator && (const DynamicAny& other) const
+{
+	if (isEmpty() || other.isEmpty()) return false;
+	return convert<bool>() && other.convert<bool>();
+}
+
+
+void DynamicAny::empty()
+{
+	delete _pHolder;
+	_pHolder = 0;
 }
 
 
