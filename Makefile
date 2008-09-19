@@ -15,45 +15,42 @@ ifndef POCO_PREFIX
 export POCO_PREFIX=/usr/local
 endif
 
-.PHONY: all libexecs cppunit tests samples install
+ifndef POCO_BUILD
+export POCO_BUILD=$(POCO_BASE)
+endif
+
+.PHONY: all libexecs cppunit tests samples clean distclean install
 
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML Util Net NetSSL_OpenSSL
-
+COMPONENTS = Foundation XML Util Net NetSSL_OpenSSL Data Data/SQLite Data/ODBC
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
 
 install: libexecs
-	mkdir -p $(INSTALLDIR)/include/Poco
-	mkdir -p $(INSTALLDIR)/lib
-	mkdir -p $(INSTALLDIR)/bin
+	install -d $(INSTALLDIR)/include/Poco
+	install -d $(INSTALLDIR)/lib
+	install -d $(INSTALLDIR)/bin
 	for comp in $(COMPONENTS) ; do \
 		if [ -d "$(POCO_BASE)/$$comp/include" ] ; then \
 			cp -Rf $(POCO_BASE)/$$comp/include/* $(INSTALLDIR)/include/ ; \
 		fi ; \
 		if [ -d "$(POCO_BUILD)/$$comp/bin" ] ; then \
-			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -Rf {} $(INSTALLDIR)/bin \; ; \
+			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec install {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "libPoco*" -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec install {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec
+.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec
+.PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests
+.PHONY: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
 
-.PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests
-
-.PHONY: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples
-
-
-
-libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec
-
-tests: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests
-
-samples: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples
-
+libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec
+tests: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests
+samples: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
 
 Foundation-libexec: 
 	$(MAKE) -C $(POCO_BASE)/Foundation
@@ -99,3 +96,54 @@ NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit
 	
 NetSSL_OpenSSL-samples: NetSSL_OpenSSL-libexec 
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples
+
+Data-libexec:  Foundation-libexec
+	$(MAKE) -C $(POCO_BASE)/Data
+
+Data-tests: Data-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/Data/testsuite
+	
+Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec
+	$(MAKE) -C $(POCO_BASE)/Data/samples
+
+Data/SQLite-libexec:  Foundation-libexec Data-libexec
+	$(MAKE) -C $(POCO_BASE)/Data/SQLite
+
+Data/SQLite-tests: Data/SQLite-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite
+
+Data/ODBC-libexec:  Foundation-libexec Data-libexec
+	$(MAKE) -C $(POCO_BASE)/Data/ODBC
+
+Data/ODBC-tests: Data/ODBC-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite
+
+clean:
+	$(MAKE) -C $(POCO_BASE)/Foundation clean
+	$(MAKE) -C $(POCO_BASE)/Foundation/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/Foundation/samples clean
+	$(MAKE) -C $(POCO_BASE)/XML clean
+	$(MAKE) -C $(POCO_BASE)/XML/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/XML/samples clean
+	$(MAKE) -C $(POCO_BASE)/Util clean
+	$(MAKE) -C $(POCO_BASE)/Util/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/Util/samples clean
+	$(MAKE) -C $(POCO_BASE)/Net clean
+	$(MAKE) -C $(POCO_BASE)/Net/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/Net/samples clean
+	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL clean
+	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples clean
+	$(MAKE) -C $(POCO_BASE)/Data clean
+	$(MAKE) -C $(POCO_BASE)/Data/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/Data/samples clean
+	$(MAKE) -C $(POCO_BASE)/Data/SQLite clean
+	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/Data/ODBC clean
+	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite clean
+
+distclean:
+	rm -rf $(POCO_BUILD)/lib
+	find $(POCO_BUILD) -name obj -type d -print0 | xargs -0 rm -rf
+	find $(POCO_BUILD) -name .dep -type d -print0 | xargs -0 rm -rf
+	find $(POCO_BUILD) -name bin -type d -print0 | xargs -0 rm -rf
