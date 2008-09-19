@@ -98,6 +98,8 @@ public:
 
 	const char* rawContent() const;
 		/// Returns the raw content.
+		///
+		/// If the BLOB is empty, returns NULL.
 
 	void assignRaw(const char* pChar, std::size_t count);
 		/// Assigns raw content to internal storage.
@@ -136,8 +138,10 @@ inline const std::vector<char>& BLOB::content() const
 
 inline const char* BLOB::rawContent() const
 {
-	poco_assert (_pContent->size());
-	return &(*_pContent)[0];
+	if (_pContent->empty())
+		return 0;
+	else
+		return &(*_pContent)[0];
 }
 
 
