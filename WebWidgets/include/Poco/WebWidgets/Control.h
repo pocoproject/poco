@@ -129,6 +129,15 @@ public:
 
 	bool isEditable() const;
 		/// Returns true iff the Cell is editable.
+		
+	void setClass(const std::string cls);
+		/// Sets css class
+		
+	const std::string& getClass() const;
+		/// Returns css class
+		
+	bool hasClass() const;
+		/// Checks if a css value is set
 
 
 	// View
@@ -245,6 +254,24 @@ inline Formatter::Ptr Control::getFormatter() const
 	return _pCell->getFormatter();
 }
 
+
+inline void Control::setClass(const std::string cls)
+{
+	_pCell->setClass(cls);
+}
+
+		
+inline const std::string& Control::getClass() const
+{
+	return _pCell->getClass();
+}
+
+		
+inline bool Control::hasClass() const
+{
+	return _pCell->hasClass();
+}
+	
 
 } } // namespace Poco::WebWidgets
 

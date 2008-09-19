@@ -169,6 +169,15 @@ public:
 		
 	Cell::EditMode getEditMode() const;	
 		/// Returns the edit mode	
+	
+	void setClass(const std::string cls);
+		/// Sets css class
+		
+	const std::string& getClass() const;
+		/// Returns css class
+		
+	bool hasClass() const;
+		/// Checks if a css value is set	
 		
 	// RequestProcessor
 	virtual void handleForm(const std::string& field, const std::string& value);
@@ -203,6 +212,7 @@ private:
 	Poco::Any      _value;
 	Formatter::Ptr _pFormatter;
 	int            _rowIndex;
+	std::string    _class;
 };
 
 
@@ -286,6 +296,24 @@ inline Cell::EditMode Cell::getEditMode() const
 inline bool Cell::hasValue() const
 {
 	return !getValue().empty();
+}
+
+
+inline void Cell::setClass(const std::string cls)
+{
+	_class = cls;
+}
+
+		
+inline const std::string& Cell::getClass() const
+{
+	return _class;
+}
+
+		
+inline bool Cell::hasClass() const
+{
+	return !getClass().empty();
 }
 
 

@@ -198,6 +198,8 @@ void Utility::writeCellProperties(const Cell* pCell, std::ostream& ostr, bool wr
 	if (!pCell->isEnabled())
 		ostr << ",disabled:true";
 	
+	if (pCell->hasClass())
+		ostr << ",cls:'" << pCell->getClass() << "'";
 	View* pOwner = pCell->getOwner();
 	if (pOwner)
 	{
