@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -21,7 +21,7 @@
     border:1px solid #99bbe8;
 }
 
-.ext-ie .x-grid3 table,.ext-safari .x-grid3 table {
+.x-grid3 table {
     table-layout:fixed;
 }
 .x-grid3-viewport{
@@ -139,11 +139,16 @@
 }
 .x-grid3-focus {
 	position:absolute;
+	left:0;
 	top:0;
-	-moz-outline:0 none;
+	width:1px;
+	height:1px;
+    line-height:1px;
+    font-size:1px;
+    -moz-outline:0 none;
     outline:0 none;
-    -moz-user-select: normal;
-    -khtml-user-select: normal;
+    -moz-user-select: text;
+    -khtml-user-select: text;
 }
 
 /* header styles */

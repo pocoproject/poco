@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -44,6 +44,7 @@
 }
 .x-date-middle {
     padding-top:2px;padding-bottom:2px;
+    width:130px; /* FF3 */
 }
 .x-date-right a, .x-date-left a{
     display:block;

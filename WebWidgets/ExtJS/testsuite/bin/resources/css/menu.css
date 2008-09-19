@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -53,11 +53,18 @@
 }
 .x-menu-focus {
 	position:absolute;
-	left:0;
-	top:-5px;
-	width:0;
-	height:0;
+	left:-1px;
+	top:-1px;
+	width:1px;
+	height:1px;
     line-height:1px;
+    font-size:1px;
+    -moz-outline:0 none;
+    outline:0 none;
+    -moz-user-select: text;
+    -khtml-user-select: text;
+    overflow:hidden;
+    display:block;
 }
 .x-menu a.x-menu-item {
 	display:block;

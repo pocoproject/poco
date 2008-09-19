@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -247,4 +247,8 @@ input.x-tree-node-cb {
 }
 .x-tree-drop-ok-between .x-dd-drop-icon{
   background-image: url(../images/default/tree/drop-between.gif);
+}
+/* Fix for ie rootVisible:false issue */
+.x-tree-root-ct {
+    zoom:1;
 }

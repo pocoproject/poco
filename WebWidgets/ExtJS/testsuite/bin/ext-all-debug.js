@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.1
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -1502,76 +1502,154 @@ Ext.EventManager = function(){
     var resizeEvent, resizeTask, textEvent, textSize;
     var E = Ext.lib.Event;
     var D = Ext.lib.Dom;
+        var xname = 'Ex' + 't';
 
+    var elHash = {};
 
-    var fireDocReady = function(){
-        if(!docReadyState){
-            docReadyState = true;
-            Ext.isReady = true;
-            if(docReadyProcId){
-                clearInterval(docReadyProcId);
+    var addListener = function(el, ename, fn, wrap, scope){
+        var id = Ext.id(el);
+        if(!elHash[id]){
+            elHash[id] = {};
+        }
+        var es = elHash[id];
+        if(!es[ename]){
+            es[ename] = [];
+        }
+        var ls = es[ename];
+        ls.push({
+            id: id,
+            ename: ename,
+            fn: fn,
+            wrap: wrap,
+            scope: scope
+        });
+
+         E.on(el, ename, wrap);
+
+        if(ename == "mousewheel" && el.addEventListener){             el.addEventListener("DOMMouseScroll", wrap, false);
+            E.on(window, 'unload', function(){
+                el.removeEventListener("DOMMouseScroll", wrap, false);
+            });
+        }
+        if(ename == "mousedown" && el == document){             Ext.EventManager.stoppedMouseDownEvent.addListener(wrap);
+        }
+    }
+
+    var removeListener = function(el, ename, fn, scope){
+        el = Ext.getDom(el);
+        var id = Ext.id(el), es = elHash[id], wrap;
+        if(es){
+            var ls = es[ename], l;
+            if(ls){
+                for(var i = 0, len = ls.length; i < len; i++){
+                    l = ls[i];
+                    if(l.fn == fn && (!scope || l.scope == scope)){
+                        wrap = l.wrap;
+                        E.un(el, ename, wrap);
+                        ls.splice(i, 1);
+                        break;
+                    }
+                }
             }
+        }
+        if(ename == "mousewheel" && el.addEventListener && wrap){
+            el.removeEventListener("DOMMouseScroll", wrap, false);
+        }
+        if(ename == "mousedown" && el == document && wrap){             Ext.EventManager.stoppedMouseDownEvent.removeListener(wrap);
+        }
+    }
+
+    var removeAll = function(el){
+        el = Ext.getDom(el);
+        var id = Ext.id(el), es = elHash[id], ls;
+        if(es){
+            for(var ename in es){
+                if(es.hasOwnProperty(ename)){
+                    ls = es[ename];
+                    for(var i = 0, len = ls.length; i < len; i++){
+                        E.un(el, ename, ls[i].wrap);
+                        ls[i] = null;
+                    }
+                }
+                es[ename] = null;
+            }
+            delete elHash[id];
+        }
+    }
+
+     var fireDocReady = function(){
+        if(!docReadyState){
+            docReadyState = Ext.isReady = true;
             if(Ext.isGecko || Ext.isOpera) {
                 document.removeEventListener("DOMContentLoaded", fireDocReady, false);
             }
-            if(Ext.isIE){
-                var defer = document.getElementById("ie-deferred-loader");
-                if(defer){
-                    defer.onreadystatechange = null;
-                    defer.parentNode.removeChild(defer);
-                }
-            }
-            if(docReadyEvent){
-                docReadyEvent.fire();
-                docReadyEvent.clearListeners();
-            }
         }
+        if(docReadyProcId){
+            clearInterval(docReadyProcId);
+            docReadyProcId = null;
+        }
+        if(docReadyEvent){
+            docReadyEvent.fire();
+            docReadyEvent.clearListeners();
+       }
     };
 
     var initDocReady = function(){
         docReadyEvent = new Ext.util.Event();
+
+        if(Ext.isReady){
+            return;
+        }
+
+                E.on(window, 'load', fireDocReady);
+
         if(Ext.isGecko || Ext.isOpera) {
-            document.addEventListener("DOMContentLoaded", fireDocReady, false);
-        }else if(Ext.isIE){
-            document.write("<s"+'cript id="ie-deferred-loader" defer="defer" src="/'+'/:"></s'+"cript>");
-            var defer = document.getElementById("ie-deferred-loader");
-            defer.onreadystatechange = function(){
-                if(this.readyState == "complete"){
-                    fireDocReady();
+            document.addEventListener('DOMContentLoaded', fireDocReady, false);
+        }
+        else if(Ext.isIE){
+            docReadyProcId = setInterval(function(){
+                try{
+                                        Ext.isReady || (document.documentElement.doScroll('left'));
+                }catch(e){
+                    return;
                 }
+                fireDocReady();              }, 5);
+
+			document.onreadystatechange = function(){
+				if(document.readyState == 'complete'){
+					document.onreadystatechange = null;
+					fireDocReady();
+				}
             };
-        }else if(Ext.isSafari){
+        }
+        else if(Ext.isSafari){
             docReadyProcId = setInterval(function(){
                 var rs = document.readyState;
-                if(rs == "complete") {
+                if(rs == 'complete') {
                     fireDocReady();
                  }
             }, 10);
         }
-        
-        E.on(window, "load", fireDocReady);
     };
 
     var createBuffered = function(h, o){
         var task = new Ext.util.DelayedTask(h);
         return function(e){
-            
-            e = new Ext.EventObjectImpl(e);
+                        e = new Ext.EventObjectImpl(e);
             task.delay(o.buffer, h, null, [e]);
         };
     };
 
-    var createSingle = function(h, el, ename, fn){
+    var createSingle = function(h, el, ename, fn, scope){
         return function(e){
-            Ext.EventManager.removeListener(el, ename, fn);
+            Ext.EventManager.removeListener(el, ename, fn, scope);
             h(e);
         };
     };
 
     var createDelayed = function(h, o){
         return function(e){
-            
-            e = new Ext.EventObjectImpl(e);
+                        e = new Ext.EventObjectImpl(e);
             setTimeout(function(){
                 h(e);
             }, o.delay || 10);
@@ -1586,6 +1664,9 @@ Ext.EventManager = function(){
             throw "Error listening for \"" + ename + '\". Element "' + element + '" doesn\'t exist.';
         }
         var h = function(e){
+                        if(!window[xname]){
+                return;
+            }
             e = Ext.EventObject.setEvent(e);
             var t;
             if(o.delegate){
@@ -1616,47 +1697,14 @@ Ext.EventManager = function(){
             h = createDelayed(h, o);
         }
         if(o.single){
-            h = createSingle(h, el, ename, fn);
+            h = createSingle(h, el, ename, fn, scope);
         }
         if(o.buffer){
             h = createBuffered(h, o);
         }
-        fn._handlers = fn._handlers || [];
-        fn._handlers.push([Ext.id(el), ename, h]);
 
-        E.on(el, ename, h);
-        if(ename == "mousewheel" && el.addEventListener){ 
-            el.addEventListener("DOMMouseScroll", h, false);
-            E.on(window, 'unload', function(){
-                el.removeEventListener("DOMMouseScroll", h, false);
-            });
-        }
-        if(ename == "mousedown" && el == document){ 
-            Ext.EventManager.stoppedMouseDownEvent.addListener(h);
-        }
+        addListener(el, ename, fn, h, scope);
         return h;
-    };
-
-    var stopListening = function(el, ename, fn){
-        var id = Ext.id(el), hds = fn._handlers, hd = fn;
-        if(hds){
-            for(var i = 0, len = hds.length; i < len; i++){
-                var h = hds[i];
-                if(h[0] == id && h[1] == ename){
-                    hd = h[2];
-                    hds.splice(i, 1);
-                    break;
-                }
-            }
-        }
-        E.un(el, ename, hd);
-        el = Ext.getDom(el);
-        if(ename == "mousewheel" && el.addEventListener){
-            el.removeEventListener("DOMMouseScroll", hd, false);
-        }
-        if(ename == "mousedown" && el == document){ 
-            Ext.EventManager.stoppedMouseDownEvent.removeListener(hd);
-        }
     };
 
     var propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/;
@@ -1671,11 +1719,9 @@ Ext.EventManager = function(){
                         continue;
                     }
                     if(typeof o[e] == "function"){
-                        
-                        listen(element, e, o, o[e], o.scope);
+                                                listen(element, e, o, o[e], o.scope);
                     }else{
-                        
-                        listen(element, e, o[e]);
+                                                listen(element, e, o[e]);
                     }
                 }
                 return;
@@ -1684,22 +1730,25 @@ Ext.EventManager = function(){
         },
 
         
-        removeListener : function(element, eventName, fn){
-            return stopListening(element, eventName, fn);
+        removeListener : function(element, eventName, fn, scope){
+            return removeListener(element, eventName, fn, scope);
         },
 
         
-        onDocumentReady : function(fn, scope, options){
-            if(docReadyState){ 
-                docReadyEvent.addListener(fn, scope, options);
-                docReadyEvent.fire();
-                docReadyEvent.clearListeners();
-                return;
-            }
-            if(!docReadyEvent){
+        removeAll : function(element){
+            return removeAll(element);
+        },
+
+        
+         onDocumentReady : function(fn, scope, options){
+			if(!docReadyEvent){
                 initDocReady();
-            }
-            docReadyEvent.addListener(fn, scope, options);
+			}
+			if(docReadyState || Ext.isReady){ 				options || (options = {});
+				fn.defer(options.delay||0, scope);
+			}else{
+				docReadyEvent.addListener(fn, scope, options);
+			}
         },
 
         
@@ -1714,8 +1763,7 @@ Ext.EventManager = function(){
             resizeEvent.addListener(fn, scope, options);
         },
 
-        
-        fireWindowResize : function(){
+                fireWindowResize : function(){
             if(resizeEvent){
                 if((Ext.isIE||Ext.isAir) && resizeTask){
                     resizeTask.delay(50);
@@ -1750,8 +1798,7 @@ Ext.EventManager = function(){
             }
         },
 
-        
-        fireResize : function(){
+                fireResize : function(){
             if(resizeEvent){
                 resizeEvent.fire(D.getViewWidth(), D.getViewHeight());
             }
@@ -1772,54 +1819,49 @@ Ext.EventManager = function(){
 
 Ext.onReady = Ext.EventManager.onDocumentReady;
 
-Ext.onReady(function(){
-    var bd = Ext.getBody();
-    if(!bd){ return; }
 
-    var cls = [
-            Ext.isIE ? "ext-ie " + (Ext.isIE6 ? 'ext-ie6' : 'ext-ie7')
-            : Ext.isGecko ? "ext-gecko"
-            : Ext.isOpera ? "ext-opera"
-            : Ext.isSafari ? "ext-safari" : ""];
+(function(){
+    var initExtCss = function(){
+                var bd = document.body || document.getElementsByTagName('body')[0];
+        if(!bd){ return false; }
+        var cls = [' ',
+                Ext.isIE ? "ext-ie " + (Ext.isIE6 ? 'ext-ie6' : 'ext-ie7')
+                : Ext.isGecko ? "ext-gecko " + (Ext.isGecko2 ? 'ext-gecko2' : 'ext-gecko3')
+                : Ext.isOpera ? "ext-opera"
+                : Ext.isSafari ? "ext-safari" : ""];
 
-    if(Ext.isMac){
-        cls.push("ext-mac");
-    }
-    if(Ext.isLinux){
-        cls.push("ext-linux");
-    }
-    if(Ext.isBorderBox){
-        cls.push('ext-border-box');
-    }
-    if(Ext.isStrict){ 
-        var p = bd.dom.parentNode;
-        if(p){
-            p.className += ' ext-strict';
+        if(Ext.isMac){
+            cls.push("ext-mac");
         }
+        if(Ext.isLinux){
+            cls.push("ext-linux");
+        }
+        if(Ext.isBorderBox){
+            cls.push('ext-border-box');
+        }
+        if(Ext.isStrict){             var p = bd.parentNode;
+            if(p){
+                p.className += ' ext-strict';
+            }
+        }
+        bd.className += cls.join(' ');
+        return true;
     }
-    bd.addClass(cls.join(' '));
-});
+
+    if(!initExtCss()){
+        Ext.onReady(initExtCss);
+    }
+})();
 
 
 Ext.EventObject = function(){
 
     var E = Ext.lib.Event;
 
-    
-    var safariKeys = {
-        63234 : 37, 
-        63235 : 39, 
-        63232 : 38, 
-        63233 : 40, 
-        63276 : 33, 
-        63277 : 34, 
-        63272 : 46, 
-        63273 : 36, 
-        63275 : 35  
-    };
+        var safariKeys = {
+        3 : 13,         63234 : 37,         63235 : 39,         63232 : 38,         63233 : 40,         63276 : 33,         63277 : 34,         63272 : 46,         63273 : 36,         63275 : 35      };
 
-    
-    var btnMap = Ext.isIE ? {1:0,4:1,2:2} :
+        var btnMap = Ext.isIE ? {1:0,4:1,2:2} :
                 (Ext.isSafari ? {1:0,2:1,3:2} : {0:0,1:1,2:2});
 
     Ext.EventObjectImpl = function(e){
@@ -1827,6 +1869,7 @@ Ext.EventObject = function(){
             this.setEvent(e.browserEvent || e);
         }
     };
+
     Ext.EventObjectImpl.prototype = {
         
         browserEvent : null,
@@ -1840,73 +1883,205 @@ Ext.EventObject = function(){
         altKey : false,
 
         
-        BACKSPACE : 8,
+        BACKSPACE: 8,
         
-        TAB : 9,
+        TAB: 9,
         
-        RETURN : 13,
+        NUM_CENTER: 12,
         
-        ENTER : 13,
+        ENTER: 13,
         
-        SHIFT : 16,
+        RETURN: 13,
         
-        CONTROL : 17,
+        SHIFT: 16,
         
-        ESC : 27,
+        CTRL: 17,
+        CONTROL : 17,         
+        ALT: 18,
         
-        SPACE : 32,
+        PAUSE: 19,
         
-        PAGEUP : 33,
+        CAPS_LOCK: 20,
         
-        PAGEDOWN : 34,
+        ESC: 27,
         
-        END : 35,
+        SPACE: 32,
         
-        HOME : 36,
+        PAGE_UP: 33,
+        PAGEUP : 33,         
+        PAGE_DOWN: 34,
+        PAGEDOWN : 34,         
+        END: 35,
         
-        LEFT : 37,
+        HOME: 36,
         
-        UP : 38,
+        LEFT: 37,
         
-        RIGHT : 39,
+        UP: 38,
         
-        DOWN : 40,
+        RIGHT: 39,
         
-        DELETE : 46,
+        DOWN: 40,
         
-        F5 : 116,
+        PRINT_SCREEN: 44,
+        
+        INSERT: 45,
+        
+        DELETE: 46,
+        
+        ZERO: 48,
+        
+        ONE: 49,
+        
+        TWO: 50,
+        
+        THREE: 51,
+        
+        FOUR: 52,
+        
+        FIVE: 53,
+        
+        SIX: 54,
+        
+        SEVEN: 55,
+        
+        EIGHT: 56,
+        
+        NINE: 57,
+        
+        A: 65,
+        
+        B: 66,
+        
+        C: 67,
+        
+        D: 68,
+        
+        E: 69,
+        
+        F: 70,
+        
+        G: 71,
+        
+        H: 72,
+        
+        I: 73,
+        
+        J: 74,
+        
+        K: 75,
+        
+        L: 76,
+        
+        M: 77,
+        
+        N: 78,
+        
+        O: 79,
+        
+        P: 80,
+        
+        Q: 81,
+        
+        R: 82,
+        
+        S: 83,
+        
+        T: 84,
+        
+        U: 85,
+        
+        V: 86,
+        
+        W: 87,
+        
+        X: 88,
+        
+        Y: 89,
+        
+        Z: 90,
+        
+        CONTEXT_MENU: 93,
+        
+        NUM_ZERO: 96,
+        
+        NUM_ONE: 97,
+        
+        NUM_TWO: 98,
+        
+        NUM_THREE: 99,
+        
+        NUM_FOUR: 100,
+        
+        NUM_FIVE: 101,
+        
+        NUM_SIX: 102,
+        
+        NUM_SEVEN: 103,
+        
+        NUM_EIGHT: 104,
+        
+        NUM_NINE: 105,
+        
+        NUM_MULTIPLY: 106,
+        
+        NUM_PLUS: 107,
+        
+        NUM_MINUS: 109,
+        
+        NUM_PERIOD: 110,
+        
+        NUM_DIVISION: 111,
+        
+        F1: 112,
+        
+        F2: 113,
+        
+        F3: 114,
+        
+        F4: 115,
+        
+        F5: 116,
+        
+        F6: 117,
+        
+        F7: 118,
+        
+        F8: 119,
+        
+        F9: 120,
+        
+        F10: 121,
+        
+        F11: 122,
+        
+        F12: 123,
 
            
         setEvent : function(e){
-            if(e == this || (e && e.browserEvent)){ 
-                return e;
+            if(e == this || (e && e.browserEvent)){                 return e;
             }
             this.browserEvent = e;
             if(e){
-                
-                this.button = e.button ? btnMap[e.button] : (e.which ? e.which-1 : -1);
+                                this.button = e.button ? btnMap[e.button] : (e.which ? e.which-1 : -1);
                 if(e.type == 'click' && this.button == -1){
                     this.button = 0;
                 }
                 this.type = e.type;
                 this.shiftKey = e.shiftKey;
-                
-                this.ctrlKey = e.ctrlKey || e.metaKey;
+                                this.ctrlKey = e.ctrlKey || e.metaKey;
                 this.altKey = e.altKey;
-                
-                this.keyCode = e.keyCode;
+                                this.keyCode = e.keyCode;
                 this.charCode = e.charCode;
-                
-                this.target = E.getTarget(e);
-                
-                this.xy = E.getXY(e);
+                                this.target = E.getTarget(e);
+                                this.xy = E.getXY(e);
             }else{
                 this.button = -1;
                 this.shiftKey = false;
                 this.ctrlKey = false;
                 this.altKey = false;
                 this.keyCode = 0;
-                this.charCode =0;
+                this.charCode = 0;
                 this.target = null;
                 this.xy = [0, 0];
             }
@@ -1946,6 +2121,7 @@ Ext.EventObject = function(){
             (k >= 36 && k <= 39) ||
             (k >= 44 && k <= 45);
         },
+
         
         stopPropagation : function(){
             if(this.browserEvent){
@@ -1994,7 +2170,7 @@ Ext.EventObject = function(){
         getTarget : function(selector, maxDepth, returnEl){
             return selector ? Ext.fly(this.target).findParent(selector, maxDepth, returnEl) : (returnEl ? Ext.get(this.target) : this.target);
         },
-        
+
         
         getRelatedTarget : function(){
             if(this.browserEvent){
@@ -2253,7 +2429,7 @@ El.prototype = {
     },
 
     
-    query : function(selector, unique){
+    query : function(selector){
         return Ext.DomQuery.select(selector, this.dom);
     },
 
@@ -2771,14 +2947,14 @@ El.prototype = {
     },
 
     
-    removeListener : function(eventName, fn){
-        Ext.EventManager.removeListener(this.dom,  eventName, fn);
+    removeListener : function(eventName, fn, scope){
+        Ext.EventManager.removeListener(this.dom,  eventName, fn, scope || this);
         return this;
     },
 
     
     removeAllListeners : function(){
-        E.purgeElement(this.dom);
+        Ext.EventManager.removeAll(this.dom);
         return this;
     },
 
@@ -2922,13 +3098,13 @@ El.prototype = {
     },
 
     	setOverflow : function(v){
-    	if(v=='auto' && Ext.isMac && Ext.isGecko){     		this.dom.style.overflow = 'hidden';
+    	if(v=='auto' && Ext.isMac && Ext.isGecko2){     		this.dom.style.overflow = 'hidden';
         	(function(){this.dom.style.overflow = 'auto';}).defer(1, this);
     	}else{
     		this.dom.style.overflow = v;
     	}
 	},
-	
+
     
      setLeftTop : function(left, top){
         this.dom.style.left = this.addUnits(left);
@@ -3467,7 +3643,7 @@ El.prototype = {
     
     createShim : function(){
         var el = document.createElement('iframe');
-        el.frameBorder = 'no';
+        el.frameBorder = '0';
         el.className = 'ext-shim';
         if(Ext.isIE && Ext.isSecure){
             el.src = Ext.SSL_SECURE_URL;
@@ -3915,6 +4091,7 @@ El.prototype = {
         return d.getAttributeNS(ns, name) || d.getAttribute(ns+":"+name) || d.getAttribute(name) || d[name];
     },
 
+    
     getTextWidth : function(text, min, max){
         return (Ext.util.TextMetrics.measure(this.dom, Ext.value(text, this.dom.innerHTML, true)).width).constrain(min || 0, max || 1000000);
     }
@@ -4026,7 +4203,7 @@ El.garbageCollect = function(){
                                                                                                                                                 if(!d || !d.parentNode || (!d.offsetParent && !document.getElementById(eid))){
             delete El.cache[eid];
             if(d && Ext.enableListenerCollection){
-                E.purgeElement(d);
+                Ext.EventManager.removeAll(d);
             }
         }
     }
@@ -5037,6 +5214,10 @@ Ext.extend(Ext.data.Connection, Ext.util.Observable, {
 
     
     disableCaching: true,
+    
+    
+    disableCachingParam: '_dc',
+    
 
     
     request : function(o){
@@ -5087,10 +5268,11 @@ Ext.extend(Ext.data.Connection, Ext.util.Observable, {
                 timeout : o.timeout || this.timeout
             };
 
-            var method = o.method||this.method||(p ? "POST" : "GET");
+            var method = o.method||this.method||((p || o.xmlData || o.jsonData) ? "POST" : "GET");
 
             if(method == 'GET' && (this.disableCaching && o.disableCaching !== false) || o.disableCaching === true){
-                url += (url.indexOf('?') != -1 ? '&' : '?') + '_dc=' + (new Date().getTime());
+                var dcp = o.disableCachingParam || this.disableCachingParam;
+                url += (url.indexOf('?') != -1 ? '&' : '?') + dcp + '=' + (new Date().getTime());
             }
 
             if(typeof o.autoAbort == 'boolean'){                 if(o.autoAbort){
@@ -5255,65 +5437,67 @@ Ext.Ajax = new Ext.data.Connection({
     }
 });
 
-Ext.Updater = function(el, forceNew){
-    el = Ext.get(el);
-    if(!forceNew && el.updateManager){
-        return el.updateManager;
-    }
-    
-    this.el = el;
-    
-    this.defaultUrl = null;
-
-    this.addEvents(
+Ext.Updater = Ext.extend(Ext.util.Observable, {
+    constructor: function(el, forceNew){
+        el = Ext.get(el);
+        if(!forceNew && el.updateManager){
+            return el.updateManager;
+        }
         
-        "beforeupdate",
+        this.el = el;
         
-        "update",
+        this.defaultUrl = null;
+
+        this.addEvents(
+            
+            "beforeupdate",
+            
+            "update",
+            
+            "failure"
+        );
+        var d = Ext.Updater.defaults;
         
-        "failure"
-    );
-    var d = Ext.Updater.defaults;
-    
-    this.sslBlankUrl = d.sslBlankUrl;
-    
-    this.disableCaching = d.disableCaching;
-    
-    this.indicatorText = d.indicatorText;
-    
-    this.showLoadIndicator = d.showLoadIndicator;
-    
-    this.timeout = d.timeout;
-    
-    this.loadScripts = d.loadScripts;
-    
-    this.transaction = null;
-    
-    this.refreshDelegate = this.refresh.createDelegate(this);
-    
-    this.updateDelegate = this.update.createDelegate(this);
-    
-    this.formUpdateDelegate = this.formUpdate.createDelegate(this);
+        this.sslBlankUrl = d.sslBlankUrl;
+        
+        this.disableCaching = d.disableCaching;
+        
+        this.indicatorText = d.indicatorText;
+        
+        this.showLoadIndicator = d.showLoadIndicator;
+        
+        this.timeout = d.timeout;
+        
+        this.loadScripts = d.loadScripts;
+        
+        this.transaction = null;
+        
+        this.refreshDelegate = this.refresh.createDelegate(this);
+        
+        this.updateDelegate = this.update.createDelegate(this);
+        
+        this.formUpdateDelegate = this.formUpdate.createDelegate(this);
 
-    if(!this.renderer){
-     
-    this.renderer = new Ext.Updater.BasicRenderer();
-    }
-    Ext.Updater.superclass.constructor.call(this);
-};
-
-Ext.extend(Ext.Updater, Ext.util.Observable, {
+        if(!this.renderer){
+         
+        this.renderer = this.getDefaultRenderer();
+        }
+        Ext.Updater.superclass.constructor.call(this);
+    },
+    
+    getDefaultRenderer: function() {
+        return new Ext.Updater.BasicRenderer();
+    },
     
     getEl : function(){
         return this.el;
     },
-    
+
     
     update : function(url, params, callback, discardUrl){
         if(this.fireEvent("beforeupdate", this.el, url, params) !== false){
             var cfg, callerScope;
-            if(typeof url == "object"){ 
-                cfg = url;
+            if(typeof url == "object"){                 cfg = url;
                 url = cfg.url;
                 params = params || cfg.params;
                 callback = callback || cfg.callback;
@@ -5333,7 +5517,7 @@ Ext.extend(Ext.Updater, Ext.util.Observable, {
                 url = url.call(this);
             }
 
-            var o = Ext.apply(cfg ||{}, {
+            var o = Ext.apply({}, {
                 url : url,
                 params: (typeof params == "function" && callerScope) ? params.createDelegate(callerScope) : params,
                 success: this.processSuccess,
@@ -5350,7 +5534,7 @@ Ext.extend(Ext.Updater, Ext.util.Observable, {
                     "scope": callerScope || window,
                     "params": params
                 }
-            });
+            }, cfg);
 
             this.transaction = Ext.Ajax.request(o);
         }
@@ -5412,7 +5596,7 @@ Ext.extend(Ext.Updater, Ext.util.Observable, {
     isAutoRefreshing : function(){
        return this.autoRefreshProcId ? true : false;
     },
-    
+
     
     showLoading : function(){
         if(this.showLoadIndicator){
@@ -5420,12 +5604,10 @@ Ext.extend(Ext.Updater, Ext.util.Observable, {
         }
     },
 
-    
-    processSuccess : function(response){
+        processSuccess : function(response){
         this.transaction = null;
         if(response.argument.form && response.argument.reset){
-            try{ 
-                response.argument.form.reset();
+            try{                 response.argument.form.reset();
             }catch(e){}
         }
         if(this.loadScripts){
@@ -5437,16 +5619,14 @@ Ext.extend(Ext.Updater, Ext.util.Observable, {
         }
     },
 
-    
-    updateComplete : function(response){
+        updateComplete : function(response){
         this.fireEvent("update", this.el, response);
         if(typeof response.argument.callback == "function"){
             response.argument.callback.call(response.argument.scope, this.el, true, response, response.argument.options);
         }
     },
 
-    
-    processFailure : function(response){
+        processFailure : function(response){
         this.transaction = null;
         this.fireEvent("failure", this.el, response);
         if(typeof response.argument.callback == "function"){
@@ -5523,576 +5703,588 @@ Ext.UpdateManager = Ext.Updater;
 
 
 
-Date.parseFunctions = {count:0};
-Date.parseRegexes = [];
-Date.formatFunctions = {count:0};
-
-Date.prototype.dateFormat = function(format) {
-    if (Date.formatFunctions[format] == null) {
-        Date.createNewFormat(format);
-    }
-    var func = Date.formatFunctions[format];
-    return this[func]();
-};
-
-
-
-Date.prototype.format = Date.prototype.dateFormat;
-
-Date.createNewFormat = function(format) {
-    var funcName = "format" + Date.formatFunctions.count++;
-    Date.formatFunctions[format] = funcName;
-    var code = "Date.prototype." + funcName + " = function(){return ";
-    var special = false;
-    var ch = '';
-    for (var i = 0; i < format.length; ++i) {
-        ch = format.charAt(i);
-        if (!special && ch == "\\") {
-            special = true;
-        }
-        else if (special) {
-            special = false;
-            code += "'" + String.escape(ch) + "' + ";
-        }
-        else {
-            code += Date.getFormatCode(ch) + " + ";
-        }
-    }
-    eval(code.substring(0, code.length - 3) + ";}");
-};
-
-
-Date.formatCodes = {
-    d: "String.leftPad(this.getDate(), 2, '0')",
-    D: "Date.getShortDayName(this.getDay())",     j: "this.getDate()",
-    l: "Date.dayNames[this.getDay()]",
-    N: "(this.getDay() ? this.getDay() : 7)",
-    S: "this.getSuffix()",
-    w: "this.getDay()",
-    z: "this.getDayOfYear()",
-    W: "String.leftPad(this.getWeekOfYear(), 2, '0')",
-    F: "Date.monthNames[this.getMonth()]",
-    m: "String.leftPad(this.getMonth() + 1, 2, '0')",
-    M: "Date.getShortMonthName(this.getMonth())",     n: "(this.getMonth() + 1)",
-    t: "this.getDaysInMonth()",
-    L: "(this.isLeapYear() ? 1 : 0)",
-    o: "(this.getFullYear() + (this.getWeekOfYear() == 1 && this.getMonth() > 0 ? +1 : (this.getWeekOfYear() >= 52 && this.getMonth() < 11 ? -1 : 0)))",
-    Y: "this.getFullYear()",
-    y: "('' + this.getFullYear()).substring(2, 4)",
-    a: "(this.getHours() < 12 ? 'am' : 'pm')",
-    A: "(this.getHours() < 12 ? 'AM' : 'PM')",
-    g: "((this.getHours() % 12) ? this.getHours() % 12 : 12)",
-    G: "this.getHours()",
-    h: "String.leftPad((this.getHours() % 12) ? this.getHours() % 12 : 12, 2, '0')",
-    H: "String.leftPad(this.getHours(), 2, '0')",
-    i: "String.leftPad(this.getMinutes(), 2, '0')",
-    s: "String.leftPad(this.getSeconds(), 2, '0')",
-    u: "String.leftPad(this.getMilliseconds(), 3, '0')",
-    O: "this.getGMTOffset()",
-    P: "this.getGMTOffset(true)",
-    T: "this.getTimezone()",
-    Z: "(this.getTimezoneOffset() * -60)",
-    c: function() {         for (var c = "Y-m-dTH:i:sP", code = [], i = 0, l = c.length; i < l; ++i) {
-            var e = c.charAt(i);
-            code.push(e == "T" ? "'T'" : Date.getFormatCode(e));         }
-        return code.join(" + ");
-    },
-    
-    U: "Math.round(this.getTime() / 1000)"
-}
-
-Date.getFormatCode = function(character) {
-    var f = Date.formatCodes[character];
-    
-    if (f) {
-      f = Ext.type(f) == 'function'? f() : f;
-      Date.formatCodes[character] = f;     }
-
-        return f || ("'" + String.escape(character) + "'");
-};
-
-
-Date.parseDate = function(input, format) {
-    if (Date.parseFunctions[format] == null) {
-        Date.createParser(format);
-    }
-    var func = Date.parseFunctions[format];
-    return Date[func](input);
-};
-
-Date.createParser = function(format) {
-    var funcName = "parse" + Date.parseFunctions.count++;
-    var regexNum = Date.parseRegexes.length;
-    var currentGroup = 1;
-    Date.parseFunctions[format] = funcName;
-
-    var code = "Date." + funcName + " = function(input){\n"
-        + "var y = -1, m = -1, d = -1, h = -1, i = -1, s = -1, ms = -1, o, z, u, v;\n"
-        + "input = String(input);var d = new Date();\n"
-        + "y = d.getFullYear();\n"
-        + "m = d.getMonth();\n"
-        + "d = d.getDate();\n"
-        + "var results = input.match(Date.parseRegexes[" + regexNum + "]);\n"
-        + "if (results && results.length > 0) {";
-    var regex = "";
-
-    var special = false;
-    var ch = '';
-    for (var i = 0; i < format.length; ++i) {
-        ch = format.charAt(i);
-        if (!special && ch == "\\") {
-            special = true;
-        }
-        else if (special) {
-            special = false;
-            regex += String.escape(ch);
-        }
-        else {
-            var obj = Date.formatCodeToRegex(ch, currentGroup);
-            currentGroup += obj.g;
-            regex += obj.s;
-            if (obj.g && obj.c) {
-                code += obj.c;
-            }
-        }
-    }
-
-    code += "if (u){\n"
-        + "v = new Date(u * 1000);\n"         + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0 && s >= 0 && ms >= 0){\n"
-        + "v = new Date(y, m, d, h, i, s, ms);\n"
-        + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0 && s >= 0){\n"
-        + "v = new Date(y, m, d, h, i, s);\n"
-        + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0){\n"
-        + "v = new Date(y, m, d, h, i);\n"
-        + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0){\n"
-        + "v = new Date(y, m, d, h);\n"
-        + "}else if (y >= 0 && m >= 0 && d > 0){\n"
-        + "v = new Date(y, m, d);\n"
-        + "}else if (y >= 0 && m >= 0){\n"
-        + "v = new Date(y, m);\n"
-        + "}else if (y >= 0){\n"
-        + "v = new Date(y);\n"
-        + "}\n}\nreturn (v && Ext.type(z || o) == 'number')?"         +     " (Ext.type(z) == 'number' ? v.add(Date.SECOND, (v.getTimezoneOffset() * 60) + z) :"         +         " v.add(Date.HOUR, (v.getGMTOffset() / 100) + (o / -100))) : v;\n"         + "}";
-
-    Date.parseRegexes[regexNum] = new RegExp("^" + regex + "$", "i");
-    eval(code);
-};
-
-Date.parseCodes = {
-    
-    d: {
-        g:1,
-        c:"d = parseInt(results[{0}], 10);\n",
-        s:"(\\d{2})"     },
-    j: function() {
-        return Ext.applyIf({
-            s:"(\\d{1,2})"         }, Date.parseCodes["d"]);
-    },
-    D: function() {
-        for (var a = [], i = 0; i < 7; a.push(Date.getShortDayName(i)), ++i);         return {
-            g:0,
-            c:null,
-            s:"(?:" + a.join("|") +")"
-        }
-    },
-    l: function() {
-        return {
-            g:0,
-            c:null,
-            s:"(?:" + Date.dayNames.join("|") + ")"
-        }
-    },
-    N: {
-        g:0,
-        c:null,
-        s:"[1-7]"     },
-    S: {
-        g:0,
-        c:null,
-        s:"(?:st|nd|rd|th)"
-    },
-    w: {
-        g:0,
-        c:null,
-        s:"[0-6]"     },
-    z: {
-        g:0,
-        c:null,
-        s:"(?:\\d{1,3}"     },
-    W: {
-        g:0,
-        c:null,
-        s:"(?:\\d{2})"     },
-    F: function() {
-        return {
-            g:1,
-            c:"m = parseInt(Date.getMonthNumber(results[{0}]), 10);\n",             s:"(" + Date.monthNames.join("|") + ")"
-        }
-    },
-    M: function() {
-        for (var a = [], i = 0; i < 12; a.push(Date.getShortMonthName(i)), ++i);         return Ext.applyIf({
-            s:"(" + a.join("|") + ")"
-        }, Date.parseCodes["F"]);
-    },
-    m: {
-        g:1,
-        c:"m = parseInt(results[{0}], 10) - 1;\n",
-        s:"(\\d{2})"     },
-    n: function() {
-        return Ext.applyIf({
-            s:"(\\d{1,2})"         }, Date.parseCodes["m"]);
-    },
-    t: {
-        g:0,
-        c:null,
-        s:"(?:\\d{2})"     },
-    L: {
-        g:0,
-        c:null,
-        s:"(?:1|0)"
-    },
-    o: function() {
-        return Date.parseCodes["Y"];
-    },
-    Y: {
-        g:1,
-        c:"y = parseInt(results[{0}], 10);\n",
-        s:"(\\d{4})"     },
-    y: {
-        g:1,
-        c:"var ty = parseInt(results[{0}], 10);\n"
-            + "y = ty > Date.y2kYear ? 1900 + ty : 2000 + ty;\n",         s:"(\\d{1,2})"
-    },
-    a: {
-        g:1,
-        c:"if (results[{0}] == 'am') {\n"
-            + "if (h == 12) { h = 0; }\n"
-            + "} else { if (h < 12) { h += 12; }}",
-        s:"(am|pm)"
-    },
-    A: {
-        g:1,
-        c:"if (results[{0}] == 'AM') {\n"
-            + "if (h == 12) { h = 0; }\n"
-            + "} else { if (h < 12) { h += 12; }}",
-        s:"(AM|PM)"
-    },
-    g: function() {
-        return Date.parseCodes["G"];
-    },
-    G: {
-        g:1,
-        c:"h = parseInt(results[{0}], 10);\n",
-        s:"(\\d{1,2})"     },
-    h: function() {
-        return Date.parseCodes["H"];
-    },
-    H: {
-        g:1,
-        c:"h = parseInt(results[{0}], 10);\n",
-        s:"(\\d{2})"     },
-    i: {
-        g:1,
-        c:"i = parseInt(results[{0}], 10);\n",
-        s:"(\\d{2})"     },
-    s: {
-        g:1,
-        c:"s = parseInt(results[{0}], 10);\n",
-        s:"(\\d{2})"     },
-    u: {
-        g:1,
-        c:"ms = parseInt(results[{0}], 10);\n",
-        s:"(\\d{3})"     },
-    O: {
-        g:1,
-        c:[
-            "o = results[{0}];",
-            "var sn = o.substring(0,1);",             "var hr = o.substring(1,3)*1 + Math.floor(o.substring(3,5) / 60);",             "var mn = o.substring(3,5) % 60;",             "o = ((-12 <= (hr*60 + mn)/60) && ((hr*60 + mn)/60 <= 14))? (sn + String.leftPad(hr, 2, '0') + String.leftPad(mn, 2, '0')) : null;\n"         ].join("\n"),
-        s: "([+\-]\\d{4})"     },
-    P: function() {
-      return Ext.applyIf({
-        s: "([+\-]\\d{2}:\\d{2})"       }, Date.parseCodes["O"]);
-    },
-    T: {
-        g:0,
-        c:null,
-        s:"[A-Z]{1,4}"     },
-    Z: {
-        g:1,
-        c:"z = results[{0}] * 1;\n"               + "z = (-43200 <= z && z <= 50400)? z : null;\n",
-        s:"([+\-]?\\d{1,5})"     },
-    c: function() {
-        var df = Date.formatCodeToRegex, calc = [];
-        var arr = [
-            df("Y", 1),
-            df("m", 2),
-            df("d", 3),
-            df("h", 4),
-            df("i", 5),
-            df("s", 6),
-            {c:"if(results[7] == 'Z'){\no = 0;\n}else{\n" + df("P", 7).c + "\n}"}         ];
-        for (var i = 0, l = arr.length; i < l; ++i) {
-            calc.push(arr[i].c);
-        }
-
-        return {
-            g:1,
-            c:calc.join(""),
-            s:arr[0].s + "-" + arr[1].s + "-" + arr[2].s + "T" + arr[3].s + ":" + arr[4].s + ":" + arr[5].s + "(" + df("P", 7).s + "|Z)"
-        }
-    },
-    U: {
-        g:1,
-        c:"u = parseInt(results[{0}], 10);\n",
-        s:"(-?\\d+)"     }
-}
-
+(function() {
 Date.formatCodeToRegex = function(character, currentGroup) {
         var p = Date.parseCodes[character];
 
     if (p) {
       p = Ext.type(p) == 'function'? p() : p;
-      Date.parseCodes[character] = p;       
-      if (p.c) {
-        p.c = String.format(p.c, currentGroup);
-      }
-    }
+      Date.parseCodes[character] = p;     }
 
-    return p || {
+    return p? Ext.applyIf({
+      c: p.c? String.format(p.c, currentGroup || "{0}") : p.c
+    }, p) : {
         g:0,
         c:null,
         s:Ext.escapeRe(character)     }
-};
-
-
-Date.prototype.getTimezone = function() {
-                                                    return this.toString().replace(/^.* (?:\((.*)\)|([A-Z]{1,4})(?:[\-+][0-9]{4})?(?: -?\d+)?)$/, "$1$2").replace(/[^A-Z]/g, "");
-};
-
-
-Date.prototype.getGMTOffset = function(colon) {
-    return (this.getTimezoneOffset() > 0 ? "-" : "+")
-        + String.leftPad(Math.abs(Math.floor(this.getTimezoneOffset() / 60)), 2, "0")
-        + (colon ? ":" : "")
-        + String.leftPad(this.getTimezoneOffset() % 60, 2, "0");
-};
-
-
-Date.prototype.getDayOfYear = function() {
-    var num = 0;
-    Date.daysInMonth[1] = this.isLeapYear() ? 29 : 28;
-    for (var i = 0; i < this.getMonth(); ++i) {
-        num += Date.daysInMonth[i];
-    }
-    return num + this.getDate() - 1;
-};
-
-
-Date.prototype.getWeekOfYear = function() {
-        var ms1d = 864e5;     var ms7d = 7 * ms1d;     var DC3 = Date.UTC(this.getFullYear(), this.getMonth(), this.getDate() + 3) / ms1d;     var AWN = Math.floor(DC3 / 7);     var Wyr = new Date(AWN * ms7d).getUTCFullYear();
-    return AWN - Math.floor(Date.UTC(Wyr, 0, 7) / ms7d) + 1;
-};
-
-
-Date.prototype.isLeapYear = function() {
-    var year = this.getFullYear();
-    return !!((year & 3) == 0 && (year % 100 || (year % 400 == 0 && year)));
-};
-
-
-Date.prototype.getFirstDayOfMonth = function() {
-    var day = (this.getDay() - (this.getDate() - 1)) % 7;
-    return (day < 0) ? (day + 7) : day;
-};
-
-
-Date.prototype.getLastDayOfMonth = function() {
-    var day = (this.getDay() + (Date.daysInMonth[this.getMonth()] - this.getDate())) % 7;
-    return (day < 0) ? (day + 7) : day;
-};
-
-
-
-Date.prototype.getFirstDateOfMonth = function() {
-    return new Date(this.getFullYear(), this.getMonth(), 1);
-};
-
-
-Date.prototype.getLastDateOfMonth = function() {
-    return new Date(this.getFullYear(), this.getMonth(), this.getDaysInMonth());
-};
-
-Date.prototype.getDaysInMonth = function() {
-    Date.daysInMonth[1] = this.isLeapYear() ? 29 : 28;
-    return Date.daysInMonth[this.getMonth()];
-};
-
-
-Date.prototype.getSuffix = function() {
-    switch (this.getDate()) {
-        case 1:
-        case 21:
-        case 31:
-            return "st";
-        case 2:
-        case 22:
-            return "nd";
-        case 3:
-        case 23:
-            return "rd";
-        default:
-            return "th";
-    }
-};
-
-Date.daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
-
-
-Date.monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-];
-
-
-Date.getShortMonthName = function(month) {
-    return Date.monthNames[month].substring(0, 3);
 }
 
+var $f = Date.formatCodeToRegex;
 
-Date.dayNames = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday"
-];
+Ext.apply(Date, {
+        parseFunctions: {count:0},
+    parseRegexes: [],
+    formatFunctions: {count:0},
+    daysInMonth : [31,28,31,30,31,30,31,31,30,31,30,31],
+    y2kYear : 50,
 
+    
+    MILLI : "ms",
 
-Date.getShortDayName = function(day) {
-    return Date.dayNames[day].substring(0, 3);
-}
+    
+    SECOND : "s",
 
-Date.y2kYear = 50;
+    
+    MINUTE : "mi",
 
+    
+    HOUR : "h",
 
-Date.monthNumbers = {
-    Jan:0,
-    Feb:1,
-    Mar:2,
-    Apr:3,
-    May:4,
-    Jun:5,
-    Jul:6,
-    Aug:7,
-    Sep:8,
-    Oct:9,
-    Nov:10,
-    Dec:11
-};
+    
+    DAY : "d",
 
+    
+    MONTH : "mo",
 
-Date.getMonthNumber = function(name) {
-        return Date.monthNumbers[name.substring(0, 1).toUpperCase() + name.substring(1, 3).toLowerCase()];
-}
+    
+    YEAR : "y",
 
+    
+    dayNames : [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+    ],
 
-Date.prototype.clone = function() {
-  return new Date(this.getTime());
-};
+    
+    monthNames : [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ],
 
+    
+    monthNumbers : {
+        Jan:0,
+        Feb:1,
+        Mar:2,
+        Apr:3,
+        May:4,
+        Jun:5,
+        Jul:6,
+        Aug:7,
+        Sep:8,
+        Oct:9,
+        Nov:10,
+        Dec:11
+    },
 
-Date.prototype.clearTime = function(clone){
-    if(clone){
-        return this.clone().clearTime();
+    
+    getShortMonthName : function(month) {
+        return Date.monthNames[month].substring(0, 3);
+    },
+
+    
+    getShortDayName : function(day) {
+        return Date.dayNames[day].substring(0, 3);
+    },
+
+    
+    getMonthNumber : function(name) {
+                return Date.monthNumbers[name.substring(0, 1).toUpperCase() + name.substring(1, 3).toLowerCase()];
+    },
+
+    
+    formatCodes : {
+        d: "String.leftPad(this.getDate(), 2, '0')",
+        D: "Date.getShortDayName(this.getDay())",         j: "this.getDate()",
+        l: "Date.dayNames[this.getDay()]",
+        N: "(this.getDay() ? this.getDay() : 7)",
+        S: "this.getSuffix()",
+        w: "this.getDay()",
+        z: "this.getDayOfYear()",
+        W: "String.leftPad(this.getWeekOfYear(), 2, '0')",
+        F: "Date.monthNames[this.getMonth()]",
+        m: "String.leftPad(this.getMonth() + 1, 2, '0')",
+        M: "Date.getShortMonthName(this.getMonth())",         n: "(this.getMonth() + 1)",
+        t: "this.getDaysInMonth()",
+        L: "(this.isLeapYear() ? 1 : 0)",
+        o: "(this.getFullYear() + (this.getWeekOfYear() == 1 && this.getMonth() > 0 ? +1 : (this.getWeekOfYear() >= 52 && this.getMonth() < 11 ? -1 : 0)))",
+        Y: "this.getFullYear()",
+        y: "('' + this.getFullYear()).substring(2, 4)",
+        a: "(this.getHours() < 12 ? 'am' : 'pm')",
+        A: "(this.getHours() < 12 ? 'AM' : 'PM')",
+        g: "((this.getHours() % 12) ? this.getHours() % 12 : 12)",
+        G: "this.getHours()",
+        h: "String.leftPad((this.getHours() % 12) ? this.getHours() % 12 : 12, 2, '0')",
+        H: "String.leftPad(this.getHours(), 2, '0')",
+        i: "String.leftPad(this.getMinutes(), 2, '0')",
+        s: "String.leftPad(this.getSeconds(), 2, '0')",
+        u: "String.leftPad(this.getMilliseconds(), 3, '0')",
+        O: "this.getGMTOffset()",
+        P: "this.getGMTOffset(true)",
+        T: "this.getTimezone()",
+        Z: "(this.getTimezoneOffset() * -60)",
+        c: function() {             for (var c = "Y-m-dTH:i:sP", code = [], i = 0, l = c.length; i < l; ++i) {
+                var e = c.charAt(i);
+                code.push(e == "T" ? "'T'" : Date.getFormatCode(e));             }
+            return code.join(" + ");
+        },
+        
+        U: "Math.round(this.getTime() / 1000)"
+    },
+
+    
+    parseDate : function(input, format) {
+        var p = Date.parseFunctions;
+        if (p[format] == null) {
+            Date.createParser(format);
+        }
+        var func = p[format];
+        return Date[func](input);
+    },
+
+        getFormatCode : function(character) {
+        var f = Date.formatCodes[character];
+
+        if (f) {
+          f = Ext.type(f) == 'function'? f() : f;
+          Date.formatCodes[character] = f;         }
+
+                return f || ("'" + String.escape(character) + "'");
+    },
+
+        createNewFormat : function(format) {
+        var funcName = "format" + Date.formatFunctions.count++;
+        Date.formatFunctions[format] = funcName;
+        var code = "Date.prototype." + funcName + " = function(){return ";
+        var special = false;
+        var ch = '';
+        for (var i = 0; i < format.length; ++i) {
+            ch = format.charAt(i);
+            if (!special && ch == "\\") {
+                special = true;
+            }
+            else if (special) {
+                special = false;
+                code += "'" + String.escape(ch) + "' + ";
+            }
+            else {
+                code += Date.getFormatCode(ch) + " + ";
+            }
+        }
+        eval(code.substring(0, code.length - 3) + ";}");
+    },
+
+        createParser : function(format) {
+        var funcName = "parse" + Date.parseFunctions.count++;
+        var regexNum = Date.parseRegexes.length;
+        var currentGroup = 1;
+        Date.parseFunctions[format] = funcName;
+
+        var code = "Date." + funcName + " = function(input){\n"
+            + "var y, m, d, h = 0, i = 0, s = 0, ms = 0, o, z, u, v;\n"
+            + "input = String(input);\n"
+            + "d = new Date();\n"
+            + "y = d.getFullYear();\n"
+            + "m = d.getMonth();\n"
+            + "d = d.getDate();\n"
+            + "var results = input.match(Date.parseRegexes[" + regexNum + "]);\n"
+            + "if (results && results.length > 0) {";
+        var regex = "";
+
+        var special = false;
+        var ch = '';
+        for (var i = 0; i < format.length; ++i) {
+            ch = format.charAt(i);
+            if (!special && ch == "\\") {
+                special = true;
+            }
+            else if (special) {
+                special = false;
+                regex += String.escape(ch);
+            }
+            else {
+                var obj = Date.formatCodeToRegex(ch, currentGroup);
+                currentGroup += obj.g;
+                regex += obj.s;
+                if (obj.g && obj.c) {
+                    code += obj.c;
+                }
+            }
+        }
+
+        code += "if (u){\n"
+            + "v = new Date(u * 1000);\n"             + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0 && s >= 0 && ms >= 0){\n"
+            + "v = new Date(y, m, d, h, i, s, ms);\n"
+            + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0 && s >= 0){\n"
+            + "v = new Date(y, m, d, h, i, s);\n"
+            + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0){\n"
+            + "v = new Date(y, m, d, h, i);\n"
+            + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0){\n"
+            + "v = new Date(y, m, d, h);\n"
+            + "}else if (y >= 0 && m >= 0 && d > 0){\n"
+            + "v = new Date(y, m, d);\n"
+            + "}else if (y >= 0 && m >= 0){\n"
+            + "v = new Date(y, m);\n"
+            + "}else if (y >= 0){\n"
+            + "v = new Date(y);\n"
+            + "}\n}\nreturn (v && (z || o))?"             +     " (Ext.type(z) == 'number' ? v.add(Date.SECOND, -v.getTimezoneOffset() * 60 - z) :"             +         " v.add(Date.MINUTE, -v.getTimezoneOffset() + (sn == '+'? -1 : 1) * (hr * 60 + mn))) : v;\n"             + "}";
+
+        Date.parseRegexes[regexNum] = new RegExp("^" + regex + "$", "i");
+        eval(code);
+    },
+
+        parseCodes : {
+        
+        d: {
+            g:1,
+            c:"d = parseInt(results[{0}], 10);\n",
+            s:"(\\d{2})"         },
+        j: {
+            g:1,
+            c:"d = parseInt(results[{0}], 10);\n",
+            s:"(\\d{1,2})"         },
+        D: function() {
+            for (var a = [], i = 0; i < 7; a.push(Date.getShortDayName(i)), ++i);             return {
+                g:0,
+                c:null,
+                s:"(?:" + a.join("|") +")"
+            }
+        },
+        l: function() {
+            return {
+                g:0,
+                c:null,
+                s:"(?:" + Date.dayNames.join("|") + ")"
+            }
+        },
+        N: {
+            g:0,
+            c:null,
+            s:"[1-7]"         },
+        S: {
+            g:0,
+            c:null,
+            s:"(?:st|nd|rd|th)"
+        },
+        w: {
+            g:0,
+            c:null,
+            s:"[0-6]"         },
+        z: {
+            g:0,
+            c:null,
+            s:"(?:\\d{1,3}"         },
+        W: {
+            g:0,
+            c:null,
+            s:"(?:\\d{2})"         },
+        F: function() {
+            return {
+                g:1,
+                c:"m = parseInt(Date.getMonthNumber(results[{0}]), 10);\n",                 s:"(" + Date.monthNames.join("|") + ")"
+            }
+        },
+        M: function() {
+            for (var a = [], i = 0; i < 12; a.push(Date.getShortMonthName(i)), ++i);             return Ext.applyIf({
+                s:"(" + a.join("|") + ")"
+            }, $f("F"));
+        },
+        m: {
+            g:1,
+            c:"m = parseInt(results[{0}], 10) - 1;\n",
+            s:"(\\d{2})"         },
+        n: {
+            g:1,
+            c:"m = parseInt(results[{0}], 10) - 1;\n",
+            s:"(\\d{1,2})"         },
+        t: {
+            g:0,
+            c:null,
+            s:"(?:\\d{2})"         },
+        L: {
+            g:0,
+            c:null,
+            s:"(?:1|0)"
+        },
+        o: function() {
+            return $f("Y");
+        },
+        Y: {
+            g:1,
+            c:"y = parseInt(results[{0}], 10);\n",
+            s:"(\\d{4})"         },
+        y: {
+            g:1,
+            c:"var ty = parseInt(results[{0}], 10);\n"
+                + "y = ty > Date.y2kYear ? 1900 + ty : 2000 + ty;\n",             s:"(\\d{1,2})"
+        },
+        a: {
+            g:1,
+            c:"if (results[{0}] == 'am') {\n"
+                + "if (h == 12) { h = 0; }\n"
+                + "} else { if (h < 12) { h += 12; }}",
+            s:"(am|pm)"
+        },
+        A: {
+            g:1,
+            c:"if (results[{0}] == 'AM') {\n"
+                + "if (h == 12) { h = 0; }\n"
+                + "} else { if (h < 12) { h += 12; }}",
+            s:"(AM|PM)"
+        },
+        g: function() {
+            return $f("G");
+        },
+        G: {
+            g:1,
+            c:"h = parseInt(results[{0}], 10);\n",
+            s:"(\\d{1,2})"         },
+        h: function() {
+            return $f("H");
+        },
+        H: {
+            g:1,
+            c:"h = parseInt(results[{0}], 10);\n",
+            s:"(\\d{2})"         },
+        i: {
+            g:1,
+            c:"i = parseInt(results[{0}], 10);\n",
+            s:"(\\d{2})"         },
+        s: {
+            g:1,
+            c:"s = parseInt(results[{0}], 10);\n",
+            s:"(\\d{2})"         },
+        u: {
+            g:1,
+            c:"ms = results[{0}]; ms = parseInt(ms, 10)/Math.pow(10, ms.length - 3);\n",
+            s:"(\\d+)"         },
+        O: {
+            g:1,
+            c:[
+                "o = results[{0}];",
+                "var sn = o.substring(0,1);",                 "var hr = o.substring(1,3)*1 + Math.floor(o.substring(3,5) / 60);",                 "var mn = o.substring(3,5) % 60;",                 "o = ((-12 <= (hr*60 + mn)/60) && ((hr*60 + mn)/60 <= 14))? (sn + String.leftPad(hr, 2, '0') + String.leftPad(mn, 2, '0')) : null;\n"             ].join("\n"),
+            s: "([+\-]\\d{4})"         },
+        P: {
+            g:1,
+            c:[
+                "o = results[{0}];",
+                "var sn = o.substring(0,1);",                 "var hr = o.substring(1,3)*1 + Math.floor(o.substring(4,6) / 60);",                 "var mn = o.substring(4,6) % 60;",                 "o = ((-12 <= (hr*60 + mn)/60) && ((hr*60 + mn)/60 <= 14))? (sn + String.leftPad(hr, 2, '0') + String.leftPad(mn, 2, '0')) : null;\n"             ].join("\n"),
+            s: "([+\-]\\d{2}:\\d{2})"         },
+        T: {
+            g:0,
+            c:null,
+            s:"[A-Z]{1,4}"         },
+        Z: {
+            g:1,
+            c:"z = results[{0}] * 1;\n"                   + "z = (-43200 <= z && z <= 50400)? z : null;\n",
+            s:"([+\-]?\\d{1,5})"         },
+        c: function() {
+            var calc = [];
+            var arr = [
+                $f("Y", 1),                 $f("m", 2),                 $f("d", 3),                 $f("h", 4),                 $f("i", 5),                 $f("s", 6),                 {c:"ms = (results[7] || '.0').substring(1); ms = parseInt(ms, 10)/Math.pow(10, ms.length - 3);\n"},                 {c:"if(results[9] == 'Z'){\no = 0;\n}else{\n" + $f("P", 9).c + "\n}"}             ];
+            for (var i = 0, l = arr.length; i < l; ++i) {
+                calc.push(arr[i].c);
+            }
+
+            return {
+                g:1,
+                c:calc.join(""),
+                s:arr[0].s + "-" + arr[1].s + "-" + arr[2].s + "T" + arr[3].s + ":" + arr[4].s + ":" + arr[5].s
+                      + "((\.|,)\\d+)?"                       + "(" + $f("P", null).s + "|Z)"             }
+        },
+        U: {
+            g:1,
+            c:"u = parseInt(results[{0}], 10);\n",
+            s:"(-?\\d+)"         }
     }
-    this.setHours(0);
-    this.setMinutes(0);
-    this.setSeconds(0);
-    this.setMilliseconds(0);
-    return this;
-};
+});
+
+}());
+
+Ext.override(Date, {
+        dateFormat : function(format) {
+        if (Date.formatFunctions[format] == null) {
+            Date.createNewFormat(format);
+        }
+        var func = Date.formatFunctions[format];
+        return this[func]();
+    },
+
+    
+    getTimezone : function() {
+                                                                                                        return this.toString().replace(/^.* (?:\((.*)\)|([A-Z]{1,4})(?:[\-+][0-9]{4})?(?: -?\d+)?)$/, "$1$2").replace(/[^A-Z]/g, "");
+    },
+
+    
+    getGMTOffset : function(colon) {
+        return (this.getTimezoneOffset() > 0 ? "-" : "+")
+            + String.leftPad(Math.abs(Math.floor(this.getTimezoneOffset() / 60)), 2, "0")
+            + (colon ? ":" : "")
+            + String.leftPad(Math.abs(this.getTimezoneOffset() % 60), 2, "0");
+    },
+
+    
+    getDayOfYear : function() {
+        var num = 0;
+        Date.daysInMonth[1] = this.isLeapYear() ? 29 : 28;
+        for (var i = 0; i < this.getMonth(); ++i) {
+            num += Date.daysInMonth[i];
+        }
+        return num + this.getDate() - 1;
+    },
+
+    
+    getWeekOfYear : function() {
+                var ms1d = 864e5;         var ms7d = 7 * ms1d;         var DC3 = Date.UTC(this.getFullYear(), this.getMonth(), this.getDate() + 3) / ms1d;         var AWN = Math.floor(DC3 / 7);         var Wyr = new Date(AWN * ms7d).getUTCFullYear();
+        return AWN - Math.floor(Date.UTC(Wyr, 0, 7) / ms7d) + 1;
+    },
+
+    
+    isLeapYear : function() {
+        var year = this.getFullYear();
+        return !!((year & 3) == 0 && (year % 100 || (year % 400 == 0 && year)));
+    },
+
+    
+    getFirstDayOfMonth : function() {
+        var day = (this.getDay() - (this.getDate() - 1)) % 7;
+        return (day < 0) ? (day + 7) : day;
+    },
+
+    
+    getLastDayOfMonth : function() {
+        var day = (this.getDay() + (Date.daysInMonth[this.getMonth()] - this.getDate())) % 7;
+        return (day < 0) ? (day + 7) : day;
+    },
+
+
+    
+    getFirstDateOfMonth : function() {
+        return new Date(this.getFullYear(), this.getMonth(), 1);
+    },
+
+    
+    getLastDateOfMonth : function() {
+        return new Date(this.getFullYear(), this.getMonth(), this.getDaysInMonth());
+    },
+
+    
+    getDaysInMonth : function() {
+        Date.daysInMonth[1] = this.isLeapYear() ? 29 : 28;
+        return Date.daysInMonth[this.getMonth()];
+    },
+
+    
+    getSuffix : function() {
+        switch (this.getDate()) {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    },
+
+    
+    clone : function() {
+        return new Date(this.getTime());
+    },
+
+    
+    clearTime : function(clone){
+        if(clone){
+            return this.clone().clearTime();
+        }
+        this.setHours(0);
+        this.setMinutes(0);
+        this.setSeconds(0);
+        this.setMilliseconds(0);
+        return this;
+    },
+
+    
+    add : function(interval, value){
+        var d = this.clone();
+        if (!interval || value === 0) return d;
+
+        switch(interval.toLowerCase()){
+            case Date.MILLI:
+                d.setMilliseconds(this.getMilliseconds() + value);
+                break;
+            case Date.SECOND:
+                d.setSeconds(this.getSeconds() + value);
+                break;
+            case Date.MINUTE:
+                d.setMinutes(this.getMinutes() + value);
+                break;
+            case Date.HOUR:
+                d.setHours(this.getHours() + value);
+                break;
+            case Date.DAY:
+                d.setDate(this.getDate() + value);
+                break;
+            case Date.MONTH:
+                var day = this.getDate();
+                if(day > 28){
+                    day = Math.min(day, this.getFirstDateOfMonth().add('mo', value).getLastDateOfMonth().getDate());
+                }
+                d.setDate(day);
+                d.setMonth(this.getMonth() + value);
+                break;
+            case Date.YEAR:
+                d.setFullYear(this.getFullYear() + value);
+                break;
+        }
+        return d;
+    },
+
+    
+    between : function(start, end){
+        var t = this.getTime();
+        return start.getTime() <= t && t <= end.getTime();
+    }
+});
+
+
+
+Date.prototype.format = Date.prototype.dateFormat;
+
 
 if(Ext.isSafari){
     Date.brokenSetMonth = Date.prototype.setMonth;
-  Date.prototype.setMonth = function(num){
-    if(num <= -1){
-      var n = Math.ceil(-num);
-      var back_year = Math.ceil(n/12);
-      var month = (n % 12) ? 12 - n % 12 : 0 ;
-      this.setFullYear(this.getFullYear() - back_year);
-      return Date.brokenSetMonth.call(this, month);
-    } else {
-      return Date.brokenSetMonth.apply(this, arguments);
-    }
-  };
-}
-
-
-Date.MILLI = "ms";
-
-Date.SECOND = "s";
-
-Date.MINUTE = "mi";
-
-Date.HOUR = "h";
-
-Date.DAY = "d";
-
-Date.MONTH = "mo";
-
-Date.YEAR = "y";
-
-
-Date.prototype.add = function(interval, value){
-  var d = this.clone();
-  if (!interval || value === 0) return d;
-  switch(interval.toLowerCase()){
-    case Date.MILLI:
-      d.setMilliseconds(this.getMilliseconds() + value);
-      break;
-    case Date.SECOND:
-      d.setSeconds(this.getSeconds() + value);
-      break;
-    case Date.MINUTE:
-      d.setMinutes(this.getMinutes() + value);
-      break;
-    case Date.HOUR:
-      d.setHours(this.getHours() + value);
-      break;
-    case Date.DAY:
-      d.setDate(this.getDate() + value);
-      break;
-    case Date.MONTH:
-      var day = this.getDate();
-      if(day > 28){
-          day = Math.min(day, this.getFirstDateOfMonth().add('mo', value).getLastDateOfMonth().getDate());
-      }
-      d.setDate(day);
-      d.setMonth(this.getMonth() + value);
-      break;
-    case Date.YEAR:
-      d.setFullYear(this.getFullYear() + value);
-      break;
-  }
-  return d;
-};
-
-
-Date.prototype.between = function(start, end){
-    var t = this.getTime();
-    return start.getTime() <= t && t <= end.getTime();
+    Date.prototype.setMonth = function(num){
+        if(num <= -1){
+            var n = Math.ceil(-num);
+            var back_year = Math.ceil(n/12);
+            var month = (n % 12) ? 12 - n % 12 : 0 ;
+            this.setFullYear(this.getFullYear() - back_year);
+            return Date.brokenSetMonth.call(this, month);
+        } else {
+            return Date.brokenSetMonth.apply(this, arguments);
+        }
+    };
 }
 
 Ext.util.DelayedTask = function(fn, scope, args){
@@ -6307,8 +6499,7 @@ Ext.extend(Ext.util.MixedCollection, Ext.util.Observable, {
 
 
     each : function(fn, scope){
-        var items = [].concat(this.items); 
-        for(var i = 0, len = items.length; i < len; i++){
+        var items = [].concat(this.items);         for(var i = 0, len = items.length; i < len; i++){
             if(fn.call(scope || items[i], items[i], i, len) === false){
                 break;
             }
@@ -6396,8 +6587,7 @@ Ext.extend(Ext.util.MixedCollection, Ext.util.Observable, {
 
     item : function(key){
         var item = typeof this.map[key] != "undefined" ? this.map[key] : this.items[key];
-        return typeof item != 'function' || this.allowFunctions ? item : null; 
-    },
+        return typeof item != 'function' || this.allowFunctions ? item : null;     },
 
 
     itemAt : function(index){
@@ -6438,8 +6628,7 @@ Ext.extend(Ext.util.MixedCollection, Ext.util.Observable, {
         return this.items[this.length-1];
     },
 
-    
-    _sort : function(property, dir, fn){
+        _sort : function(property, dir, fn){
         var dsc = String(dir).toUpperCase() == "DESC" ? -1 : 1;
         fn = fn || function(a, b){
             return a-b;
@@ -6548,10 +6737,8 @@ Ext.extend(Ext.util.MixedCollection, Ext.util.Observable, {
         return -1;
     },
 
-    
-    createValueMatcher : function(value, anyMatch, caseSensitive){
-        if(!value.exec){ 
-            value = String(value);
+        createValueMatcher : function(value, anyMatch, caseSensitive){
+        if(!value.exec){             value = String(value);
             value = new RegExp((anyMatch === true ? '' : '^') + Ext.escapeRe(value), caseSensitive ? '' : 'i');
         }
         return value;
@@ -6713,7 +6900,7 @@ Ext.util.Format = function(){
 
         
         htmlDecode : function(value){
-            return !value ? value : String(value).replace(/&amp;/g, "&").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&quot;/g, '"');
+            return !value ? value : String(value).replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
         },
 
         
@@ -6823,7 +7010,11 @@ Ext.util.Format = function(){
                 }
                 return fns[a](v);
             }
-        }()
+        }(),
+
+        nl2br : function(v){
+            return v === undefined || v === null ? '' : v.replace(/\n/g, '<br/>');
+        }
     };
 }();
 
@@ -7186,7 +7377,7 @@ Ext.extend(Ext.util.ClickRepeater, Ext.util.Observable, {
     },
 
         handleMouseReturn : function(){
-        this.el.un("mouseover", this.handleMouseReturn);
+        this.el.un("mouseover", this.handleMouseReturn, this);
         if(this.pressClass){
             this.el.addClass(this.pressClass);
         }
@@ -7195,9 +7386,9 @@ Ext.extend(Ext.util.ClickRepeater, Ext.util.Observable, {
 
         handleMouseUp : function(){
         clearTimeout(this.timer);
-        this.el.un("mouseover", this.handleMouseReturn);
-        this.el.un("mouseout", this.handleMouseOut);
-        Ext.getDoc().un("mouseup", this.handleMouseUp);
+        this.el.un("mouseover", this.handleMouseReturn, this);
+        this.el.un("mouseout", this.handleMouseOut, this);
+        Ext.getDoc().un("mouseup", this.handleMouseUp, this);
         this.el.removeClass(this.pressClass);
         this.fireEvent("mouseup", this);
     }
@@ -7325,6 +7516,10 @@ Ext.KeyMap.prototype = {
             alt = config.alt,
             fn = config.fn || config.handler,
             scope = config.scope;
+	
+	if (config.stopEvent) {
+	    this.stopEvent = config.stopEvent;    
+	}	
 
         if(typeof keyCode == "string"){
             var ks = [];
@@ -7959,7 +8154,7 @@ Ext.dd.DragDrop.prototype = {
         valid = valid && !this.invalidHandleIds[node.id];
 
         for (var i=0, len=this.invalidHandleClasses.length; valid && i<len; ++i) {
-            valid = !Dom.hasClass(node, this.invalidHandleClasses[i]);
+            valid = !Ext.fly(node).hasClass(this.invalidHandleClasses[i]);
         }
 
 
@@ -9457,7 +9652,9 @@ Ext.dd.ScrollManager = function(){
         clearProc();
         proc.el = el;
         proc.dir = dir;
-        proc.id = setInterval(doScroll, Ext.dd.ScrollManager.frequency);
+        var freq = (el.ddScrollConfig && el.ddScrollConfig.frequency) ? 
+                el.ddScrollConfig.frequency : Ext.dd.ScrollManager.frequency;
+        proc.id = setInterval(doScroll, freq);
     };
     
     var onFire = function(e, isDrop){
@@ -9687,7 +9884,11 @@ Ext.dd.StatusProxy.prototype = {
             this.ghost.update("");
             html.style.margin = "0";
             this.ghost.dom.appendChild(html);
-        }        
+        }
+        var el = this.ghost.dom.firstChild; 
+        if(el){
+            Ext.fly(el).setStyle(Ext.isIE ? 'styleFloat' : 'cssFloat', 'none');
+        }
     },
 
     
@@ -10371,7 +10572,7 @@ Ext.data.Record.prototype = {
 
     
     isModified : function(fieldName){
-        return this.modified && this.modified.hasOwnProperty(fieldName);
+        return !!(this.modified && this.modified.hasOwnProperty(fieldName));
     }
 };
 
@@ -10919,8 +11120,10 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store, {
 });
 
 Ext.data.JsonStore = function(c){
+    
+    
     Ext.data.JsonStore.superclass.constructor.call(this, Ext.apply(c, {
-        proxy: !c.data ? new Ext.data.HttpProxy({url: c.url}) : undefined,
+        proxy: c.proxy || (!c.data ? new Ext.data.HttpProxy({url: c.url}) : undefined),
         reader: new Ext.data.JsonReader(c, c.fields)
     }));
 };
@@ -11642,8 +11845,14 @@ Ext.extend(Ext.data.Node, Ext.util.Observable, {
        return (!this.parentNode ? true : this.parentNode.firstChild == this);
     },
 
+    
     hasChildNodes : function(){
         return !this.isLeaf() && this.childNodes.length > 0;
+    },
+    
+    
+    isExpandable : function(){
+        return this.attributes.expandable || this.hasChildNodes();
     },
 
     
@@ -12082,7 +12291,8 @@ Ext.ComponentMgr = function(){
             cls.xtype = xtype;
         },
 
-                create : function(config, defaultType){
+        
+        create : function(config, defaultType){
             return new types[config.xtype || defaultType](config);
         }
     };
@@ -12146,10 +12356,10 @@ Ext.Component = function(config){
     if(this.plugins){
         if(Ext.isArray(this.plugins)){
             for(var i = 0, len = this.plugins.length; i < len; i++){
-                this.plugins[i].init(this);
+                this.plugins[i] = this.initPlugin(this.plugins[i]);
             }
         }else{
-            this.plugins.init(this);
+            this.plugins = this.initPlugin(this.plugins);
         }
     }
 
@@ -12169,6 +12379,8 @@ Ext.Component = function(config){
 Ext.Component.AUTO_ID = 1000;
 
 Ext.extend(Ext.Component, Ext.util.Observable, {
+    
+    
     
     
     
@@ -12209,6 +12421,11 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
 
         getActionEl : function(){
         return this[this.actionMode];
+    },
+
+    initPlugin : function(p){
+        p.init(this);
+        return p;
     },
 
     
@@ -12255,7 +12472,9 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
                 this.disable();
             }
 
-            this.initStateEvents();
+            if(this.stateful !== false){
+                this.initStateEvents();
+            }
         }
         return this;
     },
@@ -13281,7 +13500,7 @@ Ext.BoxComponent = Ext.extend(Ext.Component, {
     
     
     
-	
+
     
 
 	    initComponent : function(){
@@ -14004,17 +14223,17 @@ Ext.Container = Ext.extend(Ext.BoxComponent, {
         return this.layout;
     },
 
-        onDestroy : function(){
+        beforeDestroy : function(){
         if(this.items){
-            var cs = this.items.items;
-            for(var i = 0, len = cs.length; i < len; i++) {
-                Ext.destroy(cs[i]);
-            }
+            Ext.destroy.apply(Ext, this.items.items);
         }
         if(this.monitorResize){
             Ext.EventManager.removeResizeListener(this.doLayout, this);
         }
-        Ext.Container.superclass.onDestroy.call(this);
+        if (this.layout && this.layout.destroy) {
+            this.layout.destroy();
+        }
+        Ext.Container.superclass.beforeDestroy.call(this);
     },
 
     
@@ -14037,7 +14256,7 @@ Ext.Container = Ext.extend(Ext.BoxComponent, {
                     if(cs[i].cascade){
                         cs[i].cascade(fn, scope, args);
                     }else{
-                        fn.apply(scope || this, args || [cs[i]]);
+                        fn.apply(scope || cs[i], args || [cs[i]]);
                     }
                 }
             }
@@ -14197,7 +14416,9 @@ Ext.layout.ContainerLayout.prototype = {
             bottom:parseInt(ms[2], 10) || 0,
             left:parseInt(ms[3], 10) || 0
         };
-    }
+    },
+
+    destroy : Ext.emptyFn
 };
 Ext.Container.LAYOUTS['auto'] = Ext.layout.ContainerLayout;
 
@@ -14387,7 +14608,7 @@ Ext.layout.ColumnLayout = Ext.extend(Ext.layout.ContainerLayout, {
         }
         this.renderAll(ct, this.innerCt);
 
-        var size = target.getViewSize();
+        var size = Ext.isIE && target.dom != Ext.getBody().dom ? target.getStyleSize() : target.getViewSize();
 
         if(size.width < 1 && size.height < 1){ 
             return;
@@ -14531,6 +14752,17 @@ Ext.layout.BorderLayout = Ext.extend(Ext.layout.ContainerLayout, {
 
         if(Ext.isIE && Ext.isStrict){             target.repaint();
         }
+    },
+
+    destroy: function() {
+        var r = ['north', 'south', 'east', 'west'];
+        for (var i = 0; i < r.length; i++) {
+            var region = this[r[i]];
+            if (region && region.split) {
+                region.split.destroy(true);
+            }
+        }
+        Ext.layout.BorderLayout.superclass.destroy.call(this);
     }
     
     
@@ -15542,7 +15774,8 @@ Ext.Panel = Ext.extend(Ext.Container, {
     
      
     
-
+    
+    
 
     
     baseCls : 'x-panel',
@@ -15568,6 +15801,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
                 toolTarget : 'header',
     collapseEl : 'bwrap',
     slideAnchor : 't',
+    disabledClass: '',
 
         deferHeight: true,
         expandDefaults: {
@@ -15635,7 +15869,8 @@ Ext.Panel = Ext.extend(Ext.Container, {
             
             this.buttons = [];
             for(var i = 0, len = btns.length; i < len; i++) {
-                if(btns[i].render){                     this.buttons.push(btns[i]);
+                if(btns[i].render){                     btns[i].ownerCt = this;
+                    this.buttons.push(btns[i]);
                 }else{
                     this.addButton(btns[i]);
                 }
@@ -15982,10 +16217,13 @@ Ext.Panel = Ext.extend(Ext.Container, {
         }
         Ext.Panel.superclass.afterRender.call(this);         this.initEvents();
     },
-    
+
         setAutoScroll : function(){
         if(this.rendered && this.autoScroll){
-            this.body.setOverflow('auto');
+            var el = this.body || this.el;
+            if(el){
+                el.setOverflow('auto');
+            }
         }
     },
 
@@ -16134,6 +16372,10 @@ Ext.Panel = Ext.extend(Ext.Container, {
                 }else if(h == 'auto'){
                     this.body.setHeight(h);
                 }
+                
+                if(this.disabled && this.el._mask){
+                    this.el._mask.setSize(this.el.dom.clientWidth, this.el.getHeight());
+                }
             }else{
                 this.queuedBodySize = {width: w, height: h};
                 if(!this.queuedExpand && this.allowQueuedExpand !== false){
@@ -16160,24 +16402,6 @@ Ext.Panel = Ext.extend(Ext.Container, {
 
         onPosition : function(){
         this.syncShadow();
-    },
-
-        onDestroy : function(){
-        if(this.tools){
-            for(var k in this.tools){
-                Ext.destroy(this.tools[k]);
-            }
-        }
-        if(this.buttons){
-            for(var b in this.buttons){
-                Ext.destroy(this.buttons[b]);
-            }
-        }
-        Ext.destroy(
-            this.topToolbar,
-            this.bottomToolbar
-        );
-        Ext.Panel.superclass.onDestroy.call(this);
     },
 
     
@@ -16265,6 +16489,21 @@ Ext.Panel = Ext.extend(Ext.Container, {
             this.footer,
             this.body
         );
+        if(this.tools){
+            for(var k in this.tools){
+                Ext.destroy(this.tools[k]);
+            }
+        }
+        if(this.buttons){
+            for(var b in this.buttons){
+                Ext.destroy(this.buttons[b]);
+            }
+        }
+        Ext.destroy(
+            this.topToolbar,
+            this.bottomToolbar
+        );
+        Ext.Panel.superclass.beforeDestroy.call(this);
     },
 
         createClasses : function(){
@@ -16440,11 +16679,11 @@ Ext.Window = Ext.extend(Ext.Panel, {
 
     initDraggable : function(){
         
-        this.dd = new Ext.Window.DD(this);  
+        this.dd = new Ext.Window.DD(this);
     },
 
        onEsc : function(){
-        this[this.closeAction]();  
+        this[this.closeAction]();
     },
 
         beforeDestroy : function(){
@@ -16456,7 +16695,7 @@ Ext.Window = Ext.extend(Ext.Panel, {
         );
         Ext.Window.superclass.beforeDestroy.call(this);
     },
-    
+
         onDestroy : function(){
         if(this.manager){
             this.manager.unregister(this);
@@ -16520,6 +16759,9 @@ Ext.Window = Ext.extend(Ext.Panel, {
         this.focus();
         this.updateHandles();
         this.saveState();
+        if(this.layout){
+            this.doLayout();
+        }
         this.fireEvent("resize", this, box.width, box.height);
     },
 
@@ -16635,6 +16877,9 @@ Ext.Window = Ext.extend(Ext.Panel, {
 
     
     hide : function(animateTarget, cb, scope){
+        if(this.activeGhost){             this.hide.defer(100, this, [animateTarget, cb, scope]);
+            return;
+        }
         if(this.hidden || this.fireEvent("beforehide", this) === false){
             return;
         }
@@ -16894,6 +17139,8 @@ Ext.Window = Ext.extend(Ext.Panel, {
         this.setPagePosition(xy[0], xy[1]);
         return this;
     }
+
+    
 });
 Ext.reg('window', Ext.Window);
 
@@ -17379,8 +17626,11 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
 
     
     deferEmptyText: true,
+    
+    trackOver: false,
 
         last: false,
+
 
         initComponent : function(){
         Ext.DataView.superclass.initComponent.call(this);
@@ -17393,6 +17643,10 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
             "beforeclick",
             
             "click",
+            
+            "mouseenter",
+            
+            "mouseleave",
             
             "containerclick",
             
@@ -17428,7 +17682,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
             scope:this
         });
 
-        if(this.overClass){
+        if(this.overClass || this.trackOver){
             this.el.on({
                 "mouseover": this.onMouseOver,
                 "mouseout": this.onMouseOut,
@@ -17445,7 +17699,6 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
     refresh : function(){
         this.clearSelections(false, true);
         this.el.update("");
-        var html = [];
         var records = this.store.getRange();
         if(records.length < 1){
             if(!this.deferEmptyText || this.hasSkippedEmptyText){
@@ -17465,7 +17718,8 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
         return data;
     },
 
-        collectData : function(records, startIndex){
+    
+    collectData : function(records, startIndex){
         var r = [];
         for(var i = 0, len = records.length; i < len; i++){
             r[r.length] = this.prepareData(records[i].data, startIndex+i, records[i]);
@@ -17592,6 +17846,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
         if(item && item !== this.lastItem){
             this.lastItem = item;
             Ext.fly(item).addClass(this.overClass);
+            this.fireEvent("mouseenter", this, this.indexOf(item), item, e);
         }
     },
 
@@ -17599,6 +17854,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
         if(this.lastItem){
             if(!e.within(this.lastItem, true)){
                 Ext.fly(this.lastItem).removeClass(this.overClass);
+                this.fireEvent("mouseleave", this, this.indexOf(this.lastItem), this.lastItem, e);
                 delete this.lastItem;
             }
         }
@@ -17703,7 +17959,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
     
     deselect : function(node){
         if(this.isSelected(node)){
-            var node = this.getNode(node);
+            node = this.getNode(node);
             this.selected.removeElement(node);
             if(this.last == node.viewIndex){
                 this.last = false;
@@ -17765,14 +18021,14 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
     getNodes : function(start, end){
         var ns = this.all.elements;
         start = start || 0;
-        end = typeof end == "undefined" ? ns.length - 1 : end;
+        end = typeof end == "undefined" ? Math.max(ns.length - 1, 0) : end;
         var nodes = [], i;
         if(start <= end){
-            for(i = start; i <= end; i++){
+            for(i = start; i <= end && ns[i]; i++){
                 nodes.push(ns[i]);
             }
         } else{
-            for(i = start; i >= end; i--){
+            for(i = start; i >= end && ns[i]; i--){
                 nodes.push(ns[i]);
             }
         }
@@ -17896,23 +18152,15 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
     
     todayTip : "{0} (Spacebar)",
     
-    minDate : null,
-    
-    maxDate : null,
-    
     minText : "This date is before the minimum date",
     
     maxText : "This date is after the maximum date",
     
     format : "m/d/y",
     
-    disabledDays : null,
+    disabledDaysText : "Disabled",
     
-    disabledDaysText : "",
-    
-    disabledDatesRE : null,
-    
-    disabledDatesText : "",
+    disabledDatesText : "Disabled",
     
     constrainToViewport : true,
     
@@ -17927,7 +18175,15 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
     monthYearText: 'Choose a month (Control+Up/Down to move years)',
     
     startDay : 0,
+    
+    showToday : true,
+    
+    
+    
+    
+    
 
+    
     initComponent : function(){
         Ext.DatePicker.superclass.initComponent.call(this);
 
@@ -17957,6 +18213,36 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
             }
             this.disabledDatesRE = new RegExp(re + ")");
         }
+    },
+    
+    
+    setDisabledDates : function(dd){
+        if(Ext.isArray(dd)){
+            this.disabledDates = dd;
+            this.disabledDatesRE = null;
+        }else{
+            this.disabledDatesRE = dd;
+        }
+        this.initDisabledDays();
+        this.update(this.value, true);
+    },
+    
+    
+    setDisabledDays : function(dd){
+        this.disabledDays = dd;
+        this.update(this.value, true);
+    },
+    
+    
+    setMinDate : function(dt){
+        this.minDate = dt;
+        this.update(this.value, true);
+    },
+    
+    
+    setMaxDate : function(dt){
+        this.maxDate = dt;
+        this.update(this.value, true);
     },
 
     
@@ -18001,7 +18287,9 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
             }
             m[m.length] = '<td><a href="#" hidefocus="on" class="x-date-date" tabIndex="1"><em><span></span></em></a></td>';
         }
-        m[m.length] = '</tr></tbody></table></td></tr><tr><td colspan="3" class="x-date-bottom" align="center"></td></tr></table><div class="x-date-mp"></div>';
+        m.push('</tr></tbody></table></td></tr>', 
+                this.showToday ? '<tr><td colspan="3" class="x-date-bottom" align="center"></td></tr>' : '', 
+                '</table><div class="x-date-mp"></div>');
 
         var el = document.createElement("div");
         el.className = "x-date-picker";
@@ -18074,8 +18362,6 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
 
         this.eventEl.on("click", this.handleDateClick,  this, {delegate: "a.x-date-date"});
 
-        this.eventEl.addKeyListener(Ext.EventObject.SPACE, this.selectToday,  this);
-
         this.el.unselectable();
         
         this.cells = this.el.select("table.x-date-inner tbody td");
@@ -18090,15 +18376,17 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
         this.mbtn.on('click', this.showMonthPicker, this);
         this.mbtn.el.child(this.mbtn.menuClassTarget).addClass("x-btn-with-menu");
 
-
-        var today = (new Date()).dateFormat(this.format);
-        this.todayBtn = new Ext.Button({
-            renderTo: this.el.child("td.x-date-bottom", true),
-            text: String.format(this.todayText, today),
-            tooltip: String.format(this.todayTip, today),
-            handler: this.selectToday,
-            scope: this
-        });
+        if(this.showToday){
+            this.todayKeyListener = this.eventEl.addKeyListener(Ext.EventObject.SPACE, this.selectToday,  this);
+            var today = (new Date()).dateFormat(this.format);
+            this.todayBtn = new Ext.Button({
+                renderTo: this.el.child("td.x-date-bottom", true),
+                text: String.format(this.todayText, today),
+                tooltip: String.format(this.todayTip, today),
+                handler: this.selectToday,
+                scope: this
+            });
+        }
         
         if(Ext.isIE){
             this.el.repaint();
@@ -18106,6 +18394,7 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
         this.update(this.value);
     },
 
+    
     createMonthPicker : function(){
         if(!this.monthPicker.dom.firstChild){
             var buf = ['<table border="0" cellspacing="0">'];
@@ -18144,6 +18433,7 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
         }
     },
 
+    
     showMonthPicker : function(){
         this.createMonthPicker();
         var size = this.el.getSize();
@@ -18158,6 +18448,7 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
         this.monthPicker.slideIn('t', {duration:.2});
     },
 
+    
     updateMPYear : function(y){
         this.mpyear = y;
         var ys = this.mpYears.elements;
@@ -18176,16 +18467,19 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
         }
     },
 
+    
     updateMPMonth : function(sm){
         this.mpMonths.each(function(m, a, i){
             m[m.dom.xmonth == sm ? 'addClass' : 'removeClass']('x-date-mp-sel');
         });
     },
 
+    
     selectMPMonth: function(m){
         
     },
 
+    
     onMonthClick : function(e, t){
         e.stopEvent();
         var el = new Ext.Element(t), pn;
@@ -18219,6 +18513,7 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
         }
     },
 
+    
     onMonthDblClick : function(e, t){
         e.stopEvent();
         var el = new Ext.Element(t), pn;
@@ -18232,6 +18527,7 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
         }
     },
 
+    
     hideMonthPicker : function(disableAnim){
         if(this.monthPicker){
             if(disableAnim === true){
@@ -18285,15 +18581,17 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
 
     
     selectToday : function(){
-        this.setValue(new Date().clearTime());
-        this.fireEvent("select", this, this.value);
+        if(this.todayBtn && !this.todayBtn.disabled){
+	        this.setValue(new Date().clearTime());
+	        this.fireEvent("select", this, this.value);
+        }
     },
 
     
-    update : function(date){
+    update : function(date, forceRefresh){
         var vd = this.activeDate;
         this.activeDate = date;
-        if(vd && this.el){
+        if(!forceRefresh && vd && this.el){
             var t = date.getTime();
             if(vd.getMonth() == date.getMonth() && vd.getFullYear() == date.getFullYear()){
                 this.cells.removeClass("x-date-selected");
@@ -18336,6 +18634,16 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
         var ddays = this.disabledDays ? this.disabledDays.join("") : false;
         var ddaysText = this.disabledDaysText;
         var format = this.format;
+        
+        if(this.showToday){
+            var td = new Date().clearTime();
+            var disable = (td < min || td > max || 
+                (ddMatch && format && ddMatch.test(td.dateFormat(format))) || 
+                (ddays && ddays.indexOf(td.getDay()) != -1));
+                        
+            this.todayBtn.setDisabled(disable);
+            this.todayKeyListener[disable ? 'disable' : 'enable']();
+        }
 
         var setCellClass = function(cal, cell){
             cell.title = "";
@@ -18421,8 +18729,7 @@ Ext.DatePicker = Ext.extend(Ext.Component, {
     
     beforeDestroy : function() {
         if(this.rendered){
-	        this.mbtn.destroy();
-	        this.todayBtn.destroy();
+            Ext.destroy(this.mbtn, this.todayBtn);
         }
     }
 
@@ -18527,9 +18834,11 @@ Ext.TabPanel = Ext.extend(Ext.Panel,  {
 
         this.stripWrap = st.createChild({cls:'x-tab-strip-wrap', cn:{
             tag:'ul', cls:'x-tab-strip x-tab-strip-'+this.tabPosition}});
-        this.stripSpacer = st.createChild({cls:'x-tab-strip-spacer'});
-        this.strip = new Ext.Element(this.stripWrap.dom.firstChild);
 
+        var beforeEl = (this.tabPosition=='bottom' ? this.stripWrap : null);
+        this.stripSpacer = st.createChild({cls:'x-tab-strip-spacer'}, beforeEl);
+        this.strip = new Ext.Element(this.stripWrap.dom.firstChild);
+        
         this.edge = this.strip.createChild({tag:'li', cls:'x-tab-edge'});
         this.strip.createChild({cls:'x-clear'});
 
@@ -18563,7 +18872,6 @@ Ext.TabPanel = Ext.extend(Ext.Panel,  {
         this.on('remove', this.onRemove, this);
 
         this.strip.on('mousedown', this.onStripMouseDown, this);
-        this.strip.on('click', this.onStripClick, this);
         this.strip.on('contextmenu', this.onStripContextMenu, this);
         if(this.enableTabScroll){
             this.strip.on('mousewheel', this.onWheel, this);
@@ -18591,23 +18899,16 @@ Ext.TabPanel = Ext.extend(Ext.Panel,  {
     },
 
         onStripMouseDown : function(e){
-        e.preventDefault();
         if(e.button != 0){
             return;
         }
+        e.preventDefault();
         var t = this.findTargets(e);
         if(t.close){
             this.remove(t.item);
             return;
         }
         if(t.item && t.item != this.activeTab){
-            this.setActiveTab(t.item);
-        }
-    },
-
-        onStripClick : function(e){
-        var t = this.findTargets(e);
-        if(!t.close && t.item && t.item != this.activeTab){
             this.setActiveTab(t.item);
         }
     },
@@ -19401,7 +19702,10 @@ Ext.Button = Ext.extend(Ext.Component, {
             var internal = e.within(this.el,  true);
             if(!internal){
                 this.el.addClass("x-btn-over");
-                Ext.getDoc().on('mouseover', this.monitorMouseOver, this);
+                if(!this.monitoringMouseOver){
+                    Ext.getDoc().on('mouseover', this.monitorMouseOver, this);
+                    this.monitoringMouseOver = true;
+                }
                 this.fireEvent('mouseover', this, e);
             }
             if(this.isMenuTriggerOver(e, internal)){
@@ -19412,7 +19716,10 @@ Ext.Button = Ext.extend(Ext.Component, {
 
         monitorMouseOver : function(e){
         if(e.target != this.el.dom && !e.within(this.el)){
-            Ext.getDoc().un('mouseover', this.monitorMouseOver, this);
+            if(this.monitoringMouseOver){
+                Ext.getDoc().un('mouseover', this.monitorMouseOver, this);
+                this.monitoringMouseOver = false;
+            }
             this.onMouseOut(e);
         }
     },
@@ -19955,7 +20262,7 @@ Ext.extend(T, Ext.BoxComponent, {
         field.render(td);
         var ti = new T.Item(td.firstChild);
         ti.render(td);
-        this.items.add(ti);
+        this.items.add(field);
         return ti;
     },
 
@@ -20200,6 +20507,7 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
     paramNames : {start: 'start', limit: 'limit'},
 
     initComponent : function(){
+        this.addEvents('change', 'beforechange');
         Ext.PagingToolbar.superclass.initComponent.call(this);
         this.cursor = 0;
         this.bind(this.store);
@@ -20281,14 +20589,15 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
        this.cursor = o.params ? o.params[this.paramNames.start] : 0;
        var d = this.getPageData(), ap = d.activePage, ps = d.pages;
 
-       this.afterTextEl.el.innerHTML = String.format(this.afterPageText, d.pages);
-       this.field.dom.value = ap;
-       this.first.setDisabled(ap == 1);
-       this.prev.setDisabled(ap == 1);
-       this.next.setDisabled(ap == ps);
-       this.last.setDisabled(ap == ps);
-       this.loading.enable();
-       this.updateInfo();
+        this.afterTextEl.el.innerHTML = String.format(this.afterPageText, d.pages);
+        this.field.dom.value = ap;
+        this.first.setDisabled(ap == 1);
+        this.prev.setDisabled(ap == 1);
+        this.next.setDisabled(ap == ps);
+        this.last.setDisabled(ap == ps);
+        this.loading.enable();
+        this.updateInfo();
+        this.fireEvent('change', this, d);
     },
 
         getPageData : function(){
@@ -20320,7 +20629,8 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
         var k = e.getKey(), d = this.getPageData(), pageNum;
         if (k == e.RETURN) {
             e.stopEvent();
-            if(pageNum = this.readPage(d)){
+            pageNum = this.readPage(d);
+            if(pageNum !== false){
                 pageNum = Math.min(Math.max(1, pageNum), d.pages) - 1;
                 this.doLoad(pageNum * this.pageSize);
             }
@@ -20353,7 +20663,14 @@ Ext.PagingToolbar = Ext.extend(Ext.Toolbar, {
         var o = {}, pn = this.paramNames;
         o[pn.start] = start;
         o[pn.limit] = this.pageSize;
-        this.store.load({params:o});
+        if(this.fireEvent('beforechange', this, o) !== false){
+            this.store.load({params:o});
+        }
+    },
+
+    
+    changePage: function(page){
+        this.doLoad(((page-1) * this.pageSize).constrain(0, this.store.getTotalCount()));  
     },
 
         onClick : function(which){
@@ -20420,7 +20737,7 @@ Ext.Resizable = function(el, config){
     }
 
     
-    this.proxy = this.el.createProxy({tag: "div", cls: "x-resizable-proxy", id: this.el.id + "-rzproxy"});
+    this.proxy = this.el.createProxy({tag: "div", cls: "x-resizable-proxy", id: this.el.id + "-rzproxy"}, Ext.getBody());
     this.proxy.unselectable();
     this.proxy.enableDisplayMode('block');
 
@@ -20980,6 +21297,8 @@ Ext.extend(Ext.Editor, Ext.Component, {
             
             "complete",
             
+            "canceledit",
+            
             "specialkey"
         );
     },
@@ -21014,14 +21333,18 @@ Ext.extend(Ext.Editor, Ext.Component, {
         }
     },
 
-    onSpecialKey : function(field, e){
-        if(this.completeOnEnter && e.getKey() == e.ENTER){
+        onSpecialKey : function(field, e){
+        var key = e.getKey();
+        if(this.completeOnEnter && key == e.ENTER){
             e.stopEvent();
             this.completeEdit();
-        }else if(this.cancelOnEsc && e.getKey() == e.ESC){
+        }else if(this.cancelOnEsc && key == e.ESC){
             this.cancelEdit();
         }else{
             this.fireEvent('specialkey', field, e);
+        }
+        if(this.field.triggerBlur && (key == e.ENTER || key == e.ESC || key == e.TAB)){
+            this.field.triggerBlur();
         }
     },
 
@@ -21067,6 +21390,9 @@ Ext.extend(Ext.Editor, Ext.Component, {
         delete this.field.lastSize;
         this.field.setSize(w, h);
         if(this.el){
+	        if(Ext.isGecko2 || Ext.isOpera){
+	            	            this.el.setSize(w, h);
+	        }
             this.el.sync();
         }
     },
@@ -21126,10 +21452,12 @@ Ext.extend(Ext.Editor, Ext.Component, {
     
     cancelEdit : function(remainVisible){
         if(this.editing){
+            var v = this.getValue();
             this.setValue(this.startValue);
             if(remainVisible !== true){
                 this.hide();
             }
+            this.fireEvent("canceledit", this, v, this.startValue);
         }
     },
 
@@ -21176,24 +21504,21 @@ Ext.MessageBox = function(){
     var bodyEl, msgEl, textboxEl, textareaEl, progressBar, pp, iconEl, spacerEl;
     var buttons, activeTextEl, bwidth, iconCls = '';
 
-    
-    var handleButton = function(button){
+        var handleButton = function(button){
         if(dlg.isVisible()){
             dlg.hide();
             Ext.callback(opt.fn, opt.scope||window, [button, activeTextEl.dom.value], 1);
         }
     };
 
-    
-    var handleHide = function(){
+        var handleHide = function(){
         if(opt && opt.cls){
             dlg.el.removeClass(opt.cls);
         }
         progressBar.reset();
     };
 
-    
-    var handleEsc = function(d, k, e){
+        var handleEsc = function(d, k, e){
         if(opt && opt.closable !== false){
             dlg.hide();
         }
@@ -21202,8 +21527,7 @@ Ext.MessageBox = function(){
         }
     };
 
-    
-    var updateButtons = function(b){
+        var updateButtons = function(b){
         var width = 0;
         if(!b){
             buttons["ok"].hide();
@@ -21259,8 +21583,7 @@ Ext.MessageBox = function(){
                 });
                 buttons = {};
                 var bt = this.buttonText;
-                
-                buttons["ok"] = dlg.addButton(bt["ok"], handleButton.createCallback("ok"));
+                                buttons["ok"] = dlg.addButton(bt["ok"], handleButton.createCallback("ok"));
                 buttons["yes"] = dlg.addButton(bt["yes"], handleButton.createCallback("yes"));
                 buttons["no"] = dlg.addButton(bt["no"], handleButton.createCallback("no"));
                 buttons["cancel"] = dlg.addButton(bt["cancel"], handleButton.createCallback("cancel"));
@@ -21298,8 +21621,7 @@ Ext.MessageBox = function(){
         
         updateText : function(text){
             if(!dlg.isVisible() && !opt.width){
-                dlg.setSize(this.maxWidth, 100); 
-            }
+                dlg.setSize(this.maxWidth, 100);             }
             msgEl.update(text || '&#160;');
 
             var iw = iconCls != '' ? (iconEl.getWidth() + iconEl.getMargins('lr')) : 0;
@@ -21307,9 +21629,7 @@ Ext.MessageBox = function(){
             var fw = dlg.getFrameWidth('lr');
             var bw = dlg.body.getFrameWidth('lr');
             if (Ext.isIE && iw > 0){
-                
-                
-                iw += 3;
+                                                iw += 3;
             }
             var w = Math.max(Math.min(opt.width || iw+mw+fw+bw, this.maxWidth),
                         Math.max(opt.minWidth || this.minWidth, bwidth || 0));
@@ -21391,7 +21711,7 @@ Ext.MessageBox = function(){
                 }
             }
             if(opt.iconCls){
-            	d.setIconClass(opt.iconCls);
+              d.setIconClass(opt.iconCls);
             }
             this.setIcon(opt.icon);
             bwidth = updateButtons(opt.buttons);
@@ -21405,14 +21725,12 @@ Ext.MessageBox = function(){
             d.modal = opt.modal !== false;
             d.mask = opt.modal !== false ? mask : false;
             if(!d.isVisible()){
-                
-                document.body.appendChild(dlg.el.dom);
+                                document.body.appendChild(dlg.el.dom);
                 d.setAnimateTarget(opt.animEl);
                 d.show(opt.animEl);
             }
 
-            
-            d.on('show', function(){
+                        d.on('show', function(){
                 if(allowClose === true){
                     d.keyMap.enable();
                 }else{
@@ -21610,6 +21928,12 @@ Ext.Tip = Ext.extend(Ext.Panel, {
         }
         bw += this.getFrameWidth() + (this.closable ? 20 : 0) + this.body.getPadding("lr");
         this.setWidth(bw.constrain(this.minWidth, this.maxWidth));
+        
+        
+        if(Ext.isIE7 && !this.repainted){
+            this.el.repaint();
+            this.repainted = true;
+        }
     },
 
     
@@ -21965,10 +22289,19 @@ Ext.QuickTips = function(){
     var tip, locks = [];
     return {
         
-        init : function(){
-            if(!tip){
-                tip = new Ext.QuickTip({elements:'header,body'});
-            }
+        init : function(autoRender){
+		    if(!tip){
+		        if(!Ext.isReady){
+		            Ext.onReady(function(){
+		                Ext.QuickTips.init(autoRender);
+		            });
+		            return;
+		        }
+		        tip = new Ext.QuickTip({elements:'header,body'});
+		        if(autoRender !== false){
+		            tip.render(Ext.getBody());
+		        }
+		    }
         },
 
         
@@ -22030,6 +22363,17 @@ Ext.tree.TreePanel = Ext.extend(Ext.Panel, {
         if(!this.eventModel){
             this.eventModel = new Ext.tree.TreeEventModel(this);
         }
+        
+        
+        var l = this.loader;
+        if(!l){
+            l = new Ext.tree.TreeLoader({
+                dataUrl: this.dataUrl
+            });
+        }else if(typeof l == 'object' && !l.load){
+            l = new Ext.tree.TreeLoader(l);
+        }
+        this.loader = l;
         
         this.nodeHash = {};
 
@@ -22120,6 +22464,9 @@ Ext.tree.TreePanel = Ext.extend(Ext.Panel, {
 
     
     setRootNode : function(node){
+        if(!node.render){ 
+            node = this.loader.createNode(node);
+        }
         this.root = node;
         node.ownerTree = this;
         node.isRoot = true;
@@ -22376,6 +22723,9 @@ Ext.tree.TreePanel = Ext.extend(Ext.Panel, {
     
     
 });
+
+Ext.tree.TreePanel.nodeTypes = {};
+
 Ext.reg('treepanel', Ext.tree.TreePanel);
 Ext.tree.TreeEventModel = function(tree){
     this.tree = tree;
@@ -22828,6 +23178,11 @@ Ext.extend(Ext.tree.TreeNode, Ext.data.Node, {
         return this.ui;
     },
 
+    getLoader : function(){
+        var owner;
+        return this.loader || ((owner = this.getOwnerTree()) && owner.loader ? owner.loader : new Ext.tree.TreeLoader());
+    },
+
     
     setFirstChild : function(node){
         var of = this.firstChild;
@@ -22854,8 +23209,11 @@ Ext.extend(Ext.tree.TreeNode, Ext.data.Node, {
 
     
     
-    appendChild : function(){
-        var node = Ext.tree.TreeNode.superclass.appendChild.apply(this, arguments);
+    appendChild : function(n){
+        if(!n.render && !Ext.isArray(n)){
+            n = this.getLoader().createNode(n);
+        }
+        var node = Ext.tree.TreeNode.superclass.appendChild.call(this, n);
         if(node && this.childrenRendered){
             node.render();
         }
@@ -22884,6 +23242,9 @@ Ext.extend(Ext.tree.TreeNode, Ext.data.Node, {
 
     
     insertBefore : function(node, refNode){
+        if(!node.render){ 
+            node = this.getLoader().createNode(node);
+        }
         var newNode = Ext.tree.TreeNode.superclass.insertBefore.apply(this, arguments);
         if(newNode && refNode && this.childrenRendered){
             node.render();
@@ -23119,18 +23480,22 @@ Ext.extend(Ext.tree.TreeNode, Ext.data.Node, {
     },
 
     destroy : function(){
-        for(var i = 0,l = this.childNodes.length; i < l; i++){
-            this.childNodes[i].destroy();
+        if(this.childNodes){
+	        for(var i = 0,l = this.childNodes.length; i < l; i++){
+	            this.childNodes[i].destroy();
+	        }
+            this.childNodes = null;
         }
-        this.childNodes = null;
         if(this.ui.destroy){
             this.ui.destroy();
         }
     }
 });
 
+Ext.tree.TreePanel.nodeTypes.node = Ext.tree.TreeNode;
+
  Ext.tree.AsyncTreeNode = function(config){
-    this.loaded = false;
+    this.loaded = config && config.loaded === true;
     this.loading = false;
     Ext.tree.AsyncTreeNode.superclass.constructor.apply(this, arguments);
     
@@ -23206,6 +23571,8 @@ Ext.extend(Ext.tree.AsyncTreeNode, Ext.tree.TreeNode, {
         this.expand(false, false, callback);
     }
 });
+
+Ext.tree.TreePanel.nodeTypes.async = Ext.tree.AsyncTreeNode;
 
 Ext.tree.TreeNodeUI = function(node){
     this.node = node;
@@ -23385,7 +23752,7 @@ Ext.tree.TreeNodeUI.prototype = {
                 return;
             }
 
-            if(this.node.attributes.singleClickExpand && !this.animating && this.node.hasChildNodes()){
+            if(this.node.attributes.singleClickExpand && !this.animating && this.node.isExpandable()){
                 this.node.toggle();
             }
 
@@ -23404,7 +23771,7 @@ Ext.tree.TreeNodeUI.prototype = {
         if(this.checkbox){
             this.toggleCheck();
         }
-        if(!this.animating && this.node.hasChildNodes()){
+        if(!this.animating && this.node.isExpandable()){
             this.node.toggle();
         }
         this.fireEvent("dblclick", this.node, e);
@@ -23429,7 +23796,7 @@ Ext.tree.TreeNodeUI.prototype = {
 
     
     ecClick : function(e){
-        if(!this.animating && (this.node.hasChildNodes() || this.node.attributes.expandable)){
+        if(!this.animating && this.node.isExpandable()){
             this.node.toggle();
         }
     },
@@ -23487,7 +23854,7 @@ Ext.tree.TreeNodeUI.prototype = {
     animExpand : function(callback){
         var ct = Ext.get(this.ctNode);
         ct.stopFx();
-        if(!this.node.hasChildNodes()){
+        if(!this.node.isExpandable()){
             this.updateExpandIcon();
             this.ctNode.style.display = "";
             Ext.callback(callback);
@@ -23670,8 +24037,7 @@ Ext.tree.TreeNodeUI.prototype = {
         if(this.rendered){
             var n = this.node, c1, c2;
             var cls = n.isLast() ? "x-tree-elbow-end" : "x-tree-elbow";
-            var hasChild = n.hasChildNodes();
-            if(hasChild || n.attributes.expandable){
+            if(n.isExpandable()){
                 if(n.expanded){
                     cls += "-minus";
                     c1 = "x-tree-node-collapsed";
@@ -23868,7 +24234,7 @@ Ext.extend(Ext.tree.TreeLoader, Ext.util.Observable, {
     },
 
     isLoading : function(){
-        return this.transId ? true : false;
+        return !!this.transId;
     },
 
     abort : function(){
@@ -23889,9 +24255,13 @@ Ext.extend(Ext.tree.TreeLoader, Ext.util.Observable, {
         if(typeof attr.uiProvider == 'string'){
            attr.uiProvider = this.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
         }
-        return(attr.leaf ?
+        if(attr.nodeType){
+            return new Ext.tree.TreePanel.nodeTypes[attr.nodeType](attr);
+        }else{
+            return attr.leaf ?
                         new Ext.tree.TreeNode(attr) :
-                        new Ext.tree.AsyncTreeNode(attr));
+                        new Ext.tree.AsyncTreeNode(attr);
+        }
     },
 
     processResponse : function(response, node, callback){
@@ -24294,7 +24664,7 @@ Ext.extend(Ext.tree.TreeDropZone, Ext.dd.DropZone, {
             }
         }
         n.ui.focus();
-        if(this.tree.hlDrop){
+        if(Ext.enableFx && this.tree.hlDrop){
             n.ui.highlight();
         }
         t.ui.endDrop();
@@ -24303,7 +24673,7 @@ Ext.extend(Ext.tree.TreeDropZone, Ext.dd.DropZone, {
 
     
     afterNodeMoved : function(dd, data, e, targetNode, dropNode){
-        if(this.tree.hlDrop){
+        if(Ext.enableFx && this.tree.hlDrop){
             dropNode.ui.focus();
             dropNode.ui.highlight();
         }
@@ -24394,6 +24764,14 @@ Ext.extend(Ext.tree.TreeDragZone, Ext.dd.DragZone, {
         var sm = this.tree.getSelectionModel();
         sm.clearSelections();
         sm.select(this.dragData.node);
+    },
+    
+    
+    afterRepair : function(){
+        if (Ext.enableFx && this.tree.hlDrop) {
+            Ext.Element.fly(this.dragData.ddel).highlight(this.hlColor || "c3daf9");
+        }
+        this.dragging = false;
     }
 });
 }
@@ -24450,7 +24828,11 @@ Ext.extend(Ext.tree.TreeEditor, Ext.Editor, {
         triggerEdit : function(node, defer){
         this.completeEdit();
 		if(node.attributes.editable !== false){
+	       
 			this.editNode = node;
+            if(this.tree.autoScroll){
+                node.ui.getEl().scrollIntoView(this.tree.body);
+            }
             this.autoEditTimer = this.startEdit.defer(this.editDelay, this, [node.ui.textNode, node.text]);
             return false;
         }
@@ -24544,10 +24926,12 @@ Ext.extend(Ext.menu.Menu, Ext.util.Observable, {
     defaultAlign : "tl-bl?",
     
     allowOtherMenus : false,
+    
+    ignoreParentClicks : false,
 
-    hidden:true,
+        hidden:true,
 
-    createEl : function(){
+        createEl : function(){
         return new Ext.Layer({
             cls: "x-menu",
             shadow:this.shadow,
@@ -24622,8 +25006,12 @@ Ext.extend(Ext.menu.Menu, Ext.util.Observable, {
         onClick : function(e){
         var t;
         if(t = this.findTargetItem(e)){
-            t.onClick(e);
-            this.fireEvent("click", this, t, e);
+            if(t.menu && this.ignoreParentClicks){
+                t.expandMenu();
+            }else{
+                t.onClick(e);
+                this.fireEvent("click", this, t, e);
+            }
         }
     },
 
@@ -24658,6 +25046,7 @@ Ext.extend(Ext.menu.Menu, Ext.util.Observable, {
                 this.setActiveItem(t, true);
             }
         }
+        this.over = true;
         this.fireEvent("mouseover", this, e, t);
     },
 
@@ -24669,6 +25058,7 @@ Ext.extend(Ext.menu.Menu, Ext.util.Observable, {
                 delete this.activeItem;
             }
         }
+        this.over = false;
         this.fireEvent("mouseout", this, e, t);
     },
 
@@ -25112,6 +25502,7 @@ Ext.extend(Ext.menu.BaseItem, Ext.Component, {
         actionMode : "container",
 
         render : function(container, parentMenu){
+        
         this.parentMenu = parentMenu;
         Ext.menu.BaseItem.superclass.render.call(this, container);
         this.container.menuItemId = this.id;
@@ -25172,9 +25563,11 @@ Ext.extend(Ext.menu.BaseItem, Ext.Component, {
             }
 });
 
-Ext.menu.TextItem = function(text){
-    this.text = text;
-    Ext.menu.TextItem.superclass.constructor.call(this);
+Ext.menu.TextItem = function(cfg){
+    if(typeof cfg == 'string'){
+        cfg = {text: cfg}
+    }
+    Ext.menu.TextItem.superclass.constructor.call(this, cfg);
 };
 
 Ext.extend(Ext.menu.TextItem, Ext.menu.BaseItem, {
@@ -25333,7 +25726,11 @@ Ext.extend(Ext.menu.Item, Ext.menu.BaseItem, {
 
         deferHide : function(){
         delete this.hideTimer;
-        this.menu.hide();
+        if(this.menu.over){
+            this.parentMenu.setActiveItem(this, false);
+        }else{
+            this.menu.hide();
+        }
     }
 });
 
@@ -25595,15 +25992,15 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         }
 
         this.el.addClass([this.fieldClass, this.cls]);
-        this.initValue();
     },
 
         initValue : function(){
         if(this.value !== undefined){
             this.setValue(this.value);
-        }else if(this.el.dom.value.length > 0){
+        }else if(this.el.dom.value.length > 0 && this.el.dom.value != this.emptyText){
             this.setValue(this.el.dom.value);
         }
+                this.originalValue = this.getValue();
     },
 
     
@@ -25617,6 +26014,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         afterRender : function(){
         Ext.form.Field.superclass.afterRender.call(this);
         this.initEvents();
+        this.initValue();
     },
 
         fireKey : function(e){
@@ -25634,7 +26032,9 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         initEvents : function(){
         this.el.on(Ext.isIE || Ext.isSafari3 ? "keydown" : "keypress", this.fireKey,  this);
         this.el.on("focus", this.onFocus,  this);
-        this.el.on("blur", this.onBlur,  this);
+        
+                var o = this.inEditor && Ext.isWindows && Ext.isGecko ? {buffer:10} : null;
+        this.el.on("blur", this.onBlur,  this, o);
 
                 this.originalValue = this.getValue();
     },
@@ -25649,7 +26049,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         }
     },
 
-    beforeBlur : Ext.emptyFn,
+        beforeBlur : Ext.emptyFn,
 
         onBlur : function(){
         this.beforeBlur();
@@ -25701,6 +26101,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         }
         this.el.addClass(this.invalidClass);
         msg = msg || this.invalidText;
+
         switch(this.msgTarget){
             case 'qtip':
                 this.el.dom.qtip = msg;
@@ -25714,6 +26115,9 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             case 'under':
                 if(!this.errorEl){
                     var elp = this.getErrorCt();
+                    if(!elp){                         this.el.dom.title = msg;
+                        break;
+                    }
                     this.errorEl = elp.createChild({cls:'x-form-invalid-msg'});
                     this.errorEl.setWidth(elp.getWidth(true)-20);
                 }
@@ -25723,6 +26127,9 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             case 'side':
                 if(!this.errorIcon){
                     var elp = this.getErrorCt();
+                    if(!elp){                         this.el.dom.title = msg;
+                        break;
+                    }
                     this.errorIcon = elp.createChild({cls:'x-form-invalid-icon'});
                 }
                 this.alignErrorIcon();
@@ -25815,13 +26222,13 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         }
     },
 
-    adjustSize : function(w, h){
+        adjustSize : function(w, h){
         var s = Ext.form.Field.superclass.adjustSize.call(this, w, h);
         s.width = this.adjustWidth(this.el.dom.tagName, s.width);
         return s;
     },
 
-    adjustWidth : function(tag, w){
+        adjustWidth : function(tag, w){
         tag = tag.toLowerCase();
         if(typeof w == 'number' && !Ext.isSafari){
             if(Ext.isIE && (tag == 'input' || tag == 'textarea')){
@@ -25851,6 +26258,82 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 
     
 });
+
+Ext.form.MessageTargets = {
+    'qtip' : {
+        mark: function(f){
+            this.el.dom.qtip = msg;
+            this.el.dom.qclass = 'x-form-invalid-tip';
+            if(Ext.QuickTips){                 Ext.QuickTips.enable();
+            }
+        },
+        clear: function(f){
+            this.el.dom.qtip = '';
+        }
+    },
+    'title' : {
+        mark: function(f){
+            this.el.dom.title = msg;
+        },
+        clear: function(f){
+            this.el.dom.title = '';
+        }
+    },
+    'under' : {
+        mark: function(f){
+            if(!this.errorEl){
+                var elp = this.getErrorCt();
+                if(!elp){                     this.el.dom.title = msg;
+                    return;
+                }
+                this.errorEl = elp.createChild({cls:'x-form-invalid-msg'});
+                this.errorEl.setWidth(elp.getWidth(true)-20);
+            }
+            this.errorEl.update(msg);
+            Ext.form.Field.msgFx[this.msgFx].show(this.errorEl, this);
+        },
+        clear: function(f){
+            if(this.errorEl){
+                Ext.form.Field.msgFx[this.msgFx].hide(this.errorEl, this);
+            }else{
+                this.el.dom.title = '';
+            }
+        }
+    },
+    'side' : {
+        mark: function(f){
+            if(!this.errorIcon){
+                var elp = this.getErrorCt();
+                if(!elp){                     this.el.dom.title = msg;
+                    return;
+                }
+                this.errorIcon = elp.createChild({cls:'x-form-invalid-icon'});
+            }
+            this.alignErrorIcon();
+            this.errorIcon.dom.qtip = msg;
+            this.errorIcon.dom.qclass = 'x-form-invalid-tip';
+            this.errorIcon.show();
+            this.on('resize', this.alignErrorIcon, this);
+        },
+        clear: function(f){
+            if(this.errorIcon){
+                this.errorIcon.dom.qtip = '';
+                this.errorIcon.hide();
+                this.un('resize', this.alignErrorIcon, this);
+            }else{
+                this.el.dom.title = '';
+            }
+        }
+    },
+    'around' : {
+        mark: function(f){
+
+        },
+        clear: function(f){
+
+        }
+    }
+};
 
 
 Ext.form.Field.msgFx = {
@@ -25956,6 +26439,13 @@ Ext.form.TextField = Ext.extend(Ext.form.Field,  {
         }
         if(this.selectOnFocus || this.emptyText){
             this.on("focus", this.preFocus, this);
+            this.el.on('mousedown', function(){
+                if(!this.hasFocus){
+                    this.el.on('mouseup', function(e){
+                        e.preventDefault();
+                    }, this, {single:true});
+                }
+            }, this);
             if(this.emptyText){
                 this.on('blur', this.postBlur, this);
                 this.applyEmptyText();
@@ -26041,12 +26531,15 @@ Ext.form.TextField = Ext.extend(Ext.form.Field,  {
     },
 
         filterKeys : function(e){
+        if(e.ctrlKey){
+            return;
+        }
         var k = e.getKey();
-        if(!Ext.isIE && (e.isNavKeyPress() || k == e.BACKSPACE || (k == e.DELETE && e.button == -1))){
+        if(Ext.isGecko && (e.isNavKeyPress() || k == e.BACKSPACE || (k == e.DELETE && e.button == -1))){
             return;
         }
         var c = e.getCharCode(), cc = String.fromCharCode(c);
-        if(Ext.isIE && (e.isSpecialKey() || !cc)){
+        if(!Ext.isGecko && e.isSpecialKey() && !cc){
             return;
         }
         if(!this.maskRe.test(cc)){
@@ -26175,7 +26668,9 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
     },
 
         alignErrorIcon : function(){
-        this.errorIcon.alignTo(this.wrap, 'tl-tr', [2, 0]);
+        if(this.wrap){
+            this.errorIcon.alignTo(this.wrap, 'tl-tr', [2, 0]);
+        }
     },
 
         onRender : function(ct, position){
@@ -26189,6 +26684,15 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
         this.initTrigger();
         if(!this.width){
             this.wrap.setWidth(this.el.getWidth()+this.trigger.getWidth());
+        }
+    },
+
+    afterRender : function(){
+        Ext.form.TriggerField.superclass.afterRender.call(this);
+        var y;
+        if(Ext.isIE && this.el.getY() != (y = this.trigger.getY())){
+            this.el.position();
+            this.el.setY(y);
         }
     },
 
@@ -26238,7 +26742,7 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
 
         triggerBlur : function(){
         this.mimicing = false;
-        Ext.get(Ext.isIE ? document.body : document).un("mousedown", this.mimicBlur);
+        Ext.get(Ext.isIE ? document.body : document).un("mousedown", this.mimicBlur, this);
         if(this.monitorTab){
             this.el.un("keydown", this.checkTab, this);
         }
@@ -26256,17 +26760,17 @@ Ext.form.TriggerField = Ext.extend(Ext.form.TextField,  {
         onDisable : function(){
         Ext.form.TriggerField.superclass.onDisable.call(this);
         if(this.wrap){
-            this.wrap.addClass('x-item-disabled');
+            this.wrap.addClass(this.disabledClass);
+            this.el.removeClass(this.disabledClass);
         }
     },
 
         onEnable : function(){
         Ext.form.TriggerField.superclass.onEnable.call(this);
         if(this.wrap){
-            this.wrap.removeClass('x-item-disabled');
+            this.wrap.removeClass(this.disabledClass);
         }
     },
-
 
         onShow : function(){
         if(this.wrap){
@@ -26385,6 +26889,7 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField,  {
         if(!e.isNavKeyPress() || e.getKey() == e.ENTER){
             this.autoSize();
         }
+        Ext.form.TextArea.superclass.onKeyUp.call(this, e);
     },
 
     
@@ -26527,17 +27032,9 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
     
     altFormats : "m/d/Y|n/j/Y|n/j/y|m/j/y|n/d/y|m/j/Y|n/d/Y|m-d-y|m-d-Y|m/d|m-d|md|mdy|mdY|d|Y-m-d",
     
-    disabledDays : null,
-    
     disabledDaysText : "Disabled",
     
-    disabledDates : null,
-    
     disabledDatesText : "Disabled",
-    
-    minValue : null,
-    
-    maxValue : null,
     
     minText : "The date in this field must be equal to or after {0}",
     
@@ -26546,6 +27043,12 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
     invalidText : "{0} is not a valid date - it must be in the format {1}",
     
     triggerClass : 'x-form-date-trigger',
+    
+    showToday : true,
+    
+    
+    
+    
     
 
         defaultAutoCreate : {tag: "input", type: "text", size: "10", autocomplete: "off"},
@@ -26559,6 +27062,10 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
             this.maxValue = this.parseDate(this.maxValue);
         }
         this.ddMatch = null;
+        this.initDisabledDays();
+    },
+
+        initDisabledDays : function(){
         if(this.disabledDates){
             var dd = this.disabledDates;
             var re = "(?:";
@@ -26566,7 +27073,40 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
                 re += dd[i];
                 if(i != dd.length-1) re += "|";
             }
-            this.ddMatch = new RegExp(re + ")");
+            this.disabledDatesRE = new RegExp(re + ")");
+        }
+    },
+
+    
+    setDisabledDates : function(dd){
+        this.disabledDates = dd;
+        this.initDisabledDays();
+        if(this.menu){
+            this.menu.picker.setDisabledDates(this.disabledDatesRE);
+        }
+    },
+
+    
+    setDisabledDays : function(dd){
+        this.disabledDays = dd;
+        if(this.menu){
+            this.menu.picker.setDisabledDays(dd);
+        }
+    },
+
+    
+    setMinValue : function(dt){
+        this.minValue = (typeof dt == "string" ? this.parseDate(dt) : dt);
+        if(this.menu){
+            this.menu.picker.setMinDate(this.minValue);
+        }
+    },
+
+    
+    setMaxValue : function(dt){
+        this.maxValue = (typeof dt == "string" ? this.parseDate(dt) : dt);
+        if(this.menu){
+            this.menu.picker.setMaxDate(this.maxValue);
         }
     },
 
@@ -26668,6 +27208,7 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
         }
     },
 
+    
             onTriggerClick : function(){
         if(this.disabled){
             return;
@@ -26683,6 +27224,7 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
             disabledDays : this.disabledDays,
             disabledDaysText : this.disabledDaysText,
             format : this.format,
+            showToday : this.showToday,
             minText : String.format(this.minText, this.formatDate(this.minValue)),
             maxText : String.format(this.maxText, this.formatDate(this.maxValue))
         });
@@ -26693,7 +27235,7 @@ Ext.form.DateField = Ext.extend(Ext.form.TriggerField,  {
         this.menu.show(this.el, "tl-bl?");
     },
 
-    beforeBlur : function(){
+        beforeBlur : function(){
         var v = this.parseDate(this.getRawValue());
         if(v){
             this.setValue(v);
@@ -26771,7 +27313,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
     
     lazyInit : true,
 
-    initComponent : function(){
+        initComponent : function(){
         Ext.form.ComboBox.superclass.initComponent.call(this);
         this.addEvents(
             
@@ -26835,7 +27377,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
 			this.displayField = 'text';
 			this.mode = 'local';
 		}
-		
+
         this.selectedIndex = -1;
         if(this.mode == 'local'){
             if(this.initialConfig.queryDelay === undefined){
@@ -26850,11 +27392,8 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         onRender : function(ct, position){
         Ext.form.ComboBox.superclass.onRender.call(this, ct, position);
         if(this.hiddenName){
-            this.hiddenField = this.el.insertSibling({tag:'input', type:'hidden', name: this.hiddenName, id: (this.hiddenId||this.hiddenName)},
-                    'before', true);
-            this.hiddenField.value =
-                this.hiddenValue !== undefined ? this.hiddenValue :
-                this.value !== undefined ? this.value : '';
+            this.hiddenField = this.el.insertSibling({tag:'input', type:'hidden', name: this.hiddenName,
+                    id: (this.hiddenId||this.hiddenName)}, 'before', true);
 
                         this.el.dom.removeAttribute('name');
         }
@@ -26874,7 +27413,16 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         }
     },
 
-    initList : function(){
+        initValue : function(){
+        Ext.form.ComboBox.superclass.initValue.call(this);
+        if(this.hiddenField){
+		    this.hiddenField.value =
+		        this.hiddenValue !== undefined ? this.hiddenValue :
+		        this.value !== undefined ? this.value : '';
+        }
+    },
+
+        initList : function(){
         if(!this.list){
             var cls = 'x-combo-list';
 
@@ -26940,7 +27488,6 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
             }
         }
     },
-
 
         bindStore : function(store, initial){
         if(this.store && !initial){
@@ -27025,7 +27572,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         }
     },
 
-    onDestroy : function(){
+        onDestroy : function(){
         if(this.view){
             this.view.el.removeAllListeners();
             this.view.el.remove();
@@ -27038,9 +27585,10 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         Ext.form.ComboBox.superclass.onDestroy.call(this);
     },
 
-    unsetDelayCheck : function(){
+        unsetDelayCheck : function(){
         delete this.delayedCheck;
     },
+
         fireKey : function(e){
         if(e.isNavKeyPress() && !this.isExpanded() && !this.delayedCheck){
             this.fireEvent("specialkey", this, e);
@@ -27229,7 +27777,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         var hb = Ext.lib.Dom.getViewHeight()-ha-this.getSize().height;
         var space = Math.max(ha, hb, this.minHeight || 0)-this.list.shadowOffset-pad-5;
         h = Math.min(h, space, this.maxHeight);
-        
+
         this.innerList.setHeight(h);
         this.list.beginUpdate();
         this.list.setHeight(h+pad);
@@ -27394,6 +27942,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
         this.fireEvent('expand', this);
     },
 
+    
             onTriggerClick : function(){
         if(this.disabled){
             return;
@@ -27422,17 +27971,26 @@ Ext.reg('combo', Ext.form.ComboBox);
 
 Ext.form.Checkbox = Ext.extend(Ext.form.Field,  {
     
-    focusClass : undefined,
+    checkedCls: 'x-form-check-checked',
     
-    fieldClass: "x-form-field",
+    focusCls: 'x-form-check-focus',
+    
+    overCls: 'x-form-check-over',
+    
+    mouseDownCls: 'x-form-check-down',
+    
+    tabIndex: 0,
     
     checked: false,
     
-    defaultAutoCreate : { tag: "input", type: 'checkbox', autocomplete: "off"},
+    defaultAutoCreate: {tag: 'input', type: 'checkbox', autocomplete: 'off'},
+    
     
     
 
-	    initComponent : function(){
+        baseCls: 'x-form-check',
+
+        initComponent : function(){
         Ext.form.Checkbox.superclass.initComponent.call(this);
         this.addEvents(
             
@@ -27440,24 +27998,118 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field,  {
         );
     },
 
+        initEvents : function(){
+        Ext.form.Checkbox.superclass.initEvents.call(this);
+        this.initCheckEvents();
+    },
+
+        initCheckEvents : function(){
+        this.innerWrap.removeAllListeners();
+        this.innerWrap.addClassOnOver(this.overCls);
+        this.innerWrap.addClassOnClick(this.mouseDownCls);
+        this.innerWrap.on('click', this.onClick, this);
+        this.innerWrap.on('keyup', this.onKeyUp, this);
+    },
+
+        onRender : function(ct, position){
+        Ext.form.Checkbox.superclass.onRender.call(this, ct, position);
+        if(this.inputValue !== undefined){
+            this.el.dom.value = this.inputValue;
+        }
+        this.el.addClass('x-hidden');
+
+        this.innerWrap = this.el.wrap({
+            tabIndex: this.tabIndex,
+            cls: this.baseCls+'-wrap-inner'
+        });
+        this.wrap = this.innerWrap.wrap({cls: this.baseCls+'-wrap'});
+
+        if(this.boxLabel){
+            this.labelEl = this.innerWrap.createChild({
+                tag: 'label',
+                htmlFor: this.el.id,
+                cls: 'x-form-cb-label',
+                html: this.boxLabel
+            });
+        }
+
+        this.imageEl = this.innerWrap.createChild({
+            tag: 'img',
+            src: Ext.BLANK_IMAGE_URL,
+            cls: this.baseCls
+        }, this.el);
+
+        if(this.checked){
+            this.setValue(true);
+        }else{
+            this.checked = this.el.dom.checked;
+        }
+        this.originalValue = this.checked;
+    },
+
+        onDestroy : function(){
+        if(this.rendered){
+            Ext.destroy(this.imageEl, this.labelEl, this.innerWrap, this.wrap);
+        }
+        Ext.form.Checkbox.superclass.onDestroy.call(this);
+    },
+
+        onFocus: function(e) {
+        Ext.form.Checkbox.superclass.onFocus.call(this, e);
+        this.el.addClass(this.focusCls);
+    },
+
+        onBlur: function(e) {
+        Ext.form.Checkbox.superclass.onBlur.call(this, e);
+        this.el.removeClass(this.focusCls);
+    },
+
         onResize : function(){
         Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
-        if(!this.boxLabel){
+        if(!this.boxLabel && !this.fieldLabel){
             this.el.alignTo(this.wrap, 'c-c');
         }
     },
-    
-        initEvents : function(){
-        Ext.form.Checkbox.superclass.initEvents.call(this);
-        this.el.on("click", this.onClick,  this);
-        this.el.on("change", this.onClick,  this);
+
+        onKeyUp : function(e){
+        if(e.getKey() == Ext.EventObject.SPACE){
+            this.onClick(e);
+        }
     },
 
-	    getResizeEl : function(){
-        return this.wrap;
+        onClick : function(e){
+        if (!this.disabled && !this.readOnly) {
+            this.toggleValue();
+        }
+        e.stopEvent();
+    },
+
+        onEnable : function(){
+        Ext.form.Checkbox.superclass.onEnable.call(this);
+        this.initCheckEvents();
+    },
+
+        onDisable : function(){
+        Ext.form.Checkbox.superclass.onDisable.call(this);
+        this.innerWrap.removeAllListeners();
+    },
+
+    toggleValue : function(){
+        this.setValue(!this.checked);
+    },
+
+        getResizeEl : function(){
+        if(!this.resizeEl){
+            this.resizeEl = Ext.isSafari ? this.wrap : (this.wrap.up('.x-form-element', 5) || this.wrap);
+        }
+        return this.resizeEl;
     },
 
         getPositionEl : function(){
+        return this.wrap;
+    },
+
+        getActionEl : function(){
         return this.wrap;
     },
 
@@ -27465,29 +28117,6 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field,  {
     markInvalid : Ext.emptyFn,
     
     clearInvalid : Ext.emptyFn,
-
-        onRender : function(ct, position){
-        Ext.form.Checkbox.superclass.onRender.call(this, ct, position);
-        if(this.inputValue !== undefined){
-            this.el.dom.value = this.inputValue;
-        }
-        this.wrap = this.el.wrap({cls: "x-form-check-wrap"});
-        if(this.boxLabel){
-            this.wrap.createChild({tag: 'label', htmlFor: this.el.id, cls: 'x-form-cb-label', html: this.boxLabel});
-        }
-        if(this.checked){
-            this.setValue(true);
-        }else{
-            this.checked = this.el.dom.checked;
-        }
-    },
-    
-        onDestroy : function(){
-        if(this.wrap){
-            this.wrap.remove();
-        }
-        Ext.form.Checkbox.superclass.onDestroy.call(this);
-    },
 
         initValue : Ext.emptyFn,
 
@@ -27499,66 +28128,268 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field,  {
         return false;
     },
 
-	    onClick : function(){
-        if(this.el.dom.checked != this.checked){
-            this.setValue(this.el.dom.checked);
-        }
-    },
-
     
-    setValue : function(v){
+    setValue : function(v) {
+        var checked = this.checked;
         this.checked = (v === true || v === 'true' || v == '1' || String(v).toLowerCase() == 'on');
+        
         if(this.el && this.el.dom){
             this.el.dom.checked = this.checked;
             this.el.dom.defaultChecked = this.checked;
         }
-        this.fireEvent("check", this, this.checked);
+        this.wrap[this.checked? 'addClass' : 'removeClass'](this.checkedCls);
+        
+        if(checked != this.checked){
+            this.fireEvent("check", this, this.checked);
+            if(this.handler){
+                this.handler.call(this.scope || this, this, this.checked);
+            }
+        }
     }
+
+    
+    
+    
 });
 Ext.reg('checkbox', Ext.form.Checkbox);
 
+
+Ext.form.CheckboxGroup = Ext.extend(Ext.form.Field, {
+    
+    columns : 'auto',
+    
+    vertical : false,
+    
+    allowBlank : true,
+    
+    blankText : "You must select at least one item in this group",
+    
+        defaultType : 'checkbox',
+    
+        groupCls: 'x-form-check-group',
+    
+        onRender : function(ct, position){
+        if(!this.el){
+            var panelCfg = {
+                cls: this.groupCls,
+                layout: 'column',
+                border: false,
+                renderTo: ct
+            };
+            var colCfg = {
+                defaultType: this.defaultType,
+                layout: 'form',
+                border: false,
+                defaults: {
+                    hideLabel: true,
+                    anchor: '100%'
+                }
+            }
+            
+            if(this.items[0].items){
+                
+                                
+                Ext.apply(panelCfg, {
+                    layoutConfig: {columns: this.items.length},
+                    defaults: this.defaults,
+                    items: this.items
+                })
+                for(var i=0, len=this.items.length; i<len; i++){
+                    Ext.applyIf(this.items[i], colCfg);
+                };
+                
+            }else{
+                
+                                                
+                var numCols, cols = [];
+                
+                if(typeof this.columns == 'string'){                     this.columns = this.items.length;
+                }
+                if(!Ext.isArray(this.columns)){
+                    var cs = [];
+                    for(var i=0; i<this.columns; i++){
+                        cs.push((100/this.columns)*.01);                     }
+                    this.columns = cs;
+                }
+                
+                numCols = this.columns.length;
+                
+                                for(var i=0; i<numCols; i++){
+                    var cc = Ext.apply({items:[]}, colCfg);
+                    cc[this.columns[i] <= 1 ? 'columnWidth' : 'width'] = this.columns[i];
+                    if(this.defaults){
+                        cc.defaults = Ext.apply(cc.defaults || {}, this.defaults)
+                    }
+                    cols.push(cc);
+                };
+                
+                                if(this.vertical){
+                    var rows = Math.ceil(this.items.length / numCols), ri = 0;
+                    for(var i=0, len=this.items.length; i<len; i++){
+                        if(i>0 && i%rows==0){
+                            ri++;
+                        }
+                        if(this.items[i].fieldLabel){
+                            this.items[i].hideLabel = false;
+                        }
+                        cols[ri].items.push(this.items[i]);
+                    };
+                }else{
+                    for(var i=0, len=this.items.length; i<len; i++){
+                        var ci = i % numCols;
+                        if(this.items[i].fieldLabel){
+                            this.items[i].hideLabel = false;
+                        }
+                        cols[ci].items.push(this.items[i]);
+                    };
+                }
+                
+                Ext.apply(panelCfg, {
+                    layoutConfig: {columns: numCols},
+                    items: cols
+                });
+            }
+            
+            this.panel = new Ext.Panel(panelCfg);
+            this.el = this.panel.getEl();
+            
+            if(this.forId && this.itemCls){
+                var l = this.el.up(this.itemCls).child('label', true);
+                if(l){
+                    l.setAttribute('htmlFor', this.forId);
+                }
+            }
+            
+            var fields = this.panel.findBy(function(c){
+                return c.isFormField;
+            }, this);
+            
+            this.items = new Ext.util.MixedCollection();
+            this.items.addAll(fields);
+        }
+        Ext.form.CheckboxGroup.superclass.onRender.call(this, ct, position);
+    },
+    
+        validateValue : function(value){
+        if(!this.allowBlank){
+            var blank = true;
+            this.items.each(function(f){
+                if(f.checked){
+                    return blank = false;
+                }
+            }, this);
+            if(blank){
+                this.markInvalid(this.blankText);
+                return false;
+            }
+        }
+        return true;
+    },
+    
+        onDisable : function(){
+        this.items.each(function(item){
+            item.disable();
+        })
+    },
+
+        onEnable : function(){
+        this.items.each(function(item){
+            item.enable();
+        })
+    },
+    
+        onResize : function(w, h){
+        this.panel.setSize(w, h);
+        this.panel.doLayout();
+    },
+    
+        reset : function(){
+        Ext.form.CheckboxGroup.superclass.reset.call(this);
+        this.items.each(function(c){
+            if(c.reset){
+                c.reset();
+            }
+        }, this);
+    },
+    
+    
+    
+    initValue : Ext.emptyFn,
+    
+    getValue : Ext.emptyFn,
+    
+    getRawValue : Ext.emptyFn,
+    
+    setValue : Ext.emptyFn,
+    
+    setRawValue : Ext.emptyFn
+    
+});
+
+Ext.reg('checkboxgroup', Ext.form.CheckboxGroup);
+
+
 Ext.form.Radio = Ext.extend(Ext.form.Checkbox, {
-    inputType: 'radio',
-
+        inputType: 'radio',
+        baseCls: 'x-form-radio',
     
-    markInvalid : Ext.emptyFn,
-    
-    clearInvalid : Ext.emptyFn,
-
     
     getGroupValue : function(){
-    	var p = this.el.up('form') || Ext.getBody();
-        var c = p.child('input[name='+this.el.dom.name+']:checked', true);
+        var c = this.getParent().child('input[name='+this.el.dom.name+']:checked', true);
         return c ? c.value : null;
     },
     
-        onClick : function(){
-    	if(this.el.dom.checked != this.checked){
-    		var p = this.el.up('form') || Ext.getBody();
-			var els = p.select('input[name='+this.el.dom.name+']');
-			els.each(function(el){
-				if(el.dom.id == this.id){
-					this.setValue(true);
-				}else{
-					Ext.getCmp(el.dom.id).setValue(false);
-				}
-			}, this);
-		}
+        getParent : function(){
+        return this.el.up('form') || Ext.getBody();
     },
 
+        toggleValue : function() {
+        if(!this.checked){
+            var els = this.getParent().select('input[name='+this.el.dom.name+']');
+            els.each(function(el){
+                if(el.dom.id == this.id){
+                    this.setValue(true);
+                }else{
+                    Ext.getCmp(el.dom.id).setValue(false);
+                }
+            }, this);
+        }
+    },
+    
     
     setValue : function(v){
-    	if (typeof v == 'boolean') {
+        if(typeof v=='boolean') {
             Ext.form.Radio.superclass.setValue.call(this, v);
-        } else {
-            var r = this.el.up('form').child('input[name='+this.el.dom.name+'][value='+v+']', true);
-            if (r){
-                r.checked = true;
+        }else{
+            var r = this.getParent().child('input[name='+this.el.dom.name+'][value='+v+']', true);
+            if(r && !r.checked){
+                Ext.getCmp(r.id).toggleValue();
             };
         }
-    }
+    },
+    
+    
+    markInvalid : Ext.emptyFn,
+    
+    clearInvalid : Ext.emptyFn
+    
 });
 Ext.reg('radio', Ext.form.Radio);
+
+
+Ext.form.RadioGroup = Ext.extend(Ext.form.CheckboxGroup, {
+    
+    allowBlank : true,
+    
+    blankText : "You must select one item in this group",
+    
+        defaultType : 'radio',
+    
+        groupCls: 'x-form-radio-group'
+});
+
+Ext.reg('radiogroup', Ext.form.RadioGroup);
+
 
 Ext.form.Hidden = Ext.extend(Ext.form.Field, {
     
@@ -27599,7 +28430,7 @@ Ext.form.BasicForm = function(el, config){
         
         'actioncomplete'
     );
-    
+
     if(el){
         this.initEl(el);
     }
@@ -27623,7 +28454,7 @@ Ext.extend(Ext.form.BasicForm, Ext.util.Observable, {
 
     
     
-    
+
         initEl : function(el){
         this.el = Ext.get(el);
         this.id = this.el.id || Ext.id();
@@ -27641,7 +28472,7 @@ Ext.extend(Ext.form.BasicForm, Ext.util.Observable, {
         onSubmit : function(e){
         e.stopEvent();
     },
-    
+
     	destroy: function() {
         this.items.each(function(f){
             Ext.destroy(f);
@@ -27917,7 +28748,17 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
 
         initComponent :function(){
         this.form = this.createForm();
-        
+
+        this.bodyCfg = {
+            tag: 'form',
+            cls: this.baseCls + '-body',
+            method : this.method || 'POST',
+            id : this.formId || Ext.id()
+        };
+        if(this.fileUpload) {
+            this.bodyCfg.enctype = 'multipart/form-data';
+        }
+
         Ext.FormPanel.superclass.initComponent.call(this);
 
         this.addEvents(
@@ -27937,7 +28778,9 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
         var f = this.form;
         var formPanel = this;
         var fn = function(c){
-            if(c.doLayout && c != formPanel){
+            if(c.isFormField){
+                f.add(c);
+            }else if(c.doLayout && c != formPanel){
                 Ext.applyIf(c, {
                     labelAlign: c.ownerCt.labelAlign,
                     labelWidth: c.ownerCt.labelWidth,
@@ -27946,8 +28789,6 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
                 if(c.items){
                     c.items.each(fn);
                 }
-            }else if(c.isFormField){
-                f.add(c);
             }
         }
         this.items.each(fn);
@@ -27966,19 +28807,12 @@ Ext.FormPanel = Ext.extend(Ext.Panel, {
         this.initFields();
 
         Ext.FormPanel.superclass.onRender.call(this, ct, position);
-        var o = {
-            tag: 'form',
-            method : this.method || 'POST',
-            id : this.formId || Ext.id()
-        };
-        if(this.fileUpload) {
-            o.enctype = 'multipart/form-data';
-        }
-        this.form.initEl(this.body.createChild(o));
+        this.form.initEl(this.body);
     },
     
         beforeDestroy: function(){
         Ext.FormPanel.superclass.beforeDestroy.call(this);
+        this.stopMonitoring();
         Ext.destroy(this.form);
     },
 
@@ -28277,7 +29111,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             e.preventDefault();
         });
 
-        if(this.enableFont && !Ext.isSafari){
+        if(this.enableFont && !Ext.isSafari2){
             this.fontSelect = tb.el.createChild({
                 tag:'select',
                 cls:'x-font-select',
@@ -28368,7 +29202,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             );
         };
 
-        if(!Ext.isSafari){
+        if(!Ext.isSafari2){
             if(this.enableLinks){
                 tb.add(
                     '-',
@@ -28407,6 +29241,16 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
     },
 
     
+    getDoc : function(){
+        return Ext.isIE ? this.getWin().document : (this.iframe.contentDocument || this.getWin().document);
+    },
+
+    
+    getWin : function(){
+        return Ext.isIE ? this.iframe.contentWindow : window.frames[this.iframe.name];
+    },
+
+    
     onRender : function(ct, position){
         Ext.form.HtmlEditor.superclass.onRender.call(this, ct, position);
         this.el.dom.style.border = '0 none';
@@ -28429,25 +29273,36 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
         var iframe = document.createElement('iframe');
         iframe.name = Ext.id();
-        iframe.frameBorder = 'no';
+        iframe.frameBorder = '0';
 
-        iframe.src=(Ext.SSL_SECURE_URL || "javascript:false");
+        iframe.src = Ext.isIE ? Ext.SSL_SECURE_URL : "javascript:;";
 
         this.wrap.dom.appendChild(iframe);
 
         this.iframe = iframe;
 
-        if(Ext.isIE){
-            iframe.contentWindow.document.designMode = 'on';
-            this.doc = iframe.contentWindow.document;
-            this.win = iframe.contentWindow;
-        } else {
-            this.doc = (iframe.contentDocument || window.frames[iframe.name].document);
-            this.win = window.frames[iframe.name];
-            this.doc.designMode = 'on';
+        this.initFrame();
+
+        if(this.autoMonitorDesignMode !== false){
+            this.monitorTask = Ext.TaskMgr.start({
+                run: this.checkDesignMode,
+                scope: this,
+                interval:100
+            });
         }
+
+        if(!this.width){
+            var sz = this.el.getSize();
+            this.setSize(sz.width, this.height || sz.height);
+        }
+    },
+
+    initFrame : function(){
+        this.doc = this.getDoc();
+        this.win = this.getWin();
+
         this.doc.open();
-        this.doc.write(this.getDocMarkup())
+        this.doc.write(this.getDocMarkup());
         this.doc.close();
 
         var task = { 
@@ -28463,9 +29318,18 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             scope: this
         };
         Ext.TaskMgr.start(task);
+    },
 
-        if(!this.width){
-            this.setSize(this.el.getSize());
+
+    checkDesignMode : function(){
+        if(this.wrap && this.wrap.dom.offsetWidth){
+            var doc = this.getDoc();
+            if(!doc){
+                return;
+            }
+            if(!doc.editorInitialized || String(doc.designMode).toLowerCase() != 'on'){
+                this.initFrame();
+            }
         }
     },
 
@@ -28637,7 +29501,17 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
         var ss = this.el.getStyles('font-size', 'font-family', 'background-image', 'background-repeat');
         ss['background-attachment'] = 'fixed'; 
         dbody.bgProperties = 'fixed'; 
+
         Ext.DomHelper.applyStyles(dbody, ss);
+
+        if(this.doc){
+            try{
+                Ext.EventManager.removeAll(this.doc);
+            }catch(e){}
+        }
+
+        this.doc = this.getDoc();
+
         Ext.EventManager.on(this.doc, {
             'mousedown': this.onEditorEvent,
             'dblclick': this.onEditorEvent,
@@ -28646,6 +29520,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             buffer:100,
             scope: this
         });
+
         if(Ext.isGecko){
             Ext.EventManager.on(this.doc, 'keypress', this.applyCommand, this);
         }
@@ -28655,11 +29530,17 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
         this.initialized = true;
 
         this.fireEvent('initialize', this);
+
+        this.doc.editorInitialized = true;
+
         this.pushValue();
     },
 
     
     onDestroy : function(){
+        if(this.monitorTask){
+            Ext.TaskMgr.stop(this.monitorTask);
+        }
         if(this.rendered){
             this.tb.items.each(function(item){
                 if(item.menu){
@@ -28745,7 +29626,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
         var btns = this.tb.items.map, doc = this.doc;
 
-        if(this.enableFont && !Ext.isSafari){
+        if(this.enableFont && !Ext.isSafari2){
             var name = (this.doc.queryCommandValue('FontName')||this.defaultFont).toLowerCase();
             if(name != this.fontSelect.dom.value){
                 this.fontSelect.dom.value = name;
@@ -28761,7 +29642,7 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             btns.justifycenter.toggle(doc.queryCommandState('justifycenter'));
             btns.justifyright.toggle(doc.queryCommandState('justifyright'));
         }
-        if(!Ext.isSafari && this.enableLists){
+        if(!Ext.isSafari2 && this.enableLists){
             btns.insertorderedlist.toggle(doc.queryCommandState('insertorderedlist'));
             btns.insertunorderedlist.toggle(doc.queryCommandState('insertunorderedlist'));
         }
@@ -28778,10 +29659,11 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
 
     
     relayCmd : function(cmd, value){
-        this.win.focus();
-        this.execCmd(cmd, value);
-        this.updateToolbar();
-        this.deferFocus();
+        (function(){
+            this.focus();
+            this.execCmd(cmd, value);
+            this.updateToolbar();
+        }).defer(10, this);
     },
 
     
@@ -29029,6 +29911,11 @@ Ext.form.TimeField = Ext.extend(Ext.form.ComboBox, {
     triggerAction: 'all',
     
     typeAhead: false,
+    
+    
+    
+    
+    initDate: '1/1/2008',
 
     
     initComponent : function(){
@@ -29044,11 +29931,11 @@ Ext.form.TimeField = Ext.extend(Ext.form.ComboBox, {
         if(!this.store){
             var min = this.parseDate(this.minValue);
             if(!min){
-                min = new Date().clearTime();
+                min = new Date(this.initDate).clearTime();
             }
             var max = this.parseDate(this.maxValue);
             if(!max){
-                max = new Date().clearTime().add('mi', (24 * 60) - 1);
+                max = new Date(this.initDate).clearTime().add('mi', (24 * 60) - 1);
             }
             var times = [];
             while(min <= max){
@@ -29097,8 +29984,9 @@ Ext.reg('timefield', Ext.form.TimeField);
 Ext.form.Label = Ext.extend(Ext.BoxComponent, {
     
     
+    
 
-    onRender : function(ct, position){
+        onRender : function(ct, position){
         if(!this.el){
             this.el = document.createElement('label');
             this.el.id = this.getId();
@@ -29108,6 +29996,15 @@ Ext.form.Label = Ext.extend(Ext.BoxComponent, {
             }
         }
         Ext.form.Label.superclass.onRender.call(this, ct, position);
+    },
+    
+    
+    setText: function(t, encode){
+        this.text = t;
+        if(this.rendered){
+            this.el.dom.innerHTML = encode !== false ? Ext.util.Format.htmlEncode(t) : t;
+        }
+        return this;
     }
 });
 
@@ -29128,6 +30025,7 @@ Ext.form.Action.CONNECT_FAILURE = 'connect';
 Ext.form.Action.LOAD_FAILURE = 'load';
 
 Ext.form.Action.prototype = {
+
 
 
 
@@ -29217,6 +30115,7 @@ Ext.form.Action.Submit = function(form, options){
 };
 
 Ext.extend(Ext.form.Action.Submit, Ext.form.Action, {
+    
     
     type : 'submit',
 
@@ -29409,6 +30308,9 @@ Ext.grid.GridPanel = Ext.extend(Ext.Panel, {
     loadMask : false,
 
     
+    deferRowRender : true,
+
+    
     rendered : false,
     
     viewReady: false,
@@ -29584,6 +30486,11 @@ Ext.grid.GridPanel = Ext.extend(Ext.Panel, {
     afterRender : function(){
         Ext.grid.GridPanel.superclass.afterRender.call(this);
         this.view.layout();
+        if(this.deferRowRender){
+            this.view.afterRender.defer(10, this.view);
+        }else{
+            this.view.afterRender();
+        }
         this.viewReady = true;
     },
 
@@ -29837,6 +30744,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     
     
     
+    
     deferEmptyText: true,
     
     scrollOffset: 19,
@@ -29854,6 +30762,18 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
     columnsText : "Columns",
 
         borderWidth: 2,
+    tdClass: 'x-grid3-cell',
+    hdCls: 'x-grid3-hd',
+
+    
+    cellSelectorDepth: 4,
+    
+    rowSelectorDepth: 10,
+
+    
+    cellSelector: 'td.x-grid3-cell',
+    
+    rowSelector: 'div.x-grid3-row',
 
     
 
@@ -29918,11 +30838,6 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         }
 
         this.templates = ts;
-
-        this.tdClass = 'x-grid3-cell';
-        this.cellSelector = 'td.x-grid3-cell';
-        this.hdCls = 'x-grid3-hd';
-        this.rowSelector = 'div.x-grid3-row';
         this.colRe = new RegExp("x-grid3-td-([^\\s]+)", "");
     },
 
@@ -29976,7 +30891,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         if(!el){
             return false;
         }
-        return this.fly(el).findParent(this.cellSelector, 3);
+        return this.fly(el).findParent(this.cellSelector, this.cellSelectorDepth);
     },
 
         findCellIndex : function(el, requiredCls){
@@ -30010,7 +30925,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         if(!el){
             return false;
         }
-        return this.fly(el).findParent(this.rowSelector, 10);
+        return this.fly(el).findParent(this.rowSelector, this.rowSelectorDepth);
     },
 
         findRowIndex : function(el){
@@ -30051,13 +30966,15 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
         removeRow : function(row){
         Ext.removeNode(this.getRow(row));
+        this.focusRow(row);
     },
-
+    
         removeRows : function(firstRow, lastRow){
         var bd = this.mainBody.dom;
         for(var rowIndex = firstRow; rowIndex <= lastRow; rowIndex++){
             Ext.removeNode(bd.childNodes[firstRow]);
         }
+        this.focusRow(firstRow);
     },
 
     
@@ -30227,6 +31144,15 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         }
     },
 
+    afterRender: function(){
+        this.mainBody.dom.innerHTML = this.renderRows();
+        this.processRows(0, true);
+
+        if(this.deferEmptyText !== true){
+            this.applyEmptyText();
+        }
+    },
+
         renderUI : function(){
 
         var header = this.renderHeaders();
@@ -30243,14 +31169,6 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         g.getGridEl().dom.innerHTML = html;
 
         this.initElements();
-
-
-        this.mainBody.dom.innerHTML = this.renderRows();
-        this.processRows(0, true);
-
-        if(this.deferEmptyText !== true){
-            this.applyEmptyText();
-        }
 
                 Ext.fly(this.innerHd).on("click", this.handleHdDown, this);
         this.mainHd.on("mouseover", this.handleHdOver, this);
@@ -30412,8 +31330,10 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
     
     focusCell : function(row, col, hscroll){
+        row = Math.min(row, Math.max(0, this.getRows().length-1));
         var xy = this.ensureVisible(row, col, hscroll);
-        this.focusEl.setXY(xy);
+        this.focusEl.setXY(xy||this.scroller.getXY());
+        
         if(Ext.isGecko){
             this.focusEl.focus();
         }else{
@@ -30478,11 +31398,11 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
                 c.scrollLeft = cright-c.clientWidth;
             }
         }
-        return cellEl ? Ext.fly(cellEl).getXY() : [c.scrollLeft, Ext.fly(rowEl).getY()];
+        return cellEl ? Ext.fly(cellEl).getXY() : [c.scrollLeft+this.el.getX(), Ext.fly(rowEl).getY()];
     },
 
         insertRows : function(dm, firstRow, lastRow, isUpdate){
-        if(!isUpdate && firstRow === 0 && lastRow == dm.getCount()-1){
+        if(!isUpdate && firstRow === 0 && lastRow >= dm.getCount()-1){
             this.refresh();
         }else{
             if(!isUpdate){
@@ -30500,6 +31420,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
                 this.processRows(firstRow);
             }
         }
+        this.focusRow(firstRow);
     },
 
         deleteRows : function(dm, firstRow, lastRow){
@@ -30755,9 +31676,6 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
 
         render : function(){
 
-        var cm = this.cm;
-        var colCount = cm.getColumnCount();
-
         if(this.autoFill){
             this.fitColumns(true, true);
         }else if(this.forceFit){
@@ -30798,6 +31716,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
             this.cm.un("columnlockchange", this.onColumnLock, this);
         }
         if(cm){
+            delete this.lastViewWidth;
             cm.on("configchange", this.onColConfigChange, this);
             cm.on("widthchange", this.onColWidthChange, this);
             cm.on("headerchange", this.onHeaderChange, this);
@@ -31779,6 +32698,7 @@ Ext.extend(Ext.grid.SplitDragZone, Ext.dd.DDProxy, {
         this.setDelta(0,0);
     }
 });
+
 Ext.grid.GridDragZone = function(grid, config){
     this.view = grid.getView();
     Ext.grid.GridDragZone.superclass.constructor.call(this, this.view.mainBody.dom, config);
@@ -31795,6 +32715,7 @@ Ext.grid.GridDragZone = function(grid, config){
 Ext.extend(Ext.grid.GridDragZone, Ext.dd.DragZone, {
     ddGroup : "GridDD",
 
+    
     getDragData : function(e){
         var t = Ext.lib.Event.getTarget(e);
         var rowIndex = this.view.findRowIndex(t);
@@ -31808,16 +32729,19 @@ Ext.extend(Ext.grid.GridDragZone, Ext.dd.DragZone, {
         return false;
     },
 
+    
     onInitDrag : function(e){
         var data = this.dragData;
         this.ddel.innerHTML = this.grid.getDragDropText();
         this.proxy.update(this.ddel);
             },
 
+    
     afterRepair : function(){
         this.dragging = false;
     },
 
+    
     getRepairXY : function(e, data){
         return false;
     },
@@ -31931,7 +32855,8 @@ Ext.extend(Ext.grid.ColumnModel, Ext.util.Observable, {
         return -1;
     },
 
-        moveColumn : function(oldIndex, newIndex){
+    
+    moveColumn : function(oldIndex, newIndex){
         var c = this.config[oldIndex];
         this.config.splice(oldIndex, 1);
         this.config.splice(newIndex, 0, c);
@@ -32458,7 +33383,7 @@ Ext.extend(Ext.grid.RowSelectionModel, Ext.grid.AbstractSelectionModel,  {
 
     
     selectRow : function(index, keepExisting, preventViewNotify){
-        if(this.locked || (index < 0 || index >= this.grid.store.getCount())) return;
+        if(this.locked || (index < 0 || index >= this.grid.store.getCount()) || this.isSelected(index)) return;
         var r = this.grid.store.getAt(index);
         if(r && this.fireEvent("beforerowselect", this, index, keepExisting, r) !== false){
             if(!keepExisting || this.singleSelect){
@@ -32845,17 +33770,18 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
                     ed.on("specialkey", this.selModel.onEditorKey, this.selModel);
                     this.activeEditor = ed;
                     var v = this.preEditValue(r, field);
-                    ed.startEdit(this.view.getCell(row, col), v);
+                    ed.startEdit(this.view.getCell(row, col).firstChild, v);
                 }).defer(50, this);
             }
         }
     },
     
-	preEditValue : function(r, field){
-		return this.autoEncode && typeof value == 'string' ? Ext.util.Format.htmlDecode(r.data[field]) : r.data[field];
+    	preEditValue : function(r, field){
+        var value = r.data[field];
+		return this.autoEncode && typeof value == 'string' ? Ext.util.Format.htmlDecode(value) : value;
 	},
 	
-	postEditValue : function(value, originalValue, r, field){
+    	postEditValue : function(value, originalValue, r, field){
 		return this.autoEncode && typeof value == 'string' ? Ext.util.Format.htmlEncode(value) : value;
 	},
 	    
@@ -32865,6 +33791,17 @@ Ext.grid.EditorGridPanel = Ext.extend(Ext.grid.GridPanel, {
             this.activeEditor[cancel === true ? 'cancelEdit' : 'completeEdit']();
         }
         this.activeEditor = null;
+    },
+    
+        onDestroy: function() {
+        if(this.rendered){
+            var cols = this.colModel.config;
+            for(var i = 0, len = cols.length; i < len; i++){
+                var c = cols[i];
+                Ext.destroy(c.editor);
+            }
+        }
+        Ext.grid.EditorGridPanel.superclass.onDestroy.call(this);
     }
 });
 Ext.reg('editorgrid', Ext.grid.EditorGridPanel);
@@ -33350,11 +34287,13 @@ Ext.ProgressBar = Ext.extend(Ext.BoxComponent, {
         if(text){
             this.updateText(text);
         }
-        var w = Math.floor(value*this.el.dom.firstChild.offsetWidth);
-        this.progressBar.setWidth(w);
-        if(this.textTopEl){
-            
-            this.textTopEl.removeClass('x-hidden').setWidth(w);
+        if(this.rendered){
+	        var w = Math.floor(value*this.el.dom.firstChild.offsetWidth);
+	        this.progressBar.setWidth(w);
+	        if(this.textTopEl){
+	            
+	            this.textTopEl.removeClass('x-hidden').setWidth(w);
+	        }
         }
         this.fireEvent('update', this, value, text);
         return this;
@@ -33365,6 +34304,7 @@ Ext.ProgressBar = Ext.extend(Ext.BoxComponent, {
         if(!this.waitTimer){
             var scope = this;
             o = o || {};
+            this.updateText(o.text);
             this.waitTimer = Ext.TaskMgr.start({
                 run: function(i){
                     var inc = o.increment || 10;
@@ -33392,7 +34332,17 @@ Ext.ProgressBar = Ext.extend(Ext.BoxComponent, {
     
     updateText : function(text){
         this.text = text || '&#160;';
-        this.textEl.update(this.text);
+        if(this.rendered){
+            this.textEl.update(this.text);
+        }
+        return this;
+    },
+    
+    
+    syncProgressBar : function(){
+        if(this.value){
+            this.updateProgress(this.value, this.text);
+        }
         return this;
     },
 
@@ -33403,6 +34353,7 @@ Ext.ProgressBar = Ext.extend(Ext.BoxComponent, {
             var inner = this.el.dom.firstChild;
             this.textEl.setSize(inner.offsetWidth, inner.offsetHeight);
         }
+        this.syncProgressBar();
         return this;
     },
 
@@ -33444,7 +34395,10 @@ Ext.Slider = Ext.extend(Ext.BoxComponent, {
 	
     animate: true,
 
-	
+    
+    dragging: false,
+
+    
     initComponent : function(){
         if(this.value === undefined){
             this.value = this.minValue;
@@ -33455,7 +34409,9 @@ Ext.Slider = Ext.extend(Ext.BoxComponent, {
             		
 			'beforechange', 
 			
-			'change', 
+			'change',
+			
+			'changecomplete',
 			
 			'dragstart', 
 			
@@ -33490,6 +34446,8 @@ Ext.Slider = Ext.extend(Ext.BoxComponent, {
         this.mon(this.el, 'mousedown', this.onMouseDown, this);
         this.mon(this.el, 'keydown', this.onKeyDown, this);
 
+        this.focusEl.swallowEvent("click", true);
+
         this.tracker = new Ext.dd.DragTracker({
             onBeforeStart: this.onBeforeDragStart.createDelegate(this),
             onStart: this.onDragStart.createDelegate(this),
@@ -33515,7 +34473,7 @@ Ext.Slider = Ext.extend(Ext.BoxComponent, {
 	
     onClickChange : function(local){
         if(local.top > this.clickRange[0] && local.top < this.clickRange[1]){
-            this.setValue(Math.round(local.left/this.getRatio()));
+            this.setValue(Math.round(this.reverseValue(local.left)), undefined, true);
         }
     },
 	
@@ -33528,18 +34486,18 @@ Ext.Slider = Ext.extend(Ext.BoxComponent, {
             case e.RIGHT:
                 e.stopEvent();
                 if(e.ctrlKey){
-                    this.setValue(this.maxValue);
+                    this.setValue(this.maxValue, undefined, true);
                 }else{
-                    this.setValue(this.value+this.keyIncrement);
+                    this.setValue(this.value+this.keyIncrement, undefined, true);
                 }
             break;
             case e.DOWN:
             case e.LEFT:
                 e.stopEvent();
                 if(e.ctrlKey){
-                    this.setValue(this.minValue);
+                    this.setValue(this.minValue, undefined, true);
                 }else{
-                    this.setValue(this.value-this.keyIncrement);
+                    this.setValue(this.value-this.keyIncrement, undefined, true);
                 }
             break;
             default:
@@ -33582,7 +34540,7 @@ Ext.Slider = Ext.extend(Ext.BoxComponent, {
     getRatio : function(){
         var w = this.innerEl.getWidth();
         var v = this.maxValue - this.minValue;
-        return w/v;
+        return v == 0 ? w : (w/v);
     },
 
 	
@@ -33597,18 +34555,27 @@ Ext.Slider = Ext.extend(Ext.BoxComponent, {
     },
 
 	
-    setValue : function(v, animate){
+    setValue : function(v, animate, changeComplete){
         v = this.normalizeValue(v);
         if(v !== this.value && this.fireEvent('beforechange', this, v, this.value) !== false){
             this.value = v;
             this.moveThumb(this.translateValue(v), animate !== false);
             this.fireEvent('change', this, v);
+            if(changeComplete){
+                this.fireEvent('changecomplete', this, v);
+            }
         }
     },
 
 	
     translateValue : function(v){
-        return (v * this.getRatio())-this.halfThumb;
+        var ratio = this.getRatio();
+        return (v * ratio)-(this.minValue * ratio)-this.halfThumb;
+    },
+
+	reverseValue : function(pos){
+        var ratio = this.getRatio();
+        return (pos+this.halfThumb+(this.minValue * ratio))/ratio;
     },
 
 	
@@ -33633,25 +34600,39 @@ Ext.Slider = Ext.extend(Ext.BoxComponent, {
 	
     onDragStart: function(e){
         this.thumb.addClass('x-slider-thumb-drag');
+        this.dragging = true;
+        this.dragStartValue = this.value;
         this.fireEvent('dragstart', this, e);
     },
 
 	
     onDrag: function(e){
         var pos = this.innerEl.translatePoints(this.tracker.getXY());
-        this.setValue(Math.round(pos.left/this.getRatio()), false);
+        this.setValue(Math.round(this.reverseValue(pos.left)), false);
         this.fireEvent('drag', this, e);
     },
 	
 	
     onDragEnd: function(e){
         this.thumb.removeClass('x-slider-thumb-drag');
+        this.dragging = false;
         this.fireEvent('dragend', this, e);
+        if(this.dragStartValue != this.value){
+            this.fireEvent('changecomplete', this, this.value);
+        }
     },
 
-	
+    
     onResize : function(w, h){
         this.innerEl.setWidth(w - (this.el.getPadding('l') + this.endEl.getPadding('r')));
+        this.syncThumb();
+    },
+    
+    
+    syncThumb : function(){
+        if(this.rendered){
+            this.moveThumb(this.translateValue(this.value));
+        }
     },
 	
 	
@@ -33665,6 +34646,7 @@ Ext.reg('slider', Ext.Slider);
 Ext.Slider.Vertical = {
     onResize : function(w, h){
         this.innerEl.setHeight(h - (this.el.getPadding('t') + this.endEl.getPadding('b')));
+        this.syncThumb();
     },
 
     getRatio : function(){
@@ -33691,7 +34673,7 @@ Ext.Slider.Vertical = {
     onClickChange : function(local){
         if(local.left > this.clickRange[0] && local.left < this.clickRange[1]){
             var bottom = this.innerEl.getHeight()-local.top;
-            this.setValue(Math.round(bottom/this.getRatio()));
+            this.setValue(Math.round(bottom/this.getRatio()), undefined, true);
         }
     }
 };
@@ -33792,7 +34774,7 @@ Ext.StatusBar = Ext.extend(Ext.Toolbar, {
         }
         
         var text = o.useDefaults ? this.defaultText : '',
-            iconCls = o.useDefaults ? this.defaultIconCls : '';
+            iconCls = o.useDefaults ? (this.defaultIconCls ? this.defaultIconCls : '') : '';
             
         if(o.anim){
             this.statusEl.fadeOut({
@@ -33867,6 +34849,161 @@ Ext.StatusBar = Ext.extend(Ext.Toolbar, {
 });
 Ext.reg('statusbar', Ext.StatusBar);
 
+
+Ext.History = (function () {
+    var iframe, hiddenField;
+    var ready = false;
+    var currentToken;
+
+    function getHash() {
+        var href = top.location.href, i = href.indexOf("#");
+        return i >= 0 ? href.substr(i + 1) : null;
+    }
+
+    function doSave() {
+        hiddenField.value = currentToken;
+    }
+
+    function handleStateChange(token) {
+        currentToken = token;
+        Ext.History.fireEvent('change', token);
+    }
+
+    function updateIFrame (token) {
+        var html = ['<html><body><div id="state">',token,'</div></body></html>'].join('');
+        try {
+            var doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(html);
+            doc.close();
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function checkIFrame() {
+        if (!iframe.contentWindow || !iframe.contentWindow.document) {
+            setTimeout(checkIFrame, 10);
+            return;
+        }
+
+        var doc = iframe.contentWindow.document;
+        var elem = doc.getElementById("state");
+        var token = elem ? elem.innerText : null;
+
+        var hash = getHash();
+
+        setInterval(function () {
+
+            doc = iframe.contentWindow.document;
+            elem = doc.getElementById("state");
+
+            var newtoken = elem ? elem.innerText : null;
+
+            var newHash = getHash();
+
+            if (newtoken !== token) {
+                token = newtoken;
+                handleStateChange(token);
+                top.location.hash = token;
+                hash = token;
+                doSave();
+            } else if (newHash !== hash) {
+                hash = newHash;
+                updateIFrame(newHash);
+            }
+
+        }, 50);
+
+        ready = true;
+
+        Ext.History.fireEvent('ready', Ext.History);
+    }
+
+    function startUp() {
+        currentToken = hiddenField.value;
+
+        if (Ext.isIE) {
+            checkIFrame();
+        } else {
+            var hash = getHash();
+            setInterval(function () {
+                var newHash = getHash();
+                if (newHash !== hash) {
+                    hash = newHash;
+                    handleStateChange(hash);
+                    doSave();
+                }
+            }, 50);
+            ready = true;
+            Ext.History.fireEvent('ready', Ext.History);
+        }
+    }
+
+    return {
+        
+        fieldId: 'x-history-field',
+        
+        iframeId: 'x-history-frame',
+        
+        events:{},
+
+        
+        init: function (onReady, scope) {
+            if(ready) {
+                Ext.callback(onReady, scope, [this]);
+                return;
+            }
+            if(!Ext.isReady){
+                Ext.onReady(function(){
+                    Ext.History.init(onReady, scope);
+                });
+                return;
+            }
+            hiddenField = Ext.getDom(Ext.History.fieldId);
+			if (Ext.isIE) {
+                iframe = Ext.getDom(Ext.History.iframeId);
+            }
+            this.addEvents('ready', 'change');
+            if(onReady){
+                this.on('ready', onReady, scope, {single:true});
+            }
+            startUp();
+        },
+
+        
+        add: function (token, preventDup) {
+            if(preventDup !== false){
+                if(this.getToken() == token){
+                    return true;
+                }
+            }
+            if (Ext.isIE) {
+                return updateIFrame(token);
+            } else {
+                top.location.hash = token;
+                return true;
+            }
+        },
+
+        
+        back: function(){
+            history.go(-1);
+        },
+
+        
+        forward: function(){
+            history.go(1);
+        },
+
+        
+        getToken: function() {
+            return ready ? currentToken : getHash();
+        }
+    };
+})();
+Ext.apply(Ext.History, new Ext.util.Observable());
 Ext.debug = {};
 
 (function(){

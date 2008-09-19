@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -63,16 +63,33 @@ ul.x-tab-strip-bottom{
     padding-bottom:0 !important;
 }
 
-.x-tab-panel-header-plain .x-tab-strip-spacer {
+.x-tab-panel-header-plain .x-tab-strip-spacer,
+.x-tab-panel-footer-plain .x-tab-strip-spacer {
     border:1px solid #8db2e3;
-    border-top: 0 none;
     height:2px;
     background: #deecfd;
     font-size:1px;
     line-height:1px;
 }
+.x-tab-panel-header-plain .x-tab-strip-spacer {
+    border-top: 0 none;
+}
+.x-tab-panel-footer-plain .x-tab-strip-spacer {
+    border-bottom: 0 none;
+}
 
-.ext-border-box .x-tab-panel-header-plain .x-tab-strip-spacer {
+.x-tab-panel-footer-plain .x-tab-strip-bottom {
+    background:transparent !important;
+    padding-bottom:0 !important;
+}
+.x-tab-panel-footer-plain {
+    background:transparent !important;
+    border-width:0 !important;
+    padding-top:0 !important;
+}
+
+.ext-border-box .x-tab-panel-header-plain .x-tab-strip-spacer,
+.ext-border-box .x-tab-panel-footer-plain .x-tab-strip-spacer {
     height:3px;
 }
 
@@ -119,7 +136,7 @@ ul.x-tab-strip li.x-tab-edge {
 	cursor:pointer;
     padding:4px 0;
 }
-.x-tab-strip .x-tab-with-icon .x-tab-right {
+.x-tab-strip-top .x-tab-with-icon .x-tab-right {
     padding-left:6px;
 }
 .x-tab-strip .x-tab-with-icon span.x-tab-strip-text {
@@ -132,7 +149,7 @@ ul.x-tab-strip li.x-tab-edge {
 	color:#15428b;
 }
 
-.x-tab-strip-active {
+.x-tab-strip-active, .x-tab-strip-active a.x-tab-right {
     cursor:default;
 }
 
@@ -338,8 +355,4 @@ ul.x-tab-strip li.x-tab-edge {
     border-top:0 none;
     overflow:hidden;
     padding:2px;
-}
-
-.x-border-layout-ct .x-tab-panel {
-	background: white;
 }

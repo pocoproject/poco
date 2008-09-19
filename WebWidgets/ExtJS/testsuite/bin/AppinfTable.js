@@ -9,6 +9,9 @@ Ext.grid.AppinfTable = Ext.extend(Ext.grid.EditorGridPanel, {
      charThatStartedEdit: null,
      
      origEditValue: null,
+	 
+	 modifiedRecord: null,
+	 modifiedField: null,
      
       // private
     initComponent : function(){
@@ -29,6 +32,41 @@ Ext.grid.AppinfTable = Ext.extend(Ext.grid.EditorGridPanel, {
 		if (code != undefined && code != e.LEFT && code != e.RIGHT && code != e.UP && code != e.DOWN && code != e.ESC && code != e.ENTER
 			&& code != e.TAB && code != e.SHIFT && code != e.PAGEUP && code != e.PAGEDOWN && code != e.HOME && code != e.F5 &&
 			code != e.END && code != e.DELETE && code != e.CONTROL && code != e.BACKSPACE){
+			if (code >= e.NUM_ZERO && code <= e.NUM_NINE)
+			{
+				switch(code){
+					case e.NUM_ZERO:
+						code = e.ZERO;
+						break;
+					case e.NUM_ONE:
+						code = e.ONE;
+						break;
+					case e.NUM_TWO:
+						code = e.TWO;
+						break;
+					case e.NUM_THREE:
+						code = e.THREE;
+						break;
+					case e.NUM_FOUR:
+						code = e.FOUR;
+						break;
+					case e.NUM_FIVE:
+						code = e.FIVE;
+						break;
+					case e.NUM_SIX:
+						code = e.SIX;
+						break;
+					case e.NUM_SEVEN:
+						code = e.SEVEN;
+						break;
+					case e.NUM_EIGHT:
+						code = e.EIGHT;
+						break;
+					case e.NUM_NINE:
+						code = e.NINE;
+						break;
+				}
+			}
 			this.charThatStartedEdit = code;
 			var sc = this.selModel.getSelectedCell();
 			var col = sc[1];
@@ -65,13 +103,15 @@ Ext.override(Ext.grid.AppinfTable, {
 					var edView = this.view.getEditorParent(ed);
 					ed.render(edView);
 				}
+				this.modifiedField = ed.field;
+				this.modifiedRecord = r;
 				var edfield = ed.field;
 					ed.row = row;
 					ed.col = col;
 					ed.record = r;
 					ed.field = edfield;
 					ed.on("complete", this.onEditComplete, this, {single: true});
-					ed.on("specialkey", this.selModel.onEditorKey, this.selModel);
+					ed.on("specialkey", this.onEditorKey, this);
 					this.activeEditor = ed;
 					var v = this.preEditValue(r, field);
 					this.origEditValue = v;
@@ -98,7 +138,7 @@ Ext.override(Ext.grid.AppinfTable, {
 	onEditComplete : function(ed, value, startValue){
         this.editing = false;
         this.activeEditor = null;
-        ed.un("specialkey", this.selModel.onEditorKey, this.selModel);
+        ed.un("specialkey", this.onEditorKey, this);
 		var r = ed.record;
         var field = this.colModel.getDataIndex(ed.col);
         value = this.postEditValue(value, startValue, r, field);
@@ -120,6 +160,27 @@ Ext.override(Ext.grid.AppinfTable, {
             }
         }
         this.view.focusCell(ed.row, ed.col);
+    },
+	onEditorKey : function(field, e){
+		var k = e.getKey();
+
+		// reset origEditValue
+		if(k == e.ESC){
+        	e.stopEvent();
+			var ed = this.activeEditor;
+			if (ed)
+			{
+				this.activeEditor = null;
+				ed.un("specialkey", this.onEditorKey, this);
+				ed.un("complete", this.onEditComplete, this);
+				ed.cancelEdit();
+				this.editing = false;
+				this.view.focusCell(ed.row, ed.col);
+			}
+			//this.modifiedRecord.set(this.modifiedField, this.origEditValue);
+        }
+		else
+			this.selModel.onEditorKey(field,e);
     }
 });
 	 

@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -66,14 +66,78 @@ textarea {
 
 /* --- TODO --- */
 
-/* checkboxes */
-
-/* --- TODO --- */
-
-/* radios */
-
-/* --- TODO --- */
-
+/* checkboxes / radios */
+.x-form-check-group, .x-form-radio-group {
+    margin-bottom: 0;
+}
+.x-form-check-group .x-form-invalid .x-panel-body,
+.x-form-radio-group .x-form-invalid .x-panel-body {
+    background-color: transparent;
+}
+.x-form-check-wrap, .x-form-radio-wrap {
+    padding: 3px 0 0 0;
+    line-height:18px;
+}
+.x-form-check-group .x-form-check-wrap, 
+.x-form-radio-group .x-form-radio-wrap {
+    height: 18px;
+}
+.ext-ie .x-form-check-group .x-form-check-wrap, 
+.ext-ie .x-form-radio-group .x-form-radio-wrap {
+    height: 21px;
+}
+.ext-ie .x-form-check-wrap input,
+.ext-ie .x-form-radio-wrap input {
+    width:15px;
+    height:15px;
+}
+.x-form-check, .x-form-radio {
+	height: 13px;
+	width: 13px;
+    vertical-align: bottom;
+} 
+.x-form-radio {
+    margin-bottom: 3px;
+}
+.x-form-check, .ext-ie .x-form-radio {
+    margin-bottom: 2px;
+}
+.x-form-check-wrap-inner, .x-form-radio-wrap-inner {
+    display: inline;
+    padding: 3px 0 0 0;
+}
+.x-form-check {
+	background: url('../images/default/form/checkbox.gif') no-repeat 0 0;
+}
+.x-form-radio {
+	background: url('../images/default/form/radio.gif') no-repeat 0 0;
+}
+.x-form-check-focus .x-form-check, .x-form-check-over .x-form-check,
+.x-form-check-focus .x-form-radio, .x-form-check-over .x-form-radio {
+	background-position: -13px 0;
+}
+.x-form-check-down .x-form-check, 
+.x-form-check-down .x-form-radio {
+	background-position:-26px 0;
+}
+.x-form-check-checked .x-form-check-focus .x-form-check, 
+.x-form-check-checked .x-form-check-over .x-form-check {
+	background-position:-13px -13px;
+}
+.x-form-check-checked .x-form-check-down .x-form-check {
+	background-position:-26px -13px;
+}
+.x-form-check-checked .x-form-check, 
+.x-form-check-checked .x-form-radio {
+	background-position:0 -13px;
+}
+.x-form-check-group-label {
+    border-bottom: 1px solid #99BBE8;
+    color: #15428B;
+    margin-bottom: 5px;
+    padding-left: 3px !important;
+    float: none !important;
+}
 
 /* wrapped fields and triggers */
 
@@ -81,10 +145,6 @@ textarea {
     position:relative;
     zoom:1;
     white-space: nowrap;
-}
-
-.x-editor .x-form-check-wrap {
-    background:#fff;
 }
 .x-form-field-wrap .x-form-trigger{
     width:17px;
@@ -170,20 +230,14 @@ textarea {
 }
 
 /* editors */
-
 .x-editor {
     visibility:hidden;
     padding:0;
     margin:0;
 }
-.x-form-check-wrap {
-    line-height:18px;
-}
-.ext-ie .x-form-check-wrap input {
-    width:15px;
-    height:15px;
-}
-.x-editor .x-form-check-wrap {
+.x-editor .x-form-check-wrap,
+.x-editor .x-form-radio-wrap {
+    background:#fff;
     padding:3px;
 }
 .x-editor .x-form-checkbox {
@@ -215,6 +269,7 @@ textarea {
     font:normal 12px tahoma, arial, helvetica, sans-serif;
     display:block;
     margin-bottom:4px;
+    zoom:1;
 }
 
 .x-form-item label {
@@ -246,6 +301,9 @@ textarea {
 
 .x-form-label-right label {
    text-align:right;
+}
+.x-form-label-left label {
+   text-align:left;
 }
 
 .x-form-label-top .x-form-item label {
@@ -407,6 +465,7 @@ textarea {
     border:1px solid #B5B8C8;
     padding:10px;
     margin-bottom:10px;
+    display:block; /* preserve margins in IE */
 }
 .x-fieldset legend {
     font:bold 11px tahoma, arial, helvetica, sans-serif;

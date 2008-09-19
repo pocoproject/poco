@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -142,7 +142,7 @@
 .x-panel-bc .x-panel-footer {
     padding-bottom:6px;
 }
-.x-panel-nofooter .x-panel-bc {
+.x-panel-nofooter .x-panel-bc, .x-panel-nofooter .x-window-bc {
 	height:6px;
     font-size:0;
     line-height:0;
@@ -151,6 +151,7 @@
 .x-panel-bwrap {
     overflow:hidden;
     zoom:1;
+    left:0;top:0;
 }
 .x-panel-body {
     overflow:hidden;

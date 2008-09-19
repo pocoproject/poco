@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<project path="" name="Ext - Resources" author="Ext JS, LLC" version="2.0.2" copyright="Ext JS Library $version&#xD;&#xA;Copyright(c) 2006-2008, $author.&#xD;&#xA;licensing@extjs.com&#xD;&#xA;&#xD;&#xA;http://extjs.com/license" output="C:\apps\www\deploy\ext-2.0.2\resources" source="true" source-dir="$output" minify="False" min-dir="$output\build" doc="False" doc-dir="$output\docs" master="true" master-file="$output\yui-ext.js" zip="true" zip-file="$output\yuo-ext.$version.zip">
+<project path="" name="Ext - Resources" author="Ext JS, LLC" version="2.2" copyright="Ext JS Library $version&#xD;&#xA;Copyright(c) 2006-2008, $author.&#xD;&#xA;licensing@extjs.com&#xD;&#xA;&#xD;&#xA;http://extjs.com/license" output="C:\apps\www\deploy\ext-2.2\resources" source="true" source-dir="$output" minify="False" min-dir="$output\build" doc="False" doc-dir="$output\docs" master="true" master-file="$output\yui-ext.js" zip="true" zip-file="$output\yuo-ext.$version.zip">
   <directory name="" />
   <target name="All css" file="$output\css\ext-all.css" debug="True" shorthand="False" shorthand-list="YAHOO.util.Dom.setStyle&#xD;&#xA;YAHOO.util.Dom.getStyle&#xD;&#xA;YAHOO.util.Dom.getRegion&#xD;&#xA;YAHOO.util.Dom.getViewportHeight&#xD;&#xA;YAHOO.util.Dom.getViewportWidth&#xD;&#xA;YAHOO.util.Dom.get&#xD;&#xA;YAHOO.util.Dom.getXY&#xD;&#xA;YAHOO.util.Dom.setXY&#xD;&#xA;YAHOO.util.CustomEvent&#xD;&#xA;YAHOO.util.Event.addListener&#xD;&#xA;YAHOO.util.Event.getEvent&#xD;&#xA;YAHOO.util.Event.getTarget&#xD;&#xA;YAHOO.util.Event.preventDefault&#xD;&#xA;YAHOO.util.Event.stopEvent&#xD;&#xA;YAHOO.util.Event.stopPropagation&#xD;&#xA;YAHOO.util.Event.stopEvent&#xD;&#xA;YAHOO.util.Anim&#xD;&#xA;YAHOO.util.Motion&#xD;&#xA;YAHOO.util.Connect.asyncRequest&#xD;&#xA;YAHOO.util.Connect.setForm&#xD;&#xA;YAHOO.util.Dom&#xD;&#xA;YAHOO.util.Event">
     <include name="css\reset.css" />
@@ -25,6 +25,7 @@
     <include name="css\layout.css" />
     <include name="css\progress.css" />
     <include name="css\dialog.css" />
+    <include name="css\slider.css" />
   </target>
   <file name="images\basic-dialog\gray\close.gif" path="images\basic-dialog\gray" />
   <file name="images\basic-dialog\gray\dlg-bg.gif" path="images\basic-dialog\gray" />
@@ -434,10 +435,7 @@
   <file name="images\gray\basic-dialog\expand.gif" path="images\gray\basic-dialog" />
   <file name="images\vista\basic-dialog\collapse.gif" path="images\vista\basic-dialog" />
   <file name="images\vista\basic-dialog\expand.gif" path="images\vista\basic-dialog" />
-  <file name="css\.DS_Store" path="css" />
-  <file name="images\default\grid\.DS_Store" path="images\default\grid" />
   <file name="images\default\toolbar\btn-arrow-light.gif" path="images\default\toolbar" />
-  <file name="images\default\.DS_Store" path="images\default" />
   <file name="images\default\shared\left-btn.gif" path="images\default\shared" />
   <file name="images\default\shared\right-btn.gif" path="images\default\shared" />
   <file name="images\default\shared\calendar.gif" path="images\default\shared" />
@@ -446,12 +444,9 @@
   <file name="images\default\bg.png" path="images\default" />
   <file name="images\default\shadow.png" path="images\default" />
   <file name="images\default\shadow-lr.png" path="images\default" />
-  <file name="images\.DS_Store" path="images" />
-  <file name=".DS_Store" path="" />
   <file name="yui-ext-resources.jsb" path="" />
   <file name="resources.jsb" path="" />
   <file name="css\box.css" path="css" />
-  <file name="images\default\box\.DS_Store" path="images\default\box" />
   <file name="images\default\box\corners-blue.gif" path="images\default\box" />
   <file name="images\default\box\corners.gif" path="images\default\box" />
   <file name="images\default\box\l-blue.gif" path="images\default\box" />
@@ -522,9 +517,6 @@
   <file name="images\default\window\right-corners.psd" path="images\default\window" />
   <file name="images\default\window\top-bottom.png" path="images\default\window" />
   <file name="images\default\window\top-bottom.psd" path="images\default\window" />
-  <file name="images\default\._.DS_Store" path="images\default" />
-  <file name="images\._.DS_Store" path="images" />
-  <file name="._.DS_Store" path="" />
   <file name="css\editor.css" path="css" />
   <file name="images\default\editor\tb-sprite.gif" path="images\default\editor" />
   <file name="css\borders.css" path="css" />
@@ -691,4 +683,17 @@
   <file name="images\default\tree\arrow-open-over.gif" path="images\default\tree" />
   <file name="images\default\tree\arrow-open.gif" path="images\default\tree" />
   <file name="images\default\tree\arrows.gif" path="images\default\tree" />
+  <file name="css\slider.css" path="css" />
+  <file name="images\default\slider\slider-bg.png" path="images\default\slider" />
+  <file name="images\default\slider\slider-thumb.png" path="images\default\slider" />
+  <file name="images\default\slider\slider-v-bg.png" path="images\default\slider" />
+  <file name="images\default\slider\slider-v-thumb.png" path="images\default\slider" />
+  <file name="images\default\panel\Thumbs.db" path="images\default\panel" />
+  <file name="images\default\form\checkbox.gif" path="images\default\form" />
+  <file name="images\default\form\radio.gif" path="images\default\form" />
+  <file name="images\default\.DS_Store" path="images\default" />
+  <file name="images\gray\tabs\Thumbs.db" path="images\gray\tabs" />
+  <file name="images\.DS_Store" path="images" />
+  <file name=".DS_Store" path="" />
+  <file name="images\default\shadow-c.psd" path="images\default" />
 </project>

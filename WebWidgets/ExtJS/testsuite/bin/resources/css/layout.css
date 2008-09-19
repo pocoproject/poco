@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -144,6 +144,12 @@
     background-color:transparent;
 }
 
+/* IE6 strict won't drag w/out a color */
+.ext-strict .ext-ie6 .x-layout-split{
+    background-color: #fff !important;
+    filter: alpha(opacity=1);
+}
+        
 .x-layout-split-h{
     background-image:url(../images/default/s.gif);
     background-position: left;

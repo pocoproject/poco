@@ -1,5 +1,5 @@
 /*
- * Ext JS Library 2.0.2
+ * Ext JS Library 2.2
  * Copyright(c) 2006-2008, Ext JS, LLC.
  * licensing@extjs.com
  * 
@@ -70,7 +70,9 @@
 	padding-bottom:2px;
     padding-right:0;
 }
-
+.ext-gecko3 .x-btn-text-icon .x-btn-center .x-btn-text {
+    padding-top:2px;
+}
 .x-btn-left, .x-btn-right{
 	font-size:1px;
     line-height:1px;
