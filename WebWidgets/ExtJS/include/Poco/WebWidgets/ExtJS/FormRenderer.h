@@ -70,7 +70,7 @@ public:
 	static std::string formVariableName(const Form* pForm);
 		/// Creates the variable name for the form
 		
-	static Poco::WebWidgets::JSDelegate createReloadFunction(const std::string& fctName, const Form* pForm);
+	static Poco::WebWidgets::JSDelegate createReloadFunction(const std::string& fctName, const Form* pForm, const std::string& onSuccess="", const std::string& failure="");
 		/// Creates a function with the given fctName (can be empty) that reloads the form
 		/// E.g.: add the returned JSDelegate to pReload->buttonClicked
 };

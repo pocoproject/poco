@@ -101,7 +101,7 @@ std::string FormRenderer::formVariableName(const Form* pForm)
 }
 
 
-Poco::WebWidgets::JSDelegate FormRenderer::createReloadFunction(const std::string& fctName, const Form* pForm)
+Poco::WebWidgets::JSDelegate FormRenderer::createReloadFunction(const std::string& fctName, const Form* pForm, const std::string& onSuccess, const std::string& onFailure)
 {
 	std::ostringstream out;
 	out << "function ";
@@ -109,7 +109,13 @@ Poco::WebWidgets::JSDelegate FormRenderer::createReloadFunction(const std::strin
 	out <<		"var theForm = Ext.getCmp('" << pForm->id() << "');" << std::endl;
 	out <<		"var uri = '" << pForm->getURI().toString() << "/;" << RequestHandler::KEY_EVID << "=" << Form::EV_RELOAD << "&";
 	out <<	RequestHandler::KEY_ID << "=" << pForm->id() << "';" << std::endl;
-	out <<		"theForm.load({url:uri,method:'GET'});" << std::endl; // success, failure handlers
+	out <<		"theForm.load({" << std::endl;
+	out <<				"url:uri,method:'GET'" << std::endl;
+	if (!onSuccess.empty())
+		out <<			",success: " << onSuccess << std::endl;
+	if (!onFailure.empty())
+		out <<			",failure: " << onFailure << std::endl;
+	out <<		"});" << std::endl; // success, failure handlers
 	out <<	"}" << std::endl;
 	return jsDelegate(out.str());
 }
