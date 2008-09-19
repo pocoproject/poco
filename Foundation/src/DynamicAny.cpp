@@ -1,7 +1,7 @@
 //
 // DynamicAny.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -112,7 +112,7 @@ DynamicAny& DynamicAny::operator += (const DynamicAny& other)
 }
 
 
-const DynamicAny DynamicAny::operator - (const DynamicAny& other) const
+DynamicAny DynamicAny::operator - (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -144,7 +144,7 @@ DynamicAny& DynamicAny::operator -= (const DynamicAny& other)
 }
 
 
-const DynamicAny DynamicAny::operator * (const DynamicAny& other) const
+DynamicAny DynamicAny::operator * (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -176,7 +176,7 @@ DynamicAny& DynamicAny::operator *= (const DynamicAny& other)
 }
 
 
-const DynamicAny DynamicAny::operator / (const DynamicAny& other) const
+DynamicAny DynamicAny::operator / (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
@@ -216,6 +216,7 @@ DynamicAny& DynamicAny::operator ++ ()
 	return *this = *this + 1;
 }
 
+
 DynamicAny DynamicAny::operator ++ (int)
 {
 	if (!isInteger())
@@ -226,6 +227,7 @@ DynamicAny DynamicAny::operator ++ (int)
 	return tmp;
 }
 
+
 DynamicAny& DynamicAny::operator -- ()
 {
 	if (!isInteger())
@@ -233,6 +235,7 @@ DynamicAny& DynamicAny::operator -- ()
 
 	return *this = *this - 1;
 }
+
 
 DynamicAny DynamicAny::operator -- (int)
 {

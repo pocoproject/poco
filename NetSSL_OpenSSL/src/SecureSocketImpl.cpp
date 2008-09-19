@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -378,7 +378,6 @@ long SecureSocketImpl::postConnectionCheck(bool server, SSL* pSSL, const std::st
 		return X509_V_OK;
 
 	X509* cert = 0;
-	X509_NAME* subj = 0;
 
 	if (mode == Context::VERIFY_NONE) // should we allow none on the client side?
 	{
@@ -394,8 +393,6 @@ long SecureSocketImpl::postConnectionCheck(SSLManager::ContextPtr pContext, X509
 {
 	static std::string locHost("127.0.0.1");
 
-	SSLManager& mgr = SSLManager::instance();
-	bool server = pContext->serverContext();
 	Context::VerificationMode mode = pContext->verificationMode();
 	if (hostName == locHost && mode != Context::VERIFY_STRICT)
 		return X509_V_OK;
