@@ -1,5 +1,5 @@
 #
-# $Id: //poco/Main/build/rules/dylib#10 $
+# $Id: //poco/1.3/build/rules/dylib#3 $
 #
 # dylib
 #
@@ -40,6 +40,10 @@ include $(POCO_BASE)/build/rules/compile
 clean:
 	$(RM) $(OBJPATH)
 	$(RM) $(DYLIB_DEBUG) $(DYLIB_RELEASE) $(DYLIB_S_DEBUG) $(DYLIB_S_RELEASE)
+
+distclean: clean
+	$(RM) obj
+	$(RM) .dep
 
 ifeq ($(LINKMODE),BOTH)
 static_debug:   bindirs $(DYLIB_S_DEBUG)
