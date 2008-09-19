@@ -103,6 +103,8 @@ void FrameRenderer::writeProperties(const Frame* pFrame, std::ostream& ostr)
 		ostr << ",collapsible:true";
 	if (pFrame->collapsed())
 		ostr << ",collapsed:true";
+	if (!pFrame->isVisible())
+		ostr << ",hidden:true";
 }
 
 
