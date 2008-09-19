@@ -256,7 +256,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="ws2_32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\lib\PocoFoundationmt.lib"
 			/>
 			<Tool
@@ -328,7 +328,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="ws2_32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\lib\PocoFoundationmtd.lib"
 			/>
 			<Tool
