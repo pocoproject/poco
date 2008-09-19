@@ -71,6 +71,8 @@ void ToggleButtonCellRenderer::renderProperties(const ToggleButtonCell* pToggleB
 	if (!pToggleButtonCell->getLabel().empty())
 		ostr << "boxLabel:'" << Utility::safe(pToggleButtonCell->getLabel()) << "',";
 	ostr << "checked:" << (pToggleButtonCell->isChecked()?"true":"false") << ",";
+	if (!pToggleButtonCell->isEditable())
+		ostr << "readOnly:true,";
 
 	Utility::writeCellProperties(pToggleButtonCell, ostr);
 	//tooltip is not supported by togglebutton
