@@ -216,7 +216,7 @@ DynamicAny& DynamicAny::operator ++ ()
 	return *this = *this + 1;
 }
 
-DynamicAny DynamicAny::operator ++ (int)
+const DynamicAny DynamicAny::operator ++ (int)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -234,7 +234,7 @@ DynamicAny& DynamicAny::operator -- ()
 	return *this = *this - 1;
 }
 
-DynamicAny DynamicAny::operator -- (int)
+const DynamicAny DynamicAny::operator -- (int)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
