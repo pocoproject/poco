@@ -277,7 +277,7 @@ std::string ODBCStatementImpl::nativeSQL()
 	{
 		delete [] pNative;
 		pNative = new char[retlen];
-		memset(pNative, 0, retlen);
+		std::memset(pNative, 0, retlen);
 		length = retlen;
 		if (Utility::isError(SQLNativeSql(_rSession.dbc(),
 			(POCO_SQLCHAR*) statement.c_str(),

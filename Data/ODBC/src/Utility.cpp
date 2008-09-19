@@ -56,10 +56,10 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	const int length = sizeof(POCO_SQLCHAR) * 512;
 
 	POCO_SQLCHAR desc[length];
-	memset(desc, 0, length);
+	std::memset(desc, 0, length);
 	SQLSMALLINT len1 = length;
 	POCO_SQLCHAR attr[length];
-	memset(attr, 0, length);
+	std::memset(attr, 0, length);
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
@@ -74,8 +74,8 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	{
 		driverMap.insert(DSNMap::value_type(std::string((char *) desc), 
 			std::string((char *) attr)));
-		memset(desc, 0, length);
-		memset(attr, 0, length);
+		std::memset(desc, 0, length);
+		std::memset(attr, 0, length);
 		len2 = length;
 	}
 
@@ -93,10 +93,10 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 	const int dsnLength = sizeof(POCO_SQLCHAR) * (SQL_MAX_DSN_LENGTH + 1);
 
 	POCO_SQLCHAR dsn[dsnLength];
-	memset(dsn, 0, dsnLength);
+	std::memset(dsn, 0, dsnLength);
 	SQLSMALLINT len1 = sizeof(POCO_SQLCHAR) * SQL_MAX_DSN_LENGTH;
 	POCO_SQLCHAR desc[length];
-	memset(desc, 0, length);
+	std::memset(desc, 0, length);
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
@@ -110,8 +110,8 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 		&len2)))
 	{
 		dsnMap.insert(DSNMap::value_type(std::string((char *) dsn), std::string((char *) desc)));
-		memset(dsn, 0, dsnLength);
-		memset(desc, 0, length);
+		std::memset(dsn, 0, dsnLength);
+		std::memset(desc, 0, length);
 		len2 = length;
 	}
 

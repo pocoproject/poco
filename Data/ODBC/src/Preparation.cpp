@@ -99,7 +99,7 @@ void Preparation::prepareRaw(std::size_t pos, SQLSMALLINT valueType, std::size_t
 	char* pChr = new char[size]; 
 	_charPtrs.push_back(pChr);
 	poco_assert_dbg (pChr);
-	memset(pChr, 0, size);
+	std::memset(pChr, 0, size);
 
 	_pValues[pos] = new Any(pChr);
 	_pLengths[pos] = new SQLLEN;

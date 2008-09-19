@@ -58,7 +58,7 @@ ODBCColumn::~ODBCColumn()
 
 void ODBCColumn::getDescription()
 {
-	memset(_columnDesc.name, 0, NAME_BUFFER_LENGTH);
+	std::memset(_columnDesc.name, 0, NAME_BUFFER_LENGTH);
 	_columnDesc.nameBufferLength = 0;
 	_columnDesc.dataType = 0;
 	_columnDesc.size = 0;

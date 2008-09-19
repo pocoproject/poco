@@ -434,9 +434,9 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				assert (SQL_SUCCEEDED(rc));
 			}
 
-			assert (0 == strncmp("111", chr[0], 3));
-			assert (0 == strncmp("222", chr[1], 3));
-			assert (0 == strncmp("333", chr[2], 3));
+			assert (0 == std::strncmp("111", chr[0], 3));
+			assert (0 == std::strncmp("222", chr[1], 3));
+			assert (0 == std::strncmp("333", chr[2], 3));
 			assert (4 == fourth);
 			assert (1.5 == fifth);
 

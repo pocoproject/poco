@@ -42,6 +42,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include <vector>
+#include <cstring>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -81,8 +82,8 @@ public:
 	explicit Diagnostics(H& rHandle): _rHandle(rHandle)
 		/// Creates and initializes the Diagnostics.
 	{
-		memset(_connectionName, 0, sizeof(_connectionName));
-		memset(_serverName, 0, sizeof(_serverName));
+		std::memset(_connectionName, 0, sizeof(_connectionName));
+		std::memset(_serverName, 0, sizeof(_serverName));
 		diagnostics();
 	}
 
@@ -193,9 +194,9 @@ public:
 					_connectionName, 
 					SQL_NAME_LENGTH, 
 					&messageLength)))
-						memcpy(_connectionName, none.c_str(), none.length());
+					std::memcpy(_connectionName, none.c_str(), none.length());
 				else if (0 == _connectionName[0]) 
-						memcpy(_connectionName, na.c_str(), na.length());
+					std::memcpy(_connectionName, na.c_str(), na.length());
 				
 				if (Utility::isError(SQLGetDiagField(handleType, 
 					_rHandle, 
@@ -204,15 +205,15 @@ public:
 					_serverName, 
 					SQL_NAME_LENGTH, 
 					&messageLength)))
-						memcpy(_serverName, none.c_str(), none.length());
+					std::memcpy(_serverName, none.c_str(), none.length());
 				else if (0 == _serverName[0]) 
-						memcpy(_serverName, na.c_str(), na.length());
+					std::memcpy(_serverName, na.c_str(), na.length());
 			}
 
 			_fields.push_back(df);
 
-			memset(df._sqlState, 0, SQL_STATE_SIZE);
-			memset(df._message, 0, SQL_MESSAGE_LENGTH);
+			std::memset(df._sqlState, 0, SQL_STATE_SIZE);
+			std::memset(df._message, 0, SQL_MESSAGE_LENGTH);
 			df._nativeError = 0;
 
 			++count;
