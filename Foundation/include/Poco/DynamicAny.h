@@ -1,7 +1,7 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/DynamicAny.h#5 $
+// $Id: //poco/1.3/Foundation/include/Poco/DynamicAny.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -188,16 +188,16 @@ public:
 		/// Assignment operator specialization for DynamicAny
 
 	template <typename T> 
-	const DynamicAny operator + (const T& other) const
+	DynamicAny operator + (const T& other) const
 		/// Addition operator for adding POD to DynamicAny
 	{
 		return convert<T>() + other;
 	}
 
-	const DynamicAny operator + (const DynamicAny& other) const;
+	DynamicAny operator + (const DynamicAny& other) const;
 		/// Addition operator specialization for DynamicAny
 
-	const DynamicAny operator + (const char* other) const;
+	DynamicAny operator + (const char* other) const;
 		/// Addition operator specialization for adding const char* to DynamicAny
 
 	DynamicAny& operator ++ ();
@@ -226,7 +226,7 @@ public:
 		/// Addition asignment operator specialization for const char*
 
 	template <typename T> 
-	const DynamicAny operator - (const T& other) const
+	DynamicAny operator - (const T& other) const
 		/// Subtraction operator for subtracting POD from DynamicAny
 	{
 		return convert<T>() - other;
@@ -433,7 +433,7 @@ inline const std::type_info& DynamicAny::type() const
 }
 
 
-inline const DynamicAny DynamicAny::operator + (const char* other) const
+inline DynamicAny DynamicAny::operator + (const char* other) const
 {
 	return convert<std::string>() + other;
 }

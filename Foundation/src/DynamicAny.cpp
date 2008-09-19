@@ -1,7 +1,7 @@
 //
 // DynamicAny.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -76,7 +76,7 @@ DynamicAny& DynamicAny::operator = (const DynamicAny& other)
 }
 
 
-const DynamicAny DynamicAny::operator + (const DynamicAny& other) const
+DynamicAny DynamicAny::operator + (const DynamicAny& other) const
 {
 	if (isInteger())
 	{
