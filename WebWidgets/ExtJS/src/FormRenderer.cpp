@@ -112,9 +112,17 @@ Poco::WebWidgets::JSDelegate FormRenderer::createReloadFunction(const std::strin
 	out <<		"theForm.load({" << std::endl;
 	out <<				"url:uri,method:'GET'" << std::endl;
 	if (!onSuccess.empty())
-		out <<			",success: " << onSuccess << std::endl;
+	{
+		out <<			",success: function(form, action){" << std::endl; 
+		out <<				"form.addListener('actioncomplete', " << onSuccess << ");" << std::endl;
+		out <<			"}" << std::endl;
+	}	
 	if (!onFailure.empty())
-		out <<			",failure: " << onFailure << std::endl;
+	{
+		out <<			",failure: function(form, action){" << std::endl; 
+		out <<				"form.addListener('actionfailed', " << onFailure << ");" << std::endl;
+		out <<			"}" << std::endl;
+	}	
 	out <<		"});" << std::endl; // success, failure handlers
 	out <<	"}" << std::endl;
 	return jsDelegate(out.str());
