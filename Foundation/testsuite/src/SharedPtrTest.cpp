@@ -1,7 +1,7 @@
 //
 // SharedPtrTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/SharedPtrTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/SharedPtrTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -84,6 +84,7 @@ namespace
 		{
 			return _number;
 		}
+		
 	private:
 		int _number;
 	};
@@ -198,6 +199,7 @@ void SharedPtrTest::testImplicitCast()
 	assert (TestObject::count() == 0);
 }
 
+
 void SharedPtrTest::testExplicitCast()
 {
 	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
@@ -211,6 +213,7 @@ void SharedPtrTest::testExplicitCast()
 	assert (TestObject::count() == 1);
 	assert (ptr2.get() == 0);
 }
+
 
 void SharedPtrTest::setUp()
 {
