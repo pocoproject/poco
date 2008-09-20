@@ -8,8 +8,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SYSLIBS += -L/usr/local/lib/mysql
-INCLUDE += -I/usr/local/include/mysql/
+SYSLIBS += -L/usr/local/lib/mysql -L/usr/lib/mysql
+INCLUDE += -I/usr/local/include/mysql/ -I/usr/include/mysql
 SYSFLAGS += -DTHREADSAFE -DNO_TCL
 
 objects = Binder Extractor SessionImpl Connector \

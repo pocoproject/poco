@@ -36,6 +36,7 @@
 
 #include "Poco/Environment_UNIX.h"
 #include "Poco/Exception.h"
+#include <cstring>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
@@ -188,7 +189,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	int s = socket(PF_INET, SOCK_DGRAM, 0);
 	if (s == -1) throw SystemException("cannot open socket");
 
-	strcpy(ifr.ifr_name, "eth0");
+	std::strcpy(ifr.ifr_name, "eth0");
 	int rc = ioctl(s, SIOCGIFHWADDR, &ifr);
 	close(s);
 	if (rc < 0) throw SystemException("cannot get MAC address");

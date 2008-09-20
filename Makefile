@@ -44,12 +44,12 @@ install: libexecs
 	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec install {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec
-.PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests
+.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec
+.PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests
 .PHONY: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
 
-libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec
-tests: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests
+libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec
+tests: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests
 samples: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
 
 Foundation-libexec: 
@@ -117,6 +117,12 @@ Data/ODBC-libexec:  Foundation-libexec Data-libexec
 
 Data/ODBC-tests: Data/ODBC-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite
+
+Data/MySQL-libexec:  Foundation-libexec Data-libexec
+	$(MAKE) -C $(POCO_BASE)/Data/MySQL
+
+Data/MySQL-tests: Data/ODBC-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite
 
 clean:
 	$(MAKE) -C $(POCO_BASE)/Foundation clean

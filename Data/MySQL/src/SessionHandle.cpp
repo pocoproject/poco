@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/MySQL/SessionHandle.h"
+#include <cstring>
 
 
 namespace Poco {
@@ -103,7 +104,7 @@ void SessionHandle::close()
 
 void SessionHandle::query(const char* str)
 {
-	int res = mysql_real_query(h, str, static_cast<unsigned long>(strlen(str))); 
+	int res = mysql_real_query(h, str, static_cast<unsigned long>(std::strlen(str))); 
 
 	if (res != 0)
 	{
