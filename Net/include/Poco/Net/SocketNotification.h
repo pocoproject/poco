@@ -1,7 +1,7 @@
 //
 // SocketNotification.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketNotification.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SocketNotification.h#2 $
 //
 // Library: Net
 // Package: Reactor
@@ -125,6 +125,19 @@ public:
 
 	~TimeoutNotification();
 		/// Destroys the TimeoutNotification.
+};
+
+
+class Net_API IdleNotification: public SocketNotification
+	/// This notification is sent when the SocketReactor does
+	/// not have any sockets to react to.
+{
+public:
+	IdleNotification(SocketReactor* pReactor);
+		/// Creates the IdleNotification for the given SocketReactor.
+
+	~IdleNotification();
+		/// Destroys the IdleNotification.
 };
 
 

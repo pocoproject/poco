@@ -1,7 +1,7 @@
 //
 // SocketTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketTest.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/SocketTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -425,6 +425,18 @@ void SocketTest::testSelect2()
 }
 
 
+void SocketTest::testSelect3()
+{
+	Socket::SocketList readList;
+	Socket::SocketList writeList;
+	Socket::SocketList exceptList;
+	Timespan timeout(1000);
+
+	int rc = Socket::select(readList, writeList, exceptList, timeout);
+	assert (rc == 0);
+}
+
+
 void SocketTest::setUp()
 {
 }
@@ -452,6 +464,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testOptions);
 	CppUnit_addTest(pSuite, SocketTest, testSelect);
 	CppUnit_addTest(pSuite, SocketTest, testSelect2);
+	CppUnit_addTest(pSuite, SocketTest, testSelect3);
 
 	return pSuite;
 }

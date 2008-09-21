@@ -1,7 +1,7 @@
 //
 // SocketReactor.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketReactor.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SocketReactor.h#2 $
 //
 // Library: Net
 // Package: Reactor
@@ -90,7 +90,8 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// If an event is detected, the corresponding event handler
 	/// is invoked. There are five event types (and corresponding
 	/// notification classes) defined: ReadableNotification, WritableNotification,
-	/// ErrorNotification, TimeoutNotification and ShutdownNotification.
+	/// ErrorNotification, TimeoutNotification, IdleNotification and 
+	/// ShutdownNotification.
 	/// 
 	/// The ReadableNotification will be dispatched if a socket becomes
 	/// readable. The WritableNotification will be dispatched if a socket
@@ -100,8 +101,16 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// If the timeout expires and no event has occured, a
 	/// TimeoutNotification will be dispatched to all event handlers
 	/// registered for it. This is done in the onTimeout() method
-	/// which can be overridded by subclasses to perform custom
+	/// which can be overridden by subclasses to perform custom
 	/// timeout processing.
+	///
+	/// If there are no sockets for the SocketReactor to pass to
+	/// Socket::select(), an IdleNotification will be dispatched to
+	/// all event handlers registered for it. This is done in the
+	/// onIdle() method which can be overridden by subclasses
+	/// to perform custom idle processing. Since onIdle() will be
+	/// called repeatedly in a loop, it is recommended to do a
+	/// short sleep or yield in the event handler.
 	///
 	/// Finally, when the SocketReactor is about to shut down (as a result 
 	/// of stop() being called), it dispatches a ShutdownNotification
@@ -174,6 +183,13 @@ protected:
 		/// Can be overridden by subclasses. The default implementation
 		/// dispatches the TimeoutNotification and thus should be called by overriding
 		/// implementations.
+		
+	virtual void onIdle();
+		/// Called if no sockets are available to call select() on.
+		///
+		/// Can be overridden by subclasses. The default implementation
+		/// dispatches the IdleNotification and thus should be called by overriding
+		/// implementations.
 
 	virtual void onShutdown();
 		/// Called when the SocketReactor is about to terminate.
@@ -208,6 +224,7 @@ private:
 	NotificationPtr _pWritableNotification;
 	NotificationPtr _pErrorNotification;
 	NotificationPtr _pTimeoutNotification;
+	NotificationPtr _pIdleNotification;
 	NotificationPtr _pShutdownNotification;
 	Poco::FastMutex _mutex;
 	

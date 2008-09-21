@@ -1,7 +1,7 @@
 //
 // SocketReactor.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketReactor.cpp#1 $
+// $Id: //poco/1.3/Net/src/SocketReactor.cpp#2 $
 //
 // Library: Net
 // Package: Reactor
@@ -38,6 +38,7 @@
 #include "Poco/Net/SocketNotification.h"
 #include "Poco/Net/SocketNotifier.h"
 #include "Poco/ErrorHandler.h"
+#include "Poco/Thread.h"
 #include "Poco/Exception.h"
 
 
@@ -57,6 +58,7 @@ SocketReactor::SocketReactor():
 	_pWritableNotification(new WritableNotification(this)),
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
+	_pIdleNotification(new IdleNotification(this)),
 	_pShutdownNotification(new ShutdownNotification(this))
 {
 }
@@ -69,6 +71,7 @@ SocketReactor::SocketReactor(const Poco::Timespan& timeout):
 	_pWritableNotification(new WritableNotification(this)),
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
+	_pIdleNotification(new IdleNotification(this)),
 	_pShutdownNotification(new ShutdownNotification(this))
 {
 }
@@ -87,31 +90,60 @@ void SocketReactor::run()
 	
 	while (!_stop)
 	{
-		readable.clear();
-		writable.clear();
-		except.clear();
+		try
 		{
-			FastMutex::ScopedLock lock(_mutex);
-			for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
+			readable.clear();
+			writable.clear();
+			except.clear();
+			int nSockets = 0;
 			{
-				if (it->second->accepts(_pReadableNotification))
-					readable.push_back(it->first);
-				if (it->second->accepts(_pWritableNotification))
-					writable.push_back(it->first);
-				if (it->second->accepts(_pErrorNotification))
-					except.push_back(it->first);
+				FastMutex::ScopedLock lock(_mutex);
+				for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
+				{
+					if (it->second->accepts(_pReadableNotification))
+					{
+						readable.push_back(it->first);
+						nSockets++;
+					}
+					if (it->second->accepts(_pWritableNotification))
+					{
+						writable.push_back(it->first);
+						nSockets++;
+					}
+					if (it->second->accepts(_pErrorNotification))
+					{
+						except.push_back(it->first);
+						nSockets++;
+					}
+				}
 			}
+			if (nSockets == 0)
+			{
+				onIdle();
+			}
+			else if (Socket::select(readable, writable, except, _timeout))
+			{
+				for (Socket::SocketList::iterator it = readable.begin(); it != readable.end(); ++it)
+					dispatch(*it, _pReadableNotification);
+				for (Socket::SocketList::iterator it = writable.begin(); it != writable.end(); ++it)
+					dispatch(*it, _pWritableNotification);
+				for (Socket::SocketList::iterator it = except.begin(); it != except.end(); ++it)
+					dispatch(*it, _pErrorNotification);
+			}
+			else onTimeout();
 		}
-		if (Socket::select(readable, writable, except, _timeout))
+		catch (Exception& exc)
 		{
-			for (Socket::SocketList::iterator it = readable.begin(); it != readable.end(); ++it)
-				dispatch(*it, _pReadableNotification);
-			for (Socket::SocketList::iterator it = writable.begin(); it != writable.end(); ++it)
-				dispatch(*it, _pWritableNotification);
-			for (Socket::SocketList::iterator it = except.begin(); it != except.end(); ++it)
-				dispatch(*it, _pErrorNotification);
+			ErrorHandler::handle(exc);
 		}
-		else onTimeout();
+		catch (std::exception& exc)
+		{
+			ErrorHandler::handle(exc);
+		}
+		catch (...)
+		{
+			ErrorHandler::handle();
+		}
 	}
 	onShutdown();
 }
@@ -169,6 +201,12 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 void SocketReactor::onTimeout()
 {
 	dispatch(_pTimeoutNotification);
+}
+
+
+void SocketReactor::onIdle()
+{
+	dispatch(_pIdleNotification);
 }
 
 

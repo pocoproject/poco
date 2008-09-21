@@ -1,7 +1,7 @@
 //
 // Socket.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/Socket.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/Socket.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -129,6 +129,10 @@ public:
 		///   * readList contains those sockets ready for reading,
 		///   * writeList contains those sockets ready for writing,
 		///   * exceptList contains those sockets with a pending error.
+		///
+		/// If the total number of sockets passed in readList, writeList and
+		/// exceptList is zero, select() will return immediately and the
+		/// return value will be 0.
 
 	bool poll(const Poco::Timespan& timeout, int mode) const;
 		/// Determines the status of the socket, using a 

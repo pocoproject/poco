@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.3/Net/src/Socket.cpp#3 $
+// $Id: //poco/1.3/Net/src/Socket.cpp#4 $
 //
 // Library: Net
 // Package: Sockets
@@ -112,6 +112,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 			nfd = int(it->sockfd());
 		FD_SET(it->sockfd(), &fdExcept);
 	}
+	if (nfd == 0) return 0;
 	Poco::Timespan remainingTime(timeout);
 	int rc;
 	do

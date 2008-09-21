@@ -1,7 +1,7 @@
 //
 // SocketNotification.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketNotification.cpp#1 $
+// $Id: //poco/1.3/Net/src/SocketNotification.cpp#2 $
 //
 // Library: Net
 // Package: Reactor
@@ -98,6 +98,17 @@ TimeoutNotification::TimeoutNotification(SocketReactor* pReactor):
 
 
 TimeoutNotification::~TimeoutNotification()
+{
+}
+
+
+IdleNotification::IdleNotification(SocketReactor* pReactor): 
+	SocketNotification(pReactor)
+{
+}
+
+
+IdleNotification::~IdleNotification()
 {
 }
 
