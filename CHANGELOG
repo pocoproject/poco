@@ -72,6 +72,7 @@ Release 1.3.3 (2008-09-22)
 - fixed SF# 1891132: Poco::Data::StatementImpl::executeWithLimit is not correct
 - fixed SF# 1951604: POCO refuses to compile with g++ 4.3.0
 
+
 Release 1.3.2 (2008-02-04)
 ==========================
 
