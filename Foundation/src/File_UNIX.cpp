@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#12 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -97,13 +97,12 @@ bool FileImpl::canReadImpl() const
 {
 	poco_assert (!_path.empty());
 
-	if (geteuid() == 0)
-		return true;
-
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == geteuid())
+		if (geteuid() == 0)
+			return true;
+		else if (st.st_uid == geteuid())
 			return (st.st_mode & S_IRUSR) != 0;
 		else if (st.st_gid == getegid())
 			return (st.st_mode & S_IRGRP) != 0;
@@ -119,13 +118,12 @@ bool FileImpl::canWriteImpl() const
 {
 	poco_assert (!_path.empty());
 
-	if (geteuid() == 0)
-		return true;
-
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == geteuid())
+		if (geteuid() == 0)
+			return true;
+		else if (st.st_uid == geteuid())
 			return (st.st_mode & S_IWUSR) != 0;
 		else if (st.st_gid == getegid())
 			return (st.st_mode & S_IWGRP) != 0;
@@ -144,7 +142,7 @@ bool FileImpl::canExecuteImpl() const
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == geteuid())
+		if (st.st_uid == geteuid() || geteuid() == 0)
 			return (st.st_mode & S_IXUSR) != 0;
 		else if (st.st_gid == getegid())
 			return (st.st_mode & S_IXGRP) != 0;
@@ -209,7 +207,7 @@ Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) && defined(st_birthtime) // st_birthtime is available only on 10.5
 	struct stat64 st;
 	if (stat64(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_birthtime);
