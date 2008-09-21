@@ -1,7 +1,7 @@
 //
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
+#include <cstring>
 
 
 namespace Poco {

@@ -1,7 +1,7 @@
 //
 // Diagnostics.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Diagnostics.h#3 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Diagnostics.h#4 $
 //
 // Library: ODBC
 // Package: ODBC
@@ -47,6 +47,7 @@
 #include <windows.h>
 #endif
 #include <sqlext.h>
+#include <cstring>
 
 
 namespace Poco {
