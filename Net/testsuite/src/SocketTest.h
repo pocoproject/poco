@@ -1,7 +1,7 @@
 //
 // SocketTest.h
 //
-// $Id: //poco/svn/Net/testsuite/src/SocketTest.h#2 $
+// $Id: //poco/1.3/Net/testsuite/src/SocketTest.h#2 $
 //
 // Definition of the SocketTest class.
 //
@@ -59,6 +59,7 @@ public:
 	void testOptions();
 	void testSelect();
 	void testSelect2();
+	void testSelect3();
 
 	void setUp();
 	void tearDown();
