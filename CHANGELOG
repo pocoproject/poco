@@ -1,12 +1,73 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.3 ()
+Release 1.3.3 (2008-09-22)
 ==========================
 
-Foundation, XML, Net, Util:
-
-Data:
+- Threads now have optional user-settable stack size (if the OS supports that feature)
+- Upgraded to SQLite 3.6.2
+- Upgraded to PCRE 7.8
+- added HttpOnly support to Poco::Net::HTTPCookie
+- NetworkInterface now has displayName() member (useful only on Windows)
+- Poco::Util::WinRegistryKey now has a read-only mode
+- Poco::Util::WinRegistryKey::deleteKey() can now recursively delete registry keys
+- Poco::File::created() now returns 0 if the creation date/time is not known, as 
+  it's the case on most Unix platforms (including Linux). 
+  On FreeBSD and Mac OS X, it returns the real creation time.
+- Time interval based log file rotation (Poco::FileChannel) now works
+  correctly. Since there's no reliable and portable way to find out the creation 
+  date of a file (Windows has the tunneling "feature", most Unixes don't provide 
+  the creation date), the creation/rotation date of the log file is written into 
+  the log file as the first line.
+- added Environment::nodeId() for obtaining the Ethernet address of the system
+  (this is now also used by UUIDGenerator - the corresponding code from UUIDGenerator
+  was moved into Environment)
+- added a release policy argument to SharedPtr template
+- Socket::select() will no longer throw an InvalidArgumentException
+  on Windows when called with no sockets at all. If all three socket
+  sets are empty, Socket::select() will return 0 immediately.
+- SocketReactor::run() now catches exceptions and reports them via
+  the ErrorHandler.
+- SocketReactor has a new IdleNotification, which will be posted when
+  the SocketReactor has no sockets to handle.
+- fixed SF# 1859738: AsyncChannel stall
+- fixed SF# 1815124: XML Compile failed on VS7.1 with XML_UNICODE_WCHAR_T
+- fixed SF# 1867340: Net and NetSSL additional dependency not set - ws2_32.lib
+- fixed SF# 1871946: no exception thrown on error
+- fixed SF# 1881113: LinearHashTable does not conform to stl iterators
+- fixed SF# 1899808: HTMLForm.load() should call clear() first
+- fixed SF# 2030074: Cookie problem with .NET server
+- fixed SF# 2009707: small bug in Net/ICMPPacketImpl.cpp
+- fixed SF# 988579: Intel Warning: invalid multibyte character sequence
+- fixed SF# 2007486: Please clarify license for Data/samples/*
+- fixed SF# 1985180: Poco::Net::DNS multithreading issue
+- fixed SF# 1968106: DigestOutputStream losing data
+- fixed SF# 1980478: FileChannel loses messages with "archive"="timestamp"
+- fixed SF# 1906481: mingw build WC_NO_BEST_FIT_CHARS is not defined
+- fixed SF# 1916763: Bug in Activity?
+- fixed SF# 1956300: HTTPServerConnection hanging
+- fixed SF# 1963214: Typo in documentation for NumberParser::parseFloat
+- fixed SF# 1981865: Cygwin Makefile lacks ThreadTarget.cpp
+- fixed SF# 1981130: pointless comparison of unsigned integer with zero
+- fixed SF# 1943728: POCO_APP_MAIN namespace issue
+- fixed SF# 1981139: initial value of reference to non-const must be an lvalue
+- fixed SF# 1995073: setupRegistry is broken if POCO_WIN32_UTF8 enabled
+- fixed SF# 1981125: std::swap_ranges overloading resolution failed
+- fixed SF# 2019857: Memory leak in Data::ODBC Extractor
+- fixed SF# 1916761: Bug in Stopwatch?
+- fixed SF# 1951443: NetworkInterface::list BSD/QNX no netmask and broadcast addr
+- fixed SF# 1935310: Unhandled characters in Windows1252Encoding
+- fixed SF# 1948361: a little bug for win32
+- fixed SF# 1896482: tryReadLock intermittent error
+- workaround for SF# 1959059: Poco::SignalHandler deadlock
+  the SignalHandler can now be disabled globally by adding a
+  #define POCO_NO_SIGNAL_HANDLER to Poco/Config.h
+- fixed SF# 2012050: Configuration key created on read access
+- fixed SF# 1895483: PCRE - possible buffer overflow
+- fixed SF# 2062835: Logfile _creationDate is wrong
+- fixed SF# 2118943: out_of_bound access in Poco::Data::BLOB:rawContent
+- fixed SF# 2121732: Prevent InvalidArgumentException in SocketReactor
 - fixed SF# 1891132: Poco::Data::StatementImpl::executeWithLimit is not correct
+
 
 Release 1.3.2 (2008-02-04)
 ==========================
@@ -49,6 +110,10 @@ Foundation, XML, Net, Util:
 - fixed SF# 1873924: Add exception code to NetException
 - fixed SF# 1873929: SMTPClientSession support for name in sender field
 - logging performance improvements (PatternFormatter)
+- fixed SF# 1883871: TypeList operator < fails for tuples with duplicate values
+- CYGWIN build works again (most things work but Foundation testsuite still fails)
+- new build configuration for Digi Embedded Linux (ARM9, uclibc)
+- new build configuration for PowerPC Linux
 
 Data:
 - fixed SF# 1724388: ODBC Diagnostics
@@ -56,6 +121,7 @@ Data:
 - fixed SF# 1803435: SessionPool onJanitorTimer called too often?
 - fixed SF# 1851997: Undefined Behavior in ODBC::Preparation
 - updated SQlite to 3.5.5
+
 
 Release 1.3.1 (2007-08-08)
 ==========================
@@ -91,6 +157,7 @@ Data:
 - fixed SF# 1739989: Data::RecordSet::operator = () (in 1.3 branch)
 - fixed SF# 1747525: SQLite, Transactions and Session Pooling (in 1.3 branch)
 - upgraded to SQLite 3.4.1
+
 
 Release 1.3.0 (2007-05-07)
 ==========================
@@ -832,4 +899,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#15 $
+$Id: //poco/1.3/dist/CHANGELOG#24 $
