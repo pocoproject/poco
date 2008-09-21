@@ -13,14 +13,14 @@ set OPENSSL_INCLUDE=%OPENSSL_DIR%\include
 set OPENSSL_LIB=%OPENSSL_DIR%\lib\VC
 set MYSQL_INCLUDE=%MYSQL_DIR%\include
 set MYSQL_LIB_DBG=%MYSQL_DIR%\lib\debug
-set MYSQL_LIB_RELESE=%MYSQL_DIR%\lib\opt
+set MYSQL_LIB_RELEASE=%MYSQL_DIR%\lib\opt
 set INCLUDE=%INCLUDE%;%OPENSSL_INCLUDE%;%MYSQL_INCLUDE%
 set LIB=%LIB%;%OPENSSL_LIB%
 set POCOBASE=%CD%
 set PATH=%POCOBASE%\bin;%PATH%
 set CLEAN_LIB=%LIB%
 set MYSQL_DEBUG_BUILD_LIB=%LIB%;%MYSQL_LIB_DBG%
-set MYSQL_RELESE_BUILD_LIB=%LIB%;%MYSQL_LIB_RELESE%
+set MYSQL_RELEASE_BUILD_LIB=%LIB%;%MYSQL_LIB_RELEASE%
 
 cd CppUnit
 devenv /useenv /rebuild debug_shared CppUnit_vs80.sln
@@ -70,7 +70,7 @@ cd %POCOBASE%
 cd Data/MySQL
 set LIB=%MYSQL_DEBUG_BUILD_LIB%
 devenv /useenv /rebuild debug_shared MySQL_vs80.sln
-set LIB=%MYSQL_RELESE_BUILD_LIB%
+set LIB=%MYSQL_RELEASE_BUILD_LIB%
 devenv /useenv /rebuild release_shared MySQL_vs80.sln
 set LIB=%CLEAN_LIB%
 cd %POCOBASE%
