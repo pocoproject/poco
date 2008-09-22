@@ -1,9 +1,9 @@
 #
-# $Id: //poco/1.3/build/config/QNX#2 $
+# $Id: //poco/1.3/build/config/QNX#3 $
 #
 # QNX
 #
-# Make settings for QNX Neutrino 6.3 with GCC 3.3.1
+# Make settings for QNX Neutrino 6.3 with GCC 3.3.5
 #
 
 #
@@ -14,7 +14,7 @@ LINKMODE = SHARED
 #
 # Define Tools
 #
-CCVER   = 3.3.1,gcc_ntox86
+CCVER   = 3.3.5,gcc_ntox86
 CC      = qcc -V$(CCVER)
 CXX     = QCC -V$(CCVER)
 LINK    = $(CXX) -V$(CCVER)
