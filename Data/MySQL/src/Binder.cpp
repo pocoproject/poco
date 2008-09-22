@@ -278,7 +278,7 @@ void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer
 		size_t s = _bindArray.size();
 		_bindArray.resize(pos + 1);
 
-		memset(&_bindArray[s], 0, sizeof(MYSQL_BIND) * (_bindArray.size() - s));
+		std::memset(&_bindArray[s], 0, sizeof(MYSQL_BIND) * (_bindArray.size() - s));
 	}
 
 	MYSQL_BIND b = {0};

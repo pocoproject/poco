@@ -198,7 +198,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 
 	{for (size_t i = 0; i < count; i++)
 	{
-		memset(&_row[i], 0, sizeof(MYSQL_BIND));
+		std::memset(&_row[i], 0, sizeof(MYSQL_BIND));
 
 		_row[i].buffer_type   = fields[i].type;
 		_row[i].buffer_length = static_cast<unsigned int>(_columns[i].length());
