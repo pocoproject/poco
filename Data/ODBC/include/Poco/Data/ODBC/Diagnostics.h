@@ -1,7 +1,7 @@
 //
 // Diagnostics.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Diagnostics.h#4 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Diagnostics.h#5 $
 //
 // Library: ODBC
 // Package: ODBC

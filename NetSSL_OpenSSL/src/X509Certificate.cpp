@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -38,12 +38,48 @@
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SecureSocketImpl.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
+#include "Poco/StreamCopier.h"
 #include <openssl/pem.h>
 
 
 namespace Poco {
 namespace Net {
 
+X509Certificate::X509Certificate(std::istream& str):
+	_issuerName(),
+	_subjectName(),
+	_pCert(0),
+	_file()
+{
+	Poco::TemporaryFile certFile;
+	
+	if (!certFile.createFile())
+		throw Poco::FileException("No temporary file could be created for X509Certificate!");
+	_file = certFile.path();
+	Poco::FileOutputStream fout(_file);
+	Poco::StreamCopier::copyStream(str, fout);
+	fout.close();
+	
+	BIO *fp=BIO_new(BIO_s_file());
+	const char* pFN = _file.c_str();
+	BIO_read_filename(fp, (void*)pFN);
+	if (!fp)
+		throw Poco::PathNotFoundException("Failed to open temporary file for X509Certificate");
+	try
+	{
+		_pCert = PEM_read_bio_X509(fp,0,0,0);
+	}
+	catch(...)
+	{
+		BIO_free(fp);
+		throw;
+	}
+	if (!_pCert)
+		throw SSLException("Faild to load certificate from " + _file);
+	initialize();
+}
 
 X509Certificate::X509Certificate(const std::string& file):
 	_issuerName(),

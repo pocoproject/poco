@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/Utility.cpp#2 $
+// $Id: //poco/1.3/Data/ODBC/src/Utility.cpp#3 $
 //
 // Library: ODBC
 // Package: ODBC

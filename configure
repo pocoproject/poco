@@ -90,6 +90,8 @@ fi
 if [ ! -f "$base/build/config/$config" ] ; then
 	echo "Unknown configuration: $config"
 	echo "Please use the --config option to specify another build configuration"
+	echo "The following configurations are available:"
+	ls $base/build/config
 	exit 1
 fi
 

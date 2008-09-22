@@ -1,7 +1,7 @@
 POCO Data Release Notes
 Data
 
-!!!Release 1.3.2
+!!!Release 1.3.3
 
 Release 1.3 of the POCO C++ Libraries is the first official release containing the Data library.
 The Data library has been available in a development state for the 1.2 release. For the 1.3
@@ -9,6 +9,15 @@ release, a few things have been changed in an incompatible way that requires cha
 to existing code.
 
 !!Summary of Changes
+
+!Changes in 1.3.3
+  - Upgraded to SQLite 3.6.2
+  - fixed SF# 1871946: no exception thrown on error
+  - fixed SF# 2007486: Please clarify license for Data/samples/*
+  - fixed SF# 2019857: Memory leak in Data::ODBC Extractor
+  - fixed SF# 2118943: out_of_bound access in Poco::Data::BLOB:rawContent
+  - fixed SF# 1891132: Poco::Data::StatementImpl::executeWithLimit is not correct
+  
 
 !Changes in 1.3.2
   - fixed SF# 1724388: ODBC Diagnostics

@@ -1,7 +1,7 @@
 //
 // SesssionHandle.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/SessionHandle.cpp#2 $
+// $Id: //poco/1.3/Data/MySQL/src/SessionHandle.cpp#3 $
 //
 // Library: Data
 // Package: MySQL
