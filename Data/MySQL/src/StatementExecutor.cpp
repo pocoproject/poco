@@ -36,6 +36,7 @@
 
 #include <mysql.h>
 #include "Poco/Data/MySQL/StatementExecutor.h"
+#include <sstream>
 
 
 namespace Poco {
@@ -177,15 +178,9 @@ bool StatementExecutor::fetchColumn(size_t n, MYSQL_BIND *bind)
 
 	if ((res != 0) && (res != MYSQL_NO_DATA))
 	{
-		std::string msg;
-		msg += "mysql_stmt_fetch_column(";
-
-		char buff[30];
-		sprintf(buff, "%d", n);
-		msg += buff;
-
-		msg += ") error";
-		throw StatementException(msg, h, _query);
+		std::ostringstream msg;
+		msg << "mysql_stmt_fetch_column(" << n << ") error";
+		throw StatementException(msg.str(), h, _query);
 	}
 
 	return (res == 0);

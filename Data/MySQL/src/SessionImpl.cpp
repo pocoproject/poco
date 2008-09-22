@@ -36,6 +36,7 @@
 
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
+#include "Poco/NumberParser.h"
 
 
 namespace
@@ -118,7 +119,8 @@ SessionImpl::SessionImpl(const std::string& connectionString) : _mysql(0), _conn
 		throw MySQLException("create session: specify database");
 	}
 
-	if (atoi(options["port"].c_str()) == 0)
+	unsigned int port = 0;
+	if (!NumberParser::tryParseUnsigned(options["port"], port) || 0 == port || port > 65535)
 	{
 		throw MySQLException("create session: specify correct port (numeric in decimal notation)");
 	}
@@ -162,7 +164,7 @@ SessionImpl::SessionImpl(const std::string& connectionString) : _mysql(0), _conn
 			options["user"].c_str(), 
 			options["password"].c_str(), 
 			options["db"].c_str(), 
-			atoi(options["port"].c_str()));
+			port);
 
 	_connected = true;
 }

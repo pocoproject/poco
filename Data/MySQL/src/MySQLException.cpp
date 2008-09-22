@@ -36,6 +36,7 @@
 
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <mysql.h>
+#include <sstream>
 
 
 namespace Poco {
@@ -80,49 +81,36 @@ StatementException::StatementException(const std::string& text, MYSQL_STMT* h, c
 
 std::string ConnectionException::compose(const std::string& text, MYSQL* h)
 {
-	std::string str;
-	str += "[Comment]: ";
-	str += text;
-	str += "\t[mysql_error]: ";
-	str += mysql_error(h);
-
-	str += "\t[mysql_errno]: ";
-	char buff[30];
-	sprintf(buff, "%d", mysql_errno(h));
-	str += buff;
-
-	str += "\t[mysql_sqlstate]: ";
-	str += mysql_sqlstate(h);
-	return str;
+	std::ostringstream str;
+	str << "[Comment]: << text\t[mysql_error]: " << mysql_error(h) << "\t[mysql_errno]: ";
+	str << mysql_errno(h) << "\t[mysql_sqlstate]: " << mysql_sqlstate(h);
+	return str.str();
 }
+
 
 std::string StatementException::compose(const std::string& text, MYSQL_STMT* h, const std::string& stmt)
 {
-	std::string str;
-	str += "[Comment]: ";
-	str += text;
+	std::ostringstream str;
+	str << "[Comment]: " << text;
 
 	if (h != 0)
 	{
-		str += "\t[mysql_stmt_error]: ";
-		str += mysql_stmt_error(h);
+		str << "\t[mysql_stmt_error]: ";
+		str << mysql_stmt_error(h);
 
-		str += "\t[mysql_stmt_errno]: ";
-		char buff[30];
-		sprintf(buff, "%d", mysql_stmt_errno(h));
-		str += buff;
+		str << "\t[mysql_stmt_errno]: " << mysql_stmt_errno(h);
 
-		str += "\t[mysql_stmt_sqlstate]: ";
-		str += mysql_stmt_sqlstate(h);
+		str << "\t[mysql_stmt_sqlstate]: ";
+		str << mysql_stmt_sqlstate(h);
 	}
 
 	if (stmt.length() > 0)
 	{
-		str += "\t[statemnt]: ";
-		str += stmt;
+		str << "\t[statemnt]: ";
+		str << stmt;
 	}
 
-	return str;
+	return str.str();
 }
 
 
