@@ -62,6 +62,8 @@ public:
 	const std::string& pathImpl() const;
 
 private:
+	void createFile();
+
 	std::string _path;
 	HANDLE      _hFile;
 	Timestamp   _creationDate;
