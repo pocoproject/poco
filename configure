@@ -2,35 +2,74 @@
 #
 # configure
 #
-# $Id: //poco/1.3/dist/configure#4 $
+# $Id: //poco/Main/dist/configure#8 $
 #
 # Configuration script for POCO.
 #
 # Usage:
 # configure [<options>...]
 #
-# Options:
-#   --config=<config_name>   
-#     Use the given build configuration
-#     See $POCO_BASE/build/config for possible configs
-#
-#   --prefix=<install_prefix>
-#     Use the given install directory for make install.
-#     Default is /usr/local
-#
-#   --no-tests
-#     Do not build testsuites.
-#
-#   --no-samples
-#     Do not build samples.
-#
-#   --no-wstring
-#     Compile with -DPOCO_NO_WSTRING.
-#
-#   --no-fpenvironment
-#     Compile with -DPOCO_NO_FPENVIRONMENT
+# Specify --help to display supported options.
 #
 
+showhelp ()
+{
+cat << ENDHELP 
+usage: configure {options}
+Configure the POCO C++ Libraries.
+
+Options:
+  --help
+    Display this help screen.
+
+  --config=<config_name>   
+    Use the given build configuration.
+    Available configurations are:
+
+`ls -C $base/build/config/`
+
+  --prefix=<install_prefix>
+    Use the given install directory for make install.
+    Default is /usr/local.
+
+  --stdcxx-base=<apache_stdcxx_install_prefix>
+    If (and only if) the $base/build/config selected with --config
+    uses the Apache stdcxx library, then apache_stdcxx_install_prefix
+    specifies the base directory where stdcxx is installed.
+
+  --no-tests
+    Do not build testsuites.
+
+  --no-samples
+    Do not build samples.
+
+  --no-wstring
+    Compile with -DPOCO_NO_WSTRING.
+    Useful if your C++ compiler does not support std::wstring
+    (such as uclibc-based systems).
+
+  --no-fpenvironment
+    Compile with -DPOCO_NO_FPENVIRONMENT.
+    Useful if your C++ compiler has incomplete floating-point support
+    (such as uclibc-based systems).
+
+  --disable-NetSSL
+    Do not build NetSSL support
+
+  --disable-Data
+    Do not build Data support
+
+  --disable-ODBC
+    Do not build Data/ODBC support
+
+  --disable-SQLite
+    Do not build Data/SQLite support
+
+  --disable-MySQL
+    Do not build Data/MySQL support
+    
+ENDHELP
+}
 # save cwd
 build=`pwd`
 # get directory where we are located
@@ -41,16 +80,26 @@ cd $build
 tests="tests"
 samples="samples"
 flags=""
+poco_netssl_support="enable"
+poco_data_support="enable"
+poco_data_odbc_support="enable"
+poco_data_sqlite_support="enable"
+poco_data_mysql_support="enable"
 # parse arguments
 while [ "$1" != "" ] ; do
-	val=`expr -- $1 : '--config=\(.*\)'`
+	val=`expr $1 : '--config=\(.*\)'`
 	if [ "$val" != "" ] ; then
 		config=$val;
 	fi
 	
-	val=`expr -- $1 : '--prefix=\(.*\)'`
+	val=`expr $1 : '--prefix=\(.*\)'`
 	if [ "$val" != "" ] ; then
 		prefix=$val
+	fi
+	
+	val=`expr $1 : '--stdcxx-base=\(.*\)'`
+	if [ "$val" != "" ] ; then
+		stdcxx_base=$val
 	fi
 	
 	if [ "$1" = "--no-samples" ] ; then
@@ -67,6 +116,34 @@ while [ "$1" != "" ] ; do
 
 	if [ "$1" = "--no-fpenvironment" ] ; then
 		flags="$flags -DPOCO_NO_FPENVIRONMENT"
+	fi
+
+	if [ "$1" = "--disable-NetSSL" ] ; then
+		poco_netssl_support="disable"
+	fi
+
+	if [ "$1" = "--disable-Data" ] ; then
+		poco_data_support="disable"
+	fi
+	
+	if [ "$1" = "--disable-ODBC" ] ; then
+		poco_data_odbc_support="disable"
+		poco_data_support="enable"
+	fi
+	
+	if [ "$1" = "--disable-SQLite" ] ; then
+		poco_data_sqlite_support="disable"
+		poco_data_support="enable"
+	fi
+	
+	if [ "$1" = "--disable-MySQL" ] ; then
+		poco_data_mysql_support="disable"
+		poco_data_support="enable"
+	fi
+	
+	if [ "$1" = "--help" ] ; then
+		showhelp
+		exit 0
 	fi
 	
 	shift
@@ -88,11 +165,13 @@ if [ "$config" = "" ] ; then
 fi
 
 if [ ! -f "$base/build/config/$config" ] ; then
-	echo "Unknown configuration: $config"
-	echo "Please use the --config option to specify another build configuration"
-	echo "The following configurations are available:"
-	ls $base/build/config
-	exit 1
+        echo "Unknown configuration: $config"
+        echo "Please use the --config=<config_name> option."
+        echo "The <config_name> can be one of the following:"
+        echo ""
+        echo "`ls -C $base/build/config/`"
+        echo ""
+        exit 1
 fi
 
 if [ "$prefix" = "" ] ; then
@@ -111,12 +190,28 @@ echo "POCO_BASE = $base" >>$build/config.make
 echo "POCO_BUILD = $build" >>$build/config.make
 echo "POCO_PREFIX = $prefix" >>$build/config.make
 echo "POCO_FLAGS = $flags" >>$build/config.make
+echo "POCO_NETSSL_SUPPORT = $poco_netssl_support" >>$build/config.make
+echo "POCO_DATA_SUPPORT = $poco_data_support" >>$build/config.make
+echo "POCO_DATA_ODBC_SUPPORT = $poco_data_odbc_support" >>$build/config.make
+echo "POCO_DATA_SQLITE_SUPPORT = $poco_data_sqlite_support" >>$build/config.make
+echo "POCO_DATA_MYSQL_SUPPORT = $poco_data_mysql_support" >>$build/config.make
+if [ "$stdcxx_base" != "" ] ; then
+	echo "STDCXX_BASE = $stdcxx_base" >>$build/config.make
+fi
 
 echo "export POCO_CONFIG" >>$build/config.make
 echo "export POCO_BASE" >>$build/config.make
 echo "export POCO_BUILD" >>$build/config.make
 echo "export POCO_PREFIX" >>$build/config.make
 echo "export POCO_FLAGS" >>$build/config.make
+echo "export POCO_NETSSL_SUPPORT = $poco_netssl_support" >>$build/config.make
+echo "export POCO_DATA_SUPPORT = $poco_data_support" >>$build/config.make
+echo "export POCO_DATA_ODBC_SUPPORT = $poco_data_odbc_support" >>$build/config.make
+echo "export POCO_DATA_SQLITE_SUPPORT = $poco_data_sqlite_support" >>$build/config.make
+echo "export POCO_DATA_MYSQL_SUPPORT = $poco_data_mysql_support" >>$build/config.make
+if [ "$stdcxx_base" != "" ] ; then
+	echo "export STDCXX_BASE" >>$build/config.make
+fi
 
 echo ".PHONY: poco" >>$build/config.make
 echo "poco: libexecs $tests $samples" >>$build/config.make
