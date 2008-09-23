@@ -394,6 +394,21 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 		throw CreateFileException(path);
 	case ERROR_DIR_NOT_EMPTY:
 		throw FileException("directory not empty", path);
+	case ERROR_WRITE_FAULT:
+		throw WriteFileException(path);
+	case ERROR_READ_FAULT:
+		throw ReadFileException(path);
+	case ERROR_SHARING_VIOLATION:
+		throw FileException("sharing violation", path);
+	case ERROR_LOCK_VIOLATION:
+		throw FileException("lock violation", path);
+	case ERROR_HANDLE_EOF:
+		throw ReadFileException("EOF reached", path);
+	case ERROR_HANDLE_DISK_FULL:
+	case ERROR_DISK_FULL:
+		throw WriteFileException("disk is full", path);
+	case ERROR_NEGATIVE_SEEK:
+		throw FileException("negative seek", path);
 	default:
 		throw FileException(path);
 	}
