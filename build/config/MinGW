@@ -66,7 +66,7 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED -I/usr/local/include -I/usr/include
+SYSFLAGS = -mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED -I/usr/local/include -I/usr/include
 
 #
 # System Specific Libraries

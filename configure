@@ -52,6 +52,21 @@ Options:
     Compile with -DPOCO_NO_FPENVIRONMENT.
     Useful if your C++ compiler has incomplete floating-point support
     (such as uclibc-based systems).
+
+  --disable-NetSSL
+    Do not build NetSSL support
+
+  --disable-Data
+    Do not build Data support
+
+  --disable-ODBC
+    Do not build Data/ODBC support
+
+  --disable-SQLite
+    Do not build Data/SQLite support
+
+  --disable-MySQL
+    Do not build Data/MySQL support
     
 ENDHELP
 }
@@ -65,6 +80,11 @@ cd $build
 tests="tests"
 samples="samples"
 flags=""
+poco_netssl_support="enable"
+poco_data_support="enable"
+poco_data_odbc_support="enable"
+poco_data_sqlite_support="enable"
+poco_data_mysql_support="enable"
 # parse arguments
 while [ "$1" != "" ] ; do
 	val=`expr $1 : '--config=\(.*\)'`
@@ -96,6 +116,29 @@ while [ "$1" != "" ] ; do
 
 	if [ "$1" = "--no-fpenvironment" ] ; then
 		flags="$flags -DPOCO_NO_FPENVIRONMENT"
+	fi
+
+	if [ "$1" = "--disable-NetSSL" ] ; then
+		poco_netssl_support="disable"
+	fi
+
+	if [ "$1" = "--disable-Data" ] ; then
+		poco_data_support="disable"
+	fi
+	
+	if [ "$1" = "--disable-ODBC" ] ; then
+		poco_data_odbc_support="disable"
+		poco_data_support="enable"
+	fi
+	
+	if [ "$1" = "--disable-SQLite" ] ; then
+		poco_data_sqlite_support="disable"
+		poco_data_support="enable"
+	fi
+	
+	if [ "$1" = "--disable-MySQL" ] ; then
+		poco_data_mysql_support="disable"
+		poco_data_support="enable"
 	fi
 	
 	if [ "$1" = "--help" ] ; then
@@ -147,6 +190,11 @@ echo "POCO_BASE = $base" >>$build/config.make
 echo "POCO_BUILD = $build" >>$build/config.make
 echo "POCO_PREFIX = $prefix" >>$build/config.make
 echo "POCO_FLAGS = $flags" >>$build/config.make
+echo "POCO_NETSSL_SUPPORT = $poco_netssl_support" >>$build/config.make
+echo "POCO_DATA_SUPPORT = $poco_data_support" >>$build/config.make
+echo "POCO_DATA_ODBC_SUPPORT = $poco_data_odbc_support" >>$build/config.make
+echo "POCO_DATA_SQLITE_SUPPORT = $poco_data_sqlite_support" >>$build/config.make
+echo "POCO_DATA_MYSQL_SUPPORT = $poco_data_mysql_support" >>$build/config.make
 if [ "$stdcxx_base" != "" ] ; then
 	echo "STDCXX_BASE = $stdcxx_base" >>$build/config.make
 fi
@@ -156,6 +204,11 @@ echo "export POCO_BASE" >>$build/config.make
 echo "export POCO_BUILD" >>$build/config.make
 echo "export POCO_PREFIX" >>$build/config.make
 echo "export POCO_FLAGS" >>$build/config.make
+echo "export POCO_NETSSL_SUPPORT = $poco_netssl_support" >>$build/config.make
+echo "export POCO_DATA_SUPPORT = $poco_data_support" >>$build/config.make
+echo "export POCO_DATA_ODBC_SUPPORT = $poco_data_odbc_support" >>$build/config.make
+echo "export POCO_DATA_SQLITE_SUPPORT = $poco_data_sqlite_support" >>$build/config.make
+echo "export POCO_DATA_MYSQL_SUPPORT = $poco_data_mysql_support" >>$build/config.make
 if [ "$stdcxx_base" != "" ] ; then
 	echo "export STDCXX_BASE" >>$build/config.make
 fi

@@ -12,6 +12,6 @@ objects = TypeHandler
 
 target         = TypeHandler
 target_version = 1
-target_libs    = PocoFoundation PocoData PocoSQLite
+target_libs    = PocoSQLite PocoData PocoFoundation 
 
 include $(POCO_BASE)/build/rules/exec
