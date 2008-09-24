@@ -14,6 +14,9 @@
 
 include $(POCO_BASE)/build/rules/global
 
+ifeq ($(POCO_CONFIG),MinGW)
+# Lack of unixODBC or iODBC is not an error for MinGW platform since it uses Windows odbc32.lib
+else
 ifeq (0, $(shell test -e /usr/lib/libodbc$(SHAREDLIBLINKEXT); echo $$?))
 SYSLIBS += -lodbc -lodbcinst
 COMMONFLAGS += -DPOCO_UNIXODBC
@@ -25,10 +28,14 @@ else
 $(error No ODBC library found. Please install unixODBC or iODBC and try again)
 endif
 endif
+endif
 
 objects = ODBCTestSuite Driver \
 	ODBCDB2Test ODBCMySQLTest ODBCOracleTest ODBCPostgreSQLTest \
 	ODBCSQLiteTest ODBCSQLServerTest ODBCTest SQLExecutor
+ifeq ($(POCO_CONFIG),MinGW)
+    objects += ODBCAccessTest
+endif
 
 target         = testrunner
 target_version = 1
