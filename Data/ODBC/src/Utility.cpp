@@ -63,8 +63,8 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	while (!Utility::isError(rc = SQLDrivers(henv, 
-		SQL_FETCH_NEXT,
+	if (!Utility::isError(rc = SQLDrivers(henv, 
+		SQL_FETCH_FIRST,
 		desc,
 		length,
 		&len1,
@@ -72,11 +72,21 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 		len2,
 		&len2)))
 	{
-		driverMap.insert(DSNMap::value_type(std::string((char *) desc), 
-			std::string((char *) attr)));
-		std::memset(desc, 0, length);
-		std::memset(attr, 0, length);
-		len2 = length;
+		do
+		{
+			driverMap.insert(DSNMap::value_type(std::string((char *) desc), 
+				std::string((char *) attr)));
+			std::memset(desc, 0, length);
+			std::memset(attr, 0, length);
+			len2 = length;
+		}while (!Utility::isError(rc = SQLDrivers(henv, 
+			SQL_FETCH_NEXT,
+			desc,
+			length,
+			&len1,
+			attr,
+			len2,
+			&len2)));
 	}
 
 	if (SQL_NO_DATA != rc) 
