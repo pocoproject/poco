@@ -29,7 +29,7 @@ objects = ODBCTestSuite Driver \
 	ODBCPostgreSQLTest ODBCSQLiteTest SQLExecutor
 
 ifeq ($(POCO_CONFIG),MinGW)
-    objects += ODBCAccessTest
+    objects += ODBCAccessTest ODBCSQLServerTest
 endif
 
 target         = testrunner
