@@ -107,6 +107,8 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 		ostr << ",minWidth:" << pOwner->getWidth();
 	if (!pView->isVisible())
 		ostr << ",hidden:true";
+	if (pView->hasPosition())
+		ostr << ",x:" << pView->getPosition().posX << ",y:" << pView->getPosition().posY;
 		
 	if (pOwner)
 	{

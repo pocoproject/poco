@@ -66,6 +66,10 @@ void ProgressIndicatorRenderer::renderHead(const Renderable* pRenderable, const 
 	std::string txt(pProgressIndicator->getText());
 	if (!txt.empty())
 		ostr << ",text:'" << txt << "'";
+
+	if (pProgressIndicator->hasPosition())
+		ostr << ",x:" << pProgressIndicator->getPosition().posX << ",y:" << pProgressIndicator->getPosition().posY;
+			
 	if (pProgressIndicator->getHeight() > 0)
 		ostr << ",height:" << pProgressIndicator->getHeight();
 	if (pProgressIndicator->getWidth() > 0)

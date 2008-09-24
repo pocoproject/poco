@@ -75,7 +75,8 @@ void TabViewRenderer::renderHead(const Renderable* pRenderable, const RenderCont
 void TabViewRenderer::renderParameters(const TabView* pTabView, const RenderContext& context, std::ostream& ostr)
 {
 	poco_assert_dbg(pTabView != 0);
-
+	if (pTabView->hasPosition())
+		ostr << ",x:" << pTabView->getPosition().posX << ",y:" << pTabView->getPosition().posY;
 	ostr << "items:[";
 	visitChildren(pTabView, context, ostr);
 	ostr << "]";

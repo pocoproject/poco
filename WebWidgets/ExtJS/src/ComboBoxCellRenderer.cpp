@@ -112,6 +112,8 @@ void ComboBoxCellRenderer::renderHead(const Renderable* pRenderable, const Rende
 	ostr << "new Ext.form.ComboBox({";
 
 	TextFieldCellRenderer::writeCellProperties(pCell, ostr, true, false);
+	if (pOwner->hasPosition())
+		ostr << ",x:" << pOwner->getPosition().posX << ",y:" << pOwner->getPosition().posY;
 	ostr << ",store:new Ext.data.SimpleStore({fields:['d'],"; //autoLoad:true,
 	ostr << "proxy:new Ext.data.HttpProxy({url:";
 	std::map<std::string, std::string> addParams;

@@ -62,6 +62,8 @@ void ImageRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	const Image* pImage = static_cast<const Poco::WebWidgets::Image*>(pRenderable);
 	ostr << "new Ext.Panel({border:false,bodyBorder:false,";
 	ostr << "id:'" << pImage->id() << "',";
+	if (pImage->hasPosition())
+		ostr << ",x:" << pImage->getPosition().posX << ",y:" << pImage->getPosition().posY;
 	ostr << "html:";
 	writeHTML(pImage, ostr);
 	ostr << ",closeAction:'hide'";

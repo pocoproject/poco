@@ -1,11 +1,11 @@
 //
-// LayoutRenderer.cpp
+// AbsoluteLayoutRenderer.cpp
 //
-// $Id: //poco/Main/WebWidgets/ExtJS/src/LayoutRenderer.cpp#5 $
+// $Id: //poco/Main/WebWidgets/ExtJS/src/AbsoluteLayoutRenderer.cpp#1 $
 //
 // Library: ExtJS
 // Package: Core
-// Module:  LayoutRenderer
+// Module:  AbsoluteLayoutRenderer
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,11 +34,8 @@
 //
 
 
-#include "Poco/WebWidgets/ExtJS/LayoutRenderer.h"
-#include "Poco/WebWidgets/ExtJS/FormRenderer.h"
+#include "Poco/WebWidgets/ExtJS/AbsoluteLayoutRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
-#include "Poco/WebWidgets/Layout.h"
-#include "Poco/WebWidgets/VerticalLayout.h"
 #include "Poco/WebWidgets/AbsoluteLayout.h"
 #include "Poco/WebWidgets/Frame.h"
 #include "Poco/WebWidgets/Panel.h"
@@ -50,35 +47,29 @@ namespace WebWidgets {
 namespace ExtJS {
 
 
-LayoutRenderer::LayoutRenderer()
+AbsoluteLayoutRenderer::AbsoluteLayoutRenderer()
 {
 }
 
 
-LayoutRenderer::~LayoutRenderer()
+AbsoluteLayoutRenderer::~AbsoluteLayoutRenderer()
 {
 }
 
 
-void LayoutRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
+void AbsoluteLayoutRenderer::renderHead(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
 {
-	const Layout* pLayout = static_cast<const Layout*>(pRenderable);
-	ContainerView::ConstIterator it = pLayout->begin();
-	int cnt(0);	
-	for (; it != pLayout->end(); ++it)
-	{
-		(*it)->renderBody(context, ostr);
-	}
-}
-
-
-void LayoutRenderer::renderLayout(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, std::size_t cols, int padHorVal, int padVertVal)
-{
-	poco_assert_dbg (pLayout != 0);
+	poco_assert_dbg (pRenderable != 0);
+	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::AbsoluteLayout));
+	const AbsoluteLayout* pLayout = static_cast<const Poco::WebWidgets::AbsoluteLayout*>(pRenderable);
 	
 	Renderable::ID id(0);
 	View::Ptr ptrParent = pLayout->parent();
-	bool parentIsNotPanel = !(ptrParent && (ptrParent.cast<Frame>() || ptrParent.cast<Panel>()));
+	bool parentIsFrame = (ptrParent && ptrParent->type() == typeid(Frame));
+	bool parentIsPanel = (ptrParent && ptrParent->type() == typeid(Panel));
+	bool parentIsNotPanel = !(parentIsFrame || parentIsPanel);
+	Poco::UInt32 width = pLayout->getWidth();
+	Poco::UInt32 height = pLayout->getHeight();
 	if (parentIsNotPanel)
 	{
 		// the parent is not a panel 
@@ -87,40 +78,24 @@ void LayoutRenderer::renderLayout(const Layout* pLayout, const RenderContext& co
 		ostr << "id:'" << pLayout->id() << "',";
 		if (!pLayout->isVisible())
 			ostr << "hidden:true,";
+		
+		if (width == 0)
+			width = ptrParent->getWidth();
+		if (height == 0)
+			height = ptrParent->getHeight();
 	}
 	
-	renderParameters(pLayout, context, ostr, cols, padHorVal, padVertVal);
+	if (width == 0)
+		width = 100;
+	if (height == 0)
+		height = 100;
+	ostr << "width:" << width;	
+	ostr << ",height:" << height;
 	
-	if (parentIsNotPanel)
-		ostr << "})";
-}
-
-
-void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext& context, std::ostream& ostr, std::size_t cols, int padHorVal, int padVertVal)
-{
-	poco_assert_dbg(pLayout != 0);
-	if (padHorVal < 0)
-		padHorVal = 0;
-	if (padVertVal < 0)
-		padVertVal = 0;
-		
-	if (pLayout->getWidth() > 0)
-		ostr << "width:" << pLayout->getWidth() << ",";
 	
-	ostr << "layout:'table'";
-	ostr << ",layoutConfig:" << "{columns:" << cols << "}";
+	ostr << ",layout:'absolute'";
 	if (pLayout->hasPosition())
 		ostr << ",x:" << pLayout->getPosition().posX << ",y:" << pLayout->getPosition().posY;
-
-	if (padHorVal > 0 || padVertVal > 0)
-	{
-		ostr << ",defaults:{";
-		ostr <<		"bodyStyle:'";
-		ostr <<			"padding:" << padVertVal << "px " << padHorVal << "px";
-		ostr <<		"'";
-		ostr <<	"}";
-	}
-	
 	ostr << ",items:[";
 		
 	ContainerView::ConstIterator it = pLayout->begin();
@@ -131,18 +106,16 @@ void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext
 			ostr << ",";
 		if (*it)
 		{
-			//horizontallayout works only when children are panels
-			bool writePanel = ((*it)->type() != typeid(AbsoluteLayout) && (*it)->type() != typeid(Panel) && (*it)->type() != typeid(Frame));
-			if (writePanel)
-				ostr << "new Ext.Panel({border:false,bodyBorder:false,items:[";
 			(*it)->renderHead(context, ostr);
-			if (writePanel)
-				ostr << "]})";
 		}
 		else
 			ostr << "{}";
 	}
 	ostr << "]";
+	
+	if (parentIsNotPanel)
+		ostr << "})";
 }
+
 
 } } } // namespace Poco::WebWidgets::ExtJS

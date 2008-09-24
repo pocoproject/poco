@@ -175,4 +175,18 @@ void View::onHide()
 }
 
 
+View::Pos::Pos():
+	posX(-1),
+	posY(-1)
+{
+}
+
+			
+View::Pos::Pos(int x, int y):
+	posX(x),
+	posY(y)
+{
+}
+
+
 } } // namespace Poco::WebWidgets

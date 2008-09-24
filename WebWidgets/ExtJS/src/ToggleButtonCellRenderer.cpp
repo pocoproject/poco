@@ -68,18 +68,23 @@ void ToggleButtonCellRenderer::renderBody(const Renderable* pRenderable, const R
 
 void ToggleButtonCellRenderer::renderProperties(const ToggleButtonCell* pToggleButtonCell, std::ostream& ostr)
 {
+	View* pOwner = pToggleButtonCell->getOwner();
+	ToggleButton* pButton = dynamic_cast<ToggleButton*>(pOwner);
 	if (!pToggleButtonCell->getLabel().empty())
 		ostr << "boxLabel:'" << Utility::safe(pToggleButtonCell->getLabel()) << "',";
 	ostr << "checked:" << (pToggleButtonCell->isChecked()?"true":"false") << ",";
 	if (!pToggleButtonCell->isEditable())
 		ostr << "readOnly:true,";
-
+	if (pOwner->hasPosition())
+		ostr << "x:" << pOwner->getPosition().posX << ",y:" << pOwner->getPosition().posY << ",";
+		
 	Utility::writeCellProperties(pToggleButtonCell, ostr);
+	
 	//tooltip is not supported by togglebutton
 	std::string tooltip (pToggleButtonCell->getToolTip());
-	View* pOwner = pToggleButtonCell->getOwner();
-	ToggleButton* pButton = dynamic_cast<ToggleButton*>(pOwner);
-			
+	
+	
+		
 	if (!tooltip.empty() || (pButton && pButton->checked.hasJavaScriptCode()))
 	{
 		ostr << ",listeners:{";

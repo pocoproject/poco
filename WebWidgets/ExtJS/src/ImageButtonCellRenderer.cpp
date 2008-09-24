@@ -72,7 +72,12 @@ void ImageButtonCellRenderer::renderHead(const Renderable* pRenderable, const Re
 		ButtonCellRenderer::renderHead(pButtonCell, context, ostr);
 	else
 	{
-		ostr << "html:";
+		const View* pOwner = pButtonCell->getOwner();
+		poco_check_ptr (pOwner);
+		ostr << "id:'" << pOwner->id() << "'";
+		if (pOwner->hasPosition())
+			ostr << ",x:" << pOwner->getPosition().posX << ",y:" << pOwner->getPosition().posY;
+		ostr << ",html:";
 		bool showTxt = pButtonCell->getShowText() || !hasImg;
 		writeHTML(pButtonCell, showTxt, ostr);
 	}

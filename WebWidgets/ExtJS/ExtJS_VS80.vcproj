@@ -210,6 +210,10 @@
 				Name="Header Files"
 				>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\ExtJS\AbsoluteLayoutRenderer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\ExtJS\AbstractTableCellHandler.h"
 					>
 				</File>
@@ -369,6 +373,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\AbsoluteLayoutRenderer.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\AbstractTableCellHandler.cpp"
 					>

@@ -83,7 +83,11 @@ void ListBoxCellRenderer::renderProperties(const ListBoxCell* pListBoxCell, std:
 		ostr << ",height:" << pListBoxCell->getHeight();
 	if (pListBoxCell->getWidth() > 0)
 		ostr << ",width:" << pListBoxCell->getWidth();
-
+	const View* pOwner = pListBoxCell->getOwner();
+	poco_check_ptr (pOwner);
+	if (pOwner->hasPosition())
+		ostr << ",x:" << pOwner->getPosition().posX << ",y:" << pOwner->getPosition().posY;
+		
 	ostr << ",dataFields:['i','d'],data:[";
 
 	//now serialize data, use cached content for that

@@ -54,6 +54,7 @@
 #include "Poco/WebWidgets/ExtJS/RadioButtonCellRenderer.h"
 #include "Poco/WebWidgets/ExtJS/GridLayoutRenderer.h"
 #include "Poco/WebWidgets/ExtJS/PanelRenderer.h"
+#include "Poco/WebWidgets/ExtJS/AbsoluteLayoutRenderer.h"
 #include "Poco/WebWidgets/ExtJS/HorizontalLayoutRenderer.h"
 #include "Poco/WebWidgets/ExtJS/VerticalLayoutRenderer.h"
 #include "Poco/WebWidgets/ExtJS/ImageRenderer.h"
@@ -76,6 +77,7 @@
 #include "Poco/WebWidgets/Cell.h"
 #include "Poco/WebWidgets/View.h"
 #include "Poco/WebWidgets/GridLayout.h"
+#include "Poco/WebWidgets/AbsoluteLayout.h"
 #include "Poco/WebWidgets/TextFieldCell.h"
 #include "Poco/WebWidgets/TimeFieldCell.h"
 #include "Poco/WebWidgets/DateFieldCell.h"
@@ -134,6 +136,7 @@ void Utility::initialize(LookAndFeel::Ptr ptr)
 	ptr->registerRenderer(typeid(ListBoxCell), new ListBoxCellRenderer());
 	ptr->registerRenderer(typeid(GridLayout), new GridLayoutRenderer());
 	ptr->registerRenderer(typeid(Panel), new PanelRenderer());
+	ptr->registerRenderer(typeid(AbsoluteLayout), new AbsoluteLayoutRenderer());
 	ptr->registerRenderer(typeid(HorizontalLayout), new HorizontalLayoutRenderer());
 	ptr->registerRenderer(typeid(VerticalLayout), new VerticalLayoutRenderer());
 	ptr->registerRenderer(typeid(Image), new ImageRenderer());
@@ -246,6 +249,8 @@ std::string Utility::safe(const std::string& str)
 {
 	std::string safe(Poco::replace(str, "\\", "\\\\"));
 	Poco::replaceInPlace(safe, "'", "\\'");
+	Poco::replaceInPlace(safe, "\n", "\\n");
+	Poco::replaceInPlace(safe, "\r", "\\r");
 	return safe;
 }
 

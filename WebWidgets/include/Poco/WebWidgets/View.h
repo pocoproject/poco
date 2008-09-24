@@ -60,6 +60,17 @@ class WebWidgets_API View: public Renderable
 public:
 	typedef Poco::AutoPtr<View> Ptr;
 	
+	struct WebWidgets_API Pos
+	{
+		int posX;
+		int posY;
+		
+		Pos();
+			/// Creates a default position (posX = posY = -1)
+			
+		Pos(int posX, int posY);
+	};
+	
 	const std::string& getName() const;
 		/// Returns the View's name.
 		
@@ -139,6 +150,27 @@ public:
 
 	Poco::UInt32 getHeight() const;
 		/// Returns the height of the view
+		
+	bool hasPosition() const;
+		/// Returns true if the view has a position not equal to the default one
+		
+	const View::Pos& getPosition() const;
+		/// Returns the position
+		
+	void setPosition(int posX, int posY);
+		/// Updates the position
+	
+	void setPosition(const View::Pos& pos);
+		/// Updates the position
+		
+	void setClass(const std::string cls);
+		/// Sets css class
+		
+	const std::string& getClass() const;
+		/// Returns css class
+		
+	bool hasClass() const;
+		/// Checks if a css value is set		
 	
 protected:
 	View(const std::string& name, const std::type_info& type);
@@ -168,11 +200,13 @@ protected:
 		/// by subclasses to perform subclass-specific tasks.
 				
 private:
-	std::string _name;
-	View* _pParent;
-	bool _visible;
+	std::string  _name;
+	View*        _pParent;
+	bool         _visible;
 	Poco::UInt32 _width;
 	Poco::UInt32 _height;
+	Pos          _pos;
+	std::string _class;
 
 };
 
@@ -245,6 +279,49 @@ inline Poco::UInt32 View::getWidth() const
 inline Poco::UInt32 View::getHeight() const
 {
 	return _height;
+}
+
+
+inline bool View::hasPosition() const
+{
+	return !(_pos.posX == -1 && _pos.posY == -1);
+}
+
+	
+inline const View::Pos& View::getPosition() const
+{
+	return _pos;
+}
+
+	
+inline void View::setPosition(int posX, int posY)
+{
+	_pos.posX = posX;
+	_pos.posY = posY;
+}
+
+
+inline void View::setPosition(const View::Pos& pos)
+{
+	_pos = pos;
+}
+
+
+inline void View::setClass(const std::string cls)
+{
+	_class = cls;
+}
+
+		
+inline const std::string& View::getClass() const
+{
+	return _class;
+}
+
+		
+inline bool View::hasClass() const
+{
+	return !getClass().empty();
 }
 
 

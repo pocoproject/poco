@@ -66,7 +66,11 @@ public:
 	void setText(const std::string& text);
 
 	std::string getText() const;
-
+	
+	const std::string& getLabelText() const;
+		/// Same as getText but instead of getText which must return a copy
+		/// due to the View interface this returns a reference
+	
 protected:
 	Label(const std::string& name, const std::type_info& type);
 		/// Creates a Label and assigns it the given name.
@@ -80,6 +84,12 @@ protected:
 private:
 	std::string _text;
 };
+
+
+inline const std::string& Label::getLabelText() const
+{
+	return _text;
+}
 
 
 } } // namespace Poco::WebWidgets

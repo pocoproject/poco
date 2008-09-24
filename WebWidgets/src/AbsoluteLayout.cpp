@@ -1,11 +1,11 @@
 //
-// HTMLRenderer.cpp
+// AbsoluteLayout.cpp
 //
-// $Id: //poco/Main/WebWidgets/ExtJS/src/HTMLRenderer.cpp#3 $
+// $Id: //poco/Main/WebWidgets/src/AbsoluteLayout.cpp#2 $
 //
-// Library: ExtJS
-// Package: Core
-// Module:  HTMLRenderer
+// Library: WebWidgets
+// Package: Layouts
+// Module:  AbsoluteLayout
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,44 +34,22 @@
 //
 
 
-#include "Poco/WebWidgets/ExtJS/HTMLRenderer.h"
-#include "Poco/WebWidgets/ExtJS/FormRenderer.h"
-#include "Poco/WebWidgets/ExtJS/Utility.h"
-#include "Poco/WebWidgets/HTML.h"
+#include "Poco/WebWidgets/AbsoluteLayout.h"
 
 
 namespace Poco {
 namespace WebWidgets {
-namespace ExtJS {
 
 
-HTMLRenderer::HTMLRenderer()
+AbsoluteLayout::AbsoluteLayout():
+	Layout(typeid(AbsoluteLayout))
 {
 }
 
 
-HTMLRenderer::~HTMLRenderer()
+AbsoluteLayout::~AbsoluteLayout()
 {
 }
 
 
-void HTMLRenderer::renderHead(const Renderable* pRenderable, const RenderContext&, std::ostream& ostr)
-{
-	poco_assert_dbg (pRenderable != 0);
-	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::HTML));
-	const HTML* pHTML = static_cast<const Poco::WebWidgets::HTML*>(pRenderable);
-	ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-	ostr << "id:'" << pHTML->id() << "',";
-	if (pHTML->hasPosition())
-		ostr << "x:" << pHTML->getPosition().posX << ",y:" << pHTML->getPosition().posY << ",";	
-	ostr << "html:'" << pHTML->getText() << "'})";
-}
-
-
-
-void HTMLRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
-{
-}
-
-
-} } } // namespace Poco::WebWidgets::ExtJS
+} } // namespace Poco::WebWidgets

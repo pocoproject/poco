@@ -1,11 +1,13 @@
 //
-// HTMLRenderer.cpp
+// AbsoluteLayout.h
 //
-// $Id: //poco/Main/WebWidgets/ExtJS/src/HTMLRenderer.cpp#3 $
+// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/AbsoluteLayout.h#2 $
 //
-// Library: ExtJS
-// Package: Core
-// Module:  HTMLRenderer
+// Library: WebWidgets
+// Package: Layouts
+// Module:  AbsoluteLayout
+//
+// Definition of the AbsoluteLayout class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,44 +36,33 @@
 //
 
 
-#include "Poco/WebWidgets/ExtJS/HTMLRenderer.h"
-#include "Poco/WebWidgets/ExtJS/FormRenderer.h"
-#include "Poco/WebWidgets/ExtJS/Utility.h"
-#include "Poco/WebWidgets/HTML.h"
+#ifndef WebWidgets_AbsoluteLayout_INCLUDED
+#define WebWidgets_AbsoluteLayout_INCLUDED
+
+
+#include "Poco/WebWidgets/Layout.h"
 
 
 namespace Poco {
 namespace WebWidgets {
-namespace ExtJS {
 
 
-HTMLRenderer::HTMLRenderer()
+class WebWidgets_API AbsoluteLayout: public Layout
+	/// AbsoluteLayout arranges views according to their positions
 {
-}
+public:
+	typedef Poco::AutoPtr<AbsoluteLayout> Ptr;
+
+	AbsoluteLayout();
+		/// Creates the AbsoluteLayout.
+		
+protected:
+	~AbsoluteLayout();
+		/// Destroys the AbsoluteLayout.
+};
 
 
-HTMLRenderer::~HTMLRenderer()
-{
-}
+} } // namespace Poco::WebWidgets
 
 
-void HTMLRenderer::renderHead(const Renderable* pRenderable, const RenderContext&, std::ostream& ostr)
-{
-	poco_assert_dbg (pRenderable != 0);
-	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::HTML));
-	const HTML* pHTML = static_cast<const Poco::WebWidgets::HTML*>(pRenderable);
-	ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-	ostr << "id:'" << pHTML->id() << "',";
-	if (pHTML->hasPosition())
-		ostr << "x:" << pHTML->getPosition().posX << ",y:" << pHTML->getPosition().posY << ",";	
-	ostr << "html:'" << pHTML->getText() << "'})";
-}
-
-
-
-void HTMLRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
-{
-}
-
-
-} } } // namespace Poco::WebWidgets::ExtJS
+#endif // WebWidgets_AbsoluteLayout_INCLUDED

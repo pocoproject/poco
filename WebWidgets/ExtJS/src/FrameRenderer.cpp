@@ -105,6 +105,10 @@ void FrameRenderer::writeProperties(const Frame* pFrame, std::ostream& ostr)
 		ostr << ",collapsed:true";
 	if (!pFrame->isVisible())
 		ostr << ",hidden:true";
+	if (pFrame->hasPosition())
+		ostr << ",x:" << pFrame->getPosition().posX << ",y:" << pFrame->getPosition().posY;
+	if (pFrame->hasClass())
+		ostr << ",cls:'" << pFrame->getClass() << "'";
 }
 
 

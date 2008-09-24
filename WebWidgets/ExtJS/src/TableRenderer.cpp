@@ -450,6 +450,8 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	// forbid reordering of columns, otherwise col index will not match the col index at the server
 	// sorting is allowed though, i.e row matching is active
 	ostr << ",clicksToEdit:1,stripeRows:true,enableColumnHide:false,enableColumnMove:false,loadMask:true";
+	if (pTable->hasPosition())
+		ostr << ",x:" << pTable->getPosition().posX << ",y:" << pTable->getPosition().posY;
 	if (pTable->getDragAndDrop())
 		ostr << ",enableDragDrop:true,ddGroup:'" << createDnDGroupName(pTable) << "'";
 		
@@ -564,7 +566,7 @@ void TableRenderer::renderColumn(const Table* pTable, const TableColumn& tc, int
 	static LookAndFeel& laf = Utility::getDefaultRenderers();
 
 	// {id:'company', header: "Company", width: 200, sortable: true, dataIndex: 'company'}
-	// {header: "Last Updated", width: 135, sortable: true, renderer: Ext.util.Format.dateRenderer('m/d/Y'), dataIndex: 'lastChange'}
+	// {header: "Last updated", width: 135, sortable: true, renderer: Ext.util.Format.dateRenderer('m/d/Y'), dataIndex: 'lastChange'}
 	ostr << "{";
 	std::string hdr(Utility::safe(tc.getHeader()));
 

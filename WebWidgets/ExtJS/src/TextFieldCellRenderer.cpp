@@ -87,6 +87,7 @@ void TextFieldCellRenderer::renderBody(const Renderable* pRenderable, const Rend
 
 void TextFieldCellRenderer::writeCellProperties(const TextFieldCell* pCell, std::ostream& ostr, bool writeValue, bool writeListeners)
 {
+	View* pOwner = pCell->getOwner();
 	Utility::writeCellProperties(pCell, ostr);
 	if (pCell->getEditMode() == Cell::EM_SELECTCONTENT)
 		ostr << ",selectOnFocus:true";
@@ -109,7 +110,7 @@ void TextFieldCellRenderer::writeCellProperties(const TextFieldCell* pCell, std:
 	{
 		//tooltip is not supported by textField, add listeners
 		std::string tooltip (pCell->getToolTip());
-		View* pOwner = pCell->getOwner();
+		
 		TextField* pText = dynamic_cast<TextField*>(pOwner);
 			
 		if (!tooltip.empty() || (pText && pText->textChanged.hasJavaScriptCode()))

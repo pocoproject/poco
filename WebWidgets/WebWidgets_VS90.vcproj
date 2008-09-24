@@ -829,6 +829,10 @@
 				Name="Header Files"
 				>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\AbsoluteLayout.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\GridLayout.h"
 					>
 				</File>
@@ -848,6 +852,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\AbsoluteLayout.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\GridLayout.cpp"
 					>

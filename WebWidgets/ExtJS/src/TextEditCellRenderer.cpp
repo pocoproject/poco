@@ -99,6 +99,11 @@ void TextEditCellRenderer::writeCellProperties(const TextEditCell* pCell, std::o
 	if (!pCell->getPlaceHolder().empty())
 		ostr << ", emptyText:'" << Utility::safe(pCell->getPlaceHolder()) << "'";
 
+	const View* pOwner = pCell->getOwner();
+	poco_check_ptr (pOwner);
+	if (pOwner->hasPosition())
+		ostr << ",x:" << pOwner->getPosition().posX << ",y:" << pOwner->getPosition().posY;
+		
 	//tooltip is not supported by textEdit, add listeners
 	std::string tooltip (pCell->getToolTip());
 	if (!tooltip.empty())

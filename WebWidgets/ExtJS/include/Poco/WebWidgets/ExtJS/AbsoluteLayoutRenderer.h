@@ -1,11 +1,13 @@
 //
-// HTMLRenderer.cpp
+// AbsoluteLayoutRenderer.h
 //
-// $Id: //poco/Main/WebWidgets/ExtJS/src/HTMLRenderer.cpp#3 $
+// $Id: //poco/Main/WebWidgets/ExtJS/include/Poco/WebWidgets/ExtJS/AbsoluteLayoutRenderer.h#2 $
 //
 // Library: ExtJS
 // Package: Core
-// Module:  HTMLRenderer
+// Module:  AbsoluteLayoutRenderer
+//
+// Definition of the AbsoluteLayoutRenderer class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,44 +36,35 @@
 //
 
 
-#include "Poco/WebWidgets/ExtJS/HTMLRenderer.h"
-#include "Poco/WebWidgets/ExtJS/FormRenderer.h"
-#include "Poco/WebWidgets/ExtJS/Utility.h"
-#include "Poco/WebWidgets/HTML.h"
+#ifndef ExtJS_AbsoluteLayoutRenderer_INCLUDED
+#define ExtJS_AbsoluteLayoutRenderer_INCLUDED
+
+
+#include "Poco/WebWidgets/ExtJS/LayoutRenderer.h"
 
 
 namespace Poco {
 namespace WebWidgets {
+	class AbsoluteLayout;
 namespace ExtJS {
 
 
-HTMLRenderer::HTMLRenderer()
+class ExtJS_API AbsoluteLayoutRenderer: public LayoutRenderer
+	/// AbsoluteLayoutRenderer renders HorizontalLayout
 {
-}
+public:
+	AbsoluteLayoutRenderer();
+		/// Creates the AbsoluteLayoutRenderer.
 
+	virtual ~AbsoluteLayoutRenderer();
+		/// Destroys the AbsoluteLayoutRenderer.
 
-HTMLRenderer::~HTMLRenderer()
-{
-}
-
-
-void HTMLRenderer::renderHead(const Renderable* pRenderable, const RenderContext&, std::ostream& ostr)
-{
-	poco_assert_dbg (pRenderable != 0);
-	poco_assert_dbg (pRenderable->type() == typeid(Poco::WebWidgets::HTML));
-	const HTML* pHTML = static_cast<const Poco::WebWidgets::HTML*>(pRenderable);
-	ostr << "new Ext.Panel({border:false,bodyBorder:false,";
-	ostr << "id:'" << pHTML->id() << "',";
-	if (pHTML->hasPosition())
-		ostr << "x:" << pHTML->getPosition().posX << ",y:" << pHTML->getPosition().posY << ",";	
-	ostr << "html:'" << pHTML->getText() << "'})";
-}
-
-
-
-void HTMLRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
-{
-}
+	void renderHead(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
+		/// Emits code for the page header to the given output stream.
+};
 
 
 } } } // namespace Poco::WebWidgets::ExtJS
+
+
+#endif // ExtJS_AbsoluteLayoutRenderer_INCLUDED

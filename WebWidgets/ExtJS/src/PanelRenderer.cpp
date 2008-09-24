@@ -64,6 +64,8 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	
 	Utility::writeRenderableProperties(pRenderable, ostr);
 	ostr <<		",manager: winGrp";
+	if (pPanel->hasPosition())
+		ostr << ",x:" << pPanel->getPosition().posX << ",y:" << pPanel->getPosition().posY;
 	if (!pPanel->getName().empty() && pPanel->showHeader())
 		ostr << ",title:'" << pPanel->getTitle() << "'";
 	if (pPanel->getWidth() > 0)
@@ -124,6 +126,8 @@ void PanelRenderer::renderHeadWithoutChildren(const Panel* pPanel, const RenderC
 	ostr <<		",manager: winGrp";
 	if (!pPanel->getName().empty() && pPanel->showHeader())
 		ostr << ",title:'" << pPanel->getTitle() << "'";
+	if (pPanel->hasPosition())
+		ostr << ",x:" << pPanel->getPosition().posX << ",y:" << pPanel->getPosition().posY;
 	if (pPanel->getWidth() > 0)
 		ostr << ",width:" << pPanel->getWidth();
 	else
