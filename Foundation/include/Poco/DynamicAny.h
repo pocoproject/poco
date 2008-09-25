@@ -250,16 +250,16 @@ public:
 
 	template <typename T> 
 	DynamicAny& operator += (const T& other)
-		/// Addition asignment operator for addition/assignment of POD to DynamicAny.
+		/// Addition assignment operator for addition/assignment of POD to DynamicAny.
 	{
 		return *this = convert<T>() + other;
 	}
 
 	DynamicAny& operator += (const DynamicAny& other);
-		/// Addition asignment operator overload for DynamicAny
+		/// Addition assignment operator overload for DynamicAny
 
 	DynamicAny& operator += (const char* other);
-		/// Addition asignment operator overload for const char*
+		/// Addition assignment operator overload for const char*
 
 	template <typename T> 
 	const DynamicAny operator - (const T& other) const
@@ -273,13 +273,13 @@ public:
 
 	template <typename T> 
 	DynamicAny& operator -= (const T& other)
-		/// Subtraction asignment operator
+		/// Subtraction assignment operator
 	{
 		return *this = convert<T>() - other;
 	}
 
 	DynamicAny& operator -= (const DynamicAny& other);
-		/// Subtraction asignment operator overload for DynamicAny
+		/// Subtraction assignment operator overload for DynamicAny
 
 	template <typename T> 
 	const DynamicAny operator * (const T& other) const
@@ -293,13 +293,13 @@ public:
 
 	template <typename T> 
 	DynamicAny& operator *= (const T& other)
-		/// Multiplication asignment operator
+		/// Multiplication assignment operator
 	{
 		return *this = convert<T>() * other;
 	}
 
 	DynamicAny& operator *= (const DynamicAny& other);
-		/// Multiplication asignment operator overload for DynamicAny
+		/// Multiplication assignment operator overload for DynamicAny
 
 	template <typename T> 
 	const DynamicAny operator / (const T& other) const
@@ -313,13 +313,13 @@ public:
 
 	template <typename T> 
 	DynamicAny& operator /= (const T& other)
-		/// Division asignment operator
+		/// Division assignment operator
 	{
 		return *this = convert<T>() / other;
 	}
 
 	DynamicAny& operator /= (const DynamicAny& other);
-		/// Division asignment operator specialization for DynamicAny
+		/// Division assignment operator specialization for DynamicAny
 
 	template <typename T> 
 	bool operator == (const T& other) const
@@ -612,28 +612,28 @@ inline char operator / (const char& other, const DynamicAny& da)
 
 
 inline char operator += (char& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to char
+	/// Addition assignment operator for adding DynamicAny to char
 {
 	return other += da.convert<char>();
 }
 
 
 inline char operator -= (char& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from char
+	/// Subtraction assignment operator for subtracting DynamicAny from char
 {
 	return other -= da.convert<char>();
 }
 
 
 inline char operator *= (char& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with char
+	/// Multiplication assignment operator for multiplying DynamicAny with char
 {
 	return other *= da.convert<char>();
 }
 
 
 inline char operator /= (char& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with char
+	/// Division assignment operator for dividing DynamicAny with char
 {
 	return other /= da.convert<char>();
 }
@@ -716,28 +716,28 @@ inline Poco::Int8 operator / (const Poco::Int8& other, const DynamicAny& da)
 
 
 inline Poco::Int8 operator += (Poco::Int8& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to Poco::Int8
+	/// Addition assignment operator for adding DynamicAny to Poco::Int8
 {
 	return other += da.convert<Poco::Int8>();
 }
 
 
 inline Poco::Int8 operator -= (Poco::Int8& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from Poco::Int8
+	/// Subtraction assignment operator for subtracting DynamicAny from Poco::Int8
 {
 	return other -= da.convert<Poco::Int8>();
 }
 
 
 inline Poco::Int8 operator *= (Poco::Int8& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with Poco::Int8
+	/// Multiplication assignment operator for multiplying DynamicAny with Poco::Int8
 {
 	return other *= da.convert<Poco::Int8>();
 }
 
 
 inline Poco::Int8 operator /= (Poco::Int8& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with Poco::Int8
+	/// Division assignment operator for dividing DynamicAny with Poco::Int8
 {
 	return other /= da.convert<Poco::Int8>();
 }
@@ -820,28 +820,28 @@ inline Poco::UInt8 operator / (const Poco::UInt8& other, const DynamicAny& da)
 
 
 inline Poco::UInt8 operator += (Poco::UInt8& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to Poco::UInt8
+	/// Addition assignment operator for adding DynamicAny to Poco::UInt8
 {
 	return other += da.convert<Poco::UInt8>();
 }
 
 
 inline Poco::UInt8 operator -= (Poco::UInt8& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from Poco::UInt8
+	/// Subtraction assignment operator for subtracting DynamicAny from Poco::UInt8
 {
 	return other -= da.convert<Poco::UInt8>();
 }
 
 
 inline Poco::UInt8 operator *= (Poco::UInt8& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with Poco::UInt8
+	/// Multiplication assignment operator for multiplying DynamicAny with Poco::UInt8
 {
 	return other *= da.convert<Poco::UInt8>();
 }
 
 
 inline Poco::UInt8 operator /= (Poco::UInt8& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with Poco::UInt8
+	/// Division assignment operator for dividing DynamicAny with Poco::UInt8
 {
 	return other /= da.convert<Poco::UInt8>();
 }
@@ -924,28 +924,28 @@ inline Poco::Int16 operator / (const Poco::Int16& other, const DynamicAny& da)
 
 
 inline Poco::Int16 operator += (Poco::Int16& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to Poco::Int16
+	/// Addition assignment operator for adding DynamicAny to Poco::Int16
 {
 	return other += da.convert<Poco::Int16>();
 }
 
 
 inline Poco::Int16 operator -= (Poco::Int16& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from Poco::Int16
+	/// Subtraction assignment operator for subtracting DynamicAny from Poco::Int16
 {
 	return other -= da.convert<Poco::Int16>();
 }
 
 
 inline Poco::Int16 operator *= (Poco::Int16& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with Poco::Int16
+	/// Multiplication assignment operator for multiplying DynamicAny with Poco::Int16
 {
 	return other *= da.convert<Poco::Int16>();
 }
 
 
 inline Poco::Int16 operator /= (Poco::Int16& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with Poco::Int16
+	/// Division assignment operator for dividing DynamicAny with Poco::Int16
 {
 	return other /= da.convert<Poco::Int16>();
 }
@@ -1028,28 +1028,28 @@ inline Poco::UInt16 operator / (const Poco::UInt16& other, const DynamicAny& da)
 
 
 inline Poco::UInt16 operator += (Poco::UInt16& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to Poco::UInt16
+	/// Addition assignment operator for adding DynamicAny to Poco::UInt16
 {
 	return other += da.convert<Poco::UInt16>();
 }
 
 
 inline Poco::UInt16 operator -= (Poco::UInt16& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from Poco::UInt16
+	/// Subtraction assignment operator for subtracting DynamicAny from Poco::UInt16
 {
 	return other -= da.convert<Poco::UInt16>();
 }
 
 
 inline Poco::UInt16 operator *= (Poco::UInt16& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with Poco::UInt16
+	/// Multiplication assignment operator for multiplying DynamicAny with Poco::UInt16
 {
 	return other *= da.convert<Poco::UInt16>();
 }
 
 
 inline Poco::UInt16 operator /= (Poco::UInt16& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with Poco::UInt16
+	/// Division assignment operator for dividing DynamicAny with Poco::UInt16
 {
 	return other /= da.convert<Poco::UInt16>();
 }
@@ -1132,28 +1132,28 @@ inline Poco::Int32 operator / (const Poco::Int32& other, const DynamicAny& da)
 
 
 inline Poco::Int32 operator += (Poco::Int32& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to Poco::Int32
+	/// Addition assignment operator for adding DynamicAny to Poco::Int32
 {
 	return other += da.convert<Poco::Int32>();
 }
 
 
 inline Poco::Int32 operator -= (Poco::Int32& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from Poco::Int32
+	/// Subtraction assignment operator for subtracting DynamicAny from Poco::Int32
 {
 	return other -= da.convert<Poco::Int32>();
 }
 
 
 inline Poco::Int32 operator *= (Poco::Int32& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with Poco::Int32
+	/// Multiplication assignment operator for multiplying DynamicAny with Poco::Int32
 {
 	return other *= da.convert<Poco::Int32>();
 }
 
 
 inline Poco::Int32 operator /= (Poco::Int32& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with Poco::Int32
+	/// Division assignment operator for dividing DynamicAny with Poco::Int32
 {
 	return other /= da.convert<Poco::Int32>();
 }
@@ -1236,28 +1236,28 @@ inline Poco::UInt32 operator / (const Poco::UInt32& other, const DynamicAny& da)
 
 
 inline Poco::UInt32 operator += (Poco::UInt32& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to Poco::UInt32
+	/// Addition assignment operator for adding DynamicAny to Poco::UInt32
 {
 	return other += da.convert<Poco::UInt32>();
 }
 
 
 inline Poco::UInt32 operator -= (Poco::UInt32& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from Poco::UInt32
+	/// Subtraction assignment operator for subtracting DynamicAny from Poco::UInt32
 {
 	return other -= da.convert<Poco::UInt32>();
 }
 
 
 inline Poco::UInt32 operator *= (Poco::UInt32& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with Poco::UInt32
+	/// Multiplication assignment operator for multiplying DynamicAny with Poco::UInt32
 {
 	return other *= da.convert<Poco::UInt32>();
 }
 
 
 inline Poco::UInt32 operator /= (Poco::UInt32& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with Poco::UInt32
+	/// Division assignment operator for dividing DynamicAny with Poco::UInt32
 {
 	return other /= da.convert<Poco::UInt32>();
 }
@@ -1340,28 +1340,28 @@ inline Poco::Int64 operator / (const Poco::Int64& other, const DynamicAny& da)
 
 
 inline Poco::Int64 operator += (Poco::Int64& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to Poco::Int64
+	/// Addition assignment operator for adding DynamicAny to Poco::Int64
 {
 	return other += da.convert<Poco::Int64>();
 }
 
 
 inline Poco::Int64 operator -= (Poco::Int64& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from Poco::Int64
+	/// Subtraction assignment operator for subtracting DynamicAny from Poco::Int64
 {
 	return other -= da.convert<Poco::Int64>();
 }
 
 
 inline Poco::Int64 operator *= (Poco::Int64& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with Poco::Int64
+	/// Multiplication assignment operator for multiplying DynamicAny with Poco::Int64
 {
 	return other *= da.convert<Poco::Int64>();
 }
 
 
 inline Poco::Int64 operator /= (Poco::Int64& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with Poco::Int64
+	/// Division assignment operator for dividing DynamicAny with Poco::Int64
 {
 	return other /= da.convert<Poco::Int64>();
 }
@@ -1444,28 +1444,28 @@ inline Poco::UInt64 operator / (const Poco::UInt64& other, const DynamicAny& da)
 
 
 inline Poco::UInt64 operator += (Poco::UInt64& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to Poco::UInt64
+	/// Addition assignment operator for adding DynamicAny to Poco::UInt64
 {
 	return other += da.convert<Poco::UInt64>();
 }
 
 
 inline Poco::UInt64 operator -= (Poco::UInt64& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from Poco::UInt64
+	/// Subtraction assignment operator for subtracting DynamicAny from Poco::UInt64
 {
 	return other -= da.convert<Poco::UInt64>();
 }
 
 
 inline Poco::UInt64 operator *= (Poco::UInt64& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with Poco::UInt64
+	/// Multiplication assignment operator for multiplying DynamicAny with Poco::UInt64
 {
 	return other *= da.convert<Poco::UInt64>();
 }
 
 
 inline Poco::UInt64 operator /= (Poco::UInt64& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with Poco::UInt64
+	/// Division assignment operator for dividing DynamicAny with Poco::UInt64
 {
 	return other /= da.convert<Poco::UInt64>();
 }
@@ -1548,28 +1548,28 @@ inline float operator / (const float& other, const DynamicAny& da)
 
 
 inline float operator += (float& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to float
+	/// Addition assignment operator for adding DynamicAny to float
 {
 	return other += da.convert<float>();
 }
 
 
 inline float operator -= (float& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from float
+	/// Subtraction assignment operator for subtracting DynamicAny from float
 {
 	return other -= da.convert<float>();
 }
 
 
 inline float operator *= (float& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with float
+	/// Multiplication assignment operator for multiplying DynamicAny with float
 {
 	return other *= da.convert<float>();
 }
 
 
 inline float operator /= (float& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with float
+	/// Division assignment operator for dividing DynamicAny with float
 {
 	return other /= da.convert<float>();
 }
@@ -1652,28 +1652,28 @@ inline double operator / (const double& other, const DynamicAny& da)
 
 
 inline double operator += (double& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to double
+	/// Addition assignment operator for adding DynamicAny to double
 {
 	return other += da.convert<double>();
 }
 
 
 inline double operator -= (double& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from double
+	/// Subtraction assignment operator for subtracting DynamicAny from double
 {
 	return other -= da.convert<double>();
 }
 
 
 inline double operator *= (double& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with double
+	/// Multiplication assignment operator for multiplying DynamicAny with double
 {
 	return other *= da.convert<double>();
 }
 
 
 inline double operator /= (double& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with double
+	/// Division assignment operator for dividing DynamicAny with double
 {
 	return other /= da.convert<double>();
 }
@@ -1807,28 +1807,28 @@ inline long operator / (const long& other, const DynamicAny& da)
 
 
 inline long operator += (long& other, const DynamicAny& da)
-	/// Addition asignment operator for adding DynamicAny to long
+	/// Addition assignment operator for adding DynamicAny to long
 {
 	return other += da.convert<long>();
 }
 
 
 inline long operator -= (long& other, const DynamicAny& da)
-	/// Subtraction asignment operator for subtracting DynamicAny from long
+	/// Subtraction assignment operator for subtracting DynamicAny from long
 {
 	return other -= da.convert<long>();
 }
 
 
 inline long operator *= (long& other, const DynamicAny& da)
-	/// Multiplication asignment operator for multiplying DynamicAny with long
+	/// Multiplication assignment operator for multiplying DynamicAny with long
 {
 	return other *= da.convert<long>();
 }
 
 
 inline long operator /= (long& other, const DynamicAny& da)
-	/// Division asignment operator for dividing DynamicAny with long
+	/// Division assignment operator for dividing DynamicAny with long
 {
 	return other /= da.convert<long>();
 }
