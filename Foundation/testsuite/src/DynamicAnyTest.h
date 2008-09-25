@@ -77,12 +77,24 @@ private:
 	{
 		TL iMin = std::numeric_limits<TS>::min();
 		Poco::DynamicAny da = iMin - 1;
+
+#if defined(_MSC_VER) && _MSC_VER < 1400    // workaround for vc7.1
+		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+#else
 		try { TS i; i = da; fail("must fail"); }
+#endif 
+
 		catch (Poco::RangeException&) {}
 
 		TL iMax = std::numeric_limits<TS>::max();
 		da = iMax + 1;
+
+#if defined(_MSC_VER) && _MSC_VER < 1400    // workaround for vc7.1
+		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+#else
 		try { TS i; i = da; fail("must fail"); }
+#endif  
+        
 		catch (Poco::RangeException&) {}
 	}
 
@@ -95,13 +107,25 @@ private:
 		{
 			TL iMin = static_cast<TL>(std::numeric_limits<TS>::min());
 			da = iMin * 10;
+
+#if defined(_MSC_VER) && _MSC_VER < 1400    // workaround for vc7.1
+			try { TS i; i = da.convert<TS>(); fail("must fail"); }
+#else
 			try { TS i; i = da; fail("must fail"); }
+#endif 
+
 			catch (Poco::RangeException&) {}
 		}
 
 		TL iMax = static_cast<TL>(std::numeric_limits<TS>::max());
 		da = iMax * 10;
+
+#if defined(_MSC_VER) && _MSC_VER < 1400    // workaround for vc7.1
+		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+#else
 		try { TS i; i = da; fail("must fail"); }
+#endif 
+
 		catch (Poco::RangeException&) {}
 	}
 
@@ -113,7 +137,13 @@ private:
 
 		TS iMin = std::numeric_limits<TS>::min();
 		Poco::DynamicAny da = iMin;
+
+#if defined(_MSC_VER) && _MSC_VER < 1400    // workaround for vc7.1
+		try { TU i; i = da.convert<TU>(); fail("must fail"); }
+#else
 		try { TU i; i = da; fail("must fail"); }
+#endif 
+
 		catch (Poco::RangeException&) {}
 	}
 
@@ -122,7 +152,13 @@ private:
 	{
 		TL iMax = std::numeric_limits<TS>::max();
 		Poco::DynamicAny da = iMax + 1;
+
+#if defined(_MSC_VER) && _MSC_VER < 1400    // workaround for vc7.1
+		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+#else
 		try { TS i; i = da; fail("must fail"); }
+#endif 
+
 		catch (Poco::RangeException&) {}
 	}
 };
