@@ -72,12 +72,18 @@ SYSFLAGS = -mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO
 # System Specific Libraries
 #
 SYSLIBS  = -L/usr/local/lib -L/usr/lib -liphlpapi -lgdi32
-ifeq ($(POCO_NET_SUPPORT),enable)
+ifeq ($(POCO_NET_SUPPORT),exclude)
+#no need for winsock2
+else
 SYSLIBS += -lws2_32
 endif
-ifeq ($(POCO_NETSSL_SUPPORT),enable)
+ifeq ($(POCO_NETSSL_SUPPORT),exclude)
+#no need for winsock2, ssl or crypto
+else
 SYSLIBS += -lws2_32 -lssl -lcrypto -lws2_32
 endif
-ifeq ($(POCO_DATA_ODBC_SUPPORT),enable)
+ifeq ($(POCO_DATA_ODBC_SUPPORT),exclude)
+#no need for odbc lib
+else
 SYSLIBS += -lodbc32
 endif

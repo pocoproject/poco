@@ -53,28 +53,28 @@ Options:
     Useful if your C++ compiler has incomplete floating-point support
     (such as uclibc-based systems).
 
-  --disable-XML
+  --exclude-XML
     Disable building of Poco::XML component support
 
-  --disable-Util
+  --exclude-Util
     Disable building of Poco::Util component support
 
-  --disable-Net
+  --exclude-Net
     Disable building of Poco::Net component support
 
-  --disable-NetSSL
+  --exclude-NetSSL
     Disable building of Poco::NetSSL component support
 
-  --disable-Data
+  --exclude-Data
     Disable building of Poco::Data component support
 
-  --disable-ODBC
+  --exclude-ODBC
     Disable building of Poco::Data::ODBC component support
 
-  --disable-SQLite
+  --exclude-SQLite
     Disable building of Poco::Data::SQLite component support
 
-  --disable-MySQL
+  --exclude-MySQL
     Disable building of Poco::Data::MySQL component support
     
 ENDHELP
@@ -89,14 +89,14 @@ cd $build
 tests="tests"
 samples="samples"
 flags=""
-poco_xml_support="enable"
-poco_util_support="enable"
-poco_net_support="enable"
-poco_netssl_support="enable"
-poco_data_support="enable"
-poco_data_odbc_support="enable"
-poco_data_sqlite_support="enable"
-poco_data_mysql_support="enable"
+poco_xml_support="include"
+poco_util_support="include"
+poco_net_support="include"
+poco_netssl_support="include"
+poco_data_support="include"
+poco_data_odbc_support="include"
+poco_data_sqlite_support="include"
+poco_data_mysql_support="include"
 # parse arguments
 while [ "$1" != "" ] ; do
 	val=`expr $1 : '--config=\(.*\)'`
@@ -130,36 +130,36 @@ while [ "$1" != "" ] ; do
 		flags="$flags -DPOCO_NO_FPENVIRONMENT"
 	fi
 
-	if [ "$1" = "--disable-XML" ] ; then
-		poco_xml_support="disable"
+	if [ "$1" = "--exclude-XML" ] ; then
+		poco_xml_support="exclude"
 	fi
 
-	if [ "$1" = "--disable-Util" ] ; then
-		poco_util_support="disable"
+	if [ "$1" = "--exclude-Util" ] ; then
+		poco_util_support="exclude"
 	fi
 
-	if [ "$1" = "--disable-Net" ] ; then
-		poco_net_support="disable"
+	if [ "$1" = "--exclude-Net" ] ; then
+		poco_net_support="exclude"
 	fi
 
-	if [ "$1" = "--disable-NetSSL" ] ; then
-		poco_netssl_support="disable"
+	if [ "$1" = "--exclude-NetSSL" ] ; then
+		poco_netssl_support="exclude"
 	fi
 
-	if [ "$1" = "--disable-Data" ] ; then
-		poco_data_support="disable"
+	if [ "$1" = "--exclude-Data" ] ; then
+		poco_data_support="exclude"
 	fi
 	
-	if [ "$1" = "--disable-ODBC" ] ; then
-		poco_data_odbc_support="disable"
+	if [ "$1" = "--exclude-ODBC" ] ; then
+		poco_data_odbc_support="exclude"
 	fi
 	
-	if [ "$1" = "--disable-SQLite" ] ; then
-		poco_data_sqlite_support="disable"
+	if [ "$1" = "--exclude-SQLite" ] ; then
+		poco_data_sqlite_support="exclude"
 	fi
 	
-	if [ "$1" = "--disable-MySQL" ] ; then
-		poco_data_mysql_support="disable"
+	if [ "$1" = "--exclude-MySQL" ] ; then
+		poco_data_mysql_support="exclude"
 	fi
 	
 	if [ "$1" = "--help" ] ; then

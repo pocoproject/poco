@@ -61,7 +61,9 @@ Foundation-tests: Foundation-libexec cppunit
 Foundation-samples: Foundation-libexec 
 	$(MAKE) -C $(POCO_BASE)/Foundation/samples
 
-ifeq ($(POCO_XML_SUPPORT),enable)
+ifeq ($(POCO_XML_SUPPORT),exclude)
+#no XML support
+else
 XML-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/XML
 
@@ -70,11 +72,11 @@ XML-tests: XML-libexec cppunit
 	
 XML-samples: XML-libexec 
 	$(MAKE) -C $(POCO_BASE)/XML/samples
-else
-#no XML support
 endif
 
-ifeq ($(POCO_UTIL_SUPPORT),enable)
+ifeq ($(POCO_UTIL_SUPPORT),exclude)
+#no Util support
+else
 Util-libexec:  Foundation-libexec XML-libexec
 	$(MAKE) -C $(POCO_BASE)/Util
 
@@ -83,11 +85,11 @@ Util-tests: Util-libexec cppunit
 	
 Util-samples: Util-libexec 
 	$(MAKE) -C $(POCO_BASE)/Util/samples
-else
-#no Util support
 endif
 
-ifeq ($(POCO_NET_SUPPORT),enable)
+ifeq ($(POCO_NET_SUPPORT),exclude)
+#no Net support
+else
 Net-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Net
 
@@ -96,11 +98,11 @@ Net-tests: Net-libexec cppunit
 	
 Net-samples: Net-libexec  Foundation-libexec XML-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Net/samples
-else
-#no Net support
 endif
 
-ifeq ($(POCO_NETSSL_SUPPORT),enable)
+ifeq ($(POCO_NETSSL_SUPPORT),exclude)
+#no NetSSL support
+else
 NetSSL_OpenSSL-libexec:  Foundation-libexec Net-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL
 
@@ -109,11 +111,11 @@ NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit
 	
 NetSSL_OpenSSL-samples: NetSSL_OpenSSL-libexec 
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples
-else
-#no NetSSL support
 endif
 
-ifeq ($(POCO_DATA_SUPPORT),enable)
+ifeq ($(POCO_DATA_SUPPORT),exclude)
+#no Data support
+else
 Data-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Data
 
@@ -123,37 +125,35 @@ Data-tests: Data-libexec cppunit
 Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/samples
 
-ifeq ($(POCO_DATA_SQLITE_SUPPORT), enable)	
+ifeq ($(POCO_DATA_SQLITE_SUPPORT), exclude)	
+#no SQLite support
+else
 Data/SQLite-libexec:  Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite
 
 Data/SQLite-tests: Data/SQLite-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite
-else
-#no SQLite support
 endif
 
-ifeq ($(POCO_DATA_ODBC_SUPPORT), enable)	
+ifeq ($(POCO_DATA_ODBC_SUPPORT), exclude)	
+#no ODBC support
+else
 Data/ODBC-libexec:  Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC
 
 Data/ODBC-tests: Data/ODBC-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite
-else
-#no ODBC support
 endif
 
-ifeq ($(POCO_DATA_MYSQL_SUPPORT), enable)	
+ifeq ($(POCO_DATA_MYSQL_SUPPORT), exclude)	
+#no MySQL support
+else
 Data/MySQL-libexec:  Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL
 
 Data/MySQL-tests: Data/ODBC-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite
-else
-#no MySQL support
 endif
-else
-#no Data support
 endif
 
 clean:
