@@ -74,6 +74,7 @@ namespace
 		{
 		case MYSQL_TYPE_TINY:     return sizeof(char);
 		case MYSQL_TYPE_SHORT:    return sizeof(short);
+		case MYSQL_TYPE_INT24:
 		case MYSQL_TYPE_LONG:     return sizeof(Poco::Int32);
 		case MYSQL_TYPE_FLOAT:    return sizeof(float);
 		case MYSQL_TYPE_DOUBLE:   return sizeof(double);
@@ -114,6 +115,7 @@ namespace
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT16;
 			return Poco::Data::MetaColumn::FDT_INT16;
 
+		case MYSQL_TYPE_INT24:
 		case MYSQL_TYPE_LONG:     
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT32;
 			return Poco::Data::MetaColumn::FDT_INT32;
