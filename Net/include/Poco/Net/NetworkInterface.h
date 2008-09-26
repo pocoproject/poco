@@ -1,7 +1,7 @@
 //
 // NetworkInterface.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#5 $
+// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#6 $
 //
 // Library: Net
 // Package: Sockets
@@ -153,6 +153,12 @@ protected:
 		/// Creates the NetworkInterface.
 
 	NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
+		/// Creates the NetworkInterface.
+		
+	NetworkInterface(const std::string& name, const IPAddress& address, int index = -1);
+		/// Creates the NetworkInterface.
+
+	NetworkInterface(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index = -1);
 		/// Creates the NetworkInterface.
 		
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;

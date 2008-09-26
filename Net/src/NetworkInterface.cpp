@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#7 $
+// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#8 $
 //
 // Library: Net
 // Package: Sockets
@@ -205,6 +205,18 @@ NetworkInterface::NetworkInterface(const std::string& name, const std::string& d
 
 NetworkInterface::NetworkInterface(const std::string& name, const std::string& displayName, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
 	_pImpl(new NetworkInterfaceImpl(name, displayName, address, subnetMask, broadcastAddress, index))
+{
+}
+
+
+NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, int index):
+	_pImpl(new NetworkInterfaceImpl(name, name, address, index))
+{
+}
+
+
+NetworkInterface::NetworkInterface(const std::string& name, const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress, int index):
+	_pImpl(new NetworkInterfaceImpl(name, name, address, subnetMask, broadcastAddress, index))
 {
 }
 
