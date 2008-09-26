@@ -24,6 +24,7 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 	dragGroup:null,
 	dropGroup:null,
 	tbar:null,
+	initVal:null,
 	appendOnly:false,
 	sortField:null,
 	sortDir:'ASC',
@@ -93,6 +94,11 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 			this.hiddenField = this.el.createChild(hiddenTag);
 		} else {
 			this.hiddenField = Ext.get(document.body).createChild(hiddenTag);
+		}
+		if (this.initVal != null)
+		{
+			this.setValue(this.initVal);
+			this.initVal = null;
 		}
 		fs.doLayout();
 	},
