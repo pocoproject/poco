@@ -69,7 +69,7 @@ using Poco::NotFoundException;
 const bool ODBCOracleTest::bindValues[8] = {true, true, true, false, false, true, false, false};
 Poco::SharedPtr<Poco::Data::Session> ODBCOracleTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> ODBCOracleTest::_pExecutor = 0;
-std::string ODBCOracleTest::_dsn = "PocoDataOracleTest";
+std::string ODBCOracleTest::_dsn = ORACLE_DSN;
 std::string ODBCOracleTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCOracleTest::_drivers;
 Poco::Data::ODBC::Utility::DSNMap ODBCOracleTest::_dataSources;
@@ -92,14 +92,14 @@ ODBCOracleTest::ODBCOracleTest(const std::string& name):
 		try
 		{
 			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
+			if (_pSession && _pSession->isConnected()) 
+				std::cout << "*** Connected to " << _dbConnString << std::endl;
 		}catch (ConnectionException& ex)
 		{
 			std::cout << "!!! WARNING: Connection failed. Oracle tests will fail !!!" << std::endl;
 			std::cout << ex.toString() << std::endl;
 		}
 
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
 		if (!_pExecutor) _pExecutor = new SQLExecutor("Oracle SQL Executor", _pSession);
 	}
 	else 
@@ -886,6 +886,7 @@ void ODBCOracleTest::checkODBCSetup()
 			{
 				std::cout << "Oracle DSN NOT found, will attempt to connect without it." << std::endl;
 				_dbConnString = "DRIVER={" ORACLE_ODBC_DRIVER "};"
+					"DBQ=" ORACLE_SERVER ":" ORACLE_PORT "/" ORACLE_SID ";"
 					"UID=" ORACLE_UID ";"
 					"PWD=" ORACLE_PWD ";"
 					"TLO=O;" //?
@@ -907,14 +908,7 @@ void ODBCOracleTest::checkODBCSetup()
 					"XSM=Default;" // schema field (Default/Database/Owner), default Default
 					"EXC=F;" // EXEC syntax (T/F), default F
 					"APA=T;" // thread safety (T/F), default T
-					"DBA=W;" // write access
-					"DBQ=" ORACLE_SID ";" // TNS service name
-					"SERVER="
-					"(DESCRIPTION="
-					" (ADDRESS=(PROTOCOL=TCP)(HOST=" ORACLE_SERVER " )(PORT=" ORACLE_PORT "))"
-					" (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=" ORACLE_SID "))"
-					");";
-
+					"DBA=W;"; // write access
 			}
 			else if (!_dbConnString.empty())
 			{

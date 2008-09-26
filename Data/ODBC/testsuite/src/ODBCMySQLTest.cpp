@@ -48,8 +48,10 @@
 #include <iostream>
 
 
+#define MYSQL_DRIVER_VERSION "5.1"
+
 #ifdef POCO_OS_FAMILY_WINDOWS
-	#define MYSQL_ODBC_DRIVER "MySQL ODBC 3.51 Driver"
+	#define MYSQL_ODBC_DRIVER "MySQL ODBC "##MYSQL_DRIVER_VERSION##" Driver"
 #else
 	#define MYSQL_ODBC_DRIVER "MySQL"
 #endif
@@ -57,7 +59,7 @@
 #define MYSQL_SERVER "localhost"
 #define MYSQL_DB "test"
 #define MYSQL_UID "root"
-#define MYSQL_PWD "mysql"
+#define MYSQL_PWD ""
 
 
 using namespace Poco::Data;
@@ -95,14 +97,14 @@ ODBCMySQLTest::ODBCMySQLTest(const std::string& name):
 		try
 		{
 			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
+			if (_pSession && _pSession->isConnected()) 
+				std::cout << "*** Connected to " << _dbConnString << std::endl;
 		}catch (ConnectionException& ex)
 		{
 			std::cout << "!!! WARNING: Connection failed. MySQL tests will fail !!!" << std::endl;
 			std::cout << ex.toString() << std::endl;
 		}
 
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
 		if (!_pExecutor) _pExecutor = new SQLExecutor("MySQL SQL Executor", _pSession);
 	}
 	else 
