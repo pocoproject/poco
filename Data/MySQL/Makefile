@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Data/MySQL/Makefile#2 $
+# $Id: //poco/1.3/Data/MySQL/Makefile#3 $
 #
 # Makefile for Poco MySQL
 #

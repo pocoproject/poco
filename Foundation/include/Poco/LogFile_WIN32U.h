@@ -1,7 +1,7 @@
 //
 // LogFile_WIN32U.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/LogFile_WIN32U.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/LogFile_WIN32U.h#3 $
 //
 // Library: Foundation
 // Package: Logging

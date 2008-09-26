@@ -1,7 +1,7 @@
 //
 // ODBCMySQLTest.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCMySQLTest.cpp#4 $
+// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCMySQLTest.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
