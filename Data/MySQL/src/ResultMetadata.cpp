@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/ResultMetadata.cpp#3 $
+// $Id: //poco/1.3/Data/MySQL/src/ResultMetadata.cpp#4 $
 //
 // Library: Data
 // Package: MySQL
@@ -233,7 +233,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 		_row[i].buffer_length = static_cast<unsigned int>(_columns[i].length());
 		_row[i].buffer        = &_buffer[0] + offset;
 		_row[i].length        = &_lengths[i];
-        	_row[i].is_null       = &_isNull[i];
+        _row[i].is_null       = &_isNull[i];
 		
 		offset += _row[i].buffer_length;
 	}
