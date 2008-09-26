@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#5 $
+// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -67,6 +67,11 @@ public:
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		return --_cnt;
+	}
+	
+	int referenceCount() const
+	{
+		return _cnt;
 	}
 
 private:
@@ -363,6 +368,11 @@ public:
 	bool operator >= (C* ptr) const
 	{
 		return get() >= ptr;
+	}
+	
+	int referenceCount() const
+	{
+		return _pCounter->referenceCount();
 	}
 
 private:
