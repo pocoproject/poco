@@ -75,6 +75,7 @@ namespace
 		{
 		case MYSQL_TYPE_TINY:     return sizeof(char);
 		case MYSQL_TYPE_SHORT:    return sizeof(short);
+		case MYSQL_TYPE_INT24:
 		case MYSQL_TYPE_LONG:     return sizeof(Poco::Int32);
 		case MYSQL_TYPE_FLOAT:    return sizeof(float);
 		case MYSQL_TYPE_DOUBLE:   return sizeof(double);
@@ -90,7 +91,6 @@ namespace
 		case MYSQL_TYPE_BLOB:
 		case MYSQL_TYPE_NULL:
 		case MYSQL_TYPE_TIMESTAMP:
-		case MYSQL_TYPE_INT24:
 		case MYSQL_TYPE_DATE:
 		case MYSQL_TYPE_TIME:
 		case MYSQL_TYPE_DATETIME:
@@ -123,6 +123,7 @@ namespace
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT16;
 			return Poco::Data::MetaColumn::FDT_INT16;
 
+		case MYSQL_TYPE_INT24:
 		case MYSQL_TYPE_LONG:     
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT32;
 			return Poco::Data::MetaColumn::FDT_INT32;
@@ -151,7 +152,6 @@ namespace
 		case MYSQL_TYPE_NEWDECIMAL:
 		case MYSQL_TYPE_NULL:
 		case MYSQL_TYPE_TIMESTAMP:
-		case MYSQL_TYPE_INT24:
 		case MYSQL_TYPE_DATE:
 		case MYSQL_TYPE_TIME:
 		case MYSQL_TYPE_DATETIME:
@@ -233,7 +233,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 		_row[i].buffer_length = static_cast<unsigned int>(_columns[i].length());
 		_row[i].buffer        = &_buffer[0] + offset;
 		_row[i].length        = &_lengths[i];
-        _row[i].is_null       = &_isNull[i];
+        	_row[i].is_null       = &_isNull[i];
 		
 		offset += _row[i].buffer_length;
 	}
