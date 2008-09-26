@@ -40,7 +40,7 @@ Release 1.3.3 (2008-09-22)
 - fixed SF# 1899808: HTMLForm.load() should call clear() first
 - fixed SF# 2030074: Cookie problem with .NET server
 - fixed SF# 2009707: small bug in Net/ICMPPacketImpl.cpp
-- fixed SF# 988579: Intel Warning: invalid multibyte character sequence
+- fixed SF# 1988579: Intel Warning: invalid multibyte character sequence
 - fixed SF# 2007486: Please clarify license for Data/samples/*
 - fixed SF# 1985180: Poco::Net::DNS multithreading issue
 - fixed SF# 1968106: DigestOutputStream losing data
@@ -71,6 +71,10 @@ Release 1.3.3 (2008-09-22)
 - fixed SF# 2121732: Prevent InvalidArgumentException in SocketReactor
 - fixed SF# 1891132: Poco::Data::StatementImpl::executeWithLimit is not correct
 - fixed SF# 1951604: POCO refuses to compile with g++ 4.3.0
+- fixed SF# 1954327: CYGWIN's pthread does not define PTHREAD_STACK_MIN
+- fixed SF# 2124636: Discrepancy between FileWIN32(U)::handleLastError
+- fixed SF# 1558300: MinGW/MSYS Builds
+- fixed SF# 2123266: Memory leak under QNX6 with dinkum library
 
 
 Release 1.3.2 (2008-02-04)
@@ -903,4 +907,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#26 $
+$Id: //poco/1.3/dist/CHANGELOG#29 $

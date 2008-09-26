@@ -71,12 +71,10 @@ are included.
 You can either build from within Visual Studio (Build->Batch Build->Select All;Rebuild)
 or from the command line. To build from the command line, start the
 Visual Studio .NET 2003 (or 2005/2008) Command Prompt and cd to the directory where you have
-extracted the POCO C++ Libraries sources. Then simply start the build_vs71.cmd (or
-build_vs80.cmd, respectively) batch file. This will build all libraries, test suites and 
-sample programs, in both debug and release versions. The dynamic link libraries will be 
-placed in the top-most bin directory. The import libraries will be placed in the top-most lib 
-directory. The test suite executables will be placed in the testsuite/bin directories.
-The sample executables will be placed in the sample/*/bin directories.
+extracted the POCO C++ Libraries sources. Then, simply start the buildwin.cmd script
+and pass as argument the version of visual studio (71, 80 or 90). You can customize
+what is being built by buildwin.cmd by passing appropriate command line arguments to
+it. Call buildwin.cmd without arguments to see what is available.
 
 In order to run the test suite and the samples, the top-most bin directory containing
 the shared libraries must be in the PATH environment variable.
@@ -197,4 +195,4 @@ at <http://pocoproject.org>.
 
 
 --
-$Id: //poco/1.3/dist/README#3 $
+$Id: //poco/1.3/dist/README#4 $

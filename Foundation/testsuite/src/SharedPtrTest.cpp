@@ -1,7 +1,7 @@
 //
 // SharedPtrTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/SharedPtrTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/SharedPtrTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -115,8 +115,10 @@ void SharedPtrTest::testSharedPtr()
 	}
 	assert (pTO1 < pTO2);
 	ptr1 = pTO1;
+	assert (ptr1.referenceCount() == 1);
 	SharedPtr<TestObject> ptr2 = pTO2;
 	SharedPtr<TestObject> ptr3 = ptr1;
+	assert (ptr1.referenceCount() == 2);
 	SharedPtr<TestObject> ptr4;
 	assert (ptr1.get() == pTO1);
 	assert (ptr1 == pTO1);
