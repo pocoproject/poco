@@ -41,6 +41,7 @@
 #include "Poco/WebWidgets/Button.h"
 #include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/WebWidgets/WebWidgetsException.h"
 #include "Poco/NumberFormatter.h"
 
 
@@ -89,6 +90,8 @@ void ButtonCellRenderer::renderProperties(const ButtonCell* pButtonCell, const s
 	{
 		ostr << "type:'submit',";
 		Form::Ptr pForm = Utility::insideForm(pButtonCell);
+		if (!pForm)
+			throw WebWidgetsException("SubmitButton must be used inside a form!");
 		ostr << "handler: function(){Ext.getCmp('" << pForm->id() << "').getForm().submit();},";
 	}
 	View* pView = pButtonCell->getOwner();

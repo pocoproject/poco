@@ -69,6 +69,7 @@
 #include "Poco/WebWidgets/SimpleTableModel.h"
 #include "Poco/WebWidgets/JSDelegate.h"
 #include "Poco/WebWidgets/ResourceManager.h"
+#include "Poco/WebWidgets/SubmitButton.h"
 #include "Poco/TeeStream.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
@@ -1127,6 +1128,39 @@ void ExtJSTest::testListBox()
 }
 
 
+void ExtJSTest::testFormListBox()
+{
+	ResourceManager::Ptr pRM(new ResourceManager());Utility::initialize(pRM, Poco::Path());WebApplication webApp(Poco::URI("/"), pRM);
+	LookAndFeel::Ptr laf(new LookAndFeel());
+	webApp.setLookAndFeel(laf);
+	RenderContext context(*laf, webApp);
+	Utility::initialize(laf);
+
+	Page::Ptr ptr = new Page("test");
+	webApp.setCurrentPage(ptr);
+	Form::Ptr ptrF = new Form(Poco::URI("/test"));
+	ptrF->setHeight(600);
+	ptrF->setWidth(800);
+	ptr->add(ptrF);
+	ListBox::Ptr ptrList(new ListBox("MyWindow"));
+	ptrList->setWidth(640);
+	ptrList->setHeight(400);
+	ptrF->add(ptrList);
+	ptrList->insert(std::string("First"), false);
+	ptrList->insert(std::string("FirstSelected"), true);
+	ptrList->insert(std::string("Second"), false);
+	ptrList->insert(std::string("SecondSelected"), true);
+	ptrF->add(new SubmitButton("", "Click"));
+	std::ostringstream ostr;
+	std::ofstream fstr("testFormListBox.html");
+	TeeOutputStream out(ostr);
+	out.addStream(fstr);
+	ptr->renderHead(context, out);
+	ptr->renderBody(context, out);
+	std::string result = ostr.str();
+}
+
+
 void ExtJSTest::testDateFormatConversion()
 {
 	std::string result = Utility::convertPocoDateToPHPDate(Poco::DateTimeFormat::ISO8601_FORMAT);
@@ -1606,6 +1640,7 @@ CppUnit::Test* ExtJSTest::suite()
 	CppUnit_addTest(pSuite, ExtJSTest, testFormFrameVerticalLayout);
 	CppUnit_addTest(pSuite, ExtJSTest, testFormGridLayoutNullElements);
 	CppUnit_addTest(pSuite, ExtJSTest, testFormImage);
+	CppUnit_addTest(pSuite, ExtJSTest, testFormListBox);
 	CppUnit_addTest(pSuite, ExtJSTest, testDateFormatConversion);
 	CppUnit_addTest(pSuite, ExtJSTest, testCollapsible);
 	CppUnit_addTest(pSuite, ExtJSTest, testCollapsible2);

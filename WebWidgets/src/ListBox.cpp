@@ -36,20 +36,21 @@
 
 #include "Poco/WebWidgets/ListBox.h"
 #include "Poco/WebWidgets/ListBoxCell.h"
+#include "Poco/Delegate.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 
 
-ListBox::ListBox(const std::string& name, const std::type_info& type, Cell::Ptr ptrCell):
+ListBox::ListBox(const std::string& name, const std::type_info& type, ListBoxCell::Ptr ptrCell):
 	Control(name, type)
 {
 	init(ptrCell);
 }
 
 
-ListBox::ListBox(const std::type_info& type, Cell::Ptr ptrCell):
+ListBox::ListBox(const std::type_info& type, ListBoxCell::Ptr ptrCell):
 	Control(type)
 {
 	init(ptrCell);
@@ -91,8 +92,12 @@ ListBox::~ListBox()
 
 void ListBox::init()
 {
-	ListBoxCell* pCell = new ListBoxCell(this);
-	setCell(pCell);
+	_pLBCell = new ListBoxCell(this);
+	_pLBCell->afterLoad = delegate(*this, &ListBox::fireAfterLoad);
+	_pLBCell->beforeLoad += Poco::delegate(this, &ListBox::fireBeforeLoad);
+	_pLBCell->rowDeselected += Poco::delegate(this, &ListBox::fireRowDeselected);
+	_pLBCell->rowSelected += Poco::delegate(this, &ListBox::fireRowSelected);
+	setCell(_pLBCell);
 }
 
 
@@ -100,11 +105,38 @@ void ListBox::init(Cell::Ptr ptrCell)
 {
 	ListBoxCell::Ptr ptr = ptrCell.cast<ListBoxCell>();
 	poco_check_ptr (ptr);
-
+	_pLBCell = ptr;
+	_pLBCell->afterLoad = delegate(*this, &ListBox::fireAfterLoad);
+	_pLBCell->beforeLoad += Poco::delegate(this, &ListBox::fireBeforeLoad);
+	_pLBCell->rowDeselected += Poco::delegate(this, &ListBox::fireRowDeselected);
+	_pLBCell->rowSelected += Poco::delegate(this, &ListBox::fireRowSelected);
 	setCell(ptrCell);
 }
 
 
+void ListBox::fireBeforeLoad(std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*>& data)
+{
+	beforeLoad(this, data.second);
+}
+
+
+void ListBox::fireAfterLoad(void* pSender)
+{
+	ListBox* pThis = this;
+	afterLoad(this, pThis);
+}
+
+
+void ListBox::fireRowSelected(int& pos)
+{
+	rowSelected(this, pos);
+}
+
+
+void ListBox::fireRowDeselected(int& pos)
+{
+	rowDeselected(this, pos);
+}
 
 
 } } // namespace Poco::WebWidgets

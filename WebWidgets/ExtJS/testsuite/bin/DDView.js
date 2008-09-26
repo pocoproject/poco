@@ -46,6 +46,7 @@ Ext.extend(Ext.ux.DDView, Ext.DataView, {
 /**    @cfg {String/Array} dropGroup The ddgroup name(s) for the View's DropZone. */ 
 /**    @cfg {Boolean} copy Causes drag operations to copy nodes rather than move. */ 
 /**    @cfg {Boolean} allowCopy Causes ctrl/drag operations to copy nodes rather than move. */ 
+	dragDisabled:false,
 
 	sortDir: 'ASC',
 
@@ -82,20 +83,24 @@ Ext.extend(Ext.ux.DDView, Ext.DataView, {
         return true; 
     }, 
      
-    destroy: function() { 
+    onDestroy: function() { 
         this.purgeListeners(); 
         this.getEl().removeAllListeners(); 
         this.getEl().remove(); 
         if (this.dragZone) { 
+            Ext.dd.ScrollManager.unregister(this.dragZone.el); 
             if (this.dragZone.destroy) { 
                 this.dragZone.destroy(); 
+				this.dragZone.proxy.el.destroy();
             } 
         } 
         if (this.dropZone) { 
+            Ext.dd.ScrollManager.unregister(this.dropZone.el); 
             if (this.dropZone.destroy) { 
                 this.dropZone.destroy(); 
             } 
-        } 
+        }
+        Ext.ux.DDView.superclass.onDestroy.call(this);
     }, 
 
 /**    Allows this class to be an Ext.form.Field so it can be found using {@link Ext.form.BasicForm#findField}. */ 
@@ -278,6 +283,7 @@ Ext.extend(Ext.ux.DDView, Ext.DataView, {
     }, 
      
     isValidDropPoint: function(pt, n, data) { 
+		if (this.dragDisabled) return false;
         if (!data.viewNodes || (data.viewNodes.length != 1)) { 
             return true; 
         } 
@@ -333,6 +339,7 @@ Ext.extend(Ext.ux.DDView, Ext.DataView, {
     }, 
 
     onNodeDrop : function(n, dd, e, data){ 
+		if (this.dragDisabled) return false;
         if (this.fireEvent("drop", this, n, dd, e, data) === false) { 
             return false; 
         } 

@@ -41,10 +41,15 @@
 
 
 #include "Poco/WebWidgets/Cell.h"
+#include "Poco/WebWidgets/Delegate.h"
+#include "Poco/FIFOEvent.h"
 #include <vector>
 
 
 namespace Poco {
+	namespace Net {
+		class HTTPServerResponse;
+	}
 namespace WebWidgets {
 
 
@@ -57,20 +62,33 @@ public:
 	typedef std::vector<std::pair<Any, bool> > Data; /// An element plus its selected flag
 	typedef std::vector<std::string> StringData;
 
+	static const std::string EV_LOADDATA;
+	static const std::string EV_AFTERLOAD;
+	static const std::string EV_ROWSELECTED;
+	static const std::string ARG_SELECTED;
+	static const std::string ARG_ROW;
+	static const std::string VAL_SELECTED;
+	static const std::string VAL_DESELECTED;
+
+	FIFOEvent<std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*> > beforeLoad; /// thrown whenever a load is requested, internal event to which the ListBoxCellRenderer must register
+
+	Delegate afterLoad; // thrown after data was loaded
+
+	FIFOEvent<int> rowSelected; /// fires the row selected event
+
+	FIFOEvent<int> rowDeselected; /// fires the row selected event
+
+	struct WebWidgets_API RowValueChange
+		/// Data sent with a rowValueChanged event. 
+	{
+		std::size_t row;
+		const Poco::Any oldValue;
+		const Poco::Any newValue;
+		RowValueChange(std::size_t row, const Poco::Any& oldValue, const Poco::Any& newValue);
+	};
+
 	ListBoxCell(View* pOwner);
 		/// Creates a ListBoxCell.
-
-	void setHeight(int height);
-		/// Sets the height in pixel. A negative value equals autoSize.
-
-	int getHeight() const;
-		/// Returns the height in pixel. A negative value equals autoSize.
-
-	void setWidth(int width);
-		/// Sets the width in pixel. A negative value equals autoSize.
-
-	int getWidth() const;
-		/// Returns the width in pixel. A negative value equals autoSize.
 
 	Data::const_iterator begin() const;
 		/// ConstIterator to all elements
@@ -108,15 +126,31 @@ public:
 	void deselect(const Any& elem);
 		/// Deselects the element.
 
+	void selectByIndex(int idx, bool sel = true);
+		/// Selects the element by Index. idx values that are out of range are ignored
+
+	void deselectByIndex(int idx);
+		/// Deselects the element. idx values that are out of range are ignored
+
+	void selectAll(bool sel= true);
+		/// Selects all elements
+
+	void deselectAll();
+		/// Deselects all elements
+
 	bool hasSelected() const;
 		/// Returns true if at least one selected element exists
 
 	const Any& getSelected() const;
-		/// Returns the first selected element, exception if none was selected
+		/// Returns the first selected element, exception if none was selected.
+		/// To get all selected elements use getElements and iterate over the
+		/// returned vector
 
 	// Cell
 	void handleForm(const std::string& field, const std::string& value);
 	
+	void handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response);
+
 	bool serializeJSON(std::ostream& out, const std::string& name);
 
 protected:
@@ -135,37 +169,12 @@ protected:
 private:
 	Data       _data;
 	StringData _fmtCache;
-	int        _height;
-	int        _width;
 };
 
 
 //
 // inlines
 //
-inline void ListBoxCell::setHeight(int height)
-{
-	_height = height;
-}
-
-
-inline int ListBoxCell::getHeight() const
-{
-	return _height;
-}
-
-
-inline void ListBoxCell::setWidth(int width)
-{
-	_width = width;
-}
-
-
-inline int ListBoxCell::getWidth() const
-{
-	return _width;
-}
-
 
 inline ListBoxCell::Data::const_iterator ListBoxCell::begin() const
 {
@@ -213,6 +222,18 @@ inline ListBoxCell::StringData::const_iterator ListBoxCell::beginString() const
 inline ListBoxCell::StringData::const_iterator ListBoxCell::endString() const
 {
 	return _fmtCache.end();
+}
+
+
+inline void ListBoxCell::deselectByIndex(int idx)
+{
+	selectByIndex(idx, false);
+}
+
+
+inline void ListBoxCell::deselectAll()
+{
+	selectAll(false);
 }
 
 

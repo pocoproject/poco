@@ -42,6 +42,8 @@
 
 #include "Poco/WebWidgets/Control.h"
 #include "Poco/WebWidgets/ListBoxCell.h"
+#include "Poco/WebWidgets/JavaScriptEvent.h"
+#include "Poco/FIFOEvent.h"
 #include <vector>
 
 
@@ -54,25 +56,22 @@ class WebWidgets_API ListBox: public Control
 {
 public:
 	typedef Poco::AutoPtr<ListBox> Ptr;
-	typedef ListBoxCell::Data Data; /// An element plus its selected flag as pair
+	typedef ListBoxCell::Data Data; /// An element plus its selected flag as std::pair
+	typedef ListBoxCell::RowValueChange RowValueChange; /// the row plus old and new value
+
+	FIFOEvent<Poco::Net::HTTPServerResponse*> beforeLoad; /// thrown whenever a load is requested, internal event to which the ListBoxCellRenderer must register
+
+	JavaScriptEvent<ListBox*> afterLoad; // thrown after data was loaded
+
+	JavaScriptEvent<int> rowSelected; /// fires the row selected event
+
+	JavaScriptEvent<int> rowDeselected; /// fires the row deselected event
 
 	ListBox(const std::string& name);
 		/// Creates a ListBox with the given name.
 
 	ListBox();
 		/// Creates an anonymous TextField.
-
-	void setHeight(int height);
-		/// Sets the height in pixel. A negative value equals autoSize.
-
-	int getHeight() const;
-		/// Returns the height in pixel. A negative value equals autoSize.
-
-	void setWidth(int width);
-		/// Sets the width in pixel. A negative value equals autoSize.
-
-	int getWidth() const;
-		/// Returns the width in pixel. A negative value equals autoSize.
 
 	Data::const_iterator begin() const;
 		/// ConstIterator to all elements
@@ -104,6 +103,18 @@ public:
 	void deselect(const Any& elem);
 		/// Deselects the element.
 
+	void selectByIndex(int idx, bool sel = true);
+		/// Selects the element by Index. idx values that are out of range are ignored
+
+	void deselectByIndex(int idx);
+		/// Deselects the element. idx values that are out of range are ignored
+
+	void selectAll(bool sel= true);
+		/// Selects all elements
+
+	void deselectAll();
+		/// Deselects all elements
+
 	bool hasSelected() const;
 		/// Returns true if at least one selected element exists
 
@@ -117,10 +128,10 @@ protected:
 	ListBox(const std::type_info& type);
 		/// Creates a ListBox.
 
-	ListBox(const std::string& name, const std::type_info& type, Cell::Ptr ptrCell);
+	ListBox(const std::string& name, const std::type_info& type, ListBoxCell::Ptr ptrCell);
 		/// Creates a ListBox and assigns it the given name.
 
-	ListBox(const std::type_info& type, Cell::Ptr ptrCell);
+	ListBox(const std::type_info& type, ListBoxCell::Ptr ptrCell);
 		/// Creates a ListBox.
 
 	~ListBox();
@@ -131,6 +142,17 @@ protected:
 
 	void init(Cell::Ptr pCell);
 		/// Common init code for all ctors.
+
+	void fireBeforeLoad(std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*>& data);
+
+	void fireAfterLoad(void* pSender);
+
+	void fireRowSelected(int& pos);
+
+	void fireRowDeselected(int& pos);
+
+private:
+	ListBoxCell* _pLBCell;
 };
 
 
@@ -138,100 +160,102 @@ protected:
 // inlines
 //
 
-inline void ListBox::setHeight(int height)
-{
-	cell<ListBoxCell>()->setHeight(height);
-}
-
-
-inline int ListBox::getHeight() const
-{
-	return cell<ListBoxCell>()->getHeight();
-}
-
-
-inline void ListBox::setWidth(int width)
-{
-	cell<ListBoxCell>()->setWidth(width);
-}
-
-
-inline int ListBox::getWidth() const
-{
-	return cell<ListBoxCell>()->getWidth();
-}
-
 
 inline bool ListBox::hasSelected() const
 {
-	return cell<ListBoxCell>()->hasSelected();
+	return _pLBCell->hasSelected();
 }
 
 
 inline ListBox::Data::const_iterator ListBox::begin() const
 {
-	return cell<ListBoxCell>()->begin();
+	return _pLBCell->begin();
 }
 
 
 inline ListBox::Data::iterator ListBox::begin()
 {
-	return cell<ListBoxCell>()->begin();
+	return _pLBCell->begin();
 }
 
 
 inline ListBox::Data::const_iterator ListBox::end() const
 {
-	return cell<ListBoxCell>()->end();
+	return _pLBCell->end();
 }
 
 
 inline ListBox::Data::iterator ListBox::end()
 {
-	return cell<ListBoxCell>()->end();
+	return _pLBCell->end();
 }
 
 
 inline void ListBox::setElements(const ListBox::Data& elems)
 {
-	cell<ListBoxCell>()->setElements(elems);
+	_pLBCell->setElements(elems);
 }
 
 
 inline const ListBox::Data& ListBox::getElements() const
 {
-	return cell<ListBoxCell>()->getElements();
+	return _pLBCell->getElements();
 }
 
 
 inline void ListBox::insert(const Any& elem, bool selected)
 {
-	cell<ListBoxCell>()->insert(elem, selected);
+	_pLBCell->insert(elem, selected);
 }
 
 
 inline void ListBox::erase(const Any& elem)
 {
-	cell<ListBoxCell>()->erase(elem);
+	_pLBCell->erase(elem);
 }
 
 
 inline void ListBox::select(const Any& elem)
 {
-	cell<ListBoxCell>()->select(elem);
+	_pLBCell->select(elem);
 }
 
 
 inline void ListBox::deselect(const Any& elem)
 {
-	cell<ListBoxCell>()->deselect(elem);
+	_pLBCell->deselect(elem);
 }
 
 
 inline const Any& ListBox::getSelected() const
 {
-	return cell<ListBoxCell>()->getSelected();
+	return _pLBCell->getSelected();
 }
+
+
+inline void ListBox::selectByIndex(int idx, bool sel)
+{
+	_pLBCell->selectByIndex(idx, sel);
+}
+
+
+inline void ListBox::deselectByIndex(int idx)
+{
+	_pLBCell->deselectByIndex(idx);
+}
+
+
+inline void ListBox::selectAll(bool sel)
+{
+	_pLBCell->selectAll(sel);
+}
+
+
+inline void ListBox::deselectAll()
+{
+	_pLBCell->deselectAll();
+}
+
 
 } } // namespace Poco::WebWidgets
 

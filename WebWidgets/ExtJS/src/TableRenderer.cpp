@@ -170,7 +170,6 @@ Poco::WebWidgets::JSDelegate TableRenderer::createAfterLoadServerCallback(const 
 }
 
 
-
 Poco::WebWidgets::JSDelegate TableRenderer::createRenderServerCallback(const Table* pTable)
 {
 	poco_check_ptr (pTable);

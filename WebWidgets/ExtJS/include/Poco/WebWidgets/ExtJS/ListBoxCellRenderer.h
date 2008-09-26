@@ -42,12 +42,17 @@
 
 #include "Poco/WebWidgets/ExtJS/ExtJS.h"
 #include "Poco/WebWidgets/Renderer.h"
+#include "Poco/WebWidgets/JSDelegate.h"
 
 
 namespace Poco {
+	namespace Net {
+		class HTTPServerResponse;
+	}
 namespace WebWidgets {
 
 	class ListBoxCell;
+	class ListBox;
 
 namespace ExtJS {
 
@@ -56,6 +61,9 @@ class ExtJS_API ListBoxCellRenderer: public Poco::WebWidgets::Renderer
 	/// ListBoxCellRenderer renders a button
 {
 public:
+	static const std::string EV_ROWSELECT;
+	static const std::string EV_ROWDESELECT;
+
 	ListBoxCellRenderer();
 		/// Creates the ListBoxCellRenderer.
 
@@ -70,6 +78,14 @@ public:
 
 	static void renderProperties(const ListBoxCell* pCell, std::ostream& ostr);
 		/// Renders button properties
+
+	static Poco::WebWidgets::JSDelegate createRowSelectionServerCallback(const ListBox* pList);
+
+	static void onBeforeLoad(void* pSender, std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*>& ld);
+
+	static Poco::WebWidgets::JSDelegate createAfterLoadServerCallback(const ListBox* pList);
+		/// Adds a javascript callback to inform the WebServer that the client has finished loading data
+		/// Method signature is ( Store this, Ext.data.Record[] records, Object options )
 };
 
 

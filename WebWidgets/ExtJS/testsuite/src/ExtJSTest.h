@@ -68,6 +68,7 @@ public:
 	void testFormFrameHorizontalLayout();
 	void testFormFrameVerticalLayout();
 	void testFormImage();
+	void testFormListBox();
 	void testTabView();
 	void testCollapsible();
 	void testCollapsible2();

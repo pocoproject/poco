@@ -35,20 +35,29 @@
 
 
 #include "Poco/WebWidgets/ListBoxCell.h"
+#include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/DateTime.h"
+#include "Poco/StringTokenizer.h"
+#include "Poco/NumberParser.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 
 
+const std::string ListBoxCell::EV_LOADDATA("load");
+const std::string ListBoxCell::EV_AFTERLOAD("afterLoad");
+const std::string ListBoxCell::EV_ROWSELECTED("rowSel");
+const std::string ListBoxCell::ARG_SELECTED("sel");
+const std::string ListBoxCell::ARG_ROW("row");
+const std::string ListBoxCell::VAL_SELECTED("1");
+const std::string ListBoxCell::VAL_DESELECTED("0");
+
 
 ListBoxCell::ListBoxCell(View* pOwner):
 	Cell(pOwner, typeid(ListBoxCell)),
 	_data(),
-	_fmtCache(),
-	_height(-1),
-	_width(-1)
+	_fmtCache()
 {
 }
 
@@ -56,9 +65,7 @@ ListBoxCell::ListBoxCell(View* pOwner):
 ListBoxCell::ListBoxCell(View* pOwner, const std::type_info& type):
 	Cell(pOwner, type),
 	_data(),
-	_fmtCache(),
-	_height(-1),
-	_width(-1)
+	_fmtCache()
 {
 }
 
@@ -70,7 +77,25 @@ ListBoxCell::~ListBoxCell()
 
 void ListBoxCell::handleForm(const std::string& field, const std::string& value)
 {
-	throw Poco::NotImplementedException();
+	// a ListBox inside a form will just send the selected values
+	// may contain multiple values like "field: 1,3"
+	// a deselectAll() would be wrong event wise
+	Poco::StringTokenizer tok(value, ",", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+	std::set<int> selected;
+	for (Poco::StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
+	{
+		int val(-1);
+		bool ok = Poco::NumberParser::tryParse(*it, val);
+		if (ok)
+			selected.insert(val);
+	}
+	for (int i = 0; i < _data.size(); ++i)
+	{
+		if (selected.find(i) != selected.end())
+			selectByIndex(i);
+		else
+			deselectByIndex(i);
+	}
 }
 
 
@@ -138,7 +163,14 @@ void ListBoxCell::select(const Any& elem)
 {
 	Data::iterator it = find(elem);
 	if (it != _data.end())
-		it->second = true;
+	{
+		if (it->second != true)
+		{
+			it->second = true;
+			int idx = it - _data.begin();
+			rowSelected(this, idx);
+		}
+	}
 }
 
 
@@ -146,7 +178,14 @@ void ListBoxCell::deselect(const Any& elem)
 {
 	Data::iterator it = find(elem);
 	if (it != _data.end())
-		it->second = false;
+	{
+		if (it->second != false)
+		{
+			it->second = false;
+			int idx = it - _data.begin();
+			rowDeselected(this, idx);
+		}
+	}
 }
 
 
@@ -172,18 +211,73 @@ const Any& ListBoxCell::getSelected() const
 bool ListBoxCell::serializeJSON(std::ostream& out, const std::string& name)
 {
 	out << name << ":";
-	if (hasSelected())
+	Data::const_iterator it = _data.begin();
+	bool written = false;
+	for (std::size_t i = 0; i < _data.size(); ++i)
 	{
-		const Poco::Any& sel = getSelected();
-		if (sel.type() == typeid(std::string) || sel.type() == typeid(Poco::DateTime))
-			out << ":'" << getFormatter()->format(sel) << "'";
-		else
-			out << ":" << getFormatter()->format(sel);
+		if (_data[i].second)
+		{
+			if (written)
+				out << ",";
+			else
+				written = true;
+			out << i;
+		}
 	}
-	else 
+	if (!written)
 		out << "''";
+
 	return true;
 }
 
+
+void ListBoxCell::selectByIndex(int idx, bool sel)
+{
+	if (idx >= 0 && idx < _data.size())
+	{
+		if (_data[idx].second != sel)
+		{
+			_data[idx].second = sel;
+			if (sel)
+				rowSelected(this, idx);
+			else
+				rowDeselected(this, idx);
+		}
+	}
+}
+
+
+void ListBoxCell::selectAll(bool sel)
+{
+	Data::iterator it = _data.begin();
+	for (; it != _data.end(); ++it)
+		it->second = sel;
+}
+
+
+void ListBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::Net::HTTPServerResponse& response)
+{
+	const std::string& ev = args[RequestHandler::KEY_EVID];
+	if (ev == EV_LOADDATA)
+	{
+		Poco::Net::HTTPServerResponse* pResp = &response;
+		std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*> data = std::make_pair(this, pResp);
+		beforeLoad(this, data);
+	}
+	else if (ev == EV_AFTERLOAD)
+	{
+		afterLoad(this);
+		response.send();
+	}
+	else if (ev == EV_ROWSELECTED)
+	{
+		int row = Poco::NumberParser::parse(args[ARG_ROW]);
+		bool sel = (args.get(ARG_SELECTED) == VAL_SELECTED);
+		selectByIndex(row, sel);
+		response.send();
+	}
+	else
+		response.send();
+}
 
 } } // namespace Poco::WebWidgets

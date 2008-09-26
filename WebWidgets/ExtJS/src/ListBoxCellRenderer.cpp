@@ -36,14 +36,25 @@
 
 #include "Poco/WebWidgets/ExtJS/ListBoxCellRenderer.h"
 #include "Poco/WebWidgets/ExtJS/FormRenderer.h"
+#include "Poco/WebWidgets/ExtJS/TableRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ListBoxCell.h"
+#include "Poco/WebWidgets/ListBox.h"
+#include "Poco/WebWidgets/RequestHandler.h"
+#include "Poco/WebWidgets/Table.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Delegate.h"
+#include "Poco/NumberFormatter.h"
 #include <sstream>
 
 
 namespace Poco {
 namespace WebWidgets {
 namespace ExtJS {
+
+
+const std::string ListBoxCellRenderer::EV_ROWSELECT("rowselect");
+const std::string ListBoxCellRenderer::EV_ROWDESELECT("rowdeselect");
 
 
 ListBoxCellRenderer::ListBoxCellRenderer()
@@ -77,45 +88,123 @@ void ListBoxCellRenderer::renderBody(const Renderable* pRenderable, const Render
 
 void ListBoxCellRenderer::renderProperties(const ListBoxCell* pListBoxCell, std::ostream& ostr)
 {
-	Utility::writeRenderableProperties(pListBoxCell, ostr);
+	Utility::writeCellProperties(pListBoxCell, ostr);
 
-	if (pListBoxCell->getHeight() > 0)
-		ostr << ",height:" << pListBoxCell->getHeight();
-	if (pListBoxCell->getWidth() > 0)
-		ostr << ",width:" << pListBoxCell->getWidth();
 	const View* pOwner = pListBoxCell->getOwner();
 	poco_check_ptr (pOwner);
+	const ListBox* pList = dynamic_cast<const ListBox*>(pOwner);
+
 	if (pOwner->hasPosition())
 		ostr << ",x:" << pOwner->getPosition().posX << ",y:" << pOwner->getPosition().posY;
-		
-	ostr << ",dataFields:['i','d'],data:[";
+	
+	if (pList)
+	{
+		bool hasListeners = (pList->rowDeselected.hasJavaScriptCode() ||
+							pList->rowSelected.hasJavaScriptCode());
+		if (hasListeners)
+		{
+			ostr << ",listeners:{";
+			bool comma = false;
+			if (pList->rowDeselected.hasJavaScriptCode())
+				comma = Utility::writeJSEvent(ostr, EV_ROWDESELECT, pList->rowDeselected, &ListBoxCellRenderer::createRowSelectionServerCallback, pList);
+			if (pList->rowDeselected.hasJavaScriptCode())
+			{
+				if (comma) ostr << ",";
+				comma = Utility::writeJSEvent(ostr, EV_ROWSELECT, pList->rowSelected, &ListBoxCellRenderer::createRowSelectionServerCallback, pList);
+			}
+			ostr << "}";
+		}
+	}
+
+	// store: afterLoad, beforeLaod event
+	ostr << ",store:new Ext.data.SimpleStore({autoLoad:true,fields:[{name:'i'},{name:'d'}]";
+		ostr << ",proxy:new Ext.data.HttpProxy({url:";
+		std::map<std::string, std::string> addParams;
+		addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ListBoxCell::EV_LOADDATA));
+		std::string url(Utility::createURI(addParams, pList->id()));
+		ostr << url << "})";
+		ostr << ",reader:new Ext.data.ArrayReader()";
+		if (pList->afterLoad.hasJavaScriptCode())
+		{
+			ostr << ",listeners:{";
+				Utility::writeJSEvent(ostr, Table::EV_AFTERLOAD, pList->afterLoad, &ListBoxCellRenderer::createAfterLoadServerCallback, pList);
+			ostr << "}";
+		}
+	
+	ostr << "})";
+	ostr << ",dataFields:['i','d'],initVal:'";
 
 	//now serialize data, use cached content for that
-	ListBoxCell::StringData::const_iterator it = pListBoxCell->beginString();
-	ListBoxCell::StringData::const_iterator itEnd = pListBoxCell->endString();
 	ListBoxCell::Data::const_iterator itV = pListBoxCell->begin();
 	ListBoxCell::Data::const_iterator itVEnd = pListBoxCell->end();
-	int cnt = 0;
 	bool selected=false;
-	std::ostringstream initValue;
-	initValue << "'";
-	for (; it != itEnd; ++it, ++cnt, ++itV)
+	int cnt(0);
+	for (; itV != itVEnd; ++itV, ++cnt)
 	{
-		if (it != pListBoxCell->beginString())
-			ostr << ",";
 		if (itV->second)
 		{
 			if (selected)
-				initValue << ",";
-			initValue << cnt;
+				ostr << ",";
+			ostr << cnt;
 			selected = true;
 		}
+	}
+	ostr << "'";
+	ostr << ",valueField:'i',displayField:'d'";
+
+	ListBoxCell* pL = const_cast<ListBoxCell*>(pListBoxCell);
+	pL->beforeLoad += Poco::delegate(&ListBoxCellRenderer::onBeforeLoad);
+	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pList->id()), pL);
+	if (!pOwner->getName().empty())
+	{
+		WebApplication::instance().registerFormProcessor(pOwner->getName(), pL);
+	}
+}
+
+
+Poco::WebWidgets::JSDelegate ListBoxCellRenderer::createRowSelectionServerCallback(const ListBox* pList)
+{
+	// rowselect : ( Ext.ux.Multiselect field, Int idx, bool selected )
+	static const std::string signature("function(field,idx,sel)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(ListBoxCell::ARG_ROW, "+idx"));
+	addParams.insert(std::make_pair(ListBoxCell::ARG_SELECTED, "+(sel?'1':'0')"));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ListBoxCell::EV_ROWSELECTED));
+	return Utility::createServerCallback(signature, addParams, pList->id(), pList->rowSelected.getOnSuccess(), pList->rowSelected.getOnFailure());
+}
+
+
+Poco::WebWidgets::JSDelegate ListBoxCellRenderer::createAfterLoadServerCallback(const ListBox* pList)
+{
+	poco_check_ptr (pList);
+	static const std::string signature("function(aStore, recs, op)");
+	std::map<std::string, std::string> addParams;
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ListBoxCell::EV_AFTERLOAD));
+	return Utility::createServerCallback(signature, addParams, pList->id(), pList->afterLoad.getOnSuccess(), pList->afterLoad.getOnFailure());
+}
+
+
+void ListBoxCellRenderer::onBeforeLoad(void* pSender, std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*>& ld)
+{
+	ld.second->setChunkedTransferEncoding(true);
+	ld.second->setContentType("text/javascript");
+	std::ostream& ostr = ld.second->send();
+	//[
+    //    ['3m Co',71.72,0.02,0.03,'9/1 12:00am'],
+    //    ['Alcoa Inc',29.01,0.42,1.47,'9/1 12:00am']
+	//]
+	ostr << "[";
+	ListBoxCell::StringData::const_iterator it = ld.first->beginString();
+	ListBoxCell::StringData::const_iterator itEnd = ld.first->endString();
+	int cnt = 0;
+	for (; it != itEnd; ++it, ++cnt)
+	{
+		if (it != ld.first->beginString())
+			ostr << ",";
 
 		ostr << "['" << cnt << "','" << *it << "']";
 	}
-	initValue << "'";
 	ostr << "]";
-	ostr << ",valueField:'i',displayField:'d',initVal:" << initValue.str();
 }
 
 
