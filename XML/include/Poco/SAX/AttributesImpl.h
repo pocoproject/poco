@@ -1,7 +1,7 @@
 //
 // AttributesImpl.h
 //
-// $Id: //poco/1.3/XML/include/Poco/SAX/AttributesImpl.h#2 $
+// $Id: //poco/1.3/XML/include/Poco/SAX/AttributesImpl.h#3 $
 //
 // Library: XML
 // Package: SAX
@@ -212,21 +212,21 @@ inline int AttributesImpl::getLength() const
 
 inline const XMLString& AttributesImpl::getLocalName(int i) const
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	return _attributes[i].localName;
 }
 
 
 inline const XMLString& AttributesImpl::getQName(int i) const
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	return _attributes[i].qname;
 }
 
 
 inline const XMLString& AttributesImpl::getType(int i) const
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	return _attributes[i].type;
 }
 
@@ -253,7 +253,7 @@ inline const XMLString& AttributesImpl::getType(const XMLString& namespaceURI, c
 
 inline const XMLString& AttributesImpl::getValue(int i) const
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	return _attributes[i].value;
 }
 
@@ -280,14 +280,14 @@ inline const XMLString& AttributesImpl::getValue(const XMLString& namespaceURI, 
 
 inline const XMLString& AttributesImpl::getURI(int i) const
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	return _attributes[i].namespaceURI;
 }
 
 
 inline bool AttributesImpl::isSpecified(int i) const
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	return _attributes[i].specified;
 }
 

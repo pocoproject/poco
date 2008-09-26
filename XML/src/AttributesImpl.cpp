@@ -1,7 +1,7 @@
 //
 // AttributesImpl.cpp
 //
-// $Id: //poco/1.3/XML/src/AttributesImpl.cpp#3 $
+// $Id: //poco/1.3/XML/src/AttributesImpl.cpp#4 $
 //
 // Library: XML
 // Package: SAX
@@ -106,7 +106,7 @@ int AttributesImpl::getIndex(const XMLString& namespaceURI, const XMLString& loc
 
 void AttributesImpl::setValue(int i, const XMLString& value)
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	_attributes[i].value     = value;
 	_attributes[i].specified = true;
 }
@@ -151,7 +151,7 @@ void AttributesImpl::setAttributes(const Attributes& attributes)
 
 void AttributesImpl::setAttribute(int i, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& type, const XMLString& value)
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	_attributes[i].namespaceURI = namespaceURI;
 	_attributes[i].localName    = localName;
 	_attributes[i].qname        = qname;
@@ -251,28 +251,28 @@ void AttributesImpl::reserve(std::size_t capacity)
 
 void AttributesImpl::setLocalName(int i, const XMLString& localName)
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	_attributes[i].localName = localName;
 }
 
 
 void AttributesImpl::setQName(int i, const XMLString& qname)
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	_attributes[i].qname = qname;
 }
 
 
 void AttributesImpl::setType(int i, const XMLString& type)
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	_attributes[i].type = type;
 }
 
 
 void AttributesImpl::setURI(int i, const XMLString& namespaceURI)
 {
-	poco_assert (i < _attributes.size());
+	poco_assert (0 <= i && i < static_cast<int>(_attributes.size()));
 	_attributes[i].namespaceURI = namespaceURI;
 }
 

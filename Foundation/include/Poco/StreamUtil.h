@@ -1,7 +1,7 @@
 //
 // StreamUtil.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/StreamUtil.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/StreamUtil.h#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -45,7 +45,7 @@
 
 // poco_ios_init
 //
-// This is a workaround for a bug in the Microsoft
+// This is a workaround for a bug in the Dinkumware
 // implementation of iostreams.
 //
 // Calling basic_ios::init() multiple times for the
@@ -90,11 +90,24 @@
 // Some stream implementations, however, require that
 // init() is called in the MyIOS constructor.
 // Therefore we replace each call to init() with
-// the following macro:
-#if defined(_MSC_VER) && (!defined(_STLP_MSVC) || defined(_STLP_NO_OWN_IOSTREAMS))
-#define poco_ios_init(buf)
+// the poco_ios_init macro defined below.
+
+
+#if !defined(POCO_IOS_INIT_HACK)
+	// Microsoft Visual Studio with Dinkumware STL (but not STLport)
+#	if defined(_MSC_VER) && (!defined(_STLP_MSVC) || defined(_STLP_NO_OWN_IOSTREAMS))
+#		define POCO_IOS_INIT_HACK 1
+    // QNX with Dinkumware but not GNU C++ Library
+#	elif defined(__QNX__) && !defined(__GLIBCPP__)
+#		define POCO_IOS_INIT_HACK 1
+#	endif
+#endif
+
+
+#if defined(POCO_IOS_INIT_HACK)
+#	define poco_ios_init(buf)
 #else
-#define poco_ios_init(buf) init(buf)
+#	define poco_ios_init(buf) init(buf)
 #endif
 
 
