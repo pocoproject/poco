@@ -72,6 +72,8 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 				data : this.data
 			});
 		}
+		
+		this.store.on('load', this.onStoreLoad, this);
 
 		this.view = new Ext.ux.DDView({
 			multiSelect: true, store: this.store, selectedClass: cls+"-selected", tpl:tpl,
@@ -95,15 +97,19 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 		} else {
 			this.hiddenField = Ext.get(document.body).createChild(hiddenTag);
 		}
+		
+		fs.doLayout();
+	},
+	
+	initValue:Ext.emptyFn,
+	
+	onStoreLoad: function() {
 		if (this.initVal != null)
 		{
 			this.setValue(this.initVal);
 			this.initVal = null;
 		}
-		fs.doLayout();
 	},
-	
-	initValue:Ext.emptyFn,
 	
 	onViewClick: function(vw, index, node, e) {
 		var arrayIndex = this.preClickSelections.indexOf(index);

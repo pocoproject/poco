@@ -132,7 +132,7 @@ void ListBoxCellRenderer::renderProperties(const ListBoxCell* pListBoxCell, std:
 		}
 	
 	ostr << "})";
-	ostr << ",dataFields:['i','d'],initVal:'";
+	ostr << ",dataFields:['i','d'],initVal:[";
 
 	//now serialize data, use cached content for that
 	ListBoxCell::Data::const_iterator itV = pListBoxCell->begin();
@@ -149,7 +149,7 @@ void ListBoxCellRenderer::renderProperties(const ListBoxCell* pListBoxCell, std:
 			selected = true;
 		}
 	}
-	ostr << "'";
+	ostr << "]";
 	ostr << ",valueField:'i',displayField:'d'";
 
 	ListBoxCell* pL = const_cast<ListBoxCell*>(pListBoxCell);

@@ -167,7 +167,7 @@ void ListBoxCell::select(const Any& elem)
 		if (it->second != true)
 		{
 			it->second = true;
-			int idx = it - _data.begin();
+			int idx = static_cast<int>(it - _data.begin());
 			rowSelected(this, idx);
 		}
 	}
@@ -182,7 +182,7 @@ void ListBoxCell::deselect(const Any& elem)
 		if (it->second != false)
 		{
 			it->second = false;
-			int idx = it - _data.begin();
+			int idx = static_cast<int>(it - _data.begin());
 			rowDeselected(this, idx);
 		}
 	}
