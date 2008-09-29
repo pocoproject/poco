@@ -47,11 +47,8 @@ namespace WebWidgets {
 
 const std::string ListBoxCell::EV_LOADDATA("load");
 const std::string ListBoxCell::EV_AFTERLOAD("afterLoad");
-const std::string ListBoxCell::EV_ROWSELECTED("rowSel");
-const std::string ListBoxCell::ARG_SELECTED("sel");
+const std::string ListBoxCell::EV_SELECTIONCHANGED("selChange");
 const std::string ListBoxCell::ARG_ROW("row");
-const std::string ListBoxCell::VAL_SELECTED("1");
-const std::string ListBoxCell::VAL_DESELECTED("0");
 
 
 ListBoxCell::ListBoxCell(View* pOwner):
@@ -96,6 +93,8 @@ void ListBoxCell::handleForm(const std::string& field, const std::string& value)
 		else
 			deselectByIndex(i);
 	}
+
+	selectionChanged(this, selected);
 }
 
 
@@ -269,11 +268,9 @@ void ListBoxCell::handleAjaxRequest(const Poco::Net::NameValueCollection& args, 
 		afterLoad(this);
 		response.send();
 	}
-	else if (ev == EV_ROWSELECTED)
+	else if (ev == EV_SELECTIONCHANGED)
 	{
-		int row = Poco::NumberParser::parse(args[ARG_ROW]);
-		bool sel = (args.get(ARG_SELECTED) == VAL_SELECTED);
-		selectByIndex(row, sel);
+		handleForm("", args[ARG_ROW]);
 		response.send();
 	}
 	else

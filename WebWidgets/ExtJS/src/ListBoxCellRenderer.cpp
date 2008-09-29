@@ -53,8 +53,7 @@ namespace WebWidgets {
 namespace ExtJS {
 
 
-const std::string ListBoxCellRenderer::EV_ROWSELECT("rowselect");
-const std::string ListBoxCellRenderer::EV_ROWDESELECT("rowdeselect");
+const std::string ListBoxCellRenderer::EV_SELECTIONCHANGED("selectionchange");
 
 
 ListBoxCellRenderer::ListBoxCellRenderer()
@@ -99,19 +98,12 @@ void ListBoxCellRenderer::renderProperties(const ListBoxCell* pListBoxCell, std:
 	
 	if (pList)
 	{
-		bool hasListeners = (pList->rowDeselected.hasJavaScriptCode() ||
-							pList->rowSelected.hasJavaScriptCode());
+		bool hasListeners = pList->selectionChanged.hasJavaScriptCode();
 		if (hasListeners)
 		{
 			ostr << ",listeners:{";
-			bool comma = false;
-			if (pList->rowDeselected.hasJavaScriptCode())
-				comma = Utility::writeJSEvent(ostr, EV_ROWDESELECT, pList->rowDeselected, &ListBoxCellRenderer::createRowSelectionServerCallback, pList);
-			if (pList->rowDeselected.hasJavaScriptCode())
-			{
-				if (comma) ostr << ",";
-				comma = Utility::writeJSEvent(ostr, EV_ROWSELECT, pList->rowSelected, &ListBoxCellRenderer::createRowSelectionServerCallback, pList);
-			}
+			Utility::writeJSEvent(ostr, EV_SELECTIONCHANGED, pList->selectionChanged, &ListBoxCellRenderer::createSelectionChangedServerCallback, pList);
+			
 			ostr << "}";
 		}
 	}
@@ -162,15 +154,14 @@ void ListBoxCellRenderer::renderProperties(const ListBoxCell* pListBoxCell, std:
 }
 
 
-Poco::WebWidgets::JSDelegate ListBoxCellRenderer::createRowSelectionServerCallback(const ListBox* pList)
+Poco::WebWidgets::JSDelegate ListBoxCellRenderer::createSelectionChangedServerCallback(const ListBox* pList)
 {
-	// rowselect : ( Ext.ux.Multiselect field, Int idx, bool selected )
-	static const std::string signature("function(field,idx,sel)");
+	// selectionchange : ( dataView, selArray )
+	static const std::string signature("function(view, sel)");
 	std::map<std::string, std::string> addParams;
-	addParams.insert(std::make_pair(ListBoxCell::ARG_ROW, "+idx"));
-	addParams.insert(std::make_pair(ListBoxCell::ARG_SELECTED, "+(sel?'1':'0')"));
-	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ListBoxCell::EV_ROWSELECTED));
-	return Utility::createServerCallback(signature, addParams, pList->id(), pList->rowSelected.getOnSuccess(), pList->rowSelected.getOnFailure());
+	addParams.insert(std::make_pair(ListBoxCell::ARG_ROW, "+sel.toString()"));
+	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ListBoxCell::EV_SELECTIONCHANGED));
+	return Utility::createServerCallback(signature, addParams, pList->id(), pList->selectionChanged.getOnSuccess(), pList->selectionChanged.getOnFailure());
 }
 
 

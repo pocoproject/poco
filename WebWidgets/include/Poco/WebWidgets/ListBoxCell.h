@@ -44,6 +44,7 @@
 #include "Poco/WebWidgets/Delegate.h"
 #include "Poco/FIFOEvent.h"
 #include <vector>
+#include <set>
 
 
 namespace Poco {
@@ -64,11 +65,8 @@ public:
 
 	static const std::string EV_LOADDATA;
 	static const std::string EV_AFTERLOAD;
-	static const std::string EV_ROWSELECTED;
-	static const std::string ARG_SELECTED;
+	static const std::string EV_SELECTIONCHANGED;
 	static const std::string ARG_ROW;
-	static const std::string VAL_SELECTED;
-	static const std::string VAL_DESELECTED;
 
 	FIFOEvent<std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*> > beforeLoad; /// thrown whenever a load is requested, internal event to which the ListBoxCellRenderer must register
 
@@ -77,6 +75,8 @@ public:
 	FIFOEvent<int> rowSelected; /// fires the row selected event
 
 	FIFOEvent<int> rowDeselected; /// fires the row selected event
+
+	FIFOEvent<const std::set<int> > selectionChanged; /// fires the row selection change event
 
 	struct WebWidgets_API RowValueChange
 		/// Data sent with a rowValueChanged event. 

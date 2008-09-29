@@ -45,6 +45,7 @@
 #include "Poco/WebWidgets/JavaScriptEvent.h"
 #include "Poco/FIFOEvent.h"
 #include <vector>
+#include <set>
 
 
 namespace Poco {
@@ -63,9 +64,11 @@ public:
 
 	JavaScriptEvent<ListBox*> afterLoad; // thrown after data was loaded
 
-	JavaScriptEvent<int> rowSelected; /// fires the row selected event
+	FIFOEvent<int> rowSelected; /// fires the row selected event
 
-	JavaScriptEvent<int> rowDeselected; /// fires the row deselected event
+	FIFOEvent<int> rowDeselected; /// fires the row deselected event
+
+	JavaScriptEvent<const std::set<int> > selectionChanged; /// fires the row selection change event
 
 	ListBox(const std::string& name);
 		/// Creates a ListBox with the given name.
@@ -150,6 +153,8 @@ protected:
 	void fireRowSelected(int& pos);
 
 	void fireRowDeselected(int& pos);
+
+	void fireSelectionChange(const std::set<int>& sel);
 
 private:
 	ListBoxCell* _pLBCell;

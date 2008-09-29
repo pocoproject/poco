@@ -1117,7 +1117,7 @@ void ExtJSTest::testListBox()
 	ptrList->insert(std::string("FirstSelected"), true);
 	ptrList->insert(std::string("Second"), false);
 	ptrList->insert(std::string("SecondSelected"), true);
-	ptrList->rowSelected.setServerCallback(Poco::WebWidgets::SC_YES);
+	ptrList->selectionChanged.setServerCallback(Poco::WebWidgets::SC_YES);
 
 	std::ostringstream ostr;
 	std::ofstream fstr("testListBox.html");

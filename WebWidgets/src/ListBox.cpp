@@ -97,6 +97,7 @@ void ListBox::init()
 	_pLBCell->beforeLoad += Poco::delegate(this, &ListBox::fireBeforeLoad);
 	_pLBCell->rowDeselected += Poco::delegate(this, &ListBox::fireRowDeselected);
 	_pLBCell->rowSelected += Poco::delegate(this, &ListBox::fireRowSelected);
+	_pLBCell->selectionChanged += Poco::delegate(this, &ListBox::fireSelectionChange);
 	setCell(_pLBCell);
 }
 
@@ -110,6 +111,7 @@ void ListBox::init(Cell::Ptr ptrCell)
 	_pLBCell->beforeLoad += Poco::delegate(this, &ListBox::fireBeforeLoad);
 	_pLBCell->rowDeselected += Poco::delegate(this, &ListBox::fireRowDeselected);
 	_pLBCell->rowSelected += Poco::delegate(this, &ListBox::fireRowSelected);
+	_pLBCell->selectionChanged += Poco::delegate(this, &ListBox::fireSelectionChange);
 	setCell(ptrCell);
 }
 
@@ -136,6 +138,12 @@ void ListBox::fireRowSelected(int& pos)
 void ListBox::fireRowDeselected(int& pos)
 {
 	rowDeselected(this, pos);
+}
+
+
+void ListBox::fireSelectionChange(const std::set<int>& sel)
+{
+	selectionChanged(this, sel);
 }
 
 

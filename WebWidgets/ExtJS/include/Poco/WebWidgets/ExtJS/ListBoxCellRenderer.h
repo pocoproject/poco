@@ -61,8 +61,7 @@ class ExtJS_API ListBoxCellRenderer: public Poco::WebWidgets::Renderer
 	/// ListBoxCellRenderer renders a button
 {
 public:
-	static const std::string EV_ROWSELECT;
-	static const std::string EV_ROWDESELECT;
+	static const std::string EV_SELECTIONCHANGED;
 
 	ListBoxCellRenderer();
 		/// Creates the ListBoxCellRenderer.
@@ -79,7 +78,8 @@ public:
 	static void renderProperties(const ListBoxCell* pCell, std::ostream& ostr);
 		/// Renders button properties
 
-	static Poco::WebWidgets::JSDelegate createRowSelectionServerCallback(const ListBox* pList);
+	static Poco::WebWidgets::JSDelegate createSelectionChangedServerCallback(const ListBox* pList);
+	/// JS signature: function(dataView, selArray){
 
 	static void onBeforeLoad(void* pSender, std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*>& ld);
 

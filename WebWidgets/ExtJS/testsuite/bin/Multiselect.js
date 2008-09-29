@@ -37,8 +37,7 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 			'click' : true,
 			'change' : true,
 			'drop' : true,
-			'rowselect' : true,
-			'rowdeselect' : true
+			'selectionchange' : true
 		});		
 	},
     onRender: function(ct, position){
@@ -83,6 +82,7 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 			sortField:this.sortField, sortDir:this.sortDir
 		});
 
+		this.view.on('selectionchange', this.onSelectionChange, this);
 		this.view.on('click', this.onViewClick, this);
 		this.view.on('beforeClick', this.onViewBeforeClick, this);
 		this.view.on('dblclick', this.onViewDblClick, this);
@@ -111,6 +111,10 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 		}
 	},
 	
+	onSelectionChange: function(dataView, selArray){
+		this.fireEvent('selectionchange', this, dataView, selArray);
+	},
+	
 	onViewClick: function(vw, index, node, e) {
 		var arrayIndex = this.preClickSelections.indexOf(index);
 		if (arrayIndex  != -1)
@@ -118,11 +122,7 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 			this.preClickSelections.splice(arrayIndex, 1);
 			this.view.clearSelections(true);
 			this.view.select(this.preClickSelections);
-			var sel = this.view.isSelected(arrayIndex);
-			if (sel)
-				this.fireEvent('rowselect', this, arrayIndex, sel);
-			else
-				this.fireEvent('rowdeselect', this, arrayIndex, sel);
+			
 		}
 		this.fireEvent('change', this, this.getValue(), this.hiddenField.dom.value);
 		this.hiddenField.dom.value = this.getValue();
