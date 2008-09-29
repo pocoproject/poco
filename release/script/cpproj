@@ -1,0 +1,184 @@
+#! /bin/sh
+#
+# $Id: //poco/1.3/release/script/cpproj#2 $
+#
+# cpproj
+#
+# Copy project files
+#
+# usage: copyproj <src> <dest>
+#
+
+src=$1
+dst=$2
+
+if [ "$src" = "" ] ; then
+	echo "usage: $0 <source> <destination>"
+	exit 1
+fi
+
+if [ "$dst" = "" ] ; then
+	echo "usage: $0 <source> <destination>"
+	exit 1
+fi
+
+mkdir -p ${dst}
+mkdir -p ${dst}/src
+
+if [ -d ${src}/include ] ; then
+	mkdir -p ${dst}/include
+	cp -R ${src}/include/* ${dst}/include
+fi
+cp ${src}/src/* ${dst}/src
+cp ${src}/*.sln ${dst}
+cp ${src}/*.vcproj ${dst}
+cp ${src}/Makefile* ${dst}
+if [ "`find ${src} -name '*.vmsbuild'`" != "" ] ; then
+	cp ${src}/*.vmsbuild ${dst}
+fi
+if [ "`find ${src} -name '*.bndlspec'`" != "" ] ; then
+	cp ${src}/*.bndlspec ${dst}
+fi
+
+if [ -f ${src}/.project ] ; then
+	cp ${src}/.project ${dst}
+	cp ${src}/.cdtproject ${dst}
+fi
+
+if [ -d ${src}/doc ] ; then
+	mkdir -p ${dst}/doc
+	cp -R ${src}/doc/* ${dst}/doc
+fi
+
+if [ -d ${src}/templates ] ; then
+	mkdir -p ${dst}/templates
+	cp -R ${src}/templates/* ${dst}/templates
+fi
+
+if [ -d ${src}/testsuite ] ; then
+	mkdir -p ${dst}/testsuite
+	mkdir -p ${dst}/testsuite/src
+
+	if [ -d ${src}/testsuite/data ] ; then
+		mkdir -p ${dst}/testsuite/data
+		cp -R ${src}/testsuite/data/* ${dst}/testsuite/data
+	fi
+
+	if [ -d ${src}/testsuite/bundles ] ; then
+		mkdir -p ${dst}/testsuite/bundles
+		cp -R ${src}/testsuite/bundles/* ${dst}/testsuite/bundles
+	fi
+
+	cp ${src}/testsuite/src/* ${dst}/testsuite/src
+	cp ${src}/testsuite/*.vcproj ${dst}/testsuite
+	cp ${src}/testsuite/Makefile* ${dst}/testsuite
+	if [ "`find ${src}/testsuite -name '*.vmsbuild'`" != "" ] ; then
+		cp ${src}/testsuite/*.vmsbuild ${dst}/testsuite
+	fi
+	if [ "`find ${src}/testsuite -name '*.opt'`" != "" ] ; then
+		cp ${src}/testsuite/*.opt ${dst}/testsuite
+	fi
+	if [ "`find ${src}/testsuite -name '*.properties'`" != "" ] ; then
+		cp ${src}/testsuite/*.properties ${dst}/testsuite
+	fi
+	if [ "`find ${src}/testsuite -name '*.xml'`" != "" ] ; then
+		cp ${src}/testsuite/*.xml ${dst}/testsuite
+	fi
+	if [ "`find ${src}/testsuite -name '*.pem'`" != "" ] ; then
+		cp ${src}/testsuite/*.pem ${dst}/testsuite
+	fi
+fi
+
+if [ -d ${src}/bundle ] ; then
+	mkdir -p ${dst}/bundle
+	cp -R ${src}/bundle/* ${dst}/bundle
+fi
+
+if [ -d ${src}/res ] ; then
+	mkdir -p ${dst}/res
+	cp -R ${src}/res/* ${dst}/res
+fi
+
+if [ -d ${src}/samples ] ; then
+	mkdir -p ${dst}/samples
+
+	cp ${src}/samples/*.sln ${dst}/samples
+	cp ${src}/samples/Makefile* ${dst}/samples
+	
+	samples=`find ${src}/samples -maxdepth 1 -mindepth 1 -type d -print | sed "s:^.*/::"`
+	
+	for sample in $samples ;
+	do
+		if [ -d "${src}/samples/${sample}/src" ] ; then
+			mkdir -p ${dst}/samples/${sample}
+			if [ -d ${src}/samples/${sample}/src ] ; then
+				mkdir -p ${dst}/samples/${sample}/src
+				cp ${src}/samples/${sample}/src/* ${dst}/samples/${sample}/src
+			fi
+
+			if [ -d ${src}/samples/${sample}/bundle ] ; then
+				mkdir -p ${dst}/samples/${sample}/bundle
+				cp -R ${src}/samples/${sample}/bundle/* ${dst}/samples/${sample}/bundle
+			fi
+
+			if [ -d ${src}/samples/${sample}/res ] ; then
+				mkdir -p ${dst}/samples/${sample}/res
+				cp -R ${src}/samples/${sample}/res/* ${dst}/samples/${sample}/res
+			fi
+			
+			cp ${src}/samples/${sample}/*.vcproj ${dst}/samples/${sample}
+			cp ${src}/samples/${sample}/Makefile* ${dst}/samples/${sample}
+			if [ "`find ${src}/samples/${sample}/ -name '*.vmsbuild'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.vmsbuild ${dst}/samples/${sample}
+			fi
+			if [ "`find ${src}/samples/${sample}/ -name '*.opt'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.opt ${dst}/samples/${sample}
+			fi
+			if [ "`find ${src}/samples/${sample}/ -name '*.properties'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.properties ${dst}/samples/${sample}
+			fi
+			if [ "`find ${src}/samples/${sample}/ -name '*.ini'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.ini ${dst}/samples/${sample}
+			fi
+			if [ "`find ${src}/samples/${sample}/ -name '*.xml'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.xml ${dst}/samples/${sample}
+			fi
+			if [ "`find ${src}/samples/${sample}/ -name '*.wsdl'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.wsdl ${dst}/samples/${sample}
+			fi
+			if [ "`find ${src}/samples/${sample}/ -name '*.pem'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.pem ${dst}/samples/${sample}
+			fi
+			if [ "`find ${src}/samples/${sample}/ -name '*.bndlspec'`" != "" ] ; then
+				cp ${src}/samples/${sample}/*.bndlspec ${dst}/samples/${sample}
+			fi
+			
+			if [ -d ${src}/samples/${sample}/include ] ; then
+				mkdir -p ${dst}/samples/${sample}/include
+				cp -R ${src}/samples/${sample}/include/* ${dst}/samples/${sample}/include
+			fi	
+	
+			if [ -d ${src}/samples/${sample}/bin ] ; then
+				mkdir -p ${dst}/samples/${sample}/bin
+				if [ "`find ${src}/samples/${sample}/bin/ -name '*.properties'`" != "" ] ; then
+					cp ${src}/samples/${sample}/bin/*.properties ${dst}/samples/${sample}/bin
+				fi
+				if [ "`find ${src}/samples/${sample}/bin/ -name '*.ini'`" != "" ] ; then
+					cp ${src}/samples/${sample}/bin/*.ini ${dst}/samples/${sample}/bin
+				fi
+				if [ "`find ${src}/samples/${sample}/bin/ -name '*.xml'`" != "" ] ; then
+					cp ${src}/samples/${sample}/bin/*.xml ${dst}/samples/${sample}/bin
+				fi
+				if [ "`find ${src}/samples/${sample}/bin/ -name '*.wsdl'`" != "" ] ; then
+					cp ${src}/samples/${sample}/bin/*.wsdl ${dst}/samples/${sample}/bin
+				fi
+				if [ "`find ${src}/samples/${sample}/bin/ -name '*.pem'`" != "" ] ; then
+					cp ${src}/samples/${sample}/bin/*.pem ${dst}/samples/${sample}/bin
+				fi
+			fi
+		else
+			mkdir -p ${dst}/samples/${sample}
+			cp -R ${src}/samples/${sample}/* ${dst}/samples/${sample}
+		fi
+	done
+fi
