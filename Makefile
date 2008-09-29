@@ -30,27 +30,31 @@ cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
 
 install: libexecs
-	install -d $(INSTALLDIR)/include/Poco
-	install -d $(INSTALLDIR)/lib
-	install -d $(INSTALLDIR)/bin
+	mkdir -p $(INSTALLDIR)/include/Poco
+	mkdir -p $(INSTALLDIR)/lib
+	mkdir -p $(INSTALLDIR)/bin
 	for comp in $(COMPONENTS) ; do \
 		if [ -d "$(POCO_BASE)/$$comp/include" ] ; then \
 			cp -Rf $(POCO_BASE)/$$comp/include/* $(INSTALLDIR)/include/ ; \
 		fi ; \
 		if [ -d "$(POCO_BUILD)/$$comp/bin" ] ; then \
-			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec install {} $(INSTALLDIR)/bin \; ; \
+			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec install {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-.PHONY: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec
-.PHONY: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests
-.PHONY: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
+libexecs =  Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec
+tests    =  Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests
+samples  =  Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
 
-libexecs: Foundation-libexec XML-libexec Util-libexec Net-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec
-tests: Foundation-tests XML-tests Util-tests Net-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests
-samples: Foundation-samples XML-samples Util-samples Net-samples NetSSL_OpenSSL-samples Data-samples
+.PHONY: $(libexecs)
+.PHONY: $(tests)
+.PHONY: $(samples)
+
+libexecs: $(filter-out $(foreach f,$(OMIT),$f%),$(libexecs))
+tests: $(filter-out $(foreach f,$(OMIT),$f%),$(tests))
+samples: $(filter-out $(foreach f,$(OMIT),$f%),$(samples))
 
 Foundation-libexec: 
 	$(MAKE) -C $(POCO_BASE)/Foundation
@@ -61,7 +65,6 @@ Foundation-tests: Foundation-libexec cppunit
 Foundation-samples: Foundation-libexec 
 	$(MAKE) -C $(POCO_BASE)/Foundation/samples
 
-ifeq ($(POCO_XML_SUPPORT),enable)
 XML-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/XML
 
@@ -70,11 +73,7 @@ XML-tests: XML-libexec cppunit
 	
 XML-samples: XML-libexec 
 	$(MAKE) -C $(POCO_BASE)/XML/samples
-else
-#no XML support
-endif
 
-ifeq ($(POCO_UTIL_SUPPORT),enable)
 Util-libexec:  Foundation-libexec XML-libexec
 	$(MAKE) -C $(POCO_BASE)/Util
 
@@ -83,11 +82,7 @@ Util-tests: Util-libexec cppunit
 	
 Util-samples: Util-libexec 
 	$(MAKE) -C $(POCO_BASE)/Util/samples
-else
-#no Util support
-endif
 
-ifeq ($(POCO_NET_SUPPORT),enable)
 Net-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Net
 
@@ -96,11 +91,7 @@ Net-tests: Net-libexec cppunit
 	
 Net-samples: Net-libexec  Foundation-libexec XML-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/Net/samples
-else
-#no Net support
-endif
 
-ifeq ($(POCO_NETSSL_SUPPORT),enable)
 NetSSL_OpenSSL-libexec:  Foundation-libexec Net-libexec Util-libexec
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL
 
@@ -109,11 +100,7 @@ NetSSL_OpenSSL-tests: NetSSL_OpenSSL-libexec cppunit
 	
 NetSSL_OpenSSL-samples: NetSSL_OpenSSL-libexec 
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples
-else
-#no NetSSL support
-endif
 
-ifeq ($(POCO_DATA_SUPPORT),enable)
 Data-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/Data
 
@@ -123,38 +110,17 @@ Data-tests: Data-libexec cppunit
 Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/samples
 
-ifeq ($(POCO_DATA_SQLITE_SUPPORT), enable)	
 Data/SQLite-libexec:  Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite
 
 Data/SQLite-tests: Data/SQLite-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite
-else
-#no SQLite support
-endif
 
-ifeq ($(POCO_DATA_ODBC_SUPPORT), enable)	
 Data/ODBC-libexec:  Foundation-libexec Data-libexec
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC
 
 Data/ODBC-tests: Data/ODBC-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite
-else
-#no ODBC support
-endif
-
-ifeq ($(POCO_DATA_MYSQL_SUPPORT), enable)	
-Data/MySQL-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL
-
-Data/MySQL-tests: Data/ODBC-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite
-else
-#no MySQL support
-endif
-else
-#no Data support
-endif
 
 clean:
 	$(MAKE) -C $(POCO_BASE)/Foundation clean
