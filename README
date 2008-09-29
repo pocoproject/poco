@@ -134,6 +134,7 @@ to configure --prefix=<path>):
 > sudo gmake -s install
 
 To build on Mac OS X 10.3 with GCC 3, do the following:
+(NOTE: This only affects 10.3; for 10.4/10.5 see above)
 
 > ./configure --config=Darwin7
 > make -s
@@ -195,4 +196,4 @@ at <http://pocoproject.org>.
 
 
 --
-$Id: //poco/1.3/dist/README#4 $
+$Id: //poco/1.3/dist/README#5 $
