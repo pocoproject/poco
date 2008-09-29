@@ -2,17 +2,14 @@
 #
 # configure
 #
-# $Id: //poco/Main/dist/configure#8 $
+# $Id: //poco/1.3/dist/configure#6 $
 #
 # Configuration script for POCO.
 #
-# Usage:
-# configure [<options>...]
-#
-# Specify --help to display supported options.
+# Invoke configure --help for help.
 #
 
-showhelp ()
+showhelp()
 {
 cat << ENDHELP 
 usage: configure {options}
@@ -53,65 +50,50 @@ Options:
     Useful if your C++ compiler has incomplete floating-point support
     (such as uclibc-based systems).
 
-  --exclude-XML
-    Disable building of Poco::XML component support
+  --omit=<component>{,<component>}
+    Do not build the specified component(s).
 
-  --exclude-Util
-    Disable building of Poco::Util component support
-
-  --exclude-Net
-    Disable building of Poco::Net component support
-
-  --exclude-NetSSL
-    Disable building of Poco::NetSSL component support
-
-  --exclude-Data
-    Disable building of Poco::Data component support
-
-  --exclude-ODBC
-    Disable building of Poco::Data::ODBC component support
-
-  --exclude-SQLite
-    Disable building of Poco::Data::SQLite component support
-
-  --exclude-MySQL
-    Disable building of Poco::Data::MySQL component support
-    
 ENDHELP
 }
+
 # save cwd
 build=`pwd`
 # get directory where we are located
 cd `dirname $0`
 base=`pwd`
 cd $build
+if [ `uname` = "QNX" ] ; then
+	EXPR=expr
+	NOTFOUND=0
+else
+	EXPR="expr --"
+	NOTFOUND=""
+fi
 
 tests="tests"
 samples="samples"
 flags=""
-poco_xml_support="include"
-poco_util_support="include"
-poco_net_support="include"
-poco_netssl_support="include"
-poco_data_support="include"
-poco_data_odbc_support="include"
-poco_data_sqlite_support="include"
-poco_data_mysql_support="include"
+omit=""
 # parse arguments
 while [ "$1" != "" ] ; do
-	val=`expr $1 : '--config=\(.*\)'`
-	if [ "$val" != "" ] ; then
+	val=`$EXPR "$1" : '--config=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
 		config=$val;
 	fi
 	
-	val=`expr $1 : '--prefix=\(.*\)'`
-	if [ "$val" != "" ] ; then
+	val=`$EXPR "$1" : '--prefix=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
 		prefix=$val
 	fi
-	
-	val=`expr $1 : '--stdcxx-base=\(.*\)'`
-	if [ "$val" != "" ] ; then
+
+	val=`$EXPR $1 : '--stdcxx-base=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
 		stdcxx_base=$val
+	fi
+
+	val=`$EXPR "$1" : '--omit=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		omit="$omit `echo $val | tr ',;' '  '`"
 	fi
 	
 	if [ "$1" = "--no-samples" ] ; then
@@ -130,43 +112,11 @@ while [ "$1" != "" ] ; do
 		flags="$flags -DPOCO_NO_FPENVIRONMENT"
 	fi
 
-	if [ "$1" = "--exclude-XML" ] ; then
-		poco_xml_support="exclude"
-	fi
-
-	if [ "$1" = "--exclude-Util" ] ; then
-		poco_util_support="exclude"
-	fi
-
-	if [ "$1" = "--exclude-Net" ] ; then
-		poco_net_support="exclude"
-	fi
-
-	if [ "$1" = "--exclude-NetSSL" ] ; then
-		poco_netssl_support="exclude"
-	fi
-
-	if [ "$1" = "--exclude-Data" ] ; then
-		poco_data_support="exclude"
-	fi
-	
-	if [ "$1" = "--exclude-ODBC" ] ; then
-		poco_data_odbc_support="exclude"
-	fi
-	
-	if [ "$1" = "--exclude-SQLite" ] ; then
-		poco_data_sqlite_support="exclude"
-	fi
-	
-	if [ "$1" = "--exclude-MySQL" ] ; then
-		poco_data_mysql_support="exclude"
-	fi
-	
 	if [ "$1" = "--help" ] ; then
 		showhelp
 		exit 0
 	fi
-	
+
 	shift
 done
 
@@ -174,11 +124,11 @@ done
 # ...special cases for CYGWIN or MinGW
 if [ "$config" = "" ] ; then
 	config=`uname`
-	cyg=`expr $config : '\(CYGWIN\).*'`
+	cyg=`$EXPR $config : '\(CYGWIN\).*'`
 	if [ "$cyg" = "CYGWIN" ] ; then
 		config=CYGWIN
     else
-        ming=`expr $config : '\(MINGW\).*'`
+        ming=`$EXPR $config : '\(MINGW\).*'`
         if [ "$ming" = "MINGW" ] ; then
             config=MinGW
         fi
@@ -186,13 +136,11 @@ if [ "$config" = "" ] ; then
 fi
 
 if [ ! -f "$base/build/config/$config" ] ; then
-        echo "Unknown configuration: $config"
-        echo "Please use the --config=<config_name> option."
-        echo "The <config_name> can be one of the following:"
-        echo ""
-        echo "`ls -C $base/build/config/`"
-        echo ""
-        exit 1
+	echo "Unknown configuration: $config"
+	echo "Please use the --config option to specify another build configuration"
+	echo "The following configurations are available:"
+	ls $base/build/config
+	exit 1
 fi
 
 if [ "$prefix" = "" ] ; then
@@ -211,14 +159,7 @@ echo "POCO_BASE = $base" >>$build/config.make
 echo "POCO_BUILD = $build" >>$build/config.make
 echo "POCO_PREFIX = $prefix" >>$build/config.make
 echo "POCO_FLAGS = $flags" >>$build/config.make
-echo "POCO_XML_SUPPORT = $poco_xml_support" >>$build/config.make
-echo "POCO_NET_SUPPORT = $poco_net_support" >>$build/config.make
-echo "POCO_UTIL_SUPPORT = $poco_util_support" >>$build/config.make
-echo "POCO_NETSSL_SUPPORT = $poco_netssl_support" >>$build/config.make
-echo "POCO_DATA_SUPPORT = $poco_data_support" >>$build/config.make
-echo "POCO_DATA_ODBC_SUPPORT = $poco_data_odbc_support" >>$build/config.make
-echo "POCO_DATA_SQLITE_SUPPORT = $poco_data_sqlite_support" >>$build/config.make
-echo "POCO_DATA_MYSQL_SUPPORT = $poco_data_mysql_support" >>$build/config.make
+echo "OMIT = $omit" >>$build/config.make
 if [ "$stdcxx_base" != "" ] ; then
 	echo "STDCXX_BASE = $stdcxx_base" >>$build/config.make
 fi
@@ -228,14 +169,6 @@ echo "export POCO_BASE" >>$build/config.make
 echo "export POCO_BUILD" >>$build/config.make
 echo "export POCO_PREFIX" >>$build/config.make
 echo "export POCO_FLAGS" >>$build/config.make
-echo "export POCO_XML_SUPPORT" >>$build/config.make
-echo "export POCO_NET_SUPPORT" >>$build/config.make
-echo "export POCO_UTIL_SUPPORT" >>$build/config.make
-echo "export POCO_NETSSL_SUPPORT" >>$build/config.make
-echo "export POCO_DATA_SUPPORT" >>$build/config.make
-echo "export POCO_DATA_ODBC_SUPPORT" >>$build/config.make
-echo "export POCO_DATA_SQLITE_SUPPORT" >>$build/config.make
-echo "export POCO_DATA_MYSQL_SUPPORT" >>$build/config.make
 if [ "$stdcxx_base" != "" ] ; then
 	echo "export STDCXX_BASE" >>$build/config.make
 fi

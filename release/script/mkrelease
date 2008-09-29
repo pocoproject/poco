@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: //poco/1.3/release/script/mkrelease#7 $
+# $Id: //poco/1.3/release/script/mkrelease#10 $
 #
 # mkrelease
 #
@@ -153,11 +153,11 @@ done
 #
 # Create components file
 #
+echo "CppUnit" >${target}/components
 for comp in $comps ;
 do
 	echo $comp >>${target}/components
 done
-echo "CppUnit" >>${target}/components
 
 
 #
@@ -206,18 +206,18 @@ cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
 
 install: libexecs
-	install -d $(INSTALLDIR)/include/Poco
-	install -d $(INSTALLDIR)/lib
-	install -d $(INSTALLDIR)/bin
+	mkdir -p $(INSTALLDIR)/include/Poco
+	mkdir -p $(INSTALLDIR)/lib
+	mkdir -p $(INSTALLDIR)/bin
 	for comp in $(COMPONENTS) ; do \
 		if [ -d "$(POCO_BASE)/$$comp/include" ] ; then \
 			cp -Rf $(POCO_BASE)/$$comp/include/* $(INSTALLDIR)/include/ ; \
 		fi ; \
 		if [ -d "$(POCO_BUILD)/$$comp/bin" ] ; then \
-			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec install {} $(INSTALLDIR)/bin \; ; \
+			find $(POCO_BUILD)/$$comp/bin -perm -700 -type f -exec cp -f {} $(INSTALLDIR)/bin \; ; \
 		fi ; \
 	done
-	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec install {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
 ENDOFSCRIPT
@@ -236,13 +236,17 @@ do
 	fi
 done
 
-echo ".PHONY:$libexecs" >>${target}/Makefile
-echo ".PHONY:$tests" >>${target}/Makefile
-echo ".PHONY:$samples" >>${target}/Makefile
+echo "libexecs = $libexecs" >>${target}/Makefile
+echo "tests    = $tests" >> ${target}/Makefile
+echo "samples  = $samples" >> ${target}/Makefile
 echo "" >>${target}/Makefile
-echo "libexecs:$libexecs" >>${target}/Makefile
-echo "tests:$tests" >>${target}/Makefile
-echo "samples:$samples" >>${target}/Makefile
+echo '.PHONY: $(libexecs)' >>${target}/Makefile
+echo '.PHONY: $(tests)' >>${target}/Makefile
+echo '.PHONY: $(samples)' >>${target}/Makefile
+echo "" >>${target}/Makefile
+echo 'libexecs: $(filter-out $(foreach f,$(OMIT),$f%),$(libexecs))' >>${target}/Makefile
+echo 'tests: $(filter-out $(foreach f,$(OMIT),$f%),$(tests))' >>${target}/Makefile
+echo 'samples: $(filter-out $(foreach f,$(OMIT),$f%),$(samples))' >>${target}/Makefile
 
 for comp in $comps ;
 do
@@ -321,7 +325,7 @@ ENDOFSCRIPT
 #
 cat >${target}/build_vs71.cmd <<'ENDOFSCRIPT'
 @echo off
-buildwin 71 shared both yes
+buildwin 71 build shared both yes
 ENDOFSCRIPT
 
 
@@ -330,7 +334,7 @@ ENDOFSCRIPT
 #
 cat >${target}/build_vs80.cmd <<'ENDOFSCRIPT'
 @echo off
-buildwin 80 shared both yes
+buildwin 80 build shared both yes
 ENDOFSCRIPT
 
 
@@ -339,7 +343,7 @@ ENDOFSCRIPT
 #
 cat >${target}/build_vs90.cmd <<'ENDOFSCRIPT'
 @echo off
-buildwin 90 shared both yes
+buildwin 90 build shared both yes
 ENDOFSCRIPT
 
 
