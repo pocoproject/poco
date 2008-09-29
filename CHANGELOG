@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.3 (2008-09-22)
+Release 1.3.3 (2008-09-29)
 ==========================
 
 - Threads now have optional user-settable stack size (if the OS supports that feature)
@@ -29,6 +29,7 @@ Release 1.3.3 (2008-09-22)
   the ErrorHandler.
 - SocketReactor has a new IdleNotification, which will be posted when
   the SocketReactor has no sockets to handle.
+- added referenceCount() method to Poco::SharedPtr.
 - POCO now builds with GCC 4.3 (but there are some stupid warnings:
   "suggest parentheses around && within ||".
 - Solution and project files for Visual Studio 2008 are included
@@ -907,4 +908,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#29 $
+$Id: //poco/1.3/dist/CHANGELOG#30 $
