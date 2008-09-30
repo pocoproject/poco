@@ -1,7 +1,7 @@
 //
 // Expire.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Expire.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/Expire.h#2 $
 //
 // Library: Foundation
 // Package: Events

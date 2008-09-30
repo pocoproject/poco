@@ -1,7 +1,7 @@
 //
 // AbstractEvent.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/AbstractEvent.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/AbstractEvent.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -53,7 +53,7 @@ namespace Poco {
 
 template <class TArgs, class TStrategy, class TDelegate> 
 class AbstractEvent
-	/// An abstractEvent is the super-class of all events. 
+	/// An AbstractEvent is the super-class of all events. 
 	/// It works similar to the way C# handles notifications (aka events in C#).
 	/// Events can be used to send information to a set of observers
 	/// which are registered at the event. The type of the data is specified with
@@ -63,7 +63,20 @@ class AbstractEvent
 	///
 	/// Note that AbstractEvent should never be used directly. One ought to use
 	/// one of its subclasses which set the TStrategy and TDelegate template parameters
-	/// to fixed values. For most use-cases the BasicEvent template will be sufficient.
+	/// to fixed values. For most use-cases the BasicEvent template will be sufficient:
+	///     #include "Poco/BasicEvent.h"
+	///     #include "Poco/Delegate.h"
+	///
+	/// If one requires delegates to be called in the order they registered, use FIFOEvent:
+	///     #include "Poco/FIFOEvent.h"
+	///     #include "Poco/Delegate.h"
+	///
+	/// Both FIFOEvent and BasicEvent work with a standard delegate. They allow one object to register
+	/// exactly one delegate at an event. In contrast, a PriorityDelegate comes with an attached priority value
+	/// and allows one object to register for one priority value one delegate. Note that PriorityDelegates
+	/// only work with PriorityEvents:
+	///     #include "Poco/PriorityEvent.h"
+	///     #include "Poco/PriorityDelegate.h"
 	///
 	/// Use events by adding them as public members to the object which is throwing notifications:
 	///
@@ -95,9 +108,13 @@ class AbstractEvent
 	/// the Delegate template is used, in case of an PriorityEvent a PriorityDelegate is used.
 	/// Mixing of observers, e.g. using a PriorityDelegate with a BasicEvent is not possible and 
 	/// checked for during compile time.
-	/// Events require the observers to follow the following method signature:
+	/// Events require the observers to follow one of the following method signature:
 	///
 	///     void onEvent(const void* pSender, TArgs& args);
+	///     void onEvent(TArgs& args);
+	///     static void onEvent(const void* pSender, TArgs& args);
+	///     static void onEvent(void* pSender, TArgs& args);
+	///     static void onEvent(TArgs& args);
 	///
 	/// For performance reasons arguments are always sent by reference. This also allows observers
 	/// to modify the sent argument. To prevent that, use <const TArg> as template
@@ -117,12 +134,13 @@ class AbstractEvent
 	///         
 	///     MyController::MyController()
 	///     {
-	///         _data.AgeChanged += Delegate<MyController, int>(this, &MyController::onDataChanged);
+	///         _data.AgeChanged += delegate(this, &MyController::onDataChanged);
 	///     }
 	///
-	/// In some cases it might be desirable to work with automatically expiring registrations:
+	/// In some cases it might be desirable to work with automatically expiring registrations. Simply add
+	/// to delegate as 3rd parameter a expireValue (in milliseconds):
 	///
-	///     _data.DataChanged += Expire<int>(Delegate<MyController, int>(this, &MyController::onDataChanged), 1000);
+	///     _data.DataChanged += delegate(this, &MyController::onDataChanged, 1000);
 	///
 	/// This will add a delegate to the event which will automatically be removed in 1000 millisecs.
 	///
@@ -131,8 +149,11 @@ class AbstractEvent
 	///
 	///     MyController::~MyController()
 	///     {
-	///         _data.DataChanged -= Delegate<MyController, int>(this, &MyController::onDataChanged);
+	///         _data.DataChanged -= delegate(this, &MyController::onDataChanged);
 	///     }
+	///
+	/// Working with PriorityDelegates as similar to working with BasicEvent/FIFOEvent.Instead of ''delegate''
+	/// simply use ''priorityDelegate''.
 	///
 	/// For further examples refer to the event testsuites.
 {

@@ -1,13 +1,13 @@
 //
-// UniqueExpireLRUCache.h
+// UniqueAccessExpireLRUCache.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/UniqueExpireLRUCache.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/UniqueAccessExpireLRUCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
-// Module:  UniqueExpireLRUCache
+// Module:  UniqueAccessExpireLRUCache
 //
-// Definition of the UniqueExpireLRUCache class.
+// Definition of the UniqueAccessExpireLRUCache class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,13 +36,13 @@
 //
 
 
-#ifndef  Foundation_UniqueExpireLRUCache_INCLUDED
-#define  Foundation_UniqueExpireLRUCache_INCLUDED
+#ifndef  Foundation_UniqueAccessExpireLRUCache_INCLUDED
+#define  Foundation_UniqueAccessExpireLRUCache_INCLUDED
 
 
 #include "Poco/AbstractCache.h"
 #include "Poco/StrategyCollection.h"
-#include "Poco/UniqueExpireStrategy.h"
+#include "Poco/UniqueAccessExpireStrategy.h"
 #include "Poco/LRUStrategy.h"
 
 
@@ -53,38 +53,39 @@ template <
 	class TKey,
 	class TValue
 >
-class UniqueExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >
-	/// A UniqueExpireLRUCache combines LRU caching and time based per entry expire caching.
+class UniqueAccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >
+	/// A UniqueAccessExpireLRUCache combines LRU caching and time based per entry expire caching.
 	/// One can define for each cache entry a seperate timepoint
 	/// but also limit the size of the cache (per default: 1024).
 	/// Each TValue object must thus offer the following method:
 	///    
-	///    const Poco::Timestamp& getExpiration() const;
+	///    const Poco::Timespan& getTimeout() const;
 	///    
-	/// which returns the absolute timepoint when the entry will be invalidated.
-	/// Accessing an object will NOT update this absolute expire timepoint.
-	/// You can use the Poco::ExpirationDecorator to add the getExpiration
+	/// which returns the relative timespan for how long the entry should be valid without being accessed!
+	/// The absolute expire timepoint is calculated as now() + getTimeout().
+	/// Accessing an object will update this absolute expire timepoint.
+	/// You can use the Poco::AccessExpirationDecorator to add the getExpiration
 	/// method to values that do not have a getExpiration function.
 {
 public:
-	UniqueExpireLRUCache(long cacheSize = 1024): 
+	UniqueAccessExpireLRUCache(long cacheSize = 1024): 
 		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));
-		this->_strategy.pushBack(new UniqueExpireStrategy<TKey, TValue>());
+		this->_strategy.pushBack(new UniqueAccessExpireStrategy<TKey, TValue>());
 	}
 
-	~UniqueExpireLRUCache()
+	~UniqueAccessExpireLRUCache()
 	{
 	}
 
 private:
-	UniqueExpireLRUCache(const UniqueExpireLRUCache& aCache);
-	UniqueExpireLRUCache& operator = (const UniqueExpireLRUCache& aCache);
+	UniqueAccessExpireLRUCache(const UniqueAccessExpireLRUCache& aCache);
+	UniqueAccessExpireLRUCache& operator = (const UniqueAccessExpireLRUCache& aCache);
 };
 
 
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_UniqueAccessExpireLRUCache_INCLUDED

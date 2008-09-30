@@ -1,13 +1,13 @@
 //
-// UniqueExpireStrategy.h
+// UniqueAccessExpireStrategy.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/UniqueExpireStrategy.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/UniqueAccessExpireStrategy.h#1 $
 //
 // Library: Foundation
 // Package: Cache
-// Module:  UniqueExpireStrategy
+// Module:  UniqueAccessExpireStrategy
 //
-// Definition of the UniqueExpireStrategy class.
+// Definition of the UniqueAccessExpireStrategy class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_UniqueExpireStrategy_INCLUDED
-#define  Foundation_UniqueExpireStrategy_INCLUDED
+#ifndef  Foundation_UniqueAccessExpireStrategy_INCLUDED
+#define  Foundation_UniqueAccessExpireStrategy_INCLUDED
 
 
 #include "Poco/KeyValueArgs.h"
@@ -45,7 +45,9 @@
 #include "Poco/AbstractStrategy.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #include "Poco/EventArgs.h"
+#include "Poco/UniqueExpireStrategy.h"
 #include <set>
 #include <map>
 
@@ -57,39 +59,42 @@ template <
 	class TKey,
 	class TValue
 >
-class UniqueExpireStrategy: public AbstractStrategy<TKey, TValue>
+class UniqueAccessExpireStrategy: public AbstractStrategy<TKey, TValue>
 	/// An UniqueExpireStrategy implements time based expiration of cache entries. In contrast
 	/// to ExpireStrategy which only allows to set a per cache expiration value, it allows to define 
 	/// expiration per CacheEntry.
 	/// Each TValue object must thus offer the following method:
 	///    
-	///    const Poco::Timestamp& getExpiration() const;
+	///    const Poco::Timestamp& getTimeout() const;
 	///    
-	/// which returns the absolute timepoint when the entry will be invalidated.
+	/// which returns the timespan for how long an object will be valid without being accessed.
 {
 public:
-	typedef std::multimap<Timestamp, TKey>     TimeIndex;
+	typedef std::pair<TKey, Timespan> KeyExpire;
+	typedef std::multimap<Timestamp, KeyExpire>     TimeIndex;
 	typedef typename TimeIndex::iterator       IndexIterator;
 	typedef typename TimeIndex::const_iterator ConstIndexIterator;
 	typedef std::map<TKey, IndexIterator>      Keys;
 	typedef typename Keys::iterator            Iterator;
 
 public:
-	UniqueExpireStrategy()
+	UniqueAccessExpireStrategy()
 		/// Create an unique expire strategy.
 	{
 	}
 
-	~UniqueExpireStrategy()
+	~UniqueAccessExpireStrategy()
 	{
 	}
 
 	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
 	{
-		// note: we have to insert even if the expire timepoint is in the past (for StrategyCollection classes to avoid inconsistency with LRU)
-		// no problem: will be removed with next get
-		const Timestamp& expire = args.value().getExpiration();
-		IndexIterator it = _keyIndex.insert(std::make_pair(expire, args.key()));
+		// the expire value defines how many millisecs in the future the
+		// value will expire, even insert negative values!
+		Timestamp expire;
+		expire += args.value().getTimeout().totalMicroseconds();
+		
+		IndexIterator it = _keyIndex.insert(std::make_pair(expire, std::make_pair(args.key(), args.value().getTimeout())));
 		std::pair<Iterator, bool> stat = _keys.insert(std::make_pair(args.key(), it));
 		if (!stat.second)
 		{
@@ -110,7 +115,20 @@ public:
 
 	void onGet(const void*, const TKey& key)
 	{
-		// get triggers no changes in an expire
+		// get updates the expiration time stamp
+		Iterator it = _keys.find(key);
+		if (it != _keys.end())
+		{
+			KeyExpire ke = it->second->second;
+			// gen new absolute expire value
+			Timestamp expire;
+			expire += ke.second.totalMicroseconds();
+			// delete old index
+			_keyIndex.erase(it->second);
+			IndexIterator itt = _keyIndex.insert(std::make_pair(expire, ke));
+			// update iterator
+			it->second = itt;
+		}
 	}
 
 	void onClear(const void*, const EventArgs& args)
@@ -143,7 +161,7 @@ public:
 		Timestamp now;
 		while (it != _keyIndex.end() && it->first < now)
 		{
-			elemsToRemove.insert(it->second);
+			elemsToRemove.insert(it->second.first);
 			++it;
 		}
 	}
@@ -157,4 +175,4 @@ protected:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_UniqueAccessExpireStrategy_INCLUDED

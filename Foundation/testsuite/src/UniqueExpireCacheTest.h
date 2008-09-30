@@ -1,7 +1,7 @@
 //
 // UniqueExpireCacheTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/UniqueExpireCacheTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/UniqueExpireCacheTest.h#2 $
 //
 // Tests for ExpireCache
 //
@@ -46,11 +46,14 @@ public:
 	~UniqueExpireCacheTest();
 
 	void testClear();
+	void testAccessClear();
 	void testDuplicateAdd();
+	void testAccessDuplicateAdd();
 	void testExpire0();
+	void testAccessExpire0();
 	void testExpireN();
 	void testExpirationDecorator();
-
+	void testAccessUpdate();
 	
 	void setUp();
 	void tearDown();

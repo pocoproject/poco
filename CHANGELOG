@@ -1,9 +1,12 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.3 (2008-09-29)
+Release 1.3.3 (2008-09-30)
 ==========================
 
 - Threads now have optional user-settable stack size (if the OS supports that feature)
+- Events now support simplified delegate syntax based on delegate function template.
+  See Poco::AbstractEvent documentation for new syntax.
+- Cache supports new access expire strategy.
 - Upgraded to SQLite 3.6.2
 - Upgraded to PCRE 7.8
 - added HttpOnly support to Poco::Net::HTTPCookie
@@ -908,4 +911,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#30 $
+$Id: //poco/1.3/dist/CHANGELOG#31 $

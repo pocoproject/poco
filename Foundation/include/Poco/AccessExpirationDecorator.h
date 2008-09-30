@@ -1,13 +1,13 @@
 //
-// ExpireCache.h
+// AccessExpirationDecorator.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ExpireCache.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/AccessExpirationDecorator.h#1 $
 //
 // Library: Foundation
-// Package: Cache
-// Module:  ExpireCache
+// Package: Events
+// Module:  AccessExpirationDecorator
 //
-// Definition of the ExpireCache class.
+// Implementation of the AccessExpirationDecorator template.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,47 +36,70 @@
 //
 
 
-#ifndef  Foundation_ExpireCache_INCLUDED
-#define  Foundation_ExpireCache_INCLUDED
+#ifndef  Foundation_AccessExpirationDecorator_INCLUDED
+#define  Foundation_AccessExpirationDecorator_INCLUDED
 
 
-#include "Poco/AbstractCache.h"
-#include "Poco/ExpireStrategy.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 
 
 namespace Poco {
 
 
-template <class TKey, class TValue> 
-class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >
-	/// An ExpireCache caches entries for a fixed time period (per default 10 minutes).
-	/// Entries expire independently of the access pattern, i.e. after a constant time.
-	/// If you require your objects to expire after they were not accessed for a given time
-	/// period use a Poco::AccessExpireCache.
-	///
-	/// Be careful when using an ExpireCache. A cache is often used
-	/// like cache.has(x) followed by cache.get x). Note that it could happen
-	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
-	/// the entry gets invalid, thus leading to an empty SharedPtr being returned 
-	/// when "get" is invoked.
+template <typename TArgs>
+class AccessExpirationDecorator
+	/// AccessExpirationDecorator adds an expiration method to values so that they can be used
+	/// with the UniqueAccessExpireCache
 {
 public:
-	ExpireCache(Timestamp::TimeDiff expire = 600000): 
-		AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >(ExpireStrategy<TKey, TValue>(expire))
+	AccessExpirationDecorator():
+		_value(),
+		_span()
 	{
 	}
 
-	~ExpireCache()
+	AccessExpirationDecorator(const TArgs& p, const Poco::Timespan::TimeDiff& diffInMs):
+			/// Creates an element that will expire in diff milliseconds
+		_value(p),
+		_span(diffInMs*1000)
 	{
+	}
+
+	AccessExpirationDecorator(const TArgs& p, const Poco::Timespan& timeSpan):
+		/// Creates an element that will expire after the given timeSpan
+		_value(p),
+		_span(timeSpan)
+	{
+	}
+
+
+	~AccessExpirationDecorator()
+	{
+	}
+	
+	const Poco::Timespan& getTimeout() const
+	{
+		return _span;
+	}
+
+	const TArgs& value() const
+	{
+		return _value;
+	}
+
+	TArgs& value()
+	{
+		return _value;
 	}
 
 private:
-	ExpireCache(const ExpireCache& aCache);
-	ExpireCache& operator = (const ExpireCache& aCache);
+	TArgs     _value;
+	Timespan  _span;
 };
 
 
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AccessExpirationDecorator_INCLUDED

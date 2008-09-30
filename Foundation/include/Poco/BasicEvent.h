@@ -1,7 +1,7 @@
 //
 // BasicEvent.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/BasicEvent.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/BasicEvent.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -61,8 +61,8 @@ class BasicEvent: public AbstractEvent <
 	/// For example:
 	///     BasicEvent<int> event;
 	///     MyClass myObject;
-	///     event += Delegate<MyClass, int>(&myObject, &MyClass::myMethod1);
-	///     event += Delegate<MyClass, int>(&myObject, &MyClass::myMethod2);
+	///     event += delegate(&myObject, &MyClass::myMethod1);
+	///     event += delegate(&myObject, &MyClass::myMethod2);
 	///
 	/// The second registration will overwrite the first one. The reason is simply that
 	/// function pointers can only be compared by equality but not by lower than.

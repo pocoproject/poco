@@ -1,13 +1,13 @@
 //
-// ExpireCache.h
+// AccessExpireCache.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ExpireCache.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/AccessExpireCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
-// Module:  ExpireCache
+// Module:  AccessExpireCache
 //
-// Definition of the ExpireCache class.
+// Definition of the AccessExpireCache class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,47 +36,45 @@
 //
 
 
-#ifndef  Foundation_ExpireCache_INCLUDED
-#define  Foundation_ExpireCache_INCLUDED
+#ifndef  Foundation_AccessExpireCache_INCLUDED
+#define  Foundation_AccessExpireCache_INCLUDED
 
 
 #include "Poco/AbstractCache.h"
-#include "Poco/ExpireStrategy.h"
+#include "Poco/AccessExpireStrategy.h"
 
 
 namespace Poco {
 
 
 template <class TKey, class TValue> 
-class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >
-	/// An ExpireCache caches entries for a fixed time period (per default 10 minutes).
-	/// Entries expire independently of the access pattern, i.e. after a constant time.
-	/// If you require your objects to expire after they were not accessed for a given time
-	/// period use a Poco::AccessExpireCache.
-	///
-	/// Be careful when using an ExpireCache. A cache is often used
+class AccessExpireCache: public AbstractCache<TKey, TValue, AccessExpireStrategy<TKey, TValue> >
+	/// An AccessExpireCache caches entries for a fixed time period (per default 10 minutes).
+	/// Entries expire when they are not accessed with get() during this time period. Each access resets
+	/// the start time for expiration.
+	/// Be careful when using an AccessExpireCache. A cache is often used
 	/// like cache.has(x) followed by cache.get x). Note that it could happen
 	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
 	/// the entry gets invalid, thus leading to an empty SharedPtr being returned 
 	/// when "get" is invoked.
 {
 public:
-	ExpireCache(Timestamp::TimeDiff expire = 600000): 
-		AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >(ExpireStrategy<TKey, TValue>(expire))
+	AccessExpireCache(Timestamp::TimeDiff expire = 600000): 
+		AbstractCache<TKey, TValue, AccessExpireStrategy<TKey, TValue> >(AccessExpireStrategy<TKey, TValue>(expire))
 	{
 	}
 
-	~ExpireCache()
+	~AccessExpireCache()
 	{
 	}
 
 private:
-	ExpireCache(const ExpireCache& aCache);
-	ExpireCache& operator = (const ExpireCache& aCache);
+	AccessExpireCache(const AccessExpireCache& aCache);
+	AccessExpireCache& operator = (const AccessExpireCache& aCache);
 };
 
 
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AccessExpireCache_INCLUDED

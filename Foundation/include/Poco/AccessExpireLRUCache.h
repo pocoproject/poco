@@ -1,13 +1,13 @@
 //
-// ExpireCache.h
+// AccessExpireLRUCache.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ExpireCache.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/AccessExpireLRUCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
-// Module:  ExpireCache
+// Module:  AccessExpireLRUCache
 //
-// Definition of the ExpireCache class.
+// Definition of the AccessExpireLRUCache class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,47 +36,47 @@
 //
 
 
-#ifndef  Foundation_ExpireCache_INCLUDED
-#define  Foundation_ExpireCache_INCLUDED
+#ifndef  Foundation_AccessExpireLRUCache_INCLUDED
+#define  Foundation_AccessExpireLRUCache_INCLUDED
 
 
 #include "Poco/AbstractCache.h"
-#include "Poco/ExpireStrategy.h"
+#include "Poco/StrategyCollection.h"
+#include "Poco/AccessExpireStrategy.h"
+#include "Poco/LRUStrategy.h"
 
 
 namespace Poco {
 
 
-template <class TKey, class TValue> 
-class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >
-	/// An ExpireCache caches entries for a fixed time period (per default 10 minutes).
-	/// Entries expire independently of the access pattern, i.e. after a constant time.
-	/// If you require your objects to expire after they were not accessed for a given time
-	/// period use a Poco::AccessExpireCache.
-	///
-	/// Be careful when using an ExpireCache. A cache is often used
-	/// like cache.has(x) followed by cache.get x). Note that it could happen
-	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
-	/// the entry gets invalid, thus leading to an empty SharedPtr being returned 
-	/// when "get" is invoked.
+template < 
+	class TKey,
+	class TValue
+>
+class AccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >
+	/// An AccessExpireLRUCache combines LRU caching and time based expire caching.
+	/// It cache entries for a fixed time period (per default 10 minutes)
+	/// but also limits the size of the cache (per default: 1024).
 {
 public:
-	ExpireCache(Timestamp::TimeDiff expire = 600000): 
-		AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >(ExpireStrategy<TKey, TValue>(expire))
+	AccessExpireLRUCache(long cacheSize = 1024, Timestamp::TimeDiff expire = 600000): 
+		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >(StrategyCollection<TKey, TValue>())
 	{
+		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));
+		this->_strategy.pushBack(new AccessExpireStrategy<TKey, TValue>(expire));
 	}
 
-	~ExpireCache()
+	~AccessExpireLRUCache()
 	{
 	}
 
 private:
-	ExpireCache(const ExpireCache& aCache);
-	ExpireCache& operator = (const ExpireCache& aCache);
+	AccessExpireLRUCache(const AccessExpireLRUCache& aCache);
+	AccessExpireLRUCache& operator = (const AccessExpireLRUCache& aCache);
 };
 
 
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AccessExpireLRUCache_INCLUDED

@@ -1,7 +1,7 @@
 //
 // PriorityDelegate.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/PriorityDelegate.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/PriorityDelegate.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -43,12 +43,13 @@
 #include "Poco/Foundation.h"
 #include "Poco/AbstractPriorityDelegate.h"
 #include "Poco/PriorityExpire.h"
+#include "Poco/FunctionPriorityDelegate.h"
 
 
 namespace Poco {
 
 
-template <class TObj, class TArgs> 
+template <class TObj, class TArgs, bool useSender = true> 
 class PriorityDelegate: public AbstractPriorityDelegate<TArgs>
 {
 public:
@@ -102,6 +103,133 @@ protected:
 private:
 	PriorityDelegate();
 };
+
+
+
+template <class TObj, class TArgs> 
+class PriorityDelegate<TObj, TArgs, false>: public AbstractPriorityDelegate<TArgs>
+{
+public:
+	typedef void (TObj::*NotifyMethod)(TArgs&);
+
+	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
+		AbstractPriorityDelegate<TArgs>(obj, prio),
+		_receiverObject(obj),
+		_receiverMethod(method)
+	{
+	}
+	
+	PriorityDelegate(const PriorityDelegate& delegate):
+		AbstractPriorityDelegate<TArgs>(delegate._pTarget, delegate._priority),
+		_receiverObject(delegate._receiverObject),
+		_receiverMethod(delegate._receiverMethod)
+	{
+	}
+	
+	PriorityDelegate& operator = (const PriorityDelegate& delegate)
+	{
+		if (&delegate != this)
+		{
+			this->_pTarget        = delegate._pTarget;
+			this->_receiverObject = delegate._receiverObject;
+			this->_receiverMethod = delegate._receiverMethod;
+			this->_priority       = delegate._priority;
+		}
+		return *this;
+	}
+
+	~PriorityDelegate()
+	{
+	}
+
+	bool notify(const void* sender, TArgs& arguments)
+	{
+		(_receiverObject->*_receiverMethod)(arguments);
+		return true; // per default the delegate never expires
+	}
+
+	AbstractPriorityDelegate<TArgs>* clone() const
+	{
+		return new PriorityDelegate(*this);
+	}
+
+protected:
+	TObj*        _receiverObject;
+	NotifyMethod _receiverMethod;
+
+private:
+	PriorityDelegate();
+};
+
+
+template <class TObj, class TArgs>
+static PriorityDelegate<TObj, TArgs, true> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(const void*, TArgs&), int prio)
+{
+	return PriorityDelegate<TObj, TArgs, true>(pObj, NotifyMethod, prio);
+}
+
+
+template <class TObj, class TArgs>
+static PriorityDelegate<TObj, TArgs, false> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(TArgs&), int prio)
+{
+	return PriorityDelegate<TObj, TArgs, false>(pObj, NotifyMethod, prio);
+}
+
+
+template <class TObj, class TArgs>
+static PriorityExpire<TArgs> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(const void*, TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
+{
+	return PriorityExpire<TArgs>(PriorityDelegate<TObj, TArgs, true>(pObj, NotifyMethod, prio), expireMilliSec);
+}
+
+
+template <class TObj, class TArgs>
+static PriorityExpire<TArgs> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
+{
+	return PriorityExpire<TArgs>(PriorityDelegate<TObj, TArgs, false>(pObj, NotifyMethod, prio), expireMilliSec);
+}
+
+
+template <class TArgs>
+static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(const void*, TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
+{
+	return PriorityExpire<TArgs>(FunctionPriorityDelegate<TArgs, true, true>(NotifyMethod, prio), expireMilliSec);
+}
+
+
+template <class TArgs>
+static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(void*, TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
+{
+	return PriorityExpire<TArgs>(FunctionPriorityDelegate<TArgs, true, false>(NotifyMethod, prio), expireMilliSec);
+}
+
+
+template <class TArgs>
+static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
+{
+	return PriorityExpire<TArgs>(FunctionPriorityDelegate<TArgs, false>(NotifyMethod, prio), expireMilliSec);
+}
+
+
+template <class TArgs>
+static FunctionPriorityDelegate<TArgs, true, true> priorityDelegate(void (*NotifyMethod)(const void*, TArgs&), int prio)
+{
+	return FunctionPriorityDelegate<TArgs, true, true>(NotifyMethod, prio);
+}
+
+
+template <class TArgs>
+static FunctionPriorityDelegate<TArgs, true, false> priorityDelegate(void (*NotifyMethod)(void*, TArgs&), int prio)
+{
+	return FunctionPriorityDelegate<TArgs, true, false>(NotifyMethod, prio);
+}
+
+
+template <class TArgs>
+static FunctionPriorityDelegate<TArgs, false> priorityDelegate(void (*NotifyMethod)(TArgs&), int prio)
+{
+	return FunctionPriorityDelegate<TArgs, false>(NotifyMethod, prio);
+}
 
 
 } // namespace Poco

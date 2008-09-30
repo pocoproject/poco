@@ -1,13 +1,13 @@
 //
-// ExpireCache.h
+// UniqueAccessExpireCache.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ExpireCache.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/UniqueAccessExpireCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
-// Module:  ExpireCache
+// Module:  UniqueAccessExpireCache
 //
-// Definition of the ExpireCache class.
+// Definition of the UniqueAccessExpireCache class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,47 +36,55 @@
 //
 
 
-#ifndef  Foundation_ExpireCache_INCLUDED
-#define  Foundation_ExpireCache_INCLUDED
+#ifndef  Foundation_UniqueAccessExpireCache_INCLUDED
+#define  Foundation_UniqueAccessExpireCache_INCLUDED
 
 
 #include "Poco/AbstractCache.h"
-#include "Poco/ExpireStrategy.h"
+#include "Poco/UniqueAccessExpireStrategy.h"
 
 
 namespace Poco {
 
 
 template <class TKey, class TValue> 
-class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >
-	/// An ExpireCache caches entries for a fixed time period (per default 10 minutes).
-	/// Entries expire independently of the access pattern, i.e. after a constant time.
-	/// If you require your objects to expire after they were not accessed for a given time
-	/// period use a Poco::AccessExpireCache.
+class UniqueAccessExpireCache: public AbstractCache<TKey, TValue, UniqueAccessExpireStrategy<TKey, TValue> >
+	/// An UniqueAccessExpireCache caches entries for a given time span. In contrast
+	/// to ExpireCache which only allows to set a per cache expiration value, it allows to define 
+	/// expiration per CacheEntry.
+	/// Each TValue object must thus offer the following method:
+	///    
+	///    const Poco::Timespan& getTimeout() const;
+	///    
+	/// which returns the relative timespan for how long the entry should be valid without being accessed!
+	/// The absolute expire timepoint is calculated as now() + getTimeout().
+	/// Accessing an object will update this absolute expire timepoint.
+	/// You can use the Poco::AccessExpirationDecorator to add the getExpiration
+	/// method to values that do not have a getExpiration function.
 	///
-	/// Be careful when using an ExpireCache. A cache is often used
+	/// Be careful when using an UniqueAccessExpireCache. A cache is often used
 	/// like cache.has(x) followed by cache.get x). Note that it could happen
 	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
 	/// the entry gets invalid, thus leading to an empty SharedPtr being returned 
 	/// when "get" is invoked.
 {
 public:
-	ExpireCache(Timestamp::TimeDiff expire = 600000): 
-		AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >(ExpireStrategy<TKey, TValue>(expire))
+	UniqueAccessExpireCache():
+		AbstractCache<TKey, TValue, UniqueAccessExpireStrategy<TKey, TValue> >(UniqueAccessExpireStrategy<TKey, TValue>())
 	{
 	}
 
-	~ExpireCache()
+	~UniqueAccessExpireCache()
 	{
 	}
 
 private:
-	ExpireCache(const ExpireCache& aCache);
-	ExpireCache& operator = (const ExpireCache& aCache);
+	UniqueAccessExpireCache(const UniqueAccessExpireCache& aCache);
+	UniqueAccessExpireCache& operator = (const UniqueAccessExpireCache& aCache);
 };
 
 
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_UniqueAccessExpireCache_INCLUDED

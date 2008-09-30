@@ -1,7 +1,7 @@
 //
 // PriorityEvent.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/PriorityEvent.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/PriorityEvent.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -66,8 +66,8 @@ class PriorityEvent: public AbstractEvent <
 	/// in their priority value:
 	///     PriorityEvent<int> tmp;
 	///     MyClass myObject;
-	///     tmp += PriorityDelegate<MyClass, int>(&myObject, &MyClass::myMethod1, 1);
-	///     tmp += PriorityDelegate<MyClass, int>(&myObject, &MyClass::myMethod2, 2);
+	///     tmp += priorityDelegate(&myObject, &MyClass::myMethod1, 1);
+	///     tmp += priorityDelegate(&myObject, &MyClass::myMethod2, 2);
 {
 public:
 	PriorityEvent()

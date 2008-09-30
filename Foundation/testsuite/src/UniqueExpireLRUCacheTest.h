@@ -1,7 +1,7 @@
 //
 // UniqueExpireLRUCacheTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/UniqueExpireLRUCacheTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/UniqueExpireLRUCacheTest.h#2 $
 //
 // Tests for UniqueExpireLRUCache
 //
@@ -46,6 +46,7 @@ public:
 	~UniqueExpireLRUCacheTest();
 
 	void testClear();
+	void testAccessClear();
 	void testExpire0();
 	void testExpireN();
 	void testCacheSize0();

@@ -3476,6 +3476,9 @@
 					RelativePath=".\include\Poco\AbstractPriorityDelegate.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\AccessExpirationDecorator.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\BasicEvent.h">
 				</File>
 				<File
@@ -3498,6 +3501,12 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\FIFOStrategy.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\FunctionDelegate.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\FunctionPriorityDelegate.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\NotificationStrategy.h">
@@ -3537,6 +3546,15 @@
 					RelativePath=".\include\Poco\AbstractStrategy.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\AccessExpireCache.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\AccessExpireLRUCache.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\AccessExpireStrategy.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\ExpirationDecorator.h">
 				</File>
 				<File
@@ -3559,6 +3577,15 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\StrategyCollection.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\UniqueAccessExpireCache.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\UniqueAccessExpireLRUCache.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\UniqueAccessExpireStrategy.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\UniqueExpireCache.h">

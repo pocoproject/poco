@@ -1,7 +1,7 @@
 //
 // ExpirationDecorator.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ExpirationDecorator.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/ExpirationDecorator.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -59,13 +59,14 @@ public:
 	{
 	}
 
-		ExpirationDecorator(const TArgs& p, const Poco::Timespan::TimeDiff& diffInMs):
+	ExpirationDecorator(const TArgs& p, const Poco::Timespan::TimeDiff& diffInMs):
 			/// Creates an element that will expire in diff milliseconds
 		_value(p),
 		_expiresAt()
 	{
 		_expiresAt += (diffInMs*1000);
 	}
+
 	ExpirationDecorator(const TArgs& p, const Poco::Timespan& timeSpan):
 		/// Creates an element that will expire after the given timeSpan
 		_value(p),

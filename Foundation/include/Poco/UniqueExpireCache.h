@@ -1,7 +1,7 @@
 //
 // UniqueExpireCache.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/UniqueExpireCache.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/UniqueExpireCache.h#2 $
 //
 // Library: Foundation
 // Package: Cache
@@ -57,6 +57,9 @@ class UniqueExpireCache: public AbstractCache<TKey, TValue, UniqueExpireStrategy
 	///    const Poco::Timestamp& getExpiration() const;
 	///    
 	/// which returns the absolute timepoint when the entry will be invalidated.
+	/// Accessing an object will NOT update this absolute expire timepoint.
+	/// You can use the Poco::ExpirationDecorator to add the getExpiration
+	/// method to values that do not have a getExpiration function.
 	///
 	/// Be careful when using an UniqueExpireCache. A cache is often used
 	/// like cache.has(x) followed by cache.get x). Note that it could happen

@@ -1,7 +1,7 @@
 //
 // TemporaryFile.cpp
 //
-// $Id: //poco/1.3/Foundation/src/TemporaryFile.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/TemporaryFile.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -93,7 +93,8 @@ TemporaryFile::~TemporaryFile()
 	{
 		try
 		{
-			remove(true);
+			if (exists())
+				remove(true);
 		}
 		catch (Exception&)
 		{
