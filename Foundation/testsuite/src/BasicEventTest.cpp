@@ -62,11 +62,14 @@ void BasicEventTest::testNoDelegate()
 	EventArgs args;
 
 	assert (_count == 0);
+	assert (Simple.empty());
 	Simple.notify(this, tmp);
 	assert (_count == 0);
 
 	Simple += delegate(this, &BasicEventTest::onSimple);
+	assert (!Simple.empty());
 	Simple -= delegate(this, &BasicEventTest::onSimple);
+	assert (Simple.empty());
 	Simple.notify(this, tmp);
 	assert (_count == 0);
 
@@ -165,6 +168,24 @@ void BasicEventTest::testDuplicateRegister()
 	Simple.notify(this, tmp);
 	assert (_count == 1);
 }
+
+
+void BasicEventTest::testNullMutex()
+{
+	Poco::BasicEvent<int, NullMutex> ev;
+	int tmp = 0;
+	
+	assert (_count == 0);
+
+	ev += delegate(this, &BasicEventTest::onSimple);
+	ev += delegate(this, &BasicEventTest::onSimple);
+	ev.notify(this, tmp);
+	assert (_count == 1);
+	ev -= delegate(this, &BasicEventTest::onSimple);
+	ev.notify(this, tmp);
+	assert (_count == 1);
+}
+
 
 void BasicEventTest::testDuplicateUnregister()
 {
@@ -406,5 +427,6 @@ CppUnit::Test* BasicEventTest::suite()
 	CppUnit_addTest(pSuite, BasicEventTest, testExpireReRegister);
 	CppUnit_addTest(pSuite, BasicEventTest, testOverwriteDelegate);
 	CppUnit_addTest(pSuite, BasicEventTest, testAsyncNotify);
+	CppUnit_addTest(pSuite, BasicEventTest, testNullMutex);
 	return pSuite;
 }

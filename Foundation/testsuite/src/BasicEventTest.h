@@ -64,6 +64,7 @@ public:
 	void testReturnParams();
 	void testOverwriteDelegate();
 	void testAsyncNotify();
+	void testNullMutex();
 	
 	void setUp();
 	void tearDown();

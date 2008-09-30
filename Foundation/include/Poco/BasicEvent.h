@@ -49,10 +49,11 @@
 namespace Poco {
 
 
-template <class TArgs> 
+template <class TArgs, class TMutex = FastMutex> 
 class BasicEvent: public AbstractEvent < 
 	TArgs, DefaultStrategy<TArgs, AbstractDelegate<TArgs>, p_less<AbstractDelegate<TArgs> > >,
-	AbstractDelegate<TArgs> 
+	AbstractDelegate<TArgs>,
+	TMutex
 >
 	/// A BasicEvent uses internally a DefaultStrategy which 
 	/// invokes delegates in an arbitrary manner.

@@ -50,7 +50,7 @@ namespace Poco {
 
 
 template <class TArgs, class TDelegate, class TCompare> 
-class DefaultStrategy: public NotificationStrategy<TArgs, TDelegate>
+class DefaultStrategy//: public NotificationStrategy<TArgs, TDelegate>
 	/// Default notification strategy. Allows one observer
 	///	to register exactly once. The observer must provide an
 	/// < (less-than) operator.

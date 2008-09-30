@@ -49,7 +49,7 @@ namespace Poco {
 
 
 template <class TArgs, class TDelegate, class TCompare> 
-class FIFOStrategy: public NotificationStrategy<TArgs, TDelegate>
+class FIFOStrategy//: public NotificationStrategy<TArgs, TDelegate>
 {
 public:
 	typedef std::list<TDelegate*>                    Delegates;

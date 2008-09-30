@@ -49,11 +49,12 @@
 namespace Poco {
 
 
-template <class TArgs> 
+template <class TArgs, class TMutex = FastMutex> 
 class FIFOEvent: public AbstractEvent < 
 	TArgs, 
 	FIFOStrategy<TArgs, AbstractDelegate<TArgs>, p_less<AbstractDelegate< TArgs> > >,
-	AbstractDelegate<TArgs>
+	AbstractDelegate<TArgs>,
+	TMutex
 >
 	/// A FIFOEvent uses internally a FIFOStrategy which guarantees
 	/// that delegates are invoked in the order they were added to
