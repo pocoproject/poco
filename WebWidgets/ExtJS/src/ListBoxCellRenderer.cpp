@@ -95,10 +95,13 @@ void ListBoxCellRenderer::renderProperties(const ListBoxCell* pListBoxCell, std:
 
 	if (pOwner->hasPosition())
 		ostr << ",x:" << pOwner->getPosition().posX << ",y:" << pOwner->getPosition().posY;
+		
+	if (!pListBoxCell->autoScroll())
+		ostr << ",autoScroll:false";
 	
 	if (pList)
 	{
-		bool hasListeners = pList->selectionChanged.hasJavaScriptCode();
+		bool hasListeners = pList->selectionChanged.hasJavaScriptCode() || !pList->rowSelected.empty() || !pList->rowDeselected.empty();
 		if (hasListeners)
 		{
 			ostr << ",listeners:{";
@@ -157,9 +160,9 @@ void ListBoxCellRenderer::renderProperties(const ListBoxCell* pListBoxCell, std:
 Poco::WebWidgets::JSDelegate ListBoxCellRenderer::createSelectionChangedServerCallback(const ListBox* pList)
 {
 	// selectionchange : ( dataView, selArray )
-	static const std::string signature("function(view, sel)");
+	static const std::string signature("function(ms, v, s, idx)");
 	std::map<std::string, std::string> addParams;
-	addParams.insert(std::make_pair(ListBoxCell::ARG_ROW, "+sel.toString()"));
+	addParams.insert(std::make_pair(ListBoxCell::ARG_ROW, "+idx"));
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID, ListBoxCell::EV_SELECTIONCHANGED));
 	return Utility::createServerCallback(signature, addParams, pList->id(), pList->selectionChanged.getOnSuccess(), pList->selectionChanged.getOnFailure());
 }

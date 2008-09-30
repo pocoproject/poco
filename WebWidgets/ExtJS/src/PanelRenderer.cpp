@@ -155,6 +155,8 @@ void PanelRenderer::renderHeadWithoutChildren(const Panel* pPanel, const RenderC
 	
 	if (!pPanel->enabled())	
 		ostr << ",disabled:true";
+	if (!pPanel->showBorder())
+		ostr << ",border:false,bodyBorder:false";	
 
 	ostr << "})";
 }

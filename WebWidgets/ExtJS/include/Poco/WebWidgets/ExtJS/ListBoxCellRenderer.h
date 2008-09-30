@@ -79,7 +79,9 @@ public:
 		/// Renders button properties
 
 	static Poco::WebWidgets::JSDelegate createSelectionChangedServerCallback(const ListBox* pList);
-	/// JS signature: function(dataView, selArray){
+	/// JS signature: function(multiselectObj, dataView, selArray, idxArray)
+	/// selArray contains the selected elements (selArray[i].viewIndex contains the index
+	/// idxArray is a compact string of all selected indizes (ie "3", "1,3,4"
 
 	static void onBeforeLoad(void* pSender, std::pair<ListBoxCell*, Poco::Net::HTTPServerResponse*>& ld);
 

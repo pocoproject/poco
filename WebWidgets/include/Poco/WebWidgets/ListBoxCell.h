@@ -107,6 +107,9 @@ public:
 
 	StringData::const_iterator endString() const;
 		/// ConstIterator to all elements
+		
+	void clearElements();
+		/// Removes all elements	
 
 	void setElements(const Data& elems);
 		/// Initializes the combo box with the provided elements
@@ -145,6 +148,12 @@ public:
 		/// Returns the first selected element, exception if none was selected.
 		/// To get all selected elements use getElements and iterate over the
 		/// returned vector
+		
+	void autoScroll(bool val);
+		// sets autoscrolling
+		
+	bool autoScroll() const;
+		/// gets autoscroll
 
 	// Cell
 	void handleForm(const std::string& field, const std::string& value);
@@ -169,6 +178,7 @@ protected:
 private:
 	Data       _data;
 	StringData _fmtCache;
+	bool       _autoScroll;
 };
 
 
@@ -234,6 +244,25 @@ inline void ListBoxCell::deselectByIndex(int idx)
 inline void ListBoxCell::deselectAll()
 {
 	selectAll(false);
+}
+
+
+inline void ListBoxCell::clearElements()
+{
+	_data.clear();
+	_fmtCache.clear();
+}
+
+
+inline void ListBoxCell::autoScroll(bool val)
+{
+	_autoScroll = val;
+}
+
+		
+inline bool ListBoxCell::autoScroll() const
+{
+	return _autoScroll;
 }
 
 

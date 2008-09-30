@@ -54,7 +54,8 @@ const std::string ListBoxCell::ARG_ROW("row");
 ListBoxCell::ListBoxCell(View* pOwner):
 	Cell(pOwner, typeid(ListBoxCell)),
 	_data(),
-	_fmtCache()
+	_fmtCache(),
+	_autoScroll(true)
 {
 }
 
@@ -62,7 +63,8 @@ ListBoxCell::ListBoxCell(View* pOwner):
 ListBoxCell::ListBoxCell(View* pOwner, const std::type_info& type):
 	Cell(pOwner, type),
 	_data(),
-	_fmtCache()
+	_fmtCache(),
+	_autoScroll(true)
 {
 }
 
@@ -77,7 +79,7 @@ void ListBoxCell::handleForm(const std::string& field, const std::string& value)
 	// a ListBox inside a form will just send the selected values
 	// may contain multiple values like "field: 1,3"
 	// a deselectAll() would be wrong event wise
-	Poco::StringTokenizer tok(value, ",", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+	Poco::StringTokenizer tok(value, ", []", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
 	std::set<int> selected;
 	for (Poco::StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
 	{
@@ -140,9 +142,8 @@ ListBoxCell::Data::const_iterator ListBoxCell::find(const Any& elem) const
 
 void ListBoxCell::setElements(const Data& elems)
 {
+	clearElements();
 	_data = elems;
-	// update _fmtCache
-	_fmtCache.clear();
 	Formatter::Ptr ptr = getFormatter();
 	Data::iterator it = _data.begin();
 	for (; it != _data.end(); ++it)

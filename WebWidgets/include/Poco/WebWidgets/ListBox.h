@@ -87,9 +87,23 @@ public:
 
 	Data::iterator end();
 		/// Iterator to all elements
+		
+	void clearElements();
+		/// Removes all elements
 
 	void setElements(const Data& elems);
 		/// Initializes the combo box with the provided elements
+		
+	template <typename T>
+	void setElements(const std::vector<T>& elems)
+		/// Initializes the combo box with the provided elements
+	{
+		Data anyElems;
+		typename std::vector<T>::const_iterator it = elems.begin();
+		for (; it != elems.end(); ++it)
+			anyElems.push_back(std::make_pair(Poco::Any(*it), false));
+		setElements(anyElems);
+	}		
 
 	const Data& getElements() const;
 		/// Returns all elements
@@ -123,6 +137,12 @@ public:
 
 	const Any& getSelected() const;
 		/// Returns the first selected element, exception if none was selected
+		
+	void autoScroll(bool val = true);
+		// sets autoscrolling
+		
+	bool autoScroll() const;
+		/// gets autoscroll	
 
 protected:
 	ListBox(const std::string& name, const std::type_info& type);
@@ -259,6 +279,24 @@ inline void ListBox::selectAll(bool sel)
 inline void ListBox::deselectAll()
 {
 	_pLBCell->deselectAll();
+}
+
+
+inline void ListBox::clearElements()
+{
+	_pLBCell->clearElements();
+}
+
+
+inline void ListBox::autoScroll(bool val)
+{
+	_pLBCell->autoScroll(val);
+}
+
+		
+inline bool ListBox::autoScroll() const
+{
+	return _pLBCell->autoScroll();
 }
 
 

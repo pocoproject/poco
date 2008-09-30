@@ -109,6 +109,8 @@ void FrameRenderer::writeProperties(const Frame* pFrame, std::ostream& ostr)
 		ostr << ",x:" << pFrame->getPosition().posX << ",y:" << pFrame->getPosition().posY;
 	if (pFrame->hasClass())
 		ostr << ",cls:'" << pFrame->getClass() << "'";
+	if (!pFrame->showBorder())
+		ostr << ",border:false,bodyBorder:false";
 }
 
 

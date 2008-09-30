@@ -114,6 +114,11 @@ public:
 	void enable(bool val);
 	
 	bool enabled() const;
+	
+	void showBorder(bool show);
+	
+	bool showBorder() const;
+	
 protected:
 	~Panel();
 		/// Destroys the Panel.
@@ -125,6 +130,7 @@ private:
 	bool        _showCloseIcon;
 	bool        _showHeader;
 	bool        _enabled;
+	bool        _showBorder;
 };
 
 
@@ -207,6 +213,18 @@ inline void Panel::enable(bool val)
 inline bool Panel::enabled() const
 {
 	return _enabled;
+}
+
+
+inline void Panel::showBorder(bool show)
+{
+	_showBorder = show;
+}
+
+
+inline bool Panel::showBorder() const
+{
+	return _showBorder;
 }
 
 
