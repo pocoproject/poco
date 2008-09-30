@@ -47,8 +47,13 @@
 namespace Poco {
 
 
-template <class TKey, class TValue> 
-class UniqueExpireCache: public AbstractCache<TKey, TValue, UniqueExpireStrategy<TKey, TValue> >
+template <
+	class TKey, 
+	class TValue,
+	class TMutex = FastMutex, 
+	class TEventMutex = FastMutex
+> 
+class UniqueExpireCache: public AbstractCache<TKey, TValue, UniqueExpireStrategy<TKey, TValue>, TMutex, TEventMutex >
 	/// An UniqueExpireCache caches entries for a given time amount. In contrast
 	/// to ExpireCache which only allows to set a per cache expiration value, it allows to define 
 	/// expiration per CacheEntry.

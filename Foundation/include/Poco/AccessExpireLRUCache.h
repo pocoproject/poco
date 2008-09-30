@@ -51,9 +51,11 @@ namespace Poco {
 
 template < 
 	class TKey,
-	class TValue
+	class TValue,
+	class TMutex = FastMutex, 
+	class TEventMutex = FastMutex
 >
-class AccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >
+class AccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>
 	/// An AccessExpireLRUCache combines LRU caching and time based expire caching.
 	/// It cache entries for a fixed time period (per default 10 minutes)
 	/// but also limits the size of the cache (per default: 1024).

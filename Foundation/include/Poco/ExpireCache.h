@@ -47,8 +47,13 @@
 namespace Poco {
 
 
-template <class TKey, class TValue> 
-class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >
+template <
+	class TKey, 
+	class TValue, 
+	class TMutex = FastMutex, 
+	class TEventMutex = FastMutex
+> 
+class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue>, TMutex, TEventMutex >
 	/// An ExpireCache caches entries for a fixed time period (per default 10 minutes).
 	/// Entries expire independently of the access pattern, i.e. after a constant time.
 	/// If you require your objects to expire after they were not accessed for a given time
