@@ -50,12 +50,15 @@
 #include "Poco/WebWidgets/Table.h"
 #include "Poco/WebWidgets/SubmitButton.h"
 #include "Poco/WebWidgets/CheckButton.h"
+#include "Poco/WebWidgets/CheckButtonCell.h"
 #include "Poco/WebWidgets/SimpleTableModel.h"
 #include "Poco/WebWidgets/Form.h"
 #include "Poco/WebWidgets/DataRetriever.h"
 #include "Poco/WebWidgets/TextField.h"
+#include "Poco/WebWidgets/TextFieldCell.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
+#include "Poco/SharedPtr.h"
 #include <iostream>
 
 
@@ -71,7 +74,7 @@ using Poco::Net::HTTPServerRequest;
 using Poco::Net::ServerSocket;
 using Poco::Net::HTTPServer;
 using Poco::Net::HTTPServerParams;
-
+using Poco::SharedPtr;
 
 using namespace Poco::WebWidgets;
 
@@ -79,8 +82,8 @@ using namespace Poco::WebWidgets;
 class WebAppHandlerFactory: public HTTPRequestHandlerFactory
 {
 public:
-	WebAppHandlerFactory(WebApplication& app, const Poco::Path& dataPath, Poco::Logger* pLogger):
-		_app(app),
+	WebAppHandlerFactory(SharedPtr<WebApplication> pApp, const Poco::Path& dataPath, Poco::Logger* pLogger):
+		_pApp(pApp),
 		_dataRoot(dataPath),
 		_aliases(),
 		_pLogger(pLogger)
@@ -93,15 +96,15 @@ public:
 		const std::string& uri = request.getURI();
 		Poco::URI url(uri);
 		const std::string& path = url.getPath();
-		const std::string& appPath = _app.getURI().getPath();
+		const std::string& appPath = _pApp->getURI().getPath();
 		if (path == appPath || 
 			(path.size() > appPath.size() && path.find(appPath) == 0 && path[appPath.size()] == ';')
 			)
-			return new RequestHandler(_app);
+			return new RequestHandler(_pApp);
 		return new DataRetriever(_aliases, _pLogger);
 	}
 private:
-	WebApplication& _app;
+	SharedPtr<WebApplication> _pApp;
 	Poco::Path      _dataRoot;
 	DataRetriever::Aliases   _aliases;
 	Poco::Logger*   _pLogger;
@@ -164,18 +167,18 @@ protected:
 	{
 		if (!_helpRequested)
 		{
-			WebApplication webApp(Poco::URI("/"));
+			ResourceManager::Ptr pRM = new ResourceManager();
+			ExtJS::Utility::initialize(pRM, Poco::Path());
+			SharedPtr<WebApplication> pWebApp = new WebApplication(Poco::URI("/"), pRM);
 			LookAndFeel::Ptr laf(new LookAndFeel());
 			Poco::WebWidgets::ExtJS::Utility::initialize(laf);
-			webApp.setLookAndFeel(laf);
+			pWebApp->setLookAndFeel(laf);
 			Page::Ptr ptr = new Page("test");
 			Form::Ptr pForm = new Form("form1", Poco::URI("/"));
 			//pForm->setURL(...);
 			Table::TableColumns tc;
-			TextField::Ptr pTxt(new TextField("txt"));
-			tc.push_back(new TableColumn(pTxt->getCell(), "StaticText"));
-			CheckButton::Ptr ptrCheck(new CheckButton("check", "Const", true));
-			tc.push_back(new TableColumn(ptrCheck->getCell(), "CheckButton"));
+			tc.push_back(new TableColumn(new TextFieldCell(0), "StaticText", 200 ));
+			tc.push_back(new TableColumn(new CheckButtonCell(0, "lbl", true), "CheckButton", 100));
 			Table::Ptr pTable = new Table(tc, new SimpleTableModel(2));
 			///init simpletablemodel
 			pTable->setValue(std::string("one"), 0,0);
@@ -184,7 +187,9 @@ protected:
 			pTable->setValue(true, 0,1);
 			pTable->setValue(false, 1,1);
 			pTable->setValue(true, 2,1);
-			pForm->add(pTable);
+			pTable->setWidth(310);
+			pTable->setHeight(200);
+			
 			pForm->add(new TextField("txtfield"));
 			CheckButton::Ptr ptrCheck2(new CheckButton("checkbutton", "CheckButton", false));
 			pForm->add(ptrCheck2);
@@ -194,7 +199,8 @@ protected:
 			pForm->add(ptrBut);
 			
 			ptr->add(pForm);
-			webApp.setCurrentPage(ptr);
+			ptr->add(pTable);
+			pWebApp->setCurrentPage(ptr);
 	
 			unsigned short port = (unsigned short) config().getInt("WebServer.port", 9980);
 			std::string data = config().getString("WebServer.dataRoot", ".");
@@ -206,7 +212,7 @@ protected:
 				throw Poco::Util::InvalidArgumentException("dataRoot is either a file or doesn't exist: must be directory!");
 
 			ServerSocket svs(port);
-			HTTPServer srv(new WebAppHandlerFactory(webApp, aPath, &logger()), svs, new HTTPServerParams);
+			HTTPServer srv(new WebAppHandlerFactory(pWebApp, aPath, &logger()), svs, new HTTPServerParams);
 			srv.start();
 			waitForTerminationRequest();
 			srv.stop();

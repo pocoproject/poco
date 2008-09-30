@@ -485,8 +485,11 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	}
 	if (pTable->getWidth() > 0)
 		ostr << ",width:" << pTable->getWidth();
+	
 	if (pTable->getHeight() > 0)
 		ostr << ",height:" << pTable->getHeight();
+	else
+		ostr << ",height:100";
 	ostr << ",viewConfig: {";
 	ostr <<		"tpl: new Ext.XTemplate('<div class=\"cell\"></div>'),";
 	ostr <<		"getRowClass: function(rec, idx, p, store) {return 'cell';}";
