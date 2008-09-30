@@ -7,8 +7,8 @@
 }
 .ux-mselect-item{
     font:normal 12px tahoma, arial, helvetica, sans-serif;
-    padding:2px;
-    border:1px solid #fff;
+    /*padding:2px;
+    border:1px solid #fff;*/
     white-space: nowrap;
     cursor:pointer;
 }

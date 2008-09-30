@@ -4,8 +4,8 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 	store:null,
 	dataFields:[],
 	data:[],
-	width:100,
-	height:100,
+	width:'auto',
+	height:'auto',
 	displayField:0,
 	valueField:1,
 	allowBlank:true,
@@ -17,6 +17,7 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 	copy:false,
 	allowDup:false,
 	allowTrash:false,
+	autoScroll:true,
 	legend:null,
 	focusClass:undefined,
 	delimiter:',',
@@ -41,26 +42,28 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 		});		
 	},
     onRender: function(ct, position){
-		var fs, cls, tpl;
+		var fs, shortCls, tpl;
 		Ext.ux.Multiselect.superclass.onRender.call(this, ct, position);
-
-		cls = 'ux-mselect';
+		shortCls = 'ux-mselect';
+		if (this.cls)
+			this.cls += (' ' + shortCls);
 
 		fs = new Ext.form.FieldSet({
 			renderTo:this.el,
+			autoScroll:this.autoScroll,
 			title:this.legend,
-			height:this.height,
+			height:this.height, //reduce height by 2 px?
 			width:this.width,
-			style:"padding:1px;",
+			style:"padding:0px 0px;margin-bottom:0px;",
 			tbar:this.tbar
 		});
 		if(!this.legend){
 			var x = fs.el.down('.'+fs.headerCls);
 			if (x) x.remove();
 		}
-		fs.body.addClass(cls);
+		fs.body.addClass(this.cls);
 
-		tpl = '<tpl for="."><div class="' + cls + '-item';
+		tpl = '<tpl for="."><div class="' + this.cls + '-item';
 		if(Ext.isIE || Ext.isIE7)tpl+='" unselectable=on';
 		else tpl+=' x-unselectable"';
 		tpl+='>{' + this.displayField + '}</div></tpl>';
@@ -75,9 +78,9 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 		this.store.on('load', this.onStoreLoad, this);
 
 		this.view = new Ext.ux.DDView({
-			multiSelect: true, store: this.store, selectedClass: cls+"-selected", tpl:tpl,
+			multiSelect: true, store: this.store, selectedClass: shortCls+"-selected", tpl:tpl,
 			allowDup:this.allowDup, copy: this.copy, allowTrash: this.allowTrash, 
-			dragGroup: this.dragGroup, dropGroup: this.dropGroup, itemSelector:"."+cls+"-item",
+			dragGroup: this.dragGroup, dropGroup: this.dropGroup, itemSelector:"."+shortCls+"-item",
 			isFormField:false, applyTo:fs.body, appendOnly:this.appendOnly,
 			sortField:this.sortField, sortDir:this.sortDir
 		});
@@ -110,11 +113,20 @@ Ext.ux.Multiselect = Ext.extend(Ext.form.Field,  {
 			this.initVal = null;
 		}
 	},
-	
+
 	onSelectionChange: function(dataView, selArray){
-		this.fireEvent('selectionchange', this, dataView, selArray);
+		if (selArray)
+		{
+			var result = new Array(selArray.length);
+			for (var i = 0; i < selArray.length; ++i)
+			{
+				result[i] = selArray[i].viewIndex;
+			}
+			var str = result.toString();
+			this.fireEvent('selectionchange', this, dataView, selArray, str);
+		}
 	},
-	
+
 	onViewClick: function(vw, index, node, e) {
 		var arrayIndex = this.preClickSelections.indexOf(index);
 		if (arrayIndex  != -1)
