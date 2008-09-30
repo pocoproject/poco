@@ -8,8 +8,8 @@ rem command-line build script for MS Visual Studio
 rem
 rem Usage:
 rem ------
-rem buildwin VS_VERSION        LINKMODE          CONFIGURATION    SAMPLES
-rem buildwin {71|80|90} [static|shared|both] [release|debug|both] [yes|no]
+rem buildwin  VS_VERSION       [ACTION]             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
+rem "buildwin {71|80|90} [build|rebuild|clean] [static|shared|both] [release|debug|both] [yes|no]"
 rem
 rem VS_VERSION is required argument. Default is build all.
 
@@ -30,7 +30,10 @@ rem Action [build|rebuild|clean]
 set ACTION=%2
 if not "%ACTION%"=="build" (
 if not "%ACTION%"=="rebuild" (
-if not "%ACTION%"=="clean"  goto usage))
+if not "%ACTION%"=="" (
+if not "%ACTION%"=="clean"  goto usage)))
+
+if "%ACTION%"=="" (set ACTION="build")
 
 rem Link mode [static|shared|both]
 set LINK_MODE=%3
@@ -111,7 +114,9 @@ set DEBUG_SHARED=1
 set RELEASE_STATIC=1
 set RELEASE_SHARED=1)))))
 
+
 echo Building:
+
 if %DEBUG_SHARED%==1   (echo debug_shared)
 if %RELEASE_SHARED%==1 (echo release_shared)
 if %DEBUG_STATIC%==1   (echo debug_static)
@@ -183,7 +188,7 @@ goto :EOF
 :usage
 echo Usage:
 echo ------
-echo buildwin  VS_VERSION         ACTION             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
+echo buildwin  VS_VERSION       [ACTION]             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
 echo "buildwin {71|80|90} [build|rebuild|clean] [static|shared|both] [release|debug|both] [yes|no]"
 
 endlocal
