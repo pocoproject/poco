@@ -76,6 +76,9 @@ void DynamicCodeLoader::handleAjaxRequest(const Poco::Net::NameValueCollection& 
 	const std::string& ev = args[RequestHandler::KEY_EVID];
 	if (ev == EV_LOAD)
 	{
+		beforeLoad(this, _pView);
+		DynamicCodeLoader* pThis = this;
+		generateCode(this, pThis);
 		/// send the JS presentation of the page
 		response.setContentType("text/javascript");
 		response.setChunkedTransferEncoding(true);

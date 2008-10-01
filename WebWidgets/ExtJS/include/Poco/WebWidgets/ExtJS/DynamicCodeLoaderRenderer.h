@@ -46,6 +46,7 @@
 
 namespace Poco {
 namespace WebWidgets {
+	class DynamicCodeLoader;
 namespace ExtJS {
 
 
@@ -64,6 +65,9 @@ public:
 		
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.	
+		
+private:
+	static void onCodeGen(DynamicCodeLoader* &pLoader);
 };
 
 

@@ -41,7 +41,10 @@
 #include "Poco/WebWidgets/DynamicCodeLoader.h"
 #include "Poco/WebWidgets/RequestHandler.h"
 #include "Poco/WebWidgets/Panel.h"
+#include "Poco/WebWidgets/WebApplication.h"
+#include "Poco/WebWidgets/RenderContext.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/Delegate.h"
 #include <sstream>
 
 
@@ -93,15 +96,27 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	str <<	"}" << std::endl;
 	
 	DynamicCodeLoader* pL = const_cast<DynamicCodeLoader*>(pLoader);
+	pL->generateCode += Poco::delegate(&DynamicCodeLoaderRenderer::onCodeGen);
 	
 	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pLoader->id()), pL);
-	
-	// the js file: only do when not already set
-	// bug: this optimization breaks logout/login stuff!
+}
+
+
+void DynamicCodeLoaderRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
+{
+}
+
+
+void DynamicCodeLoaderRenderer::onCodeGen(DynamicCodeLoader* &pL)
+{
+	View::Ptr pView = pL->view();
+	Panel::Ptr pPanel = pView.cast<Panel>();
+	WebApplication& webApp = WebApplication::instance();
+	RenderContext context(*webApp.getLookAndFeel(), webApp);
 	
 	std::ostringstream out;
 	
-	out <<	"function " << pLoader->functionName() << "(){";
+	out <<	"function " << pL->functionName() << "(){";
 	out <<		"return ";
 	// only render the child when we have a panel
 	if (pPanel)
@@ -115,11 +130,6 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	out <<	"}";
 	
 	pL->setViewCode(out.str());
-}
-
-
-void DynamicCodeLoaderRenderer::renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr)
-{
 }
 
 

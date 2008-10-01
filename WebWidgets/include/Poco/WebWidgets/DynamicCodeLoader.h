@@ -44,6 +44,7 @@
 #include "Poco/WebWidgets/RequestProcessor.h"
 #include "Poco/WebWidgets/View.h"
 #include "Poco/URI.h"
+#include "Poco/FIFOEvent.h"
 
 
 namespace Poco {
@@ -58,6 +59,9 @@ public:
 	typedef Poco::AutoPtr<DynamicCodeLoader> Ptr;
 	
 	static const std::string EV_LOAD;
+	
+	Poco::FIFOEvent<View::Ptr> beforeLoad; /// Thrown before a load
+	Poco::FIFOEvent<DynamicCodeLoader*> generateCode;
 
 	DynamicCodeLoader(View* pParent, const Poco::URI& uri, const std::string& fctName, View::Ptr pView);
 		/// Makes the code available at URI, containing JS code
@@ -123,6 +127,7 @@ private:
 	std::string _code;
 	std::string  _success;
 	std::string  _error;
+	
 };
 
 
