@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip", "zip\zip_vs80.vcproj", "{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unzip", "unzip\unzip_vs80.vcproj", "{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Win32 = debug_shared|Win32
+		release_shared|Win32 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{73408DCF-2E65-47AF-BF38-7466DAB8D5CB}.release_shared|Win32.Build.0 = release_shared|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{0CFFC7B0-04F4-4A60-B6E4-84D78EDA2C73}.release_shared|Win32.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
