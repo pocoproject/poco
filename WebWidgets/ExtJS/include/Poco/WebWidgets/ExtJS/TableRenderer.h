@@ -78,6 +78,8 @@ public:
 	static const std::string EV_CELLSELECTED;
 	static const std::string EV_STARTCELLVALUECHANGE;
 	static const std::string HIDDEN_INDEX_ROW;
+	static const std::string FIELD_TOTALPROPERTY;
+	static const std::string FIELD_ROOT;
 	
 	TableRenderer();
 		/// Creates the TableRenderer.

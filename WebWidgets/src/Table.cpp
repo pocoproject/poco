@@ -160,6 +160,10 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 	Poco::NumberParser::tryParse(strCnt, cnt);
 	if (ev == EV_LOADDATA)
 	{
+		const std::string& strLimit = args.get("limit", strCnt); //Extjs hack
+		const std::string& strStart = args.get("start", strRow);
+		Poco::NumberParser::tryParse(strStart, row);
+		Poco::NumberParser::tryParse(strLimit, cnt);
 		/// serialize the Table back
 		/// check for cnt and start if only a segment was requested	
 		if (row < 0)

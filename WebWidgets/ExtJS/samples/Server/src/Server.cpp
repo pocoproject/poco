@@ -177,18 +177,24 @@ protected:
 			Form::Ptr pForm = new Form("form1", Poco::URI("/"));
 			//pForm->setURL(...);
 			Table::TableColumns tc;
-			tc.push_back(new TableColumn(new TextFieldCell(0), "StaticText", 200 ));
-			tc.push_back(new TableColumn(new CheckButtonCell(0, "lbl", true), "CheckButton", 100));
+			tc.push_back(new TableColumn(new TextFieldCell(0), "StaticText", 200,true ));
+			tc.push_back(new TableColumn(new CheckButtonCell(0, "lbl", true), "CheckButton", 100, true));
 			Table::Ptr pTable = new Table(tc, new SimpleTableModel(2));
 			///init simpletablemodel
 			pTable->setValue(std::string("one"), 0,0);
 			pTable->setValue(std::string("two"), 1,0);
 			pTable->setValue(std::string("three"), 2,0);
+			pTable->setValue(std::string("four"), 3,0);
+			pTable->setValue(std::string("five"), 4,0);
+
 			pTable->setValue(true, 0,1);
 			pTable->setValue(false, 1,1);
 			pTable->setValue(true, 2,1);
+			pTable->setValue(false, 3,1);
+			pTable->setValue(true, 4,1);
 			pTable->setWidth(310);
 			pTable->setHeight(200);
+			pTable->setPaging(2);
 			
 			pForm->add(new TextField("txtfield"));
 			CheckButton::Ptr ptrCheck2(new CheckButton("checkbutton", "CheckButton", false));

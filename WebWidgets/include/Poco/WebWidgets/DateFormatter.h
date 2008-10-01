@@ -48,7 +48,7 @@ namespace WebWidgets {
 
 
 class WebWidgets_API DateFormatter: public Formatter
-	/// DateFormatter is sued to convert Poco::DateTime to/from string
+	/// DateFormatter is used to convert Poco::DateTime to/from string
 {
 public:
 	typedef Poco::AutoPtr<DateFormatter> Ptr;
@@ -59,6 +59,8 @@ public:
 	std::string format(const Poco::Any& value) const;
 
 	Poco::Any parse(const std::string& value) const;
+
+	bool lowerThan(const Poco::Any& first, const Poco::Any& second) const;
 
 protected:
 	~DateFormatter();

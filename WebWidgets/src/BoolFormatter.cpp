@@ -78,4 +78,14 @@ Poco::Any BoolFormatter::parse(const std::string& value) const
 }
 
 
+bool BoolFormatter::lowerThan(const Poco::Any& first, const Poco::Any& second) const
+{
+	if (first.empty())
+		return true;
+	if (second.empty())
+		return false;
+	
+	return Poco::AnyCast<bool>(first) < Poco::AnyCast<bool>(second);
+}
+
 } } // namespace Poco::WebWidgets

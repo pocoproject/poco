@@ -1,15 +1,15 @@
 //
-// Formatter.h
+// SortedTableModel.h
 //
-// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/Formatter.h#2 $
+// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/SortedTableModel.h#4 $
 //
 // Library: WebWidgets
-// Package: Formatters
-// Module:  Formatter
+// Package: Views
+// Module:  SortedTableModel
 //
-// Definition of the Formatter class.
+// Definition of the SortedTableModel class.
 //
-// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,12 +36,12 @@
 //
 
 
-#ifndef WebWidgets_Formatter_INCLUDED
-#define WebWidgets_Formatter_INCLUDED
+#ifndef WebWidgets_SortedTableModel_INCLUDED
+#define WebWidgets_SortedTableModel_INCLUDED
 
 
 #include "Poco/WebWidgets/WebWidgets.h"
-#include "Poco/RefCountedObject.h"
+#include "Poco/WebWidgets/TableModel.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Any.h"
 
@@ -50,48 +50,45 @@ namespace Poco {
 namespace WebWidgets {
 
 
-class WebWidgets_API Formatter: public Poco::RefCountedObject
-	/// A formatter is responsible for converting a generic Cell value,
-	/// stored in a Poco::Any, into a string suitable for display by
-	/// the Cell.
+class WebWidgets_API SortedTableModel: public TableModel
+	/// SortedTableModel defines the interface for data retrieval for a Table
 {
 public:
-	typedef Poco::AutoPtr<Formatter> Ptr;
-	
-	struct WebWidgets_API less
-	{
-		Formatter& fmt;
-		less (Formatter& f): fmt(f){}
-		bool operator () (const Poco::Any& first, const Poco::Any& second) const 
-		{ 
-			return fmt.lowerThan(first, second);
-		}
-	};
-	
-	virtual std::string format(const Poco::Any& value) const = 0;
-		/// Returns a string representation of the given value, suitable
-		/// for displaying in a Cell.
+	typedef Poco::AutoPtr<SortedTableModel> Ptr;
+
+	SortedTableModel(TableModel::Ptr pModel, std::size_t col, bool sortAscending);
+		/// Creates the SortedTableModel.Sorts pModel via col and if sortWithLess is 
+		/// true by less otherwise by more
+
+	const Poco::Any& getValue(std::size_t row, std::size_t col) const;
+		///Returns the value at pos(row, col) or an empty Any if no data is stored there
+
+	std::size_t getRowCount() const;
+		/// Returns the total number of rows
+
+	void setValue(const Poco::Any& val, std::size_t row, std::size_t col);
+		/// Sets the value at pos(row, col)
+
+	void deleteRow(std::size_t row);
+		/// Removes the row from the SortedTableModel
 		
-	virtual Poco::Any parse(const std::string& value) const = 0;
-		/// Parses the given string and returns an Any containing a
-		/// variable of the correct type.
-		///
-		/// Throws a Poco::SyntaxException if the value cannot be parsed.
-	
-	virtual bool lowerThan(const Poco::Any& first, const Poco::Any& second) const = 0;
-		/// Lower than comparison for any's of the same type
+	void clear();
+		/// Deletes all rows from the SortedTableModel	
+
+	void sort(std::size_t col, bool sortAscending);
 
 protected:
-	Formatter();
-	virtual ~Formatter();
-	
+	virtual ~SortedTableModel();
+		/// Destroys the SortedTableModel.
+
 private:
-	Formatter(const Formatter&);
-	Formatter& operator = (const Formatter&);
+	TableModel::Ptr _pUnsorted;
+	std::size_t     _sortCol;
+	bool            _sortAscending;
 };
 
 
 } } // namespace Poco::WebWidgets
 
 
-#endif // WebWidgets_Formatter_INCLUDED
+#endif // WebWidgets_SortedTableModel_INCLUDED

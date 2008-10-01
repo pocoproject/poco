@@ -71,4 +71,15 @@ Poco::Any DateFormatter::parse(const std::string& value) const
 }
 
 
+bool DateFormatter::lowerThan(const Poco::Any& first, const Poco::Any& second) const
+{
+	if (first.empty())
+		return true;
+	if (second.empty())
+		return false;
+	
+	return Poco::RefAnyCast<DateTime>(first) < Poco::RefAnyCast<DateTime>(second);
+}
+
+
 } } // namespace Poco::WebWidgets

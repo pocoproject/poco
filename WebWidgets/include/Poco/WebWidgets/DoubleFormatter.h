@@ -59,6 +59,8 @@ public:
 	
 	int precision() const;
 		/// Returns the precision
+
+	bool lowerThan(const Poco::Any& first, const Poco::Any& second) const;
 		
 protected:
 	~DoubleFormatter();

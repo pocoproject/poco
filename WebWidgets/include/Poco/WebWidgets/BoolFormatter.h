@@ -60,6 +60,8 @@ public:
 
 	Poco::Any parse(const std::string& value) const;
 
+	bool lowerThan(const Poco::Any& first, const Poco::Any& second) const;
+
 protected:
 	~BoolFormatter();
 		/// Destroys the BoolFormatter.

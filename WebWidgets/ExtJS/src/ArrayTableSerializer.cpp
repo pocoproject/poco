@@ -35,6 +35,8 @@
 
 
 #include "Poco/WebWidgets/ExtJS/ArrayTableSerializer.h"
+#include "Poco/WebWidgets/ExtJS/TableRenderer.h"
+#include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/Table.h"
 #include "Poco/DateTime.h"
 
@@ -53,7 +55,8 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
 	// render the row-index as last column
 	const TableModel& tm = pTable->getModel();
 	const Table::TableColumns& tc = pTable->getColumns();
-
+	if (rowCntUser == 0 && pTable->getPagingSize() > 0)
+		rowCntUser = pTable->getPagingSize();
 	poco_assert_dbg (tc.size() == tm.getColumnCount());
 
 	std::size_t colCnt = tm.getColumnCount();
@@ -62,10 +65,11 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
 		rowBegin = 0;
 	if ((rowCntUser > 0) && (rowBegin + rowCntUser < rowCnt))
 		rowCnt = rowBegin + rowCntUser;
-	ostr << "[";
+	ostr << "{\"" << TableRenderer::FIELD_TOTALPROPERTY << "\":\"" << tm.getRowCount() << "\",";
+	ostr << "\"" << TableRenderer::FIELD_ROOT << "\":[";
 	for (std::size_t row = rowBegin; row < rowCnt; ++row)
 	{
-		if (row != 0)
+		if (row != rowBegin)
 			ostr << ",[";
 		else
 			ostr << "[";
@@ -88,7 +92,7 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
 				bool isString = (typeid(std::string) == aVal.type());
 				Cell::Ptr ptrCell = tc[col]->getCell();
 				if (isString)
-					ostr << "'" << RefAnyCast<std::string>(aVal) << "'";
+					ostr << "'" << Utility::safe(RefAnyCast<std::string>(aVal)) << "'";
 				else if (ptrCell)
 				{
 					//date must be written as string
@@ -105,7 +109,7 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
 		ostr << "," << row;
 		ostr << "]";
 	}
-	ostr << "]";
+	ostr << "]}";
 }
 
 

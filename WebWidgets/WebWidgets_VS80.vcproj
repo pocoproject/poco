@@ -682,6 +682,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\SortedTableModel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\Table.h"
 					>
 				</File>
@@ -743,6 +747,10 @@
 				</File>
 				<File
 					RelativePath=".\src\SimpleTableModel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SortedTableModel.cpp"
 					>
 				</File>
 				<File

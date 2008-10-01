@@ -69,4 +69,15 @@ Poco::Any IntFormatter::parse(const std::string& value) const
 }
 
 
+bool IntFormatter::lowerThan(const Poco::Any& first, const Poco::Any& second) const
+{
+	if (first.empty())
+		return true;
+	if (second.empty())
+		return false;
+	
+	return Poco::AnyCast<int>(first) < Poco::AnyCast<int>(second);
+}
+
+
 } } // namespace Poco::WebWidgets

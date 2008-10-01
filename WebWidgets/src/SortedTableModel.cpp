@@ -1,15 +1,13 @@
 //
-// IntFormatter.h
+// SortedTableModel.cpp
 //
-// $Id: //poco/Main/WebWidgets/include/Poco/WebWidgets/IntFormatter.h#2 $
+// $Id: //poco/Main/WebWidgets/src/SortedTableModel.cpp#3 $
 //
 // Library: WebWidgets
-// Package: Formatters
-// Module:  IntFormatter
+// Package: Views
+// Module:  SortedTableModel
 //
-// Definition of the IntFormatter class.
-//
-// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,35 +34,61 @@
 //
 
 
-#ifndef WebWidgets_IntFormatter_INCLUDED
-#define WebWidgets_IntFormatter_INCLUDED
-
-
-#include "Poco/WebWidgets/Formatter.h"
+#include "Poco/WebWidgets/SortedTableModel.h"
 
 
 namespace Poco {
 namespace WebWidgets {
 
 
-class WebWidgets_API IntFormatter: public Formatter
-	/// A simple formatter for int values.
+SortedTableModel::SortedTableModel(TableModel::Ptr pModel, std::size_t col, bool sortAscending):
+	TableModel(pModel->getColumnCount()),
+	_pUnsorted(pModel),
+	_sortCol(col),
+	_sortAscending(sortAscending)
 {
-public:
-	typedef Poco::AutoPtr<IntFormatter> Ptr;
-	
-	IntFormatter();
-	std::string format(const Poco::Any& value) const;		
-	Poco::Any parse(const std::string& value) const;
+}
 
-	bool lowerThan(const Poco::Any& first, const Poco::Any& second) const;
+
+SortedTableModel::~SortedTableModel()
+{
+}
+
+
+const Poco::Any& SortedTableModel::getValue(std::size_t row, std::size_t col) const
+{
+	throw Poco::NotImplementedException();
+}
+
+
+std::size_t SortedTableModel::getRowCount() const
+{
+	throw Poco::NotImplementedException();
+}
+
+
+void SortedTableModel::setValue(const Poco::Any& val, std::size_t row, std::size_t col)
+{
+	throw Poco::NotImplementedException();
+}
+
+
+void SortedTableModel::deleteRow(std::size_t row)
+{
+	throw Poco::NotImplementedException();
+}
+
 	
-protected:
-	~IntFormatter();
-};
+void SortedTableModel::clear()
+{
+	throw Poco::NotImplementedException();
+}
+
+
+void SortedTableModel::sort(std::size_t col, bool sortAscending)
+{
+	throw Poco::NotImplementedException();
+}
 
 
 } } // namespace Poco::WebWidgets
-
-
-#endif // WebWidgets_IntFormatter_INCLUDED

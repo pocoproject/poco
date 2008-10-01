@@ -70,4 +70,15 @@ Poco::Any DoubleFormatter::parse(const std::string& value) const
 }
 
 
+bool DoubleFormatter::lowerThan(const Poco::Any& first, const Poco::Any& second) const
+{
+	if (first.empty())
+		return true;
+	if (second.empty())
+		return false;
+	
+	return Poco::AnyCast<double>(first) < Poco::AnyCast<double>(second);
+}
+
+
 } } // namespace Poco::WebWidgets

@@ -70,6 +70,8 @@ const std::string TableRenderer::EV_KEYPRESSED("keypress");
 const std::string TableRenderer::EV_ROWSELECTED("rowselect");
 const std::string TableRenderer::EV_CELLSELECTED("cellselect");
 const std::string TableRenderer::HIDDEN_INDEX_ROW("hidIdx");
+const std::string TableRenderer::FIELD_TOTALPROPERTY("tp");
+const std::string TableRenderer::FIELD_ROOT("data");
 
 
 TableRenderer::TableRenderer()
@@ -516,7 +518,6 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	 //       })
 	 if (pTable->getPagingSize() > 0)
 	 {
-		ostr << ",remoteSort:true";
 		ostr << ",bbar:new Ext.PagingToolbar({";
 		ostr <<		"pageSize:" << pTable->getPagingSize() << ",";
 		ostr <<		"displayInfo:true,";
@@ -649,17 +650,19 @@ void TableRenderer::renderStore(const Table* pTable, std::ostream& ostr)
 	ostr << "proxy:new Ext.data.HttpProxy({url:";
 	std::map<std::string, std::string> addParams;
 	addParams.insert(std::make_pair(RequestHandler::KEY_EVID,Table::EV_LOADDATA));
-	
-	
+
 	std::string url(Utility::createURI(addParams, pTable->id()));
 	ostr << url << "}),";
-	ostr << "reader:new Ext.data.ArrayReader()";
+	ostr << "reader:new Ext.data.ArrayReader({totalCnt:'";
+	ostr << FIELD_TOTALPROPERTY << "',data:'" << FIELD_ROOT << "'})";
 	if (pTable->afterLoad.hasJavaScriptCode())
 	{
 		ostr << ",listeners:{";
 			Utility::writeJSEvent(ostr, EV_AFTERLOAD, pTable->afterLoad, &TableRenderer::createAfterLoadServerCallback, pTable);
 		ostr << "}";
 	}
+	if (pTable->getPagingSize() > 0)
+		ostr << ",remoteSort:true";
 	
 	ostr << "})";
 }
