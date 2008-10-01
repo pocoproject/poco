@@ -58,7 +58,7 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
 	if (sortCol >= 0)
 		pSorted = pTable->getSortedModel(static_cast<std::size_t>(sortCol), sortAscending);
 
-	const TableModel& tm = ((sortCol >= 0)?*pSorted:pTable->getModel());
+	const TableModel& tm = (pSorted?*pSorted:pTable->getModel());
 	const Table::TableColumns& tc = pTable->getColumns();
 	if (rowCntUser == 0 && pTable->getPagingSize() > 0)
 		rowCntUser = pTable->getPagingSize();
@@ -111,7 +111,11 @@ void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, st
 			}
 		}
 		// the last column contains the rowIndx
-		ostr << "," << row;
+		// with a sorted tablemodel we want the original row value
+		if (pSorted)
+			ostr << "," << pSorted->mapping(row);
+		else
+			ostr << "," << row;
 		ostr << "]";
 	}
 	ostr << "]}";

@@ -186,12 +186,14 @@ protected:
 			pTable->setValue(std::string("three"), 2,0);
 			pTable->setValue(std::string("four"), 3,0);
 			pTable->setValue(std::string("five"), 4,0);
+			pTable->setValue(std::string("12' 23''"), 5,0);
 
 			pTable->setValue(true, 0,1);
 			pTable->setValue(false, 1,1);
 			pTable->setValue(true, 2,1);
 			pTable->setValue(false, 3,1);
 			pTable->setValue(true, 4,1);
+			pTable->setValue(true, 5,1);
 			pTable->setWidth(310);
 			pTable->setHeight(200);
 			pTable->setPaging(2);

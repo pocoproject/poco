@@ -86,12 +86,11 @@ public:
 
 	std::size_t getSortedColumn() const;
 
+	std::size_t mapping(std::size_t) const;
+
 protected:
 	virtual ~SortedTableModel();
 		/// Destroys the SortedTableModel.
-
-	std::size_t mapping(std::size_t) const;
-
 private:
 	TableModel&     _unsorted;
 	const Table*    _pTable;
