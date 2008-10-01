@@ -85,7 +85,9 @@ void TextFieldCell::handleForm(const std::string& field, const std::string& valu
 {
 	if (getValue().empty() || value != getString())
 	{
-		Poco::Any newValue = getFormatter()->parse(value);
+		Poco::Any newValue;
+		if (!value.empty())
+			newValue = getFormatter()->parse(value);
 		ValueChange vc(getFormatter(), getValue(), newValue);
 		setValue(newValue);
 		textChanged.notify(this, vc);
