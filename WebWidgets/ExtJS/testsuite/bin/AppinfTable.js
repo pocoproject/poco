@@ -12,6 +12,11 @@ Ext.override(Ext.data.ArrayReader, {
 		var records = [];
 		var root = o["data"];
 		var totalRecords = o["tp"];
+		if (!root)
+		{
+			root = o;
+			totalRecords = root.length;
+		}
 		for(var i = 0; i < root.length; i++){
 			var n = root[i];
 			var values = {};
