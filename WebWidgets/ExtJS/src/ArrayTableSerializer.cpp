@@ -38,6 +38,7 @@
 #include "Poco/WebWidgets/ExtJS/TableRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/Table.h"
+#include "Poco/WebWidgets/SortedTableModel.h"
 #include "Poco/DateTime.h"
 
 
@@ -46,14 +47,18 @@ namespace WebWidgets {
 namespace ExtJS {
 
 
-void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, std::size_t rowBegin, std::size_t rowCntUser)
+void ArrayTableSerializer::serialize(std::ostream& ostr, const Table* pTable, std::size_t rowBegin, std::size_t rowCntUser, int sortCol, bool sortAscending )
 {
 	//[
     //    ['3m Co',71.72,0.02,0.03,'9/1 12:00am'],
     //    ['Alcoa Inc',29.01,0.42,1.47,'9/1 12:00am']
 	//]
 	// render the row-index as last column
-	const TableModel& tm = pTable->getModel();
+	SortedTableModel::Ptr pSorted;
+	if (sortCol >= 0)
+		pSorted = pTable->getSortedModel(static_cast<std::size_t>(sortCol), sortAscending);
+
+	const TableModel& tm = ((sortCol >= 0)?*pSorted:pTable->getModel());
 	const Table::TableColumns& tc = pTable->getColumns();
 	if (rowCntUser == 0 && pTable->getPagingSize() > 0)
 		rowCntUser = pTable->getPagingSize();

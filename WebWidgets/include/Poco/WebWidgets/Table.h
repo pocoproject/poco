@@ -43,6 +43,7 @@
 #include "Poco/WebWidgets/View.h"
 #include "Poco/WebWidgets/Formatter.h"
 #include "Poco/WebWidgets/TableModel.h"
+#include "Poco/WebWidgets/SortedTableModel.h"
 #include "Poco/WebWidgets/TableColumn.h"
 #include "Poco/WebWidgets/RequestProcessor.h"
 #include "Poco/WebWidgets/JavaScriptEvent.h"
@@ -107,7 +108,9 @@ public:
 		Table* pTable;
 		int firstRow;
 		int rowCnt;
-		LoadData(Poco::Net::HTTPServerResponse* pResponse, Table* pTable, int firstRow, int rowCnt);
+		int sortByColumn; // -1 to not sort
+		bool sortAscending;
+		LoadData(Poco::Net::HTTPServerResponse* pResponse, Table* pTable, int firstRow, int rowCnt, int sortCol, bool sortAscending);
 	};
 	
 	JavaScriptEvent<std::size_t> rowSelected; /// fires the row selected event
@@ -209,6 +212,8 @@ public:
 		// Returns if autoEdit is on/off
 		
 	bool serializeJSON(std::ostream& out, const std::string& name);	
+
+	SortedTableModel::Ptr getSortedModel(std::size_t col, bool sortAscending) const;
 		
 protected:
 	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
@@ -225,6 +230,7 @@ protected:
 		
 private:
 	TableModel::Ptr _pModel;
+	mutable SortedTableModel::Ptr _pSorted;
 	TableColumns    _columns;
 	SelectionModel  _sm;
 	bool            _dragAndDrop;
@@ -256,7 +262,9 @@ inline std::size_t Table::getRowCount() const
 
 inline void Table::clear()
 {
-	return _pModel->clear();
+	if (_pSorted)
+		_pSorted->clear();
+	_pModel->clear();
 }
 
 

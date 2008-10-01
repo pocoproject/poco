@@ -55,7 +55,7 @@ class ExtJS_API ArrayTableSerializer
 	/// ArrayTableSerializer serializes a Table in JSON format
 {
 public:
-	static void serialize(std::ostream& ostr, const Poco::WebWidgets::Table* pTable, std::size_t rowBegin = 0, std::size_t rowCnt = 0);
+	static void serialize(std::ostream& ostr, const Poco::WebWidgets::Table* pTable, std::size_t rowBegin = 0, std::size_t rowCnt = 0, int sortCol = -1, bool sortAscending = true);
 		/// Serializes the table starting with row 0. A rowCnt of 0 means serialize all rows
 		
 	static const std::string& contentType();

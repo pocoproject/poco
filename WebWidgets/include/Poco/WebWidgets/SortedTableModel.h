@@ -44,10 +44,13 @@
 #include "Poco/WebWidgets/TableModel.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Any.h"
+#include <vector>
 
 
 namespace Poco {
 namespace WebWidgets {
+
+	class Table;
 
 
 class WebWidgets_API SortedTableModel: public TableModel
@@ -56,7 +59,7 @@ class WebWidgets_API SortedTableModel: public TableModel
 public:
 	typedef Poco::AutoPtr<SortedTableModel> Ptr;
 
-	SortedTableModel(TableModel::Ptr pModel, std::size_t col, bool sortAscending);
+	SortedTableModel(const Table* pTable, std::size_t col, bool sortAscending);
 		/// Creates the SortedTableModel.Sorts pModel via col and if sortWithLess is 
 		/// true by less otherwise by more
 
@@ -76,17 +79,41 @@ public:
 		/// Deletes all rows from the SortedTableModel	
 
 	void sort(std::size_t col, bool sortAscending);
+		/// Only sorts if col and direction is different
+
+	void forceResort(std::size_t col, bool sortAscending);
+		/// Forced resort
+
+	std::size_t getSortedColumn() const;
 
 protected:
 	virtual ~SortedTableModel();
 		/// Destroys the SortedTableModel.
 
+	std::size_t mapping(std::size_t) const;
+
 private:
-	TableModel::Ptr _pUnsorted;
+	TableModel&     _unsorted;
+	const Table*    _pTable;
 	std::size_t     _sortCol;
 	bool            _sortAscending;
+	std::vector<std::size_t> _mapping;
 };
 
+
+
+inline std::size_t SortedTableModel::mapping(std::size_t row) const
+{
+	if (_sortAscending)
+		return _mapping[row];
+	return _mapping[_mapping.size() - row -1 ];
+}
+
+
+inline std::size_t SortedTableModel::getSortedColumn() const
+{
+	return _sortCol;
+}
 
 } } // namespace Poco::WebWidgets
 

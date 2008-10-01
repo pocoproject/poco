@@ -673,7 +673,7 @@ void TableRenderer::onBeforeLoad(void* pSender, Table::LoadData& ld)
 	ld.pResponse->setChunkedTransferEncoding(true);
 	ld.pResponse->setContentType(ArrayTableSerializer::contentType());
 	std::ostream& out = ld.pResponse->send();
-	ArrayTableSerializer::serialize(out, ld.pTable, ld.firstRow, ld.rowCnt);
+	ArrayTableSerializer::serialize(out, ld.pTable, ld.firstRow, ld.rowCnt, ld.sortByColumn, ld.sortAscending);
 }
 
 

@@ -162,15 +162,20 @@ void Table::handleAjaxRequest(const Poco::Net::NameValueCollection& args, Poco::
 	{
 		const std::string& strLimit = args.get("limit", strCnt); //Extjs hack
 		const std::string& strStart = args.get("start", strRow);
+		const std::string& strSortCol = args.get("sort", "");
+		const std::string& sortDir = args.get("dir", "ASC");
+		int sortCol(-1);
 		Poco::NumberParser::tryParse(strStart, row);
 		Poco::NumberParser::tryParse(strLimit, cnt);
+		Poco::NumberParser::tryParse(strSortCol, sortCol);
+		bool sortAscending = (sortDir == "ASC");
 		/// serialize the Table back
 		/// check for cnt and start if only a segment was requested	
 		if (row < 0)
 			row = 0;
 		if (cnt < 0)
 			cnt = 0;
-		LoadData ld(&response, this, row, cnt);
+		LoadData ld(&response, this, row, cnt, sortCol, sortAscending);
 		beforeLoad.notify(this, ld);
 	}
 	else if (ev == EV_CELLCLICKED)
@@ -327,6 +332,8 @@ void Table::setValue(const Poco::Any& val, std::size_t row, std::size_t col)
 	CellValueChange ev(row, col, oldValue, val);
 	beforeCellValueChanged(this,ev);
 	_pModel->setValue(ev.newValue, row, col);
+	if (_pSorted && _pSorted->getSortedColumn() == col)
+		_pSorted = 0;
 	cellValueChanged(this, ev);
 }
 
@@ -347,11 +354,13 @@ Table::CellValueChange::CellValueChange(std::size_t r, std::size_t c, const Poco
 }
 
 
-Table::LoadData::LoadData(Poco::Net::HTTPServerResponse* pR, Table* pT, int row, int cnt):
+Table::LoadData::LoadData(Poco::Net::HTTPServerResponse* pR, Table* pT, int row, int cnt, int sortCol, bool sA):
 	pResponse(pR),
 	pTable(pT),
 	firstRow(row),
-	rowCnt(cnt)
+	rowCnt(cnt),
+	sortByColumn(sortCol),
+	sortAscending(sA)
 {
 }
 
@@ -361,5 +370,14 @@ bool Table::serializeJSON(std::ostream& out, const std::string& name)
 	return false;
 }
 
+
+SortedTableModel::Ptr Table::getSortedModel(std::size_t col, bool sortAscending) const
+{
+	if (!_pSorted)
+		_pSorted = new SortedTableModel(this, col, sortAscending);
+	else
+		_pSorted->sort(col, sortAscending);
+	return _pSorted;
+}
 
 } } // namespace Poco::WebWidgets

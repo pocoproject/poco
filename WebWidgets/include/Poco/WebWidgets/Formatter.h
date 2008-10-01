@@ -58,16 +58,6 @@ class WebWidgets_API Formatter: public Poco::RefCountedObject
 public:
 	typedef Poco::AutoPtr<Formatter> Ptr;
 	
-	struct WebWidgets_API less
-	{
-		Formatter& fmt;
-		less (Formatter& f): fmt(f){}
-		bool operator () (const Poco::Any& first, const Poco::Any& second) const 
-		{ 
-			return fmt.lowerThan(first, second);
-		}
-	};
-	
 	virtual std::string format(const Poco::Any& value) const = 0;
 		/// Returns a string representation of the given value, suitable
 		/// for displaying in a Cell.

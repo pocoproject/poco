@@ -35,18 +35,23 @@
 
 
 #include "Poco/WebWidgets/SortedTableModel.h"
+#include "Poco/WebWidgets/Table.h"
+#include <set>
 
 
 namespace Poco {
 namespace WebWidgets {
 
 
-SortedTableModel::SortedTableModel(TableModel::Ptr pModel, std::size_t col, bool sortAscending):
-	TableModel(pModel->getColumnCount()),
-	_pUnsorted(pModel),
+SortedTableModel::SortedTableModel(const Table* pTable, std::size_t col, bool sortAscending):
+	TableModel(pTable->getModel().getColumnCount()),
+	_unsorted(const_cast<TableModel&>(pTable->getModel())),
+	_pTable(pTable),
 	_sortCol(col),
-	_sortAscending(sortAscending)
+	_sortAscending(sortAscending),
+	_mapping(pTable->getModel().getRowCount())
 {
+	forceResort(col, _sortAscending);
 }
 
 
@@ -57,37 +62,82 @@ SortedTableModel::~SortedTableModel()
 
 const Poco::Any& SortedTableModel::getValue(std::size_t row, std::size_t col) const
 {
-	throw Poco::NotImplementedException();
+	return _unsorted.getValue(mapping(row), col);
 }
 
 
 std::size_t SortedTableModel::getRowCount() const
 {
-	throw Poco::NotImplementedException();
+	return _unsorted.getRowCount();
 }
 
 
 void SortedTableModel::setValue(const Poco::Any& val, std::size_t row, std::size_t col)
 {
-	throw Poco::NotImplementedException();
+	_unsorted.setValue(val, mapping(row), col);
 }
 
 
 void SortedTableModel::deleteRow(std::size_t row)
 {
-	throw Poco::NotImplementedException();
+	std::size_t mappedRow = mapping(row);
+	_unsorted.deleteRow(mappedRow);
+	_mapping.erase(_mapping.begin()+row);
 }
 
 	
 void SortedTableModel::clear()
 {
-	throw Poco::NotImplementedException();
+	_unsorted.clear();
+	_mapping.clear();
 }
+
+
+typedef std::pair<const Poco::Any*, std::size_t> Val;
+struct less
+{
+	Formatter& fmt;
+	less(Formatter& f):fmt(f){}
+	bool operator () (const Val& first, const Val& second) const 
+	{ 
+		return fmt.lowerThan(*first.first, *second.first);
+	}
+};
 
 
 void SortedTableModel::sort(std::size_t col, bool sortAscending)
 {
-	throw Poco::NotImplementedException();
+	if (_sortCol == col)
+	{
+		// we already have a sort on this oclumn
+		_sortAscending = sortAscending;
+		return;
+	}
+	
+	forceResort(col, sortAscending);
+}
+
+
+void SortedTableModel::forceResort(std::size_t col, bool sortAscending)
+{
+	_sortCol = col;
+	_sortAscending = sortAscending;
+	//build up a table of pairs containg <val, row>
+	// create a set of of these pairs to e
+	Formatter::Ptr pF = _pTable->getColumns()[col]->getCell()->getFormatter();
+	less ls(*pF);
+	std::multiset<Val, less> tbl(ls); 	
+	
+	for (std::size_t row = 0; row < _unsorted.getRowCount(); ++row)
+	{
+		tbl.insert(std::make_pair(&_unsorted.getValue(row, col), row));
+	}
+	
+	_mapping.clear();
+	
+	std::multiset<Val, less>::const_iterator it = tbl.begin();
+	for (; it != tbl.end(); ++it)
+		_mapping.push_back(it->second);
 }
 
 
