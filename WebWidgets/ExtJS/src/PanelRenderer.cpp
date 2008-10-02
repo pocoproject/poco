@@ -63,7 +63,7 @@ void PanelRenderer::renderHead(const Renderable* pRenderable, const RenderContex
 	ostr << "new Ext.Window({";
 	
 	Utility::writeRenderableProperties(pRenderable, ostr);
-	ostr <<		",manager: winGrp";
+	ostr <<		",manager: winGrp,autoScroll:true";
 	if (pPanel->hasPosition())
 		ostr << ",x:" << pPanel->getPosition().posX << ",y:" << pPanel->getPosition().posY;
 	if (!pPanel->getName().empty() && pPanel->showHeader())
