@@ -130,6 +130,8 @@ public:
 	
 	const std::set<DynamicCodeLoader::Ptr>& dynamicCodeLoaders() const;
 	
+	std::set<DynamicCodeLoader::Ptr>& dynamicCodeLoaders();
+	
 protected:
 	Page(const std::string& name, const std::type_info& type);
 		/// Creates a Page and assigns it the given name.
@@ -139,8 +141,6 @@ protected:
 		
 	~Page();
 		/// Destroys the Page.
-		
-	std::set<DynamicCodeLoader::Ptr>& dynamicCodeLoaders();	
 		
 private:
 	std::string     _text;
