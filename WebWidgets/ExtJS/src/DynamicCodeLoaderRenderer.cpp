@@ -73,7 +73,7 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	Panel::Ptr pPanel = pView.cast<Panel>();
 	poco_assert_dbg (pLoader != 0);
 	
-	str <<	"function " << pLoader->loaderFunctionName() << "(){" << std::endl;
+	str <<	"function " << pLoader->loaderFunctionName() << "(ignoreSuccess){" << std::endl;
 	str <<		"if ("<< pLoader->loaderFunctionName() << "Loaded) return;" << std::endl;
 	str <<		pLoader->loaderFunctionName() << "Loaded = true;" << std::endl;
 	str <<		"Ext.Ajax.request({" << std::endl;
@@ -96,7 +96,10 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 			str <<		(*itP)->loaderFunctionName() << "MissingChildCnt--;" << std::endl;
 	}
 	if (!pLoader->getSuccessCall().empty())
-		str <<			pLoader->getSuccessCall() << ";" << std::endl;
+	{
+		str <<			"if (!ignoreSuccess)" << std::endl;
+		str <<				pLoader->getSuccessCall() << ";" << std::endl;
+	}
 	str <<			"}";
 	if (!pLoader->getErrorCall().empty())
 		str <<		",failure:" << pLoader->getErrorCall() << std::endl;
@@ -109,7 +112,7 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 		// write the Check function
 		str <<	"function " << pLoader->loaderFunctionName() << "Check(){" << std::endl;
 		str <<		"if (" << pLoader->loaderFunctionName() << "MissingChildCnt <= 0){" << std::endl;
-		str <<			pLoader->loaderFunctionName() << "();" << std::endl;
+		str <<			pLoader->loaderFunctionName() << "(false);" << std::endl;
 		str <<			"window.clearInterval(" << pLoader->loaderFunctionName() << "PeriodicCheck);" << std::endl;
 		str <<		"}";
 		str <<		pLoader->loaderFunctionName() << "RetryCnt--;" << std::endl;
@@ -123,14 +126,14 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	// write loadAll
 	
 	std::vector<const DynamicCodeLoader*>::const_iterator it = deps.begin();
-	str <<	"function " << pLoader->loadAllFunctionName() << "(){" << std::endl;
+	str <<	"function " << pLoader->loadAllFunctionName() << "(ignoreSuccess){" << std::endl;
 	for (; it != deps.end(); ++it)
 	{
 		if (*it)
-			str << (*it)->loadAllFunctionName() << "();" << std::endl;
+			str << (*it)->loadAllFunctionName() << "(ignoreSuccess);" << std::endl;
 	}
 	if (deps.empty())
-		str <<		pLoader->loaderFunctionName() << "();";
+		str <<		pLoader->loaderFunctionName() << "(ignoreSuccess);";
 	else
 	{
 		str << "if (!" << pLoader->loaderFunctionName() << "PeriodicCheck){" << std::endl;
