@@ -66,7 +66,7 @@ public:
 	void renderBody(const Renderable* pRenderable, const RenderContext& context, std::ostream& ostr);
 		/// Emits code for the page body to the given output stream.	
 
-	void renderVariables(const DynamicCodeLoader* pLoader, const RenderContext& context, std::ostream& ostr);
+	static void renderVariables(const DynamicCodeLoader* pLoader, const RenderContext& context, std::ostream& ostr);
 		// You must first call renderVariables then renderHead
 		
 private:

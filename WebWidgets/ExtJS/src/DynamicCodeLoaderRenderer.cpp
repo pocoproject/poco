@@ -119,7 +119,6 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	}
 
 	// write loadAll
-	str <<	"function " << pLoader->loadAllFunctionName() << "(){" << std::endl;
 	
 	std::vector<const DynamicCodeLoader*>::const_iterator it = deps.begin();
 	str <<	"function " << pLoader->loadAllFunctionName() << "(){" << std::endl;

@@ -37,6 +37,7 @@
 #include "Poco/WebWidgets/ExtJS/PageRenderer.h"
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ExtJS/PanelRenderer.h"
+#include "Poco/WebWidgets/ExtJS/DynamicCodeLoaderRenderer.h"
 #include "Poco/WebWidgets/Page.h"
 #include "Poco/WebWidgets/Panel.h"
 #include "Poco/WebWidgets/RenderContext.h"
@@ -146,13 +147,20 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 			ostr <<		"oHead.appendChild(oScript);" << std::endl;
 			ostr <<	"}" << std::endl;
 		}
-		std::set<DynamicCodeLoader::Ptr>::const_iterator itDC = dcls.begin();
-		for (; itDC != dcls.end(); ++itDC)
 		{
-			(*itDC)->renderHead(context, ostr);
+			std::set<DynamicCodeLoader::Ptr>::const_iterator itDC = dcls.begin();
+			for (; itDC != dcls.end(); ++itDC)
+			{
+				DynamicCodeLoaderRenderer::renderVariables((*itDC), context, ostr);
+			}
 		}
-		
-		
+		{
+			std::set<DynamicCodeLoader::Ptr>::const_iterator itDC = dcls.begin();
+			for (; itDC != dcls.end(); ++itDC)
+			{
+				(*itDC)->renderHead(context, ostr);
+			}
+		}
 		
 		ostr << "Ext.onReady(function() {";
 		ostr << "var " << VAR_LOCALTMP << ";"; // tmp variable needed for table renderer
