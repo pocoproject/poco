@@ -518,10 +518,10 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 	 //       })
 	 if (pTable->getPagingSize() > 0)
 	 {
-		ostr << ",bbar:new Ext.PagingToolbar({";
+		ostr << ",bbar:new Ext.AppinfPagingToolbar({";
 		ostr <<		"pageSize:" << pTable->getPagingSize() << ",";
 		ostr <<		"displayInfo:true,";
-		ostr <<		"displayMsg: 'Displaying topics {0} - {1} of {2}',";
+		ostr <<		"displayMsg: 'Displaying {0} - {1} of {2}',";
 		ostr <<		"emptyMsg:'No topics to display',";
 		ostr <<		"store:tmpLocal})";
 	 }

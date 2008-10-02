@@ -1,3 +1,12 @@
+Ext.AppinfPagingToolbar = Ext.extend(Ext.PagingToolbar, {
+    onRender : function(ct, position){
+        Ext.AppinfPagingToolbar.superclass.onRender.call(this, ct, position);
+        this.loading.hide();
+    }
+});
+
+Ext.reg('appinfpaging', Ext.AppinfPagingToolbar);
+
 Ext.override(Ext.data.ArrayReader, {
 	read : function(response){
 		var data = response.responseText;
