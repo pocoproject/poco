@@ -126,14 +126,14 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	// write loadAll
 	
 	std::vector<const DynamicCodeLoader*>::const_iterator it = deps.begin();
-	str <<	"function " << pLoader->loadAllFunctionName() << "(ignoreSuccess){" << std::endl;
+	str <<	"function " << pLoader->loadAllFunctionName() << "(ignoreParentSuccess, ignoreChildSuccess){" << std::endl;
 	for (; it != deps.end(); ++it)
 	{
 		if (*it)
-			str << (*it)->loadAllFunctionName() << "(ignoreSuccess);" << std::endl;
+			str << (*it)->loadAllFunctionName() << "(ignoreChildSuccess, ignoreChildSuccess);" << std::endl;
 	}
 	if (deps.empty())
-		str <<		pLoader->loaderFunctionName() << "(ignoreSuccess);";
+		str <<		pLoader->loaderFunctionName() << "(ignoreParentSuccess);";
 	else
 	{
 		str << "if (!" << pLoader->loaderFunctionName() << "PeriodicCheck){" << std::endl;
