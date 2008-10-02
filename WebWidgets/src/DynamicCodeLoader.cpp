@@ -53,11 +53,13 @@ DynamicCodeLoader::DynamicCodeLoader(View* pParent, const Poco::URI& uri, const 
 	_uri(uri),
 	_fctName(fctName),
 	_loaderFct("load"),
+	_loadAllFct("loadAll"),
 	_pView(pView)
 {
 	poco_check_ptr (_pView);
 	poco_assert (!_fctName.empty());
 	_loaderFct.append(_fctName);
+	_loadAllFct.append(_fctName);
 }
 
 

@@ -45,6 +45,7 @@
 #include "Poco/WebWidgets/View.h"
 #include "Poco/URI.h"
 #include "Poco/FIFOEvent.h"
+#include <vector>
 
 
 namespace Poco {
@@ -77,7 +78,11 @@ public:
 		/// Returns the function name
 		
 	const std::string& loaderFunctionName() const;
-		/// Returns the function name used to load the js
+		/// Returns the function name used to load the js. Loads only the parent,
+		/// none of the dependent Children
+
+	const std::string& loadAllFunctionName() const;
+		/// Returns the function name used to load the js. Loads all the dependent children
 		
 	View::Ptr view() const;
 		/// Returns the view
@@ -113,21 +118,38 @@ public:
 		/// The JS fucntion which should be called on success
 		
 	const std::string& getErrorCall() const;
-		
+
+	void addDependency(DynamicCodeLoader* pLoader);
+		/// Tells this loader that it should first invoke pLoader
+		/// before loading itself
+
+	const std::vector<const DynamicCodeLoader*>& dependentParents() const;
+		/// Gets all parents that depend on the success of the child
+
+	const std::vector<const DynamicCodeLoader*>& dependencies() const;
+		/// Gets all children that must be loaded before this code
 protected:
 	~DynamicCodeLoader();
 		/// Destroys the DynamicCodeLoader.
+
+	void addDependentParent(const DynamicCodeLoader* pLoader);
+		/// Adds another DynamicCodeLoader that depends on the success of this loader
+		/// For example, if loader1 uses a panel from loader2,
+		/// you add loader1 to loader2:
+		///     loader2->addDependendParent(loader1);
 
 private:
 	View*       _pParent;
 	Poco::URI   _uri;
 	std::string _fctName;
 	std::string _loaderFct;
+	std::string _loadAllFct;
 	View::Ptr   _pView;
 	std::string _code;
-	std::string  _success;
-	std::string  _error;
-	
+	std::string _success;
+	std::string _error;
+	std::vector<const DynamicCodeLoader*> _dependencies;
+	std::vector<const DynamicCodeLoader*> _dependentParents;
 };
 
 
@@ -167,6 +189,12 @@ inline const std::string& DynamicCodeLoader::loaderFunctionName() const
 }
 
 
+inline const std::string& DynamicCodeLoader::loadAllFunctionName() const
+{
+	return _loadAllFct;
+}
+
+
 inline bool DynamicCodeLoader::operator < (const DynamicCodeLoader& other) const
 {
 	return _fctName < other._fctName;
@@ -200,6 +228,34 @@ inline void DynamicCodeLoader::setErrorCall(const std::string& jsFct)
 inline const std::string& DynamicCodeLoader::getErrorCall() const
 {
 	return _error;
+}
+
+
+inline void DynamicCodeLoader::addDependency(DynamicCodeLoader* pLoader)
+{
+	if (pLoader) 
+	{
+		pLoader->addDependentParent(this);
+		_dependencies.push_back(pLoader);
+	}
+}
+
+
+inline void DynamicCodeLoader::addDependentParent(const DynamicCodeLoader* pLoader)
+{
+	if (pLoader) _dependentParents.push_back(pLoader);
+}
+
+
+inline const std::vector<const DynamicCodeLoader*>& DynamicCodeLoader::dependentParents() const
+{
+	return _dependentParents;
+}
+
+
+inline const std::vector<const DynamicCodeLoader*>& DynamicCodeLoader::dependencies() const
+{
+	return _dependencies;
 }
 
 	

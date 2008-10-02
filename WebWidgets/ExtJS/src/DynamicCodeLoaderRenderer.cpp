@@ -72,7 +72,7 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	View::Ptr pView = pLoader->view();
 	Panel::Ptr pPanel = pView.cast<Panel>();
 	poco_assert_dbg (pLoader != 0);
-	str <<	"var " << pLoader->loaderFunctionName() << "Loaded = false;" << std::endl;
+	
 	str <<	"function " << pLoader->loaderFunctionName() << "(){" << std::endl;
 	str <<		"if ("<< pLoader->loaderFunctionName() << "Loaded) return;" << std::endl;
 	str <<		pLoader->loaderFunctionName() << "Loaded = true;" << std::endl;
@@ -87,6 +87,14 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 		str <<			"var parent = Ext.getCmp('" << pLoader->parent()->id() << "');" << std::endl;
 	str <<				"var child = " << pLoader->functionName() << "();" << std::endl;
 	str <<				"parent.add(child);" << std::endl;
+	// reduce the missing child cnt for all parents
+	const std::vector<const DynamicCodeLoader*>& parents = pLoader->dependentParents();
+	std::vector<const DynamicCodeLoader*>::const_iterator itP = parents.begin();
+	for (; itP != parents.end() ; ++itP)
+	{
+		if (*itP)
+			str <<		pLoader->loaderFunctionName() << "MissingChildCnt--;" << std::endl;
+	}
 	if (!pLoader->getSuccessCall().empty())
 		str <<			pLoader->getSuccessCall() << ";" << std::endl;
 	str <<			"}";
@@ -94,11 +102,59 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 		str <<		",failure:" << pLoader->getErrorCall() << std::endl;
 	str <<		"});" << std::endl;
 	str <<	"}" << std::endl;
+
+	const std::vector<const DynamicCodeLoader*>& deps = pLoader->dependencies();
+	if (!deps.empty())
+	{
+		// write the Check function
+		str <<	"function " << pLoader->loadAllFunctionName() << "Check(){" << std::endl;
+		str <<		"if (" << pLoader->loaderFunctionName() << "MissingChildCnt <= 0)" << std::endl;
+		str <<			str <<		pLoader->loaderFunctionName() << "();" << std::endl;
+		str <<		pLoader->loaderFunctionName() << "RetryCnt--;" << std::endl;
+		str <<		"if (" << pLoader->loaderFunctionName() << "RetryCnt < 0) {" << std::endl;
+		str <<			"Ext.Msg.alert ('Load Failed', 'Not all children could be loaded for the page');" << std::endl;
+		str <<			"window.clearInterval(" << pLoader->loaderFunctionName() << "PeriodicCheck);" << std::endl;
+		str <<		"}" << std::endl;
+		str <<	"}" << std::endl;
+	}
+
+	// write loadAll
+	str <<	"function " << pLoader->loadAllFunctionName() << "(){" << std::endl;
+	
+	std::vector<const DynamicCodeLoader*>::const_iterator it = deps.begin();
+	str <<	"function " << pLoader->loadAllFunctionName() << "(){" << std::endl;
+	for (; it != deps.end(); ++it)
+	{
+		if (*it)
+			str << (*it)->loadAllFunctionName() << "();" << std::endl;
+	}
+	if (deps.empty())
+		str <<		pLoader->loaderFunctionName() << "();";
+	else
+	{
+		str << "if (!" << pLoader->loaderFunctionName() << "PeriodicCheck){" << std::endl;
+		str <<		pLoader->loaderFunctionName() << "PeriodicCheck	= window.setInterval(" << std::endl;
+		str <<		pLoader->loaderFunctionName() << "Check, 1000);" << std::endl;
+		str <<	"}" << std::endl;
+	}
+	str <<	"}" << std::endl;
 	
 	DynamicCodeLoader* pL = const_cast<DynamicCodeLoader*>(pLoader);
 	pL->generateCode += Poco::delegate(&DynamicCodeLoaderRenderer::onCodeGen);
 	
 	WebApplication::instance().registerAjaxProcessor(Poco::NumberFormatter::format(pLoader->id()), pL);
+}
+
+
+void DynamicCodeLoaderRenderer::renderVariables(const DynamicCodeLoader* pLoader, const RenderContext& context, std::ostream& str)
+{
+	str <<	"var " << pLoader->loaderFunctionName() << "Loaded = false;" << std::endl;
+	if (!pLoader->dependencies().empty())
+	{
+		str <<	"var " << pLoader->loaderFunctionName() << "PeriodicCheck;" << std::endl;
+		str <<	"var " << pLoader->loaderFunctionName() << "RetryCnt = 30;" << std::endl;
+		str <<	"var " << pLoader->loaderFunctionName() << "MissingChildCnt = " << pLoader->dependencies().size() << ";" << std::endl;
+	}
 }
 
 
