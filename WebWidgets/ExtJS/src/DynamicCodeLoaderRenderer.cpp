@@ -93,7 +93,7 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	for (; itP != parents.end() ; ++itP)
 	{
 		if (*itP)
-			str <<		pLoader->loaderFunctionName() << "MissingChildCnt--;" << std::endl;
+			str <<		(*itP)->loaderFunctionName() << "MissingChildCnt--;" << std::endl;
 	}
 	if (!pLoader->getSuccessCall().empty())
 		str <<			pLoader->getSuccessCall() << ";" << std::endl;
@@ -107,9 +107,11 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	if (!deps.empty())
 	{
 		// write the Check function
-		str <<	"function " << pLoader->loadAllFunctionName() << "Check(){" << std::endl;
-		str <<		"if (" << pLoader->loaderFunctionName() << "MissingChildCnt <= 0)" << std::endl;
-		str <<			str <<		pLoader->loaderFunctionName() << "();" << std::endl;
+		str <<	"function " << pLoader->loaderFunctionName() << "Check(){" << std::endl;
+		str <<		"if (" << pLoader->loaderFunctionName() << "MissingChildCnt <= 0){" << std::endl;
+		str <<			pLoader->loaderFunctionName() << "();" << std::endl;
+		str <<			"window.clearInterval(" << pLoader->loaderFunctionName() << "PeriodicCheck);" << std::endl;
+		str <<		"}";
 		str <<		pLoader->loaderFunctionName() << "RetryCnt--;" << std::endl;
 		str <<		"if (" << pLoader->loaderFunctionName() << "RetryCnt < 0) {" << std::endl;
 		str <<			"Ext.Msg.alert ('Load Failed', 'Not all children could be loaded for the page');" << std::endl;
@@ -151,7 +153,7 @@ void DynamicCodeLoaderRenderer::renderVariables(const DynamicCodeLoader* pLoader
 	if (!pLoader->dependencies().empty())
 	{
 		str <<	"var " << pLoader->loaderFunctionName() << "PeriodicCheck;" << std::endl;
-		str <<	"var " << pLoader->loaderFunctionName() << "RetryCnt = 30;" << std::endl;
+		str <<	"var " << pLoader->loaderFunctionName() << "RetryCnt = 60;" << std::endl;
 		str <<	"var " << pLoader->loaderFunctionName() << "MissingChildCnt = " << pLoader->dependencies().size() << ";" << std::endl;
 	}
 }
