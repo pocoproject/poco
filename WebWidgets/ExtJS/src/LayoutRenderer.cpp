@@ -106,6 +106,12 @@ void LayoutRenderer::renderParameters(const Layout* pLayout, const RenderContext
 		
 	if (pLayout->getWidth() > 0)
 		ostr << "width:" << pLayout->getWidth() << ",";
+	else
+		ostr << "width:'auto',";
+	if (pLayout->getHeight() > 0)
+		ostr << "height:" << pLayout->getHeight() << ",";
+	else
+		ostr << "height:'auto',";
 	
 	ostr << "layout:'table'";
 	ostr << ",layoutConfig:" << "{columns:" << cols << "}";

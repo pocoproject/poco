@@ -95,8 +95,12 @@ void FrameRenderer::writeProperties(const Frame* pFrame, std::ostream& ostr)
 	ostr << ",frame:true,header:true,autoScroll:true";
 	if (pFrame->getWidth() > 0)
 		ostr << ",width:" << pFrame->getWidth();
+	else
+		ostr << ",width:'auto'";
 	if (pFrame->getHeight() > 0)
 		ostr << ",height:" << pFrame->getHeight();
+	else
+		ostr << ",height:'auto'";
 	if (!pFrame->getTitle().empty())
 		ostr << ",title:'" << pFrame->getTitle() << "'";
 	if (pFrame->collapsible())
