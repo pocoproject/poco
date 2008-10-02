@@ -140,6 +140,8 @@ protected:
 	~Page();
 		/// Destroys the Page.
 		
+	std::set<DynamicCodeLoader::Ptr>& dynamicCodeLoaders();	
+		
 private:
 	std::string     _text;
 	ResourceManager _rm;
@@ -213,6 +215,12 @@ inline void Page::addDynamicCodeLoader(DynamicCodeLoader::Ptr pLoader)
 
 
 inline const std::set<DynamicCodeLoader::Ptr>& Page::dynamicCodeLoaders() const
+{
+	return _codeLoaders;
+}
+
+
+inline std::set<DynamicCodeLoader::Ptr>& Page::dynamicCodeLoaders()
 {
 	return _codeLoaders;
 }
