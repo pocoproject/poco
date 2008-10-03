@@ -36,7 +36,7 @@ endif
 
 objects = ODBCTestSuite Driver \
 	ODBCDB2Test ODBCMySQLTest ODBCOracleTest \
-	ODBCPostgreSQLTest ODBCSQLiteTest SQLExecutor
+	ODBCPostgreSQLTest ODBCSQLiteTest ODBCSQLServerTest SQLExecutor
 
 ifeq ($(POCO_CONFIG),MinGW)
     objects += ODBCAccessTest ODBCSQLServerTest

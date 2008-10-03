@@ -125,7 +125,8 @@ void ODBCDB2Test::testBareboneODBC()
 		"Second VARCHAR(30),"
 		"Third BLOB,"
 		"Fourth INTEGER,"
-		"Fifth FLOAT)";
+		"Fifth FLOAT,"
+		"Sixth TIMESTAMP)";
 
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);

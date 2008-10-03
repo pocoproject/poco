@@ -36,9 +36,9 @@
 #include "ODBCOracleTest.h"
 #include "ODBCPostgreSQLTest.h"
 #include "ODBCSQLiteTest.h"
+#include "ODBCSQLServerTest.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "ODBCAccessTest.h"
-#include "ODBCSQLServerTest.h"
 #endif
 
 CppUnit::Test* ODBCTestSuite::suite()
@@ -65,9 +65,11 @@ CppUnit::Test* ODBCTestSuite::suite()
 	pSuite->addTest(ODBCDB2Test::suite());
 	pSuite->addTest(ODBCMySQLTest::suite());
 	pSuite->addTest(ODBCSQLiteTest::suite());
+	pSuite->addTest(ODBCSQLServerTest::suite());
+
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	pSuite->addTest(ODBCAccessTest::suite());
-	pSuite->addTest(ODBCSQLServerTest::suite());
-#endif	
+#endif
+		
 	return pSuite;
 }

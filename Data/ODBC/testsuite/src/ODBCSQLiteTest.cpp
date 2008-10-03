@@ -80,15 +80,14 @@ ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name):
 		try
 		{
 			_pSession = new Session(SessionFactory::instance().create(ODBC::Connector::KEY, _dbConnString));
+			if (_pSession && _pSession->isConnected()) 
+			std::cout << "*** Connected to " << _dbConnString << std::endl;
+			if (!_pExecutor) _pExecutor = new SQLExecutor("SQLite SQL Executor", _pSession);
 		}catch (ConnectionException& ex)
 		{
 			std::cout << "!!! WARNING: Connection failed. SQLite tests will fail !!!" << std::endl;
 			std::cout << ex.toString() << std::endl;
 		}
-
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dbConnString << std::endl;
-		if (!_pExecutor) _pExecutor = new SQLExecutor("SQLite SQL Executor", _pSession);
 	}
 	else 
 	if (!_pSession && !beenHere) 
@@ -113,7 +112,8 @@ void ODBCSQLiteTest::testBareboneODBC()
 		"Second VARCHAR(30),"
 		"Third BLOB,"
 		"Fourth INTEGER,"
-		"Fifth REAL)";
+		"Fifth REAL,"
+		"Sixth TIMESTAMP)";
 
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
@@ -736,7 +736,11 @@ void ODBCSQLiteTest::dropTable(const std::string& tableName)
 			}
 		}
 
-		if (!ignoreError) throw;
+		if (!ignoreError) 
+		{
+			std::cout << ex.displayText() << std::endl;
+			throw;
+		}
 	}
 }
 
@@ -815,6 +819,7 @@ void ODBCSQLiteTest::checkODBCSetup()
 	{
 		beenHere = true;
 		bool driverFound = false;
+		std::string driverName;
 
 		Utility::DriverMap::iterator itDriver = _drivers.begin();
 		for (; itDriver != _drivers.end(); ++itDriver)
@@ -824,28 +829,26 @@ void ODBCSQLiteTest::checkODBCSetup()
 				std::cout << "Driver found: " << itDriver->first 
 					<< " (" << itDriver->second << ')' << std::endl;
 
+				driverName = itDriver->first;
 				driverFound = true; 
 				break;
 			}
 		}
 
-		if (!driverFound) 
+		if (driverFound) 
 		{
-			if (!_pSession && _dbConnString.empty())
+			if (_dbConnString.empty() && !driverName.empty())
 			{
-				std::cout << "SQLite3 DSN NOT found, will attempt to connect without it." << std::endl;
-				_dbConnString = "Driver=SQLite3 ODBC Driver;Database=dummy.db;";
+				_dbConnString = format("Driver=%s;Database=dummy.db;", driverName);
+				return;
 			}
-			else if (!_dbConnString.empty())
+			else if (driverName.empty())
 			{
-				std::cout << "SQLite3 tests not available." << std::endl;
+				std::cout << "SQLite3 driver not found. Tests not available." << std::endl;
 				return;
 			}
 		}
 	}
-
-	if (!_pSession)
-		_dbConnString = "Driver=SQLite3 ODBC Driver;Database=dummy.db;";
 }
 
 
@@ -856,8 +859,6 @@ void ODBCSQLiteTest::setUp()
 
 void ODBCSQLiteTest::tearDown()
 {
-	dropTable("Person");
-	dropTable("Strings");
 }
 
 
@@ -908,3 +909,4 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 
 	return pSuite;
 }
+

@@ -81,12 +81,14 @@ ODBCOracleTest::ODBCOracleTest(const std::string& name):
 	static bool beenHere = false;
 
 	ODBC::Connector::registerConnector();
+	
 	if (_drivers.empty() || _dataSources.empty()) 
 	{
 		Utility::drivers(_drivers);
 		Utility::dataSources(_dataSources);
 		checkODBCSetup();
 	}
+	
 	if (!_pSession && !_dbConnString.empty() && !beenHere)
 	{
 		try
@@ -125,7 +127,8 @@ void ODBCOracleTest::testBareboneODBC()
 		"Second VARCHAR(30),"
 		"Third BLOB,"
 		"Fourth INTEGER,"
-		"Fifth NUMBER)";
+		"Fifth NUMBER,"
+		"Sixth TIMESTAMP)";
 
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
@@ -766,7 +769,11 @@ void ODBCOracleTest::dropTable(const std::string& tableName)
 			}
 		}
 
-		if (!ignoreError) throw;
+		if (!ignoreError) 
+		{
+			std::cout << ex.displayText() << std::endl;
+			throw;
+		}
 	}
 }
 
@@ -909,6 +916,8 @@ void ODBCOracleTest::checkODBCSetup()
 					"EXC=F;" // EXEC syntax (T/F), default F
 					"APA=T;" // thread safety (T/F), default T
 					"DBA=W;"; // write access
+
+				return;
 			}
 			else if (!_dbConnString.empty())
 			{
@@ -919,7 +928,9 @@ void ODBCOracleTest::checkODBCSetup()
 	}
 
 	if (!_pSession)
-		format(_dbConnString, "DSN=%s;Uid=Scott;Pwd=Tiger;", _dsn);
+		format(_dbConnString, "DSN=%s;Uid=%s;Pwd=%s;", _dsn,
+			std::string(ORACLE_UID),
+			std::string(ORACLE_PWD));
 }
 
 
@@ -930,8 +941,6 @@ void ODBCOracleTest::setUp()
 
 void ODBCOracleTest::tearDown()
 {
-	dropTable("Person");
-	dropTable("Strings");
 }
 
 

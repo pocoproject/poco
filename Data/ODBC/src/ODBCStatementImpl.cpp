@@ -56,12 +56,6 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_stepCalled(false),
 	_nextResponse(0)
 {
-	checkError(SQLSetStmtAttr(_stmt, 
-		SQL_CURSOR_TYPE, 
-		(SQLPOINTER) SQL_CURSOR_FORWARD_ONLY, 
-		0),
-			"SQLSetStmtAttr(SQL_CURSOR_TYPE, SQL_CURSOR_FORWARD_ONLY)");
-
 	if (_rSession.getFeature("autoBind"))
 	{
 		SQLSetStmtAttr(_stmt, 

@@ -39,6 +39,43 @@
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/Data/ODBC/ODBCException.h"
+
+
+#define poco_odbc_check_env(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		Poco::Data::ODBC::EnvironmentException ee(h); \
+		std::cout << ee.toString() << std::endl; \
+	} \
+	assert (SQL_SUCCEEDED(r))
+
+
+#define poco_odbc_check_dbc(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		Poco::Data::ODBC::ConnectionException ce(h); \
+		std::cout << ce.toString() << std::endl; \
+	} \
+	assert (SQL_SUCCEEDED(r))
+
+
+#define poco_odbc_check_stmt(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		Poco::Data::ODBC::StatementException se(h); \
+		std::cout << se.toString() << std::endl; \
+	} \
+	assert (SQL_SUCCEEDED(r))
+
+
+#define poco_odbc_check_desc(r, h) \
+	if (!SQL_SUCCEEDED(r))	\
+	{ \
+		Poco::Data::ODBC::DescriptorException de(h); \
+		std::cout << de.toString() << std::endl; \
+	} \
+	assert (SQL_SUCCEEDED(r))
 
 
 class SQLExecutor: public CppUnit::TestCase
@@ -62,7 +99,8 @@ public:
 	void bareboneODBCTest(const std::string& dbConnString,
 		const std::string& tableCreateString,
 		DataBinding bindMode, 
-		DataExtraction extractMode);
+		DataExtraction extractMode,
+		bool doTime=true);
 		/// This function uses "bare bone" ODBC API calls (i.e. calls are not 
 		/// "wrapped" in PocoData framework structures).
 		/// The purpose of the function is to verify that driver behaves

@@ -58,7 +58,7 @@
 #define POSTGRESQL_DSN "PocoDataPgSQLTest"
 #define POSTGRESQL_SERVER "localhost"
 #define POSTGRESQL_PORT "5432"
-#define POSTGRESQL_DB "postgres"
+#define POSTGRESQL_DB "template1"
 #define POSTGRESQL_UID "postgres"
 #define POSTGRESQL_PWD "postgres"
 
@@ -132,7 +132,8 @@ void ODBCPostgreSQLTest::testBareboneODBC()
 		"Second VARCHAR(30),"
 		"Third BYTEA,"
 		"Fourth INTEGER,"
-		"Fifth FLOAT)";
+		"Fifth FLOAT,"
+		"Sixth TIMESTAMP)";
 
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
@@ -915,6 +916,8 @@ void ODBCPostgreSQLTest::checkODBCSetup()
 					"ShowOidColumn=0;"
 					"FakeOidIndex=0;"
 					"ReadOnly=0;";
+
+				return;
 			}
 			else if (!_dbConnString.empty())
 			{

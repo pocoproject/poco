@@ -130,7 +130,8 @@ void ODBCMySQLTest::testBareboneODBC()
 		"Second VARCHAR(30),"
 		"Third VARBINARY(30),"
 		"Fourth INTEGER,"
-		"Fifth FLOAT)";
+		"Fifth FLOAT,"
+		"Sixth DATETIME)";
 
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
