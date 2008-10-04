@@ -77,30 +77,30 @@ POCO_HOST_OSNAME = MinGW
 endif
 POCO_HOST_OSARCH = $(subst /,-,$(shell uname -m | tr ' ' _))
 
-
+#
 # Begin Sun platforms
 #
 # Pure Solaris or GNU (Nexenta), Sun Forte and Sun Studio compilers supported
 # (on Nexenta, the default compiler is g++)
 #
-
 ifeq ($(findstring SunOS,$(POCO_HOST_OSNAME)),SunOS)
   # detect if this is Nexenta platform
   POCO_HOST_ALL_OSNAME := $(shell uname -a)
   ifeq ($(findstring Nexenta,$(POCO_HOST_ALL_OSNAME)),Nexenta)
     POCO_HOST_OSNAME := Nexenta
   else # Up to version 5.5 SunOS-SunForte config is used, 5.6 and above use SunOS-SunStudio
-    POCO_COMPILER_NAME := $(shell CC -V 2>&1)
-    POCO_COMPILER_VERSION := $(subst .,,$(filter 5.%,$(POCO_COMPILER_NAME)))
+    ifeq ($(POCO_CONFIG),SunOS)
+      POCO_COMPILER_NAME := $(shell CC -V 2>&1)
+      POCO_COMPILER_VERSION := $(subst .,,$(filter 5.%,$(POCO_COMPILER_NAME)))
     
-    ifeq (0, $(shell test $(POCO_COMPILER_VERSION) -gt 55; echo $$?))
-      POCO_CONFIG := SunOS-SunStudio
-    else
-      POCO_CONFIG := SunOS-SunForte
+      ifeq (0, $(shell test $(POCO_COMPILER_VERSION) -gt 55; echo $$?))
+        POCO_CONFIG := SunOS-SunStudio
+      else
+        POCO_CONFIG := SunOS-SunForte
+      endif
     endif
   endif
 endif
-
 #
 # End Sun Platforms
 #

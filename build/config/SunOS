@@ -1,0 +1,9 @@
+#
+# $Id: //poco/1.3/build/config/SunOS-SunStudio#1 $
+#
+# SunOS
+#
+# Build settings for SunOS/Sun Studio C++
+#
+
+include $(POCO_BASE)/SunOS-SunStudio
