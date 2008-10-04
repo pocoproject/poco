@@ -1720,7 +1720,6 @@ void SQLExecutor::internalExtraction()
 		}
 		catch (BadCastException&)
 		{
-			std::cout << "float" << std::endl;
 			float f = rset.value<float>(1,1);
 			assert (2.5 == f);
 		}
