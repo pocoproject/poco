@@ -252,7 +252,7 @@ inline void Binder::bind(std::size_t pos, const double& val)
 
 inline void Binder::bind(std::size_t pos, const bool& val)
 {
-	bindImpl(pos, val, Utility::boolDataType);
+	bindImpl(pos, val, SQL_C_BIT);
 }
 
 

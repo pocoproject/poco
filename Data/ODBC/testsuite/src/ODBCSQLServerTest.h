@@ -100,6 +100,7 @@ public:
 	void testBLOB();
 	void testBLOBStmt();
 
+	void testBool();
 	void testFloat();
 	void testDouble();
 
@@ -119,6 +120,7 @@ private:
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
 	void recreateStringsTable();
+	void recreateBoolsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();
 	void recreateTuplesTable();

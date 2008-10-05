@@ -641,6 +641,21 @@ void ODBCSQLiteTest::testBLOBStmt()
 }
 
 
+void ODBCSQLiteTest::testBool()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateBoolsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->bools();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLiteTest::testFloat()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -781,6 +796,15 @@ void ODBCSQLiteTest::recreateStringsTable()
 }
 
 
+void ODBCSQLiteTest::recreateBoolsTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+}
+
+
 void ODBCSQLiteTest::recreateFloatsTable()
 {
 	dropTable("Strings");
@@ -901,6 +925,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 	CppUnit_addTest(pSuite, ODBCSQLiteTest, testEmptyDB);
 	CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOB);
 	CppUnit_addTest(pSuite, ODBCSQLiteTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, ODBCSQLiteTest, testBool);
 	CppUnit_addTest(pSuite, ODBCSQLiteTest, testFloat);
 	CppUnit_addTest(pSuite, ODBCSQLiteTest, testDouble);
 	CppUnit_addTest(pSuite, ODBCSQLiteTest, testTuple);

@@ -266,7 +266,7 @@ inline void Preparation::prepare(std::size_t pos, Poco::UInt64)
 
 inline void Preparation::prepare(std::size_t pos, bool)
 {
-	preparePOD<bool>(pos, Utility::boolDataType);
+	preparePOD<bool>(pos, SQL_C_BIT);
 }
 
 

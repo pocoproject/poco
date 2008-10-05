@@ -294,6 +294,8 @@ std::string ODBCStatementImpl::nativeSQL()
 
 void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 {
+	if (SQL_NO_DATA == rc) return;
+
 	if (Utility::isError(rc))
 	{
 		std::ostringstream os; 	 

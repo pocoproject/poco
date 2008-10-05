@@ -147,6 +147,7 @@ public:
 	void blob(int bigSize = 1024);
 	void blobStmt();
 
+	void bools();
 	void floats();
 	void doubles();
 	void tuples();

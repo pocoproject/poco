@@ -148,7 +148,7 @@ void Preparation::prepare(std::size_t pos, const Poco::Any&)
 			return preparePOD<Poco::UInt64>(pos, SQL_C_UBIGINT);
 
 		case MetaColumn::FDT_BOOL:
-			return preparePOD<bool>(pos, Utility::boolDataType);
+			return preparePOD<bool>(pos, SQL_C_BIT);
 
 		case MetaColumn::FDT_FLOAT:
 			return preparePOD<float>(pos, SQL_C_FLOAT);

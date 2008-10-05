@@ -669,6 +669,21 @@ void ODBCMySQLTest::testBLOBStmt()
 }
 
 
+void ODBCMySQLTest::testBool()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateBoolsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->bools();
+		i += 2;
+	}
+}
+
+
 void ODBCMySQLTest::testFloat()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -802,6 +817,15 @@ void ODBCMySQLTest::recreateStringsTable()
 	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
+}
+
+
+void ODBCMySQLTest::recreateBoolsTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
 
 
@@ -952,6 +976,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testEmptyDB);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOB);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testBool);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testFloat);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDouble);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testTuple);

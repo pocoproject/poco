@@ -156,10 +156,13 @@ void ODBCSQLServerTest::testSimpleAccess()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("testSimpleAccess()"); }
 
+	std::cout << "count: " << count << std::endl;
+
 	assert (1 == count);
 
 	for (int i = 0; i < 8;)
 	{
+		std::cout << "step: " << i << std::endl;
 		recreatePersonTable();
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
@@ -683,6 +686,21 @@ void ODBCSQLServerTest::testBLOBStmt()
 }
 
 
+void ODBCSQLServerTest::testBool()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateBoolsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->bools();
+		i += 2;
+	}
+}
+
+
 void ODBCSQLServerTest::testFloat()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -778,7 +796,11 @@ void ODBCSQLServerTest::dropTable(const std::string& tableName)
 			}
 		}
 
-		if (!ignoreError) throw;
+		if (!ignoreError) 
+		{
+			std::cout << ex.displayText() << std::endl;
+			throw;
+		}
 	}
 }
 
@@ -816,6 +838,15 @@ void ODBCSQLServerTest::recreateStringsTable()
 	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
+}
+
+
+void ODBCSQLServerTest::recreateBoolsTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
 
 
@@ -872,7 +903,7 @@ void ODBCSQLServerTest::checkODBCSetup()
 		Utility::DriverMap::iterator itDrv = _drivers.begin();
 		for (; itDrv != _drivers.end(); ++itDrv)
 		{
-			if (((itDrv->first).find("SQL Server") != std::string::npos))
+			if (((itDrv->first).find(MS_SQL_SERVER_ODBC_DRIVER) != std::string::npos))
 			{
 				std::cout << "Driver found: " << itDrv->first 
 					<< " (" << itDrv->second << ')' << std::endl;
@@ -891,8 +922,7 @@ void ODBCSQLServerTest::checkODBCSetup()
 		for (; itDSN != _dataSources.end(); ++itDSN)
 		{
 			if (((itDSN->first).find(_dsn) != std::string::npos) &&
-				(((itDSN->second).find("SQL Server") != std::string::npos) ||
-				 ((itDSN->second).find("SQL Native Client") != std::string::npos)))
+				(((itDSN->second).find(MS_SQL_SERVER_ODBC_DRIVER) != std::string::npos)))
 			{
 				std::cout << "DSN found: " << itDSN->first 
 					<< " (" << itDSN->second << ')' << std::endl;
@@ -912,6 +942,7 @@ void ODBCSQLServerTest::checkODBCSetup()
 					"DATABASE=" MS_SQL_SERVER_DB ";"
 					"SERVER=" MS_SQL_SERVER_SERVER ";"
 					"PORT=" MS_SQL_SERVER_PORT ";";
+				return;
 			}
 			else if (!_dbConnString.empty())
 			{
@@ -933,8 +964,6 @@ void ODBCSQLServerTest::setUp()
 
 void ODBCSQLServerTest::tearDown()
 {
-	dropTable("Person");
-	dropTable("Strings");
 }
 
 
@@ -977,6 +1006,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 	CppUnit_addTest(pSuite, ODBCSQLServerTest, testEmptyDB);
 	CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOB);
 	CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, ODBCSQLServerTest, testBool);
 	CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);
 	CppUnit_addTest(pSuite, ODBCSQLServerTest, testDouble);
 	CppUnit_addTest(pSuite, ODBCSQLServerTest, testTuple);

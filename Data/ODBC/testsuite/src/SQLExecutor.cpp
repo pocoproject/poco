@@ -249,7 +249,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			poco_odbc_check_stmt (rc, hstmt);
 
 			rc = SQLExecute(hstmt);
-			poco_odbc_check_stmt (rc, hstmt);
+			assert (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
 
 			sql = "INSERT INTO Test VALUES (?,?,?,?,?,?)";
 			pStr = (SQLCHAR*) sql.c_str();
@@ -571,7 +571,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			sql = "DROP TABLE Test";
 			pStr = (SQLCHAR*) sql.c_str();
 			rc = SQLExecDirect(hstmt, pStr, (SQLINTEGER) sql.length());
-			poco_odbc_check_stmt (rc, hstmt);
+			assert (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
 
 			rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 			poco_odbc_check_stmt (rc, hstmt);
@@ -606,7 +606,6 @@ void SQLExecutor::simpleAccess()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
 	assert (count == 1);
 
 	try { *_pSession << "SELECT LastName FROM Person", into(result), now;  }
@@ -787,6 +786,29 @@ void SQLExecutor::insertSingleBulk()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == ((0+99)*100/2));
+}
+
+
+void SQLExecutor::bools()
+{
+	std::string funct = "bools()";
+	bool data = true;
+	bool ret = false;
+
+	try { *_pSession << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (ret);
 }
 
 

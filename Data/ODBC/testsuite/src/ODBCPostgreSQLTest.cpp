@@ -667,6 +667,21 @@ void ODBCPostgreSQLTest::testBLOBStmt()
 }
 
 
+void ODBCPostgreSQLTest::testBool()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateBoolsTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->bools();
+		i += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::testFloat()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -800,6 +815,15 @@ void ODBCPostgreSQLTest::recreateStringsTable()
 	try { *_pSession << "CREATE TABLE Strings (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
+}
+
+
+void ODBCPostgreSQLTest::recreateBoolsTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
 
 
@@ -983,6 +1007,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testEmptyDB);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOB);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBool);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testFloat);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDouble);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTuple);
