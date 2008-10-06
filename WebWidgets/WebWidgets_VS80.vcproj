@@ -674,6 +674,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\WebWidgets\PeriodicUpdater.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\WebWidgets\ProgressIndicator.h"
 					>
 				</File>
@@ -695,6 +699,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\WebWidgets\TableModel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\WebWidgets\TableUpdater.h"
 					>
 				</File>
 				<File
@@ -742,6 +750,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\PeriodicUpdater.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ProgressIndicator.cpp"
 					>
 				</File>
@@ -763,6 +775,10 @@
 				</File>
 				<File
 					RelativePath=".\src\TableModel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TableUpdater.cpp"
 					>
 				</File>
 				<File
