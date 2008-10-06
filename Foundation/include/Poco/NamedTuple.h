@@ -192,7 +192,7 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -231,7 +231,7 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
         throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -484,7 +484,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -522,7 +522,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -768,7 +768,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -805,7 +805,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -1044,7 +1044,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -1080,7 +1080,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -1313,7 +1313,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -1348,7 +1348,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -1574,7 +1574,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -1608,7 +1608,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -1827,7 +1827,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -1860,7 +1860,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -2071,7 +2071,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -2103,7 +2103,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -2308,7 +2308,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -2339,7 +2339,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -2536,7 +2536,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -2566,7 +2566,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -2757,7 +2757,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -2786,7 +2786,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -2970,7 +2970,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5,n6,n7,n8);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -2998,7 +2998,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -3175,7 +3175,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5,n6,n7);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -3202,7 +3202,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -3370,7 +3370,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5,n6);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -3396,7 +3396,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -3557,7 +3557,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,NullTypeList>:
         init(n0,n1,n2,n3,n4,n5);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -3582,7 +3582,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -3738,7 +3738,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
         init(n0,n1,n2,n3,n4);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -3762,7 +3762,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -3910,7 +3910,7 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
         init(n0,n1,n2,n3);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -3933,7 +3933,7 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -4075,7 +4075,7 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
         init(n0,n1,n2);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -4097,7 +4097,7 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -4232,7 +4232,7 @@ struct NamedTuple<T0,T1,NullTypeList>:
         init(n0,n1);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -4253,7 +4253,7 @@ struct NamedTuple<T0,T1,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
@@ -4380,7 +4380,7 @@ struct NamedTuple<T0,NullTypeList>:
         init(n0);
     }
 
-    DynamicAny get(const std::string& name) const
+    const DynamicAny get(const std::string& name) const
     {
         NameVec::const_iterator it = _pNames->begin(); 
         NameVec::const_iterator itEnd = _pNames->end();
@@ -4400,7 +4400,7 @@ struct NamedTuple<T0,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
     }
 
-    DynamicAny operator [] (const std::string& name) const
+    const DynamicAny operator [] (const std::string& name) const
     {
         return get(name);
     }
