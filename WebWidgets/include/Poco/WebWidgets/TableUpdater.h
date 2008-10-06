@@ -63,10 +63,13 @@ public:
 
 	virtual void update() = 0;
 		/// Updates the table from a given source
+		/// Will update the internally stored TableModel
 
 	virtual TableModel::Ptr model();
+		/// returns the latest model
 
 	virtual const TableModel::Ptr model() const;
+		/// returns the latest model
 
 protected:
 	TableUpdater();
