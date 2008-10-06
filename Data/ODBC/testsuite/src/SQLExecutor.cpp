@@ -808,6 +808,8 @@ void SQLExecutor::bools()
 	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	// fails with MySQL on Windows
 	assert (ret);
 }
 

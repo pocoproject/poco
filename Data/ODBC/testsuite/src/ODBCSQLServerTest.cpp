@@ -156,13 +156,10 @@ void ODBCSQLServerTest::testSimpleAccess()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("testSimpleAccess()"); }
 
-	std::cout << "count: " << count << std::endl;
-
 	assert (1 == count);
 
 	for (int i = 0; i < 8;)
 	{
-		std::cout << "step: " << i << std::endl;
 		recreatePersonTable();
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
