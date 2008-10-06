@@ -8,14 +8,14 @@ rem command-line build script for MS Visual Studio
 rem
 rem Usage:
 rem ------
-rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIG] [SAMPLES]
+rem buildwin  VS_VERSION       [ACTION]             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
 rem VS_VERSION: 71|80|90
 rem ACTION:     build|rebuild|clean
 rem LINKMODE:   static|shared|both
 rem CONFIG:     release|debug|both
 rem SAMPLES:    yes|no
 rem
-rem VS_VERSION is required. Default is build all.
+rem VS_VERSION is required argument. Default is build all.
 
 rem Change OPENSSL_DIR to match your setup
 set OPENSSL_DIR=c:\OpenSSL
@@ -32,10 +32,12 @@ set VS_VERSION=vs%1
 
 rem Action [build|rebuild|clean]
 set ACTION=%2
-if "%ACTION%"=="" set ACTION=build
 if not "%ACTION%"=="build" (
 if not "%ACTION%"=="rebuild" (
-if not "%ACTION%"=="clean"  goto usage))
+if not "%ACTION%"=="" (
+if not "%ACTION%"=="clean"  goto usage)))
+
+if "%ACTION%"=="" (set ACTION="build")
 
 rem Link mode [static|shared|both]
 set LINK_MODE=%3
@@ -116,7 +118,9 @@ set DEBUG_SHARED=1
 set RELEASE_STATIC=1
 set RELEASE_SHARED=1)))))
 
+
 echo Building:
+
 if %DEBUG_SHARED%==1   (echo debug_shared)
 if %RELEASE_SHARED%==1 (echo release_shared)
 if %DEBUG_STATIC%==1   (echo debug_static)
@@ -188,7 +192,7 @@ goto :EOF
 :usage
 echo Usage:
 echo ------
-echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIG] [SAMPLES]
+echo buildwin  VS_VERSION       [ACTION]             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
 echo VS_VERSION: "71|80|90"
 echo ACTION:     "build|rebuild|clean"
 echo LINKMODE:   "static|shared|both"
