@@ -1,7 +1,7 @@
 //
 // UUID.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/UUID.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/UUID.h#2 $
 //
 // Library: Foundation
 // Package: UUID
@@ -155,7 +155,7 @@ protected:
 	static void appendHex(std::string& str, UInt8 n);
 	static void appendHex(std::string& str, UInt16 n);
 	static void appendHex(std::string& str, UInt32 n);
-	static int nibble(char hex);
+	static UInt8 nibble(char hex);
 	void fromNetwork();
 	void toNetwork();
 

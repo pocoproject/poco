@@ -1,7 +1,7 @@
 //
 // UUID.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UUID.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/UUID.cpp#5 $
 //
 // Library: Foundation
 // Package: UUID
@@ -143,57 +143,42 @@ void UUID::swap(UUID& uuid)
 
 void UUID::parse(const std::string& uuid)
 {
-	UInt32 timeLow = 0;
-	UInt16 timeMid = 0;
-	UInt16 timeHiAndVersion = 0;
-	UInt16 clockSeq = 0;
-	UInt8  node[6] = {0, 0, 0, 0, 0, 0};
+	if (uuid.size() < 36)
+		throw SyntaxException(uuid);
+
+	if (uuid[8] != '-'|| uuid[13] != '-' || uuid[18] != '-' || uuid[23] != '-')
+		throw SyntaxException(uuid);
+	
 	std::string::const_iterator it  = uuid.begin();
-	std::string::const_iterator end = uuid.end();
-	if (it != end)
+	_timeLow = 0;
+	for (int i = 0; i < 8; ++i)
 	{
-		for (int i = 0; i < 8; ++i)
-		{
-			timeLow = timeLow*16 + nibble(*it++);
-			if (it == end) throw SyntaxException(uuid);
-		}
-		if (*it != '-') throw SyntaxException(uuid);
-		++it;
-		for (int i = 0; i < 4; ++i)
-		{
-			timeMid = timeMid*16 + nibble(*it++);
-			if (it == end) throw SyntaxException(uuid);
-		}
-		if (*it != '-') throw SyntaxException(uuid);
-		++it;
-		for (int i = 0; i < 4; ++i)
-		{
-			timeHiAndVersion = timeHiAndVersion*16 + nibble(*it++);
-			if (it == end) throw SyntaxException(uuid);
-		}
-		if (*it != '-') throw SyntaxException(uuid);
-		++it;
-		for (int i = 0; i < 4; ++i)
-		{
-			clockSeq = clockSeq*16 + nibble(*it++);
-			if (it == end) throw SyntaxException(uuid);
-		}
-		if (*it != '-') throw SyntaxException(uuid);
-		++it;
-		for (int i = 0; i < 6; ++i)
-		{
-			if (it == end) throw SyntaxException(uuid);
-			node[i] = node[i]*16 + nibble(*it++);
-			if (it == end) throw SyntaxException(uuid);
-			node[i] = node[i]*16 + nibble(*it++);
-		}
-		_timeLow = timeLow;
-		_timeMid = timeMid;
-		_timeHiAndVersion = timeHiAndVersion;
-		_clockSeq = clockSeq;
-		std::memcpy(_node, node, sizeof(_node));
+		_timeLow = (_timeLow << 4) | nibble(*it++);
+ 	}
+	++it;
+	_timeMid = 0;
+	for (int i = 0; i < 4; ++i)
+	{
+		_timeMid = (_timeMid << 4) | nibble(*it++);
 	}
-}
+	++it;
+	_timeHiAndVersion = 0;
+	for (int i = 0; i < 4; ++i)
+	{
+		_timeHiAndVersion = (_timeHiAndVersion << 4) | nibble(*it++);
+	}
+	++it;
+	_clockSeq = 0;
+	for (int i = 0; i < 4; ++i)
+	{
+		_clockSeq = (_clockSeq << 4) | nibble(*it++);
+	}
+	++it;
+	for (int i = 0; i < 6; ++i)
+	{
+		_node[i] = (nibble(*it++) << 4) | nibble(*it++) ;			
+	}
+}	
 
 
 std::string UUID::toString() const
@@ -303,16 +288,16 @@ void UUID::appendHex(std::string& str, UInt32 n)
 }
 
 
-int UUID::nibble(char hex)
+UInt8 UUID::nibble(char hex)
 {
 	if (hex >= 'a' && hex <= 'f')
-		return hex - 'a' + 10;
+		return UInt8(hex - 'a' + 10);
 	else if (hex >= 'A' && hex <= 'F')
-		return hex - 'A' + 10;
+		return UInt8(hex - 'A' + 10);
 	else if (hex >= '0' && hex <= '9')
-		return hex - '0';
+		return UInt8(hex - '0');
 	else
-		return 0;
+		return UInt8(0);
 }
 
 

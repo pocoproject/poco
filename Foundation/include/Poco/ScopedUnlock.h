@@ -1,7 +1,7 @@
 //
 // ScopedUnlock.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ScopedUnlock.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/ScopedUnlock.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -51,7 +51,7 @@ class ScopedUnlock
 	/// A class that simplifies thread synchronization
 	/// with a mutex.
 	/// The constructor accepts a Mutex and unlocks it.
-	/// The destructor unlocks the mutex.
+	/// The destructor locks the mutex.
 {
 public:
 	inline ScopedUnlock(M& mutex, bool unlockNow = true): _mutex(mutex)
