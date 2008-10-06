@@ -52,4 +52,14 @@ SimpleTableModel::~SimpleTableModel()
 }
 
 
+TableModel::Ptr SimpleTableModel::clone() const
+{
+	SimpleTableModel::Ptr pModel(new SimpleTableModel(getColumnCount()));
+
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	pModel->_data = _data;
+	return pModel;
+}
+
+
 } } // namespace Poco::WebWidgets

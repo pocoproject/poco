@@ -187,6 +187,9 @@ public:
 	const TableModel& getModel() const;
 		/// Returns the table model
 
+	void setModel(TableModel::Ptr ptr);
+		/// Sets the table model
+
 	void handleForm(const std::string& field, const std::string& value);
 		/// Handles a form field submitted by the client.
 	
@@ -277,6 +280,13 @@ inline const Table::TableColumns& Table::getColumns() const
 inline const TableModel& Table::getModel() const
 {
 	return *_pModel;
+}
+
+
+inline void Table::setModel(TableModel::Ptr ptr)
+{
+	poco_check_ptr (ptr);
+	_pModel = ptr;
 }
 
 

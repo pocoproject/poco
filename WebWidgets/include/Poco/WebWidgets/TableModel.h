@@ -75,7 +75,10 @@ public:
 		/// Removes the row from the TableModel
 		
 	virtual void clear() = 0;
-		/// Deletes all rows from the TableModel	
+		/// Deletes all rows from the TableModel
+
+	virtual TableModel::Ptr clone() const = 0;
+		/// Creates a deep-copy of the table
 
 protected:
 	virtual ~TableModel();

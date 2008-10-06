@@ -41,6 +41,7 @@
 
 
 #include "Poco/WebWidgets/TableModel.h"
+#include "Poco/Mutex.h"
 #include <vector>
 
 
@@ -55,6 +56,7 @@ class WebWidgets_API SimpleTableModel: public TableModel
 public:
 	typedef std::vector<Poco::Any> Row;
 	typedef std::vector<Row> TableData;
+	typedef Poco::AutoPtr<SimpleTableModel> Ptr;
 
 	SimpleTableModel(std::size_t colCnt);
 		/// Creates the SimpleTableModel.
@@ -69,10 +71,13 @@ public:
 		/// Sets the value at pos(row, col)
 
 	void deleteRow(std::size_t row);
-		/// Removes the row from the TableModel
+		/// Removes the row from the TableModel. NOT IMPLEMENTED!
 		
 	void clear();
 		/// Deletes all rows from the TableModel	
+
+	TableModel::Ptr clone() const;
+		/// Creates a deep-copy of the table
 	
 protected:
 	virtual ~SimpleTableModel();
@@ -80,6 +85,7 @@ protected:
 
 private:
 	TableData _data;
+	mutable Poco::FastMutex _mutex;
 };
 
 
@@ -97,6 +103,7 @@ inline std::size_t SimpleTableModel::getRowCount() const
 
 inline void SimpleTableModel::setValue(const Poco::Any& val, std::size_t row, std::size_t col)
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	if (_data.size() < row+1)
 		_data.resize(row+1, Row(getColumnCount()));
 	_data[row][col] = val;

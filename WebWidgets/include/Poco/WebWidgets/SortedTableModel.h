@@ -88,6 +88,9 @@ public:
 
 	std::size_t mapping(std::size_t) const;
 
+	TableModel::Ptr clone() const;
+		/// SortedTableModel doesn't clone the inner table.
+
 protected:
 	virtual ~SortedTableModel();
 		/// Destroys the SortedTableModel.

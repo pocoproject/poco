@@ -141,4 +141,11 @@ void SortedTableModel::forceResort(std::size_t col, bool sortAscending)
 }
 
 
+TableModel::Ptr SortedTableModel::clone() const
+{
+	SortedTableModel::Ptr pModel(new SortedTableModel(_pTable, _sortCol, _sortAscending));
+	return pModel;
+}
+
+
 } } // namespace Poco::WebWidgets
