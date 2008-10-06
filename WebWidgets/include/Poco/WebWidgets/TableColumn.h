@@ -109,6 +109,12 @@ public:
 	bool isHidden() const;
 		/// Returns the hidden status of the TableColumn
 
+	void resizable(bool val);
+		/// Sets if th ecolumn is resizable
+
+	bool resizable() const;
+		/// Returns if the column is resizable
+
 protected:
 	virtual ~TableColumn();
 		/// Destroys the TableColumn.
@@ -117,6 +123,7 @@ private:
 	Cell::Ptr   _pCell;
 	bool        _sortable;
 	bool        _hidden;
+	bool        _resizable;
 	std::string _header;
 	std::string _customRenderer;
 };
@@ -215,7 +222,19 @@ inline bool TableColumn::isHidden() const
 {
 	return _hidden;
 }
-	
+
+
+inline void TableColumn::resizable(bool val)
+{
+	_resizable = val;
+}
+
+
+inline bool TableColumn::resizable() const
+{
+	return _resizable;
+}
+
 	
 } } // namespace Poco::WebWidgets
 

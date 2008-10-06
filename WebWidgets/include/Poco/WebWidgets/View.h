@@ -170,7 +170,13 @@ public:
 		/// Returns css class
 		
 	bool hasClass() const;
-		/// Checks if a css value is set		
+		/// Checks if a css value is set
+
+	void showBorder(bool show);
+		/// Show the border around the view
+	
+	bool showBorder() const;	
+		/// Returns if view border is shown
 	
 protected:
 	View(const std::string& name, const std::type_info& type);
@@ -203,6 +209,7 @@ private:
 	std::string  _name;
 	View*        _pParent;
 	bool         _visible;
+	bool        _showBorder;
 	Poco::UInt32 _width;
 	Poco::UInt32 _height;
 	Pos          _pos;
@@ -324,6 +331,17 @@ inline bool View::hasClass() const
 	return !getClass().empty();
 }
 
+
+inline void View::showBorder(bool show)
+{
+	_showBorder = show;
+}
+
+
+inline bool View::showBorder() const
+{
+	return _showBorder;
+}
 
 } } // namespace Poco::WebWidgets
 

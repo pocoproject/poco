@@ -46,6 +46,7 @@ View::View(const std::string& name, const std::type_info& type):
 	_name(name),
 	_pParent(0),
 	_visible(true),
+	_showBorder(true),
 	_width(0),
 	_height(0)
 {
@@ -57,6 +58,7 @@ View::View(const std::type_info& type):
 	_name(),
 	_pParent(0),
 	_visible(true),
+	_showBorder(true),
 	_width(0),
 	_height(0)
 {

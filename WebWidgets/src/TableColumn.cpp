@@ -46,6 +46,7 @@ TableColumn::TableColumn(Cell::Ptr pCellFormat):
 	_pCell(pCellFormat),
 	_sortable(false),
 	_hidden(false),
+	_resizable(true),
 	_header()
 {
 	if (_pCell)
@@ -58,6 +59,7 @@ TableColumn::TableColumn(Cell::Ptr pCellFormat, const std::string& name, int wid
 	_pCell(pCellFormat),
 	_sortable(sortable),
 	_hidden(false),
+	_resizable(true),
 	_header(name)
 {
 	setWidth(width);

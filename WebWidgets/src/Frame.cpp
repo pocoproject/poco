@@ -46,8 +46,7 @@ Frame::Frame():
 	_pChild(),
 	_title(),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 }
 
@@ -57,8 +56,7 @@ Frame::Frame(const std::string& name):
 	_pChild(),
 	_title(),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 }
 
@@ -68,8 +66,7 @@ Frame::Frame(const std::string& name, const std::string& title):
 	_pChild(),
 	_title(title),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 }
 
@@ -79,8 +76,7 @@ Frame::Frame(View::Ptr pChild):
 	_pChild(),
 	_title(),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 	setChild(pChild);
 }
@@ -91,8 +87,7 @@ Frame::Frame(const std::string& name, View::Ptr pChild):
 	_pChild(),
 	_title(),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 	setChild(pChild);
 }
@@ -103,8 +98,7 @@ Frame::Frame(const std::string& name, const std::string& title, View::Ptr pChild
 	_pChild(),
 	_title(title),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 	setChild(pChild);
 }
@@ -115,8 +109,7 @@ Frame::Frame(const std::type_info& type):
 	_pChild(),
 	_title(),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 }
 
@@ -126,8 +119,7 @@ Frame::Frame(const std::string& name, const std::type_info& type):
 	_pChild(),
 	_title(),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 }
 
@@ -137,8 +129,7 @@ Frame::Frame(View::Ptr pChild, const std::type_info& type):
 	_pChild(),
 	_title(),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 	setChild(pChild);
 }
@@ -149,8 +140,7 @@ Frame::Frame(const std::string& name, View::Ptr pChild, const std::type_info& ty
 	_pChild(),
 	_title(),
 	_collapsible(false),
-	_collapsed(false),
-	_showBorder(true)
+	_collapsed(false)
 {
 	setChild(pChild);
 }

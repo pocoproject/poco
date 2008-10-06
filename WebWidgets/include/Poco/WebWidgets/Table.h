@@ -217,6 +217,11 @@ public:
 	bool serializeJSON(std::ostream& out, const std::string& name);	
 
 	SortedTableModel::Ptr getSortedModel(std::size_t col, bool sortAscending) const;
+
+	void hideHeaders(bool val);
+		// hides the top headers
+
+	bool hideHeaders() const;
 		
 protected:
 	Table(const std::string& name, const std::type_info& type, const TableColumns& tc, TableModel::Ptr pModel);
@@ -238,6 +243,7 @@ private:
 	SelectionModel  _sm;
 	bool            _dragAndDrop;
 	bool            _autoEdit;
+	bool            _hideHeaders;
 	int             _maxRowsPerPage;
 };
 
@@ -335,6 +341,18 @@ inline void Table::autoEdit(bool val)
 inline bool Table::autoEdit() const
 {
 	return _autoEdit;
+}
+
+
+inline void Table::hideHeaders(bool val)
+{
+	_hideHeaders = val;
+}
+
+
+inline bool Table::hideHeaders() const
+{
+	return _hideHeaders;
 }
 
 

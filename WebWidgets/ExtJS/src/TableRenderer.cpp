@@ -361,6 +361,10 @@ void TableRenderer::renderProperties(const Table* pTable, const RenderContext& c
 		if ((*it) && (*it)->getCell())
 			editable |= (*it)->isEditable();
 	}
+	if (!pTable->showBorder())
+		ostr << ",border:false, bodyBorder:false";
+	if (pTable->hideHeaders())
+		ostr << ",hideHeaders:true";
 	ostr << ",listeners:{";
 	bool written = false;
 	if (editable)
@@ -572,8 +576,11 @@ void TableRenderer::renderColumn(const Table* pTable, const TableColumn& tc, int
 	// {header: "Last updated", width: 135, sortable: true, renderer: Ext.util.Format.dateRenderer('m/d/Y'), dataIndex: 'lastChange'}
 	ostr << "{";
 	std::string hdr(Utility::safe(tc.getHeader()));
-
-	ostr << "header:'" << hdr << "',dataIndex:'" << idx << "'";
+	ostr << "dataIndex:'" << idx << "'";
+	if (!tc.resizable())
+		ostr << ",resizable:false";
+	if (!hdr.empty())
+		ostr << ",header:'" << hdr << "'";
 
 	if (tc.getWidth() > 0)
 		ostr << ",width:" << tc.getWidth();

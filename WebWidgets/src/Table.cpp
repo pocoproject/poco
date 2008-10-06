@@ -73,6 +73,7 @@ Table::Table(const TableColumns& tc, TableModel::Ptr pModel):
 	_sm(SM_CELL),
 	_dragAndDrop(false),
 	_autoEdit(false),
+	_hideHeaders(false),
 	_maxRowsPerPage(0)
 {
 	checkValidConfig();
@@ -85,6 +86,8 @@ Table::Table(const std::string& name, const TableColumns& tc, TableModel::Ptr pM
 	_columns(tc),
 	_sm(SM_CELL),
 	_dragAndDrop(false),
+	_autoEdit(false),
+	_hideHeaders(false),
 	_maxRowsPerPage(0)
 {
 	checkValidConfig();
@@ -97,6 +100,8 @@ Table::Table(const std::string& name, const std::type_info& type, const TableCol
 	_columns(tc),
 	_sm(SM_CELL),
 	_dragAndDrop(false),
+	_autoEdit(false),
+	_hideHeaders(false),
 	_maxRowsPerPage(0)
 {
 	checkValidConfig();
@@ -109,6 +114,8 @@ Table::Table(const std::type_info& type, const TableColumns& tc, TableModel::Ptr
 	_columns(tc),
 	_sm(SM_CELL),
 	_dragAndDrop(false),
+	_autoEdit(false),
+	_hideHeaders(false),
 	_maxRowsPerPage(0)
 {
 	checkValidConfig();

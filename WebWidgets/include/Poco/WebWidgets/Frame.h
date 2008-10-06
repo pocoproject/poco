@@ -103,10 +103,6 @@ public:
 		
 	bool collapsed() const;
 		/// Returns how the Frame should be rendered initially
-		
-	void showBorder(bool show);
-	
-	bool showBorder() const;	
 
 protected:
 	Frame(const std::type_info& type);
@@ -129,7 +125,6 @@ private:
 	std::string _title;
 	bool        _collapsible;
 	bool        _collapsed;
-	bool        _showBorder;
 };
 
 
@@ -188,18 +183,6 @@ inline void Frame::setCollapsed(bool coll)
 inline bool Frame::collapsed() const
 {
 	return _collapsed;
-}
-
-
-inline void Frame::showBorder(bool show)
-{
-	_showBorder = show;
-}
-
-
-inline bool Frame::showBorder() const
-{
-	return _showBorder;
 }
 
 
