@@ -8,7 +8,7 @@ rem command-line build script for MS Visual Studio
 rem
 rem Usage:
 rem ------
-rem buildwin  VS_VERSION       [ACTION]             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
+rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [SAMPLES]
 rem VS_VERSION: 71|80|90
 rem ACTION:     build|rebuild|clean
 rem LINKMODE:   static|shared|both
@@ -192,7 +192,7 @@ goto :EOF
 :usage
 echo Usage:
 echo ------
-echo buildwin  VS_VERSION       [ACTION]             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
+echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [SAMPLES]
 echo VS_VERSION: "71|80|90"
 echo ACTION:     "build|rebuild|clean"
 echo LINKMODE:   "static|shared|both"
