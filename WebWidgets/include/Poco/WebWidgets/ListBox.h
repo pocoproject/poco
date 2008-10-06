@@ -97,6 +97,7 @@ public:
 	template <typename T>
 	void setElements(const std::vector<T>& elems)
 		/// Initializes the combo box with the provided elements
+		/// Elements are deselected by default
 	{
 		Data anyElems;
 		typename std::vector<T>::const_iterator it = elems.begin();
@@ -107,6 +108,20 @@ public:
 
 	const Data& getElements() const;
 		/// Returns all elements
+		
+	template <typename T>
+	void getElements( std::vector<T>& data) const
+		/// Returns the elements in param data
+	{
+		data.clear();
+		const Data& elems = getElements();
+		typename Data::const_iterator it = elems.begin();
+		for (; it != elems.end(); ++it)
+		{
+			data.push_back(RefAnyCast<T>(it->first));
+		}
+	}
+
 
 	void insert(const Any& elem, bool selected = false);
 		/// Add a single element to the collection, not-selected per default

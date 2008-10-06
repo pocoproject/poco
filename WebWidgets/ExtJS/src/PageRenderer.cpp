@@ -201,29 +201,12 @@ void PageRenderer::renderHead(const Renderable* pRenderable, const RenderContext
 		
 		ostr << ",items:[";
 		// write an empty hull for the dynamiccodeloadres: solves z-seed problem
-		std::set<DynamicCodeLoader::Ptr>::const_iterator itDCL = dcls.begin();
-		AutoPtr<PanelRenderer> pPanelRenderer(new PanelRenderer());
-		bool writeComma = false;
-		for (; itDCL != dcls.end(); ++itDCL)
-		{
-			View::Ptr pView = (*itDCL)->view();
-			AutoPtr<Panel> pPanel = pView.cast<Panel>();
-			if (pPanel)
-			{
-				if (writeComma)
-				{
-					ostr << ",";
-				}
-				pPanelRenderer->renderHeadWithoutChildren(pPanel, context, ostr);
-				writeComma = true;
-			}
-		}
+		// NOTE: not really, as soon as you have scrolling in one of the children the problem is back
+		
 		//process all children
 		ContainerView::ConstIterator it = pPage->begin();
 		ContainerView::ConstIterator itEnd = pPage->end();
-		if (!dcls.empty() && it != itEnd)
-			ostr << ",";
-		
+
 		for (; it != itEnd; ++it)
 		{
 			if (it != pPage->begin())

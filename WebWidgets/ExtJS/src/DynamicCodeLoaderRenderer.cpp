@@ -70,7 +70,6 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	// - second, the js file which must be set as code at the DynamicCodeLoader
 	const DynamicCodeLoader* pLoader = static_cast<const DynamicCodeLoader*>(pRenderable);
 	View::Ptr pView = pLoader->view();
-	Panel::Ptr pPanel = pView.cast<Panel>();
 	poco_assert_dbg (pLoader != 0);
 	
 	str <<	"function " << pLoader->loaderFunctionName() << "(ignoreSuccess){" << std::endl;
@@ -81,10 +80,7 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	str <<		RequestHandler::KEY_ID << "=" << pLoader->id() << "'," << std::endl;
 	str <<			"success: function(response){" << std::endl;
 	str <<				"loadScriptDynamically('script" << pLoader->id() << "', response);" << std::endl;
-	if (pPanel)
-		str <<			"var parent = Ext.getCmp('" << pPanel->id() << "');" << std::endl;
-	else
-		str <<			"var parent = Ext.getCmp('" << pLoader->parent()->id() << "');" << std::endl;
+	str <<			"var parent = Ext.getCmp('" << pLoader->parent()->id() << "');" << std::endl;
 	str <<				"var child = " << pLoader->functionName() << "();" << std::endl;
 	str <<				"parent.add(child);" << std::endl;
 	// reduce the missing child cnt for all parents
@@ -97,8 +93,9 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	}
 	if (!pLoader->getSuccessCall().empty())
 	{
-		str <<			"if (!ignoreSuccess)" << std::endl;
+		str <<			"if (!ignoreSuccess){" << std::endl;
 		str <<				pLoader->getSuccessCall() << ";" << std::endl;
+		str <<			"}" << std::endl;
 	}
 	str <<			"}";
 	if (!pLoader->getErrorCall().empty())
@@ -112,7 +109,7 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 		// write the Check function
 		str <<	"function " << pLoader->loaderFunctionName() << "Check(){" << std::endl;
 		str <<		"if (" << pLoader->loaderFunctionName() << "MissingChildCnt <= 0){" << std::endl;
-		str <<			pLoader->loaderFunctionName() << "(false);" << std::endl;
+		str <<			pLoader->loaderFunctionName() << "(" << pLoader->loaderFunctionName() << "IgnoreSuccess);" << std::endl;
 		str <<			"window.clearInterval(" << pLoader->loaderFunctionName() << "PeriodicCheck);" << std::endl;
 		str <<		"}";
 		str <<		pLoader->loaderFunctionName() << "RetryCnt--;" << std::endl;
@@ -127,6 +124,7 @@ void DynamicCodeLoaderRenderer::renderHead(const Renderable* pRenderable, const 
 	
 	std::vector<const DynamicCodeLoader*>::const_iterator it = deps.begin();
 	str <<	"function " << pLoader->loadAllFunctionName() << "(ignoreParentSuccess, ignoreChildSuccess){" << std::endl;
+	str <<		pLoader->loaderFunctionName() << "IgnoreSuccess = ignoreParentSuccess;" << std::endl;
 	for (; it != deps.end(); ++it)
 	{
 		if (*it)
@@ -158,6 +156,7 @@ void DynamicCodeLoaderRenderer::renderVariables(const DynamicCodeLoader* pLoader
 		str <<	"var " << pLoader->loaderFunctionName() << "PeriodicCheck;" << std::endl;
 		str <<	"var " << pLoader->loaderFunctionName() << "RetryCnt = 60;" << std::endl;
 		str <<	"var " << pLoader->loaderFunctionName() << "MissingChildCnt = " << pLoader->dependencies().size() << ";" << std::endl;
+		str <<	"var " << pLoader->loaderFunctionName() << "IgnoreSuccess;" << std::endl;
 	}
 }
 
@@ -178,14 +177,8 @@ void DynamicCodeLoaderRenderer::onCodeGen(DynamicCodeLoader* &pL)
 	
 	out <<	"function " << pL->functionName() << "(){";
 	out <<		"return ";
-	// only render the child when we have a panel
-	if (pPanel)
-	{
-		AutoPtr<PanelRenderer> pRend = new PanelRenderer();
-		pRend->renderAsPanelChild(pPanel, context, out);
-	}
-	else
-		pView->renderHead(context, out);
+
+	pView->renderHead(context, out);
 	out <<		";"; // close return
 	out <<	"}";
 	
