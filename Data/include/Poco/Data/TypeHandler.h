@@ -46,6 +46,8 @@
 #include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/Nullable.h"
 #include "Poco/Tuple.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/SharedPtr.h"
 #include <cstddef>
 
 
@@ -1793,6 +1795,89 @@ public:
 		TypeHandler<K>::prepare(pos, obj.first, pPrepare);
 		pos += TypeHandler<K>::size();
 		TypeHandler<V>::prepare(pos, obj.second, pPrepare);
+	}
+
+private:
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator = (const TypeHandler&);
+};
+
+
+template <class T>
+class TypeHandler<Poco::AutoPtr<T> >: public AbstractTypeHandler
+	/// Specialization of type handler for Poco::AutoPtr
+{
+public:
+	static void bind(std::size_t pos, const Poco::AutoPtr<T>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	{
+		// *obj will trigger a nullpointer exception if empty: this is on purpose
+		TypeHandler<T>::bind(pos, *obj, pBinder, dir); 
+	}
+
+	static std::size_t size()
+	{
+		return TypeHandler<T>::size();
+	}
+
+	static void extract(std::size_t pos, Poco::AutoPtr<T>& obj, const Poco::AutoPtr<T>& defVal, AbstractExtractor* pExt)
+	{
+		poco_assert_dbg (pExt != 0);
+		if (!obj)
+			obj = new T();
+		if (defVal)
+			TypeHandler<T>::extract(pos, *obj, *defVal, pExt);
+		else
+			TypeHandler<T>::extract(pos, *obj, *obj, pExt);
+	}
+
+	static void prepare(std::size_t pos, Poco::AutoPtr<T>& obj, AbstractPreparation* pPrepare)
+	{
+		poco_assert_dbg (pPrepare != 0);
+		if (!obj)
+			obj = new T();
+		TypeHandler<T>::prepare(pos, *obj, pPrepare);
+	}
+
+private:
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator = (const TypeHandler&);
+};
+
+
+
+template <class T>
+class TypeHandler<Poco::SharedPtr<T> >: public AbstractTypeHandler
+	/// Specialization of type handler for Poco::SharedPtr
+{
+public:
+	static void bind(std::size_t pos, const Poco::SharedPtr<T>& obj, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+	{
+		// *obj will trigger a nullpointer exception if empty: this is on purpose
+		TypeHandler<T>::bind(pos, *obj, pBinder, dir); 
+	}
+
+	static std::size_t size()
+	{
+		return TypeHandler<T>::size();
+	}
+
+	static void extract(std::size_t pos, Poco::SharedPtr<T>& obj, const Poco::SharedPtr<T>& defVal, AbstractExtractor* pExt)
+	{
+		poco_assert_dbg (pExt != 0);
+		if (!obj)
+			obj = new T();
+		if (defVal)
+			TypeHandler<T>::extract(pos, *obj, *defVal, pExt);
+		else
+			TypeHandler<T>::extract(pos, *obj, *obj, pExt);
+	}
+
+	static void prepare(std::size_t pos, Poco::SharedPtr<T>& obj, AbstractPreparation* pPrepare)
+	{
+		poco_assert_dbg (pPrepare != 0);
+		if (!obj)
+			obj = new T();
+		TypeHandler<T>::prepare(pos, *obj, pPrepare);
 	}
 
 private:
