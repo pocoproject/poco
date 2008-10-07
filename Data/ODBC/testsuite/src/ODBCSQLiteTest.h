@@ -1,7 +1,7 @@
 //
 // ODBCSQLiteTest.h
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCSQLiteTest.h#2 $
+// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCSQLiteTest.h#4 $
 //
 // Definition of the ODBCSQLiteTest class.
 //

@@ -1,7 +1,7 @@
 //
 // DynamicAnyHolder.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/DynamicAnyHolder.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/DynamicAnyHolder.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -206,7 +206,7 @@ protected:
 
 private:
 	template <typename F, typename T>
-	void checkUpperLimit(const F& from, T& to) const
+	void checkUpperLimit(const F& from, T&) const
 	{
 		if ((sizeof(T) < sizeof(F)) &&
 			(from > static_cast<F>(std::numeric_limits<T>::max())))
@@ -221,14 +221,14 @@ private:
 	}
 
 	template <typename F, typename T>
-	void checkUpperLimitFloat(const F& from, T& to) const
+	void checkUpperLimitFloat(const F& from, T&) const
 	{
 		if (from > std::numeric_limits<T>::max())
 			throw RangeException("Value too large.");
 	}
 
 	template <typename F, typename T>
-	void checkLowerLimit(const F& from, T& to) const
+	void checkLowerLimit(const F& from, T&) const
 	{
 		if (from < std::numeric_limits<T>::min()) 
 			throw RangeException("Value too small.");
@@ -2691,17 +2691,17 @@ public:
 		return typeid(DateTime);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8&) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16&) const
 	{
 		throw BadCastException();
 	}
 	
-	void convert(Int32& val) const
+	void convert(Int32&) const
 	{
 		throw BadCastException();
 	}
@@ -2711,17 +2711,17 @@ public:
 		val = _val.timestamp().epochMicroseconds();
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8&) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16&) const
 	{
 		throw BadCastException();
 	}
 	
-	void convert(UInt32& val) const
+	void convert(UInt32&) const
 	{
 		throw BadCastException();
 	}
@@ -2828,17 +2828,17 @@ public:
 		return typeid(LocalDateTime);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8&) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16&) const
 	{
 		throw BadCastException();
 	}
 	
-	void convert(Int32& val) const
+	void convert(Int32&) const
 	{
 		throw BadCastException();
 	}
@@ -2848,17 +2848,17 @@ public:
 		val = _val.timestamp().epochMicroseconds();
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8&) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16&) const
 	{
 		throw BadCastException();
 	}
 	
-	void convert(UInt32& val) const
+	void convert(UInt32&) const
 	{
 		throw BadCastException();
 	}
@@ -2965,17 +2965,17 @@ public:
 		return typeid(Timestamp);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8&) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16&) const
 	{
 		throw BadCastException();
 	}
 	
-	void convert(Int32& val) const
+	void convert(Int32&) const
 	{
 		throw BadCastException();
 	}
@@ -2985,17 +2985,17 @@ public:
 		val = _val.epochMicroseconds();
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8&) const
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16&) const
 	{
 		throw BadCastException();
 	}
 	
-	void convert(UInt32& val) const
+	void convert(UInt32&) const
 	{
 		throw BadCastException();
 	}

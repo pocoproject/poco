@@ -1,7 +1,7 @@
 //
 // ODBCSQLServerTest.h
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCSQLServerTest.h#2 $
+// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCSQLServerTest.h#4 $
 //
 // Definition of the ODBCSQLServerTest class.
 //
