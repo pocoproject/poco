@@ -11,7 +11,7 @@ The XML library contains an XML parser with SAX2 and DOM interfaces,
 as well as an XMLWriter.
 The Util library contains classes for working with configuration files and 
 command line arguments, as well as various utility classes.
-The Net library contains network classes (sockets, HTTP, etc.)
+The Net library contains network classes (sockets, HTTP, etc.).
 All libraries come with a test suite and a number of sample programs.
 
 The directory layout is as follows:
@@ -76,6 +76,16 @@ and pass as argument the version of visual studio (71, 80 or 90). You can custom
 what is being built by buildwin.cmd by passing appropriate command line arguments to
 it. Call buildwin.cmd without arguments to see what is available.
 
+To disable certain components (e.g., NetSSL_OpenSSL or Data/MySQL) from the build,
+edit the file named "components" and remove the respective lines.
+
+Certain libraries, like NetSSL_OpenSSL, Crypto or Data/MySQL have dependencies
+to other libraries. Since the build script does not know where to find the necessary
+header files and import libraries, you have to either add the header file paths to
+the INCLUDE environment variable and the library path to the LIB environment variable,
+or you'll have to edit the buildwin.cmd script, where these environment variables can
+be set as well. 
+
 In order to run the test suite and the samples, the top-most bin directory containing
 the shared libraries must be in the PATH environment variable.
 
@@ -133,6 +143,14 @@ to configure --prefix=<path>):
 
 > sudo gmake -s install
 
+You can omit certain components from the build. For example, you might
+want to omit Data/ODBC or Data/MySQL if you do not have the corresponding
+third-party libraries (iodbc or unixodbc, mysqlclient) installed
+on your system. To do this, use the --omit argument to configure:
+
+> ./configure --omit=Data/ODBC,Data/MySQL
+
+
 To build on Mac OS X 10.3 with GCC 3, do the following:
 (NOTE: This only affects 10.3; for 10.4/10.5 see above)
 
@@ -155,6 +173,12 @@ compile for a PowerPC target, specify CCVER=3.3.1,gcc_ntoppcbe.
 Service Pack 1 for QNX Neutrino 6.3 must be installed, otherwise compiling the
 Foundation library will fail due to a problem with the <list> header in the
 default (Dinkumware) C++ standard library.
+
+When building on QNX, you might want to disable NetSSL_OpenSSL, Crypto and
+some Data connectors, unless you have the necessary third party components
+available:
+
+> ./configure --omit=NetSSL_OpenSSL,Crypto,Data/ODBC,Data/MySQL
 
 
 BUILDING ON OPENVMS
@@ -196,4 +220,4 @@ at <http://pocoproject.org>.
 
 
 --
-$Id: //poco/1.3/dist/README#5 $
+$Id: //poco/1.3/dist/README#6 $
