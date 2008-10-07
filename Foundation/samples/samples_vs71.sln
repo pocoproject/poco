@@ -82,8 +82,6 @@ Global
 		release_shared = release_shared
 		release_static = release_static
 	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
-	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{D49346E0-4F69-4BEC-9380-32D55D48063F}.debug_shared.ActiveCfg = debug_shared|Win32
 		{D49346E0-4F69-4BEC-9380-32D55D48063F}.debug_shared.Build.0 = debug_shared|Win32
@@ -165,14 +163,14 @@ Global
 		{E7CE21A7-3D50-485E-9B68-E1BEC97ED2E3}.release_shared.Build.0 = release_shared|Win32
 		{E7CE21A7-3D50-485E-9B68-E1BEC97ED2E3}.release_static.ActiveCfg = release_static|Win32
 		{E7CE21A7-3D50-485E-9B68-E1BEC97ED2E3}.release_static.Build.0 = release_static|Win32
-		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
-		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_shared|Win32.Build.0 = debug_shared|Win32
-		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_static|Win32.ActiveCfg = debug_static|Win32
-		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_static|Win32.Build.0 = debug_static|Win32
-		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_shared|Win32.ActiveCfg = release_shared|Win32
-		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_shared|Win32.Build.0 = release_shared|Win32
-		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_static|Win32.ActiveCfg = release_static|Win32
-		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_static|Win32.Build.0 = release_static|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_shared.ActiveCfg = debug_shared|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_shared.Build.0 = debug_shared|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_static.ActiveCfg = debug_static|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.debug_static.Build.0 = debug_static|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_shared.ActiveCfg = release_shared|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_shared.Build.0 = release_shared|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_static.ActiveCfg = release_static|Win32
+		{748FFA39-8C89-4968-9CF3-54A28A364F27}.release_static.Build.0 = release_static|Win32
 		{DB9948BB-A40E-4010-8E5E-DDCDFC1B8EFD}.debug_shared.ActiveCfg = debug_shared|Win32
 		{DB9948BB-A40E-4010-8E5E-DDCDFC1B8EFD}.debug_shared.Build.0 = debug_shared|Win32
 		{DB9948BB-A40E-4010-8E5E-DDCDFC1B8EFD}.debug_static.ActiveCfg = debug_static|Win32

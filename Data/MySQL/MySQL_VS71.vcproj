@@ -21,7 +21,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;.\src;..\..\Foundation\include;..\..\Data\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;SQLite_EXPORTS;__LCC__"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;MYSQL_EXPORTS;__LCC__"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -41,15 +41,15 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundationd.lib PocoDatad.lib libmysql.lib"
-				OutputFile="..\..\bin\PocoSQLited.dll"
+				OutputFile="..\..\bin\PocoMySQLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="..\..\bin\PocoSQLited.pdb"
+				ProgramDatabaseFile="..\..\bin\PocoMySQLd.pdb"
 				SubSystem="1"
 				OptimizeForWindows98="1"
-				ImportLibrary="..\..\lib\PocoSQLited.lib"
+				ImportLibrary="..\..\lib\PocoMySQLd.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -87,7 +87,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;.\src;..\..\Foundation\include;..\..\Data\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;SQLite_EXPORTS;__LCC__"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;MYSQL_EXPORTS;__LCC__"
 				GeneratePreprocessedFile="0"
 				KeepComments="FALSE"
 				StringPooling="TRUE"
@@ -107,7 +107,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="PocoFoundation.lib PocoData.lib libmysql.lib"
-				OutputFile="..\..\bin\PocoSQLite.dll"
+				OutputFile="..\..\bin\PocoMySQL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -117,7 +117,7 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="..\..\lib\PocoSQLite.lib"
+				ImportLibrary="..\..\lib\PocoMySQL.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>

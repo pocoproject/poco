@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Crypto"
 	ProjectGUID="{eeee7259-32e9-4d56-b023-c733940ab2a0}"
 	RootNamespace="Crypto"
@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib libeay32mdd.lib ssleay32mdd.lib"
+				AdditionalDependencies="PocoFoundationd.lib libeay32mtd.lib ssleay32mtd.lib"
 				ShowProgress="0"
 				OutputFile="..\bin\PocoCryptod.dll"
 				LinkIncremental="2"
