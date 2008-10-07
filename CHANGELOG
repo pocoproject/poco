@@ -36,6 +36,11 @@ Release 1.3.3 (2008-10-07)
 - POCO now builds with GCC 4.3 (but there are some stupid warnings:
   "suggest parentheses around && within ||".
 - Solution and project files for Visual Studio 2008 are included
+- The Zip library is now officially part of the standard POCO release.
+- The Crypto library (based on OpenSSL) has been added. The original code
+  was kindly contributed by Ferdinand Beyer.
+- A Data Connector to MySQL, contributed by Sergey Kholodilov, is now part
+  of the POCO release.
 - fixed SF# 1859738: AsyncChannel stall
 - fixed SF# 1815124: XML Compile failed on VS7.1 with XML_UNICODE_WCHAR_T
 - fixed SF# 1867340: Net and NetSSL additional dependency not set - ws2_32.lib
@@ -914,4 +919,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#33 $
+$Id: //poco/1.3/dist/CHANGELOG#34 $
