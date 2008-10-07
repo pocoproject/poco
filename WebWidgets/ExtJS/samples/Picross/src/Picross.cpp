@@ -83,13 +83,14 @@ using namespace Poco::WebWidgets;
 class WebAppHandlerFactory: public HTTPRequestHandlerFactory
 {
 public:
-	WebAppHandlerFactory(SharedPtr<WebApplication> pApp, const Poco::Path& dataPath, Poco::Logger* pLogger):
+	WebAppHandlerFactory(SharedPtr<WebApplication> pApp, const Poco::Path& dataPath, const Poco::Path& extJSPath, Poco::Logger* pLogger):
 		_pApp(pApp),
 		_dataRoot(dataPath),
 		_aliases(),
 		_pLogger(pLogger)
 	{
 		_aliases.insert(std::make_pair("", _dataRoot));
+		_aliases.insert(std::make_pair("extjs", extJSPath));
 	}
 
 	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
@@ -168,29 +169,36 @@ protected:
 	{
 		if (!_helpRequested)
 		{
-			ResourceManager::Ptr pRM = new ResourceManager();
-			ExtJS::Utility::initialize(pRM, Poco::Path());
-			SharedPtr<WebApplication> pWebApp = new WebApplication(Poco::URI("/"), pRM);
-			LookAndFeel::Ptr laf(new LookAndFeel());
-			Poco::WebWidgets::ExtJS::Utility::initialize(laf);
-			pWebApp->setLookAndFeel(laf);
-			PicrossPage::Ptr ptr = new PicrossPage();
-			ptr->createComponents();
-			ptr->initComponents();
-			
-			pWebApp->setCurrentPage(ptr);
-	
 			unsigned short port = (unsigned short) config().getInt("Picross.port", 9980);
 			std::string data = config().getString("Picross.dataRoot", ".");
+			std::string extJSDir = config().getString("Picross.extjsRoot", ".");
 			Poco::Path aPath(data);
 			aPath.makeAbsolute();
 			aPath.makeDirectory();
 			Poco::File aFile(aPath);
 			if (!aFile.exists() || aFile.isFile())
 				throw Poco::Util::InvalidArgumentException("dataRoot is either a file or doesn't exist: must be directory!");
+			Poco::Path extJS(extJSDir);
+			extJS.makeAbsolute();
+			extJS.makeDirectory();
+			Poco::File extJSFile(extJS);
+			if (!extJSFile.exists() || extJSFile.isFile())
+				throw Poco::Util::InvalidArgumentException("extjsRoot is either a file or doesn't exist: must be directory!");
 
+			ResourceManager::Ptr pRM = new ResourceManager();
+			ExtJS::Utility::initialize(pRM, Poco::Path("/extjs"));
+			SharedPtr<WebApplication> pWebApp = new WebApplication(Poco::URI("/"), pRM);
+			LookAndFeel::Ptr laf(new LookAndFeel());
+			Poco::WebWidgets::ExtJS::Utility::initialize(laf);
+			pWebApp->setLookAndFeel(laf);
+			PicrossPage::Ptr ptr = new PicrossPage(aPath);
+			ptr->createComponents();
+			ptr->initComponents();
+			
+			pWebApp->setCurrentPage(ptr);
+	
 			ServerSocket svs(port);
-			HTTPServer srv(new WebAppHandlerFactory(pWebApp, aPath, &logger()), svs, new HTTPServerParams);
+			HTTPServer srv(new WebAppHandlerFactory(pWebApp, aPath, extJS, &logger()), svs, new HTTPServerParams);
 			srv.start();
 			waitForTerminationRequest();
 			srv.stop();

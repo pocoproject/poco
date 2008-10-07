@@ -60,6 +60,7 @@ public:
 
 	PeriodicUpdater(TableUpdater::Ptr pUpdater, Poco::UInt32 interValInSeconds);
 		/// Creates the PeriodicUpdater for the given table
+		/// You must call start manually to start it!
 
 	void update();
 		/// Updates the table from a given source

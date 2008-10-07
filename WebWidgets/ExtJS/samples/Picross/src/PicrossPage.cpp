@@ -1,7 +1,8 @@
 #include "PicrossPage.h"
 
 
-PicrossPage::PicrossPage()
+PicrossPage::PicrossPage(const Poco::Path& dataRoot):
+	_dataRoot(dataRoot)
 {
 	setWidth(800);
 	setHeight(600);
@@ -10,7 +11,10 @@ PicrossPage::PicrossPage()
 	
 void PicrossPage::createComponents()
 {
-	_pFrame = new PicrossFrame(Poco::File("x_16x16.raw"));
+	Poco::Path file(_dataRoot);
+	file.makeDirectory();
+	file.setFileName("x_16x16.raw");
+	_pFrame = new PicrossFrame(Poco::File(file));
 	add (_pFrame);
 	setupJavaScript();
 }

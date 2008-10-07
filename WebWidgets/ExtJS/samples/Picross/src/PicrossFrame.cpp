@@ -46,6 +46,47 @@ void PicrossFrame::initComponents()
 void PicrossFrame::setupJavaScript(Page* pPage)
 {
 	{
+		std::ostringstream str;
+		str << "function handleRightClick(elem, val) {" << std::endl;
+		str <<		"handleClick(elem, val, false);" << std::endl;
+		str <<	"}";
+		pPage->addDynamicFunction(str.str());
+	}
+	{
+		std::ostringstream str;
+		str << "function handleClick(elem, val, leftClick) {" << std::endl;
+		str <<		"if (val == 'O'){" << std::endl;
+		str <<			"elem.innerHTML = '<img src=\"ok.png\" width=\"";
+		str <<				"16\" height=\"13" << "\" border=\"0\" alt=\"\" />';" << std::endl;
+		str <<		"}" << std::endl;
+		str <<		"else {" << std::endl;
+		str <<			"elem.innerHTML = '<img src=\"x.png\" width=\"";
+		str <<				"16\" height=\"13" << "\" border=\"0\" alt=\"\" />';" << std::endl;
+		str <<			"if (leftClick){" << std::endl; // left mouse click means the user guesses there is an entry
+		str <<				"if (val != 'O') {" << std::endl;
+		str <<					"Ext.Msg.alert('Error', 'You guessed wrong');" << std::endl;
+		str <<				"}" << std::endl;
+		str <<			"}" << std::endl;
+		str <<			"else if (e.button == 2){" << std::endl;
+		str <<				"if (val == 'O') {" << std::endl;
+		str <<					"Ext.Msg.alert('Error', 'You guessed wrong');" << std::endl;
+		str <<				"}" << std::endl;
+		str <<			"}" << std::endl;
+		str <<		"}" << std::endl;
+		str <<	"}" << std::endl;
+		pPage->addDynamicFunction(str.str());
+	}
+	{
+		std::ostringstream str;
+		str <<	"function renderColumn(val){" << std::endl;
+		str <<		"var retVal = '<img src=\"default.png\" width=\"";
+		str <<			"16\" height=\"13" << "\" border=\"0\" alt=\"\" ';"<< std::endl;
+		str <<		"retVal += '/>';" << std::endl;
+		str <<		"return retVal;" << std::endl;
+		str <<	"}"<< std::endl;
+		pPage->addDynamicFunction(str.str());
+	}
+	{
 		// setup cellclick event
 		//cellclick : ( Grid this, Number rowIndex, Number columnIndex, Ext.EventObject e )
 		std::ostringstream str;
@@ -53,14 +94,7 @@ void PicrossFrame::setupJavaScript(Page* pPage)
 		str <<		"var rec = grid.store.getAt(row);" << std::endl;
 		str <<		"var val = rec.get(''+col);" << std::endl;
 		str <<		"var html = grid.getView().getCell(row,col);" << std::endl;
-		str <<		"if (val == 'O'){" << std::endl;
-		str <<			"html.firstChild.innerHTML = '<img src=\"ok.png\" width=\"";
-		str <<				"16\" height=\"13" << "\" border=\"0\" alt=\"\" />';" << std::endl;
-		str <<		"}" << std::endl;
-		str <<		"else {" << std::endl;
-		str <<			"html.firstChild.innerHTML = '<img src=\"x.png\" width=\"";
-		str <<				"16\" height=\"13" << "\" border=\"0\" alt=\"\" />';" << std::endl;
-		str <<		"}" << std::endl;
+		str <<		"handleClick(html.firstChild, val, (e.button == 0));" << std::endl;
 		str <<	"}" << std::endl;
 		_pGameTable->cellClicked.add(jsDelegate(str.str()));
 	}
@@ -119,13 +153,7 @@ void PicrossFrame::createGameTable()
 		TableColumn::Ptr pCol = new TableColumn(new TextFieldCell(0), "", PI_CELLWIDTH, false);
 		pCol->resizable(false);
 		pCol->setEditable(false);
-		// return an image
-		std::ostringstream str;
-		str <<	"function(){";
-		str <<		"return '<img src=\"default.png\" width=\"";
-		str <<			"16\" height=\"13" << "\" border=\"0\" alt=\"\" />';";
-		str <<	"}";
-		pCol->setCustomRenderer(str.str());
+		pCol->setCustomRenderer("renderColumn");
 		tc.push_back(pCol);
 	}
 
