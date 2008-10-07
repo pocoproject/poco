@@ -1,7 +1,7 @@
 //
 // FIFOStrategy.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/FIFOStrategy.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/FIFOStrategy.h#5 $
 //
 // Library: Foundation
 // Package: Events
@@ -109,7 +109,7 @@ public:
 		}
 		std::auto_ptr<TDelegate> pDelegate(delegate.clone());
 		_observers.push_back(pDelegate.get());
-		bool tmp = _observerIndex.insert(make_pair(pDelegate.get(), --_observers.end())).second;
+		bool tmp = _observerIndex.insert(std::make_pair(pDelegate.get(), --_observers.end())).second;
 		poco_assert (tmp);
 		pDelegate.release();
 	}

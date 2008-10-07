@@ -1,7 +1,7 @@
 //
 // LRUStrategy.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/LRUStrategy.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/LRUStrategy.h#3 $
 //
 // Library: Foundation
 // Package: Cache
@@ -79,7 +79,7 @@ public:
 	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
 	{
 		_keys.push_front(args.key());
-		std::pair<IndexIterator, bool> stat = _keyIndex.insert(make_pair(args.key(), _keys.begin()));
+		std::pair<IndexIterator, bool> stat = _keyIndex.insert(std::make_pair(args.key(), _keys.begin()));
 		if (!stat.second)
 		{
 			stat.first->second = _keys.begin();
