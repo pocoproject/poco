@@ -575,6 +575,8 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexType);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccessVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSharedPtrComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testInsertEmptyVector);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSimpleAccessList);

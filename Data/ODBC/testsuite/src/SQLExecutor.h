@@ -115,7 +115,8 @@ public:
 		const std::string& tableCreateString,
 		DataBinding bindMode, 
 		DataExtraction extractMode,
-		bool doTime=true);
+		bool doTime=true,
+		const std::string& blobPlaceholder="?");
 
 	void bareboneODBCMultiResultTest(const std::string& dbConnString, 
 		const std::string& tableCreateString, 
@@ -135,6 +136,8 @@ public:
 
 	void simpleAccessVector();
 	void complexTypeVector();
+	void sharedPtrComplexTypeVector();
+	void autoPtrComplexTypeVector();
 	void insertVector();
 	void insertEmptyVector();
 
@@ -160,7 +163,7 @@ public:
 	void prepare();
 
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
-	void doBulkWithBool(Poco::UInt32 size)
+	void doBulkWithBool(Poco::UInt32 size, const std::string& blobPlaceholder="?")
 	{
 		poco_data_using_statements;
 
@@ -183,7 +186,8 @@ public:
 
 		try 
 		{
-			session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?,?)", 
+			session() << 
+				format("INSERT INTO MiscTest VALUES (?,%s,?,?,?,?)", blobPlaceholder), 
 				use(strings), 
 				use(blobs), 
 				use(ints),
@@ -199,7 +203,8 @@ public:
 
 		try 
 		{
-			session() << "INSERT INTO MiscTest VALUES (?,?,?,?,?,?)",
+			session() <<  
+				format("INSERT INTO MiscTest VALUES (?,%s,?,?,?,?)", blobPlaceholder),
 				use(strings, bulk), 
 				use(blobs, bulk), 
 				use(ints, bulk),
@@ -208,7 +213,7 @@ public:
 				use(bools, bulk), now;
 		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		
+
 		ints.clear();
 		strings.clear();
 		blobs.clear();
@@ -444,7 +449,7 @@ public:
 	void singleSelect();
 	void emptyDB();
 
-	void blob(int bigSize = 1024);
+	void blob(int bigSize = 1024, const std::string& blobPlaceholder = "?");
 
 	template <typename C1, typename C2>
 	void blobContainer(int size)

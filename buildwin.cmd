@@ -8,8 +8,12 @@ rem command-line build script for MS Visual Studio
 rem
 rem Usage:
 rem ------
-rem buildwin  VS_VERSION       [ACTION]             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
-rem "buildwin {71|80|90} [build|rebuild|clean] [static|shared|both] [release|debug|both] [yes|no]"
+rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [SAMPLES]
+rem VS_VERSION: 71|80|90
+rem ACTION:     build|rebuild|clean
+rem LINKMODE:   static|shared|both
+rem CONFIG:     release|debug|both
+rem SAMPLES:    yes|no
 rem
 rem VS_VERSION is required argument. Default is build all.
 
@@ -188,7 +192,12 @@ goto :EOF
 :usage
 echo Usage:
 echo ------
-echo buildwin  VS_VERSION       [ACTION]             [LINKMODE]        [CONFIGURATION]   [SAMPLES]
-echo "buildwin {71|80|90} [build|rebuild|clean] [static|shared|both] [release|debug|both] [yes|no]"
-
+echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [SAMPLES]
+echo VS_VERSION: "71|80|90"
+echo ACTION:     "build|rebuild|clean"
+echo LINKMODE:   "static|shared|both"
+echo CONFIG:     "release|debug|both"
+echo SAMPLES:    "yes|no"
+echo. 
+echo Default is build all.
 endlocal

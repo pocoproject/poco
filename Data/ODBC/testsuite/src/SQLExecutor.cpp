@@ -43,7 +43,9 @@
 #include "Poco/Thread.h"
 #include "Poco/Logger.h"
 #include "Poco/Message.h"
+#include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/Exception.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
@@ -141,6 +143,45 @@ struct Person
 };
 
 
+struct RefCountedPerson : public Poco::RefCountedObject
+{
+	std::string lastName;
+	std::string firstName;
+	std::string address;
+	int age;
+	RefCountedPerson(){age = 0;}
+	RefCountedPerson(const std::string& ln, const std::string& fn, const std::string& adr, int a):lastName(ln), firstName(fn), address(adr), age(a)
+	{
+	}
+	bool operator==(const Person& other) const
+	{
+		return lastName == other.lastName && firstName == other.firstName && address == other.address && age == other.age;
+	}
+
+	bool operator < (const RefCountedPerson& p) const
+	{
+		if (age < p.age)
+			return true;
+		if (lastName < p.lastName)
+			return true;
+		if (firstName < p.firstName)
+			return true;
+		return (address < p.address);
+	}
+
+	const std::string& operator () () const
+		/// This method is required so we can extract data to a map!
+	{
+		// we choose the lastName as the key
+		return lastName;
+	}
+
+private:
+	RefCountedPerson(const RefCountedPerson &);
+	RefCountedPerson& operator = (const RefCountedPerson&);
+};
+
+
 namespace Poco {
 namespace Data {
 
@@ -196,6 +237,57 @@ private:
 };
 
 
+template <>
+class TypeHandler<RefCountedPerson>
+{
+public:
+	static void bind(std::size_t pos, 
+		const RefCountedPerson& obj, 
+		AbstractBinder* pBinder, 
+		AbstractBinder::Direction dir = AbstractBinder::PD_IN)
+	{
+		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
+		poco_assert_dbg (pBinder != 0);
+		pBinder->bind(pos++, obj.lastName, dir);
+		pBinder->bind(pos++, obj.firstName, dir);
+		pBinder->bind(pos++, obj.address, dir);
+		pBinder->bind(pos++, obj.age, dir);
+	}
+
+	static void prepare(std::size_t pos, RefCountedPerson& obj, AbstractPreparation* pPrepare)
+	{
+		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
+		poco_assert_dbg (pPrepare != 0);
+		pPrepare->prepare(pos++, obj.lastName);
+		pPrepare->prepare(pos++, obj.firstName);
+		pPrepare->prepare(pos++, obj.address);
+		pPrepare->prepare(pos++, obj.age);
+	}
+
+	static std::size_t size()
+	{
+		return 4;
+	}
+
+	static void extract(std::size_t pos, RefCountedPerson& obj, const RefCountedPerson& defVal, AbstractExtractor* pExt)
+	{
+		poco_assert_dbg (pExt != 0);
+		if (!pExt->extract(pos++, obj.lastName))
+			obj.lastName = defVal.lastName;
+		if (!pExt->extract(pos++, obj.firstName))
+			obj.firstName = defVal.firstName;
+		if (!pExt->extract(pos++, obj.address))
+			obj.address = defVal.address;
+		if (!pExt->extract(pos++, obj.age))
+			obj.age = defVal.age;
+	}
+
+private:
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator=(const TypeHandler&);
+};
+
+
 } } // namespace Poco::Data
 
 
@@ -230,7 +322,8 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 	const std::string& tableCreateString, 
 	SQLExecutor::DataBinding bindMode, 
 	SQLExecutor::DataExtraction extractMode,
-	bool doTime)
+	bool doTime,
+	const std::string& blobPlaceholder)
 {
 	SQLRETURN rc;
 	SQLHENV henv = SQL_NULL_HENV;
@@ -305,7 +398,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			rc = SQLExecute(hstmt);
 			poco_odbc_check_stmt (rc, hstmt);
 
-			sql = "INSERT INTO Test VALUES (?,?,?,?,?,?)";
+			sql = format("INSERT INTO Test VALUES (?,?,%s,?,?,?)", blobPlaceholder);
 			pStr = (SQLCHAR*) sql.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
 			poco_odbc_check_stmt (rc, hstmt);
@@ -973,6 +1066,66 @@ void SQLExecutor::complexTypeVector()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (result == people);
+}
+
+
+void SQLExecutor::sharedPtrComplexTypeVector()
+{
+	std::string funct = "sharedPtrComplexTypeVector()";
+	std::vector<Poco::SharedPtr<Person> > people;
+	people.push_back(new Person("LN1", "FN1", "ADDR1", 1));
+	people.push_back(new Person("LN2", "FN2", "ADDR2", 2));
+
+	try { session() << "INSERT INTO PERSON VALUES (?,?,?,?)", use(people), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { session() << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 2);
+
+	std::vector<Person> result;
+	try { session() << "SELECT * FROM PERSON", into(result), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (2 == result.size());
+	assert (result[0] == *people[0]);
+	assert (result[1] == *people[1]);
+}
+
+
+void SQLExecutor::autoPtrComplexTypeVector()
+{
+	std::string funct = "sharedPtrComplexTypeVector()";
+	std::vector<Poco::AutoPtr<RefCountedPerson> > people;
+	people.push_back(new RefCountedPerson("LN1", "FN1", "ADDR1", 1));
+	people.push_back(new RefCountedPerson("LN2", "FN2", "ADDR2", 2));
+
+	try { session() << "INSERT INTO PERSON VALUES (?,?,?,?)", use(people), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { session() << "SELECT COUNT(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 2);
+
+	std::vector<Person> result;
+	try { session() << "SELECT * FROM PERSON", into(result), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (2 == result.size());
+	assert (result[0].address == people[0]->address);
+	assert (result[0].age == people[0]->age);
+	assert (result[0].firstName == people[0]->firstName);
+	assert (result[0].lastName == people[0]->lastName);
+	assert (result[1].address == people[1]->address);
+	assert (result[1].age == people[1]->age);
+	assert (result[1].firstName == people[1]->firstName);
+	assert (result[1].lastName == people[1]->lastName);
 }
 
 
@@ -2188,7 +2341,7 @@ void SQLExecutor::emptyDB()
 }
 
 
-void SQLExecutor::blob(int bigSize)
+void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 {
 	std::string funct = "blob()";
 	std::string lastName("lastname");
@@ -2197,7 +2350,8 @@ void SQLExecutor::blob(int bigSize)
 
 	BLOB img("0123456789", 10);
 	int count = 0;
-	try { session() << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(img), now; }
+	try { session() << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder), 
+		use(lastName), use(firstName), use(address), use(img), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	try { session() << "SELECT COUNT(*) FROM PERSON", into(count), now; }
@@ -2222,7 +2376,8 @@ void SQLExecutor::blob(int bigSize)
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try { session() << "INSERT INTO PERSON VALUES(?,?,?,?)", use(lastName), use(firstName), use(address), use(big), now; }
+	try { session() << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder), 
+		use(lastName), use(firstName), use(address), use(big), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 

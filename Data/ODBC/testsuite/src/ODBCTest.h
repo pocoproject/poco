@@ -74,6 +74,8 @@ public:
 
 	virtual void testSimpleAccessVector();
 	virtual void testComplexTypeVector();
+	virtual void testSharedPtrComplexTypeVector();
+	virtual void testAutoPtrComplexTypeVector();
 	virtual void testInsertVector();
 	virtual void testInsertEmptyVector();
 

@@ -178,7 +178,11 @@ void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name
 			}
 		}
 
-		if (!ignoreError) throw;
+		if (!ignoreError) 
+		{
+			std::cout << ex.toString() << std::endl;
+			throw;
+		}
 	}
 }
 
@@ -336,6 +340,8 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexType);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSimpleAccessVector);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSharedPtrComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testInsertEmptyVector);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSimpleAccessList);

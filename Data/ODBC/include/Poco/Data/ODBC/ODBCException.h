@@ -63,18 +63,18 @@ template <class H, SQLSMALLINT handleType>
 class HandleException: public ODBCException
 {															
 public:														
-	HandleException(const H& handle):
-		ODBCException(errorString(handle)),
-		_error(handle)
+	HandleException(const H& handle): _error(handle)
 		/// Creates HandleException
 	{
+		message(_error.toString());
 	}
 
 	HandleException(const H& handle, const std::string& msg): 
-		ODBCException(msg, errorString(handle)), 
+		ODBCException(msg), 
 		_error(handle)
 		/// Creates HandleException
 	{
+		extendedMessage(_error.toString());
 	}							
 
 	HandleException(const H& handle, const std::string& msg, const std::string& arg): 
@@ -142,9 +142,6 @@ public:
 
 	std::string toString() const
 		/// Returns the formatted error diagnostics for the handle.
-		/// Since it relies on the object being fully constructed at
-		/// the time of its usage, this function should not be used
-		/// by the constructor to pass diagnostic string to the parent. 
 	{
 		return Poco::format("ODBC Error: %s\n===================\n%s\n",
 			std::string(what()),
@@ -152,10 +149,7 @@ public:
 	}
 
 	static std::string errorString(const H& handle)
-		/// Returns the error diagnostics for the handle.
-		/// This function is used by the constructor to pass diagnostic
-		/// string to the parent. It can also be used as a "shortcut" to
-		/// error information during troubleshooting.
+		/// Returns the error diagnostics string for the handle.
 	{
 		return Error<H, handleType>(handle).toString();
 	}

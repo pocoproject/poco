@@ -63,15 +63,43 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 
 
-#ifdef POCO_OS_FAMILY_WINDOWS
+// uncomment to force FreeTDS on Windows
+//#define FORCE_FREE_TDS
+
+// uncomment to use native SQL driver
+//#define POCO_ODBC_USE_SQL_NATIVE
+
+// FreeTDS version selection guide (from http://www.freetds.org/userguide/choosingtdsprotocol.htm)
+// (see #define FREE_TDS_VERSION below)
+// Product												TDS Version	Comment
+// ---------------------------------------------------+------------+------------------------------------------------------------
+// Sybase before System 10, Microsoft SQL Server 6.x	4.2			Still works with all products, subject to its limitations.
+// Sybase System 10 and above							5.0			Still the most current protocol used by Sybase.
+// Sybase System SQL Anywhere							5.0 only 	Originally Watcom SQL Server, a completely separate codebase.
+// 																	Our best information is that SQL Anywhere first supported TDS
+// 																	in version 5.5.03 using the OpenServer Gateway (OSG), and native
+// 																	TDS 5.0 support arrived with version 6.0.
+// Microsoft SQL Server 7.0								7.0			Includes support for the extended datatypes in SQL Server 7.0
+// 																	(such as char/varchar fields of more than 255 characters), and
+// 																	support for Unicode.
+// Microsoft SQL Server 2000							8.0			Include support for bigint (64 bit integers), variant and collation
+// 																	on all fields. variant is not supported; collation is not widely used.
+
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(FORCE_FREE_TDS)
 	#ifdef POCO_ODBC_USE_SQL_NATIVE
 		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Native Client"
 	#else
 		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server"
 	#endif
+	#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver")
 #else
 	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
+	#define FREE_TDS_VERSION "8.0"
+	#if defined(POCO_OS_FAMILY_WINDOWS)
+		#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
+	#endif
 #endif
+
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
 #define MS_SQL_SERVER_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MS_SQL_SERVER_PORT "1433"
@@ -92,8 +120,11 @@ std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRI
 	"PWD=" MS_SQL_SERVER_PWD ";"
 	"DATABASE=" MS_SQL_SERVER_DB ";"
 	"SERVER=" MS_SQL_SERVER_SERVER ";"
-	"PORT=" MS_SQL_SERVER_PORT ";";
-
+	"PORT=" MS_SQL_SERVER_PORT ";"
+#ifdef FREE_TDS_VERSION
+	"TDS_Version=" FREE_TDS_VERSION ";"
+#endif
+	;
 
 ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name): 
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
@@ -116,10 +147,14 @@ void ODBCSQLServerTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
+	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
 
 	tableCreateString = "CREATE TABLE Test "
 		"(First VARCHAR(30),"
@@ -141,7 +176,7 @@ void ODBCSQLServerTest::testBLOB()
 
 	try
 	{
-		executor().blob(maxFldSize);
+		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
 		fail ("must fail");
 	}
 	catch (DataException&)
@@ -154,14 +189,14 @@ void ODBCSQLServerTest::testBLOB()
 		recreatePersonBLOBTable();
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		executor().blob(maxFldSize);
+		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
 		i += 2;
 	}
 
 	recreatePersonBLOBTable();
 	try
 	{
-		executor().blob(maxFldSize+1);
+		executor().blob(maxFldSize+1, "CONVERT(VARBINARY(MAX),?)");
 		fail ("must fail");
 	}
 	catch (DataException&) { }
@@ -205,7 +240,7 @@ void ODBCSQLServerTest::testBulk()
 		std::vector<BLOB>,
 		std::vector<double>,
 		std::vector<DateTime>,
-		std::vector<bool> >(100);
+		std::vector<bool> >(100, "CONVERT(VARBINARY(30),?)");
 
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::deque<int>,
@@ -213,7 +248,7 @@ void ODBCSQLServerTest::testBulk()
 		std::deque<BLOB>,
 		std::deque<double>,
 		std::deque<DateTime>,
-		std::deque<bool> >(100);
+		std::deque<bool> >(100, "CONVERT(VARBINARY(30),?)");
 
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::list<int>,
@@ -221,7 +256,7 @@ void ODBCSQLServerTest::testBulk()
 		std::list<BLOB>,
 		std::list<double>,
 		std::list<DateTime>,
-		std::list<bool> >(100);
+		std::list<bool> >(100, "CONVERT(VARBINARY(30),?)");
 }
 
 
@@ -704,6 +739,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSharedPtrComplexTypeVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertEmptyVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessList);

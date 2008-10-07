@@ -53,11 +53,7 @@ Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(0), 
 
 Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(0), _code(code)
 {
-	if (!arg.empty())
-	{
-		_msg.append(": ");
-		_msg.append(arg);
-	}
+	extendedMessage(arg);
 }
 
 
@@ -121,6 +117,16 @@ std::string Exception::displayText() const
 		txt.append(_msg);
 	}
 	return txt;
+}
+
+
+void Exception::extendedMessage(const std::string& arg)
+{
+	if (!arg.empty())
+	{
+		if (!_msg.empty()) _msg.append(": ");
+		_msg.append(arg);
+	}
 }
 
 

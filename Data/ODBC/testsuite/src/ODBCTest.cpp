@@ -158,6 +158,36 @@ void ODBCTest::testComplexTypeVector()
 }
 
 
+void ODBCTest::testSharedPtrComplexTypeVector()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->sharedPtrComplexTypeVector();
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testAutoPtrComplexTypeVector()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->autoPtrComplexTypeVector();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testInsertVector()
 {
 	if (!_pSession) fail ("Test not available.");
