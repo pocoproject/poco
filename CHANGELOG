@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.3 (2008-09-30)
+Release 1.3.3 (2008-10-07)
 ==========================
 
 - Threads now have optional user-settable stack size (if the OS supports that feature)
@@ -79,6 +79,9 @@ Release 1.3.3 (2008-09-30)
 - fixed SF# 2124636: Discrepancy between FileWIN32(U)::handleLastError
 - fixed SF# 1558300: MinGW/MSYS Builds
 - fixed SF# 2123266: Memory leak under QNX6 with dinkum library
+- fixed SF# 2140411: ScopedUnlock documentation bug
+- fixed SF# 2036460: UUID regression tests are failing on Linux with g++ 4.3.1
+- fixed SF# 2150438: Tuple TypeHandler position increment size is wrong
 
 
 Release 1.3.2 (2008-02-04)
@@ -911,4 +914,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#31 $
+$Id: //poco/1.3/dist/CHANGELOG#33 $
