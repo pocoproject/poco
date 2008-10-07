@@ -1822,8 +1822,8 @@ public:
 	static void extract(std::size_t pos, Poco::AutoPtr<T>& obj, const Poco::AutoPtr<T>& defVal, AbstractExtractor* pExt)
 	{
 		poco_assert_dbg (pExt != 0);
-		if (!obj)
-			obj = new T();
+		
+		obj = Poco::AutoPtr<T>(new T());
 		if (defVal)
 			TypeHandler<T>::extract(pos, *obj, *defVal, pExt);
 		else
@@ -1864,8 +1864,8 @@ public:
 	static void extract(std::size_t pos, Poco::SharedPtr<T>& obj, const Poco::SharedPtr<T>& defVal, AbstractExtractor* pExt)
 	{
 		poco_assert_dbg (pExt != 0);
-		if (!obj)
-			obj = new T();
+		
+		obj = Poco::SharedPtr<T>(new T());
 		if (defVal)
 			TypeHandler<T>::extract(pos, *obj, *defVal, pExt);
 		else
