@@ -45,6 +45,7 @@
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/DateTime.h"
 #include "Poco/Logger.h"
@@ -464,6 +465,27 @@ void SQLiteTest::testComplexTypeVector()
 	tmp << "SELECT * FROM PERSON", into(result), now;
 	assert (result == people);
 }
+
+
+void SQLiteTest::testSharedPtrComplexTypeVector()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	std::vector<Poco::SharedPtr<Person> > people;
+	people.push_back(new Person("LN1", "FN1", "ADDR1", 1));
+	people.push_back(new Person("LN2", "FN2", "ADDR2", 2));
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", use(people), now;
+	int count = 0;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 2);
+
+	std::vector<Poco::SharedPtr<Person> > result;
+	tmp << "SELECT * FROM PERSON", into(result), now;
+	assert (*result[0] == *people[0]);
+	assert (*result[1] == *people[1]);
+}
+
 
 
 void SQLiteTest::testInsertVector()
@@ -2317,6 +2339,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testComplexType);
 	CppUnit_addTest(pSuite, SQLiteTest, testSimpleAccessVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testComplexTypeVector);
+	CppUnit_addTest(pSuite, SQLiteTest, testSharedPtrComplexTypeVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testInsertEmptyVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testAffectedRows);

@@ -54,6 +54,7 @@ public:
 	void testComplexType();
 	void testSimpleAccessVector();
 	void testComplexTypeVector();
+	void testSharedPtrComplexTypeVector();
 	void testInsertVector();
 	void testInsertEmptyVector();
 	void testAffectedRows();
