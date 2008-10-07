@@ -1851,10 +1851,10 @@ void SQLiteTest::testNull()
 	RecordSet rs(ses, "SELECT * FROM NullTest");
 	rs.moveFirst();
 	assert (rs.isNull("i"));
-	assert (rs["i"] == 0);
+	assert (rs["i"].isEmpty());
 	assert (rs.isNull("r"));
 	assert (rs.isNull("v"));
-	assert (rs["v"] == "");
+	assert (rs["v"].isEmpty());
 
 	ses << "DROP TABLE IF EXISTS NullTest", now;
 	ses << "CREATE TABLE NullTest (i INTEGER, r REAL, v VARCHAR)", now;
@@ -1881,7 +1881,7 @@ void SQLiteTest::testNull()
 	assert (rs["i"] == 1);
 	assert (!rs.isNull("r"));
 	assert (rs.isNull("v"));
-	assert (rs["v"] == "");
+	assert (rs["v"].isEmpty());
 
 	assert (rs.moveNext());
 	assert (!rs.isNull("i"));
@@ -1895,7 +1895,7 @@ void SQLiteTest::testNull()
 	assert (rs.nvl("r", 1.5) == 1.5);
 
 	assert (rs.isNull("v"));
-	assert (rs["v"] == "");
+	assert (rs["v"].isEmpty());
 	assert (rs.nvl("v", s) == "123");
 }
 
