@@ -100,7 +100,8 @@ public:
 		const std::string& tableCreateString,
 		DataBinding bindMode, 
 		DataExtraction extractMode,
-		bool doTime=true);
+		bool doTime=true,
+		const std::string& blobPlaceholder="?");
 		/// This function uses "bare bone" ODBC API calls (i.e. calls are not 
 		/// "wrapped" in PocoData framework structures).
 		/// The purpose of the function is to verify that driver behaves
@@ -144,7 +145,7 @@ public:
 	void singleSelect();
 	void emptyDB();
 
-	void blob(int bigSize = 1024);
+	void blob(int bigSize = 1024, const std::string& blobPlaceholder = "?");
 	void blobStmt();
 
 	void bools();

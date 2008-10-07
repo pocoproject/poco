@@ -56,16 +56,44 @@ using Poco::Data::ODBC::StatementDiagnostics;
 using Poco::format;
 using Poco::NotFoundException;
 
+// uncomment to force FreeTDS on Windows
+//#define FORCE_FREE_TDS
 
-#ifdef POCO_OS_FAMILY_WINDOWS
+// uncomment to use native SQL driver
+#define POCO_ODBC_USE_SQL_NATIVE
+
+// FreeTDS version selection guide (from http://www.freetds.org/userguide/choosingtdsprotocol.htm)
+// (see #define FREE_TDS_VERSION below)
+// Product												TDS Version	Comment
+// ---------------------------------------------------+------------+------------------------------------------------------------
+// Sybase before System 10, Microsoft SQL Server 6.x	4.2			Still works with all products, subject to its limitations.
+// Sybase System 10 and above							5.0			Still the most current protocol used by Sybase.
+// Sybase System SQL Anywhere							5.0 only 	Originally Watcom SQL Server, a completely separate codebase. 
+// 																	Our best information is that SQL Anywhere first supported TDS 
+// 																	in version 5.5.03 using the OpenServer Gateway (OSG), and native 
+// 																	TDS 5.0 support arrived with version 6.0.
+// Microsoft SQL Server 7.0								7.0			Includes support for the extended datatypes in SQL Server 7.0 
+// 																	(such as char/varchar fields of more than 255 characters), and 
+// 																	support for Unicode.
+// Microsoft SQL Server 2000							8.0			Include support for bigint (64 bit integers), variant and collation 
+// 																	on all fields. variant is not supported; collation is not widely used. 
+
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(FORCE_FREE_TDS)
 	#ifdef POCO_ODBC_USE_SQL_NATIVE
 		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Native Client"
 	#else
 		#define MS_SQL_SERVER_ODBC_DRIVER "SQL Server"
 	#endif
+	#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver")
 #else
 	#define MS_SQL_SERVER_ODBC_DRIVER "FreeTDS"
+	#define FREE_TDS_VERSION "8.0"
+	#if defined(POCO_OS_FAMILY_WINDOWS)
+		#pragma message ("Using " MS_SQL_SERVER_ODBC_DRIVER " driver, version " FREE_TDS_VERSION)
+	#endif
 #endif
+
+
 #define MS_SQL_SERVER_DSN "PocoDataSQLServerTest"
 #define MS_SQL_SERVER_SERVER "localhost"
 #define MS_SQL_SERVER_PORT "1433"
@@ -107,7 +135,7 @@ ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name):
 		}
 
 		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << _dsn << '(' << _dbConnString << ')' << std::endl;
+			std::cout << "*** Connected to " << _dbConnString << std::endl;
 		if (!_pExecutor) _pExecutor = new SQLExecutor("SQLServer SQL Executor", _pSession);
 	}
 	else 
@@ -136,10 +164,14 @@ void ODBCSQLServerTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
-	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, 
+		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, 
+		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, 
+		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
+	_pExecutor->bareboneODBCTest(_dbConnString, tableCreateString, 
+		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
 }
 
 
@@ -641,7 +673,7 @@ void ODBCSQLServerTest::testBLOB()
 
 	try
 	{
-		_pExecutor->blob(maxFldSize);
+		_pExecutor->blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
 		fail ("must fail");
 	}
 	catch (DataException&) 
@@ -654,7 +686,7 @@ void ODBCSQLServerTest::testBLOB()
 		recreatePersonBLOBTable();
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
-		_pExecutor->blob(maxFldSize);
+		_pExecutor->blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
 		i += 2;
 	}
 
@@ -841,9 +873,9 @@ void ODBCSQLServerTest::recreateStringsTable()
 void ODBCSQLServerTest::recreateBoolsTable()
 {
 	dropTable("Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+	try { *_pSession << "CREATE TABLE Strings (str BIT)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateBoolsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateBoolsTable()"); }
 }
 
 
@@ -938,7 +970,11 @@ void ODBCSQLServerTest::checkODBCSetup()
 					"PWD=" MS_SQL_SERVER_PWD ";"
 					"DATABASE=" MS_SQL_SERVER_DB ";"
 					"SERVER=" MS_SQL_SERVER_SERVER ";"
-					"PORT=" MS_SQL_SERVER_PORT ";";
+					"PORT=" MS_SQL_SERVER_PORT ";"
+#ifdef FREE_TDS_VERSION
+					"TDS_Version=" FREE_TDS_VERSION ";"
+#endif
+					;
 				return;
 			}
 			else if (!_dbConnString.empty())

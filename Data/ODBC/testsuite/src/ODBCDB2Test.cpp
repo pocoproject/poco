@@ -677,6 +677,8 @@ void ODBCDB2Test::testBLOBStmt()
 
 void ODBCDB2Test::testBool()
 {
+	fail ("not supported");
+	/*
 	if (!_pSession) fail ("Test not available.");
 
 	for (int i = 0; i < 8;)
@@ -686,7 +688,7 @@ void ODBCDB2Test::testBool()
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
 		_pExecutor->bools();
 		i += 2;
-	}
+	}*/
 }
 
 
@@ -829,9 +831,9 @@ void ODBCDB2Test::recreateStringsTable()
 void ODBCDB2Test::recreateBoolsTable()
 {
 	dropTable("Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+	try { *_pSession << "CREATE TABLE Strings (str SMALLINT)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateBoolsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateBoolsTable()"); }
 }
 
 

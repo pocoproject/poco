@@ -48,11 +48,11 @@ class ODBCPostgreSQLTest: public CppUnit::TestCase
 	/// PostgreSQL ODBC test class
 	/// Tested:
 	/// 
-	/// Driver		|	DB				| OS										| Notes
-	/// ------------+-------------------+-------------------------------------------+--------------------------------
-	///	07.03.02.60	| PostgreSQL 7.4.6	| MS Windows XP Professional x64 v.2003/SP1	| BLOB fails (missing 'lo' module)
-	/// 08.01.02.00 | PostgreSQL 8.1.5-1| MS Windows XP Professional x64 v.2003/SP1 |
-	/// 
+	/// Driver      | Manager                  | DB                 | OS                                        | Notes
+	/// ------------+--------------------------+--------------------+-------------------------------------------+--------------------------------
+	///	07.03.02.60 |                          | PostgreSQL 7.4.6   | MS Windows XP Professional x64 v.2003/SP1 | BLOB fails (missing 'lo' module)
+	/// 08.01.02.00 |                          | PostgreSQL 8.1.5-1 | MS Windows XP Professional x64 v.2003/SP1 |
+	///	08.01.02.00 | unixODBC 2.2.11-16build1 | PostgreSQL 8.1.5-1 | Ubuntu 2.6.24-19-generic #1 SMP (hardy)   |
 {
 public:
 	ODBCPostgreSQLTest(const std::string& name);

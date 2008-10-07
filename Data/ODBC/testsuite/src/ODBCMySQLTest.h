@@ -48,11 +48,11 @@ class ODBCMySQLTest: public CppUnit::TestCase
 	/// MySQL ODBC test class
 	/// Tested:
 	/// 
-	/// Driver			|	Manager					|	DB						| OS
-	/// ----------------+---------------------------+---------------------------+------------------------------------------
-	/// 03.51.12.00		|							| MySQL 5.0.27-community-nt	| MS Windows XP Professional x64 v.2003/SP1
-	/// 05.01.05.00		|							| MySQL 5.0.67-community-nt | MS Windows XP Professional
-	/// 03.51.15r409-2	| unixODBC 2.2.11-16build1	| MySQL 5.0.51a-3ubuntu5.1  | Ubuntu 2.6.24-19-generic #1 SMP (hardy)
+	/// Driver          | Manager                  | DB                        | OS
+	/// ----------------+--------------------------+---------------------------+------------------------------------------
+	/// 03.51.12.00     |                          | MySQL 5.0.27-community-nt | MS Windows XP Professional x64 v.2003/SP1
+	/// 05.01.05.00     |                          | MySQL 5.0.67-community-nt | MS Windows XP Professional
+	/// 03.51.15r409-2  | unixODBC 2.2.11-16build1 | MySQL 5.0.51a-3ubuntu5.1  | Ubuntu 2.6.24-19-generic #1 SMP (hardy)
 
 {
 public:

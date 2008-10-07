@@ -822,8 +822,8 @@ void ODBCPostgreSQLTest::recreateBoolsTable()
 {
 	dropTable("Strings");
 	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateBoolsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateBoolsTable()"); }
 }
 
 

@@ -48,10 +48,11 @@ class ODBCOracleTest: public CppUnit::TestCase
 	/// Oracle ODBC test class
 	/// Tested:
 	/// 
-	/// Driver		|	DB							| OS
-	/// ------------+-------------------------------+------------------------------------------
-	///	10.02.00.01	| Oracle9i Release 9.2.0.4.0	| MS Windows XP Professional x64 v.2003/SP1
-	/// 10.02.00.01 | Oracle XE Release 10.2.0.1.0	| MS Windows XP Professional x64 v.2003/SP1
+	/// Driver      | Manager                  | DB                                       | OS
+	/// ------------+--------------------------+------------------------------------------+------------------------------------------
+	///	10.02.00.01 |                          | Oracle9i Release 9.2.0.4.0               | MS Windows XP Professional x64 v.2003/SP1
+	/// 10.02.00.01 |                          | Oracle XE Release 10.2.0.1.0             | MS Windows XP Professional x64 v.2003/SP1
+	/// 10.02.00.01 | unixODBC 2.2.11-16build1 | Oracle XE Release 10.2.0.1-1.1(unstable) | Ubuntu 2.6.24-19-generic #1 SMP (hardy)
 {
 public:
 	ODBCOracleTest(const std::string& name);

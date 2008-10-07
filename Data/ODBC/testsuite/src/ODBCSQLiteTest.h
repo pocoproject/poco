@@ -48,11 +48,13 @@ class ODBCSQLiteTest: public CppUnit::TestCase
 	/// SQLite3 ODBC test class
 	/// Tested:
 	/// 
-	/// Driver		|	DB			| OS
-	/// ------------+---------------+------------------------------------------
-	///	00.70.00.00	| SQLite 3.*	| MS Windows XP Professional x64 v.2003/SP1
-{
-public:
+	/// Driver         | Manager                  | DB         | OS
+	/// ---------------+--------------------------+------------+------------------------------------------
+	///	00.70.00.00    |                          | SQLite 3.* | MS Windows XP Professional x64 v.2003/SP1
+	/// 00.70-3 (hardy)| unixODBC 2.2.11-16build1 | SQLite 3.* | Ubuntu 2.6.24-19-generic #1 SMP (hardy) 
+
+{					                          
+public:				
 	ODBCSQLiteTest(const std::string& name);
 	~ODBCSQLiteTest();
 

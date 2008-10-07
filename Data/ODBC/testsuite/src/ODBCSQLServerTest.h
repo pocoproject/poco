@@ -48,10 +48,12 @@ class ODBCSQLServerTest: public CppUnit::TestCase
 	/// SQLServer ODBC test class
 	/// Tested:
 	/// 
-	/// Driver			|	DB							| OS
-	/// ----------------+-------------------------------+------------------------------------------
-	/// 2000.86.1830.00 | SQL Server Express 9.0.2047	| MS Windows XP Professional x64 v.2003/SP1
-	/// 2005.90.2047.00 | SQL Server Express 9.0.2047	| MS Windows XP Professional x64 v.2003/SP1
+	/// Driver                            | Manager                  | DB                          | OS
+	/// ----------------------------------+--------------------------+-----------------------------+------------------------------------------
+	/// SQL Server 2000.86.3959.00        |                          | SQL Server Express 9.0.2047 | MS Windows XP Professional x64 v.2003/SP1
+	/// SQL Native Client 2005.90.3042.00 |                          | SQL Server Express 9.0.2047 | MS Windows XP Professional x64 v.2003/SP1
+	/// FreeTDS 0.82.00.8128              |                          | SQL Server Express 9.0.2047 | MS Windows XP Professional x64 v.2003/SP1
+	/// FreeTDS 0.82.00.8128              | unixODBC 2.2.11-16build1 | SQL Server Express 9.0.2047 | Ubuntu 2.6.24-19-generic #1 SMP (hardy)
 	///
 
 {

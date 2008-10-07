@@ -48,9 +48,10 @@ class ODBCDB2Test: public CppUnit::TestCase
 	/// IBM DB2 UDB ODBC test class
 	/// Tested:
 	/// 
-	/// Driver		|	DB				| OS
-	/// ------------+-------------------+------------------------------------------
-	///	9.01.00.356 | DB2 Express-C 9.1	| MS Windows XP Professional x64 v.2003/SP1
+	/// Driver      | DB                | OS                                        | Notes
+	/// ------------+-------------------+-------------------------------------------+---------------------------
+	///	9.01.00.356 | DB2 Express-C 9.1 | MS Windows XP Professional x64 v.2003/SP1 | bool binding not supported
+	///
 {
 public:
 	ODBCDB2Test(const std::string& name);

@@ -176,7 +176,8 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 	const std::string& tableCreateString, 
 	SQLExecutor::DataBinding bindMode, 
 	SQLExecutor::DataExtraction extractMode,
-	bool doTime)
+	bool doTime,
+	const std::string& blobPlaceholder)
 {
 	SQLRETURN rc;
 	SQLHENV henv = SQL_NULL_HENV;
@@ -249,9 +250,9 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			poco_odbc_check_stmt (rc, hstmt);
 
 			rc = SQLExecute(hstmt);
-			assert (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
+			poco_odbc_check_stmt (rc, hstmt);
 
-			sql = "INSERT INTO Test VALUES (?,?,?,?,?,?)";
+			sql = format("INSERT INTO Test VALUES (?,?,%s,?,?,?)", blobPlaceholder);
 			pStr = (SQLCHAR*) sql.c_str();
 			rc = SQLPrepare(hstmt, pStr, (SQLINTEGER) sql.length());
 			poco_odbc_check_stmt (rc, hstmt);
@@ -378,7 +379,6 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			{
 				poco_odbc_check_stmt (rc, hstmt);
 			}
-			//assert (SQL_NEED_DATA == rc || SQL_SUCCEEDED(rc));
 
 			if (SQL_NEED_DATA == rc)
 			{
@@ -571,7 +571,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			sql = "DROP TABLE Test";
 			pStr = (SQLCHAR*) sql.c_str();
 			rc = SQLExecDirect(hstmt, pStr, (SQLINTEGER) sql.length());
-			assert (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
+			poco_odbc_check_stmt (rc, hstmt);
 
 			rc = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 			poco_odbc_check_stmt (rc, hstmt);
@@ -808,8 +808,6 @@ void SQLExecutor::bools()
 	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-	// fails with MySQL on Windows
 	assert (ret);
 }
 
@@ -1572,7 +1570,7 @@ void SQLExecutor::emptyDB()
 }
 
 
-void SQLExecutor::blob(int bigSize)
+void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 {
 	std::string funct = "blob()";
 	std::string lastName("lastname");
@@ -1581,7 +1579,7 @@ void SQLExecutor::blob(int bigSize)
 
 	BLOB img("0123456789", 10);
 	int count = 0;
-	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(img), now; }
+	try { *_pSession << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder), use(lastName), use(firstName), use(address), use(img), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
@@ -1606,7 +1604,7 @@ void SQLExecutor::blob(int bigSize)
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	try { *_pSession << "INSERT INTO Person VALUES(?,?,?,?)", use(lastName), use(firstName), use(address), use(big), now; }
+	try { *_pSession << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder), use(lastName), use(firstName), use(address), use(big), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
