@@ -517,7 +517,7 @@ extern "C" {
   /* I can confirm that it does not work on version 4.1.0... */
   /* First appears in GCC docs for version 4.3.0 */
   #define SQLITE_EXPERIMENTAL __attribute__ ((warning ("is experimental")))
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && (_MSC_VER >= 1400)
   #define SQLITE_EXPERIMENTAL __declspec(deprecated("was declared experimental"))
 #else
   #define SQLITE_EXPERIMENTAL
