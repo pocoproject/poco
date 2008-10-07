@@ -47,14 +47,7 @@ void PicrossFrame::setupJavaScript(Page* pPage)
 {
 	{
 		std::ostringstream str;
-		str << "function handleRightClick(elem, val) {" << std::endl;
-		str <<		"handleClick(elem, val, false);" << std::endl;
-		str <<	"}";
-		pPage->addDynamicFunction(str.str());
-	}
-	{
-		std::ostringstream str;
-		str << "function handleClick(elem, val, leftClick) {" << std::endl;
+		str << "function handleClick(elem, val, guessSet) {" << std::endl;
 		str <<		"if (val == 'O'){" << std::endl;
 		str <<			"elem.innerHTML = '<img src=\"ok.png\" width=\"";
 		str <<				"16\" height=\"13" << "\" border=\"0\" alt=\"\" />';" << std::endl;
@@ -62,12 +55,12 @@ void PicrossFrame::setupJavaScript(Page* pPage)
 		str <<		"else {" << std::endl;
 		str <<			"elem.innerHTML = '<img src=\"x.png\" width=\"";
 		str <<				"16\" height=\"13" << "\" border=\"0\" alt=\"\" />';" << std::endl;
-		str <<			"if (leftClick){" << std::endl; // left mouse click means the user guesses there is an entry
+		str <<			"if (guessSet){" << std::endl; // means the user guesses there is an entry
 		str <<				"if (val != 'O') {" << std::endl;
 		str <<					"Ext.Msg.alert('Error', 'You guessed wrong');" << std::endl;
 		str <<				"}" << std::endl;
 		str <<			"}" << std::endl;
-		str <<			"else if (e.button == 2){" << std::endl;
+		str <<			"else {" << std::endl;
 		str <<				"if (val == 'O') {" << std::endl;
 		str <<					"Ext.Msg.alert('Error', 'You guessed wrong');" << std::endl;
 		str <<				"}" << std::endl;
@@ -94,7 +87,7 @@ void PicrossFrame::setupJavaScript(Page* pPage)
 		str <<		"var rec = grid.store.getAt(row);" << std::endl;
 		str <<		"var val = rec.get(''+col);" << std::endl;
 		str <<		"var html = grid.getView().getCell(row,col);" << std::endl;
-		str <<		"handleClick(html.firstChild, val, (e.button == 0));" << std::endl;
+		str <<		"handleClick(html.firstChild, val, true);" << std::endl;
 		str <<	"}" << std::endl;
 		_pGameTable->cellClicked.add(jsDelegate(str.str()));
 	}
