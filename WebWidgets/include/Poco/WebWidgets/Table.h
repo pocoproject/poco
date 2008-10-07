@@ -187,6 +187,9 @@ public:
 	const TableModel& getModel() const;
 		/// Returns the table model
 
+	TableModel::Ptr getModelPtr() const;
+		/// Returns the table model
+		
 	void setModel(TableModel::Ptr ptr);
 		/// Sets the table model
 
@@ -286,6 +289,12 @@ inline const Table::TableColumns& Table::getColumns() const
 inline const TableModel& Table::getModel() const
 {
 	return *_pModel;
+}
+
+
+inline TableModel::Ptr Table::getModelPtr() const
+{
+	return _pModel;
 }
 
 

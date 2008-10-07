@@ -74,6 +74,9 @@ public:
 
 	void stop();
 		/// Stops auto updating
+		
+	Poco::UInt32 intervalInSeconds() const;
+		/// Returns the interval in seconds
 
 protected:
 	virtual ~PeriodicUpdater();
@@ -127,6 +130,12 @@ inline void PeriodicUpdater::stop()
 inline void PeriodicUpdater::updateTimer(Poco::Timer&)
 {
 	update();
+}
+
+
+inline Poco::UInt32 PeriodicUpdater::intervalInSeconds() const
+{
+	return _interValInSeconds;
 }
 
 
