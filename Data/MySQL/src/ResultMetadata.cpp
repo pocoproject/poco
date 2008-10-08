@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/ResultMetadata.cpp#4 $
+// $Id: //poco/1.3/Data/MySQL/src/ResultMetadata.cpp#5 $
 //
 // Library: Data
 // Package: MySQL
@@ -37,6 +37,7 @@
 #include "Poco/Data/MySQL/ResultMetadata.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <cstring>
+
 
 namespace
 {
