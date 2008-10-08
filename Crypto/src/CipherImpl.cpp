@@ -137,16 +137,20 @@ std::streamsize CryptoTransformImpl::transform(
 {
 	poco_assert (outputLength >= (inputLength + blockSize() - 1));
 
+	int outLen = static_cast<int>(outputLength);
+	
 	int rc = EVP_CipherUpdate(
 		&_ctx,
 		output,
-		static_cast<int*>(&outputLength),
+		&outLen,
 		input,
 		static_cast<int>(inputLength));
 
 	if (rc == 0)
 		throwError();
 
+	outputLength = static_cast<std::streamsize>(outLen);
+		
 	return outputLength;
 }
 
@@ -156,14 +160,18 @@ std::streamsize CryptoTransformImpl::finalize(
 	std::streamsize length)
 {
 	poco_assert (length >= blockSize());
+	
+	int len = static_cast<int>(length);
 
 	// Use the '_ex' version that does not perform implicit cleanup since we
 	// will call EVP_CIPHER_CTX_cleanup() from the dtor as there is no
 	// guarantee that finalize() will be called if an error occurred.
-	int rc = EVP_CipherFinal_ex(&_ctx, output, static_cast<int*>(&length));
+	int rc = EVP_CipherFinal_ex(&_ctx, output, &len);
 
 	if (rc == 0)
 		throwError();
+		
+	length = static_cast<std::streamsize>(len);
 
 	return length;
 }
