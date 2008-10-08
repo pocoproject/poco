@@ -1,7 +1,7 @@
 //
 // CipherImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherImpl.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/CipherImpl.cpp#2 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -138,7 +138,6 @@ std::streamsize CryptoTransformImpl::transform(
 	poco_assert (outputLength >= (inputLength + blockSize() - 1));
 
 	int outLen = static_cast<int>(outputLength);
-	
 	int rc = EVP_CipherUpdate(
 		&_ctx,
 		output,
@@ -149,9 +148,7 @@ std::streamsize CryptoTransformImpl::transform(
 	if (rc == 0)
 		throwError();
 
-	outputLength = static_cast<std::streamsize>(outLen);
-		
-	return outputLength;
+	return static_cast<std::streamsize>(outLen);
 }
 
 
@@ -171,9 +168,7 @@ std::streamsize CryptoTransformImpl::finalize(
 	if (rc == 0)
 		throwError();
 		
-	length = static_cast<std::streamsize>(len);
-
-	return length;
+	return static_cast<std::streamsize>(len);
 }
 
 
