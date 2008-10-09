@@ -1,5 +1,14 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.3.3p1 (2008-10-09)
+============================
+
+- Fixed SF# 2153031: 1.3.3 Crypto won't compile on 64-bit Linux
+- Fixed a warning in MySQL connector
+- Updated README
+- The global Makefile in the Zip archive is no longer broken
+
+
 Release 1.3.3 (2008-10-07)
 ==========================
 
@@ -919,4 +928,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#34 $
+$Id: //poco/1.3/dist/CHANGELOG#35 $
