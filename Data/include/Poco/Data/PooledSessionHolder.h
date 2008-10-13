@@ -75,7 +75,7 @@ public:
 
 	int idle() const;
 		/// Returns the number of seconds the session has not been used.
-				
+
 private:
 	SessionPool& _owner;
 	Poco::AutoPtr<SessionImpl> _pImpl;

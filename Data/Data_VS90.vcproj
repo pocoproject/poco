@@ -658,6 +658,10 @@
 					RelativePath=".\include\Poco\Data\SessionPool.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\Poco\Data\SessionPoolContainer.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -672,6 +676,10 @@
 				</File>
 				<File
 					RelativePath=".\src\SessionPool.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SessionPoolContainer.cpp"
 					>
 				</File>
 			</Filter>

@@ -47,6 +47,7 @@ public:
 	~SessionPoolTest();
 
 	void testSessionPool();
+	void testSessionPoolContainer();
 
 	void setUp();
 	void tearDown();

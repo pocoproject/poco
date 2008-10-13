@@ -83,6 +83,15 @@ Session SessionPool::get()
 	}
 	PooledSessionHolderPtr pHolder(_idleSessions.front());
 	PooledSessionImplPtr pPSI(new PooledSessionImpl(pHolder));
+	
+	FeatureMap::Iterator fmIt = _featureMap.begin();
+	FeatureMap::Iterator fmEnd = _featureMap.end();
+	for (; fmIt != fmEnd; ++fmIt) pPSI->setFeature(fmIt->first, fmIt->second);
+
+	PropertyMap::Iterator pmIt = _propertyMap.begin();
+	PropertyMap::Iterator pmEnd = _propertyMap.end();
+	for (; pmIt != pmEnd; ++pmIt) pPSI->setProperty(pmIt->first, pmIt->second);
+	
 	_activeSessions.push_front(pHolder);
 	_idleSessions.pop_front();
 	return Session(pPSI);
@@ -155,6 +164,50 @@ int SessionPool::allocated() const
 int SessionPool::available() const
 {
 	return _maxSessions - used();
+}
+
+
+void SessionPool::setFeature(const std::string& name, bool state)
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	if (_nSessions > 0)
+		throw InvalidAccessException("Features can not be set after the first session was created.");
+
+	_featureMap.insert(FeatureMap::ValueType(name, state));
+}
+
+
+bool SessionPool::getFeature(const std::string& name)
+{
+	FeatureMap::ConstIterator it = _featureMap.find(name);
+
+	if (_featureMap.end() == it)
+		throw NotFoundException("Feature not found:" + name);
+
+	return it->second;
+}
+
+
+void SessionPool::setProperty(const std::string& name, const Poco::Any& value)
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	if (_nSessions > 0)
+		throw InvalidAccessException("Properties can not be set after first session was created.");
+
+	_propertyMap.insert(PropertyMap::ValueType(name, value));
+}
+
+
+Poco::Any SessionPool::getProperty(const std::string& name)
+{
+	PropertyMap::ConstIterator it = _propertyMap.find(name);
+
+	if (_propertyMap.end() == it)
+		throw NotFoundException("Property not found:" + name);
+
+	return it->second;
 }
 
 

@@ -90,7 +90,6 @@ public:
 	Poco::Any getP(const std::string& name);
 
 private:
-	std::string _init;
 	bool _f;
 	Poco::Any _p;
 	bool _connected;

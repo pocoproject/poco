@@ -34,14 +34,21 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/SessionPool.h"
+#include "Poco/Data/SessionPoolContainer.h"
 #include "Poco/Thread.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include "Connector.h"
 
 
 using namespace Poco::Data::Keywords;
 using Poco::Thread;
+using Poco::AutoPtr;
+using Poco::NotFoundException;
+using Poco::InvalidAccessException;
 using Poco::Data::Session;
 using Poco::Data::SessionPool;
+using Poco::Data::SessionPoolContainer;
 using Poco::Data::SessionPoolExhaustedException;
 using Poco::Data::SessionUnavailableException;
 
@@ -62,6 +69,16 @@ void SessionPoolTest::testSessionPool()
 {
 	SessionPool pool("test", "cs", 1, 4, 5);
 	
+	pool.setFeature("f1", true);
+	assert (pool.getFeature("f1"));
+	try { pool.getFeature("g1"); fail ("must fail"); }
+	catch ( Poco::NotFoundException& ) { }
+
+	pool.setProperty("p1", 1);
+	assert (1 == Poco::AnyCast<int>(pool.getProperty("p1")));
+	try { pool.getProperty("r1"); fail ("must fail"); }
+	catch ( Poco::NotFoundException& ) { }
+
 	assert (pool.capacity() == 4);
 	assert (pool.allocated() == 0);
 	assert (pool.idle() == 0);
@@ -69,6 +86,12 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
 	Session s1(pool.get());
+
+	try { pool.setFeature("f1", true); fail ("must fail"); }
+	catch ( Poco::InvalidAccessException& ) { }
+	
+	try { pool.setProperty("p1", 1); fail ("must fail"); }
+	catch ( Poco::InvalidAccessException& ) { }
 
 	assert (pool.capacity() == 4);
 	assert (pool.allocated() == 1);
@@ -187,6 +210,28 @@ void SessionPoolTest::testSessionPool()
 }
 
 
+void SessionPoolTest::testSessionPoolContainer()
+{
+	SessionPoolContainer spc;
+	AutoPtr<SessionPool> pPool = new SessionPool("test", "cs");
+	spc.add(pPool);
+	assert (1 == spc.count());
+	try { spc.add(pPool); fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+	spc.remove(pPool->name());
+	assert (0 == spc.count());
+	try { spc.get("test"); fail ("must fail"); }
+	catch (NotFoundException&) { }
+
+	spc.add("test", "cs");
+	assert (1 == spc.count());
+	spc.remove("test://cs");
+	assert (0 == spc.count());
+	try { spc.get("test"); fail ("must fail"); }
+	catch (NotFoundException&) { }
+}
+
+
 void SessionPoolTest::setUp()
 {
 }
@@ -202,6 +247,7 @@ CppUnit::Test* SessionPoolTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SessionPoolTest");
 
 	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPool);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolContainer);
 
 	return pSuite;
 }

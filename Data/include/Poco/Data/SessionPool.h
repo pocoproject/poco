@@ -44,6 +44,8 @@
 #include "Poco/Data/PooledSessionHolder.h"
 #include "Poco/Data/PooledSessionImpl.h"
 #include "Poco/Data/Session.h"
+#include "Poco/HashMap.h"
+#include "Poco/Any.h"
 #include "Poco/Timer.h"
 #include "Poco/Mutex.h"
 #include <list>
@@ -53,7 +55,7 @@ namespace Poco {
 namespace Data {
 
 
-class Data_API SessionPool
+class Data_API SessionPool: public RefCountedObject
 	/// This class implements session pooling for POCO Data.
 	///
 	/// Creating a connection to a database is often a time consuming
@@ -131,10 +133,27 @@ public:
 	int available() const;
 		/// Returns the number of available (idle + remaining capacity) sessions.
 
+	const std::string name() const;
+		/// Returns the name for this pool.
+
+	void setFeature(const std::string& name, bool state);
+		/// Sets feature for all the sessions.
+
+	bool getFeature(const std::string& name);
+		/// Returns the requested feature.
+
+	void setProperty(const std::string& name, const Poco::Any& value);
+		/// Sets property for all sessions.
+
+	Poco::Any getProperty(const std::string& name);
+		/// Returns the requested property.
+
 protected:
-	typedef Poco::AutoPtr<PooledSessionHolder> PooledSessionHolderPtr;
-	typedef Poco::AutoPtr<PooledSessionImpl>   PooledSessionImplPtr;
-	typedef std::list<PooledSessionHolderPtr>  SessionList;
+	typedef Poco::AutoPtr<PooledSessionHolder>    PooledSessionHolderPtr;
+	typedef Poco::AutoPtr<PooledSessionImpl>      PooledSessionImplPtr;
+	typedef std::list<PooledSessionHolderPtr>     SessionList;
+	typedef Poco::HashMap<std::string, bool>      FeatureMap;
+	typedef Poco::HashMap<std::string, Poco::Any> PropertyMap;
 
 	void purgeDeadSessions();
 	int deadImpl(SessionList& rSessions);
@@ -154,10 +173,18 @@ private:
 	SessionList _idleSessions;
 	SessionList _activeSessions;
 	Poco::Timer _janitorTimer;
+	FeatureMap  _featureMap;
+	PropertyMap _propertyMap;
 	mutable Poco::FastMutex _mutex;
 	
 	friend class PooledSessionImpl;
 };
+
+
+inline const std::string SessionPool::name() const
+{
+	return format("%s://%s", _sessionKey, _connectionString);
+}
 
 
 } } // namespace Poco::Data

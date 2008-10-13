@@ -1,7 +1,11 @@
 //
-// SessionImpl.cpp
+// SessionPoolContainer.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionImpl.cpp#4 $
+// $Id: //poco/Main/Data/src/SessionPoolContainer.cpp#3 $
+//
+// Library: Data
+// Package: SessionPoolContainering
+// Module:  SessionPoolContainer
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,106 +34,65 @@
 //
 
 
-#include "SessionImpl.h"
-#include "TestStatementImpl.h"
+#include "Poco/Data/SessionPoolContainer.h"
+#include "Poco/Data/SessionFactory.h"
+#include "Poco/Data/DataException.h"
+#include "Poco/Exception.h"
+#include <algorithm>
 
 
 namespace Poco {
 namespace Data {
-namespace Test {
 
 
-SessionImpl::SessionImpl(const std::string& init):
-	_f(false),
-	_connected(true)
-{
-	addFeature("f1", &SessionImpl::setF, &SessionImpl::getF);
-	addFeature("f2", 0, &SessionImpl::getF);
-	addFeature("f3", &SessionImpl::setF, 0);
-	addFeature("connected", &SessionImpl::setConnected, &SessionImpl::getConnected);
-	addProperty("p1", &SessionImpl::setP, &SessionImpl::getP);
-	addProperty("p2", 0, &SessionImpl::getP);
-	addProperty("p3", &SessionImpl::setP, &SessionImpl::getP);
-}
-
-
-SessionImpl::~SessionImpl()
+SessionPoolContainer::SessionPoolContainer()
 {
 }
 
 
-Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
-{
-	return new TestStatementImpl(*this);
-}
-
-
-void SessionImpl::begin()
+SessionPoolContainer::~SessionPoolContainer()
 {
 }
 
 
-void SessionImpl::commit()
+void SessionPoolContainer::add(SessionPool* pPool)
 {
+	poco_check_ptr (pPool);
+
+	if (_sessionPools.find(pPool->name()) != _sessionPools.end())
+		throw InvalidAccessException("Session pool already exists: " + pPool->name());
+
+	_sessionPools.insert(SessionPoolMap::ValueType(pPool->name(), pPool));
 }
 
 
-void SessionImpl::rollback()
+Session SessionPoolContainer::add(const std::string& sessionKey, 
+	const std::string& connectionString,
+	int minSessions, 
+	int maxSessions, 
+	int idleTime)
 {
+	AutoPtr<SessionPool> pSP = 
+		new SessionPool(sessionKey, connectionString, minSessions, maxSessions, idleTime);
+
+	std::string name = pSP->name();
+
+	if (_sessionPools.find(name) != _sessionPools.end())
+		throw InvalidAccessException("Session pool already exists: " + name);
+
+	std::pair<SessionPoolMap::Iterator, bool> ins = 
+		_sessionPools.insert(SessionPoolMap::ValueType(name, pSP));
+
+	return ins.first->second->get();
 }
 
 
-void SessionImpl::close()
+Session SessionPoolContainer::get(const std::string& name)
 {
+	SessionPoolMap::Iterator it = _sessionPools.find(name);
+	if (_sessionPools.end() == it) throw NotFoundException(name);
+	return it->second->get();
 }
 
 
-bool SessionImpl::isConnected()
-{
-	return _connected;
-}
-
-
-bool SessionImpl::isTransaction()
-{
-	return false;
-}
-
-
-bool SessionImpl::getConnected(const std::string& name)
-{
-	return _connected;
-}
-
-
-void SessionImpl::setConnected(const std::string& name, bool value)
-{
-	_connected = value;
-}
-
-
-void SessionImpl::setF(const std::string& name, bool value)
-{
-	_f = value;
-}
-
-
-bool SessionImpl::getF(const std::string& name)
-{
-	return _f;
-}
-
-
-void SessionImpl::setP(const std::string& name, const Poco::Any& value)
-{
-	_p = value;
-}
-
-
-Poco::Any SessionImpl::getP(const std::string& name)
-{
-	return _p;
-}
-
-
-} } } // namespace Poco::Data::Test
+} } // namespace Poco::Data
