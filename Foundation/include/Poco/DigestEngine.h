@@ -1,7 +1,7 @@
 //
 // DigestEngine.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/DigestEngine.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/DigestEngine.h#3 $
 //
 // Library: Foundation
 // Package: Crypt
@@ -84,6 +84,9 @@ public:
 
 	static std::string digestToHex(const Digest& bytes);
 		/// Converts a message digest into a string of hexadecimal numbers.
+
+	static Digest digestFromHex(const std::string& digest);
+		/// Converts a string created by digestToHex back to its Digest presentation
 
 protected:
 	virtual void updateImpl(const void* data, unsigned length) = 0;

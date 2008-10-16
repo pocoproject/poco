@@ -1,7 +1,7 @@
 //
 // DigestStreamTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/DigestStreamTest.cpp#2 $
+// $Id: //poco/Main/Foundation/testsuite/src/DigestStreamTest.cpp#10 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -93,6 +93,15 @@ void DigestStreamTest::testOutputStream2()
 }
 
 
+void DigestStreamTest::testToFromHex()
+{
+	std::string digest("c3fcd3d76192e4007dfb496cca67e13b");
+	Poco::DigestEngine::Digest dig = DigestEngine::digestFromHex(digest);
+	std::string digest2 = DigestEngine::digestToHex(dig);
+	assert (digest == digest2);
+}
+
+
 void DigestStreamTest::setUp()
 {
 }
@@ -110,6 +119,7 @@ CppUnit::Test* DigestStreamTest::suite()
 	CppUnit_addTest(pSuite, DigestStreamTest, testInputStream);
 	CppUnit_addTest(pSuite, DigestStreamTest, testOutputStream1);
 	CppUnit_addTest(pSuite, DigestStreamTest, testOutputStream2);
+	CppUnit_addTest(pSuite, DigestStreamTest, testToFromHex);
 
 	return pSuite;
 }

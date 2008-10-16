@@ -1,7 +1,7 @@
 //
 // DigestStreamTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/DigestStreamTest.h#2 $
+// $Id: //poco/Main/Foundation/testsuite/src/DigestStreamTest.h#9 $
 //
 // Definition of the DigestStreamTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testInputStream();
 	void testOutputStream1();
 	void testOutputStream2();
+	void testToFromHex();
 
 	void setUp();
 	void tearDown();
