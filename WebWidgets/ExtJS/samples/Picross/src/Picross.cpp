@@ -170,8 +170,9 @@ protected:
 		if (!_helpRequested)
 		{
 			unsigned short port = (unsigned short) config().getInt("Picross.port", 9980);
-			std::string data = config().getString("Picross.dataRoot", ".");
-			std::string extJSDir = config().getString("Picross.extjsRoot", ".");
+			std::string data = config().getString("Picross.dataRoot", config().expand("${application.configDir}img/"));
+			std::string extJSDir = config().getString("Picross.extjsRoot", config().expand("${application.configDir}../../testsuite/bin/"));
+			std::string puzzleDir = config().getString("Picross.puzzles", config().expand("${application.configDir}puzzles/"));
 			Poco::Path aPath(data);
 			aPath.makeAbsolute();
 			aPath.makeDirectory();
@@ -185,13 +186,20 @@ protected:
 			if (!extJSFile.exists() || extJSFile.isFile())
 				throw Poco::Util::InvalidArgumentException("extjsRoot is either a file or doesn't exist: must be directory!");
 
+			Poco::Path puzzle(puzzleDir);
+			puzzle.makeAbsolute();
+			puzzle.makeDirectory();
+			Poco::File puzzleFile(puzzle);
+			if (!puzzleFile.exists() || puzzleFile.isFile())
+				throw Poco::Util::InvalidArgumentException("puzzles directory is either a file or doesn't exist: must be directory!");
+
 			ResourceManager::Ptr pRM = new ResourceManager();
 			ExtJS::Utility::initialize(pRM, Poco::Path("/extjs"));
 			SharedPtr<WebApplication> pWebApp = new WebApplication(Poco::URI("/"), pRM);
 			LookAndFeel::Ptr laf(new LookAndFeel());
 			Poco::WebWidgets::ExtJS::Utility::initialize(laf);
 			pWebApp->setLookAndFeel(laf);
-			PicrossPage::Ptr ptr = new PicrossPage(aPath);
+			PicrossPage::Ptr ptr = new PicrossPage(puzzle);
 			ptr->createComponents();
 			ptr->initComponents();
 			

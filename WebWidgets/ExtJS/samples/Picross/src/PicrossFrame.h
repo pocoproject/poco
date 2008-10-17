@@ -10,6 +10,8 @@
 #include "Poco/WebWidgets/Page.h"
 #include "Poco/WebWidgets/Table.h"
 #include "Poco/WebWidgets/GridLayout.h"
+#include "Poco/WebWidgets/ImageButton.h"
+#include "Poco/WebWidgets/Label.h"
 #include "RAWReader.h"
 
 
@@ -33,19 +35,26 @@ private:
 	void createUpperTable();
 	void createLeftTable();
 	void createGameTable();
+	void createUpperLeftComponents(Poco::WebWidgets::GridLayout::Ptr pRoot);
 
 	void initGameTable();
 	void initUpperTable();
 	void initLeftTable();
+	
 
 private:
-	RAWReader                         _bmp;
-	Poco::WebWidgets::Table::Ptr      _pUpperTable;
-	Poco::WebWidgets::Table::Ptr      _pLeftTable;
-	Poco::WebWidgets::Table::Ptr      _pGameTable;
-	Poco::WebWidgets::TableModel::Ptr _pUpperStore;
-	Poco::WebWidgets::TableModel::Ptr _pLeftStore;
-	Poco::WebWidgets::TableModel::Ptr _pGameStore;
+	RAWReader                           _bmp;
+	Poco::WebWidgets::Table::Ptr        _pUpperTable;
+	Poco::WebWidgets::Table::Ptr        _pLeftTable;
+	Poco::WebWidgets::Table::Ptr        _pGameTable;
+	Poco::WebWidgets::TableModel::Ptr   _pUpperStore;
+	Poco::WebWidgets::TableModel::Ptr   _pLeftStore;
+	Poco::WebWidgets::TableModel::Ptr   _pGameStore;
+	Poco::WebWidgets::ImageButton::Ptr  _pSelect;
+	Poco::WebWidgets::ImageButton::Ptr  _pCancel;
+	Poco::WebWidgets::Label::Ptr        _pTime;
+	Poco::WebWidgets::Label::Ptr        _pErrors;
+	int                                 _cnt;
 };
 
 #endif

@@ -59,9 +59,9 @@ void RAWReader::readRow(Poco::BinaryReader& in)
 		in >> r;
 		in >> g;
 		in >> b;
-		// we shoul do a conversion to YUB and then judge dependening on the luminace value
+		// we shoul do a conversion to YUV and then judge depending on the luminace value
 		// simple check r only
-		if (r >= 0x80u)
+		if (r <= 0x80u)
 			_data.push_back(true);
 		else
 			_data.push_back(false);
