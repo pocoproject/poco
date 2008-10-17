@@ -39,6 +39,7 @@
 #include "Poco/WebWidgets/ExtJS/Utility.h"
 #include "Poco/WebWidgets/ImageButtonCell.h"
 #include "Poco/WebWidgets/ImageButton.h"
+#include <sstream>
 
 
 namespace Poco {
@@ -88,18 +89,22 @@ void ImageButtonCellRenderer::renderHead(const Renderable* pRenderable, const Re
 
 void ImageButtonCellRenderer::writeHTML(const ImageButtonCell* pButtonCell, bool showTxt, std::ostream& ostr)
 {
-	Image::Ptr ptrImg = pButtonCell->getImage();
+	Image::Ptr pImg = pButtonCell->getImage();
 	const Poco::WebWidgets::ImageButton* pOwner = static_cast<const Poco::WebWidgets::ImageButton*>(pButtonCell->getOwner());
 	poco_check_ptr (pOwner);
+	if (pOwner->hasClass())
+		ostr << "'<div class=\"" << Utility::safe(pOwner->getClass()) << "\">";
 	ostr << "'<div>";
 	ostr << "<div><center>";
-	ostr << "<input src=\"" << Utility::safe(ptrImg->getURI().toString()) << "\"";
+	ostr << "<input src=\"" << Utility::safe(pImg->getURI().toString()) << "\"";
 	if (!pOwner->getName().empty())
 		ostr << " name=\"" << pOwner->getName() << "\"";
 	if (pOwner->getWidth() > 0)
 		ostr << " width=\"" << pOwner->getWidth() << "\"";
 	if (pOwner->getHeight() > 0)
 		ostr << " height=\"" << pOwner->getHeight() << "\"";
+	if (pImg->hasClass())
+		ostr << " class=\"" << pImg->getClass() << "\"";
 	std::string tooltip = pOwner->getToolTip();
 	if (!tooltip.empty())
 		ostr << " alt=\"" << Utility::safe(tooltip) << "\"";
@@ -107,8 +112,10 @@ void ImageButtonCellRenderer::writeHTML(const ImageButtonCell* pButtonCell, bool
 	if (pOwner->buttonClicked.hasJavaScriptCode())
 	{
 		ostr << " onclick=\"";
+		std::ostringstream str;
 		//FIXME: this will only work without params!
-		Utility::writeFunctionCode(ostr, "fct", pOwner->buttonClicked, &ButtonCellRenderer::createClickServerCallback, pOwner);
+		Utility::writeFunctionCode(str, "fct", pOwner->buttonClicked, &ButtonCellRenderer::createClickServerCallback, pOwner);
+		ostr << Utility::safe(str.str());
 		ostr << "\"";
 	}
 	ostr << " type=\"image\"/>";
