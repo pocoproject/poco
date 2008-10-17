@@ -62,6 +62,7 @@ void SessionPoolContainer::add(SessionPool* pPool)
 	if (_sessionPools.find(pPool->name()) != _sessionPools.end())
 		throw InvalidAccessException("Session pool already exists: " + pPool->name());
 
+	pPool->duplicate();
 	_sessionPools.insert(SessionPoolMap::ValueType(pPool->name(), pPool));
 }
 
@@ -72,7 +73,7 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 	int maxSessions, 
 	int idleTime)
 {
-	AutoPtr<SessionPool> pSP = 
+	SessionPool* pSP = 
 		new SessionPool(sessionKey, connectionString, minSessions, maxSessions, idleTime);
 
 	std::string name = pSP->name();
@@ -92,6 +93,14 @@ Session SessionPoolContainer::get(const std::string& name)
 	SessionPoolMap::Iterator it = _sessionPools.find(name);
 	if (_sessionPools.end() == it) throw NotFoundException(name);
 	return it->second->get();
+}
+
+
+void SessionPoolContainer::shutdown()
+{
+	SessionPoolMap::Iterator it = _sessionPools.begin();
+	SessionPoolMap::Iterator end = _sessionPools.end();
+	for (; it != end; ++it) it->second->shutdown();
 }
 
 

@@ -81,6 +81,7 @@ void SessionImpl::rollback()
 
 void SessionImpl::close()
 {
+	_connected = false;
 }
 
 

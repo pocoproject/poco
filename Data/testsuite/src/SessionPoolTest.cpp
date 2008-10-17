@@ -67,7 +67,7 @@ SessionPoolTest::~SessionPoolTest()
 
 void SessionPoolTest::testSessionPool()
 {
-	SessionPool pool("test", "cs", 1, 4, 5);
+	SessionPool pool("test", "cs", 1, 4, 2);
 	
 	pool.setFeature("f1", true);
 	assert (pool.getFeature("f1"));
@@ -150,9 +150,7 @@ void SessionPoolTest::testSessionPool()
 		Session s6(pool.get());
 		fail("pool exhausted - must throw");
 	}
-	catch (SessionPoolExhaustedException&)
-	{
-	}
+	catch (SessionPoolExhaustedException&) { }
 	
 	s5.close();
 	assert (pool.capacity() == 4);
@@ -167,9 +165,7 @@ void SessionPoolTest::testSessionPool()
 		s5 << "DROP TABLE IF EXISTS Test", now;
 		fail("session unusable - must throw");
 	}
-	catch (SessionUnavailableException&)
-	{
-	}
+	catch (SessionUnavailableException&) { }
 
 	s4.close();
 	assert (pool.capacity() == 4);
@@ -179,7 +175,7 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
 	
-	Thread::sleep(10000); // time to clean up idle sessions
+	Thread::sleep(5000); // time to clean up idle sessions
 	
 	assert (pool.capacity() == 4);
 	assert (pool.allocated() == 2);
@@ -205,6 +201,21 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.allocated() == 2);
 	assert (pool.idle() == 0);
 	assert (pool.available() == 2);
+	assert (pool.dead() == 0);
+	assert (pool.allocated() == pool.used() + pool.idle());
+
+	pool.shutdown();
+	try
+	{
+		Session s7(pool.get());
+		fail("pool shut down - must throw");
+	}
+	catch (InvalidAccessException&) { }
+
+	assert (pool.capacity() == 4);
+	assert (pool.allocated() == 0);
+	assert (pool.idle() == 0);
+	assert (pool.available() == 0);
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
 }

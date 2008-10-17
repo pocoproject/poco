@@ -133,8 +133,12 @@ public:
 	int available() const;
 		/// Returns the number of available (idle + remaining capacity) sessions.
 
-	const std::string name() const;
+	std::string name() const;
 		/// Returns the name for this pool.
+
+	static std::string name(const std::string sessionKey,
+		const std::string& connectionString);
+	/// Returns the name formatted from supplied arguments as "sessionKey://connectionString".
 
 	void setFeature(const std::string& name, bool state);
 		/// Sets feature for all the sessions.
@@ -147,6 +151,8 @@ public:
 
 	Poco::Any getProperty(const std::string& name);
 		/// Returns the requested property.
+
+	void shutdown();
 
 protected:
 	typedef Poco::AutoPtr<PooledSessionHolder>    PooledSessionHolderPtr;
@@ -164,6 +170,8 @@ private:
 	SessionPool(const SessionPool&);
 	SessionPool& operator = (const SessionPool&);
 		
+	void closeAll(SessionList& sessionList);
+
 	std::string _sessionKey;
 	std::string _connectionString;
 	int _minSessions;
@@ -175,15 +183,23 @@ private:
 	Poco::Timer _janitorTimer;
 	FeatureMap  _featureMap;
 	PropertyMap _propertyMap;
+	bool _shutdown;
 	mutable Poco::FastMutex _mutex;
 	
 	friend class PooledSessionImpl;
 };
 
 
-inline const std::string SessionPool::name() const
+inline std::string SessionPool::name(const std::string sessionKey,
+	const std::string& connectionString)
 {
-	return format("%s://%s", _sessionKey, _connectionString);
+	return format("%s://%s", sessionKey, connectionString);
+}
+
+
+inline std::string SessionPool::name() const
+{
+	return name(_sessionKey, _connectionString);
 }
 
 

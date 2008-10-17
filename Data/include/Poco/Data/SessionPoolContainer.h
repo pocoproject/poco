@@ -80,6 +80,9 @@ public:
 	int count() const;
 		/// Returns the number of session pols in the container.
 
+	void shutdown();
+		/// Shuts down all the held pools.
+
 private:
 	typedef HashMap<std::string, AutoPtr<SessionPool> > SessionPoolMap;
 
