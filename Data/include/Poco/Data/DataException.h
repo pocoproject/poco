@@ -59,6 +59,7 @@ POCO_DECLARE_EXCEPTION(Data_API, LimitException, DataException)
 POCO_DECLARE_EXCEPTION(Data_API, NotSupportedException, DataException)
 POCO_DECLARE_EXCEPTION(Data_API, SessionUnavailableException, DataException)
 POCO_DECLARE_EXCEPTION(Data_API, SessionPoolExhaustedException, DataException)
+POCO_DECLARE_EXCEPTION(Data_API, SessionPoolExistsException, DataException)
 POCO_DECLARE_EXCEPTION(Data_API, NoDataException, DataException)
 POCO_DECLARE_EXCEPTION(Data_API, LengthExceededException, DataException)
 

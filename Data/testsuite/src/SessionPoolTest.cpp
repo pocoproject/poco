@@ -50,6 +50,7 @@ using Poco::Data::Session;
 using Poco::Data::SessionPool;
 using Poco::Data::SessionPoolContainer;
 using Poco::Data::SessionPoolExhaustedException;
+using Poco::Data::SessionPoolExistsException;
 using Poco::Data::SessionUnavailableException;
 
 
@@ -228,13 +229,14 @@ void SessionPoolTest::testSessionPoolContainer()
 	spc.add(pPool);
 	assert (1 == spc.count());
 	try { spc.add(pPool); fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	catch (SessionPoolExistsException&) { }
 	spc.remove(pPool->name());
 	assert (0 == spc.count());
 	try { spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }
 
 	spc.add("test", "cs");
+	spc.add("test", "cs");//duplicate request, must be silently ignored
 	assert (1 == spc.count());
 	spc.remove("test://cs");
 	assert (0 == spc.count());

@@ -60,7 +60,7 @@ void SessionPoolContainer::add(SessionPool* pPool)
 	poco_check_ptr (pPool);
 
 	if (_sessionPools.find(pPool->name()) != _sessionPools.end())
-		throw InvalidAccessException("Session pool already exists: " + pPool->name());
+		throw SessionPoolExistsException("Session pool already exists: " + pPool->name());
 
 	pPool->duplicate();
 	_sessionPools.insert(SessionPoolMap::ValueType(pPool->name(), pPool));
@@ -73,13 +73,14 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 	int maxSessions, 
 	int idleTime)
 {
+	std::string name = SessionPool::name(sessionKey, connectionString);
+	SessionPoolMap::Iterator it = _sessionPools.find(name);
+
+	// pool already exists, silently return a session from it
+	if (it != _sessionPools.end()) return it->second->get();
+
 	SessionPool* pSP = 
 		new SessionPool(sessionKey, connectionString, minSessions, maxSessions, idleTime);
-
-	std::string name = pSP->name();
-
-	if (_sessionPools.find(name) != _sessionPools.end())
-		throw InvalidAccessException("Session pool already exists: " + name);
 
 	std::pair<SessionPoolMap::Iterator, bool> ins = 
 		_sessionPools.insert(SessionPoolMap::ValueType(name, pSP));

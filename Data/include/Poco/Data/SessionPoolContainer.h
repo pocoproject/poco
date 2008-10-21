@@ -62,6 +62,7 @@ public:
 	
 	void add(SessionPool* pPool);
 		/// Adds existing session pool to the container.
+		/// Throws SessionPoolExistsException if pool already exists.
 
 	Session add(const std::string& sessionKey, 
 		const std::string& connectionString,
@@ -69,7 +70,8 @@ public:
 		int maxSessions = 32, 
 		int idleTime = 60);
 		/// Adds a new session pool to the container and returns a Session from
-		/// newly created pool.
+		/// newly created pool. If pool already exists, request to add is silently
+		/// ignored and session is returned from the existing pool.
 
 	Session get(const std::string& name);
 		/// Returns a Session.
