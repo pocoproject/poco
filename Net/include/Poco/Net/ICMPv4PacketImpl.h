@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/ICMPPacketImpl.h"
+#include <cstddef>
 
 
 namespace Poco {
@@ -66,6 +67,12 @@ public:
 		Poco::UInt16 id;
 		Poco::UInt16 seq;
 	};
+
+	// compile-time shield against misalignment
+	poco_static_assert (offsetof(Header, code) == 0x01);
+	poco_static_assert (offsetof(Header, checksum) == 0x02);
+	poco_static_assert (offsetof(Header, id) == 0x04);
+	poco_static_assert (offsetof(Header, seq) == 0x06);
 
 	enum MessageType
 	{
