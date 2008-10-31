@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Crypto", "Crypto_VS71.vcproj", "{eeee7259-32e9-4d56-b023-c733940ab2a0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_VS71.vcproj", "{c1b1bb96-5198-48eb-ab48-9a0a0b54fb15}"
+	ProjectSection(ProjectDependencies) = postProject
+		{eeee7259-32e9-4d56-b023-c733940ab2a0} = {eeee7259-32e9-4d56-b023-c733940ab2a0}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		release_shared = release_shared
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{eeee7259-32e9-4d56-b023-c733940ab2a0}.debug_shared.ActiveCfg = debug_shared|Win32
+		{eeee7259-32e9-4d56-b023-c733940ab2a0}.debug_shared.Build.0 = debug_shared|Win32
+		{eeee7259-32e9-4d56-b023-c733940ab2a0}.release_shared.ActiveCfg = release_shared|Win32
+		{eeee7259-32e9-4d56-b023-c733940ab2a0}.release_shared.Build.0 = release_shared|Win32
+		{c1b1bb96-5198-48eb-ab48-9a0a0b54fb15}.debug_shared.ActiveCfg = debug_shared|Win32
+		{c1b1bb96-5198-48eb-ab48-9a0a0b54fb15}.debug_shared.Build.0 = debug_shared|Win32
+		{c1b1bb96-5198-48eb-ab48-9a0a0b54fb15}.release_shared.ActiveCfg = release_shared|Win32
+		{c1b1bb96-5198-48eb-ab48-9a0a0b54fb15}.release_shared.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
