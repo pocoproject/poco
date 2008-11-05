@@ -53,7 +53,7 @@ RSAKey::RSAKey(KeyLength keyLength, Exponent exp):
 {
 	int keyLen = keyLength;
 	unsigned long expVal = RSA_3;
-	if (expVal == EXP_LARGE)
+	if (exp == EXP_LARGE)
 		expVal = RSA_F4;
 	_pImpl = new RSAKeyImpl(keyLen, expVal);
 }
