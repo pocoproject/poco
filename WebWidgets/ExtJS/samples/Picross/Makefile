@@ -8,10 +8,10 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Server
+objects = Picross PicrossFrame PicrossPage RAWReader
 
-target         = Server
+target         = picross
 target_version = 1
-target_libs    = PocoFoundation PocoXML PocoNet PocoUtil
+target_libs    = PocoExtJS PocoWebWidgets PocoUtil PocoNet PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
