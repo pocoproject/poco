@@ -123,10 +123,10 @@ protected:
 };
 
 template <class TObj, class TArg, class TArgIn>
-Getter* getter(const TObj* object, TArg (TObj::*method)(TArgIn in) const)
+Getter* getter(const TObj* object, TArg (TObj::*method)(TArgIn) const, TArgIn in )
 	/// "Constructor" function for a Getter.
 {
-	return new GetterImpl2(object, method, in);
+	return new GetterImpl2<TObj, TArg, TArgIn>(object, method, in);
 }
 
 
@@ -134,7 +134,7 @@ template <class TObj, class TArg>
 Getter* getter(const TObj* object, TArg (TObj::*method)() const)
 	/// "Constructor" function for a Getter.
 {
-	return new GetterImpl(object, method);
+	return new GetterImpl<TObj, TArg>(object, method);
 }
 
 

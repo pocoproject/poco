@@ -293,7 +293,7 @@ void Template::bind(std::size_t num, const Any& val)
 	else if (type == typeid(Poco::SharedPtr<std::vector<float> >))
 		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<float> > >(val));
 	else if (type == typeid(Poco::SharedPtr<std::vector<double> >))
-		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<double> >>(val));
+		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<double> > >(val));
 	else if (type == typeid(Poco::SharedPtr<std::vector<char> >))
 		bindPtr(num, RefAnyCast<Poco::SharedPtr<std::vector<char> > >(val));
 	else if (type == typeid(Poco::SharedPtr<std::vector<bool> >))

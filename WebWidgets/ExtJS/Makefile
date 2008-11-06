@@ -22,7 +22,9 @@ objects = AbstractTableCellHandler ArrayTableSerializer \
 	TableCellHandlerFactory TableRenderer TabViewRenderer \
 	TextEditCellRenderer TextFieldCellRenderer \
 	TimeFieldCellRenderer ToggleButtonCellRenderer \
-	Utility VerticalLayoutRenderer 
+	Utility VerticalLayoutRenderer  \
+	DynamicCodeLoaderRenderer AbsoluteLayoutRenderer \
+	TemplateRenderer
 
 target         = PocoExtJS
 target_version = $(LIBVERSION)

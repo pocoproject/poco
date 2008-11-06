@@ -23,7 +23,9 @@ objects = Renderable Renderer RenderContext LookAndFeel Type Delegate \
 	PasswordField PasswordFieldCell TimeField TimeFieldCell \
 	WebApplication RequestProcessor RequestHandler \
 	SubmitButton SubmitButtonCell ResourceManager \
-	StringFormatter WebWidgetsException JSDelegate
+	StringFormatter WebWidgetsException JSDelegate \
+	SortedTableModel AjaxDelegate AbsoluteLayout \
+	DynamicCodeLoader Template
 
 target         = PocoWebWidgets
 target_version = $(LIBVERSION)
