@@ -63,21 +63,7 @@ Binder::Binder(const StatementHandle& rStmt,
 
 Binder::~Binder()
 {
-	LengthVec::iterator itLen = _lengthIndicator.begin();
-	LengthVec::iterator itLenEnd = _lengthIndicator.end();
-	for(; itLen != itLenEnd; ++itLen) delete *itLen;
-
-	TimestampMap::iterator itTS = _timestamps.begin();
-	TimestampMap::iterator itTSEnd = _timestamps.end();
-	for(; itTS != itTSEnd; ++itTS) delete itTS->first;
-
-	StringMap::iterator itStr = _strings.begin();
-	StringMap::iterator itStrEnd = _strings.end();
-	for(; itStr != itStrEnd; ++itStr) std::free(itStr->first);
-
-	CharPtrVec::iterator itChr = _charPtrs.begin();
-	CharPtrVec::iterator endChr = _charPtrs.end();
-	for (; itChr != endChr; ++itChr) delete [] *itChr;
+	freeMemory();
 }
 
 

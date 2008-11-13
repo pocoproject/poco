@@ -611,8 +611,8 @@ private:
 	template <typename T>
 	void deleteCachedArray(std::size_t pos) const
 	{
-		T* p = Poco::AnyCast<T>(&_values[pos]);
-		delete [] p;
+		T** p = Poco::AnyCast<T*>(&_values[pos]);
+		if (p) delete [] *p;
 	}
 
 	const StatementHandle&  _rStmt;

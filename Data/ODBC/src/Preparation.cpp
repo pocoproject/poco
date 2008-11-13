@@ -36,6 +36,10 @@
 
 #include "Poco/Data/ODBC/Preparation.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
+#include "Poco/Exception.h"
+
+
+using Poco::InvalidArgumentException;
 
 
 namespace Poco {
@@ -76,43 +80,34 @@ void Preparation::freeMemory() const
 {
 	IndexMap::iterator it = _varLengthArrays.begin();
 	IndexMap::iterator end = _varLengthArrays.end();
-	for (; it != end; ++it)	
+	for (; it != end; ++it)
 	{
 		switch (it->second)
 		{
-		case DT_BOOL:
-			deleteCachedArray<bool>(it->first);
-			break;
-		
-		case DT_CHAR:
-			deleteCachedArray<char>(it->first);
-			break;
+			case DT_BOOL:
+				deleteCachedArray<bool>(it->first);
+				break;
 
-		case DT_CHAR_ARRAY:
-		{
-			char* pc = AnyCast<char>(&_values[it->first]);
-			std::free(pc);
-			break;
-		}
+			case DT_CHAR:
+				deleteCachedArray<char>(it->first);
+				break;
 
-		case DT_BOOL_ARRAY:
-		{
-			bool* pb = AnyCast<bool>(&_values[it->first]);
-			std::free(pb);
-			break;
-		}
+			case DT_CHAR_ARRAY:
+			{
+				char** pc = AnyCast<char*>(&_values[it->first]);
+				if (pc) std::free(*pc);
+				break;
+			}
 
-		case DT_DATE:
-			deleteCachedArray<SQL_DATE_STRUCT>(it->first);
-			break;
+			case DT_BOOL_ARRAY:
+			{
+				bool** pb = AnyCast<bool*>(&_values[it->first]);
+				if (pb) std::free(*pb);
+				break;
+			}
 
-		case DT_TIME:
-			deleteCachedArray<SQL_TIME_STRUCT>(it->first);
-			break;
-
-		case DT_DATETIME:
-			deleteCachedArray<SQL_TIMESTAMP_STRUCT>(it->first);
-			break;
+			default:
+				throw InvalidArgumentException("Unknown data type.");
 		}
 	}
 }
