@@ -49,7 +49,6 @@
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/String.h"
-#include "Poco/DynamicAny.h"
 
 
 namespace Poco {

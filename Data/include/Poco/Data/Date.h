@@ -41,7 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/DynamicAnyHolder.h"
+#include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
 
 
@@ -158,28 +158,29 @@ inline bool Date::operator > (const Date& date)
 
 
 //
-// DynamicAnyHolderImpl<BLOB>
+// VarHolderImpl<BLOB>
 //
 
 
 namespace Poco {
+namespace Dynamic {
 
 
 template <>
-class DynamicAnyHolderImpl<Data::Date>: public DynamicAnyHolder
+class VarHolderImpl<Poco::Data::Date>: public VarHolder
 {
 public:
-	DynamicAnyHolderImpl(const Data::Date& val): _val(val)
+	VarHolderImpl(const Poco::Data::Date& val): _val(val)
 	{
 	}
 
-	~DynamicAnyHolderImpl()
+	~VarHolderImpl()
 	{
 	}
 	
 	const std::type_info& type() const
 	{
-		return typeid(Data::Date);
+		return typeid(Poco::Data::Date);
 	}
 
 	void convert(Poco::Timestamp& val) const
@@ -205,23 +206,23 @@ public:
 		val = DateTimeFormatter::format(dt, "%Y/%m/%d");
 	}
 
-	DynamicAnyHolder* clone() const
+	VarHolder* clone() const
 	{
-		return new DynamicAnyHolderImpl(_val);
+		return new VarHolderImpl(_val);
 	}
 	
-	const Data::Date& value() const
+	const Poco::Data::Date& value() const
 	{
 		return _val;
 	}
 
 private:
-	DynamicAnyHolderImpl();
-	Data::Date _val;
+	VarHolderImpl();
+	Poco::Data::Date _val;
 };
 
 
-} // namespace Poco
+} } // namespace Poco::Dynamic
 
 
 #endif // Data_Date_INCLUDED

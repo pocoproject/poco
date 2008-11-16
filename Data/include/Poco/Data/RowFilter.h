@@ -42,7 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/RecordSet.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/String.h"
 #include "Poco/RefCountedObject.h"
@@ -87,10 +87,10 @@ public:
 		OP_NOT
 	};
 
-	typedef bool (*CompT)(const DynamicAny&, const DynamicAny&);
+	typedef bool (*CompT)(const Poco::Dynamic::Var&, const Poco::Dynamic::Var&);
 	typedef AutoPtr<RowFilter> Ptr;
 	typedef std::map<std::string, Comparison> Comparisons;
-	typedef Tuple<DynamicAny, Comparison, LogicOperator> ComparisonEntry;
+	typedef Tuple<Poco::Dynamic::Var, Comparison, LogicOperator> ComparisonEntry;
 	typedef std::multimap<std::string, ComparisonEntry> ComparisonMap;
 	typedef std::map<AutoPtr<RowFilter>, LogicOperator> FilterMap;
 
@@ -153,7 +153,7 @@ public:
 	bool isEmpty() const;
 		/// Returns true if there is not filtering criteria specified.
 
-	bool isAllowed(std::size_t row) const;//const std::string& name, const DynamicAny& val) const;
+	bool isAllowed(std::size_t row) const;//const std::string& name, const Poco::Dynamic::Var& val) const;
 		/// Returns true if name and value are allowed.
 
 	bool exists(const std::string& name) const;
@@ -166,18 +166,18 @@ private:
 
 	void init();
 
-	static bool equal(const DynamicAny& p1, const DynamicAny& p2);
-	static bool notEqual(const DynamicAny& p1, const DynamicAny& p2);
-	static bool less(const DynamicAny& p1, const DynamicAny& p2);
-	static bool greater(const DynamicAny& p1, const DynamicAny& p2);
-	static bool lessOrEqual(const DynamicAny& p1, const DynamicAny& p2);
-	static bool greaterOrEqual(const DynamicAny& p1, const DynamicAny& p2);
-	static bool logicalAnd(const DynamicAny& p1, const DynamicAny& p2);
-	static bool logicalOr(const DynamicAny& p1, const DynamicAny& p2);
-	static bool isNull(const DynamicAny& p1, const DynamicAny&);
+	static bool equal(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	static bool notEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	static bool less(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	static bool greater(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	static bool lessOrEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	static bool greaterOrEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	static bool logicalAnd(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	static bool logicalOr(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	static bool isNull(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var&);
 
-	static void doCompare(DynamicAny& ret,
-		DynamicAny& val,
+	static void doCompare(Poco::Dynamic::Var& ret,
+		Poco::Dynamic::Var& val,
 		CompT comp,
 		const ComparisonEntry& ce);
 
@@ -225,55 +225,55 @@ inline bool RowFilter::isNot() const
 }
 
 
-inline bool RowFilter::equal(const DynamicAny& p1, const DynamicAny& p2)
+inline bool RowFilter::equal(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2)
 {
 	return p1 == p2;
 }
 
 
-inline bool RowFilter::notEqual(const DynamicAny& p1, const DynamicAny& p2)
+inline bool RowFilter::notEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2)
 {
 	return p1 != p2;
 }
 
 
-inline bool RowFilter::less(const DynamicAny& p1, const DynamicAny& p2)
+inline bool RowFilter::less(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2)
 {
 	return p1 < p2;
 }
 
 
-inline bool RowFilter::greater(const DynamicAny& p1, const DynamicAny& p2)
+inline bool RowFilter::greater(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2)
 {
 	return p1 > p2;
 }
 
 
-inline bool RowFilter::lessOrEqual(const DynamicAny& p1, const DynamicAny& p2)
+inline bool RowFilter::lessOrEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2)
 {
 	return p1 <= p2;
 }
 
 
-inline bool RowFilter::greaterOrEqual(const DynamicAny& p1, const DynamicAny& p2)
+inline bool RowFilter::greaterOrEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2)
 {
 	return p1 >= p2;
 }
 
 
-inline bool RowFilter::logicalAnd(const DynamicAny& p1, const DynamicAny& p2)
+inline bool RowFilter::logicalAnd(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2)
 {
 	return p1 && p2;
 }
 
 
-inline bool RowFilter::logicalOr(const DynamicAny& p1, const DynamicAny& p2)
+inline bool RowFilter::logicalOr(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2)
 {
 	return p1 || p2;
 }
 
 
-inline bool RowFilter::isNull(const DynamicAny& p1, const DynamicAny&)
+inline bool RowFilter::isNull(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var&)
 {
 	return p1.isEmpty();
 }

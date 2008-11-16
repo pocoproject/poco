@@ -42,7 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Row.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include <iterator>
 
 

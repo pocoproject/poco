@@ -147,7 +147,7 @@ void Preparation::prepare(std::size_t pos, const Poco::Any&)
 }
 
 
-void Preparation::prepare(std::size_t pos, const Poco::DynamicAny&)
+void Preparation::prepare(std::size_t pos, const Poco::Dynamic::Var&)
 {
 }
 

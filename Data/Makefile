@@ -14,7 +14,8 @@ objects = AbstractBinder AbstractBinding AbstractExtraction AbstractExtractor \
 	PooledSessionHolder PooledSessionImpl Position \
 	Range RecordSet Row RowFilter RowFormatter RowIterator \
 	SimpleRowFormatter Session SessionFactory SessionImpl \
-	SessionPool SQLChannel Statement StatementCreator StatementImpl Time
+	SessionPool SessionPoolContainer SQLChannel \
+	Statement StatementCreator StatementImpl Time
 
 target         = PocoData
 target_version = $(LIBVERSION)

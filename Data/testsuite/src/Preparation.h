@@ -114,8 +114,8 @@ public:
 	void prepare(std::size_t pos, const Poco::Any&);
 		/// Prepares an Any.
 
-	void prepare(std::size_t pos, const Poco::DynamicAny&);
-		/// Prepares a DynamicAny.
+	void prepare(std::size_t pos, const Poco::Dynamic::Var&);
+		/// Prepares a Var.
 };
 
 

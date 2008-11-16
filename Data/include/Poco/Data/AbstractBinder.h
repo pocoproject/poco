@@ -46,7 +46,7 @@
 #include "Poco/Data/BLOB.h"
 #include "Poco/DateTime.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include <vector>
 #include <deque>
 #include <list>
@@ -326,8 +326,8 @@ public:
 	void bind(std::size_t pos, const Any& val, Direction dir = PD_IN);
 		/// Binds an Any.
 	
-	void bind(std::size_t pos, const DynamicAny& val, Direction dir = PD_IN);
-		/// Binds a DynamicAny.
+	void bind(std::size_t pos, const Poco::Dynamic::Var& val, Direction dir = PD_IN);
+	/// Binds a Var.
 
 	virtual void reset();
 		/// Resets a binder. No-op by default. Implement for binders that cache data.

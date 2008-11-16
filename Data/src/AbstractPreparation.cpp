@@ -397,19 +397,19 @@ void AbstractPreparation::prepare(std::size_t pos, const std::list<Any>& val)
 }
 
 
-void AbstractPreparation::prepare(std::size_t pos, const std::vector<DynamicAny>& val)
+void AbstractPreparation::prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val)
 {
 	throw NotImplementedException("std::vector preparation must be implemented.");
 }
 
 
-void AbstractPreparation::prepare(std::size_t pos, const std::deque<DynamicAny>& val)
+void AbstractPreparation::prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val)
 {
 	throw NotImplementedException("std::deque preparation must be implemented.");
 }
 
 
-void AbstractPreparation::prepare(std::size_t pos, const std::list<DynamicAny>& val)
+void AbstractPreparation::prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val)
 {
 	throw NotImplementedException("std::list preparation must be implemented.");
 }

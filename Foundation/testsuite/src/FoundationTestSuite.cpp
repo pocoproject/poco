@@ -32,6 +32,7 @@
 
 #include "FoundationTestSuite.h"
 #include "CoreTestSuite.h"
+#include "DynamicTestSuite.h"
 #include "DateTimeTestSuite.h"
 #include "StreamsTestSuite.h"
 #include "CryptTestSuite.h"
@@ -55,6 +56,7 @@ CppUnit::Test* FoundationTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FoundationTestSuite");
 
 	pSuite->addTest(CoreTestSuite::suite());
+	pSuite->addTest(DynamicTestSuite::suite());
 	pSuite->addTest(DateTimeTestSuite::suite());
 	pSuite->addTest(StreamsTestSuite::suite());
 	pSuite->addTest(CryptTestSuite::suite());

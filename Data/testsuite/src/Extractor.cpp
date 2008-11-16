@@ -180,7 +180,7 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 }
 
 
-bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
+bool Extractor::extract(std::size_t pos, Poco::Dynamic::Var& val)
 {
 	return true;
 }

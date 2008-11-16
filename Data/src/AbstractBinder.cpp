@@ -41,7 +41,7 @@
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTime.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 
 
 namespace Poco {
@@ -449,7 +449,7 @@ void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 }
 
 
-void AbstractBinder::bind(std::size_t pos, const DynamicAny& val, Direction dir)
+void AbstractBinder::bind(std::size_t pos, const Poco::Dynamic::Var& val, Direction dir)
 {
 	const std::type_info& type = val.type();
 

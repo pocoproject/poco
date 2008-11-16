@@ -174,17 +174,18 @@ private:
 
 	std::string _sessionKey;
 	std::string _connectionString;
-	int _minSessions;
-	int _maxSessions;
-	int _idleTime;
-	int _nSessions;
+	int         _minSessions;
+	int         _maxSessions;
+	int         _idleTime;
+	int         _nSessions;
 	SessionList _idleSessions;
 	SessionList _activeSessions;
 	Poco::Timer _janitorTimer;
 	FeatureMap  _featureMap;
 	PropertyMap _propertyMap;
-	bool _shutdown;
-	mutable Poco::FastMutex _mutex;
+	bool        _shutdown;
+	mutable
+	Poco::Mutex _mutex;
 	
 	friend class PooledSessionImpl;
 };

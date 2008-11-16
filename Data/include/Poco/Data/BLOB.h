@@ -42,7 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/DynamicAnyHolder.h"
+#include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
 #include <vector>
 
@@ -232,28 +232,29 @@ namespace std
 
 
 //
-// DynamicAnyHolderImpl<BLOB>
+// VarHolderImpl<BLOB>
 //
 
 
 namespace Poco {
+namespace Dynamic {
 
 
 template <>
-class DynamicAnyHolderImpl<Data::BLOB>: public DynamicAnyHolder
+class VarHolderImpl<Poco::Data::BLOB>: public VarHolder
 {
 public:
-	DynamicAnyHolderImpl(const Data::BLOB& val): _val(val)
+	VarHolderImpl(const Poco::Data::BLOB& val): _val(val)
 	{
 	}
 
-	~DynamicAnyHolderImpl()
+	~VarHolderImpl()
 	{
 	}
 	
 	const std::type_info& type() const
 	{
-		return typeid(Data::BLOB);
+		return typeid(Poco::Data::BLOB);
 	}
 
 	void convert(std::string& val) const
@@ -261,23 +262,23 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
-	DynamicAnyHolder* clone() const
+	VarHolder* clone() const
 	{
-		return new DynamicAnyHolderImpl(_val);
+		return new VarHolderImpl(_val);
 	}
 	
-	const Data::BLOB& value() const
+	const Poco::Data::BLOB& value() const
 	{
 		return _val;
 	}
 
 private:
-	DynamicAnyHolderImpl();
-	Data::BLOB _val;
+	VarHolderImpl();
+	Poco::Data::BLOB _val;
 };
 
 
-} // namespace Poco
+} } // namespace Poco::Dynamic
 
 
 #endif // Data_BLOB_INCLUDED

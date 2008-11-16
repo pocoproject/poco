@@ -365,18 +365,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\DynamicAny.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\DynamicAnyHolder.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\DynamicStruct.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\Environment.cpp"
 					>
 				</File>
@@ -793,19 +781,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\DynamicAny.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\DynamicAnyHolder.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\DynamicFactory.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\DynamicStruct.h"
 					>
 				</File>
 				<File
@@ -4734,6 +4710,54 @@
 				</File>
 				<File
 					RelativePath=".\src\HashStatistic.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Dynamic"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\DynamicAny.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\DynamicAnyHolder.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\DynamicStruct.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Dynamic\Struct.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Dynamic\Var.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Dynamic\VarHolder.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\Struct.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Var.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\VarHolder.cpp"
 					>
 				</File>
 			</Filter>

@@ -81,8 +81,8 @@ public:
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
 
-	bool extract(std::size_t pos, Poco::DynamicAny& val);
-		/// Extracts a DynamicAny.
+	bool extract(std::size_t pos, Poco::Dynamic::Var& val);
+		/// Extracts a Var.
 
 #ifndef POCO_LONG_IS_64_BIT
 	bool extract(std::size_t pos, long& val);

@@ -54,8 +54,10 @@ namespace Poco {
 
 class DateTime;
 class Any;
-class DynamicAny;
 
+namespace Dynamic {
+class Var;
+}
 
 namespace Data {
 
@@ -306,17 +308,17 @@ public:
 	virtual bool extract(std::size_t pos, std::list<Any>& val);
 		/// Extracts an Any list.
 
-	virtual bool extract(std::size_t pos, DynamicAny& val) = 0;
-		/// Extracts a DynamicAny. Returns false if null was received.
+	virtual bool extract(std::size_t pos, Poco::Dynamic::Var& val) = 0;
+		/// Extracts a Var. Returns false if null was received.
 
-	virtual bool extract(std::size_t pos, std::vector<DynamicAny>& val);
-		/// Extracts a DynamicAny vector.
+	virtual bool extract(std::size_t pos, std::vector<Poco::Dynamic::Var>& val);
+		/// Extracts a Var vector.
 
-	virtual bool extract(std::size_t pos, std::deque<DynamicAny>& val);
-		/// Extracts a DynamicAny deque.
+	virtual bool extract(std::size_t pos, std::deque<Poco::Dynamic::Var>& val);
+		/// Extracts a Var deque.
 
-	virtual bool extract(std::size_t pos, std::list<DynamicAny>& val);
-		/// Extracts a DynamicAny list.
+	virtual bool extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val);
+		/// Extracts a Var list.
 
 	virtual bool isNull(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) = 0;
 		/// Returns true if the value at [col,row] position is null.

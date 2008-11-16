@@ -47,7 +47,7 @@
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/String.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
 #include <ostream>
 
@@ -222,30 +222,30 @@ public:
 		}
 	}
 
-	DynamicAny value(std::size_t col, std::size_t row, bool checkFiltering = true) const;
+	Poco::Dynamic::Var value(std::size_t col, std::size_t row, bool checkFiltering = true) const;
 		/// Returns the data value at column, row location.
 
-	DynamicAny value(const std::string& name, std::size_t row, bool checkFiltering = true) const;
+	Poco::Dynamic::Var value(const std::string& name, std::size_t row, bool checkFiltering = true) const;
 		/// Returns the data value at named column, row location.
 
 	template <typename T>
-	DynamicAny nvl(const std::string& name, const T& deflt = T()) const
+	Poco::Dynamic::Var nvl(const std::string& name, const T& deflt = T()) const
 		/// Returns the value in the named column of the current row
 		/// if the value is not NULL, or deflt otherwise.
 	{
 		if (isNull(name))
-			return DynamicAny(deflt);
+			return Poco::Dynamic::Var(deflt);
 		else
 			return value(name, _currentRow);
 	}
 	
 	template <typename T>
-	DynamicAny nvl(std::size_t index, const T& deflt = T()) const
+	Poco::Dynamic::Var nvl(std::size_t index, const T& deflt = T()) const
 		/// Returns the value in the given column of the current row
 		/// if the value is not NULL, or deflt otherwise.
 	{
 		if (isNull(index, _currentRow))
-			return DynamicAny(deflt);
+			return Poco::Dynamic::Var(deflt);
 		else
 			return value(index, _currentRow);
 	}
@@ -287,16 +287,16 @@ public:
 		/// Returns true if there is at least one row in the RecordSet,
 		/// false otherwise.
 
-	DynamicAny value(const std::string& name);
+	Poco::Dynamic::Var value(const std::string& name);
 		/// Returns the value in the named column of the current row.
 
-	DynamicAny value(std::size_t index);
+	Poco::Dynamic::Var value(std::size_t index);
 		/// Returns the value in the given column of the current row.
 
-	DynamicAny operator [] (const std::string& name);
+	Poco::Dynamic::Var operator [] (const std::string& name);
 		/// Returns the value in the named column of the current row.
 
-	DynamicAny operator [] (std::size_t index);
+	Poco::Dynamic::Var operator [] (std::size_t index);
 		/// Returns the value in the named column of the current row.
 
 	MetaColumn::ColumnDataType columnType(std::size_t pos) const;
@@ -468,25 +468,25 @@ inline Statement& RecordSet::operator = (const Statement& stmt)
 }
 
 
-inline DynamicAny RecordSet::value(const std::string& name)
+inline Poco::Dynamic::Var RecordSet::value(const std::string& name)
 {
 	return value(name, _currentRow);
 }
 
 
-inline DynamicAny RecordSet::value(std::size_t index)
+inline Poco::Dynamic::Var RecordSet::value(std::size_t index)
 {
 	return value(index, _currentRow);
 }
 
 
-inline DynamicAny RecordSet::operator [] (const std::string& name)
+inline Poco::Dynamic::Var RecordSet::operator [] (const std::string& name)
 {
 	return value(name, _currentRow);
 }
 
 
-inline DynamicAny RecordSet::operator [] (std::size_t index)
+inline Poco::Dynamic::Var RecordSet::operator [] (std::size_t index)
 {
 	return value(index, _currentRow);
 }

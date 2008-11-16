@@ -87,7 +87,7 @@ void Row::init(const SortMapPtr& pSortMap, const RowFormatterPtr& pFormatter)
 		// Row sortability in the strict weak ordering sense is 
 		// an invariant, hence we must start with a zero here.
 		// If null value is later retrieved from DB, the 
-		// DynamicAny::empty() call should be used to empty
+		// Var::empty() call should be used to empty
 		// the corresponding Row value.
 		_values[0] = 0;
 		addSortField(0);
@@ -100,7 +100,7 @@ Row::~Row()
 }
 
 
-DynamicAny& Row::get(std::size_t col)
+Poco::Dynamic::Var& Row::get(std::size_t col)
 {
 	try
 	{
@@ -130,7 +130,7 @@ std::size_t Row::getPosition(const std::string& name)
 }
 
 
-void Row::checkEmpty(std::size_t pos, const DynamicAny& val)
+void Row::checkEmpty(std::size_t pos, const Poco::Dynamic::Var& val)
 {
 	bool empty = true;
 	SortMap::const_iterator it = _pSortMap->begin();
@@ -198,7 +198,7 @@ void Row::addSortField(const std::string& name)
 
 void Row::removeSortField(std::size_t pos)
 {
-	checkEmpty(pos, DynamicAny());
+	checkEmpty(pos, Poco::Dynamic::Var());
 
 	SortMap::iterator it = _pSortMap->begin();
 	SortMap::iterator end = _pSortMap->end();
@@ -288,8 +288,8 @@ bool Row::isEqualSize(const Row& other) const
 
 bool Row::isEqualType(const Row& other) const
 {
-	std::vector<DynamicAny>::const_iterator it = _values.begin();
-	std::vector<DynamicAny>::const_iterator end = _values.end();
+	std::vector<Poco::Dynamic::Var>::const_iterator it = _values.begin();
+	std::vector<Poco::Dynamic::Var>::const_iterator end = _values.end();
 	for (int i = 0; it != end; ++it, ++i)
 	{
 		if (it->type() != other._values[i].type())
@@ -305,8 +305,8 @@ bool Row::operator == (const Row& other) const
 	if (!isEqualSize(other)) return false;
 	if (!isEqualType(other)) return false;
 
-	std::vector<DynamicAny>::const_iterator it = _values.begin();
-	std::vector<DynamicAny>::const_iterator end = _values.end();
+	std::vector<Poco::Dynamic::Var>::const_iterator it = _values.begin();
+	std::vector<Poco::Dynamic::Var>::const_iterator end = _values.end();
 	for (int i = 0; it != end; ++it, ++i)
 	{
 		if ((*it).convert<std::string>() != other._values[i].convert<std::string>())

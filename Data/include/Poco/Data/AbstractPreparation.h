@@ -53,7 +53,10 @@ namespace Poco {
 
 class DateTime;
 class Any;
-class DynamicAny;
+
+namespace Dynamic {
+class Var;
+}
 
 
 namespace Data {
@@ -310,17 +313,17 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Any>& val);
 		/// Prepares an Any list.
 
-	virtual void prepare(std::size_t pos, const DynamicAny&) = 0;
-		/// Prepares a DynamicAny.
+	virtual void prepare(std::size_t pos, const Poco::Dynamic::Var&) = 0;
+		/// Prepares a Var.
 
-	virtual void prepare(std::size_t pos, const std::vector<DynamicAny>& val);
-		/// Prepares a DynamicAny vector.
+	virtual void prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val);
+		/// Prepares a Var vector.
 
-	virtual void prepare(std::size_t pos, const std::deque<DynamicAny>& val);
-		/// Prepares a DynamicAny deque.
+	virtual void prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val);
+		/// Prepares a Var deque.
 
-	virtual void prepare(std::size_t pos, const std::list<DynamicAny>& val);
-		/// Prepares a DynamicAny list.
+	virtual void prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val);
+		/// Prepares a Var list.
 
 	void setLength(Poco::UInt32 length);
 		/// Sets the length of prepared data.

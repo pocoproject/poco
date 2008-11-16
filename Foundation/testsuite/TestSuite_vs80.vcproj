@@ -407,10 +407,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\DynamicAnyTest.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\DynamicFactoryTest.cpp"
 					>
 				</File>
@@ -496,10 +492,6 @@
 				</File>
 				<File
 					RelativePath=".\src\CoreTestSuite.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\DynamicAnyTest.h"
 					>
 				</File>
 				<File
@@ -1580,6 +1572,34 @@
 				</File>
 				<File
 					RelativePath=".\src\SimpleHashTableTest.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Dynamic"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\DynamicTestSuite.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\VarTest.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\DynamicTestSuite.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\VarTest.cpp"
 					>
 				</File>
 			</Filter>

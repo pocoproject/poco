@@ -47,7 +47,6 @@
 #include "DynamicFactoryTest.h"
 #include "MemoryPoolTest.h"
 #include "AnyTest.h"
-#include "DynamicAnyTest.h"
 #include "FormatTest.h"
 #include "TuplesTest.h"
 #include "NamedTuplesTest.h"
@@ -74,7 +73,6 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(DynamicFactoryTest::suite());
 	pSuite->addTest(MemoryPoolTest::suite());
 	pSuite->addTest(AnyTest::suite());
-	pSuite->addTest(DynamicAnyTest::suite());
 	pSuite->addTest(FormatTest::suite());
 	pSuite->addTest(TuplesTest::suite());
 	pSuite->addTest(NamedTuplesTest::suite());

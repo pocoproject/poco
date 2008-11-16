@@ -44,7 +44,7 @@
 #include "Poco/Data/Session.h"
 #include "Poco/DateTime.h"
 #include "Poco/Timespan.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/SharedPtr.h"
 
 
@@ -221,10 +221,10 @@ private:
 
 	void initStatements();
 
-	Timespan    _maxAge;
-	std::string _ageString;
-	DateTime    _archiveDateTime;
-	DynamicAny  _archiveCount;
+	Timespan     _maxAge;
+	std::string  _ageString;
+	DateTime     _archiveDateTime;
+	Poco::Dynamic::Var _archiveCount;
 };
 
 

@@ -396,19 +396,19 @@ bool AbstractExtractor::extract(std::size_t pos, std::list<Any>& val)
 }
 
 
-bool AbstractExtractor::extract(std::size_t pos, std::vector<DynamicAny>& val)
+bool AbstractExtractor::extract(std::size_t pos, std::vector<Poco::Dynamic::Var>& val)
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");
 }
 
 
-bool AbstractExtractor::extract(std::size_t pos, std::deque<DynamicAny>& val)
+bool AbstractExtractor::extract(std::size_t pos, std::deque<Poco::Dynamic::Var>& val)
 {
 	throw NotImplementedException("std::deque extractor must be implemented.");
 }
 
 
-bool AbstractExtractor::extract(std::size_t pos, std::list<DynamicAny>& val)
+bool AbstractExtractor::extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val)
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }

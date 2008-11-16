@@ -43,7 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/RefCountedObject.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include <sstream>
 #include <vector>
 
@@ -75,7 +75,7 @@ class Data_API RowFormatter
 public:
 	typedef std::vector<std::string>             NameVec;
 	typedef SharedPtr<std::vector<std::string> > NameVecPtr;
-	typedef std::vector<DynamicAny>              ValueVec;
+	typedef std::vector<Poco::Dynamic::Var>            ValueVec;
 
 	RowFormatter(const std::string& prefix = "", const std::string& postfix = "");
 		/// Creates the RowFormatter and sets the prefix and postfix to specified values.

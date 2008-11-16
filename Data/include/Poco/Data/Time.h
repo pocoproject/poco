@@ -41,7 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/DynamicAnyHolder.h"
+#include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
 
 
@@ -158,28 +158,29 @@ inline bool Time::operator > (const Time& time)
 
 
 //
-// DynamicAnyHolderImpl<BLOB>
+// VarHolderImpl<BLOB>
 //
 
 
 namespace Poco {
+namespace Dynamic {
 
 
 template <>
-class DynamicAnyHolderImpl<Data::Time>: public DynamicAnyHolder
+class VarHolderImpl<Poco::Data::Time>: public VarHolder
 {
 public:
-	DynamicAnyHolderImpl(const Data::Time& val): _val(val)
+	VarHolderImpl(const Poco::Data::Time& val): _val(val)
 	{
 	}
 
-	~DynamicAnyHolderImpl()
+	~VarHolderImpl()
 	{
 	}
 	
 	const std::type_info& type() const
 	{
-		return typeid(Data::Time);
+		return typeid(Poco::Data::Time);
 	}
 
 	void convert(Poco::Timestamp& val) const
@@ -209,23 +210,23 @@ public:
 		val = DateTimeFormatter::format(dt, "%H:%M:%S");
 	}
 
-	DynamicAnyHolder* clone() const
+	VarHolder* clone() const
 	{
-		return new DynamicAnyHolderImpl(_val);
+		return new VarHolderImpl(_val);
 	}
 	
-	const Data::Time& value() const
+	const Poco::Data::Time& value() const
 	{
 		return _val;
 	}
 
 private:
-	DynamicAnyHolderImpl();
-	Data::Time _val;
+	VarHolderImpl();
+	Poco::Data::Time _val;
 };
 
 
-} // namespace Poco
+} } // namespace Poco::Dynamic
 
 
 #endif // Data_Time_INCLUDED

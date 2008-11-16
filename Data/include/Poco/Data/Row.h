@@ -42,7 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/RowFormatter.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/SharedPtr.h"
 #include <vector>
@@ -115,13 +115,13 @@ public:
 	~Row();
 		/// Destroys the Row.
 
-	DynamicAny& get(std::size_t col);
+	Poco::Dynamic::Var& get(std::size_t col);
 		/// Returns the reference to data value at column location.
 
-	DynamicAny& operator [] (std::size_t col);
+	Poco::Dynamic::Var& operator [] (std::size_t col);
 		/// Returns the reference to data value at column location.
 
-	DynamicAny& operator [] (const std::string& name);
+	Poco::Dynamic::Var& operator [] (const std::string& name);
 		/// Returns the reference to data value at named column location.
 
 	template <typename T>
@@ -232,7 +232,7 @@ public:
 private:
 	void init(const SortMapPtr& pSortMap, const RowFormatterPtr& pFormatter);
 
-	void checkEmpty(std::size_t pos, const DynamicAny& val);
+	void checkEmpty(std::size_t pos, const Poco::Dynamic::Var& val);
 		/// Check if row contains only empty values and throws IllegalStateException
 		/// if that is the case.
 
@@ -289,13 +289,13 @@ inline Row::ValueVec& Row::values()
 }
 
 
-inline DynamicAny& Row::operator [] (std::size_t col)
+inline Poco::Dynamic::Var& Row::operator [] (std::size_t col)
 {
 	return get(col);
 }
 
 
-inline DynamicAny& Row::operator [] (const std::string& name)
+inline Poco::Dynamic::Var& Row::operator [] (const std::string& name)
 {
 	return get(getPosition(name));
 }

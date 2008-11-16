@@ -87,7 +87,7 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
 	Session s1(pool.get());
-
+	
 	try { pool.setFeature("f1", true); fail ("must fail"); }
 	catch ( Poco::InvalidAccessException& ) { }
 	

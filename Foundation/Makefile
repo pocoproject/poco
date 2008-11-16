@@ -12,7 +12,6 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Configurable ConsoleChannel \
 	CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator \
-	DynamicAny DynamicAnyHolder DynamicStruct \
 	Environment Event EventArgs ErrorHandler Exception FPEnvironment File Glob \
 	FileChannel Formatter FormattingChannel HexBinaryDecoder LineEndingConverter \
 	HexBinaryEncoder InflatingStream Latin1Encoding Latin9Encoding LogFile Logger \
@@ -24,12 +23,12 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	RegularExpression RefCountedObject Runnable RotateStrategy Condition \
 	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel Stopwatch StreamChannel StreamConverter StreamCopier \
-	StreamTokenizer String StringTokenizer SynchronizedObject \
+	StreamTokenizer String StringTokenizer Struct SynchronizedObject \
 	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
 	TemporaryFile TextConverter TextEncoding TextIterator Thread ThreadLocal \
 	ThreadPool ThreadTarget ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \
-	UTF8Encoding UnicodeConverter UUID UUIDGenerator Void Format \
+	UTF8Encoding UnicodeConverter UUID UUIDGenerator Var VarHolder Void Format \
 	Pipe PipeImpl PipeStream SharedMemory FileStream Unicode UTF8String \
 	adler32 compress crc32 deflate gzio infback inffast inflate inftrees trees zutil \
 	pcre_chartables pcre_compile pcre_globals pcre_maketables pcre_study \

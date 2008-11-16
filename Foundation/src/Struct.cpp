@@ -1,11 +1,11 @@
 //
-// DynamicStruct.cpp
+// Struct.cpp
 //
-// $Id: //poco/Main/Foundation/src/DynamicStruct.cpp#4 $
+// $Id: //poco/Main/Foundation/src/Struct.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
-// Module:  DynamicStruct
+// Module:  Struct
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,31 +34,32 @@
 //
 
 
-#include "Poco/DynamicStruct.h"
+#include "Poco/Dynamic/Struct.h"
 #include "Poco/Exception.h"
 
 
 namespace Poco {
+namespace Dynamic {
 
 
-DynamicStruct::DynamicStruct():
+Struct::Struct():
 	_data()
 {
 }
 
 
-DynamicStruct::DynamicStruct(const Data& d):
+Struct::Struct(const Data& d):
 	_data(d)
 {
 }
 
 
-DynamicStruct::~DynamicStruct()
+Struct::~Struct()
 {
 }
 
 
-const DynamicAny& DynamicStruct::operator[](const std::string& name) const
+const Var& Struct::operator[](const std::string& name) const
 {
 	ConstIterator it = find(name);
 	if (it == end())
@@ -67,7 +68,7 @@ const DynamicAny& DynamicStruct::operator[](const std::string& name) const
 }
 
 
-std::set<std::string> DynamicStruct::members() const
+std::set<std::string> Struct::members() const
 {
 	std::set<std::string> keys;
 	ConstIterator it = begin();
@@ -78,4 +79,4 @@ std::set<std::string> DynamicStruct::members() const
 }
 
 
-} // namespace Poco::Poco
+} } // namespace Poco::Dynamic

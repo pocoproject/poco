@@ -47,7 +47,7 @@
 #include "Poco/BinaryWriter.h"
 #include "Poco/DateTime.h"
 #include "Poco/Types.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
 #include <cstring>
 #include <sstream>
@@ -64,7 +64,7 @@ using Poco::UInt32;
 using Poco::Int64;
 using Poco::UInt64;
 using Poco::DateTime;
-using Poco::DynamicAny;
+using Poco::Dynamic::Var;
 using Poco::InvalidAccessException;
 using Poco::IllegalStateException;
 using Poco::RangeException;
@@ -879,7 +879,7 @@ void DataTest::testRow()
 
 	try
 	{
-		row4.set("field1", DynamicAny());
+		row4.set("field1", Var());
 		row4.addSortField(1);
 		row4.removeSortField(0);
 		fail ("must fail - field 1 is empty");

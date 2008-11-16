@@ -67,9 +67,9 @@ SessionPool::~SessionPool()
 
 Session SessionPool::get()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) throw InvalidAccessException("Session pull has been shut down.");
-
+	
 	purgeDeadSessions();
 
 	if (_idleSessions.empty())
@@ -104,7 +104,7 @@ Session SessionPool::get()
 
 void SessionPool::purgeDeadSessions()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 
 	SessionList::iterator it = _idleSessions.begin();
@@ -128,21 +128,21 @@ int SessionPool::capacity() const
 	
 int SessionPool::used() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	return (int) _activeSessions.size();
 }
 
 	
 int SessionPool::idle() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	return (int) _idleSessions.size();
 }
 
 
 int SessionPool::dead()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	int count = 0;
 
 	SessionList::iterator it = _activeSessions.begin();
@@ -159,7 +159,7 @@ int SessionPool::dead()
 
 int SessionPool::allocated() const
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	return _nSessions;
 }
 
@@ -173,7 +173,7 @@ int SessionPool::available() const
 
 void SessionPool::setFeature(const std::string& name, bool state)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) throw InvalidAccessException("Session pull has been shut down.");
 
 	if (_nSessions > 0)
@@ -197,7 +197,7 @@ bool SessionPool::getFeature(const std::string& name)
 
 void SessionPool::setProperty(const std::string& name, const Poco::Any& value)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) throw InvalidAccessException("Session pull has been shut down.");
 
 	if (_nSessions > 0)
@@ -220,7 +220,7 @@ Poco::Any SessionPool::getProperty(const std::string& name)
 
 void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 	
 	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
@@ -244,7 +244,7 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 
 void SessionPool::onJanitorTimer(Poco::Timer&)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 
 	SessionList::iterator it = _idleSessions.begin(); 
@@ -264,7 +264,7 @@ void SessionPool::onJanitorTimer(Poco::Timer&)
 
 void SessionPool::shutdown()
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 	_shutdown = true;
 	_janitorTimer.stop();

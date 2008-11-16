@@ -1,11 +1,11 @@
 //
-// DynamicAnyHolder.cpp
+// VarHolder.cpp
 //
-// $Id: //poco/svn/Foundation/src/DynamicAnyHolder.cpp#3 $
+// $Id: //poco/svn/Foundation/src/VarHolder.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
-// Module:  DynamicAnyHolder
+// Module:  VarHolder
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,24 +34,25 @@
 //
 
 
-#include "Poco/DynamicAnyHolder.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/VarHolder.h"
+#include "Poco/Dynamic/Var.h"
 
 
 namespace Poco {
+namespace Dynamic {
 
 
-DynamicAnyHolder::DynamicAnyHolder()
+VarHolder::VarHolder()
 {
 }
 
 
-DynamicAnyHolder::~DynamicAnyHolder()
+VarHolder::~VarHolder()
 {
 }
 
 
-void appendJSONString(std::string& val, const DynamicAny& any)
+void appendJSONString(std::string& val, const Var& any)
 {
 	bool isJsonString = (any.type() == typeid(std::string) || any.type() == typeid(char) || any.type() == typeid(Poco::DateTime) || any.type() == typeid(Poco::LocalDateTime));
 	if (isJsonString)
@@ -66,4 +67,4 @@ void appendJSONString(std::string& val, const DynamicAny& any)
 }
 
 
-} // namespace Poco
+} } // namespace Poco::Dynamic

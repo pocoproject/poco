@@ -88,7 +88,7 @@ RowFilter::~RowFilter()
 
 bool RowFilter::isAllowed(std::size_t row) const
 {
-	DynamicAny retVal;
+	Poco::Dynamic::Var retVal;
 	const RecordSet& rs = recordSet();
 	
 	std::size_t columns = rs.columnCount();
@@ -101,9 +101,9 @@ bool RowFilter::isAllowed(std::size_t row) const
 			const std::string name = toUpper(rs.metaColumn(static_cast<UInt32>(col)).name());
 			if (_comparisonMap.find(name) == _comparisonMap.end()) continue;
 
-			DynamicAny ret;
+			Poco::Dynamic::Var ret;
 			CompT compOp = 0;
-			DynamicAny val = rs.value(col, row, false);
+			Poco::Dynamic::Var val = rs.value(col, row, false);
 
 			switch (it->second.get<1>())
 			{
@@ -197,8 +197,8 @@ void RowFilter::removeFilter(const Ptr& pFilter)
 }
 
 
-void RowFilter::doCompare(DynamicAny& ret,
-	DynamicAny& val,
+void RowFilter::doCompare(Poco::Dynamic::Var& ret,
+	Poco::Dynamic::Var& val,
 	CompT comp,
 	const ComparisonEntry& ce)
 {

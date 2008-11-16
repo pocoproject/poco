@@ -43,6 +43,7 @@
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
@@ -187,7 +188,7 @@ public:
 		try 
 		{
 			session() << 
-				format("INSERT INTO MiscTest VALUES (?,%s,?,?,?,?)", blobPlaceholder), 
+				Poco::format("INSERT INTO MiscTest VALUES (?,%s,?,?,?,?)", blobPlaceholder), 
 				use(strings), 
 				use(blobs), 
 				use(ints),
@@ -204,7 +205,7 @@ public:
 		try 
 		{
 			session() <<  
-				format("INSERT INTO MiscTest VALUES (?,%s,?,?,?,?)", blobPlaceholder),
+				Poco::format("INSERT INTO MiscTest VALUES (?,%s,?,?,?,?)", blobPlaceholder),
 				use(strings, bulk), 
 				use(blobs, bulk), 
 				use(ints, bulk),

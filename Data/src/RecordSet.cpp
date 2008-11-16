@@ -96,12 +96,12 @@ RecordSet::~RecordSet()
 }
 
 
-DynamicAny RecordSet::value(std::size_t col, std::size_t row, bool useFilter) const
+Poco::Dynamic::Var RecordSet::value(std::size_t col, std::size_t row, bool useFilter) const
 {
 	if (useFilter && isFiltered() && !isAllowed(row))
 		throw InvalidAccessException("Row not allowed");
 
-	if (isNull(col, row)) return DynamicAny();
+	if (isNull(col, row)) return Poco::Dynamic::Var();
 
 	switch (columnType(col))
 	{
@@ -127,12 +127,12 @@ DynamicAny RecordSet::value(std::size_t col, std::size_t row, bool useFilter) co
 }
 
 
-DynamicAny RecordSet::value(const std::string& name, std::size_t row, bool useFilter) const
+Poco::Dynamic::Var RecordSet::value(const std::string& name, std::size_t row, bool useFilter) const
 {
 	if (useFilter && isFiltered() && !isAllowed(row))
 		throw InvalidAccessException("Row not allowed");
 
-	if (isNull(metaColumn(name).position(), row)) return DynamicAny();
+	if (isNull(metaColumn(name).position(), row)) return Poco::Dynamic::Var();
 
 	switch (columnType(name))
 	{

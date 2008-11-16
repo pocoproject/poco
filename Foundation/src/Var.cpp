@@ -1,11 +1,11 @@
 //
-// DynamicAny.cpp
+// Var.cpp
 //
-// $Id: //poco/svn/Foundation/src/DynamicAny.cpp#3 $
+// $Id: //poco/svn/Foundation/src/Var.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
-// Module:  DynamicAny
+// Module:  Var
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,27 +34,28 @@
 //
 
 
-#include "Poco/DynamicAny.h"
-#include "Poco/DynamicStruct.h"
+#include "Poco/Dynamic/Var.h"
+#include "Poco/Dynamic/Struct.h"
 #include <algorithm>
 #include <cctype>
 
 
 namespace Poco {
+namespace Dynamic {
 
 
-DynamicAny::DynamicAny(): _pHolder(0)
+Var::Var(): _pHolder(0)
 {
 }
 
 
-DynamicAny::DynamicAny(const char* pVal): 
-	_pHolder(new DynamicAnyHolderImpl<std::string>(pVal))
+Var::Var(const char* pVal): 
+	_pHolder(new VarHolderImpl<std::string>(pVal))
 {
 }
 
 
-DynamicAny::DynamicAny(const DynamicAny& other):
+Var::Var(const Var& other):
 	_pHolder(0)
 {
 	if (other._pHolder)
@@ -62,21 +63,21 @@ DynamicAny::DynamicAny(const DynamicAny& other):
 }
 
 
-DynamicAny::~DynamicAny()
+Var::~Var()
 {
 	delete _pHolder;
 }
 
 
-DynamicAny& DynamicAny::operator = (const DynamicAny& other)
+Var& Var::operator = (const Var& other)
 {
-	DynamicAny tmp(other);
+	Var tmp(other);
 	swap(tmp);
 	return *this;
 }
 
 
-const DynamicAny DynamicAny::operator + (const DynamicAny& other) const
+const Var Var::operator + (const Var& other) const
 {
 	if (isInteger())
 	{
@@ -94,7 +95,7 @@ const DynamicAny DynamicAny::operator + (const DynamicAny& other) const
 }
 
 
-DynamicAny& DynamicAny::operator += (const DynamicAny& other)
+Var& Var::operator += (const Var& other)
 {
 	if (isInteger())
 	{
@@ -112,7 +113,7 @@ DynamicAny& DynamicAny::operator += (const DynamicAny& other)
 }
 
 
-const DynamicAny DynamicAny::operator - (const DynamicAny& other) const
+const Var Var::operator - (const Var& other) const
 {
 	if (isInteger())
 	{
@@ -128,7 +129,7 @@ const DynamicAny DynamicAny::operator - (const DynamicAny& other) const
 }
 
 
-DynamicAny& DynamicAny::operator -= (const DynamicAny& other)
+Var& Var::operator -= (const Var& other)
 {
 	if (isInteger())
 	{
@@ -144,7 +145,7 @@ DynamicAny& DynamicAny::operator -= (const DynamicAny& other)
 }
 
 
-const DynamicAny DynamicAny::operator * (const DynamicAny& other) const
+const Var Var::operator * (const Var& other) const
 {
 	if (isInteger())
 	{
@@ -160,7 +161,7 @@ const DynamicAny DynamicAny::operator * (const DynamicAny& other) const
 }
 
 
-DynamicAny& DynamicAny::operator *= (const DynamicAny& other)
+Var& Var::operator *= (const Var& other)
 {
 	if (isInteger())
 	{
@@ -176,7 +177,7 @@ DynamicAny& DynamicAny::operator *= (const DynamicAny& other)
 }
 
 
-const DynamicAny DynamicAny::operator / (const DynamicAny& other) const
+const Var Var::operator / (const Var& other) const
 {
 	if (isInteger())
 	{
@@ -192,7 +193,7 @@ const DynamicAny DynamicAny::operator / (const DynamicAny& other) const
 }
 
 
-DynamicAny& DynamicAny::operator /= (const DynamicAny& other)
+Var& Var::operator /= (const Var& other)
 {
 	if (isInteger())
 	{
@@ -208,7 +209,7 @@ DynamicAny& DynamicAny::operator /= (const DynamicAny& other)
 }
 
 
-DynamicAny& DynamicAny::operator ++ ()
+Var& Var::operator ++ ()
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -216,17 +217,17 @@ DynamicAny& DynamicAny::operator ++ ()
 	return *this = *this + 1;
 }
 
-const DynamicAny DynamicAny::operator ++ (int)
+const Var Var::operator ++ (int)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
 
-	DynamicAny tmp(*this);
+	Var tmp(*this);
 	*this += 1;
 	return tmp;
 }
 
-DynamicAny& DynamicAny::operator -- ()
+Var& Var::operator -- ()
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -234,32 +235,32 @@ DynamicAny& DynamicAny::operator -- ()
 	return *this = *this - 1;
 }
 
-const DynamicAny DynamicAny::operator -- (int)
+const Var Var::operator -- (int)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
 
-	DynamicAny tmp(*this);
+	Var tmp(*this);
 	*this -= 1;
 	return tmp;
 }
 
 
-bool DynamicAny::operator == (const DynamicAny& other) const
+bool Var::operator == (const Var& other) const
 {
 	if (isEmpty() || other.isEmpty()) return false;
 	return convert<std::string>() == other.convert<std::string>();
 }
 
 
-bool DynamicAny::operator == (const char* other) const
+bool Var::operator == (const char* other) const
 {
 	if (isEmpty()) return false;
 	return convert<std::string>() == other;
 }
 
 
-bool DynamicAny::operator != (const DynamicAny& other) const
+bool Var::operator != (const Var& other) const
 {
 	if (isEmpty() && other.isEmpty()) return false;
 	else if (isEmpty() || other.isEmpty()) return true;
@@ -268,83 +269,83 @@ bool DynamicAny::operator != (const DynamicAny& other) const
 }
 
 
-bool DynamicAny::operator != (const char* other) const
+bool Var::operator != (const char* other) const
 {
 	if (isEmpty()) return true;
 	return convert<std::string>() != other;
 }
 
 
-bool DynamicAny::operator < (const DynamicAny& other) const
+bool Var::operator < (const Var& other) const
 {
 	if (isEmpty() || other.isEmpty()) return false;
 	return convert<std::string>() < other.convert<std::string>();
 }
 
 
-bool DynamicAny::operator <= (const DynamicAny& other) const
+bool Var::operator <= (const Var& other) const
 {
 	if (isEmpty() || other.isEmpty()) return false;
 	return convert<std::string>() <= other.convert<std::string>();
 }
 
 
-bool DynamicAny::operator > (const DynamicAny& other) const
+bool Var::operator > (const Var& other) const
 {
 	if (isEmpty() || other.isEmpty()) return false;
 	return convert<std::string>() > other.convert<std::string>();
 }
 
 
-bool DynamicAny::operator >= (const DynamicAny& other) const
+bool Var::operator >= (const Var& other) const
 {
 	if (isEmpty() || other.isEmpty()) return false;
 	return convert<std::string>() >= other.convert<std::string>();
 }
 
 
-bool DynamicAny::operator || (const DynamicAny& other) const
+bool Var::operator || (const Var& other) const
 {
 	if (isEmpty() || other.isEmpty()) return false;
 	return convert<bool>() || other.convert<bool>();
 }
 
 
-bool DynamicAny::operator && (const DynamicAny& other) const
+bool Var::operator && (const Var& other) const
 {
 	if (isEmpty() || other.isEmpty()) return false;
 	return convert<bool>() && other.convert<bool>();
 }
 
 
-void DynamicAny::empty()
+void Var::empty()
 {
 	delete _pHolder;
 	_pHolder = 0;
 }
 
 
-DynamicAny& DynamicAny::operator [] (const std::string& name)
+Var& Var::operator [] (const std::string& name)
 {
 	return holderImpl<DynamicStruct, InvalidAccessException>("Not an array.")->operator[](name);
 }
 
 
-const DynamicAny& DynamicAny::operator [] (const std::string& name) const
+const Var& Var::operator [] (const std::string& name) const
 {
-	return const_cast<const DynamicAny&>(holderImpl<DynamicStruct,
+	return const_cast<const Var&>(holderImpl<DynamicStruct,
 		InvalidAccessException>("Not an array.")->operator[](name));
 }
 
 
-DynamicAny DynamicAny::parse(const std::string& val)
+Var Var::parse(const std::string& val)
 {
 	std::string::size_type t = 0;
 	return parse(val, t);
 }
 
 
-DynamicAny DynamicAny::parse(const std::string& val, std::string::size_type& pos)
+Var Var::parse(const std::string& val, std::string::size_type& pos)
 {
 	// { -> an Object==DynamicStruct
 	// [ -> an array
@@ -368,7 +369,7 @@ DynamicAny DynamicAny::parse(const std::string& val, std::string::size_type& pos
 }
 
 
-DynamicAny DynamicAny::parseObject(const std::string& val, std::string::size_type& pos)
+Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 {
 	poco_assert_dbg (val[pos] == '{');
 	++pos;
@@ -381,7 +382,7 @@ DynamicAny DynamicAny::parseObject(const std::string& val, std::string::size_typ
 		if (val[pos] != ':')
 			throw DataFormatException("Incorrect object, must contain: key : value pairs"); 
 		++pos; // skip past :
-		DynamicAny value = parse(val, pos);
+		Var value = parse(val, pos);
 		aStruct.insert(key, value);
 		skipWhiteSpace(val, pos);
 		if (val[pos] == ',')
@@ -397,12 +398,12 @@ DynamicAny DynamicAny::parseObject(const std::string& val, std::string::size_typ
 }
 
 
-DynamicAny DynamicAny::parseArray(const std::string& val, std::string::size_type& pos)
+Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 {
 	poco_assert_dbg (val[pos] == '[');
 	++pos;
 	skipWhiteSpace(val, pos);
-	std::vector<DynamicAny> result;
+	std::vector<Var> result;
 	while (val[pos] != ']' && pos < val.size())
 	{
 		result.push_back(parse(val, pos));
@@ -420,7 +421,7 @@ DynamicAny DynamicAny::parseArray(const std::string& val, std::string::size_type
 }
 
 
-std::string DynamicAny::parseString(const std::string& val, std::string::size_type& pos)
+std::string Var::parseString(const std::string& val, std::string::size_type& pos)
 {
 	static const std::string STR_STOP("'\"");
 	static const std::string OTHER_STOP(" ,]}"); // we stop at space, ',', ']' or '}'
@@ -461,14 +462,14 @@ std::string DynamicAny::parseString(const std::string& val, std::string::size_ty
 }
 
 
-void DynamicAny::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
+void Var::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
 {
 	while (std::isspace(val[pos]))
 		++pos;
 }
 
 
-std::string DynamicAny::toString(const DynamicAny& any)
+std::string Var::toString(const Var& any)
 {
 	std::string res;
 	appendJSONString(res, any);
@@ -476,4 +477,4 @@ std::string DynamicAny::toString(const DynamicAny& any)
 }
 
 
-} // namespace Poco::Poco
+} } // namespace Poco::Dynamic
