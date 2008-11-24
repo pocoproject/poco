@@ -42,7 +42,7 @@ endif
 
 objects = Binder ConnectionHandle Connector EnvironmentHandle \
 	Extractor ODBCMetaColumn ODBCException ODBCStatementImpl \
-	Parameter Preparation SessionImpl TypeInfo Unicode Utility 
+	Parameter Preparator SessionImpl TypeInfo Unicode Utility 
 
 target         = PocoODBC
 target_version = $(LIBVERSION)

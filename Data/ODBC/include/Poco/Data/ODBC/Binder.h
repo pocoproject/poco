@@ -42,6 +42,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/AbstractBinder.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/ODBC/Handle.h"
 #include "Poco/Data/ODBC/Parameter.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
@@ -69,7 +70,6 @@ namespace Data {
 
 class Date;
 class Time;
-class BLOB;
 
 
 namespace ODBC {
@@ -272,6 +272,9 @@ public:
 	void bind(std::size_t pos, const BLOB& val, Direction dir);
 		/// Binds a BLOB. In-bound only.
 
+	void bind(std::size_t pos, const CLOB& val, Direction dir);
+		/// Binds a CLOB. In-bound only.
+
 	void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir);
 		/// Binds a BLOB vector.
 
@@ -280,6 +283,15 @@ public:
 
 	void bind(std::size_t pos, const std::list<BLOB>& val, Direction dir);
 		/// Binds a BLOB list.
+
+	void bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir);
+		/// Binds a CLOB vector.
+
+	void bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir);
+		/// Binds a CLOB deque.
+
+	void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir);
+		/// Binds a CLOB list.
 
 	void bind(std::size_t pos, const Date& val, Direction dir);
 		/// Binds a Date.
@@ -390,6 +402,40 @@ private:
 			(SQLPOINTER) &val, 0, 0)))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
+		}
+	}
+
+	template <typename L>
+	void bindImplLOB(std::size_t pos, const L& val, Direction dir)
+	{
+		if (isOutBound(dir) || !isInBound(dir))
+			throw NotImplementedException("LOB parameter type can only be inbound.");
+
+		SQLPOINTER pVal = (SQLPOINTER) val.rawContent();
+		SQLINTEGER size = (SQLINTEGER) val.size();
+			
+		_inParams.insert(ParamMap::value_type(pVal, size));
+
+		SQLLEN* pLenIn = new SQLLEN;
+		*pLenIn  = size;
+
+		if (PB_AT_EXEC == _paramBinding)
+			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
+
+		_lengthIndicator.push_back(pLenIn);
+
+		if (Utility::isError(SQLBindParameter(_rStmt, 
+			(SQLUSMALLINT) pos + 1, 
+			SQL_PARAM_INPUT, 
+			SQL_C_BINARY, 
+			SQL_LONGVARBINARY, 
+			(SQLUINTEGER) size,
+			0,
+			pVal,
+			(SQLINTEGER) size, 
+			_lengthIndicator.back())))
+		{
+			throw StatementException(_rStmt, "SQLBindParameter(LOB)");
 		}
 	}
 
@@ -553,8 +599,11 @@ private:
 	}
 
 	template <typename C>
-	void bindImplContainerBLOB(std::size_t pos, const C& val, Direction dir)
+	void bindImplContainerLOB(std::size_t pos, const C& val, Direction dir)
 	{
+		typedef typename C::value_type LOBType;
+		typedef typename LOBType::ValueType CharType;
+
 		if (isOutBound(dir) || !isInBound(dir))
 			throw NotImplementedException("BLOB container parameter type can only be inbound.");
 
@@ -585,7 +634,7 @@ private:
 		if (_charPtrs.size() <= pos)
 			_charPtrs.resize(pos + 1, 0);
 
-		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(char));
+		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(CharType));
 		poco_check_ptr (_charPtrs[pos]);
 
 		std::size_t blobSize;
@@ -597,7 +646,7 @@ private:
 			blobSize = cIt->size();
 			if (blobSize > size)	
 				throw LengthExceededException("SQLBindParameter(std::vector<BLOB>)");
-			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize);
+			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
 			offset += size;
 		}
 
@@ -1203,22 +1252,51 @@ inline void Binder::bind(std::size_t pos, const std::list<std::string>& val, Dir
 	bindImplContainerString(pos, val, dir);
 }
 
+inline void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
+{
+	bindImplLOB<BLOB>(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const CLOB& val, Direction dir)
+{
+	bindImplLOB<CLOB>(pos, val, dir);
+}
+
 
 inline void Binder::bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir)
 {
-	bindImplContainerBLOB(pos, val, dir);
+	bindImplContainerLOB(pos, val, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<BLOB>& val, Direction dir)
 {
-	bindImplContainerBLOB(pos, val, dir);
+	bindImplContainerLOB(pos, val, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<BLOB>& val, Direction dir)
 {
-	bindImplContainerBLOB(pos, val, dir);
+	bindImplContainerLOB(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir)
+{
+	bindImplContainerLOB(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir)
+{
+	bindImplContainerLOB(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<CLOB>& val, Direction dir)
+{
+	bindImplContainerLOB(pos, val, dir);
 }
 
 

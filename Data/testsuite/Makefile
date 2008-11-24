@@ -18,7 +18,7 @@ endif
 
 objects = DataTestSuite Driver \
 	DataTest SessionPoolTest \
-	Binder Extractor Preparation SessionImpl Connector TestStatementImpl
+	Binder Extractor Preparator SessionImpl Connector TestStatementImpl
 
 target         = testrunner
 target_version = 1

@@ -56,7 +56,7 @@ void TestStatementImpl::compileImpl()
 	// prepare binding
 	_ptrBinder    = new Binder;
 	_ptrExtractor = new Extractor;
-	_ptrPrepare   = new Preparation;
+	_ptrPreparation   = new Preparator;
 	_compiled = true;
 }
 

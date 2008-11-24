@@ -40,7 +40,7 @@
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
@@ -53,7 +53,7 @@
 
 using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
-using Poco::Data::BLOB;
+using Poco::Data::CLOB;
 using Poco::Data::ODBC::Utility;
 using Poco::Data::ODBC::ODBCException;
 using Poco::Data::ODBC::ConnectionException;
@@ -464,21 +464,21 @@ void ODBCTest::testBulk()
 	recreateMiscTable();
 	_pExecutor->doBulk<std::vector<int>,
 		std::vector<std::string>,
-		std::vector<BLOB>,
+		std::vector<CLOB>,
 		std::vector<double>,
 		std::vector<DateTime> >(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulk<std::deque<int>,
 		std::deque<std::string>,
-		std::deque<BLOB>,
+		std::deque<CLOB>,
 		std::deque<double>,
 		std::deque<DateTime> >(100);
 
 	recreateMiscTable();
 	_pExecutor->doBulk<std::list<int>,
 		std::list<std::string>,
-		std::list<BLOB>,
+		std::list<CLOB>,
 		std::list<double>,
 		std::list<DateTime> >(100);
 }
@@ -804,11 +804,11 @@ void ODBCTest::testBLOBContainer()
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
 		recreatePersonBLOBTable();
-		_pExecutor->blobContainer<std::vector<std::string>, std::vector<BLOB> >(10);
+		_pExecutor->blobContainer<std::vector<std::string>, std::vector<CLOB> >(10);
 		recreatePersonBLOBTable();
-		_pExecutor->blobContainer<std::deque<std::string>, std::deque<BLOB> >(10);
+		_pExecutor->blobContainer<std::deque<std::string>, std::deque<CLOB> >(10);
 		recreatePersonBLOBTable();
-		_pExecutor->blobContainer<std::list<std::string>, std::list<BLOB> >(10);
+		_pExecutor->blobContainer<std::list<std::string>, std::list<CLOB> >(10);
 		i += 2;
 	}
 }

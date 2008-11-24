@@ -1,7 +1,7 @@
 //
-// Preparation.cpp
+// Preparator.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/Preparation.cpp#3 $
+// $Id: //poco/Main/Data/testsuite/src/Preparator.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -30,8 +30,8 @@
 //
 
 
-#include "Preparation.h"
-#include "Poco/Data/BLOB.h"
+#include "Preparator.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Exception.h"
 
 
@@ -40,114 +40,119 @@ namespace Data {
 namespace Test {
 
 
-Preparation::Preparation()
+Preparator::Preparator()
 {
 }
 
 
-Preparation::~Preparation()
+Preparator::~Preparator()
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::Int8&)
+void Preparator::prepare(std::size_t pos, Poco::Int8&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::UInt8&)
+void Preparator::prepare(std::size_t pos, Poco::UInt8&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::Int16&)
+void Preparator::prepare(std::size_t pos, Poco::Int16&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::UInt16&)
+void Preparator::prepare(std::size_t pos, Poco::UInt16&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::Int32&)
+void Preparator::prepare(std::size_t pos, Poco::Int32&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::UInt32&)
+void Preparator::prepare(std::size_t pos, Poco::UInt32&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::Int64&)
+void Preparator::prepare(std::size_t pos, Poco::Int64&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, Poco::UInt64&)
+void Preparator::prepare(std::size_t pos, Poco::UInt64&)
 {
 }
 
 
 #ifndef POCO_LONG_IS_64_BIT
-void Preparation::prepare(std::size_t pos, long&)
+void Preparator::prepare(std::size_t pos, long&)
 {
 }
 #endif
 
 
-void Preparation::prepare(std::size_t pos, bool&)
+void Preparator::prepare(std::size_t pos, bool&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, float&)
+void Preparator::prepare(std::size_t pos, float&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, double&)
+void Preparator::prepare(std::size_t pos, double&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, char&)
+void Preparator::prepare(std::size_t pos, char&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, const std::string&)
+void Preparator::prepare(std::size_t pos, const std::string&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, const Poco::Data::BLOB&)
+void Preparator::prepare(std::size_t pos, const Poco::Data::BLOB&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, const Poco::Data::Date&)
+void Preparator::prepare(std::size_t pos, const Poco::Data::CLOB&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, const Poco::Data::Time&)
+void Preparator::prepare(std::size_t pos, const Poco::Data::Date&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, const Poco::DateTime&)
+void Preparator::prepare(std::size_t pos, const Poco::Data::Time&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, const Poco::Any&)
+void Preparator::prepare(std::size_t pos, const Poco::DateTime&)
 {
 }
 
 
-void Preparation::prepare(std::size_t pos, const Poco::Dynamic::Var&)
+void Preparator::prepare(std::size_t pos, const Poco::Any&)
+{
+}
+
+
+void Preparator::prepare(std::size_t pos, const Poco::Dynamic::Var&)
 {
 }
 

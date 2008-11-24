@@ -38,11 +38,9 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
-#include "Poco/Data/BLOB.h"
 #include "Poco/Exception.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
-#include "sqlite3.h"
 #include <cstdlib>
 
 
@@ -100,17 +98,6 @@ void Binder::bind(std::size_t pos, const double &val, Direction dir)
 void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
 	int rc = sqlite3_bind_text(_pStmt, (int) pos, val.c_str(), (int) val.size()*sizeof(char), SQLITE_TRANSIENT);
-	checkReturn(rc);
-}
-
-
-void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir)
-{
-	// convert a blob to a an unsigned char* array
-	const unsigned char* pData = reinterpret_cast<const unsigned char*>(val.rawContent());
-	int valSize = static_cast<int>(val.size());
-
-	int rc = sqlite3_bind_blob(_pStmt, static_cast<int>(pos), pData, valSize, SQLITE_STATIC); // no deep copy, do not free memory
 	checkReturn(rc);
 }
 

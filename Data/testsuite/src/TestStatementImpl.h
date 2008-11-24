@@ -41,7 +41,7 @@
 #include "Poco/SharedPtr.h"
 #include "Binder.h"
 #include "Extractor.h"
-#include "Preparation.h"
+#include "Preparator.h"
 
 
 namespace Poco {
@@ -99,10 +99,10 @@ protected:
 		/// Returns the concrete binder used by the statement.
 
 private:
-	Poco::SharedPtr<Binder>      _ptrBinder;
-	Poco::SharedPtr<Extractor>   _ptrExtractor;
-	Poco::SharedPtr<Preparation> _ptrPrepare;
-	bool                         _compiled; 
+	Poco::SharedPtr<Binder>     _ptrBinder;
+	Poco::SharedPtr<Extractor>  _ptrExtractor;
+	Poco::SharedPtr<Preparator> _ptrPreparation;
+	bool                        _compiled; 
 };
 
 

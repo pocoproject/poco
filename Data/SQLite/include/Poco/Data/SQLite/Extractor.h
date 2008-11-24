@@ -48,11 +48,9 @@
 #include "Poco/Data/Constants.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
+#include "sqlite3.h"
 #include <vector>
 #include <utility>
-
-
-struct sqlite3_stmt;
 
 
 namespace Poco {
@@ -120,6 +118,9 @@ public:
 
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
+
+	bool extract(std::size_t pos, Poco::Data::CLOB& val);
+		/// Extracts a CLOB.
 
 	bool extract(std::size_t pos, Poco::Data::Date& val);
 		/// Extracts a Date.
@@ -285,6 +286,16 @@ private:
 		return ret;
 	}
 
+	template <typename T>
+	bool extractLOB(std::size_t pos, Poco::Data::LOB<T>& val)
+	{
+		if (isNull(pos)) return false;
+		int size = sqlite3_column_bytes(_pStmt, (int) pos);
+		const T* pTmp = reinterpret_cast<const T*>(sqlite3_column_blob(_pStmt, (int) pos));
+		val = Poco::Data::LOB<T>(pTmp, size);
+		return true;
+	}
+
 	sqlite3_stmt* _pStmt;
 	NullIndVec    _nulls;
 };
@@ -296,6 +307,18 @@ private:
 inline void Extractor::reset()
 {
 	_nulls.clear();
+}
+
+
+inline bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
+{
+	return extractLOB<Poco::Data::BLOB::ValueType>(pos, val);
+}
+
+
+inline bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
+{
+	return extractLOB<Poco::Data::CLOB::ValueType>(pos, val);
 }
 
 

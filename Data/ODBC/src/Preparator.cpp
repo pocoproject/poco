@@ -1,11 +1,11 @@
 //
-// Preparation.cpp
+// Preparator.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Preparation.cpp#5 $
+// $Id: //poco/Main/Data/ODBC/src/Preparator.cpp#5 $
 //
 // Library: Data
 // Package: DataCore
-// Module:  Preparation
+// Module:  Preparator
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,7 +34,7 @@
 //
 
 
-#include "Poco/Data/ODBC/Preparation.h"
+#include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Exception.h"
 
@@ -47,7 +47,7 @@ namespace Data {
 namespace ODBC {
 
 
-Preparation::Preparation(const StatementHandle& rStmt, 
+Preparator::Preparator(const StatementHandle& rStmt, 
 	const std::string& statement, 
 	std::size_t maxFieldSize,
 	DataExtraction dataExtraction): 
@@ -61,7 +61,7 @@ Preparation::Preparation(const StatementHandle& rStmt,
 }
 
 
-Preparation::Preparation(const Preparation& other): 
+Preparator::Preparator(const Preparator& other): 
 	_rStmt(other._rStmt),
 	_maxFieldSize(other._maxFieldSize),
 	_dataExtraction(other._dataExtraction)
@@ -70,13 +70,13 @@ Preparation::Preparation(const Preparation& other):
 }
 
 
-Preparation::~Preparation()
+Preparator::~Preparator()
 {
 	freeMemory();
 }
 
 
-void Preparation::freeMemory() const
+void Preparator::freeMemory() const
 {
 	IndexMap::iterator it = _varLengthArrays.begin();
 	IndexMap::iterator end = _varLengthArrays.end();
@@ -92,9 +92,20 @@ void Preparation::freeMemory() const
 				deleteCachedArray<char>(it->first);
 				break;
 
+			case DT_UCHAR:
+				deleteCachedArray<unsigned char>(it->first);
+				break;
+
 			case DT_CHAR_ARRAY:
 			{
 				char** pc = AnyCast<char*>(&_values[it->first]);
+				if (pc) std::free(*pc);
+				break;
+			}
+
+			case DT_UCHAR_ARRAY:
+			{
+				unsigned char** pc = AnyCast<unsigned char*>(&_values[it->first]);
 				if (pc) std::free(*pc);
 				break;
 			}
@@ -113,14 +124,14 @@ void Preparation::freeMemory() const
 }
 
 
-std::size_t Preparation::columns() const
+std::size_t Preparator::columns() const
 {
 	if (_values.empty()) resize();
 	return _values.size();
 }
 
 
-void Preparation::resize() const
+void Preparator::resize() const
 {
 	SQLSMALLINT nCol = 0;
 	if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 0 != nCol)
@@ -137,7 +148,7 @@ void Preparation::resize() const
 }
 
 
-std::size_t Preparation::maxDataSize(std::size_t pos) const
+std::size_t Preparator::maxDataSize(std::size_t pos) const
 {
 	poco_assert_dbg (pos < _values.size());
 
@@ -160,7 +171,7 @@ std::size_t Preparation::maxDataSize(std::size_t pos) const
 }
 
 
-std::size_t Preparation::actualDataSize(std::size_t col, std::size_t row) const
+std::size_t Preparator::actualDataSize(std::size_t col, std::size_t row) const
 {
 	SQLLEN size = (POCO_DATA_INVALID_ROW == row) ? _lengths.at(col) :
 		_lenLengths.at(col).at(row);
@@ -172,33 +183,7 @@ std::size_t Preparation::actualDataSize(std::size_t col, std::size_t row) const
 }
 
 
-void Preparation::prepareCharArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length)
-{
-	poco_assert_dbg (DE_BOUND == _dataExtraction);
-	poco_assert_dbg (pos < _values.size());
-	poco_assert_dbg (pos < _lengths.size());
-	poco_assert_dbg (pos < _lenLengths.size());
-
-	char* pArray = (char*) std::calloc(length * size, sizeof(char));
-
-	_values[pos] = Any(pArray);
-	_lengths[pos] = 0;
-	_lenLengths[pos].resize(length);
-	_varLengthArrays.insert(IndexMap::value_type(pos, DT_CHAR_ARRAY));
-
-	if (Utility::isError(SQLBindCol(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		valueType, 
-		(SQLPOINTER) pArray, 
-		(SQLINTEGER) size, 
-		&_lenLengths[pos][0])))
-	{
-		throw StatementException(_rStmt, "SQLBindCol()");
-	}
-}
-
-
-void Preparation::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::size_t length)
+void Preparator::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::size_t length)
 {
 	poco_assert_dbg (DE_BOUND == _dataExtraction);
 	poco_assert_dbg (pos < _values.size());

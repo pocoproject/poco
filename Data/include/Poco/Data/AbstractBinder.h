@@ -43,7 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/DateTime.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
@@ -266,6 +266,9 @@ public:
 	virtual void bind(std::size_t pos, const BLOB& val, Direction dir = PD_IN) = 0;
 		/// Binds a BLOB.
 
+	virtual void bind(std::size_t pos, const CLOB& val, Direction dir = PD_IN) = 0;
+		/// Binds a CLOB.
+
 	virtual void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir = PD_IN);
 		/// Binds a BLOB vector.
 
@@ -274,6 +277,15 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<BLOB>& val, Direction dir = PD_IN);
 		/// Binds a BLOB list.
+
+	virtual void bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir = PD_IN);
+		/// Binds a CLOB vector.
+
+	virtual void bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir = PD_IN);
+		/// Binds a CLOB deque.
+
+	virtual void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir = PD_IN);
+		/// Binds a CLOB list.
 
 	virtual void bind(std::size_t pos, const DateTime& val, Direction dir = PD_IN) = 0;
 		/// Binds a DateTime.

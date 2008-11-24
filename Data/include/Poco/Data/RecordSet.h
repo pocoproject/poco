@@ -45,7 +45,7 @@
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/String.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
@@ -173,18 +173,18 @@ public:
 		{
 			case STORAGE_VECTOR:
 			{
-				typedef std::vector<T> C;
+				typedef typename std::vector<T> C;
 				return column<C>(col).value(row);
 			}
 			case STORAGE_LIST:
 			{
-				typedef std::list<T> C;
+				typedef typename std::list<T> C;
 				return column<C>(col).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
-				typedef std::deque<T> C;
+				typedef typename std::deque<T> C;
 				return column<C>(col).value(row);
 			}
 			default:
@@ -203,18 +203,18 @@ public:
 		{
 			case STORAGE_VECTOR:
 			{
-				typedef std::vector<T> C;
+				typedef typename std::vector<T> C;
 				return column<C>(name).value(row);
 			}
 			case STORAGE_LIST:
 			{
-				typedef std::list<T> C;
+				typedef typename std::list<T> C;
 				return column<C>(name).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
-				typedef std::deque<T> C;
+				typedef typename std::deque<T> C;
 				return column<C>(name).value(row);
 			}
 			default:

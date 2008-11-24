@@ -43,7 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/AbstractExtractor.h"
-#include "Poco/Data/AbstractPreparation.h"
+#include "Poco/Data/AbstractPreparator.h"
 #include "Poco/Data/Nullable.h"
 #include "Poco/Tuple.h"
 #include "Poco/AutoPtr.h"
@@ -103,13 +103,13 @@ class TypeHandler: public AbstractTypeHandler
 	///            TypeHandler<int>::bind(pos++, obj.getAge(), pBinder);
 	///        }
 	///    
-	///        static void prepare(std::size_t pos, const Person& obj, AbstractPreparation* pPrepare)
+	///        static void prepare(std::size_t pos, const Person& obj, AbstractPreparator* pPreparator)
 	///        {
 	///            // the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
-	///            poco_assert_dbg (pPrepare != 0);
-	///            TypeHandler<std::string>::prepare(pos++, obj.getLastName(), pPrepare);
-	///            TypeHandler<std::string>::prepare(pos++, obj.getFirstName(), pPrepare);
-	///            TypeHandler<int>::prepare(pos++, obj.getAge(), pPrepare);
+	///            poco_assert_dbg (pPreparator != 0);
+	///            TypeHandler<std::string>::prepare(pos++, obj.getLastName(), pPreparator);
+	///            TypeHandler<std::string>::prepare(pos++, obj.getFirstName(), pPreparator);
+	///            TypeHandler<int>::prepare(pos++, obj.getAge(), pPreparator);
 	///        }
 	///    
 	///        static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor* pExt)
@@ -151,10 +151,10 @@ public:
 		if (!pExt->extract(pos, obj)) obj = defVal;
 	}
 
-	static void prepare(std::size_t pos, T& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, T& obj, AbstractPreparator* pPreparator)
 	{
-		poco_assert_dbg (pPrepare != 0);
-		pPrepare->prepare(pos, obj);
+		poco_assert_dbg (pPreparator != 0);
+		pPreparator->prepare(pos, obj);
 	}
 
 private:
@@ -186,10 +186,10 @@ public:
 			obj.assign(obj.size(), defVal);
 	}
 
-	static void prepare(std::size_t pos, std::deque<T>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, std::deque<T>& obj, AbstractPreparator* pPreparator)
 	{
-		poco_assert_dbg (pPrepare != 0);
-		pPrepare->prepare(pos, obj);
+		poco_assert_dbg (pPreparator != 0);
+		pPreparator->prepare(pos, obj);
 	}
 
 private:
@@ -221,10 +221,10 @@ public:
 			obj.assign(obj.size(), defVal);
 	}
 
-	static void prepare(std::size_t pos, std::vector<T>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, std::vector<T>& obj, AbstractPreparator* pPreparator)
 	{
-		poco_assert_dbg (pPrepare != 0);
-		pPrepare->prepare(pos, obj);
+		poco_assert_dbg (pPreparator != 0);
+		pPreparator->prepare(pos, obj);
 	}
 
 private:
@@ -256,10 +256,10 @@ public:
 			obj.assign(obj.size(), defVal);
 	}
 
-	static void prepare(std::size_t pos, std::list<T>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, std::list<T>& obj, AbstractPreparator* pPreparator)
 	{
-		poco_assert_dbg (pPrepare != 0);
-		pPrepare->prepare(pos, obj);
+		poco_assert_dbg (pPreparator != 0);
+		pPreparator->prepare(pos, obj);
 	}
 
 private:
@@ -286,16 +286,16 @@ public:
         }
     }
 	
-    static void prepare(std::size_t pos, Nullable<T>& obj, AbstractPreparation* pPrepare) 
+    static void prepare(std::size_t pos, Nullable<T>& obj, AbstractPreparator* pPreparator) 
     {
-        poco_assert_dbg (pPrepare != 0);
+        poco_assert_dbg (pPreparator != 0);
         if (obj.isNull()) 
         {
-            pPrepare->prepare(pos++, (Poco::Any&)Poco::Data::Keywords::null);
+            pPreparator->prepare(pos++, (Poco::Any&)Poco::Data::Keywords::null);
         }
         else 
         {
-            pPrepare->prepare(pos++, (T&)obj.getValue());
+            pPreparator->prepare(pos++, (T&)obj.getValue());
         }
     }
 
@@ -382,29 +382,29 @@ public:
 		TypeHandler<T19>::bind(pos++, tuple.template get<19>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPrepare);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPrepare);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPrepare);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPrepare);
-		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPrepare);
-		TypeHandler<T17>::prepare(pos++, tuple.template get<17>(), pPrepare);
-		TypeHandler<T18>::prepare(pos++, tuple.template get<18>(), pPrepare);
-		TypeHandler<T19>::prepare(pos++, tuple.template get<19>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
+		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
+		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
+		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
+		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPreparator);
+		TypeHandler<T17>::prepare(pos++, tuple.template get<17>(), pPreparator);
+		TypeHandler<T18>::prepare(pos++, tuple.template get<18>(), pPreparator);
+		TypeHandler<T19>::prepare(pos++, tuple.template get<19>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -492,28 +492,28 @@ public:
 		TypeHandler<T18>::bind(pos++, tuple.template get<18>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPrepare);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPrepare);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPrepare);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPrepare);
-		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPrepare);
-		TypeHandler<T17>::prepare(pos++, tuple.template get<17>(), pPrepare);
-		TypeHandler<T18>::prepare(pos++, tuple.template get<18>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
+		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
+		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
+		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
+		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPreparator);
+		TypeHandler<T17>::prepare(pos++, tuple.template get<17>(), pPreparator);
+		TypeHandler<T18>::prepare(pos++, tuple.template get<18>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -598,27 +598,27 @@ public:
 		TypeHandler<T17>::bind(pos++, tuple.template get<17>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPrepare);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPrepare);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPrepare);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPrepare);
-		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPrepare);
-		TypeHandler<T17>::prepare(pos++, tuple.template get<17>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
+		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
+		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
+		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
+		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPreparator);
+		TypeHandler<T17>::prepare(pos++, tuple.template get<17>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -700,26 +700,26 @@ public:
 		TypeHandler<T16>::bind(pos++, tuple.template get<16>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPrepare);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPrepare);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPrepare);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPrepare);
-		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
+		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
+		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
+		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
+		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -798,25 +798,25 @@ public:
 		TypeHandler<T15>::bind(pos++, tuple.template get<15>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPrepare);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPrepare);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPrepare);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
+		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
+		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
+		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -892,24 +892,24 @@ public:
 		TypeHandler<T14>::bind(pos++, tuple.template get<14>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPrepare);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPrepare);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
+		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
+		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -982,23 +982,23 @@ public:
 		TypeHandler<T13>::bind(pos++, tuple.template get<13>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPrepare);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
+		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1068,22 +1068,22 @@ public:
 		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1150,21 +1150,21 @@ public:
 		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1228,20 +1228,20 @@ public:
 		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1293,19 +1293,19 @@ public:
 		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1355,18 +1355,18 @@ public:
 		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1413,17 +1413,17 @@ public:
 		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1469,16 +1469,16 @@ public:
 		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1522,15 +1522,15 @@ public:
 		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1572,14 +1572,14 @@ public:
 		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1619,13 +1619,13 @@ public:
 		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1663,12 +1663,12 @@ public:
 		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1704,11 +1704,11 @@ public:
 		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1742,10 +1742,10 @@ public:
 		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
 	}
 
-	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
-		poco_assert (pPrepare != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPrepare);
+		poco_assert (pPreparator != 0);
+		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
 	}
 
 	static std::size_t size()
@@ -1790,11 +1790,11 @@ public:
 		TypeHandler<V>::extract(pos, obj.second, defVal.second, pExt);
 	}
 
-	static void prepare(std::size_t pos, std::pair<K, V>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, std::pair<K, V>& obj, AbstractPreparator* pPreparator)
 	{
-		TypeHandler<K>::prepare(pos, obj.first, pPrepare);
+		TypeHandler<K>::prepare(pos, obj.first, pPreparator);
 		pos += TypeHandler<K>::size();
-		TypeHandler<V>::prepare(pos, obj.second, pPrepare);
+		TypeHandler<V>::prepare(pos, obj.second, pPreparator);
 	}
 
 private:
@@ -1830,12 +1830,12 @@ public:
 			TypeHandler<T>::extract(pos, *obj, *obj, pExt);
 	}
 
-	static void prepare(std::size_t pos, Poco::AutoPtr<T>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, Poco::AutoPtr<T>& obj, AbstractPreparator* pPreparator)
 	{
-		poco_assert_dbg (pPrepare != 0);
+		poco_assert_dbg (pPreparator != 0);
 		if (!obj)
 			obj = new T();
-		TypeHandler<T>::prepare(pos, *obj, pPrepare);
+		TypeHandler<T>::prepare(pos, *obj, pPreparator);
 	}
 
 private:
@@ -1872,12 +1872,12 @@ public:
 			TypeHandler<T>::extract(pos, *obj, *obj, pExt);
 	}
 
-	static void prepare(std::size_t pos, Poco::SharedPtr<T>& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, Poco::SharedPtr<T>& obj, AbstractPreparator* pPreparator)
 	{
-		poco_assert_dbg (pPrepare != 0);
+		poco_assert_dbg (pPreparator != 0);
 		if (!obj)
 			obj = new T();
-		TypeHandler<T>::prepare(pos, *obj, pPrepare);
+		TypeHandler<T>::prepare(pos, *obj, pPreparator);
 	}
 
 private:

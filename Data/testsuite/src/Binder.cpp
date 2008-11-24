@@ -31,7 +31,7 @@
 
 
 #include "Binder.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Exception.h"
 
 
@@ -128,6 +128,11 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 
 
 void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
+{
+}
+
+
+void Binder::bind(std::size_t pos, const CLOB& val, Direction dir)
 {
 }
 

@@ -38,7 +38,7 @@
 #include "Poco/Tuple.h"
 #include "Poco/NamedTuple.h"
 #include "Poco/Exception.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"

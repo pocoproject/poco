@@ -43,7 +43,7 @@
 #include "Poco/Data/Constants.h"
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/AbstractExtractor.h"
-#include "Poco/Data/ODBC/Preparation.h"
+#include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/ODBC/Utility.h"
@@ -71,7 +71,7 @@ class ODBC_API Extractor: public Poco::Data::AbstractExtractor
 {
 public:
 	Extractor(const StatementHandle& rStmt, 
-		Preparation& rPreparation);
+		Preparator& rPreparator);
 		/// Creates the Extractor.
 
 	~Extractor();
@@ -250,6 +250,9 @@ public:
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
 
+	bool extract(std::size_t pos, Poco::Data::CLOB& val);
+		/// Extracts a CLOB.
+
 	bool extract(std::size_t pos, std::vector<Poco::Data::BLOB>& val);
 		/// Extracts a BLOB vector.
 
@@ -258,6 +261,15 @@ public:
 
 	bool extract(std::size_t pos, std::list<Poco::Data::BLOB>& val);
 		/// Extracts a BLOB list.
+
+	bool extract(std::size_t pos, std::vector<Poco::Data::CLOB>& val);
+		/// Extracts a CLOB vector.
+
+	bool extract(std::size_t pos, std::deque<Poco::Data::CLOB>& val);
+		/// Extracts a CLOB deque.
+
+	bool extract(std::size_t pos, std::list<Poco::Data::CLOB>& val);
+		/// Extracts a CLOB list.
 
 	bool extract(std::size_t pos, Poco::Data::Date& val);
 		/// Extracts a Date.
@@ -319,10 +331,10 @@ public:
 	bool extract(std::size_t pos, std::list<Poco::DynamicAny>& val);
 		/// Extracts a DynamicAny list.
 
-	void setDataExtraction(Preparation::DataExtraction ext);
+	void setDataExtraction(Preparator::DataExtraction ext);
 		/// Set data extraction mode.
 
-	Preparation::DataExtraction getDataExtraction() const;
+	Preparator::DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
 	bool isNull(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW);
@@ -354,18 +366,82 @@ private:
 	bool extractBoundImpl(std::size_t pos, T& val)
 	{
 		if (isNull(pos)) return false;
-		poco_assert_dbg (typeid(T) == _rPreparation[pos].type());
-		val = *AnyCast<T>(&_rPreparation[pos]); 
+		poco_assert_dbg (typeid(T) == _rPreparator[pos].type());
+		val = *AnyCast<T>(&_rPreparator[pos]); 
 		return true;
 	}
 
-	template<typename C>
+	bool extractBoundImpl(std::size_t pos, Poco::Data::BLOB& val);
+	bool extractBoundImpl(std::size_t pos, Poco::Data::CLOB& val);
+
+	template <typename C>
 	bool extractBoundImplContainer(std::size_t pos, C& val)
 	{
 		typedef typename C::value_type Type;
-		poco_assert_dbg (typeid(std::vector<Type>) == _rPreparation[pos].type());
-		std::vector<Type>& v = RefAnyCast<std::vector<Type> >(_rPreparation[pos]);
+		poco_assert_dbg (typeid(std::vector<Type>) == _rPreparator[pos].type());
+		std::vector<Type>& v = RefAnyCast<std::vector<Type> >(_rPreparator[pos]);
 		val.assign(v.begin(), v.end());
+		return true;
+	}
+
+	bool extractBoundImplContainer(std::size_t pos, std::vector<std::string>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::deque<std::string>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::list<std::string>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::vector<Poco::Data::CLOB>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::deque<Poco::Data::CLOB>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::list<Poco::Data::CLOB>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::vector<Poco::Data::BLOB>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::deque<Poco::Data::BLOB>& values);
+	bool extractBoundImplContainer(std::size_t pos, std::list<Poco::Data::BLOB>& values);
+
+	template <typename C>
+	bool extractBoundImplContainerString(std::size_t pos, C& values)
+	{
+		typedef typename C::value_type StringType;
+		typedef typename C::iterator ItType;
+		typedef typename StringType::value_type CharType;
+
+		CharType** pc = AnyCast<CharType*>(&_rPreparator[pos]);
+		poco_assert_dbg (pc);
+		poco_assert_dbg (_rPreparator.bulkSize() == values.size());
+		std::size_t colWidth = columnSize(pos);
+		ItType it = values.begin();
+		ItType end = values.end();
+		for (int row = 0; it != end; ++it, ++row)
+			it->assign(*pc + row * colWidth, _rPreparator.actualDataSize(pos, row));
+
+		return true;
+	}
+
+	template <typename C>
+	bool extractBoundImplContainerLOB(std::size_t pos, C& values)
+	{
+		typedef typename C::value_type LOBType;
+		typedef typename LOBType::ValueType CharType;
+		typedef typename C::iterator ItType;
+
+		CharType** pc = AnyCast<CharType*>(&_rPreparator[pos]);
+		poco_assert_dbg (pc);
+		poco_assert_dbg (_rPreparator.bulkSize() == values.size());
+		std::size_t colWidth = _rPreparator.maxDataSize(pos);
+		ItType it = values.begin();
+		ItType end = values.end();
+		for (int row = 0; it != end; ++it, ++row)
+			it->assignRaw(*pc + row * colWidth, _rPreparator.actualDataSize(pos, row));
+
+		return true;
+	}
+
+	template<typename T>
+	bool extractBoundImplLOB(std::size_t pos, Poco::Data::LOB<T>& val)
+	{
+		if (isNull(pos)) return false;
+
+		std::size_t dataSize = _rPreparator.actualDataSize(pos);
+		checkDataSize(dataSize);
+		T* sp = AnyCast<T*>(_rPreparator[pos]);
+		val.assignRaw(sp, dataSize);
+
 		return true;
 	}
 
@@ -456,6 +532,9 @@ private:
 			case MetaColumn::FDT_BLOB:
 			{ return extAny<T, Poco::Data::BLOB>(pos, val); }
 
+			case MetaColumn::FDT_CLOB:
+			{ return extAny<T, Poco::Data::CLOB>(pos, val); }
+
 			case MetaColumn::FDT_DATE:
 			{ return extAny<T, Poco::Data::Date>(pos, val); }
 
@@ -480,8 +559,8 @@ private:
 	SQLINTEGER columnSize(std::size_t pos) const;
 
 	const StatementHandle&      _rStmt;
-	Preparation&                _rPreparation;
-	Preparation::DataExtraction _dataExtraction;
+	Preparator&                _rPreparator;
+	Preparator::DataExtraction _dataExtraction;
 	std::vector<SQLLEN>         _lengths;
 };
 
@@ -489,13 +568,86 @@ private:
 ///
 /// inlines
 ///
-inline void Extractor::setDataExtraction(Preparation::DataExtraction ext)
+
+inline bool Extractor::extractBoundImpl(std::size_t pos, Poco::Data::BLOB& val)
 {
-	_rPreparation.setDataExtraction(_dataExtraction = ext);
+	return extractBoundImplLOB<BLOB::ValueType>(pos, val);
 }
 
 
-inline Preparation::DataExtraction Extractor::getDataExtraction() const
+inline bool Extractor::extractBoundImpl(std::size_t pos, Poco::Data::CLOB& val)
+{
+	return extractBoundImplLOB<CLOB::ValueType>(pos, val);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::vector<std::string>& values)
+{
+	return extractBoundImplContainerString(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::deque<std::string>& values)
+{
+	return extractBoundImplContainerString(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::list<std::string>& values)
+{
+	return extractBoundImplContainerString(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+	std::vector<Poco::Data::CLOB>& values)
+{
+	return extractBoundImplContainerLOB(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+	std::deque<Poco::Data::CLOB>& values)
+{
+	return extractBoundImplContainerLOB(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+	std::list<Poco::Data::CLOB>& values)
+{
+	return extractBoundImplContainerLOB(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+	std::vector<Poco::Data::BLOB>& values)
+{
+	return extractBoundImplContainerLOB(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+	std::deque<Poco::Data::BLOB>& values)
+{
+	return extractBoundImplContainerLOB(pos, values);
+}
+
+
+inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+	std::list<Poco::Data::BLOB>& values)
+{
+	return extractBoundImplContainerLOB(pos, values);
+}
+
+
+inline void Extractor::setDataExtraction(Preparator::DataExtraction ext)
+{
+	_rPreparator.setDataExtraction(_dataExtraction = ext);
+}
+
+
+inline Preparator::DataExtraction Extractor::getDataExtraction() const
 {
 	return _dataExtraction;
 }
@@ -523,7 +675,7 @@ inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
 inline SQLINTEGER Extractor::columnSize(std::size_t pos) const
 {
 	std::size_t size = ODBCMetaColumn(_rStmt, pos).length();
-	std::size_t maxSize = _rPreparation.maxDataSize(pos);
+	std::size_t maxSize = _rPreparator.maxDataSize(pos);
 	if (size > maxSize) size = maxSize;
 	return (SQLINTEGER) size;
 }

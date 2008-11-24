@@ -112,9 +112,9 @@ private:
 	};
 
 	StatementExecutor _stmt;
-	ResultMetadata  _metadata;
-	Binder _binder;
-	Extractor _extractor;
+	ResultMetadata    _metadata;
+	Binder            _binder;
+	Extractor         _extractor;
 	int               _hasNext;
 	};
 

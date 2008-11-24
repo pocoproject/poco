@@ -43,7 +43,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/AbstractExtraction.h"
 #include "Poco/Data/Bulk.h"
-#include "Poco/Data/Prepare.h"
+#include "Poco/Data/Preparation.h"
 #include <vector>
 
 
@@ -128,13 +128,13 @@ public:
 	{
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t col)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t col)
 	{
 		Poco::UInt32 limit = getLimit();
 		if (limit != _rResult.size()) _rResult.resize(limit);
 		pPrep->setLength(limit);
 		pPrep->setBulk(true);
-		return new Prepare<C>(pPrep, col, _rResult);
+		return new Preparation<C>(pPrep, col, _rResult);
 	}
 
 protected:

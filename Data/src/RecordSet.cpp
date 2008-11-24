@@ -118,6 +118,7 @@ Poco::Dynamic::Var RecordSet::value(std::size_t col, std::size_t row, bool useFi
 		case MetaColumn::FDT_DOUBLE:    return value<double>(col, row, useFilter);
 		case MetaColumn::FDT_STRING:    return value<std::string>(col, row, useFilter);
 		case MetaColumn::FDT_BLOB:      return value<BLOB>(col, row, useFilter);
+		case MetaColumn::FDT_CLOB:      return value<CLOB>(col, row, useFilter);
 		case MetaColumn::FDT_DATE:      return value<Date>(col, row, useFilter);
 		case MetaColumn::FDT_TIME:      return value<Time>(col, row, useFilter);
 		case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(col, row);

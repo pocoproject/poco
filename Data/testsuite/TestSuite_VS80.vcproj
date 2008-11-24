@@ -440,7 +440,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Preparation.h"
+					RelativePath=".\src\Preparator.h"
 					>
 				</File>
 				<File
@@ -468,7 +468,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Preparation.cpp"
+					RelativePath=".\src\Preparator.cpp"
 					>
 				</File>
 				<File

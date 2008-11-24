@@ -1,9 +1,9 @@
 //
-// Preparation.h
+// Preparator.h
 //
-// $Id: //poco/Main/Data/testsuite/src/Preparation.h#3 $
+// $Id: //poco/Main/Data/testsuite/src/Preparator.h#3 $
 //
-// Definition of the Preparation class.
+// Definition of the Preparator class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,11 +32,11 @@
 //
 
 
-#ifndef Data_Test_Preparation_INCLUDED
-#define Data_Test_Preparation_INCLUDED
+#ifndef Data_Test_Preparator_INCLUDED
+#define Data_Test_Preparator_INCLUDED
 
 
-#include "Poco/Data/AbstractPreparation.h"
+#include "Poco/Data/AbstractPreparator.h"
 #include "Poco/Any.h"
 
 
@@ -45,81 +45,84 @@ namespace Data {
 namespace Test {
 
 
-class Preparation: public Poco::Data::AbstractPreparation
-	/// A no-op implementation of AbstractPreparation for testing.
+class Preparator: public Poco::Data::AbstractPreparator
+	/// A no-op implementation of AbstractPreparator for testing.
 {
 public:
-	Preparation();
-		/// Creates the Preparation.
+	Preparator();
+		/// Creates the Preparator.
 
-	~Preparation();
-		/// Destroys the Preparation.
+	~Preparator();
+		/// Destroys the Preparator.
 
 	void prepare(std::size_t pos, Poco::Int8&);
-		/// Prepares an Int8.
+		/// Preparations an Int8.
 
 	void prepare(std::size_t pos, Poco::UInt8&);
-		/// Prepares an UInt8.
+		/// Preparations an UInt8.
 
 	void prepare(std::size_t pos, Poco::Int16&);
-		/// Prepares an Int16.
+		/// Preparations an Int16.
 
 	void prepare(std::size_t pos, Poco::UInt16&);
-		/// Prepares an UInt16.
+		/// Preparations an UInt16.
 
 	void prepare(std::size_t pos, Poco::Int32&);
-		/// Prepares an Int32.
+		/// Preparations an Int32.
 
 	void prepare(std::size_t pos, Poco::UInt32&);
-		/// Prepares an UInt32.
+		/// Preparations an UInt32.
 
 	void prepare(std::size_t pos, Poco::Int64&);
-		/// Prepares an Int64.
+		/// Preparations an Int64.
 
 	void prepare(std::size_t pos, Poco::UInt64&);
-		/// Prepares an UInt64.
+		/// Preparations an UInt64.
 
 #ifndef POCO_LONG_IS_64_BIT
 	void prepare(std::size_t pos, long&);
-		/// Prepares a long.
+		/// Preparations a long.
 #endif
 
 	void prepare(std::size_t pos, bool&);
-		/// Prepares a boolean.
+		/// Preparations a boolean.
 
 	void prepare(std::size_t pos, float&);
-		/// Prepares a float.
+		/// Preparations a float.
 
 	void prepare(std::size_t pos, double&);
-		/// Prepares a double.
+		/// Preparations a double.
 
 	void prepare(std::size_t pos, char&);
-		/// Prepares a single character.
+		/// Preparations a single character.
 
 	void prepare(std::size_t pos, const std::string&);
-		/// Prepares a string.
+		/// Preparations a string.
 
 	void prepare(std::size_t pos, const Poco::Data::BLOB&);
-		/// Prepares a BLOB.
+		/// Preparations a BLOB.
+
+	void prepare(std::size_t pos, const Poco::Data::CLOB&);
+		/// Preparations a CLOB.
 
 	void prepare(std::size_t pos, const Poco::Data::Date&);
-		/// Prepares a Date.
+		/// Preparations a Date.
 
 	void prepare(std::size_t pos, const Poco::Data::Time&);
-		/// Prepares a Time.
+		/// Preparations a Time.
 
 	void prepare(std::size_t pos, const Poco::DateTime&);
-		/// Prepares a DateTime.
+		/// Preparations a DateTime.
 
 	void prepare(std::size_t pos, const Poco::Any&);
-		/// Prepares an Any.
+		/// Preparations an Any.
 
 	void prepare(std::size_t pos, const Poco::Dynamic::Var&);
-		/// Prepares a Var.
+		/// Preparations a Var.
 };
 
 
 } } } // namespace Poco::Data::Test
 
 
-#endif // Data_Test_Preparation_INCLUDED
+#endif // Data_Test_Preparator_INCLUDED

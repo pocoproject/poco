@@ -41,7 +41,7 @@
 
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/AbstractBinder.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <mysql.h>
 
@@ -104,9 +104,12 @@ public:
 
 	virtual void bind(std::size_t pos, const std::string& val, Direction dir);
 		/// Binds a string.
-		
+
 	virtual void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir);
 		/// Binds a BLOB.
+
+	virtual void bind(std::size_t pos, const Poco::Data::CLOB& val, Direction dir);
+		/// Binds a CLOB.
 
 	virtual void bind(std::size_t pos, const DateTime& val, Direction dir);
 		/// Binds a DateTime.
@@ -199,6 +202,12 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<BLOB>& val, Direction dir = PD_IN);
 
+	virtual void bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir = PD_IN);
+
+	virtual void bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir = PD_IN);
+
+	virtual void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir = PD_IN);
+
 	virtual void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<DateTime>& val, Direction dir = PD_IN);
@@ -235,8 +244,8 @@ public:
 	MYSQL_BIND* getBindArray() const;
 		/// Return array
 
-    //void updateDates();
-        /// Update linked times
+	//void updateDates();
+		/// Update linked times
 
 private:
 
@@ -253,7 +262,7 @@ private:
 private:
 
 	std::vector<MYSQL_BIND> _bindArray;
-    std::vector<MYSQL_TIME> _dates;
+	std::vector<MYSQL_TIME> _dates;
 };
 
 

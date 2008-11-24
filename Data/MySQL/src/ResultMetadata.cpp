@@ -80,12 +80,12 @@ namespace
 		case MYSQL_TYPE_DOUBLE:   return sizeof(double);
 		case MYSQL_TYPE_LONGLONG: return sizeof(Poco::Int64);
 
-        case MYSQL_TYPE_DATE:
-        case MYSQL_TYPE_TIME:
-        case MYSQL_TYPE_DATETIME:
-            return sizeof(MYSQL_TIME);
+		case MYSQL_TYPE_DATE:
+		case MYSQL_TYPE_TIME:
+		case MYSQL_TYPE_DATETIME:
+			return sizeof(MYSQL_TIME);
 
-        case MYSQL_TYPE_DECIMAL:
+		case MYSQL_TYPE_DECIMAL:
 		case MYSQL_TYPE_NEWDECIMAL:
 		case MYSQL_TYPE_STRING:
 		case MYSQL_TYPE_VAR_STRING:
@@ -94,7 +94,7 @@ namespace
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
 			return field.length;
-        
+
 		default:
 			throw Poco::Data::MySQL::StatementException("unknown field type");
 		}
@@ -140,9 +140,9 @@ namespace
 		case MYSQL_TYPE_BLOB:
 			return Poco::Data::MetaColumn::FDT_BLOB;
 		default:
-		    return Poco::Data::MetaColumn::FDT_UNKNOWN;
+			return Poco::Data::MetaColumn::FDT_UNKNOWN;
 		}
-	}	
+	}
 } // namespace
 
 
@@ -184,7 +184,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 			fields[i].name,                  // name
 			fieldType(fields[i]),            // type
 			fieldSize(fields[i]),            // length
-			0,                               // TODO: precision (Now I dont know how to get it)
+			0,                               // TODO: precision
 			!IS_NOT_NULL(fields[i].flags)    // nullable
 			));
 
@@ -232,14 +232,14 @@ size_t ResultMetadata::length(size_t pos) const
 	return _lengths[pos];
 }
 
-const char* ResultMetadata::rawData(size_t pos) const 
+const unsigned char* ResultMetadata::rawData(size_t pos) const 
 {
-	return reinterpret_cast<const char*>(_row[pos].buffer);
+	return reinterpret_cast<const unsigned char*>(_row[pos].buffer);
 }
 
 bool ResultMetadata::isNull(size_t pos) const 
 {
-    return (_isNull[pos] != 0);
+	return (_isNull[pos] != 0);
 }
 
 }}} // namespace Poco::Data::MySQL

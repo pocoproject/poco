@@ -55,8 +55,8 @@ namespace Poco {
 namespace Data {
 
 
-class AbstractPrepare;
 class AbstractPreparation;
+class AbstractPreparator;
 
 
 class Data_API AbstractExtraction: public Poco::RefCountedObject
@@ -109,8 +109,8 @@ public:
 	virtual bool canExtract() const;
 		/// Returns true. Implementations should override it for different behavior.
 
-	virtual AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos) = 0;
-		/// Creates a Prepare object for the extracting object
+	virtual AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos) = 0;
+		/// Creates a Preparation object for the extracting object
 
 	void setLimit(Poco::UInt32 limit);
 		/// Sets the limit.

@@ -35,8 +35,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionFactory.h"
-#include "Poco/Data/BLOB.h"
-#include "Poco/Data/BLOBStream.h"
+#include "Poco/Data/LOB.h"
+#include "Poco/Data/LOBStream.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/Column.h"
 #include "Poco/Data/Date.h"
@@ -75,9 +75,9 @@ using Poco::Data::Session;
 using Poco::Data::SessionFactory;
 using Poco::Data::Statement;
 using Poco::Data::NotSupportedException;
-using Poco::Data::BLOB;
-using Poco::Data::BLOBInputStream;
-using Poco::Data::BLOBOutputStream;
+using Poco::Data::CLOB;
+using Poco::Data::CLOBInputStream;
+using Poco::Data::CLOBOutputStream;
 using Poco::Data::MetaColumn;
 using Poco::Data::Column;
 using Poco::Data::Row;
@@ -204,31 +204,62 @@ void DataTest::testProperties()
 }
 
 
-void DataTest::testBLOB()
+void DataTest::testLOB()
+{
+	std::vector<int> vec;
+	vec.push_back(0);
+	vec.push_back(1);
+	vec.push_back(2);
+	vec.push_back(3);
+	vec.push_back(4);
+	vec.push_back(5);
+	vec.push_back(6);
+	vec.push_back(7);
+	vec.push_back(8);
+	vec.push_back(9);
+
+	Poco::Data::LOB<int> lobNum1(&vec[0], vec.size());
+	assert (lobNum1.size() == vec.size());
+	assert (0 == std::memcmp(&vec[0], lobNum1.rawContent(), lobNum1.size() * sizeof(int)));
+	assert (*lobNum1.begin() == 0);
+	Poco::Data::LOB<int>::Iterator it1 = lobNum1.end();
+	assert (*(--it1) == 9);
+	
+	Poco::Data::LOB<int> lobNum2(lobNum1);
+	assert (lobNum2.size() == lobNum1.size());
+	assert (lobNum2 == lobNum1);
+	lobNum1.swap(lobNum2);
+	assert (lobNum2 == lobNum1);
+}
+
+
+void DataTest::testCLOB()
 {
 	std::string strDigit = "1234567890";
 	std::string strAlpha = "abcdefghijklmnopqrstuvwxyz";
 	std::vector<char> vecAlpha(strAlpha.begin(), strAlpha.end());
 	std::vector<char> vecDigit(strDigit.begin(), strDigit.end());
 	
-	BLOB blobNumStr(strDigit.c_str(), strDigit.size());
+	CLOB blobNumStr(strDigit.c_str(), strDigit.size());
 	assert (blobNumStr.size() == strDigit.size());
 	assert (0 == std::strncmp(strDigit.c_str(), blobNumStr.rawContent(), blobNumStr.size()));
 	assert (*blobNumStr.begin() == '1');
-	assert (*(blobNumStr.end()-1) == '0');
-	BLOB blobNumVec(vecDigit);
+	CLOB::Iterator itNumStr = blobNumStr.end();
+	assert (*(--itNumStr) == '0');
+	CLOB blobNumVec(vecDigit);
 	assert (blobNumVec.size() == vecDigit.size());
 	assert (blobNumVec == blobNumStr);
 	blobNumVec.swap(blobNumStr);
 	assert (blobNumVec.size() == blobNumStr.size());
 	assert (blobNumVec == blobNumStr);
 
-	BLOB blobChrStr(strAlpha.c_str(), strAlpha.size());
-	BLOB blobChrVec(vecAlpha);
+	CLOB blobChrStr(strAlpha.c_str(), strAlpha.size());
+	CLOB blobChrVec(vecAlpha);
 	assert (blobChrStr.size() == strAlpha.size());
 	assert (0 == std::strncmp(strAlpha.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
 	assert (*blobChrStr.begin() == 'a');
-	assert (*(blobChrStr.end()-1) == 'z');
+	CLOB::Iterator itChrStr = blobChrStr.end();
+	assert (*(--itChrStr) == 'z');
 	assert (blobChrStr == blobChrVec);
 
 	blobNumStr.swap(blobChrStr);
@@ -245,26 +276,26 @@ void DataTest::testBLOB()
 }
 
 
-void DataTest::testBLOBStreams()
+void DataTest::testCLOBStreams()
 {
-	BLOB blob;
+	CLOB blob;
 	assert (0 == blob.size());
 
-	BLOBOutputStream bos(blob);
+	CLOBOutputStream bos(blob);
 	BinaryWriter bw(bos);
 
 	assert (0 == blob.size());
-	writeToBLOB(bw);
+	writeToCLOB(bw);
 	assert (blob.size() > 0);
 
-	BLOBInputStream bis(blob);
+	CLOBInputStream bis(blob);
 	BinaryReader br(bis);
 
-	readFromBLOB(br);
+	readFromCLOB(br);
 }
 
 
-void DataTest::writeToBLOB(BinaryWriter& writer)
+void DataTest::writeToCLOB(BinaryWriter& writer)
 {
 	writer << true;
 	writer << false;
@@ -305,7 +336,7 @@ void DataTest::writeToBLOB(BinaryWriter& writer)
 }
 
 
-void DataTest::readFromBLOB(BinaryReader& reader)
+void DataTest::readFromCLOB(BinaryReader& reader)
 {
 	bool b = false;
 	reader >> b;
@@ -1294,8 +1325,9 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testStatementFormatting);
 	CppUnit_addTest(pSuite, DataTest, testFeatures);
 	CppUnit_addTest(pSuite, DataTest, testProperties);
-	CppUnit_addTest(pSuite, DataTest, testBLOB);
-	CppUnit_addTest(pSuite, DataTest, testBLOBStreams);
+	CppUnit_addTest(pSuite, DataTest, testLOB);
+	CppUnit_addTest(pSuite, DataTest, testCLOB);
+	CppUnit_addTest(pSuite, DataTest, testCLOBStreams);
 	CppUnit_addTest(pSuite, DataTest, testColumnVector);
 	CppUnit_addTest(pSuite, DataTest, testColumnVectorBool);
 	CppUnit_addTest(pSuite, DataTest, testColumnDeque);

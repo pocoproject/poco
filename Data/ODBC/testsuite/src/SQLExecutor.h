@@ -89,7 +89,7 @@
 		using Poco::Data::Keywords::use; \
 		using Poco::Data::Keywords::bulk; \
 		using Poco::Data::Keywords::limit; \
-		using Poco::Data::BLOB; \
+		using Poco::Data::CLOB; \
 		using Poco::Data::ODBC::ConnectionException; \
 		using Poco::Data::ODBC::StatementException
 
@@ -241,8 +241,8 @@ public:
 		assert (size - 1 == ints.back());
 		assert (std::string("xyz0") == strings.front());
 		assert (std::string("xyz") + number == strings.back());
-		assert (BLOB("abc0") == blobs.front());
-		BLOB blob("abc");
+		assert (CLOB("abc0") == blobs.front());
+		CLOB blob("abc");
 		blob.appendRaw(number.c_str(), number.size());
 		assert (blob == blobs.back());
 		assert (.5 == floats.front());
@@ -294,7 +294,7 @@ public:
 		assert (size - 1 == ints.back());
 		assert (std::string("xyz0") == strings.front());
 		assert (std::string("xyz") + number == strings.back());
-		assert (BLOB("abc0") == blobs.front());
+		assert (CLOB("abc0") == blobs.front());
 		blob.assignRaw("abc", 3);
 		blob.appendRaw(number.c_str(), number.size());
 		assert (blob == blobs.back());
@@ -376,8 +376,8 @@ public:
 		assert (size - 1 == ints.back());
 		assert (std::string("xyz0") == strings.front());
 		assert (std::string("xyz") + number == strings.back());
-		assert (BLOB("abc0") == blobs.front());
-		BLOB blob("abc");
+		assert (CLOB("abc0") == blobs.front());
+		CLOB blob("abc");
 		blob.appendRaw(number.c_str(), number.size());
 		assert (blob == blobs.back());
 		assert (.5 == floats.front());
@@ -422,7 +422,7 @@ public:
 		assert (size - 1 == ints.back());
 		assert (std::string("xyz0") == strings.front());
 		assert (std::string("xyz") + number == strings.back());
-		assert (BLOB("abc0") == blobs.front());
+		assert (CLOB("abc0") == blobs.front());
 		blob.assignRaw("abc", 3);
 		blob.appendRaw(number.c_str(), number.size());
 		assert (blob == blobs.back());
@@ -461,7 +461,7 @@ public:
 		C1 lastName(size, "lastname");
 		C1 firstName(size, "firstname");
 		C1 address(size, "Address");
-		C2 img(size, BLOB("0123456789", 10));
+		C2 img(size, CLOB("0123456789", 10));
 		int count = 0;
 		try { session() << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(img), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }

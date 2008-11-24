@@ -87,7 +87,7 @@ public:
 	void testSingleSelect();
 	void testEmptyDB();
 
-	void testBLOB();
+	void testCLOB();
 
 	void testTuple1();
 	void testTupleVector1();

@@ -42,7 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/AbstractExtraction.h"
-#include "Poco/Data/Prepare.h"
+#include "Poco/Data/Preparation.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Data/Column.h"
 #include "Poco/Data/Position.h"
@@ -130,9 +130,9 @@ public:
 		return !_extracted;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<T>(pPrep, pos, _rResult);
+		return new Preparation<T>(pPrep, pos, _rResult);
 	}
 
 private:
@@ -204,9 +204,9 @@ public:
 		return 1u;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<T>(pPrep, pos, _default);
+		return new Preparation<T>(pPrep, pos, _default);
 	}
 
 protected:
@@ -285,9 +285,9 @@ public:
 		return 1u;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<bool>(pPrep, pos, _default);
+		return new Preparation<bool>(pPrep, pos, _default);
 	}
 
 protected:
@@ -364,9 +364,9 @@ public:
 		return 1u;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<T>(pPrep, pos, _default);
+		return new Preparation<T>(pPrep, pos, _default);
 	}
 
 protected:
@@ -443,9 +443,9 @@ public:
 		return 1u;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<T>(pPrep, pos, _default);
+		return new Preparation<T>(pPrep, pos, _default);
 	}
 
 protected:
@@ -576,9 +576,9 @@ public:
 		return 1u;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<T>(pPrep, pos, _default);
+		return new Preparation<T>(pPrep, pos, _default);
 	}
 
 private:
@@ -635,9 +635,9 @@ public:
 		return 1u;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<T>(pPrep, pos, _default);
+		return new Preparation<T>(pPrep, pos, _default);
 	}
 
 private:
@@ -694,9 +694,9 @@ public:
 		return 1u;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<V>(pPrep, pos, _default);
+		return new Preparation<V>(pPrep, pos, _default);
 	}
 
 private:
@@ -753,9 +753,9 @@ public:
 		return 1u;
 	}
 
-	AbstractPrepare* createPrepareObject(AbstractPreparation* pPrep, std::size_t pos)
+	AbstractPreparation* createPreparation(AbstractPreparator* pPrep, std::size_t pos)
 	{
-		return new Prepare<V>(pPrep, pos, _default);
+		return new Preparation<V>(pPrep, pos, _default);
 	}
 
 private:

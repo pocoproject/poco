@@ -324,6 +324,24 @@ bool AbstractExtractor::extract(std::size_t pos, std::list<BLOB>& val)
 }
 
 
+bool AbstractExtractor::extract(std::size_t pos, std::vector<CLOB>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::deque<CLOB>& val)
+{
+	throw NotImplementedException("std::deque extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::list<CLOB>& val)
+{
+	throw NotImplementedException("std::list extractor must be implemented.");
+}
+
+
 bool AbstractExtractor::extract(std::size_t pos, std::vector<DateTime>& val)
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");

@@ -38,11 +38,10 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/Exception.h"
-#include "sqlite3.h"
 #include <cstdlib>
 
 
@@ -112,17 +111,6 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 		val.clear();
 	else
 		val = std::string(pBuf);
-	return true;
-}
-
-
-bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
-{
-	if (isNull(pos))
-		return false;
-	int size = sqlite3_column_bytes(_pStmt, (int) pos);
-	const char* pTmp = reinterpret_cast<const char*>(sqlite3_column_blob(_pStmt, (int) pos));
-	val = Poco::Data::BLOB(pTmp, size);
 	return true;
 }
 

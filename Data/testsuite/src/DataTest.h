@@ -53,8 +53,9 @@ public:
 	void testStatementFormatting();
 	void testFeatures();
 	void testProperties();
-	void testBLOB();
-	void testBLOBStreams();
+	void testLOB();
+	void testCLOB();
+	void testCLOBStreams();
 	void testColumnVector();
 	void testColumnVectorBool();
 	void testColumnDeque();
@@ -80,8 +81,8 @@ private:
 		/// For this to pass, the following condition must be satisifed: 
 		/// row1 < row2 < row3
 
-	void writeToBLOB(Poco::BinaryWriter& writer);
-	void readFromBLOB(Poco::BinaryReader& reader);
+	void writeToCLOB(Poco::BinaryWriter& writer);
+	void readFromCLOB(Poco::BinaryReader& reader);
 };
 
 

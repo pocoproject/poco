@@ -1,7 +1,7 @@
 //
 // AbstractPreparation.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractPreparation.h#5 $
+// $Id: //poco/Main/Data/include/Poco/Data/AbstractPreparation.h#4 $
 //
 // Library: Data
 // Package: DataCore
@@ -41,335 +41,43 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/RefCountedObject.h"
-#include <vector>
-#include <deque>
-#include <list>
 #include <cstddef>
 
 
 namespace Poco {
-
-
-class DateTime;
-class Any;
-
-namespace Dynamic {
-class Var;
-}
-
-
 namespace Data {
 
 
-class Date;
-class Time;
-class BLOB;
+class AbstractPreparator;
 
 
-class Data_API AbstractPreparation: public Poco::RefCountedObject
-	/// Interface used for database preparation where we first have to register all data types (and memory output locations)
-	/// before extracting data, i.e. extract works as two-pase extract: first we call prepare once, then extract n-times.
-	/// There are cases (bulk operations using std::vector storage) when extract is called only once.
-	/// The value passed to a prepare() call is not be used by the prepare, serving only as an indication of the data type
-	/// being prepared. 
-	/// Implementing this interface is not mandatory for a connector. Connectors that only extract data after SQL execution 
-	/// (e.g. SQLite) do not need this functionality at all.
+class Data_API AbstractPreparation
+	/// Interface for calling the appropriate AbstractPreparator method
 {
 public:
-	AbstractPreparation(Poco::UInt32 length = 1u);
+	AbstractPreparation(AbstractPreparator* pPreparator);
 		/// Creates the AbstractPreparation.
 
 	virtual ~AbstractPreparation();
 		/// Destroys the AbstractPreparation.
 
-	virtual void prepare(std::size_t pos, Poco::Int8&) = 0;
-		/// Prepares an Int8.
+	virtual void prepare() = 0;
+		/// Preparations data.
 
-	virtual void prepare(std::size_t pos, std::vector<Poco::Int8>& val);
-		/// Prepares an Int8 vector.
+protected:
+	AbstractPreparator* preparation();
+		/// Returns the preparation object
 
-	virtual void prepare(std::size_t pos, std::deque<Poco::Int8>& val);
-		/// Prepares an Int8 deque.
-
-	virtual void prepare(std::size_t pos, std::list<Poco::Int8>& val);
-		/// Prepares an Int8 list.
-
-	virtual void prepare(std::size_t pos, Poco::UInt8&) = 0;
-		/// Prepares an UInt8.
-
-	virtual void prepare(std::size_t pos, std::vector<Poco::UInt8>& val);
-		/// Prepares an UInt8 vector.
-
-	virtual void prepare(std::size_t pos, std::deque<Poco::UInt8>& val);
-		/// Prepares an UInt8 deque.
-
-	virtual void prepare(std::size_t pos, std::list<Poco::UInt8>& val);
-		/// Prepares an UInt8 list.
-
-	virtual void prepare(std::size_t pos, Poco::Int16&) = 0;
-		/// Prepares an Int16.
-
-	virtual void prepare(std::size_t pos, std::vector<Poco::Int16>& val);
-		/// Prepares an Int16 vector.
-
-	virtual void prepare(std::size_t pos, std::deque<Poco::Int16>& val);
-		/// Prepares an Int16 deque.
-
-	virtual void prepare(std::size_t pos, std::list<Poco::Int16>& val);
-		/// Prepares an Int16 list.
-
-	virtual void prepare(std::size_t pos, Poco::UInt16&) = 0;
-		/// Prepares an UInt16.
-
-	virtual void prepare(std::size_t pos, std::vector<Poco::UInt16>& val);
-		/// Prepares an UInt16 vector.
-
-	virtual void prepare(std::size_t pos, std::deque<Poco::UInt16>& val);
-		/// Prepares an UInt16 deque.
-
-	virtual void prepare(std::size_t pos, std::list<Poco::UInt16>& val);
-		/// Prepares an UInt16 list.
-
-	virtual void prepare(std::size_t pos, Poco::Int32&) = 0;
-		/// Prepares an Int32.
-
-	virtual void prepare(std::size_t pos, std::vector<Poco::Int32>& val);
-		/// Prepares an Int32 vector.
-
-	virtual void prepare(std::size_t pos, std::deque<Poco::Int32>& val);
-		/// Prepares an Int32 deque.
-
-	virtual void prepare(std::size_t pos, std::list<Poco::Int32>& val);
-		/// Prepares an Int32 list.
-
-	virtual void prepare(std::size_t pos, Poco::UInt32&) = 0;
-		/// Prepares an UInt32.
-
-	virtual void prepare(std::size_t pos, std::vector<Poco::UInt32>& val);
-		/// Prepares an UInt32 vector.
-
-	virtual void prepare(std::size_t pos, std::deque<Poco::UInt32>& val);
-		/// Prepares an UInt32 deque.
-
-	virtual void prepare(std::size_t pos, std::list<Poco::UInt32>& val);
-		/// Prepares an UInt32 list.
-
-	virtual void prepare(std::size_t pos, Poco::Int64&) = 0;
-		/// Prepares an Int64.
-
-	virtual void prepare(std::size_t pos, std::vector<Poco::Int64>& val);
-		/// Prepares an Int64 vector.
-
-	virtual void prepare(std::size_t pos, std::deque<Poco::Int64>& val);
-		/// Prepares an Int64 deque.
-
-	virtual void prepare(std::size_t pos, std::list<Poco::Int64>& val);
-		/// Prepares an Int64 list.
-
-	virtual void prepare(std::size_t pos, Poco::UInt64&) = 0;
-		/// Prepares an UInt64.
-
-	virtual void prepare(std::size_t pos, std::vector<Poco::UInt64>& val);
-		/// Prepares an UInt64 vector.
-
-	virtual void prepare(std::size_t pos, std::deque<Poco::UInt64>& val);
-		/// Prepares an UInt64 deque.
-
-	virtual void prepare(std::size_t pos, std::list<Poco::UInt64>& val);
-		/// Prepares an UInt64 list.
-
-#ifndef POCO_LONG_IS_64_BIT
-	virtual void prepare(std::size_t pos, long&) = 0;
-		/// Prepares a long.
-
-	virtual void prepare(std::size_t pos, std::vector<long>& val);
-		/// Prepares a long vector.
-
-	virtual void prepare(std::size_t pos, std::deque<long>& val);
-		/// Prepares a long deque.
-
-	virtual void prepare(std::size_t pos, std::list<long>& val);
-		/// Prepares a long list.
-#endif
-
-	virtual void prepare(std::size_t pos, bool&) = 0;
-		/// Prepares a boolean.
-
-	virtual void prepare(std::size_t pos, std::vector<bool>& val);
-		/// Prepares a boolean vector.
-
-	virtual void prepare(std::size_t pos, std::deque<bool>& val);
-		/// Prepares a boolean deque.
-
-	virtual void prepare(std::size_t pos, std::list<bool>& val);
-		/// Prepares a boolean list.
-
-	virtual void prepare(std::size_t pos, float&) = 0;
-		/// Prepares a float.
-
-	virtual void prepare(std::size_t pos, std::vector<float>& val);
-		/// Prepares a float vector.
-
-	virtual void prepare(std::size_t pos, std::deque<float>& val);
-		/// Prepares a float deque.
-
-	virtual void prepare(std::size_t pos, std::list<float>& val);
-		/// Prepares a float list.
-
-	virtual void prepare(std::size_t pos, double&) = 0;
-		/// Prepares a double.
-
-	virtual void prepare(std::size_t pos, std::vector<double>& val);
-		/// Prepares a double vector.
-
-	virtual void prepare(std::size_t pos, std::deque<double>& val);
-		/// Prepares a double deque.
-
-	virtual void prepare(std::size_t pos, std::list<double>& val);
-		/// Prepares a double list.
-
-	virtual void prepare(std::size_t pos, char&) = 0;
-		/// Prepares a single character.
-
-	virtual void prepare(std::size_t pos, std::vector<char>& val);
-		/// Prepares a character vector.
-
-	virtual void prepare(std::size_t pos, std::deque<char>& val);
-		/// Prepares a character deque.
-
-	virtual void prepare(std::size_t pos, std::list<char>& val);
-		/// Prepares a character list.
-
-	virtual void prepare(std::size_t pos, const std::string&) = 0;
-		/// Prepares a string.
-
-	virtual void prepare(std::size_t pos, const std::vector<std::string>& val);
-		/// Prepares a string vector.
-
-	virtual void prepare(std::size_t pos, const std::deque<std::string>& val);
-		/// Prepares a string deque.
-
-	virtual void prepare(std::size_t pos, const std::list<std::string>& val);
-		/// Prepares a string list.
-
-	virtual void prepare(std::size_t pos, const BLOB&) = 0;
-		/// Prepares a BLOB.
-
-	virtual void prepare(std::size_t pos, const std::vector<BLOB>& val);
-		/// Prepares a BLOB vector.
-	
-	virtual void prepare(std::size_t pos, const std::deque<BLOB>& val);
-		/// Prepares a BLOB deque.
-
-	virtual void prepare(std::size_t pos, const std::list<BLOB>& val);
-		/// Prepares a BLOB list.
-
-	virtual void prepare(std::size_t pos, const DateTime&) = 0;
-		/// Prepares a DateTime.
-
-	virtual void prepare(std::size_t pos, const std::vector<DateTime>& val);
-		/// Prepares a DateTime vector.
-
-	virtual void prepare(std::size_t pos, const std::deque<DateTime>& val);
-		/// Prepares a DateTime deque.
-
-	virtual void prepare(std::size_t pos, const std::list<DateTime>& val);
-		/// Prepares a DateTime list.
-
-	virtual void prepare(std::size_t pos, const Date&) = 0;
-		/// Prepares a Date.
-
-	virtual void prepare(std::size_t pos, const std::vector<Date>& val);
-		/// Prepares a Date vector.
-
-	virtual void prepare(std::size_t pos, const std::deque<Date>& val);
-		/// Prepares a Date deque.
-
-	virtual void prepare(std::size_t pos, const std::list<Date>& val);
-		/// Prepares a Date list.
-
-	virtual void prepare(std::size_t pos, const Time&) = 0;
-		/// Prepares a Time.
-
-	virtual void prepare(std::size_t pos, const std::vector<Time>& val);
-		/// Prepares a Time vector.
-
-	virtual void prepare(std::size_t pos, const std::deque<Time>& val);
-		/// Prepares a Time deque.
-	
-	virtual void prepare(std::size_t pos, const std::list<Time>& val);
-		/// Prepares a Time list.
-
-	virtual void prepare(std::size_t pos, const Any&) = 0;
-		/// Prepares an Any.
-
-	virtual void prepare(std::size_t pos, const std::vector<Any>& val);
-		/// Prepares an Any vector.
-
-	virtual void prepare(std::size_t pos, const std::deque<Any>& val);
-		/// Prepares an Any deque.
-
-	virtual void prepare(std::size_t pos, const std::list<Any>& val);
-		/// Prepares an Any list.
-
-	virtual void prepare(std::size_t pos, const Poco::Dynamic::Var&) = 0;
-		/// Prepares a Var.
-
-	virtual void prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val);
-		/// Prepares a Var vector.
-
-	virtual void prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val);
-		/// Prepares a Var deque.
-
-	virtual void prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val);
-		/// Prepares a Var list.
-
-	void setLength(Poco::UInt32 length);
-		/// Sets the length of prepared data.
-		/// Needed only for data lengths greater than 1 (i.e. for
-		/// bulk operations).
-
-	Poco::UInt32 getLength() const;
-		/// Returns the length of prepared data. Defaults to 1.
-		/// The length is greater than one for bulk operations.
-
-	void setBulk(bool bulkPrep = true);
-		/// Sets bulk operation flag (always false at object creation time)
-
-	bool isBulk() const;
-		/// Returns bulk operation flag.
-
-private:
-	Poco::UInt32 _length;
-	bool         _bulk;
+	AbstractPreparator* _pPreparator;
 };
 
 
-///
-/// inlines
-///
-inline void AbstractPreparation::setLength(Poco::UInt32 length)
+//
+// inlines
+//
+inline AbstractPreparator* AbstractPreparation::preparation()
 {
-	_length = length;
-}
-
-
-inline Poco::UInt32 AbstractPreparation::getLength() const
-{
-	return _length;
-}
-
-
-inline void AbstractPreparation::setBulk(bool bulkPrep)
-{
-	_bulk = bulkPrep;
-}
-
-
-inline bool AbstractPreparation::isBulk() const
-{
-	return _bulk;
+	return _pPreparator;
 }
 
 

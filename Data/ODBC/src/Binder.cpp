@@ -36,7 +36,7 @@
 
 #include "Poco/Data/ODBC/Binder.h"
 #include "Poco/Data/ODBC/Utility.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
@@ -143,40 +143,6 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		_lengthIndicator.back())))
 	{
 		throw StatementException(_rStmt, "SQLBindParameter(std::string)");
-	}
-}
-
-
-void Binder::bind(std::size_t pos, const BLOB& val, Direction dir)
-{
-	if (isOutBound(dir) || !isInBound(dir))
-		throw NotImplementedException("BLOB parameter type can only be inbound.");
-
-	SQLPOINTER pVal = (SQLPOINTER) val.rawContent();
-	SQLINTEGER size = (SQLINTEGER) val.size();
-		
-	_inParams.insert(ParamMap::value_type(pVal, size));
-
-	SQLLEN* pLenIn = new SQLLEN;
-	*pLenIn  = size;
-
-	if (PB_AT_EXEC == _paramBinding)
-		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
-
-	_lengthIndicator.push_back(pLenIn);
-
-	if (Utility::isError(SQLBindParameter(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		SQL_PARAM_INPUT, 
-		SQL_C_BINARY, 
-		SQL_LONGVARBINARY, 
-		(SQLUINTEGER) size,
-		0,
-		pVal,
-		(SQLINTEGER) size, 
-		_lengthIndicator.back())))
-	{
-		throw StatementException(_rStmt, "SQLBindParameter(BLOB)");
 	}
 }
 

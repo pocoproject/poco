@@ -371,7 +371,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\AbstractPrepare.h"
+					RelativePath=".\include\Poco\Data\AbstractPreparator.h"
 					>
 				</File>
 				<File
@@ -384,14 +384,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Binding.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Data\BLOB.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Data\BLOBStream.h"
 					>
 				</File>
 				<File
@@ -436,6 +428,14 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Limit.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\LOB.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\LOBStream.h"
 					>
 				</File>
 				<File
@@ -539,19 +539,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\AbstractPrepare.cpp"
+					RelativePath=".\src\AbstractPreparator.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\AutoTransaction.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\BLOB.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\BLOBStream.cpp"
 					>
 				</File>
 				<File

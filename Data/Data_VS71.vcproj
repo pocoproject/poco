@@ -265,7 +265,7 @@
 					RelativePath=".\include\Poco\Data\AbstractPreparation.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\AbstractPrepare.h">
+					RelativePath=".\include\Poco\Data\AbstractPreparator.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\AbstractSessionImpl.h">
@@ -275,12 +275,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Binding.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\Data\BLOB.h">
-				</File>
-				<File
-					RelativePath=".\src\BLOBStream.cpp">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Bulk.h">
@@ -314,6 +308,12 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\Limit.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\LOB.h">
+				</File>
+				<File
+					RelativePath=".\src\LOBStream.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\Data\MetaColumn.h">
@@ -389,13 +389,7 @@
 					RelativePath=".\src\AbstractPreparation.cpp">
 				</File>
 				<File
-					RelativePath=".\src\AbstractPrepare.cpp">
-				</File>
-				<File
-					RelativePath=".\src\BLOB.cpp">
-				</File>
-				<File
-					RelativePath=".\include\Poco\Data\BLOBStream.h">
+					RelativePath=".\src\AbstractPreparator.cpp">
 				</File>
 				<File
 					RelativePath=".\src\Bulk.cpp">

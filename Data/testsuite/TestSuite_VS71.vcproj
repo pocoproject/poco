@@ -313,10 +313,7 @@
 					RelativePath=".\src\Extractor.h">
 				</File>
 				<File
-					RelativePath=".\src\Preparation.cpp">
-				</File>
-				<File
-					RelativePath=".\src\Preparation.h">
+					RelativePath=".\src\Preparator.h">
 				</File>
 				<File
 					RelativePath=".\src\SessionImpl.h">
@@ -333,6 +330,9 @@
 				</File>
 				<File
 					RelativePath=".\src\Connector.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Preparator.cpp">
 				</File>
 				<File
 					RelativePath=".\src\Extractor.cpp">

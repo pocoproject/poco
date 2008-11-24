@@ -31,7 +31,7 @@
 
 
 #include "Extractor.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Exception.h"
 
 
@@ -151,6 +151,12 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 
 
 bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
+{
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 {
 	return true;
 }

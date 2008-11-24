@@ -1,13 +1,13 @@
 //
-// Prepare.h
+// Preparation.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Prepare.h#8 $
+// $Id: //poco/Main/Data/include/Poco/Data/Preparation.h#8 $
 //
 // Library: Data
 // Package: DataCore
-// Module:  Prepare
+// Module:  Preparation
 //
-// Definition of the Prepare class.
+// Definition of the Preparation class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,12 +36,12 @@
 //
 
 
-#ifndef Data_Prepare_INCLUDED
-#define Data_Prepare_INCLUDED
+#ifndef Data_Preparation_INCLUDED
+#define Data_Preparation_INCLUDED
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/Data/AbstractPrepare.h"
+#include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Data/TypeHandler.h"
 #include <cstddef>
 #include <vector>
@@ -52,25 +52,25 @@ namespace Data {
 
 
 template<typename T>
-class Prepare: public AbstractPrepare
-	/// Class for calling the appropriate AbstractPreparation method.
+class Preparation: public AbstractPreparation
+	/// Class for calling the appropriate AbstractPreparator method.
 {
 public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, T& val): 
-		AbstractPrepare(pPrepare), 
+	Preparation(AbstractPreparator* pPreparator, std::size_t pos, T& val): 
+		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)
-		/// Creates the Prepare.
+		/// Creates the Preparation.
 	{
 	}
 
-	~Prepare()
-		/// Destroys the Prepare.
+	~Preparation()
+		/// Destroys the Preparation.
 	{
 	}
 
 	void prepare()
-		/// Prepares data.
+		/// Preparations data.
 	{
 		TypeHandler<T>::prepare(_pos, _val, preparation());
 	}
@@ -82,27 +82,27 @@ private:
 
 
 template<typename T>
-class Prepare<std::vector<T> >: public AbstractPrepare
-	/// Prepare specialization for std::vector.
+class Preparation<std::vector<T> >: public AbstractPreparation
+	/// Preparation specialization for std::vector.
 	/// This specialization is needed for bulk operations to enforce
 	/// the whole vector preparation, rather than only individual contained values.
 {
 public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, std::vector<T>& val = std::vector<T>()): 
-		AbstractPrepare(pPrepare), 
+	Preparation(AbstractPreparator* pPreparator, std::size_t pos, std::vector<T>& val = std::vector<T>()): 
+		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)
-		/// Creates the Prepare.
+		/// Creates the Preparation.
 	{
 	}
 
-	~Prepare()
-		/// Destroys the Prepare.
+	~Preparation()
+		/// Destroys the Preparation.
 	{
 	}
 
 	void prepare()
-		/// Prepares data.
+		/// Preparations data.
 	{
 		TypeHandler<std::vector<T> >::prepare(_pos, _val, preparation());
 	}
@@ -114,27 +114,27 @@ private:
 
 
 template<typename T>
-class Prepare<std::deque<T> >: public AbstractPrepare
-	/// Prepare specialization for std::deque.
+class Preparation<std::deque<T> >: public AbstractPreparation
+	/// Preparation specialization for std::deque.
 	/// This specialization is needed for bulk operations to enforce
 	/// the whole deque preparation, rather than only individual contained values.
 {
 public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, std::deque<T>& val = std::deque<T>()): 
-		AbstractPrepare(pPrepare), 
+	Preparation(AbstractPreparator* pPreparator, std::size_t pos, std::deque<T>& val = std::deque<T>()): 
+		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)
-		/// Creates the Prepare.
+		/// Creates the Preparation.
 	{
 	}
 
-	~Prepare()
-		/// Destroys the Prepare.
+	~Preparation()
+		/// Destroys the Preparation.
 	{
 	}
 
 	void prepare()
-		/// Prepares data.
+		/// Preparations data.
 	{
 		TypeHandler<std::deque<T> >::prepare(_pos, _val, preparation());
 	}
@@ -146,27 +146,27 @@ private:
 
 
 template<typename T>
-class Prepare<std::list<T> >: public AbstractPrepare
-	/// Prepare specialization for std::list.
+class Preparation<std::list<T> >: public AbstractPreparation
+	/// Preparation specialization for std::list.
 	/// This specialization is needed for bulk operations to enforce
 	/// the whole list preparation, rather than only individual contained values.
 {
 public:
-	Prepare(AbstractPreparation* pPrepare, std::size_t pos, std::list<T>& val = std::list<T>()): 
-		AbstractPrepare(pPrepare), 
+	Preparation(AbstractPreparator* pPreparator, std::size_t pos, std::list<T>& val = std::list<T>()): 
+		AbstractPreparation(pPreparator), 
 		_pos(pos), 
 		_val(val)
-		/// Creates the Prepare.
+		/// Creates the Preparation.
 	{
 	}
 
-	~Prepare()
-		/// Destroys the Prepare.
+	~Preparation()
+		/// Destroys the Preparation.
 	{
 	}
 
 	void prepare()
-		/// Prepares data.
+		/// Preparations data.
 	{
 		TypeHandler<std::list<T> >::prepare(_pos, _val, preparation());
 	}
@@ -180,4 +180,4 @@ private:
 } } // namespace Poco::Data
 
 
-#endif // Data_Prepare_INCLUDED
+#endif // Data_Preparation_INCLUDED

@@ -107,6 +107,9 @@ public:
 	bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
 
+	bool extract(std::size_t pos, Poco::Data::CLOB& val);
+		/// Extracts a CLOB.
+
 	bool extract(std::size_t pos, Date& val);
 		/// Extracts a Date.
 

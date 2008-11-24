@@ -38,7 +38,7 @@
 #include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
-#include "Poco/Data/AbstractPrepare.h"
+#include "Poco/Data/AbstractPreparation.h"
 #include "Poco/Exception.h"
 
 
@@ -92,9 +92,9 @@ void ODBCStatementImpl::compileImpl()
 	_nextResponse = 0;
 
 	if (_preparations.size())
-		PreparationVec().swap(_preparations);
+		PreparatorVec().swap(_preparations);
 
-	addPreparation();
+	addPreparator();
 
 	Binder::ParameterBinding bind = session().getFeature("autoBind") ? 
 		Binder::PB_IMMEDIATE : Binder::PB_AT_EXEC;
@@ -136,7 +136,7 @@ void ODBCStatementImpl::makeInternalExtractors()
 }
 
 
-void ODBCStatementImpl::addPreparation()
+void ODBCStatementImpl::addPreparator()
 {
 	if (0 == _preparations.size())
 	{
@@ -144,15 +144,15 @@ void ODBCStatementImpl::addPreparation()
 		if (statement.empty())
 			throw ODBCException("Empty statements are illegal");
 
-		Preparation::DataExtraction ext = session().getFeature("autoExtract") ? 
-			Preparation::DE_BOUND : Preparation::DE_MANUAL;
+		Preparator::DataExtraction ext = session().getFeature("autoExtract") ? 
+			Preparator::DE_BOUND : Preparator::DE_MANUAL;
 		
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
-		_preparations.push_back(new Preparation(_stmt, statement, maxFieldSize, ext));
+		_preparations.push_back(new Preparator(_stmt, statement, maxFieldSize, ext));
 	}
 	else
-		_preparations.push_back(new Preparation(*_preparations[0]));
+		_preparations.push_back(new Preparator(*_preparations[0]));
 
 	_extractors.push_back(new Extractor(_stmt, *_preparations.back()));
 }
@@ -180,7 +180,7 @@ void ODBCStatementImpl::doPrepare()
 
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
-			AbstractPrepare* pAP = (*it)->createPrepareObject(_preparations[curDataSet], pos);
+			AbstractPreparation* pAP = (*it)->createPreparation(_preparations[curDataSet], pos);
 			pAP->prepare();
 			pos += (*it)->numOfColumnsHandled();
 			delete pAP;
@@ -312,7 +312,7 @@ bool ODBCStatementImpl::hasNext()
 			if (SQL_NO_DATA == SQLMoreResults(_stmt)) 
 				return false;
 
-			addPreparation();
+			addPreparator();
 			doPrepare();
 			fixupExtraction();
 			makeStep();

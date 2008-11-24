@@ -44,10 +44,15 @@
 #include "Poco/Data/MySQL/StatementExecutor.h"
 #include "Poco/Data/MySQL/ResultMetadata.h"
 #include "Poco/Data/AbstractExtractor.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 
 
 namespace Poco {
+
+namespace Dynamic {
+	class Var;
+}
+
 namespace Data {
 namespace MySQL {
 
@@ -100,15 +105,18 @@ public:
 		
 	virtual bool extract(std::size_t pos, double& val);
 		/// Extracts a double.
-		
+
 	virtual bool extract(std::size_t pos, char& val);
 		/// Extracts a single character.
-		
+
 	virtual bool extract(std::size_t pos, std::string& val);
 		/// Extracts a string.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Data::BLOB& val);
 		/// Extracts a BLOB.
+
+	virtual bool extract(std::size_t pos, Poco::Data::CLOB& val);
+		/// Extracts a CLOB.
 
 	virtual bool extract(std::size_t pos, DateTime& val);
 		/// Extracts a DateTime. Returns false if null was received.
@@ -122,8 +130,8 @@ public:
 	virtual bool extract(std::size_t pos, Any& val);
 		/// Extracts an Any. Returns false if null was received.
 
-	virtual bool extract(std::size_t pos, DynamicAny& val);
-		/// Extracts a DynamicAny. Returns false if null was received.
+	virtual bool extract(std::size_t pos, Dynamic::Var& val);
+		/// Extracts a Dynamic::Var. Returns false if null was received.
 
 	virtual bool isNull(std::size_t col, std::size_t row);
 		/// Returns true if the value at [col,row] position is null.
@@ -131,7 +139,7 @@ public:
 	virtual void reset();
 		/// Resets any information internally cached by the extractor.
 
-        ////////////
+	////////////
 	// Not implemented extract functions
 	////////////
 	
@@ -272,6 +280,15 @@ public:
 	virtual bool extract(std::size_t pos, std::list<BLOB>& val);
 		/// Extracts a BLOB list.
 
+	virtual bool extract(std::size_t pos, std::vector<CLOB>& val);
+		/// Extracts a CLOB vector.
+
+	virtual bool extract(std::size_t pos, std::deque<CLOB>& val);
+		/// Extracts a CLOB deque.
+
+	virtual bool extract(std::size_t pos, std::list<CLOB>& val);
+		/// Extracts a CLOB list.
+
 	virtual bool extract(std::size_t pos, std::vector<DateTime>& val);
 		/// Extracts a DateTime vector.
 
@@ -308,14 +325,14 @@ public:
 	virtual bool extract(std::size_t pos, std::list<Any>& val);
 		/// Extracts an Any list.
 
-	virtual bool extract(std::size_t pos, std::vector<DynamicAny>& val);
-		/// Extracts a DynamicAny vector.
+	virtual bool extract(std::size_t pos, std::vector<Dynamic::Var>& val);
+		/// Extracts a Dynamic::Var vector.
 
-	virtual bool extract(std::size_t pos, std::deque<DynamicAny>& val);
-		/// Extracts a DynamicAny deque.
+	virtual bool extract(std::size_t pos, std::deque<Dynamic::Var>& val);
+		/// Extracts a Dynamic::Var deque.
 
-	virtual bool extract(std::size_t pos, std::list<DynamicAny>& val);
-		/// Extracts a DynamicAny list.
+	virtual bool extract(std::size_t pos, std::list<Dynamic::Var>& val);
+		/// Extracts a Dynamic::Var list.
 	
 private:
 

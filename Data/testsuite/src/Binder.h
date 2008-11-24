@@ -104,6 +104,9 @@ public:
 	void bind(std::size_t pos, const BLOB& val, Direction dir);
 		/// Binds a BLOB.
 
+	void bind(std::size_t pos, const CLOB& val, Direction dir);
+		/// Binds a CLOB.
+
 	void bind(std::size_t pos, const Date& val, Direction dir);
 		/// Binds a Date.
 

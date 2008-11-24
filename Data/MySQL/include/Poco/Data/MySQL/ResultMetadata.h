@@ -70,7 +70,7 @@ public:
 	std::size_t length(std::size_t pos) const;
 		/// Returns the length.
 
-	const char* rawData(std::size_t pos) const;
+	const unsigned char* rawData(std::size_t pos) const;
 		/// Returns raw data.
 
 	bool isNull(std::size_t pos) const;

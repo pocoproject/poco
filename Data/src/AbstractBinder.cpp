@@ -37,7 +37,7 @@
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTime.h"
 #include "Poco/Any.h"
@@ -325,6 +325,24 @@ void AbstractBinder::bind(std::size_t pos, const std::deque<BLOB>& val, Directio
 
 
 void AbstractBinder::bind(std::size_t pos, const std::list<BLOB>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<CLOB>& val, Direction dir)
 {
 	throw NotImplementedException("std::list binder must be implemented.");
 }

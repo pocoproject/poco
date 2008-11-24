@@ -39,7 +39,7 @@
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/Extraction.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/SharedPtr.h"

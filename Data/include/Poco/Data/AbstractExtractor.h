@@ -42,6 +42,7 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Constants.h"
+#include "Poco/Data/LOB.h"
 #include <vector>
 #include <deque>
 #include <list>
@@ -64,7 +65,6 @@ namespace Data {
 
 class Date;
 class Time;
-class BLOB;
 
 
 class Data_API AbstractExtractor
@@ -251,6 +251,9 @@ public:
 	virtual bool extract(std::size_t pos, BLOB& val) = 0;
 		/// Extracts a BLOB. Returns false if null was received.
 
+	virtual bool extract(std::size_t pos, CLOB& val) = 0;
+		/// Extracts a CLOB. Returns false if null was received.
+
 	virtual bool extract(std::size_t pos, std::vector<BLOB>& val);
 		/// Extracts a BLOB vector.
 
@@ -259,6 +262,15 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<BLOB>& val);
 		/// Extracts a BLOB list.
+
+	virtual bool extract(std::size_t pos, std::vector<CLOB>& val);
+		/// Extracts a CLOB vector.
+
+	virtual bool extract(std::size_t pos, std::deque<CLOB>& val);
+		/// Extracts a CLOB deque.
+
+	virtual bool extract(std::size_t pos, std::list<CLOB>& val);
+		/// Extracts a CLOB list.
 
 	virtual bool extract(std::size_t pos, DateTime& val) = 0;
 		/// Extracts a DateTime. Returns false if null was received.

@@ -50,7 +50,7 @@ using namespace Poco::Data::Keywords;
 using Poco::Data::DataException;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
-using Poco::Data::BLOB;
+using Poco::Data::CLOB;
 using Poco::Data::ODBC::Utility;
 using Poco::Data::ODBC::ConnectionException;
 using Poco::Data::ODBC::StatementException;
@@ -237,7 +237,7 @@ void ODBCSQLServerTest::testBulk()
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::vector<int>,
 		std::vector<std::string>,
-		std::vector<BLOB>,
+		std::vector<CLOB>,
 		std::vector<double>,
 		std::vector<DateTime>,
 		std::vector<bool> >(100, "CONVERT(VARBINARY(30),?)");
@@ -245,7 +245,7 @@ void ODBCSQLServerTest::testBulk()
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::deque<int>,
 		std::deque<std::string>,
-		std::deque<BLOB>,
+		std::deque<CLOB>,
 		std::deque<double>,
 		std::deque<DateTime>,
 		std::deque<bool> >(100, "CONVERT(VARBINARY(30),?)");
@@ -253,7 +253,7 @@ void ODBCSQLServerTest::testBulk()
 	recreateMiscTable();
 	_pExecutor->doBulkWithBool<std::list<int>,
 		std::list<std::string>,
-		std::list<BLOB>,
+		std::list<CLOB>,
 		std::list<double>,
 		std::list<DateTime>,
 		std::list<bool> >(100, "CONVERT(VARBINARY(30),?)");

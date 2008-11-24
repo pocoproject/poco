@@ -38,7 +38,7 @@
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 
@@ -55,10 +55,10 @@ const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z by
 
 
 Extractor::Extractor(const StatementHandle& rStmt, 
-	Preparation& rPreparation): 
+	Preparator& rPreparator): 
 	_rStmt(rStmt), 
-	_rPreparation(rPreparation),
-	_dataExtraction(rPreparation.getDataExtraction())
+	_rPreparator(rPreparator),
+	_dataExtraction(rPreparator.getDataExtraction())
 {
 }
 
@@ -73,8 +73,8 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _rPreparation.actualDataSize(pos);
-	char* sp = AnyCast<char*>(_rPreparation[pos]);
+	std::size_t dataSize = _rPreparator.actualDataSize(pos);
+	char* sp = AnyCast<char*>(_rPreparator[pos]);
 	std::size_t len = std::strlen(sp);
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
@@ -85,126 +85,10 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::vector<std::string> >(std::size_t pos, 
-	std::vector<std::string>& values)
-{
-	char** pc = AnyCast<char*>(&_rPreparation[pos]);
-	poco_assert_dbg (pc);
-	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = columnSize(pos);
-	std::vector<std::string>::iterator it = values.begin();
-	std::vector<std::string>::iterator end = values.end();
-	for (int row = 0; it != end; ++it, ++row)
-		it->assign(*pc + row * colWidth, _rPreparation.actualDataSize(pos, row));
-
-	return true;
-}
-
-
-template<>
-bool Extractor::extractBoundImplContainer<std::deque<std::string> >(std::size_t pos, 
-	std::deque<std::string>& values)
-{
-	char** pc = AnyCast<char*>(&_rPreparation[pos]);
-	poco_assert_dbg (pc);
-	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = columnSize(pos);
-	std::deque<std::string>::iterator it = values.begin();
-	std::deque<std::string>::iterator end = values.end();
-	for (int row = 0; it != end; ++it, ++row)
-		it->assign(*pc + row * colWidth, _rPreparation.actualDataSize(pos, row));
-
-	return true;
-}
-
-
-template<>
-bool Extractor::extractBoundImplContainer<std::list<std::string> >(std::size_t pos, 
-	std::list<std::string>& values)
-{
-	char** pc = AnyCast<char*>(&_rPreparation[pos]);
-	poco_assert_dbg (pc);
-	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = columnSize(pos);
-	std::list<std::string>::iterator it = values.begin();
-	std::list<std::string>::iterator end = values.end();
-	for (int row = 0; it != end; ++it, ++row)
-		it->assign(*pc + row * colWidth, _rPreparation.actualDataSize(pos, row));
-
-	return true;
-}
-
-
-template<>
-bool Extractor::extractBoundImpl<Poco::Data::BLOB>(std::size_t pos, Poco::Data::BLOB& val)
-{
-	if (isNull(pos)) return false;
-
-	std::size_t dataSize = _rPreparation.actualDataSize(pos);
-	checkDataSize(dataSize);
-	char* sp = AnyCast<char*>(_rPreparation[pos]);
-	val.assignRaw(sp, dataSize);
-
-	return true;
-}
-
-
-template<>
-bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::BLOB> >(std::size_t pos, 
-	std::vector<Poco::Data::BLOB>& values)
-{
-	char** pc = AnyCast<char*>(&_rPreparation[pos]);
-	poco_assert_dbg (pc);
-	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = _rPreparation.maxDataSize(pos);
-	std::vector<Poco::Data::BLOB>::iterator it = values.begin();
-	std::vector<Poco::Data::BLOB>::iterator end = values.end();
-	for (int row = 0; it != end; ++it, ++row)
-		it->assignRaw(*pc + row * colWidth, _rPreparation.actualDataSize(pos, row));
-
-	return true;
-}
-
-
-template<>
-bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::BLOB> >(std::size_t pos, 
-	std::deque<Poco::Data::BLOB>& values)
-{
-	char** pc = AnyCast<char*>(&_rPreparation[pos]);
-	poco_assert_dbg (pc);
-	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = _rPreparation.maxDataSize(pos);
-	std::deque<Poco::Data::BLOB>::iterator it = values.begin();
-	std::deque<Poco::Data::BLOB>::iterator end = values.end();
-	for (int row = 0; it != end; ++it, ++row)
-		it->assignRaw(*pc + row * colWidth, _rPreparation.actualDataSize(pos, row));
-
-	return true;
-}
-
-
-template<>
-bool Extractor::extractBoundImplContainer<std::list<Poco::Data::BLOB> >(std::size_t pos, 
-	std::list<Poco::Data::BLOB>& values)
-{
-	char** pc = AnyCast<char*>(&_rPreparation[pos]);
-	poco_assert_dbg (pc);
-	poco_assert_dbg (_rPreparation.bulkSize() == values.size());
-	std::size_t colWidth = _rPreparation.maxDataSize(pos);
-	std::list<Poco::Data::BLOB>::iterator it = values.begin();
-	std::list<Poco::Data::BLOB>::iterator end = values.end();
-	for (int row = 0; it != end; ++it, ++row)
-		it->assignRaw(*pc + row * colWidth, _rPreparation.actualDataSize(pos, row));
-
-	return true;
-}
-
-
-template<>
 bool Extractor::extractBoundImpl<Poco::Data::Date>(std::size_t pos, Poco::Data::Date& val)
 {
 	if (isNull(pos)) return false;
-	SQL_DATE_STRUCT& ds = *AnyCast<SQL_DATE_STRUCT>(&_rPreparation[pos]);
+	SQL_DATE_STRUCT& ds = *AnyCast<SQL_DATE_STRUCT>(&_rPreparator[pos]);
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -214,7 +98,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Date> >(std::size_t pos, 
 	std::vector<Poco::Data::Date>& val)
 {
-	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparator[pos]);
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -224,7 +108,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Date> >(std::size_t pos, 
 	std::deque<Poco::Data::Date>& val)
 {
-	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparator[pos]);
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -234,7 +118,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::list<Poco::Data::Date> >(std::size_t pos, 
 	std::list<Poco::Data::Date>& val)
 {
-	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_rPreparator[pos]);
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -245,9 +129,9 @@ bool Extractor::extractBoundImpl<Poco::Data::Time>(std::size_t pos, Poco::Data::
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _rPreparation.actualDataSize(pos);
+	std::size_t dataSize = _rPreparator.actualDataSize(pos);
 	checkDataSize(dataSize);
-	SQL_TIME_STRUCT& ts = *AnyCast<SQL_TIME_STRUCT>(&_rPreparation[pos]);
+	SQL_TIME_STRUCT& ts = *AnyCast<SQL_TIME_STRUCT>(&_rPreparator[pos]);
 	Utility::timeSync(val, ts);
 
 	return true;
@@ -258,7 +142,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Time> >(std::size_t pos, 
 	std::vector<Poco::Data::Time>& val)
 {
-	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparator[pos]);
 	Utility::timeSync(val, ds);
 	return true;
 }
@@ -268,7 +152,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Time> >(std::size_t pos, 
 	std::deque<Poco::Data::Time>& val)
 {
-	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparator[pos]);
 	Utility::timeSync(val, ds);
 	return true;
 }
@@ -278,7 +162,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::list<Poco::Data::Time> >(std::size_t pos, 
 	std::list<Poco::Data::Time>& val)
 {
-	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_rPreparator[pos]);
 	Utility::timeSync(val, ds);
 	return true;
 }
@@ -289,9 +173,9 @@ bool Extractor::extractBoundImpl<Poco::DateTime>(std::size_t pos, Poco::DateTime
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _rPreparation.actualDataSize(pos);
+	std::size_t dataSize = _rPreparator.actualDataSize(pos);
 	checkDataSize(dataSize);
-	SQL_TIMESTAMP_STRUCT& tss = *AnyCast<SQL_TIMESTAMP_STRUCT>(&_rPreparation[pos]);
+	SQL_TIMESTAMP_STRUCT& tss = *AnyCast<SQL_TIMESTAMP_STRUCT>(&_rPreparator[pos]);
 	Utility::dateTimeSync(val, tss);
 
 	return true;
@@ -302,7 +186,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::vector<Poco::DateTime> >(std::size_t pos, 
 	std::vector<Poco::DateTime>& val)
 {
-	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparator[pos]);
 	Utility::dateTimeSync(val, ds);
 	return true;
 }
@@ -312,7 +196,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::deque<Poco::DateTime> >(std::size_t pos, 
 	std::deque<Poco::DateTime>& val)
 {
-	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparator[pos]);
 	Utility::dateTimeSync(val, ds);
 	return true;
 }
@@ -322,7 +206,7 @@ template<>
 bool Extractor::extractBoundImplContainer<std::list<Poco::DateTime> >(std::size_t pos, 
 	std::list<Poco::DateTime>& val)
 {
-	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparation[pos]);
+	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_rPreparator[pos]);
 	Utility::dateTimeSync(val, ds);
 	return true;
 }
@@ -332,8 +216,8 @@ template<>
 bool Extractor::extractBoundImplContainer<std::vector<bool> >(std::size_t pos, 
 	std::vector<bool>& val)
 {
-	std::size_t length = _rPreparation.getLength();
-	bool** p = AnyCast<bool*>(&_rPreparation[pos]);
+	std::size_t length = _rPreparator.getLength();
+	bool** p = AnyCast<bool*>(&_rPreparator[pos]);
 	val.assign(*p, *p + length);
 	return true;
 }
@@ -343,8 +227,8 @@ template<>
 bool Extractor::extractBoundImplContainer<std::deque<bool> >(std::size_t pos, 
 	std::deque<bool>& val)
 {
-	std::size_t length = _rPreparation.getLength();
-	bool** p = AnyCast<bool*>(&_rPreparation[pos]);
+	std::size_t length = _rPreparator.getLength();
+	bool** p = AnyCast<bool*>(&_rPreparator[pos]);
 	val.assign(*p, *p + length);
 	return true;
 }
@@ -354,8 +238,8 @@ template<>
 bool Extractor::extractBoundImplContainer<std::list<bool> >(std::size_t pos, 
 	std::list<bool>& val)
 {
-	std::size_t length = _rPreparation.getLength();
-	bool** p = AnyCast<bool*>(&_rPreparation[pos]);
+	std::size_t length = _rPreparator.getLength();
+	bool** p = AnyCast<bool*>(&_rPreparator[pos]);
 	val.assign(*p, *p + length);
 	return true;
 }
@@ -364,7 +248,7 @@ bool Extractor::extractBoundImplContainer<std::list<bool> >(std::size_t pos,
 template<>
 bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val, SQLSMALLINT cType)
 {
-	std::size_t maxSize = _rPreparation.getMaxFieldSize();
+	std::size_t maxSize = _rPreparator.getMaxFieldSize();
 	std::size_t fetchedSize = 0;
 	std::size_t totalSize = 0;
 	
@@ -416,11 +300,11 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 
 
 template<>
-bool Extractor::extractManualImpl<Poco::Data::BLOB>(std::size_t pos, 
-	Poco::Data::BLOB& val, 
+bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos, 
+	Poco::Data::CLOB& val, 
 	SQLSMALLINT cType)
 {
-	std::size_t maxSize = _rPreparation.getMaxFieldSize();
+	std::size_t maxSize = _rPreparator.getMaxFieldSize();
 	std::size_t fetchedSize = 0;
 	std::size_t totalSize = 0;
 
@@ -553,7 +437,7 @@ bool Extractor::extractManualImpl<Poco::DateTime>(std::size_t pos,
 
 bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_SLONG);
 	else
 		return extractBoundImpl(pos, val);
@@ -562,7 +446,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::Int32>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -571,7 +455,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::Int32>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::Int32>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -580,7 +464,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::Int32>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::Int32>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -589,7 +473,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Int32>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_SBIGINT);
 	else
 		return extractBoundImpl(pos, val);
@@ -598,7 +482,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::Int64>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -607,7 +491,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::Int64>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::Int64>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -616,7 +500,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::Int64>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::Int64>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -626,7 +510,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Int64>& val)
 #ifndef POCO_LONG_IS_64_BIT
 bool Extractor::extract(std::size_t pos, long& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_SLONG);
 	else
 		return extractBoundImpl(pos, val);
@@ -635,7 +519,7 @@ bool Extractor::extract(std::size_t pos, long& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<long>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -644,7 +528,7 @@ bool Extractor::extract(std::size_t pos, std::vector<long>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<long>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -653,7 +537,7 @@ bool Extractor::extract(std::size_t pos, std::deque<long>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<long>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -663,7 +547,7 @@ bool Extractor::extract(std::size_t pos, std::list<long>& val)
 
 bool Extractor::extract(std::size_t pos, double& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_DOUBLE);
 	else
 		return extractBoundImpl(pos, val);
@@ -672,7 +556,7 @@ bool Extractor::extract(std::size_t pos, double& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<double>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -681,7 +565,7 @@ bool Extractor::extract(std::size_t pos, std::vector<double>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<double>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -690,7 +574,7 @@ bool Extractor::extract(std::size_t pos, std::deque<double>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<double>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -699,7 +583,7 @@ bool Extractor::extract(std::size_t pos, std::list<double>& val)
 
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_CHAR);
 	else
 		return extractBoundImpl(pos, val);
@@ -708,7 +592,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<std::string>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -717,7 +601,7 @@ bool Extractor::extract(std::size_t pos, std::vector<std::string>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<std::string>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -726,7 +610,7 @@ bool Extractor::extract(std::size_t pos, std::deque<std::string>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<std::string>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -735,7 +619,16 @@ bool Extractor::extract(std::size_t pos, std::list<std::string>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_BINARY);
+	else
+		return extractBoundImpl(pos, val);
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
+{
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_BINARY);
 	else
 		return extractBoundImpl(pos, val);
@@ -744,7 +637,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::BLOB>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -753,7 +646,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::BLOB>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::BLOB>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -762,7 +655,34 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::BLOB>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::Data::BLOB>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::CLOB>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::CLOB>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
+		return extractBoundImplContainer(pos, val);
+	else
+		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Data::CLOB>& val)
+{
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -771,7 +691,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Data::BLOB>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Data::Date& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_TYPE_DATE);
 	else
 		return extractBoundImpl(pos, val);
@@ -780,7 +700,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::Date& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::Date>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -789,7 +709,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::Date>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::Date>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -798,7 +718,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::Date>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::Data::Date>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -807,7 +727,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Data::Date>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Data::Time& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_TYPE_TIME);
 	else
 		return extractBoundImpl(pos, val);
@@ -816,7 +736,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::Time& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::Time>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -825,7 +745,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::Time>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::Time>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -834,7 +754,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::Time>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::Data::Time>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -843,7 +763,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Data::Time>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::DateTime& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_TYPE_TIMESTAMP);
 	else
 		return extractBoundImpl(pos, val);
@@ -852,7 +772,7 @@ bool Extractor::extract(std::size_t pos, Poco::DateTime& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::DateTime>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -861,7 +781,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::DateTime>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::DateTime>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -870,7 +790,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::DateTime>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::DateTime>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -879,7 +799,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::DateTime>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_STINYINT);
 	else
 		return extractBoundImpl(pos, val);
@@ -888,7 +808,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::Int8>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -897,7 +817,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::Int8>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::Int8>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -906,7 +826,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::Int8>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::Int8>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -915,7 +835,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Int8>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_UTINYINT);
 	else
 		return extractBoundImpl(pos, val);
@@ -924,7 +844,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt8>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -933,7 +853,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt8>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt8>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -942,7 +862,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt8>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::UInt8>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -951,7 +871,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::UInt8>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_SSHORT);
 	else
 		return extractBoundImpl(pos, val);
@@ -960,7 +880,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::Int16>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -969,7 +889,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::Int16>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::Int16>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -978,7 +898,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::Int16>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::Int16>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -987,7 +907,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Int16>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_USHORT);
 	else
 		return extractBoundImpl(pos, val);
@@ -996,7 +916,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt16>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1005,7 +925,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt16>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt16>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1014,7 +934,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt16>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::UInt16>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1023,7 +943,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::UInt16>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_ULONG);
 	else
 		return extractBoundImpl(pos, val);
@@ -1032,7 +952,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt32>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1041,7 +961,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt32>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt32>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1050,7 +970,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt32>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::UInt32>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1059,7 +979,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::UInt32>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_SBIGINT);
 	else
 		return extractBoundImpl(pos, val);
@@ -1068,7 +988,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt64>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1077,7 +997,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt64>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt64>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1086,7 +1006,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt64>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::UInt64>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1095,7 +1015,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::UInt64>& val)
 
 bool Extractor::extract(std::size_t pos, bool& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_BIT);
 	else
 		return extractBoundImpl(pos, val);
@@ -1104,7 +1024,7 @@ bool Extractor::extract(std::size_t pos, bool& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<bool>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1113,7 +1033,7 @@ bool Extractor::extract(std::size_t pos, std::vector<bool>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<bool>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1122,7 +1042,7 @@ bool Extractor::extract(std::size_t pos, std::deque<bool>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<bool>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1131,7 +1051,7 @@ bool Extractor::extract(std::size_t pos, std::list<bool>& val)
 
 bool Extractor::extract(std::size_t pos, float& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_FLOAT);
 	else
 		return extractBoundImpl(pos, val);
@@ -1140,7 +1060,7 @@ bool Extractor::extract(std::size_t pos, float& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<float>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1149,7 +1069,7 @@ bool Extractor::extract(std::size_t pos, std::vector<float>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<float>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1158,7 +1078,7 @@ bool Extractor::extract(std::size_t pos, std::deque<float>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<float>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1167,7 +1087,7 @@ bool Extractor::extract(std::size_t pos, std::list<float>& val)
 
 bool Extractor::extract(std::size_t pos, char& val)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 		return extractManualImpl(pos, val, SQL_C_STINYINT);
 	else
 		return extractBoundImpl(pos, val);
@@ -1176,7 +1096,7 @@ bool Extractor::extract(std::size_t pos, char& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<char>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1185,7 +1105,7 @@ bool Extractor::extract(std::size_t pos, std::vector<char>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<char>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1194,7 +1114,7 @@ bool Extractor::extract(std::size_t pos, std::deque<char>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<char>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1209,7 +1129,7 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::Any>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1218,7 +1138,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::Any>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::Any>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1227,7 +1147,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::Any>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::Any>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1242,7 +1162,7 @@ bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
 
 bool Extractor::extract(std::size_t pos, std::vector<Poco::DynamicAny>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1251,7 +1171,7 @@ bool Extractor::extract(std::size_t pos, std::vector<Poco::DynamicAny>& val)
 
 bool Extractor::extract(std::size_t pos, std::deque<Poco::DynamicAny>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1260,7 +1180,7 @@ bool Extractor::extract(std::size_t pos, std::deque<Poco::DynamicAny>& val)
 
 bool Extractor::extract(std::size_t pos, std::list<Poco::DynamicAny>& val)
 {
-	if (Preparation::DE_BOUND == _dataExtraction)
+	if (Preparator::DE_BOUND == _dataExtraction)
 		return extractBoundImpl(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
@@ -1269,7 +1189,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::DynamicAny>& val)
 
 bool Extractor::isNull(std::size_t col, std::size_t row)
 {
-	if (Preparation::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction)
 	{
 		try
 		{
@@ -1280,13 +1200,13 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 		}
 	}
 	else
-		return SQL_NULL_DATA == _rPreparation.actualDataSize(col, row);
+		return SQL_NULL_DATA == _rPreparator.actualDataSize(col, row);
 }
 
 
 void Extractor::checkDataSize(std::size_t size)
 {
-	std::size_t maxSize = _rPreparation.getMaxFieldSize();
+	std::size_t maxSize = _rPreparator.getMaxFieldSize();
 	if (size > maxSize)
 		throw DataException(format(FLD_SIZE_EXCEEDED_FMT, size, maxSize));
 }

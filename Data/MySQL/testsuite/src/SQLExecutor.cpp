@@ -37,7 +37,7 @@
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
-#include "Poco/Data/BLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/MySQL/Connector.h"
@@ -118,7 +118,7 @@ public:
 		pBinder->bind(pos++, obj.age, dir);
 	}
 
-	static void prepare(std::size_t pos, Person& obj, AbstractPreparation* pPrepare)
+	static void prepare(std::size_t pos, Person& obj, AbstractPreparator* pPrepare)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
 		poco_assert_dbg (pPrepare != 0);
@@ -1257,7 +1257,7 @@ void SQLExecutor::blob(int bigSize)
 	std::string firstName("firstname");
 	std::string address("Address");
 
-	Poco::Data::BLOB img("0123456789", 10);
+	Poco::Data::CLOB img("0123456789", 10);
 	int count = 0;
 	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(img), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1267,14 +1267,14 @@ void SQLExecutor::blob(int bigSize)
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (count == 1);
 
-	Poco::Data::BLOB res;
+	Poco::Data::CLOB res;
 	assert (res.size() == 0);
 	try { *_pSession << "SELECT Image FROM Person", into(res), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (res == img);
 
-	Poco::Data::BLOB big;
+	Poco::Data::CLOB big;
 	std::vector<char> v(bigSize, 'x');
 	big.assignRaw(&v[0], v.size());
 
@@ -1300,7 +1300,7 @@ void SQLExecutor::blobStmt()
 	std::string lastName("lastname");
 	std::string firstName("firstname");
 	std::string address("Address");
-	Poco::Data::BLOB blob("0123456789", 10);
+	Poco::Data::CLOB blob("0123456789", 10);
 
 	int count = 0;
 	Statement ins = (*_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(blob));
@@ -1310,7 +1310,7 @@ void SQLExecutor::blobStmt()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assert (count == 1);
 
-	Poco::Data::BLOB res;
+	Poco::Data::CLOB res;
 	poco_assert (res.size() == 0);
 	Statement stmt = (*_pSession << "SELECT Image FROM Person", into(res));
 	try { stmt.execute(); }

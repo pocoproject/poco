@@ -44,7 +44,7 @@
 #include "Poco/Data/ODBC/SessionImpl.h"
 #include "Poco/Data/ODBC/Binder.h"
 #include "Poco/Data/ODBC/Extractor.h"
-#include "Poco/Data/ODBC/Preparation.h"
+#include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/Column.h"
@@ -117,8 +117,8 @@ private:
 	typedef Poco::Data::AbstractBindingVec    Bindings;
 	typedef Poco::SharedPtr<Binder>           BinderPtr;
 	typedef Poco::Data::AbstractExtractionVec Extractions;
-	typedef Poco::SharedPtr<Preparation>      PreparationPtr;
-	typedef std::vector<PreparationPtr>       PreparationVec;
+	typedef Poco::SharedPtr<Preparator>       PreparatorPtr;
+	typedef std::vector<PreparatorPtr>        PreparatorVec;
 	typedef Poco::SharedPtr<Extractor>        ExtractorPtr;
 	typedef std::vector<ExtractorPtr>         ExtractorVec;
 	typedef std::vector<ODBCMetaColumn*>      ColumnPtrVec;
@@ -160,13 +160,13 @@ private:
 
 	void getData();
 
-	void addPreparation();
+	void addPreparator();
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
 	const SQLHDBC&        _rConnection;
 	const StatementHandle _stmt;
-	PreparationVec        _preparations;
+	PreparatorVec        _preparations;
 	BinderPtr             _pBinder;
 	ExtractorVec          _extractors;
 	bool                  _stepCalled;
