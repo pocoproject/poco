@@ -1940,7 +1940,7 @@ void VarTest::testDynamicStructBasics()
 }
 
 
-void VarTest::testDynamicStruct()
+void VarTest::testDynamicStructString()
 {
 	DynamicStruct aStruct;
 	aStruct["First Name"] = "Junior";
@@ -1951,6 +1951,22 @@ void VarTest::testDynamicStruct()
 	a1["First Name"] = "Senior";
 	assert (a1["First Name"] == "Senior");
 	testGetIdxMustThrow(a1, 0);
+}
+
+
+
+
+
+void VarTest::testDynamicStructInt()
+{
+	Dynamic::Struct<int> aStruct;
+	aStruct[0] = "Junior";
+	aStruct[1] = "POCO";
+	Var a1(aStruct);
+	assert (a1[0] == "Junior");
+	assert (a1[1] == "POCO");
+	a1[0] = "Senior";
+	assert (a1[0] == "Senior");
 }
 
 
@@ -2380,7 +2396,8 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testIsArray);
 	CppUnit_addTest(pSuite, VarTest, testArrayIdxOperator);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructBasics);
-	CppUnit_addTest(pSuite, VarTest, testDynamicStruct);
+	CppUnit_addTest(pSuite, VarTest, testDynamicStructString);
+	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);
 	CppUnit_addTest(pSuite, VarTest, testArrayToString);
 	CppUnit_addTest(pSuite, VarTest, testStructToString);
 	CppUnit_addTest(pSuite, VarTest, testArrayOfStructsToString);

@@ -51,180 +51,157 @@ namespace Poco {
 namespace Dynamic {
 
 
-class Foundation_API Struct
+template <typename K>
+class Struct
 	/// Struct allows to define a named collection of Var objects.
 {
 public:
-	typedef std::map<std::string, Var> Data;
-	typedef Data::iterator Iterator;
-	typedef Data::const_iterator ConstIterator;
+	typedef typename std::map<K, Var> Data;
+	typedef typename std::set<K> NameSet;
+	typedef typename Data::iterator Iterator;
+	typedef typename Data::const_iterator ConstIterator;
+	typedef typename Struct<K>::Data::value_type ValueType;
+	typedef typename Struct<K>::Data::size_type SizeType;
+	typedef typename std::pair<typename Struct<K>::Iterator, bool> InsRetVal;
 
-	Struct();
+	Struct(): _data()
 		/// Creates an empty Struct
+	{
+	}
 
-	Struct(const Data &val);
+	Struct(const Data &val): _data(val)
 		/// Creates the Struct from the given value.
-	
-	virtual ~Struct();
+	{
+	}
+
+	virtual ~Struct()
 		/// Destroys the Struct.
+	{
+	}
 
-	Var& operator [] (const std::string& name);
+	inline Var& operator [] (const K& name)
 		/// Returns the Var with the given name, creates an entry if not found.
+	{
+		return _data[name];
+	}
 
-	const Var& operator [] (const std::string& name) const;
+	const Var& operator [] (const K& name) const
 		/// Returns the Var with the given name, throws a
 		/// NotFoundException if the data member is not found.
+	{
+		ConstIterator it = find(name);
+		if (it == end()) throw NotFoundException(name);
+		return it->second;
+	}
 
-	bool contains(const std::string& name) const;
-		/// Returns true if the Struct contains a member with the given 
-		/// name
+	inline bool contains(const K& name) const
+		/// Returns true if the Struct contains a member with the given name
+	{
+		return find(name) != end();
+	}
 
-	Iterator find(const std::string& name);
+	inline Iterator find(const K& name)
 		/// Returns an iterator, pointing to the <name,Var> pair containing
 		/// the element, or it returns end() if the member was not found
+	{
+		return _data.find(name);
+	}
 
-	ConstIterator find(const std::string& name) const;
+	inline ConstIterator find(const K& name) const
 		/// Returns a const iterator, pointing to the <name,Var> pair containing
 		/// the element, or it returns end() if the member was not found
+	{
+		return _data.find(name);
+	}
 
-	Iterator end();
+	inline Iterator end()
 		/// Returns the end iterator for the Struct
+	{
+		return _data.end();
+	}
 
-	ConstIterator end() const;
+	inline ConstIterator end() const
 		/// Returns the end const iterator for the Struct
+	{
+		return _data.end();
+	}
 
-	Iterator begin();
+	inline Iterator begin()
 		/// Returns the begin iterator for the Struct
+	{
+		return _data.begin();
+	}
 
-	ConstIterator begin() const;
+	inline ConstIterator begin() const
 		/// Returns the begin const iterator for the Struct
+	{
+		return _data.begin();
+	}
 
-	std::pair<Struct::Iterator, bool> insert(const std::string& key, const Var& value);
+	inline InsRetVal insert(const K& key, const Var& value)
 		/// Inserts a <name, Var> pair into the Struct,
 		/// returns a pair containing the iterator and a boolean which
 		/// indicates success or not (is true, when insert succeeded, false,
 		/// when already another element was present, in this case Iterator
 		/// points to that other element)
+	{
+		return insert(std::make_pair(key, value));
+	}
 
-	std::pair<Struct::Iterator, bool> insert(const Struct::Data::value_type& aPair);
+	inline InsRetVal insert(const ValueType& aPair)
 		/// Inserts a <name, Var> pair into the Struct,
 		/// returns a pair containing the iterator and a boolean which
 		/// indicates success or not (is true, when insert succeeded, false,
 		/// when already another element was present, in this case Iterator
 		/// points to that other element)
+	{
+		return _data.insert(aPair);
+	}
 
-	Struct::Data::size_type erase(const std::string& key);
+	inline SizeType erase(const K& key)
 		/// Erases the element if found, returns number of elements deleted
+	{
+		return _data.erase(key);
+	}
 
-	void erase(Struct::Iterator it);
+	inline void erase(Iterator& it)
 		/// Erases the element at the given position
+	{
+		_data.erase(it);
+	}
 
-	bool empty() const;
+	inline bool empty() const
 		/// Returns true if the Struct doesn't contain any members
+	{
+		return _data.empty();
+	}
 
-	Struct::Data::size_type size() const;
+	SizeType size() const
 		/// Returns the number of members the Struct contains
+	{
+		return _data.size();
+	}
 
-	std::set<std::string> members() const;
+	inline NameSet members() const
 		/// Returns a sorted collection containing all member names
+	{
+		NameSet keys;
+		ConstIterator it = begin();
+		ConstIterator itEnd = end();
+		for (; it != itEnd; ++it) keys.insert(it->first);
+		return keys;
+	}
 
 private:
 	Data _data;
 };
 
 
-//
-// inlines
-//
-inline Var& Struct::operator [] (const std::string& name)
-{
-	return _data[name];
-}
-
-
-inline bool Struct::contains(const std::string& name) const
-{
-	return find(name) != end();
-}
-
-
-inline Struct::Iterator Struct::find(const std::string& name)
-{
-	return _data.find(name);
-}
-
-
-inline Struct::ConstIterator Struct::find(const std::string& name) const
-{
-	return _data.find(name);
-}
-
-
-inline Struct::Iterator Struct::end()
-{
-	return _data.end();
-}
-
-
-inline Struct::ConstIterator Struct::end() const
-{
-	return _data.end();
-}
-
-
-inline Struct::Iterator Struct::begin()
-{
-	return _data.begin();
-}
-
-
-inline Struct::ConstIterator Struct::begin() const
-{
-	return _data.begin();
-}
-
-
-inline std::pair<Struct::Iterator, bool> Struct::insert(const std::string& key, const Var& value)
-{
-	return insert(std::make_pair(key, value));
-}
-
-
-inline std::pair<Struct::Iterator, bool> Struct::insert(const Struct::Data::value_type& aPair)
-{
-	return _data.insert(aPair);
-}
-
-
-inline Struct::Data::size_type Struct::erase(const std::string& key)
-{
-	return _data.erase(key);
-}
-
-
-inline void Struct::erase(Struct::Iterator it)
-{
-	_data.erase(it);
-}
-
-
-inline bool Struct::empty() const
-{
-	return _data.empty();
-}
-
-
-inline Struct::Data::size_type Struct::size() const
-{
-	return _data.size();
-}
-
-
 template <>
-class VarHolderImpl<Struct>: public VarHolder
+class VarHolderImpl<Struct<std::string> >: public VarHolder
 {
 public:
-	VarHolderImpl(const Struct& val): _val(val)
+	VarHolderImpl(const Struct<std::string>& val): _val(val)
 	{
 	}
 
@@ -234,7 +211,7 @@ public:
 	
 	const std::type_info& type() const
 	{
-		return typeid(Struct);
+		return typeid(Struct<std::string>);
 	}
 
 	void convert(Int8& val) const
@@ -303,8 +280,8 @@ public:
 
 		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
-		Struct::ConstIterator it = _val.begin();
-		Struct::ConstIterator itEnd = _val.end();
+		Struct<std::string>::ConstIterator it = _val.begin();
+		Struct<std::string>::ConstIterator itEnd = _val.end();
 		if (!_val.empty())
 		{
 			Var key(it->first);
@@ -344,7 +321,7 @@ public:
 		return new VarHolderImpl(_val);
 	}
 	
-	const Struct& value() const
+	const Struct<std::string>& value() const
 	{
 		return _val;
 	}
@@ -390,7 +367,181 @@ public:
 	}
 
 private:
-	Struct _val;
+	Struct<std::string> _val;
+};
+
+
+template <>
+class VarHolderImpl<Struct<int> >: public VarHolder
+{
+public:
+	VarHolderImpl(const Struct<int>& val): _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+	
+	const std::type_info& type() const
+	{
+		return typeid(Struct<int>);
+	}
+
+	void convert(Int8& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to Int8");
+	}
+
+	void convert(Int16& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to Int16");
+	}
+	
+	void convert(Int32& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to Int32");
+	}
+
+	void convert(Int64& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to Int64");
+	}
+
+	void convert(UInt8& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to UInt8");
+	}
+
+	void convert(UInt16& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to UInt16");
+	}
+	
+	void convert(UInt32& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to UInt32");
+	}
+
+	void convert(UInt64& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to UInt64");
+	}
+
+	void convert(bool& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to bool");
+	}
+
+	void convert(float& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to float");
+	}
+
+	void convert(double& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to double");
+	}
+
+	void convert(char& val) const
+	{
+		throw BadCastException("Cannot cast Struct type to char");
+	}
+
+	void convert(std::string& val) const
+	{
+		// Serialize in JSON format: equals an object
+
+		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
+		val.append("{ ");
+		Struct<int>::ConstIterator it = _val.begin();
+		Struct<int>::ConstIterator itEnd = _val.end();
+		if (!_val.empty())
+		{
+			Var key(it->first);
+			appendJSONString(val, key);
+			val.append(" : ");
+			appendJSONString(val, it->second);
+			++it;
+		}
+		for (; it != itEnd; ++it)
+		{
+			val.append(", ");
+			Var key(it->first);
+			appendJSONString(val, key);
+			val.append(" : ");
+			appendJSONString(val, it->second);
+		}
+		val.append(" }");	
+	}
+
+	void convert(Poco::DateTime&) const
+	{
+		throw BadCastException("Struct -> Poco::DateTime");
+	}
+
+	void convert(Poco::LocalDateTime&) const
+	{
+		throw BadCastException("Struct -> Poco::LocalDateTime");
+	}
+
+	void convert(Poco::Timestamp&) const
+	{
+		throw BadCastException("Struct -> Poco::Timestamp");
+	}
+
+	VarHolder* clone() const
+	{
+		return new VarHolderImpl(_val);
+	}
+	
+	const Struct<int>& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isStruct() const
+	{
+		return true;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+	Var& operator [] (std::size_t name)
+	{
+		return _val[name];
+	}
+
+	const Var& operator [] (std::size_t name) const
+	{
+		return _val[name];
+	}
+
+private:
+	Struct<int> _val;
 };
 
 
@@ -398,7 +549,7 @@ private:
 
 
 //@ deprecated
-typedef Dynamic::Struct DynamicStruct;
+typedef Dynamic::Struct<std::string> DynamicStruct;
 
 
 } // namespace Poco

@@ -114,21 +114,21 @@ public:
 	}
 
 	reference operator[](size_type i) 
-		/// element access without range check. If the index is not small than the given size, the behavior is undefined.
+		/// Element access without range check. If the index is not small than the given size, the behavior is undefined.
 	{ 
 		poco_assert( i < N && "out of range" ); 
 		return elems[i];
 	}
 
 	const_reference operator[](size_type i) const 
-		/// element access without range check. If the index is not small than the given size, the behavior is undefined.
+		/// Element access without range check. If the index is not small than the given size, the behavior is undefined.
 	{	 
 		poco_assert( i < N && "out of range" ); 
 		return elems[i]; 
 	}
 
 	reference at(size_type i)
-		/// element access with range check. Throws Poco::InvalidArgumentException if the index is over range.
+		/// Element access with range check. Throws Poco::InvalidArgumentException if the index is over range.
 	{ 
 		if(i>=size())
 			throw Poco::InvalidArgumentException("Array::at() range check failed: index is over range");
@@ -136,14 +136,13 @@ public:
 	}
 
 	const_reference at(size_type i) const
-		/// element access with range check. Throws Poco::InvalidArgumentException if the index is over range.
+		/// Element access with range check. Throws Poco::InvalidArgumentException if the index is over range.
 	{
 		if(i>=size())
 			throw Poco::InvalidArgumentException("Array::at() range check failed: index is over range");
 		return elems[i]; 
 	}
 
-	// front() and back()
 	reference front() 
 	{ 
 		return elems[0]; 
@@ -186,7 +185,7 @@ public:
 	}
 
 	const T* data() const
-		/// direct access to data (read-only)
+		/// Direct access to data (read-only)
 	{ 
 		return elems; 
 	}
@@ -197,27 +196,28 @@ public:
 	}
 
 	T* c_array(){ 
-		/// use array as C array (direct read/write access to data)
+		/// Use array as C array (direct read/write access to data)
 		return elems;
 	}
 
 	template <typename Other>
 	Array<T,N>& operator= (const Array<Other,N>& rhs)
-		/// assignment with type conversion 
+		/// Assignment with type conversion 
 	{
 		std::copy(rhs.begin(),rhs.end(), begin());
 		return *this;
 	}
 
 	void assign (const T& value)
-		/// assign one value to all elements
+		/// Assign one value to all elements
 	{
 		std::fill_n(begin(),size(),value);
 	}
 
 public:
 
-	T elems[N];	// fixed-size array of elements of type T, public specifier used to make this class a aggregate.
+	T elems[N];	
+		/// Fixed-size array of elements of type T, public specifier used to make this class a aggregate.
 
 };
 

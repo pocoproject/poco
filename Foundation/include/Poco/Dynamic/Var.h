@@ -50,6 +50,10 @@ namespace Poco {
 namespace Dynamic {
 
 
+template <typename T>
+class Struct;
+
+
 class Foundation_API Var
 	/// Var allows to store data of different types and to convert between these types transparently.
 	/// Var puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent 
@@ -424,20 +428,32 @@ public:
 
 	template <typename T>
 	Var& operator [] (T n)
-		/// Index operator, only use on Vars where isArray
+		/// Index operator, only use on Vars where isArray() or isStruct()
 		/// returns true! In all other cases InvalidAccessException is thrown.
 	{
-		return holderImpl<std::vector<Var>,
-			InvalidAccessException>("Not an array.")->operator[](n);
+		if (isArray())
+			return holderImpl<std::vector<Var>,
+				InvalidAccessException>("Not an array.")->operator[](n);
+		else if (isStruct())
+			return holderImpl<Struct<int>,
+				InvalidAccessException>("Not a struct.")->operator[](n);
+		else
+			throw InvalidAccessException("Must be struct or array.");
 	}
 
 	template <typename T>
 	const Var& operator [] (T n) const
-		/// const Index operator, only use on Vars where isArray
+		/// const Index operator, only use on Vars where isArray() or isStruct()
 		/// returns true! In all other cases InvalidAccessException is thrown.
 	{
-		return const_cast<const Var&>(holderImpl<std::vector<Var>,
-			InvalidAccessException>("Not an array.")->operator[](n));
+		if (isArray())
+			return const_cast<const Var&>(holderImpl<std::vector<Var>,
+				InvalidAccessException>("Not an array.")->operator[](n));
+		else if (isStruct())
+			return const_cast<const Var&>(holderImpl<Struct<int>,
+				InvalidAccessException>("Not a struct.")->operator[](n));
+		else
+			throw InvalidAccessException("Must be struct or array.");
 	}
 
 	Var& operator [] (const std::string& name);
