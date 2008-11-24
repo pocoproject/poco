@@ -3670,10 +3670,6 @@
 				Name="Source Files"
 				>
 				<File
-					RelativePath=".\src\Struct.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\Var.cpp"
 					>
 				</File>
