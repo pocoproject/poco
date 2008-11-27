@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#16 $
+// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#17 $
 //
 // Library: Foundation
 // Package: Cache
@@ -261,6 +261,7 @@ protected:
 		else
 		{
 			Update.notify(this, args);
+			it->second = SharedPtr<TValue>(new TValue(val));
 		}
 		
 		doReplace();
@@ -275,11 +276,12 @@ protected:
 		if (it == _data.end())
 		{
 			Add.notify(this, args);
-			_data.insert(std::make_pair(key, SharedPtr<TValue>(new TValue(val))));
+			_data.insert(std::make_pair(key, val));
 		}
 		else
 		{
 			Update.notify(this, args);
+			it->second = val;
 		}
 		
 		doReplace();
