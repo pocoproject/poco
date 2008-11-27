@@ -1,7 +1,7 @@
 //
 // NumberFormatterTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/NumberFormatterTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/NumberFormatterTest.h#2 $
 //
 // Definition of the NumberFormatterTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testFormat();
 	void testFormat0();
 	void testFormatHex();
+	void testFormatFloat();
 	
 	void setUp();
 	void tearDown();

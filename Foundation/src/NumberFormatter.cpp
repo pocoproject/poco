@@ -1,7 +1,7 @@
 //
 // NumberFormatter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NumberFormatter.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/NumberFormatter.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -336,7 +336,7 @@ std::string NumberFormatter::formatHex(UInt64 value, int width)
 std::string NumberFormatter::format(float value)
 {
 	char buffer[64];
-	std::sprintf(buffer, "%.*g", 10, (double) value);
+	std::sprintf(buffer, "%.*g", 8, (double) value);
 	return std::string(buffer);
 }
 
@@ -344,7 +344,7 @@ std::string NumberFormatter::format(float value)
 std::string NumberFormatter::format(double value)
 {
 	char buffer[64];
-	std::sprintf(buffer, "%.*g", 20, value);
+	std::sprintf(buffer, "%.*g", 16, value);
 	return std::string(buffer);
 }
 

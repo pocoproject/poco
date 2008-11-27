@@ -1,7 +1,7 @@
 //
 // HashSetTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/HashSetTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/HashSetTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,6 +37,7 @@
 #include <set>
 
 
+using Poco::Hash;
 using Poco::HashSet;
 
 
@@ -54,16 +55,16 @@ void HashSetTest::testInsert()
 {
 	const int N = 1000;
 
-	HashSet<int> hs;
+	HashSet<int, Hash<int> > hs;
 	
 	assert (hs.empty());
 	
 	for (int i = 0; i < N; ++i)
 	{
-		std::pair<HashSet<int>::Iterator, bool> res = hs.insert(i);
+		std::pair<HashSet<int, Hash<int> >::Iterator, bool> res = hs.insert(i);
 		assert (*res.first == i);
 		assert (res.second);
-		HashSet<int>::Iterator it = hs.find(i);
+		HashSet<int, Hash<int> >::Iterator it = hs.find(i);
 		assert (it != hs.end());
 		assert (*it == i);
 		assert (hs.size() == i + 1);
@@ -73,14 +74,14 @@ void HashSetTest::testInsert()
 	
 	for (int i = 0; i < N; ++i)
 	{
-		HashSet<int>::Iterator it = hs.find(i);
+		HashSet<int, Hash<int> >::Iterator it = hs.find(i);
 		assert (it != hs.end());
 		assert (*it == i);
 	}
 	
 	for (int i = 0; i < N; ++i)
 	{
-		std::pair<HashSet<int>::Iterator, bool> res = hs.insert(i);
+		std::pair<HashSet<int, Hash<int> >::Iterator, bool> res = hs.insert(i);
 		assert (*res.first == i);
 		assert (!res.second);
 	}		
@@ -91,7 +92,7 @@ void HashSetTest::testErase()
 {
 	const int N = 1000;
 
-	HashSet<int> hs;
+	HashSet<int, Hash<int> > hs;
 
 	for (int i = 0; i < N; ++i)
 	{
@@ -102,20 +103,20 @@ void HashSetTest::testErase()
 	for (int i = 0; i < N; i += 2)
 	{
 		hs.erase(i);
-		HashSet<int>::Iterator it = hs.find(i);
+		HashSet<int, Hash<int> >::Iterator it = hs.find(i);
 		assert (it == hs.end());
 	}
 	assert (hs.size() == N/2);
 	
 	for (int i = 0; i < N; i += 2)
 	{
-		HashSet<int>::Iterator it = hs.find(i);
+		HashSet<int, Hash<int> >::Iterator it = hs.find(i);
 		assert (it == hs.end());
 	}
-	
+
 	for (int i = 1; i < N; i += 2)
 	{
-		HashSet<int>::Iterator it = hs.find(i);
+		HashSet<int, Hash<int> >::Iterator it = hs.find(i);
 		assert (it != hs.end());
 		assert (*it == i);
 	}
@@ -127,7 +128,7 @@ void HashSetTest::testErase()
 	
 	for (int i = 0; i < N; ++i)
 	{
-		HashSet<int>::Iterator it = hs.find(i);
+		HashSet<int, Hash<int> >::Iterator it = hs.find(i);
 		assert (it != hs.end());
 		assert (*it == i);
 	}
@@ -138,7 +139,7 @@ void HashSetTest::testIterator()
 {
 	const int N = 1000;
 
-	HashSet<int> hs;
+	HashSet<int, Hash<int> > hs;
 
 	for (int i = 0; i < N; ++i)
 	{
@@ -146,14 +147,14 @@ void HashSetTest::testIterator()
 	}
 	
 	std::set<int> values;
-	HashSet<int>::Iterator it = hs.begin();
+	HashSet<int, Hash<int> >::Iterator it = hs.begin();
 	while (it != hs.end())
 	{
 		assert (values.find(*it) == values.end());
 		values.insert(*it);
 		++it;
 	}
-	
+
 	assert (values.size() == N);
 }
 
@@ -162,7 +163,7 @@ void HashSetTest::testConstIterator()
 {
 	const int N = 1000;
 
-	HashSet<int> hs;
+	HashSet<int, Hash<int> > hs;
 
 	for (int i = 0; i < N; ++i)
 	{
@@ -170,7 +171,7 @@ void HashSetTest::testConstIterator()
 	}
 	
 	std::set<int> values;
-	HashSet<int>::ConstIterator it = hs.begin();
+	HashSet<int, Hash<int> >::ConstIterator it = hs.begin();
 	while (it != hs.end())
 	{
 		assert (values.find(*it) == values.end());

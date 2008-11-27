@@ -1,7 +1,7 @@
 //
 // NumberFormatterTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/NumberFormatterTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/NumberFormatterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -144,6 +144,20 @@ void NumberFormatterTest::testFormatHex()
 }
 
 
+void NumberFormatterTest::testFormatFloat()
+{
+	std::string s(NumberFormatter::format(1.0f));
+	assert (s == "1");
+	s = NumberFormatter::format(0.1f);
+	assert (s == "0.1");
+	
+	s = NumberFormatter::format(1.0);
+	assert (s == "1");
+	s = NumberFormatter::format(0.1);
+	assert (s == "0.1");	
+}
+
+
 void NumberFormatterTest::setUp()
 {
 }
@@ -161,6 +175,7 @@ CppUnit::Test* NumberFormatterTest::suite()
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormat);
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormat0);
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatHex);
+	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatFloat);
 
 	return pSuite;
 }

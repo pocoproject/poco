@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#5 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#7 $
 //
 // Library: Util
 // Package: Application
@@ -43,11 +43,13 @@
 #include "Poco/NamedEvent.h"
 #include "Poco/Logger.h"
 #if defined(POCO_OS_FAMILY_UNIX)
+#include "Poco/TemporaryFile.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <fstream>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Util/WinService.h"
 #include "Poco/UnWindows.h"
@@ -479,6 +481,12 @@ void ServerApplication::defineOptions(OptionSet& options)
 		Option("daemon", "", "run application as a daemon")
 			.required(false)
 			.repeatable(false));
+
+	options.addOption(
+		Option("pidfile", "", "write PID to given file")
+			.required(false)
+			.repeatable(false)
+			.argument("path"));
 }
 
 
@@ -487,6 +495,15 @@ void ServerApplication::handleOption(const std::string& name, const std::string&
 	if (name == "daemon")
 	{
 		config().setBool("application.runAsDaemon", true);
+	}
+	else if (name == "pidfile")
+	{
+		std::ofstream ostr(value.c_str());
+		if (ostr.good())
+			ostr << Poco::Process::id() << std::endl;
+		else
+			throw Poco::CreateFileException("Cannot write PID to file", value);
+		Poco::TemporaryFile::registerForDeletion(value);
 	}
 	else Application::handleOption(name, value);
 }
