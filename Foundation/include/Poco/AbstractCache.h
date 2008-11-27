@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/AbstractCache.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#16 $
 //
 // Library: Foundation
 // Package: Cache
@@ -62,6 +62,7 @@ class AbstractCache
 {
 public:
 	FIFOEvent<const KeyValueArgs<TKey, TValue >, TEventMutex > Add;
+	FIFOEvent<const KeyValueArgs<TKey, TValue >, TEventMutex > Update;
 	FIFOEvent<const TKey, TEventMutex>                         Remove;
 	FIFOEvent<const TKey, TEventMutex>                         Get;
 	FIFOEvent<const EventArgs, TEventMutex>                    Clear;
@@ -94,12 +95,35 @@ public:
 		doAdd(key, val);
 	}
 
-	void add(const TKey& key, SharedPtr<TValue > val)
+	void update(const TKey& key, const TValue& val)
 		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
 		/// If for the key already an entry exists, it will be overwritten.
+		/// The difference to add is that no remove or add events are thrown in this case, 
+		/// just a simply silent update is performed
+		/// If the key doesnot exist the behavior is equal to add, ie. an add event is thrown
+	{
+		typename TMutex::ScopedLock lock(_mutex);
+		doUpdate(key, val);
+	}
+
+	void add(const TKey& key, SharedPtr<TValue > val)
+		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
+		/// If for the key already an entry exists, it will be overwritten, ie. first a remove event
+		/// is thrown, then a add event
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		doAdd(key, val);
+	}
+
+	void update(const TKey& key, SharedPtr<TValue > val)
+		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
+		/// If for the key already an entry exists, it will be overwritten.
+		/// The difference to add is that no remove or add events are thrown in this case, 
+		/// just an Update is thrown
+		/// If the key doesnot exist the behavior is equal to add, ie. an add event is thrown
+	{
+		typename TMutex::ScopedLock lock(_mutex);
+		doUpdate(key, val);
 	}
 
 	void remove(const TKey& key)
@@ -175,6 +199,7 @@ protected:
 		/// Sets up event registration.
 	{
 		Add		+= Delegate<TStrategy, const KeyValueArgs<TKey, TValue> >(&_strategy, &TStrategy::onAdd);
+		Update	+= Delegate<TStrategy, const KeyValueArgs<TKey, TValue> >(&_strategy, &TStrategy::onUpdate);
 		Remove	+= Delegate<TStrategy, const TKey>(&_strategy, &TStrategy::onRemove);
 		Get		+= Delegate<TStrategy, const TKey>(&_strategy, &TStrategy::onGet);
 		Clear	+= Delegate<TStrategy, const EventArgs>(&_strategy, &TStrategy::onClear);
@@ -186,6 +211,7 @@ protected:
 		/// Reverts event registration.
 	{
 		Add		-= Delegate<TStrategy, const KeyValueArgs<TKey, TValue> >(&_strategy, &TStrategy::onAdd );
+		Update	-= Delegate<TStrategy, const KeyValueArgs<TKey, TValue> >(&_strategy, &TStrategy::onUpdate);
 		Remove	-= Delegate<TStrategy, const TKey>(&_strategy, &TStrategy::onRemove);
 		Get		-= Delegate<TStrategy, const TKey>(&_strategy, &TStrategy::onGet);
 		Clear	-= Delegate<TStrategy, const EventArgs>(&_strategy, &TStrategy::onClear);
@@ -217,6 +243,44 @@ protected:
 		KeyValueArgs<TKey, TValue> args(key, *val);
 		Add.notify(this, args);
 		_data.insert(std::make_pair(key, val));
+		
+		doReplace();
+	}
+
+	void doUpdate(const TKey& key, const TValue& val)
+		/// Adds the key value pair to the cache.
+		/// If for the key already an entry exists, it will be overwritten.
+	{
+		KeyValueArgs<TKey, TValue> args(key, val);
+		Iterator it = _data.find(key);
+		if (it == _data.end())
+		{
+			Add.notify(this, args);
+			_data.insert(std::make_pair(key, SharedPtr<TValue>(new TValue(val))));
+		}
+		else
+		{
+			Update.notify(this, args);
+		}
+		
+		doReplace();
+	}
+
+	void doUpdate(const TKey& key, SharedPtr<TValue>& val)
+		/// Adds the key value pair to the cache.
+		/// If for the key already an entry exists, it will be overwritten.
+	{
+		KeyValueArgs<TKey, TValue> args(key, *val);
+		Iterator it = _data.find(key);
+		if (it == _data.end())
+		{
+			Add.notify(this, args);
+			_data.insert(std::make_pair(key, SharedPtr<TValue>(new TValue(val))));
+		}
+		else
+		{
+			Update.notify(this, args);
+		}
 		
 		doReplace();
 	}

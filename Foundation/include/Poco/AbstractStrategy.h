@@ -1,7 +1,7 @@
 //
 // AbstractStrategy.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/AbstractStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/AbstractStrategy.h#4 $
 //
 // Library: Foundation
 // Package: Cache
@@ -60,10 +60,17 @@ public:
 	virtual ~AbstractStrategy()
 	{
 	}
+
+	virtual void onUpdate(const void* pSender, const KeyValueArgs <TKey, TValue>& args)
+		/// Updates an existing entry.
+	{
+		onRemove(pSender,args.key());
+		onAdd(pSender, args);
+	}
 	
 	virtual void onAdd(const void* pSender, const KeyValueArgs <TKey, TValue>& key) = 0;
 		/// Adds the key to the strategy.
-		/// If for the key already an entry exists, an excpetion will be thrown.
+		/// If for the key already an entry exists, an exception will be thrown.
 
 	virtual void onRemove(const void* pSender, const TKey& key) = 0;
 		/// Removes an entry from the strategy. If the entry is not found
