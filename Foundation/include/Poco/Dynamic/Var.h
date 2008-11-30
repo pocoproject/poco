@@ -435,8 +435,8 @@ public:
 			return holderImpl<std::vector<Var>,
 				InvalidAccessException>("Not an array.")->operator[](n);
 		else if (isStruct())
-			return holderImpl<Struct<int>,
-				InvalidAccessException>("Not a struct.")->operator[](n);
+			return structIndexOperator(holderImpl<Struct<int>,
+				InvalidAccessException>("Not a struct."), n);
 		else
 			throw InvalidAccessException("Must be struct or array.");
 	}
@@ -447,11 +447,11 @@ public:
 		/// returns true! In all other cases InvalidAccessException is thrown.
 	{
 		if (isArray())
-			return const_cast<const Var&>(holderImpl<std::vector<Var>,
-				InvalidAccessException>("Not an array.")->operator[](n));
+			return holderImpl<std::vector<Var>,
+				InvalidAccessException>("Not an array.")->operator[](n);
 		else if (isStruct())
-			return const_cast<const Var&>(holderImpl<Struct<int>,
-				InvalidAccessException>("Not a struct.")->operator[](n));
+			return structIndexOperator(holderImpl<Struct<int>,
+				InvalidAccessException>("Not a struct."), n);
 		else
 			throw InvalidAccessException("Must be struct or array.");
 	}
@@ -544,6 +544,8 @@ private:
 		else
 			throw E(errorMessage);
 	}
+
+	Var& structIndexOperator(VarHolderImpl<Struct<int> >* pStr, int n) const;
 
 	VarHolder* _pHolder;
 };
