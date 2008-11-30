@@ -436,7 +436,7 @@ public:
 				InvalidAccessException>("Not an array.")->operator[](n);
 		else if (isStruct())
 			return structIndexOperator(holderImpl<Struct<int>,
-				InvalidAccessException>("Not a struct."), n);
+				InvalidAccessException>("Not a struct."), static_cast<int>(n));
 		else
 			throw InvalidAccessException("Must be struct or array.");
 	}
@@ -451,7 +451,7 @@ public:
 				InvalidAccessException>("Not an array.")->operator[](n);
 		else if (isStruct())
 			return structIndexOperator(holderImpl<Struct<int>,
-				InvalidAccessException>("Not a struct."), n);
+				InvalidAccessException>("Not a struct."), static_cast<int>(n));
 		else
 			throw InvalidAccessException("Must be struct or array.");
 	}

@@ -530,12 +530,12 @@ public:
 		return false;
 	}
 
-	Var& operator [] (std::size_t name)
+	Var& operator [] (int name)
 	{
 		return _val[name];
 	}
 
-	const Var& operator [] (std::size_t name) const
+	const Var& operator [] (int name) const
 	{
 		return _val[name];
 	}
