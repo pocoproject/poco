@@ -37,8 +37,13 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/Socket.h"
 #include "CppUnit/TestCase.h"
 
+
+namespace Poco{
+	class Timespan;
+}
 
 class SocketTest: public CppUnit::TestCase
 {
@@ -67,6 +72,14 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	typedef int (*SelectPtr)(Poco::Net::Socket::SocketList&, 
+		Poco::Net::Socket::SocketList&, 
+		Poco::Net::Socket::SocketList&, 
+		const Poco::Timespan&);
+
+	void doSelectOrPoll1(SelectPtr);
+	void doSelectOrPoll2(SelectPtr);
+	void doSelectOrPoll3(SelectPtr);
 };
 
 

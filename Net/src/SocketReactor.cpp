@@ -121,7 +121,11 @@ void SocketReactor::run()
 			{
 				onIdle();
 			}
+#if defined(POCO_HAVE_FD_POLL)
+			else if (Socket::poll(readable, writable, except, _timeout))
+#else
 			else if (Socket::select(readable, writable, except, _timeout))
+#endif
 			{
 				for (Socket::SocketList::iterator it = readable.begin(); it != readable.end(); ++it)
 					dispatch(*it, _pReadableNotification);

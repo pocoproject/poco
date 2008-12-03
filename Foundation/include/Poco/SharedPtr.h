@@ -95,6 +95,20 @@ public:
 };
 
 
+template <class C>
+class ReleaseArrayPolicy
+	/// The release policy for SharedPtr holding arrays.
+{
+public:
+	static void release(C* pObj)
+		/// Delete the object.
+		/// Note that pObj can be 0.
+	{
+		delete [] pObj;
+	}
+};
+
+
 template <class C, class RC = ReferenceCounter, class RP = ReleasePolicy<C> >
 class SharedPtr
 	/// SharedPtr is a "smart" pointer for classes implementing

@@ -336,6 +336,15 @@ void SocketTest::testOptions()
 
 void SocketTest::testSelect()
 {
+	doSelectOrPoll1(Socket::select);
+#if defined(POCO_HAVE_FD_POLL)
+	doSelectOrPoll1(Socket::poll);
+#endif
+}
+
+
+void SocketTest::doSelectOrPoll1(SelectPtr pAction)
+{
 	Timespan timeout(250000);
 
 	EchoServer echoServer;
@@ -347,7 +356,7 @@ void SocketTest::testSelect()
 	Socket::SocketList exceptList;
 
 	readList.push_back(ss);
-	assert (Socket::select(readList, writeList, exceptList, timeout) == 0);
+	assert (pAction(readList, writeList, exceptList, timeout) == 0);
 	assert (readList.empty());
 	assert (writeList.empty());
 	assert (exceptList.empty());
@@ -358,7 +367,7 @@ void SocketTest::testSelect()
 
 	readList.push_back(ss);
 	writeList.push_back(ss);
-	assert (Socket::select(readList, writeList, exceptList, timeout) == 2);
+	assert (pAction(readList, writeList, exceptList, timeout) == 2);
 	assert (!readList.empty());
 	assert (!writeList.empty());
 	assert (exceptList.empty());
@@ -373,6 +382,15 @@ void SocketTest::testSelect()
 
 void SocketTest::testSelect2()
 {
+	doSelectOrPoll2(Socket::select);
+#if defined(POCO_HAVE_FD_POLL)
+	doSelectOrPoll2(Socket::poll);
+#endif
+}
+
+
+void SocketTest::doSelectOrPoll2(SelectPtr pAction)
+{
 	Timespan timeout(100000);
 
 	EchoServer echoServer1;
@@ -386,7 +404,7 @@ void SocketTest::testSelect2()
 
 	readList.push_back(ss1);
 	readList.push_back(ss2);
-	assert (Socket::select(readList, writeList, exceptList, timeout) == 0);
+	assert (pAction(readList, writeList, exceptList, timeout) == 0);
 	assert (readList.empty());
 	assert (writeList.empty());
 	assert (exceptList.empty());
@@ -397,7 +415,7 @@ void SocketTest::testSelect2()
 
 	readList.push_back(ss1);
 	readList.push_back(ss2);
-	assert (Socket::select(readList, writeList, exceptList, timeout) == 1);
+	assert (pAction(readList, writeList, exceptList, timeout) == 1);
 
 	assert (readList.size() == 1);
 	assert (readList[0] == ss1);
@@ -413,7 +431,7 @@ void SocketTest::testSelect2()
 	exceptList.clear();
 	writeList.push_back(ss1);
 	writeList.push_back(ss2);
-	assert (Socket::select(readList, writeList, exceptList, timeout) == 2);
+	assert (pAction(readList, writeList, exceptList, timeout) == 2);
 	assert (readList.empty());
 	assert (writeList.size() == 2);
 	assert (writeList[0] == ss1);
@@ -427,12 +445,21 @@ void SocketTest::testSelect2()
 
 void SocketTest::testSelect3()
 {
+	doSelectOrPoll3(Socket::select);
+#if defined(POCO_HAVE_FD_POLL)
+	doSelectOrPoll3(Socket::poll);
+#endif
+}
+
+
+void SocketTest::doSelectOrPoll3(SelectPtr pAction)
+{
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
 	Socket::SocketList exceptList;
 	Timespan timeout(1000);
 
-	int rc = Socket::select(readList, writeList, exceptList, timeout);
+	int rc = pAction(readList, writeList, exceptList, timeout);
 	assert (rc == 0);
 }
 
@@ -465,6 +492,5 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSelect);
 	CppUnit_addTest(pSuite, SocketTest, testSelect2);
 	CppUnit_addTest(pSuite, SocketTest, testSelect3);
-
 	return pSuite;
 }
