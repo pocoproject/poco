@@ -73,7 +73,7 @@ public:
 	{
 	}
 
-	const Diagnostics<H, handleType>& diagnostics()
+	const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns the associated diagnostics.
 	{
 		return _diagnostics;
