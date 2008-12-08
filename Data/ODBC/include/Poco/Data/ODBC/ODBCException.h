@@ -61,8 +61,8 @@ POCO_DECLARE_EXCEPTION(ODBC_API, DataTruncatedException, ODBCException)
 
 template <class H, SQLSMALLINT handleType>
 class HandleException: public ODBCException
-{															
-public:														
+{
+public:
 	HandleException(const H& handle): _error(handle)
 		/// Creates HandleException
 	{
@@ -134,7 +134,7 @@ public:
 		throw *this;
 	}
 
-	const Diagnostics<H, handleType>& diagnostics()
+	const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns error diagnostics.
 	{
 		return _error.diagnostics();
