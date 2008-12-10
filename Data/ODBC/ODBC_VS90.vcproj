@@ -400,7 +400,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\ODBC\Preparation.h"
+					RelativePath=".\include\Poco\Data\ODBC\Preparator.h"
 					>
 				</File>
 				<File
@@ -468,7 +468,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Preparation.cpp"
+					RelativePath=".\src\Preparator.cpp"
 					>
 				</File>
 				<File
