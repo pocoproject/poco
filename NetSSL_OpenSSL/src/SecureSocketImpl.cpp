@@ -48,6 +48,7 @@
 #include "Poco/RegularExpression.h"
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
+#include <set>
 
 
 using Poco::IOException;
@@ -64,6 +65,9 @@ using Poco::Timespan;
 
 namespace Poco {
 namespace Net {
+
+
+static void getCertNames (X509*, std::string& commonName, std::set<std::string>& DNSNames);
 
 
 SecureSocketImpl::SecureSocketImpl():_pBIO(0), _pSSL(0)
@@ -420,43 +424,10 @@ long SecureSocketImpl::postConnectionCheck(SSLManager::ContextPtr pContext, X509
 		return X509_V_ERR_APPLICATION_VERIFICATION;
 	}
 
-	bool ok = false;
-
-	if ((extcount = X509_get_ext_count(cert)) > 0)
-	{
-		for (int i = 0; i < extcount && !ok; ++i)
-		{
-			const char* extstr = 0;
-			X509_EXTENSION* ext;
-			ext = X509_get_ext(cert, i);
-			extstr = OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
-
-			if (!strcmp(extstr, "subjectAltName"))
-			{
-				X509V3_EXT_METHOD* meth = X509V3_EXT_get(ext);
-				if (!meth)
-					break;
-
-#if OPENSSL_VERSION_NUMBER >= 0x00908000
-				const unsigned char* pData = ext->value->data;
-				const unsigned char** ppData = &pData;
-#else
-				unsigned char* pData = ext->value->data;
-				unsigned char** ppData = &pData;
-#endif
-				STACK_OF(CONF_VALUE)* val = meth->i2v(meth, meth->d2i(0, ppData, ext->value->length), 0);
-
-				for (int j = 0; j < sk_CONF_VALUE_num(val) && !ok; ++j)
-				{
-					CONF_VALUE* nval = sk_CONF_VALUE_value(val, j);
-					if (!strcmp(nval->name, "DNS") && !strcmp(nval->value, host))
-					{
-						ok = true;
-					}
-				}
-			}
-		}
-	}
+	std::string commonName;
+	std::set<std::string> dnsNames;
+	getCertNames(cert, commonName, dnsNames);
+	bool ok = (dnsNames.find(hostName) != dnsNames.end());
 
 	char data[256];
 	if (!ok && (subj = X509_get_subject_name(cert)) && X509_NAME_get_text_by_NID(subj, NID_commonName, data, 256) > 0)
@@ -615,6 +586,50 @@ bool SecureSocketImpl::matchByAlias(const std::string& alias, const HostEntry& h
 	}
 
 	return found;
+}
+
+
+static void
+getCertNames (X509 *certificate,
+              std::string& common_name,
+              std::set<std::string>& DNS_names)
+{
+  DNS_names.clear ();
+  common_name.clear ();
+  if (certificate == 0)
+    {
+      return;
+    }
+ 
+  if (STACK_OF (GENERAL_NAME) * names = static_cast<STACK_OF (GENERAL_NAME)
+      *>
+      (X509_get_ext_d2i (certificate, NID_subject_alt_name, 0, 0)))
+    {
+      for (int i = 0; i < sk_GENERAL_NAME_num (names); ++i)
+        {
+          const GENERAL_NAME *name = sk_GENERAL_NAME_value (names, i);
+          if (name->type == GEN_DNS)
+            {
+              const char *data = reinterpret_cast<char *>
+                      (ASN1_STRING_data (name->d.ia5));
+              size_t len = ASN1_STRING_length (name->d.ia5);
+              DNS_names.insert (std::string (data, len));
+            }
+        }
+      GENERAL_NAMES_free (names);
+    }
+ 
+  if (X509_NAME * subj = X509_get_subject_name (certificate))
+    {
+      char buffer[256];
+      X509_NAME_get_text_by_NID (subj, NID_commonName,
+                                 buffer, sizeof buffer);
+      common_name = std::string (buffer);
+      if (DNS_names.empty ())
+        {
+          DNS_names.insert (common_name);
+        }
+    }
 }
 
 

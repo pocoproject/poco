@@ -39,6 +39,8 @@
 #include "CppUnit/TestSuite.h"
 
 
+#define TESTSERVERNAME "secure.appinf.com"
+
 class HTTPSClientTestSuite
 {
 public:

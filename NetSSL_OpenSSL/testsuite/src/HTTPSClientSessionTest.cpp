@@ -31,6 +31,7 @@
 
 
 #include "HTTPSClientSessionTest.h"
+#include "HTTPSClientTestSuite.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPSClientSession.h"
@@ -336,7 +337,7 @@ void HTTPSClientSessionTest::testKeepAlive()
 void HTTPSClientSessionTest::testProxy()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("wwws.appinf.com");
+	HTTPSClientSession s(TESTSERVERNAME);
 	s.setProxy("proxy.aon.at", 8080);
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
 	s.sendRequest(request);
@@ -351,7 +352,7 @@ void HTTPSClientSessionTest::testProxy()
 void HTTPSClientSessionTest::testConnectNB()
 {
 	SecureStreamSocket sock;
-	sock.connectNB(SocketAddress("server.com", 443));
+	sock.connectNB(SocketAddress(TESTSERVERNAME, 443));
 	char buf[512];
 	std::string msg("GET / HTTP/1.0\r\n\r\n");
 	sock.sendBytes(msg.c_str(), (int)msg.length());

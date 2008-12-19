@@ -31,6 +31,7 @@
 
 
 #include "HTTPSStreamFactoryTest.h"
+#include "HTTPSClientTestSuite.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPSStreamFactory.h"
@@ -103,7 +104,7 @@ void HTTPSStreamFactoryTest::testProxy()
 {
 	HTTPSTestServer server;
 	HTTPSStreamFactory factory("proxy.aon.at", 8080);
-	URI uri("https://wwws.appinf.com/");
+	URI uri(std::string("https://") + TESTSERVERNAME + "/");
 	std::auto_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
