@@ -1761,7 +1761,8 @@ void VarTest::testIsStruct()
 	long s14(232323);
 	unsigned long s15(21233232);
 	std::vector<Var> s16;
-	DynamicStruct s17;
+	Struct<std::string> s17;
+	Struct<int> s18;
 
 	Var d1(s1);
 	Var d2(s2);
@@ -1780,6 +1781,7 @@ void VarTest::testIsStruct()
 	Var d15(s15);
 	Var d16(s16);
 	Var d17(s17);
+	Var d18(s18);
 
 	assert (!d1.isStruct());
 	assert (!d2.isStruct());
@@ -1798,6 +1800,7 @@ void VarTest::testIsStruct()
 	assert (!d15.isStruct());
 	assert (!d16.isStruct());
 	assert (d17.isStruct());
+	assert (d18.isStruct());
 }
 
 
@@ -1951,10 +1954,27 @@ void VarTest::testDynamicStructString()
 	a1["First Name"] = "Senior";
 	assert (a1["First Name"] == "Senior");
 	testGetIdxMustThrow(a1, 0);
+
+	Struct<std::string> s1;
+	s1["1"] = 1;
+	s1["2"] = 2;
+	s1["3"] = 3;
+
+	Struct<std::string> s2(s1);
+	assert (s2["1"] == 1);
+	assert (s2["2"] == 2);
+	assert (s2["3"] == 3);
+
+	std::map<std::string, int> m1;
+	m1["1"] = 1;
+	m1["2"] = 2;
+	m1["3"] = 3;
+
+	Struct<std::string> m2(m1);
+	assert (m2["1"] == 1);
+	assert (m2["2"] == 2);
+	assert (m2["3"] == 3);
 }
-
-
-
 
 
 void VarTest::testDynamicStructInt()
@@ -1967,6 +1987,26 @@ void VarTest::testDynamicStructInt()
 	assert (a1[1] == "POCO");
 	a1[0] = "Senior";
 	assert (a1[0] == "Senior");
+
+	Struct<int> s1;
+	s1[1] = "1";
+	s1[2] = "2";
+	s1[3] = "3";
+
+	Struct<int> s2(s1);
+	assert (s2[1] == "1");
+	assert (s2[2] == "2");
+	assert (s2[3] == "3");
+
+	std::map<int, std::string> m1;
+	m1[1] = "1";
+	m1[2] = "2";
+	m1[3] = "3";
+
+	Struct<int> m2(m1);
+	assert (m2[1] == "1");
+	assert (m2[2] == "2");
+	assert (m2[3] == "3");
 }
 
 
