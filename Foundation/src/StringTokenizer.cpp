@@ -83,4 +83,15 @@ StringTokenizer::~StringTokenizer()
 }
 
 
+std::size_t StringTokenizer::find(const std::string& key, std::size_t pos) const
+{
+	Iterator it = begin();
+	Iterator stop = end();
+	for (it += pos; it != stop; ++it)
+		if (*it == key) return it - begin();
+
+	throw NotFoundException(key);
+}
+
+
 } // namespace Poco

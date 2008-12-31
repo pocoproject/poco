@@ -83,6 +83,11 @@ public:
 	const std::string& operator [] (std::size_t index) const;
 		/// Returns the index'th token.
 		/// Throws a RangeException if the index is out of range.
+
+	std::size_t find(const std::string& key, std::size_t pos = 0) const;
+		/// Returns the index of the first occurence of the key token
+		/// starting at position pos.
+		/// Throws a NotFoundException if the key is not found.
 		
 	std::size_t count() const;
 		/// Returns the number of tokens.
