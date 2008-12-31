@@ -61,7 +61,8 @@ public:
 		TOK_TRIM         = 2  /// remove leading and trailing whitespace from tokens
 	};
 	
-	typedef std::vector<std::string>::const_iterator Iterator;
+	typedef std::vector<std::string> TokenVec;
+	typedef TokenVec::const_iterator Iterator;
 	
 	StringTokenizer(const std::string& str, const std::string& separators, int options = 0);
 		/// Splits the given string into tokens. The tokens are expected to be
@@ -81,22 +82,37 @@ public:
 	Iterator end() const;
 	
 	const std::string& operator [] (std::size_t index) const;
-		/// Returns the index'th token.
+		/// Returns const reference the index'th token.
 		/// Throws a RangeException if the index is out of range.
 
-	std::size_t find(const std::string& key, std::size_t pos = 0) const;
-		/// Returns the index of the first occurence of the key token
+	std::string& operator [] (std::size_t index);
+		/// Returns reference to the index'th token.
+		/// Throws a RangeException if the index is out of range.
+
+	bool has(const std::string& token) const;
+		/// Returns true if token exists, false otherwise.
+
+	std::size_t find(const std::string& token, std::size_t pos = 0) const;
+		/// Returns the index of the first occurence of the token
 		/// starting at position pos.
-		/// Throws a NotFoundException if the key is not found.
+		/// Throws a NotFoundException if the token is not found.
+
+	std::size_t replace(const std::string& oldToken, const std::string& newToken, std::size_t pos = 0);
+		/// Starting at position pos, replaces all subsequent tokens having value 
+		/// equal to oldToken with newToken.
+		/// Returns the number of modified tokens.
 		
 	std::size_t count() const;
-		/// Returns the number of tokens.
+		/// Returns the total number of tokens.
+
+	std::size_t count(const std::string& token) const;
+		/// Returns the number of tokens equal to the specified token.
 
 private:
 	StringTokenizer(const StringTokenizer&);
 	StringTokenizer& operator = (const StringTokenizer&);
 	
-	std::vector<std::string> _tokens;
+	TokenVec _tokens;
 };
 
 
@@ -114,6 +130,13 @@ inline StringTokenizer::Iterator StringTokenizer::begin() const
 inline StringTokenizer::Iterator StringTokenizer::end() const
 {
 	return _tokens.end();
+}
+
+
+inline std::string& StringTokenizer::operator [] (std::size_t index)
+{
+	if (index >= _tokens.size()) throw RangeException();
+	return _tokens[index];
 }
 
 

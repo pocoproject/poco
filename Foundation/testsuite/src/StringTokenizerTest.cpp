@@ -346,7 +346,17 @@ void StringTokenizerTest::testStringTokenizer()
 void StringTokenizerTest::testFind()
 {
 	StringTokenizer st("0,1,2,3,3,2,1,0", ",", StringTokenizer::TOK_TRIM | StringTokenizer::TOK_IGNORE_EMPTY);
+	
 	assert (st.count() == 8);
+	assert (2 == st.count("0"));
+	assert (2 == st.count("1"));
+	assert (2 == st.count("2"));
+	assert (2 == st.count("3"));
+	assert (0 == st.count("4"));
+	assert (0 == st.count("5"));
+	assert (0 == st.count("6"));
+	assert (0 == st.count("7"));
+
 	assert (st[0] == "0");
 	assert (st[1] == "1");
 	assert (st[2] == "2");
@@ -355,6 +365,16 @@ void StringTokenizerTest::testFind()
 	assert (st[5] == "2");
 	assert (st[6] == "1");
 	assert (st[7] == "0");
+	
+	assert (st.has("0"));
+	assert (st.has("1"));
+	assert (st.has("2"));
+	assert (st.has("3"));
+	assert (!st.has("4"));
+	assert (!st.has("5"));
+	assert (!st.has("6"));
+	assert (!st.has("7"));
+
 	assert (st.find("0") == 0);
 	assert (st.find("1") == 1);
 	assert (st.find("2") == 2);
@@ -378,6 +398,21 @@ void StringTokenizerTest::testFind()
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
+
+	st[0] = "1";
+	st[7] = "1";
+	assert (st[0] == "1");
+	assert (st[7] == "1");
+	assert (0 == st.count("0"));
+	assert (4 == st.count("1"));
+
+	st.replace("2", "5");
+	assert (0 == st.count("2"));
+	assert (2 == st.count("5"));
+
+	st.replace("3", "6", 4);
+	assert (1 == st.count("3"));
+	assert (1 == st.count("6"));
 }
 
 
