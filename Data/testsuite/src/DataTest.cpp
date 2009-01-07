@@ -850,6 +850,12 @@ void DataTest::testRow()
 	assert (row["field3"] == 3);
 	assert (row["field4"] == 4);
 
+	assert (row["FIELD0"] == 0);
+	assert (row["FIELD1"] == 1);
+	assert (row["FIELD2"] == 2);
+	assert (row["FIELD3"] == 3);
+	assert (row["FIELD4"] == 4);
+
 	assert (row[0] == 0);
 	assert (row[1] == 1);
 	assert (row[2] == 2);

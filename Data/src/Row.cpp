@@ -36,6 +36,7 @@
 
 #include "Poco/Data/Row.h"
 #include "Poco/Data/SimpleRowFormatter.h"
+#include "Poco/String.h"
 #include "Poco/Exception.h"
 
 
@@ -121,12 +122,9 @@ std::size_t Row::getPosition(const std::string& name)
 	NameVec::const_iterator end = _pNames->end();
 	std::size_t col = 0;
 	for (; it != end; ++it, ++col)
-		if (name == *it) break;
+		if (0 == icompare(name, *it)) return col;
 	
-	if (it == end)
-		throw NotFoundException(name);
-
-	return col;
+	throw NotFoundException(name);
 }
 
 
