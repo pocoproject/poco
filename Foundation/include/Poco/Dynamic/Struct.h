@@ -77,8 +77,10 @@ public:
 	template <typename T>
 	Struct(const std::map<K, T>& val)
 	{
-		std::map<K, T>::const_iterator it = val.begin();
-		std::map<K, T>::const_iterator end = val.end();
+		typedef typename std::map<K, T>::const_iterator MapConstIterator;
+
+		MapConstIterator it = val.begin();
+		MapConstIterator end = val.end();
 		for (; it != end; ++it) _data.insert(ValueType(it->first, Var(it->second)));
 	}
 
