@@ -86,11 +86,14 @@ public:
 	bool isTransaction();
 		/// Returns true iff a transaction is in progress.
 
+	const std::string& connectorName();
+		/// Returns the name of the connector.
+
 private:
 	void open();
 		/// Opens a connection to the Database.
 
-	std::string _dbFileName;
+	std::string _connector;
 	sqlite3*    _pDB;
 	bool        _connected;
 	bool        _isTransaction;
@@ -107,6 +110,12 @@ private:
 inline 	bool SessionImpl::isTransaction()
 {
 	return _isTransaction;
+}
+
+
+inline const std::string& SessionImpl::connectorName()
+{
+	return _connector;
 }
 
 

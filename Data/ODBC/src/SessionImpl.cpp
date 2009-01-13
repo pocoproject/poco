@@ -39,6 +39,7 @@
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/ODBC/ODBCException.h"
+#include "Poco/String.h"
 #include <sqlext.h>
 
 
@@ -51,12 +52,11 @@ SessionImpl::SessionImpl(const std::string& connect,
 	Poco::Any maxFieldSize, 
 	bool enforceCapability,
 	bool autoBind,
-	bool autoExtract):
-	_connect(connect),
-	_maxFieldSize(maxFieldSize),
-	_enforceCapability(enforceCapability),
-	_autoBind(autoBind),
-	_autoExtract(autoExtract)
+	bool autoExtract): Poco::Data::AbstractSessionImpl<SessionImpl>(connect),
+		_connector(toLower(Connector::KEY)),
+		_maxFieldSize(maxFieldSize),
+		_autoBind(autoBind),
+		_autoExtract(autoExtract)
 {
 	setFeature("bulk", true);
 	open();
@@ -87,7 +87,7 @@ void SessionImpl::open()
 
 	if (Utility::isError(Poco::Data::ODBC::SQLDriverConnect(_db
 		, NULL
-		,(SQLCHAR*) _connect.c_str()
+		,(SQLCHAR*) connectionString().c_str()
 		,(SQLSMALLINT) SQL_NTS
 		, connectOutput
 		, sizeof(connectOutput)

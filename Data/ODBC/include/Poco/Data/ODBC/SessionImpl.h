@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/Data/ODBC/Binder.h"
 #include "Poco/Data/ODBC/Handle.h"
@@ -93,6 +94,9 @@ public:
 	bool isTransaction();
 		/// Returns true iff a transaction is in progress.
 
+	const std::string& connectorName();
+		/// Returns the name of the connector.
+
 	bool canTransact();
 		/// Returns true if connection is transaction-capable.
 
@@ -140,10 +144,9 @@ private:
 
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
-	std::string _connect;
+	std::string _connector;
 	const ConnectionHandle _db;
 	Poco::Any _maxFieldSize;
-	bool _enforceCapability;
 	bool _autoBind;
 	bool _autoExtract;
 	TypeInfo _dataTypes;
@@ -225,6 +228,12 @@ inline void SessionImpl::autoExtract(const std::string&, bool val)
 inline bool SessionImpl::isAutoExtract(const std::string& name)
 {
 	return _autoExtract;
+}
+
+
+inline const std::string& SessionImpl::connectorName()
+{
+	return _connector;
 }
 
 

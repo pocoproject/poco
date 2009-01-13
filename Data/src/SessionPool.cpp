@@ -44,8 +44,8 @@ namespace Poco {
 namespace Data {
 
 
-SessionPool::SessionPool(const std::string& sessionKey, const std::string& connectionString, int minSessions, int maxSessions, int idleTime):
-	_sessionKey(sessionKey),
+SessionPool::SessionPool(const std::string& connector, const std::string& connectionString, int minSessions, int maxSessions, int idleTime):
+	_connector(connector),
 	_connectionString(connectionString),
 	_minSessions(minSessions),
 	_maxSessions(maxSessions),
@@ -76,7 +76,7 @@ Session SessionPool::get()
 	{
 		if (_nSessions < _maxSessions)
 		{
-			Session newSession(SessionFactory::instance().create(_sessionKey, _connectionString));
+			Session newSession(SessionFactory::instance().create(_connector, _connectionString));
 
 			FeatureMap::Iterator fmIt = _featureMap.begin();
 			FeatureMap::Iterator fmEnd = _featureMap.end();
@@ -90,7 +90,7 @@ Session SessionPool::get()
 			_idleSessions.push_front(pHolder);
 			++_nSessions;
 		}
-		else throw SessionPoolExhaustedException(_sessionKey, _connectionString);
+		else throw SessionPoolExhaustedException(_connector, _connectionString);
 	}
 
 	PooledSessionHolderPtr pHolder(_idleSessions.front());

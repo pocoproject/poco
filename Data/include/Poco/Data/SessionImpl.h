@@ -42,6 +42,8 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/String.h"
+#include "Poco/Format.h"
 #include "Poco/Any.h"
 
 
@@ -57,7 +59,7 @@ class Data_API SessionImpl: public Poco::RefCountedObject
 	/// SessionImpl objects are noncopyable.
 {
 public:
-	SessionImpl();
+	SessionImpl(const std::string& connectionString);
 		/// Creates the SessionImpl.
 
 	virtual ~SessionImpl();
@@ -83,6 +85,18 @@ public:
 
 	virtual bool isTransaction() = 0;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+
+	virtual const std::string& connectorName() = 0;
+		/// Returns the name of the connector.
+
+	const std::string& connectionString();
+		/// Returns the connection string.
+
+	static std::string uri(const std::string& connector, const std::string& connectionString);
+		/// Returns formatted URI.
+
+	std::string uri();
+		/// Returns the URI for this session.
 
 	virtual void setFeature(const std::string& name, bool state) = 0;
 		/// Set the state of a feature.
@@ -121,9 +135,34 @@ public:
 		/// not supported by the underlying implementation.
 
 private:
+	SessionImpl();
 	SessionImpl(const SessionImpl&);
 	SessionImpl& operator = (const SessionImpl&);
+
+	std::string _connectionString;
 };
+
+
+//
+// inlines
+//
+inline const std::string& SessionImpl::connectionString()
+{
+	return _connectionString;
+}
+
+
+inline std::string SessionImpl::uri(const std::string& connector,
+	const std::string& connectionString)
+{
+	return format("%s:///%s", toLower(connector), connectionString);
+}
+
+
+inline std::string SessionImpl::uri()
+{
+	return uri(connectorName(), connectionString());
+}
 
 
 } } // namespace Poco::Data

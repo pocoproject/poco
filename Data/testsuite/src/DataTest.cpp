@@ -106,6 +106,15 @@ DataTest::~DataTest()
 void DataTest::testSession()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
+	assert ("test" == sess.impl()->connectorName());
+	assert ("cs" == sess.impl()->connectionString());
+	assert ("test:///cs" == sess.uri());
+
+	Session sess2(SessionFactory::instance().create("TeSt:///Cs"));
+	assert ("test" == sess2.impl()->connectorName());
+	assert ("Cs" == sess2.impl()->connectionString());
+	assert ("test:///Cs" == sess2.uri());
+
 	sess << "DROP TABLE IF EXISTS Test", now;
 	int count;
 	sess << "SELECT COUNT(*) FROM PERSON", into(count), now;

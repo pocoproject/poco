@@ -78,6 +78,9 @@ public:
 	bool isTransaction();
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
+	const std::string& connectorName();
+		/// Returns the name of the connector.
+
 	void setConnected(const std::string& name, bool value);
 	bool getConnected(const std::string& name);
 		/// Sets/gets the connected property.
@@ -90,9 +93,10 @@ public:
 	Poco::Any getP(const std::string& name);
 
 private:
-	bool _f;
-	Poco::Any _p;
-	bool _connected;
+	bool         _f;
+	Poco::Any    _p;
+	bool         _connected;
+	std::string  _connectionString;
 };
 
 

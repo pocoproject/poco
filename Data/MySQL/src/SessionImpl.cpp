@@ -37,6 +37,7 @@
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
 #include "Poco/NumberParser.h"
+#include "Poco/String.h"
 
 
 namespace
@@ -58,7 +59,11 @@ namespace Data {
 namespace MySQL {
 
 
-SessionImpl::SessionImpl(const std::string& connectionString) : _mysql(0), _connected(false), _inTransaction(0)
+SessionImpl::SessionImpl(const std::string& connectionString) : 
+	Poco::Data::AbstractSessionImpl<SessionImpl>(toLower(connectionString)),
+	_mysql(0),
+	_connected(false),
+	_inTransaction(0)
 {
 	addProperty("insertId", 
 		&SessionImpl::setInsertId, 

@@ -89,12 +89,12 @@ class Data_API SessionPool: public RefCountedObject
 	///     ...
 {
 public:
-	SessionPool(const std::string& sessionKey, 
+	SessionPool(const std::string& connector, 
 		const std::string& connectionString, 
 		int minSessions = 1, 
 		int maxSessions = 32, 
 		int idleTime = 60);
-		/// Creates the SessionPool for sessions with the given sessionKey
+		/// Creates the SessionPool for sessions with the given connector
 		/// and connectionString.
 		///
 		/// The pool allows for at most maxSessions sessions to be created.
@@ -136,9 +136,9 @@ public:
 	std::string name() const;
 		/// Returns the name for this pool.
 
-	static std::string name(const std::string sessionKey,
+	static std::string name(const std::string& connector,
 		const std::string& connectionString);
-	/// Returns the name formatted from supplied arguments as "sessionKey://connectionString".
+	/// Returns the name formatted from supplied arguments as "connector://connectionString".
 
 	void setFeature(const std::string& name, bool state);
 		/// Sets feature for all the sessions.
@@ -172,7 +172,7 @@ private:
 		
 	void closeAll(SessionList& sessionList);
 
-	std::string _sessionKey;
+	std::string _connector;
 	std::string _connectionString;
 	int         _minSessions;
 	int         _maxSessions;
@@ -191,16 +191,16 @@ private:
 };
 
 
-inline std::string SessionPool::name(const std::string sessionKey,
+inline std::string SessionPool::name(const std::string& connector,
 	const std::string& connectionString)
 {
-	return format("%s://%s", sessionKey, connectionString);
+	return Session::uri(connector, connectionString);
 }
 
 
 inline std::string SessionPool::name() const
 {
-	return name(_sessionKey, _connectionString);
+	return name(_connector, _connectionString);
 }
 
 

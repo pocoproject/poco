@@ -44,7 +44,7 @@ namespace Data {
 namespace ODBC {
 
 
-const std::string Connector::KEY("ODBC");
+const std::string Connector::KEY("odbc");
 
 
 Connector::Connector()

@@ -72,7 +72,8 @@ public:
 	typedef Poco::Any (C::*PropertyGetter)(const std::string&);
 		/// The getter method for a property.
 
-	AbstractSessionImpl(): _storage(std::string("deque")),
+	AbstractSessionImpl(const std::string& connectionString): SessionImpl(connectionString),
+		_storage(std::string("deque")),
 		_bulk(false),
 		_emptyStringIsNull(false),
 		_forceEmptyString(false)

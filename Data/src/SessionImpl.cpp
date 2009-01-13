@@ -41,7 +41,8 @@ namespace Poco {
 namespace Data {
 
 
-SessionImpl::SessionImpl()
+SessionImpl::SessionImpl(const std::string& connectionString):
+	_connectionString(connectionString)
 {
 }
 

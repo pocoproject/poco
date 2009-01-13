@@ -45,7 +45,7 @@ namespace Data {
 namespace SQLite {
 
 
-const std::string Connector::KEY("SQLite");
+const std::string Connector::KEY("sqlite");
 
 
 Connector::Connector()

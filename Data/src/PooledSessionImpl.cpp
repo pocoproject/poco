@@ -44,6 +44,7 @@ namespace Data {
 
 
 PooledSessionImpl::PooledSessionImpl(PooledSessionHolder* pHolder):
+	SessionImpl(pHolder->session()->connectionString()),
 	_pHolder(pHolder, true)
 {
 }
@@ -110,6 +111,12 @@ void PooledSessionImpl::close()
 		_pHolder->owner().putBack(_pHolder);
 		_pHolder = 0;
 	}
+}
+
+
+const std::string& PooledSessionImpl::connectorName()
+{
+	return access()->connectorName();
 }
 
 

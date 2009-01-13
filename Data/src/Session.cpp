@@ -36,6 +36,8 @@
 
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionFactory.h"
+#include "Poco/String.h"
+#include "Poco/URI.h"
 #include <algorithm>
 
 
@@ -58,8 +60,14 @@ Session::Session(const std::string& connector, const std::string& connectionStri
 }
 
 
-Session::Session(const Session& other):
-	_ptrImpl(other._ptrImpl),
+Session::Session(const std::string& connection)
+{
+	Session newSession(SessionFactory::instance().create(connection));
+	swap(newSession);
+}
+
+
+Session::Session(const Session& other):	_ptrImpl(other._ptrImpl),
 	_statementCreator(other._ptrImpl)
 {
 }

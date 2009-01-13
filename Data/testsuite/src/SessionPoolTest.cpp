@@ -238,7 +238,7 @@ void SessionPoolTest::testSessionPoolContainer()
 	spc.add("test", "cs");
 	spc.add("test", "cs");//duplicate request, must be silently ignored
 	assert (1 == spc.count());
-	spc.remove("test://cs");
+	spc.remove("test:///cs");
 	assert (0 == spc.count());
 	try { spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }

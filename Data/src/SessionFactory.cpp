@@ -35,6 +35,8 @@
 
 
 #include "Poco/Data/SessionFactory.h"
+#include "Poco/URI.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
@@ -62,33 +64,38 @@ void SessionFactory::add(Connector* pIn)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	SessionInfo info(pIn);
-	std::pair<Connectors::iterator, bool> res = _connectors.insert(std::make_pair(pIn->name(), info));
-	if (!res.second)
-	{
-		res.first->second.cnt++;
-	}
+	std::pair<Connectors::iterator, bool> res =
+		_connectors.insert(std::make_pair(toLower(pIn->name()), info));
+	if (!res.second) res.first->second.cnt++;
 }
 
 
 void SessionFactory::remove(const std::string& key)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	Connectors::iterator it = _connectors.find(key);
+	Connectors::iterator it = _connectors.find(toLower(key));
 	poco_assert (_connectors.end() != it);
 
 	--(it->second.cnt);
-	if (it->second.cnt == 0)
-		_connectors.erase(it);
+	if (it->second.cnt == 0) _connectors.erase(it);
 }
 
 
 Session SessionFactory::create(const std::string& key, const std::string& connectionString)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	Connectors::iterator it = _connectors.find(key);
+	Connectors::iterator it = _connectors.find(toLower(key));
 	poco_assert (_connectors.end() != it);
 
 	return Session(it->second.ptrSI->createSession(connectionString));
+}
+
+
+Session SessionFactory::create(const std::string& uri)
+{
+	URI u(uri);
+	poco_assert (!u.getPath().empty());
+	return create(u.getScheme(), u.getPath().substr(1));
 }
 
 

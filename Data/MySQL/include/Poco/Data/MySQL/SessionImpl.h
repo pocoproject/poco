@@ -98,12 +98,15 @@ public:
 	Poco::Any getInsertId(const std::string&);
 		/// Get insert id
 
-
     SessionHandle& handle();
         // Get handle
 
+	const std::string& connectorName();
+		/// Returns the name of the connector.
+
 private:
 
+	std::string _connector;
 	SessionHandle _mysql;
 	bool _connected;
 	int  _inTransaction;
@@ -124,10 +127,18 @@ inline Poco::Any SessionImpl::getInsertId(const std::string&)
 	return Poco::Any(Poco::UInt64(mysql_insert_id(_mysql)));
 }
 
+
 inline SessionHandle& SessionImpl::handle()
 {
     return _mysql;
 }
+
+
+inline const std::string& SessionImpl::connectorName()
+{
+	return _connector;
+}
+
 
 } } } // namespace Poco::Data::MySQL
 

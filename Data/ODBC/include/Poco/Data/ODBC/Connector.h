@@ -79,6 +79,7 @@ public:
 ///
 /// inlines
 ///
+
 inline const std::string& Connector::name() const
 {
 	return KEY;

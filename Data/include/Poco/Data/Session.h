@@ -180,6 +180,10 @@ public:
 		/// Creates a new session, using the given connector (which must have
 		/// been registered), and connectionString.
 
+	Session(const std::string& connection);
+		/// Creates a new session, using the given connection (must be in
+		/// "connection:///connectionString" format).
+
 	Session(const Session&);
 		/// Creates a session by copying another one.
 
@@ -219,6 +223,14 @@ public:
 
 	bool isTransaction();
 		/// Returns true iff a transaction is in progress, false otherwise.
+
+	std::string uri();
+		/// Returns the URI for this session.
+
+	static std::string uri(const std::string& connector,
+		const std::string& connectionString);
+		/// Utility function that teturns the URI formatted from supplied 
+		/// arguments as "connector://connectionString".
 
 	void setFeature(const std::string& name, bool state);
 		/// Set the state of a feature.
@@ -309,6 +321,19 @@ inline bool Session::isConnected()
 inline bool Session::isTransaction()
 {
 	return _ptrImpl->isTransaction();
+}
+
+
+inline std::string Session::uri(const std::string& connector,
+	const std::string& connectionString)
+{
+	return SessionImpl::uri(connector, connectionString);
+}
+
+
+inline std::string Session::uri()
+{
+	return _ptrImpl->uri();
 }
 
 

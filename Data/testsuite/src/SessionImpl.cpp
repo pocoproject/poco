@@ -32,6 +32,7 @@
 
 #include "SessionImpl.h"
 #include "TestStatementImpl.h"
+#include "Connector.h"
 
 
 namespace Poco {
@@ -40,6 +41,7 @@ namespace Test {
 
 
 SessionImpl::SessionImpl(const std::string& init):
+	Poco::Data::AbstractSessionImpl<SessionImpl>(init),
 	_f(false),
 	_connected(true)
 {
@@ -94,6 +96,12 @@ bool SessionImpl::isConnected()
 bool SessionImpl::isTransaction()
 {
 	return false;
+}
+
+
+const std::string& SessionImpl::connectorName()
+{
+	return Connector::KEY;
 }
 
 

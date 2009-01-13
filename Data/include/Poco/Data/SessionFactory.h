@@ -87,6 +87,10 @@ public:
 		/// Creates a Session for the given key with the connectionString. Throws an Poco:Data::UnknownDataBaseException
 		/// if no Connector is registered for that key.
 
+	Session create(const std::string& uri);
+		/// Creates a Session for the given URI (must be in key:///connectionString format). 
+		///	Throws an Poco:Data::UnknownDataBaseException if no Connector is registered for the key.
+
 private:
 	SessionFactory();
 	~SessionFactory();

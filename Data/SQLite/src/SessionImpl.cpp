@@ -37,6 +37,8 @@
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
+#include "Poco/Data/SQLite/Connector.h"
+#include "Poco/String.h"
 #include "sqlite3.h"
 #include <cstdlib>
 
@@ -52,7 +54,8 @@ const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 
 
 SessionImpl::SessionImpl(const std::string& fileName):
-	_dbFileName(fileName),
+	Poco::Data::AbstractSessionImpl<SessionImpl>(fileName),
+	_connector(toLower(Connector::KEY)),
 	_pDB(0),
 	_connected(false),
 	_isTransaction(false)
@@ -103,7 +106,7 @@ void SessionImpl::rollback()
 
 void SessionImpl::open()
 {
-	int rc = sqlite3_open(_dbFileName.c_str(), &_pDB);
+	int rc = sqlite3_open(connectionString().c_str(), &_pDB);
 
 	if (rc != 0)
 	{

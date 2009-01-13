@@ -47,7 +47,7 @@ namespace Data {
 namespace MySQL {
 
 
-std::string Connector::KEY("MySQL");
+std::string Connector::KEY("mysql");
 
 
 Connector::Connector()
