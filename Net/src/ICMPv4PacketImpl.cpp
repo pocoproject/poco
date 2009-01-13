@@ -125,7 +125,8 @@ const std::string ICMPv4PacketImpl::PARAMETER_PROBLEM_CODE[] =
 
 
 ICMPv4PacketImpl::ICMPv4PacketImpl(int dataSize): 
-	ICMPPacketImpl(dataSize)
+	ICMPPacketImpl(dataSize),
+	_seq(0)
 {
 	initPacket();
 }
