@@ -37,6 +37,8 @@
 #include "Poco/Data/SessionPoolContainer.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/URI.h"
+#include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <algorithm>
 
@@ -91,8 +93,12 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 
 Session SessionPoolContainer::get(const std::string& name)
 {
-	SessionPoolMap::Iterator it = _sessionPools.find(name);
-	if (_sessionPools.end() == it) throw NotFoundException(name);
+	URI uri(name);
+	std::string path = uri.getPath();
+	poco_assert (!path.empty());
+	std::string n = Session::uri(uri.getScheme(), path.substr(1));
+	SessionPoolMap::Iterator it = _sessionPools.find(n);
+	if (_sessionPools.end() == it) throw NotFoundException(n);
 	return it->second->get();
 }
 

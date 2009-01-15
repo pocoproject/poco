@@ -69,7 +69,10 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 //
 // Connection string to POCO
-std::string MySQLTest::_dbConnString = "user=root;password=;db=test;compress=true;auto-reconnect=true";
+std::string MySQLTest::_dbConnString = "user=" MYSQL_USER 
+	";password=" MYSQL_PWD 
+	";db=" MYSQL_DB 
+	";compress=true;auto-reconnect=true";
 
 
 MySQLTest::MySQLTest(const std::string& name): 

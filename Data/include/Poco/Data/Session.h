@@ -230,7 +230,7 @@ public:
 	static std::string uri(const std::string& connector,
 		const std::string& connectionString);
 		/// Utility function that teturns the URI formatted from supplied 
-		/// arguments as "connector://connectionString".
+		/// arguments as "connector:///connectionString".
 
 	void setFeature(const std::string& name, bool state);
 		/// Set the state of a feature.
