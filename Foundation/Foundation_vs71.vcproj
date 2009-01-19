@@ -3654,6 +3654,11 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Dynamic\Pair.h"
+					>
+				</File>
+
+				<File
 					RelativePath=".\include\Poco\Dynamic\Struct.h"
 					>
 				</File>

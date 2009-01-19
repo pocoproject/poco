@@ -36,8 +36,10 @@
 #include "Poco/Exception.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Bugcheck.h"
-#include "Poco/DynamicStruct.h"
-
+#include "Poco/Dynamic/Struct.h"
+#include "Poco/Dynamic/Pair.h"
+#include <map>
+#include <utility>
 
 #if defined(_MSC_VER) && _MSC_VER < 1400
 	#pragma warning(disable:4800)//forcing value to bool 'true' or 'false'
@@ -2010,6 +2012,49 @@ void VarTest::testDynamicStructInt()
 }
 
 
+void VarTest::testDynamicPair()
+{
+	Pair<int> aPair;
+	assert (0 == aPair.first());
+	try
+	{
+		std::string s = aPair.second().convert<std::string>();
+		fail ("must fail");
+	}
+	catch (InvalidAccessException&) { }
+
+	Var va(aPair);
+	assert ("{ 0 : null }" == va.convert<std::string>());
+
+	aPair = Pair<int>(4, "123");
+	assert ("123" == aPair.second());
+
+	va = aPair;
+	assert ("{ 4 : \"123\" }" == va.convert<std::string>());
+
+	int i = 1;
+	std::string s = "2";
+	Pair<int> iPair(i, s);
+	assert (1 == iPair.first());
+	assert ("2" == iPair.second());
+
+	Pair<std::string> sPair(s, i);
+	assert ("2" == sPair.first());
+	assert (1 == sPair.second());
+
+	std::pair<int, std::string> p = std::make_pair(i, s);
+	Pair<int> pPair(p);
+	assert (1 == pPair.first());
+	assert ("2" == pPair.second());
+
+	Var vp(pPair);
+	assert ("{ 1 : \"2\" }" == vp.convert<std::string>());
+
+	Var vs(sPair);
+	assert ("{ \"2\" : 1 }" == vs.convert<std::string>());
+}
+
+
 void VarTest::testArrayToString()
 {
 	std::string s1("string");
@@ -2019,7 +2064,7 @@ void VarTest::testArrayToString()
 	s16.push_back(s2);
 	Var a1(s16);
 	std::string res = a1.convert<std::string>();
-	std::string expected("[ 'string', 23 ]");
+	std::string expected("[ \"string\", 23 ]");
 	assert (res == expected);
 }
 
@@ -2032,8 +2077,7 @@ void VarTest::testStructToString()
 	aStruct["Age"] = 1;
 	Var a1(aStruct);
 	std::string res = a1.convert<std::string>();
-	std::string expected = "{ 'Age' : 1, 'First Name' : 'Junior', 'Last Name' : 'POCO' }";
-;
+	std::string expected = "{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }";
 	assert (res == expected);
 }
 
@@ -2057,14 +2101,14 @@ void VarTest::testArrayOfStructsToString()
 	Var a1(s16);
 	std::string res = a1.convert<std::string>();
 	std::string expected = "[ "
-						"{ 'Age' : 1, 'First Name' : 'Junior', 'Last Name' : 'POCO' }, "
-						"{ 'Age' : 100, 'First Name' : 'Senior', 'Last Name' : 'POCO' }, "
+						"{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }, "
+						"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" }, "
 							"[ "
-							"{ 'Age' : 1, 'First Name' : 'Junior', 'Last Name' : 'POCO' }, "
-							"{ 'Age' : 100, 'First Name' : 'Senior', 'Last Name' : 'POCO' }, "
+							"{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }, "
+							"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" }, "
 								"[ "
-								"{ 'Age' : 1, 'First Name' : 'Junior', 'Last Name' : 'POCO' }, "
-								"{ 'Age' : 100, 'First Name' : 'Senior', 'Last Name' : 'POCO' } "
+								"{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }, "
+								"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" } "
 								"] ] ]";
 	
 	assert (res == expected);
@@ -2090,8 +2134,8 @@ void VarTest::testStructWithArraysToString()
 	aStruct["Address"] = addr;
 	Var a2(aStruct);
 	std::string res = a2.convert<std::string>();
-	std::string expected = "{ 'Address' : { 'Country' : 'Carinthia', 'Number' : 4, 'Street' : 'Unknown' }, "
-								"'Age' : 1, 'First Name' : 'Junior', 'Last Name' : [ 'string', 23 ] }";
+	std::string expected = "{ \"Address\" : { \"Country\" : \"Carinthia\", \"Number\" : 4, \"Street\" : \"Unknown\" }, "
+								"\"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : [ \"string\", 23 ] }";
 
 	assert (res == expected);
 }
@@ -2435,6 +2479,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testIsStruct);
 	CppUnit_addTest(pSuite, VarTest, testIsArray);
 	CppUnit_addTest(pSuite, VarTest, testArrayIdxOperator);
+	CppUnit_addTest(pSuite, VarTest, testDynamicPair);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructBasics);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);

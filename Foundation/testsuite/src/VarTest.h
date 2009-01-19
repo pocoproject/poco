@@ -72,6 +72,7 @@ public:
 	void testIsStruct();
 	void testIsArray();
 	void testArrayIdxOperator();
+	void testDynamicPair();
 	void testDynamicStructBasics();
 	void testDynamicStructString();
 	void testDynamicStructInt();

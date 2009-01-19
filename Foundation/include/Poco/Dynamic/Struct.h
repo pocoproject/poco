@@ -1,7 +1,7 @@
 //
 // Struct.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Struct.h#9 $
+// $Id: //poco/Main/Foundation/include/Poco/Dynamic/Struct.h#9 $
 //
 // Library: Foundation
 // Package: Dynamic
@@ -69,7 +69,7 @@ public:
 	{
 	}
 
-	Struct(const Data &val): _data(val)
+	Struct(const Data& val): _data(val)
 		/// Creates the Struct from the given value.
 	{
 	}
@@ -286,9 +286,6 @@ public:
 
 	void convert(std::string& val) const
 	{
-		// Serialize in JSON format: equals an object
-
-		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
 		Struct<std::string>::ConstIterator it = _val.begin();
 		Struct<std::string>::ConstIterator itEnd = _val.end();
@@ -460,9 +457,6 @@ public:
 
 	void convert(std::string& val) const
 	{
-		// Serialize in JSON format: equals an object
-
-		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
 		Struct<int>::ConstIterator it = _val.begin();
 		Struct<int>::ConstIterator itEnd = _val.end();

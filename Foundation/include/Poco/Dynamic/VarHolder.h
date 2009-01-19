@@ -65,6 +65,9 @@ namespace Dynamic {
 class Var;
 
 
+bool Foundation_API isJSONString(const Var& any);
+	/// Returns true for values that should be JSON-formatted as string.
+
 void Foundation_API appendJSONString(std::string& val, const Var& any);
 	/// Converts the any to a JSON value and adds it to val
 

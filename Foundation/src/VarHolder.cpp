@@ -52,17 +52,24 @@ VarHolder::~VarHolder()
 }
 
 
+bool isJSONString(const Var& any)
+{
+	return any.type() == typeid(std::string) || 
+		any.type() == typeid(char) || 
+		any.type() == typeid(Poco::DateTime) || 
+		any.type() == typeid(Poco::LocalDateTime);
+}
+
+
 void appendJSONString(std::string& val, const Var& any)
 {
-	bool isJsonString = (any.type() == typeid(std::string) || any.type() == typeid(char) || any.type() == typeid(Poco::DateTime) || any.type() == typeid(Poco::LocalDateTime));
-	if (isJsonString)
+	if (any.isEmpty()) val.append("null");
+	else 
 	{
-		val.append(1, '\'');
-	}
-	val.append(any.convert<std::string>());
-	if (isJsonString)
-	{
-		val.append(1, '\'');
+		bool isStr = isJSONString(any);
+		if (isStr) val.append(1, '"');
+		val.append(any.convert<std::string>());
+		if (isStr) val.append(1, '"');
 	}
 }
 

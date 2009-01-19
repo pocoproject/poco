@@ -53,7 +53,6 @@ namespace Dynamic {
 template <typename T>
 class Struct;
 
-
 class Foundation_API Var
 	/// Var allows to store data of different types and to convert between these types transparently.
 	/// Var puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent 
