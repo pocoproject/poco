@@ -189,7 +189,7 @@ private:
 							const std::string& varName,
 							const std::list<JSDelegate>& delegates);
 							
-	static std::list<JSDelegate> Utility::insertServerCallback(const std::list<JSDelegate>& delegates, 
+	static std::list<JSDelegate> insertServerCallback(const std::list<JSDelegate>& delegates, 
 					const Poco::WebWidgets::JSDelegate& serverCallback, 
 					std::size_t serverCallPos);
 
