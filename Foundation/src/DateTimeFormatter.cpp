@@ -55,6 +55,7 @@ std::string DateTimeFormatter::format(const Timestamp& timestamp, const std::str
 std::string DateTimeFormatter::format(const DateTime& dateTime, const std::string& fmt, int timeZoneDifferential)
 {
 	std::string result;
+	result.reserve(64);
 	std::string::const_iterator it  = fmt.begin();
 	std::string::const_iterator end = fmt.end();
 	while (it != end)
@@ -107,6 +108,7 @@ std::string DateTimeFormatter::format(const LocalDateTime& dateTime, const std::
 std::string DateTimeFormatter::format(const Timespan& timespan, const std::string& fmt)
 {
 	std::string result;
+	result.reserve(32);
 	std::string::const_iterator it  = fmt.begin();
 	std::string::const_iterator end = fmt.end();
 	while (it != end)
@@ -140,6 +142,7 @@ std::string DateTimeFormatter::format(const Timespan& timespan, const std::strin
 std::string DateTimeFormatter::tzdISO(int timeZoneDifferential)
 {
 	std::string tzd;
+	tzd.reserve(8);
 	if (timeZoneDifferential != UTC)
 	{
 		if (timeZoneDifferential >= 0)
@@ -165,6 +168,7 @@ std::string DateTimeFormatter::tzdISO(int timeZoneDifferential)
 std::string DateTimeFormatter::tzdRFC(int timeZoneDifferential)
 {
 	std::string tzd;
+	tzd.reserve(8);
 	if (timeZoneDifferential != UTC)
 	{
 		if (timeZoneDifferential >= 0)

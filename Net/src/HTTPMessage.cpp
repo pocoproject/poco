@@ -62,6 +62,7 @@ const std::string HTTPMessage::TRANSFER_ENCODING          = "Transfer-Encoding";
 const std::string HTTPMessage::CONNECTION                 = "Connection";
 const std::string HTTPMessage::CONNECTION_KEEP_ALIVE      = "Keep-Alive";
 const std::string HTTPMessage::CONNECTION_CLOSE           = "Close";
+const std::string HTTPMessage::EMPTY;
 
 
 HTTPMessage::HTTPMessage():
@@ -98,8 +99,9 @@ void HTTPMessage::setContentLength(int length)
 	
 int HTTPMessage::getContentLength() const
 {
-	if (has(CONTENT_LENGTH))
-		return NumberParser::parse(get(CONTENT_LENGTH));
+	const std::string& contentLength = get(CONTENT_LENGTH, EMPTY);
+	if (!contentLength.empty())
+		return NumberParser::parse(contentLength);
 	else
 		return UNKNOWN_CONTENT_LENGTH;
 }
@@ -116,10 +118,7 @@ void HTTPMessage::setTransferEncoding(const std::string& transferEncoding)
 
 const std::string& HTTPMessage::getTransferEncoding() const
 {
-	if (has(TRANSFER_ENCODING))
-		return get(TRANSFER_ENCODING);
-	else
-		return IDENTITY_TRANSFER_ENCODING;
+	return get(TRANSFER_ENCODING, IDENTITY_TRANSFER_ENCODING);
 }
 
 
@@ -155,10 +154,7 @@ void HTTPMessage::setContentType(const MediaType& mediaType)
 	
 const std::string& HTTPMessage::getContentType() const
 {
-	if (has(CONTENT_TYPE))
-		return get(CONTENT_TYPE);
-	else
-		return UNKNOWN_CONTENT_TYPE;
+	return get(CONTENT_TYPE, UNKNOWN_CONTENT_TYPE);
 }
 
 
@@ -173,8 +169,9 @@ void HTTPMessage::setKeepAlive(bool keepAlive)
 
 bool HTTPMessage::getKeepAlive() const
 {
-	if (has(CONNECTION))
-		return icompare(get(CONNECTION), CONNECTION_KEEP_ALIVE) == 0;
+	const std::string& connection = get(CONNECTION, EMPTY);
+	if (!connection.empty())
+		return icompare(connection, CONNECTION_KEEP_ALIVE) == 0;
 	else
 		return getVersion() == HTTP_1_1;
 }

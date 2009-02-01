@@ -51,7 +51,7 @@ class ScopedUnlock
 	/// A class that simplifies thread synchronization
 	/// with a mutex.
 	/// The constructor accepts a Mutex and unlocks it.
-	/// The destructor unlocks the mutex.
+	/// The destructor locks the mutex.
 {
 public:
 	inline ScopedUnlock(M& mutex, bool unlockNow = true): _mutex(mutex)

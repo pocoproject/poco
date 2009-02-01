@@ -237,7 +237,9 @@ void HTTPCookie::setHttpOnly(bool flag)
 
 std::string HTTPCookie::toString() const
 {
-	std::string result(_name);
+	std::string result;
+	result.reserve(256);
+	result.append(_name);
 	result.append("=");
 	if (_version == 0)
 	{

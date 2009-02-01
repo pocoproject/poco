@@ -51,6 +51,9 @@ namespace Poco {
 namespace Net {
 
 
+const std::string HTTPServerRequestImpl::EXPECT("Expect");
+
+
 HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPServerSession& session, HTTPServerParams* pParams):
 	_response(response),
 	_pStream(0),
@@ -87,7 +90,8 @@ HTTPServerRequestImpl::~HTTPServerRequestImpl()
 
 bool HTTPServerRequestImpl::expectContinue() const
 {
-	return has("Expect") && icompare(get("Expect"), "100-continue") == 0;
+	const std::string& expect = get(EXPECT, EMPTY);
+	return !expect.empty() && icompare(expect, "100-continue") == 0;
 }
 
 

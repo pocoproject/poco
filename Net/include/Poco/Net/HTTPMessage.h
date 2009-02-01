@@ -143,6 +143,8 @@ public:
 	static const std::string CONNECTION_KEEP_ALIVE;
 	static const std::string CONNECTION_CLOSE;
 
+	static const std::string EMPTY;
+
 protected:
 	HTTPMessage();
 		/// Creates the HTTPMessage with version HTTP/1.0.

@@ -81,11 +81,15 @@ void MessageHeader::write(std::ostream& ostr) const
 void MessageHeader::read(std::istream& istr)
 {
 	static const int eof = std::char_traits<char>::eof();
+	std::string name;
+	std::string value;
+	name.reserve(32);
+	value.reserve(64);
 	int ch = istr.get();
 	while (ch != eof && ch != '\r' && ch != '\n')
 	{
-		std::string name;
-		std::string value;
+		name.clear();
+		value.clear();
 		while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = istr.get(); }
 		if (ch == '\n') { ch = istr.get(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
@@ -118,6 +122,7 @@ void MessageHeader::splitElements(const std::string& s, std::vector<std::string>
 	std::string::const_iterator it  = s.begin();
 	std::string::const_iterator end = s.end();
 	std::string elem;
+	elem.reserve(64);
 	while (it != end)
 	{
 		if (*it == '"')
@@ -174,11 +179,15 @@ void MessageHeader::splitParameters(const std::string& s, std::string& value, Na
 
 void MessageHeader::splitParameters(const std::string::const_iterator& begin, const std::string::const_iterator& end, NameValueCollection& parameters)
 {
+	std::string pname;
+	std::string pvalue;
+	pname.reserve(32);
+	pvalue.reserve(64);
 	std::string::const_iterator it = begin;
 	while (it != end)
 	{
-		std::string pname;
-		std::string pvalue;
+		pname.clear();
+		pvalue.clear();
 		while (it != end && std::isspace(*it)) ++it;
 		while (it != end && *it != '=' && *it != ';') pname += *it++;
 		Poco::trimRightInPlace(pname);

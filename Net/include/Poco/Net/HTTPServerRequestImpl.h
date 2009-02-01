@@ -92,6 +92,9 @@ public:
 	HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response.
 
+protected:
+	static const std::string EXPECT;
+
 private:
 	HTTPServerResponse& _response;
 	std::istream*       _pStream;

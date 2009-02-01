@@ -1,7 +1,7 @@
 //
 // UUID.cpp
 //
-// $Id: //poco/svn/Foundation/src/UUID.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/UUID.cpp#4 $
 //
 // Library: Foundation
 // Package: UUID
@@ -143,30 +143,32 @@ void UUID::swap(UUID& uuid)
 
 void UUID::parse(const std::string& uuid)
 {
-	if(uuid.size() < 36)
-	{
+	if (uuid.size() < 36)
 		throw SyntaxException(uuid);
-	}
-	if(uuid[8] != '-' || uuid[13] != '-' || uuid[18] != '-' || uuid[23] != '-')
-	{
+
+	if (uuid[8] != '-'|| uuid[13] != '-' || uuid[18] != '-' || uuid[23] != '-')
 		throw SyntaxException(uuid);
-	}
+	
 	std::string::const_iterator it  = uuid.begin();
+	_timeLow = 0;
 	for (int i = 0; i < 8; ++i)
 	{
 		_timeLow = (_timeLow << 4) | nibble(*it++);
-	}
+ 	}
 	++it;
+	_timeMid = 0;
 	for (int i = 0; i < 4; ++i)
 	{
 		_timeMid = (_timeMid << 4) | nibble(*it++);
 	}
 	++it;
+	_timeHiAndVersion = 0;
 	for (int i = 0; i < 4; ++i)
 	{
 		_timeHiAndVersion = (_timeHiAndVersion << 4) | nibble(*it++);
 	}
 	++it;
+	_clockSeq = 0;
 	for (int i = 0; i < 4; ++i)
 	{
 		_clockSeq = (_clockSeq << 4) | nibble(*it++);
@@ -176,7 +178,7 @@ void UUID::parse(const std::string& uuid)
 	{
 		_node[i] = (nibble(*it++) << 4) | nibble(*it++) ;			
 	}
-}
+}	
 
 
 std::string UUID::toString() const
