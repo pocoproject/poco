@@ -67,7 +67,7 @@ class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValu
 {
 public:
 	ExpireCache(Timestamp::TimeDiff expire = 600000): 
-		AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue> >(ExpireStrategy<TKey, TValue>(expire))
+		AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue>, TMutex, TEventMutex>(ExpireStrategy<TKey, TValue>(expire))
 	{
 	}
 

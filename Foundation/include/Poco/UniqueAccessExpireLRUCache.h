@@ -71,7 +71,7 @@ class UniqueAccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCol
 {
 public:
 	UniqueAccessExpireLRUCache(long cacheSize = 1024): 
-		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >(StrategyCollection<TKey, TValue>())
+		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));
 		this->_strategy.pushBack(new UniqueAccessExpireStrategy<TKey, TValue>());

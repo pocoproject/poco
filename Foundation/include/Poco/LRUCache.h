@@ -58,7 +58,7 @@ class LRUCache: public AbstractCache<TKey, TValue, LRUStrategy<TKey, TValue>, TM
 {
 public:
 	LRUCache(long size = 1024):
-		AbstractCache<TKey, TValue, LRUStrategy<TKey, TValue> >(LRUStrategy<TKey, TValue>(size))
+		AbstractCache<TKey, TValue, LRUStrategy<TKey, TValue>, TMutex, TEventMutex>(LRUStrategy<TKey, TValue>(size))
 	{
 	}
 

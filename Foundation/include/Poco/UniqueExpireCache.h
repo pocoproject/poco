@@ -74,7 +74,7 @@ class UniqueExpireCache: public AbstractCache<TKey, TValue, UniqueExpireStrategy
 {
 public:
 	UniqueExpireCache():
-		AbstractCache<TKey, TValue, UniqueExpireStrategy<TKey, TValue> >(UniqueExpireStrategy<TKey, TValue>())
+		AbstractCache<TKey, TValue, UniqueExpireStrategy<TKey, TValue>, TMutex, TEventMutex>(UniqueExpireStrategy<TKey, TValue>())
 	{
 	}
 

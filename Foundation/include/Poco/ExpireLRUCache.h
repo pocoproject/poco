@@ -62,7 +62,7 @@ class ExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey
 {
 public:
 	ExpireLRUCache(long cacheSize = 1024, Timestamp::TimeDiff expire = 600000): 
-		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue> >(StrategyCollection<TKey, TValue>())
+		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));
 		this->_strategy.pushBack(new ExpireStrategy<TKey, TValue>(expire));
