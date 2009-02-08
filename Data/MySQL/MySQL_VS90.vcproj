@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;.\src;..\..\Foundation\include;..\..\Data\include"
+				AdditionalIncludeDirectories=".\include;.\src;..\..\Foundation\include;..\..\Data\include;.\include\Poco\Data\MySQL\mysql"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MYSQL_EXPORTS;POCO_DLL;NO_TCL;THREADSAFE;__LCC__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

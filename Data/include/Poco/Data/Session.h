@@ -173,6 +173,11 @@ class Data_API Session
 	/// For complete list of supported data types with their respective specifications, see the documentation for format in Foundation.
 {
 public:
+	static const Poco::UInt32 TRANSACTION_READ_UNCOMMITTED = 0x00000001L;
+	static const Poco::UInt32 TRANSACTION_READ_COMMITTED   = 0x00000002L;
+	static const Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
+	static const Poco::UInt32 TRANSACTION_SERIALIZABLE     = 0x00000008L;
+
 	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
 		/// Creates the Session.
 
@@ -221,8 +226,25 @@ public:
 	bool isConnected();
 		/// Returns true iff session is connected, false otherwise.
 
+	bool canTransact();
+		/// Returns true if session has transaction capabilities.
+
 	bool isTransaction();
 		/// Returns true iff a transaction is in progress, false otherwise.
+
+	void setTransactionIsolation(Poco::UInt32);
+		/// Sets the transaction isolation level.
+
+	Poco::UInt32 getTransactionIsolation();
+		/// Returns the transaction isolation level.
+
+	bool hasTransactionIsolation(Poco::UInt32 ti);
+		/// Returns true iff the transaction isolation level corresponding
+		/// to the supplied bitmask is supported.
+
+	bool isTransactionIsolation(Poco::UInt32 ti);
+		/// Returns true iff the transaction isolation level corresponds
+		/// to the supplied bitmask.
 
 	std::string uri();
 		/// Returns the URI for this session.
@@ -318,9 +340,39 @@ inline bool Session::isConnected()
 }
 
 
+inline bool Session::canTransact()
+{
+	return _ptrImpl->canTransact();
+}
+
+
 inline bool Session::isTransaction()
 {
 	return _ptrImpl->isTransaction();
+}
+
+
+inline void Session::setTransactionIsolation(Poco::UInt32 ti)
+{
+	_ptrImpl->setTransactionIsolation(ti);
+}
+
+
+inline Poco::UInt32 Session::getTransactionIsolation()
+{
+	return _ptrImpl->getTransactionIsolation();
+}
+
+
+inline bool Session::hasTransactionIsolation(Poco::UInt32 ti)
+{
+	return _ptrImpl->hasTransactionIsolation(ti);
+}
+
+
+inline bool Session::isTransactionIsolation(Poco::UInt32 ti)
+{
+	return _ptrImpl->isTransactionIsolation(ti);
 }
 
 

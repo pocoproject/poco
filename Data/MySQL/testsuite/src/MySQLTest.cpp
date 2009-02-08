@@ -79,27 +79,6 @@ MySQLTest::MySQLTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
     MySQL::Connector::registerConnector();
-
-	/*static bool beenHere = false;
-	
-
-	if (!beenHere)
-	{
-		try
-		{
-			_pSession = new Session(SessionFactory::instance().create(MySQL::Connector::KEY, _dbConnString));
-		}catch (ConnectionException& ex)
-		{
-			std::cout << "!!! WARNING: Connection failed. MySQL tests will fail !!!" << std::endl;
-			std::cout << ex.toString() << std::endl;
-		}
-
-		if (_pSession && _pSession->isConnected()) 
-			std::cout << "*** Connected to " << '(' << _dbConnString << ')' << std::endl;
-		if (!_pExecutor) _pExecutor = new SQLExecutor("MySQL SQL Executor", _pSession);
-	}
-
-	beenHere = true;*/
 }
 
 
@@ -510,6 +489,24 @@ void MySQLTest::testNull()
 }
 
 
+void MySQLTest::testSessionTransaction()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonBLOBTable();
+	_pExecutor->sessionTransaction(_dbConnString);
+}
+
+
+void MySQLTest::testTransaction()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonBLOBTable();
+	_pExecutor->transaction(_dbConnString);
+}
+
+
 void MySQLTest::testNullableInt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -814,6 +811,8 @@ CppUnit::Test* MySQLTest::suite()
     CppUnit_addTest(pSuite, MySQLTest, testNullableInt);
     CppUnit_addTest(pSuite, MySQLTest, testNullableString);
     CppUnit_addTest(pSuite, MySQLTest, testTupleWithNullable);
+	CppUnit_addTest(pSuite, MySQLTest, testSessionTransaction);
+	CppUnit_addTest(pSuite, MySQLTest, testTransaction);
 
     return pSuite;
 }

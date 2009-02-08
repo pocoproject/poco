@@ -96,7 +96,7 @@ private:
 
 private:
 
-	MYSQL_STMT* h;
+	MYSQL_STMT* _pHandle;
 	int _state;
 	std::string _query;
 };
@@ -108,7 +108,7 @@ private:
 
 inline StatementExecutor::operator MYSQL_STMT* ()
 {
-	return h;
+	return _pHandle;
 }
 
 

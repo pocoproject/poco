@@ -89,7 +89,7 @@ private:
 
 private:
 	
-	MYSQL* h;
+	MYSQL* _pHandle;
 };
 
 
@@ -99,7 +99,7 @@ private:
 
 inline SessionHandle::operator MYSQL* ()
 {
-	return h;
+	return _pHandle;
 }
 
 

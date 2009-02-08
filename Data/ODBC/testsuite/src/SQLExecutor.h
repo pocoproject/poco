@@ -514,12 +514,17 @@ public:
 	void sqlChannel(const std::string& connect);
 	void sqlLogger(const std::string& connect);
 
+	void sessionTransaction(const std::string& connect);
+	void transaction(const std::string& connect);
+	void transactor();
+
 private:
 	static const std::string MULTI_INSERT;
 	static const std::string MULTI_SELECT;
 
-	Poco::Data::Session& session();
+	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
 
+	Poco::Data::Session& session();
 	Poco::Data::Session* _pSession;
 };
 

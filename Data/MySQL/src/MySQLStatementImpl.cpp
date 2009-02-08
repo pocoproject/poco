@@ -144,43 +144,24 @@ void MySQLStatementImpl::compileImpl()
 	_metadata.init(_stmt);
 
 	if (_metadata.columnsReturned() > 0)
-	{
 		_stmt.bindResult(_metadata.row());
-	}
 }
 
 	
 void MySQLStatementImpl::bindImpl()
 {
-	//
-	// Bind all bindings
-	//
-
+	Poco::Data::AbstractBindingVec& binds = bindings();
+	size_t pos = 0;
+	Poco::Data::AbstractBindingVec::iterator it = binds.begin();
+	Poco::Data::AbstractBindingVec::iterator itEnd = binds.end();
+	for (; it != itEnd && (*it)->canBind(); ++it)
 	{
-		Poco::Data::AbstractBindingVec& binds = bindings();
-		size_t pos = 0;
-		Poco::Data::AbstractBindingVec::iterator it = binds.begin();
-		Poco::Data::AbstractBindingVec::iterator itEnd = binds.end();
-
-		for (; it != itEnd && (*it)->canBind(); ++it)
-		{
-			(*it)->bind(pos);
-			pos += (*it)->numOfColumnsHandled();
-		}
+		(*it)->bind(pos);
+		pos += (*it)->numOfColumnsHandled();
 	}
 
-	//
-	// And bind them to statement
-	//
-
 	_stmt.bindParams(_binder.getBindArray(), _binder.size());
-
-	//
-	// And execute
-	//
-
 	_stmt.execute();
-
 	_hasNext = NEXT_DONTKNOW;
 }
 

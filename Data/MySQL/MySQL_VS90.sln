@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MySQL", "MySQL_VS90.vcproj", "{D9C692A6-D089-4269-B444-C445ED192F0D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_VS90.vcproj", "{1B30A91B-375F-11DB-837B-00123FC423B5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9C692A6-D089-4269-B444-C445ED192F0D} = {D9C692A6-D089-4269-B444-C445ED192F0D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

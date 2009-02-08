@@ -161,8 +161,11 @@ public:
 	virtual void testMultipleResults();
 
 	virtual void testSQLChannel();
-
 	virtual void testSQLLogger();
+
+	virtual void testSessionTransaction();
+	virtual void testTransaction();
+	virtual void testTransactor();
 
 protected:
 	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;

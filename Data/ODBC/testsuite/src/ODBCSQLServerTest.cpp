@@ -806,6 +806,9 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 
 		return pSuite;
 	}

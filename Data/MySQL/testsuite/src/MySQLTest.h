@@ -113,6 +113,9 @@ public:
 	void testNullableString();
 	void testTupleWithNullable();
 	
+	void testSessionTransaction();
+	void testTransaction();
+
 	void setUp();
 	void tearDown();
 

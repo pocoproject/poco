@@ -72,7 +72,12 @@ public:
 	void rollback();
 	void close();
 	bool isConnected();
+	bool canTransact();
 	bool isTransaction();
+	void setTransactionIsolation(Poco::UInt32);
+	Poco::UInt32 getTransactionIsolation();
+	bool hasTransactionIsolation(Poco::UInt32);
+	bool isTransactionIsolation(Poco::UInt32);
 	const std::string& connectorName();
 	void setFeature(const std::string& name, bool state);	
 	bool getFeature(const std::string& name);

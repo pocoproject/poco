@@ -506,6 +506,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Transaction.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\TypeHandler.h"
 					>
 				</File>
@@ -535,10 +539,6 @@
 				</File>
 				<File
 					RelativePath=".\src\AbstractPreparator.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\AutoTransaction.cpp"
 					>
 				</File>
 				<File
@@ -623,6 +623,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Time.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Transaction.cpp"
 					>
 				</File>
 			</Filter>

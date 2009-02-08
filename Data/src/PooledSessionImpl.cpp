@@ -80,9 +80,39 @@ bool PooledSessionImpl::isConnected()
 }
 
 
+bool PooledSessionImpl::canTransact()
+{
+	return access()->canTransact();
+}
+
+
 bool PooledSessionImpl::isTransaction()
 {
 	return access()->isTransaction();
+}
+
+
+void PooledSessionImpl::setTransactionIsolation(Poco::UInt32 ti)
+{
+	access()->setTransactionIsolation(ti);
+}
+
+
+Poco::UInt32 PooledSessionImpl::getTransactionIsolation()
+{
+	return access()->getTransactionIsolation();
+}
+
+
+bool PooledSessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+{
+	return access()->hasTransactionIsolation(ti);
+}
+
+
+bool PooledSessionImpl::isTransactionIsolation(Poco::UInt32 ti)
+{
+	return access()->isTransactionIsolation(ti);
 }
 
 

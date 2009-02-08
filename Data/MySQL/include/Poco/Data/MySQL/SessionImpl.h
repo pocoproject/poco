@@ -43,6 +43,7 @@
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/Data/MySQL/SessionHandle.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
@@ -54,6 +55,10 @@ class MySQL_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 	/// Implements SessionImpl interface
 {
 public:
+	static const std::string MYSQL_READ_UNCOMMITTED;
+	static const std::string MYSQL_READ_COMMITTED;
+	static const std::string MYSQL_REPEATABLE_READ;
+	static const std::string MYSQL_SERIALIZABLE;
 
 	SessionImpl(const std::string& connectionString);
 		/// Creates the SessionImpl. Opens a connection to the database
@@ -71,27 +76,50 @@ public:
 	~SessionImpl();
 		/// Destroys the SessionImpl.
 		
-	virtual Poco::Data::StatementImpl* createStatementImpl();
+	Poco::Data::StatementImpl* createStatementImpl();
 		/// Returns an MySQL StatementImpl
 
-	virtual void begin();
+	void begin();
 		/// Starts a transaction
 	
-	virtual void commit();
+	void commit();
 		/// Commits and ends a transaction		
 
-	virtual void rollback();
+	void rollback();
 		/// Aborts a transaction
 		
-	virtual void close();
+	void close();
 		/// Closes the connection
 		
-	virtual bool isConnected();
-		/// Returns true iff session is connected.
+	bool isConnected();
+		/// Returns true if connected, false otherwise.
+
+	bool canTransact();
+		/// Returns true if session has transaction capabilities.
+
+	bool isTransaction();
+		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+
+	void setTransactionIsolation(Poco::UInt32 ti);
+		/// Sets the transaction isolation level.
+
+	Poco::UInt32 getTransactionIsolation();
+		/// Returns the transaction isolation level.
+
+	bool hasTransactionIsolation(Poco::UInt32 ti);
+		/// Returns true iff the transaction isolation level corresponding
+		/// to the supplied bitmask is supported.
+
+	bool isTransactionIsolation(Poco::UInt32 ti);
+		/// Returns true iff the transaction isolation level corresponds
+		/// to the supplied bitmask.
 		
-	virtual bool isTransaction();
-		/// Returns true iff a transaction is in progress.
-		
+	void autoCommit(const std::string&, bool val);
+		/// Sets autocommit property for the session.
+
+	bool isAutoCommit(const std::string& name="");
+		/// Returns autocommit property value.
+
 	void setInsertId(const std::string&, const Poco::Any&);
 		/// Try to set insert id - do nothing.
 		
@@ -106,16 +134,49 @@ public:
 
 private:
 
+	template <typename T>
+	inline T& getValue(MYSQL_BIND* pResult, T& val)
+	{
+		return val = *((T*) pResult->buffer);
+	}
+
+	template <typename T>
+	T& getSetting(const std::string& name, T& val)
+		/// Returns required setting.
+		/// Limited to one setting at a time.
+	{
+		StatementExecutor ex(_handle);
+		ResultMetadata metadata;
+		metadata.reset();
+		ex.prepare(Poco::format("SELECT @@%s", name));
+		metadata.init(ex);
+
+		if (metadata.columnsReturned() > 0)
+			ex.bindResult(metadata.row());
+		else
+			throw InvalidArgumentException("No data returned.");
+
+		ex.execute(); ex.fetch();
+		MYSQL_BIND* pResult = metadata.row();
+		return getValue<T>(pResult, val);
+	}
+
 	std::string _connector;
-	SessionHandle _mysql;
+	SessionHandle _handle;
 	bool _connected;
-	int  _inTransaction;
+	bool  _inTransaction;
+	Poco::FastMutex _mutex;
 };
 
 
 //
 // inlines
 //
+inline bool SessionImpl::canTransact()
+{
+	return true;
+}
+
 
 inline void SessionImpl::setInsertId(const std::string&, const Poco::Any&)
 {
@@ -124,19 +185,33 @@ inline void SessionImpl::setInsertId(const std::string&, const Poco::Any&)
 
 inline Poco::Any SessionImpl::getInsertId(const std::string&)
 {
-	return Poco::Any(Poco::UInt64(mysql_insert_id(_mysql)));
+	return Poco::Any(Poco::UInt64(mysql_insert_id(_handle)));
 }
 
 
 inline SessionHandle& SessionImpl::handle()
 {
-    return _mysql;
+    return _handle;
 }
 
 
 inline const std::string& SessionImpl::connectorName()
 {
 	return _connector;
+}
+
+
+inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
+{
+	return getTransactionIsolation() == ti;
+}
+
+
+template <>
+inline std::string& SessionImpl::getValue(MYSQL_BIND* pResult, std::string& val)
+{
+	val.assign((char*) pResult->buffer, pResult->buffer_length);
+	return val;
 }
 
 

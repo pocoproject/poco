@@ -1,11 +1,11 @@
 //
-// AutoTransaction.cpp
+// Transaction.cpp
 //
-// $Id: //poco/Main/Data/src/AutoTransaction.cpp#1 $
+// $Id: //poco/Main/Data/src/Transaction.cpp#1 $
 //
 // Library: Data
 // Package: DataCore
-// Module:  AutoTransaction
+// Module:  Transaction
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,35 +34,40 @@
 //
 
 
-#include "Poco/Data/AutoTransaction.h"
+#include "Poco/Data/Transaction.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
 namespace Data {
 
 
-AutoTransaction::AutoTransaction(Poco::Data::Session& session, Poco::Logger* pLogger):
-	_session(session),
-	_pLogger(pLogger),
-	_mustRollback(true)
+Transaction::Transaction(Poco::Data::Session& rSession, Poco::Logger* pLogger):
+	_rSession(rSession),
+	_pLogger(pLogger)
 {
-	if (!_session.isTransaction())
-	{
-		_session.begin();
-	}
+	begin();
+}
+
+
+Transaction::Transaction(Poco::Data::Session& rSession, bool start):
+	_rSession(rSession),
+	_pLogger(0)
+{
+	if (start) begin();
 }
 
 	
-AutoTransaction::~AutoTransaction()
+Transaction::~Transaction()
 {
-	if (_mustRollback)
+	if (_rSession.isTransaction())
 	{
 		try
 		{
 			if (_pLogger) 
 				_pLogger->debug("Rolling back transaction.");
 
-			_session.rollback();
+			_rSession.rollback();
 		}
 		catch (Poco::Exception& exc)
 		{
@@ -72,24 +77,57 @@ AutoTransaction::~AutoTransaction()
 	}
 }
 
-	
-void AutoTransaction::commit()
+
+void Transaction::begin()
+{
+	if (!_rSession.isTransaction())
+		_rSession.begin();
+	else
+		throw InvalidAccessException("Transaction in progress.");
+}
+
+
+void Transaction::execute(const std::string& sql, bool doCommit)
+{
+	if (!_rSession.isTransaction()) _rSession.begin();
+	_rSession << sql, Keywords::now;
+	if (doCommit) commit();
+}
+
+
+void Transaction::execute(const std::vector<std::string>& sql)
+{
+	try
+	{
+		std::vector<std::string>::const_iterator it = sql.begin();
+		std::vector<std::string>::const_iterator end = sql.end();
+		for (; it != end; ++it)	execute(*it, it + 1 == end ? true : false);
+		return;
+	}
+	catch (Exception& ex)
+	{
+		if (_pLogger) _pLogger->error(ex.displayText());
+	}
+
+	rollback();
+}
+
+
+void Transaction::commit()
 {
 	if (_pLogger) 
 		_pLogger->debug("Committing transaction.");
 
-	_session.commit();
-	_mustRollback = false;
+	_rSession.commit();
 }
 
 	
-void AutoTransaction::rollback()
+void Transaction::rollback()
 {
 	if (_pLogger) 
 		_pLogger->debug("Rolling back transaction.");
 
-	_session.rollback();
-	_mustRollback = false;
+	_rSession.rollback();
 }
 
 

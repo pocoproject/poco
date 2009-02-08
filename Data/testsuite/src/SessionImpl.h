@@ -75,8 +75,25 @@ public:
 		/// Returns true if session is connected to the database, 
 		/// false otherwise.
 
+	bool canTransact();
+		/// Returns true if session has transaction capabilities.
+
 	bool isTransaction();
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+
+	void setTransactionIsolation(Poco::UInt32);
+		/// Sets the transaction isolation level.
+
+	Poco::UInt32 getTransactionIsolation();
+		/// Returns the transaction isolation level.
+
+	bool hasTransactionIsolation(Poco::UInt32);
+		/// Returns true iff the transaction isolation level corresponding
+		/// to the supplied bitmask is supported.
+
+	bool isTransactionIsolation(Poco::UInt32);
+		/// Returns true iff the transaction isolation level corresponds
+		/// to the supplied bitmask.
 
 	const std::string& connectorName();
 		/// Returns the name of the connector.

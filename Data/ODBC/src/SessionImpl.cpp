@@ -39,6 +39,7 @@
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/ODBC/ODBCException.h"
+#include "Poco/Data/Session.h"
 #include "Poco/String.h"
 #include <sqlext.h>
 
@@ -56,7 +57,9 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_connector(toLower(Connector::KEY)),
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
-		_autoExtract(autoExtract)
+		_autoExtract(autoExtract),
+		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
+		_inTransaction(false)
 {
 	setFeature("bulk", true);
 	open();
@@ -65,18 +68,20 @@ SessionImpl::SessionImpl(const std::string& connect,
 
 SessionImpl::~SessionImpl()
 {
-	close();
+	if (isTransaction() && !getFeature("autoCommit"))
+	{
+		try { rollback(); }
+		catch (...) { }
+	}
+
+	try { close(); }
+	catch (...) { }
 }
 
 
 Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
 {
 	return new ODBCStatementImpl(*this);
-}
-
-
-void SessionImpl::begin()
-{
 }
 
 
@@ -128,11 +133,101 @@ void SessionImpl::open()
 
 bool SessionImpl::canTransact()
 {
-	SQLUSMALLINT ret;
-	checkError(Poco::Data::ODBC::SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, 0, 0), 
-		"Failed to obtain transaction capability info.");
+	if (ODBC_TXN_CAPABILITY_UNKNOWN == _canTransact)
+	{
+		SQLUSMALLINT ret;
+		checkError(Poco::Data::ODBC::SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, 0, 0), 
+			"Failed to obtain transaction capability info.");
 
-	return (SQL_TC_NONE != ret);
+		_canTransact = (SQL_TC_NONE != ret) ? 
+			ODBC_TXN_CAPABILITY_TRUE : 
+			ODBC_TXN_CAPABILITY_FALSE;
+	}
+
+	return ODBC_TXN_CAPABILITY_TRUE == _canTransact;
+}
+
+
+void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
+{
+	Poco::UInt32 isolation = 0;
+
+	if (ti & Session::TRANSACTION_READ_UNCOMMITTED)
+		isolation |= SQL_TXN_READ_UNCOMMITTED;
+
+	if (ti & Session::TRANSACTION_READ_COMMITTED)
+		isolation |= SQL_TXN_READ_COMMITTED;
+
+	if (ti & Session::TRANSACTION_REPEATABLE_READ)
+		isolation |= SQL_TXN_REPEATABLE_READ;
+
+	if (ti & Session::TRANSACTION_SERIALIZABLE)
+		isolation |= SQL_TXN_SERIALIZABLE;
+
+	checkError(SQLSetConnectAttr(_db, SQL_ATTR_TXN_ISOLATION, (SQLPOINTER) isolation, 0));
+}
+
+
+Poco::UInt32 SessionImpl::getTransactionIsolation()
+{
+	SQLUINTEGER isolation = 0;
+	checkError(SQLGetConnectAttr(_db, SQL_ATTR_TXN_ISOLATION,
+		&isolation,
+		0,
+		0));
+
+	return transactionIsolation(isolation);
+}
+
+
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+{
+	if (isTransaction()) throw InvalidAccessException();
+
+	bool retval = true;
+	Poco::UInt32 old = getTransactionIsolation();
+	try { setTransactionIsolation(ti); }
+	catch (Poco::Exception&) { retval = false; }
+	setTransactionIsolation(old);
+	return retval;
+}
+
+
+Poco::UInt32 SessionImpl::getDefaultTransactionIsolation()
+{
+	SQLUINTEGER isolation = 0;
+	checkError(SQLGetInfo(_db, SQL_DEFAULT_TXN_ISOLATION,
+		&isolation,
+		0,
+		0));
+
+	return transactionIsolation(isolation);
+}
+
+
+Poco::UInt32 SessionImpl::transactionIsolation(SQLUINTEGER isolation)
+{
+	if (0 == isolation)
+		throw InvalidArgumentException("transactionIsolation(SQLUINTEGER)");
+
+	Poco::UInt32 ret = 0;
+
+	if (isolation & SQL_TXN_READ_UNCOMMITTED)
+		ret |= Session::TRANSACTION_READ_UNCOMMITTED;
+
+	if (isolation & SQL_TXN_READ_COMMITTED)
+		ret |= Session::TRANSACTION_READ_COMMITTED;
+
+	if (isolation & SQL_TXN_REPEATABLE_READ)
+		ret |= Session::TRANSACTION_REPEATABLE_READ;
+
+	if (isolation & SQL_TXN_SERIALIZABLE)
+		ret |= Session::TRANSACTION_SERIALIZABLE;
+
+	if (0 == ret)
+		throw InvalidArgumentException("transactionIsolation(SQLUINTEGER)");
+
+	return ret;
 }
 
 
@@ -171,21 +266,57 @@ bool SessionImpl::isConnected()
 		0)))
 		return false;
 
-	return (0 == value);
+	return (SQL_CD_FALSE == value);
 }
 
 
 bool SessionImpl::isTransaction()
 {
-	Poco::UInt32 value = 0;
+	if (!canTransact()) return false;
 
+	Poco::UInt32 value = 0;
 	checkError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
 		SQL_ATTR_AUTOCOMMIT,
 		&value,
 		0,
 		0));
 
-	return (0 == value);
+	if (0 == value) return _inTransaction;
+	else return false;
+}
+
+
+void SessionImpl::begin()
+{
+	if (isAutoCommit())
+		throw InvalidAccessException("Session in auto commit mode.");
+
+	{
+		Poco::FastMutex::ScopedLock l(_mutex);
+
+		if (_inTransaction)
+			throw InvalidAccessException("Transaction in progress.");
+
+		_inTransaction = true;
+	}
+}
+
+
+void SessionImpl::commit()
+{
+	if (!isAutoCommit())
+		checkError(SQLEndTran(SQL_HANDLE_DBC, _db, SQL_COMMIT));
+
+	_inTransaction = false;
+}
+
+
+void SessionImpl::rollback()
+{
+	if (!isAutoCommit())
+		checkError(SQLEndTran(SQL_HANDLE_DBC, _db, SQL_ROLLBACK));
+
+	_inTransaction = false;
 }
 
 

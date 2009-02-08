@@ -271,6 +271,9 @@
 					RelativePath=".\include\Poco\Data\AbstractSessionImpl.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\AutoTransaction.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Binder.h">
 				</File>
 				<File
@@ -367,6 +370,9 @@
 					RelativePath=".\include\Poco\Data\Time.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\Transaction.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\TypeHandler.h">
 				</File>
 			</Filter>
@@ -453,6 +459,9 @@
 				</File>
 				<File
 					RelativePath=".\src\Time.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Transaction.cpp">
 				</File>
 			</Filter>
 		</Filter>

@@ -48,6 +48,7 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Mutex.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -63,6 +64,13 @@ class ODBC_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 	/// Implements SessionImpl interface
 {
 public:
+	enum TransactionCapability
+	{
+		ODBC_TXN_CAPABILITY_UNKNOWN = -1,
+		ODBC_TXN_CAPABILITY_FALSE = 0,
+		ODBC_TXN_CAPABILITY_TRUE = 1
+	};
+
 	SessionImpl(const std::string& connect, 
 		Poco::Any maxFieldSize = std::size_t(1024), 
 		bool enforceCapability=false,
@@ -99,6 +107,20 @@ public:
 
 	bool canTransact();
 		/// Returns true if connection is transaction-capable.
+
+	void setTransactionIsolation(Poco::UInt32 ti);
+		/// Sets the transaction isolation level.
+
+	Poco::UInt32 getTransactionIsolation();
+		/// Returns the transaction isolation level.
+
+	bool hasTransactionIsolation(Poco::UInt32);
+		/// Returns true iff the transaction isolation level corresponding
+		/// to the supplied bitmask is supported.
+
+	bool isTransactionIsolation(Poco::UInt32);
+		/// Returns true iff the transaction isolation level corresponds
+		/// to the supplied bitmask.
 
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
@@ -144,12 +166,19 @@ private:
 
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
+	Poco::UInt32 getDefaultTransactionIsolation();
+
+	Poco::UInt32 transactionIsolation(SQLUINTEGER isolation);
+
 	std::string _connector;
 	const ConnectionHandle _db;
 	Poco::Any _maxFieldSize;
 	bool _autoBind;
 	bool _autoExtract;
 	TypeInfo _dataTypes;
+	char _canTransact;
+	bool _inTransaction;
+	Poco::FastMutex _mutex;
 };
 
 
@@ -166,20 +195,6 @@ inline void SessionImpl::checkError(SQLRETURN rc, const std::string& msg)
 inline const ConnectionHandle& SessionImpl::dbc() const
 {
 	return _db;
-}
-
-
-inline void SessionImpl::commit()
-{
-	if (!isAutoCommit())
-		checkError(SQLEndTran(SQL_HANDLE_DBC, _db, SQL_COMMIT));
-}
-
-
-inline void SessionImpl::rollback()
-{
-	if (!isAutoCommit())
-		checkError(SQLEndTran(SQL_HANDLE_DBC, _db, SQL_ROLLBACK));
 }
 
 
@@ -234,6 +249,12 @@ inline bool SessionImpl::isAutoExtract(const std::string& name)
 inline const std::string& SessionImpl::connectorName()
 {
 	return _connector;
+}
+
+
+inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
+{
+	return 0 != (ti & getTransactionIsolation());
 }
 
 

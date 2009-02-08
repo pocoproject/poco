@@ -83,8 +83,25 @@ public:
 	virtual bool isConnected() = 0;
 		/// Returns true if session is connected, false otherwise.
 
+	virtual bool canTransact() = 0;
+		/// Returns true if session has transaction capabilities.
+
 	virtual bool isTransaction() = 0;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+
+	virtual void setTransactionIsolation(Poco::UInt32) = 0;
+		/// Sets the transaction isolation level.
+
+	virtual Poco::UInt32 getTransactionIsolation() = 0;
+		/// Returns the transaction isolation level.
+
+	virtual bool hasTransactionIsolation(Poco::UInt32) = 0;
+		/// Returns true iff the transaction isolation level corresponding
+		/// to the supplied bitmask is supported.
+
+	virtual bool isTransactionIsolation(Poco::UInt32) = 0;
+		/// Returns true iff the transaction isolation level corresponds
+		/// to the supplied bitmask.
 
 	virtual const std::string& connectorName() = 0;
 		/// Returns the name of the connector.

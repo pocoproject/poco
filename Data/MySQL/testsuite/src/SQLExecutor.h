@@ -110,7 +110,12 @@ public:
 	void internalExtraction();
 	void doNull();
 
+	void sessionTransaction(const std::string& connect);
+	void transaction(const std::string& connect);
+
 private:
+	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
+
 	Poco::Data::Session* _pSession;
 };
 

@@ -9,7 +9,7 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = AbstractBinder AbstractBinding AbstractExtraction AbstractExtractor \
-	AbstractPreparation AbstractPreparator ArchiveStrategy AutoTransaction \
+	AbstractPreparation AbstractPreparator ArchiveStrategy Transaction \
 	Bulk Connector DataException Date Limit MetaColumn \
 	PooledSessionHolder PooledSessionImpl Position \
 	Range RecordSet Row RowFilter RowFormatter RowIterator \

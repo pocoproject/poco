@@ -7,7 +7,7 @@
 // Package: Core
 // Module:  AutoTransaction
 //
-// Definition of the AutoTransaction class.
+// Forward header for the Transaction class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -41,49 +41,14 @@
 #define Data_AutoTransaction_INCLUDED
 
 
-#include "Poco/Data/Data.h"
-#include "Poco/Data/Session.h"
-#include "Poco/Logger.h"
+#include "Poco/Data/Transaction.h"
 
 
 namespace Poco {
 namespace Data {
 
 
-class Data_API AutoTransaction
-	/// AutoTransaction helps with transactions in domain logic.
-	/// When an AutoTransaction object is created, it first checks whether a
-	/// transaction is in progress. If not, a new transaction is created.
-	/// When the AutoTransaction is destroyed, and commit() has been called,
-	/// nothing is done. Otherwise, the current transaction is rolled back.
-{
-public:
-	AutoTransaction(Poco::Data::Session& session, Poco::Logger* pLogger = 0);
-		/// Creates the AutoTransaction, using the given database session and logger.
-		
-	~AutoTransaction();
-		/// Destroys the AutoTransaction.
-		/// Rolls back the current database transaction if it has not been commited
-		/// (by calling commit()), or rolled back (by calling rollback()).
-		///
-		/// If an exception is thrown during rollback, the exception is logged
-		/// and no further action is taken. 
-		
-	void commit();
-		/// Commits the current transaction.
-		
-	void rollback();
-		/// Rolls back the current transaction.
-		
-private:
-	AutoTransaction();
-	AutoTransaction(const AutoTransaction&);
-	AutoTransaction& operator = (const AutoTransaction&);
-	
-	Session& _session;
-	Logger*  _pLogger;
-	bool     _mustRollback;
-};
+typedef Transaction AutoTransaction;
 
 
 } } // namespace Poco::Data

@@ -93,7 +93,36 @@ bool SessionImpl::isConnected()
 }
 
 
+bool SessionImpl::canTransact()
+{
+	return false;
+}
+
+
 bool SessionImpl::isTransaction()
+{
+	return false;
+}
+
+
+void SessionImpl::setTransactionIsolation(Poco::UInt32)
+{
+}
+
+
+Poco::UInt32 SessionImpl::getTransactionIsolation()
+{
+	return 0;
+}
+
+
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32)
+{
+	return false;
+}
+
+
+bool SessionImpl::isTransactionIsolation(Poco::UInt32)
 {
 	return false;
 }

@@ -38,7 +38,9 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
 #include "Poco/Data/SQLite/Connector.h"
+#include "Poco/Data/Session.h"
 #include "Poco/String.h"
+#include "Poco/Exception.h"
 #include "sqlite3.h"
 #include <cstdlib>
 
@@ -101,6 +103,33 @@ void SessionImpl::rollback()
 	tmp.add(ABORT_TRANSACTION);
 	tmp.execute();
 	_isTransaction = false;
+}
+
+
+void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
+{
+	if (ti != Session::TRANSACTION_READ_COMMITTED)
+		throw Poco::InvalidArgumentException("setTransactionIsolation()");
+}
+
+
+Poco::UInt32 SessionImpl::getTransactionIsolation()
+{
+	return Session::TRANSACTION_READ_COMMITTED;
+}
+
+
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+{
+	if (ti == Session::TRANSACTION_READ_COMMITTED) return true;
+	return false;
+}
+
+
+bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
+{
+	if (ti == Session::TRANSACTION_READ_COMMITTED) return true;
+	return false;
 }
 
 

@@ -397,6 +397,9 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testDynamicAny);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSessionTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTransaction);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTransactor);
 
 		return pSuite;
 	}

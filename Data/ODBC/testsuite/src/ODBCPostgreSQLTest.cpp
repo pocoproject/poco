@@ -656,6 +656,9 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 		//CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSessionTransaction);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTransaction);
+		CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTransactor);
 
 		return pSuite;
 	}
