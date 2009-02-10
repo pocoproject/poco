@@ -59,52 +59,6 @@ class Data_API Transaction
 	/// See Transaction for more detaisl nad purpose of this template.
 {
 public:
-	template <typename T>
-	class Transactor
-		/// Transactor is a helper functor template.
-		/// It is used to consolidate the C++ code that participates in
-		/// the transaction.
-		///
-		/// Example usage:
-		/// 
-		/// struct ATransaction
-		/// {
-		///		void operator () (Session& session) const
-		///		{
-		///			// do something ...
-		///		}
-		/// };
-		/// 
-		/// ATransaction t;
-		/// Transaction at(session); 
-		/// at.transact(t); // commits, if successful
-		///
-		/// See Transaction for more details on how to use Transactor.
-	{
-	public:
-		Transactor(T& transactor): _transactor(transactor)
-			/// Creates the Transactor
-		{
-		}
-
-		inline void operator () (Poco::Data::Session& session)
-		{
-			_transactor(session);
-		}
-
-		inline void operator () (Poco::Data::Session& session) const
-		{
-			_transactor(session);
-		}
-
-	private:
-		Transactor();
-		Transactor(const Transactor&);
-		Transactor& operator = (const Transactor&);
-
-		T& _transactor;
-	};
-
 	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = 0);
 		/// Creates the Transaction and starts it, using the given database session and logger.
 
@@ -117,15 +71,35 @@ public:
 	Transaction(Poco::Data::Session& rSession, T& t, Poco::Logger* pLogger = 0): 
 		_rSession(rSession),
 		_pLogger(pLogger)
-		/// Creates the Transaction, using the given database session and logger.
-		/// The type for the second argument must be Transactor-compatible, i.e. 
-		/// provide the overload for the operator ().
+		/// Creates the Transaction, using the given database session, transactor and logger.
+		/// The transactor type must provide operator () overload taking non-const Session 
+		/// reference as an argument.
+		///
 		/// When transaction is created using this constructor, it is executed and
 		/// commited automatically. If no error occurs, rollback is disabled and does
-		/// not occur at destruction time.
+		/// not occur at destruction time. If an error occurs resulting in exception being
+		/// thrown, the transaction is rolled back and exception propagated to calling code.
+		/// 
+		/// Example usage:
+		/// 
+		/// struct Transactor
+		/// {
+		///		void operator () (Session& session) const
+		///		{
+		///			// do something ...
+		///		}
+		/// };
+		/// 
+		/// Transactor tr;
+		/// Transaction tn(session, tr); 
 	{
-		begin();
-		execute(t);
+		try { transact(t); }
+		catch (...)
+		{
+			if (_pLogger) _pLogger->error("Error executing transaction.");
+			rollback();
+			throw;
+		}
 	}
 
 	~Transaction();
@@ -164,12 +138,11 @@ public:
 
 	template <typename T>
 	void transact(T& t)
-		/// Executes the transactor and, if doCommit is true, commits the transaction.
-		/// Passing true value for commit disables rollback during destruction
-		/// of this Transaction object.
+		/// Executes the transactor and, unless transactor throws an exception, 
+		/// commits the transaction.
 	{
-		Transactor<T> transactor(t);
-		transactor(_rSession);
+		if (!isActive()) begin();
+		t(_rSession);
 		commit();
 	}
 

@@ -69,10 +69,10 @@ Transaction::~Transaction()
 
 			_rSession.rollback();
 		}
-		catch (Poco::Exception& exc)
+		catch (...)
 		{
 			if (_pLogger) 
-				_pLogger->fatal("Error while rolling back database transaction: " + exc.displayText());
+				_pLogger->error("Error while rolling back database transaction.");
 		}
 	}
 }

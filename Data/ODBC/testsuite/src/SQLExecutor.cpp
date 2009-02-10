@@ -3688,8 +3688,7 @@ void SQLExecutor::transactor()
 	session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
 
 	TestCommitTransactor ct;
-	Transaction t1(session());
-	t1.transact(ct);
+	Transaction t1(session(), ct);
 
 	try { session() << "SELECT count(*) FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -3708,8 +3707,46 @@ void SQLExecutor::transactor()
 	try
 	{
 		TestRollbackTransactor rt;
-		Transaction t2(session());
-		t2.transact(rt);
+		Transaction t(session(), rt);
+		fail ("must fail");
+	} catch (Poco::Exception&) { }
+
+	try { session() << "SELECT count(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (0 == count);
+
+	try
+	{
+		TestRollbackTransactor rt;
+		Transaction t(session());
+		t.transact(rt);
+		fail ("must fail");
+	} catch (Poco::Exception&) { }
+
+	try { session() << "SELECT count(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (0 == count);
+
+	try
+	{
+		TestRollbackTransactor rt;
+		Transaction t(session(), false);
+		t.transact(rt);
+		fail ("must fail");
+	} catch (Poco::Exception&) { }
+
+	try { session() << "SELECT count(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (0 == count);
+
+	try
+	{
+		TestRollbackTransactor rt;
+		Transaction t(session(), true);
+		t.transact(rt);
 		fail ("must fail");
 	} catch (Poco::Exception&) { }
 
