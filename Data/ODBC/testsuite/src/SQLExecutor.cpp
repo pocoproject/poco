@@ -3659,20 +3659,20 @@ void SQLExecutor::transaction(const std::string& connect)
 }
 
 
-struct TestCommitTransaction
+struct TestCommitTransactor
 {
 	void operator () (Session& session) const
 	{
-		session << "INSERT INTO PERSON VALUES (?,?,?,?)", bind("lastName"), bind("firstName"), bind("address"), bind("age"), now;
+		session << "INSERT INTO PERSON VALUES ('lastName','firstName','address',10)", now;
 	}
 };
 
 
-struct TestRollbackTransaction
+struct TestRollbackTransactor
 {
 	void operator () (Session& session) const
 	{
-		session << "INSERT INTO PERSON VALUES (?,?,?,?)", bind("lastName"), bind("firstName"), bind("address"), bind("age"), now;
+		session << "INSERT INTO PERSON VALUES ('lastName','firstName','address',10)", now;
 		throw Poco::Exception("test");
 	}
 };
@@ -3683,7 +3683,11 @@ void SQLExecutor::transactor()
 	std::string funct = "transaction()";
 	int count = 0;
 
-	TestCommitTransaction ct;
+	bool autoCommit = session().getFeature("autoCommit");
+	session().setFeature("autoCommit", false);
+	session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
+
+	TestCommitTransactor ct;
 	Transaction t1(session());
 	t1.transact(ct);
 
@@ -3692,15 +3696,27 @@ void SQLExecutor::transactor()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (1 == count);
 
+	try { session() << "DELETE FROM PERSON", now; session().commit();}
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	
+	try { session() << "SELECT count(*) FROM PERSON", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (0 == count);
+
 	try
 	{
-		TestRollbackTransaction rt;
+		TestRollbackTransactor rt;
 		Transaction t2(session());
 		t2.transact(rt);
+		fail ("must fail");
 	} catch (Poco::Exception&) { }
 
 	try { session() << "SELECT count(*) FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (0 == count);
+
+	session().setFeature("autoCommit", autoCommit);
 }

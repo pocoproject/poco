@@ -76,7 +76,8 @@ public:
 		/// };
 		/// 
 		/// ATransaction t;
-		/// Transaction at(session, t); // commits, if successful
+		/// Transaction at(session); 
+		/// at.transact(t); // commits, if successful
 		///
 		/// See Transaction for more details on how to use Transactor.
 	{
