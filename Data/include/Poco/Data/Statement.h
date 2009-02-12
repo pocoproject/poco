@@ -369,6 +369,10 @@ public:
 	const std::string& getStorage() const;
 		/// Returns the internal storage type for the stamement.
 
+	std::size_t rowsExtracted(int dataSet = -1) const;
+		/// Returns the number of rows returned for current data set.
+		/// Default value (-1) indicates current data set (if any).
+
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the current data set.
@@ -698,6 +702,12 @@ inline void Statement::setStorage(const std::string& storage)
 inline std::size_t Statement::extractionCount() const
 {
 	return _pImpl->extractionCount();
+}
+
+
+inline std::size_t Statement::rowsExtracted(int dataSet) const
+{
+	return _pImpl->rowsExtracted(dataSet);
 }
 
 

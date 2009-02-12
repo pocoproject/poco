@@ -54,7 +54,7 @@ namespace Data {
 RecordSet::RecordSet(const Statement& rStatement): 
 	Statement(rStatement),
 	_currentRow(0),
-	_pBegin(new RowIterator(this, 0 == extractionCount())),
+	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
 	_pFilter(0)
 {
@@ -66,7 +66,7 @@ RecordSet::RecordSet(Session& rSession,
 	RowFormatter* pRowFormatter): 
 	Statement((rSession << query, now)),
 	_currentRow(0),
-	_pBegin(new RowIterator(this, 0 == extractionCount())),
+	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
 	_pFilter(0)
 {
@@ -77,7 +77,7 @@ RecordSet::RecordSet(Session& rSession,
 RecordSet::RecordSet(const RecordSet& other):
 	Statement(other.impl().duplicate()),
 	_currentRow(other._currentRow),
-	_pBegin(new RowIterator(this, 0 == extractionCount())),
+	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
 	_pFilter(other._pFilter)
 {
@@ -161,7 +161,8 @@ Poco::Dynamic::Var RecordSet::value(const std::string& name, std::size_t row, bo
 
 Row& RecordSet::row(std::size_t pos)
 {
-	if (pos > rowCount() - 1)
+	std::size_t rowCnt = rowCount();
+	if (0 == rowCnt || pos > rowCnt - 1)
 		throw RangeException("Invalid recordset row requested.");
 
 	RowMap::const_iterator it = _rowMap.find(pos);

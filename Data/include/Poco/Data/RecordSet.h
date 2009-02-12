@@ -450,8 +450,7 @@ inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs
 
 inline std::size_t RecordSet::totalRowCount() const
 {
-	poco_assert (extractions().size());
-	return extractions()[0].get()->numOfRowsHandled();
+	return rowsExtracted();
 }
 
 

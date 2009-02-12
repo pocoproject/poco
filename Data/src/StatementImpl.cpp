@@ -394,6 +394,20 @@ void StatementImpl::removeBind(const std::string& name)
 }
 
 
+std::size_t StatementImpl::rowsExtracted(int dataSet) const
+{
+	if (-1 == dataSet) dataSet = _curDataSet;
+	if (extractions().size() > 0)
+	{
+		poco_assert (dataSet >= 0);
+		if (_extractors[dataSet].size() > 0)
+			return _extractors[dataSet][0]->numOfRowsHandled();
+	}
+	
+	return 0;
+}
+
+
 void StatementImpl::formatSQL(std::vector<Any>& arguments)
 {
 	std::string sql;

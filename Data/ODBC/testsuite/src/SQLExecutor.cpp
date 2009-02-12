@@ -3036,6 +3036,13 @@ void SQLExecutor::rowIterator()
 	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
 	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
 
+	try { session() << "DELETE FROM Vectors", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	RecordSet rset0(session(), "SELECT * FROM Vectors");
+	assert (rset0.begin() == rset0.end());
+
 	try { session() << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -3058,7 +3065,7 @@ void SQLExecutor::rowIterator()
 
 	RowFilter::Ptr pRF = new RowFilter(&rset);
 	assert (pRF->isEmpty());
-	pRF->add("str0", RowFilter::VALUE_EQUAL, 1);
+	pRF->add("str0", RowFilter::VALUE_EQUAL, "3");
 	assert (!pRF->isEmpty());
 	it = rset.begin();
 	end = rset.end();
@@ -3067,7 +3074,6 @@ void SQLExecutor::rowIterator()
 		assert (it->get(0) == i);
 		assert (1 == i);
 	}
-
 }
 
 

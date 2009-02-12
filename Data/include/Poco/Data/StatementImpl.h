@@ -218,8 +218,12 @@ protected:
 	virtual AbstractBinder& binder() = 0;
 		/// Returns the concrete binder used by the statement.
 
-	int columnsExtracted() const;
+	std::size_t columnsExtracted() const;
 		/// Returns the number of columns that the extractors handle.
+
+	std::size_t rowsExtracted(int dataSet = -1) const;
+		/// Returns the number of rows returned for current data set.
+		/// Default value (-1) indicates current data set (if any).
 
 	const AbstractBindingVec& bindings() const;
 		/// Returns the bindings.
@@ -486,7 +490,7 @@ inline AbstractExtractionVec& StatementImpl::extractions()
 }
 
 
-inline int StatementImpl::columnsExtracted() const
+inline std::size_t StatementImpl::columnsExtracted() const
 {
 	poco_assert (_curDataSet < _columnsExtracted.size());
 	return _columnsExtracted[_curDataSet];
