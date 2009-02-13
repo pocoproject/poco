@@ -369,21 +369,25 @@ public:
 	const std::string& getStorage() const;
 		/// Returns the internal storage type for the stamement.
 
-	std::size_t rowsExtracted(int dataSet = -1) const;
-		/// Returns the number of rows returned for current data set.
-		/// Default value (-1) indicates current data set (if any).
+	Poco::UInt32 columnsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
+		/// Returns the number of columns returned for current data set.
+		/// Default value indicates current data set (if any).
 
-	std::size_t extractionCount() const;
+	Poco::UInt32 rowsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
+		/// Returns the number of rows returned for current data set.
+		/// Default value indicates current data set (if any).
+
+	Poco::UInt32 extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the current data set.
 
-	std::size_t dataSetCount() const;
+	Poco::UInt32 dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
 
-	std::size_t nextDataSet();
+	Poco::UInt32 nextDataSet();
 		/// Returns the index of the next data set.
 
-	std::size_t previousDataSet();
+	Poco::UInt32 previousDataSet();
 		/// Returns the index of the previous data set.
 
 	bool hasMoreDataSets() const;
@@ -699,31 +703,37 @@ inline void Statement::setStorage(const std::string& storage)
 }
 
 
-inline std::size_t Statement::extractionCount() const
+inline Poco::UInt32 Statement::extractionCount() const
 {
 	return _pImpl->extractionCount();
 }
 
 
-inline std::size_t Statement::rowsExtracted(int dataSet) const
+inline Poco::UInt32 Statement::columnsExtracted(int dataSet) const
+{
+	return _pImpl->columnsExtracted(dataSet);
+}
+
+
+inline Poco::UInt32 Statement::rowsExtracted(int dataSet) const
 {
 	return _pImpl->rowsExtracted(dataSet);
 }
 
 
-inline std::size_t Statement::dataSetCount() const
+inline Poco::UInt32 Statement::dataSetCount() const
 {
 	return _pImpl->dataSetCount();
 }
 
 
-inline std::size_t Statement::nextDataSet()
+inline Poco::UInt32 Statement::nextDataSet()
 {
 	return _pImpl->activateNextDataSet();
 }
 
 
-inline std::size_t Statement::previousDataSet()
+inline Poco::UInt32 Statement::previousDataSet()
 {
 	return _pImpl->activatePreviousDataSet();
 }

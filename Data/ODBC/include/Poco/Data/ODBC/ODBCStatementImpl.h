@@ -166,7 +166,7 @@ private:
 
 	const SQLHDBC&        _rConnection;
 	const StatementHandle _stmt;
-	PreparatorVec        _preparations;
+	PreparatorVec         _preparations;
 	BinderPtr             _pBinder;
 	ExtractorVec          _extractors;
 	bool                  _stepCalled;

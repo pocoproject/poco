@@ -112,6 +112,8 @@ public:
 	static const std::string LIST;
 	static const std::string UNKNOWN;
 
+	static const int USE_CURRENT_DATA_SET = -1;
+
 	StatementImpl(SessionImpl& rSession);
 		/// Creates the StatementImpl.
 
@@ -162,11 +164,11 @@ public:
 	Storage getStorage() const;
 		/// Returns the storage type for this statement.
 
-	std::size_t extractionCount() const;
+	Poco::UInt32 extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the statement.
 
-	std::size_t dataSetCount() const;
+	Poco::UInt32 dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
 		
 protected:
@@ -218,12 +220,12 @@ protected:
 	virtual AbstractBinder& binder() = 0;
 		/// Returns the concrete binder used by the statement.
 
-	std::size_t columnsExtracted() const;
+	Poco::UInt32 columnsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of columns that the extractors handle.
 
-	std::size_t rowsExtracted(int dataSet = -1) const;
-		/// Returns the number of rows returned for current data set.
-		/// Default value (-1) indicates current data set (if any).
+	Poco::UInt32 rowsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
+		/// Returns the number of rows extracted for current data set.
+		/// Default value (USE_CURRENT_DATA_SET) indicates current data set (if any).
 
 	const AbstractBindingVec& bindings() const;
 		/// Returns the bindings.
@@ -391,7 +393,7 @@ private:
 		}
 	}
 
-	bool isNull(std::size_t col, std::size_t row) const;
+	bool isNull(Poco::UInt32 col, Poco::UInt32 row) const;
 		/// Returns true if the value in [col, row] is null.
 		
 	void forbidBulk();
@@ -490,13 +492,6 @@ inline AbstractExtractionVec& StatementImpl::extractions()
 }
 
 
-inline std::size_t StatementImpl::columnsExtracted() const
-{
-	poco_assert (_curDataSet < _columnsExtracted.size());
-	return _columnsExtracted[_curDataSet];
-}
-
-
 inline StatementImpl::State StatementImpl::getState() const
 {
 	return _state;
@@ -521,13 +516,13 @@ inline StatementImpl::Storage StatementImpl::getStorage() const
 }
 
 
-inline std::size_t StatementImpl::extractionCount() const
+inline Poco::UInt32 StatementImpl::extractionCount() const
 {
 	return extractions().size();
 }
 
 
-inline std::size_t StatementImpl::dataSetCount() const
+inline Poco::UInt32 StatementImpl::dataSetCount() const
 {
 	return _extractors.size();
 }
@@ -539,7 +534,7 @@ inline bool StatementImpl::isStoredProcedure() const
 }
 
 
-inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
+inline bool StatementImpl::isNull(Poco::UInt32 col, Poco::UInt32 row) const
 {
 	try 
 	{

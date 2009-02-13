@@ -394,12 +394,25 @@ void StatementImpl::removeBind(const std::string& name)
 }
 
 
-std::size_t StatementImpl::rowsExtracted(int dataSet) const
+Poco::UInt32 StatementImpl::columnsExtracted(int dataSet) const
 {
-	if (-1 == dataSet) dataSet = _curDataSet;
+	if (USE_CURRENT_DATA_SET == dataSet) dataSet = _curDataSet;
+	if (_columnsExtracted.size() > 0)
+	{
+		poco_assert (dataSet >= 0 && dataSet < _columnsExtracted.size());
+		return _columnsExtracted[dataSet];
+	}
+
+	return 0;
+}
+
+
+Poco::UInt32 StatementImpl::rowsExtracted(int dataSet) const
+{
+	if (USE_CURRENT_DATA_SET == dataSet) dataSet = _curDataSet;
 	if (extractions().size() > 0)
 	{
-		poco_assert (dataSet >= 0);
+		poco_assert (dataSet >= 0 && dataSet < _extractors.size());
 		if (_extractors[dataSet].size() > 0)
 			return _extractors[dataSet][0]->numOfRowsHandled();
 	}
