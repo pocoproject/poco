@@ -344,7 +344,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 
 	pollfd pollBuf;
 
-	std::memset(&pollBuf, 0, sizeof(pollfd));
+	memset(&pollBuf, 0, sizeof(pollfd));
 	pollBuf.fd = _sockfd;
 	if (mode & SELECT_READ) pollBuf.events |= POLLIN;
 	if (mode & SELECT_WRITE) pollBuf.events |= POLLOUT;
