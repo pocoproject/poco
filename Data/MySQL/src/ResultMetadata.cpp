@@ -212,12 +212,12 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	}}
 }
 
-Poco::UInt32 ResultMetadata::columnsReturned() const
+std::size_t ResultMetadata::columnsReturned() const
 {
-	return static_cast<Poco::UInt32>(_columns.size());
+	return static_cast<std::size_t>(_columns.size());
 }
 
-const MetaColumn& ResultMetadata::metaColumn(Poco::UInt32 pos) const
+const MetaColumn& ResultMetadata::metaColumn(std::size_t pos) const
 {
 	return _columns[pos];
 }

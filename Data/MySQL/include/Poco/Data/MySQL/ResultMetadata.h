@@ -58,10 +58,10 @@ public:
 	void init(MYSQL_STMT* stmt);
 		/// Initializes the metadata.
 
-	Poco::UInt32 columnsReturned() const;
+	std::size_t columnsReturned() const;
 		/// Returns the number of columns in resultset.
 
-	const MetaColumn& metaColumn(Poco::UInt32 pos) const;
+	const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns the reference to the specified metacolumn.
 
 	MYSQL_BIND* row();
