@@ -43,7 +43,7 @@
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-	#pragma warning(disable:4312)// 'type cast' : conversion from 'Poco::UInt32' to 'SQLPOINTER' of greater size
+	#pragma warning(disable:4312)// 'type cast' : conversion from 'std::size_t' to 'SQLPOINTER' of greater size
 #endif
 
 
@@ -162,7 +162,7 @@ void ODBCStatementImpl::doPrepare()
 {
 	if (session().getFeature("autoExtract") && hasData())
 	{
-		Poco::UInt32 curDataSet = currentDataSet();
+		std::size_t curDataSet = currentDataSet();
 		poco_check_ptr (_preparations[curDataSet]);
 
 		Extractions& extracts = extractions();
@@ -171,7 +171,7 @@ void ODBCStatementImpl::doPrepare()
 
 		if (it != itEnd && (*it)->isBulk())
 		{
-			Poco::UInt32 limit = getExtractionLimit();
+			std::size_t limit = getExtractionLimit();
 			if (limit == Limit::LIMIT_UNLIMITED) 
 				throw InvalidArgumentException("Bulk operation not allowed without limit.");
 			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) limit, 0),
@@ -210,7 +210,7 @@ void ODBCStatementImpl::doBind()
 		Bindings::iterator itEnd = binds.end();
 
 		if (it != itEnd && 0 == _affectedRowCount)
-			_affectedRowCount = static_cast<Poco::UInt32>((*it)->numOfRowsHandled());
+			_affectedRowCount = static_cast<std::size_t>((*it)->numOfRowsHandled());
 
 		for (std::size_t pos = 0; it != itEnd && (*it)->canBind(); ++it)
 		{
@@ -336,7 +336,7 @@ void ODBCStatementImpl::makeStep()
 }
 
 
-Poco::UInt32 ODBCStatementImpl::next()
+std::size_t ODBCStatementImpl::next()
 {
 	std::size_t count = 0;
 
@@ -359,12 +359,10 @@ Poco::UInt32 ODBCStatementImpl::next()
 	else
 	{
 		throw StatementException(_stmt,
-			std::string("Iterator Error: trying to access the next value"));
+			std::string("Next row not available."));
 	}
 
-	return static_cast<Poco::UInt32>(count);
-
-	return 0;
+	return count;
 }
 
 
@@ -419,8 +417,8 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 
 void ODBCStatementImpl::fillColumns()
 {
-	Poco::UInt32 colCount = columnsReturned();
-	Poco::UInt32 curDataSet = currentDataSet();
+	std::size_t colCount = columnsReturned();
+	std::size_t curDataSet = currentDataSet();
 	if (curDataSet >= _columnPtrs.size())
 		_columnPtrs.resize(curDataSet + 1);
 
@@ -438,9 +436,9 @@ bool ODBCStatementImpl::isStoredProcedure() const
 }
 
 
-const MetaColumn& ODBCStatementImpl::metaColumn(Poco::UInt32 pos) const
+const MetaColumn& ODBCStatementImpl::metaColumn(std::size_t pos) const
 {
-	Poco::UInt32 curDataSet = currentDataSet();
+	std::size_t curDataSet = currentDataSet();
 	poco_assert_dbg (curDataSet < _columnPtrs.size());
 
 	std::size_t sz = _columnPtrs[curDataSet].size();
@@ -452,13 +450,13 @@ const MetaColumn& ODBCStatementImpl::metaColumn(Poco::UInt32 pos) const
 }
 
 
-Poco::UInt32 ODBCStatementImpl::affectedRowCount() const
+std::size_t ODBCStatementImpl::affectedRowCount() const
 {
 	if (0 == _affectedRowCount)
 	{
 		SQLLEN rows;
 		if (!Utility::isError(SQLRowCount(_stmt, &rows)))
-			_affectedRowCount = static_cast<Poco::UInt32>(rows);
+			_affectedRowCount = static_cast<std::size_t>(rows);
 	}
 
 	return _affectedRowCount;

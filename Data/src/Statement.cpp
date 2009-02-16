@@ -109,7 +109,7 @@ Statement& Statement::reset(Session& session)
 }
 
 
-Statement::ResultType Statement::execute()
+std::size_t Statement::execute()
 {
 	Mutex::ScopedLock lock(_mutex);
 	bool isDone = done();
@@ -164,7 +164,7 @@ void Statement::setAsync(bool async)
 }
 
 
-Statement::ResultType Statement::wait(long milliseconds)
+std::size_t Statement::wait(long milliseconds)
 {
 	if (!_pResult) return 0;
 

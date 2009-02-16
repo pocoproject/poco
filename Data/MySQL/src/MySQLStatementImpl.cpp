@@ -55,19 +55,19 @@ MySQLStatementImpl::~MySQLStatementImpl()
 }
 
 
-Poco::UInt32 MySQLStatementImpl::columnsReturned() const
+std::size_t MySQLStatementImpl::columnsReturned() const
 {
 	return _metadata.columnsReturned();
 }
 
 
-Poco::UInt32 MySQLStatementImpl::affectedRowCount() const
+std::size_t MySQLStatementImpl::affectedRowCount() const
 {
     return 0;
 }
 
 	
-const MetaColumn& MySQLStatementImpl::metaColumn(Poco::UInt32 pos) const
+const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos) const
 {
 	return _metadata.metaColumn(pos);
 }
@@ -100,7 +100,7 @@ bool MySQLStatementImpl::hasNext()
 }
 
 	
-Poco::UInt32 MySQLStatementImpl::next()
+std::size_t MySQLStatementImpl::next()
 {
 	if (!hasNext())
 		throw StatementException("No data received");	
@@ -151,7 +151,7 @@ void MySQLStatementImpl::compileImpl()
 void MySQLStatementImpl::bindImpl()
 {
 	Poco::Data::AbstractBindingVec& binds = bindings();
-	size_t pos = 0;
+	std::size_t pos = 0;
 	Poco::Data::AbstractBindingVec::iterator it = binds.begin();
 	Poco::Data::AbstractBindingVec::iterator itEnd = binds.end();
 	for (; it != itEnd && (*it)->canBind(); ++it)

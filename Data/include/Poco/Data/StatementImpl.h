@@ -144,7 +144,7 @@ public:
 	std::string toString() const;
 		/// Create a string version of the SQL statement.
 
-	Poco::UInt32 execute();
+	std::size_t execute();
 		/// Executes a statement. Returns the number of rows 
 		/// extracted for statements returning data or number of rows 
 		/// affected for all other statements (insert, update, delete).
@@ -164,22 +164,22 @@ public:
 	Storage getStorage() const;
 		/// Returns the storage type for this statement.
 
-	Poco::UInt32 extractionCount() const;
+	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the statement.
 
-	Poco::UInt32 dataSetCount() const;
+	std::size_t dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
 		
 protected:
-	virtual Poco::UInt32 columnsReturned() const = 0;
+	virtual std::size_t columnsReturned() const = 0;
 		/// Returns number of columns returned by query. 
 
-	virtual Poco::UInt32 affectedRowCount() const = 0;
+	virtual std::size_t affectedRowCount() const = 0;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 
-	virtual const MetaColumn& metaColumn(Poco::UInt32 pos) const = 0;
+	virtual const MetaColumn& metaColumn(std::size_t pos) const = 0;
 		/// Returns column meta data.
 
 	const MetaColumn& metaColumn(const std::string& name) const;
@@ -192,7 +192,7 @@ protected:
 		/// several consecutive calls to hasNext without data getting lost, 
 		/// ie. hasNext(); hasNext(); next() must be equal to hasNext(); next();
 
-	virtual Poco::UInt32 next() = 0;
+	virtual std::size_t next() = 0;
 		/// Retrieves the next row or set of rows from the resultset and
 		/// returns the number of rows retreved.
 		///
@@ -220,10 +220,10 @@ protected:
 	virtual AbstractBinder& binder() = 0;
 		/// Returns the concrete binder used by the statement.
 
-	Poco::UInt32 columnsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
+	std::size_t columnsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of columns that the extractors handle.
 
-	Poco::UInt32 rowsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
+	std::size_t rowsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows extracted for current data set.
 		/// Default value (USE_CURRENT_DATA_SET) indicates current data set (if any).
 
@@ -236,7 +236,7 @@ protected:
 	AbstractExtractionVec& extractions();
 		/// Returns the extractions vector.
 
-	void makeExtractors(Poco::UInt32 count);
+	void makeExtractors(std::size_t count);
 		/// Determines the type of the internal extraction container and
 		/// calls the extraction creation function (addInternalExtract)
 		/// with appropriate data type and container type arguments.
@@ -284,21 +284,21 @@ protected:
 	void fixupExtraction();
 		/// Sets the AbstractExtractor at the extractors.
 
-	Poco::UInt32 currentDataSet() const;
+	std::size_t currentDataSet() const;
 		/// Returns the current data set.
 
-	Poco::UInt32 activateNextDataSet();
+	std::size_t activateNextDataSet();
 		/// Returns the next data set index, or throws NoDataException if the last 
 		/// data set was reached.
 
-	Poco::UInt32 activatePreviousDataSet();
+	std::size_t activatePreviousDataSet();
 		/// Returns the previous data set index, or throws NoDataException if the last 
 		/// data set was reached.
 
 	bool hasMoreDataSets() const;
 		/// Returns true if there are data sets not activated yet.
 
-	Poco::UInt32 getExtractionLimit();
+	std::size_t getExtractionLimit();
 		/// Returns the extraction limit value.
 
 	const Limit& extractionLimit() const;
@@ -311,12 +311,12 @@ private:
 	void bind();
 		/// Binds the statement, if not yet bound.
 
-	Poco::UInt32 executeWithLimit();
+	std::size_t executeWithLimit();
 		/// Executes with an upper limit set. Returns the number of rows 
 		/// extracted for statements returning data or number of rows 
 		/// affected for all other statements (insert, update, delete).
 
-	Poco::UInt32 executeWithoutLimit();
+	std::size_t executeWithoutLimit();
 		/// Executes without an upper limit set. Returns the number of rows 
 		/// extracted for statements returning data or number of rows 
 		/// affected for all other statements (insert, update, delete).
@@ -393,7 +393,7 @@ private:
 		}
 	}
 
-	bool isNull(Poco::UInt32 col, Poco::UInt32 row) const;
+	bool isNull(std::size_t col, std::size_t row) const;
 		/// Returns true if the value in [col, row] is null.
 		
 	void forbidBulk();
@@ -435,14 +435,14 @@ private:
 
 	State                    _state;
 	Limit                    _extrLimit;
-	Poco::UInt32             _lowerLimit;
+	std::size_t             _lowerLimit;
 	std::vector<int>         _columnsExtracted;
 	SessionImpl&             _rSession;
 	Storage                  _storage;
 	std::ostringstream       _ostr;
 	AbstractBindingVec       _bindings;
 	AbstractExtractionVecVec _extractors;
-	Poco::UInt32             _curDataSet;
+	std::size_t             _curDataSet;
 	BulkType                 _bulkBinding;
 	BulkType                 _bulkExtraction;
 
@@ -516,15 +516,15 @@ inline StatementImpl::Storage StatementImpl::getStorage() const
 }
 
 
-inline Poco::UInt32 StatementImpl::extractionCount() const
+inline std::size_t StatementImpl::extractionCount() const
 {
-	return extractions().size();
+	return static_cast<std::size_t>(extractions().size());
 }
 
 
-inline Poco::UInt32 StatementImpl::dataSetCount() const
+inline std::size_t StatementImpl::dataSetCount() const
 {
-	return _extractors.size();
+	return static_cast<std::size_t>(_extractors.size());
 }
 
 
@@ -534,7 +534,7 @@ inline bool StatementImpl::isStoredProcedure() const
 }
 
 
-inline bool StatementImpl::isNull(Poco::UInt32 col, Poco::UInt32 row) const
+inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
 {
 	try 
 	{
@@ -546,13 +546,13 @@ inline bool StatementImpl::isNull(Poco::UInt32 col, Poco::UInt32 row) const
 }
 
 
-inline Poco::UInt32 StatementImpl::currentDataSet() const
+inline std::size_t StatementImpl::currentDataSet() const
 {
 	return _curDataSet;
 }
 
 
-inline Poco::UInt32 StatementImpl::getExtractionLimit()
+inline std::size_t StatementImpl::getExtractionLimit()
 {
 	return _extrLimit.value();
 }

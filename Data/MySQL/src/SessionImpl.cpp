@@ -36,7 +36,6 @@
 
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
-#include "Poco/Data/MySQL/StatementExecutor.h"
 #include "Poco/Data/Session.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"

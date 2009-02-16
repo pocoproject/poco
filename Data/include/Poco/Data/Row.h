@@ -260,7 +260,7 @@ Data_API std::ostream& operator << (std::ostream &os, const Row& row);
 ///
 inline std::size_t Row::fieldCount() const
 {
-	return _values.size();
+	return static_cast<std::size_t>(_values.size());
 }
 
 

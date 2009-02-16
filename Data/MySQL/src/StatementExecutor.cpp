@@ -81,7 +81,7 @@ void StatementExecutor::prepare(const std::string& query)
 }
 
 
-void StatementExecutor::bindParams(MYSQL_BIND* params, size_t count)
+void StatementExecutor::bindParams(MYSQL_BIND* params, std::size_t count)
 {
 	if (_state < STMT_COMPILED)
 		throw StatementException("Satement is not compiled yet");
@@ -132,7 +132,7 @@ bool StatementExecutor::fetch()
 }
 
 
-bool StatementExecutor::fetchColumn(size_t n, MYSQL_BIND *bind)
+bool StatementExecutor::fetchColumn(std::size_t n, MYSQL_BIND *bind)
 {
 	if (_state < STMT_EXECUTED)
 		throw StatementException("Satement is not executed yet");

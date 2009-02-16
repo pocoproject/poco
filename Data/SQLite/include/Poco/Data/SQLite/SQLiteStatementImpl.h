@@ -68,10 +68,10 @@ public:
 		/// Destroys the SQLiteStatementImpl.
 
 protected:
-	Poco::UInt32 columnsReturned() const;
+	std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
 
-	Poco::UInt32 affectedRowCount() const;
+	std::size_t affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT. 
@@ -82,13 +82,13 @@ protected:
 		/// were originally in the table. To get an accurate count of the number of rows deleted, 
 		/// use "DELETE FROM table WHERE 1".
 
-	const MetaColumn& metaColumn(Poco::UInt32 pos) const;
+	const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns column meta data.
 
 	bool hasNext();
 		/// Returns true if a call to next() will return data.
 
-	Poco::UInt32 next();
+	std::size_t next();
 		/// Retrieves the next row from the resultset and returns 1.
 		/// Will throw, if the resultset is empty.
 
@@ -135,7 +135,7 @@ private:
 	BinderPtr        _pBinder;
 	ExtractorPtr     _pExtractor;
 	MetaColumnVecVec _columns;
-	Poco::UInt32     _affectedRowCount;
+	std::size_t      _affectedRowCount;
 	StrPtr           _pLeftover;
 	BindIt           _bindBegin;
 	bool             _canBind;

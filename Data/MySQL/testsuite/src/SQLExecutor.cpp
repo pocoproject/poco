@@ -1277,9 +1277,9 @@ void SQLExecutor::blob(int bigSize)
 
 	Poco::Data::CLOB big;
 	std::vector<char> v(bigSize, 'x');
-	big.assignRaw(&v[0], v.size());
+	big.assignRaw(&v[0], (std::size_t) v.size());
 
-	assert (big.size() == (size_t)bigSize);
+	assert (big.size() == (std::size_t) bigSize);
 
 	try { *_pSession << "DELETE FROM Person", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1359,7 +1359,7 @@ void SQLExecutor::tupleVector()
 	try { *_pSession << "SELECT COUNT(*) FROM Tuples", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (v.size() == (size_t)count);
+	assert (v.size() == (std::size_t) count);
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> > ret;
 	try { *_pSession << "SELECT * FROM Tuples", into(ret), now; }

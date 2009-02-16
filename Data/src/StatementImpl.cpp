@@ -65,7 +65,7 @@ const std::string StatementImpl::UNKNOWN = "unknown";
 
 StatementImpl::StatementImpl(SessionImpl& rSession):
 	_state(ST_INITIALIZED),
-	_extrLimit(upperLimit((Poco::UInt32) Limit::LIMIT_UNLIMITED, false)),
+	_extrLimit(upperLimit((std::size_t) Limit::LIMIT_UNLIMITED, false)),
 	_lowerLimit(0),
 	_rSession(rSession),
 	_storage(STORAGE_UNKNOWN_IMPL),
@@ -84,10 +84,10 @@ StatementImpl::~StatementImpl()
 }
 
 
-Poco::UInt32 StatementImpl::execute()
+std::size_t StatementImpl::execute()
 {
 	resetExtraction();
-	Poco::UInt32 lim = 0;
+	std::size_t lim = 0;
 	if (_lowerLimit > _extrLimit.value())
 		throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
 
@@ -110,11 +110,11 @@ Poco::UInt32 StatementImpl::execute()
 }
 
 
-Poco::UInt32 StatementImpl::executeWithLimit()
+std::size_t StatementImpl::executeWithLimit()
 {
 	poco_assert (_state != ST_DONE);
-	Poco::UInt32 count = 0;
-	Poco::UInt32 limit = _extrLimit.value();
+	std::size_t count = 0;
+	std::size_t limit = _extrLimit.value();
 
 	do
 	{
@@ -134,10 +134,10 @@ Poco::UInt32 StatementImpl::executeWithLimit()
 }
 
 
-Poco::UInt32 StatementImpl::executeWithoutLimit()
+std::size_t StatementImpl::executeWithoutLimit()
 {
 	poco_assert (_state != ST_DONE);
-	Poco::UInt32 count = 0;
+	std::size_t count = 0;
 
 	do
 	{
@@ -160,7 +160,7 @@ void StatementImpl::compile()
 
 		if (!extractions().size() && !isStoredProcedure())
 		{
-			Poco::UInt32 cols = columnsReturned();
+			std::size_t cols = columnsReturned();
 			if (cols) makeExtractors(cols);
 		}
 
@@ -207,7 +207,7 @@ void StatementImpl::setExtractionLimit(const Limit& extrLimit)
 
 void StatementImpl::setBulkExtraction(const Bulk& b)
 {
-	Poco::UInt32 limit = getExtractionLimit();
+	std::size_t limit = getExtractionLimit();
 	if (Limit::LIMIT_UNLIMITED != limit && b.size() != limit)
 		throw InvalidArgumentException("Can not set limit for statement.");
 
@@ -280,7 +280,7 @@ void StatementImpl::setStorage(const std::string& storage)
 }
 
 
-void StatementImpl::makeExtractors(Poco::UInt32 count)
+void StatementImpl::makeExtractors(std::size_t count)
 {
 	for (int i = 0; i < count; ++i)
 	{
@@ -328,8 +328,8 @@ void StatementImpl::makeExtractors(Poco::UInt32 count)
 
 const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 {
-	Poco::UInt32 cols = columnsReturned();
-	for (Poco::UInt32 i = 0; i < cols; ++i)
+	std::size_t cols = columnsReturned();
+	for (std::size_t i = 0; i < cols; ++i)
 	{
 		const MetaColumn& column = metaColumn(i);
 		if (0 == icompare(column.name(), name)) return column;
@@ -339,7 +339,7 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 }
 
 
-Poco::UInt32 StatementImpl::activateNextDataSet()
+std::size_t StatementImpl::activateNextDataSet()
 {
 	if (_curDataSet + 1 < dataSetCount())
 		return ++_curDataSet;
@@ -348,7 +348,7 @@ Poco::UInt32 StatementImpl::activateNextDataSet()
 }
 
 
-Poco::UInt32 StatementImpl::activatePreviousDataSet()
+std::size_t StatementImpl::activatePreviousDataSet()
 {
 	if (_curDataSet > 0)
 		return --_curDataSet;
@@ -360,7 +360,7 @@ Poco::UInt32 StatementImpl::activatePreviousDataSet()
 void StatementImpl::addExtract(AbstractExtraction* pExtraction)
 {
 	poco_check_ptr (pExtraction);
-	Poco::UInt32 pos = pExtraction->position();
+	std::size_t pos = pExtraction->position();
 	if (pos >= _extractors.size()) 
 		_extractors.resize(pos + 1);
 
@@ -394,7 +394,7 @@ void StatementImpl::removeBind(const std::string& name)
 }
 
 
-Poco::UInt32 StatementImpl::columnsExtracted(int dataSet) const
+std::size_t StatementImpl::columnsExtracted(int dataSet) const
 {
 	if (USE_CURRENT_DATA_SET == dataSet) dataSet = _curDataSet;
 	if (_columnsExtracted.size() > 0)
@@ -407,7 +407,7 @@ Poco::UInt32 StatementImpl::columnsExtracted(int dataSet) const
 }
 
 
-Poco::UInt32 StatementImpl::rowsExtracted(int dataSet) const
+std::size_t StatementImpl::rowsExtracted(int dataSet) const
 {
 	if (USE_CURRENT_DATA_SET == dataSet) dataSet = _curDataSet;
 	if (extractions().size() > 0)

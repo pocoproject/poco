@@ -124,7 +124,7 @@ public:
 		/// The number of rows reported is independent of filtering.
 
 	std::size_t columnCount() const;
-		/// Returns the number of rows in the recordset.
+		/// Returns the number of columns in the recordset.
 
 	template <class C>
 	const Column<C>& column(const std::string& name) const
@@ -456,7 +456,7 @@ inline std::size_t RecordSet::totalRowCount() const
 
 inline std::size_t RecordSet::columnCount() const
 {
-	return extractions().size();
+	return static_cast<std::size_t>(extractions().size());
 }
 
 

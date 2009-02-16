@@ -451,7 +451,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Data\Prepare.h"
+					RelativePath=".\include\Poco\data\Preparation.h"
 					>
 				</File>
 				<File

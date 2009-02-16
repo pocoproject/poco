@@ -238,7 +238,7 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<std::string>& val, Direction dir = PD_IN);
 
-	size_t size() const;
+	std::size_t size() const;
 		/// Return count of binded parameters
 
 	MYSQL_BIND* getBindArray() const;

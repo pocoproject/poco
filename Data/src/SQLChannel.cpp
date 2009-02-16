@@ -120,7 +120,7 @@ void SQLChannel::logAsync(const Message& msg)
 {
 	if (!_pSession || !_pSession->isConnected()) open();
 
-	Statement::ResultType ret = wait();
+	std::size_t ret = wait();
 	if (0 == ret && !_pLogStatement->done() && !_pLogStatement->initialized()) 
 	{
 		if (_throw) 

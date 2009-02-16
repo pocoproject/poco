@@ -73,20 +73,20 @@ public:
 		/// Destroys the ODBCStatementImpl.
 
 protected:
-	Poco::UInt32 columnsReturned() const;
+	std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
 
-	Poco::UInt32 affectedRowCount() const;
+	std::size_t affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert or update.
 
-	const MetaColumn& metaColumn(Poco::UInt32 pos) const;
+	const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns column meta data.
 
 	bool hasNext();
 		/// Returns true if a call to next() will return data.
 
-	Poco::UInt32 next();
+	std::size_t next();
 		/// Retrieves the next row or set of rows from the resultset.
 		/// Returns the number of rows retrieved.
 		/// Will throw, if the resultset is empty.
@@ -173,7 +173,7 @@ private:
 	int                   _nextResponse;
 	ColumnPtrVecVec       _columnPtrs;
 	bool                  _prepared;
-	mutable Poco::UInt32  _affectedRowCount;
+	mutable std::size_t   _affectedRowCount;
 	bool                  _canCompile;
 };
 
@@ -196,11 +196,11 @@ inline AbstractBinder& ODBCStatementImpl::binder()
 }
 
 
-inline Poco::UInt32 ODBCStatementImpl::columnsReturned() const
+inline std::size_t ODBCStatementImpl::columnsReturned() const
 {
 	poco_assert_dbg (currentDataSet() < _preparations.size());
 	poco_assert_dbg (_preparations[currentDataSet()]);
-	return (Poco::UInt32) _preparations[currentDataSet()]->columns();
+	return static_cast<std::size_t>(_preparations[currentDataSet()]->columns());
 }
 
 

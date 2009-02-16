@@ -94,11 +94,10 @@ class Data_API Statement
 public:
 	typedef void (*Manipulator)(Statement&);
 
-	typedef Poco::UInt32                                  ResultType;
-	typedef ActiveResult<ResultType>                      Result;
-	typedef SharedPtr<Result>                             ResultPtr;
-	typedef ActiveMethod<ResultType, void, StatementImpl> AsyncExecMethod;
-	typedef SharedPtr<AsyncExecMethod>                    AsyncExecMethodPtr;
+	typedef ActiveResult<std::size_t>                      Result;
+	typedef SharedPtr<Result>                           ResultPtr;
+	typedef ActiveMethod<std::size_t, void, StatementImpl> AsyncExecMethod;
+	typedef SharedPtr<AsyncExecMethod>                  AsyncExecMethodPtr;
 
 	static const int WAIT_FOREVER = -1;
 
@@ -273,7 +272,7 @@ public:
 	Statement& operator , (Poco::Int16 value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
-	Statement& operator , (Poco::UInt32 value);
+	Statement& operator , (std::size_t value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
 	Statement& operator , (Poco::Int32 value);
@@ -310,7 +309,7 @@ public:
 	const std::string& toString() const;
 		/// Creates a string from the accumulated SQL statement.
 
-	ResultType execute();
+	std::size_t execute();
 		/// Executes the statement synchronously or asynchronously. 
 		/// Stops when either a limit is hit or the whole statement was executed.
 		/// Returns the number of rows extracted from the database (for statements
@@ -337,7 +336,7 @@ public:
 	bool isAsync() const;
 		/// Returns true if statement was marked for asynchronous execution.
 
-	Statement::ResultType wait(long milliseconds = WAIT_FOREVER);
+	std::size_t wait(long milliseconds = WAIT_FOREVER);
 		/// Waits for the execution completion for asynchronous statements or
 		/// returns immediately for synchronous ones. The return value for 
 		/// asynchronous statement is the execution result (i.e. number of 
@@ -369,25 +368,25 @@ public:
 	const std::string& getStorage() const;
 		/// Returns the internal storage type for the stamement.
 
-	Poco::UInt32 columnsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
+	std::size_t columnsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
 		/// Returns the number of columns returned for current data set.
 		/// Default value indicates current data set (if any).
 
-	Poco::UInt32 rowsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
+	std::size_t rowsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows returned for current data set.
 		/// Default value indicates current data set (if any).
 
-	Poco::UInt32 extractionCount() const;
+	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the current data set.
 
-	Poco::UInt32 dataSetCount() const;
+	std::size_t dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
 
-	Poco::UInt32 nextDataSet();
+	std::size_t nextDataSet();
 		/// Returns the index of the next data set.
 
-	Poco::UInt32 previousDataSet();
+	std::size_t previousDataSet();
 		/// Returns the index of the previous data set.
 
 	bool hasMoreDataSets() const;
@@ -564,7 +563,7 @@ inline Statement& Statement::operator , (Poco::Int16 value)
 }
 
 
-inline Statement& Statement::operator , (Poco::UInt32 value)
+inline Statement& Statement::operator , (std::size_t value)
 {
 	return commaPODImpl(value);
 }
@@ -687,7 +686,7 @@ inline const AbstractExtractionVec& Statement::extractions() const
 
 inline const MetaColumn& Statement::metaColumn(std::size_t pos) const
 {
-	return _pImpl->metaColumn(static_cast<UInt32>(pos));
+	return _pImpl->metaColumn(pos);
 }
 
 
@@ -703,37 +702,37 @@ inline void Statement::setStorage(const std::string& storage)
 }
 
 
-inline Poco::UInt32 Statement::extractionCount() const
+inline std::size_t Statement::extractionCount() const
 {
 	return _pImpl->extractionCount();
 }
 
 
-inline Poco::UInt32 Statement::columnsExtracted(int dataSet) const
+inline std::size_t Statement::columnsExtracted(int dataSet) const
 {
 	return _pImpl->columnsExtracted(dataSet);
 }
 
 
-inline Poco::UInt32 Statement::rowsExtracted(int dataSet) const
+inline std::size_t Statement::rowsExtracted(int dataSet) const
 {
 	return _pImpl->rowsExtracted(dataSet);
 }
 
 
-inline Poco::UInt32 Statement::dataSetCount() const
+inline std::size_t Statement::dataSetCount() const
 {
 	return _pImpl->dataSetCount();
 }
 
 
-inline Poco::UInt32 Statement::nextDataSet()
+inline std::size_t Statement::nextDataSet()
 {
 	return _pImpl->activateNextDataSet();
 }
 
 
-inline Poco::UInt32 Statement::previousDataSet()
+inline std::size_t Statement::previousDataSet()
 {
 	return _pImpl->activatePreviousDataSet();
 }

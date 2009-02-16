@@ -3204,7 +3204,7 @@ void SQLExecutor::asynchronous(int rowCount)
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
 	assert (data.size() == 0);
 	assert (!stmt2.done());
-	Statement::ResultType rows = 0;
+	std::size_t rows = 0;
 	
 	for (int i = 0; !stmt2.done(); i += step)
 	{

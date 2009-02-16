@@ -142,7 +142,7 @@ public:
 
 	static std::size_t size()
 	{
-		return 1;
+		return 1u;
 	}
 
 	static void extract(std::size_t pos, T& obj, const T& defVal, AbstractExtractor* pExt)
@@ -176,7 +176,7 @@ public:
 
 	static std::size_t size()
 	{
-		return 1;
+		return 1u;
 	}
 
 	static void extract(std::size_t pos, std::deque<T>& obj, const T& defVal, AbstractExtractor* pExt)
@@ -211,7 +211,7 @@ public:
 
 	static std::size_t size()
 	{
-		return 1;
+		return 1u;
 	}
 
 	static void extract(std::size_t pos, std::vector<T>& obj, const T& defVal, AbstractExtractor* pExt)
@@ -246,7 +246,7 @@ public:
 
 	static std::size_t size()
 	{
-		return 1;
+		return 1u;
 	}
 
 	static void extract(std::size_t pos, std::list<T>& obj, const T& defVal, AbstractExtractor* pExt)
@@ -301,7 +301,7 @@ public:
 
     static std::size_t size() 
     {
-        return 1;
+        return 1u;
     }
 
     static void extract(std::size_t pos, Nullable<T>& obj, const Nullable<T>& , AbstractExtractor* pExt) 
@@ -409,7 +409,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -518,7 +518,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -623,7 +623,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -724,7 +724,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -821,7 +821,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -914,7 +914,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1003,7 +1003,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1088,7 +1088,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1169,7 +1169,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1246,7 +1246,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1310,7 +1310,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1371,7 +1371,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1428,7 +1428,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1483,7 +1483,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1535,7 +1535,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1584,7 +1584,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1630,7 +1630,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, NullTypeList>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1673,7 +1673,7 @@ public:
 
 	static std::size_t size()
 	{
-	        return Poco::Tuple<T0, T1, T2, NullTypeList>::length;
+	        return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1713,7 +1713,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, NullTypeList>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, T1, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1750,7 +1750,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, NullTypeList>::length;
+		return static_cast<std::size_t>(Poco::Tuple<T0, NullTypeList>::length);
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, 
@@ -1780,7 +1780,7 @@ public:
 
 	static std::size_t size()
 	{
-		return TypeHandler<K>::size() + TypeHandler<V>::size();
+		return static_cast<std::size_t>(TypeHandler<K>::size() + TypeHandler<V>::size());
 	}
 
 	static void extract(std::size_t pos, std::pair<K, V>& obj, const std::pair<K, V>& defVal, AbstractExtractor* pExt)
@@ -1816,7 +1816,7 @@ public:
 
 	static std::size_t size()
 	{
-		return TypeHandler<T>::size();
+		return static_cast<std::size_t>(TypeHandler<T>::size());
 	}
 
 	static void extract(std::size_t pos, Poco::AutoPtr<T>& obj, const Poco::AutoPtr<T>& defVal, AbstractExtractor* pExt)
@@ -1858,7 +1858,7 @@ public:
 
 	static std::size_t size()
 	{
-		return TypeHandler<T>::size();
+		return static_cast<std::size_t>(TypeHandler<T>::size());
 	}
 
 	static void extract(std::size_t pos, Poco::SharedPtr<T>& obj, const Poco::SharedPtr<T>& defVal, AbstractExtractor* pExt)

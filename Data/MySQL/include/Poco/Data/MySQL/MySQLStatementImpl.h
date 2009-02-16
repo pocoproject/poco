@@ -68,20 +68,20 @@ public:
 		
 protected:
 
-	virtual Poco::UInt32 columnsReturned() const;
+	virtual std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.		
 
-	virtual Poco::UInt32 affectedRowCount() const;
+	virtual std::size_t affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 	
-	virtual const MetaColumn& metaColumn(Poco::UInt32 pos) const;
+	virtual const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns column meta data.
 		
 	virtual bool hasNext();
 		/// Returns true if a call to next() will return data.
 		
-    virtual Poco::UInt32 next();
+    virtual std::size_t next();
 		/// Retrieves the next row from the resultset.
 		/// Will throw, if the resultset is empty.
 	

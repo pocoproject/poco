@@ -176,7 +176,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _rResult.size();
+		return static_cast<std::size_t>(_rResult.size());
 	}
 
 	std::size_t numOfRowsAllowed() const
@@ -255,7 +255,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _rResult.size();
+		return static_cast<std::size_t>(_rResult.size());
 	}
 
 	std::size_t numOfRowsAllowed() const
@@ -560,7 +560,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _rResult.size();
+		return static_cast<std::size_t>(_rResult.size());
 	}
 
 	std::size_t numOfRowsAllowed() const
@@ -619,7 +619,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _rResult.size();
+		return static_cast<std::size_t>(_rResult.size());
 	}
 
 	std::size_t numOfRowsAllowed() const
@@ -678,7 +678,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _rResult.size();
+		return static_cast<std::size_t>(_rResult.size());
 	}
 
 	std::size_t numOfRowsAllowed() const
@@ -737,7 +737,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _rResult.size();
+		return static_cast<std::size_t>(_rResult.size());
 	}
 
 	std::size_t numOfRowsAllowed() const

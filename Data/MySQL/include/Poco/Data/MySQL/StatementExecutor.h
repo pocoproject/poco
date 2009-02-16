@@ -71,7 +71,7 @@ public:
 	void prepare(const std::string& query);
 		/// Prepares the statement for execution.
 
-	void bindParams(MYSQL_BIND* params, size_t count);
+	void bindParams(MYSQL_BIND* params, std::size_t count);
 		/// Binds the params.
 
 	void bindResult(MYSQL_BIND* result);
@@ -83,7 +83,7 @@ public:
 	bool fetch();
 		/// Fetches the data.
 
-	bool fetchColumn(size_t n, MYSQL_BIND *bind);
+	bool fetchColumn(std::size_t n, MYSQL_BIND *bind);
 		/// Fetches the column.
 		
 	operator MYSQL_STMT* ();

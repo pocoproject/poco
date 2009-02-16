@@ -67,7 +67,7 @@ namespace
 		MYSQL_RES* h;
 	};
 
-	size_t fieldSize(const MYSQL_FIELD& field)
+	std::size_t fieldSize(const MYSQL_FIELD& field)
 		/// Convert field MySQL-type and field MySQL-length to actual field length
 	{
 		switch (field.type)
@@ -171,13 +171,13 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 		return;
 	}
 
-	size_t count = mysql_num_fields(h);
+	std::size_t count = mysql_num_fields(h);
 	MYSQL_FIELD* fields = mysql_fetch_fields(h);
 
-	size_t commonSize = 0;
+	std::size_t commonSize = 0;
 	_columns.reserve(count);
 
-	{for (size_t i = 0; i < count; i++)
+	{for (std::size_t i = 0; i < count; i++)
 	{
 		_columns.push_back(MetaColumn(
 			i,                               // position
@@ -196,9 +196,9 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	_lengths.resize(count);
 	_isNull.resize(count);
 
-	size_t offset = 0;
+	std::size_t offset = 0;
 
-	{for (size_t i = 0; i < count; i++)
+	{for (std::size_t i = 0; i < count; i++)
 	{
 		std::memset(&_row[i], 0, sizeof(MYSQL_BIND));
 
@@ -227,17 +227,17 @@ MYSQL_BIND* ResultMetadata::row()
 	return &_row[0];
 }
 
-size_t ResultMetadata::length(size_t pos) const
+std::size_t ResultMetadata::length(std::size_t pos) const
 {
 	return _lengths[pos];
 }
 
-const unsigned char* ResultMetadata::rawData(size_t pos) const 
+const unsigned char* ResultMetadata::rawData(std::size_t pos) const 
 {
 	return reinterpret_cast<const unsigned char*>(_row[pos].buffer);
 }
 
-bool ResultMetadata::isNull(size_t pos) const 
+bool ResultMetadata::isNull(std::size_t pos) const 
 {
 	return (_isNull[pos] != 0);
 }

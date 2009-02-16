@@ -226,9 +226,9 @@ void Binder::bind(std::size_t pos, const NullData&, Direction dir)
 }
 
 
-size_t Binder::size() const
+std::size_t Binder::size() const
 {
-	return _bindArray.size();
+	return static_cast<std::size_t>(_bindArray.size());
 }
 
 
@@ -245,7 +245,7 @@ MYSQL_BIND* Binder::getBindArray() const
 
 /*void Binder::updateDates()
 {
-	for (size_t i = 0; i < _dates.size(); i++)
+	for (std::size_t i = 0; i < _dates.size(); i++)
 	{
 		switch (_dates[i].mt.time_type)
 		{
@@ -282,7 +282,7 @@ void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer
 {
 	if (pos >= _bindArray.size())
 	{
-		size_t s = _bindArray.size();
+		std::size_t s = static_cast<std::size_t>(_bindArray.size());
 		_bindArray.resize(pos + 1);
 
 		std::memset(&_bindArray[s], 0, sizeof(MYSQL_BIND) * (_bindArray.size() - s));

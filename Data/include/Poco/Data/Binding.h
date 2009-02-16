@@ -337,7 +337,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _val.size();
+		return static_cast<std::size_t>(_val.size());
 	}
 
 	bool canBind() const
@@ -481,7 +481,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _val.size();
+		return static_cast<std::size_t>(_val.size());
 	}
 
 	bool canBind() const
@@ -558,7 +558,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _deq.size();
+		return static_cast<std::size_t>(_deq.size());
 	}
 
 	bool canBind() const
@@ -873,7 +873,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _val.size();
+		return static_cast<std::size_t>(_val.size());
 	}
 
 	bool canBind() const
@@ -1000,7 +1000,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _val.size();
+		return static_cast<std::size_t>(_val.size());
 	}
 
 	bool canBind() const
@@ -1127,7 +1127,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _val.size();
+		return static_cast<std::size_t>(_val.size());
 	}
 
 	bool canBind() const
@@ -1254,7 +1254,7 @@ public:
 
 	std::size_t numOfRowsHandled() const
 	{
-		return _val.size();
+		return static_cast<std::size_t>(_val.size());
 	}
 
 	bool canBind() const

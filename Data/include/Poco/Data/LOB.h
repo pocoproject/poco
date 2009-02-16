@@ -193,7 +193,7 @@ public:
 	std::size_t size() const
 		/// Returns the size of the LOB in bytes.
 	{
-		return _pContent->size();
+		return static_cast<std::size_t>(_pContent->size());
 	}
 
 private:

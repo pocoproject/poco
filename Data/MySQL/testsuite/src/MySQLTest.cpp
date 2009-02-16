@@ -493,7 +493,7 @@ void MySQLTest::testSessionTransaction()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreatePersonBLOBTable();
+	recreatePersonTable();
 	_pExecutor->sessionTransaction(_dbConnString);
 }
 
@@ -502,7 +502,7 @@ void MySQLTest::testTransaction()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreatePersonBLOBTable();
+	recreatePersonTable();
 	_pExecutor->transaction(_dbConnString);
 }
 

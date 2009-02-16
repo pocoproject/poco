@@ -83,8 +83,6 @@ class Data_API SQLChannel: public Poco::Channel
 	/// a risk of long blocking periods in case of remote server communication delays.
 {
 public:
-	typedef Statement::ResultType ResultType;
-
 	SQLChannel();
 		/// Creates SQLChannel.
 
@@ -145,7 +143,7 @@ public:
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 
-	ResultType wait();
+	std::size_t wait();
 		/// Waits for the completion of the previous operation and returns
 		/// the result. If chanel is in synchronous mode, returns 0 immediately.
 
@@ -217,7 +215,7 @@ private:
 // inlines
 //
 
-inline SQLChannel::ResultType SQLChannel::wait()
+inline std::size_t SQLChannel::wait()
 {
 	if (_async && _pLogStatement) 
 		return _pLogStatement->wait(_timeout);

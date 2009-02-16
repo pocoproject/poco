@@ -43,6 +43,8 @@
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/Data/MySQL/SessionHandle.h"
+#include "Poco/Data/MySQL/StatementExecutor.h"
+#include "Poco/Data/MySQL/ResultMetadata.h"
 #include "Poco/Mutex.h"
 
 

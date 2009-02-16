@@ -142,7 +142,7 @@ void SQLiteStatementImpl::compileImpl()
 
 	if (colCount)
 	{
-		Poco::UInt32 curDataSet = currentDataSet();
+		std::size_t curDataSet = currentDataSet();
 		if (curDataSet >= _columns.size()) _columns.resize(curDataSet + 1);
 		for (int i = 0; i < colCount; ++i)
 		{
@@ -252,7 +252,7 @@ bool SQLiteStatementImpl::hasNext()
 }
 
 
-Poco::UInt32 SQLiteStatementImpl::next()
+std::size_t SQLiteStatementImpl::next()
 {
 	if (SQLITE_ROW == _nextResponse)
 	{
@@ -284,21 +284,21 @@ Poco::UInt32 SQLiteStatementImpl::next()
 }
 
 
-Poco::UInt32 SQLiteStatementImpl::columnsReturned() const
+std::size_t SQLiteStatementImpl::columnsReturned() const
 {
-	return (Poco::UInt32) _columns[currentDataSet()].size();
+	return (std::size_t) _columns[currentDataSet()].size();
 }
 
 
-const MetaColumn& SQLiteStatementImpl::metaColumn(Poco::UInt32 pos) const
+const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 {
-	Poco::UInt32 curDataSet = currentDataSet();
+	std::size_t curDataSet = currentDataSet();
 	poco_assert (pos >= 0 && pos <= _columns[curDataSet].size());
 	return _columns[curDataSet][pos];
 }
 
 
-Poco::UInt32 SQLiteStatementImpl::affectedRowCount() const
+std::size_t SQLiteStatementImpl::affectedRowCount() const
 {
 	return _affectedRowCount ? _affectedRowCount : sqlite3_changes(_pDB);
 }
