@@ -7,7 +7,7 @@
 // All rights reserved.
 //
 // This is unpublished proprietary source code of Applied Informatics.
-// The contents of this file may not be disclosed to third parties, 
+// The contents of this file may not be disclosed to third parties,
 // copied or duplicated in any form, in whole or in part.
 //
 
@@ -35,6 +35,7 @@
 #include "http_request.h"
 #include "util_filter.h"
 
+#include <memory>
 
 using Poco::Net::HTTPServerRequest;
 using Poco::Net::HTTPServerResponse;
@@ -160,39 +161,39 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 {
 	ApacheRequestRec rec(r);
 	ApacheApplication& app(ApacheApplication::instance());
-	
+
 	try
 	{
 		// ensure application is ready
 		app.setup();
-		
+
 		// if the ApacheRequestHandler declines handling - we stop
 		// request handling here and let other modules do their job!
 		if (!app.factory().mustHandle(r->uri))
 			return DECLINED;
 
 	    apr_status_t rv;
-		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK))) 
-			return rv; 
+		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK)))
+			return rv;
 
 		std::auto_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
-			&rec, 
-			r->connection->local_ip, 
+			&rec,
+			r->connection->local_ip,
 			r->connection->local_addr->port,
-			r->connection->remote_ip, 
+			r->connection->remote_ip,
 			r->connection->remote_addr->port));
 
 		std::auto_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
 
 		// add header information to request
 		rec.copyHeaders(*pRequest);
-		
+
 		try
 		{
 			std::auto_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
 
 			if (pHandler.get())
-			{				
+			{
 				pHandler->handleRequest(*pRequest, *pResponse);
 			}
 			else
@@ -260,25 +261,25 @@ extern "C" const char* ApacheConnector_config(cmd_parms *cmd, void *in_dconf, co
 }
 
 
-extern "C" const command_rec ApacheConnector_cmds[] = 
+extern "C" const command_rec ApacheConnector_cmds[] =
 {
     AP_INIT_RAW_ARGS(
-		"AddPocoRequestHandler", 
-		reinterpret_cast<cmd_func>(ApacheConnector_uris), 
+		"AddPocoRequestHandler",
+		reinterpret_cast<cmd_func>(ApacheConnector_uris),
 		NULL,
-		RSRC_CONF, 
+		RSRC_CONF,
 		"POCO RequestHandlerFactory class name followed by shared library path followed by a list of ' ' separated URIs that must be handled by this module."),
     AP_INIT_RAW_ARGS(
-		"AddPocoConfig", 
-		reinterpret_cast<cmd_func>(ApacheConnector_config), 
+		"AddPocoConfig",
+		reinterpret_cast<cmd_func>(ApacheConnector_config),
 		NULL,
-		RSRC_CONF, 
+		RSRC_CONF,
 		"Path of the POCO configuration file."),
     { NULL }
 };
 
 
-module AP_MODULE_DECLARE_DATA poco_module = 
+module AP_MODULE_DECLARE_DATA poco_module =
 {
 	STANDARD20_MODULE_STUFF,
 	NULL,
