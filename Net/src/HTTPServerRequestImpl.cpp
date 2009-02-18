@@ -1,7 +1,7 @@
 //
 // HTTPServerRequestImpl.cpp
 //
-// $Id: //poco/svn/Net/src/HTTPServerRequestImpl.cpp#2 $
+// $Id: //poco/Main/Net/src/HTTPServerRequestImpl.cpp#4 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -57,12 +57,8 @@ const std::string HTTPServerRequestImpl::EXPECT("Expect");
 HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPServerSession& session, HTTPServerParams* pParams):
 	_response(response),
 	_pStream(0),
-	_pParams(pParams)
+	_pParams(pParams, true)
 {
-	poco_check_ptr (_pParams);
-	
-	_pParams->duplicate();
-
 	HTTPHeaderInputStream hs(session);
 	read(hs);
 	
@@ -83,7 +79,6 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPS
 
 HTTPServerRequestImpl::~HTTPServerRequestImpl()
 {
-	_pParams->release();
 	delete _pStream;
 }
 
