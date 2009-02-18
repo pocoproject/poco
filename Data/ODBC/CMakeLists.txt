@@ -1,22 +1,26 @@
-set(LIBNAME "PocoData")
+set(LIBNAME "PocoODBC")
 set(LIBNAMED "${LIBNAME}d")
 
 set(SRCS "")
 aux_source_directory(src SRCS)
+
+add_definitions( ${ODBC_CFLAGS} )
+
+include_directories( include )
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES COMPILE_FLAGS ${DEBUG_CXX_FLAGS}
 	VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}
 	SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-target_link_libraries( ${LIBNAME} PocoFoundation )
+target_link_libraries( ${LIBNAME} PocoData PocoFoundation ${ODBC_LINK_FLAGS})
 
 add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAMED}  
 	PROPERTIES COMPILE_FLAGS "${RELEASE_CXX_FLAGS}" 
 	VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}
 	SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-target_link_libraries( ${LIBNAMED} PocoFoundationd )
+target_link_libraries( ${LIBNAMED} PocoDatad PocoFoundationd ${ODBC_LINK_FLAGS})
 
 install(
     DIRECTORY include/Poco
@@ -27,13 +31,5 @@ install(
     TARGETS ${LIBNAME} ${LIBNAMED}
     DESTINATION lib
     )
-
-add_subdirectory( SQLite )
-if(MYSQL_FOUND)
-    add_subdirectory( MySQL )
-endif(MYSQL_FOUND)
-if(ODBC_CONFIG)
-#    add_subdirectory( ODBC )
-endif(ODBC_CONFIG)
 
 #add_subdirectory( testsuite )

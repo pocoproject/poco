@@ -18,5 +18,16 @@ set_target_properties( ${LIBNAMED}
 	SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 target_link_libraries( ${LIBNAMED} PocoFoundationd )
 
+install(
+    DIRECTORY include/Poco
+    DESTINATION include
+    )
+    
+install(
+    TARGETS ${LIBNAME} ${LIBNAMED}
+    DESTINATION lib
+    )
+
 add_subdirectory( ExtJS )
+
 #add_subdirectory( testsuite )
