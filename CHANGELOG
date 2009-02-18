@@ -1,5 +1,21 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.3.4 (2009-02-xx)
+==========================
+
+- fixed SF# 2611804: PropertyFileConfiguration continuation lines
+- fixed SF# 2529788: ServerApplication::beDaemon() broken
+- fixed SF# 2445467: Bug in Thread_WIN32.cpp
+- Improved performance of HTTP Server by removing some
+  string copy operations
+- fixed SF# 2310735: HTTPServer: Keep-Alive only works with send()
+- fixed appinf.com IP address in Net testsuite
+- fixed RFC-00188: NumberFormatter and float/double numbers
+- added --pidfile option to ServerApplication on Unix
+- fixed SF# 2499504: Bug in Win32_Thread when using from dll (fixed also for POSIX threads)
+- fixed SF# 2465794: HTTPServerRequestImpl memory leak
+
+
 Release 1.3.3p1 (2008-10-09)
 ============================
 
@@ -928,4 +944,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#35 $
+$Id: //poco/1.3/dist/CHANGELOG#36 $
