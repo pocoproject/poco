@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#7 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#8 $
 //
 // Library: Util
 // Package: Application
@@ -467,9 +467,14 @@ void ServerApplication::beDaemon()
 	
 	setsid();
 	umask(0);
-	close(0);
-	close(1);
-	close(2);
+	
+	// attach stdin, stdout, stderr to /dev/null
+	// instead of just closing them. This avoids
+	// issues with third party/legacy code writing
+	// stuff to stdout/stderr.
+	freopen("/dev/null", "r+", stdin);
+	freopen("/dev/null", "r+", stdout);
+	freopen("/dev/null", "r+", stderr);
 }
 
 

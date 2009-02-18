@@ -1,7 +1,7 @@
 //
 // SocketAddressTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketAddressTest.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/SocketAddressTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -84,7 +84,7 @@ void SocketAddressTest::testSocketAddress()
 	}
 	
 	SocketAddress sa4("www.appinf.com", 80);
-	assert (sa4.host().toString() == "213.229.60.82");
+	assert (sa4.host().toString() == "216.146.46.35");
 	assert (sa4.port() == 80);
 	
 	try

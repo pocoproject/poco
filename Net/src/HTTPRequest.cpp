@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#4 $
+// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#6 $
 //
 // Library: Net
 // Package: HTTP
@@ -136,6 +136,7 @@ const std::string& HTTPRequest::getHost() const
 void HTTPRequest::setCookies(const NameValueCollection& cookies)
 {
 	std::string cookie;
+	cookie.reserve(64);
 	for (NameValueCollection::ConstIterator it = cookies.begin(); it != cookies.end(); ++it)
 	{
 		if (it != cookies.begin())
@@ -207,6 +208,9 @@ void HTTPRequest::read(std::istream& istr)
 	std::string method;
 	std::string uri;
 	std::string version;
+	method.reserve(16);
+	uri.reserve(64);
+	version.reserve(16);
 	int ch = istr.get();
 	if (ch == eof) throw NoMessageException();
 	while (std::isspace(ch)) ch = istr.get();

@@ -1,7 +1,7 @@
 //
 // HTTPServerResponseImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPServerResponseImpl.cpp#2 $
+// $Id: //poco/1.3/Net/src/HTTPServerResponseImpl.cpp#4 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -68,8 +68,6 @@ HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPServerSession& session):
 	_session(session),
 	_pStream(0)
 {
-	Timestamp now;
-	setDate(now);
 }
 
 
@@ -128,7 +126,7 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 	Poco::FileInputStream istr(path);
 	if (istr.good())
 	{
-		_pStream = new HTTPOutputStream(_session);
+		_pStream = new HTTPHeaderOutputStream(_session);
 		write(*_pStream);
 		StreamCopier::copyStream(istr, *_pStream);
 	}
@@ -143,7 +141,7 @@ void HTTPServerResponseImpl::sendBuffer(const void* pBuffer, std::size_t length)
 	setContentLength(static_cast<int>(length));
 	setChunkedTransferEncoding(false);
 	
-	_pStream = new HTTPOutputStream(_session);
+	_pStream = new HTTPHeaderOutputStream(_session);
 	write(*_pStream);
 	_pStream->write(static_cast<const char*>(pBuffer), static_cast<std::streamsize>(length));
 }

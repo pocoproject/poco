@@ -1,7 +1,7 @@
 //
 // PropertyFileConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/PropertyFileConfigurationTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/PropertyFileConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -66,8 +66,8 @@ void PropertyFileConfigurationTest::testLoad()
 		"prop3.prop31: value3\n"
 		"# comment\n"
 		"  prop3.prop32: value 4\n"
-		"prop3.prop33: value5, value6,\\\n"
-		"value7, value8,\\\r\n"
+		"prop3.prop33: value5, value6, \\\n"
+		"value7, value8, \\\r\n"
 		"value9\n"
 		"prop4 = escaped[\\t\\r\\n\\f]\n"
 		"#prop4 = foo\n"

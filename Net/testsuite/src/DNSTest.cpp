@@ -1,7 +1,7 @@
 //
 // DNSTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/DNSTest.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/DNSTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -64,7 +64,7 @@ void DNSTest::testHostByName()
 	assert (!he1.aliases().empty());
 	assert (he1.aliases()[0] == "www.appinf.com");
 	assert (he1.addresses().size() == 1);
-	assert (he1.addresses()[0].toString() == "213.229.60.82");
+	assert (he1.addresses()[0].toString() == "216.146.46.35");
 	
 	try
 	{

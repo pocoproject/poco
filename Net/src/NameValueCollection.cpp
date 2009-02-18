@@ -1,7 +1,7 @@
 //
 // NameValueCollection.cpp
 //
-// $Id: //poco/1.3/Net/src/NameValueCollection.cpp#1 $
+// $Id: //poco/1.3/Net/src/NameValueCollection.cpp#2 $
 //
 // Library: Net
 // Package: Messages
@@ -92,8 +92,9 @@ void NameValueCollection::set(const std::string& name, const std::string& value)
 {
 	Iterator it = _map.find(name);
 	if (it != _map.end())
-		_map.erase(it);
-	_map.insert(HeaderMap::value_type(name, value));
+		it->second = value;
+	else
+		_map.insert(HeaderMap::value_type(name, value));
 }
 
 	

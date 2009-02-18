@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/1.3/Foundation/src/Thread_WIN32.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/Thread_WIN32.cpp#7 $
 //
 // Library: Foundation
 // Package: Threading
@@ -43,7 +43,7 @@
 namespace Poco {
 
 
-DWORD ThreadImpl::_currentKey = TLS_OUT_OF_INDEXES;
+ThreadImpl::CurrentThreadHolder ThreadImpl::_currentThreadHolder;
 
 
 ThreadImpl::ThreadImpl():
@@ -52,12 +52,6 @@ ThreadImpl::ThreadImpl():
 	_prio(PRIO_NORMAL_IMPL),
 	_stackSize(POCO_THREAD_STACK_SIZE)
 {
-	if (_currentKey == TLS_OUT_OF_INDEXES)
-	{
-		_currentKey = TlsAlloc();
-		if (_currentKey == TLS_OUT_OF_INDEXES)
-			throw SystemException("cannot allocate thread context key");
-	}
 }
 
 			
@@ -178,10 +172,7 @@ void ThreadImpl::threadCleanup()
 
 ThreadImpl* ThreadImpl::currentImpl()
 {
-	if (_currentKey == TLS_OUT_OF_INDEXES)
-		return 0;
-	else
-		return (ThreadImpl*) TlsGetValue(_currentKey);
+	return _currentThreadHolder.get();
 }
 
 
@@ -191,7 +182,7 @@ DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
 unsigned __stdcall ThreadImpl::runnableEntry(void* pThread)
 #endif
 {
-	TlsSetValue(_currentKey, pThread);
+	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
 	try
 	{
 		reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
@@ -218,7 +209,7 @@ DWORD WINAPI ThreadImpl::callableEntry(LPVOID pThread)
 unsigned __stdcall ThreadImpl::callableEntry(void* pThread)
 #endif
 {
-	TlsSetValue(_currentKey, pThread);
+	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
 	try
 	{
 		ThreadImpl* pTI = reinterpret_cast<ThreadImpl*>(pThread);

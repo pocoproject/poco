@@ -1,7 +1,7 @@
 //
 // HTTPServerRequestImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerRequestImpl.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerRequestImpl.h#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -43,6 +43,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/AutoPtr.h"
 #include <istream>
 
 
@@ -92,12 +93,15 @@ public:
 	HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response.
 
+protected:
+	static const std::string EXPECT;
+	
 private:
-	HTTPServerResponse& _response;
-	std::istream*       _pStream;
-	HTTPServerParams*   _pParams;
-	SocketAddress       _clientAddress;
-	SocketAddress       _serverAddress;
+	HTTPServerResponse&             _response;
+	std::istream*                   _pStream;
+	Poco::AutoPtr<HTTPServerParams> _pParams;
+	SocketAddress                   _clientAddress;
+	SocketAddress                   _serverAddress;
 };
 
 

@@ -1,7 +1,7 @@
 //
 // Environment_WIN32.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_WIN32.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Environment_WIN32.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -37,6 +37,7 @@
 #include "Poco/Environment_WIN32.h"
 #include "Poco/Exception.h"
 #include <sstream>
+#include <cstring>
 #include "Poco/UnWindows.h"
 #include <iphlpapi.h>
 

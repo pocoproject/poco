@@ -1,7 +1,7 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#3 $
+// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#4 $
 //
 // Library: Net
 // Package: HTTP
@@ -237,7 +237,9 @@ void HTTPCookie::setHttpOnly(bool flag)
 
 std::string HTTPCookie::toString() const
 {
-	std::string result(_name);
+	std::string result;
+	result.reserve(256);
+	result.append(_name);
 	result.append("=");
 	if (_version == 0)
 	{

@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPServerConnection.cpp#4 $
+// $Id: //poco/1.3/Net/src/HTTPServerConnection.cpp#5 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -43,6 +43,7 @@
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/Timestamp.h"
 #include <memory>
 
 
@@ -79,6 +80,8 @@ void HTTPServerConnection::run()
 			HTTPServerResponseImpl response(session);
 			HTTPServerRequestImpl request(response, session, _pParams);
 			
+			Poco::Timestamp now;
+			response.setDate(now);
 			response.setVersion(request.getVersion());
 			response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
 			if (!server.empty())
