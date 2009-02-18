@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#6 $
+// $Id: //poco/Main/Foundation/src/Thread_POSIX.cpp#20 $
 //
 // Library: Foundation
 // Package: Threading
@@ -75,19 +75,12 @@ namespace
 namespace Poco {
 
 
-pthread_key_t ThreadImpl::_currentKey;
-bool ThreadImpl::_haveCurrentKey = false;
+ThreadImpl::CurrentThreadHolder ThreadImpl::_currentThreadHolder;
 
 
 ThreadImpl::ThreadImpl():
 	_pData(new ThreadData)
 {
-	if (!_haveCurrentKey)
-	{
-		if (pthread_key_create(&_currentKey, NULL))
-			throw SystemException("cannot allocate thread context key");
-		_haveCurrentKey = true;
-	}
 }
 
 			
@@ -263,16 +256,13 @@ bool ThreadImpl::joinImpl(long milliseconds)
 
 ThreadImpl* ThreadImpl::currentImpl()
 {
-	if (_haveCurrentKey)
-		return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_currentKey));
-	else
-		return 0;
+	return _currentThreadHolder.get();
 }
 
 
 void* ThreadImpl::runnableEntry(void* pThread)
 {
-	pthread_setspecific(_currentKey, pThread);
+	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	sigset_t sset;
@@ -310,7 +300,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 
 void* ThreadImpl::callableEntry(void* pThread)
 {
-	pthread_setspecific(_currentKey, pThread);
+	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	sigset_t sset;

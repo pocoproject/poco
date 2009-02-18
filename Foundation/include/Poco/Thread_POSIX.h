@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Thread_POSIX.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread_POSIX.h#8 $
 //
 // Library: Foundation
 // Package: Threading
@@ -108,6 +108,31 @@ protected:
 	static int reverseMapPrio(int osPrio);
 
 private:
+	class CurrentThreadHolder
+	{
+	public:
+		CurrentThreadHolder()
+		{
+			if (pthread_key_create(&_key, NULL))
+				throw SystemException("cannot allocate thread context key");
+		}
+		~CurrentThreadHolder()
+		{
+			pthread_key_delete(_key);
+		}
+		ThreadImpl* get() const
+		{
+			return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_key));
+		}
+		void set(ThreadImpl* pThread)
+		{
+			pthread_setspecific(_key, pThread);
+		}
+	
+	private:
+		pthread_key_t _key;
+	};
+
 	struct ThreadData: public RefCountedObject
 	{
 		ThreadData():
@@ -131,8 +156,7 @@ private:
 
 	AutoPtr<ThreadData> _pData;
 
-	static pthread_key_t _currentKey;
-	static bool          _haveCurrentKey;
+	static CurrentThreadHolder _currentThreadHolder;
 	
 #if defined(POCO_OS_FAMILY_UNIX)
 	SignalHandler::JumpBufferVec _jumpBufferVec;

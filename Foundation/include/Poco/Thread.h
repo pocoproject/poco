@@ -1,7 +1,7 @@
 //
 // Thread.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Thread.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread.h#7 $
 //
 // Library: Foundation
 // Package: Threading

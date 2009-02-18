@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Thread_WIN32.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Thread_WIN32.h#8 $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the ThreadImpl class for WIN32.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -116,13 +116,38 @@ protected:
 	void threadCleanup();
 
 private:
+	class CurrentThreadHolder
+	{
+	public:
+		CurrentThreadHolder(): _slot(TlsAlloc())
+		{
+			if (_slot == TLS_OUT_OF_INDEXES)
+				throw SystemException("cannot allocate thread context key");
+		}
+		~CurrentThreadHolder()
+		{
+			TlsFree(_slot);
+		}
+		ThreadImpl* get() const
+		{
+			return reinterpret_cast<ThreadImpl*>(TlsGetValue(_slot));
+		}
+		void set(ThreadImpl* pThread)
+		{
+			TlsSetValue(_slot, pThread);
+		}
+	
+	private:
+		DWORD _slot;
+	};
+
 	Runnable*    _pRunnableTarget;
 	CallbackData _callbackTarget;
 	HANDLE       _thread;
 	int          _prio;
 	int          _stackSize;
 
-	static DWORD _currentKey;
+	static CurrentThreadHolder _currentThreadHolder;
 };
 
 
