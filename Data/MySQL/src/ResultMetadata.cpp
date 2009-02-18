@@ -36,6 +36,7 @@
 
 #include "Poco/Data/MySQL/ResultMetadata.h"
 #include "Poco/Data/MySQL/MySQLException.h"
+#include <cstring>
 
 namespace
 {
