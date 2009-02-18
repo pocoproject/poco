@@ -1,7 +1,7 @@
 //
 // ZipFileInfo.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipFileInfo.cpp#4 $
+// $Id: //poco/1.3/Zip/src/ZipFileInfo.cpp#5 $
 //
 // Library: Zip
 // Package: Zip
@@ -69,6 +69,9 @@ ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 	setLastModifiedAt(header.lastModifiedAt());
 	setEncryption(false);
 	setFileName(header.getFileName());
+
+	if (getHostSystem() == ZipCommon::HS_UNIX)
+		setUnixAttributes();
 }
 
 
@@ -137,6 +140,19 @@ std::string ZipFileInfo::createHeader() const
 	result.append(_extraField);
 	result.append(_fileComment);
 	return result;
+}
+
+
+void ZipFileInfo::setUnixAttributes()
+{
+	bool isDir = isDirectory();
+	int mode;
+	if (isDir)
+		mode = DEFAULT_UNIX_DIR_MODE;
+	else
+		mode = DEFAULT_UNIX_FILE_MODE;
+	Poco::UInt32 attrs = (mode << 16) | (isDir ? 0x10 : 0);
+	setExternalFileAttributes(attrs);
 }
 
 

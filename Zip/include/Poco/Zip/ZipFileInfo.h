@@ -1,7 +1,7 @@
 //
 // ZipFileInfo.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipFileInfo.h#3 $
+// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipFileInfo.h#4 $
 //
 // Library: Zip
 // Package: Zip
@@ -138,6 +138,8 @@ private:
 	void setFileNameLength(Poco::UInt16 size);
 
 	void setFileName(const std::string& str);
+	
+	void setExternalFileAttributes(Poco::UInt32 attrs);
 
 	void parse(std::istream& in, bool assumeHeaderRead);
 
@@ -156,6 +158,8 @@ private:
 	Poco::UInt16 getFileCommentLength() const;
 
 	Poco::UInt32 getExternalFileAttributes() const;
+	
+	void setUnixAttributes();
 
 private:
 	enum
@@ -194,6 +198,12 @@ private:
 		RELATIVEOFFSETLOCALHEADER_POS = EXTERNALFILE_ATTR_POS + EXTERNALFILE_ATTR_SIZE,
 		RELATIVEOFFSETLOCALHEADER_SIZE = 4,
 		FULLHEADER_SIZE = 46
+	};
+	
+	enum 
+	{
+		DEFAULT_UNIX_FILE_MODE = 0640,
+		DEFAULT_UNIX_DIR_MODE  = 0755
 	};
 
 	char           _rawInfo[FULLHEADER_SIZE];
@@ -459,6 +469,12 @@ inline void ZipFileInfo::setFileName(const std::string& str)
 {
 	_fileName = str;
 	setFileNameLength(static_cast<Poco::UInt16>(str.size()));
+}
+
+
+inline void ZipFileInfo::setExternalFileAttributes(Poco::UInt32 attrs)
+{
+	ZipUtil::set32BitValue(attrs, _rawInfo, EXTERNALFILE_ATTR_POS);
 }
 
 
