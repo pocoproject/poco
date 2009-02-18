@@ -1,7 +1,7 @@
 //
 // Compress.cpp
 //
-// $Id: //poco/1.3/Zip/src/Compress.cpp#4 $
+// $Id: //poco/Main/Zip/src/Compress.cpp#8 $
 //
 // Library: Zip
 // Package: Zip
@@ -180,7 +180,6 @@ void Compress::addFile(const Poco::Path& file, const Poco::Path& fileName, ZipCo
 		cm = ZipCommon::CM_STORE;
 		cl = ZipCommon::CL_NORMAL;
 	}
-	
 	std::ifstream in(file.toString().c_str(), std::ios::binary);
 	if (!in.good())
 		throw ZipException("Invalid input stream for " + aFile.path());
@@ -189,6 +188,7 @@ void Compress::addFile(const Poco::Path& file, const Poco::Path& fileName, ZipCo
 		Poco::File aParent(file.parent());
 		addDirectory(fileName.parent(), aParent.getLastModified());
 	}
+
 	addFile(in, aFile.getLastModified(), fileName, cm, cl);
 }
 

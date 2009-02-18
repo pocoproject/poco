@@ -1,7 +1,7 @@
 //
 // ZipStream.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipStream.cpp#4 $
+// $Id: //poco/Main/Zip/src/ZipStream.cpp#14 $
 //
 // Library: Zip
 // Package: Zip
