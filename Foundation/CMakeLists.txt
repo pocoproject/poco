@@ -200,7 +200,6 @@ target_link_libraries( ${LIBNAMED} dl rt)
 install(
     DIRECTORY include/Poco
     DESTINATION include
-    FILES_MATCHING PATTERN "*.h"
     )
     
 install(
