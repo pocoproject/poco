@@ -65,3 +65,4 @@ install(
     )
 
 add_subdirectory( testsuite )
+add_subdirectory( samples )

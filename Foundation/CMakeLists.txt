@@ -131,6 +131,8 @@ set( BASE_SRCS
   src/UUIDGenerator.cpp
   src/Unicode.cpp
   src/UnicodeConverter.cpp
+  src/Var.cpp
+  src/VarHolder.cpp
   src/Void.cpp
   src/Windows1252Encoding.cpp
   src/adler32.c
@@ -207,4 +209,5 @@ install(
     DESTINATION lib
     )
     
+add_subdirectory( samples )
 #add_subdirectory( testsuite )

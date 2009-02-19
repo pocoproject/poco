@@ -36,4 +36,5 @@ if(ODBC_CONFIG)
 #    add_subdirectory( ODBC )
 endif(ODBC_CONFIG)
 
+add_subdirectory( samples )
 #add_subdirectory( testsuite )

@@ -3,8 +3,8 @@ if(WITH_UNIXODBC)
 	find_program(ODBC_CONFIG odbc_config $ENV{ODBC_PATH}/bin PATHS)
 		
 	if(NOT ODBC_CONFIG)
-		message(FATAL_ERROR "Couldn't find unixODBC")
-	endif(NOT ODBC_CONFIG)
+		message(STATUS "Couldn't find unixODBC")
+	else(NOT ODBC_CONFIG)
 
 	message(STATUS "unixODBC: Found odbc_config in ${ODBC_CONFIG}")
 
@@ -12,14 +12,15 @@ if(WITH_UNIXODBC)
 	set (CMAKE_FLAGS "${CMAKE_FLAGS} -I${ODBC_INCLUDE_DIR}")
 
 	exec_program(${ODBC_CONFIG} ARGS "--libs" OUTPUT_VARIABLE ODBC_LINK_FLAGS)
+	endif(NOT ODBC_CONFIG)
 
 else(WITH_UNIXODBC)
 
 	find_program(ODBC_CONFIG iodbc-config $ENV{ODBC_PATH}/bin PATHS)
 		
 	if(NOT ODBC_CONFIG)
-		message(FATAL_ERROR "Couldn't find iODBC")
-	endif(NOT ODBC_CONFIG)
+		message(STATUS "Couldn't find iODBC")
+	else(NOT ODBC_CONFIG)
 
 	message(STATUS "iODBC: Found iodbc-config in ${ODBC_CONFIG}")
 
@@ -27,6 +28,7 @@ else(WITH_UNIXODBC)
 	set(CMAKE_FLAGS "${CMAKE_FLAGS} ${ODBC_CFLAGS}")
 
 	exec_program(${ODBC_CONFIG} ARGS "--libs" OUTPUT_VARIABLE ODBC_LINK_FLAGS)
+	endif(NOT ODBC_CONFIG)
 		
 endif(WITH_UNIXODBC)
 

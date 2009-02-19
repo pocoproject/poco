@@ -47,11 +47,9 @@ endif(MYSQL_LIB)
 
 if (MYSQL_INCLUDE_DIR AND MYSQL_LIB_DIR)
 	set(MYSQL_FOUND TRUE)
-
 	message(STATUS "MySQL Include directory: ${MYSQL_INCLUDE_DIR}  library directory: ${MYSQL_LIB_DIR}")
-
 	include_directories(${MYSQL_INCLUDE_DIR})
 	link_directories(${MYSQL_LIB_DIR})
 else (MYSQL_INCLUDE_DIR AND MYSQL_LIB_DIR)
-	message(WARNING "Cannot find MySQL, include directory: ${MYSQL_INCLUDE_DIR} library directory: ${MYSQL_LIB_DIR}")
+	message(STATUS "Cannot find MySQL, include directory: ${MYSQL_INCLUDE_DIR} library directory: ${MYSQL_LIB_DIR}")
 endif (MYSQL_INCLUDE_DIR AND MYSQL_LIB_DIR)
