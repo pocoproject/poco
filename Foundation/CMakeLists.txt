@@ -114,6 +114,7 @@ set( BASE_SRCS
   src/TextEncoding.cpp
   src/TextIterator.cpp
   src/Thread.cpp
+  src/ThreadTarget.cpp
   src/ThreadLocal.cpp
   src/ThreadPool.cpp
   src/Timer.cpp
@@ -210,4 +211,4 @@ install(
     )
     
 add_subdirectory( samples )
-#add_subdirectory( testsuite )
+add_subdirectory( testsuite )

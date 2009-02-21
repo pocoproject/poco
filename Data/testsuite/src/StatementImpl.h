@@ -40,7 +40,7 @@
 #include "Poco/SharedPtr.h"
 #include "Binder.h"
 #include "Extractor.h"
-#include "Preparation.h"
+#include "Preparator.h"
 
 
 struct sqlite3;

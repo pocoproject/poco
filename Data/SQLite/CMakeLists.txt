@@ -32,4 +32,4 @@ install(
     DESTINATION lib
     )
 
-#add_subdirectory( testsuite )
+add_subdirectory( testsuite )
