@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/svn/Net/src/HTTPClientSession.cpp#2 $
+// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#20 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -301,7 +301,7 @@ std::string HTTPClientSession::getHostInfo() const
 	std::string result("http://");
 	result.append(_host);
 	result.append(":");
-	result.append(NumberFormatter::format(_port));
+	NumberFormatter::append(result, _port);
 	return result;
 }
 

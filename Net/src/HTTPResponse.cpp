@@ -1,7 +1,7 @@
 //
 // HTTPResponse.cpp
 //
-// $Id: //poco/svn/Net/src/HTTPResponse.cpp#2 $
+// $Id: //poco/Main/Net/src/HTTPResponse.cpp#13 $
 //
 // Library: Net
 // Package: HTTP
@@ -212,7 +212,7 @@ void HTTPResponse::getCookies(std::vector<HTTPCookie>& cookies) const
 
 void HTTPResponse::write(std::ostream& ostr) const
 {
-	ostr << getVersion() << " " << NumberFormatter::format((int) _status) << " " << _reason << "\r\n";
+	ostr << getVersion() << " " << static_cast<int>(_status) << " " << _reason << "\r\n";
 	HTTPMessage::write(ostr);
 	ostr << "\r\n";
 }

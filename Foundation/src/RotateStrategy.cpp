@@ -1,7 +1,7 @@
 //
 // RotateStrategy.cpp
 //
-// $Id: //poco/1.3/Foundation/src/RotateStrategy.cpp#2 $
+// $Id: //poco/Main/Foundation/src/RotateStrategy.cpp#8 $
 //
 // Library: Foundation
 // Package: Logging
@@ -101,7 +101,7 @@ bool RotateByIntervalStrategy::mustRotate(LogFile* pFile)
 		{
 			_lastRotate.update();
 			std::string tag(ROTATE_TEXT);
-			tag += DateTimeFormatter::format(_lastRotate, DateTimeFormat::RFC1036_FORMAT);
+			DateTimeFormatter::append(tag, _lastRotate, DateTimeFormat::RFC1036_FORMAT);
 			pFile->write(tag);
 		}
 	}

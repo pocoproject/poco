@@ -1,13 +1,13 @@
 //
 // PropertyFileConfiguration.cpp
 //
-// $Id: //poco/svn/Util/src/PropertyFileConfiguration.cpp#2 $
+// $Id: //poco/Main/Util/src/PropertyFileConfiguration.cpp#11 $
 //
 // Library: Util
 // Package: Configuration
 // Module:  PropertyFileConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -150,34 +150,37 @@ void PropertyFileConfiguration::parseLine(std::istream& istr)
 
 int PropertyFileConfiguration::readChar(std::istream& istr)
 {
-	int c = istr.get();
-	if (c == '\\')
+	for (;;)
 	{
-		c = istr.get();
-		switch (c)
+		int c = istr.get();
+		if (c == '\\')
 		{
-		case 't':
-			return '\t';
-		case 'r':
-			return '\r';
-		case 'n':
-			return '\n';
-		case 'f':
-			return '\f';
-		case '\r':
-			if (istr.peek() == '\n')
-				istr.get();
-			return ' ';
-		case '\n':
-			return ' ';
-		default:
-			return c;
+			c = istr.get();
+			switch (c)
+			{
+			case 't':
+				return '\t';
+			case 'r':
+				return '\r';
+			case 'n':
+				return '\n';
+			case 'f':
+				return '\f';
+			case '\r':
+				if (istr.peek() == '\n')
+					istr.get();
+				continue;
+			case '\n':
+				continue;
+			default:
+				return c;
+			}
 		}
+		else if (c == '\n' || c == '\r')
+			return 0;
+		else
+			return c;
 	}
-	else if (c == '\n' || c == '\r')
-		return 0;
-	else
-		return c;
 }
 
 

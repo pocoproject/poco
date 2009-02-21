@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/svn/Foundation/src/URI.cpp#2 $
+// $Id: //poco/Main/Foundation/src/URI.cpp#15 $
 //
 // Library: Foundation
 // Package: URI
@@ -293,7 +293,7 @@ std::string URI::getAuthority() const
 	if (_port && !isWellKnownPort())
 	{
 		auth += ':';
-		auth.append(NumberFormatter::format(_port));
+		NumberFormatter::append(auth, _port);
 	}
 	return auth;
 }

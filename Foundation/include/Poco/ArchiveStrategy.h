@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/ArchiveStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/ArchiveStrategy.h#5 $
 //
 // Library: Foundation
 // Package: Logging
@@ -9,7 +9,7 @@
 //
 // Definition of the ArchiveStrategy class and subclasses.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -120,7 +120,7 @@ public:
 		delete pFile;
 		std::string archPath = path;
 		archPath.append(".");
-		archPath.append(DateTimeFormatter::format(DT().timestamp(), "%Y%m%d%H%M%S%i"));
+		DateTimeFormatter::append(archPath, DT().timestamp(), "%Y%m%d%H%M%S%i");
 		
 		if (exists(archPath)) archiveByNumber(archPath);
 		else moveFile(path, archPath);
@@ -129,7 +129,6 @@ public:
 	}
 
 private:
-
 	void archiveByNumber(const std::string& basePath)
 		/// A monotonic increasing number is appended to the
 		/// log file name. The most recent archived file
@@ -141,7 +140,7 @@ private:
 		{
 			path = basePath;
 			path.append(".");
-			path.append(NumberFormatter::format(++n));
+			NumberFormatter::append(path, ++n);
 		}
 		while (exists(path));
 		
@@ -151,16 +150,15 @@ private:
 			if (n > 0)
 			{
 				oldPath.append(".");
-				oldPath.append(NumberFormatter::format(n - 1));
+				NumberFormatter::append(oldPath, n - 1);
 			}
 			std::string newPath = basePath;
 			newPath.append(".");
-			newPath.append(NumberFormatter::format(n));
+			NumberFormatter::append(newPath, n);
 			moveFile(oldPath, newPath);
 			--n;
 		}
 	}
-
 };
 
 

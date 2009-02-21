@@ -1,7 +1,7 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/svn/Net/src/RemoteSyslogChannel.cpp#2 $
+// $Id: //poco/Main/Net/src/RemoteSyslogChannel.cpp#4 $
 //
 // Library: Net
 // Package: Logging
@@ -127,24 +127,24 @@ void RemoteSyslogChannel::log(const Message& msg)
 	std::string m;
 	m.reserve(1024);
 	m += '<';
-	m += Poco::NumberFormatter::format(getPrio(msg) + _facility);
+	Poco::NumberFormatter::append(m, getPrio(msg) + _facility);
 	m += '>';
 	if (_bsdFormat)
 	{
-		m += Poco::DateTimeFormatter::format(msg.getTime(), BSD_TIMEFORMAT);
+		Poco::DateTimeFormatter::append(m, msg.getTime(), BSD_TIMEFORMAT);
 		m += ' ';
 		m += _host;
 	}
 	else
 	{
 		m += "1 "; // version
-		m += Poco::DateTimeFormatter::format(msg.getTime(), SYSLOG_TIMEFORMAT);
+		Poco::DateTimeFormatter::append(m, msg.getTime(), SYSLOG_TIMEFORMAT);
 		m += ' ';
 		m += _host;
 		m += ' ';
 		m += _name;
 		m += ' ';
-		m += Poco::NumberFormatter::format(msg.getPid());
+		Poco::NumberFormatter::append(m, msg.getPid());
 		m += ' ';
 		m += msg.getSource();
 	}

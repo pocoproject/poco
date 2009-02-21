@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.cpp
 //
-// $Id: //poco/svn/Foundation/src/ArchiveStrategy.cpp#2 $
+// $Id: //poco/Main/Foundation/src/ArchiveStrategy.cpp#9 $
 //
 // Library: Foundation
 // Package: Logging
@@ -186,7 +186,7 @@ LogFile* ArchiveByNumberStrategy::archive(LogFile* pFile)
 	{
 		path = basePath;
 		path.append(".");
-		path.append(NumberFormatter::format(++n));
+		NumberFormatter::append(path, ++n);
 	}
 	while (exists(path));
 	
@@ -196,11 +196,11 @@ LogFile* ArchiveByNumberStrategy::archive(LogFile* pFile)
 		if (n > 0)
 		{
 			oldPath.append(".");
-			oldPath.append(NumberFormatter::format(n - 1));
+			NumberFormatter::append(oldPath, n - 1);
 		}
 		std::string newPath = basePath;
 		newPath.append(".");
-		newPath.append(NumberFormatter::format(n));
+		NumberFormatter::append(newPath, n);
 		moveFile(oldPath, newPath);
 		--n;
 	}
