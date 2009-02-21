@@ -24,6 +24,8 @@ include(FindOpenSSL)
 
 include(contrib/cmake/FindMySQL.cmake)
 include(contrib/cmake/FindODBC.cmake)
+include(contrib/cmake/FindAPR.cmake)
+include(contrib/cmake/FindApache2.cmake)
 
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
@@ -49,4 +51,7 @@ endif(OPENSSL_FOUND)
 add_subdirectory(Data)
 add_subdirectory(WebWidgets)
 add_subdirectory(Zip)
-#add_subdirectory(ApacheConnector)
+
+if(APRUTIL_FOUND AND APACHE_FOUND)
+    add_subdirectory(ApacheConnector)
+endif(APRUTIL_FOUND AND APACHE_FOUND)

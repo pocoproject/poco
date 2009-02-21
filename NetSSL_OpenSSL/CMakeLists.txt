@@ -26,3 +26,5 @@ install(
     TARGETS ${LIBNAME} ${LIBNAMED}
     DESTINATION lib
     )
+
+add_subdirectory( samples )
