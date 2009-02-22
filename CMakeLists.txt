@@ -49,14 +49,14 @@ if (CMAKE_SYSTEM MATCHES "Linux")
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
-  set(SYSLIBS  "pthread dl rt")
+  set(SYSLIBS  pthread dl rt)
 endif(CMAKE_SYSTEM MATCHES "Linux")
 
 if (CMAKE_SYSTEM MATCHES "SunOS")
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
   add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
-  set(SYSLIBS  std15D pthread rt nsl dl)
+  set(SYSLIBS  std15D pthread rt nsl dl socket)
 endif(CMAKE_SYSTEM MATCHES "SunOS")
 
 if (CMAKE_COMPILER_IS_MINGW)
