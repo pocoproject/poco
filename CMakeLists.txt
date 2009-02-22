@@ -41,13 +41,34 @@ include(contrib/cmake/FindApache2.cmake)
 
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
- add_definitions( -DPOCO_OS_FAMILY_WINDOWS)
-else (CMAKE_SYSTEM MATCHES "Windows")
- add_definitions( -DPOCO_OS_FAMILY_UNIX )
+ add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DPOCO_WIN32_UTF8)
+  set(SYSLIBS iphlpapi gdi32)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
-# Standard 'must be' defines
-add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
+if (CMAKE_SYSTEM MATCHES "Linux")
+  add_definitions( -DPOCO_OS_FAMILY_UNIX )
+  # Standard 'must be' defines
+  add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
+  set(SYSLIBS  "pthread dl rt")
+endif(CMAKE_SYSTEM MATCHES "Linux")
+
+if (CMAKE_SYSTEM MATCHES "SunOS")
+  add_definitions( -DPOCO_OS_FAMILY_UNIX )
+  # Standard 'must be' defines
+  add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
+  set(SYSLIBS  std15D pthread rt nsl dl)
+endif(CMAKE_SYSTEM MATCHES "SunOS")
+
+if (CMAKE_COMPILER_IS_MINGW)
+    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
+    add_definitions(-mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED )
+  link_directories(/usr/local/lib /usr/lib)
+  include_directories(/usr/local/include /usr/include)
+endif (CMAKE_COMPILER_IS_MINGW)
+
+if (CMAKE_COMPILER_IS_CYGWIN)
+#    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
+endif (CMAKE_COMPILER_IS_CYGWIN)
 
 add_subdirectory(CppUnit)
 add_subdirectory(Foundation)

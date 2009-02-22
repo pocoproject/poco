@@ -1,4 +1,4 @@
-set(SAMPLE_NAME "String>Tokenizer")
+set(SAMPLE_NAME "StringTokenizer")
 
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)

@@ -164,7 +164,6 @@ set( BASE_SRCS
   src/zutil.c
 )
 
-
 set(WIN_SRCS
   src/EventLogChannel.cpp
   src/WindowsConsoleChannel.cpp
@@ -182,23 +181,19 @@ else (CMAKE_SYSTEM MATCHES "Windows")
  add_definitions( -DPCRE_STATIC)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
-#add_library( PocoFoundation ${SRCS} )
-#set_target_properties( PocoFoundation PROPERTIES COMPILE_FLAGS ${RELEASE_CPPFLAGS} )
-#target_link_libraries( PocoFoundation pthread)
-
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES COMPILE_FLAGS ${DEBUG_CXX_FLAGS}
 	VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}
 	SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-target_link_libraries( ${LIBNAME} dl rt)
+target_link_libraries( ${LIBNAME} ${SYSLIBS})
 
 add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAMED}  
 	PROPERTIES COMPILE_FLAGS "${RELEASE_CXX_FLAGS}" 
 	VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}
 	SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-target_link_libraries( ${LIBNAMED} dl rt)
+target_link_libraries( ${LIBNAMED} ${SYSLIBS})
 
 install(
     DIRECTORY include/Poco
