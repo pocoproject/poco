@@ -1,13 +1,13 @@
 //
 // AcceptCertificateHandler.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/AcceptCertificateHandler.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/AcceptCertificateHandler.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  AcceptCertificateHandler
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -41,13 +41,19 @@ namespace Poco {
 namespace Net {
 
 
-AcceptCertificateHandler::AcceptCertificateHandler(bool server):InvalidCertificateHandler(server)
+AcceptCertificateHandler::AcceptCertificateHandler(bool server): InvalidCertificateHandler(server)
 {
 }
 
 
 AcceptCertificateHandler::~AcceptCertificateHandler()
 {
+}
+
+
+void AcceptCertificateHandler::onInvalidCertificate(const void*, VerificationErrorArgs& errorCert)
+{
+	errorCert.setIgnoreError(true);
 }
 
 

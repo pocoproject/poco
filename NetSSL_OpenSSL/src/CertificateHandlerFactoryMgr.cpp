@@ -1,13 +1,13 @@
 //
 // CertificateHandlerFactoryMgr.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/CertificateHandlerFactoryMgr.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/CertificateHandlerFactoryMgr.cpp#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  CertificateHandlerFactoryMgr
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization

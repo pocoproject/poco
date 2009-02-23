@@ -1,7 +1,7 @@
 //
 // SocketNotifier.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/SocketNotifier.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/SocketNotifier.h#3 $
 //
 // Library: Net
 // Package: Reactor
@@ -62,7 +62,7 @@ class Net_API SocketNotifier: public Poco::RefCountedObject
 	/// to notify registered event handlers of socket events.
 {
 public:
-	SocketNotifier(const Socket& socket);
+	explicit SocketNotifier(const Socket& socket);
 		/// Creates the SocketNotifier for the given socket.
 		
 	void addObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);

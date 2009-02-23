@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#20 $
+// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#21 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -187,7 +187,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	if (!request.has(HTTPRequest::HOST))
 		request.setHost(_host, _port);
 	if (!_proxyHost.empty())
-		request.setURI(getHostInfo() + request.getURI());
+		request.setURI(proxyRequestPrefix() + request.getURI());
 	_reconnect = keepAlive;
 	_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
 	if (request.getChunkedTransferEncoding())
@@ -203,7 +203,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength() + cs.chars());
 		request.write(*_pRequestStream);
 	}
-	else if (request.getMethod() == HTTPRequest::HTTP_GET || request.getMethod() == HTTPRequest::HTTP_HEAD)
+	else if (request.getMethod() != HTTPRequest::HTTP_PUT && request.getMethod() != HTTPRequest::HTTP_POST)
 	{
 		Poco::CountingOutputStream cs;
 		request.write(cs);
@@ -296,7 +296,7 @@ void HTTPClientSession::reconnect()
 }
 
 
-std::string HTTPClientSession::getHostInfo() const
+std::string HTTPClientSession::proxyRequestPrefix() const
 {
 	std::string result("http://");
 	result.append(_host);

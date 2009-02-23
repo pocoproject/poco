@@ -1,7 +1,7 @@
 //
 // HTTPSClientTestSuite.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/testsuite/src/HTTPSClientTestSuite.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSClientTestSuite.h#7 $
 //
 // Definition of the HTTPSClientTestSuite class.
 //
@@ -38,8 +38,6 @@
 
 #include "CppUnit/TestSuite.h"
 
-
-#define TESTSERVERNAME "secure.appinf.com"
 
 class HTTPSClientTestSuite
 {

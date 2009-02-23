@@ -1,13 +1,13 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#13 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
 // Module:  HTTPSClientSession
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -37,12 +37,9 @@
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
+#include "Poco/Net/SSLManager.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
-#include "Poco/Net/HTTPHeaderStream.h"
-#include "Poco/Net/HTTPStream.h"
-#include "Poco/Net/HTTPFixedLengthStream.h"
-#include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 
@@ -56,24 +53,47 @@ namespace Net {
 
 
 HTTPSClientSession::HTTPSClientSession():
-	HTTPClientSession(SecureStreamSocket())
+	HTTPClientSession(SecureStreamSocket()),
+	_pContext(SSLManager::instance().defaultClientContext())
 {
-	setPort(Utility::HTTPS_PORT);
+	setPort(HTTPS_PORT);
 }
 
 
 HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket):
-	HTTPClientSession(socket)
+	HTTPClientSession(socket),
+	_pContext(socket.context())
 {
-	setPort(Utility::HTTPS_PORT);
+	setPort(HTTPS_PORT);
 }
 
 
 HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 port):
-	HTTPClientSession(SecureStreamSocket())
+	HTTPClientSession(SecureStreamSocket()),
+	_pContext(SSLManager::instance().defaultClientContext())
 {
 	setHost(host);
 	setPort(port);
+	SecureStreamSocket sss(socket());
+	sss.setPeerHostName(host);
+}
+
+
+HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext):
+	HTTPClientSession(SecureStreamSocket(pContext)),
+	_pContext(pContext)
+{
+}
+
+
+HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext):
+	HTTPClientSession(SecureStreamSocket(pContext)),
+	_pContext(pContext)
+{
+	setHost(host);
+	setPort(port);
+	SecureStreamSocket sss(socket());
+	sss.setPeerHostName(host);
 }
 
 
@@ -82,26 +102,45 @@ HTTPSClientSession::~HTTPSClientSession()
 }
 
 
-std::string HTTPSClientSession::getHostInfo() const
+X509Certificate HTTPSClientSession::serverCertificate()
 {
-	std::string result("https://");
-	result.append(getHost());
-	result.append(":");
-	result.append(NumberFormatter::format(getPort()));
-	return result;
+	SecureStreamSocket sss(socket());
+	return sss.peerCertificate();
+}
+
+
+std::string HTTPSClientSession::proxyRequestPrefix() const
+{
+	return std::string();
 }
 
 
 void HTTPSClientSession::connect(const SocketAddress& address)
 {
-	if (!getProxyHost().empty())
+	if (getProxyHost().empty())
 	{
-		StreamSocket& aSock = socket();
-		SecureStreamSocketImpl* pImplSock = dynamic_cast<SecureStreamSocketImpl*>(aSock.impl());
-		poco_check_ptr (pImplSock);
-		pImplSock->setTunnelEndPoint(getHost(), getPort());
+		HTTPSession::connect(address);
 	}
-	HTTPSession::connect(address);
+	else
+	{
+		HTTPClientSession proxySession(address);
+		proxySession.setHost(getProxyHost());
+		proxySession.setPort(getProxyPort());
+		SocketAddress targetAddress(getHost(), getPort());
+		HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress.toString(), HTTPMessage::HTTP_1_1);
+		HTTPResponse proxyResponse;
+		proxyRequest.set("Proxy-Connection", "keep-alive");
+		proxyRequest.set("Host", getHost());
+		proxySession.setKeepAlive(true);
+		proxySession.sendRequest(proxyRequest);
+		proxySession.receiveResponse(proxyResponse);
+		if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
+			throw HTTPException("Cannot establish proxy connection", proxyResponse.getReason());
+		
+		StreamSocket proxySocket(proxySession.detachSocket());
+		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext);
+		attachSocket(secureSocket);
+	}
 }
 
 

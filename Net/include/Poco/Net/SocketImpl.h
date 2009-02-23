@@ -1,7 +1,7 @@
 //
 // SocketImpl.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/SocketImpl.h#3 $
+// $Id: //poco/Main/Net/include/Poco/Net/SocketImpl.h#6 $
 //
 // Library: Net
 // Package: Sockets
@@ -335,7 +335,7 @@ public:
 	int socketError();
 		/// Returns the value of the SO_ERROR socket option.
 	
-	poco_socket_t sockfd();
+	poco_socket_t sockfd() const;
 		/// Returns the socket descriptor for the 
 		/// underlying native socket.
 	
@@ -383,13 +383,9 @@ protected:
 		/// The third argument, proto, is normally set to 0,
 		/// except for raw sockets.
 
-	void setSockfd(poco_socket_t aSocket);
+	void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
 		/// Allows subclasses to set the socket manually, iff no valid socket is set yet!
 	
-	void invalidate();
-	/// Sets a socket to POCO_INVALID_SOCKET. It is assumed that the socket was closed 
-	/// via a prior operation.
-
 	static int lastError();
 		/// Returns the last error code.
 
@@ -424,7 +420,7 @@ private:
 //
 // inlines
 //
-inline poco_socket_t SocketImpl::sockfd()
+inline poco_socket_t SocketImpl::sockfd() const
 {
 	return _sockfd;
 }
@@ -443,12 +439,6 @@ inline int SocketImpl::lastError()
 #else
 	return errno;
 #endif
-}
-
-
-inline void SocketImpl::invalidate()
-{
-	_sockfd = POCO_INVALID_SOCKET;
 }
 
 

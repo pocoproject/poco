@@ -1,13 +1,13 @@
 //
 // InvalidCertificateHandler.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/InvalidCertificateHandler.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/InvalidCertificateHandler.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  InvalidCertificateHandler
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization

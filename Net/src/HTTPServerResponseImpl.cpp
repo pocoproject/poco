@@ -1,7 +1,7 @@
 //
 // HTTPServerResponseImpl.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerResponseImpl.cpp#6 $
+// $Id: //poco/Main/Net/src/HTTPServerResponseImpl.cpp#7 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -154,7 +154,7 @@ void HTTPServerResponseImpl::redirect(const std::string& uri)
 	setStatusAndReason(HTTPResponse::HTTP_FOUND);
 	set("Location", uri);
 
-	_pStream = new HTTPOutputStream(_session);
+	_pStream = new HTTPHeaderOutputStream(_session);
 	write(*_pStream);
 }
 

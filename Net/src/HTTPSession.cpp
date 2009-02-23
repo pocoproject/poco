@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/svn/Net/src/HTTPSession.cpp#2 $
+// $Id: //poco/Main/Net/src/HTTPSession.cpp#14 $
 //
 // Library: Net
 // Package: HTTP
@@ -211,6 +211,21 @@ void HTTPSession::setException(const Poco::Exception& exc)
 {
 	delete _pException;
 	_pException = exc.clone();
+}
+
+
+StreamSocket HTTPSession::detachSocket()
+{
+	StreamSocket oldSocket(_socket);
+	StreamSocket newSocket;
+	_socket = newSocket;
+	return oldSocket;
+}
+
+
+void HTTPSession::attachSocket(const StreamSocket& socket)
+{
+	_socket = socket;
 }
 
 

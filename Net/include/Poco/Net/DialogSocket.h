@@ -1,7 +1,7 @@
 //
 // DialogSocket.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/DialogSocket.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/DialogSocket.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -70,7 +70,7 @@ public:
 		/// Before sending or receiving data, the socket
 		/// must be connected with a call to connect().
 
-	DialogSocket(const SocketAddress& address);
+	explicit DialogSocket(const SocketAddress& address);
 		/// Creates a stream socket and connects it to
 		/// the socket specified by address.
 

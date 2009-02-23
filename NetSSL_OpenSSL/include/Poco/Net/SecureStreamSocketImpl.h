@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -9,7 +9,7 @@
 //
 // Definition of the SecureStreamSocketImpl class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -43,6 +43,8 @@
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/SecureSocketImpl.h"
 #include "Poco/Net/StreamSocketImpl.h"
+#include "Poco/Net/Context.h"
+#include "Poco/Net/X509Certificate.h"
 
 
 namespace Poco {
@@ -50,26 +52,22 @@ namespace Net {
 
 
 class NetSSL_API SecureStreamSocketImpl: public StreamSocketImpl
-	/// This class implements a SSL TCP socket.
+	/// This class implements a SSL stream socket.
 {
 public:
-	SecureStreamSocketImpl();
+	SecureStreamSocketImpl(Context::Ptr pContext);
 		/// Creates the SecureStreamSocketImpl.
 
-	SecureStreamSocketImpl(SSL* _pSSL);
-		/// Creates a SecureStreamSocketImpl using the given native socket.
+	SecureStreamSocketImpl(StreamSocketImpl* pStreamSocket, Context::Ptr pContext);
+		/// Creates the SecureStreamSocketImpl.
 
 	SocketImpl* acceptConnection(SocketAddress& clientAddr);
-		/// Get the next completed connection from the
-		/// socket's completed connection queue.
+		/// Not supported by a SecureStreamSocket.
 		///
-		/// If the queue is empty, waits until a connection
-		/// request completes.
-		///
-		/// Returns a new TCP socket for the connection
-		/// with the client.
-		///
-		/// The client socket's address is returned in clientAddr.
+		/// Throws a Poco::InvalidAccessException.
+
+	void acceptSSL();
+		/// Performs a SSL server-side handshake.
 	
 	void connect(const SocketAddress& address);
 		/// Initializes the socket and establishes a connection to 
@@ -87,26 +85,19 @@ public:
 		/// Initializes the socket and establishes a connection to 
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
+		
+	void connectSSL();
+		/// Performs a SSL client-side handshake on an already connected TCP socket.
 	
 	void bind(const SocketAddress& address, bool reuseAddress = false);
-		/// Bind a local address to the socket.
+		/// Not supported by a SecureStreamSocket.
 		///
-		/// This is usually only done when establishing a server
-		/// socket. TCP clients should not bind a socket to a
-		/// specific address.
-		///
-		/// If reuseAddress is true, sets the SO_REUSEADDR
-		/// socket option.
+		/// Throws a Poco::InvalidAccessException.
 		
 	void listen(int backlog = 64);
-		/// Puts the socket into listening state.
+		/// Not supported by a SecureStreamSocket.
 		///
-		/// The socket becomes a passive socket that
-		/// can accept incoming connection requests.
-		///
-		/// The backlog argument specifies the maximum
-		/// number of connections that can be queued
-		/// for this socket.
+		/// Throws a Poco::InvalidAccessException.
 
 	void close();
 		/// Close the socket.
@@ -125,45 +116,63 @@ public:
 		/// Returns the number of bytes received.
 	
 	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
-		/// Sends the contents of the given buffer through
-		/// the socket to the given address.
+		/// Not supported by a SecureStreamSocket.
 		///
-		/// Returns the number of bytes sent, which may be
-		/// less than the number of bytes specified.
+		/// Throws a Poco::InvalidAccessException.
 	
 	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
-		/// Receives data from the socket and stores it
-		/// in buffer. Up to length bytes are received.
-		/// Stores the address of the sender in address.
+		/// Not supported by a SecureStreamSocket.
 		///
-		/// Returns the number of bytes received.
+		/// Throws a Poco::InvalidAccessException.
 	
 	void sendUrgent(unsigned char data);
-		/// Sends one byte of urgent data through
-		/// the socket.
+		/// Not supported by a SecureStreamSocket.
 		///
-		/// The data is sent with the MSG_OOB flag.
-		///
-		/// The preferred way for a socket to receive urgent data
-		/// is by enabling the SO_OOBINLINE option.
+		/// Throws a Poco::InvalidAccessException.
 
-	void setTunnelEndPoint(const std::string& host, Poco::UInt16 port);
-		/// Due to the fact that SSLConnections that run over proxies require
-		/// a different connect phase (ie send an unencrypted HTTP CONNECT before
-		/// establishing, we must inform the socket that it is only used as a proxy
-		/// that works as a tunnel to the given endPoint.
-		/// Only call this method on disconnected sockets.
+	void shutdownReceive();
+		/// Shuts down the receiving part of the socket connection.
+		///
+		/// Since SSL does not support a half shutdown, this does
+		/// nothing.
+		
+	void shutdownSend();
+		/// Shuts down the receiving part of the socket connection.
+		///
+		/// Since SSL does not support a half shutdown, this does
+		/// nothing.
+		
+	void shutdown();
+		/// Shuts down the SSL connection.
+
+	void setPeerHostName(const std::string& hostName);
+		/// Sets the peer host name for certificate validation purposes.
+		
+	const std::string& getPeerHostName() const;
+		/// Returns the peer host name.
+
+	X509Certificate peerCertificate() const;
+		/// Returns the peer's X509 certificate.
+		
+	Context::Ptr context() const;
+		/// Returns the SSL context used by this socket.
 
 protected:
 	~SecureStreamSocketImpl();
 		/// Destroys the SecureStreamSocketImpl.
 
+	static int lastError();
+	static void error();
+	static void error(const std::string& arg);
+	static void error(int code);
+	static void error(int code, const std::string& arg);
+
 private:
 	SecureStreamSocketImpl(const SecureStreamSocketImpl&);
 	SecureStreamSocketImpl& operator = (const SecureStreamSocketImpl&);
 
-private:
-	SecureSocketImpl _socket;
+	SecureSocketImpl _impl;
+	std::string      _peerHostName;
 
 	friend class SecureSocketImpl;
 };
@@ -172,9 +181,45 @@ private:
 //
 // inlines
 //
-inline void SecureStreamSocketImpl::setTunnelEndPoint(const std::string& host, Poco::UInt16 port)
+inline const std::string& SecureStreamSocketImpl::getPeerHostName() const
 {
-	_socket.setTunnelEndPoint(host, port);
+	return _peerHostName;
+}
+
+
+inline Context::Ptr SecureStreamSocketImpl::context() const
+{
+	return _impl.context();
+}
+
+
+inline int SecureStreamSocketImpl::lastError()
+{
+	return SocketImpl::lastError();
+}
+
+
+inline void SecureStreamSocketImpl::error()
+{
+	return SocketImpl::error();
+}
+
+
+inline void SecureStreamSocketImpl::error(const std::string& arg)
+{
+	return SocketImpl::error(arg);
+}
+
+
+inline void SecureStreamSocketImpl::error(int code)
+{
+	return SocketImpl::error(code);
+}
+
+
+inline void SecureStreamSocketImpl::error(int code, const std::string& arg)
+{
+	return SocketImpl::error(code, arg);
 }
 
 

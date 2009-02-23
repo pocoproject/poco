@@ -1,7 +1,7 @@
 //
 // NetSSLTestSuite.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/testsuite/src/NetSSLTestSuite.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/NetSSLTestSuite.h#7 $
 //
 // Definition of the NetSSLTestSuite class.
 //

@@ -1,7 +1,7 @@
 //
 // MulticastSocket.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/MulticastSocket.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/MulticastSocket.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -58,7 +58,7 @@ public:
 	MulticastSocket();
 		/// Creates the MulticastSocket.
 
-	MulticastSocket(IPAddress::Family family);
+	explicit MulticastSocket(IPAddress::Family family);
 		/// Creates an unconnected datagram socket.
 		///
 		/// The socket will be created for the

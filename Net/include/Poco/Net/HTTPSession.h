@@ -1,7 +1,7 @@
 //
 // HTTPSession.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/HTTPSession.h#5 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPSession.h#7 $
 //
 // Library: Net
 // Package: HTTP
@@ -96,7 +96,13 @@ public:
 	{
 		HTTP_PORT = 80
 	};
-
+	
+	StreamSocket detachSocket();
+		/// Detaches the socket from the session.
+		///
+		/// The socket is returned, and a new, uninitialized socket is
+		/// attached to the session.
+		
 protected:
 	HTTPSession();
 		/// Creates a HTTP session using an
@@ -154,12 +160,16 @@ protected:
 		/// Connects the underlying socket to the given address
 		/// and sets the socket's receive timeout.	
 		
+	void attachSocket(const StreamSocket& socket);
+		/// Attaches a socket to the session, replacing the
+		/// previously attached socket.
+
 	void close();
 		/// Closes the underlying socket.
 		
 	void setException(const Poco::Exception& exc);
 		/// Stores a clone of the exception.
-		
+	
 private:
 	enum
 	{

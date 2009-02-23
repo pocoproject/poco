@@ -1,7 +1,7 @@
 //
 // download.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/samples/download/src/download.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/samples/download/src/download.cpp#8 $
 //
 // This sample demonstrates the URIStreamOpener class.
 //
@@ -81,18 +81,10 @@ int main(int argc, char** argv)
 	}
 
 	// Note: we must create the passphrase handler prior Context 
-	SharedPtr<PrivateKeyPassphraseHandler> ptrConsole = new KeyConsoleHandler(false);    // ask the user via console for the pwd
 	SharedPtr<InvalidCertificateHandler> ptrCert = new ConsoleCertificateHandler(false); // ask the user via console
-	SharedPtr<Context> ptrContext = new Context("any.pem", "rootcert.pem", false, Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
-	SSLManager::instance().initializeClient(ptrConsole, ptrCert, ptrContext);
+	Context::Ptr ptrContext = new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+	SSLManager::instance().initializeClient(0, ptrCert, ptrContext);
 
-	// init of server part is not required, but we keep the code here as an example
-	/*
-	ptrConsole = new KeyConsoleHandler(true);    // ask the user via console for the pwd
-	ptrCert = new ConsoleCertificateHandler(true); // ask the user via console
-	ptrContext = new Context("any.pem", "rootcert.pem", true, Context::VERIFY_NONE, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
-	SSLManager::instance().initializeServer(ptrConsole, ptrCert, ptrContext);
-	*/
 	try
 	{
 		URI uri(argv[1]);

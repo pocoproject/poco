@@ -1,13 +1,13 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/SSLManager.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/SSLManager.cpp#14 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  SSLManager
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -39,6 +39,7 @@
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include "Poco/Net/SSLInitializer.h"
+#include "Poco/Net/SSLException.h"
 #include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
 #include "Poco/Util/Application.h"
@@ -51,6 +52,7 @@ namespace Net {
 
 
 const std::string SSLManager::CFG_PRIV_KEY_FILE("privateKeyFile");
+const std::string SSLManager::CFG_CERTIFICATE_FILE("certificateFile");
 const std::string SSLManager::CFG_CA_LOCATION("caConfig");
 const std::string SSLManager::CFG_VER_MODE("verificationMode");
 const Context::VerificationMode SSLManager::VAL_VER_MODE(Context::VERIFY_STRICT);
@@ -79,12 +81,6 @@ SSLManager::~SSLManager()
 	PrivateKeyPassPhrase.clear();
 	ClientVerificationError.clear();
 	ServerVerificationError.clear();
-	_ptrServerPassPhraseHandler  = 0;
-	_ptrServerCertificateHandler = 0;
-	_ptrDefaultServerContext     = 0;
-	_ptrClientPassPhraseHandler  = 0;
-	_ptrClientCertificateHandler = 0;
-	_ptrDefaultClientContext     = 0;
 	SSLInitializer::uninitialize();
 }
 
@@ -96,7 +92,7 @@ SSLManager& SSLManager::instance()
 }
 
 
-void SSLManager::initializeServer(PrivateKeyPassphraseHandlerPtr& ptrPassPhraseHandler, InvalidCertificateHandlerPtr& ptrHandler, ContextPtr ptrContext)
+void SSLManager::initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassPhraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext)
 {
 	_ptrServerPassPhraseHandler  = ptrPassPhraseHandler;
 	_ptrServerCertificateHandler = ptrHandler;
@@ -104,7 +100,7 @@ void SSLManager::initializeServer(PrivateKeyPassphraseHandlerPtr& ptrPassPhraseH
 }
 
 
-void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr& ptrPassPhraseHandler, InvalidCertificateHandlerPtr& ptrHandler, ContextPtr ptrContext)
+void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassPhraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext)
 {
 	_ptrClientPassPhraseHandler  = ptrPassPhraseHandler;
 	_ptrClientCertificateHandler = ptrHandler;
@@ -112,7 +108,7 @@ void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr& ptrPassPhraseH
 }
 
 
-SSLManager::ContextPtr SSLManager::defaultServerContext()
+Context::Ptr SSLManager::defaultServerContext()
 {
 	if (!_ptrDefaultServerContext)
 		initDefaultContext(true);
@@ -121,7 +117,7 @@ SSLManager::ContextPtr SSLManager::defaultServerContext()
 }
 
 
-SSLManager::ContextPtr SSLManager::defaultClientContext()
+Context::Ptr SSLManager::defaultClientContext()
 {
 	if (!_ptrDefaultClientContext)
 		initDefaultContext(false);
@@ -210,34 +206,31 @@ void SSLManager::initDefaultContext(bool server)
 
 	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
-	if (!config.hasProperty(prefix+CFG_PRIV_KEY_FILE))
-	{
-		throw Poco::Util::EmptyOptionException(std::string("Missing Configuration Entry: ") + prefix+CFG_PRIV_KEY_FILE);
-	}
+
 	// mandatory options
-	std::string privKeyFile = config.getString(prefix+CFG_PRIV_KEY_FILE);
-	std::string caLocation = config.getString(prefix+CFG_CA_LOCATION);
+	std::string privKeyFile = config.getString(prefix + CFG_PRIV_KEY_FILE, "");
+	std::string certFile = config.getString(prefix + CFG_CERTIFICATE_FILE, privKeyFile);	
+	std::string caLocation = config.getString(prefix + CFG_CA_LOCATION, "");
+
+	if (certFile.empty() && privKeyFile.empty())
+		throw SSLException("Configuration error: no certificate file has been specified.");
 
 	// optional options for which we have defaults defined
 	Context::VerificationMode verMode = VAL_VER_MODE;
-	if (config.hasProperty(prefix+CFG_VER_MODE))
+	if (config.hasProperty(prefix + CFG_VER_MODE))
 	{
 		// either: none, relaxed, strict, once
-		std::string mode = config.getString(prefix+CFG_VER_MODE);
+		std::string mode = config.getString(prefix + CFG_VER_MODE);
 		verMode = Utility::convertVerificationMode(mode);
 	}
 
-	int verDepth = config.getInt(prefix+CFG_VER_DEPTH, VAL_VER_DEPTH);
-	bool loadDefCA = config.getBool(prefix+CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
-	std::string cypherList = config.getString(prefix+CFG_CYPHER_LIST, VAL_CYPHER_LIST);
+	int verDepth = config.getInt(prefix + CFG_VER_DEPTH, VAL_VER_DEPTH);
+	bool loadDefCA = config.getBool(prefix + CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
+	std::string cypherList = config.getString(prefix + CFG_CYPHER_LIST, VAL_CYPHER_LIST);
 	if (server)
-	{
-		_ptrDefaultServerContext = new Context(privKeyFile, caLocation, server, verMode, verDepth, loadDefCA, cypherList);
-	}
+		_ptrDefaultServerContext = new Context(Context::SERVER_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cypherList);
 	else
-	{
-		_ptrDefaultClientContext = new Context(privKeyFile, caLocation, server, verMode, verDepth, loadDefCA, cypherList);
-	}
+		_ptrDefaultClientContext = new Context(Context::CLIENT_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cypherList);
 }
 
 
@@ -256,7 +249,7 @@ void SSLManager::initPassPhraseHandler(bool server)
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
 
-	std::string className(config.getString(prefix+CFG_DELEGATE_HANDLER, VAL_DELEGATE_HANDLER));
+	std::string className(config.getString(prefix + CFG_DELEGATE_HANDLER, VAL_DELEGATE_HANDLER));
 
 	const PrivateKeyFactory* pFactory = 0;
 	if (privateKeyFactoryMgr().hasFactory(className))

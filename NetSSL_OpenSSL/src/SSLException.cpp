@@ -1,13 +1,13 @@
 //
 // SSLException.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/SSLException.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/SSLException.cpp#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  SSLException
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -42,9 +42,10 @@ namespace Poco {
 namespace Net {
 
 
-POCO_IMPLEMENT_EXCEPTION(SSLException, NetException, "SSLException")
-POCO_IMPLEMENT_EXCEPTION(SSLContextException, SSLException, "SSLContextException")
-POCO_IMPLEMENT_EXCEPTION(InvalidCertificateException, SSLException, "InvalidCertificateException")
+POCO_IMPLEMENT_EXCEPTION(SSLException, NetException, "SSL Exception")
+POCO_IMPLEMENT_EXCEPTION(SSLContextException, SSLException, "SSL context exception")
+POCO_IMPLEMENT_EXCEPTION(InvalidCertificateException, SSLException, "Invalid certficate")
+POCO_IMPLEMENT_EXCEPTION(CertificateValidationException, SSLException, "Certificate validation error")
 
 
 } } // namespace Poco::Net

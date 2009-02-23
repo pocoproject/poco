@@ -1,7 +1,7 @@
 //
 // SecureServerSocketImpl.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocketImpl.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocketImpl.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -9,7 +9,7 @@
 //
 // Definition of the SecureServerSocketImpl class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -43,6 +43,7 @@
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/SecureSocketImpl.h"
 #include "Poco/Net/ServerSocketImpl.h"
+#include "Poco/Net/Context.h"
 
 
 namespace Poco {
@@ -53,8 +54,9 @@ class NetSSL_API SecureServerSocketImpl: public ServerSocketImpl
 	/// The SocketImpl class for SecureServerSocket.
 {
 public:
-	SecureServerSocketImpl();
-		/// Creates the SecureServerSocketImpl.
+	SecureServerSocketImpl(Context::Ptr pContext);
+		/// Creates the SecureServerSocketImpl using the
+		/// given SSL context object.
 
 	SocketImpl* acceptConnection(SocketAddress& clientAddr);
 		/// Get the next completed connection from the
@@ -69,21 +71,19 @@ public:
 		/// The client socket's address is returned in clientAddr.
 	
 	void connect(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
-		/// the TCP server at the given address.
+		/// Not supported by this kind of socket.
 		///
-		/// Can also be used for UDP sockets. In this case, no
-		/// connection is established. Instead, incoming and outgoing
-		/// packets are restricted to the specified address.
+		/// Throws a Poco::InvalidAccessException.
 
 	void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-		/// Initializes the socket, sets the socket timeout and 
-		/// establishes a connection to the TCP server at the given address.
+		/// Not supported by this kind of socket.
+		///
+		/// Throws a Poco::InvalidAccessException.
 
 	void connectNB(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
-		/// the TCP server at the given address. Prior to opening the
-		/// connection the socket is set to nonblocking mode.
+		/// Not supported by this kind of socket.
+		///
+		/// Throws a Poco::InvalidAccessException.
 	
 	void bind(const SocketAddress& address, bool reuseAddress = false);
 		/// Bind a local address to the socket.
@@ -109,40 +109,32 @@ public:
 		/// Close the socket.
 	
 	int sendBytes(const void* buffer, int length, int flags = 0);
-		/// Sends the contents of the given buffer through
-		/// the socket. Any specified flags are ignored.
+		/// Not supported by this kind of socket.
 		///
-		/// Returns the number of bytes sent, which may be
-		/// less than the number of bytes specified.
+		/// Throws a Poco::InvalidAccessException.
 	
 	int receiveBytes(void* buffer, int length, int flags = 0);
-		/// Receives data from the socket and stores it
-		/// in buffer. Up to length bytes are received.
+		/// Not supported by this kind of socket.
 		///
-		/// Returns the number of bytes received.
+		/// Throws a Poco::InvalidAccessException.
 	
 	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
-		/// Sends the contents of the given buffer through
-		/// the socket to the given address.
+		/// Not supported by this kind of socket.
 		///
-		/// Returns the number of bytes sent, which may be
-		/// less than the number of bytes specified.
+		/// Throws a Poco::InvalidAccessException.
 	
 	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
-		/// Receives data from the socket and stores it
-		/// in buffer. Up to length bytes are received.
-		/// Stores the address of the sender in address.
+		/// Not supported by this kind of socket.
 		///
-		/// Returns the number of bytes received.
+		/// Throws a Poco::InvalidAccessException.
 	
 	void sendUrgent(unsigned char data);
-		/// Sends one byte of urgent data through
-		/// the socket.
+		/// Not supported by this kind of socket.
 		///
-		/// The data is sent with the MSG_OOB flag.
-		///
-		/// The preferred way for a socket to receive urgent data
-		/// is by enabling the SO_OOBINLINE option.
+		/// Throws a Poco::InvalidAccessException.
+		
+	Context::Ptr context() const;
+		/// Returns the SSL context used by this socket.
 
 protected:
 	~SecureServerSocketImpl();
@@ -153,8 +145,17 @@ private:
 	SecureServerSocketImpl& operator = (const SecureServerSocketImpl&);
 
 private:
-	SecureSocketImpl _socket;
+	SecureSocketImpl _impl;
 };
+
+
+//
+// inlines
+//
+inline Context::Ptr SecureServerSocketImpl::context() const
+{
+	return _impl.context();
+}
 
 
 } } // namespace Poco::Net

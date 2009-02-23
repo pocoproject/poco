@@ -1,7 +1,7 @@
 //
 // Utility.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/Utility.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/Utility.h#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -9,7 +9,7 @@
 //
 // Definition of the Utility class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -49,20 +49,22 @@ namespace Net {
 
 
 class NetSSL_API Utility
-	/// Class Utility. helper class for init & shutdown of the OpenSSL library
+	/// This class provides various helper functions for working
+	/// with the OpenSSL library.
 {
 public:
-	static int HTTPS_PORT;
-		/// Default port value for HHTPS
-
 	static Context::VerificationMode convertVerificationMode(const std::string& verMode);
 		/// Non-case sensitive conversion of a string to a VerificationMode enum.
-		/// If verMode is illegal an OptionException is thrown.
+		/// If verMode is illegal an InvalidArgumentException is thrown.
 
 	static std::string convertCertificateError(long errCode);
-		/// Converts an SSL error code into human readable form
+		/// Converts an SSL certificate handling error code into an error message.
 
-	static std::string convertSSLError(SSL* pSSL, int errCode);
+	static std::string getLastError();
+		/// Returns the last error from the error stack
+
+	static void clearErrorStack();
+		/// Clears the error stack
 };
 
 

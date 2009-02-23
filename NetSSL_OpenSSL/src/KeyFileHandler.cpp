@@ -1,13 +1,13 @@
 //
 // KeyFileHandler.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/KeyFileHandler.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/KeyFileHandler.cpp#12 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  KeyFileHandler
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -63,12 +63,12 @@ void KeyFileHandler::onPrivateKeyRequested(const void* pSender, std::string& pri
 {
 	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
 	std::string prefix = serverSide() ? SSLManager::CFG_SERVER_PREFIX : SSLManager::CFG_CLIENT_PREFIX;
-	if (!config.hasProperty(prefix+CFG_PRIV_KEY_FILE))
+	if (!config.hasProperty(prefix + CFG_PRIV_KEY_FILE))
 	{
-		throw Poco::Util::EmptyOptionException(std::string("Missing Configuration Entry: ") + prefix+CFG_PRIV_KEY_FILE);
+		throw Poco::Util::EmptyOptionException(std::string("Missing Configuration Entry: ") + prefix + CFG_PRIV_KEY_FILE);
 	}
 
-	privateKey = config.getString(prefix+CFG_PRIV_KEY_FILE);
+	privateKey = config.getString(prefix + CFG_PRIV_KEY_FILE);
 }
 
 

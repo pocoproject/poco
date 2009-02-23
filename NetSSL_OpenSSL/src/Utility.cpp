@@ -1,13 +1,13 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/Utility.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/Utility.cpp#13 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Utility
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -44,9 +44,6 @@ namespace Poco {
 namespace Net {
 
 
-int Utility::HTTPS_PORT = 443;
-
-
 Context::VerificationMode Utility::convertVerificationMode(const std::string& vMode)
 {
 	std::string mode = Poco::toLower(vMode);
@@ -61,7 +58,7 @@ Context::VerificationMode Utility::convertVerificationMode(const std::string& vM
 	else if (mode == "once")
 		verMode = Context::VERIFY_ONCE;
 	else
-		throw Poco::Util::OptionException(std::string("Wrong value >") + vMode + std::string("< for a verificationMode. Can only be none, relaxed, strict or once."));
+		throw Poco::InvalidArgumentException("Invalid verification mode. Should be relaxed, strict or once but got", vMode);
 
 	return verMode;
 }
@@ -74,61 +71,22 @@ std::string Utility::convertCertificateError(long errCode)
 }
 
 
-std::string Utility::convertSSLError(SSL* pSSL, int errCode)
+std::string Utility::getLastError()
 {
-	
-	std::string errMsg;
-	if (errCode > 0) return "no error";
-
-	int connectErr = SSL_get_error(pSSL, errCode);
-	long lErr = 0;
-	char buf[512];
-	
-	switch (connectErr)
+	unsigned long errCode = ERR_get_error();
+	if (errCode != 0)
 	{
-	case SSL_ERROR_ZERO_RETURN:
-		// connection closed
-		errMsg = "connection closed by server";
-		break;
-	case SSL_ERROR_WANT_READ:
-		errMsg = "want read";
-		break;
-	case SSL_ERROR_WANT_WRITE:
-		errMsg = "want write";
-		break;
-	case SSL_ERROR_WANT_CONNECT: 
-		errMsg = "want connect";
-		break;
-	case SSL_ERROR_WANT_ACCEPT:
-		errMsg = "want accept";
-		break;
-	case SSL_ERROR_WANT_X509_LOOKUP:
-		errMsg = "want lookup";
-		break;
-	case SSL_ERROR_SYSCALL:
-		errMsg = "syscall";
-		break;
-	case SSL_ERROR_SSL:
-		lErr = ERR_get_error();
-		if (errCode == 0)
-		{
-			errMsg = "EOF was observed";
-		}
-		else if (errCode == -1)
-		{
-			errMsg = "The underlying BIO reported an I/O error";
-		}
-		else
-		{
-			ERR_error_string_n(lErr, buf, 512);
-			errMsg = buf;
-		}
-		break;
-	default:
-		errMsg = "none";
+		char buffer[256];
+		ERR_error_string_n(errCode, buffer, sizeof(buffer));
+		return std::string(buffer);
 	}
+	else return "No error";
+}
 
-	return errMsg;
+
+void Utility::clearErrorStack()
+{
+	ERR_clear_error();
 }
 
 

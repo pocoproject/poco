@@ -1,7 +1,7 @@
 //
 // NetSSL.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -11,7 +11,7 @@
 // This file must be the first file included by every other OpenSSL
 // header file.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization

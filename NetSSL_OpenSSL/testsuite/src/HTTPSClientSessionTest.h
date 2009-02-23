@@ -1,7 +1,7 @@
 //
 // HTTPSClientSessionTest.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.h#10 $
 //
 // Definition of the HTTPSClientSessionTest class.
 //
@@ -54,11 +54,9 @@ public:
 	void testPostSmallChunked();
 	void testPostLargeChunked();
 	void testPostLargeChunkedKeepAlive();
-	void testPostSmallClose();
-	void testPostLargeClose();
 	void testKeepAlive();
+	void testInterop();
 	void testProxy();
-	void testConnectNB();
 
 	void setUp();
 	void tearDown();

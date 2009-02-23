@@ -1,13 +1,13 @@
 //
 // KeyConsoleHandler.cpp
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/src/KeyConsoleHandler.cpp#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/KeyConsoleHandler.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  KeyConsoleHandler
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -54,7 +54,7 @@ KeyConsoleHandler::~KeyConsoleHandler()
 
 void KeyConsoleHandler::onPrivateKeyRequested(const void* pSender, std::string& privateKey)
 {
-	std::cout << "Please enter the pass-phrase for the private key: ";
+	std::cout << "Please enter the passphrase for the private key: ";
 	std::cin >> privateKey;
 }
 

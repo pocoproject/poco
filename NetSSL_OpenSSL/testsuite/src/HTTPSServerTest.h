@@ -1,7 +1,7 @@
 //
 // HTTPSServerTest.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.h#8 $
 //
 // Definition of the HTTPSServerTest class.
 //
@@ -48,10 +48,8 @@ public:
 
 	void testIdentityRequest();
 	void testChunkedRequest();
-	void testClosedRequest();
 	void testIdentityRequestKeepAlive();
 	void testChunkedRequestKeepAlive();
-	void testClosedRequestKeepAlive();
 	void test100Continue();
 	void testRedirect();
 	void testAuth();

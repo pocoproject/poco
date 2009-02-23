@@ -1,7 +1,7 @@
 //
 // SocketAcceptor.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/SocketAcceptor.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/SocketAcceptor.h#3 $
 //
 // Library: Net
 // Package: Reactor
@@ -89,7 +89,7 @@ class SocketAcceptor
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:		
-	SocketAcceptor(ServerSocket& socket):
+	explicit SocketAcceptor(ServerSocket& socket):
 		_socket(socket),
 		_pReactor(0)
 		/// Creates an SocketAcceptor, using the given ServerSocket.

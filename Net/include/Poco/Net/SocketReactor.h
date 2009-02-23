@@ -1,7 +1,7 @@
 //
 // SocketReactor.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketReactor.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/SocketReactor.h#5 $
 //
 // Library: Net
 // Package: Reactor
@@ -132,7 +132,7 @@ public:
 	SocketReactor();
 		/// Creates the SocketReactor.
 
-	SocketReactor(const Poco::Timespan& timeout);
+	explicit SocketReactor(const Poco::Timespan& timeout);
 		/// Creates the SocketReactor, using the given timeout.
 
 	virtual ~SocketReactor();

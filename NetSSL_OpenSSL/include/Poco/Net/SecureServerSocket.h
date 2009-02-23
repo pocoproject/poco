@@ -1,7 +1,7 @@
 //
 // SecureServerSocket.h
 //
-// $Id: //poco/svn/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocket.h#1 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocket.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -9,7 +9,7 @@
 //
 // Definition of the SecureServerSocket class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -42,6 +42,7 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/Context.h"
 
 
 namespace Poco {
@@ -53,7 +54,15 @@ class NetSSL_API SecureServerSocket: public ServerSocket
 {
 public:
 	SecureServerSocket();
-		/// Creates a SSL server socket.
+		/// Creates a SSL server socket using the
+		/// default SSL server context.
+		///
+		/// The server socket must be bound to
+		/// an address and put into listening state.
+
+	explicit SecureServerSocket(Context::Ptr pContext);
+		/// Creates a SSL server socket, using the
+		/// given SSL context object.
 		///
 		/// The server socket must be bound to
 		/// an address and put into listening state.
@@ -61,11 +70,19 @@ public:
 	SecureServerSocket(const Socket& socket);
 		/// Creates the SecureServerSocket with the SocketImpl
 		/// from another socket. The SocketImpl must be
-		/// a ServerSocketImpl, otherwise an InvalidArgumentException
+		/// a SecureServerSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
 	SecureServerSocket(const SocketAddress& address, int backlog = 64);
-		/// Creates a server socket, binds it
+		/// Creates a server socket using the default server SSL context,
+		/// binds it to the given address and puts it in listening
+		/// state.
+		///
+		/// After successful construction, the server socket
+		/// is ready to accept connections.
+
+	SecureServerSocket(const SocketAddress& address, int backlog, Context::Ptr pContext);
+		/// Creates a server socket using the given SSL context, binds it
 		/// to the given address and puts it in listening
 		/// state.
 		///
@@ -73,7 +90,15 @@ public:
 		/// is ready to accept connections.
 
 	SecureServerSocket(Poco::UInt16 port, int backlog = 64);
-		/// Creates a server socket, binds it
+		/// Creates a server socket using the default server SSL context,
+		/// binds it to the given port and puts it in listening
+		/// state.
+		///
+		/// After successful construction, the server socket
+		/// is ready to accept connections.
+
+	SecureServerSocket(Poco::UInt16 port, int backlog, Context::Ptr pContext);
+		/// Creates a server socket using the given SSL context, binds it
 		/// to the given port and puts it in listening
 		/// state.
 		///
@@ -97,7 +122,7 @@ public:
 		/// If the queue is empty, waits until a connection
 		/// request completes.
 		///
-		/// Returns a new SSL TCP socket for the connection
+		/// Returns a new SSL socket for the connection
 		/// with the client.
 		///
 		/// The client socket's address is returned in clientAddr.
@@ -109,8 +134,11 @@ public:
 		/// If the queue is empty, waits until a connection
 		/// request completes.
 		///
-		/// Returns a new TCP socket for the connection
+		/// Returns a new SSL socket for the connection
 		/// with the client.
+
+	Context::Ptr context() const;
+		/// Returns the SSL context used by this socket.
 };
 
 

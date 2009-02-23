@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/svn/Net/src/SocketImpl.cpp#3 $
+// $Id: //poco/Main/Net/src/SocketImpl.cpp#26 $
 //
 // Library: Net
 // Package: Sockets
@@ -337,6 +337,7 @@ int SocketImpl::available()
 	ioctl(FIONREAD, result);
 	return result;
 }
+
 
 bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 {
@@ -804,9 +805,8 @@ void SocketImpl::ioctl(int request, void* arg)
 }
 
 
-void SocketImpl::setSockfd(poco_socket_t aSocket)
+void SocketImpl::reset(poco_socket_t aSocket)
 {
-	poco_assert(sockfd() == POCO_INVALID_SOCKET);
 	_sockfd = aSocket;
 }
 

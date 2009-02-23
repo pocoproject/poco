@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/svn/Foundation/src/DateTimeParser.cpp#3 $
+// $Id: //poco/Main/Foundation/src/DateTimeParser.cpp#18 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -103,14 +103,11 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 					break;					 
 				case 'y':
 					SKIP_JUNK();
-					PARSE_NUMBER(year);
-					if (year < 1000)
-					{
-						if (year >= 70) 
-							year += 1900;
-						else
-							year += 2000;
-					}
+					PARSE_NUMBER_N(year, 2);
+					if (year >= 70) 
+						year += 1900;
+					else
+						year += 2000;
 					break;
 				case 'Y':
 					SKIP_JUNK();

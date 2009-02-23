@@ -1,7 +1,7 @@
 //
 // POP3ClientSession.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/POP3ClientSession.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/POP3ClientSession.h#3 $
 //
 // Library: Net
 // Package: Mail
@@ -76,7 +76,7 @@ public:
 	
 	typedef std::vector<MessageInfo> MessageInfoVec;
 
-	POP3ClientSession(const StreamSocket& socket);
+	explicit POP3ClientSession(const StreamSocket& socket);
 		/// Creates the POP3ClientSession using
 		/// the given socket, which must be connected
 		/// to a POP3 server.
