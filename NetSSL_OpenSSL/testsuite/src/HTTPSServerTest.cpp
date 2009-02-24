@@ -1,7 +1,7 @@
 //
 // HTTPSServerTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.cpp#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -192,29 +192,6 @@ void HTTPSServerTest::testChunkedRequest()
 }
 
 
-void HTTPSServerTest::testClosedRequest()
-{
-	SecureServerSocket svs(0);
-	HTTPServerParams* pParams = new HTTPServerParams;
-	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
-	srv.start();
-	
-	HTTPSClientSession cs("localhost", svs.address().port());
-	std::string body(5000, 'x');
-	HTTPRequest request("POST", "/echoBody");
-	request.setContentType("text/plain");
-	cs.sendRequest(request) << body;
-	HTTPResponse response;
-	std::string rbody;
-	cs.receiveResponse(response) >> rbody;
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getContentType() == "text/plain");
-	assert (!response.getChunkedTransferEncoding());
-	assert (rbody == body);
-}
-
-
 void HTTPSServerTest::testIdentityRequestKeepAlive()
 {
 	SecureServerSocket svs(0);
@@ -281,31 +258,6 @@ void HTTPSServerTest::testChunkedRequestKeepAlive()
 	assert (response.getChunkedTransferEncoding());
 	assert (!response.getKeepAlive());
 	assert (rbody == body);
-}
-
-
-void HTTPSServerTest::testClosedRequestKeepAlive()
-{
-	SecureServerSocket svs(0);
-	HTTPServerParams* pParams = new HTTPServerParams;
-	pParams->setKeepAlive(true);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
-	srv.start();
-	
-	HTTPSClientSession cs("localhost", svs.address().port());
-	std::string body(5000, 'x');
-	HTTPRequest request("POST", "/echoBody");
-	request.setContentType("text/plain");
-	cs.sendRequest(request) << body;
-	HTTPResponse response;
-	std::string rbody;
-	cs.receiveResponse(response) >> rbody;
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getContentType() == "text/plain");
-	assert (!response.getChunkedTransferEncoding());
-	assert (!response.getKeepAlive());
-	assert (rbody == body);
-	int n = (int) rbody.size();
 }
 
 
@@ -408,10 +360,8 @@ CppUnit::Test* HTTPSServerTest::suite()
 
 	CppUnit_addTest(pSuite, HTTPSServerTest, testIdentityRequest);
 	CppUnit_addTest(pSuite, HTTPSServerTest, testChunkedRequest);
-	CppUnit_addTest(pSuite, HTTPSServerTest, testClosedRequest);
 	CppUnit_addTest(pSuite, HTTPSServerTest, testIdentityRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSServerTest, testChunkedRequestKeepAlive);
-	CppUnit_addTest(pSuite, HTTPSServerTest, testClosedRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSServerTest, test100Continue);
 	CppUnit_addTest(pSuite, HTTPSServerTest, testRedirect);
 	CppUnit_addTest(pSuite, HTTPSServerTest, testAuth);

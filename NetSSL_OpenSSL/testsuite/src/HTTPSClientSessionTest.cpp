@@ -1,7 +1,7 @@
 //
 // HTTPSClientSessionTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -45,6 +45,8 @@
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Exception.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
 #include "HTTPSTestServer.h"
 #include <istream>
 #include <ostream>
@@ -52,9 +54,7 @@
 
 
 using namespace Poco::Net;
-
 using Poco::StreamCopier;
-
 
 
 class TestRequestHandler: public HTTPRequestHandler
@@ -251,40 +251,6 @@ void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 }
 
 
-void HTTPSClientSessionTest::testPostSmallClose()
-{
-	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
-	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
-	std::string body("this is a random request body");
-	s.sendRequest(request) << body;
-	HTTPResponse response;
-	std::istream& rs = s.receiveResponse(response);
-	assert (!response.getChunkedTransferEncoding());
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == body);
-}
-
-
-void HTTPSClientSessionTest::testPostLargeClose()
-{
-	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
-	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
-	std::string body(8000, 'x');
-	s.sendRequest(request) << body;
-	HTTPResponse response;
-	std::istream& rs = s.receiveResponse(response);
-	assert (!response.getChunkedTransferEncoding());
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	std::ostringstream ostr;
-	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == body);
-}
-
-
 void HTTPSClientSessionTest::testKeepAlive()
 {
 	HTTPSTestServer srv;
@@ -333,36 +299,39 @@ void HTTPSClientSessionTest::testKeepAlive()
 }
 
 
-void HTTPSClientSessionTest::testProxy()
+void HTTPSClientSessionTest::testInterop()
 {
-	HTTPSTestServer srv;
-	HTTPSClientSession s("wwws.appinf.com");
-	s.setProxy("proxy.aon.at", 8080);
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
+	HTTPSClientSession s("secure.appinf.com");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
 	s.sendRequest(request);
+	X509Certificate cert = s.serverCertificate();
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str().length() > 0);
+	std::string str(ostr.str());
+	assert (str == "This is a test file for NetSSL.\n");
+	assert (cert.commonName() == "secure.appinf.com");
 }
 
 
-void HTTPSClientSessionTest::testConnectNB()
+void HTTPSClientSessionTest::testProxy()
 {
-	SecureStreamSocket sock;
-	sock.connectNB(SocketAddress("server.com", 443));
-	char buf[512];
-	std::string msg("GET / HTTP/1.0\r\n\r\n");
-	sock.sendBytes(msg.c_str(), (int)msg.length());
-	Socket::SocketList read;
-	Socket::SocketList write;
-	Socket::SocketList exec;
-	read.push_back(sock);
-	Socket::select(read, write, exec, Poco::Timespan(30, 0) );
-	int rc = sock.receiveBytes(buf, 512);
-	assert (rc > 0);
+	HTTPSTestServer srv;
+	HTTPSClientSession s("secure.appinf.com");
+	s.setProxy("proxy.aon.at", 8080);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
+	s.sendRequest(request);
+	X509Certificate cert = s.serverCertificate();
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	std::string str(ostr.str());
+	assert (str == "This is a test file for NetSSL.\n");
+	assert (cert.commonName() == "secure.appinf.com");
 }
+
 
 void HTTPSClientSessionTest::setUp()
 {
@@ -386,11 +355,9 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallChunked);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunked);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunkedKeepAlive);
-	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallClose);
-	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeClose);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
-	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testConnectNB);
 
 	return pSuite;
 }

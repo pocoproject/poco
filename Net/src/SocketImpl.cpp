@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#5 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#6 $
 //
 // Library: Net
 // Package: Sockets
@@ -770,9 +770,8 @@ void SocketImpl::ioctl(int request, void* arg)
 }
 
 
-void SocketImpl::setSockfd(poco_socket_t aSocket)
+void SocketImpl::reset(poco_socket_t aSocket)
 {
-	poco_assert(sockfd() == POCO_INVALID_SOCKET);
 	_sockfd = aSocket;
 }
 

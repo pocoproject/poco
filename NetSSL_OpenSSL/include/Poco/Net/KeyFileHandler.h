@@ -1,7 +1,7 @@
 //
 // KeyFileHandler.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/KeyFileHandler.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/KeyFileHandler.h#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -9,7 +9,7 @@
 //
 // Definition of the KeyFileHandler class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -49,7 +49,8 @@ namespace Net {
 
 
 class NetSSL_API KeyFileHandler: public PrivateKeyPassphraseHandler
-	/// Class KeyFileHandler. Reads the key for a certificate from a configuration file
+	/// An implementation of PrivateKeyPassphraseHandler that 
+	/// reads the key for a certificate from a configuration file
 	/// under the path "openSSL.privateKeyPassphraseHandler.options.password".
 {
 public:

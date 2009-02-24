@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -9,7 +9,7 @@
 //
 // Definition of the HTTPSClientSession class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -43,6 +43,8 @@
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/Context.h"
+#include "Poco/Net/X509Certificate.h"
 
 
 namespace Poco {
@@ -76,33 +78,56 @@ class NetSSL_API HTTPSClientSession: public HTTPClientSession
 	///
 	/// See RFC 2616 <http://www.faqs.org/rfcs/rfc2616.html> for more
 	/// information about the HTTP protocol.
+	///
+	/// Note that sending requests that neither contain a content length
+	/// field in the header nor are using chunked transfer encoding will
+	/// result in a SSL protocol violation, as the framework shuts down
+	/// the socket after sending the message body. No orderly SSL shutdown
+	/// will be performed in this case.
 {
 public:
+	enum
+	{
+		HTTPS_PORT = 443
+	};
+	
 	HTTPSClientSession();
 		/// Creates an unconnected HTTPSClientSession.
 
-	HTTPSClientSession(const SecureStreamSocket& socket);
+	explicit HTTPSClientSession(const SecureStreamSocket& socket);
 		/// Creates a HTTPSClientSession using the given socket.
 		/// The socket must not be connected. The session
 		/// takes ownership of the socket.
 
-	HTTPSClientSession(const std::string& host, Poco::UInt16 port = Utility::HTTPS_PORT);
+	HTTPSClientSession(const std::string& host, Poco::UInt16 port = HTTPS_PORT);
 		/// Creates a HTTPSClientSession using the given host and port.
+
+	explicit HTTPSClientSession(Context::Ptr pContext);
+		/// Creates an unconnected HTTPSClientSession, using the
+		/// give SSL context.
+
+	HTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext);
+		/// Creates a HTTPSClientSession using the given host and port,
+		/// using the given SSL context.
 
 	~HTTPSClientSession();
 		/// Destroys the HTTPSClientSession and closes
 		/// the underlying socket.
+		
+	X509Certificate serverCertificate();
+		/// Returns the server's certificate.
+		///
+		/// The certificate is available after the first request has been sent.
 
 protected:
 	void connect(const SocketAddress& address);
-		// Connects the socket to the server.
-	
-	std::string getHostInfo() const;
-		/// Returns the target host and port number for proxy requests.
+	std::string proxyRequestPrefix() const;
 
 private:
 	HTTPSClientSession(const HTTPSClientSession&);
 	HTTPSClientSession& operator = (const HTTPSClientSession&);
+	
+	Context::Ptr _pContext;
 };
 
 

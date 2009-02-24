@@ -1,7 +1,7 @@
 //
 // ConsoleCertificateHandler.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/ConsoleCertificateHandler.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/ConsoleCertificateHandler.h#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -9,7 +9,7 @@
 //
 // Definition of the ConsoleCertificateHandler class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -49,7 +49,8 @@ namespace Net {
 
 
 class NetSSL_API ConsoleCertificateHandler: public InvalidCertificateHandler
-	/// A ConsoleCertificateHandler is invoked whenever an error occurs verifying the certificate. 
+	/// A ConsoleCertificateHandler is invoked whenever an error occurs verifying the certificate.
+	/// 
 	/// The certificate is printed to stdout and the user is asked via console if he wants to accept it.
 {
 public:

@@ -1,7 +1,7 @@
 //
 // AcceptCertificateHandler.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/AcceptCertificateHandler.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/AcceptCertificateHandler.h#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -9,7 +9,7 @@
 //
 // Definition of the AcceptCertificateHandler class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -51,7 +51,9 @@ namespace Net {
 class NetSSL_API AcceptCertificateHandler: public InvalidCertificateHandler
 	/// A AcceptCertificateHandler is invoked whenever an error 
 	/// occurs verifying the certificate. It always accepts
-	/// the certificate. Only use this one during testing!
+	/// the certificate.
+	///
+	/// Should be using for testing purposes only.
 {
 public:
 	AcceptCertificateHandler(bool handleErrorsOnServerSide);
@@ -64,15 +66,6 @@ public:
 		/// Receives the questionable certificate in parameter errorCert. If one wants to accept the
 		/// certificate, call errorCert.setIgnoreError(true).
 };
-
-
-//
-// inlines
-//
-inline void AcceptCertificateHandler::onInvalidCertificate(const void*, VerificationErrorArgs& errorCert)
-{
-	errorCert.setIgnoreError(true);
-}
 
 
 } } // namespace Poco::Net

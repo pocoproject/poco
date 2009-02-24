@@ -1,7 +1,7 @@
 //
 // SystemConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/SystemConfiguration.cpp#1 $
+// $Id: //poco/1.3/Util/src/SystemConfiguration.cpp#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -37,6 +37,11 @@
 #include "Poco/Util/SystemConfiguration.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Process.h"
 #include "Poco/Exception.h"
 
 
@@ -55,6 +60,8 @@ const std::string SystemConfiguration::NODENAME       = "system.nodeName";
 const std::string SystemConfiguration::CURRENTDIR     = "system.currentDir";
 const std::string SystemConfiguration::HOMEDIR        = "system.homeDir";
 const std::string SystemConfiguration::TEMPDIR        = "system.tempDir";
+const std::string SystemConfiguration::DATETIME       = "system.dateTime";
+const std::string SystemConfiguration::PID            = "system.pid";
 const std::string SystemConfiguration::ENV            = "system.env.";
 
 
@@ -84,6 +91,10 @@ bool SystemConfiguration::getRaw(const std::string& key, std::string& value) con
 		value = Path::home();
 	else if (key == TEMPDIR)
 		value = Path::temp();
+	else if (key == DATETIME)
+		value = Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FORMAT);
+	else if (key == PID)
+		value = Poco::NumberFormatter::format(Poco::Process::id());
 	else if (key.compare(0, ENV.size(), ENV) == 0)
 		return getEnv(key.substr(ENV.size()), value);
 	else
@@ -113,6 +124,8 @@ void SystemConfiguration::enumerate(const std::string& key, Keys& range) const
 		range.push_back("currentDir");
 		range.push_back("homeDir");
 		range.push_back("tempDir");
+		range.push_back("dateTime");
+		range.push_back("pid");
 		range.push_back("env");
 	}
 }

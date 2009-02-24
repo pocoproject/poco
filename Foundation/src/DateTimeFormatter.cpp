@@ -1,7 +1,7 @@
 //
 // DateTimeFormatter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DateTimeFormatter.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/DateTimeFormatter.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -36,8 +36,6 @@
 
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
-#include "Poco/DateTime.h"
-#include "Poco/LocalDateTime.h"
 #include "Poco/Timestamp.h"
 #include "Poco/NumberFormatter.h"
 
@@ -45,17 +43,8 @@
 namespace Poco {
 
 
-std::string DateTimeFormatter::format(const Timestamp& timestamp, const std::string& fmt, int timeZoneDifferential)
+void DateTimeFormatter::append(std::string& str, const DateTime& dateTime, const std::string& fmt, int timeZoneDifferential)
 {
-	DateTime dateTime(timestamp);
-	return format(dateTime, fmt, timeZoneDifferential);
-}
-
-
-std::string DateTimeFormatter::format(const DateTime& dateTime, const std::string& fmt, int timeZoneDifferential)
-{
-	std::string result;
-	result.reserve(64);
 	std::string::const_iterator it  = fmt.begin();
 	std::string::const_iterator end = fmt.end();
 	while (it != end)
@@ -66,49 +55,40 @@ std::string DateTimeFormatter::format(const DateTime& dateTime, const std::strin
 			{
 				switch (*it)
 				{
-				case 'w': result.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()], 0, 3); break;
-				case 'W': result.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()]); break;
-				case 'b': result.append(DateTimeFormat::MONTH_NAMES[dateTime.month() - 1], 0, 3); break;
-				case 'B': result.append(DateTimeFormat::MONTH_NAMES[dateTime.month() - 1]); break;
-				case 'd': result.append(NumberFormatter::format0(dateTime.day(), 2)); break;
-				case 'e': result.append(NumberFormatter::format(dateTime.day())); break;
-				case 'f': result.append(NumberFormatter::format(dateTime.day(), 2)); break;
-				case 'm': result.append(NumberFormatter::format0(dateTime.month(), 2)); break;
-				case 'n': result.append(NumberFormatter::format(dateTime.month())); break;
-				case 'o': result.append(NumberFormatter::format(dateTime.month(), 2)); break;
-				case 'y': result.append(NumberFormatter::format0(dateTime.year() % 100, 2)); break;
-				case 'Y': result.append(NumberFormatter::format0(dateTime.year(), 4)); break;
-				case 'H': result.append(NumberFormatter::format0(dateTime.hour(), 2)); break;
-				case 'h': result.append(NumberFormatter::format0(dateTime.hourAMPM(), 2)); break;
-				case 'a': result.append(dateTime.isAM() ? "am" : "pm"); break;
-				case 'A': result.append(dateTime.isAM() ? "AM" : "PM"); break;
-				case 'M': result.append(NumberFormatter::format0(dateTime.minute(), 2)); break;
-				case 'S': result.append(NumberFormatter::format0(dateTime.second(), 2)); break;
-				case 'i': result.append(NumberFormatter::format0(dateTime.millisecond(), 3)); break;
-				case 'c': result.append(NumberFormatter::format(dateTime.millisecond()/100)); break;
-				case 'z': result.append(tzdISO(timeZoneDifferential)); break;
-				case 'Z': result.append(tzdRFC(timeZoneDifferential)); break;
-				default:  result += *it;
+				case 'w': str.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()], 0, 3); break;
+				case 'W': str.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()]); break;
+				case 'b': str.append(DateTimeFormat::MONTH_NAMES[dateTime.month() - 1], 0, 3); break;
+				case 'B': str.append(DateTimeFormat::MONTH_NAMES[dateTime.month() - 1]); break;
+				case 'd': NumberFormatter::append0(str, dateTime.day(), 2); break;
+				case 'e': NumberFormatter::append(str, dateTime.day()); break;
+				case 'f': NumberFormatter::append(str, dateTime.day(), 2); break;
+				case 'm': NumberFormatter::append0(str, dateTime.month(), 2); break;
+				case 'n': NumberFormatter::append(str, dateTime.month()); break;
+				case 'o': NumberFormatter::append(str, dateTime.month(), 2); break;
+				case 'y': NumberFormatter::append0(str, dateTime.year() % 100, 2); break;
+				case 'Y': NumberFormatter::append0(str, dateTime.year(), 4); break;
+				case 'H': NumberFormatter::append0(str, dateTime.hour(), 2); break;
+				case 'h': NumberFormatter::append0(str, dateTime.hourAMPM(), 2); break;
+				case 'a': str.append(dateTime.isAM() ? "am" : "pm"); break;
+				case 'A': str.append(dateTime.isAM() ? "AM" : "PM"); break;
+				case 'M': NumberFormatter::append0(str, dateTime.minute(), 2); break;
+				case 'S': NumberFormatter::append0(str, dateTime.second(), 2); break;
+				case 'i': NumberFormatter::append0(str, dateTime.millisecond(), 3); break;
+				case 'c': NumberFormatter::append(str, dateTime.millisecond()/100); break;
+				case 'z': tzdISO(str, timeZoneDifferential); break;
+				case 'Z': tzdRFC(str, timeZoneDifferential); break;
+				default:  str += *it;
 				}
 				++it;
 			}
 		}
-		else result += *it++;
+		else str += *it++;
 	}
-	return result;
 }
 
 
-std::string DateTimeFormatter::format(const LocalDateTime& dateTime, const std::string& fmt)
+void DateTimeFormatter::append(std::string& str, const Timespan& timespan, const std::string& fmt)
 {
-	return format(dateTime._dateTime, fmt, dateTime._tzd);
-}
-
-
-std::string DateTimeFormatter::format(const Timespan& timespan, const std::string& fmt)
-{
-	std::string result;
-	result.reserve(32);
 	std::string::const_iterator it  = fmt.begin();
 	std::string::const_iterator end = fmt.end();
 	while (it != end)
@@ -119,73 +99,66 @@ std::string DateTimeFormatter::format(const Timespan& timespan, const std::strin
 			{
 				switch (*it)
 				{
-				case 'd': result.append(NumberFormatter::format(timespan.days())); break;
-				case 'H': result.append(NumberFormatter::format0(timespan.hours(), 2)); break;
-				case 'h': result.append(NumberFormatter::format(timespan.totalHours())); break;
-				case 'M': result.append(NumberFormatter::format0(timespan.minutes(), 2)); break;
-				case 'm': result.append(NumberFormatter::format(timespan.totalMinutes())); break;
-				case 'S': result.append(NumberFormatter::format0(timespan.seconds(), 2)); break;
-				case 's': result.append(NumberFormatter::format(timespan.totalSeconds())); break;
-				case 'i': result.append(NumberFormatter::format0(timespan.milliseconds(), 3)); break;
-				case 'c': result.append(NumberFormatter::format(timespan.milliseconds()/100)); break;
-				default:  result += *it;
+				case 'd': NumberFormatter::append(str, timespan.days()); break;
+				case 'H': NumberFormatter::append0(str, timespan.hours(), 2); break;
+				case 'h': NumberFormatter::append(str, timespan.totalHours()); break;
+				case 'M': NumberFormatter::append0(str, timespan.minutes(), 2); break;
+				case 'm': NumberFormatter::append(str, timespan.totalMinutes()); break;
+				case 'S': NumberFormatter::append0(str, timespan.seconds(), 2); break;
+				case 's': NumberFormatter::append(str, timespan.totalSeconds()); break;
+				case 'i': NumberFormatter::append0(str, timespan.milliseconds(), 3); break;
+				case 'c': NumberFormatter::append(str, timespan.milliseconds()/100); break;
+				default:  str += *it;
 				}
 				++it;
 			}
 		}
-		else result += *it++;
+		else str += *it++;
 	}
-	return result;
 }
 
 
-std::string DateTimeFormatter::tzdISO(int timeZoneDifferential)
+void DateTimeFormatter::tzdISO(std::string& str, int timeZoneDifferential)
 {
-	std::string tzd;
-	tzd.reserve(8);
 	if (timeZoneDifferential != UTC)
 	{
 		if (timeZoneDifferential >= 0)
 		{
-			tzd += '+';
-			tzd += NumberFormatter::format0(timeZoneDifferential/3600, 2);
-			tzd += ':';
-			tzd += NumberFormatter::format0((timeZoneDifferential%3600)/60, 2);
+			str += '+';
+			NumberFormatter::append0(str, timeZoneDifferential/3600, 2);
+			str += ':';
+			NumberFormatter::append0(str, (timeZoneDifferential%3600)/60, 2);
 		}
 		else
 		{
-			tzd += '-';
-			tzd += NumberFormatter::format0(-timeZoneDifferential/3600, 2);
-			tzd += ':';
-			tzd += NumberFormatter::format0((-timeZoneDifferential%3600)/60, 2);
+			str += '-';
+			NumberFormatter::append0(str, -timeZoneDifferential/3600, 2);
+			str += ':';
+			NumberFormatter::append0(str, (-timeZoneDifferential%3600)/60, 2);
 		}
 	}
-	else tzd = "Z";
-	return tzd;
+	else str += 'Z';
 }
 
 
-std::string DateTimeFormatter::tzdRFC(int timeZoneDifferential)
+void DateTimeFormatter::tzdRFC(std::string& str, int timeZoneDifferential)
 {
-	std::string tzd;
-	tzd.reserve(8);
 	if (timeZoneDifferential != UTC)
 	{
 		if (timeZoneDifferential >= 0)
 		{
-			tzd += '+';
-			tzd += NumberFormatter::format0(timeZoneDifferential/3600, 2);
-			tzd += NumberFormatter::format0((timeZoneDifferential%3600)/60, 2);
+			str += '+';
+			NumberFormatter::append0(str, timeZoneDifferential/3600, 2);
+			NumberFormatter::append0(str, (timeZoneDifferential%3600)/60, 2);
 		}
 		else
 		{
-			tzd += '-';
-			tzd += NumberFormatter::format0(-timeZoneDifferential/3600, 2);
-			tzd += NumberFormatter::format0((-timeZoneDifferential%3600)/60, 2);
+			str += '-';
+			NumberFormatter::append0(str, -timeZoneDifferential/3600, 2);
+			NumberFormatter::append0(str, (-timeZoneDifferential%3600)/60, 2);
 		}		
 	}
-	else tzd = "GMT";
-	return tzd;
+	else str += "GMT";
 }
 
 

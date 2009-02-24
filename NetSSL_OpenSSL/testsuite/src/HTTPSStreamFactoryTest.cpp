@@ -1,7 +1,7 @@
 //
 // HTTPSStreamFactoryTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -103,7 +103,7 @@ void HTTPSStreamFactoryTest::testProxy()
 {
 	HTTPSTestServer server;
 	HTTPSStreamFactory factory("proxy.aon.at", 8080);
-	URI uri("https://wwws.appinf.com/");
+	URI uri("https://sourceforge.net/");
 	std::auto_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);

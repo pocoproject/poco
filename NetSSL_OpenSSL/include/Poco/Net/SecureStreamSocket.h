@@ -1,7 +1,7 @@
 //
 // SecureStreamSocket.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#5 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -9,7 +9,7 @@
 //
 // Definition of the SecureStreamSocket class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -42,6 +42,8 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/Context.h"
+#include "Poco/Net/X509Certificate.h"
 
 
 namespace Poco {
@@ -50,22 +52,72 @@ namespace Net {
 
 class NetSSL_API SecureStreamSocket: public StreamSocket
 	/// A subclass of StreamSocket for secure SSL sockets.
+	///
+	/// A few notes about nonblocking IO:
+	/// sendBytes() and receiveBytes() can return a
+	/// negative value when using a nonblocking socket, which means 
+	/// a SSL handshake is currently in progress and more data
+	/// needs to be read or written for the handshake to continue.
+	/// If sendBytes() or receiveBytes() return ERR_SSL_WANT_WRITE,
+	/// sendBytes() must be called as soon as possible (usually, after
+	/// select() indicates that data can be written). Likewise, if
+	/// ERR_SSL_WANT_READ is returned, receiveBytes() must be called
+	/// as soon as data is available for reading (indicated by select()).
+	///
+	/// The SSL handshake is delayed until the first sendBytes() or 
+	/// receiveBytes() operation is performed on the socket. No automatic
+	/// post connection check (checking the peer certificate for a valid
+	/// hostname) is performed when using nonblocking I/O.
 {
 public:
+	enum
+	{
+		ERR_SSL_WANT_READ  = -1,
+		ERR_SSL_WANT_WRITE = -2
+	};
+	
 	SecureStreamSocket();
-		/// Creates an unconnected stream socket.
+		/// Creates an unconnected secure stream socket
+		/// using the default client SSL context.
 		///
 		/// Before sending or receiving data, the socket
 		/// must be connected with a call to connect().
 
-	SecureStreamSocket(const SocketAddress& address);
-		/// Creates a stream socket and connects it to
+	explicit SecureStreamSocket(Context::Ptr pContext);
+		/// Creates an unconnected secure stream socket
+		/// using the given SSL context.
+		///
+		/// Before sending or receiving data, the socket
+		/// must be connected with a call to connect().
+
+	explicit SecureStreamSocket(const SocketAddress& address);
+		/// Creates a secure stream socket using the default 
+		/// client SSL context and connects it to
 		/// the socket specified by address.
 
+	SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext);
+		/// Creates a secure stream socket using the given 
+		/// client SSL context and connects it to
+		/// the socket specified by address.
+
+	SecureStreamSocket(const SocketAddress& address, const std::string& hostName);
+		/// Creates a secure stream socket using the default 
+		/// client SSL context and connects it to
+		/// the socket specified by address.
+		///
+		/// The given host name is used for certificate verification.
+
+	SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext);
+		/// Creates a secure stream socket using the given 
+		/// client SSL context and connects it to
+		/// the socket specified by address.
+		///
+		/// The given host name is used for certificate verification.
+
 	SecureStreamSocket(const Socket& socket);
-		/// Creates the StreamSocket with the SocketImpl
+		/// Creates the SecureStreamSocket with the SocketImpl
 		/// from another socket. The SocketImpl must be
-		/// a StreamSocketImpl, otherwise an InvalidArgumentException
+		/// a SecureStreamSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
 	virtual ~SecureStreamSocket();
@@ -77,6 +129,38 @@ public:
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.	
+	
+	X509Certificate peerCertificate() const;
+		/// Returns the peer's X509 certificate.
+		
+	void setPeerHostName(const std::string& hostName);
+		/// Sets the peer's host name used for certificate validation.
+		
+	const std::string& getPeerHostName() const;
+		/// Returns the peer's host name used for certificate validation.
+
+	static SecureStreamSocket attach(const StreamSocket& streamSocket);
+		/// Creates a SecureStreamSocket over an existing socket
+		/// connection. The given StreamSocket must be connected.
+		/// A SSL handshake will be performed.
+
+	static SecureStreamSocket attach(const StreamSocket& streamSocket, Context::Ptr pContext);
+		/// Creates a SecureStreamSocket over an existing socket
+		/// connection. The given StreamSocket must be connected.
+		/// A SSL handshake will be performed.
+
+	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName);
+		/// Creates a SecureStreamSocket over an existing socket
+		/// connection. The given StreamSocket must be connected.
+		/// A SSL handshake will be performed.
+
+	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext);
+		/// Creates a SecureStreamSocket over an existing socket
+		/// connection. The given StreamSocket must be connected.
+		/// A SSL handshake will be performed.
+
+	Context::Ptr context() const;
+		/// Returns the SSL context used by this socket.
 
 protected:
 	SecureStreamSocket(SocketImpl* pImpl);

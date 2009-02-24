@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#4 $
 //
 // Library: Net
 // Package: Mail
@@ -70,7 +70,7 @@ public:
 		AUTH_LOGIN,
 	};
 
-	SMTPClientSession(const StreamSocket& socket);
+	explicit SMTPClientSession(const StreamSocket& socket);
 		/// Creates the SMTPClientSession using
 		/// the given socket, which must be connected
 		/// to a SMTP server.

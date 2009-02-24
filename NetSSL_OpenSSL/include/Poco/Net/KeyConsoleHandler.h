@@ -1,7 +1,7 @@
 //
 // KeyConsoleHandler.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/KeyConsoleHandler.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/KeyConsoleHandler.h#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -9,7 +9,7 @@
 //
 // Definition of the KeyConsoleHandler class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -49,7 +49,8 @@ namespace Net {
 
 
 class NetSSL_API KeyConsoleHandler: public PrivateKeyPassphraseHandler
-	/// Class KeyConsoleHandler. Reads the key for a certificate from the console.
+	/// An implementation of PrivateKeyPassphraseHandler that
+	/// reads the key for a certificate from the console.
 {
 public:
 	KeyConsoleHandler(bool server);

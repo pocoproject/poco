@@ -1,7 +1,7 @@
 //
 // DateTimeFormatter.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/DateTimeFormatter.h#1 $
+// $Id: //poco/1.3/Foundation/include/Poco/DateTimeFormatter.h#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -41,13 +41,13 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/DateTime.h"
+#include "Poco/LocalDateTime.h"
 
 
 namespace Poco {
 
 
-class DateTime;
-class LocalDateTime;
 class Timestamp;
 class Timespan;
 
@@ -55,6 +55,12 @@ class Timespan;
 class Foundation_API DateTimeFormatter
 	/// This class converts dates and times into strings, supporting a  
 	/// variety of standard and custom formats.
+	///
+	/// There are two kind of static member functions:
+	///    * format* functions return a std::string containing
+	///      the formatted value.
+	///    * append* functions append the formatted value to
+	///      an existing string.
 {
 public:
 	enum
@@ -119,6 +125,26 @@ public:
 		///   * %c - centisecond (0 .. 9)
 		///   * %% - percent sign
 
+	static void append(std::string& str, const Timestamp& timestamp, const std::string& fmt, int timeZoneDifferential = UTC);
+		/// Formats the given timestamp according to the given format and appends it to str.
+		///
+		/// See format() for documentation of the formatting string.
+
+	static void append(std::string& str, const DateTime& dateTime, const std::string& fmt, int timeZoneDifferential = UTC);
+		/// Formats the given date and time according to the given format and appends it to str.
+		///
+		/// See format() for documentation of the formatting string.
+
+	static void append(std::string& str, const LocalDateTime& dateTime, const std::string& fmt);
+		/// Formats the given local date and time according to the given format and appends it to str.
+		///
+		/// See format() for documentation of the formatting string.
+
+	static void append(std::string& str, const Timespan& timespan, const std::string& fmt = "%dd %H:%M:%S.%i");
+		/// Formats the given timespan according to the given format and appends it to str.
+		///
+		/// See format() for documentation of the formatting string.
+
 	static std::string tzdISO(int timeZoneDifferential);
 		/// Formats the given timezone differential in ISO format.
 		/// If timeZoneDifferential is UTC, "Z" is returned,
@@ -128,7 +154,78 @@ public:
 		/// Formats the given timezone differential in RFC format.
 		/// If timeZoneDifferential is UTC, "GMT" is returned,
 		/// otherwise ++HHMM (or -HHMM) is returned.
+
+	static void tzdISO(std::string& str, int timeZoneDifferential);
+		/// Formats the given timezone differential in ISO format
+		/// and appends it to the given string.
+		/// If timeZoneDifferential is UTC, "Z" is returned,
+		/// otherwise, +HH.MM (or -HH.MM) is returned.
+		
+	static void tzdRFC(std::string& str, int timeZoneDifferential);
+		/// Formats the given timezone differential in RFC format
+		/// and appends it to the given string.
+		/// If timeZoneDifferential is UTC, "GMT" is returned,
+		/// otherwise ++HHMM (or -HHMM) is returned.
 };
+
+
+//
+// inlines
+//
+inline std::string DateTimeFormatter::format(const Timestamp& timestamp, const std::string& fmt, int timeZoneDifferential)
+{
+	DateTime dateTime(timestamp);
+	return format(dateTime, fmt, timeZoneDifferential);
+}
+
+
+inline std::string DateTimeFormatter::format(const DateTime& dateTime, const std::string& fmt, int timeZoneDifferential)
+{
+	std::string result;
+	result.reserve(64);
+	append(result, dateTime, fmt, timeZoneDifferential);
+	return result;
+}
+
+
+inline std::string DateTimeFormatter::format(const LocalDateTime& dateTime, const std::string& fmt)
+{
+	return format(dateTime._dateTime, fmt, dateTime._tzd);
+}
+
+
+inline std::string DateTimeFormatter::format(const Timespan& timespan, const std::string& fmt)
+{
+	std::string result;
+	result.reserve(32);
+	append(result, timespan, fmt);
+	return result;
+}
+
+
+inline void DateTimeFormatter::append(std::string& str, const Timestamp& timestamp, const std::string& fmt, int timeZoneDifferential)
+{
+	DateTime dateTime(timestamp);
+	append(str, dateTime, fmt, timeZoneDifferential);
+}
+
+
+inline std::string DateTimeFormatter::tzdISO(int timeZoneDifferential)
+{
+	std::string result;
+	result.reserve(8);
+	tzdISO(result, timeZoneDifferential);
+	return result;
+}
+
+
+inline std::string DateTimeFormatter::tzdRFC(int timeZoneDifferential)
+{
+	std::string result;
+	result.reserve(8);
+	tzdRFC(result, timeZoneDifferential);
+	return result;
+}
 
 
 } // namespace Poco

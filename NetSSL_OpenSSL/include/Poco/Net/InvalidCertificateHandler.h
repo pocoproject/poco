@@ -1,7 +1,7 @@
 //
 // InvalidCertificateHandler.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/InvalidCertificateHandler.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/InvalidCertificateHandler.h#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -9,7 +9,7 @@
 //
 // Definition of the InvalidCertificateHandler class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -52,7 +52,7 @@ class NetSSL_API InvalidCertificateHandler
 	/// A InvalidCertificateHandler is invoked whenever an error occurs verifying the certificate. It allows the user
 	/// to inspect and accept/reject the certificate.
 	/// One can install one's own InvalidCertificateHandler by implementing this interface. Note that
-	/// in the cpp file of the subclass the following code must be present (assuming you use the namespace My_API 
+	/// in the implementation file of the subclass the following code must be present (assuming you use the namespace My_API 
 	/// and the name of your handler class is MyGuiHandler):
 	///    
 	///    #include "Poco/Net/CertificateHandlerFactory.h"
@@ -72,11 +72,13 @@ class NetSSL_API InvalidCertificateHandler
 	///            [...] // Put optional config params for the handler here
 	///        </options>
 	///    </invalidCertificateHandler>
+	///
 	/// Note that the name of the InvalidCertificateHandler must be same as the one provided to the POCO_REGISTER_CHFACTORY macro.
 {
 public:
 	InvalidCertificateHandler(bool handleErrorsOnServerSide);
-		/// Creates the InvalidCertificateHandler. 
+		/// Creates the InvalidCertificateHandler.
+		/// 
 		/// Set handleErrorsOnServerSide to true if the certificate handler is used on the server side.
 		/// Automatically registers at one of the SSLManager::VerificationError events.
 

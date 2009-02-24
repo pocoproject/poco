@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.3/Net/src/IPAddress.cpp#6 $
+// $Id: //poco/1.3/Net/src/IPAddress.cpp#8 $
 //
 // Library: Net
 // Package: NetCore
@@ -117,13 +117,13 @@ public:
 		const UInt8* bytes = reinterpret_cast<const UInt8*>(&_addr);
 		std::string result;
 		result.reserve(16);
-		result.append(NumberFormatter::format(bytes[0]));
+		NumberFormatter::append(result, bytes[0]);
 		result.append(".");
-		result.append(NumberFormatter::format(bytes[1]));
+		NumberFormatter::append(result, bytes[1]);
 		result.append(".");
-		result.append(NumberFormatter::format(bytes[2]));
+		NumberFormatter::append(result, bytes[2]);
 		result.append(".");
-		result.append(NumberFormatter::format(bytes[3]));
+		NumberFormatter::append(result, bytes[3]);
 		return result;
 	}
 
@@ -295,13 +295,13 @@ public:
 			else
 				result.append("::FFFF:");
 			const UInt8* bytes = reinterpret_cast<const UInt8*>(&_addr);
-			result.append(NumberFormatter::format(bytes[12]));
+			NumberFormatter::append(result, bytes[12]);
 			result.append(".");
-			result.append(NumberFormatter::format(bytes[13]));
+			NumberFormatter::append(result, bytes[13]);
 			result.append(".");
-			result.append(NumberFormatter::format(bytes[14]));
+			NumberFormatter::append(result, bytes[14]);
 			result.append(".");
-			result.append(NumberFormatter::format(bytes[15]));
+			NumberFormatter::append(result, bytes[15]);
 			return result;
 		}
 		else
@@ -324,7 +324,7 @@ public:
 					}
 				}
 				if (i > 0) result.append(":");
-				if (i < 8) result.append(NumberFormatter::formatHex(ntohs(words[i++])));
+				if (i < 8) NumberFormatter::appendHex(result, ntohs(words[i++]));
 			}
 			return result;
 		}

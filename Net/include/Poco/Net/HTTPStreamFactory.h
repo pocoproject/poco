@@ -1,7 +1,7 @@
 //
 // HTTPStreamFactory.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPStreamFactory.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPStreamFactory.h#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -82,6 +82,10 @@ public:
 		
 	static void registerFactory();
 		/// Registers the HTTPStreamFactory with the
+		/// default URIStreamOpener instance.	
+
+	static void unregisterFactory();
+		/// Unregisters the HTTPStreamFactory with the
 		/// default URIStreamOpener instance.	
 		
 private:

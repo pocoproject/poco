@@ -1,7 +1,7 @@
 //
 // VerificationErrorArgs.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/VerificationErrorArgs.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/VerificationErrorArgs.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -9,7 +9,7 @@
 //
 // Definition of the VerificationErrorArgs class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization

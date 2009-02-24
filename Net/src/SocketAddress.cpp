@@ -1,7 +1,7 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketAddress.cpp#2 $
+// $Id: //poco/1.3/Net/src/SocketAddress.cpp#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -331,7 +331,7 @@ std::string SocketAddress::toString() const
 	if (host().family() == IPAddress::IPv6)
 		result.append("]");
 	result.append(":");
-	result.append(NumberFormatter::format(port()));
+	NumberFormatter::append(result, port());
 	return result;
 }
 

@@ -1,13 +1,13 @@
 //
 // SecureStreamSocket.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureStreamSocket
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -37,6 +37,7 @@
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
 #include "Poco/Net/SocketImpl.h"
+#include "Poco/Net/SSLManager.h"
 #include "Poco/Exception.h"
 
 
@@ -48,14 +49,43 @@ namespace Net {
 
 
 SecureStreamSocket::SecureStreamSocket(): 
-	StreamSocket(new SecureStreamSocketImpl)
+	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
+{
+}
+
+
+SecureStreamSocket::SecureStreamSocket(Context::Ptr pContext): 
+	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 }
 
 
 SecureStreamSocket::SecureStreamSocket(const SocketAddress& address): 
-	StreamSocket(new SecureStreamSocketImpl)
+	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
 {
+	connect(address);
+}
+
+
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName): 
+	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
+	connect(address);
+}
+
+
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext): 
+	StreamSocket(new SecureStreamSocketImpl(pContext))
+{
+	connect(address);
+}
+
+
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext): 
+	StreamSocket(new SecureStreamSocketImpl(pContext))
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
 	connect(address);
 }
 
@@ -88,6 +118,68 @@ SecureStreamSocket& SecureStreamSocket::operator = (const Socket& socket)
 	else
 		throw InvalidArgumentException("Cannot assign incompatible socket");
 	return *this;
+}
+
+
+X509Certificate SecureStreamSocket::peerCertificate() const
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->peerCertificate();
+}
+
+
+void SecureStreamSocket::setPeerHostName(const std::string& hostName)
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
+}
+
+	
+const std::string& SecureStreamSocket::getPeerHostName() const
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->getPeerHostName();
+}
+
+
+SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket)
+{
+	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), SSLManager::instance().defaultClientContext());
+	SecureStreamSocket result(pImpl);
+	pImpl->connectSSL();
+	return result;
+}
+
+
+SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, Context::Ptr pContext)
+{
+	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
+	SecureStreamSocket result(pImpl);
+	pImpl->connectSSL();
+	return result;
+}
+
+
+SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, const std::string& peerHostName)
+{
+	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), SSLManager::instance().defaultClientContext());
+	SecureStreamSocket result(pImpl);
+	result.setPeerHostName(peerHostName);
+	pImpl->connectSSL();
+	return result;
+}
+
+
+SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext)
+{
+	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
+	SecureStreamSocket result(pImpl);
+	result.setPeerHostName(peerHostName);
+	pImpl->connectSSL();
+	return result;
+}
+
+
+Context::Ptr SecureStreamSocket::context() const
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->context();
 }
 
 

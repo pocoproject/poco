@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#6 $
+// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#7 $
 //
 // Library: Net
 // Package: HTTP
@@ -121,7 +121,7 @@ void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 	if (port != HTTPSession::HTTP_PORT)
 	{
 		value.append(":");
-		value.append(NumberFormatter::format(port));
+		NumberFormatter::append(value, port);
 	}
 	setHost(value);
 }

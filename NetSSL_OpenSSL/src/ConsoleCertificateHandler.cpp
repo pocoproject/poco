@@ -1,13 +1,13 @@
 //
 // ConsoleCertificateHandler.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/ConsoleCertificateHandler.cpp#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/ConsoleCertificateHandler.cpp#5 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  ConsoleCertificateHandler
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -42,7 +42,7 @@ namespace Poco {
 namespace Net {
 
 
-ConsoleCertificateHandler::ConsoleCertificateHandler(bool server):InvalidCertificateHandler(server)
+ConsoleCertificateHandler::ConsoleCertificateHandler(bool server): InvalidCertificateHandler(server)
 {
 }
 
@@ -55,13 +55,14 @@ ConsoleCertificateHandler::~ConsoleCertificateHandler()
 void ConsoleCertificateHandler::onInvalidCertificate(const void*, VerificationErrorArgs& errorCert)
 {
 	const X509Certificate& aCert = errorCert.certificate();
-	std::cout << " Certificate:\n";
-	std::cout << "----------------\n";
-	std::cout << "  IssuerName: \t" << aCert.issuerName() << "\n";
-	std::cout << "  SubjectName:\t" << aCert.subjectName() << "\n\n";
+	std::cout << "\n";
+	std::cout << "WARNING: Certificate verification failed\n";
+	std::cout << "----------------------------------------\n";
+	std::cout << "Issuer Name:  " << aCert.issuerName() << "\n";
+	std::cout << "Subject Name: " << aCert.subjectName() << "\n\n";
 	std::cout << "The certificate yielded the error: " << errorCert.errorMessage() << "\n\n";
-	std::cout << "The error occurred at in the certificate chain at position " << errorCert.errorDepth() << "\n";
-	std::cout << "Accept the certificate? (y,n)";
+	std::cout << "The error occurred in the certificate chain at position " << errorCert.errorDepth() << "\n";
+	std::cout << "Accept the certificate (y,n)? ";
 	char c;
 	std::cin >> c;
 	if (c == 'y' || c == 'Y')

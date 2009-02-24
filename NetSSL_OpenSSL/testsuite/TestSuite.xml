@@ -10,7 +10,7 @@
 			<privateKeyPassphraseHandler>
 				<name>KeyFileHandler</name>
 				<options>
-					<password>test</password>
+					<password>secret</password>
 				</options>
 			</privateKeyPassphraseHandler>
 			<invalidCertificateHandler>
@@ -29,7 +29,7 @@
 			<privateKeyPassphraseHandler>
 				<name>KeyFileHandler</name>
 				<options>
-					<password>test</password>
+					<password>secret</password>
 				</options>
 			</privateKeyPassphraseHandler>
 			<invalidCertificateHandler>

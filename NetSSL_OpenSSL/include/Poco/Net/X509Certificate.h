@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#4 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -9,7 +9,7 @@
 //
 // Definition of the X509Certificate class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -42,7 +42,9 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/Context.h"
+#include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
+#include <set>
 #include <openssl/ssl.h>
 
 
@@ -50,24 +52,34 @@ namespace Poco {
 namespace Net {
 
 
+class HostEntry;
+
+
 class NetSSL_API X509Certificate
-	/// This class represents an X509 Certificate.
+	/// This class represents a X509 Certificate.
 {
 public:
-	X509Certificate(std::istream& str);
-		/// Loads the X509Certificate from the stream
+	explicit X509Certificate(std::istream& istr);
+		/// Creates the X509Certificate object by reading
+		/// a certificate in PEM format from a stream.
 
-	X509Certificate(const std::string& file);
-		/// Loads the X509Certificate from the file
+	explicit X509Certificate(const std::string& path);
+		/// Creates the X509Certificate object by reading
+		/// a certificate in PEM format from a file.
 
-	X509Certificate(X509* pCert);
-		/// Creates the X509Certificate.
+	explicit X509Certificate(X509* pCert);
+		/// Creates the X509Certificate from an existing
+		/// OpenSSL certificate. Ownership is taken of 
+		/// the certificate.
 
-	X509Certificate(const X509Certificate&);
+	X509Certificate(const X509Certificate& cert);
+		/// Creates the certificate by copying another one.
 
-	X509Certificate& operator=(const X509Certificate&);
+	X509Certificate& operator = (const X509Certificate& cert);
+		/// Assigns a certificate.
 
 	void swap(X509Certificate& cert);
+		/// Exchanges the certificate with another one.
 
 	~X509Certificate();
 		/// Destroys the X509Certificate.
@@ -78,23 +90,39 @@ public:
 	const std::string& subjectName() const;
 		/// Returns the certificate subject name.
 		
-	const X509* certificate() const;
-		/// Returns the OpenSSL certificate.
-
-	bool verify(const std::string& hostName, Poco::SharedPtr<Context> ptr);
-		/// Verifies the validity of the certificate against the hostname
-
+	std::string commonName() const;
+		/// Returns the common name stored in the certificate.
 		
-private:
-	void initialize();
-		/// Extracts data from _pCert. Assumes _pCert != 0.
+	const X509* certificate() const;
+		/// Returns the underlying OpenSSL certificate.
 
+	long verify(const std::string& hostName) const;
+		/// Verifies the validity of the certificate against the host name.
 
+	void extractNames(std::string& commonName, std::set<std::string>& domainNames) const;
+		/// Extracts the common name and the alias domain names from the
+		/// certificate.
+		
+	Poco::DateTime validFrom() const;
+		/// Returns the date and time the certificate is valid from.
+		
+	Poco::DateTime expiresOn() const;
+		/// Returns the date and time the certificate expires.
+
+protected:
+	void init();
+	static bool containsWildcards(const std::string& commonName);
+	static bool matchByAlias(const std::string& alias, const HostEntry& heData);
+	
 private:
+	enum
+	{
+		NAME_BUFFER_SIZE = 256
+	};
+	
 	std::string _issuerName;
 	std::string _subjectName;
 	X509*       _pCert;
-	std::string _file;
 };
 
 

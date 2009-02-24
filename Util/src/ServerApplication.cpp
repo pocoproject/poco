@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#8 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#9 $
 //
 // Library: Util
 // Package: Application
@@ -223,7 +223,7 @@ void ServerApplication::waitForTerminationRequest()
 {
 	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
 	std::string evName("POCOTRM");
-	evName.append(NumberFormatter::formatHex(Process::id(), 8));
+	NumberFormatter::appendHex(evName, Process::id(), 8);
 	NamedEvent ev(evName);
 	ev.wait();
 	_terminated.set();
@@ -548,7 +548,7 @@ void ServerApplication::waitForTerminationRequest()
 	sys$qiow(0, ioChan, IO$_SETMODE | IO$M_CTRLCAST, 0, 0, 0, terminate, 0, 0, 0, 0, 0);
 
 	std::string evName("POCOTRM");
-	evName.append(NumberFormatter::formatHex(Process::id(), 8));
+	NumberFormatter::appendHex(evName, Process::id(), 8);
 	NamedEvent ev(evName);
 	try
 	{

@@ -1,7 +1,7 @@
 //
 // HTTPSSessionInstantiator.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSSessionInstantiator.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSSessionInstantiator.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -9,7 +9,7 @@
 //
 // Definition of the HTTPSSessionInstantiator class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization

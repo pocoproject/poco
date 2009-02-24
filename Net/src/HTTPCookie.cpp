@@ -1,7 +1,7 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#4 $
+// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#5 $
 //
 // Library: Net
 // Package: HTTP
@@ -260,7 +260,7 @@ std::string HTTPCookie::toString() const
 			Timestamp ts;
 			ts += _maxAge*Timestamp::resolution();
 			result.append("; expires=");
-			result.append(DateTimeFormatter::format(ts, DateTimeFormat::HTTP_FORMAT));
+			DateTimeFormatter::append(result, ts, DateTimeFormat::HTTP_FORMAT);
 		}
 		if (_secure)
 		{
@@ -298,7 +298,7 @@ std::string HTTPCookie::toString() const
 		if (_maxAge >= 0)
 		{
 			result.append("; Max-Age=\"");
-			result.append(NumberFormatter::format(_maxAge));
+			NumberFormatter::append(result, _maxAge);
 			result.append("\"");
 		}
 		if (_secure)

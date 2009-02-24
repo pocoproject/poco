@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPClientSession.h#4 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPClientSession.h#5 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -169,8 +169,9 @@ protected:
 	int write(const char* buffer, std::streamsize length);
 		/// Tries to re-connect if keep-alive is on.
 	
-	virtual std::string getHostInfo() const;
-		/// Returns the target host and port number for proxy requests.
+	virtual std::string proxyRequestPrefix() const;
+		/// Returns the prefix prepended to the URI for proxy requests
+		/// (e.g., "http://myhost.com").
 
 	void deleteResponseStream();
 		/// Deletes the response stream and sets it to 0.

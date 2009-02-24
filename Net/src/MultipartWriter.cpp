@@ -1,7 +1,7 @@
 //
 // MultipartWriter.cpp
 //
-// $Id: //poco/1.3/Net/src/MultipartWriter.cpp#2 $
+// $Id: //poco/1.3/Net/src/MultipartWriter.cpp#3 $
 //
 // Library: Net
 // Package: Messages
@@ -99,8 +99,8 @@ std::string MultipartWriter::createBoundary()
 {
 	std::string boundary("MIME_boundary_");
 	Random rnd;
-	boundary.append(NumberFormatter::formatHex(rnd.next(), 8));
-	boundary.append(NumberFormatter::formatHex(rnd.next(), 8));
+	NumberFormatter::appendHex(boundary, rnd.next(), 8);
+	NumberFormatter::appendHex(boundary, rnd.next(), 8);
 	return boundary;
 }
 
