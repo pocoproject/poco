@@ -43,7 +43,10 @@
 #if defined(POCO_HAVE_FD_POLL)
 	#include <poll.h>
 #endif
-
+#if defined(sun) || defined(__sun) || defined(__sun__)
+#include <unistd.h>
+#include <stropts.h>
+#endif 
 
 using Poco::IOException;
 using Poco::TimeoutException;

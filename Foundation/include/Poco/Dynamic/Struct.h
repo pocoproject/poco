@@ -155,7 +155,9 @@ public:
 		/// when already another element was present, in this case Iterator
 		/// points to that other element)
 	{
-		return insert(std::make_pair(key, value));
+		// fix: SunPro C++ is silly ...
+		ValueType valueType(key,value);
+		return insert(valueType);
 	}
 
 	inline InsRetVal insert(const ValueType& aPair)

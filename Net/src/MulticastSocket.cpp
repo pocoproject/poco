@@ -34,6 +34,10 @@
 //
 
 
+#if defined(sun) || defined(__sun) || defined(__sun__)
+#define __EXTENSIONS__
+#endif
+
 #include "Poco/Net/MulticastSocket.h"
 #include "Poco/Net/NetException.h"
 #include <cstring>

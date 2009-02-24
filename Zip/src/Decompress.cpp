@@ -128,7 +128,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		std::ofstream out(dest.toString().c_str(), std::ios::binary);
 		if (!out)
 		{
-			std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Failed to open output stream " + dest.toString());
+			std::pair<const ZipLocalFileHeader, const std::string> tmp(hdr, "Failed to open output stream " + dest.toString());
 			EError.notify(this, tmp);
 			return false;
 		}
@@ -138,7 +138,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		Poco::File aFile(file);
 		if (!aFile.exists() || !aFile.isFile())
 		{
-			std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Failed to create output stream " + dest.toString());
+			std::pair<const ZipLocalFileHeader, const std::string> tmp(hdr, "Failed to create output stream " + dest.toString());
 			EError.notify(this, tmp);
 			return false;
 		}
@@ -147,7 +147,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		{
 			if (!_keepIncompleteFiles)
 				aFile.remove();
-			std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "CRC mismatch. Corrupt file: " + dest.toString());
+			std::pair<const ZipLocalFileHeader, const std::string> tmp(hdr, "CRC mismatch. Corrupt file: " + dest.toString());
 			EError.notify(this, tmp);
 			return false;
 		}
@@ -158,23 +158,23 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		{
 			if (!_keepIncompleteFiles)
 				aFile.remove();
-			std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Filesizes do not match. Corrupt file: " + dest.toString());
+			std::pair<const ZipLocalFileHeader, const std::string> tmp(hdr, "Filesizes do not match. Corrupt file: " + dest.toString());
 			EError.notify(this, tmp);
 			return false;
 		}
 
-		std::pair<const ZipLocalFileHeader, const Poco::Path> tmp = std::make_pair(hdr, file);
+		std::pair<const ZipLocalFileHeader, const Poco::Path> tmp(hdr, file);
 		EOk.notify(this, tmp);
 	}
 	catch (Poco::Exception& e)
 	{
-		std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Exception: " + e.displayText());
+		std::pair<const ZipLocalFileHeader, const std::string> tmp(hdr, "Exception: " + e.displayText());
 		EError.notify(this, tmp);
 		return false;
 	}
 	catch (...)
 	{
-		std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Unknown Exception");
+		std::pair<const ZipLocalFileHeader, const std::string> tmp(hdr, "Unknown Exception");
 		EError.notify(this, tmp);
 		return false;
 	}
@@ -185,7 +185,9 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 
 void Decompress::onOk(const void*, std::pair<const ZipLocalFileHeader, const Poco::Path>& val)
 {
-	_mapping.insert(std::make_pair(val.first.getFileName(), val.second));
+//	std::pair<std::string,Poco::Path> par(val.first.getFileName(), val.second);
+	ZipMapping::value_type p(val.first.getFileName(), val.second);
+	_mapping.insert(p);
 }
 
 

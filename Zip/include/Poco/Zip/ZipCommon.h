@@ -100,7 +100,7 @@ public:
 		HS_MVS = 15,
 		HS_BEOS = 16,
 		HS_TANDEM = 17,
-		HS_UNUSED = 18,
+		HS_UNUSED = 18
 	};
 
 	enum FileType

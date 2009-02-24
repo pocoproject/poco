@@ -41,7 +41,6 @@
 #include <sys/utsname.h>
 #include <cstring>
 
-
 namespace Poco {
 
 
@@ -206,8 +205,11 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 // General Unix
 //
 #include <sys/ioctl.h>
-#if defined(sun) || defined(__sun)
+#if defined(sun) || defined(__sun) || defined(__sun__)
+#define __EXTENSIONS__
+#include <net/if_arp.h>
 #include <sys/sockio.h>
+#include <stropts.h>
 #endif
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -218,7 +220,6 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 #include <net/if.h>
 #include <net/if_arp.h>
 #include <unistd.h>
-
 
 namespace Poco {
 

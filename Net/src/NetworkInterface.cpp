@@ -33,6 +33,10 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+#if defined(sun) || defined(__sun) || defined(__sun__)
+#define __EXTENSIONS__
+#include <net/if.h>
+#endif
 
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/Net/DatagramSocket.h"
@@ -43,7 +47,6 @@
 #include "Poco/UnicodeConverter.h"
 #endif
 #include <cstring>
-
 
 using Poco::NumberFormatter;
 using Poco::FastMutex;

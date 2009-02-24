@@ -42,6 +42,7 @@
 
 #include "Poco/Zip/Zip.h"
 #include "Poco/Zip/ParseCallback.h"
+#include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Path.h"
 #include "Poco/FIFOEvent.h"
 
