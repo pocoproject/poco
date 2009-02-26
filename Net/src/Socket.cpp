@@ -160,7 +160,6 @@ int Socket::poll(SocketList& readList, SocketList& writeList, SocketList& except
 	SocketList readyWriteList;
 	SocketList readyExceptList;
 
-	int count = 0;
 	SocketList::iterator begE = exceptList.begin();
 	SocketList::iterator endE = exceptList.end();
 	for (int idx = 0; idx < nfd; ++idx)

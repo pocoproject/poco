@@ -80,15 +80,24 @@ public:
 		TYPE_BINARY  // TYPE I (Image)
 	};
 	
+	FTPClientSession();
+		/// Creates an FTPClientSession.
+		///
+		/// Passive mode will be used for data transfers.
+
 	explicit FTPClientSession(const StreamSocket& socket);
 		/// Creates an FTPClientSession using the given
 		/// connected socket for the control connection.
 		///
 		/// Passive mode will be used for data transfers.
 		
-	FTPClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT);
+	FTPClientSession(const std::string& host,
+		Poco::UInt16 port = FTP_PORT,
+		const std::string& username = "",
+		const std::string& password = "");
 		/// Creates an FTPClientSession using a socket connected
-		/// to the given host and port.
+		/// to the given host and port. If username is supplied,
+		/// login is attempted.
 		///
 		/// Passive mode will be used for data transfers.
 		
@@ -106,7 +115,14 @@ public:
 		
 	bool getPassive() const;
 		/// Returns true iff passive mode is enabled for this connection.
-		
+	
+	void open(const std::string& host,
+		Poco::UInt16 port,
+		const std::string& username = "",
+		const std::string& password = "");
+		/// Opens the FTP connection to the given host and port.
+		/// If username is supplied, login is attempted.
+
 	void login(const std::string& username, const std::string& password);
 		/// Authenticates the user against the FTP server. Must be
 		/// called before any other commands (except QUIT) can be sent.
@@ -116,6 +132,8 @@ public:
 		///
 		/// Throws a FTPException in case of a FTP-specific error, or a
 		/// NetException in case of a general network communication failure.
+
+	void logout();
 
 	void close();
 		/// Sends a QUIT command and closes the connection to the server.	
@@ -295,6 +313,12 @@ public:
 		/// Sends the given command verbatim to the server
 		/// and waits for a response.
 
+	bool isOpen() const;
+		/// Returns true if the connection with FTP server is opened.
+
+	bool isLoggedIn() const;
+		/// Returns true if the session is logged in.
+
 protected:
 	enum StatusClass
 	{
@@ -329,16 +353,18 @@ protected:
 	void endTransfer();
 	
 private:
-	FTPClientSession();
 	FTPClientSession(const FTPClientSession&);
 	FTPClientSession& operator = (const FTPClientSession&);
-		
-	DialogSocket   _controlSocket;
+	
+	std::string    _host;
+	Poco::UInt16   _port;
+	DialogSocket*  _pControlSocket;
 	SocketStream*  _pDataStream;
 	bool           _passiveMode;
 	FileType       _fileType;
 	bool           _supports1738;
-	bool           _isOpen;
+	bool           _serverReady;
+	bool           _isLoggedIn;
 	Poco::Timespan _timeout;
 };
 
@@ -373,6 +399,18 @@ inline bool FTPClientSession::isTransientNegative(int status)
 inline bool FTPClientSession::isPermanentNegative(int status)
 {
 	return status/100 == FTP_PERMANENT_NEGATIVE;
+}
+
+
+inline bool FTPClientSession::isOpen() const
+{
+	return _pControlSocket != 0;
+}
+
+
+inline bool FTPClientSession::isLoggedIn() const
+{
+	return _isLoggedIn;
 }
 
 
