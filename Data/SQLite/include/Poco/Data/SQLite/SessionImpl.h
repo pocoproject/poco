@@ -59,7 +59,8 @@ class SQLite_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl
 	/// Implements SessionImpl interface.
 {
 public:
-	SessionImpl(const std::string& fileName);
+	SessionImpl(const std::string& fileName,
+		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database.
 
 	~SessionImpl();
@@ -76,6 +77,9 @@ public:
 
 	void rollback();
 		/// Aborts a transaction.
+
+	void open(const std::string& connect = "");
+		/// Opens a connection to the Database.
 
 	void close();
 		/// Closes the session.
@@ -107,8 +111,6 @@ public:
 		/// Returns the name of the connector.
 
 private:
-	void open();
-		/// Opens a connection to the Database.
 
 	std::string _connector;
 	sqlite3*    _pDB;

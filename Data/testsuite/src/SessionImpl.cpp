@@ -40,8 +40,8 @@ namespace Data {
 namespace Test {
 
 
-SessionImpl::SessionImpl(const std::string& init):
-	Poco::Data::AbstractSessionImpl<SessionImpl>(init),
+SessionImpl::SessionImpl(const std::string& init, std::size_t timeout):
+	Poco::Data::AbstractSessionImpl<SessionImpl>(init, timeout),
 	_f(false),
 	_connected(true)
 {
@@ -57,6 +57,24 @@ SessionImpl::SessionImpl(const std::string& init):
 
 SessionImpl::~SessionImpl()
 {
+}
+
+
+void SessionImpl::open(const std::string& connectionString)
+{
+	_connected = true;
+}
+
+
+void SessionImpl::close()
+{
+	_connected = false;
+}
+
+
+bool SessionImpl::isConnected()
+{
+	return _connected;
 }
 
 
@@ -78,18 +96,6 @@ void SessionImpl::commit()
 
 void SessionImpl::rollback()
 {
-}
-
-
-void SessionImpl::close()
-{
-	_connected = false;
-}
-
-
-bool SessionImpl::isConnected()
-{
-	return _connected;
 }
 
 

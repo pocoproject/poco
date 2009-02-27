@@ -922,6 +922,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransactor);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testReconnect);
 
 		return pSuite;
 	}

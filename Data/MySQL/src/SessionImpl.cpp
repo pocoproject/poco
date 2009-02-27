@@ -66,8 +66,8 @@ const std::string SessionImpl::MYSQL_REPEATABLE_READ = "REPEATABLE READ";
 const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 
 
-SessionImpl::SessionImpl(const std::string& connectionString) : 
-	Poco::Data::AbstractSessionImpl<SessionImpl>(toLower(connectionString)),
+SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeout) : 
+	Poco::Data::AbstractSessionImpl<SessionImpl>(toLower(connectionString), timeout),
 	_handle(0),
 	_connected(false),
 	_inTransaction(false)
@@ -75,6 +75,28 @@ SessionImpl::SessionImpl(const std::string& connectionString) :
 	addProperty("insertId", 
 		&SessionImpl::setInsertId, 
 		&SessionImpl::getInsertId);
+
+	open();
+}
+
+
+void SessionImpl::open(const std::string& connect)
+{
+	if (connect != connectionString())
+	{
+		if (isConnected())
+			throw InvalidAccessException("Session already connected");
+
+		if (!connect.empty())
+			setConnectionString(connect);
+	}
+
+	poco_assert_dbg (!connectionString().empty());
+
+	_handle.init();
+	
+	unsigned int timeout = static_cast<unsigned int>(getTimeout());
+	_handle.options(MYSQL_OPT_CONNECT_TIMEOUT, timeout);
 
 	std::map<std::string, std::string> options;
 
@@ -87,9 +109,10 @@ SessionImpl::SessionImpl(const std::string& connectionString) :
 	options["compress"] = "";
 	options["auto-reconnect"] = "";
 
-	for (std::string::const_iterator start = connectionString.begin();;) 
+	const std::string& connString = connectionString();
+	for (std::string::const_iterator start = connString.begin();;) 
 	{
-		std::string::const_iterator finish = std::find(start, connectionString.end(), ';');
+		std::string::const_iterator finish = std::find(start, connString.end(), ';');
 		std::string::const_iterator middle = std::find(start, finish, '=');
 
 		if (middle == finish)
@@ -97,7 +120,7 @@ SessionImpl::SessionImpl(const std::string& connectionString) :
 
 		options[copyStripped(start, middle)] = copyStripped(middle + 1, finish);
 
-		if ((finish == connectionString.end()) || (finish + 1 == connectionString.end())) break;
+		if ((finish == connString.end()) || (finish + 1 == connString.end())) break;
 
 		start = finish + 1;
 	} 
@@ -127,8 +150,7 @@ SessionImpl::SessionImpl(const std::string& connectionString) :
 		throw MySQLException("create session: specify correct auto-reconnect option (true or false) or skip it");
 
 	// Real connect
-	_handle.connect(
-			options["host"].c_str(), 
+	_handle.connect(options["host"].c_str(), 
 			options["user"].c_str(), 
 			options["password"].c_str(), 
 			options["db"].c_str(), 

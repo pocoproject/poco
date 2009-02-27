@@ -59,10 +59,16 @@ public:
 	~SessionHandle();
         /// Destroy handle, close connection
 
+	void init(MYSQL* mysql = 0);
+		/// Initializes the handle iff not initialized.
+
 	void options(mysql_option opt);
         /// Set connection options
 
 	void options(mysql_option opt, bool b);
+        /// Set connection options
+
+	void options(mysql_option opt, unsigned int i);
         /// Set connection options
 
 	void connect(const char* host, const char* user, const char* password, const char* db, unsigned int port);

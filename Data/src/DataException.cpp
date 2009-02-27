@@ -56,6 +56,8 @@ POCO_IMPLEMENT_EXCEPTION(SessionPoolExhaustedException, DataException, "No more 
 POCO_IMPLEMENT_EXCEPTION(SessionPoolExistsException, DataException, "Session already exists in the pool")
 POCO_IMPLEMENT_EXCEPTION(NoDataException, DataException, "No data found")
 POCO_IMPLEMENT_EXCEPTION(LengthExceededException, DataException, "Data too long")
+POCO_IMPLEMENT_EXCEPTION(ConnectionFailedException, DataException, "Connection attempt failed")
+POCO_IMPLEMENT_EXCEPTION(NotConnectedException, DataException, "Not connected to data source")
 
 
 } } // namespace Poco::Data

@@ -45,30 +45,33 @@ namespace Poco {
 namespace Data {
 
 
-Session::Session(Poco::AutoPtr<SessionImpl> ptrImpl):
-	_ptrImpl(ptrImpl),
-	_statementCreator(ptrImpl)
+Session::Session(Poco::AutoPtr<SessionImpl> pImpl):
+	_pImpl(pImpl),
+	_statementCreator(pImpl)
 {
-	poco_check_ptr (ptrImpl.get());
+	poco_check_ptr (pImpl.get());
 }
 
 
-Session::Session(const std::string& connector, const std::string& connectionString)
+Session::Session(const std::string& connector,
+	const std::string& connectionString,
+	std::size_t timeout)
 {
-	Session newSession(SessionFactory::instance().create(connector, connectionString));
+	Session newSession(SessionFactory::instance().create(connector, connectionString, timeout));
 	swap(newSession);
 }
 
 
-Session::Session(const std::string& connection)
+Session::Session(const std::string& connection,
+	std::size_t timeout)
 {
-	Session newSession(SessionFactory::instance().create(connection));
+	Session newSession(SessionFactory::instance().create(connection, timeout));
 	swap(newSession);
 }
 
 
-Session::Session(const Session& other):	_ptrImpl(other._ptrImpl),
-	_statementCreator(other._ptrImpl)
+Session::Session(const Session& other):	_pImpl(other._pImpl),
+	_statementCreator(other._pImpl)
 {
 }
 
@@ -90,7 +93,7 @@ void Session::swap(Session& other)
 {
 	using std::swap;
 	swap(_statementCreator, other._statementCreator);
-	swap(_ptrImpl, other._ptrImpl);
+	swap(_pImpl, other._pImpl);
 }
 
 

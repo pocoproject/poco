@@ -435,14 +435,14 @@ private:
 
 	State                    _state;
 	Limit                    _extrLimit;
-	std::size_t             _lowerLimit;
+	std::size_t              _lowerLimit;
 	std::vector<int>         _columnsExtracted;
 	SessionImpl&             _rSession;
 	Storage                  _storage;
 	std::ostringstream       _ostr;
 	AbstractBindingVec       _bindings;
 	AbstractExtractionVecVec _extractors;
-	std::size_t             _curDataSet;
+	std::size_t              _curDataSet;
 	BulkType                 _bulkBinding;
 	BulkType                 _bulkExtraction;
 

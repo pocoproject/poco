@@ -400,6 +400,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTransactor);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testReconnect);
 
 		return pSuite;
 	}

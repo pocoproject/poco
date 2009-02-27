@@ -476,7 +476,7 @@ void SQLExecutor::insertSingleBulk()
 
 	for (x = 0; x < 100; ++x)
 	{
-		int i = stmt.execute();
+		std::size_t i = stmt.execute();
 		assert (i == 0);
 	}
 
@@ -1802,4 +1802,45 @@ void SQLExecutor::transaction(const std::string& connect)
 	assert (2 == count);
 
 	_pSession->setFeature("autoCommit", autoCommit);
+}
+
+
+void SQLExecutor::reconnect()
+{
+	std::string funct = "reconnect()";
+	std::string lastName = "lastName";
+	std::string firstName("firstName");
+	std::string address("Address");
+	int age = 133132;
+	int count = 0;
+	std::string result;
+
+	try { (*_pSession) << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age), now;  }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	count = 0;
+	try { (*_pSession) << "SELECT COUNT(*) FROM PERSON", into(count), now;  }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	assert (_pSession->isConnected());
+	_pSession->close();
+	assert (!_pSession->isConnected());
+	try 
+	{
+		(*_pSession) << "SELECT LastName FROM PERSON", into(result), now;  
+		fail ("must fail");
+	}
+	catch(NotConnectedException&){ }
+	assert (!_pSession->isConnected());
+
+	_pSession->open();
+	assert (_pSession->isConnected());
+	try { (*_pSession) << "SELECT Age FROM PERSON", into(count), now;  }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == age);
+	assert (_pSession->isConnected());
 }

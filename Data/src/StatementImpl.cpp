@@ -45,6 +45,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
+#include "Poco/Data/DataException.h"
 
 
 using Poco::icompare;
@@ -74,6 +75,9 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_bulkBinding(BULK_UNDEFINED),
 	_bulkExtraction(BULK_UNDEFINED)
 {
+	if (!_rSession.isConnected())
+		throw NotConnectedException(_rSession.connectionString());
+
 	_extractors.resize(1);
 	_columnsExtracted.resize(1, 0);
 }
@@ -87,6 +91,13 @@ StatementImpl::~StatementImpl()
 std::size_t StatementImpl::execute()
 {
 	resetExtraction();
+
+	if (!_rSession.isConnected())
+	{
+		_state = ST_DONE;
+		throw NotConnectedException(_rSession.connectionString());
+	}
+
 	std::size_t lim = 0;
 	if (_lowerLimit > _extrLimit.value())
 		throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");

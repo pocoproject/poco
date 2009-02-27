@@ -113,6 +113,8 @@ public:
 	void sessionTransaction(const std::string& connect);
 	void transaction(const std::string& connect);
 
+	void reconnect();
+
 private:
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
 

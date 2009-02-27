@@ -44,7 +44,8 @@ namespace Data {
 
 
 PooledSessionImpl::PooledSessionImpl(PooledSessionHolder* pHolder):
-	SessionImpl(pHolder->session()->connectionString()),
+	SessionImpl(pHolder->session()->connectionString(),
+		pHolder->session()->getTimeout()),
 	_pHolder(pHolder, true)
 {
 }
@@ -119,6 +120,12 @@ bool PooledSessionImpl::isTransactionIsolation(Poco::UInt32 ti)
 void PooledSessionImpl::rollback()
 {
 	return access()->rollback();
+}
+
+
+void PooledSessionImpl::open(const std::string& connect)
+{
+	access()->open(connect);
 }
 
 

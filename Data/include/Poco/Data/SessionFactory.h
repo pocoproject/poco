@@ -83,11 +83,14 @@ public:
 		/// Lowers the reference count for the Connector registered under that key. If the count reaches zero,
 		/// the object is removed.
 
-	Session create(const std::string& key, const std::string& connectionString);
+	Session create(const std::string& key,
+		const std::string& connectionString,
+		std::size_t timeout = Session::CONNECT_TIMEOUT_DEFAULT);
 		/// Creates a Session for the given key with the connectionString. Throws an Poco:Data::UnknownDataBaseException
 		/// if no Connector is registered for that key.
 
-	Session create(const std::string& uri);
+	Session create(const std::string& uri,
+		std::size_t timeout = Session::CONNECT_TIMEOUT_DEFAULT);
 		/// Creates a Session for the given URI (must be in key:///connectionString format). 
 		///	Throws an Poco:Data::UnknownDataBaseException if no Connector is registered for the key.
 

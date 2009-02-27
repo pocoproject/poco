@@ -76,6 +76,9 @@ public:
 	Statement operator << (const T& t)
 		/// Creates a Statement.
 	{
+		if (!_ptrImpl->isConnected())
+			throw NotConnectedException(_ptrImpl->connectionString());
+
 		Statement stmt(_ptrImpl->createStatementImpl());
 		stmt << t;
 		return stmt;

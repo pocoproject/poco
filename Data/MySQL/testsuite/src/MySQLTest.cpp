@@ -507,6 +507,15 @@ void MySQLTest::testTransaction()
 }
 
 
+void MySQLTest::testReconnect()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonTable();
+	_pExecutor->reconnect();
+}
+
+
 void MySQLTest::testNullableInt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -813,6 +822,7 @@ CppUnit::Test* MySQLTest::suite()
     CppUnit_addTest(pSuite, MySQLTest, testTupleWithNullable);
 	CppUnit_addTest(pSuite, MySQLTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testTransaction);
+	CppUnit_addTest(pSuite, MySQLTest, testReconnect);
 
     return pSuite;
 }

@@ -129,6 +129,8 @@ public:
 	void testBindingCount();
 	void testMultipleResults();
 
+	void testReconnect();
+
 	void setUp();
 	void tearDown();
 

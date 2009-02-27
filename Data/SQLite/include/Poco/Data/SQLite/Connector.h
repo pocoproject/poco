@@ -65,7 +65,8 @@ public:
 	const std::string& name() const;
 		/// Returns the name associated with this connector.
 
-	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString);
+	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
+		std::size_t timeout = Poco::Data::SessionImpl::CONNECT_TIMEOUT_DEFAULT);
 		/// Creates a SQLite SessionImpl object and initializes it with the given connectionString.
 
 	static void registerConnector();

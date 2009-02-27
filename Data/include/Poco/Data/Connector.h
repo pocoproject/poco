@@ -66,7 +66,8 @@ public:
 	virtual const std::string& name() const = 0;
 		/// Returns the name associated with this connector.
 
-	virtual Poco::AutoPtr<SessionImpl> createSession(const std::string& connectionString) = 0;
+	virtual Poco::AutoPtr<SessionImpl> createSession(const std::string& connectionString,
+		std::size_t timeout = SessionImpl::CONNECT_TIMEOUT_DEFAULT) = 0;
 		/// Create a SessionImpl object and initialize it with the given connectionString.
 };
 

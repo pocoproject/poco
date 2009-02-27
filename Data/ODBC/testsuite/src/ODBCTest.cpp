@@ -47,12 +47,14 @@
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
+#include "Poco/Data/DataException.h"
 #include <sqltypes.h>
 #include <iostream>
 
 
 using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
+using Poco::Data::ConnectionFailedException;
 using Poco::Data::CLOB;
 using Poco::Data::ODBC::Utility;
 using Poco::Data::ODBC::ODBCException;
@@ -1187,6 +1189,23 @@ void ODBCTest::testTransactor()
 }
 
 
+void ODBCTest::testReconnect()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	std::string tableName("Person");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->reconnect();
+		i += 2;
+	}
+}
+
+
 bool ODBCTest::canConnect(const std::string& driver,
 	std::string& dsn,
 	std::string& uid,
@@ -1262,9 +1281,9 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	try
 	{
 		return new Session(Poco::Data::ODBC::Connector::KEY, dbConnString);
-	}catch (ConnectionException& ex)
+	}catch (ConnectionFailedException& ex)
 	{
-		std::cout << ex.toString() << std::endl;
+		std::cout << ex.displayText() << std::endl;
 		return 0;
 	}
 }

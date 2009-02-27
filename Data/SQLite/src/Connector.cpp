@@ -58,9 +58,10 @@ Connector::~Connector()
 }
 
 
-Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString)
+Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString,
+	std::size_t timeout)
 {
-	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString));
+	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString, timeout));
 }
 
 

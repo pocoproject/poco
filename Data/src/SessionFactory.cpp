@@ -81,21 +81,24 @@ void SessionFactory::remove(const std::string& key)
 }
 
 
-Session SessionFactory::create(const std::string& key, const std::string& connectionString)
+Session SessionFactory::create(const std::string& key,
+	const std::string& connectionString,
+	std::size_t timeout)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	Connectors::iterator it = _connectors.find(toLower(key));
 	poco_assert (_connectors.end() != it);
 
-	return Session(it->second.ptrSI->createSession(connectionString));
+	return Session(it->second.ptrSI->createSession(connectionString, timeout));
 }
 
 
-Session SessionFactory::create(const std::string& uri)
+Session SessionFactory::create(const std::string& uri,
+	std::size_t timeout)
 {
 	URI u(uri);
 	poco_assert (!u.getPath().empty());
-	return create(u.getScheme(), u.getPath().substr(1));
+	return create(u.getScheme(), u.getPath().substr(1), timeout);
 }
 
 

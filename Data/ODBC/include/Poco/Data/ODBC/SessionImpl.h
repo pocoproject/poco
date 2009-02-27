@@ -64,6 +64,8 @@ class ODBC_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 	/// Implements SessionImpl interface
 {
 public:
+	static const std::size_t ODBC_MAX_FIELD_SIZE = 1024u;
+
 	enum TransactionCapability
 	{
 		ODBC_TXN_CAPABILITY_UNKNOWN = -1,
@@ -71,18 +73,36 @@ public:
 		ODBC_TXN_CAPABILITY_TRUE = 1
 	};
 
+	SessionImpl(const std::string& connect,
+		std::size_t timeout,
+		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+		bool autoBind = true,
+		bool autoExtract = true);
+		/// Creates the SessionImpl. Opens a connection to the database.
+		/// Throws NotConnectedException if connection was not succesful.
+
+	//@ deprecated
 	SessionImpl(const std::string& connect, 
-		Poco::Any maxFieldSize = std::size_t(1024), 
+		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE, 
 		bool enforceCapability=false,
 		bool autoBind = true,
 		bool autoExtract = true);
-		/// Creates the SessionImpl. Opens a connection to the database
+		/// Creates the SessionImpl. Opens a connection to the database.
 
 	~SessionImpl();
 		/// Destroys the SessionImpl.
 
 	Poco::Data::StatementImpl* createStatementImpl();
 		/// Returns an ODBC StatementImpl
+
+	void open(const std::string& connect = "");
+		/// Opens a connection to the Database
+
+	void close();
+		/// Closes the connection
+
+	bool isConnected();
+		/// Returns true if session is connected
 
 	void begin();
 		/// Starts a transaction
@@ -92,12 +112,6 @@ public:
 
 	void rollback();
 		/// Aborts a transaction
-
-	void close();
-		/// Closes the connection
-
-	bool isConnected();
-		/// Returns true if session is connected
 
 	bool isTransaction();
 		/// Returns true iff a transaction is in progress.
@@ -161,24 +175,21 @@ private:
 
 	static const int FUNCTIONS = SQL_API_ODBC3_ALL_FUNCTIONS_SIZE;
 
-	void open();
-		/// Opens a connection to the Database
-
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
 	Poco::UInt32 getDefaultTransactionIsolation();
 
 	Poco::UInt32 transactionIsolation(SQLUINTEGER isolation);
 
-	std::string _connector;
+	std::string            _connector;
 	const ConnectionHandle _db;
-	Poco::Any _maxFieldSize;
-	bool _autoBind;
-	bool _autoExtract;
-	TypeInfo _dataTypes;
-	char _canTransact;
-	bool _inTransaction;
-	Poco::FastMutex _mutex;
+	Poco::Any              _maxFieldSize;
+	bool                   _autoBind;
+	bool                   _autoExtract;
+	TypeInfo               _dataTypes;
+	char                   _canTransact;
+	bool                   _inTransaction;
+	Poco::FastMutex        _mutex;
 };
 
 

@@ -42,6 +42,7 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/Data/SimpleRowFormatter.h"
+#include "Poco/Data/DataException.h"
 #include "Connector.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
@@ -89,6 +90,7 @@ using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBinding;
 using Poco::Data::AbstractBindingVec;
+using Poco::Data::NotConnectedException;
 
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
@@ -110,6 +112,10 @@ void DataTest::testSession()
 	assert ("cs" == sess.impl()->connectionString());
 	assert ("test:///cs" == sess.uri());
 
+	assert (sess.getTimeout() == Session::CONNECT_TIMEOUT_DEFAULT);
+	sess.setTimeout(123);
+	assert (sess.getTimeout() == 123);
+
 	Session sess2(SessionFactory::instance().create("TeSt:///Cs"));
 	assert ("test" == sess2.impl()->connectorName());
 	assert ("Cs" == sess2.impl()->connectionString());
@@ -121,6 +127,36 @@ void DataTest::testSession()
 	
 	std::string str;
 	Statement stmt = (sess << "SELECT * FROM Strings", into(str), limit(50));
+	stmt.execute();
+
+	sess.close();
+	assert (!sess.getFeature("connected"));
+	assert (!sess.isConnected());
+
+	try
+	{
+		stmt.execute(); 
+		fail ("must fail");
+	} catch (NotConnectedException&) { }
+
+	try
+	{
+		sess << "SELECT * FROM Strings", now; 
+		fail ("must fail");
+	} catch (NotConnectedException&) { }
+
+	sess.open();
+	assert (sess.getFeature("connected"));
+	assert (sess.isConnected());
+	
+	sess << "SELECT * FROM Strings", now; 
+	stmt.execute();
+
+	sess.reconnect();
+	assert (sess.getFeature("connected"));
+	assert (sess.isConnected());
+	
+	sess << "SELECT * FROM Strings", now; 
 	stmt.execute();
 }
 

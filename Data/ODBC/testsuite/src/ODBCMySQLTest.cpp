@@ -497,6 +497,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testTransactor);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testReconnect);
 
 		return pSuite;
 	}

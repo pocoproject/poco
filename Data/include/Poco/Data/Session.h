@@ -173,6 +173,7 @@ class Data_API Session
 	/// For complete list of supported data types with their respective specifications, see the documentation for format in Foundation.
 {
 public:
+	static const std::size_t CONNECT_TIMEOUT_DEFAULT = SessionImpl::CONNECT_TIMEOUT_DEFAULT;
 	static const Poco::UInt32 TRANSACTION_READ_UNCOMMITTED = 0x00000001L;
 	static const Poco::UInt32 TRANSACTION_READ_COMMITTED   = 0x00000002L;
 	static const Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
@@ -181,11 +182,14 @@ public:
 	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
 		/// Creates the Session.
 
-	Session(const std::string& connector, const std::string& connectionString);
+	Session(const std::string& connector,
+		const std::string& connectionString,
+		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
 		/// Creates a new session, using the given connector (which must have
 		/// been registered), and connectionString.
 
-	Session(const std::string& connection);
+	Session(const std::string& connection,
+		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
 		/// Creates a new session, using the given connection (must be in
 		/// "connection:///connectionString" format).
 
@@ -211,6 +215,29 @@ public:
 	StatementImpl* createStatementImpl();
 		/// Creates a StatementImpl.
 
+	void open(const std::string& connect = "");
+		/// Opens the session using the supplied string.
+		/// Can also be used with default empty string to 
+		/// reconnect a disconnected session.
+		/// If the connection is not established, 
+		/// a ConnectionFailedException is thrown. 
+		/// Zero timout means indefinite
+
+	void close();
+		/// Closes the session.
+
+	bool isConnected();
+		/// Returns true iff session is connected, false otherwise.
+
+	void reconnect();
+		/// Closes the session and opens it.
+
+	void setTimeout(std::size_t timeout);
+		/// Sets the session timeout value.
+
+	std::size_t getTimeout() const;
+		/// Returns the session timeout value.
+
 	void begin();
 		/// Starts a transaction.
 
@@ -219,12 +246,6 @@ public:
 
 	void rollback();
 		/// Rolls back and ends a transaction.
-	
-	void close();
-		/// Closes the session.
-
-	bool isConnected();
-		/// Returns true iff session is connected, false otherwise.
 
 	bool canTransact();
 		/// Returns true if session has transaction capabilities.
@@ -296,7 +317,7 @@ public:
 private:
 	Session();
 
-	Poco::AutoPtr<SessionImpl> _ptrImpl;
+	Poco::AutoPtr<SessionImpl> _pImpl;
 	StatementCreator           _statementCreator;
 };
 
@@ -306,73 +327,97 @@ private:
 //
 inline StatementImpl* Session::createStatementImpl()
 {
-	return _ptrImpl->createStatementImpl();
+	return _pImpl->createStatementImpl();
 }
 
 
-inline void Session::begin()
+inline void Session::open(const std::string& connect)
 {
-	return _ptrImpl->begin();
-}
-
-
-inline void Session::commit()
-{
-	return _ptrImpl->commit();
-}
-
-
-inline void Session::rollback()
-{
-	return _ptrImpl->rollback();
+	_pImpl->open(connect);
 }
 
 
 inline void Session::close()
 {
-	_ptrImpl->close();
+	_pImpl->close();
 }
 
 
 inline bool Session::isConnected()
 {
-	return _ptrImpl->isConnected();
+	return _pImpl->isConnected();
+}
+
+
+inline void Session::reconnect()
+{
+	_pImpl->reconnect();
+}
+
+
+inline void Session::setTimeout(std::size_t timeout)
+{
+	_pImpl->setTimeout(timeout);
+}
+
+
+inline std::size_t Session::getTimeout() const
+{
+	return _pImpl->getTimeout();
+}
+
+
+inline void Session::begin()
+{
+	return _pImpl->begin();
+}
+
+
+inline void Session::commit()
+{
+	return _pImpl->commit();
+}
+
+
+inline void Session::rollback()
+{
+	return _pImpl->rollback();
 }
 
 
 inline bool Session::canTransact()
 {
-	return _ptrImpl->canTransact();
+	return _pImpl->canTransact();
 }
 
 
 inline bool Session::isTransaction()
 {
-	return _ptrImpl->isTransaction();
+	return _pImpl->isTransaction();
 }
 
 
 inline void Session::setTransactionIsolation(Poco::UInt32 ti)
 {
-	_ptrImpl->setTransactionIsolation(ti);
+	_pImpl->setTransactionIsolation(ti);
 }
 
 
 inline Poco::UInt32 Session::getTransactionIsolation()
 {
-	return _ptrImpl->getTransactionIsolation();
+	return _pImpl->getTransactionIsolation();
 }
 
 
 inline bool Session::hasTransactionIsolation(Poco::UInt32 ti)
 {
-	return _ptrImpl->hasTransactionIsolation(ti);
+	return _pImpl->hasTransactionIsolation(ti);
 }
 
 
 inline bool Session::isTransactionIsolation(Poco::UInt32 ti)
 {
-	return _ptrImpl->isTransactionIsolation(ti);
+	return _pImpl->isTransactionIsolation(ti);
 }
 
 
@@ -385,37 +430,37 @@ inline std::string Session::uri(const std::string& connector,
 
 inline std::string Session::uri()
 {
-	return _ptrImpl->uri();
+	return _pImpl->uri();
 }
 
 
 inline void Session::setFeature(const std::string& name, bool state)
 {
-	_ptrImpl->setFeature(name, state);
+	_pImpl->setFeature(name, state);
 }
 
 
 inline bool Session::getFeature(const std::string& name) const
 {
-	return const_cast<SessionImpl*>(_ptrImpl.get())->getFeature(name);
+	return const_cast<SessionImpl*>(_pImpl.get())->getFeature(name);
 }
 
 
 inline void Session::setProperty(const std::string& name, const Poco::Any& value)
 {
-	_ptrImpl->setProperty(name, value);
+	_pImpl->setProperty(name, value);
 }
 
 
 inline Poco::Any Session::getProperty(const std::string& name) const
 {
-	return const_cast<SessionImpl*>(_ptrImpl.get())->getProperty(name);
+	return const_cast<SessionImpl*>(_pImpl.get())->getProperty(name);
 }
 
 
 inline SessionImpl* Session::impl()
 {
-	return _ptrImpl;
+	return _pImpl;
 }
 
 

@@ -518,6 +518,8 @@ public:
 	void transaction(const std::string& connect);
 	void transactor();
 
+	void reconnect();
+
 private:
 	static const std::string MULTI_INSERT;
 	static const std::string MULTI_SELECT;

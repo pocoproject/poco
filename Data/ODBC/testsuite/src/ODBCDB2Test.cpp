@@ -681,6 +681,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTransaction);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTransactor);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testReconnect);
 
 		return pSuite;
 	}

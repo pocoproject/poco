@@ -35,6 +35,7 @@
 
 
 #include "Poco/Data/MySQL/SessionHandle.h"
+#include "Poco/Data/DataException.h"
 
 
 namespace Poco {
@@ -42,10 +43,20 @@ namespace Data {
 namespace MySQL {
 
 
-SessionHandle::SessionHandle(MYSQL* mysql)
+SessionHandle::SessionHandle(MYSQL* mysql): _pHandle(0)
 {
-	if (!(_pHandle = mysql_init(mysql)))
-		throw ConnectionException("mysql_init error");
+	init(mysql);
+}
+
+
+void SessionHandle::init(MYSQL* mysql)
+{
+	if (!_pHandle)
+	{
+		_pHandle = mysql_init(mysql);
+		if (!_pHandle)
+			throw ConnectionException("mysql_init error");
+	}
 }
 
 
@@ -69,11 +80,17 @@ void SessionHandle::options(mysql_option opt, bool b)
 		throw ConnectionException("mysql_options error", _pHandle);
 }
 
+void SessionHandle::options(mysql_option opt, unsigned int i)
+{
+	if (mysql_options(_pHandle, opt, &i) != 0)
+		throw ConnectionException("mysql_options error", _pHandle);
+}
+
 
 void SessionHandle::connect(const char* host, const char* user, const char* password, const char* db, unsigned int port)
 {
 	if (!mysql_real_connect(_pHandle, host, user, password, db, port, 0, 0))
-		throw ConnectionException("create session: mysql_real_connect error", _pHandle);
+		throw ConnectionFailedException("mysql_real_connect error");
 }
 
 

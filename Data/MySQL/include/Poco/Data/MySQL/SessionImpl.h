@@ -62,7 +62,8 @@ public:
 	static const std::string MYSQL_REPEATABLE_READ;
 	static const std::string MYSQL_SERIALIZABLE;
 
-	SessionImpl(const std::string& connectionString);
+	SessionImpl(const std::string& connectionString,
+		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database
 		///
 		/// Connection string format:
@@ -81,6 +82,15 @@ public:
 	Poco::Data::StatementImpl* createStatementImpl();
 		/// Returns an MySQL StatementImpl
 
+	void open(const std::string& connection = "");
+		/// Opens a connection to the database.
+
+	void close();
+		/// Closes the connection.
+		
+	bool isConnected();
+		/// Returns true if connected, false otherwise.
+
 	void begin();
 		/// Starts a transaction
 	
@@ -90,12 +100,6 @@ public:
 	void rollback();
 		/// Aborts a transaction
 		
-	void close();
-		/// Closes the connection
-		
-	bool isConnected();
-		/// Returns true if connected, false otherwise.
-
 	bool canTransact();
 		/// Returns true if session has transaction capabilities.
 
@@ -163,10 +167,10 @@ private:
 		return getValue<T>(pResult, val);
 	}
 
-	std::string _connector;
-	SessionHandle _handle;
-	bool _connected;
-	bool  _inTransaction;
+	std::string     _connector;
+	SessionHandle   _handle;
+	bool            _connected;
+	bool            _inTransaction;
 	Poco::FastMutex _mutex;
 };
 

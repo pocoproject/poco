@@ -809,6 +809,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testReconnect);
 
 		return pSuite;
 	}

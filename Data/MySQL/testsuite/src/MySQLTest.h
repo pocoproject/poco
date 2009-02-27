@@ -116,6 +116,8 @@ public:
 	void testSessionTransaction();
 	void testTransaction();
 
+	void testReconnect();
+
 	void setUp();
 	void tearDown();
 

@@ -50,7 +50,8 @@ class SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 	/// A no-op implementation of SessionImpl for testing.
 {
 public:
-	SessionImpl(const std::string& init);
+	SessionImpl(const std::string& init,
+		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database.
 
 	~SessionImpl();
@@ -58,6 +59,16 @@ public:
 
 	Poco::Data::StatementImpl* createStatementImpl();
 		/// Returns an test StatementImpl.
+
+	void open(const std::string& connectionString = "");
+		/// Opens the session.
+
+	void close();
+		/// Closes the session.
+
+	bool isConnected();
+		/// Returns true if session is connected to the database, 
+		/// false otherwise.
 
 	void begin();
 		/// Starts a transaction.
@@ -67,13 +78,6 @@ public:
 
 	void rollback();
 		/// Aborts a transaction.
-		
-	void close();
-		/// Closes the session.
-
-	bool isConnected();
-		/// Returns true if session is connected to the database, 
-		/// false otherwise.
 
 	bool canTransact();
 		/// Returns true if session has transaction capabilities.

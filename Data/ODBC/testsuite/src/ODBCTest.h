@@ -167,6 +167,8 @@ public:
 	virtual void testTransaction();
 	virtual void testTransactor();
 
+	virtual void testReconnect();
+
 protected:
 	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
 

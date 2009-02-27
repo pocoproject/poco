@@ -70,6 +70,7 @@ public:
 	void begin();
 	void commit();
 	void rollback();
+	void open(const std::string& connect = "");
 	void close();
 	bool isConnected();
 	bool canTransact();

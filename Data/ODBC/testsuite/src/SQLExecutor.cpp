@@ -85,6 +85,7 @@ using Poco::Data::CLOB;
 using Poco::Data::Date;
 using Poco::Data::Time;
 using Poco::Data::Transaction;
+using Poco::Data::NotConnectedException;
 using Poco::Data::ODBC::Utility;
 using Poco::Data::ODBC::Preparator;
 using Poco::Data::ODBC::ConnectionException;
@@ -3762,4 +3763,45 @@ void SQLExecutor::transactor()
 	assert (0 == count);
 
 	session().setFeature("autoCommit", autoCommit);
+}
+
+
+void SQLExecutor::reconnect()
+{
+	std::string funct = "reconnect()";
+	std::string lastName = "lastName";
+	std::string firstName("firstName");
+	std::string address("Address");
+	int age = 133132;
+	int count = 0;
+	std::string result;
+
+	try { session() << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age), now;  }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	count = 0;
+	try { session() << "SELECT COUNT(*) FROM PERSON", into(count), now;  }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	assert (session().isConnected());
+	session().close();
+	assert (!session().isConnected());
+	try 
+	{
+		session() << "SELECT LastName FROM PERSON", into(result), now;  
+		fail ("must fail");
+	}
+	catch(NotConnectedException&){ }
+	assert (!session().isConnected());
+
+	session().open();
+	assert (session().isConnected());
+	try { session() << "SELECT Age FROM PERSON", into(count), now;  }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == age);
+	assert (session().isConnected());
 }

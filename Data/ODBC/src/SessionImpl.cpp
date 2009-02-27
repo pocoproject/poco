@@ -50,6 +50,24 @@ namespace ODBC {
 
 
 SessionImpl::SessionImpl(const std::string& connect,
+	std::size_t timeout,
+	std::size_t maxFieldSize,
+	bool autoBind,
+	bool autoExtract): 
+	Poco::Data::AbstractSessionImpl<SessionImpl>(connect, timeout),
+		_connector(toLower(Connector::KEY)),
+		_maxFieldSize(maxFieldSize),
+		_autoBind(autoBind),
+		_autoExtract(autoExtract),
+		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
+		_inTransaction(false)
+{
+	setFeature("bulk", true);
+	open();
+}
+
+
+SessionImpl::SessionImpl(const std::string& connect,
 	Poco::Any maxFieldSize, 
 	bool enforceCapability,
 	bool autoBind,
@@ -85,8 +103,30 @@ Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
 }
 
 
-void SessionImpl::open()
+void SessionImpl::open(const std::string& connect)
 {
+	if (connect != connectionString())
+	{
+		if (isConnected())
+			throw InvalidAccessException("Session already connected");
+
+		if (!connect.empty())
+			setConnectionString(connect);
+	}
+
+	poco_assert_dbg (!connectionString().empty());
+
+	SQLUINTEGER tout = static_cast<SQLUINTEGER>(getTimeout());
+	if (Utility::isError(SQLSetConnectAttr(_db, SQL_ATTR_LOGIN_TIMEOUT, (SQLPOINTER) tout, 0)))
+	{
+		if (Utility::isError(SQLGetConnectAttr(_db, SQL_ATTR_LOGIN_TIMEOUT, &tout, 0, 0)) ||
+				getTimeout() != tout)
+		{
+			ConnectionError e(_db);
+			throw ConnectionFailedException(e.toString());
+		}
+	}
+
 	SQLCHAR connectOutput[512] = {0};
 	SQLSMALLINT result;
 
@@ -99,9 +139,10 @@ void SessionImpl::open()
 		, &result
 		, SQL_DRIVER_NOPROMPT)))
 	{
-		ConnectionException exc(_db);
+		ConnectionError err(_db);
+		std::string errStr = err.toString();
 		close();
-		throw exc;
+		throw ConnectionFailedException(errStr);
 	}
 
 	_dataTypes.fillTypeInfo(_db);

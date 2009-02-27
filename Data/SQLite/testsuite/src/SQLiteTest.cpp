@@ -43,6 +43,7 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/TypeHandler.h"
+#include "Poco/Data/DataException.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
 #include "Poco/SharedPtr.h"
@@ -71,6 +72,7 @@ using Poco::Data::Time;
 using Poco::Data::AbstractExtractionVec;
 using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
+using Poco::Data::NotConnectedException;
 using Poco::Tuple;
 using Poco::Any;
 using Poco::AnyCast;
@@ -2317,6 +2319,48 @@ void SQLiteTest::testMultipleResults()
 }
 
 
+void SQLiteTest::testReconnect()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE Person (LastName VARCHAR(30),"
+		"FirstName VARCHAR(30),"
+		"Address VARCHAR(30),"
+		"Age INTEGER)", now;
+
+	std::string lastName = "lastName";
+	std::string firstName("firstName");
+	std::string address("Address");
+	int age = 133132;
+	int count = 0;
+	std::string result;
+
+	session << "INSERT INTO PERSON VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age), now;
+
+	count = 0;
+	session << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assert (count == 1);
+
+	assert (session.isConnected());
+	session.close();
+	assert (!session.isConnected());
+	try 
+	{
+		session << "SELECT LastName FROM PERSON", into(result), now;  
+		fail ("must fail");
+	}
+	catch(NotConnectedException&){ }
+	assert (!session.isConnected());
+
+	session.open();
+	assert (session.isConnected());
+	session << "SELECT Age FROM PERSON", into(count), now;
+	assert (count == age);
+	assert (session.isConnected());
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -2404,6 +2448,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testBindingCount);
 	CppUnit_addTest(pSuite, SQLiteTest, testMultipleResults);
 	CppUnit_addTest(pSuite, SQLiteTest, testPair);
+	CppUnit_addTest(pSuite, SQLiteTest, testReconnect);
 
 	return pSuite;
 }

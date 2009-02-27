@@ -38,7 +38,10 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
 #include "Poco/Data/SQLite/Connector.h"
+#include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/Session.h"
+#include "Poco/ActiveMethod.h"
+#include "Poco/ActiveResult.h"
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include "sqlite3.h"
@@ -55,8 +58,8 @@ const std::string SessionImpl::COMMIT_TRANSACTION("COMMIT");
 const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 
 
-SessionImpl::SessionImpl(const std::string& fileName):
-	Poco::Data::AbstractSessionImpl<SessionImpl>(fileName),
+SessionImpl::SessionImpl(const std::string& fileName, std::size_t timeout):
+	Poco::Data::AbstractSessionImpl<SessionImpl>(fileName, timeout),
 	_connector(toLower(Connector::KEY)),
 	_pDB(0),
 	_connected(false),
@@ -133,14 +136,61 @@ bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-void SessionImpl::open()
+class ActiveConnector
 {
-	int rc = sqlite3_open(connectionString().c_str(), &_pDB);
-
-	if (rc != 0)
+public:
+	ActiveConnector(const std::string& connectString, sqlite3** ppDB):
+		connect(this, &ActiveConnector::connectImpl),
+		_connectString(connectString),
+		_ppDB(ppDB)
 	{
-		close();
-		Utility::throwException(rc);
+		poco_check_ptr(_ppDB);
+	}
+	
+	ActiveMethod<int, void, ActiveConnector> connect;
+	
+private:
+	ActiveConnector();
+
+	inline int connectImpl()
+	{
+		return sqlite3_open(_connectString.c_str(), _ppDB);
+	}
+
+	std::string _connectString;
+	sqlite3**   _ppDB;
+};
+
+
+void SessionImpl::open(const std::string& connect)
+{
+	if (connect != connectionString())
+	{
+		if (isConnected())
+			throw InvalidAccessException("Session already connected");
+
+		if (!connect.empty())
+			setConnectionString(connect);
+	}
+
+	poco_assert_dbg (!connectionString().empty());
+
+	try
+	{
+		ActiveConnector connector(connectionString(), &_pDB);
+		ActiveResult<int> result = connector.connect();
+		if (!result.tryWait(getTimeout() * 1000))
+			throw ConnectionFailedException("Timed out.");
+
+		int rc = result.data();
+		if (rc != 0)
+		{
+			close();
+			Utility::throwException(rc);
+		}
+	} catch (SQLiteException& ex)
+	{
+		throw ConnectionFailedException(ex.displayText());
 	}
 
 	_connected = true;

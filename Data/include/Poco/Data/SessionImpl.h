@@ -59,7 +59,14 @@ class Data_API SessionImpl: public Poco::RefCountedObject
 	/// SessionImpl objects are noncopyable.
 {
 public:
-	SessionImpl(const std::string& connectionString);
+	static const std::size_t CONNECT_TIMEOUT_INFINITE = 0;
+		/// Infinite connection/login timeout.
+
+	static const std::size_t CONNECT_TIMEOUT_DEFAULT = 30;
+		/// Default connection/login timeout in seconds.
+
+	SessionImpl(const std::string& connectionString,
+		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
 	virtual ~SessionImpl();
@@ -67,6 +74,29 @@ public:
 
 	virtual StatementImpl* createStatementImpl() = 0;
 		/// Creates a StatementImpl.
+
+	virtual void open(const std::string& connectionString = "") = 0;
+		/// Opens the session using the supplied string.
+		/// Can also be used with default empty string to reconnect 
+		/// a disconnected session.
+		/// If the connection is not established within requested timeout 
+		/// (specified in seconds), a ConnectionFailedException is thrown. 
+		/// Zero timout means indefinite
+
+	virtual void close() = 0;
+		/// Closes the connection.
+
+	virtual bool isConnected() = 0;
+		/// Returns true if session is connected, false otherwise.
+
+	void setTimeout(std::size_t timeout);
+		/// Sets the session timeout value.
+
+	std::size_t getTimeout() const;
+		/// Returns the session timeout value.
+
+	void reconnect();
+		/// Closes the connection and opens it again.
 
 	virtual void begin() = 0;
 		/// Starts a transaction.
@@ -76,12 +106,6 @@ public:
 
 	virtual void rollback() = 0;
 		/// Aborts a transaction.
-
-	virtual void close() = 0;
-		/// Closes the connection.
-
-	virtual bool isConnected() = 0;
-		/// Returns true if session is connected, false otherwise.
 
 	virtual bool canTransact() = 0;
 		/// Returns true if session has transaction capabilities.
@@ -151,12 +175,19 @@ public:
 		/// Throws a NotSupportedException if the requested property is
 		/// not supported by the underlying implementation.
 
+protected:
+	void setConnectionString(const std::string& connectionString);
+		/// Sets the connection string. Should only be called on
+		/// disconnetced sessions. Throws InvalidAccessException when called on
+		/// a connected session.
+
 private:
 	SessionImpl();
 	SessionImpl(const SessionImpl&);
 	SessionImpl& operator = (const SessionImpl&);
 
 	std::string _connectionString;
+	std::size_t _timeout;
 };
 
 
@@ -166,6 +197,18 @@ private:
 inline const std::string& SessionImpl::connectionString()
 {
 	return _connectionString;
+}
+
+
+inline void SessionImpl::setTimeout(std::size_t timeout)
+{
+	_timeout = timeout;
+}
+
+
+inline std::size_t SessionImpl::getTimeout() const
+{
+	return _timeout;
 }
 
 
