@@ -50,11 +50,11 @@ namespace ODBC {
 
 
 SessionImpl::SessionImpl(const std::string& connect,
-	std::size_t timeout,
+	std::size_t loginTimeout,
 	std::size_t maxFieldSize,
 	bool autoBind,
 	bool autoExtract): 
-	Poco::Data::AbstractSessionImpl<SessionImpl>(connect, timeout),
+	Poco::Data::AbstractSessionImpl<SessionImpl>(connect, loginTimeout),
 		_connector(toLower(Connector::KEY)),
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
@@ -116,11 +116,11 @@ void SessionImpl::open(const std::string& connect)
 
 	poco_assert_dbg (!connectionString().empty());
 
-	SQLUINTEGER tout = static_cast<SQLUINTEGER>(getTimeout());
+	SQLUINTEGER tout = static_cast<SQLUINTEGER>(getLoginTimeout());
 	if (Utility::isError(SQLSetConnectAttr(_db, SQL_ATTR_LOGIN_TIMEOUT, (SQLPOINTER) tout, 0)))
 	{
 		if (Utility::isError(SQLGetConnectAttr(_db, SQL_ATTR_LOGIN_TIMEOUT, &tout, 0, 0)) ||
-				getTimeout() != tout)
+				getLoginTimeout() != tout)
 		{
 			ConnectionError e(_db);
 			throw ConnectionFailedException(e.toString());
@@ -169,6 +169,45 @@ void SessionImpl::open(const std::string& connect)
 	Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
 
 	if (!canTransact()) autoCommit("", true);
+}
+
+
+bool SessionImpl::isConnected()
+{
+	SQLUINTEGER value = 0;
+
+	if (Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
+		SQL_ATTR_CONNECTION_DEAD,
+		&value,
+		0,
+		0))) return false;
+
+	return (SQL_CD_FALSE == value);
+}
+
+
+void SessionImpl::setConnectionTimeout(std::size_t timeout)
+{
+	SQLUINTEGER value = static_cast<SQLUINTEGER>(timeout);
+
+	checkError(Poco::Data::ODBC::SQLSetConnectAttr(_db,
+		SQL_ATTR_CONNECTION_TIMEOUT,
+		&value,
+		SQL_IS_UINTEGER), "Failed to set connection timeout.");
+}
+
+
+std::size_t SessionImpl::getConnectionTimeout()
+{
+	SQLUINTEGER value = 0;
+
+	checkError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
+		SQL_ATTR_CONNECTION_TIMEOUT,
+		&value,
+		0,
+		0), "Failed to get connection timeout.");
+
+	return value;
 }
 
 
@@ -278,7 +317,7 @@ void SessionImpl::autoCommit(const std::string&, bool val)
 		SQL_ATTR_AUTOCOMMIT, 
 		val ? (SQLPOINTER) SQL_AUTOCOMMIT_ON : 
 			(SQLPOINTER) SQL_AUTOCOMMIT_OFF, 
-		0), "Failed to set automatic commit.");
+		SQL_IS_UINTEGER), "Failed to set automatic commit.");
 }
 
 
@@ -293,21 +332,6 @@ bool SessionImpl::isAutoCommit(const std::string&)
 		0));
 
 	return (0 != value);
-}
-
-
-bool SessionImpl::isConnected()
-{
-	Poco::UInt32 value = 0;
-
-	if (Utility::isError(Poco::Data::ODBC::SQLGetConnectAttr(_db,
-		SQL_ATTR_CONNECTION_DEAD,
-		&value,
-		0,
-		0)))
-		return false;
-
-	return (SQL_CD_FALSE == value);
 }
 
 

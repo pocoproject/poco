@@ -80,8 +80,8 @@ private:
 	const ConnectionHandle& operator=(const ConnectionHandle&);
 
 	const EnvironmentHandle* _pEnvironment;
-	SQLHDBC _hdbc;
-	bool _ownsEnvironment;
+	SQLHDBC                  _hdbc;
+	bool                     _ownsEnvironment;
 };
 
 

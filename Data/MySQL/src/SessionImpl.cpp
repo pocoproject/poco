@@ -66,8 +66,8 @@ const std::string SessionImpl::MYSQL_REPEATABLE_READ = "REPEATABLE READ";
 const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 
 
-SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeout) : 
-	Poco::Data::AbstractSessionImpl<SessionImpl>(toLower(connectionString), timeout),
+SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) : 
+	Poco::Data::AbstractSessionImpl<SessionImpl>(toLower(connectionString), loginTimeout),
 	_handle(0),
 	_connected(false),
 	_inTransaction(false)
@@ -77,6 +77,7 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeou
 		&SessionImpl::getInsertId);
 
 	open();
+	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 }
 
 
@@ -95,7 +96,7 @@ void SessionImpl::open(const std::string& connect)
 
 	_handle.init();
 	
-	unsigned int timeout = static_cast<unsigned int>(getTimeout());
+	unsigned int timeout = static_cast<unsigned int>(getLoginTimeout());
 	_handle.options(MYSQL_OPT_CONNECT_TIMEOUT, timeout);
 
 	std::map<std::string, std::string> options;
@@ -275,17 +276,13 @@ void SessionImpl::close()
 		_connected = false;
 	}
 }
-	
 
-bool SessionImpl::isConnected()
-{
-	return _connected;
-}
-	
 
-bool SessionImpl::isTransaction()
+void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
-	return _inTransaction;
+	_handle.options(MYSQL_OPT_READ_TIMEOUT, static_cast<unsigned int>(timeout));
+	_handle.options(MYSQL_OPT_WRITE_TIMEOUT, static_cast<unsigned int>(timeout));
+	_timeout = timeout;
 }
 
 

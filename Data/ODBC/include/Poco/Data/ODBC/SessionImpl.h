@@ -74,7 +74,7 @@ public:
 	};
 
 	SessionImpl(const std::string& connect,
-		std::size_t timeout,
+		std::size_t loginTimeout,
 		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE, 
 		bool autoBind = true,
 		bool autoExtract = true);
@@ -103,6 +103,12 @@ public:
 
 	bool isConnected();
 		/// Returns true if session is connected
+
+	void setConnectionTimeout(std::size_t timeout);
+		/// Sets the session connection timeout value.
+
+	std::size_t getConnectionTimeout();
+		/// Returns the session connection timeout value.
 
 	void begin();
 		/// Starts a transaction

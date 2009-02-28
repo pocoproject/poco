@@ -73,6 +73,8 @@ public:
 	void open(const std::string& connect = "");
 	void close();
 	bool isConnected();
+	void setConnectionTimeout(std::size_t timeout);
+	std::size_t getConnectionTimeout();
 	bool canTransact();
 	bool isTransaction();
 	void setTransactionIsolation(Poco::UInt32);

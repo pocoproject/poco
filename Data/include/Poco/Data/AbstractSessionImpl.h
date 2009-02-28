@@ -73,7 +73,7 @@ public:
 		/// The getter method for a property.
 
 	AbstractSessionImpl(const std::string& connectionString,
-		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT): SessionImpl(connectionString, timeout),
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(connectionString, timeout),
 			_storage(std::string("deque")),
 			_bulk(false),
 			_emptyStringIsNull(false),

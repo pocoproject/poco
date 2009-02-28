@@ -45,7 +45,7 @@ namespace Data {
 
 PooledSessionImpl::PooledSessionImpl(PooledSessionHolder* pHolder):
 	SessionImpl(pHolder->session()->connectionString(),
-		pHolder->session()->getTimeout()),
+		pHolder->session()->getLoginTimeout()),
 	_pHolder(pHolder, true)
 {
 }
@@ -78,6 +78,18 @@ void PooledSessionImpl::commit()
 bool PooledSessionImpl::isConnected()
 {
 	return access()->isConnected();
+}
+
+
+void PooledSessionImpl::setConnectionTimeout(std::size_t timeout)
+{
+	return access()->setConnectionTimeout(timeout);
+}
+
+
+std::size_t PooledSessionImpl::getConnectionTimeout()
+{
+	return access()->getConnectionTimeout();
 }
 
 

@@ -63,7 +63,7 @@ public:
 	static const std::string MYSQL_SERIALIZABLE;
 
 	SessionImpl(const std::string& connectionString,
-		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database
 		///
 		/// Connection string format:
@@ -90,6 +90,12 @@ public:
 		
 	bool isConnected();
 		/// Returns true if connected, false otherwise.
+
+	void setConnectionTimeout(std::size_t timeout);
+		/// Sets the session connection timeout value.
+
+	std::size_t getConnectionTimeout();
+		/// Returns the session connection timeout value.
 
 	void begin();
 		/// Starts a transaction
@@ -171,6 +177,7 @@ private:
 	SessionHandle   _handle;
 	bool            _connected;
 	bool            _inTransaction;
+	std::size_t     _timeout;
 	Poco::FastMutex _mutex;
 };
 
@@ -207,9 +214,27 @@ inline const std::string& SessionImpl::connectorName()
 }
 
 
+inline bool SessionImpl::isTransaction()
+{
+	return _inTransaction;
+}
+
+
 inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
 {
 	return getTransactionIsolation() == ti;
+}
+
+
+inline bool SessionImpl::isConnected()
+{
+	return _connected;
+}
+	
+
+inline std::size_t SessionImpl::getConnectionTimeout()
+{
+	return _timeout;
 }
 
 

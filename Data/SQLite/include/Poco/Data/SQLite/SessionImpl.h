@@ -60,7 +60,7 @@ class SQLite_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl
 {
 public:
 	SessionImpl(const std::string& fileName,
-		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database.
 
 	~SessionImpl();
@@ -68,15 +68,6 @@ public:
 
 	Poco::Data::StatementImpl* createStatementImpl();
 		/// Returns an SQLite StatementImpl.
-
-	void begin();
-		/// Starts a transaction.
-
-	void commit();
-		/// Commits and ends a transaction.
-
-	void rollback();
-		/// Aborts a transaction.
 
 	void open(const std::string& connect = "");
 		/// Opens a connection to the Database.
@@ -86,6 +77,21 @@ public:
 
 	bool isConnected();
 		/// Returns true if connected, false otherwise.
+
+	void setConnectionTimeout(std::size_t timeout);
+		/// Sets the session connection timeout value.
+
+	std::size_t getConnectionTimeout();
+		/// Returns the session connection timeout value.
+
+	void begin();
+		/// Starts a transaction.
+
+	void commit();
+		/// Commits and ends a transaction.
+
+	void rollback();
+		/// Aborts a transaction.
 
 	bool canTransact();
 		/// Returns true if session has transaction capabilities.
@@ -116,6 +122,7 @@ private:
 	sqlite3*    _pDB;
 	bool        _connected;
 	bool        _isTransaction;
+	int         _timeout;
 	
 	static const std::string DEFERRED_BEGIN_TRANSACTION;
 	static const std::string COMMIT_TRANSACTION;
@@ -141,6 +148,12 @@ inline 	bool SessionImpl::isTransaction()
 inline const std::string& SessionImpl::connectorName()
 {
 	return _connector;
+}
+
+
+inline std::size_t SessionImpl::getConnectionTimeout()
+{
+	return static_cast<std::size_t>(_timeout);
 }
 
 

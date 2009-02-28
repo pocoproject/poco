@@ -173,7 +173,7 @@ class Data_API Session
 	/// For complete list of supported data types with their respective specifications, see the documentation for format in Foundation.
 {
 public:
-	static const std::size_t CONNECT_TIMEOUT_DEFAULT = SessionImpl::CONNECT_TIMEOUT_DEFAULT;
+	static const std::size_t LOGIN_TIMEOUT_DEFAULT = SessionImpl::LOGIN_TIMEOUT_DEFAULT;
 	static const Poco::UInt32 TRANSACTION_READ_UNCOMMITTED = 0x00000001L;
 	static const Poco::UInt32 TRANSACTION_READ_COMMITTED   = 0x00000002L;
 	static const Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
@@ -184,12 +184,12 @@ public:
 
 	Session(const std::string& connector,
 		const std::string& connectionString,
-		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a new session, using the given connector (which must have
 		/// been registered), and connectionString.
 
 	Session(const std::string& connection,
-		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a new session, using the given connection (must be in
 		/// "connection:///connectionString" format).
 
@@ -232,11 +232,17 @@ public:
 	void reconnect();
 		/// Closes the session and opens it.
 
-	void setTimeout(std::size_t timeout);
-		/// Sets the session timeout value.
+	void setLoginTimeout(std::size_t timeout);
+		/// Sets the session login timeout value.
 
-	std::size_t getTimeout() const;
-		/// Returns the session timeout value.
+	std::size_t getLoginTimeout() const;
+		/// Returns the session login timeout value.
+
+	void setConnectionTimeout(std::size_t timeout);
+		/// Sets the session connection timeout value.
+
+	std::size_t getConnectionTimeout();
+		/// Returns the session connection timeout value.
 
 	void begin();
 		/// Starts a transaction.
@@ -355,15 +361,27 @@ inline void Session::reconnect()
 }
 
 
-inline void Session::setTimeout(std::size_t timeout)
+inline void Session::setLoginTimeout(std::size_t timeout)
 {
-	_pImpl->setTimeout(timeout);
+	_pImpl->setLoginTimeout(timeout);
 }
 
 
-inline std::size_t Session::getTimeout() const
+inline std::size_t Session::getLoginTimeout() const
 {
-	return _pImpl->getTimeout();
+	return _pImpl->getLoginTimeout();
+}
+
+
+inline void Session::setConnectionTimeout(std::size_t timeout)
+{
+	_pImpl->setConnectionTimeout(timeout);
+}
+
+
+inline std::size_t Session::getConnectionTimeout()
+{
+	return _pImpl->getConnectionTimeout();
 }
 
 

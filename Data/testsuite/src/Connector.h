@@ -61,7 +61,7 @@ public:
 		/// Returns the name associated with this connector.
 
 	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
-		std::size_t timeout = SessionImpl::CONNECT_TIMEOUT_DEFAULT);
+		std::size_t timeout = SessionImpl::LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a test SessionImpl object and initializes it with the given connectionString.
 
 	static void addToFactory();

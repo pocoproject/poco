@@ -51,7 +51,7 @@ class SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 {
 public:
 	SessionImpl(const std::string& init,
-		std::size_t timeout = CONNECT_TIMEOUT_DEFAULT);
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database.
 
 	~SessionImpl();
@@ -69,6 +69,12 @@ public:
 	bool isConnected();
 		/// Returns true if session is connected to the database, 
 		/// false otherwise.
+
+	void setConnectionTimeout(std::size_t timeout);
+		/// Sets the session connection timeout value.
+
+	std::size_t getConnectionTimeout();
+		/// Returns the session connection timeout value.
 
 	void begin();
 		/// Starts a transaction.

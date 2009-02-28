@@ -112,9 +112,9 @@ void DataTest::testSession()
 	assert ("cs" == sess.impl()->connectionString());
 	assert ("test:///cs" == sess.uri());
 
-	assert (sess.getTimeout() == Session::CONNECT_TIMEOUT_DEFAULT);
-	sess.setTimeout(123);
-	assert (sess.getTimeout() == 123);
+	assert (sess.getLoginTimeout() == Session::LOGIN_TIMEOUT_DEFAULT);
+	sess.setLoginTimeout(123);
+	assert (sess.getLoginTimeout() == 123);
 
 	Session sess2(SessionFactory::instance().create("TeSt:///Cs"));
 	assert ("test" == sess2.impl()->connectorName());

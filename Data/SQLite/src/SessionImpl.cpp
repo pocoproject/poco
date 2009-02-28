@@ -58,14 +58,15 @@ const std::string SessionImpl::COMMIT_TRANSACTION("COMMIT");
 const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 
 
-SessionImpl::SessionImpl(const std::string& fileName, std::size_t timeout):
-	Poco::Data::AbstractSessionImpl<SessionImpl>(fileName, timeout),
+SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
+	Poco::Data::AbstractSessionImpl<SessionImpl>(fileName, loginTimeout),
 	_connector(toLower(Connector::KEY)),
 	_pDB(0),
 	_connected(false),
 	_isTransaction(false)
 {
 	open();
+	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 }
 
 
@@ -179,7 +180,7 @@ void SessionImpl::open(const std::string& connect)
 	{
 		ActiveConnector connector(connectionString(), &_pDB);
 		ActiveResult<int> result = connector.connect();
-		if (!result.tryWait(getTimeout() * 1000))
+		if (!result.tryWait(getLoginTimeout() * 1000))
 			throw ConnectionFailedException("Timed out.");
 
 		int rc = result.data();
@@ -212,6 +213,15 @@ void SessionImpl::close()
 bool SessionImpl::isConnected()
 {
 	return _connected;
+}
+
+
+void SessionImpl::setConnectionTimeout(std::size_t timeout)
+{
+	int tout = 1000 * timeout;
+	int rc = sqlite3_busy_timeout(_pDB, tout);
+	if (rc != 0) Utility::throwException(rc);
+	_timeout = tout;
 }
 
 

@@ -65,7 +65,9 @@ CppUnit::Test* ODBCTestSuite::suite()
 	addTest(pSuite, ODBCSQLiteTest::suite());
 	addTest(pSuite, ODBCSQLServerTest::suite());
 	addTest(pSuite, ODBCDB2Test::suite());
-#if defined(POCO_OS_FAMILY_WINDOWS)
+// MS Access driver does not support connection status detection
+// disabled for the time being
+#if 0 //defined(POCO_OS_FAMILY_WINDOWS)
 	addTest(pSuite, ODBCAccessTest::suite());
 #endif
 

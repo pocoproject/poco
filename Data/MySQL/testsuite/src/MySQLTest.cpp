@@ -43,6 +43,7 @@
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 #include "Poco/Data/Nullable.h"
+#include "Poco/Data/DataException.h"
 #include <iostream>
 
 using namespace Poco::Data;
@@ -764,7 +765,7 @@ CppUnit::Test* MySQLTest::suite()
 	{
 		_pSession = new Session(MySQL::Connector::KEY, _dbConnString);
 	}
-    catch (ConnectionException& ex)
+    catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
 		return 0;

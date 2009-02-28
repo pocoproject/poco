@@ -78,6 +78,17 @@ bool SessionImpl::isConnected()
 }
 
 
+void SessionImpl::setConnectionTimeout(std::size_t timeout)
+{
+}
+
+
+std::size_t SessionImpl::getConnectionTimeout()
+{
+	return 0;
+}
+
+
 Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
 {
 	return new TestStatementImpl(*this);
