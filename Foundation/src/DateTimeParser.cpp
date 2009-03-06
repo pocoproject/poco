@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/Main/Foundation/src/DateTimeParser.cpp#18 $
+// $Id: //poco/Main/Foundation/src/DateTimeParser.cpp#19 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -65,6 +65,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 	int minute = 0;
 	int second = 0;
 	int millis = 0;
+	int micros = 0;
 	int tzd    = 0;
 
 	std::string::const_iterator it   = str.begin();
@@ -139,6 +140,11 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 					PARSE_NUMBER_N(millis, 1);
 					millis *= 100;
 					break;
+				case 'F':
+					SKIP_JUNK();
+					PARSE_NUMBER_N(millis, 3);
+					PARSE_NUMBER_N(micros, 3);
+					break;
 				case 'z':
 				case 'Z':
 					tzd = parseTZD(it, end);
@@ -151,8 +157,8 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 	}
 	if (month == 0) month = 1;
 	if (day == 0) day = 1;
-	if (DateTime::isValid(year, month, day, hour, minute, second, millis))
-		dateTime.assign(year, month, day, hour, minute, second, millis);
+	if (DateTime::isValid(year, month, day, hour, minute, second, millis, micros))
+		dateTime.assign(year, month, day, hour, minute, second, millis, micros);
 	else 
 		throw SyntaxException("date/time component out of range");
 	timeZoneDifferential = tzd;

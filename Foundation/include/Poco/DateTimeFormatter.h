@@ -1,7 +1,7 @@
 //
 // DateTimeFormatter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DateTimeFormatter.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/DateTimeFormatter.h#4 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -94,6 +94,7 @@ public:
 		///   * %S - second (00 .. 59)
 		///   * %i - millisecond (000 .. 999)
 		///   * %c - centisecond (0 .. 9)
+		///   * %F - fractional seconds/microseconds (000000 - 999999)
 		///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN).
 		///   * %Z - time zone differential in RFC format (GMT or +NNNN)
 		///   * %% - percent sign
@@ -123,6 +124,7 @@ public:
 		///   * %s - total seconds (0 .. n)
 		///   * %i - milliseconds (000 .. 999)
 		///   * %c - centisecond (0 .. 9)
+		///   * %F - fractional seconds/microseconds (000000 - 999999)
 		///   * %% - percent sign
 
 	static void append(std::string& str, const Timestamp& timestamp, const std::string& fmt, int timeZoneDifferential = UTC);
