@@ -36,7 +36,7 @@
 
 #include "Poco/Environment.h"
 #include <cstdlib>
-
+#include <cstdio>
 
 #if defined(POCO_OS_FAMILY_VMS)
 #include "Environment_VMS.cpp"
