@@ -29,11 +29,15 @@ install(
     )
 
 add_subdirectory( SQLite )
+
 if(MYSQL_FOUND)
     add_subdirectory( MySQL )
 endif(MYSQL_FOUND)
-if(ODBC_CONFIG)
-#    add_subdirectory( ODBC )
+
+include(../contrib/cmake/FindODBC.cmake)
+
+if(NOT ODBC_CONFIG-NOT_FOUND)
+    add_subdirectory( ODBC )
 endif(ODBC_CONFIG)
 
 add_subdirectory( samples )

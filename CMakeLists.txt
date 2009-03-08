@@ -35,7 +35,6 @@ include(FindCygwin)
 include(FindOpenSSL)
 
 include(contrib/cmake/FindMySQL.cmake)
-include(contrib/cmake/FindODBC.cmake)
 include(contrib/cmake/FindAPR.cmake)
 include(contrib/cmake/FindApache2.cmake)
 

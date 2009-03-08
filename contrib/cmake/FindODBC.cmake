@@ -1,34 +1,37 @@
-if(WITH_UNIXODBC)
-	# check for location of odbc_config
-	find_program(ODBC_CONFIG odbc_config $ENV{ODBC_PATH}/bin PATHS)
-		
-	if(NOT ODBC_CONFIG)
-		message(STATUS "Couldn't find unixODBC")
-	else(NOT ODBC_CONFIG)
+# check for location of odbc_config
+find_program(ODBC_CONFIG odbc_config 
+	$ENV{ODBC_PATH}/bin 
+	/usr/bin 
+	/usr/local/bin 
+	PATHS)
 
-	message(STATUS "unixODBC: Found odbc_config in ${ODBC_CONFIG}")
-
+if(ODBC_CONFIG-NOT_FOUND)
+	message(STATUS "Couldn't find unixODBC")
+else(NOT ODBC_CONFIG)
+	message(STATUS "Found unixODBC: odbc_config in ${ODBC_CONFIG}")
 	exec_program(${ODBC_CONFIG} ARGS "--include-prefix" OUTPUT_VARIABLE ODBC_INCLUDE_DIR)
-	set (CMAKE_FLAGS "${CMAKE_FLAGS} -I${ODBC_INCLUDE_DIR}")
-
+	include_directories(${ODBC_INCLUDE_DIR})
 	exec_program(${ODBC_CONFIG} ARGS "--libs" OUTPUT_VARIABLE ODBC_LINK_FLAGS)
-	endif(NOT ODBC_CONFIG)
+	add_definitions(-DPOCO_UNIXODBC)
+endif(ODBC_CONFIG-NOT_FOUND)
 
-else(WITH_UNIXODBC)
-
-	find_program(ODBC_CONFIG iodbc-config $ENV{ODBC_PATH}/bin PATHS)
-		
-	if(NOT ODBC_CONFIG)
+if(ODBC_CONFIG-NOT_FOUND)
+	find_program(ODBC_CONFIG iodbc-config 
+		$ENV{ODBC_PATH}/bin 
+		/usr/bin 
+		/usr/local/bin 
+		PATHS)
+	if(ODBC_CONFIG-NOT_FOUND)
 		message(STATUS "Couldn't find iODBC")
-	else(NOT ODBC_CONFIG)
+	else(ODBC_CONFIG-NOT_FOUND)
+		message(STATUS "Found iODBC: iodbc-config in ${ODBC_CONFIG}")
+		exec_program(${ODBC_CONFIG} ARGS "--cflags" OUTPUT_VARIABLE ODBC_CFLAGS)
+		add_definitions( ${ODBC_CFLAGS} )
+		exec_program(${ODBC_CONFIG} ARGS "--libs" OUTPUT_VARIABLE ODBC_LINK_FLAGS)
+		add_definitions(-DPOCO_IODBC)
+	endif(ODBC_CONFIG-NOT_FOUND)
+endif(ODBC_CONFIG-NOT_FOUND)
 
-	message(STATUS "iODBC: Found iodbc-config in ${ODBC_CONFIG}")
-
-	exec_program(${ODBC_CONFIG} ARGS "--cflags" OUTPUT_VARIABLE ODBC_CFLAGS)
-	set(CMAKE_FLAGS "${CMAKE_FLAGS} ${ODBC_CFLAGS}")
-
-	exec_program(${ODBC_CONFIG} ARGS "--libs" OUTPUT_VARIABLE ODBC_LINK_FLAGS)
-	endif(NOT ODBC_CONFIG)
-		
-endif(WITH_UNIXODBC)
-
+if(ODBC_CONFIG-NOT_FOUND)
+	#try odbc32.lib on windows
+endif(ODBC_CONFIG-NOT_FOUND)

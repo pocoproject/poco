@@ -1,8 +1,22 @@
 set(LIBNAME "PocoODBC")
 set(LIBNAMED "${LIBNAME}d")
 
-set(SRCS "")
-aux_source_directory(src SRCS)
+set(SRCS 
+src/Binder.cpp
+src/ConnectionHandle.cpp
+src/Connector.cpp
+src/EnvironmentHandle.cpp
+src/Extractor.cpp
+src/ODBCException.cpp
+src/ODBCMetaColumn.cpp
+src/ODBCStatementImpl.cpp
+src/Parameter.cpp
+src/Preparator.cpp
+src/SessionImpl.cpp
+src/TypeInfo.cpp
+src/Unicode.cpp
+src/Utility.cpp
+)
 
 add_definitions( ${ODBC_CFLAGS} )
 
@@ -32,4 +46,4 @@ install(
     DESTINATION lib
     )
 
-#add_subdirectory( testsuite )
+add_subdirectory( testsuite )
