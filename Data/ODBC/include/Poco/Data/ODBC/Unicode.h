@@ -73,7 +73,7 @@ namespace Data {
 namespace ODBC {
 
 
-#if defined(POCO_PTR_IS_64_BIT) || defined(POCO_UNIXODBC) // mkrivos - unixodbc+linux32 doesn't compile with SQLPOINTER & SQLColAttribute()
+#if defined(POCO_PTR_IS_64_BIT) || defined(POCO_OS_FAMILY_UNIX) // mkrivos - POCO_OS_FAMILY_UNIX doesn't compile with SQLPOINTER & SQLColAttribute()
 	typedef SQLLEN* NumAttrPtrType;
 #else
 	typedef SQLPOINTER NumAttrPtrType;

@@ -86,13 +86,13 @@ void TestStatementImpl::bindImpl()
 }
 
 
-Poco::UInt32 TestStatementImpl::columnsReturned() const
+std::size_t TestStatementImpl::columnsReturned() const
 {
 	return 0;
 }
 
 
-const MetaColumn& TestStatementImpl::metaColumn(Poco::UInt32 pos) const
+const MetaColumn& TestStatementImpl::metaColumn(std::size_t pos) const
 {
 	static MetaColumn c(pos, "", MetaColumn::FDT_BOOL, 0);
 	return c;
@@ -105,7 +105,7 @@ bool TestStatementImpl::hasNext()
 }
 
 
-Poco::UInt32 TestStatementImpl::next()
+std::size_t TestStatementImpl::next()
 {
 	Poco::Data::AbstractExtractionVec::iterator it    = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();

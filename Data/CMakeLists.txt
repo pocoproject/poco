@@ -3,6 +3,7 @@ set(LIBNAMED "${LIBNAME}d")
 
 set(SRCS "")
 aux_source_directory(src SRCS)
+include_directories( SQLite/include )
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
@@ -36,9 +37,11 @@ endif(MYSQL_FOUND)
 
 include(../contrib/cmake/FindODBC.cmake)
 
-if(NOT ODBC_CONFIG-NOT_FOUND)
+if(${ODBC_CONFIG} MATCHES "ODBC_CONFIG-NOTFOUND")
+	message("ODBC Support Disabled - no ODBC runtime")
+else(${ODBC_CONFIG} MATCHES "ODBC_CONFIG-NOTFOUND")
     add_subdirectory( ODBC )
-endif(ODBC_CONFIG)
+endif(${ODBC_CONFIG} MATCHES "ODBC_CONFIG-NOTFOUND")
 
 add_subdirectory( samples )
 add_subdirectory( testsuite )

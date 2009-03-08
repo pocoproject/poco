@@ -272,7 +272,7 @@ public:
 	Statement& operator , (Poco::Int16 value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
-	Statement& operator , (std::size_t value);
+	Statement& operator , (Poco::UInt32 value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
 	Statement& operator , (Poco::Int32 value);
@@ -563,7 +563,7 @@ inline Statement& Statement::operator , (Poco::Int16 value)
 }
 
 
-inline Statement& Statement::operator , (std::size_t value)
+inline Statement& Statement::operator , (Poco::UInt32 value)
 {
 	return commaPODImpl(value);
 }

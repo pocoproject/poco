@@ -63,20 +63,20 @@ public:
 		/// Destroys the TestStatementImpl.
 
 protected:
-	Poco::UInt32 columnsReturned() const;
+	std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query. 
 	
-	Poco::UInt32 affectedRowCount() const;
+	std::size_t affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert or update.
 
-	const MetaColumn& metaColumn(Poco::UInt32 pos) const;
+	const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns column meta data.
 
 	bool hasNext();
 		/// Returns true if a call to next() will return data.
 
-	Poco::UInt32 next();
+	std::size_t next();
 		/// Retrieves the next row or set of rows from the resultset.
 		/// Will throw, if the resultset is empty.
 
@@ -121,7 +121,7 @@ inline AbstractBinder& TestStatementImpl::binder()
 }
 
 
-inline Poco::UInt32 TestStatementImpl::affectedRowCount() const
+inline std::size_t TestStatementImpl::affectedRowCount() const
 {
 	return 0;
 }
