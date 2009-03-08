@@ -37,6 +37,7 @@
 #include "Poco/Data/MySQL/SessionHandle.h"
 #include "Poco/Data/DataException.h"
 
+#define POCO_MYSQL_VERSION_NUMBER ((NDB_VERSION_MAJOR<<16) | (NDB_VERSION_MINOR<<8) | (NDB_VERSION_BUILD&0xFF))
 
 namespace Poco {
 namespace Data {
@@ -82,7 +83,12 @@ void SessionHandle::options(mysql_option opt, bool b)
 
 void SessionHandle::options(mysql_option opt, unsigned int i)
 {
-	if (mysql_options(_pHandle, opt, (const char *)&i) != 0)
+#if (POCO_MYSQL_VERSION_NUMBER < 0x050108)
+	const char* tmp = (const char *)&i;
+#else
+	const void* tmp = (const void *)&i;
+#endif
+	if (mysql_options(_pHandle, opt, tmp) != 0)
 		throw ConnectionException("mysql_options error", _pHandle);
 }
 
