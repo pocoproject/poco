@@ -41,8 +41,8 @@
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
 #	endif
-#include <limits.h>
 #endif
+#include <climits>
 
 
 using Poco::Thread;
