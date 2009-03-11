@@ -176,12 +176,6 @@
 #endif
 
 
-//TODO: determine all platforms having poll() call
-#if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_LINUX)
-#define POCO_HAVE_FD_POLL 1
-#endif
-
-
 #if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS)
 #define POCO_BROKEN_TIMEOUTS 1
 #endif

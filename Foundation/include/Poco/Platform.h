@@ -185,4 +185,10 @@
 #endif
 
 
+//TODO: determine all platforms having poll() call
+#if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_LINUX)
+	#define POCO_HAVE_FD_POLL 1
+#endif
+
+
 #endif // Foundation_Platform_INCLUDED
