@@ -151,6 +151,7 @@ void CoreTest::testBuffer()
 {
 	std::size_t s = 10;
 	Buffer<int> b(s);
+	assert (b.size() * sizeof(int) == b.byteCount());
 	std::vector<int> v;
 	for (int i = 0; i < s; ++i)
 		v.push_back(i);
@@ -161,6 +162,60 @@ void CoreTest::testBuffer()
 	for (int i = 0; i < s; ++i)
 		assert (b[i] == i);
 
+	s = 5;
+	b.resize(s);
+	assert (b.size() * sizeof(int) == b.byteCount());
+	v.clear();
+	for (int i = 0; i < s; ++i)
+		v.push_back(i);
+
+	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+
+	assert (s == b.size());
+	for (int i = 0; i < s; ++i)
+		assert (b[i] == i);
+
+	std::size_t t = s;
+	s = 50;
+	b.resize(s, true);
+	assert (b.size() * sizeof(int) == b.byteCount());
+	for (int i = 0; i < t; ++i)
+		assert (b[i] == i);
+
+	v.clear();
+	for (int i = 0; i < s; ++i)
+		v.push_back(i);
+
+	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+
+	assert (s == b.size());
+	for (int i = 0; i < s; ++i)
+		assert (b[i] == i);
+
+	Buffer<int> b0;
+	b0 = b;
+	assert (s == b0.size());
+	for (int i = 0; i < s; ++i)
+		assert (b0[i] == i);
+
+	Buffer<int> b1(b0);
+	assert (s == b1.size());
+	for (int i = 0; i < s; ++i)
+		assert (b1[i] == i);
+
+	int* pi = b1.begin();
+	for (int i = 0; pi != b1.end(); ++pi, ++i)
+		assert (*pi == i);
+
+	b1.append(b0);
+	assert (s * 2 == b1.size());
+	int i = 0;
+	for (; i < s; ++i)
+		assert (b1[i] == i);
+
+	for (int j = 0; i < s; ++i, ++j)
+		assert (b1[i] == j);
+ 
 #if ENABLE_BUGCHECK_TEST
 	try { int i = b[s]; fail ("must fail"); }
 	catch (Exception&) { }

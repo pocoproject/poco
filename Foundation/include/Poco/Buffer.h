@@ -49,9 +49,9 @@ namespace Poco {
 
 template <class T>
 class Buffer
-	/// A very simple buffer class that allocates a buffer of
-	/// a given type and size in the constructor and
-	/// deallocates the buffer in the destructor.
+	/// A buffer class that allocates a buffer of a given type and size.
+	/// Buffer can be zero-size, resized, copy-constructed and assigned.
+	/// Memory allocation, resizing and deallocation is managed automatically.
 	///
 	/// This class is useful everywhere where a temporary buffer
 	/// is needed.
@@ -59,23 +59,99 @@ class Buffer
 public:
 	Buffer(std::size_t size):
 		_size(size),
-		_ptr(new T[size])
+		_ptr(size ? new T[size] : 0)
 		/// Creates and allocates the Buffer.
 	{
 	}
 	
+	Buffer(): _size(0),	_ptr(0)
+		/// Creates the Buffer.
+	{
+	}
+
+	Buffer(const Buffer& other):
+		/// Copy constructor.
+		_size(other._size),
+		_ptr(other._size ? new T[other._size] : 0)
+	{
+		if (_size)
+			std::memcpy(_ptr, other._ptr, _size * sizeof(T));
+	}
+
+	Buffer& operator = (const Buffer& other)
+		/// Assignment operator.
+	{
+		if (this != &other)
+		{
+			Buffer tmp(other);
+			swap(tmp);
+		}
+
+		return *this;
+	}
+
 	~Buffer()
 		/// Destroys the Buffer.
 	{
 		delete [] _ptr;
 	}
 	
+	void swap(Buffer& other)
+		/// Swaps the buffer with another one.
+	{
+		using std::swap;
+		
+		swap(_ptr, other._ptr);
+		swap(_size, other._size);
+	}
+
 	std::size_t size() const
 		/// Returns the size of the buffer.
 	{
 		return _size;
 	}
 	
+	void resize(std::size_t newSize, bool preserve = false)
+		/// Resizes the buffer. If preserve is true, the contents
+		/// of the buffer is preserved. If the newSize is smaller
+		/// than the current size, data truncation will occur.
+		/// 
+		/// For efficiency sake, the default behavior is not to
+		/// preserve the contents.
+	{
+		if (preserve) 
+		{
+			Buffer tmp;
+			tmp = *this;
+			recreate(newSize);
+			std::size_t size = _size < tmp._size ? _size : tmp._size;
+			std::memcpy(_ptr, tmp._ptr, size * sizeof(T));
+			return;
+		}
+
+		recreate(newSize);
+	}
+
+	void append(const T* buf, std::size_t sz)
+		/// Resizes this buffer and appends the argument buffer.
+	{
+		std::size_t oldSize = _size;
+		resize(_size + sz, true);
+		std::memcpy(_ptr + oldSize, buf, sz);
+	}
+
+	void append(const Buffer& buf)
+		/// Resizes this buffer and appends the argument buffer.
+	{
+		append(buf.begin(), buf.size());
+	}
+
+	std::size_t byteCount() const
+		/// Returns the total length of the buffer in bytes .
+	{
+		return _size * sizeof(T);
+	}
+
 	T* begin()
 		/// Returns a pointer to the beginning of the buffer.
 	{
@@ -115,12 +191,16 @@ public:
 	}
 
 private:
-	Buffer();
-	Buffer(const Buffer&);
-	Buffer& operator = (const Buffer&);
+
+	void recreate(std::size_t newSize)
+	{
+		delete [] _ptr;
+		_ptr = new T[newSize];
+		_size = newSize;
+	}
 
 	std::size_t _size;
-	T* _ptr;
+	T*          _ptr;
 };
 
 
