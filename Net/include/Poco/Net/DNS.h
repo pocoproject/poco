@@ -1,7 +1,7 @@
 //
 // DNS.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/DNS.h#3 $
+// $Id: //poco/Main/Net/include/Poco/Net/DNS.h#4 $
 //
 // Library: Net
 // Package: NetCore
@@ -118,6 +118,9 @@ public:
 
 	static void flushCache();
 		/// Flushes the internal DNS cache.
+		
+	static std::string hostName();
+		/// Returns the host name of this host.
 
 protected:
 	static int lastError();

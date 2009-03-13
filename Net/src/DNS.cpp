@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/Main/Net/src/DNS.cpp#9 $
+// $Id: //poco/Main/Net/src/DNS.cpp#10 $
 //
 // Library: Net
 // Package: NetCore
@@ -180,7 +180,7 @@ IPAddress DNS::resolveOne(const std::string& address)
 
 HostEntry DNS::thisHost()
 {
-	return hostByName(Environment::nodeName());
+	return hostByName(hostName());
 }
 
 
@@ -189,6 +189,17 @@ void DNS::flushCache()
 	FastMutex::ScopedLock lock(_mutex);
 
 	_cache.clear();
+}
+
+
+std::string DNS::hostName()
+{
+	char buffer[256];
+	int rc = gethostname(buffer, sizeof(buffer));
+	if (rc == 0)
+		return std::string(buffer);
+	else
+		throw NetException("Cannot get host name");
 }
 
 
