@@ -1,7 +1,7 @@
 //
 // ThreadTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ThreadTest.cpp#5 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ThreadTest.cpp#6 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -40,8 +40,8 @@
 #include <iostream>
 #if defined(__sun) && defined(__SVR4)
 #define __EXTENSIONS__
-#include <limits.h>
 #endif
+#include <climits>
 
 
 using Poco::Thread;

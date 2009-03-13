@@ -39,14 +39,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPFormServer", "HTTPFormS
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwitterClient", "TwitterClient\TwitterClient_vs71.vcproj", "{D4483069-8403-4013-822D-100D349ABCA7}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug_shared = debug_shared
 		debug_static = debug_static
 		release_shared = release_shared
 		release_static = release_static
-	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{1DDAE25B-2263-45B2-8931-C36AD28A0362}.debug_shared.ActiveCfg = debug_shared|Win32
@@ -129,6 +131,14 @@ Global
 		{45A054E6-44EC-4943-809A-BA8B2A25DA21}.release_shared.Build.0 = release_shared|Win32
 		{45A054E6-44EC-4943-809A-BA8B2A25DA21}.release_static.ActiveCfg = release_static|Win32
 		{45A054E6-44EC-4943-809A-BA8B2A25DA21}.release_static.Build.0 = release_static|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.debug_shared.ActiveCfg = debug_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.debug_shared.Build.0 = debug_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.debug_static.ActiveCfg = debug_static|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.debug_static.Build.0 = debug_static|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.release_shared.ActiveCfg = release_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.release_shared.Build.0 = release_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.release_static.ActiveCfg = release_static|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.release_static.Build.0 = release_static|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

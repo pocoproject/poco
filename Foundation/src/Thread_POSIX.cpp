@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#8 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#9 $
 //
 // Library: Foundation
 // Package: Threading
@@ -42,8 +42,8 @@
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
 #	endif
-#	include <limits.h>
 #endif
+#include <climits>
 
 
 //

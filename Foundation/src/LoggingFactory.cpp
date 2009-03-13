@@ -1,7 +1,7 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/1.3/Foundation/src/LoggingFactory.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/LoggingFactory.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -108,13 +108,19 @@ void LoggingFactory::registerBuiltins()
 #else
 	_channelFactory.registerClass("ConsoleChannel", new Instantiator<ConsoleChannel, Channel>);
 #endif
+#ifndef POCO_NO_FILECHANNEL
 	_channelFactory.registerClass("FileChannel", new Instantiator<FileChannel, Channel>);
+#endif
 	_channelFactory.registerClass("FormattingChannel", new Instantiator<FormattingChannel, Channel>);
+#ifndef POCO_NO_SPLITTERCHANNEL
 	_channelFactory.registerClass("SplitterChannel", new Instantiator<SplitterChannel, Channel>);
+#endif
 	_channelFactory.registerClass("NullChannel", new Instantiator<NullChannel, Channel>);
 
 #if defined(POCO_OS_FAMILY_UNIX)
+#ifndef POCO_NO_SYSLOGCHANNEL
 	_channelFactory.registerClass("SyslogChannel", new Instantiator<SyslogChannel, Channel>);
+#endif
 #endif
 #if defined(POCO_OS_FAMILY_VMS)
 	_channelFactory.registerClass("OpcomChannel", new Instantiator<OpcomChannel, Channel>);

@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.3/Util/src/Application.cpp#6 $
+// $Id: //poco/1.3/Util/src/Application.cpp#8 $
 //
 // Library: Util
 // Package: Application
@@ -250,16 +250,20 @@ int Application::loadConfiguration(int priority)
 		_pConfig->add(new PropertyFileConfiguration(cfgPath.toString()), priority, false, false);
 		++n;
 	}
+#ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "ini", cfgPath))
 	{
 		_pConfig->add(new IniFileConfiguration(cfgPath.toString()), priority, false, false);
 		++n;
 	}
+#endif
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "xml", cfgPath))
 	{
 		_pConfig->add(new XMLConfiguration(cfgPath.toString()), priority, false, false);
 		++n;
 	}
+#endif
 	if (n > 0)
 	{
 		_pConfig->setString("application.configDir", cfgPath.parent().toString());
@@ -274,10 +278,14 @@ void Application::loadConfiguration(const std::string& path, int priority)
 	std::string ext = confPath.getExtension();
 	if (icompare(ext, "properties") == 0)
 		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
+#ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	else if (icompare(ext, "ini") == 0)
 		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
+#endif
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	else if (icompare(ext, "xml") == 0)
 		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false, false);
+#endif
 	else
 		throw Poco::InvalidArgumentException("Unsupported configuration file type", ext);
 }
@@ -366,7 +374,10 @@ void Application::processOptions()
 		std::string value;
 		if (processor.process(*it, name, value))
 		{
-			handleOption(name, value);
+			if (!name.empty()) // "--" option to end options processing
+			{
+				handleOption(name, value);
+			}
 			it = _args.erase(it);
 		}
 		else ++it;
