@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPFormServer", "HTTPFormS
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SMTPLogger", "SMTPLogger\SMTPLogger_vs90.vcproj", "{5194085E-A629-4021-B908-BA02101B5B9B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwitterClient", "TwitterClient\TwitterClient_vs90.vcproj", "{D4483069-8403-4013-822D-100D349ABCA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|Win32 = debug_shared|Win32
@@ -118,6 +120,14 @@ Global
 		{5194085E-A629-4021-B908-BA02101B5B9B}.release_shared|Win32.Build.0 = release_shared|Win32
 		{5194085E-A629-4021-B908-BA02101B5B9B}.release_static|Win32.ActiveCfg = release_static|Win32
 		{5194085E-A629-4021-B908-BA02101B5B9B}.release_static|Win32.Build.0 = release_static|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.debug_shared|Win32.ActiveCfg = debug_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.debug_shared|Win32.Build.0 = debug_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.debug_static|Win32.ActiveCfg = debug_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.debug_static|Win32.Build.0 = debug_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.release_shared|Win32.ActiveCfg = release_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.release_shared|Win32.Build.0 = release_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.release_static|Win32.ActiveCfg = release_shared|Win32
+		{D4483069-8403-4013-822D-100D349ABCA7}.release_static|Win32.Build.0 = release_shared|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

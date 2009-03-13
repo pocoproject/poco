@@ -9,4 +9,5 @@ add_subdirectory(TimeServer)
 add_subdirectory(dict)
 add_subdirectory(download)
 add_subdirectory(httpget)
+add_subdirectory(TwitterClient)
 
