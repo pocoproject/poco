@@ -42,6 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include <cstddef>
+#include <cstring>
 
 
 namespace Poco {
