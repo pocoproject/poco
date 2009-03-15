@@ -41,7 +41,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
-
+#include <fstream> // std::streamsize
 
 namespace Poco {
 namespace Crypto {
