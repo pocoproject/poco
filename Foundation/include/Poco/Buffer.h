@@ -136,6 +136,7 @@ public:
 	void append(const T* buf, std::size_t sz)
 		/// Resizes this buffer and appends the argument buffer.
 	{
+		if (0 == sz) return;
 		std::size_t oldSize = _size;
 		resize(_size + sz, true);
 		std::memcpy(_ptr + oldSize, buf, sz);
@@ -177,6 +178,12 @@ public:
 		return _ptr + _size;
 	}
 	
+	bool isEmpty() const
+		/// Return true if buffer is empty.
+	{
+		return 0 == _size;
+	}
+
 	T& operator [] (std::size_t index)
 	{
 		poco_assert (index < _size);
@@ -196,7 +203,11 @@ private:
 	void recreate(std::size_t newSize)
 	{
 		delete [] _ptr;
-		_ptr = new T[newSize];
+		if (0 == newSize)
+			_ptr = 0;
+		else
+			_ptr = new T[newSize];
+
 		_size = newSize;
 	}
 

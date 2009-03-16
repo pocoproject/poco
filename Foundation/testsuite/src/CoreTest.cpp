@@ -216,6 +216,9 @@ void CoreTest::testBuffer()
 	for (int j = 0; i < s; ++i, ++j)
 		assert (b1[i] == j);
  
+	b1.resize(0);
+	assert (b1.isEmpty());
+
 #if ENABLE_BUGCHECK_TEST
 	try { int i = b[s]; fail ("must fail"); }
 	catch (Exception&) { }
