@@ -216,6 +216,11 @@ void CoreTest::testBuffer()
 	for (int j = 0; i < s; ++i, ++j)
 		assert (b1[i] == j);
  
+	b1.clear();
+	pi = b1.begin();
+	for (; pi != b1.end(); ++pi)
+		assert (*pi == 0);
+
 	b1.resize(0);
 	assert (b1.isEmpty());
 

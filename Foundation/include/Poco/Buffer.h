@@ -112,6 +112,12 @@ public:
 		return _size;
 	}
 	
+	void clear()
+		/// Sets the contents of the bufer to zero.
+	{
+		std::memset(_ptr, 0, _size * sizeof(T));
+	}
+
 	void resize(std::size_t newSize, bool preserve = false)
 		/// Resizes the buffer. If preserve is true, the contents
 		/// of the buffer is preserved. If the newSize is smaller
@@ -122,11 +128,17 @@ public:
 	{
 		if (preserve) 
 		{
+			if (_size == newSize) return;
 			Buffer tmp;
 			tmp = *this;
 			recreate(newSize);
 			std::size_t size = _size < tmp._size ? _size : tmp._size;
 			std::memcpy(_ptr, tmp._ptr, size * sizeof(T));
+			return;
+		}
+		else if (_size == newSize) 
+		{
+			clear();
 			return;
 		}
 
@@ -148,8 +160,14 @@ public:
 		append(buf.begin(), buf.size());
 	}
 
+	std::size_t elementSize() const
+		/// Returns the size of the buffer element.
+	{
+		return sizeof(T);
+	}
+
 	std::size_t byteCount() const
-		/// Returns the total length of the buffer in bytes .
+		/// Returns the total length of the buffer in bytes.
 	{
 		return _size * sizeof(T);
 	}
@@ -202,13 +220,16 @@ private:
 
 	void recreate(std::size_t newSize)
 	{
-		delete [] _ptr;
-		if (0 == newSize)
-			_ptr = 0;
-		else
-			_ptr = new T[newSize];
+		if (newSize != _size)
+		{
+			delete [] _ptr;
+			if (0 == newSize)
+				_ptr = 0;
+			else
+				_ptr = new T[newSize];
 
-		_size = newSize;
+			_size = newSize;
+		}
 	}
 
 	std::size_t _size;
