@@ -45,7 +45,9 @@
 
 #if defined(_POSIX_TIMEOUTS) && (_POSIX_TIMEOUTS - 200112L) >= 0L
 #if defined(_POSIX_THREADS) && (_POSIX_THREADS - 200112L) >= 0L
+#if !(defined(__SUNPRO_CC))
 #define POCO_HAVE_MUTEX_TIMEOUT
+#endif
 #endif
 #endif
 

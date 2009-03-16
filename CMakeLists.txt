@@ -33,6 +33,7 @@ include_directories( CppUnit/include Foundation/include XML/include Net/include 
 include(CheckTypeSize)
 include(FindCygwin)
 include(FindOpenSSL)
+include(CMakeDetermineCompilerId)
 
 include(contrib/cmake/FindMySQL.cmake)
 include(contrib/cmake/FindAPR.cmake)
@@ -47,7 +48,7 @@ endif(CMAKE_SYSTEM MATCHES "Windows")
 if (CMAKE_SYSTEM MATCHES "Linux")
   add_definitions( -DPOCO_OS_FAMILY_UNIX )
   # Standard 'must be' defines
-  add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
+  add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64)
   set(SYSLIBS  pthread dl rt)
 endif(CMAKE_SYSTEM MATCHES "Linux")
 
@@ -68,6 +69,11 @@ endif (CMAKE_COMPILER_IS_MINGW)
 if (CMAKE_COMPILER_IS_CYGWIN)
 #    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
 endif (CMAKE_COMPILER_IS_CYGWIN)
+
+# SunPro C++
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
+  add_definitions( -D_BSD_SOURCE -library=stlport4)
+endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 
 add_subdirectory(CppUnit)
 add_subdirectory(Foundation)
