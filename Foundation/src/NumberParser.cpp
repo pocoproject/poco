@@ -36,6 +36,7 @@
 
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <cstdio>
 #include <cctype>
 
@@ -174,6 +175,61 @@ bool NumberParser::tryParseFloat(const std::string& s, double& value)
 {
 	char temp;
 	return std::sscanf(s.c_str(), "%lf%c", &value, &temp) == 1;
+}
+
+
+bool NumberParser::parseBool(const std::string& s)
+{
+	bool result;
+	if (tryParseBool(s, result))
+		return result;
+	else
+		throw SyntaxException("Not a valid bool number", s);
+}
+
+	
+bool NumberParser::tryParseBool(const std::string& s, bool& value)
+{
+	int n;
+	if (NumberParser::tryParse(s, n))
+	{
+		value = (n != 0);
+		return true;
+	}
+
+	if (icompare(s, "true") == 0)
+	{
+		value = true;
+		return true;
+	}
+	else if (icompare(s, "yes") == 0)
+	{
+		value = true;
+		return true;
+	}
+	else if (icompare(s, "on") == 0)
+	{
+		value = true;
+		return true;
+	}
+	
+	if (icompare(s, "false") == 0)
+	{
+		value = false;
+		return true;
+	}
+	else if (icompare(s, "no") == 0)
+	{
+		value = false;
+		return true;
+	}
+	else if (icompare(s, "off") == 0)
+	{
+		value = false;
+		return true;
+	}
+	
+	return false;
 }
 
 

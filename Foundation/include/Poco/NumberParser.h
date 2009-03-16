@@ -115,6 +115,21 @@ public:
 		/// from the given string. 
 		/// Returns true if a valid floating point number has been found, 
 		/// false otherwise. 
+
+	static bool parseBool(const std::string& s);
+		/// Parses a bool value in decimal or string notation
+		/// from the given string.
+		/// Valid forms are: "0", "1", "true", "on", false", "yes", "no", "off".
+		/// String forms are NOT case sensitive.
+		/// Throws a SyntaxException if the string does not hold a valid bool number
+
+	static bool tryParseBool(const std::string& s, bool& value);
+		/// Parses a bool value in decimal or string notation
+		/// from the given string.
+		/// Valid forms are: "0", "1", "true", "on", false", "yes", "no", "off".
+		/// String forms are NOT case sensitive.
+		/// Returns true if a valid bool number has been found, 
+		/// false otherwise.
 };
 
 
