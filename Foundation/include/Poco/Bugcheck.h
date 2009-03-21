@@ -42,6 +42,9 @@
 
 #include "Poco/Foundation.h"
 #include <string>
+#if defined(_DEBUG)
+#	include <iostream>
+#endif
 
 
 namespace Poco {
@@ -93,10 +96,10 @@ protected:
 // useful macros (these automatically supply line number and file name)
 //
 #if defined(_DEBUG)
-	#define poco_assert_dbg(cond) \
+#	define poco_assert_dbg(cond) \
 		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
 #else
-	#define poco_assert_dbg(cond)
+#	define poco_assert_dbg(cond)
 #endif
 
 
@@ -122,6 +125,22 @@ protected:
 
 #define poco_debugger_msg(msg) \
 	Poco::Bugcheck::debugger(msg, __FILE__, __LINE__)
+
+
+#if defined(_DEBUG)
+#	define poco_stdout_dbg(outstr) \
+		std::cout << __FILE__ << '(' << __LINE__ << "):" << outstr << std::endl;
+#else
+#	define poco_stdout_dbg(outstr)
+#endif
+
+
+#if defined(_DEBUG)
+#	define poco_stderr_dbg(outstr) \
+		std::cerr << __FILE__ << '(' << __LINE__ << "):" << outstr << std::endl;
+#else
+#	define poco_stderr_dbg(outstr)
+#endif
 
 
 //
