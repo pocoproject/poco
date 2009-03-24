@@ -1,7 +1,7 @@
 //
 // HTTPServerConnectionFactory.cpp
 //
-// $Id: //poco/svn/Net/src/HTTPServerConnectionFactory.cpp#2 $
+// $Id: //poco/Main/Net/src/HTTPServerConnectionFactory.cpp#7 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -36,7 +36,6 @@
 
 #include "Poco/Net/HTTPServerConnectionFactory.h"
 #include "Poco/Net/HTTPServerConnection.h"
-#include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 
@@ -44,21 +43,16 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerConnectionFactory::HTTPServerConnectionFactory(HTTPServerParams* pParams, HTTPRequestHandlerFactory* pFactory):
+HTTPServerConnectionFactory::HTTPServerConnectionFactory(HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
 	_pParams(pParams),
 	_pFactory(pFactory)
 {
-	poco_check_ptr (pParams);
 	poco_check_ptr (pFactory);
-	
-	_pParams->duplicate();
 }
 
 
 HTTPServerConnectionFactory::~HTTPServerConnectionFactory()
 {
-	_pParams->release();
-	delete _pFactory;
 }
 
 

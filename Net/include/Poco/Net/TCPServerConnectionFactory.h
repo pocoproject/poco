@@ -1,7 +1,7 @@
 //
 // TCPServerConnectionFactory.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/TCPServerConnectionFactory.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/TCPServerConnectionFactory.h#3 $
 //
 // Library: Net
 // Package: TCPServer
@@ -42,6 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/TCPServerConnection.h"
+#include "Poco/SharedPtr.h"
 
 
 namespace Poco {
@@ -64,6 +65,8 @@ class Net_API TCPServerConnectionFactory
 	/// of TCPServerConnection.
 {
 public:
+	typedef Poco::SharedPtr<TCPServerConnectionFactory> Ptr;
+	
 	virtual ~TCPServerConnectionFactory();
 		/// Destroys the TCPServerConnectionFactory.
 

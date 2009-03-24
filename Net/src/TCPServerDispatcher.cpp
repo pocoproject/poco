@@ -1,7 +1,7 @@
 //
 // TCPServerDispatcher.cpp
 //
-// $Id: //poco/svn/Net/src/TCPServerDispatcher.cpp#2 $
+// $Id: //poco/Main/Net/src/TCPServerDispatcher.cpp#10 $
 //
 // Library: Net
 // Package: TCPServer
@@ -36,7 +36,6 @@
 
 #include "Poco/Net/TCPServerDispatcher.h"
 #include "Poco/Net/TCPServerConnectionFactory.h"
-#include "Poco/Net/TCPServerParams.h"
 #include "Poco/Notification.h"
 #include "Poco/AutoPtr.h"
 #include <memory>
@@ -73,7 +72,7 @@ private:
 };
 
 
-TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory* pFactory, Poco::ThreadPool& threadPool, TCPServerParams* pParams):
+TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, TCPServerParams::Ptr pParams):
 	_rc(1),
 	_pParams(pParams),
 	_currentThreads(0),
@@ -97,8 +96,6 @@ TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory* pFactory, P
 
 TCPServerDispatcher::~TCPServerDispatcher()
 {
-	_pParams->release();
-	delete _pConnectionFactory;
 }
 
 

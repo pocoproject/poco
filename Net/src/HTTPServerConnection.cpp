@@ -1,7 +1,7 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerConnection.cpp#11 $
+// $Id: //poco/Main/Net/src/HTTPServerConnection.cpp#12 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -40,7 +40,6 @@
 #include "Poco/Net/HTTPServerResponseImpl.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
@@ -51,21 +50,17 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams* pParams, HTTPRequestHandlerFactory* pFactory):
+HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
 	TCPServerConnection(socket),
 	_pParams(pParams),
 	_pFactory(pFactory)
 {
 	poco_check_ptr (pFactory);
-	poco_check_ptr (pParams);
-	
-	_pParams->duplicate();
 }
 
 
 HTTPServerConnection::~HTTPServerConnection()
 {
-	_pParams->release();
 }
 
 

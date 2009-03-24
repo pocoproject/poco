@@ -1,7 +1,7 @@
 //
 // TCPServer.cpp
 //
-// $Id: //poco/svn/Net/src/TCPServer.cpp#3 $
+// $Id: //poco/Main/Net/src/TCPServer.cpp#12 $
 //
 // Library: Net
 // Package: TCPServer
@@ -50,7 +50,7 @@ namespace Poco {
 namespace Net {
 
 
-TCPServer::TCPServer(TCPServerConnectionFactory* pFactory, const ServerSocket& socket, TCPServerParams* pParams):
+TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams):
 	_socket(socket),
 	_pDispatcher(new TCPServerDispatcher(pFactory, Poco::ThreadPool::defaultPool(), pParams)),
 	_thread(threadName(socket)),
@@ -59,7 +59,7 @@ TCPServer::TCPServer(TCPServerConnectionFactory* pFactory, const ServerSocket& s
 }
 
 
-TCPServer::TCPServer(TCPServerConnectionFactory* pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams* pParams):
+TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams):
 	_socket(socket),
 	_pDispatcher(new TCPServerDispatcher(pFactory, threadPool, pParams)),
 	_thread(threadName(socket)),

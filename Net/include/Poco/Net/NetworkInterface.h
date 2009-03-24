@@ -1,7 +1,7 @@
 //
 // NetworkInterface.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#7 $
+// $Id: //poco/Main/Net/include/Poco/Net/NetworkInterface.h#5 $
 //
 // Library: Net
 // Package: Sockets

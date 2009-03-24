@@ -1,7 +1,7 @@
 //
 // HTTPServer.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/HTTPServer.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServer.h#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -42,14 +42,12 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/TCPServer.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPServerParams.h"
 
 
 namespace Poco {
 namespace Net {
-
-
-class HTTPRequestHandlerFactory;
-class HTTPServerParams;
 
 
 class Net_API HTTPServer: public TCPServer
@@ -75,7 +73,7 @@ class Net_API HTTPServer: public TCPServer
 	/// information about the HTTP protocol.
 {
 public:
-	HTTPServer(HTTPRequestHandlerFactory* pFactory, const ServerSocket& socket, HTTPServerParams* pParams);
+	HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, const ServerSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServer, using the given ServerSocket.
 		///
 		/// The server takes ownership of the HTTPRequstHandlerFactory
@@ -85,7 +83,7 @@ public:
 		///
 		/// News threads are taken from the default thread pool.
 
-	HTTPServer(HTTPRequestHandlerFactory* pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams* pParams);
+	HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServer, using the given ServerSocket.
 		///
 		/// The server takes ownership of the HTTPRequstHandlerFactory

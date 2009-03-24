@@ -1,7 +1,7 @@
 //
 // HTTPServerParams.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/HTTPServerParams.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerParams.h#3 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -55,6 +55,8 @@ class Net_API HTTPServerParams: public TCPServerParams
 	/// Subclasses may add new parameters to the class.
 {
 public:
+	typedef Poco::AutoPtr<HTTPServerParams> Ptr;
+	
 	HTTPServerParams();
 		/// Creates the HTTPServerParams.
 		///
