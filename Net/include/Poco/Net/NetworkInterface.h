@@ -1,7 +1,7 @@
 //
 // NetworkInterface.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#6 $
+// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#7 $
 //
 // Library: Net
 // Package: Sockets
@@ -70,13 +70,13 @@ public:
 		/// The name is empty, the IP address is the wildcard
 		/// address and the index is zero.
 	
-	NetworkInterface(const NetworkInterface& interface);
+	NetworkInterface(const NetworkInterface& interfc);
 		/// Creates the NetworkInterface by copying another one.
 
 	~NetworkInterface();
 		/// Destroys the NetworkInterface.
 
-	NetworkInterface& operator = (const NetworkInterface& interface);
+	NetworkInterface& operator = (const NetworkInterface& interfc);
 		/// Assigns another NetworkInterface.
 		
 	void swap(NetworkInterface& other);

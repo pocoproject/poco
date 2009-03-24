@@ -913,7 +913,7 @@ void SocketImpl::error(int code, const std::string& arg)
 	case POCO_EHOSTUNREACH:
 		throw NetException("No route to host", code);
 	default:
-		throw IOException(NumberFormatter::format(code) + arg, code);
+		throw IOException(NumberFormatter::format(code), arg, code);
 	}
 }
 
