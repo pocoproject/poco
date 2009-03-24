@@ -83,4 +83,10 @@ void Connector::enableSharedCache(bool flag)
 }
 
 
+void Connector::enableSoftHeapLimit(int limit)
+{
+	sqlite3_soft_heap_limit(limit);
+}
+
+
 } } } // namespace Poco::Data::SQLite
