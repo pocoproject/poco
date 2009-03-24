@@ -1,7 +1,7 @@
 //
 // Connector.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Connector.cpp#3 $
+// $Id: //poco/1.3/Data/SQLite/src/Connector.cpp#4 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -79,6 +79,12 @@ void Connector::unregisterConnector()
 void Connector::enableSharedCache(bool flag)
 {
 	sqlite3_enable_shared_cache(flag ? 1 : 0);
+}
+
+
+void Connector::enableSoftHeapLimit(int limit)
+{
+	sqlite3_soft_heap_limit(limit);
 }
 
 

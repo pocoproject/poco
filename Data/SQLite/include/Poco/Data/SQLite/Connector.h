@@ -1,7 +1,7 @@
 //
 // Connector.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Connector.h#2 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Connector.h#3 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -74,6 +74,11 @@ public:
 	static void enableSharedCache(bool flag = true);
 		/// Enables or disables SQlite shared cache mode
 		/// (see http://www.sqlite.org/sharedcache.html for a discussion).
+
+	static void enableSoftHeapLimit(int limit);
+		/// Sets a soft upper limit to the amount of memory allocated
+		/// by SQLite. For more information, please see the SQLite
+		/// sqlite_soft_heap_limit() function (http://www.sqlite.org/c3ref/soft_heap_limit.html).
 };
 
 

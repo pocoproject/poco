@@ -1,14 +1,14 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Data/SQLite/Makefile#5 $
+# $Id: //poco/1.3/Data/SQLite/Makefile#6 $
 #
 # Makefile for Poco SQLite
 #
 
 include $(POCO_BASE)/build/rules/global
 
-SYSFLAGS += -DTHREADSAFE -DNO_TCL -DSQLITE_DISABLE_LFS
+SYSFLAGS += -DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS
 
 objects = Binder Extractor SessionImpl Connector \
 	SQLiteException SQLiteStatementImpl Utility \
