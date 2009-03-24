@@ -1,7 +1,7 @@
 //
 // CryptoTransform.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoTransform.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoTransform.h#2 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include <ios>
 
 
 namespace Poco {

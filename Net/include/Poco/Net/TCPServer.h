@@ -1,7 +1,7 @@
 //
 // TCPServer.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/TCPServer.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/TCPServer.h#4 $
 //
 // Library: Net
 // Package: TCPServer
@@ -42,6 +42,8 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/TCPServerParams.h"
 #include "Poco/Runnable.h"
 #include "Poco/Thread.h"
 #include "Poco/ThreadPool.h"
@@ -51,9 +53,7 @@ namespace Poco {
 namespace Net {
 
 
-class TCPServerParams;
 class TCPServerDispatcher;
-class TCPServerConnectionFactory;
 
 
 class Net_API TCPServer: public Poco::Runnable
@@ -98,7 +98,7 @@ class Net_API TCPServer: public Poco::Runnable
 	/// Already served connections, however, will continue being served.
 {
 public:
-	TCPServer(TCPServerConnectionFactory* pFactory, const ServerSocket& socket, TCPServerParams* pParams = 0);
+	TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
 		/// The server takes ownership of the TCPServerConnectionFactory
@@ -110,7 +110,7 @@ public:
 		///
 		/// News threads are taken from the default thread pool.
 
-	TCPServer(TCPServerConnectionFactory* pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams* pParams = 0);
+	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
 		/// The server takes ownership of the TCPServerConnectionFactory

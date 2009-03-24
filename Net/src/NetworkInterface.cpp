@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#8 $
+// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#9 $
 //
 // Library: Net
 // Package: Sockets
@@ -190,8 +190,8 @@ NetworkInterface::NetworkInterface():
 }
 
 
-NetworkInterface::NetworkInterface(const NetworkInterface& interface):
-	_pImpl(interface._pImpl)
+NetworkInterface::NetworkInterface(const NetworkInterface& interfc):
+	_pImpl(interfc._pImpl)
 {
 	_pImpl->duplicate();
 }
@@ -227,9 +227,9 @@ NetworkInterface::~NetworkInterface()
 }
 
 
-NetworkInterface& NetworkInterface::operator = (const NetworkInterface& interface)
+NetworkInterface& NetworkInterface::operator = (const NetworkInterface& interfc)
 {
-	NetworkInterface tmp(interface);
+	NetworkInterface tmp(interfc);
 	swap(tmp);
 	return *this;
 }

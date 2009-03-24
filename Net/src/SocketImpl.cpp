@@ -323,8 +323,6 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 
 void SocketImpl::sendUrgent(unsigned char data)
 {
-	poco_assert (_sockfd != POCO_INVALID_SOCKET);
-
 	int rc = ::send(_sockfd, reinterpret_cast<const char*>(&data), sizeof(data), MSG_OOB);
 	if (rc < 0) error();
 }
@@ -340,8 +338,6 @@ int SocketImpl::available()
 
 bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 {
-	poco_assert (_sockfd != POCO_INVALID_SOCKET);
-
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
