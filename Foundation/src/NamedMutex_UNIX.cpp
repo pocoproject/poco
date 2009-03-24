@@ -1,7 +1,7 @@
 //
 // NamedMutex_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NamedMutex_UNIX.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/NamedMutex_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -39,7 +39,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
-#if defined(sun) || defined(__APPLE__) || defined(__osf__)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(_AIX)
 #include <semaphore.h>
 #else
 #include <unistd.h>
@@ -60,7 +60,7 @@ namespace Poco {
 		unsigned short int* array;
 		struct seminfo*     __buf;
 	};
-#elif defined(hpux)
+#elif defined(__hpux)
 	union semun
 	{
 		int              val;
@@ -74,7 +74,7 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 	_name(name)
 {
 	std::string fileName = getFileName();
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	_sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 1);
 	if ((long) _sem == (long) SEM_FAILED) 
 		throw SystemException("cannot create named mutex (sem_open() failed)", _name);
@@ -99,13 +99,13 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 		_semid = semget(key, 1, 0);
 	}
 	else throw SystemException("cannot create named mutex (semget() failed)", _name);
-#endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
+#endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 }
 
 
 NamedMutexImpl::~NamedMutexImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	sem_close(_sem);
 #endif
 }
@@ -113,7 +113,7 @@ NamedMutexImpl::~NamedMutexImpl()
 
 void NamedMutexImpl::lockImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	int err;
 	do
 	{
@@ -139,7 +139,7 @@ void NamedMutexImpl::lockImpl()
 
 bool NamedMutexImpl::tryLockImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	return sem_trywait(_sem) == 0;
 #else
 	struct sembuf op;
@@ -153,7 +153,7 @@ bool NamedMutexImpl::tryLockImpl()
 
 void NamedMutexImpl::unlockImpl()
 {
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	if (sem_post(_sem) != 0)
 	   	throw SystemException("cannot unlock named mutex", _name);
 #else

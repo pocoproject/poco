@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#6 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#7 $
 //
 // Library: Net
 // Package: Sockets
@@ -875,7 +875,7 @@ void SocketImpl::error(int code, const std::string& arg)
 	case POCO_EHOSTUNREACH:
 		throw NetException("No route to host");
 	default:
-		throw IOException(NumberFormatter::format(code) + arg);
+		throw IOException(NumberFormatter::format(code), arg);
 	}
 }
 

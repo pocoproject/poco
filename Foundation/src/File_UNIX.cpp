@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#13 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#14 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -443,8 +443,10 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 		throw FileException("no space left on device", path);
 	case EDQUOT:
 		throw FileException("disk quota exceeded", path);
+#if !defined(_AIX)
 	case ENOTEMPTY:
 		throw FileException("directory not empty", path);
+#endif
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path);
 	case ENFILE:

@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Thread_POSIX.h#6 $
+// $Id: //poco/1.3/Foundation/include/Poco/Thread_POSIX.h#7 $
 //
 // Library: Foundation
 // Package: Threading
@@ -47,6 +47,7 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <pthread.h>
+#include <limits.h>
 #if !defined(POCO_NO_SYS_SELECT_H)
 #include <sys/select.h>
 #endif
