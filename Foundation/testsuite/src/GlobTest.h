@@ -1,7 +1,7 @@
 //
 // GlobTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/GlobTest.h#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/GlobTest.h#2 $
 //
 // Definition of the GlobTest class.
 //
@@ -53,6 +53,7 @@ public:
 	void testMatchRange();
 	void testMisc();
 	void testGlob();
+	void testCaseless();
 
 	void setUp();
 	void tearDown();

@@ -1,7 +1,7 @@
 //
 // GlobTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/GlobTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/GlobTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -331,6 +331,72 @@ void GlobTest::testMisc()
 }
 
 
+void GlobTest::testCaseless()
+{
+	Glob g1("*.cpp", Glob::GLOB_CASELESS);
+	assert (g1.match("Glob.cpp"));
+	assert (!g1.match("Glob.h"));
+	assert (g1.match("Glob.CPP"));
+	assert (!g1.match("Glob.H"));
+	
+	Glob g2("*.[hc]", Glob::GLOB_CASELESS);
+	assert (g2.match("foo.c"));
+	assert (g2.match("foo.h"));
+	assert (!g2.match("foo.i"));
+	assert (g2.match("foo.C"));
+	assert (g2.match("foo.H"));
+	assert (!g2.match("foo.I"));
+		
+	Glob g4("File*.?pp", Glob::GLOB_CASELESS);
+	assert (g4.match("file.hpp"));
+	assert (g4.match("FILE.CPP"));
+	assert (g4.match("filesystem.hpp"));
+	assert (g4.match("FILESYSTEM.HPP"));
+	assert (!g4.match("FILE.H"));
+	assert (!g4.match("file.h"));
+	
+	Glob g5("File*.[ch]*", Glob::GLOB_CASELESS);
+	assert (g5.match("file.hpp"));
+	assert (g5.match("FILE.HPP"));
+	assert (g5.match("file.cpp"));
+	assert (g5.match("FILE.CPP"));
+	assert (g5.match("filesystem.hpp"));
+	assert (g5.match("FILESYSTEM.HPP"));
+	assert (g5.match("file.h"));
+	assert (g5.match("FILE.H"));
+	assert (g5.match("filesystem.cp"));
+	assert (g5.match("FILESYSTEM.CP"));
+
+	Glob g6("[abc]", Glob::GLOB_CASELESS);
+	assert (g6.match("a"));
+	assert (g6.match("b"));
+	assert (g6.match("c"));
+	assert (g6.match("A"));
+	assert (g6.match("B"));
+	assert (g6.match("C"));
+
+	Glob g7("[a-f]", Glob::GLOB_CASELESS);
+	assert (g7.match("a"));
+	assert (g7.match("b"));
+	assert (g7.match("f"));
+	assert (!g7.match("g"));
+	assert (g7.match("A"));
+	assert (g7.match("B"));
+	assert (g7.match("F"));
+	assert (!g7.match("G"));
+
+	Glob g8("[A-F]", Glob::GLOB_CASELESS);
+	assert (g8.match("a"));
+	assert (g8.match("b"));
+	assert (g8.match("f"));
+	assert (!g8.match("g"));
+	assert (g8.match("A"));
+	assert (g8.match("B"));
+	assert (g8.match("F"));
+	assert (!g8.match("G"));
+}
+
+
 void GlobTest::testGlob()
 {
 	createFile("globtest/Makefile");
@@ -353,6 +419,16 @@ void GlobTest::testGlob()
 	assert (files.find("globtest/include/") != files.end());
 	assert (files.find("globtest/src/") != files.end());
 	assert (files.find("globtest/testsuite/") != files.end());
+
+	files.clear();
+	Glob::glob("GlobTest/*", files, Glob::GLOB_CASELESS);
+	translatePaths(files);
+	assert (files.size() == 5);
+	assert (files.find("globtest/Makefile") != files.end());
+	assert (files.find("globtest/.hidden") != files.end());
+	assert (files.find("globtest/include/") != files.end());
+	assert (files.find("globtest/src/") != files.end());
+	assert (files.find("globtest/testsuite/") != files.end());
 	
 	files.clear();
 	Glob::glob("globtest/*/*.[hc]", files);
@@ -366,6 +442,13 @@ void GlobTest::testGlob()
 	
 	files.clear();
 	Glob::glob("gl?bt?st/*/*/*.c", files);
+	translatePaths(files);
+	assert (files.size() == 2);
+	assert (files.find("globtest/testsuite/src/test.c") != files.end());
+	assert (files.find("globtest/testsuite/src/main.c") != files.end());
+
+	files.clear();
+	Glob::glob("Gl?bT?st/*/*/*.C", files, Glob::GLOB_CASELESS);
 	translatePaths(files);
 	assert (files.size() == 2);
 	assert (files.find("globtest/testsuite/src/test.c") != files.end());
@@ -439,6 +522,7 @@ CppUnit::Test* GlobTest::suite()
 	CppUnit_addTest(pSuite, GlobTest, testMatchAsterisk);
 	CppUnit_addTest(pSuite, GlobTest, testMatchRange);
 	CppUnit_addTest(pSuite, GlobTest, testMisc);
+	CppUnit_addTest(pSuite, GlobTest, testCaseless);
 	CppUnit_addTest(pSuite, GlobTest, testGlob);
 
 	return pSuite;

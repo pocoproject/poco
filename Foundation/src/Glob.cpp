@@ -1,7 +1,7 @@
 //
 // Glob.cpp
 //
-// $Id: //poco/svn/Foundation/src/Glob.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Glob.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -39,6 +39,8 @@
 #include "Poco/Exception.h"
 #include "Poco/DirectoryIterator.h"
 #include "Poco/File.h"
+#include "Poco/UTF8Encoding.h"
+#include "Poco/Unicode.h"
 
 
 namespace Poco {
@@ -59,10 +61,11 @@ Glob::~Glob()
 
 bool Glob::match(const std::string& subject)
 {
-	std::string::const_iterator itp  = _pattern.begin();
-	std::string::const_iterator endp = _pattern.end();
-	std::string::const_iterator its  = subject.begin();
-	std::string::const_iterator ends = subject.end();
+	UTF8Encoding utf8;
+	TextIterator itp(_pattern, utf8);
+	TextIterator endp(_pattern);
+	TextIterator its(subject, utf8);
+	TextIterator ends(subject);
 	
 	if ((_options & GLOB_DOT_SPECIAL) && its != ends && *its == '.' && (*itp == '?' || *itp == '*'))
 		return false;
@@ -100,7 +103,7 @@ void Glob::glob(const Path& pathPattern, std::set<std::string>& files, int optio
 }
 
 
-bool Glob::match(std::string::const_iterator& itp, const std::string::const_iterator& endp, std::string::const_iterator& its, const std::string::const_iterator& ends)
+bool Glob::match(TextIterator& itp, const TextIterator& endp, TextIterator& its, const TextIterator& ends)
 {
 	while (itp != endp)
 	{
@@ -138,7 +141,14 @@ bool Glob::match(std::string::const_iterator& itp, const std::string::const_iter
 			if (++itp == endp) throw SyntaxException("backslash must be followed by character in glob pattern");
 			// fallthrough
 		default:
-			if (*itp != *its) return false;
+			if (_options & GLOB_CASELESS)
+			{
+				if (Unicode::toLower(*itp) != Unicode::toLower(*its)) return false;
+			}
+			else
+			{
+				if (*itp != *its) return false;
+			}
 			++itp; ++its;
 		}
 	}
@@ -146,14 +156,17 @@ bool Glob::match(std::string::const_iterator& itp, const std::string::const_iter
 }
 
 
-bool Glob::matchAfterAsterisk(std::string::const_iterator itp, const std::string::const_iterator& endp, std::string::const_iterator its, const std::string::const_iterator& ends)
+bool Glob::matchAfterAsterisk(TextIterator itp, const TextIterator& endp, TextIterator its, const TextIterator& ends)
 {
 	return match(itp, endp, its, ends);
 }
 
 
-bool Glob::matchSet(std::string::const_iterator& itp, const std::string::const_iterator& endp, char c)
+bool Glob::matchSet(TextIterator& itp, const TextIterator& endp, int c)
 {
+	if (_options & GLOB_CASELESS)
+		c = Unicode::toLower(c);
+
 	while (itp != endp)
 	{
 		switch (*itp)
@@ -164,14 +177,19 @@ bool Glob::matchSet(std::string::const_iterator& itp, const std::string::const_i
 		case '\\':
 			if (++itp == endp) throw SyntaxException("backslash must be followed by character in glob pattern");
 		}
-		char first = *itp;
-		char last  = first;
+		int first = *itp;
+		int last  = first;
 		if (++itp != endp && *itp == '-')
 		{
 			if (++itp != endp)
 				last = *itp++;
 			else
 				throw SyntaxException("bad range syntax in glob pattern");
+		}
+		if (_options & GLOB_CASELESS)
+		{
+			first = Unicode::toLower(first);
+			last  = Unicode::toLower(last);
 		}
 		if (first <= c && c <= last)
 		{
