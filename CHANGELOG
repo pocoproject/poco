@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.4 (2009-02-xx)
+Release 1.3.4 (2009-03-xx)
 ==========================
 
 - fixed SF# 2611804: PropertyFileConfiguration continuation lines
@@ -14,7 +14,34 @@ Release 1.3.4 (2009-02-xx)
 - added --pidfile option to ServerApplication on Unix
 - fixed SF# 2499504: Bug in Win32_Thread when using from dll (fixed also for POSIX threads)
 - fixed SF# 2465794: HTTPServerRequestImpl memory leak
-
+- fixed SF# 2583934: Zip: No Unix permissions set
+- the NetSSL_OpenSSL library has been heavily refactored
+- added NumberFormatter::append*() and DateTimeFormatter::append() functions
+- use NumberFormatter::append() and DateTimeFormatter::append() instead of format() where 
+  it makes sense to gain some performance
+- added system.dateTime and system.pid to Poco::Util::SystemConfiguration
+- added %F format specifier (fractional seconds/microseconds) to DateTimeFormatter,
+  DateTimeParser and PatternFormatter.
+- fixed SF# 2630476: Thread_POSIX::setStackSize() failure with g++ 4.3
+- fixed SF# 2679279: Handling of -- option broken
+- added compile options to reduce memory footprint of statically linked applications 
+  by excluding various classes from automatically being linked.
+  See the POCO_NO_* macros in Poco/Config.h.
+- fixed SF# 2644940: on Windows the COMPUTER-NAME and the HOSTNAME can be different
+- added DNS::hostName() function	
+- added build configuration for iPhone (using Apple's SDK)
+- basic support for AIX 5.x/xlC 8
+- fixed a bug resulting in a badly formatted exception message with IOException 
+  thrown due to a socket-related error
+- fixed SF# 2644718: NetworkInterface name conflict in MinGW
+- added a missing #include to CryptoTransform.h
+- fixed SF# 2635377: HTTPServer::HTTPServer should take AutoPtr<HTTPServerParams>
+- replaced plain pointers with smart pointers in some interfaces
+- upgraded to sqlite 3.6.11
+- Poco::Glob now works with UTF-8 encoded strings and supports case-insensitive comparison.
+  This also fixes SF# 1944831: Glob::glob on windows should be case insensitve
+- added Twitter client sample to Net library
+ 
 
 Release 1.3.3p1 (2008-10-09)
 ============================
@@ -944,4 +971,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#36 $
+$Id: //poco/1.3/dist/CHANGELOG#39 $

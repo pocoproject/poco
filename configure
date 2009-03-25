@@ -2,7 +2,7 @@
 #
 # configure
 #
-# $Id: //poco/1.3/dist/configure#5 $
+# $Id: //poco/1.3/dist/configure#8 $
 #
 # Configuration script for POCO.
 #
@@ -52,6 +52,16 @@ Options:
 
   --omit=<component>{,<component>}
     Do not build the specified component(s).
+    
+  --include-path=<path>
+    Add search path for header files.
+    
+  --library-path=<path>
+    Add search path for library files.
+    
+  --poquito
+    Omit a few features for smaller codesize when linking
+    statically for embedded targets.
 
 ENDHELP
 }
@@ -74,6 +84,8 @@ tests="tests"
 samples="samples"
 flags=""
 omit=""
+includepath=""
+librarypath=""
 # parse arguments
 while [ "$1" != "" ] ; do
 	val=`$EXPR "$1" : '--config=\(.*\)'`
@@ -95,6 +107,16 @@ while [ "$1" != "" ] ; do
 	if [ "$val" != "$NOTFOUND" ] ; then
 		omit="$omit `echo $val | tr ',;' '  '`"
 	fi
+
+	val=`$EXPR "$1" : '--include-path=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		includepath="$includepath `echo $val | tr ',;' '  '`"
+	fi
+
+	val=`$EXPR "$1" : '--library-path=\(.*\)'`
+	if [ "$val" != "$NOTFOUND" ] ; then
+		librarypath="$librarypath `echo $val | tr ',;' '  '`"
+	fi
 	
 	if [ "$1" = "--no-samples" ] ; then
 		samples=""
@@ -112,6 +134,10 @@ while [ "$1" != "" ] ; do
 		flags="$flags -DPOCO_NO_FPENVIRONMENT"
 	fi
 
+	if [ "$1" = "--poquito" ] ; then
+		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION"
+	fi
+	
 	if [ "$1" = "--help" ] ; then
 		showhelp
 		exit 0
@@ -147,6 +173,11 @@ if [ "$prefix" = "" ] ; then
 	prefix=/usr/local
 fi
 
+# check for patches
+if [ -d $base/patches/$config ] ; then
+	echo "NOTE: There are patches for your configuration available. Please apply them before compiling."
+fi
+
 # copy Makefile to build dir
 if [ "$base" != "$build" ] ; then
 	cp $base/Makefile $build
@@ -163,7 +194,12 @@ echo "OMIT = $omit" >>$build/config.make
 if [ "$stdcxx_base" != "" ] ; then
 	echo "STDCXX_BASE = $stdcxx_base" >>$build/config.make
 fi
-
+if [ "$includepath" != "" ] ; then
+	echo "POCO_ADD_INCLUDE = $includepath" >>$build/config.make
+fi
+if [ "$librarypath" != "" ] ; then
+	echo "POCO_ADD_LIBRARY = $librarypath" >>$build/config.make
+fi
 echo "export POCO_CONFIG" >>$build/config.make
 echo "export POCO_BASE" >>$build/config.make
 echo "export POCO_BUILD" >>$build/config.make
