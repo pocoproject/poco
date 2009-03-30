@@ -61,8 +61,22 @@ TabView::TabView(const std::string& name):
 }
 
 
+TabView::TabView(const char* pName):
+	ContainerView(std::string(pName), typeid(TabView)),
+	_activeView(NO_VIEW_SELECTED)
+{
+}
+
+
 TabView::TabView(const std::string& name, const std::type_info& type):
 	ContainerView(name, type),
+	_activeView(NO_VIEW_SELECTED)
+{
+}
+
+
+TabView::TabView(const char* pName, const std::type_info& type):
+	ContainerView(std::string(pName), type),
 	_activeView(NO_VIEW_SELECTED)
 {
 }

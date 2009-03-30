@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="WebWidgets"
 	ProjectGUID="{8962DAD7-4F7B-46D0-A451-8D3476606890}"
 	RootNamespace="WebWidgets"

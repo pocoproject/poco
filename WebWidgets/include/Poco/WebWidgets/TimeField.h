@@ -72,6 +72,9 @@ public:
 	TimeField(const std::string& name);
 		/// Creates a named TimeField.
 
+	explicit TimeField(const char* pName);
+		/// Creates a named TimeField.
+
 	TimeField::Format getFormat() const;
 		/// Returns the time format
 
@@ -87,6 +90,9 @@ public:
 
 protected:
 	TimeField(const std::string& name, const std::type_info& type);
+		/// Creates a TimeField and assigns it the given name.
+
+	explicit TimeField(const char* pName, const std::type_info& type);
 		/// Creates a TimeField and assigns it the given name.
 
 	TimeField(const std::type_info& type);

@@ -48,6 +48,12 @@ DateField::DateField(const std::string& name, const std::type_info& type):
 }
 
 
+DateField::DateField(const char* pName, const std::type_info& type):
+	TextField(std::string(pName), type, new DateFieldCell(this))
+{
+}
+
+
 DateField::DateField(const std::type_info& type):
 	TextField(type, new DateFieldCell(this))
 {
@@ -56,6 +62,12 @@ DateField::DateField(const std::type_info& type):
 
 DateField::DateField(const std::string& name):
 	TextField(name, typeid(DateField), new DateFieldCell(this))
+{
+}
+
+
+DateField::DateField(const char* pName):
+	TextField(std::string(pName), typeid(DateField), new DateFieldCell(this))
 {
 }
 

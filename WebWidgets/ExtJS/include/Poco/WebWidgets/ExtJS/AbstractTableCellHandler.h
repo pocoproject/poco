@@ -49,7 +49,7 @@
 namespace Poco {
 namespace WebWidgets {
 
-	class Cell;
+class Cell;
 
 namespace ExtJS {
 

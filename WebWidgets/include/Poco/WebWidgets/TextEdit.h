@@ -61,6 +61,9 @@ public:
 	TextEdit(const std::string& name);
 		/// Creates a TextField with the given name.
 
+	explicit TextEdit(const char* pName);
+		/// Creates a TextField with the given name.
+
 	TextEdit();
 		/// Creates an anonymous TextField.
 
@@ -88,10 +91,16 @@ protected:
 	TextEdit(const std::string& name, const std::type_info& type);
 		/// Creates a TextEdit and assigns it the given name.
 
+	explicit TextEdit(const char* pName, const std::type_info& type);
+		/// Creates a TextEdit and assigns it the given name.
+
 	TextEdit(const std::type_info& type);
 		/// Creates a TextEdit.
 
 	TextEdit(const std::string& name, const std::type_info& type, Cell::Ptr ptrCell);
+		/// Creates a TextEdit and assigns it the given name.
+
+	explicit TextEdit(const char* pName, const std::type_info& type, Cell::Ptr ptrCell);
 		/// Creates a TextEdit and assigns it the given name.
 
 	TextEdit(const std::type_info& type, Cell::Ptr ptrCell);

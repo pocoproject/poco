@@ -59,8 +59,14 @@ public:
 	PasswordField(const std::string& name);
 		/// Creates a named PasswordField.
 
+	explicit PasswordField(const char* pName);
+		/// Creates a named PasswordField.
+
 protected:
 	PasswordField(const std::string& name, const std::type_info& type);
+		/// Creates a PasswordField and assigns it the given name.
+
+	explicit PasswordField(const char* pName, const std::type_info& type);
 		/// Creates a PasswordField and assigns it the given name.
 		
 	PasswordField(const std::type_info& type);

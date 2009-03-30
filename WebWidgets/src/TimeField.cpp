@@ -50,6 +50,14 @@ TimeField::TimeField(const std::string& name, const std::type_info& type):
 }
 
 
+TimeField::TimeField(const char* pName, const std::type_info& type):
+	TextField(std::string(pName), type, new TimeFieldCell(this)),
+	_pMyCell(0)
+{
+	_pMyCell = cell<TimeFieldCell>();
+}
+
+
 TimeField::TimeField(const std::type_info& type):
 	TextField(type, new TimeFieldCell(this)),
 	_pMyCell(0)
@@ -60,6 +68,14 @@ TimeField::TimeField(const std::type_info& type):
 
 TimeField::TimeField(const std::string& name):
 	TextField(name, typeid(TimeField), new TimeFieldCell(this)),
+	_pMyCell(0)
+{
+	_pMyCell = cell<TimeFieldCell>();
+}
+
+
+TimeField::TimeField(const char* pName):
+	TextField(std::string(pName), typeid(TimeField), new TimeFieldCell(this)),
 	_pMyCell(0)
 {
 	_pMyCell = cell<TimeFieldCell>();

@@ -49,6 +49,13 @@ TextEdit::TextEdit(const std::string& name, const std::type_info& type, Cell::Pt
 }
 
 
+TextEdit::TextEdit(const char* pName, const std::type_info& type, Cell::Ptr ptrCell):
+	Control(std::string(pName), type)
+{
+	init(ptrCell);
+}
+
+
 TextEdit::TextEdit(const std::type_info& type, Cell::Ptr ptrCell):
 	Control(type)
 {
@@ -63,6 +70,14 @@ TextEdit::TextEdit(const std::string& name, const std::type_info& type):
 }
 
 
+TextEdit::TextEdit(const char* pName, const std::type_info& type):
+	Control(std::string(pName), type)
+{
+	init();
+}
+
+
+
 TextEdit::TextEdit(const std::type_info& type):
 	Control(type)
 {
@@ -72,6 +87,13 @@ TextEdit::TextEdit(const std::type_info& type):
 
 TextEdit::TextEdit(const std::string& name):
 	Control(name, typeid(TextEdit))
+{
+	init();
+}
+
+
+TextEdit::TextEdit(const char* pName):
+	Control(std::string(pName), typeid(TextEdit))
 {
 	init();
 }

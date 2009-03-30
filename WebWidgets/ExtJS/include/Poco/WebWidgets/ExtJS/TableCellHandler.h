@@ -69,14 +69,13 @@ public:
 
 
 template <typename T>
-static void write(const T& t, std::ostream& out)
+inline void write(const T& t, std::ostream& out)
 {
 	out << t;
 }
 
 
-template <>
-void write(const std::string& t, std::ostream& out)
+inline void write(const std::string& t, std::ostream& out)
 {
 	out << "'" << Utility::safe(t) << "'";
 }
@@ -181,7 +180,6 @@ public:
 	{
 	}
 
-
 	void addFixed(const std::string& name, const std::string& fixedContent)
 		/// Adds a variable with a given fixed string content. The content will not be wrapped
 		/// with ' ' but will be written as is
@@ -199,6 +197,13 @@ public:
 		static const std::string var("val");
 		addData<Ret>(Function);
 		addFixed(name, var);
+	}
+
+	template <typename Ret>
+	void addDynamic(const char* pName, Ret (Class::*Function)() const)
+		/// Overload for char*. Forwards to the call using std::string.
+	{
+		addDynamic<Ret>(std::string(pName), Function);
 	}
 
 	void writeData(const void* pAny, std::ostream& out)

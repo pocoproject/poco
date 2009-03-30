@@ -50,6 +50,13 @@ TextField::TextField(const std::string& name, const std::type_info& type, Cell::
 }
 
 
+TextField::TextField(const char* pName, const std::type_info& type, Cell::Ptr ptrCell):
+	Control(std::string(pName), type)
+{
+	init(ptrCell);
+}
+
+
 TextField::TextField(const std::type_info& type, Cell::Ptr ptrCell):
 	Control(type)
 {
@@ -59,6 +66,13 @@ TextField::TextField(const std::type_info& type, Cell::Ptr ptrCell):
 
 TextField::TextField(const std::string& name, const std::type_info& type):
 	Control(name, type)
+{
+	init();
+}
+
+
+TextField::TextField(const char* pName, const std::type_info& type):
+	Control(std::string(pName), type)
 {
 	init();
 }
@@ -82,6 +96,13 @@ TextField::TextField(const std::string& name, const std::string& txt):
 
 TextField::TextField(const std::string& name):
 	Control(name, typeid(TextField))
+{
+	init();
+}
+
+
+TextField::TextField(const char* pName):
+	Control(std::string(pName), typeid(TextField))
 {
 	init();
 }

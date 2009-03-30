@@ -53,6 +53,16 @@ ComboBox::ComboBox(const std::string& name, const std::type_info& type):
 }
 
 
+ComboBox::ComboBox(const char* pName, const std::type_info& type):
+	TextField(std::string(pName), type, new ComboBoxCell(this))
+{
+	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
+	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->beforeSelect += Poco::delegate(this, &ComboBox::fireBeforeSelect);
+	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
+}
+
+
 ComboBox::ComboBox(const std::type_info& type):
 	TextField(type, new ComboBoxCell(this))
 {
@@ -65,6 +75,16 @@ ComboBox::ComboBox(const std::type_info& type):
 
 ComboBox::ComboBox(const std::string& name):
 	TextField(name, typeid(ComboBox), new ComboBoxCell(this))
+{
+	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
+	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);
+	pCell->beforeSelect += Poco::delegate(this, &ComboBox::fireBeforeSelect);
+	pCell->afterLoad = delegate(*this, &ComboBox::fireAfterLoad);
+}
+
+
+ComboBox::ComboBox(const char* pName):
+	TextField(std::string(pName), typeid(ComboBox), new ComboBoxCell(this))
 {
 	ComboBoxCell::Ptr pCell = cell<ComboBoxCell>();
 	pCell->selected += Poco::delegate(this, &ComboBox::fireSelected);

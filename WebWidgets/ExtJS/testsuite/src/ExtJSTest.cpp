@@ -1188,7 +1188,11 @@ void ExtJSTest::testFunction()
 	ptrBut2->setToolTip("click here to disable");
 	ptrFrm->add(ptrBut2);
 	TableCellHandler<CheckButtonCell>::Ptr pHandle(new TableCellHandler<CheckButtonCell>("Ext.form.Checkbox", false, true));
-	pHandle->addDynamic<bool>("checked", &CheckButtonCell::getBool);
+	
+	// this is really clumsy, but it seems to be the only way to force Sun CC to digest it
+	typedef bool (CheckButtonCell::*Fun)() const;
+	pHandle->addDynamic<bool>("checked", Fun(&CheckButtonCell::getBool));
+	
 	pHandle->addFixed("dummy", "dummy");
 	std::ostringstream str;
 	pHandle->writeData(ptrBut->cell<CheckButtonCell>(), str);
@@ -1387,6 +1391,7 @@ void ExtJSTest::testJSEvent()
 												"all.invoke(p1);"
 											"}"
 										"}");
+
 	assert (result == expected);
 }
 

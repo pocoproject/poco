@@ -64,18 +64,30 @@ public:
 		
 	SubmitButton(const std::string& name);
 		/// Creates a SubmitButton with the given name.
+
+	explicit SubmitButton(const char* pName);
+		/// Creates a SubmitButton with the given name.
 		
 	SubmitButton(const std::string& name, const std::string& lblTxt);
+		/// Creates a SubmitButton with the given name and label text.
+
+	explicit SubmitButton(const char* pName, const char* pLblTxt);
 		/// Creates a SubmitButton with the given name and label text.
 
 protected:
 	SubmitButton(const std::string& name, const std::type_info& type);
 		/// Creates a SubmitButton and assigns it the given name.
 
+	explicit SubmitButton(const char* pName, const std::type_info& type);
+		/// Creates a SubmitButton and assigns it the given name.
+
 	SubmitButton(const std::type_info& type);
 		/// Creates a SubmitButton.
 
 	SubmitButton(const std::string& name, const std::type_info& type, Cell::Ptr ptrCell);
+		/// Creates a SubmitButton and assigns it the given name.
+
+	explicit SubmitButton(const char* pName, const std::type_info& type, Cell::Ptr ptrCell);
 		/// Creates a SubmitButton and assigns it the given name.
 
 	SubmitButton(const std::type_info& type, Cell::Ptr ptrCell);

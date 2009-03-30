@@ -60,8 +60,14 @@ public:
 	NumberField(const std::string& name, Formatter::Ptr pF = new IntFormatter());
 		/// Creates a named NumberField.
 
+	explicit NumberField(const char* pName, Formatter::Ptr pF = new IntFormatter());
+		/// Creates a named NumberField.
+
 protected:
 	NumberField(const std::string& name, const std::type_info& type);
+		/// Creates a NumberField and assigns it the given name.
+
+	explicit NumberField(const char* pName, const std::type_info& type);
 		/// Creates a NumberField and assigns it the given name.
 
 	NumberField(const std::type_info& type);

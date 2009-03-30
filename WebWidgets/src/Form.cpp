@@ -71,9 +71,29 @@ Form::Form(const std::string& name, const Poco::URI& uri):
 {
 }
 
+	
+Form::Form(const char* pName, const Poco::URI& uri):
+ContainerView(std::string(pName), typeid(Form)),
+	_method(METHOD_POST),
+	_encoding(ENCODING_MULTIPART),
+	_uri(uri),
+	_namedChildren()
+{
+}
+
 
 Form::Form(const std::string& name, const std::type_info& type, const Poco::URI& uri):
 	ContainerView(name, type),
+	_method(METHOD_POST),
+	_encoding(ENCODING_MULTIPART),
+	_uri(uri),
+	_namedChildren()
+{
+}
+
+
+Form::Form(const char* pName, const std::type_info& type, const Poco::URI& uri):
+	ContainerView(std::string(pName), type),
 	_method(METHOD_POST),
 	_encoding(ENCODING_MULTIPART),
 	_uri(uri),

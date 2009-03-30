@@ -62,6 +62,13 @@ Button::Button(const std::string& name, const std::type_info& type):
 	init();
 }
 
+
+Button::Button(const char* pName, const std::type_info& type):
+	Control(std::string(pName), type)
+{
+	init();
+}
+
 	
 Button::Button(const std::type_info& type):
 	Control(type)
@@ -77,11 +84,26 @@ Button::Button(const std::string& name):
 }
 
 
+Button::Button(const char* pName):
+	Control(std::string(pName), typeid(Button))
+{
+	init();
+}
+
+
 Button::Button(const std::string& name, const std::string& txt):
 	Control(name, typeid(Button))
 {
 	init();
 	setText(txt);
+}
+
+
+Button::Button(const char* pName, const char* pTxt):
+	Control(std::string(pName), typeid(Button))
+{
+	init();
+	setText(std::string(pTxt));
 }
 
 

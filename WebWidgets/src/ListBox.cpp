@@ -50,6 +50,13 @@ ListBox::ListBox(const std::string& name, const std::type_info& type, ListBoxCel
 }
 
 
+ListBox::ListBox(const char* pName, const std::type_info& type, ListBoxCell::Ptr ptrCell):
+	Control(std::string(pName), type)
+{
+	init(ptrCell);
+}
+
+
 ListBox::ListBox(const std::type_info& type, ListBoxCell::Ptr ptrCell):
 	Control(type)
 {
@@ -64,6 +71,13 @@ ListBox::ListBox(const std::string& name, const std::type_info& type):
 }
 
 
+ListBox::ListBox(const char* pName, const std::type_info& type):
+	Control(std::string(pName), type)
+{
+	init();
+}
+
+
 ListBox::ListBox(const std::type_info& type):
 	Control(type)
 {
@@ -73,6 +87,13 @@ ListBox::ListBox(const std::type_info& type):
 
 ListBox::ListBox(const std::string& name):
 	Control(name, typeid(ListBox))
+{
+	init();
+}
+
+
+ListBox::ListBox(const char* pName):
+	Control(std::string(pName), typeid(ListBox))
 {
 	init();
 }

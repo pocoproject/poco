@@ -454,7 +454,6 @@ bool Utility::writeJSEvent(std::ostream& out, const std::string& eventName, cons
 		out << "fn:" << fct << "{";
 		writeFunctionCode(out, "all", delegates);
 		out << "}"; //closes fn
-		
 	}	
 	if (delayTime > 0)
 	{

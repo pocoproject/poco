@@ -61,9 +61,25 @@ Page::Page(const std::string& name):
 {
 }
 
+	
+Page::Page(const char* pName):
+	ContainerView(std::string(pName), typeid(Page)),
+	_text(),
+	_rm()
+{
+}
+
 
 Page::Page(const std::string& name, const std::type_info& type):
 	ContainerView(name, type),
+	_text(),
+	_rm()
+{
+}
+
+
+Page::Page(const char* pName, const std::type_info& type):
+	ContainerView(std::string(pName), type),
 	_text(),
 	_rm()
 {

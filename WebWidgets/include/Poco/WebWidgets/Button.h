@@ -64,7 +64,13 @@ public:
 	Button(const std::string& name);
 		/// Creates a Button with the given name.
 
+	explicit Button(const char* pName);
+		/// Creates a Button with the given name.
+
 	Button(const std::string& name, const std::string& lblTxt);
+		/// Creates a Button with the given name and lblTxt.
+
+	explicit Button(const char* pName, const char* pLblTxt);
 		/// Creates a Button with the given name and lblTxt.
 
 	Button();
@@ -75,6 +81,9 @@ public:
 
 protected:
 	Button(const std::string& name, const std::type_info& type);
+		/// Creates a Button and assigns it the given name.
+
+	explicit Button(const char* pName, const std::type_info& type);
 		/// Creates a Button and assigns it the given name.
 
 	Button(const std::type_info& type);

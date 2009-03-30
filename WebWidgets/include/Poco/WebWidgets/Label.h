@@ -59,7 +59,13 @@ public:
 	Label(const std::string& name);
 		/// Creates a Label with the given name.
 
+	explicit Label(const char* pName);
+		/// Creates a Label with the given name.
+
 	Label(const std::string& name, const std::string& text);
+		/// Creates a Label with the given name and text.
+
+	Label(const char* pName, const char* pText);
 		/// Creates a Label with the given name and text.
 
 	// View
@@ -73,6 +79,9 @@ public:
 	
 protected:
 	Label(const std::string& name, const std::type_info& type);
+		/// Creates a Label and assigns it the given name.
+
+	explicit Label(const char* pName, const std::type_info& type);
 		/// Creates a Label and assigns it the given name.
 
 	Label(const std::type_info& type);

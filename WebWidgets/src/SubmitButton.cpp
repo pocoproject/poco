@@ -48,6 +48,12 @@ SubmitButton::SubmitButton(const std::string& name, const std::type_info& type, 
 }
 
 
+SubmitButton::SubmitButton(const char* pName, const std::type_info& type, Cell::Ptr ptrCell):
+	Button(std::string(pName), type, ptrCell)
+{
+}
+
+
 SubmitButton::SubmitButton(const std::type_info& type, Cell::Ptr ptrCell):
 	Button(type, ptrCell)
 {
@@ -60,21 +66,40 @@ SubmitButton::SubmitButton(const std::string& name, const std::type_info& type):
 }
 
 
+SubmitButton::SubmitButton(const char* pName, const std::type_info& type):
+	Button(std::string(pName), type, new SubmitButtonCell(this))
+{
+}
+
+
 SubmitButton::SubmitButton(const std::type_info& type):
 	Button(type, new SubmitButtonCell(this))
 {
 }
 
 
-SubmitButton::SubmitButton(const std::string& name, const std::string& lbl):
+SubmitButton::SubmitButton(const std::string& name, const std::string& lblTxt):
 	Button(name, typeid(SubmitButton), new SubmitButtonCell(this))
 {
-	setText(lbl);
+	setText(lblTxt);
+}
+
+
+SubmitButton::SubmitButton(const char* pName, const char* pLblTxt):
+	Button(std::string(pName), typeid(SubmitButton), new SubmitButtonCell(this))
+{
+	setText(std::string(pLblTxt));
 }
 
 
 SubmitButton::SubmitButton(const std::string& name):
 	Button(name, typeid(SubmitButton), new SubmitButtonCell(this))
+{
+}
+
+
+SubmitButton::SubmitButton(const char* pName):
+	Button(std::string(pName), typeid(SubmitButton), new SubmitButtonCell(this))
 {
 }
 

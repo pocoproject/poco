@@ -53,6 +53,12 @@ Label::Label(const std::string& name):
 }
 
 
+Label::Label(const char* pName):
+	View(std::string(pName), typeid(Label))
+{
+}
+
+
 Label::Label(const std::string& name, const std::string& text):
 	View(name, typeid(Label)),
 	_text(text)
@@ -60,8 +66,21 @@ Label::Label(const std::string& name, const std::string& text):
 }
 
 
+Label::Label(const char* pName, const char* pText):
+	View(std::string(pName), typeid(Label)),
+	_text(pText)
+{
+}
+
+
 Label::Label(const std::string& name, const std::type_info& type):
 	View(name, type)
+{
+}
+
+
+Label::Label(const char* pName, const std::type_info& type):
+	View(std::string(pName), type)
 {
 }
 

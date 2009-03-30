@@ -53,32 +53,38 @@ TableCellHandlerFactory::TableCellHandlerFactory()
 {
 	{
 		TableCellHandler<CheckButtonCell>::Ptr pHandle(new TableCellHandler<CheckButtonCell>("Ext.form.Checkbox", true, true));
-		pHandle->addDynamic<bool>("checked", &CheckButtonCell::getBool);
+		typedef bool (CheckButtonCell::*Function)() const;
+		pHandle->addDynamic<bool>("checked", Function(&CheckButtonCell::getBool));
 		registerFactory(typeid(CheckButtonCell), pHandle);
 	}
 	{
 		TableCellHandler<TextEditCell>::Ptr pHandle(new TableCellHandler<TextEditCell>("Ext.form.TextArea", true, true));
-		pHandle->addDynamic<std::string>("value", &TextEditCell::getString);
+		typedef std::string (TextEditCell::*Function)() const;
+		pHandle->addDynamic<std::string>("value", Function(&TextEditCell::getString));
 		registerFactory(typeid(TextEditCell), pHandle);
 	}
 	{
 		TableCellHandler<TextFieldCell>::Ptr pHandle(new TableCellHandler<TextFieldCell>("Ext.form.TextField", true, false));
-		pHandle->addDynamic<std::string>("value", &TextFieldCell::getString);
+		typedef std::string (TextFieldCell::*Function)() const;
+		pHandle->addDynamic<std::string>("value", Function(&TextFieldCell::getString));
 		registerFactory(typeid(TextFieldCell), pHandle);
 	}
 	{
 		TableCellHandler<NumberFieldCell>::Ptr pHandle(new TableCellHandler<NumberFieldCell>("Ext.form.NumberField", true, false));
-		pHandle->addDynamic<std::string>("value", &NumberFieldCell::getString);
+		typedef std::string (NumberFieldCell::*Function)() const;
+		pHandle->addDynamic<std::string>("value", Function(&NumberFieldCell::getString));
 		registerFactory(typeid(NumberFieldCell), pHandle);
 	}
 	{
 		TableCellHandler<ComboBoxCell>::Ptr pHandle(new TableCellHandler<ComboBoxCell>("Ext.form.ComboBox", true, false));
-		pHandle->addDynamic<std::string>("value", &ComboBoxCell::getString);
+		typedef std::string (ComboBoxCell::*Function)() const;
+		pHandle->addDynamic<std::string>("value", Function(&ComboBoxCell::getString));
 		registerFactory(typeid(ComboBoxCell), pHandle);
 	}
 	{
 		TableCellHandler<ButtonCell>::Ptr pHandle(new TableCellHandler<ButtonCell>("Ext.Button", false, true));
-		pHandle->addDynamic<std::string>("text", &ButtonCell::getString);
+		typedef std::string (ButtonCell::*Function)() const;
+		pHandle->addDynamic<std::string>("text", Function(&ButtonCell::getString));
 		registerFactory(typeid(ButtonCell), pHandle);
 	}
 	{

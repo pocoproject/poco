@@ -73,6 +73,9 @@ public:
 	ListBox(const std::string& name);
 		/// Creates a ListBox with the given name.
 
+	explicit ListBox(const char* pName);
+		/// Creates a ListBox with the given name.
+
 	ListBox();
 		/// Creates an anonymous TextField.
 
@@ -163,10 +166,16 @@ protected:
 	ListBox(const std::string& name, const std::type_info& type);
 		/// Creates a ListBox and assigns it the given name.
 
+	explicit ListBox(const char* pName, const std::type_info& type);
+		/// Creates a ListBox and assigns it the given name.
+
 	ListBox(const std::type_info& type);
 		/// Creates a ListBox.
 
 	ListBox(const std::string& name, const std::type_info& type, ListBoxCell::Ptr ptrCell);
+		/// Creates a ListBox and assigns it the given name.
+
+	explicit ListBox(const char* pName, const std::type_info& type, ListBoxCell::Ptr ptrCell);
 		/// Creates a ListBox and assigns it the given name.
 
 	ListBox(const std::type_info& type, ListBoxCell::Ptr ptrCell);

@@ -75,6 +75,9 @@ public:
 	ComboBox(const std::string& name);
 		/// Creates a named ComboBox
 
+	explicit ComboBox(const char* pName);
+		/// Creates a named ComboBox
+
 	std::vector<Any>::const_iterator begin() const;
 		/// ConstIterator to all elements
 
@@ -121,6 +124,9 @@ public:
 
 protected:
 	ComboBox(const std::string& name, const std::type_info& type);
+		/// Creates a DateField and assigns it the given name.
+
+	explicit ComboBox(const char* pName, const std::type_info& type);
 		/// Creates a DateField and assigns it the given name.
 
 	ComboBox(const std::type_info& type);

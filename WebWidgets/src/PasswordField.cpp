@@ -48,6 +48,12 @@ PasswordField::PasswordField(const std::string& name, const std::type_info& type
 }
 
 
+PasswordField::PasswordField(const char* pName, const std::type_info& type):
+	TextField(std::string(pName), type, new PasswordFieldCell(this))
+{
+}
+
+
 PasswordField::PasswordField(const std::type_info& type):
 	TextField(type, new PasswordFieldCell(this))
 {
@@ -56,6 +62,12 @@ PasswordField::PasswordField(const std::type_info& type):
 
 PasswordField::PasswordField(const std::string& name):
 	TextField(name, typeid(PasswordField), new PasswordFieldCell(this))
+{
+}
+
+
+PasswordField::PasswordField(const char* pName):
+	TextField(std::string(pName), typeid(PasswordField), new PasswordFieldCell(this))
 {
 }
 

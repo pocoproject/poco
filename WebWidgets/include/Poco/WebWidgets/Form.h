@@ -75,6 +75,9 @@ public:
 
 	Form(const std::string& name, const Poco::URI& uri);
 		/// Creates a Form with the given name.
+	
+	explicit Form(const char* pName, const Poco::URI& uri);
+		/// Creates a Form with the given name.
 		
 	void setMethod(const std::string& method);
 		/// Sets the HTTP request method for submitting the form.
@@ -113,6 +116,9 @@ public:
 			
 protected:
 	Form(const std::string& name, const std::type_info& type, const Poco::URI& uri);
+		/// Creates a Form and assigns it the given name.
+
+	explicit Form(const char* pName, const std::type_info& type, const Poco::URI& uri);
 		/// Creates a Form and assigns it the given name.
 		
 	Form(const std::type_info& type, const Poco::URI& uri);

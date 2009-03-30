@@ -82,6 +82,9 @@ public:
 		
 	Page(const std::string& name);
 		/// Creates a Page with the given name.
+
+	explicit Page(const char* pName);
+		/// Creates a Page with the given name.
 	
 	// View
 	void setText(const std::string& text);
@@ -134,6 +137,9 @@ public:
 	
 protected:
 	Page(const std::string& name, const std::type_info& type);
+		/// Creates a Page and assigns it the given name.
+
+	explicit Page(const char* pName, const std::type_info& type);
 		/// Creates a Page and assigns it the given name.
 		
 	Page(const std::type_info& type);

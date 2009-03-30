@@ -61,6 +61,9 @@ public:
 	TabView(const std::string& name);
 		/// Creates a TabView with the given name.
 
+	explicit TabView(const char* pName);
+		/// Creates a TabView with the given name.
+
 	void setActiveView(ContainerView::ViewVec::size_type pos);
 		/// Sets the active view, pos must be valid. If pos is NONE_SELECTED no view is active
 
@@ -69,6 +72,9 @@ public:
 
 protected:
 	TabView(const std::string& name, const std::type_info& type);
+		/// Creates a TabView and assigns it the given name.
+
+	explicit TabView(const char* pName, const std::type_info& type);
 		/// Creates a TabView and assigns it the given name.
 		
 	TabView(const std::type_info& type);

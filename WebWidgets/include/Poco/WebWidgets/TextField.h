@@ -66,6 +66,9 @@ public:
 	TextField(const std::string& name);
 		/// Creates a TextField with the given name.
 
+	explicit TextField(const char* pName);
+		/// Creates a TextField with the given name.
+
 	TextField();
 		/// Creates an anonymous TextField.
 
@@ -96,10 +99,16 @@ protected:
 	TextField(const std::string& name, const std::type_info& type);
 		/// Creates a TextField and assigns it the given name.
 
+	explicit TextField(const char* pName, const std::type_info& type);
+		/// Creates a TextField and assigns it the given name.
+
 	TextField(const std::type_info& type);
 		/// Creates a TextField.
 
 	TextField(const std::string& name, const std::type_info& type, Cell::Ptr ptrCell);
+		/// Creates a TextField and assigns it the given name.
+
+	explicit TextField(const char* pName, const std::type_info& type, Cell::Ptr ptrCell);
 		/// Creates a TextField and assigns it the given name.
 
 	TextField(const std::type_info& type, Cell::Ptr ptrCell);

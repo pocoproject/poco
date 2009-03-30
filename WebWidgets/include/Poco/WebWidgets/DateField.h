@@ -62,6 +62,9 @@ public:
 	DateField(const std::string& name);
 		/// Creates a named DateField  with a simple Y-m-d format
 
+	explicit DateField(const char* pName);
+		/// Creates a named DateField  with a simple Y-m-d format
+
 	void setFormat(const std::string& dateFormat);
 		/// Sets a format string as defined in Poco::DateFormat, Poco::DateFormatter
 
@@ -76,6 +79,10 @@ public:
 
 protected:
 	DateField(const std::string& name, const std::type_info& type);
+		/// Creates a DateField and assigns it the given name.
+
+
+	explicit DateField(const char* pName, const std::type_info& type);
 		/// Creates a DateField and assigns it the given name.
 
 	DateField(const std::type_info& type);
