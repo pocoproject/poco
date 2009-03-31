@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#3 $
+// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#4 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -111,6 +111,7 @@ void SessionImpl::open()
 		Utility::throwException(rc);
 	}
 
+	sqlite3_extended_result_codes(_pDB, 1);
 	_connected = true;
 }
 

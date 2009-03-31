@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#5 $
+// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#6 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -87,8 +87,7 @@ void SQLiteStatementImpl::compileImpl()
 				sqlite3_finalize(pStmt);
 			}
 			pStmt = 0;
-			std::string errMsg = sqlite3_errmsg(_pDB);
-			Utility::throwException(rc, errMsg);
+			Utility::throwException(rc, statement);
 		}
 		else if (rc == SQLITE_OK && pStmt)
 		{
@@ -192,7 +191,7 @@ bool SQLiteStatementImpl::hasNext()
 
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
 	{
-		Utility::throwException(_nextResponse);
+		Utility::throwException(_nextResponse, toString());
 	}
 
 	return (_nextResponse == SQLITE_ROW);
@@ -223,7 +222,7 @@ void SQLiteStatementImpl::next()
 	else
 	{
 		int rc = _nextResponse;
-		Utility::throwException(rc, std::string("Iterator Error: trying to access the next value"));
+		Utility::throwException(rc, std::string("Iterator Error: trying to access the next value: ") + toString());
 	}
 }
 
