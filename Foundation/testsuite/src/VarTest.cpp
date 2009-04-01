@@ -934,6 +934,9 @@ void VarTest::testChar()
 
 void VarTest::testFloat()
 {
+	Var any("0");
+	float f = any;
+
 	float src = 32.0f;
 	Var a1 = src;
 	
@@ -1022,6 +1025,10 @@ void VarTest::testFloat()
 
 void VarTest::testDouble()
 {
+	double d = 0;
+	Var v(d);
+	float f = v;
+
 	double src = 32.0;
 	Var a1 = src;
 	
