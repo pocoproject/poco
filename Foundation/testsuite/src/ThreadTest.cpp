@@ -39,7 +39,9 @@
 #include "Poco/Event.h"
 #include <iostream>
 #if defined(__sun) && defined(__SVR4)
-#define __EXTENSIONS__
+#	if !defined(__EXTENSIONS__)
+#		define __EXTENSIONS__
+#	endif
 #endif
 #include <climits>
 
