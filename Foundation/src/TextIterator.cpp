@@ -119,8 +119,7 @@ int TextIterator::operator * () const
 	
 	unsigned char c = (unsigned char) *_it;
 	int n = _pEncoding->characterMap()[c];
-	if (n >= -1)
-		return n;
+	if (n >= -1) return n;
 	else
 	{
 		poco_assert_dbg (n >= -TextEncoding::MAX_SEQUENCE_LENGTH);

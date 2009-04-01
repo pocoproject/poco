@@ -76,8 +76,8 @@ void UTF8StringTest::testCompare()
 	
 	assert (UTF8::icompare(a5, b5) < 0);
 
-	std::string a6("\303\274\303\266\303\244"); // "u"a"o
-	std::string b6("\303\234\303\226\303\204"); // "U"A"O
+	std::string a6("\303\274\303\266\303\244"); // "u"o"a
+	std::string b6("\303\234\303\226\303\204"); // "U"O"A
 	
 	assert (UTF8::icompare(a6, b6) == 0);
 }
@@ -93,11 +93,15 @@ void UTF8StringTest::testTransform()
 	UTF8::toUpperInPlace(s2);
 	assert (s2 == "ABCDE123");
 
-	std::string s3("\303\274\303\266\303\244"); // "u"a"o
+	std::string s3("\303\274\303\266\303\244"); // "u"o"a
 	UTF8::toUpperInPlace(s3);	
-	assert (s3 == "\303\234\303\226\303\204"); // "U"A"O
+	assert (s3 == "\303\234\303\226\303\204"); // "U"O"A
 	UTF8::toLowerInPlace(s3);
-	assert (s3 == "\303\274\303\266\303\244"); // "U"A"O
+	assert (s3 == "\303\274\303\266\303\244"); // "u"o"a
+
+	// a mix of invalid sequences
+	std::string str = "\xC2\xE5\xF0\xF8\xE8\xED\xFB+-++";
+	assert ("???" == UTF8::toLower(str));
 }
 
 

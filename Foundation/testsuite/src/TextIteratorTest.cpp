@@ -165,28 +165,14 @@ void TextIteratorTest::testOneUTF8()
 	assert (it != end);
 	assert (*it++ == 0xabcde);
 	assert (it == end);
-	
-	// 5 byte sequence
-	n = encoding.convert(0xabcdef, data, sizeof(data));
-	assert (n == 5);
-	text.assign((char*) data, n);
-	it  = TextIterator(text, encoding);
-	end = TextIterator(text);
-	
-	assert (it != end);
-	assert (*it++ == 0xabcdef);
-	assert (it == end);
 
-	// 6 byte sequence
+	// 5 byte sequence - not supported
+	n = encoding.convert(0xabcdef, data, sizeof(data));
+	assert (n == 0);
+
+	// 6 byte sequence - not supported
 	n = encoding.convert(0xfabcdef, data, sizeof(data));
-	assert (n == 6);
-	text.assign((char*) data, n);
-	it  = TextIterator(text, encoding);
-	end = TextIterator(text);
-	
-	assert (it != end);
-	assert (*it++ == 0xfabcdef);
-	assert (it == end);
+	assert (n == 0);
 }
 
 
