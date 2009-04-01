@@ -103,28 +103,55 @@ const TextEncoding::CharacterMap& UTF8Encoding::characterMap() const
 }
 
 
+bool UTF8Encoding::isLegal(const unsigned char *bytes, int length)
+{
+	if (0 == bytes || 0 == length) return false;
+
+    unsigned char a;
+    const unsigned char* srcptr = bytes + length;
+    switch (length)
+	{
+		default: return false;
+		case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+		case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+		case 2: if ((a = (*--srcptr)) > 0xBF) return false;
+
+			switch (*bytes) 
+			{
+				case 0xE0: if (a < 0xA0) return false; break;
+				case 0xED: if (a > 0x9F) return false; break;
+				case 0xF0: if (a < 0x90) return false; break;
+				case 0xF4: if (a > 0x8F) return false; break;
+				default:   if (a < 0x80) return false;
+			}
+			
+		case 1: if (*bytes >= 0x80 && *bytes < 0xC2) return false;
+    }
+
+	if (*bytes > 0xF4) return false;
+
+	return true;
+}
+
+
 int UTF8Encoding::convert(const unsigned char* bytes) const
 {
 	int n = _charMap[*bytes];
 	int uc;
+	
 	switch (n)
 	{
-	case -6:
-		uc = *bytes & 0x01; break;
-	case -5:
-		uc = *bytes & 0x03; break;
-	case -4:
-		uc = *bytes & 0x07; break;
-	case -3:
-		uc = *bytes & 0x0F; break;
-	case -2:
-		uc = *bytes & 0x1F; break;
-	default:
-		uc = n;
+		case -6: case -5: case -1: return -1;
+
+		case -4: case -3: case -2:
+			if (!isLegal(bytes, -n)) return -1;
+			uc = *bytes & ((0x07 << (n + 4)) | 0x03); break;
+
+		default: return n;
 	}
+
 	while (n++ < -1) 
 	{	
-		// TODO: check for malformed or overlong sequences
 		uc <<= 6;
 		uc |= (*++bytes & 0x3F);
 	}
@@ -134,6 +161,10 @@ int UTF8Encoding::convert(const unsigned char* bytes) const
 
 int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
+#ifdef _DEBUG
+	unsigned char* lb = bytes;
+#endif
+
 	if (ch <= 0x7F)
 	{
 		if (bytes && length >= 1)
@@ -147,6 +178,7 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 			*bytes++ = (unsigned char) ((ch >> 6) & 0x1F | 0xC0);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
+		poco_assert_dbg (isLegal(lb, 2));
 		return 2;
 	}
 	else if (ch <= 0xFFFF)
@@ -157,9 +189,10 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
+		poco_assert_dbg (isLegal(lb, 3));
 		return 3;
 	}
-	else if (ch <= 0x1FFFFF)
+	else if (ch <= 0x10FFFF)
 	{
 		if (bytes && length >= 4)
 		{
@@ -168,32 +201,8 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
+		poco_assert_dbg (isLegal(lb, 4));
 		return 4;
-	}
-	else if (ch <= 0x3FFFFFF)
-	{
-		if (bytes && length >= 5)
-		{
-			*bytes++ = (unsigned char) ((ch >> 24) & 0x03 | 0xF8);
-			*bytes++ = (unsigned char) ((ch >> 18) & 0x3F | 0x80);
-			*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
-			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
-			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
-		}
-		return 5;
-	}
-	else if (ch <= 0x7FFFFFFF)
-	{
-		if (bytes && length >= 6)
-		{
-			*bytes++ = (unsigned char) ((ch >> 30) & 0x01 | 0xFC);
-			*bytes++ = (unsigned char) ((ch >> 24) & 0x3F | 0x80);
-			*bytes++ = (unsigned char) ((ch >> 18) & 0x3F | 0x80);
-			*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
-			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
-			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
-		}
-		return 6;
 	}
 	else return 0;
 }

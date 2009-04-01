@@ -129,7 +129,7 @@ protected:
 
 #if defined(_DEBUG)
 #	define poco_stdout_dbg(outstr) \
-		std::cout << __FILE__ << '(' << __LINE__ << "):" << outstr << std::endl;
+		std::cout << __FILE__ << '(' << std::dec << __LINE__ << "):" << outstr << std::endl;
 #else
 #	define poco_stdout_dbg(outstr)
 #endif
@@ -137,7 +137,7 @@ protected:
 
 #if defined(_DEBUG)
 #	define poco_stderr_dbg(outstr) \
-		std::cerr << __FILE__ << '(' << __LINE__ << "):" << outstr << std::endl;
+		std::cerr << __FILE__ << '(' << std::dec << __LINE__ << "):" << outstr << std::endl;
 #else
 #	define poco_stderr_dbg(outstr)
 #endif

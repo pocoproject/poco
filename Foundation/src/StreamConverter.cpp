@@ -101,7 +101,11 @@ int StreamConverterBuf::readFromDevice()
 		if (_pIstr->gcount() == -n - 1)
 		{
 			uc = _inEncoding.convert(_buffer);
-			if (uc == -1) uc = _defaultChar;
+			if (uc == -1)
+			{
+				uc = _defaultChar;
+				++_errors;
+			}
 		}
 		else
 		{
