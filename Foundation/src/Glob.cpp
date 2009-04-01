@@ -132,7 +132,7 @@ bool Glob::match(TextIterator& itp, const TextIterator& endp, TextIterator& its,
 				if (itp != endp)
 				{
 					bool mtch = matchSet(itp, endp, *its++);
-					if (invert && mtch || !invert && !mtch) return false;
+					if ((invert && mtch) || (!invert && !mtch)) return false;
 					break;
 				}
 			}

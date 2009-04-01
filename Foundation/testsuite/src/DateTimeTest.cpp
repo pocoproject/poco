@@ -394,10 +394,10 @@ void DateTimeTest::testRelational()
             const DateTime& U = u;
             u.assign(values[j].year, values[j].month, values[j].day);
 
-            loop_2_assert(i, j, j <  i == U <  V);
-            loop_2_assert(i, j, j <= i == U <= V);
-            loop_2_assert(i, j, j >= i == U >= V);
-            loop_2_assert(i, j, j >  i == U >  V);
+            loop_2_assert(i, j, (j <  i) == (U <  V));
+            loop_2_assert(i, j, (j <= i) == (U <= V));
+            loop_2_assert(i, j, (j >= i) == (U >= V));
+            loop_2_assert(i, j, (j >  i) == (U >  V));
         }
     }
 }

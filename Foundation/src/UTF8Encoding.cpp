@@ -176,7 +176,7 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 	{
 		if (bytes && length >= 2)
 		{
-			*bytes++ = (unsigned char) ((ch >> 6) & 0x1F | 0xC0);
+			*bytes++ = (unsigned char) (((ch >> 6) & 0x1F) | 0xC0);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
 		poco_assert_dbg (isLegal(lb, 2));
@@ -186,8 +186,8 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 	{
 		if (bytes && length >= 3)
 		{
-			*bytes++ = (unsigned char) ((ch >> 12) & 0x0F | 0xE0);
-			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
+			*bytes++ = (unsigned char) (((ch >> 12) & 0x0F) | 0xE0);
+			*bytes++ = (unsigned char) (((ch >> 6) & 0x3F) | 0x80);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
 		poco_assert_dbg (isLegal(lb, 3));
@@ -197,9 +197,9 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 	{
 		if (bytes && length >= 4)
 		{
-			*bytes++ = (unsigned char) ((ch >> 18) & 0x07 | 0xF0);
-			*bytes++ = (unsigned char) ((ch >> 12) & 0x3F | 0x80);
-			*bytes++ = (unsigned char) ((ch >> 6) & 0x3F | 0x80);
+			*bytes++ = (unsigned char) (((ch >> 18) & 0x07) | 0xF0);
+			*bytes++ = (unsigned char) (((ch >> 12) & 0x3F) | 0x80);
+			*bytes++ = (unsigned char) (((ch >> 6) & 0x3F) | 0x80);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
 		poco_assert_dbg (isLegal(lb, 4));

@@ -567,9 +567,9 @@ void URI::encode(const std::string& str, const std::string& reserved, std::strin
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
 	{
 		char c = *it;
-		if (c >= 'a' && c <= 'z' || 
-		    c >= 'A' && c <= 'Z' || 
-		    c >= '0' && c <= '9' ||
+		if ((c >= 'a' && c <= 'z') || 
+		    (c >= 'A' && c <= 'Z') || 
+		    (c >= '0' && c <= '9') ||
 		    c == '-' || c == '_' || 
 		    c == '.' || c == '~')
 		{
@@ -794,8 +794,8 @@ void URI::mergePath(const std::string& path)
 		addLeadingSlash = _path[0] == '/';
 	}
 	getPathSegments(path, segments);
-	addLeadingSlash = addLeadingSlash || !path.empty() && path[0] == '/';
-	bool hasTrailingSlash = !path.empty() && *(path.rbegin()) == '/';
+	addLeadingSlash = addLeadingSlash || (!path.empty() && path[0] == '/');
+	bool hasTrailingSlash = (!path.empty() && *(path.rbegin()) == '/');
 	bool addTrailingSlash = false;
 	for (std::vector<std::string>::const_iterator it = segments.begin(); it != segments.end(); ++it)
 	{

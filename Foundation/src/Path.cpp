@@ -711,11 +711,11 @@ void Path::parseWindows(const std::string& path)
 			char d = *it++;
 			if (it != end && *it == ':') // drive letter
 			{
-				if (_absolute || !(d >= 'a' && d <= 'z' || d >= 'A' && d <= 'Z')) throw PathSyntaxException(path);
+				if (_absolute || !((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z'))) throw PathSyntaxException(path);
 				_absolute = true;
 				_device += d;
 				++it;
-				if (it == end || *it != '\\' && *it != '/') throw PathSyntaxException(path);
+				if (it == end || (*it != '\\' && *it != '/')) throw PathSyntaxException(path);
 				++it;
 			}
 			else --it;

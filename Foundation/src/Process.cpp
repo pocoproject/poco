@@ -109,7 +109,7 @@ ProcessHandle Process::launch(const std::string& command, const Args& args)
 
 ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
 {
-	poco_assert (inPipe == 0 || inPipe != outPipe && inPipe != errPipe);
+	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
 
 	return ProcessHandle(launchImpl(command, args, inPipe, outPipe, errPipe));
 }
