@@ -1,7 +1,7 @@
 //
 // LineEndingConverter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/LineEndingConverter.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/LineEndingConverter.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams

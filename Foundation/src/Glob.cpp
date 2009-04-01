@@ -1,7 +1,7 @@
 //
 // Glob.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Glob.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Glob.cpp#4 $
 //
 // Library: Foundation
 // Package: Filesystem

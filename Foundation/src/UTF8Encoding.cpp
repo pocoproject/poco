@@ -1,7 +1,7 @@
 //
 // UTF8Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UTF8Encoding.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/UTF8Encoding.cpp#4 $
 //
 // Library: Foundation
 // Package: Text
@@ -105,32 +105,46 @@ const TextEncoding::CharacterMap& UTF8Encoding::characterMap() const
 
 bool UTF8Encoding::isLegal(const unsigned char *bytes, int length)
 {
+	// Note: The following is loosely based on the isLegalUTF8 function
+	// from ftp://ftp.unicode.org/Public/PROGRAMS/CVTUTF/ConvertUTF.c
+	// Excuse the ugliness...
+	
 	if (0 == bytes || 0 == length) return false;
 
     unsigned char a;
     const unsigned char* srcptr = bytes + length;
     switch (length)
 	{
-		default: return false;
-		case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
-		case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
-		case 2: if ((a = (*--srcptr)) > 0xBF) return false;
-
-			switch (*bytes) 
-			{
-				case 0xE0: if (a < 0xA0) return false; break;
-				case 0xED: if (a > 0x9F) return false; break;
-				case 0xF0: if (a < 0x90) return false; break;
-				case 0xF4: if (a > 0x8F) return false; break;
-				default:   if (a < 0x80) return false;
-			}
-			
-		case 1: if (*bytes >= 0x80 && *bytes < 0xC2) return false;
+	default:
+		return false;
+		// Everything else falls through when true.
+	case 4:
+		if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+	case 3: 
+		if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+	case 2:
+		if ((a = (*--srcptr)) > 0xBF) return false;
+		switch (*bytes) 
+		{
+		case 0xE0:
+			if (a < 0xA0) return false; 
+			break;
+		case 0xED:
+			if (a > 0x9F) return false; 
+			break;
+		case 0xF0:
+			if (a < 0x90) return false; 
+			break;
+		case 0xF4:
+			if (a > 0x8F) return false; 
+			break;
+		default:
+			if (a < 0x80) return false;
+		}
+	case 1:
+		if (*bytes >= 0x80 && *bytes < 0xC2) return false;
     }
-
-	if (*bytes > 0xF4) return false;
-
-	return true;
+	return *bytes <= 0xF4;
 }
 
 
@@ -141,14 +155,18 @@ int UTF8Encoding::convert(const unsigned char* bytes) const
 	
 	switch (n)
 	{
-		case -6: case -5: case -1: return -1;
-
-		case -4: case -3: case -2:
-			if (!isLegal(bytes, -n)) return -1;
-			uc = *bytes & ((0x07 << (n + 4)) | 0x03);
-			break;
-
-		default: return n;
+	case -6:
+	case -5:
+	case -1:
+		return -1;
+	case -4: 
+	case -3: 
+	case -2:
+		if (!isLegal(bytes, -n)) return -1;
+		uc = *bytes & ((0x07 << (n + 4)) | 0x03);
+		break;
+	default:
+		return n;
 	}
 
 	while (n++ < -1) 

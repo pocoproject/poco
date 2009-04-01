@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.3/Foundation/src/URI.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/URI.cpp#3 $
 //
 // Library: Foundation
 // Package: URI

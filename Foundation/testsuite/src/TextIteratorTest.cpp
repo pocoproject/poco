@@ -1,7 +1,7 @@
 //
 // TextIteratorTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TextIteratorTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TextIteratorTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
