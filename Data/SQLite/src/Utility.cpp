@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#4 $
+// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#5 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -98,6 +98,7 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 	case SQLITE_BUSY:
 		throw DBLockedException(addErrMsg);
 	case SQLITE_LOCKED:
+	case SQLITE_LOCKED_SHAREDCACHE:
 		throw TableLockedException(addErrMsg);
 	case SQLITE_NOMEM:
 		throw NoMemoryException(addErrMsg);

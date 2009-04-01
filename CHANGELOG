@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.4 (2009-03-xx)
+Release 1.3.4 (2009-04-xx)
 ==========================
 
 - fixed SF# 2611804: PropertyFileConfiguration continuation lines
@@ -37,11 +37,13 @@ Release 1.3.4 (2009-03-xx)
 - added a missing #include to CryptoTransform.h
 - fixed SF# 2635377: HTTPServer::HTTPServer should take AutoPtr<HTTPServerParams>
 - replaced plain pointers with smart pointers in some interfaces
-- upgraded to sqlite 3.6.11
+- upgraded to sqlite 3.6.12
+- improved Data::SQLite error reporting
 - Poco::Glob now works with UTF-8 encoded strings and supports case-insensitive comparison.
   This also fixes SF# 1944831: Glob::glob on windows should be case insensitve
 - added Twitter client sample to Net library
- 
+- Fixed SF# 2513643: Seg fault in Poco::UTF8::toLower on 64-bit Linux
+
 
 Release 1.3.3p1 (2008-10-09)
 ============================
@@ -971,4 +973,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#39 $
+$Id: //poco/1.3/dist/CHANGELOG#40 $
