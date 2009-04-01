@@ -33,7 +33,9 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#define __EXTENSIONS__
+#ifndef __EXTENSIONS__
+#	define __EXTENSIONS__
+#endif
 #include <math.h>
 #include "Poco/FPEnvironment_SUN.h"
 

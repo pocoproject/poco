@@ -42,8 +42,11 @@
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
 #	endif
+	// must be limits.h for PTHREAD_STACK_MIN on Solaris
+#	include <limits.h>
+#else
+#	include <climits>
 #endif
-#include <climits>
 
 
 //

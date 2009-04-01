@@ -206,15 +206,16 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 //
 #include <sys/ioctl.h>
 #if defined(sun) || defined(__sun) || defined(__sun__)
-#define __EXTENSIONS__
-#include <net/if_arp.h>
-#include <sys/sockio.h>
-#include <stropts.h>
+#	ifndef __EXTENSIONS__
+#		define __EXTENSIONS__
+#	endif
+#	include <net/if_arp.h>
+#	include <sys/sockio.h>
+#	include <stropts.h>
 #endif
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#include <net/if.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <net/if.h>
