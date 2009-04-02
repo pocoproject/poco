@@ -43,7 +43,6 @@
 #		define __EXTENSIONS__
 #	endif
 #endif
-#include <climits>
 
 
 //

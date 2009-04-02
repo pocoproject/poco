@@ -47,6 +47,7 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <pthread.h>
+// must be limits.h (not <climits>) for PTHREAD_STACK_MIN on Solaris
 #include <limits.h>
 #if !defined(POCO_NO_SYS_SELECT_H)
 #include <sys/select.h>
