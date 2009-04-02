@@ -143,7 +143,7 @@ bool Name::equals(const XMLString& qname, const XMLString& namespaceURI, const X
 
 bool Name::equalsWeakly(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return _qname == qname && !qname.empty() || _namespaceURI == namespaceURI && _localName == localName && !_localName.empty();
+	return (_qname == qname && !qname.empty()) || (_namespaceURI == namespaceURI && _localName == localName && !_localName.empty());
 }
 
 
