@@ -89,7 +89,7 @@ bool OptionSet::hasOption(const std::string& name, bool matchShort) const
 	bool found = false;
 	for (Iterator it = _options.begin(); it != _options.end(); ++it)
 	{
-		if (matchShort && it->matchesShort(name) || !matchShort && it->matchesFull(name))
+		if ((matchShort && it->matchesShort(name)) || (!matchShort && it->matchesFull(name)))
 		{
 			if (!found)
 				found = true;
@@ -106,7 +106,7 @@ const Option& OptionSet::getOption(const std::string& name, bool matchShort) con
 	const Option* pOption = 0;
 	for (Iterator it = _options.begin(); it != _options.end(); ++it)
 	{
-		if (matchShort && it->matchesShort(name) || !matchShort && it->matchesPartial(name))
+		if ((matchShort && it->matchesShort(name)) || (!matchShort && it->matchesPartial(name)))
 		{
 			if (!pOption)
 			{
