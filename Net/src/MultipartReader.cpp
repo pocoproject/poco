@@ -76,7 +76,7 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	int ch = _istr.get();
 	if (ch == eof) return -1;
 	*buffer++ = (char) ch; ++n;
-	if (ch == '\n' || ch == '\r' && _istr.peek() == '\n')
+	if (ch == '\n' || (ch == '\r' && _istr.peek() == '\n'))
 	{
 		if (ch == '\r')
 		{
@@ -102,7 +102,7 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			}
 			if (it == end)
 			{
-				if (ch == '\n' || ch == '\r' && _istr.peek() == '\n')
+				if (ch == '\n' || (ch == '\r' && _istr.peek() == '\n'))
 				{
 					if (ch == '\r')
 					{

@@ -108,7 +108,7 @@ void NameValueCollectionTest::testNameValueCollection()
 	std::string v2 = it->second;
 	assert (it->first == "name3");
 	
-	assert (v1 == "value3" && v2 == "value31" || v1 == "value31" && v2 == "value3");
+	assert ((v1 == "value3" && v2 == "value31") || (v1 == "value31" && v2 == "value3"));
 	
 	nvc.erase("name3");
 	assert (!nvc.has("name3"));

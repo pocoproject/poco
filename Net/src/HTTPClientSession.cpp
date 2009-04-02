@@ -175,7 +175,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	_pResponseStream = 0;
 
 	bool keepAlive = getKeepAlive();
-	if (connected() && !keepAlive || mustReconnect())
+	if ((connected() && !keepAlive) || mustReconnect())
 	{
 		close();
 		_mustReconnect = false;

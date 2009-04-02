@@ -139,7 +139,7 @@ void TCPServerDispatcher::run()
 		}
 	
 		FastMutex::ScopedLock lock(_mutex);
-		if (_stopped || _currentThreads > 1 && _queue.empty())
+		if (_stopped || (_currentThreads > 1 && _queue.empty()))
 		{
 			--_currentThreads;
 			break;
