@@ -47,6 +47,7 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DirectoryIterator.h"
+#include "Poco/Exception.h"
 #include <vector>
 
 
@@ -64,6 +65,7 @@ using Poco::LocalDateTime;
 using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
 using Poco::DirectoryIterator;
+using Poco::InvalidArgumentException;
 
 
 FileChannelTest::FileChannelTest(const std::string& name): CppUnit::TestCase(name)
@@ -405,6 +407,7 @@ void FileChannelTest::purgeAge(const std::string& pa)
 void FileChannelTest::noPurgeAge(const std::string& npa)
 {
 	std::string name = filename();
+
 	try
 	{
 		AutoPtr<FileChannel> pChannel = new FileChannel(name);
@@ -444,8 +447,16 @@ void FileChannelTest::noPurgeAge(const std::string& npa)
 void FileChannelTest::testPurgeAge()
 {
 	purgeAge("5 seconds");
-	noPurgeAge("0 seconds");
+	try
+	{
+		noPurgeAge("0 seconds");
+		fail ("must fail");
+	} catch (InvalidArgumentException&)
+	{
+	}
+
 	noPurgeAge("");
+	noPurgeAge("none");
 }
 
 
@@ -516,8 +527,16 @@ void FileChannelTest::noPurgeCount(const std::string& npc)
 void FileChannelTest::testPurgeCount()
 {
 	purgeCount("2");
+	try
+	{
+		noPurgeCount("0");
+		fail ("must fail");
+	} catch (InvalidArgumentException&)
+	{
+	}
+
 	noPurgeCount("");
-	noPurgeCount("0");
+	noPurgeCount("none");
 }
 
 

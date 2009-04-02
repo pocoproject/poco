@@ -154,6 +154,7 @@ class Foundation_API FileChannel: public Channel
 	///
 	/// The purgeAge property can have the following values:
 	///
+	///   * "none" or ""   no purging
 	///   * <n> [seconds]  the maximum age is <n> seconds.
 	///   * <n> minutes:   the maximum age is <n> minutes.
 	///   * <n> hours:     the maximum age is <n> hours.
@@ -161,10 +162,10 @@ class Foundation_API FileChannel: public Channel
 	///   * <n> weeks:     the maximum age is <n> weeks.
 	///   * <n> months:    the maximum age is <n> months, where a month has 30 days.
 	///
-	/// The purgeCount property has an integer value that
-	/// specifies the maximum number of archived log files.
-	/// If the number is exceeded, archived log files are 
-	/// deleted, starting with the oldest.
+	/// The purgeCount property has an integer value that specifies the maximum number 
+	/// of archived log files. If the number is exceeded, archived log files are 
+	/// deleted, starting with the oldest. When "none" or empty string are
+	/// supplied, they reset purgeCount to none (no purging).
 	///
 	/// For a more lightweight file channel class, see SimpleFileChannel.
 {
