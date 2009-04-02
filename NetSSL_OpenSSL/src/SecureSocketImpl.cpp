@@ -304,7 +304,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 long SecureSocketImpl::verifyCertificate(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
-	if (mode == Context::VERIFY_NONE || isLocalHost(hostName) && mode != Context::VERIFY_STRICT)
+	if (mode == Context::VERIFY_NONE || (isLocalHost(hostName) && mode != Context::VERIFY_STRICT))
 	{
 		return X509_V_OK;
 	}
