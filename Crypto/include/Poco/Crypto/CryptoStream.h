@@ -1,7 +1,7 @@
 //
 // CryptoStream.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoStream.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoStream.h#2 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -61,8 +61,7 @@ class Crypto_API CryptoStreamBuf : public Poco::BufferedStreamBuf
 {
 public:
 	CryptoStreamBuf(std::istream& istr, CryptoTransform* pTransform, std::size_t bufferSize = 8192);
-	CryptoStreamBuf(std::ostream& ostr, CryptoTransform* pTransform,
-		std::size_t bufferSize = 8192);
+	CryptoStreamBuf(std::ostream& ostr, CryptoTransform* pTransform, std::size_t bufferSize = 8192);
 
 	virtual ~CryptoStreamBuf();
 
@@ -92,10 +91,8 @@ class Crypto_API CryptoIOS : public virtual std::ios
 	/// stream buffer and base classes.
 {
 public:
-	CryptoIOS(std::istream& istr, CryptoTransform* pTransform,
-		std::size_t bufferSize = 8192);
-	CryptoIOS(std::ostream& ostr, CryptoTransform* pTransform,
-		std::size_t bufferSize = 8192);
+	CryptoIOS(std::istream& istr, CryptoTransform* pTransform, std::size_t bufferSize = 8192);
+	CryptoIOS(std::ostream& ostr, CryptoTransform* pTransform, std::size_t bufferSize = 8192);
 	~CryptoIOS();
 	CryptoStreamBuf* rdbuf();
 

@@ -1,7 +1,7 @@
 //
 // RSADigestEngine.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSADigestEngine.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSADigestEngine.h#2 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -51,8 +51,6 @@
 
 namespace Poco {
 namespace Crypto {
-
-
 
 
 class Crypto_API RSADigestEngine: public Poco::DigestEngine

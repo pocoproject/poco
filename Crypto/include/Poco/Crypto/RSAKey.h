@@ -1,7 +1,7 @@
 //
 // RSAKey.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKey.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKey.h#2 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -76,15 +76,11 @@ public:
 		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.
 		/// Can be used to sign and verify a stream
 
-	RSAKey(const std::string& publicKeyFile, 
-		const std::string& privateKeyFile="", 
-		const std::string& privateKeyPwd="");
+	RSAKey(const std::string& publicKeyFile, const std::string& privateKeyFile = "",  const std::string& privateKeyPwd = "");
 		/// Creates the RSAKey. Can only by used for signing if privateKeyFile
 		/// is not empty.
 
-	RSAKey(std::istream* pPubKey, 
-		std::istream* pPrivKey = 0, 
-		const std::string& privateKeyPwd="");
+	RSAKey(std::istream* pPubKey, std::istream* pPrivKey = 0, const std::string& privateKeyPwd = "");
 		/// Creates the RSAKey. Can only by used for signing if pPrivKey
 		/// is not null. If a private key file is specified, you don't need to
 		/// specify a public key file. OpenSSL will auto-create it from the private key.
@@ -95,7 +91,7 @@ public:
 	int size() const;
 		/// Returns the RSA_size
 
-	void save(const std::string& pubKeyFile, const std::string& privKeyFile="", const std::string& privKeyPwd="");
+	void save(const std::string& pubKeyFile, const std::string& privKeyFile = "", const std::string& privKeyPwd = "");
 		/// Exports the keys to the given files. pubKeyFile/privKeyFile can be empty
 
 	void save(std::ostream* pPubKey, std::ostream* pPrivKey = 0, const std::string& privateKeyPwd = "");

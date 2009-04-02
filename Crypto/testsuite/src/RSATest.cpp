@@ -1,7 +1,7 @@
 //
 // RSATest.cpp
 //
-// $Id: //poco/1.3/Crypto/testsuite/src/RSATest.cpp#2 $
+// $Id: //poco/1.3/Crypto/testsuite/src/RSATest.cpp#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -205,8 +205,7 @@ void RSATest::testCertificate()
 	std::istringstream str(anyPem);
 	X509Certificate cert(str);
 	
-	Context::Ptr pContext(new Context("", "", false));
-	bool ok = cert.verify("www.appinf.com", pContext);
+	bool ok = cert.verify("www.appinf.com") != 0;
 	RSAKey key(cert);
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(key);
 	std::string val("lets do some encryption");

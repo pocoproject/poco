@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#2 $
+// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#3 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -62,7 +62,7 @@ static void throwError()
 }
 
 
-class RSAEncryptImpl : public CryptoTransform
+class RSAEncryptImpl: public CryptoTransform
 {
 public:
 	enum
@@ -177,9 +177,7 @@ std::streamsize RSAEncryptImpl::finalize(
 }
 
 
-
-
-class RSADecryptImpl : public CryptoTransform
+class RSADecryptImpl: public CryptoTransform
 {
 public:
 	enum
@@ -244,7 +242,7 @@ std::streamsize RSADecryptImpl::transform(
 	poco_assert_dbg(_pos <= rsaSize);
 	poco_assert (outputLength >= rsaSize);
 	int rc = 0;
-while (inputLength > 0)
+	while (inputLength > 0)
 	{
 		// check how many data bytes we are missing to get the buffer full
 		poco_assert_dbg (rsaSize >= _pos);
@@ -291,6 +289,7 @@ std::streamsize RSADecryptImpl::finalize(
 
 	return rc;
 }
+
 
 RSACipherImpl::RSACipherImpl(const RSAKey& key):
 	_key(key)

@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#9 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#10 $
 //
 // Library: Util
 // Package: Application
@@ -472,9 +472,12 @@ void ServerApplication::beDaemon()
 	// instead of just closing them. This avoids
 	// issues with third party/legacy code writing
 	// stuff to stdout/stderr.
-	freopen("/dev/null", "r+", stdin);
-	freopen("/dev/null", "r+", stdout);
-	freopen("/dev/null", "r+", stderr);
+	FILE* fin  = freopen("/dev/null", "r+", stdin);
+	if (!fin) throw Poco::OpenFileException("Cannot attach stdin to /dev/null");
+	FILE* fout = freopen("/dev/null", "r+", stdout);
+	if (!fout) throw Poco::OpenFileException("Cannot attach stdout to /dev/null");
+	FILE* ferr = freopen("/dev/null", "r+", stderr);
+	if (!ferr) throw Poco::OpenFileException("Cannot attach stderr to /dev/null");
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Cipher.cpp
 //
-// $Id: //poco/1.3/Crypto/src/Cipher.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/Cipher.cpp#2 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -37,14 +37,12 @@
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CryptoStream.h"
 #include "Poco/Crypto/CryptoTransform.h"
-
 #include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/HexBinaryEncoder.h"
 #include "Poco/HexBinaryDecoder.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Exception.h"
-
 #include <sstream>
 #include <memory>
 
@@ -95,20 +93,20 @@ void Cipher::encrypt(std::istream& source, std::ostream& sink, Encoding encoding
 		break;
 
 	case ENC_BASE64:
-	{
-		Poco::Base64Encoder encoder(sink);
-		StreamCopier::copyStream(encryptor, encoder);
-		encoder.close();
-		break;
-	}
+		{
+			Poco::Base64Encoder encoder(sink);
+			StreamCopier::copyStream(encryptor, encoder);
+			encoder.close();
+			break;
+		}
 
 	case ENC_BINHEX:
-	{
-		Poco::HexBinaryEncoder encoder(sink);
-		StreamCopier::copyStream(encryptor, encoder);
-		encoder.close();
-		break;
-	}
+		{
+			Poco::HexBinaryEncoder encoder(sink);
+			StreamCopier::copyStream(encryptor, encoder);
+			encoder.close();
+			break;
+		}
 
 	default:
 		throw Poco::InvalidArgumentException("Invalid argument", "encoding");
@@ -128,20 +126,20 @@ void Cipher::decrypt(std::istream& source, std::ostream& sink, Encoding encoding
 		break;
 
 	case ENC_BASE64:
-	{
-		Poco::Base64Decoder decoder(source);
-		StreamCopier::copyStream(decoder, decryptor);
-		decryptor.close();
-		break;
-	}
+		{
+			Poco::Base64Decoder decoder(source);
+			StreamCopier::copyStream(decoder, decryptor);
+			decryptor.close();
+			break;
+		}
 
 	case ENC_BINHEX:
-	{
-		Poco::HexBinaryDecoder decoder(source);
-		StreamCopier::copyStream(decoder, decryptor);
-		decryptor.close();
-		break;
-	}
+		{
+			Poco::HexBinaryDecoder decoder(source);
+			StreamCopier::copyStream(decoder, decryptor);
+			decryptor.close();
+			break;
+		}
 
 	default:
 		throw Poco::InvalidArgumentException("Invalid argument", "encoding");

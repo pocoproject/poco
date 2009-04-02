@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#2 $
+// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#3 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -203,8 +203,6 @@ int RSAKeyImpl::size() const
 {
 	return RSA_size(_pRSA);
 }
-
-
 
 
 void RSAKeyImpl::save(const std::string& pubKeyFile, const std::string& privKeyFile, const std::string& privKeyPwd)

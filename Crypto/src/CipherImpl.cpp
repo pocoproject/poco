@@ -1,7 +1,7 @@
 //
 // CipherImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherImpl.cpp#2 $
+// $Id: //poco/1.3/Crypto/src/CipherImpl.cpp#3 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -60,7 +60,7 @@ static void throwError()
 }
 
 
-class CryptoTransformImpl : public CryptoTransform
+class CryptoTransformImpl: public CryptoTransform
 {
 public:
 	typedef Cipher::ByteVec ByteVec;
@@ -103,10 +103,10 @@ CryptoTransformImpl::CryptoTransformImpl(
 	const EVP_CIPHER* pCipher,
 	const ByteVec&    key,
 	const ByteVec&    iv,
-	Direction         dir) :
-		_pCipher(pCipher),
-		_key(key),
-		_iv(iv)
+	Direction         dir):
+	_pCipher(pCipher),
+	_key(key),
+	_iv(iv)
 {
 	EVP_CipherInit(
 		&_ctx,
