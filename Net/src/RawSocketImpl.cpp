@@ -55,7 +55,7 @@ RawSocketImpl::RawSocketImpl(IPAddress::Family family, int proto)
 {
 	if (family == IPAddress::IPv4)
 		init2(AF_INET, proto);
-#if POCO_HAVE_IPv6
+#if defined(POCO_HAVE_IPv6)
 	else if (family == IPAddress::IPv6)
 		init2(AF_INET6, proto);
 #endif
