@@ -55,7 +55,7 @@ DatagramSocketImpl::DatagramSocketImpl(IPAddress::Family family)
 {
 	if (family == IPAddress::IPv4)
 		init(AF_INET);
-#if POCO_HAVE_IPv6
+#if defined(POCO_HAVE_IPv6)
 	else if (family == IPAddress::IPv6)
 		init(AF_INET6);
 #endif
