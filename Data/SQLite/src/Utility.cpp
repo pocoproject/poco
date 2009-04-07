@@ -49,6 +49,60 @@ namespace Data {
 namespace SQLite {
 
 
+Utility::TypeMap Utility::_types;
+
+
+Utility::Utility()
+{
+	Poco::FastMutex::ScopedLock l(_mutex);
+
+	if (_types.empty())
+	{
+		_types.insert(TypeMap::value_type("", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("BOOL", MetaColumn::FDT_BOOL));
+		_types.insert(TypeMap::value_type("BOOLEAN", MetaColumn::FDT_BOOL));
+		_types.insert(TypeMap::value_type("BIT", MetaColumn::FDT_BOOL));
+		_types.insert(TypeMap::value_type("UINT8", MetaColumn::FDT_UINT8));
+		_types.insert(TypeMap::value_type("UTINY", MetaColumn::FDT_UINT8));
+		_types.insert(TypeMap::value_type("UINTEGER8", MetaColumn::FDT_UINT8));
+		_types.insert(TypeMap::value_type("INT8", MetaColumn::FDT_INT8));
+		_types.insert(TypeMap::value_type("TINY", MetaColumn::FDT_INT8));
+		_types.insert(TypeMap::value_type("INTEGER8", MetaColumn::FDT_INT8));
+		_types.insert(TypeMap::value_type("UINT16", MetaColumn::FDT_UINT16));
+		_types.insert(TypeMap::value_type("USHORT", MetaColumn::FDT_UINT16));
+		_types.insert(TypeMap::value_type("UINTEGER16", MetaColumn::FDT_UINT16));
+		_types.insert(TypeMap::value_type("INT16", MetaColumn::FDT_INT16));
+		_types.insert(TypeMap::value_type("SHORT", MetaColumn::FDT_INT16));
+		_types.insert(TypeMap::value_type("INTEGER16", MetaColumn::FDT_INT16));
+		_types.insert(TypeMap::value_type("UINT", MetaColumn::FDT_UINT32));
+		_types.insert(TypeMap::value_type("UINT32", MetaColumn::FDT_UINT32));
+		_types.insert(TypeMap::value_type("UINTEGER32", MetaColumn::FDT_UINT32));
+		_types.insert(TypeMap::value_type("INT", MetaColumn::FDT_INT32));
+		_types.insert(TypeMap::value_type("INT32", MetaColumn::FDT_INT32));
+		_types.insert(TypeMap::value_type("INTEGER", MetaColumn::FDT_INT32));
+		_types.insert(TypeMap::value_type("INTEGER32", MetaColumn::FDT_INT32));
+		_types.insert(TypeMap::value_type("UINT64", MetaColumn::FDT_UINT64));
+		_types.insert(TypeMap::value_type("ULONG", MetaColumn::FDT_INT64));
+		_types.insert(TypeMap::value_type("UINTEGER64", MetaColumn::FDT_UINT64));
+		_types.insert(TypeMap::value_type("INT64", MetaColumn::FDT_INT64));
+		_types.insert(TypeMap::value_type("LONG", MetaColumn::FDT_INT64));
+		_types.insert(TypeMap::value_type("INTEGER64", MetaColumn::FDT_INT64));
+		_types.insert(TypeMap::value_type("COUNTER", MetaColumn::FDT_UINT64));
+		_types.insert(TypeMap::value_type("AUTOINCREMENT", MetaColumn::FDT_UINT64));
+		_types.insert(TypeMap::value_type("REAL", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("FLOA", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("FLOAT", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("DOUB", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("DOUBLE", MetaColumn::FDT_DOUBLE));
+		_types.insert(TypeMap::value_type("CHAR", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("CLOB", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("TEXT", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("VARCHAR", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("BLOB", MetaColumn::FDT_BLOB));
+	}
+}
+
+
 std::string Utility::lastError(sqlite3 *pDB)
 {
 	return std::string(sqlite3_errmsg(pDB));
@@ -59,25 +113,17 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 {
 	poco_assert_dbg (pStmt);
 
+	static Utility u;
+	
 	const char* pc = sqlite3_column_decltype(pStmt, (int) pos);
 	std::string sqliteType = pc ? pc : "";
 	Poco::toUpperInPlace(sqliteType);
-	
-	if (sqliteType.npos != sqliteType.find("INT"))
-		return MetaColumn::FDT_INT32;
-	else if (sqliteType.empty() || 
-		sqliteType.npos != sqliteType.find("CHAR") ||
-		sqliteType.npos != sqliteType.find("CLOB") ||
-		sqliteType.npos != sqliteType.find("TEXT"))
-		return MetaColumn::FDT_STRING;
-	else if (sqliteType.npos != sqliteType.find("REAL") ||
-		sqliteType.npos != sqliteType.find("FLOA") ||
-		sqliteType.npos != sqliteType.find("DOUB"))
-		return MetaColumn::FDT_DOUBLE;
-	else if (sqliteType.npos != sqliteType.find("BLOB"))
-		return MetaColumn::FDT_BLOB;
+	sqliteType = sqliteType.substr(0, sqliteType.find_first_of(" ("));
 
-	throw Poco::NotFoundException();
+	TypeMap::const_iterator it = _types.find(Poco::trimInPlace(sqliteType));
+	if (_types.end() == it)	throw Poco::NotFoundException();
+
+	return it->second;
 }
 
 
