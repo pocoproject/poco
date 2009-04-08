@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.h
 //
-// $Id: //poco/svn/Util/testsuite/src/XMLConfigurationTest.h#1 $
+// $Id: //poco/Main/Util/testsuite/src/XMLConfigurationTest.h#5 $
 //
 // Definition of the XMLConfigurationTest class.
 //
@@ -47,6 +47,7 @@ public:
 	~XMLConfigurationTest();
 
 	void testLoad();
+	void testSave();
 
 	void setUp();
 	void tearDown();
