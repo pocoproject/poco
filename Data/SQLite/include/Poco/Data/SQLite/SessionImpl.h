@@ -1,7 +1,7 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#4 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#5 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -57,8 +57,23 @@ namespace SQLite {
 
 class SQLite_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 	/// Implements SessionImpl interface.
+	///
+	/// The following properties are supported:
+	///   * transactionMode: "DEFERRED", "IMMEDIATE" or "EXCLUSIVE"
+	///   * maxRetryAttempts: maximum number of attemptes to retry an operation if
+	///     database is locked or busy. Between retry attempts, sleep for a random
+	///     time.
+	///   * minRetrySleep: the minimum time (in milliseconds) waited between two retry attempts.
+	///   * maxRetrySleep: the maximum time (in milliseconds) waited between two retry attempts.
 {
 public:
+	enum
+	{
+		DEFAULT_MAX_RETRY_ATTEMPTS = 0, /// Default maximum number of attempts to retry an operation if the database is locked.
+		DEFAULT_MIN_RETRY_SLEEP    = 2, /// Default minimum sleep interval (milliseconds) between retry attempts.
+		DEFAULT_MAX_RETRY_SLEEP    = 20 /// Default maximum sleep interval (milliseconds) between retry attempts.
+	};
+	
 	SessionImpl(const std::string& fileName);
 		/// Creates the SessionImpl. Opens a connection to the database.
 
@@ -85,10 +100,16 @@ public:
 
 	bool isConnected();
 		/// Returns true iff connected, false otherwise.
-
+		
 protected:
 	void setTransactionMode(const std::string& prop, const Poco::Any& value);
 	Poco::Any getTransactionMode(const std::string& prop);
+	void setMaxRetryAttempts(const std::string& prop, const Poco::Any& value);
+	Poco::Any getMaxRetryAttempts(const std::string& prop);
+	void setMinRetrySleep(const std::string& prop, const Poco::Any& value);
+	Poco::Any getMinRetrySleep(const std::string& prop);
+	void setMaxRetrySleep(const std::string& prop, const Poco::Any& value);
+	Poco::Any getMaxRetrySleep(const std::string& prop);
 	
 private:
 	void open();
@@ -97,6 +118,9 @@ private:
 	std::string _dbFileName;
 	sqlite3*    _pDB;
 	std::string _transactionMode;
+	int         _maxRetryAttempts;
+	int         _minRetrySleep;
+	int         _maxRetrySleep;
 	bool        _connected;
 	bool        _isTransaction;
 	

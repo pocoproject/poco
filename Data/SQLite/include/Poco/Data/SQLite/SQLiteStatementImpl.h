@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SQLiteStatementImpl.h#2 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SQLiteStatementImpl.h#3 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -46,6 +46,7 @@
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Random.h"
 
 
 struct sqlite3;
@@ -61,7 +62,7 @@ class SQLite_API SQLiteStatementImpl: public Poco::Data::StatementImpl
 	/// Implements statement functionality needed for SQLite
 {
 public:
-	SQLiteStatementImpl(sqlite3* pDB);
+	SQLiteStatementImpl(sqlite3* pDB, int maxRetryAttempts, int minRetrySleep, int maxRetrySleep);
 		/// Creates the SQLiteStatementImpl.
 
 	~SQLiteStatementImpl();
@@ -85,6 +86,10 @@ protected:
 		/// Returns true if a valid statement is set and we can bind.
 
 	void compileImpl();
+		/// Compiles the statement, doesn't bind yet, retries if
+		/// the database is locked.
+
+	void compileImplImpl();
 		/// Compiles the statement, doesn't bind yet
 
 	void bindImpl();
@@ -99,17 +104,24 @@ protected:
 private:
 	void clear();
 		/// Removes the _pStmt
+		
+	void sleep();
+		/// Sleep for a random time (between retry attempts).
 
 	typedef Poco::Data::AbstractBindingVec Bindings;
 	typedef Poco::Data::AbstractExtractionVec Extractions;
 
 	sqlite3*      _pDB;
 	sqlite3_stmt* _pStmt;
+	int           _maxRetryAttempts;
+	int           _minRetrySleep;
+	int           _maxRetrySleep;
 	bool          _stepCalled;
 	int           _nextResponse;
 	Poco::SharedPtr<Binder>    _pBinder;
 	Poco::SharedPtr<Extractor> _pExtractor;
 	std::vector<Poco::Data::MetaColumn> _columns;
+	Poco::Random _rnd;
 };
 
 

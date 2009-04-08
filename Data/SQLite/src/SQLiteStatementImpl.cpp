@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#6 $
+// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#7 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -37,6 +37,7 @@
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
+#include "Poco/Thread.h"
 #include "Poco/String.h"
 #include <cstdlib>
 #include <cstring>
@@ -48,9 +49,12 @@ namespace Data {
 namespace SQLite {
 
 
-SQLiteStatementImpl::SQLiteStatementImpl(sqlite3* pDB):
+SQLiteStatementImpl::SQLiteStatementImpl(sqlite3* pDB, int maxRetryAttempts, int minRetrySleep, int maxRetrySleep):
 	_pDB(pDB),
 	_pStmt(0),
+	_maxRetryAttempts(maxRetryAttempts),
+	_minRetrySleep(minRetrySleep),
+	_maxRetrySleep(maxRetrySleep),
 	_stepCalled(false),
 	_nextResponse(0)
 {
@@ -64,6 +68,26 @@ SQLiteStatementImpl::~SQLiteStatementImpl()
 
 
 void SQLiteStatementImpl::compileImpl()
+{
+	for (int i = 0; i <= _maxRetryAttempts; i++)
+	{
+		try
+		{
+			compileImplImpl();
+			return;
+		}
+		catch (LockedException&)
+		{
+			if (i < _maxRetryAttempts)
+				sleep();
+			else
+				throw;
+		}
+	}
+}
+
+
+void SQLiteStatementImpl::compileImplImpl()
 {
 	if (_pStmt) return;
 
@@ -93,7 +117,7 @@ void SQLiteStatementImpl::compileImpl()
 		{
 			queryFound = true;
 		}
-		else if(rc == SQLITE_OK && !pStmt) // comment/whitespace ignore
+		else if (rc == SQLITE_OK && !pStmt) // comment/whitespace ignore
 		{
 			pSql = pLeftover;
 			if (std::strlen(pSql) == 0)
@@ -181,13 +205,31 @@ bool SQLiteStatementImpl::hasNext()
 	// _pStmt is allowed to be null for conditional SQL statements
 	if (_pStmt == 0)
 	{
-		_stepCalled      = true;
+		_stepCalled   = true;
 		_nextResponse = SQLITE_DONE;
 		return false;
 	}
 
-	_stepCalled      = true;
-	_nextResponse = sqlite3_step(_pStmt);
+	_stepCalled = true;
+	for (int i = 0; i <= _maxRetryAttempts; i++)
+	{
+		_nextResponse = sqlite3_step(_pStmt);
+		switch (_nextResponse)
+		{
+		case SQLITE_BUSY:
+		case SQLITE_LOCKED:
+		case SQLITE_LOCKED_SHAREDCACHE:
+			if (i < _maxRetryAttempts)
+			{
+				sleep();
+				continue;
+			}
+			break;
+		default:
+			break;
+		}
+		break;
+	}
 
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
 	{
@@ -237,6 +279,12 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(Poco::UInt32 pos) const
 {
 	poco_assert (pos >= 0 && pos <= _columns.size());
 	return _columns[pos];
+}
+
+
+void SQLiteStatementImpl::sleep()
+{
+	Poco::Thread::sleep(_minRetrySleep + _rnd.next(_maxRetrySleep - _minRetrySleep));
 }
 
 

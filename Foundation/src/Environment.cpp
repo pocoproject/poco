@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Environment.cpp#3 $
 //
 // Library: Foundation
 // Package: Core

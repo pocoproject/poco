@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#5 $
+// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#6 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -55,10 +55,16 @@ SessionImpl::SessionImpl(const std::string& fileName):
 	_dbFileName(fileName),
 	_pDB(0),
 	_transactionMode("DEFERRED"),
+	_maxRetryAttempts(DEFAULT_MAX_RETRY_ATTEMPTS),
+	_minRetrySleep(DEFAULT_MIN_RETRY_SLEEP),
+	_maxRetrySleep(DEFAULT_MAX_RETRY_SLEEP),
 	_connected(false),
 	_isTransaction(false)
 {
 	addProperty("transactionMode", &SessionImpl::setTransactionMode, &SessionImpl::getTransactionMode);
+	addProperty("maxRetryAttempts", &SessionImpl::setMaxRetryAttempts, &SessionImpl::getMaxRetryAttempts);
+	addProperty("minRetrySleep", &SessionImpl::setMinRetrySleep, &SessionImpl::getMinRetrySleep);
+	addProperty("maxRetrySleep", &SessionImpl::setMaxRetrySleep, &SessionImpl::getMaxRetrySleep);
 	open();
 }
 
@@ -72,13 +78,13 @@ SessionImpl::~SessionImpl()
 Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
 {
 	poco_check_ptr (_pDB);
-	return new SQLiteStatementImpl(_pDB);
+	return new SQLiteStatementImpl(_pDB, _maxRetryAttempts, _minRetrySleep, _maxRetrySleep);
 }
 
 
 void SessionImpl::begin()
 {
-	SQLiteStatementImpl tmp(_pDB);
+	SQLiteStatementImpl tmp(_pDB, _maxRetryAttempts, _minRetrySleep, _maxRetrySleep);
 	tmp.add(BEGIN_TRANSACTION + _transactionMode);
 	tmp.execute();
 	_isTransaction = true;
@@ -87,7 +93,7 @@ void SessionImpl::begin()
 
 void SessionImpl::commit()
 {
-	SQLiteStatementImpl tmp(_pDB);
+	SQLiteStatementImpl tmp(_pDB, _maxRetryAttempts, _minRetrySleep, _maxRetrySleep);
 	tmp.add(COMMIT_TRANSACTION);
 	tmp.execute();
 	_isTransaction = false;
@@ -96,7 +102,7 @@ void SessionImpl::commit()
 
 void SessionImpl::rollback()
 {
-	SQLiteStatementImpl tmp(_pDB);
+	SQLiteStatementImpl tmp(_pDB, _maxRetryAttempts, _minRetrySleep, _maxRetrySleep);
 	tmp.add(ABORT_TRANSACTION);
 	tmp.execute();
 	_isTransaction = false;
@@ -145,6 +151,51 @@ void SessionImpl::setTransactionMode(const std::string& prop, const Poco::Any& v
 Poco::Any SessionImpl::getTransactionMode(const std::string& prop)
 {
 	return Poco::Any(_transactionMode);
+}
+
+
+void SessionImpl::setMaxRetryAttempts(const std::string& prop, const Poco::Any& value)
+{
+	int maxRetryAttempts = Poco::RefAnyCast<int>(value);
+	if (maxRetryAttempts < 0) throw Poco::InvalidArgumentException("maxRetryAttempts must be >= 0");
+	
+	_maxRetryAttempts = maxRetryAttempts;
+}
+
+
+Poco::Any SessionImpl::getMaxRetryAttempts(const std::string& prop)
+{
+	return Poco::Any(_maxRetryAttempts);
+}
+
+
+void SessionImpl::setMinRetrySleep(const std::string& prop, const Poco::Any& value)
+{
+	int minRetrySleep = Poco::RefAnyCast<int>(value);
+	if (minRetrySleep < 0 || minRetrySleep > _maxRetrySleep) throw Poco::InvalidArgumentException("minRetrySleep must be >= 0 and <= maxRetrySleep");
+
+	_minRetrySleep = minRetrySleep;
+}
+
+
+Poco::Any SessionImpl::getMinRetrySleep(const std::string& prop)
+{
+	return Poco::Any(_minRetrySleep);
+}
+
+
+void SessionImpl::setMaxRetrySleep(const std::string& prop, const Poco::Any& value)
+{
+	int maxRetrySleep = Poco::RefAnyCast<int>(value);
+	if (maxRetrySleep < _minRetrySleep) throw Poco::InvalidArgumentException("maxRetrySleep must be >= minRetrySleep");
+
+	_maxRetrySleep = maxRetrySleep;
+}
+
+
+Poco::Any SessionImpl::getMaxRetrySleep(const std::string& prop)
+{
+	return Poco::Any(_maxRetrySleep);
 }
 
 

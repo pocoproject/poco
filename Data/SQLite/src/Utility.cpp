@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#5 $
+// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#6 $
 //
 // Library: SQLite
 // Package: SQLite
