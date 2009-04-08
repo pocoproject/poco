@@ -1,7 +1,7 @@
 //
 // XMLConfiguration.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/XMLConfiguration.h#1 $
+// $Id: //poco/1.3/Util/include/Poco/Util/XMLConfiguration.h#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -44,6 +44,7 @@
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/AutoPtr.h"
+#include "Poco/DOM/DOMWriter.h"
 #include "Poco/SAX/InputSource.h"
 #include <istream>
 
@@ -86,9 +87,6 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	///
 	/// Enumerating attributes is not supported.
 	/// Calling keys("prop3.prop4") will return an empty range. 
-	///
-	/// Setting properties is not supported. An attempt to set a property results
-	/// in a NotImplementedException being thrown.
 {
 public:
 	XMLConfiguration();
@@ -131,6 +129,30 @@ public:
 	void load(const Poco::XML::Node* pNode);
 		/// Loads the XML document containing the configuration data
 		/// from the given XML node.
+	
+	void loadEmpty(const std::string& rootElementName);
+		/// Loads an empty XML document containing only the
+		/// root element with the given name.
+		
+	void save(const std::string& path) const;
+		/// Writes the XML document containing the configuration data
+		/// to the file given by path.
+
+	void save(std::ostream& str) const;
+		/// Writes the XML document containing the configuration data
+		/// to the given stream.
+
+	void save(Poco::XML::DOMWriter& writer, const std::string& path) const;
+		/// Writes the XML document containing the configuration data
+		/// to the file given by path, using the given DOMWriter.
+		///
+		/// This can be used to use a DOMWriter with custom options.
+
+	void save(Poco::XML::DOMWriter& writer, std::ostream& str) const;
+		/// Writes the XML document containing the configuration data
+		/// to the given stream.
+		///
+		/// This can be used to use a DOMWriter with custom options.
 
 protected:
 	bool getRaw(const std::string& key, std::string& value) const;
@@ -140,10 +162,10 @@ protected:
 
 private:
 	const Poco::XML::Node* findNode(const std::string& key) const;
-	static const Poco::XML::Node* findNode(std::string::const_iterator& it, const std::string::const_iterator& end, const Poco::XML::Node* pNode);
-	static const Poco::XML::Node* findElement(const std::string& name, const Poco::XML::Node* pNode);
-	static const Poco::XML::Node* findElement(int index, const Poco::XML::Node* pNode);
-	static const Poco::XML::Node* findAttribute(const std::string& name, const Poco::XML::Node* pNode);
+	static Poco::XML::Node* findNode(std::string::const_iterator& it, const std::string::const_iterator& end, Poco::XML::Node* pNode, bool create = false);
+	static Poco::XML::Node* findElement(const std::string& name, Poco::XML::Node* pNode, bool create);
+	static Poco::XML::Node* findElement(int index, Poco::XML::Node* pNode, bool create);
+	static Poco::XML::Node* findAttribute(const std::string& name, Poco::XML::Node* pNode, bool create);
 
 	Poco::XML::AutoPtr<Poco::XML::Node>     _pRoot;
 	Poco::XML::AutoPtr<Poco::XML::Document> _pDocument;

@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -98,21 +98,95 @@ void XMLConfigurationTest::testLoad()
 	
 	try
 	{
-		pConf->setString("foo", "bar");
-		fail("Not supported - must throw");
-	}
-	catch (NotImplementedException&)
-	{
-	}
-	
-	try
-	{
 		std::string s = pConf->getString("foo");
 		fail("No property - must throw");
 	}
 	catch (NotFoundException&)
 	{
 	}
+}
+
+
+void XMLConfigurationTest::testSave()
+{
+	AutoPtr<XMLConfiguration> pConf = new XMLConfiguration;
+	pConf->loadEmpty("config");
+	
+	std::ostringstream ostr;
+	pConf->save(ostr);
+	std::string s(ostr.str());
+	assert (s == "<config/>\n");
+	
+	pConf->setString("prop1", "value1");
+	assert (pConf->getString("prop1") == "value1");
+
+	pConf->setString("prop2", "value2");
+	assert (pConf->getString("prop2") == "value2");
+	
+	pConf->setString("prop3.prop4[@attr]", "value3");
+	assert (pConf->getString("prop3.prop4[@attr]") == "value3");
+
+	pConf->setString("prop3.prop4[1][@attr]", "value4");
+	assert (pConf->getString("prop3.prop4[1][@attr]") == "value4");
+
+	pConf->setString("prop5", "value5a");
+	assert (pConf->getString("prop5") == "value5a");
+
+	pConf->setString("prop5[0]", "value5");
+	assert (pConf->getString("prop5[0]") == "value5");
+	assert (pConf->getString("prop5") == "value5");
+
+	pConf->setString("prop5[1]", "value6");
+	assert (pConf->getString("prop5[1]") == "value6");
+
+	try
+	{
+		pConf->setString("prop5[3]", "value7");
+		fail("bad index - must throw");
+	}
+	catch (Poco::InvalidArgumentException&)
+	{
+	}
+	
+	std::ostringstream ostr2;
+	pConf->save(ostr2);
+	s = ostr2.str();
+	
+	assert (s ==
+		"<config>\n"
+		"\t<prop1>value1</prop1>\n"
+		"\t<prop2>value2</prop2>\n"
+		"\t<prop3>\n"
+		"\t\t<prop4 attr=\"value3\"/>\n"
+		"\t\t<prop4 attr=\"value4\"/>\n"
+		"\t</prop3>\n"
+		"\t<prop5>value5</prop5>\n"
+		"\t<prop5>value6</prop5>\n"
+		"</config>\n");
+		
+	pConf->setString("prop1", "value11");
+	assert (pConf->getString("prop1") == "value11");
+
+	pConf->setString("prop2", "value21");
+	assert (pConf->getString("prop2") == "value21");
+
+	pConf->setString("prop3.prop4[1][@attr]", "value41");
+	assert (pConf->getString("prop3.prop4[1][@attr]") == "value41");
+
+	std::ostringstream ostr3;
+	pConf->save(ostr3);
+	s = ostr3.str();
+	assert (s ==
+		"<config>\n"
+		"\t<prop1>value11</prop1>\n"
+		"\t<prop2>value21</prop2>\n"
+		"\t<prop3>\n"
+		"\t\t<prop4 attr=\"value3\"/>\n"
+		"\t\t<prop4 attr=\"value41\"/>\n"
+		"\t</prop3>\n"
+		"\t<prop5>value5</prop5>\n"
+		"\t<prop5>value6</prop5>\n"
+		"</config>\n");
 }
 
 
@@ -131,6 +205,7 @@ CppUnit::Test* XMLConfigurationTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("XMLConfigurationTest");
 
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoad);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testSave);
 
 	return pSuite;
 }
