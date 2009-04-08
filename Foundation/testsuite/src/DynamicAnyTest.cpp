@@ -766,9 +766,6 @@ void DynamicAnyTest::testChar()
 
 void DynamicAnyTest::testFloat()
 {
-	DynamicAny any("0");
-	float f = any;
-
 	float src = 32.0f;
 	DynamicAny a1 = src;
 	
@@ -840,10 +837,6 @@ void DynamicAnyTest::testFloat()
 
 void DynamicAnyTest::testDouble()
 {
-	double d = 0;
-	DynamicAny any(d);
-	float f = any;
-
 	double src = 32.0;
 	DynamicAny a1 = src;
 	

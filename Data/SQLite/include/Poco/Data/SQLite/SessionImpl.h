@@ -1,7 +1,7 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#3 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#4 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -86,16 +86,21 @@ public:
 	bool isConnected();
 		/// Returns true iff connected, false otherwise.
 
+protected:
+	void setTransactionMode(const std::string& prop, const Poco::Any& value);
+	Poco::Any getTransactionMode(const std::string& prop);
+	
 private:
 	void open();
 		/// Opens a connection to the Database.
 
 	std::string _dbFileName;
 	sqlite3*    _pDB;
+	std::string _transactionMode;
 	bool        _connected;
 	bool        _isTransaction;
 	
-	static const std::string DEFERRED_BEGIN_TRANSACTION;
+	static const std::string BEGIN_TRANSACTION;
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
 };

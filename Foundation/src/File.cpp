@@ -1,7 +1,7 @@
 //
 // File.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/File.cpp#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -157,6 +157,12 @@ bool File::isDirectory() const
 bool File::isLink() const
 {
 	return isLinkImpl();
+}
+
+
+bool File::isDevice() const
+{
+	return isDeviceImpl();
 }
 
 

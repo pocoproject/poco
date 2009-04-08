@@ -1,7 +1,7 @@
 //
 // StreamSocketImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/StreamSocketImpl.h#1 $
+// $Id: //poco/1.3/Net/include/Poco/Net/StreamSocketImpl.h#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -54,6 +54,10 @@ class Net_API StreamSocketImpl: public SocketImpl
 public:
 	StreamSocketImpl();
 		/// Creates a StreamSocketImpl.
+
+	explicit StreamSocketImpl(IPAddress::Family addressFamily);
+		/// Creates a SocketImpl, with the underlying
+		/// socket initialized for the given address family.
 		
 	StreamSocketImpl(poco_socket_t sockfd);
 		/// Creates a StreamSocketImpl using the given native socket.

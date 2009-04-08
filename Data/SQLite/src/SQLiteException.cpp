@@ -1,7 +1,7 @@
 //
 // SQLiteException.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SQLiteException.cpp#5 $
+// $Id: //poco/1.3/Data/SQLite/src/SQLiteException.cpp#6 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -48,8 +48,9 @@ POCO_IMPLEMENT_EXCEPTION(InvalidSQLStatementException, SQLiteException, "SQL Sta
 POCO_IMPLEMENT_EXCEPTION(InternalDBErrorException, SQLiteException, "SQLite internal error")
 POCO_IMPLEMENT_EXCEPTION(DBAccessDeniedException, SQLiteException, "Access permission denied")
 POCO_IMPLEMENT_EXCEPTION(ExecutionAbortedException, SQLiteException, "Execution of SQL statement aborted by callback")
-POCO_IMPLEMENT_EXCEPTION(DBLockedException, SQLiteException, "Database is locked")
-POCO_IMPLEMENT_EXCEPTION(TableLockedException, SQLiteException, "Table is locked")
+POCO_IMPLEMENT_EXCEPTION(LockedException, SQLiteException, "Database is locked")
+POCO_IMPLEMENT_EXCEPTION(DBLockedException, LockedException, "Database is locked")
+POCO_IMPLEMENT_EXCEPTION(TableLockedException, LockedException, "Table is locked")
 POCO_IMPLEMENT_EXCEPTION(NoMemoryException, SQLiteException, "Out of Memory")
 POCO_IMPLEMENT_EXCEPTION(ReadOnlyException, SQLiteException, "Attempt to write a readonly database")
 POCO_IMPLEMENT_EXCEPTION(InterruptException, SQLiteException, "Database operation interrupted")

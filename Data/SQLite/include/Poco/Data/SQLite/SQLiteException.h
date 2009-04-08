@@ -1,7 +1,7 @@
 //
 // SQLiteException.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SQLiteException.h#4 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SQLiteException.h#5 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -54,8 +54,9 @@ POCO_DECLARE_EXCEPTION(SQLite_API, InvalidSQLStatementException, SQLiteException
 POCO_DECLARE_EXCEPTION(SQLite_API, InternalDBErrorException, SQLiteException)
 POCO_DECLARE_EXCEPTION(SQLite_API, DBAccessDeniedException, SQLiteException)
 POCO_DECLARE_EXCEPTION(SQLite_API, ExecutionAbortedException, SQLiteException)
-POCO_DECLARE_EXCEPTION(SQLite_API, DBLockedException, SQLiteException)
-POCO_DECLARE_EXCEPTION(SQLite_API, TableLockedException, SQLiteException)
+POCO_DECLARE_EXCEPTION(SQLite_API, LockedException, SQLiteException)
+POCO_DECLARE_EXCEPTION(SQLite_API, DBLockedException, LockedException)
+POCO_DECLARE_EXCEPTION(SQLite_API, TableLockedException, LockedException)
 POCO_DECLARE_EXCEPTION(SQLite_API, NoMemoryException, SQLiteException)
 POCO_DECLARE_EXCEPTION(SQLite_API, ReadOnlyException, SQLiteException)
 POCO_DECLARE_EXCEPTION(SQLite_API, InterruptException, SQLiteException)

@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#14 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#15 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -187,6 +187,19 @@ bool FileImpl::isLinkImpl() const
 	struct stat st;
 	if (lstat(_path.c_str(), &st) == 0)
 		return S_ISLNK(st.st_mode);
+	else
+		handleLastErrorImpl(_path);
+	return false;
+}
+
+
+bool FileImpl::isDeviceImpl() const
+{
+	poco_assert (!_path.empty());
+
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+		return S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode);
 	else
 		handleLastErrorImpl(_path);
 	return false;

@@ -1,7 +1,7 @@
 //
 // SocketTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketTest.cpp#2 $
+// $Id: //poco/1.3/Net/testsuite/src/SocketTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -282,8 +282,8 @@ void SocketTest::testTimeout()
 void SocketTest::testBufferSize()
 {
 	EchoServer echoServer;
-	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	SocketAddress sa("localhost", 1234);
+	StreamSocket ss(sa.family());
 	
 	int osz = ss.getSendBufferSize();
 	int rsz = 32000;

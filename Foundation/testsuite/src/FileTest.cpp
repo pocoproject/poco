@@ -1,7 +1,7 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/FileTest.cpp#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FileTest.cpp#5 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -242,6 +242,21 @@ void FileTest::testFileAttributes2()
 	ts = Timestamp::fromEpochTime(1000000);
 	f.setLastModified(ts);
 	assert (f.getLastModified() == ts);
+}
+
+
+void FileTest::testFileAttributes3()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	File f("/dev/console");
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+	File f("CON");
+#endif
+
+	assert (f.isDevice());
+	assert (!f.isFile());
+	assert (!f.isDirectory());
+	assert (!f.isLink());
 }
 
 
@@ -511,6 +526,7 @@ CppUnit::Test* FileTest::suite()
 
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes1);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes2);
+	CppUnit_addTest(pSuite, FileTest, testFileAttributes3);
 	CppUnit_addTest(pSuite, FileTest, testCompare);
 	CppUnit_addTest(pSuite, FileTest, testSwap);
 	CppUnit_addTest(pSuite, FileTest, testSize);

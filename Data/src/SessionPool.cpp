@@ -1,7 +1,7 @@
 //
 // SessionPool.cpp
 //
-// $Id: //poco/1.3/Data/src/SessionPool.cpp#4 $
+// $Id: //poco/1.3/Data/src/SessionPool.cpp#6 $
 //
 // Library: Data
 // Package: SessionPooling
@@ -54,13 +54,13 @@ SessionPool::SessionPool(const std::string& sessionKey, const std::string& conne
 	_janitorTimer(1000*idleTime, 1000*idleTime/4)
 {
 	Poco::TimerCallback<SessionPool> callback(*this, &SessionPool::onJanitorTimer);
-	_janitorTimer.start(callback);
+	if (_idleTime > 0) _janitorTimer.start(callback);
 }
 
 
 SessionPool::~SessionPool()
 {
-	_janitorTimer.stop();
+	if (_idleTime > 0) _janitorTimer.stop();
 }
 
 
@@ -75,6 +75,7 @@ Session SessionPool::get()
 		if (_nSessions < _maxSessions)
 		{
 			Session newSession(SessionFactory::instance().create(_sessionKey, _connectionString));
+			customizeSession(newSession);
 			PooledSessionHolderPtr pHolder(new PooledSessionHolder(*this, newSession.impl()));
 			_idleSessions.push_front(pHolder);
 			++_nSessions;
@@ -155,6 +156,11 @@ int SessionPool::allocated() const
 int SessionPool::available() const
 {
 	return _maxSessions - used();
+}
+
+
+void SessionPool::customizeSession(Session&)
+{
 }
 
 

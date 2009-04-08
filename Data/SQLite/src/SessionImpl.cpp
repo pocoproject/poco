@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#4 $
+// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#5 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -46,7 +46,7 @@ namespace Data {
 namespace SQLite {
 
 
-const std::string SessionImpl::DEFERRED_BEGIN_TRANSACTION("BEGIN DEFERRED");
+const std::string SessionImpl::BEGIN_TRANSACTION("BEGIN ");
 const std::string SessionImpl::COMMIT_TRANSACTION("COMMIT");
 const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 
@@ -54,9 +54,11 @@ const std::string SessionImpl::ABORT_TRANSACTION("ROLLBACK");
 SessionImpl::SessionImpl(const std::string& fileName):
 	_dbFileName(fileName),
 	_pDB(0),
+	_transactionMode("DEFERRED"),
 	_connected(false),
 	_isTransaction(false)
 {
+	addProperty("transactionMode", &SessionImpl::setTransactionMode, &SessionImpl::getTransactionMode);
 	open();
 }
 
@@ -77,7 +79,7 @@ Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
 void SessionImpl::begin()
 {
 	SQLiteStatementImpl tmp(_pDB);
-	tmp.add(DEFERRED_BEGIN_TRANSACTION);
+	tmp.add(BEGIN_TRANSACTION + _transactionMode);
 	tmp.execute();
 	_isTransaction = true;
 }
@@ -131,6 +133,18 @@ void SessionImpl::close()
 bool SessionImpl::isConnected()
 {
 	return _connected;
+}
+
+
+void SessionImpl::setTransactionMode(const std::string& prop, const Poco::Any& value)
+{
+	_transactionMode = Poco::RefAnyCast<std::string>(value);
+}
+
+
+Poco::Any SessionImpl::getTransactionMode(const std::string& prop)
+{
+	return Poco::Any(_transactionMode);
 }
 
 

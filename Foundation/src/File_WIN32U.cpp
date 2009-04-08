@@ -1,7 +1,7 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_WIN32U.cpp#9 $
+// $Id: //poco/1.3/Foundation/src/File_WIN32U.cpp#10 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -169,12 +169,7 @@ bool FileImpl::canExecuteImpl() const
 
 bool FileImpl::isFileImpl() const
 {
-	poco_assert (!_path.empty());
-
-	DWORD attr = GetFileAttributesW(_upath.c_str());
-	if (attr == 0xFFFFFFFF)
-		handleLastErrorImpl(_path);
-	return (attr & FILE_ATTRIBUTE_DIRECTORY) == 0;
+	return !isDirectoryImpl() && !isDeviceImpl();
 }
 
 
@@ -191,6 +186,20 @@ bool FileImpl::isDirectoryImpl() const
 
 bool FileImpl::isLinkImpl() const
 {
+	return false;
+}
+
+
+bool FileImpl::isDeviceImpl() const
+{
+	poco_assert (!_path.empty());
+
+	FileHandle fh(_path, _upath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
+	DWORD type = GetFileType(fh.get());
+	if (type == FILE_TYPE_CHAR)
+		return true;
+	else if (type == FILE_TYPE_UNKNOWN && GetLastError() != NO_ERROR)
+		handleLastErrorImpl(_path);
 	return false;
 }
 
@@ -238,7 +247,7 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 	FILETIME ft;
 	ft.dwLowDateTime  = low;
 	ft.dwHighDateTime = high;
-	FileHandle fh(_path, _upath, FILE_ALL_ACCESS, FILE_SHARE_WRITE, OPEN_EXISTING);
+	FileHandle fh(_path, _upath, FILE_ALL_ACCESS, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
 	if (SetFileTime(fh.get(), 0, &ft, &ft) == 0)
 		handleLastErrorImpl(_path);
 }
@@ -262,7 +271,7 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 {
 	poco_assert (!_path.empty());
 
-	FileHandle fh(_path, _upath, GENERIC_WRITE, FILE_SHARE_WRITE, OPEN_EXISTING);
+	FileHandle fh(_path, _upath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING);
 	LARGE_INTEGER li;
 	li.QuadPart = size;
 	if (SetFilePointer(fh.get(), li.LowPart, &li.HighPart, FILE_BEGIN) == -1)

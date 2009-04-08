@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#7 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#8 $
 //
 // Library: Net
 // Package: Sockets
@@ -114,9 +114,10 @@ void SocketImpl::connect(const SocketAddress& address)
 
 void SocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
-	poco_assert (_sockfd == POCO_INVALID_SOCKET);
-	
-	init(address.af());
+	if (_sockfd == POCO_INVALID_SOCKET)
+	{
+		init(address.af());
+	}
 	setBlocking(false);
 	try
 	{

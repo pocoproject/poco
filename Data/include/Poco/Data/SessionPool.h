@@ -1,7 +1,7 @@
 //
 // SessionPool.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/SessionPool.h#2 $
+// $Id: //poco/1.3/Data/include/Poco/Data/SessionPool.h#4 $
 //
 // Library: Data
 // Package: SessionPooling
@@ -94,6 +94,8 @@ public:
 		/// The pool allows for at most maxSessions sessions to be created.
 		/// If a session has been idle for more than idleTime seconds, and more than
 		/// minSessions sessions are in the pool, the session is automatically destroyed.
+		///
+		/// If idleTime is 0, automatic cleanup of unused sessions is disabled.
 
 	~SessionPool();
 		/// Destroys the SessionPool.
@@ -128,6 +130,12 @@ public:
 		/// Returns the number of available (idle + remaining capacity) sessions.
 
 protected:
+	virtual void customizeSession(Session& session);
+		/// Can be overridden by subclass to perform custom initialization
+		/// of a newly created database session.
+		///
+		/// The default implementation does nothing.
+
 	typedef Poco::AutoPtr<PooledSessionHolder> PooledSessionHolderPtr;
 	typedef Poco::AutoPtr<PooledSessionImpl>   PooledSessionImplPtr;
 	typedef std::list<PooledSessionHolderPtr>  SessionList;
