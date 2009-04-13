@@ -63,7 +63,7 @@ class ODBC_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 public:
 	SessionImpl(const std::string& fileName, 
 		Poco::Any maxFieldSize = std::size_t(1024), 
-		bool enforceCapability=false,
+		bool enforceCapability=false, // @deprecated
 		bool autoBind=false,
 		bool autoExtract=false);
 		/// Creates the SessionImpl. Opens a connection to the database

@@ -9,7 +9,7 @@
 include $(POCO_BASE)/build/rules/global
 
 # adjust for the target system (usually '/usr/lib' or '/usr/local/lib')
-ODBCLIBDIR = /usr/local/lib
+ODBCLIBDIR = /usr/lib
 
 INCLUDE += -I/usr/local/include -I/usr/include -I/usr/include/odbc -I/usr/local/include/odbc
 SYSLIBS += -L/usr/local/lib/odbc -L/usr/lib/odbc -L/usr/lib -L/usr/local/lib
