@@ -71,6 +71,8 @@ set( BASE_SRCS
   src/Notification.cpp
   src/NotificationCenter.cpp
   src/NotificationQueue.cpp
+  src/TimedNotificationQueue.cpp
+  src/PriorityNotificationQueue.cpp
   src/NullChannel.cpp
   src/NullStream.cpp
   src/NumberFormatter.cpp
