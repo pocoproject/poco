@@ -1,7 +1,7 @@
 //
 // HTTPServerSession.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/HTTPServerSession.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/HTTPServerSession.h#5 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -43,14 +43,13 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/HTTPServerSession.h"
+#include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Timespan.h"
 
 
 namespace Poco {
 namespace Net {
-
-
-class HTTPServerParams;
 
 
 class Net_API HTTPServerSession: public HTTPSession
@@ -59,7 +58,7 @@ class Net_API HTTPServerSession: public HTTPSession
 	/// HTTPServer.
 {
 public:
-	HTTPServerSession(const StreamSocket& socket, HTTPServerParams* pParams);
+	HTTPServerSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServerSession.
 
 	virtual ~HTTPServerSession();

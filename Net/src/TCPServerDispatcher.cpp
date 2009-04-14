@@ -1,7 +1,7 @@
 //
 // TCPServerDispatcher.cpp
 //
-// $Id: //poco/Main/Net/src/TCPServerDispatcher.cpp#10 $
+// $Id: //poco/Main/Net/src/TCPServerDispatcher.cpp#11 $
 //
 // Library: Net
 // Package: TCPServer
@@ -139,7 +139,7 @@ void TCPServerDispatcher::run()
 		}
 	
 		FastMutex::ScopedLock lock(_mutex);
-		if (_stopped || _currentThreads > 1 && _queue.empty())
+		if (_stopped || (_currentThreads > 1 && _queue.empty()))
 		{
 			--_currentThreads;
 			break;

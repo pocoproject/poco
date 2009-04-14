@@ -1,7 +1,7 @@
 //
 // QuotedPrintableEncoder.cpp
 //
-// $Id: //poco/svn/Net/src/QuotedPrintableEncoder.cpp#2 $
+// $Id: //poco/Main/Net/src/QuotedPrintableEncoder.cpp#7 $
 //
 // Library: Net
 // Package: Messages
@@ -83,7 +83,7 @@ int QuotedPrintableEncoderBuf::writeToDevice(char c)
 		_pending = charToInt(c);
 		return _pending;
 	}
-	else if (c == '\r' || c == '\n' || c > 32 && c < 127 && c != '=')
+	else if (c == '\r' || c == '\n' || (c > 32 && c < 127 && c != '='))
 	{
 		writeRaw(c);
 	}

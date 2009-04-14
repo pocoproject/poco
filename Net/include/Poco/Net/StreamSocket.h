@@ -1,7 +1,7 @@
 //
 // StreamSocket.h
 //
-// $Id: //poco/Main/Net/include/Poco/Net/StreamSocket.h#3 $
+// $Id: //poco/Main/Net/include/Poco/Net/StreamSocket.h#4 $
 //
 // Library: Net
 // Package: Sockets
@@ -65,6 +65,15 @@ public:
 	explicit StreamSocket(const SocketAddress& address);
 		/// Creates a stream socket and connects it to
 		/// the socket specified by address.
+
+	explicit StreamSocket(IPAddress::Family family);
+		/// Creates an unconnected stream socket
+		/// for the given address family.
+		///
+		/// This is useful if certain socket options
+		/// (like send and receive buffer) sizes, that must 
+		/// be set before connecting the socket, will be
+		/// set later on.
 
 	StreamSocket(const Socket& socket);
 		/// Creates the StreamSocket with the SocketImpl

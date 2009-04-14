@@ -1,7 +1,7 @@
 //
 // DatagramSocketImpl.cpp
 //
-// $Id: //poco/svn/Net/src/DatagramSocketImpl.cpp#2 $
+// $Id: //poco/Main/Net/src/DatagramSocketImpl.cpp#7 $
 //
 // Library: Net
 // Package: Sockets
@@ -60,7 +60,6 @@ DatagramSocketImpl::DatagramSocketImpl(IPAddress::Family family)
 		init(AF_INET6);
 #endif
 	else throw InvalidArgumentException("Invalid or unsupported address family passed to DatagramSocketImpl");
-
 }
 
 	

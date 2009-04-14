@@ -1,7 +1,7 @@
 //
 // SocketAddress.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/SocketAddress.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/SocketAddress.h#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -126,6 +126,9 @@ public:
 	std::string toString() const;
 		/// Returns a string representation of the address.
 		
+	IPAddress::Family family() const;
+		/// Returns the address family of the host's address.
+		
 	enum
 	{
 		MAX_ADDRESS_LENGTH = 
@@ -153,6 +156,12 @@ private:
 inline void swap(SocketAddress& a1, SocketAddress& a2)
 {
 	a1.swap(a2);
+}
+
+
+inline IPAddress::Family SocketAddress::family() const
+{
+	return host().family();
 }
 
 

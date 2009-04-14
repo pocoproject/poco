@@ -1,7 +1,7 @@
 //
 // HostEntry.cpp
 //
-// $Id: //poco/Main/Net/src/HostEntry.cpp#8 $
+// $Id: //poco/Main/Net/src/HostEntry.cpp#9 $
 //
 // Library: Net
 // Package: NetCore
@@ -89,9 +89,21 @@ HostEntryImpl::HostEntryImpl(struct addrinfo* ainfo)
 	for (struct addrinfo* ai = ainfo; ai; ai = ai->ai_next)
 	{
 		if (ai->ai_canonname)
+		{
 			_name.assign(ai->ai_canonname);
+		}
 		else if (ai->ai_addrlen && ai->ai_addr)
-			_addresses.push_back(IPAddress(ai->ai_addr, (poco_socklen_t) ai->ai_addrlen));
+		{
+			switch (ai->ai_addr->sa_family)
+			{
+			case AF_INET:
+				_addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in*>(&ai->ai_addr)->sin_addr, sizeof(in_addr)));
+				break;
+			case AF_INET6:
+				_addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in6*>(&ai->ai_addr)->sin6_addr, sizeof(in6_addr)));
+				break;
+			}
+		}
 	}
 }
 

@@ -1,7 +1,7 @@
 //
 // StreamSocket.cpp
 //
-// $Id: //poco/Main/Net/src/StreamSocket.cpp#9 $
+// $Id: //poco/Main/Net/src/StreamSocket.cpp#10 $
 //
 // Library: Net
 // Package: Sockets
@@ -54,6 +54,11 @@ StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
 StreamSocket::StreamSocket(const SocketAddress& address): Socket(new StreamSocketImpl)
 {
 	connect(address);
+}
+
+
+StreamSocket::StreamSocket(IPAddress::Family family): Socket(new StreamSocketImpl(family))
+{
 }
 
 

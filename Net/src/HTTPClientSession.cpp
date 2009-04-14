@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#21 $
+// $Id: //poco/Main/Net/src/HTTPClientSession.cpp#22 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -175,7 +175,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	_pResponseStream = 0;
 
 	bool keepAlive = getKeepAlive();
-	if (connected() && !keepAlive || mustReconnect())
+	if ((connected() && !keepAlive) || mustReconnect())
 	{
 		close();
 		_mustReconnect = false;

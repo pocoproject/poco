@@ -1,7 +1,7 @@
 //
 // DatagramSocketImpl.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/DatagramSocketImpl.h#2 $
+// $Id: //poco/Main/Net/include/Poco/Net/DatagramSocketImpl.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -59,7 +59,7 @@ public:
 		/// be an IPv6 socket. Otherwise, it will be
 		/// an IPv4 socket.
 
-	DatagramSocketImpl(IPAddress::Family family);
+	explicit DatagramSocketImpl(IPAddress::Family family);
 		/// Creates an unconnected datagram socket.
 		///
 		/// The socket will be created for the

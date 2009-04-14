@@ -1,7 +1,7 @@
 //
 // HTTPServerSession.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerSession.cpp#9 $
+// $Id: //poco/Main/Net/src/HTTPServerSession.cpp#11 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -35,14 +35,13 @@
 
 
 #include "Poco/Net/HTTPServerSession.h"
-#include "Poco/Net/HTTPServerParams.h"
 
 
 namespace Poco {
 namespace Net {
 
 
-HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParams* pParams):
+HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams):
 	HTTPSession(socket, pParams->getKeepAlive()),
 	_firstRequest(true),
 	_keepAliveTimeout(pParams->getKeepAliveTimeout()),
