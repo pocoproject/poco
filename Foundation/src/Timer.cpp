@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/svn/Foundation/src/Timer.cpp#3 $
+// $Id: //poco/Main/Foundation/src/Timer.cpp#14 $
 //
 // Library: Foundation
 // Package: Threading
@@ -78,9 +78,13 @@ void Timer::start(const AbstractTimerCallback& method, ThreadPool& threadPool)
 
 void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority, ThreadPool& threadPool)
 {
+	Poco::Timestamp nextInvocation;
+	nextInvocation += _startInterval*1000;
+
 	poco_assert (!_pCallback);
 
 	FastMutex::ScopedLock lock(_mutex);	
+	_nextInvocation = nextInvocation;
 	_pCallback = method.clone();
 	_wakeUp.reset();
 	threadPool.startWithPriority(priority, *this);
@@ -157,14 +161,14 @@ void Timer::setPeriodicInterval(long milliseconds)
 
 void Timer::run()
 {
-	long interval;
-	{
-		FastMutex::ScopedLock lock(_mutex);
-		interval = _startInterval;
-	}
+	Poco::Timestamp now;
+	long interval(0);
 	do
 	{
-		if (_wakeUp.tryWait(interval))
+		now.update();
+		long sleep = static_cast<long>((_nextInvocation - now)/1000);
+		if (sleep < 0) sleep = 0;
+		if (_wakeUp.tryWait(sleep))
 		{
 			FastMutex::ScopedLock lock(_mutex);
 			interval = _periodicInterval;
@@ -192,6 +196,7 @@ void Timer::run()
 				interval = _periodicInterval;
 			}
 		}
+		_nextInvocation += interval*1000;
 	}
 	while (interval > 0);
 	_done.set();

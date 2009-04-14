@@ -1,7 +1,7 @@
 //
 // File_WIN32.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/File_WIN32.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/File_WIN32.h#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -65,6 +65,7 @@ protected:
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
 	bool isLinkImpl() const;
+	bool isDeviceImpl() const;
 	bool isHiddenImpl() const;
 	Timestamp createdImpl() const;
 	Timestamp getLastModifiedImpl() const;

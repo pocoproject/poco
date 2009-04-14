@@ -1,7 +1,7 @@
 //
 // NotificationQueueTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/NotificationQueueTest.cpp#2 $
+// $Id: //poco/Main/Foundation/testsuite/src/NotificationQueueTest.cpp#11 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -38,6 +38,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/RunnableAdapter.h"
+#include "Poco/Random.h"
 
 
 using Poco::NotificationQueue;
@@ -46,23 +47,26 @@ using Poco::Thread;
 using Poco::RunnableAdapter;
 
 
-class QTestNotification: public Notification
+namespace
 {
-public:
-	QTestNotification(const std::string& data): _data(data)
+	class QTestNotification: public Notification
 	{
-	}
-	~QTestNotification()
-	{
-	}
-	const std::string& data() const
-	{
-		return _data;
-	}
+	public:
+		QTestNotification(const std::string& data): _data(data)
+		{
+		}
+		~QTestNotification()
+		{
+		}
+		const std::string& data() const
+		{
+			return _data;
+		}
 
-private:
-	std::string _data;
-};
+	private:
+		std::string _data;
+	};
+}
 
 
 NotificationQueueTest::NotificationQueueTest(const std::string& name): CppUnit::TestCase(name)
@@ -171,6 +175,8 @@ void NotificationQueueTest::testWaitDequeue()
 
 void NotificationQueueTest::testThreads()
 {
+	const int NOTIFICATION_COUNT = 5000;
+
 	Thread t1("thread1");
 	Thread t2("thread2");
 	Thread t3("thread3");
@@ -179,7 +185,7 @@ void NotificationQueueTest::testThreads()
 	t1.start(ra);
 	t2.start(ra);
 	t3.start(ra);
-	for (int i = 0; i < 5000; ++i)
+	for (int i = 0; i < NOTIFICATION_COUNT; ++i)
 	{
 		_queue.enqueueNotification(new Notification);
 	}
@@ -189,10 +195,10 @@ void NotificationQueueTest::testThreads()
 	t1.join();
 	t2.join();
 	t3.join();
-	assert (_handled.size() == 5000);
-	assert (_handled.count("thread1") > 50);
-	assert (_handled.count("thread2") > 50);
-	assert (_handled.count("thread3") > 10);
+	assert (_handled.size() == NOTIFICATION_COUNT);
+	assert (_handled.count("thread1") > 0);
+	assert (_handled.count("thread2") > 0);
+	assert (_handled.count("thread3") > 0);
 }
 
 
@@ -217,6 +223,7 @@ void NotificationQueueTest::tearDown()
 
 void NotificationQueueTest::work()
 {
+	Poco::Random rnd;
 	Thread::sleep(50);
 	Notification* pNf = _queue.waitDequeueNotification();
 	while (pNf)
@@ -225,7 +232,7 @@ void NotificationQueueTest::work()
 		_mutex.lock();
 		_handled.insert(Thread::current()->name());
 		_mutex.unlock();
-		Thread::yield();
+		Thread::sleep(rnd.next(5));
 		pNf = _queue.waitDequeueNotification();
 	}
 }

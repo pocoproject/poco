@@ -1,7 +1,7 @@
 //
 // File_UNIX.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/File_UNIX.h#3 $
+// $Id: //poco/Main/Foundation/include/Poco/File_UNIX.h#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -64,6 +64,7 @@ protected:
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
 	bool isLinkImpl() const;
+	bool isDeviceImpl() const;
 	bool isHiddenImpl() const;
 	Timestamp createdImpl() const;
 	Timestamp getLastModifiedImpl() const;

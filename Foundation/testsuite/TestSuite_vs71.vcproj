@@ -553,6 +553,12 @@
 				<File
 					RelativePath=".\src\NotificationsTestSuite.cpp">
 				</File>
+				<File
+					RelativePath=".\src\PriorityNotificationQueueTest.cpp">
+				</File>
+				<File
+					RelativePath=".\src\TimedNotificationQueueTest.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -565,6 +571,12 @@
 				</File>
 				<File
 					RelativePath=".\src\NotificationsTestSuite.h">
+				</File>
+				<File
+					RelativePath=".\src\PriorityNotificationQueueTest.h">
+				</File>
+				<File
+					RelativePath=".\src\TimedNotificationQueueTest.h">
 				</File>
 			</Filter>
 		</Filter>
@@ -1210,30 +1222,23 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Dynamic"
-			>
+			Name="Dynamic">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\DynamicTestSuite.h"
-					>
+					RelativePath=".\src\DynamicTestSuite.h">
 				</File>
 				<File
-					RelativePath=".\src\VarTest.h"
-					>
+					RelativePath=".\src\VarTest.h">
 				</File>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\DynamicTestSuite.cpp"
-					>
+					RelativePath=".\src\DynamicTestSuite.cpp">
 				</File>
 				<File
-					RelativePath=".\src\VarTest.cpp"
-					>
+					RelativePath=".\src\VarTest.cpp">
 				</File>
 			</Filter>
 		</Filter>

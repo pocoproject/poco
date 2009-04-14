@@ -1,7 +1,7 @@
 //
 // NotificationCenter.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/NotificationCenter.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/NotificationCenter.h#4 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Notification.h"
 #include "Poco/Mutex.h"
 #include <list>
 
@@ -48,7 +49,6 @@
 namespace Poco {
 
 
-class Notification;
 class AbstractObserver;
 
 
@@ -116,7 +116,7 @@ public:
 	void removeObserver(const AbstractObserver& observer);
 		/// Unregisters an observer with the NotificationCenter.
 
-	void postNotification(Notification* pNotification);
+	void postNotification(Notification::Ptr pNotification);
 		/// Posts a notification to the NotificationCenter.
 		/// The NotificationCenter then delivers the notification
 		/// to all interested observers.

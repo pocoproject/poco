@@ -1,7 +1,7 @@
 //
 // FileTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/FileTest.h#2 $
+// $Id: //poco/Main/Foundation/testsuite/src/FileTest.h#12 $
 //
 // Definition of the FileTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testFileAttributes1();
 	void testCreateFile();
 	void testFileAttributes2();
+	void testFileAttributes3();
 	void testCompare();
 	void testSwap();
 	void testSize();

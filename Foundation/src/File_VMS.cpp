@@ -1,7 +1,7 @@
 //
 // File_VMS.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_VMS.cpp#4 $
+// $Id: //poco/Main/Foundation/src/File_VMS.cpp#18 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -164,6 +164,12 @@ bool FileImpl::isDirectoryImpl() const
 		return S_ISDIR(st.st_mode);
 	else
 		handleLastErrorImpl(_path);
+	return false;
+}
+
+
+bool FileImpl::isLinkImpl() const
+{
 	return false;
 }
 
