@@ -621,6 +621,34 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Timer"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\TimerTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TimerTestSuite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\TimerTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TimerTestSuite.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

@@ -26,6 +26,8 @@ src/Subsystem.cpp
 src/SystemConfiguration.cpp
 src/Validator.cpp
 src/XMLConfiguration.cpp
+src/Timer.cpp
+src/TimerTask.cpp
 )
 
 set( WIN_SRCS

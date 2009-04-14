@@ -19,6 +19,8 @@ src/SystemConfigurationTest.cpp
 src/UtilTestSuite.cpp
 src/ValidatorTest.cpp
 src/XMLConfigurationTest.cpp
+src/TimerTestSuite.cpp
+src/TimerTest.cpp
 )
 
 set( WIN_TEST_SRCS

@@ -14,7 +14,8 @@ objects = AbstractConfiguration Application ConfigurationMapper \
 	Option OptionException OptionProcessor OptionSet \
 	PropertyFileConfiguration Subsystem SystemConfiguration \
 	XMLConfiguration FilesystemConfiguration ServerApplication \
-	Validator IntValidator RegExpValidator OptionCallback
+	Validator IntValidator RegExpValidator OptionCallback \
+	Timer TimerTask
 
 ifeq ($(POCO_CONFIG),MinGW)
 	objects += WinService 

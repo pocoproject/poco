@@ -15,7 +15,8 @@ objects = AbstractConfigurationTest ConfigurationTestSuite \
 	OptionProcessorTest OptionSetTest OptionTest \
 	OptionsTestSuite PropertyFileConfigurationTest \
 	SystemConfigurationTest UtilTestSuite XMLConfigurationTest \
-	FilesystemConfigurationTest ValidatorTest
+	FilesystemConfigurationTest ValidatorTest \
+	TimerTest TimerTestSuite
 
 target         = testrunner
 target_version = 1
