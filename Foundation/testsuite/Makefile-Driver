@@ -20,6 +20,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	NamedEventTest NamedMutexTest ProcessesTestSuite ProcessTest \
 	MemoryPoolTest MD2EngineTest MD4EngineTest MD5EngineTest ManifestTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
+	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
 	NumberParserTest PathTest PatternFormatterTest RWLockTest \
 	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest \

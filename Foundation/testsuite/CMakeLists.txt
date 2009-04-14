@@ -65,6 +65,8 @@ src/NamedMutexTest.cpp
 src/NamedTuplesTest.cpp
 src/NotificationCenterTest.cpp
 src/NotificationQueueTest.cpp
+src/PriorityNotificationQueueTest.cpp
+src/TimedNotificationQueueTest.cpp
 src/NotificationsTestSuite.cpp
 src/NullStreamTest.cpp
 src/NumberFormatterTest.cpp
