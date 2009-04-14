@@ -1,13 +1,9 @@
 //
-// Notification.h
+// TimerTest.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Notification.h#2 $
+// $Id: //poco/1.3/Util/testsuite/src/TimerTest.h#1 $
 //
-// Library: Foundation
-// Package: Notifications
-// Module:  Notification
-//
-// Definition of the Notification class.
+// Definition of the TimerTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,42 +32,36 @@
 //
 
 
-#ifndef Foundation_Notification_INCLUDED
-#define Foundation_Notification_INCLUDED
+#ifndef TimerTest_INCLUDED
+#define TimerTest_INCLUDED
 
 
-#include "Poco/Foundation.h"
-#include "Poco/Mutex.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/AutoPtr.h"
+#include "Poco/Util/Util.h"
+#include "CppUnit/TestCase.h"
+#include "Poco/Util/TimerTask.h"
+#include "Poco/Event.h"
 
 
-namespace Poco {
-
-
-class Foundation_API Notification: public RefCountedObject
-	/// The base class for all notification classes used
-	/// with the NotificationCenter and the NotificationQueue
-	/// classes.
-	/// The Notification class can be used with the AutoPtr
-	/// template class.
+class TimerTest: public CppUnit::TestCase
 {
 public:
-	typedef AutoPtr<Notification> Ptr;
+	TimerTest(const std::string& name);
+	~TimerTest();
+
+	void testSchedule();
+	void testScheduleInterval();
+	void testScheduleAtFixedRate();
+
+	void setUp();
+	void tearDown();
 	
-	Notification();
-		/// Creates the notification.
+	void onTimer(Poco::Util::TimerTask& task);
 
-	virtual std::string name() const;
-		/// Returns the name of the notification.
-		/// The default implementation returns the class name.
+	static CppUnit::Test* suite();
 
-protected:
-	virtual ~Notification();
+private:
+	Poco::Event _event;
 };
 
 
-} // namespace Poco
-
-
-#endif // Foundation_Notification_INCLUDED
+#endif // TimerTest_INCLUDED

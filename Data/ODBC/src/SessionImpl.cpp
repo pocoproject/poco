@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/SessionImpl.cpp#3 $
+// $Id: //poco/1.3/Data/ODBC/src/SessionImpl.cpp#4 $
 //
 // Library: ODBC
 // Package: ODBC

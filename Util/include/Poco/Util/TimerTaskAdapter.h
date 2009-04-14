@@ -1,15 +1,15 @@
 //
-// Notification.h
+// TimerTaskAdapter.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Notification.h#2 $
+// $Id: //poco/1.3/Util/include/Poco/Util/TimerTaskAdapter.h#1 $
 //
-// Library: Foundation
-// Package: Notifications
-// Module:  Notification
+// Library: Util
+// Package: Timer
+// Module:  TimerTaskAdapter
 //
-// Definition of the Notification class.
+// Definition of the TimerTaskAdapter class template.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,42 +36,56 @@
 //
 
 
-#ifndef Foundation_Notification_INCLUDED
-#define Foundation_Notification_INCLUDED
+#ifndef Util_TimerTaskAdapter_INCLUDED
+#define Util_TimerTaskAdapter_INCLUDED
 
 
-#include "Poco/Foundation.h"
-#include "Poco/Mutex.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/AutoPtr.h"
+#include "Poco/Util/Util.h"
+#include "Poco/Util/TimerTask.h"
 
 
 namespace Poco {
+namespace Util {
 
 
-class Foundation_API Notification: public RefCountedObject
-	/// The base class for all notification classes used
-	/// with the NotificationCenter and the NotificationQueue
-	/// classes.
-	/// The Notification class can be used with the AutoPtr
-	/// template class.
+template <class C>
+class TimerTaskAdapter: public TimerTask
+	/// This class template simplifies the implementation
+	/// of TimerTask objects by allowing a member function
+	/// of an object to be called as task. 
 {
 public:
-	typedef AutoPtr<Notification> Ptr;
+	typedef void (C::*Callback)(TimerTask&);
 	
-	Notification();
-		/// Creates the notification.
-
-	virtual std::string name() const;
-		/// Returns the name of the notification.
-		/// The default implementation returns the class name.
-
+	TimerTaskAdapter(C& object, Callback method): _pObject(&object), _method(method)
+		/// Creates the TimerTaskAdapter, using the given 
+		/// object and its member function as task target.
+		///
+		/// The member function must accept one argument,
+		/// a reference to a TimerTask object.
+	{
+	}
+	
+	void run()
+	{
+		(_pObject->*_method)(*this);
+	}
+			
 protected:
-	virtual ~Notification();
+	~TimerTaskAdapter()
+		/// Destroys the TimerTaskAdapter.
+	{
+	}
+	
+private:
+	TimerTaskAdapter();
+
+	C*       _pObject;
+	Callback _method;
 };
 
 
-} // namespace Poco
+} } // namespace Poco::Util
 
 
-#endif // Foundation_Notification_INCLUDED
+#endif // Util_TimerTaskAdapter_INCLUDED

@@ -762,6 +762,14 @@
 					RelativePath=".\src\NotificationsTestSuite.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\PriorityNotificationQueueTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TimedNotificationQueueTest.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -776,6 +784,14 @@
 				</File>
 				<File
 					RelativePath=".\src\NotificationsTestSuite.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PriorityNotificationQueueTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TimedNotificationQueueTest.h"
 					>
 				</File>
 			</Filter>

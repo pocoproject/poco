@@ -1,7 +1,7 @@
 //
 // NotificationCenter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NotificationCenter.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/NotificationCenter.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -80,12 +80,11 @@ void NotificationCenter::removeObserver(const AbstractObserver& observer)
 }
 
 
-void NotificationCenter::postNotification(Notification* pNotification)
+void NotificationCenter::postNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
 
 	Mutex::ScopedLock lock(_mutex);
-	AutoPtr<Notification> pNf = pNotification;
 	ObserverList::iterator it = _observers.begin();
 	while (it != _observers.end())
 	{

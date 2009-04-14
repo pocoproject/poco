@@ -6,6 +6,7 @@
 	ProjectGUID="{6FF56CDB-787A-4714-A28C-919003F9FA6C}"
 	RootNamespace="Util"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -99,9 +100,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -193,9 +191,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -631,6 +626,38 @@
 			<Filter
 				Name="Source Files"
 				>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Timer"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Util\Timer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\TimerTask.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\TimerTaskAdapter.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\Timer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TimerTask.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>

@@ -1,13 +1,13 @@
 //
-// NotificationQueue.cpp
+// PriorityNotificationQueue.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NotificationQueue.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/PriorityNotificationQueue.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications
-// Module:  NotificationQueue
+// Module:  PriorityNotificationQueue
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,7 +34,7 @@
 //
 
 
-#include "Poco/NotificationQueue.h"
+#include "Poco/PriorityNotificationQueue.h"
 #include "Poco/NotificationCenter.h"
 #include "Poco/Notification.h"
 #include "Poco/SingletonHolder.h"
@@ -43,27 +43,28 @@
 namespace Poco {
 
 
-NotificationQueue::NotificationQueue()
+PriorityNotificationQueue::PriorityNotificationQueue()
 {
 }
 
 
-NotificationQueue::~NotificationQueue()
+PriorityNotificationQueue::~PriorityNotificationQueue()
 {
 	clear();
 }
 
 
-void NotificationQueue::enqueueNotification(Notification::Ptr pNotification)
+void PriorityNotificationQueue::enqueueNotification(Notification::Ptr pNotification, int priority)
 {
 	poco_check_ptr (pNotification);
 	FastMutex::ScopedLock lock(_mutex);
 	if (_waitQueue.empty())
 	{
-		_nfQueue.push_back(pNotification);
+		_nfQueue.insert(NfQueue::value_type(priority, pNotification));
 	}
 	else
 	{
+		poco_assert_dbg(_nfQueue.empty());
 		WaitInfo* pWI = _waitQueue.front();
 		_waitQueue.pop_front();
 		pWI->pNf = pNotification;
@@ -72,32 +73,14 @@ void NotificationQueue::enqueueNotification(Notification::Ptr pNotification)
 }
 
 
-void NotificationQueue::enqueueUrgentNotification(Notification::Ptr pNotification)
-{
-	poco_check_ptr (pNotification);
-	FastMutex::ScopedLock lock(_mutex);
-	if (_waitQueue.empty())
-	{
-		_nfQueue.push_front(pNotification);
-	}
-	else
-	{
-		WaitInfo* pWI = _waitQueue.front();
-		_waitQueue.pop_front();
-		pWI->pNf = pNotification;
-		pWI->nfAvailable.set();
-	}	
-}
-
-
-Notification* NotificationQueue::dequeueNotification()
+Notification* PriorityNotificationQueue::dequeueNotification()
 {
 	FastMutex::ScopedLock lock(_mutex);
 	return dequeueOne().duplicate();
 }
 
 
-Notification* NotificationQueue::waitDequeueNotification()
+Notification* PriorityNotificationQueue::waitDequeueNotification()
 {
 	Notification::Ptr pNf;
 	WaitInfo* pWI = 0;
@@ -115,7 +98,7 @@ Notification* NotificationQueue::waitDequeueNotification()
 }
 
 
-Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
+Notification* PriorityNotificationQueue::waitDequeueNotification(long milliseconds)
 {
 	Notification::Ptr pNf;
 	WaitInfo* pWI = 0;
@@ -148,7 +131,7 @@ Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 }
 
 
-void NotificationQueue::dispatch(NotificationCenter& notificationCenter)
+void PriorityNotificationQueue::dispatch(NotificationCenter& notificationCenter)
 {
 	FastMutex::ScopedLock lock(_mutex);
 	Notification::Ptr pNf = dequeueOne();
@@ -160,7 +143,7 @@ void NotificationQueue::dispatch(NotificationCenter& notificationCenter)
 }
 
 
-void NotificationQueue::wakeUpAll()
+void PriorityNotificationQueue::wakeUpAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
 	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
@@ -171,49 +154,50 @@ void NotificationQueue::wakeUpAll()
 }
 
 
-bool NotificationQueue::empty() const
+bool PriorityNotificationQueue::empty() const
 {
 	FastMutex::ScopedLock lock(_mutex);
 	return _nfQueue.empty();
 }
 
 	
-int NotificationQueue::size() const
+int PriorityNotificationQueue::size() const
 {
 	FastMutex::ScopedLock lock(_mutex);
 	return static_cast<int>(_nfQueue.size());
 }
 
 
-void NotificationQueue::clear()
+void PriorityNotificationQueue::clear()
 {
 	FastMutex::ScopedLock lock(_mutex);
 	_nfQueue.clear();	
 }
 
 
-bool NotificationQueue::hasIdleThreads() const
+bool PriorityNotificationQueue::hasIdleThreads() const
 {
 	FastMutex::ScopedLock lock(_mutex);
 	return !_waitQueue.empty();
 }
 
 
-Notification::Ptr NotificationQueue::dequeueOne()
+Notification::Ptr PriorityNotificationQueue::dequeueOne()
 {
 	Notification::Ptr pNf;
-	if (!_nfQueue.empty())
+	NfQueue::iterator it = _nfQueue.begin();
+	if (it != _nfQueue.end())
 	{
-		pNf = _nfQueue.front();
-		_nfQueue.pop_front();
+		pNf = it->second;
+		_nfQueue.erase(it);
 	}
 	return pNf;
 }
 
 
-NotificationQueue& NotificationQueue::defaultQueue()
+PriorityNotificationQueue& PriorityNotificationQueue::defaultQueue()
 {
-	static SingletonHolder<NotificationQueue> sh;
+	static SingletonHolder<PriorityNotificationQueue> sh;
 	return *sh.get();
 }
 

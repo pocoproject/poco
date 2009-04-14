@@ -468,6 +468,33 @@
 				Filter="">
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Timer"
+			Filter="">
+			<Filter
+				Name="Header Files"
+				Filter="">
+				<File
+					RelativePath=".\include\Poco\Util\Timer.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\TimerTask.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\TimerTaskAdapter.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				Filter="">
+				<File
+					RelativePath=".\src\Timer.cpp">
+				</File>
+				<File
+					RelativePath=".\src\TimerTask.cpp">
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

@@ -1,7 +1,7 @@
 //
 // NotificationsTestSuite.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/NotificationsTestSuite.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/NotificationsTestSuite.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -33,6 +33,8 @@
 #include "NotificationsTestSuite.h"
 #include "NotificationCenterTest.h"
 #include "NotificationQueueTest.h"
+#include "PriorityNotificationQueueTest.h"
+#include "TimedNotificationQueueTest.h"
 
 
 CppUnit::Test* NotificationsTestSuite::suite()
@@ -41,6 +43,8 @@ CppUnit::Test* NotificationsTestSuite::suite()
 
 	pSuite->addTest(NotificationCenterTest::suite());
 	pSuite->addTest(NotificationQueueTest::suite());
+	pSuite->addTest(PriorityNotificationQueueTest::suite());
+	pSuite->addTest(TimedNotificationQueueTest::suite());
 
 	return pSuite;
 }

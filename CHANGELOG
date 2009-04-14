@@ -43,7 +43,30 @@ Release 1.3.4 (2009-04-xx)
   This also fixes SF# 1944831: Glob::glob on windows should be case insensitve
 - added Twitter client sample to Net library
 - Fixed SF# 2513643: Seg fault in Poco::UTF8::toLower on 64-bit Linux
-
+- Poco::Data::SessionPool: the janitor can be disabled by specifying a zero idle time.
+- added Poco::Data::SessionPool::customizeSession()
+- added support for different SQLite transaction modes (DEFERRED, IMMEDIATE, EXCLUSIVE)
+- fixed a few wrong #if POCO_HAVE_IPv6 in the Net library
+- added support for creating an initialized, but unconnected StreamSocket.
+- added File::isDevice()
+- added family() member function to SocketAddress,
+- Data::SQLite: added support for automatic retries if the database is locked
+- XMLConfiguration is now writable
+- fixed an IPv6 implementation for Windows bug in HostEntry
+- Timer class improvement: interval between callback is no longer influenced by the 
+  time needed to execute the callback.
+- added PriorityNotificationQueue and TimedNotificationQueue classes to Foundation. 
+  These are variants of the NotificationQueue class that support priority and 
+  timestamp-tagged notifications.
+- added Poco::Util::Timer class. This implements a timer that can schedule different 
+  tasks at different times, using only one thread.
+- the signatures of Poco::NotificationQueue and Poco::NotificationCenter member functions 
+  have been changed to accept a Poco::Notification::Ptr instead of Poco::Notification* 
+  to improve exception safety. This change should be transparent and fully backwards 
+  compatible. The signature of the methods returning a Poco::Notification* have not been 
+  changed for backwards compatibility. It is recommended, that any Notification* obtained 
+  should be immediately assigned to a Notification::Ptr.	
+	  
 
 Release 1.3.3p1 (2008-10-09)
 ============================
@@ -973,4 +996,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#40 $
+$Id: //poco/1.3/dist/CHANGELOG#41 $

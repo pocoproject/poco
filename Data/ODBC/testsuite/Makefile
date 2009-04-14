@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Data/ODBC/testsuite/Makefile#6 $
+# $Id: //poco/1.3/Data/ODBC/testsuite/Makefile#7 $
 #
 # Makefile for Poco SQLite testsuite
 #

@@ -1,15 +1,15 @@
 //
-// NotificationQueue.h
+// TimedNotificationQueue.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/NotificationQueue.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/TimedNotificationQueue.h#3 $
 //
 // Library: Foundation
 // Package: Notifications
-// Module:  NotificationQueue
+// Module:  TimedNotificationQueue
 //
-// Definition of the NotificationQueue class.
+// Definition of the TimedNotificationQueue class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,66 +36,61 @@
 //
 
 
-#ifndef Foundation_NotificationQueue_INCLUDED
-#define Foundation_NotificationQueue_INCLUDED
+#ifndef Foundation_TimedNotificationQueue_INCLUDED
+#define Foundation_TimedNotificationQueue_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "Poco/Notification.h"
 #include "Poco/Mutex.h"
 #include "Poco/Event.h"
-#include <deque>
+#include "Poco/Timestamp.h"
+#include <map>
 
 
 namespace Poco {
 
 
-class NotificationCenter;
-
-
-class Foundation_API NotificationQueue
-	/// A NotificationQueue object provides a way to implement asynchronous
+class Foundation_API TimedNotificationQueue
+	/// A TimedNotificationQueue object provides a way to implement timed, asynchronous
 	/// notifications. This is especially useful for sending notifications
 	/// from one thread to another, for example from a background thread to 
 	/// the main (user interface) thread. 
-	/// 
-	/// The NotificationQueue can also be used to distribute work from
-	/// a controlling thread to one or more worker threads. Each worker thread
-	/// repeatedly calls waitDequeueNotification() and processes the
-	/// returned notification. Special care must be taken when shutting
-	/// down a queue with worker threads waiting for notifications.
-	/// The recommended sequence to shut down and destroy the queue is to
-	///   1. set a termination flag for every worker thread
-	///   2. call the wakeUpAll() method
-	///   3. join each worker thread
-	///   4. destroy the notification queue.
+	///
+	/// The TimedNotificationQueue is quite similar to the NotificationQueue class.
+	/// The only difference to NotificationQueue is that each Notification is tagged
+	/// with a Timestamp. When inserting a Notification into the queue, the
+	/// Notification is inserted according to the given Timestamp, with 
+	/// lower Timestamp values being inserted before higher ones.
+	///
+	/// Notifications are dequeued in order of their timestamps.
+	///
+	/// TimedNotificationQueue has some restrictions regarding multithreaded use.
+	/// While multiple threads may enqueue notifications, only one thread at a
+	/// time may dequeue notifications from the queue.
+	///
+	/// If two threads try to dequeue a notification simultaneously, the results
+	/// are undefined.
 {
 public:
-	NotificationQueue();
-		/// Creates the NotificationQueue.
+	TimedNotificationQueue();
+		/// Creates the TimedNotificationQueue.
 
-	~NotificationQueue();
-		/// Destroys the NotificationQueue.
+	~TimedNotificationQueue();
+		/// Destroys the TimedNotificationQueue.
 
-	void enqueueNotification(Notification::Ptr pNotification);
+	void enqueueNotification(Notification::Ptr pNotification, Timestamp timestamp);
 		/// Enqueues the given notification by adding it to
-		/// the end of the queue (FIFO).
+		/// the queue according to the given timestamp.
+		/// Lower timestamp values are inserted before higher ones.
 		/// The queue takes ownership of the notification, thus
 		/// a call like
-		///     notificationQueue.enqueueNotification(new MyNotification);
-		/// does not result in a memory leak.
-		
-	void enqueueUrgentNotification(Notification::Ptr pNotification);
-		/// Enqueues the given notification by adding it to
-		/// the front of the queue (LIFO). The event therefore gets processed
-		/// before all other events already in the queue.
-		/// The queue takes ownership of the notification, thus
-		/// a call like
-		///     notificationQueue.enqueueUrgentNotification(new MyNotification);
+		///     notificationQueue.enqueueNotification(new MyNotification, someTime);
 		/// does not result in a memory leak.
 
 	Notification* dequeueNotification();
-		/// Dequeues the next pending notification.
+		/// Dequeues the next pending notification with a timestamp
+		/// less than or equal to the current time.
 		/// Returns 0 (null) if no notification is available.
 		/// The caller gains ownership of the notification and
 		/// is expected to release it when done with it.
@@ -103,7 +98,7 @@ public:
 		/// It is highly recommended that the result is immediately
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
-
+		
 	Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
@@ -129,13 +124,6 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	void dispatch(NotificationCenter& notificationCenter);
-		/// Dispatches all queued notifications to the given
-		/// notification center.
-
-	void wakeUpAll();
-		/// Wakes up all threads that wait for a notification.
-	
 	bool empty() const;
 		/// Returns true iff the queue is empty.
 		
@@ -144,29 +132,19 @@ public:
 
 	void clear();
 		/// Removes all notifications from the queue.
-		
-	bool hasIdleThreads() const;	
-		/// Returns true if the queue has at least one thread waiting 
-		/// for a notification.
-		
-	static NotificationQueue& defaultQueue();
-		/// Returns a reference to the default
-		/// NotificationQueue.
+		///
+		/// Calling clear() while another thread executes one of
+		/// the dequeue member functions will result in undefined
+		/// behavior.
 
 protected:
-	Notification::Ptr dequeueOne();
+	typedef std::multimap<Timestamp, Notification::Ptr> NfQueue;
+	Notification::Ptr dequeueOne(NfQueue::iterator& it);
+	bool wait(Timestamp::TimeDiff interval);
 	
 private:
-	typedef std::deque<Notification::Ptr> NfQueue;
-	struct WaitInfo
-	{
-		Notification::Ptr pNf;
-		Event             nfAvailable;
-	};
-	typedef std::deque<WaitInfo*> WaitQueue;
-
-	NfQueue           _nfQueue;
-	WaitQueue         _waitQueue;
+	NfQueue _nfQueue;
+	Event   _nfAvailable;
 	mutable FastMutex _mutex;
 };
 
@@ -174,4 +152,4 @@ private:
 } // namespace Poco
 
 
-#endif // Foundation_NotificationQueue_INCLUDED
+#endif // Foundation_TimedNotificationQueue_INCLUDED

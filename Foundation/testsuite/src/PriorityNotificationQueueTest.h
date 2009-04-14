@@ -1,15 +1,11 @@
 //
-// Notification.h
+// PriorityNotificationQueueTest.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Notification.h#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/PriorityNotificationQueueTest.h#1 $
 //
-// Library: Foundation
-// Package: Notifications
-// Module:  Notification
+// Definition of the PriorityNotificationQueueTest class.
 //
-// Definition of the Notification class.
-//
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,42 +32,41 @@
 //
 
 
-#ifndef Foundation_Notification_INCLUDED
-#define Foundation_Notification_INCLUDED
+#ifndef PriorityNotificationQueueTest_INCLUDED
+#define PriorityNotificationQueueTest_INCLUDED
 
 
 #include "Poco/Foundation.h"
+#include "CppUnit/TestCase.h"
+#include "Poco/PriorityNotificationQueue.h"
 #include "Poco/Mutex.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/AutoPtr.h"
+#include <set>
 
 
-namespace Poco {
-
-
-class Foundation_API Notification: public RefCountedObject
-	/// The base class for all notification classes used
-	/// with the NotificationCenter and the NotificationQueue
-	/// classes.
-	/// The Notification class can be used with the AutoPtr
-	/// template class.
+class PriorityNotificationQueueTest: public CppUnit::TestCase
 {
 public:
-	typedef AutoPtr<Notification> Ptr;
-	
-	Notification();
-		/// Creates the notification.
+	PriorityNotificationQueueTest(const std::string& name);
+	~PriorityNotificationQueueTest();
 
-	virtual std::string name() const;
-		/// Returns the name of the notification.
-		/// The default implementation returns the class name.
+	void testQueueDequeue();
+	void testWaitDequeue();
+	void testThreads();
+	void testDefaultQueue();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
 
 protected:
-	virtual ~Notification();
+	void work();
+
+private:
+	Poco::PriorityNotificationQueue    _queue;
+	std::multiset<std::string> _handled;
+	Poco::FastMutex            _mutex;
 };
 
 
-} // namespace Poco
-
-
-#endif // Foundation_Notification_INCLUDED
+#endif // PriorityNotificationQueueTest_INCLUDED

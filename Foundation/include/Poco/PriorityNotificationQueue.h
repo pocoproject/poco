@@ -1,15 +1,15 @@
 //
-// NotificationQueue.h
+// PriorityNotificationQueue.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/NotificationQueue.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/PriorityNotificationQueue.h#2 $
 //
 // Library: Foundation
 // Package: Notifications
-// Module:  NotificationQueue
+// Module:  PriorityNotificationQueue
 //
-// Definition of the NotificationQueue class.
+// Definition of the PriorityNotificationQueue class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,14 +36,15 @@
 //
 
 
-#ifndef Foundation_NotificationQueue_INCLUDED
-#define Foundation_NotificationQueue_INCLUDED
+#ifndef Foundation_PriorityNotificationQueue_INCLUDED
+#define Foundation_PriorityNotificationQueue_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "Poco/Notification.h"
 #include "Poco/Mutex.h"
 #include "Poco/Event.h"
+#include <map>
 #include <deque>
 
 
@@ -53,13 +54,23 @@ namespace Poco {
 class NotificationCenter;
 
 
-class Foundation_API NotificationQueue
-	/// A NotificationQueue object provides a way to implement asynchronous
+class Foundation_API PriorityNotificationQueue
+	/// A PriorityNotificationQueue object provides a way to implement asynchronous
 	/// notifications. This is especially useful for sending notifications
 	/// from one thread to another, for example from a background thread to 
 	/// the main (user interface) thread. 
+	///
+	/// The PriorityNotificationQueue is quite similar to the NotificationQueue class.
+	/// The only difference to NotificationQueue is that each Notification is tagged
+	/// with a priority value. When inserting a Notification into the queue, the
+	/// Notification is inserted according to the given priority value, with 
+	/// lower priority values being inserted before higher priority
+	/// values. Therefore, the lower the numerical priority value, the higher
+	/// the actual notification priority. 
+	///
+	/// Notifications are dequeued in order of their priority.
 	/// 
-	/// The NotificationQueue can also be used to distribute work from
+	/// The PriorityNotificationQueue can also be used to distribute work from
 	/// a controlling thread to one or more worker threads. Each worker thread
 	/// repeatedly calls waitDequeueNotification() and processes the
 	/// returned notification. Special care must be taken when shutting
@@ -71,29 +82,21 @@ class Foundation_API NotificationQueue
 	///   4. destroy the notification queue.
 {
 public:
-	NotificationQueue();
-		/// Creates the NotificationQueue.
+	PriorityNotificationQueue();
+		/// Creates the PriorityNotificationQueue.
 
-	~NotificationQueue();
-		/// Destroys the NotificationQueue.
+	~PriorityNotificationQueue();
+		/// Destroys the PriorityNotificationQueue.
 
-	void enqueueNotification(Notification::Ptr pNotification);
+	void enqueueNotification(Notification::Ptr pNotification, int priority);
 		/// Enqueues the given notification by adding it to
-		/// the end of the queue (FIFO).
+		/// the queue according to the given priority.
+		/// Lower priority values are inserted before higher priority values.
 		/// The queue takes ownership of the notification, thus
 		/// a call like
-		///     notificationQueue.enqueueNotification(new MyNotification);
+		///     notificationQueue.enqueueNotification(new MyNotification, 1);
 		/// does not result in a memory leak.
 		
-	void enqueueUrgentNotification(Notification::Ptr pNotification);
-		/// Enqueues the given notification by adding it to
-		/// the front of the queue (LIFO). The event therefore gets processed
-		/// before all other events already in the queue.
-		/// The queue takes ownership of the notification, thus
-		/// a call like
-		///     notificationQueue.enqueueUrgentNotification(new MyNotification);
-		/// does not result in a memory leak.
-
 	Notification* dequeueNotification();
 		/// Dequeues the next pending notification.
 		/// Returns 0 (null) if no notification is available.
@@ -149,19 +152,19 @@ public:
 		/// Returns true if the queue has at least one thread waiting 
 		/// for a notification.
 		
-	static NotificationQueue& defaultQueue();
+	static PriorityNotificationQueue& defaultQueue();
 		/// Returns a reference to the default
-		/// NotificationQueue.
+		/// PriorityNotificationQueue.
 
 protected:
 	Notification::Ptr dequeueOne();
 	
 private:
-	typedef std::deque<Notification::Ptr> NfQueue;
+	typedef std::multimap<int, Notification::Ptr> NfQueue;
 	struct WaitInfo
 	{
 		Notification::Ptr pNf;
-		Event             nfAvailable;
+		Event nfAvailable;
 	};
 	typedef std::deque<WaitInfo*> WaitQueue;
 
@@ -174,4 +177,4 @@ private:
 } // namespace Poco
 
 
-#endif // Foundation_NotificationQueue_INCLUDED
+#endif // Foundation_PriorityNotificationQueue_INCLUDED

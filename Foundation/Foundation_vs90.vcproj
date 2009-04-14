@@ -2768,6 +2768,14 @@
 					RelativePath=".\src\NotificationQueue.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\PriorityNotificationQueue.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TimedNotificationQueue.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -2794,6 +2802,14 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\Observer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\PriorityNotificationQueue.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\TimedNotificationQueue.h"
 					>
 				</File>
 			</Filter>

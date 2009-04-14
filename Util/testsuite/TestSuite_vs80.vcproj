@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="TestSuite"
 	ProjectGUID="{E40E738C-447B-40F4-A878-EBA9A2459270}"
 	Keyword="Win32Proj"
@@ -616,6 +616,34 @@
 				</File>
 				<File
 					RelativePath=".\src\WinRegistryTest.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Timer"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\TimerTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TimerTestSuite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\TimerTest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TimerTestSuite.cpp"
 					>
 				</File>
 			</Filter>
