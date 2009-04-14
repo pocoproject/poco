@@ -1,7 +1,7 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/svn/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#1 $
+// $Id: //poco/Main/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#12 $
 //
 // This sample demonstrates the NotificationQueue, ThreadPool,
 // FastMutex and ScopedLock classes.
@@ -58,6 +58,8 @@ class WorkNotification: public Notification
 	// The notification sent to worker threads.
 {
 public:
+	typedef AutoPtr<WorkNotification> Ptr;
+	
 	WorkNotification(int data):
 		_data(data)
 	{
@@ -89,10 +91,10 @@ public:
 		Random rnd;
 		for (;;)
 		{
-			AutoPtr<Notification> pNf(_queue.waitDequeueNotification());
+			Notification::Ptr pNf(_queue.waitDequeueNotification());
 			if (pNf)
 			{
-				WorkNotification* pWorkNf = dynamic_cast<WorkNotification*>(pNf.get());
+				WorkNotification::Ptr pWorkNf = pNf.cast<WorkNotification>();
 				if (pWorkNf)
 				{
 					{
