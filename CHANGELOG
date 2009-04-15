@@ -37,7 +37,7 @@ Release 1.3.4 (2009-04-xx)
 - added a missing #include to CryptoTransform.h
 - fixed SF# 2635377: HTTPServer::HTTPServer should take AutoPtr<HTTPServerParams>
 - replaced plain pointers with smart pointers in some interfaces
-- upgraded to sqlite 3.6.12
+- upgraded to sqlite 3.6.13
 - improved Data::SQLite error reporting
 - Poco::Glob now works with UTF-8 encoded strings and supports case-insensitive comparison.
   This also fixes SF# 1944831: Glob::glob on windows should be case insensitve
@@ -66,7 +66,9 @@ Release 1.3.4 (2009-04-xx)
   compatible. The signature of the methods returning a Poco::Notification* have not been 
   changed for backwards compatibility. It is recommended, that any Notification* obtained 
   should be immediately assigned to a Notification::Ptr.	
-	  
+- SQLite::SessionImpl::isTransaction() now uses sqlite3_get_autocommit() to find out 
+  about the transaction state.
+		  
 
 Release 1.3.3p1 (2008-10-09)
 ============================
@@ -996,4 +998,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#41 $
+$Id: //poco/1.3/dist/CHANGELOG#42 $

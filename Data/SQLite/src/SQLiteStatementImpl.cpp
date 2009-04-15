@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#7 $
+// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#9 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -158,7 +158,7 @@ bool SQLiteStatementImpl::canBind() const
 
 void SQLiteStatementImpl::bindImpl()
 {
-	_stepCalled      = false;
+	_stepCalled = false;
 	_nextResponse = 0;
 	if (_pStmt == 0) return;
 
@@ -216,9 +216,16 @@ bool SQLiteStatementImpl::hasNext()
 		_nextResponse = sqlite3_step(_pStmt);
 		switch (_nextResponse)
 		{
-		case SQLITE_BUSY:
+			// Notes: When we get SQLITE_BUSY, we do not need to reset the statement 
+			// to try again.
+			// When we get SQLITE_LOCKED, we must reset the statement before trying
+			// again. SQLITE_LOCKED is only returned for the first call to sqlite3_step,
+			// so resetting and retrying is safe.
 		case SQLITE_LOCKED:
 		case SQLITE_LOCKED_SHAREDCACHE:
+			sqlite3_reset(_pStmt);
+			// fallthrough
+		case SQLITE_BUSY:	
 			if (i < _maxRetryAttempts)
 			{
 				sleep();

@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#6 $
+// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#7 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -58,8 +58,7 @@ SessionImpl::SessionImpl(const std::string& fileName):
 	_maxRetryAttempts(DEFAULT_MAX_RETRY_ATTEMPTS),
 	_minRetrySleep(DEFAULT_MIN_RETRY_SLEEP),
 	_maxRetrySleep(DEFAULT_MAX_RETRY_SLEEP),
-	_connected(false),
-	_isTransaction(false)
+	_connected(false)
 {
 	addProperty("transactionMode", &SessionImpl::setTransactionMode, &SessionImpl::getTransactionMode);
 	addProperty("maxRetryAttempts", &SessionImpl::setMaxRetryAttempts, &SessionImpl::getMaxRetryAttempts);
@@ -87,7 +86,6 @@ void SessionImpl::begin()
 	SQLiteStatementImpl tmp(_pDB, _maxRetryAttempts, _minRetrySleep, _maxRetrySleep);
 	tmp.add(BEGIN_TRANSACTION + _transactionMode);
 	tmp.execute();
-	_isTransaction = true;
 }
 
 
@@ -96,7 +94,6 @@ void SessionImpl::commit()
 	SQLiteStatementImpl tmp(_pDB, _maxRetryAttempts, _minRetrySleep, _maxRetrySleep);
 	tmp.add(COMMIT_TRANSACTION);
 	tmp.execute();
-	_isTransaction = false;
 }
 
 
@@ -105,7 +102,6 @@ void SessionImpl::rollback()
 	SQLiteStatementImpl tmp(_pDB, _maxRetryAttempts, _minRetrySleep, _maxRetrySleep);
 	tmp.add(ABORT_TRANSACTION);
 	tmp.execute();
-	_isTransaction = false;
 }
 
 
@@ -139,6 +135,12 @@ void SessionImpl::close()
 bool SessionImpl::isConnected()
 {
 	return _connected;
+}
+
+
+bool SessionImpl::isTransaction()
+{
+	return sqlite3_get_autocommit(_pDB) == 0;
 }
 
 

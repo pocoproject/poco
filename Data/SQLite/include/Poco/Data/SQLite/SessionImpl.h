@@ -1,7 +1,7 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#5 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#7 $
 //
 // Library: SQLite
 // Package: SQLite
@@ -62,9 +62,12 @@ class SQLite_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl
 	///   * transactionMode: "DEFERRED", "IMMEDIATE" or "EXCLUSIVE"
 	///   * maxRetryAttempts: maximum number of attemptes to retry an operation if
 	///     database is locked or busy. Between retry attempts, sleep for a random
-	///     time.
+	///     time. 
 	///   * minRetrySleep: the minimum time (in milliseconds) waited between two retry attempts.
 	///   * maxRetrySleep: the maximum time (in milliseconds) waited between two retry attempts.
+	///
+	/// Notes: For automatic retries to work, you should start every transaction that
+	/// at one point will write to the database with IMMEDIATE or EXCLUSIVE mode.
 {
 public:
 	enum
@@ -122,21 +125,11 @@ private:
 	int         _minRetrySleep;
 	int         _maxRetrySleep;
 	bool        _connected;
-	bool        _isTransaction;
 	
 	static const std::string BEGIN_TRANSACTION;
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
 };
-
-
-//
-// inlines
-//
-inline 	bool SessionImpl::isTransaction()
-{
-	return _isTransaction;
-}
 
 
 } } } // namespace Poco::Data::SQLite
