@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#9 $
+// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#10 $
 //
 // Library: Net
 // Package: Sockets
@@ -296,7 +296,7 @@ NetworkInterface NetworkInterface::forName(const std::string& name, bool require
 	NetworkInterfaceList ifs = list();
 	for (NetworkInterfaceList::const_iterator it = ifs.begin(); it != ifs.end(); ++it)
 	{
-		if (it->name() == name && it->supportsIPv6() == requireIPv6)
+		if (it->name() == name && ((requireIPv6 && it->supportsIPv6()) || !requireIPv6))
 			return *it;
 	}
 	throw InterfaceNotFoundException(name);
@@ -389,7 +389,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 	pAdapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(new char[addrLen]);
 	// Make an initial call to GetAdaptersAddresses to get
 	// the necessary size into addrLen
-	rc = GetAdaptersAddresses(AF_INET6, 0, 0, pAdapterAddresses, &addrLen);
+	rc = GetAdaptersAddresses(AF_UNSPEC, 0, 0, pAdapterAddresses, &addrLen);
 	if (rc == ERROR_BUFFER_OVERFLOW) 
 	{
 		delete [] reinterpret_cast<char*>(pAdapterAddresses);
@@ -401,14 +401,23 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 	}
 	try
 	{
-		if (GetAdaptersAddresses(AF_INET6, 0, 0, pAdapterAddresses, &addrLen) == NO_ERROR) 
+		if (GetAdaptersAddresses(AF_UNSPEC, 0, 0, pAdapterAddresses, &addrLen) == NO_ERROR) 
 		{
 			pAddress = pAdapterAddresses;
 			while (pAddress) 
 			{
 				if (pAddress->FirstUnicastAddress)
 				{
-					IPAddress addr(pAddress->FirstUnicastAddress->Address.lpSockaddr, pAddress->FirstUnicastAddress->Address.iSockaddrLength);
+					IPAddress addr;
+					switch (pAddress->FirstUnicastAddress->Address.lpSockaddr->sa_family)
+					{
+					case AF_INET:
+						addr = IPAddress(&reinterpret_cast<struct sockaddr_in*>(pAddress->FirstUnicastAddress->Address.lpSockaddr)->sin_addr, sizeof(in_addr));
+						break;
+					case AF_INET6:
+						addr = IPAddress(&reinterpret_cast<struct sockaddr_in6*>(pAddress->FirstUnicastAddress->Address.lpSockaddr)->sin6_addr, sizeof(in6_addr));
+						break;
+					}
 					std::string name(pAddress->AdapterName);
 					std::string displayName;
 #ifdef POCO_WIN32_UTF8
@@ -431,6 +440,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 		throw;
 	}
 	delete [] reinterpret_cast<char*>(pAdapterAddresses);
+	return result;
 #endif
 
 	// Add IPv4 loopback interface (not returned by GetAdaptersInfo)

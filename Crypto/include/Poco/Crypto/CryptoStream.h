@@ -1,10 +1,10 @@
 //
 // CryptoStream.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoStream.h#2 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoStream.h#3 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CryptoStream
 //
 // Definition of the CryptoStreamBuf, CryptoInputStream and CryptoOutputStream
@@ -55,7 +55,7 @@ class CryptoTransform;
 class Cipher;
 
 
-class Crypto_API CryptoStreamBuf : public Poco::BufferedStreamBuf
+class Crypto_API CryptoStreamBuf: public Poco::BufferedStreamBuf
 	/// This stream buffer performs cryptographic transformation on the data
 	/// going through it.
 {
@@ -66,6 +66,7 @@ public:
 	virtual ~CryptoStreamBuf();
 
 	void close();
+		/// Flushes all buffers and finishes the encryption.
 
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
@@ -84,7 +85,7 @@ private:
 };
 
 
-class Crypto_API CryptoIOS : public virtual std::ios
+class Crypto_API CryptoIOS: public virtual std::ios
 	/// The base class for CryptoInputStream and CryptoOutputStream.
 	///
 	/// This class is needed to ensure correct initialization order of the
@@ -101,7 +102,7 @@ protected:
 };
 
 
-class Crypto_API CryptoInputStream : public CryptoIOS, public std::istream
+class Crypto_API CryptoInputStream: public CryptoIOS, public std::istream
 	/// This stream transforms all data passing through it using the given
 	/// CryptoTransform.
 	///
@@ -118,10 +119,11 @@ public:
 		/// Create a new encrypting CryptoInputStream object using the given cipher.
 
 	~CryptoInputStream();
+		/// Destroys the CryptoInputStream.
 };
 
 
-class Crypto_API CryptoOutputStream : public CryptoIOS, public std::ostream
+class Crypto_API CryptoOutputStream: public CryptoIOS, public std::ostream
 	/// This stream transforms all data passing through it using the given
 	/// CryptoTransform.
 	///
@@ -141,8 +143,10 @@ public:
 		/// Create a new decrypting CryptoOutputStream object using the given cipher.
 
 	~CryptoOutputStream();
+		/// Destroys the CryptoOutputStream.
 
 	void close();
+		/// Flushes all buffers and finishes the encryption.
 };
 
 

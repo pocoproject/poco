@@ -1,7 +1,7 @@
 //
 // ZipTest.h
 //
-// $Id: //poco/1.3/Zip/testsuite/src/ZipTest.h#5 $
+// $Id: //poco/1.3/Zip/testsuite/src/ZipTest.h#6 $
 //
 // Definition of the ZipTest class.
 //
@@ -50,7 +50,6 @@ public:
 	void testSkipSingleFile();
 	void testDecompressSingleFile();
 	void testDecompress();
-	void decompressDirectlyFromNet();
 	void testCrcAndSizeAfterData();
 	void testCrcAndSizeAfterDataWithArchive();
 

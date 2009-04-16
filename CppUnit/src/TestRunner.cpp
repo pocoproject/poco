@@ -1,7 +1,7 @@
 //
 // TestRunner.cpp
 //
-// $Id: //poco/1.3/CppUnit/src/TestRunner.cpp#1 $
+// $Id: //poco/1.3/CppUnit/src/TestRunner.cpp#2 $
 //
 
 
@@ -15,7 +15,14 @@
 namespace CppUnit {
 
 
-TestRunner::TestRunner()
+TestRunner::TestRunner():
+	_ostr(std::cout)
+{
+}
+
+
+TestRunner::TestRunner(std::ostream& ostr):
+	_ostr(ostr)
 {
 }
 
@@ -29,7 +36,7 @@ TestRunner::~TestRunner()
 
 void TestRunner::printBanner()
 {
-    std::cout 
+    _ostr 
 		<< "Usage: driver [-all] [-print] [-wait] [name] ..." << std::endl
 		<< "       where name is the name of a test case class" << std::endl;
 }
@@ -90,7 +97,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 
 			if (!testToRun) 
 			{
-				std::cout << "Test " << testCase << " not found." << std::endl;
+				_ostr << "Test " << testCase << " not found." << std::endl;
 				return false;
 			}
 		}
@@ -113,7 +120,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 
 	if (wait) 
 	{
-		std::cout << "<RETURN> to continue" << std::endl;
+		_ostr << "<RETURN> to continue" << std::endl;
 		std::cin.get();
 	}
 
@@ -123,10 +130,10 @@ bool TestRunner::run(const std::vector<std::string>& args)
 
 bool TestRunner::run(Test* test)
 {
-	TextTestResult result;
+	TextTestResult result(_ostr);
 
 	test->run(&result);
-	std::cout << result << std::endl;
+	_ostr << result << std::endl;
 
 	return result.wasSuccessful();
 }
@@ -141,8 +148,8 @@ void TestRunner::addTest(const std::string& name, Test* test)
 void TestRunner::print(const std::string& name, Test* pTest, int indent)
 {
 	for (int i = 0; i < indent; ++i)
-		std::cout << "    ";
-	std::cout << name << std::endl;
+		_ostr << "    ";
+	_ostr << name << std::endl;
 	TestSuite* pSuite = dynamic_cast<TestSuite*>(pTest);
 	if (pSuite)
 	{

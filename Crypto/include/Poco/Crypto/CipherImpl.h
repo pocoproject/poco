@@ -1,10 +1,10 @@
 //
 // CipherImpl.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CipherImpl.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CipherImpl.h#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherImpl
 //
 // Definition of the CipherImpl class.
@@ -51,7 +51,7 @@ namespace Poco {
 namespace Crypto {
 
 
-class CipherImpl : public Cipher
+class CipherImpl: public Cipher
 	/// An implementation of the Cipher class for OpenSSL's crypto library.
 {
 public:
@@ -62,7 +62,7 @@ public:
 		/// Destroys the CipherImpl.
 
 	const std::string& name() const;
-		/// Returns the name of the Cipher.
+		/// Returns the name of the cipher.
 
 	CryptoTransform* createEncryptor();
 		/// Creates an encrytor object.

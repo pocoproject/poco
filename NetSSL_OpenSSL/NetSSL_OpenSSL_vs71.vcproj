@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;NetSSL_EXPORTS"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -85,7 +85,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="3"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;NetSSL_EXPORTS"
 				GeneratePreprocessedFile="0"
 				KeepComments="FALSE"
@@ -140,14 +140,14 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_STATIC;NetSSL_EXPORTS"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
@@ -189,8 +189,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -201,7 +201,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="3"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_STATIC;NetSSL_EXPORTS"
 				GeneratePreprocessedFile="0"
 				KeepComments="FALSE"
@@ -291,9 +291,6 @@
 					RelativePath=".\include\Poco\Net\SSLException.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SSLInitializer.h">
-				</File>
-				<File
 					RelativePath=".\include\Poco\Net\SSLManager.h">
 				</File>
 				<File
@@ -344,9 +341,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SSLException.cpp">
-				</File>
-				<File
-					RelativePath=".\src\SSLInitializer.cpp">
 				</File>
 				<File
 					RelativePath=".\src\SSLManager.cpp">

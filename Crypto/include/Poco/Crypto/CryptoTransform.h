@@ -1,10 +1,10 @@
 //
 // CryptoTransform.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoTransform.h#2 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoTransform.h#3 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CryptoTransform
 //
 // Definition of the CryptoTransform class.

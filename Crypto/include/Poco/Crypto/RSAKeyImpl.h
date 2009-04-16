@@ -1,10 +1,10 @@
 //
 // RSAKeyImpl.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKeyImpl.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKeyImpl.h#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: RSA
 // Module:  RSAKeyImpl
 //
 // Definition of the RSAKeyImpl class.
@@ -50,10 +50,10 @@ typedef struct rsa_st RSA;
 
 
 namespace Poco {
-	namespace Net {
-		class X509Certificate;
-	}
 namespace Crypto {
+
+
+class X509Certificate;
 
 
 class RSAKeyImpl: public Poco::RefCountedObject
@@ -62,47 +62,59 @@ class RSAKeyImpl: public Poco::RefCountedObject
 public:
 	typedef Poco::AutoPtr<RSAKeyImpl> Ptr;
 
-	RSAKeyImpl(const Poco::Net::X509Certificate& cert);
-		/// Extracts the RSAKey from the certificate
+	RSAKeyImpl(const X509Certificate& cert);
+		/// Extracts the RSA public key from the given certificate.
 
 	RSAKeyImpl(int keyLength, unsigned long exponent);
-		/// Creates the RSAKeyImpl.
+		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.
+		/// Can be used to sign data and verify signatures.
 
-	RSAKeyImpl(const std::string& publicKey, const std::string& privateKeyFile, const std::string& privateKeyPwd);
-		/// Creates the RSAKeyImpl.
+	RSAKeyImpl(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase);
+		/// Creates the RSAKey, by reading public and private key from the given files and
+		/// using the given passphrase for the private key. Can only by used for signing if 
+		/// a private key is available. 
 
-	RSAKeyImpl(std::istream* pPubKey, std::istream* pPrivKey, const std::string& privateKeyPwd);
-		/// Creates the RSAKeyImpl. privKey is an optional parameter which can be null.
+	RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase);
+		/// Creates the RSAKey. Can only by used for signing if pPrivKey
+		/// is not null. If a private key file is specified, you don't need to
+		/// specify a public key file. OpenSSL will auto-create it from the private key.
 
 	~RSAKeyImpl();
 		/// Destroys the RSAKeyImpl.
 
 	RSA* getRSA();
-		/// Returns the openssl rsa object
+		/// Returns the OpenSSL RSA object.
 
 	const RSA* getRSA() const;
-		/// Returns the openssl rsa object
+		/// Returns the OpenSSL RSA object.
 
 	int size() const;
-		/// Returns the RSA_size
+		/// Returns the RSA modulus size.
 
-	void save(const std::string& pubKeyFile, const std::string& privKeyFile, const std::string& privKeyPwd);
-		/// Exports the keys to the given files. privKeyFile can be empty
+	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
+		/// Exports the public and private keys to the given files. 
+		///
+		/// If an empty filename is specified, the corresponding key
+		/// is not exported.
 
-	void save(std::ostream* pPubKey, std::ostream* pPrivKey, const std::string& privateKeyPwd);
-		/// Exports the keys to the given streams. Can be empty
+	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+		/// Exports the public and private key to the given streams.
+		///
+		/// If a null pointer is passed for a stream, the corresponding
+		/// key is not exported.
 
 private:
-	void init(const std::string& pubKeyFile, const std::string& privKeyFile, const std::string& privKeyPwd);
-		/// Initializes the object
-
+	void init(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase);
 	void freeRSA();
-		// Deletes the RSA object
+
 private:
 	RSA* _pRSA;
 };
 
 
+//
+// inlines
+//
 inline RSA* RSAKeyImpl::getRSA()
 {
 	return _pRSA;

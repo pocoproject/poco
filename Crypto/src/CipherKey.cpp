@@ -1,10 +1,10 @@
 //
 // CipherKey.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherKey.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/CipherKey.cpp#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherKey
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.

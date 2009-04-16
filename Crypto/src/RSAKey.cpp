@@ -1,10 +1,10 @@
 //
 // RSAKey.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKey.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/RSAKey.cpp#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: RSA
 // Module:  RSAKey
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -42,7 +42,7 @@ namespace Poco {
 namespace Crypto {
 
 
-RSAKey::RSAKey(const Poco::Net::X509Certificate& cert):
+RSAKey::RSAKey(const X509Certificate& cert):
 	_pImpl(new RSAKeyImpl(cert))
 {
 }
@@ -59,16 +59,14 @@ RSAKey::RSAKey(KeyLength keyLength, Exponent exp):
 }
 
 
-RSAKey::RSAKey(const std::string& publicKey, const std::string& privateKeyFile, const std::string& pwd):
-	_pImpl(new RSAKeyImpl(publicKey, privateKeyFile, pwd))
+RSAKey::RSAKey(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase):
+	_pImpl(new RSAKeyImpl(publicKeyFile, privateKeyFile, privateKeyPassphrase))
 {
 }
 
 
-RSAKey::RSAKey(std::istream* pPubKey, 
-		std::istream* pPrivKey, 
-		const std::string& privateKeyPwd):
-	_pImpl(new RSAKeyImpl(pPubKey, pPrivKey, privateKeyPwd))
+RSAKey::RSAKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase):
+	_pImpl(new RSAKeyImpl(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase))
 {
 }
 
@@ -83,15 +81,15 @@ int RSAKey::size() const
 	return _pImpl->size();
 }
 
-void RSAKey::save(const std::string& pubKeyFile, const std::string& privKeyFile, const std::string& privKeyPwd)
+void RSAKey::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
 {
-	_pImpl->save(pubKeyFile, privKeyFile, privKeyPwd);
+	_pImpl->save(publicKeyFile, privateKeyFile, privateKeyPassphrase);
 }
 
 
-void RSAKey::save(std::ostream* pPubKey, std::ostream* pPrivKey, const std::string& privateKeyPwd)
+void RSAKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase)
 {
-	_pImpl->save(pPubKey, pPrivKey, privateKeyPwd);
+	_pImpl->save(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase);
 }
 
 

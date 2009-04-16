@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -54,73 +54,30 @@ namespace Net {
 
 
 X509Certificate::X509Certificate(std::istream& istr):
-	_pCert(0)
+	Poco::Crypto::X509Certificate(istr)
 {	
-	// copy certificate to a temporary file so that it
-	// can be read by OpenSSL.
-	Poco::TemporaryFile certFile;
-	std::string path = certFile.path();
-	Poco::FileOutputStream ostr(path);
-	Poco::StreamCopier::copyStream(istr, ostr);
-	ostr.close();
-	
-	BIO *pBIO = BIO_new(BIO_s_file());
-	if (!pBIO) throw SSLException("Cannot create BIO for reading certificate file");
-	if (!BIO_read_filename(pBIO, path.c_str()))
-	{
-		BIO_free(pBIO);
-		throw Poco::OpenFileException("Cannot open certificate file for reading");
-	}
-
-	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
-	BIO_free(pBIO);
-	
-	if (!_pCert) throw SSLException("Faild to load certificate");
-
-	init();
 }
 
 
 X509Certificate::X509Certificate(const std::string& path):
-	_pCert(0)
+	Poco::Crypto::X509Certificate(path)
 {
-	BIO *pBIO = BIO_new(BIO_s_file());
-	if (!pBIO) throw SSLException("Cannot create BIO for reading certificate file");
-	if (!BIO_read_filename(pBIO, path.c_str()))
-	{
-		BIO_free(pBIO);
-		throw Poco::OpenFileException("Cannot open certificate file for reading");
-	}
-	
-	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
-	BIO_free(pBIO);
-	
-	if (!_pCert) throw SSLException("Faild to load certificate from " + path);
-
-	init();
 }
 
 
 X509Certificate::X509Certificate(X509* pCert):
-	_pCert(pCert)
+	Poco::Crypto::X509Certificate(pCert)
 {
-	poco_check_ptr(_pCert);
-	
-	_pCert = X509_dup(_pCert);
-	init();
 }
 
 
-X509Certificate::X509Certificate(const X509Certificate& cert):
-	_issuerName(cert._issuerName),
-	_subjectName(cert._subjectName),
-	_pCert(cert._pCert)
+X509Certificate::X509Certificate(const Poco::Crypto::X509Certificate& cert):
+	Poco::Crypto::X509Certificate(cert)
 {
-	_pCert = X509_dup(_pCert);
 }
 
 
-X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
+X509Certificate& X509Certificate::operator = (const Poco::Crypto::X509Certificate& cert)
 {
 	X509Certificate tmp(cert);
 	swap(tmp);
@@ -128,41 +85,27 @@ X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
 }
 
 
-void X509Certificate::swap(X509Certificate& cert)
-{
-	using std::swap;
-	swap(cert._issuerName, _issuerName);
-	swap(cert._subjectName, _subjectName);
-	swap(cert._pCert, _pCert);
-}
-
-
 X509Certificate::~X509Certificate()
 {
-	X509_free(_pCert);
-}
-
-
-void X509Certificate::init()
-{
-	char buffer[NAME_BUFFER_SIZE];
-	X509_NAME_oneline(X509_get_issuer_name(_pCert), buffer, sizeof(buffer));
-	_issuerName = buffer;
-	X509_NAME_oneline(X509_get_subject_name(_pCert), buffer, sizeof(buffer));
-	_subjectName = buffer;
 }
 
 
 long X509Certificate::verify(const std::string& hostName) const
+{
+	return verify(*this, hostName);
+}
+
+
+long X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, const std::string& hostName)
 {		
 	std::string commonName;
 	std::set<std::string> dnsNames;
-	extractNames(commonName, dnsNames);
+	certificate.extractNames(commonName, dnsNames);
 	bool ok = (dnsNames.find(hostName) != dnsNames.end());
 
 	char buffer[NAME_BUFFER_SIZE];
 	X509_NAME* subj = 0;
-	if (!ok && (subj = X509_get_subject_name(_pCert)) && X509_NAME_get_text_by_NID(subj, NID_commonName, buffer, sizeof(buffer)) > 0)
+	if (!ok && (subj = X509_get_subject_name(const_cast<X509*>(certificate.certificate()))) && X509_NAME_get_text_by_NID(subj, NID_commonName, buffer, sizeof(buffer)) > 0)
 	{
 		buffer[NAME_BUFFER_SIZE - 1] = 0;
 		std::string commonName(buffer); // commonName can contain wildcards like *.appinf.com
@@ -238,62 +181,6 @@ bool X509Certificate::matchByAlias(const std::string& alias, const HostEntry& he
 		found = expr.match(*it);
 	}
 	return found;
-}
-
-
-std::string X509Certificate::commonName() const
-{
-	if (X509_NAME* subj = X509_get_subject_name(_pCert))
-    {
-		char buffer[NAME_BUFFER_SIZE];
-		X509_NAME_get_text_by_NID(subj, NID_commonName, buffer, sizeof(buffer));
-		return std::string(buffer);
-    }
-    else return std::string();
-}
-
-
-void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
-{
-	domainNames.clear(); 
-	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
-    {
-		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
-        {
-			const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
-			if (name->type == GEN_DNS)
-			{
-				const char* data = reinterpret_cast<char*>(ASN1_STRING_data(name->d.ia5));
-				std::size_t len = ASN1_STRING_length(name->d.ia5);
-				domainNames.insert(std::string(data, len));
-            }
-		}
-		GENERAL_NAMES_free(names);
-	}
- 
-	cmnName = commonName();
-	if (!cmnName.empty() && domainNames.empty())
-	{
-		domainNames.insert(cmnName);
-	}
-}
-
-
-Poco::DateTime X509Certificate::validFrom() const
-{
-	ASN1_TIME* certTime = X509_get_notBefore(_pCert);
-	std::string dateTime(reinterpret_cast<char*>(certTime->data));
-	int tzd;
-	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
-}
-
-	
-Poco::DateTime X509Certificate::expiresOn() const
-{
-	ASN1_TIME* certTime = X509_get_notAfter(_pCert);
-	std::string dateTime(reinterpret_cast<char*>(certTime->data));
-	int tzd;
-	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
 }
 
 

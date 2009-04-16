@@ -1,10 +1,10 @@
 //
 // Cipher.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Cipher.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Cipher.h#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  Cipher
 //
 // Definition of the Cipher class.

@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;NetSSL_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -135,7 +135,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;NetSSL_EXPORTS"
 				GeneratePreprocessedFile="0"
 				KeepComments="false"
@@ -203,8 +203,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -227,7 +227,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS;POCO_STATIC"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -275,8 +275,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -303,7 +303,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS;POCO_STATIC"
 				GeneratePreprocessedFile="0"
 				KeepComments="false"
@@ -412,10 +412,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SSLInitializer.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Net\SSLManager.h"
 					>
 				</File>
@@ -481,10 +477,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SSLException.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SSLInitializer.cpp"
 					>
 				</File>
 				<File

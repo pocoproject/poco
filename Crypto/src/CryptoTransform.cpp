@@ -1,10 +1,10 @@
 //
 // CryptoTransform.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CryptoTransform.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/CryptoTransform.cpp#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CryptoTransform
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

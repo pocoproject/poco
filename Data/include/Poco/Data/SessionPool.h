@@ -1,7 +1,7 @@
 //
 // SessionPool.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/SessionPool.h#4 $
+// $Id: //poco/1.3/Data/include/Poco/Data/SessionPool.h#5 $
 //
 // Library: Data
 // Package: SessionPooling
@@ -97,7 +97,7 @@ public:
 		///
 		/// If idleTime is 0, automatic cleanup of unused sessions is disabled.
 
-	~SessionPool();
+	virtual ~SessionPool();
 		/// Destroys the SessionPool.
 		
 	Session get();

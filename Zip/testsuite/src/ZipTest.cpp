@@ -1,7 +1,7 @@
 //
 // ZipTest.cpp
 //
-// $Id: //poco/1.3/Zip/testsuite/src/ZipTest.cpp#6 $
+// $Id: //poco/1.3/Zip/testsuite/src/ZipTest.cpp#7 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -41,16 +41,6 @@
 #include "Poco/URI.h"
 #include "Poco/Path.h"
 #include "Poco/Delegate.h"
-#include "Poco/Net/HTTPClientSession.h"
-#include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTTPResponse.h"
-#include "Poco/Net/HTTPServer.h"
-#include "Poco/Net/HTTPServerParams.h"
-#include "Poco/Net/AbstractHTTPRequestHandler.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/ServerSocket.h"
 #include "Poco/StreamCopier.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -59,45 +49,7 @@
 
 
 using namespace Poco::Zip;
-using namespace Poco::Net;
 
-
-
-namespace
-{
-	class ZipFileRequestHandler: public HTTPRequestHandler
-	{
-	public:
-		ZipFileRequestHandler()
-		{
-		}
-
-		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
-		{
-			response.setChunkedTransferEncoding(true);
-			std::string testFile = ZipTest::getTestFile("test.zip");
-			std::ifstream inp(testFile.c_str(), std::ios::binary);
-			poco_assert (inp);
-		
-			response.setContentType("application/zip");
-			
-			std::ostream& ostr = response.send();
-			Poco::StreamCopier::copyStream(inp, ostr);
-		}
-	};
-
-	class RequestHandlerFactory: public HTTPRequestHandlerFactory
-	{
-	public:
-		HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
-		{
-			if (request.getURI() == "/test.zip")
-				return new ZipFileRequestHandler;
-			else
-				return 0;
-		}
-	};
-}
 
 ZipTest::ZipTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -231,29 +183,6 @@ void ZipTest::testDecompressFlat()
 }
 
 
-void ZipTest::decompressDirectlyFromNet()
-{
-	ServerSocket svs(22222);
-	HTTPServerParams* pParams = new HTTPServerParams;
-	pParams->setKeepAlive(true);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
-	srv.start();
-	Poco::URI uri("http://localhost:22222/test.zip");
-
-	HTTPClientSession session("localhost", 22222);
-	HTTPRequest req(HTTPRequest::HTTP_GET, "/test.zip", HTTPMessage::HTTP_1_1);
-	session.sendRequest(req);
-	HTTPResponse res;
-	std::istream& rs = session.receiveResponse(res);
-	Decompress dec(rs, Poco::Path());
-	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
-	dec.decompressAllFiles();
-	dec.EError -= Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
-	poco_assert (_errCnt == 0);
-	poco_assert (!dec.mapping().empty());
-}
-
-
 void ZipTest::onDecompressError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info)
 {
 	++_errCnt;
@@ -279,7 +208,6 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDecompressSingleFile);
 	CppUnit_addTest(pSuite, ZipTest, testDecompress);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressFlat);
-	CppUnit_addTest(pSuite, ZipTest, decompressDirectlyFromNet);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterData);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterDataWithArchive);
 	return pSuite;

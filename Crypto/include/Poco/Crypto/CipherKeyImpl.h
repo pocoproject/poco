@@ -1,10 +1,10 @@
 //
 // CipherKeyImpl.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CipherKeyImpl.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CipherKeyImpl.h#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherKeyImpl
 //
 // Definition of the CipherKeyImpl class.
@@ -54,8 +54,8 @@ namespace Poco {
 namespace Crypto {
 
 
-class CipherKeyImpl : public RefCountedObject
-	/// An implementation of the Cipher class for OpenSSL's crypto library.
+class CipherKeyImpl: public RefCountedObject
+	/// An implementation of the CipherKey class for OpenSSL's crypto library.
 {
 public:
 	typedef std::vector<unsigned char> ByteVec;
@@ -76,15 +76,19 @@ public:
 		const std::string& passphrase, 
 		const std::string& salt,
 		int iterationCount);
-		/// Creates a new CipherKeyImpl object
+		/// Creates a new CipherKeyImpl object, using
+		/// the given cipher name, passphrase, salt value
+		/// and iteration count.
 
 	CipherKeyImpl(const std::string& name, 
 		const ByteVec& key, 
 		const ByteVec& iv);
-		/// Creates a new CipherKeyImpl object
+		/// Creates a new CipherKeyImpl object, using the 
+		/// given cipher name, key and initialization vector.
 
 	CipherKeyImpl(const std::string& name);
-		/// Creates a new CipherKeyImpl object. Autoinitializes  key and iv
+		/// Creates a new CipherKeyImpl object. Autoinitializes key
+		/// and initialization vector.
 
 	virtual ~CipherKeyImpl();
 		/// Destroys the CipherKeyImpl.
@@ -126,10 +130,10 @@ private:
 	 	/// Generates key and IV from a password and optional salt string.
 
 	void generateKey();
-		/// Generates key and IV from random data
+		/// Generates key and IV from random data.
 
 	void getRandomBytes(ByteVec& vec, std::size_t count);
-		/// Stores random bytes in vec
+		/// Stores random bytes in vec.
 
 private:
 	const EVP_CIPHER* _pCipher;

@@ -1,10 +1,10 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#3 $
+// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#4 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: RSA
 // Module:  RSAKeyImpl
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -35,11 +35,10 @@
 
 
 #include "Poco/Crypto/RSAKeyImpl.h"
+#include "Poco/Crypto/X509Certificate.h"
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/TemporaryFile.h"
-#include "Poco/Net/SSLManager.h"
-#include "Poco/Net/X509Certificate.h"
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 
@@ -48,7 +47,7 @@ namespace Poco {
 namespace Crypto {
 
 
-RSAKeyImpl::RSAKeyImpl(const Poco::Net::X509Certificate& cert):
+RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 	_pRSA(0)
 {
 	const X509* pCert = cert.certificate();
@@ -62,12 +61,10 @@ RSAKeyImpl::RSAKeyImpl(const Poco::Net::X509Certificate& cert):
 RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
 	_pRSA(0)
 {
-	//dummy access to SSLMananger so that the SSLInitializer of NetSSL gets called!
-	Poco::Net::SSLManager::instance();
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
 	_pRSA = RSA_new();
 	int ret = 0;
-	BIGNUM *bn = 0;
+	BIGNUM* bn = 0;
 	try
 	{
 		bn = BN_new();
@@ -89,98 +86,94 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
 
 
 RSAKeyImpl::RSAKeyImpl(
-		const std::string& publicKey, 
+		const std::string& publicKeyFile, 
 		const std::string& privateKeyFile, 
-		const std::string& privateKeyPwd):
+		const std::string& privateKeyPassphrase):
 	_pRSA(0)
 {
-	//dummy access to SSLMananger so that the SSLInitializer of NetSSL gets called!
-	Poco::Net::SSLManager::instance();
-	init(publicKey, privateKeyFile, privateKeyPwd);
+	init(publicKeyFile, privateKeyFile, privateKeyPassphrase);
 }
 
 
-RSAKeyImpl::RSAKeyImpl(std::istream* pubKey, std::istream* privKey, const std::string& privKeyPwd):
+RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase):
 	_pRSA(0)
 {
-	//dummy access to SSLMananger so that the SSLInitializer of NetSSL gets called!
-	Poco::Net::SSLManager::instance();
 	// due to C lib not supporting streams, we create two temporary files
-	std::string pubKeyFile;
+	std::string publicKeyFile;
 	Poco::TemporaryFile pubFile;
-	if (pubKey)
+	if (pPublicKeyStream)
 	{
 		if (!pubFile.createFile())
 			throw Poco::FileException("No temporary file could be created for public file!");
-		pubKeyFile = pubFile.path();
-		Poco::FileOutputStream fout(pubKeyFile);
-		Poco::StreamCopier::copyStream(*pubKey, fout);
+		publicKeyFile = pubFile.path();
+		Poco::FileOutputStream fout(publicKeyFile);
+		Poco::StreamCopier::copyStream(*pPublicKeyStream, fout);
 	}
-	std::string privKeyFile;
+	std::string privateKeyFile;
 	Poco::TemporaryFile privFile;
-	if (privKey)
+	if (pPrivateKeyStream)
 	{
 		if (!privFile.createFile())
 			throw Poco::FileException("No temporary file could be created for private file!");
-		privKeyFile = privFile.path();
-		Poco::FileOutputStream fout(privKeyFile);
-		Poco::StreamCopier::copyStream(*privKey, fout);
+		privateKeyFile = privFile.path();
+		Poco::FileOutputStream fout(privateKeyFile);
+		Poco::StreamCopier::copyStream(*pPrivateKeyStream, fout);
 
 	}
-	init(pubKeyFile, privKeyFile, privKeyPwd);
+	init(publicKeyFile, privateKeyFile, privateKeyPassphrase);
 }
 
 
-void RSAKeyImpl::init(const std::string& pubKeyFile, const std::string& privKeyFile, const std::string& privKeyPwd)
+void RSAKeyImpl::init(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
 {
 	poco_assert_dbg(_pRSA == 0);
+	
 	_pRSA = RSA_new();
-	if (!pubKeyFile.empty())
+	if (!publicKeyFile.empty())
 	{
-		BIO *out=BIO_new(BIO_s_file());
-		const char* pFN = pubKeyFile.c_str();
-		BIO_read_filename(out, (void*)pFN);
-		if (out)
+		BIO* out = BIO_new(BIO_s_file());
+		if (!out) throw Poco::IOException("Cannot create BIO for reading public key", publicKeyFile);
+		int rc = BIO_read_filename(out, publicKeyFile.c_str());
+		if (rc)
 		{
 			RSA* pubKey = PEM_read_bio_RSAPublicKey(out, &_pRSA, 0, 0);
 			BIO_free(out);
 			if (!pubKey)
 			{
 				freeRSA();
-				throw Poco::FileException("Failed to load public key: " + pubKeyFile);
+				throw Poco::FileException("Failed to load public key", publicKeyFile);
 			}
 		}
 		else
 		{
 			freeRSA();
-			throw Poco::FileNotFoundException("Public key file not found: " + pubKeyFile);
+			throw Poco::FileNotFoundException("Public key file", publicKeyFile);
 		}
 	}
 
-	if (!privKeyFile.empty())
+	if (!privateKeyFile.empty())
 	{
-		BIO* out=BIO_new(BIO_s_file());
-		const char* pFN = privKeyFile.c_str();
-		BIO_read_filename(out, (void*)pFN);
-		
-		if (out)
+		BIO* out = BIO_new(BIO_s_file());
+		if (!out) throw Poco::IOException("Cannot create BIO for reading private key", privateKeyFile);
+		int rc = BIO_read_filename(out, privateKeyFile.c_str());
+		if (rc)
 		{
 			RSA* privKey = 0;
-			if (privKeyPwd.empty())
+			if (privateKeyPassphrase.empty())
 				privKey = PEM_read_bio_RSAPrivateKey(out, &_pRSA, 0, 0);
 			else
-				privKey = PEM_read_bio_RSAPrivateKey(out, &_pRSA, 0, (void*)privKeyPwd.c_str());
+				privKey = PEM_read_bio_RSAPrivateKey(out, &_pRSA, 0, const_cast<char*>(privateKeyPassphrase.c_str()));
 			BIO_free(out);
 			if (!privKey)
 			{
 				freeRSA();
-				throw Poco::FileException("Failed to load private key: " + privKeyFile);
+				throw Poco::FileException("Failed to load private key", privateKeyFile);
 			}
 		}
 		else
 		{
 			freeRSA();
-			throw Poco::FileNotFoundException("Private key file not found: " + privKeyFile);
+			throw Poco::FileNotFoundException("Private key file", privateKeyFile);
 		}
 	}
 }
@@ -188,6 +181,7 @@ void RSAKeyImpl::init(const std::string& pubKeyFile, const std::string& privKeyF
 
 RSAKeyImpl::~RSAKeyImpl()
 {
+	freeRSA();
 }
 
 
@@ -205,68 +199,91 @@ int RSAKeyImpl::size() const
 }
 
 
-void RSAKeyImpl::save(const std::string& pubKeyFile, const std::string& privKeyFile, const std::string& privKeyPwd)
+void RSAKeyImpl::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
 {
-	if (!pubKeyFile.empty())
+	if (!publicKeyFile.empty())
 	{
-		BIO *out=BIO_new(BIO_s_file());
-		const char* pFN = pubKeyFile.c_str();
-		BIO_write_filename(out, (void*)pFN);
-		if (!PEM_write_bio_RSAPublicKey(out,_pRSA))
-			throw Poco::FileException("Failed to write public key to file:" + pubKeyFile);
+		BIO* out = BIO_new(BIO_s_file());
+		if (!out) throw Poco::IOException("Cannot create BIO for writing public key file", publicKeyFile);
+		try
+		{
+			if (BIO_write_filename(out, const_cast<char*>(publicKeyFile.c_str())))
+			{
+				if (!PEM_write_bio_RSAPublicKey(out, _pRSA))
+					throw Poco::WriteFileException("Failed to write public key to file", publicKeyFile);
+			}
+			else throw Poco::CreateFileException("Cannot create public key file");
+		}
+		catch (...)
+		{
+			BIO_free(out);
+			throw;
+		}
 		BIO_free(out);
 	}
-	if (!privKeyFile.empty())
+	
+	if (!privateKeyFile.empty())
 	{
-		BIO *out=BIO_new(BIO_s_file());
-		const char* pFN = privKeyFile.c_str();
-		BIO_write_filename(out, (void*)pFN);
-
-		int ret = 0;
-		if (privKeyPwd.empty())
-			ret = PEM_write_bio_RSAPrivateKey(out, _pRSA, EVP_des_ede3_cbc(), 0, 0, 0, 0);
-		else
-			ret = PEM_write_bio_RSAPrivateKey(out, _pRSA, EVP_des_ede3_cbc(), (unsigned char *)privKeyPwd.c_str(), privKeyPwd.length(), 0, 0);
-
-		if (!ret)
-			throw Poco::FileException("Failed to write private key to file:" + privKeyFile);
+		BIO* out = BIO_new(BIO_s_file());
+		if (!out) throw Poco::IOException("Cannot create BIO for writing private key file", privateKeyFile);
+		try
+		{
+			if (BIO_write_filename(out, const_cast<char*>(privateKeyFile.c_str())))
+			{
+				int rc = 0;
+				if (privateKeyPassphrase.empty())
+					rc = PEM_write_bio_RSAPrivateKey(out, _pRSA, EVP_des_ede3_cbc(), 0, 0, 0, 0);
+				else
+					rc = PEM_write_bio_RSAPrivateKey(out, _pRSA, EVP_des_ede3_cbc(), 
+						reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())), 
+						privateKeyPassphrase.length(), 0, 0);
+				if (!rc) throw Poco::FileException("Failed to write private key to file", privateKeyFile);
+			}
+			else throw Poco::CreateFileException("Cannot create private key file", privateKeyFile);
+		}
+		catch (...)
+		{
+			BIO_free(out);
+			throw;
+		}
 		BIO_free(out);
 	}
 }
 
 
-void RSAKeyImpl::save(std::ostream* pPubKey, std::ostream* pPrivKey, const std::string& privateKeyPwd)
+void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase)
 {
-	if (!pPubKey && !pPrivKey)
-		return;
+	if (!pPublicKeyStream && !pPrivateKeyStream) return;
+	
 	// due to C lib not supporting streams, we create two temporary files
-	std::string pubKeyFile;
+	std::string publicKeyFile;
 	Poco::TemporaryFile pubFile;
-	if (pPubKey)
+	if (pPublicKeyStream)
 	{
-		pubKeyFile = pubFile.path();
+		publicKeyFile = pubFile.path();
 		if (!pubFile.createFile())
-			throw Poco::FileException("No temporary file could be created for public file!");
+			throw Poco::CreateFileException("Cannot create temporary public file");
 	}
-	std::string privKeyFile;
+	std::string privateKeyFile;
 	Poco::TemporaryFile privFile;
-	if (pPrivKey)
+	if (pPrivateKeyStream)
 	{
+		privateKeyFile = privFile.path();
 		if (!privFile.createFile())
-			throw Poco::FileException("No temporary file could be created for private file!");
-		privKeyFile = privFile.path();
+			throw Poco::FileException("Cannot crate temporary private key file");
 	}
-	save(pubKeyFile, privKeyFile, privateKeyPwd);
+	save(publicKeyFile, privateKeyFile, privateKeyPassphrase);
+	
 	// now copy everything from the temp files to the original streams
-	if (pPubKey)
+	if (pPublicKeyStream)
 	{
-		Poco::FileInputStream fPub(pubKeyFile);
-		Poco::StreamCopier::copyStream(fPub, *pPubKey);
+		Poco::FileInputStream istr(publicKeyFile);
+		Poco::StreamCopier::copyStream(istr, *pPublicKeyStream);
 	}
-	if (pPrivKey)
+	if (pPrivateKeyStream)
 	{
-		Poco::FileInputStream fPriv(privKeyFile);
-		Poco::StreamCopier::copyStream(fPriv, *pPrivKey);
+		Poco::FileInputStream istr(privateKeyFile);
+		Poco::StreamCopier::copyStream(istr, *pPrivateKeyStream);
 	}
 }
 

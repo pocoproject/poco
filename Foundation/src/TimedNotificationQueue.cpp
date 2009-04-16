@@ -1,7 +1,7 @@
 //
 // TimedNotificationQueue.cpp
 //
-// $Id: //poco/1.3/Foundation/src/TimedNotificationQueue.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/TimedNotificationQueue.cpp#5 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -162,7 +162,7 @@ bool TimedNotificationQueue::wait(Timestamp::TimeDiff interval)
 	{
 		Timestamp now;
 		Timestamp::TimeDiff sleep = interval <= MAX_SLEEP ? interval : MAX_SLEEP;
-		if (_nfAvailable.tryWait(static_cast<long>((interval + 999)/1000)))
+		if (_nfAvailable.tryWait(static_cast<long>((sleep + 999)/1000)))
 			return true;
 		interval -= now.elapsed();
 	}

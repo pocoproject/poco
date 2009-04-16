@@ -68,7 +68,30 @@ Release 1.3.4 (2009-04-xx)
   should be immediately assigned to a Notification::Ptr.	
 - SQLite::SessionImpl::isTransaction() now uses sqlite3_get_autocommit() to find out 
   about the transaction state.
-		  
+- refactored Crypto library to make it independent from NetSSL_OpenSSL.
+- added support for RSA-MD5 digital signatures to Crypto library.
+- removed SSLInitializer from NetSSL library (now moved to Crypto library)
+- added build configs for static libraries to Crypto library
+- OpenSSL now depends on Crypto library (which makes more sense than
+  vice versa, as it was before). Poco::Net::X509Certificate is now
+  a subclass of Poco::Crypto::X509Certificate (adding the verify()
+  member function) and the Poco::Net::SSLInitializer class was 
+  moved to Poco::Crypto::OpenSSLInitializer.		  
+- added build configs for static libraries to Zip
+- added batch mode to CppUnit::WinTestRunner.
+  WinTestRunnerApp supports a batch mode, which runs the
+  test using the standard text-based TestRunner from CppUnit.
+  To enable batch mode, start the application with the "/b"
+  or "/B" command line argument. Optionally, a path to a file
+  where the test output will be written to may be given:
+  "/b:<path>" or "/B:<path>".
+  When run in batch mode, the exit code of the application
+  will denote test success (0) or failure (1).
+- testsuites now also work for static builds on Windows
+- The IPv6 support for Windows now basically works (Net library compiled with POCO_HAVE_IPv6)
+- fixed a potential error when shutting down openssl in a statically linked application
+- added static build configs to Data library
+
 
 Release 1.3.3p1 (2008-10-09)
 ============================
@@ -998,4 +1021,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#42 $
+$Id: //poco/1.3/dist/CHANGELOG#43 $

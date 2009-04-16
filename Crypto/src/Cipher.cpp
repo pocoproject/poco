@@ -1,10 +1,10 @@
 //
 // Cipher.cpp
 //
-// $Id: //poco/1.3/Crypto/src/Cipher.cpp#2 $
+// $Id: //poco/1.3/Crypto/src/Cipher.cpp#3 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  Cipher
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -97,16 +97,16 @@ void Cipher::encrypt(std::istream& source, std::ostream& sink, Encoding encoding
 			Poco::Base64Encoder encoder(sink);
 			StreamCopier::copyStream(encryptor, encoder);
 			encoder.close();
-			break;
 		}
+		break;
 
 	case ENC_BINHEX:
 		{
 			Poco::HexBinaryEncoder encoder(sink);
 			StreamCopier::copyStream(encryptor, encoder);
 			encoder.close();
-			break;
 		}
+		break;
 
 	default:
 		throw Poco::InvalidArgumentException("Invalid argument", "encoding");
@@ -130,16 +130,16 @@ void Cipher::decrypt(std::istream& source, std::ostream& sink, Encoding encoding
 			Poco::Base64Decoder decoder(source);
 			StreamCopier::copyStream(decoder, decryptor);
 			decryptor.close();
-			break;
 		}
+		break;
 
 	case ENC_BINHEX:
 		{
 			Poco::HexBinaryDecoder decoder(source);
 			StreamCopier::copyStream(decoder, decryptor);
 			decryptor.close();
-			break;
 		}
+		break;
 
 	default:
 		throw Poco::InvalidArgumentException("Invalid argument", "encoding");

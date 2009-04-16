@@ -1,7 +1,7 @@
 //
 // TimerTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/TimerTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/TimerTest.cpp#2 $
 //
 // Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -84,15 +84,15 @@ void TimerTest::testScheduleInterval()
 	timer.schedule(pTask, 500, 500);
 	
 	_event.wait();
-	assert (time.elapsed() >= 600000);
+	assert (time.elapsed() >= 590000);
 	assert (pTask->lastExecution().elapsed() < 130000);
 
 	_event.wait();
-	assert (time.elapsed() >= 1200000);
+	assert (time.elapsed() >= 1190000);
 	assert (pTask->lastExecution().elapsed() < 130000);
 
 	_event.wait();
-	assert (time.elapsed() >= 1800000);
+	assert (time.elapsed() >= 1790000);
 	assert (pTask->lastExecution().elapsed() < 130000);
 
 	pTask->cancel();

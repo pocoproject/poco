@@ -1,10 +1,10 @@
 //
 // CipherFactory.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherFactory.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/CipherFactory.cpp#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherFactory
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -40,10 +40,8 @@
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/CipherImpl.h"
 #include "Poco/Crypto/RSACipherImpl.h"
-
 #include "Poco/Exception.h"
 #include "Poco/SingletonHolder.h"
-
 #include <openssl/evp.h>
 #include <openssl/err.h>
 
@@ -90,9 +88,9 @@ Cipher* CipherFactory::createCipher(const CipherKey& key)
 }
 
 
-Cipher* CipherFactory::createCipher(const RSAKey& key)
+Cipher* CipherFactory::createCipher(const RSAKey& key, RSAPaddingMode paddingMode)
 {
-	return new RSACipherImpl(key);
+	return new RSACipherImpl(key, paddingMode);
 }
 
 

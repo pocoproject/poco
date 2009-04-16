@@ -5,6 +5,7 @@
 	Name="TestSuite"
 	ProjectGUID="{B2B88092-5BCE-4AC0-941E-88167138B4A7}"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -41,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Util\include"
+				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Crypto\include;..\..\Foundation\include;..\..\Util\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_DLL;WINVER=0x0500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -94,9 +95,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -131,7 +129,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Util\include"
+				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Crypto\include;..\..\Foundation\include;..\..\Util\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_DLL;WINVER=0x0500"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -185,16 +183,13 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
@@ -218,7 +213,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Util\include"
+				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Crypto\include;..\..\Foundation\include;..\..\Util\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;WINVER=0x0500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -243,7 +238,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib PocoNetmtd.lib PocoNetSSLmtd.lib PocoUtilmtd.lib libeay32mtd.lib ssleay32mtd.lib PocoXMLmtd.lib winmm.lib"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoFoundationmtd.lib PocoNetmtd.lib PocoNetSSLmtd.lib PocoUtilmtd.lib libeay32mtd.lib ssleay32mtd.lib PocoXMLmtd.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\debug_static\WinTestRunner.res"
 				OutputFile="bin/TestSuitemtd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -271,16 +266,13 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="release_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
@@ -308,7 +300,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Util\include"
+				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Crypto\include;..\..\Foundation\include;..\..\Util\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;WINVER=0x0500"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -332,7 +324,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib PocoXMLmt.lib PocoNetmt.lib PocoNetSSLmt.lib PocoUtilmt.lib libeay32mt.lib ssleay32mt.lib winmm.lib"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoFoundationmt.lib PocoXMLmt.lib PocoNetmt.lib PocoNetSSLmt.lib PocoUtilmt.lib libeay32mt.lib ssleay32mt.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\debug_static\WinTestRunner.res"
 				OutputFile="bin/TestSuitemt.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -360,9 +352,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

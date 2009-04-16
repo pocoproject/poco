@@ -246,7 +246,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoUtilmt.lib PocoFoundationmt.lib PocoXMLmt.lib winmm.lib"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoUtilmt.lib PocoFoundationmt.lib PocoXMLmt.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\release_static\WinTestRunner.res"
 				OutputFile="bin/TestSuitemt.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
@@ -334,7 +334,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoUtilmtd.lib PocoFoundationmtd.lib PocoXMLmtd.lib winmm.lib"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoUtilmtd.lib PocoFoundationmtd.lib PocoXMLmtd.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\debug_static\WinTestRunner.res"
 				OutputFile="bin/TestSuitemtd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"

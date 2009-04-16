@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Crypto/testsuite/Makefile#2 $
+# $Id: //poco/1.3/Crypto/testsuite/Makefile#3 $
 #
 # Makefile for Poco Crypto testsuite
 #
@@ -13,6 +13,6 @@ objects = CryptoTestSuite Driver \
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoCrypto PocoNetSSL PocoNet PocoFoundation CppUnit
+target_libs    = PocoCrypto PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec

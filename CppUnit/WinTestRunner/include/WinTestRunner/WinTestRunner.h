@@ -1,7 +1,7 @@
 //
 // WinTestRunner.h
 //
-// $Id: //poco/1.3/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#2 $
+// $Id: //poco/1.3/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#3 $
 //
 // Application shell for CppUnit's TestRunner dialog.
 //
@@ -50,6 +50,16 @@ private:
 class WinTestRunner_API WinTestRunnerApp: public CWinApp
 	/// A simple application class that hosts the TestRunner dialog.
 	/// Create a subclass and override the TestMain() method.
+	///
+	/// WinTestRunnerApp supports a batch mode, which runs the
+	/// test using the standard text-based TestRunner from CppUnit.
+	/// To enable batch mode, start the application with the "/b"
+	/// or "/B" argument. Optionally, a filename may be specified
+	/// where the test output will be written to: "/b:<path>" or
+	/// "/B:<path>".
+	///
+	/// When run in batch mode, the exit code of the application
+	/// will denote test success (0) or failure (1).
 {
 public:
 	virtual BOOL InitInstance();

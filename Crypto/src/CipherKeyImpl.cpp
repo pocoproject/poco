@@ -1,10 +1,10 @@
 //
 // CipherKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherKeyImpl.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/CipherKeyImpl.cpp#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherKeyImpl
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -56,7 +56,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_key(),
 	_iv()
 {
-	//dummy access to Cipherfactory so that the EVP lib is initilaized
+	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
@@ -76,7 +76,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_key(),
 	_iv()
 {
-	//dummy access to Cipherfactory so that the EVP lib is initilaized
+	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
@@ -93,7 +93,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name):
 	_key(),
 	_iv()
 {
-	//dummy access to Cipherfactory so that the EVP lib is initilaized
+	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
@@ -103,6 +103,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name):
 	_iv = ByteVec(ivSize());
 	generateKey();
 }
+
 
 CipherKeyImpl::~CipherKeyImpl()
 {

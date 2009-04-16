@@ -1,10 +1,10 @@
 //
 // CryptoStream.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CryptoStream.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/CryptoStream.cpp#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CryptoStream
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.3/Net/src/DNS.cpp#2 $
+// $Id: //poco/1.3/Net/src/DNS.cpp#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -137,6 +137,7 @@ const HostEntry& DNS::hostByAddress(const IPAddress& address)
 			struct addrinfo* pAI;
 			struct addrinfo hints;
 			memset(&hints, 0, sizeof(hints));
+			hints.ai_flags = AI_CANONNAME;
 			if (getaddrinfo(fqname, NULL, &hints, &pAI) == 0)
 			{
 				std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(std::string(fqname), HostEntry(pAI)));

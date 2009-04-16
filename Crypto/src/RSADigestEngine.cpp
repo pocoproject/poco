@@ -1,10 +1,10 @@
 //
 // RSADigestEngine.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSADigestEngine.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/RSADigestEngine.cpp#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: RSA
 // Module:  RSADigestEngine
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -42,12 +42,11 @@ namespace Poco {
 namespace Crypto {
 
 
-RSADigestEngine::RSADigestEngine(const RSAKey& key):
+RSADigestEngine::RSADigestEngine(const RSAKey& key, DigestType digestType):
 	_key(key),
-	_sig(),
-	_sha1()
+	_engine(digestType == DIGEST_MD5 ? static_cast<Poco::DigestEngine&>(_md5Engine) : static_cast<Poco::DigestEngine&>(_sha1Engine)),
+	_type(digestType == DIGEST_MD5 ? NID_md5 : NID_sha1)
 {
-	_sig = DigestEngine::Digest(key.size());
 }
 
 
@@ -58,48 +57,56 @@ RSADigestEngine::~RSADigestEngine()
 
 unsigned RSADigestEngine::digestLength() const
 {
-	return _sha1.digestLength();
+	return _engine.digestLength();
 }
 
 
 void RSADigestEngine::reset()
 {
-	_sha1.reset();
-	_sig = DigestEngine::Digest(_key.size());
+	_engine.reset();
+	_digest.clear();
+	_signature.clear();
 }
 
 	
 const DigestEngine::Digest& RSADigestEngine::digest()
 {
-	return _sha1.digest();
+	if (_digest.empty())
+	{
+		_digest = _engine.digest();
+	}
+	return _digest;
 }
 
 
 const DigestEngine::Digest& RSADigestEngine::signature()
 {
-	const DigestEngine::Digest& digest = _sha1.digest();
-	unsigned int sigLen = _sig.size();
-	RSA_sign(NID_sha1, &digest[0], (unsigned int)digest.size(), &_sig[0], &sigLen, _key.impl()->getRSA());
-	// truncate _sig to sigLen
-	if (sigLen < _sig.size())
-		_sig.resize(sigLen);
-    return _sig;
+	if (_signature.empty())
+	{
+		digest();
+		_signature.resize(_key.size());
+		unsigned sigLen = _signature.size();
+		RSA_sign(_type, &_digest[0], static_cast<unsigned>(_digest.size()), &_signature[0], &sigLen, _key.impl()->getRSA());
+		// truncate _sig to sigLen
+		if (sigLen < _signature.size())
+			_signature.resize(sigLen);
+	}
+    return _signature;
 }
 
 	
-void RSADigestEngine::verify(const DigestEngine::Digest& sig)
+bool RSADigestEngine::verify(const DigestEngine::Digest& sig)
 {
-	const DigestEngine::Digest& digest = _sha1.digest();
+	digest();
 	DigestEngine::Digest sigCpy = sig; // copy becausse RSA_verify can modify sigCpy
-	int ret = RSA_verify(NID_sha1, &digest[0], (unsigned int)digest.size(), &sigCpy[0], (unsigned int)sigCpy.size(), _key.impl()->getRSA());
-	if (ret == 0)
-		throw Poco::DataFormatException("Signature does not match");
+	int ret = RSA_verify(_type, &_digest[0], static_cast<unsigned>(_digest.size()), &sigCpy[0], static_cast<unsigned>(sigCpy.size()), _key.impl()->getRSA());
+	return ret != 0;
 }
 
 
 void RSADigestEngine::updateImpl(const void* data, unsigned length)
 {
-	_sha1.update(data, length);
+	_engine.update(data, length);
 }
 
 

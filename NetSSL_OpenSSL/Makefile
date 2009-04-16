@@ -13,7 +13,7 @@ SYSLIBS += -lssl -lcrypto
 objects = AcceptCertificateHandler CertificateHandlerFactory \
 	CertificateHandlerFactoryMgr ConsoleCertificateHandler \
 	Context HTTPSClientSession HTTPSStreamFactory HTTPSSessionInstantiator \
-	SSLInitializer InvalidCertificateHandler KeyConsoleHandler \
+	InvalidCertificateHandler KeyConsoleHandler \
 	KeyFileHandler PrivateKeyFactory PrivateKeyFactoryMgr \
 	PrivateKeyPassphraseHandler SecureServerSocket SecureServerSocketImpl \
 	SecureSocketImpl SecureStreamSocket SecureStreamSocketImpl \
@@ -22,6 +22,6 @@ objects = AcceptCertificateHandler CertificateHandlerFactory \
 
 target         = PocoNetSSL
 target_version = $(LIBVERSION)
-target_libs    = PocoFoundation PocoNet PocoUtil
+target_libs    = PocoNet PocoCrypto PocoUtil PocoFoundation 
 
 include $(POCO_BASE)/build/rules/lib
