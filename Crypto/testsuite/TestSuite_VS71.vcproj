@@ -215,7 +215,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoCryptomt.lib PocoFoundationmt.lib libeay32mt.lib ssleay32mt.libwinmm.lib ..\..\CppUnit\WinTestRunner\obj\release_static\WinTestRunner.res"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoCryptomt.lib PocoFoundationmt.lib libeay32mt.lib ssleay32mt.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\release_static\WinTestRunner.res"
 				OutputFile="bin/TestSuitemt.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
