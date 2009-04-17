@@ -1,9 +1,9 @@
 //
 // Utility.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Utility.h#3 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Utility.h#4 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Utility
 //

@@ -1,9 +1,9 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#9 $
+// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#10 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLiteStatementImpl
 //

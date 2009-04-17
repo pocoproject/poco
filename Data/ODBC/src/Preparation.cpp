@@ -1,10 +1,10 @@
 //
 // Preparation.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/Preparation.cpp#5 $
+// $Id: //poco/1.3/Data/ODBC/src/Preparation.cpp#7 $
 //
-// Library: Data
-// Package: DataCore
+// Library: Data/ODBC
+// Package: ODBC
 // Module:  Preparation
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

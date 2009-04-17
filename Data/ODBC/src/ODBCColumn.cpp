@@ -1,9 +1,9 @@
 //
 // ODBCColumn.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/ODBCColumn.cpp#8 $
+// $Id: //poco/1.3/Data/ODBC/src/ODBCColumn.cpp#9 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCColumn
 //

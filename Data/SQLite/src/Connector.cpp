@@ -1,9 +1,9 @@
 //
 // Connector.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Connector.cpp#4 $
+// $Id: //poco/1.3/Data/SQLite/src/Connector.cpp#5 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Connector
 //

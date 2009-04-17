@@ -1,9 +1,9 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#7 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#8 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SessionImpl
 //

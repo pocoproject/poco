@@ -1,9 +1,9 @@
 //
 // Extractor.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Extractor.h#3 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Extractor.h#4 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Extractor
 //

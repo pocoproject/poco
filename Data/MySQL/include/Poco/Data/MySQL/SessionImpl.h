@@ -1,9 +1,9 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/SessionImpl.h#2 $
+// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/SessionImpl.h#3 $
 //
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  SessionImpl
 //

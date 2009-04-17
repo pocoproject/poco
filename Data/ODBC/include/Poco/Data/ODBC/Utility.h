@@ -1,9 +1,9 @@
 //
 // Utility.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Utility.h#2 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Utility.h#3 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Utility
 //

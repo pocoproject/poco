@@ -1,9 +1,9 @@
 //
 // Parameter.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Parameter.h#2 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Parameter.h#3 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Parameter
 //

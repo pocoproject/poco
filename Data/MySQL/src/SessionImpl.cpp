@@ -1,9 +1,9 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/SessionImpl.cpp#3 $
+// $Id: //poco/1.3/Data/MySQL/src/SessionImpl.cpp#4 $
 //
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  SessionImpl
 //

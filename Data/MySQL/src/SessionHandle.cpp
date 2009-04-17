@@ -1,9 +1,9 @@
 //
 // SesssionHandle.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/SessionHandle.cpp#3 $
+// $Id: //poco/1.3/Data/MySQL/src/SessionHandle.cpp#4 $
 //
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  SessionHandle
 //

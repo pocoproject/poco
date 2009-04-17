@@ -1,9 +1,9 @@
 //
 // Connector.h
 //
-// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/Connector.h#2 $
+// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/Connector.h#3 $
 //
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  Connector
 //

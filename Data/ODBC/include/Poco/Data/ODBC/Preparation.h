@@ -1,10 +1,10 @@
 //
 // Preparation.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Preparation.h#4 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Preparation.h#6 $
 //
-// Library: Data
-// Package: DataCore
+// Library: Data/ODBC
+// Package: ODBC
 // Module:  Preparation
 //
 // Definition of the Preparation class.

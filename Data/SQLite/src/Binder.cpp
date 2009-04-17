@@ -1,9 +1,9 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Binder.cpp#2 $
+// $Id: //poco/1.3/Data/SQLite/src/Binder.cpp#3 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Binder
 //

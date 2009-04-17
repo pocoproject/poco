@@ -1,9 +1,9 @@
 //
 // Parameter.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/Parameter.cpp#4 $
+// $Id: //poco/1.3/Data/ODBC/src/Parameter.cpp#5 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Parameter
 //

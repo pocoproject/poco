@@ -1,9 +1,9 @@
 //
 // SQLiteException.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SQLiteException.cpp#6 $
+// $Id: //poco/1.3/Data/SQLite/src/SQLiteException.cpp#7 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLiteException
 //

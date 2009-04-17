@@ -1,9 +1,9 @@
 //
 // MySQLstatementImpl.h
 //
-// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQLStatementImpl.h#2 $
+// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQLStatementImpl.h#3 $
 //
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  MySQLstatementImpl
 //

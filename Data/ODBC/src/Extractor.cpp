@@ -1,9 +1,9 @@
 //
 // Extractor.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/Extractor.cpp#7 $
+// $Id: //poco/1.3/Data/ODBC/src/Extractor.cpp#8 $
 //
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Extractor
 //

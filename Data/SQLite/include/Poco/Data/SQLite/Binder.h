@@ -1,9 +1,9 @@
 //
 // Binder.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Binder.h#2 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Binder.h#3 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Binder
 //

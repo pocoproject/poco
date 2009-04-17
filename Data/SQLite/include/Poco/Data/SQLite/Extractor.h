@@ -1,9 +1,9 @@
 //
 // Extractor.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Extractor.h#2 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Extractor.h#3 $
 //
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Extractor
 //

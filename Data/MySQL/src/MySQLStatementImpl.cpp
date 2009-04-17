@@ -1,9 +1,9 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/MySQLStatementImpl.cpp#2 $
+// $Id: //poco/1.3/Data/MySQL/src/MySQLStatementImpl.cpp#3 $
 //
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  MySQLStatementImpl
 //
