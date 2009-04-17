@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#4 $
+// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#5 $
 //
 // Library: Crypto
 // Package: RSA
@@ -236,7 +236,7 @@ void RSAKeyImpl::save(const std::string& publicKeyFile, const std::string& priva
 				else
 					rc = PEM_write_bio_RSAPrivateKey(out, _pRSA, EVP_des_ede3_cbc(), 
 						reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())), 
-						privateKeyPassphrase.length(), 0, 0);
+						static_cast<int>(privateKeyPassphrase.length()), 0, 0);
 				if (!rc) throw Poco::FileException("Failed to write private key to file", privateKeyFile);
 			}
 			else throw Poco::CreateFileException("Cannot create private key file", privateKeyFile);

@@ -1,7 +1,7 @@
 //
 // CipherKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherKeyImpl.cpp#2 $
+// $Id: //poco/1.3/Crypto/src/CipherKeyImpl.cpp#3 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -170,7 +170,7 @@ void CipherKeyImpl::generateKey(
 
 	if (!salt.empty())
 	{
-		int len = salt.size();
+		int len = static_cast<int>(salt.size());
 		// Create the salt array from the salt string
 		for (int i = 0; i < 8; ++i)
 			saltBytes[i] = salt.at(i % len);
@@ -184,7 +184,7 @@ void CipherKeyImpl::generateKey(
 		EVP_md5(),
 		(salt.empty() ? 0 : saltBytes),
 		reinterpret_cast<const unsigned char*>(password.data()),
-		password.size(),
+		static_cast<int>(password.size()),
 		iterationCount,
 		keyBytes,
 		ivBytes);

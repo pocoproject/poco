@@ -1,7 +1,7 @@
 //
 // RSADigestEngine.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSADigestEngine.cpp#2 $
+// $Id: //poco/1.3/Crypto/src/RSADigestEngine.cpp#3 $
 //
 // Library: Crypto
 // Package: RSA
@@ -85,7 +85,7 @@ const DigestEngine::Digest& RSADigestEngine::signature()
 	{
 		digest();
 		_signature.resize(_key.size());
-		unsigned sigLen = _signature.size();
+		unsigned sigLen = static_cast<unsigned>(_signature.size());
 		RSA_sign(_type, &_digest[0], static_cast<unsigned>(_digest.size()), &_signature[0], &sigLen, _key.impl()->getRSA());
 		// truncate _sig to sigLen
 		if (sigLen < _signature.size())

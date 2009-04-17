@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#4 $
+// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#5 $
 //
 // Library: Crypto
 // Package: RSA
@@ -141,7 +141,7 @@ namespace
 		std::streamsize		 outputLength)
 	{
 		// always fill up the buffer before writing!
-		std::streamsize rsaSize = blockSize();
+		std::streamsize rsaSize = static_cast<std::streamsize>(blockSize());
 		poco_assert_dbg(_pos <= rsaSize);
 		poco_assert (outputLength >= rsaSize);
 		int rc = 0;
@@ -254,7 +254,7 @@ namespace
 	{
 		
 		// always fill up the buffer before decrypting!
-		std::streamsize rsaSize = blockSize();
+		std::streamsize rsaSize = static_cast<std::streamsize>(blockSize());
 		poco_assert_dbg(_pos <= rsaSize);
 		poco_assert (outputLength >= rsaSize);
 		int rc = 0;
