@@ -1,7 +1,7 @@
 //
 // MulticastSocket.cpp
 //
-// $Id: //poco/1.3/Net/src/MulticastSocket.cpp#3 $
+// $Id: //poco/1.3/Net/src/MulticastSocket.cpp#4 $
 //
 // Library: Net
 // Package: Sockets
@@ -39,9 +39,11 @@
 #include <cstring>
 
 
-#if defined(hpux) && defined(_XOPEN_SOURCE_EXTENDED)
+#if defined(hpux) && defined(_XOPEN_SOURCE_EXTENDED) && defined(POCO_HPUX_IP_MREQ_HACK)
 // netinet/in.h does not define struct ip_mreq if
-// _XOPEN_SOURCE_EXTENDED is #define'd.
+// _XOPEN_SOURCE_EXTENDED is #define'd in HP-UX 11.x 
+// versions prior to 11.30. Compile with -DPOCO_HPUX_IP_MREQ_HACK
+// if you experience problems.
 struct ip_mreq 
 {
 	struct in_addr imr_multiaddr;

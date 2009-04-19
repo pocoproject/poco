@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/X509Certificate.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/X509Certificate.h#2 $
 //
 // Library: Crypto
 // Package: Certificate
@@ -44,6 +44,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <set>
+#include <istream>
 #include <openssl/ssl.h>
 
 

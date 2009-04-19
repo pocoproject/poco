@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKeyImpl.h#2 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKeyImpl.h#3 $
 //
 // Library: Crypto
 // Package: RSA
@@ -43,6 +43,8 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
+#include <istream>
+#include <ostream>
 
 
 struct rsa_st;

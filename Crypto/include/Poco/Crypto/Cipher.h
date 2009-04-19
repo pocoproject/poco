@@ -1,7 +1,7 @@
 //
 // Cipher.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Cipher.h#2 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Cipher.h#3 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -43,7 +43,8 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
-
+#include <istream>
+#include <ostream>
 #include <vector>
 
 

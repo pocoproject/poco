@@ -2,7 +2,7 @@
 #
 # configure
 #
-# $Id: //poco/1.3/dist/configure#8 $
+# $Id: //poco/1.3/dist/configure#9 $
 #
 # Configuration script for POCO.
 #
@@ -43,15 +43,16 @@ Options:
   --no-wstring
     Compile with -DPOCO_NO_WSTRING.
     Useful if your C++ compiler does not support std::wstring
-    (such as uclibc-based systems).
+    (such as uClibc-based systems).
 
   --no-fpenvironment
     Compile with -DPOCO_NO_FPENVIRONMENT.
     Useful if your C++ compiler has incomplete floating-point support
-    (such as uclibc-based systems).
+    (such as uClibc-based systems).
 
   --omit=<component>{,<component>}
     Do not build the specified component(s).
+    Example: --omit=Data/MySQL,Data/ODBC,Zip
     
   --include-path=<path>
     Add search path for header files.
