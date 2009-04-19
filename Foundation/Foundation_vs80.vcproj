@@ -358,6 +358,10 @@
 				Name="Source Files"
 				>
 				<File
+					RelativePath=".\src\AtomicCounter.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Bugcheck.cpp"
 					>
 				</File>
@@ -759,6 +763,10 @@
 				>
 				<File
 					RelativePath=".\include\Poco\Any.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\AtomicCounter.h"
 					>
 				</File>
 				<File

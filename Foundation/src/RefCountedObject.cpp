@@ -1,7 +1,7 @@
 //
 // RefCountedObject.cpp
 //
-// $Id: //poco/1.3/Foundation/src/RefCountedObject.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/RefCountedObject.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -40,30 +40,13 @@
 namespace Poco {
 
 
-RefCountedObject::RefCountedObject(): _rc(1)
+RefCountedObject::RefCountedObject(): _counter(1)
 {
 }
 
 
 RefCountedObject::~RefCountedObject()
 {
-}
-
-
-void RefCountedObject::duplicate() const
-{
-	_rcMutex.lock();
-	++_rc;
-	_rcMutex.unlock();
-}
-
-
-void RefCountedObject::release() const
-{
-	_rcMutex.lock();
-	int rc = --_rc;
-	_rcMutex.unlock();
-	if (rc == 0) delete this;
 }
 
 

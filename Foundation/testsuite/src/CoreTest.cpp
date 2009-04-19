@@ -1,7 +1,7 @@
 //
 // CoreTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.cpp#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.cpp#5 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,7 +37,9 @@
 #include "Poco/Exception.h"
 #include "Poco/Environment.h"
 #include "Poco/Thread.h"
+#include "Poco/Runnable.h"
 #include "Poco/Buffer.h"
+#include "Poco/AtomicCounter.h"
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -47,7 +49,36 @@ using Poco::Bugcheck;
 using Poco::Exception;
 using Poco::Environment;
 using Poco::Thread;
+using Poco::Runnable;
 using Poco::Buffer;
+using Poco::AtomicCounter;
+
+
+namespace
+{
+	class ACTRunnable: public Poco::Runnable
+	{
+	public:
+		ACTRunnable(AtomicCounter& counter):
+			_counter(counter)
+		{
+		}
+		
+		void run()
+		{
+			for (int i = 0; i < 100000; ++i)
+			{
+				_counter++;
+				_counter--;
+				++_counter;
+				--_counter;
+			}
+		}
+		
+	private:
+		AtomicCounter& _counter;
+	};
+}
 
 
 //
@@ -168,6 +199,48 @@ void CoreTest::testBuffer()
 }
 
 
+void CoreTest::testAtomicCounter()
+{
+	AtomicCounter ac;
+	
+	assert (ac.value() == 0);
+	assert (ac++ == 0);
+	assert (ac-- == 1);
+	assert (++ac == 1);
+	assert (--ac == 0);
+	
+	ac = 2;
+	assert (ac.value() == 2);
+	
+	ac = 0;
+	assert (ac.value() == 0);
+	
+	AtomicCounter ac2(2);
+	assert (ac2.value() == 2);
+	
+	ACTRunnable act(ac);
+	Thread t1;
+	Thread t2;
+	Thread t3;
+	Thread t4;
+	Thread t5;
+	
+	t1.start(act);
+	t2.start(act);
+	t3.start(act);
+	t4.start(act);
+	t5.start(act);
+	
+	t1.join();
+	t2.join();
+	t3.join();
+	t4.join();
+	t5.join();
+	
+	assert (ac.value() == 0);
+}
+
+
 void CoreTest::setUp()
 {
 }
@@ -187,6 +260,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testBugcheck);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
+	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 
 	return pSuite;
 }

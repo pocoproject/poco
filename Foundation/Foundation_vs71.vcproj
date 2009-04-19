@@ -250,6 +250,9 @@
 				Name="Source Files"
 				Filter="">
 				<File
+					RelativePath=".\src\AtomicCounter.cpp">
+				</File>
+				<File
 					RelativePath=".\src\Bugcheck.cpp">
 				</File>
 				<File
@@ -550,6 +553,9 @@
 			<Filter
 				Name="Header Files"
 				Filter="">
+				<File
+					RelativePath=".\include\Poco\AtomicCounter.h">
+				</File>
 				<File
 					RelativePath=".\include\Poco\Any.h">
 				</File>

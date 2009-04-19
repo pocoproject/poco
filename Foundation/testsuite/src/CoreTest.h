@@ -1,7 +1,7 @@
 //
 // CoreTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.h#3 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.h#4 $
 //
 // Definition of the CoreTest class.
 //
@@ -52,6 +52,7 @@ public:
 	void testFPE();
 	void testEnvironment();
 	void testBuffer();
+	void testAtomicCounter();
 
 	void setUp();
 	void tearDown();

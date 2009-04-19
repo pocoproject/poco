@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#6 $
+// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -42,7 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
-#include "Poco/Mutex.h"
+#include "Poco/AtomicCounter.h"
 #include <algorithm>
 
 
@@ -59,24 +59,21 @@ public:
 
 	void duplicate()
 	{
-		FastMutex::ScopedLock lock(_mutex);
 		++_cnt;
 	}
 
 	int release()
 	{
-		FastMutex::ScopedLock lock(_mutex);
 		return --_cnt;
 	}
 	
 	int referenceCount() const
 	{
-		return _cnt;
+		return _cnt.value();
 	}
 
 private:
-	FastMutex _mutex;
-	int _cnt;
+	AtomicCounter _cnt;
 };
 
 
