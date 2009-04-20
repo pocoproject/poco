@@ -59,7 +59,7 @@ class Foundation_API ErrorHandler
 	/// global ErrorHandler that is invoked whenever a thread has
 	/// been terminated by an unhandled exception.
 	/// The ErrorHandler must be derived from this class and can
-	/// provide implementations of all three handleException() overloads.
+	/// provide implementations of all three exception() overloads.
 	///
 	/// The ErrorHandler is always invoked within the context of
 	/// the offending thread.
