@@ -1,7 +1,7 @@
 //
 // PipeImpl_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/PipeImpl_POSIX.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/PipeImpl_POSIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -38,6 +38,7 @@
 #include "Poco/Exception.h"
 #include <sys/types.h>
 #include <unistd.h>
+#include <errno.h>
 
 
 namespace Poco {

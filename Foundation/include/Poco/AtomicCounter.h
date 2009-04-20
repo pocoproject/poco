@@ -1,7 +1,7 @@
 //
 // AtomicCounter.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/AtomicCounter.h#5 $
+// $Id: //poco/1.3/Foundation/include/Poco/AtomicCounter.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -119,7 +119,7 @@ private:
 #if POCO_OS == POCO_OS_WINDOWS_NT
 	typedef volatile LONG ImplType;
 #elif POCO_OS == POCO_OS_MAC_OS_X
-	typedef volatile int32_t ImplType;
+	typedef int32_t ImplType;
 #else // generic implementation based on FastMutex
 	struct ImplType
 	{

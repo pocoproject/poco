@@ -1,7 +1,7 @@
 //
 // ZipTest.cpp
 //
-// $Id: //poco/1.3/Zip/testsuite/src/ZipTest.cpp#7 $
+// $Id: //poco/1.3/Zip/testsuite/src/ZipTest.cpp#10 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,6 +36,7 @@
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Zip/ZipStream.h"
 #include "Poco/Zip/Decompress.h"
+#include "Poco/Zip/ZipCommon.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/File.h"
 #include "Poco/URI.h"
@@ -65,17 +66,17 @@ void ZipTest::testSkipSingleFile()
 {
 	std::string testFile = getTestFile("test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
-	poco_assert (inp);
+	assert (inp.good());
 	SkipCallback skip;
 	ZipLocalFileHeader hdr(inp, false, skip);
-	poco_assert (ZipCommon::HS_FAT == hdr.getHostSystem());
+	assert (ZipCommon::HS_FAT == hdr.getHostSystem());
 	int major = hdr.getMajorVersionNumber();
 	int minor = hdr.getMinorVersionNumber();
-	poco_assert (major <= 2);
+	assert (major <= 2);
 	std::size_t hdrSize = hdr.getHeaderSize();
-	poco_assert (hdrSize > 30);
+	assert (hdrSize > 30);
 	ZipCommon::CompressionMethod cm = hdr.getCompressionMethod();
-	poco_assert (!hdr.isEncrypted());
+	assert (!hdr.isEncrypted());
 	Poco::DateTime aDate = hdr.lastModifiedAt();
 	Poco::UInt32 cS = hdr.getCompressedSize();
 	Poco::UInt32 uS = hdr.getUncompressedSize();
@@ -87,36 +88,36 @@ void ZipTest::testDecompressSingleFile()
 {
 	std::string testFile = getTestFile("test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
-	poco_assert (inp);
+	assert (inp.good());
 	ZipArchive arch(inp);
-	ZipArchive::FileHeaders::const_iterator it = arch.findHeader("Zip_VS71.vcproj");
-	poco_assert (it != arch.headerEnd());
+	ZipArchive::FileHeaders::const_iterator it = arch.findHeader("testfile.txt");
+	assert (it != arch.headerEnd());
 	ZipInputStream zipin (inp, it->second);
 	std::ostringstream out(std::ios::binary);
 	Poco::StreamCopier::copyStream(zipin, out);
-	poco_assert(!out.str().empty());
+	assert(!out.str().empty());
 }
 
 
 void ZipTest::testCrcAndSizeAfterData()
 {
-	std::string testFile = getTestFile("java.zip");
+	std::string testFile = getTestFile("data.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
-	poco_assert (inp);
+	assert (inp.good());
 	Decompress dec(inp, Poco::Path());
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
 	dec.decompressAllFiles();
 	dec.EError -= Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
-	poco_assert (_errCnt == 0);
-	poco_assert (!dec.mapping().empty());
+	assert (_errCnt == 0);
+	assert (!dec.mapping().empty());
 }
 
 
 void ZipTest::testCrcAndSizeAfterDataWithArchive()
 {
-	std::string testFile = getTestFile("java.zip");
+	std::string testFile = getTestFile("data.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
-	poco_assert (inp);
+	assert (inp.good());
 	Poco::Zip::ZipArchive zip(inp);
 	inp.clear();
 	inp.seekg(0);
@@ -159,13 +160,13 @@ void ZipTest::testDecompress()
 {
 	std::string testFile = getTestFile("test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
-	poco_assert (inp);
+	assert (inp.good());
 	Decompress dec(inp, Poco::Path());
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
 	dec.decompressAllFiles();
 	dec.EError -= Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
-	poco_assert (_errCnt == 0);
-	poco_assert (!dec.mapping().empty());
+	assert (_errCnt == 0);
+	assert (!dec.mapping().empty());
 }
 
 
@@ -173,13 +174,13 @@ void ZipTest::testDecompressFlat()
 {
 	std::string testFile = getTestFile("test.zip");
 	std::ifstream inp(testFile.c_str(), std::ios::binary);
-	poco_assert (inp);
+	assert (inp.good());
 	Decompress dec(inp, Poco::Path(), true);
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
 	dec.decompressAllFiles();
 	dec.EError -= Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
-	poco_assert (_errCnt == 0);
-	poco_assert (!dec.mapping().empty());
+	assert (_errCnt == 0);
+	assert (!dec.mapping().empty());
 }
 
 

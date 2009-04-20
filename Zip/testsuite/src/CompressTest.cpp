@@ -1,7 +1,7 @@
 //
 // CompressTest.cpp
 //
-// $Id: //poco/1.3/Zip/testsuite/src/CompressTest.cpp#5 $
+// $Id: //poco/1.3/Zip/testsuite/src/CompressTest.cpp#6 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.

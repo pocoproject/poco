@@ -1,7 +1,7 @@
 //
 // Decompress.cpp
 //
-// $Id: //poco/1.3/Zip/src/Decompress.cpp#4 $
+// $Id: //poco/1.3/Zip/src/Decompress.cpp#5 $
 //
 // Library: Zip
 // Package: Zip
@@ -168,13 +168,13 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 	}
 	catch (Poco::Exception& e)
 	{
-		std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Exception: " + e.displayText());
+		std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, std::string("Exception: " + e.displayText()));
 		EError.notify(this, tmp);
 		return false;
 	}
 	catch (...)
 	{
-		std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Unknown Exception");
+		std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, std::string("Unknown Exception"));
 		EError.notify(this, tmp);
 		return false;
 	}

@@ -1,7 +1,7 @@
 //
 // PartialStreamTest.cpp
 //
-// $Id: //poco/1.3/Zip/testsuite/src/PartialStreamTest.cpp#3 $
+// $Id: //poco/1.3/Zip/testsuite/src/PartialStreamTest.cpp#4 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -61,7 +61,7 @@ void PartialStreamTest::testReading()
 	char buf[124];
 	in.read(buf, 124);
 	std::string res(buf, in.gcount());
-	poco_assert (res == result);
+	assert (res == result);
 }
 
 
@@ -74,11 +74,11 @@ void PartialStreamTest::testWriting()
 	std::ostringstream ostr;
 	PartialOutputStream out(ostr, prefix.size(), postfix.size());
 	out.write(result.c_str(), static_cast<std::streamsize>(result.length()));
-	poco_assert (out.good());
+	assert (out.good());
 	out.close();
 	std::string res (ostr.str());
-	poco_assert (out.bytesWritten() == message.size());
-	poco_assert (message == res);
+	assert (out.bytesWritten() == message.size());
+	assert (message == res);
 }
 
 
@@ -91,11 +91,11 @@ void PartialStreamTest::testWritingZero()
 	std::ostringstream ostr;
 	PartialOutputStream out(ostr, prefix.size(), postfix.size());
 	out.write(result.c_str(), static_cast<std::streamsize>(result.length()));
-	poco_assert (out.good());
+	assert (out.good());
 	out.close();
 	std::string res (ostr.str());
-	poco_assert (out.bytesWritten() == message.size());
-	poco_assert (message == res);
+	assert (out.bytesWritten() == message.size());
+	assert (message == res);
 }
 
 
@@ -108,11 +108,11 @@ void PartialStreamTest::testWritingOne()
 	std::ostringstream ostr;
 	PartialOutputStream out(ostr, prefix.size(), postfix.size());
 	out.write(result.c_str(), static_cast<std::streamsize>(result.length()));
-	poco_assert (out.good());
+	assert (out.good());
 	out.close();
 	std::string res (ostr.str());
-	poco_assert (out.bytesWritten() == message.size());
-	poco_assert (message == res);
+	assert (out.bytesWritten() == message.size());
+	assert (message == res);
 }
 
 
