@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/Main/Util/src/Application.cpp#30 $
+// $Id: //poco/Main/Util/src/Application.cpp#31 $
 //
 // Library: Util
 // Package: Application
@@ -250,16 +250,20 @@ int Application::loadConfiguration(int priority)
 		_pConfig->add(new PropertyFileConfiguration(cfgPath.toString()), priority, false, false);
 		++n;
 	}
+#ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "ini", cfgPath))
 	{
 		_pConfig->add(new IniFileConfiguration(cfgPath.toString()), priority, false, false);
 		++n;
 	}
+#endif
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "xml", cfgPath))
 	{
 		_pConfig->add(new XMLConfiguration(cfgPath.toString()), priority, false, false);
 		++n;
 	}
+#endif
 	if (n > 0)
 	{
 		_pConfig->setString("application.configDir", cfgPath.parent().toString());
@@ -274,10 +278,14 @@ void Application::loadConfiguration(const std::string& path, int priority)
 	std::string ext = confPath.getExtension();
 	if (icompare(ext, "properties") == 0)
 		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
+#ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	else if (icompare(ext, "ini") == 0)
 		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
+#endif
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	else if (icompare(ext, "xml") == 0)
 		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false, false);
+#endif
 	else
 		throw Poco::InvalidArgumentException("Unsupported configuration file type", ext);
 }
@@ -399,6 +407,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 	{
 		if (!Path::find(Environment::get("PATH"), _command, appPath))
 			appPath = Path(Path::current(), _command);
+		appPath.makeAbsolute();
 	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
@@ -432,7 +441,7 @@ bool Application::findFile(Poco::Path& path) const
 	Path appPath;
 	getApplicationPath(appPath);
 	Path base = appPath.parent();
-	while (base.depth() > 0)
+	do
 	{
 		Path p(base, path);
 		File f(p);
@@ -441,8 +450,9 @@ bool Application::findFile(Poco::Path& path) const
 			path = p;
 			return true;
 		}
-		base.popDirectory();
+		if (base.depth() > 0) base.popDirectory();
 	}
+	while (base.depth() > 0);
 	return false;
 }
 
