@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.3/Util/src/Application.cpp#8 $
+// $Id: //poco/1.3/Util/src/Application.cpp#9 $
 //
 // Library: Util
 // Package: Application
@@ -407,6 +407,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 	{
 		if (!Path::find(Environment::get("PATH"), _command, appPath))
 			appPath = Path(Path::current(), _command);
+		appPath.makeAbsolute();
 	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
@@ -440,7 +441,7 @@ bool Application::findFile(Poco::Path& path) const
 	Path appPath;
 	getApplicationPath(appPath);
 	Path base = appPath.parent();
-	while (base.depth() > 0)
+	do
 	{
 		Path p(base, path);
 		File f(p);
@@ -449,8 +450,9 @@ bool Application::findFile(Poco::Path& path) const
 			path = p;
 			return true;
 		}
-		base.popDirectory();
+		if (base.depth() > 0) base.popDirectory();
 	}
+	while (base.depth() > 0);
 	return false;
 }
 

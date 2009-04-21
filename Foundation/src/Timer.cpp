@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Timer.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/Timer.cpp#6 $
 //
 // Library: Foundation
 // Package: Threading
