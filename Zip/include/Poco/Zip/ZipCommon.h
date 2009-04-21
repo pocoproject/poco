@@ -1,7 +1,7 @@
 //
 // ZipCommon.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipCommon.h#3 $
+// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipCommon.h#4 $
 //
 // Library: Zip
 // Package: Zip
@@ -100,7 +100,7 @@ public:
 		HS_MVS = 15,
 		HS_BEOS = 16,
 		HS_TANDEM = 17,
-		HS_UNUSED = 18,
+		HS_UNUSED = 18
 	};
 
 	enum FileType
