@@ -14,7 +14,7 @@ command line arguments, as well as various utility classes.
 The Net library contains network classes (sockets, HTTP, etc.).
 All libraries come with a test suite and a number of sample programs.
 
-The directory layout is as follows:
+The basic directory layout is as follows:
 
 build/                     the build system for Unix/OpenVMS and additional utility scripts
     config/                build configurations for various Unix platforms
@@ -47,12 +47,28 @@ Foundation/                project and make/build files for the Foundation libra
 XML/                       project and make/build files for the XML library
     include/
         Poco/
-            XML/           header files for the XML library
+            XML/           header files for the core XML library
+            SAX/           header files for SAX support
+            DOM/           header files for DOM support
     src/                   source files for the XML library
     testsuite/             project and make/build files for the XML testsuite
               src/         source files for the XML testsuite
               bin/         test suite executables
     samples/               sample applications for the XML library
+
+Net/                       project and make/build files for the Net library
+    include/
+        Poco/
+            Net/           header files for the Net library
+    src/                   source files for the Net library
+    testsuite/             project and make/build files for the Net testsuite
+              src/         source files for the Net testsuite
+              bin/         test suite executables
+    samples/               sample applications for the Net library
+
+
+Depending on what package you have downloaded, there may be other libraries
+as well (such as Data, Crypto, NetSSL_OpenSSL and Zip).
 
 
 DOCUMENTATION
@@ -258,4 +274,4 @@ at <http://pocoproject.org>.
 
 
 --
-$Id: //poco/1.3/dist/README#7 $
+$Id: //poco/1.3/dist/README#8 $
