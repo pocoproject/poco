@@ -17,6 +17,13 @@ SYSLIBS += -L/usr/local/lib/odbc -L/usr/lib/odbc -L/usr/lib -L/usr/local/lib
 ifeq ($(POCO_CONFIG),MinGW)
 # Lack of unixODBC or iODBC is not an error for MinGW platform since it uses Windows odbc32.lib
 else
+ifeq ($(POCO_CONFIG),CYGWIN)
+# -DODBCVER=0x0300: SQLHandle declaration issue
+# -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
+CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
+# CYGWIN platform has its own ODBC library in /lib/w32api 
+SYSLIBS += -L/lib/w32api -lodbc32 -lodbccp32
+else
 ifeq (0, $(shell test -e $(ODBCLIBDIR)/libodbc$(SHAREDLIBLINKEXT); echo $$?))
 SYSLIBS += -lodbc -lodbcinst
 COMMONFLAGS += -DPOCO_UNIXODBC
@@ -34,6 +41,7 @@ SYSLIBS += -liodbc -liodbcinst
 COMMONFLAGS += -DPOCO_IODBC
 else
 $(error No ODBC library found. Please install unixODBC or iODBC and try again)
+endif
 endif
 endif
 endif

@@ -13,7 +13,7 @@ rem VS_VERSION: 71|80|90
 rem ACTION:     build|rebuild|clean
 rem LINKMODE:   static|shared|both
 rem CONFIG:     release|debug|both
-rem SAMPLES:    yes|no
+rem SAMPLES:    yes|no (shared only)
 rem
 rem VS_VERSION is required argument. Default is build all.
 
@@ -181,8 +181,6 @@ for /f %%G in ('findstr /R "." components') do (
   echo ========== Building %%G/samples ==========
   if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
   if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
-  if %DEBUG_STATIC%==1   devenv /useenv /%ACTION% debug_static samples_%VS_VERSION%.sln
-  if %RELEASE_STATIC%==1 devenv /useenv /%ACTION% release_static samples_%VS_VERSION%.sln
   cd %POCOBASE%
  )
 )
@@ -197,7 +195,7 @@ echo VS_VERSION: "71|80|90"
 echo ACTION:     "build|rebuild|clean"
 echo LINKMODE:   "static|shared|both"
 echo CONFIG:     "release|debug|both"
-echo SAMPLES:    "yes|no"
+echo SAMPLES:    "yes|no" (shared only)
 echo. 
 echo Default is build all.
 endlocal

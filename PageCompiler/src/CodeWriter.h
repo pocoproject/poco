@@ -1,7 +1,7 @@
 //
 // CodeWriter.h
 //
-// $Id: //poco/1.3/PageCompiler/src/CodeWriter.h#1 $
+// $Id: //poco/1.3/PageCompiler/src/CodeWriter.h#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -50,7 +50,7 @@ public:
 	CodeWriter(const Page& page, const std::string& clazz);
 		/// Creates the CodeWriter, using the given Page.
 
-	~CodeWriter();
+	virtual ~CodeWriter();
 		/// Destroys the PageReader.
 
 	virtual void writeHeader(std::ostream& ostr, const std::string& headerFileName);

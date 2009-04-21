@@ -1,7 +1,7 @@
 //
 // DataTypes.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/DataTypes.h#3 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/DataTypes.h#4 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -42,7 +42,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #include <map>
-#ifdef POCO_OS_FAMILY_WINDOWS
+#if defined(POCO_OS_FAMILY_WINDOWS) || defined(__CYGWIN__)
 #include <windows.h>
 #endif
 #include <sqlext.h>

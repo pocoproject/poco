@@ -1,7 +1,7 @@
 //
 // CodeWriter.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/CodeWriter.cpp#1 $
+// $Id: //poco/1.3/PageCompiler/src/CodeWriter.cpp#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -290,3 +290,4 @@ void CodeWriter::writeRequest(std::ostream& ostr)
 	ostr << "\n";
 	ostr << "\tstd::ostream& ostr = response.send();\n";
 }
+

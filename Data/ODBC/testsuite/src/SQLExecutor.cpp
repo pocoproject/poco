@@ -1577,7 +1577,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	std::string firstName("firstname");
 	std::string address("Address");
 
-	BLOB img("0123456789", 10);
+	Poco::Data::BLOB img("0123456789", 10);
 	int count = 0;
 	try { *_pSession << format("INSERT INTO Person VALUES (?,?,?,%s)", blobPlaceholder), use(lastName), use(firstName), use(address), use(img), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -1587,14 +1587,14 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == 1);
 
-	BLOB res;
+	Poco::Data::BLOB res;
 	assert (res.size() == 0);
 	try { *_pSession << "SELECT Image FROM Person", into(res), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (res == img);
 
-	BLOB big;
+	Poco::Data::BLOB big;
 	std::vector<char> v(bigSize, 'x');
 	big.assignRaw(&v[0], v.size());
 
@@ -1621,7 +1621,7 @@ void SQLExecutor::blobStmt()
 	std::string lastName("lastname");
 	std::string firstName("firstname");
 	std::string address("Address");
-	BLOB blob("0123456789", 10);
+	Poco::Data::BLOB blob("0123456789", 10);
 
 	int count = 0;
 	Statement ins = (*_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(blob));
@@ -1631,7 +1631,7 @@ void SQLExecutor::blobStmt()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == 1);
 
-	BLOB res;
+	Poco::Data::BLOB res;
 	poco_assert (res.size() == 0);
 	Statement stmt = (*_pSession << "SELECT Image FROM Person", into(res));
 	try { stmt.execute(); }
