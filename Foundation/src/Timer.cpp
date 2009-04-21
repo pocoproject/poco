@@ -171,6 +171,7 @@ void Timer::run()
 		if (_wakeUp.tryWait(sleep))
 		{
 			FastMutex::ScopedLock lock(_mutex);
+			_nextInvocation.update();
 			interval = _periodicInterval;
 		}
 		else
