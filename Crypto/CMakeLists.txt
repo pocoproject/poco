@@ -22,6 +22,7 @@ target_link_libraries( ${LIBNAMED}  PocoNetSSLd PocoNetd ssl crypto)
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    PATTERN ".svn" EXCLUDE
     )
     
 install(

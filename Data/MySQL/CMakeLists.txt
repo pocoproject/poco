@@ -26,6 +26,7 @@ target_link_libraries( ${LIBNAMED} PocoDatad PocoFoundationd ${MYSQL_LIB})
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    PATTERN ".svn" EXCLUDE
     )
     
 install(

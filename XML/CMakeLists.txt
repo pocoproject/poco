@@ -22,6 +22,7 @@ target_link_libraries( ${LIBNAMED} PocoFoundationd)
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    PATTERN ".svn" EXCLUDE
     )
     
 install(

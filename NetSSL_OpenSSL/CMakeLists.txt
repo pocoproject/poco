@@ -20,6 +20,7 @@ target_link_libraries( ${LIBNAMED}  ssl crypto)
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    PATTERN ".svn" EXCLUDE
     )
     
 install(

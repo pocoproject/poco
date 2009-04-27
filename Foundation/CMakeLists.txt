@@ -206,6 +206,7 @@ target_link_libraries( ${LIBNAMED} ${SYSLIBS})
 install(
     DIRECTORY include/Poco
     DESTINATION include
+    PATTERN ".svn" EXCLUDE
     )
     
 install(
