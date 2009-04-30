@@ -4,14 +4,14 @@
 // $Id: //poco/svn/Util/include/Poco/Util/Units.h#1 $
 //
 // Library: Util
-// Package: Util
+// Package: Units
 // Module:  Units
 //
 // Basic definitions for the Poco Util library.
 // This file must be the first file included by every other Util
 // header file.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2007-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,8 +35,6 @@
 // FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
-
 //
 //	Adapted for POCO from the following source:
 //
