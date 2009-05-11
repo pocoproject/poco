@@ -1,7 +1,7 @@
 //
 // Decompress.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/Decompress.h#3 $
+// $Id: //poco/1.3/Zip/include/Poco/Zip/Decompress.h#4 $
 //
 // Library: Zip
 // Package: Zip
@@ -42,6 +42,7 @@
 
 #include "Poco/Zip/Zip.h"
 #include "Poco/Zip/ParseCallback.h"
+#include "Poco/Zip/ZipArchive.h"
 #include "Poco/Path.h"
 #include "Poco/FIFOEvent.h"
 

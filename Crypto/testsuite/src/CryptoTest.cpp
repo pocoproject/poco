@@ -1,7 +1,7 @@
 //
 // CryptoTest.cpp
 //
-// $Id: //poco/1.3/Crypto/testsuite/src/CryptoTest.cpp#1 $
+// $Id: //poco/1.3/Crypto/testsuite/src/CryptoTest.cpp#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,9 +36,40 @@
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherKey.h"
+#include "Poco/Crypto/X509Certificate.h"
+#include <sstream>
 
 
 using namespace Poco::Crypto;
+
+
+static const std::string APPINF_PEM(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIESzCCAzOgAwIBAgIBATALBgkqhkiG9w0BAQUwgdMxEzARBgNVBAMMCmFwcGlu\n"
+	"Zi5jb20xNjA0BgNVBAoMLUFwcGxpZWQgSW5mb3JtYXRpY3MgU29mdHdhcmUgRW5n\n"
+	"aW5lZXJpbmcgR21iSDEUMBIGA1UECwwLRGV2ZWxvcG1lbnQxEjAQBgNVBAgMCUNh\n"
+	"cmludGhpYTELMAkGA1UEBhMCQVQxHjAcBgNVBAcMFVN0LiBKYWtvYiBpbSBSb3Nl\n"
+	"bnRhbDEtMCsGCSqGSIb3DQEJARYeZ3VlbnRlci5vYmlsdHNjaG5pZ0BhcHBpbmYu\n"
+	"Y29tMB4XDTA5MDUwNzE0NTY1NloXDTI5MDUwMjE0NTY1NlowgdMxEzARBgNVBAMM\n"
+	"CmFwcGluZi5jb20xNjA0BgNVBAoMLUFwcGxpZWQgSW5mb3JtYXRpY3MgU29mdHdh\n"
+	"cmUgRW5naW5lZXJpbmcgR21iSDEUMBIGA1UECwwLRGV2ZWxvcG1lbnQxEjAQBgNV\n"
+	"BAgMCUNhcmludGhpYTELMAkGA1UEBhMCQVQxHjAcBgNVBAcMFVN0LiBKYWtvYiBp\n"
+	"bSBSb3NlbnRhbDEtMCsGCSqGSIb3DQEJARYeZ3VlbnRlci5vYmlsdHNjaG5pZ0Bh\n"
+	"cHBpbmYuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA89GolWCR\n"
+	"KtLQclJ2M2QtpFqzNC54hUQdR6n8+DAeruH9WFwLSdWW2fEi+jrtd/WEWCdt4PxX\n"
+	"F2/eBYeURus7Hg2ZtJGDd3je0+Ygsv7+we4cMN/knaBY7rATqhmnZWk+yBpkf5F2\n"
+	"IHp9gBxUaJWmt/bq3XrvTtzrDXpCd4zg4zPXZ8IC8ket5o3K2vnkAOsIsgN+Ffqd\n"
+	"4GjF4dsblG6u6E3VarGRLwGtgB8BAZOA/33mV4FHSMkc4OXpAChaK3tM8YhrLw+m\n"
+	"XtsfqDiv1825S6OWFCKGj/iX8X2QAkrdB63vXCSpb3de/ByIUfp31PpMlMh6dKo1\n"
+	"vf7yj0nb2w0utQIDAQABoyowKDAOBgNVHQ8BAf8EBAMCB4AwFgYDVR0lAQH/BAww\n"
+	"CgYIKwYBBQUHAwMwDQYJKoZIhvcNAQEFBQADggEBAM0cpfb4BgiU/rkYe121P581\n"
+	"ftg5Ck1PYYda1Fy/FgzbgJh2AwVo/6sn6GF79/QkEcWEgtCMNNO3LMTTddUUApuP\n"
+	"jnEimyfmUhIThyud/vryzTMNa/eZMwaAqUQWqLf+AwgqjUsBSMenbSHavzJOpsvR\n"
+	"LI0PQ1VvqB+3UGz0JUnBJiKvHs83Fdm4ewPAf3M5fGcIa+Fl2nU5Plzwzskj84f6\n"
+	"73ZlEEi3aW9JieNy7RWsMM+1E8Sj2CGRZC4BM9V1Fgnsh4+VHX8Eu7eHucvfeIYx\n"
+	"3mmLMoK4sCayL/FGhrUDw5AkWb8tKNpRXY+W60Et281yxQSeWLPIbatVzIWI0/M=\n"
+	"-----END CERTIFICATE-----\n"
+);
 
 
 CryptoTest::CryptoTest(const std::string& name): CppUnit::TestCase(name)
@@ -51,7 +82,7 @@ CryptoTest::~CryptoTest()
 }
 
 
-void CryptoTest::testEncoding()
+void CryptoTest::testEncryptDecrypt()
 {
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256"));
 
@@ -62,7 +93,7 @@ void CryptoTest::testEncoding()
 }
 
 
-void CryptoTest::testEncoding2()
+void CryptoTest::testEncryptDecryptWithSalt()
 {
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "simplepwd", "Too much salt"));
 	
@@ -73,6 +104,33 @@ void CryptoTest::testEncoding2()
 	
 	std::string result = pCipher2->decryptString(out, Cipher::ENC_BASE64);
 	poco_assert (in == result);
+}
+
+
+void CryptoTest::testCertificate()
+{
+	std::istringstream certStream(APPINF_PEM);
+	X509Certificate cert(certStream);
+	
+	std::string subjectName(cert.subjectName());
+	std::string issuerName(cert.issuerName());
+	std::string commonName(cert.commonName());
+	std::string country(cert.subjectName(X509Certificate::NID_COUNTRY));
+	std::string localityName(cert.subjectName(X509Certificate::NID_LOCALITY_NAME));
+	std::string stateOrProvince(cert.subjectName(X509Certificate::NID_STATE_OR_PROVINCE));
+	std::string organizationName(cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
+	std::string organizationUnitName(cert.subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME));
+	
+	assert (subjectName == "/CN=appinf.com/O=Applied Informatics Software Engineering GmbH/OU=Development/ST=Carinthia/C=AT/L=St. Jakob im Rosental/emailAddress=guenter.obiltschnig@appinf.com");
+	assert (issuerName == subjectName);
+	assert (commonName == "appinf.com");
+	assert (country == "AT");
+	assert (localityName == "St. Jakob im Rosental");
+	assert (stateOrProvince == "Carinthia");
+	assert (organizationName == "Applied Informatics Software Engineering GmbH");
+	assert (organizationUnitName == "Development");
+	
+	assert (cert.issuedBy(cert));
 }
 
 
@@ -90,8 +148,9 @@ CppUnit::Test* CryptoTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("CryptoTest");
 
-	CppUnit_addTest(pSuite, CryptoTest, testEncoding);
-	CppUnit_addTest(pSuite, CryptoTest, testEncoding2);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecrypt);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSalt);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 
 	return pSuite;
 }

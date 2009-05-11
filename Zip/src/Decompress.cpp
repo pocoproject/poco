@@ -1,7 +1,7 @@
 //
 // Decompress.cpp
 //
-// $Id: //poco/1.3/Zip/src/Decompress.cpp#5 $
+// $Id: //poco/1.3/Zip/src/Decompress.cpp#6 $
 //
 // Library: Zip
 // Package: Zip
@@ -58,6 +58,7 @@ Decompress::Decompress(std::istream& in, const Poco::Path& outputDir, bool flatt
 	_mapping()
 {
 	_outDir.makeAbsolute();
+	_outDir.makeDirectory();
 	poco_assert (_in.good());
 	Poco::File tmp(_outDir);
 	if (!tmp.exists())
@@ -95,7 +96,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 			std::string dirName = hdr.getFileName();
 			if (dirName.find(ZipCommon::ILLEGAL_PATH) != std::string::npos)
 				throw ZipException("Illegal entry name " + dirName + " containing " + ZipCommon::ILLEGAL_PATH);
-			Poco::Path dir(dirName);
+			Poco::Path dir(_outDir, dirName);
 			dir.makeDirectory();
 			Poco::File aFile(dir);
 			aFile.createDirectories();

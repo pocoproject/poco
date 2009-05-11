@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#5 $
+// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#6 $
 //
 // Library: Crypto
 // Package: RSA
@@ -104,7 +104,7 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 	if (pPublicKeyStream)
 	{
 		if (!pubFile.createFile())
-			throw Poco::FileException("No temporary file could be created for public file!");
+			throw Poco::CreateFileException("Cannot create temporary file for writing public key");
 		publicKeyFile = pubFile.path();
 		Poco::FileOutputStream fout(publicKeyFile);
 		Poco::StreamCopier::copyStream(*pPublicKeyStream, fout);
@@ -114,7 +114,7 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 	if (pPrivateKeyStream)
 	{
 		if (!privFile.createFile())
-			throw Poco::FileException("No temporary file could be created for private file!");
+			throw Poco::CreateFileException("Cannot create temporary file for writing private key");
 		privateKeyFile = privFile.path();
 		Poco::FileOutputStream fout(privateKeyFile);
 		Poco::StreamCopier::copyStream(*pPrivateKeyStream, fout);

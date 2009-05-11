@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#12 $
 //
 // Library: Foundation
 // Package: Threading
@@ -37,6 +37,8 @@
 #include "Poco/Thread_POSIX.h"
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
+#include "Poco/Timespan.h"
+#include "Poco/Timestamp.h"
 #include <signal.h>
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
@@ -256,6 +258,40 @@ bool ThreadImpl::joinImpl(long milliseconds)
 ThreadImpl* ThreadImpl::currentImpl()
 {
 	return _currentThreadHolder.get();
+}
+
+
+void ThreadImpl::sleepImpl(long milliseconds)
+{
+#if defined(__VMS) || defined(__digital__)
+		// This is specific to DECThreads
+		struct timespec interval;
+		interval.tv_sec  = milliseconds / 1000;
+		interval.tv_nsec = (milliseconds % 1000)*1000000; 
+		pthread_delay_np(&interval);
+#else 
+	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
+	int rc;
+	do
+	{
+		struct timeval tv;
+		tv.tv_sec  = (long) remainingTime.totalSeconds();
+		tv.tv_usec = (long) remainingTime.useconds();
+		Poco::Timestamp start;
+		rc = ::select(0, NULL, NULL, NULL, &tv);
+		if (rc < 0 && errno == EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = start.elapsed();
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (remainingTime > 0 && rc < 0 && errno == EINTR);
+	if (rc < 0) throw Poco::SystemException("Thread::sleep(): select() failed");
+#endif
 }
 
 

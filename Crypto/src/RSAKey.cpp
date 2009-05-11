@@ -1,7 +1,7 @@
 //
 // RSAKey.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKey.cpp#2 $
+// $Id: //poco/1.3/Crypto/src/RSAKey.cpp#3 $
 //
 // Library: Crypto
 // Package: RSA
@@ -80,6 +80,7 @@ int RSAKey::size() const
 {
 	return _pImpl->size();
 }
+
 
 void RSAKey::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
 {

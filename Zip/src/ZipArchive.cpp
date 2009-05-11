@@ -1,7 +1,7 @@
 //
 // ZipArchive.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipArchive.cpp#3 $
+// $Id: //poco/1.3/Zip/src/ZipArchive.cpp#4 $
 //
 // Library: Zip
 // Package: Zip
@@ -114,7 +114,6 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 			else
 				throw Poco::IllegalStateException("Garbage after directory header");
 		}
-
 	}
 }
 

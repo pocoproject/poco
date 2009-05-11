@@ -1,7 +1,7 @@
 //
 // Error.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Error.h#3 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Error.h#4 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -73,7 +73,7 @@ public:
 	{
 	}
 
-	const Diagnostics<H, handleType>& diagnostics()
+	const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns the associated diagnostics.
 	{
 		return _diagnostics;

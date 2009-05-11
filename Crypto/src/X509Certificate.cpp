@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.3/Crypto/src/X509Certificate.cpp#1 $
+// $Id: //poco/1.3/Crypto/src/X509Certificate.cpp#4 $
 //
 // Library: Crypto
 // Package: Certificate
@@ -35,14 +35,14 @@
 
 
 #include "Poco/Crypto/X509Certificate.h"
-#include "Poco/TemporaryFile.h"
-#include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/String.h"
 #include "Poco/DateTimeParser.h"
+#include <sstream>
 #include <openssl/pem.h>
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
+#include <openssl/evp.h>
 
 
 namespace Poco {
@@ -52,48 +52,14 @@ namespace Crypto {
 X509Certificate::X509Certificate(std::istream& istr):
 	_pCert(0)
 {	
-	// copy certificate to a temporary file so that it
-	// can be read by OpenSSL.
-	Poco::TemporaryFile certFile;
-	std::string path = certFile.path();
-	Poco::FileOutputStream ostr(path);
-	Poco::StreamCopier::copyStream(istr, ostr);
-	ostr.close();
-	
-	BIO *pBIO = BIO_new(BIO_s_file());
-	if (!pBIO) throw Poco::IOException("Cannot create BIO for reading certificate file");
-	if (!BIO_read_filename(pBIO, path.c_str()))
-	{
-		BIO_free(pBIO);
-		throw Poco::OpenFileException("Cannot open certificate file for reading");
-	}
-
-	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
-	BIO_free(pBIO);
-	
-	if (!_pCert) throw Poco::ReadFileException("Faild to read certificate from file");
-
-	init();
+	load(istr);
 }
 
 
 X509Certificate::X509Certificate(const std::string& path):
 	_pCert(0)
 {
-	BIO *pBIO = BIO_new(BIO_s_file());
-	if (!pBIO) throw Poco::IOException("Cannot create BIO for reading certificate file", path);
-	if (!BIO_read_filename(pBIO, path.c_str()))
-	{
-		BIO_free(pBIO);
-		throw Poco::OpenFileException("Cannot open certificate file for reading", path);
-	}
-	
-	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
-	BIO_free(pBIO);
-	
-	if (!_pCert) throw Poco::ReadFileException("Faild to load certificate from", path);
-
-	init();
+	load(path);
 }
 
 
@@ -139,6 +105,92 @@ X509Certificate::~X509Certificate()
 }
 
 
+void X509Certificate::load(std::istream& istr)
+{
+	poco_assert (!_pCert);
+		
+	std::stringstream certStream;
+	Poco::StreamCopier::copyStream(istr, certStream);
+	std::string cert = certStream.str();
+		
+	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cert.data()), static_cast<int>(cert.size()));
+	if (!pBIO) throw Poco::IOException("Cannot create BIO for reading certificate");
+	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
+	BIO_free(pBIO);
+	
+	if (!_pCert) throw Poco::IOException("Faild to load certificate from stream");
+
+	init();
+}
+
+
+void X509Certificate::load(const std::string& path)
+{
+	poco_assert (!_pCert);
+
+	BIO *pBIO = BIO_new(BIO_s_file());
+	if (!pBIO) throw Poco::IOException("Cannot create BIO for reading certificate file", path);
+	if (!BIO_read_filename(pBIO, path.c_str()))
+	{
+		BIO_free(pBIO);
+		throw Poco::OpenFileException("Cannot open certificate file for reading", path);
+	}
+	
+	_pCert = PEM_read_bio_X509(pBIO, 0, 0, 0);
+	BIO_free(pBIO);
+	
+	if (!_pCert) throw Poco::ReadFileException("Faild to load certificate from", path);
+
+	init();
+}
+
+
+void X509Certificate::save(std::ostream& stream) const
+{
+	BIO *pBIO = BIO_new(BIO_s_mem());
+	if (!pBIO) throw Poco::IOException("Cannot create BIO for writing certificate");
+	try
+	{
+		if (!PEM_write_bio_X509(pBIO, _pCert)) 
+			throw Poco::IOException("Failed to write certificate to stream");
+
+		char *pData;
+		long size;
+		size = BIO_get_mem_data(pBIO, &pData);
+		stream.write(pData, size);
+	}
+	catch (...)
+	{
+		BIO_free(pBIO);
+		throw;
+	}
+	BIO_free(pBIO);
+}
+
+
+void X509Certificate::save(const std::string& path) const
+{
+	BIO *pBIO = BIO_new(BIO_s_file());
+	if (!pBIO) throw Poco::IOException("Cannot create BIO for reading certificate file", path);
+	if (!BIO_write_filename(pBIO, const_cast<char*>(path.c_str())))
+	{
+		BIO_free(pBIO);
+		throw Poco::CreateFileException("Cannot create certificate file", path);
+	}
+	try
+	{
+		if (!PEM_write_bio_X509(pBIO, _pCert)) 
+			throw Poco::WriteFileException("Failed to write certificate to file", path);
+	}
+	catch (...)
+	{
+		BIO_free(pBIO);
+		throw;
+	}
+	BIO_free(pBIO);
+}
+
+
 void X509Certificate::init()
 {
 	char buffer[NAME_BUFFER_SIZE];
@@ -151,10 +203,28 @@ void X509Certificate::init()
 
 std::string X509Certificate::commonName() const
 {
+	return subjectName(NID_COMMON_NAME);
+}
+
+
+std::string X509Certificate::issuerName(NID nid) const
+{
+	if (X509_NAME* issuer = X509_get_issuer_name(_pCert))
+    {
+		char buffer[NAME_BUFFER_SIZE];
+		X509_NAME_get_text_by_NID(issuer, nid, buffer, sizeof(buffer));
+		return std::string(buffer);
+    }
+    else return std::string();
+}
+
+
+std::string X509Certificate::subjectName(NID nid) const
+{
 	if (X509_NAME* subj = X509_get_subject_name(_pCert))
     {
 		char buffer[NAME_BUFFER_SIZE];
-		X509_NAME_get_text_by_NID(subj, NID_commonName, buffer, sizeof(buffer));
+		X509_NAME_get_text_by_NID(subj, nid, buffer, sizeof(buffer));
 		return std::string(buffer);
     }
     else return std::string();
@@ -202,6 +272,18 @@ Poco::DateTime X509Certificate::expiresOn() const
 	std::string dateTime(reinterpret_cast<char*>(certTime->data));
 	int tzd;
 	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+}
+
+
+bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
+{
+	X509* pCert = const_cast<X509*>(_pCert);
+	X509* pIssuerCert = const_cast<X509*>(issuerCertificate.certificate());
+	EVP_PKEY* pIssuerPublicKey = X509_get_pubkey(pIssuerCert);
+	if (!pIssuerPublicKey) throw Poco::InvalidArgumentException("Issuer certificate has no public key");
+	int rc = X509_verify(pCert, pIssuerPublicKey);
+	EVP_PKEY_free(pIssuerPublicKey);
+	return rc != 0;
 }
 
 

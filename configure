@@ -2,7 +2,7 @@
 #
 # configure
 #
-# $Id: //poco/1.3/dist/configure#9 $
+# $Id: //poco/1.3/dist/configure#10 $
 #
 # Configuration script for POCO.
 #
@@ -208,6 +208,12 @@ echo "export POCO_PREFIX" >>$build/config.make
 echo "export POCO_FLAGS" >>$build/config.make
 if [ "$stdcxx_base" != "" ] ; then
 	echo "export STDCXX_BASE" >>$build/config.make
+fi
+if [ "$includepath" != "" ] ; then
+	echo "export POCO_ADD_INCLUDE" >>$build/config.make
+fi
+if [ "$librarypath" != "" ] ; then
+	echo "export POCO_ADD_LIBRARY" >>$build/config.make
 fi
 
 echo ".PHONY: poco" >>$build/config.make

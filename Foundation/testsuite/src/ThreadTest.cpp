@@ -1,7 +1,7 @@
 //
 // ThreadTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ThreadTest.cpp#6 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ThreadTest.cpp#7 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,6 +37,8 @@
 #include "Poco/Runnable.h"
 #include "Poco/ThreadTarget.h"
 #include "Poco/Event.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #include <iostream>
 #if defined(__sun) && defined(__SVR4)
 #define __EXTENSIONS__
@@ -300,6 +302,15 @@ void ThreadTest::testThreadStackSize()
 }
 
 
+void ThreadTest::testSleep()
+{
+	Poco::Timestamp start;
+	Thread::sleep(200);
+	Poco::Timespan elapsed = start.elapsed();
+	assert (elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -322,6 +333,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testThreadTarget);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadFunction);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
+	CppUnit_addTest(pSuite, ThreadTest, testSleep);
 
 	return pSuite;
 }

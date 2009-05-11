@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/X509Certificate.h#2 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/X509Certificate.h#5 $
 //
 // Library: Crypto
 // Package: Certificate
@@ -56,6 +56,18 @@ class Crypto_API X509Certificate
 	/// This class represents a X509 Certificate.
 {
 public:
+	enum NID
+		/// Name identifier for extracting information from
+		/// a certificate subject's or issuer's distinguished name.
+	{
+		NID_COMMON_NAME = 13,
+		NID_COUNTRY = 14,
+		NID_LOCALITY_NAME = 15,
+		NID_STATE_OR_PROVINCE = 16,
+		NID_ORGANIZATION_NAME = 17,
+		NID_ORGANIZATION_UNIT_NAME = 18	
+	};
+	
 	explicit X509Certificate(std::istream& istr);
 		/// Creates the X509Certificate object by reading
 		/// a certificate in PEM format from a stream.
@@ -74,7 +86,7 @@ public:
 
 	X509Certificate& operator = (const X509Certificate& cert);
 		/// Assigns a certificate.
-
+ 
 	void swap(X509Certificate& cert);
 		/// Exchanges the certificate with another one.
 
@@ -82,17 +94,25 @@ public:
 		/// Destroys the X509Certificate.
 
 	const std::string& issuerName() const;
-		/// Returns the certificate issuer name.
+		/// Returns the certificate issuer's distinguished name. 
+		
+	std::string issuerName(NID nid) const;
+		/// Extracts the information specified by the given
+		/// NID (name identifier) from the certificate issuer's
+		/// distinguished name.
 		
 	const std::string& subjectName() const;
-		/// Returns the certificate subject name.
+		/// Returns the certificate subject's distinguished name.
+
+	std::string subjectName(NID nid) const;
+		/// Extracts the information specified by the given
+		/// NID (name identifier) from the certificate subject's
+		/// distinguished name.
 		
 	std::string commonName() const;
-		/// Returns the common name stored in the certificate.
+		/// Returns the common name stored in the certificate
+		/// subject's distinguished name.
 		
-	const X509* certificate() const;
-		/// Returns the underlying OpenSSL certificate.
-
 	void extractNames(std::string& commonName, std::set<std::string>& domainNames) const;
 		/// Extracts the common name and the alias domain names from the
 		/// certificate.
@@ -102,9 +122,41 @@ public:
 		
 	Poco::DateTime expiresOn() const;
 		/// Returns the date and time the certificate expires.
+		
+	void save(std::ostream& stream) const;
+		/// Writes the certificate to the given stream.
+		/// The certificate is written in PEM format.
+
+	void save(const std::string& path) const;
+		/// Writes the certificate to the file given by path.
+		/// The certificate is written in PEM format.
+		
+	bool issuedBy(const X509Certificate& issuerCertificate) const;
+		/// Checks whether the certificate has been issued by
+		/// the issuer given by issuerCertificate. This can be
+		/// used to validate a certificate chain.
+		///
+		/// Verifies if the certificate has been signed with the
+		/// issuer's private key, using the public key from the issuer
+		/// certificate.
+		///
+		/// Returns true if verification against the issuer certificate
+		/// was successfull, false otherwise.
+
+	const X509* certificate() const;
+		/// Returns the underlying OpenSSL certificate.
 
 protected:
+	void load(std::istream& stream);
+		/// Loads the certificate from the given stream. The
+		/// certificate must be in PEM format.
+		
+	void load(const std::string& path);
+		/// Loads the certificate from the given file. The
+		/// certificate must be in PEM format.
+
 	void init();
+		/// Extracts issuer and subject name from the certificate.
 	
 private:
 	enum

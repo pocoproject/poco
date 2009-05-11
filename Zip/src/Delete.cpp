@@ -1,7 +1,7 @@
 //
 // Delete.cpp
 //
-// $Id: //poco/1.3/Zip/src/Delete.cpp#1 $
+// $Id: //poco/1.3/Zip/src/Delete.cpp#2 $
 //
 // Library: Zip
 // Package: Manipulation
@@ -49,14 +49,7 @@ Delete::Delete(const ZipLocalFileHeader& hdr):
 
 void Delete::execute(Compress& c, std::istream& input)
 {
-	// due to absolute positioning in compress we don't need to do this
-	/*
-	input.seekg(_hdr.getEndPos(), std::ios_base::beg);
-	if (_hdr.searchCRCAndSizesAfterData())
-	{
-		ZipDataInfo info(in, false);
-	}
-	*/
+	// due to absolute positioning in compress we don't need to do anything
 }
 
 

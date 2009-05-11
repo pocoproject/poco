@@ -1,7 +1,7 @@
 //
 // CryptoTest.h
 //
-// $Id: //poco/1.3/Crypto/testsuite/src/CryptoTest.h#1 $
+// $Id: //poco/1.3/Crypto/testsuite/src/CryptoTest.h#2 $
 //
 // Definition of the CryptoTest class.
 //
@@ -46,8 +46,9 @@ public:
 	CryptoTest(const std::string& name);
 	~CryptoTest();
 
-	void testEncoding();
-	void testEncoding2();
+	void testEncryptDecrypt();
+	void testEncryptDecryptWithSalt();
+	void testCertificate();
 
 	void setUp();
 	void tearDown();

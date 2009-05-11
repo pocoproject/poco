@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKeyImpl.h#3 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKeyImpl.h#4 $
 //
 // Library: Crypto
 // Package: RSA
@@ -64,7 +64,7 @@ class RSAKeyImpl: public Poco::RefCountedObject
 public:
 	typedef Poco::AutoPtr<RSAKeyImpl> Ptr;
 
-	RSAKeyImpl(const X509Certificate& cert);
+	explicit RSAKeyImpl(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
 
 	RSAKeyImpl(int keyLength, unsigned long exponent);

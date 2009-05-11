@@ -1,7 +1,7 @@
 //
 // ODBCStatementImpl.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/ODBCStatementImpl.cpp#8 $
+// $Id: //poco/1.3/Data/ODBC/src/ODBCStatementImpl.cpp#9 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -195,8 +195,8 @@ void ODBCStatementImpl::clear()
 		//(returned by 3.x drivers when cursor is not opened)
 		for (int i = 0; i < diagnostics.count(); ++i)
 		{
-			if (ignoreError = 
-				(INVALID_CURSOR_STATE == std::string(diagnostics.sqlState(i))))
+			ignoreError = (INVALID_CURSOR_STATE == std::string(diagnostics.sqlState(i)));
+			if (ignoreError)
 			{
 				break;
 			}

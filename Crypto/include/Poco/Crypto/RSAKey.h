@@ -1,7 +1,7 @@
 //
 // RSAKey.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKey.h#3 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKey.h#4 $
 //
 // Library: Crypto
 // Package: RSA
@@ -75,7 +75,7 @@ public:
 		EXP_LARGE
 	};
 
-	RSAKey(const X509Certificate& cert);
+	explicit RSAKey(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
 
 	RSAKey(KeyLength keyLength, Exponent exp);

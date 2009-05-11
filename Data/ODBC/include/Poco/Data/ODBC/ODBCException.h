@@ -1,7 +1,7 @@
 //
 // ODBCException.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/ODBCException.h#3 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/ODBCException.h#4 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -121,7 +121,7 @@ public:
 		throw *this;
 	}
 
-	const Diagnostics<H, handleType>& diagnostics()
+	const Diagnostics<H, handleType>& diagnostics() const
 	{
 		return _error.diagnostics();
 	}

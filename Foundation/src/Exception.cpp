@@ -1,7 +1,7 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Exception.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Exception.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -146,7 +146,7 @@ POCO_IMPLEMENT_EXCEPTION(RangeException, LogicException, "Out of range")
 POCO_IMPLEMENT_EXCEPTION(IllegalStateException, LogicException, "Illegal state")
 POCO_IMPLEMENT_EXCEPTION(InvalidAccessException, LogicException, "Invalid access")
 POCO_IMPLEMENT_EXCEPTION(SignalException, LogicException, "Signal received")
-POCO_IMPLEMENT_EXCEPTION(UnhandledException, LogicException, "Signal received")
+POCO_IMPLEMENT_EXCEPTION(UnhandledException, LogicException, "Unhandled exception")
 
 POCO_IMPLEMENT_EXCEPTION(RuntimeException, Exception, "Runtime exception")
 POCO_IMPLEMENT_EXCEPTION(NotFoundException, RuntimeException, "Not found")
