@@ -44,6 +44,7 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/HashMap.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
@@ -74,7 +75,12 @@ public:
 		/// ignored and session is returned from the existing pool.
 
 	Session get(const std::string& name);
-		/// Returns a Session.
+		/// Returns the requested Session.
+		/// Throws NotFoundException if session is not found.
+
+	SessionPool& getPool(const std::string& name);
+		/// Returns a SessionPool reference.
+		/// Throws NotFoundException if session is not found.
 
 	void remove(const std::string& name);
 		/// Removes a SessionPool.
@@ -91,7 +97,8 @@ private:
 	SessionPoolContainer(const SessionPoolContainer&);
 	SessionPoolContainer& operator = (const SessionPoolContainer&);
 		
-	SessionPoolMap _sessionPools;
+	SessionPoolMap  _sessionPools;
+	Poco::FastMutex _mutex;
 };
 
 

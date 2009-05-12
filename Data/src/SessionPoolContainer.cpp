@@ -43,6 +43,9 @@
 #include <algorithm>
 
 
+using Poco::FastMutex;
+
+
 namespace Poco {
 namespace Data {
 
@@ -59,6 +62,7 @@ SessionPoolContainer::~SessionPoolContainer()
 
 void SessionPoolContainer::add(SessionPool* pPool)
 {
+	FastMutex::ScopedLock lock(_mutex);
 	poco_check_ptr (pPool);
 
 	if (_sessionPools.find(pPool->name()) != _sessionPools.end())
@@ -75,6 +79,7 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 	int maxSessions, 
 	int idleTime)
 {
+	FastMutex::ScopedLock lock(_mutex);
 	std::string name = SessionPool::name(sessionKey, connectionString);
 	SessionPoolMap::Iterator it = _sessionPools.find(name);
 
@@ -93,13 +98,19 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 
 Session SessionPoolContainer::get(const std::string& name)
 {
+	return getPool(name).get();
+}
+
+
+SessionPool& SessionPoolContainer::getPool(const std::string& name)
+{
 	URI uri(name);
 	std::string path = uri.getPath();
 	poco_assert (!path.empty());
 	std::string n = Session::uri(uri.getScheme(), path.substr(1));
 	SessionPoolMap::Iterator it = _sessionPools.find(n);
 	if (_sessionPools.end() == it) throw NotFoundException(n);
-	return it->second->get();
+	return *it->second;
 }
 
 
