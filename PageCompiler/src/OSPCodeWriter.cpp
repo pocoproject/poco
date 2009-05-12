@@ -1,7 +1,7 @@
 //
 // OSPCodeWriter.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/OSPCodeWriter.cpp#1 $
+// $Id: //poco/1.3/PageCompiler/src/OSPCodeWriter.cpp#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,6 +32,7 @@
 
 #include "OSPCodeWriter.h"
 #include "Page.h"
+#include "Poco/NumberParser.h"
 
 
 OSPCodeWriter::OSPCodeWriter(const Page& page, const std::string& clazz):
@@ -108,6 +109,12 @@ void OSPCodeWriter::writeSession(std::ostream& ostr)
 {
 	if (page().has("page.session"))
 	{
+		std::string sessionTimeoutStr = page().get("page.sessionTimeout", "30");
+		int sessionTimeout;
+		if (!Poco::NumberParser::tryParse(sessionTimeoutStr, sessionTimeout))
+		{
+			sessionTimeoutStr = "context()->thisBundle()->properties().getInt(\"" + sessionTimeoutStr + "\")";
+		}
 		ostr << "\tPoco::OSP::Web::WebSession::Ptr session;\n";
 		ostr << "\t{\n";
 		ostr << "\t\tPoco::OSP::ServiceRef::Ptr pWebSessionManagerRef = context()->registry().findByName(Poco::OSP::Web::WebSessionManager::SERVICE_NAME);\n";
@@ -116,7 +123,7 @@ void OSPCodeWriter::writeSession(std::ostream& ostr)
 		ostr << "\t\t\tPoco::OSP::Web::WebSessionManager::Ptr pWebSessionManager = pWebSessionManagerRef->castedInstance<Poco::OSP::Web::WebSessionManager>();\n";
 		ostr << "\t\t\tsession = pWebSessionManager->find(\"" << page().get("page.session") << "\", request);\n";
 		ostr << "\t\t\tif (session.isNull())\n";
-		ostr << "\t\t\t\tsession = pWebSessionManager->get(\"" << page().get("page.session") << "\", request, " << page().get("page.sessionTimeout", "30") << ", context());\n";
+		ostr << "\t\t\t\tsession = pWebSessionManager->get(\"" << page().get("page.session") << "\", request, " << sessionTimeoutStr << ", context());\n";
 		ostr << "\t\t}\n";
 		ostr << "\t}\n";
 	}

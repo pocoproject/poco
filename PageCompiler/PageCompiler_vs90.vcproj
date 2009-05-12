@@ -5,6 +5,7 @@
 	Name="PageCompiler"
 	ProjectGUID="{E12E5C71-79A4-495A-848F-F1710111E610}"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -94,10 +95,8 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(TargetPath) ..\bin"
 			/>
 		</Configuration>
 		<Configuration
@@ -185,10 +184,8 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(TargetPath) ..\bin"
 			/>
 		</Configuration>
 	</Configurations>

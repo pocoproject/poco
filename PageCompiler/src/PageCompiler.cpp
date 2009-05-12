@@ -1,7 +1,7 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#1 $
+// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#2 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
@@ -95,33 +95,36 @@ protected:
 		Application::defineOptions(options);
 
 		options.addOption(
-			Option("help", "h", "display help information on command line arguments")
+			Option("help", "h", "Display help information on command line arguments.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHelp)));
 
 		options.addOption(
-			Option("define", "D", "define a property")
+			Option("define", "D", 
+				"Define a configuration property. A configuration property "
+				"defined with this option can be referenced in the input "
+				"page file, using the following syntax: ${<name>}.")
 				.required(false)
 				.repeatable(true)
-				.argument("name=value")
+				.argument("<name>=<value>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleDefine)));
 				
 		options.addOption(
-			Option("config-file", "f", "load configuration data from a file")
+			Option("config-file", "f", "Load configuration data from the given file.")
 				.required(false)
 				.repeatable(true)
-				.argument("file")
+				.argument("<file>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleConfig)));
 
 		options.addOption(
-			Option("osp", "O", "add factory class definition/implementation for use with OSP")
+			Option("osp", "O", "Add factory class definition and implementation for use with the Open Service Platform.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleOSP)));
 
 		options.addOption(
-			Option("apache", "A", "add factory class definition/implementation and shared library manifest for use with ApacheConnector")
+			Option("apache", "A", "Add factory class definition and implementation, and shared library manifest for use with ApacheConnector.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleApache)));
@@ -130,7 +133,6 @@ protected:
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
-		displayHelp();
 		stopOptionsProcessing();
 	}
 	
@@ -158,8 +160,21 @@ protected:
 	{
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
-		helpFormatter.setUsage("OPTIONS PAGES");
-		helpFormatter.setHeader("The POCO C++ Server Page Compiler.");
+		helpFormatter.setUsage("[<option> ...] <file> ...");
+		helpFormatter.setHeader(
+			"\n"
+			"The POCO C++ Server Page Compiler.\n"
+			"Copyright (c) 2008-2009 by Applied Informatics Software Engineering GmbH.\n"
+			"All rights reserved.\n\n"
+			"This program compiles web pages containing embedded C++ code "
+			"into a C++ class that can be used with the HTTP server "
+			"from the POCO Net library. \n\n"
+			"The following command line options are supported:"
+		);
+		helpFormatter.setFooter(
+			"For more information, please see the POCO C++ Libraries "
+			"documentation at <http://pocoproject.org/docs/>."
+		);
 		helpFormatter.format(std::cout);
 	}
 	
@@ -179,8 +194,11 @@ protected:
 
 	int main(const std::vector<std::string>& args)
 	{
-		if (_helpRequested)
+		if (_helpRequested || args.empty())
+		{
+			displayHelp();
 			return Application::EXIT_OK;
+		}
 
 		for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
 		{
