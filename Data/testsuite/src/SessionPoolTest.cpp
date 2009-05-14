@@ -88,6 +88,9 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.allocated() == pool.used() + pool.idle());
 	Session s1(pool.get());
 	
+	assert (s1.getFeature("f1"));
+	assert (1 == Poco::AnyCast<int>(s1.getProperty("p1")));
+
 	try { pool.setFeature("f1", true); fail ("must fail"); }
 	catch ( Poco::InvalidAccessException& ) { }
 	
@@ -101,7 +104,9 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
 
-	Session s2(pool.get());
+	Session s2(pool.get("f1", false));
+	assert (!s2.getFeature("f1"));
+	assert (1 == Poco::AnyCast<int>(s2.getProperty("p1")));
 
 	assert (pool.capacity() == 4);
 	assert (pool.allocated() == 2);
@@ -111,7 +116,9 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.allocated() == pool.used() + pool.idle());
 	
 	{
-		Session s3(pool.get());
+		Session s3(pool.get("p1", 2));
+		assert (s3.getFeature("f1"));
+		assert (2 == Poco::AnyCast<int>(s3.getProperty("p1")));
 
 		assert (pool.capacity() == 4);
 		assert (pool.allocated() == 3);
@@ -129,6 +136,8 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.allocated() == pool.used() + pool.idle());
 
 	Session s4(pool.get());
+	assert (s4.getFeature("f1"));
+	assert (1 == Poco::AnyCast<int>(s4.getProperty("p1")));
 
 	assert (pool.capacity() == 4);
 	assert (pool.allocated() == 3);

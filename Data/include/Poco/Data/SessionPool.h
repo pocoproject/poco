@@ -114,7 +114,28 @@ public:
 		/// If the maximum number of sessions for this pool has
 		/// already been created, a SessionPoolExhaustedException
 		/// is thrown.
-		
+	
+	template <typename T>
+	Session get(const std::string& name, const T& value)
+		/// Returns a Session with requested property set.
+		/// The property can be diferent from the default pool
+		/// value, in which case it is reset back to the pool 
+		/// value when the session is reclaimed by the pool.
+	{
+		Session& s = get();
+		_addPropertyMap.insert(AddPropertyMap::value_type(s.impl(),
+			std::make_pair(name, s.getProperty(name))));
+		s.setProperty(name, value);
+
+		return s;
+	}
+
+	Session get(const std::string& name, bool value);
+		/// Returns a Session with requested feature set.
+		/// The feature can be diferent from the default pool
+		/// value, in which case it is reset back to the pool 
+		/// value when the session is reclaimed by the pool.
+
 	int capacity() const;
 		/// Returns the maximum number of sessions the SessionPool will manage.
 		
@@ -163,27 +184,35 @@ protected:
 
 	void purgeDeadSessions();
 	int deadImpl(SessionList& rSessions);
+	void applySettings(SessionImpl* pImpl);
 	void putBack(PooledSessionHolderPtr pHolder);
 	void onJanitorTimer(Poco::Timer&);
 
 private:
+	typedef std::pair<std::string, Poco::Any> PropertyPair; 
+	typedef std::pair<std::string, bool> FeaturePair; 
+	typedef std::map<SessionImpl*, PropertyPair> AddPropertyMap;
+	typedef std::map<SessionImpl*, FeaturePair> AddFeatureMap;
+
 	SessionPool(const SessionPool&);
 	SessionPool& operator = (const SessionPool&);
 		
 	void closeAll(SessionList& sessionList);
 
-	std::string _connector;
-	std::string _connectionString;
-	int         _minSessions;
-	int         _maxSessions;
-	int         _idleTime;
-	int         _nSessions;
-	SessionList _idleSessions;
-	SessionList _activeSessions;
-	Poco::Timer _janitorTimer;
-	FeatureMap  _featureMap;
-	PropertyMap _propertyMap;
-	bool        _shutdown;
+	std::string    _connector;
+	std::string    _connectionString;
+	int            _minSessions;
+	int            _maxSessions;
+	int            _idleTime;
+	int            _nSessions;
+	SessionList    _idleSessions;
+	SessionList    _activeSessions;
+	Poco::Timer    _janitorTimer;
+	FeatureMap     _featureMap;
+	PropertyMap    _propertyMap;
+	bool           _shutdown;
+	AddPropertyMap _addPropertyMap;
+	AddFeatureMap  _addFeatureMap;
 	mutable
 	Poco::Mutex _mutex;
 	

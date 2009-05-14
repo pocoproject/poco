@@ -65,6 +65,17 @@ SessionPool::~SessionPool()
 }
 
 
+Session SessionPool::get(const std::string& name, bool value)
+{
+	Session& s = get();
+	_addFeatureMap.insert(AddFeatureMap::value_type(s.impl(),
+		std::make_pair(name, s.getFeature(name))));
+	s.setFeature(name, value);
+
+	return s;
+}
+
+
 Session SessionPool::get()
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
@@ -77,14 +88,7 @@ Session SessionPool::get()
 		if (_nSessions < _maxSessions)
 		{
 			Session newSession(SessionFactory::instance().create(_connector, _connectionString));
-
-			FeatureMap::Iterator fmIt = _featureMap.begin();
-			FeatureMap::Iterator fmEnd = _featureMap.end();
-			for (; fmIt != fmEnd; ++fmIt) newSession.setFeature(fmIt->first, fmIt->second);
-
-			PropertyMap::Iterator pmIt = _propertyMap.begin();
-			PropertyMap::Iterator pmEnd = _propertyMap.end();
-			for (; pmIt != pmEnd; ++pmIt) newSession.setProperty(pmIt->first, pmIt->second);
+			applySettings(newSession.impl());
 
 			PooledSessionHolderPtr pHolder(new PooledSessionHolder(*this, newSession.impl()));
 			_idleSessions.push_front(pHolder);
@@ -218,16 +222,40 @@ Poco::Any SessionPool::getProperty(const std::string& name)
 }
 
 
+void SessionPool::applySettings(SessionImpl* pImpl)
+{
+	FeatureMap::Iterator fmIt = _featureMap.begin();
+	FeatureMap::Iterator fmEnd = _featureMap.end();
+	for (; fmIt != fmEnd; ++fmIt) pImpl->setFeature(fmIt->first, fmIt->second);
+
+	PropertyMap::Iterator pmIt = _propertyMap.begin();
+	PropertyMap::Iterator pmEnd = _propertyMap.end();
+	for (; pmIt != pmEnd; ++pmIt) pImpl->setProperty(pmIt->first, pmIt->second);
+}
+
+
 void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
-	
+
 	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
 	if (it != _activeSessions.end())
 	{
 		if (pHolder->session()->isConnected())
 		{
+			// reverse settings applied at acquisition time, if any
+			AddPropertyMap::iterator pIt = _addPropertyMap.find(pHolder->session());
+			if (pIt != _addPropertyMap.end())
+				pHolder->session()->setProperty(pIt->second.first, pIt->second.second);
+
+			AddFeatureMap::iterator fIt = _addFeatureMap.find(pHolder->session());
+			if (fIt != _addFeatureMap.end())
+				pHolder->session()->setFeature(fIt->second.first, fIt->second.second);
+
+			// re-apply the default pool settings
+			applySettings(pHolder->session());
+
 			pHolder->access();
 			_idleSessions.push_front(pHolder);
 		}
