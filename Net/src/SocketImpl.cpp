@@ -347,6 +347,10 @@ int SocketImpl::available()
 
 bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 {
+	// Marian Krivos - 28.05.2009
+	// crash fix: SIGSEGV on linux when _sockfd == -1
+	poco_assert (_sockfd != POCO_INVALID_SOCKET);
+
 #if defined(POCO_HAVE_FD_POLL)
 	pollfd pollBuf;
 	
