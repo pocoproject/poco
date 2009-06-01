@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Environment.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,7 +36,8 @@
 
 #include "Poco/Environment.h"
 #include <cstdlib>
-#include <cstdio>
+#include <cstdio> // sprintf()
+
 
 #if defined(POCO_OS_FAMILY_VMS)
 #include "Environment_VMS.cpp"
@@ -122,6 +123,12 @@ std::string Environment::nodeId()
 void Environment::nodeId(NodeId& id)
 {
 	return EnvironmentImpl::nodeIdImpl(id);
+}
+
+
+unsigned Environment::processorCount()
+{
+	return EnvironmentImpl::processorCountImpl();
 }
 
 

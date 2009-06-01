@@ -1,7 +1,7 @@
 //
 // Environment_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_WIN32U.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Environment_WIN32U.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -203,6 +203,14 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 		throw;
 	}
 	delete [] reinterpret_cast<char*>(pAdapterInfo);
+}
+
+
+unsigned EnvironmentImpl::processorCountImpl()
+{
+	SYSTEM_INFO si;
+	GetSystemInfo(&si);
+	return si.dwNumberOfProcessors;
 }
 
 

@@ -1,7 +1,7 @@
-//
+
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,10 +36,18 @@
 
 #include "Poco/Environment_UNIX.h"
 #include "Poco/Exception.h"
+#include <cstring>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
+#include <sys/param.h>
 #include <cstring>
+#if defined(POCO_OS_FAMILY_BSD)
+#include <sys/sysctl.h>
+#elif POCO_OS == POCO_OS_HPUX
+#include <pthread.h>
+#endif
+
 
 namespace Poco {
 
@@ -117,6 +125,27 @@ std::string EnvironmentImpl::nodeNameImpl()
 }
 
 
+unsigned EnvironmentImpl::processorCountImpl()
+{
+#if defined(POCO_OS_FAMILY_BSD)
+	unsigned count;
+	std::size_t size = sizeof(count);
+	if (sysctlbyname("hw.ncpu", &count, &size, 0, 0))
+		return 1;
+	else
+		return count;
+#elif POCO_OS == POCO_OS_HPUX
+	return pthread_num_processors_np();
+#elif defined(_SC_NPROCESSORS_ONLN)
+	int count = sysconf(_SC_NPROCESSORS_ONLN);
+	if (count <= 0) count = 1;
+	return static_cast<int>(count);
+#else
+	return 1;
+#endif
+}
+
+
 } // namespace Poco
 
 
@@ -188,7 +217,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	int s = socket(PF_INET, SOCK_DGRAM, 0);
 	if (s == -1) throw SystemException("cannot open socket");
 
-	strcpy(ifr.ifr_name, "eth0");
+	std::strcpy(ifr.ifr_name, "eth0");
 	int rc = ioctl(s, SIOCGIFHWADDR, &ifr);
 	close(s);
 	if (rc < 0) throw SystemException("cannot get MAC address");
@@ -205,22 +234,19 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 // General Unix
 //
 #include <sys/ioctl.h>
-#if defined(sun) || defined(__sun) || defined(__sun__)
-#	ifndef __EXTENSIONS__
-#		define __EXTENSIONS__
-#	endif
-#	include <net/if_arp.h>
-#	include <sys/sockio.h>
-#	include <stropts.h>
+#if defined(sun) || defined(__sun)
+#include <sys/sockio.h>
 #endif
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <net/if.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <net/if.h>
 #include <net/if_arp.h>
 #include <unistd.h>
+
 
 namespace Poco {
 
