@@ -427,6 +427,16 @@ inline void swap(DateTime& d1, DateTime& d2)
 }
 
 
+inline void DateTime::checkLimit(short& lower, short& higher, short limit)
+{
+	if (lower >= limit)
+	{
+		higher += short(lower / limit);
+		lower = short(lower % limit);
+	}
+}
+
+
 } // namespace Poco
 
 

@@ -335,23 +335,13 @@ double DateTime::toJulianDay(int year, int month, int day, int hour, int minute,
 }
 
 
-void DateTime::checkLimit(short& lower, short& higher, short limit)
-{
-	if (lower > limit)
-	{
-		higher += short(lower / limit);
-		lower   = short((lower % limit) - 1);
-	}
-}
-
-
 void DateTime::normalize()
 {
-	checkLimit(_microsecond, _millisecond, 999);
-	checkLimit(_millisecond, _second, 999);
-	checkLimit(_second, _minute, 59);
-	checkLimit(_minute, _hour, 59);
-	checkLimit(_hour, _day, 23);
+	checkLimit(_microsecond, _millisecond, 1000);
+	checkLimit(_millisecond, _second, 1000);
+	checkLimit(_second, _minute, 60);
+	checkLimit(_minute, _hour, 60);
+	checkLimit(_hour, _day, 24);
 
 	if (_day > daysOfMonth(_year, _month))
 	{
