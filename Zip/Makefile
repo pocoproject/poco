@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Zip/Makefile#2 $
+# $Id: //poco/Main/Zip/Makefile#6 $
 #
 # Makefile for Poco Zip
 #

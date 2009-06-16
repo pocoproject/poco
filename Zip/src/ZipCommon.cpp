@@ -1,7 +1,7 @@
 //
 // ZipCommon.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipCommon.cpp#3 $
+// $Id: //poco/Main/Zip/src/ZipCommon.cpp#3 $
 //
 // Library: Zip
 // Package: Zip

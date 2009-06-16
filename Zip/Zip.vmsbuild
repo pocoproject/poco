@@ -1,7 +1,7 @@
 #
 # Zip.vmsbuild
 #
-# $Id: //poco/1.3/Zip/Zip.vmsbuild#1 $
+# $Id: //poco/Main/Zip/Zip.vmsbuild#3 $
 #
 LIB=PocoZip
 Decompress

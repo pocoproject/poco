@@ -1,7 +1,7 @@
 //
 // Keep.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/Keep.h#1 $
+// $Id: //poco/Main/Zip/include/Poco/Zip/Keep.h#1 $
 //
 // Library: Zip
 // Package: Manipulation

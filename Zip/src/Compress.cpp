@@ -314,9 +314,7 @@ ZipArchive Compress::close()
 	std::string centr(central.createHeader());
 	_out.write(centr.c_str(), static_cast<std::streamsize>(centr.size()));
 	_out.flush();
-	// SunPro C++ fix 
-	std::pair<UInt16, ZipArchiveInfo> par(0, central);
-	_dirs.insert(par);
+	_dirs.insert(std::make_pair(0, central));
 	return ZipArchive(_files, _infos, _dirs);
 }
 

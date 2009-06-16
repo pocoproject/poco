@@ -1,7 +1,7 @@
 //
 // ZipLocalFileHeader.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipLocalFileHeader.h#4 $
+// $Id: //poco/Main/Zip/include/Poco/Zip/ZipLocalFileHeader.h#10 $
 //
 // Library: Zip
 // Package: Zip
@@ -45,7 +45,7 @@
 #include "Poco/Zip/ZipCommon.h"
 #include "Poco/DateTime.h"
 #include "Poco/Path.h"
-#include <iostream>
+#include <istream>
 
 
 namespace Poco {

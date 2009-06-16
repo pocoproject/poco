@@ -1,7 +1,7 @@
 //
 // Compress.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/Compress.h#4 $
+// $Id: //poco/Main/Zip/include/Poco/Zip/Compress.h#6 $
 //
 // Library: Zip
 // Package: Zip
@@ -43,6 +43,8 @@
 #include "Poco/Zip/Zip.h"
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/FIFOEvent.h"
+#include <istream>
+#include <ostream>
 
 
 namespace Poco {

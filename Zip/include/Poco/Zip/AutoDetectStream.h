@@ -1,7 +1,7 @@
 //
 // AutoDetectStream.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/AutoDetectStream.h#4 $
+// $Id: //poco/Main/Zip/include/Poco/Zip/AutoDetectStream.h#4 $
 //
 // Library: Zip
 // Package: Zip

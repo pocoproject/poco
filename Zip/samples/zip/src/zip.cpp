@@ -1,7 +1,7 @@
 //
 // zip.cpp
 //
-// $Id: //poco/1.3/Zip/samples/zip/src/zip.cpp#3 $
+// $Id: //poco/Main/Zip/samples/zip/src/zip.cpp#4 $
 //
 // This sample demonstrates the Compress class.
 //

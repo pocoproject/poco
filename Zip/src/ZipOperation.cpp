@@ -1,7 +1,7 @@
 //
 // ZipOperation.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipOperation.cpp#1 $
+// $Id: //poco/Main/Zip/src/ZipOperation.cpp#1 $
 //
 // Library: Zip
 // Package: Manipulation

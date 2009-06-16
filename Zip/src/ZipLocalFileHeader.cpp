@@ -1,7 +1,7 @@
 //
 // ZipLocalFileHeader.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipLocalFileHeader.cpp#4 $
+// $Id: //poco/Main/Zip/src/ZipLocalFileHeader.cpp#9 $
 //
 // Library: Zip
 // Package: Zip

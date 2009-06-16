@@ -1,7 +1,7 @@
 //
 // Replace.cpp
 //
-// $Id: //poco/1.3/Zip/src/Replace.cpp#1 $
+// $Id: //poco/Main/Zip/src/Replace.cpp#2 $
 //
 // Library: Zip
 // Package: Manipulation
@@ -47,7 +47,6 @@ Replace::Replace(const ZipLocalFileHeader& hdr, const std::string& localPath):
 	_add(hdr.getFileName(), localPath, hdr.getCompressionMethod(), hdr.getCompressionLevel())
 {
 }
-
 
 
 void Replace::execute(Compress& c, std::istream& input)

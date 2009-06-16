@@ -1,7 +1,7 @@
 //
 // ZipException.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipException.cpp#4 $
+// $Id: //poco/Main/Zip/src/ZipException.cpp#4 $
 //
 // Library: Zip
 // Package: Zip

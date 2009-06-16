@@ -1,7 +1,7 @@
 //
 // unzip.cpp
 //
-// $Id: //poco/1.3/Zip/samples/unzip/src/unzip.cpp#3 $
+// $Id: //poco/Main/Zip/samples/unzip/src/unzip.cpp#3 $
 //
 // This sample demonstrates the Decompress class.
 //

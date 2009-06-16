@@ -12,16 +12,26 @@ Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug_shared = debug_shared
 		release_shared = release_shared
+		debug_static = debug_static
+		release_static = release_static
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{4AC75EAD-BFCF-41E6-AB1F-0DA203CC7C61}.debug_shared.ActiveCfg = debug_shared|Win32
 		{4AC75EAD-BFCF-41E6-AB1F-0DA203CC7C61}.debug_shared.Build.0 = debug_shared|Win32
 		{4AC75EAD-BFCF-41E6-AB1F-0DA203CC7C61}.release_shared.ActiveCfg = release_shared|Win32
 		{4AC75EAD-BFCF-41E6-AB1F-0DA203CC7C61}.release_shared.Build.0 = release_shared|Win32
+		{4AC75EAD-BFCF-41E6-AB1F-0DA203CC7C61}.debug_static.ActiveCfg = debug_static|Win32
+		{4AC75EAD-BFCF-41E6-AB1F-0DA203CC7C61}.debug_static.Build.0 = debug_static|Win32
+		{4AC75EAD-BFCF-41E6-AB1F-0DA203CC7C61}.release_static.ActiveCfg = release_static|Win32
+		{4AC75EAD-BFCF-41E6-AB1F-0DA203CC7C61}.release_static.Build.0 = release_static|Win32
 		{9665FC3C-DB71-4C6C-AAEE-AAFD73CB31E7}.debug_shared.ActiveCfg = debug_shared|Win32
 		{9665FC3C-DB71-4C6C-AAEE-AAFD73CB31E7}.debug_shared.Build.0 = debug_shared|Win32
 		{9665FC3C-DB71-4C6C-AAEE-AAFD73CB31E7}.release_shared.ActiveCfg = release_shared|Win32
 		{9665FC3C-DB71-4C6C-AAEE-AAFD73CB31E7}.release_shared.Build.0 = release_shared|Win32
+		{9665FC3C-DB71-4C6C-AAEE-AAFD73CB31E7}.debug_static.ActiveCfg = debug_static|Win32
+		{9665FC3C-DB71-4C6C-AAEE-AAFD73CB31E7}.debug_static.Build.0 = debug_static|Win32
+		{9665FC3C-DB71-4C6C-AAEE-AAFD73CB31E7}.release_static.ActiveCfg = release_static|Win32
+		{9665FC3C-DB71-4C6C-AAEE-AAFD73CB31E7}.release_static.Build.0 = release_static|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

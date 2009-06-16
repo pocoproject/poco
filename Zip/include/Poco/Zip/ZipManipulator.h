@@ -1,7 +1,7 @@
 //
 // ZipManipulator.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipManipulator.h#2 $
+// $Id: //poco/Main/Zip/include/Poco/Zip/ZipManipulator.h#3 $
 //
 // Library: Zip
 // Package: Manipulation

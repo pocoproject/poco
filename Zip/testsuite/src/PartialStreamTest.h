@@ -1,7 +1,7 @@
 //
 // PartialStreamTest.h
 //
-// $Id: //poco/1.3/Zip/testsuite/src/PartialStreamTest.h#3 $
+// $Id: //poco/Main/Zip/testsuite/src/PartialStreamTest.h#4 $
 //
 // Definition of the PartialStreamTest class.
 //

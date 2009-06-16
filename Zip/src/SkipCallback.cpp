@@ -1,7 +1,7 @@
 //
 // SkipCallback.cpp
 //
-// $Id: //poco/1.3/Zip/src/SkipCallback.cpp#4 $
+// $Id: //poco/Main/Zip/src/SkipCallback.cpp#5 $
 //
 // Library: Zip
 // Package: Zip

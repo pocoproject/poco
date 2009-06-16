@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Zip/samples/unzip/Makefile#1 $
+# $Id: //poco/Main/Zip/samples/unzip/Makefile#1 $
 #
 # Makefile for Poco SampleServer
 #
