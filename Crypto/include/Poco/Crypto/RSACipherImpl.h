@@ -1,10 +1,10 @@
 //
 // RSACipherImpl.h
 //
-// $Id: //poco/Main/Crypto/include/Poco/Crypto/RSACipherImpl.h#1 $
+// $Id: //poco/Main/Crypto/include/Poco/Crypto/RSACipherImpl.h#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: RSA
 // Module:  RSACipherImpl
 //
 // Definition of the RSACipherImpl class.
@@ -43,7 +43,6 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/RSAKey.h"
-
 #include <openssl/evp.h>
 
 
@@ -51,12 +50,19 @@ namespace Poco {
 namespace Crypto {
 
 
-class RSACipherImpl : public Cipher
-	/// An implementation of the RSA class for OpenSSL's crypto library.
+class RSACipherImpl: public Cipher
+	/// An implementation of the Cipher class for 
+	/// assymetric (public-private key) encryption
+	/// based on the the RSA algorithm in OpenSSL's 
+	/// crypto library.
+	///
+	/// Encryption is using the public key, decryption
+	/// requires the private key.
 {
 public:
-	RSACipherImpl(const RSAKey& key);
-		/// Creates a new RSACipherImpl object for the given RSAKey.
+	RSACipherImpl(const RSAKey& key, RSAPaddingMode paddingMode);
+		/// Creates a new RSACipherImpl object for the given RSAKey
+		/// and using the given padding mode.
 
 	virtual ~RSACipherImpl();
 		/// Destroys the RSACipherImpl.
@@ -72,6 +78,7 @@ public:
 
 private:
 	RSAKey _key;
+	RSAPaddingMode _paddingMode;
 };
 
 

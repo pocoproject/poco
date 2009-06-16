@@ -4,7 +4,7 @@
 // $Id$
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherFactory
 //
 // Definition of the CipherFactory class.
@@ -63,11 +63,10 @@ public:
 	virtual ~CipherFactory();
 		/// Destroys the CipherFactory.
 
-	
 	Cipher* createCipher(const CipherKey& key);
-		/// Creates a Cipher object for the given Cipher name. Valid cipher names
-		/// depend on the OpenSSL version the library is linked with; see the output
-		/// of
+		/// Creates a Cipher object for the given Cipher name. Valid cipher 
+		/// names depend on the OpenSSL version the library is linked with;  
+		/// see the output of
 		///
 		///     openssl enc --help
 		///
@@ -79,10 +78,10 @@ public:
 		///   * DES: "des", "des3"
 		///   * Blowfish: "bf"
 
-	Cipher* createCipher(const RSAKey& key);
-		/// Creates a RSACipher
+	Cipher* createCipher(const RSAKey& key, RSAPaddingMode paddingMode = RSA_PADDING_PKCS1);
+		/// Creates a RSACipher using the given RSA key and padding mode
+		/// for public key encryption/private key decryption.
 	
-
 	static CipherFactory& defaultFactory();
 		/// Returns the default CipherFactory.
 

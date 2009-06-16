@@ -4,7 +4,7 @@
 // $Id$
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CryptoTransform
 //
 // Definition of the CryptoTransform class.
@@ -41,7 +41,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
-#include <ios> 
+#include <ios>
 
 
 namespace Poco {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="NetSSL_OpenSSL"
 	ProjectGUID="{5AECC55E-A469-11DA-8DA6-005056C00008}"
 	RootNamespace="OpenSSL"
@@ -67,7 +67,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib PocoNetd.lib PocoUtild.lib libeay32mtd.lib ssleay32mtd.lib ws2_32.lib"
+				AdditionalDependencies="PocoFoundationd.lib PocoNetd.lib PocoUtild.lib libeay32mdd.lib ssleay32mdd.lib ws2_32.lib"
 				OutputFile="..\bin\PocoNetSSLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -196,8 +196,8 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static|Win32"
-			OutputDirectory=".\obj\debug_static"
-			IntermediateDirectory=".\obj\debug_static"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -245,7 +245,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoNetSSLmtd.lib"
 			/>
 			<Tool
@@ -266,8 +265,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static|Win32"
-			OutputDirectory=".\obj\release_static"
-			IntermediateDirectory=".\obj\release_static"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -319,7 +318,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\lib\PocoNetSSLmt.lib"
 			/>
 			<Tool

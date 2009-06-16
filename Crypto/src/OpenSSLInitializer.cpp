@@ -1,11 +1,11 @@
 //
-// SSLInitializer.cpp
+// OpenSSLInitializer.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/SSLInitializer.cpp#11 $
+// $Id: //poco/Main/Crypto/src/OpenSSLInitializer.cpp#1 $
 //
-// Library: NetSSL_OpenSSL
-// Package: SSLCore
-// Module:  SSLInitializer
+// Library: Crypto
+// Package: CryotpCore
+// Module:  OpenSSLInitializer
 //
 // Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,14 +34,13 @@
 //
 
 
-#include "Poco/Net/SSLInitializer.h"
-#include "Poco/Net/KeyConsoleHandler.h"
-#include "Poco/Net/KeyFileHandler.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/RandomStream.h"
 #include "Poco/Thread.h"
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
 #include <openssl/crypto.h>
+#include <openssl/err.h>
 
 
 using Poco::RandomInputStream;
@@ -50,29 +49,29 @@ using Poco::FastMutex;
 
 
 namespace Poco {
-namespace Net {
+namespace Crypto {
 
 
-FastMutex* SSLInitializer::_mutexes(0);
-int SSLInitializer::_rc(0);
+FastMutex* OpenSSLInitializer::_mutexes(0);
+int OpenSSLInitializer::_rc(0);
 
 
-static SSLInitializer initializer;
+static OpenSSLInitializer initializer;
 
 
-SSLInitializer::SSLInitializer()
+OpenSSLInitializer::OpenSSLInitializer()
 {
 	initialize();
 }
 
 
-SSLInitializer::~SSLInitializer()
+OpenSSLInitializer::~OpenSSLInitializer()
 {
 	uninitialize();
 }
 
 
-void SSLInitializer::initialize()
+void OpenSSLInitializer::initialize()
 {
 	if (++_rc == 1)
 	{
@@ -86,27 +85,30 @@ void SSLInitializer::initialize()
 		
 		int nMutexes = CRYPTO_num_locks();
 		_mutexes = new FastMutex[nMutexes];
-		CRYPTO_set_locking_callback(&SSLInitializer::lock);
+		CRYPTO_set_locking_callback(&OpenSSLInitializer::lock);
 #ifndef POCO_OS_FAMILY_WINDOWS // SF# 1828231: random unhandled exceptions when linking with ssl
-		CRYPTO_set_id_callback(&SSLInitializer::id);
+		CRYPTO_set_id_callback(&OpenSSLInitializer::id);
 #endif
-		CRYPTO_set_dynlock_create_callback(&SSLInitializer::dynlockCreate);
-		CRYPTO_set_dynlock_lock_callback(&SSLInitializer::dynlock);
-		CRYPTO_set_dynlock_destroy_callback(&SSLInitializer::dynlockDestroy);
+		CRYPTO_set_dynlock_create_callback(&OpenSSLInitializer::dynlockCreate);
+		CRYPTO_set_dynlock_lock_callback(&OpenSSLInitializer::dynlock);
+		CRYPTO_set_dynlock_destroy_callback(&OpenSSLInitializer::dynlockDestroy);
 	}
 }
 
 
-void SSLInitializer::uninitialize()
+void OpenSSLInitializer::uninitialize()
 {
 	if (--_rc == 0)
 	{
+		EVP_cleanup();
+		ERR_free_strings();
+		CRYPTO_set_locking_callback(0);
 		delete [] _mutexes;
 	}
 }
 
 
-void SSLInitializer::lock(int mode, int n, const char* file, int line)
+void OpenSSLInitializer::lock(int mode, int n, const char* file, int line)
 {
 	if (mode & CRYPTO_LOCK)
 		_mutexes[n].lock();
@@ -115,20 +117,20 @@ void SSLInitializer::lock(int mode, int n, const char* file, int line)
 }
 
 
-unsigned long SSLInitializer::id()
+unsigned long OpenSSLInitializer::id()
 {
 	Thread* pThread = Thread::current();
 	return pThread ? pThread->id() : 0;
 }
 
 
-struct CRYPTO_dynlock_value* SSLInitializer::dynlockCreate(const char* file, int line)
+struct CRYPTO_dynlock_value* OpenSSLInitializer::dynlockCreate(const char* file, int line)
 {
 	return new CRYPTO_dynlock_value;
 }
 
 
-void SSLInitializer::dynlock(int mode, struct CRYPTO_dynlock_value* lock, const char* file, int line)
+void OpenSSLInitializer::dynlock(int mode, struct CRYPTO_dynlock_value* lock, const char* file, int line)
 {
 	poco_check_ptr (lock);
 
@@ -139,10 +141,10 @@ void SSLInitializer::dynlock(int mode, struct CRYPTO_dynlock_value* lock, const 
 }
 
 
-void SSLInitializer::dynlockDestroy(struct CRYPTO_dynlock_value* lock, const char* file, int line)
+void OpenSSLInitializer::dynlockDestroy(struct CRYPTO_dynlock_value* lock, const char* file, int line)
 {
 	delete lock;
 }
 
 
-} } // namespace Poco::Net
+} } // namespace Poco::Crypto

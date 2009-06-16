@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/Context.cpp#17 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/Context.cpp#18 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -63,7 +63,11 @@ Context::Context(
 	_pSSLContext(0)
 {
 	_pSSLContext = SSL_CTX_new(SSLv23_method());
-	if (!_pSSLContext) throw SSLException("Cannot create SSL_CTX object");
+	if (!_pSSLContext) 
+	{
+		unsigned long err = ERR_get_error();
+		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
+	}
 	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPasswdCallback);
 	Utility::clearErrorStack();
 	

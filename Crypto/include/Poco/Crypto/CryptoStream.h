@@ -4,7 +4,7 @@
 // $Id$
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CryptoStream
 //
 // Definition of the CryptoStreamBuf, CryptoInputStream and CryptoOutputStream
@@ -55,18 +55,18 @@ class CryptoTransform;
 class Cipher;
 
 
-class Crypto_API CryptoStreamBuf : public Poco::BufferedStreamBuf
+class Crypto_API CryptoStreamBuf: public Poco::BufferedStreamBuf
 	/// This stream buffer performs cryptographic transformation on the data
 	/// going through it.
 {
 public:
-	CryptoStreamBuf(std::istream& istr, CryptoTransform* pTransform, std::size_t bufferSize = 8192);
-	CryptoStreamBuf(std::ostream& ostr, CryptoTransform* pTransform,
-		std::size_t bufferSize = 8192);
+	CryptoStreamBuf(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
+	CryptoStreamBuf(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
 
 	virtual ~CryptoStreamBuf();
 
 	void close();
+		/// Flushes all buffers and finishes the encryption.
 
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
@@ -85,17 +85,15 @@ private:
 };
 
 
-class Crypto_API CryptoIOS : public virtual std::ios
+class Crypto_API CryptoIOS: public virtual std::ios
 	/// The base class for CryptoInputStream and CryptoOutputStream.
 	///
 	/// This class is needed to ensure correct initialization order of the
 	/// stream buffer and base classes.
 {
 public:
-	CryptoIOS(std::istream& istr, CryptoTransform* pTransform,
-		std::size_t bufferSize = 8192);
-	CryptoIOS(std::ostream& ostr, CryptoTransform* pTransform,
-		std::size_t bufferSize = 8192);
+	CryptoIOS(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
+	CryptoIOS(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
 	~CryptoIOS();
 	CryptoStreamBuf* rdbuf();
 
@@ -104,7 +102,7 @@ protected:
 };
 
 
-class Crypto_API CryptoInputStream : public CryptoIOS, public std::istream
+class Crypto_API CryptoInputStream: public CryptoIOS, public std::istream
 	/// This stream transforms all data passing through it using the given
 	/// CryptoTransform.
 	///
@@ -113,18 +111,19 @@ class Crypto_API CryptoInputStream : public CryptoIOS, public std::istream
 	/// respectively.
 {
 public:
-	CryptoInputStream(std::istream& istr, CryptoTransform* pTransform, std::size_t bufferSize = 8192);
+	CryptoInputStream(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
 		/// Create a new CryptoInputStream object. The CryptoInputStream takes the
 		/// ownership of the given CryptoTransform object.
 
-	CryptoInputStream(std::istream& istr, Cipher& cipher, std::size_t bufferSize = 8192);
+	CryptoInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize = 8192);
 		/// Create a new encrypting CryptoInputStream object using the given cipher.
 
 	~CryptoInputStream();
+		/// Destroys the CryptoInputStream.
 };
 
 
-class Crypto_API CryptoOutputStream : public CryptoIOS, public std::ostream
+class Crypto_API CryptoOutputStream: public CryptoIOS, public std::ostream
 	/// This stream transforms all data passing through it using the given
 	/// CryptoTransform.
 	///
@@ -136,16 +135,18 @@ class Crypto_API CryptoOutputStream : public CryptoIOS, public std::ostream
 	/// to ensure completion of cryptographic transformation.
 {
 public:
-	CryptoOutputStream(std::ostream& ostr, CryptoTransform* pTransform, std::size_t bufferSize = 8192);
+	CryptoOutputStream(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
 		/// Create a new CryptoOutputStream object. The CryptoOutputStream takes the
 		/// ownership of the given CryptoTransform object.
 
-	CryptoOutputStream(std::ostream& ostr, Cipher& cipher, std::size_t bufferSize = 8192);
+	CryptoOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize = 8192);
 		/// Create a new decrypting CryptoOutputStream object using the given cipher.
 
 	~CryptoOutputStream();
+		/// Destroys the CryptoOutputStream.
 
 	void close();
+		/// Flushes all buffers and finishes the encryption.
 };
 
 

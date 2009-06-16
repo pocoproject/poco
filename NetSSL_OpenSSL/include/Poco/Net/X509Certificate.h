@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#11 $
+// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#12 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -41,7 +41,7 @@
 
 
 #include "Poco/Net/NetSSL.h"
-#include "Poco/Net/Context.h"
+#include "Poco/Crypto/X509Certificate.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <set>
@@ -55,8 +55,9 @@ namespace Net {
 class HostEntry;
 
 
-class NetSSL_API X509Certificate
-	/// This class represents a X509 Certificate.
+class NetSSL_API X509Certificate: public Poco::Crypto::X509Certificate
+	/// This class extends Poco::Crypto::X509Certificate with the
+	/// feature to validate a certificate.
 {
 public:
 	explicit X509Certificate(std::istream& istr);
@@ -72,45 +73,28 @@ public:
 		/// OpenSSL certificate. Ownership is taken of 
 		/// the certificate.
 
-	X509Certificate(const X509Certificate& cert);
+	X509Certificate(const Poco::Crypto::X509Certificate& cert);
 		/// Creates the certificate by copying another one.
 
-	X509Certificate& operator = (const X509Certificate& cert);
+	X509Certificate& operator = (const Poco::Crypto::X509Certificate& cert);
 		/// Assigns a certificate.
-
-	void swap(X509Certificate& cert);
-		/// Exchanges the certificate with another one.
 
 	~X509Certificate();
 		/// Destroys the X509Certificate.
 
-	const std::string& issuerName() const;
-		/// Returns the certificate issuer name.
-		
-	const std::string& subjectName() const;
-		/// Returns the certificate subject name.
-		
-	std::string commonName() const;
-		/// Returns the common name stored in the certificate.
-		
-	const X509* certificate() const;
-		/// Returns the underlying OpenSSL certificate.
-
 	long verify(const std::string& hostName) const;
 		/// Verifies the validity of the certificate against the host name.
-
-	void extractNames(std::string& commonName, std::set<std::string>& domainNames) const;
-		/// Extracts the common name and the alias domain names from the
-		/// certificate.
+		///
+		/// Returns X509_V_OK if verification succeeded, or an
+		/// error code (X509_V_ERR_APPLICATION_VERIFICATION) otherwise.
 		
-	Poco::DateTime validFrom() const;
-		/// Returns the date and time the certificate is valid from.
+	static long verify(const Poco::Crypto::X509Certificate& cert, const std::string& hostName);
+		/// Verifies the validity of the certificate against the host name.
+		///
+		/// Returns X509_V_OK if verification succeeded, or an
+		/// error code (X509_V_ERR_APPLICATION_VERIFICATION) otherwise.
 		
-	Poco::DateTime expiresOn() const;
-		/// Returns the date and time the certificate expires.
-
 protected:
-	void init();
 	static bool containsWildcards(const std::string& commonName);
 	static bool matchByAlias(const std::string& alias, const HostEntry& heData);
 	
@@ -119,32 +103,7 @@ private:
 	{
 		NAME_BUFFER_SIZE = 256
 	};
-	
-	std::string _issuerName;
-	std::string _subjectName;
-	X509*       _pCert;
 };
-
-
-//
-// inlines
-//
-inline const std::string& X509Certificate::issuerName() const
-{
-	return _issuerName;
-}
-
-
-inline const std::string& X509Certificate::subjectName() const
-{
-	return _subjectName;
-}
-
-
-inline const X509* X509Certificate::certificate() const
-{
-	return _pCert;
-}
 
 
 } } // namespace Poco::Net

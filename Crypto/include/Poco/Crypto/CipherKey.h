@@ -1,10 +1,10 @@
 //
 // CipherKey.h
 //
-// $Id: //poco/Main/Crypto/include/Poco/Crypto/CipherKey.h#1 $
+// $Id: //poco/Main/Crypto/include/Poco/Crypto/CipherKey.h#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherKey
 //
 // Definition of the CipherKey class.
@@ -49,7 +49,7 @@ namespace Crypto {
 
 
 class Crypto_API CipherKey
-	/// class CipherKey stores the key information for decryption/encryption of data.
+	/// CipherKey stores the key information for decryption/encryption of data.
 	/// To create a random key, using the following code:
 	///
 	///     CipherKey key("aes-256");
@@ -64,6 +64,7 @@ class Crypto_API CipherKey
 	/// use a salt value to make the key more robust:
 	///
 	///     std::string password = "secret";
+	///     std::string salt("asdff8723lasdf(**923412");
 	///		CipherKey key("aes-256", password, salt);
 	///
 {
@@ -73,24 +74,28 @@ public:
 
 	enum
 	{
-		DEFAULT_ITERATION_COUNT = 2000	/// Default iteration count to use with
-										/// generateKey().  RSA security recommends
-										/// an iteration count of at least 1000.
+		DEFAULT_ITERATION_COUNT = 2000
+			/// Default iteration count to use with
+			/// generateKey(). RSA security recommends
+			/// an iteration count of at least 1000.
 	};
 
 	CipherKey(const std::string& name, 
 		const std::string& passphrase, 
 		const std::string& salt = "",
 		int iterationCount = DEFAULT_ITERATION_COUNT);
-		/// Creates a new CipherKeyImpl object
+		/// Creates a new CipherKeyImpl object using the given
+		/// cipher name, passphrase, salt value and iteration count.
 
 	CipherKey(const std::string& name, 
 		const ByteVec& key, 
 		const ByteVec& iv);
-		/// Creates a new CipherKeyImpl object
+		/// Creates a new CipherKeyImpl object using the given cipher
+		/// name, key and initialization vector.
 
 	CipherKey(const std::string& name);
-		/// Creates a new CipherKeyImpl object. Autoinitializes  key and iv
+		/// Creates a new CipherKeyImpl object. Autoinitializes key and 
+		/// initialization vector.
 
 	~CipherKey();
 		/// Destroys the CipherKeyImpl.
@@ -130,6 +135,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline const std::string& CipherKey::name() const
 {
 	return _pImpl->name();

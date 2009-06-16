@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/SSLManager.cpp#14 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/SSLManager.cpp#15 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -38,7 +38,7 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
-#include "Poco/Net/SSLInitializer.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
@@ -72,7 +72,7 @@ const std::string SSLManager::CFG_CLIENT_PREFIX("openSSL.client.");
 
 SSLManager::SSLManager()
 {
-	SSLInitializer::initialize();
+	Poco::Crypto::OpenSSLInitializer::initialize();
 }
 
 
@@ -81,7 +81,9 @@ SSLManager::~SSLManager()
 	PrivateKeyPassPhrase.clear();
 	ClientVerificationError.clear();
 	ServerVerificationError.clear();
-	SSLInitializer::uninitialize();
+	_ptrDefaultServerContext = 0; // ensure all Context objects go away before we uninitialize OpenSSL.
+	_ptrDefaultClientContext = 0;
+	Poco::Crypto::OpenSSLInitializer::uninitialize();
 }
 
 

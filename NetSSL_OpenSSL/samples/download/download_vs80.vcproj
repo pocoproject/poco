@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="download"
 	ProjectGUID="{22F6B2E6-A532-4156-A49A-835A21BFF3F6}"
 	RootNamespace="download"
@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Net\include;..\..\..\Util\include;..\..\..\NetSSL_OpenSSL\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Net\include;..\..\..\Util\include;..\..\..\Crypto\include;..\..\..\NetSSL_OpenSSL\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_DLL;WINVER=0x0500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -67,12 +67,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib PocoNetd.lib PocoNetSSLd.lib PocoUtild.lib"
-				OutputFile="bin/$(ProjectName)d.exe"
+				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib PocoNetd.lib PocoCryptod.lib PocoNetSSLd.lib PocoUtild.lib"
+				OutputFile="bin/downloadd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin/$(ProjectName)d.pdb"
+				ProgramDatabaseFile="bin/downloadd.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -132,7 +132,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Net\include;..\..\..\Util\include;..\..\..\NetSSL_OpenSSL\include"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Net\include;..\..\..\Util\include;..\..\..\Crypto\include;..\..\..\NetSSL_OpenSSL\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_DLL;WINVER=0x0500"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -156,185 +156,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib PocoXML.lib PocoNet.lib PocoNetSSL.lib PocoUtil.lib"
-				OutputFile="bin/$(ProjectName).exe"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib"
-				GenerateDebugInformation="false"
-				ProgramDatabaseFile=""
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="debug_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Net\include;..\..\..\Util\include;..\..\..\NetSSL_OpenSSL\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;WINVER=0x0500"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				BufferSecurityCheck="true"
-				TreatWChar_tAsBuiltInType="true"
-				ForceConformanceInForLoopScope="true"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationmtd.lib PocoXMLmtd.lib PocoNetmtd.lib PocoNetSSLmtd.lib PocoUtilmtd.lib ws2_32.lib iphlpapi.lib advapi32.lib libeay32mt.lib ssleay32mt.lib"
-				OutputFile="bin/$(ProjectName)mtd.exe"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin/$(ProjectName)mtd.pdb"
-				SubSystem="1"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="release_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				InlineFunctionExpansion="1"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Net\include;..\..\..\Util\include;..\..\..\NetSSL_OpenSSL\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;WINVER=0x0500"
-				StringPooling="true"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				TreatWChar_tAsBuiltInType="true"
-				ForceConformanceInForLoopScope="true"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationmt.lib PocoXMLmt.lib PocoNetmt.lib PocoNetSSLmt.lib PocoUtilmt.lib ws2_32.lib iphlpapi.lib advapi32.lib libeay32mt.lib ssleay32mt.lib"
-				OutputFile="bin/$(ProjectName)mt.exe"
+				AdditionalDependencies="PocoFoundation.lib PocoXML.lib PocoNet.lib PocoCrypto.lib PocoNetSSL.lib PocoUtil.lib"
+				OutputFile="bin/download.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib"
 				GenerateDebugInformation="false"

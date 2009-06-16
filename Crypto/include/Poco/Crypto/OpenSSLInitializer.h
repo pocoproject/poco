@@ -1,13 +1,13 @@
 //
-// SSLInitializer.h
+// OpenSSLInitializer.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/include/Poco/Net/SSLInitializer.h#7 $
+// $Id: //poco/Main/Crypto/include/Poco/Crypto/OpenSSLInitializer.h#1 $
 //
-// Library: NetSSL_OpenSSL
-// Package: SSLCore
-// Module:  SSLInitializer
+// Library: Crypto
+// Package: CryptoCore
+// Module:  OpenSSLInitializer
 //
-// Definition of the SSLInitializer class.
+// Definition of the OpenSSLInitializer class.
 //
 // Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,11 +36,11 @@
 //
 
 
-#ifndef NetSSL_SSLInitializer_INCLUDED
-#define NetSSL_SSLInitializer_INCLUDED
+#ifndef Crypto_OpenSSLInitializer_INCLUDED
+#define Crypto_OpenSSLInitializer_INCLUDED
 
 
-#include "Poco/Net/NetSSL.h"
+#include "Poco/Crypto/Crypto.h"
 #include "Poco/Mutex.h"
 
 
@@ -54,20 +54,20 @@ extern "C"
 
 
 namespace Poco {
-namespace Net {
+namespace Crypto {
 
 
-class NetSSL_API SSLInitializer
+class Crypto_API OpenSSLInitializer
 	/// Initalizes the OpenSSL library.
 	///
 	/// The class ensures the earliest initialization and the
 	/// latest shutdown of the OpenSSL library.
 {
 public:
-	SSLInitializer();
+	OpenSSLInitializer();
 		/// Automatically initialize OpenSSL on startup.
 		
-	~SSLInitializer();
+	~OpenSSLInitializer();
 		/// Automatically shut down OpenSSL on exit.
 	
 	static void initialize();
@@ -95,7 +95,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} } // namespace Poco::Crypto
 
 
-#endif // NetSSL_SSLInitializer_INCLUDED
+#endif // Crypto_OpenSSLInitializer_INCLUDED

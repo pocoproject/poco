@@ -4,7 +4,7 @@
 // $Id$
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherImpl
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -44,129 +44,134 @@ namespace Poco {
 namespace Crypto {
 
 
-static void throwError()
+namespace
 {
-	unsigned long err;
-	std::string msg;
-	
-	while ((err = ERR_get_error()))
+	void throwError()
 	{
-		if (!msg.empty())
-			msg.append("; ");
-		msg.append(ERR_error_string(err, 0));
+		unsigned long err;
+		std::string msg;
+		
+		while ((err = ERR_get_error()))
+		{
+			if (!msg.empty())
+				msg.append("; ");
+			msg.append(ERR_error_string(err, 0));
+		}
+
+		throw Poco::IOException(msg);
 	}
 
-	throw Poco::IOException(msg);
-}
 
-
-class CryptoTransformImpl : public CryptoTransform
-{
-public:
-	typedef Cipher::ByteVec ByteVec;
-
-	enum Direction
+	class CryptoTransformImpl: public CryptoTransform
 	{
-		DIR_ENCRYPT,
-		DIR_DECRYPT
+	public:
+		typedef Cipher::ByteVec ByteVec;
+
+		enum Direction
+		{
+			DIR_ENCRYPT,
+			DIR_DECRYPT
+		};
+
+		CryptoTransformImpl(
+			const EVP_CIPHER* pCipher,
+			const ByteVec&    key,
+			const ByteVec&    iv,
+			Direction         dir);
+
+		~CryptoTransformImpl();
+		
+		std::size_t blockSize() const;
+
+		std::streamsize transform(
+			const unsigned char* input,
+			std::streamsize      inputLength,
+			unsigned char*       output,
+			std::streamsize      outputLength);
+		
+		std::streamsize finalize(
+			unsigned char*  output,
+			std::streamsize length);
+
+	private:
+		const EVP_CIPHER* _pCipher;
+		EVP_CIPHER_CTX    _ctx;
+		ByteVec           _key;
+		ByteVec           _iv;
 	};
 
-	CryptoTransformImpl(
+
+	CryptoTransformImpl::CryptoTransformImpl(
 		const EVP_CIPHER* pCipher,
 		const ByteVec&    key,
 		const ByteVec&    iv,
-		Direction         dir);
-
-	~CryptoTransformImpl();
-	
-	std::size_t blockSize() const;
-
-	std::streamsize transform(
-		const unsigned char* input,
-		std::streamsize      inputLength,
-		unsigned char*       output,
-		std::streamsize      outputLength);
-	
-	std::streamsize finalize(
-		unsigned char*  output,
-		std::streamsize length);
-
-private:
-	const EVP_CIPHER* _pCipher;
-	EVP_CIPHER_CTX    _ctx;
-	ByteVec           _key;
-	ByteVec           _iv;
-};
-
-
-CryptoTransformImpl::CryptoTransformImpl(
-	const EVP_CIPHER* pCipher,
-	const ByteVec&    key,
-	const ByteVec&    iv,
-	Direction         dir) :
+		Direction         dir):
 		_pCipher(pCipher),
 		_key(key),
 		_iv(iv)
-{
-	EVP_CipherInit(
-		&_ctx,
-		_pCipher,
-		&_key[0],
-		&_iv[0],
-		(dir == DIR_ENCRYPT) ? 1 : 0);
-}
+	{
+		EVP_CipherInit(
+			&_ctx,
+			_pCipher,
+			&_key[0],
+			&_iv[0],
+			(dir == DIR_ENCRYPT) ? 1 : 0);
+	}
 
 
-CryptoTransformImpl::~CryptoTransformImpl()
-{
-	EVP_CIPHER_CTX_cleanup(&_ctx);
-}
+	CryptoTransformImpl::~CryptoTransformImpl()
+	{
+		EVP_CIPHER_CTX_cleanup(&_ctx);
+	}
 
 
-std::size_t CryptoTransformImpl::blockSize() const
-{
-	return EVP_CIPHER_CTX_block_size(&_ctx);
-}
+	std::size_t CryptoTransformImpl::blockSize() const
+	{
+		return EVP_CIPHER_CTX_block_size(&_ctx);
+	}
 
 
-std::streamsize CryptoTransformImpl::transform(
-	const unsigned char* input,
-	std::streamsize      inputLength,
-	unsigned char*       output,
-	std::streamsize      outputLength)
-{
-	poco_assert (outputLength >= (inputLength + blockSize() - 1));
-	int outLen = static_cast<int>(outputLength);
-	int rc = EVP_CipherUpdate(
-		&_ctx,
-		output,
-		&outLen,
-		input,
-		static_cast<int>(inputLength));
+	std::streamsize CryptoTransformImpl::transform(
+		const unsigned char* input,
+		std::streamsize      inputLength,
+		unsigned char*       output,
+		std::streamsize      outputLength)
+	{
+		poco_assert (outputLength >= (inputLength + blockSize() - 1));
 
-	if (rc == 0)
-		throwError();
+		int outLen = static_cast<int>(outputLength);
+		int rc = EVP_CipherUpdate(
+			&_ctx,
+			output,
+			&outLen,
+			input,
+			static_cast<int>(inputLength));
 
-	outputLength = static_cast<std::streamsize>(outLen);
-	return outputLength;
-}
+		if (rc == 0)
+			throwError();
+
+		return static_cast<std::streamsize>(outLen);
+	}
 
 
-std::streamsize CryptoTransformImpl::finalize(
-	unsigned char*	output,
-	std::streamsize length)
-{
-	poco_assert (length >= blockSize());
-	int len = static_cast<int>(length);
-	// Use the '_ex' version that does not perform implicit cleanup since we
-	// will call EVP_CIPHER_CTX_cleanup() from the dtor as there is no
-	// guarantee that finalize() will be called if an error occurred.
-	int rc = EVP_CipherFinal_ex(&_ctx, output, &len);
+	std::streamsize CryptoTransformImpl::finalize(
+		unsigned char*	output,
+		std::streamsize length)
+	{
+		poco_assert (length >= blockSize());
+		
+		int len = static_cast<int>(length);
 
-	if (rc == 0)
-		throwError();
-	length = static_cast<std::streamsize>(len);
-	return length;
+		// Use the '_ex' version that does not perform implicit cleanup since we
+		// will call EVP_CIPHER_CTX_cleanup() from the dtor as there is no
+		// guarantee that finalize() will be called if an error occurred.
+		int rc = EVP_CipherFinal_ex(&_ctx, output, &len);
+
+		if (rc == 0)
+			throwError();
+			
+		return static_cast<std::streamsize>(len);
+	}
 }
 
 
@@ -184,16 +189,14 @@ CipherImpl::~CipherImpl()
 CryptoTransform* CipherImpl::createEncryptor()
 {
 	CipherKeyImpl::Ptr p = _key.impl();
-	return new CryptoTransformImpl(p->cipher(), p->getKey(), p->getIV(),
-		CryptoTransformImpl::DIR_ENCRYPT);
+	return new CryptoTransformImpl(p->cipher(), p->getKey(), p->getIV(), CryptoTransformImpl::DIR_ENCRYPT);
 }
 
 
 CryptoTransform* CipherImpl::createDecryptor()
 {
 	CipherKeyImpl::Ptr p = _key.impl();
-	return new CryptoTransformImpl(p->cipher(), p->getKey(), p->getIV(),
-		CryptoTransformImpl::DIR_DECRYPT);
+	return new CryptoTransformImpl(p->cipher(), p->getKey(), p->getIV(), CryptoTransformImpl::DIR_DECRYPT);
 }
 
 

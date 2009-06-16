@@ -4,7 +4,7 @@
 // $Id$
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CryptoTransform
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

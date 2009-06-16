@@ -1,10 +1,10 @@
 //
 // CipherKeyImpl.cpp
 //
-// $Id: //poco/Main/Crypto/src/CipherKeyImpl.cpp#1 $
+// $Id: //poco/Main/Crypto/src/CipherKeyImpl.cpp#2 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  CipherKeyImpl
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -56,7 +56,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_key(),
 	_iv()
 {
-	//dummy access to Cipherfactory so that the EVP lib is initilaized
+	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
@@ -76,7 +76,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_key(),
 	_iv()
 {
-	//dummy access to Cipherfactory so that the EVP lib is initilaized
+	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
@@ -93,7 +93,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name):
 	_key(),
 	_iv()
 {
-	//dummy access to Cipherfactory so that the EVP lib is initilaized
+	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
@@ -103,6 +103,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name):
 	_iv = ByteVec(ivSize());
 	generateKey();
 }
+
 
 CipherKeyImpl::~CipherKeyImpl()
 {
@@ -169,7 +170,7 @@ void CipherKeyImpl::generateKey(
 
 	if (!salt.empty())
 	{
-		int len = salt.size();
+		int len = static_cast<int>(salt.size());
 		// Create the salt array from the salt string
 		for (int i = 0; i < 8; ++i)
 			saltBytes[i] = salt.at(i % len);
@@ -183,7 +184,7 @@ void CipherKeyImpl::generateKey(
 		EVP_md5(),
 		(salt.empty() ? 0 : saltBytes),
 		reinterpret_cast<const unsigned char*>(password.data()),
-		password.size(),
+		static_cast<int>(password.size()),
 		iterationCount,
 		keyBytes,
 		ivBytes);

@@ -1,10 +1,10 @@
 //
 // RSAKey.h
 //
-// $Id: //poco/Main/Crypto/include/Poco/Crypto/RSAKey.h#3 $
+// $Id: //poco/Main/Crypto/include/Poco/Crypto/RSAKey.h#4 $
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: RSA
 // Module:  RSAKey
 //
 // Definition of the RSAKey class.
@@ -45,19 +45,25 @@
 
 
 namespace Poco {
-	namespace Net {
-		class X509Certificate;
-	}
 namespace Crypto {
 
 
+class X509Certificate;
+
+
 class Crypto_API RSAKey
-	/// Stores an RSAKey
+	/// This class stores an RSA key pair, consisting
+	/// of private and public key. Storage of the private
+	/// key is optional.
+	///
+	/// If a private key is available, the RSAKey can be
+	/// used for decrypting data (encrypted with the public key)
+	/// or computing secure digital signatures.
 {
 public:
 	enum KeyLength
 	{
-		KL_512 = 512,
+		KL_512  = 512,
 		KL_1024 = 1024,
 		KL_2048 = 2048,
 		KL_4096 = 4096
@@ -69,22 +75,19 @@ public:
 		EXP_LARGE
 	};
 
-	RSAKey(const Poco::Net::X509Certificate& cert);
-		/// Extracts the RSAKey from the certificate
+	explicit RSAKey(const X509Certificate& cert);
+		/// Extracts the RSA public key from the given certificate.
 
 	RSAKey(KeyLength keyLength, Exponent exp);
 		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.
-		/// Can be used to sign and verify a stream
+		/// Can be used to sign data and verify signatures.
 
-	RSAKey(const std::string& publicKeyFile, 
-		const std::string& privateKeyFile="", 
-		const std::string& privateKeyPwd="");
-		/// Creates the RSAKey. Can only by used for signing if privateKeyFile
-		/// is not empty.
+	RSAKey(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
+		/// Creates the RSAKey, by reading public and private key from the given files and
+		/// using the given passphrase for the private key. Can only by used for signing if 
+		/// a private key is available. 
 
-	RSAKey(std::istream* pPubKey, 
-		std::istream* pPrivKey = 0, 
-		const std::string& privateKeyPwd="");
+	RSAKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
 		/// Creates the RSAKey. Can only by used for signing if pPrivKey
 		/// is not null. If a private key file is specified, you don't need to
 		/// specify a public key file. OpenSSL will auto-create it from the private key.
@@ -93,16 +96,22 @@ public:
 		/// Destroys the RSAKey.
 
 	int size() const;
-		/// Returns the RSA_size
+		/// Returns the RSA modulus size.
 
-	void save(const std::string& pubKeyFile, const std::string& privKeyFile="", const std::string& privKeyPwd="");
-		/// Exports the keys to the given files. pubKeyFile/privKeyFile can be empty
+	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
+		/// Exports the public and private keys to the given files. 
+		///
+		/// If an empty filename is specified, the corresponding key
+		/// is not exported.
 
-	void save(std::ostream* pPubKey, std::ostream* pPrivKey = 0, const std::string& privateKeyPwd = "");
-		/// Exports the keys to the given streams. pPubKey/pPrivKey can be empty
+	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+		/// Exports the public and private key to the given streams.
+		///
+		/// If a null pointer is passed for a stream, the corresponding
+		/// key is not exported.
 
 	RSAKeyImpl::Ptr impl();
-		/// Returns the impl object
+		/// Returns the impl object.
 
 	const std::string& name() const;
 		/// Returns "rsa"
@@ -112,6 +121,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline RSAKeyImpl::Ptr RSAKey::impl()
 {
 	return _pImpl;

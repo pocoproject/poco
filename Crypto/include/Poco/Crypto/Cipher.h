@@ -4,7 +4,7 @@
 // $Id$
 //
 // Library: Crypto
-// Package: CryptoCore
+// Package: Cipher
 // Module:  Cipher
 //
 // Definition of the Cipher class.
@@ -43,7 +43,8 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
-
+#include <istream>
+#include <ostream>
 #include <vector>
 
 

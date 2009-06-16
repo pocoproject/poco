@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#29 $
+// $Id: //poco/Main/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#30 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -237,17 +237,14 @@ void SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
 	{
-		// if we can't get a clean SSL shutdown after 10
-		// attempts, something's probably wrong with the
-		// peer and we give up.
-		int rc;
-		int attempts = 0;
-		do
-		{
-			rc = SSL_shutdown(_pSSL);
-			++attempts;
-		}
-		while (rc == 0 && attempts < 10);
+		// A proper clean shutdown would require us to
+		// retry the shutdown if we get a zero return
+		// value, until SSL_shutdown() returns 1.
+		// However, this will lead to problems with
+		// most web browsers, so we just set the shutdown
+		// flag by calling SSL_shutdown() once and be
+		// done with it.
+		int rc = SSL_shutdown(_pSSL);
 		if (rc < 0) handleError(rc);
 		SSL_clear(_pSSL);
 		SSL_free(_pSSL);
@@ -304,7 +301,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 long SecureSocketImpl::verifyCertificate(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
-	if (mode == Context::VERIFY_NONE || isLocalHost(hostName) && mode != Context::VERIFY_STRICT)
+	if (mode == Context::VERIFY_NONE || (isLocalHost(hostName) && mode != Context::VERIFY_STRICT))
 	{
 		return X509_V_OK;
 	}

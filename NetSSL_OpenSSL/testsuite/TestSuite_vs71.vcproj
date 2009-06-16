@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Util\include"
+				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Crypto\include;..\..\Util\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_DLL;WINVER=0x0500"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -81,7 +81,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Util\include"
+				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Crypto\include;..\..\Util\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_DLL;WINVER=0x0500"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -130,15 +130,15 @@
 		</Configuration>
 		<Configuration
 			Name="debug_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Util\include"
+				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Crypto\include;..\..\Util\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;WINVER=0x0500"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -186,8 +186,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_static|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2">
@@ -199,7 +199,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Util\include"
+				AdditionalIncludeDirectories="..\include;..\..\Net\include;..\..\Crypto\include;..\..\Util\include;..\..\Foundation\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;WINVER=0x0500"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
