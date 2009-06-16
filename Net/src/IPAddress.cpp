@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/Main/Net/src/IPAddress.cpp#21 $
+// $Id: //poco/Main/Net/src/IPAddress.cpp#22 $
 //
 // Library: Net
 // Package: NetCore
@@ -175,9 +175,9 @@ public:
 	bool isSiteLocal() const
 	{
 		UInt32 addr = ntohl(_addr.s_addr);
-		return (addr & 0xFF000000) == 0x0A000000 ||      // 10.0.0.0/24
-		       (addr & 0xFFFF0000) == 0xC0A80000 ||      // 192.68.0.0/16
-		       addr >= 0xAC100000 && addr <= 0xAC1FFFFF; // 172.16.0.0 to 172.31.255.255
+		return (addr & 0xFF000000) == 0x0A000000 ||        // 10.0.0.0/24
+		       (addr & 0xFFFF0000) == 0xC0A80000 ||        // 192.68.0.0/16
+		       (addr >= 0xAC100000 && addr <= 0xAC1FFFFF); // 172.16.0.0 to 172.31.255.255
 	}
 	
 	bool isIPv4Compatible() const

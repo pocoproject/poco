@@ -1,7 +1,7 @@
 //
 // DNSTest.cpp
 //
-// $Id: //poco/svn/Net/testsuite/src/DNSTest.cpp#2 $
+// $Id: //poco/Main/Net/testsuite/src/DNSTest.cpp#8 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -61,10 +61,13 @@ void DNSTest::testHostByName()
 {
 	HostEntry he1 = DNS::hostByName("www.appinf.com");
 	assert (he1.name() == "appinf.com");
+#if !defined(_WIN32) && !defined(POCO_HAVE_IPv6)
+	// getaddrinfo() does not report any aliases
 	assert (!he1.aliases().empty());
 	assert (he1.aliases()[0] == "www.appinf.com");
+#endif
 	assert (he1.addresses().size() == 1);
-	assert (he1.addresses()[0].toString() == "213.229.60.82");
+	assert (he1.addresses()[0].toString() == "216.146.46.35");
 	
 	try
 	{
@@ -82,12 +85,12 @@ void DNSTest::testHostByName()
 
 void DNSTest::testHostByAddress()
 {
-	IPAddress ip1("213.229.60.82");
+	IPAddress ip1("216.146.46.35");
 	HostEntry he1 = DNS::hostByAddress(ip1);
-	assert (he1.name() == "quentin.inode.at");
+	assert (he1.name() == "web.appinf.com");
 	assert (he1.aliases().empty());
 	assert (he1.addresses().size() == 1);
-	assert (he1.addresses()[0].toString() == "213.229.60.82");
+	assert (he1.addresses()[0].toString() == "216.146.46.35");
 	
 	IPAddress ip2("10.0.244.253");
 	try
