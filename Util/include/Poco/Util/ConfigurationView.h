@@ -1,7 +1,7 @@
 //
 // ConfigurationView.h
 //
-// $Id: //poco/svn/Util/include/Poco/Util/ConfigurationView.h#1 $
+// $Id: //poco/Main/Util/include/Poco/Util/ConfigurationView.h#2 $
 //
 // Library: Util
 // Package: Configuration

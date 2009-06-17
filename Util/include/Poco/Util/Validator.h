@@ -1,7 +1,7 @@
 //
 // Validator.h
 //
-// $Id: //poco/svn/Util/include/Poco/Util/Validator.h#1 $
+// $Id: //poco/Main/Util/include/Poco/Util/Validator.h#1 $
 //
 // Library: Util
 // Package: Options

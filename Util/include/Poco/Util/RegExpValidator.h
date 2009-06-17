@@ -1,7 +1,7 @@
 //
 // RegExpValidator.h
 //
-// $Id: //poco/svn/Util/include/Poco/Util/RegExpValidator.h#1 $
+// $Id: //poco/Main/Util/include/Poco/Util/RegExpValidator.h#1 $
 //
 // Library: Util
 // Package: Options

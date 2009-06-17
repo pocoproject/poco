@@ -1,7 +1,7 @@
 //
 // LoggingSubsystem.h
 //
-// $Id: //poco/svn/Util/include/Poco/Util/LoggingSubsystem.h#1 $
+// $Id: //poco/Main/Util/include/Poco/Util/LoggingSubsystem.h#2 $
 //
 // Library: Util
 // Package: Application

@@ -1,7 +1,7 @@
 //
 // WinService.h
 //
-// $Id: //poco/svn/Util/include/Poco/Util/WinService.h#1 $
+// $Id: //poco/Main/Util/include/Poco/Util/WinService.h#4 $
 //
 // Library: Util
 // Package: Windows
