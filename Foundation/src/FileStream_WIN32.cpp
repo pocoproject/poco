@@ -1,7 +1,7 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/svn/Foundation/src/FileStream_WIN32.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/FileStream_WIN32.cpp#4 $
 //
 // Library: Foundation
 // Package: Streams
@@ -79,6 +79,9 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 		access |= GENERIC_WRITE;
 
 	DWORD shareMode = FILE_SHARE_READ;
+	if (!(mode & std::ios::out))
+		shareMode |= FILE_SHARE_WRITE;
+		
 	DWORD creationDisp = OPEN_EXISTING;
 	if (mode & std::ios::trunc)
 		creationDisp = CREATE_ALWAYS;
