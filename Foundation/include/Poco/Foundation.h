@@ -43,6 +43,12 @@
 
 
 //
+// Version Information
+//
+#define POCO_VERSION 0x010400D0
+
+
+//
 // Include library configuration
 //
 #include "Poco/Config.h"
