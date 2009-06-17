@@ -1,7 +1,7 @@
 
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -42,6 +42,11 @@
 #include <sys/utsname.h>
 #include <sys/param.h>
 #include <cstring>
+#if defined(POCO_OS_FAMILY_BSD)
+#include <sys/sysctl.h>
+#elif POCO_OS == POCO_OS_HPUX
+#include <pthread.h>
+#endif
 
 
 namespace Poco {
@@ -117,6 +122,27 @@ std::string EnvironmentImpl::nodeNameImpl()
 	struct utsname uts;
 	uname(&uts);
 	return uts.nodename;
+}
+
+
+unsigned EnvironmentImpl::processorCountImpl()
+{
+#if defined(POCO_OS_FAMILY_BSD)
+	unsigned count;
+	std::size_t size = sizeof(count);
+	if (sysctlbyname("hw.ncpu", &count, &size, 0, 0))
+		return 1;
+	else
+		return count;
+#elif POCO_OS == POCO_OS_HPUX
+	return pthread_num_processors_np();
+#elif defined(_SC_NPROCESSORS_ONLN)
+	int count = sysconf(_SC_NPROCESSORS_ONLN);
+	if (count <= 0) count = 1;
+	return static_cast<int>(count);
+#else
+	return 1;
+#endif
 }
 
 

@@ -1,7 +1,7 @@
 //
 // SharedPtr.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#7 $
+// $Id: //poco/1.3/Foundation/include/Poco/SharedPtr.h#8 $
 //
 // Library: Foundation
 // Package: Core
@@ -88,6 +88,20 @@ public:
 		/// Note that pObj can be 0.
 	{
 		delete pObj;
+	}
+};
+
+
+template <class C>
+class ReleaseArrayPolicy
+	/// The release policy for SharedPtr holding arrays.
+{
+public:
+	static void release(C* pObj)
+		/// Delete the object.
+		/// Note that pObj can be 0.
+	{
+		delete [] pObj;
 	}
 };
 

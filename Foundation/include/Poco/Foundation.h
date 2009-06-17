@@ -1,7 +1,7 @@
 //
 // Foundation.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Foundation.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/Foundation.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -40,6 +40,12 @@
 
 #ifndef Foundation_Foundation_INCLUDED
 #define Foundation_Foundation_INCLUDED
+
+
+//
+// Version Information
+//
+#define POCO_VERSION 0x01030600
 
 
 //

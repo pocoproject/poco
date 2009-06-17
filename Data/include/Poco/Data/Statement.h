@@ -1,7 +1,7 @@
 //
 // Statement.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/Statement.h#3 $
+// $Id: //poco/1.3/Data/include/Poco/Data/Statement.h#4 $
 //
 // Library: Data
 // Package: DataCore
@@ -130,9 +130,6 @@ public:
 	bool done();
 		/// Returns if the statement was completely executed or if a previously set limit stopped it
 		/// and there is more work to do. When no limit is set, it will always - after calling execute() - return true.
-
-	Statement& reset(Session& session);
-		/// Resets the Statement so that it can be filled with a new SQL command.
 
 protected:
 	const AbstractExtractionVec& extractions() const;

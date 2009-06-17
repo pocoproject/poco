@@ -1,7 +1,7 @@
 //
 // PageReader.h
 //
-// $Id: //poco/1.3/PageCompiler/src/PageReader.h#1 $
+// $Id: //poco/1.3/PageCompiler/src/PageReader.h#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -63,6 +63,9 @@ public:
 		/// to the reader's Page object. Also parses page
 		/// attributes and include directives.
 
+	void emitLineDirectives(bool flag = true);
+		/// Enables writing of #line directives to generated code.
+
 protected:
 	enum ParsingState
 	{
@@ -85,6 +88,9 @@ protected:
 	void nextToken(std::istream& istr, std::string& token);
 	void handleAttribute(const std::string& name, const std::string& value);
 	std::string where() const;
+
+protected:
+	void generateLineDirective(std::ostream& ostr);
 	
 private:
 	PageReader();
@@ -96,6 +102,7 @@ private:
 	std::string _path;
 	std::string _attrs;
 	int _line;
+	bool _emitLineDirectives;
 };
 
 

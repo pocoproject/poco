@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Environment.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -123,6 +123,12 @@ std::string Environment::nodeId()
 void Environment::nodeId(NodeId& id)
 {
 	return EnvironmentImpl::nodeIdImpl(id);
+}
+
+
+unsigned Environment::processorCount()
+{
+	return EnvironmentImpl::processorCountImpl();
 }
 
 

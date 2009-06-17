@@ -1,7 +1,7 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#2 $
+// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#3 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
@@ -79,7 +79,8 @@ public:
 	CompilerApp(): 
 		_helpRequested(false),
 		_generateOSPCode(false),
-		_generateApacheCode(false)
+		_generateApacheCode(false),
+		_emitLineDirectives(true)
 	{
 	}
 
@@ -128,6 +129,12 @@ protected:
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleApache)));
+
+		options.addOption(
+			Option("noline", "N", "Do not include #line directives in generated code.")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleNoLine)));
 	}
 	
 	void handleHelp(const std::string& name, const std::string& value)
@@ -154,6 +161,11 @@ protected:
 	void handleApache(const std::string& name, const std::string& value)
 	{
 		_generateApacheCode = true;
+	}
+	
+	void handleNoLine(const std::string& name, const std::string& value)
+	{
+		_emitLineDirectives = false;
 	}
 
 	void displayHelp()
@@ -214,6 +226,7 @@ protected:
 
 		FileInputStream srcStream(path);
 		PageReader pageReader(page, path);
+		pageReader.emitLineDirectives(_emitLineDirectives);
 		pageReader.parse(srcStream);
 
 		Path p(path);
@@ -281,6 +294,7 @@ private:
 	bool _helpRequested;
 	bool _generateOSPCode;
 	bool _generateApacheCode;
+	bool _emitLineDirectives;
 };
 
 

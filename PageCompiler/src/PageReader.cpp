@@ -1,7 +1,7 @@
 //
 // PageReader.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/PageReader.cpp#1 $
+// $Id: //poco/1.3/PageCompiler/src/PageReader.cpp#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -49,7 +49,8 @@ PageReader::PageReader(Page& page, const std::string& path):
 	_page(page),
 	_pParent(0),
 	_path(path),
-	_line(0)
+	_line(0),
+	_emitLineDirectives(false)
 {
 	_attrs.reserve(4096);
 }
@@ -59,7 +60,8 @@ PageReader::PageReader(const PageReader& parent, const std::string& path):
 	_page(parent._page),
 	_pParent(&parent),
 	_path(path),
-	_line(0)
+	_line(0),
+	_emitLineDirectives(false)
 {
 	_attrs.reserve(4096);
 }
@@ -67,6 +69,12 @@ PageReader::PageReader(const PageReader& parent, const std::string& path):
 
 PageReader::~PageReader()
 {
+}
+
+
+void PageReader::emitLineDirectives(bool flag)
+{
+	_emitLineDirectives = flag;
 }
 
 
@@ -87,6 +95,7 @@ void PageReader::parse(std::istream& pageStream)
 			if (state == STATE_MARKUP)
 			{
 				_page.handler() << MARKUP_END;
+				generateLineDirective(_page.handler());
 				state = STATE_BLOCK;
 			}
 			else _page.handler() << token;
@@ -96,6 +105,7 @@ void PageReader::parse(std::istream& pageStream)
 			if (state == STATE_MARKUP)
 			{
 				_page.handler() << MARKUP_END;
+				generateLineDirective(_page.implDecls());
 				state = STATE_IMPLDECL;
 			}
 			else _page.handler() << token;
@@ -105,6 +115,7 @@ void PageReader::parse(std::istream& pageStream)
 			if (state == STATE_MARKUP)
 			{
 				_page.handler() << MARKUP_END;
+				generateLineDirective(_page.headerDecls());
 				state = STATE_HDRDECL;
 			}
 			else _page.handler() << token;
@@ -133,6 +144,7 @@ void PageReader::parse(std::istream& pageStream)
 			if (state == STATE_MARKUP)
 			{
 				_page.handler() << MARKUP_END;
+				generateLineDirective(_page.handler());
 				_page.handler() << EXPR_BEGIN;
 				state = STATE_EXPR;
 			}
@@ -318,6 +330,7 @@ void PageReader::include(const std::string& path)
 	
 	Poco::FileInputStream includeStream(currentPath.toString());
 	PageReader includeReader(*this, currentPath.toString());
+	includeReader.emitLineDirectives(_emitLineDirectives);
 	includeReader.parse(includeStream);
 	
 	_page.handler() << "\t// end include " << currentPath.toString() << "\n";
@@ -335,4 +348,24 @@ std::string PageReader::where() const
 		pParent = pParent->_pParent;
 	}
 	return result.str();
+}
+
+
+void PageReader::generateLineDirective(std::ostream& ostr)
+{
+	if (_emitLineDirectives)
+	{
+		Poco::Path p(_path);
+		p.makeAbsolute();
+		std::string absPath = p.toString();
+		ostr << "#line " << _line << " \"";
+		for (std::string::const_iterator it = absPath.begin(); it != absPath.end(); ++it)
+		{
+			if (*it == '\\')
+				ostr << "\\\\";
+			else
+				ostr << *it;
+		}
+		ostr << "\"\n";
+	}
 }

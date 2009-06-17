@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Timer.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/Timer.cpp#7 $
 //
 // Library: Foundation
 // Package: Threading
@@ -78,7 +78,7 @@ void Timer::start(const AbstractTimerCallback& method, ThreadPool& threadPool)
 
 void Timer::start(const AbstractTimerCallback& method, Thread::Priority priority, ThreadPool& threadPool)
 {
-	Poco::Timestamp nextInvocation;
+	Timestamp nextInvocation;
 	nextInvocation += _startInterval*1000;
 
 	poco_assert (!_pCallback);
@@ -161,7 +161,7 @@ void Timer::setPeriodicInterval(long milliseconds)
 
 void Timer::run()
 {
-	Poco::Timestamp now;
+	Timestamp now;
 	long interval(0);
 	do
 	{
@@ -197,7 +197,7 @@ void Timer::run()
 				interval = _periodicInterval;
 			}
 		}
-		_nextInvocation += interval*1000;
+		_nextInvocation += static_cast<Timestamp::TimeDiff>(interval)*1000;
 	}
 	while (interval > 0);
 	_done.set();

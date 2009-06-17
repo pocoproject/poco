@@ -1,7 +1,7 @@
 //
 // DateTimeParserTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/DateTimeParserTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/DateTimeParserTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -395,6 +395,15 @@ void DateTimeParserTest::testGuess()
 	assert (tzd == 0);
 
 	dt = DateTimeParser::parse("Sat, 8 Jan 05 12:30:00 +0100", tzd);
+	assert (dt.year() == 2005);
+	assert (dt.month() == 1);
+	assert (dt.day() == 8);
+	assert (dt.hour() == 12);
+	assert (dt.minute() == 30);
+	assert (dt.second() == 0);
+	assert (tzd == 3600);
+
+	dt = DateTimeParser::parse("Sat, 8 Jan 2005 12:30:00 +0100", tzd);
 	assert (dt.year() == 2005);
 	assert (dt.month() == 1);
 	assert (dt.day() == 8);

@@ -1,7 +1,27 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.3.6 (2009-07-xx)
+==========================
+
+- added Environment::processorCount()
+- added POCO_VERSION macro to Poco/Foundation.h
+- fixed SF# 2807527: Poco::Timer bug for long startInterval/periodic interval
+- fixed a bug similar to SF# 2807527 in Poco::Util::Timer.
+- fixed SF# 2795395: Constructor doesn't treat the params "key" and "iv"
+- fixed SF# 2804457: DateTime::checkLimit looks wrong
+- fixed SF# 2804546: DateTimeParser requires explicit RFC1123 format
+- added ReleaseArrayPolicy to Poco::SharedPtr
+- upgraded to SQLite 3.6.15
+- fixed SF# 2782709: Missing semicolons in "Logger.h" convenience
+- fixed SF# 2526407: DefaultStrategy.h ++it instead of it++ in a loop
+- fixed SF# 2502235: Poco STLPort patch
+- fixed SF# 2186643: Data::Statement::reset() not implemented in 1.3.3
+- fixed SF# 2164227: Allow File opened read only by FileInputSteam to be writable
+- fixed SF# 2791934: use of char_traits::copy in BufferedStreamBuf::underflow
+
+
 Release 1.3.5 (2009-05-11)
-============================
+==========================
 
 - fixed SF# 2779410: Poco::Data::ODBC::HandleException impovement
 - fixed wrong exception text for Poco::UnhandledException
@@ -1044,4 +1064,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#47 $
+$Id: //poco/1.3/dist/CHANGELOG#48 $

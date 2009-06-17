@@ -1,7 +1,7 @@
 //
 // Environment_VMS.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_VMS.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Environment_VMS.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -142,6 +142,31 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	close(s);
 	if (rc < 0) throw SystemException("cannot get MAC address");
 	std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
+}
+
+
+unsigned EnvironmentImpl::processorCountImpl()
+{
+	#pragma pointer_size save
+	#pragma pointer_size 32
+
+	Poco::UInt32 count;
+	unsigned short length;
+
+	ILE3 items[2];
+	items[0].ile3$w_code         = SYI$_ACTIVECPU_CNT;
+	items[0].ile3$w_length       = sizeof(count);
+	items[0].ile3$ps_bufaddr     = &count;
+	items[0].ile3$ps_retlen_addr = &length;
+	items[1].ile3$w_code         = 0;
+	items[1].ile3$w_length       = 0;
+
+	if (sys$getsyiw(0, 0, 0, items, 0, 0, 0) == 1)
+		return count;
+	else
+		throw SystemException("$GETSYI failed");
+
+	#pragma pointer_size restore
 }
 
 

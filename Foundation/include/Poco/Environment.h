@@ -1,7 +1,7 @@
 //
 // Environment.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Environment.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Environment.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -94,6 +94,11 @@ public:
 		/// of the first Ethernet adapter found on the system.
 		///
 		/// Throws a SystemException if no Ethernet adapter is available.
+		
+	static unsigned processorCount();
+		/// Returns the number of processors installed in the system.
+		///
+		/// If the number of processors cannot be determined, returns 1.
 };
 
 

@@ -1,7 +1,7 @@
 //
 // CipherKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherKeyImpl.cpp#3 $
+// $Id: //poco/1.3/Crypto/src/CipherKeyImpl.cpp#4 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -73,8 +73,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	const ByteVec& iv):
 	_pCipher(0),
 	_name(name),
-	_key(),
-	_iv()
+	_key(key),
+	_iv(iv)
 {
 	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
@@ -82,8 +82,6 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 
 	if (!_pCipher)
 		throw Poco::NotFoundException("Cipher " + name + " was not found");
-	_key = ByteVec(keySize());
-	_iv = ByteVec(ivSize());
 }
 
 	
