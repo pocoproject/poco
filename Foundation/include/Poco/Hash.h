@@ -1,7 +1,7 @@
 //
 // Hash.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Hash.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/Hash.h#3 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -54,7 +54,7 @@ struct Hash
 	std::size_t operator () (T value) const
 		/// Returns the hash for the given value.
 	{
-		return hash(value);
+		return Poco::hash(value);
 	}
 };
 
