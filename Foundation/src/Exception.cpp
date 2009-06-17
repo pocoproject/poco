@@ -124,6 +124,16 @@ std::string Exception::displayText() const
 }
 
 
+void Exception::extendedMessage(const std::string& arg)
+{
+	if (!arg.empty())
+	{
+		if (!_msg.empty()) _msg.append(": ");
+		_msg.append(arg);
+	}
+}
+
+
 Exception* Exception::clone() const
 {
 	return new Exception(*this);

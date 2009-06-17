@@ -1,9 +1,9 @@
 //
 // Error.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Error.h#4 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Error.h#3 $
 //
-// Library: Data/ODBC
+// Library: ODBC
 // Package: ODBC
 // Module:  Error
 //
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_Error_INCLUDED
-#define ODBC_Error_INCLUDED
+#ifndef Data_ODBC_Error_INCLUDED
+#define Data_ODBC_Error_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -63,7 +63,7 @@ class Error
 	/// as well as individual diagnostic records.
 {
 public:
-	explicit Error(H handle) : _diagnostics(handle)
+	explicit Error(const H& handle) : _diagnostics(handle)
 		/// Creates the Error.
 	{
 	}
@@ -92,7 +92,7 @@ public:
 			return str;
 
 		std::string s;
-		format(s, 
+		Poco::format(s, 
 			"===========================\n"
 			"ODBC Diagnostic record #%d:\n"
 			"===========================\n"
@@ -112,7 +112,7 @@ public:
 	{
 		std::string str;
 
-		format(str, 
+		Poco::format(str, 
 			"Connection:%s\nServer:%s\n",
 			_diagnostics.connectionName(),
 			_diagnostics.serverName());

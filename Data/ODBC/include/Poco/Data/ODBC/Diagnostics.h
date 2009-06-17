@@ -1,9 +1,9 @@
 //
 // Diagnostics.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Diagnostics.h#6 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Diagnostics.h#4 $
 //
-// Library: Data/ODBC
+// Library: ODBC
 // Package: ODBC
 // Module:  Diagnostics
 //
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_Diagnostics_INCLUDED
-#define ODBC_Diagnostics_INCLUDED
+#ifndef Data_ODBC_Diagnostics_INCLUDED
+#define Data_ODBC_Diagnostics_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -47,7 +47,6 @@
 #include <windows.h>
 #endif
 #include <sqlext.h>
-#include <cstring>
 
 
 namespace Poco {
@@ -59,28 +58,28 @@ template <typename H, SQLSMALLINT handleType>
 class Diagnostics
 	/// Utility class providing functionality for retrieving ODBC diagnostic
 	/// records. Diagnostics object must be created with corresponding handle
-	/// as constructor argument. During construction, diagnostic records with corresponding
-	/// fields are populated and the object is ready for querying on various diagnostic fields.
+	/// as constructor argument. During construction, diagnostic records fields 
+	/// are populated and the object is ready for querying.
 {
 public:
 
 	static const unsigned int SQL_STATE_SIZE = SQL_SQLSTATE_SIZE + 1;
 	static const unsigned int SQL_MESSAGE_LENGTH = SQL_MAX_MESSAGE_LENGTH + 1;
 	static const unsigned int SQL_NAME_LENGTH = 128;
-	static const std::string DATA_TRUNCATED;
+	static const std::string  DATA_TRUNCATED;
 
 	struct DiagnosticFields
 	{
 		/// SQLGetDiagRec fields
-		POCO_SQLCHAR     _sqlState[SQL_STATE_SIZE];
-		POCO_SQLCHAR     _message[SQL_MESSAGE_LENGTH];
-		SQLINTEGER  _nativeError;
+		SQLCHAR    _sqlState[SQL_STATE_SIZE];
+		SQLCHAR    _message[SQL_MESSAGE_LENGTH];
+		SQLINTEGER _nativeError;
 	};
 
 	typedef std::vector<DiagnosticFields> FieldVec;
 	typedef typename FieldVec::const_iterator Iterator;
 
-	explicit Diagnostics(H& rHandle): _rHandle(rHandle)
+	explicit Diagnostics(const H& handle): _rHandle(handle)
 		/// Creates and initializes the Diagnostics.
 	{
 		std::memset(_connectionName, 0, sizeof(_connectionName));
@@ -149,12 +148,12 @@ public:
 		return _fields;
 	}
 
-	const Iterator begin() const
+	Iterator begin() const
 	{
 		return _fields.begin();
 	}
 
-	const Iterator end() const
+	Iterator end() const
 	{
 		return _fields.end();
 	}
@@ -180,11 +179,6 @@ public:
 		{
 			if (1 == count)
 			{
-				poco_assert (sizeof(_connectionName) > none.length());
-				poco_assert (sizeof(_connectionName) > na.length());
-				poco_assert (sizeof(_serverName) > none.length());
-				poco_assert (sizeof(_serverName) > na.length());
-
 				// success of the following two calls is optional
 				// (they fail if connection has not been established yet
 				//  or return empty string if not applicable for the context)
@@ -193,22 +187,38 @@ public:
 					count, 
 					SQL_DIAG_CONNECTION_NAME, 
 					_connectionName, 
-					SQL_NAME_LENGTH, 
+					sizeof(_connectionName), 
 					&messageLength)))
-					std::memcpy(_connectionName, none.c_str(), none.length());
+				{
+					std::size_t len = sizeof(_connectionName) > none.length() ? 
+						none.length() : sizeof(_connectionName) - 1;
+					std::memcpy(_connectionName, none.c_str(), len);
+				}
 				else if (0 == _connectionName[0]) 
-					std::memcpy(_connectionName, na.c_str(), na.length());
+				{
+					std::size_t len = sizeof(_connectionName) > na.length() ? 
+						na.length() : sizeof(_connectionName) - 1;
+					std::memcpy(_connectionName, na.c_str(), len);
+				}
 				
 				if (Utility::isError(SQLGetDiagField(handleType, 
 					_rHandle, 
 					count, 
 					SQL_DIAG_SERVER_NAME, 
 					_serverName, 
-					SQL_NAME_LENGTH, 
+					sizeof(_serverName), 
 					&messageLength)))
-					std::memcpy(_serverName, none.c_str(), none.length());
+				{
+					std::size_t len = sizeof(_serverName) > none.length() ? 
+						none.length() : sizeof(_serverName) - 1;
+					std::memcpy(_serverName, none.c_str(), len);
+				}
 				else if (0 == _serverName[0]) 
-					std::memcpy(_serverName, na.c_str(), na.length());
+				{
+					std::size_t len = sizeof(_serverName) > na.length() ? 
+						na.length() : sizeof(_serverName) - 1;
+					std::memcpy(_serverName, na.c_str(), len);
+				}
 			}
 
 			_fields.push_back(df);
@@ -228,14 +238,14 @@ private:
 	Diagnostics();
 
 	/// SQLGetDiagField fields
-	POCO_SQLCHAR _connectionName[SQL_NAME_LENGTH];
-	POCO_SQLCHAR _serverName[SQL_NAME_LENGTH];
+	SQLCHAR _connectionName[SQL_NAME_LENGTH];
+	SQLCHAR _serverName[SQL_NAME_LENGTH];
 
 	/// Diagnostics container
 	FieldVec _fields;
 
 	/// Context handle
-	H& _rHandle;
+	const H& _rHandle;
 };
 
 

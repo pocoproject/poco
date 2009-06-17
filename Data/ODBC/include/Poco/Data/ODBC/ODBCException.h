@@ -1,9 +1,9 @@
 //
 // ODBCException.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/ODBCException.h#4 $
+// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCException.h#4 $
 //
-// Library: Data/ODBC
+// Library: ODBC
 // Package: ODBC
 // Module:  ODBCException
 //
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef ODBC_ODBCException_INCLUDED
-#define ODBC_ODBCException_INCLUDED
+#ifndef Data_ODBC_ODBCException_INCLUDED
+#define Data_ODBC_ODBCException_INCLUDED
 
 
 #include "Poco/Data/ODBC/ODBC.h"
@@ -45,6 +45,7 @@
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Format.h"
 
 
 namespace Poco {
@@ -60,79 +61,97 @@ POCO_DECLARE_EXCEPTION(ODBC_API, DataTruncatedException, ODBCException)
 
 template <class H, SQLSMALLINT handleType>
 class HandleException: public ODBCException
-{															
-public:														
+{
+public:
 	HandleException(const H& handle): _error(handle)
+		/// Creates HandleException
 	{
+		message(_error.toString());
 	}
 
 	HandleException(const H& handle, const std::string& msg): 
 		ODBCException(msg), 
 		_error(handle)
+		/// Creates HandleException
 	{
+		extendedMessage(_error.toString());
 	}							
 
 	HandleException(const H& handle, const std::string& msg, const std::string& arg): 
 		ODBCException(msg, arg), 
 		_error(handle)
+		/// Creates HandleException
 	{
 	}
 
 	HandleException(const H& handle, const std::string& msg, const Poco::Exception& exc): 
 		ODBCException(msg, exc),
 		_error(handle)
+		/// Creates HandleException
 	{
 	}
 
 	HandleException(const HandleException& exc): 
 		ODBCException(exc),
 		_error(exc._error)
+		/// Creates HandleException
 	{
-	}									
+	}
 
-	~HandleException() throw()															
+	~HandleException() throw()
+		/// Destroys HandleException
 	{
 	}
 
 	HandleException& operator = (const HandleException& exc)
+		/// Assignment operator
 	{
 		HandleException::operator = (exc);
 		return *this;
 	}
 
 	const char* name() const throw()
+		/// Returns the name of the exception
 	{
-		
 		return "ODBC handle exception";
 	}
 
 	const char* className() const throw()
+		/// Returns the HandleException class name.
 	{
 		return typeid(*this).name();
 	}
 
 	Poco::Exception* clone() const
+		/// Clones the HandleException
 	{
 		return new HandleException(*this);
 	}
 
 	void rethrow() const
+		/// Re-throws the HandleException.
 	{
 		throw *this;
 	}
 
 	const Diagnostics<H, handleType>& diagnostics() const
+		/// Returns error diagnostics.
 	{
 		return _error.diagnostics();
 	}
 
 	std::string toString() const
+		/// Returns the formatted error diagnostics for the handle.
 	{
-		std::stringstream os;
-		os << "ODBC Error: " << what() << std::endl 
-			<< "===================" << std::endl 
-			<< _error.toString() << std::endl ;
-		return os.str();
+		return Poco::format("ODBC Error: %s\n===================\n%s\n",
+			std::string(what()),
+			_error.toString());
+	}
+
+	static std::string errorString(const H& handle)
+		/// Returns the error diagnostics string for the handle.
+	{
+		return Error<H, handleType>(handle).toString();
 	}
 
 private:
@@ -140,8 +159,8 @@ private:
 };
 
 
-typedef HandleException<SQLHENV, SQL_HANDLE_ENV> EnvironmentException;
-typedef HandleException<SQLHDBC, SQL_HANDLE_DBC> ConnectionException;
+typedef HandleException<SQLHENV, SQL_HANDLE_ENV>   EnvironmentException;
+typedef HandleException<SQLHDBC, SQL_HANDLE_DBC>   ConnectionException;
 typedef HandleException<SQLHSTMT, SQL_HANDLE_STMT> StatementException;
 typedef HandleException<SQLHDESC, SQL_HANDLE_DESC> DescriptorException;
 

@@ -112,6 +112,12 @@ public:
 protected:
 	Exception(int code = 0);
 		/// Standard constructor.
+
+	void message(const std::string& msg);
+		/// Sets the message for the exception.
+
+	void extendedMessage(const std::string& arg);
+		/// Sets the extended message for the exception.
 		
 private:
 	std::string _msg;
@@ -132,6 +138,12 @@ inline const Exception* Exception::nested() const
 inline const std::string& Exception::message() const
 {
 	return _msg;
+}
+
+
+inline void Exception::message(const std::string& msg)
+{
+	_msg = msg;
 }
 
 
