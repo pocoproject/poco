@@ -1,7 +1,7 @@
 //
 // IntValidator.cpp
 //
-// $Id: //poco/svn/Util/src/IntValidator.cpp#1 $
+// $Id: //poco/Main/Util/src/IntValidator.cpp#1 $
 //
 // Library: Util
 // Package: Options

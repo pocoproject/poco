@@ -1,7 +1,7 @@
 //
 // ConfigurationView.cpp
 //
-// $Id: //poco/svn/Util/src/ConfigurationView.cpp#1 $
+// $Id: //poco/Main/Util/src/ConfigurationView.cpp#7 $
 //
 // Library: Util
 // Package: Configuration

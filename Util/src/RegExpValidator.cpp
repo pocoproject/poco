@@ -1,7 +1,7 @@
 //
 // RegExpValidator.cpp
 //
-// $Id: //poco/svn/Util/src/RegExpValidator.cpp#1 $
+// $Id: //poco/Main/Util/src/RegExpValidator.cpp#2 $
 //
 // Library: Util
 // Package: Options

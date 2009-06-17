@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/Main/Util/src/ServerApplication.cpp#28 $
+// $Id: //poco/Main/Util/src/ServerApplication.cpp#29 $
 //
 // Library: Util
 // Package: Application
@@ -423,7 +423,8 @@ int ServerApplication::run(int argc, char** argv)
 		init(argc, argv);
 		if (runAsDaemon)
 		{
-			chdir("/");
+			int rc = chdir("/");
+			if (rc != 0) return EXIT_OSERR;
 		}
 	}
 	catch (Exception& exc)

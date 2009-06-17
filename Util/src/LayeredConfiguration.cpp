@@ -1,7 +1,7 @@
 //
 // LayeredConfiguration.cpp
 //
-// $Id: //poco/svn/Util/src/LayeredConfiguration.cpp#1 $
+// $Id: //poco/Main/Util/src/LayeredConfiguration.cpp#8 $
 //
 // Library: Util
 // Package: Configuration
