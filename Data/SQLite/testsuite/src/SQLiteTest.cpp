@@ -89,7 +89,7 @@ using Poco::NotFoundException;
 using Poco::NullPointerException;
 using Poco::Data::SQLite::ConstraintViolationException;
 using Poco::Data::SQLite::ParameterCountMismatchException;
-using Poco::Int64;
+using Poco::Int32;
 
 
 struct Person
@@ -1759,13 +1759,13 @@ void SQLiteTest::testInternalExtraction()
 	assert (3 == rset2.columnCount());
 	assert (4 == rset2.rowCount());
 
-	Int64 a = rset.value<Int64>(0,2);
+	Int32 a = rset.value<Int32>(0,2);
 	assert (3 == a);
 
 	int c = rset2.value(0);
 	assert (1 == c);
 
-	Int64 b = rset2.value<Int64>("InT0",2);
+	Int32 b = rset2.value<Int32>("InT0",2);
 	assert (3 == b);
 
 	double d = rset.value<double>(1,0);
@@ -1774,7 +1774,7 @@ void SQLiteTest::testInternalExtraction()
 	std::string s = rset.value<std::string>(2,1);
 	assert ("4" == s);
 	
-	typedef std::deque<Int64> IntDeq;
+	typedef std::deque<Int32> IntDeq;
 	
 	const Column<IntDeq>& col = rset.column<IntDeq>(0);
 	assert (col[0] == 1);
@@ -2024,7 +2024,7 @@ void SQLiteTest::testAny()
 	tmp << "DROP TABLE IF EXISTS Anys", now;
 	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
-	Any i = Int64(42);
+	Any i = Int32(42);
 	Any f = double(42.5);
 	Any s = std::string("42");
 
@@ -2038,7 +2038,7 @@ void SQLiteTest::testAny()
 	f = 0.0;
 	s = std::string("");
 	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
-	assert (AnyCast<Int64>(i) == 42);
+	assert (AnyCast<Int32>(i) == 42);
 	assert (AnyCast<double>(f) == 42.5);
 	assert (AnyCast<std::string>(s) == "42");
 }
@@ -2050,7 +2050,7 @@ void SQLiteTest::testDynamicAny()
 	tmp << "DROP TABLE IF EXISTS Anys", now;
 	tmp << "CREATE TABLE Anys (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
 
-	DynamicAny i = Int64(42);
+	DynamicAny i = Int32(42);
 	DynamicAny f = double(42.5);
 	DynamicAny s = std::string("42");
 

@@ -42,6 +42,8 @@
 
 #include "Poco/Data/SQLite/SQLite.h"
 #include "Poco/Data/MetaColumn.h"
+#include "Poco/Mutex.h"
+#include <map>
 
 
 struct sqlite3;
@@ -59,6 +61,15 @@ class SQLite_API Utility
 public:
 	static const std::string SQLITE_DATE_FORMAT;
 	static const std::string SQLITE_TIME_FORMAT;
+	typedef std::map<std::string, MetaColumn::ColumnDataType> TypeMap;
+
+	Utility();
+		/// Maps SQLite column declared types to Poco::Data types through
+		/// static TypeMap member.
+		/// Note: SQLite is type-agnostic and it is the end-user responsibility
+		/// to ensure that column declared data type corresponds to the type of 
+		/// data actually held in the database.
+		/// Column types are case-insensitive.
 
 	static std::string lastError(sqlite3* pDb);
 		/// Retreives the last error code from sqlite and converts it to a string
@@ -68,6 +79,10 @@ public:
 
 	static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
 		/// Returns column data type.
+
+private:
+	static TypeMap _types;
+	Poco::FastMutex _mutex;
 };
 
 
