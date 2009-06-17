@@ -1,7 +1,7 @@
 //
 // IniFileConfigurationTest.h
 //
-// $Id: //poco/svn/Util/testsuite/src/IniFileConfigurationTest.h#1 $
+// $Id: //poco/Main/Util/testsuite/src/IniFileConfigurationTest.h#4 $
 //
 // Definition of the IniFileConfigurationTest class.
 //

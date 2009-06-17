@@ -1,7 +1,7 @@
 //
 // HelpFormatterTest.h
 //
-// $Id: //poco/svn/Util/testsuite/src/HelpFormatterTest.h#1 $
+// $Id: //poco/Main/Util/testsuite/src/HelpFormatterTest.h#4 $
 //
 // Definition of the HelpFormatterTest class.
 //

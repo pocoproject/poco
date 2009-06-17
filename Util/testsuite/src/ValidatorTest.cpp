@@ -1,7 +1,7 @@
 //
 // ValidatorTest.cpp
 //
-// $Id: //poco/svn/Util/testsuite/src/ValidatorTest.cpp#1 $
+// $Id: //poco/Main/Util/testsuite/src/ValidatorTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

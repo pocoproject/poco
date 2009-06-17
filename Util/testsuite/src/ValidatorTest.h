@@ -1,7 +1,7 @@
 //
 // ValidatorTest.h
 //
-// $Id: //poco/svn/Util/testsuite/src/ValidatorTest.h#1 $
+// $Id: //poco/Main/Util/testsuite/src/ValidatorTest.h#1 $
 //
 // Definition of the ValidatorTest class.
 //

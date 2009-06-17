@@ -1,7 +1,7 @@
 //
 // WinRegistryTest.h
 //
-// $Id: //poco/svn/Util/testsuite/src/WinRegistryTest.h#1 $
+// $Id: //poco/Main/Util/testsuite/src/WinRegistryTest.h#4 $
 //
 // Definition of the WinRegistryTest class.
 //

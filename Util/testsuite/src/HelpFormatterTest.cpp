@@ -1,7 +1,7 @@
 //
 // HelpFormatterTest.cpp
 //
-// $Id: //poco/svn/Util/testsuite/src/HelpFormatterTest.cpp#1 $
+// $Id: //poco/Main/Util/testsuite/src/HelpFormatterTest.cpp#6 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
