@@ -1,7 +1,7 @@
 //
 // NObserver.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NObserver.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/NObserver.h#3 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -64,7 +64,7 @@ class NObserver: public AbstractObserver
 	/// management.
 {
 public:
-	typedef Notification::Ptr NotificationPtr;
+	typedef AutoPtr<N> NotificationPtr;
 	typedef void (C::*Callback)(const NotificationPtr&);
 
 	NObserver(C& object, Callback method): 
