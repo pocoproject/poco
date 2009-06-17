@@ -3,11 +3,13 @@ Foundation
 XML
 Util
 Net
+Crypto
 NetSSL_OpenSSL
 Data
 Data/SQLite
 Data/ODBC
 Data/MySQL
+Zip
 ApacheConnector
 WebWidgets
 WebWidgets/ExtJS
