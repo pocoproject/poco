@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#7 $
+// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#8 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -98,6 +98,10 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("CLOB", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("TEXT", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("VARCHAR", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("NCHAR", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("NCLOB", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("NTEXT", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("NVARCHAR", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("BLOB", MetaColumn::FDT_BLOB));
 	}
 }
