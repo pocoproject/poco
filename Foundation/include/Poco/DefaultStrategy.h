@@ -1,7 +1,7 @@
 //
 // DefaultStrategy.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/DefaultStrategy.h#2 $
+// $Id: //poco/Main/Foundation/include/Poco/DefaultStrategy.h#5 $
 //
 // Library: Foundation
 // Package: Events
@@ -79,7 +79,7 @@ public:
 	{
 		std::vector<Iterator> delMe;
 
-		for (Iterator it = _observers.begin(); it != _observers.end(); it++)
+		for (Iterator it = _observers.begin(); it != _observers.end(); ++it)
 		{
 			if (!(*it)->notify(sender, arguments))
 			{
