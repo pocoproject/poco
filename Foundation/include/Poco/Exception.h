@@ -1,7 +1,7 @@
 //
 // Exception.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Exception.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Exception.h#3 $
 //
 // Library: Foundation
 // Package: Core

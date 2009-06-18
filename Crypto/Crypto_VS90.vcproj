@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib libeay32mtd.lib ssleay32mtd.lib"
+				AdditionalDependencies="PocoFoundationd.lib libeay32mdd.lib ssleay32mdd.lib"
 				ShowProgress="0"
 				OutputFile="..\bin\PocoCryptod.dll"
 				LinkIncremental="2"
@@ -161,7 +161,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib  libeay32mt.lib ssleay32mt.lib"
+				AdditionalDependencies="PocoFoundation.lib  libeay32md.lib ssleay32md.lib"
 				OutputFile="..\bin\PocoCrypto.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

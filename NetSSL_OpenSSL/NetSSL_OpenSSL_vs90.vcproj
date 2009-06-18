@@ -69,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib PocoNetd.lib PocoUtild.lib libeay32mtd.lib ssleay32mtd.lib ws2_32.lib"
+				AdditionalDependencies="PocoFoundationd.lib PocoNetd.lib PocoUtild.lib libeay32mdd.lib ssleay32mdd.lib ws2_32.lib"
 				OutputFile="..\bin\PocoNetSSLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -160,7 +160,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib PocoNet.lib PocoUtil.lib libeay32mt.lib ssleay32mt.lib ws2_32.lib"
+				AdditionalDependencies="PocoFoundation.lib PocoNet.lib PocoUtil.lib libeay32md.lib ssleay32md.lib ws2_32.lib"
 				OutputFile="..\bin\PocoNetSSL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

@@ -138,58 +138,58 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 	case SQLITE_OK:
 		break;
 	case SQLITE_ERROR:
-		throw InvalidSQLStatementException(std::string("SQL error or missing database"), addErrMsg);
+		throw InvalidSQLStatementException(addErrMsg);
 	case SQLITE_INTERNAL:
-		throw InternalDBErrorException(std::string("An internal logic error in SQLite"), addErrMsg);
+		throw InternalDBErrorException(addErrMsg);
 	case SQLITE_PERM:
-		throw DBAccessDeniedException(std::string("Access permission denied"), addErrMsg);
+		throw DBAccessDeniedException(addErrMsg);
 	case SQLITE_ABORT:
-		throw ExecutionAbortedException(std::string("Callback routine requested an abort"), addErrMsg);
+		throw ExecutionAbortedException(addErrMsg);
 	case SQLITE_BUSY:
-		throw DBLockedException(std::string("The database file is locked"), addErrMsg);
+		throw DBLockedException(addErrMsg);
 	case SQLITE_LOCKED:
 	case SQLITE_LOCKED_SHAREDCACHE:
 		throw TableLockedException(addErrMsg);
 	case SQLITE_NOMEM:
-		throw NoMemoryException(std::string("A malloc() failed"), addErrMsg);
+		throw NoMemoryException(addErrMsg);
 	case SQLITE_READONLY:
-		throw ReadOnlyException(std::string("Attempt to write a readonly database"), addErrMsg);
+		throw ReadOnlyException(addErrMsg);
 	case SQLITE_INTERRUPT:
-		throw InterruptException(std::string("Operation terminated by sqlite_interrupt()"), addErrMsg);
+		throw InterruptException(addErrMsg);
 	case SQLITE_IOERR:
-		throw IOErrorException(std::string("Some kind of disk I/O error occurred"), addErrMsg);
+		throw IOErrorException(addErrMsg);
 	case SQLITE_CORRUPT:
-		throw CorruptImageException(std::string("The database disk image is malformed"), addErrMsg);
+		throw CorruptImageException(addErrMsg);
 	case SQLITE_NOTFOUND:
-		throw TableNotFoundException(std::string("Table or record not found"), addErrMsg);
+		throw TableNotFoundException(addErrMsg);
 	case SQLITE_FULL:
-		throw DatabaseFullException(std::string("Insertion failed because database is full"), addErrMsg);
+		throw DatabaseFullException(addErrMsg);
 	case SQLITE_CANTOPEN:
-		throw CantOpenDBFileException(std::string("Unable to open the database file"), addErrMsg);
+		throw CantOpenDBFileException(addErrMsg);
 	case SQLITE_PROTOCOL:
-		throw LockProtocolException(std::string("Database lock protocol error"), addErrMsg);
+		throw LockProtocolException(addErrMsg);
 	case SQLITE_EMPTY:
-		throw InternalDBErrorException(std::string("(Internal Only) Database table is empty"), addErrMsg);
+		throw InternalDBErrorException(addErrMsg);
 	case SQLITE_SCHEMA:
-		throw SchemaDiffersException(std::string("The database schema changed"), addErrMsg);
+		throw SchemaDiffersException(addErrMsg);
 	case SQLITE_TOOBIG:
-		throw RowTooBigException(std::string("Too much data for one row of a table"), addErrMsg);
+		throw RowTooBigException(addErrMsg);
 	case SQLITE_CONSTRAINT:
-		throw ConstraintViolationException(std::string("Abort due to constraint violation"), addErrMsg);
+		throw ConstraintViolationException(addErrMsg);
 	case SQLITE_MISMATCH:
-		throw DataTypeMismatchException(std::string("Data type mismatch"), addErrMsg);
+		throw DataTypeMismatchException(addErrMsg);
 	case SQLITE_MISUSE:
-		throw InvalidLibraryUseException(std::string("Library used incorrectly"), addErrMsg);
+		throw InvalidLibraryUseException(addErrMsg);
 	case SQLITE_NOLFS:
-		throw OSFeaturesMissingException(std::string("Uses OS features not supported on host"), addErrMsg);
+		throw OSFeaturesMissingException(addErrMsg);
 	case SQLITE_AUTH:
-		throw AuthorizationDeniedException(std::string("Authorization denied"), addErrMsg);
+		throw AuthorizationDeniedException(addErrMsg);
 	case SQLITE_FORMAT:
-		throw CorruptImageException(std::string("Auxiliary database format error"), addErrMsg);
+		throw CorruptImageException(addErrMsg);
 	case SQLITE_NOTADB:
-		throw CorruptImageException(std::string("File opened that is not a database file"), addErrMsg);
+		throw CorruptImageException(addErrMsg);
 	case SQLITE_RANGE:
-		throw InvalidSQLStatementException(std::string("Bind Parameter out of range (Access of invalid position 0? bind starts with 1!)"), addErrMsg);
+		throw InvalidSQLStatementException(std::string("Bind parameter out of range (Access of invalid position 0? Bind starts with 1!)"), addErrMsg);
 	case SQLITE_ROW:
 		break; // sqlite_step() has another row ready
 	case SQLITE_DONE:
