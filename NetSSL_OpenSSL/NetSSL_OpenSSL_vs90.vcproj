@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="NetSSL_OpenSSL"
 	ProjectGUID="{5AECC55E-A469-11DA-8DA6-005056C00008}"
 	RootNamespace="OpenSSL"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;C:\OpenSSL\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;NetSSL_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -71,7 +71,7 @@
 				OutputFile="..\bin\PocoNetSSLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib"
+				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC\static"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoNetSSLd.pdb"
 				SubSystem="1"
@@ -131,7 +131,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;C:\OpenSSL\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;NetSSL_EXPORTS"
 				GeneratePreprocessedFile="0"
 				KeepComments="false"
@@ -161,7 +161,7 @@
 				OutputFile="..\bin\PocoNetSSL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib"
+				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC\static"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile=""
 				SubSystem="1"
@@ -219,7 +219,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;C:\OpenSSL\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS;POCO_STATIC"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -246,6 +246,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\PocoNetSSLmtd.lib"
+				AdditionalLibraryDirectories="C:\OpenSSL\lib\VC\static"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -292,7 +293,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include;C:\OpenSSL\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS;POCO_STATIC"
 				GeneratePreprocessedFile="0"
 				KeepComments="false"
@@ -319,6 +320,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\PocoNetSSLmt.lib"
+				AdditionalLibraryDirectories="C:\OpenSSL\lib\VC\static"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -399,10 +401,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SSLInitializer.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\Poco\Net\SSLManager.h"
 					>
 				</File>
@@ -468,10 +466,6 @@
 				</File>
 				<File
 					RelativePath=".\src\SSLException.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SSLInitializer.cpp"
 					>
 				</File>
 				<File

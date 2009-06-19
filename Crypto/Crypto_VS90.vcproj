@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;C:\OpenSSL\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;Crypto_EXPORTS;OPENSSL_NO_DEPRECATED"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -68,12 +68,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib libeay32mtd.lib ssleay32mtd.lib"
+				AdditionalDependencies="PocoFoundationd.lib libeay32mtd.lib ssleay32mtd.lib ws2_32.lib"
 				ShowProgress="0"
 				OutputFile="..\bin\PocoCryptod.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib"
+				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC\static"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoCryptod.pdb"
 				SubSystem="1"
@@ -134,7 +134,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;C:\OpenSSL\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;Crypto_EXPORTS"
 				GeneratePreprocessedFile="0"
 				KeepComments="false"
@@ -161,11 +161,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib  libeay32mt.lib ssleay32mt.lib"
+				AdditionalDependencies="PocoFoundation.lib  libeay32mt.lib ssleay32mt.lib ws2_32.lib"
 				OutputFile="..\bin\PocoCrypto.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib"
+				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC\static"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile=""
 				SubSystem="1"
@@ -230,7 +230,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;C:\OpenSSL\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;Crypto_EXPORTS;POCO_STATIC"
 				GeneratePreprocessedFile="0"
 				KeepComments="false"
@@ -258,6 +258,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\PocoCryptomt.lib"
+				AdditionalLibraryDirectories="C:\OpenSSL\lib\VC\static"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -302,7 +303,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;C:\OpenSSL\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;Crypto_EXPORTS;POCO_STATIC"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -330,6 +331,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\PocoCryptomtd.lib"
+				AdditionalLibraryDirectories="C:\OpenSSL\lib\VC\static"
 			/>
 			<Tool
 				Name="VCALinkTool"
