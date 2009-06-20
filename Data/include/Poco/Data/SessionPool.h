@@ -122,7 +122,7 @@ public:
 		/// value, in which case it is reset back to the pool 
 		/// value when the session is reclaimed by the pool.
 	{
-		Session& s = get();
+		Session s = get();
 		_addPropertyMap.insert(AddPropertyMap::value_type(s.impl(),
 			std::make_pair(name, s.getProperty(name))));
 		s.setProperty(name, value);
