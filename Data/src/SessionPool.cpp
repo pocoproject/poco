@@ -67,7 +67,7 @@ SessionPool::~SessionPool()
 
 Session SessionPool::get(const std::string& name, bool value)
 {
-	Session& s = get();
+	Session s = get();
 	_addFeatureMap.insert(AddFeatureMap::value_type(s.impl(),
 		std::make_pair(name, s.getFeature(name))));
 	s.setFeature(name, value);
