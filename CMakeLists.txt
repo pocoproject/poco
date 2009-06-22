@@ -28,12 +28,12 @@ IF (ENABLE_TESTS)
 ENDIF (ENABLE_TESTS)
 
 # Set local include path
-include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include)
+include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include Crypto/include)
 
 include(CheckTypeSize)
 include(FindCygwin)
 include(FindOpenSSL)
-include(CMakeDetermineCompilerId)
+#include(CMakeDetermineCompilerId)
 
 include(contrib/cmake/FindMySQL.cmake)
 include(contrib/cmake/FindAPR.cmake)
