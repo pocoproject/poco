@@ -38,11 +38,12 @@ endif(MYSQL_FOUND)
 
 include(../contrib/cmake/FindODBC.cmake)
 
-if(${ODBC_CONFIG} MATCHES "ODBC_CONFIG-NOTFOUND")
-	message("ODBC Support Disabled - no ODBC runtime")
-else(${ODBC_CONFIG} MATCHES "ODBC_CONFIG-NOTFOUND")
-    add_subdirectory( ODBC )
-endif(${ODBC_CONFIG} MATCHES "ODBC_CONFIG-NOTFOUND")
+if ( ${UNIX_ODBC_CONFIG} STREQUAL UNIX_ODBC_CONFIG-NOTFOUND AND ${IODBC_CONFIG} STREQUAL IODBC_CONFIG-NOTFOUND)
+	message(STATUS "ODBC Support Disabled - no ODBC runtime")
+else ()
+	message(STATUS "ODBC Support Enabled")
+	add_subdirectory( ODBC )
+endif ()
 
 add_subdirectory( samples )
 add_subdirectory( testsuite )
