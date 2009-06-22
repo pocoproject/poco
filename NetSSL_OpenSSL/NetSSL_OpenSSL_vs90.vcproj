@@ -71,7 +71,7 @@
 				OutputFile="..\bin\PocoNetSSLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC\static"
+				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoNetSSLd.pdb"
 				SubSystem="1"
@@ -157,11 +157,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib PocoNet.lib PocoUtil.lib libeay32mt.lib ssleay32mt.lib ws2_32.lib"
+				AdditionalDependencies="PocoFoundation.lib PocoNet.lib PocoUtil.lib libeay32md.lib ssleay32md.lib ws2_32.lib"
 				OutputFile="..\bin\PocoNetSSL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC\static"
+				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile=""
 				SubSystem="1"

@@ -68,12 +68,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib libeay32mtd.lib ssleay32mtd.lib ws2_32.lib"
+				AdditionalDependencies="PocoFoundationd.lib libeay32mdd.lib ssleay32mdd.lib ws2_32.lib"
 				ShowProgress="0"
 				OutputFile="..\bin\PocoCryptod.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC\static"
+				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoCryptod.pdb"
 				SubSystem="1"
@@ -161,11 +161,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib  libeay32mt.lib ssleay32mt.lib ws2_32.lib"
+				AdditionalDependencies="PocoFoundation.lib  libeay32md.lib ssleay32md.lib ws2_32.lib"
 				OutputFile="..\bin\PocoCrypto.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC\static"
+				AdditionalLibraryDirectories="..\lib;C:\OpenSSL\lib\VC"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile=""
 				SubSystem="1"
