@@ -1,7 +1,7 @@
 //
 // NotificationCenterTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/NotificationCenterTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/NotificationCenterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -72,10 +72,14 @@ void NotificationCenterTest::test2()
 {
 	NotificationCenter nc;
 	nc.addObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
+	assert (nc.hasObservers());
+	assert (nc.countObservers() == 1);
 	nc.postNotification(new Notification);
 	assert (_set.size() == 1);
 	assert (_set.find("handle1") != _set.end());
 	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
+	assert (!nc.hasObservers());
+	assert (nc.countObservers() == 0);
 }
 
 
@@ -84,12 +88,16 @@ void NotificationCenterTest::test3()
 	NotificationCenter nc;
 	nc.addObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
 	nc.addObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle2));
+	assert (nc.hasObservers());
+	assert (nc.countObservers() == 2);
 	nc.postNotification(new Notification);
 	assert (_set.size() == 2);
 	assert (_set.find("handle1") != _set.end());
 	assert (_set.find("handle2") != _set.end());
 	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle1));
 	nc.removeObserver(Observer<NotificationCenterTest, Notification>(*this, &NotificationCenterTest::handle2));
+	assert (!nc.hasObservers());
+	assert (nc.countObservers() == 0);
 }
 
 

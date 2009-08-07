@@ -1,7 +1,7 @@
 //
 // SocketNotifier.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketNotifier.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SocketNotifier.h#3 $
 //
 // Library: Net
 // Package: Reactor
@@ -79,6 +79,9 @@ public:
 		
 	bool hasObservers() const;
 		/// Returns true if there are subscribers.
+		
+	std::size_t countObservers() const;
+		/// Returns the number of subscribers;
 
 protected:
 	~SocketNotifier();
@@ -105,6 +108,12 @@ inline bool SocketNotifier::accepts(SocketNotification* pNotification)
 inline bool SocketNotifier::hasObservers() const
 {
 	return _nc.hasObservers();
+}
+
+
+inline std::size_t SocketNotifier::countObservers() const
+{
+	return _nc.countObservers();
 }
 
 

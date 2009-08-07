@@ -1,7 +1,7 @@
 //
 // NotificationCenter.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/NotificationCenter.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/NotificationCenter.h#3 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -43,7 +43,9 @@
 #include "Poco/Foundation.h"
 #include "Poco/Notification.h"
 #include "Poco/Mutex.h"
-#include <list>
+#include "Poco/SharedPtr.h"
+#include <vector>
+#include <cstddef>
 
 
 namespace Poco {
@@ -134,12 +136,16 @@ public:
 		/// Can be used to improve performance if an expensive notification
 		/// shall only be created and posted if there are any observers.
 		
+	std::size_t countObservers() const;
+		/// Returns the number of registered observers.
+		
 	static NotificationCenter& defaultCenter();
 		/// Returns a reference to the default
 		/// NotificationCenter.
 
 private:
-	typedef std::list<AbstractObserver*> ObserverList;
+	typedef Poco::SharedPtr<AbstractObserver> AbstractObserverPtr;
+	typedef std::vector<AbstractObserverPtr> ObserverList;
 
 	ObserverList  _observers;
 	mutable Mutex _mutex;

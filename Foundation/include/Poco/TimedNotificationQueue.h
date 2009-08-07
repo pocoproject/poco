@@ -1,7 +1,7 @@
 //
 // TimedNotificationQueue.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/TimedNotificationQueue.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/TimedNotificationQueue.h#4 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -105,8 +105,6 @@ public:
 		/// to be enqueued. 
 		/// The caller gains ownership of the notification and
 		/// is expected to release it when done with it.
-		/// This method returns 0 (null) if wakeUpWaitingThreads()
-		/// has been called by another thread.
 		///
 		/// It is highly recommended that the result is immediately
 		/// assigned to a Notification::Ptr, to avoid potential

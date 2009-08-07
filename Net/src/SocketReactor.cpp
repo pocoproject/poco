@@ -1,7 +1,7 @@
 //
 // SocketReactor.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketReactor.cpp#2 $
+// $Id: //poco/1.3/Net/src/SocketReactor.cpp#3 $
 //
 // Library: Net
 // Package: Reactor
@@ -169,31 +169,41 @@ const Poco::Timespan& SocketReactor::getTimeout() const
 
 void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
 	NotifierPtr pNotifier;
-	EventHandlerMap::iterator it = _handlers.find(socket);
-	if (it == _handlers.end())
 	{
-		pNotifier = new SocketNotifier(socket);
-		_handlers[socket] = pNotifier;
+		FastMutex::ScopedLock lock(_mutex);
+		
+		EventHandlerMap::iterator it = _handlers.find(socket);
+		if (it == _handlers.end())
+		{
+			pNotifier = new SocketNotifier(socket);
+			_handlers[socket] = pNotifier;
+		}
+		else pNotifier = it->second;
 	}
-	else pNotifier = it->second;
 	pNotifier->addObserver(this, observer);
 }
 
 
 void SocketReactor::removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
-	EventHandlerMap::iterator it = _handlers.find(socket);
-	if (it != _handlers.end())
+	NotifierPtr pNotifier;
 	{
-		NotifierPtr pNotifier = it->second;
+		FastMutex::ScopedLock lock(_mutex);
+		
+		EventHandlerMap::iterator it = _handlers.find(socket);
+		if (it != _handlers.end())
+		{
+			pNotifier = it->second;
+			if (pNotifier->countObservers() == 1)
+			{
+				_handlers.erase(it);
+			}
+		}
+	}
+	if (pNotifier)
+	{
 		pNotifier->removeObserver(this, observer);
-		if (!pNotifier->hasObservers())
-			_handlers.erase(it);
 	}
 }
 
