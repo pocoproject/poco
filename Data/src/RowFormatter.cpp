@@ -45,13 +45,22 @@ namespace Data {
 
 RowFormatter::RowFormatter(const std::string& prefix, const std::string& postfix):
 	_prefix(prefix), 
-	_postfix(postfix)
+	_postfix(postfix),
+	_totalRowCount(0)
 {
 }
 
 
 RowFormatter::~RowFormatter()
 {
+}
+
+
+void RowFormatter::reset()
+{
+	_prefix = "";
+	_postfix = "";
+	_totalRowCount = INVALID_ROW_COUNT;
 }
 
 

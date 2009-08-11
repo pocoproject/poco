@@ -75,7 +75,9 @@ class Data_API RowFormatter
 public:
 	typedef std::vector<std::string>             NameVec;
 	typedef SharedPtr<std::vector<std::string> > NameVecPtr;
-	typedef std::vector<Poco::Dynamic::Var>            ValueVec;
+	typedef std::vector<Poco::Dynamic::Var>      ValueVec;
+
+	static const int INVALID_ROW_COUNT = -1;
 
 	RowFormatter(const std::string& prefix = "", const std::string& postfix = "");
 		/// Creates the RowFormatter and sets the prefix and postfix to specified values.
@@ -89,34 +91,72 @@ public:
 	virtual std::string& formatValues(const ValueVec& vals, std::string& formattedValues) const = 0;
 		/// Formats the row values.
 
+	virtual int rowCount() const;
+		/// Returns INVALID_ROW_COUNT. Must be implemented by inheriting classes
+		/// which maintain count of processed rows.
+
+	int getTotalRowCount() const;
+		/// Returns zero. Must be implemented by inheriting classes.
+		/// Typically, total row count shall be set up front through
+		/// setTotalRowCount() call.
+
+	void setTotalRowCount(int count);
+		/// Sets total row count.
+
 	const std::string& prefix() const;
 		/// Returns prefix string;
 
 	const std::string& postfix() const;
 		/// Returns postfix string;
 
+	void reset();
+		/// Resets the formatter by setting prefix and postfix
+		/// to empty strings and row count to INVALID_ROW_COUNT.
+
 protected:
-	void setPrefix(const std::string& prefix);
-	void setPostfix(const std::string& postfix);
+
+	void setPrefix(const std::string& prefix) const;
+		/// Sets the p[refix for the formatter.
+
+	void setPostfix(const std::string& postfix) const;
+		/// Sets the postfix for the formatter
 
 private:
-	std::string     _prefix;
-	std::string     _postfix;
+
+	mutable std::string _prefix;
+	mutable std::string _postfix;
+	int                 _totalRowCount;
 };
 
 
 ///
 /// inlines
 ///
+inline int RowFormatter::rowCount() const
+{
+	return INVALID_ROW_COUNT;
+}
 
 
-inline void RowFormatter::setPrefix(const std::string& prefix)
+inline int RowFormatter::getTotalRowCount() const
+{
+	return _totalRowCount;
+}
+
+
+inline void RowFormatter::setTotalRowCount(int count)
+{
+	_totalRowCount = count;
+}
+
+
+inline void RowFormatter::setPrefix(const std::string& prefix) const
 {
 	_prefix = prefix;
 }
 
 
-inline void RowFormatter::setPostfix(const std::string& postfix)
+inline void RowFormatter::setPostfix(const std::string& postfix) const
 {
 	_postfix = postfix;
 }

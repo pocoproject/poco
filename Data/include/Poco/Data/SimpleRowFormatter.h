@@ -79,6 +79,9 @@ public:
 	std::string& formatValues(const ValueVec& vals, std::string& formattedValues) const;
 		/// Formats the row values.
 
+	int rowCount() const;
+		/// Returns row count.
+
 	void setColumnWidth(std::streamsize width);
 		/// Sets the column width.
 
@@ -87,12 +90,17 @@ public:
 
 private:
 	std::streamsize _colWidth;
+	mutable int     _rowCount;
 };
 
 
 ///
 /// inlines
 ///
+inline int SimpleRowFormatter::rowCount() const
+{
+	return _rowCount;
+}
 
 
 inline void SimpleRowFormatter::setColumnWidth(std::streamsize columnWidth)

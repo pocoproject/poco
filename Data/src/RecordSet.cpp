@@ -51,13 +51,19 @@ namespace Poco {
 namespace Data {
 
 
-RecordSet::RecordSet(const Statement& rStatement): 
+const std::size_t RecordSet::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::size_t>::max();
+
+
+RecordSet::RecordSet(const Statement& rStatement,
+	RowFormatter* pRowFormatter): 
 	Statement(rStatement),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
-	_pFilter(0)
+	_pFilter(0),
+	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 {
+	if (pRowFormatter) setRowFormatter(pRowFormatter);
 }
 
 
@@ -68,7 +74,8 @@ RecordSet::RecordSet(Session& rSession,
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
-	_pFilter(0)
+	_pFilter(0),
+	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 {
 	if (pRowFormatter) setRowFormatter(pRowFormatter);
 }
@@ -79,7 +86,8 @@ RecordSet::RecordSet(const RecordSet& other):
 	_currentRow(other._currentRow),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
-	_pFilter(other._pFilter)
+	_pFilter(other._pFilter),
+	_totalRowCount(other._totalRowCount)
 {
 }
 
@@ -203,7 +211,7 @@ Row& RecordSet::row(std::size_t pos)
 std::size_t RecordSet::rowCount() const
 {
 	poco_assert (extractions().size());
-	std::size_t rc = totalRowCount();
+	std::size_t rc = subTotalRowCount();
 	if (!isFiltered()) return rc;
 
 	std::size_t counter = 0;
@@ -225,7 +233,7 @@ bool RecordSet::isAllowed(std::size_t row) const
 
 bool RecordSet::moveFirst()
 {
-	if (totalRowCount() > 0)
+	if (subTotalRowCount() > 0)
 	{
 		if (!isFiltered())
 		{
@@ -237,7 +245,7 @@ bool RecordSet::moveFirst()
 		currentRow = 0;
 		while (!isAllowed(currentRow))
 		{
-			if (currentRow >= totalRowCount() - 1) return false;
+			if (currentRow >= subTotalRowCount() - 1) return false;
 			++currentRow;
 		}
 
@@ -253,7 +261,7 @@ bool RecordSet::moveNext()
 	std::size_t currentRow = _currentRow;
 	do
 	{
-		if (currentRow >= totalRowCount() - 1) return false;
+		if (currentRow >= subTotalRowCount() - 1) return false;
 		++currentRow;
 	} while (isFiltered() && !isAllowed(currentRow));
 
@@ -278,10 +286,10 @@ bool RecordSet::movePrevious()
 
 bool RecordSet::moveLast()
 {
-	if (totalRowCount() > 0)
+	if (subTotalRowCount() > 0)
 	{
 		std::size_t currentRow = _currentRow;
-		currentRow = totalRowCount() - 1;
+		currentRow = subTotalRowCount() - 1;
 		if (!isFiltered())
 		{
 			_currentRow = currentRow;
@@ -303,26 +311,21 @@ bool RecordSet::moveLast()
 
 std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::size_t length) const
 {
-	if (length == RowIterator::POSITION_END) 
-	{
-		if (0 != offset) throw RangeException("Invalid range.");
-		length = rowCount();
-	}
-
 	RowIterator itBegin = *_pBegin + offset;
-	RowIterator itEnd = itBegin + length;
+	RowIterator itEnd = (RowIterator::POSITION_END != length) ? itBegin + length : *_pEnd;
 	std::copy(itBegin, itEnd, std::ostream_iterator<Row>(os));
 	return os;
 }
 
 
-std::ostream& RecordSet::copy(std::ostream& os) const
+std::ostream& RecordSet::copy(std::ostream& os, std::size_t offset, std::size_t length) const
 {
-	const RowFormatter& ri = (*_pBegin)->getFormatter();
-	os << ri.prefix();
+	RowFormatter& rf = const_cast<RowFormatter&>((*_pBegin)->getFormatter());
+	rf.setTotalRowCount(getTotalRowCount());
+	os << rf.prefix();
 	copyNames(os);
-	copyValues(os);
-	os << ri.postfix();
+	copyValues(os, offset, length);
+	os << rf.postfix();
 	return os;
 }
 
@@ -338,6 +341,12 @@ void RecordSet::filter(RowFilter* pFilter)
 bool RecordSet::isFiltered() const
 {
 	return _pFilter && !_pFilter->isEmpty();
+}
+
+
+void RecordSet::setTotalRowCount(const std::string& sql)
+{
+	session() << sql, into(_totalRowCount), now;
 }
 
 

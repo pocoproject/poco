@@ -153,7 +153,7 @@ public:
 	bool isEmpty() const;
 		/// Returns true if there is not filtering criteria specified.
 
-	bool isAllowed(std::size_t row) const;//const std::string& name, const Poco::Dynamic::Var& val) const;
+	bool isAllowed(std::size_t row) const;
 		/// Returns true if name and value are allowed.
 
 	bool exists(const std::string& name) const;

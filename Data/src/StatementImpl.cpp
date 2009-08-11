@@ -80,6 +80,7 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 
 	_extractors.resize(1);
 	_columnsExtracted.resize(1, 0);
+	_subTotalRowCount.resize(1, 0);
 }
 
 
@@ -88,9 +89,9 @@ StatementImpl::~StatementImpl()
 }
 
 
-std::size_t StatementImpl::execute()
+std::size_t StatementImpl::execute(const bool& reset)
 {
-	resetExtraction();
+	if (reset) resetExtraction();
 
 	if (!_rSession.isConnected())
 	{
@@ -117,7 +118,29 @@ std::size_t StatementImpl::execute()
 	if (lim < _lowerLimit)
 		throw LimitException("Did not receive enough data.");
 
+	assignSubTotal(reset);
+
 	return lim;
+}
+
+
+void StatementImpl::assignSubTotal(bool reset)
+{
+	if (_extractors.size() == _subTotalRowCount.size())
+	{
+		CountVec::iterator it  = _subTotalRowCount.begin();
+		CountVec::iterator end = _subTotalRowCount.end();
+		for (int counter = 0; it != end; ++it, ++counter)
+		{
+			if (_extractors[counter].size())
+			{
+				if (reset)
+					*it += _extractors[counter][0]->numOfRowsHandled();
+				else
+					*it = _extractors[counter][0]->numOfRowsHandled();
+			}
+		}
+	}
 }
 
 
@@ -229,13 +252,19 @@ void StatementImpl::setBulkExtraction(const Bulk& b)
 
 void StatementImpl::fixupExtraction()
 {
+	CountVec::iterator sIt  = _subTotalRowCount.begin();
+	CountVec::iterator sEnd = _subTotalRowCount.end();
+	for (; sIt != sEnd; ++sIt) *sIt = 0;
+
+	if (_curDataSet >= _columnsExtracted.size())
+	{
+		_columnsExtracted.resize(_curDataSet + 1, 0);
+		_subTotalRowCount.resize(_curDataSet + 1, 0);
+	}
+
 	Poco::Data::AbstractExtractionVec::iterator it    = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
 	AbstractExtractor& ex = extractor();
-	
-	if (_curDataSet >= _columnsExtracted.size()) 
-		_columnsExtracted.resize(_curDataSet + 1, 0);
-	
 	for (; it != itEnd; ++it)
 	{
 		(*it)->setExtractor(&ex);
@@ -426,6 +455,19 @@ std::size_t StatementImpl::rowsExtracted(int dataSet) const
 		poco_assert (dataSet >= 0 && dataSet < _extractors.size());
 		if (_extractors[dataSet].size() > 0)
 			return _extractors[dataSet][0]->numOfRowsHandled();
+	}
+	
+	return 0;
+}
+
+
+std::size_t StatementImpl::subTotalRowCount(int dataSet) const
+{
+	if (USE_CURRENT_DATA_SET == dataSet) dataSet = _curDataSet;
+	if (_subTotalRowCount.size() > 0)
+	{
+		poco_assert (dataSet >= 0 && dataSet < _subTotalRowCount.size());
+		return _subTotalRowCount[dataSet];
 	}
 	
 	return 0;

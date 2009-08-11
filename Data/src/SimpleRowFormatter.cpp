@@ -44,7 +44,7 @@ namespace Data {
 
 
 SimpleRowFormatter::SimpleRowFormatter(std::streamsize columnWidth):
-	_colWidth(columnWidth)
+	_colWidth(columnWidth), _rowCount(0)
 {
 }
 
@@ -81,6 +81,8 @@ void SimpleRowFormatter::swap(SimpleRowFormatter& other)
 
 std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::string& formattedNames) const
 {
+	_rowCount = 0;
+
 	std::ostringstream str;
 	std::string line(_colWidth * pNames->size(), '-');
 
@@ -112,9 +114,14 @@ std::string& SimpleRowFormatter::formatValues(const ValueVec& vals, std::string&
 		}
 		else str << std::left;
 
-		str << std::setw(_colWidth) << it->convert<std::string>();
+		if (!it->isEmpty())
+			str << std::setw(_colWidth) << it->convert<std::string>();
+		else
+			str << std::setw(_colWidth) << "null";
 	}
 	str << std::endl;
+
+	++_rowCount;
 
 	return formattedValues = str.str();
 }

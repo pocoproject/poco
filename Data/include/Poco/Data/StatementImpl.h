@@ -144,10 +144,15 @@ public:
 	std::string toString() const;
 		/// Create a string version of the SQL statement.
 
-	std::size_t execute();
+	std::size_t execute(const bool& reset = true);
 		/// Executes a statement. Returns the number of rows 
 		/// extracted for statements returning data or number of rows 
 		/// affected for all other statements (insert, update, delete).
+		/// If reset is true (default), the underlying bound storage is
+		/// reset and reused. In case of containers, this means they are
+		/// cleared and resized to accomodate the number of rows returned by
+		/// this execution step. When reset is false, data is appended to the
+		/// bound containers during multiple execute calls.
 
 	void reset();
 		/// Resets the statement, so that we can reuse all bindings and re-execute again.
@@ -226,6 +231,10 @@ protected:
 	std::size_t rowsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows extracted for current data set.
 		/// Default value (USE_CURRENT_DATA_SET) indicates current data set (if any).
+
+	std::size_t subTotalRowCount(int dataSet = USE_CURRENT_DATA_SET) const;
+		/// Returns the number of rows extracted so far for the data set.
+		/// Default value indicates current data set (if any).
 
 	const AbstractBindingVec& bindings() const;
 		/// Returns the bindings.
@@ -430,8 +439,12 @@ private:
 	void formatSQL(std::vector<Any>& arguments);
 		/// Formats the SQL string by filling in placeholders with values from supplied vector.
 
+	void assignSubTotal(bool reset);
+
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
+
+	typedef std::vector<std::size_t> CountVec;
 
 	State                    _state;
 	Limit                    _extrLimit;
@@ -445,6 +458,7 @@ private:
 	std::size_t              _curDataSet;
 	BulkType                 _bulkBinding;
 	BulkType                 _bulkExtraction;
+	CountVec                 _subTotalRowCount;
 
 	friend class Statement; 
 };
@@ -453,6 +467,8 @@ private:
 //
 // inlines
 //
+
+
 inline void StatementImpl::addBind(AbstractBinding* pBinding)
 {
 	poco_check_ptr (pBinding);

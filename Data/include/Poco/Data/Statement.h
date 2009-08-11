@@ -95,9 +95,9 @@ public:
 	typedef void (*Manipulator)(Statement&);
 
 	typedef ActiveResult<std::size_t>                      Result;
-	typedef SharedPtr<Result>                           ResultPtr;
-	typedef ActiveMethod<std::size_t, void, StatementImpl> AsyncExecMethod;
-	typedef SharedPtr<AsyncExecMethod>                  AsyncExecMethodPtr;
+	typedef SharedPtr<Result>                              ResultPtr;
+	typedef ActiveMethod<std::size_t, bool, StatementImpl> AsyncExecMethod;
+	typedef SharedPtr<AsyncExecMethod>                     AsyncExecMethodPtr;
 
 	static const int WAIT_FOREVER = -1;
 
@@ -309,17 +309,20 @@ public:
 	const std::string& toString() const;
 		/// Creates a string from the accumulated SQL statement.
 
-	std::size_t execute();
+	std::size_t execute(bool reset = true);
 		/// Executes the statement synchronously or asynchronously. 
 		/// Stops when either a limit is hit or the whole statement was executed.
 		/// Returns the number of rows extracted from the database (for statements
 		/// returning data) or number of rows affected (for all other statements).
+		/// If reset is true (default), associated storage is reset and reused.
+		/// Otherwise, the results from this execution step are appended.
+		/// Reset argument has no meaning for unlimited statements that return all rows.
 		/// If isAsync() returns  true, the statement is executed asynchronously 
 		/// and the return value from this function is zero.
 		/// The result of execution (i.e. number of returned or affected rows) can be 
 		/// obtained by calling wait() on the statement at a later point in time.
 
-	const Result& executeAsync();
+	const Result& executeAsync(bool reset = true);
 		/// Executes the statement asynchronously. 
 		/// Stops when either a limit is hit or the whole statement was executed.
 		/// Returns immediately. Calling wait() (on either the result returned from this 
@@ -373,7 +376,11 @@ public:
 		/// Default value indicates current data set (if any).
 
 	std::size_t rowsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
-		/// Returns the number of rows returned for current data set.
+		/// Returns the number of rows returned for current data set during last statement
+		/// execution. Default value indicates current data set (if any).
+
+	std::size_t subTotalRowCount(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
+		/// Returns the number of rows extracted so far for the data set.
 		/// Default value indicates current data set (if any).
 
 	std::size_t extractionCount() const;
@@ -421,8 +428,11 @@ protected:
 	const RowFormatterPtr& getRowFormatter();
 		/// Returns the row formatter for this statement.
 
+	Session session();
+		/// Returns the underlying session.
+
 private:
-	const Result& doAsyncExec();
+	const Result& doAsyncExec(bool reset = true);
 		/// Asynchronously executes the statement.
 
 	template <typename T>
@@ -443,6 +453,14 @@ private:
 	RowFormatterPtr     _pRowFormatter;
 	mutable std::string _stmtString;
 };
+
+//
+// inlines
+
+inline std::size_t Statement::subTotalRowCount(int dataSet) const
+{
+	return _pImpl->subTotalRowCount(dataSet);
+}
 
 
 namespace Keywords {

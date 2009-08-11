@@ -50,6 +50,7 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
 #include <ostream>
+#include <limits>
 
 
 namespace Poco {
@@ -93,8 +94,12 @@ public:
 
 	using Statement::isNull;
 	using Statement::setRowFormatter;
+	using Statement::subTotalRowCount;
 
-	explicit RecordSet(const Statement& rStatement);
+	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
+
+	explicit RecordSet(const Statement& rStatement,
+		RowFormatter* pRowFormatter = 0);
 		/// Creates the RecordSet.
 
 	explicit RecordSet(Session& rSession, 
@@ -119,9 +124,31 @@ public:
 		/// for large recordsets, so it should be used judiciously.
 		/// Use totalRowCount() to obtain the total number of rows.
 
+	std::size_t extractedRowCount() const;
+		/// Returns the number of rows extracted during the last statement
+		/// execution.
+		/// The number of rows reported is independent of filtering.
+
 	std::size_t totalRowCount() const;
+		//@ deprecated
+		/// Replaced with subTotalRowCount() and getTotalRowCount().
+
+	std::size_t getTotalRowCount() const;
 		/// Returns the total number of rows in the RecordSet.
 		/// The number of rows reported is independent of filtering.
+		/// If the total row count has not been set externally 
+		/// (either explicitly or implicitly through SQL), the value
+		/// returned shall only be accurate if the statement limit
+		/// is less or equal to the total row count.
+
+	void setTotalRowCount(std::size_t totalRowCount);
+		/// Explicitly sets the total row count.
+
+	void setTotalRowCount(const std::string& sql);
+		/// Implicitly sets the total row count.
+		/// The supplied sql must return exactly one column
+		/// and one row. The returned value must be an unsigned
+		/// integer. The value is set as the total number of rows.
 
 	std::size_t columnCount() const;
 		/// Returns the number of columns in the recordset.
@@ -340,7 +367,9 @@ public:
 		/// cause RangeException to be thrown.
 		/// Copied string is formatted by the current RowFormatter.
 
-	std::ostream& copy(std::ostream& os) const;
+	std::ostream& copy(std::ostream& os,
+		std::size_t offset = 0,
+		std::size_t length = RowIterator::POSITION_END) const;
 		/// Copies the column names and values to the target output stream.
 		/// Copied strings are formatted by the current RowFormatter.
 
@@ -432,6 +461,7 @@ private:
 	RowIterator* _pEnd;
 	RowMap       _rowMap;
 	RowFilter*   _pFilter;
+	std::size_t  _totalRowCount;
 
 	friend class RowIterator;
 	friend class RowFilter;
@@ -448,7 +478,28 @@ inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs
 }
 
 
+inline std::size_t RecordSet::getTotalRowCount() const
+{
+	if (UNKNOWN_TOTAL_ROW_COUNT == _totalRowCount)
+		return subTotalRowCount();
+	else
+		return _totalRowCount;
+}
+
+
 inline std::size_t RecordSet::totalRowCount() const
+{
+	return getTotalRowCount();
+}
+
+
+inline void RecordSet::setTotalRowCount(std::size_t totalRowCount)
+{
+	_totalRowCount = totalRowCount;
+}
+
+
+inline std::size_t RecordSet::extractedRowCount() const
 {
 	return rowsExtracted();
 }

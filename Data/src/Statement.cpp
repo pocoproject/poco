@@ -109,7 +109,7 @@ Statement& Statement::reset(Session& session)
 }
 
 
-std::size_t Statement::execute()
+std::size_t Statement::execute(bool reset)
 {
 	Mutex::ScopedLock lock(_mutex);
 	bool isDone = done();
@@ -124,7 +124,7 @@ std::size_t Statement::execute()
 		if (!isAsync())
 		{
 			if (isDone) _pImpl->reset();
-			return _pImpl->execute();
+			return _pImpl->execute(reset);
 		}
 		else
 		{
@@ -136,22 +136,22 @@ std::size_t Statement::execute()
 }
 
 
-const Statement::Result& Statement::executeAsync()
+const Statement::Result& Statement::executeAsync(bool reset)
 {
 	Mutex::ScopedLock lock(_mutex);
 	if (initialized() || paused() || done())
-		return doAsyncExec();
+		return doAsyncExec(reset);
 	else
 		throw InvalidAccessException("Statement still executing.");
 }
 
 
-const Statement::Result& Statement::doAsyncExec()
+const Statement::Result& Statement::doAsyncExec(bool reset)
 {
 	if (done()) _pImpl->reset();
 	if (!_pAsyncExec)
 		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
-	_pResult = new Result((*_pAsyncExec)());
+	_pResult = new Result((*_pAsyncExec)(reset));
 	return *_pResult;
 }
 
@@ -305,6 +305,13 @@ Statement& Statement::operator , (BulkFnType)
 	_pImpl->setBulkBinding();
 
 	return *this;
+}
+
+
+Session Statement::session()
+{
+	Poco::AutoPtr<SessionImpl> ps(&impl()->session(), true); 
+	return Session(ps);
 }
 
 
