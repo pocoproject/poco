@@ -50,12 +50,15 @@ public:
 	FileHandle(const std::string& path, const std::wstring& upath, DWORD access, DWORD share, DWORD disp)
 	{
 		_h = CreateFileW(upath.c_str(), access, share, 0, disp, 0, 0);
-		if (!_h) FileImpl::handleLastErrorImpl(path);
+		if (_h == INVALID_HANDLE_VALUE)
+		{
+			FileImpl::handleLastErrorImpl(path);
+		}
 	}
 	
 	~FileHandle()
 	{
-		if (_h) CloseHandle(_h);
+		if (_h != INVALID_HANDLE_VALUE) CloseHandle(_h);
 	}
 	
 	HANDLE get() const
