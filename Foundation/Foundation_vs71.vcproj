@@ -554,10 +554,10 @@
 				Name="Header Files"
 				Filter="">
 				<File
-					RelativePath=".\include\Poco\AtomicCounter.h">
+					RelativePath=".\include\Poco\Any.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\Any.h">
+					RelativePath=".\include\Poco\AtomicCounter.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\AutoPtr.h">
@@ -796,6 +796,9 @@
 					RelativePath=".\src\LineEndingConverter.cpp">
 				</File>
 				<File
+					RelativePath=".\src\MemoryStream.cpp">
+				</File>
+				<File
 					RelativePath=".\src\NullStream.cpp">
 				</File>
 				<File
@@ -909,6 +912,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\LineEndingConverter.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\MemoryStream.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\NullStream.h">

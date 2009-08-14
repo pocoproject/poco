@@ -1,9 +1,13 @@
 //
-// StreamsTestSuite.cpp
+// MemoryStream.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/StreamsTestSuite.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/MemoryStream.cpp#1 $
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Library: Foundation
+// Package: Streams
+// Module:  MemoryStream
+//
+// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,37 +34,46 @@
 //
 
 
-#include "StreamsTestSuite.h"
-#include "Base64Test.h"
-#include "HexBinaryTest.h"
-#include "StreamCopierTest.h"
-#include "CountingStreamTest.h"
-#include "NullStreamTest.h"
-#include "ZLibTest.h"
-#include "StreamTokenizerTest.h"
-#include "BinaryReaderWriterTest.h"
-#include "LineEndingConverterTest.h"
-#include "TeeStreamTest.h"
-#include "FileStreamTest.h"
-#include "MemoryStreamTest.h"
+#include "Poco/MemoryStream.h"
 
 
-CppUnit::Test* StreamsTestSuite::suite()
+namespace Poco {
+
+
+MemoryIOS::MemoryIOS(char* pBuffer, std::streamsize bufferSize):
+	_buf(pBuffer, bufferSize)
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("StreamsTestSuite");
-
-	pSuite->addTest(Base64Test::suite());
-	pSuite->addTest(HexBinaryTest::suite());
-	pSuite->addTest(StreamCopierTest::suite());
-	pSuite->addTest(CountingStreamTest::suite());
-	pSuite->addTest(NullStreamTest::suite());
-	pSuite->addTest(ZLibTest::suite());
-	pSuite->addTest(StreamTokenizerTest::suite());
-	pSuite->addTest(BinaryReaderWriterTest::suite());
-	pSuite->addTest(LineEndingConverterTest::suite());
-	pSuite->addTest(TeeStreamTest::suite());
-	pSuite->addTest(FileStreamTest::suite());
-	pSuite->addTest(MemoryStreamTest::suite());
-
-	return pSuite;
+	poco_ios_init(&_buf);
 }
+
+
+MemoryIOS::~MemoryIOS()
+{
+}
+
+
+MemoryInputStream::MemoryInputStream(const char* pBuffer, std::streamsize bufferSize): 
+	MemoryIOS(const_cast<char*>(pBuffer), bufferSize), 
+	std::istream(&_buf)
+{
+}
+
+
+MemoryInputStream::~MemoryInputStream()
+{
+}
+
+
+MemoryOutputStream::MemoryOutputStream(char* pBuffer, std::streamsize bufferSize): 
+	MemoryIOS(pBuffer, bufferSize), 
+	std::ostream(&_buf)
+{
+}
+
+
+MemoryOutputStream::~MemoryOutputStream()
+{
+}
+
+
+} // namespace Poco

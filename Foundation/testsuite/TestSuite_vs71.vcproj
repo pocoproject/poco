@@ -413,6 +413,9 @@
 					RelativePath=".\src\LineEndingConverterTest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\MemoryStreamTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\NullStreamTest.cpp">
 				</File>
 				<File
@@ -451,6 +454,9 @@
 				</File>
 				<File
 					RelativePath=".\src\LineEndingConverterTest.h">
+				</File>
+				<File
+					RelativePath=".\src\MemoryStreamTest.h">
 				</File>
 				<File
 					RelativePath=".\src\NullStreamTest.h">

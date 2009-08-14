@@ -757,11 +757,11 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\include\Poco\AtomicCounter.h"
+					RelativePath=".\include\Poco\Any.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\Poco\Any.h"
+					RelativePath=".\include\Poco\AtomicCounter.h"
 					>
 				</File>
 				<File
@@ -1077,6 +1077,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\MemoryStream.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\NullStream.cpp"
 					>
 				</File>
@@ -1162,6 +1166,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\LineEndingConverter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MemoryStream.h"
 					>
 				</File>
 				<File

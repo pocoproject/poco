@@ -1082,6 +1082,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\MemoryStream.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\NullStream.cpp"
 					>
 				</File>
@@ -1167,6 +1171,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\LineEndingConverter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MemoryStream.h"
 					>
 				</File>
 				<File
