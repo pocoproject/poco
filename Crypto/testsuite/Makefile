@@ -8,6 +8,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
+SYSLIBS += -lssl -lcrypto
+
 objects = CryptoTestSuite Driver \
 	CryptoTest RSATest
 
