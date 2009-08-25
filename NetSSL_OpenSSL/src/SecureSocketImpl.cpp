@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#15 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#16 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -80,6 +80,10 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 SecureSocketImpl::~SecureSocketImpl()
 {
 	close();
+	if (_pSSL)
+	{
+		SSL_free(_pSSL);
+	}
 }
 
 	
@@ -211,9 +215,6 @@ void SecureSocketImpl::shutdown()
 		// done with it.
 		int rc = SSL_shutdown(_pSSL);
 		if (rc < 0) handleError(rc);
-		SSL_clear(_pSSL);
-		SSL_free(_pSSL);
-		_pSSL = 0;
 	}
 }
 
