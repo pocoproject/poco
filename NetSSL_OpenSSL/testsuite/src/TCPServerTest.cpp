@@ -1,7 +1,7 @@
 //
 // TCPServerTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/TCPServerTest.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/TCPServerTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -214,10 +214,14 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 4);
 	
-	SecureStreamSocket ss5(sa);
+	SecureStreamSocket ss5;
+	ss5.setLazyHandshake();
+	ss5.connect(sa);
 	Thread::sleep(200);
 	assert (srv.queuedConnections() == 1);
-	SecureStreamSocket ss6(sa);
+	SecureStreamSocket ss6;
+	ss6.setLazyHandshake();
+	ss6.connect(sa);
 	Thread::sleep(200);
 	assert (srv.queuedConnections() == 2);
 	
@@ -252,7 +256,8 @@ void TCPServerTest::testMultiConnections()
 	ss5.close();
 	ss6.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);}
+	assert (srv.currentConnections() == 0);
+}
 
 
 void TCPServerTest::setUp()

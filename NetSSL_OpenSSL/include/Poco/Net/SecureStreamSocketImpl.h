@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -66,9 +66,6 @@ public:
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	void acceptSSL();
-		/// Performs a SSL server-side handshake.
-	
 	void connect(const SocketAddress& address);
 		/// Initializes the socket and establishes a connection to 
 		/// the TCP server at the given address.
@@ -86,9 +83,6 @@ public:
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 		
-	void connectSSL();
-		/// Performs a SSL client-side handshake on an already connected TCP socket.
-	
 	void bind(const SocketAddress& address, bool reuseAddress = false);
 		/// Not supported by a SecureStreamSocket.
 		///
@@ -157,7 +151,36 @@ public:
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 
+	void setLazyHandshake(bool flag = true);
+		/// Enable lazy SSL handshake. If enabled, the SSL handshake
+		/// will be performed the first time date is sent or
+		/// received over the connection.
+		
+	bool getLazyHandshake() const;
+		/// Returns true if setLazyHandshake(true) has been called.
+
+	void verifyPeerCertificate();
+		/// Performs post-connect (or post-accept) peer certificate validation,
+		/// using the peer's IP address as host name.
+
+	void verifyPeerCertificate(const std::string& hostName);
+		/// Performs post-connect (or post-accept) peer certificate validation
+		/// using the given host name.
+
+	int completeHandshake();
+		/// Completes the SSL handshake.
+		///
+		/// If the SSL connection was the result of an accept(),
+		/// the server-side handshake is completed, otherwise
+		/// a client-side handshake is performed. 
+		
 protected:
+	void acceptSSL();
+		/// Performs a SSL server-side handshake.
+	
+	void connectSSL();
+		/// Performs a SSL client-side handshake on an already connected TCP socket.
+	
 	~SecureStreamSocketImpl();
 		/// Destroys the SecureStreamSocketImpl.
 
@@ -172,9 +195,10 @@ private:
 	SecureStreamSocketImpl& operator = (const SecureStreamSocketImpl&);
 
 	SecureSocketImpl _impl;
-	std::string      _peerHostName;
+	bool             _lazyHandshake;
 
 	friend class SecureSocketImpl;
+	friend class SecureStreamSocket;
 };
 
 
@@ -183,7 +207,13 @@ private:
 //
 inline const std::string& SecureStreamSocketImpl::getPeerHostName() const
 {
-	return _peerHostName;
+	return _impl.getPeerHostName();
+}
+
+
+inline void SecureStreamSocketImpl::setPeerHostName(const std::string& peerHostName)
+{
+	_impl.setPeerHostName(peerHostName);
 }
 
 

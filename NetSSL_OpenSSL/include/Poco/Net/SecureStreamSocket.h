@@ -1,7 +1,7 @@
 //
 // SecureStreamSocket.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#5 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -67,7 +67,9 @@ class NetSSL_API SecureStreamSocket: public StreamSocket
 	/// The SSL handshake is delayed until the first sendBytes() or 
 	/// receiveBytes() operation is performed on the socket. No automatic
 	/// post connection check (checking the peer certificate for a valid
-	/// hostname) is performed when using nonblocking I/O.
+	/// hostname) is performed when using nonblocking I/O. To manually
+	/// perform peer certificate validation, call verifyPeerCertificate()
+	/// after the SSL handshake has been completed.
 {
 public:
 	enum
@@ -161,7 +163,42 @@ public:
 
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
+		
+	void setLazyHandshake(bool flag = true);
+		/// Enable lazy SSL handshake. If enabled, the SSL handshake
+		/// will be performed the first time date is sent or
+		/// received over the connection.
+		
+	bool getLazyHandshake() const;
+		/// Returns true if setLazyHandshake(true) has been called.
+		
+	void verifyPeerCertificate();
+		/// Performs post-connect (or post-accept) peer certificate validation,
+		/// using the peer host name set with setPeerHostName(), or the peer's
+		/// IP address string if no peer host name has been set.
+		///
+		/// Should only be used for non-blocking connections, after the
+		/// initial SSL handshake has been performed (see completeHandshake()).
 
+	void verifyPeerCertificate(const std::string& hostName);
+		/// Performs post-connect (or post-accept) peer certificate validation
+		/// using the given host name.
+		///
+		/// Should only be used for non-blocking connections, after the
+		/// initial SSL handshake has been performed (see completeHandshake()).
+		
+	int completeHandshake();
+		/// Completes the SSL handshake.
+		///
+		/// If the SSL connection was the result of an accept(),
+		/// the server-side handshake is completed, otherwise
+		/// a client-side handshake is performed.
+		///
+		/// Returns 1 if the handshake was successful, ERR_SSL_WANT_READ or
+		/// ERR_SSL_WANT_WRITE if more data is required to complete the
+		/// handshake. In this case, completeHandshake() should be called
+		/// again, after the necessary condition has been met.
+		
 protected:
 	SecureStreamSocket(SocketImpl* pImpl);
 

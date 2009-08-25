@@ -1,7 +1,7 @@
 //
 // SecureStreamSocket.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#4 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#5 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -180,6 +180,30 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 Context::Ptr SecureStreamSocket::context() const
 {
 	return static_cast<SecureStreamSocketImpl*>(impl())->context();
+}
+
+
+void SecureStreamSocket::setLazyHandshake(bool flag)
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->setLazyHandshake(flag);
+}
+
+	
+bool SecureStreamSocket::getLazyHandshake() const
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->getLazyHandshake();
+}
+
+
+void SecureStreamSocket::verifyPeerCertificate()
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->verifyPeerCertificate();
+}
+
+
+void SecureStreamSocket::verifyPeerCertificate(const std::string& hostName)
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->verifyPeerCertificate(hostName);
 }
 
 

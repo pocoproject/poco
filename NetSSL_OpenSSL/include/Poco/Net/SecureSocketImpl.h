@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -78,26 +78,27 @@ public:
 		///
 		/// The client socket's address is returned in clientAddr.
 	
-	void acceptSSL();
-		/// Performs a server-side SSL handshake and certificate verification.
-	
-	void connect(const SocketAddress& address, const std::string& hostName);
+	void connect(const SocketAddress& address, bool performHandshake);
 		/// Initializes the socket and establishes a secure connection to 
 		/// the TCP server at the given address.
+		///
+		/// If performHandshake is true, the SSL handshake is performed immediately 
+		/// after establishing the connection. Otherwise, the handshake is performed
+		/// the first time sendBytes(), receiveBytes() or completeHandshake() is called.
 
-	void connect(const SocketAddress& address, const std::string& hostName, const Poco::Timespan& timeout);
+	void connect(const SocketAddress& address, const Poco::Timespan& timeout, bool performHandshake);
 		/// Initializes the socket, sets the socket timeout and 
 		/// establishes a secure connection to the TCP server at the given address.
+		///
+		/// If performHandshake is true, the SSL handshake is performed immediately 
+		/// after establishing the connection. Otherwise, the handshake is performed
+		/// the first time sendBytes(), receiveBytes() or completeHandshake() is called.
 
-	void connectNB(const SocketAddress& address, const std::string& hostName);
+	void connectNB(const SocketAddress& address);
 		/// Initializes the socket and establishes a secure connection to 
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
-	void connectSSL(const std::string& hostName);
-		/// Performs a client-side SSL handshake and establishes a secure 
-		/// connection over an already existing TCP connection.
-	
 	void bind(const SocketAddress& address, bool reuseAddress = false);
 		/// Bind a local address to the socket.
 		///
@@ -138,6 +139,13 @@ public:
 		/// in buffer. Up to length bytes are received.
 		///
 		/// Returns the number of bytes received.
+		
+	int completeHandshake();
+		/// Completes the SSL handshake.
+		///
+		/// If the SSL connection was the result of an accept(),
+		/// the server-side handshake is completed, otherwise
+		/// a client-side handshake is performed. 
 	
 	poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
@@ -148,9 +156,31 @@ public:
 	Context::Ptr context() const;
 		/// Returns the SSL context used for this socket.
 
+	void verifyPeerCertificate();
+		/// Performs post-connect (or post-accept) peer certificate validation,
+		/// using the peer host name set with setPeerHostName(), or the peer's
+		/// IP address string if no peer host name has been set.
+
+	void verifyPeerCertificate(const std::string& hostName);
+		/// Performs post-connect (or post-accept) peer certificate validation
+		/// using the given peer host name.
+
+	void setPeerHostName(const std::string& hostName);
+		/// Sets the peer host name for certificate validation purposes.
+		
+	const std::string& getPeerHostName() const;
+		/// Returns the peer host name.
+
 protected:
+	void acceptSSL();
+		/// Performs a server-side SSL handshake and certificate verification.
+
+	void connectSSL(bool performHandshake);
+		/// Performs a client-side SSL handshake and establishes a secure 
+		/// connection over an already existing TCP connection.
+	
 	long verifyCertificate(const std::string& hostName);
-		/// PostConnectionCheck to verify that a peer really presented a valid certificate.
+		/// Performs post-connect (or post-accept) peer certificate validation.
 		
 	static bool isLocalHost(const std::string& hostName);
 		/// Returns true iff the given host name is the local host 
@@ -166,6 +196,10 @@ private:
 	SSL* _pSSL;
 	Poco::AutoPtr<SocketImpl> _pSocket;
 	Context::Ptr _pContext;
+	bool _needHandshake;
+	std::string _peerHostName;
+	
+	friend class SecureStreamSocketImpl;
 };
 
 
@@ -181,6 +215,12 @@ inline poco_socket_t SecureSocketImpl::sockfd()
 inline Context::Ptr SecureSocketImpl::context() const
 {
 	return _pContext;
+}
+
+
+inline const std::string& SecureSocketImpl::getPeerHostName() const
+{
+	return _peerHostName;
 }
 
 

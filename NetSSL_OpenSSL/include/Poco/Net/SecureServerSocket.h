@@ -1,7 +1,7 @@
 //
 // SecureServerSocket.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocket.h#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocket.h#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -126,6 +126,11 @@ public:
 		/// with the client.
 		///
 		/// The client socket's address is returned in clientAddr.
+		///
+		/// No SSL handshake is performed on the new connection.
+		/// The SSL handshake will be performed the first time
+		/// sendBytes(), receiveBytes() or completeHandshake()
+		/// is called on the returned SecureStreamSocket.
 
 	StreamSocket acceptConnection();
 		/// Get the next completed connection from the
@@ -136,6 +141,11 @@ public:
 		///
 		/// Returns a new SSL socket for the connection
 		/// with the client.
+		///
+		/// No SSL handshake is performed on the new connection.
+		/// The SSL handshake will be performed the first time
+		/// sendBytes(), receiveBytes() or completeHandshake()
+		/// is called on the returned SecureStreamSocket.
 
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.

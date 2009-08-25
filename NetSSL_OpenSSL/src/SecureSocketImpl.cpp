@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#14 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#15 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -69,7 +69,8 @@ namespace Net {
 SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext): 
 	_pSSL(0),
 	_pSocket(pSocketImpl),
-	_pContext(pContext)
+	_pContext(pContext),
+	_needHandshake(false)
 {
 	poco_check_ptr (_pSocket);
 	poco_check_ptr (_pContext);
@@ -109,70 +110,39 @@ void SecureSocketImpl::acceptSSL()
 		throw SSLException("Cannot create SSL object");
 	}
 	SSL_set_bio(_pSSL, pBIO, pBIO);
-
-	try
-	{
-		if (_pSocket->getBlocking())
-		{
-			int err = SSL_accept(_pSSL);			
-			if (err > 0)
-			{
-				std::string clientName = _pSocket->peerAddress().host().toString();
-				long certErr = verifyCertificate(clientName);
-				if (certErr != X509_V_OK)
-				{
-					std::string msg = Utility::convertCertificateError(certErr);
-					throw CertificateValidationException("Unacceptable certificate from " + clientName, msg);
-				}
-			}
-			else
-			{
-				handleError(err);
-			}
-		}
-		else
-		{
-			SSL_set_accept_state(_pSSL);
-		}
-	}
-	catch (...)
-	{
-		SSL_shutdown(_pSSL);
-		SSL_free(_pSSL);
-		_pSSL = 0;
-		throw;
-	}
+	SSL_set_accept_state(_pSSL);
+	_needHandshake = true;
 }
 
 
-void SecureSocketImpl::connect(const SocketAddress& address, const std::string& hostName)
+void SecureSocketImpl::connect(const SocketAddress& address, bool performHandshake)
 {
 	poco_assert (!_pSSL);
 
 	_pSocket->connect(address);
-	connectSSL(hostName);
+	connectSSL(performHandshake);
 }
 
 
-void SecureSocketImpl::connect(const SocketAddress& address, const std::string& hostName, const Poco::Timespan& timeout)
+void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout, bool performHandshake)
 {
 	poco_assert (!_pSSL);
 
 	_pSocket->connect(address, timeout);
-	connectSSL(hostName);
+	connectSSL(performHandshake);
 }
 
 
-void SecureSocketImpl::connectNB(const SocketAddress& address, const std::string& hostName)
+void SecureSocketImpl::connectNB(const SocketAddress& address)
 {
 	poco_assert (!_pSSL);
 
 	_pSocket->connectNB(address);
-	connectSSL(hostName);
+	connectSSL(false);
 }
 
 
-void SecureSocketImpl::connectSSL(const std::string& hostName)
+void SecureSocketImpl::connectSSL(bool performHandshake)
 {
 	poco_assert (!_pSSL);
 	poco_assert (_pSocket->initialized());
@@ -191,21 +161,16 @@ void SecureSocketImpl::connectSSL(const std::string& hostName)
 	
 	try
 	{
-		if (_pSocket->getBlocking())
+		if (performHandshake && _pSocket->getBlocking())
 		{
 			int ret = SSL_connect(_pSSL);
 			handleError(ret);
-		
-			long certErr = verifyCertificate(hostName);
-			if (certErr != X509_V_OK)
-			{
-				std::string msg = Utility::convertCertificateError(certErr);
-				throw InvalidCertificateException(msg);
-			}
+			verifyPeerCertificate();
 		}
 		else
 		{
 			SSL_set_connect_state(_pSSL);
+			_needHandshake = true;
 		}
 	}
 	catch (...)
@@ -266,6 +231,14 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	poco_check_ptr (_pSSL);
 
 	int rc;
+	if (_needHandshake)
+	{
+		rc = completeHandshake();
+		if (rc == 1)
+			verifyPeerCertificate();
+		else 
+			return rc;
+	}
 	do
 	{
 		rc = SSL_write(_pSSL, buffer, length);
@@ -285,6 +258,14 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	poco_check_ptr (_pSSL);
 
 	int rc;
+	if (_needHandshake)
+	{
+		rc = completeHandshake();
+		if (rc == 1)
+			verifyPeerCertificate();
+		else
+			return rc;
+	}
 	do
 	{
 		rc = SSL_read(_pSSL, buffer, length);
@@ -295,6 +276,46 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		return handleError(rc);
 	}
 	return rc;
+}
+
+
+int SecureSocketImpl::completeHandshake()
+{
+	poco_assert (_pSocket->initialized());
+	poco_check_ptr (_pSSL);
+
+	int rc;
+	do
+	{
+		rc = SSL_do_handshake(_pSSL);
+	}
+	while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
+	if (rc <= 0) 
+	{
+		return handleError(rc);
+	}
+	_needHandshake = false;
+	return rc;
+}
+
+
+void SecureSocketImpl::verifyPeerCertificate()
+{
+	if (_peerHostName.empty())
+		_peerHostName = _pSocket->peerAddress().host().toString();
+		
+	verifyPeerCertificate(_peerHostName);
+}
+
+
+void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
+{
+	long certErr = verifyCertificate(hostName);
+	if (certErr != X509_V_OK)
+	{
+		std::string msg = Utility::convertCertificateError(certErr);
+		throw CertificateValidationException("Unacceptable certificate from " + hostName, msg);
+	}
 }
 
 
@@ -314,7 +335,6 @@ long SecureSocketImpl::verifyCertificate(const std::string& hostName)
 	}
 	else return X509_V_OK;
 }
-
 
 
 bool SecureSocketImpl::isLocalHost(const std::string& hostName)
@@ -380,6 +400,12 @@ int SecureSocketImpl::handleError(int rc)
 		break;
 	}
 	return rc;
+}
+
+
+void SecureSocketImpl::setPeerHostName(const std::string& peerHostName)
+{
+	_peerHostName = peerHostName;
 }
 
 
