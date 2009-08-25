@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#4 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#5 $
 //
 // Library: Net
 // Package: Mail

@@ -1,7 +1,7 @@
 //
 // ThreadTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ThreadTest.cpp#7 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ThreadTest.cpp#8 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

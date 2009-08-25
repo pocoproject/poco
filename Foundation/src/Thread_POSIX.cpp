@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#12 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#13 $
 //
 // Library: Foundation
 // Package: Threading
@@ -290,7 +290,7 @@ void ThreadImpl::sleepImpl(long milliseconds)
 		}
 	}
 	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0) throw Poco::SystemException("Thread::sleep(): select() failed");
+	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): select() failed");
 #endif
 }
 
