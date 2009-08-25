@@ -263,6 +263,40 @@ ThreadImpl* ThreadImpl::currentImpl()
 }
 
 
+void ThreadImpl::sleepImpl(long milliseconds)
+{
+#if defined(__VMS) || defined(__digital__)
+		// This is specific to DECThreads
+		struct timespec interval;
+		interval.tv_sec  = milliseconds / 1000;
+		interval.tv_nsec = (milliseconds % 1000)*1000000; 
+		pthread_delay_np(&interval);
+#else 
+	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
+	int rc;
+	do
+	{
+		struct timeval tv;
+		tv.tv_sec  = (long) remainingTime.totalSeconds();
+		tv.tv_usec = (long) remainingTime.useconds();
+		Poco::Timestamp start;
+		rc = ::select(0, NULL, NULL, NULL, &tv);
+		if (rc < 0 && errno == EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = start.elapsed();
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (remainingTime > 0 && rc < 0 && errno == EINTR);
+	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): select() failed");
+#endif
+}
+
+
 void* ThreadImpl::runnableEntry(void* pThread)
 {
 	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
