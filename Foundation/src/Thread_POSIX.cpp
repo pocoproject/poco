@@ -37,6 +37,8 @@
 #include "Poco/Thread_POSIX.h"
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #include <signal.h>
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
