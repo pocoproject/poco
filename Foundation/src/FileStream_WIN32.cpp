@@ -1,7 +1,7 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileStream_WIN32.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/FileStream_WIN32.cpp#5 $
 //
 // Library: Foundation
 // Package: Streams
@@ -55,13 +55,7 @@ FileStreamBuf::FileStreamBuf():
 
 FileStreamBuf::~FileStreamBuf()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 
@@ -151,16 +145,24 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 }
 
 
-void FileStreamBuf::close()
+bool FileStreamBuf::close()
 {
+	bool success = true;
 	if (_handle != INVALID_HANDLE_VALUE)
 	{
-		if (getMode() & std::ios::out)
-			sync();
-			
+		try
+		{
+			if (getMode() & std::ios::out)
+				sync();
+		}
+		catch (...)
+		{
+			success = false;
+		}
 		CloseHandle(_handle);
 		_handle = INVALID_HANDLE_VALUE;
 	}
+	return success;
 }
 
 

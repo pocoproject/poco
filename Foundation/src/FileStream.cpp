@@ -1,7 +1,7 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileStream.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/FileStream.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -67,7 +67,10 @@ void FileIOS::open(const std::string& path, std::ios::openmode mode)
 
 void FileIOS::close()
 {
-	_buf.close();
+	if (!_buf.close())
+	{
+		setstate(ios_base::badbit);
+	}
 }
 
 

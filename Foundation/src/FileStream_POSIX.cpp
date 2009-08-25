@@ -1,7 +1,7 @@
 //
 // FileStream_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileStream_POSIX.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/FileStream_POSIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -56,13 +56,7 @@ FileStreamBuf::FileStreamBuf():
 
 FileStreamBuf::~FileStreamBuf()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 
@@ -123,14 +117,23 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 }
 
 
-void FileStreamBuf::close()
+bool FileStreamBuf::close()
 {
+	bool success = true;
 	if (_fd != -1)
 	{
-		sync();
+		try
+		{
+			sync();
+		}
+		catch (...)
+		{
+			success = false;
+		}
 		::close(_fd);
 		_fd = -1;
 	}
+	return success;
 }
 
 
