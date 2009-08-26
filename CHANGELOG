@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.3.6 (2009-07-xx)
+Release 1.3.6 (2009-09-xx)
 ==========================
 
 - added Environment::processorCount()
@@ -19,6 +19,31 @@ Release 1.3.6 (2009-07-xx)
 - fixed SF# 2164227: Allow File opened read only by FileInputSteam to be writable
 - fixed SF# 2791934: use of char_traits::copy in BufferedStreamBuf::underflow
 - fixed SF# 2807750: Support additional SQL types in SQLite
+- fixed documentation bugs in Timed/PriorityNotificationQueue
+- fixed SF# 2828401: Deadlock in SocketReactor/NotificationCenter (also fixes patch# 1956490)
+  NotificationCenter now uses a std::vector internally instead of a std::list, and the mutex is
+  no longer held while notifications are sent to observers.
+- fixed SF# 2835206: File_WIN32 not checking aganist INVALID_HANDLE_VALUE
+- fixed SF# 2841812: Posix ThreadImpl::sleepImpl throws exceptions on EINTR
+- fixed SF# 2839579: simple DoS for SSL TCPServer, HTTPS server
+  No SSL handshake is performed during accept() - the handshake is delayed until
+  sendBytes(), receiveBytes() or completeHandshake() is called for the first time.
+  This also allows for better handshake and certificate validation when using
+  nonblocking connections.
+- fixed SF# 2836049: Possible handle leak in FileStream
+  If sync() fails, close() now simply set's the stream's bad bit.
+  In any case, close() closes the file handle/descriptor.   
+- fixed SF# 2814451: NetSSL: receiveBytes crashes if socket is closed
+- added a workaround for Vista service network initialization issue
+  (an Windows service using the Net library running under Vista will
+  crash in the call to WSAStartup() done in NetworkInitializer).
+  Workaround is to call WSAStartup() in the application's main().
+  Automatic call to WSAStartup() in the Net library can now be disabled 
+  by compiling Net with -DPOCO_NET_NO_AUTOMATIC_WSASTARTUP. Also
+  the new Poco::Net::initializeNetwork() and Poco::Net::uninitializeNetwork()
+  functions can be used to call WSAStartup() and WSACleanup(), respectively,
+  in a platform-independent way (on platforms other than Windows, these
+  functions will simply do nothing).
 
 
 Release 1.3.5 (2009-05-11)
@@ -1065,4 +1090,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#49 $
+$Id: //poco/1.3/dist/CHANGELOG#50 $
