@@ -256,7 +256,6 @@ void FileTest::testFileAttributes3()
 	assert (f.isDevice());
 	assert (!f.isFile());
 	assert (!f.isDirectory());
-	assert (!f.isLink());
 }
 
 
@@ -524,6 +523,7 @@ CppUnit::Test* FileTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileTest");
 
+	CppUnit_addTest(pSuite, FileTest, testCreateFile);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes1);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes2);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes3);
