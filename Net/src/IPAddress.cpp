@@ -502,7 +502,8 @@ IPAddress::IPAddress(Family family): _pImpl(0)
 	else if (family == IPv6)
 		_pImpl = new IPv6AddressImpl();
 #endif
-	else Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	else
+		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
