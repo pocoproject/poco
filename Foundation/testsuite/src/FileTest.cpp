@@ -256,7 +256,6 @@ void FileTest::testFileAttributes3()
 	assert (f.isDevice());
 	assert (!f.isFile());
 	assert (!f.isDirectory());
-	assert (!f.isLink());
 }
 
 
