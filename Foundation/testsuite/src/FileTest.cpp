@@ -60,6 +60,17 @@ FileTest::~FileTest()
 }
 
 
+void FileTest::testCreateFile()
+{
+	File f("testfile.dat");
+	bool created = f.createFile();
+	assert (created);
+	assert (!f.isHidden());
+	created = f.createFile();
+	assert (!created);
+}
+
+
 void FileTest::testFileAttributes1()
 {
 	File f("testfile.dat");
@@ -200,17 +211,6 @@ void FileTest::testFileAttributes1()
 	catch (Exception&)
 	{
 	}
-}
-
-
-void FileTest::testCreateFile()
-{
-	File f("testfile.dat");
-	bool created = f.createFile();
-	assert (created);
-	assert (!f.isHidden());
-	created = f.createFile();
-	assert (!created);
 }
 
 
@@ -524,6 +524,7 @@ CppUnit::Test* FileTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileTest");
 
+	CppUnit_addTest(pSuite, FileTest, testCreateFile);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes1);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes2);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes3);
