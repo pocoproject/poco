@@ -82,12 +82,12 @@ std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRI
 	"DBQ=" ORACLE_SERVER ":" ORACLE_PORT "/" ORACLE_SID ";"
 	"UID=" ORACLE_UID ";"
 	"PWD=" ORACLE_PWD ";"
-	"TLO=O;" //?
+	"TLO=O;" // translation option
 	"FBS=60000;" // fetch buffer size (bytes), default 60000
 	"FWC=F;" // force SQL_WCHAR support (T/F), default F
 	"CSR=F;" // close cursor (T/F), default F
-	"MDI=Me;" // metadata (SQL_ATTR_METADATA_ID) ID default (T/F), default T
-	"MTS=T;" //?
+	"MDI=T;" // metadata ID (SQL_ATTR_METADATA_ID) (T/F), default T
+	"MTS=F;" // Microsoft Transaction Server support (T/F)
 	"DPM=F;" // disable SQLDescribeParam (T/F), default F
 	"NUM=NLS;" // numeric settings (NLS implies Globalization Support)
 	"BAM=IfAllSuccessful;" // batch autocommit, (IfAllSuccessful/UpToFirstFailure/AllSuccessful), default IfAllSuccessful
@@ -101,7 +101,7 @@ std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRI
 	"XSM=Default;" // schema field (Default/Database/Owner), default Default
 	"EXC=F;" // EXEC syntax (T/F), default F
 	"APA=T;" // thread safety (T/F), default T
-	"DBA=W;"; // write access
+	"DBA=W;"; // write access (R/W)
 
 const std::string ODBCOracleTest::MULTI_INSERT = 
 	"BEGIN "

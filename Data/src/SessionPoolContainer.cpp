@@ -62,9 +62,9 @@ SessionPoolContainer::~SessionPoolContainer()
 
 void SessionPoolContainer::add(SessionPool* pPool)
 {
-	FastMutex::ScopedLock lock(_mutex);
 	poco_check_ptr (pPool);
 
+	FastMutex::ScopedLock lock(_mutex);
 	if (_sessionPools.find(pPool->name()) != _sessionPools.end())
 		throw SessionPoolExistsException("Session pool already exists: " + pPool->name());
 
@@ -79,8 +79,9 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 	int maxSessions, 
 	int idleTime)
 {
-	FastMutex::ScopedLock lock(_mutex);
 	std::string name = SessionPool::name(sessionKey, connectionString);
+
+	FastMutex::ScopedLock lock(_mutex);
 	SessionPoolMap::Iterator it = _sessionPools.find(name);
 
 	// pool already exists, silently return a session from it
@@ -108,6 +109,8 @@ SessionPool& SessionPoolContainer::getPool(const std::string& name)
 	std::string path = uri.getPath();
 	poco_assert (!path.empty());
 	std::string n = Session::uri(uri.getScheme(), path.substr(1));
+
+	FastMutex::ScopedLock lock(_mutex);
 	SessionPoolMap::Iterator it = _sessionPools.find(n);
 	if (_sessionPools.end() == it) throw NotFoundException(n);
 	return *it->second;
