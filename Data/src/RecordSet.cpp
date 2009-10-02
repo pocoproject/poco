@@ -309,6 +309,16 @@ bool RecordSet::moveLast()
 }
 
 
+void RecordSet::setRowFormatter(RowFormatter* pRowFormatter)
+{
+	pRowFormatter->setTotalRowCount(getTotalRowCount());
+	Statement::setRowFormatter(pRowFormatter);
+	RowMap::iterator it = _rowMap.begin();
+	RowMap::iterator end = _rowMap.end();
+	for (; it != end; ++it) it->second->setFormatter(getRowFormatter());
+}
+
+
 std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::size_t length) const
 {
 	RowIterator itBegin = *_pBegin + offset;

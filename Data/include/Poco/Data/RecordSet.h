@@ -93,7 +93,6 @@ public:
 	typedef RowIterator                 Iterator;
 
 	using Statement::isNull;
-	using Statement::setRowFormatter;
 	using Statement::subTotalRowCount;
 
 	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
@@ -112,6 +111,9 @@ public:
 
 	~RecordSet();
 		/// Destroys the RecordSet.
+
+	void setRowFormatter(RowFormatter* pRowFormatter);
+		/// Assigns the row formatter to the statement and all recordset rows.
 
 	Statement& operator = (const Statement& stmt);
 		/// Assignment operator.
