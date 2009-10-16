@@ -1,7 +1,7 @@
 //
 // CodeWriter.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/CodeWriter.cpp#2 $
+// $Id: //poco/1.3/PageCompiler/src/CodeWriter.cpp#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -76,6 +76,10 @@ void CodeWriter::writeImpl(std::ostream& ostr, const std::string& headerFileName
 {
 	ostr << "#include \"" << headerFileName << "\"\n";
 	writeImplIncludes(ostr);
+	if (_page.getBool("page.buffered", false))
+	{
+		ostr << "#include <sstream>\n";
+	}
 	ostr << "\n\n";
 
 	std::string decls(_page.implDecls().str());
@@ -234,10 +238,15 @@ void CodeWriter::writeHandler(std::ostream& ostr)
 {
 	ostr << "void " << _class << "::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)\n";
 	ostr << "{\n";
+	writeResponse(ostr);
+	if (_page.has("page.precondition"))
+	{
+		ostr << "\tif (!(" << _page.get("page.precondition") << ")) return;\n\n";
+	}
 	writeSession(ostr);
 	writeForm(ostr);
-	writeRequest(ostr);
-	ostr << _page.handler().str();
+	ostr << _page.preHandler().str();
+	writeContent(ostr);
 	ostr << "}\n";
 }
 
@@ -259,7 +268,7 @@ void CodeWriter::writeSession(std::ostream& ostr)
 
 void CodeWriter::writeForm(std::ostream& ostr)
 {
-	if (_page.get("page.form", "true") != "false")
+	if (_page.getBool("page.form", true))
 	{
 		std::string partHandler(_page.get("page.formPartHandler", ""));
 		if (!partHandler.empty())
@@ -276,18 +285,36 @@ void CodeWriter::writeForm(std::ostream& ostr)
 }
 
 
-void CodeWriter::writeRequest(std::ostream& ostr)
+void CodeWriter::writeResponse(std::ostream& ostr)
 {
 	std::string contentType(_page.get("page.contentType", "text/html"));
-	std::string chunked(_page.get("page.chunked", "true"));
+	bool buffered(_page.getBool("page.buffered", false));
+	bool chunked(_page.getBool("page.chunked", !buffered));
 
-	if (chunked != "false")
+	if (chunked)
 	{
 		ostr << "\tresponse.setChunkedTransferEncoding(true);\n";
 	}
 
 	ostr << "\tresponse.setContentType(\"" << contentType << "\");\n";
 	ostr << "\n";
-	ostr << "\tstd::ostream& ostr = response.send();\n";
+}
+
+
+void CodeWriter::writeContent(std::ostream& ostr)
+{
+	bool buffered(_page.getBool("page.buffered", false));
+	
+	if (buffered)
+	{
+		ostr << "\tstd::ostringstream responseStream;\n";
+		ostr << _page.handler().str();
+		ostr << "\tresponse.send() << responseStream.str();\n";		
+	}
+	else
+	{
+		ostr << "\tstd::ostream& responseStream = response.send();\n";
+		ostr << _page.handler().str();
+	}
 }
 

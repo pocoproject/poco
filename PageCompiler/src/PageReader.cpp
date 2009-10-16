@@ -1,7 +1,7 @@
 //
 // PageReader.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/PageReader.cpp#2 $
+// $Id: //poco/1.3/PageCompiler/src/PageReader.cpp#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -39,10 +39,10 @@
 #include <cctype>
 
 
-const std::string PageReader::MARKUP_BEGIN("\tostr << \"");
+const std::string PageReader::MARKUP_BEGIN("\tresponseStream << \"");
 const std::string PageReader::MARKUP_END("\";\n");
-const std::string PageReader::EXPR_BEGIN("\tostr << ");
-const std::string PageReader::EXPR_END(";\n");
+const std::string PageReader::EXPR_BEGIN("\tresponseStream << (");
+const std::string PageReader::EXPR_END(");\n");
 
 
 PageReader::PageReader(Page& page, const std::string& path):
@@ -97,6 +97,16 @@ void PageReader::parse(std::istream& pageStream)
 				_page.handler() << MARKUP_END;
 				generateLineDirective(_page.handler());
 				state = STATE_BLOCK;
+			}
+			else _page.handler() << token;
+		}
+		else if (token == "<%%")
+		{
+			if (state == STATE_MARKUP)
+			{
+				_page.handler() << MARKUP_END;
+				generateLineDirective(_page.preHandler());
+				state = STATE_PREHANDLER;
 			}
 			else _page.handler() << token;
 		}
@@ -202,6 +212,9 @@ void PageReader::parse(std::istream& pageStream)
 			case STATE_HDRDECL:
 				_page.headerDecls() << token;
 				break;
+			case STATE_PREHANDLER:
+				_page.preHandler() << token;
+				break;
 			case STATE_BLOCK:
 				_page.handler() << token;
 				break;
@@ -245,10 +258,19 @@ void PageReader::parseAttributes()
 		if (ch != '=') throw Poco::SyntaxException("bad attribute syntax: '=' expected", where());
 		ch = istr.get();
 		while (ch != eof && std::isspace(ch)) ch = istr.get();
-		if (ch != '"') throw Poco::SyntaxException("bad attribute syntax: '\"' expected", where());
-		ch = istr.get();
-		while (ch != eof && ch != '"') { value += (char) ch; ch = istr.get(); }
-		if (ch != '"') throw Poco::SyntaxException("bad attribute syntax: '\"' expected", where());
+		if (ch == '"')
+		{
+			ch = istr.get();
+			while (ch != eof && ch != '"') { value += (char) ch; ch = istr.get(); }
+			if (ch != '"') throw Poco::SyntaxException("bad attribute syntax: '\"' expected", where());
+		}
+		else if (ch == '\'')
+		{
+			ch = istr.get();
+			while (ch != eof && ch != '\'') { value += (char) ch; ch = istr.get(); }
+			if (ch != '\'') throw Poco::SyntaxException("bad attribute syntax: ''' expected", where());
+		}
+		else throw Poco::SyntaxException("bad attribute syntax: '\"' or ''' expected", where());
 		ch = istr.get();
 		handleAttribute(name, value);
 		while (ch != eof && std::isspace(ch)) ch = istr.get();
@@ -269,6 +291,12 @@ void PageReader::nextToken(std::istream& istr, std::string& token)
 			ch = istr.peek();
 			switch (ch)
 			{
+			case '%':
+			case '@':
+			case '=':
+				ch = istr.get();
+				token += (char) ch;
+				break;
 			case '!':
 				ch = istr.get();
 				token += (char) ch;
@@ -277,14 +305,6 @@ void PageReader::nextToken(std::istream& istr, std::string& token)
 					ch = istr.get();
 					token += (char) ch;
 				}
-				break;
-			case '=':
-				ch = istr.get();
-				token += (char) ch;
-				break;
-			case '@':
-				ch = istr.get();
-				token += (char) ch;
 				break;
 			case '-':
 				ch = istr.get();
@@ -312,6 +332,22 @@ void PageReader::handleAttribute(const std::string& name, const std::string& val
 	if (name == "include.page")
 	{
 		include(value);
+	}
+	else if (name == "header.include")
+	{
+		_page.headerDecls() << "#include \"" << value << "\"\n";
+	}
+	else if (name == "header.sinclude")
+	{
+		_page.headerDecls() << "#include <" << value << ">\n";
+	}
+	else if (name == "impl.include")
+	{
+		_page.implDecls() << "#include \"" << value << "\"\n";
+	}
+	else if (name == "impl.sinclude")
+	{
+		_page.implDecls() << "#include <" << value << ">\n";
 	}
 	else
 	{

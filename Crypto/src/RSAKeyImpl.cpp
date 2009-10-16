@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#6 $
+// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#7 $
 //
 // Library: Crypto
 // Package: RSA
@@ -41,6 +41,9 @@
 #include "Poco/TemporaryFile.h"
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
+#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+#include <openssl/bn.h>
+#endif
 
 
 namespace Poco {

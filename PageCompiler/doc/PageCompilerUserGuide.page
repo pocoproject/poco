@@ -2,11 +2,11 @@ POCO C++ Server Page Compiler User Guide
 PageCompiler
 
 !!!Introduction
-PageCompiler is a command line tool that translates HTML files (and other kinds of files), into
+PageCompiler is a command line tool that translates HTML files (and other kinds of files) into
 C++ code, more precisely, subclasses of Poco::Net::HTTPRequestHandler.
 The source files can contain special directives that allow it to include C++ code into
 the source file. The syntax of this directives is based on the syntax used for 
-Java Server Pages (JSP) and PHP.
+Java Server Pages (JSP) and Active Server Pages.
 
 The following introductory sample shows the code for a simple page that displays the
 current date and time.
@@ -103,6 +103,28 @@ Arbitrary C++ code fragments can be included using the Scriptlet directive.
     %>
 ----
 
+!!Pre-Response Scriptlet
+
+This is similar to an ordinary scriptlet, except that it will be executed
+before the HTTP response is sent. This can be used to manipulate the HTTP response
+object.
+
+    <%%
+        <statement>
+        ...
+    %>
+
+The main feature of this directive is that it allows to send a redirect response to
+the client if a certain condition is true.
+
+Example:
+    <%%
+        if (!loggedIn)
+        {
+        	return response.redirect("/");
+        }
+    %>
+ 
 !!Include Directive
 
 Another CPSP file can be included into the current file using the Include
@@ -111,8 +133,35 @@ Directive.
     <%@ include page="<path>" %>
 ----
 
-If the given path is relative, it is considered relative to the path of
-the currently processed CPSP file.
+!!C++ Header Include Directive
+
+Include a C++ header file in the generated header file.
+    <%@ header include="<path>" %>
+
+This corresponds to:
+    <%!! #include "<path>" %>
+    
+A variant of this directive is:
+    <%@ header sinclude="<path>" %>
+
+This corresponds to:
+    <%!! #include <<path>> %>
+
+
+!!C++ Implementation Include Directive
+
+Include a C++ header file in the generated implementation file.
+    <%@ impl include="<path>" %>
+
+This corresponds to:
+    <%! #include "<path>" %>
+    
+A variant of this directive is:
+    <%@ impl sinclude="<path>" %>
+
+This corresponds to:
+    <%! #include <<path>> %>
+
 
 !!Page Directive
 
@@ -194,6 +243,27 @@ For use with the POCO Open Service Platform only.
 
 Specifies the session timeout in minutes.
 
+!buffered
+
+Enables or disables response buffering. Response buffering is disabled by default.
+Set to <[true]> to enable buffering, or to <[false]> to disable it.
+If response buffering is enabled, everything written to the response stream
+is actually written to a string stream (<[std::ostringstream]>).
+Sending of the HTTP response back to the client is deferred to 
+when the page is complete.
+
+!precondition
+
+Allows to specify a C++ boolean expression which will be evaluated before processing
+of the page begins. If the expression evaluates to false, processing of the
+page is immediately terminated and no response is sent to the client.
+
+The expression can be a call to a member function defined in the handler base class.
+If that function returns false, it can send its own response to the client.
+
+Example:
+    <%@ page precondition="checkCredentials(request, response)" %>
+----
 
 !!Implicit Objects
 
@@ -206,6 +276,10 @@ The HTTP request object - an instance of Poco::Net::HTTPServerRequest.
 !response
 
 The HTTP response object - an instance of Poco::Net::HTTPServerRequest.
+
+!responseStream
+
+The output stream where the response body is written to.
 
 !form
 

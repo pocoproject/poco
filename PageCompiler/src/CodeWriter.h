@@ -1,7 +1,7 @@
 //
 // CodeWriter.h
 //
-// $Id: //poco/1.3/PageCompiler/src/CodeWriter.h#2 $
+// $Id: //poco/1.3/PageCompiler/src/CodeWriter.h#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -76,7 +76,8 @@ protected:
 	virtual void writeFactory(std::ostream& ostr);
 	virtual void writeSession(std::ostream& ostr);
 	virtual void writeForm(std::ostream& ostr);
-	virtual void writeRequest(std::ostream& ostr);
+	virtual void writeResponse(std::ostream& ostr);
+	virtual void writeContent(std::ostream& ostr);
 	virtual void writeManifest(std::ostream& ostr);
 	
 	void beginGuard(std::ostream& ostr, const std::string& headerFileName);

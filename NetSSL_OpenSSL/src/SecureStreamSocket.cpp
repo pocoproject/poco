@@ -1,7 +1,7 @@
 //
 // SecureStreamSocket.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#5 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -204,6 +204,12 @@ void SecureStreamSocket::verifyPeerCertificate()
 void SecureStreamSocket::verifyPeerCertificate(const std::string& hostName)
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->verifyPeerCertificate(hostName);
+}
+
+
+int SecureStreamSocket::completeHandshake()
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->completeHandshake();
 }
 
 

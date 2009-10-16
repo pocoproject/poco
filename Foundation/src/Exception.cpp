@@ -1,7 +1,7 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Exception.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/Exception.cpp#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -178,6 +178,7 @@ POCO_IMPLEMENT_EXCEPTION(SyntaxException, DataException, "Syntax error")
 POCO_IMPLEMENT_EXCEPTION(CircularReferenceException, DataException, "Circular reference")
 POCO_IMPLEMENT_EXCEPTION(PathSyntaxException, SyntaxException, "Bad path syntax")
 POCO_IMPLEMENT_EXCEPTION(IOException, RuntimeException, "I/O error")
+POCO_IMPLEMENT_EXCEPTION(ProtocolException, IOException, "Protocol error")
 POCO_IMPLEMENT_EXCEPTION(FileException, IOException, "File access error")
 POCO_IMPLEMENT_EXCEPTION(FileExistsException, FileException, "File exists")
 POCO_IMPLEMENT_EXCEPTION(FileNotFoundException, FileException, "File not found")

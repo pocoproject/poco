@@ -1,7 +1,7 @@
 //
 // Page.h
 //
-// $Id: //poco/1.3/PageCompiler/src/Page.h#1 $
+// $Id: //poco/1.3/PageCompiler/src/Page.h#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -65,7 +65,24 @@ public:
 		/// Returns the request handler code.
 
 	const std::stringstream& handler() const;
+		/// Returns the request prehandler code.
+
+	std::stringstream& preHandler();
 		/// Returns the request handler code.
+
+	const std::stringstream& preHandler() const;
+		/// Returns the request prehandler code.
+		
+	bool getBool(const std::string& property, bool deflt = false) const;
+		/// Returns the boolean value of the given property.
+		///
+		/// The return value will be true if the property
+		/// has one of the following values:
+		///    - true
+		///    - yes
+		///    - on
+		///
+		/// Otherwise, the return value will be false.
 		
 private:
 	Page(const Page&);
@@ -74,6 +91,7 @@ private:
 	std::stringstream _headerDecls;
 	std::stringstream _implDecls;
 	std::stringstream _handler;
+	std::stringstream _preHandler;
 };
 
 
@@ -113,6 +131,18 @@ inline std::stringstream& Page::handler()
 inline const std::stringstream& Page::handler() const
 {
 	return _handler;
+}
+
+
+inline std::stringstream& Page::preHandler()
+{
+	return _preHandler;
+}
+
+
+inline const std::stringstream& Page::preHandler() const
+{
+	return _preHandler;
 }
 
 

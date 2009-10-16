@@ -1,7 +1,7 @@
 //
 // Exception.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Exception.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/Exception.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -254,6 +254,7 @@ POCO_DECLARE_EXCEPTION(Foundation_API, SyntaxException, DataException)
 POCO_DECLARE_EXCEPTION(Foundation_API, CircularReferenceException, DataException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PathSyntaxException, SyntaxException)
 POCO_DECLARE_EXCEPTION(Foundation_API, IOException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ProtocolException, IOException)
 POCO_DECLARE_EXCEPTION(Foundation_API, FileException, IOException)
 POCO_DECLARE_EXCEPTION(Foundation_API, FileExistsException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, FileNotFoundException, FileException)

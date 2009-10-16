@@ -1,7 +1,7 @@
 //
 // PageReader.h
 //
-// $Id: //poco/1.3/PageCompiler/src/PageReader.h#2 $
+// $Id: //poco/1.3/PageCompiler/src/PageReader.h#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -72,6 +72,7 @@ protected:
 		STATE_MARKUP,
 		STATE_IMPLDECL,
 		STATE_HDRDECL,
+		STATE_PREHANDLER,
 		STATE_BLOCK,
 		STATE_EXPR,
 		STATE_COMMENT,
