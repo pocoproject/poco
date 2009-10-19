@@ -1,7 +1,7 @@
 //
 // MySQLException.h
 //
-// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQLException.h#3 $
+// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQLException.h#4 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -59,7 +59,7 @@ class MySQL_API MySQLException: public Poco::Data::DataException
 	/// Base class for all MySQL exceptions
 {
 public:
-	MySQLException(const std::string& msg);
+	MySQLException(const std::string& msg, int code = 0);
 		/// Creates MySQLException.
 
 	MySQLException(const MySQLException& exc);
@@ -112,7 +112,7 @@ class StatementException : public MySQLException
 	/// StatementException
 {
 public:
-	StatementException(const std::string& msg);
+	StatementException(const std::string& msg, int code = 0);
 		/// Creates StatementException.
 
 	StatementException(const std::string& text, MYSQL_STMT* h, const std::string& stmt = "");

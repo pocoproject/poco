@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/MySQLException.cpp#4 $
+// $Id: //poco/1.3/Data/MySQL/src/MySQLException.cpp#5 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -44,12 +44,14 @@ namespace Data {
 namespace MySQL {
 
 
-MySQLException::MySQLException(const std::string& msg) : Poco::Data::DataException(std::string("[MySQL]: ") + msg)
+MySQLException::MySQLException(const std::string& msg, int code): 
+	Poco::Data::DataException(std::string("[MySQL]: ") + msg, code)
 {
 }
 
 
-MySQLException::MySQLException(const MySQLException& exc) : Poco::Data::DataException(exc)
+MySQLException::MySQLException(const MySQLException& exc): 
+	Poco::Data::DataException(exc)
 {
 }
 
@@ -59,22 +61,26 @@ MySQLException::~MySQLException() throw()
 }
 
 
-ConnectionException::ConnectionException(const std::string& msg) : MySQLException(msg)
+ConnectionException::ConnectionException(const std::string& msg): 
+	MySQLException(msg)
 {
 }
 
 
-ConnectionException::ConnectionException(const std::string& text, MYSQL* h) : MySQLException(compose(text, h))
+ConnectionException::ConnectionException(const std::string& text, MYSQL* h): 
+	MySQLException(compose(text, h))
 {
 }
 
 
-StatementException::StatementException(const std::string& msg) : MySQLException(msg)
+StatementException::StatementException(const std::string& msg, int code): 
+	MySQLException(msg, code)
 {
 }
 
 
-StatementException::StatementException(const std::string& text, MYSQL_STMT* h, const std::string& stmt) : MySQLException(compose(text, h, stmt))
+StatementException::StatementException(const std::string& text, MYSQL_STMT* h, const std::string& stmt): 
+	MySQLException(compose(text, h, stmt), mysql_stmt_errno(h))
 {
 }
 
