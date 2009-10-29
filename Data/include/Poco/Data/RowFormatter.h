@@ -103,10 +103,10 @@ public:
 	void setTotalRowCount(int count);
 		/// Sets total row count.
 
-	const std::string& prefix() const;
+	virtual const std::string& prefix() const;
 		/// Returns prefix string;
 
-	const std::string& postfix() const;
+	virtual const std::string& postfix() const;
 		/// Returns postfix string;
 
 	void reset();
@@ -116,7 +116,7 @@ public:
 protected:
 
 	void setPrefix(const std::string& prefix) const;
-		/// Sets the p[refix for the formatter.
+		/// Sets the prefix for the formatter.
 
 	void setPostfix(const std::string& postfix) const;
 		/// Sets the postfix for the formatter

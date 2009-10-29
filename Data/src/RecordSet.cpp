@@ -319,11 +319,24 @@ void RecordSet::setRowFormatter(RowFormatter* pRowFormatter)
 }
 
 
+std::ostream& RecordSet::copyNames(std::ostream& os) const
+{
+	std::string names = (*_pBegin)->namesToString();
+	if (!names.empty()) os << names;
+	return os;
+}
+
+
 std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::size_t length) const
 {
 	RowIterator itBegin = *_pBegin + offset;
 	RowIterator itEnd = (RowIterator::POSITION_END != length) ? itBegin + length : *_pEnd;
-	std::copy(itBegin, itEnd, std::ostream_iterator<Row>(os));
+	std::string val;
+	for (; itBegin != itEnd; ++itBegin)
+	{
+		val = itBegin->valuesToString();
+		if (!val.empty()) os << val;
+	}
 	return os;
 }
 

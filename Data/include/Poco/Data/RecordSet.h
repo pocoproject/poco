@@ -616,13 +616,6 @@ inline RecordSet::Iterator RecordSet::end()
 }
 
 
-inline std::ostream& RecordSet::copyNames(std::ostream& os) const
-{
-	os << (*_pBegin)->namesToString();
-	return os;
-}
-
-
 inline const RowFilter* RecordSet::getFilter() const
 {
 	return _pFilter;
