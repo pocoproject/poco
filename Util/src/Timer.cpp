@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.3/Util/src/Timer.cpp#2 $
+// $Id: //poco/1.3/Util/src/Timer.cpp#3 $
 //
 // Library: Util
 // Package: Timer
@@ -237,16 +237,14 @@ Timer::Timer(Poco::Thread::Priority priority)
 
 Timer::~Timer()
 {
-	Poco::Timestamp now;
-	_queue.enqueueNotification(new StopNotification(_queue), now);
+	_queue.enqueueNotification(new StopNotification(_queue), 0);
 	_thread.join();
 }
 
 	
 void Timer::cancel()
 {
-	Poco::Timestamp now;
-	_queue.enqueueNotification(new CancelNotification(_queue), now);
+	_queue.enqueueNotification(new CancelNotification(_queue), 0);
 }
 
 

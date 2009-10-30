@@ -1,7 +1,7 @@
 //
 // MessageHeaderTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/MessageHeaderTest.h#1 $
+// $Id: //poco/1.3/Net/testsuite/src/MessageHeaderTest.h#2 $
 //
 // Definition of the MessageHeaderTest class.
 //
@@ -51,6 +51,7 @@ public:
 	void testRead2();
 	void testRead3();
 	void testRead4();
+	void testRead5();
 	void testReadFolding1();
 	void testReadFolding2();
 	void testReadFolding3();

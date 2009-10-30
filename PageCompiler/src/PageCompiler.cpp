@@ -1,7 +1,7 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#3 $
+// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#4 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
@@ -119,6 +119,20 @@ protected:
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleConfig)));
 
 		options.addOption(
+			Option("output-dir", "o", "Write output files to directory <dir>.")
+				.required(false)
+				.repeatable(false)
+				.argument("<dir>")
+				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleOutputDir)));
+
+		options.addOption(
+			Option("header-output-dir", "H", "Write header file to directory <dir>.")
+				.required(false)
+				.repeatable(false)
+				.argument("<dir>")
+				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHeaderOutputDir)));
+
+		options.addOption(
 			Option("osp", "O", "Add factory class definition and implementation for use with the Open Service Platform.")
 				.required(false)
 				.repeatable(false)
@@ -151,6 +165,16 @@ protected:
 	void handleConfig(const std::string& name, const std::string& value)
 	{
 		loadConfiguration(value);
+	}
+
+	void handleOutputDir(const std::string& name, const std::string& value)
+	{
+		_outputDir = value;
+	}
+
+	void handleHeaderOutputDir(const std::string& name, const std::string& value)
+	{
+		_headerOutputDir = value;
 	}
 
 	void handleOSP(const std::string& name, const std::string& value)
@@ -232,7 +256,7 @@ protected:
 		Path p(path);
 		config().setString("inputFileName", p.getFileName());
 		config().setString("inputFilePath", p.toString());
-
+		
 		DateTime now;
 		config().setString("dateTime", DateTimeFormatter::format(now, DateTimeFormat::SORTABLE_FORMAT));
 
@@ -250,24 +274,35 @@ protected:
 
 		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
 
+		if (!_outputDir.empty())
+		{
+			p = Path(_outputDir, p.getBaseName());
+		}
+		p.setExtension("cpp");
+		std::string implPath = p.toString();
+		std::string implFileName = p.getFileName();
+
+		if (!_headerOutputDir.empty())
+		{
+			p = Path(_headerOutputDir, p.getBaseName());
+		}
 		p.setExtension("h");
 		std::string headerPath = p.toString();
 		std::string headerFileName = p.getFileName();
-		config().setString("outputFileName", p.getFileName());
-		config().setString("outputFilePath", headerPath);
-		FileOutputStream headerStream(headerPath);
-		OutputLineEndingConverter headerLEC(headerStream);
-		writeFileHeader(headerLEC);
-		pCodeWriter->writeHeader(headerLEC, p.getFileName());
 
-		p.setExtension("cpp");
-		std::string implPath = p.toString();
-		config().setString("outputFileName", p.getFileName());
+		config().setString("outputFileName", implFileName);
 		config().setString("outputFilePath", implPath);
 		FileOutputStream implStream(implPath);
 		OutputLineEndingConverter implLEC(implStream);
 		writeFileHeader(implLEC);
 		pCodeWriter->writeImpl(implLEC, headerFileName);
+
+		config().setString("outputFileName", headerFileName);
+		config().setString("outputFilePath", headerPath);
+		FileOutputStream headerStream(headerPath);
+		OutputLineEndingConverter headerLEC(headerStream);
+		writeFileHeader(headerLEC);
+		pCodeWriter->writeHeader(headerLEC, headerFileName);
 	}
 
 	void writeFileHeader(std::ostream& ostr)
@@ -295,6 +330,8 @@ private:
 	bool _generateOSPCode;
 	bool _generateApacheCode;
 	bool _emitLineDirectives;
+	std::string _outputDir;
+	std::string _headerOutputDir;
 };
 
 

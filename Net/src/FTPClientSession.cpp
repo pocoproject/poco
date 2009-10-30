@@ -1,7 +1,7 @@
 //
 // FTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/FTPClientSession.cpp#2 $
+// $Id: //poco/1.3/Net/src/FTPClientSession.cpp#3 $
 //
 // Library: Net
 // Package: FTP
@@ -101,9 +101,10 @@ Poco::Timespan FTPClientSession::getTimeout() const
 }
 
 
-void FTPClientSession::setPassive(bool flag)
+void FTPClientSession::setPassive(bool flag, bool useRFC1738)
 {
-	_passiveMode = flag;
+	_passiveMode  = flag;
+	_supports1738 = useRFC1738;
 }
 
 	

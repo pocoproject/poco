@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/InflatingStream.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/InflatingStream.cpp#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -109,6 +109,16 @@ int InflatingStreamBuf::close()
 		_pOstr = 0;
 	}
 	return 0;
+}
+
+
+void InflatingStreamBuf::reset()
+{
+	int rc = inflateReset(&_zstr);
+	if (rc == Z_OK)
+		_eof = false;
+	else
+		throw IOException(zError(rc));
 }
 
 
@@ -259,6 +269,13 @@ InflatingInputStream::InflatingInputStream(std::istream& istr, InflatingStreamBu
 
 InflatingInputStream::~InflatingInputStream()
 {
+}
+
+
+void InflatingInputStream::reset()
+{
+	_buf.reset();
+	clear();
 }
 
 

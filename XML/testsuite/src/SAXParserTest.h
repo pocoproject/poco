@@ -1,7 +1,7 @@
 //
 // SAXParserTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/SAXParserTest.h#2 $
+// $Id: //poco/1.3/XML/testsuite/src/SAXParserTest.h#3 $
 //
 // Definition of the SAXParserTest class.
 //
@@ -69,6 +69,7 @@ public:
 	void testEncoding();
 	void testParseMemory();
 	void testCharacters();
+	void testParsePartialReads();
 
 	void setUp();
 	void tearDown();
@@ -96,6 +97,7 @@ public:
 	static const std::string XHTML_LATIN1_ENTITIES;
 	static const std::string RSS;
 	static const std::string ENCODING;
+	static const std::string WSDL;
 };
 
 

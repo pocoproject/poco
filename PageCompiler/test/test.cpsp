@@ -20,7 +20,6 @@ using Poco::DateTimeFormat;
 </head>
 <%-- This is a server-side comment --%>
 <body>
-<%@ include page="header.inc" %>
 <h1>Hello, World!</h1>
 <p><%= dt %></p>
 </body>

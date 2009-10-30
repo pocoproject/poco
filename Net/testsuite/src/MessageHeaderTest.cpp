@@ -1,7 +1,7 @@
 //
 // MessageHeaderTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/MessageHeaderTest.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/MessageHeaderTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -120,6 +120,19 @@ void MessageHeaderTest::testRead4()
 	assert (ch == '\n');
 	ch = istr.get();
 	assert (ch == 's');
+}
+
+
+void MessageHeaderTest::testRead5()
+{
+	std::string s("name1:\r\nname2: value2\r\nname3: value3\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.read(istr);
+	assert (mh.size() == 3);
+	assert (mh["name1"] == "");
+	assert (mh["name2"] == "value2");
+	assert (mh["name3"] == "value3");
 }
 
 
@@ -371,6 +384,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testRead2);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testRead3);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testRead4);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testRead5);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding1);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding2);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding3);

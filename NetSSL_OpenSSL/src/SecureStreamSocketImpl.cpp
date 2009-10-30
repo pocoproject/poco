@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -126,13 +126,16 @@ int SecureStreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	const char* p = reinterpret_cast<const char*>(buffer);
 	int remaining = length;
-	while (remaining > 0)
+	int sent = 0;
+	while (remaining > 0 && getBlocking())
 	{
-		int n = _impl.sendBytes(p, length, flags);
+		int n = _impl.sendBytes(p, remaining, flags);
+		if (n < 0) return n;
 		p += n; 
 		remaining -= n;
+		sent += n;
 	}
-	return length;
+	return sent;
 }
 
 

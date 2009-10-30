@@ -8,12 +8,13 @@ rem command-line build script for MS Visual Studio
 rem
 rem Usage:
 rem ------
-rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [SAMPLES]
+rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [SAMPLES] [DEVENV]
 rem VS_VERSION: 71|80|90
 rem ACTION:     build|rebuild|clean
 rem LINKMODE:   static|shared|both
 rem CONFIG:     release|debug|both
 rem SAMPLES:    yes|no (shared only)
+rem DEVENV:     devenv|vcexpress
 rem
 rem VS_VERSION is required argument. Default is build all.
 
@@ -29,6 +30,15 @@ set POCOBASE=%CD%
 rem VS version {71|80|90}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
+
+
+if "%6"=="" goto USE_DEVENV
+set BUILD_TOOL="%6"
+goto USE_CUSTOM
+:USE_DEVENV
+set BUILD_TOOL=devenv
+:USE_CUSTOM
+
 
 rem Action [build|rebuild|clean]
 set ACTION=%2
@@ -134,37 +144,37 @@ for /f %%G in ('findstr /R "." components') do (
    if exist %%Q_%VS_VERSION%.sln (
     echo.
     echo ========== Building %%G ==========
-    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%Q_%VS_VERSION%.sln)
-    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%Q_%VS_VERSION%.sln)
-    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%Q_%VS_VERSION%.sln)
-    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%Q_%VS_VERSION%.sln)
+    if %DEBUG_SHARED%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_shared %%Q_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (%BUILD_TOOL% /useenv /%ACTION% release_shared %%Q_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_static %%Q_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (%BUILD_TOOL% /useenv /%ACTION% release_static %%Q_%VS_VERSION%.sln)
    )
 
    if exist %%R_%VS_VERSION%.sln (
     echo.
     echo ========== Building %%G ==========
-    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%R_%VS_VERSION%.sln)
-    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%R_%VS_VERSION%.sln)
-    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%R_%VS_VERSION%.sln)
-    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%R_%VS_VERSION%.sln)
+    if %DEBUG_SHARED%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_shared %%R_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (%BUILD_TOOL% /useenv /%ACTION% release_shared %%R_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_static %%R_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (%BUILD_TOOL% /useenv /%ACTION% release_static %%R_%VS_VERSION%.sln)
    )
-   
+
    if exist %%S_%VS_VERSION%.sln (
     echo.
     echo ========== Building %%G ==========
-    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%S_%VS_VERSION%.sln)
-    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%S_%VS_VERSION%.sln)
-    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%S_%VS_VERSION%.sln)
-    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%S_%VS_VERSION%.sln)
+    if %DEBUG_SHARED%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_shared %%S_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (%BUILD_TOOL% /useenv /%ACTION% release_shared %%S_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_static %%S_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (%BUILD_TOOL% /useenv /%ACTION% release_static %%S_%VS_VERSION%.sln)
    )
 
    if exist %%T_%VS_VERSION%.sln (
     echo.
     echo ========== Building %%G ==========
-    if %DEBUG_SHARED%==1   (devenv /useenv /%ACTION% debug_shared %%T_%VS_VERSION%.sln)
-    if %RELEASE_SHARED%==1 (devenv /useenv /%ACTION% release_shared %%T_%VS_VERSION%.sln)
-    if %DEBUG_STATIC%==1   (devenv /useenv /%ACTION% debug_static %%T_%VS_VERSION%.sln)
-    if %RELEASE_STATIC%==1 (devenv /useenv /%ACTION% release_static %%T_%VS_VERSION%.sln)
+    if %DEBUG_SHARED%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_shared %%T_%VS_VERSION%.sln)
+    if %RELEASE_SHARED%==1 (%BUILD_TOOL% /useenv /%ACTION% release_shared %%T_%VS_VERSION%.sln)
+    if %DEBUG_STATIC%==1   (%BUILD_TOOL% /useenv /%ACTION% debug_static %%T_%VS_VERSION%.sln)
+    if %RELEASE_STATIC%==1 (%BUILD_TOOL% /useenv /%ACTION% release_static %%T_%VS_VERSION%.sln)
    )
   )
   cd %POCOBASE%
@@ -179,8 +189,8 @@ for /f %%G in ('findstr /R "." components') do (
   cd %%G\samples
   echo.
   echo ========== Building %%G/samples ==========
-  if %DEBUG_SHARED%==1   devenv /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
-  if %RELEASE_SHARED%==1 devenv /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
+  if %DEBUG_SHARED%==1   %BUILD_TOOL% /useenv /%ACTION% debug_shared samples_%VS_VERSION%.sln
+  if %RELEASE_SHARED%==1 %BUILD_TOOL% /useenv /%ACTION% release_shared samples_%VS_VERSION%.sln
   cd %POCOBASE%
  )
 )
@@ -190,12 +200,13 @@ goto :EOF
 :usage
 echo Usage:
 echo ------
-echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [SAMPLES]
+echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [SAMPLES] [DEVENV]
 echo VS_VERSION: "71|80|90"
 echo ACTION:     "build|rebuild|clean"
 echo LINKMODE:   "static|shared|both"
 echo CONFIG:     "release|debug|both"
 echo SAMPLES:    "yes|no" (shared only)
-echo. 
+echo DEVENV:     "devenv|vcexpress"
+echo.
 echo Default is build all.
 endlocal

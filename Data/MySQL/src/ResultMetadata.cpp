@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/ResultMetadata.cpp#6 $
+// $Id: //poco/1.3/Data/MySQL/src/ResultMetadata.cpp#7 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -235,7 +235,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 		_row[i].buffer        = &_buffer[0] + offset;
 		_row[i].length        = &_lengths[i];
         _row[i].is_null       = &_isNull[i];
-		
+		_row[i].is_unsigned   = (my_bool) ((fields[i].flags & UNSIGNED_FLAG) == UNSIGNED_FLAG);		
 		offset += _row[i].buffer_length;
 	}
 }

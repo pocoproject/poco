@@ -1,7 +1,7 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/1.3/XML/src/ParserEngine.cpp#5 $
+// $Id: //poco/1.3/XML/src/ParserEngine.cpp#6 $
 //
 // Library: XML
 // Package: XML
@@ -112,6 +112,7 @@ ParserEngine::ParserEngine():
 	_expandInternalEntities(true),
 	_externalGeneralEntities(false),
 	_externalParameterEntities(false),
+	_enablePartialReads(false),
 	_pNamespaceStrategy(new NoNamespacesStrategy()),
 	_pEntityResolver(0),
 	_pDTDHandler(0),
@@ -131,6 +132,7 @@ ParserEngine::ParserEngine(const XMLString& encoding):
 	_expandInternalEntities(true),
 	_externalGeneralEntities(false),
 	_externalParameterEntities(false),
+	_enablePartialReads(false),
 	_pNamespaceStrategy(new NoNamespacesStrategy()),
 	_pEntityResolver(0),
 	_pDTDHandler(0),
@@ -232,6 +234,12 @@ void ParserEngine::setErrorHandler(ErrorHandler* pErrorHandler)
 }
 
 
+void ParserEngine::setEnablePartialReads(bool flag)
+{
+	_enablePartialReads = flag;
+}
+
+
 void ParserEngine::parse(InputSource* pInputSource)
 {
 	init();
@@ -266,18 +274,15 @@ void ParserEngine::parse(const char* pBuffer, std::size_t size)
 
 void ParserEngine::parseByteInputStream(XMLByteInputStream& istr)
 {
-	istr.read(_pBuffer, PARSE_BUFFER_SIZE);
-	int n = static_cast<int>(istr.gcount());
+	std::streamsize n = readBytes(istr, _pBuffer, PARSE_BUFFER_SIZE);
 	while (n > 0)
 	{
 		if (!XML_Parse(_parser, _pBuffer, n, 0))
 			handleError(XML_GetErrorCode(_parser));
 		if (istr.good())
-		{
-			istr.read(_pBuffer, PARSE_BUFFER_SIZE);
-			n = static_cast<int>(istr.gcount());
-		}
-		else n = 0;
+			n = readBytes(istr, _pBuffer, PARSE_BUFFER_SIZE);
+		else 
+			n = 0;
 	}
 	if (!XML_Parse(_parser, _pBuffer, 0, 1))
 		handleError(XML_GetErrorCode(_parser));
@@ -286,18 +291,15 @@ void ParserEngine::parseByteInputStream(XMLByteInputStream& istr)
 
 void ParserEngine::parseCharInputStream(XMLCharInputStream& istr)
 {
-	istr.read(reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
-	int n = static_cast<int>(istr.gcount());
+	std::streamsize n = readChars(istr, reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
 	while (n > 0)
 	{
 		if (!XML_Parse(_parser, _pBuffer, n*sizeof(XMLChar), 0))
 			handleError(XML_GetErrorCode(_parser));
 		if (istr.good())
-		{
-			istr.read(reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
-			n = static_cast<int>(istr.gcount());
-		}
-		else n = 0;
+			n = readChars(istr, reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
+		else 
+			n = 0;
 	}
 	if (!XML_Parse(_parser, _pBuffer, 0, 1))
 		handleError(XML_GetErrorCode(_parser));
@@ -321,18 +323,15 @@ void ParserEngine::parseExternalByteInputStream(XML_Parser extParser, XMLByteInp
 	char *pBuffer = new char[PARSE_BUFFER_SIZE];
 	try
 	{
-		istr.read(pBuffer, PARSE_BUFFER_SIZE);
-		int n = static_cast<int>(istr.gcount());
+		std::streamsize n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE);
 		while (n > 0)
 		{
 			if (!XML_Parse(extParser, pBuffer, n, 0))
 				handleError(XML_GetErrorCode(extParser));
 			if (istr.good())
-			{
-				istr.read(pBuffer, PARSE_BUFFER_SIZE);
-				n = static_cast<int>(istr.gcount());
-			} 
-			else n = 0;
+				n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE);
+			else 
+				n = 0;
 		}
 		if (!XML_Parse(extParser, pBuffer, 0, 1))
 			handleError(XML_GetErrorCode(extParser));
@@ -351,18 +350,15 @@ void ParserEngine::parseExternalCharInputStream(XML_Parser extParser, XMLCharInp
 	XMLChar *pBuffer = new XMLChar[PARSE_BUFFER_SIZE/sizeof(XMLChar)];
 	try
 	{
-		istr.read(pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
-		int n = static_cast<int>(istr.gcount());
+		std::streamsize n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
 		while (n > 0)
 		{
 			if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), n*sizeof(XMLChar), 0))
 				handleError(XML_GetErrorCode(extParser));
 			if (istr.good())
-			{
-				istr.read(pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
-				n = static_cast<int>(istr.gcount());
-			} 
-			else n = 0;
+				n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
+			else 
+				n = 0;
 		}
 		if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), 0, 1))
 			handleError(XML_GetErrorCode(extParser));
@@ -373,6 +369,46 @@ void ParserEngine::parseExternalCharInputStream(XML_Parser extParser, XMLCharInp
 		throw;
 	}
 	delete [] pBuffer;
+}
+
+
+std::streamsize ParserEngine::readBytes(XMLByteInputStream& istr, char* pBuffer, std::streamsize bufferSize)
+{
+	if (_enablePartialReads)
+	{
+		istr.read(pBuffer, 1);
+		if (istr.gcount() == 1)
+		{
+			std::streamsize n = istr.readsome(pBuffer + 1, bufferSize - 1);
+			return n + 1;
+		}
+		else return 0;
+	}
+	else
+	{
+		istr.read(pBuffer, bufferSize);
+		return istr.gcount();
+	}
+}
+
+
+std::streamsize ParserEngine::readChars(XMLCharInputStream& istr, XMLChar* pBuffer, std::streamsize bufferSize)
+{
+	if (_enablePartialReads)
+	{
+		istr.read(_pBuffer, 1);
+		if (istr.gcount() == 1)
+		{
+			std::streamsize n = istr.readsome(pBuffer + 1, bufferSize - 1);
+			return n + 1;
+		}
+		else return 0;
+	}
+	else
+	{
+		istr.read(pBuffer, bufferSize);
+		return istr.gcount();
+	}
 }
 
 

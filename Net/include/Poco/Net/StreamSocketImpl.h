@@ -1,7 +1,7 @@
 //
 // StreamSocketImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/StreamSocketImpl.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/StreamSocketImpl.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -63,7 +63,12 @@ public:
 		/// Creates a StreamSocketImpl using the given native socket.
 		
 	virtual int sendBytes(const void* buffer, int length, int flags = 0);
-		/// Ensures that all data in buffer is sent.
+		/// Ensures that all data in buffer is sent if the socket
+		/// is blocking. In case of a non-blocking socket, sends as
+		/// many bytes as possible.
+		///
+		/// Returns the number of bytes sent. The return value may also be
+		/// negative to denote some special condition.
 
 protected:
 	virtual ~StreamSocketImpl();

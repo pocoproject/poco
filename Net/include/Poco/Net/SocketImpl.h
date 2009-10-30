@@ -1,7 +1,7 @@
 //
 // SocketImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketImpl.h#6 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SocketImpl.h#7 $
 //
 // Library: Net
 // Package: Sockets
@@ -135,12 +135,18 @@ public:
 		///
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
+		///
+		/// Certain socket implementations may also return a negative
+		/// value denoting a certain condition.
 	
 	virtual int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		///
 		/// Returns the number of bytes received.
+		///
+		/// Certain socket implementations may also return a negative
+		/// value denoting a certain condition.
 	
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 		/// Sends the contents of the given buffer through

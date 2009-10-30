@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.3/Net/src/MessageHeader.cpp#3 $
+// $Id: //poco/1.3/Net/src/MessageHeader.cpp#4 $
 //
 // Library: Net
 // Package: Messages
@@ -94,7 +94,7 @@ void MessageHeader::read(std::istream& istr)
 		if (ch == '\n') { ch = istr.get(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
 		if (ch != eof) ch = istr.get(); // ':'
-		while (std::isspace(ch)) ch = istr.get();
+		while (ch != eof && std::isspace(ch) && ch != '\r' && ch != '\n') ch = istr.get();
 		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = istr.get(); }
 		if (ch == '\r') ch = istr.get();
 		if (ch == '\n')

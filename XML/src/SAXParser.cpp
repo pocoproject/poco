@@ -1,7 +1,7 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/1.3/XML/src/SAXParser.cpp#2 $
+// $Id: //poco/1.3/XML/src/SAXParser.cpp#3 $
 //
 // Library: XML
 // Package: SAX
@@ -44,6 +44,9 @@
 
 namespace Poco {
 namespace XML {
+
+
+const XMLString SAXParser::FEATURE_PARTIAL_READS = toXMLString("http://www.appinf.com/features/enable-partial-reads");
 
 
 SAXParser::SAXParser():
@@ -144,6 +147,8 @@ void SAXParser::setFeature(const XMLString& featureId, bool state)
 		_namespaces = state;
 	else if (featureId == XMLReader::FEATURE_NAMESPACE_PREFIXES)
 		_namespacePrefixes = state;
+	else if (featureId == FEATURE_PARTIAL_READS)
+		_engine.setEnablePartialReads(state);
 	else throw SAXNotRecognizedException(fromXMLString(featureId));
 }
 
@@ -160,6 +165,8 @@ bool SAXParser::getFeature(const XMLString& featureId) const
 		return _namespaces;
 	else if (featureId == XMLReader::FEATURE_NAMESPACE_PREFIXES)
 		return _namespacePrefixes;
+	else if (featureId == FEATURE_PARTIAL_READS)
+		return _engine.getEnablePartialReads();
 	else throw SAXNotRecognizedException(fromXMLString(featureId));
 }
 
