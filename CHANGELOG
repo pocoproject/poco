@@ -61,6 +61,7 @@ Release 1.3.6 (2009-11-xx)
 - fixed SF# 2877970: possible bug in timer task
 - fixed SF# 2874104: wrong parsing empty http headers
 - fixed SF# 2860694: Incorrect return code from SecureStreamSocketImpl::sendBytes
+- fixed SF# 2849750: Possible bug with XMLWriter?
 
 
 Release 1.3.5 (2009-05-11)
@@ -1107,4 +1108,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#51 $
+$Id: //poco/1.3/dist/CHANGELOG#52 $

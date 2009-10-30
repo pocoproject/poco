@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.3/XML/src/XMLWriter.cpp#2 $
+// $Id: //poco/1.3/XML/src/XMLWriter.cpp#3 $
 //
 // Library: XML
 // Package: XML
@@ -737,7 +737,12 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 
 void XMLWriter::writeMarkup(const std::string& str) const
 {
+#if defined(XML_UNICODE_WCHAR_T)
+	const XMLString xmlString = toXMLString(str);
+	writeXML(xmlString);
+#else
 	_pTextConverter->write(str.data(), (int) str.size());
+#endif
 }
 
 
