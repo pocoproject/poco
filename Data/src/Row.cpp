@@ -398,4 +398,13 @@ const std::string& Row::namesToString() const
 }
 
 
+void Row::formatNames() const
+{
+	if (!_pNames)
+		throw NullPointerException();
+
+	return _pFormatter->formatNames(names());
+}
+
+
 } } // namespace Poco::Data

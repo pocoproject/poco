@@ -63,7 +63,7 @@ public:
 		setPostfix(os.str());
 	}
 
-	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) const
+	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames)
 	{
 		std::ostringstream str;
 
@@ -76,7 +76,7 @@ public:
 		return formattedNames = str.str();
 	}
 
-	std::string& formatValues(const ValueVec& vals, std::string& formattedValues) const
+	std::string& formatValues(const ValueVec& vals, std::string& formattedValues)
 	{
 		std::ostringstream str;
 

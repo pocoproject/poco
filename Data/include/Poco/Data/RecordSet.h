@@ -358,6 +358,9 @@ public:
 		/// Copies the column names to the target output stream.
 		/// Copied string is formatted by the current RowFormatter.
 
+	void formatNames() const;
+		/// Formats names using the current RowFormatter.
+
 	std::ostream& copyValues(std::ostream& os, 
 		std::size_t offset = 0, 
 		std::size_t length = RowIterator::POSITION_END) const;
@@ -368,6 +371,14 @@ public:
 		/// An invalid combination of offset/length arguments shall
 		/// cause RangeException to be thrown.
 		/// Copied string is formatted by the current RowFormatter.
+
+	void formatValues(std::size_t offset, std::size_t length) const;
+		/// Formats values using the current RowFormatter.
+		/// The data set to be formatted is starting at the specified offset 
+		/// from the recordset beginning. The number of rows to be copied
+		/// is specified by length argument.
+		/// An invalid combination of offset/length arguments shall
+		/// cause RangeException to be thrown.
 
 	std::ostream& copy(std::ostream& os,
 		std::size_t offset = 0,
@@ -619,6 +630,12 @@ inline RecordSet::Iterator RecordSet::end()
 inline const RowFilter* RecordSet::getFilter() const
 {
 	return _pFilter;
+}
+
+
+inline void RecordSet::formatNames() const
+{
+	(*_pBegin)->formatNames();
 }
 
 

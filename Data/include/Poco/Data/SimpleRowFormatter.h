@@ -73,10 +73,10 @@ public:
 	void swap(SimpleRowFormatter& other);
 		/// Swaps the row formatter with another one.
 
-	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames) const;
+	std::string& formatNames(const NameVecPtr pNames, std::string& formattedNames);
 		/// Formats the row field names.
 
-	std::string& formatValues(const ValueVec& vals, std::string& formattedValues) const;
+	std::string& formatValues(const ValueVec& vals, std::string& formattedValues);
 		/// Formats the row values.
 
 	int rowCount() const;
@@ -90,7 +90,7 @@ public:
 
 private:
 	std::streamsize _colWidth;
-	mutable int     _rowCount;
+	int             _rowCount;
 };
 
 

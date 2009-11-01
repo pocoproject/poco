@@ -329,15 +329,19 @@ std::ostream& RecordSet::copyNames(std::ostream& os) const
 
 std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::size_t length) const
 {
-	RowIterator itBegin = *_pBegin + offset;
-	RowIterator itEnd = (RowIterator::POSITION_END != length) ? itBegin + length : *_pEnd;
-	std::string val;
-	for (; itBegin != itEnd; ++itBegin)
-	{
-		val = itBegin->valuesToString();
-		if (!val.empty()) os << val;
-	}
+	RowIterator it = *_pBegin + offset;
+	RowIterator end = (RowIterator::POSITION_END != length) ? it + length : *_pEnd;
+	std::copy(it, end, std::ostream_iterator<Row>(os));
 	return os;
+}
+
+
+void RecordSet::formatValues(std::size_t offset, std::size_t length) const
+{
+	RowIterator it = *_pBegin + offset;
+	RowIterator end = (RowIterator::POSITION_END != length) ? it + length : *_pEnd;
+	std::string val;
+	for (; it != end; ++it) it->formatValues();
 }
 
 
@@ -345,10 +349,20 @@ std::ostream& RecordSet::copy(std::ostream& os, std::size_t offset, std::size_t 
 {
 	RowFormatter& rf = const_cast<RowFormatter&>((*_pBegin)->getFormatter());
 	rf.setTotalRowCount(getTotalRowCount());
-	os << rf.prefix();
-	copyNames(os);
-	copyValues(os, offset, length);
-	os << rf.postfix();
+	if (RowFormatter::FORMAT_PROGRESSIVE == rf.getMode())
+	{
+		os << rf.prefix();
+		copyNames(os);
+		copyValues(os, offset, length);
+		os << rf.postfix();
+	}
+	else
+	{
+		formatNames();
+		formatValues(offset, length);
+		os << rf.toString();
+	}
+
 	return os;
 }
 

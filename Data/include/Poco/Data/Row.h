@@ -195,10 +195,16 @@ public:
 		/// Resets the sorting criteria to field 0 only.
 
 	const std::string& namesToString() const;
-		/// Converts the row names to string.
+		/// Converts the column names to string.
+
+	void formatNames() const;
+		/// Fomats the column names.
 
 	const std::string& valuesToString() const;
-		/// Converts the row values to string.
+		/// Converts the row values to string and returns the formated string.
+
+	void formatValues() const;
+		/// Fomats the row values.
 
 	bool operator == (const Row& other) const;
 		/// Equality operator.
@@ -243,12 +249,12 @@ private:
 	bool isEqualSize(const Row& other) const;
 	bool isEqualType(const Row& other) const;
 
-	NameVecPtr           _pNames;
-	ValueVec             _values;
-	SortMapPtr           _pSortMap;
-	RowFormatterPtr      _pFormatter;
-	mutable std::string  _nameStr;
-	mutable std::string  _valueStr;
+	NameVecPtr              _pNames;
+	ValueVec                _values;
+	SortMapPtr              _pSortMap;
+	mutable RowFormatterPtr _pFormatter;
+	mutable std::string     _nameStr;
+	mutable std::string     _valueStr;
 };
 
 
@@ -316,6 +322,12 @@ inline const Row::SortMapPtr& Row::getSortMap() const
 inline const std::string& Row::valuesToString() const
 {
 	return _pFormatter->formatValues(values(), _valueStr);
+}
+
+
+inline void Row::formatValues() const
+{
+	return _pFormatter->formatValues(values());
 }
 
 

@@ -79,7 +79,7 @@ void SimpleRowFormatter::swap(SimpleRowFormatter& other)
 }
 
 
-std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::string& formattedNames) const
+std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::string& formattedNames)
 {
 	_rowCount = 0;
 
@@ -98,7 +98,7 @@ std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::strin
 }
 
 
-std::string& SimpleRowFormatter::formatValues(const ValueVec& vals, std::string& formattedValues) const
+std::string& SimpleRowFormatter::formatValues(const ValueVec& vals, std::string& formattedValues)
 {
 	std::ostringstream str;
 
