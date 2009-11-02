@@ -1,7 +1,7 @@
 //
 // MailMessageTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/MailMessageTest.h#1 $
+// $Id: //poco/1.3/Net/testsuite/src/MailMessageTest.h#2 $
 //
 // Definition of the MailMessageTest class.
 //
@@ -54,6 +54,7 @@ public:
 	void testReadQP();
 	void testRead8Bit();
 	void testReadMultiPart();
+	void testEncodeWord();
 
 	void setUp();
 	void tearDown();

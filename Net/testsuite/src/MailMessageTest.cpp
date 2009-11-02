@@ -1,7 +1,7 @@
 //
 // MailMessageTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/MailMessageTest.cpp#2 $
+// $Id: //poco/1.3/Net/testsuite/src/MailMessageTest.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -413,6 +413,28 @@ void MailMessageTest::testReadMultiPart()
 }
 
 
+void MailMessageTest::testEncodeWord()
+{
+	std::string plain("this is pure ASCII");
+	std::string encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
+	assert (encoded == plain);
+	
+	plain = "This text contains German Umlauts: \304\326";
+	encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
+	assert (encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6?=");
+	
+	plain = "This text contains German Umlauts: \304\326. "
+	        "It is also a very long text. Longer than 75 "
+	        "characters. Long enough to become three lines "
+	        "after being word-encoded.";
+	encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
+	assert (encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6=2E_It_?=\r\n"
+	                   " =?ISO-8859-1?q?is_also_a_very_long_text=2E_Longer_than_75_characters=2E_?=\r\n"
+	                   " =?ISO-8859-1?q?Long_enough_to_become_three_lines_after_being_word-encode?=\r\n"
+	                   " =?ISO-8859-1?q?d=2E?=");
+}
+
+
 void MailMessageTest::setUp()
 {
 }
@@ -435,6 +457,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadQP);
 	CppUnit_addTest(pSuite, MailMessageTest, testRead8Bit);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
+	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);
 
 	return pSuite;
 }

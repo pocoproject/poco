@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.3/Net/src/MailMessage.cpp#2 $
+// $Id: //poco/1.3/Net/src/MailMessage.cpp#4 $
 //
 // Library: Net
 // Package: Mail
@@ -49,6 +49,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
+#include "Poco/NumberFormatter.h"
 #include <sstream>
 #include <cctype>
 
@@ -458,7 +459,7 @@ const std::string& MailMessage::contentTransferEncodingToString(ContentTransferE
 	switch (encoding)
 	{
 	case ENCODING_7BIT:
-		return CTE_8BIT;
+		return CTE_7BIT;
 	case ENCODING_8BIT:
 		return CTE_8BIT;
 	case ENCODING_QUOTED_PRINTABLE:
@@ -498,6 +499,81 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 	rec.append(">");
 	if (lineLength(str) + rec.length() > 70) str.append("\r\n\t");
 	str.append(rec);
+}
+
+
+std::string MailMessage::encodeWord(const std::string& text, const std::string& charset)
+{
+	bool containsNonASCII = false;
+	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	{
+		if (static_cast<unsigned char>(*it) > 127)
+		{
+			containsNonASCII = true;
+			break;
+		}
+	}
+	if (!containsNonASCII) return text;
+	
+	std::string encodedText;
+	int lineLength = 0;
+	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	{
+		if (lineLength == 0)
+		{
+			encodedText += "=?";
+			encodedText += charset;
+			encodedText += "?q?";
+			lineLength += charset.length() + 5;
+		}
+		switch (*it)
+		{
+		case ' ':
+			encodedText += '_';
+			lineLength++;
+			break;
+		case '=':
+		case '?':
+		case '_':
+		case '(':
+		case ')':
+		case '[':
+		case ']':
+		case '<':
+		case '>':
+		case ',':
+		case ';':
+		case ':':
+		case '.':
+		case '@':
+			encodedText += '=';
+			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(*it)), 2);
+			lineLength += 3;
+			break;
+		default:
+			if (*it > 32 && *it < 127)
+			{
+				encodedText += *it;
+				lineLength++;
+			}
+			else
+			{
+				encodedText += '=';
+				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(*it)), 2);
+				lineLength += 3;
+			}
+		}
+		if ((lineLength >= 64 && (*it == ' ' || *it == '\t' || *it == '\r' || *it == '\n')) || lineLength >= 72)
+		{
+			encodedText += "?=\r\n ";
+			lineLength = 0;
+		}
+	}
+	if (lineLength > 0)
+	{
+		encodedText += "?=";
+	}	
+	return encodedText;
 }
 
 
