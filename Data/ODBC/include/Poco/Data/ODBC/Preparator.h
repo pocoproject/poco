@@ -126,162 +126,162 @@ public:
 	~Preparator();
 		/// Destroys the Preparator.
 
-	void prepare(std::size_t pos, Poco::Int8& val);
+	void prepare(std::size_t pos, const Poco::Int8& val);
 		/// Prepares an Int8.
 
-	void prepare(std::size_t pos, std::vector<Poco::Int8>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Int8>& val);
 		/// Prepares an Int8 vector.
 
-	void prepare(std::size_t pos, std::deque<Poco::Int8>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Int8>& val);
 		/// Prepares an Int8 deque.
 
-	void prepare(std::size_t pos, std::list<Poco::Int8>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Int8>& val);
 		/// Prepares an Int8 list.
 
-	void prepare(std::size_t pos, Poco::UInt8& val);
+	void prepare(std::size_t pos, const Poco::UInt8& val);
 		/// Prepares an UInt8.
 
-	void prepare(std::size_t pos, std::vector<Poco::UInt8>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::UInt8>& val);
 		/// Prepares an UInt8 vector.
 
-	void prepare(std::size_t pos, std::deque<Poco::UInt8>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::UInt8>& val);
 		/// Prepares an UInt8 deque.
 
-	void prepare(std::size_t pos, std::list<Poco::UInt8>& val);
+	void prepare(std::size_t pos, const std::list<Poco::UInt8>& val);
 		/// Prepares an UInt8 list.
 
-	void prepare(std::size_t pos, Poco::Int16& val);
+	void prepare(std::size_t pos, const Poco::Int16& val);
 		/// Prepares an Int16.
 
-	void prepare(std::size_t pos, std::vector<Poco::Int16>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Int16>& val);
 		/// Prepares an Int16 vector.
 
-	void prepare(std::size_t pos, std::deque<Poco::Int16>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Int16>& val);
 		/// Prepares an Int16 deque.
 
-	void prepare(std::size_t pos, std::list<Poco::Int16>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Int16>& val);
 		/// Prepares an Int16 list.
 
-	void prepare(std::size_t pos, Poco::UInt16& val);
+	void prepare(std::size_t pos, const Poco::UInt16& val);
 		/// Prepares an UInt16.
 
-	void prepare(std::size_t pos, std::vector<Poco::UInt16>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::UInt16>& val);
 		/// Prepares an UInt16 vector.
 
-	void prepare(std::size_t pos, std::deque<Poco::UInt16>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::UInt16>& val);
 		/// Prepares an UInt16 deque.
 
-	void prepare(std::size_t pos, std::list<Poco::UInt16>& val);
+	void prepare(std::size_t pos, const std::list<Poco::UInt16>& val);
 		/// Prepares an UInt16 list.
 
-	void prepare(std::size_t pos, Poco::Int32& val);
+	void prepare(std::size_t pos, const Poco::Int32& val);
 		/// Prepares an Int32.
 
-	void prepare(std::size_t pos, std::vector<Poco::Int32>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Int32>& val);
 		/// Prepares an Int32 vector.
 
-	void prepare(std::size_t pos, std::deque<Poco::Int32>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Int32>& val);
 		/// Prepares an Int32 deque.
 
-	void prepare(std::size_t pos, std::list<Poco::Int32>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Int32>& val);
 		/// Prepares an Int32 list.
 
-	void prepare(std::size_t pos, Poco::UInt32& val);
+	void prepare(std::size_t pos, const Poco::UInt32& val);
 		/// Prepares an UInt32.
 
-	void prepare(std::size_t pos, std::vector<Poco::UInt32>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::UInt32>& val);
 		/// Prepares an UInt32 vector.
 
-	void prepare(std::size_t pos, std::deque<Poco::UInt32>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::UInt32>& val);
 		/// Prepares an UInt32 deque.
 
-	void prepare(std::size_t pos, std::list<Poco::UInt32>& val);
+	void prepare(std::size_t pos, const std::list<Poco::UInt32>& val);
 		/// Prepares an UInt32 list.
 
-	void prepare(std::size_t pos, Poco::Int64& val);
+	void prepare(std::size_t pos, const Poco::Int64& val);
 		/// Prepares an Int64.
 
-	void prepare(std::size_t pos, std::vector<Poco::Int64>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Int64>& val);
 		/// Prepares an Int64 vector.
 
-	void prepare(std::size_t pos, std::deque<Poco::Int64>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Int64>& val);
 		/// Prepares an Int64 deque.
 
-	void prepare(std::size_t pos, std::list<Poco::Int64>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Int64>& val);
 		/// Prepares an Int64 list.
 
-	void prepare(std::size_t pos, Poco::UInt64& val);
+	void prepare(std::size_t pos, const Poco::UInt64& val);
 		/// Prepares an UInt64.
 
-	void prepare(std::size_t pos, std::vector<Poco::UInt64>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::UInt64>& val);
 		/// Prepares an UInt64 vector.
 
-	void prepare(std::size_t pos, std::deque<Poco::UInt64>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::UInt64>& val);
 		/// Prepares an UInt64 deque.
 
-	void prepare(std::size_t pos, std::list<Poco::UInt64>& val);
+	void prepare(std::size_t pos, const std::list<Poco::UInt64>& val);
 		/// Prepares an UInt64 list.
 
 #ifndef POCO_LONG_IS_64_BIT
-	void prepare(std::size_t pos, long& val);
+	void prepare(std::size_t pos, const long& val);
 		/// Prepares a long.
 
-	void prepare(std::size_t pos, std::vector<long>& val);
+	void prepare(std::size_t pos, const std::vector<long>& val);
 		/// Prepares a long vector.
 
-	void prepare(std::size_t pos, std::deque<long>& val);
+	void prepare(std::size_t pos, const std::deque<long>& val);
 		/// Prepares a long deque.
 
-	void prepare(std::size_t pos, std::list<long>& val);
+	void prepare(std::size_t pos, const std::list<long>& val);
 		/// Prepares a long list.
 #endif
 
-	void prepare(std::size_t pos, bool& val);
+	void prepare(std::size_t pos, const bool& val);
 		/// Prepares a boolean.
 
-	void prepare(std::size_t pos, std::vector<bool>& val);
+	void prepare(std::size_t pos, const std::vector<bool>& val);
 		/// Prepares a boolean vector.
 
-	void prepare(std::size_t pos, std::deque<bool>& val);
+	void prepare(std::size_t pos, const std::deque<bool>& val);
 		/// Prepares a boolean deque.
 
-	void prepare(std::size_t pos, std::list<bool>& val);
+	void prepare(std::size_t pos, const std::list<bool>& val);
 		/// Prepares a boolean list.
 
-	void prepare(std::size_t pos, float& val);
+	void prepare(std::size_t pos, const float& val);
 		/// Prepares a float.
 
-	void prepare(std::size_t pos, std::vector<float>& val);
+	void prepare(std::size_t pos, const std::vector<float>& val);
 		/// Prepares a float vector.
 
-	void prepare(std::size_t pos, std::deque<float>& val);
+	void prepare(std::size_t pos, const std::deque<float>& val);
 		/// Prepares a float deque.
 
-	void prepare(std::size_t pos, std::list<float>& val);
+	void prepare(std::size_t pos, const std::list<float>& val);
 		/// Prepares a float list.
 
-	void prepare(std::size_t pos, double& val);
+	void prepare(std::size_t pos, const double& val);
 		/// Prepares a double.
 
-	void prepare(std::size_t pos, std::vector<double>& val);
+	void prepare(std::size_t pos, const std::vector<double>& val);
 		/// Prepares a double vector.
 
-	void prepare(std::size_t pos, std::deque<double>& val);
+	void prepare(std::size_t pos, const std::deque<double>& val);
 		/// Prepares a double deque.
 
-	void prepare(std::size_t pos, std::list<double>& val);
+	void prepare(std::size_t pos, const std::list<double>& val);
 		/// Prepares a double list.
 
-	void prepare(std::size_t pos, char& val);
+	void prepare(std::size_t pos, const char& val);
 		/// Prepares a single character.
 
-	void prepare(std::size_t pos, std::vector<char>& val);
+	void prepare(std::size_t pos, const std::vector<char>& val);
 		/// Prepares a single character vector.
 
-	void prepare(std::size_t pos, std::deque<char>& val);
+	void prepare(std::size_t pos, const std::deque<char>& val);
 		/// Prepares a single character deque.
 
-	void prepare(std::size_t pos, std::list<char>& val);
+	void prepare(std::size_t pos, const std::list<char>& val);
 		/// Prepares a single character list.
 
 	void prepare(std::size_t pos, const std::string& val);
@@ -676,315 +676,315 @@ private:
 //
 // inlines
 //
-inline void Preparator::prepare(std::size_t pos, Poco::Int8&)
+inline void Preparator::prepare(std::size_t pos, const Poco::Int8&)
 {
 	prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<Poco::Int8>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Int8>& val)
 {
 	prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<Poco::Int8>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Int8>& val)
 {
 	prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<Poco::Int8>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Int8>& val)
 {
 	prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, Poco::UInt8&)
+inline void Preparator::prepare(std::size_t pos, const Poco::UInt8&)
 {
 	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<Poco::UInt8>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::UInt8>& val)
 {
 	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<Poco::UInt8>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::UInt8>& val)
 {
 	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<Poco::UInt8>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::UInt8>& val)
 {
 	prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, Poco::Int16&)
+inline void Preparator::prepare(std::size_t pos, const Poco::Int16&)
 {
 	prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<Poco::Int16>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Int16>& val)
 {
 	prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<Poco::Int16>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Int16>& val)
 {
 	prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<Poco::Int16>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Int16>& val)
 {
 	prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, Poco::UInt16&)
+inline void Preparator::prepare(std::size_t pos, const Poco::UInt16&)
 {
 	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<Poco::UInt16>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::UInt16>& val)
 {
 	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<Poco::UInt16>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::UInt16>& val)
 {
 	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<Poco::UInt16>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::UInt16>& val)
 {
 	prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, Poco::Int32&)
+inline void Preparator::prepare(std::size_t pos, const Poco::Int32&)
 {
 	prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<Poco::Int32>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Int32>& val)
 {
 	prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<Poco::Int32>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Int32>& val)
 {
 	prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<Poco::Int32>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Int32>& val)
 {
 	prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, Poco::UInt32&)
+inline void Preparator::prepare(std::size_t pos, const Poco::UInt32&)
 {
 	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<Poco::UInt32>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::UInt32>& val)
 {
 	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<Poco::UInt32>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::UInt32>& val)
 {
 	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<Poco::UInt32>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::UInt32>& val)
 {
 	prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, Poco::Int64&)
+inline void Preparator::prepare(std::size_t pos, const Poco::Int64&)
 {
 	prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<Poco::Int64>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Int64>& val)
 {
 	prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<Poco::Int64>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Int64>& val)
 {
 	prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<Poco::Int64>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Int64>& val)
 {
 	prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, Poco::UInt64&)
+inline void Preparator::prepare(std::size_t pos, const Poco::UInt64&)
 {
 	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<Poco::UInt64>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::UInt64>& val)
 {
 	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<Poco::UInt64>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::UInt64>& val)
 {
 	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<Poco::UInt64>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<Poco::UInt64>& val)
 {
 	prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, val.size());
 }
 
 
 #ifndef POCO_LONG_IS_64_BIT
-inline void Preparator::prepare(std::size_t pos, long&)
+inline void Preparator::prepare(std::size_t pos, const long&)
 {
 	prepareFixedSize<long>(pos, SQL_C_SLONG);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<long>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<long>& val)
 {
 	prepareFixedSize<long>(pos, SQL_C_SLONG, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<long>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<long>& val)
 {
 	prepareFixedSize<long>(pos, SQL_C_SLONG, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<long>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<long>& val)
 {
 	prepareFixedSize<long>(pos, SQL_C_SLONG, val.size());
 }
 #endif
 
 
-inline void Preparator::prepare(std::size_t pos, bool&)
+inline void Preparator::prepare(std::size_t pos, const bool&)
 {
 	prepareFixedSize<bool>(pos, SQL_C_BIT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<bool>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<bool>& val)
 {
 	prepareBoolArray(pos, SQL_C_BIT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<bool>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<bool>& val)
 {
 	prepareBoolArray(pos, SQL_C_BIT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<bool>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<bool>& val)
 {
 	prepareBoolArray(pos, SQL_C_BIT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, float&)
+inline void Preparator::prepare(std::size_t pos, const float&)
 {
 	prepareFixedSize<float>(pos, SQL_C_FLOAT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<float>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<float>& val)
 {
 	prepareFixedSize<float>(pos, SQL_C_FLOAT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<float>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<float>& val)
 {
 	prepareFixedSize<float>(pos, SQL_C_FLOAT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<float>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<float>& val)
 {
 	prepareFixedSize<float>(pos, SQL_C_FLOAT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, double&)
+inline void Preparator::prepare(std::size_t pos, const double&)
 {
 	prepareFixedSize<double>(pos, SQL_C_DOUBLE);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<double>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<double>& val)
 {
 	prepareFixedSize<double>(pos, SQL_C_DOUBLE, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<double>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<double>& val)
 {
 	prepareFixedSize<double>(pos, SQL_C_DOUBLE, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<double>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<double>& val)
 {
 	prepareFixedSize<double>(pos, SQL_C_DOUBLE, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, char&)
+inline void Preparator::prepare(std::size_t pos, const char&)
 {
 	prepareFixedSize<char>(pos, SQL_C_STINYINT);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::vector<char>& val)
+inline void Preparator::prepare(std::size_t pos, const std::vector<char>& val)
 {
 	prepareFixedSize<char>(pos, SQL_C_STINYINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::deque<char>& val)
+inline void Preparator::prepare(std::size_t pos, const std::deque<char>& val)
 {
 	prepareFixedSize<char>(pos, SQL_C_STINYINT, val.size());
 }
 
 
-inline void Preparator::prepare(std::size_t pos, std::list<char>& val)
+inline void Preparator::prepare(std::size_t pos, const std::list<char>& val)
 {
 	prepareFixedSize<char>(pos, SQL_C_STINYINT, val.size());
 }

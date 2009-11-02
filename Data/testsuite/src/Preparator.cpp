@@ -50,69 +50,69 @@ Preparator::~Preparator()
 }
 
 
-void Preparator::prepare(std::size_t pos, Poco::Int8&)
+void Preparator::prepare(std::size_t pos, const Poco::Int8&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, Poco::UInt8&)
+void Preparator::prepare(std::size_t pos, const Poco::UInt8&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, Poco::Int16&)
+void Preparator::prepare(std::size_t pos, const Poco::Int16&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, Poco::UInt16&)
+void Preparator::prepare(std::size_t pos, const Poco::UInt16&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, Poco::Int32&)
+void Preparator::prepare(std::size_t pos, const Poco::Int32&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, Poco::UInt32&)
+void Preparator::prepare(std::size_t pos, const Poco::UInt32&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, Poco::Int64&)
+void Preparator::prepare(std::size_t pos, const Poco::Int64&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, Poco::UInt64&)
+void Preparator::prepare(std::size_t pos, const Poco::UInt64&)
 {
 }
 
 
 #ifndef POCO_LONG_IS_64_BIT
-void Preparator::prepare(std::size_t pos, long&)
+void Preparator::prepare(std::size_t pos, const long&)
 {
 }
 #endif
 
 
-void Preparator::prepare(std::size_t pos, bool&)
+void Preparator::prepare(std::size_t pos, const bool&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, float&)
+void Preparator::prepare(std::size_t pos, const float&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, double&)
+void Preparator::prepare(std::size_t pos, const double&)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, char&)
+void Preparator::prepare(std::size_t pos, const char&)
 {
 }
 

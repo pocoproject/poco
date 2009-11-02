@@ -330,6 +330,37 @@ private:
 
 /// Poco::Tuple TypeHandler specializations
 
+// define this macro to nothing for smaller code size
+#define POCO_TUPLE_TYPE_HANDLER_INLINE inline
+
+
+template <typename TupleType, typename Type, int N>
+POCO_TUPLE_TYPE_HANDLER_INLINE
+void tupleBind(std::size_t& pos, TupleType tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
+{
+	pBinder->bind(pos, tuple.template get<N>(), dir);
+	pos += TypeHandler<Type>::size();
+}
+
+
+template <typename TupleType, typename Type, int N>
+POCO_TUPLE_TYPE_HANDLER_INLINE
+void tuplePrepare(std::size_t& pos, TupleType tuple, AbstractPreparator* pPreparator)
+{
+	pPreparator->prepare(pos, tuple.template get<N>());
+	pos += TypeHandler<Type>::size();
+}
+
+
+template <typename TupleType, typename DefValType, typename Type, int N>
+POCO_TUPLE_TYPE_HANDLER_INLINE
+void tupleExtract(std::size_t& pos, TupleType tuple, DefValType defVal, AbstractExtractor* pExt)
+{
+	if (!pExt->extract(pos, tuple.template get<N>()))
+			tuple.template set<N>(defVal.template get<N>());
+	pos += TypeHandler<Type>::size();
+}
+
 
 template <class T0, 
 	class T1, 
@@ -360,51 +391,51 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
-		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
-		TypeHandler<T13>::bind(pos++, tuple.template get<13>(), pBinder, dir);
-		TypeHandler<T14>::bind(pos++, tuple.template get<14>(), pBinder, dir);
-		TypeHandler<T15>::bind(pos++, tuple.template get<15>(), pBinder, dir);
-		TypeHandler<T16>::bind(pos++, tuple.template get<16>(), pBinder, dir);
-		TypeHandler<T17>::bind(pos++, tuple.template get<17>(), pBinder, dir);
-		TypeHandler<T18>::bind(pos++, tuple.template get<18>(), pBinder, dir);
-		TypeHandler<T19>::bind(pos++, tuple.template get<19>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T12, 12>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T13, 13>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T14, 14>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T15, 15>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T16, 16>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T17, 17>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T18, 18>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T19, 19>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
-		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPreparator);
-		TypeHandler<T17>::prepare(pos++, tuple.template get<17>(), pPreparator);
-		TypeHandler<T18>::prepare(pos++, tuple.template get<18>(), pPreparator);
-		TypeHandler<T19>::prepare(pos++, tuple.template get<19>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T14, 14>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T15, 15>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T16, 16>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T17, 17>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T18, 18>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T19, 19>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -415,26 +446,26 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
-		TypeHandler<T12>::extract(pos++, tuple.template get<12>(), defVal.template get<12>(), pExt);
-		TypeHandler<T13>::extract(pos++, tuple.template get<13>(), defVal.template get<13>(), pExt);
-		TypeHandler<T14>::extract(pos++, tuple.template get<14>(), defVal.template get<14>(), pExt);
-		TypeHandler<T15>::extract(pos++, tuple.template get<15>(), defVal.template get<15>(), pExt);
-		TypeHandler<T16>::extract(pos++, tuple.template get<16>(), defVal.template get<16>(), pExt);
-		TypeHandler<T17>::extract(pos++, tuple.template get<17>(), defVal.template get<17>(), pExt);
-		TypeHandler<T18>::extract(pos++, tuple.template get<18>(), defVal.template get<18>(), pExt);
-		TypeHandler<T19>::extract(pos++, tuple.template get<19>(), defVal.template get<19>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T12, 12>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T13, 13>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T14, 14>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T15, 15>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T16, 16>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T17, 17>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T18, 18>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T19, 19>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -471,49 +502,49 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
-		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
-		TypeHandler<T13>::bind(pos++, tuple.template get<13>(), pBinder, dir);
-		TypeHandler<T14>::bind(pos++, tuple.template get<14>(), pBinder, dir);
-		TypeHandler<T15>::bind(pos++, tuple.template get<15>(), pBinder, dir);
-		TypeHandler<T16>::bind(pos++, tuple.template get<16>(), pBinder, dir);
-		TypeHandler<T17>::bind(pos++, tuple.template get<17>(), pBinder, dir);
-		TypeHandler<T18>::bind(pos++, tuple.template get<18>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T12, 12>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T13, 13>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T14, 14>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T15, 15>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T16, 16>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T17, 17>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T18, 18>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
-		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPreparator);
-		TypeHandler<T17>::prepare(pos++, tuple.template get<17>(), pPreparator);
-		TypeHandler<T18>::prepare(pos++, tuple.template get<18>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T14, 14>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T15, 15>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T16, 16>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T17, 17>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T18, 18>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -524,25 +555,25 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
-		TypeHandler<T12>::extract(pos++, tuple.template get<12>(), defVal.template get<12>(), pExt);
-		TypeHandler<T13>::extract(pos++, tuple.template get<13>(), defVal.template get<13>(), pExt);
-		TypeHandler<T14>::extract(pos++, tuple.template get<14>(), defVal.template get<14>(), pExt);
-		TypeHandler<T15>::extract(pos++, tuple.template get<15>(), defVal.template get<15>(), pExt);
-		TypeHandler<T16>::extract(pos++, tuple.template get<16>(), defVal.template get<16>(), pExt);
-		TypeHandler<T17>::extract(pos++, tuple.template get<17>(), defVal.template get<17>(), pExt);
-		TypeHandler<T18>::extract(pos++, tuple.template get<18>(), defVal.template get<18>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T12, 12>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T13, 13>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T14, 14>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T15, 15>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T16, 16>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T17, 17>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T18, 18>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -578,24 +609,24 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
-		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
-		TypeHandler<T13>::bind(pos++, tuple.template get<13>(), pBinder, dir);
-		TypeHandler<T14>::bind(pos++, tuple.template get<14>(), pBinder, dir);
-		TypeHandler<T15>::bind(pos++, tuple.template get<15>(), pBinder, dir);
-		TypeHandler<T16>::bind(pos++, tuple.template get<16>(), pBinder, dir);
-		TypeHandler<T17>::bind(pos++, tuple.template get<17>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T12, 12>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T13, 13>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T14, 14>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T15, 15>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T16, 16>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T17, 17>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
@@ -629,24 +660,24 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
-		TypeHandler<T12>::extract(pos++, tuple.template get<12>(), defVal.template get<12>(), pExt);
-		TypeHandler<T13>::extract(pos++, tuple.template get<13>(), defVal.template get<13>(), pExt);
-		TypeHandler<T14>::extract(pos++, tuple.template get<14>(), defVal.template get<14>(), pExt);
-		TypeHandler<T15>::extract(pos++, tuple.template get<15>(), defVal.template get<15>(), pExt);
-		TypeHandler<T16>::extract(pos++, tuple.template get<16>(), defVal.template get<16>(), pExt);
-		TypeHandler<T17>::extract(pos++, tuple.template get<17>(), defVal.template get<17>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T12, 12>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T13, 13>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T14, 14>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T15, 15>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T16, 16>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T17, 17>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -681,45 +712,45 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
-		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
-		TypeHandler<T13>::bind(pos++, tuple.template get<13>(), pBinder, dir);
-		TypeHandler<T14>::bind(pos++, tuple.template get<14>(), pBinder, dir);
-		TypeHandler<T15>::bind(pos++, tuple.template get<15>(), pBinder, dir);
-		TypeHandler<T16>::bind(pos++, tuple.template get<16>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T12, 12>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T13, 13>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T14, 14>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T15, 15>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T16, 16>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
-		TypeHandler<T16>::prepare(pos++, tuple.template get<16>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T14, 14>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T15, 15>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T16, 16>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -730,23 +761,23 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
-		TypeHandler<T12>::extract(pos++, tuple.template get<12>(), defVal.template get<12>(), pExt);
-		TypeHandler<T13>::extract(pos++, tuple.template get<13>(), defVal.template get<13>(), pExt);
-		TypeHandler<T14>::extract(pos++, tuple.template get<14>(), defVal.template get<14>(), pExt);
-		TypeHandler<T15>::extract(pos++, tuple.template get<15>(), defVal.template get<15>(), pExt);
-		TypeHandler<T16>::extract(pos++, tuple.template get<16>(), defVal.template get<16>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T12, 12>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T13, 13>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T14, 14>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T15, 15>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T16, 16>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -780,43 +811,43 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
-		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
-		TypeHandler<T13>::bind(pos++, tuple.template get<13>(), pBinder, dir);
-		TypeHandler<T14>::bind(pos++, tuple.template get<14>(), pBinder, dir);
-		TypeHandler<T15>::bind(pos++, tuple.template get<15>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T12, 12>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T13, 13>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T14, 14>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T15, 15>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
-		TypeHandler<T14>::prepare(pos++, tuple.template get<14>(), pPreparator);
-		TypeHandler<T15>::prepare(pos++, tuple.template get<15>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T14, 14>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T15, 15>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -827,22 +858,22 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
-		TypeHandler<T12>::extract(pos++, tuple.template get<12>(), defVal.template get<12>(), pExt);
-		TypeHandler<T13>::extract(pos++, tuple.template get<13>(), defVal.template get<13>(), pExt);
-		TypeHandler<T14>::extract(pos++, tuple.template get<14>(), defVal.template get<14>(), pExt);
-		TypeHandler<T15>::extract(pos++, tuple.template get<15>(), defVal.template get<15>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T12, 12>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T13, 13>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T14, 14>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T15, 15>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -875,21 +906,21 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
-		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
-		TypeHandler<T13>::bind(pos++, tuple.template get<13>(), pBinder, dir);
-		TypeHandler<T14>::bind(pos++, tuple.template get<14>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T12, 12>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T13, 13>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T14, 14>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
@@ -920,21 +951,21 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
-		TypeHandler<T12>::extract(pos++, tuple.template get<12>(), defVal.template get<12>(), pExt);
-		TypeHandler<T13>::extract(pos++, tuple.template get<13>(), defVal.template get<13>(), pExt);
-		TypeHandler<T14>::extract(pos++, tuple.template get<14>(), defVal.template get<14>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T12, 12>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T13, 13>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T14, 14>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -966,39 +997,39 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
-		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
-		TypeHandler<T13>::bind(pos++, tuple.template get<13>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T12, 12>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T13, 13>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
-		TypeHandler<T13>::prepare(pos++, tuple.template get<13>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1009,20 +1040,20 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
-		TypeHandler<T12>::extract(pos++, tuple.template get<12>(), defVal.template get<12>(), pExt);
-		TypeHandler<T13>::extract(pos++, tuple.template get<13>(), defVal.template get<13>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T12, 12>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T13, 13>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1053,37 +1084,37 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
-		TypeHandler<T12>::bind(pos++, tuple.template get<12>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T12, 12>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
-		TypeHandler<T12>::prepare(pos++, tuple.template get<12>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1094,19 +1125,19 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
-		TypeHandler<T12>::extract(pos++, tuple.template get<12>(), defVal.template get<12>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T12, 12>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1136,35 +1167,35 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
-		TypeHandler<T11>::bind(pos++, tuple.template get<11>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T11, 11>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
-		TypeHandler<T11>::prepare(pos++, tuple.template get<11>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1175,18 +1206,18 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
-		TypeHandler<T11>::extract(pos++, tuple.template get<11>(), defVal.template get<11>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T11, 11>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1215,33 +1246,33 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
-		TypeHandler<T10>::bind(pos++, tuple.template get<10>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T10, 10>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
-		TypeHandler<T10>::prepare(pos++, tuple.template get<10>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1252,17 +1283,17 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
-		TypeHandler<T10>::extract(pos++, tuple.template get<10>(), defVal.template get<10>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T10, 10>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1281,31 +1312,31 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
-		TypeHandler<T9>::bind(pos++, tuple.template get<9>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T9, 9>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
-		TypeHandler<T9>::prepare(pos++, tuple.template get<9>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1316,16 +1347,16 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
-		TypeHandler<T9>::extract(pos++, tuple.template get<9>(), defVal.template get<9>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T9, 9>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1344,29 +1375,29 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
-		TypeHandler<T8>::bind(pos++, tuple.template get<8>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T8, 8>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
-		TypeHandler<T8>::prepare(pos++, tuple.template get<8>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1377,15 +1408,15 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
-		TypeHandler<T8>::extract(pos++, tuple.template get<8>(), defVal.template get<8>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T8, 8>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1403,27 +1434,28 @@ public:
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
-		TypeHandler<T7>::bind(pos++, tuple.template get<7>(), pBinder, dir);
+		poco_assert (pBinder != 0);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T7, 7>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
-		TypeHandler<T7>::prepare(pos++, tuple.template get<7>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1434,14 +1466,14 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
-		TypeHandler<T7>::extract(pos++, tuple.template get<7>(), defVal.template get<7>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T7, 7>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1460,25 +1492,25 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
-		TypeHandler<T6>::bind(pos++, tuple.template get<6>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T6, 6>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
-		TypeHandler<T6>::prepare(pos++, tuple.template get<6>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1489,13 +1521,13 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
-		TypeHandler<T6>::extract(pos++, tuple.template get<6>(), defVal.template get<6>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T6, 6>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1514,23 +1546,23 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
-		TypeHandler<T5>::bind(pos++, tuple.template get<5>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T5, 5>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
-		TypeHandler<T5>::prepare(pos++, tuple.template get<5>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1541,12 +1573,12 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
-		TypeHandler<T5>::extract(pos++, tuple.template get<5>(), defVal.template get<5>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T5, 5>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1565,21 +1597,21 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
-		TypeHandler<T4>::bind(pos++, tuple.template get<4>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T4, 4>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
-		TypeHandler<T4>::prepare(pos++, tuple.template get<4>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1590,11 +1622,11 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
-		TypeHandler<T4>::extract(pos++, tuple.template get<4>(), defVal.template get<4>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T4, 4>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1613,19 +1645,19 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
-		TypeHandler<T3>::bind(pos++, tuple.template get<3>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T3, 3>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
-		TypeHandler<T3>::prepare(pos++, tuple.template get<3>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1636,10 +1668,10 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
-		TypeHandler<T3>::extract(pos++, tuple.template get<3>(), defVal.template get<3>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T3, 3>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1658,17 +1690,17 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
-		TypeHandler<T2>::bind(pos++, tuple.template get<2>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T2, 2>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
-		TypeHandler<T2>::prepare(pos++, tuple.template get<2>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1679,9 +1711,9 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
-		TypeHandler<T2>::extract(pos++, tuple.template get<2>(), defVal.template get<2>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T2, 2>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1700,15 +1732,15 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
-		TypeHandler<T1>::bind(pos++, tuple.template get<1>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T1, 1>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
-		TypeHandler<T1>::prepare(pos++, tuple.template get<1>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1719,8 +1751,8 @@ public:
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
-		TypeHandler<T1>::extract(pos++, tuple.template get<1>(), defVal.template get<1>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T1, 1>(pos, tuple, defVal, pExt);
 	}
 
 private:
@@ -1739,13 +1771,13 @@ public:
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert (pBinder != 0);
-		TypeHandler<T0>::bind(pos++, tuple.template get<0>(), pBinder, dir);
+		tupleBind<TupleConstRef, T0, 0>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		TypeHandler<T0>::prepare(pos++, tuple.template get<0>(), pPreparator);
+		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -1757,7 +1789,7 @@ public:
 		AbstractExtractor* pExt)
 	{
 		poco_assert (pExt != 0);
-		TypeHandler<T0>::extract(pos++, tuple.template get<0>(), defVal.template get<0>(), pExt);
+		tupleExtract<TupleRef, TupleConstRef, T0, 0>(pos, tuple, defVal, pExt);
 	}
 
 private:

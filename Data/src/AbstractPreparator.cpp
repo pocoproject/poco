@@ -53,237 +53,237 @@ AbstractPreparator::~AbstractPreparator()
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<Poco::Int8>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::Int8>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<Poco::Int8>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<Poco::Int8>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<Poco::Int8>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::Int8>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<Poco::UInt8>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::UInt8>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<Poco::UInt8>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<Poco::UInt8>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<Poco::UInt8>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::UInt8>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<Poco::Int16>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::Int16>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<Poco::Int16>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<Poco::Int16>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<Poco::Int16>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::Int16>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<Poco::UInt16>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::UInt16>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<Poco::UInt16>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<Poco::UInt16>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<Poco::UInt16>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::UInt16>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<Poco::Int32>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::Int32>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<Poco::Int32>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<Poco::Int32>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<Poco::Int32>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::Int32>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<Poco::UInt32>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::UInt32>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<Poco::UInt32>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<Poco::UInt32>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<Poco::UInt32>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::UInt32>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<Poco::Int64>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::Int64>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<Poco::Int64>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<Poco::Int64>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<Poco::Int64>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::Int64>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<Poco::UInt64>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<Poco::UInt64>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<Poco::UInt64>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<Poco::UInt64>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<Poco::UInt64>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::UInt64>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
 #ifndef POCO_LONG_IS_64_BIT
-void AbstractPreparator::prepare(std::size_t pos, std::vector<long>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<long>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<long>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<long>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<long>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<long>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 #endif
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<bool>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<bool>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<bool>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<bool>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<bool>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<bool>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<float>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<float>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<float>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<float>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<float>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<float>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<double>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<double>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<double>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<double>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<double>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<double>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::vector<char>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<char>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::deque<char>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<char>& val)
 {
 	throw NotImplementedException("std::deque preparator must be implemented.");
 }
 
 
-void AbstractPreparator::prepare(std::size_t pos, std::list<char>& val)
+void AbstractPreparator::prepare(std::size_t pos, const std::list<char>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
