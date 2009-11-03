@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#8 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#9 $
 //
 // Library: Net
 // Package: Sockets
@@ -621,7 +621,7 @@ void SocketImpl::setNoDelay(bool flag)
 
 bool SocketImpl::getNoDelay()
 {
-	int value;
+	int value(0);
 	getOption(IPPROTO_TCP, TCP_NODELAY, value);
 	return value != 0;
 }
@@ -636,7 +636,7 @@ void SocketImpl::setKeepAlive(bool flag)
 
 bool SocketImpl::getKeepAlive()
 {
-	int value;
+	int value(0);
 	getOption(SOL_SOCKET, SO_KEEPALIVE, value);
 	return value != 0;
 }
@@ -651,7 +651,7 @@ void SocketImpl::setReuseAddress(bool flag)
 
 bool SocketImpl::getReuseAddress()
 {
-	int value;
+	int value(0);
 	getOption(SOL_SOCKET, SO_REUSEADDR, value);
 	return value != 0;
 }
@@ -678,7 +678,7 @@ void SocketImpl::setReusePort(bool flag)
 bool SocketImpl::getReusePort()
 {
 #ifdef SO_REUSEPORT
-	int value;
+	int value(0);
 	getOption(SOL_SOCKET, SO_REUSEPORT, value);
 	return value != 0;
 #else
@@ -696,7 +696,7 @@ void SocketImpl::setOOBInline(bool flag)
 
 bool SocketImpl::getOOBInline()
 {
-	int value;
+	int value(0);
 	getOption(SOL_SOCKET, SO_OOBINLINE, value);
 	return value != 0;
 }
@@ -711,7 +711,7 @@ void SocketImpl::setBroadcast(bool flag)
 	
 bool SocketImpl::getBroadcast()
 {
-	int value;
+	int value(0);
 	getOption(SOL_SOCKET, SO_BROADCAST, value);
 	return value != 0;
 }
@@ -727,7 +727,7 @@ void SocketImpl::setBlocking(bool flag)
 
 int SocketImpl::socketError()
 {
-	int result;
+	int result(0);
 	getOption(SOL_SOCKET, SO_ERROR, result);
 	return result;
 }
