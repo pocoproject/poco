@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#11 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#12 $
 //
 // Library: Util
 // Package: Application
@@ -402,7 +402,10 @@ void ServerApplication::waitForTerminationRequest()
 {
 	sigset_t sset;
 	sigemptyset(&sset);
-	sigaddset(&sset, SIGINT);
+	if (!std::getenv("POCO_ENABLE_DEBUGGER"))
+	{
+		sigaddset(&sset, SIGINT);
+	}
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
 	sigprocmask(SIG_BLOCK, &sset, NULL);
