@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.3/Net/src/IPAddress.cpp#10 $
+// $Id: //poco/1.3/Net/src/IPAddress.cpp#11 $
 //
 // Library: Net
 // Package: NetCore
@@ -453,10 +453,23 @@ public:
 		else return 0;
 #else
 		struct in6_addr ia;
-		if (inet_pton(AF_INET6, addr.c_str(), &ia) == 1)
-			return new IPv6AddressImpl(&ia);
+		std::string::size_type idx = addr.find('%');
+		if (std::string::npos != idx)
+		{
+			std::string::size_type start = ('[' == addr[0]) ? 1 : 0;
+			std::string myAddr(addr, start, idx - start);
+			if (inet_pton(AF_INET6, myAddr.c_str(), &ia) == 1)
+				return new IPv6AddressImpl(&ia);
+			else
+				return 0;
+		}
 		else
-			return 0;
+		{
+			if (inet_pton(AF_INET6, addr.c_str(), &ia) == 1)
+				return new IPv6AddressImpl(&ia);
+			else
+				return 0;
+		}
 #endif
 	}
 	

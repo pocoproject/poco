@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#13 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#14 $
 //
 // Library: Foundation
 // Package: Threading
@@ -45,7 +45,9 @@
 #		define __EXTENSIONS__
 #	endif
 #endif
-
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
+#	include <time.h>
+#endif
 
 //
 // Block SIGPIPE in main thread.
@@ -269,6 +271,28 @@ void ThreadImpl::sleepImpl(long milliseconds)
 		interval.tv_sec  = milliseconds / 1000;
 		interval.tv_nsec = (milliseconds % 1000)*1000000; 
 		pthread_delay_np(&interval);
+#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
+	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
+	int rc;
+	do
+	{
+		struct timespec ts;
+		ts.tv_sec  = (long) remainingTime.totalSeconds();
+		ts.tv_nsec = (long) remainingTime.useconds()*1000;
+		Poco::Timestamp start;
+		rc = ::nanosleep(&ts, 0);
+		if (rc < 0 && errno == EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = start.elapsed();
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (remainingTime > 0 && rc < 0 && errno == EINTR);
+	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): nanosleep() failed");
 #else 
 	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
 	int rc;

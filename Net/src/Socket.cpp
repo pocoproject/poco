@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.3/Net/src/Socket.cpp#4 $
+// $Id: //poco/1.3/Net/src/Socket.cpp#5 $
 //
 // Library: Net
 // Package: Sockets
@@ -94,23 +94,35 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	FD_ZERO(&fdRead);
 	for (SocketList::const_iterator it = readList.begin(); it != readList.end(); ++it)
 	{
-		if (int(it->sockfd()) > nfd)
-			nfd = int(it->sockfd());
-		FD_SET(it->sockfd(), &fdRead);
+		poco_socket_t fd = it->sockfd();
+		if (fd != POCO_INVALID_SOCKET)
+		{
+			if (int(fd) > nfd)
+				nfd = int(fd);
+			FD_SET(fd, &fdRead);
+		}
 	}
 	FD_ZERO(&fdWrite);
 	for (SocketList::const_iterator it = writeList.begin(); it != writeList.end(); ++it)
 	{
-		if (int(it->sockfd()) > nfd)
-			nfd = int(it->sockfd());
-		FD_SET(it->sockfd(), &fdWrite);
+		poco_socket_t fd = it->sockfd();
+		if (fd != POCO_INVALID_SOCKET)
+		{
+			if (int(fd) > nfd)
+				nfd = int(fd);
+			FD_SET(fd, &fdWrite);
+		}
 	}
 	FD_ZERO(&fdExcept);
 	for (SocketList::const_iterator it = exceptList.begin(); it != exceptList.end(); ++it)
 	{
-		if (int(it->sockfd()) > nfd)
-			nfd = int(it->sockfd());
-		FD_SET(it->sockfd(), &fdExcept);
+		poco_socket_t fd = it->sockfd();
+		if (fd != POCO_INVALID_SOCKET)
+		{
+			if (int(fd) > nfd)
+				nfd = int(fd);
+			FD_SET(fd, &fdExcept);
+		}
 	}
 	if (nfd == 0) return 0;
 	Poco::Timespan remainingTime(timeout);
@@ -138,22 +150,34 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	SocketList readyReadList;
 	for (SocketList::const_iterator it = readList.begin(); it != readList.end(); ++it)
 	{
-		if (FD_ISSET(it->sockfd(), &fdRead))
-			readyReadList.push_back(*it);
+		poco_socket_t fd = it->sockfd();
+		if (fd != POCO_INVALID_SOCKET)
+		{
+			if (FD_ISSET(fd, &fdRead))
+				readyReadList.push_back(*it);
+		}
 	}
 	std::swap(readList, readyReadList);
 	SocketList readyWriteList;
 	for (SocketList::const_iterator it = writeList.begin(); it != writeList.end(); ++it)
 	{
-		if (FD_ISSET(it->sockfd(), &fdWrite))
-			readyWriteList.push_back(*it);
+		poco_socket_t fd = it->sockfd();
+		if (fd != POCO_INVALID_SOCKET)
+		{
+			if (FD_ISSET(fd, &fdWrite))
+				readyWriteList.push_back(*it);
+		}
 	}
 	std::swap(writeList, readyWriteList);
 	SocketList readyExceptList;
 	for (SocketList::const_iterator it = exceptList.begin(); it != exceptList.end(); ++it)
 	{
-		if (FD_ISSET(it->sockfd(), &fdExcept))
-			readyExceptList.push_back(*it);
+		poco_socket_t fd = it->sockfd();
+		if (fd != POCO_INVALID_SOCKET)
+		{
+			if (FD_ISSET(fd, &fdExcept))
+				readyExceptList.push_back(*it);
+		}
 	}
 	std::swap(exceptList, readyExceptList);	
 	return rc; 

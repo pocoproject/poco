@@ -1,7 +1,7 @@
 //
 // BinaryWriter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/BinaryWriter.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/BinaryWriter.cpp#5 $
 //
 // Library: Foundation
 // Package: Streams
@@ -308,6 +308,12 @@ void BinaryWriter::write7BitEncoded(UInt64 value)
 void BinaryWriter::writeRaw(const std::string& rawData)
 {
 	_ostr.write(rawData.data(), (std::streamsize) rawData.length());
+}
+
+
+void BinaryWriter::writeRaw(const char* buffer, std::streamsize length)
+{
+	_ostr.write(buffer, length);
 }
 
 

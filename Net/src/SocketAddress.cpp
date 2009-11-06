@@ -1,7 +1,7 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketAddress.cpp#3 $
+// $Id: //poco/1.3/Net/src/SocketAddress.cpp#4 $
 //
 // Library: Net
 // Package: NetCore
@@ -354,6 +354,21 @@ void SocketAddress::init(const std::string& host, Poco::UInt16 port)
 	if (IPAddress::tryParse(host, ip))
 	{
 		init(ip, port);
+
+		std::string::size_type pos = host.rfind('%');
+		if (std::string::npos != pos)
+		{
+			std::string scope(host, pos + 1);
+		#ifdef _WIN32
+			((sockaddr_in6*)addr())->sin6_scope_id = atoi(scope.c_str());
+		#else
+			if (']' == scope[scope.length() - 1])
+			{
+				scope.resize(scope.length() - 1);
+			}
+			((sockaddr_in6*)addr())->sin6_scope_id = if_nametoindex(scope.c_str());
+		#endif
+		}
 	}
 	else
 	{

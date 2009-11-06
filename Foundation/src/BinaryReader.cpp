@@ -1,7 +1,7 @@
 //
 // BinaryReader.cpp
 //
-// $Id: //poco/1.3/Foundation/src/BinaryReader.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/BinaryReader.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -255,7 +255,7 @@ void BinaryReader::read7BitEncoded(UInt64& value)
 #endif
 
 
-void BinaryReader::readRaw(int length, std::string& value)
+void BinaryReader::readRaw(std::streamsize length, std::string& value)
 {
 	value.clear();
 	value.reserve(length);
@@ -265,6 +265,12 @@ void BinaryReader::readRaw(int length, std::string& value)
 		_istr.read(&c, 1);
 		value += c;
 	}
+}
+
+
+void BinaryReader::readRaw(char* buffer, std::streamsize length)
+{
+	_istr.read(buffer, length);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#10 $
+// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#11 $
 //
 // Library: Net
 // Package: Sockets
@@ -12,7 +12,7 @@
 //
 // Permission is hereby granted, free of charge, to any person or organization
 // obtaining a copy of the software and accompanying documentation covered by
-// this license (the "Software") to use, reproduce, display, distribute,
+// this license (the "Software") to use, reproduce, display, distribute ,
 // execute, and transmit the Software, and to prepare derivative works of the
 // Software, and to permit third-parties to whom the Software is furnished to
 // do so, all subject to the following:
@@ -292,7 +292,6 @@ bool NetworkInterface::supportsIPv6() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-#if defined(_WIN32)
 	NetworkInterfaceList ifs = list();
 	for (NetworkInterfaceList::const_iterator it = ifs.begin(); it != ifs.end(); ++it)
 	{
@@ -300,31 +299,6 @@ NetworkInterface NetworkInterface::forName(const std::string& name, bool require
 			return *it;
 	}
 	throw InterfaceNotFoundException(name);
-#else
-	FastMutex::ScopedLock lock(_mutex);
-
-	struct ifreq ifr;
-	std::strncpy(ifr.ifr_name, name.c_str(), IFNAMSIZ);
-	DatagramSocket ds(requireIPv6 ? IPAddress::IPv6 : IPAddress::IPv4);
-	ds.impl()->ioctl(SIOCGIFADDR, &ifr);
-	IPAddress addr;
-#if defined(POCO_HAVE_IPv6)
-	if (ifr.ifr_addr.sa_family == AF_INET)
-		addr = IPAddress(&reinterpret_cast<const struct sockaddr_in*>(&ifr.ifr_addr)->sin_addr, sizeof(struct in_addr));
-	else if (ifr.ifr_addr.sa_family == AF_INET6)
-		addr = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(&ifr.ifr_addr)->sin6_addr, sizeof(struct in6_addr));
-	else
-		throw InterfaceNotFoundException(addr.toString(), "interface has no IP address");
-	int index = if_nametoindex(name.c_str());
-#else
-	if (ifr.ifr_addr.sa_family == AF_INET)
-		addr = IPAddress(&reinterpret_cast<const struct sockaddr_in*>(&ifr.ifr_addr)->sin_addr, sizeof(struct in_addr));
-	else
-		throw InterfaceNotFoundException(addr.toString(), "interface has no IP address");
-	int index = 0;
-#endif
-	return NetworkInterface(name, name, addr, index);
-#endif
 }
 
 	

@@ -1,7 +1,7 @@
 //
 // LocalDateTime.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/LocalDateTime.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/LocalDateTime.h#4 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -79,7 +79,7 @@ public:
 		/// for the current time zone.
 
 	LocalDateTime(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
-		/// Creates a DateTime for the given Gregorian local date and time.
+		/// Creates a LocalDateTime for the given Gregorian local date and time.
 		///   * year is from 0 to 9999.
 		///   * month is from 1 to 12.
 		///   * day is from 1 to 31.
@@ -91,7 +91,7 @@ public:
 
 	//@ deprecated
 	LocalDateTime(int tzd, int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond);
-		/// Creates a DateTime for the given Gregorian date and time in the
+		/// Creates a LocalDateTime for the given Gregorian date and time in the
 		/// time zone denoted by the time zone differential in tzd.
 		///   * tzd is in seconds.
 		///   * year is from 0 to 9999.

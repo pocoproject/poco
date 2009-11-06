@@ -69,6 +69,12 @@ Release 1.3.6 (2009-11-xx)
 - fixed an issue with retrieving the value of socket options on Windows 7. 
   Before obtaining the value of a socket, we now initialize the variable receiving the 
   socket option value to zero.
+- fixed SF# 2836141: Documentation errors
+- fixed SF# 2864232: Socket::select() does not detect closed sockets on windows
+- fixed SF# 2812143: Socket::select() should check socket descriptors...
+- fixed SF# 2801750: NetworkInterface <iface-Obj>forName returns wrong subnetMask
+- fixed SF# 2816315: Problem with POSIX Thread::sleepImpl
+- fixed SF# 2795646: IPv6 address parsing bug
 
 
 Release 1.3.5 (2009-05-11)
@@ -1115,4 +1121,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#54 $
+$Id: //poco/1.3/dist/CHANGELOG#55 $
