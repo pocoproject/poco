@@ -11,7 +11,7 @@ Release 1.3.6 (2009-11-xx)
 - fixed SF# 2804457: DateTime::checkLimit looks wrong
 - fixed SF# 2804546: DateTimeParser requires explicit RFC1123 format
 - added ReleaseArrayPolicy to Poco::SharedPtr
-- upgraded to SQLite 3.6.15
+- upgraded to SQLite 3.6.20
 - fixed SF# 2782709: Missing semicolons in "Logger.h" convenience
 - fixed SF# 2526407: DefaultStrategy.h ++it instead of it++ in a loop
 - fixed SF# 2502235: Poco STLPort patch
@@ -1125,4 +1125,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#56 $
+$Id: //poco/1.3/dist/CHANGELOG#57 $
