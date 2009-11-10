@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#16 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#17 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -79,11 +79,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 
 SecureSocketImpl::~SecureSocketImpl()
 {
-	close();
-	if (_pSSL)
-	{
-		SSL_free(_pSSL);
-	}
+	reset();
 }
 
 	
@@ -121,6 +117,8 @@ void SecureSocketImpl::acceptSSL()
 
 void SecureSocketImpl::connect(const SocketAddress& address, bool performHandshake)
 {
+	if (_pSSL) reset();
+	
 	poco_assert (!_pSSL);
 
 	_pSocket->connect(address);
@@ -130,6 +128,8 @@ void SecureSocketImpl::connect(const SocketAddress& address, bool performHandsha
 
 void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout, bool performHandshake)
 {
+	if (_pSSL) reset();
+	
 	poco_assert (!_pSSL);
 
 	_pSocket->connect(address, timeout);
@@ -139,6 +139,8 @@ void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespa
 
 void SecureSocketImpl::connectNB(const SocketAddress& address)
 {
+	if (_pSSL) reset();
+	
 	poco_assert (!_pSSL);
 
 	_pSocket->connectNB(address);
@@ -407,6 +409,17 @@ int SecureSocketImpl::handleError(int rc)
 void SecureSocketImpl::setPeerHostName(const std::string& peerHostName)
 {
 	_peerHostName = peerHostName;
+}
+
+
+void SecureSocketImpl::reset()
+{
+	close();
+	if (_pSSL)
+	{
+		SSL_free(_pSSL);
+		_pSSL = 0;
+	}
 }
 
 

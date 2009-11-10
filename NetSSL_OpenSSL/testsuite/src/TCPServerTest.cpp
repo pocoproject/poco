@@ -1,7 +1,7 @@
 //
 // TCPServerTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/TCPServerTest.cpp#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/TCPServerTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -260,6 +260,46 @@ void TCPServerTest::testMultiConnections()
 }
 
 
+void TCPServerTest::testReuseSocket()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+	assert (srv.currentConnections() == 0);
+	assert (srv.currentThreads() == 0);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 0);
+	
+	SocketAddress sa("localhost", svs.address().port());
+	SecureStreamSocket ss1(sa);
+	std::string data("hello, world");
+	ss1.sendBytes(data.data(), (int) data.size());
+	char buffer[256];
+	int n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assert (n > 0);
+	assert (std::string(buffer, n) == data);
+	assert (srv.currentConnections() == 1);
+	assert (srv.currentThreads() == 1);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 1);
+	ss1.close();
+	Thread::sleep(300);
+	assert (srv.currentConnections() == 0);
+
+	ss1.connect(sa);
+	ss1.sendBytes(data.data(), (int) data.size());
+	n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assert (n > 0);
+	assert (std::string(buffer, n) == data);
+	assert (srv.currentConnections() == 1);
+	assert (srv.queuedConnections() == 0);
+	assert (srv.totalConnections() == 2);
+	ss1.close();
+	Thread::sleep(300);
+	assert (srv.currentConnections() == 0);
+}
+
+
 void TCPServerTest::setUp()
 {
 }
@@ -277,6 +317,7 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testOneConnection);
 	CppUnit_addTest(pSuite, TCPServerTest, testTwoConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnections);
+	CppUnit_addTest(pSuite, TCPServerTest, testReuseSocket);
 
 	return pSuite;
 }

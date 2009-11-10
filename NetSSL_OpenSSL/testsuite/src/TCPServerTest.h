@@ -1,7 +1,7 @@
 //
 // TCPServerTest.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/TCPServerTest.h#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/TCPServerTest.h#2 $
 //
 // Definition of the TCPServerTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testOneConnection();
 	void testTwoConnections();
 	void testMultiConnections();
+	void testReuseSocket();
 
 	void setUp();
 	void tearDown();

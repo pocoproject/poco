@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#8 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -170,7 +170,7 @@ public:
 		
 	const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
-
+		
 protected:
 	void acceptSSL();
 		/// Performs a server-side SSL handshake and certificate verification.
@@ -188,6 +188,15 @@ protected:
 		
 	int handleError(int rc);
 		/// Handles an SSL error by throwing an appropriate exception.
+
+	void reset();
+		/// Prepares the socket for re-use. 
+		///
+		/// After closing and resetting a socket, the socket can
+		/// be used for a new connection.
+		///
+		/// Note that simply closing a socket is not sufficient
+		/// to be able to re-use it again.
 
 private:	
 	SecureSocketImpl(const SecureSocketImpl&);
