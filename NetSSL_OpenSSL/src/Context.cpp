@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -39,6 +39,7 @@
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/Utility.h"
 #include "Poco/File.h"
+#include "Poco/Path.h"
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -76,9 +77,9 @@ Context::Context(
 	{
 		Poco::File aFile(caLocation);
 		if (aFile.isDirectory())
-			errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, caLocation.c_str());
+			errCode = SSL_CTX_load_verify_locations(_pSSLContext, 0, Poco::Path::transcode(caLocation).c_str());
 		else
-			errCode = SSL_CTX_load_verify_locations(_pSSLContext, caLocation.c_str(), 0);
+			errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(caLocation).c_str(), 0);
 		if (errCode != 1)
 		{
 			std::string msg = Utility::getLastError();
@@ -100,7 +101,7 @@ Context::Context(
 	
 	if (!privateKeyFile.empty())
 	{
-		errCode = SSL_CTX_use_PrivateKey_file(_pSSLContext, privateKeyFile.c_str(), SSL_FILETYPE_PEM);
+		errCode = SSL_CTX_use_PrivateKey_file(_pSSLContext, Poco::Path::transcode(privateKeyFile).c_str(), SSL_FILETYPE_PEM);
 		if (errCode != 1)
 		{
 			std::string msg = Utility::getLastError();			
@@ -111,7 +112,7 @@ Context::Context(
 	
 	if (!certificateFile.empty())
 	{
-		errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, certificateFile.c_str());
+		errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(certificateFile).c_str());
 		if (errCode != 1)
 		{
 			std::string errMsg = Utility::getLastError();

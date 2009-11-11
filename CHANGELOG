@@ -79,6 +79,7 @@ Release 1.3.6 (2009-11-xx)
   Poco::Util::ServerApplication::waitForTerminationRequest() no longer registers a
   signal handler for SIGINT if the environment variable POCO_ENABLE_DEBUGGER
   is defined.
+- fixed SF# 2896070: Poco::Net::Context with non-ASCII paths
   
 
 Release 1.3.5 (2009-05-11)
@@ -1125,4 +1126,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#57 $
+$Id: //poco/1.3/dist/CHANGELOG#58 $
