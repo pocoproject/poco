@@ -323,12 +323,12 @@ void DataTest::testCLOB()
 
 	assert (blobChrStr != blobNumStr);
 	Var vLOB = blobNumStr;
-	blobChrStr = vLOB;
+	blobChrStr = (CLOB) vLOB;
 	assert (blobChrStr == blobNumStr);
 
 	std::string xyz = "xyz";
 	vLOB = xyz;
-	blobChrStr = vLOB;
+	blobChrStr = (CLOB) vLOB;
 	assert (0 == std::strncmp(xyz.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
 }
 
