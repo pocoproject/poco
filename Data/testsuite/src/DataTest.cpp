@@ -49,6 +49,8 @@
 #include "Poco/DateTime.h"
 #include "Poco/Types.h"
 #include "Poco/Dynamic/Var.h"
+#include "Poco/Data/DynamicLOB.h"
+#include "Poco/Data/DynamicDateTime.h"
 #include "Poco/Exception.h"
 #include <cstring>
 #include <sstream>
@@ -318,6 +320,16 @@ void DataTest::testCLOB()
 	assert (blobNumStr == blobChrVec);
 	std::swap(blobNumStr, blobChrVec);
 	assert (blobNumStr == blobChrVec);
+
+	assert (blobChrStr != blobNumStr);
+	Var vLOB = blobNumStr;
+	blobChrStr = vLOB;
+	assert (blobChrStr == blobNumStr);
+
+	std::string xyz = "xyz";
+	vLOB = xyz;
+	blobChrStr = vLOB;
+	assert (0 == std::strncmp(xyz.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
 }
 
 
@@ -1306,6 +1318,20 @@ void DataTest::testDateAndTime()
 
 	t1 = dt;
 	assert (t1 == dt);
+
+	d.assign(2007, 6, 15);
+	d1.assign(2007, 6, 16);
+	assert (d != d1);
+	Var vDate = d;
+	d1 = vDate;
+	assert (d == d1);
+
+	t.assign(12, 30, 15);
+	t1.assign(12, 30, 16);
+	assert (t != t1);
+	Var vTime = t;
+	t1 = vTime;
+	assert (t == t1);
 }
 
 

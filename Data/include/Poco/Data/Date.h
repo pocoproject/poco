@@ -49,6 +49,12 @@ namespace Poco {
 
 class DateTime;
 
+namespace Dynamic {
+
+class Var;
+
+}
+
 namespace Data {
 
 
@@ -84,8 +90,14 @@ public:
 	void assign(int year, int month, int day);
 		/// Assigns date.
 
+	Date& operator = (const Date& d);
+		/// Assignment operator for Date.
+
 	Date& operator = (const DateTime& dt);
 		/// Assignment operator for DateTime.
+
+	Date& operator = (const Poco::Dynamic::Var& var);
+		/// Assignment operator for Var.
 
 	bool operator == (const Date& date);
 		/// Equality operator.
@@ -127,6 +139,13 @@ inline int Date::day() const
 }
 
 
+inline Date& Date::operator = (const Date& d)
+{
+	assign(d.year(), d.month(), d.day());
+	return *this;
+}
+
+
 inline Date& Date::operator = (const DateTime& dt)
 {
 	assign(dt.year(), dt.month(), dt.day());
@@ -158,7 +177,7 @@ inline bool Date::operator > (const Date& date)
 
 
 //
-// VarHolderImpl<BLOB>
+// VarHolderImpl<Date>
 //
 
 

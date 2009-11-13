@@ -307,6 +307,12 @@
 					RelativePath=".\include\Poco\Data\Date.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Data\DynamicDateTime.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\Data\DynamicLOB.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Data\Extraction.h">
 				</File>
 				<File
@@ -408,6 +414,9 @@
 				</File>
 				<File
 					RelativePath=".\src\Date.cpp">
+				</File>
+				<File
+					RelativePath=".\src\DynamicLOB.cpp">
 				</File>
 				<File
 					RelativePath=".\src\Limit.cpp">

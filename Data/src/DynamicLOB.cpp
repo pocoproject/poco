@@ -1,11 +1,11 @@
 //
-// Time.cpp
+// DynamicLOB.cpp
 //
-// $Id: //poco/Main/Data/src/Time.cpp#5 $
+// $Id: //poco/Main/Data/src/DynamicLOB.cpp#1 $
 //
 // Library: Data
 // Package: DataCore
-// Module:  Time
+// Module:  DynamicLOB
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,114 +34,52 @@
 //
 
 
-#include "Poco/Data/Time.h"
-#include "Poco/Data/DynamicDateTime.h"
-#include "Poco/DateTime.h"
+#include "Poco/Data/DynamicLOB.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Dynamic/Var.h"
-
-
-using Poco::DateTime;
-using Poco::Dynamic::Var;
-
-
-namespace Poco {
-namespace Data {
-
-
-Time::Time()
-{
-	DateTime dt;
-	assign(dt.hour(), dt.minute(), dt.second());
-}
-
-
-Time::Time(int hour, int minute, int second)
-{
-	assign(hour, minute, second);
-}
-
-
-Time::Time(const DateTime& dt)
-{
-	assign(dt.hour(), dt.minute(), dt.second());
-}
-
-
-Time::~Time()
-{
-}
-
-
-void Time::assign(int hour, int minute, int second)
-{
-	if (hour < 0 || hour > 23) 
-		throw InvalidArgumentException("Hour must be between 0 and 23.");
-
-	if (minute < 0 || minute > 59) 
-		throw InvalidArgumentException("Minute must be between 0 and 59.");
-
-	if (second < 0 || second > 59) 
-		throw InvalidArgumentException("Second must be between 0 and 59.");
-
-	_hour = hour;
-	_minute = minute;
-	_second = second;
-}
-
-
-bool Time::operator < (const Time& time)
-{
-	int hour = time.hour();
-
-	if (_hour < hour) return true;
-	else if (_hour > hour) return false;
-	else // hours equal
-	{
-		int minute = time.minute();
-		if (_minute < minute) return true;
-		else 
-		if (_minute > minute) return false;
-		else // minutes equal
-		if (_second < time.second()) return true;
-	}
-
-	return false;
-}
-
-
-Time& Time::operator = (const Var& var)
-{
-	*this = var.operator Time(); // g++ workaround
-	return *this;
-}
-
-
-} } // namespace Poco::Data
 
 
 namespace Poco {
 namespace Dynamic {
 
 
-using Poco::Data::Time;
-using Poco::DateTime;
+using Poco::Data::CLOB;
+using Poco::Data::BLOB;
 
 
 template <>
-Var::operator Time () const
+Var::operator CLOB () const
 {
 	if (!_pHolder)
 		throw InvalidAccessException("Can not convert empty value.");
 
-	if (typeid(Time) == _pHolder->type())
-		return extract<Time>();
+	if (typeid(CLOB) == _pHolder->type())
+		return extract<CLOB>();
 	else
 	{
-		Poco::DateTime result;
+		std::string result;
 		_pHolder->convert(result);
-		return Time(result);
+		return CLOB(result);
 	}
 }
 
 
-} } // namespace Poco::Dynamic
+template <>
+Var::operator BLOB () const
+{
+	if (!_pHolder)
+		throw InvalidAccessException("Can not convert empty value.");
+
+	if (typeid(BLOB) == _pHolder->type())
+		return extract<BLOB>();
+	else
+	{
+		std::string result;
+		_pHolder->convert(result);
+		return BLOB(reinterpret_cast<const unsigned char*>(result.data()),
+			result.size());
+	}
+}
+
+
+} } // namespace Poco::Data

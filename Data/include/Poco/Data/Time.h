@@ -47,6 +47,12 @@
 
 namespace Poco {
 
+namespace Dynamic {
+
+class Var;
+
+}
+
 class DateTime;
 
 namespace Data {
@@ -84,8 +90,14 @@ public:
 	void assign(int hour, int minute, int second);
 		/// Assigns time.
 
+	Time& operator = (const Time& t);
+		/// Assignment operator for Time.
+
 	Time& operator = (const DateTime& dt);
 		/// Assignment operator for DateTime.
+
+	Time& operator = (const Poco::Dynamic::Var& var);
+		/// Assignment operator for Var.
 
 	bool operator == (const Time& time);
 		/// Equality operator.
@@ -127,6 +139,13 @@ inline  int Time::second() const
 }
 
 
+inline Time& Time::operator = (const Time& t)
+{
+	assign(t.hour(), t.minute(), t.second());
+	return *this;
+}
+
+
 inline Time& Time::operator = (const DateTime& dt)
 {
 	assign(dt.hour(), dt.minute(), dt.second());
@@ -158,7 +177,7 @@ inline bool Time::operator > (const Time& time)
 
 
 //
-// VarHolderImpl<BLOB>
+// VarHolderImpl<Time>
 //
 
 

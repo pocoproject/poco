@@ -37,9 +37,12 @@
 #include "Poco/Data/Date.h"
 #include "Poco/DateTime.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/Data/DynamicDateTime.h"
+#include "Poco/Dynamic/Var.h"
 
 
 using Poco::DateTime;
+using Poco::Dynamic::Var;
 using Poco::NumberFormatter;
 
 
@@ -109,4 +112,39 @@ bool Date::operator < (const Date& date)
 }
 
 
+Date& Date::operator = (const Var& var)
+{
+	*this = var.operator Date(); // g++ workaround
+	return *this;
+}
+
+
 } } // namespace Poco::Data
+
+
+namespace Poco {
+namespace Dynamic {
+
+
+using Poco::Data::Date;
+using Poco::DateTime;
+
+
+template <>
+Var::operator Date () const
+{
+	if (!_pHolder)
+		throw InvalidAccessException("Can not convert empty value.");
+
+	if (typeid(Date) == _pHolder->type())
+		return extract<Date>();
+	else
+	{
+		Poco::DateTime result;
+		_pHolder->convert(result);
+		return Date(result);
+	}
+}
+
+
+} } // namespace Poco::Dynamic
