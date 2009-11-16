@@ -1,7 +1,7 @@
 //
 // TextIterator.cpp
 //
-// $Id: //poco/1.3/Foundation/src/TextIterator.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/TextIterator.cpp#5 $
 //
 // Library: Foundation
 // Package: Text
@@ -116,21 +116,36 @@ int TextIterator::operator * () const
 {
 	poco_check_ptr (_pEncoding);
 	poco_assert (_it != _end);
+	std::string::const_iterator it = _it;
 	
-	unsigned char c = (unsigned char) *_it;
-	int n = _pEncoding->characterMap()[c];
-	if (n >= -1) return n;
+	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
+	unsigned char* p = buffer;
+
+	if (it != _end)
+		*p++ = *it++;
+	else
+		*p++ = 0;
+
+	int read = 1;
+	int n = _pEncoding->queryConvert(buffer, 1);
+
+	while (-1 > n && (_end - it) >= -n - read)
+	{
+		while (read < -n && it != _end)
+		{ 
+			*p++ = *it++; 
+			read++; 
+		}
+		n = _pEncoding->queryConvert(buffer, read);
+	}
+
+	if (-1 > n)
+	{
+		return -1;
+	}
 	else
 	{
-		poco_assert_dbg (n >= -TextEncoding::MAX_SEQUENCE_LENGTH);
-		unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
-		unsigned char* p = buffer;
-		std::string::const_iterator it = _it;
-		while (n < 0 && it != _end) { *p++ = *it++; ++n; }
-		if (n == 0)
-			return _pEncoding->convert(buffer);
-		else
-			return -1;
+		return n;
 	}
 }
 
@@ -140,12 +155,31 @@ TextIterator& TextIterator::operator ++ ()
 	poco_check_ptr (_pEncoding);
 	poco_assert (_it != _end);
 	
-	unsigned char c = (unsigned char) *_it;
-	int n = _pEncoding->characterMap()[c];
-	if (n >= -1)
-		++_it;
+	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
+	unsigned char* p = buffer;
+
+	if (_it != _end)
+		*p++ = *_it++;
 	else
-		while (n < 0 && _it != _end) { ++_it; ++n; }
+		*p++ = 0;
+
+	int read = 1;
+	int n = _pEncoding->sequenceLength(buffer, 1);
+
+	while (-1 > n && (_end - _it) >= -n - read)
+	{
+		while (read < -n && _it != _end)
+		{ 
+			*p++ = *_it++; 
+			read++; 
+		}
+		n = _pEncoding->sequenceLength(buffer, read);
+	}
+	while (read < n && _it != _end)
+	{ 
+		_it++; 
+		read++; 
+	}
 
 	return *this;
 }

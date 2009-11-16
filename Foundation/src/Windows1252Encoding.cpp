@@ -1,7 +1,7 @@
 //
 // Windows1252Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Windows1252Encoding.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Windows1252Encoding.cpp#6 $
 //
 // Library: Foundation
 // Package: Text
@@ -150,6 +150,21 @@ int Windows1252Encoding::convert(int ch, unsigned char* bytes, int length) const
 	case 0x0178: if (bytes && length >= 1) *bytes = 0x9f; return 1;
 	default: return 0;
 	}
+}
+
+
+int Windows1252Encoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	if (1 <= length)
+		return _charMap[*bytes];
+	else
+		return -1;
+}
+
+
+int Windows1252Encoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 

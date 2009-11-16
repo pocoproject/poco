@@ -1,7 +1,7 @@
 //
 // Latin1Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Latin1Encoding.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Latin1Encoding.cpp#5 $
 //
 // Library: Foundation
 // Package: Text
@@ -119,6 +119,21 @@ int Latin1Encoding::convert(int ch, unsigned char* bytes, int length) const
 		return 1;
 	}
 	else return 0;
+}
+
+
+int Latin1Encoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	if (1 <= length)
+		return *bytes;
+	else
+		return -1;
+}
+
+
+int Latin1Encoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 

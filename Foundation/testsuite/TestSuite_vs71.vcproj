@@ -932,6 +932,9 @@
 					RelativePath=".\src\TextTestSuite.cpp">
 				</File>
 				<File
+					RelativePath=".\src\UnicodeConverterTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\UTF8StringTest.cpp">
 				</File>
 			</Filter>
@@ -952,6 +955,9 @@
 				</File>
 				<File
 					RelativePath=".\src\TextTestSuite.h">
+				</File>
+				<File
+					RelativePath=".\src\UnicodeConverterTest.h">
 				</File>
 				<File
 					RelativePath=".\src\UTF8StringTest.h">

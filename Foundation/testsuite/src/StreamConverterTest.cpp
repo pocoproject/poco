@@ -1,7 +1,7 @@
 //
 // StreamConverterTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/StreamConverterTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/StreamConverterTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -144,6 +144,18 @@ void StreamConverterTest::testIdentityUTF8In()
 	StreamCopier::copyStream(converter4, ostr4);
 	assert (ostr4.str() == text);
 	assert (converter4.errors() == 0);
+
+	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
+	std::string text2((const char*) supp);
+
+	std::istringstream istr5(text2);
+	std::ostringstream ostr5;
+	InputStreamConverter converter5(istr5, encoding, encoding);
+	StreamCopier::copyStream(converter5, ostr5);
+	assert (ostr5.str() == text2);
+	assert (converter5.errors() == 0);
+
+
 }
 
 

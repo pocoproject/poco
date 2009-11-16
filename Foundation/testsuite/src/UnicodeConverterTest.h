@@ -1,15 +1,11 @@
 //
-// ASCIIEncoding.h
+// UnicodeConverterTest.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ASCIIEncoding.h#4 $
+// $Id: //poco/1.3/Foundation/testsuite/src/UnicodeConverterTest.h#2 $
 //
-// Library: Foundation
-// Package: Text
-// Module:  ASCIIEncoding
+// Definition of the UnicodeConverterTest class.
 //
-// Definition of the ASCIIEncoding class.
-//
-// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,38 +32,31 @@
 //
 
 
-#ifndef Foundation_ASCIIEncoding_INCLUDED
-#define Foundation_ASCIIEncoding_INCLUDED
+#ifndef UnicodeConverterTest_INCLUDED
+#define UnicodeConverterTest_INCLUDED
 
 
 #include "Poco/Foundation.h"
-#include "Poco/TextEncoding.h"
+#include "CppUnit/TestCase.h"
 
 
-namespace Poco {
-
-
-class Foundation_API ASCIIEncoding: public TextEncoding
-	/// 7-bit ASCII text encoding.
+class UnicodeConverterTest: public CppUnit::TestCase
 {
 public:
-	ASCIIEncoding();
-	~ASCIIEncoding();
-	const char* canonicalName() const;
-	bool isA(const std::string& encodingName) const;
-	const CharacterMap& characterMap() const;
-	int convert(const unsigned char* bytes) const;
-	int convert(int ch, unsigned char* bytes, int length) const;
-	int queryConvert(const unsigned char* bytes, int length) const;
-	int sequenceLength(const unsigned char* bytes, int length) const;
-	
+	UnicodeConverterTest(const std::string& name);
+	~UnicodeConverterTest();
+
+	void testString();
+	void testCharPtrLength();
+	void testCharPtr();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
 private:
-	static const char* _names[];
-	static const CharacterMap _charMap;
 };
 
 
-} // namespace Poco
-
-
-#endif // Foundation_ASCIIEncoding_INCLUDED
+#endif // UnicodeConverterTest_INCLUDED

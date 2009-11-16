@@ -1,7 +1,7 @@
 //
 // StreamConverter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/StreamConverter.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/StreamConverter.cpp#5 $
 //
 // Library: Foundation
 // Package: Text
@@ -85,34 +85,28 @@ int StreamConverterBuf::readFromDevice()
 
 	poco_assert (c < 256);
 	int uc;
-	int n = _inEncoding.characterMap()[c];
-	if (n == -1)
+	_buffer [0] = (unsigned char) c;
+	int n = _inEncoding.queryConvert(_buffer, 1);
+	int read = 1;
+
+	while (-1 > n)
+	{
+		poco_assert_dbg(-n <= sizeof(_buffer));
+		_pIstr->read((char*) _buffer + read, -n - read);
+		read = -n;
+		n = _inEncoding.queryConvert(_buffer, -n);
+	}
+
+	if (-1 >= n)
 	{
 		uc = _defaultChar;
 		++_errors;
 	}
-	else if (n >= 0)
-		uc = n;
 	else
 	{
-		poco_assert_dbg(-n <= sizeof(_buffer));
-		_buffer[0] = (unsigned char) c;
-		_pIstr->read((char*) _buffer + 1, -n - 1);
-		if (_pIstr->gcount() == -n - 1)
-		{
-			uc = _inEncoding.convert(_buffer);
-			if (uc == -1)
-			{
-				uc = _defaultChar;
-				++_errors;
-			}
-		}
-		else
-		{
-			uc = _defaultChar;
-			++_errors;
-		}
+		uc = n;
 	}
+
 	_sequenceLength = _outEncoding.convert(uc, _buffer, sizeof(_buffer));
 	if (_sequenceLength == 0)
 		_sequenceLength = _outEncoding.convert(_defaultChar, _buffer, sizeof(_buffer));
@@ -127,34 +121,31 @@ int StreamConverterBuf::writeToDevice(char c)
 {
 	poco_assert_dbg (_pOstr);
 
-	if (_sequenceLength == 0)
+	_buffer[_pos++] = (unsigned char) c;
+	if (_sequenceLength == 0 || _sequenceLength == _pos)
 	{
-		int n = _inEncoding.characterMap()[(unsigned char) c];
-		if (n == -1)
+		int n = _inEncoding.queryConvert(_buffer, _pos);
+		if (-1 <= n)
 		{
-			++_errors;
-			return -1;
+			int uc = n;
+			if (-1 == n)
+			{
+				++_errors;
+				return -1;
+			}
+			int n = _outEncoding.convert(uc, _buffer, sizeof(_buffer));
+			if (n == 0) n = _outEncoding.convert(_defaultChar, _buffer, sizeof(_buffer));
+			poco_assert_dbg (n <= sizeof(_buffer));
+			_pOstr->write((char*) _buffer, n);
+			_sequenceLength = 0;
+			_pos = 0;
 		}
-		_buffer[0] = (unsigned char) c;
-		_sequenceLength = n < 0 ? -n : 1;
-		_pos = 1;
-	}
-	else _buffer[_pos++] = (unsigned char) c;
-	if (_pos == _sequenceLength)
-	{
-		int uc = _inEncoding.convert(_buffer);
-		if (uc == -1)
+		else
 		{
-			++_errors; 
-			return -1;
+			_sequenceLength = -n;
 		}
-		int n = _outEncoding.convert(uc, _buffer, sizeof(_buffer));
-		if (n == 0) n = _outEncoding.convert(_defaultChar, _buffer, sizeof(_buffer));
-		poco_assert_dbg (n <= sizeof(_buffer));
-		_pOstr->write((char*) _buffer, n);
-		_sequenceLength = 0;
-		_pos = 0;
 	}
+
 	return charToInt(c);
 }
 

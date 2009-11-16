@@ -1,7 +1,7 @@
 //
 // TextEncoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/TextEncoding.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/TextEncoding.cpp#5 $
 //
 // Library: Foundation
 // Package: Text
@@ -145,13 +145,25 @@ TextEncoding::~TextEncoding()
 
 int TextEncoding::convert(const unsigned char* bytes) const
 {
-	return (int) *bytes;
+	return static_cast<int>(*bytes);
 }
 
 
 int TextEncoding::convert(int ch, unsigned char* bytes, int length) const
 {
 	return 0;
+}
+
+
+int TextEncoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	return (int) *bytes;
+}
+
+
+int TextEncoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 

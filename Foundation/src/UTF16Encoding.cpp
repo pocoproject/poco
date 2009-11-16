@@ -1,7 +1,7 @@
 //
 // UTF16Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UTF16Encoding.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/UTF16Encoding.cpp#5 $
 //
 // Library: Foundation
 // Package: Text
@@ -143,7 +143,36 @@ int UTF16Encoding::convert(const unsigned char* bytes) const
 	unsigned char* p = (unsigned char*) &uc;
 	*p++ = *bytes++;
 	*p++ = *bytes++;
-	return _flipBytes ? ByteOrder::flipBytes(uc) : uc;
+
+	if (_flipBytes)
+	{
+		ByteOrder::flipBytes(uc);
+	}
+
+	if (uc >= 0xd800 && uc < 0xdc00)
+	{
+		UInt16 uc2;
+		p = (unsigned char*) &uc2;
+		*p++ = *bytes++;
+		*p++ = *bytes++;
+
+		if (_flipBytes)
+		{
+			ByteOrder::flipBytes(uc2);
+		}
+		if (uc2 >= 0xdc00 && uc2 < 0xe000)
+		{
+			return ((uc & 0x3ff) << 10) + (uc2 & 0x3ff) + 0x10000;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	else
+	{
+		return uc;
+	}
 }
 
 
@@ -181,6 +210,85 @@ int UTF16Encoding::convert(int ch, unsigned char* bytes, int length) const
 		}
 		return 4;
 	}
+}
+
+
+int UTF16Encoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	int ret = -2;
+
+	if (length >= 2)
+	{
+		UInt16 uc;
+		unsigned char* p = (unsigned char*) &uc;
+		*p++ = *bytes++;
+		*p++ = *bytes++;
+		if (_flipBytes) 
+			ByteOrder::flipBytes(ret);
+		if (uc >= 0xd800 && uc < 0xdc00)
+		{
+			if (length >= 4)
+			{
+				UInt16 uc2;
+				p = (unsigned char*) &uc2;
+				*p++ = *bytes++;
+				*p++ = *bytes++;
+				if (_flipBytes) 
+					ByteOrder::flipBytes(ret);
+				if (uc2 >= 0xdc00 && uc < 0xe000)
+				{
+					ret = ((uc & 0x3ff) << 10) + (uc2 & 0x3ff) + 0x10000;
+				}
+				else
+				{
+					ret = -1;	// Malformed sequence
+				}
+			}
+			else
+			{
+				ret = -4;	// surrogate pair, four bytes needed
+			}
+		}
+		else
+		{
+			ret = uc;
+		}
+	}
+
+	return ret;
+}
+
+
+int UTF16Encoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	int ret = -2;
+
+	if (_flipBytes)
+	{
+		if (length >= 1)
+		{
+			unsigned char c = *bytes;
+			if (c >= 0xd8 && c < 0xdc)
+				ret = 4;
+			else
+				ret = 2;
+		}
+	}
+	else
+	{
+		if (length >= 2)
+		{
+			UInt16 uc;
+			unsigned char* p = (unsigned char*) &uc;
+			*p++ = *bytes++;
+			*p++ = *bytes++;
+			if (uc >= 0xd800 && uc < 0xdc00)
+				ret = 4;
+			else
+				ret = 2;
+		}
+	}
+	return ret;
 }
 
 

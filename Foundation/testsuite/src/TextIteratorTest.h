@@ -1,7 +1,7 @@
 //
 // TextIteratorTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TextIteratorTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TextIteratorTest.h#3 $
 //
 // Definition of the TextIteratorTest class.
 //
@@ -52,6 +52,8 @@ public:
 	void testEmptyUTF8();
 	void testOneUTF8();
 	void testUTF8();
+	void testUTF8Supplementary();
+	void testUTF16Supplementary();
 	void testSwap();
 
 	void setUp();

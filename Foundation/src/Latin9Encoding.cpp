@@ -1,7 +1,7 @@
 //
 // Latin9Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Latin9Encoding.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Latin9Encoding.cpp#7 $
 //
 // Library: Foundation
 // Package: Text
@@ -130,6 +130,21 @@ int Latin9Encoding::convert(int ch, unsigned char* bytes, int length) const
 	case 0x20ac: if (bytes && length >= 1) *bytes = 0xa4; return 1;
 	default: return 0;
 	}
+}
+
+
+int Latin9Encoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	if (1 <= length)
+		return _charMap[*bytes];
+	else
+		return -1;
+}
+
+
+int Latin9Encoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 
