@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.3/Crypto/src/X509Certificate.cpp#4 $
+// $Id: //poco/1.3/Crypto/src/X509Certificate.cpp#5 $
 //
 // Library: Crypto
 // Package: Certificate
@@ -67,8 +67,7 @@ X509Certificate::X509Certificate(X509* pCert):
 	_pCert(pCert)
 {
 	poco_check_ptr(_pCert);
-	
-	_pCert = X509_dup(_pCert);
+
 	init();
 }
 

@@ -85,6 +85,9 @@ Release 1.3.6 (2009-11-xx)
   for how this is implemented. Contributed by Philippe Cuvillier.
 - fixed SF# 2897650: [branch 1.3.6] Net.SocketAddress won't compile for CYGWIN
 - fixed SF# 2896161: Building on Windows fails when basedir has space in it
+- fixed SF# 2864380: Memory leak when using secure sockets
+- NetSSL_OpenSSL: the SSL/TLS session cache is now disabled by default and
+  can be enabled per Context using Poco::Net::Context::enableSessionCache().
 
 
 Release 1.3.5 (2009-05-11)
@@ -1131,4 +1134,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#59 $
+$Id: //poco/1.3/dist/CHANGELOG#60 $

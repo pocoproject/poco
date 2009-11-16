@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -71,6 +71,7 @@ Context::Context(
 	}
 	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPasswdCallback);
 	Utility::clearErrorStack();
+	SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
 	
 	int errCode = 0;
 	if (!caLocation.empty())
@@ -109,7 +110,7 @@ Context::Context(
 			throw SSLContextException(std::string("Error loading private key from file ") + privateKeyFile, msg);
 		}
 	}
-	
+
 	if (!certificateFile.empty())
 	{
 		errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(certificateFile).c_str());
@@ -128,12 +129,25 @@ Context::Context(
 
 	SSL_CTX_set_verify_depth(_pSSLContext, verificationDepth);
 	SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
+	SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
 }
 
 
 Context::~Context()
 {
 	SSL_CTX_free(_pSSLContext);
+}
+
+
+void Context::enableSessionCache(bool flag)
+{
+	SSL_CTX_set_session_cache_mode(_pSSLContext, flag ? SSL_SESS_CACHE_SERVER : SSL_SESS_CACHE_OFF);
+}
+
+	
+bool Context::sessionCacheEnabled() const
+{
+	return SSL_CTX_get_session_cache_mode(_pSSLContext) != SSL_SESS_CACHE_OFF;
 }
 
 

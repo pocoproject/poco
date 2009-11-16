@@ -1,7 +1,7 @@
 //
 // Context.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -140,6 +140,14 @@ public:
 
 	Context::VerificationMode verificationMode() const;
 		/// Returns the verification mode.
+		
+	void enableSessionCache(bool flag = true);
+		/// Enable or disable the SSL/TLS session cache for a server.
+		///
+		/// The default is a disabled session cache.
+		
+	bool sessionCacheEnabled() const;
+		/// Returns true iff the session cache is enabled.
 
 private:
 	Usage _usage;

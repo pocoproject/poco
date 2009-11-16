@@ -1,7 +1,7 @@
 //
 // SSLManager.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -48,6 +48,7 @@
 #include "Poco/Net/InvalidCertificateHandler.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Mutex.h"
 #include <openssl/ssl.h>
 
 
@@ -68,8 +69,8 @@ class NetSSL_API SSLManager
 	/// or any of the passPhraseHandler methods (which tries to auto-initialize
 	/// the context and passphrase handler based on an Poco::Util::Application configuration).
 	///
-	/// An exemplary documentation which sets either the server or client defaultcontext and creates a PrivateKeyPassphraseHandler
-	/// that reads the password from the XML file looks like this:
+	/// An exemplary documentation which sets either the server or client default context and creates 
+	/// a PrivateKeyPassphraseHandler that reads the password from the XML file looks like this:
 	///
 	///    <AppConfig>
 	///       <openSSL>
@@ -92,6 +93,7 @@ class NetSSL_API SSLManager
 	///                 <options>
 	///                 </options>
 	///            </invalidCertificateHandler>
+	///            <cacheSessions>true</cacheSessions>
 	///          </server|client>
 	///       </openSSL>
 	///    </AppConfig>
@@ -226,6 +228,7 @@ private:
 	Context::Ptr                   _ptrDefaultClientContext;
 	PrivateKeyPassphraseHandlerPtr _ptrClientPassPhraseHandler;
 	InvalidCertificateHandlerPtr   _ptrClientCertificateHandler;
+	Poco::FastMutex                _mutex;
 
 	static const std::string CFG_PRIV_KEY_FILE;
 	static const std::string CFG_CERTIFICATE_FILE;
@@ -242,6 +245,7 @@ private:
 	static const std::string VAL_DELEGATE_HANDLER;
 	static const std::string CFG_CERTIFICATE_HANDLER;
 	static const std::string VAL_CERTIFICATE_HANDLER;
+	static const std::string CFG_CACHE_SESSIONS;
 
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class Context;

@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#5 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -68,6 +68,7 @@ const std::string SSLManager::CFG_CERTIFICATE_HANDLER("invalidCertificateHandler
 const std::string SSLManager::VAL_CERTIFICATE_HANDLER("ConsoleCertificateHandler");
 const std::string SSLManager::CFG_SERVER_PREFIX("openSSL.server.");
 const std::string SSLManager::CFG_CLIENT_PREFIX("openSSL.client.");
+const std::string SSLManager::CFG_CACHE_SESSIONS("cacheSessions");
 
 
 SSLManager::SSLManager()
@@ -112,6 +113,8 @@ void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassPhraseHa
 
 Context::Ptr SSLManager::defaultServerContext()
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	
 	if (!_ptrDefaultServerContext)
 		initDefaultContext(true);
 
@@ -121,6 +124,8 @@ Context::Ptr SSLManager::defaultServerContext()
 
 Context::Ptr SSLManager::defaultClientContext()
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (!_ptrDefaultClientContext)
 		initDefaultContext(false);
 
@@ -130,6 +135,8 @@ Context::Ptr SSLManager::defaultClientContext()
 
 SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::serverPassPhraseHandler()
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (!_ptrServerPassPhraseHandler)
 		initPassPhraseHandler(true);
 
@@ -139,6 +146,8 @@ SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::serverPassPhraseHandler()
 
 SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::clientPassPhraseHandler()
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (!_ptrClientPassPhraseHandler)
 		initPassPhraseHandler(false);
 
@@ -148,6 +157,8 @@ SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::clientPassPhraseHandler()
 
 SSLManager::InvalidCertificateHandlerPtr SSLManager::serverCertificateHandler()
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (!_ptrServerCertificateHandler)
 		initCertificateHandler(true);
 
@@ -157,6 +168,8 @@ SSLManager::InvalidCertificateHandlerPtr SSLManager::serverCertificateHandler()
 
 SSLManager::InvalidCertificateHandlerPtr SSLManager::clientCertificateHandler()
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (!_ptrClientCertificateHandler)
 		initCertificateHandler(false);
 
@@ -233,6 +246,12 @@ void SSLManager::initDefaultContext(bool server)
 		_ptrDefaultServerContext = new Context(Context::SERVER_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cypherList);
 	else
 		_ptrDefaultClientContext = new Context(Context::CLIENT_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cypherList);
+		
+	if (server)
+	{
+		bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
+		_ptrDefaultServerContext->enableSessionCache(cacheSessions);
+	}
 }
 
 
