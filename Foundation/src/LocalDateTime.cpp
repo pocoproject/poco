@@ -1,7 +1,7 @@
 //
 // LocalDateTime.cpp
 //
-// $Id: //poco/1.3/Foundation/src/LocalDateTime.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/LocalDateTime.cpp#5 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -275,6 +275,30 @@ LocalDateTime& LocalDateTime::operator -= (const Timespan& span)
 
 void LocalDateTime::determineTzd(bool adjust)
 {
+	if (adjust)
+	{
+		std::time_t epochTime = _dateTime.timestamp().epochTime();
+#if defined(_WIN32) || defined(POCO_NO_POSIX_TSF)
+		std::tm* broken = std::localtime(&epochTime);
+		_tzd = (Timezone::utcOffset() + ((broken->tm_isdst == 1) ? 3600 : 0));
+#else
+		std::tm broken;
+		localtime_r(&epochTime, &broken);
+		_tzd = (Timezone::utcOffset() + ((broken.tm_isdst == 1) ? 3600 : 0));
+#endif
+		adjustForTzd();
+	}
+	else
+	{
+		int dst;
+		dstOffset(dst);
+		_tzd = (Timezone::utcOffset() + dst);
+	}
+}
+
+
+std::time_t LocalDateTime::dstOffset(int& dstOffset) const
+{
 	std::time_t local;
 	std::tm     broken;
 
@@ -286,10 +310,9 @@ void LocalDateTime::determineTzd(bool adjust)
 	broken.tm_sec   = _dateTime.second();
 	broken.tm_isdst = -1;
 	local = std::mktime(&broken);
-
-	_tzd = (Timezone::utcOffset() + ((broken.tm_isdst == 1) ? 3600 : 0));
-	if (adjust)
-		adjustForTzd();
+	
+	dstOffset = (broken.tm_isdst == 1) ? 3600 : 0;
+	return local;
 }
 
 

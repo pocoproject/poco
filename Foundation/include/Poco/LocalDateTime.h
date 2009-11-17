@@ -1,7 +1,7 @@
 //
 // LocalDateTime.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/LocalDateTime.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/LocalDateTime.h#6 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -268,6 +268,9 @@ protected:
 		
 	void adjustForTzd();
 		/// Adjust the _dateTime member based on the _tzd member.
+		
+	std::time_t dstOffset(int& dstOffset) const;
+		/// Determine the DST offset for the current date/time.
 	
 private:
 	DateTime _dateTime;
@@ -376,10 +379,12 @@ inline int LocalDateTime::tzd() const
 	return _tzd;
 }
 
+
 inline Timestamp LocalDateTime::timestamp() const
 {
 	return Timestamp::fromUtcTime(_dateTime.utcTime());
 }
+
 
 inline Timestamp::UtcTimeVal LocalDateTime::utcTime() const
 {
