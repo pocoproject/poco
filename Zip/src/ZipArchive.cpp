@@ -1,7 +1,7 @@
 //
 // ZipArchive.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipArchive.cpp#4 $
+// $Id: //poco/1.3/Zip/src/ZipArchive.cpp#5 $
 //
 // Library: Zip
 // Package: Zip
@@ -115,6 +115,14 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 				throw Poco::IllegalStateException("Garbage after directory header");
 		}
 	}
+}
+
+
+const std::string& ZipArchive::getZipComment() const
+{
+    // It seems that only the "first" disk is populated (look at Compress::close()), so getting the first ZipArchiveInfo
+    DirectoryInfos::const_iterator it = _disks.begin();
+    return it->second.getZipComment();
 }
 
 

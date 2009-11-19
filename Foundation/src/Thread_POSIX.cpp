@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#14 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#15 $
 //
 // Library: Foundation
 // Package: Threading
@@ -260,6 +260,12 @@ bool ThreadImpl::joinImpl(long milliseconds)
 ThreadImpl* ThreadImpl::currentImpl()
 {
 	return _currentThreadHolder.get();
+}
+
+
+ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
+{
+    return pthread_self();
 }
 
 

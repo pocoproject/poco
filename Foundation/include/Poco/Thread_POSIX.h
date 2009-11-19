@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Thread_POSIX.h#9 $
+// $Id: //poco/1.3/Foundation/include/Poco/Thread_POSIX.h#10 $
 //
 // Library: Foundation
 // Package: Threading
@@ -61,6 +61,7 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
+    typedef pthread_t TIDImpl;
 	typedef void (*Callable)(void*);
 
 	enum Priority
@@ -84,7 +85,8 @@ public:
 
 	ThreadImpl();				
 	~ThreadImpl();
-
+    
+	TIDImpl tidImpl() const;
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio);
@@ -102,6 +104,7 @@ public:
 	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
+	static TIDImpl currentTidImpl();
 
 protected:
 	static void* runnableEntry(void* pThread);
@@ -198,6 +201,12 @@ inline void ThreadImpl::yieldImpl()
 inline int ThreadImpl::getStackSizeImpl() const
 {
 	return _pData->stackSize;
+}
+
+
+inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
+{
+	return _pData->thread;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // CompressTest.h
 //
-// $Id: //poco/1.3/Zip/testsuite/src/CompressTest.h#5 $
+// $Id: //poco/1.3/Zip/testsuite/src/CompressTest.h#6 $
 //
 // Definition of the CompressTest class.
 //
@@ -51,6 +51,7 @@ public:
 	void testManipulator();
 	void testManipulatorDel();
 	void testManipulatorReplace();
+    void testSetZipComment();
 
 	void setUp();
 	void tearDown();

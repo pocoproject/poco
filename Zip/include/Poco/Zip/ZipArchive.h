@@ -1,7 +1,7 @@
 //
 // ZipArchive.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipArchive.h#4 $
+// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipArchive.h#5 $
 //
 // Library: Zip
 // Package: Zip
@@ -82,6 +82,8 @@ public:
 	FileHeaders::const_iterator headerBegin() const;
 
 	FileHeaders::const_iterator headerEnd() const;
+
+    const std::string& getZipComment() const;
 
 private:
 	void parse(std::istream& in, ParseCallback& pc);

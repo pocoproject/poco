@@ -1,7 +1,7 @@
 //
 // Decompress.cpp
 //
-// $Id: //poco/1.3/Zip/src/Decompress.cpp#6 $
+// $Id: //poco/1.3/Zip/src/Decompress.cpp#7 $
 //
 // Library: Zip
 // Package: Zip
@@ -136,7 +136,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		ZipInputStream inp(zipStream, hdr, false);
 		Poco::StreamCopier::copyStream(inp, out);
 		out.close();
-		Poco::File aFile(file);
+		Poco::File aFile(dest.toString());
 		if (!aFile.exists() || !aFile.isFile())
 		{
 			std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Failed to create output stream " + dest.toString());

@@ -1,7 +1,7 @@
 //
 // ZipArchiveInfo.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipArchiveInfo.h#3 $
+// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipArchiveInfo.h#5 $
 //
 // Library: Zip
 // Package: Zip
@@ -85,6 +85,9 @@ public:
 
 	const std::string& getZipComment() const;
 		/// Returns the (optional) Zip Comment
+
+	void setZipComment(const std::string& comment);
+		/// Sets the optional Zip comment.
 
 	void setNumberOfEntries(Poco::UInt16 val);
 		/// Returns the number of entries on this disk

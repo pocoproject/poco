@@ -1,7 +1,7 @@
 //
 // Compress.cpp
 //
-// $Id: //poco/1.3/Zip/src/Compress.cpp#4 $
+// $Id: //poco/1.3/Zip/src/Compress.cpp#5 $
 //
 // Library: Zip
 // Package: Zip
@@ -304,6 +304,10 @@ ZipArchive Compress::close()
 	central.setNumberOfEntries(numEntries);
 	central.setTotalNumberOfEntries(numEntries);
 	central.setHeaderOffset(centralDirStart);
+	if (!_comment.empty() && _comment.size() <= 65535)
+	{
+		central.setZipComment(_comment);
+	}
 	std::string centr(central.createHeader());
 	_out.write(centr.c_str(), static_cast<std::streamsize>(centr.size()));
 	_out.flush();

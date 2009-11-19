@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/1.3/Foundation/src/Thread_WIN32.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/Thread_WIN32.cpp#9 $
 //
 // Library: Foundation
 // Package: Threading
@@ -49,6 +49,7 @@ ThreadImpl::CurrentThreadHolder ThreadImpl::_currentThreadHolder;
 ThreadImpl::ThreadImpl():
 	_pRunnableTarget(0),
 	_thread(0),
+	_threadId(0),
 	_prio(PRIO_NORMAL_IMPL),
 	_stackSize(POCO_THREAD_STACK_SIZE)
 {
@@ -107,11 +108,11 @@ void ThreadImpl::startImpl(Callable target, void* pData)
 void ThreadImpl::createImpl(Entry ent, void* pData)
 {
 #if defined(_DLL)
-	DWORD threadId;
-	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &threadId);
+	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &_threadId);
 #else
 	unsigned threadId;
 	_thread = (HANDLE) _beginthreadex(NULL, _stackSize, ent, this, 0, &threadId);
+	_threadId = static_cast<DWORD>(threadId);
 #endif
 	if (!_thread)
 		throw SystemException("cannot create thread");
@@ -173,6 +174,12 @@ void ThreadImpl::threadCleanup()
 ThreadImpl* ThreadImpl::currentImpl()
 {
 	return _currentThreadHolder.get();
+}
+
+
+ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
+{
+    return GetCurrentThreadId();
 }
 
 

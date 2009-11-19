@@ -1,7 +1,7 @@
 //
 // ZipArchiveInfo.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipArchiveInfo.cpp#3 $
+// $Id: //poco/1.3/Zip/src/ZipArchiveInfo.cpp#4 $
 //
 // Library: Zip
 // Package: Zip
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Zip/ZipArchiveInfo.h"
+#include "Poco/Zip/ZipException.h"
 #include "Poco/Buffer.h"
 #include <istream>
 #include <cstring>
@@ -100,6 +101,20 @@ std::string ZipArchiveInfo::createHeader() const
 	std::string result(_rawInfo, FULLHEADER_SIZE);
 	result.append(_comment);
 	return result;
+}
+
+
+void ZipArchiveInfo::setZipComment(const std::string& comment)
+{    
+	// Confirm string is of valid size
+	if (comment.size() > 65535)
+		throw ZipException("Maximum number of entries for a ZIP file reached: 65535");
+
+	// Change the value of the ZIP Comment Size to reflect new comment size
+	ZipUtil::set16BitValue(comment.size(), _rawInfo, ZIPCOMMENT_LENGTH_POS);
+
+    // Now change our internal comment
+	_comment = comment;
 }
 
 

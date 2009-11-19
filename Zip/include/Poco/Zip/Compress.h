@@ -1,7 +1,7 @@
 //
 // Compress.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/Compress.h#5 $
+// $Id: //poco/1.3/Zip/include/Poco/Zip/Compress.h#7 $
 //
 // Library: Zip
 // Package: Zip
@@ -76,6 +76,12 @@ public:
 		/// Adds a directory entry recursively to the zip file, set excludeRoot to false to exclude the parent directory.
 		/// If excludeRoot is true you can specify an empty name to add the files as relative files
 
+	void setZipComment(const std::string& comment);
+		/// Sets the Zip file comment.
+
+	const std::string& getZipComment() const;
+		/// Returns the Zip file comment.
+		
 	ZipArchive close();
 		/// Finalizes the ZipArchive, closes it.
 
@@ -102,10 +108,26 @@ private:
 	ZipArchive::FileInfos      _infos;
 	ZipArchive::DirectoryInfos _dirs;
 	Poco::UInt32               _offset;
+    std::string                _comment;
 
 	friend class Keep;
 	friend class Rename;
 };
+
+
+//
+// inlines
+//
+inline void Compress::setZipComment(const std::string& comment)
+{
+	_comment = comment;
+}
+
+
+inline const std::string& Compress::getZipComment() const
+{
+	return _comment;
+}
 
 
 } } // namespace Poco::Zip

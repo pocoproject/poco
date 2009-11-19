@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Thread_WIN32.h#8 $
+// $Id: //poco/1.3/Foundation/include/Poco/Thread_WIN32.h#10 $
 //
 // Library: Foundation
 // Package: Threading
@@ -51,6 +51,7 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
+    typedef DWORD TIDImpl;
 	typedef void (*Callable)(void*);
 
 #if defined(_DLL)
@@ -81,6 +82,7 @@ public:
 	ThreadImpl();				
 	~ThreadImpl();
 
+	TIDImpl tidImpl() const;
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio);
@@ -98,7 +100,8 @@ public:
 	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
-
+	static TIDImpl currentTidImpl();
+    
 protected:
 #if defined(_DLL)
 	static DWORD WINAPI runnableEntry(LPVOID pThread);
@@ -144,6 +147,7 @@ private:
 	Runnable*    _pRunnableTarget;
 	CallbackData _callbackTarget;
 	HANDLE       _thread;
+	DWORD        _threadId;
 	int          _prio;
 	int          _stackSize;
 
@@ -199,6 +203,12 @@ inline void ThreadImpl::setStackSizeImpl(int size)
 inline int ThreadImpl::getStackSizeImpl() const
 {
 	return _stackSize;
+}
+
+
+inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
+{
+	return _threadId;
 }
 
 
