@@ -99,7 +99,11 @@ AAAIntroduction
     and uses the LOAD_WITH_ALTERED_SEARCH_PATH if an absolute path is specified. This will
     add the directory containing the library to the search path for DLLs that the
     loaded library depends upon.
- 
+  - Mac OS X build settings now match those used by default Xcode projects, making linking the 
+    POCO libs to Xcode projects easier
+  - Replaced use of std::valarray in Poco::Net::ICMPEventArgs with std::vector due to issues with 
+    std::valarray together with STDCXX debug mode on OS X
+
 
 !!!Release 1.3.5
 
