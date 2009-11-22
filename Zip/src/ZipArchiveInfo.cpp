@@ -1,7 +1,7 @@
 //
 // ZipArchiveInfo.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipArchiveInfo.cpp#4 $
+// $Id: //poco/1.3/Zip/src/ZipArchiveInfo.cpp#5 $
 //
 // Library: Zip
 // Package: Zip
@@ -111,7 +111,7 @@ void ZipArchiveInfo::setZipComment(const std::string& comment)
 		throw ZipException("Maximum number of entries for a ZIP file reached: 65535");
 
 	// Change the value of the ZIP Comment Size to reflect new comment size
-	ZipUtil::set16BitValue(comment.size(), _rawInfo, ZIPCOMMENT_LENGTH_POS);
+	ZipUtil::set16BitValue(static_cast<Poco::UInt16>(comment.size()), _rawInfo, ZIPCOMMENT_LENGTH_POS);
 
     // Now change our internal comment
 	_comment = comment;

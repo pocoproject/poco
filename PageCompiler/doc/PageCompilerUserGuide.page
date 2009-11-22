@@ -1,5 +1,5 @@
 POCO C++ Server Page Compiler User Guide
-PageCompiler
+POCO PageCompiler
 
 !!!Introduction
 PageCompiler is a command line tool that translates HTML files (and other kinds of files) into

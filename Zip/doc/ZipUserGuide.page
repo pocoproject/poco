@@ -1,5 +1,5 @@
 POCO Zip User Guide
-Zip
+POCO Zip Library
 
 !!!Introduction
 POCO Zip adds support for parsing and creating Zip files. It offers the following features:

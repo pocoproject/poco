@@ -1,7 +1,7 @@
 //
 // SharedLibrary_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/SharedLibrary_WIN32U.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/SharedLibrary_WIN32U.cpp#3 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -36,6 +36,7 @@
 
 #include "Poco/SharedLibrary_WIN32U.h"
 #include "Poco/UnicodeConverter.h"
+#include "Poco/Path.h"
 #include "Poco/UnWindows.h"
 
 
@@ -61,9 +62,12 @@ void SharedLibraryImpl::loadImpl(const std::string& path)
 	FastMutex::ScopedLock lock(_mutex);
 
 	if (_handle) throw LibraryAlreadyLoadedException(_path);
+	DWORD flags(0);
+	Path p(path);
+	if (p.isAbsolute()) flags |= LOAD_WITH_ALTERED_SEARCH_PATH;
 	std::wstring upath;
 	UnicodeConverter::toUTF16(path, upath);
-	_handle = LoadLibraryW(upath.c_str());
+	_handle = LoadLibraryExW(upath.c_str(), 0, flags);
 	if (!_handle) throw LibraryLoadException(path);
 	_path = path;
 }

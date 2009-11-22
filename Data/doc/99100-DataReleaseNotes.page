@@ -1,11 +1,21 @@
 POCO Data Release Notes
-Data
+POCO Data Library
+
+!!!Release 1.3.6
+
+!!Summary of Changes
+
+  - fixed SF# 2186643: Data::Statement::reset() not implemented in 1.3.3
+  - better error reporting in Data MySQL connector (patch #2881270 by Jan "HanzZ" Kaluza)
+  - fixed SF# 2876179: MySQL Signed/Unsigned value bug
+  - upgraded to SQLite 3.6.20
+
 
 !!!Release 1.3.5
 
 !!Summary of Changes
 
-- fixed SF# 2779410: Poco::Data::ODBC::HandleException impovement
+  - fixed SF# 2779410: Poco::Data::ODBC::HandleException impovement
 
 
 !!!Release 1.3.4

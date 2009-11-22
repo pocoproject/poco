@@ -1,7 +1,7 @@
 //
 // SharedLibrary_WIN32.cpp
 //
-// $Id: //poco/1.3/Foundation/src/SharedLibrary_WIN32.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/SharedLibrary_WIN32.cpp#4 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -35,6 +35,7 @@
 
 
 #include "Poco/SharedLibrary_WIN32.h"
+#include "Poco/Path.h"
 #include "Poco/UnWindows.h"
 
 
@@ -60,7 +61,10 @@ void SharedLibraryImpl::loadImpl(const std::string& path)
 	FastMutex::ScopedLock lock(_mutex);
 
 	if (_handle) throw LibraryAlreadyLoadedException(_path);
-	_handle = LoadLibraryA(path.c_str());
+	DWORD flags(0);
+	Path p(path);
+	if (p.isAbsolute()) flags |= LOAD_WITH_ALTERED_SEARCH_PATH;
+	_handle = LoadLibraryExA(path.c_str(), 0, flags);
 	if (!_handle) throw LibraryLoadException(path);
 	_path = path;
 }

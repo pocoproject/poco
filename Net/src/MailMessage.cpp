@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.3/Net/src/MailMessage.cpp#4 $
+// $Id: //poco/1.3/Net/src/MailMessage.cpp#5 $
 //
 // Library: Net
 // Package: Mail
@@ -516,7 +516,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 	if (!containsNonASCII) return text;
 	
 	std::string encodedText;
-	int lineLength = 0;
+	std::string::size_type lineLength = 0;
 	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
 	{
 		if (lineLength == 0)

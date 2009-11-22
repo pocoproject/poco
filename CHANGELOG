@@ -93,6 +93,10 @@ Release 1.3.6 (2009-11-24)
 - added Thread::TID type, as well as Thread::tid() and Thread::currentTid() to obtain the native 
   thread handle/ID
 - added Zip file comment support
+- On Windows, Poco::SharedLibrary::load() now uses LoadLibraryEx instead of LoadLibrary
+  and uses the LOAD_WITH_ALTERED_SEARCH_PATH if an absolute path is specified. This will
+  add the directory containing the library to the search path for DLLs that the
+  loaded library depends upon.
 
 
 Release 1.3.5 (2009-05-11)
@@ -1139,4 +1143,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#63 $
+$Id: //poco/1.3/dist/CHANGELOG#64 $
