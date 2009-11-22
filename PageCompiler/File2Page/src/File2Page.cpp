@@ -1,7 +1,7 @@
 //
 // File2Page.cpp
 //
-// $Id: //poco/1.3/PageCompiler/File2Page/src/File2Page.cpp#1 $
+// $Id: //poco/1.3/PageCompiler/File2Page/src/File2Page.cpp#2 $
 //
 // An application that creates a Page Compiler source file from an
 // ordinary file.
@@ -105,12 +105,19 @@ protected:
 				.repeatable(false)
 				.argument("class-name")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleClassName)));
+
+		options.addOption(
+			Option("namespace", "n", "specify the handler class namespace name")
+				.required(false)
+				.repeatable(false)
+				.argument("namespace-name")
+				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleNamespace)));
 	
-			options.addOption(
+		options.addOption(
 			Option("output", "o", "specify the output file name")
 				.required(false)
 				.repeatable(false)
-				.argument("class-name")
+				.argument("path")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleOutput)));
 }
 	
@@ -130,7 +137,12 @@ protected:
 	{
 		_clazz = value;
 	}
-		
+
+	void handleNamespace(const std::string& name, const std::string& value)
+	{
+		_namespace = value;
+	}
+				
 	void handleOutput(const std::string& name, const std::string& value)
 	{
 		_output = value;
@@ -170,6 +182,7 @@ protected:
 		ostr << "<%@ page\n"
 		     << "    contentType=\"" << _contentType << "\"\n"
 		     << "    form=\"false\"\n"
+		     << "    namespace=\"" << _namespace << "\"\n"
 		     << "    class=\"" << _clazz << "\"\n%><%!\n";
 		ostr << "// " << path << "\n";
 		ostr << "static const char data[] = {\n\t";
@@ -186,7 +199,7 @@ protected:
 			ch = istr.get();
 		}
 		ostr << "\n};\n%><%\n";
-		ostr << "\tostr.write(data, sizeof(data));\n";
+		ostr << "\tresponseStream.write(data, sizeof(data));\n";
 		ostr << "%>";
 	}
 	
@@ -205,7 +218,7 @@ protected:
 		else if (ext == "css")
 			return "text/css";
 		else if (ext == "js")
-			return "text/javascript";
+			return "application/javascript";
 		else
 			return "application/binary";
 	}
@@ -226,6 +239,7 @@ private:
 	bool _helpRequested;
 	std::string _contentType;
 	std::string _clazz;
+	std::string _namespace;
 	std::string _output;
 };
 
