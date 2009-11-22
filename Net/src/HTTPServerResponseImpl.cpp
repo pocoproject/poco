@@ -1,7 +1,7 @@
 //
 // HTTPServerResponseImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPServerResponseImpl.cpp#5 $
+// $Id: //poco/1.3/Net/src/HTTPServerResponseImpl.cpp#6 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -150,6 +150,9 @@ void HTTPServerResponseImpl::sendBuffer(const void* pBuffer, std::size_t length)
 void HTTPServerResponseImpl::redirect(const std::string& uri)
 {
 	poco_assert (!_pStream);
+
+	setContentLength(0);
+	setChunkedTransferEncoding(false);
 
 	setStatusAndReason(HTTPResponse::HTTP_FOUND);
 	set("Location", uri);
