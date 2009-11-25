@@ -338,7 +338,7 @@ template <typename TupleType, typename Type, int N>
 POCO_TUPLE_TYPE_HANDLER_INLINE
 void tupleBind(std::size_t& pos, TupleType tuple, AbstractBinder* pBinder, AbstractBinder::Direction dir)
 {
-	pBinder->bind(pos, tuple.template get<N>(), dir);
+	TypeHandler<Type>::bind(pos, tuple.template get<N>(), pBinder, dir);
 	pos += TypeHandler<Type>::size();
 }
 
@@ -347,7 +347,7 @@ template <typename TupleType, typename Type, int N>
 POCO_TUPLE_TYPE_HANDLER_INLINE
 void tuplePrepare(std::size_t& pos, TupleType tuple, AbstractPreparator* pPreparator)
 {
-	pPreparator->prepare(pos, tuple.template get<N>());
+	TypeHandler<Type>::prepare(pos, tuple.template get<N>(), pPreparator);
 	pos += TypeHandler<Type>::size();
 }
 
@@ -356,8 +356,8 @@ template <typename TupleType, typename DefValType, typename Type, int N>
 POCO_TUPLE_TYPE_HANDLER_INLINE
 void tupleExtract(std::size_t& pos, TupleType tuple, DefValType defVal, AbstractExtractor* pExt)
 {
-	if (!pExt->extract(pos, tuple.template get<N>()))
-			tuple.template set<N>(defVal.template get<N>());
+	Poco::Data::TypeHandler<Type>::extract(pos, tuple.template get<N>(),
+	defVal.template get<N>(), pExt);
 	pos += TypeHandler<Type>::size();
 }
 
@@ -416,31 +416,50 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T14, 14>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T15, 15>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T16, 16>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T17, 17>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T18, 18>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T19, 19>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T14, 14>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T15, 15>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T16, 16>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T17, 17>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T18, 18>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T19, 19>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size() +
+			TypeHandler<T16>::size() +
+			TypeHandler<T17>::size() +
+			TypeHandler<T18>::size() +
+			TypeHandler<T19>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -526,30 +545,48 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T14, 14>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T15, 15>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T16, 16>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T17, 17>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T18, 18>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T14, 14>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T15, 15>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T16, 16>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T17, 17>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T18, 18>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size() +
+			TypeHandler<T16>::size() +
+			TypeHandler<T17>::size() +
+			TypeHandler<T18>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -654,7 +691,24 @@ public:
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size() +
+			TypeHandler<T16>::size() +
+			TypeHandler<T17>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -734,28 +788,44 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T14, 14>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T15, 15>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T16, 16>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T14, 14>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T15, 15>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T16, 16>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size() +
+			TypeHandler<T16>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -832,27 +902,42 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T14, 14>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T15, 15>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T14, 14>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T15, 15>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -945,7 +1030,21 @@ public:
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1016,25 +1115,38 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T13, 13>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T13, 13>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1102,24 +1214,36 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T12, 12>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T12, 12>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1184,23 +1308,34 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T11, 11>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T11, 11>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1262,22 +1397,32 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T10, 10>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T10, 10>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1327,21 +1472,30 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T9, 9>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T9, 9>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1389,20 +1543,28 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T8, 8>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T8, 8>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1448,19 +1610,26 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T7, 7>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T7, 7>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1504,18 +1673,24 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T6, 6>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T6, 6>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1557,17 +1732,22 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T5, 5>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T5, 5>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1607,16 +1787,20 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T4, 4>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T4, 4>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1654,15 +1838,18 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T3, 3>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T3, 3>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, T3, NullTypeList>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1698,14 +1885,16 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T2, 2>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T2, 2>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-	        return static_cast<std::size_t>(Poco::Tuple<T0, T1, T2, NullTypeList>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1739,13 +1928,14 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T1, 1>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T1, 1>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, T1, NullTypeList>::length);
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1777,12 +1967,12 @@ public:
 	static void prepare(std::size_t pos, TupleRef tuple, AbstractPreparator* pPreparator)
 	{
 		poco_assert (pPreparator != 0);
-		tuplePrepare<TupleConstRef, T0, 0>(pos, tuple, pPreparator);
+		tuplePrepare<TupleRef, T0, 0>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(Poco::Tuple<T0, NullTypeList>::length);
+		return TypeHandler<T0>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, 

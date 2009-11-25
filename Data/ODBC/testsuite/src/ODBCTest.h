@@ -71,6 +71,7 @@ public:
 
 	virtual void testSimpleAccess();
 	virtual void testComplexType();
+	virtual void testComplexTypeTuple();
 
 	virtual void testSimpleAccessVector();
 	virtual void testComplexTypeVector();
@@ -174,6 +175,7 @@ protected:
 
 	virtual void dropObject(const std::string& type, const std::string& name);
 	virtual void recreatePersonTable();
+	virtual void recreatePersonTupleTable();
 	virtual void recreatePersonBLOBTable();
 	virtual void recreatePersonDateTimeTable();
 	virtual void recreatePersonDateTable();
@@ -273,31 +275,37 @@ inline void ODBCTest::dropObject(const std::string& type, const std::string& nam
 
 inline void ODBCTest::recreatePersonTable()
 { 
-	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+	throw Poco::NotImplementedException("ODBCTest::recreatePersonTable()");
+}
+
+
+inline void ODBCTest::recreatePersonTupleTable()
+{ 
+	throw Poco::NotImplementedException("ODBCTest::recreatePersonTupleTable()");
 }
 
 
 inline void ODBCTest::recreatePersonBLOBTable()
 { 
-	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+	throw Poco::NotImplementedException("ODBCTest::recreatePersonBLOBTable()");
 }
 
 
 inline void ODBCTest::recreatePersonDateTimeTable()
 { 
-	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+	throw Poco::NotImplementedException("ODBCTest::recreatePersonDateTimeTable()");
 }
 
 
 inline void ODBCTest::recreatePersonDateTable()
 { 
-	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+	throw Poco::NotImplementedException("ODBCTest::recreatePersonDateTable()");
 }
 
 
 inline void ODBCTest::recreatePersonTimeTable()
 { 
-	throw Poco::NotImplementedException("ODBCTest::testStoredFunctionDynamicAny()");
+	throw Poco::NotImplementedException("ODBCTest::recreatePersonTimeTable()");
 }
 
 

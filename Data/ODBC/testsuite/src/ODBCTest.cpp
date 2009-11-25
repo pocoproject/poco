@@ -131,6 +131,21 @@ void ODBCTest::testComplexType()
 }
 
 
+void ODBCTest::testComplexTypeTuple()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTupleTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->complexTypeTuple();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testSimpleAccessVector()
 {
 	if (!_pSession) fail ("Test not available.");

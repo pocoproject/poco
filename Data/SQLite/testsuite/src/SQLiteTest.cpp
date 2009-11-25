@@ -409,6 +409,19 @@ void SQLiteTest::testComplexType()
 	Person c2;
 	tmp << "SELECT * FROM PERSON WHERE LASTNAME = :ln", into(c1), use(p1.lastName), now;
 	assert (c1 == p1);
+
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName1 VARCHAR(30), FirstName1 VARCHAR, Address1 VARCHAR, Age1 INTEGER(3),"
+			"LastName2 VARCHAR(30), FirstName2 VARCHAR, Address2 VARCHAR, Age2 INTEGER(3))", now;
+	
+	Tuple<Person,Person> t(p1,p2);
+
+	tmp << "INSERT INTO PERSON VALUES(:ln1, :fn1, :ad1, :age1, :ln2, :fn2, :ad2, :age2)", use(t), now;
+
+	Tuple<Person,Person> ret;
+	assert (ret != t);
+	tmp << "SELECT * FROM PERSON", into(ret), now;
+	assert (ret == t);
 }
 
 

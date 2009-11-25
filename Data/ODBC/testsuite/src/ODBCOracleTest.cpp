@@ -698,6 +698,16 @@ void ODBCOracleTest::recreatePersonTable()
 }
 
 
+void ODBCOracleTest::recreatePersonTupleTable()
+{
+	dropObject("TABLE", "Person");
+	try { *_pSession << "CREATE TABLE Person (LastName1 VARCHAR2(30), FirstName1 VARCHAR2(30), Address1 VARCHAR2(30), Age1 INTEGER,"
+		"LastName2 VARCHAR2(30), FirstName2 VARCHAR2(30), Address2 VARCHAR2(30), Age2 INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTupleTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTupleTable()"); }
+}
+
+
 void ODBCOracleTest::recreatePersonBLOBTable()
 {
 	dropObject("TABLE", "Person");
@@ -848,6 +858,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexType);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeTuple);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccessVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSharedPtrComplexTypeVector);

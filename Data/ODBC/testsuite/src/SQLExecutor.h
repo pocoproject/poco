@@ -134,6 +134,7 @@ public:
 
 	void simpleAccess();
 	void complexType();
+	void complexTypeTuple();
 
 	void simpleAccessVector();
 	void complexTypeVector();
