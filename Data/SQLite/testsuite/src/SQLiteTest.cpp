@@ -92,38 +92,81 @@ using Poco::Data::SQLite::ParameterCountMismatchException;
 using Poco::Int32;
 
 
-struct Person
+class Person
 {
-	std::string lastName;
-	std::string firstName;
-	std::string address;
-	int age;
-	Person(){age = 0;}
-	Person(const std::string& ln, const std::string& fn, const std::string& adr, int a):lastName(ln), firstName(fn), address(adr), age(a)
+public:
+	Person(){_age = 0;}
+	Person(const std::string& ln, const std::string& fn, const std::string& adr, int a):_lastName(ln), _firstName(fn), _address(adr), _age(a)
 	{
 	}
 	bool operator==(const Person& other) const
 	{
-		return lastName == other.lastName && firstName == other.firstName && address == other.address && age == other.age;
+		return _lastName == other._lastName && _firstName == other._firstName && _address == other._address && _age == other._age;
 	}
 
 	bool operator < (const Person& p) const
 	{
-		if (age < p.age)
+		if (_age < p._age)
 			return true;
-		if (lastName < p.lastName)
+		if (_lastName < p._lastName)
 			return true;
-		if (firstName < p.firstName)
+		if (_firstName < p._firstName)
 			return true;
-		return (address < p.address);
+		return (_address < p._address);
 	}
 
 	const std::string& operator () () const
 		/// This method is required so we can extract data to a map!
 	{
 		// we choose the lastName as examplary key
-		return lastName;
+		return _lastName;
 	}
+
+	const std::string& getLastName() const
+	{
+		return _lastName;
+	}
+
+	void setLastName(const std::string& lastName)
+	{
+		_lastName = lastName;
+	}
+
+	const std::string& getFirstName() const
+	{
+		return _firstName;
+	}
+
+	void setFirstName(const std::string& firstName)
+	{
+		_firstName = firstName;
+	}
+
+	const std::string& getAddress() const
+	{
+		return _address;
+	}
+
+	void setAddress(const std::string& address)
+	{
+		_address = address;
+	}
+
+	const int& getAge() const
+	{
+		return _age;
+	}
+
+	void setAge(const int& age)
+	{
+		_age = age;
+	}
+
+private:
+	std::string _lastName;
+	std::string _firstName;
+	std::string _address;
+	int         _age;
 };
 
 
@@ -139,20 +182,20 @@ public:
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
 		poco_assert_dbg (pBinder != 0);
-		pBinder->bind(pos++, obj.lastName, dir);
-		pBinder->bind(pos++, obj.firstName, dir);
-		pBinder->bind(pos++, obj.address, dir);
-		pBinder->bind(pos++, obj.age, dir);
+		pBinder->bind(pos++, obj.getLastName(), dir);
+		pBinder->bind(pos++, obj.getFirstName(), dir);
+		pBinder->bind(pos++, obj.getAddress(), dir);
+		pBinder->bind(pos++, obj.getAge(), dir);
 	}
 
 	static void prepare(std::size_t pos, Person& obj, AbstractPreparator* pPrepare)
 	{
 		// the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))
 		poco_assert_dbg (pPrepare != 0);
-		pPrepare->prepare(pos++, obj.lastName);
-		pPrepare->prepare(pos++, obj.firstName);
-		pPrepare->prepare(pos++, obj.address);
-		pPrepare->prepare(pos++, obj.age);
+		pPrepare->prepare(pos++, obj.getLastName());
+		pPrepare->prepare(pos++, obj.getFirstName());
+		pPrepare->prepare(pos++, obj.getAddress());
+		pPrepare->prepare(pos++, obj.getAge());
 	}
 
 	static std::size_t size()
@@ -166,15 +209,27 @@ public:
 		std::string lastName;
 		std::string firstName;
 		std::string address;
+		int age;
 
-		if (!pExt->extract(pos++, obj.lastName))
-			obj.lastName = defVal.lastName;
-		if (!pExt->extract(pos++, obj.firstName))
-			obj.firstName = defVal.firstName;
-		if (!pExt->extract(pos++, obj.address))
-			obj.address = defVal.address;
-		if (!pExt->extract(pos++, obj.age))
-			obj.age = defVal.age;
+		if (pExt->extract(pos++, lastName))
+			obj.setLastName(lastName);
+		else
+			obj.setLastName(defVal.getLastName());
+
+		if (pExt->extract(pos++, firstName))
+			obj.setFirstName(firstName);
+		else
+			obj.setFirstName(defVal.getFirstName());
+
+		if (pExt->extract(pos++, address))
+			obj.setAddress(address);
+		else
+			obj.setAddress(defVal.getAddress());
+
+		if (pExt->extract(pos++, age))
+			obj.setAge(age);
+		else
+			obj.setAge(defVal.getAge());
 	}
 
 private:
@@ -407,7 +462,7 @@ void SQLiteTest::testComplexType()
 
 	Person c1;
 	Person c2;
-	tmp << "SELECT * FROM PERSON WHERE LASTNAME = :ln", into(c1), use(p1.lastName), now;
+	tmp << "SELECT * FROM PERSON WHERE LASTNAME = :ln", into(c1), useRef(p1.getLastName()), now;
 	assert (c1 == p1);
 
 	tmp << "DROP TABLE IF EXISTS Person", now;
@@ -1225,7 +1280,7 @@ void SQLiteTest::testEmptyDB()
 	Person result;
 	Statement stmt = (tmp << "SELECT * FROM PERSON", into(result), limit(1));
 	stmt.execute();
-	assert (result.firstName.empty());
+	assert (result.getFirstName().empty());
 	assert (stmt.done());
 }
 

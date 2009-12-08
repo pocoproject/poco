@@ -79,7 +79,10 @@ class TypeHandler: public AbstractTypeHandler
 	///        std::string _lastName;
 	///        std::string _firstName;
 	///        int         _age;
-	///        [....] // public set/get methods, a default constructor, optional < operator (for set, multiset) or function operator (for map, multimap)
+	///    public:
+	///        const std::string& getLastName();
+	///        [...] // other set/get methods (returning const reference), a default constructor, 
+	///        [...] // optional < operator (for set, multiset) or function operator (for map, multimap)
 	///    };
 	///
 	/// The TypeHandler must provide a custom bind, size, prepare and extract method:
@@ -103,7 +106,7 @@ class TypeHandler: public AbstractTypeHandler
 	///            TypeHandler<int>::bind(pos++, obj.getAge(), pBinder);
 	///        }
 	///    
-	///        static void prepare(std::size_t pos, const Person& obj, AbstractPreparator* pPreparator)
+	///        static void prepare(std::size_t pos, Person& obj, AbstractPreparator* pPreparator)
 	///        {
 	///            // the table is defined as Person (LastName VARCHAR(30), FirstName VARCHAR, Age INTEGER(3))
 	///            poco_assert_dbg (pPreparator != 0);
