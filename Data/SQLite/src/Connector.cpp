@@ -1,7 +1,7 @@
 //
 // Connector.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Connector.cpp#5 $
+// $Id: //poco/1.3/Data/SQLite/src/Connector.cpp#6 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -37,7 +37,11 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SessionFactory.h"
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
 #include "sqlite3.h"
+#endif
 
 
 namespace Poco {

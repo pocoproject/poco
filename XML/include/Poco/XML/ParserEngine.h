@@ -1,7 +1,7 @@
 //
 // ParserEngine.h
 //
-// $Id: //poco/1.3/XML/include/Poco/XML/ParserEngine.h#3 $
+// $Id: //poco/1.3/XML/include/Poco/XML/ParserEngine.h#4 $
 //
 // Library: XML
 // Package: XML
@@ -40,7 +40,11 @@
 
 
 #include "Poco/XML/XML.h"
+#if defined(POCO_UNBUNDLED)
+#include <expat.h>
+#else
 #include "Poco/XML/expat.h"
+#endif
 #include "Poco/XML/XMLString.h"
 #include "Poco/XML/XMLStream.h"
 #include "Poco/SAX/Locator.h"

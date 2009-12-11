@@ -1,7 +1,7 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/1.3/Foundation/src/RegularExpression.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/RegularExpression.cpp#3 $
 //
 // Library: Foundation
 // Package: RegExp
@@ -37,7 +37,11 @@
 #include "Poco/RegularExpression.h"
 #include "Poco/Exception.h"
 #include <sstream>
+#if defined(POCO_UNBUNDLED)
+#include <pcre.h>
+#else
 #include "pcre.h"
+#endif
 
 
 namespace Poco {

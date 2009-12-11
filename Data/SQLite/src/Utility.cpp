@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#8 $
+// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#9 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -41,7 +41,11 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/String.h"
 #include "Poco/Exception.h"
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
 #include "sqlite3.h"
+#endif
 
 
 namespace Poco {

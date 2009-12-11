@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#10 $
+// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#11 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -41,7 +41,11 @@
 #include "Poco/String.h"
 #include <cstdlib>
 #include <cstring>
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
 #include "sqlite3.h"
+#endif
 
 
 namespace Poco {

@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#8 $
+// $Id: //poco/1.3/Data/SQLite/src/SessionImpl.cpp#9 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -37,7 +37,11 @@
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
 #include "sqlite3.h"
+#endif
 #include <cstdlib>
 
 

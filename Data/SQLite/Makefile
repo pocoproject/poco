@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Data/SQLite/Makefile#7 $
+# $Id: //poco/1.3/Data/SQLite/Makefile#8 $
 #
 # Makefile for Poco SQLite
 #
@@ -13,8 +13,15 @@ SYSFLAGS += -DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS \
 	-DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED
 
 objects = Binder Extractor SessionImpl Connector \
-	SQLiteException SQLiteStatementImpl Utility \
-	sqlite3
+	SQLiteException SQLiteStatementImpl Utility
+
+sqlite_objects = sqlite3
+
+ifdef POCO_UNBUNDLED
+	SYSLIBS += -lsqlite3
+else
+	objects += $(sqlite_objects)
+endif
 
 target         = PocoSQLite
 target_version = $(LIBVERSION)

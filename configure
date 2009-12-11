@@ -2,7 +2,7 @@
 #
 # configure
 #
-# $Id: //poco/1.3/dist/configure#10 $
+# $Id: //poco/1.3/dist/configure#11 $
 #
 # Configuration script for POCO.
 #
@@ -64,6 +64,10 @@ Options:
     Omit a few features for smaller codesize when linking
     statically for embedded targets.
 
+  --unbundled
+    Use system-provided zlib, pcre, expat and sqlite instead of 
+    bundled ones.
+
 ENDHELP
 }
 
@@ -87,6 +91,7 @@ flags=""
 omit=""
 includepath=""
 librarypath=""
+unbundled=""
 # parse arguments
 while [ "$1" != "" ] ; do
 	val=`$EXPR "$1" : '--config=\(.*\)'`
@@ -137,6 +142,11 @@ while [ "$1" != "" ] ; do
 
 	if [ "$1" = "--poquito" ] ; then
 		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION"
+	fi
+
+	if [ "$1" = "--unbundled" ] ; then
+		flags="$flags -DPOCO_UNBUNDLED"
+		unbundled=1
 	fi
 	
 	if [ "$1" = "--help" ] ; then
@@ -201,6 +211,9 @@ fi
 if [ "$librarypath" != "" ] ; then
 	echo "POCO_ADD_LIBRARY = $librarypath" >>$build/config.make
 fi
+if [ "$unbundled" != "" ] ; then
+	echo "POCO_UNBUNDLED = 1" >>$build/config.make
+fi
 echo "export POCO_CONFIG" >>$build/config.make
 echo "export POCO_BASE" >>$build/config.make
 echo "export POCO_BUILD" >>$build/config.make
@@ -214,6 +227,9 @@ if [ "$includepath" != "" ] ; then
 fi
 if [ "$librarypath" != "" ] ; then
 	echo "export POCO_ADD_LIBRARY" >>$build/config.make
+fi
+if [ "$unbundled" != "" ] ; then
+	echo "export POCO_UNBUNDLED " >>$build/config.make
 fi
 
 echo ".PHONY: poco" >>$build/config.make

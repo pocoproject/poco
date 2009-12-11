@@ -1,7 +1,7 @@
 //
 // InflatingStream.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/InflatingStream.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/InflatingStream.h#4 $
 //
 // Library: Foundation
 // Package: Streams
@@ -44,7 +44,11 @@
 #include "Poco/BufferedStreamBuf.h"
 #include <istream>
 #include <ostream>
+#if defined(POCO_UNBUNDLED)
+#include <zlib.h>
+#else
 #include "Poco/zlib.h"
+#endif
 
 
 namespace Poco {

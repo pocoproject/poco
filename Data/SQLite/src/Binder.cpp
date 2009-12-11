@@ -1,7 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Binder.cpp#3 $
+// $Id: //poco/1.3/Data/SQLite/src/Binder.cpp#4 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -38,7 +38,11 @@
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/BLOB.h"
 #include "Poco/Exception.h"
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
 #include "sqlite3.h"
+#endif
 #include <cstdlib>
 
 
