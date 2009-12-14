@@ -1,7 +1,7 @@
 //
 // Timezone_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Timezone_UNIX.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Timezone_UNIX.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Timezone.h"
+#include "Poco/Exception.h"
 #include <ctime>
 
 
@@ -84,7 +85,8 @@ int Timezone::dst()
 {
 	std::time_t now = std::time(NULL);
 	struct std::tm t;
-	localtime_r(&now, &t);
+	if (!localtime_r(&now, &t))
+		throw Poco::SystemException("cannot get local time DST offset");
 	return t.tm_isdst == 1 ? 3600 : 0;
 }
 
@@ -93,6 +95,7 @@ bool Timezone::isDst(const Timestamp& timestamp)
 {
 	std::time_t time = timestamp.epochTime();
 	struct std::tm* tms = std::localtime(&time);
+	if (!tms) throw Poco::SystemException("cannot get local time DST flag");
 	return tms->tm_isdst > 0;
 }
 

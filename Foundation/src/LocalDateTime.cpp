@@ -1,7 +1,7 @@
 //
 // LocalDateTime.cpp
 //
-// $Id: //poco/1.3/Foundation/src/LocalDateTime.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/LocalDateTime.cpp#6 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -37,6 +37,7 @@
 #include "Poco/LocalDateTime.h"
 #include "Poco/Timezone.h"
 #include "Poco/Timespan.h"
+#include "Poco/Exception.h"
 #include <algorithm>
 #include <ctime>
 
@@ -280,10 +281,12 @@ void LocalDateTime::determineTzd(bool adjust)
 		std::time_t epochTime = _dateTime.timestamp().epochTime();
 #if defined(_WIN32) || defined(POCO_NO_POSIX_TSF)
 		std::tm* broken = std::localtime(&epochTime);
+		if (!broken) throw Poco::SystemException("cannot get local time");
 		_tzd = (Timezone::utcOffset() + ((broken->tm_isdst == 1) ? 3600 : 0));
 #else
 		std::tm broken;
-		localtime_r(&epochTime, &broken);
+		if (!localtime_r(&epochTime, &broken))
+			throw Poco::SystemException("cannot get local time");
 		_tzd = (Timezone::utcOffset() + ((broken.tm_isdst == 1) ? 3600 : 0));
 #endif
 		adjustForTzd();

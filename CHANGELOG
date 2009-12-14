@@ -7,6 +7,8 @@ Release 1.3.6p1
   bundled ones (-DPOCO_UNBUNDLED, configure --unbundled)
 - fixed SF# 2911407: Add sh4 support
 - fixed SF# 2912746: RSAKey::EXP_LARGE doesn't work
+- fixed SF# 2904119: abstractstrategy uses std::set but do not includes it
+- fixed SF# 2909946: localtime NULL pointer
 
 
 Release 1.3.6 (2009-11-24)
@@ -1156,4 +1158,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#66 $
+$Id: //poco/1.3/dist/CHANGELOG#69 $
