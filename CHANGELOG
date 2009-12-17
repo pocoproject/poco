@@ -10,6 +10,7 @@ Release 1.3.6p1
 - fixed SF# 2904119: abstractstrategy uses std::set but do not includes it
 - fixed SF# 2909946: localtime NULL pointer
 - fixed SF# 2914986: potential expat DoS security issues (CVE-2009-3560 and CVE-2009-3720)
+- fixed SF# 2916305: SSL Manager crashes
 
 
 Release 1.3.6 (2009-11-24)
@@ -1159,4 +1160,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#70 $
+$Id: //poco/1.3/dist/CHANGELOG#71 $

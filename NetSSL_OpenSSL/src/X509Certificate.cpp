@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -67,6 +67,12 @@ X509Certificate::X509Certificate(const std::string& path):
 
 X509Certificate::X509Certificate(X509* pCert):
 	Poco::Crypto::X509Certificate(pCert)
+{
+}
+
+
+X509Certificate::X509Certificate(X509* pCert, bool shared):
+	Poco::Crypto::X509Certificate(pCert, shared)
 {
 }
 

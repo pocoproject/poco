@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/X509Certificate.h#5 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/X509Certificate.h#6 $
 //
 // Library: Crypto
 // Package: Certificate
@@ -80,6 +80,12 @@ public:
 		/// Creates the X509Certificate from an existing
 		/// OpenSSL certificate. Ownership is taken of 
 		/// the certificate.
+
+	X509Certificate(X509* pCert, bool shared);
+		/// Creates the X509Certificate from an existing
+		/// OpenSSL certificate. Ownership is taken of 
+		/// the certificate. If shared is true, the 
+		/// certificate's reference count is incremented.
 
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.

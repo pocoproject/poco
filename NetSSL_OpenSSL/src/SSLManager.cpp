@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -182,7 +182,7 @@ int SSLManager::verifyCallback(bool server, int ok, X509_STORE_CTX* pStore)
 	if (!ok)
 	{
 		X509* pCert = X509_STORE_CTX_get_current_cert(pStore);
-		X509Certificate x509(pCert);
+		X509Certificate x509(pCert, true);
 		int depth = X509_STORE_CTX_get_error_depth(pStore);
 		int err = X509_STORE_CTX_get_error(pStore);
 		std::string error(X509_verify_cert_error_string(err));

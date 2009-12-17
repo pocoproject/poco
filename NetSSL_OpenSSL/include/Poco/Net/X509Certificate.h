@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -72,6 +72,12 @@ public:
 		/// Creates the X509Certificate from an existing
 		/// OpenSSL certificate. Ownership is taken of 
 		/// the certificate.
+
+	X509Certificate(X509* pCert, bool shared);
+		/// Creates the X509Certificate from an existing
+		/// OpenSSL certificate. Ownership is taken of 
+		/// the certificate. If shared is true, the 
+		/// certificate's reference count is incremented.
 
 	X509Certificate(const Poco::Crypto::X509Certificate& cert);
 		/// Creates the certificate by copying another one.
