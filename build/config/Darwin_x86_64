@@ -1,27 +1,28 @@
 #
-# $Id: //poco/1.3/build/config/Darwin_x86_64#1 $
+# $Id: //poco/1.3/build/config/Darwin_x86_64#2 $
 #
-# Darwin8
+# Darwin_x86_64
 #
-# Build settings for Mac OS X 10.4/GCC 4.0.0
+# Build settings for Mac OS X 10.5/10.6 (GCC 4.0.1)
+# The build settings defined in this file are compatible
+# with XCode 3.1 C++ projects.
 # 
 
 #
 # General Settings
 #
 LINKMODE = SHARED
-POCO_TARGET_OSARCH = x64_64
 
 #
 # Tools
 #
-CC      = cc -arch x86_64
-CXX     = c++ -arch x86_64
+CC      = gcc-4.0 
+CXX     = g++-4.0 
 LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib
-SHLIB   = $(CXX) -dynamiclib -Wl,-install_name,$@ -o $@
-DYLIB   = $(CXX) -dynamic -bundle -read_only_relocs suppress -Wl,-noprebind -Wl,-bind_at_load -o $@ 
+SHLIB   = $(CXX) -dynamiclib -o $@
+DYLIB   = $(CXX) -dynamic -bundle -read_only_relocs suppress -Wl,-bind_at_load -o $@ 
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = 
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc
@@ -39,26 +40,22 @@ SHAREDLIBLINKEXT = .dylib
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
-CFLAGS32        =
-CFLAGS64        =
-CXXFLAGS        = -Wall -Wno-sign-compare
-CXXFLAGS32      =
-CXXFLAGS64      = 
-LINKFLAGS       =
-LINKFLAGS32     =
-LINKFLAGS64     =
+CFLAGS          = -arch x86_64
+CXXFLAGS        = -arch x86_64 -Wall -Wno-sign-compare
+LINKFLAGS       = -arch x86_64
+SHLIBFLAGS      = -arch x86_64
+DYLIBFLAGS      = -arch x86_64
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  =
 SHAREDOPT_CC    = -fPIC 
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = 
-DEBUGOPT_CC     = -g -D_DEBUG=$(DEBUGLEVEL)
-DEBUGOPT_CXX    = -g -D_DEBUG=$(DEBUGLEVEL) 
+DEBUGOPT_CC     = -O0 -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_CXX    = -O0 -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL) -D_GLIBCXX_DEBUG=1 -D_GLIBCXX_DEBUG_PEDANTIC=1 -mfix-and-continue -fvisibility-inlines-hidden 
 DEBUGOPT_LINK   =
-RELEASEOPT_CC   = -DNDEBUG -O2
-RELEASEOPT_CXX  = -DNDEBUG -O 
+RELEASEOPT_CC   = -DNDEBUG -Os
+RELEASEOPT_CXX  = -DNDEBUG -O2 -fvisibility-inlines-hidden
 RELEASEOPT_LINK =
 
 #
@@ -69,4 +66,4 @@ SYSFLAGS = -DPOCO_HAVE_IPv6
 #
 # System Specific Libraries
 #
-SYSLIBS  =  -ldl
+SYSLIBS  = -ldl

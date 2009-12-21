@@ -1,9 +1,11 @@
 #
-# $Id: //poco/1.3/build/config/Darwin#5 $
+# $Id: //poco/1.3/build/config/Darwin#8 $
 #
-# Darwin8
+# Darwin
 #
-# Build settings for Mac OS X 10.4/GCC 4.0.0
+# Build settings for Mac OS X 10.5/10.6 (GCC 4.0.1)
+# The build settings defined in this file are compatible
+# with XCode 3.1 C++ projects.
 # 
 
 #
@@ -14,8 +16,8 @@ LINKMODE = SHARED
 #
 # Tools
 #
-CC      = gcc
-CXX     = c++
+CC      = gcc-4.0
+CXX     = g++-4.0
 LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib
@@ -39,22 +41,18 @@ SHAREDLIBLINKEXT = .dylib
 # Compiler and Linker Flags
 #
 CFLAGS          = 
-CFLAGS32        =
-CFLAGS64        =
 CXXFLAGS        = -Wall -Wno-sign-compare
-CXXFLAGS32      =
-CXXFLAGS64      = 
 LINKFLAGS       =
-LINKFLAGS32     =
-LINKFLAGS64     =
+SHLIBFLAGS      =
+DYLIBFLAGS      =
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  =
 SHAREDOPT_CC    = -fPIC 
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = 
-DEBUGOPT_CC     = -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL)
-DEBUGOPT_CXX    = -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL) -D_GLIBCXX_DEBUG=1 -D_GLIBCXX_DEBUG_PEDANTIC=1 -mfix-and-continue -fvisibility-inlines-hidden 
+DEBUGOPT_CC     = -O0 -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL)
+DEBUGOPT_CXX    = -O0 -g -gdwarf-2 -D_DEBUG=$(DEBUGLEVEL) -D_GLIBCXX_DEBUG=1 -D_GLIBCXX_DEBUG_PEDANTIC=1 -mfix-and-continue -fvisibility-inlines-hidden 
 DEBUGOPT_LINK   =
 RELEASEOPT_CC   = -DNDEBUG -Os
 RELEASEOPT_CXX  = -DNDEBUG -O2 -fvisibility-inlines-hidden
