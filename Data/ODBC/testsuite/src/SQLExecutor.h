@@ -1,7 +1,7 @@
 //
 // SQLExecutor.h
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/SQLExecutor.h#5 $
+// $Id: //poco/1.3/Data/ODBC/testsuite/src/SQLExecutor.h#6 $
 //
 // Definition of the SQLExecutor class.
 //
@@ -111,6 +111,7 @@ public:
 
 	void simpleAccess();
 	void complexType();
+	void complexTypeTuple();
 	void simpleAccessVector();
 	void complexTypeVector();
 	void insertVector();

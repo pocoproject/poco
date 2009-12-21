@@ -1,7 +1,7 @@
 //
 // TypeHandler.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/TypeHandler.h#3 $
+// $Id: //poco/1.3/Data/include/Poco/Data/TypeHandler.h#4 $
 //
 // Library: Data
 // Package: DataCore
@@ -159,7 +159,7 @@ template <typename TupleType, typename Type, int N>
 POCO_TUPLE_TYPE_HANDLER_INLINE
 void tupleBind(std::size_t& pos, TupleType tuple, AbstractBinder* pBinder)
 {
-	pBinder->bind(pos, tuple.template get<N>());
+	TypeHandler<Type>::bind(pos, tuple.template get<N>(), pBinder);
 	pos += TypeHandler<Type>::size();
 }
 
@@ -168,7 +168,7 @@ template <typename TupleType, typename Type, int N>
 POCO_TUPLE_TYPE_HANDLER_INLINE
 void tuplePrepare(std::size_t& pos, TupleType tuple, AbstractPreparation* pPrepare)
 {
-	pPrepare->prepare(pos, tuple.template get<N>());
+	TypeHandler<Type>::prepare(pos, tuple.template get<N>(), pPrepare);
 	pos += TypeHandler<Type>::size();
 }
 
@@ -177,8 +177,7 @@ template <typename TupleType, typename DefValType, typename Type, int N>
 POCO_TUPLE_TYPE_HANDLER_INLINE
 void tupleExtract(std::size_t& pos, TupleType tuple, DefValType defVal, AbstractExtractor* pExt)
 {
-	if (!pExt->extract(pos, tuple.template get<N>()))
-			tuple.template set<N>(defVal.template get<N>());
+	TypeHandler<Type>::extract(pos, tuple.template get<N>(), defVal.template get<N>(), pExt);
 	pos += TypeHandler<Type>::size();
 }
 
@@ -262,7 +261,26 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size() +
+			TypeHandler<T16>::size() +
+			TypeHandler<T17>::size() +
+			TypeHandler<T18>::size() +
+			TypeHandler<T19>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -373,7 +391,25 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size() +
+			TypeHandler<T16>::size() +
+			TypeHandler<T17>::size() +
+			TypeHandler<T18>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -480,7 +516,24 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size() +
+			TypeHandler<T16>::size() +
+			TypeHandler<T17>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -583,7 +636,23 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size() +
+			TypeHandler<T16>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -682,7 +751,22 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size() +
+			TypeHandler<T15>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -777,7 +861,21 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size() +
+			TypeHandler<T14>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -868,7 +966,20 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size() +
+			TypeHandler<T13>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -955,7 +1066,19 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size() +
+			TypeHandler<T12>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1038,7 +1161,18 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size() +
+			TypeHandler<T11>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1117,7 +1251,17 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size() +
+			TypeHandler<T10>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1183,7 +1327,16 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size() +
+			TypeHandler<T9>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1246,7 +1399,15 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size() +
+			TypeHandler<T8>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1306,7 +1467,14 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size() +
+			TypeHandler<T7>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1363,7 +1531,13 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size() +
+			TypeHandler<T6>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1417,7 +1591,12 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size() +
+			TypeHandler<T5>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1468,7 +1647,11 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size() +
+			TypeHandler<T4>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1516,7 +1699,10 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, T3, NullTypeList>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size() +
+			TypeHandler<T3>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1561,7 +1747,9 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, T2, NullTypeList>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size() +
+			TypeHandler<T2>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1603,7 +1791,8 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, T1, NullTypeList>::length;
+		return TypeHandler<T0>::size() +
+			TypeHandler<T1>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, AbstractExtractor* pExt)
@@ -1642,7 +1831,7 @@ public:
 
 	static std::size_t size()
 	{
-		return Poco::Tuple<T0, NullTypeList>::length;
+		return TypeHandler<T0>::size();
 	}
 
 	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, 

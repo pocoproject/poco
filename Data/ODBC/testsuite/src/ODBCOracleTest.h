@@ -1,7 +1,7 @@
 //
 // ODBCOracleTest.h
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCOracleTest.h#4 $
+// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCOracleTest.h#5 $
 //
 // Definition of the ODBCOracleTest class.
 //
@@ -62,6 +62,7 @@ public:
 
 	void testSimpleAccess();
 	void testComplexType();
+	void testComplexTypeTuple();
 	void testSimpleAccessVector();
 	void testComplexTypeVector();
 	void testInsertVector();
@@ -117,6 +118,7 @@ private:
 	void checkODBCSetup();
 	void dropTable(const std::string& tableName);
 	void recreatePersonTable();
+	void recreatePersonTupleTable();
 	void recreatePersonBLOBTable();
 	void recreateStringsTable();
 	void recreateBoolsTable();

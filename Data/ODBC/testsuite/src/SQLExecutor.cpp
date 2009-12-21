@@ -649,6 +649,26 @@ void SQLExecutor::complexType()
 }
 
 
+void SQLExecutor::complexTypeTuple()
+{
+	std::string funct = "complexTypeTuple()";
+	Person p1("LN1", "FN1", "ADDR1", 1);
+	Person p2("LN2", "FN2", "ADDR2", 2);
+
+	Tuple<Person,Person> t(p1,p2);
+	try { *_pSession << "INSERT INTO PERSON VALUES(?,?,?,?,?,?,?,?)", use(t), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	Tuple<Person,Person> ret;
+	assert (ret != t);
+	try { *_pSession << "SELECT * FROM PERSON", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (ret == t);
+}
+
+
 void SQLExecutor::simpleAccessVector()
 {
 	std::string funct = "simpleAccessVector()";

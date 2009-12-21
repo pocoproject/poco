@@ -1,7 +1,7 @@
 //
 // ODBCOracleTest.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCOracleTest.cpp#8 $
+// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCOracleTest.cpp#9 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -170,6 +170,21 @@ void ODBCOracleTest::testComplexType()
 		_pSession->setFeature("autoBind", bindValues[i]);
 		_pSession->setFeature("autoExtract", bindValues[i+1]);
 		_pExecutor->complexType();
+		i += 2;
+	}
+}
+
+
+void ODBCOracleTest::testComplexTypeTuple()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTupleTable();
+		_pSession->setFeature("autoBind", bindValues[i]);
+		_pSession->setFeature("autoExtract", bindValues[i+1]);
+		_pExecutor->complexTypeTuple();
 		i += 2;
 	}
 }
@@ -802,6 +817,16 @@ void ODBCOracleTest::recreatePersonTable()
 }
 
 
+void ODBCOracleTest::recreatePersonTupleTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName1 VARCHAR2(30), FirstName1 VARCHAR2(30), Address1 VARCHAR2(30), Age1 INTEGER,"
+		"LastName2 VARCHAR2(30), FirstName2 VARCHAR2(30), Address2 VARCHAR2(30), Age2 INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTupleTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTupleTable()"); }
+}
+
+
 void ODBCOracleTest::recreatePersonBLOBTable()
 {
 	dropTable("Person");
@@ -975,6 +1000,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 	CppUnit_addTest(pSuite, ODBCOracleTest, testBareboneODBC);
 	CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccess);
 	CppUnit_addTest(pSuite, ODBCOracleTest, testComplexType);
+	CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeTuple);
 	CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccessVector);
 	CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeVector);
 	CppUnit_addTest(pSuite, ODBCOracleTest, testInsertVector);
