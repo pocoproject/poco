@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#5 $
+// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#6 $
 //
 // Library: Crypto
 // Package: RSA
@@ -86,11 +86,6 @@ namespace
 	class RSAEncryptImpl: public CryptoTransform
 	{
 	public:
-		enum
-		{
-			OVERFLOW = 11
-		};
-		
 		RSAEncryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
 		~RSAEncryptImpl();
 		
@@ -196,11 +191,6 @@ namespace
 	class RSADecryptImpl: public CryptoTransform
 	{
 	public:
-		enum
-		{
-			OVERFLOW = 11
-		};
-		
 		RSADecryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
 		~RSADecryptImpl();
 		

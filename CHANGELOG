@@ -8,6 +8,8 @@ Release 1.3.6p2 (2010-01-xx)
   were using the lock (fix contributed by Bjrn Carlsson)
 - added Poco::Environment::libraryVersion().
 - fixed SF# 2919461: Context ignores parameter cypherList
+- removed an unused enum from RSACipherImpl.cpp (Crypto)
+- integrated a new expat patch for CVE-2009-3560.
 
 
 Release 1.3.6p1 (2009-12-21)
@@ -1171,4 +1173,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#74 $
+$Id: //poco/1.3/dist/CHANGELOG#76 $
