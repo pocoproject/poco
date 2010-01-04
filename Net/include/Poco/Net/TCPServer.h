@@ -1,7 +1,7 @@
 //
 // TCPServer.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/TCPServer.h#4 $
+// $Id: //poco/1.3/Net/include/Poco/Net/TCPServer.h#5 $
 //
 // Library: Net
 // Package: TCPServer
@@ -101,26 +101,18 @@ public:
 	TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
-		/// The server takes ownership of the TCPServerConnectionFactory
-		/// and deletes it when it's no longer needed.
-		///
-		/// The server also takes ownership of the TCPServerParams object.
 		/// If no TCPServerParams object is given, the server's TCPServerDispatcher
 		/// creates its own one.
 		///
-		/// News threads are taken from the default thread pool.
+		/// New threads are taken from the default thread pool.
 
 	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
-		/// The server takes ownership of the TCPServerConnectionFactory
-		/// and deletes it when it's no longer needed.
-		///
-		/// The server also takes ownership of the TCPServerParams object.
 		/// If no TCPServerParams object is given, the server's TCPServerDispatcher
 		/// creates its own one.
 		///
-		/// News threads are taken from the given thread pool.
+		/// New threads are taken from the given thread pool.
 
 	virtual ~TCPServer();
 		/// Destroys the TCPServer and its TCPServerConnectionFactory.
@@ -143,7 +135,7 @@ public:
 		/// No new connections will be accepted.
 		/// Already handled connections will continue to be served.
 		///
-		/// Once the server is stopped, it cannot be restarted.
+		/// Once the server has been stopped, it cannot be restarted.
 		
 	int currentThreads() const;
 		/// Returns the number of currently used connection threads.

@@ -1,7 +1,7 @@
 //
 // TCPServerDispatcher.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/TCPServerDispatcher.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/TCPServerDispatcher.h#4 $
 //
 // Library: Net
 // Package: TCPServer
@@ -61,10 +61,6 @@ class Net_API TCPServerDispatcher: public Poco::Runnable
 public:
 	TCPServerDispatcher(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, TCPServerParams::Ptr pParams);
 		/// Creates the TCPServerDispatcher.
-		///
-		/// The dispatcher takes ownership of the TCPServerParams object.
-		/// If no TCPServerParams object is supplied, the TCPServerDispatcher
-		/// creates one.
 
 	void duplicate();
 		/// Increments the object's reference count.
