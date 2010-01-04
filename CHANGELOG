@@ -1,5 +1,15 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.3.6p2 (2010-01-xx)
+============================
+
+- fixed an issue in the Windows implementation Poco::RWLock, where
+  tryReadLock() sometimes would return false even if no writers
+  were using the lock (fix contributed by Bjrn Carlsson)
+- added Poco::Environment::libraryVersion().
+- fixed SF# 2919461: Context ignores parameter cypherList
+
+
 Release 1.3.6p1 (2009-12-21)
 ============================
 
@@ -1161,4 +1171,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#72 $
+$Id: //poco/1.3/dist/CHANGELOG#74 $

@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#8 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -58,7 +58,7 @@ Context::Context(
 	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
-	const std::string& cypherList):
+	const std::string& cipherList):
 	_usage(usage),
 	_mode(verificationMode),
 	_pSSLContext(0)
@@ -72,7 +72,7 @@ Context::Context(
 	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPasswdCallback);
 	Utility::clearErrorStack();
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
-	
+
 	int errCode = 0;
 	if (!caLocation.empty())
 	{
@@ -99,13 +99,13 @@ Context::Context(
 			throw SSLContextException("Cannot load default CA certificates", msg);
 		}
 	}
-	
+
 	if (!privateKeyFile.empty())
 	{
 		errCode = SSL_CTX_use_PrivateKey_file(_pSSLContext, Poco::Path::transcode(privateKeyFile).c_str(), SSL_FILETYPE_PEM);
 		if (errCode != 1)
 		{
-			std::string msg = Utility::getLastError();			
+			std::string msg = Utility::getLastError();
 			SSL_CTX_free(_pSSLContext);
 			throw SSLContextException(std::string("Error loading private key from file ") + privateKeyFile, msg);
 		}
@@ -118,15 +118,16 @@ Context::Context(
 		{
 			std::string errMsg = Utility::getLastError();
 			SSL_CTX_free(_pSSLContext);
-			throw SSLContextException(std::string("Error loading certificate from file ") + privateKeyFile, errMsg);
+			throw SSLContextException(std::string("Error loading certificate from file ") + certificateFile, errMsg);
 		}
 	}
-	
+
 	if (usage == SERVER_USE)
 		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyServerCallback);
 	else
 		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyClientCallback);
 
+	SSL_CTX_set_cipher_list(_pSSLContext, cipherList.c_str());
 	SSL_CTX_set_verify_depth(_pSSLContext, verificationDepth);
 	SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 	SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
@@ -144,7 +145,7 @@ void Context::enableSessionCache(bool flag)
 	SSL_CTX_set_session_cache_mode(_pSSLContext, flag ? SSL_SESS_CACHE_SERVER : SSL_SESS_CACHE_OFF);
 }
 
-	
+
 bool Context::sessionCacheEnabled() const
 {
 	return SSL_CTX_get_session_cache_mode(_pSSLContext) != SSL_SESS_CACHE_OFF;

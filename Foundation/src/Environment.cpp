@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Environment.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -129,6 +129,12 @@ void Environment::nodeId(NodeId& id)
 unsigned Environment::processorCount()
 {
 	return EnvironmentImpl::processorCountImpl();
+}
+
+
+Poco::UInt32 Environment::libraryVersion()
+{
+	return POCO_VERSION;
 }
 
 
