@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/OpenSSLInitializer.h#1 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/OpenSSLInitializer.h#2 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -91,6 +91,7 @@ protected:
 
 private:
 	static Poco::FastMutex* _mutexes;
+	static Poco::FastMutex _mutex;
 	static int _rc;
 };
 

@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#9 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -38,6 +38,7 @@
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/Utility.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include <openssl/bio.h>
@@ -63,6 +64,8 @@ Context::Context(
 	_mode(verificationMode),
 	_pSSLContext(0)
 {
+	Poco::Crypto::OpenSSLInitializer::initialize();
+	
 	_pSSLContext = SSL_CTX_new(SSLv23_method());
 	if (!_pSSLContext) 
 	{
@@ -137,6 +140,8 @@ Context::Context(
 Context::~Context()
 {
 	SSL_CTX_free(_pSSLContext);
+	
+	Poco::Crypto::OpenSSLInitializer::uninitialize();
 }
 
 

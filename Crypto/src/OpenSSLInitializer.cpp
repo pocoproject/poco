@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#3 $
+// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#4 $
 //
 // Library: Crypto
 // Package: CryotpCore
@@ -53,6 +53,7 @@ namespace Crypto {
 
 
 FastMutex* OpenSSLInitializer::_mutexes(0);
+FastMutex OpenSSLInitializer::_mutex;
 int OpenSSLInitializer::_rc(0);
 
 
@@ -73,6 +74,8 @@ OpenSSLInitializer::~OpenSSLInitializer()
 
 void OpenSSLInitializer::initialize()
 {
+	FastMutex::ScopedLock lock(_mutex);
+	
 	if (++_rc == 1)
 	{
 		poco_assert (1 == SSL_library_init()); // always returns 1
@@ -98,6 +101,8 @@ void OpenSSLInitializer::initialize()
 
 void OpenSSLInitializer::uninitialize()
 {
+	FastMutex::ScopedLock lock(_mutex);
+
 	if (--_rc == 0)
 	{
 		EVP_cleanup();
