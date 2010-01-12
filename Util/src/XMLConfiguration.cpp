@@ -1,7 +1,7 @@
 //
 // XMLConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/XMLConfiguration.cpp#2 $
+// $Id: //poco/1.3/Util/src/XMLConfiguration.cpp#3 $
 //
 // Library: Util
 // Package: Configuration
@@ -270,9 +270,29 @@ Poco::XML::Node* XMLConfiguration::findNode(std::string::const_iterator& it, con
 			{
 				++it;
 				std::string attr;
-				while (it != end && *it != ']') attr += *it++;
-				if (it != end) ++it;
-				return findAttribute(attr, pNode, create);
+				while (it != end && *it != ']' && *it != '=') attr += *it++;
+				if (it != end && *it == '=')
+				{
+					++it;
+					std::string value;
+					if (it != end && *it == '\'')
+					{
+						++it;
+						while (it != end && *it != '\'') value += *it++;
+						if (it != end) ++it;
+					}
+					else
+					{
+						while (it != end && *it != ']') value += *it++;
+					}
+					if (it != end) ++it;
+					return findNode(it, end, findElement(attr, value, pNode), create);
+				}
+				else
+				{
+					if (it != end) ++it;
+					return findAttribute(attr, pNode, create);
+				}
 			}
 			else
 			{
@@ -337,6 +357,27 @@ Poco::XML::Node* XMLConfiguration::findElement(int index, Poco::XML::Node* pNode
 			return pElem;
 		}
 		else throw Poco::InvalidArgumentException("Element index out of range.");
+	}
+	return pNode;
+}
+
+
+Poco::XML::Node* XMLConfiguration::findElement(const std::string& attr, const std::string& value, Poco::XML::Node* pNode)
+{
+	Poco::XML::Node* pRefNode = pNode;
+	Poco::XML::Element* pElem = dynamic_cast<Poco::XML::Element*>(pNode);
+	if (!(pElem && pElem->getAttribute(attr) == value))
+	{
+		pNode = pNode->nextSibling();
+		while (pNode)
+		{
+			if (pNode->nodeName() == pRefNode->nodeName())
+			{
+				pElem = dynamic_cast<Poco::XML::Element*>(pNode);
+				if (pElem && pElem->getAttribute(attr) == value) break;
+			}
+			pNode = pNode->nextSibling();
+		}
 	}
 	return pNode;
 }

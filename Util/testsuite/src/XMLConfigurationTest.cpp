@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.cpp#2 $
+// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -67,8 +67,14 @@ void XMLConfigurationTest::testLoad()
 		"		<prop4 attr='value3'/>"
 		"		<prop4 attr='value4'/>"
 		"	</prop3>"
-		"	<prop5>value5</prop5>"
-		"	<prop5>value6</prop5>"
+		"	<prop5 id='1'>value5</prop5>"
+		"	<prop5 id='2'>value6</prop5>"
+		"   <prop6 id='foo'>"
+		"       <prop7>value7</prop7>"
+		"   </prop6>"
+		"   <prop6 id='bar'>"
+		"       <prop7>value8</prop7>"
+		"   </prop6>"
 		"</config>";
 		
 	std::istringstream istr(xmlFile);	
@@ -81,15 +87,21 @@ void XMLConfigurationTest::testLoad()
 	assert (pConf->getString("prop5") == "value5");
 	assert (pConf->getString("prop5[0]") == "value5");
 	assert (pConf->getString("prop5[1]") == "value6");
+	assert (pConf->getString("prop5[@id=1]") == "value5");
+	assert (pConf->getString("prop5[@id='2']") == "value6");
+	assert (pConf->getString("prop6[@id=foo].prop7") == "value7");
+	assert (pConf->getString("prop6[@id='bar'].prop7") == "value8");
 	
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
-	assert (keys.size() == 5);
+	assert (keys.size() == 7);
 	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop5") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop5[1]") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "prop6") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "prop6[1]") != keys.end());
 	
 	pConf->keys("prop3", keys);
 	assert (keys.size() == 2);
@@ -99,6 +111,15 @@ void XMLConfigurationTest::testLoad()
 	try
 	{
 		std::string s = pConf->getString("foo");
+		fail("No property - must throw");
+	}
+	catch (NotFoundException&)
+	{
+	}
+
+	try
+	{
+		std::string s = pConf->getString("prop5[@id='3']");
 		fail("No property - must throw");
 	}
 	catch (NotFoundException&)
@@ -173,6 +194,9 @@ void XMLConfigurationTest::testSave()
 	pConf->setString("prop3.prop4[1][@attr]", "value41");
 	assert (pConf->getString("prop3.prop4[1][@attr]") == "value41");
 
+	pConf->setString("prop3.prop4[2][@attr]", "value42");
+	assert (pConf->getString("prop3.prop4[2][@attr]") == "value42");
+
 	std::ostringstream ostr3;
 	pConf->save(ostr3);
 	s = ostr3.str();
@@ -183,6 +207,7 @@ void XMLConfigurationTest::testSave()
 		"\t<prop3>\n"
 		"\t\t<prop4 attr=\"value3\"/>\n"
 		"\t\t<prop4 attr=\"value41\"/>\n"
+		"\t\t<prop4 attr=\"value42\"/>\n"
 		"\t</prop3>\n"
 		"\t<prop5>value5</prop5>\n"
 		"\t<prop5>value6</prop5>\n"

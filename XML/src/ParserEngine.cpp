@@ -1,7 +1,7 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/1.3/XML/src/ParserEngine.cpp#6 $
+// $Id: //poco/1.3/XML/src/ParserEngine.cpp#7 $
 //
 // Library: XML
 // Package: XML
@@ -350,13 +350,13 @@ void ParserEngine::parseExternalCharInputStream(XML_Parser extParser, XMLCharInp
 	XMLChar *pBuffer = new XMLChar[PARSE_BUFFER_SIZE/sizeof(XMLChar)];
 	try
 	{
-		std::streamsize n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
+		std::streamsize n = readChars(istr, pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
 		while (n > 0)
 		{
 			if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), n*sizeof(XMLChar), 0))
 				handleError(XML_GetErrorCode(extParser));
 			if (istr.good())
-				n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
+				n = readChars(istr, pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
 			else 
 				n = 0;
 		}
@@ -396,7 +396,7 @@ std::streamsize ParserEngine::readChars(XMLCharInputStream& istr, XMLChar* pBuff
 {
 	if (_enablePartialReads)
 	{
-		istr.read(_pBuffer, 1);
+		istr.read(pBuffer, 1);
 		if (istr.gcount() == 1)
 		{
 			std::streamsize n = istr.readsome(pBuffer + 1, bufferSize - 1);

@@ -13,6 +13,8 @@ Release 1.3.6p2 (2010-01-xx)
 - fixed SF# 2926458: SSL Context Problem. The Poco::Net::Context
   class now makes sure that OpenSSL is properly initialized.
 - updated iPhone build configuration (contributed by Martin York)
+- fixed SF# 1815124 (reopened): XML Compile failed on VS7.1 with
+  XML_UNICODE_WCHAR_T
 
 
 Release 1.3.6p1 (2009-12-21)
@@ -1176,4 +1178,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#78 $
+$Id: //poco/1.3/dist/CHANGELOG#79 $
