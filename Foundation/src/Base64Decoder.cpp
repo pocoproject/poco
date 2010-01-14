@@ -1,7 +1,7 @@
 //
 // Base64Decoder.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Base64Decoder.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Base64Decoder.cpp#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -88,13 +88,13 @@ int Base64DecoderBuf::readFromDevice()
 		if ((c = readOne()) == -1) return -1;
 		buffer[0] = (unsigned char) c;
 		if (IN_ENCODING[buffer[0]] == 0xFF) throw DataFormatException();
-		if ((c = readOne()) == -1) return -1;
+		if ((c = readOne()) == -1) throw DataFormatException();
 		buffer[1] = (unsigned char) c;
 		if (IN_ENCODING[buffer[1]] == 0xFF) throw DataFormatException();
-		if ((c = readOne()) == -1) return -1;
+		if ((c = readOne()) == -1) throw DataFormatException();
 		buffer[2] = c;
 		if (IN_ENCODING[buffer[2]] == 0xFF) throw DataFormatException();
-		if ((c = readOne()) == -1) return -1;
+		if ((c = readOne()) == -1) throw DataFormatException();
 		buffer[3] = c;
 		if (IN_ENCODING[buffer[3]] == 0xFF) throw DataFormatException();
 		

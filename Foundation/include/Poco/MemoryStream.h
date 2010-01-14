@@ -1,7 +1,7 @@
 //
 // MemoryStream.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/MemoryStream.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/MemoryStream.h#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -101,7 +101,7 @@ public:
 	
 	std::streamsize charsWritten() const
 	{
-		return this->pptr() - this->pbase();
+		return static_cast<std::streamsize>(this->pptr() - this->pbase());
 	}
 
 private:
