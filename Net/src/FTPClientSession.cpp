@@ -1,7 +1,7 @@
 //
 // FTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/FTPClientSession.cpp#3 $
+// $Id: //poco/1.3/Net/src/FTPClientSession.cpp#4 $
 //
 // Library: Net
 // Package: FTP
@@ -318,7 +318,7 @@ std::string FTPClientSession::extractPath(const std::string& response)
 			if (*it == '"')
 			{
 				++it;
-				if (it != end && *it != '"') break;
+				if (it == end || (it != end && *it != '"')) break;
 			}
 			path += *it++;
 		}
