@@ -1,7 +1,7 @@
 //
 // HTTPServerRequestImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerRequestImpl.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerRequestImpl.h#4 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -53,6 +53,7 @@ namespace Net {
 
 class HTTPServerSession;
 class HTTPServerParams;
+class StreamSocket;
 
 
 class Net_API HTTPServerRequestImpl: public HTTPServerRequest
@@ -92,12 +93,16 @@ public:
 
 	HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response.
+		
+	StreamSocket& socket();
+		/// Returns a reference to the underlying socket.
 
 protected:
 	static const std::string EXPECT;
 	
 private:
 	HTTPServerResponse&             _response;
+	HTTPServerSession&              _session;
 	std::istream*                   _pStream;
 	Poco::AutoPtr<HTTPServerParams> _pParams;
 	SocketAddress                   _clientAddress;

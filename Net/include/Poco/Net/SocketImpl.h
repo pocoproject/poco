@@ -1,7 +1,7 @@
 //
 // SocketImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketImpl.h#7 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SocketImpl.h#8 $
 //
 // Library: Net
 // Package: Sockets
@@ -337,6 +337,10 @@ public:
 		/// Returns the blocking mode of the socket.
 		/// This method will only work if the blocking modes of 
 		/// the socket are changed via the setBlocking method!
+		
+	virtual bool secure() const;
+		/// Returns true iff the socket's connection is secure
+		/// (using SSL or TLS).
 
 	int socketError();
 		/// Returns the value of the SO_ERROR socket option.

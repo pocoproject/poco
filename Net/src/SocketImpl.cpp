@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#9 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#10 $
 //
 // Library: Net
 // Package: Sockets
@@ -334,6 +334,12 @@ int SocketImpl::available()
 	int result;
 	ioctl(FIONREAD, result);
 	return result;
+}
+
+
+bool SocketImpl::secure() const
+{
+	return false;
 }
 
 

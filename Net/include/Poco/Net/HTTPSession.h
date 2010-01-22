@@ -1,7 +1,7 @@
 //
 // HTTPSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPSession.h#5 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPSession.h#6 $
 //
 // Library: Net
 // Package: HTTP
@@ -102,7 +102,10 @@ public:
 		///
 		/// The socket is returned, and a new, uninitialized socket is
 		/// attached to the session.
-		
+
+	StreamSocket& socket();
+		/// Returns a reference to the underlying socket.
+
 protected:
 	HTTPSession();
 		/// Creates a HTTP session using an
@@ -150,9 +153,6 @@ protected:
 	int buffered() const;
 		/// Returns the number of bytes in the buffer.
 
-	StreamSocket& socket();
-		/// Returns a reference to the underlying socket.
-		
 	void refill();
 		/// Refills the internal buffer.
 		

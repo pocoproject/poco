@@ -1,7 +1,7 @@
 //
 // SSLManager.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#4 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#5 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -66,7 +66,7 @@ class NetSSL_API SSLManager
 	/// Either initialize via Poco::Util::Application or via the
 	/// initialize methods of the singleton. Note that the latter initialization must happen very early
 	/// during program startup before somebody calls defaultClientContext()/defaultServerContext() 
-	/// or any of the passPhraseHandler methods (which tries to auto-initialize
+	/// or any of the passphraseHandler methods (which tries to auto-initialize
 	/// the context and passphrase handler based on an Poco::Util::Application configuration).
 	///
 	/// An exemplary documentation which sets either the server or client default context and creates 
@@ -81,7 +81,7 @@ class NetSSL_API SSLManager
 	///            <verificationMode>relaxed</verificationMode>
 	///            <verificationDepth>9</verificationDepth>
 	///            <loadDefaultCAFile>true</loadDefaultCAFile>
-	///            <cypherList>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</cypherList>
+	///            <cipherList>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</cipherList>
 	///            <privateKeyPassphraseHandler>
 	///                <name>KeyFileHandler</name>
 	///                <options>
@@ -103,45 +103,48 @@ public:
 	typedef Poco::SharedPtr<InvalidCertificateHandler> InvalidCertificateHandlerPtr;
 
 	Poco::BasicEvent<VerificationErrorArgs> ServerVerificationError;
-		/// Thrown whenever a certificate error is detected by the server during a handshake.
+		/// Fired whenever a certificate error is detected by the server during a handshake.
 
 	Poco::BasicEvent<VerificationErrorArgs> ClientVerificationError;
-		/// Thrown whenever a certificate error is detected by the client during a handshake.
+		/// Fired whenever a certificate error is detected by the client during a handshake.
 
-	Poco::BasicEvent<std::string> PrivateKeyPassPhrase;
-		/// Thrown when a encrypted certificate is loaded. Not setting the password
+	Poco::BasicEvent<std::string> PrivateKeyPassphraseRequired;
+		/// Fired when a encrypted certificate is loaded. Not setting the password
 		/// in the event parameter will result in a failure to load the certificate.
 		///
-		/// Per default the SSLManager checks the configuration.xml file (path openSSL.privateKeyPassphraseHandler.name)
+		/// Per default the SSLManager checks the application configuration file 
+		/// (path openSSL.privateKeyPassphraseHandler.name)
 		/// for which default delegate it should register. If nothing is configured,
 		/// a KeyConsoleHandler is used.
 
 	static SSLManager& instance();
 		/// Returns the instance of the SSLManager singleton.
 
-	void initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassPhraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext);
+	void initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext);
 		/// Initializes the server side of the SSLManager with a default passphrase handler, a default invalid certificate handler and a default context. If this method
 		/// is never called the SSLmanager will try to initialize its members from an application configuration.
 		///
 		/// Note: ALWAYS create the handlers before you create the context!
 		///
 		/// Valid initialization code would be:
-		///    SharedPtr<PrivateKeyPassphraseHandler> ptrConsole = new KeyConsoleHandler();
-		///    SharedPtr<InvalidCertificateHandler> ptrCert = new ConsoleCertificateHandler();
-		///    Context::Ptr ptrContext = new Context("any.pem", "rootcert.pem", Context::Relaxed, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		///     SharedPtr<PrivateKeyPassphraseHandler> pConsoleHandler = new KeyConsoleHandler;
+		///     SharedPtr<InvalidCertificateHandler> pInvalidCertHandler = new ConsoleCertificateHandler;
+		///     Context::Ptr pContext = new Context(Context::SERVER_USE, "any.pem", "any.pem", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		///     SSLManager::instance().initializeServer(pConsoleHandler, pInvalidCertHandler, pContext);
 		///
 		/// This method can only be called if no defaultContext is set yet.
 
-	void initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassPhraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext);
+	void initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext);
 		/// Initializes the client side of the SSLManager with a default passphrase handler, a default invalid certificate handler and a default context. If this method
 		/// is never called the SSLmanager will try to initialize its members from an application configuration.
 		///
 		/// Note: ALWAYS create the handlers before you create the context!
 		///
 		/// Valid initialization code would be:
-		///    SharedPtr<PrivateKeyPassphraseHandler> ptrConsole = new KeyConsoleHandler();
-		///    SharedPtr<InvalidCertificateHandler> ptrCert = new ConsoleCertificateHandler();
-		///    Context::Ptr ptrContext = new Context("any.pem", "rootcert.pem", Context::Relaxed, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		///     SharedPtr<PrivateKeyPassphraseHandler> pConsoleHandler = new KeyConsoleHandler;
+		///     SharedPtr<InvalidCertificateHandler> pInvalidCertHandler = new ConsoleCertificateHandler;
+		///     Context::Ptr pContext = new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		///     SSLManager::instance().initializeClient(pConsoleHandler, pInvalidCertHandler, pContext);
 		///
 		/// This method can only be called if no defaultContext is set yet.
 
@@ -153,7 +156,7 @@ public:
 		/// Returns the default context used by the client. The first call to this method initializes the defaultContext
 		/// from an application configuration.
 
-	PrivateKeyPassphraseHandlerPtr serverPassPhraseHandler();
+	PrivateKeyPassphraseHandlerPtr serverPassphraseHandler();
 		/// Returns the configured passphrase handler of the server. If none is set, the method will create a default one
 		/// from an application configuration
 
@@ -161,7 +164,7 @@ public:
 		/// Returns an initialized certificate handler (used by the server to verify client cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
-	PrivateKeyPassphraseHandlerPtr clientPassPhraseHandler();
+	PrivateKeyPassphraseHandlerPtr clientPassphraseHandler();
 		/// Returns the configured passphrase handler of the client. If none is set, the method will create a default one
 		/// from an application configuration
 
@@ -209,7 +212,7 @@ private:
 	void initEvents(bool server);
 		/// Registers delegates at the events according to the configuration.
 
-	void initPassPhraseHandler(bool server);
+	void initPassphraseHandler(bool server);
 		/// Inits the passphrase handler.
 
 	void initCertificateHandler(bool server);
@@ -223,10 +226,10 @@ private:
 	PrivateKeyFactoryMgr           _factoryMgr;
 	CertificateHandlerFactoryMgr   _certHandlerFactoryMgr;
 	Context::Ptr                   _ptrDefaultServerContext;
-	PrivateKeyPassphraseHandlerPtr _ptrServerPassPhraseHandler;
+	PrivateKeyPassphraseHandlerPtr _ptrServerPassphraseHandler;
 	InvalidCertificateHandlerPtr   _ptrServerCertificateHandler;
 	Context::Ptr                   _ptrDefaultClientContext;
-	PrivateKeyPassphraseHandlerPtr _ptrClientPassPhraseHandler;
+	PrivateKeyPassphraseHandlerPtr _ptrClientPassphraseHandler;
 	InvalidCertificateHandlerPtr   _ptrClientCertificateHandler;
 	Poco::FastMutex                _mutex;
 
@@ -239,8 +242,9 @@ private:
 	static const int         VAL_VER_DEPTH;
 	static const std::string CFG_ENABLE_DEFAULT_CA;
 	static const bool        VAL_ENABLE_DEFAULT_CA;
-	static const std::string CFG_CYPHER_LIST;
-	static const std::string VAL_CYPHER_LIST;
+	static const std::string CFG_CIPHER_LIST;
+	static const std::string CFG_CYPHER_LIST; // for backwards compatibility
+	static const std::string VAL_CIPHER_LIST;
 	static const std::string CFG_DELEGATE_HANDLER;
 	static const std::string VAL_DELEGATE_HANDLER;
 	static const std::string CFG_CERTIFICATE_HANDLER;

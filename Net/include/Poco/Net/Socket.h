@@ -1,7 +1,7 @@
 //
 // Socket.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/Socket.h#4 $
+// $Id: //poco/1.3/Net/include/Poco/Net/Socket.h#5 $
 //
 // Library: Net
 // Package: Sockets
@@ -296,6 +296,10 @@ public:
 	SocketImpl* impl() const;
 		/// Returns the SocketImpl for this socket.
 		
+	bool secure() const;
+		/// Returns true iff the socket's connection is secure
+		/// (using SSL or TLS).
+		
 	static bool supportsIPv4();
 		/// Returns true if the system supports IPv4.
 		
@@ -585,6 +589,12 @@ inline SocketAddress Socket::address() const
 inline SocketAddress Socket::peerAddress() const
 {
 	return _pImpl->peerAddress();
+}
+
+
+inline bool Socket::secure() const
+{
+	return _pImpl->secure();
 }
 
 

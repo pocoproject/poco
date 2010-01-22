@@ -1,5 +1,15 @@
 This is the changelog file for the POCO C++ Libraries.
 
+
+Release 1.3.7 (2010-0?-??)
+==========================
+
+- SSLManager: documentation fixes, code cleanup
+- SSLManager: renamed PrivateKeyPassPhrase event to PrivateKeyPassphraseRequired
+- added HTTPServerRequestImpl::socket() to get access to the underlying socket
+- added Socket::secure() to find out whether a given socket supports SSL/TLS
+
+
 Release 1.3.6p2 (2010-01-15)
 ============================
 
@@ -1179,4 +1189,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#79 $
+$Id: //poco/1.3/dist/CHANGELOG#82 $

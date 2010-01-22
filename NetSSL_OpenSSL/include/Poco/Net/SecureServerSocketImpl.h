@@ -1,7 +1,7 @@
 //
 // SecureServerSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocketImpl.h#4 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocketImpl.h#5 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -132,6 +132,10 @@ public:
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
+
+	bool secure() const;
+		/// Returns true iff the socket's connection is secure
+		/// (using SSL or TLS).
 		
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.

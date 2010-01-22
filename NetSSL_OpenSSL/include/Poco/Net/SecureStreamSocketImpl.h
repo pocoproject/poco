@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -138,6 +138,10 @@ public:
 		
 	void shutdown();
 		/// Shuts down the SSL connection.
+		
+	bool secure() const;
+		/// Returns true iff the socket's connection is secure
+		/// (using SSL or TLS).
 
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer host name for certificate validation purposes.
