@@ -1,7 +1,7 @@
 //
 // Foundation.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Foundation.h#5 $
+// $Id: //poco/1.3/Foundation/include/Poco/Foundation.h#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -11,7 +11,7 @@
 // This file must be the first file included by every other Foundation
 // header file.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -51,7 +51,7 @@
 //    - CC is the revision number, and
 //    - DD is the patch level number.
 //
-#define POCO_VERSION 0x01030602
+#define POCO_VERSION 0x010307D0
 
 
 //
