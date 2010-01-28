@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#8 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -88,17 +88,23 @@ public:
 	~X509Certificate();
 		/// Destroys the X509Certificate.
 
-	long verify(const std::string& hostName) const;
+	bool verify(const std::string& hostName) const;
 		/// Verifies the validity of the certificate against the host name.
 		///
-		/// Returns X509_V_OK if verification succeeded, or an
-		/// error code (X509_V_ERR_APPLICATION_VERIFICATION) otherwise.
+		/// For this check to be successful, the certificate must contain
+		/// a domain name that matches the domain name
+		/// of the host.
+		/// 
+		/// Returns true if verification succeeded, or false otherwise.
 		
-	static long verify(const Poco::Crypto::X509Certificate& cert, const std::string& hostName);
+	static bool verify(const Poco::Crypto::X509Certificate& cert, const std::string& hostName);
 		/// Verifies the validity of the certificate against the host name.
 		///
-		/// Returns X509_V_OK if verification succeeded, or an
-		/// error code (X509_V_ERR_APPLICATION_VERIFICATION) otherwise.
+		/// For this check to be successful, the certificate must contain
+		/// a domain name that matches the domain name
+		/// of the host.
+		///
+		/// Returns true if verification succeeded, or false otherwise.
 		
 protected:
 	static bool containsWildcards(const std::string& commonName);

@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#8 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/X509Certificate.cpp#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -96,13 +96,13 @@ X509Certificate::~X509Certificate()
 }
 
 
-long X509Certificate::verify(const std::string& hostName) const
+bool X509Certificate::verify(const std::string& hostName) const
 {
 	return verify(*this, hostName);
 }
 
 
-long X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, const std::string& hostName)
+bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, const std::string& hostName)
 {		
 	std::string commonName;
 	std::set<std::string> dnsNames;
@@ -151,15 +151,10 @@ long X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 		}
 		catch (HostNotFoundException&)
 		{
-			return X509_V_ERR_APPLICATION_VERIFICATION;
+			return false;
 		}
 	}
-
-	// we already have a verify callback registered so no need to ask twice SSL_get_verify_result(pSSL);
-	if (ok)
-		return X509_V_OK;
-	else
-		return X509_V_ERR_APPLICATION_VERIFICATION;
+	return ok;
 }
 
 

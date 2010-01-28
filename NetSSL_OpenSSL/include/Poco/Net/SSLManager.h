@@ -1,7 +1,7 @@
 //
 // SSLManager.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#5 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -78,9 +78,9 @@ class NetSSL_API SSLManager
 	///            <privateKeyFile>mycert.key</privateKeyFile>
 	///            <certificateFile>mycert.crt</certificateFile>
 	///            <caConfig>rootcert.pem</caConfig>
-	///            <verificationMode>relaxed</verificationMode>
-	///            <verificationDepth>9</verificationDepth>
-	///            <loadDefaultCAFile>true</loadDefaultCAFile>
+	///            <verificationMode>none|relaxed|strict|once</verificationMode>
+	///            <verificationDepth>1..9</verificationDepth>
+	///            <loadDefaultCAFile>true|false</loadDefaultCAFile>
 	///            <cipherList>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</cipherList>
 	///            <privateKeyPassphraseHandler>
 	///                <name>KeyFileHandler</name>
@@ -93,7 +93,8 @@ class NetSSL_API SSLManager
 	///                 <options>
 	///                 </options>
 	///            </invalidCertificateHandler>
-	///            <cacheSessions>true</cacheSessions>
+	///            <cacheSessions>true|false</cacheSessions>
+	///            <extendedVerification>true|false</extendedVerification>
 	///          </server|client>
 	///       </openSSL>
 	///    </AppConfig>
@@ -250,6 +251,7 @@ private:
 	static const std::string CFG_CERTIFICATE_HANDLER;
 	static const std::string VAL_CERTIFICATE_HANDLER;
 	static const std::string CFG_CACHE_SESSIONS;
+	static const std::string CFG_EXTENDED_VERIFICATION;
 
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class Context;

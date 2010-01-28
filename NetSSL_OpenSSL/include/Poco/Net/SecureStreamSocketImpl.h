@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#8 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -149,8 +149,15 @@ public:
 	const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
+	bool havePeerCertificate() const;
+		/// Returns true iff the peer has presented a
+		/// certificate.
+
 	X509Certificate peerCertificate() const;
 		/// Returns the peer's X509 certificate.
+		///
+		/// Throws a SSLException if the peer did not
+		/// present a certificate.
 		
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.

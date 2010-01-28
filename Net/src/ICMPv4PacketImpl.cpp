@@ -1,7 +1,7 @@
 //
 // ICMPv4PacketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/ICMPv4PacketImpl.cpp#2 $
+// $Id: //poco/1.3/Net/src/ICMPv4PacketImpl.cpp#3 $
 //
 // Library: Net
 // Package: ICMP
@@ -201,7 +201,7 @@ Poco::UInt8* ICMPv4PacketImpl::data(Poco::UInt8* buffer, int length) const
 bool ICMPv4PacketImpl::validReplyID(Poco::UInt8* buffer, int length) const
 {
 	Header *icp = header(buffer, length);
-	return icp && (Process::id() == icp->id);
+	return icp && (static_cast<Poco::UInt16>(Process::id()) == icp->id);
 }
 
 

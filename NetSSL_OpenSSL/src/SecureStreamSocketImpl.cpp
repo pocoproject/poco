@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#8 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -185,13 +185,25 @@ bool SecureStreamSocketImpl::secure() const
 }
 
 
+bool SecureStreamSocketImpl::havePeerCertificate() const
+{
+	X509* pCert = _impl.peerCertificate();
+	if (pCert)
+	{
+		X509_free(pCert);
+		return true;
+	}
+	else return false;
+}
+
+
 X509Certificate SecureStreamSocketImpl::peerCertificate() const
 {
 	X509* pCert = _impl.peerCertificate();
 	if (pCert)
 		return X509Certificate(pCert);
 	else
-		throw SSLException("No certificate available yet");
+		throw SSLException("No certificate available");
 }
 
 

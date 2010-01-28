@@ -1,7 +1,7 @@
 //
 // ICMPEventArgs.cpp
 //
-// $Id: //poco/1.3/Net/src/ICMPEventArgs.cpp#2 $
+// $Id: //poco/1.3/Net/src/ICMPEventArgs.cpp#3 $
 //
 // Library: Net
 // Package: ICMP
@@ -57,7 +57,7 @@ ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int 
 	_sent(0),
 	_dataSize(dataSize), 
 	_ttl(ttl), 
-	_rtt(0, repetitions), 
+	_rtt(repetitions, 0), 
 	_errors(repetitions)
 {
 }

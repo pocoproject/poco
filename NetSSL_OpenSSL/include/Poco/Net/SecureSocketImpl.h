@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#9 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -179,7 +179,7 @@ protected:
 		/// Performs a client-side SSL handshake and establishes a secure 
 		/// connection over an already existing TCP connection.
 	
-	long verifyCertificate(const std::string& hostName);
+	long verifyPeerCertificateImpl(const std::string& hostName);
 		/// Performs post-connect (or post-accept) peer certificate validation.
 		
 	static bool isLocalHost(const std::string& hostName);

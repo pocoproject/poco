@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#10 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -62,7 +62,8 @@ Context::Context(
 	const std::string& cipherList):
 	_usage(usage),
 	_mode(verificationMode),
-	_pSSLContext(0)
+	_pSSLContext(0),
+	_extendedCertificateVerification(true)
 {
 	Poco::Crypto::OpenSSLInitializer::initialize();
 	
@@ -154,6 +155,12 @@ void Context::enableSessionCache(bool flag)
 bool Context::sessionCacheEnabled() const
 {
 	return SSL_CTX_get_session_cache_mode(_pSSLContext) != SSL_SESS_CACHE_OFF;
+}
+
+
+void Context::enableExtendedCertificateVerification(bool flag)
+{
+	_extendedCertificateVerification = flag;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#8 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -70,6 +70,7 @@ const std::string SSLManager::VAL_CERTIFICATE_HANDLER("ConsoleCertificateHandler
 const std::string SSLManager::CFG_SERVER_PREFIX("openSSL.server.");
 const std::string SSLManager::CFG_CLIENT_PREFIX("openSSL.client.");
 const std::string SSLManager::CFG_CACHE_SESSIONS("cacheSessions");
+const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
 
 
 SSLManager::SSLManager()
@@ -254,6 +255,11 @@ void SSLManager::initDefaultContext(bool server)
 		bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 		_ptrDefaultServerContext->enableSessionCache(cacheSessions);
 	}
+	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, false);
+	if (server)
+		_ptrDefaultServerContext->enableExtendedCertificateVerification(extendedVerification);
+	else
+		_ptrDefaultClientContext->enableExtendedCertificateVerification(extendedVerification);
 }
 
 

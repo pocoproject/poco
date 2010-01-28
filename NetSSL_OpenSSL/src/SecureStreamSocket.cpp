@@ -1,7 +1,7 @@
 //
 // SecureStreamSocket.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -118,6 +118,12 @@ SecureStreamSocket& SecureStreamSocket::operator = (const Socket& socket)
 	else
 		throw InvalidArgumentException("Cannot assign incompatible socket");
 	return *this;
+}
+
+
+bool SecureStreamSocket::havePeerCertificate() const
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->havePeerCertificate();
 }
 
 

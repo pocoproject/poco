@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#17 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#18 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -313,7 +313,7 @@ void SecureSocketImpl::verifyPeerCertificate()
 
 void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
 {
-	long certErr = verifyCertificate(hostName);
+	long certErr = verifyPeerCertificateImpl(hostName);
 	if (certErr != X509_V_OK)
 	{
 		std::string msg = Utility::convertCertificateError(certErr);
@@ -322,10 +322,11 @@ void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
 }
 
 
-long SecureSocketImpl::verifyCertificate(const std::string& hostName)
+long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
-	if (mode == Context::VERIFY_NONE || (isLocalHost(hostName) && mode != Context::VERIFY_STRICT))
+	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
+	    (isLocalHost(hostName) && mode != Context::VERIFY_STRICT))
 	{
 		return X509_V_OK;
 	}
@@ -334,7 +335,7 @@ long SecureSocketImpl::verifyCertificate(const std::string& hostName)
 	if (pCert)
 	{
 		X509Certificate cert(pCert);
-		return cert.verify(hostName);
+		return cert.verify(hostName) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
 	}
 	else return X509_V_OK;
 }

@@ -1,7 +1,7 @@
 //
 // Context.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -148,11 +148,22 @@ public:
 		
 	bool sessionCacheEnabled() const;
 		/// Returns true iff the session cache is enabled.
+		
+	void enableExtendedCertificateVerification(bool flag = true);
+		/// Enable or disable the automatic post-connection
+		/// extended certificate verification.
+		///
+		/// See X509Certificate::verify() for more information.
+		
+	bool extendedCertificateVerificationEnabled() const;
+		/// Returns true iff automatic extended certificate 
+		/// verification is enabled.
 
 private:
 	Usage _usage;
 	VerificationMode _mode;
 	SSL_CTX* _pSSLContext;
+	bool _extendedCertificateVerification;
 };
 
 
@@ -174,6 +185,12 @@ inline Context::VerificationMode Context::verificationMode() const
 inline SSL_CTX* Context::sslContext() const
 {
 	return _pSSLContext;
+}
+
+
+inline bool Context::extendedCertificateVerificationEnabled() const
+{
+	return _extendedCertificateVerification;
 }
 
 
