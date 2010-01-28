@@ -1,7 +1,7 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#4 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -102,12 +102,13 @@ public:
 		if (socket.havePeerCertificate())
 		{
 			X509Certificate cert = socket.peerCertificate();
-			std::cout << cert.subjectName() << std::endl;
+			app.logger().information("Client certificate: " + cert.subjectName());
 		}
 		else
 		{
-			std::cout << "No peer certificate available." << std::endl;
+			app.logger().information("No client certificate available.");
 		}
+		
 		Timestamp now;
 		std::string dt(DateTimeFormatter::format(now, _format));
 
@@ -224,8 +225,8 @@ protected:
 		else
 		{
 			// get parameters from configuration file
-			unsigned short port = (unsigned short) config().getInt("HTTPTimeServer.port", 9980);
-			std::string format(config().getString("HTTPTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
+			unsigned short port = (unsigned short) config().getInt("HTTPSTimeServer.port", 9980);
+			std::string format(config().getString("HTTPSTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
 			
 			// set-up a server socket
 			SecureServerSocket svs(port);
