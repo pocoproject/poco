@@ -12,6 +12,6 @@ objects = Server
 
 target         = Server
 target_version = 1
-target_libs    = PocoFoundation PocoXML PocoNet PocoUtil
+target_libs    = PocoExtJS PocoWebWidgets PocoFoundation PocoXML PocoNet PocoUtil
 
 include $(POCO_BASE)/build/rules/exec
