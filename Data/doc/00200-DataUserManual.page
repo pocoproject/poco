@@ -117,7 +117,7 @@ Lets assume we have a Person table that contains an age, a first and a last name
     std::string firstName("Peter";
     std::string lastName("Junior");
     int age = 0;
-    ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use(firstName), use(lastName), use(age), now;
+    ses << "INSERT INTO PERSON VALUES (:fn, :ln, :age)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
 ----
 
@@ -135,7 +135,7 @@ which is done by writing <!into(age, -1)!>:
     std::string firstName("Peter";
     std::string lastName("Junior");
     int age = 0;
-    ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use(firstName), use(lastName), use(age), now;
+    ses << "INSERT INTO PERSON VALUES (:fn, :ln, :age)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age, -1), now;
 ----
 
@@ -207,7 +207,7 @@ The following code will very likely fail (but this is platform/compiler dependen
 building in release or debug mode, it will work from Monday to Thursday but will always fail on Friday, so shortly spoken: the kind of bugs
 software developers <*really*> love):
     
-    Statement stmt = (ses << INSERT INTO PERSON VALUES (:fn, :ln, :age)", use("Peter"), use("Junior"), use(4)); //ERR!
+    Statement stmt = (ses << "INSERT INTO PERSON VALUES (:fn, :ln, :age)", use("Peter"), use("Junior"), use(4)); //ERR!
     stmt.execute();
 ----
 The constant values <*Junior*>, <*Peter*> and <*4*> must be assigned to variables prior, otherwise their values will be invalid when execute is called.
