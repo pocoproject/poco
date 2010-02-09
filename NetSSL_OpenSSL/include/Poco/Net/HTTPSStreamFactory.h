@@ -1,7 +1,7 @@
 //
 // HTTPSStreamFactory.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSStreamFactory.h#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSStreamFactory.h#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -60,7 +60,14 @@ public:
 	HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort = HTTPSession::HTTP_PORT);
 		/// Creates the HTTPSStreamFactory.
 		///
-		/// HTTP connections will use the given proxy.
+		/// HTTPS connections will use the given proxy.
+
+	HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword);
+		/// Creates the HTTPSStreamFactory.
+		///
+		/// HTTPS connections will use the given proxy and
+		/// will be authorized against the proxy using Basic authentication
+		/// with the given proxyUsername and proxyPassword.
 
 	~HTTPSStreamFactory();
 		/// Destroys the HTTPSStreamFactory.
@@ -83,6 +90,8 @@ private:
 	
 	std::string  _proxyHost;
 	Poco::UInt16 _proxyPort;
+	std::string  _proxyUsername;
+	std::string  _proxyPassword;
 };
 
 

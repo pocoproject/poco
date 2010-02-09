@@ -1,7 +1,7 @@
 //
 // HTTPClientSessionTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTTPClientSessionTest.cpp#2 $
+// $Id: //poco/1.3/Net/testsuite/src/HTTPClientSessionTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -277,6 +277,26 @@ void HTTPClientSessionTest::testProxy()
 }
 
 
+void HTTPClientSessionTest::testProxyAuth()
+{
+	HTTPTestServer srv;
+	HTTPClientSession s("www.somehost.com");
+	s.setProxy("localhost", srv.port());
+	s.setProxyCredentials("user", "pass");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assert (response.getContentLength() == HTTPTestServer::LARGE_BODY.length());
+	assert (response.getContentType() == "text/plain");
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	std::string r = srv.lastRequest();
+	assert (r.find("Proxy-Authorization: Basic dXNlcjpwYXNz\r\n") != std::string::npos);	
+}
+
+
 void HTTPClientSessionTest::setUp()
 {
 }
@@ -302,6 +322,7 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostLargeClose);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testKeepAlive);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxy);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyAuth);
 
 	return pSuite;
 }

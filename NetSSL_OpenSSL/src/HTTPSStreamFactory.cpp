@@ -1,7 +1,7 @@
 //
 // HTTPSStreamFactory.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSStreamFactory.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSStreamFactory.cpp#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -68,6 +68,15 @@ HTTPSStreamFactory::HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt1
 }
 
 
+HTTPSStreamFactory::HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword):
+	_proxyHost(proxyHost),
+	_proxyPort(proxyPort),
+	_proxyUsername(proxyUsername),
+	_proxyPassword(proxyPassword)
+{
+}
+
+
 HTTPSStreamFactory::~HTTPSStreamFactory()
 {
 }
@@ -94,6 +103,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 				pSession->setProxy(_proxyHost, _proxyPort);
 			else
 				pSession->setProxy(proxyUri.getHost(), proxyUri.getPort());
+			pSession->setProxyCredentials(_proxyUsername, _proxyPassword);
 			std::string path = resolvedURI.getPathAndQuery();
 			if (path.empty()) path = "/";
 			HTTPRequest req(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);

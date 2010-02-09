@@ -1,7 +1,7 @@
 //
 // HTTPSessionFactory.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPSessionFactory.cpp#1 $
+// $Id: //poco/1.3/Net/src/HTTPSessionFactory.cpp#2 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -122,6 +122,7 @@ HTTPClientSession* HTTPSessionFactory::createClientSession(const Poco::URI& uri)
 	if (it != _instantiators.end())
 	{
 		it->second.pIn->setProxy(_proxyHost, _proxyPort);
+		it->second.pIn->setProxyCredentials(_proxyUsername, _proxyPassword);
 		return it->second.pIn->createClientSession(uri);
 	}
 	else throw Poco::UnknownURISchemeException(uri.getScheme());
@@ -134,6 +135,15 @@ void HTTPSessionFactory::setProxy(const std::string& host, Poco::UInt16 port)
 
 	_proxyHost = host;
 	_proxyPort = port;
+}
+
+
+void HTTPSessionFactory::setProxyCredentials(const std::string& username, const std::string& password)
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	_proxyUsername = username;
+	_proxyPassword = password;
 }
 
 

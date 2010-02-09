@@ -1,7 +1,7 @@
 //
 // HTTPStreamFactory.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPStreamFactory.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPStreamFactory.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -62,6 +62,13 @@ public:
 		///
 		/// HTTP connections will use the given proxy.
 
+	HTTPStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword);
+		/// Creates the HTTPStreamFactory.
+		///
+		/// HTTP connections will use the given proxy and
+		/// will be authorized against the proxy using Basic authentication
+		/// with the given proxyUsername and proxyPassword.
+
 	virtual ~HTTPStreamFactory();
 		/// Destroys the HTTPStreamFactory.
 		
@@ -96,6 +103,8 @@ private:
 	
 	std::string  _proxyHost;
 	Poco::UInt16 _proxyPort;
+	std::string  _proxyUsername;
+	std::string  _proxyPassword;
 };
 
 

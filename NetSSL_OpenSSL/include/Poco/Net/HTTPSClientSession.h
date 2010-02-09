@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#7 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -122,6 +122,7 @@ public:
 protected:
 	void connect(const SocketAddress& address);
 	std::string proxyRequestPrefix() const;
+	void proxyAuthenticate(HTTPRequest& request);
 
 private:
 	HTTPSClientSession(const HTTPSClientSession&);

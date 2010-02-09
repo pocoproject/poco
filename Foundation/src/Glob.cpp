@@ -1,7 +1,7 @@
 //
 // Glob.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Glob.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/Glob.cpp#5 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -50,7 +50,6 @@ Glob::Glob(const std::string& pattern, int options):
 	_pattern(pattern),
 	_options(options)
 {
-	poco_assert (!_pattern.empty());
 }
 
 

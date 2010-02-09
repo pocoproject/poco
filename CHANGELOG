@@ -13,6 +13,9 @@ Release 1.3.7 (2010-0?-??)
 - fixed SF# 2941228: ICMPClient::ping() issues on Mac OS X
 - fixed SF# 2941231: ICMPEventArgs out of bounds array access
 - added PageCompiler sample
+- added missing newline at end of xmlparse.c
+- Poco::Glob can now be used with an empty pattern which will match nothing (from Kim Graesman)
+- added support for HTTP proxy authentication (Basic authentication only)
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1194,4 +1197,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#83 $
+$Id: //poco/1.3/dist/CHANGELOG#84 $

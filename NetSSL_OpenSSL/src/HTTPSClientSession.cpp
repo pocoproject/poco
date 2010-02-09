@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#5 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#6 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -115,6 +115,11 @@ std::string HTTPSClientSession::proxyRequestPrefix() const
 }
 
 
+void HTTPSClientSession::proxyAuthenticate(HTTPRequest& request)
+{
+}
+
+
 void HTTPSClientSession::connect(const SocketAddress& address)
 {
 	if (getProxyHost().empty())
@@ -131,6 +136,7 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 		HTTPResponse proxyResponse;
 		proxyRequest.set("Proxy-Connection", "keep-alive");
 		proxyRequest.set("Host", getHost());
+		proxyAuthenticateImpl(proxyRequest);
 		proxySession.setKeepAlive(true);
 		proxySession.sendRequest(proxyRequest);
 		proxySession.receiveResponse(proxyResponse);

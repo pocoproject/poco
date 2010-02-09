@@ -1,7 +1,7 @@
 //
 // HTTPSSessionInstantiator.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSSessionInstantiator.cpp#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSSessionInstantiator.cpp#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -58,6 +58,7 @@ HTTPClientSession* HTTPSSessionInstantiator::createClientSession(const Poco::URI
 	poco_assert (uri.getScheme() == "https");
 	HTTPSClientSession* pSession = new HTTPSClientSession(uri.getHost(), uri.getPort());
 	pSession->setProxy(proxyHost(), proxyPort());
+	pSession->setProxyCredentials(proxyUsername(), proxyPassword());
 	return pSession;
 }
 

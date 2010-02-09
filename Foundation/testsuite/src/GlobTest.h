@@ -1,7 +1,7 @@
 //
 // GlobTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/GlobTest.h#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/GlobTest.h#3 $
 //
 // Definition of the GlobTest class.
 //
@@ -54,6 +54,7 @@ public:
 	void testMisc();
 	void testGlob();
 	void testCaseless();
+	void testMatchEmptyPattern();
 
 	void setUp();
 	void tearDown();
