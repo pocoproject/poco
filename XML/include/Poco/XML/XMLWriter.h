@@ -1,7 +1,7 @@
 //
 // XMLWriter.h
 //
-// $Id: //poco/1.3/XML/include/Poco/XML/XMLWriter.h#1 $
+// $Id: //poco/1.3/XML/include/Poco/XML/XMLWriter.h#2 $
 //
 // Library: XML
 // Package: XML
@@ -311,6 +311,9 @@ private:
 	static const std::string MARKUP_AMPENC;
 	static const std::string MARKUP_LTENC;
 	static const std::string MARKUP_GTENC;
+	static const std::string MARKUP_TABENC;
+	static const std::string MARKUP_CRENC;
+	static const std::string MARKUP_LFENC;
 	static const std::string MARKUP_LT;
 	static const std::string MARKUP_GT;
 	static const std::string MARKUP_SLASHGT;

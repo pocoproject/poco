@@ -1,7 +1,7 @@
 //
 // XMLWriterTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/XMLWriterTest.h#3 $
+// $Id: //poco/1.3/XML/testsuite/src/XMLWriterTest.h#4 $
 //
 // Definition of the XMLWriterTest class.
 //
@@ -66,6 +66,7 @@ public:
 	void testEmptyCharacters();
 	void testCDATA();
 	void testRawCharacters();
+	void testAttributeCharacters();
 	void testDefaultNamespace();
 	void testQNamespaces();
 	void testQNamespacesNested();

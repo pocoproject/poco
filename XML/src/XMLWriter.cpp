@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.3/XML/src/XMLWriter.cpp#3 $
+// $Id: //poco/1.3/XML/src/XMLWriter.cpp#4 $
 //
 // Library: XML
 // Package: XML
@@ -56,6 +56,9 @@ const std::string XMLWriter::MARKUP_APOSENC     = "&apos;";
 const std::string XMLWriter::MARKUP_AMPENC      = "&amp;";
 const std::string XMLWriter::MARKUP_LTENC       = "&lt;";
 const std::string XMLWriter::MARKUP_GTENC       = "&gt;";
+const std::string XMLWriter::MARKUP_TABENC      = "&#x9;";
+const std::string XMLWriter::MARKUP_CRENC       = "&#xD;";
+const std::string XMLWriter::MARKUP_LFENC       = "&#xA;";
 const std::string XMLWriter::MARKUP_LT          = "<";
 const std::string XMLWriter::MARKUP_GT          = ">";
 const std::string XMLWriter::MARKUP_SLASHGT     = "/>";
@@ -729,7 +732,26 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 		writeMarkup(MARKUP_SPACE);
 		writeXML(it->first);
 		writeMarkup(MARKUP_EQQUOT);
-		characters(it->second);
+		for (XMLString::const_iterator itc = it->second.begin(); itc != it->second.end(); ++itc)
+		{
+			XMLChar c = *itc;
+			switch (c)
+			{
+			case '"':  writeMarkup(MARKUP_QUOTENC); break;
+			case '\'': writeMarkup(MARKUP_APOSENC); break;
+			case '&':  writeMarkup(MARKUP_AMPENC); break;
+			case '<':  writeMarkup(MARKUP_LTENC); break;
+			case '>':  writeMarkup(MARKUP_GTENC); break;
+			case '\t': writeMarkup(MARKUP_TABENC); break;
+			case '\r': writeMarkup(MARKUP_CRENC); break;
+			case '\n': writeMarkup(MARKUP_LFENC); break;
+			default:
+				if (c >= 0 && c < 32)
+					throw XMLException("Invalid character token.");
+				else 
+					writeXML(c);
+			}
+		}
 		writeMarkup(MARKUP_QUOT);
 	}
 }

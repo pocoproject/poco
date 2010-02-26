@@ -16,6 +16,7 @@ Release 1.3.7 (2010-0?-??)
 - added missing newline at end of xmlparse.c
 - Poco::Glob can now be used with an empty pattern which will match nothing (from Kim Graesman)
 - added support for HTTP proxy authentication (Basic authentication only)
+- fixed SF# 2958959: XMLWriter must encode CR, LF and TAB in attribute values as character entities.
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1197,4 +1198,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#84 $
+$Id: //poco/1.3/dist/CHANGELOG#85 $

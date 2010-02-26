@@ -1,7 +1,7 @@
 //
 // File2Page.cpp
 //
-// $Id: //poco/1.3/PageCompiler/File2Page/src/File2Page.cpp#2 $
+// $Id: //poco/1.3/PageCompiler/File2Page/src/File2Page.cpp#3 $
 //
 // An application that creates a Page Compiler source file from an
 // ordinary file.
@@ -43,6 +43,7 @@
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/DateTime.h"
 #include <iostream>
 
 
@@ -183,7 +184,12 @@ protected:
 		     << "    contentType=\"" << _contentType << "\"\n"
 		     << "    form=\"false\"\n"
 		     << "    namespace=\"" << _namespace << "\"\n"
-		     << "    class=\"" << _clazz << "\"\n%><%!\n";
+		     << "    class=\"" << _clazz << "\"\n"
+		     << "    precondition=\"checkModified(request)\"%><%@"
+		     << "    impl include=\"Poco/DateTime.h\"\n"
+		     << "         include=\"Poco/DateTimeParser.h\"\n"
+		     << "         include=\"Poco/DateTimeFormatter.h\"\n"
+		     << "         include=\"Poco/DateTimeFormat.h\"%><%!\n\n";
 		ostr << "// " << path << "\n";
 		ostr << "static const char data[] = {\n\t";
 		int ch = istr.get();
@@ -198,9 +204,33 @@ protected:
 			}
 			ch = istr.get();
 		}
-		ostr << "\n};\n%><%\n";
-		ostr << "\tresponseStream.write(data, sizeof(data));\n";
-		ostr << "%>";
+		Poco::File f(path);
+		Poco::DateTime lm = f.getLastModified();
+		ostr << "\n};\n\n\n";
+		ostr << "static bool checkModified(Poco::Net::HTTPServerRequest& request)\n"
+		     << "{\n"
+		     << "\tPoco::DateTime modified(" << lm.year() << ", " << lm.month() << ", " << lm.day() << ", " << lm.hour() << ", " << lm.minute() << ", " << lm.second() << ");\n"
+		     << "\trequest.response().setChunkedTransferEncoding(false);\n"
+		     << "\trequest.response().set(\"Last-Modified\", Poco::DateTimeFormatter::format(modified, Poco::DateTimeFormat::HTTP_FORMAT));\n"
+		     << "\tif (request.has(\"If-Modified-Since\"))\n"
+		     << "\t{\n"
+		     << "\t\tPoco::DateTime modifiedSince;\n"
+		     << "\t\tint tzd;\n"
+		     << "\t\tPoco::DateTimeParser::parse(request.get(\"If-Modified-Since\"), modifiedSince, tzd);\n"
+		     << "\t\tif (modified <= modifiedSince)\n"
+		     << "\t\t{\n"
+		     << "\t\t\trequest.response().setContentLength(0);\n"
+		     << "\t\t\trequest.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_MODIFIED);\n"
+		     << "\t\t\trequest.response().send();\n"
+		     << "\t\t\treturn false;\n"
+		     << "\t\t}\n"
+		     << "\t}\n"
+		     << "\trequest.response().setContentLength(static_cast<int>(sizeof(data)));\n"
+		     << "\treturn true;\n"
+		     << "}\n"
+			 << "%><%\n"
+		     << "\tresponseStream.write(data, sizeof(data));\n"
+		     << "%>";
 	}
 	
 	std::string extToContentType(const std::string& ext)

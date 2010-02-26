@@ -1,7 +1,7 @@
 //
 // XMLWriterTest.cpp
 //
-// $Id: //poco/1.3/XML/testsuite/src/XMLWriterTest.cpp#3 $
+// $Id: //poco/1.3/XML/testsuite/src/XMLWriterTest.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -370,6 +370,22 @@ void XMLWriterTest::testRawCharacters()
 }
 
 
+void XMLWriterTest::testAttributeCharacters()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL);
+	writer.startDocument();
+	AttributesImpl attrs;
+	attrs.addAttribute("", "", "a1", "CDATA", "a b c\n\td");
+	attrs.addAttribute("", "", "a2", "CDATA", "a b c\r\nd");
+	writer.startElement("", "", "el", attrs);
+	writer.endElement("", "", "el");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<el a1=\"a b c&#xA;&#x9;d\" a2=\"a b c&#xD;&#xA;d\"/>");
+}
+
+
 void XMLWriterTest::testDefaultNamespace()
 {
 	std::ostringstream str;
@@ -587,6 +603,7 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCDATA);
 	CppUnit_addTest(pSuite, XMLWriterTest, testRawCharacters);
+	CppUnit_addTest(pSuite, XMLWriterTest, testAttributeCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDefaultNamespace);
 	CppUnit_addTest(pSuite, XMLWriterTest, testQNamespaces);
 	CppUnit_addTest(pSuite, XMLWriterTest, testQNamespacesNested);
