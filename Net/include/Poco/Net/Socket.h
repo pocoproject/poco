@@ -134,15 +134,6 @@ public:
 		/// exceptList is zero, select() will return immediately and the
 		/// return value will be 0.
 
-	static int poll(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
-		/// Provides same functionality as select() call on the platforms
-		/// that have poll() system call available. The advantage of using poll() over
-		/// select() is that the number of socket file descriptors scanned is dynamically 
-		/// determined at runtime and is not subject to static maximum limitations like select().
-		///	
-		/// For documentation, see 
-		/// select(SocketList&, SocketList&, SocketList&, const Poco::Timespan&)
-
 	bool poll(const Poco::Timespan& timeout, int mode) const;
 		/// Determines the status of the socket, using a 
 		/// call to poll() or select().

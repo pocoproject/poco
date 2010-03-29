@@ -91,11 +91,9 @@ Socket::~Socket()
 }
 
 
-int Socket::poll(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
+int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
 {
-#if !defined(POCO_HAVE_FD_POLL)
-	throw NotImplementedException("poll() is only available on POSIX platforms");
-#else
+#if defined(POCO_HAVE_FD_POLL)
 	nfds_t nfd = readList.size() + writeList.size() + exceptList.size();
 	if (0 == nfd) return 0;
 
@@ -173,15 +171,12 @@ int Socket::poll(SocketList& readList, SocketList& writeList, SocketList& except
 	}
 	std::swap(readList, readyReadList);
 	std::swap(writeList, readyWriteList);
-	std::swap(exceptList, readyExceptList);	
-
+	std::swap(exceptList, readyExceptList);
+	
+//	return rc;
 	return readList.size() + writeList.size() + exceptList.size();
-#endif
-}
 
-
-int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
-{
+#else
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
@@ -250,8 +245,10 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		if (FD_ISSET(it->sockfd(), &fdExcept))
 			readyExceptList.push_back(*it);
 	}
-	std::swap(exceptList, readyExceptList);	
-	return rc; 
+	std::swap(exceptList, readyExceptList);
+	 
+	return rc;
+#endif
 }
 
 
