@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.3/Net/src/HTMLForm.cpp#5 $
+// $Id: //poco/1.3/Net/src/HTMLForm.cpp#6 $
 //
 // Library: Net
 // Package: HTML
@@ -125,7 +125,7 @@ void HTMLForm::addPart(const std::string& name, PartSource* pSource)
 void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
 {
 	clear();
-	if (request.getMethod() == HTTPRequest::HTTP_POST)
+	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
 		std::string mediaType;
 		NameValueCollection params;
@@ -176,7 +176,7 @@ void HTMLForm::read(std::istream& istr, PartHandler& handler)
 
 void HTMLForm::prepareSubmit(HTTPRequest& request)
 {
-	if (request.getMethod() == HTTPRequest::HTTP_POST)
+	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
 		if (_encoding == ENCODING_URL)
 		{

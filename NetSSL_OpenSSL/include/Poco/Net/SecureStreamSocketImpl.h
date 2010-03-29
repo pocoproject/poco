@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#9 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -9,7 +9,7 @@
 //
 // Definition of the SecureStreamSocketImpl class.
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -184,6 +184,27 @@ public:
 		/// If the SSL connection was the result of an accept(),
 		/// the server-side handshake is completed, otherwise
 		/// a client-side handshake is performed. 
+
+	Session::Ptr currentSession();
+		/// Returns the SSL session of the current connection,
+		/// for reuse in a future connection (if session caching
+		/// is enabled).
+		///
+		/// If no connection is established, returns null.
+		
+	void useSession(Session::Ptr pSession);
+		/// Sets the SSL session to use for the next
+		/// connection. Setting a previously saved Session
+		/// object is necessary to enable session caching.
+		///
+		/// To remove the currently set session, a null pointer
+		/// can be given.
+		///
+		/// Must be called before connect() to be effective.
+		
+	bool sessionWasReused();
+		/// Returns true iff a reused session was negotiated during
+		/// the handshake.
 		
 protected:
 	void acceptSSL();
@@ -231,6 +252,24 @@ inline void SecureStreamSocketImpl::setPeerHostName(const std::string& peerHostN
 inline Context::Ptr SecureStreamSocketImpl::context() const
 {
 	return _impl.context();
+}
+
+
+inline Session::Ptr SecureStreamSocketImpl::currentSession()
+{
+	return _impl.currentSession();
+}
+
+	
+inline void SecureStreamSocketImpl::useSession(Session::Ptr pSession)
+{
+	_impl.useSession(pSession);
+}
+
+	
+inline bool SecureStreamSocketImpl::sessionWasReused()
+{
+	return _impl.sessionWasReused();
 }
 
 

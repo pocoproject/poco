@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="NetSSL_OpenSSL"
 	ProjectGUID="{5AECC55E-A469-11DA-8DA6-005056C00008}"
 	RootNamespace="OpenSSL"
@@ -408,6 +408,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Net\Session.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Net\SSLException.h"
 					>
 				</File>
@@ -473,6 +477,10 @@
 				</File>
 				<File
 					RelativePath=".\src\PrivateKeyPassphraseHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Session.cpp"
 					>
 				</File>
 				<File

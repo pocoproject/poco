@@ -1,15 +1,15 @@
 //
-// Event_WIN32.h
+// Session.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Event_WIN32.h#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Session.h#1 $
 //
-// Library: Foundation
-// Package: Threading
-// Module:  Event
+// Library: NetSSL_OpenSSL
+// Package: SSLCore
+// Module:  Session
 //
-// Definition of the EventImpl class for WIN32.
+// Definition of the Session class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,55 +36,66 @@
 //
 
 
-#ifndef Foundation_Event_WIN32_INCLUDED
-#define Foundation_Event_WIN32_INCLUDED
+#ifndef NetSSL_Session_INCLUDED
+#define NetSSL_Session_INCLUDED
 
 
-#include "Poco/Foundation.h"
-#include "Poco/Exception.h"
-#include "Poco/UnWindows.h"
+#include "Poco/Net/NetSSL.h"
+#include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
+#include <openssl/ssl.h>
 
 
 namespace Poco {
+namespace Net {
 
 
-class Foundation_API EventImpl
+class NetSSL_API Session: public Poco::RefCountedObject
+	/// This class encapsulates a SSL session object
+	/// used with session caching on the client side.
+	///
+	/// For session caching to work, a client must
+	/// save the session object from an existing connection,
+	/// if it wants to reuse it with a future connection.
 {
-protected:
-	EventImpl(bool autoReset);		
-	~EventImpl();
-	void setImpl();
-	void waitImpl();
-	bool waitImpl(long milliseconds);
-	void resetImpl();
-	
+public:
+	typedef Poco::AutoPtr<Session> Ptr;
+
+	SSL_SESSION* sslSession() const;
+		/// Returns the stored OpenSSL SSL_SESSION object.
+
+protected:	
+	Session(SSL_SESSION* pSession);
+		/// Creates a new Session object, using the given
+		/// SSL_SESSION object. 
+		/// 
+		/// The SSL_SESSION's reference count is not changed.
+
+	~Session();
+		/// Destroys the Session.
+		///
+		/// Calls SSL_SESSION_free() on the stored
+		/// SSL_SESSION object.
+
 private:
-	HANDLE _event;
+	Session();
+
+	SSL_SESSION* _pSession;
+	
+	friend class SecureSocketImpl;
 };
 
 
 //
 // inlines
 //
-inline void EventImpl::setImpl()
+inline SSL_SESSION* Session::sslSession() const
 {
-	if (!SetEvent(_event))
-	{
-		throw SystemException("cannot signal event");
-	}
+	return _pSession;
 }
 
 
-inline void EventImpl::resetImpl()
-{
-	if (!ResetEvent(_event))
-	{
-		throw SystemException("cannot reset event");
-	}
-}
+} } // namespace Poco::Net
 
 
-} // namespace Poco
-
-
-#endif // Foundation_Event_WIN32_INCLUDED
+#endif // NetSSL_Session_INCLUDED

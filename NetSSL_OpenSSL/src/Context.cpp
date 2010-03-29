@@ -1,13 +1,13 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#11 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#13 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Context
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -41,6 +41,7 @@
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
+#include "Poco/Timestamp.h"
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -148,7 +149,31 @@ Context::~Context()
 
 void Context::enableSessionCache(bool flag)
 {
-	SSL_CTX_set_session_cache_mode(_pSSLContext, flag ? SSL_SESS_CACHE_SERVER : SSL_SESS_CACHE_OFF);
+	if (flag)
+	{
+		SSL_CTX_set_session_cache_mode(_pSSLContext, _usage == SERVER_USE ? SSL_SESS_CACHE_SERVER : SSL_SESS_CACHE_CLIENT);
+	}
+	else
+	{
+		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
+	}
+}
+
+
+void Context::enableSessionCache(bool flag, const std::string& sessionIdContext)
+{
+	poco_assert (_usage == SERVER_USE);
+	poco_assert (sessionIdContext.length() <= SSL_MAX_SSL_SESSION_ID_LENGTH);
+	if (flag)
+	{
+		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_SERVER);
+		int rc = SSL_CTX_set_session_id_context(_pSSLContext, reinterpret_cast<const unsigned char*>(sessionIdContext.data()), static_cast<unsigned>(sessionIdContext.length()));
+		if (rc != 1) throw SSLContextException("cannot set session ID context");
+	}
+	else
+	{
+		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
+	}
 }
 
 
@@ -158,9 +183,58 @@ bool Context::sessionCacheEnabled() const
 }
 
 
+void Context::setSessionCacheSize(std::size_t size)
+{
+	poco_assert (_usage == SERVER_USE);
+	
+	SSL_CTX_sess_set_cache_size(_pSSLContext, static_cast<long>(size));
+}
+
+	
+std::size_t Context::getSessionCacheSize() const
+{
+	poco_assert (_usage == SERVER_USE);
+	
+	return static_cast<std::size_t>(SSL_CTX_sess_get_cache_size(_pSSLContext));
+}
+
+
+void Context::setSessionTimeout(long seconds)
+{
+	poco_assert (_usage == SERVER_USE);
+
+	SSL_CTX_set_timeout(_pSSLContext, seconds);
+}
+
+
+long Context::getSessionTimeout() const
+{
+	poco_assert (_usage == SERVER_USE);
+
+	return SSL_CTX_get_timeout(_pSSLContext);
+}
+
+
+void Context::flushSessionCache() 
+{
+	poco_assert (_usage == SERVER_USE);
+
+	Poco::Timestamp now;
+	SSL_CTX_flush_sessions(_pSSLContext, static_cast<long>(now.epochTime()));
+}
+
+
 void Context::enableExtendedCertificateVerification(bool flag)
 {
 	_extendedCertificateVerification = flag;
+}
+
+
+void Context::disableStatelessSessionResumption()
+{
+#if defined(SSL_OP_NO_TICKET)
+	SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_TICKET);
+#endif
 }
 
 

@@ -1,15 +1,13 @@
 //
-// Event_WIN32.h
+// Session.cpp
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Event_WIN32.h#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Session.cpp#1 $
 //
-// Library: Foundation
-// Package: Threading
-// Module:  Event
+// Library: NetSSL_OpenSSL
+// Package: SSLCore
+// Module:  Session
 //
-// Definition of the EventImpl class for WIN32.
-//
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,55 +34,23 @@
 //
 
 
-#ifndef Foundation_Event_WIN32_INCLUDED
-#define Foundation_Event_WIN32_INCLUDED
-
-
-#include "Poco/Foundation.h"
-#include "Poco/Exception.h"
-#include "Poco/UnWindows.h"
+#include "Poco/Net/Session.h"
 
 
 namespace Poco {
+namespace Net {
 
 
-class Foundation_API EventImpl
+Session::Session(SSL_SESSION* pSession):
+	_pSession(pSession)
 {
-protected:
-	EventImpl(bool autoReset);		
-	~EventImpl();
-	void setImpl();
-	void waitImpl();
-	bool waitImpl(long milliseconds);
-	void resetImpl();
-	
-private:
-	HANDLE _event;
-};
-
-
-//
-// inlines
-//
-inline void EventImpl::setImpl()
-{
-	if (!SetEvent(_event))
-	{
-		throw SystemException("cannot signal event");
-	}
 }
 
 
-inline void EventImpl::resetImpl()
+Session::~Session()
 {
-	if (!ResetEvent(_event))
-	{
-		throw SystemException("cannot reset event");
-	}
+	SSL_SESSION_free(_pSession);
 }
 
 
-} // namespace Poco
-
-
-#endif // Foundation_Event_WIN32_INCLUDED
+} } // namespace Poco::Net

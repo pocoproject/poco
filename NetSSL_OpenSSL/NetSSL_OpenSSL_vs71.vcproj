@@ -288,6 +288,9 @@
 					RelativePath=".\include\Poco\Net\PrivateKeyPassphraseHandler.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Net\Session.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Net\SSLException.h">
 				</File>
 				<File
@@ -338,6 +341,9 @@
 				</File>
 				<File
 					RelativePath=".\src\PrivateKeyPassphraseHandler.cpp">
+				</File>
+				<File
+					RelativePath=".\src\Session.cpp">
 				</File>
 				<File
 					RelativePath=".\src\SSLException.cpp">

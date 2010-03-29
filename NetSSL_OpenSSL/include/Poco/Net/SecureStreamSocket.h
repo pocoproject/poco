@@ -1,7 +1,7 @@
 //
 // SecureStreamSocket.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -9,7 +9,7 @@
 //
 // Definition of the SecureStreamSocket class.
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -43,6 +43,7 @@
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/Context.h"
+#include "Poco/Net/Session.h"
 #include "Poco/Net/X509Certificate.h"
 
 
@@ -92,6 +93,17 @@ public:
 		/// Before sending or receiving data, the socket
 		/// must be connected with a call to connect().
 
+	SecureStreamSocket(Context::Ptr pContext, Session::Ptr pSession);
+		/// Creates an unconnected secure stream socket
+		/// using the given SSL context.
+		///
+		/// Before sending or receiving data, the socket
+		/// must be connected with a call to connect().
+		///
+		/// The given Session is reused, if possible (client session
+		/// caching is enabled for the given Context, and the server
+		/// agrees to reuse the session).
+
 	explicit SecureStreamSocket(const SocketAddress& address);
 		/// Creates a secure stream socket using the default 
 		/// client SSL context and connects it to
@@ -101,6 +113,15 @@ public:
 		/// Creates a secure stream socket using the given 
 		/// client SSL context and connects it to
 		/// the socket specified by address.
+
+	SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext, Session::Ptr pSession);
+		/// Creates a secure stream socket using the given 
+		/// client SSL context and connects it to
+		/// the socket specified by address.
+		///
+		/// The given Session is reused, if possible (client session
+		/// caching is enabled for the given Context, and the server
+		/// agrees to reuse the session).
 
 	SecureStreamSocket(const SocketAddress& address, const std::string& hostName);
 		/// Creates a secure stream socket using the default 
@@ -115,6 +136,17 @@ public:
 		/// the socket specified by address.
 		///
 		/// The given host name is used for certificate verification.
+
+	SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext, Session::Ptr pSession);
+		/// Creates a secure stream socket using the given 
+		/// client SSL context and connects it to
+		/// the socket specified by address.
+		///
+		/// The given host name is used for certificate verification.
+		///
+		/// The given Session is reused, if possible (client session
+		/// caching is enabled for the given Context, and the server
+		/// agrees to reuse the session).
 
 	SecureStreamSocket(const Socket& socket);
 		/// Creates the SecureStreamSocket with the SocketImpl
@@ -158,6 +190,15 @@ public:
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
 
+	static SecureStreamSocket attach(const StreamSocket& streamSocket, Context::Ptr pContext, Session::Ptr pSession);
+		/// Creates a SecureStreamSocket over an existing socket
+		/// connection. The given StreamSocket must be connected.
+		/// A SSL handshake will be performed.
+		///
+		/// The given Session is reused, if possible (client session
+		/// caching is enabled for the given Context, and the server
+		/// agrees to reuse the session).
+
 	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
@@ -167,6 +208,15 @@ public:
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
+
+	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession);
+		/// Creates a SecureStreamSocket over an existing socket
+		/// connection. The given StreamSocket must be connected.
+		/// A SSL handshake will be performed.
+		///
+		/// The given Session is reused, if possible (client session
+		/// caching is enabled for the given Context, and the server
+		/// agrees to reuse the session).
 
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
@@ -205,6 +255,27 @@ public:
 		/// ERR_SSL_WANT_WRITE if more data is required to complete the
 		/// handshake. In this case, completeHandshake() should be called
 		/// again, after the necessary condition has been met.
+
+	Session::Ptr currentSession();
+		/// Returns the SSL session of the current connection,
+		/// for reuse in a future connection (if session caching
+		/// is enabled).
+		///
+		/// If no connection is established, returns null.
+		
+	void useSession(Session::Ptr pSession);
+		/// Sets the SSL session to use for the next
+		/// connection. Setting a previously saved Session
+		/// object is necessary to enable session caching.
+		///
+		/// To remove the currently set session, a null pointer
+		/// can be given.
+		///
+		/// Must be called before connect() to be effective.
+		
+	bool sessionWasReused();
+		/// Returns true iff a reused session was negotiated during
+		/// the handshake.
 		
 protected:
 	SecureStreamSocket(SocketImpl* pImpl);

@@ -1,7 +1,7 @@
 //
 // FileStream_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileStream_POSIX.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/FileStream_POSIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -81,7 +81,7 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 	else
 		flags |= O_WRONLY;
 			
-	_fd = ::open(path.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP);
+	_fd = ::open(path.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (_fd == -1)
 		File::handleLastError(_path);
 		

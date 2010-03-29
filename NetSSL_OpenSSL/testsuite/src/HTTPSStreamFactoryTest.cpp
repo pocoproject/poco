@@ -1,7 +1,7 @@
 //
 // HTTPSStreamFactoryTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.cpp#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.cpp#3 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,6 +35,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPSStreamFactory.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Util/Application.h"
+#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
 #include "Poco/StreamCopier.h"
@@ -46,6 +48,7 @@
 using Poco::Net::HTTPSStreamFactory;
 using Poco::Net::NetException;
 using Poco::Net::HTTPException;
+using Poco::Util::Application;
 using Poco::URI;
 using Poco::StreamCopier;
 
@@ -102,8 +105,11 @@ void HTTPSStreamFactoryTest::testRedirect()
 void HTTPSStreamFactoryTest::testProxy()
 {
 	HTTPSTestServer server;
-	HTTPSStreamFactory factory("proxy.aon.at", 8080);
-	URI uri("https://sourceforge.net/");
+	HTTPSStreamFactory factory(
+		Application::instance().config().getString("testsuite.proxy.host"), 
+		Application::instance().config().getInt("testsuite.proxy.port")
+	);
+	URI uri("https://secure.appinf.com/public/poco/NetSSL.txt");
 	std::auto_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);

@@ -18,7 +18,7 @@ objects = AcceptCertificateHandler CertificateHandlerFactory \
 	PrivateKeyPassphraseHandler SecureServerSocket SecureServerSocketImpl \
 	SecureSocketImpl SecureStreamSocket SecureStreamSocketImpl \
 	SSLException SSLManager Utility VerificationErrorArgs \
-	X509Certificate
+	X509Certificate Session
 
 target         = PocoNetSSL
 target_version = $(LIBVERSION)

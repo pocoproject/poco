@@ -1,13 +1,13 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#18 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#20 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureSocketImpl
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -164,6 +164,11 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		throw SSLException("Cannot create SSL object");
 	}
 	SSL_set_bio(_pSSL, pBIO, pBIO);
+	
+	if (_pSession)
+	{
+		SSL_set_session(_pSSL, _pSession->sslSession());
+	}
 	
 	try
 	{
@@ -421,6 +426,40 @@ void SecureSocketImpl::reset()
 		SSL_free(_pSSL);
 		_pSSL = 0;
 	}
+}
+
+
+Session::Ptr SecureSocketImpl::currentSession()
+{
+	if (_pSSL)
+	{
+		SSL_SESSION* pSession = SSL_get1_session(_pSSL);
+		if (pSession)
+		{
+			if (_pSession && pSession == _pSession->sslSession())
+			{
+				SSL_SESSION_free(pSession);
+				return _pSession;
+			}
+			else return new Session(pSession);
+		}
+	}
+	return 0;
+}
+
+	
+void SecureSocketImpl::useSession(Session::Ptr pSession)
+{
+	_pSession = pSession;
+}
+
+
+bool SecureSocketImpl::sessionWasReused()
+{
+	if (_pSSL)
+		return SSL_session_reused(_pSSL) != 0;
+	else
+		return false;
 }
 
 

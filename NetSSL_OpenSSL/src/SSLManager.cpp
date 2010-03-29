@@ -1,13 +1,13 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#9 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  SSLManager
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -70,6 +70,9 @@ const std::string SSLManager::VAL_CERTIFICATE_HANDLER("ConsoleCertificateHandler
 const std::string SSLManager::CFG_SERVER_PREFIX("openSSL.server.");
 const std::string SSLManager::CFG_CLIENT_PREFIX("openSSL.client.");
 const std::string SSLManager::CFG_CACHE_SESSIONS("cacheSessions");
+const std::string SSLManager::CFG_SESSION_ID_CONTEXT("sessionIdContext");
+const std::string SSLManager::CFG_SESSION_CACHE_SIZE("sessionCacheSize");
+const std::string SSLManager::CFG_SESSION_TIMEOUT("sessionTimeout");
 const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
 
 
@@ -254,6 +257,21 @@ void SSLManager::initDefaultContext(bool server)
 	{
 		bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 		_ptrDefaultServerContext->enableSessionCache(cacheSessions);
+		std::string sessionIdContext = config.getString(prefix + CFG_SESSION_ID_CONTEXT, "");
+		if (!sessionIdContext.empty())
+		{
+			_ptrDefaultServerContext->enableSessionCache(cacheSessions, sessionIdContext);
+		}
+		if (config.hasProperty(prefix + CFG_SESSION_CACHE_SIZE))
+		{
+			int cacheSize = config.getInt(prefix + CFG_SESSION_CACHE_SIZE);
+			_ptrDefaultServerContext->setSessionCacheSize(cacheSize);
+		}
+		if (config.hasProperty(prefix + CFG_SESSION_TIMEOUT))
+		{
+			int timeout = config.getInt(prefix + CFG_SESSION_TIMEOUT);
+			_ptrDefaultServerContext->setSessionTimeout(timeout);
+		}
 	}
 	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, false);
 	if (server)

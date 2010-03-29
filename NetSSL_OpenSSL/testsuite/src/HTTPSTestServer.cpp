@@ -1,7 +1,7 @@
 //
 // HTTPSTestServer.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSTestServer.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSTestServer.cpp#4 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -52,6 +52,17 @@ const std::string HTTPSTestServer::LARGE_BODY(4000, 'x');
 
 HTTPSTestServer::HTTPSTestServer():
 	_socket(SocketAddress()),
+	_thread("HTTPSTestServer"),
+	_stop(false)
+{
+	_thread.start(*this);
+	_ready.wait();
+	_lastRequest.reserve(4000);
+}
+
+
+HTTPSTestServer::HTTPSTestServer(Poco::Net::Context::Ptr pContext):
+	_socket(SocketAddress(), 64, pContext),
 	_thread("HTTPSTestServer"),
 	_stop(false)
 {

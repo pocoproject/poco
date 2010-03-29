@@ -1,13 +1,13 @@
 //
 // SecureStreamSocket.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureStreamSocket
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -60,6 +60,13 @@ SecureStreamSocket::SecureStreamSocket(Context::Ptr pContext):
 }
 
 
+SecureStreamSocket::SecureStreamSocket(Context::Ptr pContext, Session::Ptr pSession): 
+	StreamSocket(new SecureStreamSocketImpl(pContext))
+{
+	useSession(pSession);
+}
+
+
 SecureStreamSocket::SecureStreamSocket(const SocketAddress& address): 
 	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
 {
@@ -82,10 +89,27 @@ SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Pt
 }
 
 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext, Session::Ptr pSession): 
+	StreamSocket(new SecureStreamSocketImpl(pContext))
+{
+	useSession(pSession);
+	connect(address);
+}
+
+
 SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext): 
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
+	connect(address);
+}
+
+
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext, Session::Ptr pSession): 
+	StreamSocket(new SecureStreamSocketImpl(pContext))
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
+	useSession(pSession);
 	connect(address);
 }
 
@@ -163,6 +187,16 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 }
 
 
+SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, Context::Ptr pContext, Session::Ptr pSession)
+{
+	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
+	SecureStreamSocket result(pImpl);
+	result.useSession(pSession);
+	pImpl->connectSSL();
+	return result;
+}
+
+
 SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, const std::string& peerHostName)
 {
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), SSLManager::instance().defaultClientContext());
@@ -178,6 +212,17 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
 	SecureStreamSocket result(pImpl);
 	result.setPeerHostName(peerHostName);
+	pImpl->connectSSL();
+	return result;
+}
+
+
+SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession)
+{
+	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
+	SecureStreamSocket result(pImpl);
+	result.setPeerHostName(peerHostName);
+	result.useSession(pSession);
 	pImpl->connectSSL();
 	return result;
 }
@@ -216,6 +261,24 @@ void SecureStreamSocket::verifyPeerCertificate(const std::string& hostName)
 int SecureStreamSocket::completeHandshake()
 {
 	return static_cast<SecureStreamSocketImpl*>(impl())->completeHandshake();
+}
+
+
+Session::Ptr SecureStreamSocket::currentSession()
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->currentSession();
+}
+
+	
+void SecureStreamSocket::useSession(Session::Ptr pSession)
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->useSession(pSession);
+}
+
+	
+bool SecureStreamSocket::sessionWasReused()
+{
+	return static_cast<SecureStreamSocketImpl*>(impl())->sessionWasReused();
 }
 
 

@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#10 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#12 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -9,7 +9,7 @@
 //
 // Definition of the SecureSocketImpl class.
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -44,6 +44,7 @@
 #include "Poco/Net/SocketImpl.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/X509Certificate.h"
+#include "Poco/Net/Session.h"
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 
@@ -171,6 +172,27 @@ public:
 	const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 		
+	Session::Ptr currentSession();
+		/// Returns the SSL session of the current connection,
+		/// for reuse in a future connection (if session caching
+		/// is enabled).
+		///
+		/// If no connection is established, returns null.
+		
+	void useSession(Session::Ptr pSession);
+		/// Sets the SSL session to use for the next
+		/// connection. Setting a previously saved Session
+		/// object is necessary to enable session caching.
+		///
+		/// To remove the currently set session, a null pointer
+		/// can be given.
+		///
+		/// Must be called before connect() to be effective.
+		
+	bool sessionWasReused();
+		/// Returns true iff a reused session was negotiated during
+		/// the handshake.
+		
 protected:
 	void acceptSSL();
 		/// Performs a server-side SSL handshake and certificate verification.
@@ -207,6 +229,7 @@ private:
 	Context::Ptr _pContext;
 	bool _needHandshake;
 	std::string _peerHostName;
+	Session::Ptr _pSession;
 	
 	friend class SecureStreamSocketImpl;
 };

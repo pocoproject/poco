@@ -1,13 +1,13 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
 // Module:  HTTPSClientSession
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -86,9 +86,29 @@ HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext):
 }
 
 
+HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext, Session::Ptr pSession):
+	HTTPClientSession(SecureStreamSocket(pContext, pSession)),
+	_pContext(pContext),
+	_pSession(pSession)
+{
+}
+
+
 HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext):
 	HTTPClientSession(SecureStreamSocket(pContext)),
 	_pContext(pContext)
+{
+	setHost(host);
+	setPort(port);
+	SecureStreamSocket sss(socket());
+	sss.setPeerHostName(host);
+}
+
+
+HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext, Session::Ptr pSession):
+	HTTPClientSession(SecureStreamSocket(pContext, pSession)),
+	_pContext(pContext),
+	_pSession(pSession)
 {
 	setHost(host);
 	setPort(port);
@@ -124,7 +144,16 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 {
 	if (getProxyHost().empty())
 	{
+		SecureStreamSocket sss(socket());
+		if (_pContext->sessionCacheEnabled())
+		{
+			sss.useSession(_pSession);
+		}
 		HTTPSession::connect(address);
+		if (_pContext->sessionCacheEnabled())
+		{
+			_pSession = sss.currentSession();
+		}
 	}
 	else
 	{
@@ -144,9 +173,19 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 			throw HTTPException("Cannot establish proxy connection", proxyResponse.getReason());
 		
 		StreamSocket proxySocket(proxySession.detachSocket());
-		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext);
+		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
 		attachSocket(secureSocket);
+		if (_pContext->sessionCacheEnabled())
+		{
+			_pSession = secureSocket.currentSession();
+		}
 	}
+}
+
+
+Session::Ptr HTTPSClientSession::sslSession()
+{
+	return _pSession;
 }
 
 

@@ -328,7 +328,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="HTTPServer"
+			Name="HTTPSServer"
 			Filter="">
 			<Filter
 				Name="Header Files"

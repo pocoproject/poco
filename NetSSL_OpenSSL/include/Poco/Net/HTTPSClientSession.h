@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#8 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -44,6 +44,7 @@
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/Context.h"
+#include "Poco/Net/Session.h"
 #include "Poco/Net/X509Certificate.h"
 
 
@@ -84,6 +85,11 @@ class NetSSL_API HTTPSClientSession: public HTTPClientSession
 	/// result in a SSL protocol violation, as the framework shuts down
 	/// the socket after sending the message body. No orderly SSL shutdown
 	/// will be performed in this case.
+	///
+	/// If session caching has been enabled for the Context object passed
+	/// to the HTTPSClientSession, the HTTPSClientSession class will
+	/// attempt to reuse a previously obtained Session object in
+	/// case of a reconnect.
 {
 public:
 	enum
@@ -106,9 +112,25 @@ public:
 		/// Creates an unconnected HTTPSClientSession, using the
 		/// give SSL context.
 
+	HTTPSClientSession(Context::Ptr pContext, Session::Ptr pSession);
+		/// Creates an unconnected HTTPSClientSession, using the
+		/// give SSL context.
+		///
+		/// The given Session is reused, if possible (client session
+		/// caching is enabled for the given Context, and the server
+		/// agrees to reuse the session).
+
 	HTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext);
 		/// Creates a HTTPSClientSession using the given host and port,
 		/// using the given SSL context.
+
+	HTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext, Session::Ptr pSession);
+		/// Creates a HTTPSClientSession using the given host and port,
+		/// using the given SSL context.
+		///
+		/// The given Session is reused, if possible (client session
+		/// caching is enabled for the given Context, and the server
+		/// agrees to reuse the session).
 
 	~HTTPSClientSession();
 		/// Destroys the HTTPSClientSession and closes
@@ -118,6 +140,15 @@ public:
 		/// Returns the server's certificate.
 		///
 		/// The certificate is available after the first request has been sent.
+		
+	Session::Ptr sslSession();
+		/// Returns the SSL Session object for the current 
+		/// connection, if session caching has been enabled for
+		/// the HTTPSClientSession's Context. A null pointer is 
+		/// returned otherwise.
+		///
+		/// The Session object can be obtained after the first request has
+		/// been sent.
 
 protected:
 	void connect(const SocketAddress& address);
@@ -129,6 +160,7 @@ private:
 	HTTPSClientSession& operator = (const HTTPSClientSession&);
 	
 	Context::Ptr _pContext;
+	Session::Ptr _pSession;
 };
 
 

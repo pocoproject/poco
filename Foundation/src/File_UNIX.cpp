@@ -1,7 +1,7 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#15 $
+// $Id: //poco/1.3/Foundation/src/File_UNIX.cpp#16 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -406,7 +406,7 @@ bool FileImpl::createFileImpl()
 {
 	poco_assert (!_path.empty());
 	
-	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{
 		close(n);
@@ -426,7 +426,7 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) 
+	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
 		handleLastErrorImpl(_path);
 	return true;
 }
