@@ -360,10 +360,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	poco_assert (_sockfd != POCO_INVALID_SOCKET);
 
 #if defined(POCO_HAVE_FD_EPOLL)
-#warning "Poco use EPOLL for SocketImpl::poll"
-	//
-	// Allocate epoll queue
-	//
+
 	int epollfd = epoll_create(1);
 	if (epollfd < 0)
 	{
@@ -373,9 +370,6 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		error(std::string("Can't create epoll - ") + buf);
 	}
 
-	//
-	// Fill epoll event
-	//
 	struct epoll_event ev_in;
 	memset(&ev_in, 0, sizeof(ev_in));
 
@@ -386,9 +380,6 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	if (mode & SELECT_ERROR)
 		ev_in.events |= EPOLLERR;
 
-	//
-	// Add epoll event to epoll queue
-	//
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, _sockfd, &ev_in) < 0)
 	{
 		char buf[4000];
@@ -419,19 +410,13 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
 
-	//
-	// Close epoll
-	//
 	::close(epollfd);
 
 	if (rc < 0) error();
 	return rc > 0; 
 
 #elif defined(POCO_HAVE_FD_KQUEUE)
-#warning "Poco use KQUEUE for SocketImpl::poll"
-	//
-	// Allocate kevent queue
-	//
+
 	int kqueuefd = kqueue();
 	if (kqueuefd < 0)
 	{
@@ -441,9 +426,6 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		error(std::string("Can't create kqueue - ") + buf);
 	}
 
-	//
-	// Fill kevent queue
-	//
 	struct kevent events_in[3];
 	memset(events_in, 0, sizeof(events_in));
 
@@ -489,16 +471,13 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
 
-	//
-	// Close kqueue
-	//
 	::close(kqueuefd);
 
 	if (rc < 0) error();
 	return rc > 0; 
 
 #elif defined(POCO_HAVE_FD_POLL)
-#warning "Poco use POLL for SocketImpl::poll"
+
 	pollfd pollBuf;
 	
 	memset(&pollBuf, 0, sizeof(pollfd));
@@ -526,7 +505,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	while (rc < 0 && lastError() == POCO_EINTR);
 
 #else
-#warning "Poco use SELECT for SocketImpl::poll"
+
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
@@ -565,7 +544,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		}
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
-#endif // POCO_HAVE_FD_POLL
+#endif
 	if (rc < 0) error();
 	return rc > 0; 
 }

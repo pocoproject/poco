@@ -103,41 +103,22 @@ Socket::~Socket()
 int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
 {
 #if defined(POCO_HAVE_FD_EPOLL)
-#warning "Poco use EPOLL for Socket::select"
-	//
-	// Size of epoll queue
-	//
+
 	int epoll_size = readList.size() + writeList.size() + exceptList.size();
 
-	//
-	// If nothing to do, return 0
-	//
-	if (epoll_size == 0)
-		return 0;
+	if (epoll_size == 0) return 0;
 
-	//
-	// Fill epoll queue
-	//
 	int epollfd = -1;
 	{
-		//
-		// Epoll events to be filled
-		//
 		struct epoll_event events_in[epoll_size];
 		memset(events_in, 0, sizeof (events_in));
 
-		//
-		// Current epoll event to be filled
-		//
 		struct epoll_event* event_last = events_in;
 
 		for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
 		{
 			if (it->sockfd() != POCO_INVALID_SOCKET)
 			{
-				//
-				// Try to find file descriptor in epoll events
-				//
 				struct epoll_event* e = events_in;
 				for (; e != event_last; ++e)
 				{
@@ -145,9 +126,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 						break;
 				}
 
-				//
-				// If not found allocate new epoll event
-				//
 				if (e == event_last)
 				{
 					e->data.ptr = &(*it);
@@ -163,9 +141,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		{
 			if (it->sockfd() != POCO_INVALID_SOCKET)
 			{
-				//
-				// Try to find file descriptor in epoll events
-				//
 				struct epoll_event* e = events_in;
 				for (; e != event_last; ++e)
 				{
@@ -173,9 +148,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 						break;
 				}
 
-				//
-				// If not found allocate new epoll event
-				//
 				if (e == event_last)
 				{
 					e->data.ptr = &(*it);
@@ -191,9 +163,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		{
 			if (it->sockfd() != POCO_INVALID_SOCKET)
 			{
-				//
-				// Try to find file descriptor in epoll events
-				//
 				struct epoll_event* e = events_in;
 				for (; e != event_last; ++e)
 				{
@@ -201,9 +170,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 						break;
 				}
 
-				//
-				// If not found allocate new epoll event
-				//
 				if (e == event_last)
 				{
 					e->data.ptr = &(*it);
@@ -215,14 +181,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 			}
 		}
 
-		//
-		// Recalculate real epoll queue size
-		//
 		epoll_size = event_last - events_in;
 
-		//
-		// Allocate epoll queue
-		//
 		epollfd = epoll_create(epoll_size);
 		if (epollfd < 0)
 		{
@@ -232,9 +192,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 			SocketImpl::error(std::string("Can't create epoll - ") + buf);
 		}
 
-		//
-		// Place epoll events into epoll queue
-		//
 		for (struct epoll_event* e = events_in; e != event_last; ++e)
 		{
 			if (epoll_ctl(epollfd, EPOLL_CTL_ADD, reinterpret_cast<Socket*> (e->data.ptr)->sockfd(), e) < 0)
@@ -269,9 +226,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	}
 	while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
 
-	//
-	// Close epoll queue
-	//
 	::close(epollfd);
 
 	if (rc < 0) SocketImpl::error();
@@ -294,21 +248,11 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	return readList.size() + writeList.size() + exceptList.size();
 
 #elif defined(POCO_HAVE_FD_KQUEUE)
-#warning "Poco use KQUEUE for Socket::select"
-	//
-	// Size of kqueue queue
-	//
+
 	int kqueue_size = readList.size() + writeList.size() + exceptList.size();
 
-	//
-	// If nothing to do, return 0
-	//
-	if (kqueue_size == 0)
-		return 0;
+	if (kqueue_size == 0) return 0;
 
-	//
-	// Create kevent queue
-	//
 	int kqueuefd = kqueue();
 	if (kqueuefd < 0)
 	{
@@ -318,17 +262,11 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		SocketImpl::error(std::string("Can't create kqueue - ") + buf);
 	}
 
-	//
-	// Allocate in/out kevent queues
-	//
 	struct kevent events_in[kqueue_size];
 	struct kevent events_out[kqueue_size];
 	memset(&events_in , 0, sizeof(events_in));
 	memset(&events_out, 0, sizeof(events_out));
 
-	//
-	// Add sockets to events_in list for appropriate event
-	//
 	for (size_t i = 0; i < readList.size(); ++i)
 	{
 		if (readList[i].sockfd () != POCO_INVALID_SOCKET)
@@ -373,9 +311,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	}
 	while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
 
-	//
-	// Close kqueue
-	//
 	::close(kqueuefd);
 
 	if (rc < 0) SocketImpl::error();
@@ -398,7 +333,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	return readList.size() + writeList.size() + exceptList.size();
 
 #elif defined(POCO_HAVE_FD_POLL)
-#warning "Poco use POLL for Socket::select"
+
 	nfds_t nfd = readList.size() + writeList.size() + exceptList.size();
 	if (0 == nfd) return 0;
 
@@ -478,11 +413,10 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	std::swap(writeList, readyWriteList);
 	std::swap(exceptList, readyExceptList);
 	
-//	return rc;
 	return readList.size() + writeList.size() + exceptList.size();
 
 #else
-#warning "Poco use SELECT for Socket::select"
+
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
