@@ -40,9 +40,19 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
-#if defined(POCO_HAVE_FD_POLL)
-       #include <poll.h>
+
+
+#if defined(POCO_HAVE_FD_EPOLL)
+	#include <sys/epoll.h>
+#elif defined(POCO_HAVE_FD_KQUEUE)
+	#include <sys/types.h>
+	#include <sys/event.h>
+	#include <sys/time.h>
+#elif defined(POCO_HAVE_FD_POLL)
+	#include <poll.h>
 #endif
+
+
 #if defined(sun) || defined(__sun) || defined(__sun__)
 #include <unistd.h>
 #include <stropts.h>
@@ -349,7 +359,146 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 {
 	poco_assert (_sockfd != POCO_INVALID_SOCKET);
 
-#if defined(POCO_HAVE_FD_POLL)
+#if defined(POCO_HAVE_FD_EPOLL)
+#warning "Poco use EPOLL for SocketImpl::poll"
+	//
+	// Allocate epoll queue
+	//
+	int epollfd = epoll_create(1);
+	if (epollfd < 0)
+	{
+		char buf[4000];
+		strerror_r(errno, buf, sizeof(buf));
+
+		error(std::string("Can't create epoll - ") + buf);
+	}
+
+	//
+	// Fill epoll event
+	//
+	struct epoll_event ev_in;
+	memset(&ev_in, 0, sizeof(ev_in));
+
+	if (mode & SELECT_READ)
+		ev_in.events |= EPOLLIN;
+	if (mode & SELECT_WRITE)
+		ev_in.events |= EPOLLOUT;
+	if (mode & SELECT_ERROR)
+		ev_in.events |= EPOLLERR;
+
+	//
+	// Add epoll event to epoll queue
+	//
+	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, _sockfd, &ev_in) < 0)
+	{
+		char buf[4000];
+		strerror_r(errno, buf, sizeof(buf));
+
+		::close(epollfd);
+		error(std::string("Can't insert socket to epoll - ") + buf);
+	}
+
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		struct epoll_event ev_out;
+		memset(&ev_out, 0, sizeof(ev_out));
+
+		Poco::Timestamp start;
+		rc = epoll_wait(epollfd, &ev_out, 1, remainingTime.totalMilliseconds());
+		if (rc < 0 && lastError() == POCO_EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (rc < 0 && lastError() == POCO_EINTR);
+
+	//
+	// Close epoll
+	//
+	::close(epollfd);
+
+	if (rc < 0) error();
+	return rc > 0; 
+
+#elif defined(POCO_HAVE_FD_KQUEUE)
+#warning "Poco use KQUEUE for SocketImpl::poll"
+	//
+	// Allocate kevent queue
+	//
+	int kqueuefd = kqueue();
+	if (kqueuefd < 0)
+	{
+		char buf[4000];
+		strerror_r(errno, buf, sizeof(buf));
+
+		error(std::string("Can't create kqueue - ") + buf);
+	}
+
+	//
+	// Fill kevent queue
+	//
+	struct kevent events_in[3];
+	memset(events_in, 0, sizeof(events_in));
+
+	int kqueue_size = 0;
+	if (mode & SELECT_READ)
+	{
+		EV_SET(&events_in[kqueue_size], _sockfd, EVFILT_READ, EV_ADD|EV_CLEAR, 0, 0, &events_in[kqueue_size]);
+		++kqueue_size;
+	}
+	if (mode & SELECT_WRITE)
+	{
+		EV_SET(&events_in[kqueue_size], _sockfd, EVFILT_WRITE, EV_ADD|EV_CLEAR, 0, 0, &events_in[kqueue_size]);
+		++kqueue_size;
+	}
+	if (mode & SELECT_ERROR)
+	{
+		EV_SET(&events_in[kqueue_size], _sockfd, EVFILT_READ/*FIXME:*/, EV_ADD|EV_CLEAR, 0, 0, &events_in[kqueue_size]);
+		++kqueue_size;
+	}
+
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		struct kevent events_out[kqueue_size];
+		memset(events_out, 0, sizeof(events_out));
+
+		struct timespec ts;
+		ts.tv_sec  = (long)remainingTime.totalSeconds();
+		ts.tv_nsec = (long)remainingTime.useconds();
+
+		Poco::Timestamp start;
+		rc = kevent(kqueuefd, events_in, kqueue_size, events_out, kqueue_size, &ts);
+		if (rc < 0 && lastError() == POCO_EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (rc < 0 && lastError() == POCO_EINTR);
+
+	//
+	// Close kqueue
+	//
+	::close(kqueuefd);
+
+	if (rc < 0) error();
+	return rc > 0; 
+
+#elif defined(POCO_HAVE_FD_POLL)
+#warning "Poco use POLL for SocketImpl::poll"
 	pollfd pollBuf;
 	
 	memset(&pollBuf, 0, sizeof(pollfd));
@@ -375,7 +524,9 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		}
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
+
 #else
+#warning "Poco use SELECT for SocketImpl::poll"
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
