@@ -189,11 +189,6 @@
 	#define POCO_HAVE_FD_EPOLL 1
 #endif
 
-//TODO: need to determine which of FreeBSD have kqueue
-#if (POCO_OS == POCO_OS_FREE_BSD)
-	#define POCO_HAVE_FD_KQUEUE 1
-#endif
-
 //TODO: determine all platforms having poll() call
 #if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_LINUX)
 	#define POCO_HAVE_FD_POLL 1

@@ -44,10 +44,6 @@
 
 #if defined(POCO_HAVE_FD_EPOLL)
 	#include <sys/epoll.h>
-#elif defined(POCO_HAVE_FD_KQUEUE)
-	#include <sys/types.h>
-	#include <sys/event.h>
-	#include <sys/time.h>
 #elif defined(POCO_HAVE_FD_POLL)
 	#include <poll.h>
 #endif
@@ -411,67 +407,6 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	while (rc < 0 && lastError() == POCO_EINTR);
 
 	::close(epollfd);
-
-	if (rc < 0) error();
-	return rc > 0; 
-
-#elif defined(POCO_HAVE_FD_KQUEUE)
-
-	int kqueuefd = kqueue();
-	if (kqueuefd < 0)
-	{
-		char buf[4000];
-		strerror_r(errno, buf, sizeof(buf));
-
-		error(std::string("Can't create kqueue - ") + buf);
-	}
-
-	struct kevent events_in[3];
-	memset(events_in, 0, sizeof(events_in));
-
-	int kqueue_size = 0;
-	if (mode & SELECT_READ)
-	{
-		EV_SET(&events_in[kqueue_size], _sockfd, EVFILT_READ, EV_ADD|EV_CLEAR, 0, 0, &events_in[kqueue_size]);
-		++kqueue_size;
-	}
-	if (mode & SELECT_WRITE)
-	{
-		EV_SET(&events_in[kqueue_size], _sockfd, EVFILT_WRITE, EV_ADD|EV_CLEAR, 0, 0, &events_in[kqueue_size]);
-		++kqueue_size;
-	}
-	if (mode & SELECT_ERROR)
-	{
-		EV_SET(&events_in[kqueue_size], _sockfd, EVFILT_READ/*FIXME:*/, EV_ADD|EV_CLEAR, 0, 0, &events_in[kqueue_size]);
-		++kqueue_size;
-	}
-
-	Poco::Timespan remainingTime(timeout);
-	int rc;
-	do
-	{
-		struct kevent events_out[kqueue_size];
-		memset(events_out, 0, sizeof(events_out));
-
-		struct timespec ts;
-		ts.tv_sec  = (long)remainingTime.totalSeconds();
-		ts.tv_nsec = (long)remainingTime.useconds();
-
-		Poco::Timestamp start;
-		rc = kevent(kqueuefd, events_in, kqueue_size, events_out, kqueue_size, &ts);
-		if (rc < 0 && lastError() == POCO_EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && lastError() == POCO_EINTR);
-
-	::close(kqueuefd);
 
 	if (rc < 0) error();
 	return rc > 0; 

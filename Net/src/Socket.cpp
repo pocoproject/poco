@@ -43,10 +43,6 @@
 
 #if defined(POCO_HAVE_FD_EPOLL)
 	#include <sys/epoll.h>
-#elif defined(POCO_HAVE_FD_KQUEUE)
-	#include <sys/types.h>
-	#include <sys/event.h>
-	#include <sys/time.h>
 #elif defined(POCO_HAVE_FD_POLL)
 	#include "Poco/SharedPtr.h"
 	#include <poll.h>
@@ -241,91 +237,6 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 			readyReadList.push_back(*reinterpret_cast<Socket*>(events_out[n].data.ptr));
 		if (events_out[n].events & EPOLLOUT)
 			readyWriteList.push_back(*reinterpret_cast<Socket*>(events_out[n].data.ptr));
-	}
-	std::swap(readList, readyReadList);
-	std::swap(writeList, readyWriteList);
-	std::swap(exceptList, readyExceptList);
-	return readList.size() + writeList.size() + exceptList.size();
-
-#elif defined(POCO_HAVE_FD_KQUEUE)
-
-	int kqueue_size = readList.size() + writeList.size() + exceptList.size();
-
-	if (kqueue_size == 0) return 0;
-
-	int kqueuefd = kqueue();
-	if (kqueuefd < 0)
-	{
-		char buf[4000];
-		strerror_r(errno, buf, sizeof(buf));
-
-		SocketImpl::error(std::string("Can't create kqueue - ") + buf);
-	}
-
-	struct kevent events_in[kqueue_size];
-	struct kevent events_out[kqueue_size];
-	memset(&events_in , 0, sizeof(events_in));
-	memset(&events_out, 0, sizeof(events_out));
-
-	for (size_t i = 0; i < readList.size(); ++i)
-	{
-		if (readList[i].sockfd () != POCO_INVALID_SOCKET)
-		{
-			EV_SET(events_in + i, readList[i].sockfd (), EVFILT_READ, EV_ADD|EV_CLEAR, 0, 0, &readList[i]);
-		}
-	}
-	for (size_t i = 0; i < writeList.size(); ++i)
-	{
-		if (writeList[i].sockfd () != POCO_INVALID_SOCKET)
-		{
-			EV_SET(events_in + readList.size () + i, writeList[i].sockfd (), EVFILT_WRITE, EV_ADD|EV_CLEAR, 0, 0, &writeList[i]);
-		}
-	}
-	for (size_t i = 0; i < exceptList.size(); ++i)
-	{
-		if (exceptList[i].sockfd () != POCO_INVALID_SOCKET)
-		{
-			EV_SET(events_in + readList.size () + writeList.size () + i, exceptList[i].sockfd (), EVFILT_READ/*FIXME*/, EV_ADD|EV_CLEAR, 0, 0, &exceptList[i]);
-		}
-	}
-
-	Poco::Timespan remainingTime(timeout);
-	int rc;
-	do
-	{
-		struct timespec ts;
-		ts.tv_sec  = (long)remainingTime.totalSeconds();
-		ts.tv_nsec = (long)remainingTime.useconds();
-
-		Poco::Timestamp start;
-		rc = kevent(kqueuefd, events_in, kqueue_size, events_out, kqueue_size, &ts);
-		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
-		{
- 			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
-
-	::close(kqueuefd);
-
-	if (rc < 0) SocketImpl::error();
-
- 	SocketList readyReadList;
-	SocketList readyWriteList;
-	SocketList readyExceptList;
-	for (int n = 0; n < rc; ++n)
-	{
-		if (events_out[n].flags & EV_ERROR)
-			readyExceptList.push_back(*reinterpret_cast<Socket*>(events_out[n].udata));
-		else if (events_out[n].filter == EVFILT_READ)
-			readyReadList.push_back(*reinterpret_cast<Socket*>(events_out[n].udata));
-		else if (events_out[n].filter == EVFILT_WRITE)
-			readyWriteList.push_back(*reinterpret_cast<Socket*>(events_out[n].udata));
 	}
 	std::swap(readList, readyReadList);
 	std::swap(writeList, readyWriteList);
