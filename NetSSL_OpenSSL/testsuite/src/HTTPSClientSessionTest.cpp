@@ -1,7 +1,7 @@
 //
 // HTTPSClientSessionTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#6 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#7 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -367,7 +367,7 @@ void HTTPSClientSessionTest::testCachedSession()
 	HTTPSTestServer srv(pServerContext);
 
 	Context::Ptr pClientContext = new Context(
-		Context::SERVER_USE, 
+		Context::CLIENT_USE, 
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.caConfig"),
