@@ -89,4 +89,22 @@
 #endif
 
 
+namespace Poco {
+namespace Net {
+
+
+void initializeNetwork();
+	/// Initialize the network subsystem.
+	/// Calls WSAStartup() on Windows, does nothing
+	/// on other platforms.
+	
+void uninitializeNetwork();
+	/// Uninitialize the network subsystem.
+	/// Calls WSACleanup() on Windows, does nothing
+	/// on other platforms.
+
+
+} } // namespace Poco::Net
+
+
 #endif // Net_Net_INCLUDED

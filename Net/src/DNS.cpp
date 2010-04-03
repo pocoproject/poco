@@ -50,7 +50,7 @@ using Poco::IOException;
 //
 // Automatic initialization of Windows networking
 //
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(POCO_NET_NO_AUTOMATIC_WSASTARTUP)
 namespace
 {
 	class NetworkInitializer
@@ -58,14 +58,12 @@ namespace
 	public:
 		NetworkInitializer()
 		{
-			WORD    version = MAKEWORD(2, 2);
-			WSADATA data;
-			WSAStartup(version, &data);
+			Poco::Net::initializeNetwork();
 		}
 		
 		~NetworkInitializer()
 		{
-			WSACleanup();
+			Poco::Net::uninitializeNetwork();
 		}
 	};
 	
@@ -233,6 +231,24 @@ void DNS::error(int code, const std::string& arg)
 	default:
 		throw IOException(NumberFormatter::format(code));
 	}
+}
+
+
+void initializeNetwork()
+{
+#if defined(_WIN32)
+	WORD    version = MAKEWORD(2, 2);
+	WSADATA data;
+	WSAStartup(version, &data);
+#endif // _WIN32
+}
+		
+
+void uninitializeNetwork()
+{
+#if defined(_WIN32)
+	WSACleanup();
+#endif // _WIN32
 }
 
 
