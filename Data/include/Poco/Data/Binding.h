@@ -1357,7 +1357,7 @@ template <typename T>
 inline Binding<T>* use(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
-	// if this test fails with an error, you tried to pass a const ref value to bind
+	// If this test fails with an error, you tried to pass a const ref value to use().
 	// This check is here to avoid passing in local variables (like use(1) )
 	// Resolve this either by using bind (which will copy the value) or
 	// if you are sure that the const ref will still exist when execute is called (which can be a lot later!)
