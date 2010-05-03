@@ -1,7 +1,7 @@
 //
 // CodeWriter.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/CodeWriter.cpp#3 $
+// $Id: //poco/1.3/PageCompiler/src/CodeWriter.cpp#4 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -78,6 +78,7 @@ void CodeWriter::writeImpl(std::ostream& ostr, const std::string& headerFileName
 	writeImplIncludes(ostr);
 	if (_page.getBool("page.buffered", false))
 	{
+		ostr << "#include \"Poco/StreamCopier.h\"\n";
 		ostr << "#include <sstream>\n";
 	}
 	ostr << "\n\n";
@@ -304,12 +305,17 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 void CodeWriter::writeContent(std::ostream& ostr)
 {
 	bool buffered(_page.getBool("page.buffered", false));
+	bool chunked(_page.getBool("page.chunked", !buffered));
 	
 	if (buffered)
 	{
-		ostr << "\tstd::ostringstream responseStream;\n";
+		ostr << "\tstd::stringstream responseStream;\n";
 		ostr << _page.handler().str();
-		ostr << "\tresponse.send() << responseStream.str();\n";		
+		if (!chunked)
+		{
+			ostr << "\tresponse.setContentLength(static_cast<int>(responseStream.tellp()));\n";
+		}
+		ostr << "\tPoco::StreamCopier::copyStream(responseStream, response.send());\n";		
 	}
 	else
 	{

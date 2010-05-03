@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#11 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#13 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -232,8 +232,8 @@ void SSLManager::initDefaultContext(bool server)
 	std::string certFile = config.getString(prefix + CFG_CERTIFICATE_FILE, privKeyFile);	
 	std::string caLocation = config.getString(prefix + CFG_CA_LOCATION, "");
 
-	if (certFile.empty() && privKeyFile.empty())
-		throw SSLException("Configuration error: no certificate file has been specified.");
+	if (server && certFile.empty() && privKeyFile.empty())
+		throw SSLException("Configuration error: no certificate file has been specified");
 
 	// optional options for which we have defaults defined
 	Context::VerificationMode verMode = VAL_VER_MODE;
@@ -253,9 +253,9 @@ void SSLManager::initDefaultContext(bool server)
 	else
 		_ptrDefaultClientContext = new Context(Context::CLIENT_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
 		
+	bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 	if (server)
 	{
-		bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 		_ptrDefaultServerContext->enableSessionCache(cacheSessions);
 		std::string sessionIdContext = config.getString(prefix + CFG_SESSION_ID_CONTEXT, "");
 		if (!sessionIdContext.empty())
@@ -272,6 +272,10 @@ void SSLManager::initDefaultContext(bool server)
 			int timeout = config.getInt(prefix + CFG_SESSION_TIMEOUT);
 			_ptrDefaultServerContext->setSessionTimeout(timeout);
 		}
+	}
+	else
+	{
+		_ptrDefaultClientContext->enableSessionCache(cacheSessions);
 	}
 	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, false);
 	if (server)
