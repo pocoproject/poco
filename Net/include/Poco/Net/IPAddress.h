@@ -1,7 +1,7 @@
 //
 // IPAddress.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/IPAddress.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/IPAddress.h#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -321,6 +321,12 @@ public:
 		/// string contains a valid address.
 		///
 		/// Returns false and leaves result unchanged otherwise.
+
+	static IPAddress wildcard(Family family = IPv4);
+		/// Returns a wildcard IPv4 or IPv6 address (0.0.0.0).
+		
+	static IPAddress broadcast();
+		/// Returns a broadcast IPv4 address (255.255.255.255).
 
 	enum
 	{

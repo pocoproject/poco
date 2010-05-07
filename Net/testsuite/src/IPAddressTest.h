@@ -1,7 +1,7 @@
 //
 // IPAddressTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/IPAddressTest.h#1 $
+// $Id: //poco/1.3/Net/testsuite/src/IPAddressTest.h#2 $
 //
 // Definition of the IPAddressTest class.
 //
@@ -55,6 +55,8 @@ public:
 	void testMCClassification6();
 	void testRelationals();
 	void testRelationals6();
+	void testWildcard();
+	void testBroadcast();
 	
 	void setUp();
 	void tearDown();

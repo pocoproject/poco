@@ -28,6 +28,9 @@ Release 1.3.7 (2010-0?-??)
 - added system.nodeId to SystemConfiguration
 - added a note to Poco::Util::ServerApplication documentation regarding
   creation of threads
+- added Poco::Net::IPAddress::broadcast() and Poco::Net::IPAddress::wildcard() to 
+  create broadcast (255.255.255.255) and wildcard (0.0.0.0) addresses.
+- fixed SF# 2916154: Poco::Net::IPAddress::isLoopback() only works for 127.0.0.1.
   
 
 Release 1.3.6p2 (2010-01-15)
@@ -1209,4 +1212,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#86 $
+$Id: //poco/1.3/dist/CHANGELOG#87 $

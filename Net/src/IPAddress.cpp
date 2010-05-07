@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.3/Net/src/IPAddress.cpp#11 $
+// $Id: //poco/1.3/Net/src/IPAddress.cpp#12 $
 //
 // Library: Net
 // Package: NetCore
@@ -159,7 +159,7 @@ public:
 	
 	bool isLoopback() const
 	{
-		return ntohl(_addr.s_addr) == 0x7F000001; // 127.0.0.1
+		return (ntohl(_addr.s_addr) & 0xFF000000) == 0x7F000000; // 127.0.0.1 to 127.255.255.255
 	}
 	
 	bool isMulticast() const
@@ -809,6 +809,20 @@ void IPAddress::mask(const IPAddress& mask, const IPAddress& set)
 	_pImpl->release();
 	_pImpl = pClone;
 	_pImpl->mask(mask._pImpl, set._pImpl);
+}
+
+
+IPAddress IPAddress::wildcard(Family family)
+{
+	return IPAddress(family);
+}
+
+
+IPAddress IPAddress::broadcast()
+{
+	struct in_addr ia;
+	ia.s_addr = INADDR_NONE;
+	return IPAddress(&ia, sizeof(ia));
 }
 
 

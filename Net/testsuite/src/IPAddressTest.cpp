@@ -1,7 +1,7 @@
 //
 // IPAddressTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/IPAddressTest.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/IPAddressTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -357,6 +357,22 @@ void IPAddressTest::testRelationals()
 }
 
 
+void IPAddressTest::testWildcard()
+{
+	IPAddress wildcard = IPAddress::wildcard();
+	assert (wildcard.isWildcard());
+	assert (wildcard.toString() == "0.0.0.0");
+}
+
+
+void IPAddressTest::testBroadcast()
+{
+	IPAddress broadcast = IPAddress::broadcast();
+	assert (broadcast.isBroadcast());
+	assert (broadcast.toString() == "255.255.255.255");
+}
+
+
 void IPAddressTest::testRelationals6()
 {
 #ifdef POCO_HAVE_IPv6
@@ -387,6 +403,8 @@ CppUnit::Test* IPAddressTest::suite()
 	CppUnit_addTest(pSuite, IPAddressTest, testMCClassification6);
 	CppUnit_addTest(pSuite, IPAddressTest, testRelationals);
 	CppUnit_addTest(pSuite, IPAddressTest, testRelationals6);
+	CppUnit_addTest(pSuite, IPAddressTest, testWildcard);
+	CppUnit_addTest(pSuite, IPAddressTest, testBroadcast);
 
 	return pSuite;
 }
