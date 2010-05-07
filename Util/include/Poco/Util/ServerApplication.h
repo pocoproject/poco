@@ -1,7 +1,7 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/ServerApplication.h#4 $
+// $Id: //poco/1.3/Util/include/Poco/Util/ServerApplication.h#5 $
 //
 // Library: Util
 // Package: Application
@@ -64,6 +64,12 @@ class Util_API ServerApplication: public Application
 	///     initialize() method.
 	///   - At the end of the main() method, waitForTerminationRequest()
 	///     should be called.
+	///   - New threads must only be created in initialize() or main() or
+	///     methods called from there, but not in the application class'
+	///     constructor or in the constructor of instance variables.
+	///     The reason for this is that a fork() will be in order to
+	///     create the daemon process, and threads created prior to the
+	///     fork() won't be taken over to the daemon process.
 	///   - The main(argc, argv) function must look as follows:
 	///
 	///   int main(int argc, char** argv)

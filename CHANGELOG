@@ -14,10 +14,21 @@ Release 1.3.7 (2010-0?-??)
 - fixed SF# 2941231: ICMPEventArgs out of bounds array access
 - added PageCompiler sample
 - added missing newline at end of xmlparse.c
-- Poco::Glob can now be used with an empty pattern which will match nothing (from Kim Graesman)
+- Poco::Glob can now be used with an empty pattern which will match nothing (patch from Kim Graesman)
 - added support for HTTP proxy authentication (Basic authentication only)
 - fixed SF# 2958959: XMLWriter must encode CR, LF and TAB in attribute values as character entities.
-
+- HTMLForm now supports PUT requests as well (see <http://pocoproject.org/forum/viewtopic.php?f=12&t=2163&p=3930#p3930>)
+- fixed SF# #2970521: FileOutputStream and file permissions.
+  (also fixed in File class)
+- removed an unused (and wrong) default parameter from EventImpl constructor for WIN32.
+- added full support for session caching to NetSSL_OpenSSL
+- fixed SF# 2984454: Poco::Util::Timer::scheduleAtFixedRate() works incorrectly
+- fixed a bug in Poco::Util::Timer that could lead to high CPU load if
+  the system clock is moved forward.
+- added system.nodeId to SystemConfiguration
+- added a note to Poco::Util::ServerApplication documentation regarding
+  creation of threads
+  
 
 Release 1.3.6p2 (2010-01-15)
 ============================
@@ -1198,4 +1209,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#85 $
+$Id: //poco/1.3/dist/CHANGELOG#86 $

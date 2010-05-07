@@ -1,7 +1,7 @@
 //
 // SystemConfiguration.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/SystemConfiguration.h#3 $
+// $Id: //poco/1.3/Util/include/Poco/Util/SystemConfiguration.h#4 $
 //
 // Library: Util
 // Package: Configuration
@@ -57,6 +57,8 @@ class Util_API SystemConfiguration: public AbstractConfiguration
 	///   - system.osVersion: the operating system version
 	///   - system.osArchitecture: the operating system architecture
 	///   - system.nodeName: the node (or host) name
+	///   - system.nodeId: system ID, based on the Ethernet address (format "xxxxxxxxxxxx") 
+	///     of the first Ethernet adapter found on the system.
 	///   - system.currentDir: the current working directory
 	///   - system.homeDir: the user's home directory
 	///   - system.tempDir: the system's temporary directory
@@ -87,6 +89,7 @@ private:
 	static const std::string OSVERSION;
 	static const std::string OSARCHITECTURE;
 	static const std::string NODENAME;
+	static const std::string NODEID;
 	static const std::string CURRENTDIR;
 	static const std::string HOMEDIR;
 	static const std::string TEMPDIR;

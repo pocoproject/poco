@@ -1,7 +1,7 @@
 //
 // SystemConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/SystemConfiguration.cpp#2 $
+// $Id: //poco/1.3/Util/src/SystemConfiguration.cpp#3 $
 //
 // Library: Util
 // Package: Configuration
@@ -43,6 +43,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Process.h"
 #include "Poco/Exception.h"
+#include <cstdio>
 
 
 using Poco::Environment;
@@ -57,6 +58,7 @@ const std::string SystemConfiguration::OSNAME         = "system.osName";
 const std::string SystemConfiguration::OSVERSION      = "system.osVersion";
 const std::string SystemConfiguration::OSARCHITECTURE = "system.osArchitecture";
 const std::string SystemConfiguration::NODENAME       = "system.nodeName";
+const std::string SystemConfiguration::NODEID         = "system.nodeId";
 const std::string SystemConfiguration::CURRENTDIR     = "system.currentDir";
 const std::string SystemConfiguration::HOMEDIR        = "system.homeDir";
 const std::string SystemConfiguration::TEMPDIR        = "system.tempDir";
@@ -78,27 +80,67 @@ SystemConfiguration::~SystemConfiguration()
 bool SystemConfiguration::getRaw(const std::string& key, std::string& value) const
 {
 	if (key == OSNAME)
+	{
 		value = Environment::osName();
+	}
 	else if (key == OSVERSION)
+	{
 		value = Environment::osVersion();
+	}
 	else if (key == OSARCHITECTURE)
+	{
 		value = Environment::osArchitecture();
+	}
 	else if (key == NODENAME)
+	{
 		value = Environment::nodeName();
+	}
+	else if (key == NODEID)
+	{
+		try
+		{
+			Poco::Environment::NodeId id;
+			Poco::Environment::nodeId(id);
+			char result[13];
+			std::sprintf(result, "%02x%02x%02x%02x%02x%02x",
+				id[0],
+				id[1],
+				id[2],
+				id[3],
+				id[4],
+				id[5]);
+			value = result;
+		}
+		catch (...)
+		{
+			value = "000000000000";
+		}
+	}
 	else if (key == CURRENTDIR)
+	{
 		value = Path::current();
+	}
 	else if (key == HOMEDIR)
+	{
 		value = Path::home();
+	}
 	else if (key == TEMPDIR)
+	{
 		value = Path::temp();
+	}
 	else if (key == DATETIME)
+	{
 		value = Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FORMAT);
+	}
 	else if (key == PID)
+	{
 		value = Poco::NumberFormatter::format(Poco::Process::id());
+	}
 	else if (key.compare(0, ENV.size(), ENV) == 0)
+	{
 		return getEnv(key.substr(ENV.size()), value);
-	else
-		return false;
+	}
+	else return false;
 	return true;
 }
 
