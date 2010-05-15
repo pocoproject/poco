@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/config/iPhone#2 $
+# $Id: //poco/1.3/build/config/iPhone#3 $
 #
 # iPhone
 #
@@ -9,25 +9,29 @@
 #
 # General Settings
 #
-LINKMODE           			= STATIC
+# iPhone OS does not allow dynamic linking to user libraries
 #
-# IPHONE_SDK_VERSION = 2.2.1
+LINKMODE = STATIC
+
+#
 # If the SDK is defined use it
 # Otherwise find the latest version installed
 #
+# IPHONE_SDK_VERSION = 2.2.1
+
 # if IPHONE_SDK_VERSION_MIN is defined use that
 # Otherwise use the version found. 
-IPHONE_SDK					= iPhoneOS
-IPHONE_SDK_ROOT				= /Developer/Platforms/iPhoneOS.platform/Developer/SDKs
-IPHONE_SDK_ROOT_DIR			= $(IPHONE_SDK_ROOT)/$(IPHONE_SDK)
-IPHONE_SDK_BASE				= $(shell ls -d $(IPHONE_SDK_ROOT_DIR)$(IPHONE_SDK_VERSION)*.sdk | tail -1)
-IPHONE_SDK_VERSION_MIN		?= $(patsubst %.sdk,%,$(patsubst $(IPHONE_SDK_ROOT_DIR)%,%,$(IPHONE_SDK_BASE)))
 
+IPHONE_SDK             ?= iPhoneOS
+IPHONE_SDK_ROOT         = /Developer/Platforms/$(IPHONE_SDK).platform/Developer/SDKs
+IPHONE_SDK_ROOT_DIR     = $(IPHONE_SDK_ROOT)/$(IPHONE_SDK)
+IPHONE_SDK_BASE         = $(shell ls -d $(IPHONE_SDK_ROOT_DIR)$(IPHONE_SDK_VERSION)*.sdk | tail -1)
+IPHONE_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(IPHONE_SDK_ROOT_DIR)%,%,$(IPHONE_SDK_BASE)))
 
-POCO_TARGET_OSNAME = iPhone
-POCO_TARGET_OSARCH = armv6
-TOOL_PREFIX        = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
-OSFLAGS            = -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -mthumb -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
+POCO_TARGET_OSNAME     ?= $(IPHONE_SDK)
+POCO_TARGET_OSARCH     ?= armv6
+TOOL_PREFIX            ?= /Developer/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
+OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -mthumb -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
 
 #
 # Tools

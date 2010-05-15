@@ -31,6 +31,9 @@ Release 1.3.7 (2010-0?-??)
 - added Poco::Net::IPAddress::broadcast() and Poco::Net::IPAddress::wildcard() to 
   create broadcast (255.255.255.255) and wildcard (0.0.0.0) addresses.
 - fixed SF# 2916154: Poco::Net::IPAddress::isLoopback() only works for 127.0.0.1.
+- added build configuration for iPhone Simulator
+- GNU Make based build system provides new variables: POCO_HOST_BINDIR, POCO_HOST_BINPATH,
+  POCO_HOST_LIBDIR, POCO_HOST_LIBPATH and POCO_TARGET_* equivalents.
   
 
 Release 1.3.6p2 (2010-01-15)
@@ -1212,4 +1215,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#87 $
+$Id: //poco/1.3/dist/CHANGELOG#88 $
