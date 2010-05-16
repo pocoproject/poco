@@ -34,7 +34,11 @@ Release 1.3.7 (2010-0?-??)
 - added build configuration for iPhone Simulator
 - GNU Make based build system provides new variables: POCO_HOST_BINDIR, POCO_HOST_BINPATH,
   POCO_HOST_LIBDIR, POCO_HOST_LIBPATH and POCO_TARGET_* equivalents.
-  
+- Application::initialize() and Application::uninitialize() will be called from within run().
+  This solves various issues with uninitialize() not being called, or being called inappropriately 
+  from the Application destructor.
+- added /startup option to specify startup mode for Windows services (automatic or manual)
+
 
 Release 1.3.6p2 (2010-01-15)
 ============================
@@ -1215,4 +1219,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#88 $
+$Id: //poco/1.3/dist/CHANGELOG#89 $

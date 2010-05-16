@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.3/Util/src/Application.cpp#9 $
+// $Id: //poco/1.3/Util/src/Application.cpp#10 $
 //
 // Library: Util
 // Package: Application
@@ -106,13 +106,6 @@ Application::Application(int argc, char* argv[]):
 
 Application::~Application()
 {
-	try
-	{
-		uninitialize();
-	}
-	catch (...)
-	{
-	}
 	_pInstance = 0;
 }
 
@@ -188,7 +181,6 @@ void Application::init()
 	_pConfig->setString("application.dir", appPath.parent().toString());
 	_pConfig->setString("application.configDir", appPath.parent().toString());
 	processOptions();
-	initialize(*this);
 }
 
 
@@ -305,9 +297,11 @@ void Application::stopOptionsProcessing()
 
 int Application::run()
 {
+	int rc = EXIT_SOFTWARE;
+	initialize(*this);
 	try
 	{
-		return main(_args);
+		rc = main(_args);
 	}
 	catch (Poco::Exception& exc)
 	{
@@ -321,7 +315,8 @@ int Application::run()
 	{
 		logger().fatal("system exception");
 	}
-	return EXIT_SOFTWARE;
+	uninitialize();
+	return rc;
 }
 
 

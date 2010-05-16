@@ -1,7 +1,7 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/ServerApplication.h#5 $
+// $Id: //poco/1.3/Util/include/Poco/Util/ServerApplication.h#6 $
 //
 // Library: Util
 // Package: Application
@@ -67,8 +67,8 @@ class Util_API ServerApplication: public Application
 	///   - New threads must only be created in initialize() or main() or
 	///     methods called from there, but not in the application class'
 	///     constructor or in the constructor of instance variables.
-	///     The reason for this is that a fork() will be in order to
-	///     create the daemon process, and threads created prior to the
+	///     The reason for this is that fork() will be called in order to
+	///     create the daemon process, and threads created prior to calling
 	///     fork() won't be taken over to the daemon process.
 	///   - The main(argc, argv) function must look as follows:
 	///
@@ -95,6 +95,8 @@ class Util_API ServerApplication: public Application
 	/// The file name of the application executable (excluding the .exe suffix)
 	/// is used as the service name. Additionally, a more user-friendly name can be
 	/// specified, using the /displayName option (e.g., /displayName="Demo Service").
+	/// The startup mode (automatic or manual) for the service can be specified
+	/// with the /startup option.
 	///
 	/// An application can determine whether it is running as a service by checking
 	/// for the "application.runAsService" configuration property.
@@ -169,11 +171,12 @@ protected:
 	int run();
 	void waitForTerminationRequest();
 	void defineOptions(OptionSet& options);
-	void handleOption(const std::string& name, const std::string& value);
 	static void terminate();
 
 private:
 #if defined(POCO_OS_FAMILY_UNIX)
+	void handleDaemon(const std::string& name, const std::string& value);
+	void handlePidFile(const std::string& name, const std::string& value);
 	bool isDaemon(int argc, char** argv);
 	void beDaemon();
 #elif defined(POCO_OS_FAMILY_WINDOWS)
@@ -196,9 +199,14 @@ private:
 	void beService();
 	void registerService();
 	void unregisterService();
+	void handleRegisterService(const std::string& name, const std::string& value);
+	void handleUnregisterService(const std::string& name, const std::string& value);
+	void handleDisplayName(const std::string& name, const std::string& value);
+	void handleStartup(const std::string& name, const std::string& value);	
 	
 	Action      _action;
 	std::string _displayName;
+	std::string _startup;
 
 	static Poco::Event           _terminated;
 	static SERVICE_STATUS        _serviceStatus; 
