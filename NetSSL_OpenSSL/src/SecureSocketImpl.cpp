@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#20 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#21 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -212,16 +212,22 @@ void SecureSocketImpl::listen(int backlog)
 void SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
-	{
-		// A proper clean shutdown would require us to
-		// retry the shutdown if we get a zero return
-		// value, until SSL_shutdown() returns 1.
-		// However, this will lead to problems with
-		// most web browsers, so we just set the shutdown
-		// flag by calling SSL_shutdown() once and be
-		// done with it.
-		int rc = SSL_shutdown(_pSSL);
-		if (rc < 0) handleError(rc);
+	{        
+        // Don't shut down the socket more than once.
+        int shutdownState = SSL_get_shutdown(_pSSL);
+        bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
+        if (!shutdownSent)
+        {
+			// A proper clean shutdown would require us to
+			// retry the shutdown if we get a zero return
+			// value, until SSL_shutdown() returns 1.
+			// However, this will lead to problems with
+			// most web browsers, so we just set the shutdown
+			// flag by calling SSL_shutdown() once and be
+			// done with it.
+			int rc = SSL_shutdown(_pSSL);
+			if (rc < 0) handleError(rc);
+		}
 	}
 }
 

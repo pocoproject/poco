@@ -38,6 +38,7 @@ Release 1.3.7 (2010-0?-??)
   This solves various issues with uninitialize() not being called, or being called inappropriately 
   from the Application destructor.
 - added /startup option to specify startup mode for Windows services (automatic or manual)
+- fixed SF# 2967354: SecureSocketImpl shutdown/close problem
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1219,4 +1220,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#89 $
+$Id: //poco/1.3/dist/CHANGELOG#90 $
