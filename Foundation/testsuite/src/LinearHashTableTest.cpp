@@ -1,7 +1,7 @@
 //
 // LinearHashTableTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/LinearHashTableTest.cpp#3 $
+// $Id: //poco/1.3/Foundation/testsuite/src/LinearHashTableTest.cpp#4 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -76,6 +76,7 @@ void LinearHashTableTest::testInsert()
 		assert (*it == i);
 		assert (ht.size() == i + 1);
 	}		
+	assert (ht.buckets() == N + 1);
 	
 	assert (!ht.empty());
 	
@@ -91,6 +92,8 @@ void LinearHashTableTest::testInsert()
 		std::pair<LinearHashTable<int, Hash<int> >::Iterator, bool> res = ht.insert(i);
 		assert (*res.first == i);
 		assert (!res.second);
+		assert (ht.size() == N);
+		assert (ht.buckets() == N + 1);
 	}		
 }
 
