@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#10 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#12 $
 //
 // Library: Net
 // Package: Sockets
@@ -108,7 +108,11 @@ void SocketImpl::connect(const SocketAddress& address)
 		rc = ::connect(_sockfd, address.addr(), address.length());
 	}
 	while (rc != 0 && lastError() == POCO_EINTR);
-	if (rc != 0) error(address.toString());
+	if (rc != 0) 
+	{
+		int err = lastError();
+		error(err, address.toString());
+	}
 }
 
 
@@ -124,11 +128,12 @@ void SocketImpl::connect(const SocketAddress& address, const Poco::Timespan& tim
 		int rc = ::connect(_sockfd, address.addr(), address.length());
 		if (rc != 0)
 		{
-			if (lastError() != POCO_EINPROGRESS && lastError() != POCO_EWOULDBLOCK)
-				error(address.toString());
+			int err = lastError();
+			if (err != POCO_EINPROGRESS && err != POCO_EWOULDBLOCK)
+				error(err, address.toString());
 			if (!poll(timeout, SELECT_READ | SELECT_WRITE))
 				throw Poco::TimeoutException("connect timed out", address.toString());
-			int err = socketError();
+			err = socketError();
 			if (err != 0) error(err);
 		}
 	}
@@ -151,8 +156,9 @@ void SocketImpl::connectNB(const SocketAddress& address)
 	int rc = ::connect(_sockfd, address.addr(), address.length());
 	if (rc != 0)
 	{
-		if (lastError() != POCO_EINPROGRESS && lastError() != POCO_EWOULDBLOCK)
-			error(address.toString());
+		int err = lastError();
+		if (err != POCO_EINPROGRESS && err != POCO_EWOULDBLOCK)
+			error(err, address.toString());
 	}
 }
 
@@ -262,10 +268,11 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 	while (rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) 
 	{
-		if (lastError() == POCO_EAGAIN || lastError() == POCO_ETIMEDOUT)
+		int err = lastError();
+		if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
 			throw TimeoutException();
 		else
-			error();
+			error(err);
 	}
 	return rc;
 }
@@ -313,10 +320,11 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 	}
 	else
 	{
-		if (lastError() == POCO_EAGAIN || lastError() == POCO_ETIMEDOUT)
+		int err = lastError();
+		if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
 			throw TimeoutException();
 		else
-			error();
+			error(err);
 	}
 	return rc;
 }
@@ -418,7 +426,7 @@ int SocketImpl::getReceiveBufferSize()
 
 void SocketImpl::setSendTimeout(const Poco::Timespan& timeout)
 {
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(POCO_BROKEN_TIMEOUTS)
 	int value = (int) timeout.totalMilliseconds();
 	setOption(SOL_SOCKET, SO_SNDTIMEO, value);
 #elif defined(POCO_BROKEN_TIMEOUTS)
@@ -432,7 +440,7 @@ void SocketImpl::setSendTimeout(const Poco::Timespan& timeout)
 Poco::Timespan SocketImpl::getSendTimeout()
 {
 	Timespan result;
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(POCO_BROKEN_TIMEOUTS)
 	int value;
 	getOption(SOL_SOCKET, SO_SNDTIMEO, value);
 	result = Timespan::TimeDiff(value)*1000;
@@ -463,7 +471,7 @@ void SocketImpl::setReceiveTimeout(const Poco::Timespan& timeout)
 Poco::Timespan SocketImpl::getReceiveTimeout()
 {
 	Timespan result;
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(POCO_BROKEN_TIMEOUTS)
 	int value;
 	getOption(SOL_SOCKET, SO_RCVTIMEO, value);
 	result = Timespan::TimeDiff(value)*1000;
@@ -785,8 +793,9 @@ void SocketImpl::reset(poco_socket_t aSocket)
 
 void SocketImpl::error()
 {
+	int err = lastError();
 	std::string empty;
-	error(lastError(), empty);
+	error(err, empty);
 }
 
 

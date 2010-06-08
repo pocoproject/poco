@@ -1,7 +1,7 @@
 //
 // CryptTestSuite.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/CryptTestSuite.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CryptTestSuite.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -43,7 +43,7 @@
 
 CppUnit::Test* CryptTestSuite::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("CryptTestTestSuite");
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("CryptTestSuite");
 
 	pSuite->addTest(MD2EngineTest::suite());
 	pSuite->addTest(MD4EngineTest::suite());

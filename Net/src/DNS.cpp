@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.3/Net/src/DNS.cpp#4 $
+// $Id: //poco/1.3/Net/src/DNS.cpp#5 $
 //
 // Library: Net
 // Package: NetCore
@@ -152,7 +152,8 @@ const HostEntry& DNS::hostByAddress(const IPAddress& address)
 		return res.first->second;
 	}
 #endif
-	error(lastError(), address.toString());      // will throw an appropriate exception
+	int err = lastError();
+	error(err, address.toString());      // will throw an appropriate exception
 	throw NetException(); // to silence compiler
 }
 
