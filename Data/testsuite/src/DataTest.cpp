@@ -1,7 +1,7 @@
 //
 // DataTest.cpp
 //
-// $Id: //poco/1.3/Data/testsuite/src/DataTest.cpp#4 $
+// $Id: //poco/1.3/Data/testsuite/src/DataTest.cpp#5 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -167,20 +167,20 @@ void DataTest::testBLOB()
 	std::vector<char> vecAlpha(strAlpha.begin(), strAlpha.end());
 	std::vector<char> vecDigit(strDigit.begin(), strDigit.end());
 	
-	BLOB blobNumStr(strDigit.c_str(), strDigit.size());
+	Poco::Data::BLOB blobNumStr(strDigit.c_str(), strDigit.size());
 	assert (blobNumStr.size() == strDigit.size());
 	assert (0 == std::strncmp(strDigit.c_str(), blobNumStr.rawContent(), blobNumStr.size()));
 	assert (*blobNumStr.begin() == '1');
 	assert (*(blobNumStr.end()-1) == '0');
-	BLOB blobNumVec(vecDigit);
+	Poco::Data::BLOB blobNumVec(vecDigit);
 	assert (blobNumVec.size() == vecDigit.size());
 	assert (blobNumVec == blobNumStr);
 	blobNumVec.swap(blobNumStr);
 	assert (blobNumVec.size() == blobNumStr.size());
 	assert (blobNumVec == blobNumStr);
 
-	BLOB blobChrStr(strAlpha.c_str(), strAlpha.size());
-	BLOB blobChrVec(vecAlpha);
+	Poco::Data::BLOB blobChrStr(strAlpha.c_str(), strAlpha.size());
+	Poco::Data::BLOB blobChrVec(vecAlpha);
 	assert (blobChrStr.size() == strAlpha.size());
 	assert (0 == std::strncmp(strAlpha.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
 	assert (*blobChrStr.begin() == 'a');
@@ -198,7 +198,7 @@ void DataTest::testBLOB()
 
 void DataTest::testBLOBStreams()
 {
-	BLOB blob;
+	Poco::Data::BLOB blob;
 	assert (0 == blob.size());
 
 	BLOBOutputStream bos(blob);

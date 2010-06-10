@@ -1,7 +1,7 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#4 $
+// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#5 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
@@ -133,6 +133,13 @@ protected:
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHeaderOutputDir)));
 
 		options.addOption(
+			Option("header-prefix", "P", "Prepend the given <prefix> to the header file name in the generated #include directive.")
+				.required(false)
+				.repeatable(false)
+				.argument("<prefix>")
+				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHeaderPrefix)));
+
+		options.addOption(
 			Option("osp", "O", "Add factory class definition and implementation for use with the Open Service Platform.")
 				.required(false)
 				.repeatable(false)
@@ -177,6 +184,13 @@ protected:
 		_headerOutputDir = value;
 	}
 
+	void handleHeaderPrefix(const std::string& name, const std::string& value)
+	{
+		_headerPrefix = value;
+		if (!_headerPrefix.empty() && _headerPrefix[_headerPrefix.size() - 1] != '/')
+			_headerPrefix += '/';
+	}
+
 	void handleOSP(const std::string& name, const std::string& value)
 	{
 		_generateOSPCode = true;	
@@ -200,7 +214,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Server Page Compiler.\n"
-			"Copyright (c) 2008-2009 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2008-2010 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program compiles web pages containing embedded C++ code "
 			"into a C++ class that can be used with the HTTP server "
@@ -295,7 +309,7 @@ protected:
 		FileOutputStream implStream(implPath);
 		OutputLineEndingConverter implLEC(implStream);
 		writeFileHeader(implLEC);
-		pCodeWriter->writeImpl(implLEC, headerFileName);
+		pCodeWriter->writeImpl(implLEC, _headerPrefix + headerFileName);
 
 		config().setString("outputFileName", headerFileName);
 		config().setString("outputFilePath", headerPath);
@@ -332,6 +346,7 @@ private:
 	bool _emitLineDirectives;
 	std::string _outputDir;
 	std::string _headerOutputDir;
+	std::string _headerPrefix;
 };
 
 

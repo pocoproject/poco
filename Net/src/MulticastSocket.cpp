@@ -1,7 +1,7 @@
 //
 // MulticastSocket.cpp
 //
-// $Id: //poco/1.3/Net/src/MulticastSocket.cpp#4 $
+// $Id: //poco/1.3/Net/src/MulticastSocket.cpp#5 $
 //
 // Library: Net
 // Package: Sockets
@@ -95,16 +95,16 @@ MulticastSocket& MulticastSocket::operator = (const Socket& socket)
 }
 
 
-void MulticastSocket::setInterface(const NetworkInterface& interface)
+void MulticastSocket::setInterface(const NetworkInterface& interfc)
 {
-	if (!interface.supportsIPv6())
+	if (!interfc.supportsIPv6())
 	{
-		impl()->setOption(IPPROTO_IP, IP_MULTICAST_IF, interface.address());
+		impl()->setOption(IPPROTO_IP, IP_MULTICAST_IF, interfc.address());
 	}
 	else
 	{
 #if defined(POCO_HAVE_IPv6)
-		impl()->setOption(IPPROTO_IPV6, IPV6_MULTICAST_IF, interface.index());
+		impl()->setOption(IPPROTO_IPV6, IPV6_MULTICAST_IF, interfc.index());
 #endif
 	}
 }
@@ -211,13 +211,13 @@ void MulticastSocket::joinGroup(const IPAddress& groupAddress)
 }
 
 	
-void MulticastSocket::joinGroup(const IPAddress& groupAddress, const NetworkInterface& interface)
+void MulticastSocket::joinGroup(const IPAddress& groupAddress, const NetworkInterface& interfc)
 {
 	if (groupAddress.af() == AF_INET)
 	{
 		struct ip_mreq mr;
 		std::memcpy(&mr.imr_multiaddr, groupAddress.addr(), groupAddress.length());
-		std::memcpy(&mr.imr_interface, interface.address().addr(), interface.address().length());
+		std::memcpy(&mr.imr_interface, interfc.address().addr(), interfc.address().length());
 		impl()->setRawOption(IPPROTO_IP, IP_ADD_MEMBERSHIP, &mr, sizeof(mr));
 	}
 	else
@@ -225,7 +225,7 @@ void MulticastSocket::joinGroup(const IPAddress& groupAddress, const NetworkInte
 #if defined(POCO_HAVE_IPv6)
 		struct ipv6_mreq mr;
 		std::memcpy(&mr.ipv6mr_multiaddr, groupAddress.addr(), groupAddress.length());
-		mr.ipv6mr_interface = interface.index();
+		mr.ipv6mr_interface = interfc.index();
 		impl()->setRawOption(IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mr, sizeof(mr));
 #endif
 	}
@@ -239,13 +239,13 @@ void MulticastSocket::leaveGroup(const IPAddress& groupAddress)
 }
 
 	
-void MulticastSocket::leaveGroup(const IPAddress& groupAddress, const NetworkInterface& interface)
+void MulticastSocket::leaveGroup(const IPAddress& groupAddress, const NetworkInterface& interfc)
 {
 	if (groupAddress.af() == AF_INET)
 	{
 		struct ip_mreq mr;
 		std::memcpy(&mr.imr_multiaddr, groupAddress.addr(), groupAddress.length());
-		std::memcpy(&mr.imr_interface, interface.address().addr(), interface.address().length());
+		std::memcpy(&mr.imr_interface, interfc.address().addr(), interfc.address().length());
 		impl()->setRawOption(IPPROTO_IP, IP_DROP_MEMBERSHIP, &mr, sizeof(mr));
 	}
 	else
@@ -253,7 +253,7 @@ void MulticastSocket::leaveGroup(const IPAddress& groupAddress, const NetworkInt
 #if defined(POCO_HAVE_IPv6)
 		struct ipv6_mreq mr;
 		std::memcpy(&mr.ipv6mr_multiaddr, groupAddress.addr(), groupAddress.length());
-		mr.ipv6mr_interface = interface.index();
+		mr.ipv6mr_interface = interfc.index();
 		impl()->setRawOption(IPPROTO_IPV6, IPV6_DROP_MEMBERSHIP, &mr, sizeof(mr));
 #endif
 	}

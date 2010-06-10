@@ -1,7 +1,7 @@
 //
 // MulticastSocket.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/MulticastSocket.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/MulticastSocket.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -87,7 +87,7 @@ public:
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.	
 
-	void setInterface(const NetworkInterface& interface);
+	void setInterface(const NetworkInterface& interfc);
 		/// Sets the interface used for sending multicast packets.
 		///
 		/// To select the default interface, specify an empty
@@ -121,13 +121,13 @@ public:
 	void joinGroup(const IPAddress& groupAddress);
 		/// Joins the specified multicast group at the default interface.
 		
-	void joinGroup(const IPAddress& groupAddress, const NetworkInterface& interface);
+	void joinGroup(const IPAddress& groupAddress, const NetworkInterface& interfc);
 		/// Joins the specified multicast group at the given interface.
 		
 	void leaveGroup(const IPAddress& groupAddress);
 		/// Leaves the specified multicast group at the default interface.
 		
-	void leaveGroup(const IPAddress& groupAddress, const NetworkInterface& interface);
+	void leaveGroup(const IPAddress& groupAddress, const NetworkInterface& interfc);
 		/// Leaves the specified multicast group at the given interface.
 };
 

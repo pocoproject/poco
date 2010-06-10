@@ -1,7 +1,7 @@
 //
 // SQLiteTest.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/testsuite/src/SQLiteTest.cpp#6 $
+// $Id: //poco/1.3/Data/SQLite/testsuite/src/SQLiteTest.cpp#7 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -983,12 +983,12 @@ void SQLiteTest::testBLOB()
 	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Image BLOB)", now;
-	BLOB img("0123456789", 10);
+	Poco::Data::BLOB img("0123456789", 10);
 	int count = 0;
 	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :img)", use(lastName), use(firstName), use(address), use(img), now;
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);
-	BLOB res;
+	Poco::Data::BLOB res;
 	poco_assert (res.size() == 0);
 	tmp << "SELECT Image FROM Person WHERE LastName == :ln", use("lastname"), into(res), now;
 	poco_assert (res == img);
@@ -1002,13 +1002,13 @@ void SQLiteTest::testBLOBStmt()
 	Session tmp (SessionFactory::instance().create(SQLite::Connector::KEY, "dummy.db"));
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Image BLOB)", now;
-	BLOB img("0123456789", 10);
+	Poco::Data::BLOB img("0123456789", 10);
 	int count = 0;
-	Statement ins = (tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :img)", use("lastname"), use("firstname"), use("Address"), use(BLOB("0123456789", 10)));
+	Statement ins = (tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :img)", use("lastname"), use("firstname"), use("Address"), use(Poco::Data::BLOB("0123456789", 10)));
 	ins.execute();
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);
-	BLOB res;
+	Poco::Data::BLOB res;
 	poco_assert (res.size() == 0);
 	Statement stmt = (tmp << "SELECT Image FROM Person WHERE LastName == :ln", use("lastname"), into(res));
 	stmt.execute();
