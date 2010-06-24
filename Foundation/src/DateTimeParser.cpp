@@ -1,7 +1,7 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DateTimeParser.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/DateTimeParser.cpp#8 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -317,7 +317,7 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
 	std::string month;
-	while ((it != end && std::isspace(*it)) || std::ispunct(*it)) ++it;
+	while (it != end && (std::isspace(*it) || std::ispunct(*it))) ++it;
 	bool isFirst = true;
 	while (it != end && std::isalpha(*it)) 
 	{
@@ -338,7 +338,7 @@ int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::strin
 int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
 	std::string dow;
-	while ((it != end && std::isspace(*it)) || std::ispunct(*it)) ++it;
+	while (it != end && (std::isspace(*it) || std::ispunct(*it))) ++it;
 	bool isFirst = true;
 	while (it != end && std::isalpha(*it)) 
 	{
@@ -359,7 +359,7 @@ int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::s
 int DateTimeParser::parseAMPM(std::string::const_iterator& it, const std::string::const_iterator& end, int hour)
 {
 	std::string ampm;
-	while ((it != end && std::isspace(*it)) || std::ispunct(*it)) ++it;
+	while (it != end && (std::isspace(*it) || std::ispunct(*it))) ++it;
 	while (it != end && std::isalpha(*it)) 
 	{
 		char ch = (*it++);
