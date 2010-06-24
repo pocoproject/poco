@@ -1,7 +1,7 @@
 //
 // HTMLFormTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/HTMLFormTest.cpp#3 $
+// $Id: //poco/1.3/Net/testsuite/src/HTMLFormTest.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -152,12 +152,12 @@ void HTMLFormTest::testWriteMultipart()
 		"\r\n"
 		"value&4\r\n"
 		"--MIME_boundary_0123456789\r\n"
-		"Content-Disposition: file; name=\"attachment1\"\r\n"
+		"Content-Disposition: form-data; name=\"attachment1\"\r\n"
 		"Content-Type: text/plain\r\n"
 		"\r\n"
 		"This is an attachment\r\n"
 		"--MIME_boundary_0123456789\r\n"
-		"Content-Disposition: file; name=\"attachment2\"; filename=\"att2.txt\"\r\n"
+		"Content-Disposition: form-data; name=\"attachment2\"; filename=\"att2.txt\"\r\n"
 		"Content-Type: text/plain\r\n"
 		"\r\n"
 		"This is another attachment\r\n"

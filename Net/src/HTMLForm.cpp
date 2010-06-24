@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.3/Net/src/HTMLForm.cpp#6 $
+// $Id: //poco/1.3/Net/src/HTMLForm.cpp#7 $
 //
 // Library: Net
 // Package: HTML
@@ -344,7 +344,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	for (PartVec::iterator ita = _parts.begin(); ita != _parts.end(); ++ita)
 	{
 		MessageHeader header;
-		std::string disp("file; name=\"");
+		std::string disp("form-data; name=\"");
 		disp.append(ita->name);
 		disp.append("\"");
 		std::string filename = ita->pSource->filename();
