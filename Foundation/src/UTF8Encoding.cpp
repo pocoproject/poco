@@ -1,7 +1,7 @@
 //
 // UTF8Encoding.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UTF8Encoding.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/UTF8Encoding.cpp#8 $
 //
 // Library: Foundation
 // Package: Text
@@ -135,10 +135,6 @@ int UTF8Encoding::convert(const unsigned char* bytes) const
 
 int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
-#ifdef _DEBUG
-	unsigned char* lb = bytes;
-#endif
-
 	if (ch <= 0x7F)
 	{
 		if (bytes && length >= 1)
@@ -152,7 +148,6 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 			*bytes++ = (unsigned char) (((ch >> 6) & 0x1F) | 0xC0);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
-		poco_assert_dbg (isLegal(lb, 2));
 		return 2;
 	}
 	else if (ch <= 0xFFFF)
@@ -163,7 +158,6 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 			*bytes++ = (unsigned char) (((ch >> 6) & 0x3F) | 0x80);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
-		poco_assert_dbg (isLegal(lb, 3));
 		return 3;
 	}
 	else if (ch <= 0x10FFFF)
@@ -175,7 +169,6 @@ int UTF8Encoding::convert(int ch, unsigned char* bytes, int length) const
 			*bytes++ = (unsigned char) (((ch >> 6) & 0x3F) | 0x80);
 			*bytes   = (unsigned char) ((ch & 0x3F) | 0x80);
 		}
-		poco_assert_dbg (isLegal(lb, 4));
 		return 4;
 	}
 	else return 0;
