@@ -1,7 +1,7 @@
 //
 // Binder.h
 //
-// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/Binder.h#3 $
+// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/Binder.h#4 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -103,6 +103,9 @@ public:
 		
 	virtual void bind(std::size_t pos, const Poco::Data::BLOB& val);
 		/// Binds a BLOB.
+
+	virtual void bind(std::size_t pos);
+		/// Binds a NULL value.
 
 	size_t size() const;
 		/// Return count of binded parameters

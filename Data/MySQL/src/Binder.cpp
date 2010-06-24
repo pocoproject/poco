@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/Binder.cpp#4 $
+// $Id: //poco/1.3/Data/MySQL/src/Binder.cpp#5 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -133,6 +133,12 @@ void Binder::bind(std::size_t pos, const std::string& val)
 void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 {
 	realBind(pos, MYSQL_TYPE_STRING, val.rawContent(), static_cast<int>(val.size()));
+}
+
+
+void Binder::bind(std::size_t pos)
+{
+	realBind(pos, MYSQL_TYPE_NULL, NULL, 0);
 }
 
 

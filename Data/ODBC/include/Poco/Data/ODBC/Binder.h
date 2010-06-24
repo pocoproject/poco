@@ -1,7 +1,7 @@
 //
 // Binder.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Binder.h#5 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Binder.h#6 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -117,6 +117,9 @@ public:
 
 	void bind(std::size_t pos, const Poco::Data::BLOB& val);
 		/// Binds a BLOB.
+
+	void bind(std::size_t pos);
+		/// Binds a NULL value.
 
 	void setDataBinding(ParameterBinding binding);
 		/// Set data binding type.

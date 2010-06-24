@@ -1,7 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Binder.cpp#4 $
+// $Id: //poco/1.3/Data/SQLite/src/Binder.cpp#5 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -97,6 +97,13 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 	int valSize = static_cast<int>(val.size());
 
 	int rc = sqlite3_bind_blob(_pStmt, static_cast<int>(pos), pData, valSize, SQLITE_STATIC); // no deep copy, do not free memory
+	checkReturn(rc);
+}
+
+
+void Binder::bind(std::size_t pos)
+{
+	int rc = sqlite3_bind_null(_pStmt, static_cast<int>(pos));
 	checkReturn(rc);
 }
 

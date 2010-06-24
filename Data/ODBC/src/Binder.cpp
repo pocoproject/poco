@@ -1,7 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/Binder.cpp#4 $
+// $Id: //poco/1.3/Data/ODBC/src/Binder.cpp#5 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -117,6 +117,27 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 			throw StatementException(_rStmt, 
 				"SQLBindParameter()");
 		}
+}
+
+
+void Binder::bind(std::size_t pos)
+{
+	_lengthIndicator.push_back(0);
+	_dataSize.insert(SizeMap::value_type(0, 0));
+
+	if (Utility::isError(SQLBindParameter(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		SQL_PARAM_INPUT, 
+		SQL_C_SHORT, 
+		SQL_TYPE_NULL, 
+		0,
+		0,
+		(SQLPOINTER) 0, 
+		0, 
+		_lengthIndicator.back())))
+	{
+		throw StatementException(_rStmt, "SQLBindParameter()");
+	}
 }
 
 

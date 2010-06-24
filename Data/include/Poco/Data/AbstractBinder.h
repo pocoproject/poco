@@ -1,7 +1,7 @@
 //
 // AbstractBinder.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/AbstractBinder.h#2 $
+// $Id: //poco/1.3/Data/include/Poco/Data/AbstractBinder.h#3 $
 //
 // Library: Data
 // Package: DataCore
@@ -106,6 +106,9 @@ public:
 
 	virtual void bind(std::size_t pos, const BLOB& val) = 0;
 		/// Binds a BLOB.
+		
+	virtual void bind(std::size_t pos) = 0;
+		/// Binds a NULL value.
 };
 
 

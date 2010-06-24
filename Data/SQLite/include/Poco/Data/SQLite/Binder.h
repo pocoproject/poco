@@ -1,7 +1,7 @@
 //
 // Binder.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Binder.h#3 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Binder.h#4 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -107,6 +107,9 @@ public:
 
 	void bind(std::size_t pos, const Poco::Data::BLOB& val);
 		/// Binds a BLOB.
+
+	void bind(std::size_t pos);
+		/// Binds a NULL value.
 
 private:
 	void checkReturn(int rc);

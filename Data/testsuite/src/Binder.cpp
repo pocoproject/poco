@@ -1,7 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/1.3/Data/testsuite/src/Binder.cpp#1 $
+// $Id: //poco/1.3/Data/testsuite/src/Binder.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -121,6 +121,11 @@ void Binder::bind(std::size_t pos, const std::string& val)
 
 
 void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
+{
+}
+
+
+void Binder::bind(std::size_t pos)
 {
 }
 
