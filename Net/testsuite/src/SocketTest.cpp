@@ -1,7 +1,7 @@
 //
 // SocketTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketTest.cpp#3 $
+// $Id: //poco/1.3/Net/testsuite/src/SocketTest.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -161,7 +161,7 @@ void SocketTest::testConnectRefusedNB()
 	Poco::UInt16 port = serv.address().port();
 	serv.close();
 	StreamSocket ss;
-	Timespan timeout(10000);
+	Timespan timeout(2, 0);
 	try
 	{
 		ss.connect(SocketAddress("localhost", port), timeout);

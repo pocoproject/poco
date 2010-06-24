@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#12 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#13 $
 //
 // Library: Net
 // Package: Sockets
@@ -131,7 +131,7 @@ void SocketImpl::connect(const SocketAddress& address, const Poco::Timespan& tim
 			int err = lastError();
 			if (err != POCO_EINPROGRESS && err != POCO_EWOULDBLOCK)
 				error(err, address.toString());
-			if (!poll(timeout, SELECT_READ | SELECT_WRITE))
+			if (!poll(timeout, SELECT_READ | SELECT_WRITE | SELECT_ERROR))
 				throw Poco::TimeoutException("connect timed out", address.toString());
 			err = socketError();
 			if (err != 0) error(err);
@@ -883,9 +883,9 @@ void SocketImpl::error(int code, const std::string& arg)
 	case POCO_ECONNREFUSED:
 		throw ConnectionRefusedException(arg);
 	case POCO_EHOSTDOWN:
-		throw NetException("Host is down");
+		throw NetException("Host is down", arg);
 	case POCO_EHOSTUNREACH:
-		throw NetException("No route to host");
+		throw NetException("No route to host", arg);
 	default:
 		throw IOException(NumberFormatter::format(code), arg);
 	}
