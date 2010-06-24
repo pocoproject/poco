@@ -1,7 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#11 $
+// $Id: //poco/1.3/Data/SQLite/src/SQLiteStatementImpl.cpp#12 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -172,10 +172,7 @@ void SQLiteStatementImpl::bindImpl()
 	Bindings& binds = bindings();
 	int pc = sqlite3_bind_parameter_count(_pStmt);
 	if (binds.empty() && 0 == pc) return;
-	else if (binds.empty() && pc > 0)
-		throw ParameterCountMismatchException();
-	else if (!binds.empty() && binds.size() * (*binds.begin())->numOfColumnsHandled() != pc)
-		throw ParameterCountMismatchException();
+	if (binds.empty() && pc > 0) throw ParameterCountMismatchException();
 
 	std::size_t pos = 1; // sqlite starts with 1 not 0!
 
@@ -183,8 +180,10 @@ void SQLiteStatementImpl::bindImpl()
 	Bindings::iterator itEnd = binds.end();
 	for (; it != itEnd && (*it)->canBind(); ++it)
 	{
+		std::size_t nc = (*it)->numOfColumnsHandled();
+		if (pos + nc > pc + 1) throw ParameterCountMismatchException();
 		(*it)->bind(pos);
-		pos += (*it)->numOfColumnsHandled();
+		pos += nc;
 	}
 }
 
