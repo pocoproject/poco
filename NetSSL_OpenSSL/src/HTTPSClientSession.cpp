@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#8 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#9 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -160,6 +160,7 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 		HTTPClientSession proxySession(address);
 		proxySession.setHost(getProxyHost());
 		proxySession.setPort(getProxyPort());
+		proxySession.setTimeout(getTimeout());
 		SocketAddress targetAddress(getHost(), getPort());
 		HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress.toString(), HTTPMessage::HTTP_1_1);
 		HTTPResponse proxyResponse;

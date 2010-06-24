@@ -1,7 +1,7 @@
 //
 // Driver.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/Driver.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/Driver.cpp#2 $
 //
 // Console-based test driver for Poco NetSSL.
 //
@@ -45,40 +45,51 @@ class NetSSLApp: public Poco::Util::Application
 public:
 	NetSSLApp()
 	{
+		Poco::Net::HTTPStreamFactory::registerFactory();
+		Poco::Net::HTTPSStreamFactory::registerFactory();
 	}
 
 	~NetSSLApp()
 	{
 	}
 
-protected:	
+	int main(const std::vector<std::string>& args)
+	{
+		CppUnit::TestRunner runner;
+		runner.addTest("NetSSLTestSuite", NetSSLTestSuite::suite());
+		return runner.run(_targs) ? 0 : 1;
+	}
+	
+	void setup(int argc, char** argv)
+	{
+		init(1, argv);
+		for (int i = 0; i < argc; ++i)
+			_targs.push_back(std::string(argv[i]));
+	}
+
+protected:
 	void initialize(Poco::Util::Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Poco::Util::Application::initialize(self);
 	}
+	
+private:
+	std::vector<std::string> _targs;
 };
 
 
 int main(int ac, char **av)
 {
-	Poco::Net::HTTPStreamFactory::registerFactory();
-	Poco::Net::HTTPSStreamFactory::registerFactory();
 	NetSSLApp app;
 	try
 	{
-		app.init(1, av);
+		app.setup(ac, av);
+		return app.run();
 	}
 	catch (Poco::Exception& exc)
 	{
 		std::cout << exc.displayText() << std::endl;
 		return 1;
 	}
-
-	std::vector<std::string> args;
-	for (int i = 0; i < ac; ++i)
-		args.push_back(std::string(av[i]));
-	CppUnit::TestRunner runner;
-	runner.addTest("NetSSLTestSuite", NetSSLTestSuite::suite());
-	return runner.run(args) ? 0 : 1;
 }

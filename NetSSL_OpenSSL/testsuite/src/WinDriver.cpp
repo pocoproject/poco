@@ -1,7 +1,7 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/WinDriver.cpp#1 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/WinDriver.cpp#3 $
 //
 // Windows test driver for Poco OpenSSL.
 //
@@ -44,18 +44,31 @@ class NetSSLApp: public Poco::Util::Application
 public:
 	NetSSLApp()
 	{
+		Poco::Net::HTTPStreamFactory::registerFactory();
+		Poco::Net::HTTPSStreamFactory::registerFactory();
 	}
 
 	~NetSSLApp()
 	{
 	}
 
-protected:	
-	void initialize(Application& self)
+	int main(const std::vector<std::string>& args)
+	{
+		CppUnit::WinTestRunner runner;
+		runner.addTest(NetSSLTestSuite::suite());
+		runner.run();
+		return 0;
+	}
+	
+protected:
+	void initialize(Poco::Util::Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
-		Application::initialize(self);
+		Poco::Util::Application::initialize(self);
 	}
+	
+private:
+	std::vector<std::string> _targs;
 };
 
 
@@ -63,22 +76,18 @@ class TestDriver: public CppUnit::WinTestRunnerApp
 {
 	void TestMain()
 	{
-		CppUnit::WinTestRunner runner;
-		Poco::Net::HTTPStreamFactory::registerFactory();
-		Poco::Net::HTTPSStreamFactory::registerFactory();
 		NetSSLApp app;
-		std::string argv("OpenSSLTest");
+		std::string argv("TestSuite");
 		const char* pArgv = argv.c_str();
 		try
 		{
 			app.init(1, (char**)&pArgv);
+			app.run();
 		}
 		catch (Poco::Exception& exc)
 		{
 			app.logger().log(exc);
 		}
-		runner.addTest(NetSSLTestSuite::suite());
-		runner.run();
 	}
 };
 
