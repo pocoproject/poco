@@ -1,7 +1,7 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileStream_WIN32.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/FileStream_WIN32.cpp#6 $
 //
 // Library: Foundation
 // Package: Streams
@@ -64,7 +64,9 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 	poco_assert (_handle == INVALID_HANDLE_VALUE);
 
 	_path = path;
+	_pos = 0;
 	setMode(mode);
+	resetBuffers();
 
 	DWORD access = 0;
 	if (mode & std::ios::in)

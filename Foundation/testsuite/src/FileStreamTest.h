@@ -1,7 +1,7 @@
 //
 // FileStreamTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/FileStreamTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FileStreamTest.h#2 $
 //
 // Definition of the FileStreamTest class.
 //
@@ -56,6 +56,7 @@ public:
 	void testOpenModeAte();
 	void testOpenModeApp();
 	void testSeek();
+	void testMultiOpen();
 
 	void setUp();
 	void tearDown();

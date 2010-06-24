@@ -1,7 +1,7 @@
 //
 // FileStream_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileStream_POSIX.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/FileStream_POSIX.cpp#4 $
 //
 // Library: Foundation
 // Package: Streams
@@ -64,8 +64,10 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 {
 	poco_assert (_fd == -1);
 
+	_pos = 0;
 	_path = path;
 	setMode(mode);
+	resetBuffers();
 
 	int flags(0);
 	if (mode & std::ios::trunc)

@@ -1,7 +1,7 @@
 //
 // FileStreamTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/FileStreamTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FileStreamTest.cpp#2 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -304,6 +304,27 @@ void FileStreamTest::testSeek()
 }
 
 
+void FileStreamTest::testMultiOpen()
+{
+	Poco::FileStream str("test.txt", std::ios::trunc);
+	str << "0123456789\n";
+	str << "abcdefghij\n";
+	str << "klmnopqrst\n";
+	str.close();
+	
+	std::string s;
+	str.open("test.txt", std::ios::in);
+	std::getline(str, s);
+	assert (s == "0123456789");
+	str.close();
+
+	str.open("test.txt", std::ios::in);
+	std::getline(str, s);
+	assert (s == "0123456789");
+	str.close();	
+}
+
+
 void FileStreamTest::setUp()
 {
 }
@@ -328,6 +349,7 @@ CppUnit::Test* FileStreamTest::suite()
 	CppUnit_addTest(pSuite, FileStreamTest, testOpenModeAte);
 	CppUnit_addTest(pSuite, FileStreamTest, testOpenModeApp);
 	CppUnit_addTest(pSuite, FileStreamTest, testSeek);
+	CppUnit_addTest(pSuite, FileStreamTest, testMultiOpen);
 
 	return pSuite;
 }
