@@ -1,7 +1,7 @@
 //
 // CoreTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.cpp#6 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.cpp#7 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -40,6 +40,7 @@
 #include "Poco/Runnable.h"
 #include "Poco/Buffer.h"
 #include "Poco/AtomicCounter.h"
+#include "Poco/Nullable.h"
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -52,6 +53,7 @@ using Poco::Thread;
 using Poco::Runnable;
 using Poco::Buffer;
 using Poco::AtomicCounter;
+using Poco::Nullable;
 
 
 namespace
@@ -242,6 +244,40 @@ void CoreTest::testAtomicCounter()
 }
 
 
+void CoreTest::testNullable()
+{
+	Nullable<int> n1;
+	assert (n1.isNull());
+	
+	assert (n1.value(42) == 42);
+	
+	try
+	{
+		int tmp = n1.value();
+		fail("null value, must throw");
+	}
+	catch (Poco::NullValueException&)
+	{
+	}
+	
+	n1 = 1;
+	assert (!n1.isNull());
+	assert (n1.value() == 1);
+	
+	Nullable<int> n2(42);
+	assert (!n2.isNull());
+	assert (n2.value() == 42);
+	assert (n2.value(99) == 42);
+	
+	n1 = n2;
+	assert (!n1.isNull());
+	assert (n1.value() == 42);
+	
+	n1.clear();
+	assert (n1.isNull());
+}
+
+
 void CoreTest::setUp()
 {
 }
@@ -262,6 +298,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
+	CppUnit_addTest(pSuite, CoreTest, testNullable);
 
 	return pSuite;
 }

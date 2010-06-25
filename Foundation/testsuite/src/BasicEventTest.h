@@ -1,7 +1,7 @@
 //
 // BasicEventTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/BasicEventTest.h#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/BasicEventTest.h#3 $
 //
 // Tests for BasicEvent
 //
@@ -64,6 +64,7 @@ public:
 	void testReturnParams();
 	void testOverwriteDelegate();
 	void testAsyncNotify();
+	void testNullMutex();
 	
 	void setUp();
 	void tearDown();

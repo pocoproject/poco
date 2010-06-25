@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKeyImpl.h#4 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKeyImpl.h#5 $
 //
 // Library: Crypto
 // Package: RSA
@@ -106,7 +106,6 @@ public:
 		/// key is not exported.
 
 private:
-	void init(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase);
 	void freeRSA();
 
 private:

@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.3/XML/src/XMLWriter.cpp#4 $
+// $Id: //poco/1.3/XML/src/XMLWriter.cpp#5 $
 //
 // Library: XML
 // Package: XML
@@ -93,7 +93,8 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 	_inInternalDTD(false),
 	_contentWritten(false),
 	_unclosedStartTag(false),
-	_prefix(0)
+	_prefix(0),
+	_nsContextPushed(false)
 {
 	_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, *_pOutEncoding);
 	setNewLine(NEWLINE_DEFAULT);
@@ -114,7 +115,8 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 	_inInternalDTD(false),
 	_contentWritten(false),
 	_unclosedStartTag(false),
-	_prefix(0)
+	_prefix(0),
+	_nsContextPushed(false)
 {
 	_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, textEncoding);
 	setNewLine(NEWLINE_DEFAULT);
@@ -135,7 +137,8 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 	_inInternalDTD(false),
 	_contentWritten(false),
 	_unclosedStartTag(false),
-	_prefix(0)
+	_prefix(0),
+	_nsContextPushed(false)
 {
 	if (pTextEncoding)
 	{
@@ -408,14 +411,20 @@ void XMLWriter::dataElement(const XMLString& namespaceURI, const XMLString& loca
 void XMLWriter::startPrefixMapping(const XMLString& prefix, const XMLString& namespaceURI)
 {
 	if (prefix != NamespaceSupport::XML_NAMESPACE_PREFIX)
+	{
+		if (!_nsContextPushed)
+		{
+			_namespaces.pushContext();
+			_nsContextPushed = true;
+		}
 		_namespaces.declarePrefix(prefix, namespaceURI);
+	}
 }
 
 
 void XMLWriter::endPrefixMapping(const XMLString& prefix)
 {
-	if (prefix != NamespaceSupport::XML_NAMESPACE_PREFIX)
-		_namespaces.undeclarePrefix(prefix);
+	// Note: prefix removed by popContext() at element closing tag
 }
 
 
@@ -576,6 +585,9 @@ void XMLWriter::prettyPrint() const
 
 void XMLWriter::writeStartElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
+	if (!_nsContextPushed)
+		_namespaces.pushContext();
+	_nsContextPushed = false;
 	++_elementCount;
 	writeMarkup(MARKUP_LT);
 	if (!localName.empty() && (qname.empty() || localName == qname))
@@ -614,7 +626,6 @@ void XMLWriter::writeStartElement(const XMLString& namespaceURI, const XMLString
 	addAttributes(attributeMap, attributes, namespaceURI);
 	writeAttributes(attributeMap);
 	_unclosedStartTag = true;
-	_namespaces.pushContext();
 }
 
 
@@ -668,7 +679,6 @@ void XMLWriter::declareAttributeNamespaces(const Attributes& attributes)
 				prefix = newPrefix();
 				_namespaces.declarePrefix(prefix, namespaceURI);
 			}
-
 
 			const XMLString& uri = _namespaces.getURI(prefix);
 			if ((uri.empty() || uri != namespaceURI) && !namespaceURI.empty())

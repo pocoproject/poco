@@ -1,7 +1,7 @@
 //
 // RSAKey.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKey.h#4 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/RSAKey.h#5 $
 //
 // Library: Crypto
 // Package: RSA
@@ -110,7 +110,7 @@ public:
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
-	RSAKeyImpl::Ptr impl();
+	RSAKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
 
 	const std::string& name() const;
@@ -124,7 +124,7 @@ private:
 //
 // inlines
 //
-inline RSAKeyImpl::Ptr RSAKey::impl()
+inline RSAKeyImpl::Ptr RSAKey::impl() const
 {
 	return _pImpl;
 }

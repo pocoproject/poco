@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.3/Foundation/src/URI.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/URI.cpp#4 $
 //
 // Library: Foundation
 // Package: URI
@@ -289,7 +289,13 @@ std::string URI::getAuthority() const
 		auth.append(_userInfo);
 		auth += '@';
 	}
-	auth.append(_host);
+	if (_host.find(':') != std::string::npos)
+	{
+		auth += '[';
+		auth += _host;
+		auth += ']';
+	}
+	else auth.append(_host);
 	if (_port && !isWellKnownPort())
 	{
 		auth += ':';
@@ -710,9 +716,10 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 	if (*it == '[')
 	{
 		// IPv6 address
+		++it;
 		while (it != end && *it != ']') host += *it++;
 		if (it == end) throw SyntaxException("unterminated IPv6 address");
-		host += *it++;
+		++it;
 	}
 	else
 	{

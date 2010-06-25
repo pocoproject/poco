@@ -1,7 +1,7 @@
 //
 // URITest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/URITest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/URITest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -168,7 +168,7 @@ void URITest::testConstruction()
 	URI uri10("ldap", "[2001:db8::7]", "/c=GB?objectClass?one");
 	assert (uri10.getScheme() == "ldap");
 	assert (uri10.getUserInfo().empty());
-	assert (uri10.getHost() == "[2001:db8::7]");
+	assert (uri10.getHost() == "2001:db8::7");
 	assert (uri10.getPort() == 389);
 	assert (uri10.getAuthority() == "[2001:db8::7]");
 	assert (uri10.getPathEtc() == "/c=GB?objectClass?one");
@@ -253,7 +253,7 @@ void URITest::testParse()
 	uri = "ldap://[2001:db8::7]/c=GB?objectClass?one";
 	assert (uri.getScheme() == "ldap");
 	assert (uri.getUserInfo().empty());
-	assert (uri.getHost() == "[2001:db8::7]");
+	assert (uri.getHost() == "2001:db8::7");
 	assert (uri.getPort() == 389);
 	assert (uri.getAuthority() == "[2001:db8::7]");
 	assert (uri.getPath() == "/c=GB");

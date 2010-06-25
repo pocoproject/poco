@@ -1,7 +1,7 @@
 //
 // NetworkInterface.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#7 $
+// $Id: //poco/1.3/Net/include/Poco/Net/NetworkInterface.h#8 $
 //
 // Library: Net
 // Package: Sockets
@@ -62,6 +62,13 @@ class Net_API NetworkInterface
 {
 public:
 	typedef std::vector<NetworkInterface> NetworkInterfaceList;
+	
+	enum IPVersion
+	{
+		IPv4_ONLY,    /// Return interfaces with IPv4 address only
+		IPv6_ONLY,    /// Return interfaces with IPv6 address only
+		IPv4_OR_IPv6  /// Return interfaces with IPv4 or IPv6 address
+	};
 
 	NetworkInterface();
 		/// Creates a NetworkInterface representing the
@@ -116,6 +123,15 @@ public:
 		/// Returns true if the interface supports IPv6.	
 		
 	static NetworkInterface forName(const std::string& name, bool requireIPv6 = false);
+		/// Returns the NetworkInterface for the given name.
+		/// 
+		/// If requireIPv6 is false, an IPv4 interface is returned.
+		/// Otherwise, an IPv6 interface is returned.
+		///
+		/// Throws an InterfaceNotFoundException if an interface
+		/// with the give name does not exist.
+
+	static NetworkInterface forName(const std::string& name, IPVersion ipVersion);
 		/// Returns the NetworkInterface for the given name.
 		/// 
 		/// If requireIPv6 is false, an IPv4 interface is returned.

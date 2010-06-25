@@ -1,7 +1,7 @@
 //
 // Mutex.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Mutex.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/Mutex.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -163,6 +163,54 @@ public:
 private:
 	FastMutex(const FastMutex&);
 	FastMutex& operator = (const FastMutex&);
+};
+
+
+class Foundation_API NullMutex
+	/// A NullMutex is an simple mutex implementation
+	/// which performs no locking at all. Useful in policy driven design
+	/// where the type of mutex used can be now a template parameter allowing 
+	/// to switch between thread-safe and not thread-safe implementations.
+{
+public:
+	typedef Poco::ScopedLock<NullMutex> ScopedLock;
+	
+	NullMutex()
+		/// Creates the NullMutex.
+	{
+	}
+		
+	~NullMutex()
+		/// Destroys the NullMutex.
+	{
+	}
+
+	void lock()
+		/// Does nothing.
+	{
+	}
+		
+	void lock(long)
+		/// Does nothing.
+	{
+	}
+
+	bool tryLock()
+		/// Does nothing and always returns true.
+	{
+		return true;
+	}
+
+	bool tryLock(long)
+		/// Does nothing and always returns true.
+	{
+		return true;
+	}
+
+	void unlock()
+		/// Does nothing.
+	{
+	}
 };
 
 

@@ -1,7 +1,7 @@
 //
 // ParserWriterTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/ParserWriterTest.h#1 $
+// $Id: //poco/1.3/XML/testsuite/src/ParserWriterTest.h#2 $
 //
 // Definition of the ParserWriterTest class.
 //
@@ -58,7 +58,6 @@ public:
 private:
 	static const std::string XHTML;
 	static const std::string XHTML2;
-	static const std::string WSDL;
 };
 
 

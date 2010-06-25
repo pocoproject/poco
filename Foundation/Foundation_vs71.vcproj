@@ -650,6 +650,9 @@
 					RelativePath=".\include\Poco\NestedDiagnosticContext.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Nullable.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\NumberFormatter.h">
 				</File>
 				<File

@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#11 $
+// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#12 $
 //
 // Library: Net
 // Package: Sockets
@@ -297,6 +297,25 @@ NetworkInterface NetworkInterface::forName(const std::string& name, bool require
 	{
 		if (it->name() == name && ((requireIPv6 && it->supportsIPv6()) || !requireIPv6))
 			return *it;
+	}
+	throw InterfaceNotFoundException(name);
+}
+
+
+NetworkInterface NetworkInterface::forName(const std::string& name, IPVersion ipVersion)
+{
+	NetworkInterfaceList ifs = list();
+	for (NetworkInterfaceList::const_iterator it = ifs.begin(); it != ifs.end(); ++it)
+	{
+		if (it->name() == name)
+		{
+			if (ipVersion == IPv4_ONLY && it->supportsIPv4())
+				return *it;
+			else if (ipVersion == IPv6_ONLY && it->supportsIPv6())
+				return *it;
+			else if (ipVersion == IPv4_OR_IPv6)
+				return *it;
+		}
 	}
 	throw InterfaceNotFoundException(name);
 }

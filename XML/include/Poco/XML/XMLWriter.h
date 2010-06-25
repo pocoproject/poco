@@ -1,7 +1,7 @@
 //
 // XMLWriter.h
 //
-// $Id: //poco/1.3/XML/include/Poco/XML/XMLWriter.h#2 $
+// $Id: //poco/1.3/XML/include/Poco/XML/XMLWriter.h#3 $
 //
 // Library: XML
 // Package: XML
@@ -305,6 +305,7 @@ private:
 	ElementStack     _elementStack;
 	NamespaceSupport _namespaces;
 	int              _prefix;
+	bool             _nsContextPushed;
 
 	static const std::string MARKUP_QUOTENC;
 	static const std::string MARKUP_APOSENC;

@@ -1,7 +1,7 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Exception.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/Exception.cpp#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -149,6 +149,7 @@ void Exception::rethrow() const
 POCO_IMPLEMENT_EXCEPTION(LogicException, Exception, "Logic exception")
 POCO_IMPLEMENT_EXCEPTION(AssertionViolationException, LogicException, "Assertion violation")
 POCO_IMPLEMENT_EXCEPTION(NullPointerException, LogicException, "Null pointer")
+POCO_IMPLEMENT_EXCEPTION(NullValueException, LogicException, "Null value")
 POCO_IMPLEMENT_EXCEPTION(BugcheckException, LogicException, "Bugcheck")
 POCO_IMPLEMENT_EXCEPTION(InvalidArgumentException, LogicException, "Invalid argument")
 POCO_IMPLEMENT_EXCEPTION(NotImplementedException, LogicException, "Not implemented")

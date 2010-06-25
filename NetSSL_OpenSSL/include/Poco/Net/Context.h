@@ -1,7 +1,7 @@
 //
 // Context.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#10 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#12 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -41,6 +41,8 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/RSAKey.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
@@ -133,8 +135,49 @@ public:
 			///   * loadDefaultCAs specifies wheter the builtin CA certificates from OpenSSL are used.
 			///   * cipherList specifies the supported ciphers in OpenSSL notation.
 
+	Context(
+		Usage usage,
+		const std::string& caLocation, 
+		VerificationMode verificationMode = VERIFY_RELAXED,
+		int verificationDepth = 9,
+		bool loadDefaultCAs = false,
+		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+			/// Creates a Context.
+			/// 
+			///   * usage specifies whether the context is used by a client or server.
+			///   * caLocation contains the path to the file or directory containing the
+			///     CA/root certificates. Can be empty if the OpenSSL builtin CA certificates
+			///     are used (see loadDefaultCAs).
+			///   * verificationMode specifies whether and how peer certificates are validated.
+			///   * verificationDepth sets the upper limit for verification chain sizes. Verification
+			///     will fail if a certificate chain larger than this is encountered.
+			///   * loadDefaultCAs specifies wheter the builtin CA certificates from OpenSSL are used.
+			///   * cipherList specifies the supported ciphers in OpenSSL notation.
+			///
+			/// Note that a private key and/or certificate must be specified with
+			/// usePrivateKey()/useCertificate() before the Context can be used.
+
 	~Context();
 		/// Destroys the Context.
+
+	void useCertificate(const Poco::Crypto::X509Certificate& certificate);
+		/// Sets the certificate to be used by the Context.
+		///
+		/// To set-up a complete certificate chain, it might be
+		/// necessary to call addChainCertificate() to specify
+		/// additional certificates.
+		///
+		/// Note that useCertificate() must always be called before
+		/// usePrivateKey().
+		
+	void addChainCertificate(const Poco::Crypto::X509Certificate& certificate);
+		/// Adds a certificate for certificate chain validation.
+		
+	void usePrivateKey(const Poco::Crypto::RSAKey& key);
+		/// Sets the private key to be used by the Context.
+		///
+		/// Note that useCertificate() must always be called before
+		/// usePrivateKey().
 
 	SSL_CTX* sslContext() const;
 		/// Returns the underlying OpenSSL SSL Context object.
