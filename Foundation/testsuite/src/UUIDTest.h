@@ -1,7 +1,7 @@
 //
 // UUIDTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/UUIDTest.h#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/UUIDTest.h#2 $
 //
 // Definition of the UUIDTest class.
 //
@@ -52,7 +52,8 @@ public:
 	void testVersion();
 	void testVariant();
 	void testSwap();
-	
+	void testTryParse();
+
 	void setUp();
 	void tearDown();
 

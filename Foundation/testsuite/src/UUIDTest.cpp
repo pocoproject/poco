@@ -1,7 +1,7 @@
 //
 // UUIDTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/UUIDTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/UUIDTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -163,6 +163,16 @@ void UUIDTest::testSwap()
 	assert (uuid2.toString() == "db4fa7e9-9e62-4597-99e0-b1ec0b59800e");
 }
 
+void UUIDTest::testTryParse()
+{
+	UUID uuid;
+	assert (uuid.tryParse("6BA7B810-9DAD-11D1-80B4-00C04FD430C8"));
+	assert (uuid.toString() == "6ba7b810-9dad-11d1-80b4-00c04fd430c8");
+
+	UUID notUuid;
+	assert (!notUuid.tryParse("not a uuid"));
+	assert (notUuid.isNil());
+}
 
 void UUIDTest::setUp()
 {
@@ -184,6 +194,7 @@ CppUnit::Test* UUIDTest::suite()
 	CppUnit_addTest(pSuite, UUIDTest, testVersion);
 	CppUnit_addTest(pSuite, UUIDTest, testVariant);
 	CppUnit_addTest(pSuite, UUIDTest, testSwap);
+	CppUnit_addTest(pSuite, UUIDTest, testTryParse);
 
 	return pSuite;
 }

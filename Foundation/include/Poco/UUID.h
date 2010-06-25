@@ -1,7 +1,7 @@
 //
 // UUID.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/UUID.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/UUID.h#3 $
 //
 // Library: Foundation
 // Package: UUID
@@ -95,6 +95,12 @@ public:
 		
 	void parse(const std::string& uuid);
 		/// Parses the UUID from its string representation.
+
+	bool tryParse(const std::string& uuid);
+		/// Tries to interpret the given string as an UUID.
+		/// If the UUID is syntactically valid, assigns the
+		/// members and returns true. Otherwise leaves the 
+		/// object unchanged and returns false.
 
 	std::string toString() const;
 		/// Returns a string representation of the UUID consisting
