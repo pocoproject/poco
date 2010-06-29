@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/InflatingStream.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/InflatingStream.cpp#5 $
 //
 // Library: Foundation
 // Package: Streams
@@ -56,10 +56,14 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	_zstr.next_out  = 0;
 	_zstr.avail_out = 0;
 
-	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
-	if (rc != Z_OK) throw IOException(zError(rc)); 
-
 	_buffer = new char[INFLATE_BUFFER_SIZE];
+
+	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
+	if (rc != Z_OK) 
+	{
+		delete [] _buffer;
+		throw IOException(zError(rc)); 
+	}
 }
 
 
@@ -78,10 +82,14 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	_zstr.next_out  = 0;
 	_zstr.avail_out = 0;
 
-	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
-	if (rc != Z_OK) throw IOException(zError(rc));
-
 	_buffer = new char[INFLATE_BUFFER_SIZE];
+
+	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
+	if (rc != Z_OK) 
+	{
+		delete [] _buffer;
+		throw IOException(zError(rc));
+	}
 }
 
 
@@ -95,19 +103,15 @@ InflatingStreamBuf::~InflatingStreamBuf()
 	{
 	}
 	delete [] _buffer;
+	inflateEnd(&_zstr);
 }
 
 
 int InflatingStreamBuf::close()
 {
 	sync();
-	if (_pIstr || _pOstr)
-	{
-		int rc = inflateEnd(&_zstr);
-		if (rc != Z_OK) throw IOException(zError(rc));
-		_pIstr = 0;
-		_pOstr = 0;
-	}
+	_pIstr = 0;
+	_pOstr = 0;
 	return 0;
 }
 
