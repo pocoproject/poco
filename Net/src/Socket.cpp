@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.3/Net/src/Socket.cpp#5 $
+// $Id: //poco/1.3/Net/src/Socket.cpp#6 $
 //
 // Library: Net
 // Package: Sockets
@@ -39,6 +39,9 @@
 #include "Poco/Timestamp.h"
 #include <algorithm>
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
+#if defined(POCO_HAVE_FD_EPOLL)
+#include <sys/epoll.h>
+#endif
 
 
 namespace Poco {
@@ -87,6 +90,138 @@ Socket::~Socket()
 
 int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
 {
+#if defined(POCO_HAVE_FD_EPOLL)
+
+	int epollSize = readList.size() + writeList.size() + exceptList.size();
+	if (epollSize == 0) return 0;
+
+	int epollfd = -1;
+	{
+		struct epoll_event eventsIn[epollSize];
+		memset(eventsIn, 0, sizeof(eventsIn));
+		struct epoll_event* eventLast = eventsIn;
+		for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
+		{
+			if (it->sockfd() != POCO_INVALID_SOCKET)
+			{
+				struct epoll_event* e = eventsIn;
+				for (; e != eventLast; ++e)
+				{
+					if (reinterpret_cast<Socket*> (e->data.ptr)->sockfd() == it->sockfd())
+						break;
+				}
+				if (e == eventLast)
+				{
+					e->data.ptr = &(*it);
+					++eventLast;
+				}
+				e->events |= EPOLLIN;
+			}
+		}
+
+		for (SocketList::iterator it = writeList.begin(); it != writeList.end(); ++it)
+		{
+			if (it->sockfd() != POCO_INVALID_SOCKET)
+			{
+				struct epoll_event* e = eventsIn;
+				for (; e != eventLast; ++e)
+				{
+					if (reinterpret_cast<Socket*> (e->data.ptr)->sockfd() == it->sockfd())
+						break;
+				}
+				if (e == eventLast)
+				{
+					e->data.ptr = &(*it);
+					++eventLast;
+				}
+				e->events |= EPOLLOUT;
+			}
+		}
+
+		for (SocketList::iterator it = exceptList.begin(); it != exceptList.end(); ++it)
+		{
+			if (it->sockfd() != POCO_INVALID_SOCKET)
+			{
+				struct epoll_event* e = eventsIn;
+				for (; e != eventLast; ++e)
+				{
+					if (reinterpret_cast<Socket*> (e->data.ptr)->sockfd() == it->sockfd())
+						break;
+				}
+				if (e == eventLast)
+				{
+					e->data.ptr = &(*it);
+					++eventLast;
+				}
+				e->events |= EPOLLERR;
+			}
+		}
+
+		epollSize = eventLast - eventsIn;
+		epollfd = epoll_create(epollSize);
+		if (epollfd < 0)
+		{
+			char buf[1024];
+			strerror_r(errno, buf, sizeof(buf));
+
+			SocketImpl::error(std::string("Can't create epoll queue: ") + buf);
+		}
+
+		for (struct epoll_event* e = eventsIn; e != eventLast; ++e)
+		{
+			if (epoll_ctl(epollfd, EPOLL_CTL_ADD, reinterpret_cast<Socket*> (e->data.ptr)->sockfd(), e) < 0)
+			{
+				char buf[1024];
+				strerror_r(errno, buf, sizeof(buf));
+				::close(epollfd);
+				SocketImpl::error(std::string("Can't insert socket to epoll queue: ") + buf);
+			}
+		}
+	}
+
+	struct epoll_event eventsOut[epollSize];
+	memset(eventsOut, 0, sizeof(eventsOut));
+
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		Poco::Timestamp start;
+		rc = epoll_wait(epollfd, eventsOut, epollSize, remainingTime.totalMilliseconds());
+		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+		{
+ 			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+
+	::close(epollfd);
+	if (rc < 0) SocketImpl::error();
+
+ 	SocketList readyReadList;
+	SocketList readyWriteList;
+	SocketList readyExceptList;
+	for (int n = 0; n < rc; ++n)
+	{
+		if (eventsOut[n].events & EPOLLERR)
+			readyExceptList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
+		if (eventsOut[n].events & EPOLLIN)
+			readyReadList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
+		if (eventsOut[n].events & EPOLLOUT)
+			readyWriteList.push_back(*reinterpret_cast<Socket*>(eventsOut[n].data.ptr));
+	}
+	std::swap(readList, readyReadList);
+	std::swap(writeList, readyWriteList);
+	std::swap(exceptList, readyExceptList);
+	return readList.size() + writeList.size() + exceptList.size();
+
+#else
+
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
@@ -181,6 +316,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	}
 	std::swap(exceptList, readyExceptList);	
 	return rc; 
+
+#endif // POCO_HAVE_FD_EPOLL
 }
 
 

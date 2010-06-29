@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/config/Linux#3 $
+# $Id: //poco/1.3/build/config/Linux#4 $
 #
 # Linux
 #
@@ -63,7 +63,7 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
+SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DPOCO_HAVE_FD_EPOLL
 
 #
 # System Specific Libraries

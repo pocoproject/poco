@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketImpl.cpp#13 $
+// $Id: //poco/1.3/Net/src/SocketImpl.cpp#14 $
 //
 // Library: Net
 // Package: Sockets
@@ -40,6 +40,9 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
+#if defined(POCO_HAVE_FD_EPOLL)
+#include <sys/epoll.h>
+#endif
 
 
 using Poco::IOException;
@@ -353,6 +356,61 @@ bool SocketImpl::secure() const
 
 bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 {
+#if defined(POCO_HAVE_FD_EPOLL)
+
+	int epollfd = epoll_create(1);
+	if (epollfd < 0)
+	{
+		char buf[1024];
+		strerror_r(errno, buf, sizeof(buf));
+		error(std::string("Can't create epoll queue: ") + buf);
+	}
+
+	struct epoll_event evin;
+	memset(&evin, 0, sizeof(evin));
+
+	if (mode & SELECT_READ)
+		evin.events |= EPOLLIN;
+	if (mode & SELECT_WRITE)
+		evin.events |= EPOLLOUT;
+	if (mode & SELECT_ERROR)
+		evin.events |= EPOLLERR;
+
+	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, _sockfd, &evin) < 0)
+	{
+		char buf[1024];
+		strerror_r(errno, buf, sizeof(buf));
+		::close(epollfd);
+		error(std::string("Can't insert socket to epoll queue: ") + buf);
+	}
+
+	Poco::Timespan remainingTime(timeout);
+	int rc;
+	do
+	{
+		struct epoll_event evout;
+		memset(&evout, 0, sizeof(evout));
+
+		Poco::Timestamp start;
+		rc = epoll_wait(epollfd, &evout, 1, remainingTime.totalMilliseconds());
+		if (rc < 0 && lastError() == POCO_EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = end - start;
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (rc < 0 && lastError() == POCO_EINTR);
+
+	::close(epollfd);
+	if (rc < 0) error();
+	return rc > 0; 
+
+#else
+
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
@@ -393,6 +451,8 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	while (rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
 	return rc > 0; 
+
+#endif // POCO_HAVE_FD_EPOLL
 }
 
 	
