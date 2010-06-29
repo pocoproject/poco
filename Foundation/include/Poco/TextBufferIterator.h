@@ -1,15 +1,15 @@
 //
-// TextIterator.h
+// TextBufferIterator.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/TextIterator.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/TextBufferIterator.h#2 $
 //
 // Library: Foundation
 // Package: Text
-// Module:  TextIterator
+// Module:  TextBufferIterator
 //
-// Definition of the TextIterator class.
+// Definition of the TextBufferIterator class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,11 +36,12 @@
 //
 
 
-#ifndef Foundation_TextIterator_INCLUDED
-#define Foundation_TextIterator_INCLUDED
+#ifndef Foundation_TextBufferIterator_INCLUDED
+#define Foundation_TextBufferIterator_INCLUDED
 
 
 #include "Poco/Foundation.h"
+#include <cstdlib>
 
 
 namespace Poco {
@@ -49,18 +50,18 @@ namespace Poco {
 class TextEncoding;
 
 
-class Foundation_API TextIterator
-	/// An unidirectional iterator for iterating over characters in a string.
-	/// The TextIterator uses a TextEncoding object to
+class Foundation_API TextBufferIterator
+	/// An unidirectional iterator for iterating over characters in a buffer.
+	/// The TextBufferIterator uses a TextEncoding object to
 	/// work with multi-byte character encodings like UTF-8.
 	/// Characters are reported in Unicode.
 	///
-	/// Example: Count the number of UTF-8 characters in a string.
+	/// Example: Count the number of UTF-8 characters in a buffer.
 	///
 	///     UTF8Encoding utf8Encoding;
-	///     std::string utf8String("....");
-	///     TextIterator it(utf8String, utf8Encoding);
-	///     TextIterator end(utf8String);
+	///     char buffer[] = "...";
+	///     TextBufferIterator it(buffer, utf8Encoding);
+	///     TextBufferIterator end(it.end());
 	///     int n = 0;
 	///     while (it != end) { ++n; ++it; }
 	///
@@ -68,38 +69,41 @@ class Foundation_API TextIterator
 	/// reported as two separate characters, due to restrictions of
 	/// the TextEncoding class.
 	///
-	/// For iterating over char buffers, see the TextBufferIterator class.
+	/// For iterating over the characters in a std::string, see the
+	/// TextIterator class.
 {
 public:
-	TextIterator();
-		/// Creates an uninitialized TextIterator.
+	TextBufferIterator();
+		/// Creates an uninitialized TextBufferIterator.
 		
-	TextIterator(const std::string& str, const TextEncoding& encoding);
-		/// Creates a TextIterator for the given string.
+	TextBufferIterator(const char* begin, const TextEncoding& encoding);
+		/// Creates a TextBufferIterator for the given buffer, which must be 0-terminated.
 		/// The encoding object must not be deleted as long as the iterator
 		/// is in use.
 
-	TextIterator(const std::string::const_iterator& begin, const std::string::const_iterator& end, const TextEncoding& encoding);
-		/// Creates a TextIterator for the given range.
+	TextBufferIterator(const char* begin, std::size_t size, const TextEncoding& encoding);
+		/// Creates a TextBufferIterator for the given buffer with the given size.
 		/// The encoding object must not be deleted as long as the iterator
 		/// is in use.
 
-	TextIterator(const std::string& str);
-		/// Creates an end TextIterator for the given string.
+	TextBufferIterator(const char* begin, const char* end, const TextEncoding& encoding);
+		/// Creates a TextBufferIterator for the given range.
+		/// The encoding object must not be deleted as long as the iterator
+		/// is in use.
 
-	TextIterator(const std::string::const_iterator& end);
-		/// Creates an end TextIterator.
+	TextBufferIterator(const char* end);
+		/// Creates an end TextBufferIterator for the given buffer.
 
-	~TextIterator();
-		/// Destroys the TextIterator.
+	~TextBufferIterator();
+		/// Destroys the TextBufferIterator.
 	
-	TextIterator(const TextIterator& it);
+	TextBufferIterator(const TextBufferIterator& it);
 		/// Copy constructor.
 	
-	TextIterator& operator = (const TextIterator& it);
+	TextBufferIterator& operator = (const TextBufferIterator& it);
 		/// Assignment operator.
 		
-	void swap(TextIterator& it);
+	void swap(TextBufferIterator& it);
 		/// Swaps the iterator with another one.
 	
 	int operator * () const;
@@ -107,57 +111,57 @@ public:
 		/// If there is no valid character at the current position,
 		/// -1 is returned.
 		
-	TextIterator& operator ++ (); 
+	TextBufferIterator& operator ++ (); 
 		/// Prefix increment operator.
 
-	TextIterator operator ++ (int);		
+	TextBufferIterator operator ++ (int);		
 		/// Postfix increment operator.
 
-	bool operator == (const TextIterator& it) const;
+	bool operator == (const TextBufferIterator& it) const;
 		/// Compares two iterators for equality.
 		
-	bool operator != (const TextIterator& it) const;
+	bool operator != (const TextBufferIterator& it) const;
 		/// Compares two iterators for inequality.
-		
-	TextIterator end() const;
+
+	TextBufferIterator end() const;
 		/// Returns the end iterator for the range handled
 		/// by the iterator.
 		
 private:
-	const TextEncoding*         _pEncoding;
-	std::string::const_iterator _it;
-	std::string::const_iterator _end;
+	const TextEncoding* _pEncoding;
+	const char* _it;
+	const char* _end;
 };
 
 
 //
 // inlines
 //
-inline bool TextIterator::operator == (const TextIterator& it) const
+inline bool TextBufferIterator::operator == (const TextBufferIterator& it) const
 {
 	return _it == it._it;
 }
 
 
-inline bool TextIterator::operator != (const TextIterator& it) const
+inline bool TextBufferIterator::operator != (const TextBufferIterator& it) const
 {
 	return _it != it._it;
 }
 
 
-inline void swap(TextIterator& it1, TextIterator& it2)
+inline void swap(TextBufferIterator& it1, TextBufferIterator& it2)
 {
 	it1.swap(it2);
 }
 
 
-inline TextIterator TextIterator::end() const
+inline TextBufferIterator TextBufferIterator::end() const
 {
-	return TextIterator(_end);
+	return TextBufferIterator(_end);
 }
 
 
 } // namespace Poco
 
 
-#endif // Foundation_TextIterator_INCLUDED
+#endif // Foundation_TextBufferIterator_INCLUDED

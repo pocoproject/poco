@@ -920,6 +920,9 @@
 					RelativePath=".\src\StreamConverterTest.cpp">
 				</File>
 				<File
+					RelativePath=".\src\TextBufferIteratorTest.cpp">
+				</File>
+				<File
 					RelativePath=".\src\TextConverterTest.cpp">
 				</File>
 				<File
@@ -943,6 +946,9 @@
 				Filter="">
 				<File
 					RelativePath=".\src\StreamConverterTest.h">
+				</File>
+				<File
+					RelativePath=".\src\TextBufferIteratorTest.h">
 				</File>
 				<File
 					RelativePath=".\src\TextConverterTest.h">

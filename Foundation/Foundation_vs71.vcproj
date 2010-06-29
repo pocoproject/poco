@@ -3350,6 +3350,9 @@
 					RelativePath=".\src\StreamConverter.cpp">
 				</File>
 				<File
+					RelativePath=".\src\TextBufferIterator.cpp">
+				</File>
+				<File
 					RelativePath=".\src\TextConverter.cpp">
 				</File>
 				<File
@@ -3391,6 +3394,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\StreamConverter.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\TextBufferIterator.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\TextConverter.h">

@@ -1,9 +1,11 @@
 //
-// TextTestSuite.cpp
+// TextBufferIteratorTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TextTestSuite.cpp#6 $
+// $Id: //poco/1.3/Foundation/testsuite/src/TextBufferIteratorTest.h#1 $
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Definition of the TextBufferIteratorTest class.
+//
+// Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,31 +32,37 @@
 //
 
 
-#include "TextTestSuite.h"
-#include "TextIteratorTest.h"
-#include "TextBufferIteratorTest.h"
-#include "TextConverterTest.h"
-#include "StreamConverterTest.h"
-#include "TextEncodingTest.h"
-#include "UTF8StringTest.h"
-#ifdef _WINDOWS
-#include "UnicodeConverterTest.h"
-#endif
+#ifndef TextBufferIteratorTest_INCLUDED
+#define TextBufferIteratorTest_INCLUDED
 
 
-CppUnit::Test* TextTestSuite::suite()
+#include "Poco/Foundation.h"
+#include "CppUnit/TestCase.h"
+
+
+class TextBufferIteratorTest: public CppUnit::TestCase
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("TextTestSuite");
+public:
+	TextBufferIteratorTest(const std::string& name);
+	~TextBufferIteratorTest();
 
-	pSuite->addTest(TextIteratorTest::suite());
-	pSuite->addTest(TextBufferIteratorTest::suite());
-	pSuite->addTest(TextConverterTest::suite());
-	pSuite->addTest(StreamConverterTest::suite());
-	pSuite->addTest(TextEncodingTest::suite());
-	pSuite->addTest(UTF8StringTest::suite());
-#ifdef _WINDOWS
-	pSuite->addTest(UnicodeConverterTest::suite());
-#endif
+	void testEmptyLatin1();
+	void testOneLatin1();
+	void testLatin1();
+	void testEmptyUTF8();
+	void testOneUTF8();
+	void testUTF8();
+	void testUTF8Supplementary();
+	void testUTF16Supplementary();
+	void testSwap();
 
-	return pSuite;
-}
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+};
+
+
+#endif // TextBufferIteratorTest_INCLUDED

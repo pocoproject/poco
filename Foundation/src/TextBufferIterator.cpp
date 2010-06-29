@@ -1,13 +1,13 @@
 //
-// TextIterator.cpp
+// TextBufferIterator.cpp
 //
-// $Id: //poco/1.3/Foundation/src/TextIterator.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/TextBufferIterator.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
-// Module:  TextIterator
+// Module:  TextBufferIterator
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,29 +34,40 @@
 //
 
 
-#include "Poco/TextIterator.h"
+#include "Poco/TextBufferIterator.h"
 #include "Poco/TextEncoding.h"
 #include <algorithm>
+#include <cstring>
 
 
 namespace Poco {
 
 
-TextIterator::TextIterator():
-	_pEncoding(0)
+TextBufferIterator::TextBufferIterator():
+	_pEncoding(0),
+	_it(0),
+	_end(0)
 {
 }
 
 
-TextIterator::TextIterator(const std::string& str, const TextEncoding& encoding):
+TextBufferIterator::TextBufferIterator(const char* begin, const TextEncoding& encoding):
 	_pEncoding(&encoding),
-	_it(str.begin()),
-	_end(str.end())
+	_it(begin),
+	_end(begin + std::strlen(begin))
 {
 }
 
 
-TextIterator::TextIterator(const std::string::const_iterator& begin, const std::string::const_iterator& end, const TextEncoding& encoding):
+TextBufferIterator::TextBufferIterator(const char* begin, std::size_t size, const TextEncoding& encoding):
+	_pEncoding(&encoding),
+	_it(begin),
+	_end(begin + size)
+{
+}
+
+
+TextBufferIterator::TextBufferIterator(const char* begin, const char* end, const TextEncoding& encoding):
 	_pEncoding(&encoding),
 	_it(begin),
 	_end(end)
@@ -64,15 +75,7 @@ TextIterator::TextIterator(const std::string::const_iterator& begin, const std::
 }
 
 
-TextIterator::TextIterator(const std::string& str):
-	_pEncoding(0),
-	_it(str.end()),
-	_end(str.end())
-{
-}
-
-
-TextIterator::TextIterator(const std::string::const_iterator& end):
+TextBufferIterator::TextBufferIterator(const char* end):
 	_pEncoding(0),
 	_it(end),
 	_end(end)
@@ -80,12 +83,12 @@ TextIterator::TextIterator(const std::string::const_iterator& end):
 }
 
 
-TextIterator::~TextIterator()
+TextBufferIterator::~TextBufferIterator()
 {
 }
 
 
-TextIterator::TextIterator(const TextIterator& it):
+TextBufferIterator::TextBufferIterator(const TextBufferIterator& it):
 	_pEncoding(it._pEncoding),
 	_it(it._it),
 	_end(it._end)
@@ -93,7 +96,7 @@ TextIterator::TextIterator(const TextIterator& it):
 }
 
 
-TextIterator& TextIterator::operator = (const TextIterator& it)
+TextBufferIterator& TextBufferIterator::operator = (const TextBufferIterator& it)
 {
 	if (&it != this)
 	{
@@ -105,7 +108,7 @@ TextIterator& TextIterator::operator = (const TextIterator& it)
 }
 
 
-void TextIterator::swap(TextIterator& it)
+void TextBufferIterator::swap(TextBufferIterator& it)
 {
 	std::swap(_pEncoding, it._pEncoding);
 	std::swap(_it, it._it);
@@ -113,11 +116,11 @@ void TextIterator::swap(TextIterator& it)
 }
 
 
-int TextIterator::operator * () const
+int TextBufferIterator::operator * () const
 {
 	poco_check_ptr (_pEncoding);
 	poco_assert (_it != _end);
-	std::string::const_iterator it = _it;
+	const char* it = _it;
 	
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
 	unsigned char* p = buffer;
@@ -151,7 +154,7 @@ int TextIterator::operator * () const
 }
 
 	
-TextIterator& TextIterator::operator ++ ()
+TextBufferIterator& TextBufferIterator::operator ++ ()
 {
 	poco_check_ptr (_pEncoding);
 	poco_assert (_it != _end);
@@ -186,9 +189,9 @@ TextIterator& TextIterator::operator ++ ()
 }
 
 
-TextIterator TextIterator::operator ++ (int)
+TextBufferIterator TextBufferIterator::operator ++ (int)
 {
-	TextIterator prev(*this);
+	TextBufferIterator prev(*this);
 	operator ++ ();
 	return prev;
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="TestSuite"
 	ProjectGUID="{F1EE93DF-347F-4CB3-B191-C4E63F38E972}"
 	Keyword="Win32Proj"
@@ -1212,6 +1212,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\TextBufferIteratorTest.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\TextConverterTest.cpp"
 					>
 				</File>
@@ -1241,6 +1245,10 @@
 				>
 				<File
 					RelativePath=".\src\StreamConverterTest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TextBufferIteratorTest.h"
 					>
 				</File>
 				<File
