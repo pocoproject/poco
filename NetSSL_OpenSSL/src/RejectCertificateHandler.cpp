@@ -1,11 +1,11 @@
 //
-// CertificateHandlerFactoryMgr.cpp
+// RejectCertificateHandler.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/CertificateHandlerFactoryMgr.cpp#4 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/RejectCertificateHandler.cpp#1 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
-// Module:  CertificateHandlerFactoryMgr
+// Module:  RejectCertificateHandler
 //
 // Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,9 +34,6 @@
 //
 
 
-#include "Poco/Net/CertificateHandlerFactoryMgr.h"
-#include "Poco/Net/ConsoleCertificateHandler.h"
-#include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Net/RejectCertificateHandler.h"
 
 
@@ -44,47 +41,19 @@ namespace Poco {
 namespace Net {
 
 
-CertificateHandlerFactoryMgr::CertificateHandlerFactoryMgr()
-{
-	setFactory("ConsoleCertificateHandler", new CertificateHandlerFactoryImpl<ConsoleCertificateHandler>());
-	setFactory("AcceptCertificateHandler", new CertificateHandlerFactoryImpl<AcceptCertificateHandler>());
-	setFactory("RejectCertificateHandler", new CertificateHandlerFactoryImpl<RejectCertificateHandler>());
-}
-
-
-CertificateHandlerFactoryMgr::~CertificateHandlerFactoryMgr()
+RejectCertificateHandler::RejectCertificateHandler(bool server): InvalidCertificateHandler(server)
 {
 }
 
 
-void CertificateHandlerFactoryMgr::setFactory(const std::string& name, CertificateHandlerFactory* pFactory)
+RejectCertificateHandler::~RejectCertificateHandler()
 {
-	bool success = _factories.insert(make_pair(name, Poco::SharedPtr<CertificateHandlerFactory>(pFactory))).second;
-	if (!success)
-		delete pFactory;
-	poco_assert(success);
-}
-		
-
-bool CertificateHandlerFactoryMgr::hasFactory(const std::string& name) const
-{
-	return _factories.find(name) != _factories.end();
-}
-		
-	
-const CertificateHandlerFactory* CertificateHandlerFactoryMgr::getFactory(const std::string& name) const
-{
-	FactoriesMap::const_iterator it = _factories.find(name);
-	if (it != _factories.end())
-		return it->second;
-	else
-		return 0;
 }
 
 
-void CertificateHandlerFactoryMgr::removeFactory(const std::string& name)
+void RejectCertificateHandler::onInvalidCertificate(const void*, VerificationErrorArgs& errorCert)
 {
-	_factories.erase(name);
+	errorCert.setIgnoreError(false);
 }
 
 

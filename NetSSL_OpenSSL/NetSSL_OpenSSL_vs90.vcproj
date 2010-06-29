@@ -403,6 +403,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\Net\RejectCertificateHandler.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Net\Session.h"
 					>
 				</File>
@@ -472,6 +476,10 @@
 				</File>
 				<File
 					RelativePath=".\src\PrivateKeyPassphraseHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RejectCertificateHandler.cpp"
 					>
 				</File>
 				<File
