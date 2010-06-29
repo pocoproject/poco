@@ -1,7 +1,7 @@
 //
 // DeflatingStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DeflatingStream.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/DeflatingStream.cpp#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -98,7 +98,7 @@ DeflatingStreamBuf::~DeflatingStreamBuf()
 
 int DeflatingStreamBuf::close()
 {
-	sync();
+	BufferedStreamBuf::sync();
 	if (_pIstr)
 	{
 		int rc = deflateEnd(&_zstr);
@@ -133,6 +133,34 @@ int DeflatingStreamBuf::close()
 }
 
 
+int DeflatingStreamBuf::sync()
+{
+	if (BufferedStreamBuf::sync())
+		return -1;
+
+	if (_pOstr && _zstr.next_out)
+	{
+		int rc = deflate(&_zstr, Z_SYNC_FLUSH);
+		if (rc != Z_OK) throw IOException(zError(rc)); 
+		_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
+		if (!_pOstr->good()) throw IOException(zError(rc)); 
+		while (_zstr.avail_out == 0) 
+		{
+			_zstr.next_out  = (unsigned char*) _buffer;
+			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+			rc = deflate(&_zstr, Z_SYNC_FLUSH);
+			if (rc != Z_OK) throw IOException(zError(rc)); 
+			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
+			if (!_pOstr->good()) throw IOException(zError(rc)); 
+		};
+		_zstr.next_out  = (unsigned char*) _buffer;
+		_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+	}
+
+	return 0;
+}
+
+
 int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_pIstr) return 0;
@@ -141,8 +169,14 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		int n = 0;
 		if (_pIstr->good())
 		{
-			_pIstr->read(_buffer, DEFLATE_BUFFER_SIZE);
-			n = static_cast<int>(_pIstr->gcount());
+			n = static_cast<int>(_pIstr->readsome(_buffer, DEFLATE_BUFFER_SIZE));
+			if (!n && _pIstr->good())
+			{
+				_pIstr->read(_buffer, 1);
+				n = static_cast<int>(_pIstr->gcount());
+				if (_pIstr->good())
+					n += static_cast<int>(_pIstr->readsome(_buffer + 1, DEFLATE_BUFFER_SIZE - 1));
+			}
 		}
 		if (n > 0)
 		{
@@ -178,8 +212,14 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			int n = 0;
 			if (_pIstr->good())
 			{
-				_pIstr->read(_buffer, DEFLATE_BUFFER_SIZE);
-				n = static_cast<int>(_pIstr->gcount());
+				n = static_cast<int>(_pIstr->readsome(_buffer, DEFLATE_BUFFER_SIZE));
+				if (!n && _pIstr->good() && (_zstr.avail_out == static_cast<int>(length)))
+				{
+					_pIstr->read(_buffer, 1);
+					n = static_cast<int>(_pIstr->gcount());
+					if (_pIstr->good())
+						n += static_cast<int>(_pIstr->readsome(_buffer + 1, DEFLATE_BUFFER_SIZE - 1));
+				}
 			}
 			if (n > 0)
 			{
@@ -190,7 +230,10 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			{
 				_zstr.next_in  = 0;
 				_zstr.avail_in = 0;
-				_eof = true;
+				if (_pIstr->eof())
+					_eof = true;
+				else
+					return static_cast<int>(length) - _zstr.avail_out;
 			}
 		}
 	}
@@ -269,6 +312,12 @@ DeflatingOutputStream::~DeflatingOutputStream()
 int DeflatingOutputStream::close()
 {
 	return _buf.close();
+}
+
+
+int DeflatingOutputStream::sync()
+{
+	return _buf.pubsync();
 }
 
 

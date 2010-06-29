@@ -1,7 +1,7 @@
 //
 // DeflatingStream.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/DeflatingStream.h#2 $
+// $Id: //poco/1.3/Foundation/include/Poco/DeflatingStream.h#3 $
 //
 // Library: Foundation
 // Package: Streams
@@ -77,6 +77,7 @@ public:
 protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
+	virtual int sync();
 
 private:
 	enum 
@@ -126,6 +127,9 @@ public:
 	DeflatingOutputStream(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
 	~DeflatingOutputStream();
 	int close();
+
+protected:
+	virtual int sync();
 };
 
 
