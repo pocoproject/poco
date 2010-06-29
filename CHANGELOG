@@ -78,6 +78,9 @@ Release 1.3.7 (2010-07-??)
   Socket::select() and Socket::poll() will use epoll under Linux if the Net library is compiled
   with -DPOCO_HAVE_FD_EPOLL. This is the default for the Linux build configuration (but not for
   the various build configurations targeting embedded Linux platforms).
+- fixed SF# 2941664: Memory leak in DeflatingStream with zero-length streams (also fixed some other potential, 
+  but unlikely, memory leaks)
+- fixed SF# 2946457: added RejectCertificateHandler
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1259,4 +1262,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#97 $
+$Id: //poco/1.3/dist/CHANGELOG#98 $
