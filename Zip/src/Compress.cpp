@@ -1,7 +1,7 @@
 //
 // Compress.cpp
 //
-// $Id: //poco/1.3/Zip/src/Compress.cpp#5 $
+// $Id: //poco/1.3/Zip/src/Compress.cpp#6 $
 //
 // Library: Zip
 // Package: Zip
@@ -42,7 +42,7 @@
 #include "Poco/Zip/ZipException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/File.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 
 
 namespace Poco {
@@ -174,9 +174,7 @@ void Compress::addFile(std::istream& in, const Poco::DateTime& lastModifiedAt, c
 void Compress::addFile(const Poco::Path& file, const Poco::Path& fileName, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl)
 {
 	Poco::File aFile(file);
-	std::ifstream in(file.toString().c_str(), std::ios::binary);
-	if (!in.good())
-		throw ZipException("Invalid input stream for " + aFile.path());
+	Poco::FileInputStream in(file.toString());
 	if (fileName.depth() > 1)
 	{
 		Poco::File aParent(file.parent());

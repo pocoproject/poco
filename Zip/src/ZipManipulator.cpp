@@ -1,7 +1,7 @@
 //
 // ZipManipulator.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipManipulator.cpp#3 $
+// $Id: //poco/1.3/Zip/src/ZipManipulator.cpp#4 $
 //
 // Library: Zip
 // Package: Manipulation
@@ -46,7 +46,6 @@
 #include "Poco/Delegate.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
-#include <fstream>
 
 
 namespace Poco {
@@ -59,7 +58,7 @@ ZipManipulator::ZipManipulator(const std::string& zipFile, bool backupOriginalFi
 	_changes(),
 	_in(0)
 {
-	std::ifstream in(zipFile.c_str(), std::ios::binary);
+	Poco::FileInputStream in(zipFile);
 	_in = new ZipArchive(in);
 }
 
