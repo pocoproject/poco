@@ -1,7 +1,7 @@
 
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#10 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,6 +36,7 @@
 
 #include "Poco/Environment_UNIX.h"
 #include "Poco/Exception.h"
+#include "Poco/Buffer.h"
 #include <cstring>
 #include <unistd.h>
 #include <stdlib.h>
@@ -167,11 +168,11 @@ namespace Poco {
 
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
+	std::memset(&id, 0, sizeof(id));
 	struct ifaddrs* ifaphead;
 	int rc = getifaddrs(&ifaphead);
-	if (rc) throw SystemException("cannot get network adapter list");
+	if (rc) return;
 
-	bool foundAdapter = false;
 	for (struct ifaddrs* ifap = ifaphead; ifap; ifap = ifap->ifa_next) 
 	{
 		if (ifap->ifa_addr && ifap->ifa_addr->sa_family == AF_LINK) 
@@ -182,13 +183,11 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 			if (ap && alen > 0) 
 			{
 				std::memcpy(&id, ap, sizeof(id));
-				foundAdapter = true;
 				break;
 			}
 		}
 	}
 	freeifaddrs(ifaphead);
-	if (!foundAdapter) throw SystemException("cannot determine MAC address (no suitable network adapter found)");
 }
 
 
@@ -203,6 +202,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>
+#include <net/if_arp.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 
@@ -212,17 +212,56 @@ namespace Poco {
 
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
-	struct ifreq ifr;
+	std::memset(&id, 0, sizeof(id));
+	int sock = socket(PF_INET, SOCK_DGRAM, 0);
+	if (sock == -1) return;
 
-	int s = socket(PF_INET, SOCK_DGRAM, 0);
-	if (s == -1) throw SystemException("cannot open socket");
-
-	std::strcpy(ifr.ifr_name, "eth0");
-	int rc = ioctl(s, SIOCGIFHWADDR, &ifr);
-	close(s);
-	if (rc < 0) throw SystemException("cannot get MAC address");
-	struct sockaddr* sa = reinterpret_cast<struct sockaddr*>(&ifr.ifr_addr);
-	std::memcpy(&id, sa->sa_data, sizeof(id));
+	// the following code is loosely based
+	// on W. Richard Stevens, UNIX Network Programming, pp 434ff.
+	int lastlen = 0;
+	int len = 100*sizeof(struct ifreq);
+	struct ifconf ifc;
+	char* buf = 0;
+	for (;;)
+	{
+		buf = new char[len];
+		ifc.ifc_len = len;
+		ifc.ifc_buf = buf;
+		if (::ioctl(sock, SIOCGIFCONF, &ifc) < 0)
+		{
+			if (errno != EINVAL || lastlen != 0)
+			{
+				close(sock);
+				delete [] buf;
+				return;
+			}
+		}
+		else
+		{
+			if (ifc.ifc_len == lastlen)
+				break;
+			lastlen = ifc.ifc_len;
+		}
+		len += 10*sizeof(struct ifreq);
+		delete [] buf;
+	}
+	for (const char* ptr = buf; ptr < buf + ifc.ifc_len;)
+	{
+		const struct ifreq* ifr = reinterpret_cast<const struct ifreq*>(ptr);		
+		int rc = ioctl(sock, SIOCGIFHWADDR, ifr);
+		if (rc != -1)
+		{
+			const struct sockaddr* sa = reinterpret_cast<const struct sockaddr*>(&ifr->ifr_hwaddr);
+			if (sa->sa_family == ARPHRD_ETHER)
+			{
+				std::memcpy(&id, sa->sa_data, sizeof(id));
+				break;
+			}
+		}
+		ptr += sizeof(struct ifreq);
+	}
+	close(sock);
+	delete [] buf;
 }
 
 
@@ -253,15 +292,16 @@ namespace Poco {
 
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
+	std::memset(&id, 0, sizeof(id));
 	char name[MAXHOSTNAMELEN];
 	if (gethostname(name, sizeof(name)))
-		throw SystemException("cannot get host name");
+		return;
 
 	struct hostent* pHost = gethostbyname(name);
-	if (!pHost) throw SystemException("cannot get host IP address");
+	if (!pHost) return;
 
 	int s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (s == -1) throw SystemException("cannot open socket");
+	if (s == -1) return;
 
 	struct arpreq ar;
 	std::memset(&ar, 0, sizeof(ar));
@@ -270,7 +310,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	std::memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
 	int rc = ioctl(s, SIOCGARP, &ar);
 	close(s);
-	if (rc < 0) throw SystemException("cannot get MAC address");
+	if (rc < 0) return;
 	std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
 }
 

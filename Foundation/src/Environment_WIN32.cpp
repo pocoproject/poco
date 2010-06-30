@@ -1,7 +1,7 @@
 //
 // Environment_WIN32.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_WIN32.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/Environment_WIN32.cpp#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -148,6 +148,8 @@ std::string EnvironmentImpl::nodeNameImpl()
 
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
+	std::memset(&id, 0, sizeof(id));
+
 	PIP_ADAPTER_INFO pAdapterInfo;
 	PIP_ADAPTER_INFO pAdapter = 0;
 	ULONG len    = sizeof(IP_ADAPTER_INFO);
@@ -162,31 +164,21 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	}
 	else if (rc != ERROR_SUCCESS)
 	{
-		throw SystemException("cannot get network adapter list");
+		return;
 	}
-	try
+	if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR) 
 	{
+		pAdapter = pAdapterInfo;
 		bool found = false;
-		if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR) 
+		while (pAdapter && !found) 
 		{
-			pAdapter = pAdapterInfo;
-			while (pAdapter && !found) 
+			if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 			{
-				if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
-				{
-					std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
-					found = true;
-				}
-				pAdapter = pAdapter->Next;
+				found = true;
+				std::memcpy(&id, pAdapter->Address, pAdapter->AddressLength);
 			}
+			pAdapter = pAdapter->Next;
 		}
-		else throw SystemException("cannot get network adapter list");
-		if (!found) throw SystemException("no Ethernet adapter found");
-	}
-	catch (Exception&)
-	{
-		delete [] reinterpret_cast<char*>(pAdapterInfo);
-		throw;
 	}
 	delete [] reinterpret_cast<char*>(pAdapterInfo);
 }
