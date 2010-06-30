@@ -1,7 +1,7 @@
 //
 // Path_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Path_WIN32U.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Path_WIN32U.cpp#4 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -56,7 +56,7 @@ std::string PathImpl::currentImpl()
 		if (n > 0 && n <= len)
 		{
 			UnicodeConverter::toUTF8(buffer.begin(), result);
-			if (result[n - 1] != '\\')
+			if (result[result.size() - 1] != '\\')
 				result.append("\\");
 			return result;
 		}
@@ -84,7 +84,7 @@ std::string PathImpl::tempImpl()
 	{
 		std::string result;
 		UnicodeConverter::toUTF8(buffer.begin(), result);
-		if (result[n - 1] != '\\')
+		if (result[result.size() - 1] != '\\')
 			result.append("\\");
 		return result;
 	}
