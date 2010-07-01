@@ -1,7 +1,7 @@
 //
 // MailMessage.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/MailMessage.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/MailMessage.h#4 $
 //
 // Library: Net
 // Package: Mail
@@ -169,14 +169,30 @@ public:
 		///
 		/// The MailMessage will be converted to a multipart message
 		/// if it is not already one.
+		///
+		/// The part name, and the filename specified in the part source
+		/// must not contain any non-ASCII characters.
+		/// To include non-ASCII characters in the part name or filename, 
+		/// use RFC 2047 word encoding (see encodeWord()).
+
 
 	void addContent(PartSource* pSource, ContentTransferEncoding encoding = ENCODING_QUOTED_PRINTABLE);
 		/// Adds a part to the mail message by calling
 		/// addPart("", pSource, CONTENT_INLINE, encoding);
+		///
+		/// The part name, and the filename specified in the part source
+		/// must not contain any non-ASCII characters.
+		/// To include non-ASCII characters in the part name or filename, 
+		/// use RFC 2047 word encoding (see encodeWord()).
 		
 	void addAttachment(const std::string& name, PartSource* pSource, ContentTransferEncoding encoding = ENCODING_BASE64);
 		/// Adds an attachment to the mail message by calling
 		/// addPart(name, pSource, CONTENT_ATTACHMENT, encoding);
+		///
+		/// The part name, and the filename specified in the part source
+		/// must not contain any non-ASCII characters.
+		/// To include non-ASCII characters in the part name or filename, 
+		/// use RFC 2047 word encoding (see encodeWord()).
 
 	void read(std::istream& istr, PartHandler& handler);
 		/// Reads the MailMessage from the given input stream.

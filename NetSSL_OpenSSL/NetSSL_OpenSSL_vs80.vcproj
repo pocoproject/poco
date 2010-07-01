@@ -601,6 +601,26 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Mail"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\SecureSMTPClientSession.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\SecureSMTPClientSession.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

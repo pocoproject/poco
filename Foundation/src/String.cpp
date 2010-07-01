@@ -1,7 +1,7 @@
 //
 // String.h
 //
-// $Id: //poco/1.3/Foundation/src/String.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/String.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -52,8 +52,8 @@ int icompare(const std::string& str, std::string::size_type pos, std::string::si
 	std::string::const_iterator end1 = str.begin() + pos + n;
 	while (it1 != end1 && it2 != end2)
 	{
-        std::string::value_type c1 = std::tolower(*it1);
-        std::string::value_type c2 = std::tolower(*it2);
+        std::string::value_type c1 = Ascii::toLower(*it1);
+        std::string::value_type c2 = Ascii::toLower(*it2);
         if (c1 < c2)
             return -1;
         else if (c1 > c2)
@@ -122,8 +122,8 @@ int icompare(const std::string& str, std::string::size_type pos, std::string::si
 	std::string::const_iterator end = str.begin() + pos + n;
 	while (it != end && *ptr)
 	{
-        std::string::value_type c1 = std::tolower(*it);
-        std::string::value_type c2 = std::tolower(*ptr);
+        std::string::value_type c1 = Ascii::toLower(*it);
+        std::string::value_type c2 = Ascii::toLower(*ptr);
         if (c1 < c2)
             return -1;
         else if (c1 > c2)

@@ -1,7 +1,7 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#5 $
+// $Id: //poco/1.3/PageCompiler/src/PageCompiler.cpp#6 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
@@ -45,12 +45,12 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/LineEndingConverter.h"
+#include "Poco/Ascii.h"
 #include "Page.h"
 #include "PageReader.h"
 #include "CodeWriter.h"
 #include "ApacheCodeWriter.h"
 #include "OSPCodeWriter.h"
-#include <cctype>
 #include <sstream>
 #include <iostream>
 #include <memory>
@@ -283,7 +283,7 @@ protected:
 		else
 		{
 			clazz = p.getBaseName() + "Handler";
-			clazz[0] = std::toupper(clazz[0]);
+			clazz[0] = Poco::Ascii::toUpper(clazz[0]);
 		}			
 
 		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));

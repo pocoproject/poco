@@ -1,7 +1,7 @@
 //
 // PageReader.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/PageReader.cpp#3 $
+// $Id: //poco/1.3/PageCompiler/src/PageReader.cpp#4 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,7 +36,7 @@
 #include "Poco/CountingStream.h"
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 const std::string PageReader::MARKUP_BEGIN("\tresponseStream << \"");
@@ -246,18 +246,18 @@ void PageReader::parseAttributes()
 	std::string basename;
 	std::istringstream istr(_attrs);
 	int ch = istr.get();
-	while (ch != eof && std::isspace(ch)) ch = istr.get();
-	while (ch != eof && std::isalnum(ch)) { basename += (char) ch; ch = istr.get(); }
-	while (ch != eof && std::isspace(ch)) ch = istr.get();
+	while (ch != eof && Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (ch != eof && Poco::Ascii::isAlphaNumeric(ch)) { basename += (char) ch; ch = istr.get(); }
+	while (ch != eof && Poco::Ascii::isSpace(ch)) ch = istr.get();
 	while (ch != eof)
 	{
 		std::string name(basename + ".");
 		std::string value;
-		while (ch != eof && std::isalnum(ch)) { name += (char) ch; ch = istr.get(); }
-		while (ch != eof && std::isspace(ch)) ch = istr.get();
+		while (ch != eof && Poco::Ascii::isAlphaNumeric(ch)) { name += (char) ch; ch = istr.get(); }
+		while (ch != eof && Poco::Ascii::isSpace(ch)) ch = istr.get();
 		if (ch != '=') throw Poco::SyntaxException("bad attribute syntax: '=' expected", where());
 		ch = istr.get();
-		while (ch != eof && std::isspace(ch)) ch = istr.get();
+		while (ch != eof && Poco::Ascii::isSpace(ch)) ch = istr.get();
 		if (ch == '"')
 		{
 			ch = istr.get();
@@ -273,7 +273,7 @@ void PageReader::parseAttributes()
 		else throw Poco::SyntaxException("bad attribute syntax: '\"' or ''' expected", where());
 		ch = istr.get();
 		handleAttribute(name, value);
-		while (ch != eof && std::isspace(ch)) ch = istr.get();
+		while (ch != eof && Poco::Ascii::isSpace(ch)) ch = istr.get();
 	}
 }
 

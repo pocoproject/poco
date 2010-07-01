@@ -85,6 +85,17 @@ Release 1.3.7 (2010-07-??)
 - fixed SF# 2929805: Environment::nodeId() does not work if no eth0 device exists
 - Environment::nodeId() no longer throws if no hardware ethernet address can be determined. 
   It returns an all-zero address instead.
+- Added additional classification functions to Poco::Unicode class; made classification functions inline.
+- added Ascii class for ASCII character classification.
+  Methods of the Ascii class are now used instead of the
+  standard library functions (std::isspace(), etc.) due to
+  possible inconsistent results or assertions when the
+  standard library functions are used with character codes
+  outside the ASCII range.
+- Poco::Net::MailMessage: fixed a bug in StringPartHandler that resulted in incorrect handling of non-ASCII data if char is signed.
+- Improved SMTPClientSession compatibility with various mail servers when using AUTH_LOGIN authentication.
+- Poco::Net::SMTPClientSession now also supports login with AUTH PLAIN.
+- Added Poco::Net::SecureSMTPClientSession class, supporting STARTTLS for secure SMTP connections.
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1266,4 +1277,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#99 $
+$Id: //poco/1.3/dist/CHANGELOG#100 $

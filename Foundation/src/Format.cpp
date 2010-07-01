@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Format.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/Format.cpp#8 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,8 +36,8 @@
 
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include "Poco/Ascii.h"
 #include <sstream>
-#include <cctype>
 #include <cstddef>
 
 
@@ -66,7 +66,7 @@ namespace
 	void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
 	{
 		int width = 0;
-		while (itFmt != endFmt && std::isdigit(*itFmt))
+		while (itFmt != endFmt && Ascii::isDigit(*itFmt))
 		{
 			width = 10*width + *itFmt - '0';
 			++itFmt;
@@ -81,7 +81,7 @@ namespace
 		{
 			++itFmt;
 			int prec = 0;
-			while (itFmt != endFmt && std::isdigit(*itFmt))
+			while (itFmt != endFmt && Ascii::isDigit(*itFmt))
 			{
 				prec = 10*prec + *itFmt - '0';
 				++itFmt;

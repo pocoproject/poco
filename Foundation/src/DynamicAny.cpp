@@ -1,7 +1,7 @@
 //
 // DynamicAny.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/DynamicAny.cpp#8 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,7 +36,6 @@
 
 #include "Poco/DynamicAny.h"
 #include <algorithm>
-#include <cctype>
 
 
 namespace Poco {

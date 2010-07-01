@@ -1,7 +1,7 @@
 //
 // Path_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Path_UNIX.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Path_UNIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -37,11 +37,11 @@
 #include "Poco/Path_UNIX.h"
 #include "Poco/Exception.h"
 #include "Poco/Environment_UNIX.h"
+#include "Poco/Ascii.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <pwd.h>
-#include <cctype>
 #include <climits>
 
 
@@ -139,7 +139,7 @@ std::string PathImpl::expandImpl(const std::string& path)
 			}
 			else
 			{
-				while (it != end && (std::isalnum(*it) || *it == '_')) var += *it++;
+				while (it != end && (Ascii::isAlphaNumeric(*it) || *it == '_')) var += *it++;
 			}
 			char* val = getenv(var.c_str());
 			if (val) result += val;

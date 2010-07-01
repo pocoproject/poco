@@ -1,7 +1,7 @@
 //
 // NumberParser.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NumberParser.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/NumberParser.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -37,7 +37,6 @@
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
 #include <cstdio>
-#include <cctype>
 
 
 #if defined(_MSC_VER)

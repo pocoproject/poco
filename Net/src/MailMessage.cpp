@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.3/Net/src/MailMessage.cpp#5 $
+// $Id: //poco/1.3/Net/src/MailMessage.cpp#7 $
 //
 // Library: Net
 // Package: Mail
@@ -49,9 +49,9 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
 #include <sstream>
-#include <cctype>
 
 
 using Poco::Base64Encoder;
@@ -83,12 +83,7 @@ namespace
 		
 		void handlePart(const MessageHeader& header, std::istream& stream)
 		{
-			int ch = stream.get();
-			while (ch >= 0)
-			{
-				_str += (char) ch;
-				ch = stream.get();
-			}
+			Poco::StreamCopier::copyToString(stream, _str);
 		}
 		
 	private:

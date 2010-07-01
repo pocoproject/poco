@@ -1,7 +1,7 @@
 //
 // Unicode.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Unicode.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Unicode.cpp#3 $
 //
 // Library: Foundation
 // Package: Text
@@ -55,23 +55,7 @@ void Unicode::properties(int ch, CharacterProperties& props)
 	props.script   = static_cast<Script>(ucd->script);
 }
 
-	
-bool Unicode::isLower(int ch)
-{
-	CharacterProperties props;
-	properties(ch, props);
-	return props.category == UCP_LETTER && props.type == UCP_LOWER_CASE_LETTER;
-}
 
-	
-bool Unicode::isUpper(int ch)
-{
-	CharacterProperties props;
-	properties(ch, props);
-	return props.category == UCP_LETTER && props.type == UCP_UPPER_CASE_LETTER;
-}
-
-	
 int Unicode::toLower(int ch)
 {
 	if (isUpper(ch))

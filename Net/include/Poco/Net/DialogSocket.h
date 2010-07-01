@@ -1,7 +1,7 @@
 //
 // DialogSocket.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/DialogSocket.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/DialogSocket.h#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -89,6 +89,9 @@ public:
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.	
+
+	DialogSocket& operator = (const DialogSocket& socket);
+		/// Assignment operator.
 
 	void sendByte(unsigned char ch);
 		/// Sends a single byte over the socket connection.

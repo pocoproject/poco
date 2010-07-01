@@ -353,6 +353,10 @@
 				Name="Source Files"
 				>
 				<File
+					RelativePath=".\src\Ascii.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\AtomicCounter.cpp"
 					>
 				</File>
@@ -758,6 +762,10 @@
 				>
 				<File
 					RelativePath=".\include\Poco\Any.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Ascii.h"
 					>
 				</File>
 				<File

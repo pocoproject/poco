@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#7 $
+// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#8 $
 //
 // Library: Net
 // Package: HTTP
@@ -39,7 +39,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/NumberFormatter.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 using Poco::NumberFormatter;
@@ -175,9 +175,9 @@ void HTTPRequest::getCredentials(std::string& scheme, std::string& authInfo) con
 		const std::string& auth = get(AUTHORIZATION);
 		std::string::const_iterator it  = auth.begin();
 		std::string::const_iterator end = auth.end();
-		while (it != end && std::isspace(*it)) ++it;
-		while (it != end && !std::isspace(*it)) scheme += *it++;
-		while (it != end && std::isspace(*it)) ++it;
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
+		while (it != end && !Poco::Ascii::isSpace(*it)) scheme += *it++;
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 		while (it != end) authInfo += *it++;
 	}
 	else throw NotAuthenticatedException();
@@ -213,16 +213,16 @@ void HTTPRequest::read(std::istream& istr)
 	version.reserve(16);
 	int ch = istr.get();
 	if (ch == eof) throw NoMessageException();
-	while (std::isspace(ch)) ch = istr.get();
+	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP request header");
-	while (!std::isspace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
-	if (!std::isspace(ch)) throw MessageException("HTTP request method invalid or too long");
-	while (std::isspace(ch)) ch = istr.get();
-	while (!std::isspace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
-	if (!std::isspace(ch)) throw MessageException("HTTP request URI invalid or too long");
-	while (std::isspace(ch)) ch = istr.get();
-	while (!std::isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
-	if (!std::isspace(ch)) throw MessageException("Invalid HTTP version string");
+	while (!Poco::Ascii::isSpace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
+	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request method invalid or too long");
+	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (!Poco::Ascii::isSpace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
+	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request URI invalid or too long");
+	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (!Poco::Ascii::isSpace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
+	if (!Poco::Ascii::isSpace(ch)) throw MessageException("Invalid HTTP version string");
 	while (ch != '\n' && ch != eof) { ch = istr.get(); }
 	HTTPMessage::read(istr);
 	ch = istr.get();

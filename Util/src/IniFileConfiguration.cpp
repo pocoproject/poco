@@ -1,7 +1,7 @@
 //
 // IniFileConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/IniFileConfiguration.cpp#4 $
+// $Id: //poco/1.3/Util/src/IniFileConfiguration.cpp#5 $
 //
 // Library: Util
 // Package: Configuration
@@ -39,7 +39,7 @@
 #include "Poco/String.h"
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 #include <set>
 
 
@@ -150,7 +150,7 @@ void IniFileConfiguration::parseLine(std::istream& istr)
 	static const int eof = std::char_traits<char>::eof(); 
 
 	int c = istr.get();
-	while (c != eof && std::isspace((char) c)) c = istr.get();
+	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();
 	if (c != eof)
 	{
 		if (c == ';')

@@ -1,7 +1,7 @@
 //
 // HTTPResponse.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPResponse.cpp#4 $
+// $Id: //poco/1.3/Net/src/HTTPResponse.cpp#5 $
 //
 // Library: Net
 // Package: HTTP
@@ -42,7 +42,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeParser.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 using Poco::DateTime;
@@ -228,16 +228,16 @@ void HTTPResponse::read(std::istream& istr)
 	
 	int ch =  istr.get();
 	if (ch == eof) throw NoMessageException();
-	while (std::isspace(ch)) ch = istr.get();
+	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP response header");
-	while (!std::isspace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
-	if (!std::isspace(ch)) throw MessageException("Invalid HTTP version string");
-	while (std::isspace(ch)) ch = istr.get();
-	while (!std::isspace(ch) && ch != eof && status.length() < MAX_STATUS_LENGTH) { status += (char) ch; ch = istr.get(); }
-	if (!std::isspace(ch)) throw MessageException("Invalid HTTP status code");
-	while (std::isspace(ch)) ch = istr.get();
+	while (!Poco::Ascii::isSpace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
+	if (!Poco::Ascii::isSpace(ch)) throw MessageException("Invalid HTTP version string");
+	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (!Poco::Ascii::isSpace(ch) && ch != eof && status.length() < MAX_STATUS_LENGTH) { status += (char) ch; ch = istr.get(); }
+	if (!Poco::Ascii::isSpace(ch)) throw MessageException("Invalid HTTP status code");
+	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	while (ch != '\r' && ch != '\n' && ch != eof && reason.length() < MAX_REASON_LENGTH) { reason += (char) ch; ch = istr.get(); }
-	if (!std::isspace(ch)) throw MessageException("HTTP reason string too long");
+	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP reason string too long");
 	if (ch == '\r') ch = istr.get();
 
 	HTTPMessage::read(istr);

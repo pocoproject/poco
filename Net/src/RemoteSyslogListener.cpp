@@ -1,7 +1,7 @@
 //
 // RemoteSyslogListener.cpp
 //
-// $Id: //poco/1.3/Net/src/RemoteSyslogListener.cpp#1 $
+// $Id: //poco/1.3/Net/src/RemoteSyslogListener.cpp#2 $
 //
 // Library: Net
 // Package: Logging
@@ -46,7 +46,7 @@
 #include "Poco/Message.h"
 #include "Poco/LoggingFactory.h"
 #include "Poco/Buffer.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 #include <cstddef>
 
 
@@ -256,7 +256,7 @@ void SyslogParser::parse(const std::string& msg)
 	// BSD: expects a month value in string form: Jan, Feb...
 	// SYSLOG expects a version number: 1
 	
-	if (std::isdigit(msg[pos]))
+	if (Poco::Ascii::isDigit(msg[pos]))
 	{
 		parseNew(msg, severity, fac, pos);
 	}
@@ -275,7 +275,7 @@ void SyslogParser::parsePrio(const std::string& msg, std::size_t& pos, RemoteSys
 	++pos;
 	std::size_t start = pos;
 	
-	while (pos < msg.size() && std::isdigit(msg[pos]))
+	while (pos < msg.size() && Poco::Ascii::isDigit(msg[pos]))
 		++pos;
 	
 	poco_assert (msg[pos] == '>');
@@ -350,7 +350,7 @@ void SyslogParser::parseBSD(const std::string& msg, RemoteSyslogChannel::Severit
 			else if (spaceCnt == 2)
 			{
 				// a day value!
-				if (!(std::isdigit(msg[pos-1]) && (std::isdigit(msg[pos-2]) || std::isspace(msg[pos-2]))))
+				if (!(Poco::Ascii::isDigit(msg[pos-1]) && (Poco::Ascii::isDigit(msg[pos-2]) || Poco::Ascii::isSpace(msg[pos-2]))))
 				{
 					// assume the next field is a hostname
 					spaceCnt = 3;
@@ -394,7 +394,7 @@ void SyslogParser::parseBSD(const std::string& msg, RemoteSyslogChannel::Severit
 std::string SyslogParser::parseUntilSpace(const std::string& msg, std::size_t& pos)
 {
 	std::size_t start = pos;
-	while (pos < msg.size() && !std::isspace(msg[pos]))
+	while (pos < msg.size() && !Poco::Ascii::isSpace(msg[pos]))
 		++pos;
 	// skip space
 	++pos;

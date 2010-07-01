@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#4 $
+// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#6 $
 //
 // Library: Net
 // Package: Mail
@@ -49,6 +49,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
+#include "Poco/String.h"
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -135,7 +136,7 @@ void SMTPClientSession::loginUsingCRAM_MD5(const std::string& username, const st
 	std::string response;
 	
 	status = sendCommand("AUTH CRAM-MD5", response);
-	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate CRAM-MD5", response);
+	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate using CRAM-MD5", response);
 	std::string challengeBase64 = response.substr(4);
 	
 	std::istringstream istr(challengeBase64);
@@ -167,7 +168,7 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	std::string response;
 	
 	status = sendCommand("AUTH LOGIN", response);
-	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate LOGIN", response);
+	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate using LOGIN", response);
 	
 	std::ostringstream usernameBase64;
 	Base64Encoder usernameEncoder(usernameBase64);
@@ -189,30 +190,55 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	//C: user_password
 	//S: login:
 	//C: user_login
-	if (response == "334 VXNlcm5hbWU6") // username first (md5("Username:"))
+	
+	std::string decodedResponse;
+	std::istringstream responseStream(response.substr(4));
+	Base64Decoder responseDecoder(responseStream);
+	responseDecoder >> decodedResponse;
+	
+	if (Poco::icompare(decodedResponse, 0, 8, "username") == 0) // username first (md5("Username:"))
 	{
 		status = sendCommand(usernameBase64.str(), response);
-		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN user name failed", response);
+		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN username failed", response);
 		
 		status = sendCommand(passwordBase64.str(), response);
 		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN password failed", response);  
 	}
-	else if (response == "334 UGFzc3dvcmQ6") // password first (md5("Password:"))
+	else if  (Poco::icompare(decodedResponse, 0, 8, "password") == 0) // password first (md5("Password:"))
 	{
 		status = sendCommand(passwordBase64.str(), response);
 		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN password failed", response);  
 		
 		status = sendCommand(usernameBase64.str(), response);
-		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN user name failed", response);
+		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN username failed", response);
 	}
-  
+}
+
+void SMTPClientSession::loginUsingPlain(const std::string& username, const std::string& password)
+{
+	int status = 0;
+	std::string response;
+	
+	std::ostringstream credentialsBase64;
+	Base64Encoder credentialsEncoder(credentialsBase64);
+	credentialsEncoder << username << '\0' << password;
+	credentialsEncoder.close();
+
+	status = sendCommand("AUTH PLAIN", credentialsBase64.str(), response);
+	if (!isPositiveCompletion(status)) throw SMTPException("Login using PLAIN failed", response);
 }
 
 
 void SMTPClientSession::login(LoginMethod loginMethod, const std::string& username, const std::string& password)
 {
+	login(Environment::nodeName(), loginMethod, username, password);
+}
+
+
+void SMTPClientSession::login(const std::string& hostname, LoginMethod loginMethod, const std::string& username, const std::string& password)
+{
 	std::string response;
-	login(Environment::nodeName(), response);
+	login(hostname, response);
 	
 	if (loginMethod == AUTH_CRAM_MD5)
 	{
@@ -229,6 +255,14 @@ void SMTPClientSession::login(LoginMethod loginMethod, const std::string& userna
 			loginUsingLogin(username, password);
 		}
 		else throw SMTPException("The mail service does not support LOGIN authentication", response);
+	}
+	else if (loginMethod == AUTH_PLAIN)
+	{
+		if (response.find("PLAIN", 0) != std::string::npos)
+		{
+			loginUsingPlain(username, password);
+		}
+		else throw SMTPException("The mail service does not support PLAIN authentication", response);
 	}
 	else if (loginMethod != AUTH_NONE)
 	{

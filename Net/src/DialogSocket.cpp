@@ -1,7 +1,7 @@
 //
 // DialogSocket.cpp
 //
-// $Id: //poco/1.3/Net/src/DialogSocket.cpp#3 $
+// $Id: //poco/1.3/Net/src/DialogSocket.cpp#5 $
 //
 // Library: Net
 // Package: Sockets
@@ -35,8 +35,8 @@
 
 
 #include "Poco/Net/DialogSocket.h"
+#include "Poco/Ascii.h"
 #include <cstring>
-#include <cctype>
 
 
 namespace Poco {
@@ -81,6 +81,17 @@ DialogSocket::~DialogSocket()
 DialogSocket& DialogSocket::operator = (const Socket& socket)
 {
 	StreamSocket::operator = (socket);
+	_pNext   = _pBuffer;
+	_pEnd    = _pBuffer;
+	return *this;
+}
+
+
+DialogSocket& DialogSocket::operator = (const DialogSocket& socket)
+{
+	StreamSocket::operator = (socket);
+	_pNext   = _pBuffer;
+	_pEnd    = _pBuffer;
 	return *this;
 }
 
@@ -256,7 +267,7 @@ int DialogSocket::receiveStatusLine(std::string& line)
 	int ch = get();
 	if (ch != EOF_CHAR) line += (char) ch;
 	int n = 0;
-	while (std::isdigit(ch) && n < 3)
+	while (Poco::Ascii::isDigit(ch) && n < 3)
 	{
 		status *= 10;
 		status += ch - '0';

@@ -1,7 +1,7 @@
 //
 // MediaType.cpp
 //
-// $Id: //poco/1.3/Net/src/MediaType.cpp#2 $
+// $Id: //poco/1.3/Net/src/MediaType.cpp#3 $
 //
 // Library: Net
 // Package: Messages
@@ -37,8 +37,8 @@
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/String.h"
+#include "Poco/Ascii.h"
 #include <algorithm>
-#include <cctype>
 
 
 using Poco::icompare;
@@ -179,10 +179,10 @@ void MediaType::parse(const std::string& mediaType)
 	_parameters.clear();
 	std::string::const_iterator it  = mediaType.begin();
 	std::string::const_iterator end = mediaType.end();
-	while (it != end && std::isspace(*it)) ++it;
+	while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 	while (it != end && *it != '/') _type += *it++;
 	if (it != end) ++it;
-	while (it != end && *it != ';' && !std::isspace(*it)) _subType += *it++;
+	while (it != end && *it != ';' && !Poco::Ascii::isSpace(*it)) _subType += *it++;
 	while (it != end && *it != ';') ++it;
 	MessageHeader::splitParameters(it, end, _parameters);
 }

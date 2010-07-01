@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.3/Net/src/MessageHeader.cpp#4 $
+// $Id: //poco/1.3/Net/src/MessageHeader.cpp#5 $
 //
 // Library: Net
 // Package: Messages
@@ -37,7 +37,7 @@
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/String.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 namespace Poco {
@@ -94,7 +94,7 @@ void MessageHeader::read(std::istream& istr)
 		if (ch == '\n') { ch = istr.get(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
 		if (ch != eof) ch = istr.get(); // ':'
-		while (ch != eof && std::isspace(ch) && ch != '\r' && ch != '\n') ch = istr.get();
+		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = istr.get();
 		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = istr.get(); }
 		if (ch == '\r') ch = istr.get();
 		if (ch == '\n')
@@ -169,7 +169,7 @@ void MessageHeader::splitParameters(const std::string& s, std::string& value, Na
 	parameters.clear();
 	std::string::const_iterator it  = s.begin();
 	std::string::const_iterator end = s.end();
-	while (it != end && std::isspace(*it)) ++it;
+	while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 	while (it != end && *it != ';') value += *it++;
 	Poco::trimRightInPlace(value);
 	if (it != end) ++it;
@@ -188,11 +188,11 @@ void MessageHeader::splitParameters(const std::string::const_iterator& begin, co
 	{
 		pname.clear();
 		pvalue.clear();
-		while (it != end && std::isspace(*it)) ++it;
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 		while (it != end && *it != '=' && *it != ';') pname += *it++;
 		Poco::trimRightInPlace(pname);
 		if (it != end && *it != ';') ++it;
-		while (it != end && std::isspace(*it)) ++it;
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 		while (it != end && *it != ';')
 		{
 			if (*it == '"')
@@ -228,7 +228,7 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 	bool mustQuote = false;
 	for (std::string::const_iterator it = value.begin(); !mustQuote && it != value.end(); ++it)
 	{
-		if (!std::isalnum(*it) && *it != '.' && *it != '_' && *it != '-' && !(std::isspace(*it) && allowSpace))
+		if (!Poco::Ascii::isAlphaNumeric(*it) && *it != '.' && *it != '_' && *it != '-' && !(Poco::Ascii::isSpace(*it) && allowSpace))
 			mustQuote = true;
 	}
 	if (mustQuote) result += '"';

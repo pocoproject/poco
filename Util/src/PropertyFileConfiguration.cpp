@@ -1,7 +1,7 @@
 //
 // PropertyFileConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/PropertyFileConfiguration.cpp#6 $
+// $Id: //poco/1.3/Util/src/PropertyFileConfiguration.cpp#7 $
 //
 // Library: Util
 // Package: Configuration
@@ -40,7 +40,7 @@
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
 #include "Poco/LineEndingConverter.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 using Poco::trim;
@@ -125,7 +125,7 @@ void PropertyFileConfiguration::parseLine(std::istream& istr)
 	static const int eof = std::char_traits<char>::eof(); 
 
 	int c = istr.get();
-	while (c != eof && std::isspace((char) c)) c = istr.get();
+	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();
 	if (c != eof)
 	{
 		if (c == '#' || c == '!')

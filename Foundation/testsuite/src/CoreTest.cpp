@@ -1,7 +1,7 @@
 //
 // CoreTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.cpp#7 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.cpp#8 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -41,6 +41,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/AtomicCounter.h"
 #include "Poco/Nullable.h"
+#include "Poco/Ascii.h"
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -54,6 +55,7 @@ using Poco::Runnable;
 using Poco::Buffer;
 using Poco::AtomicCounter;
 using Poco::Nullable;
+using Poco::Ascii;
 
 
 namespace
@@ -278,6 +280,81 @@ void CoreTest::testNullable()
 }
 
 
+void CoreTest::testAscii()
+{
+	assert (Ascii::isAscii('A'));
+	assert (!Ascii::isAscii(-1));
+	assert (!Ascii::isAscii(128));
+	assert (!Ascii::isAscii(222));
+	
+	assert (Ascii::isSpace(' '));
+	assert (Ascii::isSpace('\t'));
+	assert (Ascii::isSpace('\r'));
+	assert (Ascii::isSpace('\n'));
+	assert (!Ascii::isSpace('A'));
+	assert (!Ascii::isSpace(-1));
+	assert (!Ascii::isSpace(222));
+	
+	assert (Ascii::isDigit('0'));
+	assert (Ascii::isDigit('1'));
+	assert (Ascii::isDigit('2'));
+	assert (Ascii::isDigit('3'));
+	assert (Ascii::isDigit('4'));
+	assert (Ascii::isDigit('5'));
+	assert (Ascii::isDigit('6'));
+	assert (Ascii::isDigit('7'));
+	assert (Ascii::isDigit('8'));
+	assert (Ascii::isDigit('9'));
+	assert (!Ascii::isDigit('a'));
+	
+	assert (Ascii::isHexDigit('0'));
+	assert (Ascii::isHexDigit('1'));
+	assert (Ascii::isHexDigit('2'));
+	assert (Ascii::isHexDigit('3'));
+	assert (Ascii::isHexDigit('4'));
+	assert (Ascii::isHexDigit('5'));
+	assert (Ascii::isHexDigit('6'));
+	assert (Ascii::isHexDigit('7'));
+	assert (Ascii::isHexDigit('8'));
+	assert (Ascii::isHexDigit('9'));
+	assert (Ascii::isHexDigit('a'));
+	assert (Ascii::isHexDigit('b'));
+	assert (Ascii::isHexDigit('c'));
+	assert (Ascii::isHexDigit('d'));
+	assert (Ascii::isHexDigit('e'));
+	assert (Ascii::isHexDigit('f'));
+	assert (Ascii::isHexDigit('A'));
+	assert (Ascii::isHexDigit('B'));
+	assert (Ascii::isHexDigit('C'));
+	assert (Ascii::isHexDigit('D'));
+	assert (Ascii::isHexDigit('E'));
+	assert (Ascii::isHexDigit('F'));
+	assert (!Ascii::isHexDigit('G'));
+
+	assert (Ascii::isPunct('.'));
+	assert (Ascii::isPunct(','));
+	assert (!Ascii::isPunct('A'));
+	
+	assert (Ascii::isAlpha('a'));
+	assert (Ascii::isAlpha('Z'));
+	assert (!Ascii::isAlpha('0'));
+	
+	assert (Ascii::isLower('a'));
+	assert (!Ascii::isLower('A'));
+	
+	assert (Ascii::isUpper('A'));
+	assert (!Ascii::isUpper('a'));
+	
+	assert (Ascii::toLower('A') == 'a');
+	assert (Ascii::toLower('z') == 'z');
+	assert (Ascii::toLower('0') == '0');
+	
+	assert (Ascii::toUpper('a') == 'A');
+	assert (Ascii::toUpper('0') == '0');
+	assert (Ascii::toUpper('Z') == 'Z');
+}
+
+
 void CoreTest::setUp()
 {
 }
@@ -299,6 +376,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
+	CppUnit_addTest(pSuite, CoreTest, testAscii);
 
 	return pSuite;
 }

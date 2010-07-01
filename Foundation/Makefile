@@ -1,14 +1,14 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Foundation/Makefile#10 $
+# $Id: //poco/1.3/Foundation/Makefile#11 $
 #
 # Makefile for Poco Foundation
 #
 
 include $(POCO_BASE)/build/rules/global
 
-objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder \
+objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Configurable ConsoleChannel \
 	CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator \

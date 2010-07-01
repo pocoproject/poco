@@ -1,13 +1,13 @@
 //
-// StringTokenizer.cpp
+// SecureSMTPClientSession.h
 //
-// $Id: //poco/1.3/Foundation/src/StringTokenizer.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSMTPClientSession.cpp#1 $
 //
-// Library: Foundation
-// Package: Core
-// Module:  StringTokenizer
+// Library: NetSSL_OpenSSL
+// Package: Mail
+// Module:  SecureSMTPClientSession
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,53 +34,52 @@
 //
 
 
-#include "Poco/StringTokenizer.h"
-#include "Poco/Ascii.h"
+#include "Poco/Net/SecureSMTPClientSession.h"
+#include "Poco/Net/SecureStreamSocket.h"
+#include "Poco/Net/SSLManager.h"
+#include "Poco/Net/DialogSocket.h"
 
 
 namespace Poco {
+namespace Net {
 
 
-StringTokenizer::StringTokenizer(const std::string& str, const std::string& separators, int options)
+SecureSMTPClientSession::SecureSMTPClientSession(const StreamSocket& socket):
+	SMTPClientSession(socket)
 {
-	std::string::const_iterator it1 = str.begin();
-	std::string::const_iterator it2;
-	std::string::const_iterator it3;
-	std::string::const_iterator end = str.end();
+}
+
+
+SecureSMTPClientSession::SecureSMTPClientSession(const std::string& host, Poco::UInt16 port):
+	SMTPClientSession(host, port)
+{
+}
+
+
+SecureSMTPClientSession::~SecureSMTPClientSession()
+{
+}
+
+
+bool SecureSMTPClientSession::startTLS()
+{
+	return startTLS(SSLManager::instance().defaultClientContext());
+}
+
+
+bool SecureSMTPClientSession::startTLS(Context::Ptr pContext)
+{
+	int status = 0;
+	std::string response;
 	
-	while (it1 != end)
-	{
-		if (options & TOK_TRIM)
-		{
-			while (it1 != end && Ascii::isSpace(*it1)) ++it1;
-		}
-		it2 = it1;
-		while (it2 != end && separators.find(*it2) == std::string::npos) ++it2;
-		it3 = it2;
-		if (it3 != it1 && (options & TOK_TRIM))
-		{
-			--it3;
-			while (it3 != it1 && Ascii::isSpace(*it3)) --it3;
-			if (!Ascii::isSpace(*it3)) ++it3;
-		}
-		if (options & TOK_IGNORE_EMPTY)
-		{
-			if (it3 != it1)
-				_tokens.push_back(std::string(it1, it3));
-		}
-		else
-		{
-			_tokens.push_back(std::string(it1, it3));
-		}
-		it1 = it2;
-		if (it1 != end) ++it1;
-	}
+	status = sendCommand("STARTTLS", response);
+	if (!isPositiveCompletion(status)) return false;
+
+	SecureStreamSocket sss(SecureStreamSocket::attach(socket(), pContext));
+	socket() = sss;
+	
+	return true;
 }
 
 
-StringTokenizer::~StringTokenizer()
-{
-}
-
-
-} // namespace Poco
+} } // namespace Poco::Net

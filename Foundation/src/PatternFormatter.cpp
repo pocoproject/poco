@@ -1,7 +1,7 @@
 //
 // PatternFormatter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/PatternFormatter.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/PatternFormatter.cpp#6 $
 //
 // Library: Foundation
 // Package: Logging
@@ -43,7 +43,6 @@
 #include "Poco/Timezone.h"
 #include "Poco/Environment.h"
 #include <cstdio>
-#include <cctype>
 
 
 namespace Poco {

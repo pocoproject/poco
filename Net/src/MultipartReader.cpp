@@ -1,7 +1,7 @@
 //
 // MultipartReader.cpp
 //
-// $Id: //poco/1.3/Net/src/MultipartReader.cpp#4 $
+// $Id: //poco/1.3/Net/src/MultipartReader.cpp#5 $
 //
 // Library: Net
 // Package: Messages
@@ -37,7 +37,7 @@
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 using Poco::BufferedStreamBuf;
@@ -268,7 +268,7 @@ void MultipartReader::guessBoundary()
 {
 	static const int eof = std::char_traits<char>::eof();
 	int ch = _istr.get();
-	while (std::isspace(ch))
+	while (Poco::Ascii::isSpace(ch))
 		ch = _istr.get();
 	if (ch == '-' && _istr.peek() == '-')
 	{

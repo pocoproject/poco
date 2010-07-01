@@ -1,7 +1,7 @@
 //
 // FilePartSource.cpp
 //
-// $Id: //poco/1.3/Net/src/FilePartSource.cpp#2 $
+// $Id: //poco/1.3/Net/src/FilePartSource.cpp#3 $
 //
 // Library: Net
 // Package: Messages
@@ -63,6 +63,17 @@ FilePartSource::FilePartSource(const std::string& path, const std::string& media
 {
 	Path p(path);
 	_filename = p.getFileName();
+	if (!_istr.good())
+		throw OpenFileException(path);
+}
+
+
+FilePartSource::FilePartSource(const std::string& path, const std::string& filename, const std::string& mediaType):
+	PartSource(mediaType),
+	_filename(filename),
+	_istr(path)
+{
+	Path p(path);
 	if (!_istr.good())
 		throw OpenFileException(path);
 }

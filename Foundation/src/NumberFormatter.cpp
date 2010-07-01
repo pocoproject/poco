@@ -1,7 +1,7 @@
 //
 // NumberFormatter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NumberFormatter.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/NumberFormatter.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,7 +36,6 @@
 
 #include "Poco/NumberFormatter.h"
 #include <cstdio>
-#include <cctype>
 
 
 #if defined(_MSC_VER)

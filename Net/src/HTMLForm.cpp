@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.3/Net/src/HTMLForm.cpp#7 $
+// $Id: //poco/1.3/Net/src/HTMLForm.cpp#8 $
 //
 // Library: Net
 // Package: HTML
@@ -48,7 +48,6 @@
 #include "Poco/URI.h"
 #include "Poco/String.h"
 #include <sstream>
-#include <cctype>
 
 
 using Poco::NullInputStream;

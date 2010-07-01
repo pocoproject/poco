@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#5 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#7 $
 //
 // Library: Net
 // Package: Mail
@@ -67,7 +67,8 @@ public:
 	{
 		AUTH_NONE,
 		AUTH_CRAM_MD5,
-		AUTH_LOGIN
+		AUTH_LOGIN,
+		AUTH_PLAIN
 	};
 
 	explicit SMTPClientSession(const StreamSocket& socket);
@@ -100,6 +101,10 @@ public:
 
 	void login();
 		/// Calls login(hostname) with the current host name.
+
+	void login(const std::string& hostname, LoginMethod loginMethod, const std::string& username, const std::string& password);
+		/// Logs in to the SMTP server using the given authentication method and the given
+		/// credentials.
 
 	void login(LoginMethod loginMethod, const std::string& username, const std::string& password);
 		/// Logs in to the SMTP server using the given authentication method and the given
@@ -164,6 +169,7 @@ protected:
 	void loginUsingCRAM_MD5(const std::string& username, const std::string& password);
 	void loginUsingLogin(const std::string& username, const std::string& password);
 	void loginUsingPlain(const std::string& username, const std::string& password);
+	DialogSocket& socket();
 
 private:
 	DialogSocket _socket;
@@ -195,6 +201,12 @@ inline bool SMTPClientSession::isTransientNegative(int status)
 inline bool SMTPClientSession::isPermanentNegative(int status)
 {
 	return status/100 == SMTP_PERMANENT_NEGATIVE;
+}
+
+
+inline DialogSocket& SMTPClientSession::socket()
+{
+	return _socket;
 }
 
 
