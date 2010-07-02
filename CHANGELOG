@@ -96,6 +96,8 @@ Release 1.3.7 (2010-07-??)
 - Improved SMTPClientSession compatibility with various mail servers when using AUTH_LOGIN authentication.
 - Poco::Net::SMTPClientSession now also supports login with AUTH PLAIN.
 - Added Poco::Net::SecureSMTPClientSession class, supporting STARTTLS for secure SMTP connections.
+- fixed an issue with SharedMemory on POSIX systems, where a shared memory region would be deleted 
+  despite the server flag set to true (see http://pocoproject.org/forum/viewtopic.php?f=12&t=3494).
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1277,4 +1279,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#100 $
+$Id: //poco/1.3/dist/CHANGELOG#101 $

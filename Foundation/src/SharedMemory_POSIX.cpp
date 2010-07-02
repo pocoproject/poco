@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/1.3/Foundation/src/SharedMemory_POSIX.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/SharedMemory_POSIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -146,7 +146,7 @@ void SharedMemoryImpl::close()
 		::close(_fd);
 		_fd = -1;
 	}
-	if (!_fileMapped && _server)
+	if (!_fileMapped && !_server)
 	{
 		::shm_unlink(_name.c_str());
 	}
