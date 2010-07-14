@@ -1,7 +1,7 @@
 //
 // HTTPMessage.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPMessage.cpp#2 $
+// $Id: //poco/1.3/Net/src/HTTPMessage.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -171,7 +171,7 @@ bool HTTPMessage::getKeepAlive() const
 {
 	const std::string& connection = get(CONNECTION, EMPTY);
 	if (!connection.empty())
-		return icompare(connection, CONNECTION_KEEP_ALIVE) == 0;
+		return icompare(connection, CONNECTION_CLOSE) != 0;
 	else
 		return getVersion() == HTTP_1_1;
 }

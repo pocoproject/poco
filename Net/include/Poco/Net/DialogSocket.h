@@ -1,7 +1,7 @@
 //
 // DialogSocket.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/DialogSocket.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/DialogSocket.h#4 $
 //
 // Library: Net
 // Package: Sockets
@@ -62,6 +62,11 @@ class Net_API DialogSocket: public StreamSocket
 	///
 	/// Limited support for the TELNET protocol (RFC 854) is
 	/// available.
+	///
+	/// Warning: Do not call receiveBytes() on a DialogSocket.
+	/// Due to internal buffering in DialogSocket, receiveBytes()
+	/// may return an unexpected result and interfere with
+	/// DialogSocket's buffering. Use receiveRawBytes() instead.
 {
 public:
 	DialogSocket();
@@ -153,6 +158,16 @@ public:
 		/// buffer.
 		///
 		/// Returns -1 (EOF_CHAR) if no more characters are available.
+
+	int receiveRawBytes(void* buffer, int length);
+		/// Read up to length bytes from the connection and place
+		/// them into buffer. If there are data bytes in the internal
+		/// buffer, these bytes are returned first.
+		///
+		/// Use this member function instead of receiveBytes().
+		///
+		/// Returns the number of bytes read, which may be
+		/// less than requested.
 
 	void synch();
 		/// Sends a TELNET SYNCH signal over the connection.

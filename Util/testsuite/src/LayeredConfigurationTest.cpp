@@ -1,7 +1,7 @@
 //
 // LayeredConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/LayeredConfigurationTest.cpp#2 $
+// $Id: //poco/1.3/Util/testsuite/src/LayeredConfigurationTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -175,6 +175,41 @@ void LayeredConfigurationTest::testThreeLayers()
 }
 
 
+void LayeredConfigurationTest::testRemove()
+{
+	AutoPtr<LayeredConfiguration> pLC = new LayeredConfiguration;
+	AutoPtr<MapConfiguration> pMC1 = new MapConfiguration;
+	AutoPtr<MapConfiguration> pMC2 = new MapConfiguration;
+	
+	pMC1->setString("prop1", "value1");
+	pMC1->setString("prop2", "value2");
+	pMC2->setString("prop2", "value3");
+	pMC2->setString("prop3", "value4");
+	
+	pLC->add(pMC1, 0);
+	pLC->add(pMC2, -1);
+
+	AbstractConfiguration::Keys keys;
+	pLC->keys(keys);
+	assert (keys.size() == 3);
+	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
+	
+	assert (pLC->getString("prop1") == "value1");
+	assert (pLC->getString("prop2") == "value3");
+	assert (pLC->getString("prop3") == "value4");
+
+	pLC->remove(pMC2);
+	keys.clear();
+	pLC->keys(keys);
+	assert (keys.size() == 2);
+	
+	assert (pLC->getString("prop1") == "value1");
+	assert (pLC->getString("prop2") == "value2");
+}
+
+
 void LayeredConfigurationTest::setUp()
 {
 }
@@ -193,6 +228,7 @@ CppUnit::Test* LayeredConfigurationTest::suite()
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testOneLayer);
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testTwoLayers);
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testThreeLayers);
+	CppUnit_addTest(pSuite, LayeredConfigurationTest, testRemove);
 
 	return pSuite;
 }

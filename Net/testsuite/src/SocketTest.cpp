@@ -1,7 +1,7 @@
 //
 // SocketTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketTest.cpp#4 $
+// $Id: //poco/1.3/Net/testsuite/src/SocketTest.cpp#5 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -174,6 +174,28 @@ void SocketTest::testConnectRefusedNB()
 	{
 	}
 }
+
+
+void SocketTest::testNonBlocking()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.setBlocking(false);
+
+	Timespan timeout(1000000);
+	assert (ss.poll(timeout, Socket::SELECT_WRITE));
+	int n = ss.sendBytes("hello", 5);
+	assert (n == 5);
+
+	char buffer[256];
+	assert (ss.poll(timeout, Socket::SELECT_READ));
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assert (n == 5);
+	assert (std::string(buffer, n) == "hello");
+	ss.close();
+}
+
 
 
 void SocketTest::testAddress()
@@ -457,6 +479,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testConnect);
 	CppUnit_addTest(pSuite, SocketTest, testConnectRefused);
 	CppUnit_addTest(pSuite, SocketTest, testConnectRefusedNB);
+	CppUnit_addTest(pSuite, SocketTest, testNonBlocking);
 	CppUnit_addTest(pSuite, SocketTest, testAddress);
 	CppUnit_addTest(pSuite, SocketTest, testAssign);
 	CppUnit_addTest(pSuite, SocketTest, testTimeout);

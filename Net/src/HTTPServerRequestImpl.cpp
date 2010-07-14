@@ -1,7 +1,7 @@
 //
 // HTTPServerRequestImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPServerRequestImpl.cpp#5 $
+// $Id: //poco/1.3/Net/src/HTTPServerRequestImpl.cpp#6 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -87,6 +87,12 @@ HTTPServerRequestImpl::~HTTPServerRequestImpl()
 StreamSocket& HTTPServerRequestImpl::socket()
 {
 	return _session.socket();
+}
+
+
+StreamSocket HTTPServerRequestImpl::detachSocket()
+{
+	return _session.detachSocket();
 }
 
 

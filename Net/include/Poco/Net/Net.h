@@ -1,11 +1,11 @@
 //
 // Net.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/Net.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/Net.h#4 $
 //
 // Library: Net
 // Package: NetCore
-// Module:  IPAddress
+// Module:  Net
 //
 // Basic definitions for the Poco Net library.
 // This file must be the first file included by every other Net

@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPClientSession.h#6 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPClientSession.h#7 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -178,6 +178,12 @@ public:
 		/// the response body. The stream is valid until
 		/// sendRequest() is called or the session is
 		/// destroyed.
+		
+	void reset();
+		/// Resets the session and closes the socket.
+		///
+		/// The next request will initiate a new connection,
+		/// even if persistent connections are enabled.
 	
 protected:
 	enum
@@ -222,7 +228,7 @@ protected:
 	bool getExpectResponseBody() const;
 		/// Returns _expectResponseBody.
 
-	bool mustReconnect() const;
+	virtual bool mustReconnect() const;
 		/// Checks if we can reuse a persistent connection.
 		
 	virtual void proxyAuthenticate(HTTPRequest& request);

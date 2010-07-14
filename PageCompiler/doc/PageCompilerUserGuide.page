@@ -191,12 +191,23 @@ Defaults to Poco::Net::HTTPRequestHandler. Do not forget to add a Header Declara
 containing an <[#include]> directive for the header file containing the definition
 of that class, otherwise the generated code won't compile.
 
+!context
+
+Allows passing of a context object to the request handler's constructor.
+The context object is stored in the request handler object and can be
+obtained by calling the context() object.
+
+The class of the context object must be specified.
+Cannot be used together with <[ctorArg]>.
+
 !ctorArg
 
 Allows to specify the type of a single argument being passed to the constructor
 of the generated request handler class. Can only be used together with <[baseClass]>.
 The argument is passed on to the constructor of the base class, therefore, one of the 
 constructors of the base class must also accept a single argument of the specified type.
+
+Cannot be used together with <[context]>.
 
 !export
 

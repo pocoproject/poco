@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPClientSession.cpp#9 $
+// $Id: //poco/1.3/Net/src/HTTPClientSession.cpp#11 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -282,6 +282,12 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 }
 
 
+void HTTPClientSession::reset()
+{
+	close();
+}
+
+
 int HTTPClientSession::write(const char* buffer, std::streamsize length)
 {
 	try
@@ -346,7 +352,7 @@ void HTTPClientSession::deleteRequestStream()
 
 void HTTPClientSession::setResponseStream(std::istream* pRespStream)
 {
-	poco_assert( !_pResponseStream);
+	poco_assert (!_pResponseStream);
 	_pResponseStream = pRespStream;
 }
 

@@ -1,7 +1,7 @@
 //
 // SocketTest.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketTest.h#2 $
+// $Id: //poco/1.3/Net/testsuite/src/SocketTest.h#3 $
 //
 // Definition of the SocketTest class.
 //
@@ -52,6 +52,7 @@ public:
 	void testConnect();
 	void testConnectRefused();
 	void testConnectRefusedNB();
+	void testNonBlocking();
 	void testAddress();
 	void testAssign();
 	void testTimeout();

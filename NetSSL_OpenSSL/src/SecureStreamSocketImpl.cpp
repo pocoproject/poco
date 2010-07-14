@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#10 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#11 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -36,6 +36,7 @@
 
 #include "Poco/Net/SecureStreamSocketImpl.h"
 #include "Poco/Net/SSLException.h"
+#include "Poco/Thread.h"
 
 
 namespace Poco {
@@ -127,13 +128,18 @@ int SecureStreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	const char* p = reinterpret_cast<const char*>(buffer);
 	int remaining = length;
 	int sent = 0;
-	while (remaining > 0 && getBlocking())
+	bool blocking = getBlocking();
+	while (remaining > 0)
 	{
 		int n = _impl.sendBytes(p, remaining, flags);
-		if (n < 0) return n;
+		if (n < 0 && !blocking) return n;
 		p += n; 
-		remaining -= n;
 		sent += n;
+		remaining -= n;
+		if (blocking && remaining > 0)
+			Poco::Thread::yield();
+		else
+			break;
 	}
 	return sent;
 }

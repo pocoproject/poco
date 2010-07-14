@@ -1,7 +1,7 @@
 //
 // LayeredConfiguration.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/LayeredConfiguration.h#2 $
+// $Id: //poco/1.3/Util/include/Poco/Util/LayeredConfiguration.h#3 $
 //
 // Library: Util
 // Package: Configuration
@@ -126,6 +126,12 @@ public:
 		/// Adds a read-only configuration to the front of the LayeredConfiguration.
 		/// If shared is true, the LayeredConfiguration takes ownership
 		/// of the given configuration.
+		
+	void remove(AbstractConfiguration* pConfig);
+		/// Removes the given configuration from the LayeredConfiguration.
+		///
+		/// Does nothing if the given configuration is not part of the
+		/// LayeredConfiguration.
 		
 protected:
 	typedef Poco::AutoPtr<AbstractConfiguration> ConfigPtr;

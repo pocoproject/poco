@@ -1,7 +1,7 @@
 //
 // LayeredConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/LayeredConfiguration.cpp#2 $
+// $Id: //poco/1.3/Util/src/LayeredConfiguration.cpp#4 $
 //
 // Library: Util
 // Package: Configuration
@@ -117,6 +117,19 @@ void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, boo
 		++it;
 		
 	_configs.insert(it, item);
+}
+
+
+void LayeredConfiguration::remove(AbstractConfiguration* pConfig)
+{
+	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
+	{
+		if (it->pConfig == pConfig)
+		{
+			_configs.erase(it);
+			break;
+		}
+	}
 }
 
 

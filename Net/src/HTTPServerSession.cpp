@@ -1,7 +1,7 @@
 //
 // HTTPServerSession.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPServerSession.cpp#6 $
+// $Id: //poco/1.3/Net/src/HTTPServerSession.cpp#7 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -59,6 +59,8 @@ HTTPServerSession::~HTTPServerSession()
 
 bool HTTPServerSession::hasMoreRequests()
 {
+	if (!socket().impl()->initialized()) return false;
+
 	if (_firstRequest)
 	{
 		_firstRequest = false;

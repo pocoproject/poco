@@ -1,7 +1,7 @@
 //
 // HTTPServerRequestImpl.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerRequestImpl.h#4 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerRequestImpl.h#5 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -96,6 +96,10 @@ public:
 		
 	StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
+		
+	StreamSocket detachSocket();
+		/// Returns the underlying socket after detaching
+		/// it from the server session.
 
 protected:
 	static const std::string EXPECT;

@@ -92,12 +92,18 @@ Release 1.3.7 (2010-07-??)
   possible inconsistent results or assertions when the
   standard library functions are used with character codes
   outside the ASCII range.
-- Poco::Net::MailMessage: fixed a bug in StringPartHandler that resulted in incorrect handling of non-ASCII data if char is signed.
+- Poco::Net::MailMessage: fixed a bug in StringPartHandler that resulted in incorrect handling of non-ASCII data if 
+  char is signed.
 - Improved SMTPClientSession compatibility with various mail servers when using AUTH_LOGIN authentication.
 - Poco::Net::SMTPClientSession now also supports login with AUTH PLAIN.
 - Added Poco::Net::SecureSMTPClientSession class, supporting STARTTLS for secure SMTP connections.
 - fixed an issue with SharedMemory on POSIX systems, where a shared memory region would be deleted 
   despite the server flag set to true (see http://pocoproject.org/forum/viewtopic.php?f=12&t=3494).
+- PageCompiler: added a new page context directive, to allow passing custom context objects to the
+  request handler.
+- fixed StreamSocketImpl::sendBytes() for non-blocking sockets
+- added Poco::Net::DialogSocket::receiveRawBytes(), which should be used instead of receiveBytes() due to internal 
+  buffering by DialogSocket.
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1279,4 +1285,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#101 $
+$Id: //poco/1.3/dist/CHANGELOG#102 $
