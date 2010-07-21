@@ -104,6 +104,8 @@ Release 1.3.7 (2010-07-??)
 - fixed StreamSocketImpl::sendBytes() for non-blocking sockets
 - added Poco::Net::DialogSocket::receiveRawBytes(), which should be used instead of receiveBytes() due to internal 
   buffering by DialogSocket.
+- DOMParser: FEATURE_WHITESPACE has been renamed to FEATURE_FILTER_WHITESPACE (which now matches the underlying URI)
+  and is now handled correctly (previously we did the exact reverse thing)
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1285,4 +1287,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#102 $
+$Id: //poco/1.3/dist/CHANGELOG#103 $
