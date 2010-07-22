@@ -97,7 +97,7 @@ void XMLConfiguration::load(Poco::XML::InputSource* pInputSource)
 	
 	Poco::XML::DOMParser parser;
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
-	parser.setFeature(Poco::XML::DOMParser::FEATURE_WHITESPACE, true);
+	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
 	Poco::XML::AutoPtr<Poco::XML::Document> pDoc = parser.parse(pInputSource);
 	load(pDoc);
 }
