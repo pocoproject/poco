@@ -108,6 +108,7 @@ Release 1.3.7 (2010-07-??)
   and is now handled correctly (previously we did the exact reverse thing)
 - added Poco::Util::AbstractConfiguration::remove() to remove a configuration property; added removeRaw() implementations 
   to all implementations (contributions by Daniel Hobi and Alexey Shults).
+- fixed NetSSL_OpenSSL compilation error on Windows with OpenSSL 1.0
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1289,4 +1290,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#104 $
+$Id: //poco/1.3/dist/CHANGELOG#105 $

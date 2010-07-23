@@ -1,7 +1,7 @@
 //
 // Context.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#13 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/Context.h#14 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/Net/SocketDefs.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/RefCountedObject.h"

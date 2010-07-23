@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#9 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/X509Certificate.h#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -41,11 +41,11 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/Net/SocketDefs.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <set>
-#include <openssl/ssl.h>
 
 
 namespace Poco {
