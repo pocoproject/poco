@@ -1,7 +1,7 @@
 //
 // ICMPSocketImpl.cpp
 //
-// $Id: //poco/1.3/Net/src/ICMPSocketImpl.cpp#1 $
+// $Id: //poco/1.3/Net/src/ICMPSocketImpl.cpp#2 $
 //
 // Library: Net
 // Package: ICMP
@@ -37,6 +37,7 @@
 #include "Poco/Net/ICMPSocketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
+#include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
 
 
@@ -51,7 +52,8 @@ namespace Net {
 
 ICMPSocketImpl::ICMPSocketImpl(IPAddress::Family family, int dataSize, int ttl, int timeout):
 	RawSocketImpl(family, IPPROTO_ICMP),
-	_icmpPacket(family, dataSize)
+	_icmpPacket(family, dataSize),
+	_timeout(timeout)
 {
 	setOption(IPPROTO_IP, IP_TTL, ttl);
 	setReceiveTimeout(Timespan(timeout));
@@ -77,21 +79,28 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 
 	try
 	{
+		Poco::Timestamp ts;
 		do
 		{
+			if (ts.isElapsed(_timeout)) 
+			{
+				// This guards against a possible DoS attack, where sending
+				// fake ping responses will cause an endless loop.
+				throw TimeoutException();
+			}
 			SocketImpl::receiveFrom(buffer, maxPacketSize, address, flags);
 		}
-		while(!_icmpPacket.validReplyID(buffer, maxPacketSize));
+		while (!_icmpPacket.validReplyID(buffer, maxPacketSize));
 	}
 	catch (TimeoutException&)
 	{
-		delete[] buffer;			
+		delete [] buffer;			
 		throw;
 	}
 	catch (Exception&)
 	{
 		std::string err = _icmpPacket.errorDescription(buffer, maxPacketSize);
-		delete[] buffer;
+		delete [] buffer;
 		if (!err.empty()) 
 			throw ICMPException(err);
 		else 
