@@ -1,7 +1,7 @@
 //
 // DeflatingStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DeflatingStream.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/DeflatingStream.cpp#5 $
 //
 // Library: Foundation
 // Package: Streams
@@ -174,10 +174,8 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			n = static_cast<int>(_pIstr->readsome(_buffer, DEFLATE_BUFFER_SIZE));
 			if (!n && _pIstr->good())
 			{
-				_pIstr->read(_buffer, 1);
+				_pIstr->read(_buffer, DEFLATE_BUFFER_SIZE);
 				n = static_cast<int>(_pIstr->gcount());
-				if (_pIstr->good())
-					n += static_cast<int>(_pIstr->readsome(_buffer + 1, DEFLATE_BUFFER_SIZE - 1));
 			}
 		}
 		if (n > 0)
@@ -213,12 +211,10 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			if (_pIstr->good())
 			{
 				n = static_cast<int>(_pIstr->readsome(_buffer, DEFLATE_BUFFER_SIZE));
-				if (!n && _pIstr->good() && (_zstr.avail_out == static_cast<int>(length)))
+				if (!n && _pIstr->good())
 				{
-					_pIstr->read(_buffer, 1);
+					_pIstr->read(_buffer, DEFLATE_BUFFER_SIZE);
 					n = static_cast<int>(_pIstr->gcount());
-					if (_pIstr->good())
-						n += static_cast<int>(_pIstr->readsome(_buffer + 1, DEFLATE_BUFFER_SIZE - 1));
 				}
 			}
 			if (n > 0)
@@ -230,10 +226,7 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			{
 				_zstr.next_in  = 0;
 				_zstr.avail_in = 0;
-				if (_pIstr->eof())
-					_eof = true;
-				else
-					return static_cast<int>(length) - _zstr.avail_out;
+				_eof = true;
 			}
 		}
 	}

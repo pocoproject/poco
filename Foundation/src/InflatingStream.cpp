@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/InflatingStream.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/InflatingStream.cpp#6 $
 //
 // Library: Foundation
 // Package: Streams
@@ -138,10 +138,8 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			n = static_cast<int>(_pIstr->readsome(_buffer, INFLATE_BUFFER_SIZE));
 			if (!n && _pIstr->good())
 			{
-				_pIstr->read(_buffer, 1);
+				_pIstr->read(_buffer, INFLATE_BUFFER_SIZE);
 				n = static_cast<int>(_pIstr->gcount());
-				if (_pIstr->good())
-					n += static_cast<int>(_pIstr->readsome(_buffer + 1, INFLATE_BUFFER_SIZE - 1));
 			}
 		}
 		if (n == 0) return 0;
@@ -179,10 +177,8 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				n = static_cast<int>(_pIstr->readsome(_buffer, INFLATE_BUFFER_SIZE));
 				if (!n && _pIstr->good() && (_zstr.avail_out == static_cast<int>(length)))
 				{
-					_pIstr->read(_buffer, 1);
+					_pIstr->read(_buffer, INFLATE_BUFFER_SIZE);
 					n = static_cast<int>(_pIstr->gcount());
-					if (_pIstr->good())
-						n += static_cast<int>(_pIstr->readsome(_buffer + 1, INFLATE_BUFFER_SIZE - 1));
 				}
 			}
 			if (n > 0)
