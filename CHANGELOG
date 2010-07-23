@@ -109,6 +109,11 @@ Release 1.3.7 (2010-07-??)
 - added Poco::Util::AbstractConfiguration::remove() to remove a configuration property; added removeRaw() implementations 
   to all implementations (contributions by Daniel Hobi and Alexey Shults).
 - fixed NetSSL_OpenSSL compilation error on Windows with OpenSSL 1.0
+- Added optional FIPS mode support to NetSSL_OpenSSL (contributed by Lior Okman).
+  If OpenSSL has been configured and built with FIPS support, then FIPS support can
+  be enabled by calling Poco::Crypto::OpenSSLInitializer::enableFIPSMode(true); or
+  by setting the fips property in the OpenSSL configuration to true (see Poco::Net::SSLManager
+  for details).
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1290,4 +1295,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#105 $
+$Id: //poco/1.3/dist/CHANGELOG#106 $

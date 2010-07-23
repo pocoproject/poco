@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#4 $
+// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#5 $
 //
 // Library: Crypto
 // Package: CryotpCore
@@ -41,19 +41,21 @@
 #include <openssl/rand.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#if SSLEAY_VERSION_NUMBER >= 0x0907000L
+#include <openssl/conf.h>
+#endif
 
 
 using Poco::RandomInputStream;
 using Poco::Thread;
-using Poco::FastMutex;
 
 
 namespace Poco {
 namespace Crypto {
 
 
-FastMutex* OpenSSLInitializer::_mutexes(0);
-FastMutex OpenSSLInitializer::_mutex;
+Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
+Poco::FastMutex OpenSSLInitializer::_mutex;
 int OpenSSLInitializer::_rc(0);
 
 
@@ -74,10 +76,15 @@ OpenSSLInitializer::~OpenSSLInitializer()
 
 void OpenSSLInitializer::initialize()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	
 	if (++_rc == 1)
 	{
+#if SSLEAY_VERSION_NUMBER >= 0x0907000L
+		// Highly recommended, since it allows some of the defaults to be configured
+		// via the /etc/ssl/openssl.cnf file
+		OPENSSL_config(NULL);
+#endif
 		poco_assert (1 == SSL_library_init()); // always returns 1
 		SSL_load_error_strings();
 		
@@ -87,7 +94,7 @@ void OpenSSLInitializer::initialize()
 		RAND_seed(seed, SEEDSIZE);
 		
 		int nMutexes = CRYPTO_num_locks();
-		_mutexes = new FastMutex[nMutexes];
+		_mutexes = new Poco::FastMutex[nMutexes];
 		CRYPTO_set_locking_callback(&OpenSSLInitializer::lock);
 #ifndef POCO_OS_FAMILY_WINDOWS // SF# 1828231: random unhandled exceptions when linking with ssl
 		CRYPTO_set_id_callback(&OpenSSLInitializer::id);
@@ -101,7 +108,7 @@ void OpenSSLInitializer::initialize()
 
 void OpenSSLInitializer::uninitialize()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	Poco::FastMutex::ScopedLock lock(_mutex);
 
 	if (--_rc == 0)
 	{

@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/OpenSSLInitializer.h#2 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/OpenSSLInitializer.h#3 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -42,6 +42,10 @@
 
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Mutex.h"
+#include <openssl/opensslconf.h>
+#ifdef OPENSSL_FIPS
+#include <openssl/fips.h>
+#endif
 
 
 extern "C"
@@ -76,6 +80,12 @@ public:
 	static void uninitialize();
 		/// Shuts down the OpenSSL machinery.
 
+	static bool isFIPSEnabled();
+		// Returns true if FIPS mode is enabled, false otherwise.
+
+	static void enableFIPSMode(bool enabled);
+		// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
+
 protected:
 	enum
 	{
@@ -94,6 +104,27 @@ private:
 	static Poco::FastMutex _mutex;
 	static int _rc;
 };
+
+
+//
+// inlines
+//
+inline bool OpenSSLInitializer::isFIPSEnabled()
+{
+#ifdef OPENSSL_FIPS
+	return FIPS_mode() ? true : false;
+#else
+	return false;
+#endif
+}
+
+
+inline void OpenSSLInitializer::enableFIPSMode(bool enabled)
+{
+#ifdef OPENSSL_FIPS
+	FIPS_mode_set(enabled);
+#endif
+}
 
 
 } } // namespace Poco::Crypto

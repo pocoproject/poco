@@ -1,7 +1,7 @@
 //
 // SSLManager.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#9 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -50,6 +50,9 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #include <openssl/ssl.h>
+#ifdef OPENSSL_FIPS
+#include <openssl/fips.h>
+#endif
 
 
 namespace Poco {
@@ -97,6 +100,7 @@ class NetSSL_API SSLManager
 	///            <sessionTimeout>0..n</sessionTimeout>           <!-- server only -->
 	///            <extendedVerification>true|false</extendedVerification>
 	///          </server|client>
+	///          <fips>false</fips>
 	///       </openSSL>
 	///    </AppConfig>
 	///
@@ -133,6 +137,8 @@ class NetSSL_API SSLManager
 	///    - sessionTimeout (integer):  Sets the timeout (in seconds) of cached sessions on the server.
 	///    - extendedVerification (boolean): Enable or disable the automatic post-connection
 	///      extended certificate verification.
+	///    - fips: Enable or disable OpenSSL FIPS mode. Only supported if the OpenSSL version 
+	///      that this library is built against supports FIPS mode.
 {
 public:
 	typedef Poco::SharedPtr<PrivateKeyPassphraseHandler> PrivateKeyPassphraseHandlerPtr;
@@ -216,6 +222,9 @@ public:
 		/// Returns the CertificateHandlerFactoryMgr which stores the 
 		/// factories for the different registered certificate handlers.
 
+	static bool isFIPSEnabled();
+		// Returns true if FIPS mode is enabled, false otherwise.
+
 	static const std::string CFG_SERVER_PREFIX;
 	static const std::string CFG_CLIENT_PREFIX;
 
@@ -291,6 +300,11 @@ private:
 	static const std::string CFG_SESSION_TIMEOUT;
 	static const std::string CFG_EXTENDED_VERIFICATION;
 
+#ifdef OPENSSL_FIPS
+	static const std::string CFG_FIPS_MODE;
+	static const bool        VAL_FIPS_MODE;
+#endif
+
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class Context;
 };
@@ -308,6 +322,16 @@ inline PrivateKeyFactoryMgr& SSLManager::privateKeyFactoryMgr()
 inline CertificateHandlerFactoryMgr& SSLManager::certificateHandlerFactoryMgr()
 {
 	return _certHandlerFactoryMgr;
+}
+
+
+inline bool SSLManager::isFIPSEnabled()
+{
+#ifdef OPENSSL_FIPS
+	return FIPS_mode() ? true : false;
+#else
+	return false;
+#endif
 }
 
 

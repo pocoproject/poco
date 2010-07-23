@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#13 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#14 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -74,6 +74,10 @@ const std::string SSLManager::CFG_SESSION_ID_CONTEXT("sessionIdContext");
 const std::string SSLManager::CFG_SESSION_CACHE_SIZE("sessionCacheSize");
 const std::string SSLManager::CFG_SESSION_TIMEOUT("sessionTimeout");
 const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
+#ifdef OPENSSL_FIPS
+const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
+const bool        SSLManager::VAL_FIPS_MODE(false);
+#endif
 
 
 SSLManager::SSLManager()
@@ -225,6 +229,15 @@ void SSLManager::initDefaultContext(bool server)
 	initEvents(server);
 
 	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
+
+#ifdef OPENSSL_FIPS
+	bool fipsEnabled = config.getBool(CFG_FIPS_MODE, VAL_FIPS_MODE);
+	if (fipsEnabled && !Poco::Crypto::OpenSSLInitializer::isFIPSEnabled())
+	{
+		Poco::Crypto::OpenSSLInitializer::enableFIPSMode(true);
+	}
+#endif
+
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 
 	// mandatory options

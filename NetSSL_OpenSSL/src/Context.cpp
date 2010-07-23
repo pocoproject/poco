@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#14 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#15 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -68,7 +68,14 @@ Context::Context(
 {
 	Poco::Crypto::OpenSSLInitializer::initialize();
 	
-	_pSSLContext = SSL_CTX_new(SSLv23_method());
+	if (SSLManager::isFIPSEnabled())
+	{
+		_pSSLContext = SSL_CTX_new(TLSv1_method());
+	}
+	else
+	{
+		_pSSLContext = SSL_CTX_new(SSLv23_method());
+	}
 	if (!_pSSLContext) 
 	{
 		unsigned long err = ERR_get_error();
@@ -153,7 +160,14 @@ Context::Context(
 {
 	Poco::Crypto::OpenSSLInitializer::initialize();
 	
-	_pSSLContext = SSL_CTX_new(SSLv23_method());
+	if (SSLManager::isFIPSEnabled())
+	{
+		_pSSLContext = SSL_CTX_new(TLSv1_method());
+	}
+	else
+	{
+		_pSSLContext = SSL_CTX_new(SSLv23_method());
+	}
 	if (!_pSSLContext) 
 	{
 		unsigned long err = ERR_get_error();
