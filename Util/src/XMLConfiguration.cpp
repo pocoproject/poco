@@ -1,7 +1,7 @@
 //
 // XMLConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/XMLConfiguration.cpp#3 $
+// $Id: //poco/1.3/Util/src/XMLConfiguration.cpp#4 $
 //
 // Library: Util
 // Package: Configuration
