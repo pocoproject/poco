@@ -1,7 +1,7 @@
 //
 // ConfigurationMapperTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/ConfigurationMapperTest.h#1 $
+// $Id: //poco/1.3/Util/testsuite/src/ConfigurationMapperTest.h#2 $
 //
 // Definition of the ConfigurationMapperTest class.
 //
@@ -36,16 +36,15 @@
 #define ConfigurationMapperTest_INCLUDED
 
 
+#include "AbstractConfigurationTest.h"
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
-#include "Poco/Util/AbstractConfiguration.h"
 
 
-class ConfigurationMapperTest: public CppUnit::TestCase
+class ConfigurationMapperTest: public AbstractConfigurationTest
 {
 public:
 	ConfigurationMapperTest(const std::string& name);
-	~ConfigurationMapperTest();
+	virtual ~ConfigurationMapperTest();
 
 	void testMapper1();
 	void testMapper2();
@@ -58,7 +57,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	Poco::Util::AbstractConfiguration* createConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
 };
 
 

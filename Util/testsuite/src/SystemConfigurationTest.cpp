@@ -1,7 +1,7 @@
 //
 // SystemConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/SystemConfigurationTest.cpp#2 $
+// $Id: //poco/1.3/Util/testsuite/src/SystemConfigurationTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -99,11 +99,12 @@ void SystemConfigurationTest::testKeys()
 	assert (std::find(keys.begin(), keys.end(), "system") != keys.end());
 
 	pConf->keys("system", keys);
-	assert (keys.size() == 10);
+	assert (keys.size() == 11);
 	assert (std::find(keys.begin(), keys.end(), "osName") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "osVersion") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "osArchitecture") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "nodeName") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "nodeId") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "currentDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "homeDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "tempDir") != keys.end());

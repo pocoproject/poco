@@ -1,7 +1,7 @@
 //
 // FilesystemConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/FilesystemConfigurationTest.h#1 $
+// $Id: //poco/1.3/Util/testsuite/src/FilesystemConfigurationTest.h#2 $
 //
 // Definition of the FilesystemConfigurationTest class.
 //
@@ -36,15 +36,16 @@
 #define FilesystemConfigurationTest_INCLUDED
 
 
+#include "AbstractConfigurationTest.h"
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/Path.h"
 
 
-class FilesystemConfigurationTest: public CppUnit::TestCase
+class FilesystemConfigurationTest: public AbstractConfigurationTest
 {
 public:
 	FilesystemConfigurationTest(const std::string& name);
-	~FilesystemConfigurationTest();
+	virtual ~FilesystemConfigurationTest();
 
 	void testFilesystemConfiguration();
 
@@ -54,6 +55,9 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
+
+	Poco::Path const _path;
 };
 
 

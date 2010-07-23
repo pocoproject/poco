@@ -1,7 +1,7 @@
 //
 // PropertyFileConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/PropertyFileConfigurationTest.cpp#2 $
+// $Id: //poco/1.3/Util/testsuite/src/PropertyFileConfigurationTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -46,7 +46,7 @@ using Poco::AutoPtr;
 using Poco::NotFoundException;
 
 
-PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& name): CppUnit::TestCase(name)
+PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -125,6 +125,12 @@ void PropertyFileConfigurationTest::testSave()
 }
 
 
+AbstractConfiguration* PropertyFileConfigurationTest::allocConfiguration() const
+{
+	return new PropertyFileConfiguration;
+}
+
+
 void PropertyFileConfigurationTest::setUp()
 {
 }
@@ -139,6 +145,7 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PropertyFileConfigurationTest");
 
+	AbstractConfigurationTest_addTests(pSuite, PropertyFileConfigurationTest);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSave);
 

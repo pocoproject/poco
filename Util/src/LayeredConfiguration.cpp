@@ -1,7 +1,7 @@
 //
 // LayeredConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/LayeredConfiguration.cpp#4 $
+// $Id: //poco/1.3/Util/src/LayeredConfiguration.cpp#5 $
 //
 // Library: Util
 // Package: Configuration
@@ -120,7 +120,7 @@ void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, boo
 }
 
 
-void LayeredConfiguration::remove(AbstractConfiguration* pConfig)
+void LayeredConfiguration::removeConfiguration(AbstractConfiguration* pConfig)
 {
 	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
 	{
@@ -172,6 +172,19 @@ void LayeredConfiguration::enumerate(const std::string& key, Keys& range) const
 				range.push_back(*itr);
 				keys.insert(*itr);
 			}
+		}
+	}
+}
+
+
+void LayeredConfiguration::removeRaw(const std::string& key)
+{
+	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
+	{
+		if (it->writeable)
+		{
+			it->pConfig->remove(key);
+			return;
 		}
 	}
 }

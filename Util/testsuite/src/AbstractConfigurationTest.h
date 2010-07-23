@@ -1,7 +1,7 @@
 //
 // AbstractConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/AbstractConfigurationTest.h#1 $
+// $Id: //poco/1.3/Util/testsuite/src/AbstractConfigurationTest.h#2 $
 //
 // Definition of the AbstractConfigurationTest class.
 //
@@ -38,6 +38,7 @@
 
 #include "Poco/Util/Util.h"
 #include "CppUnit/TestCase.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Util/AbstractConfiguration.h"
 
 
@@ -45,7 +46,7 @@ class AbstractConfigurationTest: public CppUnit::TestCase
 {
 public:
 	AbstractConfigurationTest(const std::string& name);
-	~AbstractConfigurationTest();
+	virtual ~AbstractConfigurationTest();
 
 	void testHasProperty();
 	void testGetString();
@@ -58,15 +59,32 @@ public:
 	void testSetDouble();
 	void testSetBool();
 	void testKeys();
+	void testRemove();
 	
 	void setUp();
 	void tearDown();
 
-	static CppUnit::Test* suite();
-
-private:
-	Poco::Util::AbstractConfiguration* createConfiguration() const;
+protected:
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const = 0;
+	virtual Poco::AutoPtr<Poco::Util::AbstractConfiguration> createConfiguration() const;
 };
+
+
+#define AbstractConfigurationTest_addTests(suite, cls) \
+	do { \
+		CppUnit_addTest(suite, cls, testHasProperty); \
+		CppUnit_addTest(suite, cls, testGetString); \
+		CppUnit_addTest(suite, cls, testGetInt); \
+		CppUnit_addTest(suite, cls, testGetDouble); \
+		CppUnit_addTest(suite, cls, testGetBool); \
+		CppUnit_addTest(suite, cls, testExpand); \
+		CppUnit_addTest(suite, cls, testSetString); \
+		CppUnit_addTest(suite, cls, testSetInt); \
+		CppUnit_addTest(suite, cls, testSetDouble); \
+		CppUnit_addTest(suite, cls, testSetBool); \
+		CppUnit_addTest(suite, cls, testKeys); \
+		CppUnit_addTest(suite, cls, testRemove); \
+	} while(0)
 
 
 #endif // AbstractConfigurationTest_INCLUDED

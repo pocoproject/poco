@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/AbstractConfiguration.cpp#2 $
+// $Id: //poco/1.3/Util/src/AbstractConfiguration.cpp#3 $
 //
 // Library: Util
 // Package: Configuration
@@ -75,6 +75,12 @@ bool AbstractConfiguration::hasProperty(const std::string& key) const
 
 
 bool AbstractConfiguration::hasOption(const std::string& key) const
+{
+	return hasProperty(key);
+}
+
+
+bool AbstractConfiguration::has(const std::string& key) const
 {
 	return hasProperty(key);
 }
@@ -289,6 +295,20 @@ std::string AbstractConfiguration::expand(const std::string& value) const
 	FastMutex::ScopedLock lock(_mutex);
 
 	return internalExpand(value);
+}
+
+
+void AbstractConfiguration::remove(const std::string& key)
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	removeRaw(key);
+}
+
+
+void AbstractConfiguration::removeRaw(const std::string& key)
+{
+	throw Poco::NotImplementedException("removeRaw()");
 }
 
 

@@ -1,7 +1,7 @@
 //
 // WinRegistryConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/WinRegistryConfiguration.cpp#4 $
+// $Id: //poco/1.3/Util/src/WinRegistryConfiguration.cpp#5 $
 //
 // Library: Util
 // Package: Windows
@@ -38,6 +38,7 @@
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -116,6 +117,12 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 		aKey.values(range);
 		aKey.subKeys(range);
 	}
+}
+
+
+void WinRegistryConfiguration::removeRaw(const std::string& key)
+{
+	throw Poco::NotImplementedException("Removing a key in a WinRegistryConfiguration");
 }
 
 

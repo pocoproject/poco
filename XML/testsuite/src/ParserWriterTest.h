@@ -1,7 +1,7 @@
 //
 // ParserWriterTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/ParserWriterTest.h#2 $
+// $Id: //poco/1.3/XML/testsuite/src/ParserWriterTest.h#3 $
 //
 // Definition of the ParserWriterTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testParseWriteXHTML();
 	void testParseWriteXHTML2();
 	void testParseWriteWSDL();
+	void testParseWriteSimple();
 
 	void setUp();
 	void tearDown();

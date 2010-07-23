@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/AbstractConfiguration.h#1 $
+// $Id: //poco/1.3/Util/include/Poco/Util/AbstractConfiguration.h#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -76,6 +76,12 @@ public:
 
 	bool hasOption(const std::string& key) const;
 		/// Returns true iff the property with the given key exists.
+		///
+		/// Same as hasProperty().
+
+	bool has(const std::string& key) const;
+		/// Returns true iff the property with the given key exists.
+		///
 		/// Same as hasProperty().
 		
 	std::string getString(const std::string& key) const;
@@ -190,6 +196,11 @@ public:
 		///
 		/// If a circular property reference is detected, a
 		/// CircularReferenceException will be thrown.
+
+	void remove(const std::string& key);
+		/// Removes the property with the given key.
+		///
+		/// Does nothing if the key does not exist.
 	
 protected:
 	virtual bool getRaw(const std::string& key, std::string& value) const = 0;
@@ -207,6 +218,14 @@ protected:
 	virtual void enumerate(const std::string& key, Keys& range) const = 0;
 		/// Returns in range the names of all subkeys under the given key.
 		/// If an empty key is passed, all root level keys are returned.
+		
+	virtual void removeRaw(const std::string& key);
+		/// Removes the property with the given key.
+		///
+		/// Does nothing if the key does not exist.
+		///
+		/// Should be overridden by subclasses; the default
+		/// implementation throws a Poco::NotImplementedException.
 
 	static int parseInt(const std::string& value);
 	static bool parseBool(const std::string& value);

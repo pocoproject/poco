@@ -1,7 +1,7 @@
 //
 // MapConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/MapConfigurationTest.h#1 $
+// $Id: //poco/1.3/Util/testsuite/src/MapConfigurationTest.h#2 $
 //
 // Definition of the MapConfigurationTest class.
 //
@@ -36,15 +36,15 @@
 #define MapConfigurationTest_INCLUDED
 
 
+#include "AbstractConfigurationTest.h"
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
 
 
-class MapConfigurationTest: public CppUnit::TestCase
+class MapConfigurationTest: public AbstractConfigurationTest
 {
 public:
 	MapConfigurationTest(const std::string& name);
-	~MapConfigurationTest();
+	virtual ~MapConfigurationTest();
 
 	void testClear();
 
@@ -54,6 +54,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
 };
 
 

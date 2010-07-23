@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.h#2 $
+// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.h#3 $
 //
 // Definition of the XMLConfigurationTest class.
 //
@@ -36,18 +36,19 @@
 #define XMLConfigurationTest_INCLUDED
 
 
+#include "AbstractConfigurationTest.h"
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
 
 
-class XMLConfigurationTest: public CppUnit::TestCase
+class XMLConfigurationTest: public AbstractConfigurationTest
 {
 public:
 	XMLConfigurationTest(const std::string& name);
-	~XMLConfigurationTest();
+	virtual ~XMLConfigurationTest();
 
 	void testLoad();
 	void testSave();
+	void testLoadAppendSave();
 
 	void setUp();
 	void tearDown();
@@ -55,6 +56,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
 };
 
 

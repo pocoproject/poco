@@ -1,7 +1,7 @@
 //
 // IniFileConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/IniFileConfigurationTest.h#1 $
+// $Id: //poco/1.3/Util/testsuite/src/IniFileConfigurationTest.h#2 $
 //
 // Definition of the IniFileConfigurationTest class.
 //
@@ -36,17 +36,18 @@
 #define IniFileConfigurationTest_INCLUDED
 
 
+#include "AbstractConfigurationTest.h"
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
 
 
-class IniFileConfigurationTest: public CppUnit::TestCase
+class IniFileConfigurationTest: public AbstractConfigurationTest
 {
 public:
 	IniFileConfigurationTest(const std::string& name);
-	~IniFileConfigurationTest();
+	virtual ~IniFileConfigurationTest();
 
 	void testLoad();
+	void testCaseInsensitiveRemove();
 
 	void setUp();
 	void tearDown();
@@ -54,6 +55,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
 };
 
 

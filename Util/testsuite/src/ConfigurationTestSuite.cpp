@@ -1,7 +1,7 @@
 //
 // ConfigurationTestSuite.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/ConfigurationTestSuite.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/ConfigurationTestSuite.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -48,7 +48,6 @@ CppUnit::Test* ConfigurationTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ConfigurationTestSuite");
 
-	pSuite->addTest(AbstractConfigurationTest::suite());
 	pSuite->addTest(ConfigurationViewTest::suite());
 	pSuite->addTest(ConfigurationMapperTest::suite());
 	pSuite->addTest(MapConfigurationTest::suite());

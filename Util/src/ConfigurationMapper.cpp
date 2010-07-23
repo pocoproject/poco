@@ -1,7 +1,7 @@
 //
 // ConfigurationMapper.cpp
 //
-// $Id: //poco/1.3/Util/src/ConfigurationMapper.cpp#1 $
+// $Id: //poco/1.3/Util/src/ConfigurationMapper.cpp#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -101,6 +101,13 @@ void ConfigurationMapper::enumerate(const std::string& key, Keys& range) const
 		else translatedKey = translateKey(key);
 		_pConfig->enumerate(translatedKey, range);
 	}
+}
+
+
+void ConfigurationMapper::removeRaw(const std::string& key)
+{
+	std::string translatedKey = translateKey(key);
+	_pConfig->remove(translatedKey);
 }
 
 

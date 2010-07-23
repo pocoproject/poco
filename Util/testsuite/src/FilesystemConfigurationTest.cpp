@@ -1,7 +1,7 @@
 //
 // FilesystemConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/FilesystemConfigurationTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/FilesystemConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,6 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Util/FilesystemConfiguration.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/File.h"
 #include <algorithm>
 
 
@@ -43,7 +44,8 @@ using Poco::Util::AbstractConfiguration;
 using Poco::AutoPtr;
 
 
-FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& name): CppUnit::TestCase(name)
+FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& name): AbstractConfigurationTest(name),
+	_path("TestConfiguration")
 {
 }
 
@@ -55,7 +57,7 @@ FilesystemConfigurationTest::~FilesystemConfigurationTest()
 
 void FilesystemConfigurationTest::testFilesystemConfiguration()
 {
-	AutoPtr<FilesystemConfiguration> config = new FilesystemConfiguration("TestConfiguration");
+	AutoPtr<FilesystemConfiguration> config = new FilesystemConfiguration(_path.toString());
 	
 	config->setString("logging.loggers.root.channel.class", "ConsoleChannel");
 	config->setString("logging.loggers.app.name", "Application");
@@ -99,13 +101,27 @@ void FilesystemConfigurationTest::testFilesystemConfiguration()
 }
 
 
+AbstractConfiguration* FilesystemConfigurationTest::allocConfiguration() const
+{
+	return new FilesystemConfiguration(_path.toString());
+}
+
+
 void FilesystemConfigurationTest::setUp()
 {
+	Poco::File dir(_path);
+	if (dir.exists()) {
+		dir.remove(true);
+	}
 }
 
 
 void FilesystemConfigurationTest::tearDown()
 {
+	Poco::File dir(_path);
+	if (dir.exists()) {
+		dir.remove(true);
+	}
 }
 
 
@@ -113,6 +129,7 @@ CppUnit::Test* FilesystemConfigurationTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FilesystemConfigurationTest");
 
+	AbstractConfigurationTest_addTests(pSuite, FilesystemConfigurationTest);
 	CppUnit_addTest(pSuite, FilesystemConfigurationTest, testFilesystemConfiguration);
 
 	return pSuite;

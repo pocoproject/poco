@@ -1,7 +1,7 @@
 //
 // IniFileConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/IniFileConfiguration.cpp#5 $
+// $Id: //poco/1.3/Util/src/IniFileConfiguration.cpp#6 $
 //
 // Library: Util
 // Package: Configuration
@@ -109,7 +109,7 @@ bool IniFileConfiguration::getRaw(const std::string& key, std::string& value) co
 
 void IniFileConfiguration::setRaw(const std::string& key, const std::string& value)
 {
-	throw Poco::NotImplementedException("Setting a property in an IniFileConfiguration");
+	_map[key] = value;
 }
 
 
@@ -134,6 +134,24 @@ void IniFileConfiguration::enumerate(const std::string& key, Keys& range) const
 				range.push_back(subKey);
 				keys.insert(subKey);
 			}
+		}
+	}
+}
+
+
+void IniFileConfiguration::removeRaw(const std::string& key)
+{
+	std::string prefix = key;
+	if (!prefix.empty()) prefix += '.';
+	std::string::size_type psize = prefix.size();
+	IStringMap::iterator it = _map.begin();
+	IStringMap::iterator itCur;
+	while (it != _map.end())
+	{
+		itCur = it++;
+		if ((icompare(itCur->first, key) == 0) || (icompare(itCur->first, psize, prefix) == 0))
+		{
+			_map.erase(itCur);
 		}
 	}
 }

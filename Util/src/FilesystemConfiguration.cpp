@@ -1,7 +1,7 @@
 //
 // FilesystemConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/FilesystemConfiguration.cpp#3 $
+// $Id: //poco/1.3/Util/src/FilesystemConfiguration.cpp#4 $
 //
 // Library: Util
 // Package: Configuration
@@ -39,7 +39,6 @@
 #include "Poco/Path.h"
 #include "Poco/DirectoryIterator.h"
 #include "Poco/StringTokenizer.h"
-#include "Poco/Exception.h"
 #include "Poco/FileStream.h"
 
 
@@ -47,7 +46,6 @@ using Poco::Path;
 using Poco::File;
 using Poco::DirectoryIterator;
 using Poco::StringTokenizer;
-using Poco::NotFoundException;
 
 
 namespace Poco {
@@ -107,13 +105,31 @@ void FilesystemConfiguration::setRaw(const std::string& key, const std::string& 
 
 void FilesystemConfiguration::enumerate(const std::string& key, Keys& range) const
 {
-	DirectoryIterator it(keyToPath(key));
+	Path p(keyToPath(key));
+	File dir(p);
+	if (!dir.exists())
+	{
+		return;
+	}
+
+	DirectoryIterator it(p);
 	DirectoryIterator end;
 	while (it != end)
 	{
 		 if (it->isDirectory())
 			range.push_back(it.name());
 		++it;
+	}
+}
+
+
+void FilesystemConfiguration::removeRaw(const std::string& key)
+{
+	Path p(keyToPath(key));
+	File dir(p);
+	if (dir.exists())
+	{
+		dir.remove(true);
 	}
 }
 

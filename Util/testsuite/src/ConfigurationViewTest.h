@@ -1,7 +1,7 @@
 //
 // ConfigurationViewTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/ConfigurationViewTest.h#1 $
+// $Id: //poco/1.3/Util/testsuite/src/ConfigurationViewTest.h#2 $
 //
 // Definition of the ConfigurationViewTest class.
 //
@@ -36,16 +36,15 @@
 #define ConfigurationViewTest_INCLUDED
 
 
+#include "AbstractConfigurationTest.h"
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
-#include "Poco/Util/AbstractConfiguration.h"
 
 
-class ConfigurationViewTest: public CppUnit::TestCase
+class ConfigurationViewTest: public AbstractConfigurationTest
 {
 public:
 	ConfigurationViewTest(const std::string& name);
-	~ConfigurationViewTest();
+	virtual ~ConfigurationViewTest();
 
 	void testView();
 
@@ -55,7 +54,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	Poco::Util::AbstractConfiguration* createConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
 };
 
 

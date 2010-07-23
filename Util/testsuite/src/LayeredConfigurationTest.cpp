@@ -1,7 +1,7 @@
 //
 // LayeredConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/LayeredConfigurationTest.cpp#3 $
+// $Id: //poco/1.3/Util/testsuite/src/LayeredConfigurationTest.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -48,7 +48,7 @@ using Poco::NotFoundException;
 using Poco::RuntimeException;
 
 
-LayeredConfigurationTest::LayeredConfigurationTest(const std::string& name): CppUnit::TestCase(name)
+LayeredConfigurationTest::LayeredConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -108,6 +108,9 @@ void LayeredConfigurationTest::testOneLayer()
 
 	pLC->setString("prop3", "value3");
 	assert (pLC->getString("prop3") == "value3");
+
+	pLC->remove("prop3");
+	assert (!pLC->hasProperty("prop3"));
 }
 
 
@@ -145,6 +148,10 @@ void LayeredConfigurationTest::testTwoLayers()
 	pLC->setString("prop1", "value11");
 	assert (pLC->getString("prop1") == "value1");
 	assert (pMC2->getString("prop1") == "value11");
+
+	pLC->remove("prop1");
+	assert (pLC->getString("prop1") == "value1");
+	assert (!pMC2->hasProperty("prop1"));
 }
 
 
@@ -200,13 +207,26 @@ void LayeredConfigurationTest::testRemove()
 	assert (pLC->getString("prop2") == "value3");
 	assert (pLC->getString("prop3") == "value4");
 
-	pLC->remove(pMC2);
+	pLC->removeConfiguration(pMC2);
 	keys.clear();
 	pLC->keys(keys);
 	assert (keys.size() == 2);
 	
 	assert (pLC->getString("prop1") == "value1");
 	assert (pLC->getString("prop2") == "value2");
+}
+
+
+AbstractConfiguration* LayeredConfigurationTest::allocConfiguration() const
+{
+	LayeredConfiguration* pLC = new LayeredConfiguration;
+	AutoPtr<MapConfiguration> pMC1 = new MapConfiguration;
+	AutoPtr<MapConfiguration> pMC2 = new MapConfiguration;
+
+	pLC->add(pMC1, 0);
+	pLC->addWriteable(pMC2, 1);
+
+	return pLC;
 }
 
 
@@ -224,6 +244,7 @@ CppUnit::Test* LayeredConfigurationTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("LayeredConfigurationTest");
 
+	AbstractConfigurationTest_addTests(pSuite, LayeredConfigurationTest);
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testEmpty);
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testOneLayer);
 	CppUnit_addTest(pSuite, LayeredConfigurationTest, testTwoLayers);

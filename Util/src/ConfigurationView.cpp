@@ -1,7 +1,7 @@
 //
 // ConfigurationView.cpp
 //
-// $Id: //poco/1.3/Util/src/ConfigurationView.cpp#1 $
+// $Id: //poco/1.3/Util/src/ConfigurationView.cpp#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -75,6 +75,13 @@ void ConfigurationView::enumerate(const std::string& key, Keys& range) const
 {
 	std::string translatedKey = translateKey(key);
 	_pConfig->enumerate(translatedKey, range);
+}
+
+
+void ConfigurationView::removeRaw(const std::string& key)
+{
+	std::string translatedKey = translateKey(key);
+	_pConfig->remove(translatedKey);
 }
 
 

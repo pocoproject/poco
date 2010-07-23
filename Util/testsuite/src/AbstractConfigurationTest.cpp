@@ -1,7 +1,7 @@
 //
 // AbstractConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/AbstractConfigurationTest.cpp#2 $
+// $Id: //poco/1.3/Util/testsuite/src/AbstractConfigurationTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,7 +32,6 @@
 
 #include "AbstractConfigurationTest.h"
 #include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
@@ -248,7 +247,7 @@ void AbstractConfigurationTest::testKeys()
 
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
-	assert (keys.size() == 12);
+	assert (keys.size() == 13);
 	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
@@ -269,12 +268,55 @@ void AbstractConfigurationTest::testKeys()
 	assert (keys.size() == 2);
 	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "string2") != keys.end());
+
+	assert (!pConf->hasProperty("nonexistent.sub"));
+	pConf->keys("nonexistent.sub", keys);
+	assert (keys.empty());
 }
 
 
-AbstractConfiguration* AbstractConfigurationTest::createConfiguration() const
+void AbstractConfigurationTest::testRemove()
 {
-	AbstractConfiguration* pConfig = new MapConfiguration;
+	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
+	AbstractConfiguration::Keys keys;
+
+	assert (pConf->hasProperty("prop1"));
+	assert (pConf->hasProperty("prop4.bool1"));
+	assert (pConf->hasProperty("prop4.bool2"));
+	assert (pConf->hasProperty("prop4.bool3"));
+	pConf->keys(keys);
+	assert (keys.size() == 13);
+	pConf->keys("prop4", keys);
+	assert (keys.size() == 13);
+
+	pConf->remove("prop4.bool1");
+	assert (!pConf->hasProperty("prop4.bool1"));
+	assert (pConf->hasProperty("prop4.bool2"));
+	assert (pConf->hasProperty("prop4.bool3"));
+	pConf->keys(keys);
+	assert (keys.size() == 13);
+	pConf->keys("prop4", keys);
+	assert (keys.size() == 12);
+
+	pConf->remove("prop4");
+	assert (!pConf->hasProperty("prop4.bool1"));
+	assert (!pConf->hasProperty("prop4.bool2"));
+	assert (!pConf->hasProperty("prop4.bool3"));
+	assert (pConf->hasProperty("prop1"));
+	pConf->keys(keys);
+	assert (keys.size() == 12);
+	pConf->keys("prop4", keys);
+	assert (keys.size() == 0);
+
+	assert (!pConf->hasProperty("nonexistent.sub.value"));
+	pConf->remove("nonexistent.sub.value");
+	assert (!pConf->hasProperty("nonexistent.sub.value"));
+}
+
+
+Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfiguration() const
+{
+	Poco::AutoPtr<AbstractConfiguration> pConfig = allocConfiguration();
 	
 	pConfig->setString("prop1", "foo");
 	pConfig->setString("prop2", "bar");
@@ -293,6 +335,12 @@ AbstractConfiguration* AbstractConfigurationTest::createConfiguration() const
 	pConfig->setString("prop4.bool6", "no");
 	pConfig->setString("prop4.bool7", "ON");
 	pConfig->setString("prop4.bool8", "Off");
+	pConfig->setString("prop5.string1", "foo");
+	pConfig->setString("prop5.string2", "bar");
+	pConfig->setString("prop5.sub1.string1", "FOO");
+	pConfig->setString("prop5.sub1.string2", "BAR");
+	pConfig->setString("prop5.sub2.string1", "Foo");
+	pConfig->setString("prop5.sub2.string2", "Bar");
 	pConfig->setString("ref1", "${prop3.string1}${prop3.string2}");
 	pConfig->setString("ref2", "${prop4.int1}");
 	pConfig->setString("ref3", "${ref4}");
@@ -314,24 +362,4 @@ void AbstractConfigurationTest::setUp()
 
 void AbstractConfigurationTest::tearDown()
 {
-}
-
-
-CppUnit::Test* AbstractConfigurationTest::suite()
-{
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("AbstractConfigurationTest");
-
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testHasProperty);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testGetString);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testGetInt);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testGetDouble);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testGetBool);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testExpand);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testSetString);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testSetInt);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testSetDouble);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testSetBool);
-	CppUnit_addTest(pSuite, AbstractConfigurationTest, testKeys);
-
-	return pSuite;
 }

@@ -1,7 +1,7 @@
 //
 // SystemConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/SystemConfiguration.cpp#3 $
+// $Id: //poco/1.3/Util/src/SystemConfiguration.cpp#4 $
 //
 // Library: Util
 // Package: Configuration
@@ -163,6 +163,7 @@ void SystemConfiguration::enumerate(const std::string& key, Keys& range) const
 		range.push_back("osVersion");
 		range.push_back("osArchitecture");
 		range.push_back("nodeName");
+		range.push_back("nodeId");
 		range.push_back("currentDir");
 		range.push_back("homeDir");
 		range.push_back("tempDir");
@@ -170,6 +171,12 @@ void SystemConfiguration::enumerate(const std::string& key, Keys& range) const
 		range.push_back("pid");
 		range.push_back("env");
 	}
+}
+
+
+void SystemConfiguration::removeRaw(const std::string& key)
+{
+	throw Poco::NotImplementedException("Removing a key in a SystemConfiguration");
 }
 
 

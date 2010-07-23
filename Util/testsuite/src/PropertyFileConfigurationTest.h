@@ -1,7 +1,7 @@
 //
 // PropertyFileConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/PropertyFileConfigurationTest.h#1 $
+// $Id: //poco/1.3/Util/testsuite/src/PropertyFileConfigurationTest.h#2 $
 //
 // Definition of the PropertyFileConfigurationTest class.
 //
@@ -36,15 +36,15 @@
 #define PropertyFileConfigurationTest_INCLUDED
 
 
+#include "AbstractConfigurationTest.h"
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
 
 
-class PropertyFileConfigurationTest: public CppUnit::TestCase
+class PropertyFileConfigurationTest: public AbstractConfigurationTest
 {
 public:
 	PropertyFileConfigurationTest(const std::string& name);
-	~PropertyFileConfigurationTest();
+	virtual ~PropertyFileConfigurationTest();
 
 	void testLoad();
 	void testSave();
@@ -55,6 +55,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
 };
 
 

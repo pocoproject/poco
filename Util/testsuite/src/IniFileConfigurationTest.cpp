@@ -1,7 +1,7 @@
 //
 // IniFileConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/IniFileConfigurationTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/IniFileConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -47,7 +47,7 @@ using Poco::NotImplementedException;
 using Poco::NotFoundException;
 
 
-IniFileConfigurationTest::IniFileConfigurationTest(const std::string& name): CppUnit::TestCase(name)
+IniFileConfigurationTest::IniFileConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -98,23 +98,59 @@ void IniFileConfigurationTest::testLoad()
 	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	
-	try
-	{
-		pConf->setString("foo", "bar");
-		fail("Not supported - must throw");
-	}
-	catch (NotImplementedException&)
-	{
-	}
-	
-	try
-	{
-		std::string s = pConf->getString("foo");
-		fail("No property - must throw");
-	}
-	catch (NotFoundException&)
-	{
-	}
+	pConf->setString("prop1", "value11");
+	assert (pConf->getString("PROP1") == "value11");
+	pConf->setString("Prop1", "value12");
+	assert (pConf->getString("prop1") == "value12");
+	pConf->keys(keys);
+	assert (keys.size() == 4);
+	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "section1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "section 2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "Prop1") == keys.end());
+}
+
+
+void IniFileConfigurationTest::testCaseInsensitiveRemove()
+{
+	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
+	AbstractConfiguration::Keys keys;
+
+	assert (pConf->hasProperty("Prop1"));
+	assert (pConf->hasProperty("prop4.BOOL1"));
+	assert (pConf->hasProperty("Prop4.bool2"));
+	assert (pConf->hasProperty("PROP4.Bool3"));
+	pConf->keys(keys);
+	assert (keys.size() == 13);
+	pConf->keys("prop4", keys);
+	assert (keys.size() == 13);
+
+	pConf->remove("PROP4.Bool1");
+	assert (pConf->hasProperty("Prop1"));
+	assert (!pConf->hasProperty("prop4.BOOL1"));
+	assert (pConf->hasProperty("Prop4.bool2"));
+	assert (pConf->hasProperty("PROP4.Bool3"));
+	pConf->keys(keys);
+	assert (keys.size() == 13);
+	pConf->keys("PROP4", keys);
+	assert (keys.size() == 12);
+
+	pConf->remove("Prop4");
+	assert (pConf->hasProperty("Prop1"));
+	assert (!pConf->hasProperty("prop4.BOOL1"));
+	assert (!pConf->hasProperty("Prop4.bool2"));
+	assert (!pConf->hasProperty("PROP4.Bool3"));
+	pConf->keys(keys);
+	assert (keys.size() == 12);
+	pConf->keys("prop4", keys);
+	assert (keys.size() == 0);
+}
+
+
+AbstractConfiguration* IniFileConfigurationTest::allocConfiguration() const
+{
+	return new IniFileConfiguration;
 }
 
 
@@ -132,7 +168,9 @@ CppUnit::Test* IniFileConfigurationTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("IniFileConfigurationTest");
 
+	AbstractConfigurationTest_addTests(pSuite, IniFileConfigurationTest);
 	CppUnit_addTest(pSuite, IniFileConfigurationTest, testLoad);
+	CppUnit_addTest(pSuite, IniFileConfigurationTest, testCaseInsensitiveRemove);
 
 	return pSuite;
 }

@@ -1,7 +1,7 @@
 //
 // ConfigurationMapperTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/ConfigurationMapperTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/ConfigurationMapperTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -46,7 +46,7 @@ using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
 
 
-ConfigurationMapperTest::ConfigurationMapperTest(const std::string& name): CppUnit::TestCase(name)
+ConfigurationMapperTest::ConfigurationMapperTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -60,36 +60,41 @@ void ConfigurationMapperTest::testMapper1()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 	AutoPtr<AbstractConfiguration> pMapper = new ConfigurationMapper("", "", pConf);
-	assert (pMapper->hasProperty("config.value1"));
-	assert (pMapper->hasProperty("config.value2"));
+	assert (pMapper->hasProperty("prop5.string1"));
+	assert (pMapper->hasProperty("prop5.string1"));
 
 	AbstractConfiguration::Keys keys;
 	pMapper->keys(keys);
-	assert (keys.size() == 1);
-	assert (std::find(keys.begin(), keys.end(), "config") != keys.end());
+	assert (keys.size() == 13);
+	assert (std::find(keys.begin(), keys.end(), "prop5") != keys.end());
 
-	pMapper->keys("config", keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "value1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "value2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "sub") != keys.end());
+	pMapper->keys("prop5", keys);
+	assert (keys.size() == 4);
+	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "string2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
 	
-	assert (pMapper->getString("config.value1") == "v1");
-	assert (pMapper->getString("config.sub.value2") == "v4");
+	assert (pMapper->getString("prop5.string1") == "foo");
+	assert (pMapper->getString("prop5.sub1.string1") == "FOO");
 	
-	pMapper->setString("config.value3", "v5");
-	assert (pMapper->getString("config.value3") == "v5");
-	assert (pConf->getString("config.value3") == "v5");
+	pMapper->setString("prop5.string3", "baz");
+	assert (pMapper->getString("prop5.string3") == "baz");
+	assert (pConf->getString("prop5.string3") == "baz");
+
+	pMapper->remove("prop5.string3");
+	assert (!pMapper->hasProperty("prop5.string3"));
+	assert (!pConf->hasProperty("prop5.string3"));
 }
 
 
 void ConfigurationMapperTest::testMapper2()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
-	AutoPtr<AbstractConfiguration> pMapper = new ConfigurationMapper("config", "root.conf", pConf);
+	AutoPtr<AbstractConfiguration> pMapper = new ConfigurationMapper("prop5", "root.conf", pConf);
 
-	assert (pMapper->hasProperty("root.conf.value1"));
-	assert (pMapper->hasProperty("root.conf.value2"));
+	assert (pMapper->hasProperty("root.conf.string1"));
+	assert (pMapper->hasProperty("root.conf.string2"));
 
 	AbstractConfiguration::Keys keys;
 	pMapper->keys(keys);
@@ -101,17 +106,22 @@ void ConfigurationMapperTest::testMapper2()
 	assert (std::find(keys.begin(), keys.end(), "conf") != keys.end());
 
 	pMapper->keys("root.conf", keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "value1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "value2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "sub") != keys.end());
+	assert (keys.size() == 4);
+	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "string2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
 
-	assert (pMapper->getString("root.conf.value1") == "v1");
-	assert (pMapper->getString("root.conf.sub.value2") == "v4");
+	assert (pMapper->getString("root.conf.string1") == "foo");
+	assert (pMapper->getString("root.conf.sub1.string1") == "FOO");
 	
-	pMapper->setString("root.conf.value3", "v5");
-	assert (pMapper->getString("root.conf.value3") == "v5");
-	assert (pConf->getString("config.value3") == "v5");
+	pMapper->setString("root.conf.string3", "baz");
+	assert (pMapper->getString("root.conf.string3") == "baz");
+	assert (pConf->getString("prop5.string3") == "baz");
+
+	pMapper->remove("root.conf.string3");
+	assert (!pMapper->hasProperty("root.conf.string3"));
+	assert (!pConf->hasProperty("prop5.string3"));
 }
 
 
@@ -120,8 +130,8 @@ void ConfigurationMapperTest::testMapper3()
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 	AutoPtr<AbstractConfiguration> pMapper = new ConfigurationMapper("", "root", pConf);
 
-	assert (pMapper->hasProperty("root.config.value1"));
-	assert (pMapper->hasProperty("root.config.value2"));
+	assert (pMapper->hasProperty("root.prop5.string1"));
+	assert (pMapper->hasProperty("root.prop5.string2"));
 
 	AbstractConfiguration::Keys keys;
 	pMapper->keys(keys);
@@ -129,58 +139,61 @@ void ConfigurationMapperTest::testMapper3()
 	assert (std::find(keys.begin(), keys.end(), "root") != keys.end());
 
 	pMapper->keys("root", keys);
-	assert (keys.size() == 1);
-	assert (std::find(keys.begin(), keys.end(), "config") != keys.end());
+	assert (keys.size() == 13);
+	assert (std::find(keys.begin(), keys.end(), "prop5") != keys.end());
 
-	pMapper->keys("root.config", keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "value1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "value2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "sub") != keys.end());
+	pMapper->keys("root.prop5", keys);
+	assert (keys.size() == 4);
+	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "string2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
 	
-	assert (pMapper->getString("root.config.value1") == "v1");
-	assert (pMapper->getString("root.config.sub.value2") == "v4");
+	assert (pMapper->getString("root.prop5.string1") == "foo");
+	assert (pMapper->getString("root.prop5.sub1.string1") == "FOO");
 	
-	pMapper->setString("root.config.value3", "v5");
-	assert (pMapper->getString("root.config.value3") == "v5");
-	assert (pConf->getString("config.value3") == "v5");
+	pMapper->setString("root.prop5.string3", "baz");
+	assert (pMapper->getString("root.prop5.string3") == "baz");
+	assert (pConf->getString("prop5.string3") == "baz");
+
+	pMapper->remove("root.prop5.string3");
+	assert (!pMapper->hasProperty("root.prop5.string3"));
+	assert (!pConf->hasProperty("prop5.string3"));
 }
 
 
 void ConfigurationMapperTest::testMapper4()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
-	AutoPtr<AbstractConfiguration> pMapper = new ConfigurationMapper("config", "", pConf);
+	AutoPtr<AbstractConfiguration> pMapper = new ConfigurationMapper("prop5", "", pConf);
 
-	assert (pMapper->hasProperty("value1"));
-	assert (pMapper->hasProperty("value2"));
+	assert (pMapper->hasProperty("string1"));
+	assert (pMapper->hasProperty("string2"));
 
 	AbstractConfiguration::Keys keys;
 	pMapper->keys(keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "value1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "value2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "sub") != keys.end());
+	assert (keys.size() == 4);
+	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "string2") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
 	
-	assert (pMapper->getString("value1") == "v1");
-	assert (pMapper->getString("sub.value2") == "v4");
+	assert (pMapper->getString("string1") == "foo");
+	assert (pMapper->getString("sub1.string1") == "FOO");
 	
-	pMapper->setString("value3", "v5");
-	assert (pMapper->getString("value3") == "v5");
-	assert (pConf->getString("config.value3") == "v5");
+	pMapper->setString("string3", "baz");
+	assert (pMapper->getString("string3") == "baz");
+	assert (pConf->getString("prop5.string3") == "baz");
+
+	pMapper->remove("string3");
+	assert (!pMapper->hasProperty("string3"));
+	assert (!pConf->hasProperty("prop5.string3"));
 }
 
 
-AbstractConfiguration* ConfigurationMapperTest::createConfiguration() const
+AbstractConfiguration* ConfigurationMapperTest::allocConfiguration() const
 {
-	AbstractConfiguration* pConfig = new MapConfiguration;
-	
-	pConfig->setString("config.value1", "v1");
-	pConfig->setString("config.value2", "v2");
-	pConfig->setString("config.sub.value1", "v3");
-	pConfig->setString("config.sub.value2", "v4");
-	
-	return pConfig;
+	return new MapConfiguration;
 }
 
 
@@ -198,6 +211,7 @@ CppUnit::Test* ConfigurationMapperTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ConfigurationMapperTest");
 
+	AbstractConfigurationTest_addTests(pSuite, ConfigurationMapperTest);
 	CppUnit_addTest(pSuite, ConfigurationMapperTest, testMapper1);
 	CppUnit_addTest(pSuite, ConfigurationMapperTest, testMapper2);
 	CppUnit_addTest(pSuite, ConfigurationMapperTest, testMapper3);

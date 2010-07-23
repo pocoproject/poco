@@ -1,7 +1,7 @@
 //
 // ParserWriterTest.cpp
 //
-// $Id: //poco/1.3/XML/testsuite/src/ParserWriterTest.cpp#3 $
+// $Id: //poco/1.3/XML/testsuite/src/ParserWriterTest.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,6 +36,7 @@
 #include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/XML/XMLWriter.h"
@@ -91,6 +92,40 @@ void ParserWriterTest::testParseWriteXHTML2()
 }
 
 
+void ParserWriterTest::testParseWriteSimple()
+{
+	static const std::string simple =
+		"<config>\n"
+		"\t<prop1>value1</prop1>\n"
+		"\t<prop2>value2</prop2>\n"
+		"</config>\n";
+
+	std::istringstream istr(simple);
+	std::ostringstream ostr;
+
+	DOMParser parser;
+	parser.setFeature(DOMParser::FEATURE_FILTER_WHITESPACE, true);
+	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
+	DOMWriter writer;
+	writer.setNewLine("\n");
+	writer.setOptions(XMLWriter::PRETTY_PRINT);
+	InputSource source(istr);
+	AutoPtr<Document> pDoc = parser.parse(&source);
+	writer.writeNode(ostr, pDoc);
+
+	unsigned int numChildren = 0;
+	Poco::XML::Node* child = pDoc->documentElement()->firstChild();
+	while (child) {
+		numChildren++;
+		child = child->nextSibling();
+	}
+	assert (numChildren == 2);
+
+	std::string xml = ostr.str();
+	assert (xml == simple);
+}
+
+
 void ParserWriterTest::setUp()
 {
 }
@@ -107,6 +142,7 @@ CppUnit::Test* ParserWriterTest::suite()
 
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML2);
+	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteSimple);
 
 	return pSuite;
 }

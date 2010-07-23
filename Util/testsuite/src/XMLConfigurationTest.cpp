@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.cpp#3 $
+// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.cpp#5 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -47,7 +47,7 @@ using Poco::NotImplementedException;
 using Poco::NotFoundException;
 
 
-XMLConfigurationTest::XMLConfigurationTest(const std::string& name): CppUnit::TestCase(name)
+XMLConfigurationTest::XMLConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -107,6 +107,14 @@ void XMLConfigurationTest::testLoad()
 	assert (keys.size() == 2);
 	assert (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop4[1]") != keys.end());
+
+	assert (pConf->hasProperty("prop3.prop4[@attr]"));
+	pConf->remove("prop3.prop4[@attr]");
+	assert (!pConf->hasProperty("prop3.prop4[@attr]"));
+
+	assert (pConf->hasProperty("prop3"));
+	pConf->remove("prop3");
+	assert (!pConf->hasProperty("prop3"));
 	
 	try
 	{
@@ -215,6 +223,38 @@ void XMLConfigurationTest::testSave()
 }
 
 
+void XMLConfigurationTest::testLoadAppendSave()
+{
+	AutoPtr<XMLConfiguration> pConf = new XMLConfiguration;
+	std::istringstream istr("<config>\n"
+		"\t<prop1>value1</prop1>\n"
+		"</config>\n");
+	pConf->load(istr);
+
+	pConf->setString("prop2", "value2");
+	assert (pConf->getString("prop2") == "value2");
+
+	std::ostringstream ostr;
+	pConf->save(ostr);
+	std::string s(ostr.str());
+
+	assert (s ==
+		"<config>\n"
+		"\t<prop1>value1</prop1>\n"
+		"\t<prop2>value2</prop2>\n"
+		"</config>\n");
+}
+
+
+AbstractConfiguration* XMLConfigurationTest::allocConfiguration() const
+{
+	XMLConfiguration* pConfig = new XMLConfiguration();
+	pConfig->loadEmpty("TestConfiguration");
+
+	return pConfig;
+}
+
+
 void XMLConfigurationTest::setUp()
 {
 }
@@ -229,8 +269,10 @@ CppUnit::Test* XMLConfigurationTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("XMLConfigurationTest");
 
+	AbstractConfigurationTest_addTests(pSuite, XMLConfigurationTest);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testSave);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoadAppendSave);
 
 	return pSuite;
 }

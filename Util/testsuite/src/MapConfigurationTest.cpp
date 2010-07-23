@@ -1,7 +1,7 @@
 //
 // MapConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/MapConfigurationTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/MapConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,11 +37,12 @@
 #include "Poco/AutoPtr.h"
 
 
+using Poco::Util::AbstractConfiguration;
 using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
 
 
-MapConfigurationTest::MapConfigurationTest(const std::string& name): CppUnit::TestCase(name)
+MapConfigurationTest::MapConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -63,6 +64,12 @@ void MapConfigurationTest::testClear()
 }
 
 
+AbstractConfiguration* MapConfigurationTest::allocConfiguration() const
+{
+	return new MapConfiguration;
+}
+
+
 void MapConfigurationTest::setUp()
 {
 }
@@ -77,6 +84,7 @@ CppUnit::Test* MapConfigurationTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MapConfigurationTest");
 
+	AbstractConfigurationTest_addTests(pSuite, MapConfigurationTest);
 	CppUnit_addTest(pSuite, MapConfigurationTest, testClear);
 
 	return pSuite;

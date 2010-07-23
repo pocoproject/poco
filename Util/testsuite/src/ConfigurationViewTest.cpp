@@ -1,7 +1,7 @@
 //
 // ConfigurationViewTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/ConfigurationViewTest.cpp#1 $
+// $Id: //poco/1.3/Util/testsuite/src/ConfigurationViewTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -44,7 +44,7 @@ using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
 
 
-ConfigurationViewTest::ConfigurationViewTest(const std::string& name): CppUnit::TestCase(name)
+ConfigurationViewTest::ConfigurationViewTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -63,7 +63,7 @@ void ConfigurationViewTest::testView()
 
 	AbstractConfiguration::Keys keys;
 	pView->keys(keys);
-	assert (keys.size() == 4);
+	assert (keys.size() == 13);
 	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
@@ -72,8 +72,8 @@ void ConfigurationViewTest::testView()
 	assert (pView->getString("prop1") == "foo");
 	assert (pView->getString("prop3.string1") == "foo");
 	
-	pView->setString("prop5", "foobar");
-	assert (pConf->getString("prop5") == "foobar");
+	pView->setString("prop6", "foobar");
+	assert (pConf->getString("prop6") == "foobar");
 	
 	pView = pConf->createView("prop1");
 	pView->keys(keys);
@@ -95,16 +95,18 @@ void ConfigurationViewTest::testView()
 	pView->setString("string3", "foobar");
 	assert (pConf->getString("prop3.string3") == "foobar");
 
-	pView = pConf->createView("prop4");
+	pView = pConf->createView("prop5");
 	pView->keys(keys);
-	assert (keys.size() == 2);
-	assert (std::find(keys.begin(), keys.end(), "prop41") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop42") != keys.end());
+	assert (keys.size() == 4);
+	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub1") != keys.end());
+	assert (std::find(keys.begin(), keys.end(), "sub2") != keys.end());
 	
-	assert (pView->getString("prop41.string1") == "FOO");
-	assert (pView->getString("prop42.string2") == "Bar");
+	assert (pView->getString("sub1.string1") == "FOO");
+	assert (pView->getString("sub2.string2") == "Bar");
 
-	pView = pConf->createView("prop4.prop41");
+	pView = pConf->createView("prop5.sub1");
 	pView->keys(keys);
 	assert (keys.size() == 2);
 	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
@@ -114,24 +116,16 @@ void ConfigurationViewTest::testView()
 	assert (pView->getString("string2") == "BAR");
 	
 	pView->setString("string3", "foobar");
-	assert (pConf->getString("prop4.prop41.string3") == "foobar");
+	assert (pConf->getString("prop5.sub1.string3") == "foobar");
+
+	pView->remove("string3");
+	assert (!pConf->hasProperty("prop5.sub1.string3"));
 }
 
 
-AbstractConfiguration* ConfigurationViewTest::createConfiguration() const
+AbstractConfiguration* ConfigurationViewTest::allocConfiguration() const
 {
-	AbstractConfiguration* pConfig = new MapConfiguration;
-	
-	pConfig->setString("prop1", "foo");
-	pConfig->setString("prop2", "bar");
-	pConfig->setString("prop3.string1", "foo");
-	pConfig->setString("prop3.string2", "bar");
-	pConfig->setString("prop4.prop41.string1", "FOO");
-	pConfig->setString("prop4.prop41.string2", "BAR");
-	pConfig->setString("prop4.prop42.string1", "Foo");
-	pConfig->setString("prop4.prop42.string2", "Bar");
-	
-	return pConfig;
+	return new MapConfiguration;
 }
 
 
@@ -149,6 +143,7 @@ CppUnit::Test* ConfigurationViewTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ConfigurationViewTest");
 
+	AbstractConfigurationTest_addTests(pSuite, ConfigurationViewTest);
 	CppUnit_addTest(pSuite, ConfigurationViewTest, testView);
 
 	return pSuite;
