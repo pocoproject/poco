@@ -1,7 +1,7 @@
 
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#10 $
+// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#11 $
 //
 // Library: Foundation
 // Package: Core
@@ -202,7 +202,11 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>
+#ifndef __CYGWIN__
 #include <net/if_arp.h>
+#else // workaround for Cygwin, which does not have if_arp.h 
+#define ARPHRD_ETHER 1 /* Ethernet 10Mbps */
+#endif 
 #include <arpa/inet.h>
 #include <unistd.h>
 
