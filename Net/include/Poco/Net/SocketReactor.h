@@ -1,7 +1,7 @@
 //
 // SocketReactor.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketReactor.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SocketReactor.h#4 $
 //
 // Library: Net
 // Package: Reactor
@@ -197,6 +197,13 @@ protected:
 		/// Can be overridden by subclasses. The default implementation
 		/// dispatches the ShutdownNotification and thus should be called by overriding
 		/// implementations.
+
+	virtual void onBusy();
+		/// Called when the SocketReactor is busy and at least one notification
+		/// has been dispatched.
+		///
+		/// Can be overridden by subclasses to perform additional
+		/// periodic tasks. The default implementation does nothing.
 
 	void dispatch(const Socket& socket, SocketNotification* pNotification);
 		/// Dispatches the given notification to all observers

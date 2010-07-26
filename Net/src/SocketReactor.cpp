@@ -1,7 +1,7 @@
 //
 // SocketReactor.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketReactor.cpp#3 $
+// $Id: //poco/1.3/Net/src/SocketReactor.cpp#4 $
 //
 // Library: Net
 // Package: Reactor
@@ -123,6 +123,8 @@ void SocketReactor::run()
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{
+				onBusy();
+
 				for (Socket::SocketList::iterator it = readable.begin(); it != readable.end(); ++it)
 					dispatch(*it, _pReadableNotification);
 				for (Socket::SocketList::iterator it = writable.begin(); it != writable.end(); ++it)
@@ -223,6 +225,11 @@ void SocketReactor::onIdle()
 void SocketReactor::onShutdown()
 {
 	dispatch(_pShutdownNotification);
+}
+
+
+void SocketReactor::onBusy()
+{
 }
 
 
