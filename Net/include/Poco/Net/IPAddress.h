@@ -1,7 +1,7 @@
 //
 // IPAddress.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/IPAddress.h#3 $
+// $Id: //poco/1.3/Net/include/Poco/Net/IPAddress.h#4 $
 //
 // Library: Net
 // Package: NetCore
@@ -350,9 +350,9 @@ private:
 //
 // inlines
 //
-inline void swap(IPAddress& a1, IPAddress& a2)
+inline void swap(IPAddress& addr1, IPAddress& addr2)
 {
-	a1.swap(a2);
+	addr1.swap(addr2);
 }
 
 
