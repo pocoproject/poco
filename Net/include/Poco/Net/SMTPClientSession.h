@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#7 $
+// $Id: //poco/1.3/Net/include/Poco/Net/SMTPClientSession.h#8 $
 //
 // Library: Net
 // Package: Mail
@@ -42,6 +42,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/DialogSocket.h"
+#include "Poco/DigestEngine.h"
 #include "Poco/Timespan.h"
 
 
@@ -67,6 +68,7 @@ public:
 	{
 		AUTH_NONE,
 		AUTH_CRAM_MD5,
+		AUTH_CRAM_SHA1,
 		AUTH_LOGIN,
 		AUTH_PLAIN
 	};
@@ -166,7 +168,9 @@ protected:
 	static bool isPermanentNegative(int status);
 
 	void login(const std::string& hostname, std::string& response);
-	void loginUsingCRAM_MD5(const std::string& username, const std::string& password);
+	void loginUsingCRAMMD5(const std::string& username, const std::string& password);
+	void loginUsingCRAMSHA1(const std::string& username, const std::string& password);
+	void loginUsingCRAM(const std::string& username, const std::string& method, Poco::DigestEngine& hmac);
 	void loginUsingLogin(const std::string& username, const std::string& password);
 	void loginUsingPlain(const std::string& username, const std::string& password);
 	DialogSocket& socket();

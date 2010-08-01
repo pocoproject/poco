@@ -1,7 +1,7 @@
 //
 // File2Page.cpp
 //
-// $Id: //poco/1.3/PageCompiler/File2Page/src/File2Page.cpp#3 $
+// $Id: //poco/1.3/PageCompiler/File2Page/src/File2Page.cpp#4 $
 //
 // An application that creates a Page Compiler source file from an
 // ordinary file.
@@ -235,12 +235,14 @@ protected:
 	
 	std::string extToContentType(const std::string& ext)
 	{
-		if (ext == "jpg")
+		if (ext == "jpg" || ext == "jpeg")
 			return "image/jpeg";
 		else if (ext == "png")
 			return "image/png";
 		else if (ext == "gif")
 			return "image/gif";
+		else if (ext == "ico")
+			return "image/x-icon";
 		else if (ext == "htm")
 			return "text/html";
 		else if (ext == "html")

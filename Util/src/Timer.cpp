@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.3/Util/src/Timer.cpp#5 $
+// $Id: //poco/1.3/Util/src/Timer.cpp#6 $
 //
 // Library: Util
 // Package: Timer
@@ -37,6 +37,7 @@
 #include "Poco/Util/Timer.h"
 #include "Poco/Notification.h"
 #include "Poco/ErrorHandler.h"
+#include "Poco/Event.h"
 
 
 using Poco::ErrorHandler;
@@ -105,8 +106,17 @@ public:
 	bool execute()
 	{
 		queue().clear();
+		_finished.set();
 		return true;
 	}
+	
+	void wait()
+	{
+		_finished.wait();
+	}
+	
+private:
+	Poco::Event _finished;
 };
 
 
@@ -247,9 +257,14 @@ Timer::~Timer()
 }
 
 	
-void Timer::cancel()
+void Timer::cancel(bool wait)
 {
-	_queue.enqueueNotification(new CancelNotification(_queue), 0);
+	Poco::AutoPtr<CancelNotification> pNf = new CancelNotification(_queue);
+	_queue.enqueueNotification(pNf, 0);
+	if (wait)
+	{
+		pNf->wait();
+	}
 }
 
 

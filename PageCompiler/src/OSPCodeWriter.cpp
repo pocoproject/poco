@@ -1,7 +1,7 @@
 //
 // OSPCodeWriter.cpp
 //
-// $Id: //poco/1.3/PageCompiler/src/OSPCodeWriter.cpp#2 $
+// $Id: //poco/1.3/PageCompiler/src/OSPCodeWriter.cpp#3 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -109,11 +109,18 @@ void OSPCodeWriter::writeSession(std::ostream& ostr)
 {
 	if (page().has("page.session"))
 	{
-		std::string sessionTimeoutStr = page().get("page.sessionTimeout", "30");
+		std::string session = page().get("page.session");
+		std::string sessionCode;
+		if (session.empty()) return;
+		if (session[0] == '@')
+			sessionCode = "context()->thisBundle()->properties().getString(\"" + session.substr(1) + "\")";
+		else
+			sessionCode = "\"" + session + "\"";
+		std::string sessionTimeoutCode = page().get("page.sessionTimeout", "30");
 		int sessionTimeout;
-		if (!Poco::NumberParser::tryParse(sessionTimeoutStr, sessionTimeout))
+		if (!Poco::NumberParser::tryParse(sessionTimeoutCode, sessionTimeout))
 		{
-			sessionTimeoutStr = "context()->thisBundle()->properties().getInt(\"" + sessionTimeoutStr + "\")";
+			sessionTimeoutCode = "context()->thisBundle()->properties().getInt(\"" + sessionTimeoutCode + "\")";
 		}
 		ostr << "\tPoco::OSP::Web::WebSession::Ptr session;\n";
 		ostr << "\t{\n";
@@ -121,9 +128,7 @@ void OSPCodeWriter::writeSession(std::ostream& ostr)
 		ostr << "\t\tif (pWebSessionManagerRef)\n";
 		ostr << "\t\t{\n";
 		ostr << "\t\t\tPoco::OSP::Web::WebSessionManager::Ptr pWebSessionManager = pWebSessionManagerRef->castedInstance<Poco::OSP::Web::WebSessionManager>();\n";
-		ostr << "\t\t\tsession = pWebSessionManager->find(\"" << page().get("page.session") << "\", request);\n";
-		ostr << "\t\t\tif (session.isNull())\n";
-		ostr << "\t\t\t\tsession = pWebSessionManager->get(\"" << page().get("page.session") << "\", request, " << sessionTimeoutStr << ", context());\n";
+		ostr << "\t\t\tsession = pWebSessionManager->get(" << sessionCode << ", request, " << sessionTimeoutCode << ", context());\n";
 		ostr << "\t\t}\n";
 		ostr << "\t}\n";
 	}

@@ -1,7 +1,7 @@
 //
 // FormatTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/FormatTest.h#3 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FormatTest.h#4 $
 //
 // Definition of the FormatTest class.
 //
@@ -67,6 +67,7 @@ public:
 	void testFloatSci();
 	void testString();
 	void testMultiple();
+	void testIndex();
 
 	void setUp();
 	void tearDown();

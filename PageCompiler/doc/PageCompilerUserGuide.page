@@ -4,9 +4,9 @@ POCO PageCompiler
 !!!Introduction
 PageCompiler is a command line tool that translates HTML files (and other kinds of files) into
 C++ code, more precisely, subclasses of Poco::Net::HTTPRequestHandler.
-The source files can contain special directives that allow it to include C++ code into
-the source file. The syntax of this directives is based on the syntax used for 
-Java Server Pages (JSP) and Active Server Pages.
+The source files can contain special directives that allow embedding of C++ code. 
+The syntax of these directives is based on the syntax used for 
+Java Server Pages (JSP) and Active Server Pages (ASP).
 
 The following introductory sample shows the code for a simple page that displays the
 current date and time.
@@ -246,13 +246,17 @@ For use with the POCO Open Service Platform only.
 Specifies the identifier of the session obtained from the OSP Web Session Manager.
 If specified, a Poco::OSP::Web::WebSession object will be available in the
 request handler through a variable named <[session]>. The variable is of type
-Poco::OSP::Web::WebSession::Ptr.
+Poco::OSP::Web::WebSession::Ptr. If the identifier starts with an asterisk
+('@'), the identifier is considered to be a bundle property name, and the
+session identifier is read from the respective bundle property.
 
 !sessionTimeout (OSP only)
 
 For use with the POCO Open Service Platform only.
 
 Specifies the session timeout in minutes.
+If the argument is a string, it is considered to be a bundle property name
+and the timeout value is read from the respective bundle property.
 
 !buffered
 

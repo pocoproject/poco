@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.3.7 (2010-07-??)
+Release 1.4.0 (2010-08-??)
 ==========================
 
 - SSLManager: documentation fixes, code cleanup
@@ -94,7 +94,8 @@ Release 1.3.7 (2010-07-??)
   outside the ASCII range.
 - Poco::Net::MailMessage: fixed a bug in StringPartHandler that resulted in incorrect handling of non-ASCII data if 
   char is signed.
-- Improved SMTPClientSession compatibility with various mail servers when using AUTH_LOGIN authentication.
+- Improved Poco::Net::SMTPClientSession compatibility with various mail servers when using AUTH_LOGIN authentication.
+- Added CRAM-SHA1 support to Poco::Net::SMTPClientSession
 - Poco::Net::SMTPClientSession now also supports login with AUTH PLAIN.
 - Added Poco::Net::SecureSMTPClientSession class, supporting STARTTLS for secure SMTP connections.
 - fixed an issue with SharedMemory on POSIX systems, where a shared memory region would be deleted 
@@ -117,6 +118,14 @@ Release 1.3.7 (2010-07-??)
 - fixed SF# 3031530: Ping and possible no timeout
 - added Poco::Net::SocketReactor::onBusy(), called whenever at least one notification will
   be dispatched.
+- fixed SF# 3034863: Compiler warning in net/IPAddress.h with poco 1.3.2
+- added support for CRAM-SHA1 authentication to SMTPClientSession
+- Poco::format(): arguments can now be addressed by their index, e.g. %[2]d
+- Poco::Util::Timer::cancel() now accepts an optional boolean argument.
+  If true is passed, cancel() waits until the task queue has been purged.
+  Otherwise, it returns immediately and works asynchronously, as before.
+- Poco::Net::HTTPServerResponse::redirect() now accepts an optional additional
+  argument to specify the HTTP status code for the redirection.       
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1298,4 +1307,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#109 $
+$Id: //poco/1.3/dist/CHANGELOG#111 $

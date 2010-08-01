@@ -1,7 +1,7 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#6 $
+// $Id: //poco/1.3/Net/src/SMTPClientSession.cpp#7 $
 //
 // Library: Net
 // Package: Mail
@@ -45,6 +45,7 @@
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/HMACEngine.h"
 #include "Poco/MD5Engine.h"
+#include "Poco/SHA1Engine.h"
 #include "Poco/DigestStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Base64Encoder.h"
@@ -58,6 +59,7 @@
 using Poco::DigestEngine;
 using Poco::HMACEngine;
 using Poco::MD5Engine;
+using Poco::SHA1Engine;
 using Poco::DigestOutputStream;
 using Poco::StreamCopier;
 using Poco::Base64Encoder;
@@ -130,21 +132,34 @@ void SMTPClientSession::login()
 }
 
 
-void SMTPClientSession::loginUsingCRAM_MD5(const std::string& username, const std::string& password)
+void SMTPClientSession::loginUsingCRAMMD5(const std::string& username, const std::string& password)
+{
+	HMACEngine<MD5Engine> hmac(password);
+	loginUsingCRAM(username, "CRAM-MD5", hmac);
+}
+
+
+void SMTPClientSession::loginUsingCRAMSHA1(const std::string& username, const std::string& password)
+{
+	HMACEngine<SHA1Engine> hmac(password);
+	loginUsingCRAM(username, "CRAM-SHA1", hmac);
+}
+
+
+void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::string& method, Poco::DigestEngine& hmac)
 {
 	int status = 0;
 	std::string response;
 	
-	status = sendCommand("AUTH CRAM-MD5", response);
-	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate using CRAM-MD5", response);
+	status = sendCommand(std::string("AUTH ") + method, response);
+	if (!isPositiveIntermediate(status)) throw SMTPException(std::string("Cannot authenticate using ") + method, response);
 	std::string challengeBase64 = response.substr(4);
 	
 	std::istringstream istr(challengeBase64);
 	Base64Decoder decoder(istr);
 	std::string challenge;
-	decoder >> challenge;
+	StreamCopier::copyToString(decoder, challenge);
 	
-	HMACEngine<MD5Engine> hmac(password);
 	hmac.update(challenge);
 	
 	const DigestEngine::Digest& digest = hmac.digest();
@@ -158,7 +173,7 @@ void SMTPClientSession::loginUsingCRAM_MD5(const std::string& username, const st
 	encoder.close();
 	
 	status = sendCommand(challengeResponseBase64.str(), response);
-  	if (!isPositiveCompletion(status)) throw SMTPException("Login using CRAM-MD5 failed", response);  
+  	if (!isPositiveCompletion(status)) throw SMTPException(std::string("Login using ") + method + " failed", response);  
 }
 
 
@@ -194,7 +209,7 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	std::string decodedResponse;
 	std::istringstream responseStream(response.substr(4));
 	Base64Decoder responseDecoder(responseStream);
-	responseDecoder >> decodedResponse;
+	StreamCopier::copyToString(responseDecoder, decodedResponse);
 	
 	if (Poco::icompare(decodedResponse, 0, 8, "username") == 0) // username first (md5("Username:"))
 	{
@@ -244,9 +259,17 @@ void SMTPClientSession::login(const std::string& hostname, LoginMethod loginMeth
 	{
 		if (response.find("CRAM-MD5", 0) != std::string::npos)
 		{
-			loginUsingCRAM_MD5(username, password);
+			loginUsingCRAMMD5(username, password);
 		}
 		else throw SMTPException("The mail service does not support CRAM-MD5 authentication", response);
+	}
+	else if (loginMethod == AUTH_CRAM_SHA1)
+	{
+		if (response.find("CRAM-SHA1", 0) != std::string::npos)
+		{
+			loginUsingCRAMSHA1(username, password);
+		}
+		else throw SMTPException("The mail service does not support CRAM-SHA1 authentication", response);
 	}
 	else if (loginMethod == AUTH_LOGIN)
 	{
