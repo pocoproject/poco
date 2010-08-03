@@ -1,7 +1,7 @@
 //
 // FTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/FTPClientSession.cpp#5 $
+// $Id: //poco/1.3/Net/src/FTPClientSession.cpp#6 $
 //
 // Library: Net
 // Package: FTP
@@ -118,11 +118,11 @@ void FTPClientSession::login(const std::string& username, const std::string& pas
 {
 	std::string response;
 	int status = _controlSocket.receiveStatusMessage(response);
-	if (!isPositiveCompletion(status)) throw FTPException("Cannot login to server", response);
+	if (!isPositiveCompletion(status)) throw FTPException("Cannot login to server", response, status);
 	status = sendCommand("USER", username, response);
 	if (isPositiveIntermediate(status))
 		status = sendCommand("PASS", password, response);
-	if (!isPositiveCompletion(status)) throw FTPException("Login denied", response);
+	if (!isPositiveCompletion(status)) throw FTPException("Login denied", response, status);
 	setFileType(_fileType);
 }
 
@@ -150,7 +150,7 @@ void FTPClientSession::setFileType(FTPClientSession::FileType type)
 {
 	std::string response;
 	int status = sendCommand("TYPE", (type == TYPE_TEXT ? "A" : "I"), response);
-	if (!isPositiveCompletion(status)) throw FTPException("Cannot set file type", response);
+	if (!isPositiveCompletion(status)) throw FTPException("Cannot set file type", response, status);
 	_fileType = type;
 }
 
@@ -168,7 +168,7 @@ std::string FTPClientSession::systemType()
 	if (isPositiveCompletion(status))
 		return response.substr(4);
 	else
-		throw FTPException("Cannot get remote system type", response);
+		throw FTPException("Cannot get remote system type", response, status);
 }
 
 
@@ -176,7 +176,7 @@ void FTPClientSession::setWorkingDirectory(const std::string& path)
 {
 	std::string response;
 	int status = sendCommand("CWD", path, response);
-	if (!isPositiveCompletion(status)) throw FTPException("Cannot change directory", response);
+	if (!isPositiveCompletion(status)) throw FTPException("Cannot change directory", response, status);
 }
 
 
@@ -187,7 +187,7 @@ std::string FTPClientSession::getWorkingDirectory()
 	if (isPositiveCompletion(status))
 		return extractPath(response);
 	else
-		throw FTPException("Cannot get current working directory", response);
+		throw FTPException("Cannot get current working directory", response, status);
 }
 
 
@@ -195,7 +195,7 @@ void FTPClientSession::cdup()
 {
 	std::string response;
 	int status = sendCommand("CDUP", response);
-	if (!isPositiveCompletion(status)) throw FTPException("Cannot change directory", response);
+	if (!isPositiveCompletion(status)) throw FTPException("Cannot change directory", response, status);
 }
 
 	
@@ -203,9 +203,9 @@ void FTPClientSession::rename(const std::string& oldName, const std::string& new
 {
 	std::string response;
 	int status = sendCommand("RNFR", oldName, response);
-	if (!isPositiveIntermediate(status)) throw FTPException(std::string("Cannot rename ") + oldName, response);
+	if (!isPositiveIntermediate(status)) throw FTPException(std::string("Cannot rename ") + oldName, response, status);
 	status = sendCommand("RNTO", newName, response);
-	if (!isPositiveCompletion(status)) throw FTPException(std::string("Cannot rename to ") + newName, response);
+	if (!isPositiveCompletion(status)) throw FTPException(std::string("Cannot rename to ") + newName, response, status);
 }
 
 	
@@ -213,7 +213,7 @@ void FTPClientSession::remove(const std::string& path)
 {
 	std::string response;
 	int status = sendCommand("DELE", path, response);
-	if (!isPositiveCompletion(status)) throw FTPException(std::string("Cannot remove " + path), response);
+	if (!isPositiveCompletion(status)) throw FTPException(std::string("Cannot remove " + path), response, status);
 }
 
 
@@ -221,7 +221,7 @@ void FTPClientSession::createDirectory(const std::string& path)
 {
 	std::string response;
 	int status = sendCommand("MKD", path, response);
-	if (!isPositiveCompletion(status)) throw FTPException(std::string("Cannot create directory ") + path, response);
+	if (!isPositiveCompletion(status)) throw FTPException(std::string("Cannot create directory ") + path, response, status);
 }
 
 
@@ -229,7 +229,7 @@ void FTPClientSession::removeDirectory(const std::string& path)
 {
 	std::string response;
 	int status = sendCommand("RMD", path, response);
-	if (!isPositiveCompletion(status)) throw FTPException(std::string("Cannot remove directory ") + path, response);
+	if (!isPositiveCompletion(status)) throw FTPException(std::string("Cannot remove directory ") + path, response, status);
 }
 
 
@@ -286,7 +286,7 @@ void FTPClientSession::abort()
 	int status = sendCommand("ABOR", response);
 	if (status == 426)
 		status = _controlSocket.receiveStatusMessage(response);
-	if (status != 226) throw FTPException("Cannot abort transfer", response);
+	if (status != 226) throw FTPException("Cannot abort transfer", response, status);
 }
 
 
@@ -342,7 +342,7 @@ StreamSocket FTPClientSession::activeDataConnection(const std::string& command, 
 	sendPortCommand(server.address());
 	std::string response;
 	int status = sendCommand(command, arg, response);
-	if (!isPositivePreliminary(status)) throw FTPException(command + " command failed", response);
+	if (!isPositivePreliminary(status)) throw FTPException(command + " command failed", response, status);
 	if (server.poll(_timeout, Socket::SELECT_READ))
 		return server.acceptConnection();
 	else
@@ -356,7 +356,7 @@ StreamSocket FTPClientSession::passiveDataConnection(const std::string& command,
 	StreamSocket sock(sa);
 	std::string response;
 	int status = sendCommand(command, arg, response);
-	if (!isPositivePreliminary(status)) throw FTPException(command + " command failed", response);
+	if (!isPositivePreliminary(status)) throw FTPException(command + " command failed", response, status);
 	return sock;
 }
 
@@ -405,7 +405,7 @@ bool FTPClientSession::sendEPRT(const SocketAddress& addr)
 	else if (isPermanentNegative(status))
 		return false;
 	else
-		throw FTPException("EPRT command failed", response);
+		throw FTPException("EPRT command failed", response, status);
 }
 
 
@@ -423,7 +423,7 @@ void FTPClientSession::sendPORT(const SocketAddress& addr)
 	arg += NumberFormatter::format(port % 256);
 	std::string response;
 	int status = sendCommand("PORT", arg, response);
-	if (!isPositiveCompletion(status)) throw FTPException("PORT command failed", response);
+	if (!isPositiveCompletion(status)) throw FTPException("PORT command failed", response, status);
 }
 
 
@@ -440,7 +440,7 @@ bool FTPClientSession::sendEPSV(SocketAddress& addr)
 	{
 		return false;
 	}
-	else throw FTPException("EPSV command failed", response);
+	else throw FTPException("EPSV command failed", response, status);
 }
 
 
@@ -448,7 +448,7 @@ void FTPClientSession::sendPASV(SocketAddress& addr)
 {
 	std::string response;
 	int status = sendCommand("PASV", response);
-	if (!isPositiveCompletion(status)) throw FTPException("PASV command failed", response);
+	if (!isPositiveCompletion(status)) throw FTPException("PASV command failed", response, status);
 	parseAddress(response, addr);
 }
 
@@ -501,7 +501,7 @@ void FTPClientSession::endTransfer()
 		_pDataStream = 0;
 		std::string response;
 		int status = _controlSocket.receiveStatusMessage(response);
-		if (!isPositiveCompletion(status)) throw FTPException("Data transfer failed", response);
+		if (!isPositiveCompletion(status)) throw FTPException("Data transfer failed", response, status);
 	}
 }
 

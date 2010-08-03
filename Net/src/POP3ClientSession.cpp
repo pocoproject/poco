@@ -1,7 +1,7 @@
 //
 // POP3ClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/POP3ClientSession.cpp#4 $
+// $Id: //poco/1.3/Net/src/POP3ClientSession.cpp#5 $
 //
 // Library: Net
 // Package: Mail
@@ -156,7 +156,7 @@ void POP3ClientSession::login(const std::string& username, const std::string& pa
 {
 	std::string response;
 	_socket.receiveMessage(response);
-	if (!isPositive(response)) throw SMTPException("The POP3 service is unavailable", response);
+	if (!isPositive(response)) throw POP3Exception("The POP3 service is unavailable", response);
 	sendCommand("USER", username, response);
 	if (!isPositive(response)) throw POP3Exception("Login rejected for user", response);
 	sendCommand("PASS", password, response);
