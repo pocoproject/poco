@@ -1,7 +1,7 @@
 //
 // Process_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Process_WIN32U.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/Process_WIN32U.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -209,10 +209,16 @@ void ProcessImpl::killImpl(PIDImpl pid)
 
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 {
-	std::string evName("POCOTRM");
-	evName.append(NumberFormatter::formatHex(pid, 8));
-	NamedEvent ev(evName);
+	NamedEvent ev(terminationEventName(pid));
 	ev.set();
+}
+
+
+std::string ProcessImpl::terminationEventName(PIDImpl pid)
+{
+	std::string evName("POCOTRM");
+	NumberFormatter::appendHex(evName, pid, 8);
+	return evName;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/ServerApplication.h#6 $
+// $Id: //poco/1.3/Util/include/Poco/Util/ServerApplication.h#7 $
 //
 // Library: Util
 // Package: Application
@@ -43,6 +43,7 @@
 #include "Poco/Util/Util.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Event.h"
+#include "Poco/NamedEvent.h"
 
 
 namespace Poco {
@@ -208,6 +209,7 @@ private:
 	std::string _displayName;
 	std::string _startup;
 
+	static Poco::NamedEvent      _terminate;
 	static Poco::Event           _terminated;
 	static SERVICE_STATUS        _serviceStatus; 
 	static SERVICE_STATUS_HANDLE _serviceStatusHandle; 

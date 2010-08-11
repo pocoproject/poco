@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#15 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#16 $
 //
 // Library: Util
 // Package: Application
@@ -74,6 +74,7 @@ namespace Util {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
 Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus; 
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
@@ -109,7 +110,11 @@ int ServerApplication::run()
 
 void ServerApplication::terminate()
 {
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_terminate.set();
+#else
 	Process::requestTermination(Process::id());
+#endif
 }
 
 
@@ -217,10 +222,7 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 void ServerApplication::waitForTerminationRequest()
 {
 	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
-	std::string evName("POCOTRM");
-	NumberFormatter::appendHex(evName, Process::id(), 8);
-	NamedEvent ev(evName);
-	ev.wait();
+	_terminate.wait();
 	_terminated.set();
 }
 

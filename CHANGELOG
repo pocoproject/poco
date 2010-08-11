@@ -129,6 +129,7 @@ Release 1.4.0 (2010-08-??)
 - fixed a warning (BinaryReader.cpp) and error (ThreadLocal.cpp) in Foundation when compiling with Visual Studio 2010
 - fixed a wrong exception in Poco::Net::POP3ClientSession
 - Poco::Net::FTPClientSession and Poco::Net::SMTPClientSession now set the error code in exceptions they throw
+- fixed a potential race condition with terminating a Windows service based on Poco::Util::ServerApplication
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1310,4 +1311,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#112 $
+$Id: //poco/1.3/dist/CHANGELOG#113 $
