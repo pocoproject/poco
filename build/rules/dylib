@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/rules/dylib#4 $
+# $Id: //poco/1.3/build/rules/dylib#5 $
 #
 # dylib
 #
@@ -24,8 +24,8 @@ endif
 
 DYLIB_DEBUG        = $(BINPATH)/$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)
 DYLIB_RELEASE      = $(BINPATH)/$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
-DYLIB_S_DEBUG      = $(BINPATH)/$(target)d$(OSARCH_POSTFIX)_s$(SHL_EXT)
-DYLIB_S_RELEASE    = $(BINPATH)/$(target)$(OSARCH_POSTFIX)_s$(SHL_EXT)
+DYLIB_S_DEBUG      = $(BINPATH)/static/$(target)d$(OSARCH_POSTFIX)$(SHL_EXT)
+DYLIB_S_RELEASE    = $(BINPATH)/static/$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
 
 TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
 TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
@@ -46,33 +46,28 @@ distclean: clean
 	$(RM) obj
 	$(RM) .dep
 
-ifeq ($(LINKMODE),BOTH)
-static_debug:   bindirs $(DYLIB_S_DEBUG)
-static_release: bindirs $(DYLIB_S_RELEASE)
-else
-static_debug:   bindirs $(DYLIB_DEBUG)
-static_release: bindirs $(DYLIB_RELEASE)
-endif
+static_debug:   static_bindirs $(DYLIB_S_DEBUG)
+static_release: static_bindirs $(DYLIB_S_RELEASE)
 shared_debug:   bindirs $(DYLIB_DEBUG)
 shared_release: bindirs $(DYLIB_RELEASE)
 
 $(DYLIB_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
-	@echo "** Building dynamic library (debug)" $@
+	@echo "** Building dynamic library (debug, shared)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
-	@echo "** Building dynamic library (release)" $@
+	@echo "** Building dynamic library (release, shared)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
-	@echo "** Building dynamic library (debug)" $@
+	@echo "** Building dynamic library (debug, static)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
-	@echo "** Building dynamic library (release)" $@
+	@echo "** Building dynamic library (release, static)" $@
 	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
 	$(postbuild)
 

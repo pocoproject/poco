@@ -707,6 +707,9 @@
 					RelativePath=".\include\Poco\UnWindows.h">
 				</File>
 				<File
+					RelativePath=".\include\Poco\Version.h">
+				</File>
+				<File
 					RelativePath=".\include\Poco\Void.h">
 				</File>
 			</Filter>

@@ -17,7 +17,7 @@ LINKMODE = SHARED
 CC      = cc -xtarget=opteron -m64
 CXX     = CC -xtarget=opteron -m64 -library=no%Cstd
 LINK    = $(CXX)
-LIB     = $(CXX) -xar -o
+LIB     = $(CXX) -xar -o $@
 RANLIB  = ranlib
 SHLIB   = $(CXX) $(LINKFLAGS) -G -o $@ -h$(notdir $@)
 SHLIBLN = $(POCO_BASE)/build/script/shlibln

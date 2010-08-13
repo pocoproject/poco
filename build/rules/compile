@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/rules/compile#3 $
+# $Id: //poco/1.3/build/rules/compile#4 $
 #
 # compile
 #
@@ -21,31 +21,32 @@ all_release: static_release shared_release
 #
 # Create directories if necessary
 #
-.PHONY: objdirs libdirs bindirs
+.PHONY: objdirs libdirs bindirs static_bindirs
 objdirs: $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_SHARED) $(OBJPATH_DEBUG_SHARED) 
 libdirs: objdirs $(LIBPATH) 
 bindirs: objdirs $(BINPATH)
+static_bindirs: objdirs $(BINPATH)/static
 
-$(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_SHARED) $(OBJPATH_DEBUG_SHARED) $(LIBPATH) $(BINPATH):
+$(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_SHARED) $(OBJPATH_DEBUG_SHARED) $(LIBPATH) $(BINPATH) $(BINPATH)/static:
 	$(MKDIR) $@
 
 #
 # Rules for compiling
 #	
 $(OBJPATH_DEBUG_STATIC)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d
-	@echo "** Compiling" $< "(debug)"
+	@echo "** Compiling" $< "(debug, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(STATICOPT_CXX) -c $< -o $@
 
 $(OBJPATH_RELEASE_STATIC)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d
-	@echo "** Compiling" $< "(release)"
+	@echo "** Compiling" $< "(release, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(STATICOPT_CXX) -c $< -o $@
 
 $(OBJPATH_DEBUG_STATIC)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d
-	@echo "** Compiling" $< "(debug)"
+	@echo "** Compiling" $< "(debug, static)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(DEBUGOPT_CC) $(STATICOPT_CC) -c $< -o $@
 
 $(OBJPATH_RELEASE_STATIC)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d
-	@echo "** Compiling" $< "(release)"
+	@echo "** Compiling" $< "(release, static)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(RELEASEOPT_CC) $(STATICOPT_CC) -c $< -o $@
 
 $(OBJPATH_DEBUG_SHARED)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d

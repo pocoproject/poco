@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/rules/global#12 $
+# $Id: //poco/1.3/build/rules/global#13 $
 #
 # global
 #
@@ -256,17 +256,6 @@ ifeq ($(strip $(STRIP)),)
 STRIPCMD = 
 else
 STRIPCMD = $(STRIP) $@$(BINEXT)
-endif
-
-#
-# Remote debugging support
-#
-ifeq ($(strip $(STRIPDBG)),)
-CPYDBG =
-STRIPDBGCMD = 
-else
-CPYDBG = cp $@ $@x
-STRIPDBGCMD = $(STRIP) $@x
 endif
 
 #

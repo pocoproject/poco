@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Foundation/Makefile#11 $
+# $Id: //poco/1.3/Foundation/Makefile#12 $
 #
 # Makefile for Poco Foundation
 #
@@ -49,7 +49,7 @@ else
 	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects)
 endif
 
-ifeq ($(POCO_CONFIG),MinGW)
+ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
 	objects += EventLogChannel WindowsConsoleChannel
 else
 	objects += SyslogChannel

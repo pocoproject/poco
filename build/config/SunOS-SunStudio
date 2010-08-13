@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/config/SunOS-SunStudio#1 $
+# $Id: //poco/1.3/build/config/SunOS-SunStudio#3 $
 #
 # SunStudio
 #
@@ -17,7 +17,7 @@ LINKMODE = SHARED
 CC      = cc
 CXX     = CC
 LINK    = $(CXX)
-LIB     = $(CXX) -xar -o
+LIB     = $(CXX) -xar -o $@
 RANLIB  = ranlib
 SHLIB   = $(CXX) $(LINKFLAGS) -G -o $@ -h$(notdir $@)
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
@@ -40,11 +40,11 @@ SHAREDLIBLINKEXT = .so
 CFLAGS          = -mt -Isrc
 CFLAGS32        =
 CFLAGS64        = -m64
-CXXFLAGS        = -m32 -mt -library=stlport4 -erroff=hidevf
+CXXFLAGS        = -mt -library=stlport4 -erroff=hidevf
 CXXFLAGS32      =
 CXXFLAGS64      = -m64
-LINKFLAGS       = -m32 -mt -library=stlport4
-LINKFLAGS32     = -m32
+LINKFLAGS       = -mt -library=stlport4
+LINKFLAGS32     =
 LINKFLAGS64     = -m64
 STATICOPT_CC    =
 STATICOPT_CXX   =

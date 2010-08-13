@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/Environment.cpp#6 $
 //
 // Library: Foundation
 // Package: Core
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Environment.h"
+#include "Poco/Version.h"
 #include <cstdlib>
 #include <cstdio> // sprintf()
 

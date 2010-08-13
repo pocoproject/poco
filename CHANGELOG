@@ -132,7 +132,13 @@ Release 1.4.0 (2010-08-??)
 - fixed a potential race condition with terminating a Windows service based on Poco::Util::ServerApplication
 - fixed a bug in global build configuration file: explicitly setting POCO_CONFIG did not work on Solaris platforms,
   as it was always overridden by the automatically determined configuration.
-
+- Added support for MinGW cross builds on Linux.
+- Changed location of statically linked build products in the gmake-based build system.
+  Statically linked executables are now in bin/$(OSNAME)/$(OSARCH)/static and no longer
+  have the _s suffix
+- The POCO_VERSION macro now is in its own header file, "Poco/Version.h". It is no longer
+  available through "Poco/Foundation.h".
+  
 
 Release 1.3.6p2 (2010-01-15)
 ============================
@@ -1313,4 +1319,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#114 $
+$Id: //poco/1.3/dist/CHANGELOG#116 $

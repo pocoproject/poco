@@ -1,7 +1,7 @@
 //
 // Foundation.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Foundation.h#6 $
+// $Id: //poco/1.3/Foundation/include/Poco/Foundation.h#7 $
 //
 // Library: Foundation
 // Package: Core
@@ -40,18 +40,6 @@
 
 #ifndef Foundation_Foundation_INCLUDED
 #define Foundation_Foundation_INCLUDED
-
-
-//
-// Version Information
-//
-// Version format is 0xAABBCCDD, where
-//    - AA is the major version number,
-//    - BB is the minor version number,
-//    - CC is the revision number, and
-//    - DD is the patch level number.
-//
-#define POCO_VERSION 0x010307D0
 
 
 //
