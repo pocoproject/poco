@@ -1,7 +1,7 @@
 //
 // HTTPMessage.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPMessage.h#2 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPMessage.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -79,8 +79,8 @@ public:
 	void setTransferEncoding(const std::string& transferEncoding);
 		/// Sets the transfer encoding for this message.
 		///
-		/// The value should be either IDENTITY_TRANSFER_CODING
-		/// or CHUNKED_TRANSFER_CODING.
+		/// The value should be either IDENTITY_TRANSFER_ENCODING
+		/// or CHUNKED_TRANSFER_ENCODING.
 
 	const std::string& getTransferEncoding() const;
 		/// Returns the transfer encoding used for this
@@ -88,7 +88,7 @@ public:
 		///
 		/// Normally, this is the value of the Transfer-Encoding
 		/// header field. If no such field is present,
-		/// returns IDENTITY_TRANSFER_CODING.
+		/// returns IDENTITY_TRANSFER_ENCODING.
 		
 	void setChunkedTransferEncoding(bool flag);
 		/// If flag is true, sets the Transfer-Encoding header to
