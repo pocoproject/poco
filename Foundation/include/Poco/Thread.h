@@ -1,7 +1,7 @@
 //
 // Thread.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Thread.h#6 $
+// $Id: //poco/1.3/Foundation/include/Poco/Thread.h#7 $
 //
 // Library: Foundation
 // Package: Threading
@@ -123,6 +123,8 @@ public:
 	int getOSPriority() const;
 		/// Returns the thread's priority, expressed as an operating system
 		/// specific priority value.
+		///
+		/// May return 0 if the priority has not been explicitly set.
 		
 	static int getMinOSPriority();
 		/// Returns the mininum operating system-specific priority value,

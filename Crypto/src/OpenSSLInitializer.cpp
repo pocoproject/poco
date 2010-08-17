@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#5 $
+// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#6 $
 //
 // Library: Crypto
 // Package: CryotpCore
@@ -131,8 +131,7 @@ void OpenSSLInitializer::lock(int mode, int n, const char* file, int line)
 
 unsigned long OpenSSLInitializer::id()
 {
-	Thread* pThread = Thread::current();
-	return pThread ? pThread->id() : 0;
+	return Poco::Thread::currentTid();
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Thread_POSIX.h#10 $
+// $Id: //poco/1.3/Foundation/include/Poco/Thread_POSIX.h#11 $
 //
 // Library: Foundation
 // Package: Threading
@@ -145,6 +145,7 @@ private:
 			pCallbackTarget(0),
 			thread(0),
 			prio(PRIO_NORMAL_IMPL),
+			osPrio(0),
 			done(false),
 			stackSize(POCO_THREAD_STACK_SIZE)
 		{

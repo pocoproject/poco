@@ -1,7 +1,7 @@
 //
 // BinaryReader.cpp
 //
-// $Id: //poco/1.3/Foundation/src/BinaryReader.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/BinaryReader.cpp#4 $
 //
 // Library: Foundation
 // Package: Streams
@@ -202,11 +202,12 @@ BinaryReader& BinaryReader::operator >> (std::string& value)
 	UInt32 size = 0;
 	read7BitEncoded(size);
 	value.clear();
+	if (!_istr.good()) return *this;
 	value.reserve(size);
 	while (size--)
 	{
 		char c;
-		_istr.read(&c, 1);
+		if (!_istr.read(&c, 1).good()) break;
 		value += c;
 	}
 	return *this;
@@ -262,7 +263,7 @@ void BinaryReader::readRaw(std::streamsize length, std::string& value)
 	while (length--)
 	{
 		char c;
-		_istr.read(&c, 1);
+		if (!_istr.read(&c, 1).good()) break;
 		value += c;
 	}
 }

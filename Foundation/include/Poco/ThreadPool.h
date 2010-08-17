@@ -1,7 +1,7 @@
 //
 // ThreadPool.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ThreadPool.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/ThreadPool.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -73,12 +73,19 @@ public:
 		int maxCapacity = 16,
 		int idleTime = 60,
 		int stackSize = POCO_THREAD_STACK_SIZE);
+		/// Creates a thread pool with minCapacity threads.
+		/// If required, up to maxCapacity threads are created
+		/// a NoThreadAvailableException exception is thrown.
+		/// If a thread is running idle for more than idleTime seconds,
+		/// and more than minCapacity threads are running, the thread
+		/// is killed. Threads are created with given stack size.
+
 	ThreadPool(const std::string& name,
 		int minCapacity = 2,
 		int maxCapacity = 16,
 		int idleTime = 60,
 		int stackSize = POCO_THREAD_STACK_SIZE);
-		/// Creates a thread pool with minCapacity threads.
+		/// Creates a thread pool with the given name and minCapacity threads.
 		/// If required, up to maxCapacity threads are created
 		/// a NoThreadAvailableException exception is thrown.
 		/// If a thread is running idle for more than idleTime seconds,
@@ -151,6 +158,11 @@ public:
 		/// as the thread pool is also implicitly managed in
 		/// calls to start(), addCapacity() and joinAll().
 
+	const std::string& name() const;
+		/// Returns the name of the thread pool,
+		/// or an empty string if no name has been
+		/// specified in the constructor.
+
 	static ThreadPool& defaultPool();
 		/// Returns a reference to the default
 		/// thread pool.
@@ -191,6 +203,12 @@ inline void ThreadPool::setStackSize(int stackSize)
 inline int ThreadPool::getStackSize() const
 {
 	return _stackSize;
+}
+
+
+inline const std::string& ThreadPool::name() const
+{
+	return _name;
 }
 
 

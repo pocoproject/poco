@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#15 $
+// $Id: //poco/1.3/Foundation/src/Thread_POSIX.cpp#16 $
 //
 // Library: Foundation
 // Package: Threading
@@ -129,7 +129,9 @@ void ThreadImpl::setOSPriorityImpl(int prio)
 
 int ThreadImpl::getMinOSPriorityImpl()
 {
-#if defined(__VMS) || defined(__digital__)
+#if defined(POCO_THREAD_PRIORITY_MIN)
+	return POCO_THREAD_PRIORITY_MIN;
+#elif defined(__VMS) || defined(__digital__)
 	return PRI_OTHER_MIN;
 #else
 	return sched_get_priority_min(SCHED_OTHER);
@@ -139,7 +141,9 @@ int ThreadImpl::getMinOSPriorityImpl()
 
 int ThreadImpl::getMaxOSPriorityImpl()
 {
-#if defined(__VMS) || defined(__digital__)
+#if defined(POCO_THREAD_PRIORITY_MAX)
+	return POCO_THREAD_PRIORITY_MAX;
+#elif defined(__VMS) || defined(__digital__)
 	return PRI_OTHER_MAX;
 #else
 	return sched_get_priority_max(SCHED_OTHER);
