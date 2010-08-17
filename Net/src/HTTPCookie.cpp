@@ -1,7 +1,7 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#5 $
+// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#6 $
 //
 // Library: Net
 // Package: HTTP
@@ -44,6 +44,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
+#include "Poco/URI.h"
 
 
 using Poco::Timestamp;
@@ -311,6 +312,24 @@ std::string HTTPCookie::toString() const
 		}
 		result.append("; Version=\"1\"");
 	}
+	return result;
+}
+
+
+std::string HTTPCookie::escape(const std::string& str)
+{
+	static const std::string ILLEGAL_CHARS("()[]/|\\',;");
+	
+	std::string result;
+	Poco::URI::encode(str, ILLEGAL_CHARS, result);
+	return result;
+}
+
+
+std::string HTTPCookie::unescape(const std::string& str)
+{
+	std::string result;
+	Poco::URI::decode(str, result);
 	return result;
 }
 

@@ -138,7 +138,8 @@ Release 1.4.0 (2010-08-??)
   have the _s suffix
 - The POCO_VERSION macro now is in its own header file, "Poco/Version.h". It is no longer
   available through "Poco/Foundation.h".
-  
+- added Poco::Net::HTTPCookie::escape() and Poco::Net::HTTPCookie::unescape().
+
 
 Release 1.3.6p2 (2010-01-15)
 ============================
@@ -1319,4 +1320,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#116 $
+$Id: //poco/1.3/dist/CHANGELOG#117 $
