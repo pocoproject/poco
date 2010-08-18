@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/1.3/Util/src/WinRegistryKey.cpp#6 $
+// $Id: //poco/1.3/Util/src/WinRegistryKey.cpp#7 $
 //
 // Library: Util
 // Package: Windows
@@ -222,7 +222,7 @@ int WinRegistryKey::getInt(const std::string& name)
 	open();
 	DWORD type;
 	DWORD data;
-	DWORD size;
+	DWORD size = sizeof(data);
 #if defined(POCO_WIN32_UTF8)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(name, uname);
