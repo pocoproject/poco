@@ -1,7 +1,7 @@
 //
 // CipherFactory.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CipherFactory.h#2 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CipherFactory.h#3 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -86,8 +86,6 @@ public:
 		/// Returns the default CipherFactory.
 
 private:
-	static int _instanceCount;
-
 	CipherFactory(const CipherFactory&);
 	CipherFactory& operator = (const CipherFactory&);
 };

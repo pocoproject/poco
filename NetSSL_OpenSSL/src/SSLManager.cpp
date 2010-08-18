@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#14 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#16 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -44,7 +44,6 @@
 #include "Poco/Delegate.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
-#include "Poco/Util/LayeredConfiguration.h"
 
 
 namespace Poco {
@@ -91,7 +90,7 @@ SSLManager::~SSLManager()
 	PrivateKeyPassphraseRequired.clear();
 	ClientVerificationError.clear();
 	ServerVerificationError.clear();
-	_ptrDefaultServerContext = 0; // ensure all Context objects go away before we uninitialize OpenSSL.
+	_ptrDefaultServerContext = 0;
 	_ptrDefaultClientContext = 0;
 	Poco::Crypto::OpenSSLInitializer::uninitialize();
 }
@@ -207,7 +206,7 @@ int SSLManager::verifyCallback(bool server, int ok, X509_STORE_CTX* pStore)
 }
 
 
-int SSLManager::privateKeyPasswdCallback(char* pBuf, int size, int flag, void* userData)
+int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, void* userData)
 {
 	std::string pwd;
 	SSLManager::instance().PrivateKeyPassphraseRequired.notify(&SSLManager::instance(), pwd);
@@ -228,7 +227,7 @@ void SSLManager::initDefaultContext(bool server)
 
 	initEvents(server);
 
-	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
+	Poco::Util::AbstractConfiguration& config = appConfig();
 
 #ifdef OPENSSL_FIPS
 	bool fipsEnabled = config.getBool(CFG_FIPS_MODE, VAL_FIPS_MODE);
@@ -269,12 +268,8 @@ void SSLManager::initDefaultContext(bool server)
 	bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 	if (server)
 	{
-		_ptrDefaultServerContext->enableSessionCache(cacheSessions);
-		std::string sessionIdContext = config.getString(prefix + CFG_SESSION_ID_CONTEXT, "");
-		if (!sessionIdContext.empty())
-		{
-			_ptrDefaultServerContext->enableSessionCache(cacheSessions, sessionIdContext);
-		}
+		std::string sessionIdContext = config.getString(prefix + CFG_SESSION_ID_CONTEXT, config.getString("application.name", ""));
+		_ptrDefaultServerContext->enableSessionCache(cacheSessions, sessionIdContext);
 		if (config.hasProperty(prefix + CFG_SESSION_CACHE_SIZE))
 		{
 			int cacheSize = config.getInt(prefix + CFG_SESSION_CACHE_SIZE);
@@ -311,7 +306,7 @@ void SSLManager::initPassphraseHandler(bool server)
 	if (!server && _ptrClientPassphraseHandler) return;
 	
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
-	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
+	Poco::Util::AbstractConfiguration& config = appConfig();
 
 	std::string className(config.getString(prefix + CFG_DELEGATE_HANDLER, VAL_DELEGATE_HANDLER));
 
@@ -338,7 +333,7 @@ void SSLManager::initCertificateHandler(bool server)
 	if (!server && _ptrClientCertificateHandler) return;
 
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
-	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
+	Poco::Util::AbstractConfiguration& config = appConfig();
 
 	std::string className(config.getString(prefix+CFG_CERTIFICATE_HANDLER, VAL_CERTIFICATE_HANDLER));
 
@@ -356,6 +351,22 @@ void SSLManager::initCertificateHandler(bool server)
 			_ptrClientCertificateHandler = pFactory->create(false);
 	}
 	else throw Poco::Util::UnknownOptionException(std::string("No InvalidCertificate handler known with the name ") + className);
+}
+
+
+Poco::Util::AbstractConfiguration& SSLManager::appConfig()
+{
+	try
+	{
+		return Poco::Util::Application::instance().config();
+	}
+	catch (Poco::NullPointerException&)
+	{
+		throw Poco::IllegalStateException(
+			"An application configuration is required to initialize the Poco::Net::SSLManager, "
+			"but no Poco::Util::Application instance is available."
+		);
+	}
 }
 
 

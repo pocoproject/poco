@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#15 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/Context.cpp#17 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -81,7 +81,7 @@ Context::Context(
 		unsigned long err = ERR_get_error();
 		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
 	}
-	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPasswdCallback);
+	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
 	Utility::clearErrorStack();
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
 
@@ -173,7 +173,7 @@ Context::Context(
 		unsigned long err = ERR_get_error();
 		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
 	}
-	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPasswdCallback);
+	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
 	Utility::clearErrorStack();
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
 
@@ -273,17 +273,20 @@ void Context::enableSessionCache(bool flag)
 void Context::enableSessionCache(bool flag, const std::string& sessionIdContext)
 {
 	poco_assert (_usage == SERVER_USE);
-	poco_assert (sessionIdContext.length() <= SSL_MAX_SSL_SESSION_ID_LENGTH);
+
 	if (flag)
 	{
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_SERVER);
-		int rc = SSL_CTX_set_session_id_context(_pSSLContext, reinterpret_cast<const unsigned char*>(sessionIdContext.data()), static_cast<unsigned>(sessionIdContext.length()));
-		if (rc != 1) throw SSLContextException("cannot set session ID context");
 	}
 	else
 	{
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
 	}
+	
+	unsigned length = static_cast<unsigned>(sessionIdContext.length());
+	if (length > SSL_MAX_SSL_SESSION_ID_LENGTH) length = SSL_MAX_SSL_SESSION_ID_LENGTH;
+	int rc = SSL_CTX_set_session_id_context(_pSSLContext, reinterpret_cast<const unsigned char*>(sessionIdContext.data()), length);
+	if (rc != 1) throw SSLContextException("cannot set session ID context");
 }
 
 

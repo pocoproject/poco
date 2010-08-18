@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#6 $
+// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#7 $
 //
 // Library: Crypto
 // Package: CryotpCore
@@ -80,13 +80,12 @@ void OpenSSLInitializer::initialize()
 	
 	if (++_rc == 1)
 	{
-#if SSLEAY_VERSION_NUMBER >= 0x0907000L
-		// Highly recommended, since it allows some of the defaults to be configured
-		// via the /etc/ssl/openssl.cnf file
+#if OPENSSL_VERSION_NUMBER >= 0x0907000L
 		OPENSSL_config(NULL);
 #endif
-		poco_assert (1 == SSL_library_init()); // always returns 1
+		SSL_library_init();
 		SSL_load_error_strings();
+		OpenSSL_add_all_algorithms();
 		
 		char seed[SEEDSIZE];
 		RandomInputStream rnd;
@@ -131,7 +130,10 @@ void OpenSSLInitializer::lock(int mode, int n, const char* file, int line)
 
 unsigned long OpenSSLInitializer::id()
 {
-	return Poco::Thread::currentTid();
+	// Note: we use an old-style C cast here because
+	// neither static_cast<> nor reinterpret_cast<>
+	// work uniformly across all platforms.
+	return (unsigned long) Poco::Thread::currentTid();
 }
 
 

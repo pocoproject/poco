@@ -1,7 +1,7 @@
 //
 // CipherFactory.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherFactory.cpp#2 $
+// $Id: //poco/1.3/Crypto/src/CipherFactory.cpp#3 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -40,6 +40,7 @@
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/CipherImpl.h"
 #include "Poco/Crypto/RSACipherImpl.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Exception.h"
 #include "Poco/SingletonHolder.h"
 #include <openssl/evp.h>
@@ -50,28 +51,15 @@ namespace Poco {
 namespace Crypto {
 
 
-int CipherFactory::_instanceCount = 0;
-
-
 CipherFactory::CipherFactory()
 {
-	if (_instanceCount == 0)
-	{
-		OpenSSL_add_all_algorithms();
-		ERR_load_crypto_strings();
-	}
-	++_instanceCount;
+	OpenSSLInitializer::initialize();
 }
 
 
 CipherFactory::~CipherFactory()
 {
-	--_instanceCount;
-	if (_instanceCount == 0)
-	{
-		ERR_free_strings();
-		EVP_cleanup();
-	}
+	OpenSSLInitializer::uninitialize();
 }
 
 

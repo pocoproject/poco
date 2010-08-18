@@ -1,7 +1,7 @@
 //
 // KeyFileHandler.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/KeyFileHandler.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/KeyFileHandler.cpp#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -37,7 +37,7 @@
 #include "Poco/Net/KeyFileHandler.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/File.h"
-#include "Poco/Util/LayeredConfiguration.h"
+#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
 
@@ -61,14 +61,22 @@ KeyFileHandler::~KeyFileHandler()
 
 void KeyFileHandler::onPrivateKeyRequested(const void* pSender, std::string& privateKey)
 {
-	Poco::Util::LayeredConfiguration& config = Poco::Util::Application::instance().config();
-	std::string prefix = serverSide() ? SSLManager::CFG_SERVER_PREFIX : SSLManager::CFG_CLIENT_PREFIX;
-	if (!config.hasProperty(prefix + CFG_PRIV_KEY_FILE))
+	try
 	{
-		throw Poco::Util::EmptyOptionException(std::string("Missing Configuration Entry: ") + prefix + CFG_PRIV_KEY_FILE);
+		Poco::Util::AbstractConfiguration& config = Poco::Util::Application::instance().config();
+		std::string prefix = serverSide() ? SSLManager::CFG_SERVER_PREFIX : SSLManager::CFG_CLIENT_PREFIX;
+		if (!config.hasProperty(prefix + CFG_PRIV_KEY_FILE))
+			throw Poco::Util::EmptyOptionException(std::string("Missing Configuration Entry: ") + prefix + CFG_PRIV_KEY_FILE);
+		
+		privateKey = config.getString(prefix + CFG_PRIV_KEY_FILE);
 	}
-
-	privateKey = config.getString(prefix + CFG_PRIV_KEY_FILE);
+	catch (Poco::NullPointerException&)
+	{
+		throw Poco::IllegalStateException(
+			"An application configuration is required to obtain the private key passphrase, "
+			"but no Poco::Util::Application instance is available."
+			);
+	}
 }
 
 
