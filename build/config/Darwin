@@ -1,11 +1,16 @@
 #
-# $Id: //poco/1.3/build/config/Darwin#8 $
+# $Id: //poco/1.3/build/config/Darwin#9 $
 #
 # Darwin
 #
 # Build settings for Mac OS X 10.5/10.6 (GCC 4.0.1)
 # The build settings defined in this file are compatible
 # with XCode 3.1 C++ projects.
+#
+# NOTE: This build configuration will build 64-bit targets
+# on Mac OS X 10.6, but place them into the Darwin/i386
+# directories. Use the Darwin32 and Darwin64 build configurations
+# for correct build locations.
 # 
 
 #
@@ -40,11 +45,11 @@ SHAREDLIBLINKEXT = .dylib
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
-CXXFLAGS        = -Wall -Wno-sign-compare
-LINKFLAGS       =
-SHLIBFLAGS      =
-DYLIBFLAGS      =
+CFLAGS          = $(ARCHFLAGS)
+CXXFLAGS        = $(ARCHFLAGS) -Wall -Wno-sign-compare
+LINKFLAGS       = $(ARCHFLAGS)
+SHLIBFLAGS      = $(ARCHFLAGS)
+DYLIBFLAGS      = $(ARCHFLAGS)
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  =
