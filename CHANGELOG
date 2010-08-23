@@ -146,6 +146,13 @@ Release 1.4.0 (2010-08-??)
 - fixed a bug in Poco::Util::WinRegistryKey::getInt():
   The size variable passed to RegQueryValueExW() should be initialized to the size 
   of the output buffer.
+- Added rudimentary support for compiling with Clang 2.0 (Xcode 4) on Mac OS X.
+- New build configurations for Mac OS X: Darwin32 and Darwin64 for explicit
+  32-bit and 64-bit builds. Note that the default Darwin build configuration 
+  will build 64-bit on Snow Leopard and 32-bit on Leopard, but will always place
+  build products in Darwin/i386. The new Darwin32 and Darwin64 configurations
+  will use the correct directories.
+- fixed SF# 3051598: Bug in URL encoding
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1327,4 +1334,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#119 $
+$Id: //poco/1.3/dist/CHANGELOG#121 $
