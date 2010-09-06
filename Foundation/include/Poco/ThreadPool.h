@@ -1,7 +1,7 @@
 //
 // ThreadPool.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/ThreadPool.h#4 $
+// $Id: //poco/1.3/Foundation/include/Poco/ThreadPool.h#5 $
 //
 // Library: Foundation
 // Package: Threading
@@ -142,13 +142,25 @@ public:
 		/// threads are available.
 
 	void stopAll();
-		/// Stops all running threads.
+		/// Stops all running threads and waits for their completion.
+		///
 		/// Will also delete all thread objects.
 		/// If used, this method should be the last action before
 		/// the thread pool is deleted.
+		///
+		/// Note: If a thread fails to stop within 10 seconds 
+		/// (due to a programming error, for example), the
+		/// underlying thread object will not be deleted and
+		/// this method will return anyway. This allows for a
+		/// more or less graceful shutdown in case of a misbehaving
+		/// thread.
 
 	void joinAll();
 		/// Waits for all threads to complete.
+		///
+		/// Note that this will not actually join() the underlying
+		/// thread, but rather wait for the thread's runnables
+		/// to finish.
 
 	void collect();
 		/// Stops and removes no longer used threads from the

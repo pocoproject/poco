@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/1.3/Foundation/src/ThreadPool.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/ThreadPool.cpp#7 $
 //
 // Library: Foundation
 // Package: Threading
@@ -175,16 +175,17 @@ void PooledThread::activate()
 
 void PooledThread::release()
 {
+	const long JOIN_TIMEOUT = 10000;
+	
 	_mutex.lock();
 	_pTarget = 0;
 	_mutex.unlock();
-	// In case of a statically allocated thread pool (such
-	// as the default thread pool), Windows may have already
-	// terminated the thread before we got here.
-	if (_thread.isRunning()) 
-		_targetReady.set();
-	else
+
+	_targetReady.set();
+	if (_thread.tryJoin(JOIN_TIMEOUT))
+	{
 		delete this;
+	}
 }
 
 
@@ -229,7 +230,6 @@ void PooledThread::run()
 			break;
 		}
 	}
-	delete this;
 }
 
 

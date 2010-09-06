@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#11 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#12 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -166,6 +166,12 @@ int SecureStreamSocketImpl::receiveFrom(void* buffer, int length, SocketAddress&
 void SecureStreamSocketImpl::sendUrgent(unsigned char data)
 {
 	throw Poco::InvalidAccessException("Cannot sendUrgent() on a SecureStreamSocketImpl");
+}
+
+
+int SecureStreamSocketImpl::available()
+{
+	return _impl.available();
 }
 
 

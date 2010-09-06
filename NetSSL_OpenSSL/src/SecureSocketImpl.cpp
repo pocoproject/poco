@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#21 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#22 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -290,6 +290,14 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		return handleError(rc);
 	}
 	return rc;
+}
+
+
+int SecureSocketImpl::available() const
+{
+	poco_check_ptr (_pSSL);
+
+	return SSL_pending(_pSSL);
 }
 
 

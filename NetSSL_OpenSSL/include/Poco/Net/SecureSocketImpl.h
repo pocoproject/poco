@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#12 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#13 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -141,13 +141,17 @@ public:
 		///
 		/// Returns the number of bytes received.
 		
+	int available() const;
+		/// Returns the number of bytes available from the
+		/// SSL buffer for immediate reading.
+	
 	int completeHandshake();
 		/// Completes the SSL handshake.
 		///
 		/// If the SSL connection was the result of an accept(),
 		/// the server-side handshake is completed, otherwise
 		/// a client-side handshake is performed. 
-	
+		
 	poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
 

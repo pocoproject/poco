@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.4.0 (2010-08-??)
+Release 1.4.0 (2010-09-??)
 ==========================
 
 - SSLManager: documentation fixes, code cleanup
@@ -153,6 +153,15 @@ Release 1.4.0 (2010-08-??)
   build products in Darwin/i386. The new Darwin32 and Darwin64 configurations
   will use the correct directories.
 - fixed SF# 3051598: Bug in URL encoding
+- Poco::ThreadPool::stopAll() (and thus also the destructor) will now wait for each
+  pooled thread to terminate before returning. This fixes an issue with creating
+  and orderly shutting down a thread pool in a plugin. Previously, a pooled thread
+  in a thread pool created by a dynamically loaded library might still be running
+  when the plugin's shared library was unloaded, resulting in Bad Things happening.
+  This can now no longer happen. As a downside, a pooled thread that fails to
+  finish will block stopAll() and the destructor forever.
+- NetSSL_OpenSSL: for a SecureStreamSocket, available() now returns the number of bytes that 
+  are pending in the SSL buffer (SSL_pending()), not the actual socket buffer.
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1334,4 +1343,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#121 $
+$Id: //poco/1.3/dist/CHANGELOG#123 $

@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#11 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#12 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -123,6 +123,14 @@ public:
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
+
+	int available();
+		/// Returns the number of bytes available that can be read
+		/// without causing the socket to block.
+		///
+		/// For an SSL connection, returns the number of bytes that
+		/// can be read from the currently buffered SSL record,
+		/// before a new record is read from the underlying socket.
 
 	void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
