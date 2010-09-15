@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/AbstractConfiguration.h#2 $
+// $Id: //poco/1.3/Util/include/Poco/Util/AbstractConfiguration.h#3 $
 //
 // Library: Util
 // Package: Configuration
@@ -141,15 +141,15 @@ public:
 		/// are expanded.
 
 	bool getBool(const std::string& key) const;
-		/// Returns the double value of the property with the given name.
+		/// Returns the boolean value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
-		/// to a double.
+		/// to a boolean.
 		/// If the value contains references to other properties (${<property>}), these
 		/// are expanded.
 		
 	bool getBool(const std::string& key, bool defaultValue) const;
-		/// If a property with the given key exists, returns the property's bool value,
+		/// If a property with the given key exists, returns the property's boolean value,
 		/// otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
 		/// to a boolean.
