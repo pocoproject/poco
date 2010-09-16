@@ -2,7 +2,7 @@
 #
 # configure
 #
-# $Id: //poco/1.3/dist/configure#11 $
+# $Id: //poco/1.3/dist/configure#12 $
 #
 # Configuration script for POCO.
 #
@@ -49,6 +49,15 @@ Options:
     Compile with -DPOCO_NO_FPENVIRONMENT.
     Useful if your C++ compiler has incomplete floating-point support
     (such as uClibc-based systems).
+
+  --no-sharedmemory
+    Compile with -DPOCO_NO_SHAREDMEMORY.
+    For systems that don't support shared memory API's,
+    like uClibc-based Linux systems.
+
+  --no-sharedlibs
+    Compile with -DPOCO_NO_SHAREDLIBS.
+    For systems that don't support shared library loading.
 
   --omit=<component>{,<component>}
     Do not build the specified component(s).
@@ -138,6 +147,14 @@ while [ "$1" != "" ] ; do
 
 	if [ "$1" = "--no-fpenvironment" ] ; then
 		flags="$flags -DPOCO_NO_FPENVIRONMENT"
+	fi
+
+	if [ "$1" = "--no-sharedmemory" ] ; then
+		flags="$flags -DPOCO_NO_SHAREDMEMORY"
+	fi
+
+	if [ "$1" = "--no-sharedlibs" ] ; then
+		flags="$flags -DPOCO_NO_SHAREDLIBS"
 	fi
 
 	if [ "$1" = "--poquito" ] ; then
