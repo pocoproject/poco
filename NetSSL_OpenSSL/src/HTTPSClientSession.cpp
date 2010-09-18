@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#9 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#10 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -119,6 +119,12 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 
 HTTPSClientSession::~HTTPSClientSession()
 {
+}
+
+
+bool HTTPSClientSession::secure() const
+{
+	return true;
 }
 
 

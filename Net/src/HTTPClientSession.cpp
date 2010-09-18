@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPClientSession.cpp#11 $
+// $Id: //poco/1.3/Net/src/HTTPClientSession.cpp#12 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -285,6 +285,12 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 void HTTPClientSession::reset()
 {
 	close();
+}
+
+
+bool HTTPClientSession::secure() const
+{
+	return false;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPClientSession.h#7 $
+// $Id: //poco/1.3/Net/include/Poco/Net/HTTPClientSession.h#8 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -184,6 +184,10 @@ public:
 		///
 		/// The next request will initiate a new connection,
 		/// even if persistent connections are enabled.
+		
+	virtual bool secure() const;
+		/// Return true iff the session uses SSL or TLS,
+		/// or false otherwise.
 	
 protected:
 	enum

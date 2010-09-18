@@ -1,7 +1,7 @@
 //
 // TCPServer.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/TCPServer.h#5 $
+// $Id: //poco/1.3/Net/include/Poco/Net/TCPServer.h#6 $
 //
 // Library: Net
 // Package: TCPServer
@@ -156,7 +156,7 @@ public:
 		/// Returns the number of refused connections.
 
 	Poco::UInt16 port() const;
-		/// Returns the port the server socket listens to
+		/// Returns the port the server socket listens on.
 
 protected:
 	void run();

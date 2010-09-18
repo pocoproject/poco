@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#8 $
+// $Id: //poco/1.3/Net/src/HTTPRequest.cpp#9 $
 //
 // Library: Net
 // Package: HTTP
@@ -35,7 +35,6 @@
 
 
 #include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/NumberFormatter.h"
@@ -118,7 +117,7 @@ void HTTPRequest::setHost(const std::string& host)
 void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 {
 	std::string value(host);
-	if (port != HTTPSession::HTTP_PORT)
+	if (port != 80 && port != 443)
 	{
 		value.append(":");
 		NumberFormatter::append(value, port);

@@ -162,6 +162,9 @@ Release 1.4.0 (2010-09-??)
   finish will block stopAll() and the destructor forever.
 - NetSSL_OpenSSL: for a SecureStreamSocket, available() now returns the number of bytes that 
   are pending in the SSL buffer (SSL_pending()), not the actual socket buffer.
+- Added Poco::Net::HTTPClientSession::secure() to check for a secure connection.
+- Poco::Net::HTTPRequest::setHost() now does not include the port number in the Host header 
+  if it's either 80 or 443.
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1343,4 +1346,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#123 $
+$Id: //poco/1.3/dist/CHANGELOG#124 $
