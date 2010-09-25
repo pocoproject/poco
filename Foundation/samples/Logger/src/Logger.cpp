@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.3/Foundation/samples/Logger/src/Logger.cpp#1 $
+// $Id: //poco/1.3/Foundation/samples/Logger/src/Logger.cpp#2 $
 //
 // This class demonstrates the Logger, PatternFormatter, FormattingChannel,
 // ConsoleChannel and FileChannel classes.
@@ -75,6 +75,9 @@ int main(int argc, char** argv)
 	
 	consoleLogger.information("An information message");
 	fileLogger.information("An information message");
+	
+	poco_information(consoleLogger, "Another informational message");
+	poco_warning_f2(consoleLogger, "A warning message with arguments: %d, %d", 1, 2);
 	
 	Logger::get("ConsoleLogger").error("Another error message");
 	

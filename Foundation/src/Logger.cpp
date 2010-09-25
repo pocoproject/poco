@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Logger.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/Logger.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -127,6 +127,12 @@ void Logger::log(const Message& msg)
 void Logger::log(const Exception& exc)
 {
 	error(exc.displayText());
+}
+
+
+void Logger::log(const Exception& exc, const char* file, int line)
+{
+	error(exc.displayText(), file, line);
 }
 
 
