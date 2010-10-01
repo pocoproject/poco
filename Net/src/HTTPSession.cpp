@@ -1,7 +1,7 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPSession.cpp#5 $
+// $Id: //poco/1.3/Net/src/HTTPSession.cpp#6 $
 //
 // Library: Net
 // Package: HTTP
@@ -226,6 +226,12 @@ StreamSocket HTTPSession::detachSocket()
 void HTTPSession::attachSocket(const StreamSocket& socket)
 {
 	_socket = socket;
+}
+
+
+void HTTPSession::attachSessionData(const Poco::Any& data)
+{
+	_data = data;
 }
 
 
