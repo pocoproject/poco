@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/InflatingStream.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/InflatingStream.cpp#8 $
 //
 // Library: Foundation
 // Package: Streams
@@ -67,6 +67,32 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 }
 
 
+InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits): 
+	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
+	_pIstr(&istr),
+	_pOstr(0),
+	_eof(false),
+	_check(false)
+{
+	_zstr.zalloc    = Z_NULL;
+	_zstr.zfree     = Z_NULL;
+	_zstr.opaque    = Z_NULL;
+	_zstr.next_in   = 0;
+	_zstr.avail_in  = 0;
+	_zstr.next_out  = 0;
+	_zstr.avail_out = 0;
+
+	_buffer = new char[INFLATE_BUFFER_SIZE];
+
+	int rc = inflateInit2(&_zstr, windowBits);
+	if (rc != Z_OK) 
+	{
+		delete [] _buffer;
+		throw IOException(zError(rc)); 
+	}
+}
+
+
 InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type): 
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
 	_pIstr(0),
@@ -85,6 +111,32 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
 	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
+	if (rc != Z_OK) 
+	{
+		delete [] _buffer;
+		throw IOException(zError(rc));
+	}
+}
+
+
+InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits): 
+	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
+	_pIstr(0),
+	_pOstr(&ostr),
+	_eof(false),
+	_check(false)
+{
+	_zstr.zalloc    = Z_NULL;
+	_zstr.zfree     = Z_NULL;
+	_zstr.opaque    = Z_NULL;
+	_zstr.next_in   = 0;
+	_zstr.avail_in  = 0;
+	_zstr.next_out  = 0;
+	_zstr.avail_out = 0;
+
+	_buffer = new char[INFLATE_BUFFER_SIZE];
+
+	int rc = inflateInit2(&_zstr, windowBits);
 	if (rc != Z_OK) 
 	{
 		delete [] _buffer;
@@ -229,8 +281,22 @@ InflatingIOS::InflatingIOS(std::ostream& ostr, InflatingStreamBuf::StreamType ty
 }
 
 
+InflatingIOS::InflatingIOS(std::ostream& ostr, int windowBits):
+	_buf(ostr, windowBits)
+{
+	poco_ios_init(&_buf);
+}
+
+
 InflatingIOS::InflatingIOS(std::istream& istr, InflatingStreamBuf::StreamType type):
 	_buf(istr, type)
+{
+	poco_ios_init(&_buf);
+}
+
+
+InflatingIOS::InflatingIOS(std::istream& istr, int windowBits):
+	_buf(istr, windowBits)
 {
 	poco_ios_init(&_buf);
 }
@@ -254,6 +320,13 @@ InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, InflatingStream
 }
 
 
+InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, int windowBits):
+	InflatingIOS(ostr, windowBits),
+	std::ostream(&_buf)
+{
+}
+
+
 InflatingOutputStream::~InflatingOutputStream()
 {
 }
@@ -267,6 +340,13 @@ int InflatingOutputStream::close()
 
 InflatingInputStream::InflatingInputStream(std::istream& istr, InflatingStreamBuf::StreamType type):
 	InflatingIOS(istr, type),
+	std::istream(&_buf)
+{
+}
+
+
+InflatingInputStream::InflatingInputStream(std::istream& istr, int windowBits):
+	InflatingIOS(istr, windowBits),
 	std::istream(&_buf)
 {
 }

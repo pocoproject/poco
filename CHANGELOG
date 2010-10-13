@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.4.0 (2010-09-??)
+Release 1.4.0 (2010-10-??)
 ==========================
 
 - SSLManager: documentation fixes, code cleanup
@@ -171,6 +171,8 @@ Release 1.4.0 (2010-09-??)
 - new logging macros that incorporate Poco::format(): poco_information_f1(logger, format, arg) with up to 4 arguments
 - added Poco::Net::HTTPSession::attachSessionData() and Poco::Net::HTTPSession::sessionData()
   to attach arbitrary data to a HTTP session.
+- added additional constructors to zlib stream classes that allow passing
+  a windowBits parameter to the underlying zlib library.
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1352,4 +1354,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#126 $
+$Id: //poco/1.3/dist/CHANGELOG#127 $
