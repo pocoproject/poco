@@ -1,7 +1,7 @@
 //
 // ConfigurationView.cpp
 //
-// $Id: //poco/1.3/Util/src/ConfigurationView.cpp#2 $
+// $Id: //poco/1.3/Util/src/ConfigurationView.cpp#3 $
 //
 // Library: Util
 // Package: Configuration
@@ -88,7 +88,7 @@ void ConfigurationView::removeRaw(const std::string& key)
 std::string ConfigurationView::translateKey(const std::string& key) const
 {
 	std::string result = _prefix;
-	if (!result.empty() && !key.empty()) result += '.';
+	if (!result.empty() && !key.empty() && key[0] != '[') result += '.';
 	result += key;
 	return result;
 }
