@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.3/Net/src/MailMessage.cpp#7 $
+// $Id: //poco/1.3/Net/src/MailMessage.cpp#8 $
 //
 // Library: Net
 // Package: Mail
@@ -352,12 +352,14 @@ void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTr
 		{
 			QuotedPrintableEncoder encoder(ostr);
 			StreamCopier::copyStream(istr, encoder);
+			encoder.close();
 		}
 		break;
 	case ENCODING_BASE64:
 		{
 			Base64Encoder encoder(ostr);
 			StreamCopier::copyStream(istr, encoder);
+			encoder.close();
 		}
 		break;
 	}

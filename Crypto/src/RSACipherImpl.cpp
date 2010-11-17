@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#6 $
+// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#7 $
 //
 // Library: Crypto
 // Package: RSA
@@ -175,13 +175,37 @@ namespace
 
 	std::streamsize RSAEncryptImpl::finalize(unsigned char*	output, std::streamsize length)
 	{
-		poco_assert (length >= blockSize());
+		poco_assert (length >= 2*blockSize());
 		int rc = 0;
 		if (_pos > 0)
 		{
-			rc = RSA_public_encrypt(_pos, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
-			if (rc == -1)
-				throwError();
+			int maxLength = blockSize();
+			switch (_paddingMode)
+			{
+			case RSA_PADDING_PKCS1:
+			case RSA_PADDING_SSLV23:
+				maxLength -= 11;
+				break;
+			case RSA_PADDING_PKCS1_OAEP:
+				maxLength -= 41;
+				break;
+			default:
+				break;
+			}
+			if (_pos <= maxLength)
+			{
+				rc = RSA_public_encrypt(_pos, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+				if (rc == -1) throwError();
+			}
+			else
+			{
+				int n = RSA_public_encrypt(maxLength, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+				if (n == -1) throwError();
+				rc += n;
+				n = RSA_public_encrypt(_pos - maxLength, _pBuf + maxLength, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+				if (n == -1) throwError();
+				rc += n;
+			}
 		}
 
 		return rc;

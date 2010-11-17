@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#22 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#23 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -47,6 +47,7 @@
 #include "Poco/Net/DNS.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
+#include "Poco/Format.h"
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 
@@ -395,8 +396,7 @@ int SecureSocketImpl::handleError(int rc)
 		// these should not occur
 		poco_bugcheck();
 		return rc;
-	case SSL_ERROR_SYSCALL:
-	case SSL_ERROR_SSL:
+	default:
 		{
 			long lastError = ERR_get_error();
 			if (lastError == 0)
@@ -405,9 +405,9 @@ int SecureSocketImpl::handleError(int rc)
 				{
 					throw SSLException("The underlying socket connection has been unexpectedly closed");
 				}
-				else if (rc == -1)
+				else
 				{
-					SecureStreamSocketImpl::error("The BIO reported an error");
+					SecureStreamSocketImpl::error(Poco::format("The BIO reported an error: %d", rc));
 				}
 			}
 			else
@@ -419,8 +419,6 @@ int SecureSocketImpl::handleError(int rc)
 			}
 		}
  		break;
-	default:
-		break;
 	}
 	return rc;
 }
