@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/AbstractConfiguration.cpp#3 $
+// $Id: //poco/1.3/Util/src/AbstractConfiguration.cpp#4 $
 //
 // Library: Util
 // Package: Configuration
@@ -208,33 +208,25 @@ bool AbstractConfiguration::getBool(const std::string& key, bool defaultValue) c
 
 void AbstractConfiguration::setString(const std::string& key, const std::string& value)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	setRaw(key, value);
+	setRawWithEvent(key, value);
 }
 
 	
 void AbstractConfiguration::setInt(const std::string& key, int value)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	setRaw(key, NumberFormatter::format(value));
+	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
 
 void AbstractConfiguration::setDouble(const std::string& key, double value)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	setRaw(key, NumberFormatter::format(value));
+	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
 
 void AbstractConfiguration::setBool(const std::string& key, bool value)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	setRaw(key, value ? "true" : "false");
+	setRawWithEvent(key, value ? "true" : "false");
 }
 
 
@@ -300,9 +292,13 @@ std::string AbstractConfiguration::expand(const std::string& value) const
 
 void AbstractConfiguration::remove(const std::string& key)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	propertyRemoving(this, key);
+	{
+		FastMutex::ScopedLock lock(_mutex);
 
-	removeRaw(key);
+		removeRaw(key);
+	}
+	propertyRemoved(this, key);
 }
 
 
@@ -384,6 +380,19 @@ bool AbstractConfiguration::parseBool(const std::string& value)
 		return false;
 	else 
 		throw SyntaxException("Cannot convert to boolean", value);
+}
+
+
+void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string value)
+{
+	KeyValue kv(key, value);
+	propertyChanging(this, kv);
+	{
+		FastMutex::ScopedLock lock(_mutex);
+
+		setRaw(key, value);
+	}
+	propertyChanged(this, kv);
 }
 
 

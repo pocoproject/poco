@@ -1,7 +1,7 @@
 //
 // AbstractConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/AbstractConfigurationTest.h#2 $
+// $Id: //poco/1.3/Util/testsuite/src/AbstractConfigurationTest.h#3 $
 //
 // Definition of the AbstractConfigurationTest class.
 //
@@ -60,13 +60,27 @@ public:
 	void testSetBool();
 	void testKeys();
 	void testRemove();
+	void testChangeEvents();
+	void testRemoveEvents();
 	
 	void setUp();
 	void tearDown();
+	
+	void onPropertyChanging(const void*, Poco::Util::AbstractConfiguration::KeyValue& kv);
+	void onPropertyChanged(const void*, const Poco::Util::AbstractConfiguration::KeyValue& kv);
+	void onPropertyRemoving(const void*, const std::string& key);
+	void onPropertyRemoved(const void*, const std::string& key);
 
 protected:
 	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const = 0;
 	virtual Poco::AutoPtr<Poco::Util::AbstractConfiguration> createConfiguration() const;
+
+	std::string _changingKey;
+	std::string _changingValue;
+	std::string _changedKey;
+	std::string _changedValue;
+	std::string _removingKey;
+	std::string _removedKey;
 };
 
 
@@ -84,6 +98,8 @@ protected:
 		CppUnit_addTest(suite, cls, testSetBool); \
 		CppUnit_addTest(suite, cls, testKeys); \
 		CppUnit_addTest(suite, cls, testRemove); \
+		CppUnit_addTest(suite, cls, testChangeEvents); \
+		CppUnit_addTest(suite, cls, testRemoveEvents); \
 	} while(0)
 
 

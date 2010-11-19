@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.3/XML/src/XMLWriter.cpp#5 $
+// $Id: //poco/1.3/XML/src/XMLWriter.cpp#6 $
 //
 // Library: XML
 // Package: XML
@@ -94,10 +94,11 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 	_contentWritten(false),
 	_unclosedStartTag(false),
 	_prefix(0),
-	_nsContextPushed(false)
+	_nsContextPushed(false),
+	_indent(MARKUP_TAB)
 {
 	_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, *_pOutEncoding);
-	setNewLine(NEWLINE_DEFAULT);
+	setNewLine((_options & CANONICAL_XML) ? NEWLINE_LF : NEWLINE_DEFAULT);
 }
 
 
@@ -116,10 +117,11 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 	_contentWritten(false),
 	_unclosedStartTag(false),
 	_prefix(0),
-	_nsContextPushed(false)
+	_nsContextPushed(false),
+	_indent(MARKUP_TAB)
 {
 	_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, textEncoding);
-	setNewLine(NEWLINE_DEFAULT);
+	setNewLine((_options & CANONICAL_XML) ? NEWLINE_LF : NEWLINE_DEFAULT);
 }
 
 
@@ -138,7 +140,8 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 	_contentWritten(false),
 	_unclosedStartTag(false),
 	_prefix(0),
-	_nsContextPushed(false)
+	_nsContextPushed(false),
+	_indent(MARKUP_TAB)
 {
 	if (pTextEncoding)
 	{
@@ -150,7 +153,7 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 		_pOutEncoding = new Poco::UTF8Encoding;
 		_pTextConverter = new Poco::OutputStreamConverter(str, *_pInEncoding, *_pOutEncoding);
 	}
-	setNewLine(NEWLINE_DEFAULT);
+	setNewLine((_options & CANONICAL_XML) ? NEWLINE_LF : NEWLINE_DEFAULT);
 }
 
 
@@ -184,6 +187,18 @@ void XMLWriter::setNewLine(const std::string& newLineCharacters)
 const std::string& XMLWriter::getNewLine() const
 {
 	return _newLine;
+}
+
+
+void XMLWriter::setIndent(const std::string& indent)
+{
+	_indent = indent;
+}
+
+
+const std::string& XMLWriter::getIndent() const
+{
+	return _indent;
 }
 
 
@@ -517,7 +532,7 @@ void XMLWriter::notationDecl(const XMLString& name, const XMLString* publicId, c
 	if (_options & PRETTY_PRINT)
 	{
 		writeNewLine();
-		writeMarkup(MARKUP_TAB);
+		writeMarkup(_indent);
 	}
 	writeMarkup("<!NOTATION ");
 	writeXML(name);
@@ -548,7 +563,7 @@ void XMLWriter::unparsedEntityDecl(const XMLString& name, const XMLString* publi
 	if (_options & PRETTY_PRINT)
 	{
 		writeNewLine();
-		writeMarkup(MARKUP_TAB);
+		writeMarkup(_indent);
 	}
 	writeMarkup("<!ENTITY ");
 	writeXML(name);
@@ -631,13 +646,18 @@ void XMLWriter::writeStartElement(const XMLString& namespaceURI, const XMLString
 
 void XMLWriter::writeEndElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname)
 {
-	if (_unclosedStartTag)
+	if (_unclosedStartTag && !(_options & CANONICAL_XML))
 	{
 		writeMarkup(MARKUP_SLASHGT);
 		_unclosedStartTag = false;
 	}
 	else
 	{
+		if (_unclosedStartTag)
+		{
+			writeMarkup(MARKUP_GT);
+			_unclosedStartTag = false;
+		}
 		writeMarkup(MARKUP_LTSLASH);
 		if (!localName.empty())
 		{
@@ -739,7 +759,15 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 {
 	for (AttributeMap::const_iterator it = attributeMap.begin(); it != attributeMap.end(); ++it)
 	{
-		writeMarkup(MARKUP_SPACE);
+		if ((_options & PRETTY_PRINT) && (_options & PRETTY_PRINT_ATTRIBUTES))
+		{
+			writeNewLine();
+			writeIndent(_depth + 1);
+		}
+		else
+		{
+			writeMarkup(MARKUP_SPACE);
+		}
 		writeXML(it->first);
 		writeMarkup(MARKUP_EQQUOT);
 		for (XMLString::const_iterator itc = it->second.begin(); itc != it->second.end(); ++itc)
@@ -814,8 +842,14 @@ void XMLWriter::writeNewLine() const
 
 void XMLWriter::writeIndent() const
 {
-	for (int i = 0; i < _depth; ++i)
-		writeMarkup(MARKUP_TAB);
+	writeIndent(_depth);
+}
+
+
+void XMLWriter::writeIndent(int depth) const
+{
+	for (int i = 0; i < depth; ++i)
+		writeMarkup(_indent);
 }
 
 

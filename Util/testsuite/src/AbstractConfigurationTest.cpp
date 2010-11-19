@@ -1,7 +1,7 @@
 //
 // AbstractConfigurationTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/AbstractConfigurationTest.cpp#3 $
+// $Id: //poco/1.3/Util/testsuite/src/AbstractConfigurationTest.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,6 +35,7 @@
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
+#include "Poco/Delegate.h"
 #include <algorithm>
 
 
@@ -104,7 +105,7 @@ void AbstractConfigurationTest::testGetInt()
 	
 	try
 	{
-		int x = pConf->getInt("prop1");
+		pConf->getInt("prop1");
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -126,7 +127,7 @@ void AbstractConfigurationTest::testGetDouble()
 	
 	try
 	{
-		double x = pConf->getDouble("prop1");
+		pConf->getDouble("prop1");
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -154,7 +155,7 @@ void AbstractConfigurationTest::testGetBool()
 
 	try
 	{
-		bool x = pConf->getBool("prop1");
+		pConf->getBool("prop1");
 		fail("not a boolean - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -238,7 +239,53 @@ void AbstractConfigurationTest::testSetBool()
 	pConf->setBool("set.bool2", false);
 	assert (pConf->getBool("set.bool1"));
 	assert (!pConf->getBool("set.bool2"));
-}	
+}
+
+
+void AbstractConfigurationTest::testChangeEvents()
+{
+	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
+
+	pConf->propertyChanging += Poco::delegate(this, &AbstractConfigurationTest::onPropertyChanging);
+	pConf->propertyChanged += Poco::delegate(this, &AbstractConfigurationTest::onPropertyChanged);
+	
+	pConf->setString("set.string1", "foobar");
+	assert (_changingKey == "set.string1");
+	assert (_changingValue == "foobar");
+	assert (_changedKey == "set.string1");
+	assert (_changedValue == "foobar");
+	
+	pConf->setInt("set.int1", 42);
+	assert (_changingKey == "set.int1");
+	assert (_changingValue == "42");
+	assert (_changedKey == "set.int1");
+	assert (_changedValue == "42");
+	
+	pConf->setDouble("set.double1", 1.5);
+	assert (_changingKey == "set.double1");
+	assert (_changingValue == "1.5");
+	assert (_changedKey == "set.double1");
+	assert (_changedValue == "1.5");
+	
+	pConf->setBool("set.bool1", true);
+	assert (_changingKey == "set.bool1");
+	assert (_changingValue == "true");
+	assert (_changedKey == "set.bool1");
+	assert (_changedValue == "true");
+}
+
+
+void AbstractConfigurationTest::testRemoveEvents()
+{
+	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
+
+	pConf->propertyRemoving += Poco::delegate(this, &AbstractConfigurationTest::onPropertyRemoving);
+	pConf->propertyRemoved += Poco::delegate(this, &AbstractConfigurationTest::onPropertyRemoved);
+
+	pConf->remove("prop4.bool1");
+	assert (_removingKey == "prop4.bool1");
+	assert (_removedKey == "prop4.bool1");
+}
 
 
 void AbstractConfigurationTest::testKeys()
@@ -357,9 +404,41 @@ Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfigurat
 
 void AbstractConfigurationTest::setUp()
 {
+	_changingKey.clear();
+	_changingValue.clear();
+	_changedKey.clear();
+	_changedValue.clear();
+	_removingKey.clear();
+	_removedKey.clear();
 }
 
 
 void AbstractConfigurationTest::tearDown()
 {
+}
+
+
+void AbstractConfigurationTest::onPropertyChanging(const void*, AbstractConfiguration::KeyValue& kv)
+{
+	_changingKey   = kv.key();
+	_changingValue = kv.value();
+}
+
+
+void AbstractConfigurationTest::onPropertyChanged(const void*, const AbstractConfiguration::KeyValue& kv)
+{
+	_changedKey   = kv.key();
+	_changedValue = kv.value();
+}
+
+
+void AbstractConfigurationTest::onPropertyRemoving(const void*, const std::string& key)
+{
+	_removingKey = key;
+}
+
+
+void AbstractConfigurationTest::onPropertyRemoved(const void*, const std::string& key)
+{
+	_removedKey = key;
 }
