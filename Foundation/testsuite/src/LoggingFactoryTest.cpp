@@ -1,7 +1,7 @@
 //
 // LoggingFactoryTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/LoggingFactoryTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/LoggingFactoryTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -96,7 +96,7 @@ void LoggingFactoryTest::testBuiltins()
 	LoggingFactory& fact = LoggingFactory::defaultFactory();
 	
 	AutoPtr<Channel> pConsoleChannel = fact.createChannel("ConsoleChannel");
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(_WIN32_WCE)
 	assert (dynamic_cast<Poco::WindowsConsoleChannel*>(pConsoleChannel.get()) != 0);
 #else
 	assert (dynamic_cast<ConsoleChannel*>(pConsoleChannel.get()) != 0);

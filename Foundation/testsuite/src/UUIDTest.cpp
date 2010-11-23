@@ -1,7 +1,7 @@
 //
 // UUIDTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/UUIDTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/UUIDTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -72,37 +72,37 @@ void UUIDTest::testBuffer()
 
 void UUIDTest::testCompare()
 {
-	UUID nil;
-	assert (nil.isNil());
-	assert (UUID::nil().isNil());
+	UUID null;
+	assert (null.isNull());
+	assert (UUID::null().isNull());
 	
-	UUID uuid1 = nil;
+	UUID uuid1 = null;
 	UUID uuid2;
-	assert (uuid1.isNil());
-	assert (uuid1 == nil);
-	assert (!(uuid1 != nil));
-	assert (uuid1 >= nil);
-	assert (uuid1 <= nil);
-	assert (!(uuid1 > nil));
-	assert (!(uuid1 < nil));
+	assert (uuid1.isNull());
+	assert (uuid1 == null);
+	assert (!(uuid1 != null));
+	assert (uuid1 >= null);
+	assert (uuid1 <= null);
+	assert (!(uuid1 > null));
+	assert (!(uuid1 < null));
 	assert (uuid1.toString() == "00000000-0000-0000-0000-000000000000");
 	
 	uuid1 = UUID::dns();
-	assert (!uuid1.isNil());
-	assert (uuid1 != nil);
-	assert (!(uuid1 == nil));
-	assert (uuid1 >= nil);
-	assert (!(uuid1 <= nil));
-	assert (uuid1 > nil);
-	assert (!(uuid1 < nil));
+	assert (!uuid1.isNull());
+	assert (uuid1 != null);
+	assert (!(uuid1 == null));
+	assert (uuid1 >= null);
+	assert (!(uuid1 <= null));
+	assert (uuid1 > null);
+	assert (!(uuid1 < null));
 	assert (uuid1.toString() == "6ba7b810-9dad-11d1-80b4-00c04fd430c8");
 
-	assert (nil != uuid1);
-	assert (!(nil == uuid1));
-	assert (!(nil >= uuid1));
-	assert (nil <= uuid1);
-	assert (!(nil > uuid1));
-	assert (nil < uuid1);
+	assert (null != uuid1);
+	assert (!(null == uuid1));
+	assert (!(null >= uuid1));
+	assert (null <= uuid1);
+	assert (!(null > uuid1));
+	assert (null < uuid1);
 	
 	uuid2 = uuid1;
 	assert (uuid2 == uuid1);
@@ -171,7 +171,7 @@ void UUIDTest::testTryParse()
 
 	UUID notUuid;
 	assert (!notUuid.tryParse("not a uuid"));
-	assert (notUuid.isNil());
+	assert (notUuid.isNull());
 }
 
 void UUIDTest::setUp()

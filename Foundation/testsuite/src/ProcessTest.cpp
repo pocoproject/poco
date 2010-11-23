@@ -1,7 +1,7 @@
 //
 // ProcessTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ProcessTest.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/ProcessTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -66,6 +66,10 @@ void ProcessTest::testLaunch()
 #if defined(POCO_OS_FAMILY_UNIX)
 	cmd = "./";
 	cmd += name;
+#elif defined(_WIN32_WCE)
+	cmd = "\\";
+	cmd += name;
+	cmd += ".EXE";
 #else
 	cmd = name;
 #endif
@@ -82,6 +86,7 @@ void ProcessTest::testLaunch()
 
 void ProcessTest::testLaunchRedirectIn()
 {
+#if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
 #if defined(_DEBUG)
@@ -104,11 +109,13 @@ void ProcessTest::testLaunchRedirectIn()
 	ostr.close();
 	int rc = ph.wait();
 	assert (rc == 100);
+#endif // !defined(_WIN32_WCE)
 }
 
 
 void ProcessTest::testLaunchRedirectOut()
 {
+#if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
 #if defined(_DEBUG)
@@ -133,6 +140,7 @@ void ProcessTest::testLaunchRedirectOut()
 	assert (s == "Hello, world!");
 	int rc = ph.wait();
 	assert (rc == 1);
+#endif // !defined(_WIN32_WCE)
 }
 
 

@@ -6,11 +6,11 @@ AAAIntroduction
 
 !!Summary of Changes
 
-  - SSLManager: documentation fixes, code cleanup
-  - SSLManager: renamed PrivateKeyPassPhrase event to PrivateKeyPassphraseRequired
-  - added HTTPServerRequestImpl::socket() to get access to the underlying socket
-  - added Socket::secure() to find out whether a given socket supports SSL/TLS
-  - added SecureStreamSocket::havePeerCertificate()
+  - Poco::Net::SSLManager: documentation fixes, code cleanup
+  - Poco::Net::SSLManager: renamed PrivateKeyPassPhrase event to PrivateKeyPassphraseRequired
+  - added Poco::Net::HTTPServerRequestImpl::socket() to get access to the underlying socket
+  - added Poco::Net::Socket::secure() to find out whether a given socket supports SSL/TLS
+  - added Poco::Net::SecureStreamSocket::havePeerCertificate()
   - NetSSL: added support for turning off extended certificate validation (hostname matching)
   - fixed SF# 2941228: ICMPClient::ping() issues on Mac OS X
   - fixed SF# 2941231: ICMPEventArgs out of bounds array access
@@ -18,8 +18,8 @@ AAAIntroduction
   - added missing newline at end of xmlparse.c
   - Poco::Glob can now be used with an empty pattern which will match nothing (patch from Kim Graesman)
   - added support for HTTP proxy authentication (Basic authentication only)
-  - fixed SF# 2958959: XMLWriter must encode CR, LF and TAB in attribute values as character entities.
-  - HTMLForm now supports PUT requests as well (see <http://pocoproject.org/forum/viewtopic.php?f=12&t=2163&p=3930#p3930>)
+  - fixed SF# 2958959: Poco::XML::XMLWriter must encode CR, LF and TAB in attribute values as character entities.
+  - Poco::Net::HTMLForm now supports PUT requests as well (see <http://pocoproject.org/forum/viewtopic.php?f=12&t=2163&p=3930#p3930>)
   - fixed SF# #2970521: FileOutputStream and file permissions.
     (also fixed in File class)
   - removed an unused (and wrong) default parameter from EventImpl constructor for WIN32.
@@ -36,7 +36,7 @@ AAAIntroduction
   - added build configuration for iPhone Simulator
   - GNU Make based build system provides new variables: POCO_HOST_BINDIR, POCO_HOST_BINPATH,
     POCO_HOST_LIBDIR, POCO_HOST_LIBPATH and POCO_TARGET_* equivalents.
-  - Application::initialize() and Application::uninitialize() will now be called from within run().
+  - Poco::Util::Application::initialize() and Poco::Util::Application::uninitialize() will now be called from within run().
     This solves various issues with uninitialize() not being called, or being called inappropriately 
     from the Application destructor.
     Please note that this change will break applications that use the Application class,
@@ -49,15 +49,15 @@ AAAIntroduction
     in a heap operation which called a Windows API to allocate memory. This would reset the 
     GetLastError() error code. Since WSAGetLastError() is just an alias for GetLastError(), the actual 
     error code from the socket operation would be lost.
-  - upgraded SQLite to 3.6.23.1
+  - upgraded SQLite to 3.7.3
   - added --header-prefix option to PageCompiler
   - fixed SF# 3003875: SQLite data binding is broken
   - fixed SF# 2993988: Issue with multiple calls to open()/close() on File*Stream
-  - fixed SF# 2990256: HTMLForm and file uploads
+  - fixed SF# 2990256: Poco::Net::HTMLForm and file uploads
   - fixed SF# 2969227: DateTimeParser bug
   - fixed SF# 2966698: Socket connect with timeout issue
   - fixed SF# 2981041: Bind NULL to a query (patch supplied)
-  - fixed SF# 2961419: UTF8Encoding::convert() doesn't work properly in DEBUG mode
+  - fixed SF# 2961419: Poco::UTF8Encoding::convert() doesn't work properly in DEBUG mode
   - fixed SF# 2957068: Timeout value not picked up by proxy in HTTPSClientSession
   - fixed NetSSL_OpenSSL test runner for Poco::Util::Application class changes
   - Poco::AbstractEvent, Poco::AbstractCache and related classes now accept a Mutex class as additional template argument.
@@ -85,10 +85,10 @@ AAAIntroduction
   - fixed SF# 2946457: added RejectCertificateHandler
   - fixed SF# 2946621: Poco::Path bug with POCO_WIN32_UTF8
   - fixed SF# 2929805: Environment::nodeId() does not work if no eth0 device exists
-  - Environment::nodeId() no longer throws if no hardware ethernet address can be determined. 
+  - Poco::Environment::nodeId() no longer throws if no hardware ethernet address can be determined. 
     It returns an all-zero address instead.
   - Added additional classification functions to Poco::Unicode class; made classification functions inline.
-  - added Ascii class for ASCII character classification.
+  - added Poco::Ascii class for ASCII character classification.
     Methods of the Ascii class are now used instead of the
     standard library functions (std::isspace(), etc.) due to
     possible inconsistent results or assertions when the
@@ -104,10 +104,10 @@ AAAIntroduction
     despite the server flag set to true (see http://pocoproject.org/forum/viewtopic.php?f=12&t=3494).
   - PageCompiler: added a new page context directive, to allow passing custom context objects to the
     request handler.
-  - fixed StreamSocketImpl::sendBytes() for non-blocking sockets
+  - fixed Poco::Net::StreamSocketImpl::sendBytes() for non-blocking sockets
   - added Poco::Net::DialogSocket::receiveRawBytes(), which should be used instead of receiveBytes() due to internal 
     buffering by DialogSocket.
-  - DOMParser: FEATURE_WHITESPACE has been renamed to FEATURE_FILTER_WHITESPACE (which now matches the underlying URI)
+  - Poco::XML::DOMParser: FEATURE_WHITESPACE has been renamed to FEATURE_FILTER_WHITESPACE (which now matches the underlying URI)
     and is now handled correctly (previously we did the exact reverse thing)
   - added Poco::Util::AbstractConfiguration::remove() to remove a configuration property; added removeRaw() implementations 
     to all implementations (contributions by Daniel Hobi and Alexey Shults).
@@ -141,10 +141,10 @@ AAAIntroduction
   - The POCO_VERSION macro now is in its own header file, "Poco/Version.h". It is no longer
     available through "Poco/Foundation.h".
   - added Poco::Net::HTTPCookie::escape() and Poco::Net::HTTPCookie::unescape().
-  - fixed SF# 3021173: Thread (POSIX) returns uninitialised value for OS priority
-  - fixed SF# 3040870: ThreadPool has no function to get assigned name
+  - fixed SF# 3021173: Poco::Thread (POSIX) returns uninitialised value for OS priority
+  - fixed SF# 3040870: Poco::ThreadPool has no function to get assigned name
   - fixed SF# 3044303: Can't use own config file on Solaris & OSARCH_64BITS ignored
-  - fixed SF# 2943896: AsyncChannel::log blocks
+  - fixed SF# 2943896: Poco::AsyncChannel::log() blocks
   - fixed a bug in Poco::Util::WinRegistryKey::getInt():
     The size variable passed to RegQueryValueExW() should be initialized to the size 
     of the output buffer.
@@ -162,7 +162,7 @@ AAAIntroduction
     when the plugin's shared library was unloaded, resulting in Bad Things happening.
     This can now no longer happen. As a downside, a pooled thread that fails to
     finish will block stopAll() and the destructor forever.
-  - NetSSL_OpenSSL: for a SecureStreamSocket, available() now returns the number of bytes that 
+  - NetSSL_OpenSSL: for a Poco::Net::SecureStreamSocket, available() now returns the number of bytes that 
     are pending in the SSL buffer (SSL_pending()), not the actual socket buffer.
   - Added Poco::Net::HTTPClientSession::secure() to check for a secure connection.
   - Poco::Net::HTTPRequest::setHost() now does not include the port number in the Host header 
@@ -176,8 +176,8 @@ AAAIntroduction
   - added additional constructors to zlib stream classes that allow passing
     a windowBits parameter to the underlying zlib library.
   - fixed a potential error handling issue in Poco::Net::SecureSocketImpl.
-  - fixed SF# 3110272: RSACipherImpl bug.
-  - fixed SF# 3081677: ConfigurationView's getRaw not retrieving xml attributes.
+  - fixed SF# 3110272: Poco::Crypto::RSACipherImpl bug.
+  - fixed SF# 3081677: Poco::Util::ConfigurationView's getRaw not retrieving xml attributes.
   - added basic support for Canonical XML and better pretty-printing support to Poco::XML::XMLWriter.
   - Poco::Util::AbstractConfiguration now supports events fired when changing or
     removing properties.
@@ -194,7 +194,12 @@ AAAIntroduction
     writing std::vectors of the supported basic types. Also, strings
     can now be written in a different encoding (a Poco::TextEncoding
     can be optionally passed to the constructor).
-
+  - Windows Embedded CE (5.0 and newer) is now a supported platform.
+  - Poco::UUID::nil() and Poco::UUID::isNil() have been renamed to
+    Poco::UUID::null() and Poco::UUID::isNill(), respectively, to avoid
+    issues with Objective-C++ projects on Mac OS X and iOS where nil is
+    a system-provided macro.
+  
 
 !!Incompatible Changes and Possible Transition Issues
 
@@ -202,6 +207,13 @@ AAAIntroduction
     the callback function takes longer to execute than the given
     timer interval. In this case, the missed intervals are counted
     and the next callback will be at the next proper interval.
+  - Poco::XML::DOMParser: FEATURE_WHITESPACE has been renamed to FEATURE_FILTER_WHITESPACE 
+    (which now matches the underlying URI)
+    and is now handled correctly (previously we did the exact reverse thing)
+  - Poco::UUID::nil() and Poco::UUID::isNil() have been renamed to
+    Poco::UUID::null() and Poco::UUID::isNull(), respectively, to avoid
+    issues with Objective-C++ projects on Mac OS X and iOS where nil is
+    a system-provided macro.
     
 
 !!!Release 1.3.6p2

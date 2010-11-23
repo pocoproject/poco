@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Path.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/Path.cpp#6 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -50,7 +50,11 @@
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Path_UNIX.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32_WCE)
+#include "Path_WINCE.cpp"
+#else
 #include "Path_WIN32U.cpp"
+#endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Path_WIN32.cpp"
 #endif

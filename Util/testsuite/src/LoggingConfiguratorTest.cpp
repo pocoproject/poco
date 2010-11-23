@@ -1,7 +1,7 @@
 //
 // LoggingConfiguratorTest.cpp
 //
-// $Id: //poco/1.3/Util/testsuite/src/LoggingConfiguratorTest.cpp#2 $
+// $Id: //poco/1.3/Util/testsuite/src/LoggingConfiguratorTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -111,7 +111,7 @@ void LoggingConfiguratorTest::testConfigurator()
 	assert (root.getLevel() == Message::PRIO_WARNING);
 	FormattingChannel* pFC = dynamic_cast<FormattingChannel*>(root.getChannel());
 	assertNotNull (pFC);
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(_WIN32_WCE)
 	assertNotNull (dynamic_cast<Poco::WindowsConsoleChannel*>(pFC->getChannel()));
 #else
 	assertNotNull (dynamic_cast<ConsoleChannel*>(pFC->getChannel()));

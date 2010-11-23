@@ -1,7 +1,7 @@
 //
 // StreamTokenizerTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/StreamTokenizerTest.cpp#3 $
+// $Id: //poco/1.3/Foundation/testsuite/src/StreamTokenizerTest.cpp#4 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -65,7 +65,7 @@ public:
 	
 	bool start(char c, std::istream& istr)
 	{
-		if (Ascii::isAlpha(c))
+		if (c != -1 && Ascii::isAlpha(c))
 		{
 			_value = c;
 			return true;
@@ -76,7 +76,7 @@ public:
 	void finish(std::istream& istr)
 	{
 		int c = istr.peek();
-		while (Ascii::isAlphaNumeric(c))
+		while (c != -1 && Ascii::isAlphaNumeric(c))
 		{
 			istr.get();
 			_value += c;
@@ -104,7 +104,7 @@ public:
 	
 	bool start(char c, std::istream& istr)
 	{
-		if (Ascii::isDigit(c))
+		if (c != -1 && Ascii::isDigit(c))
 		{
 			_value = c;
 			return true;
@@ -115,7 +115,7 @@ public:
 	void finish(std::istream& istr)
 	{
 		int c = istr.peek();
-		while (Ascii::isDigit(c))
+		while (c != -1 && Ascii::isDigit(c))
 		{
 			istr.get();
 			_value += c;

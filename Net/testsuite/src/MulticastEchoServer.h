@@ -1,7 +1,7 @@
 //
 // MulticastEchoServer.h
 //
-// $Id: //poco/1.3/Net/testsuite/src/MulticastEchoServer.h#1 $
+// $Id: //poco/1.3/Net/testsuite/src/MulticastEchoServer.h#2 $
 //
 // Definition of the MulticastEchoServer class.
 //
@@ -64,7 +64,7 @@ public:
 	const Poco::Net::SocketAddress& group() const;
 		/// Returns the group address where the server listens.
 	
-	const Poco::Net::NetworkInterface& interface() const;
+	const Poco::Net::NetworkInterface& interfc() const;
 		/// Returns the network interface for multicasting.
 	
 protected:	

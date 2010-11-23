@@ -1,7 +1,7 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/FileTest.cpp#6 $
+// $Id: //poco/1.3/Foundation/testsuite/src/FileTest.cpp#7 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -249,13 +249,15 @@ void FileTest::testFileAttributes3()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
 	File f("/dev/console");
-#elif defined(POCO_OS_FAMILY_WINDOWS)
+#elif defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 	File f("CON");
 #endif
 
+#if !defined(_WIN32_WCE)
 	assert (f.isDevice());
 	assert (!f.isFile());
 	assert (!f.isDirectory());
+#endif
 }
 
 
@@ -287,6 +289,12 @@ void FileTest::testCompare()
 void FileTest::testRootDir()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+	File f1("\\");
+	File f2("/");
+	assert (f1.exists());
+	assert (f2.exists());
+#else
 	File f1("/");
 	File f2("c:/");
 	File f3("c:\\");
@@ -295,6 +303,7 @@ void FileTest::testRootDir()
 	assert (f2.exists());
 	assert (f3.exists());
 	assert (f4.exists());
+#endif
 #else
 	File f1("/");
 	assert (f1.exists());

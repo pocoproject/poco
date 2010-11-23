@@ -1,7 +1,7 @@
 //
 // Process.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Process.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/Process.cpp#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -38,7 +38,11 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32_WCE)
+#include "Process_WINCE.cpp"
+#else
 #include "Process_WIN32U.cpp"
+#endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Process_WIN32.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)

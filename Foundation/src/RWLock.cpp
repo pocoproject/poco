@@ -1,7 +1,7 @@
 //
 // RWLock.cpp
 //
-// $Id: //poco/1.3/Foundation/src/RWLock.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/RWLock.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -38,7 +38,11 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+#include "RWLock_WINCE.cpp"
+#else
 #include "RWLock_WIN32.cpp"
+#endif
 #else
 #include "RWLock_POSIX.cpp"
 #endif

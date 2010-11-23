@@ -1,7 +1,7 @@
 //
 // PathTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/PathTest.cpp#2 $
+// $Id: //poco/1.3/Foundation/testsuite/src/PathTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -1563,6 +1563,9 @@ void PathTest::testFind()
 	bool found = Path::find(Environment::get("PATH"), "ls", p);
 	bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123", p);
 #elif defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+	return;
+#endif
 	bool found = Path::find(Environment::get("PATH"), "cmd.exe", p);
 	bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123.zzz", p);
 #else

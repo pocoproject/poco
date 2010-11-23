@@ -1,7 +1,7 @@
 //
 // UUID.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/UUID.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/UUID.h#4 $
 //
 // Library: Foundation
 // Package: UUID
@@ -135,12 +135,12 @@ public:
 	bool operator >  (const UUID& uuid) const;
 	bool operator >= (const UUID& uuid) const;
 	
-	bool isNil() const;
+	bool isNull() const;
 		/// Returns true iff the UUID is nil (in other words,
 		/// consists of all zeros).
 
-	static const UUID& nil();
-		/// Returns a nil UUID.
+	static const UUID& null();
+		/// Returns a null/nil UUID.
 
 	static const UUID& dns();
 		/// Returns the namespace identifier for the DNS namespace.
@@ -221,9 +221,9 @@ inline UUID::Version UUID::version() const
 }
 
 
-inline bool UUID::isNil() const
+inline bool UUID::isNull() const
 {
-	return compare(nil()) == 0;
+	return compare(null()) == 0;
 }
 
 

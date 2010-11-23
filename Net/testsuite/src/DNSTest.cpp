@@ -1,7 +1,7 @@
 //
 // DNSTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/DNSTest.cpp#3 $
+// $Id: //poco/1.3/Net/testsuite/src/DNSTest.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -60,7 +60,11 @@ DNSTest::~DNSTest()
 void DNSTest::testHostByName()
 {
 	HostEntry he1 = DNS::hostByName("www.appinf.com");
+#if defined(_WIN32_WCE)
+	assert (he1.name() == "www.appinf.com");
+#else
 	assert (he1.name() == "appinf.com");
+#endif
 #if !defined(_WIN32) && !defined(POCO_HAVE_IPv6)
 	// getaddrinfo() does not report any aliases
 	assert (!he1.aliases().empty());

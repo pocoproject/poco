@@ -1,7 +1,7 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File_WIN32U.cpp#11 $
+// $Id: //poco/1.3/Foundation/src/File_WIN32U.cpp#12 $
 //
 // Library: Foundation
 // Package: Filesystem

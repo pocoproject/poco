@@ -1,7 +1,7 @@
 //
 // UUID.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UUID.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/UUID.cpp#7 $
 //
 // Library: Foundation
 // Package: UUID
@@ -327,10 +327,10 @@ void UUID::toNetwork()
 }
 
 
-const UUID& UUID::nil()
+const UUID& UUID::null()
 {
-	static UUID nil;
-	return nil;
+	static UUID null;
+	return null;
 }
 
 

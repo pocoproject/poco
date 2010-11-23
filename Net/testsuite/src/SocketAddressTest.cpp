@@ -1,7 +1,7 @@
 //
 // SocketAddressTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/SocketAddressTest.cpp#2 $
+// $Id: //poco/1.3/Net/testsuite/src/SocketAddressTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -70,9 +70,11 @@ void SocketAddressTest::testSocketAddress()
 	assert (sa2.host().toString() == "192.168.1.100");
 	assert (sa2.port() == 100);
 
+#if !defined(_WIN32_WCE)
 	SocketAddress sa3("192.168.1.100", "ftp");
 	assert (sa3.host().toString() == "192.168.1.100");
 	assert (sa3.port() == 21);
+#endif
 
 	try
 	{

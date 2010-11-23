@@ -1,7 +1,7 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/1.3/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#3 $
+// $Id: //poco/1.3/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#4 $
 //
 // This sample demonstrates the NotificationQueue, ThreadPool,
 // FastMutex and ScopedLock classes.
@@ -50,7 +50,6 @@ using Poco::ThreadPool;
 using Poco::Thread;
 using Poco::Runnable;
 using Poco::FastMutex;
-using Poco::Random;
 using Poco::AutoPtr;
 
 
@@ -88,7 +87,7 @@ public:
 	
 	void run()
 	{
-		Random rnd;
+		Poco::Random rnd;
 		for (;;)
 		{
 			Notification::Ptr pNf(_queue.waitDequeueNotification());

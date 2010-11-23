@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.3/Util/src/ServerApplication.cpp#16 $
+// $Id: //poco/1.3/Util/src/ServerApplication.cpp#18 $
 //
 // Library: Util
 // Package: Application
@@ -53,7 +53,9 @@
 #include <sys/stat.h>
 #include <fstream>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
+#if !defined(_WIN32_WCE)
 #include "Poco/Util/WinService.h"
+#endif
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
@@ -75,17 +77,21 @@ namespace Util {
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
+#if !defined(_WIN32_WCE)
 Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus; 
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
+#endif
 #endif
 
 
 ServerApplication::ServerApplication()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if !defined(_WIN32_WCE)
 	_action = SRV_RUN;
 	std::memset(&_serviceStatus, 0, sizeof(_serviceStatus));
+#endif
 #endif
 }
 
@@ -119,6 +125,7 @@ void ServerApplication::terminate()
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if !defined(_WIN32_WCE)
 
 
 //
@@ -417,6 +424,66 @@ void ServerApplication::handleStartup(const std::string& name, const std::string
 }
 
 
+#else // _WIN32_WCE
+void ServerApplication::waitForTerminationRequest()
+{
+	_terminate.wait();
+}
+
+
+int ServerApplication::run(int argc, char** argv)
+{
+	try
+	{
+		init(argc, argv);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	int rc = run();
+	try
+	{
+		uninitialize();
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		rc = EXIT_CONFIG;
+	}
+	return rc;
+}
+
+
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+int ServerApplication::run(int argc, wchar_t** argv)
+{
+	try
+	{
+		init(argc, argv);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	int rc = run();
+	try
+	{
+		uninitialize();
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		rc = EXIT_CONFIG;
+	}
+	return rc;
+}
+#endif
+
+
+#endif // _WIN32_WCE
 #elif defined(POCO_OS_FAMILY_UNIX)
 
 

@@ -1,7 +1,7 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/ServerApplication.h#7 $
+// $Id: //poco/1.3/Util/include/Poco/Util/ServerApplication.h#9 $
 //
 // Library: Util
 // Package: Application
@@ -171,7 +171,9 @@ public:
 protected:
 	int run();
 	void waitForTerminationRequest();
+#if !defined(_WIN32_WCE)
 	void defineOptions(OptionSet& options);
+#endif
 	static void terminate();
 
 private:
@@ -181,6 +183,7 @@ private:
 	bool isDaemon(int argc, char** argv);
 	void beDaemon();
 #elif defined(POCO_OS_FAMILY_WINDOWS)
+#if !defined(_WIN32_WCE)
 	enum Action
 	{
 		SRV_RUN,
@@ -209,10 +212,11 @@ private:
 	std::string _displayName;
 	std::string _startup;
 
-	static Poco::NamedEvent      _terminate;
 	static Poco::Event           _terminated;
 	static SERVICE_STATUS        _serviceStatus; 
 	static SERVICE_STATUS_HANDLE _serviceStatusHandle; 
+#endif // _WIN32_WCE
+	static Poco::NamedEvent      _terminate;
 #endif
 };
 

@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_WIN32U.cpp
 //
-// $Id: //poco/1.3/Foundation/src/DirectoryIterator_WIN32U.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/DirectoryIterator_WIN32U.cpp#5 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -35,7 +35,11 @@
 
 
 #include "Poco/DirectoryIterator_WIN32U.h"
+#if defined(_WIN32_WCE)
+#include "Poco/File_WINCE.h"
+#else
 #include "Poco/File_WIN32U.h"
+#endif
 #include "Poco/Path.h"
 #include "Poco/UnicodeConverter.h"
 #include <cstring>

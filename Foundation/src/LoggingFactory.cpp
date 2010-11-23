@@ -1,7 +1,7 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/1.3/Foundation/src/LoggingFactory.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/LoggingFactory.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -48,7 +48,7 @@
 #if defined(POCO_OS_FAMILY_VMS)
 #include "Poco/OpcomChannel.h"
 #endif
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 #include "Poco/EventLogChannel.h"
 #include "Poco/WindowsConsoleChannel.h"
 #endif
@@ -103,7 +103,7 @@ LoggingFactory& LoggingFactory::defaultFactory()
 void LoggingFactory::registerBuiltins()
 {
 	_channelFactory.registerClass("AsyncChannel", new Instantiator<AsyncChannel, Channel>);
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 	_channelFactory.registerClass("ConsoleChannel", new Instantiator<WindowsConsoleChannel, Channel>);
 #else
 	_channelFactory.registerClass("ConsoleChannel", new Instantiator<ConsoleChannel, Channel>);
@@ -125,7 +125,7 @@ void LoggingFactory::registerBuiltins()
 #if defined(POCO_OS_FAMILY_VMS)
 	_channelFactory.registerClass("OpcomChannel", new Instantiator<OpcomChannel, Channel>);
 #endif
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 	_channelFactory.registerClass("EventLogChannel", new Instantiator<EventLogChannel, Channel>);
 #endif
 

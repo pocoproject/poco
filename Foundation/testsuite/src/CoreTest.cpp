@@ -1,7 +1,7 @@
 //
 // CoreTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.cpp#8 $
+// $Id: //poco/1.3/Foundation/testsuite/src/CoreTest.cpp#9 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -161,10 +161,11 @@ void CoreTest::testBugcheck()
 
 void CoreTest::testEnvironment()
 {
+#if !defined(_WIN32_WCE) 
 	Environment::set("FOO", "BAR");
 	assert (Environment::has("FOO"));
 	assert (Environment::get("FOO") == "BAR");
-	assert (!Environment::has("THISONEDOESNOTEXIST123"));
+#endif
 	try
 	{
 		std::string v = Environment::get("THISONEDOESNOTEXIST123");

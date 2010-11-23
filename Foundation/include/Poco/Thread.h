@@ -1,7 +1,7 @@
 //
 // Thread.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Thread.h#7 $
+// $Id: //poco/1.3/Foundation/include/Poco/Thread.h#8 $
 //
 // Library: Foundation
 // Package: Threading
@@ -45,7 +45,11 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+#include "Poco/Thread_WINCE.h"
+#else
 #include "Poco/Thread_WIN32.h"
+#endif
 #else
 #include "Poco/Thread_POSIX.h"
 #endif

@@ -1,7 +1,7 @@
 //
 // WindowsConsoleChannel.cpp
 //
-// $Id: //poco/1.3/Foundation/src/WindowsConsoleChannel.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/WindowsConsoleChannel.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging

@@ -1,0 +1,46 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Zip", "Zip_CE_vs90.vcproj", "{C61F04B9-012E-4F6D-92EC-982F11DD9607}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_CE_vs90.vcproj", "{61559834-DA78-4378-BF44-68CE13B41AC4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607} = {C61F04B9-012E-4F6D-92EC-982F11DD9607}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_shared|Digi JumpStart (ARMV4I) = debug_shared|Digi JumpStart (ARMV4I)
+		debug_static|Digi JumpStart (ARMV4I) = debug_static|Digi JumpStart (ARMV4I)
+		release_shared|Digi JumpStart (ARMV4I) = release_shared|Digi JumpStart (ARMV4I)
+		release_static|Digi JumpStart (ARMV4I) = release_static|Digi JumpStart (ARMV4I)
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.debug_shared|Digi JumpStart (ARMV4I).ActiveCfg = debug_shared|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.debug_shared|Digi JumpStart (ARMV4I).Build.0 = debug_shared|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.debug_shared|Digi JumpStart (ARMV4I).Deploy.0 = debug_shared|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.debug_static|Digi JumpStart (ARMV4I).ActiveCfg = debug_static|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.debug_static|Digi JumpStart (ARMV4I).Build.0 = debug_static|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.debug_static|Digi JumpStart (ARMV4I).Deploy.0 = debug_static|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.release_shared|Digi JumpStart (ARMV4I).ActiveCfg = release_shared|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.release_shared|Digi JumpStart (ARMV4I).Build.0 = release_shared|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.release_shared|Digi JumpStart (ARMV4I).Deploy.0 = release_shared|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.release_static|Digi JumpStart (ARMV4I).ActiveCfg = release_static|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.release_static|Digi JumpStart (ARMV4I).Build.0 = release_static|Digi JumpStart (ARMV4I)
+		{C61F04B9-012E-4F6D-92EC-982F11DD9607}.release_static|Digi JumpStart (ARMV4I).Deploy.0 = release_static|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.debug_shared|Digi JumpStart (ARMV4I).ActiveCfg = debug_shared|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.debug_shared|Digi JumpStart (ARMV4I).Build.0 = debug_shared|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.debug_shared|Digi JumpStart (ARMV4I).Deploy.0 = debug_shared|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.debug_static|Digi JumpStart (ARMV4I).ActiveCfg = debug_static|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.debug_static|Digi JumpStart (ARMV4I).Build.0 = debug_static|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.debug_static|Digi JumpStart (ARMV4I).Deploy.0 = debug_static|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.release_shared|Digi JumpStart (ARMV4I).ActiveCfg = release_shared|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.release_shared|Digi JumpStart (ARMV4I).Build.0 = release_shared|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.release_shared|Digi JumpStart (ARMV4I).Deploy.0 = release_shared|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.release_static|Digi JumpStart (ARMV4I).ActiveCfg = release_static|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.release_static|Digi JumpStart (ARMV4I).Build.0 = release_static|Digi JumpStart (ARMV4I)
+		{61559834-DA78-4378-BF44-68CE13B41AC4}.release_static|Digi JumpStart (ARMV4I).Deploy.0 = release_static|Digi JumpStart (ARMV4I)
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

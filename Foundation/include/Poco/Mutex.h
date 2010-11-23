@@ -1,7 +1,7 @@
 //
 // Mutex.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Mutex.h#3 $
+// $Id: //poco/1.3/Foundation/include/Poco/Mutex.h#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -46,7 +46,11 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+#include "Poco/Mutex_WINCE.h"
+#else
 #include "Poco/Mutex_WIN32.h"
+#endif
 #else
 #include "Poco/Mutex_POSIX.h"
 #endif

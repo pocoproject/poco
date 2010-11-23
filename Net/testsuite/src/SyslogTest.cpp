@@ -1,7 +1,7 @@
 //
 // SyslogTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/SyslogTest.cpp#1 $
+// $Id: //poco/1.3/Net/testsuite/src/SyslogTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -151,19 +151,19 @@ void SyslogTest::testListener()
 	listener->open();
 	CachingChannel cl;
 	listener->addChannel(&cl);
-	poco_assert (cl.getCurrentSize() == 0);
+	assert (cl.getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	Poco::Thread::sleep(1000);
 	listener->close();
 	channel->close();
-	poco_assert (cl.getCurrentSize() == 1);
+	assert (cl.getCurrentSize() == 1);
 	std::vector<Poco::Message> msgs;
 	cl.getMessages(msgs, 0, 10);
-	poco_assert (msgs.size() == 1);
-	poco_assert (msgs[0].getSource() == "asource");
-	poco_assert (msgs[0].getText() == "amessage");
-	poco_assert (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assert (msgs.size() == 1);
+	assert (msgs[0].getSource() == "asource");
+	assert (msgs[0].getText() == "amessage");
+	assert (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
 }
 
 
@@ -177,20 +177,20 @@ void SyslogTest::testOldBSD()
 	listener->open();
 	CachingChannel cl;
 	listener->addChannel(&cl);
-	poco_assert (cl.getCurrentSize() == 0);
+	assert (cl.getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	Poco::Thread::sleep(1000);
 	listener->close();
 	channel->close();
-	poco_assert (cl.getCurrentSize() == 1);
+	assert (cl.getCurrentSize() == 1);
 	std::vector<Poco::Message> msgs;
 	cl.getMessages(msgs, 0, 10);
-	poco_assert (msgs.size() == 1);
+	assert (msgs.size() == 1);
 	// the source is lost with old BSD messages: we only send the local host name!
-	poco_assert (msgs[0].getSource() == Poco::Net::DNS::thisHost().name());
-	poco_assert (msgs[0].getText() == "amessage");
-	poco_assert (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assert (msgs[0].getSource() == Poco::Net::DNS::thisHost().name());
+	assert (msgs[0].getText() == "amessage");
+	assert (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // File.cpp
 //
-// $Id: //poco/1.3/Foundation/src/File.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/File.cpp#7 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -40,7 +40,11 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32_WCE)
+#include "File_WINCE.cpp"
+#else
 #include "File_WIN32U.cpp"
+#endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "File_WIN32.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
