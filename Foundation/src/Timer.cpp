@@ -1,7 +1,7 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Timer.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/Timer.cpp#8 $
 //
 // Library: Foundation
 // Package: Threading
@@ -46,6 +46,7 @@ namespace Poco {
 Timer::Timer(long startInterval, long periodicInterval): 
 	_startInterval(startInterval), 
 	_periodicInterval(periodicInterval),
+	_skipped(0),
 	_pCallback(0)
 {
 	poco_assert (startInterval >= 0 && periodicInterval >= 0);
@@ -161,16 +162,31 @@ void Timer::setPeriodicInterval(long milliseconds)
 
 void Timer::run()
 {
-	Timestamp now;
+	Poco::Timestamp now;
 	long interval(0);
 	do
 	{
-		now.update();
-		long sleep = static_cast<long>((_nextInvocation - now)/1000);
-		if (sleep < 0) sleep = 0;
+		long sleep(0);
+		do
+		{
+			now.update();
+			sleep = static_cast<long>((_nextInvocation - now)/1000);
+			if (sleep < 0)
+			{
+				if (interval == 0)
+				{
+					sleep = 0;
+					break;
+				}
+				_nextInvocation += interval*1000;
+				++_skipped;
+			}
+		}
+		while (sleep < 0);
+
 		if (_wakeUp.tryWait(sleep))
 		{
-			FastMutex::ScopedLock lock(_mutex);
+			Poco::FastMutex::ScopedLock lock(_mutex);
 			_nextInvocation.update();
 			interval = _periodicInterval;
 		}
@@ -180,27 +196,31 @@ void Timer::run()
 			{
 				_pCallback->invoke(*this);
 			}
-			catch (Exception& exc)
+			catch (Poco::Exception& exc)
 			{
-				ErrorHandler::handle(exc);
+				Poco::ErrorHandler::handle(exc);
 			}
 			catch (std::exception& exc)
 			{
-				ErrorHandler::handle(exc);
+				Poco::ErrorHandler::handle(exc);
 			}
 			catch (...)
 			{
-				ErrorHandler::handle();
+				Poco::ErrorHandler::handle();
 			}
-			{
-				FastMutex::ScopedLock lock(_mutex);
-				interval = _periodicInterval;
-			}
+			interval = _periodicInterval;
 		}
-		_nextInvocation += static_cast<Timestamp::TimeDiff>(interval)*1000;
+		_nextInvocation += interval*1000;
+		_skipped = 0;
 	}
 	while (interval > 0);
 	_done.set();
+}
+
+
+long Timer::skipped() const
+{
+	return _skipped;
 }
 
 

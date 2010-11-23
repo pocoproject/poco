@@ -1,7 +1,7 @@
 //
 // ElementTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/ElementTest.h#1 $
+// $Id: //poco/1.3/XML/testsuite/src/ElementTest.h#2 $
 //
 // Definition of the ElementTest class.
 //
@@ -55,6 +55,8 @@ public:
 	void testInnerText();
 	void testChildElement();
 	void testChildElementNS();
+	void testNodeByPath();
+	void testNodeByPathNS();
 	
 	void setUp();
 	void tearDown();

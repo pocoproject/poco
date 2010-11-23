@@ -1,7 +1,7 @@
 //
 // BinaryReader.cpp
 //
-// $Id: //poco/1.3/Foundation/src/BinaryReader.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/BinaryReader.cpp#5 $
 //
 // Library: Foundation
 // Package: Streams
@@ -36,13 +36,29 @@
 
 #include "Poco/BinaryReader.h"
 #include "Poco/ByteOrder.h"
+#include "Poco/TextEncoding.h"
+#include "Poco/TextConverter.h"
+#include <algorithm>
 
 
 namespace Poco {
 
 
 BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
-	_istr(istr)
+	_istr(istr),
+	_pTextConverter(0)
+{
+#if defined(POCO_ARCH_BIG_ENDIAN)
+	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
+#else
+	_flipBytes = (byteOrder == BIG_ENDIAN_BYTE_ORDER);
+#endif
+}
+
+
+BinaryReader::BinaryReader(std::istream& istr, TextEncoding& encoding, StreamByteOrder byteOrder):
+	_istr(istr),
+	_pTextConverter(new TextConverter(encoding, Poco::TextEncoding::global()))
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
@@ -54,6 +70,7 @@ BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
 
 BinaryReader::~BinaryReader()
 {
+	delete _pTextConverter;
 }
 
 
@@ -209,6 +226,12 @@ BinaryReader& BinaryReader::operator >> (std::string& value)
 		char c;
 		if (!_istr.read(&c, 1).good()) break;
 		value += c;
+	}
+	if (_pTextConverter)
+	{
+		std::string converted;
+		_pTextConverter->convert(value, converted);
+		std::swap(value, converted);
 	}
 	return *this;
 }
