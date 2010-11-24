@@ -1,7 +1,7 @@
 //
 // SSLException.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLException.h#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLException.h#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -52,6 +52,7 @@ POCO_DECLARE_EXCEPTION(NetSSL_API, SSLException, NetException)
 POCO_DECLARE_EXCEPTION(NetSSL_API, SSLContextException, SSLException)
 POCO_DECLARE_EXCEPTION(NetSSL_API, InvalidCertificateException, SSLException)
 POCO_DECLARE_EXCEPTION(NetSSL_API, CertificateValidationException, SSLException)
+POCO_DECLARE_EXCEPTION(NetSSL_API, SSLConnectionUnexpectedlyClosedException, SSLException)
 
 
 } } // namespace Poco::Net

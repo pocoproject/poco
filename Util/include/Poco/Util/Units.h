@@ -1,7 +1,7 @@
 //
 // Units.h
 //
-// $Id: //poco/1.3/Util/include/Poco/Util/Units.h#2 $
+// $Id: //poco/1.3/Util/include/Poco/Util/Units.h#3 $
 //
 // Library: Util
 // Package: Units
@@ -374,7 +374,7 @@ namespace Internal
 		/// specialize this template.
 		/// The default implementation falls through to Convert2.
 	{
-		static_assert<Convertible<T1,T2>::Value> check_convertible;
+		static_assert<Convertible<T1,T2>::Value> checkConvertible;
 			/// If this fails, then T1 is not Convertible to T2:
 
 		template <typename V>
@@ -386,7 +386,7 @@ namespace Internal
 
 	template <typename T>
 	struct Convert<T, T>
-		/// Trivial conversion to the same type.
+		// Trivial conversion to the same type.
 	{
 		template <typename U>
 		static const U& fn(const U& u) { return u; }
@@ -394,7 +394,7 @@ namespace Internal
 	
 	template <typename T>
 	struct Convert3<T, T>
-		/// Convert to same type.
+		// Convert to same type.
 	{
 		template <typename U>
 		static const U& fn(const U& u) { return u; }
@@ -402,7 +402,7 @@ namespace Internal
 
 	template <typename T, typename U, int Num, int Den>
 	struct Convert2<Scale<T, Num, Den>, U>
-		/// Convert from a scaled Unit
+		// Convert from a scaled Unit.
 	{
 		template <typename V>
 		static V fn(const V& v)
@@ -413,7 +413,7 @@ namespace Internal
 	
 	template <typename T, typename U, int Num, int Den>
 	struct Convert3<T, Scale<U, Num, Den> >
-		/// Convert to a scaled Unit
+		// Convert to a scaled Unit.
 	{
 		template <typename V>
 		static V fn(const V& v)
@@ -424,7 +424,7 @@ namespace Internal
 
 	template <typename T, typename U, int Num, int Den>
 	struct Convert2<Translate<T, Num, Den>, U>
-		/// Convert from a translated Unit
+		// Convert from a translated Unit.
 	{
 		template <typename V>
 		static V fn(const V& v)
@@ -435,7 +435,7 @@ namespace Internal
 
 	template <typename T, typename U, int Num, int Den>
 	struct Convert3<T, Translate<U, Num, Den> >
-		/// Convert to a translated Unit
+		// Convert to a translated Unit.
 	{
 		template <typename V>
 		static V fn(const V& v)
@@ -448,7 +448,7 @@ namespace Internal
 	struct CountTerms
 		/// Count the power to which Unit Term is raised in the Unit List.
 		/// Returns a rational num/den of the power of term Term in List.
-		/// The default assumes that Term is not found (num/den=0)
+		/// The default assumes that Term is not found (num/den=0).
 	{
 		static const int num = 0;
 		static const int den = 1;
@@ -463,7 +463,7 @@ namespace Internal
  
 	template <typename Term, typename U, int N, int D>
 	struct CountTerms<Term, Scale<U, N, D> >
-		/// CountTerms ignores scaling factors - that is taken care of by ScalingFactor.
+		// CountTerms ignores scaling factors - that is taken care of by ScalingFactor.
 	{
 		typedef CountTerms<Term, U> result;
 		static const int num = result::num;
@@ -472,7 +472,7 @@ namespace Internal
 
 	template <typename Term, typename U, int N, int D>
 	struct CountTerms<Term, Translate<U, N, D> >
-		/// CountTerms ignores translation.
+		// CountTerms ignores translation.
 	{
 		typedef CountTerms<Term, U> result;
 		static const int num = result::num;
@@ -481,19 +481,17 @@ namespace Internal
 
 	template <typename Term, typename T1, typename T2>
 	struct CountTerms<Term, Compose<T1,T2> >
-		/// Addition of fractions.
+		// Addition of fractions.
 	{
 		typedef CountTerms<Term, T1> result1;
 		typedef CountTerms<Term, T2> result2;
-		static const int num =
-			result1::num * result2::den + result1::den * result2::num;
-		static const int den =
-			result1::den * result2::den;
+		static const int num = result1::num * result2::den + result1::den * result2::num;
+		static const int den = result1::den * result2::den;
 	};
 
 	template <typename Term, typename U, int N, int D>
 	struct CountTerms<Term, Power<U, N, D> >
-		/// Multiplication of fractions.
+		// Multiplication of fractions.
 	{
 		typedef CountTerms<Term, U> result;
 		static const int num = N * result::num;
@@ -543,7 +541,7 @@ namespace Internal
 
 	template <typename T1, typename T2>
 	struct Convertible
-		/// Determines whether two types are Convertible
+		/// Determines whether two types are Convertible.
 		/// Counts the powers in the LHS and RHS and ensures they are equal.
 	{
 		static const bool Value =
@@ -555,7 +553,7 @@ namespace Internal
 	struct FixedPower
 		/// A functor that raises a Value to the power Num/Den.
 		/// The template is specialised for efficiency 
-		/// so that we don't always have to call the std::Power function.
+		/// so that we don't always have to call the std::power function.
 	{
 		template <typename T> static T Power(const T& t)
 		{
@@ -688,8 +686,14 @@ namespace Internal
 
 
 #define UNIT_DISPLAY_NAME(Unit, string) \
-	template <> struct OutputUnit<Unit> { \
-	template <typename Stream> static void fn(Stream& os) { os << string; } \
+	template <> \
+	struct OutputUnit<Unit> \
+	{ \
+		template <typename Stream> \
+		static void fn(Stream& os) \
+		{ \
+			os << string; \
+		} \
 	}
 
 
@@ -697,20 +701,26 @@ namespace Internal
 {
 	template <typename U>
 	struct OutputUnit2
-		/// The default Unit formatting mechanism
+		/// The default Unit formatting mechanism.
 	{
 		template <typename Stream>
-		static void fn(Stream &os) { os << "Units"; }
+		static void fn(Stream &os) 
+		{
+			os << "Units";
+		}
 	};
 }
 
 
 template <typename U>
 struct OutputUnit
-	/// Functor to write Unit text to stream
+	/// Functor to write Unit text to stream.
 {
 	template <typename Stream>
-	static void fn(Stream &os) { Internal::OutputUnit2<U>::fn(os); }
+	static void fn(Stream &os) 
+	{
+		Internal::OutputUnit2<U>::fn(os);
+	}
 };
 
 
@@ -913,16 +923,23 @@ namespace Units
 			_pHolder(new Holder<T>(val)),
 			_multiplier(multiplier),
 			_prefix(prefix)
-		{ }
+		{ 
+		}
 
 		double value() const
-		{ return _pHolder->get() * _multiplier;	}
+		{ 
+			return _pHolder->get() * _multiplier;
+		}
 
 		void addPrefix(std::ostream& os) const
-		{ os << _prefix; }
+		{
+			os << _prefix;
+		}
 
 		void addUnit(std::ostream& os) const
-		{ _pHolder->appendUnit(os); }
+		{
+			_pHolder->appendUnit(os);
+		}
 
 	private:
 		Prefix();
@@ -940,13 +957,19 @@ namespace Units
 		{
 			typedef Value<typename U::ValueType, typename U::Unit> ValueType;
 
-			Holder (const U& val): _val(ValueType(val)) { }
+			Holder (const U& val): _val(ValueType(val)) 
+			{
+			}
 
 			double get() const
-			{ return _val.get(); }
+			{
+				return _val.get();
+			}
 
 			void appendUnit(std::ostream& os) const
-			{ OutputUnit<typename U::Unit>::fn(os); }
+			{
+				OutputUnit<typename U::Unit>::fn(os);
+			}
 
 			ValueType _val;
 		};
@@ -1197,10 +1220,19 @@ namespace Values
 	typedef Value<double, Units::dozen> dozen;
 	typedef Value<double, Units::bakers_dozen> bakers_dozen;
 
-	#define DEFINE_PREFIX_CLASS(name, scale, prefix) struct name: public Units::Prefix \
-	{ template <typename T> name(const T& val): Prefix(val, scale, prefix) { } }; \
-	template <typename Str> Str& operator << (Str& os, const name& val) \
-	{ return streamOp<Str>(os, val); }
+	#define DEFINE_PREFIX_CLASS(name, scale, prefix) \
+		struct name: public Units::Prefix \
+		{ \
+			template <typename T> \
+			name(const T& val): Prefix(val, scale, prefix) \
+			{ \
+			} \
+		}; \
+		template <typename Str> \
+		Str& operator << (Str& os, const name& val) \
+		{ \
+			return streamOp<Str>(os, val); \
+		}
 
 	DEFINE_PREFIX_CLASS (deca, .1, "da")
 	DEFINE_PREFIX_CLASS (hecto, .01, "h")

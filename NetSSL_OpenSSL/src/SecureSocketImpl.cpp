@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#23 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#24 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -251,7 +251,9 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		rc = completeHandshake();
 		if (rc == 1)
 			verifyPeerCertificate();
-		else 
+		else if (rc == 0)
+			throw SSLConnectionUnexpectedlyClosedException();
+		else
 			return rc;
 	}
 	do
@@ -261,7 +263,8 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
 	if (rc <= 0) 
 	{
-		return handleError(rc);
+		rc = handleError(rc);
+		if (rc == 0) throw SSLConnectionUnexpectedlyClosedException();
 	}
 	return rc;
 }
@@ -403,7 +406,7 @@ int SecureSocketImpl::handleError(int rc)
 			{
 				if (rc == 0)
 				{
-					throw SSLException("The underlying socket connection has been unexpectedly closed");
+					throw SSLConnectionUnexpectedlyClosedException();
 				}
 				else
 				{

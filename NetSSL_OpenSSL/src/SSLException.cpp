@@ -1,7 +1,7 @@
 //
 // SSLException.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLException.cpp#2 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLException.cpp#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -46,6 +46,7 @@ POCO_IMPLEMENT_EXCEPTION(SSLException, NetException, "SSL Exception")
 POCO_IMPLEMENT_EXCEPTION(SSLContextException, SSLException, "SSL context exception")
 POCO_IMPLEMENT_EXCEPTION(InvalidCertificateException, SSLException, "Invalid certficate")
 POCO_IMPLEMENT_EXCEPTION(CertificateValidationException, SSLException, "Certificate validation error")
+POCO_IMPLEMENT_EXCEPTION(SSLConnectionUnexpectedlyClosedException, SSLException, "SSL connection unexpectedly closed")
 
 
 } } // namespace Poco::Net

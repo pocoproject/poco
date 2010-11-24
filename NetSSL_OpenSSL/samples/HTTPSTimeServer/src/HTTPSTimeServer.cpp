@@ -1,7 +1,7 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#4 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#5 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -225,7 +225,7 @@ protected:
 		else
 		{
 			// get parameters from configuration file
-			unsigned short port = (unsigned short) config().getInt("HTTPSTimeServer.port", 9980);
+			unsigned short port = (unsigned short) config().getInt("HTTPSTimeServer.port", 9443);
 			std::string format(config().getString("HTTPSTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
 			
 			// set-up a server socket

@@ -12,22 +12,22 @@ AAAIntroduction
   - added Poco::Net::Socket::secure() to find out whether a given socket supports SSL/TLS
   - added Poco::Net::SecureStreamSocket::havePeerCertificate()
   - NetSSL: added support for turning off extended certificate validation (hostname matching)
-  - fixed SF# 2941228: ICMPClient::ping() issues on Mac OS X
-  - fixed SF# 2941231: ICMPEventArgs out of bounds array access
+  - fixed SF# 2941228: Poco::Net::ICMPClient::ping() issues on Mac OS X
+  - fixed SF# 2941231: Poco::Net::ICMPEventArgs out of bounds array access
   - added PageCompiler sample
   - added missing newline at end of xmlparse.c
   - Poco::Glob can now be used with an empty pattern which will match nothing (patch from Kim Graesman)
   - added support for HTTP proxy authentication (Basic authentication only)
   - fixed SF# 2958959: Poco::XML::XMLWriter must encode CR, LF and TAB in attribute values as character entities.
   - Poco::Net::HTMLForm now supports PUT requests as well (see <http://pocoproject.org/forum/viewtopic.php?f=12&t=2163&p=3930#p3930>)
-  - fixed SF# #2970521: FileOutputStream and file permissions.
+  - fixed SF# #2970521: Poco::FileOutputStream and file permissions.
     (also fixed in File class)
   - removed an unused (and wrong) default parameter from EventImpl constructor for WIN32.
   - added full support for session caching to NetSSL_OpenSSL
   - fixed SF# 2984454: Poco::Util::Timer::scheduleAtFixedRate() works incorrectly
   - fixed a bug in Poco::Util::Timer that could lead to high CPU load if
     the system clock is moved forward.
-  - added system.nodeId to SystemConfiguration
+  - added "system.nodeId" property to Poco::Util::SystemConfiguration
   - added a note to Poco::Util::ServerApplication documentation regarding
     creation of threads
   - added Poco::Net::IPAddress::broadcast() and Poco::Net::IPAddress::wildcard() to 
@@ -54,11 +54,11 @@ AAAIntroduction
   - fixed SF# 3003875: SQLite data binding is broken
   - fixed SF# 2993988: Issue with multiple calls to open()/close() on File*Stream
   - fixed SF# 2990256: Poco::Net::HTMLForm and file uploads
-  - fixed SF# 2969227: DateTimeParser bug
+  - fixed SF# 2969227: Poco::DateTimeParser bug
   - fixed SF# 2966698: Socket connect with timeout issue
   - fixed SF# 2981041: Bind NULL to a query (patch supplied)
   - fixed SF# 2961419: Poco::UTF8Encoding::convert() doesn't work properly in DEBUG mode
-  - fixed SF# 2957068: Timeout value not picked up by proxy in HTTPSClientSession
+  - fixed SF# 2957068: Timeout value not picked up by proxy in Poco::Net::HTTPSClientSession
   - fixed NetSSL_OpenSSL test runner for Poco::Util::Application class changes
   - Poco::AbstractEvent, Poco::AbstractCache and related classes now accept a Mutex class as additional template argument.
     Poco::NullMutex can be used if no synchronization is desired.
@@ -77,12 +77,12 @@ AAAIntroduction
   - fixed SF# 2902029: zlib flush support (Z_SYNC_FLUSH)
   - added Poco::TextBufferIterator class
   - fixed SF# 2977249: Use epoll instead select under Linux
-    Socket::select() and Socket::poll() will use epoll under Linux if the Net library is compiled
+    Poco::Net::Socket::select() and Poco::Net::Socket::poll() will use epoll under Linux if the Net library is compiled
     with -DPOCO_HAVE_FD_EPOLL. This is the default for the Linux build configuration (but not for
     the various build configurations targeting embedded Linux platforms).
-  - fixed SF# 2941664: Memory leak in DeflatingStream with zero-length streams (also fixed some other potential, 
+  - fixed SF# 2941664: Memory leak in Poco::DeflatingStream with zero-length streams (also fixed some other potential, 
     but unlikely, memory leaks)
-  - fixed SF# 2946457: added RejectCertificateHandler
+  - fixed SF# 2946457: added Poco::Net::RejectCertificateHandler
   - fixed SF# 2946621: Poco::Path bug with POCO_WIN32_UTF8
   - fixed SF# 2929805: Environment::nodeId() does not work if no eth0 device exists
   - Poco::Environment::nodeId() no longer throws if no hardware ethernet address can be determined. 
@@ -120,8 +120,8 @@ AAAIntroduction
   - fixed SF# 3031530: Ping and possible no timeout
   - added Poco::Net::SocketReactor::onBusy(), called whenever at least one notification will
     be dispatched.
-  - fixed SF# 3034863: Compiler warning in net/IPAddress.h with poco 1.3.2
-  - added support for CRAM-SHA1 authentication to SMTPClientSession
+  - fixed SF# 3034863: Compiler warning in Net/IPAddress.h with poco 1.3.2
+  - added support for CRAM-SHA1 authentication to Poco::Net::SMTPClientSession
   - Poco::format(): arguments can now be addressed by their index, e.g. %[2]d
   - Poco::Util::Timer::cancel() now accepts an optional boolean argument.
     If true is passed, cancel() waits until the task queue has been purged.
@@ -196,7 +196,7 @@ AAAIntroduction
     can be optionally passed to the constructor).
   - Windows Embedded CE (5.0 and newer) is now a supported platform.
   - Poco::UUID::nil() and Poco::UUID::isNil() have been renamed to
-    Poco::UUID::null() and Poco::UUID::isNill(), respectively, to avoid
+    Poco::UUID::null() and Poco::UUID::isNull(), respectively, to avoid
     issues with Objective-C++ projects on Mac OS X and iOS where nil is
     a system-provided macro.
   
