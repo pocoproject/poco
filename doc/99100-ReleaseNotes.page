@@ -199,7 +199,10 @@ AAAIntroduction
     Poco::UUID::null() and Poco::UUID::isNull(), respectively, to avoid
     issues with Objective-C++ projects on Mac OS X and iOS where nil is
     a system-provided macro.
-  
+  - Crypto bugfixes: Poco::Crypto::RSACipherImpl now pads every block of data, not just the 
+    last (or last two).
+  - Improved Crypto testsuite by adding new tests.
+
 
 !!Incompatible Changes and Possible Transition Issues
 

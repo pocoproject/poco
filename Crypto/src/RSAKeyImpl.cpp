@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#8 $
+// $Id: //poco/1.3/Crypto/src/RSAKeyImpl.cpp#9 $
 //
 // Library: Crypto
 // Package: RSA
@@ -155,9 +155,8 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 	_pRSA = RSA_new();
 	if (pPublicKeyStream)
 	{
-		std::stringstream publicKeyStream;
-		Poco::StreamCopier::copyStream(*pPublicKeyStream, publicKeyStream);
-		std::string publicKeyData = publicKeyStream.str();
+		std::string publicKeyData;
+		Poco::StreamCopier::copyToString(*pPublicKeyStream, publicKeyData);
 		BIO* bio = BIO_new_mem_buf(const_cast<char*>(publicKeyData.data()), static_cast<int>(publicKeyData.size()));
 		if (!bio) throw Poco::IOException("Cannot create BIO for reading public key");
 		RSA* publicKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, 0, 0);
@@ -171,9 +170,8 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 
 	if (pPrivateKeyStream)
 	{
-		std::stringstream privateKeyStream;
-		Poco::StreamCopier::copyStream(*pPrivateKeyStream, privateKeyStream);
-		std::string privateKeyData = privateKeyStream.str();
+		std::string privateKeyData;
+		Poco::StreamCopier::copyToString(*pPrivateKeyStream, privateKeyData);
 		BIO* bio = BIO_new_mem_buf(const_cast<char*>(privateKeyData.data()), static_cast<int>(privateKeyData.size()));
 		if (!bio) throw Poco::IOException("Cannot create BIO for reading private key");
 		RSA* privateKey = 0;

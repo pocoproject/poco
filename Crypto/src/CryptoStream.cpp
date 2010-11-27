@@ -1,7 +1,7 @@
 //
 // CryptoStream.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CryptoStream.cpp#3 $
+// $Id: //poco/1.3/Crypto/src/CryptoStream.cpp#5 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -54,35 +54,29 @@ namespace Crypto {
 //
 
 
-CryptoStreamBuf::CryptoStreamBuf(
-	std::istream&	 istr,
-	CryptoTransform* pTransform,
-	std::streamsize  bufferSize) :
-		Poco::BufferedStreamBuf(bufferSize, std::ios::in),
-		_pTransform(pTransform),
-		_pIstr(&istr),
-		_pOstr(0),
-		_eof(false),
-		_buffer(bufferSize)
+CryptoStreamBuf::CryptoStreamBuf(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize):
+	Poco::BufferedStreamBuf(bufferSize, std::ios::in),
+	_pTransform(pTransform),
+	_pIstr(&istr),
+	_pOstr(0),
+	_eof(false),
+	_buffer(bufferSize)
 {
-	poco_check_ptr(pTransform);
-	poco_assert(bufferSize >= 2 * pTransform->blockSize());
+	poco_check_ptr (pTransform);
+	poco_assert (bufferSize > 2 * pTransform->blockSize());
 }
 
 
-CryptoStreamBuf::CryptoStreamBuf(
-	std::ostream&	 ostr,
-	CryptoTransform* pTransform,
-	std::streamsize  bufferSize) :
-		Poco::BufferedStreamBuf(bufferSize, std::ios::out),
-		_pTransform(pTransform),
-		_pIstr(0),
-		_pOstr(&ostr),
-		_eof(false),
-		_buffer(bufferSize)
+CryptoStreamBuf::CryptoStreamBuf(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize):
+	Poco::BufferedStreamBuf(bufferSize, std::ios::out),
+	_pTransform(pTransform),
+	_pIstr(0),
+	_pOstr(&ostr),
+	_eof(false),
+	_buffer(bufferSize)
 {
-	poco_check_ptr(pTransform);
-	poco_assert(bufferSize >= 2 * pTransform->blockSize());
+	poco_check_ptr (pTransform);
+	poco_assert (bufferSize > 2 * pTransform->blockSize());
 }
 
 
@@ -137,12 +131,12 @@ int CryptoStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 	while (!_eof)
 	{
-		int m = static_cast<int>(length) - count - static_cast<int>(_pTransform->blockSize() - 1);
+		int m = (static_cast<int>(length) - count)/2 - static_cast<int>(_pTransform->blockSize());
 
 		// Make sure we can read at least one more block. Explicitely check
 		// for m < 0 since blockSize() returns an unsigned int and the
-		// comparison might give fals results for m < 0.
-		if (m < 0 || m < _pTransform->blockSize())
+		// comparison might give false results for m < 0.
+		if (m <= 0)
 			break;
 
 		int n = 0;
@@ -182,7 +176,7 @@ int CryptoStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	if (!_pOstr)
 		return 0;
 
-	std::size_t maxChunkSize = _buffer.size() - (_pTransform->blockSize() - 1);
+	std::size_t maxChunkSize = _buffer.size()/2;
 	std::size_t count = 0;
 
 	while (count < length)
@@ -221,21 +215,15 @@ int CryptoStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 //
 
 
-CryptoIOS::CryptoIOS(
-	std::istream&	 istr,
-	CryptoTransform* pTransform,
-	std::streamsize  bufferSize) :
-		_buf(istr, pTransform, bufferSize)
+CryptoIOS::CryptoIOS(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize):
+	_buf(istr, pTransform, bufferSize)
 {
 	poco_ios_init(&_buf);
 }
 
 
-CryptoIOS::CryptoIOS(
-	std::ostream&	 ostr,
-	CryptoTransform* pTransform,
-	std::streamsize  bufferSize) :
-		_buf(ostr, pTransform, bufferSize)
+CryptoIOS::CryptoIOS(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize):
+	_buf(ostr, pTransform, bufferSize)
 {
 	poco_ios_init(&_buf);
 }
@@ -257,22 +245,16 @@ CryptoStreamBuf* CryptoIOS::rdbuf()
 //
 
 
-CryptoInputStream::CryptoInputStream(
-	std::istream&	 istr,
-	CryptoTransform* pTransform,
-	std::streamsize  bufferSize) :
-		CryptoIOS(istr, pTransform, bufferSize),
-		std::istream(&_buf)
+CryptoInputStream::CryptoInputStream(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize):
+	CryptoIOS(istr, pTransform, bufferSize),
+	std::istream(&_buf)
 {
 }
 
 
-CryptoInputStream::CryptoInputStream(
-	std::istream&	 istr,
-	Cipher&          cipher, 
-	std::streamsize  bufferSize) :
-		CryptoIOS(istr, cipher.createEncryptor(), bufferSize),
-		std::istream(&_buf)
+CryptoInputStream::CryptoInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize):
+	CryptoIOS(istr, cipher.createEncryptor(), bufferSize),
+	std::istream(&_buf)
 {
 }
 
@@ -287,22 +269,16 @@ CryptoInputStream::~CryptoInputStream()
 //
 
 
-CryptoOutputStream::CryptoOutputStream(
-	std::ostream&    ostr,
-	CryptoTransform* pTransform,
-	std::streamsize  bufferSize) :
-		CryptoIOS(ostr, pTransform, bufferSize),
-		std::ostream(&_buf)
+CryptoOutputStream::CryptoOutputStream(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize):
+	CryptoIOS(ostr, pTransform, bufferSize),
+	std::ostream(&_buf)
 {
 }
 
 
-CryptoOutputStream::CryptoOutputStream(
-	std::ostream&    ostr, 
-	Cipher&          cipher, 
-	std::streamsize  bufferSize):
-		CryptoIOS(ostr, cipher.createDecryptor(), bufferSize),
-		std::ostream(&_buf)
+CryptoOutputStream::CryptoOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize):
+	CryptoIOS(ostr, cipher.createDecryptor(), bufferSize),
+	std::ostream(&_buf)
 {
 }
 

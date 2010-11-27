@@ -1,7 +1,7 @@
 //
 // RSATest.h
 //
-// $Id: //poco/1.3/Crypto/testsuite/src/RSATest.h#1 $
+// $Id: //poco/1.3/Crypto/testsuite/src/RSATest.h#2 $
 //
 // Definition of the RSATest class.
 //
@@ -49,8 +49,8 @@ public:
 	void testNewKeys();
 	void testSign();
 	void testSignManipulated();
-	void createRSACipher();
-	void createRSACipherLarge();
+	void testRSACipher();
+	void testRSACipherLarge();
 	void testCertificate();
 
 	void setUp();

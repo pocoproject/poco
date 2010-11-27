@@ -1,7 +1,7 @@
 //
 // CryptoTest.cpp
 //
-// $Id: //poco/1.3/Crypto/testsuite/src/CryptoTest.cpp#3 $
+// $Id: //poco/1.3/Crypto/testsuite/src/CryptoTest.cpp#4 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -86,24 +86,60 @@ void CryptoTest::testEncryptDecrypt()
 {
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256"));
 
-	std::string in("1234567890");
-	std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
-	std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
-	poco_assert (in == result);
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
+		std::string result = pCipher->decryptString(out, Cipher::ENC_NONE);
+		poco_assert (in == result);
+	}
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
+		std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
+		poco_assert (in == result);
+	}
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
+		std::string result = pCipher->decryptString(out, Cipher::ENC_BINHEX);
+		poco_assert (in == result);
+	}
 }
 
 
 void CryptoTest::testEncryptDecryptWithSalt()
 {
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "simplepwd", "Too much salt"));
-	
-	std::string in("1234567890");
-	std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
-
 	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "simplepwd", "Too much salt"));
 	
-	std::string result = pCipher2->decryptString(out, Cipher::ENC_BASE64);
-	poco_assert (in == result);
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
+		std::string result = pCipher2->decryptString(out, Cipher::ENC_NONE);
+		poco_assert (in == result);
+	}
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
+		std::string result = pCipher2->decryptString(out, Cipher::ENC_BASE64);
+		poco_assert (in == result);
+	}
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
+		std::string result = pCipher2->decryptString(out, Cipher::ENC_BINHEX);
+		poco_assert (in == result);
+	}
 }
 
 

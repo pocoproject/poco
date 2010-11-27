@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#7 $
+// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#9 $
 //
 // Library: Crypto
 // Package: RSA
@@ -90,6 +90,7 @@ namespace
 		~RSAEncryptImpl();
 		
 		std::size_t blockSize() const;
+		std::size_t maxDataSize() const;
 
 		std::streamsize transform(
 			const unsigned char* input,
@@ -129,6 +130,25 @@ namespace
 	}
 
 
+	std::size_t RSAEncryptImpl::maxDataSize() const
+	{
+		std::size_t size = blockSize();
+		switch (_paddingMode)
+		{
+		case RSA_PADDING_PKCS1:
+		case RSA_PADDING_SSLV23:
+			size -= 11;
+			break;
+		case RSA_PADDING_PKCS1_OAEP:
+			size -= 41;
+			break;
+		default:
+			break;
+		}
+		return size;
+	}
+
+
 	std::streamsize RSAEncryptImpl::transform(
 		const unsigned char* input,
 		std::streamsize		 inputLength,
@@ -136,24 +156,25 @@ namespace
 		std::streamsize		 outputLength)
 	{
 		// always fill up the buffer before writing!
+		std::streamsize maxSize = static_cast<std::streamsize>(maxDataSize());
 		std::streamsize rsaSize = static_cast<std::streamsize>(blockSize());
-		poco_assert_dbg(_pos <= rsaSize);
+		poco_assert_dbg(_pos <= maxSize);
 		poco_assert (outputLength >= rsaSize);
 		int rc = 0;
 		while (inputLength > 0)
 		{
 			// check how many data bytes we are missing to get the buffer full
-			poco_assert_dbg (rsaSize >= _pos);
-			std::streamsize missing = rsaSize - _pos;
+			poco_assert_dbg (maxSize >= _pos);
+			std::streamsize missing = maxSize - _pos;
 			if (missing == 0)
 			{
 				poco_assert (outputLength >= rsaSize);
-				int tmp = RSA_public_encrypt(rsaSize, _pBuf, output, const_cast<RSA*>(_pRSA), RSA_NO_PADDING);
-				if (tmp == -1)
+				int n = RSA_public_encrypt(maxSize, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+				if (n == -1)
 					throwError();
-				rc += tmp;
-				output += tmp;
-				outputLength -= tmp;
+				rc += n;
+				output += n;
+				outputLength -= n;
 				_pos = 0;
 				
 			}
@@ -168,46 +189,20 @@ namespace
 				inputLength -= missing;
 			}
 		}
-
 		return rc;
 	}
 
 
 	std::streamsize RSAEncryptImpl::finalize(unsigned char*	output, std::streamsize length)
 	{
-		poco_assert (length >= 2*blockSize());
+		poco_assert (length >= blockSize());
+		poco_assert (_pos <= maxDataSize());
 		int rc = 0;
 		if (_pos > 0)
 		{
-			int maxLength = blockSize();
-			switch (_paddingMode)
-			{
-			case RSA_PADDING_PKCS1:
-			case RSA_PADDING_SSLV23:
-				maxLength -= 11;
-				break;
-			case RSA_PADDING_PKCS1_OAEP:
-				maxLength -= 41;
-				break;
-			default:
-				break;
-			}
-			if (_pos <= maxLength)
-			{
-				rc = RSA_public_encrypt(_pos, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
-				if (rc == -1) throwError();
-			}
-			else
-			{
-				int n = RSA_public_encrypt(maxLength, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
-				if (n == -1) throwError();
-				rc += n;
-				n = RSA_public_encrypt(_pos - maxLength, _pBuf + maxLength, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
-				if (n == -1) throwError();
-				rc += n;
-			}
+			rc = RSA_public_encrypt(_pos, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+			if (rc == -1) throwError();
 		}
-
 		return rc;
 	}
 
@@ -279,7 +274,7 @@ namespace
 			std::streamsize missing = rsaSize - _pos;
 			if (missing == 0)
 			{
-				int tmp = RSA_private_decrypt(rsaSize, _pBuf, output, const_cast<RSA*>(_pRSA), RSA_NO_PADDING);
+				int tmp = RSA_private_decrypt(rsaSize, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 				if (tmp == -1)
 					throwError();
 				rc += tmp;
@@ -299,7 +294,6 @@ namespace
 				inputLength -= missing;
 			}
 		}
-
 		return rc;
 	}
 
@@ -314,7 +308,6 @@ namespace
 			if (rc == -1)
 				throwError();
 		}
-
 		return rc;
 	}
 }
