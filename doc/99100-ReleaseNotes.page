@@ -218,6 +218,16 @@ AAAIntroduction
     named PocoDataMySQL, PocoDataODBC and PocoDataSQLite.
   - fixed SF# 3125498: Linux NetworkInterface::list() doesn't return IPv6 IPs
   - fixed SF# 3125457: IPv6 IPAddress tests are wrong
+  - Added initialization functions for the NetSSL_OpenSSL and Crypto libraries.
+    These should be called instead of relying on automatic initialization,
+    implemented with static initializer objects, as this won't work with
+    statically linked executables (where the linker won't include the
+    static initializer object).
+    The functions are Poco::Crypto::initializeCrypto(), Poco::Crypto::uninitializeCrypto(),
+    Poco::Net::initializeSSL() and Poco::Net::uninitializeSSL().
+    Applications using Crypto and/or NetSSL should call these methods appropriately at
+    program startup and shutdown.
+    Note: In release 1.3.6, similar functions have been added to the Net library.
 
 
 !!Incompatible Changes and Possible Transition Issues
@@ -239,6 +249,16 @@ AAAIntroduction
     and release_static have been renamed to debug_static_md and 
     release_static_md, respectively. Also, the suffixes of the static
     library names have changed to match usual conventions.
+  - New static initialization functions for the Crypto and NetSSL_OpenSSL libraries
+    have been added. These should be called instead of relying on automatic initialization,
+    implemented with static initializer objects, as this won't work with
+    statically linked executables (where the linker won't include the
+    static initializer object).
+    The functions are Poco::Crypto::initializeCrypto(), Poco::Crypto::uninitializeCrypto(),
+    Poco::Net::initializeSSL() and Poco::Net::uninitializeSSL().
+    Applications using Crypto and/or NetSSL should call these methods appropriately at
+    program startup and shutdown.
+    Note: In release 1.3.6, similar functions have been added to the Net library.
 
 
 !!!Release 1.3.6p2

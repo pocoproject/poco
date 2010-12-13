@@ -1,7 +1,7 @@
 //
 // Crypto.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Crypto.h#4 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Crypto.h#5 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -102,7 +102,7 @@ namespace Poco {
 namespace Crypto {
 
 
-void initializeCrypto();
+void Crypto_API initializeCrypto();
 	/// Initialize the Crypto library, as well as the underlying OpenSSL
 	/// libraries, by calling OpenSSLInitializer::initialize().
 	///
@@ -119,7 +119,7 @@ void initializeCrypto();
 	/// must be performed.
 	
 
-void uninitializeCrypto();
+void Crypto_API uninitializeCrypto();
 	/// Uninitializes the Crypto library by calling 
 	/// OpenSSLInitializer::uninitialize().
 

@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.3/build/rules/global#13 $
+# $Id: //poco/1.3/build/rules/global#15 $
 #
 # global
 #
@@ -74,7 +74,7 @@ endif
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
-POCO_HOST_OSARCH = $(subst /,-,$(shell uname -m | tr ' ' _))
+POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
 
 #
 # Begin Sun platforms
@@ -112,6 +112,11 @@ POCO_CONFIG = $(POCO_HOST_OSNAME)
 endif
 
 #
+# Include System Specific Settings
+#
+include $(POCO_BASE)/build/config/$(POCO_CONFIG)
+
+#
 # Check if a 64bit build is requested
 #
 ifndef OSARCH_64BITS
@@ -123,11 +128,6 @@ OSARCH_POSTFIX = 64
 else
 OSARCH_POSTFIX =
 endif
-
-#
-# Include System Specific Settings
-#
-include $(POCO_BASE)/build/config/$(POCO_CONFIG)
 
 #
 # Determine operating system

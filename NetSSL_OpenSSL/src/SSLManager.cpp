@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#18 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#19 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -81,14 +81,12 @@ const bool        SSLManager::VAL_FIPS_MODE(false);
 
 SSLManager::SSLManager()
 {
-	Poco::Crypto::OpenSSLInitializer::initialize();
 }
 
 
 SSLManager::~SSLManager()
 {
 	shutdown();
-	Poco::Crypto::OpenSSLInitializer::uninitialize();
 }
 
 

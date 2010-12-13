@@ -215,7 +215,17 @@ Release 1.4.0 (2010-12-14)
   named PocoDataMySQL, PocoDataODBC and PocoDataSQLite.
 - fixed SF# 3125498: Linux NetworkInterface::list() doesn't return IPv6 IPs
 - fixed SF# 3125457: IPv6 IPAddress tests are wrong
-
+- Added initialization functions for the NetSSL_OpenSSL and Crypto libraries.
+  These should be called instead of relying on automatic initialization,
+  implemented with static initializer objects, as this won't work with
+  statically linked executables (where the linker won't include the
+  static initializer object).
+  The functions are Poco::Crypto::initializeCrypto(), Poco::Crypto::uninitializeCrypto(),
+  Poco::Net::initializeSSL() and Poco::Net::uninitializeSSL().
+  Applications using Crypto and/or NetSSL should call these methods appropriately at
+  program startup and shutdown.
+  Note: In release 1.3.6, similar functions have been added to the Net library.
+  
 
 Release 1.3.6p2 (2010-01-15)
 ============================
@@ -1396,4 +1406,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#137 $
+$Id: //poco/1.3/dist/CHANGELOG#138 $
