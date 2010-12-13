@@ -1,7 +1,7 @@
 //
 // UUIDGenerator.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UUIDGenerator.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/UUIDGenerator.cpp#6 $
 //
 // Library: Foundation
 // Package: UUID
@@ -88,7 +88,11 @@ UUID UUIDGenerator::createFromName(const UUID& nsid, const std::string& name, Di
 	UUID netNsid = nsid;
 	netNsid.toNetwork();
 	de.reset();
-	de.update(&netNsid, sizeof(netNsid));
+	de.update(&netNsid._timeLow, sizeof(netNsid._timeLow));
+	de.update(&netNsid._timeMid, sizeof(netNsid._timeMid));
+	de.update(&netNsid._timeHiAndVersion, sizeof(netNsid._timeHiAndVersion));
+	de.update(&netNsid._clockSeq, sizeof(netNsid._clockSeq));
+	de.update(&netNsid._node[0], sizeof(netNsid._node));
 	de.update(name);
 	char buffer[16];
 	const DigestEngine::Digest& d = de.digest();
@@ -145,9 +149,14 @@ UUID UUIDGenerator::createOne()
 }
 
 
-UUIDGenerator& UUIDGenerator::defaultGenerator()
+namespace
 {
 	static SingletonHolder<UUIDGenerator> sh;
+}
+
+
+UUIDGenerator& UUIDGenerator::defaultGenerator()
+{
 	return *sh.get();
 }
 

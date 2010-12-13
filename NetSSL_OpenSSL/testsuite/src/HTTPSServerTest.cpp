@@ -1,7 +1,7 @@
 //
 // HTTPSServerTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSServerTest.cpp#4 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -77,7 +77,7 @@ namespace
 			
 			std::istream& istr = request.stream();
 			std::ostream& ostr = response.send();
-			int n = StreamCopier::copyStream(istr, ostr);
+			StreamCopier::copyStream(istr, ostr);
 		}
 	};
 	

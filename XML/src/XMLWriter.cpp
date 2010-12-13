@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.3/XML/src/XMLWriter.cpp#6 $
+// $Id: //poco/1.3/XML/src/XMLWriter.cpp#7 $
 //
 // Library: XML
 // Package: XML
@@ -266,7 +266,7 @@ void XMLWriter::endFragment()
 
 void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname)
 {
-	static const AttributesImpl attributes;
+	const AttributesImpl attributes;
 	startElement(namespaceURI, localName, qname, attributes);
 }
 
@@ -305,7 +305,7 @@ void XMLWriter::endElement(const XMLString& namespaceURI, const XMLString& local
 
 void XMLWriter::emptyElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname)
 {
-	static const AttributesImpl attributes;
+	const AttributesImpl attributes;
 	emptyElement(namespaceURI, localName, qname, attributes);
 }
 
@@ -398,14 +398,18 @@ void XMLWriter::processingInstruction(const XMLString& target, const XMLString& 
 }
 
 
+namespace
+{
+	static const XMLString CDATA = toXMLString("CDATA");
+}
+
+
 void XMLWriter::dataElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname,
                              const XMLString& data,
 	                         const XMLString& attr1, const XMLString& value1,
 							 const XMLString& attr2, const XMLString& value2,
 							 const XMLString& attr3, const XMLString& value3)
 {
-	static const XMLString CDATA = toXMLString("CDATA");
-
 	AttributesImpl attributes;
 	if (!attr1.empty()) attributes.addAttribute(XMLString(), XMLString(), attr1, CDATA, value1);
 	if (!attr2.empty()) attributes.addAttribute(XMLString(), XMLString(), attr2, CDATA, value2);

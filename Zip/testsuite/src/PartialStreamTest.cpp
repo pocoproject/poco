@@ -1,7 +1,7 @@
 //
 // PartialStreamTest.cpp
 //
-// $Id: //poco/1.3/Zip/testsuite/src/PartialStreamTest.cpp#4 $
+// $Id: //poco/1.3/Zip/testsuite/src/PartialStreamTest.cpp#5 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -60,7 +60,7 @@ void PartialStreamTest::testReading()
 	PartialInputStream in(istr, 0, static_cast<std::streamoff>(message.length()), true, prefix, postfix);
 	char buf[124];
 	in.read(buf, 124);
-	std::string res(buf, in.gcount());
+	std::string res(buf, static_cast<std::string::size_type>(in.gcount()));
 	assert (res == result);
 }
 

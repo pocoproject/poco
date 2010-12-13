@@ -1,49 +1,38 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="9,00"
 	Name="NetSSL_OpenSSL"
+	Version="9.00"
+	ProjectType="Visual C++"
 	ProjectGUID="{5AECC55E-A469-11DA-8DA6-005056C00008}"
-	RootNamespace="OpenSSL"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
-	>
+	RootNamespace="NetSSL_OpenSSL"
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
+	<ToolFiles/>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\debug_shared"
-			IntermediateDirectory="obj\debug_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="2"
-			>
+			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCMIDLTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;NetSSL_EXPORTS"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -57,75 +46,56 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-			/>
+				DisableSpecificWarnings=""/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib PocoNetd.lib PocoUtild.lib libeay32mdd.lib ssleay32mdd.lib ws2_32.lib"
+				AdditionalDependencies="libeay32mdd.lib ssleay32mdd.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin\PocoNetSSLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoNetSSLd.pdb"
+				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
-				OptimizeForWindows98="0"
 				ImportLibrary="..\lib\PocoNetSSLd.lib"
-				TargetMachine="1"
-			/>
+				TargetMachine="1"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManifestTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
+				Name="VCAppVerifierTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\release_shared"
-			IntermediateDirectory="obj\release_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="2"
-			>
+			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCMIDLTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
@@ -133,10 +103,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;NetSSL_EXPORTS"
-				GeneratePreprocessedFile="0"
-				KeepComments="false"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -148,82 +116,174 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-			/>
+				DisableSpecificWarnings=""/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib PocoNet.lib PocoUtil.lib libeay32md.lib ssleay32md.lib ws2_32.lib"
+				AdditionalDependencies="libeay32md.lib ssleay32md.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin\PocoNetSSL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile=""
+				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				OptimizeForWindows98="0"
 				ImportLibrary="..\lib\PocoNetSSL.lib"
-				TargetMachine="1"
-			/>
+				TargetMachine="1"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManifestTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
+				Name="VCAppVerifierTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static|Win32"
+			Name="debug_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="2"
-			>
+			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCMIDLTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS;POCO_STATIC"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
+				StringPooling="true"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				BufferSecurityCheck="true"
+				TreatWChar_tAsBuiltInType="true"
+				ForceConformanceInForLoopScope="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="4"
+				CompileAs="0"
+				DisableSpecificWarnings=""/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\PocoNetSSLmtd.lib"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+		</Configuration>
+		<Configuration
+			Name="release_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				TreatWChar_tAsBuiltInType="true"
+				ForceConformanceInForLoopScope="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings=""/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\PocoNetSSLmt.lib"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -237,60 +297,43 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="0"
-			/>
+				DisableSpecificWarnings=""/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="..\lib\PocoNetSSLmtd.lib"
-			/>
+				OutputFile="..\lib\PocoNetSSLmdd.lib"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static|Win32"
+			Name="release_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="2"
-			>
+			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCMIDLTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
@@ -298,10 +341,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Net\include;..\Crypto\include;..\Util\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS;POCO_STATIC"
-				GeneratePreprocessedFile="0"
-				KeepComments="false"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -313,310 +354,176 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 				CompileAs="0"
-			/>
+				DisableSpecificWarnings=""/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="..\lib\PocoNetSSLmt.lib"
-			/>
+				OutputFile="..\lib\PocoNetSSLmd.lib"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="SSLCore"
-			>
+			Name="SSLCore">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Net\AcceptCertificateHandler.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\AcceptCertificateHandler.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\CertificateHandlerFactory.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\CertificateHandlerFactory.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\CertificateHandlerFactoryMgr.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\CertificateHandlerFactoryMgr.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\ConsoleCertificateHandler.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\ConsoleCertificateHandler.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\Context.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\Context.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\InvalidCertificateHandler.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\InvalidCertificateHandler.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\KeyConsoleHandler.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\KeyConsoleHandler.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\KeyFileHandler.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\KeyFileHandler.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\NetSSL.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\NetSSL.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\PrivateKeyFactory.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\PrivateKeyFactory.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\PrivateKeyFactoryMgr.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\PrivateKeyFactoryMgr.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\PrivateKeyPassphraseHandler.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\PrivateKeyPassphraseHandler.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\RejectCertificateHandler.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\RejectCertificateHandler.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\Session.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\Session.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\SSLException.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\SSLException.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\SSLManager.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\SSLManager.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\Utility.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\Utility.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\VerificationErrorArgs.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\VerificationErrorArgs.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\X509Certificate.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\X509Certificate.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\AcceptCertificateHandler.cpp"
-					>
-				</File>
+					RelativePath=".\src\AcceptCertificateHandler.cpp"/>
 				<File
-					RelativePath=".\src\CertificateHandlerFactory.cpp"
-					>
-				</File>
+					RelativePath=".\src\CertificateHandlerFactory.cpp"/>
 				<File
-					RelativePath=".\src\CertificateHandlerFactoryMgr.cpp"
-					>
-				</File>
+					RelativePath=".\src\CertificateHandlerFactoryMgr.cpp"/>
 				<File
-					RelativePath=".\src\ConsoleCertificateHandler.cpp"
-					>
-				</File>
+					RelativePath=".\src\ConsoleCertificateHandler.cpp"/>
 				<File
-					RelativePath=".\src\Context.cpp"
-					>
-				</File>
+					RelativePath=".\src\Context.cpp"/>
 				<File
-					RelativePath=".\src\InvalidCertificateHandler.cpp"
-					>
-				</File>
+					RelativePath=".\src\InvalidCertificateHandler.cpp"/>
 				<File
-					RelativePath=".\src\KeyConsoleHandler.cpp"
-					>
-				</File>
+					RelativePath=".\src\KeyConsoleHandler.cpp"/>
 				<File
-					RelativePath=".\src\KeyFileHandler.cpp"
-					>
-				</File>
+					RelativePath=".\src\KeyFileHandler.cpp"/>
 				<File
-					RelativePath=".\src\PrivateKeyFactory.cpp"
-					>
-				</File>
+					RelativePath=".\src\PrivateKeyFactory.cpp"/>
 				<File
-					RelativePath=".\src\PrivateKeyFactoryMgr.cpp"
-					>
-				</File>
+					RelativePath=".\src\PrivateKeyFactoryMgr.cpp"/>
 				<File
-					RelativePath=".\src\PrivateKeyPassphraseHandler.cpp"
-					>
-				</File>
+					RelativePath=".\src\PrivateKeyPassphraseHandler.cpp"/>
 				<File
-					RelativePath=".\src\RejectCertificateHandler.cpp"
-					>
-				</File>
+					RelativePath=".\src\RejectCertificateHandler.cpp"/>
 				<File
-					RelativePath=".\src\Session.cpp"
-					>
-				</File>
+					RelativePath=".\src\Session.cpp"/>
 				<File
-					RelativePath=".\src\SSLException.cpp"
-					>
-				</File>
+					RelativePath=".\src\SSLException.cpp"/>
 				<File
-					RelativePath=".\src\SSLManager.cpp"
-					>
-				</File>
+					RelativePath=".\src\SSLManager.cpp"/>
 				<File
-					RelativePath=".\src\Utility.cpp"
-					>
-				</File>
+					RelativePath=".\src\Utility.cpp"/>
 				<File
-					RelativePath=".\src\VerificationErrorArgs.cpp"
-					>
-				</File>
+					RelativePath=".\src\VerificationErrorArgs.cpp"/>
 				<File
-					RelativePath=".\src\X509Certificate.cpp"
-					>
-				</File>
+					RelativePath=".\src\X509Certificate.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="HTTPSClient"
-			>
+			Name="HTTPSClient">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Net\HTTPSClientSession.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\HTTPSClientSession.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPSSessionInstantiator.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\HTTPSSessionInstantiator.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPSStreamFactory.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\HTTPSStreamFactory.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\HTTPSClientSession.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPSClientSession.cpp"/>
 				<File
-					RelativePath=".\src\HTTPSSessionInstantiator.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPSSessionInstantiator.cpp"/>
 				<File
-					RelativePath=".\src\HTTPSStreamFactory.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPSStreamFactory.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="SSLSockets"
-			>
+			Name="SSLSockets">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Net\SecureServerSocket.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\SecureServerSocket.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\SecureServerSocketImpl.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\SecureServerSocketImpl.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\SecureSocketImpl.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\SecureSocketImpl.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\SecureStreamSocket.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\SecureStreamSocket.h"/>
 				<File
-					RelativePath=".\include\Poco\Net\SecureStreamSocketImpl.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\SecureStreamSocketImpl.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\SecureServerSocket.cpp"
-					>
-				</File>
+					RelativePath=".\src\SecureServerSocket.cpp"/>
 				<File
-					RelativePath=".\src\SecureServerSocketImpl.cpp"
-					>
-				</File>
+					RelativePath=".\src\SecureServerSocketImpl.cpp"/>
 				<File
-					RelativePath=".\src\SecureSocketImpl.cpp"
-					>
-				</File>
+					RelativePath=".\src\SecureSocketImpl.cpp"/>
 				<File
-					RelativePath=".\src\SecureStreamSocket.cpp"
-					>
-				</File>
+					RelativePath=".\src\SecureStreamSocket.cpp"/>
 				<File
-					RelativePath=".\src\SecureStreamSocketImpl.cpp"
-					>
-				</File>
+					RelativePath=".\src\SecureStreamSocketImpl.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Mail"
-			>
+			Name="Mail">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Net\SecureSMTPClientSession.h"
-					>
-				</File>
+					RelativePath=".\include\Poco\Net\SecureSMTPClientSession.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\SecureSMTPClientSession.cpp"
-					>
-				</File>
+					RelativePath=".\src\SecureSMTPClientSession.cpp"/>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

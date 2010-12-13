@@ -1,49 +1,41 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="9.00"
 	Name="HTTPSTimeServer"
-	ProjectGUID="{7C4285ED-F0BC-4CBA-B1F0-61FCB7FA26C4}"
-	Keyword="Win32Proj"
-	>
+	Version="9.00"
+	ProjectType="Visual C++"
+	ProjectGUID="{F8DE5054-3EC1-3FB4-9FE6-38EE974745A9}"
+	RootNamespace="HTTPSTimeServer"
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
-			Name="Digi JumpStart (ARMV4I)"
-		/>
+			Name="Digi JumpStart (ARMV4I)"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
+	<ToolFiles/>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="0"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
-				Optimization="4"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Crypto\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="3"
 				BufferSecurityCheck="true"
@@ -52,271 +44,143 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
+				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="PocoFoundationd.lib PocoXMLd.lib PocoUtild.lib PocoCryptod.lib PocoNetd.lib PocoNetSSLd.lib libeay32d.lib ssleay32d.lib"
-				OutputFile="bin\$(PlatformName)\shared\$(ProjectName)d.exe"
+				AdditionalDependencies="libeay32mdd.lib ssleay32mdd.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\shared\HTTPSTimeServerd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
-				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\$(PlatformName)\shared\$(ProjectName)d.pdb"
+				ProgramDatabaseFile="bin\$(PlatformName)\shared\HTTPSTimeServerd.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="0"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="4"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Crypto\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;_CRT_SECURE_NO_WARNINGS"
-				StringPooling="true"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-				CompileForArchitecture="2"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="PocoFoundation.lib PocoXML.lib PocoUtil.lib PocoCrypto.lib PocoNet.lib PocoNetSSL.lib libeay32.lib ssleay32.lib"
-				OutputFile="bin\$(PlatformName)\shared\$(ProjectName).exe"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
-				GenerateDebugInformation="false"
-				ProgramDatabaseFile=""
-				SubSystem="0"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="0"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
-		</Configuration>
-		<Configuration
-			Name="release_static|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			UseOfMFC="0"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="4"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Crypto\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;POCO_STATIC;_CRT_SECURE_NO_WARNINGS"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-				CompileForArchitecture="2"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationmt.lib PocoXMLmt.lib PocoUtilmt.lib PocoCryptomt.lib PocoNetmt.lib PocoNetSSLmt.lib libeay32mt.lib ssleay32mt.lib ws2.lib iphlpapi.lib"
-				OutputFile="bin\$(PlatformName)\static\$(ProjectName).exe"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
-				GenerateDebugInformation="false"
-				ProgramDatabaseFile=""
-				SubSystem="0"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="0"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
-		</Configuration>
-		<Configuration
-			Name="debug_static|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			UseOfMFC="0"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Crypto\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"
+				CompileForArchitecture="2"
+				InterworkCalls="false"/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="libeay32md.lib ssleay32md.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\shared\HTTPSTimeServer.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile=""
+				SubSystem="0"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="0"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCCodeSignTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""/>
+			<DebuggerTool/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_mt|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="1"
 				BufferSecurityCheck="true"
@@ -325,79 +189,283 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
+				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationmtd.lib PocoXMLmtd.lib PocoUtilmtd.lib PocoCryptomtd.lib PocoNetmtd.lib PocoNetSSLmtd.lib libeay32mtd.lib ssleay32mtd.lib ws2.lib iphlpapi.lib"
-				ShowProgress="0"
-				OutputFile="bin\$(PlatformName)\static\$(ProjectName)d.exe"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="iphlpapi.lib libeay32mtd.lib ssleay32mtd.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\static_mt\HTTPSTimeServerd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
-				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\$(PlatformName)\static\$(ProjectName)d.pdb"
+				ProgramDatabaseFile="bin\$(PlatformName)\static_mt\HTTPSTimeServerd.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
+		</Configuration>
+		<Configuration
+			Name="release_static_mt|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="4"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800"
+				CompileForArchitecture="2"
+				InterworkCalls="false"/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="iphlpapi.lib libeay32mt.lib ssleay32mt.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\static_mt\HTTPSTimeServer.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile=""
+				SubSystem="0"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="0"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCCodeSignTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""/>
+			<DebuggerTool/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_md|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"
+				CompileForArchitecture="2"
+				InterworkCalls="false"/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\static_md\HTTPSTimeServerd.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="bin\$(PlatformName)\static_md\HTTPSTimeServerd.pdb"
+				SubSystem="0"
+				RandomizedBaseAddress="1"
+				TargetMachine="0"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCCodeSignTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""/>
+			<DebuggerTool/>
+		</Configuration>
+		<Configuration
+			Name="release_static_md|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="4"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\..\..\Foundation\include;..\..\..\XML\include;..\..\..\Util\include;..\..\..\Net\include;..\..\..\NetSSL_OpenSSL\include;..\..\..\Crypto\include"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800"
+				CompileForArchitecture="2"
+				InterworkCalls="false"/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="iphlpapi.lib libeay32md.lib ssleay32md.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\static_md\HTTPSTimeServer.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile=""
+				SubSystem="0"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="0"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCCodeSignTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="Configuration Files"
-			>
+			Name="Configuration Files">
 			<File
-				RelativePath=".\HTTPSTimeServer.properties"
-				>
-			</File>
+				RelativePath=".\HTTPSTimeServer.properties"/>
 		</Filter>
 		<Filter
-			Name="Source Files"
-			>
+			Name="Source Files">
 			<File
-				RelativePath=".\src\HTTPSTimeServer.cpp"
-				>
-			</File>
+				RelativePath=".\src\HTTPSTimeServer.cpp"/>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

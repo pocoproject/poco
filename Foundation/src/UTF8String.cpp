@@ -1,7 +1,7 @@
 //
 // UTF8String.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UTF8String.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/UTF8String.cpp#3 $
 //
 // Library: Foundation
 // Package: Text
@@ -45,10 +45,14 @@
 namespace Poco {
 
 
-int UTF8::icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2)
+namespace
 {
 	static UTF8Encoding utf8;
-	
+}
+
+
+int UTF8::icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2)
+{	
 	std::string::size_type sz = str.size();
 	if (pos > sz) pos = sz;
 	if (pos + n > sz) n = sz - pos;
@@ -120,8 +124,6 @@ int UTF8::icompare(const std::string& str1, std::string::size_type pos1, std::st
 
 int UTF8::icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, const std::string::value_type* ptr)
 {
-	static UTF8Encoding utf8;
-
 	poco_check_ptr (ptr);
 	std::string::size_type sz = str.size();
 	if (pos > sz) pos = sz;
@@ -160,7 +162,6 @@ int UTF8::icompare(const std::string& str, const std::string::value_type* ptr)
 
 std::string UTF8::toUpper(const std::string& str)
 {
-	static UTF8Encoding utf8;
 	std::string result;
 	TextConverter converter(utf8, utf8);
 	converter.convert(str, result, Unicode::toUpper);
@@ -170,7 +171,6 @@ std::string UTF8::toUpper(const std::string& str)
 
 std::string& UTF8::toUpperInPlace(std::string& str)
 {
-	static UTF8Encoding utf8;
 	std::string result;
 	TextConverter converter(utf8, utf8);
 	converter.convert(str, result, Unicode::toUpper);
@@ -181,7 +181,6 @@ std::string& UTF8::toUpperInPlace(std::string& str)
 
 std::string UTF8::toLower(const std::string& str)
 {
-	static UTF8Encoding utf8;
 	std::string result;
 	TextConverter converter(utf8, utf8);
 	converter.convert(str, result, Unicode::toLower);
@@ -191,7 +190,6 @@ std::string UTF8::toLower(const std::string& str)
 
 std::string& UTF8::toLowerInPlace(std::string& str)
 {
-	static UTF8Encoding utf8;
 	std::string result;
 	TextConverter converter(utf8, utf8);
 	converter.convert(str, result, Unicode::toLower);

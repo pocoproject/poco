@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="7.10"
 	Name="MySQL"
-	ProjectGUID="{55F99C16-6BDF-4009-ABDB-653F7EE6FE9E}"
+	Version="7.10"
+	ProjectType="Visual C++"
+	ProjectGUID="{73E19FDE-1570-488C-B3DB-72A60FADD408}"
 	RootNamespace="MySQL"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -13,15 +13,15 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\debug_shared"
-			IntermediateDirectory="obj\debug_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;MYSQL_EXPORTS;__LCC__"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;THREADSAFE;__LCC__;MySQL_EXPORTS"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -31,25 +31,26 @@
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings="4996;4244;4018"/>
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib PocoDatad.lib libmysql.lib"
-				OutputFile="..\..\bin\PocoMySQLd.dll"
+				AdditionalDependencies="libmysql.lib"
+				OutputFile="..\..\bin\PocoDataMySQLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="..\..\bin\PocoMySQLd.pdb"
+				ProgramDatabaseFile="..\..\bin\PocoDataMySQLd.pdb"
+				AdditionalLibraryDirectories="..\..\lib"
 				SubSystem="1"
-				OptimizeForWindows98="1"
-				ImportLibrary="..\..\lib\PocoMySQLd.lib"
+				ImportLibrary="..\..\lib\PocoDataMySQLd.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -74,8 +75,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\release_shared"
-			IntermediateDirectory="obj\release_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -85,39 +86,37 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;MYSQL_EXPORTS;__LCC__"
-				GeneratePreprocessedFile="0"
-				KeepComments="FALSE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;THREADSAFE;__LCC__;MySQL_EXPORTS"
 				StringPooling="TRUE"
+				BasicRuntimeChecks="3"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="FALSE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
 				CompileAs="0"
-				DisableSpecificWarnings="4996;4244;4018"/>
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib PocoData.lib libmysql.lib"
-				OutputFile="..\..\bin\PocoMySQL.dll"
+				AdditionalDependencies="libmysql.lib"
+				OutputFile="..\..\bin\PocoDataMySQL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="FALSE"
-				ProgramDatabaseFile=""
+				AdditionalLibraryDirectories="..\..\lib"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				OptimizeForWindows98="1"
-				ImportLibrary="..\..\lib\PocoMySQL.lib"
+				ImportLibrary="..\..\lib\PocoDataMySQL.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -141,34 +140,37 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static|Win32"
-			OutputDirectory="obj\debug_static"
-			IntermediateDirectory="obj\debug_static"
+			Name="debug_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;MYSQL_EXPORTS;POCO_STATIC;MYSQL_EXPORTS;__LCC__"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				BufferSecurityCheck="TRUE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoMySQLmtd.lib"/>
+				OutputFile="..\..\lib\PocoDataMySQLmtd.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -184,14 +186,16 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static|Win32"
-			OutputDirectory="obj\release_static"
-			IntermediateDirectory="obj\release_static"
+			Name="release_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -201,27 +205,28 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;MYSQL_EXPORTS;POCO_STATIC;MYSQL_EXPORTS;__LCC__"
-				GeneratePreprocessedFile="0"
-				KeepComments="FALSE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__"
 				StringPooling="TRUE"
-				RuntimeLibrary="2"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoMySQLmt.lib"/>
+				OutputFile="..\..\lib\PocoDataMySQLmt.lib"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -237,80 +242,176 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__"
+				StringPooling="TRUE"
+				MinimalRebuild="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="TRUE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\..\lib\PocoDataMySQLmdd.lib"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="release_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				AdditionalIncludeDirectories=".\include;..\..\Foundation\include;..\..\Data\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__"
+				StringPooling="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\..\lib\PocoDataMySQLmd.lib"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="Header Files"
-			Filter="">
+			Name="Source Files"
+			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\Binder.h">
-			</File>
+				RelativePath=".\src\Binder.cpp"/>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\Connector.h">
-			</File>
+				RelativePath=".\src\Connector.cpp"/>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\Extractor.h">
-			</File>
+				RelativePath=".\src\Extractor.cpp"/>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\MySQL.h">
-			</File>
+				RelativePath=".\src\MySQLException.cpp"/>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\MySQLException.h">
-			</File>
+				RelativePath=".\src\MySQLStatementImpl.cpp"/>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\MySQLStatementImpl.h">
-			</File>
+				RelativePath=".\src\ResultMetadata.cpp"/>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\ResultMetadata.h">
-			</File>
+				RelativePath=".\src\SessionHandle.cpp"/>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\SessionHandle.h">
-			</File>
+				RelativePath=".\src\SessionImpl.cpp"/>
 			<File
-				RelativePath=".\include\Poco\Data\MySQL\SessionImpl.h">
-			</File>
-			<File
-				RelativePath=".\include\Poco\Data\MySQL\StatementExecutor.h">
-			</File>
+				RelativePath=".\src\StatementExecutor.cpp"/>
 		</Filter>
 		<Filter
-			Name="Source Files"
-			Filter="">
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\src\Binder.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\Binder.h"/>
 			<File
-				RelativePath=".\src\Connector.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\Connector.h"/>
 			<File
-				RelativePath=".\src\Extractor.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\Extractor.h"/>
 			<File
-				RelativePath=".\src\MySQLException.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\MySQL.h"/>
 			<File
-				RelativePath=".\src\MySQLStatementImpl.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\MySQLException.h"/>
 			<File
-				RelativePath=".\src\ResultMetadata.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\MySQLStatementImpl.h"/>
 			<File
-				RelativePath=".\src\SessionHandle.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\ResultMetadata.h"/>
 			<File
-				RelativePath=".\src\SessionImpl.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\SessionHandle.h"/>
 			<File
-				RelativePath=".\src\StatementExecutor.cpp">
-			</File>
+				RelativePath=".\include\Poco\Data\MySQL\SessionImpl.h"/>
+			<File
+				RelativePath=".\include\Poco\Data\MySQL\StatementExecutor.h"/>
 		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"/>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

@@ -1,7 +1,7 @@
 //
 // DOMWriter.cpp
 //
-// $Id: //poco/1.3/XML/src/DOMWriter.cpp#3 $
+// $Id: //poco/1.3/XML/src/DOMWriter.cpp#4 $
 //
 // Library: XML
 // Package: DOM
@@ -54,7 +54,8 @@ namespace XML {
 
 DOMWriter::DOMWriter():
 	_pTextEncoding(0),
-	_options(0)
+	_options(0),
+	_indent("\t")
 {
 }
 
@@ -83,6 +84,12 @@ void DOMWriter::setNewLine(const std::string& newLine)
 }
 
 
+void DOMWriter::setIndent(const std::string& indent)
+{
+	_indent = indent;
+}
+
+
 void DOMWriter::writeNode(XMLByteOutputStream& ostr, const Node* pNode)
 {
 	poco_check_ptr (pNode);
@@ -91,6 +98,7 @@ void DOMWriter::writeNode(XMLByteOutputStream& ostr, const Node* pNode)
 
 	XMLWriter writer(ostr, _options, _encodingName, _pTextEncoding);
 	writer.setNewLine(_newLine);
+	writer.setIndent(_indent);
 	
 	DOMSerializer serializer;
 	serializer.setContentHandler(&writer);

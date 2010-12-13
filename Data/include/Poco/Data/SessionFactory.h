@@ -1,7 +1,7 @@
 //
 // SessionFactory.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/SessionFactory.h#3 $
+// $Id: //poco/1.3/Data/include/Poco/Data/SessionFactory.h#4 $
 //
 // Library: Data
 // Package: DataCore
@@ -71,6 +71,12 @@ class Data_API SessionFactory
 	///      Session ses("SQLite", "dummy.db");
 {
 public:
+	SessionFactory();
+		/// Creates the SessionFactory.
+		
+	~SessionFactory();
+		/// Destroys the SessionFactory.
+
 	static SessionFactory& instance();
 		/// returns the static instance of the singleton.
 
@@ -88,8 +94,6 @@ public:
 		/// if no Connector is registered for that key.
 
 private:
-	SessionFactory();
-	~SessionFactory();
 	SessionFactory(const SessionFactory&);
 	SessionFactory& operator = (const SessionFactory&);
 

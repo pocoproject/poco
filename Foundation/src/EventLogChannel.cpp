@@ -1,7 +1,7 @@
 //
 // EventLogChannel.cpp
 //
-// $Id: //poco/1.3/Foundation/src/EventLogChannel.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/EventLogChannel.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -265,15 +265,15 @@ void EventLogChannel::setUpRegistry() const
 			DWORD count = 8;
 			DWORD types = 7;
 #if defined(POCO_WIN32_UTF8)
-			RegSetValueExW(hKey, L"CategoryMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) sizeof(wchar_t)*(path.size() + 1));
-			RegSetValueExW(hKey, L"EventMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) sizeof(wchar_t)*(path.size() + 1));
-			RegSetValueExW(hKey, L"CategoryCount", 0, REG_DWORD, (const BYTE*) &count, (DWORD) sizeof(count));
-			RegSetValueExW(hKey, L"TypesSupported", 0, REG_DWORD, (const BYTE*) &types, (DWORD) sizeof(types));
+			RegSetValueExW(hKey, L"CategoryMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), static_cast<DWORD>(sizeof(wchar_t)*(path.size() + 1)));
+			RegSetValueExW(hKey, L"EventMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), static_cast<DWORD>(sizeof(wchar_t)*(path.size() + 1)));
+			RegSetValueExW(hKey, L"CategoryCount", 0, REG_DWORD, (const BYTE*) &count, static_cast<DWORD>(sizeof(count)));
+			RegSetValueExW(hKey, L"TypesSupported", 0, REG_DWORD, (const BYTE*) &types, static_cast<DWORD>(sizeof(types)));
 #else
-			RegSetValueEx(hKey, "CategoryMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) path.size() + 1);
-			RegSetValueEx(hKey, "EventMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), (DWORD) path.size() + 1);
-			RegSetValueEx(hKey, "CategoryCount", 0, REG_DWORD, (const BYTE*) &count, (DWORD) sizeof(count));
-			RegSetValueEx(hKey, "TypesSupported", 0, REG_DWORD, (const BYTE*) &types, (DWORD) sizeof(types));
+			RegSetValueEx(hKey, "CategoryMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), static_cast<DWORD>(path.size() + 1));
+			RegSetValueEx(hKey, "EventMessageFile", 0, REG_SZ, (const BYTE*) path.c_str(), static_cast<DWORD>(path.size() + 1));
+			RegSetValueEx(hKey, "CategoryCount", 0, REG_DWORD, (const BYTE*) &count, static_cast<DWORD>(sizeof(count)));
+			RegSetValueEx(hKey, "TypesSupported", 0, REG_DWORD, (const BYTE*) &types, static_cast<DWORD>(sizeof(types)));
 #endif
 		}
 	}

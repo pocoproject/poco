@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#12 $
+// $Id: //poco/1.3/Net/src/NetworkInterface.cpp#14 $
 //
 // Library: Net
 // Package: Sockets
@@ -550,6 +550,67 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 //
 // Linux
 //
+#if defined(POCO_HAVE_IPv6)
+
+
+#include <sys/types.h>
+#include <ifaddrs.h>
+
+
+namespace Poco {
+namespace Net {
+
+
+NetworkInterface::NetworkInterfaceList NetworkInterface::list()
+{
+	NetworkInterfaceList result;
+
+	struct ifaddrs* ifaces = 0;
+	struct ifaddrs* currIface = 0;
+
+	if (getifaddrs(&ifaces) < 0) 
+		throw NetException("cannot get network adapter list");
+	
+	try 
+	{
+		for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next) 
+		{
+			IPAddress addr;
+			bool haveAddr = false;
+			switch (currIface->ifa_addr->sa_family)
+			{
+			case AF_INET6:
+				addr = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(currIface->ifa_addr)->sin6_addr, sizeof(struct in6_addr));
+				haveAddr = true;
+				break;
+			case AF_INET:
+				addr = IPAddress(&reinterpret_cast<const struct sockaddr_in*>(currIface->ifa_addr)->sin_addr, sizeof(struct in_addr));
+				haveAddr = true;
+				break;
+			default:
+				break;
+			}
+			if (haveAddr) 
+			{
+				int index = if_nametoindex(currIface->ifa_name);
+				std::string name(currIface->ifa_name);
+				result.push_back(NetworkInterface(name, name, addr, index));
+			}
+		}
+	}
+	catch (...) 
+	{
+	}
+	if (ifaces) freeifaddrs(ifaces);
+
+	return result;
+}
+
+
+} } // namespace Poco::Net
+
+
+#else // !POCO_HAVE_IPv6
 
 
 namespace Poco {
@@ -595,12 +656,6 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 			bool haveAddr = false;
 			switch (ifr->ifr_addr.sa_family)
 			{
-#if defined(POCO_HAVE_IPv6)
-			case AF_INET6:
-				addr = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(&ifr->ifr_addr)->sin6_addr, sizeof(struct in6_addr));
-				haveAddr = true;
-				break;
-#endif
 			case AF_INET:
 				addr = IPAddress(&reinterpret_cast<const struct sockaddr_in*>(&ifr->ifr_addr)->sin_addr, sizeof(struct in_addr));
 				haveAddr = true;
@@ -610,11 +665,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 			}
 			if (haveAddr)
 			{
-#if defined(POCO_HAVE_IPv6)
-				int index = if_nametoindex(ifr->ifr_name);
-#else
 				int index = -1;
-#endif
 				std::string name(ifr->ifr_name);
 				result.push_back(NetworkInterface(name, name, addr, index));
 			}
@@ -632,6 +683,9 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 
 
 } } // namespace Poco::Net
+
+
+#endif // POCO_HAVE_IPv6
 
 
 #else

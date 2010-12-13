@@ -1,7 +1,7 @@
 //
 // TemporaryFile.cpp
 //
-// $Id: //poco/1.3/Foundation/src/TemporaryFile.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/TemporaryFile.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -116,17 +116,27 @@ void TemporaryFile::keepUntilExit()
 }
 
 
-void TemporaryFile::registerForDeletion(const std::string& path)
+namespace 
 {
 	static TempFileCollector fc;
+}
+
+
+void TemporaryFile::registerForDeletion(const std::string& path)
+{
 	fc.registerFile(path);
+}
+
+
+namespace
+{
+	static FastMutex mutex;
 }
 
 
 std::string TemporaryFile::tempName()
 {
 	std::ostringstream name;
-	static FastMutex mutex;
 	static unsigned long count = 0;
 	mutex.lock();
 	unsigned long n = count++;

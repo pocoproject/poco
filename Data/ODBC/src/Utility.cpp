@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/Utility.cpp#5 $
+// $Id: //poco/1.3/Data/ODBC/src/Utility.cpp#6 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -50,9 +50,14 @@ const SQLSMALLINT Utility::boolDataType = (sizeof(bool) <= sizeof(char)) ? SQL_C
 	(sizeof(bool) == sizeof(short)) ? SQL_C_SHORT : SQL_C_LONG;
 
 
+namespace
+{
+	static const EnvironmentHandle envHandle;
+}
+
+
 Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 {
-	static const EnvironmentHandle henv;
 	const int length = sizeof(POCO_SQLCHAR) * 512;
 
 	POCO_SQLCHAR desc[length];
@@ -63,7 +68,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	if (!Utility::isError(rc = SQLDrivers(henv, 
+	if (!Utility::isError(rc = SQLDrivers(envHandle, 
 		SQL_FETCH_FIRST,
 		desc,
 		length,
@@ -79,7 +84,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 			std::memset(desc, 0, length);
 			std::memset(attr, 0, length);
 			len2 = length;
-		}while (!Utility::isError(rc = SQLDrivers(henv, 
+		}while (!Utility::isError(rc = SQLDrivers(envHandle, 
 			SQL_FETCH_NEXT,
 			desc,
 			length,
@@ -90,7 +95,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	}
 
 	if (SQL_NO_DATA != rc) 
-		throw EnvironmentError(henv);
+		throw EnvironmentError(envHandle);
 
 	return driverMap;
 }
@@ -98,7 +103,6 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 
 Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 {
-	static const EnvironmentHandle henv;
 	const int length = sizeof(POCO_SQLCHAR) * 512;
 	const int dsnLength = sizeof(POCO_SQLCHAR) * (SQL_MAX_DSN_LENGTH + 1);
 
@@ -110,7 +114,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	while (!Utility::isError(rc = SQLDataSources(henv, 
+	while (!Utility::isError(rc = SQLDataSources(envHandle, 
 		SQL_FETCH_NEXT,
 		dsn,
 		SQL_MAX_DSN_LENGTH,
@@ -126,7 +130,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 	}
 
 	if (SQL_NO_DATA != rc) 
-		throw EnvironmentError(henv);
+		throw EnvironmentError(envHandle);
 
 	return dsnMap;
 }

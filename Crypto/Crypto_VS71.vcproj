@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="7.10"
 	Name="Crypto"
-	ProjectGUID="{eeee7259-32e9-4d56-b023-c733940ab2a0}"
+	Version="7.10"
+	ProjectType="Visual C++"
+	ProjectGUID="{EEEE7259-32E9-4D56-B023-C733940AB2A0}"
 	RootNamespace="Crypto"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -13,15 +13,15 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\debug_shared"
-			IntermediateDirectory="obj\debug_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;Crypto_EXPORTS;OPENSSL_NO_DEPRECATED"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -31,23 +31,25 @@
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib libeay32mdd.lib ssleay32mdd.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32mdd.lib ssleay32mdd.lib"
 				OutputFile="..\bin\PocoCryptod.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="..\bin\PocoCryptod.pdb"
+				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
-				OptimizeForWindows98="1"
 				ImportLibrary="..\lib\PocoCryptod.lib"
 				TargetMachine="1"/>
 			<Tool
@@ -73,8 +75,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\release_shared"
-			IntermediateDirectory="obj\release_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -84,37 +86,36 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;Crypto_EXPORTS;OPENSSL_NO_DEPRECATED"
-				GeneratePreprocessedFile="0"
-				KeepComments="FALSE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS"
 				StringPooling="TRUE"
+				BasicRuntimeChecks="3"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="FALSE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib libeay32md.lib ssleay32md.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32md.lib ssleay32md.lib"
 				OutputFile="..\bin\PocoCrypto.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="FALSE"
-				ProgramDatabaseFile=""
+				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				OptimizeForWindows98="1"
 				ImportLibrary="..\lib\PocoCrypto.lib"
 				TargetMachine="1"/>
 			<Tool
@@ -139,29 +140,32 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static|Win32"
-			OutputDirectory="obj\debug_static"
-			IntermediateDirectory="obj\debug_static"
+			Name="debug_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;Crypto_EXPORTS;POCO_STATIC"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				BufferSecurityCheck="TRUE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -182,14 +186,16 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static|Win32"
-			OutputDirectory="obj\release_static"
-			IntermediateDirectory="obj\release_static"
+			Name="release_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -199,27 +205,28 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;Crypto_EXPORTS;POCO_STATIC"
-				GeneratePreprocessedFile="0"
-				KeepComments="FALSE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="TRUE"
-				RuntimeLibrary="2"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\PocoCryptomt.lib"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -235,144 +242,214 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
+				StringPooling="TRUE"
+				MinimalRebuild="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="TRUE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\PocoCryptomdd.lib"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="release_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
+				StringPooling="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\PocoCryptomd.lib"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="CryptoCore"
-			Filter="">
+			Name="Cipher">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Crypto\Crypto.h">
-				</File>
+					RelativePath=".\include\Poco\Crypto\Cipher.h"/>
 				<File
-					RelativePath=".\include\Poco\Crypto\OpenSSLInitializer.h">
-				</File>
+					RelativePath=".\include\Poco\Crypto\CipherFactory.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\CipherImpl.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\CipherKey.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\CipherKeyImpl.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\CryptoStream.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\CryptoTransform.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\OpenSSLInitializer.cpp">
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Cipher"
-			Filter="">
-			<Filter
-				Name="Header Files"
-				Filter="">
+					RelativePath=".\src\Cipher.cpp"/>
 				<File
-					RelativePath=".\include\Poco\Crypto\Cipher.h">
-				</File>
+					RelativePath=".\src\CipherFactory.cpp"/>
 				<File
-					RelativePath=".\include\Poco\Crypto\CipherFactory.h">
-				</File>
+					RelativePath=".\src\CipherImpl.cpp"/>
 				<File
-					RelativePath=".\include\Poco\Crypto\CipherImpl.h">
-				</File>
+					RelativePath=".\src\CipherKey.cpp"/>
 				<File
-					RelativePath=".\include\Poco\Crypto\CipherKey.h">
-				</File>
+					RelativePath=".\src\CipherKeyImpl.cpp"/>
 				<File
-					RelativePath=".\include\Poco\Crypto\CipherKeyImpl.h">
-				</File>
+					RelativePath=".\src\CryptoStream.cpp"/>
 				<File
-					RelativePath=".\include\Poco\Crypto\CryptoStream.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\Crypto\CryptoTransform.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				Filter="">
-				<File
-					RelativePath=".\src\Cipher.cpp">
-				</File>
-				<File
-					RelativePath=".\src\CipherFactory.cpp">
-				</File>
-				<File
-					RelativePath=".\src\CipherImpl.cpp">
-				</File>
-				<File
-					RelativePath=".\src\CipherKey.cpp">
-				</File>
-				<File
-					RelativePath=".\src\CipherKeyImpl.cpp">
-				</File>
-				<File
-					RelativePath=".\src\CryptoStream.cpp">
-				</File>
-				<File
-					RelativePath=".\src\CryptoTransform.cpp">
-				</File>
+					RelativePath=".\src\CryptoTransform.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Certificate"
-			Filter="">
+			Name="RSA">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Crypto\X509Certificate.h">
-				</File>
+					RelativePath=".\include\Poco\Crypto\RSACipherImpl.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\RSADigestEngine.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\RSAKey.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\RSAKeyImpl.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\X509Certificate.cpp">
-				</File>
+					RelativePath=".\src\RSACipherImpl.cpp"/>
+				<File
+					RelativePath=".\src\RSADigestEngine.cpp"/>
+				<File
+					RelativePath=".\src\RSAKey.cpp"/>
+				<File
+					RelativePath=".\src\RSAKeyImpl.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="RSA"
-			Filter="">
+			Name="Certificate">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Crypto\RSACipherImpl.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\Crypto\RSADigestEngine.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\Crypto\RSAKey.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\Crypto\RSAKeyImpl.h">
-				</File>
+					RelativePath=".\include\Poco\Crypto\X509Certificate.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\RSACipherImpl.cpp">
-				</File>
+					RelativePath=".\src\X509Certificate.cpp"/>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="CryptoCore">
+			<Filter
+				Name="Header Files">
 				<File
-					RelativePath=".\src\RSADigestEngine.cpp">
-				</File>
+					RelativePath=".\include\Poco\Crypto\Crypto.h"/>
 				<File
-					RelativePath=".\src\RSAKey.cpp">
-				</File>
+					RelativePath=".\include\Poco\Crypto\OpenSSLInitializer.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
 				<File
-					RelativePath=".\src\RSAKeyImpl.cpp">
-				</File>
+					RelativePath=".\src\OpenSSLInitializer.cpp"/>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

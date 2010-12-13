@@ -1,7 +1,7 @@
 //
 // HTTPSClientSessionTest.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#7 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#8 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -292,13 +292,13 @@ void HTTPSClientSessionTest::testKeepAlive()
 	assert (response.getChunkedTransferEncoding());
 	assert (response.getKeepAlive());
 	std::ostringstream ostr3;
-	int n = StreamCopier::copyStream(rs3, ostr3);
+	StreamCopier::copyStream(rs3, ostr3);
 	assert (ostr3.str() == HTTPSTestServer::LARGE_BODY);
 
 	request.setMethod(HTTPRequest::HTTP_HEAD);
 	request.setURI("/large");
 	s.sendRequest(request);
-	std::istream& rs4= s.receiveResponse(response);
+	std::istream& rs4 = s.receiveResponse(response);
 	assert (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
 	assert (response.getContentType() == "text/plain");
 	assert (!response.getKeepAlive());

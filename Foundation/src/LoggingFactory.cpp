@@ -1,7 +1,7 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/1.3/Foundation/src/LoggingFactory.cpp#4 $
+// $Id: //poco/1.3/Foundation/src/LoggingFactory.cpp#5 $
 //
 // Library: Foundation
 // Package: Logging
@@ -93,9 +93,14 @@ Formatter* LoggingFactory::createFormatter(const std::string& className) const
 }
 
 
-LoggingFactory& LoggingFactory::defaultFactory()
+namespace
 {
 	static SingletonHolder<LoggingFactory> sh;
+}
+
+
+LoggingFactory& LoggingFactory::defaultFactory()
+{
 	return *sh.get();
 }
 

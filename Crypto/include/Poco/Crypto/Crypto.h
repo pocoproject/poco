@@ -1,7 +1,7 @@
 //
 // Crypto.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Crypto.h#2 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Crypto.h#3 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -93,19 +93,7 @@ enum RSAPaddingMode
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Crypto_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoCryptod.lib")
-			#else
-				#pragma comment(lib, "PocoCrypto.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoCryptomtd.lib")
-			#else
-				#pragma comment(lib, "PocoCryptomt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoCrypto" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

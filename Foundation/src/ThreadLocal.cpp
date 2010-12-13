@@ -1,7 +1,7 @@
 //
 // ThreadLocal.cpp
 //
-// $Id: //poco/1.3/Foundation/src/ThreadLocal.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/ThreadLocal.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -76,6 +76,12 @@ TLSAbstractSlot*& ThreadLocalStorage::get(const void* key)
 }
 
 
+namespace
+{
+	static SingletonHolder<ThreadLocalStorage> sh;
+}
+
+
 ThreadLocalStorage& ThreadLocalStorage::current()
 {
 	Thread* pThread = Thread::current();
@@ -85,7 +91,6 @@ ThreadLocalStorage& ThreadLocalStorage::current()
 	}
 	else
 	{
-		static SingletonHolder<ThreadLocalStorage> sh;
 		return *sh.get();
 	}
 }

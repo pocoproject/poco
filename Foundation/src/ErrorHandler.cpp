@@ -1,7 +1,7 @@
 //
 // ErrorHandler.cpp
 //
-// $Id: //poco/1.3/Foundation/src/ErrorHandler.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/ErrorHandler.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -122,9 +122,12 @@ ErrorHandler* ErrorHandler::set(ErrorHandler* pHandler)
 	return pOld;
 }
 
-	
+
 ErrorHandler* ErrorHandler::defaultHandler()
 {
+	// NOTE: Since this is called to initialize the static _pHandler
+	// variable, sh has to be a local static, otherwise we run
+	// into static initialization order issues.
 	static SingletonHolder<ErrorHandler> sh;
 	return sh.get();
 }

@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#16 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#17 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -96,9 +96,14 @@ SSLManager::~SSLManager()
 }
 
 
-SSLManager& SSLManager::instance()
+namespace
 {
 	static Poco::SingletonHolder<SSLManager> singleton;
+}
+
+
+SSLManager& SSLManager::instance()
+{
 	return *singleton.get();
 }
 

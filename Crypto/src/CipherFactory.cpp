@@ -1,7 +1,7 @@
 //
 // CipherFactory.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CipherFactory.cpp#3 $
+// $Id: //poco/1.3/Crypto/src/CipherFactory.cpp#5 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -53,19 +53,22 @@ namespace Crypto {
 
 CipherFactory::CipherFactory()
 {
-	OpenSSLInitializer::initialize();
 }
 
 
 CipherFactory::~CipherFactory()
 {
-	OpenSSLInitializer::uninitialize();
+}
+
+
+namespace
+{
+	static Poco::SingletonHolder<CipherFactory> holder;
 }
 
 
 CipherFactory& CipherFactory::defaultFactory()
 {
-	static Poco::SingletonHolder<CipherFactory> holder;
 	return *holder.get();
 }
 

@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#9 $
+// $Id: //poco/1.3/Crypto/src/RSACipherImpl.cpp#11 $
 //
 // Library: Crypto
 // Package: RSA
@@ -36,6 +36,7 @@
 
 #include "Poco/Crypto/RSACipherImpl.h"
 #include "Poco/Crypto/CryptoTransform.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Exception.h"
 #include <openssl/err.h>
 #include <openssl/rsa.h>
@@ -169,7 +170,7 @@ namespace
 			if (missing == 0)
 			{
 				poco_assert (outputLength >= rsaSize);
-				int n = RSA_public_encrypt(maxSize, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+				int n = RSA_public_encrypt(static_cast<int>(maxSize), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 				if (n == -1)
 					throwError();
 				rc += n;
@@ -183,7 +184,7 @@ namespace
 				if (missing > inputLength)
 					missing = inputLength;
 
-				std::memcpy(_pBuf+_pos, input, missing);
+				std::memcpy(_pBuf + _pos, input, static_cast<std::size_t>(missing));
 				input += missing;
 				_pos += missing;
 				inputLength -= missing;
@@ -200,7 +201,7 @@ namespace
 		int rc = 0;
 		if (_pos > 0)
 		{
-			rc = RSA_public_encrypt(_pos, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+			rc = RSA_public_encrypt(static_cast<int>(_pos), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 			if (rc == -1) throwError();
 		}
 		return rc;
@@ -274,7 +275,7 @@ namespace
 			std::streamsize missing = rsaSize - _pos;
 			if (missing == 0)
 			{
-				int tmp = RSA_private_decrypt(rsaSize, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+				int tmp = RSA_private_decrypt(static_cast<int>(rsaSize), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 				if (tmp == -1)
 					throwError();
 				rc += tmp;
@@ -288,7 +289,7 @@ namespace
 				if (missing > inputLength)
 					missing = inputLength;
 
-				std::memcpy(_pBuf+_pos, input, missing);
+				std::memcpy(_pBuf + _pos, input, static_cast<std::size_t>(missing));
 				input += missing;
 				_pos += missing;
 				inputLength -= missing;
@@ -304,7 +305,7 @@ namespace
 		int rc = 0;
 		if (_pos > 0)
 		{
-			rc = RSA_private_decrypt(_pos, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+			rc = RSA_private_decrypt(static_cast<int>(_pos), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 			if (rc == -1)
 				throwError();
 		}
@@ -317,11 +318,13 @@ RSACipherImpl::RSACipherImpl(const RSAKey& key, RSAPaddingMode paddingMode):
 	_key(key),
 	_paddingMode(paddingMode)
 {
+	OpenSSLInitializer::initialize();
 }
 
 
 RSACipherImpl::~RSACipherImpl()
 {
+	OpenSSLInitializer::uninitialize();
 }
 
 

@@ -1,7 +1,7 @@
 //
 // SocketNotifier.cpp
 //
-// $Id: //poco/1.3/Net/src/SocketNotifier.cpp#2 $
+// $Id: //poco/1.3/Net/src/SocketNotifier.cpp#3 $
 //
 // Library: Net
 // Package: Reactor
@@ -85,10 +85,14 @@ void SocketNotifier::removeObserver(SocketReactor* pReactor, const Poco::Abstrac
 }
 
 
-void SocketNotifier::dispatch(SocketNotification* pNotification)
+namespace
 {
 	static Socket nullSocket;
+}
 
+
+void SocketNotifier::dispatch(SocketNotification* pNotification)
+{
 	pNotification->setSocket(_socket);
 	pNotification->duplicate();
 	try

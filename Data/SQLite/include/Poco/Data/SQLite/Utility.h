@@ -1,7 +1,7 @@
 //
 // Utility.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Utility.h#4 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/Utility.h#5 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -60,8 +60,6 @@ class SQLite_API Utility
 {
 public:
 	typedef std::map<std::string, MetaColumn::ColumnDataType> TypeMap;
-
-	Utility();
 		/// Maps SQLite column declared types to Poco::Data types through
 		/// static TypeMap member.
 		/// Note: SQLite is type-agnostic and it is the end-user responsibility
@@ -79,8 +77,10 @@ public:
 		/// Returns column data type.
 
 private:
+	static void initTypeMap();
+
 	static TypeMap _types;
-	Poco::FastMutex _mutex;
+	static Poco::FastMutex _mutex;
 };
 
 

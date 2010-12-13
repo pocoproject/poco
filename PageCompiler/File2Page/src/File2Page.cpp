@@ -1,7 +1,7 @@
 //
 // File2Page.cpp
 //
-// $Id: //poco/1.3/PageCompiler/File2Page/src/File2Page.cpp#4 $
+// $Id: //poco/1.3/PageCompiler/File2Page/src/File2Page.cpp#5 $
 //
 // An application that creates a Page Compiler source file from an
 // ordinary file.
@@ -191,7 +191,7 @@ protected:
 		     << "         include=\"Poco/DateTimeFormatter.h\"\n"
 		     << "         include=\"Poco/DateTimeFormat.h\"%><%!\n\n";
 		ostr << "// " << path << "\n";
-		ostr << "static const char data[] = {\n\t";
+		ostr << "static const unsigned char data[] = {\n\t";
 		int ch = istr.get();
 		int pos = 0;
 		while (ch != -1)
@@ -229,7 +229,7 @@ protected:
 		     << "\treturn true;\n"
 		     << "}\n"
 			 << "%><%\n"
-		     << "\tresponseStream.write(data, sizeof(data));\n"
+		     << "\tresponseStream.write(reinterpret_cast<const char*>(data), sizeof(data));\n"
 		     << "%>";
 	}
 	

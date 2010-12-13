@@ -1,7 +1,7 @@
 //
 // NetSSL.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#4 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -72,19 +72,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(NetSSL_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoNetSSLd.lib")
-			#else
-				#pragma comment(lib, "PocoNetSSL.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoNetSSLmtd.lib")
-			#else
-				#pragma comment(lib, "PocoNetSSLmt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

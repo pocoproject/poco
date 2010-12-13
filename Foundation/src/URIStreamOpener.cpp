@@ -1,7 +1,7 @@
 //
 // URIStreamOpener.cpp
 //
-// $Id: //poco/1.3/Foundation/src/URIStreamOpener.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/URIStreamOpener.cpp#3 $
 //
 // Library: Foundation
 // Package: URI
@@ -152,9 +152,14 @@ bool URIStreamOpener::supportsScheme(const std::string& scheme)
 }
 
 
-URIStreamOpener& URIStreamOpener::defaultOpener()
+namespace
 {
 	static SingletonHolder<URIStreamOpener> sh;
+}
+
+
+URIStreamOpener& URIStreamOpener::defaultOpener()
+{
 	return *sh.get();
 }
 

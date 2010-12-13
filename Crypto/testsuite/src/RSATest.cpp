@@ -1,7 +1,7 @@
 //
 // RSATest.cpp
 //
-// $Id: //poco/1.3/Crypto/testsuite/src/RSATest.cpp#6 $
+// $Id: //poco/1.3/Crypto/testsuite/src/RSATest.cpp#7 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -133,7 +133,7 @@ void RSATest::testSign()
 	std::string msg("Test this sign message");
 	RSAKey key(RSAKey::KL_2048, RSAKey::EXP_LARGE);
 	RSADigestEngine eng(key);
-	eng.update(msg.c_str(), msg.length());
+	eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
 	const Poco::DigestEngine::Digest& sig = eng.signature();
 	std::string hexDig = Poco::DigestEngine::digestToHex(sig);
 
@@ -144,7 +144,7 @@ void RSATest::testSign()
 	std::istringstream iPub(pubKey);
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(key);
-	eng2.update(msg.c_str(), msg.length());
+	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
 	assert (eng2.verify(sig));
 }
 
@@ -155,7 +155,7 @@ void RSATest::testSignManipulated()
 	std::string msgManip("Test that sign message");
 	RSAKey key(RSAKey::KL_2048, RSAKey::EXP_LARGE);
 	RSADigestEngine eng(key);
-	eng.update(msg.c_str(), msg.length());
+	eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
 	const Poco::DigestEngine::Digest& sig = eng.signature();
 	std::string hexDig = Poco::DigestEngine::digestToHex(sig);
 
@@ -166,7 +166,7 @@ void RSATest::testSignManipulated()
 	std::istringstream iPub(pubKey);
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(key);
-	eng2.update(msgManip.c_str(), msgManip.length());
+	eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
 	assert (!eng2.verify(sig));
 }
 

@@ -1,7 +1,7 @@
 //
 // BinaryWriter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/BinaryWriter.cpp#6 $
+// $Id: //poco/1.3/Foundation/src/BinaryWriter.cpp#7 $
 //
 // Library: Foundation
 // Package: Streams
@@ -297,14 +297,14 @@ BinaryWriter& BinaryWriter::operator << (const char* value)
 	if (_pTextConverter)
 	{
 		std::string converted;
-		_pTextConverter->convert(value, std::strlen(value), converted);
+		_pTextConverter->convert(value, static_cast<int>(std::strlen(value)), converted);
 		UInt32 length = (UInt32) converted.size();
 		write7BitEncoded(length);
 		_ostr.write(converted.data(), length);
 	}
 	else
 	{
-		UInt32 length = (UInt32) std::strlen(value);
+		UInt32 length = static_cast<UInt32>(std::strlen(value));
 		write7BitEncoded(length);
 		_ostr.write(value, length);
 	}

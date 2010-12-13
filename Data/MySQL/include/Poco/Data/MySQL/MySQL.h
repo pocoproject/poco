@@ -1,7 +1,7 @@
 //
 // MySQL.h
 //
-// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQL.h#3 $
+// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQL.h#4 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -70,19 +70,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MYSQL_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoMySQLd.lib")
-			#else
-				#pragma comment(lib, "PocoMySQL.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoMySQLmtd.lib")
-			#else
-				#pragma comment(lib, "PocoMySQLmt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoDataMySQL" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

@@ -1,7 +1,7 @@
 //
 // Zip.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/Zip.h#4 $
+// $Id: //poco/1.3/Zip/include/Poco/Zip/Zip.h#5 $
 //
 // Library: Zip
 // Package: Zip
@@ -72,19 +72,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Zip_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoZipd.lib")
-			#else
-				#pragma comment(lib, "PocoZip.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoZipmtd.lib")
-			#else
-				#pragma comment(lib, "PocoZipmt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoZip" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

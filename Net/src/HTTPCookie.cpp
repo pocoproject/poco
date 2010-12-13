@@ -1,7 +1,7 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#6 $
+// $Id: //poco/1.3/Net/src/HTTPCookie.cpp#7 $
 //
 // Library: Net
 // Package: HTTP
@@ -316,10 +316,14 @@ std::string HTTPCookie::toString() const
 }
 
 
-std::string HTTPCookie::escape(const std::string& str)
+namespace
 {
 	static const std::string ILLEGAL_CHARS("()[]/|\\',;");
-	
+}
+
+
+std::string HTTPCookie::escape(const std::string& str)
+{
 	std::string result;
 	Poco::URI::encode(str, ILLEGAL_CHARS, result);
 	return result;

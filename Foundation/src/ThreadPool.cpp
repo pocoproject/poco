@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/1.3/Foundation/src/ThreadPool.cpp#8 $
+// $Id: //poco/1.3/Foundation/src/ThreadPool.cpp#9 $
 //
 // Library: Foundation
 // Package: Threading
@@ -512,9 +512,14 @@ private:
 };
 
 
-ThreadPool& ThreadPool::defaultPool()
+namespace
 {
 	static ThreadPoolSingletonHolder sh;
+}
+
+
+ThreadPool& ThreadPool::defaultPool()
+{
 	return *sh.pool();
 }
 

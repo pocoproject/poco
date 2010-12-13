@@ -1,7 +1,7 @@
 //
 // PatternFormatter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/PatternFormatter.cpp#7 $
+// $Id: //poco/1.3/Foundation/src/PatternFormatter.cpp#8 $
 //
 // Library: Foundation
 // Package: Logging
@@ -170,7 +170,7 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 }
 
 
-const std::string& PatternFormatter::getPriorityName(int prio)
+namespace
 {
 	static std::string priorities[] = 
 	{
@@ -184,7 +184,11 @@ const std::string& PatternFormatter::getPriorityName(int prio)
 		"Debug",
 		"Trace"
 	};
+}
 
+
+const std::string& PatternFormatter::getPriorityName(int prio)
+{
 	poco_assert (1 <= prio && prio <= 8);	
 	return priorities[prio];
 }

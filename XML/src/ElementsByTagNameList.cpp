@@ -1,7 +1,7 @@
 //
 // ElementsByTagNameList.cpp
 //
-// $Id: //poco/1.3/XML/src/ElementsByTagNameList.cpp#2 $
+// $Id: //poco/1.3/XML/src/ElementsByTagNameList.cpp#3 $
 //
 // Library: XML
 // Package: DOM
@@ -76,10 +76,14 @@ unsigned long ElementsByTagNameList::length() const
 }
 
 
-Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) const
+namespace
 {
 	static const XMLString asterisk = toXMLString("*");
+}
 
+
+Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) const
+{
 	if (!pParent) return 0;
 
 	// preorder search
@@ -141,8 +145,6 @@ unsigned long ElementsByTagNameListNS::length() const
 
 Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) const
 {
-	static const XMLString asterisk = toXMLString("*");
-
 	if (!pParent) return 0;
 
 	// preorder search

@@ -1,7 +1,7 @@
 //
 // RSAKey.cpp
 //
-// $Id: //poco/1.3/Crypto/src/RSAKey.cpp#4 $
+// $Id: //poco/1.3/Crypto/src/RSAKey.cpp#5 $
 //
 // Library: Crypto
 // Package: RSA
@@ -94,10 +94,15 @@ void RSAKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStrea
 }
 
 
+namespace
+{
+	static const std::string RSA("rsa");
+}
+
+
 const std::string& RSAKey::name() const
 {
-	static const std::string n("rsa");
-	return n;
+	return RSA;
 }
 
 

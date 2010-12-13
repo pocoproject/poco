@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="7.10"
 	Name="TestSuite"
-	ProjectGUID="{e40e738c-447b-40f4-a878-eba9a2459270}"
+	Version="7.10"
+	ProjectType="Visual C++"
+	ProjectGUID="{E40E738C-447B-40F4-A878-EBA9A2459270}"
+	RootNamespace="TestSuite"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -12,16 +13,17 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\debug_shared"
-			IntermediateDirectory="obj\debug_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_DLL;WINVER=0x0500"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;"
+				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -30,19 +32,22 @@
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib PocoUtild.lib PocoFoundationd.lib PocoXMLd.lib"
-				OutputFile="bin/TestSuited.exe"
+				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib "
+				OutputFile="bin\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="bin/TestSuited.pdb"
+				ProgramDatabaseFile="bin\TestSuited.pdb"
 				SubSystem="2"
 				TargetMachine="1"/>
 			<Tool
@@ -68,8 +73,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\release_shared"
-			IntermediateDirectory="obj\release_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2">
@@ -81,8 +86,8 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_DLL;WINVER=0x0500"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="FALSE"
@@ -90,15 +95,18 @@
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnit.lib WinTestRunner.lib PocoUtil.lib PocoFoundation.lib PocoXML.lib"
-				OutputFile="bin/TestSuite.exe"
+				AdditionalDependencies="CppUnit.lib WinTestRunner.lib "
+				OutputFile="bin\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="FALSE"
@@ -129,38 +137,43 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static|Win32"
-			OutputDirectory="obj\debug_static"
-			IntermediateDirectory="obj\debug_static"
+			Name="debug_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;WINVER=0x0500"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
+				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				BufferSecurityCheck="TRUE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib PocoUtilmtd.lib PocoFoundationmtd.lib PocoXMLmtd.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\debug_static\WinTestRunner.res"
-				OutputFile="bin/TestSuitemtd.exe"
+				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib iphlpapi.lib winmm.lib nafxcwd.lib libcmtd.lib WinTestRunner.res "
+				OutputFile="bin\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib"
+				IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="bin/TestSuitemtd.pdb"
+				ProgramDatabaseFile="bin\static_mt\TestSuited.pdb"
 				SubSystem="2"
 				TargetMachine="1"/>
 			<Tool
@@ -185,9 +198,135 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static|Win32"
-			OutputDirectory="obj\release_static"
-			IntermediateDirectory="obj\release_static"
+			Name="release_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="1"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				OptimizeForWindowsApplication="TRUE"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"
+				DisableSpecificWarnings="4800;"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib iphlpapi.lib winmm.lib nafxcw.lib libcmt.lib WinTestRunner.res "
+				OutputFile="bin\static_mt\TestSuite.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\lib"
+				IgnoreDefaultLibraryNames="nafxcw.lib;libcmt.lib"
+				GenerateDebugInformation="FALSE"
+				ProgramDatabaseFile=""
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="2"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
+				StringPooling="TRUE"
+				MinimalRebuild="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="TRUE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				DisableSpecificWarnings="4800;"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res "
+				OutputFile="bin\static_md\TestSuited.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\lib"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="bin\static_md\TestSuited.pdb"
+				SubSystem="2"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="release_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			CharacterSet="2">
@@ -199,8 +338,8 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\include;..\..\Foundation\include;..\..\XML\include;..\..\Util\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;WINVER=0x0500"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\XML\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="FALSE"
@@ -208,15 +347,18 @@
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib PocoUtilmt.lib PocoFoundationmt.lib PocoXMLmt.lib winmm.lib ..\..\CppUnit\WinTestRunner\obj\release_static\WinTestRunner.res"
-				OutputFile="bin/TestSuitemt.exe"
+				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res "
+				OutputFile="bin\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="FALSE"
@@ -247,237 +389,164 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="Application"
-			Filter="">
+			Name="Application">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files"/>
+			<Filter
+				Name="Source Files"/>
+		</Filter>
+		<Filter
+			Name="_Suite">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\src\UtilTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
+				<File
+					RelativePath=".\src\UtilTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="_Suite"
-			Filter="">
+			Name="_Driver">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\UtilTestSuite.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				Filter="">
-				<File
-					RelativePath=".\src\UtilTestSuite.cpp">
-				</File>
+					RelativePath=".\src\WinDriver.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="_Driver"
-			Filter="">
+			Name="Configuration">
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\src\WinDriver.cpp">
-				</File>
+					RelativePath=".\src\AbstractConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\ConfigurationMapperTest.h"/>
+				<File
+					RelativePath=".\src\ConfigurationTestSuite.h"/>
+				<File
+					RelativePath=".\src\ConfigurationViewTest.h"/>
+				<File
+					RelativePath=".\src\FilesystemConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\IniFileConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\LayeredConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\LoggingConfiguratorTest.h"/>
+				<File
+					RelativePath=".\src\MapConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\PropertyFileConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\SystemConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\XMLConfigurationTest.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\AbstractConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\ConfigurationMapperTest.cpp"/>
+				<File
+					RelativePath=".\src\ConfigurationTestSuite.cpp"/>
+				<File
+					RelativePath=".\src\ConfigurationViewTest.cpp"/>
+				<File
+					RelativePath=".\src\FilesystemConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\IniFileConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\LayeredConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\LoggingConfiguratorTest.cpp"/>
+				<File
+					RelativePath=".\src\MapConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\PropertyFileConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\SystemConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\XMLConfigurationTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Configuration"
-			Filter="">
+			Name="Options">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\src\AbstractConfigurationTest.h">
-				</File>
+					RelativePath=".\src\HelpFormatterTest.h"/>
 				<File
-					RelativePath=".\src\ConfigurationMapperTest.h">
-				</File>
+					RelativePath=".\src\OptionProcessorTest.h"/>
 				<File
-					RelativePath=".\src\ConfigurationTestSuite.h">
-				</File>
+					RelativePath=".\src\OptionSetTest.h"/>
 				<File
-					RelativePath=".\src\ConfigurationViewTest.h">
-				</File>
+					RelativePath=".\src\OptionsTestSuite.h"/>
 				<File
-					RelativePath=".\src\FilesystemConfigurationTest.h">
-				</File>
+					RelativePath=".\src\OptionTest.h"/>
 				<File
-					RelativePath=".\src\IniFileConfigurationTest.h">
-				</File>
-				<File
-					RelativePath=".\src\LayeredConfigurationTest.h">
-				</File>
-				<File
-					RelativePath=".\src\LoggingConfiguratorTest.h">
-				</File>
-				<File
-					RelativePath=".\src\MapConfigurationTest.h">
-				</File>
-				<File
-					RelativePath=".\src\PropertyFileConfigurationTest.h">
-				</File>
-				<File
-					RelativePath=".\src\SystemConfigurationTest.h">
-				</File>
-				<File
-					RelativePath=".\src\XMLConfigurationTest.h">
-				</File>
+					RelativePath=".\src\ValidatorTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\AbstractConfigurationTest.cpp">
-				</File>
+					RelativePath=".\src\HelpFormatterTest.cpp"/>
 				<File
-					RelativePath=".\src\ConfigurationMapperTest.cpp">
-				</File>
+					RelativePath=".\src\OptionProcessorTest.cpp"/>
 				<File
-					RelativePath=".\src\ConfigurationTestSuite.cpp">
-				</File>
+					RelativePath=".\src\OptionSetTest.cpp"/>
 				<File
-					RelativePath=".\src\ConfigurationViewTest.cpp">
-				</File>
+					RelativePath=".\src\OptionsTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\FilesystemConfigurationTest.cpp">
-				</File>
+					RelativePath=".\src\OptionTest.cpp"/>
 				<File
-					RelativePath=".\src\IniFileConfigurationTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\LayeredConfigurationTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\LoggingConfiguratorTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\MapConfigurationTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\PropertyFileConfigurationTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\SystemConfigurationTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\XMLConfigurationTest.cpp">
-				</File>
+					RelativePath=".\src\ValidatorTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Options"
-			Filter="">
+			Name="Windows">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\src\HelpFormatterTest.h">
-				</File>
+					RelativePath=".\src\WinConfigurationTest.h"/>
 				<File
-					RelativePath=".\src\OptionProcessorTest.h">
-				</File>
+					RelativePath=".\src\WindowsTestSuite.h"/>
 				<File
-					RelativePath=".\src\OptionSetTest.h">
-				</File>
-				<File
-					RelativePath=".\src\OptionsTestSuite.h">
-				</File>
-				<File
-					RelativePath=".\src\OptionTest.h">
-				</File>
-				<File
-					RelativePath=".\src\ValidatorTest.h">
-				</File>
+					RelativePath=".\src\WinRegistryTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\HelpFormatterTest.cpp">
-				</File>
+					RelativePath=".\src\WinConfigurationTest.cpp"/>
 				<File
-					RelativePath=".\src\OptionProcessorTest.cpp">
-				</File>
+					RelativePath=".\src\WindowsTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\OptionSetTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\OptionsTestSuite.cpp">
-				</File>
-				<File
-					RelativePath=".\src\OptionTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\ValidatorTest.cpp">
-				</File>
+					RelativePath=".\src\WinRegistryTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Windows"
-			Filter="">
+			Name="Timer">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\src\WinConfigurationTest.h">
-				</File>
+					RelativePath=".\src\TimerTest.h"/>
 				<File
-					RelativePath=".\src\WindowsTestSuite.h">
-				</File>
-				<File
-					RelativePath=".\src\WinRegistryTest.h">
-				</File>
+					RelativePath=".\src\TimerTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\WinConfigurationTest.cpp">
-				</File>
+					RelativePath=".\src\TimerTest.cpp"/>
 				<File
-					RelativePath=".\src\WindowsTestSuite.cpp">
-				</File>
-				<File
-					RelativePath=".\src\WinRegistryTest.cpp">
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Timer"
-			Filter="">
-			<Filter
-				Name="Header Files"
-				Filter="">
-				<File
-					RelativePath=".\src\TimerTest.h">
-				</File>
-				<File
-					RelativePath=".\src\TimerTestSuite.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				Filter="">
-				<File
-					RelativePath=".\src\TimerTest.cpp">
-				</File>
-				<File
-					RelativePath=".\src\TimerTestSuite.cpp">
-				</File>
+					RelativePath=".\src\TimerTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

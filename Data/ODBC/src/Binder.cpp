@@ -1,7 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/Binder.cpp#5 $
+// $Id: //poco/1.3/Data/ODBC/src/Binder.cpp#6 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -123,7 +123,8 @@ void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 void Binder::bind(std::size_t pos)
 {
 	_lengthIndicator.push_back(0);
-	_dataSize.insert(SizeMap::value_type(0, 0));
+	_dataSize.insert(SizeMap::value_type(static_cast<SQLPOINTER>(0), static_cast<SQLLEN>(0)));
+		// NOTE: stupid casts required by VS2010.
 
 	if (Utility::isError(SQLBindParameter(_rStmt, 
 		(SQLUSMALLINT) pos + 1, 

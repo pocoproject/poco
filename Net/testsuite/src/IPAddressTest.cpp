@@ -1,7 +1,7 @@
 //
 // IPAddressTest.cpp
 //
-// $Id: //poco/1.3/Net/testsuite/src/IPAddressTest.cpp#2 $
+// $Id: //poco/1.3/Net/testsuite/src/IPAddressTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -233,6 +233,40 @@ void IPAddressTest::testClassification()
 	assert (!ip8.isSiteLocalMC());
 	assert (!ip8.isOrgLocalMC());
 	assert (!ip8.isGlobalMC());
+
+#ifdef POCO_HAVE_IPv6
+
+	IPAddress ip9("::1");
+	assert (!ip9.isWildcard());
+	assert (!ip9.isBroadcast());
+	assert (ip9.isLoopback());
+	assert (!ip9.isMulticast());
+	assert (ip9.isUnicast());
+	assert (!ip9.isLinkLocal());
+	assert (!ip9.isSiteLocal());
+	assert (!ip9.isWellKnownMC());
+	assert (!ip9.isNodeLocalMC());
+	assert (!ip9.isLinkLocalMC());
+	assert (!ip9.isSiteLocalMC());
+	assert (!ip9.isOrgLocalMC());
+	assert (!ip9.isGlobalMC());
+
+	IPAddress ip10("fe80::12");
+	assert (!ip10.isWildcard());
+	assert (!ip10.isBroadcast());
+	assert (!ip10.isLoopback());
+	assert (!ip10.isMulticast());
+	assert (ip10.isUnicast());
+	assert (ip10.isLinkLocal());
+	assert (!ip10.isSiteLocal());
+	assert (!ip10.isWellKnownMC());
+	assert (!ip10.isNodeLocalMC());
+	assert (!ip10.isLinkLocalMC());
+	assert (!ip10.isSiteLocalMC());
+	assert (!ip10.isOrgLocalMC());
+	assert (!ip10.isGlobalMC());
+
+#endif
 }
 
 

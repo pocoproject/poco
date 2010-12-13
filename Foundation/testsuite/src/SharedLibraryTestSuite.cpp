@@ -1,7 +1,7 @@
 //
 // SharedLibraryTestSuite.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/SharedLibraryTestSuite.cpp#1 $
+// $Id: //poco/1.3/Foundation/testsuite/src/SharedLibraryTestSuite.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -40,9 +40,12 @@ CppUnit::Test* SharedLibraryTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SharedLibraryTestSuite");
 
-	pSuite->addTest(SharedLibraryTest::suite());
 	pSuite->addTest(ManifestTest::suite());
+
+#if !defined(_WIN32) || defined(_DLL)
+	pSuite->addTest(SharedLibraryTest::suite());
 	pSuite->addTest(ClassLoaderTest::suite());
+#endif
 
 	return pSuite;
 }

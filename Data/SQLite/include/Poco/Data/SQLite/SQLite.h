@@ -1,7 +1,7 @@
 //
 // SQLite.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SQLite.h#3 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SQLite.h#4 $
 //
 // Library: Data/SQLite
 // Package: SQLIte
@@ -72,19 +72,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(SQLite_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoSQLited.lib")
-			#else
-				#pragma comment(lib, "PocoSQLite.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoSQLitemtd.lib")
-			#else
-				#pragma comment(lib, "PocoSQLitemt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoDataSQLite" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

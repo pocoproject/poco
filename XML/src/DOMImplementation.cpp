@@ -1,7 +1,7 @@
 //
 // DOMImplementation.cpp
 //
-// $Id: //poco/1.3/XML/src/DOMImplementation.cpp#2 $
+// $Id: //poco/1.3/XML/src/DOMImplementation.cpp#3 $
 //
 // Library: XML
 // Package: DOM
@@ -93,9 +93,14 @@ Document* DOMImplementation::createDocument(const XMLString& namespaceURI, const
 }
 
 
-const DOMImplementation& DOMImplementation::instance()
+namespace
 {
 	static Poco::SingletonHolder<DOMImplementation> sh;
+}
+
+
+const DOMImplementation& DOMImplementation::instance()
+{
 	return *sh.get();
 }
 

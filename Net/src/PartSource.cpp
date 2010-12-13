@@ -1,7 +1,7 @@
 //
 // PartSource.cpp
 //
-// $Id: //poco/1.3/Net/src/PartSource.cpp#1 $
+// $Id: //poco/1.3/Net/src/PartSource.cpp#2 $
 //
 // Library: Net
 // Package: Messages
@@ -58,10 +58,15 @@ PartSource::~PartSource()
 }
 
 
+namespace
+{
+	static const std::string EMPTY;
+}
+
+
 const std::string& PartSource::filename()
 {
-	static const std::string empty;
-	return empty;
+	return EMPTY;
 }
 
 

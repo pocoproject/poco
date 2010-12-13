@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#24 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SecureSocketImpl.cpp#25 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -102,7 +102,7 @@ void SecureSocketImpl::acceptSSL()
 
 	BIO* pBIO = BIO_new(BIO_s_socket());
 	if (!pBIO) throw SSLException("Cannot create BIO object");
-	BIO_set_fd(pBIO, _pSocket->sockfd(), BIO_NOCLOSE);
+	BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
 
 	_pSSL = SSL_new(_pContext->sslContext());
 	if (!_pSSL)
@@ -156,7 +156,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	
 	BIO* pBIO = BIO_new(BIO_s_socket());
 	if (!pBIO) throw SSLException("Cannot create SSL BIO object");
-	BIO_set_fd(pBIO, _pSocket->sockfd(), BIO_NOCLOSE);
+	BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
 
 	_pSSL = SSL_new(_pContext->sslContext());
 	if (!_pSSL) 

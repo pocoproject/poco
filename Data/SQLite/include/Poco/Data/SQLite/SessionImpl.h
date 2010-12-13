@@ -1,7 +1,7 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#8 $
+// $Id: //poco/1.3/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#9 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -104,6 +104,12 @@ public:
 	bool isConnected();
 		/// Returns true iff connected, false otherwise.
 		
+	sqlite3* db();
+		/// Returns a pointer to the underlying sqlite3 structure.
+		///
+		/// This can be called to invoke sqlite API functions 
+		/// directly on the underlying database.
+		
 protected:
 	void setTransactionMode(const std::string& prop, const Poco::Any& value);
 	Poco::Any getTransactionMode(const std::string& prop);
@@ -130,6 +136,15 @@ private:
 	static const std::string COMMIT_TRANSACTION;
 	static const std::string ABORT_TRANSACTION;
 };
+
+
+//
+// inlines
+//
+inline sqlite3* SessionImpl::db()
+{
+	return _pDB;
+}
 
 
 } } } // namespace Poco::Data::SQLite

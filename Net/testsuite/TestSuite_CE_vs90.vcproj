@@ -1,50 +1,40 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="9.00"
 	Name="TestSuite"
-	ProjectGUID="{369AC87B-5DD2-493C-A6AC-EF0F9364FCE7}"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
-	>
+	Version="9.00"
+	ProjectType="Visual C++"
+	ProjectGUID="{D5EFBF27-B934-4B8D-8AE5-6EC00374819C}"
+	RootNamespace="TestSuite"
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
-			Name="Digi JumpStart (ARMV4I)"
-		/>
+			Name="Digi JumpStart (ARMV4I)"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
+	<ToolFiles/>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="0"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\Foundation\include;..\..\CppUnit\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="3"
@@ -54,277 +44,142 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
+				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitd.lib PocoFoundationd.lib PocoNetd.lib"
-				OutputFile="bin\$(PlatformName)\$(ProjectName)d.exe"
+				AdditionalDependencies="CppUnitd.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\shared\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\$(PlatformName)\$(ProjectName)d.pdb"
+				ProgramDatabaseFile="bin\$(PlatformName)\shared\TestSuited.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="0"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="4"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\..\Foundation\include;..\..\CppUnit\include"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;_CRT_SECURE_NO_WARNINGS"
-				StringPooling="true"
-				MinimalRebuild="false"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-				CompileAs="0"
-				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnit.lib PocoFoundation.lib PocoNet.lib"
-				OutputFile="bin\$(PlatformName)\$(ProjectName).exe"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
-				GenerateDebugInformation="false"
-				ProgramDatabaseFile=""
-				SubSystem="0"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="0"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
-		</Configuration>
-		<Configuration
-			Name="release_static|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			UseOfMFC="0"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="4"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\..\Foundation\include;..\..\CppUnit\include"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;POCO_STATIC;_CRT_SECURE_NO_WARNINGS"
-				StringPooling="true"
-				MinimalRebuild="false"
-				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-				CompileAs="0"
-				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib PocoFoundationmt.lib PocoNetmt.lib ws2.lib iphlpapi.lib"
-				OutputFile="bin\$(PlatformName)\$(ProjectName)mt.exe"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
-				GenerateDebugInformation="false"
-				ProgramDatabaseFile=""
-				SubSystem="0"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="0"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
-		</Configuration>
-		<Configuration
-			Name="debug_static|Digi JumpStart (ARMV4I)"
-			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			UseOfMFC="0"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\Foundation\include;..\..\CppUnit\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"
+				CompileForArchitecture="2"
+				InterworkCalls="false"/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="CppUnit.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\shared\TestSuite.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile=""
+				SubSystem="0"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="0"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCCodeSignTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""/>
+			<DebuggerTool/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_mt|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="1"
@@ -334,670 +189,619 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
+				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib PocoFoundationmtd.lib PocoNetmtd.lib ws2.lib iphlpapi.lib"
-				OutputFile="bin\$(PlatformName)\$(ProjectName)mtd.exe"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="CppUnitmtd.lib iphlpapi.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\$(PlatformName)\$(ProjectName)mtd.pdb"
+				ProgramDatabaseFile="bin\$(PlatformName)\static_mt\TestSuited.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="\Hard Disk"
+				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
+		</Configuration>
+		<Configuration
+			Name="release_static_mt|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="4"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800"
+				CompileForArchitecture="2"
+				InterworkCalls="false"/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="CppUnitmt.lib iphlpapi.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\static_mt\TestSuite.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile=""
+				SubSystem="0"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="0"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCCodeSignTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""/>
+			<DebuggerTool/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_md|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"
+				CompileForArchitecture="2"
+				InterworkCalls="false"/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="CppUnitmdd.lib iphlpapi.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\static_md\TestSuited.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="bin\$(PlatformName)\static_md\TestSuited.pdb"
+				SubSystem="0"
+				RandomizedBaseAddress="1"
+				TargetMachine="0"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCCodeSignTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""/>
+			<DebuggerTool/>
+		</Configuration>
+		<Configuration
+			Name="release_static_md|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1">
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="4"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800"
+				CompileForArchitecture="2"
+				InterworkCalls="false"/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/FORCE:MULTIPLE"
+				AdditionalDependencies="CppUnitmd.lib iphlpapi.lib ws2.lib iphlpapi.lib"
+				OutputFile="bin\$(PlatformName)\static_md\TestSuite.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile=""
+				SubSystem="0"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="0"/>
+			<Tool
+				Name="VCALinkTool"/>
+			<Tool
+				Name="VCXDCMakeTool"/>
+			<Tool
+				Name="VCBscMakeTool"/>
+			<Tool
+				Name="VCFxCopTool"/>
+			<Tool
+				Name="VCCodeSignTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="NetCore"
-			>
+			Name="NetCore">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\DNSTest.h"
-					>
-				</File>
+					RelativePath=".\src\DNSTest.h"/>
 				<File
-					RelativePath=".\src\IPAddressTest.h"
-					>
-				</File>
+					RelativePath=".\src\IPAddressTest.h"/>
 				<File
-					RelativePath=".\src\NetCoreTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\NetCoreTestSuite.h"/>
 				<File
-					RelativePath=".\src\SocketAddressTest.h"
-					>
-				</File>
+					RelativePath=".\src\SocketAddressTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\DNSTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\DNSTest.cpp"/>
 				<File
-					RelativePath=".\src\IPAddressTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\IPAddressTest.cpp"/>
 				<File
-					RelativePath=".\src\NetCoreTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\NetCoreTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\SocketAddressTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\SocketAddressTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="_Suite"
-			>
+			Name="_Suite">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\NetTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\NetTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\NetTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\NetTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="_Driver"
-			>
+			Name="_Driver">
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\WinCEDriver.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Header Files"
-				>
+					RelativePath=".\src\WinCEDriver.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Sockets"
-			>
+			Name="Sockets">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\DatagramSocketTest.h"
-					>
-				</File>
+					RelativePath=".\src\DatagramSocketTest.h"/>
 				<File
-					RelativePath=".\src\DialogServer.h"
-					>
-				</File>
+					RelativePath=".\src\DialogServer.h"/>
 				<File
-					RelativePath=".\src\DialogSocketTest.h"
-					>
-				</File>
+					RelativePath=".\src\DialogSocketTest.h"/>
 				<File
-					RelativePath=".\src\EchoServer.h"
-					>
-				</File>
+					RelativePath=".\src\EchoServer.h"/>
 				<File
-					RelativePath=".\src\MulticastEchoServer.h"
-					>
-				</File>
+					RelativePath=".\src\MulticastEchoServer.h"/>
 				<File
-					RelativePath=".\src\MulticastSocketTest.h"
-					>
-				</File>
+					RelativePath=".\src\MulticastSocketTest.h"/>
 				<File
-					RelativePath=".\src\NetworkInterfaceTest.h"
-					>
-				</File>
+					RelativePath=".\src\NetworkInterfaceTest.h"/>
 				<File
-					RelativePath=".\src\RawSocketTest.h"
-					>
-				</File>
+					RelativePath=".\src\RawSocketTest.h"/>
 				<File
-					RelativePath=".\src\SocketsTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\SocketsTestSuite.h"/>
 				<File
-					RelativePath=".\src\SocketStreamTest.h"
-					>
-				</File>
+					RelativePath=".\src\SocketStreamTest.h"/>
 				<File
-					RelativePath=".\src\SocketTest.h"
-					>
-				</File>
+					RelativePath=".\src\SocketTest.h"/>
 				<File
-					RelativePath=".\src\UDPEchoServer.h"
-					>
-				</File>
+					RelativePath=".\src\UDPEchoServer.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\DatagramSocketTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\DatagramSocketTest.cpp"/>
 				<File
-					RelativePath=".\src\DialogServer.cpp"
-					>
-				</File>
+					RelativePath=".\src\DialogServer.cpp"/>
 				<File
-					RelativePath=".\src\DialogSocketTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\DialogSocketTest.cpp"/>
 				<File
-					RelativePath=".\src\EchoServer.cpp"
-					>
-				</File>
+					RelativePath=".\src\EchoServer.cpp"/>
 				<File
-					RelativePath=".\src\MulticastEchoServer.cpp"
-					>
-				</File>
+					RelativePath=".\src\MulticastEchoServer.cpp"/>
 				<File
-					RelativePath=".\src\MulticastSocketTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\MulticastSocketTest.cpp"/>
 				<File
-					RelativePath=".\src\NetworkInterfaceTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\NetworkInterfaceTest.cpp"/>
 				<File
-					RelativePath=".\src\RawSocketTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\RawSocketTest.cpp"/>
 				<File
-					RelativePath=".\src\SocketsTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\SocketsTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\SocketStreamTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\SocketStreamTest.cpp"/>
 				<File
-					RelativePath=".\src\SocketTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\SocketTest.cpp"/>
 				<File
-					RelativePath=".\src\UDPEchoServer.cpp"
-					>
-				</File>
+					RelativePath=".\src\UDPEchoServer.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Messages"
-			>
+			Name="Messages">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\MediaTypeTest.h"
-					>
-				</File>
+					RelativePath=".\src\MediaTypeTest.h"/>
 				<File
-					RelativePath=".\src\MessageHeaderTest.h"
-					>
-				</File>
+					RelativePath=".\src\MessageHeaderTest.h"/>
 				<File
-					RelativePath=".\src\MessagesTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\MessagesTestSuite.h"/>
 				<File
-					RelativePath=".\src\MultipartReaderTest.h"
-					>
-				</File>
+					RelativePath=".\src\MultipartReaderTest.h"/>
 				<File
-					RelativePath=".\src\MultipartWriterTest.h"
-					>
-				</File>
+					RelativePath=".\src\MultipartWriterTest.h"/>
 				<File
-					RelativePath=".\src\NameValueCollectionTest.h"
-					>
-				</File>
+					RelativePath=".\src\NameValueCollectionTest.h"/>
 				<File
-					RelativePath=".\src\QuotedPrintableTest.h"
-					>
-				</File>
+					RelativePath=".\src\QuotedPrintableTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\MediaTypeTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\MediaTypeTest.cpp"/>
 				<File
-					RelativePath=".\src\MessageHeaderTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\MessageHeaderTest.cpp"/>
 				<File
-					RelativePath=".\src\MessagesTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\MessagesTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\MultipartReaderTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\MultipartReaderTest.cpp"/>
 				<File
-					RelativePath=".\src\MultipartWriterTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\MultipartWriterTest.cpp"/>
 				<File
-					RelativePath=".\src\NameValueCollectionTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\NameValueCollectionTest.cpp"/>
 				<File
-					RelativePath=".\src\QuotedPrintableTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\QuotedPrintableTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="HTTP"
-			>
+			Name="HTTP">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\HTTPCookieTest.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPCookieTest.h"/>
 				<File
-					RelativePath=".\src\HTTPCredentialsTest.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPCredentialsTest.h"/>
 				<File
-					RelativePath=".\src\HTTPRequestTest.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPRequestTest.h"/>
 				<File
-					RelativePath=".\src\HTTPResponseTest.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPResponseTest.h"/>
 				<File
-					RelativePath=".\src\HTTPTestServer.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPTestServer.h"/>
 				<File
-					RelativePath=".\src\HTTPTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\HTTPCookieTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPCookieTest.cpp"/>
 				<File
-					RelativePath=".\src\HTTPCredentialsTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPCredentialsTest.cpp"/>
 				<File
-					RelativePath=".\src\HTTPRequestTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPRequestTest.cpp"/>
 				<File
-					RelativePath=".\src\HTTPResponseTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPResponseTest.cpp"/>
 				<File
-					RelativePath=".\src\HTTPTestServer.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPTestServer.cpp"/>
 				<File
-					RelativePath=".\src\HTTPTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="TCPServer"
-			>
+			Name="TCPServer">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\TCPServerTest.h"
-					>
-				</File>
+					RelativePath=".\src\TCPServerTest.h"/>
 				<File
-					RelativePath=".\src\TCPServerTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\TCPServerTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\TCPServerTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\TCPServerTest.cpp"/>
 				<File
-					RelativePath=".\src\TCPServerTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\TCPServerTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="HTTPServer"
-			>
+			Name="HTTPServer">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\HTTPServerTest.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPServerTest.h"/>
 				<File
-					RelativePath=".\src\HTTPServerTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPServerTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\HTTPServerTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPServerTest.cpp"/>
 				<File
-					RelativePath=".\src\HTTPServerTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPServerTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="HTML"
-			>
+			Name="HTML">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\HTMLFormTest.h"
-					>
-				</File>
+					RelativePath=".\src\HTMLFormTest.h"/>
 				<File
-					RelativePath=".\src\HTMLTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\HTMLTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\HTMLFormTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTMLFormTest.cpp"/>
 				<File
-					RelativePath=".\src\HTMLTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTMLTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="HTTPClient"
-			>
+			Name="HTTPClient">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\HTTPClientSessionTest.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPClientSessionTest.h"/>
 				<File
-					RelativePath=".\src\HTTPClientTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPClientTestSuite.h"/>
 				<File
-					RelativePath=".\src\HTTPStreamFactoryTest.h"
-					>
-				</File>
+					RelativePath=".\src\HTTPStreamFactoryTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\HTTPClientSessionTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPClientSessionTest.cpp"/>
 				<File
-					RelativePath=".\src\HTTPClientTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPClientTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\HTTPStreamFactoryTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HTTPStreamFactoryTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="FTPClient"
-			>
+			Name="FTPClient">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\FTPClientSessionTest.h"
-					>
-				</File>
+					RelativePath=".\src\FTPClientSessionTest.h"/>
 				<File
-					RelativePath=".\src\FTPClientTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\FTPClientTestSuite.h"/>
 				<File
-					RelativePath=".\src\FTPStreamFactoryTest.h"
-					>
-				</File>
+					RelativePath=".\src\FTPStreamFactoryTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\FTPClientSessionTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\FTPClientSessionTest.cpp"/>
 				<File
-					RelativePath=".\src\FTPClientTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\FTPClientTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\FTPStreamFactoryTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\FTPStreamFactoryTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Reactor"
-			>
+			Name="Reactor">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\ReactorTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\ReactorTestSuite.h"/>
 				<File
-					RelativePath=".\src\SocketReactorTest.h"
-					>
-				</File>
+					RelativePath=".\src\SocketReactorTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\ReactorTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\ReactorTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\SocketReactorTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\SocketReactorTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Mail"
-			>
+			Name="Mail">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\MailMessageTest.h"
-					>
-				</File>
+					RelativePath=".\src\MailMessageTest.h"/>
 				<File
-					RelativePath=".\src\MailStreamTest.h"
-					>
-				</File>
+					RelativePath=".\src\MailStreamTest.h"/>
 				<File
-					RelativePath=".\src\MailTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\MailTestSuite.h"/>
 				<File
-					RelativePath=".\src\POP3ClientSessionTest.h"
-					>
-				</File>
+					RelativePath=".\src\POP3ClientSessionTest.h"/>
 				<File
-					RelativePath=".\src\SMTPClientSessionTest.h"
-					>
-				</File>
+					RelativePath=".\src\SMTPClientSessionTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\MailMessageTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\MailMessageTest.cpp"/>
 				<File
-					RelativePath=".\src\MailStreamTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\MailStreamTest.cpp"/>
 				<File
-					RelativePath=".\src\MailTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\MailTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\POP3ClientSessionTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\POP3ClientSessionTest.cpp"/>
 				<File
-					RelativePath=".\src\SMTPClientSessionTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\SMTPClientSessionTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="ICMP"
-			>
+			Name="ICMP">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\ICMPClientTest.h"
-					>
-				</File>
+					RelativePath=".\src\ICMPClientTest.h"/>
 				<File
-					RelativePath=".\src\ICMPClientTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\ICMPClientTestSuite.h"/>
 				<File
-					RelativePath=".\src\ICMPSocketTest.h"
-					>
-				</File>
+					RelativePath=".\src\ICMPSocketTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\ICMPClientTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\ICMPClientTest.cpp"/>
 				<File
-					RelativePath=".\src\ICMPClientTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\ICMPClientTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\ICMPSocketTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\ICMPSocketTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Logging"
-			>
+			Name="Logging">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\SyslogTest.h"
-					>
-				</File>
+					RelativePath=".\src\SyslogTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\SyslogTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\SyslogTest.cpp"/>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

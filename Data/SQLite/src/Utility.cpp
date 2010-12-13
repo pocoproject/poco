@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#9 $
+// $Id: //poco/1.3/Data/SQLite/src/Utility.cpp#11 $
 //
 // Library: Data/SQLite
 // Package: SQLite
@@ -54,11 +54,12 @@ namespace SQLite {
 
 
 Utility::TypeMap Utility::_types;
+Poco::FastMutex Utility::_mutex;
 
 
-Utility::Utility()
+void Utility::initTypeMap()
 {
-	Poco::FastMutex::ScopedLock l(_mutex);
+	Poco::FastMutex::ScopedLock lock(_mutex);
 
 	if (_types.empty())
 	{
@@ -121,7 +122,7 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 {
 	poco_assert_dbg (pStmt);
 
-	static Utility u;
+	initTypeMap();
 	
 	const char* pc = sqlite3_column_decltype(pStmt, (int) pos);
 	std::string sqliteType = pc ? pc : "";

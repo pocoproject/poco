@@ -1,7 +1,7 @@
 //
 // NotificationCenter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NotificationCenter.cpp#3 $
+// $Id: //poco/1.3/Foundation/src/NotificationCenter.cpp#4 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -105,9 +105,14 @@ std::size_t NotificationCenter::countObservers() const
 }
 
 
-NotificationCenter& NotificationCenter::defaultCenter()
+namespace
 {
 	static SingletonHolder<NotificationCenter> sh;
+}
+
+
+NotificationCenter& NotificationCenter::defaultCenter()
+{
 	return *sh.get();
 }
 

@@ -1,7 +1,7 @@
 //
 // LoggingRegistry.cpp
 //
-// $Id: //poco/1.3/Foundation/src/LoggingRegistry.cpp#1 $
+// $Id: //poco/1.3/Foundation/src/LoggingRegistry.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -124,9 +124,14 @@ void LoggingRegistry::clear()
 }
 
 
-LoggingRegistry& LoggingRegistry::defaultRegistry()
+namespace
 {
 	static SingletonHolder<LoggingRegistry> sh;
+}
+
+
+LoggingRegistry& LoggingRegistry::defaultRegistry()
+{
 	return *sh.get();
 }
 

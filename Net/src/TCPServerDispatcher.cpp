@@ -1,7 +1,7 @@
 //
 // TCPServerDispatcher.cpp
 //
-// $Id: //poco/1.3/Net/src/TCPServerDispatcher.cpp#5 $
+// $Id: //poco/1.3/Net/src/TCPServerDispatcher.cpp#6 $
 //
 // Library: Net
 // Package: TCPServer
@@ -147,6 +147,12 @@ void TCPServerDispatcher::run()
 	}
 }
 
+
+namespace
+{
+	static const std::string threadName("TCPServerConnection");
+}
+
 	
 void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 {
@@ -159,7 +165,6 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 		{
 			try
 			{
-				static const std::string threadName("TCPServerConnection");
 				_threadPool.startWithPriority(_pParams->getThreadPriority(), *this, threadName);
 				++_currentThreads;
 			}

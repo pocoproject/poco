@@ -1,7 +1,7 @@
 //
 // Net.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/Net.h#4 $
+// $Id: //poco/1.3/Net/include/Poco/Net/Net.h#5 $
 //
 // Library: Net
 // Package: NetCore
@@ -72,19 +72,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Net_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoNetd.lib")
-			#else
-				#pragma comment(lib, "PocoNet.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoNetmtd.lib")
-			#else
-				#pragma comment(lib, "PocoNetmt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoNet" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

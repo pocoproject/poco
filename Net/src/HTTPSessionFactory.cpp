@@ -1,7 +1,7 @@
 //
 // HTTPSessionFactory.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPSessionFactory.cpp#2 $
+// $Id: //poco/1.3/Net/src/HTTPSessionFactory.cpp#3 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -147,9 +147,14 @@ void HTTPSessionFactory::setProxyCredentials(const std::string& username, const 
 }
 
 
-HTTPSessionFactory& HTTPSessionFactory::defaultFactory()
+namespace
 {
 	static SingletonHolder<HTTPSessionFactory> singleton;
+}
+
+
+HTTPSessionFactory& HTTPSessionFactory::defaultFactory()
+{
 	return *singleton.get();
 }
 

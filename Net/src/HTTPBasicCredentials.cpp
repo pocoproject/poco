@@ -1,7 +1,7 @@
 //
 // HTTPBasicCredentials.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPBasicCredentials.cpp#1 $
+// $Id: //poco/1.3/Net/src/HTTPBasicCredentials.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -116,6 +116,7 @@ void HTTPBasicCredentials::authenticate(HTTPRequest& request)
 {
 	std::ostringstream ostr;
 	Base64Encoder encoder(ostr);
+	encoder.rdbuf()->setLineLength(0);
 	encoder << _username << ":" << _password;
 	encoder.close();
 	request.setCredentials(SCHEME, ostr.str());

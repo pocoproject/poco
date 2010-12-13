@@ -1,7 +1,7 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/1.3/Foundation/src/NotificationQueue.cpp#2 $
+// $Id: //poco/1.3/Foundation/src/NotificationQueue.cpp#3 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -211,9 +211,14 @@ Notification::Ptr NotificationQueue::dequeueOne()
 }
 
 
-NotificationQueue& NotificationQueue::defaultQueue()
+namespace
 {
 	static SingletonHolder<NotificationQueue> sh;
+}
+
+
+NotificationQueue& NotificationQueue::defaultQueue()
+{
 	return *sh.get();
 }
 

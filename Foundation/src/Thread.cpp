@@ -1,7 +1,7 @@
 //
 // Thread.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Thread.cpp#5 $
+// $Id: //poco/1.3/Foundation/src/Thread.cpp#6 $
 //
 // Library: Foundation
 // Package: Threading
@@ -146,10 +146,15 @@ std::string Thread::makeName()
 }
 
 
+namespace
+{
+	static FastMutex uniqueIdMutex;
+}
+
+
 int Thread::uniqueId()
 {
-	static FastMutex mtx;
-	FastMutex::ScopedLock lock(mtx);
+	FastMutex::ScopedLock lock(uniqueIdMutex);
 
 	static unsigned count = 0;
 	++count;

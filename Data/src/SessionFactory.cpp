@@ -1,7 +1,7 @@
 //
 // SessionFactory.cpp
 //
-// $Id: //poco/1.3/Data/src/SessionFactory.cpp#2 $
+// $Id: //poco/1.3/Data/src/SessionFactory.cpp#3 $
 //
 // Library: Data
 // Package: DataCore
@@ -51,10 +51,15 @@ SessionFactory::~SessionFactory()
 }
 
 
+namespace
+{
+	static SessionFactory sessionFactory;
+}
+
+
 SessionFactory& SessionFactory::instance()
 {
-	static SessionFactory sf;
-	return sf;
+	return sessionFactory;
 }
 
 

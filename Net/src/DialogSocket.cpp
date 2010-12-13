@@ -1,7 +1,7 @@
 //
 // DialogSocket.cpp
 //
-// $Id: //poco/1.3/Net/src/DialogSocket.cpp#6 $
+// $Id: //poco/1.3/Net/src/DialogSocket.cpp#7 $
 //
 // Library: Net
 // Package: Sockets
@@ -289,7 +289,7 @@ int DialogSocket::receiveStatusLine(std::string& line)
 int DialogSocket::receiveRawBytes(void* buffer, int length)
 {
 	refill();
-	int n = _pEnd - _pNext;
+	int n = static_cast<int>(_pEnd - _pNext);
 	if (n > length) n = length;
 	std::memcpy(buffer, _pNext, n);
 	_pNext += n;

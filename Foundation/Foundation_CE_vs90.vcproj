@@ -52,6 +52,7 @@
 				RuntimeTypeInfo="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
 			/>
@@ -147,6 +148,7 @@
 				RuntimeTypeInfo="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
 			/>
@@ -204,7 +206,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="debug_static|Digi JumpStart (ARMV4I)"
+			Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
@@ -241,6 +243,7 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
+				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
 			/>
@@ -285,7 +288,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="release_static|Digi JumpStart (ARMV4I)"
+			Name="release_static_mt|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
@@ -324,6 +327,7 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
+				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
 				InterworkCalls="false"
 			/>
@@ -339,6 +343,172 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\$(PlatformName)\Poco$(ProjectName)mt.lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCCodeSignTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_md|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				AdditionalIncludeDirectories=".\include;.\wcelibcex-1.0\src"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;PCRE_STATIC;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800"
+				CompileForArchitecture="2"
+				InterworkCalls="false"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\$(PlatformName)\Poco$(ProjectName)mdd.lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCCodeSignTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
+		</Configuration>
+		<Configuration
+			Name="release_static_md|Digi JumpStart (ARMV4I)"
+			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="4"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories=".\include;.\wcelibcex-1.0\src"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;PCRE_STATIC;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
+				MinimalRebuild="false"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4800"
+				CompileForArchitecture="2"
+				InterworkCalls="false"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\$(PlatformName)\Poco$(ProjectName)md.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -425,7 +595,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -433,7 +603,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -461,7 +647,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -469,7 +655,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -745,7 +947,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -753,7 +955,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -781,7 +999,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -789,7 +1007,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -821,7 +1055,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -829,7 +1063,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -857,7 +1107,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -865,7 +1115,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -893,7 +1159,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -901,7 +1167,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -937,7 +1219,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -945,7 +1227,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -973,7 +1271,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -981,7 +1279,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1009,7 +1323,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1017,7 +1331,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1049,7 +1379,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1057,7 +1387,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1085,7 +1431,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1093,7 +1439,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1133,7 +1495,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1141,7 +1503,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1169,7 +1547,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1177,7 +1555,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1205,7 +1599,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1213,7 +1607,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1501,7 +1911,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1509,7 +1919,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1537,7 +1963,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1545,7 +1971,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1573,7 +2015,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1581,7 +2023,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1609,7 +2067,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1617,7 +2075,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1645,7 +2119,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1653,7 +2127,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1853,7 +2343,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1861,7 +2351,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1905,7 +2411,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1913,7 +2419,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1941,7 +2463,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1949,7 +2471,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1977,7 +2515,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -1985,7 +2523,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2013,7 +2567,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2021,7 +2575,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2073,7 +2643,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2081,7 +2651,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2133,7 +2719,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2141,7 +2727,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2169,7 +2771,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2177,7 +2779,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2425,7 +3043,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2433,7 +3051,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2461,7 +3095,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2469,7 +3103,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2497,7 +3147,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2505,7 +3155,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2533,7 +3199,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2541,7 +3207,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2573,7 +3255,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2581,7 +3263,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2609,7 +3307,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2617,7 +3315,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2645,7 +3359,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2653,7 +3367,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2681,7 +3411,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2689,7 +3419,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2717,7 +3463,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2725,7 +3471,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2761,7 +3523,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2769,7 +3531,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2797,7 +3575,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2805,7 +3583,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2833,7 +3627,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2841,7 +3635,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2869,7 +3679,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2877,7 +3687,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2905,7 +3731,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -2913,7 +3739,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3037,7 +3879,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3045,7 +3887,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3073,7 +3931,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3081,7 +3939,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3109,7 +3983,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3117,7 +3991,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3145,7 +4035,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3153,7 +4043,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3185,7 +4091,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3193,7 +4099,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3221,7 +4143,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3229,7 +4151,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3257,7 +4195,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3265,7 +4203,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3293,7 +4247,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3301,7 +4255,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3337,7 +4307,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3345,7 +4315,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3373,7 +4359,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3381,7 +4367,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3409,7 +4411,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3417,7 +4419,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3453,7 +4471,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3461,7 +4479,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3489,7 +4523,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3497,7 +4531,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3525,7 +4575,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3533,7 +4583,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3561,7 +4627,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3569,7 +4635,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3597,7 +4679,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3605,7 +4687,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3637,7 +4735,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3645,7 +4743,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3673,7 +4787,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3681,7 +4795,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3709,7 +4839,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3717,7 +4847,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3925,7 +5071,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3933,7 +5079,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3961,7 +5123,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3969,7 +5131,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -3997,7 +5175,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4005,7 +5183,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4737,7 +5931,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4745,7 +5939,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4773,7 +5983,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4781,7 +5991,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4809,7 +6035,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4817,7 +6043,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4845,7 +6087,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4853,7 +6095,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4881,7 +6139,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4889,7 +6147,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4929,7 +6203,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4937,7 +6211,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4965,7 +6255,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -4973,7 +6263,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5001,7 +6307,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5009,7 +6315,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5037,7 +6359,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5045,7 +6367,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5073,7 +6411,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="debug_static|Digi JumpStart (ARMV4I)"
+						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5081,7 +6419,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="release_static|Digi JumpStart (ARMV4I)"
+						Name="release_static_mt|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="debug_static_md|Digi JumpStart (ARMV4I)"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="release_static_md|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true"
 						>
 						<Tool

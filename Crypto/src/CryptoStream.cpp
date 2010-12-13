@@ -1,7 +1,7 @@
 //
 // CryptoStream.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CryptoStream.cpp#5 $
+// $Id: //poco/1.3/Crypto/src/CryptoStream.cpp#7 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -60,7 +60,7 @@ CryptoStreamBuf::CryptoStreamBuf(std::istream& istr, CryptoTransform* pTransform
 	_pIstr(&istr),
 	_pOstr(0),
 	_eof(false),
-	_buffer(bufferSize)
+	_buffer(static_cast<std::size_t>(bufferSize))
 {
 	poco_check_ptr (pTransform);
 	poco_assert (bufferSize > 2 * pTransform->blockSize());
@@ -73,7 +73,7 @@ CryptoStreamBuf::CryptoStreamBuf(std::ostream& ostr, CryptoTransform* pTransform
 	_pIstr(0),
 	_pOstr(&ostr),
 	_eof(false),
-	_buffer(bufferSize)
+	_buffer(static_cast<std::size_t>(bufferSize))
 {
 	poco_check_ptr (pTransform);
 	poco_assert (bufferSize > 2 * pTransform->blockSize());
@@ -110,7 +110,7 @@ void CryptoStreamBuf::close()
 		_pOstr = 0;
 		
 		// Finalize transformation.
-		int n = _pTransform->finalize(_buffer.begin(), static_cast<std::streamsize>(_buffer.size()));
+		std::streamsize n = _pTransform->finalize(_buffer.begin(), static_cast<std::streamsize>(_buffer.size()));
 		
 		if (n > 0)
 		{
@@ -152,18 +152,18 @@ int CryptoStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			_eof = true;
 
 			// No more data, finalize transformation
-			count += _pTransform->finalize(
+			count += static_cast<int>(_pTransform->finalize(
 				reinterpret_cast<unsigned char*>(buffer + count),
-				length - count);
+				static_cast<int>(length) - count));
 		}
 		else
 		{
 			// Transform next chunk of data
-			count += _pTransform->transform(
+			count += static_cast<int>(_pTransform->transform(
 				_buffer.begin(),
 				n,
 				reinterpret_cast<unsigned char*>(buffer + count),
-				length - count);
+				static_cast<int>(length) - count));
 		}
 	}
 
@@ -182,12 +182,12 @@ int CryptoStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	while (count < length)
 	{
 		// Truncate chunk size so that the maximum output fits into _buffer.
-		std::size_t n = length - count;
+		std::size_t n = static_cast<std::size_t>(length) - count;
 		if (n > maxChunkSize)
 			n = maxChunkSize;
 
 		// Transform next chunk of data
-		int k = _pTransform->transform(
+		std::streamsize k = _pTransform->transform(
 			reinterpret_cast<const unsigned char*>(buffer + count),
 			static_cast<std::streamsize>(n),
 			_buffer.begin(),

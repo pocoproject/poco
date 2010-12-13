@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="7.10"
 	Name="Data"
-	ProjectGUID="{240e83c3-368d-11db-9fbc-00123fc423b5}"
+	Version="7.10"
+	ProjectType="Visual C++"
+	ProjectGUID="{240E83C3-368D-11DB-9FBC-00123FC423B5}"
 	RootNamespace="Data"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -13,15 +13,15 @@
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
-			OutputDirectory="obj\debug_shared"
-			IntermediateDirectory="obj\debug_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;POCO_DLL;Data_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Data_EXPORTS"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -31,23 +31,25 @@
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationd.lib"
+				AdditionalDependencies=""
 				OutputFile="..\bin\PocoDatad.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="..\bin\PocoDatad.pdb"
+				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
-				OptimizeForWindows98="1"
 				ImportLibrary="..\lib\PocoDatad.lib"
 				TargetMachine="1"/>
 			<Tool
@@ -73,8 +75,8 @@
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
-			OutputDirectory="obj\release_shared"
-			IntermediateDirectory="obj\release_shared"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -84,37 +86,36 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;POCO_DLL;Data_EXPORTS"
-				GeneratePreprocessedFile="0"
-				KeepComments="FALSE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;Data_EXPORTS"
 				StringPooling="TRUE"
+				BasicRuntimeChecks="3"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="FALSE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundation.lib"
+				AdditionalDependencies=""
 				OutputFile="..\bin\PocoData.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="FALSE"
-				ProgramDatabaseFile=""
+				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				OptimizeForWindows98="1"
 				ImportLibrary="..\lib\PocoData.lib"
 				TargetMachine="1"/>
 			<Tool
@@ -139,29 +140,32 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static|Win32"
-			OutputDirectory="obj\debug_static"
-			IntermediateDirectory="obj\debug_static"
+			Name="debug_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;Data_EXPORTS;POCO_STATIC"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				BufferSecurityCheck="TRUE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -182,14 +186,16 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static|Win32"
-			OutputDirectory="obj\release_static"
-			IntermediateDirectory="obj\release_static"
+			Name="release_static_mt|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -199,27 +205,28 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;Data_EXPORTS;POCO_STATIC"
-				GeneratePreprocessedFile="0"
-				KeepComments="FALSE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="TRUE"
-				RuntimeLibrary="2"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="0"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\PocoDatamt.lib"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -235,204 +242,250 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="debug_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
+				StringPooling="TRUE"
+				MinimalRebuild="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BufferSecurityCheck="TRUE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\PocoDatamdd.lib"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="release_static_md|Win32"
+			OutputDirectory="obj\$(ConfigurationName)"
+			IntermediateDirectory="obj\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
+				StringPooling="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				ForceConformanceInForLoopScope="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="0"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc70.pdb"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="0"
+				CompileAs="0"
+				DisableSpecificWarnings="4800;"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="..\lib\PocoDatamd.lib"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="DataCore"
-			Filter="">
+			Name="DataCore">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Data\AbstractBinder.h">
-				</File>
+					RelativePath=".\include\Poco\Data\AbstractBinder.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\AbstractBinding.h">
-				</File>
+					RelativePath=".\include\Poco\Data\AbstractBinding.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\AbstractExtraction.h">
-				</File>
+					RelativePath=".\include\Poco\Data\AbstractExtraction.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\AbstractExtractor.h">
-				</File>
+					RelativePath=".\include\Poco\Data\AbstractExtractor.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\AbstractPreparation.h">
-				</File>
+					RelativePath=".\include\Poco\Data\AbstractPreparation.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\AbstractPrepare.h">
-				</File>
+					RelativePath=".\include\Poco\Data\AbstractPrepare.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\AbstractSessionImpl.h">
-				</File>
+					RelativePath=".\include\Poco\Data\AbstractSessionImpl.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Binder.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Binding.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Binding.h">
-				</File>
+					RelativePath=".\include\Poco\Data\BLOB.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\BLOB.h">
-				</File>
+					RelativePath=".\include\Poco\Data\BLOBStream.h"/>
 				<File
-					RelativePath=".\src\BLOBStream.cpp">
-				</File>
+					RelativePath=".\include\Poco\Data\Column.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Column.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Common.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Common.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Connector.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Data.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Data.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\DataException.h">
-				</File>
+					RelativePath=".\include\Poco\Data\DataException.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Extraction.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Extraction.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Limit.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Limit.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\MetaColumn.h">
-				</File>
+					RelativePath=".\include\Poco\Data\MetaColumn.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Prepare.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Prepare.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Range.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Range.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\RecordSet.h">
-				</File>
+					RelativePath=".\include\Poco\Data\RecordSet.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Session.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Session.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\SessionFactory.h">
-				</File>
+					RelativePath=".\include\Poco\Data\SessionFactory.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\SessionImpl.h">
-				</File>
+					RelativePath=".\include\Poco\Data\SessionImpl.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Connector.h">
-				</File>
+					RelativePath=".\include\Poco\Data\Statement.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\Statement.h">
-				</File>
+					RelativePath=".\include\Poco\Data\StatementCreator.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\StatementCreator.h">
-				</File>
+					RelativePath=".\include\Poco\Data\StatementImpl.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\StatementImpl.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\Data\TypeHandler.h">
-				</File>
+					RelativePath=".\include\Poco\Data\TypeHandler.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\AbstractBinder.cpp">
-				</File>
+					RelativePath=".\src\AbstractBinder.cpp"/>
 				<File
-					RelativePath=".\src\AbstractBinding.cpp">
-				</File>
+					RelativePath=".\src\AbstractBinding.cpp"/>
 				<File
-					RelativePath=".\src\AbstractExtraction.cpp">
-				</File>
+					RelativePath=".\src\AbstractExtraction.cpp"/>
 				<File
-					RelativePath=".\src\AbstractExtractor.cpp">
-				</File>
+					RelativePath=".\src\AbstractExtractor.cpp"/>
 				<File
-					RelativePath=".\src\AbstractPreparation.cpp">
-				</File>
+					RelativePath=".\src\AbstractPreparation.cpp"/>
 				<File
-					RelativePath=".\src\AbstractPrepare.cpp">
-				</File>
+					RelativePath=".\src\AbstractPrepare.cpp"/>
 				<File
-					RelativePath=".\src\BLOB.cpp">
-				</File>
+					RelativePath=".\src\BLOB.cpp"/>
 				<File
-					RelativePath=".\include\Poco\Data\BLOBStream.h">
-				</File>
+					RelativePath=".\src\BLOBStream.cpp"/>
 				<File
-					RelativePath=".\src\DataException.cpp">
-				</File>
+					RelativePath=".\src\Connector.cpp"/>
 				<File
-					RelativePath=".\src\Limit.cpp">
-				</File>
+					RelativePath=".\src\DataException.cpp"/>
 				<File
-					RelativePath=".\src\MetaColumn.cpp">
-				</File>
+					RelativePath=".\src\Limit.cpp"/>
 				<File
-					RelativePath=".\src\Range.cpp">
-				</File>
+					RelativePath=".\src\MetaColumn.cpp"/>
 				<File
-					RelativePath=".\src\RecordSet.cpp">
-				</File>
+					RelativePath=".\src\Range.cpp"/>
 				<File
-					RelativePath=".\src\Session.cpp">
-				</File>
+					RelativePath=".\src\RecordSet.cpp"/>
 				<File
-					RelativePath=".\src\SessionFactory.cpp">
-				</File>
+					RelativePath=".\src\Session.cpp"/>
 				<File
-					RelativePath=".\src\SessionImpl.cpp">
-				</File>
+					RelativePath=".\src\SessionFactory.cpp"/>
 				<File
-					RelativePath=".\src\Connector.cpp">
-				</File>
+					RelativePath=".\src\SessionImpl.cpp"/>
 				<File
-					RelativePath=".\src\Statement.cpp">
-				</File>
+					RelativePath=".\src\Statement.cpp"/>
 				<File
-					RelativePath=".\src\StatementCreator.cpp">
-				</File>
+					RelativePath=".\src\StatementCreator.cpp"/>
 				<File
-					RelativePath=".\src\StatementImpl.cpp">
-				</File>
+					RelativePath=".\src\StatementImpl.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="SessionPooling"
-			Filter="">
+			Name="SessionPooling">
 			<Filter
-				Name="Header Files"
-				Filter="">
+				Name="Header Files">
 				<File
-					RelativePath=".\include\Poco\Data\PooledSessionHolder.h">
-				</File>
+					RelativePath=".\include\Poco\Data\PooledSessionHolder.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\PooledSessionImpl.h">
-				</File>
+					RelativePath=".\include\Poco\Data\PooledSessionImpl.h"/>
 				<File
-					RelativePath=".\include\Poco\Data\SessionPool.h">
-				</File>
+					RelativePath=".\include\Poco\Data\SessionPool.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				Filter="">
+				Name="Source Files">
 				<File
-					RelativePath=".\src\PooledSessionHolder.cpp">
-				</File>
+					RelativePath=".\src\PooledSessionHolder.cpp"/>
 				<File
-					RelativePath=".\src\PooledSessionImpl.cpp">
-				</File>
+					RelativePath=".\src\PooledSessionImpl.cpp"/>
 				<File
-					RelativePath=".\src\SessionPool.cpp">
-				</File>
+					RelativePath=".\src\SessionPool.cpp"/>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

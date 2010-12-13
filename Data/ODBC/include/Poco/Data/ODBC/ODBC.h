@@ -1,7 +1,7 @@
 //
 // ODBC.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/ODBC.h#3 $
+// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/ODBC.h#4 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -75,19 +75,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(ODBC_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoODBCd.lib")
-			#else
-				#pragma comment(lib, "PocoODBC.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoODBCmtd.lib")
-			#else
-				#pragma comment(lib, "PocoODBCmt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoDataODBC" POCO_LIB_SUFFIX)
 	#endif
 #endif
 
