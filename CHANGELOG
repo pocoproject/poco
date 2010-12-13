@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.4.0 (2010-11-??)
+Release 1.4.0 (2010-12-14)
 ==========================
 
 - SSLManager: documentation fixes, code cleanup
@@ -199,6 +199,22 @@ Release 1.4.0 (2010-11-??)
 - Crypto bugfixes: RSACipherImpl now pads every block of data, not just the 
   last (or last two).
 - Improved Crypto testsuite by adding new tests
+- Added new Visual Studio project configurations: debug_static_mt and release_static_mt
+  (linking with static runtime libraries). The existing configurations debug_static
+  and release_static have been renamed to debug_static_md and release_static_md, respectively.
+  The suffixes of the static libraries have also changed. The static_md configurations
+  now build libraries with suffixes md[d], while the libraries built by the static_mt
+  configurations have mt[d] suffixes.
+- Added Visual Studio project files for 64-bit builds.
+- Added Visual Studio 2010 project files.
+- Removed the use of local static objects in various methods due to
+  their construction not being threadsafe (and thus leading to
+  potential race conditions) on Windows/Visual C++.
+- Fixed some warning on 64-bit Windows builds.
+- The name of the Data connector libraries have changed. They are now
+  named PocoDataMySQL, PocoDataODBC and PocoDataSQLite.
+- fixed SF# 3125498: Linux NetworkInterface::list() doesn't return IPv6 IPs
+- fixed SF# 3125457: IPv6 IPAddress tests are wrong
 
 
 Release 1.3.6p2 (2010-01-15)
@@ -1380,4 +1396,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.3/dist/CHANGELOG#134 $
+$Id: //poco/1.3/dist/CHANGELOG#137 $

@@ -148,6 +148,7 @@ function's return value.
     #include "Poco/ActiveMethod.h"
     #include "Poco/ActiveResult.h"
     #include <utility>
+    #include <iostream>
     
     using Poco::ActiveMethod;
     using Poco::ActiveResult;
@@ -155,7 +156,7 @@ function's return value.
     class ActiveAdder
     {
     public:
-        ActiveObject(): activeAdd(this, &ActiveAdder::add)
+        ActiveAdder(): add(this, &ActiveAdder::addImpl)
         {
         }
     
