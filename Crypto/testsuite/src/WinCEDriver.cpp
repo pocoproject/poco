@@ -1,13 +1,9 @@
 //
-// Version.h
+// WinCEDriver.cpp
 //
-// $Id: //poco/1.3/Foundation/include/Poco/Version.h#5 $
+// $Id: //poco/1.3/Crypto/testsuite/src/WinCEDriver.cpp#2 $
 //
-// Library: Foundation
-// Package: Core
-// Module:  Version
-//
-// Version information for the POCO C++ Libraries.
+// Console-based test driver for Windows CE.
 //
 // Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -36,25 +32,38 @@
 //
 
 
-#ifndef Foundation_Version_INCLUDED
-#define Foundation_Version_INCLUDED
+#include "CppUnit/TestRunner.h"
+#include "CryptoTestSuite.h"
+#include <cstdlib>
 
 
-//
-// Version Information
-//
-// Version format is 0xAABBCCDD, where
-//    - AA is the major version number,
-//    - BB is the minor version number,
-//    - CC is the revision number, and
-//    - DD is the patch level number.
-//      Note that some patch level numbers have
-//      a special meaning:
-//      Dx are development releases
-//      Ax are alpha releases
-//      Bx are beta releases
-//
-#define POCO_VERSION 0x010400B5
+class CryptoInitializer
+{
+public:
+	CryptoInitializer()
+	{
+		Poco::Crypto::initializeCrypto();
+	}
+	
+	~CryptoInitializer()
+	{
+		Poco::Crypto::uninitializeCrypto();
+	}
+};
 
 
-#endif // Foundation_Version_INCLUDED
+int _tmain(int argc, wchar_t* argv[])
+{
+	CryptoInitializer ci;
+
+	std::vector<std::string> args;
+	for (int i = 0; i < argc; ++i)
+	{
+		char buffer[1024];
+		std::wcstombs(buffer, argv[i], sizeof(buffer));
+		args.push_back(std::string(buffer));
+	}
+	CppUnit::TestRunner runner;	
+	runner.addTest("CryptoTestSuite", CryptoTestSuite::suite());
+	return runner.run(args) ? 0 : 1;
+}

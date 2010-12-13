@@ -1,11 +1,11 @@
 //
-// Driver.cpp
+// WinCEDriver.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/Driver.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/WinCEDriver.cpp#2 $
 //
-// Console-based test driver for Poco NetSSL.
+// Console-based test driver for Windows CE.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -37,7 +37,7 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/HTTPSStreamFactory.h"
-#include <iostream>
+#include <cstdlib>
 
 
 class NetSSLApp: public Poco::Util::Application
@@ -62,11 +62,16 @@ public:
 		return runner.run(_targs) ? 0 : 1;
 	}
 	
-	void setup(int argc, char** argv)
+	void setup(const std::vector<std::string>& args)
 	{
+		char* argv[1] =
+		{
+			args[0].c_str();
+		};
+		
 		init(1, argv);
 		for (int i = 0; i < argc; ++i)
-			_targs.push_back(std::string(argv[i]));
+			_targs.push_back(args[i]);
 	}
 
 protected:
@@ -81,12 +86,20 @@ private:
 };
 
 
-int main(int ac, char **av)
+int _tmain(int argc, wchar_t* argv[])
 {
+	std::vector<std::string> args;
+	for (int i = 0; i < argc; ++i)
+	{
+		char buffer[1024];
+		std::wcstombs(buffer, argv[i], sizeof(buffer));
+		args.push_back(std::string(buffer));
+	}
+
 	NetSSLApp app;
 	try
 	{
-		app.setup(ac, av);
+		app.setup(args);
 		return app.run();
 	}
 	catch (Poco::Exception& exc)

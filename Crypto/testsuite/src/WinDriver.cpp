@@ -1,7 +1,7 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/1.3/Crypto/testsuite/src/WinDriver.cpp#1 $
+// $Id: //poco/1.3/Crypto/testsuite/src/WinDriver.cpp#2 $
 //
 // Windows test driver for Poco Crypto.
 //
@@ -34,12 +34,30 @@
 
 #include "WinTestRunner/WinTestRunner.h"
 #include "CryptoTestSuite.h"
+#include "Poco/Crypto/Crypto.h"
+
+
+class CryptoInitializer
+{
+public:
+	CryptoInitializer()
+	{
+		Poco::Crypto::initializeCrypto();
+	}
+	
+	~CryptoInitializer()
+	{
+		Poco::Crypto::uninitializeCrypto();
+	}
+};
 
 
 class TestDriver: public CppUnit::WinTestRunnerApp
 {
 	void TestMain()
 	{
+		CryptoInitializer ci;
+
 		CppUnit::WinTestRunner runner;
 		runner.addTest(CryptoTestSuite::suite());
 		runner.run();

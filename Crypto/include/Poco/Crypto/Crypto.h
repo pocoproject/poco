@@ -1,7 +1,7 @@
 //
 // Crypto.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Crypto.h#3 $
+// $Id: //poco/1.3/Crypto/include/Poco/Crypto/Crypto.h#4 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -96,6 +96,35 @@ enum RSAPaddingMode
 		#pragma comment(lib, "PocoCrypto" POCO_LIB_SUFFIX)
 	#endif
 #endif
+
+
+namespace Poco {
+namespace Crypto {
+
+
+void initializeCrypto();
+	/// Initialize the Crypto library, as well as the underlying OpenSSL
+	/// libraries, by calling OpenSSLInitializer::initialize().
+	///
+	/// Should be called before using any class from the Crypto library.
+	/// The Crypto will be initialized automatically, through a static
+	/// initializer class instance, if the library is linked dynamically.
+	/// When linked statically, the static initializer will not be linked
+	/// to the application, and thus the library will not be initialized
+	/// automatically. However, it is recommended to call initializeCrypto()
+	/// in any case at application startup.
+	///
+	/// Can be called multiple times; however, for every call to
+	/// initializeCrypto(), a matching call to uninitializeCrypto()
+	/// must be performed.
+	
+
+void uninitializeCrypto();
+	/// Uninitializes the Crypto library by calling 
+	/// OpenSSLInitializer::uninitialize().
+
+
+} } // namespace Poco::Crypto
 
 
 #endif // Crypto_Crypto_INCLUDED

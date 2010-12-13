@@ -1,7 +1,7 @@
 //
 // genrsakey.cpp
 //
-// $Id: //poco/1.3/Crypto/samples/genrsakey/src/genrsakey.cpp#1 $
+// $Id: //poco/1.3/Crypto/samples/genrsakey/src/genrsakey.cpp#2 $
 //
 // This sample demonstrates the XYZ class.
 //
@@ -72,6 +72,12 @@ public:
 		 _name(),
 		 _pwd()
 	{
+		Poco::Crypto::initializeCrypto();
+	}
+	
+	~RSAApp()
+	{
+		Poco::Crypto::uninitializeCrypto();
 	}
 
 protected:	

@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#7 $
+// $Id: //poco/1.3/Crypto/src/OpenSSLInitializer.cpp#8 $
 //
 // Library: Crypto
 // Package: CryotpCore
@@ -157,6 +157,18 @@ void OpenSSLInitializer::dynlock(int mode, struct CRYPTO_dynlock_value* lock, co
 void OpenSSLInitializer::dynlockDestroy(struct CRYPTO_dynlock_value* lock, const char* file, int line)
 {
 	delete lock;
+}
+
+
+void initializeCrypto()
+{
+	OpenSSLInitializer::initialize();
+}
+
+
+void uninitializeCrypto()
+{
+	OpenSSLInitializer::uninitialize();
 }
 
 

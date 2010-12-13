@@ -1,7 +1,7 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/WinDriver.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/WinDriver.cpp#4 $
 //
 // Windows test driver for Poco OpenSSL.
 //
@@ -44,12 +44,14 @@ class NetSSLApp: public Poco::Util::Application
 public:
 	NetSSLApp()
 	{
+		Poco::Net::initializeSSL();
 		Poco::Net::HTTPStreamFactory::registerFactory();
 		Poco::Net::HTTPSStreamFactory::registerFactory();
 	}
 
 	~NetSSLApp()
 	{
+		Poco::Net::uninitializeSSL();
 	}
 
 	int main(const std::vector<std::string>& args)

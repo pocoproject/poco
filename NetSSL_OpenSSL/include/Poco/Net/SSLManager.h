@@ -1,7 +1,7 @@
 //
 // SSLManager.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#12 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#13 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -241,6 +241,15 @@ public:
 
 	static bool isFIPSEnabled();
 		// Returns true if FIPS mode is enabled, false otherwise.
+		
+	void shutdown();
+		/// Shuts down the SSLManager and releases the default Context
+		/// objects. After a call to shutdown(), the SSLManager can no
+		/// longer be used.
+		///
+		/// Normally, it's not necessary to call this method directly, as this
+		/// will be called either by uninitializeSSL(), or when
+		/// the SSLManager instance is destroyed.
 
 	static const std::string CFG_SERVER_PREFIX;
 	static const std::string CFG_CLIENT_PREFIX;

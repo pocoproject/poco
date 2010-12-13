@@ -1,7 +1,7 @@
 //
 // Net.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/Net.h#5 $
+// $Id: //poco/1.3/Net/include/Poco/Net/Net.h#6 $
 //
 // Library: Net
 // Package: NetCore
@@ -85,7 +85,8 @@ void initializeNetwork();
 	/// Initialize the network subsystem.
 	/// Calls WSAStartup() on Windows, does nothing
 	/// on other platforms.
-	
+
+
 void uninitializeNetwork();
 	/// Uninitialize the network subsystem.
 	/// Calls WSACleanup() on Windows, does nothing

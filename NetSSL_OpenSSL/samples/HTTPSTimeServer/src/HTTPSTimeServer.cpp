@@ -1,7 +1,7 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#5 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#6 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -171,10 +171,12 @@ class HTTPSTimeServer: public Poco::Util::ServerApplication
 public:
 	HTTPSTimeServer(): _helpRequested(false)
 	{
+		Poco::Net::initializeSSL();
 	}
 	
 	~HTTPSTimeServer()
 	{
+		Poco::Net::uninitializeSSL();
 	}
 
 protected:

@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#17 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/src/SSLManager.cpp#18 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -87,12 +87,18 @@ SSLManager::SSLManager()
 
 SSLManager::~SSLManager()
 {
+	shutdown();
+	Poco::Crypto::OpenSSLInitializer::uninitialize();
+}
+
+
+void SSLManager::shutdown()
+{
 	PrivateKeyPassphraseRequired.clear();
 	ClientVerificationError.clear();
 	ServerVerificationError.clear();
 	_ptrDefaultServerContext = 0;
 	_ptrDefaultClientContext = 0;
-	Poco::Crypto::OpenSSLInitializer::uninitialize();
 }
 
 
@@ -372,6 +378,19 @@ Poco::Util::AbstractConfiguration& SSLManager::appConfig()
 			"but no Poco::Util::Application instance is available."
 		);
 	}
+}
+
+
+void initializeSSL()
+{
+	Poco::Crypto::initializeCrypto();
+}
+
+
+void uninitializeSSL()
+{
+	SSLManager::instance().shutdown();
+	Poco::Crypto::uninitializeCrypto();
 }
 
 

@@ -1,7 +1,7 @@
 //
 // NetSSL.h
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#4 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#5 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -75,6 +75,36 @@
 		#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
 	#endif
 #endif
+
+
+namespace Poco {
+namespace Net {
+
+
+void initializeSSL();
+	/// Initialize the NetSSL library, as well as the underlying OpenSSL
+	/// libraries, by calling Poco::Crypto::OpenSSLInitializer::initialize().
+	///
+	/// Should be called before using any class from the NetSSL library.
+	/// The NetSSL will be initialized automatically, through a static
+	/// initializer class instance, if the library is linked dynamically.
+	/// When linked statically, the static initializer will not be linked
+	/// to the application, and thus the library will not be initialized
+	/// automatically. However, it is recommended to call initializeSSL()
+	/// in any case at application startup.
+	///
+	/// Can be called multiple times; however, for every call to
+	/// initializeSSL(), a matching call to uninitializeSSL()
+	/// must be performed.
+	
+
+void uninitializeSSL();
+	/// Uninitializes the NetSSL library by calling 
+	/// Poco::Crypto::OpenSSLInitializer::uninitialize() and
+	/// shutting down the SSLManager.
+
+
+} } // namespace Poco::Net
 
 
 #endif // NetSSL_NetSSL_INCLUDED

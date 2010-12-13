@@ -1,7 +1,7 @@
 //
 // download.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/samples/download/src/download.cpp#3 $
+// $Id: //poco/1.3/NetSSL_OpenSSL/samples/download/src/download.cpp#4 $
 //
 // This sample demonstrates the URIStreamOpener class.
 //
@@ -65,8 +65,24 @@ using Poco::Net::InvalidCertificateHandler;
 using Poco::Net::ConsoleCertificateHandler;
 
 
+class SSLInitializer
+{
+public:
+	SSLInitializer()
+	{
+		Poco::Net::initializeSSL();
+	}
+	
+	~SSLInitializer()
+	{
+		Poco::Net::uninitializeSSL();
+	}
+};
+
+
 int main(int argc, char** argv)
 {
+	SSLInitializer sslInitializer;
 	HTTPStreamFactory::registerFactory();
 	HTTPSStreamFactory::registerFactory();
 	FTPStreamFactory::registerFactory();
