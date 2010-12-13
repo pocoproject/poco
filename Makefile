@@ -24,7 +24,7 @@ endif
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation XML Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler
+COMPONENTS = Foundation XML Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler PageCompiler/File2Page
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit 
@@ -44,7 +44,7 @@ install: libexecs
 	find $(POCO_BUILD)/lib -name "libPoco*" -type f -exec cp -f {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
 
-libexecs =  Foundation-libexec XML-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec
+libexecs =  Foundation-libexec XML-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec
 tests    =  Foundation-tests XML-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Zip-tests
 samples  =  Foundation-samples XML-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples Zip-samples PageCompiler-samples
 
@@ -152,6 +152,9 @@ PageCompiler-libexec:  Net-libexec Util-libexec XML-libexec Foundation-libexec
 PageCompiler-samples: PageCompiler-libexec 
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/samples
 
+PageCompiler/File2Page-libexec:  Net-libexec Util-libexec XML-libexec Foundation-libexec
+	$(MAKE) -C $(POCO_BASE)/PageCompiler/File2Page
+
 clean:
 	$(MAKE) -C $(POCO_BASE)/Foundation clean
 	$(MAKE) -C $(POCO_BASE)/Foundation/testsuite clean
@@ -185,6 +188,7 @@ clean:
 	$(MAKE) -C $(POCO_BASE)/Zip/samples clean
 	$(MAKE) -C $(POCO_BASE)/PageCompiler clean
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/samples clean
+	$(MAKE) -C $(POCO_BASE)/PageCompiler/File2Page clean
 
 distclean:
 	rm -rf $(POCO_BUILD)/lib
