@@ -1,2 +1,2 @@
 @echo off
-buildwin 80 build shared both yes
+buildwin 80 build shared both Win32 samples
