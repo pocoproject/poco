@@ -1,7 +1,7 @@
 //
 // ZipArchive.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipArchive.h#5 $
+// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipArchive.h#1 $
 //
 // Library: Zip
 // Package: Zip

@@ -1,7 +1,7 @@
 //
 // HTTPMessage.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPMessage.cpp#3 $
+// $Id: //poco/1.4/Net/src/HTTPMessage.cpp#1 $
 //
 // Library: Net
 // Package: HTTP

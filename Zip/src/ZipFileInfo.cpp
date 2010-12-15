@@ -1,7 +1,7 @@
 //
 // ZipFileInfo.cpp
 //
-// $Id: //poco/1.3/Zip/src/ZipFileInfo.cpp#5 $
+// $Id: //poco/1.4/Zip/src/ZipFileInfo.cpp#1 $
 //
 // Library: Zip
 // Package: Zip

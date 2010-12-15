@@ -1,7 +1,7 @@
 //
 // TestApp_WINCE.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TestApp_WINCE.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/TestApp_WINCE.cpp#1 $
 //
 // Copyright (c) 2005-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.

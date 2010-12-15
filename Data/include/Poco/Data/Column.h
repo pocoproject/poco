@@ -1,7 +1,7 @@
 //
 // Column.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/Column.h#3 $
+// $Id: //poco/1.4/Data/include/Poco/Data/Column.h#1 $
 //
 // Library: Data
 // Package: DataCore

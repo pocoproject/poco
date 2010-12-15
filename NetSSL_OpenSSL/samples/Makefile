@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/NetSSL_OpenSSL/samples/Makefile#1 $
+# $Id: //poco/1.4/NetSSL_OpenSSL/samples/Makefile#1 $
 #
 # Makefile for Poco NetSSL Samples
 #

@@ -1,7 +1,7 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/testsuite/src/WinDriver.cpp#2 $
+// $Id: //poco/1.4/Data/MySQL/testsuite/src/WinDriver.cpp#1 $
 //
 // Windows test driver for Poco MySQL.
 //

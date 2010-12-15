@@ -1,7 +1,7 @@
 //
 // UUID.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UUID.cpp#8 $
+// $Id: //poco/1.4/Foundation/src/UUID.cpp#1 $
 //
 // Library: Foundation
 // Package: UUID

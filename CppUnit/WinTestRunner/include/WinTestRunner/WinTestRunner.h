@@ -1,7 +1,7 @@
 //
 // WinTestRunner.h
 //
-// $Id: //poco/1.3/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#3 $
+// $Id: //poco/1.4/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#1 $
 //
 // Application shell for CppUnit's TestRunner dialog.
 //

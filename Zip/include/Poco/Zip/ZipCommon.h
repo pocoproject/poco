@@ -1,7 +1,7 @@
 //
 // ZipCommon.h
 //
-// $Id: //poco/1.3/Zip/include/Poco/Zip/ZipCommon.h#4 $
+// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipCommon.h#1 $
 //
 // Library: Zip
 // Package: Zip

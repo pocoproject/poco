@@ -1,7 +1,7 @@
 //
 // DataTypes.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/DataTypes.h#4 $
+// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/DataTypes.h#1 $
 //
 // Library: Data/ODBC
 // Package: ODBC

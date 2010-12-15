@@ -1,7 +1,7 @@
 //
 // SQLiteTest.h
 //
-// $Id: //poco/1.3/Data/SQLite/testsuite/src/SQLiteTest.h#5 $
+// $Id: //poco/1.4/Data/SQLite/testsuite/src/SQLiteTest.h#1 $
 //
 // Definition of the SQLiteTest class.
 //

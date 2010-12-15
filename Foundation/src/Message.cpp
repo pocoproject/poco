@@ -1,7 +1,7 @@
 //
 // Message.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Message.cpp#5 $
+// $Id: //poco/1.4/Foundation/src/Message.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging

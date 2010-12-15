@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/XML/samples/DOMParser/Makefile#2 $
+# $Id: //poco/1.4/XML/samples/DOMParser/Makefile#1 $
 #
 # Makefile for Poco DOMParser
 #

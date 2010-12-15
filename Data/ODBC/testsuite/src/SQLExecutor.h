@@ -1,7 +1,7 @@
 //
 // SQLExecutor.h
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/SQLExecutor.h#6 $
+// $Id: //poco/1.4/Data/ODBC/testsuite/src/SQLExecutor.h#1 $
 //
 // Definition of the SQLExecutor class.
 //

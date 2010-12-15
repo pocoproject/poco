@@ -1,7 +1,7 @@
 //
 // Error.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Error.h#5 $
+// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/Error.h#1 $
 //
 // Library: ODBC
 // Package: ODBC

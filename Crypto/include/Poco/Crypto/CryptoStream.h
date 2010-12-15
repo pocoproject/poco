@@ -1,7 +1,7 @@
 //
 // CryptoStream.h
 //
-// $Id: //poco/1.3/Crypto/include/Poco/Crypto/CryptoStream.h#4 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CryptoStream.h#1 $
 //
 // Library: Crypto
 // Package: Cipher

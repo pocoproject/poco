@@ -1,7 +1,7 @@
 //
 // CryptoStream.cpp
 //
-// $Id: //poco/1.3/Crypto/src/CryptoStream.cpp#7 $
+// $Id: //poco/1.4/Crypto/src/CryptoStream.cpp#1 $
 //
 // Library: Crypto
 // Package: Cipher

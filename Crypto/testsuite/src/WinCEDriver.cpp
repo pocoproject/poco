@@ -1,7 +1,7 @@
 //
 // WinCEDriver.cpp
 //
-// $Id: //poco/1.3/Crypto/testsuite/src/WinCEDriver.cpp#2 $
+// $Id: //poco/1.4/Crypto/testsuite/src/WinCEDriver.cpp#1 $
 //
 // Console-based test driver for Windows CE.
 //
@@ -34,6 +34,7 @@
 
 #include "CppUnit/TestRunner.h"
 #include "CryptoTestSuite.h"
+#include "Poco/Crypto/Crypto.h"
 #include <cstdlib>
 
 

@@ -1,7 +1,7 @@
 //
 // AbstractExtraction.cpp
 //
-// $Id: //poco/1.3/Data/src/AbstractExtraction.cpp#1 $
+// $Id: //poco/1.4/Data/src/AbstractExtraction.cpp#1 $
 //
 // Library: Data
 // Package: DataCore

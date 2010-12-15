@@ -1,7 +1,7 @@
 //
 // SessionPool.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/SessionPool.h#5 $
+// $Id: //poco/1.4/Data/include/Poco/Data/SessionPool.h#1 $
 //
 // Library: Data
 // Package: SessionPooling

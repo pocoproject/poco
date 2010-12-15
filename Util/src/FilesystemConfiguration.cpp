@@ -1,7 +1,7 @@
 //
 // FilesystemConfiguration.cpp
 //
-// $Id: //poco/1.3/Util/src/FilesystemConfiguration.cpp#4 $
+// $Id: //poco/1.4/Util/src/FilesystemConfiguration.cpp#1 $
 //
 // Library: Util
 // Package: Configuration

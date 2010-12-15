@@ -1,7 +1,7 @@
 //
 // MapConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/MapConfigurationTest.h#2 $
+// $Id: //poco/1.4/Util/testsuite/src/MapConfigurationTest.h#1 $
 //
 // Definition of the MapConfigurationTest class.
 //

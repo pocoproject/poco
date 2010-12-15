@@ -1,7 +1,7 @@
 //
 // Twitter.cpp
 //
-// $Id: //poco/1.3/Net/samples/TwitterClient/src/Twitter.cpp#2 $
+// $Id: //poco/1.4/Net/samples/TwitterClient/src/Twitter.cpp#1 $
 //
 // A C++ implementation of a Twitter client based on the POCO Net library.
 //

@@ -1,7 +1,7 @@
 //
 // ODBCOracleTest.h
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCOracleTest.h#5 $
+// $Id: //poco/1.4/Data/ODBC/testsuite/src/ODBCOracleTest.h#1 $
 //
 // Definition of the ODBCOracleTest class.
 //

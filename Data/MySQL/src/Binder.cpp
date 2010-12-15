@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/Binder.cpp#5 $
+// $Id: //poco/1.4/Data/MySQL/src/Binder.cpp#1 $
 //
 // Library: Data/MySQL
 // Package: MySQL

@@ -1,7 +1,7 @@
 //
 // DefaultHandler.cpp
 //
-// $Id: //poco/1.3/XML/src/DefaultHandler.cpp#1 $
+// $Id: //poco/1.4/XML/src/DefaultHandler.cpp#1 $
 //
 // Library: XML
 // Package: SAX

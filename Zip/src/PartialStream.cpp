@@ -1,7 +1,7 @@
 //
 // PartialStream.cpp
 //
-// $Id: //poco/1.3/Zip/src/PartialStream.cpp#3 $
+// $Id: //poco/1.4/Zip/src/PartialStream.cpp#1 $
 //
 // Library: Zip
 // Package: Zip

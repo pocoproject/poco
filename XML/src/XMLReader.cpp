@@ -1,7 +1,7 @@
 //
 // XMLReader.cpp
 //
-// $Id: //poco/1.3/XML/src/XMLReader.cpp#1 $
+// $Id: //poco/1.4/XML/src/XMLReader.cpp#1 $
 //
 // Library: XML
 // Package: SAX

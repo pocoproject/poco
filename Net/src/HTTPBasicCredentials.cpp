@@ -1,7 +1,7 @@
 //
 // HTTPBasicCredentials.cpp
 //
-// $Id: //poco/1.3/Net/src/HTTPBasicCredentials.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPBasicCredentials.cpp#1 $
 //
 // Library: Net
 // Package: HTTP

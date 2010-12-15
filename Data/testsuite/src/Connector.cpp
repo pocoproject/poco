@@ -1,7 +1,7 @@
 //
 // Connector.cpp
 //
-// $Id: //poco/1.3/Data/testsuite/src/Connector.cpp#1 $
+// $Id: //poco/1.4/Data/testsuite/src/Connector.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

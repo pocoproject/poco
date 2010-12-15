@@ -1,7 +1,7 @@
 //
 // ODBCDB2Test.h
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCDB2Test.h#4 $
+// $Id: //poco/1.4/Data/ODBC/testsuite/src/ODBCDB2Test.h#1 $
 //
 // Definition of the ODBCDB2Test class.
 //

@@ -1,7 +1,7 @@
 //
 // Session.cpp
 //
-// $Id: //poco/1.3/Data/src/Session.cpp#2 $
+// $Id: //poco/1.4/Data/src/Session.cpp#1 $
 //
 // Library: Data
 // Package: DataCore

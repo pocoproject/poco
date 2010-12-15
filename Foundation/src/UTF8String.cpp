@@ -1,7 +1,7 @@
 //
 // UTF8String.cpp
 //
-// $Id: //poco/1.3/Foundation/src/UTF8String.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/UTF8String.cpp#1 $
 //
 // Library: Foundation
 // Package: Text

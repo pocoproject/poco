@@ -1,7 +1,7 @@
 //
 // Net.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/Net.h#7 $
+// $Id: //poco/1.4/Net/include/Poco/Net/Net.h#1 $
 //
 // Library: Net
 // Package: NetCore

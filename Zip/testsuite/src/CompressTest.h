@@ -1,7 +1,7 @@
 //
 // CompressTest.h
 //
-// $Id: //poco/1.3/Zip/testsuite/src/CompressTest.h#6 $
+// $Id: //poco/1.4/Zip/testsuite/src/CompressTest.h#1 $
 //
 // Definition of the CompressTest class.
 //

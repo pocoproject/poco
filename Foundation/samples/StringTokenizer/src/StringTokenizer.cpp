@@ -1,7 +1,7 @@
 //
 // StringTokenizer.cpp
 //
-// $Id: //poco/1.3/Foundation/samples/StringTokenizer/src/StringTokenizer.cpp#1 $
+// $Id: //poco/1.4/Foundation/samples/StringTokenizer/src/StringTokenizer.cpp#1 $
 //
 // This sample demonstrates the usage of the StringTokenizer class.
 //

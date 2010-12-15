@@ -1,7 +1,7 @@
 //
 // PartialStreamTest.cpp
 //
-// $Id: //poco/1.3/Zip/testsuite/src/PartialStreamTest.cpp#5 $
+// $Id: //poco/1.4/Zip/testsuite/src/PartialStreamTest.cpp#1 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.

@@ -1,7 +1,7 @@
 //
 // WinCEDriver.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/testsuite/src/WinCEDriver.cpp#2 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/WinCEDriver.cpp#1 $
 //
 // Console-based test driver for Windows CE.
 //
@@ -64,13 +64,13 @@ public:
 	
 	void setup(const std::vector<std::string>& args)
 	{
-		char* argv[1] =
+		char* argv[] =
 		{
-			args[0].c_str();
+			const_cast<char*>(args[0].c_str())
 		};
 		
 		init(1, argv);
-		for (int i = 0; i < argc; ++i)
+		for (std::size_t i = 0; i < args.size(); ++i)
 			_targs.push_back(args[i]);
 	}
 

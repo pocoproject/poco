@@ -1,7 +1,7 @@
 //
 // FileChannelTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/FileChannelTest.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FileChannelTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

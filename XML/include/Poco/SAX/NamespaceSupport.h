@@ -1,7 +1,7 @@
 //
 // NamespaceSupport.h
 //
-// $Id: //poco/1.3/XML/include/Poco/SAX/NamespaceSupport.h#2 $
+// $Id: //poco/1.4/XML/include/Poco/SAX/NamespaceSupport.h#1 $
 //
 // Library: XML
 // Package: SAX

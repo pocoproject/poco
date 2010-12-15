@@ -1,7 +1,7 @@
 //
 // ODBCSQLiteTest.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCSQLiteTest.cpp#7 $
+// $Id: //poco/1.4/Data/ODBC/testsuite/src/ODBCSQLiteTest.cpp#1 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

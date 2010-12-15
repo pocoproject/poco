@@ -1,7 +1,7 @@
 //
 // TextEncodingTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/TextEncodingTest.h#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/TextEncodingTest.h#1 $
 //
 // Definition of the TextEncodingTest class.
 //

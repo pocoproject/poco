@@ -1,7 +1,7 @@
 //
 // NamePoolTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/NamePoolTest.h#1 $
+// $Id: //poco/1.4/XML/testsuite/src/NamePoolTest.h#1 $
 //
 // Definition of the NamePoolTest class.
 //

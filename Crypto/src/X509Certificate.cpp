@@ -1,7 +1,7 @@
 //
 // X509Certificate.cpp
 //
-// $Id: //poco/1.3/Crypto/src/X509Certificate.cpp#6 $
+// $Id: //poco/1.4/Crypto/src/X509Certificate.cpp#1 $
 //
 // Library: Crypto
 // Package: Certificate

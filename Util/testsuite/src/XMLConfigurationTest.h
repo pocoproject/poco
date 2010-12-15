@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/XMLConfigurationTest.h#3 $
+// $Id: //poco/1.4/Util/testsuite/src/XMLConfigurationTest.h#1 $
 //
 // Definition of the XMLConfigurationTest class.
 //

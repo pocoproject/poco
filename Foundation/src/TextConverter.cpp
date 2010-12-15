@@ -1,7 +1,7 @@
 //
 // TextConverter.cpp
 //
-// $Id: //poco/1.3/Foundation/src/TextConverter.cpp#5 $
+// $Id: //poco/1.4/Foundation/src/TextConverter.cpp#1 $
 //
 // Library: Foundation
 // Package: Text

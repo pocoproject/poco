@@ -1,7 +1,7 @@
 //
 // BLOB.cpp
 //
-// $Id: //poco/1.3/Data/src/BLOB.cpp#2 $
+// $Id: //poco/1.4/Data/src/BLOB.cpp#1 $
 //
 // Library: Data
 // Package: DataCore

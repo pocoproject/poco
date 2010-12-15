@@ -1,7 +1,7 @@
 //
 // POP3ClientSession.cpp
 //
-// $Id: //poco/1.3/Net/src/POP3ClientSession.cpp#5 $
+// $Id: //poco/1.4/Net/src/POP3ClientSession.cpp#1 $
 //
 // Library: Net
 // Package: Mail

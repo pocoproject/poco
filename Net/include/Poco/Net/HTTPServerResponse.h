@@ -1,7 +1,7 @@
 //
 // HTTPServerResponse.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/HTTPServerResponse.h#5 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPServerResponse.h#1 $
 //
 // Library: Net
 // Package: HTTPServer

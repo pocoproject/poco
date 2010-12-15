@@ -1,7 +1,7 @@
 //
 // ZipTest.h
 //
-// $Id: //poco/1.3/Zip/testsuite/src/ZipTest.h#7 $
+// $Id: //poco/1.4/Zip/testsuite/src/ZipTest.h#1 $
 //
 // Definition of the ZipTest class.
 //

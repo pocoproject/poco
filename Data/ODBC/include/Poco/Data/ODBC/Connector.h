@@ -1,7 +1,7 @@
 //
 // Connector.h
 //
-// $Id: //poco/1.3/Data/ODBC/include/Poco/Data/ODBC/Connector.h#2 $
+// $Id: //poco/1.4/Data/ODBC/include/Poco/Data/ODBC/Connector.h#1 $
 //
 // Library: Data/ODBC
 // Package: ODBC

@@ -1,7 +1,7 @@
 //
 // SessionPoolTest.h
 //
-// $Id: //poco/1.3/Data/testsuite/src/SessionPoolTest.h#1 $
+// $Id: //poco/1.4/Data/testsuite/src/SessionPoolTest.h#1 $
 //
 // Definition of the SessionPoolTest class.
 //

@@ -1,7 +1,7 @@
 //
 // ODBCAccessTest.h
 //
-// $Id: //poco/1.3/Data/ODBC/testsuite/src/ODBCAccessTest.h#2 $
+// $Id: //poco/1.4/Data/ODBC/testsuite/src/ODBCAccessTest.h#1 $
 //
 // Definition of the ODBCAccessTest class.
 //

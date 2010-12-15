@@ -1,7 +1,7 @@
 //
 // Preparation.cpp
 //
-// $Id: //poco/1.3/Data/ODBC/src/Preparation.cpp#7 $
+// $Id: //poco/1.4/Data/ODBC/src/Preparation.cpp#1 $
 //
 // Library: Data/ODBC
 // Package: ODBC

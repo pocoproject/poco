@@ -1,7 +1,7 @@
 //
 // SocketConnector.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketConnector.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/SocketConnector.h#1 $
 //
 // Library: Net
 // Package: Reactor

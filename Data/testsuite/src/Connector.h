@@ -1,7 +1,7 @@
 //
 // Connector.h
 //
-// $Id: //poco/1.3/Data/testsuite/src/Connector.h#1 $
+// $Id: //poco/1.4/Data/testsuite/src/Connector.h#1 $
 //
 // Definition of the Connector class.
 //

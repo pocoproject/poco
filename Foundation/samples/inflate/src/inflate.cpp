@@ -1,7 +1,7 @@
 //
 // inflate.cpp
 //
-// $Id: //poco/1.3/Foundation/samples/inflate/src/inflate.cpp#1 $
+// $Id: //poco/1.4/Foundation/samples/inflate/src/inflate.cpp#1 $
 //
 // This sample demonstrates the InflatingInputStream and StreamCopier classes.
 //

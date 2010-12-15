@@ -1,7 +1,7 @@
 //
 // MetaColumn.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/MetaColumn.h#2 $
+// $Id: //poco/1.4/Data/include/Poco/Data/MetaColumn.h#1 $
 //
 // Library: Data
 // Package: DataCore

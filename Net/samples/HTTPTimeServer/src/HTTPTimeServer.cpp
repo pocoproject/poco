@@ -1,7 +1,7 @@
 //
 // HTTPTimeServer.cpp
 //
-// $Id: //poco/1.3/Net/samples/HTTPTimeServer/src/HTTPTimeServer.cpp#2 $
+// $Id: //poco/1.4/Net/samples/HTTPTimeServer/src/HTTPTimeServer.cpp#1 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //

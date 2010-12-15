@@ -1,7 +1,7 @@
 //
 // AutoDetectStream.cpp
 //
-// $Id: //poco/1.3/Zip/src/AutoDetectStream.cpp#4 $
+// $Id: //poco/1.4/Zip/src/AutoDetectStream.cpp#1 $
 //
 // Library: Zip
 // Package: Zip

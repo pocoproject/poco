@@ -1,7 +1,7 @@
 //
 // ConfigurationViewTest.h
 //
-// $Id: //poco/1.3/Util/testsuite/src/ConfigurationViewTest.h#2 $
+// $Id: //poco/1.4/Util/testsuite/src/ConfigurationViewTest.h#1 $
 //
 // Definition of the ConfigurationViewTest class.
 //

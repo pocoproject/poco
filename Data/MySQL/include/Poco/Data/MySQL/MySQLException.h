@@ -1,7 +1,7 @@
 //
 // MySQLException.h
 //
-// $Id: //poco/1.3/Data/MySQL/include/Poco/Data/MySQL/MySQLException.h#4 $
+// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/MySQLException.h#1 $
 //
 // Library: Data/MySQL
 // Package: MySQL

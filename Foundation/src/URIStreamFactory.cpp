@@ -1,7 +1,7 @@
 //
 // URIStreamFactory.cpp
 //
-// $Id: //poco/1.3/Foundation/src/URIStreamFactory.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/URIStreamFactory.cpp#1 $
 //
 // Library: Foundation
 // Package: URI

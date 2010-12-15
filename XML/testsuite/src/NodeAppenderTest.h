@@ -1,7 +1,7 @@
 //
 // NodeAppenderTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/NodeAppenderTest.h#1 $
+// $Id: //poco/1.4/XML/testsuite/src/NodeAppenderTest.h#1 $
 //
 // Definition of the NodeAppenderTest class.
 //

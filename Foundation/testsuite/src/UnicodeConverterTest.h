@@ -1,7 +1,7 @@
 //
 // UnicodeConverterTest.h
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/UnicodeConverterTest.h#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/UnicodeConverterTest.h#1 $
 //
 // Definition of the UnicodeConverterTest class.
 //

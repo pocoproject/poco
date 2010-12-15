@@ -1,7 +1,7 @@
 //
 // RejectCertificateHandler.cpp
 //
-// $Id: //poco/1.3/NetSSL_OpenSSL/src/RejectCertificateHandler.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/RejectCertificateHandler.cpp#1 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore

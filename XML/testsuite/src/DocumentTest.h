@@ -1,7 +1,7 @@
 //
 // DocumentTest.h
 //
-// $Id: //poco/1.3/XML/testsuite/src/DocumentTest.h#1 $
+// $Id: //poco/1.4/XML/testsuite/src/DocumentTest.h#1 $
 //
 // Definition of the DocumentTest class.
 //

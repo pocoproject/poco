@@ -1,7 +1,7 @@
 //
 // Decompress.cpp
 //
-// $Id: //poco/1.3/Zip/src/Decompress.cpp#8 $
+// $Id: //poco/1.4/Zip/src/Decompress.cpp#1 $
 //
 // Library: Zip
 // Package: Zip

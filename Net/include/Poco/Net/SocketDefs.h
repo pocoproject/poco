@@ -1,7 +1,7 @@
 //
 // SocketDefs.h
 //
-// $Id: //poco/1.3/Net/include/Poco/Net/SocketDefs.h#4 $
+// $Id: //poco/1.4/Net/include/Poco/Net/SocketDefs.h#1 $
 //
 // Library: Net
 // Package: NetCore

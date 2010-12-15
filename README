@@ -11,7 +11,7 @@ The XML library contains an XML parser with SAX2 and DOM interfaces,
 as well as an XMLWriter.
 The Util library contains classes for working with configuration files and 
 command line arguments, as well as various utility classes.
-The Net library contains network classes (sockets, HTTP, etc.).
+The Net library contains network classes (sockets, HTTP client/server, etc.).
 All libraries come with a test suite and a number of sample programs.
 
 The basic directory layout is as follows:
@@ -23,10 +23,12 @@ build/                     the build system for Unix/OpenVMS and additional util
     vms/                   OpenVMS build system scripts
 
 bin/                       all executables (dynamic link libraries on Windows)
+bin64/                     all 64-bit executables (and DLLs)
 
 doc/                       additional documentation
 
 lib/                       all libraries (import libraries on Windows)
+lib64/                     all 64-bit libraries
 
 CppUnit/                   project and make/build files for the CppUnit unit testing framework
     doc/                   additional documentation
@@ -74,8 +76,8 @@ as well (such as Data, Crypto, NetSSL_OpenSSL and Zip).
 DOCUMENTATION
 =============
 
-Online browsable reference documentation in HTML is available at
-<http://pocoproject.org/poco/docs/>. 
+Plenty of documentation (tutorial slides, articles and SDK reference)
+is available at <http://pocoproject.org/documentation/>.
 
 
 EXTERNAL DEPENDENCIES
@@ -119,14 +121,15 @@ accordingly.
 BUILDING ON WINDOWS
 ===================
 
-Microsoft Visual Studio 7.1 (2003), 8.0 (2005) or 9.0 (2008) is required to build the  
-POCO C++ Libraries on Windows platforms. Solution and project files for all three versions 
-are included.
+Microsoft Visual Studio 7.1 (2003), 8.0 (2005), 9.0 (2008) or 10.0 (2010) is required to 
+build the POCO C++ Libraries on Windows platforms. Solution and project files for all 
+versions are included. For Visual Studio 2008 and 2010, 64-bit (x64) builds are
+supported as well.
 You can either build from within Visual Studio (Build->Batch Build->Select All;Rebuild)
 or from the command line. To build from the command line, start the
-Visual Studio .NET 2003 (or 2005/2008) Command Prompt and cd to the directory where you have
-extracted the POCO C++ Libraries sources. Then, simply start the buildwin.cmd script
-and pass as argument the version of visual studio (71, 80 or 90). You can customize
+Visual Studio .NET 2003 (or 2005/2008/2010) Command Prompt and cd to the directory where you 
+have extracted the POCO C++ Libraries sources. Then, simply start the buildwin.cmd script
+and pass as argument the version of visual studio (71, 80, 90 or 100). You can customize
 what is being built by buildwin.cmd by passing appropriate command line arguments to
 it. Call buildwin.cmd without arguments to see what is available.
 
@@ -143,30 +146,28 @@ be set as well.
 In order to run the test suite and the samples, the top-most bin directory containing
 the shared libraries must be in the PATH environment variable.
 
-If you want to run the test suite or samples from within Visual Studio, we recommend that
-you download and install the free Solution Build Environment for Visual Studio .NET 2003,
-from <http://www.workspacewhiz.com/SolutionBuildEnvironmentReadme.html>.
-
-You can then add the bin directory to the PATH environment variable in a .slnenv file,
-using the following entry.
-
-POCO_BASE=p:\poco
-PATH=$(PATH);$(POCO_BASE)\bin
-
-Of course you will have to change the path p:\poco so that it matches your environment.
-
 IMPORTANT NOTE: Please make sure that the path to the directory containing the
 POCO C++ Libraries source tree does not contain spaces. Otherwise, the Microsoft
-message compiler will fail when building the Foundation library.
+message compiler may fail when building the Foundation library.
+
+
+BUILDING FOR WINDOWS CE
+
+Building for Windows CE is supported with Microsoft Visual Studio 2008.
+Unless you have the Digi JumpStart Windows CE 6.0 SDK installed, you'll
+have to modify the included Visual Studio project and solution files.
+Please see the SDK Reference Documentation (http://pocoproject.org/documentation)
+for instructions.
 
 
 BUILDING ON UNIX/LINUX/MAC OS X
 ===============================
 
 For building on Unix platforms, the POCO C++ Libraries come with their own
-build system. The build system is based on GNU Make 3.80, with the help from a few
-shell scripts. If you do not have GNU Make 3.80 (or later) installed on your machine, 
-you will need to download it from <http://directory.fsf.org/devel/build/make.html>, 
+build system. The build system is based on GNU Make 3.80 (or newer), with the help 
+from a few shell scripts. If you do not have GNU Make 3.80 (or later) installed on 
+your machine, you will need to download it from 
+http://directory.fsf.org/devel/build/make.html>, 
 build and install it prior to building the POCO C++ Libraries.
 
 You can check the version of GNU Make installed on your system with
@@ -274,4 +275,4 @@ at <http://pocoproject.org>.
 
 
 --
-$Id: //poco/1.3/dist/README#8 $
+$Id: //poco/1.4/dist/README#1 $

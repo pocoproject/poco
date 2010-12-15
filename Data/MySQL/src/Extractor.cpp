@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/Extractor.cpp#3 $
+// $Id: //poco/1.4/Data/MySQL/src/Extractor.cpp#1 $
 //
 // Library: Data/MySQL
 // Package: MySQL

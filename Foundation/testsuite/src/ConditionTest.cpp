@@ -1,7 +1,7 @@
 //
 // ConditionTest.cpp
 //
-// $Id: //poco/1.3/Foundation/testsuite/src/ConditionTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ConditionTest.cpp#1 $
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.

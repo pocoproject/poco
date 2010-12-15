@@ -1,7 +1,7 @@
 #
 # ODBC.vmsbuild
 #
-# $Id: //poco/1.3/Data/ODBC/ODBC.vmsbuild#1 $
+# $Id: //poco/1.4/Data/ODBC/ODBC.vmsbuild#1 $
 #
 LIB=PocoODBC
 Binder

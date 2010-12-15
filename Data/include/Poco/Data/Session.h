@@ -1,7 +1,7 @@
 //
 // Session.h
 //
-// $Id: //poco/1.3/Data/include/Poco/Data/Session.h#3 $
+// $Id: //poco/1.4/Data/include/Poco/Data/Session.h#1 $
 //
 // Library: Data
 // Package: DataCore

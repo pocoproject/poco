@@ -1,7 +1,7 @@
 //
 // Tuple.cpp
 //
-// $Id: //poco/1.3/Data/samples/Tuple/src/Tuple.cpp#4 $
+// $Id: //poco/1.4/Data/samples/Tuple/src/Tuple.cpp#1 $
 //
 // This sample demonstrates the Data library.
 //

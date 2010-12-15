@@ -1,7 +1,7 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/1.3/Foundation/samples/DateTime/src/DateTime.cpp#2 $
+// $Id: //poco/1.4/Foundation/samples/DateTime/src/DateTime.cpp#1 $
 //
 // This sample demonstrates the DateTime class.
 //

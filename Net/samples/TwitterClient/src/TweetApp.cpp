@@ -1,7 +1,7 @@
 //
 // TwitterApp.cpp
 //
-// $Id: //poco/1.3/Net/samples/TwitterClient/src/TweetApp.cpp#1 $
+// $Id: //poco/1.4/Net/samples/TwitterClient/src/TweetApp.cpp#1 $
 //
 // A very simple command-line Twitter client.
 //

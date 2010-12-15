@@ -1,7 +1,7 @@
 //
 // Timezone.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Timezone.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/Timezone.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
