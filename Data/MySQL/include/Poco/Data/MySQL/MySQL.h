@@ -1,7 +1,7 @@
 //
 // MySQL.h
 //
-// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/MySQL.h#1 $
+// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/MySQL.h#2 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -45,14 +45,14 @@
 
 //
 // The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the ODBC_EXPORTS
+// from a DLL simpler. All files within this DLL are compiled with the MySQL_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// ODBC_API functions as being imported from a DLL, wheras this DLL sees symbols
+// MySQL_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(MYSQL_EXPORTS)
+	#if defined(MySQL_EXPORTS)
 		#define MySQL_API __declspec(dllexport)
 	#else
 		#define MySQL_API __declspec(dllimport)
@@ -69,7 +69,7 @@
 // Automatically link Data library.
 //
 #if defined(_MSC_VER)
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MYSQL_EXPORTS)
+	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MySQL_EXPORTS)
 		#pragma comment(lib, "PocoDataMySQL" POCO_LIB_SUFFIX)
 	#endif
 #endif
