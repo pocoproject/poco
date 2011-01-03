@@ -1,0 +1,39 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TimeServer", "TimeServer\TimeServer_vs71.vcproj", "{7720D4EF-F5DD-4265-91C5-83980CB70B84}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FormServer", "FormServer\FormServer_vs71.vcproj", "{198BFE74-AD16-4D8B-81F7-F700B3B6456F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug_shared = debug_shared
+		debug_static = debug_static
+		release_shared = release_shared
+		release_static = release_static
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{7720D4EF-F5DD-4265-91C5-83980CB70B84}.debug_shared.ActiveCfg = debug_shared|Win32
+		{7720D4EF-F5DD-4265-91C5-83980CB70B84}.debug_shared.Build.0 = debug_shared|Win32
+		{7720D4EF-F5DD-4265-91C5-83980CB70B84}.debug_static.ActiveCfg = debug_shared|Win32
+		{7720D4EF-F5DD-4265-91C5-83980CB70B84}.debug_static.Build.0 = debug_shared|Win32
+		{7720D4EF-F5DD-4265-91C5-83980CB70B84}.release_shared.ActiveCfg = release_shared|Win32
+		{7720D4EF-F5DD-4265-91C5-83980CB70B84}.release_shared.Build.0 = release_shared|Win32
+		{7720D4EF-F5DD-4265-91C5-83980CB70B84}.release_static.ActiveCfg = release_shared|Win32
+		{7720D4EF-F5DD-4265-91C5-83980CB70B84}.release_static.Build.0 = release_shared|Win32
+		{198BFE74-AD16-4D8B-81F7-F700B3B6456F}.debug_shared.ActiveCfg = debug_shared|Win32
+		{198BFE74-AD16-4D8B-81F7-F700B3B6456F}.debug_shared.Build.0 = debug_shared|Win32
+		{198BFE74-AD16-4D8B-81F7-F700B3B6456F}.debug_static.ActiveCfg = debug_shared|Win32
+		{198BFE74-AD16-4D8B-81F7-F700B3B6456F}.debug_static.Build.0 = debug_shared|Win32
+		{198BFE74-AD16-4D8B-81F7-F700B3B6456F}.release_shared.ActiveCfg = release_shared|Win32
+		{198BFE74-AD16-4D8B-81F7-F700B3B6456F}.release_shared.Build.0 = release_shared|Win32
+		{198BFE74-AD16-4D8B-81F7-F700B3B6456F}.release_static.ActiveCfg = release_shared|Win32
+		{198BFE74-AD16-4D8B-81F7-F700B3B6456F}.release_static.Build.0 = release_shared|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

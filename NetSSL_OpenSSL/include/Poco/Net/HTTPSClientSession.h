@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -105,6 +105,15 @@ public:
 		/// The socket must not be connected. The session
 		/// takes ownership of the socket.
 
+	HTTPSClientSession(const SecureStreamSocket& socket, Session::Ptr pSession);
+		/// Creates a HTTPSClientSession using the given socket.
+		/// The socket must not be connected. The session
+		/// takes ownership of the socket.
+		///
+		/// The given Session is reused, if possible (client session
+		/// caching is enabled for the given Context, and the server
+		/// agrees to reuse the session).
+
 	HTTPSClientSession(const std::string& host, Poco::UInt16 port = HTTPS_PORT);
 		/// Creates a HTTPSClientSession using the given host and port.
 
@@ -153,6 +162,9 @@ public:
 		///
 		/// The Session object can be obtained after the first request has
 		/// been sent.
+		
+	// HTTPSession
+	void abort();
 
 protected:
 	void connect(const SocketAddress& address);

@@ -1,7 +1,7 @@
 //
 // SecureStreamSocket.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureStreamSocket.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -279,6 +279,12 @@ void SecureStreamSocket::useSession(Session::Ptr pSession)
 bool SecureStreamSocket::sessionWasReused()
 {
 	return static_cast<SecureStreamSocketImpl*>(impl())->sessionWasReused();
+}
+
+
+void SecureStreamSocket::abort()
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->abort();
 }
 
 

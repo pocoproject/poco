@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -121,7 +121,14 @@ void SecureStreamSocketImpl::close()
 	reset();
 	_impl.close();
 }
-	
+
+
+void SecureStreamSocketImpl::abort()
+{
+	reset();
+	_impl.abort();
+}
+
 
 int SecureStreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {

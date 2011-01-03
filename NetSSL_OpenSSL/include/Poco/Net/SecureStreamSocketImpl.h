@@ -1,7 +1,7 @@
 //
 // SecureStreamSocketImpl.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -146,6 +146,10 @@ public:
 		
 	void shutdown();
 		/// Shuts down the SSL connection.
+		
+	void abort();
+		/// Aborts the connection by closing the underlying
+		/// TCP connection. No orderly SSL shutdown is performed.
 		
 	bool secure() const;
 		/// Returns true iff the socket's connection is secure

@@ -1,7 +1,7 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -127,6 +127,11 @@ public:
 
 	void close();
 		/// Close the socket.
+		
+	void abort();
+		/// Aborts the connection by closing the
+		/// underlying TCP connection. No orderly SSL shutdown
+		/// is performed.
 	
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through

@@ -1,7 +1,7 @@
 //
 // SecureStreamSocket.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
@@ -276,6 +276,10 @@ public:
 	bool sessionWasReused();
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
+		
+	void abort();
+		/// Aborts the SSL connection by closing the underlying
+		/// TCP connection. No orderly SSL shutdown is performed.
 		
 protected:
 	SecureStreamSocket(SocketImpl* pImpl);

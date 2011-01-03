@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -68,6 +68,15 @@ HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket):
 }
 
 
+HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, Session::Ptr pSession):
+	HTTPClientSession(socket),
+	_pContext(socket.context()),
+	_pSession(pSession)
+{
+	setPort(HTTPS_PORT);
+}
+
+
 HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 port):
 	HTTPClientSession(SecureStreamSocket()),
 	_pContext(SSLManager::instance().defaultClientContext())
@@ -125,6 +134,13 @@ HTTPSClientSession::~HTTPSClientSession()
 bool HTTPSClientSession::secure() const
 {
 	return true;
+}
+
+
+void HTTPSClientSession::abort()
+{
+	SecureStreamSocket sss(socket());
+	sss.abort();
 }
 
 
