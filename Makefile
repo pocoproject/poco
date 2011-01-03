@@ -189,6 +189,7 @@ clean:
 	$(MAKE) -C $(POCO_BASE)/PageCompiler clean
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/samples clean
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/File2Page clean
+	$(MAKE) -C $(POCO_BASE)/CppUnit clean
 
 distclean:
 	rm -rf $(POCO_BUILD)/lib

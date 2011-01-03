@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/rules/lib#1 $
+# $Id: //poco/1.4/build/rules/lib#2 $
 #
 # lib
 #
@@ -40,6 +40,7 @@ include $(POCO_BASE)/build/rules/compile
 clean:
 	$(RM) $(OBJPATH)
 	$(RM) $(LIB_RELEASE_STATIC) $(LIB_DEBUG_STATIC) $(LIB_RELEASE_SHARED) $(LIB_DEBUG_SHARED)
+	$(RM) $(LIB_DEBUG_SHARED_LINK) $(LIB_RELEASE_SHARED_LINK)
 
 distclean: clean
 	$(RM) obj

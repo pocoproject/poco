@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/Darwin#1 $
+# $Id: //poco/1.4/build/config/Darwin#2 $
 #
 # Darwin
 #
@@ -30,7 +30,7 @@ LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib
 SHLIB   = $(CXX) -dynamiclib -o $@
-DYLIB   = $(CXX) -dynamic -bundle -Wl,-bind_at_load -o $@ 
+DYLIB   = $(CXX) -dynamic -bundle -bind_at_load -o $@ 
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = 
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc
