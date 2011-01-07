@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Util/samples/Makefile#1 $
+# $Id: //poco/1.4/Util/samples/Makefile#2 $
 #
 # Makefile for Poco Util Samples
 #
@@ -11,3 +11,4 @@ clean all: projects
 projects:
 	$(MAKE) -C SampleApp $(MAKECMDGOALS)
 	$(MAKE) -C SampleServer $(MAKECMDGOALS)
+	$(MAKE) -C pkill $(MAKECMDGOALS)

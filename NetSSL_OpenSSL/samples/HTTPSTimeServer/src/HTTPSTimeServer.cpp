@@ -1,7 +1,7 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#2 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -164,9 +164,9 @@ class HTTPSTimeServer: public Poco::Util::ServerApplication
 	/// (HTTPTimeServerd[.exe]), you must also create a copy of the configuration
 	/// file named HTTPTimeServerd.properties. In the configuration file, you
 	/// can specify the port on which the server is listening (default
-	/// 9980) and the format of the date/time string sent back to the client.
+	/// 9443) and the format of the date/time string sent back to the client.
 	///
-	/// To test the TimeServer you can use any web browser (https://localhost:9980/).
+	/// To test the TimeServer you can use any web browser (https://localhost:9443/).
 {
 public:
 	HTTPSTimeServer(): _helpRequested(false)

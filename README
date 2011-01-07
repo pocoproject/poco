@@ -213,6 +213,13 @@ To build on Mac OS X 10.3 with GCC 3, do the following:
 > make -s
 
 
+IMPORTANT: Make sure that the path to the build directory does not
+contain symbolic links. Furthermore, on Mac OS X (or other systems
+with case insensitive filesystems), make sure that the characters in 
+the path have the correct case. Otherwise you'll get an error saying
+"Current working directory not under $PROJECT_BASE.".
+
+
 BUILDING ON QNX NEUTRINO
 ========================
 
@@ -275,4 +282,4 @@ at <http://pocoproject.org>.
 
 
 --
-$Id: //poco/1.4/dist/README#1 $
+$Id: //poco/1.4/dist/README#2 $
