@@ -42,7 +42,7 @@ include(contrib/cmake/FindApache2.cmake)
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
  add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DPOCO_WIN32_UTF8)
-  set(SYSLIBS iphlpapi gdi32)
+  set(SYSLIBS iphlpapi gdi32 odbc32)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
 if (CMAKE_SYSTEM MATCHES "Linux")
