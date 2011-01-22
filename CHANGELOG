@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.4.0p1 (2011-01-03)
+Release 1.4.1 (2011-01-24)
 ============================
 
 - fixed SF# 3150223: Poco::BinaryReader cannot read std::vector correctly
@@ -16,6 +16,23 @@ Release 1.4.0p1 (2011-01-03)
 - Poco::Net::HTTPSession::abort() now also can be used with a
   Poco::Net::HTTPSClientSession.
 - fixed SF# 3148045: make clean and distclean issues
+- changed Data library names on Unix/Linux platforms to
+  match the names on Windows (PocoSQLite -> PocoDataSQLite,
+  PocoMySQL -> PocoDataMySQL, PocoODBC -> PocoDataODBC)
+- added additional options to configure script
+- added additional documentation to Poco::Net::HTTPClientSession
+- Poco::Net::HTTPClientSession::receiveResponse() closes the connection 
+  if an exception is thrown while reading the response header. 
+  This ensures that a new connection will be set up for the next request 
+  if persistent connections are used.
+- improved Poco::Net::MultipartDecoder performance by reading directly from streambuf
+- improved performance of Poco::Base64Encoder, Poco::Base64Decoder, 
+  Poco::HexBinaryEncoder and Poco::HexBinaryDecoder by working directly with the 
+  given stream's streambuf.
+- improved performance of MessageHeader::read() by reading directly from streambuf 
+  instead of istream.
+- it is now possible to specify additional MIME part header fields
+  for a MIME part through the Poco::Net::PartSource class.
 
 
 Release 1.4.0 (2010-12-14)
@@ -1423,4 +1440,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#2 $
+$Id: //poco/1.4/dist/CHANGELOG#5 $

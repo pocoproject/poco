@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#3 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -201,46 +201,54 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		close();
 		_mustReconnect = false;
 	}
-	if (!connected())
-		reconnect();
-	if (!keepAlive)
-		request.setKeepAlive(false);
-	if (!request.has(HTTPRequest::HOST))
-		request.setHost(_host, _port);
-	if (!_proxyHost.empty())
+	try
 	{
-		request.setURI(proxyRequestPrefix() + request.getURI());
-		proxyAuthenticate(request);
+		if (!connected())
+			reconnect();
+		if (!keepAlive)
+			request.setKeepAlive(false);
+		if (!request.has(HTTPRequest::HOST))
+			request.setHost(_host, _port);
+		if (!_proxyHost.empty())
+		{
+			request.setURI(proxyRequestPrefix() + request.getURI());
+			proxyAuthenticate(request);
+		}
+		_reconnect = keepAlive;
+		_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
+		if (request.getChunkedTransferEncoding())
+		{
+			HTTPHeaderOutputStream hos(*this);
+			request.write(hos);
+			_pRequestStream = new HTTPChunkedOutputStream(*this);
+		}
+		else if (request.getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
+		{
+			Poco::CountingOutputStream cs;
+			request.write(cs);
+			_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength() + cs.chars());
+			request.write(*_pRequestStream);
+		}
+		else if (request.getMethod() != HTTPRequest::HTTP_PUT && request.getMethod() != HTTPRequest::HTTP_POST)
+		{
+			Poco::CountingOutputStream cs;
+			request.write(cs);
+			_pRequestStream = new HTTPFixedLengthOutputStream(*this, cs.chars());
+			request.write(*_pRequestStream);
+		}
+		else
+		{
+			_pRequestStream = new HTTPOutputStream(*this);
+			request.write(*_pRequestStream);
+		}	
+		_lastRequest.update();
+		return *_pRequestStream;
 	}
-	_reconnect = keepAlive;
-	_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
-	if (request.getChunkedTransferEncoding())
+	catch (Exception&)
 	{
-		HTTPHeaderOutputStream hos(*this);
-		request.write(hos);
-		_pRequestStream = new HTTPChunkedOutputStream(*this);
+		close();
+		throw;
 	}
-	else if (request.getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
-	{
-		Poco::CountingOutputStream cs;
-		request.write(cs);
-		_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength() + cs.chars());
-		request.write(*_pRequestStream);
-	}
-	else if (request.getMethod() != HTTPRequest::HTTP_PUT && request.getMethod() != HTTPRequest::HTTP_POST)
-	{
-		Poco::CountingOutputStream cs;
-		request.write(cs);
-		_pRequestStream = new HTTPFixedLengthOutputStream(*this, cs.chars());
-		request.write(*_pRequestStream);
-	}
-	else
-	{
-		_pRequestStream = new HTTPOutputStream(*this);
-		request.write(*_pRequestStream);
-	}	
-	_lastRequest.update();
-	return *_pRequestStream;
 }
 
 
@@ -259,10 +267,16 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 		}
 		catch (MessageException&)
 		{
+			close();
 			if (networkException())
 				networkException()->rethrow();
 			else
 				throw;
+		}
+		catch (Exception&)
+		{
+			close();
+			throw;
 		}
 	}
 	while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);

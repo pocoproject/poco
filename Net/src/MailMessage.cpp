@@ -1,7 +1,7 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.4/Net/src/MailMessage.cpp#1 $
+// $Id: //poco/1.4/Net/src/MailMessage.cpp#2 $
 //
 // Library: Net
 // Package: Mail
@@ -316,7 +316,7 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 
 void MailMessage::writePart(MultipartWriter& writer, const Part& part) const
 {
-	MessageHeader partHeader;
+	MessageHeader partHeader(part.pSource->headers());
 	MediaType mediaType(part.pSource->mediaType());
 	if (!part.name.empty())
 		mediaType.setParameter("name", part.name);

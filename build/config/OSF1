@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/OSF1#1 $
+# $Id: //poco/1.4/build/config/OSF1#2 $
 #
 # OSF1
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE = SHARED
+LINKMODE ?= SHARED
 
 #
 # Define Tools

@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/Darwin-clang#1 $
+# $Id: //poco/1.4/build/config/Darwin-clang#2 $
 #
 # Darwin
 #
@@ -11,7 +11,7 @@
 #
 # General Settings
 #
-LINKMODE = SHARED
+LINKMODE ?= SHARED
 
 #
 # Tools

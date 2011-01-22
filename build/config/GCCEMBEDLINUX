@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/GCCEMBEDLINUX#1 $
+# $Id: //poco/1.4/build/config/GCCEMBEDLINUX#2 $
 #
 # ARM-Linux
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE           = STATIC
+LINKMODE          ?= STATIC
 POCO_TARGET_OSNAME = Linux
 POCO_TARGET_OSARCH = ARM
 TOOL               = /opt/crosstool/gcc-4.1.0-glibc-2.3.2/arm-unknown-linux-gnu/bin/arm-unknown-linux-gnu

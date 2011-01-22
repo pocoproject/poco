@@ -1,7 +1,7 @@
 //
 // HexBinaryDecoder.cpp
 //
-// $Id: //poco/1.4/Foundation/src/HexBinaryDecoder.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/HexBinaryDecoder.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -41,7 +41,8 @@
 namespace Poco {
 
 
-HexBinaryDecoderBuf::HexBinaryDecoderBuf(std::istream& istr): _istr(istr)
+HexBinaryDecoderBuf::HexBinaryDecoderBuf(std::istream& istr): 
+	_buf(*istr.rdbuf())
 {
 }
 
@@ -78,9 +79,9 @@ int HexBinaryDecoderBuf::readFromDevice()
 
 int HexBinaryDecoderBuf::readOne()
 {
-	int ch = _istr.get();
+	int ch = _buf.sbumpc();
 	while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n')
-		ch = _istr.get();
+		ch = _buf.sbumpc();
 	return ch;
 }
 

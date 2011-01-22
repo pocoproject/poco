@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/SunOS-SunStudio#1 $
+# $Id: //poco/1.4/build/config/SunOS-SunStudio#2 $
 #
 # SunStudio
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE = SHARED
+LINKMODE ?= SHARED
 
 #
 # Tools

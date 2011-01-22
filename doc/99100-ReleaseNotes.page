@@ -2,22 +2,39 @@ POCO C++ Libraries Release Notes
 AAAIntroduction
 
 
-!!!Release 1.4.0p1
+!!!Release 1.4.1
 
 !! Summary of Changes
 
   - fixed SF# 3150223: Poco::BinaryReader cannot read std::vector correctly
-  - fixed SF# 3146326: SharedMemory issue
+  - fixed SF# 3146326: Poco::SharedMemory issue
   - made Poco::Net::HTTPSession::abort() virtual
   - added Poco::Net::SecureStreamSocket::abort() to immediately close
     a SSL/TLS connection without performing an orderly SSL/TLS shutdown.
-  - fixed SF# 3148126: HTTPSClientSession destructor (!) throws an IOException.
+  - fixed SF# 3148126: Poco::Net::HTTPSClientSession destructor (!) throws an IOException.
     Added try/catch block to Poco::Net::SecureSocketImpl destructor.
   - added additional constructor to Poco::Net::HTTPSClientSession, taking
     both a socket and a session object.
   - Poco::Net::HTTPSession::abort() now also can be used with a
     Poco::Net::HTTPSClientSession.
   - fixed SF# 3148045: make clean and distclean issues
+  - changed Data library names on Unix/Linux platforms to
+    match the names on Windows (PocoSQLite -> PocoDataSQLite,
+    PocoMySQL -> PocoDataMySQL, PocoODBC -> PocoDataODBC)
+  - added additional options to configure script
+  - added additional documentation to Poco::Net::HTTPClientSession
+  - Poco::Net::HTTPClientSession::receiveResponse() closes the connection 
+    if an exception is thrown while reading the response header. 
+    This ensures that a new connection will be set up for the next request 
+    if persistent connections are used.
+  - improved Poco::Net::MultipartDecoder performance by reading directly from streambuf
+  - improved performance of Poco::Base64Encoder, Poco::Base64Decoder, 
+    Poco::HexBinaryEncoder and Poco::HexBinaryDecoder by working directly with the 
+    given stream's streambuf.
+  - improved performance of MessageHeader::read() by reading directly from streambuf 
+    instead of istream.
+  - it is now possible to specify additional MIME part header fields
+    for a MIME part through the Poco::Net::PartSource class.
 
 
 !!!Release 1.4.0

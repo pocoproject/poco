@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/SSV-LINUX#1 $
+# $Id: //poco/1.4/build/config/SSV-LINUX#2 $
 #
 # ARM-Linux
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE           = STATIC
+LINKMODE           ?= STATIC
 POCO_TARGET_OSNAME = Linux
 POCO_TARGET_OSARCH = armv4tl
 TOOL               = /usr/local/arm-ssv1-linux/bin/arm-ssv1-linux

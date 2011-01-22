@@ -52,7 +52,7 @@ objects = Binder ConnectionHandle Connector DataTypes EnvironmentHandle \
 	Extractor ODBCColumn ODBCException ODBCStatementImpl \
 	Parameter Preparation SessionImpl Utility 
 
-target         = PocoODBC
+target         = PocoDataODBC
 target_version = $(LIBVERSION)
 target_libs    = PocoData PocoFoundation
 

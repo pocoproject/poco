@@ -10,7 +10,7 @@
 #
 # General Settings, note that strip doesn't do anything on Cygwin, thus empty
 #
-LINKMODE = SHARED
+LINKMODE ?= SHARED
 
 #
 # Define Tools

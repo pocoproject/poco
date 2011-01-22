@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Data/samples/Binding/Makefile#1 $
+# $Id: //poco/1.4/Data/samples/Binding/Makefile#2 $
 #
 # Makefile for Poco Data Binding sample
 #
@@ -12,6 +12,6 @@ objects = Binding
 
 target         = Binding
 target_version = 1
-target_libs    = PocoSQLite PocoData PocoFoundation
+target_libs    = PocoDataSQLite PocoData PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

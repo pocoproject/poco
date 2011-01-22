@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Data/MySQL/Makefile#1 $
+# $Id: //poco/1.4/Data/MySQL/Makefile#2 $
 #
 # Makefile for Poco MySQL
 #
@@ -16,7 +16,7 @@ objects = Binder Extractor SessionImpl Connector \
 	MySQLStatementImpl ResultMetadata MySQLException \
 	SessionHandle StatementExecutor
 
-target         = PocoMySQL
+target         = PocoDataMySQL
 target_version = $(LIBVERSION)
 target_libs    = PocoData PocoFoundation
 

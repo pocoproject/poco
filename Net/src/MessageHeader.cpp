@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.4/Net/src/MessageHeader.cpp#1 $
+// $Id: //poco/1.4/Net/src/MessageHeader.cpp#2 $
 //
 // Library: Net
 // Package: Messages
@@ -81,32 +81,34 @@ void MessageHeader::write(std::ostream& ostr) const
 void MessageHeader::read(std::istream& istr)
 {
 	static const int eof = std::char_traits<char>::eof();
+	std::streambuf& buf = *istr.rdbuf();
+
 	std::string name;
 	std::string value;
 	name.reserve(32);
 	value.reserve(64);
-	int ch = istr.get();
+	int ch = buf.sbumpc();
 	while (ch != eof && ch != '\r' && ch != '\n')
 	{
 		name.clear();
 		value.clear();
-		while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = istr.get(); }
-		if (ch == '\n') { ch = istr.get(); continue; } // ignore invalid header lines
+		while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = buf.sbumpc(); }
+		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
-		if (ch != eof) ch = istr.get(); // ':'
-		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = istr.get();
-		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = istr.get(); }
-		if (ch == '\r') ch = istr.get();
+		if (ch != eof) ch = buf.sbumpc(); // ':'
+		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
+		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = buf.sbumpc(); }
+		if (ch == '\r') ch = buf.sbumpc();
 		if (ch == '\n')
-			ch = istr.get();
+			ch = buf.sbumpc();
 		else if (ch != eof)
 			throw MessageException("Field value too long/no CRLF found");
 		while (ch == ' ' || ch == '\t') // folding
 		{
-			while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = istr.get(); }
-			if (ch == '\r') ch = istr.get();
+			while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = buf.sbumpc(); }
+			if (ch == '\r') ch = buf.sbumpc();
 			if (ch == '\n')
-				ch = istr.get();
+				ch = buf.sbumpc();
 			else if (ch != eof)
 				throw MessageException("Folded field value too long/no CRLF found");
 		}

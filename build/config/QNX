@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/QNX#1 $
+# $Id: //poco/1.4/build/config/QNX#2 $
 #
 # QNX
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE = SHARED
+LINKMODE ?= SHARED
 
 #
 # Define Tools

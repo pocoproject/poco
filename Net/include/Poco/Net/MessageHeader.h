@@ -1,7 +1,7 @@
 //
 // MessageHeader.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/MessageHeader.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/MessageHeader.h#2 $
 //
 // Library: Net
 // Package: Messages

@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/CygLinux#1 $
+# $Id: //poco/1.4/build/config/CygLinux#2 $
 #
 # Linux
 #
@@ -10,7 +10,7 @@
 #
 # General Settings
 #
-LINKMODE = SHARED
+LINKMODE ?= SHARED
 TOOL = /opt/crosstool/gcc-4.0.2-glibc-2.3.2/i686-unknown-linux-gnu/bin/i686-unknown-linux-gnu-
 POCO_TARGET_OSNAME = Linux
 POCO_TARGET_OSARCH = i686

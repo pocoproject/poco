@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/SH-Linux#1 $
+# $Id: //poco/1.4/build/config/SH-Linux#2 $
 #
 # SH-Linux
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE           = SHARED
+LINKMODE           ?= SHARED
 POCO_TARGET_OSNAME = Linux
 POCO_TARGET_OSARCH = sh4
 TOOL               = sh4-linux

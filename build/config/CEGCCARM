@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/CEGCCARM#1 $
+# $Id: //poco/1.4/build/config/CEGCCARM#2 $
 #
 # CYGWIN
 #
@@ -11,7 +11,7 @@
 #
 # General Settings
 #
-LINKMODE = SHARED
+LINKMODE ?= SHARED
 POCO_TARGET_OSNAME = WinCE
 POCO_TARGET_OSARCH = ARM
 TOOLPATH = /opt/cegcc

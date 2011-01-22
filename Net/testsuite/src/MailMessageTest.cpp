@@ -1,7 +1,7 @@
 //
 // MailMessageTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MailMessageTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/MailMessageTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -269,7 +269,9 @@ void MailMessageTest::testWriteMultiPart()
 	Timestamp ts(0);
 	message.setDate(ts);
 	message.addContent(new StringPartSource("Hello World!\r\n", "text/plain"), MailMessage::ENCODING_8BIT);
-	message.addAttachment("sample", new StringPartSource("This is some binary data. Really.", "application/octet-stream", "sample.dat"));
+	StringPartSource* pSPS = new StringPartSource("This is some binary data. Really.", "application/octet-stream", "sample.dat");
+	pSPS->headers().set("Content-ID", "abcd1234");
+	message.addAttachment("sample", pSPS);
 
 	assert (message.isMultipart());
 
@@ -293,6 +295,7 @@ void MailMessageTest::testWriteMultiPart()
 		"\r\n"
 		"--$\r\n"
 		"Content-Disposition: attachment; filename=sample.dat\r\n"
+		"Content-ID: abcd1234\r\n"
 		"Content-Transfer-Encoding: base64\r\n"
 		"Content-Type: application/octet-stream; name=sample\r\n"
 		"\r\n"

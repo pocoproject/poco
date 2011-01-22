@@ -1,7 +1,7 @@
 //
 // Base64Decoder.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Base64Decoder.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Base64Decoder.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -56,7 +56,7 @@ namespace
 Base64DecoderBuf::Base64DecoderBuf(std::istream& istr): 
 	_groupLength(0),
 	_groupIndex(0),
-	_istr(istr)
+	_buf(*istr.rdbuf())
 {
 	FastMutex::ScopedLock lock(mutex);
 	if (!IN_ENCODING_INIT)
@@ -121,9 +121,9 @@ int Base64DecoderBuf::readFromDevice()
 
 int Base64DecoderBuf::readOne()
 {
-	int ch = _istr.get();
+	int ch = _buf.sbumpc();
 	while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n')
-		ch = _istr.get();
+		ch = _buf.sbumpc();
 	return ch;
 }
 

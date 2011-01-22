@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/ARM-Linux#1 $
+# $Id: //poco/1.4/build/config/ARM-Linux#2 $
 #
 # ARM-Linux
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE           = SHARED
+LINKMODE          ?= SHARED
 POCO_TARGET_OSNAME = Linux
 POCO_TARGET_OSARCH = ARM
 STLPORT_INCLUDE    = /usr/local/include/stlport

@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/MinGW#1 $
+# $Id: //poco/1.4/build/config/MinGW#2 $
 #
 # MinGW32
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE = STATIC
+LINKMODE ?= STATIC
 POCO_TARGET_OSNAME = MinGW
 POCO_TARGET_OSARCH = ia32
 

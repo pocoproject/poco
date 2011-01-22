@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/Angstrom#1 $
+# $Id: //poco/1.4/build/config/Angstrom#2 $
 #
 # Angstrom
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE           = SHARED
+LINKMODE          ?= SHARED
 POCO_TARGET_OSNAME = Linux
 POCO_TARGET_OSARCH = armv5te
 TOOL               = arm-angstrom-linux-gnueabi

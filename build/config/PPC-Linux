@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/PPC-Linux#1 $
+# $Id: //poco/1.4/build/config/PPC-Linux#2 $
 #
 # PPC-Linux
 #
@@ -9,7 +9,7 @@
 #
 # General Settings
 #
-LINKMODE           = STATIC
+LINKMODE          ?= STATIC
 POCO_TARGET_OSNAME = Linux
 POCO_TARGET_OSARCH = PPC
 TOOL               = ppc-linux
