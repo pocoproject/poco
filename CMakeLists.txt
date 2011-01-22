@@ -1,9 +1,9 @@
-PROJECT(poco)
+PROJECT(Poco)
 
-cmake_minimum_required(VERSION 2.4.8)
+cmake_minimum_required(VERSION 2.6.0)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "3")
+set(CPACK_PACKAGE_VERSION_MINOR "4")
 set(CPACK_PACKAGE_VERSION_PATCH "99")
 SET(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 SET(RELEASE_NAME "Unstable-trunk")
@@ -13,19 +13,28 @@ SET(PROJECT_VERSION ${COMPLETE_VERSION})
 set(DEBUG_CXX_FLAGS   "${COMMON_CXX} ${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 set(RELEASE_CXX_FLAGS "${COMMON_CXX} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
+option(ENABLE_TESTS
+  "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
+
+option(POCO_STATIC
+  "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
+
 # Uncomment from next two lines to force statitc or dynamic library, default is autodetection
 if(POCO_STATIC)
     set( LIB_MODE STATIC )
+    message(STATUS "Building static libraries")
 else(POCO_STATIC)
     set( LIB_MODE SHARED )
+    message(STATUS "Building dynamic libraries")
 endif(POCO_STATIC)
 
-# whether unit tests should be build
-SET (ENABLE_TESTS FALSE CACHE BOOL "Build unit tests?")
-
 IF (ENABLE_TESTS)
+  include(CTest)
   ENABLE_TESTING()
-ENDIF (ENABLE_TESTS)
+  message(STATUS "Building with unittests & samples")
+ELSE ()
+  message(STATUS "Building without tests & samples")
+ENDIF ()
 
 # Set local include path
 include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include Crypto/include)
@@ -75,7 +84,10 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
   add_definitions( -D_BSD_SOURCE -library=stlport4)
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 
-add_subdirectory(CppUnit)
+IF (ENABLE_TESTS)
+   add_subdirectory(CppUnit)
+ENDIF ()
+
 add_subdirectory(Foundation)
 add_subdirectory(XML)
 add_subdirectory(Util)
@@ -116,3 +128,8 @@ SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 
 INCLUDE(CPack)
+
+message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
+message(STATUS "XXX: CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+message(STATUS "XXX: CMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "XXX: CMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}")

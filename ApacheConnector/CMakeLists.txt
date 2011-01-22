@@ -19,4 +19,6 @@ set_target_properties( ${LIBNAMED}
 	SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 target_link_libraries( ${LIBNAMED} )
 
-add_subdirectory(samples)
+if (ENABLE_TESTS)
+  add_subdirectory(samples)
+endif ()

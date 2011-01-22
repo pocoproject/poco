@@ -31,4 +31,7 @@ install(
 
 add_subdirectory( ExtJS )
 
-add_subdirectory( testsuite )
+if (ENABLE_TESTS)
+  add_subdirectory(testsuite)
+endif ()
+

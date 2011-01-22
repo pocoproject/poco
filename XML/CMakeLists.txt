@@ -30,5 +30,8 @@ install(
     DESTINATION lib
     )
 
-add_subdirectory( samples )
-add_subdirectory( testsuite )
+if (ENABLE_TESTS)
+  add_subdirectory(samples)
+  add_subdirectory(testsuite)
+endif ()
+
