@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -281,7 +281,7 @@ void ThreadImpl::sleepImpl(long milliseconds)
 		interval.tv_sec  = milliseconds / 1000;
 		interval.tv_nsec = (milliseconds % 1000)*1000000; 
 		pthread_delay_np(&interval);
-#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
+#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
 	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
 	int rc;
 	do

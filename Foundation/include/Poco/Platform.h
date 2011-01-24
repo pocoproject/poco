@@ -1,7 +1,7 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -117,6 +117,9 @@
 #elif defined(__VMS)
 	#define POCO_OS_FAMILY_VMS 1
 	#define POCO_OS POCO_OS_VMS
+#elif defined(VXWORKS)
+  #define POCO_OS_FAMILY_UNIX 1
+  #define POCO_OS POCO_OS_VXWORKS
 #endif
 
 
