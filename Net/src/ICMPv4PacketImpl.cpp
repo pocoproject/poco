@@ -1,7 +1,7 @@
 //
 // ICMPv4PacketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPv4PacketImpl.cpp#1 $
+// $Id: //poco/1.4/Net/src/ICMPv4PacketImpl.cpp#2 $
 //
 // Library: Net
 // Package: ICMP
@@ -38,15 +38,16 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
-#include "Poco/Process.h"
 #include "Poco/NumberFormatter.h"
+#if !defined(POCO_VXWORKS)
+#include "Poco/Process.h"
+#endif
 #include <sstream>
 
 
 using Poco::InvalidArgumentException;
 using Poco::Timestamp;
 using Poco::Timespan;
-using Poco::Process;
 using Poco::NumberFormatter;
 using Poco::UInt8;
 using Poco::UInt16;
@@ -151,8 +152,12 @@ void ICMPv4PacketImpl::initPacket()
 	icp->code     = 0;
 	icp->checksum = 0;
 	icp->seq      = ++_seq;
-	icp->id       = static_cast<UInt16>(Process::id());
-	
+#if defined(POCO_VXWORKS)
+	icp->id       = 0;
+#else
+	icp->id       = static_cast<UInt16>(Poco::Process::id());
+#endif
+
 	struct timeval* ptp = (struct timeval *) (icp + 1);
 	*ptp = time();
 
@@ -201,7 +206,11 @@ Poco::UInt8* ICMPv4PacketImpl::data(Poco::UInt8* buffer, int length) const
 bool ICMPv4PacketImpl::validReplyID(Poco::UInt8* buffer, int length) const
 {
 	Header *icp = header(buffer, length);
+#if defined(POCO_VXWORKS)
+	return icp && icp->id == 0;
+#else
 	return icp && (static_cast<Poco::UInt16>(Process::id()) == icp->id);
+#endif
 }
 
 

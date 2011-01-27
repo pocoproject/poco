@@ -1,7 +1,7 @@
 //
 // Timezone.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Timezone.cpp#2 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -44,6 +44,8 @@
 #else
 #include "Timezone_WIN32.cpp"
 #endif
+#elif defined(POCO_VXWORKS)
+#include "Timezone_VX.cpp"
 #else
 #include "Timezone_UNIX.cpp"
 #endif

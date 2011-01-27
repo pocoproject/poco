@@ -1,0 +1,65 @@
+BUILD=PPC440diab_debug
+MACRO_AR=dar
+MACRO_ARCHIVE="\$(PRJ_DIR)/$CONFIG/$TARGET.a"
+MACRO_AS=dcc
+MACRO_CC=dcc
+MACRO_CC_ARCH_SPEC=-tPPC440FS:vxworks55
+MACRO_CFLAGS="-g \\
+	$MACRO_CC_ARCH_SPEC \\
+	-W:c:,-Xmismatch-warning=2 \\
+	-ew1554,1551,1552,1086,1047,1547 \\
+	-Xclib-optim-off \\
+	-Xansi \\
+	-Xstrings-in-text=0 \\
+	-Wa,-Xsemi-is-newline \\
+	-ei1516,1643,1604 \\
+	-Xlocal-data-area-static-only \\
+	-Xsize-opt \\
+	-I. \\
+	-I\$(WIND_BASE)/target/h/ \\
+	-I../../include \\
+	-DCPU=PPC440 \\
+	-DTOOL_FAMILY=diab \\
+	-DTOOL=diab \\
+	-DPOCO_VXWORKS \\
+	-D_DEBUG \\
+	$CFLAGS"
+MACRO_CFLAGS_AS="-g \\
+	$MACRO_CC_ARCH_SPEC \\
+	-W:c:,-Xmismatch-warning=2 \\
+	-ew1554,1551,1552,1086,1047,1547 \\
+	-Xclib-optim-off \\
+	-Xansi \\
+	-Xstrings-in-text=0 \\
+	-Wa,-Xsemi-is-newline \\
+	-ei1516,1643,1604 \\
+	-Xlocal-data-area-static-only \\
+	-Xsize-opt \\
+	-Xpreprocess-assembly \\
+	-c \\
+	-I. \\
+	-I\$(WIND_BASE)/target/h/ \\
+	-DCPU=PPC440 \\
+	-DTOOL_FAMILY=diab \\
+	-DTOOL=diab"
+MACRO_CPP="dcc -E -Xpreprocessor-lineno-off"
+MACRO_HEX_FLAGS=""
+MACRO_LD=dld
+MACRO_LDFLAGS="$MACRO_CC_ARCH_SPEC -X -N -Xgenerate-paddr"
+MACRO_LD_PARTIAL_FLAGS="$MACRO_CC_ARCH_SPEC -X -r"
+MACRO_LD_PARTIAL="dld $MACRO_LD_PARTIAL_FLAGS"
+MACRO_NM=nmppc
+MACRO_OPTION_DEFINE_MACRO=-D
+MACRO_OPTION_DEPEND="-Xmake-dependency -w"
+MACRO_OPTION_GENERATE_DEPENDENCY_FILE=-MD
+MACRO_OPTION_INCLUDE_DIR=-I
+MACRO_OPTION_LANG_C=-xc
+MACRO_OPTION_UNDEFINE_MACRO=-U
+MACRO_POST_BUILD_RULE=""
+MACRO_PRJ_LIBS=""
+MACRO_SIZE=sizeppc
+MACRO_TOOL_FAMILY=diab
+RO_DEPEND_PATH="{\$(WIND_BASE)/target/h/} \\
+	{\$(WIND_BASE)/target/src/} \\
+	{\$(WIND_BASE)/target/config/}"
+TC=::tc_PPC440diab

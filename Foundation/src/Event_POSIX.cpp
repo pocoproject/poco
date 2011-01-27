@@ -1,7 +1,7 @@
 //
 // Event_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Event_POSIX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Event_POSIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -35,7 +35,11 @@
 
 
 #include "Poco/Event_POSIX.h"
+#if defined(POCO_VXWORKS)
+#include <timers.h>
+#else
 #include <sys/time.h>
+#endif
 
 
 namespace Poco {
@@ -85,6 +89,15 @@ bool EventImpl::waitImpl(long milliseconds)
 	delta.tv_sec  = milliseconds / 1000;
 	delta.tv_nsec = (milliseconds % 1000)*1000000;
 	pthread_get_expiration_np(&delta, &abstime);
+#elif defined(POCO_VXWORKS)
+	clock_gettime(CLOCK_REALTIME, &abstime);
+	abstime.tv_sec  += milliseconds / 1000;
+	abstime.tv_nsec += (milliseconds % 1000)*1000000;
+	if (abstime.tv_nsec >= 1000000000)
+	{
+		abstime.tv_nsec -= 1000000000;
+		abstime.tv_sec++;
+	}
 #else
 	struct timeval tv;
 	gettimeofday(&tv, NULL);

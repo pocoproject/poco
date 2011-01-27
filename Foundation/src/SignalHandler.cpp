@@ -1,7 +1,7 @@
 //
 // SignalHandler.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SignalHandler.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/SignalHandler.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -37,7 +37,7 @@
 #include "Poco/SignalHandler.h"
 
 
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 
 
 #include "Poco/Thread.h"

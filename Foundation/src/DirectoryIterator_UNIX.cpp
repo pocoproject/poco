@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryIterator_UNIX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/DirectoryIterator_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -35,7 +35,11 @@
 
 
 #include "Poco/DirectoryIterator_UNIX.h"
+#if defined(POCO_VXWORKS)
+#include "Poco/File_VX.h"
+#else
 #include "Poco/File_UNIX.h"
+#endif
 #include "Poco/Path.h"
 
 
@@ -47,7 +51,11 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _pDir(0),
 	Path p(path);
 	p.makeFile();
 
+#if defined(POCO_VXWORKS)
+	_pDir = opendir(const_cast<char*>(p.toString().c_str()));
+#else
 	_pDir = opendir(p.toString().c_str());
+#endif
 	if (!_pDir) File::handleLastError(path);
 
 	next();

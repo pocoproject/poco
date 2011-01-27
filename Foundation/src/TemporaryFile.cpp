@@ -1,7 +1,7 @@
 //
 // TemporaryFile.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TemporaryFile.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/TemporaryFile.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -37,7 +37,9 @@
 #include "Poco/TemporaryFile.h"
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
+#if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
+#endif
 #include "Poco/Mutex.h"
 #include <set>
 #include <sstream>
@@ -142,7 +144,11 @@ std::string TemporaryFile::tempName()
 	unsigned long n = count++;
 	mutex.unlock();
 	name << Path::temp();
+#if defined(POCO_VXWORKS)
+	name << "tmp";
+#else
 	name << "tmp" << Process::id();
+#endif
 	for (int i = 0; i < 6; ++i)
 	{
 		name << char('a' + (n % 26));

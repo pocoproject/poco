@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketImpl.cpp#1 $
+// $Id: //poco/1.4/Net/src/SocketImpl.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -108,7 +108,11 @@ void SocketImpl::connect(const SocketAddress& address)
 	int rc;
 	do
 	{
+#if defined(POCO_VXWORKS)
+		rc = ::connect(_sockfd, (sockaddr*) address.addr(), address.length());
+#else
 		rc = ::connect(_sockfd, address.addr(), address.length());
+#endif
 	}
 	while (rc != 0 && lastError() == POCO_EINTR);
 	if (rc != 0) 
@@ -128,7 +132,11 @@ void SocketImpl::connect(const SocketAddress& address, const Poco::Timespan& tim
 	setBlocking(false);
 	try
 	{
+#if defined(POCO_VXWORKS)
+		int rc = ::connect(_sockfd, (sockaddr*) address.addr(), address.length());
+#else
 		int rc = ::connect(_sockfd, address.addr(), address.length());
+#endif
 		if (rc != 0)
 		{
 			int err = lastError();
@@ -156,7 +164,11 @@ void SocketImpl::connectNB(const SocketAddress& address)
 		init(address.af());
 	}
 	setBlocking(false);
+#if defined(POCO_VXWORKS)
+	int rc = ::connect(_sockfd, (sockaddr*) address.addr(), address.length());
+#else
 	int rc = ::connect(_sockfd, address.addr(), address.length());
+#endif
 	if (rc != 0)
 	{
 		int err = lastError();
@@ -177,7 +189,11 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 		setReuseAddress(true);
 		setReusePort(true);
 	}
+#if defined(POCO_VXWORKS)
+	int rc = ::bind(_sockfd, (sockaddr*) address.addr(), address.length());
+#else
 	int rc = ::bind(_sockfd, address.addr(), address.length());
+#endif
 	if (rc != 0) error(address.toString());
 }
 
@@ -288,7 +304,11 @@ int SocketImpl::sendTo(const void* buffer, int length, const SocketAddress& addr
 	int rc;
 	do
 	{
+#if defined(POCO_VXWORKS)
+		rc = ::sendto(_sockfd, (char*) buffer, length, flags, (sockaddr*) address.addr(), address.length());
+#else
 		rc = ::sendto(_sockfd, reinterpret_cast<const char*>(buffer), length, flags, address.addr(), address.length());
+#endif
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
@@ -613,8 +633,12 @@ void SocketImpl::setOption(int level, int option, const Poco::Timespan& value)
 void SocketImpl::setRawOption(int level, int option, const void* value, poco_socklen_t length)
 {
 	poco_assert (_sockfd != POCO_INVALID_SOCKET);
-	
+
+#if defined(POCO_VXWORKS)
+	int rc = ::setsockopt(_sockfd, level, option, (char*) value, length);
+#else	
 	int rc = ::setsockopt(_sockfd, level, option, reinterpret_cast<const char*>(value), length);
+#endif
 	if (rc == -1) error();
 }
 
@@ -827,6 +851,8 @@ void SocketImpl::ioctl(int request, int& arg)
 {
 #if defined(_WIN32)
 	int rc = ioctlsocket(_sockfd, request, reinterpret_cast<u_long*>(&arg));
+#elif defined(POCO_VXWORKS)
+	int rc = ::ioctl(_sockfd, request, (int) &arg);
 #else
 	int rc = ::ioctl(_sockfd, request, &arg);
 #endif
@@ -838,6 +864,8 @@ void SocketImpl::ioctl(int request, void* arg)
 {
 #if defined(_WIN32)
 	int rc = ioctlsocket(_sockfd, request, reinterpret_cast<u_long*>(arg));
+#elif defined(POCO_VXWORKS)
+	int rc = ::ioctl(_sockfd, request, (int) arg);
 #else
 	int rc = ::ioctl(_sockfd, request, arg);
 #endif

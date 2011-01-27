@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.4/Net/src/MessageHeader.cpp#2 $
+// $Id: //poco/1.4/Net/src/MessageHeader.cpp#3 $
 //
 // Library: Net
 // Package: Messages
@@ -112,6 +112,7 @@ void MessageHeader::read(std::istream& istr)
 			else if (ch != eof)
 				throw MessageException("Folded field value too long/no CRLF found");
 		}
+		Poco::trimRightInPlace(value);
 		add(name, value);
 	}
 	istr.putback(ch);

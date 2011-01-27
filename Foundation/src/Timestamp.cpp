@@ -1,7 +1,7 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timestamp.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Timestamp.cpp#2 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -40,8 +40,12 @@
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <time.h>
 #include <unistd.h>
+#if defined(POCO_VXWORKS)
+#include <timers.h>
+#else
 #include <sys/time.h>
 #include <sys/times.h>
+#endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/UnWindows.h"
 #if defined(_WIN32_WCE)
@@ -233,6 +237,13 @@ void Timestamp::update()
 	ts.HighPart = ft.dwHighDateTime;
 	ts.QuadPart -= epoch.QuadPart;
 	_ts = ts.QuadPart/10;
+
+#elif defined(POCO_VXWORKS)
+
+	struct timespec ts;
+	if (clock_gettime(CLOCK_REALTIME, &ts))
+		throw SystemException("cannot get time of day");
+	_ts = TimeVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
 
 #else
 

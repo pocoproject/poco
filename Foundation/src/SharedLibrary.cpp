@@ -1,7 +1,7 @@
 //
 // SharedLibrary.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/SharedLibrary.cpp#2 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -40,6 +40,8 @@
 
 #if defined(hpux) || defined(_hpux)
 #include "SharedLibrary_HPUX.cpp"
+#elif defined(POCO_VXWORKS)
+#include "SharedLibrary_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "SharedLibrary_UNIX.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)

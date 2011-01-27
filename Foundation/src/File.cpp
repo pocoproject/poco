@@ -1,7 +1,7 @@
 //
 // File.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/File.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -47,6 +47,8 @@
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "File_WIN32.cpp"
+#elif defined(POCO_VXWORKS)
+#include "File_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "File_UNIX.cpp"
 #else

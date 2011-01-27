@@ -1,7 +1,7 @@
 //
 // DynamicAnyTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DynamicAnyTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DynamicAnyTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -972,6 +972,60 @@ void DynamicAnyTest::testString()
 }
 
 
+void DynamicAnyTest::testString2()
+{
+	DynamicAny a1("-32");
+	
+	assert (a1.type() == typeid(std::string));
+
+	std::string s1;
+	Poco::Int8 s2;
+	Poco::Int16 s3;
+	Poco::Int32 s4;
+	Poco::Int64 s5;
+	float s10;
+	double s11;
+	bool s12;
+	char s13;
+	a1.convert(s1);
+	a1.convert(s2);
+	a1.convert(s3);
+	a1.convert(s4);
+	a1.convert(s5);
+	a1.convert(s10);
+	a1.convert(s11);
+	a1.convert(s12);
+	a1.convert(s13);
+	long s14;
+	unsigned long s15;
+	a1.convert(s14);
+	a1.convert(s15);
+	assert (s14 == -32);
+	assert (s15 == -32);
+	assert (s1 == "-32");
+	assert (s2 == -32);
+	assert (s3 == -32);
+	assert (s4 == -32);
+	assert (s5 == -32);
+	assert (s10 == -32.0f);
+	assert (s11 == -32.0);
+	assert (s12);
+	assert (s13 == '-');
+
+	const std::string& value = a1.extract<std::string>();
+	assert (value == "-32");
+	
+	try
+	{
+		Int16 value2; value2 = a1.extract<Int16>();
+		fail("bad cast - must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+}
+
+
 void DynamicAnyTest::testLong()
 {
 	long src = 32;
@@ -1251,6 +1305,7 @@ CppUnit::Test* DynamicAnyTest::suite()
 	CppUnit_addTest(pSuite, DynamicAnyTest, testFloat);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testDouble);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testString);
+	CppUnit_addTest(pSuite, DynamicAnyTest, testString2);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testLong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testULong);
 	CppUnit_addTest(pSuite, DynamicAnyTest, testConversionOperator);

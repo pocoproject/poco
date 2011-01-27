@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.4/Util/src/Application.cpp#1 $
+// $Id: //poco/1.4/Util/src/Application.cpp#2 $
 //
 // Library: Util
 // Package: Application
@@ -384,7 +384,7 @@ void Application::processOptions()
 
 void Application::getApplicationPath(Poco::Path& appPath) const
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	if (_command.find('/') != std::string::npos)
 	{
 		Path path(_command);

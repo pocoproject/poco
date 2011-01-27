@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/IPAddress.cpp#1 $
+// $Id: //poco/1.4/Net/src/IPAddress.cpp#2 $
 //
 // Library: Net
 // Package: NetCore
@@ -232,9 +232,9 @@ public:
 		else
 			return new IPv4AddressImpl(&ia);
 #else
-#if __GNUC__ < 3
+#if __GNUC__ < 3 || defined(POCO_VXWORKS)
 		struct in_addr ia;
-		ia.s_addr = inet_addr(addr.c_str());
+		ia.s_addr = inet_addr(const_cast<char*>(addr.c_str()));
 		if (ia.s_addr == INADDR_NONE && addr != "255.255.255.255")
 			return 0;
 		else

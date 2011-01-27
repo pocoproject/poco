@@ -1,7 +1,7 @@
 //
 // HTTPRequestTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPRequestTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPRequestTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -142,6 +142,25 @@ void HTTPRequestTest::testRead3()
 }
 
 
+void HTTPRequestTest::testRead4()
+{
+	std::string s("POST /test.cgi HTTP/1.1\r\nConnection: Close\r\nContent-Length:   100  \r\nContent-Type: text/plain\r\nHost: localhost:8000\r\nUser-Agent: Poco\r\n\r\n");
+	std::istringstream istr(s);
+	HTTPRequest request;
+	request.read(istr);
+	assert (request.getMethod() == HTTPRequest::HTTP_POST);
+	assert (request.getURI() == "/test.cgi");
+	assert (request.getVersion() == HTTPMessage::HTTP_1_1);
+	assert (request.size() == 5);
+	assert (request["Connection"] == "Close");
+	assert (request["Host"] == "localhost:8000");
+	assert (request["User-Agent"] == "Poco");
+	assert (request.getContentType() == "text/plain");
+	assert (request.getContentLength() == 100);
+	assert (istr.get() == -1);
+}
+
+
 void HTTPRequestTest::testInvalid1()
 {
 	std::string s(256, 'x');
@@ -237,6 +256,7 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead1);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead3);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testRead4);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid1);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid3);

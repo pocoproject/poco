@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.4/Util/src/ServerApplication.cpp#1 $
+// $Id: //poco/1.4/Util/src/ServerApplication.cpp#2 $
 //
 // Library: Util
 // Package: Application
@@ -39,12 +39,14 @@
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/OptionException.h"
 #include "Poco/Exception.h"
+#if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
-#include "Poco/NumberFormatter.h"
 #include "Poco/NamedEvent.h"
+#endif
+#include "Poco/NumberFormatter.h"
 #include "Poco/Logger.h"
 #include "Poco/String.h"
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/TemporaryFile.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -64,8 +66,6 @@
 #endif
 
 
-using Poco::NamedEvent;
-using Poco::Process;
 using Poco::NumberFormatter;
 using Poco::Exception;
 using Poco::SystemException;
@@ -118,8 +118,10 @@ void ServerApplication::terminate()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	_terminate.set();
+#elif defined(POCO_VXWORKS)
+	_terminate.set();
 #else
-	Process::requestTermination(Process::id());
+	Poco::Process::requestTermination(Process::id());
 #endif
 }
 
@@ -246,6 +248,42 @@ int ServerApplication::run(int argc, char** argv)
 		try
 		{
 			init(argc, argv);
+			switch (_action)
+			{
+			case SRV_REGISTER:
+				registerService();
+				rc = EXIT_OK;
+				break;
+			case SRV_UNREGISTER:
+				unregisterService();
+				rc = EXIT_OK;
+				break;
+			default:
+				rc = run();
+			}
+		}
+		catch (Exception& exc)
+		{
+			logger().log(exc);
+			rc = EXIT_SOFTWARE;
+		}
+		return rc;
+	}
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	if (!hasConsole() && isService())
+	{
+		return 0;
+	}
+	else 
+	{
+		int rc = EXIT_OK;
+		try
+		{
+			init(args);
 			switch (_action)
 			{
 			case SRV_REGISTER:
@@ -456,6 +494,31 @@ int ServerApplication::run(int argc, char** argv)
 }
 
 
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	try
+	{
+		init(args);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	int rc = run();
+	try
+	{
+		uninitialize();
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		rc = EXIT_CONFIG;
+	}
+	return rc;
+}
+
+
 #if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 int ServerApplication::run(int argc, wchar_t** argv)
 {
@@ -484,6 +547,52 @@ int ServerApplication::run(int argc, wchar_t** argv)
 
 
 #endif // _WIN32_WCE
+#elif defined(POCO_VXWORKS)
+//
+// VxWorks specific code
+//
+void ServerApplication::waitForTerminationRequest()
+{
+	_terminate.wait();
+}
+
+
+int ServerApplication::run(int argc, char** argv)
+{
+	try
+	{
+		init(argc, argv);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	return run();
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	try
+	{
+		init(args);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	return run();
+}
+
+
+void ServerApplication::defineOptions(OptionSet& options)
+{
+	Application::defineOptions(options);
+}
+
+
 #elif defined(POCO_OS_FAMILY_UNIX)
 
 
@@ -516,6 +625,39 @@ int ServerApplication::run(int argc, char** argv)
 	try
 	{
 		init(argc, argv);
+		if (runAsDaemon)
+		{
+			int rc = chdir("/");
+			if (rc != 0) return EXIT_OSERR;
+		}
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	return run();
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	bool runAsDaemon = false;
+	for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+	{
+		if (*it == "--daemon")
+		{
+			runAsDaemon = true;
+			break;
+		}
+	}		
+	if (runAsDaemon)
+	{
+		beDaemon();
+	}
+	try
+	{
+		init(args);
 		if (runAsDaemon)
 		{
 			int rc = chdir("/");
@@ -637,8 +779,8 @@ void ServerApplication::waitForTerminationRequest()
 	sys$qiow(0, ioChan, IO$_SETMODE | IO$M_CTRLCAST, 0, 0, 0, terminate, 0, 0, 0, 0, 0);
 
 	std::string evName("POCOTRM");
-	NumberFormatter::appendHex(evName, Process::id(), 8);
-	NamedEvent ev(evName);
+	NumberFormatter::appendHex(evName, Poco::Process::id(), 8);
+	Poco::NamedEvent ev(evName);
 	try
 	{
 		ev.wait();
@@ -657,6 +799,21 @@ int ServerApplication::run(int argc, char** argv)
 	try
 	{
 		init(argc, argv);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	return run();
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	try
+	{
+		init(args);
 	}
 	catch (Exception& exc)
 	{

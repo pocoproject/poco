@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Environment.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -42,6 +42,8 @@
 
 #if defined(POCO_OS_FAMILY_VMS)
 #include "Environment_VMS.cpp"
+#elif defined(POCO_VXWORKS)
+#include "Environment_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Environment_UNIX.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)

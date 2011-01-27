@@ -1,7 +1,7 @@
 //
 // Path_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path_UNIX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Path_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -41,7 +41,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#if !defined(POCO_VXWORKS)
 #include <pwd.h>
+#endif
 #include <climits>
 
 
@@ -69,6 +71,9 @@ std::string PathImpl::currentImpl()
 
 std::string PathImpl::homeImpl()
 {
+#if defined(POCO_VXWORKS)
+	return "/";
+#else
 	std::string path;
 	struct passwd* pwd = getpwuid(getuid());
 	if (pwd)
@@ -84,6 +89,7 @@ std::string PathImpl::homeImpl()
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] != '/') path.append("/");
 	return path;
+#endif
 }
 
 

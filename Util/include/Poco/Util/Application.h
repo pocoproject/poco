@@ -1,7 +1,7 @@
 //
 // Application.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/Application.h#1 $
+// $Id: //poco/1.4/Util/include/Poco/Util/Application.h#2 $
 //
 // Library: Util
 // Package: Application
@@ -50,6 +50,9 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/AutoPtr.h"
+#if defined(POCO_VXWORKS)
+#include <cstdarg>
+#endif
 #include <vector>
 #include <typeinfo>
 
@@ -471,6 +474,33 @@ inline Poco::Timespan Application::uptime() const
 		try									\
 		{									\
 			pApp->init(argc, argv);			\
+		}									\
+		catch (Poco::Exception& exc)		\
+		{									\
+			pApp->logger().log(exc);		\
+			return Poco::Util::Application::EXIT_CONFIG;\
+		}									\
+		return pApp->run();					\
+	}
+#elif defined(POCO_VXWORKS)
+	#define POCO_APP_MAIN(App) \
+	int pocoAppMain(const char* appName, ...) \
+	{ \
+		std::vector<std::string> args; \
+		args.push_back(std::string(appName)); \
+		va_list vargs; \
+		va_start(vargs, appName); \
+		const char* arg = va_arg(vargs, const char*); \
+		while (arg) \
+		{ \
+			args.push_back(std::string(arg)); \
+			arg = va_arg(vargs, const char*); \
+		} \
+		va_end(vargs); \
+		Poco::AutoPtr<App> pApp = new App;	\
+		try									\
+		{									\
+			pApp->init(args);			\
 		}									\
 		catch (Poco::Exception& exc)		\
 		{									\

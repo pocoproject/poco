@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#1 $
+// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -97,7 +97,7 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_address(address),
 	_index(index)
 {
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(POCO_VXWORKS)
 	if (index == -1) // IPv4
 	{
 		struct ifreq ifr;
@@ -483,6 +483,58 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 		throw;
 	}
 	delete [] reinterpret_cast<char*>(pAdapterInfo);
+
+	return result;
+}
+
+
+} } // namespace Poco::Net
+
+
+#elif defined(POCO_VXWORKS)
+//
+// VxWorks
+//
+
+
+namespace Poco {
+namespace Net {
+
+
+NetworkInterface::NetworkInterfaceList NetworkInterface::list()
+{
+	FastMutex::ScopedLock lock(_mutex);
+	NetworkInterfaceList result;
+
+	int ifIndex = 0;
+	char ifName[32];
+	char ifAddr[4];
+
+	for (;;)
+	{
+		if (ifIndexToIfName(ifIndex, ifName) == OK)
+		{
+			std::string name(ifName);
+			IPAddress addr;
+			IPAddress mask;
+			IPAddress bcst;
+			if (ifAddrGet(ifName, ifAddr) == OK)
+			{			
+				addr = IPAddress(ifAddr, sizeof(ifAddr));
+			}
+			int ifMask;
+			if (ifMaskGet(ifName, &ifMask) == OK)
+			{
+				mask = IPAddress(&ifMask, sizeof(ifMask));
+			}
+			if (ifBroadcastGet(ifName, ifAddr) == OK)
+			{
+				bcst = IPAddress(ifAddr, sizeof(ifAddr));
+			}
+			result.push_back(NetworkInterface(name, name, addr, mask, bcst));
+		}
+		else break;	
+	}
 
 	return result;
 }

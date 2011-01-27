@@ -1,7 +1,7 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketAddress.cpp#1 $
+// $Id: //poco/1.4/Net/src/SocketAddress.cpp#2 $
 //
 // Library: Net
 // Package: NetCore
@@ -390,11 +390,15 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 	}
 	else
 	{
+#if defined(POCO_VXWORKS)
+		throw ServiceNotFoundException(service);
+#else
 		struct servent* se = getservbyname(service.c_str(), NULL);
 		if (se)
 			return ntohs(se->s_port);
 		else
 			throw ServiceNotFoundException(service);
+#endif
 	}
 }
 

@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread_POSIX.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Thread_POSIX.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -164,7 +164,7 @@ private:
 
 	static CurrentThreadHolder _currentThreadHolder;
 	
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
 	friend class SignalHandler;
 #endif

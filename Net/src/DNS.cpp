@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#1 $
+// $Id: //poco/1.4/Net/src/DNS.cpp#2 $
 //
 // Library: Net
 // Package: NetCore
@@ -102,6 +102,14 @@ const HostEntry& DNS::hostByName(const std::string& hostname)
 			freeaddrinfo(pAI);
 			return res.first->second;
 		}
+#elif defined(POCO_VXWORKS)
+		static char buffer[2048];
+		struct hostent* he = resolvGetHostByName((char*) hostname.c_str(), buffer, sizeof(buffer));
+		if (he)
+		{
+			std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(hostname, HostEntry(he)));
+			return res.first->second;
+		}
 #else
 		struct hostent* he = gethostbyname(hostname.c_str());
 		if (he)
@@ -143,6 +151,14 @@ const HostEntry& DNS::hostByAddress(const IPAddress& address)
 				return res.first->second;
 			}
 		}
+	}
+#elif defined(POCO_VXWORKS)
+	char buffer[2048];
+	struct hostent* he = resolvGetHostByAddr(reinterpret_cast<const char*>(address.addr()), buffer, sizeof(buffer));
+	if (he)
+	{
+		std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(std::string(he->h_name), HostEntry(he)));
+		return res.first->second;
 	}
 #else
 	struct hostent* he = gethostbyaddr(reinterpret_cast<const char*>(address.addr()), address.length(), address.af());
@@ -207,6 +223,8 @@ int DNS::lastError()
 {
 #if defined(_WIN32)
 	return GetLastError();
+#elif defined(POCO_VXWORKS)
+	return errno;
 #else
 	return h_errno;
 #endif

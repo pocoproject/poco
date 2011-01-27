@@ -1,7 +1,7 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Debugger.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Debugger.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -40,7 +40,7 @@
 #include <cstdio>
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#include "Poco/UnWindows.h"
-#elif defined(POCO_OS_FAMILY_UNIX)
+#elif defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	#include <unistd.h>
 	#include <signal.h>
 #elif defined(POCO_OS_FAMILY_VMS)
@@ -78,6 +78,8 @@ bool Debugger::isAvailable()
 		#else
 			return IsDebuggerPresent() ? true : false;
 		#endif
+	#elif defined(POCO_VXWORKS)
+		return false;
 	#elif defined(POCO_OS_FAMILY_UNIX)
 		return std::getenv("POCO_ENABLE_DEBUGGER") ? true : false;
 	#elif defined(POCO_OS_FAMILY_VMS)
@@ -132,6 +134,10 @@ void Debugger::enter()
 	if (isAvailable())
 	{
 		DebugBreak();
+	}
+	#elif defined(POCO_VXWORKS)
+	{
+		// not supported
 	}
 	#elif defined(POCO_OS_FAMILY_UNIX)
 	if (isAvailable())

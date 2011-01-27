@@ -1,7 +1,7 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -117,7 +117,7 @@
 #elif defined(__VMS)
 	#define POCO_OS_FAMILY_VMS 1
 	#define POCO_OS POCO_OS_VMS
-#elif defined(VXWORKS)
+#elif defined(POCO_VXWORKS)
   #define POCO_OS_FAMILY_UNIX 1
   #define POCO_OS POCO_OS_VXWORKS
 #endif
@@ -164,7 +164,7 @@
 	#define POCO_ARCH POCO_ARCH_HPPA
 	#define POCO_ARCH_BIG_ENDIAN 1
 #elif defined(__PPC) || defined(__POWERPC__) || defined(__powerpc) || defined(__PPC__) || \
-      defined(__powerpc__) || defined(__ppc__) || defined(_ARCH_PPC) || defined(_M_PPC)
+      defined(__powerpc__) || defined(__ppc__) || defined(__ppc) || defined(_ARCH_PPC) || defined(_M_PPC)
 	#define POCO_ARCH POCO_ARCH_PPC
 	#define POCO_ARCH_BIG_ENDIAN 1
 #elif defined(_POWER) || defined(_ARCH_PWR) || defined(_ARCH_PWR2) || defined(_ARCH_PWR3) || \
@@ -187,7 +187,7 @@
 #elif defined(__s390__)
 	#define POCO_ARCH POCO_ARCH_S390
 	#define POCO_ARCH_BIG_ENDIAN 1
-#elif defined(__sh__)
+#elif defined(__sh__) || defined(__sh)
 	#define POCO_ARCH POCO_ARCH_SH
 	#if defined(__LITTLE_ENDIAN__)
 		#define POCO_ARCH_LITTLE_ENDIAN 1

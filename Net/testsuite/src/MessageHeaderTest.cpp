@@ -1,7 +1,7 @@
 //
 // MessageHeaderTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -125,7 +125,7 @@ void MessageHeaderTest::testRead4()
 
 void MessageHeaderTest::testRead5()
 {
-	std::string s("name1:\r\nname2: value2\r\nname3: value3\r\n");
+	std::string s("name1:\r\nname2: value2\r\nname3: value3  \r\n");
 	std::istringstream istr(s);
 	MessageHeader mh;
 	mh.read(istr);

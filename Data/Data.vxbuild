@@ -1,0 +1,32 @@
+#
+# Data.vxbuild
+#
+# $Id: //poco/1.4/Data/Data.vxbuild#1 $
+#
+TARGET=pocoData
+CFLAGS="-I../../../Foundation/include"
+SOURCES="
+	AbstractBinder.cpp
+	AbstractBinding.cpp
+	AbstractExtraction.cpp
+	AbstractExtractor.cpp
+	AbstractPreparation.cpp
+	AbstractPrepare.cpp
+	BLOB.cpp
+	BLOBStream.cpp
+	Connector.cpp
+	DataException.cpp
+	Limit.cpp
+	MetaColumn.cpp
+	PooledSessionHolder.cpp
+	PooledSessionImpl.cpp
+	Range.cpp
+	RecordSet.cpp
+	Session.cpp
+	SessionFactory.cpp
+	SessionImpl.cpp
+	SessionPool.cpp
+	Statement.cpp
+	StatementCreator.cpp
+	StatementImpl.cpp
+"

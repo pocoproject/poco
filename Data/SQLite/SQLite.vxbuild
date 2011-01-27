@@ -1,0 +1,29 @@
+#
+# SQLite.vxbuild
+#
+# $Id: //poco/1.4/Data/SQLite/SQLite.vxbuild#1 $
+#
+TARGET=pocoDataSQLite
+CFLAGS="-I../../../../Foundation/include \\
+	-I../../../../Data/include \\
+	-DSQLITE_THREADSAFE=1 \\
+	-DSQLITE_DISABLE_LFS \\
+	-DSQLITE_OMIT_UTF16 \\
+	-DSQLITE_OMIT_PROGRESS_CALLBACK \\
+	-DSQLITE_OMIT_COMPLETE \\
+	-DSQLITE_OMIT_TCL_VARIABLE \\
+	-DSQLITE_OMIT_DEPRECATED \\
+	-DSQLITE_OMIT_WAL \\
+	-DSQLITE_OMIT_LOAD_EXTENSION \\
+	-DSQLITE_HOMEGROWN_RECURSIVE_MUTEX \\
+	-DOS_VXWORKS=551"
+SOURCES="
+	Binder.cpp
+	Connector.cpp
+	Extractor.cpp
+	SQLiteException.cpp
+	SQLiteStatementImpl.cpp
+	SessionImpl.cpp
+	Utility.cpp
+	sqlite3.c
+"
