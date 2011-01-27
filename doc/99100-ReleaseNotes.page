@@ -42,6 +42,8 @@ AAAIntroduction
     will be available in release 1.4.2.
   - fixed SF# 3165918: Poco::DynamicAny fails to convert from string to float
   - fixed SF# 3165910: Poco::Net::MessageHeader does not accept HTTP conforming header
+  - made Poco::Task::cancel() virtual so that tasks can implement custom
+    cancellation behavior.
 
 
 !!!Release 1.4.0
