@@ -35,6 +35,13 @@ AAAIntroduction
     instead of istream.
   - it is now possible to specify additional MIME part header fields
     for a MIME part through the Poco::Net::PartSource class.
+  - upgraded SQLite to release 3.7.4
+  - added experimental VxWorks support for VxWorks 5.5.1/Tornado 2.2 and
+    newer. Please see the VxWorks Platform Notes in the reference documentation
+    for more information. Currently, the VxWorks is untested; full support
+    will be available in release 1.4.2.
+  - fixed SF# 3165918: Poco::DynamicAny fails to convert from string to float
+  - fixed SF# 3165910: Poco::Net::MessageHeader does not accept HTTP conforming header
 
 
 !!!Release 1.4.0
