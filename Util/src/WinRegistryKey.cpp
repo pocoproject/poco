@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#1 $
+// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#2 $
 //
 // Library: Util
 // Package: Windows
@@ -50,9 +50,10 @@ namespace Poco {
 namespace Util {
 
 
-WinRegistryKey::WinRegistryKey(const std::string& key, bool readOnly):
+WinRegistryKey::WinRegistryKey(const std::string& key, bool readOnly, REGSAM extraSam):
 	_hKey(0),
-	_readOnly(readOnly)
+	_readOnly(readOnly),
+	_extraSam(extraSam)
 {
 	std::string::size_type pos = key.find('\\');
 	if (pos != std::string::npos)
@@ -65,11 +66,12 @@ WinRegistryKey::WinRegistryKey(const std::string& key, bool readOnly):
 }
 
 
-WinRegistryKey::WinRegistryKey(HKEY hRootKey, const std::string& subKey, bool readOnly):
+WinRegistryKey::WinRegistryKey(HKEY hRootKey, const std::string& subKey, bool readOnly, REGSAM extraSam):
 	_hRootKey(hRootKey),
 	_subKey(subKey),
 	_hKey(0),
-	_readOnly(readOnly)
+	_readOnly(readOnly),
+	_extraSam(extraSam)
 {
 }
 
@@ -282,13 +284,13 @@ bool WinRegistryKey::exists()
 #if defined(POCO_WIN32_UTF8)
 	std::wstring usubKey;
 	Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
-	if (RegOpenKeyExW(_hRootKey, usubKey.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+	if (RegOpenKeyExW(_hRootKey, usubKey.c_str(), 0, KEY_READ | _extraSam, &hKey) == ERROR_SUCCESS)
 	{
 		RegCloseKey(hKey);
 		return true;
 	}
 #else
-	if (RegOpenKeyEx(_hRootKey, _subKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+	if (RegOpenKeyEx(_hRootKey, _subKey.c_str(), 0, KEY_READ | _extraSam, &hKey) != ERROR_SUCCESS)
 	{
 		RegCloseKey(hKey);
 		return true;
@@ -327,7 +329,7 @@ bool WinRegistryKey::exists(const std::string& name)
 #if defined(POCO_WIN32_UTF8)
 	std::wstring usubKey;
 	Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
-	if (RegOpenKeyExW(_hRootKey, usubKey.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+	if (RegOpenKeyExW(_hRootKey, usubKey.c_str(), 0, KEY_READ | _extraSam, &hKey) == ERROR_SUCCESS)
 	{
 		std::wstring uname;
 		Poco::UnicodeConverter::toUTF16(name, uname);
@@ -335,7 +337,7 @@ bool WinRegistryKey::exists(const std::string& name)
 		RegCloseKey(hKey);
 	}
 #else
-	if (RegOpenKeyEx(_hRootKey, _subKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+	if (RegOpenKeyEx(_hRootKey, _subKey.c_str(), 0, KEY_READ | _extraSam, &hKey) != ERROR_SUCCESS)
 	{
 		exists = RegQueryValueEx(hKey, name.c_str(), NULL, NULL, NULL, NULL) == ERROR_SUCCESS;
 		RegCloseKey(hKey);
@@ -354,23 +356,23 @@ void WinRegistryKey::open()
 		Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
 		if (_readOnly)
 		{
-			if (RegOpenKeyExW(_hRootKey, usubKey.c_str(), 0, KEY_READ, &_hKey) != ERROR_SUCCESS)
+			if (RegOpenKeyExW(_hRootKey, usubKey.c_str(), 0, KEY_READ | _extraSam, &_hKey) != ERROR_SUCCESS)
 				throw NotFoundException("Cannot open registry key: ", key());
 		}
 		else
 		{
-			if (RegCreateKeyExW(_hRootKey, usubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE, NULL, &_hKey, NULL) != ERROR_SUCCESS)
+			if (RegCreateKeyExW(_hRootKey, usubKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE | _extraSam, NULL, &_hKey, NULL) != ERROR_SUCCESS)
 				throw SystemException("Cannot open registry key: ", key());
 		}
 #else
 		if (_readOnly)
 		{
-			if (RegOpenKeyEx(_hRootKey, _subKey.c_str(), 0, KEY_READ, &_hKey) != ERROR_SUCCESS)
+			if (RegOpenKeyEx(_hRootKey, _subKey.c_str(), 0, KEY_READ | _extraSam, &_hKey) != ERROR_SUCCESS)
 				throw NotFoundException("Cannot open registry key: ", key());
 		}
 		else
 		{
-			if (RegCreateKeyEx(_hRootKey, _subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE, NULL, &_hKey, NULL) != ERROR_SUCCESS)
+			if (RegCreateKeyEx(_hRootKey, _subKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE | _extraSam, NULL, &_hKey, NULL) != ERROR_SUCCESS)
 				throw SystemException("Cannot open registry key: ", key());
 		}
 #endif

@@ -44,6 +44,9 @@ AAAIntroduction
   - fixed SF# 3165910: Poco::Net::MessageHeader does not accept HTTP conforming header
   - made Poco::Task::cancel() virtual so that tasks can implement custom
     cancellation behavior.
+  - added optional argument to Poco::Util::WinRegistryKey constructor
+    to specify additional flags (in addition to KEY_READ and KEY_WRITE)
+    for the samDesired argument of RegOpenKeyEx() or RegCreateKeyEx().
 
 
 !!!Release 1.4.0
