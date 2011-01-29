@@ -1,7 +1,7 @@
 //
 // AbstractEvent.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AbstractEvent.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/AbstractEvent.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -209,25 +209,16 @@ public:
 		/// the next notify. If one of the delegates throws an exception, the notify
 		/// method is immediately aborted and the exception is reported to the caller.
 	{
-		SharedPtr<TStrategy> ptrStrat;
-		bool enabled = false;
+		Poco::ScopedLockWithUnlock<TMutex> lock(_mutex);
 		
-		{
-			typename TMutex::ScopedLock lock(_mutex);
-			enabled = _enabled;
-			if (_enabled)
-			{
-				// thread-safeness: 
-				// copy should be faster and safer than blocking until
-				// execution ends
-				ptrStrat = new TStrategy(_strategy);
-			}
-		}
-
-		if (enabled)
-		{
-			ptrStrat->notify(pSender, args);
-		}
+		if (!_enabled) return;
+		
+		// thread-safeness: 
+		// copy should be faster and safer than blocking until
+		// execution ends
+		TStrategy strategy(_strategy);
+		lock.unlock();
+		strategy.notify(pSender, args);
 	}
 
 	ActiveResult<TArgs> notifyAsync(const void* pSender, const TArgs& args)

@@ -47,6 +47,8 @@ AAAIntroduction
   - added optional argument to Poco::Util::WinRegistryKey constructor
     to specify additional flags (in addition to KEY_READ and KEY_WRITE)
     for the samDesired argument of RegOpenKeyEx() or RegCreateKeyEx().
+  - improved Poco::BasicEvent::notify() performance by avoiding an unnecessary heap
+    allocation.  
 
 
 !!!Release 1.4.0

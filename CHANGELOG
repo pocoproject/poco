@@ -1,8 +1,8 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.4.1 (2011-01-28)
-============================
+Release 1.4.1 (2011-01-29)
+==========================
 
 - fixed SF# 3150223: Poco::BinaryReader cannot read std::vector correctly
 - fixed SF# 3146326: SharedMemory issue
@@ -45,7 +45,9 @@ Release 1.4.1 (2011-01-28)
 - added optional argument to Poco::Util::WinRegistryKey constructor
   to specify additional flags (in addition to KEY_READ and KEY_WRITE)
   for the samDesired argument of RegOpenKeyEx() or RegCreateKeyEx().
-  
+- improved Poco::BasicEvent::notify() performance by avoiding an unnecessary heap
+  allocation.  
+
 
 Release 1.4.0 (2010-12-14)
 ==========================
@@ -1452,4 +1454,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#9 $
+$Id: //poco/1.4/dist/CHANGELOG#10 $
