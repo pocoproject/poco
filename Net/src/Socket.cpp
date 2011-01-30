@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.4/Net/src/Socket.cpp#1 $
+// $Id: //poco/1.4/Net/src/Socket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -102,12 +102,13 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		struct epoll_event* eventLast = eventsIn;
 		for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
 		{
-			if (it->sockfd() != POCO_INVALID_SOCKET)
+			poco_socket_t sockfd = it->sockfd();
+			if (sockfd != POCO_INVALID_SOCKET)
 			{
 				struct epoll_event* e = eventsIn;
 				for (; e != eventLast; ++e)
 				{
-					if (reinterpret_cast<Socket*> (e->data.ptr)->sockfd() == it->sockfd())
+					if (reinterpret_cast<Socket*>(e->data.ptr)->sockfd() == sockfd)
 						break;
 				}
 				if (e == eventLast)
@@ -121,12 +122,13 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 
 		for (SocketList::iterator it = writeList.begin(); it != writeList.end(); ++it)
 		{
-			if (it->sockfd() != POCO_INVALID_SOCKET)
+			poco_socket_t sockfd = it->sockfd();
+			if (sockfd != POCO_INVALID_SOCKET)
 			{
 				struct epoll_event* e = eventsIn;
 				for (; e != eventLast; ++e)
 				{
-					if (reinterpret_cast<Socket*> (e->data.ptr)->sockfd() == it->sockfd())
+					if (reinterpret_cast<Socket*>(e->data.ptr)->sockfd() == sockfd)
 						break;
 				}
 				if (e == eventLast)
@@ -140,12 +142,13 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 
 		for (SocketList::iterator it = exceptList.begin(); it != exceptList.end(); ++it)
 		{
-			if (it->sockfd() != POCO_INVALID_SOCKET)
+			poco_socket_t sockfd = it->sockfd();
+			if (sockfd != POCO_INVALID_SOCKET)
 			{
 				struct epoll_event* e = eventsIn;
 				for (; e != eventLast; ++e)
 				{
-					if (reinterpret_cast<Socket*> (e->data.ptr)->sockfd() == it->sockfd())
+					if (reinterpret_cast<Socket*>(e->data.ptr)->sockfd() == sockfd)
 						break;
 				}
 				if (e == eventLast)
@@ -163,18 +166,21 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		{
 			char buf[1024];
 			strerror_r(errno, buf, sizeof(buf));
-
 			SocketImpl::error(std::string("Can't create epoll queue: ") + buf);
 		}
 
 		for (struct epoll_event* e = eventsIn; e != eventLast; ++e)
 		{
-			if (epoll_ctl(epollfd, EPOLL_CTL_ADD, reinterpret_cast<Socket*> (e->data.ptr)->sockfd(), e) < 0)
+			poco_socket_t sockfd = reinterpret_cast<Socket*>(e->data.ptr)->sockfd();
+			if (sockfd != POCO_INVALID_SOCKET)
 			{
-				char buf[1024];
-				strerror_r(errno, buf, sizeof(buf));
-				::close(epollfd);
-				SocketImpl::error(std::string("Can't insert socket to epoll queue: ") + buf);
+				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, e) < 0)
+				{
+					char buf[1024];
+					strerror_r(errno, buf, sizeof(buf));
+					::close(epollfd);
+					SocketImpl::error(std::string("Can't insert socket to epoll queue: ") + buf);
+				}
 			}
 		}
 	}

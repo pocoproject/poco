@@ -1,7 +1,7 @@
 //
 // NetException.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NetException.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/NetException.h#2 $
 //
 // Library: Net
 // Package: NetCore
@@ -50,6 +50,7 @@ namespace Net {
 
 POCO_DECLARE_EXCEPTION(Net_API, NetException, Poco::IOException)
 POCO_DECLARE_EXCEPTION(Net_API, InvalidAddressException, NetException)
+POCO_DECLARE_EXCEPTION(Net_API, InvalidSocketException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, ServiceNotFoundException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, ConnectionAbortedException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, ConnectionResetException, NetException)

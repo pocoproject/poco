@@ -1,7 +1,7 @@
 //
 // MediaTypeTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MediaTypeTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/MediaTypeTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -99,6 +99,38 @@ void MediaTypeTest::testMatch()
 }
 
 
+void MediaTypeTest::testMatchRange()
+{
+	MediaType mt1("Text/Plain");
+	MediaType mt2("text/plain");
+	MediaType mt3("text/xml");
+	MediaType mt4("image/jpg");
+	MediaType mt5("text/*");
+	MediaType mt6("*/*");
+	assert (mt1.matchesRange(mt5));
+	assert (mt2.matchesRange(mt5));
+	assert (mt3.matchesRange(mt5));
+	assert (!mt4.matchesRange(mt5));
+	assert (mt1.matchesRange(mt6));
+	assert (mt2.matchesRange(mt6));
+	assert (mt3.matchesRange(mt6));
+	assert (mt4.matchesRange(mt6));
+	
+	assert (mt5.matchesRange(mt1));
+	assert (mt5.matchesRange(mt2));
+	assert (mt5.matchesRange(mt3));
+	assert (!mt5.matchesRange(mt4));
+	
+	assert (mt1.matchesRange("text", "*"));
+	assert (mt2.matchesRange("text", "*"));
+	assert (mt3.matchesRange("text", "*"));
+	assert (!mt4.matchesRange("text", "*"));
+	
+	assert (mt1.matchesRange("*"));
+	assert (mt4.matchesRange("*"));
+}
+
+
 void MediaTypeTest::setUp()
 {
 }
@@ -116,6 +148,7 @@ CppUnit::Test* MediaTypeTest::suite()
 	CppUnit_addTest(pSuite, MediaTypeTest, testParse);
 	CppUnit_addTest(pSuite, MediaTypeTest, testToString);
 	CppUnit_addTest(pSuite, MediaTypeTest, testMatch);
+	CppUnit_addTest(pSuite, MediaTypeTest, testMatchRange);
 
 	return pSuite;
 }

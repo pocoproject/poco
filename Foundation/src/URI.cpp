@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URI.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/URI.cpp#2 $
 //
 // Library: Foundation
 // Package: URI
@@ -647,6 +647,14 @@ unsigned short URI::getWellKnownPort() const
 		return 389;
 	else if (_scheme == "https")
 		return 443;
+	else if (_scheme == "rtsp")
+		return 554;
+	else if (_scheme == "sip")
+		return 5060;
+	else if (_scheme == "sips")
+		return 5061;
+	else if (_scheme == "xmpp")
+		return 5222;
 	else
 		return 0;
 }

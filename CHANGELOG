@@ -47,6 +47,11 @@ Release 1.4.1 (2011-01-29)
   for the samDesired argument of RegOpenKeyEx() or RegCreateKeyEx().
 - improved Poco::BasicEvent::notify() performance by avoiding an unnecessary heap
   allocation.  
+- added additional well-known port numbers to Poco::URI: rtsp, sip, sips, xmpp.
+- added Poco::Net::MediaType::matchesRange()
+- improved invalid socket handling: a Poco::Net::InvalidSocketException is 
+  now thrown instead of an assertion when an operation is attempted on a closed or 
+  otherwise uninitialized socket.
 
 
 Release 1.4.0 (2010-12-14)
@@ -1454,4 +1459,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#10 $
+$Id: //poco/1.4/dist/CHANGELOG#12 $

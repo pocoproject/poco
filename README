@@ -21,6 +21,7 @@ build/                     the build system for Unix/OpenVMS and additional util
     rules/                 common build rules for all platforms
     scripts/               build and utility scripts
     vms/                   OpenVMS build system scripts
+    vxconfig/              VxWorks build configurations
 
 bin/                       all executables (dynamic link libraries on Windows)
 bin64/                     all 64-bit executables (and DLLs)
@@ -243,6 +244,14 @@ available:
 > ./configure --omit=NetSSL_OpenSSL,Crypto,Data/ODBC,Data/MySQL
 
 
+BUILDING FOR VXWORKS
+====================
+
+Please see the VxWorks Platform Notes in the Reference Documentation for
+more information. The Reference Documentation can be found online
+at <http://pocoproject.org/docs/>.
+
+
 BUILDING ON OPENVMS
 ===================
 
@@ -282,4 +291,4 @@ at <http://pocoproject.org>.
 
 
 --
-$Id: //poco/1.4/dist/README#2 $
+$Id: //poco/1.4/dist/README#3 $
