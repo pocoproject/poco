@@ -1,7 +1,7 @@
 //
 // Mutex_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Mutex_POSIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Mutex_POSIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -63,7 +63,7 @@ MutexImpl::MutexImpl()
 	pthread_mutexattr_init(&attr);
 #if defined(PTHREAD_MUTEX_RECURSIVE_NP)
 	pthread_mutexattr_settype_np(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
-#elif defined(PTHREAD_MUTEX_RECURSIVE)
+#elif !defined(POCO_VXWORKS) 
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 #endif
 	if (pthread_mutex_init(&_mutex, &attr))
@@ -81,7 +81,7 @@ MutexImpl::MutexImpl(bool fast)
 	pthread_mutexattr_init(&attr);
 #if defined(PTHREAD_MUTEX_RECURSIVE_NP)
 	pthread_mutexattr_settype_np(&attr, fast ? PTHREAD_MUTEX_NORMAL_NP : PTHREAD_MUTEX_RECURSIVE_NP);
-#elif defined(PTHREAD_MUTEX_RECURSIVE)
+#elif !defined(POCO_VXWORKS)
 	pthread_mutexattr_settype(&attr, fast ? PTHREAD_MUTEX_NORMAL : PTHREAD_MUTEX_RECURSIVE);
 #endif
 	if (pthread_mutex_init(&_mutex, &attr))

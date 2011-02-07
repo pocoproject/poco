@@ -1,6 +1,19 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 1.4.1p1 (2011-02-08)
+============================
+
+- Poco::Mutex is now a recursive mutex again on Linux
+  (this was caused by an unfortunate feature test for
+  PTHREAD_MUTEX_RECURSIVE which did not work on Linux
+  as PTHREAD_MUTEX_RECURSIVE is an enum value and not
+  a macro)
+- Poco::Net::SecureSocketImpl::abort() now simply shuts
+  down the underlying socket connection and does not free
+  the SSL object.
+
+
 Release 1.4.1 (2011-01-29)
 ==========================
 
@@ -1459,4 +1472,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#12 $
+$Id: //poco/1.4/dist/CHANGELOG#13 $

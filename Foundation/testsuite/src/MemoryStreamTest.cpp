@@ -1,7 +1,7 @@
 //
 // MemoryStreamTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/MemoryStreamTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/MemoryStreamTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -55,7 +55,7 @@ void MemoryStreamTest::testInput()
 	const char* data = "This is a test";
 	MemoryInputStream istr1(data, 14);
 	
-	char c = istr1.get();
+	int c = istr1.get();
 	assert (c == 'T');
 	c = istr1.get();
 	assert (c == 'h');
