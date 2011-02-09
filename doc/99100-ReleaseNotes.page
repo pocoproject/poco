@@ -11,9 +11,9 @@ AAAIntroduction
     PTHREAD_MUTEX_RECURSIVE which did not work on Linux
     as PTHREAD_MUTEX_RECURSIVE is an enum value and not
     a macro)
-  - Poco::Net::SecureSocketImpl::abort() now simply shuts
+  - Poco::Net::SecureSocketImpl::abort() now only shuts
     down the underlying socket connection and does not free
-    the SSL object.
+    the SSL object, due to multithreading issues.
 
 
 !!!Release 1.4.1

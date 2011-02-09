@@ -1,7 +1,7 @@
 //
 // Version.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Version.h#4 $
+// $Id: //poco/1.4/Foundation/include/Poco/Version.h#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -9,7 +9,7 @@
 //
 // Version information for the POCO C++ Libraries.
 //
-// Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -54,7 +54,7 @@
 //      Ax are alpha releases
 //      Bx are beta releases
 //
-#define POCO_VERSION 0x01040100
+#define POCO_VERSION 0x01040101
 
 
 #endif // Foundation_Version_INCLUDED
