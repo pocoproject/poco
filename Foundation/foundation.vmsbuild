@@ -42,6 +42,7 @@ HexBinaryDecoder
 HexBinaryEncoder
 InflatingStream
 Latin1Encoding
+Latin2Encoding
 Latin9Encoding
 Logger
 LoggingFactory

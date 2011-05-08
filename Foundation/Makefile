@@ -14,7 +14,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator \
 	Environment Event EventArgs ErrorHandler Exception FPEnvironment File Glob \
 	FileChannel Formatter FormattingChannel HexBinaryDecoder LineEndingConverter \
-	HexBinaryEncoder InflatingStream Latin1Encoding Latin9Encoding LogFile Logger \
+	HexBinaryEncoder InflatingStream Latin1Encoding Latin2Encoding Latin9Encoding LogFile Logger \
 	LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
 	MemoryPool MD2Engine MD4Engine MD5Engine Manifest Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
@@ -28,7 +28,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
 	TemporaryFile TextConverter TextEncoding TextIterator Thread ThreadLocal \
 	ThreadPool ThreadTarget ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
-	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1252Encoding \
+	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1250Encoding Windows1251Encoding Windows1252Encoding \
 	UTF8Encoding UnicodeConverter UUID UUIDGenerator Var VarHolder Void Format \
 	Pipe PipeImpl PipeStream SharedMemory FileStream Unicode UTF8String \
 	adler32 compress crc32 deflate gzio infback inffast inflate inftrees trees zutil \

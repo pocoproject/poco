@@ -50,6 +50,7 @@ set( BASE_SRCS
   src/HexBinaryEncoder.cpp
   src/InflatingStream.cpp
   src/Latin1Encoding.cpp
+  src/Latin2Encoding.cpp
   src/Latin9Encoding.cpp
   src/LineEndingConverter.cpp
   src/LocalDateTime.cpp
@@ -137,6 +138,8 @@ set( BASE_SRCS
   src/Var.cpp
   src/VarHolder.cpp
   src/Void.cpp
+  src/Windows1250Encoding.cpp
+  src/Windows1251Encoding.cpp
   src/Windows1252Encoding.cpp
   src/adler32.c
   src/compress.c
