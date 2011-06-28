@@ -1,7 +1,7 @@
 //
 // File2Page.cpp
 //
-// $Id: //poco/1.4/PageCompiler/File2Page/src/File2Page.cpp#1 $
+// $Id: //poco/1.4/PageCompiler/File2Page/src/File2Page.cpp#2 $
 //
 // An application that creates a Page Compiler source file from an
 // ordinary file.
@@ -251,6 +251,8 @@ protected:
 			return "text/css";
 		else if (ext == "js")
 			return "application/javascript";
+		else if (ext == "xml")
+			return "text/xml";
 		else
 			return "application/binary";
 	}

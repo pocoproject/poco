@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -49,10 +49,11 @@
 #	include <time.h>
 #endif
 
+
 //
 // Block SIGPIPE in main thread.
 //
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 namespace
 {
 	class SignalBlocker

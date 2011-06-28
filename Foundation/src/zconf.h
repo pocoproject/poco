@@ -3,7 +3,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id: //poco/1.4/Foundation/src/zconf.h#1 $ */
+/* @(#) $Id: //poco/1.4/Foundation/src/zconf.h#2 $ */
 
 #ifndef ZCONF_H
 #define ZCONF_H
@@ -301,7 +301,7 @@ typedef uLong FAR uLongf;
 #  define z_off_t long
 #endif
 
-#if defined(__OS400__)
+#if defined(__OS400__) || defined(POCO_VXWORKS)
 #  define NO_vsnprintf
 #endif
 

@@ -1,7 +1,7 @@
 //
 // DateTimeFormatterTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeFormatterTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeFormatterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -67,6 +67,21 @@ void DateTimeFormatterTest::testISO8601()
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FORMAT, -3600);
 	assert (str == "2005-01-08T12:30:00-01:00");
+}
+
+
+void DateTimeFormatterTest::testISO8601Frac()
+{
+	DateTime dt(2005, 1, 8, 12, 30, 00, 12, 34);
+
+	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT);
+	assert (str == "2005-01-08T12:30:00.012034Z");
+
+	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, 3600);
+	assert (str == "2005-01-08T12:30:00.012034+01:00");
+
+	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, -3600);
+	assert (str == "2005-01-08T12:30:00.012034-01:00");
 }
 
 
@@ -215,6 +230,7 @@ CppUnit::Test* DateTimeFormatterTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DateTimeFormatterTest");
 
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testISO8601);
+	CppUnit_addTest(pSuite, DateTimeFormatterTest, testISO8601Frac);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC822);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC1123);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testHTTP);

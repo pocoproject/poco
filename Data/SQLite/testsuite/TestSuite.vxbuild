@@ -1,0 +1,15 @@
+#
+# TestSuite.vxbuild
+#
+# $Id$
+#
+TARGET=SQLiteTestSuite
+CFLAGS="-I../../../../../Foundation/include \\
+	-I../../../../../Data/include \\
+	-I../../../../../Data/SQLite/include \\
+	-I../../../../../CppUnit/include"
+SOURCES="
+	Driver.cpp
+	SQLiteTest.cpp
+	SQLiteTestSuite.cpp
+"

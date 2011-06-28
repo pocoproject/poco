@@ -1,7 +1,7 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogChannel.cpp#1 $
+// $Id: //poco/1.4/Net/src/RemoteSyslogChannel.cpp#2 $
 //
 // Library: Net
 // Package: Logging
@@ -231,7 +231,7 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 	}
 	else if (name == PROP_FORMAT)
 	{
-		_bsdFormat = (value == "bsd");
+		_bsdFormat = (value == "bsd" || value == "rfc3164");
 	}
 	else
 	{
@@ -312,7 +312,7 @@ std::string RemoteSyslogChannel::getProperty(const std::string& name) const
 	}
 	else if (name == PROP_FORMAT)
 	{
-		return _bsdFormat ? "bsd" : "new";
+		return _bsdFormat ? "rfc3164" : "rfc5424";
 	}
 	else
 	{

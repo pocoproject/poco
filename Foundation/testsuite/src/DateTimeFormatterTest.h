@@ -1,7 +1,7 @@
 //
 // DateTimeFormatterTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeFormatterTest.h#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeFormatterTest.h#2 $
 //
 // Definition of the DateTimeFormatterTest class.
 //
@@ -47,6 +47,7 @@ public:
 	~DateTimeFormatterTest();
 
 	void testISO8601();
+	void testISO8601Frac();
 	void testRFC822();
 	void testRFC1123();
 	void testHTTP();

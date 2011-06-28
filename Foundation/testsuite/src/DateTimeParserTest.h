@@ -1,7 +1,7 @@
 //
 // DateTimeParserTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeParserTest.h#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeParserTest.h#2 $
 //
 // Definition of the DateTimeParserTest class.
 //
@@ -47,6 +47,7 @@ public:
 	~DateTimeParserTest();
 
 	void testISO8601();
+	void testISO8601Frac();
 	void testRFC822();
 	void testRFC1123();
 	void testHTTP();

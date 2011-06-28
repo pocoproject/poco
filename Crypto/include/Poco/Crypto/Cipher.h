@@ -1,7 +1,7 @@
 //
 // Cipher.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Cipher.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Cipher.h#2 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -112,9 +112,12 @@ public:
 	enum Encoding
 		/// Transport encoding to use for encryptString() and decryptString().
 	{
-		ENC_NONE,		/// Plain binary output
-		ENC_BASE64,		/// Base64-encoded output
-		ENC_BINHEX		/// BinHex-encoded output
+		ENC_NONE         = 0x00, /// Plain binary output
+		ENC_BASE64       = 0x01, /// Base64-encoded output
+		ENC_BINHEX       = 0x02, /// BinHex-encoded output
+		ENC_BASE64_NO_LF = 0x81, /// Base64-encoded output, no linefeeds
+		ENC_BINHEX_NO_LF = 0x82, /// BinHex-encoded output, no linefeeds
+		
 	};
 
 	virtual ~Cipher();

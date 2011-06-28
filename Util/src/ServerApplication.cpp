@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.4/Util/src/ServerApplication.cpp#2 $
+// $Id: //poco/1.4/Util/src/ServerApplication.cpp#3 $
 //
 // Library: Util
 // Package: Application
@@ -82,6 +82,9 @@ Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus; 
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
 #endif
+#endif
+#if defined(POCO_VXWORKS)
+Poco::Event ServerApplication::_terminate;
 #endif
 
 

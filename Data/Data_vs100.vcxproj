@@ -80,20 +80,26 @@
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">..\bin\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">..\bin\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">false</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">..\lib\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">..\lib\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">..\lib\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">..\lib\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">obj\$(Configuration)\</IntDir>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">PocoDatad</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">PocoDatamdd</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">PocoDatamtd</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">PocoData</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">PocoDatamd</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">PocoDatamt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">
     <ClCompile>
@@ -174,6 +180,7 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
+      <ProgramDataBaseFileName>..\lib\PocoDatamtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -222,6 +229,7 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
+      <ProgramDataBaseFileName>..\lib\PocoDatamdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -247,6 +255,7 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
+      <ProgramDataBaseFileName>..\lib\PocoDatamd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>

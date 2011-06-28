@@ -1,7 +1,7 @@
 //
 // Process.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Process.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -45,6 +45,8 @@
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Process_WIN32.cpp"
+#elif defined(POCO_VXWORKS)
+#include "Process_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Process_UNIX.cpp"
 #else

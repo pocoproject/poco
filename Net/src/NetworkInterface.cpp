@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#2 $
+// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -421,8 +421,8 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 					if (rc) displayName = displayNameBuffer;
 #endif
 					result.push_back(NetworkInterface(name, displayName, addr, pAddress->Ipv6IfIndex));
-					pAddress = pAddress->Next;
 				}
+				pAddress = pAddress->Next;
 			}
 		}
 		else throw NetException("cannot get network adapter list");

@@ -1,7 +1,7 @@
 //
 // CoreTestSuite.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/CoreTestSuite.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/CoreTestSuite.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -38,7 +38,9 @@
 #include "ByteOrderTest.h"
 #include "StringTest.h"
 #include "StringTokenizerTest.h"
+#ifndef POCO_VXWORKS
 #include "FPETest.h"
+#endif
 #include "RegularExpressionTest.h"
 #include "NDCTest.h"
 #include "NumberFormatterTest.h"
@@ -49,7 +51,9 @@
 #include "DynamicAnyTest.h"
 #include "FormatTest.h"
 #include "TuplesTest.h"
+#ifndef POCO_VXWORKS
 #include "NamedTuplesTest.h"
+#endif
 #include "TypeListTest.h"
 
 
@@ -64,7 +68,9 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(ByteOrderTest::suite());
 	pSuite->addTest(StringTest::suite());
 	pSuite->addTest(StringTokenizerTest::suite());
+#ifndef POCO_VXWORKS
 	pSuite->addTest(FPETest::suite());
+#endif
 	pSuite->addTest(RegularExpressionTest::suite());
 	pSuite->addTest(NDCTest::suite());
 	pSuite->addTest(NumberFormatterTest::suite());
@@ -75,7 +81,9 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(DynamicAnyTest::suite());
 	pSuite->addTest(FormatTest::suite());
 	pSuite->addTest(TuplesTest::suite());
+#ifndef POCO_VXWORKS
 	pSuite->addTest(NamedTuplesTest::suite());
+#endif
 	pSuite->addTest(TypeListTest::suite());
 
 	return pSuite;

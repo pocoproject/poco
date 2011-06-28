@@ -1,7 +1,7 @@
 //
 // Path.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Path.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Path.h#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -241,6 +241,9 @@ public:
 		
 	void popDirectory();
 		/// Removes the last directory from the directory list.
+		
+	void popFrontDirectory();
+		/// Removes the first directory from the directory list.
 		
 	void setFileName(const std::string& name);
 		/// Sets the filename.

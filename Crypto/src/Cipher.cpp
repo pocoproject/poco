@@ -1,7 +1,7 @@
 //
 // Cipher.cpp
 //
-// $Id: //poco/1.4/Crypto/src/Cipher.cpp#1 $
+// $Id: //poco/1.4/Crypto/src/Cipher.cpp#2 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -93,16 +93,26 @@ void Cipher::encrypt(std::istream& source, std::ostream& sink, Encoding encoding
 		break;
 
 	case ENC_BASE64:
+	case ENC_BASE64_NO_LF:
 		{
 			Poco::Base64Encoder encoder(sink);
+			if (encoding == ENC_BASE64_NO_LF)
+			{
+				encoder.rdbuf()->setLineLength(0);
+			}
 			StreamCopier::copyStream(encryptor, encoder);
 			encoder.close();
 		}
 		break;
 
 	case ENC_BINHEX:
+	case ENC_BINHEX_NO_LF:
 		{
 			Poco::HexBinaryEncoder encoder(sink);
+			if (encoding == ENC_BINHEX_NO_LF)
+			{
+				encoder.rdbuf()->setLineLength(0);
+			}
 			StreamCopier::copyStream(encryptor, encoder);
 			encoder.close();
 		}
@@ -126,6 +136,7 @@ void Cipher::decrypt(std::istream& source, std::ostream& sink, Encoding encoding
 		break;
 
 	case ENC_BASE64:
+	case ENC_BASE64_NO_LF:
 		{
 			Poco::Base64Decoder decoder(source);
 			StreamCopier::copyStream(decoder, decryptor);
@@ -134,6 +145,7 @@ void Cipher::decrypt(std::istream& source, std::ostream& sink, Encoding encoding
 		break;
 
 	case ENC_BINHEX:
+	case ENC_BINHEX_NO_LF:
 		{
 			Poco::HexBinaryDecoder decoder(source);
 			StreamCopier::copyStream(decoder, decryptor);

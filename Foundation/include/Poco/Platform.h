@@ -1,7 +1,7 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -139,6 +139,7 @@
 #define POCO_ARCH_M68K    0x0b
 #define POCO_ARCH_S390    0x0c
 #define POCO_ARCH_SH      0x0d
+#define POCO_ARCH_NIOS2   0x0e
 
 
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
@@ -194,6 +195,14 @@
 	#else
 		#define POCO_ARCH_BIG_ENDIAN 1
 	#endif
+#elif defined (nios2) || defined(__nios2) || defined(__nios2__)
+    #define POCO_ARCH POCO_ARCH_NIOS2
+    #if defined(__nios2_little_endian) || defined(nios2_little_endian) || defined(__nios2_little_endian__)
+		#define POCO_ARCH_LITTLE_ENDIAN 1
+	#else
+		#define POCO_ARCH_BIG_ENDIAN 1
+	#endif
+
 #endif
 
 

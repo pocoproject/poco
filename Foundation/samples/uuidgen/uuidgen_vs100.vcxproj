@@ -80,24 +80,30 @@
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">bin\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">bin\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">false</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">bin\static_mt\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">bin\static_mt\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">false</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">bin\static_md\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">true</LinkIncremental>
-    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">obj\$(Configuration)\</OutDir>
+    <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">bin\static_md\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">false</LinkIncremental>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">uuidgend</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_md|Win32&apos;">uuidgend</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_static_mt|Win32&apos;">uuidgend</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_shared|Win32&apos;">uuidgen</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_md|Win32&apos;">uuidgen</TargetName>
+    <TargetName Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;release_static_mt|Win32&apos;">uuidgen</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">
     <ClCompile>

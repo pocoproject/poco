@@ -1,7 +1,7 @@
 //
 // SocketDefs.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketDefs.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/SocketDefs.h#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -47,6 +47,7 @@
 #define POCO_INVALID_SOCKET  INVALID_SOCKET
 #define poco_socket_t        SOCKET
 #define poco_socklen_t       int
+#define poco_ioctl_request_t int
 #define poco_closesocket(s)  closesocket(s)
 #define POCO_EINTR           WSAEINTR
 #define POCO_EACCES          WSAEACCES
@@ -100,6 +101,7 @@
 #define POCO_INVALID_SOCKET  -1
 #define poco_socket_t        int
 #define poco_socklen_t       int
+#define poco_ioctl_request_t int
 #define poco_closesocket(s)  ::close(s)
 #define POCO_EINTR           EINTR
 #define POCO_EACCES          EACCES
@@ -168,6 +170,11 @@
 #define POCO_INVALID_SOCKET  -1
 #define poco_socket_t        int
 #define poco_socklen_t       socklen_t
+#if defined(POCO_OS_FAMILY_BSD)
+#define poco_ioctl_request_t unsigned long
+#else
+#define poco_ioctl_request_t int
+#endif
 #define poco_closesocket(s)  ::close(s)
 #define POCO_EINTR           EINTR
 #define POCO_EACCES          EACCES

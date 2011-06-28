@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Path.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -522,6 +522,15 @@ void Path::popDirectory()
 	poco_assert (!_dirs.empty());
 	
 	_dirs.pop_back();
+}
+
+
+void Path::popFrontDirectory()
+{
+	poco_assert (!_dirs.empty());
+	
+	StringVec::iterator it = _dirs.begin();
+	_dirs.erase(it);
 }
 
 	

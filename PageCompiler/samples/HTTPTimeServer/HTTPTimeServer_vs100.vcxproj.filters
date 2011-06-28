@@ -2,14 +2,19 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Page Files">
-      <UniqueIdentifier>{013d5e12-a084-42fa-b81d-466d3c4973b5}</UniqueIdentifier>
+      <UniqueIdentifier>{208f41de-502b-41ff-800f-3e7f97a855ca}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{fb0c3ab5-46eb-45ba-9e85-a3741fe6007e}</UniqueIdentifier>
+      <UniqueIdentifier>{52d9bc4d-b9d1-41ac-be8b-c27c2dcc919b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Generated Files">
-      <UniqueIdentifier>{466507a4-1a09-4009-b1b6-f24bc7d4301e}</UniqueIdentifier>
+      <UniqueIdentifier>{78e5c433-48ef-4048-b01e-096b400754cf}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\TimeHandler.cpsp">
+      <Filter>Page Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HTTPTimeServerApp.cpp">
@@ -23,10 +28,5 @@
     <ClInclude Include="src\TimeHandler.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="src\TimeHandler.cpsp">
-      <Filter>Page Files</Filter>
-    </CustomBuild>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 //
 // Mutex_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Mutex_POSIX.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/Mutex_POSIX.cpp#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -42,6 +42,7 @@
 #include <unistd.h>
 #if defined(POCO_VXWORKS)
 #include <timers.h>
+#include <cstring>
 #else
 #include <sys/time.h>
 #endif
@@ -59,6 +60,13 @@ namespace Poco {
 
 MutexImpl::MutexImpl()
 {
+#if defined(POCO_VXWORKS)
+	// This workaround is for VxWorks 5.x where
+	// pthread_mutex_init() won't properly initialize the mutex
+	// resulting in a subsequent freeze in pthread_mutex_destroy()
+	// if the mutex has never been used.
+	std::memset(&_mutex, 0, sizeof(_mutex));
+#endif
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 #if defined(PTHREAD_MUTEX_RECURSIVE_NP)
@@ -77,6 +85,13 @@ MutexImpl::MutexImpl()
 
 MutexImpl::MutexImpl(bool fast)
 {
+#if defined(POCO_VXWORKS)
+	// This workaround is for VxWorks 5.x where
+	// pthread_mutex_init() won't properly initialize the mutex
+	// resulting in a subsequent freeze in pthread_mutex_destroy()
+	// if the mutex has never been used.
+	std::memset(&_mutex, 0, sizeof(_mutex));
+#endif
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 #if defined(PTHREAD_MUTEX_RECURSIVE_NP)

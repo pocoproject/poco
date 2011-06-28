@@ -1,7 +1,7 @@
 //
 // FoundationTestSuite.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FoundationTestSuite.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FoundationTestSuite.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -43,7 +43,9 @@
 #include "UUIDTestSuite.h"
 #include "TextTestSuite.h"
 #include "URITestSuite.h"
+#if !defined(POCO_VXWORKS)
 #include "ProcessesTestSuite.h"
+#endif
 #include "TaskTestSuite.h"
 #include "EventTestSuite.h"
 #include "CacheTestSuite.h"
@@ -66,7 +68,9 @@ CppUnit::Test* FoundationTestSuite::suite()
 	pSuite->addTest(UUIDTestSuite::suite());
 	pSuite->addTest(TextTestSuite::suite());
 	pSuite->addTest(URITestSuite::suite());
+#if !defined(POCO_VXWORKS)
 	pSuite->addTest(ProcessesTestSuite::suite());
+#endif
 	pSuite->addTest(TaskTestSuite::suite());
 	pSuite->addTest(EventTestSuite::suite());
 	pSuite->addTest(CacheTestSuite::suite());

@@ -1,44 +1,34 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="9.00"
 	Name="TestSuite"
+	Version="9.00"
+	ProjectType="Visual C++"
 	ProjectGUID="{E40E738C-447B-40F4-A878-EBA9A2459270}"
 	RootNamespace="TestSuite"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
-	>
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
-			Name="Digi JumpStart (ARMV4I)"
-		/>
+			Name="Digi JumpStart (ARMV4I)"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
+	<ToolFiles/>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -56,17 +46,13 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
@@ -78,58 +64,43 @@
 				ProgramDatabaseFile="bin\$(PlatformName)\shared\TestSuited.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -147,17 +118,13 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
@@ -170,58 +137,43 @@
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -239,17 +191,13 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
@@ -261,58 +209,43 @@
 				ProgramDatabaseFile="bin\$(PlatformName)\static_mt\TestSuited.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -333,17 +266,13 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
@@ -356,58 +285,43 @@
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -425,17 +339,13 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
@@ -447,58 +357,43 @@
 				ProgramDatabaseFile="bin\$(PlatformName)\static_md\TestSuited.pdb"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
-			>
+			CharacterSet="1">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
+				TargetEnvironment="1"/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -519,17 +414,13 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800"
 				CompileForArchitecture="2"
-				InterworkCalls="false"
-			/>
+				InterworkCalls="false"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCManagedResourceCompilerTool"/>
 			<Tool
-				Name="VCResourceCompilerTool"
-			/>
+				Name="VCResourceCompilerTool"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
@@ -542,280 +433,185 @@
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="0"
-			/>
+				TargetMachine="0"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCALinkTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCXDCMakeTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCBscMakeTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCFxCopTool"/>
 			<Tool
-				Name="VCCodeSignTool"
-			/>
+				Name="VCCodeSignTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
+				AdditionalFiles=""/>
+			<DebuggerTool/>
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
+	<References/>
 	<Files>
 		<Filter
-			Name="Application"
-			>
+			Name="Application">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files"/>
+			<Filter
+				Name="Source Files"/>
+		</Filter>
+		<Filter
+			Name="_Suite">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\src\UtilTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
+				<File
+					RelativePath=".\src\UtilTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="_Suite"
-			>
+			Name="_Driver">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\UtilTestSuite.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				>
-				<File
-					RelativePath=".\src\UtilTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\WinCEDriver.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="_Driver"
-			>
+			Name="Configuration">
 			<Filter
-				Name="Source Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\WinCEDriver.cpp"
-					>
-				</File>
+					RelativePath=".\src\AbstractConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\ConfigurationMapperTest.h"/>
+				<File
+					RelativePath=".\src\ConfigurationTestSuite.h"/>
+				<File
+					RelativePath=".\src\ConfigurationViewTest.h"/>
+				<File
+					RelativePath=".\src\FilesystemConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\IniFileConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\LayeredConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\LoggingConfiguratorTest.h"/>
+				<File
+					RelativePath=".\src\MapConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\PropertyFileConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\SystemConfigurationTest.h"/>
+				<File
+					RelativePath=".\src\XMLConfigurationTest.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\AbstractConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\ConfigurationMapperTest.cpp"/>
+				<File
+					RelativePath=".\src\ConfigurationTestSuite.cpp"/>
+				<File
+					RelativePath=".\src\ConfigurationViewTest.cpp"/>
+				<File
+					RelativePath=".\src\FilesystemConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\IniFileConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\LayeredConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\LoggingConfiguratorTest.cpp"/>
+				<File
+					RelativePath=".\src\MapConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\PropertyFileConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\SystemConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\XMLConfigurationTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Configuration"
-			>
+			Name="Options">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\AbstractConfigurationTest.h"
-					>
-				</File>
+					RelativePath=".\src\HelpFormatterTest.h"/>
 				<File
-					RelativePath=".\src\ConfigurationMapperTest.h"
-					>
-				</File>
+					RelativePath=".\src\OptionProcessorTest.h"/>
 				<File
-					RelativePath=".\src\ConfigurationTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\OptionSetTest.h"/>
 				<File
-					RelativePath=".\src\ConfigurationViewTest.h"
-					>
-				</File>
+					RelativePath=".\src\OptionsTestSuite.h"/>
 				<File
-					RelativePath=".\src\FilesystemConfigurationTest.h"
-					>
-				</File>
+					RelativePath=".\src\OptionTest.h"/>
 				<File
-					RelativePath=".\src\IniFileConfigurationTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\LayeredConfigurationTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\LoggingConfiguratorTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\MapConfigurationTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PropertyFileConfigurationTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SystemConfigurationTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\XMLConfigurationTest.h"
-					>
-				</File>
+					RelativePath=".\src\ValidatorTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\AbstractConfigurationTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\HelpFormatterTest.cpp"/>
 				<File
-					RelativePath=".\src\ConfigurationMapperTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\OptionProcessorTest.cpp"/>
 				<File
-					RelativePath=".\src\ConfigurationTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\OptionSetTest.cpp"/>
 				<File
-					RelativePath=".\src\ConfigurationViewTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\OptionsTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\FilesystemConfigurationTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\OptionTest.cpp"/>
 				<File
-					RelativePath=".\src\IniFileConfigurationTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\LayeredConfigurationTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\LoggingConfiguratorTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\MapConfigurationTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PropertyFileConfigurationTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SystemConfigurationTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\XMLConfigurationTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\ValidatorTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Options"
-			>
+			Name="Windows">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\HelpFormatterTest.h"
-					>
-				</File>
+					RelativePath=".\src\WinConfigurationTest.h"/>
 				<File
-					RelativePath=".\src\OptionProcessorTest.h"
-					>
-				</File>
+					RelativePath=".\src\WindowsTestSuite.h"/>
 				<File
-					RelativePath=".\src\OptionSetTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\OptionsTestSuite.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\OptionTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ValidatorTest.h"
-					>
-				</File>
+					RelativePath=".\src\WinRegistryTest.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\HelpFormatterTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\WinConfigurationTest.cpp"/>
 				<File
-					RelativePath=".\src\OptionProcessorTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\WindowsTestSuite.cpp"/>
 				<File
-					RelativePath=".\src\OptionSetTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\OptionsTestSuite.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\OptionTest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ValidatorTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\WinRegistryTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Timer"
-			>
+			Name="Timer">
 			<Filter
-				Name="Header Files"
-				>
+				Name="Header Files">
 				<File
-					RelativePath=".\src\TimerTest.h"
-					>
-				</File>
+					RelativePath=".\src\TimerTest.h"/>
 				<File
-					RelativePath=".\src\TimerTestSuite.h"
-					>
-				</File>
+					RelativePath=".\src\TimerTestSuite.h"/>
 			</Filter>
 			<Filter
-				Name="Source Files"
-				>
+				Name="Source Files">
 				<File
-					RelativePath=".\src\TimerTest.cpp"
-					>
-				</File>
+					RelativePath=".\src\TimerTest.cpp"/>
 				<File
-					RelativePath=".\src\TimerTestSuite.cpp"
-					>
-				</File>
+					RelativePath=".\src\TimerTestSuite.cpp"/>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals>
-	</Globals>
+	<Globals/>
 </VisualStudioProject>

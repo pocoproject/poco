@@ -1,7 +1,7 @@
 //
 // Path_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Path_UNIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -72,7 +72,10 @@ std::string PathImpl::currentImpl()
 std::string PathImpl::homeImpl()
 {
 #if defined(POCO_VXWORKS)
-	return "/";
+	if (EnvironmentImpl::hasImpl("HOME"))
+		return EnvironmentImpl::getImpl("HOME");
+	else
+		return "/";
 #else
 	std::string path;
 	struct passwd* pwd = getpwuid(getuid());
@@ -113,7 +116,11 @@ std::string PathImpl::tempImpl()
 
 std::string PathImpl::nullImpl()
 {
+#if defined(POCO_VXWORKS)
+	return "/null";
+#else
 	return "/dev/null";
+#endif
 }
 
 

@@ -1,7 +1,7 @@
 //
 // PathTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/PathTest.h#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/PathTest.h#2 $
 //
 // Definition of the PathTest class.
 //
@@ -72,6 +72,7 @@ public:
 	void testFind();
 	void testSwap();
 	void testResolve();
+	void testPushPop();
 
 	void setUp();
 	void tearDown();

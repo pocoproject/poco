@@ -1,7 +1,7 @@
 //
 // SocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketImpl.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/SocketImpl.h#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -349,10 +349,10 @@ public:
 		/// Returns the socket descriptor for the 
 		/// underlying native socket.
 	
-	void ioctl(int request, int& arg);
+	void ioctl(poco_ioctl_request_t request, int& arg);
 		/// A wrapper for the ioctl system call.
 
-	void ioctl(int request, void* arg);
+	void ioctl(poco_ioctl_request_t request, void* arg);
 		/// A wrapper for the ioctl system call.
 	
 	bool initialized() const;

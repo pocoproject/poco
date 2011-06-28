@@ -1,7 +1,7 @@
 //
 // Event_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Event_POSIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Event_POSIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -37,6 +37,7 @@
 #include "Poco/Event_POSIX.h"
 #if defined(POCO_VXWORKS)
 #include <timers.h>
+#include <cstring>
 #else
 #include <sys/time.h>
 #endif
@@ -47,6 +48,13 @@ namespace Poco {
 
 EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 {
+#if defined(POCO_VXWORKS)
+	// This workaround is for VxWorks 5.x where
+	// pthread_mutex_init() won't properly initialize the mutex
+	// resulting in a subsequent freeze in pthread_mutex_destroy()
+	// if the mutex has never been used.
+	std::memset(&_mutex, 0, sizeof(_mutex));
+#endif
 	if (pthread_mutex_init(&_mutex, NULL))
 		throw SystemException("cannot create event (mutex)");
 	if (pthread_cond_init(&_cond, NULL))

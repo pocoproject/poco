@@ -301,6 +301,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="..\lib\PocoFoundationmdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -373,6 +374,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="..\lib\PocoFoundationmtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -3390,7 +3392,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="mc -h &quot;$(InputDir).&quot; -r &quot;$(InputDir).&quot; &quot;$(InputPath)"
+							CommandLine="mc -h &quot;$(InputDir).&quot; -r &quot;$(InputDir).&quot; &quot;$(InputPath)&#x0D;&#x0A;"
 							Outputs="$(InputDir)\pocomsg.rc;$(InputDir)\pocomsg.h;"
 						/>
 					</FileConfiguration>

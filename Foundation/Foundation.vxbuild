@@ -1,7 +1,7 @@
 #
 # Foundation.vxbuild
 #
-# $Id: //poco/1.4/Foundation/Foundation.vxbuild#1 $
+# $Id: //poco/1.4/Foundation/Foundation.vxbuild#2 $
 #
 TARGET=pocoFoundation
 SOURCES="
@@ -81,6 +81,7 @@ SOURCES="
 	Path.cpp
 	PatternFormatter.cpp
 	PriorityNotificationQueue.cpp
+	Process.cpp
 	PurgeStrategy.cpp
 	RWLock.cpp
 	Random.cpp
@@ -143,4 +144,18 @@ SOURCES="
 	inftrees.c
 	trees.c 
 	zutil.c
+	pcre_chartables.c
+	pcre_compile.c
+	pcre_exec.c
+	pcre_fullinfo.c
+	pcre_globals.c
+	pcre_maketables.c
+	pcre_newline.c
+	pcre_ord2utf8.c
+	pcre_study.c
+	pcre_tables.c
+	pcre_try_flipped.c
+	pcre_ucd.c
+	pcre_valid_utf8.c
+	pcre_xclass.c
 "

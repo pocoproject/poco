@@ -1,6 +1,26 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 1.4.2 (2011-07-xx)
+==========================
+
+- added Poco::DateTimeFormat::ISO8601_FRAC_FORMAT
+- added new Poco::DateTimeFormatter and Poco::DateTimeParser format specifier:
+  %s for seconds with optional fractions of a second
+- fixed a problem with ioctl() on BSD platforms (including OS X) where the 
+  second argument to ioctl() is unsigned long instead of int, causing bad 
+  things on a OS X 64-bit kernel.
+- fixed a potential endless loop when enumerating IPv6 network addresses 
+  (reported by Laurent Carcagno)
+- new compile-time config option on Windows to set thread names in
+  debugger. Enable with -DPOCO_WIN32_DEBUGGER_THREAD_NAMES. Available
+  only in debug builds.
+- Cipher can now create Base64 and HexBinary encoded output without linefeeds 
+  (suitable for use in cookies, etc.)
+- added Poco::Path::popFrontDirectory()
+- improved VxWorks support
+
+
 Release 1.4.1p1 (2011-02-08)
 ============================
 
@@ -1472,4 +1492,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#14 $
+$Id: //poco/1.4/dist/CHANGELOG#15 $

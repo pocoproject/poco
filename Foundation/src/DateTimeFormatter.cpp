@@ -1,7 +1,7 @@
 //
 // DateTimeFormatter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTimeFormatter.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/DateTimeFormatter.cpp#2 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -73,6 +73,10 @@ void DateTimeFormatter::append(std::string& str, const DateTime& dateTime, const
 				case 'A': str.append(dateTime.isAM() ? "AM" : "PM"); break;
 				case 'M': NumberFormatter::append0(str, dateTime.minute(), 2); break;
 				case 'S': NumberFormatter::append0(str, dateTime.second(), 2); break;
+				case 's': NumberFormatter::append0(str, dateTime.second(), 2); 
+				          str += '.'; 
+				          NumberFormatter::append0(str, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); 
+				          break;
 				case 'i': NumberFormatter::append0(str, dateTime.millisecond(), 3); break;
 				case 'c': NumberFormatter::append(str, dateTime.millisecond()/100); break;
 				case 'F': NumberFormatter::append0(str, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); break;

@@ -1,7 +1,7 @@
 //
 // SystemConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/SystemConfigurationTest.cpp#1 $
+// $Id: //poco/1.4/Util/testsuite/src/SystemConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -38,7 +38,9 @@
 #include "Poco/Exception.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
+#if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
+#endif
 #include "Poco/NumberParser.h"
 #include <algorithm>
 
@@ -77,8 +79,10 @@ void SystemConfigurationTest::testProperties()
 	std::string dateTime = pConf->getString("system.dateTime");
 	assert (dateTime.size() == 20);
 	
+#if !defined(POCO_VXWORKS)
 	std::string pid = pConf->getString("system.pid");
 	assert (Poco::NumberParser::parse64(pid) == Poco::Process::id());
+#endif
 	
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	std::string home = pConf->getString("system.env.HOMEPATH");
@@ -99,7 +103,11 @@ void SystemConfigurationTest::testKeys()
 	assert (std::find(keys.begin(), keys.end(), "system") != keys.end());
 
 	pConf->keys("system", keys);
+#if defined(POCO_VXWORKS)
+	assert (keys.size() == 10);
+#else
 	assert (keys.size() == 11);
+#endif
 	assert (std::find(keys.begin(), keys.end(), "osName") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "osVersion") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "osArchitecture") != keys.end());
@@ -109,7 +117,9 @@ void SystemConfigurationTest::testKeys()
 	assert (std::find(keys.begin(), keys.end(), "homeDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "tempDir") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "dateTime") != keys.end());
+#if !defined(POCO_VXWORKS)
 	assert (std::find(keys.begin(), keys.end(), "pid") != keys.end());
+#endif
 	assert (std::find(keys.begin(), keys.end(), "env") != keys.end());
 }
 

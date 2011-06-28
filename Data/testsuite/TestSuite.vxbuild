@@ -1,0 +1,22 @@
+#
+# TestSuite.vxbuild
+#
+# $Id$
+#
+TARGET=DataTestSuite
+CFLAGS="-I../../../../Foundation/include \\
+	-I../../../../Data/include \\
+	-I../../../../CppUnit/include"
+SOURCES="
+	Binder.cpp
+	Connector.cpp
+	DataTest.cpp
+	DataTestSuite.cpp
+	Driver.cpp
+	Extractor.cpp
+	Preparation.cpp
+	SessionImpl.cpp
+	SessionPoolTest.cpp
+	StatementImpl.cpp
+	TestStatementImpl.cpp
+"

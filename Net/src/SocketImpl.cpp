@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketImpl.cpp#3 $
+// $Id: //poco/1.4/Net/src/SocketImpl.cpp#4 $
 //
 // Library: Net
 // Package: Sockets
@@ -848,7 +848,7 @@ void SocketImpl::initSocket(int af, int type, int proto)
 }
 
 
-void SocketImpl::ioctl(int request, int& arg)
+void SocketImpl::ioctl(poco_ioctl_request_t request, int& arg)
 {
 #if defined(_WIN32)
 	int rc = ioctlsocket(_sockfd, request, reinterpret_cast<u_long*>(&arg));
@@ -861,7 +861,7 @@ void SocketImpl::ioctl(int request, int& arg)
 }
 
 
-void SocketImpl::ioctl(int request, void* arg)
+void SocketImpl::ioctl(poco_ioctl_request_t request, void* arg)
 {
 #if defined(_WIN32)
 	int rc = ioctlsocket(_sockfd, request, reinterpret_cast<u_long*>(arg));
