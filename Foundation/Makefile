@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/Makefile#1 $
+# $Id: //poco/1.4/Foundation/Makefile#2 $
 #
 # Makefile for Poco Foundation
 #
@@ -16,7 +16,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel Base64Decoder Base64E
 	FileChannel Formatter FormattingChannel HexBinaryDecoder LineEndingConverter \
 	HexBinaryEncoder InflatingStream Latin1Encoding Latin9Encoding LogFile Logger \
 	LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
-	MemoryPool MD2Engine MD4Engine MD5Engine Manifest Message Mutex \
+	MemoryPool MD4Engine MD5Engine Manifest Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
 	NotificationQueue PriorityNotificationQueue TimedNotificationQueue \
 	NullStream NumberFormatter NumberParser AbstractObserver \

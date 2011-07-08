@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/testsuite/Makefile-Driver#1 $
+# $Id: //poco/1.4/Foundation/testsuite/Makefile-Driver#2 $
 #
 # Makefile for Poco Foundation testsuite
 #
@@ -18,7 +18,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	FoundationTestSuite HMACEngineTest HexBinaryTest LoggerTest \
 	LoggingFactoryTest LoggingRegistryTest LoggingTestSuite LogStreamTest \
 	NamedEventTest NamedMutexTest ProcessesTestSuite ProcessTest \
-	MemoryPoolTest MD2EngineTest MD4EngineTest MD5EngineTest ManifestTest \
+	MemoryPoolTest MD4EngineTest MD5EngineTest ManifestTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \

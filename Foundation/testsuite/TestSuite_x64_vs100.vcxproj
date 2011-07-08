@@ -337,7 +337,6 @@
     <ClCompile Include="src\CryptTestSuite.cpp" />
     <ClCompile Include="src\DigestStreamTest.cpp" />
     <ClCompile Include="src\HMACEngineTest.cpp" />
-    <ClCompile Include="src\MD2EngineTest.cpp" />
     <ClCompile Include="src\MD4EngineTest.cpp" />
     <ClCompile Include="src\MD5EngineTest.cpp" />
     <ClCompile Include="src\RandomStreamTest.cpp" />
@@ -467,7 +466,6 @@
     <ClInclude Include="src\CryptTestSuite.h" />
     <ClInclude Include="src\DigestStreamTest.h" />
     <ClInclude Include="src\HMACEngineTest.h" />
-    <ClInclude Include="src\MD2EngineTest.h" />
     <ClInclude Include="src\MD4EngineTest.h" />
     <ClInclude Include="src\MD5EngineTest.h" />
     <ClInclude Include="src\RandomStreamTest.h" />

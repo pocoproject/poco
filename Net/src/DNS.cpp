@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#2 $
+// $Id: //poco/1.4/Net/src/DNS.cpp#5 $
 //
 // Library: Net
 // Package: NetCore
@@ -39,6 +39,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Environment.h"
 #include "Poco/NumberFormatter.h"
+#include <cstring>
 
 
 using Poco::FastMutex;
@@ -76,96 +77,83 @@ namespace Poco {
 namespace Net {
 
 
-DNS::DNSCache DNS::_cache;
-Poco::FastMutex DNS::_mutex;
-
-
-const HostEntry& DNS::hostByName(const std::string& hostname)
+HostEntry DNS::hostByName(const std::string& hostname)
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
-	DNSCache::const_iterator it = _cache.find(hostname);
-	if (it != _cache.end())
+#if defined(POCO_HAVE_IPv6)
+	struct addrinfo* pAI;
+	struct addrinfo hints;
+	std::memset(&hints, 0, sizeof(hints));
+	hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
+	int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI); 
+	if (rc == 0)
 	{
-		return it->second;
+		HostEntry result(pAI);
+		freeaddrinfo(pAI);
+		return result;
 	}
 	else
 	{
-#if defined(_WIN32) && defined(POCO_HAVE_IPv6)
-		struct addrinfo* pAI;
-		struct addrinfo hints;
-		memset(&hints, 0, sizeof(hints));
-		hints.ai_flags = AI_CANONNAME;
-		if (getaddrinfo(hostname.c_str(), NULL, &hints, &pAI) == 0)
-		{
-			std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(hostname, HostEntry(pAI)));
-			freeaddrinfo(pAI);
-			return res.first->second;
-		}
-#elif defined(POCO_VXWORKS)
-		static char buffer[2048];
-		struct hostent* he = resolvGetHostByName((char*) hostname.c_str(), buffer, sizeof(buffer));
-		if (he)
-		{
-			std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(hostname, HostEntry(he)));
-			return res.first->second;
-		}
-#else
-		struct hostent* he = gethostbyname(hostname.c_str());
-		if (he)
-		{
-			std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(hostname, HostEntry(he)));
-			return res.first->second;
-		}
-#endif
+		aierror(rc, hostname);
 	}
+#elif defined(POCO_VXWORKS)
+	static char buffer[2048];
+	struct hostent* he = resolvGetHostByName((char*) hostname.c_str(), buffer, sizeof(buffer));
+	if (he)
+	{
+		return HostEntry(he);
+	}
+#else
+	struct hostent* he = gethostbyname(hostname.c_str());
+	if (he)
+	{
+		return HostEntry(he);
+	}
+#endif
 	error(lastError(), hostname);      // will throw an appropriate exception
 	throw NetException(); // to silence compiler
 }
 
 
-const HostEntry& DNS::hostByAddress(const IPAddress& address)
+HostEntry DNS::hostByAddress(const IPAddress& address)
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-#if defined(_WIN32) && defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6)
 	SocketAddress sa(address, 0);
 	static char fqname[1024];
-	if (getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, 0) == 0)
+	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD); 
+	if (rc == 0)
 	{
-		DNSCache::const_iterator it = _cache.find(std::string(fqname));
-		if (it != _cache.end())
+		struct addrinfo* pAI;
+		struct addrinfo hints;
+		std::memset(&hints, 0, sizeof(hints));
+		hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
+		rc = getaddrinfo(fqname, NULL, &hints, &pAI);
+		if (rc == 0)
 		{
-			return it->second;
+			HostEntry result(pAI);
+			freeaddrinfo(pAI);
+			return result;
 		}
 		else
 		{
-			struct addrinfo* pAI;
-			struct addrinfo hints;
-			memset(&hints, 0, sizeof(hints));
-			hints.ai_flags = AI_CANONNAME;
-			if (getaddrinfo(fqname, NULL, &hints, &pAI) == 0)
-			{
-				std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(std::string(fqname), HostEntry(pAI)));
-				freeaddrinfo(pAI);
-				return res.first->second;
-			}
+			aierror(rc, address.toString());
 		}
+	}
+	else
+	{
+		aierror(rc, address.toString());
 	}
 #elif defined(POCO_VXWORKS)
 	char buffer[2048];
 	struct hostent* he = resolvGetHostByAddr(reinterpret_cast<const char*>(address.addr()), buffer, sizeof(buffer));
 	if (he)
 	{
-		std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(std::string(he->h_name), HostEntry(he)));
-		return res.first->second;
+		return HostEntry(he);
 	}
 #else
 	struct hostent* he = gethostbyaddr(reinterpret_cast<const char*>(address.addr()), address.length(), address.af());
 	if (he)
 	{
-		std::pair<DNSCache::iterator, bool> res = _cache.insert(std::pair<std::string, HostEntry>(std::string(he->h_name), HostEntry(he)));
-		return res.first->second;
+		return HostEntry(he);
 	}
 #endif
 	int err = lastError();
@@ -174,7 +162,7 @@ const HostEntry& DNS::hostByAddress(const IPAddress& address)
 }
 
 
-const HostEntry& DNS::resolve(const std::string& address)
+HostEntry DNS::resolve(const std::string& address)
 {
 	IPAddress ip;
 	if (IPAddress::tryParse(address, ip))
@@ -194,7 +182,7 @@ IPAddress DNS::resolveOne(const std::string& address)
 }
 
 
-const HostEntry& DNS::thisHost()
+HostEntry DNS::thisHost()
 {
 	return hostByName(hostName());
 }
@@ -202,9 +190,6 @@ const HostEntry& DNS::thisHost()
 
 void DNS::flushCache()
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	_cache.clear();
 }
 
 
@@ -250,6 +235,33 @@ void DNS::error(int code, const std::string& arg)
 	default:
 		throw IOException(NumberFormatter::format(code));
 	}
+}
+
+
+void DNS::aierror(int code, const std::string& arg)
+{
+#if defined(POCO_HAVE_IPv6)
+	switch (code)
+	{
+	case EAI_AGAIN:
+		throw DNSException("Temporary DNS error while resolving", arg);
+	case EAI_FAIL:
+		throw DNSException("Non recoverable DNS error while resolving", arg);
+#if !defined(_WIN32) // EAI_NODATA and EAI_NONAME have the same value
+	case EAI_NODATA:
+		throw NoAddressFoundException(arg);
+#endif
+	case EAI_NONAME:
+		throw HostNotFoundException(arg);
+#if defined(EAI_SYSTEM)
+	case EAI_SYSTEM:
+		error(lastError(), arg);
+		break;
+#endif
+	default:
+		throw DNSException("EAI", NumberFormatter::format(code));
+	}
+#endif // POCO_HAVE_IPv6
 }
 
 

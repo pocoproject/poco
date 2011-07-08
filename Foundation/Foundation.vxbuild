@@ -1,7 +1,7 @@
 #
 # Foundation.vxbuild
 #
-# $Id: //poco/1.4/Foundation/Foundation.vxbuild#2 $
+# $Id: //poco/1.4/Foundation/Foundation.vxbuild#3 $
 #
 TARGET=pocoFoundation
 SOURCES="
@@ -62,7 +62,6 @@ SOURCES="
 	Logger.cpp
 	LoggingFactory.cpp
 	LoggingRegistry.cpp
-	MD2Engine.cpp
 	MD4Engine.cpp
 	MD5Engine.cpp
 	Manifest.cpp

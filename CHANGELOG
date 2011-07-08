@@ -19,6 +19,20 @@ Release 1.4.2 (2011-07-xx)
   (suitable for use in cookies, etc.)
 - added Poco::Path::popFrontDirectory()
 - improved VxWorks support
+- IPv6 fixes: added proper scope id handling in IPAddress, SocketAddress
+  and related classes.
+- Added Poco::Net::ServerSocket::bind6() which allows control over the
+  IPPROTO_IPV6/IPV6_V6ONLY socket option.
+- Removed Poco::MD2Engine class due to licensing issues (the 
+  license for the MD2 code from RSA only allows non-commercial
+  use). Note that the MD4 and MD5 code from RSA does not have
+  this issue.
+- fixed a Net HTTP client testsuite issue where some tests might
+  have failed due to prematurely aborted connections by
+  the HTTPTestServer.
+- Poco::Net::SocketAddress: when there is more than one address
+  returned by a DNS lookup for a name, IPv4 addresses will be
+  preferred to IPv6 ones.
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1492,4 +1506,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#15 $
+$Id: //poco/1.4/dist/CHANGELOG#16 $

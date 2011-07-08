@@ -846,10 +846,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\MD2EngineTest.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\MD4EngineTest.cpp"
 					>
 				</File>
@@ -883,10 +879,6 @@
 				</File>
 				<File
 					RelativePath=".\src\HMACEngineTest.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\MD2EngineTest.h"
 					>
 				</File>
 				<File

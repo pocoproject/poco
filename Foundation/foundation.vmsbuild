@@ -49,7 +49,6 @@ LoggingRegistry
 NamedEvent
 NamedMutex
 NullChannel
-MD2Engine
 MD4Engine
 MD5Engine
 Manifest

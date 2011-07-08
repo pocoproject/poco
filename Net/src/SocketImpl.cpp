@@ -1,7 +1,7 @@
 //
 // SocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketImpl.cpp#4 $
+// $Id: //poco/1.4/Net/src/SocketImpl.cpp#5 $
 //
 // Library: Net
 // Package: Sockets
@@ -195,6 +195,30 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 	int rc = ::bind(_sockfd, address.addr(), address.length());
 #endif
 	if (rc != 0) error(address.toString());
+}
+
+
+void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+#if defined(POCO_HAVE_IPv6)
+	if (address.family() != IPAddress::IPv6)
+		throw Poco::InvalidArgumentException("SocketAddress must be an IPv6 address");
+		
+	if (_sockfd == POCO_INVALID_SOCKET)
+	{
+		init(address.af());
+	}
+	setOption(IPPROTO_IPV6, IPV6_V6ONLY, ipV6Only ? 1 : 0);
+	if (reuseAddress)
+	{
+		setReuseAddress(true);
+		setReusePort(true);
+	}
+	int rc = ::bind(_sockfd, address.addr(), address.length());
+	if (rc != 0) error(address.toString());
+#else
+	throw Poco::NotImplementedException("No IPv6 support available");
+#endif
 }
 
 	

@@ -1,7 +1,7 @@
 //
 // HostEntry.cpp
 //
-// $Id: //poco/1.4/Net/src/HostEntry.cpp#1 $
+// $Id: //poco/1.4/Net/src/HostEntry.cpp#5 $
 //
 // Library: Net
 // Package: NetCore
@@ -74,7 +74,7 @@ HostEntry::HostEntry(struct hostent* entry)
 }
 
 
-#if defined(_WIN32) && defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6)
 
 
 HostEntry::HostEntry(struct addrinfo* ainfo)
@@ -95,7 +95,7 @@ HostEntry::HostEntry(struct addrinfo* ainfo)
 				_addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in*>(ai->ai_addr)->sin_addr, sizeof(in_addr)));
 				break;
 			case AF_INET6:
-				_addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in6*>(ai->ai_addr)->sin6_addr, sizeof(in6_addr)));
+				_addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in6*>(ai->ai_addr)->sin6_addr, sizeof(in6_addr), reinterpret_cast<struct sockaddr_in6*>(ai->ai_addr)->sin6_scope_id));
 				break;
 			}
 		}
@@ -103,7 +103,7 @@ HostEntry::HostEntry(struct addrinfo* ainfo)
 }
 
 
-#endif
+#endif // POCO_HAVE_IPv6
 
 
 HostEntry::HostEntry(const HostEntry& entry):

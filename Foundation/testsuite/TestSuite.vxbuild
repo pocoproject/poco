@@ -60,7 +60,6 @@ SOURCES="
 	LoggingFactoryTest.cpp
 	LoggingRegistryTest.cpp
 	LoggingTestSuite.cpp
-	MD2EngineTest.cpp
 	MD4EngineTest.cpp
 	MD5EngineTest.cpp
 	ManifestTest.cpp

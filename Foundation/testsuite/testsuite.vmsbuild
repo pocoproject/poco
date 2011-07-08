@@ -1,7 +1,7 @@
 #
 # buildfiles.vms
 #
-# $Id: //poco/1.4/Foundation/testsuite/testsuite.vmsbuild#1 $
+# $Id: //poco/1.4/Foundation/testsuite/testsuite.vmsbuild#2 $
 #
 EXE=TestRunner
 ActiveMethodTest
@@ -42,7 +42,6 @@ LoggingTestSuite
 NamedEventTest
 NamedMutexTest
 ProcessesTestSuite
-MD2EngineTest
 MD4EngineTest
 MD5EngineTest
 ManifestTest

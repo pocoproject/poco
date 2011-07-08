@@ -1,7 +1,7 @@
 //
 // ServerSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/ServerSocket.cpp#1 $
+// $Id: //poco/1.4/Net/src/ServerSocket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -105,6 +105,20 @@ void ServerSocket::bind(Poco::UInt16 port, bool reuseAddress)
 	IPAddress wildcardAddr;
 	SocketAddress address(wildcardAddr, port);
 	impl()->bind(address, reuseAddress);
+}
+
+
+void ServerSocket::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	impl()->bind6(address, reuseAddress, ipV6Only);
+}
+
+
+void ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only)
+{
+	IPAddress wildcardAddr;
+	SocketAddress address(wildcardAddr, port);
+	impl()->bind6(address, reuseAddress, ipV6Only);
 }
 
 	

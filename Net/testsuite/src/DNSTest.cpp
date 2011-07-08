@@ -1,7 +1,7 @@
 //
 // DNSTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/DNSTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/DNSTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -59,19 +59,16 @@ DNSTest::~DNSTest()
 
 void DNSTest::testHostByName()
 {
-	HostEntry he1 = DNS::hostByName("www.appinf.com");
-#if defined(_WIN32_WCE)
-	assert (he1.name() == "www.appinf.com");
-#else
-	assert (he1.name() == "appinf.com");
-#endif
+	HostEntry he1 = DNS::hostByName("aliastest.appinf.com");
+	// different systems report different canonical names, unfortunately.
+	assert (he1.name() == "dnstest.appinf.com" || he1.name() == "aliastest.appinf.com");
 #if !defined(_WIN32) && !defined(POCO_HAVE_IPv6)
 	// getaddrinfo() does not report any aliases
 	assert (!he1.aliases().empty());
-	assert (he1.aliases()[0] == "www.appinf.com");
+	assert (he1.aliases()[0] == "aliastest.appinf.com");
 #endif
-	assert (he1.addresses().size() == 1);
-	assert (he1.addresses()[0].toString() == "216.146.46.35");
+	assert (he1.addresses().size() >= 1);
+	assert (he1.addresses()[0].toString() == "1.2.3.4");
 	
 	try
 	{
@@ -89,12 +86,12 @@ void DNSTest::testHostByName()
 
 void DNSTest::testHostByAddress()
 {
-	IPAddress ip1("216.146.46.35");
+	IPAddress ip1("80.122.195.86");
 	HostEntry he1 = DNS::hostByAddress(ip1);
-	assert (he1.name() == "web.appinf.com");
+	assert (he1.name() == "mailhost.appinf.com");
 	assert (he1.aliases().empty());
-	assert (he1.addresses().size() == 1);
-	assert (he1.addresses()[0].toString() == "216.146.46.35");
+	assert (he1.addresses().size() >= 1);
+	assert (he1.addresses()[0].toString() == "80.122.195.86");
 	
 	IPAddress ip2("10.0.244.253");
 	try

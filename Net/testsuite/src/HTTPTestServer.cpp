@@ -1,7 +1,7 @@
 //
 // HTTPTestServer.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPTestServer.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPTestServer.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -103,6 +103,14 @@ void HTTPTestServer::run()
 				std::string response = handleRequest();
 				ss.sendBytes(response.data(), (int) response.size());
 				Poco::Thread::sleep(1000);
+				try
+				{
+					ss.shutdown();
+					Poco::Thread::sleep(1000);
+				}
+				catch (Poco::Exception& exc)
+				{
+				}
 			}
 			catch (Poco::Exception& exc)
 			{

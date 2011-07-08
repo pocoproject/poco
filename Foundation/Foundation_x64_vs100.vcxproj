@@ -526,7 +526,6 @@
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\DigestEngine.cpp" />
     <ClCompile Include="src\DigestStream.cpp" />
-    <ClCompile Include="src\MD2Engine.cpp" />
     <ClCompile Include="src\MD4Engine.cpp" />
     <ClCompile Include="src\MD5Engine.cpp" />
     <ClCompile Include="src\Random.cpp" />
@@ -1093,7 +1092,6 @@
     <ClInclude Include="include\Poco\DigestEngine.h" />
     <ClInclude Include="include\Poco\DigestStream.h" />
     <ClInclude Include="include\Poco\HMACEngine.h" />
-    <ClInclude Include="include\Poco\MD2Engine.h" />
     <ClInclude Include="include\Poco\MD4Engine.h" />
     <ClInclude Include="include\Poco\MD5Engine.h" />
     <ClInclude Include="include\Poco\Random.h" />

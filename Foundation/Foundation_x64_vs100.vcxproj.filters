@@ -435,9 +435,6 @@
     <ClCompile Include="src\DigestStream.cpp">
       <Filter>Crypt\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\MD2Engine.cpp">
-      <Filter>Crypt\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\MD4Engine.cpp">
       <Filter>Crypt\Source Files</Filter>
     </ClCompile>
@@ -1227,9 +1224,6 @@
       <Filter>Crypt\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\HMACEngine.h">
-      <Filter>Crypt\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\MD2Engine.h">
       <Filter>Crypt\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\MD4Engine.h">

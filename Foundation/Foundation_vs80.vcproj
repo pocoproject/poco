@@ -2364,10 +2364,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\MD2Engine.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\MD4Engine.cpp"
 					>
 				</File>
@@ -2401,10 +2397,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\HMACEngine.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\MD2Engine.h"
 					>
 				</File>
 				<File
