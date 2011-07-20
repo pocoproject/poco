@@ -1,8 +1,8 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.4.2 (2011-07-xx)
-==========================
+Release 1.4.2d2 (2011-07-15)
+============================
 
 - added Poco::DateTimeFormat::ISO8601_FRAC_FORMAT
 - added new Poco::DateTimeFormatter and Poco::DateTimeParser format specifier:
@@ -33,6 +33,10 @@ Release 1.4.2 (2011-07-xx)
 - Poco::Net::SocketAddress: when there is more than one address
   returned by a DNS lookup for a name, IPv4 addresses will be
   preferred to IPv6 ones.
+- NetworkInterface::list() now also returns IPv4 interfaces on Windows when 
+  built with -DPOCO_HAVE_IPv6
+- XMLWriter: fixed a bug with attribute namespaces (no namespace prefix 
+  written if attribute namespace is the same as element namespace)
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1506,4 +1510,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#16 $
+$Id: //poco/1.4/dist/CHANGELOG#17 $

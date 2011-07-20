@@ -1,7 +1,7 @@
 //
 // File2Page.cpp
 //
-// $Id: //poco/1.4/PageCompiler/File2Page/src/File2Page.cpp#2 $
+// $Id: //poco/1.4/PageCompiler/File2Page/src/File2Page.cpp#3 $
 //
 // An application that creates a Page Compiler source file from an
 // ordinary file.
@@ -99,7 +99,14 @@ protected:
 				.repeatable(false)
 				.argument("MIME-Type")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleContentType)));
-				
+
+		options.addOption(
+			Option("contentLanguage", "l", "specify a content language")
+				.required(false)
+				.repeatable(false)
+				.argument("language")
+				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleContentLang)));
+								
 		options.addOption(
 			Option("class", "c", "specify the handler class name")
 				.required(false)
@@ -132,6 +139,11 @@ protected:
 	void handleContentType(const std::string& name, const std::string& value)
 	{
 		_contentType = value;
+	}
+
+	void handleContentLang(const std::string& name, const std::string& value)
+	{
+		_contentLang = value;
 	}
 	
 	void handleClassName(const std::string& name, const std::string& value)
@@ -181,8 +193,12 @@ protected:
 		Poco::FileInputStream istr(path);
 		Poco::FileOutputStream ostr(op.toString());
 		ostr << "<%@ page\n"
-		     << "    contentType=\"" << _contentType << "\"\n"
-		     << "    form=\"false\"\n"
+		     << "    contentType=\"" << _contentType << "\"\n";
+		if (!_contentLang.empty())
+		{
+			ostr << "    contentLanguage=\"" << _contentLang << "\"\n";
+		}
+		ostr << "    form=\"false\"\n"
 		     << "    namespace=\"" << _namespace << "\"\n"
 		     << "    class=\"" << _clazz << "\"\n"
 		     << "    precondition=\"checkModified(request)\"%><%@"
@@ -272,6 +288,7 @@ protected:
 private:
 	bool _helpRequested;
 	std::string _contentType;
+	std::string _contentLang;
 	std::string _clazz;
 	std::string _namespace;
 	std::string _output;

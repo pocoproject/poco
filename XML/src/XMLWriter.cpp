@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.4/XML/src/XMLWriter.cpp#1 $
+// $Id: //poco/1.4/XML/src/XMLWriter.cpp#2 $
 //
 // Library: XML
 // Package: XML
@@ -744,7 +744,7 @@ void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attr
 		if (!localName.empty())
 		{
 			XMLString prefix;
-			if (namespaceURI != elementNamespaceURI)
+			if (!namespaceURI.empty())
 				prefix = _namespaces.getPrefix(namespaceURI);
 			if (!prefix.empty())
 			{

@@ -1,7 +1,7 @@
 //
 // CodeWriter.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/CodeWriter.cpp#1 $
+// $Id: //poco/1.4/PageCompiler/src/CodeWriter.cpp#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -310,6 +310,7 @@ void CodeWriter::writeForm(std::ostream& ostr)
 void CodeWriter::writeResponse(std::ostream& ostr)
 {
 	std::string contentType(_page.get("page.contentType", "text/html"));
+	std::string contentLang(_page.get("page.contentLanguage", ""));
 	bool buffered(_page.getBool("page.buffered", false));
 	bool chunked(_page.getBool("page.chunked", !buffered));
 
@@ -319,6 +320,11 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 	}
 
 	ostr << "\tresponse.setContentType(\"" << contentType << "\");\n";
+	if (!contentLang.empty())
+	{
+		ostr << "\tif (request.has(\"Accept-Language\"))\n"
+			 << "\t\tresponse.set(\"Content-Language\", \"" << contentLang << "\");\n";
+	}
 	ostr << "\n";
 }
 
