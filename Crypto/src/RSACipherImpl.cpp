@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSACipherImpl.cpp#1 $
+// $Id: //poco/1.4/Crypto/src/RSACipherImpl.cpp#2 $
 //
 // Library: Crypto
 // Package: RSA
@@ -121,7 +121,7 @@ namespace
 
 	RSAEncryptImpl::~RSAEncryptImpl()
 	{
-		delete _pBuf;
+		delete [] _pBuf;
 	}
 
 
@@ -246,7 +246,7 @@ namespace
 
 	RSADecryptImpl::~RSADecryptImpl()
 	{
-		delete _pBuf;
+		delete [] _pBuf;
 	}
 
 

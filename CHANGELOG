@@ -1,8 +1,8 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.4.2d2 (2011-07-15)
-============================
+Release 1.4.2 (2011-08-xx)
+==========================
 
 - added Poco::DateTimeFormat::ISO8601_FRAC_FORMAT
 - added new Poco::DateTimeFormatter and Poco::DateTimeParser format specifier:
@@ -37,6 +37,7 @@ Release 1.4.2d2 (2011-07-15)
   built with -DPOCO_HAVE_IPv6
 - XMLWriter: fixed a bug with attribute namespaces (no namespace prefix 
   written if attribute namespace is the same as element namespace)
+- fixed SF# 3378588: Mismatched new[]/delete (in RSAEncryptImpl and RSADecryptImpl)
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1510,4 +1511,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#17 $
+$Id: //poco/1.4/dist/CHANGELOG#18 $
