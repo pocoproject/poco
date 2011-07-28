@@ -1,7 +1,7 @@
 //
 // Logger.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Logger.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Logger.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -113,6 +113,10 @@ public:
 		
 	void setLevel(int level);
 		/// Sets the Logger's log level.
+		///
+		/// See Message::Priority for valid log levels.
+		/// Setting the log level to zero turns off
+		/// logging for that Logger.
 		
 	int getLevel() const;
 		/// Returns the Logger's log level.
@@ -121,6 +125,7 @@ public:
 		/// Sets the Logger's log level using a symbolic value.
 		///
 		/// Valid values are:
+		///   - none (turns off logging)
 		///   - fatal
 		///   - critical
 		///   - error

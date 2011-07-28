@@ -1,7 +1,7 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketAddress.cpp#4 $
+// $Id: //poco/1.4/Net/src/SocketAddress.cpp#5 $
 //
 // Library: Net
 // Package: NetCore
@@ -82,10 +82,16 @@ public:
 protected:
 	SocketAddressImpl()
 	{
+#if defined(_WIN32)
+		Poco::Net::initializeNetwork();
+#endif
 	}
 	
 	virtual ~SocketAddressImpl()
 	{
+#if defined(_WIN32)
+		Poco::Net::uninitializeNetwork();
+#endif
 	}
 	
 private:

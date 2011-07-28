@@ -1,7 +1,7 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/IPAddress.cpp#3 $
+// $Id: //poco/1.4/Net/src/IPAddress.cpp#4 $
 //
 // Library: Net
 // Package: NetCore
@@ -88,10 +88,16 @@ public:
 protected:
 	IPAddressImpl()
 	{
+#if defined(_WIN32)
+		Poco::Net::initializeNetwork();
+#endif
 	}
 	
 	virtual ~IPAddressImpl()
 	{
+#if defined(_WIN32)
+		Poco::Net::uninitializeNetwork();
+#endif
 	}
 
 private:

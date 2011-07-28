@@ -1,7 +1,7 @@
 //
 // NetSSL.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -86,11 +86,10 @@ void NetSSL_API initializeSSL();
 	/// libraries, by calling Poco::Crypto::OpenSSLInitializer::initialize().
 	///
 	/// Should be called before using any class from the NetSSL library.
-	/// The NetSSL will be initialized automatically, through a static
-	/// initializer class instance, if the library is linked dynamically.
-	/// When linked statically, the static initializer will not be linked
-	/// to the application, and thus the library will not be initialized
-	/// automatically. However, it is recommended to call initializeSSL()
+	/// The NetSSL will be initialized automatically, through 
+	/// Poco::Crypto::OpenSSLInitializer instances or similar mechanisms
+	/// when creating Context or SSLManager instances.
+	/// However, it is recommended to call initializeSSL()
 	/// in any case at application startup.
 	///
 	/// Can be called multiple times; however, for every call to

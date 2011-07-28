@@ -1,7 +1,7 @@
 //
 // CipherImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CipherImpl.cpp#1 $
+// $Id: //poco/1.4/Crypto/src/CipherImpl.cpp#2 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -36,7 +36,6 @@
 
 #include "Poco/Crypto/CipherImpl.h"
 #include "Poco/Crypto/CryptoTransform.h"
-#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Exception.h"
 #include <openssl/err.h>
 
@@ -179,13 +178,11 @@ namespace
 CipherImpl::CipherImpl(const CipherKey& key):
 	_key(key)
 {
-	OpenSSLInitializer::initialize();
 }
 
 
 CipherImpl::~CipherImpl()
 {
-	OpenSSLInitializer::uninitialize();
 }
 
 

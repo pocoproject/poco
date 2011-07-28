@@ -1,7 +1,7 @@
 //
 // CipherFactory.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CipherFactory.cpp#1 $
+// $Id: //poco/1.4/Crypto/src/CipherFactory.cpp#2 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -40,7 +40,6 @@
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/CipherImpl.h"
 #include "Poco/Crypto/RSACipherImpl.h"
-#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Exception.h"
 #include "Poco/SingletonHolder.h"
 #include <openssl/evp.h>

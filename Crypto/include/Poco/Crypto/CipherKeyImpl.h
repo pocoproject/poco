@@ -1,7 +1,7 @@
 //
 // CipherKeyImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherKeyImpl.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherKeyImpl.h#2 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <vector>
@@ -136,10 +137,11 @@ private:
 		/// Stores random bytes in vec.
 
 private:
-	const EVP_CIPHER* _pCipher;
-	std::string	      _name;
-	ByteVec		      _key;
-	ByteVec		      _iv;
+	const EVP_CIPHER*  _pCipher;
+	std::string	       _name;
+	ByteVec		       _key;
+	ByteVec		       _iv;
+	OpenSSLInitializer _openSSLInitializer;
 };
 
 

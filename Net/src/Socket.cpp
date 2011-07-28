@@ -1,7 +1,7 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.4/Net/src/Socket.cpp#2 $
+// $Id: //poco/1.4/Net/src/Socket.cpp#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -324,6 +324,16 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	return rc; 
 
 #endif // POCO_HAVE_FD_EPOLL
+}
+
+
+bool Socket::supportsIPv6()
+{
+#if defined(POCO_HAVE_IPv6)
+	return true;
+#else
+	return false;
+#endif
 }
 
 

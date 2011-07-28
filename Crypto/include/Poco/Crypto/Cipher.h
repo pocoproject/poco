@@ -1,7 +1,7 @@
 //
 // Cipher.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Cipher.h#2 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Cipher.h#3 $
 //
 // Library: Crypto
 // Package: Cipher

@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSACipherImpl.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSACipherImpl.h#2 $
 //
 // Library: Crypto
 // Package: RSA
@@ -43,6 +43,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/RSAKey.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include <openssl/evp.h>
 
 
@@ -79,6 +80,7 @@ public:
 private:
 	RSAKey _key;
 	RSAPaddingMode _paddingMode;
+	OpenSSLInitializer _openSSLInitializer;
 };
 
 

@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSAKeyImpl.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSAKeyImpl.h#2 $
 //
 // Library: Crypto
 // Package: RSA
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <istream>
@@ -110,6 +111,7 @@ private:
 
 private:
 	RSA* _pRSA;
+	OpenSSLInitializer _openSSLInitializer;
 };
 
 

@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSACipherImpl.cpp#2 $
+// $Id: //poco/1.4/Crypto/src/RSACipherImpl.cpp#3 $
 //
 // Library: Crypto
 // Package: RSA
@@ -36,7 +36,6 @@
 
 #include "Poco/Crypto/RSACipherImpl.h"
 #include "Poco/Crypto/CryptoTransform.h"
-#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Exception.h"
 #include <openssl/err.h>
 #include <openssl/rsa.h>
@@ -318,13 +317,11 @@ RSACipherImpl::RSACipherImpl(const RSAKey& key, RSAPaddingMode paddingMode):
 	_key(key),
 	_paddingMode(paddingMode)
 {
-	OpenSSLInitializer::initialize();
 }
 
 
 RSACipherImpl::~RSACipherImpl()
 {
-	OpenSSLInitializer::uninitialize();
 }
 
 

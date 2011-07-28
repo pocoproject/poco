@@ -38,6 +38,19 @@ Release 1.4.2 (2011-08-xx)
 - XMLWriter: fixed a bug with attribute namespaces (no namespace prefix 
   written if attribute namespace is the same as element namespace)
 - fixed SF# 3378588: Mismatched new[]/delete (in RSAEncryptImpl and RSADecryptImpl)
+- fixed SF# 3212954 (OpenSSLInitializer::uninitialize() crash) and 
+  SF# 3196862 (Static OpenSSLInitializer instance causes Windows deadlocks) by
+  remoting the static Poco::Crypto::OpenSSLInitializer instance. Automatic OpenSSL
+  initialization is now done through Poco::Crypto::Cipher, Poco::Crypto::CipherKey, 
+  Poco::Crypto::X509Certificate, Poco::Net::Context classes; however, it is still
+  recommended to call Poco::Crypto::initializeCrypto() and 
+  Poco::Crypto::uninitializeCrypto() early at application startup, and late at
+  shutdown respectively (or Poco::Net::initializeSSL()/Poco::Net::uninitializeSSL()
+  if the NetSSL library is used) to avoid multiple full OpenSSL init/uninit cycles
+  during application runtime.
+- Poco::Logger now also support a symbolic log level "none"
+  (for use with setLevel()) that disables logging completely
+  for that Logger (equivalent to setLevel(0)).
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1511,4 +1524,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#18 $
+$Id: //poco/1.4/dist/CHANGELOG#20 $

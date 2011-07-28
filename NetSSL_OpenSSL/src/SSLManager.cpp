@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SSLManager.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SSLManager.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -234,8 +234,8 @@ void SSLManager::initDefaultContext(bool server)
 	if (server && _ptrDefaultServerContext) return;
 	if (!server && _ptrDefaultClientContext) return;
 
+	Poco::Crypto::OpenSSLInitializer openSSLInitializer;
 	initEvents(server);
-
 	Poco::Util::AbstractConfiguration& config = appConfig();
 
 #ifdef OPENSSL_FIPS

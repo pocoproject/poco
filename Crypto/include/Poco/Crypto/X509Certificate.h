@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/X509Certificate.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/X509Certificate.h#2 $
 //
 // Library: Crypto
 // Package: Certificate
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <set>
@@ -173,6 +174,7 @@ private:
 	std::string _issuerName;
 	std::string _subjectName;
 	X509*       _pCert;
+	OpenSSLInitializer _openSSLInitializer;
 };
 
 

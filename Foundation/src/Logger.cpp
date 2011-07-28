@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Logger.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Logger.cpp#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -83,7 +83,9 @@ void Logger::setLevel(int level)
 
 void Logger::setLevel(const std::string& level)
 {
-	if (level == "fatal")
+	if (level == "none")
+		setLevel(0);
+	else if (level == "fatal")
 		setLevel(Message::PRIO_FATAL);
 	else if (level == "critical")
 		setLevel(Message::PRIO_CRITICAL);

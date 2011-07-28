@@ -1,7 +1,7 @@
 //
 // CipherImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherImpl.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherImpl.h#2 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -43,7 +43,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherKey.h"
-
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include <openssl/evp.h>
 
 
@@ -72,6 +72,7 @@ public:
 
 private:
 	CipherKey _key;
+	OpenSSLInitializer _openSSLInitializer;
 };
 
 

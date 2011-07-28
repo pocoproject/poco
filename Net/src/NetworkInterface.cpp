@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#5 $
+// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#6 $
 //
 // Library: Net
 // Package: Sockets
@@ -369,29 +369,36 @@ namespace Net {
 
 
 #if defined(POCO_HAVE_IPv6)
-IPAddress subnetMaskForInterface(const std::string& name)
+IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 {
-	std::string subKey("SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\");
-	subKey += name;
-	std::wstring usubKey;
-	Poco::UnicodeConverter::toUTF16(subKey, usubKey);
-	HKEY hKey;
-	if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, usubKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
-		return IPAddress();
-	wchar_t unetmask[16];
-	DWORD size = sizeof(unetmask);
-	if (RegQueryValueExW(hKey, L"DhcpSubnetMask", NULL, NULL, (LPBYTE) &unetmask, &size) != ERROR_SUCCESS)
+	if (isLoopback)
 	{
-		if (RegQueryValueExW(hKey, L"SubnetMask", NULL, NULL, (LPBYTE) &unetmask, &size) != ERROR_SUCCESS)
-		{
-			RegCloseKey(hKey);
-			return IPAddress();
-		}
+		return IPAddress::parse("255.0.0.0");
 	}
-	RegCloseKey(hKey);
-	std::string netmask;
-	Poco::UnicodeConverter::toUTF8(unetmask, netmask);
-	return IPAddress::parse(netmask);
+	else
+	{
+		std::string subKey("SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\");
+		subKey += name;
+		std::wstring usubKey;
+		Poco::UnicodeConverter::toUTF16(subKey, usubKey);
+		HKEY hKey;
+		if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, usubKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+			return IPAddress();
+		wchar_t unetmask[16];
+		DWORD size = sizeof(unetmask);
+		if (RegQueryValueExW(hKey, L"DhcpSubnetMask", NULL, NULL, (LPBYTE) &unetmask, &size) != ERROR_SUCCESS)
+		{
+			if (RegQueryValueExW(hKey, L"SubnetMask", NULL, NULL, (LPBYTE) &unetmask, &size) != ERROR_SUCCESS)
+			{
+				RegCloseKey(hKey);
+				return IPAddress();
+			}
+		}
+		RegCloseKey(hKey);
+		std::string netmask;
+		Poco::UnicodeConverter::toUTF8(unetmask, netmask);
+		return IPAddress::parse(netmask);
+	}
 }
 #endif // POCO_HAVE_IPv6
 
@@ -427,36 +434,42 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 			pAddress = pAdapterAddresses;
 			while (pAddress) 
 			{
-				PIP_ADAPTER_UNICAST_ADDRESS pUniAddr = pAddress->FirstUnicastAddress;
-				while (pUniAddr)
+				if (pAddress->OperStatus == IfOperStatusUp)
 				{
-					std::string name(pAddress->AdapterName);
-					std::string displayName;
-#ifdef POCO_WIN32_UTF8
-					Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
-#else
-					char displayNameBuffer[1024];
-					int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
-					if (rc) displayName = displayNameBuffer;
-#endif
-					IPAddress address;
-					IPAddress subnetMask;
-					IPAddress broadcastAddress;
-					switch (pUniAddr->Address.lpSockaddr->sa_family)
+					PIP_ADAPTER_UNICAST_ADDRESS pUniAddr = pAddress->FirstUnicastAddress;
+					while (pUniAddr)
 					{
-					case AF_INET:
-						address = IPAddress(&reinterpret_cast<struct sockaddr_in*>(pUniAddr->Address.lpSockaddr)->sin_addr, sizeof(in_addr));
-						subnetMask = subnetMaskForInterface(name);
-						broadcastAddress = address;
-						broadcastAddress.mask(subnetMask, IPAddress::broadcast());
-						result.push_back(NetworkInterface(name, displayName, address, subnetMask, broadcastAddress));
-						break;
-					case AF_INET6:
-						address = IPAddress(&reinterpret_cast<struct sockaddr_in6*>(pUniAddr->Address.lpSockaddr)->sin6_addr, sizeof(in6_addr), reinterpret_cast<struct sockaddr_in6*>(pUniAddr->Address.lpSockaddr)->sin6_scope_id);
-						result.push_back(NetworkInterface(name, displayName, address, pAddress->Ipv6IfIndex));
-						break;
+						std::string name(pAddress->AdapterName);
+						std::string displayName;
+#ifdef POCO_WIN32_UTF8
+						Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, displayName);
+#else
+						char displayNameBuffer[1024];
+						int rc = WideCharToMultiByte(CP_ACP, WC_DEFAULTCHAR, pAddress->FriendlyName, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
+						if (rc) displayName = displayNameBuffer;
+#endif
+						IPAddress address;
+						IPAddress subnetMask;
+						IPAddress broadcastAddress;
+						switch (pUniAddr->Address.lpSockaddr->sa_family)
+						{
+						case AF_INET:
+							address = IPAddress(&reinterpret_cast<struct sockaddr_in*>(pUniAddr->Address.lpSockaddr)->sin_addr, sizeof(in_addr));
+							subnetMask = subnetMaskForInterface(name, address.isLoopback());
+							if (!address.isLoopback())
+							{
+								broadcastAddress = address;
+								broadcastAddress.mask(subnetMask, IPAddress::broadcast());
+							}
+							result.push_back(NetworkInterface(name, displayName, address, subnetMask, broadcastAddress));
+							break;
+						case AF_INET6:
+							address = IPAddress(&reinterpret_cast<struct sockaddr_in6*>(pUniAddr->Address.lpSockaddr)->sin6_addr, sizeof(in6_addr), reinterpret_cast<struct sockaddr_in6*>(pUniAddr->Address.lpSockaddr)->sin6_scope_id);
+							result.push_back(NetworkInterface(name, displayName, address, pAddress->Ipv6IfIndex));
+							break;
+						}
+						pUniAddr = pUniAddr->Next;
 					}
-					pUniAddr = pUniAddr->Next;
 				}
 				pAddress = pAddress->Next;
 			}

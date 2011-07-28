@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#5 $
+// $Id: //poco/1.4/Net/src/DNS.cpp#7 $
 //
 // Library: Net
 // Package: NetCore
@@ -39,6 +39,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Environment.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/AtomicCounter.h"
 #include <cstring>
 
 
@@ -48,10 +49,6 @@ using Poco::NumberFormatter;
 using Poco::IOException;
 
 
-//
-// Automatic initialization of Windows networking
-//
-#if defined(_WIN32) && !defined(POCO_NET_NO_AUTOMATIC_WSASTARTUP)
 namespace
 {
 	class NetworkInitializer
@@ -65,12 +62,9 @@ namespace
 		~NetworkInitializer()
 		{
 			Poco::Net::uninitializeNetwork();
-		}
+		}		
 	};
-	
-	static NetworkInitializer networkInitializer;
 }
-#endif // _WIN32
 
 
 namespace Poco {
@@ -79,6 +73,8 @@ namespace Net {
 
 HostEntry DNS::hostByName(const std::string& hostname)
 {
+	NetworkInitializer networkInitializer;
+	
 #if defined(POCO_HAVE_IPv6)
 	struct addrinfo* pAI;
 	struct addrinfo hints;
@@ -116,6 +112,8 @@ HostEntry DNS::hostByName(const std::string& hostname)
 
 HostEntry DNS::hostByAddress(const IPAddress& address)
 {
+	NetworkInitializer networkInitializer;
+
 #if defined(POCO_HAVE_IPv6)
 	SocketAddress sa(address, 0);
 	static char fqname[1024];
@@ -164,6 +162,8 @@ HostEntry DNS::hostByAddress(const IPAddress& address)
 
 HostEntry DNS::resolve(const std::string& address)
 {
+	NetworkInitializer networkInitializer;
+
 	IPAddress ip;
 	if (IPAddress::tryParse(address, ip))
 		return hostByAddress(ip);
@@ -174,6 +174,8 @@ HostEntry DNS::resolve(const std::string& address)
 
 IPAddress DNS::resolveOne(const std::string& address)
 {
+	NetworkInitializer networkInitializer;
+
 	const HostEntry& entry = resolve(address);
 	if (!entry.addresses().empty())
 		return entry.addresses()[0];
@@ -195,6 +197,8 @@ void DNS::flushCache()
 
 std::string DNS::hostName()
 {
+	NetworkInitializer networkInitializer;
+
 	char buffer[256];
 	int rc = gethostname(buffer, sizeof(buffer));
 	if (rc == 0)
@@ -265,12 +269,21 @@ void DNS::aierror(int code, const std::string& arg)
 }
 
 
+#if defined(_WIN32)
+static Poco::AtomicCounter initializeCount;
+#endif
+
+
 void initializeNetwork()
 {
 #if defined(_WIN32)
-	WORD    version = MAKEWORD(2, 2);
-	WSADATA data;
-	WSAStartup(version, &data);
+	if (++initializeCount == 1)
+	{
+		WORD    version = MAKEWORD(2, 2);
+		WSADATA data;
+		if (WSAStartup(version, &data) != 0)
+			throw NetException("Failed to initialize network subsystem");
+	}
 #endif // _WIN32
 }
 		
@@ -278,7 +291,10 @@ void initializeNetwork()
 void uninitializeNetwork()
 {
 #if defined(_WIN32)
-	WSACleanup();
+	if (--initializeCount == 0)
+	{
+		WSACleanup();
+	}
 #endif // _WIN32
 }
 

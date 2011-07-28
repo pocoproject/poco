@@ -1,7 +1,7 @@
 //
 // SSLManager.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -299,15 +299,15 @@ private:
 		/// verification are handled. Return 0 to terminate the handshake,
 		/// or 1 to continue despite the error.
 
-	PrivateKeyFactoryMgr           _factoryMgr;
-	CertificateHandlerFactoryMgr   _certHandlerFactoryMgr;
-	Context::Ptr                   _ptrDefaultServerContext;
-	PrivateKeyPassphraseHandlerPtr _ptrServerPassphraseHandler;
-	InvalidCertificateHandlerPtr   _ptrServerCertificateHandler;
-	Context::Ptr                   _ptrDefaultClientContext;
-	PrivateKeyPassphraseHandlerPtr _ptrClientPassphraseHandler;
-	InvalidCertificateHandlerPtr   _ptrClientCertificateHandler;
-	Poco::FastMutex                _mutex;
+	PrivateKeyFactoryMgr             _factoryMgr;
+	CertificateHandlerFactoryMgr     _certHandlerFactoryMgr;
+	Context::Ptr                     _ptrDefaultServerContext;
+	PrivateKeyPassphraseHandlerPtr   _ptrServerPassphraseHandler;
+	InvalidCertificateHandlerPtr     _ptrServerCertificateHandler;
+	Context::Ptr                     _ptrDefaultClientContext;
+	PrivateKeyPassphraseHandlerPtr   _ptrClientPassphraseHandler;
+	InvalidCertificateHandlerPtr     _ptrClientCertificateHandler;
+	Poco::FastMutex                  _mutex;
 
 	static const std::string CFG_PRIV_KEY_FILE;
 	static const std::string CFG_CERTIFICATE_FILE;
