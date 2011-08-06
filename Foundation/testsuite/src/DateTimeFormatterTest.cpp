@@ -47,6 +47,10 @@ using Poco::DateTimeFormatter;
 
 DateTimeFormatterTest::DateTimeFormatterTest(const std::string& name): CppUnit::TestCase(name)
 {
+	// Linker regresion SF #3288584
+	std::string message;
+	Poco::LocalDateTime now;
+	Poco::DateTimeFormatter::append(message,now,"%H:%M:%S.%i");
 }
 
 
