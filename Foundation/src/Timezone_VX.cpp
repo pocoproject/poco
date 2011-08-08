@@ -1,7 +1,7 @@
 //
 // Timezone_VXX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_VX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Timezone_VX.cpp#2 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -57,7 +57,7 @@ int Timezone::dst()
 {
 	std::time_t now = std::time(NULL);
 	struct std::tm t;
-	if (!localtime_r(&now, &t))
+	if (localtime_r(&now, &t) != OK)
 		throw Poco::SystemException("cannot get local time DST offset");
 	return t.tm_isdst == 1 ? 3600 : 0;
 }

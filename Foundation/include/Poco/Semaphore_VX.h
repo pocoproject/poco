@@ -1,15 +1,15 @@
 //
-// Mutex_POSIX.h
+// Semaphore_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Mutex_POSIX.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Semaphore_VX.h#1 $
 //
 // Library: Foundation
 // Package: Threading
-// Module:  Mutex
+// Module:  Semaphore
 //
-// Definition of the MutexImpl and FastMutexImpl classes for POSIX Threads.
+// Definition of the SemaphoreImpl class for VxWorks.
 //
-// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-20011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,73 +36,43 @@
 //
 
 
-#ifndef Foundation_Mutex_POSIX_INCLUDED
-#define Foundation_Mutex_POSIX_INCLUDED
+#ifndef Foundation_Semaphore_VX_INCLUDED
+#define Foundation_Semaphore_VX_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
-#include <pthread.h>
-#include <errno.h>
+#include <semLib.h>
 
 
 namespace Poco {
 
 
-class Foundation_API MutexImpl
+class Foundation_API SemaphoreImpl
 {
 protected:
-	MutexImpl();
-	MutexImpl(bool fast);
-	~MutexImpl();
-	void lockImpl();
-	bool tryLockImpl();
-	bool tryLockImpl(long milliseconds);
-	void unlockImpl();
+	SemaphoreImpl(int n, int max);		
+	~SemaphoreImpl();
+	void setImpl();
+	void waitImpl();
+	bool waitImpl(long milliseconds);
 	
 private:
-	pthread_mutex_t _mutex;
-};
-
-
-class Foundation_API FastMutexImpl: public MutexImpl
-{
-protected:
-	FastMutexImpl();
-	~FastMutexImpl();
+	SEM_ID _sem;
 };
 
 
 //
 // inlines
 //
-inline void MutexImpl::lockImpl()
+inline void SemaphoreImpl::setImpl()
 {
-	if (pthread_mutex_lock(&_mutex)) 
-		throw SystemException("cannot lock mutex");
-}
-
-
-inline bool MutexImpl::tryLockImpl()
-{
-	int rc = pthread_mutex_trylock(&_mutex);
-	if (rc == 0)
-		return true;
-	else if (rc == EBUSY)
-		return false;
-	else
-		throw SystemException("cannot lock mutex");
-}
-
-
-inline void MutexImpl::unlockImpl()
-{
-	if (pthread_mutex_unlock(&_mutex))
-		throw SystemException("cannot unlock mutex");
+	if (semGive(_sem) != OK)
+		throw SystemException("cannot signal semaphore");
 }
 
 
 } // namespace Poco
 
 
-#endif // Foundation_Mutex_POSIX_INCLUDED
+#endif // Foundation_Semaphore_VX_INCLUDED

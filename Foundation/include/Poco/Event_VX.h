@@ -1,11 +1,13 @@
 //
-// Timezone_UNIX.cpp
+// Event_VX.h
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Event_VX.h#1 $
 //
 // Library: Foundation
-// Package: DateTime
-// Module:  Timezone
+// Package: Threading
+// Module:  Event
+//
+// Definition of the EventImpl class for VxWorks.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,88 +36,36 @@
 //
 
 
-#include "Poco/Timezone.h"
+#ifndef Foundation_Event_VX_INCLUDED
+#define Foundation_Event_VX_INCLUDED
+
+
+#include "Poco/Foundation.h"
 #include "Poco/Exception.h"
-#include <ctime>
+#include <semLib.h>
 
 
 namespace Poco {
 
 
-class TZInfo
+class Foundation_API EventImpl
 {
-public:
-	TZInfo()
-	{
-		tzset();
-	}
+protected:
+	EventImpl(bool autoReset);		
+	~EventImpl();
+	void setImpl();
+	void waitImpl();
+	bool waitImpl(long milliseconds);
+	void resetImpl();
 	
-	int timeZone()
-	{
-	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined(POCO_ANDROID) // no timezone global var
-		std::time_t now = std::time(NULL);
-		struct std::tm t;
-		gmtime_r(&now, &t);
-		std::time_t utc = std::mktime(&t);
-		return now - utc;
-	#elif defined(__CYGWIN__)
-		return -_timezone;
-	#else
-		return -timezone;
-	#endif
-	}
-	
-	const char* name(bool dst)
-	{
-		return tzname[dst ? 1 : 0];
-	}
+private:
+	bool          _auto;
+	volatile bool _state;
+	SEM_ID        _sem;
 };
 
 
-static TZInfo tzInfo;
-
-
-int Timezone::utcOffset()
-{
-	return tzInfo.timeZone();
-}
-
-	
-int Timezone::dst()
-{
-	std::time_t now = std::time(NULL);
-	struct std::tm t;
-	if (!localtime_r(&now, &t))
-		throw Poco::SystemException("cannot get local time DST offset");
-	return t.tm_isdst == 1 ? 3600 : 0;
-}
-
-
-bool Timezone::isDst(const Timestamp& timestamp)
-{
-	std::time_t time = timestamp.epochTime();
-	struct std::tm* tms = std::localtime(&time);
-	if (!tms) throw Poco::SystemException("cannot get local time DST flag");
-	return tms->tm_isdst > 0;
-}
-
-	
-std::string Timezone::name()
-{
-	return std::string(tzInfo.name(dst() != 0));
-}
-
-	
-std::string Timezone::standardName()
-{
-	return std::string(tzInfo.name(false));
-}
-
-	
-std::string Timezone::dstName()
-{
-	return std::string(tzInfo.name(true));
-}
-
-
 } // namespace Poco
+
+
+#endif // Foundation_Event_VX_INCLUDED

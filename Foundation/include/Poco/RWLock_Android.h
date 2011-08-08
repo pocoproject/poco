@@ -1,15 +1,15 @@
 //
-// Mutex_POSIX.h
+// RWLock_Android.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Mutex_POSIX.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/RWLock_Android.h#1 $
 //
 // Library: Foundation
 // Package: Threading
-// Module:  Mutex
+// Module:  RWLock
 //
-// Definition of the MutexImpl and FastMutexImpl classes for POSIX Threads.
+// Definition of the RWLockImpl class for Android Threads.
 //
-// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef Foundation_Mutex_POSIX_INCLUDED
-#define Foundation_Mutex_POSIX_INCLUDED
+#ifndef Foundation_RWLock_Android_INCLUDED
+#define Foundation_RWLock_Android_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -49,15 +49,15 @@
 namespace Poco {
 
 
-class Foundation_API MutexImpl
+class Foundation_API RWLockImpl
 {
 protected:
-	MutexImpl();
-	MutexImpl(bool fast);
-	~MutexImpl();
-	void lockImpl();
-	bool tryLockImpl();
-	bool tryLockImpl(long milliseconds);
+	RWLockImpl();
+	~RWLockImpl();
+	void readLockImpl();
+	bool tryReadLockImpl();
+	void writeLockImpl();
+	bool tryWriteLockImpl();
 	void unlockImpl();
 	
 private:
@@ -65,25 +65,17 @@ private:
 };
 
 
-class Foundation_API FastMutexImpl: public MutexImpl
-{
-protected:
-	FastMutexImpl();
-	~FastMutexImpl();
-};
-
-
 //
 // inlines
 //
-inline void MutexImpl::lockImpl()
+inline void RWLockImpl::readLockImpl()
 {
 	if (pthread_mutex_lock(&_mutex)) 
-		throw SystemException("cannot lock mutex");
+		throw SystemException("cannot lock reader/writer lock");
 }
 
 
-inline bool MutexImpl::tryLockImpl()
+inline bool RWLockImpl::tryReadLockImpl()
 {
 	int rc = pthread_mutex_trylock(&_mutex);
 	if (rc == 0)
@@ -91,18 +83,37 @@ inline bool MutexImpl::tryLockImpl()
 	else if (rc == EBUSY)
 		return false;
 	else
-		throw SystemException("cannot lock mutex");
+		throw SystemException("cannot lock reader/writer lock");
 }
 
 
-inline void MutexImpl::unlockImpl()
+inline void RWLockImpl::writeLockImpl()
+{
+	if (pthread_mutex_lock(&_mutex)) 
+		throw SystemException("cannot lock reader/writer lock");
+}
+
+
+inline bool RWLockImpl::tryWriteLockImpl()
+{
+	int rc = pthread_mutex_trylock(&_mutex);
+	if (rc == 0)
+		return true;
+	else if (rc == EBUSY)
+		return false;
+	else
+		throw SystemException("cannot lock reader/writer lock");
+}
+
+
+inline void RWLockImpl::unlockImpl()
 {
 	if (pthread_mutex_unlock(&_mutex))
-		throw SystemException("cannot unlock mutex");
+		throw SystemException("cannot unlock reader/writer lock");
 }
 
 
 } // namespace Poco
 
 
-#endif // Foundation_Mutex_POSIX_INCLUDED
+#endif // Foundation_RWLock_Android_INCLUDED

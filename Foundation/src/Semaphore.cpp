@@ -1,7 +1,7 @@
 //
 // Semaphore.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Semaphore.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Semaphore.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -39,6 +39,8 @@
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Semaphore_WIN32.cpp"
+#elif defined(POCO_VXWORKS)
+#include "Semaphore_VX.cpp"
 #else
 #include "Semaphore_POSIX.cpp"
 #endif

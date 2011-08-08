@@ -1,11 +1,11 @@
 //
-// Timezone_UNIX.cpp
+// Event_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Event_VX.cpp#1 $
 //
 // Library: Foundation
-// Package: DateTime
-// Module:  Timezone
+// Package: Threading
+// Module:  Event
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -34,87 +34,67 @@
 //
 
 
-#include "Poco/Timezone.h"
-#include "Poco/Exception.h"
-#include <ctime>
+#include "Poco/Event_VX.h"
+#include <sysLib.h>
 
 
 namespace Poco {
 
 
-class TZInfo
+EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 {
-public:
-	TZInfo()
+	_sem = semCCreate(SEM_Q_PRIORITY, 0);
+	if (_sem == 0)
+		throw Poco::SystemException("cannot create event");
+}
+
+
+EventImpl::~EventImpl()
+{
+	semDelete(_sem);
+}
+
+
+void EventImpl::setImpl()
+{
+	if (_auto)
 	{
-		tzset();
+		if (semGive(_sem) != OK)
+			throw SystemException("cannot set event");
 	}
-	
-	int timeZone()
+	else
 	{
-	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined(POCO_ANDROID) // no timezone global var
-		std::time_t now = std::time(NULL);
-		struct std::tm t;
-		gmtime_r(&now, &t);
-		std::time_t utc = std::mktime(&t);
-		return now - utc;
-	#elif defined(__CYGWIN__)
-		return -_timezone;
-	#else
-		return -timezone;
-	#endif
+		_state = true;
+		if (semFlush(_sem) != OK)
+			throw SystemException("cannot set event");
 	}
-	
-	const char* name(bool dst)
+}
+
+
+void EventImpl::resetImpl()
+{
+	_state = false;
+}
+
+
+void EventImpl::waitImpl()
+{
+	if (!_state)
 	{
-		return tzname[dst ? 1 : 0];
+		if (semTake(_sem, WAIT_FOREVER) != OK)
+			throw SystemException("cannot wait for event");
 	}
-};
-
-
-static TZInfo tzInfo;
-
-
-int Timezone::utcOffset()
-{
-	return tzInfo.timeZone();
-}
-
-	
-int Timezone::dst()
-{
-	std::time_t now = std::time(NULL);
-	struct std::tm t;
-	if (!localtime_r(&now, &t))
-		throw Poco::SystemException("cannot get local time DST offset");
-	return t.tm_isdst == 1 ? 3600 : 0;
 }
 
 
-bool Timezone::isDst(const Timestamp& timestamp)
+bool EventImpl::waitImpl(long milliseconds)
 {
-	std::time_t time = timestamp.epochTime();
-	struct std::tm* tms = std::localtime(&time);
-	if (!tms) throw Poco::SystemException("cannot get local time DST flag");
-	return tms->tm_isdst > 0;
-}
-
-	
-std::string Timezone::name()
-{
-	return std::string(tzInfo.name(dst() != 0));
-}
-
-	
-std::string Timezone::standardName()
-{
-	return std::string(tzInfo.name(false));
-}
-
-	
-std::string Timezone::dstName()
-{
-	return std::string(tzInfo.name(true));
+	if (!_state)
+	{
+		int ticks = milliseconds*sysClkRateGet()/1000;
+		return semTake(_sem, ticks) == OK;
+	}
+	else return true;
 }
 
 

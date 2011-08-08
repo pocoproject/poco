@@ -1,13 +1,13 @@
 //
-// Timezone_UNIX.cpp
+// Mutex_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Mutex_VX.cpp#1 $
 //
 // Library: Foundation
-// Package: DateTime
-// Module:  Timezone
+// Package: Threading
+// Module:  Mutex
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -34,87 +34,56 @@
 //
 
 
-#include "Poco/Timezone.h"
-#include "Poco/Exception.h"
-#include <ctime>
+#include "Poco/Mutex_VX.h"
+#include <sysLib.h>
 
 
 namespace Poco {
 
 
-class TZInfo
+MutexImpl::MutexImpl()
 {
-public:
-	TZInfo()
+	_sem = semMCreate(SEM_INVERSION_SAFE | SEM_Q_PRIORITY);
+	if (_sem == 0)
+		throw Poco::SystemException("cannot create mutex");
+}
+
+
+MutexImpl::MutexImpl(bool fast)
+{
+	if (fast)
 	{
-		tzset();
+		_sem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 	}
-	
-	int timeZone()
+	else
 	{
-	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined(POCO_ANDROID) // no timezone global var
-		std::time_t now = std::time(NULL);
-		struct std::tm t;
-		gmtime_r(&now, &t);
-		std::time_t utc = std::mktime(&t);
-		return now - utc;
-	#elif defined(__CYGWIN__)
-		return -_timezone;
-	#else
-		return -timezone;
-	#endif
+		_sem = semMCreate(SEM_INVERSION_SAFE | SEM_Q_PRIORITY);
 	}
-	
-	const char* name(bool dst)
-	{
-		return tzname[dst ? 1 : 0];
-	}
-};
-
-
-static TZInfo tzInfo;
-
-
-int Timezone::utcOffset()
-{
-	return tzInfo.timeZone();
-}
-
-	
-int Timezone::dst()
-{
-	std::time_t now = std::time(NULL);
-	struct std::tm t;
-	if (!localtime_r(&now, &t))
-		throw Poco::SystemException("cannot get local time DST offset");
-	return t.tm_isdst == 1 ? 3600 : 0;
+	if (_sem == 0)
+		throw Poco::SystemException("cannot create mutex");
 }
 
 
-bool Timezone::isDst(const Timestamp& timestamp)
+MutexImpl::~MutexImpl()
 {
-	std::time_t time = timestamp.epochTime();
-	struct std::tm* tms = std::localtime(&time);
-	if (!tms) throw Poco::SystemException("cannot get local time DST flag");
-	return tms->tm_isdst > 0;
+	semDelete(_sem);
 }
 
-	
-std::string Timezone::name()
+
+bool MutexImpl::tryLockImpl(long milliseconds)
 {
-	return std::string(tzInfo.name(dst() != 0));
+	int ticks = milliseconds*sysClkRateGet()/1000;
+	return semTake(_sem, ticks) == OK;
 }
 
-	
-std::string Timezone::standardName()
+
+FastMutexImpl::FastMutexImpl(): MutexImpl(true)
 {
-	return std::string(tzInfo.name(false));
 }
 
-	
-std::string Timezone::dstName()
+
+FastMutexImpl::~FastMutexImpl()
 {
-	return std::string(tzInfo.name(true));
 }
 
 

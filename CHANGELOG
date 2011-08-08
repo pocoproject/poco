@@ -51,6 +51,9 @@ Release 1.4.2 (2011-08-xx)
 - Poco::Logger now also support a symbolic log level "none"
   (for use with setLevel()) that disables logging completely
   for that Logger (equivalent to setLevel(0)).
+- Added experimental Android support, using the existing gmake-based
+  build system.
+- fixed SF# 3288584: DateTimeFormatter link error
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1524,4 +1527,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#20 $
+$Id: //poco/1.4/dist/CHANGELOG#21 $

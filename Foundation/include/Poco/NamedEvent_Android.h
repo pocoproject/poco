@@ -1,15 +1,15 @@
 //
-// Mutex_POSIX.h
+// NamedEvent_Android.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Mutex_POSIX.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/NamedEvent_Android.h#1 $
 //
 // Library: Foundation
-// Package: Threading
-// Module:  Mutex
+// Package: Processes
+// Module:  NamedEvent
 //
-// Definition of the MutexImpl and FastMutexImpl classes for POSIX Threads.
+// Definition of the NamedEventImpl class for Android.
 //
-// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,73 +36,27 @@
 //
 
 
-#ifndef Foundation_Mutex_POSIX_INCLUDED
-#define Foundation_Mutex_POSIX_INCLUDED
+#ifndef Foundation_NamedEvent_Android_INCLUDED
+#define Foundation_NamedEvent_Android_INCLUDED
 
 
 #include "Poco/Foundation.h"
-#include "Poco/Exception.h"
-#include <pthread.h>
-#include <errno.h>
 
 
 namespace Poco {
 
 
-class Foundation_API MutexImpl
+class Foundation_API NamedEventImpl
 {
 protected:
-	MutexImpl();
-	MutexImpl(bool fast);
-	~MutexImpl();
-	void lockImpl();
-	bool tryLockImpl();
-	bool tryLockImpl(long milliseconds);
-	void unlockImpl();
-	
-private:
-	pthread_mutex_t _mutex;
+	NamedEventImpl(const std::string& name);	
+	~NamedEventImpl();
+	void setImpl();
+	void waitImpl();
 };
-
-
-class Foundation_API FastMutexImpl: public MutexImpl
-{
-protected:
-	FastMutexImpl();
-	~FastMutexImpl();
-};
-
-
-//
-// inlines
-//
-inline void MutexImpl::lockImpl()
-{
-	if (pthread_mutex_lock(&_mutex)) 
-		throw SystemException("cannot lock mutex");
-}
-
-
-inline bool MutexImpl::tryLockImpl()
-{
-	int rc = pthread_mutex_trylock(&_mutex);
-	if (rc == 0)
-		return true;
-	else if (rc == EBUSY)
-		return false;
-	else
-		throw SystemException("cannot lock mutex");
-}
-
-
-inline void MutexImpl::unlockImpl()
-{
-	if (pthread_mutex_unlock(&_mutex))
-		throw SystemException("cannot unlock mutex");
-}
 
 
 } // namespace Poco
 
 
-#endif // Foundation_Mutex_POSIX_INCLUDED
+#endif // Foundation_NamedEvent_Android_INCLUDED

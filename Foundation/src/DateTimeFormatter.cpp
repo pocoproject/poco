@@ -1,7 +1,7 @@
 //
 // DateTimeFormatter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTimeFormatter.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/DateTimeFormatter.cpp#3 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -47,6 +47,7 @@ void DateTimeFormatter::append(std::string& str, const LocalDateTime& dateTime, 
 {
 	DateTimeFormatter::append(str, dateTime.utc(), fmt, dateTime.tzd());
 }
+
 
 void DateTimeFormatter::append(std::string& str, const DateTime& dateTime, const std::string& fmt, int timeZoneDifferential)
 {

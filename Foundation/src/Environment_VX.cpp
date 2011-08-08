@@ -1,7 +1,7 @@
 
 // Environment_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -53,8 +53,8 @@
 #include <netinet/in.h>
 #include <net/if.h>
 #include <arpa/inet.h>
-#include <net/if.h>
-#include <net/if_arp.h>
+#include <netinet/if_ether.h>
+#include <ifLib.h>
 #include <unistd.h>
 
 
@@ -151,34 +151,23 @@ unsigned EnvironmentImpl::processorCountImpl()
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
 	std::memset(&id, 0, sizeof(id));
-	int ifIndex = 0;
+
+	int ifIndex = 1;
 	char ifName[32];
-	char ifAddr[4];
-
-	int s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (s == -1) return;
-
 	for (;;)
 	{
 		if (ifIndexToIfName(ifIndex, ifName) == OK)
 		{
-			if (ifAddrGet(ifName, ifAddr) == OK)
-			{			
-				struct arpreq ar;
-				std::memset(&ar, 0, sizeof(ar));
-				struct sockaddr_in* pAddr = reinterpret_cast<struct sockaddr_in*>(&ar.arp_pa);
-				pAddr->sin_family = AF_INET;
-				std::memcpy(&pAddr->sin_addr, ifAddr, sizeof(struct in_addr));
-				int rc = ioctl(s, SIOCGARP, reinterpret_cast<int>(&ar));
-				if (rc < 0) continue;
-				std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
-				close(s);
+			struct ifnet* pIf = ifunit(ifName);
+			if (pIf)
+			{
+				std::memcpy(&id, ((struct arpcom *) pIf)->ac_enaddr, sizeof(id));
 				return;
 			}
 		}
 		else break;	
+		++ifIndex;
 	}
-	close(s);
 	throw SystemException("cannot get Ethernet hardware address");
 }
 

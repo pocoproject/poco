@@ -1,15 +1,13 @@
 //
-// Mutex_POSIX.h
+// Semaphore_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Mutex_POSIX.h#2 $
+// $Id: //poco/1.4/Foundation/src/Semaphore_VX.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading
-// Module:  Mutex
+// Module:  Semaphore
 //
-// Definition of the MutexImpl and FastMutexImpl classes for POSIX Threads.
-//
-// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,73 +34,41 @@
 //
 
 
-#ifndef Foundation_Mutex_POSIX_INCLUDED
-#define Foundation_Mutex_POSIX_INCLUDED
-
-
-#include "Poco/Foundation.h"
-#include "Poco/Exception.h"
-#include <pthread.h>
-#include <errno.h>
+#include "Poco/Semaphore_VX.h"
+#include <sysLib.h>
 
 
 namespace Poco {
 
 
-class Foundation_API MutexImpl
+SemaphoreImpl::SemaphoreImpl(int n, int max)
 {
-protected:
-	MutexImpl();
-	MutexImpl(bool fast);
-	~MutexImpl();
-	void lockImpl();
-	bool tryLockImpl();
-	bool tryLockImpl(long milliseconds);
-	void unlockImpl();
-	
-private:
-	pthread_mutex_t _mutex;
-};
+	poco_assert (n >= 0 && max > 0 && n <= max);
 
-
-class Foundation_API FastMutexImpl: public MutexImpl
-{
-protected:
-	FastMutexImpl();
-	~FastMutexImpl();
-};
-
-
-//
-// inlines
-//
-inline void MutexImpl::lockImpl()
-{
-	if (pthread_mutex_lock(&_mutex)) 
-		throw SystemException("cannot lock mutex");
+	_sem = semCCreate(SEM_Q_PRIORITY, n);
+	if (_sem == 0)
+		throw Poco::SystemException("cannot create semaphore");
 }
 
 
-inline bool MutexImpl::tryLockImpl()
+SemaphoreImpl::~SemaphoreImpl()
 {
-	int rc = pthread_mutex_trylock(&_mutex);
-	if (rc == 0)
-		return true;
-	else if (rc == EBUSY)
-		return false;
-	else
-		throw SystemException("cannot lock mutex");
+	semDelete(_sem);
 }
 
 
-inline void MutexImpl::unlockImpl()
+void SemaphoreImpl::waitImpl()
 {
-	if (pthread_mutex_unlock(&_mutex))
-		throw SystemException("cannot unlock mutex");
+	if (semTake(_sem, WAIT_FOREVER) != OK)
+		throw SystemException("cannot wait for semaphore");
+}
+
+
+bool SemaphoreImpl::waitImpl(long milliseconds)
+{
+	int ticks = milliseconds*sysClkRateGet()/1000;
+	return semTake(_sem, ticks) == OK;
 }
 
 
 } // namespace Poco
-
-
-#endif // Foundation_Mutex_POSIX_INCLUDED

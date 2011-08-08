@@ -1,7 +1,7 @@
 //
 // SharedLibrary_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary_UNIX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/SharedLibrary_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -67,7 +67,11 @@ void SharedLibraryImpl::loadImpl(const std::string& path)
 	FastMutex::ScopedLock lock(_mutex);
 
 	if (_handle) throw LibraryAlreadyLoadedException(path);
-	_handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+	int flags = RTLD_LAZY | RTLD_GLOBAL;
+#if defined(RTLD_DEEPBIND)
+	flags |= RTLD_DEEPBIND;
+#endif
+	_handle = dlopen(path.c_str(), flags);
 	if (!_handle)
 	{
 		const char* err = dlerror();

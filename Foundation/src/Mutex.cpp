@@ -1,7 +1,7 @@
 //
 // Mutex.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Mutex.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Mutex.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -43,6 +43,8 @@
 #else
 #include "Mutex_WIN32.cpp"
 #endif
+#elif defined(POCO_VXWORKS)
+#include "Mutex_VX.cpp"
 #else
 #include "Mutex_POSIX.cpp"
 #endif
