@@ -1,7 +1,7 @@
 //
 // HostEntry.cpp
 //
-// $Id: //poco/1.4/Net/src/HostEntry.cpp#5 $
+// $Id: //poco/1.4/Net/src/HostEntry.cpp#6 $
 //
 // Library: Net
 // Package: NetCore
@@ -104,6 +104,19 @@ HostEntry::HostEntry(struct addrinfo* ainfo)
 
 
 #endif // POCO_HAVE_IPv6
+
+
+#if defined(POCO_VXWORKS)
+
+
+HostEntry::HostEntry(const std::string& name, const IPAddress& addr):
+	_name(name)
+{
+	_addresses.push_back(addr);
+}
+
+
+#endif // POCO_VXWORKS
 
 
 HostEntry::HostEntry(const HostEntry& entry):

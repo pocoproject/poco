@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#6 $
+// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#7 $
 //
 // Library: Net
 // Package: Sockets
@@ -555,9 +555,9 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 	FastMutex::ScopedLock lock(_mutex);
 	NetworkInterfaceList result;
 
-	int ifIndex = 0;
+	int ifIndex = 1;
 	char ifName[32];
-	char ifAddr[4];
+	char ifAddr[INET_ADDR_LEN];
 
 	for (;;)
 	{
@@ -569,7 +569,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 			IPAddress bcst;
 			if (ifAddrGet(ifName, ifAddr) == OK)
 			{			
-				addr = IPAddress(ifAddr, sizeof(ifAddr));
+				addr = IPAddress(std::string(ifAddr));
 			}
 			int ifMask;
 			if (ifMaskGet(ifName, &ifMask) == OK)
@@ -578,9 +578,10 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 			}
 			if (ifBroadcastGet(ifName, ifAddr) == OK)
 			{
-				bcst = IPAddress(ifAddr, sizeof(ifAddr));
+				bcst = IPAddress(std::string(ifAddr));
 			}
 			result.push_back(NetworkInterface(name, name, addr, mask, bcst));
+			ifIndex++;
 		}
 		else break;	
 	}

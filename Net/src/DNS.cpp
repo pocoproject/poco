@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#7 $
+// $Id: //poco/1.4/Net/src/DNS.cpp#8 $
 //
 // Library: Net
 // Package: NetCore
@@ -92,11 +92,10 @@ HostEntry DNS::hostByName(const std::string& hostname)
 		aierror(rc, hostname);
 	}
 #elif defined(POCO_VXWORKS)
-	static char buffer[2048];
-	struct hostent* he = resolvGetHostByName((char*) hostname.c_str(), buffer, sizeof(buffer));
-	if (he)
+	int addr = hostGetByName(const_cast<char*>(hostname.c_str()));
+	if (addr != ERROR)
 	{
-		return HostEntry(he);
+		return HostEntry(hostname, IPAddress(&addr, sizeof(addr)));
 	}
 #else
 	struct hostent* he = gethostbyname(hostname.c_str());
@@ -141,11 +140,10 @@ HostEntry DNS::hostByAddress(const IPAddress& address)
 		aierror(rc, address.toString());
 	}
 #elif defined(POCO_VXWORKS)
-	char buffer[2048];
-	struct hostent* he = resolvGetHostByAddr(reinterpret_cast<const char*>(address.addr()), buffer, sizeof(buffer));
-	if (he)
+	char name[MAXHOSTNAMELEN + 1];
+	if (hostGetByAddr(*reinterpret_cast<const int*>(address.addr()), name) == OK)
 	{
-		return HostEntry(he);
+		return HostEntry(std::string(name), address);
 	}
 #else
 	struct hostent* he = gethostbyaddr(reinterpret_cast<const char*>(address.addr()), address.length(), address.af());

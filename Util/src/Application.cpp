@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.4/Util/src/Application.cpp#2 $
+// $Id: //poco/1.4/Util/src/Application.cpp#3 $
 //
 // Library: Util
 // Package: Application
@@ -55,7 +55,7 @@
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/UnWindows.h"
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
 #endif
 #if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
@@ -119,7 +119,7 @@ void Application::setup()
 	
 	addSubsystem(new LoggingSubsystem);
 	
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	#if !defined(_DEBUG)
 	Poco::SignalHandler::install();
 	#endif

@@ -1,7 +1,7 @@
 //
 // HostEntry.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HostEntry.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HostEntry.h#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -68,6 +68,10 @@ public:
 #if defined(POCO_HAVE_IPv6)
 	HostEntry(struct addrinfo* info);
 		/// Creates the HostEntry from the data in an addrinfo structure.
+#endif
+
+#if defined(POCO_VXWORKS)
+	HostEntry(const std::string& name, const IPAddress& addr);
 #endif
 
 	HostEntry(const HostEntry& entry);
