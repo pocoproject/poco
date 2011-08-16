@@ -366,13 +366,13 @@ std::string URI::getPathEtc() const
 {
 	std::string pathEtc;
 	encode(_path, RESERVED_PATH, pathEtc);
-	if (!_query.empty())
-	{
-		pathEtc += '?';
-		encode(_query, RESERVED_QUERY, pathEtc);
-	}
-	if (!_fragment.empty())
-	{
+        if (!_query.empty())
+        {
+                pathEtc += '?';
+                pathEtc.append(_query);
+        }
+        if (!_fragment.empty())
+        {
 		pathEtc += '#';
 		encode(_fragment, RESERVED_FRAGMENT, pathEtc);
 	}
@@ -444,8 +444,8 @@ void URI::resolve(const URI& relativeURI)
 				_query = relativeURI._query;
 			}
 		}
-	}
-	_fragment = relativeURI._fragment;	
+        }
+        _fragment = relativeURI._fragment;      
 }
 
 

@@ -53,6 +53,7 @@ public:
 	void testNormalize();
 	void testResolve();
 	void testSwap();
+	void testOther();
 
 	void setUp();
 	void tearDown();
