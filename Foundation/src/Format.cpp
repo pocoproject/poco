@@ -86,7 +86,7 @@ namespace
 				prec = 10*prec + *itFmt - '0';
 				++itFmt;
 			}
-			if (prec != 0) str.precision(prec);
+			if (prec >= 0) str.precision(prec);
 		}
 	}
 	
