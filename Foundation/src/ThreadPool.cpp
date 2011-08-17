@@ -449,8 +449,16 @@ PooledThread* ThreadPool::getThread()
 		if (_threads.size() < _maxCapacity)
 		{
 			pThread = createThread();
-			pThread->start();
-			_threads.push_back(pThread);
+			try
+			{
+				pThread->start();
+				_threads.push_back(pThread);
+			}
+			catch(SystemException& e)
+			{
+				delete pThread;
+				throw;
+			}
 		}
 		else throw NoThreadAvailableException();
 	}
