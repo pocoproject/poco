@@ -1,7 +1,7 @@
 //
 // CryptoTest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.cpp#1 $
+// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.cpp#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -37,6 +37,8 @@
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherKey.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/CryptoStream.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
@@ -143,6 +145,36 @@ void CryptoTest::testEncryptDecryptWithSalt()
 }
 
 
+void CryptoTest::testStreams()
+{
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256"));
+
+	static const std::string SECRET_MESSAGE = "This is a secret message. Don't tell anyone.";
+
+	std::stringstream sstr;
+	EncryptingOutputStream encryptor(sstr, *pCipher);
+	encryptor << SECRET_MESSAGE;
+	encryptor.close();
+	
+	DecryptingInputStream decryptor(sstr, *pCipher);
+	std::string result;
+	Poco::StreamCopier::copyToString(decryptor, result);
+	
+	assert (result == SECRET_MESSAGE);
+	assert (decryptor.eof());
+	assert (!decryptor.bad());
+
+
+	std::istringstream emptyStream;
+	DecryptingInputStream badDecryptor(emptyStream, *pCipher);
+	Poco::StreamCopier::copyToString(badDecryptor, result);
+
+	assert (badDecryptor.fail());
+	assert (badDecryptor.bad());
+	assert (!badDecryptor.eof());
+}
+
+
 void CryptoTest::testCertificate()
 {
 	std::istringstream certStream(APPINF_PEM);
@@ -186,6 +218,7 @@ CppUnit::Test* CryptoTest::suite()
 
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecrypt);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSalt);
+	CppUnit_addTest(pSuite, CryptoTest, testStreams);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 
 	return pSuite;

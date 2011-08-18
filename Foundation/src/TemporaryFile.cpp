@@ -1,7 +1,7 @@
 //
 // TemporaryFile.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TemporaryFile.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/TemporaryFile.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -59,12 +59,12 @@ public:
 	{
 		for (std::set<std::string>::iterator it = _files.begin(); it != _files.end(); ++it)
 		{
-                        try
-                        {
-                                File f(*it);
-                                        f.remove(true);
-                        }
-                        catch (Exception&)
+			try
+			{
+				File f(*it);
+				f.remove(true);
+			}
+			catch (Exception&)
 			{
 			}
 		}
@@ -84,19 +84,23 @@ private:
 };
 
 
-TemporaryFile::TemporaryFile(): File(tempName()), _keep(false)
+TemporaryFile::TemporaryFile(): 
+	File(tempName()), 
+	_keep(false)
 {
 }
 
 
-TemporaryFile::TemporaryFile(const std::string& tempDir): File(tempName(tempDir)), _keep(false)
+TemporaryFile::TemporaryFile(const std::string& tempDir): 
+	File(tempName(tempDir)), 
+	_keep(false)
 {
 }
 
 
 TemporaryFile::~TemporaryFile()
 {
-        if (!_keep)
+	if (!_keep)
 	{
 		try
 		{
@@ -125,38 +129,38 @@ void TemporaryFile::keepUntilExit()
 
 namespace 
 {
-        static TempFileCollector fc;
+	static TempFileCollector fc;
 }
 
 
 void TemporaryFile::registerForDeletion(const std::string& path)
 {
-        fc.registerFile(path);
+	fc.registerFile(path);
 }
 
 
 namespace
 {
-        static FastMutex mutex;
+	static FastMutex mutex;
 }
 
 
 std::string TemporaryFile::tempName(const std::string& tempDir)
 {
-        std::ostringstream name;
-        static unsigned long count = 0;
-        mutex.lock();
-        unsigned long n = count++;
-        mutex.unlock();
-        name << (tempDir.empty() ? Path::temp() : tempDir);
+	std::ostringstream name;
+	static unsigned long count = 0;
+	mutex.lock();
+	unsigned long n = count++;
+	mutex.unlock();
+	name << (tempDir.empty() ? Path::temp() : tempDir);
 #if defined(POCO_VXWORKS)
-        name << "tmp";
+	name << "tmp";
 #else
-        name << "tmp" << Process::id();
+	name << "tmp" << Process::id();
 #endif
-        for (int i = 0; i < 6; ++i)
-        {
-                name << char('a' + (n % 26));
+	for (int i = 0; i < 6; ++i)
+	{
+		name << char('a' + (n % 26));
 		n /= 26;
 	}
 	return name.str();

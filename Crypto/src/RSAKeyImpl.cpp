@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSAKeyImpl.cpp#1 $
+// $Id: //poco/1.4/Crypto/src/RSAKeyImpl.cpp#2 $
 //
 // Library: Crypto
 // Package: RSA
@@ -41,6 +41,7 @@
 #include <sstream>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
+#include <openssl/evp.h>
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
 #include <openssl/bn.h>
 #endif
@@ -55,9 +56,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 {
 	const X509* pCert = cert.certificate();
 	EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));
-	
-	RSA* pRSA = pKey->pkey.rsa;
-	_pRSA = RSAPublicKey_dup(pRSA);
+	_pRSA = EVP_PKEY_get1_RSA(pKey);
 }
 
 

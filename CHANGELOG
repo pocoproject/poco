@@ -63,6 +63,14 @@ Release 1.4.2 (2011-08-xx)
 - fixed SF# 3379935: ThreadPool Start Bug
 - fixed SF# 3354451: Poco::Format::parsePrec never sets the precision to zero
 - fixed SF# 3387258: _MAX_PATH used but unknown in Path_WIN32
+- fixed a problem in RSAKeyImpl where direct access to the RSA in a EVP_PKEY
+  would no longer work in recent OpenSSL versions. Using EVP_PKEY_get1_RSA() 
+  fixes the issue.
+- added Poco::Crypto::EncryptingInputStream, Poco::Crypto::EncryptingOutputStream, 
+  Poco::Crypto::DecryptingInputStream and Poco::Crypto::DecryptingOutputStream.
+- fixed SF# 3148126: HTTPSClientSession destructor (!) throws an IOException
+- fixed SF# 3178098: Add constructor to Poco::TemporaryFile to specify directory
+- fixed SF# 3175310: Absolute path when device
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1536,4 +1544,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#22 $
+$Id: //poco/1.4/dist/CHANGELOG#23 $

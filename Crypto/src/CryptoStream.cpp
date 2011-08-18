@@ -1,7 +1,7 @@
 //
 // CryptoStream.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CryptoStream.cpp#1 $
+// $Id: //poco/1.4/Crypto/src/CryptoStream.cpp#2 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -289,6 +289,86 @@ CryptoOutputStream::~CryptoOutputStream()
 
 
 void CryptoOutputStream::close()
+{
+	_buf.close();
+}
+
+
+//
+// EncryptingInputStream
+//
+
+
+EncryptingInputStream::EncryptingInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize):
+	CryptoIOS(istr, cipher.createEncryptor(), bufferSize),
+	std::istream(&_buf)
+{
+}
+
+
+EncryptingInputStream::~EncryptingInputStream()
+{
+}
+
+
+//
+// EncryptingOuputStream
+//
+
+
+EncryptingOutputStream::EncryptingOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize):
+	CryptoIOS(ostr, cipher.createEncryptor(), bufferSize),
+	std::ostream(&_buf)
+{
+}
+
+
+EncryptingOutputStream::~EncryptingOutputStream()
+{
+}
+
+
+void EncryptingOutputStream::close()
+{
+	_buf.close();
+}
+
+
+//
+// DecryptingInputStream
+//
+
+
+DecryptingInputStream::DecryptingInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize):
+	CryptoIOS(istr, cipher.createDecryptor(), bufferSize),
+	std::istream(&_buf)
+{
+}
+
+
+DecryptingInputStream::~DecryptingInputStream()
+{
+}
+
+
+//
+// DecryptingOuputStream
+//
+
+
+DecryptingOutputStream::DecryptingOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize):
+	CryptoIOS(ostr, cipher.createDecryptor(), bufferSize),
+	std::ostream(&_buf)
+{
+}
+
+
+DecryptingOutputStream::~DecryptingOutputStream()
+{
+}
+
+
+void DecryptingOutputStream::close()
 {
 	_buf.close();
 }

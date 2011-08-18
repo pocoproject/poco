@@ -1,7 +1,7 @@
 //
 // CryptoStream.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CryptoStream.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CryptoStream.h#2 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -144,6 +144,64 @@ public:
 
 	~CryptoOutputStream();
 		/// Destroys the CryptoOutputStream.
+
+	void close();
+		/// Flushes all buffers and finishes the encryption.
+};
+
+
+class Crypto_API DecryptingInputStream: public CryptoIOS, public std::istream
+	/// This stream decrypts all data passing through it using the given
+	/// Cipher.
+{
+public:
+	DecryptingInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize = 8192);
+		/// Create a new DecryptingInputStream object using the given cipher.
+
+	~DecryptingInputStream();
+		/// Destroys the DecryptingInputStream.
+};
+
+
+class Crypto_API DecryptingOutputStream: public CryptoIOS, public std::ostream
+	/// This stream decrypts all data passing through it using the given
+	/// Cipher.
+{
+public:
+	DecryptingOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize = 8192);
+		/// Create a new DecryptingOutputStream object using the given cipher.
+
+	~DecryptingOutputStream();
+		/// Destroys the DecryptingOutputStream.
+
+	void close();
+		/// Flushes all buffers and finishes the decryption.
+};
+
+
+class Crypto_API EncryptingInputStream: public CryptoIOS, public std::istream
+	/// This stream encrypts all data passing through it using the given
+	/// Cipher.
+{
+public:
+	EncryptingInputStream(std::istream& istr, Cipher& cipher, std::streamsize bufferSize = 8192);
+		/// Create a new EncryptingInputStream object using the given cipher.
+
+	~EncryptingInputStream();
+		/// Destroys the EncryptingInputStream.
+};
+
+
+class Crypto_API EncryptingOutputStream: public CryptoIOS, public std::ostream
+	/// This stream encrypts all data passing through it using the given
+	/// Cipher.
+{
+public:
+	EncryptingOutputStream(std::ostream& ostr, Cipher& cipher, std::streamsize bufferSize = 8192);
+		/// Create a new EncryptingOutputStream object using the given cipher.
+
+	~EncryptingOutputStream();
+		/// Destroys the EncryptingOutputStream.
 
 	void close();
 		/// Flushes all buffers and finishes the encryption.

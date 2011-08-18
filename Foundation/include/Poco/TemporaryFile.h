@@ -1,7 +1,7 @@
 //
 // TemporaryFile.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/TemporaryFile.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/TemporaryFile.h#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -64,15 +64,15 @@ class Foundation_API TemporaryFile: public File
 	/// before the application terminates.
 {
 public:
-        TemporaryFile();
-                /// Creates the TemporaryFile.
+	TemporaryFile();
+		/// Creates the TemporaryFile.
 
     TemporaryFile(const std::string& tempDir);
-        /// Creates the TemporaryFile in the tempDir directory.
+		/// Creates the TemporaryFile using the given directory.
 
-        ~TemporaryFile();
-                /// Destroys the TemporaryFile and
-                /// deletes the corresponding file on
+	~TemporaryFile();
+		/// Destroys the TemporaryFile and
+		/// deletes the corresponding file on
 		/// disk unless keep() or keepUntilExit()
 		/// has been called.
 
@@ -86,14 +86,14 @@ public:
 		/// for deletion at process termination.
 
 	static void registerForDeletion(const std::string& path);
-                /// Registers the given file for deletion
-                /// at process termination.
+		/// Registers the given file for deletion
+		/// at process termination.
 
-        static std::string tempName(const std::string& tempDir = "");
-                /// Returns a unique path name for a temporary
-                /// file in the system's scratch directory if argument is empty string
-                /// or in the provided directory name.
-                /// (see Path::temp()).
+	static std::string tempName(const std::string& tempDir = "");
+		/// Returns a unique path name for a temporary
+		/// file in the system's scratch directory (see Path::temp())
+		/// if tempDir is empty or in the directory specified in tempDir
+		/// otherwise.
 
 private:
 	bool _keep;

@@ -1,7 +1,7 @@
 //
 // SocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketImpl.h#3 $
+// $Id: //poco/1.4/Net/include/Poco/Net/SocketImpl.h#4 $
 //
 // Library: Net
 // Package: Sockets
@@ -411,7 +411,7 @@ protected:
 		/// except for raw sockets.
 
 	void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
-		/// Allows subclasses to set the socket manually, iff no valid socket is set yet!
+		/// Allows subclasses to set the socket manually, iff no valid socket is set yet.
 	
 	static int lastError();
 		/// Returns the last error code.
