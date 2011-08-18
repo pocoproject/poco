@@ -1,7 +1,7 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/1.4/Foundation/src/ThreadPool.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/ThreadPool.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -469,7 +469,7 @@ PooledThread* ThreadPool::getThread()
                 pThread->start();
                 _threads.push_back(pThread);
             }
-            catch(SystemException& e)
+            catch (...)
             {
                 delete pThread;
                 throw;

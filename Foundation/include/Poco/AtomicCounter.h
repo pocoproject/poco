@@ -1,7 +1,7 @@
 //
 // AtomicCounter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AtomicCounter.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/AtomicCounter.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -161,9 +161,8 @@ inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
 	
 inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
 {
-	ValueType result(_counter);
-	InterlockedIncrement(&_counter);
-	return result;
+	ValueType result = InterlockedIncrement(&_counter);
+	return --result;
 }
 
 
@@ -175,9 +174,8 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
 	
 inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
-	ValueType result(_counter);
-	InterlockedDecrement(&_counter);
-	return result;
+	ValueType result = InterlockedDecrement(&_counter);
+	return ++result;
 }
 
 	
@@ -211,9 +209,8 @@ inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
 	
 inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
 {
-	ValueType result(_counter);
-	OSAtomicIncrement32(&_counter);
-	return result;
+	ValueType result = OSAtomicIncrement32(&_counter);
+	return --result;
 }
 
 
@@ -225,9 +222,8 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
 	
 inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
-	ValueType result(_counter);
-	OSAtomicDecrement32(&_counter);
-	return result;
+	ValueType result = OSAtomicDecrement32(&_counter);
+	return ++result;
 }
 
 	

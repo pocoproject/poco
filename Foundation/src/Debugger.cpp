@@ -1,7 +1,7 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Debugger.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Debugger.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -65,7 +65,7 @@ bool Debugger::isAvailable()
 #if defined(_DEBUG)
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 		#if defined(_WIN32_WCE)
-			#if (_WIN32_WCE >= 600)
+			#if (_WIN32_WCE >= 0x600)
 			    BOOL isDebuggerPresent;
 			    if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &isDebuggerPresent))
 			    {

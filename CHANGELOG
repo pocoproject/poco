@@ -54,6 +54,15 @@ Release 1.4.2 (2011-08-xx)
 - Added experimental Android support, using the existing gmake-based
   build system.
 - fixed SF# 3288584: DateTimeFormatter link error
+- fixed SF# 3187117: Typo in InflatingInputStream doc
+- fixed SF# 3309731: _WIN32_WCE comparison should be with 0x600 not 600
+- fixed SF# 3393026: RegularExpression.h identical enum value
+- fixed SF# 3274222: AtomicCounter's postfix operators aren't atomic on Windows
+- fixed SF# 3317177: Handle leak on windows
+- fixed SF# 3181882: Poco::URI::getPathEtc() double-encodes query
+- fixed SF# 3379935: ThreadPool Start Bug
+- fixed SF# 3354451: Poco::Format::parsePrec never sets the precision to zero
+- fixed SF# 3387258: _MAX_PATH used but unknown in Path_WIN32
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1527,4 +1536,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#21 $
+$Id: //poco/1.4/dist/CHANGELOG#22 $

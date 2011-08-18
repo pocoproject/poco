@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URI.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/URI.cpp#3 $
 //
 // Library: Foundation
 // Package: URI
@@ -366,13 +366,13 @@ std::string URI::getPathEtc() const
 {
 	std::string pathEtc;
 	encode(_path, RESERVED_PATH, pathEtc);
-        if (!_query.empty())
-        {
-                pathEtc += '?';
-                pathEtc.append(_query);
-        }
-        if (!_fragment.empty())
-        {
+	if (!_query.empty())
+	{
+		pathEtc += '?';
+		pathEtc += _query;
+	}
+	if (!_fragment.empty())
+	{
 		pathEtc += '#';
 		encode(_fragment, RESERVED_FRAGMENT, pathEtc);
 	}
@@ -387,7 +387,7 @@ std::string URI::getPathAndQuery() const
 	if (!_query.empty())
 	{
 		pathAndQuery += '?';
-		encode(_query, RESERVED_QUERY, pathAndQuery);
+		pathAndQuery += _query;
 	}
 	return pathAndQuery;
 }

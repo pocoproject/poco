@@ -1,7 +1,7 @@
 //
 // Thread.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Thread.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -107,7 +107,7 @@ public:
 		/// Returns the name of the thread.
 
 	std::string getName() const;
-		/// Returns teh name of the thread.
+		/// Returns the name of the thread.
 
 	void setName(const std::string& name);
 		/// Sets the name of the thread.
