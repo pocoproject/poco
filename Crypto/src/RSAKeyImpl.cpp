@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSAKeyImpl.cpp#2 $
+// $Id: //poco/1.4/Crypto/src/RSAKeyImpl.cpp#3 $
 //
 // Library: Crypto
 // Package: RSA
@@ -208,6 +208,24 @@ int RSAKeyImpl::size() const
 }
 
 
+RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
+{
+	return convertToByteVec(_pRSA->n);
+}
+
+
+RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
+{
+	return convertToByteVec(_pRSA->e);
+}
+
+
+RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
+{
+	return convertToByteVec(_pRSA->d);
+}
+
+
 void RSAKeyImpl::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
 {
 	if (!publicKeyFile.empty())
@@ -298,6 +316,23 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyS
 		pPrivateKeyStream->write(pData, static_cast<std::streamsize>(size));
 		BIO_free(bio);
 	}
+}
+
+
+RSAKeyImpl::ByteVec RSAKeyImpl::convertToByteVec(const BIGNUM* bn)
+{
+	int numBytes = BN_num_bytes(bn);
+	ByteVec byteVector(numBytes);
+
+	ByteVec::value_type* buffer = new ByteVec::value_type[numBytes];
+	BN_bn2bin(bn, buffer);
+
+	for (int i = 0; i < numBytes; ++i)
+		byteVector[i] = buffer[i];
+
+	delete [] buffer;
+
+	return byteVector;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // PatternFormatter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/PatternFormatter.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/PatternFormatter.cpp#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -123,6 +123,7 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 				case 'F': NumberFormatter::append0(text, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); break;
 				case 'z': text.append(DateTimeFormatter::tzdISO(_localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
 				case 'Z': text.append(DateTimeFormatter::tzdRFC(_localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
+				case 'E': NumberFormatter::append(text, msg.getTime().epochTime()); break;
 				case '[':
 				{
 					++it;

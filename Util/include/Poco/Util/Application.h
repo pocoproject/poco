@@ -1,7 +1,7 @@
 //
 // Application.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/Application.h#2 $
+// $Id: //poco/1.4/Util/include/Poco/Util/Application.h#4 $
 //
 // Library: Util
 // Package: Application
@@ -213,7 +213,7 @@ public:
 		///
 		/// Returns the number of configuration files loaded, which may be zero.
 		///
-		/// This method must not be called before initialize(argc, argv)
+		/// This method must not be called before init(argc, argv)
 		/// has been called.
 
 	void loadConfiguration(const std::string& path, int priority = PRIO_DEFAULT);
@@ -228,7 +228,6 @@ public:
 		///
 		/// The configuration will be added to the application's 
 		/// LayeredConfiguration with the given priority.
-		///
 
 	template <class C> C& getSubsystem() const;
 		/// Returns a reference to the subsystem of the class
@@ -388,6 +387,10 @@ private:
 	Poco::Logger*   _pLogger;
 	Poco::Timestamp _startTime;
 	bool            _stopOptionsProcessing;
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	std::string _workingDirAtLaunch;
+#endif
 
 	static Application* _pInstance;
 	

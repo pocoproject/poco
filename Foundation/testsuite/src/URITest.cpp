@@ -1,7 +1,7 @@
 //
 // URITest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/URITest.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/URITest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -180,7 +180,6 @@ void URITest::testConstruction()
 	assert (uri11.getPathEtc() == "/index.html?query=test#fragment");
 	assert (uri11.getQuery() == "query=test");
 	assert (uri11.getFragment() == "fragment");
-
 }
 
 
@@ -543,6 +542,10 @@ void URITest::testToString()
 
 	uri = "./c:/Windows/system32/";
 	assert (uri.toString() == "./c:/Windows/system32/");
+	
+	uri = "http://www.appinf.com";
+	uri.setRawQuery("query=test");
+	assert (uri.toString() == "http://www.appinf.com/?query=test");
 }
 
 

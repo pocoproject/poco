@@ -1,7 +1,7 @@
 //
 // HTTPMessage.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPMessage.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPMessage.h#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -65,13 +65,13 @@ public:
 	const std::string& getVersion() const;
 		/// Returns the HTTP version for this message.
 		
-	void setContentLength(int length);
+	void setContentLength(std::streamsize length);
 		/// Sets the Content-Length header.
 		///
 		/// If length is UNKNOWN_CONTENT_LENGTH, removes
 		/// the Content-Length header.
 		
-	int getContentLength() const;
+	std::streamsize getContentLength() const;
 		/// Returns the content length for this message,
 		/// which may be UNKNOWN_CONTENT_LENGTH if
 		/// no Content-Length header is present.

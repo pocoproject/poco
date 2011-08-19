@@ -71,6 +71,26 @@ Release 1.4.2 (2011-08-xx)
 - fixed SF# 3148126: HTTPSClientSession destructor (!) throws an IOException
 - fixed SF# 3178098: Add constructor to Poco::TemporaryFile to specify directory
 - fixed SF# 3175310: Absolute path when device
+- fixed SF# 3301207: Guided tour example contradicts apidoc (API doc was wrong)
+- Poco::Net::HTTPMessage::setContentLength() and Poco::Net::HTTPMessage::getContentLength() now
+  use std::streamsize instead of int. This enables 64-bit Content-Length support at least
+  on 64-bit platforms.
+- fixed SF# 3177530: TemporaryFile::tempName() + glob bug on xp
+- fixed SF# 3177372: FileChannel documentation inconsistency
+- added %E format specifier to Poco::PattermFormatter (epoch time in seconds
+  since midnight, January 1 1970)
+- On Windows, Poco::Util::ServerApplication now supports a /description command 
+  line argument for specifying a service description (together with /registerService)
+- added Poco::Util::WinService::setDescription() and 
+  Poco::Util::WinService::getDescription()
+- fixed SF# 3155477: Incorrect URI path handling
+- fixed SF# 3309736: Extended Exception macros to set default exception code
+  new macro is named POCO_DECLARE_EXCEPTION_CODE
+- added getter functions for modulus and exponents to Poco::Crypto::RSAKey.
+- added Poco::Net::SocketAddress::operator == () and 
+  Poco::Net::SocketAddress::operator != ()
+- fixed SF# 3182746: IPAddress.cpp IPv6 bug on big-endian
+- fixed SF# 3196961: Unix daemon fails to loadConfiguration() if started from cwd
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1544,4 +1564,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#23 $
+$Id: //poco/1.4/dist/CHANGELOG#24 $

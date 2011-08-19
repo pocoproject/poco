@@ -1,7 +1,7 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/ServerApplication.h#2 $
+// $Id: //poco/1.4/Util/include/Poco/Util/ServerApplication.h#3 $
 //
 // Library: Util
 // Package: Application
@@ -97,7 +97,8 @@ class Util_API ServerApplication: public Application
 	/// be unregistered, by specifying the /unregisterService option.
 	/// The file name of the application executable (excluding the .exe suffix)
 	/// is used as the service name. Additionally, a more user-friendly name can be
-	/// specified, using the /displayName option (e.g., /displayName="Demo Service").
+	/// specified, using the /displayName option (e.g., /displayName="Demo Service")
+	/// and a service description can be added with the /description option.
 	/// The startup mode (automatic or manual) for the service can be specified
 	/// with the /startup option.
 	///
@@ -219,10 +220,12 @@ private:
 	void handleRegisterService(const std::string& name, const std::string& value);
 	void handleUnregisterService(const std::string& name, const std::string& value);
 	void handleDisplayName(const std::string& name, const std::string& value);
+	void handleDescription(const std::string& name, const std::string& value);
 	void handleStartup(const std::string& name, const std::string& value);	
 	
 	Action      _action;
 	std::string _displayName;
+	std::string _description;
 	std::string _startup;
 
 	static Poco::Event           _terminated;

@@ -1,7 +1,7 @@
 //
 // RSAKey.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSAKey.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSAKey.h#2 $
 //
 // Library: Crypto
 // Package: RSA
@@ -97,6 +97,15 @@ public:
 
 	int size() const;
 		/// Returns the RSA modulus size.
+
+	RSAKeyImpl::ByteVec modulus() const;
+		/// Returns the RSA modulus.
+
+	RSAKeyImpl::ByteVec encryptionExponent() const;
+		/// Returns the RSA encryption exponent.
+
+	RSAKeyImpl::ByteVec decryptionExponent() const;
+		/// Returns the RSA decryption exponent.
 
 	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
 		/// Exports the public and private keys to the given files. 

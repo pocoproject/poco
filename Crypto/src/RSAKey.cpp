@@ -1,7 +1,7 @@
 //
 // RSAKey.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSAKey.cpp#1 $
+// $Id: //poco/1.4/Crypto/src/RSAKey.cpp#2 $
 //
 // Library: Crypto
 // Package: RSA
@@ -79,6 +79,24 @@ RSAKey::~RSAKey()
 int RSAKey::size() const
 {
 	return _pImpl->size();
+}
+
+
+RSAKeyImpl::ByteVec RSAKey::modulus() const
+{
+	return _pImpl->modulus();
+}
+
+
+RSAKeyImpl::ByteVec RSAKey::encryptionExponent() const
+{
+	return _pImpl->encryptionExponent();
+}
+
+
+RSAKeyImpl::ByteVec RSAKey::decryptionExponent() const
+{
+	return _pImpl->decryptionExponent();
 }
 
 

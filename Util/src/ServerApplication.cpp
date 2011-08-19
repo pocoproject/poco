@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.4/Util/src/ServerApplication.cpp#3 $
+// $Id: //poco/1.4/Util/src/ServerApplication.cpp#5 $
 //
 // Library: Util
 // Package: Application
@@ -57,6 +57,7 @@
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #if !defined(_WIN32_WCE)
 #include "Poco/Util/WinService.h"
+#include "Poco/Util/WinRegistryKey.h"
 #endif
 #include "Poco/UnWindows.h"
 #include <cstring>
@@ -390,6 +391,8 @@ void ServerApplication::registerService()
 		service.setStartup(WinService::SVC_AUTO_START);
 	else if (_startup == "manual")
 		service.setStartup(WinService::SVC_MANUAL_START);
+	if (!_description.empty())
+		service.setDescription(_description);
 	logger().information("The application has been successfully registered as a service.");
 }
 
@@ -428,6 +431,13 @@ void ServerApplication::defineOptions(OptionSet& options)
 			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDisplayName)));
 
 	options.addOption(
+		Option("description", "", "Specify a description for the service (only with /registerService).")
+			.required(false)
+			.repeatable(false)
+			.argument("text")
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDescription)));
+
+	options.addOption(
 		Option("startup", "", "Specify the startup mode for the service (only with /registerService).")
 			.required(false)
 			.repeatable(false)
@@ -451,6 +461,12 @@ void ServerApplication::handleUnregisterService(const std::string& name, const s
 void ServerApplication::handleDisplayName(const std::string& name, const std::string& value)
 {
 	_displayName = value;
+}
+
+
+void ServerApplication::handleDescription(const std::string& name, const std::string& value)
+{
+	_description = value;
 }
 
 

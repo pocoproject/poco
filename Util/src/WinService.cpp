@@ -1,7 +1,7 @@
 //
 // WinService.cpp
 //
-// $Id: //poco/1.4/Util/src/WinService.cpp#1 $
+// $Id: //poco/1.4/Util/src/WinService.cpp#2 $
 //
 // Library: Util
 // Package: Windows
@@ -35,6 +35,7 @@
 
 
 #include "Poco/Util/WinService.h"
+#include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
 #if defined(POCO_WIN32_UTF8)
@@ -53,6 +54,8 @@ namespace Util {
 
 
 const int WinService::STARTUP_TIMEOUT = 30000;
+const std::string WinService::REGISTRY_KEY("SYSTEM\\CurrentControlSet\\Services\\");
+const std::string WinService::REGISTRY_DESCRIPTION("Description");
 
 
 WinService::WinService(const std::string& name):
@@ -253,6 +256,24 @@ WinService::Startup WinService::getStartup() const
 	}
 	LocalFree(pSvcConfig);
 	return result;
+}
+
+
+void WinService::setDescription(const std::string& description)
+{
+	std::string key(REGISTRY_KEY);
+	key += _name;
+	WinRegistryKey regKey(HKEY_LOCAL_MACHINE, key);
+	regKey.setString(REGISTRY_DESCRIPTION, description);
+}
+
+
+std::string WinService::getDescription() const
+{
+	std::string key(REGISTRY_KEY);
+	key += _name;
+	WinRegistryKey regKey(HKEY_LOCAL_MACHINE, key, true);
+	return regKey.getString(REGISTRY_DESCRIPTION);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URI.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/URI.cpp#4 $
 //
 // Library: Foundation
 // Package: URI
@@ -228,6 +228,10 @@ std::string URI::toString() const
 			if (!auth.empty() && _path[0] != '/')
 				uri += '/';
 			encode(_path, RESERVED_PATH, uri);
+		}
+		else if (!_query.empty() || !_fragment.empty())
+		{
+			uri += '/';
 		}
 	}
 	if (!_query.empty())

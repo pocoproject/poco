@@ -1,7 +1,7 @@
 //
 // RSAKeyImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSAKeyImpl.h#2 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSAKeyImpl.h#3 $
 //
 // Library: Crypto
 // Package: RSA
@@ -46,9 +46,12 @@
 #include "Poco/AutoPtr.h"
 #include <istream>
 #include <ostream>
+#include <vector>
 
 
+struct bignum_st;
 struct rsa_st;
+typedef struct bignum_st BIGNUM;
 typedef struct rsa_st RSA;
 
 
@@ -64,6 +67,7 @@ class RSAKeyImpl: public Poco::RefCountedObject
 {
 public:
 	typedef Poco::AutoPtr<RSAKeyImpl> Ptr;
+	typedef std::vector<unsigned char> ByteVec;
 
 	explicit RSAKeyImpl(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
@@ -94,6 +98,15 @@ public:
 	int size() const;
 		/// Returns the RSA modulus size.
 
+	ByteVec modulus() const;
+		/// Returns the RSA modulus.
+
+	ByteVec encryptionExponent() const;
+		/// Returns the RSA encryption exponent.
+
+	ByteVec decryptionExponent() const;
+		/// Returns the RSA decryption exponent.
+
 	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
 		/// Exports the public and private keys to the given files. 
 		///
@@ -108,6 +121,8 @@ public:
 
 private:
 	void freeRSA();
+
+	static ByteVec convertToByteVec(const BIGNUM* bn);
 
 private:
 	RSA* _pRSA;
