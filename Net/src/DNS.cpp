@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#8 $
+// $Id: //poco/1.4/Net/src/DNS.cpp#9 $
 //
 // Library: Net
 // Package: NetCore
@@ -259,6 +259,10 @@ void DNS::aierror(int code, const std::string& arg)
 	case EAI_SYSTEM:
 		error(lastError(), arg);
 		break;
+#endif
+#if defined(_WIN32)
+	case WSANO_DATA: // may happen on XP
+		throw HostNotFoundException(arg);
 #endif
 	default:
 		throw DNSException("EAI", NumberFormatter::format(code));
