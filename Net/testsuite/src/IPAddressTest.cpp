@@ -1,7 +1,7 @@
 //
 // IPAddressTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/IPAddressTest.cpp#1 $
+// $Id: //poco/1.4/Net/testsuite/src/IPAddressTest.cpp#2 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -233,40 +233,6 @@ void IPAddressTest::testClassification()
 	assert (!ip8.isSiteLocalMC());
 	assert (!ip8.isOrgLocalMC());
 	assert (!ip8.isGlobalMC());
-
-#ifdef POCO_HAVE_IPv6
-
-	IPAddress ip9("::1");
-	assert (!ip9.isWildcard());
-	assert (!ip9.isBroadcast());
-	assert (ip9.isLoopback());
-	assert (!ip9.isMulticast());
-	assert (ip9.isUnicast());
-	assert (!ip9.isLinkLocal());
-	assert (!ip9.isSiteLocal());
-	assert (!ip9.isWellKnownMC());
-	assert (!ip9.isNodeLocalMC());
-	assert (!ip9.isLinkLocalMC());
-	assert (!ip9.isSiteLocalMC());
-	assert (!ip9.isOrgLocalMC());
-	assert (!ip9.isGlobalMC());
-
-	IPAddress ip10("fe80::12");
-	assert (!ip10.isWildcard());
-	assert (!ip10.isBroadcast());
-	assert (!ip10.isLoopback());
-	assert (!ip10.isMulticast());
-	assert (ip10.isUnicast());
-	assert (ip10.isLinkLocal());
-	assert (!ip10.isSiteLocal());
-	assert (!ip10.isWellKnownMC());
-	assert (!ip10.isNodeLocalMC());
-	assert (!ip10.isLinkLocalMC());
-	assert (!ip10.isSiteLocalMC());
-	assert (!ip10.isOrgLocalMC());
-	assert (!ip10.isGlobalMC());
-
-#endif
 }
 
 
@@ -352,6 +318,95 @@ void IPAddressTest::testMCClassification()
 void IPAddressTest::testClassification6()
 {
 #ifdef POCO_HAVE_IPv6
+	IPAddress ip1("::"); // wildcard
+	assert (ip1.isWildcard());
+	assert (!ip1.isBroadcast());
+	assert (!ip1.isLoopback());
+	assert (!ip1.isMulticast());
+	assert (!ip1.isUnicast());
+	assert (!ip1.isLinkLocal());
+	assert (!ip1.isSiteLocal());
+	assert (!ip1.isWellKnownMC());
+	assert (!ip1.isNodeLocalMC());
+	assert (!ip1.isLinkLocalMC());
+	assert (!ip1.isSiteLocalMC());
+	assert (!ip1.isOrgLocalMC());
+	assert (!ip1.isGlobalMC());
+		
+	IPAddress ip3("::1"); // loopback
+	assert (!ip3.isWildcard());
+	assert (!ip3.isBroadcast());
+	assert (ip3.isLoopback());
+	assert (!ip3.isMulticast());
+	assert (ip3.isUnicast());
+	assert (!ip3.isLinkLocal());
+	assert (!ip3.isSiteLocal());
+	assert (!ip3.isWellKnownMC());
+	assert (!ip3.isNodeLocalMC());
+	assert (!ip3.isLinkLocalMC());
+	assert (!ip3.isSiteLocalMC());
+	assert (!ip3.isOrgLocalMC());
+	assert (!ip3.isGlobalMC());
+
+	IPAddress ip4("2001:0db8:85a3:0000:0000:8a2e:0370:7334"); // unicast
+	assert (!ip4.isWildcard());
+	assert (!ip4.isBroadcast());
+	assert (!ip4.isLoopback());
+	assert (!ip4.isMulticast());
+	assert (ip4.isUnicast());
+	assert (!ip4.isLinkLocal());
+	assert (!ip4.isSiteLocal());
+	assert (!ip4.isWellKnownMC());
+	assert (!ip4.isNodeLocalMC());
+	assert (!ip4.isLinkLocalMC());
+	assert (!ip4.isSiteLocalMC());
+	assert (!ip4.isOrgLocalMC());
+	assert (!ip4.isGlobalMC());
+
+	IPAddress ip5("fe80::21f:5bff:fec6:6707"); // link local unicast
+	assert (!ip5.isWildcard());
+	assert (!ip5.isBroadcast());
+	assert (!ip5.isLoopback());
+	assert (!ip5.isMulticast());
+	assert (ip5.isUnicast());
+	assert (ip5.isLinkLocal());
+	assert (!ip5.isSiteLocal());
+	assert (!ip5.isWellKnownMC());
+	assert (!ip5.isNodeLocalMC());
+	assert (!ip5.isLinkLocalMC());
+	assert (!ip5.isSiteLocalMC());
+	assert (!ip5.isOrgLocalMC());
+	assert (!ip5.isGlobalMC());
+
+	IPAddress ip10("fe80::12"); // link local unicast
+	assert (!ip10.isWildcard());
+	assert (!ip10.isBroadcast());
+	assert (!ip10.isLoopback());
+	assert (!ip10.isMulticast());
+	assert (ip10.isUnicast());
+	assert (ip10.isLinkLocal());
+	assert (!ip10.isSiteLocal());
+	assert (!ip10.isWellKnownMC());
+	assert (!ip10.isNodeLocalMC());
+	assert (!ip10.isLinkLocalMC());
+	assert (!ip10.isSiteLocalMC());
+	assert (!ip10.isOrgLocalMC());
+	assert (!ip10.isGlobalMC());
+
+	IPAddress ip6("fec0::21f:5bff:fec6:6707"); // site local unicast
+	assert (!ip6.isWildcard());
+	assert (!ip6.isBroadcast());
+	assert (!ip6.isLoopback());
+	assert (!ip6.isMulticast());
+	assert (ip6.isUnicast());
+	assert (!ip6.isLinkLocal());
+	assert (ip6.isSiteLocal());
+	assert (!ip6.isWellKnownMC());
+	assert (!ip6.isNodeLocalMC());
+	assert (!ip6.isLinkLocalMC());
+	assert (!ip6.isSiteLocalMC());
+	assert (!ip6.isOrgLocalMC());
+	assert (!ip6.isGlobalMC());
 #endif
 }
 
@@ -359,6 +414,80 @@ void IPAddressTest::testClassification6()
 void IPAddressTest::testMCClassification6()
 {
 #ifdef POCO_HAVE_IPv6
+	IPAddress ip1("ff02:0:0:0:0:0:0:c"); // well-known link-local multicast
+	assert (!ip1.isWildcard());
+	assert (!ip1.isBroadcast());
+	assert (!ip1.isLoopback());
+	assert (ip1.isMulticast());
+	assert (!ip1.isUnicast());
+	assert (!ip1.isLinkLocal());
+	assert (!ip1.isSiteLocal());
+	assert (ip1.isWellKnownMC());
+	assert (!ip1.isNodeLocalMC());
+	assert (ip1.isLinkLocalMC()); 
+	assert (!ip1.isSiteLocalMC());
+	assert (!ip1.isOrgLocalMC());
+	assert (!ip1.isGlobalMC());
+
+	IPAddress ip2("FF01:0:0:0:0:0:0:FB"); // node-local unicast
+	assert (!ip2.isWildcard());
+	assert (!ip2.isBroadcast());
+	assert (!ip2.isLoopback());
+	assert (ip2.isMulticast());
+	assert (!ip2.isUnicast());
+	assert (!ip2.isLinkLocal());
+	assert (!ip2.isSiteLocal());
+	assert (ip2.isWellKnownMC());
+	assert (ip2.isNodeLocalMC());
+	assert (!ip2.isLinkLocalMC());
+	assert (!ip2.isSiteLocalMC());
+	assert (!ip2.isOrgLocalMC());
+	assert (!ip2.isGlobalMC()); 
+
+	IPAddress ip3("FF05:0:0:0:0:0:0:FB"); // site local unicast
+	assert (!ip3.isWildcard());
+	assert (!ip3.isBroadcast());
+	assert (!ip3.isLoopback());
+	assert (ip3.isMulticast());
+	assert (!ip3.isUnicast());
+	assert (!ip3.isLinkLocal());
+	assert (!ip3.isSiteLocal());
+	assert (ip3.isWellKnownMC());
+	assert (!ip3.isNodeLocalMC());
+	assert (!ip3.isLinkLocalMC());
+	assert (ip3.isSiteLocalMC());
+	assert (!ip3.isOrgLocalMC());
+	assert (!ip3.isGlobalMC());
+
+	IPAddress ip4("FF18:0:0:0:0:0:0:FB"); // org local unicast
+	assert (!ip4.isWildcard());
+	assert (!ip4.isBroadcast());
+	assert (!ip4.isLoopback());
+	assert (ip4.isMulticast());
+	assert (!ip4.isUnicast());
+	assert (!ip4.isLinkLocal());
+	assert (!ip4.isSiteLocal());
+	assert (!ip4.isWellKnownMC());
+	assert (!ip4.isNodeLocalMC());
+	assert (!ip4.isLinkLocalMC());
+	assert (!ip4.isSiteLocalMC());
+	assert (ip4.isOrgLocalMC());
+	assert (!ip4.isGlobalMC());
+
+	IPAddress ip5("FF1F:0:0:0:0:0:0:FB"); // global unicast
+	assert (!ip5.isWildcard());
+	assert (!ip5.isBroadcast());
+	assert (!ip5.isLoopback());
+	assert (ip5.isMulticast());
+	assert (!ip5.isUnicast());
+	assert (!ip5.isLinkLocal());
+	assert (!ip5.isSiteLocal());
+	assert (!ip5.isWellKnownMC());
+	assert (!ip5.isNodeLocalMC());
+	assert (!ip5.isLinkLocalMC()); 
+	assert (!ip5.isSiteLocalMC());
+	assert (!ip5.isOrgLocalMC());
+	assert (ip5.isGlobalMC());
 #endif
 }
 
