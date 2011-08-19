@@ -91,6 +91,7 @@ Release 1.4.2 (2011-08-xx)
   Poco::Net::SocketAddress::operator != ()
 - fixed SF# 3182746: IPAddress.cpp IPv6 bug on big-endian
 - fixed SF# 3196961: Unix daemon fails to loadConfiguration() if started from cwd
+- fixed SF# 3393700: NotificationCenter may call a removed observer and crash.
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1564,4 +1565,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#24 $
+$Id: //poco/1.4/dist/CHANGELOG#25 $

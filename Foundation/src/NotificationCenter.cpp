@@ -1,7 +1,7 @@
 //
 // NotificationCenter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NotificationCenter.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/NotificationCenter.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -68,6 +68,7 @@ void NotificationCenter::removeObserver(const AbstractObserver& observer)
 	{
 		if (observer.equals(**it))
 		{
+			(*it)->disable();
 			_observers.erase(it);
 			return;
 		}
