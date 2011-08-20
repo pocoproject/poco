@@ -1,7 +1,7 @@
 //
 // PriorityEventTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/PriorityEventTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/PriorityEventTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -109,7 +109,7 @@ void PriorityEventTest::testNoDelegate()
 	Simple += priorityDelegate(&PriorityEventTest::onStaticSimple3, 3);
 	
 	Simple.notify(this, tmp);
-	assert (_count == 3);
+	assert (_count == 4);
 	Simple -= priorityDelegate(PriorityEventTest::onStaticSimple, 0);
 }
 
@@ -167,18 +167,17 @@ void PriorityEventTest::testDuplicateRegister()
 	Simple += priorityDelegate(this, &PriorityEventTest::onSimple, 0);
 	Simple += priorityDelegate(this, &PriorityEventTest::onSimple, 0);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 2);
 	Simple -= priorityDelegate(this, &PriorityEventTest::onSimple, 0);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 3);
 
-	Simple += priorityDelegate(this, &PriorityEventTest::onSimple, 0);
 	Simple += priorityDelegate(this, &PriorityEventTest::onSimpleOther, 1);
 	Simple.notify(this, tmp);
-	assert (_count == 2 + LARGEINC);
+	assert (_count == 4 + LARGEINC);
 	Simple -= priorityDelegate(this, &PriorityEventTest::onSimpleOther, 1);
 	Simple.notify(this, tmp);
-	assert (_count == 3 + LARGEINC);
+	assert (_count == 5 + LARGEINC);
 }
 
 void PriorityEventTest::testDuplicateUnregister()
@@ -278,7 +277,7 @@ void PriorityEventTest::testPriorityOrderExpire()
 	assert (tmp == 2);
 
 	// both ways of unregistering should work
-	Simple -= priorityDelegate(&o1, &DummyDelegate::onSimple, 0, 600000);
+	Simple -= priorityDelegate(&o1, &DummyDelegate::onSimple, 0, 500000);
 	Simple -= priorityDelegate(&o2, &DummyDelegate::onSimple2, 1);
 	Simple.notify(this, tmp);
 	assert (tmp == 2);
@@ -293,7 +292,7 @@ void PriorityEventTest::testPriorityOrderExpire()
 
 	Simple -= priorityDelegate(&o2, &DummyDelegate::onSimple2, 1);
 	// it is not forbidden to unregister a non expiring event with an expire decorator (it is just stupid ;-))
-	Simple -= priorityDelegate(&o1, &DummyDelegate::onSimple, 0, 600000);
+	Simple -= priorityDelegate(&o1, &DummyDelegate::onSimple, 0, 500000);
 	Simple.notify(this, tmp);
 	assert (tmp == 2);
 
@@ -377,18 +376,12 @@ void PriorityEventTest::testReturnParams()
 void PriorityEventTest::testOverwriteDelegate()
 {
 	DummyDelegate o1;
-	Simple += priorityDelegate(&o1, &DummyDelegate::onSimple2, 0);
-	// o1 can only have one entry per priority, thus the next line will replace the entry
 	Simple += priorityDelegate(&o1, &DummyDelegate::onSimple, 0);
+	Simple += priorityDelegate(&o1, &DummyDelegate::onSimple2, 0);
 
 	int tmp = 0; // onsimple requires 0 as input
 	Simple.notify(this, tmp);
-	assert (tmp == 1);
-	// now overwrite with onsimple2 with requires as input tmp = 1
-	Simple += priorityDelegate(&o1, &DummyDelegate::onSimple2, 0, 23000);
-	Simple.notify(this, tmp);
 	assert (tmp == 2);
-	Simple -= priorityDelegate(&o1, &DummyDelegate::onSimple2, 0, 23000);
 }
 
 void PriorityEventTest::testAsyncNotify()

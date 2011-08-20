@@ -1011,6 +1011,7 @@
     <ClInclude Include="include\Poco\Platform_VMS.h" />
     <ClInclude Include="include\Poco\Platform_WIN32.h" />
     <ClInclude Include="include\Poco\Poco.h" />
+    <ClInclude Include="include\Poco\PriorityStrategy.h" />
     <ClInclude Include="include\Poco\RefCountedObject.h" />
     <ClInclude Include="include\Poco\SharedPtr.h" />
     <ClInclude Include="include\Poco\SingletonHolder.h" />
@@ -1229,7 +1230,6 @@
     <ClInclude Include="include\Poco\AbstractPriorityDelegate.h" />
     <ClInclude Include="include\Poco\AccessExpirationDecorator.h" />
     <ClInclude Include="include\Poco\BasicEvent.h" />
-    <ClInclude Include="include\Poco\CompareFunctions.h" />
     <ClInclude Include="include\Poco\DefaultStrategy.h" />
     <ClInclude Include="include\Poco\Delegate.h" />
     <ClInclude Include="include\Poco\EventArgs.h" />

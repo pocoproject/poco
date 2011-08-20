@@ -4437,13 +4437,7 @@
 					RelativePath=".\include\Poco\AbstractPriorityDelegate.h">
 				</File>
 				<File
-					RelativePath=".\include\Poco\AccessExpirationDecorator.h">
-				</File>
-				<File
 					RelativePath=".\include\Poco\BasicEvent.h">
-				</File>
-				<File
-					RelativePath=".\include\Poco\CompareFunctions.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\DefaultStrategy.h">
@@ -4481,6 +4475,9 @@
 				<File
 					RelativePath=".\include\Poco\PriorityExpire.h">
 				</File>
+				<File
+					RelativePath=".\include\Poco\PriorityStrategy.h">
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -4505,6 +4502,9 @@
 				</File>
 				<File
 					RelativePath=".\include\Poco\AbstractStrategy.h">
+				</File>
+				<File
+					RelativePath=".\include\Poco\AccessExpirationDecorator.h">
 				</File>
 				<File
 					RelativePath=".\include\Poco\AccessExpireCache.h">

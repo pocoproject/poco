@@ -92,6 +92,13 @@ Release 1.4.2 (2011-08-xx)
 - fixed SF# 3182746: IPAddress.cpp IPv6 bug on big-endian
 - fixed SF# 3196961: Unix daemon fails to loadConfiguration() if started from cwd
 - fixed SF# 3393700: NotificationCenter may call a removed observer and crash.
+- Reworked implementation of the events framework (Poco::BasicEvent and friends).
+  The framework is now completely multithreading save (even in the case that
+  an event subscriber object unsubscribes and is deleted while an event is
+  being dispatched). Also, the restriction that any object can only register
+  one delegate for each event has been removed. For most cases, dispatching
+  events should be faster, as dispatching an event now needs less dynamic memory
+  allocations.
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1565,4 +1572,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#25 $
+$Id: //poco/1.4/dist/CHANGELOG#26 $

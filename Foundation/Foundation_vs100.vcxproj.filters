@@ -1631,13 +1631,7 @@
     <ClInclude Include="include\Poco\AbstractPriorityDelegate.h">
       <Filter>Events\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\AccessExpirationDecorator.h">
-      <Filter>Events\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Poco\BasicEvent.h">
-      <Filter>Events\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\CompareFunctions.h">
       <Filter>Events\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\DefaultStrategy.h">
@@ -1759,6 +1753,12 @@
     </ClInclude>
     <ClInclude Include="include\Poco\SimpleHashTable.h">
       <Filter>Hashing\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\AccessExpirationDecorator.h">
+      <Filter>Cache\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\PriorityStrategy.h">
+      <Filter>Events\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

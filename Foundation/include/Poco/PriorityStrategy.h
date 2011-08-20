@@ -1,11 +1,11 @@
 //
-// DefaultStrategy.h
+// PriorityStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DefaultStrategy.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/PriorityStrategy.h#2 $
 //
 // Library: Foundation
 // Package: Events
-// Module:  DefaultStrategy
+// Module:  PrioritytStrategy
 //
 // Implementation of the DefaultStrategy template.
 //
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef Foundation_DefaultStrategy_INCLUDED
-#define Foundation_DefaultStrategy_INCLUDED
+#ifndef Foundation_PriorityStrategy_INCLUDED
+#define Foundation_PriorityStrategy_INCLUDED
 
 
 #include "Poco/NotificationStrategy.h"
@@ -49,12 +49,11 @@ namespace Poco {
 
 
 template <class TArgs, class TDelegate> 
-class DefaultStrategy: public NotificationStrategy<TArgs, TDelegate>
-	/// Default notification strategy.
+class PriorityStrategy: public NotificationStrategy<TArgs, TDelegate>
+	/// NotificationStrategy for PriorityEvent.
 	///
-	/// Internally, a std::vector<> is used to store
-	/// delegate objects. Delegates are invoked in the
-	/// order in which they have been registered.
+	/// Delegates are kept in a std::vector<>, ordered
+	/// by their priority.
 {
 public:
 	typedef SharedPtr<TDelegate>         DelegatePtr;
@@ -62,16 +61,16 @@ public:
 	typedef typename Delegates::iterator Iterator;
 
 public:
-	DefaultStrategy()
+	PriorityStrategy()
 	{
 	}
 
-	DefaultStrategy(const DefaultStrategy& s):
+	PriorityStrategy(const PriorityStrategy& s):
 		_delegates(s._delegates)
 	{
 	}
 
-	~DefaultStrategy()
+	~PriorityStrategy()
 	{
 	}
 
@@ -85,6 +84,14 @@ public:
 
 	void add(const TDelegate& delegate)
 	{
+		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
+		{
+			if ((*it)->priority() > delegate.priority())
+			{
+				_delegates.insert(it, DelegatePtr(static_cast<TDelegate*>(delegate.clone())));
+				return;
+			}
+		}
 		_delegates.push_back(DelegatePtr(static_cast<TDelegate*>(delegate.clone())));
 	}
 
@@ -101,7 +108,7 @@ public:
 		}
 	}
 
-	DefaultStrategy& operator = (const DefaultStrategy& s)
+	PriorityStrategy& operator = (const PriorityStrategy& s)
 	{
 		if (this != &s)
 		{
@@ -132,4 +139,4 @@ protected:
 } // namespace Poco
 
 
-#endif // Foundation_DefaultStrategy_INCLUDED
+#endif // Foundation_PriorityStrategy_INCLUDED

@@ -1,7 +1,7 @@
 //
 // BasicEventTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/BasicEventTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/BasicEventTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -112,7 +112,7 @@ void BasicEventTest::testNoDelegate()
 	Simple += delegate(&BasicEventTest::onStaticSimple3);
 	
 	Simple.notify(this, tmp);
-	assert (_count == 2);
+	assert (_count == 3);
 	Simple -= delegate(BasicEventTest::onStaticSimple);
 }
 
@@ -163,10 +163,10 @@ void BasicEventTest::testDuplicateRegister()
 	Simple += delegate(this, &BasicEventTest::onSimple);
 	Simple += delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 2);
 	Simple -= delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 3);
 }
 
 
@@ -180,10 +180,10 @@ void BasicEventTest::testNullMutex()
 	ev += delegate(this, &BasicEventTest::onSimple);
 	ev += delegate(this, &BasicEventTest::onSimple);
 	ev.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 2);
 	ev -= delegate(this, &BasicEventTest::onSimple);
 	ev.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 3);
 }
 
 
@@ -251,10 +251,10 @@ void BasicEventTest::testExpire()
 	Simple += delegate(&BasicEventTest::onStaticSimple2, 400);
 	Simple += delegate(&BasicEventTest::onStaticSimple3, 400);
 	Simple.notify(this, tmp);
-	assert (_count == 3);
+	assert (_count == 4);
 	Poco::Thread::sleep(700);
 	Simple.notify(this, tmp);
-	assert (_count == 3);
+	assert (_count == 4);
 }
 
 void BasicEventTest::testExpireReRegister()
@@ -292,15 +292,10 @@ void BasicEventTest::testReturnParams()
 void BasicEventTest::testOverwriteDelegate()
 {
 	DummyDelegate o1;
-	Simple += delegate(&o1, &DummyDelegate::onSimple2);
-	// o1 can only have one entry, thus the next line will replace the entry
 	Simple += delegate(&o1, &DummyDelegate::onSimple);
+	Simple += delegate(&o1, &DummyDelegate::onSimple2);
 
 	int tmp = 0; // onsimple requires 0 as input
-	Simple.notify(this, tmp);
-	assert (tmp == 1);
-	// now overwrite with onsimple2 with requires as input tmp = 1
-	Simple += delegate(&o1, &DummyDelegate::onSimple2, 23000);
 	Simple.notify(this, tmp);
 	assert (tmp == 2);
 }

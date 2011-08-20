@@ -1,7 +1,7 @@
 //
 // FIFOEventTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FIFOEventTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FIFOEventTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -145,10 +145,10 @@ void FIFOEventTest::testDuplicateRegister()
 	Simple += delegate(this, &FIFOEventTest::onSimple);
 	Simple += delegate(this, &FIFOEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 2);
 	Simple -= delegate(this, &FIFOEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assert (_count == 3);
 }
 
 void FIFOEventTest::testDuplicateUnregister()
@@ -330,15 +330,10 @@ void FIFOEventTest::testReturnParams()
 void FIFOEventTest::testOverwriteDelegate()
 {
 	DummyDelegate o1;
-	Simple += delegate(&o1, &DummyDelegate::onSimple2);
-	// o1 can only have one entry, thus the next line will replace the entry
 	Simple += delegate(&o1, &DummyDelegate::onSimple);
+	Simple += delegate(&o1, &DummyDelegate::onSimple2);
 
 	int tmp = 0; // onsimple requires 0 as input
-	Simple.notify(this, tmp);
-	assert (tmp == 1);
-	// now overwrite with onsimple2 with requires as input tmp = 1
-	Simple += delegate(&o1, &DummyDelegate::onSimple2, 23000);
 	Simple.notify(this, tmp);
 	assert (tmp == 2);
 }
