@@ -1,7 +1,7 @@
 //
 // AbstractEvent.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/AbstractEvent.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/AbstractEvent.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_AbstractFoundation_INCLUDED
-#define  Foundation_AbstractFoundation_INCLUDED
+#ifndef Foundation_AbstractFoundation_INCLUDED
+#define Foundation_AbstractFoundation_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -209,25 +209,16 @@ public:
 		/// the next notify. If one of the delegates throws an exception, the notify
 		/// method is immediately aborted and the exception is reported to the caller.
 	{
-		SharedPtr<TStrategy> ptrStrat;
-		bool enabled = false;
+		Poco::ScopedLockWithUnlock<TMutex> lock(_mutex);
 		
-		{
-			typename TMutex::ScopedLock lock(_mutex);
-			enabled = _enabled;
-			if (_enabled)
-			{
-				// thread-safeness: 
-				// copy should be faster and safer than blocking until
-				// execution ends
-				ptrStrat = new TStrategy(_strategy);
-			}
-		}
-
-		if (enabled)
-		{
-			ptrStrat->notify(pSender, args);
-		}
+		if (!_enabled) return;
+		
+		// thread-safeness: 
+		// copy should be faster and safer than blocking until
+		// execution ends
+		TStrategy strategy(_strategy);
+		lock.unlock();
+		strategy.notify(pSender, args);
 	}
 
 	ActiveResult<TArgs> notifyAsync(const void* pSender, const TArgs& args)
@@ -260,7 +251,7 @@ public:
 	}
 	
 	void enable()
-		/// Enables the event
+		/// Enables the event.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		_enabled = true;
@@ -288,7 +279,7 @@ public:
 	}
 	
 	bool empty() const
-		/// Checks if any delegates are registered at the delegate
+		/// Checks if any delegates are registered at the delegate.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		return _strategy.empty();
@@ -337,4 +328,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AbstractFoundation_INCLUDED
