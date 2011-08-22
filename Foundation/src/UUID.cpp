@@ -143,18 +143,24 @@ void UUID::swap(UUID& uuid)
 
 void UUID::parse(const std::string& uuid)
 {
-	if (uuid.size() < 36)
+	if (!tryParse(uuid))
 		throw SyntaxException(uuid);
+}	
+
+bool UUID::tryParse(const std::string& uuid)
+{
+	if (uuid.size() < 36)
+		return false;
 
 	if (uuid[8] != '-'|| uuid[13] != '-' || uuid[18] != '-' || uuid[23] != '-')
-		throw SyntaxException(uuid);
-	
-	std::string::const_iterator it  = uuid.begin();
+		return false;
+
+	std::string::const_iterator it = uuid.begin();
 	_timeLow = 0;
 	for (int i = 0; i < 8; ++i)
 	{
 		_timeLow = (_timeLow << 4) | nibble(*it++);
- 	}
+	}
 	++it;
 	_timeMid = 0;
 	for (int i = 0; i < 4; ++i)
@@ -178,7 +184,9 @@ void UUID::parse(const std::string& uuid)
 	{
 		_node[i] = (nibble(*it++) << 4) | nibble(*it++) ;			
 	}
-}	
+
+	return true;
+}
 
 
 std::string UUID::toString() const
@@ -319,37 +327,42 @@ void UUID::toNetwork()
 }
 
 
-const UUID& UUID::nil()
+namespace
 {
-	static UUID nil;
-	return nil;
+	static UUID uuidNull;
+	static UUID uuidDNS("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
+	static UUID uuidURI("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
+	static UUID uuidOID("6ba7b812-9dad-11d1-80b4-00c04fd430c8");
+	static UUID uuidX500("6ba7b814-9dad-11d1-80b4-00c04fd430c8");
+}
+
+
+const UUID& UUID::null()
+{
+	return uuidNull;
 }
 
 
 const UUID& UUID::dns()
 {
-	static UUID uuidDNS("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
 	return uuidDNS;
 }
 
 	
 const UUID& UUID::uri()
 {
-	static UUID uuidURI("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
 	return uuidURI;
 }
 
 
 const UUID& UUID::oid()
 {
-	static UUID uuidOID("6ba7b812-9dad-11d1-80b4-00c04fd430c8");
 	return uuidOID;
 }
 
 
 const UUID& UUID::x500()
 {
-	static UUID uuidX500("6ba7b814-9dad-11d1-80b4-00c04fd430c8");
 	return uuidX500;
 }
 
