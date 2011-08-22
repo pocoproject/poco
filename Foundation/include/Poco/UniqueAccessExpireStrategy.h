@@ -1,7 +1,7 @@
 //
 // UniqueAccessExpireStrategy.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/UniqueAccessExpireStrategy.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/UniqueAccessExpireStrategy.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,8 +36,9 @@
 //
 
 
-#ifndef  Foundation_UniqueAccessExpireStrategy_INCLUDED
-#define  Foundation_UniqueAccessExpireStrategy_INCLUDED
+#ifndef Foundation_UniqueAccessExpireStrategy_INCLUDED
+#define Foundation_UniqueAccessExpireStrategy_INCLUDED
+
 
 #include "Poco/KeyValueArgs.h"
 #include "Poco/ValidArgs.h"
@@ -49,11 +50,9 @@
 #include "Poco/UniqueExpireStrategy.h"
 #include <set>
 #include <map>
-#include <stdio.h>
 
 
 namespace Poco {
-
 
 
 template < 
@@ -71,12 +70,12 @@ class UniqueAccessExpireStrategy: public AbstractStrategy<TKey, TValue>
 	/// which returns the timespan for how long an object will be valid without being accessed.
 {
 public:
-	typedef std::pair<TKey, Timespan> KeyExpire;
-	typedef std::multimap<Timestamp, KeyExpire>     TimeIndex;
-	typedef typename TimeIndex::iterator       IndexIterator;
-	typedef typename TimeIndex::const_iterator ConstIndexIterator;
-	typedef std::map<TKey, IndexIterator>      Keys;
-	typedef typename Keys::iterator            Iterator;
+	typedef std::pair<TKey, Timespan>           KeyExpire;
+	typedef std::multimap<Timestamp, KeyExpire> TimeIndex;
+	typedef typename TimeIndex::iterator        IndexIterator;
+	typedef typename TimeIndex::const_iterator  ConstIndexIterator;
+	typedef std::map<TKey, IndexIterator>       Keys;
+	typedef typename Keys::iterator             Iterator;
 
 public:
 	UniqueAccessExpireStrategy()
@@ -175,4 +174,5 @@ protected:
 
 } // namespace Poco
 
-#endif
+
+#endif // Foundation_UniqueAccessExpireStrategy_INCLUDED

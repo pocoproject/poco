@@ -1,7 +1,7 @@
 //
 // UniqueExpireLRUCache.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/UniqueExpireLRUCache.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/UniqueExpireLRUCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_UniqueExpireLRUCache_INCLUDED
-#define  Foundation_UniqueExpireLRUCache_INCLUDED
+#ifndef Foundation_UniqueExpireLRUCache_INCLUDED
+#define Foundation_UniqueExpireLRUCache_INCLUDED
 
 
 #include "Poco/AbstractCache.h"
@@ -55,7 +55,7 @@ template <
 	class TMutex = FastMutex, 
 	class TEventMutex = FastMutex
 >
-class UniqueExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex >
+class UniqueExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>
 	/// A UniqueExpireLRUCache combines LRU caching and time based per entry expire caching.
 	/// One can define for each cache entry a seperate timepoint
 	/// but also limit the size of the cache (per default: 1024).
@@ -89,4 +89,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_UniqueExpireLRUCache_INCLUDED
