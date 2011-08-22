@@ -35,7 +35,12 @@
 
 
 #include "Poco/Event_POSIX.h"
+#if defined(POCO_VXWORKS)
+#include <timers.h>
+#include <cstring>
+#else
 #include <sys/time.h>
+#endif
 
 
 namespace Poco {
@@ -43,6 +48,13 @@ namespace Poco {
 
 EventImpl::EventImpl(bool autoReset): _auto(autoReset), _state(false)
 {
+#if defined(POCO_VXWORKS)
+	// This workaround is for VxWorks 5.x where
+	// pthread_mutex_init() won't properly initialize the mutex
+	// resulting in a subsequent freeze in pthread_mutex_destroy()
+	// if the mutex has never been used.
+	std::memset(&_mutex, 0, sizeof(_mutex));
+#endif
 	if (pthread_mutex_init(&_mutex, NULL))
 		throw SystemException("cannot create event (mutex)");
 	if (pthread_cond_init(&_cond, NULL))
@@ -85,6 +97,15 @@ bool EventImpl::waitImpl(long milliseconds)
 	delta.tv_sec  = milliseconds / 1000;
 	delta.tv_nsec = (milliseconds % 1000)*1000000;
 	pthread_get_expiration_np(&delta, &abstime);
+#elif defined(POCO_VXWORKS)
+	clock_gettime(CLOCK_REALTIME, &abstime);
+	abstime.tv_sec  += milliseconds / 1000;
+	abstime.tv_nsec += (milliseconds % 1000)*1000000;
+	if (abstime.tv_nsec >= 1000000000)
+	{
+		abstime.tv_nsec -= 1000000000;
+		abstime.tv_sec++;
+	}
 #else
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
