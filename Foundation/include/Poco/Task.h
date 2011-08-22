@@ -83,10 +83,14 @@ public:
 		/// The value will be between 0.0 (just started)
 		/// and 1.0 (completed).
 
-	void cancel();
+	virtual void cancel();
 		/// Requests the task to cancel itself. For cancellation
 		/// to work, the task's runTask() method must periodically
 		/// call isCancelled() and react accordingly.
+		///
+		/// Can be overridden to implement custom behavior,
+		/// but the base class implementation of cancel() should
+		/// be called to ensure proper behavior.
 
 	bool isCancelled() const;
 		/// Returns true if cancellation of the task has been
