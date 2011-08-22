@@ -67,7 +67,10 @@ void FileIOS::open(const std::string& path, std::ios::openmode mode)
 
 void FileIOS::close()
 {
-	_buf.close();
+	if (!_buf.close())
+	{
+		setstate(ios_base::badbit);
+	}
 }
 
 
