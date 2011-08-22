@@ -130,6 +130,12 @@ void Logger::log(const Exception& exc)
 }
 
 
+void Logger::log(const Exception& exc, const char* file, int line)
+{
+	error(exc.displayText(), file, line);
+}
+
+
 void Logger::dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio)
 {
 	if (_level >= prio && _pChannel)
@@ -150,8 +156,11 @@ void Logger::setLevel(const std::string& name, int level)
 		std::string::size_type len = name.length();
 		for (LoggerMap::iterator it = _pLoggerMap->begin(); it != _pLoggerMap->end(); ++it)
 		{
-			if (len == 0 || it->first.compare(0, len, name) == 0 && (it->first.length() == len || it->first[len] == '.'))
+			if (len == 0 || 
+				(it->first.compare(0, len, name) == 0 && (it->first.length() == len || it->first[len] == '.')))
+			{
 				it->second->setLevel(level);
+			}
 		}
 	}
 }
@@ -166,8 +175,11 @@ void Logger::setChannel(const std::string& name, Channel* pChannel)
 		std::string::size_type len = name.length();
 		for (LoggerMap::iterator it = _pLoggerMap->begin(); it != _pLoggerMap->end(); ++it)
 		{
-			if (len == 0 || it->first.compare(0, len, name) == 0 && (it->first.length() == len || it->first[len] == '.'))
+			if (len == 0 ||
+				(it->first.compare(0, len, name) == 0 && (it->first.length() == len || it->first[len] == '.')))
+			{
 				it->second->setChannel(pChannel);
+			}
 		}
 	}
 }
@@ -182,8 +194,11 @@ void Logger::setProperty(const std::string& loggerName, const std::string& prope
 		std::string::size_type len = loggerName.length();
 		for (LoggerMap::iterator it = _pLoggerMap->begin(); it != _pLoggerMap->end(); ++it)
 		{
-			if (len == 0 || it->first.compare(0, len, loggerName) == 0 && (it->first.length() == len || it->first[len] == '.'))
+			if (len == 0 ||
+				(it->first.compare(0, len, loggerName) == 0 && (it->first.length() == len || it->first[len] == '.')))
+			{
 				it->second->setProperty(propertyName, value);
+			}
 		}
 	}
 }
@@ -445,10 +460,14 @@ public:
 };
 
 
-void Logger::add(Logger* pLogger)
+namespace
 {
 	static AutoLoggerShutdown als;
+}
 
+
+void Logger::add(Logger* pLogger)
+{
 	if (!_pLoggerMap)
 		_pLoggerMap = new LoggerMap;
 	_pLoggerMap->insert(LoggerMap::value_type(pLogger->name(), pLogger));

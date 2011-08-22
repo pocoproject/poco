@@ -124,9 +124,14 @@ void LoggingRegistry::clear()
 }
 
 
-LoggingRegistry& LoggingRegistry::defaultRegistry()
+namespace
 {
 	static SingletonHolder<LoggingRegistry> sh;
+}
+
+
+LoggingRegistry& LoggingRegistry::defaultRegistry()
+{
 	return *sh.get();
 }
 
