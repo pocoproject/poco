@@ -36,7 +36,9 @@
 
 #include "Poco/Message.h"
 #include "Poco/Exception.h"
+#if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
+#endif
 #include "Poco/Thread.h"
 #include <algorithm>
 
@@ -48,6 +50,8 @@ Message::Message():
 	_prio(PRIO_FATAL), 
 	_tid(0), 
 	_pid(0),
+	_file(0),
+	_line(0),
 	_pMap(0) 
 {
 	init();
@@ -60,6 +64,22 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 	_prio(prio), 
 	_tid(0),
 	_pid(0),
+	_file(0),
+	_line(0),
+	_pMap(0) 
+{
+	init();
+}
+
+
+Message::Message(const std::string& source, const std::string& text, Priority prio, const char* file, int line):
+	_source(source), 
+	_text(text), 
+	_prio(prio), 
+	_tid(0),
+	_pid(0),
+	_file(file),
+	_line(line),
 	_pMap(0) 
 {
 	init();
@@ -73,7 +93,9 @@ Message::Message(const Message& msg):
 	_time(msg._time),
 	_tid(msg._tid),
 	_thread(msg._thread),
-	_pid(msg._pid)
+	_pid(msg._pid),
+	_file(msg._file),
+	_line(msg._line)
 {
 	if (msg._pMap)
 		_pMap = new StringMap(*msg._pMap);
@@ -89,7 +111,9 @@ Message::Message(const Message& msg, const std::string& text):
 	_time(msg._time),
 	_tid(msg._tid),
 	_thread(msg._thread),
-	_pid(msg._pid)
+	_pid(msg._pid),
+	_file(msg._file),
+	_line(msg._line)
 {
 	if (msg._pMap)
 		_pMap = new StringMap(*msg._pMap);
@@ -106,7 +130,9 @@ Message::~Message()
 
 void Message::init()
 {
+#if !defined(POCO_VXWORKS)
 	_pid = Process::id();
+#endif
 	Thread* pThread = Thread::current();
 	if (pThread)
 	{
@@ -137,6 +163,8 @@ void Message::swap(Message& msg)
 	swap(_tid, msg._tid);
 	swap(_thread, msg._thread);
 	swap(_pid, msg._pid);
+	swap(_file, msg._file);
+	swap(_line, msg._line);
 	swap(_pMap, msg._pMap);
 }
 
@@ -180,6 +208,18 @@ void Message::setTid(long tid)
 void Message::setPid(long pid)
 {
 	_pid = pid;
+}
+
+
+void Message::setSourceFile(const char* file)
+{
+	_file = file;
+}
+
+
+void Message::setSourceLine(int line)
+{
+	_line = line;
 }
 
 
