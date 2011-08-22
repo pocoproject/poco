@@ -1,7 +1,7 @@
 //
 // ActiveMethod.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/ActiveMethod.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/ActiveMethod.h#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -106,7 +106,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 	
-	ActiveResultType operator () (const ArgType& arg = ArgType())
+	ActiveResultType operator () (const ArgType& arg)
 		/// Invokes the ActiveMethod.
 	{
 		ActiveResultType result(new ActiveResultHolder<ResultType>());
