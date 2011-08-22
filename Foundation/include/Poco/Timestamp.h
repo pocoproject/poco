@@ -48,10 +48,15 @@ namespace Poco {
 
 
 class Foundation_API Timestamp
-	/// A Timestamp stores a monotonic time value
+	/// A Timestamp stores a monotonic* time value
 	/// with (theoretical) microseconds resolution.
 	/// Timestamps can be compared with each other
 	/// and simple arithmetics are supported.
+	///
+	/// [*] Note that Timestamp values are only monotonic as
+	/// long as the systems's clock is monotonic as well
+	/// (and not, e.g. set back).
+	///
 	/// Timestamps are UTC (Coordinated Universal Time)
 	/// based and thus independent of the timezone
 	/// in effect on the system.
