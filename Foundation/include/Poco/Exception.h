@@ -112,13 +112,13 @@ public:
 protected:
 	Exception(int code = 0);
 		/// Standard constructor.
-		
+
 	void message(const std::string& msg);
 		/// Sets the message for the exception.
 
 	void extendedMessage(const std::string& arg);
 		/// Sets the extended message for the exception.
-
+		
 private:
 	std::string _msg;
 	Exception*  _pNested;
@@ -225,6 +225,7 @@ inline int Exception::code() const
 POCO_DECLARE_EXCEPTION(Foundation_API, LogicException, Exception)
 POCO_DECLARE_EXCEPTION(Foundation_API, AssertionViolationException, LogicException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NullPointerException, LogicException)
+POCO_DECLARE_EXCEPTION(Foundation_API, NullValueException, LogicException)
 POCO_DECLARE_EXCEPTION(Foundation_API, BugcheckException, LogicException)
 POCO_DECLARE_EXCEPTION(Foundation_API, InvalidArgumentException, LogicException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NotImplementedException, LogicException)
@@ -254,6 +255,7 @@ POCO_DECLARE_EXCEPTION(Foundation_API, SyntaxException, DataException)
 POCO_DECLARE_EXCEPTION(Foundation_API, CircularReferenceException, DataException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PathSyntaxException, SyntaxException)
 POCO_DECLARE_EXCEPTION(Foundation_API, IOException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ProtocolException, IOException)
 POCO_DECLARE_EXCEPTION(Foundation_API, FileException, IOException)
 POCO_DECLARE_EXCEPTION(Foundation_API, FileExistsException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, FileNotFoundException, FileException)
