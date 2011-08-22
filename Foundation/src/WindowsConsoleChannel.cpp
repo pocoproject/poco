@@ -1,7 +1,7 @@
 //
 // WindowsConsoleChannel.cpp
 //
-// $Id: //poco/svn/Foundation/src/WindowsConsoleChannel.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/WindowsConsoleChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -69,14 +69,14 @@ void WindowsConsoleChannel::log(const Message& msg)
 	if (_isFile)
 	{
 		DWORD written;
-		WriteFile(_hConsole, text.data(), text.size(), &written, NULL);	
+		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, NULL);	
 	}
 	else
 	{
 		std::wstring utext;
 		UnicodeConverter::toUTF16(text, utext);
 		DWORD written;
-		WriteConsoleW(_hConsole, utext.data(), utext.size(), &written, NULL);
+		WriteConsoleW(_hConsole, utext.data(), static_cast<DWORD>(utext.size()), &written, NULL);
 	}
 #else
 	DWORD written;
