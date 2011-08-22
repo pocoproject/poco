@@ -38,9 +38,15 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32_WCE)
+#include "Process_WINCE.cpp"
+#else
 #include "Process_WIN32U.cpp"
+#endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Process_WIN32.cpp"
+#elif defined(POCO_VXWORKS)
+#include "Process_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Process_UNIX.cpp"
 #else
@@ -109,7 +115,7 @@ ProcessHandle Process::launch(const std::string& command, const Args& args)
 
 ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe)
 {
-	poco_assert (inPipe == 0 || inPipe != outPipe && inPipe != errPipe);
+	poco_assert (inPipe == 0 || (inPipe != outPipe && inPipe != errPipe));
 
 	return ProcessHandle(launchImpl(command, args, inPipe, outPipe, errPipe));
 }
