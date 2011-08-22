@@ -85,6 +85,10 @@ public:
 
 	void close();
 		/// Closes the file stream.
+		///
+		/// If, for an output stream, the close operation fails (because
+		/// the contents of the stream buffer cannot synced back to
+		/// the filesystem), the bad bit is set in the stream state.
 
 	FileStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
