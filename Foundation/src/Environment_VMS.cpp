@@ -123,15 +123,16 @@ std::string EnvironmentImpl::nodeNameImpl()
 
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
+	std::memset(&id, 0, sizeof(id));
 	char name[MAXHOSTNAMELEN];
 	if (gethostname(name, sizeof(name)))
-		throw SystemException("cannot get host name");
-
+		return;
+		
 	struct hostent* pHost = gethostbyname(name);
-	if (!pHost) throw SystemException("cannot get host IP address");
+	if (!pHost) return;
 
 	int s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (s == -1) throw SystemException("cannot open socket");
+	if (s == -1) return;
 
 	struct arpreq ar;
 	std::memset(&ar, 0, sizeof(ar));
@@ -140,7 +141,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	std::memcpy(&pAddr->sin_addr, *pHost->h_addr_list, sizeof(struct in_addr));
 	int rc = ioctl(s, SIOCGARP, &ar);
 	close(s);
-	if (rc < 0) throw SystemException("cannot get MAC address");
+	if (rc < 0) return;
 	std::memcpy(&id, ar.arp_ha.sa_data, sizeof(id));
 }
 
