@@ -1,7 +1,7 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileStream_WIN32.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/FileStream_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -55,25 +55,21 @@ FileStreamBuf::FileStreamBuf():
 
 FileStreamBuf::~FileStreamBuf()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+        close();
 }
 
 
 void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 {
-	poco_assert (_handle == INVALID_HANDLE_VALUE);
+        poco_assert (_handle == INVALID_HANDLE_VALUE);
 
-	_path = path;
-	setMode(mode);
+        _path = path;
+        _pos = 0;
+        setMode(mode);
+        resetBuffers();
 
-	DWORD access = 0;
-	if (mode & std::ios::in)
+        DWORD access = 0;
+        if (mode & std::ios::in)
 		access |= GENERIC_READ;
 	if (mode & std::ios::out)
 		access |= GENERIC_WRITE;
@@ -151,16 +147,24 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 }
 
 
-void FileStreamBuf::close()
+bool FileStreamBuf::close()
 {
-	if (_handle != INVALID_HANDLE_VALUE)
-	{
-		if (getMode() & std::ios::out)
-			sync();
-			
-		CloseHandle(_handle);
-		_handle = INVALID_HANDLE_VALUE;
-	}
+        bool success = true;
+        if (_handle != INVALID_HANDLE_VALUE)
+        {
+                try
+                {
+                        if (getMode() & std::ios::out)
+                                sync();
+                }
+                catch (...)
+                {
+                        success = false;
+                }
+                CloseHandle(_handle);
+                _handle = INVALID_HANDLE_VALUE;
+        }
+        return success;
 }
 
 

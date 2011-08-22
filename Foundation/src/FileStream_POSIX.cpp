@@ -56,13 +56,7 @@ FileStreamBuf::FileStreamBuf():
 
 FileStreamBuf::~FileStreamBuf()
 {
-	try
-	{
-		close();
-	}
-	catch (...)
-	{
-	}
+	close();
 }
 
 
@@ -70,8 +64,10 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 {
 	poco_assert (_fd == -1);
 
+	_pos = 0;
 	_path = path;
 	setMode(mode);
+	resetBuffers();
 
 	int flags(0);
 	if (mode & std::ios::trunc)
@@ -87,7 +83,7 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 	else
 		flags |= O_WRONLY;
 			
-	_fd = ::open(path.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP);
+	_fd = ::open(path.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (_fd == -1)
 		File::handleLastError(_path);
 		
@@ -115,7 +111,11 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (_fd == -1) return -1;
 
+#if defined(POCO_VXWORKS)
+	int n = write(_fd, const_cast<char*>(buffer), length);
+#else
 	int n = write(_fd, buffer, length);
+#endif
 	if (n == -1)
 		File::handleLastError(_path);
 	_pos += n;
@@ -123,14 +123,23 @@ int FileStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 }
 
 
-void FileStreamBuf::close()
+bool FileStreamBuf::close()
 {
+	bool success = true;
 	if (_fd != -1)
 	{
-		sync();
+		try
+		{
+			sync();
+		}
+		catch (...)
+		{
+			success = false;
+		}
 		::close(_fd);
 		_fd = -1;
 	}
+	return success;
 }
 
 
