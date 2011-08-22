@@ -114,22 +114,22 @@ void RWLockImpl::readLockImpl()
 
 bool RWLockImpl::tryReadLockImpl()
 {
-	HANDLE h[2];
-	h[0] = _mutex;
-	h[1] = _readEvent;
-	switch (WaitForMultipleObjects(2, h, TRUE, 1))
+	for (;;)
 	{
-	case WAIT_OBJECT_0:
-	case WAIT_OBJECT_0 + 1:
-		++_readers;
-		ResetEvent(_writeEvent);
-		ReleaseMutex(_mutex);
-		poco_assert_dbg(_writers == 0);
-		return true;
-	case WAIT_TIMEOUT:
-		return false;
-	default:
-		throw SystemException("cannot lock reader/writer lock");
+		if (_writers != 0 || _writersWaiting != 0)
+			return false;
+
+		DWORD result = tryReadLockOnce();
+		switch (result)
+		{
+		case WAIT_OBJECT_0:
+		case WAIT_OBJECT_0 + 1:
+			return true;
+		case WAIT_TIMEOUT:
+			continue; // try again
+		default:
+			throw SystemException("cannot lock reader/writer lock");
+		}
 	}
 }
 
@@ -199,6 +199,29 @@ void RWLockImpl::unlockImpl()
 		break;
 	default:
 		throw SystemException("cannot unlock reader/writer lock");
+	}
+}
+
+
+DWORD RWLockImpl::tryReadLockOnce()
+{
+	HANDLE h[2];
+	h[0] = _mutex;
+	h[1] = _readEvent;
+	DWORD result = WaitForMultipleObjects(2, h, TRUE, 1); 
+	switch (result)
+	{
+	case WAIT_OBJECT_0:
+	case WAIT_OBJECT_0 + 1:
+		++_readers;
+		ResetEvent(_writeEvent);
+		ReleaseMutex(_mutex);
+		poco_assert_dbg(_writers == 0);
+		return result;
+	case WAIT_TIMEOUT:
+		return result;
+	default:
+		throw SystemException("cannot lock reader/writer lock");
 	}
 }
 
