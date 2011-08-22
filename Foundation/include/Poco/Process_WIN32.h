@@ -81,6 +81,7 @@ public:
 	static ProcessHandleImpl* launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe);		
 	static void killImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
+	static std::string terminationEventName(PIDImpl pid);
 };
 
 
