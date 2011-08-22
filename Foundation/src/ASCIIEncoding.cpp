@@ -104,7 +104,7 @@ const TextEncoding::CharacterMap& ASCIIEncoding::characterMap() const
 
 int ASCIIEncoding::convert(const unsigned char* bytes) const
 {
-	return *bytes;
+	return _charMap[*bytes];
 }
 
 
@@ -117,6 +117,21 @@ int ASCIIEncoding::convert(int ch, unsigned char* bytes, int length) const
 		return 1;
 	}
 	else return 0;
+}
+
+
+int ASCIIEncoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	if (1 <= length)
+		return _charMap [*bytes];
+	else
+		return -1;
+}
+
+
+int ASCIIEncoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 

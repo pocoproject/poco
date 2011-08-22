@@ -1,7 +1,7 @@
 //
 // Windows1252Encoding.cpp
 //
-// $Id: //poco/Main/Foundation/src/Windows1252Encoding.cpp#7 $
+// $Id: //poco/1.4/Foundation/src/Windows1252Encoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -36,6 +36,7 @@
 
 #include "Poco/Windows1252Encoding.h"
 #include "Poco/String.h"
+#include <map>
 
 
 namespace Poco {
@@ -106,19 +107,64 @@ const TextEncoding::CharacterMap& Windows1252Encoding::characterMap() const
 
 int Windows1252Encoding::convert(const unsigned char* bytes) const
 {
-	return *bytes;
+	return _charMap[*bytes];
 }
 
 
 int Windows1252Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
-	if (ch >= 0 && ch <= 255)
+	if (ch >= 0 && ch <= 255 && _charMap[ch] == ch)
 	{
 		if (bytes && length >= 1)
-			*bytes = (unsigned char) ch;
+			*bytes = ch;
 		return 1;
 	}
-	else return 0;
+	else switch (ch)
+	{
+	case 0x20ac: if (bytes && length >= 1) *bytes = 0x80; return 1;
+	case 0x201a: if (bytes && length >= 1) *bytes = 0x82; return 1;
+	case 0x0192: if (bytes && length >= 1) *bytes = 0x83; return 1;
+	case 0x201e: if (bytes && length >= 1) *bytes = 0x84; return 1;
+	case 0x2026: if (bytes && length >= 1) *bytes = 0x85; return 1;
+	case 0x2020: if (bytes && length >= 1) *bytes = 0x86; return 1;
+	case 0x2021: if (bytes && length >= 1) *bytes = 0x87; return 1;
+	case 0x02c6: if (bytes && length >= 1) *bytes = 0x88; return 1;
+	case 0x2030: if (bytes && length >= 1) *bytes = 0x89; return 1;
+	case 0x0160: if (bytes && length >= 1) *bytes = 0x8a; return 1;
+	case 0x2039: if (bytes && length >= 1) *bytes = 0x8b; return 1;
+	case 0x0152: if (bytes && length >= 1) *bytes = 0x8c; return 1;
+	case 0x017d: if (bytes && length >= 1) *bytes = 0x8e; return 1;
+	case 0x2018: if (bytes && length >= 1) *bytes = 0x91; return 1;
+	case 0x2019: if (bytes && length >= 1) *bytes = 0x92; return 1;
+	case 0x201c: if (bytes && length >= 1) *bytes = 0x93; return 1;
+	case 0x201d: if (bytes && length >= 1) *bytes = 0x94; return 1;
+	case 0x2022: if (bytes && length >= 1) *bytes = 0x95; return 1;
+	case 0x2013: if (bytes && length >= 1) *bytes = 0x96; return 1;
+	case 0x2014: if (bytes && length >= 1) *bytes = 0x97; return 1;
+	case 0x02dc: if (bytes && length >= 1) *bytes = 0x98; return 1;
+	case 0x2122: if (bytes && length >= 1) *bytes = 0x99; return 1;
+	case 0x0161: if (bytes && length >= 1) *bytes = 0x9a; return 1;
+	case 0x203a: if (bytes && length >= 1) *bytes = 0x9b; return 1;
+	case 0x0153: if (bytes && length >= 1) *bytes = 0x9c; return 1;
+	case 0x017e: if (bytes && length >= 1) *bytes = 0x9e; return 1;
+	case 0x0178: if (bytes && length >= 1) *bytes = 0x9f; return 1;
+	default: return 0;
+	}
+}
+
+
+int Windows1252Encoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	if (1 <= length)
+		return _charMap[*bytes];
+	else
+		return -1;
+}
+
+
+int Windows1252Encoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 

@@ -151,13 +151,25 @@ TextEncoding::~TextEncoding()
 
 int TextEncoding::convert(const unsigned char* bytes) const
 {
-	return (int) *bytes;
+	return static_cast<int>(*bytes);
 }
 
 
 int TextEncoding::convert(int ch, unsigned char* bytes, int length) const
 {
 	return 0;
+}
+
+
+int TextEncoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	return (int) *bytes;
+}
+
+
+int TextEncoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 
@@ -209,9 +221,14 @@ TextEncoding& TextEncoding::global()
 }
 
 
-TextEncodingManager& TextEncoding::manager()
+namespace
 {
 	static SingletonHolder<TextEncodingManager> sh;
+}
+
+
+TextEncodingManager& TextEncoding::manager()
+{
 	return *sh.get();
 }
 

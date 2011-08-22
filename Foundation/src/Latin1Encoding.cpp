@@ -122,4 +122,19 @@ int Latin1Encoding::convert(int ch, unsigned char* bytes, int length) const
 }
 
 
+int Latin1Encoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	if (1 <= length)
+		return *bytes;
+	else
+		return -1;
+}
+
+
+int Latin1Encoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
+}
+
+
 } // namespace Poco

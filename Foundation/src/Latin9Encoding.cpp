@@ -106,13 +106,13 @@ const TextEncoding::CharacterMap& Latin9Encoding::characterMap() const
 
 int Latin9Encoding::convert(const unsigned char* bytes) const
 {
-	return *bytes;
+	return _charMap[*bytes];
 }
 
 
 int Latin9Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
-	if (ch >= 0 && ch <= 255)
+	if (ch >= 0 && ch <= 255 && _charMap[ch] == ch)
 	{
 		if (bytes && length >= 1)
 			*bytes = ch;
@@ -130,6 +130,21 @@ int Latin9Encoding::convert(int ch, unsigned char* bytes, int length) const
 	case 0x20ac: if (bytes && length >= 1) *bytes = 0xa4; return 1;
 	default: return 0;
 	}
+}
+
+
+int Latin9Encoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	if (1 <= length)
+		return _charMap[*bytes];
+	else
+		return -1;
+}
+
+
+int Latin9Encoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 
