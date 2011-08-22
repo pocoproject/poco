@@ -1,7 +1,7 @@
 //
 // UnicodeConverter.cpp
 //
-// $Id: //poco/svn/Foundation/src/UnicodeConverter.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/UnicodeConverter.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -55,7 +55,20 @@ void UnicodeConverter::toUTF16(const std::string& utf8String, std::wstring& utf1
 	UTF8Encoding utf8Encoding;
 	TextIterator it(utf8String, utf8Encoding);
 	TextIterator end(utf8String);
-	while (it != end) utf16String += (wchar_t) *it++;
+	while (it != end) 
+	{
+		int cc = *it++;
+		if (cc <= 0xffff)
+		{
+			utf16String += (wchar_t) cc;
+		}
+		else
+		{
+			cc -= 0x10000;
+			utf16String += (wchar_t) ((cc >> 10) & 0x3ff) | 0xd800;
+			utf16String += (wchar_t) (cc & 0x3ff) | 0xdc00;
+		}
+	}
 }
 
 
@@ -72,28 +85,44 @@ void UnicodeConverter::toUTF16(const char* utf8String, int length, std::wstring&
 	
 	while (it < end)
 	{
-		unsigned char c = *it;
-		int n = utf8Encoding.characterMap()[c];
-		int uc = '?';
-		if (n == -1) 
+		int n = utf8Encoding.queryConvert(it, 1);
+		int uc;
+		int read = 1;
+
+		while (-1 > n && (end - it) >= -n)
 		{
-			++it;
+			read = -n;
+			n = utf8Encoding.queryConvert(it, read);
 		}
-		else if (n >= 0)
+		
+		if (-1 > n)
 		{
-			uc = n;
-			++it;
+			it = end;
 		}
 		else
 		{
-			if (it - n <= end)
-			{
-				uc = utf8Encoding.convert(it);
-				if (uc == -1) uc = '?';
-			}
-			it -= n;
+			it += read;
 		}
-		utf16String += (wchar_t) uc; // TODO: surrogates
+
+		if (-1 >= n)
+		{
+			uc = 0xfffd;	// Replacement Character (instead of '?')
+		}
+		else
+		{
+			uc = n;
+		}
+
+		if (uc > 0xffff)
+		{
+			uc -= 0x10000;
+			utf16String += (wchar_t) ((uc >> 10) & 0x3ff) | 0xd800 ;
+			utf16String += (wchar_t) (uc & 0x3ff) | 0xdc00 ;
+		}
+		else
+		{
+			utf16String += (wchar_t) uc;
+		}
 	}
 }
 
