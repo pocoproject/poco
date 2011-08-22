@@ -1,7 +1,7 @@
 //
 // ThreadTarget.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/ThreadTarget.h#2 $
+// $Id: ThreadTarget.h 1327 2010-02-09 13:56:31Z obiltschnig $
 //
 // Library: Foundation
 // Package: Threading
@@ -9,7 +9,7 @@
 //
 // Definition of the ThreadTarget class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -53,24 +53,26 @@ class Foundation_API ThreadTarget: public Runnable
 	/// Note that it is possible to pass those entities directly to Thread::start().
 	/// This adapter is provided as a convenience for higher abstraction level
 	/// scenarios where Runnable abstract class is used.
+	///
+	/// For using a non-static member function as a thread target, please
+	/// see the RunnableAdapter class.
 	/// 
 	/// Usage:
 	///    class MyObject
 	///    {
 	///        static void doSomething() {}
 	///    };
-	///    ThreadTarget ra(&MyObject::doSomething));
+	///    ThreadTarget ra(&MyObject::doSomething);
 	///    Thread thr;
 	///    thr.start(ra);
 	///
 	/// or:
 	/// 
-	///  void doSomething() {}
+	///    void doSomething() {}
 	/// 
-	///  ThreadTarget ra(doSomething));
-	///  Thread thr;
-	///  thr.start(ra);
-
+	///    ThreadTarget ra(doSomething);
+	///    Thread thr;
+	///    thr.start(ra);
 {
 public:
 	typedef void (*Callback)();
@@ -92,6 +94,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline void ThreadTarget::run()
 {
 	_method();

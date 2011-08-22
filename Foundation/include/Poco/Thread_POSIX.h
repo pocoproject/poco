@@ -47,10 +47,15 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <pthread.h>
+// must be limits.h (not <climits>) for PTHREAD_STACK_MIN on Solaris
+#include <limits.h>
 #if !defined(POCO_NO_SYS_SELECT_H)
 #include <sys/select.h>
 #endif
 #include <errno.h>
+#if defined(POCO_VXWORKS)
+#include <cstring>
+#endif
 
 
 namespace Poco {
@@ -59,6 +64,7 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:	
+    typedef pthread_t TIDImpl;
 	typedef void (*Callable)(void*);
 
 	enum Priority
@@ -82,7 +88,8 @@ public:
 
 	ThreadImpl();				
 	~ThreadImpl();
-
+    
+	TIDImpl tidImpl() const;
 	void setPriorityImpl(int prio);
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio);
@@ -100,6 +107,7 @@ public:
 	static void sleepImpl(long milliseconds);
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
+	static TIDImpl currentTidImpl();
 
 protected:
 	static void* runnableEntry(void* pThread);
@@ -140,9 +148,15 @@ private:
 			pCallbackTarget(0),
 			thread(0),
 			prio(PRIO_NORMAL_IMPL),
+			osPrio(0),
 			done(false),
 			stackSize(POCO_THREAD_STACK_SIZE)
 		{
+		#if defined(POCO_VXWORKS)
+			// This workaround is for VxWorks 5.x where
+			// pthread_init() won't properly initialize the thread.
+			std::memset(&thread, 0, sizeof(thread));
+		#endif
 		}
 
 		Runnable*     pRunnableTarget;
@@ -158,7 +172,7 @@ private:
 
 	static CurrentThreadHolder _currentThreadHolder;
 	
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
 	friend class SignalHandler;
 #endif
@@ -196,6 +210,12 @@ inline void ThreadImpl::yieldImpl()
 inline int ThreadImpl::getStackSizeImpl() const
 {
 	return _pData->stackSize;
+}
+
+
+inline ThreadImpl::TIDImpl ThreadImpl::tidImpl() const
+{
+	return _pData->thread;
 }
 
 
