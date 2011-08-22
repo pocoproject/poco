@@ -53,7 +53,11 @@ Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(0), 
 
 Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(0), _code(code)
 {
-	extendedMessage(arg);
+	if (!arg.empty())
+	{
+		_msg.append(": ");
+		_msg.append(arg);
+	}
 }
 
 
@@ -145,6 +149,7 @@ void Exception::rethrow() const
 POCO_IMPLEMENT_EXCEPTION(LogicException, Exception, "Logic exception")
 POCO_IMPLEMENT_EXCEPTION(AssertionViolationException, LogicException, "Assertion violation")
 POCO_IMPLEMENT_EXCEPTION(NullPointerException, LogicException, "Null pointer")
+POCO_IMPLEMENT_EXCEPTION(NullValueException, LogicException, "Null value")
 POCO_IMPLEMENT_EXCEPTION(BugcheckException, LogicException, "Bugcheck")
 POCO_IMPLEMENT_EXCEPTION(InvalidArgumentException, LogicException, "Invalid argument")
 POCO_IMPLEMENT_EXCEPTION(NotImplementedException, LogicException, "Not implemented")
@@ -152,7 +157,7 @@ POCO_IMPLEMENT_EXCEPTION(RangeException, LogicException, "Out of range")
 POCO_IMPLEMENT_EXCEPTION(IllegalStateException, LogicException, "Illegal state")
 POCO_IMPLEMENT_EXCEPTION(InvalidAccessException, LogicException, "Invalid access")
 POCO_IMPLEMENT_EXCEPTION(SignalException, LogicException, "Signal received")
-POCO_IMPLEMENT_EXCEPTION(UnhandledException, LogicException, "Signal received")
+POCO_IMPLEMENT_EXCEPTION(UnhandledException, LogicException, "Unhandled exception")
 
 POCO_IMPLEMENT_EXCEPTION(RuntimeException, Exception, "Runtime exception")
 POCO_IMPLEMENT_EXCEPTION(NotFoundException, RuntimeException, "Not found")
@@ -174,6 +179,7 @@ POCO_IMPLEMENT_EXCEPTION(SyntaxException, DataException, "Syntax error")
 POCO_IMPLEMENT_EXCEPTION(CircularReferenceException, DataException, "Circular reference")
 POCO_IMPLEMENT_EXCEPTION(PathSyntaxException, SyntaxException, "Bad path syntax")
 POCO_IMPLEMENT_EXCEPTION(IOException, RuntimeException, "I/O error")
+POCO_IMPLEMENT_EXCEPTION(ProtocolException, IOException, "Protocol error")
 POCO_IMPLEMENT_EXCEPTION(FileException, IOException, "File access error")
 POCO_IMPLEMENT_EXCEPTION(FileExistsException, FileException, "File exists")
 POCO_IMPLEMENT_EXCEPTION(FileNotFoundException, FileException, "File not found")
