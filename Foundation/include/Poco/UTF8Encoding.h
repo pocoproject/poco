@@ -58,7 +58,9 @@ public:
 	const CharacterMap& characterMap() const;
 	int convert(const unsigned char* bytes) const;
 	int convert(int ch, unsigned char* bytes, int length) const;
-	
+	int queryConvert(const unsigned char* bytes, int length) const;
+	int sequenceLength(const unsigned char* bytes, int length) const;
+
 	static bool isLegal(const unsigned char *bytes, int length);
 		/// Utility routine to tell whether a sequence of bytes is legal UTF-8.
 		/// This must be called with the length pre-determined by the first byte.
