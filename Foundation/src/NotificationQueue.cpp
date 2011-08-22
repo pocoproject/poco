@@ -211,9 +211,14 @@ Notification::Ptr NotificationQueue::dequeueOne()
 }
 
 
-NotificationQueue& NotificationQueue::defaultQueue()
+namespace
 {
 	static SingletonHolder<NotificationQueue> sh;
+}
+
+
+NotificationQueue& NotificationQueue::defaultQueue()
+{
 	return *sh.get();
 }
 
