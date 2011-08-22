@@ -1,7 +1,7 @@
 //
 // AbstractStrategy.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AbstractStrategy.h#4 $
+// $Id: //poco/1.4/Foundation/include/Poco/AbstractStrategy.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,13 +36,14 @@
 //
 
 
-#ifndef  Foundation_AbstractStrategy_INCLUDED
-#define  Foundation_AbstractStrategy_INCLUDED
+#ifndef Foundation_AbstractStrategy_INCLUDED
+#define Foundation_AbstractStrategy_INCLUDED
 
 
 #include "Poco/KeyValueArgs.h"
 #include "Poco/ValidArgs.h"
 #include "Poco/EventArgs.h"
+#include <set>
 
 
 namespace Poco {
@@ -95,4 +96,4 @@ public:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AbstractStrategy_INCLUDED
