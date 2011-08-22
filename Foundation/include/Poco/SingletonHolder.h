@@ -56,17 +56,19 @@ class SingletonHolder
 	/// when the application that created them terminates.
 {
 public:
-	SingletonHolder()
+	SingletonHolder():
+		_pS(0)
 		/// Creates the SingletonHolder.
 	{
-		_pS = 0;
 	}
+	
 	~SingletonHolder()
 		/// Destroys the SingletonHolder and the singleton
 		/// object that it holds.
 	{
 		delete _pS;
 	}
+	
 	S* get()
 		/// Returns a pointer to the singleton object
 		/// hold by the SingletonHolder. The first call
