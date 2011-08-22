@@ -1,7 +1,7 @@
 //
 // AbstractNode.cpp
 //
-// $Id: //poco/1.4/XML/src/AbstractNode.cpp#1 $
+// $Id: //poco/1.4/XML/src/AbstractNode.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -234,6 +234,18 @@ bool AbstractNode::hasAttributes() const
 XMLString AbstractNode::innerText() const
 {
 	return EMPTY_STRING;
+}
+
+
+Node* AbstractNode::getNodeByPath(const XMLString& path) const
+{
+	return 0;
+}
+
+
+Node* AbstractNode::getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const
+{
+	return 0;
 }
 
 

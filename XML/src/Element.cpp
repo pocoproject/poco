@@ -1,7 +1,7 @@
 //
 // Element.cpp
 //
-// $Id: //poco/1.4/XML/src/Element.cpp#1 $
+// $Id: //poco/1.4/XML/src/Element.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -41,7 +41,6 @@
 #include "Poco/DOM/ElementsByTagNameList.h"
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/AttrMap.h"
-#include "Poco/NumberParser.h"
 
 
 namespace Poco {
@@ -461,193 +460,6 @@ Element* Element::getElementByIdNS(const XMLString& elementId, const XMLString& 
 		pNode = pNode->nextSibling();
 	}
 	return 0;
-}
-
-
-Node* Element::getNodeByPath(const XMLString& path)
-{
-	XMLString::const_iterator it = path.begin();
-	if (it != path.end() && *it == '/') ++it;
-	return findNode(it, path.end(), this, 0);
-}
-
-
-Node* Element::getNodeByPathNS(const XMLString& path, const NSMap& nsMap)
-{
-	XMLString::const_iterator it = path.begin();
-	if (it != path.end() && *it == '/') ++it;
-	return findNode(it, path.end(), this, &nsMap);
-}
-
-
-Node* Element::findNode(XMLString::const_iterator& it, const XMLString::const_iterator& end, Node* pNode, const NSMap* pNSMap)
-{
-	if (pNode && it != end)
-	{
-		if (*it == '[')
-		{
-			++it;
-			if (it != end && *it == '@')
-			{
-				++it;
-				XMLString attr;
-				while (it != end && *it != ']' && *it != '=') attr += *it++;
-				if (it != end && *it == '=')
-				{
-					++it;
-					XMLString value;
-					if (it != end && *it == '\'')
-					{
-						++it;
-						while (it != end && *it != '\'') value += *it++;
-						if (it != end) ++it;
-					}
-					else
-					{
-						while (it != end && *it != ']') value += *it++;
-					}
-					if (it != end) ++it;
-					return findNode(it, end, findElement(attr, value, pNode, pNSMap), pNSMap);
-				}
-				else
-				{
-					if (it != end) ++it;
-					return findAttribute(attr, pNode, pNSMap);
-				}
-			}
-			else
-			{
-				XMLString index;
-				while (it != end && *it != ']') index += *it++;
-				if (it != end) ++it;
-				return findNode(it, end, findElement(Poco::NumberParser::parse(index), pNode, pNSMap), pNSMap);
-			}
-		}
-		else
-		{
-			while (it != end && *it == '/') ++it;
-			XMLString key;
-			while (it != end && *it != '/' && *it != '[') key += *it++;
-			return findNode(it, end, findElement(key, pNode, pNSMap), pNSMap);
-		}
-	}
-	else return pNode;
-}
-
-
-Node* Element::findElement(const XMLString& name, Node* pNode, const NSMap* pNSMap)
-{
-	Node* pChild = pNode->firstChild();
-	while (pChild)
-	{
-		if (pChild->nodeType() == Node::ELEMENT_NODE && namesAreEqual(pChild, name, pNSMap))
-			return pChild;
-		pChild = pChild->nextSibling();
-	}
-	return 0;
-}
-
-
-Node* Element::findElement(int index, Node* pNode, const NSMap* pNSMap)
-{
-	Node* pRefNode = pNode;
-	if (index > 0)
-	{
-		pNode = pNode->nextSibling();
-		while (pNode)
-		{
-			if (namesAreEqual(pNode, pRefNode, pNSMap))
-			{
-				if (--index == 0) break;
-			}
-			pNode = pNode->nextSibling();
-		}
-	}
-	return pNode;
-}
-
-
-Node* Element::findElement(const XMLString& attr, const XMLString& value, Node* pNode, const NSMap* pNSMap)
-{
-	Node* pRefNode = pNode;
-	Element* pElem = dynamic_cast<Element*>(pNode);
-	if (!(pElem && pElem->hasAttributeValue(attr, value, pNSMap)))
-	{
-		pNode = pNode->nextSibling();
-		while (pNode)
-		{
-			if (namesAreEqual(pNode, pRefNode, pNSMap))
-			{
-				pElem = dynamic_cast<Element*>(pNode);
-				if (pElem && pElem->hasAttributeValue(attr, value, pNSMap)) break;
-			}
-			pNode = pNode->nextSibling();
-		}
-	}
-	return pNode;
-}
-
-
-Attr* Element::findAttribute(const XMLString& name, Node* pNode, const NSMap* pNSMap)
-{
-	Attr* pResult(0);
-	Element* pElem = dynamic_cast<Element*>(pNode);
-	if (pElem)
-	{
-		if (pNSMap)
-		{
-			XMLString namespaceURI;
-			XMLString localName;
-			if (pNSMap->processName(name, namespaceURI, localName, true))
-			{
-				pResult = pElem->getAttributeNodeNS(namespaceURI, localName);
-			}
-		}
-		else
-		{
-			pResult = pElem->getAttributeNode(name);
-		}
-	}
-	return pResult;
-}
-
-
-bool Element::hasAttributeValue(const XMLString& name, const XMLString& value, const NSMap* pNSMap)
-{
-	Attr* pAttr = findAttribute(name, this, pNSMap);
-	return pAttr && pAttr->getValue() == value;
-}
-
-
-bool Element::namesAreEqual(Node* pNode1, Node* pNode2, const NSMap* pNSMap)
-{
-	if (pNSMap)
-	{
-		return pNode1->localName() == pNode2->localName() && pNode1->namespaceURI() == pNode2->namespaceURI();
-	}
-	else
-	{
-		return pNode1->nodeName() == pNode2->nodeName();
-	}
-}
-
-
-bool Element::namesAreEqual(Node* pNode, const XMLString& name, const NSMap* pNSMap)
-{
-	if (pNSMap)
-	{
-		XMLString namespaceURI;
-		XMLString localName;
-		if (pNSMap->processName(name, namespaceURI, localName, false))
-		{
-			return pNode->namespaceURI() == namespaceURI && pNode->localName() == localName;
-		}
-		else return false;
-	}
-	else
-	{
-		return pNode->nodeName() == name;
-	}
 }
 
 

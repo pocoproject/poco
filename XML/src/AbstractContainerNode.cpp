@@ -1,7 +1,7 @@
 //
 // AbstractContainerNode.cpp
 //
-// $Id: //poco/1.4/XML/src/AbstractContainerNode.cpp#1 $
+// $Id: //poco/1.4/XML/src/AbstractContainerNode.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -36,7 +36,12 @@
 
 #include "Poco/DOM/AbstractContainerNode.h"
 #include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Attr.h"
 #include "Poco/DOM/DOMException.h"
+#include "Poco/DOM/ElementsByTagNameList.h"
+#include "Poco/DOM/AutoPtr.h"
+#include "Poco/NumberParser.h"
 
 
 namespace Poco {
@@ -319,6 +324,247 @@ bool AbstractContainerNode::hasChildNodes() const
 bool AbstractContainerNode::hasAttributes() const
 {
 	return false;
+}
+
+
+Node* AbstractContainerNode::getNodeByPath(const XMLString& path) const
+{
+	XMLString::const_iterator it = path.begin();
+	if (it != path.end() && *it == '/') 
+	{
+		++it;
+		if (it != path.end() && *it == '/')
+		{
+			++it;
+			XMLString name;
+			while (it != path.end() && *it != '/' && *it != '@' && *it != '[') name += *it++;
+			if (it != path.end() && *it == '/') ++it;
+			if (name.empty()) name += '*';
+			AutoPtr<ElementsByTagNameList> pList = new ElementsByTagNameList(this, name);
+			unsigned long length = pList->length();
+			for (unsigned long i = 0; i < length; i++)
+			{
+				XMLString::const_iterator beg = it;
+				const Node* pNode = findNode(beg, path.end(), pList->item(i), 0);
+				if (pNode) return const_cast<Node*>(pNode);
+			}
+			return 0;
+		}
+	}
+	return const_cast<Node*>(findNode(it, path.end(), this, 0));
+}
+
+
+Node* AbstractContainerNode::getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const
+{
+	XMLString::const_iterator it = path.begin();
+	if (it != path.end() && *it == '/') 
+	{
+		++it;
+		if (it != path.end() && *it == '/')
+		{
+			++it;
+			XMLString name;
+			while (it != path.end() && *it != '/' && *it != '@' && *it != '[') name += *it++;
+			if (it != path.end() && *it == '/') ++it;
+			XMLString namespaceURI;
+			XMLString localName;
+			bool nameOK = true;
+			if (name.empty())
+			{
+				namespaceURI += '*';
+				localName += '*';
+			}
+			else
+			{
+				nameOK = nsMap.processName(name, namespaceURI, localName, false);
+			}
+			if (nameOK)
+			{
+				AutoPtr<ElementsByTagNameListNS> pList = new ElementsByTagNameListNS(this, namespaceURI, localName);
+				unsigned long length = pList->length();
+				for (unsigned long i = 0; i < length; i++)
+				{
+					XMLString::const_iterator beg = it;
+					const Node* pNode = findNode(beg, path.end(), pList->item(i), &nsMap);
+					if (pNode) return const_cast<Node*>(pNode);
+				}
+			}
+			return 0;
+		}
+	}
+	return const_cast<Node*>(findNode(it, path.end(), this, &nsMap));
+}
+
+
+const Node* AbstractContainerNode::findNode(XMLString::const_iterator& it, const XMLString::const_iterator& end, const Node* pNode, const NSMap* pNSMap)
+{
+	if (pNode && it != end)
+	{
+		if (*it == '[')
+		{
+			++it;
+			if (it != end && *it == '@')
+			{
+				++it;
+				XMLString attr;
+				while (it != end && *it != ']' && *it != '=') attr += *it++;
+				if (it != end && *it == '=')
+				{
+					++it;
+					XMLString value;
+					if (it != end && *it == '\'')
+					{
+						++it;
+						while (it != end && *it != '\'') value += *it++;
+						if (it != end) ++it;
+					}
+					else
+					{
+						while (it != end && *it != ']') value += *it++;
+					}
+					if (it != end) ++it;
+					return findNode(it, end, findElement(attr, value, pNode, pNSMap), pNSMap);
+				}
+				else
+				{
+					if (it != end) ++it;
+					return findAttribute(attr, pNode, pNSMap);
+				}
+			}
+			else
+			{
+				XMLString index;
+				while (it != end && *it != ']') index += *it++;
+				if (it != end) ++it;
+				return findNode(it, end, findElement(Poco::NumberParser::parse(index), pNode, pNSMap), pNSMap);
+			}
+		}
+		else
+		{
+			while (it != end && *it == '/') ++it;
+			XMLString key;
+			while (it != end && *it != '/' && *it != '[') key += *it++;
+			return findNode(it, end, findElement(key, pNode, pNSMap), pNSMap);
+		}
+	}
+	else return pNode;
+}
+
+
+const Node* AbstractContainerNode::findElement(const XMLString& name, const Node* pNode, const NSMap* pNSMap)
+{
+	Node* pChild = pNode->firstChild();
+	while (pChild)
+	{
+		if (pChild->nodeType() == Node::ELEMENT_NODE && namesAreEqual(pChild, name, pNSMap))
+			return pChild;
+		pChild = pChild->nextSibling();
+	}
+	return 0;
+}
+
+
+const Node* AbstractContainerNode::findElement(int index, const Node* pNode, const NSMap* pNSMap)
+{
+	const Node* pRefNode = pNode;
+	if (index > 0)
+	{
+		pNode = pNode->nextSibling();
+		while (pNode)
+		{
+			if (namesAreEqual(pNode, pRefNode, pNSMap))
+			{
+				if (--index == 0) break;
+			}
+			pNode = pNode->nextSibling();
+		}
+	}
+	return pNode;
+}
+
+
+const Node* AbstractContainerNode::findElement(const XMLString& attr, const XMLString& value, const Node* pNode, const NSMap* pNSMap)
+{
+	const Node* pRefNode = pNode;
+	const Element* pElem = dynamic_cast<const Element*>(pNode);
+	if (!(pElem && pElem->hasAttributeValue(attr, value, pNSMap)))
+	{
+		pNode = pNode->nextSibling();
+		while (pNode)
+		{
+			if (namesAreEqual(pNode, pRefNode, pNSMap))
+			{
+				pElem = dynamic_cast<const Element*>(pNode);
+				if (pElem && pElem->hasAttributeValue(attr, value, pNSMap)) break;
+			}
+			pNode = pNode->nextSibling();
+		}
+	}
+	return pNode;
+}
+
+
+const Attr* AbstractContainerNode::findAttribute(const XMLString& name, const Node* pNode, const NSMap* pNSMap)
+{
+	const Attr* pResult(0);
+	const Element* pElem = dynamic_cast<const Element*>(pNode);
+	if (pElem)
+	{
+		if (pNSMap)
+		{
+			XMLString namespaceURI;
+			XMLString localName;
+			if (pNSMap->processName(name, namespaceURI, localName, true))
+			{
+				pResult = pElem->getAttributeNodeNS(namespaceURI, localName);
+			}
+		}
+		else
+		{
+			pResult = pElem->getAttributeNode(name);
+		}
+	}
+	return pResult;
+}
+
+
+bool AbstractContainerNode::hasAttributeValue(const XMLString& name, const XMLString& value, const NSMap* pNSMap) const
+{
+	const Attr* pAttr = findAttribute(name, this, pNSMap);
+	return pAttr && pAttr->getValue() == value;
+}
+
+
+bool AbstractContainerNode::namesAreEqual(const Node* pNode1, const Node* pNode2, const NSMap* pNSMap)
+{
+	if (pNSMap)
+	{
+		return pNode1->localName() == pNode2->localName() && pNode1->namespaceURI() == pNode2->namespaceURI();
+	}
+	else
+	{
+		return pNode1->nodeName() == pNode2->nodeName();
+	}
+}
+
+
+bool AbstractContainerNode::namesAreEqual(const Node* pNode, const XMLString& name, const NSMap* pNSMap)
+{
+	if (pNSMap)
+	{
+		XMLString namespaceURI;
+		XMLString localName;
+		if (pNSMap->processName(name, namespaceURI, localName, false))
+		{
+			return pNode->namespaceURI() == namespaceURI && pNode->localName() == localName;
+		}
+		else return false;
+	}
+	else
+	{
+		return pNode->nodeName() == name;
+	}
 }
 
 

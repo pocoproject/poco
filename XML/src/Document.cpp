@@ -1,7 +1,7 @@
 //
 // Document.cpp
 //
-// $Id: //poco/1.4/XML/src/Document.cpp#1 $
+// $Id: //poco/1.4/XML/src/Document.cpp#2 $
 //
 // Library: XML
 // Package: DOM
@@ -319,26 +319,6 @@ Element* Document::getElementByIdNS(const XMLString& elementId, const XMLString&
 	Element* pElem = documentElement();
 	if (pElem) pElem = pElem->getElementByIdNS(elementId, idAttributeURI, idAttributeLocalName);
 	return pElem;
-}
-
-
-Node* Document::getNodeByPath(const XMLString& path)
-{
-	Element* pElem = documentElement();
-	if (pElem)
-		return pElem->getNodeByPath(path);
-	else
-		return 0;
-}
-
-
-Node* Document::getNodeByPathNS(const XMLString& path, const Element::NSMap& nsMap)
-{
-	Element* pElem = documentElement();
-	if (pElem)
-		return pElem->getNodeByPathNS(path, nsMap);
-	else
-		return 0;
 }
 
 

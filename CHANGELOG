@@ -99,6 +99,13 @@ Release 1.4.2 (2011-08-xx)
   one delegate for each event has been removed. For most cases, dispatching
   events should be faster, as dispatching an event now needs less dynamic memory
   allocations.
+- fixed SF# 3178109: getNodeByPath() changes:
+  getNodeByPath() and getNodeByPathNS() have been moved to Poco::XML::Node. 
+  Furthermore, when invoked on a Poco::XML::Document, the behavior has changed
+  so that the document element is now included when traversing the path (previously,
+  traversal would start at the document element, now it starts at the document).
+  The path expression can now start with a double-slash, which results in a recursive
+  search for the path's first element in the DOM tree.
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1572,4 +1579,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#26 $
+$Id: //poco/1.4/dist/CHANGELOG#27 $

@@ -1,7 +1,7 @@
 //
 // XMLWriterTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.cpp#2 $
+// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.cpp#3 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -487,7 +487,7 @@ void XMLWriterTest::testAttributeNamespaces()
 	writer.endElement("urn:ns", "r", "");
 	writer.endDocument();
 	std::string xml = str.str();
-	assert (xml == "<ns1:r ns1:myattr2=\"attrValue2\" ns2:myattr=\"attrValue\" xmlns:ns1=\"urn:ns\" xmlns:ns2=\"urn:other\">data</ns1:r>");
+	assert (xml == "<ns2:r ns1:myattr=\"attrValue\" ns2:myattr2=\"attrValue2\" xmlns:ns1=\"urn:other\" xmlns:ns2=\"urn:ns\">data</ns2:r>");
 }
 
 

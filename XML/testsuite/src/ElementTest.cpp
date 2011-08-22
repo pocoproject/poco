@@ -1,7 +1,7 @@
 //
 // ElementTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/ElementTest.cpp#1 $
+// $Id: //poco/1.4/XML/testsuite/src/ElementTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -632,6 +632,25 @@ void ElementTest::testChildElementNS()
 
 void ElementTest::testNodeByPath()
 {
+	/*
+	<root>
+		<elem1>
+			<elemA/>
+			<elemA/>
+		</elem1>
+		<elem2>
+			<elemB attr1="value1"/>
+			<elemB attr1="value2"/>
+			<elemB attr1="value3"/>
+			<elemC attr1="value1">
+				<elemC1 attr1="value1"/>
+				<elemC2/>
+			</elemC>
+			<elemC attr1="value2"/>
+		</elem2>
+	</root>
+	*/
+
 	AutoPtr<Document> pDoc   = new Document;
 	
 	AutoPtr<Element> pRoot   = pDoc->createElement("root");
@@ -669,10 +688,15 @@ void ElementTest::testNodeByPath()
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);	
 	
+	pDoc->appendChild(pRoot);
+	
 	Node* pNode = pRoot->getNodeByPath("/");
 	assert (pNode == pRoot);
 	
 	pNode = pRoot->getNodeByPath("/elem1");
+	assert (pNode == pElem1);
+	
+	pNode = pDoc->getNodeByPath("/root/elem1");
 	assert (pNode == pElem1);
 	
 	pNode = pRoot->getNodeByPath("/elem2");
@@ -719,23 +743,59 @@ void ElementTest::testNodeByPath()
 
 	pNode = pRoot->getNodeByPath("/elem2/elemC[@attr1='value1']/elemC1[@attr1]");
 	assert (pNode && pNode->nodeValue() == "value1");
+
+	pNode = pDoc->getNodeByPath("//elemB[@attr1='value1']");
+	assert (pNode == pElem21);
+	
+	pNode = pDoc->getNodeByPath("//elemB[@attr1='value2']");
+	assert (pNode == pElem22);
+
+	pNode = pDoc->getNodeByPath("//elemB[@attr1='value3']");
+	assert (pNode == pElem23);
+
+	pNode = pDoc->getNodeByPath("//elemB[@attr1='value4']");
+	assert (pNode == 0);
+
+	pNode = pDoc->getNodeByPath("//[@attr1='value1']");
+	assert (pNode == pElem21);
+
+	pNode = pDoc->getNodeByPath("//[@attr1='value2']");
+	assert (pNode == pElem22);
 }
 
 
 void ElementTest::testNodeByPathNS()
 {
+	/*
+	<ns1:root xmlns:ns1="urn:ns1">
+		<ns1:elem1>
+			<ns2:elemA xmlns:ns2="urn:ns2"/>
+			<ns3:elemA xmlns:ns3="urn:ns2"/>
+		</ns1:elem1>
+		<ns1:elem2>
+			<ns2:elemB ns2:attr1="value1" xmlns:ns2="urn:ns2"/>
+			<ns2:elemB ns2:attr1="value2" xmlns:ns2="urn:ns2"/>
+			<ns2:elemB ns2:attr1="value3" xmlns:ns2="urn:ns2"/>
+			<ns2:elemC ns2:attr1="value1" xmlns:ns2="urn:ns2">
+				<ns2:elemC1 ns2:attr1="value1"/>
+				<ns2:elemC2/>
+			</ns2:elemC>
+			<ns2:elemC ns2:attr1="value2" xmlns:ns2="urn:ns2"/>
+		</ns1:elem2>
+	</ns1:root>	
+	*/
 	AutoPtr<Document> pDoc   = new Document;
 	
-	AutoPtr<Element> pRoot   = pDoc->createElementNS("urn:ns1", "root");
-	AutoPtr<Element> pElem1  = pDoc->createElementNS("urn:ns1", "elem1");
-	AutoPtr<Element> pElem11 = pDoc->createElementNS("urn:ns2", "elemA");
-	AutoPtr<Element> pElem12 = pDoc->createElementNS("urn:ns2", "elemA");
-	AutoPtr<Element> pElem2  = pDoc->createElementNS("urn:ns1", "elem2");
-	AutoPtr<Element> pElem21 = pDoc->createElementNS("urn:ns2", "elemB");
-	AutoPtr<Element> pElem22 = pDoc->createElementNS("urn:ns2", "elemB");
-	AutoPtr<Element> pElem23 = pDoc->createElementNS("urn:ns2", "elemB");
-	AutoPtr<Element> pElem24 = pDoc->createElementNS("urn:ns2", "elemC");
-	AutoPtr<Element> pElem25 = pDoc->createElementNS("urn:ns2", "elemC");
+	AutoPtr<Element> pRoot   = pDoc->createElementNS("urn:ns1", "ns1:root");
+	AutoPtr<Element> pElem1  = pDoc->createElementNS("urn:ns1", "ns1:elem1");
+	AutoPtr<Element> pElem11 = pDoc->createElementNS("urn:ns2", "ns2:elemA");
+	AutoPtr<Element> pElem12 = pDoc->createElementNS("urn:ns2", "ns2:elemA");
+	AutoPtr<Element> pElem2  = pDoc->createElementNS("urn:ns1", "ns1:elem2");
+	AutoPtr<Element> pElem21 = pDoc->createElementNS("urn:ns2", "ns2:elemB");
+	AutoPtr<Element> pElem22 = pDoc->createElementNS("urn:ns2", "ns2:elemB");
+	AutoPtr<Element> pElem23 = pDoc->createElementNS("urn:ns2", "ns2:elemB");
+	AutoPtr<Element> pElem24 = pDoc->createElementNS("urn:ns2", "ns2:elemC");
+	AutoPtr<Element> pElem25 = pDoc->createElementNS("urn:ns2", "ns2:elemC");
 	
 	pElem21->setAttributeNS("urn:ns2", "ns2:attr1", "value1");
 	pElem22->setAttributeNS("urn:ns2", "ns2:attr1", "value2");
@@ -760,64 +820,87 @@ void ElementTest::testNodeByPathNS()
 
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);	
+
+	pDoc->appendChild(pRoot);
 	
 	Element::NSMap nsMap;
 	nsMap.declarePrefix("ns1", "urn:ns1");
-	nsMap.declarePrefix("ns2", "urn:ns2");
+	nsMap.declarePrefix("NS2", "urn:ns2");
 	
 	Node* pNode = pRoot->getNodeByPathNS("/", nsMap);
 	assert (pNode == pRoot);
 	
 	pNode = pRoot->getNodeByPathNS("/ns1:elem1", nsMap);
 	assert (pNode == pElem1);
-	
+
+	pNode = pDoc->getNodeByPathNS("/ns1:root/ns1:elem1", nsMap);
+	assert (pNode == pElem1);
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2", nsMap);
 	assert (pNode == pElem2);
 	
-	pNode = pRoot->getNodeByPathNS("/ns1:elem1/ns2:elemA", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA", nsMap);
 	assert (pNode == pElem11);
 	
-	pNode = pRoot->getNodeByPathNS("/ns1:elem1/ns2:elemA[0]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA[0]", nsMap);
 	assert (pNode == pElem11);
 
-	pNode = pRoot->getNodeByPathNS("/ns1:elem1/ns2:elemA[1]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA[1]", nsMap);
 	assert (pNode == pElem12);
 	
-	pNode = pRoot->getNodeByPathNS("/ns1:elem1/ns2:elemA[2]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA[2]", nsMap);
 	assert (pNode == 0);
 	
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemB", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB", nsMap);
 	assert (pNode == pElem21);
 	
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemB[0]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[0]", nsMap);
 	assert (pNode == pElem21);
 
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemB[1]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[1]", nsMap);
 	assert (pNode == pElem22);
 
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemB[2]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[2]", nsMap);
 	assert (pNode == pElem23);
 
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemB[3]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[3]", nsMap);
 	assert (pNode == 0);
 	
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemB[@ns2:attr1]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr1]", nsMap);
 	assert (pNode && pNode->nodeValue() == "value1");
 
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemB[@ns2:attr2]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr2]", nsMap);
 	assert (pNode == 0);
 
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemB[@ns2:attr1='value2']", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr1='value2']", nsMap);
 	assert (pNode == pElem22);
 
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemC[@ns2:attr1='value1']/ns2:elemC1", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemC[@NS2:attr1='value1']/NS2:elemC1", nsMap);
 	assert (pNode == pElem241);
 
-	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns2:elemC[@ns2:attr1='value1']/ns2:elemC1[@ns2:attr1]", nsMap);
+	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemC[@NS2:attr1='value1']/NS2:elemC1[@NS2:attr1]", nsMap);
 	assert (pNode && pNode->nodeValue() == "value1");
 
-	pNode = pRoot->getNodeByPathNS("/ns2:elem1", nsMap);
+	pNode = pRoot->getNodeByPathNS("/NS2:elem1", nsMap);
 	assert (pNode == 0);
+
+	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value1']", nsMap);
+	assert (pNode == pElem21);
+	
+	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value2']", nsMap);
+	assert (pNode == pElem22);
+
+	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value3']", nsMap);
+	assert (pNode == pElem23);
+
+	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value4']", nsMap);
+	assert (pNode == 0);
+
+	pNode = pDoc->getNodeByPathNS("//[@NS2:attr1='value1']", nsMap);
+	assert (pNode == pElem21);
+	
+	pNode = pDoc->getNodeByPathNS("//[@NS2:attr1='value2']", nsMap);
+	assert (pNode == pElem22);
 }
 
 

@@ -1,7 +1,7 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.4/XML/src/XMLWriter.cpp#2 $
+// $Id: //poco/1.4/XML/src/XMLWriter.cpp#3 $
 //
 // Library: XML
 // Package: XML
@@ -608,6 +608,9 @@ void XMLWriter::writeStartElement(const XMLString& namespaceURI, const XMLString
 		_namespaces.pushContext();
 	_nsContextPushed = false;
 	++_elementCount;
+	
+	declareAttributeNamespaces(attributes);
+
 	writeMarkup(MARKUP_LT);
 	if (!localName.empty() && (qname.empty() || localName == qname))
 	{
@@ -639,7 +642,6 @@ void XMLWriter::writeStartElement(const XMLString& namespaceURI, const XMLString
 	}
 	else throw XMLException("Tag mismatch", nameToString(localName, qname));
 
-	declareAttributeNamespaces(attributes);
 	AttributeMap attributeMap;
 	addNamespaceAttributes(attributeMap);
 	addAttributes(attributeMap, attributes, namespaceURI);
