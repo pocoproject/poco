@@ -1,7 +1,7 @@
 //
 // AccessExpireStrategy.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/AccessExpireStrategy.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/AccessExpireStrategy.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_AccessExpireStrategy_INCLUDED
-#define  Foundation_AccessExpireStrategy_INCLUDED
+#ifndef Foundation_AccessExpireStrategy_INCLUDED
+#define Foundation_AccessExpireStrategy_INCLUDED
 
 
 #include "Poco/KeyValueArgs.h"
@@ -90,4 +90,4 @@ public:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AccessExpireStrategy_INCLUDED

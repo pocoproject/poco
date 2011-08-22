@@ -1,7 +1,7 @@
 //
 // AccessExpirationDecorator.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/AccessExpirationDecorator.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/AccessExpirationDecorator.h#1 $
 //
 // Library: Foundation
 // Package: Events
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_AccessExpirationDecorator_INCLUDED
-#define  Foundation_AccessExpirationDecorator_INCLUDED
+#ifndef Foundation_AccessExpirationDecorator_INCLUDED
+#define Foundation_AccessExpirationDecorator_INCLUDED
 
 
 #include "Poco/Timestamp.h"
@@ -102,4 +102,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AccessExpirationDecorator_INCLUDED

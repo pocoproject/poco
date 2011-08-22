@@ -1,7 +1,7 @@
 //
 // AbstractPriorityDelegate.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/AbstractPriorityDelegate.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/AbstractPriorityDelegate.h#1 $
 //
 // Library: Foundation
 // Package: Events
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_AbstractPriorityDelegate_INCLUDED
-#define  Foundation_AbstractPriorityDelegate_INCLUDED
+#ifndef Foundation_AbstractPriorityDelegate_INCLUDED
+#define Foundation_AbstractPriorityDelegate_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -106,4 +106,4 @@ protected:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AbstractPriorityDelegate_INCLUDED

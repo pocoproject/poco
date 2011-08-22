@@ -1,7 +1,7 @@
 //
 // AccessExpireLRUCache.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/AccessExpireLRUCache.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/AccessExpireLRUCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_AccessExpireLRUCache_INCLUDED
-#define  Foundation_AccessExpireLRUCache_INCLUDED
+#ifndef Foundation_AccessExpireLRUCache_INCLUDED
+#define Foundation_AccessExpireLRUCache_INCLUDED
 
 
 #include "Poco/AbstractCache.h"
@@ -62,7 +62,7 @@ class AccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollectio
 {
 public:
 	AccessExpireLRUCache(long cacheSize = 1024, Timestamp::TimeDiff expire = 600000): 
-		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>(StrategyCollection<TKey, TValue>())
+		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex >(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));
 		this->_strategy.pushBack(new AccessExpireStrategy<TKey, TValue>(expire));
@@ -81,4 +81,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AccessExpireLRUCache_INCLUDED

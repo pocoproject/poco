@@ -1,7 +1,7 @@
 //
 // AbstractCache.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/AbstractCache.h#17 $
+// $Id: //poco/1.4/Foundation/include/Poco/AbstractCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_AbstractCache_INCLUDED
-#define  Foundation_AbstractCache_INCLUDED
+#ifndef Foundation_AbstractCache_INCLUDED
+#define Foundation_AbstractCache_INCLUDED
 
 
 #include "Poco/KeyValueArgs.h"
@@ -378,4 +378,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_AbstractCache_INCLUDED
