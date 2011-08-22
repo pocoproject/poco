@@ -35,7 +35,7 @@
 
 
 #include "Poco/StringTokenizer.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 namespace Poco {
@@ -52,7 +52,7 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 	{
 		if (options & TOK_TRIM)
 		{
-			while (it1 != end && std::isspace(*it1)) ++it1;
+			while (it1 != end && Ascii::isSpace(*it1)) ++it1;
 		}
 		it2 = it1;
 		while (it2 != end && separators.find(*it2) == std::string::npos) ++it2;
@@ -60,8 +60,8 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 		if (it3 != it1 && (options & TOK_TRIM))
 		{
 			--it3;
-			while (it3 != it1 && std::isspace(*it3)) --it3;
-			if (!std::isspace(*it3)) ++it3;
+			while (it3 != it1 && Ascii::isSpace(*it3)) --it3;
+			if (!Ascii::isSpace(*it3)) ++it3;
 		}
 		if (options & TOK_IGNORE_EMPTY)
 		{
