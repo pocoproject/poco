@@ -43,7 +43,7 @@
 #include "Poco/Foundation.h"
 
 
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 
 
 #include <vector>
