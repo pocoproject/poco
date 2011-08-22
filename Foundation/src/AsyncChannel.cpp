@@ -86,7 +86,7 @@ AsyncChannel::~AsyncChannel()
 
 void AsyncChannel::setChannel(Channel* pChannel)
 {
-	FastMutex::ScopedLock lock(_mutex);
+	FastMutex::ScopedLock lock(_channelMutex);
 	
 	if (_pChannel) _pChannel->release();
 	_pChannel = pChannel;
@@ -102,7 +102,7 @@ Channel* AsyncChannel::getChannel() const
 
 void AsyncChannel::open()
 {
-	FastMutex::ScopedLock lock(_mutex);
+	FastMutex::ScopedLock lock(_threadMutex);
 
 	if (!_thread.isRunning())
 		_thread.start(*this);
@@ -150,7 +150,7 @@ void AsyncChannel::run()
 	{
 		MessageNotification* pNf = dynamic_cast<MessageNotification*>(nf.get());
 		{
-			FastMutex::ScopedLock lock(_mutex);
+			FastMutex::ScopedLock lock(_channelMutex);
 
 			if (pNf && _pChannel) _pChannel->log(pNf->message());
 		}
