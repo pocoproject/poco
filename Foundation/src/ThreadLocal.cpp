@@ -70,9 +70,15 @@ TLSAbstractSlot*& ThreadLocalStorage::get(const void* key)
 {
 	TLSMap::iterator it = _map.find(key);
 	if (it == _map.end())
-		return _map.insert(TLSMap::value_type(key, 0)).first->second;
+		return _map.insert(TLSMap::value_type(key, reinterpret_cast<Poco::TLSAbstractSlot*>(0))).first->second;
 	else
 		return it->second;
+}
+
+
+namespace
+{
+	static SingletonHolder<ThreadLocalStorage> sh;
 }
 
 
@@ -85,7 +91,6 @@ ThreadLocalStorage& ThreadLocalStorage::current()
 	}
 	else
 	{
-		static SingletonHolder<ThreadLocalStorage> sh;
 		return *sh.get();
 	}
 }

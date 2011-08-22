@@ -42,6 +42,9 @@
 #include "Poco/ErrorHandler.h"
 #include <sstream>
 #include <ctime>
+#if defined(_WIN32_WCE)
+#include "wce_time.h"
+#endif
 
 
 namespace Poco {
@@ -86,7 +89,11 @@ PooledThread::PooledThread(const std::string& name, int stackSize):
 {
 	poco_assert_dbg (stackSize >= 0);
 	_thread.setStackSize(stackSize);
-	_idleTime = time(NULL);
+#if defined(_WIN32_WCE)
+	_idleTime = wceex_time(NULL);
+#else
+	_idleTime = std::time(NULL);
+#endif
 }
 
 
@@ -149,7 +156,11 @@ int PooledThread::idleTime()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
+#if defined(_WIN32_WCE)
+	return (int) (wceex_time(NULL) - _idleTime);
+#else
 	return (int) (time(NULL) - _idleTime);
+#endif	
 }
 
 
@@ -175,6 +186,8 @@ void PooledThread::activate()
 
 void PooledThread::release()
 {
+	const long JOIN_TIMEOUT = 10000;
+	
 	_mutex.lock();
 	_pTarget = 0;
 	_mutex.unlock();
@@ -183,8 +196,11 @@ void PooledThread::release()
 	// terminated the thread before we got here.
 	if (_thread.isRunning())
 		_targetReady.set();
-	else
-		delete this;
+
+    if (_thread.tryJoin(JOIN_TIMEOUT))
+    {
+        delete this;
+    }
 }
 
 
@@ -216,7 +232,11 @@ void PooledThread::run()
 			}
 			FastMutex::ScopedLock lock(_mutex);
 			_pTarget  = 0;
+#if defined(_WIN32_WCE)
+			_idleTime = wceex_time(NULL);
+#else
 			_idleTime = time(NULL);
+#endif	
 			_idle     = true;
 			_targetCompleted.set();
 			ThreadLocalStorage::clear();
@@ -229,7 +249,6 @@ void PooledThread::run()
 			break;
 		}
 	}
-	delete this;
 }
 
 
@@ -505,9 +524,14 @@ private:
 };
 
 
-ThreadPool& ThreadPool::defaultPool()
+namespace
 {
 	static ThreadPoolSingletonHolder sh;
+}
+
+
+ThreadPool& ThreadPool::defaultPool()
+{
 	return *sh.pool();
 }
 

@@ -40,6 +40,52 @@
 #include <process.h>
 
 
+#if defined(_DEBUG) && defined(POCO_WIN32_DEBUGGER_THREAD_NAMES)
+
+
+namespace
+{
+	/// See <http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx> 
+	/// and <http://blogs.msdn.com/b/stevejs/archive/2005/12/19/505815.aspx> for
+	/// more information on the code below.
+
+	const DWORD MS_VC_EXCEPTION = 0x406D1388;
+	
+	#pragma pack(push,8)
+	typedef struct tagTHREADNAME_INFO
+	{
+		DWORD dwType;     // Must be 0x1000.
+		LPCSTR szName;    // Pointer to name (in user addr space).
+		DWORD dwThreadID; // Thread ID (-1=caller thread).
+		DWORD dwFlags;    // Reserved for future use, must be zero.
+	} THREADNAME_INFO;
+	#pragma pack(pop)
+	
+	void setThreadName(DWORD dwThreadID, const char* threadName)
+	{
+		if (IsDebuggerPresent())
+		{
+			THREADNAME_INFO info;
+			info.dwType     = 0x1000;
+			info.szName     = threadName;
+			info.dwThreadID = dwThreadID;
+			info.dwFlags    = 0;
+		
+			__try
+			{
+				RaiseException(MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+			}
+			__except (EXCEPTION_CONTINUE_EXECUTION)
+			{
+			}
+		}
+	}
+}
+
+
+#endif
+
+
 namespace Poco {
 
 
@@ -49,6 +95,7 @@ ThreadImpl::CurrentThreadHolder ThreadImpl::_currentThreadHolder;
 ThreadImpl::ThreadImpl():
 	_pRunnableTarget(0),
 	_thread(0),
+	_threadId(0),
 	_prio(PRIO_NORMAL_IMPL),
 	_stackSize(POCO_THREAD_STACK_SIZE)
 {
@@ -107,11 +154,11 @@ void ThreadImpl::startImpl(Callable target, void* pData)
 void ThreadImpl::createImpl(Entry ent, void* pData)
 {
 #if defined(_DLL)
-	DWORD threadId;
-	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &threadId);
+	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &_threadId);
 #else
 	unsigned threadId;
 	_thread = (HANDLE) _beginthreadex(NULL, _stackSize, ent, this, 0, &threadId);
+	_threadId = static_cast<DWORD>(threadId);
 #endif
 	if (!_thread)
 		throw SystemException("cannot create thread");
@@ -176,6 +223,12 @@ ThreadImpl* ThreadImpl::currentImpl()
 }
 
 
+ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
+{
+    return GetCurrentThreadId();
+}
+
+
 #if defined(_DLL)
 DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
 #else
@@ -183,6 +236,9 @@ unsigned __stdcall ThreadImpl::runnableEntry(void* pThread)
 #endif
 {
 	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
+#if defined(_DEBUG) && defined(POCO_WIN32_DEBUGGER_THREAD_NAMES)
+	setThreadName(-1, reinterpret_cast<Thread*>(pThread)->getName().c_str());
+#endif
 	try
 	{
 		reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
@@ -210,6 +266,9 @@ unsigned __stdcall ThreadImpl::callableEntry(void* pThread)
 #endif
 {
 	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
+#if defined(_DEBUG) && defined(POCO_WIN32_DEBUGGER_THREAD_NAMES)
+	setThreadName(-1, reinterpret_cast<Thread*>(pThread)->getName().c_str());
+#endif
 	try
 	{
 		ThreadImpl* pTI = reinterpret_cast<ThreadImpl*>(pThread);

@@ -1,13 +1,13 @@
 //
 // ThreadTarget.cpp
 //
-// $Id: //poco/svn/Foundation/src/ThreadTarget.cpp#2 $
+// $Id: ThreadTarget.cpp 762 2008-09-16 19:04:32Z obiltschnig $
 //
 // Library: Foundation
 // Package: Threading
 // Module:  ThreadTarget
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,7 +35,6 @@
 
 
 #include "Poco/ThreadTarget.h"
-
 
 
 namespace Poco {

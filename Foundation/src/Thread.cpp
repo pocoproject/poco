@@ -42,7 +42,11 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+#include "Thread_WINCE.cpp"
+#else
 #include "Thread_WIN32.cpp"
+#endif
 #else
 #include "Thread_POSIX.cpp"
 #endif
@@ -142,10 +146,15 @@ std::string Thread::makeName()
 }
 
 
+namespace
+{
+	static FastMutex uniqueIdMutex;
+}
+
+
 int Thread::uniqueId()
 {
-	static FastMutex mtx;
-	FastMutex::ScopedLock lock(mtx);
+	FastMutex::ScopedLock lock(uniqueIdMutex);
 
 	static unsigned count = 0;
 	++count;
