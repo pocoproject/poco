@@ -1,7 +1,7 @@
 //
 // PriorityDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PriorityDelegate.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/PriorityDelegate.h#5 $
 //
 // Library: Foundation
 // Package: Events
@@ -99,8 +99,8 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const PriorityDelegate& otherDelegate = dynamic_cast<const PriorityDelegate&>(other.unwrap());
-		return this->priority() == otherDelegate.priority() && _receiverObject == otherDelegate._receiverObject && _receiverMethod == otherDelegate._receiverMethod;
+		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
+		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
 	AbstractDelegate<TArgs>* clone() const
@@ -173,8 +173,8 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const PriorityDelegate& otherDelegate = static_cast<const PriorityDelegate&>(other.unwrap());
-		return this->priority() == otherDelegate.priority() && _receiverObject == otherDelegate._receiverObject && _receiverMethod == otherDelegate._receiverMethod;
+		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
+		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
 	AbstractDelegate<TArgs>* clone() const

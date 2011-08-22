@@ -1,7 +1,7 @@
 //
 // Expire.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Expire.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Expire.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -109,9 +109,9 @@ public:
 		_pDelegate->disable();
 	}
 
-	const AbstractDelegate<TArgs>& unwrap() const
+	const AbstractDelegate<TArgs>* unwrap() const
 	{
-		return *this->_pDelegate;
+		return this->_pDelegate;
 	}
 
 protected:

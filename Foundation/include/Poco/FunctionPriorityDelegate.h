@@ -1,7 +1,7 @@
 //
 // FunctionPriorityDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FunctionPriorityDelegate.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/FunctionPriorityDelegate.h#5 $
 //
 // Library: Foundation
 // Package: Events
@@ -96,8 +96,8 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const FunctionPriorityDelegate& otherDelegate = dynamic_cast<const FunctionPriorityDelegate&>(other.unwrap());
-		return this->priority() == otherDelegate.priority() && _receiverMethod == otherDelegate._receiverMethod;
+		const FunctionPriorityDelegate* pOtherDelegate = dynamic_cast<const FunctionPriorityDelegate*>(other.unwrap());
+		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
 	AbstractDelegate<TArgs>* clone() const
@@ -166,8 +166,8 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const FunctionPriorityDelegate& otherDelegate = dynamic_cast<const FunctionPriorityDelegate&>(other.unwrap());
-		return this->priority() == otherDelegate.priority() && _receiverMethod == otherDelegate._receiverMethod;
+		const FunctionPriorityDelegate* pOtherDelegate = dynamic_cast<const FunctionPriorityDelegate*>(other.unwrap());
+		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
 	AbstractDelegate<TArgs>* clone() const
@@ -236,8 +236,8 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const FunctionPriorityDelegate& otherDelegate = dynamic_cast<const FunctionPriorityDelegate&>(other.unwrap());
-		return this->priority() == otherDelegate.priority() && _receiverMethod == otherDelegate._receiverMethod;
+		const FunctionPriorityDelegate* pOtherDelegate = dynamic_cast<const FunctionPriorityDelegate*>(other.unwrap());
+		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
 	AbstractDelegate<TArgs>* clone() const

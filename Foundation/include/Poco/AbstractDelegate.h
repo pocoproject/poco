@@ -1,7 +1,7 @@
 //
 // AbstractDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AbstractDelegate.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/AbstractDelegate.h#4 $
 //
 // Library: Foundation
 // Package: Events
@@ -68,7 +68,7 @@ public:
 		/// Returns true if successful, or false if the delegate
 		/// has been disabled or has expired.
 
-	virtual bool equals(const AbstractDelegate<TArgs>& other) const = 0;
+	virtual bool equals(const AbstractDelegate& other) const = 0;
 		/// Compares the AbstractDelegate with the other one for equality.
 
 	virtual AbstractDelegate* clone() const = 0;
@@ -77,11 +77,11 @@ public:
 	virtual void disable() = 0;
 		/// Disables the delegate, which is done prior to removal.
 		
-	virtual const AbstractDelegate<TArgs>& unwrap() const
+	virtual const AbstractDelegate* unwrap() const
 		/// Returns the unwrapped delegate. Must be overridden by decorators
 		/// like Expire.
 	{
-		return *this;
+		return this;
 	}
 };
 

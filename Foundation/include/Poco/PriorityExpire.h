@@ -1,7 +1,7 @@
 //
 // PriorityExpire.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PriorityExpire.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/PriorityExpire.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -110,9 +110,9 @@ public:
 		_pDelegate->disable();
 	}
 
-	const AbstractPriorityDelegate<TArgs>& unwrap() const
+	const AbstractPriorityDelegate<TArgs>* unwrap() const
 	{
-		return *this->_pDelegate;
+		return this->_pDelegate;
 	}
 
 protected:

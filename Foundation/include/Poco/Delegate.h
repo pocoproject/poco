@@ -1,7 +1,7 @@
 //
 // Delegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Delegate.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Delegate.h#4 $
 //
 // Library: Foundation
 // Package: Events
@@ -96,8 +96,8 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const Delegate& otherDelegate = dynamic_cast<const Delegate&>(other.unwrap());
-		return _receiverObject == otherDelegate._receiverObject && _receiverMethod == otherDelegate._receiverMethod;
+		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
 	AbstractDelegate<TArgs>* clone() const
@@ -168,8 +168,8 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const Delegate& otherDelegate = dynamic_cast<const Delegate&>(other.unwrap());
-		return _receiverObject == otherDelegate._receiverObject && _receiverMethod == otherDelegate._receiverMethod;
+		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
 	AbstractDelegate<TArgs>* clone() const
