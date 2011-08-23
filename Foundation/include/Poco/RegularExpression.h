@@ -80,13 +80,13 @@ public:
 		///
 		/// See the PCRE documentation for more information.
 	{
-		RE_CASELESS        = 0x00000001, /// case insensitive matching (/i) [ctor]
-		RE_MULTILINE       = 0x00000002, /// enable multi-line mode; affects ^ and $ (/m) [ctor]
-		RE_DOTALL          = 0x00000004, /// dot matches all characters, including newline (/s) [ctor]
-		RE_EXTENDED        = 0x00000004, /// totally ignore whitespace (/x) [ctor]
-		RE_ANCHORED        = 0x00000010, /// treat pattern as if it starts with a ^ [ctor, match]
-		RE_DOLLAR_ENDONLY  = 0x00000020, /// dollar matches end-of-string only, not last newline in string [ctor]
-		RE_EXTRA           = 0x00000040, /// enable optional PCRE functionality [ctor]
+                RE_CASELESS        = 0x00000001, /// case insensitive matching (/i) [ctor]
+                RE_MULTILINE       = 0x00000002, /// enable multi-line mode; affects ^ and $ (/m) [ctor]
+                RE_DOTALL          = 0x00000004, /// dot matches all characters, including newline (/s) [ctor]
+                RE_EXTENDED        = 0x00000008, /// totally ignore whitespace (/x) [ctor]
+                RE_ANCHORED        = 0x00000010, /// treat pattern as if it starts with a ^ [ctor, match]
+                RE_DOLLAR_ENDONLY  = 0x00000020, /// dollar matches end-of-string only, not last newline in string [ctor]
+                RE_EXTRA           = 0x00000040, /// enable optional PCRE functionality [ctor]
 		RE_NOTBOL          = 0x00000080, /// circumflex does not match beginning of string [match]
 		RE_NOTEOL          = 0x00000100, /// $ does not match end of string [match]
 		RE_UNGREEDY        = 0x00000200, /// make quantifiers ungreedy [ctor]
