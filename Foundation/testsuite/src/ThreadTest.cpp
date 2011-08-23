@@ -37,6 +37,8 @@
 #include "Poco/Runnable.h"
 #include "Poco/ThreadTarget.h"
 #include "Poco/Event.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #if defined(__sun) && defined(__SVR4)
 #       if !defined(__EXTENSIONS__)
 #define __EXTENSIONS__

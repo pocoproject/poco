@@ -72,6 +72,7 @@ public:
 	void testFind();
 	void testSwap();
 	void testResolve();
+	void testPushPop();
 
 	void setUp();
 	void tearDown();

@@ -16,7 +16,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AtomicCounter Base64D
 	FileChannel Formatter FormattingChannel HexBinaryDecoder LineEndingConverter \
 	HexBinaryEncoder InflatingStream Latin1Encoding Latin2Encoding Latin9Encoding LogFile Logger \
 	LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
-	MemoryPool MD2Engine MD4Engine MD5Engine Manifest Message Mutex \
+	MemoryPool MD4Engine MD5Engine Manifest MemoryStream Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
 	TimedNotificationQueue PriorityNotificationQueue \
 	NotificationQueue NullStream NumberFormatter NumberParser AbstractObserver \
@@ -26,7 +26,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AtomicCounter Base64D
 	SignalHandler SplitterChannel Stopwatch StreamChannel StreamConverter StreamCopier \
 	StreamTokenizer String StringTokenizer SynchronizedObject \
 	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
-	TemporaryFile TextConverter TextEncoding TextIterator Thread ThreadLocal \
+	TemporaryFile TextConverter TextEncoding TextBufferIterator  TextIterator Thread ThreadLocal \
 	ThreadPool ThreadTarget ActiveDispatcher Timer Timespan Timestamp Timezone Token URI \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1250Encoding Windows1251Encoding Windows1252Encoding \
 	UTF8Encoding UnicodeConverter UUID UUIDGenerator Var VarHolder Void Format \

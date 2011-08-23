@@ -1,7 +1,7 @@
 //
 // InflatingStream.cpp
 //
-// $Id: //poco/svn/Foundation/src/InflatingStream.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/InflatingStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -53,13 +53,43 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	_zstr.opaque    = Z_NULL;
 	_zstr.next_in   = 0;
 	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
+        _zstr.next_out  = 0;
+        _zstr.avail_out = 0;
 
-	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
-	if (rc != Z_OK) throw IOException(zError(rc)); 
+        _buffer = new char[INFLATE_BUFFER_SIZE];
 
-	_buffer = new char[INFLATE_BUFFER_SIZE];
+        int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
+        if (rc != Z_OK) 
+        {
+                delete [] _buffer;
+                throw IOException(zError(rc)); 
+        }
+}
+
+
+InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits): 
+        BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
+        _pIstr(&istr),
+        _pOstr(0),
+        _eof(false),
+        _check(false)
+{
+        _zstr.zalloc    = Z_NULL;
+        _zstr.zfree     = Z_NULL;
+        _zstr.opaque    = Z_NULL;
+        _zstr.next_in   = 0;
+        _zstr.avail_in  = 0;
+        _zstr.next_out  = 0;
+        _zstr.avail_out = 0;
+
+        _buffer = new char[INFLATE_BUFFER_SIZE];
+
+        int rc = inflateInit2(&_zstr, windowBits);
+        if (rc != Z_OK) 
+        {
+                delete [] _buffer;
+                throw IOException(zError(rc)); 
+        }
 }
 
 
@@ -75,13 +105,43 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	_zstr.opaque    = Z_NULL;
 	_zstr.next_in   = 0;
 	_zstr.avail_in  = 0;
-	_zstr.next_out  = 0;
-	_zstr.avail_out = 0;
+        _zstr.next_out  = 0;
+        _zstr.avail_out = 0;
 
-	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
-	if (rc != Z_OK) throw IOException(zError(rc));
+        _buffer = new char[INFLATE_BUFFER_SIZE];
 
-	_buffer = new char[INFLATE_BUFFER_SIZE];
+        int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
+        if (rc != Z_OK) 
+        {
+                delete [] _buffer;
+                throw IOException(zError(rc));
+        }
+}
+
+
+InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits): 
+        BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
+        _pIstr(0),
+        _pOstr(&ostr),
+        _eof(false),
+        _check(false)
+{
+        _zstr.zalloc    = Z_NULL;
+        _zstr.zfree     = Z_NULL;
+        _zstr.opaque    = Z_NULL;
+        _zstr.next_in   = 0;
+        _zstr.avail_in  = 0;
+        _zstr.next_out  = 0;
+        _zstr.avail_out = 0;
+
+        _buffer = new char[INFLATE_BUFFER_SIZE];
+
+        int rc = inflateInit2(&_zstr, windowBits);
+        if (rc != Z_OK) 
+        {
+                delete [] _buffer;
+                throw IOException(zError(rc));
+        }
 }
 
 
@@ -92,23 +152,29 @@ InflatingStreamBuf::~InflatingStreamBuf()
 		close();
 	}
 	catch (...)
-	{
-	}
-	delete [] _buffer;
+        {
+        }
+        delete [] _buffer;
+        inflateEnd(&_zstr);
 }
 
 
 int InflatingStreamBuf::close()
 {
-	sync();
-	if (_pIstr || _pOstr)
-	{
-		int rc = inflateEnd(&_zstr);
-		if (rc != Z_OK) throw IOException(zError(rc));
-		_pIstr = 0;
-		_pOstr = 0;
-	}
-	return 0;
+        sync();
+        _pIstr = 0;
+        _pOstr = 0;
+        return 0;
+}
+
+
+void InflatingStreamBuf::reset()
+{
+        int rc = inflateReset(&_zstr);
+        if (rc == Z_OK)
+                _eof = false;
+        else
+                throw IOException(zError(rc));
 }
 
 
@@ -161,11 +227,12 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			}
 			if (n > 0)
 			{
-				_zstr.next_in  = (unsigned char*) _buffer;
-				_zstr.avail_in = n;
-			}
-		}
-	}
+                                _zstr.next_in  = (unsigned char*) _buffer;
+                                _zstr.avail_in = n;
+                        } 
+                        else return static_cast<int>(length) - _zstr.avail_out;
+                }
+        }
 }
 
 
@@ -214,10 +281,24 @@ InflatingIOS::InflatingIOS(std::ostream& ostr, InflatingStreamBuf::StreamType ty
 }
 
 
+InflatingIOS::InflatingIOS(std::ostream& ostr, int windowBits):
+        _buf(ostr, windowBits)
+{
+        poco_ios_init(&_buf);
+}
+
+
 InflatingIOS::InflatingIOS(std::istream& istr, InflatingStreamBuf::StreamType type):
-	_buf(istr, type)
+        _buf(istr, type)
 {
 	poco_ios_init(&_buf);
+}
+
+
+InflatingIOS::InflatingIOS(std::istream& istr, int windowBits):
+        _buf(istr, windowBits)
+{
+        poco_ios_init(&_buf);
 }
 
 
@@ -235,6 +316,13 @@ InflatingStreamBuf* InflatingIOS::rdbuf()
 InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, InflatingStreamBuf::StreamType type):
 	InflatingIOS(ostr, type),
 	std::ostream(&_buf)
+{
+}
+
+
+InflatingOutputStream::InflatingOutputStream(std::ostream& ostr, int windowBits):
+        InflatingIOS(ostr, windowBits),
+        std::ostream(&_buf)
 {
 }
 
@@ -257,8 +345,22 @@ InflatingInputStream::InflatingInputStream(std::istream& istr, InflatingStreamBu
 }
 
 
+InflatingInputStream::InflatingInputStream(std::istream& istr, int windowBits):
+        InflatingIOS(istr, windowBits),
+        std::istream(&_buf)
+{
+}
+
+
 InflatingInputStream::~InflatingInputStream()
 {
+}
+
+
+void InflatingInputStream::reset()
+{
+        _buf.reset();
+        clear();
 }
 
 

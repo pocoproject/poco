@@ -54,11 +54,11 @@ src/LoggerTest.cpp
 src/LoggingFactoryTest.cpp
 src/LoggingRegistryTest.cpp
 src/LoggingTestSuite.cpp
-src/MD2EngineTest.cpp
 src/MD4EngineTest.cpp
 src/MD5EngineTest.cpp
 src/ManifestTest.cpp
 src/MemoryPoolTest.cpp
+src/MemoryStreamTest.cpp
 src/NDCTest.cpp
 src/NamedEventTest.cpp
 src/NamedMutexTest.cpp

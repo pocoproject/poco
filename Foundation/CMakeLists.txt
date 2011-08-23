@@ -64,6 +64,7 @@ set( BASE_SRCS
   src/MD5Engine.cpp
   src/Manifest.cpp
   src/MemoryPool.cpp
+  src/MemoryStream.cpp
   src/Message.cpp
   src/Mutex.cpp
   src/NamedEvent.cpp

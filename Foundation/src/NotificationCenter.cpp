@@ -1,7 +1,7 @@
 //
 // NotificationCenter.cpp
 //
-// $Id: //poco/Main/Foundation/src/NotificationCenter.cpp#13 $
+// $Id: //poco/1.4/Foundation/src/NotificationCenter.cpp#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -51,74 +51,70 @@ NotificationCenter::NotificationCenter()
 
 NotificationCenter::~NotificationCenter()
 {
-	for (ObserverList::iterator it = _observers.begin(); it != _observers.end(); ++it)
-	{
-		delete *it;
-	}
 }
 
 
 void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
-	Mutex::ScopedLock lock(_mutex);
-	_observers.push_front(observer.clone());
+        Mutex::ScopedLock lock(_mutex);
+        _observers.push_back(observer.clone());
 }
 
 
 void NotificationCenter::removeObserver(const AbstractObserver& observer)
 {
-	Mutex::ScopedLock lock(_mutex);
-	for (ObserverList::iterator it = _observers.begin(); it != _observers.end(); ++it)
-	{
-		if (*it && observer.equals(**it))
-		{
-			delete *it;
-			*it = 0;
-			return;
-		}
-	}
+        Mutex::ScopedLock lock(_mutex);
+        for (ObserverList::iterator it = _observers.begin(); it != _observers.end(); ++it)
+        {
+                if (observer.equals(**it))
+                {
+                        (*it)->disable();
+                        _observers.erase(it);
+                        return;
+                }
+        }
 }
 
 
 void NotificationCenter::postNotification(Notification::Ptr pNotification)
 {
-	poco_check_ptr (pNotification);
+        poco_check_ptr (pNotification);
 
-	Mutex::ScopedLock lock(_mutex);
-	ObserverList::iterator it = _observers.begin();
-	while (it != _observers.end())
-	{
-		ObserverList::iterator cur = it++;
-		if (*cur)
-		{
-			(*cur)->notify(pNotification);
-		}
-		else
-		{
-			_observers.erase(cur);
-		}
-	}
+        ScopedLockWithUnlock<Mutex> lock(_mutex);
+        ObserverList observersToNotify(_observers);
+        lock.unlock();
+        for (ObserverList::iterator it = observersToNotify.begin(); it != observersToNotify.end(); ++it)
+        {
+                (*it)->notify(pNotification);
+        }
 }
 
 
 bool NotificationCenter::hasObservers() const
 {
-	Mutex::ScopedLock lock(_mutex);
+        Mutex::ScopedLock lock(_mutex);
 
-	ObserverList::const_iterator it = _observers.begin();
-	while (it != _observers.end())
-	{
-		if (*it) return true;
-		++it;
-	}
-	return false;
+        return !_observers.empty();
+}
+
+
+std::size_t NotificationCenter::countObservers() const
+{
+        Mutex::ScopedLock lock(_mutex);
+
+        return _observers.size();
+}
+
+
+namespace
+{
+        static SingletonHolder<NotificationCenter> sh;
 }
 
 
 NotificationCenter& NotificationCenter::defaultCenter()
 {
-	static SingletonHolder<NotificationCenter> sh;
-	return *sh.get();
+        return *sh.get();
 }
 
 
