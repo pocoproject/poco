@@ -1,7 +1,7 @@
 //
 // ExpireLRUCache.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/ExpireLRUCache.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/ExpireLRUCache.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_ExpireLRUCache_INCLUDED
-#define  Foundation_ExpireLRUCache_INCLUDED
+#ifndef Foundation_ExpireLRUCache_INCLUDED
+#define Foundation_ExpireLRUCache_INCLUDED
 
 
 #include "Poco/AbstractCache.h"
@@ -55,7 +55,7 @@ template <
 	class TMutex = FastMutex, 
 	class TEventMutex = FastMutex
 >
-class ExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex >
+class ExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>
 	/// An ExpireLRUCache combines LRU caching and time based expire caching.
 	/// It cache entries for a fixed time period (per default 10 minutes)
 	/// but also limits the size of the cache (per default: 1024).
@@ -81,4 +81,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_ExpireLRUCache_INCLUDED

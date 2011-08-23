@@ -58,14 +58,15 @@ public:
 	~FileStreamBuf();
 		/// Destroys the FileStream.
 
-	void open(const std::string& path, std::ios::openmode mode);
-		/// Opens the given file in the given mode.
+        void open(const std::string& path, std::ios::openmode mode);
+                /// Opens the given file in the given mode.
 
-	void close();
-		/// Closes the File stream buffer
+        bool close();
+                /// Closes the File stream buffer. Returns true if successful,
+                /// false otherwise.
 
-	std::streampos seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode = std::ios::in | std::ios::out);
-		/// change position by offset, according to way and mode
+        std::streampos seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode = std::ios::in | std::ios::out);
+                /// change position by offset, according to way and mode
 
 	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out);
 		/// change to specified position, according to mode
