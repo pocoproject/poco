@@ -1,7 +1,7 @@
 //
 // StrategyCollection.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/StrategyCollection.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/StrategyCollection.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_StrategyCollection_INCLUDED
-#define  Foundation_StrategyCollection_INCLUDED
+#ifndef Foundation_StrategyCollection_INCLUDED
+#define Foundation_StrategyCollection_INCLUDED
 
 
 #include "Poco/KeyValueArgs.h"
@@ -52,10 +52,10 @@ namespace Poco {
 
 template <class TKey, class TValue> 
 class StrategyCollection: public AbstractStrategy<TKey, TValue>
-	/// An StrategyCollection is a decorator masking n collections as a single one
+        /// An StrategyCollection is a decorator masking n collections as a single one.
 {
 public:
-	typedef std::vector<SharedPtr<AbstractStrategy<TKey, TValue> > > Strategies;
+        typedef std::vector<SharedPtr<AbstractStrategy<TKey, TValue> > > Strategies;
 	typedef typename Strategies::iterator       Iterator;
 	typedef typename Strategies::const_iterator ConstIterator;
 
@@ -152,4 +152,4 @@ protected:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_StrategyCollection_INCLUDED
