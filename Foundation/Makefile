@@ -8,7 +8,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder \
+objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AtomicCounter Base64Decoder Base64Encoder \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Configurable ConsoleChannel \
 	CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator \
@@ -31,7 +31,7 @@ objects = ArchiveStrategy ASCIIEncoding AsyncChannel Base64Decoder Base64Encoder
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF16Encoding Windows1250Encoding Windows1251Encoding Windows1252Encoding \
 	UTF8Encoding UnicodeConverter UUID UUIDGenerator Var VarHolder Void Format \
 	Pipe PipeImpl PipeStream SharedMemory FileStream Unicode UTF8String \
-	adler32 compress crc32 deflate gclose gzlib gzread gzwrite infback inffast inflate inftrees trees uncompr zutil \
+	adler32 compress crc32 deflate gzclose gzlib gzread gzwrite infback inffast inflate inftrees trees uncompr zutil \
 	pcre_chartables pcre_compile pcre_globals pcre_maketables pcre_study \
 	pcre_tables pcre_try_flipped pcre_ucd pcre_valid_utf8 \
 	pcre_exec pcre_ord2utf8 pcre_newline pcre_fullinfo pcre_xclass

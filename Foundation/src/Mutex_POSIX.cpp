@@ -45,7 +45,7 @@
 #include <cstring>
 #else
 #include <sys/time.h>
-
+#endif
 
 #if defined(_POSIX_TIMEOUTS) && (_POSIX_TIMEOUTS - 200112L) >= 0L
 #if defined(_POSIX_THREADS) && (_POSIX_THREADS - 200112L) >= 0L

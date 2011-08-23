@@ -72,30 +72,6 @@ PatternFormatter::~PatternFormatter()
 }
 
 
-inline void PatternFormatter::fmt(std::string& str, int value)
-{
-        char buffer[64];
-        std::sprintf(buffer, "%d", value);
-        str.append(buffer);
-}
-
-
-inline void PatternFormatter::fmt(std::string& str, int value, int width)
-{
-        char buffer[64];
-        std::sprintf(buffer, "%*d", width, value);
-        str.append(buffer);
-}
-
-
-inline void PatternFormatter::fmt0(std::string& str, int value, int width)
-{
-        char buffer[64];
-        std::sprintf(buffer, "%0*d", width, value);
-        str.append(buffer);
-}
-
-
 void PatternFormatter::format(const Message& msg, std::string& text)
 {
         Timestamp timestamp = msg.getTime();
@@ -114,45 +90,45 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 			if (++it != end)
 			{
 				switch (*it)
-                                {
-                                case 's': text.append(msg.getSource()); break;
-                                case 't': text.append(msg.getText()); break;
-                                case 'l': NumberFormatter::append(text, (int) msg.getPriority()); break;
-                                case 'p': text.append(getPriorityName((int) msg.getPriority())); break;
-                                case 'q': text += getPriorityName((int) msg.getPriority()).at(0); break;
-                                case 'P': NumberFormatter::append(text, msg.getPid()); break;
-                                case 'T': text.append(msg.getThread()); break;
-                                case 'I': NumberFormatter::append(text, msg.getTid()); break;
-                                case 'N': text.append(Environment::nodeName()); break;
-                                case 'U': text.append(msg.getSourceFile() ? msg.getSourceFile() : ""); break;
-                                case 'u': NumberFormatter::append(text, msg.getSourceLine()); break;
-                                case 'w': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()], 0, 3); break;
-                                case 'W': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()]); break;
-                                case 'b': text.append(DateTimeFormat::MONTH_NAMES[dateTime.month() - 1], 0, 3); break;
-                                case 'B': text.append(DateTimeFormat::MONTH_NAMES[dateTime.month() - 1]); break;
-                                case 'd': NumberFormatter::append0(text, dateTime.day(), 2); break;
-                                case 'e': NumberFormatter::append(text, dateTime.day()); break;
-                                case 'f': NumberFormatter::append(text, dateTime.day(), 2); break;
-                                case 'm': NumberFormatter::append0(text, dateTime.month(), 2); break;
-                                case 'n': NumberFormatter::append(text, dateTime.month()); break;
-                                case 'o': NumberFormatter::append(text, dateTime.month(), 2); break;
-                                case 'y': NumberFormatter::append0(text, dateTime.year() % 100, 2); break;
-                                case 'Y': NumberFormatter::append0(text, dateTime.year(), 4); break;
-                                case 'H': NumberFormatter::append0(text, dateTime.hour(), 2); break;
-                                case 'h': NumberFormatter::append0(text, dateTime.hourAMPM(), 2); break;
-                                case 'a': text.append(dateTime.isAM() ? "am" : "pm"); break;
-                                case 'A': text.append(dateTime.isAM() ? "AM" : "PM"); break;
-                                case 'M': NumberFormatter::append0(text, dateTime.minute(), 2); break;
-                                case 'S': NumberFormatter::append0(text, dateTime.second(), 2); break;
-                                case 'i': NumberFormatter::append0(text, dateTime.millisecond(), 3); break;
-                                case 'c': NumberFormatter::append(text, dateTime.millisecond()/100); break;
-                                case 'F': NumberFormatter::append0(text, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); break;
-                                case 'z': text.append(DateTimeFormatter::tzdISO(_localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
-                                case 'Z': text.append(DateTimeFormatter::tzdRFC(_localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
-                                case 'E': NumberFormatter::append(text, msg.getTime().epochTime()); break;
-                                case '[':
-                                {
-                                        ++it;
+				{
+				case 's': text.append(msg.getSource()); break;
+				case 't': text.append(msg.getText()); break;
+				case 'l': NumberFormatter::append(text, (int) msg.getPriority()); break;
+				case 'p': text.append(getPriorityName((int) msg.getPriority())); break;
+				case 'q': text += getPriorityName((int) msg.getPriority()).at(0); break;
+				case 'P': NumberFormatter::append(text, msg.getPid()); break;
+				case 'T': text.append(msg.getThread()); break;
+				case 'I': NumberFormatter::append(text, msg.getTid()); break;
+				case 'N': text.append(Environment::nodeName()); break;
+				case 'U': text.append(msg.getSourceFile() ? msg.getSourceFile() : ""); break;
+				case 'u': NumberFormatter::append(text, msg.getSourceLine()); break;
+				case 'w': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()], 0, 3); break;
+				case 'W': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()]); break;
+				case 'b': text.append(DateTimeFormat::MONTH_NAMES[dateTime.month() - 1], 0, 3); break;
+				case 'B': text.append(DateTimeFormat::MONTH_NAMES[dateTime.month() - 1]); break;
+				case 'd': NumberFormatter::append0(text, dateTime.day(), 2); break;
+				case 'e': NumberFormatter::append(text, dateTime.day()); break;
+				case 'f': NumberFormatter::append(text, dateTime.day(), 2); break;
+				case 'm': NumberFormatter::append0(text, dateTime.month(), 2); break;
+				case 'n': NumberFormatter::append(text, dateTime.month()); break;
+				case 'o': NumberFormatter::append(text, dateTime.month(), 2); break;
+				case 'y': NumberFormatter::append0(text, dateTime.year() % 100, 2); break;
+				case 'Y': NumberFormatter::append0(text, dateTime.year(), 4); break;
+				case 'H': NumberFormatter::append0(text, dateTime.hour(), 2); break;
+				case 'h': NumberFormatter::append0(text, dateTime.hourAMPM(), 2); break;
+				case 'a': text.append(dateTime.isAM() ? "am" : "pm"); break;
+				case 'A': text.append(dateTime.isAM() ? "AM" : "PM"); break;
+				case 'M': NumberFormatter::append0(text, dateTime.minute(), 2); break;
+				case 'S': NumberFormatter::append0(text, dateTime.second(), 2); break;
+				case 'i': NumberFormatter::append0(text, dateTime.millisecond(), 3); break;
+				case 'c': NumberFormatter::append(text, dateTime.millisecond()/100); break;
+				case 'F': NumberFormatter::append0(text, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); break;
+				case 'z': text.append(DateTimeFormatter::tzdISO(_localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
+				case 'Z': text.append(DateTimeFormatter::tzdRFC(_localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
+				case 'E': NumberFormatter::append(text, msg.getTime().epochTime()); break;
+				case '[':
+				{
+					++it;
 					std::string prop;
 					while (it != end && *it != ']') prop += *it++;
 					if (it == end) --it;
@@ -199,8 +175,8 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 
 namespace
 {
-        static std::string priorities[] = 
-        {
+	static std::string priorities[] = 
+	{
 		"",
 		"Fatal",
 		"Critical",
@@ -208,16 +184,16 @@ namespace
 		"Warning",
 		"Notice",
 		"Information",
-                "Debug",
-                "Trace"
-        };
+		"Debug",
+		"Trace"
+	};
 }
 
 
 const std::string& PatternFormatter::getPriorityName(int prio)
 {
-        poco_assert (1 <= prio && prio <= 8);   
-        return priorities[prio];
+	poco_assert (1 <= prio && prio <= 8);	
+	return priorities[prio];
 }
 
 
