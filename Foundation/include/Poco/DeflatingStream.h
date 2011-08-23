@@ -44,38 +44,42 @@
 #include "Poco/BufferedStreamBuf.h"
 #include <istream>
 #include <ostream>
+#if defined(POCO_UNBUNDLED)
+#include <zlib.h>
+#else
 #include "Poco/zlib.h"
+#endif
 
 
 namespace Poco {
 
 
 class Foundation_API DeflatingStreamBuf: public BufferedStreamBuf
-	/// This is the streambuf class used by DeflatingInputStream and DeflatingOutputStream.
-	/// The actual work is delegated to zlib 1.2.1 (see http://www.gzip.org).
-	/// Both zlib (deflate) streams and gzip streams are supported.
-	/// Output streams should always call close() to ensure
-	/// proper completion of compression.
+        /// This is the streambuf class used by DeflatingInputStream and DeflatingOutputStream.
+        /// The actual work is delegated to zlib (see http://zlib.net).
+        /// Both zlib (deflate) streams and gzip streams are supported.
+        /// Output streams should always call close() to ensure
+        /// proper completion of compression.
 	/// A compression level (0 to 9) can be specified in the constructor.
 {
 public:
-	enum StreamType
-	{
-		STREAM_ZLIB,
-		STREAM_GZIP
-	};
+        enum StreamType
+        {
+                STREAM_ZLIB, /// Create a zlib header, use Adler-32 checksum.
+                STREAM_GZIP  /// Create a gzip header, use CRC-32 checksum.
+        };
 
-	DeflatingStreamBuf(std::istream& istr, StreamType type, int level);
-	DeflatingStreamBuf(std::ostream& ostr, StreamType type, int level);
-	~DeflatingStreamBuf();
-	int close();
+        DeflatingStreamBuf(std::istream& istr, StreamType type, int level);
+        DeflatingStreamBuf(std::ostream& ostr, StreamType type, int level);
+        ~DeflatingStreamBuf();
+        int close();
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+        int readFromDevice(char* buffer, std::streamsize length);
+        int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+        enum 
 	{
 		STREAM_BUFFER_SIZE  = 1024,
 		DEFLATE_BUFFER_SIZE = 32768
@@ -96,13 +100,13 @@ class Foundation_API DeflatingIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	DeflatingIOS(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
-	DeflatingIOS(std::istream& istr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
-	~DeflatingIOS();
-	DeflatingStreamBuf* rdbuf();
-
+        DeflatingIOS(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
+        DeflatingIOS(std::istream& istr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
+        ~DeflatingIOS();
+        DeflatingStreamBuf* rdbuf();
+                
 protected:
-	DeflatingStreamBuf _buf;
+        DeflatingStreamBuf _buf;
 };
 
 
@@ -119,9 +123,9 @@ class Foundation_API DeflatingOutputStream: public DeflatingIOS, public std::ost
 	///     ostr.close();
 {
 public:
-	DeflatingOutputStream(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
-	~DeflatingOutputStream();
-	int close();
+        DeflatingOutputStream(std::ostream& ostr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
+        ~DeflatingOutputStream();
+        int close();
 };
 
 
@@ -130,8 +134,8 @@ class Foundation_API DeflatingInputStream: public DeflatingIOS, public std::istr
 	/// using zlib's deflate algorithm.
 {
 public:
-	DeflatingInputStream(std::istream& istr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
-	~DeflatingInputStream();
+        DeflatingInputStream(std::istream& istr, DeflatingStreamBuf::StreamType type = DeflatingStreamBuf::STREAM_ZLIB, int level = Z_DEFAULT_COMPRESSION);
+        ~DeflatingInputStream();
 };
 
 
