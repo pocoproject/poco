@@ -60,14 +60,16 @@ class Foundation_API PatternFormatter: public Formatter
 	///   * %t - message text
 	///   * %l - message priority level (1 .. 7)
 	///   * %p - message priority (Fatal, Critical, Error, Warning, Notice, Information, Debug, Trace)
-	///   * %q - abbreviated message priority (F, C, E, W,N, I, D, T)
+	///   * %q - abbreviated message priority (F, C, E, W, N, I, D, T)
 	///   * %P - message process identifier
-	///   * %T - message thread name
-	///   * %I - message thread identifier (numeric)
-	///   * %N - node or host name
-	///   * %w - message date/time abbreviated weekday (Mon, Tue, ...)
-	///   * %W - message date/time full weekday (Monday, Tuesday, ...)
-	///   * %b - message date/time abbreviated month (Jan, Feb, ...)
+        ///   * %T - message thread name
+        ///   * %I - message thread identifier (numeric)
+        ///   * %N - node or host name
+        ///   * %U - message source file path (empty string if not set)
+        ///   * %u - message source line number (0 if not set)
+        ///   * %w - message date/time abbreviated weekday (Mon, Tue, ...)
+        ///   * %W - message date/time full weekday (Monday, Tuesday, ...)
+        ///   * %b - message date/time abbreviated month (Jan, Feb, ...)
 	///   * %B - message date/time full month (January, February, ...)
 	///   * %d - message date/time zero-padded day of month (01 .. 31)
 	///   * %e - message date/time day of month (1 .. 31)
@@ -83,13 +85,14 @@ class Foundation_API PatternFormatter: public Formatter
 	///   * %A - message date/time AM/PM
 	///   * %M - message date/time minute (00 .. 59)
 	///   * %S - message date/time second (00 .. 59)
-	///   * %i - message date/time millisecond (000 .. 999)
-	///   * %c - message date/time centisecond (0 .. 9)
-	///   * %F - message date/time fractional seconds/microseconds (000000 - 999999)
-	///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN).
-	///   * %Z - time zone differential in RFC format (GMT or +NNNN)
-	///   * %[name] - the value of the message parameter with the given name
-	///   * %% - percent sign
+        ///   * %i - message date/time millisecond (000 .. 999)
+        ///   * %c - message date/time centisecond (0 .. 9)
+        ///   * %F - message date/time fractional seconds/microseconds (000000 - 999999)
+        ///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN)
+        ///   * %Z - time zone differential in RFC format (GMT or +NNNN)
+        ///   * %E - epoch time (UTC, seconds since midnight, January 1, 1970)
+        ///   * %[name] - the value of the message parameter with the given name
+        ///   * %% - percent sign
 
 {
 public:
@@ -131,16 +134,12 @@ public:
 	static const std::string PROP_TIMES;
 
 protected:
-	static const std::string& getPriorityName(int);
-		/// Returns a string for the given priority value.
-	
-	static void fmt(std::string& str, int value);
-	static void fmt(std::string& str, int value, int width);
-	static void fmt0(std::string& str, int value, int width);
-	
+        static const std::string& getPriorityName(int);
+                /// Returns a string for the given priority value.
+        
 private:
-	bool        _localTime;
-	std::string _pattern;
+        bool        _localTime;
+        std::string _pattern;
 };
 
 
