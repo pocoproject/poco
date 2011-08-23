@@ -239,12 +239,15 @@ public:
 	void pushDirectory(const std::string& dir);
 		/// Adds a directory to the directory list.
 		
-	void popDirectory();
-		/// Removes the last directory from the directory list.
-		
-	void setFileName(const std::string& name);
-		/// Sets the filename.
-		
+        void popDirectory();
+                /// Removes the last directory from the directory list.
+                
+        void popFrontDirectory();
+                /// Removes the first directory from the directory list.
+                
+        void setFileName(const std::string& name);
+                /// Sets the filename.
+                
 	const std::string& getFileName() const;
 		/// Returns the filename.
 
