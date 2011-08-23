@@ -1,7 +1,7 @@
 //
 // InflatingStream.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/InflatingStream.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/InflatingStream.h#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -44,34 +44,38 @@
 #include "Poco/BufferedStreamBuf.h"
 #include <istream>
 #include <ostream>
+#if defined(POCO_UNBUNDLED)
+#include <zlib.h>
+#else
 #include "Poco/zlib.h"
+#endif
 
 
 namespace Poco {
 
 
 class Foundation_API InflatingStreamBuf: public BufferedStreamBuf
-	/// This is the streambuf class used by InflatingInputStream and InflatingOutputStream.
-	/// The actual work is delegated to zlib 1.2.1 (see http://www.gzip.org).
-	/// Both zlib (deflate) streams and gzip streams are supported.
-	/// Output streams should always call close() to ensure
-	/// proper completion of decompression.
+        /// This is the streambuf class used by InflatingInputStream and InflatingOutputStream.
+        /// The actual work is delegated to zlib (see http://zlib.net).
+        /// Both zlib (deflate) streams and gzip streams are supported.
+        /// Output streams should always call close() to ensure
+        /// proper completion of decompression.
 {
 public:
-	enum StreamType
-	{
-		STREAM_ZLIB,
-		STREAM_GZIP,
-		STREAM_ZIP // ZIP is handled as STREAM_ZLIB, except that we do not check the ADLER32 value (must be checked by an outside class!)
-	};
+        enum StreamType
+        {
+                STREAM_ZLIB, /// Expect a zlib header, use Adler-32 checksum.
+                STREAM_GZIP, /// Expect a gzip header, use CRC-32 checksum.
+                STREAM_ZIP   /// STREAM_ZIP is handled as STREAM_ZLIB, except that we do not check the ADLER32 value (must be checked by caller)
+        };
 
-	InflatingStreamBuf(std::istream& istr, StreamType type);
-	InflatingStreamBuf(std::ostream& ostr, StreamType type);
-	~InflatingStreamBuf();
-	int close();
-
+        InflatingStreamBuf(std::istream& istr, StreamType type);
+        InflatingStreamBuf(std::ostream& ostr, StreamType type);
+        ~InflatingStreamBuf();
+        int close();
+                
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+        int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
@@ -97,26 +101,26 @@ class Foundation_API InflatingIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	InflatingIOS(std::ostream& ostr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
-	InflatingIOS(std::istream& istr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
-	~InflatingIOS();
-	InflatingStreamBuf* rdbuf();
-
+        InflatingIOS(std::ostream& ostr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
+        InflatingIOS(std::istream& istr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
+        ~InflatingIOS();
+        InflatingStreamBuf* rdbuf();
+                
 protected:
-	InflatingStreamBuf _buf;
+        InflatingStreamBuf _buf;
 };
 
 
 class Foundation_API InflatingOutputStream: public InflatingIOS, public std::ostream
-	/// This stream decompresses all data passing through it
-	/// using zlib's inflate algorithm.
-	/// After all data has been written to the stream, close()
-	/// must be called to ensure completion of decompression.
+        /// This stream decompresses all data passing through it
+        /// using zlib's inflate algorithm.
+        /// After all data has been written to the stream, close()
+        /// must be called to ensure completion of decompression.
 {
 public:
-	InflatingOutputStream(std::ostream& ostr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
-	~InflatingOutputStream();
-	int close();
+        InflatingOutputStream(std::ostream& ostr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
+        ~InflatingOutputStream();
+        int close();
 };
 
 
@@ -124,14 +128,14 @@ class Foundation_API InflatingInputStream: public InflatingIOS, public std::istr
 	/// This stream decompresses all data passing through it
 	/// using zlib's inflate algorithm.
 	/// Example:
-	///     std::ifstream istr("data.gz", std::ios::binary);
-	///     InflatingInputStream inflater(istr, InflatingStreamBuf::STREAM_GZIP);
-	///     std::string data;
-	///     istr >> data;
+        ///     std::ifstream istr("data.gz", std::ios::binary);
+        ///     InflatingInputStream inflater(istr, InflatingStreamBuf::STREAM_GZIP);
+        ///     std::string data;
+        ///     istr >> data;
 {
 public:
-	InflatingInputStream(std::istream& istr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
-	~InflatingInputStream();
+        InflatingInputStream(std::istream& istr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
+        ~InflatingInputStream();
 };
 
 
