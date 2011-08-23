@@ -83,10 +83,12 @@ void Logger::setLevel(int level)
 
 void Logger::setLevel(const std::string& level)
 {
-	if (level == "fatal")
-		setLevel(Message::PRIO_FATAL);
-	else if (level == "critical")
-		setLevel(Message::PRIO_CRITICAL);
+        if (level == "none")
+                setLevel(0);
+        else if (level == "fatal")
+                setLevel(Message::PRIO_FATAL);
+        else if (level == "critical")
+                setLevel(Message::PRIO_CRITICAL);
 	else if (level == "error")
 		setLevel(Message::PRIO_ERROR);
 	else if (level == "warning")
