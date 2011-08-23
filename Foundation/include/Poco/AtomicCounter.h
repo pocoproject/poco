@@ -158,12 +158,11 @@ inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
 	return InterlockedIncrement(&_counter);
 }
 
-	
+        
 inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
 {
-	ValueType result(_counter);
-	InterlockedIncrement(&_counter);
-	return result;
+        ValueType result = InterlockedIncrement(&_counter);
+        return --result;
 }
 
 
@@ -172,15 +171,14 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
 	return InterlockedDecrement(&_counter);
 }
 
-	
+        
 inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
-	ValueType result(_counter);
-	InterlockedDecrement(&_counter);
-	return result;
+        ValueType result = InterlockedDecrement(&_counter);
+        return ++result;
 }
 
-	
+        
 inline bool AtomicCounter::operator ! () const
 {
 	return _counter == 0;
@@ -208,12 +206,11 @@ inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
 	return OSAtomicIncrement32(&_counter);
 }
 
-	
+        
 inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
 {
-	ValueType result(_counter);
-	OSAtomicIncrement32(&_counter);
-	return result;
+        ValueType result = OSAtomicIncrement32(&_counter);
+        return --result;
 }
 
 
@@ -222,15 +219,14 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
 	return OSAtomicDecrement32(&_counter);
 }
 
-	
+        
 inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
-	ValueType result(_counter);
-	OSAtomicDecrement32(&_counter);
-	return result;
+        ValueType result = OSAtomicDecrement32(&_counter);
+        return ++result;
 }
 
-	
+        
 inline bool AtomicCounter::operator ! () const
 {
 	return _counter == 0;
