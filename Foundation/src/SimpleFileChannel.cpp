@@ -1,7 +1,7 @@
 //
 // SimpleFileChannel.cpp
 //
-// $Id: //poco/svn/Foundation/src/SimpleFileChannel.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/SimpleFileChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -39,7 +39,7 @@
 #include "Poco/File.h"
 #include "Poco/Message.h"
 #include "Poco/Exception.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 namespace Poco {
@@ -179,17 +179,17 @@ const std::string& SimpleFileChannel::secondaryPath() const
 
 void SimpleFileChannel::setRotation(const std::string& rotation)
 {
-	std::string::const_iterator it  = rotation.begin();
-	std::string::const_iterator end = rotation.end();
-	UInt64 n = 0;
-	while (it != end && std::isspace(*it)) ++it;
-	while (it != end && std::isdigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && std::isspace(*it)) ++it;
-	std::string unit;
-	while (it != end && std::isalpha(*it)) unit += *it++;
-	
-	if (unit == "K")
-		_limit = n*1024;
+        std::string::const_iterator it  = rotation.begin();
+        std::string::const_iterator end = rotation.end();
+        UInt64 n = 0;
+        while (it != end && Ascii::isSpace(*it)) ++it;
+        while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+        while (it != end && Ascii::isSpace(*it)) ++it;
+        std::string unit;
+        while (it != end && Ascii::isAlpha(*it)) unit += *it++;
+        
+        if (unit == "K")
+                _limit = n*1024;
 	else if (unit == "M")
 		_limit = n*1024*1024;
 	else if (unit.empty())
