@@ -196,14 +196,15 @@
                 #define POCO_ARCH_BIG_ENDIAN 1
         #endif
 
-//TODO: need to determine Linux > 2.6.0
-#if (POCO_OS == POCO_OS_LINUX)
+	//TODO: need to determine Linux > 2.6.0
+	#if (POCO_OS == POCO_OS_LINUX)
         #define POCO_HAVE_FD_EPOLL 1
         #endif
 
-//TODO: determine all platforms having poll() call
-#if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_LINUX)
+	//TODO: determine all platforms having poll() call
+	#if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_LINUX)
         #define POCO_HAVE_FD_POLL 1
+        #endif
 
 #elif defined (nios2) || defined(__nios2) || defined(__nios2__)
     #define POCO_ARCH POCO_ARCH_NIOS2
