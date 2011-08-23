@@ -4,7 +4,7 @@
 // $Id: //poco/1.4/Foundation/include/Poco/AccessExpirationDecorator.h#1 $
 //
 // Library: Foundation
-// Package: Events
+// Package: Cache
 // Module:  AccessExpirationDecorator
 //
 // Implementation of the AccessExpirationDecorator template.
