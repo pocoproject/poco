@@ -41,6 +41,8 @@
 #include "NamedEvent_WIN32U.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "NamedEvent_WIN32.cpp"
+#elif defined(POCO_ANDROID)
+#include "NamedEvent_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedEvent_UNIX.cpp"
 #else

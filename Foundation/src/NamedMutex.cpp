@@ -41,6 +41,8 @@
 #include "NamedMutex_WIN32U.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "NamedMutex_WIN32.cpp"
+#elif defined(POCO_ANDROID)
+#include "NamedMutex_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedMutex_UNIX.cpp"
 #else
