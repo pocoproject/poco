@@ -1,7 +1,7 @@
 //
 // BinaryReader.cpp
 //
-// $Id: //poco/svn/Foundation/src/BinaryReader.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/BinaryReader.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -36,16 +36,32 @@
 
 #include "Poco/BinaryReader.h"
 #include "Poco/ByteOrder.h"
+#include "Poco/TextEncoding.h"
+#include "Poco/TextConverter.h"
+#include <algorithm>
 
 
 namespace Poco {
 
 
 BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
-	_istr(istr)
+        _istr(istr),
+        _pTextConverter(0)
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
-	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
+        _flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
+#else
+        _flipBytes = (byteOrder == BIG_ENDIAN_BYTE_ORDER);
+#endif
+}
+
+
+BinaryReader::BinaryReader(std::istream& istr, TextEncoding& encoding, StreamByteOrder byteOrder):
+        _istr(istr),
+        _pTextConverter(new TextConverter(encoding, Poco::TextEncoding::global()))
+{
+#if defined(POCO_ARCH_BIG_ENDIAN)
+        _flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
 #else
 	_flipBytes = (byteOrder == BIG_ENDIAN_BYTE_ORDER);
 #endif
@@ -54,6 +70,7 @@ BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
 
 BinaryReader::~BinaryReader()
 {
+        delete _pTextConverter;
 }
 
 
@@ -199,17 +216,24 @@ BinaryReader& BinaryReader::operator >> (UInt64& value)
 
 BinaryReader& BinaryReader::operator >> (std::string& value)
 {
-	UInt32 size = 0;
-	read7BitEncoded(size);
-	value.clear();
-	value.reserve(size);
-	while (size--)
-	{
-		char c;
-		_istr.read(&c, 1);
-		value += c;
-	}
-	return *this;
+        UInt32 size = 0;
+        read7BitEncoded(size);
+        value.clear();
+        if (!_istr.good()) return *this;
+        value.reserve(size);
+        while (size--)
+        {
+                char c;
+                if (!_istr.read(&c, 1).good()) break;
+                value += c;
+        }
+        if (_pTextConverter)
+        {
+                std::string converted;
+                _pTextConverter->convert(value, converted);
+                std::swap(value, converted);
+        }
+        return *this;
 }
 
 
@@ -255,22 +279,28 @@ void BinaryReader::read7BitEncoded(UInt64& value)
 #endif
 
 
-void BinaryReader::readRaw(int length, std::string& value)
+void BinaryReader::readRaw(std::streamsize length, std::string& value)
 {
-	value.clear();
-	value.reserve(length);
-	while (length--)
-	{
-		char c;
-		_istr.read(&c, 1);
-		value += c;
-	}
+        value.clear();
+        value.reserve(static_cast<std::string::size_type>(length));
+        while (length--)
+        {
+                char c;
+                if (!_istr.read(&c, 1).good()) break;
+                value += c;
+        }
+}
+
+
+void BinaryReader::readRaw(char* buffer, std::streamsize length)
+{
+        _istr.read(buffer, length);
 }
 
 
 void BinaryReader::readBOM()
 {
-	UInt16 bom;
+        UInt16 bom;
 	_istr.read((char*) &bom, sizeof(bom));
 	_flipBytes = bom != 0xFEFF;
 }

@@ -1,7 +1,7 @@
 //
 // Base64Encoder.cpp
 //
-// $Id: //poco/svn/Foundation/src/Base64Encoder.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Base64Encoder.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -54,10 +54,10 @@ const unsigned char Base64EncoderBuf::OUT_ENCODING[64] =
 
 
 Base64EncoderBuf::Base64EncoderBuf(std::ostream& ostr): 
-	_groupLength(0),
-	_pos(0),
-	_lineLength(72),
-	_ostr(ostr)
+        _groupLength(0),
+        _pos(0),
+        _lineLength(72),
+        _buf(*ostr.rdbuf())
 {
 }
 
@@ -88,58 +88,63 @@ int Base64EncoderBuf::getLineLength() const
 
 int Base64EncoderBuf::writeToDevice(char c)
 {
-	_group[_groupLength++] = (unsigned char) c;
-	if (_groupLength == 3)
-	{
-		unsigned char idx;
-		idx = _group[0] >> 2;
-		_ostr.put(OUT_ENCODING[idx]);
-		idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
-		_ostr.put(OUT_ENCODING[idx]);
-		idx = ((_group[1] & 0x0F) << 2) | (_group[2] >> 6);
-		_ostr.put(OUT_ENCODING[idx]);
-		idx = _group[2] & 0x3F;
-		_ostr.put(OUT_ENCODING[idx]);
-		_pos += 4;
-		if (_lineLength > 0 && _pos >= _lineLength) 
-		{
-			_ostr << "\r\n";
-			_pos = 0;
-		}
-		_groupLength = 0;
-	}
-	return _ostr ? charToInt(c) : -1;
+        static const int eof = std::char_traits<char>::eof();
+
+        _group[_groupLength++] = (unsigned char) c;
+        if (_groupLength == 3)
+        {
+                unsigned char idx;
+                idx = _group[0] >> 2;
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                idx = ((_group[1] & 0x0F) << 2) | (_group[2] >> 6);
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                idx = _group[2] & 0x3F;
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                _pos += 4;
+                if (_lineLength > 0 && _pos >= _lineLength) 
+                {
+                        if (_buf.sputc('\r') == eof) return eof;
+                        if (_buf.sputc('\n') == eof) return eof;
+                        _pos = 0;
+                }
+                _groupLength = 0;
+        }
+        return charToInt(c);
 }
 
 
 int Base64EncoderBuf::close()
 {
-	sync();
-	if (_groupLength == 1)
-	{
-		_group[1] = 0;
-		unsigned char idx;
-		idx = _group[0] >> 2;
-		_ostr.put(OUT_ENCODING[idx]);
-		idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
-		_ostr.put(OUT_ENCODING[idx]);
-		_ostr << "==";
-	}
-	else if (_groupLength == 2)
-	{
-		_group[2] = 0;
-		unsigned char idx;
-		idx = _group[0] >> 2;
-		_ostr.put(OUT_ENCODING[idx]);
-		idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
-		_ostr.put(OUT_ENCODING[idx]);
-		idx = ((_group[1] & 0x0F) << 2) | (_group[2] >> 6);
-		_ostr.put(OUT_ENCODING[idx]);
-		_ostr.put('=');
-	}
-	_ostr.flush();
-	_groupLength = 0;
-	return _ostr ? 0 : -1;
+        static const int eof = std::char_traits<char>::eof();
+
+        if (sync() == eof) return eof;
+        if (_groupLength == 1)
+        {
+                _group[1] = 0;
+                unsigned char idx;
+                idx = _group[0] >> 2;
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                if (_buf.sputc('=') == eof) return eof;
+                if (_buf.sputc('=') == eof) return eof;
+        }
+        else if (_groupLength == 2)
+        {
+                _group[2] = 0;
+                unsigned char idx;
+                idx = _group[0] >> 2;
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                idx = ((_group[1] & 0x0F) << 2) | (_group[2] >> 6);
+                if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
+                if (_buf.sputc('=') == eof) return eof;
+        }
+        _groupLength = 0;
+        return _buf.pubsync();
 }
 
 

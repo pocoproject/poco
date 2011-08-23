@@ -1,7 +1,7 @@
 //
 // BinaryWriter.cpp
 //
-// $Id: //poco/svn/Foundation/src/BinaryWriter.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/BinaryWriter.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
@@ -36,6 +36,8 @@
 
 #include "Poco/BinaryWriter.h"
 #include "Poco/ByteOrder.h"
+#include "Poco/TextEncoding.h"
+#include "Poco/TextConverter.h"
 #include <cstring>
 
 
@@ -43,10 +45,23 @@ namespace Poco {
 
 
 BinaryWriter::BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder):
-	_ostr(ostr)
+        _ostr(ostr),
+        _pTextConverter(0)
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
-	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
+        _flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
+#else
+        _flipBytes = (byteOrder == BIG_ENDIAN_BYTE_ORDER);
+#endif
+}
+
+
+BinaryWriter::BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByteOrder byteOrder):
+        _ostr(ostr),
+        _pTextConverter(new TextConverter(Poco::TextEncoding::global(), encoding))
+{
+#if defined(POCO_ARCH_BIG_ENDIAN)
+        _flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
 #else
 	_flipBytes = (byteOrder == BIG_ENDIAN_BYTE_ORDER);
 #endif
@@ -55,6 +70,7 @@ BinaryWriter::BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder):
 
 BinaryWriter::~BinaryWriter()
 {
+        delete _pTextConverter;
 }
 
 
@@ -256,20 +272,43 @@ BinaryWriter& BinaryWriter::operator << (UInt64 value)
 
 BinaryWriter& BinaryWriter::operator << (const std::string& value)
 {
-	UInt32 length = (UInt32) value.size();
-	write7BitEncoded(length);
-	_ostr.write(value.data(), length);
-	return *this;
+        if (_pTextConverter)
+        {
+                std::string converted;
+                _pTextConverter->convert(value, converted);
+                UInt32 length = (UInt32) converted.size();
+                write7BitEncoded(length);
+                _ostr.write(converted.data(), length);
+        }
+        else
+        {
+                UInt32 length = (UInt32) value.size();
+                write7BitEncoded(length);
+                _ostr.write(value.data(), length);
+        }
+        return *this;
 }
 
 
 BinaryWriter& BinaryWriter::operator << (const char* value)
 {
-	poco_check_ptr (value);
-	UInt32 length = (UInt32) std::strlen(value);
-	write7BitEncoded(length);
-	_ostr.write(value, length);
-	return *this;
+        poco_check_ptr (value);
+        
+        if (_pTextConverter)
+        {
+                std::string converted;
+                _pTextConverter->convert(value, static_cast<int>(std::strlen(value)), converted);
+                UInt32 length = (UInt32) converted.size();
+                write7BitEncoded(length);
+                _ostr.write(converted.data(), length);
+        }
+        else
+        {
+                UInt32 length = static_cast<UInt32>(std::strlen(value));
+                write7BitEncoded(length);
+                _ostr.write(value, length);
+        }
+        return *this;
 }
 
 
@@ -311,9 +350,15 @@ void BinaryWriter::writeRaw(const std::string& rawData)
 }
 
 
+void BinaryWriter::writeRaw(const char* buffer, std::streamsize length)
+{
+        _ostr.write(buffer, length);
+}
+
+
 void BinaryWriter::writeBOM()
 {
-	UInt16 value = 0xFEFF;
+        UInt16 value = 0xFEFF;
 	if (_flipBytes) value = ByteOrder::flipBytes(value);
 	_ostr.write((const char*) &value, sizeof(value));
 }

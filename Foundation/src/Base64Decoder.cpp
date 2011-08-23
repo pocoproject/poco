@@ -1,7 +1,7 @@
 //
 // Base64Decoder.cpp
 //
-// $Id: //poco/svn/Foundation/src/Base64Decoder.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Base64Decoder.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -47,15 +47,20 @@ unsigned char Base64DecoderBuf::IN_ENCODING[256];
 bool Base64DecoderBuf::IN_ENCODING_INIT = false;
 
 
-Base64DecoderBuf::Base64DecoderBuf(std::istream& istr): 
-	_groupLength(0),
-	_groupIndex(0),
-	_istr(istr)
+namespace
 {
-	static FastMutex mutex;
-	FastMutex::ScopedLock lock(mutex);
-	if (!IN_ENCODING_INIT)
-	{
+        static FastMutex mutex;
+}
+
+
+Base64DecoderBuf::Base64DecoderBuf(std::istream& istr): 
+        _groupLength(0),
+        _groupIndex(0),
+        _buf(*istr.rdbuf())
+{
+        FastMutex::ScopedLock lock(mutex);
+        if (!IN_ENCODING_INIT)
+        {
 		for (unsigned i = 0; i < sizeof(IN_ENCODING); i++)
 		{
 			IN_ENCODING[i] = 0xFF;
@@ -85,19 +90,19 @@ int Base64DecoderBuf::readFromDevice()
 	{
 		unsigned char buffer[4];
 		int c;
-		if ((c = readOne()) == -1) return -1;
-		buffer[0] = (unsigned char) c;
-		if (IN_ENCODING[buffer[0]] == 0xFF) throw DataFormatException();
-		if ((c = readOne()) == -1) return -1;
-		buffer[1] = (unsigned char) c;
-		if (IN_ENCODING[buffer[1]] == 0xFF) throw DataFormatException();
-		if ((c = readOne()) == -1) return -1;
-		buffer[2] = c;
-		if (IN_ENCODING[buffer[2]] == 0xFF) throw DataFormatException();
-		if ((c = readOne()) == -1) return -1;
-		buffer[3] = c;
-		if (IN_ENCODING[buffer[3]] == 0xFF) throw DataFormatException();
-		
+                if ((c = readOne()) == -1) return -1;
+                buffer[0] = (unsigned char) c;
+                if (IN_ENCODING[buffer[0]] == 0xFF) throw DataFormatException();
+                if ((c = readOne()) == -1) throw DataFormatException();
+                buffer[1] = (unsigned char) c;
+                if (IN_ENCODING[buffer[1]] == 0xFF) throw DataFormatException();
+                if ((c = readOne()) == -1) throw DataFormatException();
+                buffer[2] = c;
+                if (IN_ENCODING[buffer[2]] == 0xFF) throw DataFormatException();
+                if ((c = readOne()) == -1) throw DataFormatException();
+                buffer[3] = c;
+                if (IN_ENCODING[buffer[3]] == 0xFF) throw DataFormatException();
+                
 		_group[0] = (IN_ENCODING[buffer[0]] << 2) | (IN_ENCODING[buffer[1]] >> 4);
 		_group[1] = ((IN_ENCODING[buffer[1]] & 0x0F) << 4) | (IN_ENCODING[buffer[2]] >> 2);
 		_group[2] = (IN_ENCODING[buffer[2]] << 6) | IN_ENCODING[buffer[3]];
@@ -116,10 +121,10 @@ int Base64DecoderBuf::readFromDevice()
 
 int Base64DecoderBuf::readOne()
 {
-	int ch = _istr.get();
-	while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n')
-		ch = _istr.get();
-	return ch;
+        int ch = _buf.sbumpc();
+        while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n')
+                ch = _buf.sbumpc();
+        return ch;
 }
 
 
