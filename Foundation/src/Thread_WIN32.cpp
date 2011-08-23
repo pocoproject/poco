@@ -141,11 +141,12 @@ void ThreadImpl::startImpl(Runnable& target)
 
 void ThreadImpl::startImpl(Callable target, void* pData)
 {
-	if (isRunningImpl())
-		throw SystemException("thread already running");
+        if (isRunningImpl())
+                throw SystemException("thread already running");
 
-	_callbackTarget.callback = target;
-	_callbackTarget.pData = pData;
+        threadCleanup();
+        _callbackTarget.callback = target;
+        _callbackTarget.pData = pData;
 
 	createImpl(callableEntry, this);
 }

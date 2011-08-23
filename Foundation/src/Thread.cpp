@@ -1,7 +1,7 @@
 //
 // Thread.cpp
 //
-// $Id: //poco/Main/Foundation/src/Thread.cpp#16 $
+// $Id: //poco/1.4/Foundation/src/Thread.cpp#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -47,6 +47,8 @@
 #else
 #include "Thread_WIN32.cpp"
 #endif
+#elif defined(POCO_VXWORKS)
+#include "Thread_VX.cpp"
 #else
 #include "Thread_POSIX.cpp"
 #endif
