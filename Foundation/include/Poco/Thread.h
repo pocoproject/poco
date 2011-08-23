@@ -50,6 +50,8 @@
 #else
 #include "Poco/Thread_WIN32.h"
 #endif
+#elif defined(POCO_VXWORKS)
+#include "Poco/Thread_VX.h"
 #else
 #include "Poco/Thread_POSIX.h"
 #endif
@@ -102,13 +104,13 @@ public:
 		/// Returns the native thread ID of the thread.
 
 	std::string name() const;
-		/// Returns the name of the thread.
+                /// Returns the name of the thread.
 
-	std::string getName() const;
-		/// Returns teh name of the thread.
+        std::string getName() const;
+                /// Returns the name of the thread.
 
-	void setName(const std::string& name);
-		/// Sets the name of the thread.
+        void setName(const std::string& name);
+                /// Sets the name of the thread.
 
 	void setPriority(Priority prio);
 		/// Sets the thread's priority.
