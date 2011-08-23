@@ -1,7 +1,7 @@
 //
 // TextConverter.cpp
 //
-// $Id: //poco/svn/Foundation/src/TextConverter.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/TextConverter.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -93,40 +93,41 @@ int TextConverter::convert(const void* source, int length, std::string& destinat
 	const unsigned char* it  = (const unsigned char*) source;
 	const unsigned char* end = (const unsigned char*) source + length;
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
-	
-	while (it < end)
-	{
-		unsigned char c = *it;
-		int n = _inEncoding.characterMap()[c];
-		int uc;
-		if (n == -1) 
-		{
-			++errors; 
-			uc = _defaultChar; 
-			++it;
-		}
-		else if (n >= 0)
-		{
-			uc = n;
-			++it;
-		}
-		else
-		{
-			if (it - n <= end)
-			{
-				uc = _inEncoding.convert(it);
-				if (uc == -1) uc = _defaultChar;
-			}
-			else 
-			{ 
-				++errors; 
-				uc = _defaultChar; 
-			}
-			it -= n;
-		}
-		uc = trans(uc);
-		n = _outEncoding.convert(uc, buffer, sizeof(buffer));
-		if (n == 0) n = _outEncoding.convert(_defaultChar, buffer, sizeof(buffer));
+        
+        while (it < end)
+        {
+                int n = _inEncoding.queryConvert(it, 1);
+                int uc;
+                int read = 1;
+
+                while (-1 > n && (end - it) >= -n)
+                {
+                        read = -n;
+                        n = _inEncoding.queryConvert(it, read);
+                }
+
+                if (-1 > n)
+                {
+                        it = end;
+                }
+                else
+                {
+                        it += read;
+                }
+
+                if (-1 >= n)
+                {
+                        uc = _defaultChar;
+                        ++errors;
+                }
+                else
+                {
+                        uc = n;
+                }
+
+                uc = trans(uc);
+                n = _outEncoding.convert(uc, buffer, sizeof(buffer));
+                if (n == 0) n = _outEncoding.convert(_defaultChar, buffer, sizeof(buffer));
 		poco_assert (n <= sizeof(buffer));
 		destination.append((const char*) buffer, n);
 	}
