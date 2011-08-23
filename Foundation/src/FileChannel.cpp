@@ -46,7 +46,7 @@
 #include "Poco/String.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 namespace Poco {
@@ -217,17 +217,17 @@ const std::string& FileChannel::path() const
 
 void FileChannel::setRotation(const std::string& rotation)
 {
-	std::string::const_iterator it  = rotation.begin();
-	std::string::const_iterator end = rotation.end();
-	int n = 0;
-	while (it != end && std::isspace(*it)) ++it;
-	while (it != end && std::isdigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && std::isspace(*it)) ++it;
-	std::string unit;
-	while (it != end && std::isalpha(*it)) unit += *it++;
-	
-	RotateStrategy* pStrategy = 0;
-	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
+        std::string::const_iterator it  = rotation.begin();
+        std::string::const_iterator end = rotation.end();
+        int n = 0;
+        while (it != end && Ascii::isSpace(*it)) ++it;
+        while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+        while (it != end && Ascii::isSpace(*it)) ++it;
+        std::string unit;
+        while (it != end && Ascii::isAlpha(*it)) unit += *it++;
+        
+        RotateStrategy* pStrategy = 0;
+        if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
 		if (_times == "utc")
 			pStrategy = new RotateAtTimeStrategy<DateTime>(rotation);
@@ -302,23 +302,23 @@ void FileChannel::setCompress(const std::string& compress)
 
 void FileChannel::setPurgeAge(const std::string& age)
 {
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = 0;
-	_purgeAge = "none";
-	if (age.empty() || 0 == icompare(age, "none")) return;
+        delete _pPurgeStrategy;
+        _pPurgeStrategy = 0;
+        _purgeAge = "none";
+        if (age.empty() || 0 == icompare(age, "none")) return;
 
-	std::string::const_iterator it  = age.begin();
-	std::string::const_iterator end = age.end();
-	
-	int n = 0;
-	while (it != end && std::isspace(*it)) ++it;
-	while (it != end && std::isdigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && std::isspace(*it)) ++it;
-	std::string unit;
-	while (it != end && std::isalpha(*it)) unit += *it++;
-	
-	Timespan::TimeDiff factor = Timespan::SECONDS;
-	if (unit == "minutes")
+        std::string::const_iterator it  = age.begin();
+        std::string::const_iterator end = age.end();
+        
+        int n = 0;
+        while (it != end && Ascii::isSpace(*it)) ++it;
+        while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+        while (it != end && Ascii::isSpace(*it)) ++it;
+        std::string unit;
+        while (it != end && Ascii::isAlpha(*it)) unit += *it++;
+        
+        Timespan::TimeDiff factor = Timespan::SECONDS;
+        if (unit == "minutes")
 		factor = Timespan::MINUTES;
 	else if (unit == "hours")
 		factor = Timespan::HOURS;
@@ -328,37 +328,37 @@ void FileChannel::setPurgeAge(const std::string& age)
 		factor = 7*Timespan::DAYS;
 	else if (unit == "months")
 		factor = 30*Timespan::DAYS;
-	else if (unit != "seconds")
-		throw InvalidArgumentException("purgeAge", age);
+        else if (unit != "seconds")
+                throw InvalidArgumentException("purgeAge", age);
+                
+        if (0 == n)
+                throw InvalidArgumentException("Zero is not valid purge age.");
 
-	if (0 == n)
-		throw InvalidArgumentException("Zero is not valid purge age.");
-
-	_pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
-	_purgeAge = age;
+        _pPurgeStrategy = new PurgeByAgeStrategy(Timespan(factor*n));
+        _purgeAge = age;
 }
 
 
 void FileChannel::setPurgeCount(const std::string& count)
 {
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = 0;
-	_purgeAge = "none";
-	if (count.empty() || 0 == icompare(count, "none")) return;
+        delete _pPurgeStrategy;
+        _pPurgeStrategy = 0;
+        _purgeAge = "none";
+        if (count.empty() || 0 == icompare(count, "none")) return;
 
-	int n = 0;
-	std::string::const_iterator it  = count.begin();
-	std::string::const_iterator end = count.end();
-	
-	while (it != end && std::isspace(*it)) ++it;
-	while (it != end && std::isdigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && std::isspace(*it)) ++it;
+        int n = 0;
+        std::string::const_iterator it  = count.begin();
+        std::string::const_iterator end = count.end();
 
-	if (0 == n)
-		throw InvalidArgumentException("Zero is not valid purge count.");
+        while (it != end && std::isspace(*it)) ++it;
+        while (it != end && std::isdigit(*it)) { n *= 10; n += *it++ - '0'; }
+        while (it != end && std::isspace(*it)) ++it;
 
-	_pPurgeStrategy = new PurgeByCountStrategy(n);
-	_purgeCount = count;
+        if (0 == n)
+                throw InvalidArgumentException("Zero is not valid purge count.");
+
+        _pPurgeStrategy = new PurgeByCountStrategy(n);
+        _purgeCount = count;
 }
 
 
