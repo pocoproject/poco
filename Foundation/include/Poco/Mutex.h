@@ -46,7 +46,13 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(_WIN32_WCE)
+#include "Poco/Mutex_WINCE.h"
+#else
 #include "Poco/Mutex_WIN32.h"
+#endif
+#elif defined(POCO_VXWORKS)
+#include "Poco/Mutex_VX.h"
 #else
 #include "Poco/Mutex_POSIX.h"
 #endif
@@ -167,51 +173,51 @@ private:
 
 
 class Foundation_API NullMutex
-	/// A NullMutex is an empty mutex implementation
-	/// which performs no locking at all. Useful in policy driven design
-	/// where the type of mutex used can be now a template parameter allowing the user to switch
-	/// between thread-safe and not thread-safe depending on his need
-	/// Works with the ScopedLock class
+        /// A NullMutex is an empty mutex implementation
+        /// which performs no locking at all. Useful in policy driven design
+        /// where the type of mutex used can be now a template parameter allowing the user to switch
+        /// between thread-safe and not thread-safe depending on his need
+        /// Works with the ScopedLock class
 {
 public:
-	typedef Poco::ScopedLock<NullMutex> ScopedLock;
-	
-	NullMutex()
-		/// creates the NullMutex.
-	{
-	}
-		
-	~NullMutex()
-		/// destroys the NullMutex.
-	{
-	}
+        typedef Poco::ScopedLock<NullMutex> ScopedLock;
+        
+        NullMutex()
+                /// Creates the NullMutex.
+        {
+        }
+                
+        ~NullMutex()
+                /// Destroys the NullMutex.
+        {
+        }
 
-	void lock()
-		/// Always succeeds
-	{
-	}
-		
-	void lock(long milliseconds)
-		/// Always succeeds
-	{
-	}
+        void lock()
+                /// Does nothing.
+        {
+        }
+                
+        void lock(long)
+                /// Does nothing.
+        {
+        }
 
-	bool tryLock()
-		/// Always returns true
-	{
-		return true;
-	}
+        bool tryLock()
+                /// Does nothing and always returns true.
+        {
+                return true;
+        }
 
-	bool tryLock(long)
-		/// Always returns true
-	{
-		return true;
-	}
+        bool tryLock(long)
+                /// Does nothing and always returns true.
+        {
+                return true;
+        }
 
-	void unlock()
-		/// Always succeeds
-	{
-	}
+        void unlock()
+                /// Does nothing.
+        {
+        }
 };
 
 

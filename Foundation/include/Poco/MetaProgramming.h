@@ -1,7 +1,7 @@
 //
-// TypeChecks.h
+// MetaProgramming.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/MetaProgramming.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/MetaProgramming.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_TypeChecks_INCLUDED
-#define  Foundation_TypeChecks_INCLUDED
+#ifndef Foundation_MetaProgramming_INCLUDED
+#define Foundation_MetaProgramming_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -48,10 +48,10 @@ namespace Poco {
 
 template <typename T>
 struct IsReference
-	///Use this struct to determine if a template type is a reference
+        /// Use this struct to determine if a template type is a reference.
 {
-	enum 
-	{
+        enum 
+        {
 		VALUE = 0
 	};
 };
@@ -77,13 +77,12 @@ struct IsReference<const T&>
 };
 
 
-
 template <typename T>
 struct IsConst
-	///Use this struct to determine if a template type is a const type
+        /// Use this struct to determine if a template type is a const type.
 {
-	enum 
-	{
+        enum 
+        {
 		VALUE = 0
 	};
 };
@@ -111,21 +110,21 @@ struct IsConst<const T>
 
 template <typename T, int i>
 struct IsConst<const T[i]>
-	/// Specialization for const char arrays
+        /// Specialization for const char arrays
 {
-	enum 
-	{
-		VALUE = 1
-	};
+        enum 
+        {
+                VALUE = 1
+        };
 };
 
 
 template <typename T>
 struct TypeWrapper
-	/// Use the type wrapper if you want to dedecouple constness and references from template types
+        /// Use the type wrapper if you want to decouple constness and references from template types.
 {
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
+        typedef T TYPE;
+        typedef const T CONSTTYPE;
 	typedef T& REFTYPE;
 	typedef const T& CONSTREFTYPE;
 };
@@ -161,8 +160,7 @@ struct TypeWrapper<T&>
 };
 
 
-
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_MetaProgramming_INCLUDED
