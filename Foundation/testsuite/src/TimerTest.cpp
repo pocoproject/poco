@@ -62,19 +62,19 @@ void TimerTest::testTimer()
 	Stopwatch sw;
 	TimerCallback<TimerTest> tc(*this, &TimerTest::onTimer);
 	sw.start();
-	t.start(tc);
-	_event.wait();
-	sw.stop();
-	assert (sw.elapsed() >= 90000 && sw.elapsed() < 150000);
-	sw.restart();
-	_event.wait();
-	sw.stop();
-	assert (sw.elapsed() >= 190000 && sw.elapsed() < 250000);
-	sw.restart();
-	_event.wait();
-	sw.stop();
-	assert (sw.elapsed() >= 190000 && sw.elapsed() < 250000);
-	t.stop();	
+        t.start(tc);
+        _event.wait();
+        sw.stop();
+        assert (sw.elapsed() >= 80000 && sw.elapsed() < 250000);
+        sw.restart();
+        _event.wait();
+        sw.stop();
+        assert (sw.elapsed() >= 180000 && sw.elapsed() < 250000);
+        sw.restart();
+        _event.wait();
+        sw.stop();
+        assert (sw.elapsed() >= 180000 && sw.elapsed() < 250000);
+        t.stop();       
 }
 
 

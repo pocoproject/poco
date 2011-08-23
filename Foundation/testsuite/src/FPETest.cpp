@@ -80,6 +80,8 @@ void FPETest::testClassify()
 #pragma OPTIMIZE OFF
 #elif defined(_MSC_VER)
 #pragma optimize("", off)
+#elif defined(__APPLE__)
+#pragma GCC optimization_level 0
 #endif
 
 
@@ -129,6 +131,8 @@ void FPETest::testFlags()
 #pragma OPTIMIZE ON
 #elif defined(_MSC_VER)
 #pragma optimize("", on)
+#elif defined(__APPLE__)
+#pragma GCC optimization_level reset
 #endif
 
 

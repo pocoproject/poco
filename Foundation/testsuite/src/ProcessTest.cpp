@@ -1,7 +1,7 @@
 //
 // ProcessTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/ProcessTest.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ProcessTest.cpp#1 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -64,10 +64,14 @@ void ProcessTest::testLaunch()
 #endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
+        cmd = "./";
+        cmd += name;
+#elif defined(_WIN32_WCE)
+        cmd = "\\";
+        cmd += name;
+        cmd += ".EXE";
 #else
-	cmd = name;
+        cmd = name;
 #endif
 
 	std::vector<std::string> args;
@@ -82,8 +86,9 @@ void ProcessTest::testLaunch()
 
 void ProcessTest::testLaunchRedirectIn()
 {
-	std::string name("TestApp");
-	std::string cmd;
+#if !defined(_WIN32_WCE)
+        std::string name("TestApp");
+        std::string cmd;
 #if defined(_DEBUG)
 	name += "d";
 #endif
@@ -101,16 +106,18 @@ void ProcessTest::testLaunchRedirectIn()
 	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(100, 'x');
-	ostr.close();
-	int rc = ph.wait();
-	assert (rc == 100);
+        ostr.close();
+        int rc = ph.wait();
+        assert (rc == 100);
+#endif // !defined(_WIN32_WCE)
 }
 
 
 void ProcessTest::testLaunchRedirectOut()
 {
-	std::string name("TestApp");
-	std::string cmd;
+#if !defined(_WIN32_WCE)
+        std::string name("TestApp");
+        std::string cmd;
 #if defined(_DEBUG)
 	name += "d";
 #endif
@@ -130,9 +137,10 @@ void ProcessTest::testLaunchRedirectOut()
 	std::string s;
 	int c = istr.get();
 	while (c != -1) { s += (char) c; c = istr.get(); }
-	assert (s == "Hello, world!");
-	int rc = ph.wait();
-	assert (rc == 1);
+        assert (s == "Hello, world!");
+        int rc = ph.wait();
+        assert (rc == 1);
+#endif // !defined(_WIN32_WCE)
 }
 
 

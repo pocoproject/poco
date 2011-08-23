@@ -38,11 +38,14 @@
 
 CppUnit::Test* SharedLibraryTestSuite::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SharedLibraryTestSuite");
+        CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SharedLibraryTestSuite");
 
-	pSuite->addTest(SharedLibraryTest::suite());
-	pSuite->addTest(ManifestTest::suite());
-	pSuite->addTest(ClassLoaderTest::suite());
+        pSuite->addTest(ManifestTest::suite());
 
-	return pSuite;
+#if !defined(_WIN32) || defined(_DLL)
+        pSuite->addTest(SharedLibraryTest::suite());
+        pSuite->addTest(ClassLoaderTest::suite());
+#endif
+
+        return pSuite;
 }

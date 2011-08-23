@@ -64,12 +64,13 @@ public:
 	void testBool();
 	void testAnyInt();
 	void testFloatFix();
-	void testFloatSci();
-	void testString();
-	void testMultiple();
+        void testFloatSci();
+        void testString();
+        void testMultiple();
+        void testIndex();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

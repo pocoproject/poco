@@ -1560,11 +1560,14 @@ void PathTest::testFind()
 {
 	Path p;
 #if defined(POCO_OS_FAMILY_UNIX)
-	bool found = Path::find(Environment::get("PATH"), "ls", p);
-	bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123", p);
+        bool found = Path::find(Environment::get("PATH"), "ls", p);
+        bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123", p);
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-	bool found = Path::find(Environment::get("PATH"), "cmd.exe", p);
-	bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123.zzz", p);
+#if defined(_WIN32_WCE)
+        return;
+#endif
+        bool found = Path::find(Environment::get("PATH"), "cmd.exe", p);
+        bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123.zzz", p);
 #else
 	bool found = true;
 	bool notfound = false;
@@ -1607,6 +1610,22 @@ void PathTest::testResolve()
 }
 
 
+void PathTest::testPushPop()
+{
+        Path p;
+        p.pushDirectory("a");
+        p.pushDirectory("b");
+        p.pushDirectory("c");
+        assert (p.toString(Path::PATH_UNIX) == "a/b/c/");
+
+        p.popDirectory();
+        assert (p.toString(Path::PATH_UNIX) == "a/b/");
+
+        p.popFrontDirectory();
+        assert (p.toString(Path::PATH_UNIX) == "b/");
+}
+
+
 void PathTest::setUp()
 {
 }
@@ -1644,9 +1663,10 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testForDirectory);
 	CppUnit_addTest(pSuite, PathTest, testExpand);
 	CppUnit_addTest(pSuite, PathTest, testListRoots);
-	CppUnit_addTest(pSuite, PathTest, testFind);
-	CppUnit_addTest(pSuite, PathTest, testSwap);
-	CppUnit_addTest(pSuite, PathTest, testResolve);
+        CppUnit_addTest(pSuite, PathTest, testFind);
+        CppUnit_addTest(pSuite, PathTest, testSwap);
+        CppUnit_addTest(pSuite, PathTest, testResolve);
+        CppUnit_addTest(pSuite, PathTest, testPushPop);
 
-	return pSuite;
+        return pSuite;
 }

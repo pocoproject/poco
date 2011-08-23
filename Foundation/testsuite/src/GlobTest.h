@@ -51,12 +51,13 @@ public:
 	void testMatchQM();
 	void testMatchAsterisk();
 	void testMatchRange();
-	void testMisc();
-	void testGlob();
-	void testCaseless();
+        void testMisc();
+        void testGlob();
+        void testCaseless();
+        void testMatchEmptyPattern();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

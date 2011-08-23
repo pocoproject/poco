@@ -1,11 +1,11 @@
 //
-// NumberFormatterTest.h
+// TextBufferIteratorTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/NumberFormatterTest.h#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/TextBufferIteratorTest.h#1 $
 //
-// Definition of the NumberFormatterTest class.
+// Definition of the TextBufferIteratorTest class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -32,32 +32,37 @@
 //
 
 
-#ifndef NumberFormatterTest_INCLUDED
-#define NumberFormatterTest_INCLUDED
+#ifndef TextBufferIteratorTest_INCLUDED
+#define TextBufferIteratorTest_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
 
 
-class NumberFormatterTest: public CppUnit::TestCase
+class TextBufferIteratorTest: public CppUnit::TestCase
 {
 public:
-	NumberFormatterTest(const std::string& name);
-	~NumberFormatterTest();
+        TextBufferIteratorTest(const std::string& name);
+        ~TextBufferIteratorTest();
 
-        void testFormat();
-        void testFormat0();
-        void testFormatHex();
-        void testFormatFloat();
-        
+        void testEmptyLatin1();
+        void testOneLatin1();
+        void testLatin1();
+        void testEmptyUTF8();
+        void testOneUTF8();
+        void testUTF8();
+        void testUTF8Supplementary();
+        void testUTF16Supplementary();
+        void testSwap();
+
         void setUp();
         void tearDown();
 
-	static CppUnit::Test* suite();
+        static CppUnit::Test* suite();
 
 private:
 };
 
 
-#endif // NumberFormatterTest_INCLUDED
+#endif // TextBufferIteratorTest_INCLUDED

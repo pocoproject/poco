@@ -107,9 +107,135 @@ void DateTimeParserTest::testISO8601()
 }
 
 
+void DateTimeParserTest::testISO8601Frac()
+{
+        int tzd;
+        DateTime dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00Z", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 0);
+        assert (dt.microsecond() == 0);
+        assert (tzd == 0);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00+01:00", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 0);
+        assert (dt.microsecond() == 0);
+        assert (tzd == 3600);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00-01:00", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 0);
+        assert (dt.microsecond() == 0);
+        assert (tzd == -3600);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 0);
+        assert (dt.microsecond() == 0);
+        assert (tzd == 0);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 0);
+        assert (dt.minute() == 0);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 0);
+        assert (dt.microsecond() == 0);
+        assert (tzd == 0);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.1Z", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 100);
+        assert (dt.microsecond() == 0);
+        assert (tzd == 0);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.123+01:00", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 123);
+        assert (dt.microsecond() == 0);
+        assert (tzd == 3600);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.12345-01:00", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 123);
+        assert (dt.microsecond() == 450);
+        assert (tzd == -3600);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 0);
+        assert (dt.microsecond() == 0);
+        assert (tzd == 0);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.123456", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 12);
+        assert (dt.minute() == 30);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 123);
+        assert (dt.microsecond() == 456);
+        assert (tzd == 0);
+
+        dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08", tzd);
+        assert (dt.year() == 2005);
+        assert (dt.month() == 1);
+        assert (dt.day() == 8);
+        assert (dt.hour() == 0);
+        assert (dt.minute() == 0);
+        assert (dt.second() == 0);
+        assert (dt.millisecond() == 0);
+        assert (dt.microsecond() == 0);
+        assert (tzd == 0);
+}
+
+
 void DateTimeParserTest::testRFC822()
 {
-	int tzd;
+        int tzd;
 	DateTime dt = DateTimeParser::parse(DateTimeFormat::RFC822_FORMAT, "Sat, 8 Jan 05 12:30:00 GMT", tzd);
 	assert (dt.year() == 2005);
 	assert (dt.month() == 1);
@@ -541,12 +667,13 @@ void DateTimeParserTest::tearDown()
 
 CppUnit::Test* DateTimeParserTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DateTimeParserTest");
+        CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DateTimeParserTest");
 
-	CppUnit_addTest(pSuite, DateTimeParserTest, testISO8601);
-	CppUnit_addTest(pSuite, DateTimeParserTest, testRFC822);
-	CppUnit_addTest(pSuite, DateTimeParserTest, testRFC1123);
-	CppUnit_addTest(pSuite, DateTimeParserTest, testHTTP);
+        CppUnit_addTest(pSuite, DateTimeParserTest, testISO8601);
+        CppUnit_addTest(pSuite, DateTimeParserTest, testISO8601Frac);
+        CppUnit_addTest(pSuite, DateTimeParserTest, testRFC822);
+        CppUnit_addTest(pSuite, DateTimeParserTest, testRFC1123);
+        CppUnit_addTest(pSuite, DateTimeParserTest, testHTTP);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testRFC850);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testRFC1036);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testASCTIME);

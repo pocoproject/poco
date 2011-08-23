@@ -1,7 +1,7 @@
 //
 // BinaryReaderWriterTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/BinaryReaderWriterTest.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/BinaryReaderWriterTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -131,10 +131,16 @@ void BinaryReaderWriterTest::write(BinaryWriter& writer)
 	writer.write7BitEncoded((UInt64) 1000);
 	writer.write7BitEncoded((UInt64) 10000);
 	writer.write7BitEncoded((UInt64) 100000);
-	writer.write7BitEncoded((UInt64) 1000000);
+        writer.write7BitEncoded((UInt64) 1000000);
 #endif
+        
+        std::vector<int> vec;
+        vec.push_back(1);
+        vec.push_back(2);
+        vec.push_back(3);
+        writer << vec;
 
-	writer.writeRaw("RAW");
+        writer.writeRaw("RAW");
 }
 
 
@@ -224,11 +230,18 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 	reader.read7BitEncoded(uint64v);
 	assert (uint64v == 100000);
 	reader.read7BitEncoded(uint64v);
-	assert (uint64v == 1000000);
+        assert (uint64v == 1000000);
 #endif
 
-	reader.readRaw(3, str);
-	assert (str == "RAW");
+        std::vector<int> vec;
+        reader >> vec;
+        assert (vec.size() == 3);
+        assert (vec[0] == 1);
+        assert (vec[1] == 2);
+        assert (vec[2] == 3);
+
+        reader.readRaw(3, str);
+        assert (str == "RAW");
 }
 
 

@@ -53,12 +53,13 @@ public:
 	void testOpenModeIn();
 	void testOpenModeOut();
 	void testOpenModeTrunc();
-	void testOpenModeAte();
-	void testOpenModeApp();
-	void testSeek();
+        void testOpenModeAte();
+        void testOpenModeApp();
+        void testSeek();
+        void testMultiOpen();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

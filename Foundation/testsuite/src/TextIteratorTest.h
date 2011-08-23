@@ -49,12 +49,14 @@ public:
 	void testEmptyLatin1();
 	void testOneLatin1();
 	void testLatin1();
-	void testEmptyUTF8();
-	void testOneUTF8();
-	void testUTF8();
-	void testSwap();
+        void testEmptyUTF8();
+        void testOneUTF8();
+        void testUTF8();
+        void testUTF8Supplementary();
+        void testUTF16Supplementary();
+        void testSwap();
 
-	void setUp();
+        void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();

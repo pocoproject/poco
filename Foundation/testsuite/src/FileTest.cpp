@@ -1,7 +1,7 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/Main/Foundation/testsuite/src/FileTest.cpp#16 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FileTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -60,20 +60,9 @@ FileTest::~FileTest()
 }
 
 
-void FileTest::testCreateFile()
-{
-	File f("testfile.dat");
-	bool created = f.createFile();
-	assert (created);
-	assert (!f.isHidden());
-	created = f.createFile();
-	assert (!created);
-}
-
-
 void FileTest::testFileAttributes1()
 {
-	File f("testfile.dat");
+        File f("testfile.dat");
 	assert (!f.exists());
 	
 	try
@@ -214,9 +203,20 @@ void FileTest::testFileAttributes1()
 }
 
 
+void FileTest::testCreateFile()
+{
+        File f("testfile.dat");
+        bool created = f.createFile();
+        assert (created);
+        assert (!f.isHidden());
+        created = f.createFile();
+        assert (!created);
+}
+
+
 void FileTest::testFileAttributes2()
 {
-	TemporaryFile f;
+        TemporaryFile f;
 	bool created = f.createFile();
 	Timestamp ts;
 	assert (created);
@@ -248,14 +248,16 @@ void FileTest::testFileAttributes2()
 void FileTest::testFileAttributes3()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-	File f("/dev/console");
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-	File f("CON");
+        File f("/dev/console");
+#elif defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
+        File f("CON");
 #endif
 
-	assert (f.isDevice());
-	assert (!f.isFile());
-	assert (!f.isDirectory());
+#if !defined(_WIN32_WCE)
+        assert (f.isDevice());
+        assert (!f.isFile());
+        assert (!f.isDirectory());
+#endif
 }
 
 
@@ -287,17 +289,24 @@ void FileTest::testCompare()
 void FileTest::testRootDir()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	File f1("/");
-	File f2("c:/");
-	File f3("c:\\");
+#if defined(_WIN32_WCE)
+        File f1("\\");
+        File f2("/");
+        assert (f1.exists());
+        assert (f2.exists());
+#else
+        File f1("/");
+        File f2("c:/");
+        File f3("c:\\");
 	File f4("\\");
 	assert (f1.exists());
-	assert (f2.exists());
-	assert (f3.exists());
-	assert (f4.exists());
+        assert (f2.exists());
+        assert (f3.exists());
+        assert (f4.exists());
+#endif
 #else
-	File f1("/");
-	assert (f1.exists());
+        File f1("/");
+        assert (f1.exists());
 #endif
 }
 

@@ -48,12 +48,13 @@ public:
 
 	void testDeflate1();
 	void testDeflate2();
-	void testDeflate3();
-	void testGzip1();
-	void testGzip2();
+        void testDeflate3();
+        void testGzip1();
+        void testGzip2();
+        void testGzip3();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

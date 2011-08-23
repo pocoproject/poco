@@ -1,7 +1,7 @@
 //
 // StreamTokenizerTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/StreamTokenizerTest.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/StreamTokenizerTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -35,7 +35,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/StreamTokenizer.h"
 #include "Poco/Token.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 #include <sstream>
 
 
@@ -44,6 +44,7 @@ using Poco::Token;
 using Poco::InvalidToken;
 using Poco::EOFToken;
 using Poco::WhitespaceToken;
+using Poco::Ascii;
 
 
 class IdentifierToken: public Token
@@ -61,24 +62,24 @@ public:
 	{
 		return Token::IDENTIFIER_TOKEN;
 	}
-	
-	bool start(char c, std::istream& istr)
-	{
-		if (std::isalpha(c))
-		{
-			_value = c;
-			return true;
+        
+        bool start(char c, std::istream& istr)
+        {
+                if (c != -1 && Ascii::isAlpha(c))
+                {
+                        _value = c;
+                        return true;
 		}
 		else return false;
 	}
 	
-	void finish(std::istream& istr)
-	{
-		int c = istr.peek();
-		while (std::isalnum(c))
-		{
-			istr.get();
-			_value += c;
+        void finish(std::istream& istr)
+        {
+                int c = istr.peek();
+                while (c != -1 && Ascii::isAlphaNumeric(c))
+                {
+                        istr.get();
+                        _value += c;
 			c = istr.peek();
 		}
 	}
@@ -100,24 +101,24 @@ public:
 	{
 		return Token::INTEGER_LITERAL_TOKEN;
 	}
-	
-	bool start(char c, std::istream& istr)
-	{
-		if (std::isdigit(c))
-		{
-			_value = c;
-			return true;
+        
+        bool start(char c, std::istream& istr)
+        {
+                if (c != -1 && Ascii::isDigit(c))
+                {
+                        _value = c;
+                        return true;
 		}
 		else return false;
 	}
 	
-	void finish(std::istream& istr)
-	{
-		int c = istr.peek();
-		while (std::isdigit(c))
-		{
-			istr.get();
-			_value += c;
+        void finish(std::istream& istr)
+        {
+                int c = istr.peek();
+                while (c != -1 && Ascii::isDigit(c))
+                {
+                        istr.get();
+                        _value += c;
 			c = istr.peek();
 		}
 	}

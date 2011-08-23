@@ -38,13 +38,13 @@
 #include "Poco/ThreadTarget.h"
 #include "Poco/Event.h"
 #if defined(__sun) && defined(__SVR4)
-#	if !defined(__EXTENSIONS__)
-#		define __EXTENSIONS__
-#	endif
-	// must be limits.h for PTHREAD_STACK_MIN on Solaris
-#	include <limits.h>
+#       if !defined(__EXTENSIONS__)
+#define __EXTENSIONS__
+#endif
+        // must be limits.h for PTHREAD_STACK_MIN on Solaris
+#       include <limits.h>
 #else
-#	include <climits>
+#include <climits>
 #endif
 
 
@@ -272,30 +272,30 @@ void ThreadTest::testThreadFunction()
 
 void ThreadTest::testThreadStackSize()
 {
-	// some platforms (e.g. Fedora Core9/g++ 4.3.0) ignore set stack size value
-	// so some asserts will fail here
+        // some platforms (e.g. Fedora Core9/g++ 4.3.0) ignore set stack size value
+        // so some asserts will fail here
 
-	int stackSize = 50000000;
-	Thread thread;
+        int stackSize = 50000000;
+        Thread thread;
 
-	assert (0 == thread.getStackSize());
-	thread.setStackSize(stackSize);
-	assert (stackSize == thread.getStackSize());
-	int tmp = MyRunnable::_staticVar;
-	thread.start(freeFunc, &tmp);
-	thread.join();
+        assert (0 == thread.getStackSize());
+        thread.setStackSize(stackSize);
+        assert (stackSize == thread.getStackSize());
+        int tmp = MyRunnable::_staticVar;
+        thread.start(freeFunc, &tmp);
+        thread.join();
 	assert (tmp * 2 == MyRunnable::_staticVar);
 
 	stackSize = 1;
 	thread.setStackSize(stackSize);
 #ifdef PTHREAD_STACK_MIN
-	assert (PTHREAD_STACK_MIN == thread.getStackSize());
+        assert (PTHREAD_STACK_MIN == thread.getStackSize());
 #else
-	assert (stackSize == thread.getStackSize());
+        assert (stackSize == thread.getStackSize());
 #endif // PTHREAD_STACK_MIN
-	tmp = MyRunnable::_staticVar;
-	thread.start(freeFunc, &tmp);
-	thread.join();
+        tmp = MyRunnable::_staticVar;
+        thread.start(freeFunc, &tmp);
+        thread.join();
 	assert (tmp * 2 == MyRunnable::_staticVar);
 
 	thread.setStackSize(0);
@@ -304,6 +304,15 @@ void ThreadTest::testThreadStackSize()
 	thread.start(freeFunc, &tmp);
 	thread.join();
 	assert (tmp * 2 == MyRunnable::_staticVar);
+}
+
+
+void ThreadTest::testSleep()
+{
+        Poco::Timestamp start;
+        Thread::sleep(200);
+        Poco::Timespan elapsed = start.elapsed();
+        assert (elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);
 }
 
 
@@ -326,9 +335,10 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testCurrent);
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
 	CppUnit_addTest(pSuite, ThreadTest, testJoin);
-	CppUnit_addTest(pSuite, ThreadTest, testThreadTarget);
-	CppUnit_addTest(pSuite, ThreadTest, testThreadFunction);
-	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
+        CppUnit_addTest(pSuite, ThreadTest, testThreadTarget);
+        CppUnit_addTest(pSuite, ThreadTest, testThreadFunction);
+        CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
+        CppUnit_addTest(pSuite, ThreadTest, testSleep);
 
-	return pSuite;
+        return pSuite;
 }

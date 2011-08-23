@@ -49,12 +49,13 @@ public:
 	void testParse();
 	void testBuffer();
 	void testCompare();
-	void testVersion();
-	void testVariant();
-	void testSwap();
-	
-	void setUp();
-	void tearDown();
+        void testVersion();
+        void testVariant();
+        void testSwap();
+        void testTryParse();
+
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

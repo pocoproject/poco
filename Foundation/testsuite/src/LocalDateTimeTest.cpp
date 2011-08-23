@@ -1,7 +1,7 @@
 //
 // LocalDateTimeTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/LocalDateTimeTest.cpp#3 $
+// $Id: //poco/1.4/Foundation/testsuite/src/LocalDateTimeTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -42,13 +42,18 @@
 #include "Poco/DateTimeFormatter.h"
 #include <ctime>
 #include <iostream>
-
+#if defined(_WIN32_WCE)
+#include "wce_time.h"
+#endif
 
 using Poco::LocalDateTime;
 using Poco::DateTime;
 using Poco::Timestamp;
 using Poco::Timespan;
 using Poco::Timezone;
+#ifndef _WIN32_WCE
+using std::strftime;
+#endif
 
 
 LocalDateTimeTest::LocalDateTimeTest(const std::string& name): CppUnit::TestCase(name)
@@ -379,9 +384,10 @@ void LocalDateTimeTest::testSwap()
 
 void LocalDateTimeTest::testTimezone()
 {
-	std::time_t   tINCREMENT = (30 * 24 * 60 * 60); // 30 days
-	Timespan      tsINCREMENT(30*Timespan::DAYS);
-	LocalDateTime now;
+#if !defined(_WIN32_WCE)
+        std::time_t   tINCREMENT = (30 * 24 * 60 * 60); // 30 days
+        Timespan      tsINCREMENT(30*Timespan::DAYS);
+        LocalDateTime now;
 	std::time_t   t = std::time(NULL);
 	std::tm       then;
 	bool          foundDST = false;
@@ -458,9 +464,10 @@ void LocalDateTimeTest::testTimezone()
 	{
 		std::cerr
 			<< __FILE__ << ":" << __LINE__
-			<< " - failed to locate DST boundary, timezone test skipped."
-			<< std::endl;
-	}
+                        << " - failed to locate DST boundary, timezone test skipped."
+                        << std::endl;
+        }
+#endif
 }
 
 

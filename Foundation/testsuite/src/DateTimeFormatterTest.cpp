@@ -47,10 +47,10 @@ using Poco::DateTimeFormatter;
 
 DateTimeFormatterTest::DateTimeFormatterTest(const std::string& name): CppUnit::TestCase(name)
 {
-	// Linker regresion SF #3288584
-	std::string message;
-	Poco::LocalDateTime now;
-	Poco::DateTimeFormatter::append(message,now,"%H:%M:%S.%i");
+        // Linker regresion SF #3288584
+        std::string message;
+        Poco::LocalDateTime now;
+        Poco::DateTimeFormatter::append(message,now,"%H:%M:%S.%i");
 }
 
 
@@ -74,9 +74,24 @@ void DateTimeFormatterTest::testISO8601()
 }
 
 
+void DateTimeFormatterTest::testISO8601Frac()
+{
+        DateTime dt(2005, 1, 8, 12, 30, 00, 12, 34);
+
+        std::string str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT);
+        assert (str == "2005-01-08T12:30:00.012034Z");
+
+        str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, 3600);
+        assert (str == "2005-01-08T12:30:00.012034+01:00");
+
+        str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, -3600);
+        assert (str == "2005-01-08T12:30:00.012034-01:00");
+}
+
+
 void DateTimeFormatterTest::testRFC822()
 {
-	DateTime dt(2005, 1, 8, 12, 30, 00);
+        DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::RFC822_FORMAT);
 	assert (str == "Sat, 8 Jan 05 12:30:00 GMT");
@@ -216,12 +231,13 @@ void DateTimeFormatterTest::tearDown()
 
 CppUnit::Test* DateTimeFormatterTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DateTimeFormatterTest");
+        CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DateTimeFormatterTest");
 
-	CppUnit_addTest(pSuite, DateTimeFormatterTest, testISO8601);
-	CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC822);
-	CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC1123);
-	CppUnit_addTest(pSuite, DateTimeFormatterTest, testHTTP);
+        CppUnit_addTest(pSuite, DateTimeFormatterTest, testISO8601);
+        CppUnit_addTest(pSuite, DateTimeFormatterTest, testISO8601Frac);
+        CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC822);
+        CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC1123);
+        CppUnit_addTest(pSuite, DateTimeFormatterTest, testHTTP);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC850);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testRFC1036);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testASCTIME);

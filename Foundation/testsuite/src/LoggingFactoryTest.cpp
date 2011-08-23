@@ -93,13 +93,13 @@ LoggingFactoryTest::~LoggingFactoryTest()
 
 void LoggingFactoryTest::testBuiltins()
 {
-	LoggingFactory& fact = LoggingFactory::defaultFactory();
-	
-	AutoPtr<Channel> pConsoleChannel = fact.createChannel("ConsoleChannel");
-#if defined(_WIN32)
-	assert (dynamic_cast<Poco::WindowsConsoleChannel*>(pConsoleChannel.get()) != 0);
+        LoggingFactory& fact = LoggingFactory::defaultFactory();
+        
+        AutoPtr<Channel> pConsoleChannel = fact.createChannel("ConsoleChannel");
+#if defined(_WIN32) && !defined(_WIN32_WCE)
+        assert (dynamic_cast<Poco::WindowsConsoleChannel*>(pConsoleChannel.get()) != 0);
 #else
-	assert (dynamic_cast<ConsoleChannel*>(pConsoleChannel.get()) != 0);
+        assert (dynamic_cast<ConsoleChannel*>(pConsoleChannel.get()) != 0);
 #endif
 
 	AutoPtr<Channel> pFileChannel = fact.createChannel("FileChannel");

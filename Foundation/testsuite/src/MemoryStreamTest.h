@@ -1,11 +1,11 @@
 //
-// NumberFormatterTest.h
+// MemoryStreamTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/NumberFormatterTest.h#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/MemoryStreamTest.h#1 $
 //
-// Definition of the NumberFormatterTest class.
+// Definition of the MemoryStreamTest class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -32,32 +32,30 @@
 //
 
 
-#ifndef NumberFormatterTest_INCLUDED
-#define NumberFormatterTest_INCLUDED
+#ifndef MemoryStreamTest_INCLUDED
+#define MemoryStreamTest_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
 
 
-class NumberFormatterTest: public CppUnit::TestCase
+class MemoryStreamTest: public CppUnit::TestCase
 {
 public:
-	NumberFormatterTest(const std::string& name);
-	~NumberFormatterTest();
+        MemoryStreamTest(const std::string& name);
+        ~MemoryStreamTest();
 
-        void testFormat();
-        void testFormat0();
-        void testFormatHex();
-        void testFormatFloat();
-        
+        void testInput();
+        void testOutput();
+
         void setUp();
         void tearDown();
 
-	static CppUnit::Test* suite();
+        static CppUnit::Test* suite();
 
 private:
 };
 
 
-#endif // NumberFormatterTest_INCLUDED
+#endif // MemoryStreamTest_INCLUDED

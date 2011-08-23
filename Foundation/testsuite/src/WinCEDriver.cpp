@@ -1,11 +1,11 @@
 //
-// NumberFormatterTest.h
+// WinCEDriver.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/NumberFormatterTest.h#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/WinCEDriver.cpp#1 $
 //
-// Definition of the NumberFormatterTest class.
+// Console-based test driver for Windows CE.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -32,32 +32,21 @@
 //
 
 
-#ifndef NumberFormatterTest_INCLUDED
-#define NumberFormatterTest_INCLUDED
+#include "CppUnit/TestRunner.h"
+#include "FoundationTestSuite.h"
+#include <cstdlib>
 
 
-#include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
-
-
-class NumberFormatterTest: public CppUnit::TestCase
+int _tmain(int argc, wchar_t* argv[])
 {
-public:
-	NumberFormatterTest(const std::string& name);
-	~NumberFormatterTest();
-
-        void testFormat();
-        void testFormat0();
-        void testFormatHex();
-        void testFormatFloat();
-        
-        void setUp();
-        void tearDown();
-
-	static CppUnit::Test* suite();
-
-private:
-};
-
-
-#endif // NumberFormatterTest_INCLUDED
+        std::vector<std::string> args;
+        for (int i = 0; i < argc; ++i)
+        {
+                char buffer[1024];
+                std::wcstombs(buffer, argv[i], sizeof(buffer));
+                args.push_back(std::string(buffer));
+        }
+        CppUnit::TestRunner runner;     
+        runner.addTest("FoundationTestSuite", FoundationTestSuite::suite());
+        return runner.run(args) ? 0 : 1;
+}

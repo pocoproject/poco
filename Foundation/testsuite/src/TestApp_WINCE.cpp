@@ -1,11 +1,9 @@
 //
-// NumberFormatterTest.h
+// TestApp_WINCE.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/NumberFormatterTest.h#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/TestApp_WINCE.cpp#1 $
 //
-// Definition of the NumberFormatterTest class.
-//
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -32,32 +30,26 @@
 //
 
 
-#ifndef NumberFormatterTest_INCLUDED
-#define NumberFormatterTest_INCLUDED
+#include <string>
+#include <iostream>
 
 
-#include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
-
-
-class NumberFormatterTest: public CppUnit::TestCase
+int _tmain(int argc, wchar_t* argv[])
 {
-public:
-	NumberFormatterTest(const std::string& name);
-	~NumberFormatterTest();
-
-        void testFormat();
-        void testFormat0();
-        void testFormatHex();
-        void testFormatFloat();
-        
-        void setUp();
-        void tearDown();
-
-	static CppUnit::Test* suite();
-
-private:
-};
-
-
-#endif // NumberFormatterTest_INCLUDED
+        if (argc > 1)
+        {
+                std::wstring arg(argv[1]);
+                if (arg == L"-hello")
+                {
+                        std::cout << "Hello, world!";
+                }
+                else if (arg == L"-count")
+                {
+                        int n = 0;
+                        int c = std::cin.get();
+                        while (c != -1) { ++n; c = std::cin.get(); }
+                        return n;
+                }
+        }
+        return argc - 1;
+}

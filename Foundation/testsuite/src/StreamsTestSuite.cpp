@@ -42,6 +42,7 @@
 #include "LineEndingConverterTest.h"
 #include "TeeStreamTest.h"
 #include "FileStreamTest.h"
+#include "MemoryStreamTest.h"
 
 
 CppUnit::Test* StreamsTestSuite::suite()
@@ -56,9 +57,10 @@ CppUnit::Test* StreamsTestSuite::suite()
 	pSuite->addTest(ZLibTest::suite());
 	pSuite->addTest(StreamTokenizerTest::suite());
 	pSuite->addTest(BinaryReaderWriterTest::suite());
-	pSuite->addTest(LineEndingConverterTest::suite());
-	pSuite->addTest(TeeStreamTest::suite());
-	pSuite->addTest(FileStreamTest::suite());
+        pSuite->addTest(LineEndingConverterTest::suite());
+        pSuite->addTest(TeeStreamTest::suite());
+        pSuite->addTest(FileStreamTest::suite());
+        pSuite->addTest(MemoryStreamTest::suite());
 
-	return pSuite;
+        return pSuite;
 }

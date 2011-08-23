@@ -1,7 +1,7 @@
 //
 // ZLibTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/ZLibTest.cpp#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ZLibTest.cpp#1 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -150,6 +150,35 @@ void ZLibTest::testGzip2()
 }
 
 
+void ZLibTest::testGzip3()
+{
+        std::stringstream buffer;
+        DeflatingOutputStream deflater1(buffer, DeflatingStreamBuf::STREAM_GZIP);
+        deflater1 << "abcdefabcdefabcdefabcdefabcdefabcdef" << std::endl;
+        deflater1 << "abcdefabcdefabcdefabcdefabcdefabcdef" << std::endl;
+        deflater1.close();
+        DeflatingOutputStream deflater2(buffer, DeflatingStreamBuf::STREAM_GZIP);
+        deflater2 << "bcdefabcdefabcdefabcdefabcdefabcdefa" << std::endl;
+        deflater2 << "bcdefabcdefabcdefabcdefabcdefabcdefa" << std::endl;
+        deflater2.close();
+        InflatingInputStream inflater(buffer, InflatingStreamBuf::STREAM_GZIP);
+        std::string data;
+        inflater >> data;
+        assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+        inflater >> data;
+        assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+        data.clear();
+        inflater >> data;
+        assert (data.empty());
+        assert (inflater.eof());
+        inflater.reset();
+        inflater >> data;
+        assert (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");
+        inflater >> data;
+        assert (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");        
+}
+
+
 void ZLibTest::setUp()
 {
 }
@@ -166,9 +195,10 @@ CppUnit::Test* ZLibTest::suite()
 
 	CppUnit_addTest(pSuite, ZLibTest, testDeflate1);
 	CppUnit_addTest(pSuite, ZLibTest, testDeflate2);
-	CppUnit_addTest(pSuite, ZLibTest, testDeflate3);
-	CppUnit_addTest(pSuite, ZLibTest, testGzip1);
-	CppUnit_addTest(pSuite, ZLibTest, testGzip2);
+        CppUnit_addTest(pSuite, ZLibTest, testDeflate3);
+        CppUnit_addTest(pSuite, ZLibTest, testGzip1);
+        CppUnit_addTest(pSuite, ZLibTest, testGzip2);
+        CppUnit_addTest(pSuite, ZLibTest, testGzip3);
 
-	return pSuite;
+        return pSuite;
 }

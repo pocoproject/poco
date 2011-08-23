@@ -1,9 +1,9 @@
 //
-// NumberFormatterTest.h
+// UnicodeConverterTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/NumberFormatterTest.h#2 $
+// $Id: //poco/1.4/Foundation/testsuite/src/UnicodeConverterTest.h#1 $
 //
-// Definition of the NumberFormatterTest class.
+// Definition of the UnicodeConverterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -32,32 +32,31 @@
 //
 
 
-#ifndef NumberFormatterTest_INCLUDED
-#define NumberFormatterTest_INCLUDED
+#ifndef UnicodeConverterTest_INCLUDED
+#define UnicodeConverterTest_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
 
 
-class NumberFormatterTest: public CppUnit::TestCase
+class UnicodeConverterTest: public CppUnit::TestCase
 {
 public:
-	NumberFormatterTest(const std::string& name);
-	~NumberFormatterTest();
+        UnicodeConverterTest(const std::string& name);
+        ~UnicodeConverterTest();
 
-        void testFormat();
-        void testFormat0();
-        void testFormatHex();
-        void testFormatFloat();
-        
+        void testString();
+        void testCharPtrLength();
+        void testCharPtr();
+
         void setUp();
         void tearDown();
 
-	static CppUnit::Test* suite();
+        static CppUnit::Test* suite();
 
 private:
 };
 
 
-#endif // NumberFormatterTest_INCLUDED
+#endif // UnicodeConverterTest_INCLUDED

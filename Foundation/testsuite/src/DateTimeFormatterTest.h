@@ -44,12 +44,13 @@ class DateTimeFormatterTest: public CppUnit::TestCase
 {
 public:
 	DateTimeFormatterTest(const std::string& name);
-	~DateTimeFormatterTest();
+        ~DateTimeFormatterTest();
 
-	void testISO8601();
-	void testRFC822();
-	void testRFC1123();
-	void testHTTP();
+        void testISO8601();
+        void testISO8601Frac();
+        void testRFC822();
+        void testRFC1123();
+        void testHTTP();
 	void testRFC850();
 	void testRFC1036();
 	void testASCTIME();
