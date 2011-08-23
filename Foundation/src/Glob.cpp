@@ -47,10 +47,10 @@ namespace Poco {
 
 
 Glob::Glob(const std::string& pattern, int options): 
-	_pattern(pattern),
-	_options(options)
+        _pattern(pattern),
+        _options(options)
 {
-	poco_assert (!_pattern.empty());
+        poco_assert (!_pattern.empty());
 }
 
 
@@ -129,13 +129,13 @@ bool Glob::match(TextIterator& itp, const TextIterator& endp, TextIterator& its,
 			{
 				bool invert = *itp == '!';
 				if (invert) ++itp;
-				if (itp != endp)
-				{
-					bool mtch = matchSet(itp, endp, *its++);
-					if (invert && mtch || !invert && !mtch) return false;
-					break;
-				}
-			}
+                                if (itp != endp)
+                                {
+                                        bool mtch = matchSet(itp, endp, *its++);
+                                        if ((invert && mtch) || (!invert && !mtch)) return false;
+                                        break;
+                                }
+                        }
 			throw SyntaxException("bad range syntax in glob pattern");
 		case '\\':
 			if (++itp == endp) throw SyntaxException("backslash must be followed by character in glob pattern");
