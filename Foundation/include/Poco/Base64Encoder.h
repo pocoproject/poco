@@ -49,12 +49,17 @@ namespace Poco {
 
 
 class Foundation_API Base64EncoderBuf: public UnbufferedStreamBuf
-	/// This streambuf base64-encodes all data written
-	/// to it and forwards it to a connected
-	/// ostream.
+        /// This streambuf base64-encodes all data written
+        /// to it and forwards it to a connected
+        /// ostream.
+        ///
+        /// Note: The characters are directly written
+        /// to the ostream's streambuf, thus bypassing
+        /// the ostream. The ostream's state is therefore
+        /// not updated to match the buffer's state.
 {
 public:
-	Base64EncoderBuf(std::ostream& ostr);
+        Base64EncoderBuf(std::ostream& ostr);
 	~Base64EncoderBuf();
 	
 	int close();
@@ -74,14 +79,14 @@ public:
 private:
 	int writeToDevice(char c);
 
-	unsigned char _group[3];
-	int           _groupLength;
-	int           _pos;
-	int           _lineLength;
-	std::ostream& _ostr;
-	
-	static const unsigned char OUT_ENCODING[64];
-	
+	unsigned char   _group[3];
+        int             _groupLength;
+        int             _pos;
+        int             _lineLength;
+        std::streambuf& _buf;
+        
+        static const unsigned char OUT_ENCODING[64];
+        
 	friend class Base64DecoderBuf;
 
 	Base64EncoderBuf(const Base64EncoderBuf&);
@@ -114,12 +119,17 @@ class Foundation_API Base64Encoder: public Base64EncoderIOS, public std::ostream
 	/// This ostream base64-encodes all data
 	/// written to it and forwards it to
 	/// a connected ostream.
-	/// Always call close() when done
-	/// writing data, to ensure proper
-	/// completion of the encoding operation.
+        /// Always call close() when done
+        /// writing data, to ensure proper
+        /// completion of the encoding operation.
+        ///
+        /// Note: The characters are directly written
+        /// to the ostream's streambuf, thus bypassing
+        /// the ostream. The ostream's state is therefore
+        /// not updated to match the buffer's state.
 {
 public:
-	Base64Encoder(std::ostream& ostr);
+        Base64Encoder(std::ostream& ostr);
 	~Base64Encoder();
 
 private:

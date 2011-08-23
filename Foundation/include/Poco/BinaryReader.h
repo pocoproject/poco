@@ -41,17 +41,23 @@
 
 
 #include "Poco/Foundation.h"
+#include <vector>
 #include <istream>
 
 
 namespace Poco {
 
 
+class TextEncoding;
+class TextConverter;
+
+
 class Foundation_API BinaryReader
-	/// This class reads basic types in binary form into an input stream.
-	/// It provides an extractor-based interface similar to istream.
-	/// The reader also supports automatic conversion from big-endian
-	/// (network byte order) to little-endian and vice-versa.
+        /// This class reads basic types (and std::vectors thereof)
+        /// in binary form into an input stream.
+        /// It provides an extractor-based interface similar to istream.
+        /// The reader also supports automatic conversion from big-endian
+        /// (network byte order) to little-endian and vice-versa.
 	/// Use a BinaryWriter to create a stream suitable for a BinaryReader.
 {
 public:
@@ -64,11 +70,17 @@ public:
 		UNSPECIFIED_BYTE_ORDER   = 4   /// unknown, byte-order will be determined by reading the byte-order mark
 	};
 
-	BinaryReader(std::istream& istr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
-		/// Creates the BinaryReader.
+        BinaryReader(std::istream& istr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
+                /// Creates the BinaryReader.
 
-	~BinaryReader();
-		/// Destroys the BinaryReader.
+        BinaryReader(std::istream& istr, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
+                /// Creates the BinaryReader using the given TextEncoding.
+                ///
+                /// Strings will be converted from the specified encoding
+                /// to the currently set global encoding (see Poco::TextEncoding::global()).
+
+        ~BinaryReader();
+                /// Destroys the BinaryReader.
 
 	BinaryReader& operator >> (bool& value);
 	BinaryReader& operator >> (char& value);
@@ -88,26 +100,46 @@ public:
 	BinaryReader& operator >> (UInt64& value);
 #endif
 
-	BinaryReader& operator >> (std::string& value);
+        BinaryReader& operator >> (std::string& value);
 
-	void read7BitEncoded(UInt32& value);
-		/// Reads a 32-bit unsigned integer in compressed format.
-		/// See BinaryWriter::write7BitEncoded() for a description
+        template <typename T>
+        BinaryReader& operator >> (std::vector<T>& value)
+        {
+                Poco::UInt32 size(0);
+                T elem;
+
+                *this >> size;
+                if (!good()) return *this;
+                value.reserve(size);
+                while (this->good() && size-- > 0)
+                {
+                        *this >> elem;
+                        value.push_back(elem);
+                }
+                return *this;
+        }
+
+        void read7BitEncoded(UInt32& value);
+                /// Reads a 32-bit unsigned integer in compressed format.
+                /// See BinaryWriter::write7BitEncoded() for a description
 		/// of the compression algorithm.
 
 #if defined(POCO_HAVE_INT64)
 	void read7BitEncoded(UInt64& value);
 		/// Reads a 64-bit unsigned integer in compressed format.
 		/// See BinaryWriter::write7BitEncoded() for a description
-		/// of the compression algorithm.
+                /// of the compression algorithm.
 #endif
 
-	void readRaw(int length, std::string& value);
-		/// Reads length bytes of raw data into value.
+        void readRaw(std::streamsize length, std::string& value);
+                /// Reads length bytes of raw data into value.
 
-	void readBOM();
-		/// Reads a byte-order mark from the stream and configures
-		/// the reader for the encountered byte order.
+        void readRaw(char* buffer, std::streamsize length);
+                /// Reads length bytes of raw data into buffer.
+
+        void readBOM();
+                /// Reads a byte-order mark from the stream and configures
+                /// the reader for the encountered byte order.
 		/// A byte-order mark is a 16-bit integer with a value of 0xFEFF,
 		/// written in host byte order.
 		
@@ -131,8 +163,9 @@ public:
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
 private:
-	std::istream& _istr;
-	bool          _flipBytes; 
+        std::istream&  _istr;
+        bool           _flipBytes; 
+        TextConverter* _pTextConverter;
 };
 
 

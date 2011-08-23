@@ -1,7 +1,7 @@
 //
 // BinaryWriter.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/BinaryWriter.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/BinaryWriter.h#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -41,17 +41,23 @@
 
 
 #include "Poco/Foundation.h"
+#include <vector>
 #include <ostream>
 
 
 namespace Poco {
 
 
+class TextEncoding;
+class TextConverter;
+
+
 class Foundation_API BinaryWriter
-	/// This class writes basic types in binary form into an output stream.
-	/// It provides an inserter-based interface similar to ostream.
-	/// The writer also supports automatic conversion from big-endian
-	/// (network byte order) to little-endian and vice-versa.
+        /// This class writes basic types (and std::vectors of these) 
+        /// in binary form into an output stream.
+        /// It provides an inserter-based interface similar to ostream.
+        /// The writer also supports automatic conversion from big-endian
+        /// (network byte order) to little-endian and vice-versa.
 	/// Use a BinaryReader to read from a stream created by a BinaryWriter.
 	/// Be careful when exchanging data between systems with different
 	/// data type sizes (e.g., 32-bit and 64-bit architectures), as the sizes
@@ -69,11 +75,17 @@ public:
 		LITTLE_ENDIAN_BYTE_ORDER = 3  /// little-endian byte-order
 	};
 	
-	BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
-		/// Creates the BinaryWriter.
+        BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
+                /// Creates the BinaryWriter.
 
-	~BinaryWriter();
-		/// Destroys the BinaryWriter.
+        BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
+                /// Creates the BinaryWriter using the given TextEncoding.
+                ///
+                /// Strings will be converted from the currently set global encoding
+                /// (see Poco::TextEncoding::global()) to the specified encoding.
+
+        ~BinaryWriter();
+                /// Destroys the BinaryWriter.
 
 	BinaryWriter& operator << (bool value);
 	BinaryWriter& operator << (char value);
@@ -93,12 +105,26 @@ public:
 	BinaryWriter& operator << (UInt64 value);
 #endif
 
-	BinaryWriter& operator << (const std::string& value);
-	BinaryWriter& operator << (const char* value);
-	
-	void write7BitEncoded(UInt32 value);
-		/// Writes a 32-bit unsigned integer in a compressed format.
-		/// The value is written out seven bits at a time, starting 
+        BinaryWriter& operator << (const std::string& value);
+        BinaryWriter& operator << (const char* value);
+
+        template <typename T>
+        BinaryWriter& operator << (const std::vector<T>& value)
+        {
+                Poco::UInt32 size(static_cast<Poco::UInt32>(value.size()));
+
+                *this << size;
+                for (typename std::vector<T>::const_iterator it = value.begin(); it != value.end(); ++it)
+                {
+                        *this << *it;
+                }
+
+                return *this;
+        }
+        
+        void write7BitEncoded(UInt32 value);
+                /// Writes a 32-bit unsigned integer in a compressed format.
+                /// The value is written out seven bits at a time, starting 
 		/// with the seven least-significant bits. 
 		/// The high bit of a byte indicates whether there are more bytes to be 
 		/// written after this one.
@@ -120,12 +146,15 @@ public:
 		/// This process is repeated until the entire integer has been written.
 #endif
 
-	void writeRaw(const std::string& rawData);
-		/// Writes the string as-is to the stream.
+        void writeRaw(const std::string& rawData);
+                /// Writes the string as-is to the stream.
+                
+        void writeRaw(const char* buffer, std::streamsize length);
+                /// Writes length raw bytes from the given buffer to the stream.
 
-	void writeBOM();
-		/// Writes a byte-order mark to the stream. A byte order mark is
-		/// a 16-bit integer with a value of 0xFEFF, written in host byte-order. 
+        void writeBOM();
+                /// Writes a byte-order mark to the stream. A byte order mark is
+                /// a 16-bit integer with a value of 0xFEFF, written in host byte-order. 
 		/// A BinaryReader uses the byte-order mark to determine the byte-order 
 		/// of the stream.
 
@@ -149,8 +178,9 @@ public:
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
 private:
-	std::ostream& _ostr;
-	bool          _flipBytes;
+        std::ostream&  _ostr;
+        bool           _flipBytes;
+        TextConverter* _pTextConverter;
 };
 
 
