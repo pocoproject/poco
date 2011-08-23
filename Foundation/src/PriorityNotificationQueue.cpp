@@ -195,10 +195,15 @@ Notification::Ptr PriorityNotificationQueue::dequeueOne()
 }
 
 
+namespace
+{
+        static SingletonHolder<PriorityNotificationQueue> sh;
+}
+
+
 PriorityNotificationQueue& PriorityNotificationQueue::defaultQueue()
 {
-	static SingletonHolder<PriorityNotificationQueue> sh;
-	return *sh.get();
+        return *sh.get();
 }
 
 

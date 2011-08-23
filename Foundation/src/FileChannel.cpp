@@ -350,9 +350,9 @@ void FileChannel::setPurgeCount(const std::string& count)
         std::string::const_iterator it  = count.begin();
         std::string::const_iterator end = count.end();
 
-        while (it != end && std::isspace(*it)) ++it;
-        while (it != end && std::isdigit(*it)) { n *= 10; n += *it++ - '0'; }
-        while (it != end && std::isspace(*it)) ++it;
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+	while (it != end && Ascii::isSpace(*it)) ++it;
 
         if (0 == n)
                 throw InvalidArgumentException("Zero is not valid purge count.");

@@ -43,8 +43,6 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timezone.h"
 #include "Poco/Environment.h"
-#include <cstdio>
-#include <cctype>
 
 
 namespace Poco {
@@ -74,7 +72,7 @@ PatternFormatter::~PatternFormatter()
 
 void PatternFormatter::format(const Message& msg, std::string& text)
 {
-        Timestamp timestamp = msg.getTime();
+	Timestamp timestamp = msg.getTime();
 	if (_localTime)
 	{
 		timestamp += Timezone::utcOffset()*Timestamp::resolution();

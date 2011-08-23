@@ -55,11 +55,11 @@ int Timezone::utcOffset()
 	
 int Timezone::dst()
 {
-	std::time_t now = std::time(NULL);
-	struct std::tm t;
-	if (!localtime_r(&now, &t))
-		throw Poco::SystemException("cannot get local time DST offset");
-	return t.tm_isdst == 1 ? 3600 : 0;
+        std::time_t now = std::time(NULL);
+        struct std::tm t;
+        if (localtime_r(&now, &t) != OK)
+                throw Poco::SystemException("cannot get local time DST offset");
+        return t.tm_isdst == 1 ? 3600 : 0;
 }
 
 
