@@ -35,6 +35,7 @@
 
 
 #include "Poco/SharedLibrary_WIN32.h"
+#include "Poco/Path.h"
 #include "Poco/UnWindows.h"
 
 
@@ -57,12 +58,12 @@ SharedLibraryImpl::~SharedLibraryImpl()
 
 void SharedLibraryImpl::loadImpl(const std::string& path)
 {
-	FastMutex::ScopedLock lock(_mutex);
+        FastMutex::ScopedLock lock(_mutex);
 
-	if (_handle) throw LibraryAlreadyLoadedException(_path);
-	_handle = LoadLibraryA(path.c_str());
-	if (!_handle) throw LibraryLoadException(path);
-	_path = path;
+        if (_handle) throw LibraryAlreadyLoadedException(_path);
+        _handle = LoadLibraryA(path.c_str());
+        if (!_handle) throw LibraryLoadException(path);
+        _path = path;
 }
 
 

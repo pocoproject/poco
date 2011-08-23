@@ -64,13 +64,17 @@ SharedLibraryImpl::~SharedLibraryImpl()
 
 void SharedLibraryImpl::loadImpl(const std::string& path)
 {
-	FastMutex::ScopedLock lock(_mutex);
+        FastMutex::ScopedLock lock(_mutex);
 
-	if (_handle) throw LibraryAlreadyLoadedException(path);
-	_handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-	if (!_handle)
-	{
-		const char* err = dlerror();
+        if (_handle) throw LibraryAlreadyLoadedException(path);
+        int flags = RTLD_LAZY | RTLD_GLOBAL;
+#if defined(RTLD_DEEPBIND)
+        flags |= RTLD_DEEPBIND;
+#endif
+        _handle = dlopen(path.c_str(), flags);
+        if (!_handle)
+        {
+                const char* err = dlerror();
 		throw LibraryLoadException(err ? std::string(err) : path);
 	}
 	_path = path;
