@@ -56,11 +56,11 @@
 
 // Reduce bloat imported by "Poco/UnWindows.h"
 #if defined(_WIN32)
-	#if !defined(_WIN32_WINNT)
-		#define _WIN32_WINNT 0x0500
-	#endif
-	#if !defined(WIN32_LEAN_AND_MEAN) && !defined(POCO_BLOATED_WIN32)
-		#define WIN32_LEAN_AND_MEAN
+        #if !defined(_WIN32_WINNT)
+                #define _WIN32_WINNT 0x0501
+        #endif
+        #if !defined(WIN32_LEAN_AND_MEAN) && !defined(POCO_BLOATED_WIN32)
+                #define WIN32_LEAN_AND_MEAN
 	#endif
 #endif
 
