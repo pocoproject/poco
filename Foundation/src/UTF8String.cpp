@@ -1,7 +1,7 @@
 //
 // UTF8String.cpp
 //
-// $Id: //poco/svn/Foundation/src/UTF8String.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/UTF8String.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -45,13 +45,17 @@
 namespace Poco {
 
 
-int UTF8::icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2)
+namespace
 {
-	static UTF8Encoding utf8;
-	
-	std::string::size_type sz = str.size();
-	if (pos > sz) pos = sz;
-	if (pos + n > sz) n = sz - pos;
+        static UTF8Encoding utf8;
+}
+
+
+int UTF8::icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2)
+{       
+        std::string::size_type sz = str.size();
+        if (pos > sz) pos = sz;
+        if (pos + n > sz) n = sz - pos;
 	TextIterator uit1(str.begin() + pos, str.begin() + pos + n, utf8); 
 	TextIterator uend1(str.begin() + pos + n);
 	TextIterator uit2(it2, end2, utf8);
@@ -120,11 +124,9 @@ int UTF8::icompare(const std::string& str1, std::string::size_type pos1, std::st
 
 int UTF8::icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, const std::string::value_type* ptr)
 {
-	static UTF8Encoding utf8;
-
-	poco_check_ptr (ptr);
-	std::string::size_type sz = str.size();
-	if (pos > sz) pos = sz;
+        poco_check_ptr (ptr);
+        std::string::size_type sz = str.size();
+        if (pos > sz) pos = sz;
 	if (pos + n > sz) n = sz - pos;
 	TextIterator uit(str.begin() + pos, str.begin() + pos + n, utf8); 
 	TextIterator uend(str.begin() + pos + n);
@@ -160,20 +162,18 @@ int UTF8::icompare(const std::string& str, const std::string::value_type* ptr)
 
 std::string UTF8::toUpper(const std::string& str)
 {
-	static UTF8Encoding utf8;
-	std::string result;
-	TextConverter converter(utf8, utf8);
-	converter.convert(str, result, Unicode::toUpper);
+        std::string result;
+        TextConverter converter(utf8, utf8);
+        converter.convert(str, result, Unicode::toUpper);
 	return result;
 }
 
 
 std::string& UTF8::toUpperInPlace(std::string& str)
 {
-	static UTF8Encoding utf8;
-	std::string result;
-	TextConverter converter(utf8, utf8);
-	converter.convert(str, result, Unicode::toUpper);
+        std::string result;
+        TextConverter converter(utf8, utf8);
+        converter.convert(str, result, Unicode::toUpper);
 	std::swap(str, result);
 	return str;
 }
@@ -181,20 +181,18 @@ std::string& UTF8::toUpperInPlace(std::string& str)
 
 std::string UTF8::toLower(const std::string& str)
 {
-	static UTF8Encoding utf8;
-	std::string result;
-	TextConverter converter(utf8, utf8);
-	converter.convert(str, result, Unicode::toLower);
+        std::string result;
+        TextConverter converter(utf8, utf8);
+        converter.convert(str, result, Unicode::toLower);
 	return result;
 }
 
 
 std::string& UTF8::toLowerInPlace(std::string& str)
 {
-	static UTF8Encoding utf8;
-	std::string result;
-	TextConverter converter(utf8, utf8);
-	converter.convert(str, result, Unicode::toLower);
+        std::string result;
+        TextConverter converter(utf8, utf8);
+        converter.convert(str, result, Unicode::toLower);
 	std::swap(str, result);
 	return str;
 }
