@@ -1,7 +1,7 @@
 //
 // LRUStrategy.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/LRUStrategy.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/LRUStrategy.h#1 $
 //
 // Library: Foundation
 // Package: Cache
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_LRUStrategy_INCLUDED
-#define  Foundation_LRUStrategy_INCLUDED
+#ifndef Foundation_LRUStrategy_INCLUDED
+#define Foundation_LRUStrategy_INCLUDED
 
 
 #include "Poco/KeyValueArgs.h"
@@ -76,13 +76,13 @@ public:
 	{
 	}
 
-	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
-	{
-		_keys.push_front(args.key());
-		std::pair<IndexIterator, bool> stat = _keyIndex.insert(make_pair(args.key(), _keys.begin()));
-		if (!stat.second)
-		{
-			stat.first->second = _keys.begin();
+        void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
+        {
+                _keys.push_front(args.key());
+                std::pair<IndexIterator, bool> stat = _keyIndex.insert(std::make_pair(args.key(), _keys.begin()));
+                if (!stat.second)
+                {
+                        stat.first->second = _keys.begin();
 		}
 	}
 
@@ -159,4 +159,4 @@ protected:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_LRUStrategy_INCLUDED

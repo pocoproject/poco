@@ -1,7 +1,7 @@
 //
 // Logger.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Logger.h#7 $
+// $Id: //poco/1.4/Foundation/include/Poco/Logger.h#3 $
 //
 // Library: Foundation
 // Package: Logging
@@ -110,20 +110,25 @@ public:
 		
 	Channel* getChannel() const;
 		/// Returns the Channel attached to the logger.
-		
-	void setLevel(int level);
-		/// Sets the Logger's log level.
-		
-	int getLevel() const;
-		/// Returns the Logger's log level.
+                
+        void setLevel(int level);
+                /// Sets the Logger's log level.
+                ///
+                /// See Message::Priority for valid log levels.
+                /// Setting the log level to zero turns off
+                /// logging for that Logger.
+                
+        int getLevel() const;
+                /// Returns the Logger's log level.
 		
 	void setLevel(const std::string& level);
-		/// Sets the Logger's log level using a symbolic value.
-		///
-		/// Valid values are:
-		///   - fatal
-		///   - critical
-		///   - error
+                /// Sets the Logger's log level using a symbolic value.
+                ///
+                /// Valid values are:
+                ///   - none (turns off logging)
+                ///   - fatal
+                ///   - critical
+                ///   - error
 		///   - warning
 		///   - notice
 		///   - information
