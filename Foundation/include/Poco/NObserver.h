@@ -1,7 +1,7 @@
 //
 // NObserver.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NObserver.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/NObserver.h#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -42,6 +42,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/AbstractObserver.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
@@ -93,19 +94,24 @@ public:
 		}
 		return *this;
 	}
-	
-	void notify(Notification* pNf) const
-	{
-		N* pCastNf = dynamic_cast<N*>(pNf);
-		if (pCastNf)
-		{
-			NotificationPtr ptr(pCastNf, true);
-			(_pObject->*_method)(ptr);
-		}
-	}
-	
-	bool equals(const AbstractObserver& abstractObserver) const
-	{
+        
+        void notify(Notification* pNf) const
+        {
+                Poco::Mutex::ScopedLock lock(_mutex);
+
+                if (_pObject)
+                {
+                        N* pCastNf = dynamic_cast<N*>(pNf);
+                        if (pCastNf)
+                        {
+				NotificationPtr ptr(pCastNf, true);
+                                (_pObject->*_method)(ptr);
+                        }
+                }
+        }
+        
+        bool equals(const AbstractObserver& abstractObserver) const
+        {
 		const NObserver* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
@@ -117,14 +123,22 @@ public:
 	
 	AbstractObserver* clone() const
 	{
-		return new NObserver(*this);
-	}
-	
-private:
-	NObserver();
+                return new NObserver(*this);
+        }
+        
+        void disable()
+        {
+                Poco::Mutex::ScopedLock lock(_mutex);
+                
+                _pObject = 0;
+        }
 
-	C*       _pObject;
-	Callback _method;
+private:
+        NObserver();
+
+        C*       _pObject;
+        Callback _method;
+        mutable Poco::Mutex _mutex;
 };
 
 
