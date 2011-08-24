@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URI.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/URI.cpp#5 $
 //
 // Library: Foundation
 // Package: URI
@@ -448,8 +448,8 @@ void URI::resolve(const URI& relativeURI)
 				_query = relativeURI._query;
 			}
 		}
-        }
-        _fragment = relativeURI._fragment;      
+	}
+	_fragment = relativeURI._fragment;      
 }
 
 

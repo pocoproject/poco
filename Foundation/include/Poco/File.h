@@ -1,7 +1,7 @@
 //
 // File.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/File.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/File.h#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -160,27 +160,27 @@ public:
 	Timestamp getLastModified() const;
 		/// Returns the modification date of the file.
 		
-	void setLastModified(const Timestamp& ts);
+	File& setLastModified(const Timestamp& ts);
 		/// Sets the modification date of the file.
 		
 	FileSize getSize() const;
 		/// Returns the size of the file in bytes.
 		
-	void setSize(FileSize size);
+	File& setSize(FileSize size);
 		/// Sets the size of the file in bytes. Can be used
 		/// to truncate a file.
 		
-	void setWriteable(bool flag = true);
+	File& setWriteable(bool flag = true);
 		/// Makes the file writeable (if flag is true), or
 		/// non-writeable (if flag is false) by setting the
 		/// file's flags in the filesystem accordingly.
 		
-	void setReadOnly(bool flag = true);
+	File& setReadOnly(bool flag = true);
 		/// Makes the file non-writeable (if flag is true), or
 		/// writeable (if flag is false) by setting the
 		/// file's flags in the filesystem accordingly.
 		
-	void setExecutable(bool flag = true);
+	File& setExecutable(bool flag = true);
 		/// Makes the file executable (if flag is true), or
 		/// non-executable (if flag is false) by setting
 		/// the file's permission bits accordingly.
