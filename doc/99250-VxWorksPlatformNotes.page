@@ -79,7 +79,8 @@ Some OS libraries can be omitted if the POCO class requiring it
 
 !!Poco::Path
 
-Poco::Path::home() returns the root directory ("/").
+Poco::Path::home() returns the value of environment variable <[HOME]>, if defined,
+or else the root directory path ("/").
   
 
 !!Poco::FPEnvironment
@@ -168,8 +169,8 @@ project files for Tornado. However, a Bash shell script is provided that
 will generate the project files (.wpj). On Windows, a Cygwin installation
 is required to run this script. Project files are
 generated from VxWorks build description files (<**.vxbuild*>),
-which are present in all library directories ($POCO_BASE/Foundation,
-$POCO_BASE/XML, etc.) of libraries that are available on VxWorks. Also 
+which are present in all library directories (<*$POCO_BASE/Foundation*>,
+<*$POCO_BASE/XML*>, etc.) of libraries that are available on VxWorks. Also 
 required are build configuration files that specify the build settings 
 for a specific target architecture. These are located in 
 <*$POCO_BASE/build/vxconfig*>. To generate
@@ -184,6 +185,46 @@ A new directory named <*vx*> will be created, containing the
 generated Tornado project file. The project file can be
 opened in Tornado, and a build can be started.
 
+!!Testing
+
+Every testsuite exports a global function that runs the tests,
+similar to what the <*testrunner*> command does on Unix/Linux
+systems. For example, to invoke the Foundation testsuite on
+the target (using the host-based shell), first load the necessary modules:
+
+    => ld <p:/poco-1.4/CppUnit/vx/PPC440diab_debug/cppUnit.out
+    Loading p:/poco-1.4/CppUnit/vx/PPC440diab_debug/cppUnit.out \
+    value = 13481712 = 0xcdb6f0
+    => ld <p:/poco-1.4/Foundation/vx/PPC440diab_debug/pocoFoundation.out
+    Loading p:/poco-1.4/Foundation/vx/PPC440diab_debug/pocoFoundation.out -
+    value = 13294784 = 0xcadcc0
+    => ld <p:/poco-1.4/Foundation/testsuite/vx/PPC440diab_debug/FoundationTestSuite.out
+    Loading p:/poco-1.4/Foundation/testsuite/vx/PPC440diab_debug/FoundationTestSuite.out -
+    value = 51068280 = 0x30b3d78
+----
+
+Then, if the testsuite does file I/O, set the target's current directory
+to the testsuite directory:
+
+    => @cd "/tgtsvr/poco-1.4/Foundation/testsuite"
+----
+
+It's also a good ideal to redirect the standard output to the
+system console (serial port) with:
+
+    => ?shConfig SH_GET_TASK_IO off
+----
+
+Then, the testsuite can be started:
+
+    => FoundationTestSuiteRunner "-all"
+----
+
+The arguments passed to the FoundationTestSuiteRunner
+(or any other testsuite runner) function are the same
+as the ones passed to the <*testrunner*> command:
+one or more test/testsuite names, "-all" to run all
+tests, or "-print" to print all test/testsuite names.
 
 !!Reference System
 

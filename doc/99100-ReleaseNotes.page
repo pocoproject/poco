@@ -2,6 +2,114 @@ POCO C++ Libraries Release Notes
 AAAIntroduction
 
 
+!!!Release 1.4.2
+
+!! Summary of Changes
+
+  - added Poco::DateTimeFormat::ISO8601_FRAC_FORMAT
+  - added new Poco::DateTimeFormatter and Poco::DateTimeParser format specifier:
+    %s for seconds with optional fractions of a second
+  - fixed a problem with ioctl() on BSD platforms (including OS X) where the 
+    second argument to ioctl() is unsigned long instead of int, causing bad 
+    things on a OS X 64-bit kernel.
+  - fixed a potential endless loop when enumerating IPv6 network addresses 
+    (reported by Laurent Carcagno)
+  - new compile-time config option on Windows to set thread names in
+    debugger. Enable with -DPOCO_WIN32_DEBUGGER_THREAD_NAMES. Available
+    only in debug builds.
+  - Cipher can now create Base64 and HexBinary encoded output without linefeeds 
+    (suitable for use in cookies, etc.)
+  - added Poco::Path::popFrontDirectory()
+  - improved VxWorks support
+  - IPv6 fixes: added proper scope id handling in IPAddress, SocketAddress
+    and related classes.
+  - Added Poco::Net::ServerSocket::bind6() which allows control over the
+    IPPROTO_IPV6/IPV6_V6ONLY socket option.
+  - Removed Poco::MD2Engine class due to licensing issues (the 
+    license for the MD2 code from RSA only allows non-commercial
+    use). Note that the MD4 and MD5 code from RSA does not have
+    this issue.
+  - fixed a Net HTTP client testsuite issue where some tests might
+    have failed due to prematurely aborted connections by
+    the HTTPTestServer.
+  - Poco::Net::SocketAddress: when there is more than one address
+    returned by a DNS lookup for a name, IPv4 addresses will be
+    preferred to IPv6 ones.
+  - Poco::Net::NetworkInterface::list() now also returns IPv4 interfaces on Windows when 
+    built with -DPOCO_HAVE_IPv6
+  - Poco::XML::XMLWriter: fixed a bug with attribute namespaces (no namespace prefix 
+    written if attribute namespace is the same as element namespace)
+  - fixed SF# 3378588: Mismatched new[]/delete (in RSAEncryptImpl and RSADecryptImpl)
+  - fixed SF# 3212954 (OpenSSLInitializer::uninitialize() crash) and 
+    SF# 3196862 (Static OpenSSLInitializer instance causes Windows deadlocks) by
+    removing the static Poco::Crypto::OpenSSLInitializer instance. Automatic OpenSSL
+    initialization is now done through Poco::Crypto::Cipher, Poco::Crypto::CipherKey, 
+    Poco::Crypto::X509Certificate, Poco::Net::Context classes; however, it is still
+    recommended to call Poco::Crypto::initializeCrypto() and 
+    Poco::Crypto::uninitializeCrypto() early at application startup, and late at
+    shutdown respectively (or Poco::Net::initializeSSL()/Poco::Net::uninitializeSSL()
+    if the NetSSL library is used) to avoid multiple full OpenSSL init/uninit cycles
+    during application runtime.
+  - Poco::Logger now also support a symbolic log level "none"
+    (for use with setLevel()) that disables logging completely
+    for that Logger (equivalent to setLevel(0)).
+  - Added experimental Android support, using the existing gmake-based
+    build system.
+  - fixed SF# 3288584: DateTimeFormatter link error
+  - fixed SF# 3187117: Typo in InflatingInputStream doc
+  - fixed SF# 3309731: _WIN32_WCE comparison should be with 0x600 not 600
+  - fixed SF# 3393026: RegularExpression.h identical enum value
+  - fixed SF# 3274222: AtomicCounter's postfix operators aren't atomic on Windows
+  - fixed SF# 3317177: Handle leak on windows
+  - fixed SF# 3181882: Poco::URI::getPathEtc() double-encodes query
+  - fixed SF# 3379935: Poco::ThreadPool Start Bug
+  - fixed SF# 3354451: Poco::Format::parsePrec() never sets the precision to zero
+  - fixed SF# 3387258: _MAX_PATH used but unknown in Path_WIN32
+  - fixed a problem in Poco::Crypto::RSAKeyImpl where direct access to the RSA in a 
+    EVP_PKEY would no longer work in recent OpenSSL versions. Using EVP_PKEY_get1_RSA() 
+    fixes the issue.
+  - added Poco::Crypto::EncryptingInputStream, Poco::Crypto::EncryptingOutputStream, 
+    Poco::Crypto::DecryptingInputStream and Poco::Crypto::DecryptingOutputStream.
+  - fixed SF# 3148126: Poco::Net::HTTPSClientSession destructor throws an IOException
+  - fixed SF# 3178098: Add constructor to Poco::TemporaryFile to specify directory
+  - fixed SF# 3175310: Absolute path when device 
+  - fixed SF# 3301207: Guided tour example contradicts apidoc (API doc was wrong)
+  - Poco::Net::HTTPMessage::setContentLength() and Poco::Net::HTTPMessage::getContentLength() now
+    use std::streamsize instead of int. This enables 64-bit Content-Length support at least
+    on 64-bit platforms.
+  - fixed SF# 3177530: Poco::TemporaryFile::tempName() + glob bug on xp
+  - fixed SF# 3177372: Poco::FileChannel documentation inconsistency
+  - added %E format specifier to Poco::PattermFormatter (epoch time in seconds
+    since midnight, January 1 1970)
+  - On Windows, Poco::Util::ServerApplication now supports a /description command 
+    line argument for specifying a service description (together with /registerService)
+  - added Poco::Util::WinService::setDescription() and 
+    Poco::Util::WinService::getDescription()
+  - fixed SF# 3155477: Incorrect URI path handling
+  - fixed SF# 3309736: Extended Exception macros to set default exception code
+    new macro is named POCO_DECLARE_EXCEPTION_CODE
+  - added getter functions for modulus and exponents to Poco::Crypto::RSAKey.
+  - added Poco::Net::SocketAddress::operator == () and 
+    Poco::Net::SocketAddress::operator != ()
+  - fixed SF# 3182746: IPAddress.cpp IPv6 bug on big-endian
+  - fixed SF# 3196961: Unix daemon fails to loadConfiguration() if started from cwd
+  - fixed SF# 3393700: NotificationCenter may call a removed observer and crash.
+  - Reworked implementation of the events framework (Poco::BasicEvent and friends).
+    The framework is now completely multithreading save (even in the case that
+    an event subscriber object unsubscribes and is deleted while an event is
+    being dispatched). Also, the restriction that any object can only register
+    one delegate for each event has been removed. For most cases, dispatching
+    events should be faster, as dispatching an event now needs less dynamic memory
+    allocations.
+  - fixed SF# 3178109: getNodeByPath() changes:
+    getNodeByPath() and getNodeByPathNS() have been moved to Poco::XML::Node. 
+    Furthermore, when invoked on a Poco::XML::Document, the behavior has changed
+    so that the document element is now included when traversing the path (previously,
+    traversal would start at the document element, now it starts at the document).
+    The path expression can now start with a double-slash, which results in a recursive
+    search for the path's first element in the DOM tree.
+
+
 !!!Release 1.4.1p1
 
 !! Summary of Changes

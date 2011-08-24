@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/Android#1 $
+# $Id: //poco/1.4/build/config/Android#2 $
 #
 # Android
 #
@@ -9,10 +9,28 @@
 #
 # General Settings
 #
-LINKMODE          ?= SHARED
-POCO_TARGET_OSNAME = Android
-POCO_TARGET_OSARCH = armv7-a
-TOOL               = arm-linux-androideabi
+LINKMODE           ?= STATIC
+ANDROID_ABI        ?= armeabi
+POCO_TARGET_OSNAME  = Android
+POCO_TARGET_OSARCH  = $(ANDROID_ABI)
+
+ifeq ($(ANDROID_ABI),armeabi)
+TOOL      = arm-linux-androideabi
+ARCHFLAGS = -mthumb
+else
+ifeq ($(ANDROID_ABI),armeabi-v7a)
+TOOL      = arm-linux-androideabi
+ARCHFLAGS = -march=armv7-a -mfloat-abi=softfp
+LINKFLAGS = -Wl,--fix-cortex-a8
+else
+ifeq ($(ANDROID_ABI),x86)
+TOOL      = i686-android-linux
+ARCHFLAGS = -march=i686 -msse3 -mstackrealign -mfpmath=sse
+else
+$(error Invalid ABI specified in ANDROID_ABI)
+endif
+endif
+endif
 
 #
 # Define Tools
@@ -40,13 +58,13 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -Isrc -march=armv7-a -mfloat-abi=softfp
+CFLAGS          = $(ARCHFLAGS)
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = -march=armv7-a -mfloat-abi=softfp
+CXXFLAGS        = $(ARCHFLAGS)
 CXXFLAGS32      =
 CXXFLAGS64      =
-LINKFLAGS       = -Wl,--fix-cortex-a8
+LINKFLAGS      += 
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =
@@ -70,4 +88,4 @@ SYSFLAGS = -DPOCO_ANDROID -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SH
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lsupc++
+SYSLIBS  = -lstdc++ -lsupc++
