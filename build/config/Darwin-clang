@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/Darwin-clang#2 $
+# $Id: //poco/1.4/build/config/Darwin-clang#4 $
 #
 # Darwin
 #
@@ -7,11 +7,19 @@
 # The build settings defined in this file are compatible
 # with XCode 4 C++ projects.
 # 
+# NOTE: This build configuration will build 64-bit binaries.
+# Use the Darwin32-clang build configuration to build 32-bit binaries.
+#
 
 #
 # General Settings
 #
 LINKMODE ?= SHARED
+
+POCO_TARGET_OSARCH ?= x86_64
+POCO_HOST_OSARCH   := $(POCO_TARGET_OSARCH)
+ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH)
+
 
 #
 # Tools
