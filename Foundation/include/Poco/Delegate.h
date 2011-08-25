@@ -1,7 +1,7 @@
 //
 // Delegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Delegate.h#4 $
+// $Id: //poco/1.4/Foundation/include/Poco/Delegate.h#5 $
 //
 // Library: Foundation
 // Package: Events
@@ -238,7 +238,7 @@ static Expire<TArgs> delegate(void (*NotifyMethod)(void*, TArgs&), Timestamp::Ti
 template <class TArgs>
 static Expire<TArgs> delegate(void (*NotifyMethod)(TArgs&), Timestamp::TimeDiff expireMillisecs)
 {
-	return Expire<TArgs>(FunctionDelegate<TArgs, false>( NotifyMethod), expireMillisecs);
+	return Expire<TArgs>(FunctionDelegate<TArgs, false>(NotifyMethod), expireMillisecs);
 }
 
 
