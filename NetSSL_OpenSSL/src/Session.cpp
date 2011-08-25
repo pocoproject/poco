@@ -1,7 +1,7 @@
 //
 // Session.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/Session.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/Session.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -32,6 +32,12 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+
+
+#if defined(__APPLE__)
+// Some OpenSSL functions are deprecated in OS X 10.7
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
+#endif
 
 
 #include "Poco/Net/Session.h"

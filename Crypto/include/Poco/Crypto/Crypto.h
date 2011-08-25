@@ -1,7 +1,7 @@
 //
 // Crypto.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Crypto.h#2 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Crypto.h#3 $
 //
 // Library: Crypto
 // Package: CryptoCore
@@ -40,6 +40,12 @@
 
 #ifndef Crypto_Crypto_INCLUDED
 #define Crypto_Crypto_INCLUDED
+
+
+#if defined(__APPLE__)
+// OS X 10.7 deprecates some OpenSSL functions
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
+#endif
 
 
 #include "Poco/Foundation.h"
