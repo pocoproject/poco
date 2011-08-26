@@ -104,6 +104,7 @@ src/TestPlugin.cpp
 src/TextConverterTest.cpp
 src/TextEncodingTest.cpp
 src/TextIteratorTest.cpp
+src/TextBufferIteratorTest.cpp
 src/TextTestSuite.cpp
 src/ThreadLocalTest.cpp
 src/ThreadPoolTest.cpp
@@ -123,6 +124,7 @@ src/UUIDGeneratorTest.cpp
 src/UUIDTest.cpp
 src/UUIDTestSuite.cpp
 src/UniqueExpireCacheTest.cpp
+src/UnicodeConverterTest.cpp
 src/UniqueExpireLRUCacheTest.cpp
 src/VarTest.cpp
 src/ZLibTest.cpp

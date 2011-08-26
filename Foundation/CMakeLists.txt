@@ -3,6 +3,8 @@ set(LIBNAMED "${LIBNAME}d")
 
 set( BASE_SRCS 
   src/ASCIIEncoding.cpp
+  src/Ascii.cpp
+  src/AtomicCounter.cpp
   src/AbstractObserver.cpp
   src/ActiveDispatcher.cpp
   src/ArchiveStrategy.cpp
@@ -59,7 +61,6 @@ set( BASE_SRCS
   src/Logger.cpp
   src/LoggingFactory.cpp
   src/LoggingRegistry.cpp
-  src/MD2Engine.cpp
   src/MD4Engine.cpp
   src/MD5Engine.cpp
   src/Manifest.cpp
@@ -117,6 +118,7 @@ set( BASE_SRCS
   src/TextConverter.cpp
   src/TextEncoding.cpp
   src/TextIterator.cpp
+  src/TextBufferIterator.cpp
   src/Thread.cpp
   src/ThreadTarget.cpp
   src/ThreadLocal.cpp
