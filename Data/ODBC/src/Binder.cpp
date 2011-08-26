@@ -1,7 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/1.4/Data/ODBC/src/Binder.cpp#2 $
+// $Id: //poco/1.4/Data/ODBC/src/Binder.cpp#3 $
 //
 // Library: Data/ODBC
 // Package: ODBC
@@ -56,14 +56,17 @@ Binder::Binder(const StatementHandle& rStmt, Binder::ParameterBinding dataBindin
 
 Binder::~Binder()
 {
-	std::vector<SQLLEN*>::iterator it = _lengthIndicator.begin();
-	std::vector<SQLLEN*>::iterator itEnd = _lengthIndicator.end();
-	for(; it != itEnd; ++it) delete *it;
+	reset();
 }
 
 
 void Binder::bind(std::size_t pos, const std::string& val)
 {
+	if (pos == 0) 
+	{
+		reset();
+	}
+
 	SQLINTEGER size = (SQLINTEGER) val.size();
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn = SQL_NTS;
@@ -93,35 +96,45 @@ void Binder::bind(std::size_t pos, const std::string& val)
 
 void Binder::bind(std::size_t pos, const Poco::Data::BLOB& val)
 {
-		SQLINTEGER size = (SQLINTEGER) val.size();
-		SQLLEN* pLenIn = new SQLLEN;
-		*pLenIn  = size;
+	if (pos == 0) 
+	{
+		reset();
+	}
 
-		if (PB_AT_EXEC == _paramBinding)
-			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
+	SQLINTEGER size = (SQLINTEGER) val.size();
+	SQLLEN* pLenIn = new SQLLEN;
+	*pLenIn  = size;
 
-		_lengthIndicator.push_back(pLenIn);
-		_dataSize[(SQLPOINTER) val.rawContent()] = size;
+	if (PB_AT_EXEC == _paramBinding)
+		*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			SQL_PARAM_INPUT, 
-			SQL_C_BINARY, 
-			SQL_LONGVARBINARY, 
-			(SQLUINTEGER) size,
-			0,
-			(SQLPOINTER) val.rawContent(), 
-			(SQLINTEGER) size, 
-			_lengthIndicator.back())))
-		{
-			throw StatementException(_rStmt, 
-				"SQLBindParameter()");
-		}
+	_lengthIndicator.push_back(pLenIn);
+	_dataSize[(SQLPOINTER) val.rawContent()] = size;
+
+	if (Utility::isError(SQLBindParameter(_rStmt, 
+		(SQLUSMALLINT) pos + 1, 
+		SQL_PARAM_INPUT, 
+		SQL_C_BINARY, 
+		SQL_LONGVARBINARY, 
+		(SQLUINTEGER) size,
+		0,
+		(SQLPOINTER) val.rawContent(), 
+		(SQLINTEGER) size, 
+		_lengthIndicator.back())))
+	{
+		throw StatementException(_rStmt, 
+			"SQLBindParameter()");
+	}
 }
 
 
 void Binder::bind(std::size_t pos)
 {
+	if (pos == 0) 
+	{
+		reset();
+	}
+
 	_lengthIndicator.push_back(0);
 	_dataSize.insert(SizeMap::value_type(static_cast<SQLPOINTER>(0), static_cast<SQLLEN>(0)));
 		// NOTE: stupid casts required by VS2010.
@@ -154,6 +167,16 @@ std::size_t Binder::dataSize(SQLPOINTER pAddr) const
 void Binder::bind(std::size_t pos, const char* const &pVal)
 {
 	//no-op
+}
+
+
+void Binder::reset()
+{
+	std::vector<SQLLEN*>::iterator it = _lengthIndicator.begin();
+	std::vector<SQLLEN*>::iterator itEnd = _lengthIndicator.end();
+	for(; it != itEnd; ++it) delete *it;
+	_lengthIndicator.clear();
+	_dataSize.clear();
 }
 
 
