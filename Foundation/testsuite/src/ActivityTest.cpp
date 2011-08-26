@@ -1,7 +1,7 @@
 //
 // ActivityTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ActivityTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/ActivityTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -61,7 +61,7 @@ namespace
 			return _activity;
 		}
 		
-		int count() const
+		Poco::UInt64 count() const
 		{
 			return _count;
 		}
@@ -75,7 +75,7 @@ namespace
 
 	private:
 		Activity<ActiveObject> _activity;
-		int                    _count;
+		Poco::UInt64           _count;
 	};
 }
  

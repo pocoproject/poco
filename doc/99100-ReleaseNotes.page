@@ -108,6 +108,8 @@ AAAIntroduction
     traversal would start at the document element, now it starts at the document).
     The path expression can now start with a double-slash, which results in a recursive
     search for the path's first element in the DOM tree.
+  - fixed SF# 3382935: String data being truncated using ODBC, and
+    SF# 2921813: Wrong implementation of the ODBC string binding
 
 
 !!!Release 1.4.1p1

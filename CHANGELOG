@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.4.2 (2011-08-xx)
+Release 1.4.2 (2011-08-28)
 ==========================
 
 - added Poco::DateTimeFormat::ISO8601_FRAC_FORMAT
@@ -40,7 +40,7 @@ Release 1.4.2 (2011-08-xx)
 - fixed SF# 3378588: Mismatched new[]/delete (in RSAEncryptImpl and RSADecryptImpl)
 - fixed SF# 3212954 (OpenSSLInitializer::uninitialize() crash) and 
   SF# 3196862 (Static OpenSSLInitializer instance causes Windows deadlocks) by
-  remoting the static Poco::Crypto::OpenSSLInitializer instance. Automatic OpenSSL
+  removing the static Poco::Crypto::OpenSSLInitializer instance. Automatic OpenSSL
   initialization is now done through Poco::Crypto::Cipher, Poco::Crypto::CipherKey, 
   Poco::Crypto::X509Certificate, Poco::Net::Context classes; however, it is still
   recommended to call Poco::Crypto::initializeCrypto() and 
@@ -106,6 +106,8 @@ Release 1.4.2 (2011-08-xx)
   traversal would start at the document element, now it starts at the document).
   The path expression can now start with a double-slash, which results in a recursive
   search for the path's first element in the DOM tree.
+- fixed SF# 3382935: String data being truncated using ODBC, and
+  SF# 2921813: Wrong implementation of the ODBC string binding
 
 
 Release 1.4.1p1 (2011-02-08)
@@ -1579,4 +1581,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#27 $
+$Id: //poco/1.4/dist/CHANGELOG#29 $
