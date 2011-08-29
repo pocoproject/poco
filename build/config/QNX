@@ -1,9 +1,13 @@
 #
-# $Id: //poco/1.4/build/config/QNX#2 $
+# $Id: //poco/1.4/build/config/QNX#3 $
 #
 # QNX
 #
-# Make settings for QNX Neutrino 6.3 with GCC 3.3.5
+# Make settings for QNX Neutrino 6.3.2 or later.
+# For cross-builds, or if the default compiler version
+# selected by the script is wrong, the make variable
+# CCVER can be overridden:
+# make CCVER=4.2.4,gcc_ntox86
 #
 
 #
@@ -14,7 +18,22 @@ LINKMODE ?= SHARED
 #
 # Define Tools
 #
+ifndef CCVER
+QNXREL = $(shell uname -r)
+ifeq ($(QNXREL),6.3.2)
 CCVER   = 3.3.5,gcc_ntox86
+else
+ifeq ($(QNXREL),6.4.0)
+CCVER   = 4.2.4,gcc_ntox86
+else
+ifeq ($(QNXREL),6.4.1)
+CCVER   = 4.3.3,gcc_ntox86
+else
+CCVER   = 4.4.2,gcc_ntox86
+endif
+endif
+endif
+endif
 CC      = qcc -V$(CCVER)
 CXX     = QCC -V$(CCVER)
 LINK    = $(CXX) -V$(CCVER)
