@@ -1,7 +1,7 @@
 //
 // Path_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path_WIN32.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/Path_WIN32.cpp#4 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -74,7 +74,7 @@ std::string PathImpl::tempImpl()
 	DWORD n = GetTempPathA(sizeof(buffer), buffer);
 	if (n > 0 && n < sizeof(buffer))
 	{
-		n = GetLongPathNameA(buffer.begin(), buffer.begin(), static_cast<DWORD>(buffer.size()));
+		n = GetLongPathNameA(buffer, buffer, static_cast<DWORD>(sizeof buffer));
 		if (n <= 0) throw SystemException("Cannot get temporary directory long path name");
 		std::string result(buffer, n);
 		if (result[n - 1] != '\\')
