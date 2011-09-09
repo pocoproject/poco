@@ -290,8 +290,6 @@
     <ClCompile Include="src\ByteOrder.cpp" />
     <ClCompile Include="src\Checksum.cpp" />
     <ClCompile Include="src\Debugger.cpp" />
-    <ClCompile Include="src\DynamicAny.cpp" />
-    <ClCompile Include="src\DynamicAnyHolder.cpp" />
     <ClCompile Include="src\Environment.cpp" />
     <ClCompile Include="src\Environment_UNIX.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
@@ -368,6 +366,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Latin2Encoding.cpp" />
     <ClCompile Include="src\MemoryPool.cpp" />
     <ClCompile Include="src\NestedDiagnosticContext.cpp" />
     <ClCompile Include="src\NumberFormatter.cpp" />
@@ -375,6 +374,8 @@
     <ClCompile Include="src\RefCountedObject.cpp" />
     <ClCompile Include="src\String.cpp" />
     <ClCompile Include="src\StringTokenizer.cpp" />
+    <ClCompile Include="src\Var.cpp" />
+    <ClCompile Include="src\VarHolder.cpp" />
     <ClCompile Include="src\Void.cpp" />
     <ClCompile Include="src\Base64Decoder.cpp" />
     <ClCompile Include="src\Base64Encoder.cpp" />
@@ -418,6 +419,8 @@
     <ClCompile Include="src\inflate.c" />
     <ClCompile Include="src\inftrees.c" />
     <ClCompile Include="src\trees.c" />
+    <ClCompile Include="src\Windows1250Encoding.cpp" />
+    <ClCompile Include="src\Windows1251Encoding.cpp" />
     <ClCompile Include="src\zutil.c" />
     <ClCompile Include="src\ActiveDispatcher.cpp" />
     <ClCompile Include="src\Condition.cpp" />
