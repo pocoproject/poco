@@ -15,7 +15,14 @@
 namespace CppUnit {
 
 
-TestRunner::TestRunner()
+TestRunner::TestRunner():
+        _ostr(std::cout)
+{
+}
+
+
+TestRunner::TestRunner(std::ostream& ostr):
+        _ostr(ostr)
 {
 }
 
@@ -29,9 +36,9 @@ TestRunner::~TestRunner()
 
 void TestRunner::printBanner()
 {
-    std::cout 
-		<< "Usage: driver [-all] [-print] [-wait] [name] ..." << std::endl
-		<< "       where name is the name of a test case class" << std::endl;
+    _ostr 
+                << "Usage: driver [-all] [-print] [-wait] [name] ..." << std::endl
+                << "       where name is the name of a test case class" << std::endl;
 }
 
 
@@ -88,12 +95,12 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			}
 			numberOfTests++;
 
-			if (!testToRun) 
-			{
-				std::cout << "Test " << testCase << " not found." << std::endl;
-				return false;
-			}
-		}
+                        if (!testToRun) 
+                        {
+                                _ostr << "Test " << testCase << " not found." << std::endl;
+                                return false;
+                        }
+                }
 	}
 
 	if (all)
@@ -111,11 +118,11 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		return false;
 	}
 
-	if (wait) 
-	{
-		std::cout << "<RETURN> to continue" << std::endl;
-		std::cin.get();
-	}
+        if (wait) 
+        {
+                _ostr << "<RETURN> to continue" << std::endl;
+                std::cin.get();
+        }
 
 	return success;
 }
@@ -123,12 +130,12 @@ bool TestRunner::run(const std::vector<std::string>& args)
 
 bool TestRunner::run(Test* test)
 {
-	TextTestResult result;
+        TextTestResult result(_ostr);
 
-	test->run(&result);
-	std::cout << result << std::endl;
+        test->run(&result);
+        _ostr << result << std::endl;
 
-	return result.wasSuccessful();
+        return result.wasSuccessful();
 }
 
 
@@ -140,12 +147,12 @@ void TestRunner::addTest(const std::string& name, Test* test)
 
 void TestRunner::print(const std::string& name, Test* pTest, int indent)
 {
-	for (int i = 0; i < indent; ++i)
-		std::cout << "    ";
-	std::cout << name << std::endl;
-	TestSuite* pSuite = dynamic_cast<TestSuite*>(pTest);
-	if (pSuite)
-	{
+        for (int i = 0; i < indent; ++i)
+                _ostr << "    ";
+        _ostr << name << std::endl;
+        TestSuite* pSuite = dynamic_cast<TestSuite*>(pTest);
+        if (pSuite)
+        {
 		const std::vector<Test*>& tests = pSuite->tests();
 		for (std::vector<Test*>::const_iterator it = tests.begin(); it != tests.end(); ++it)
 		{

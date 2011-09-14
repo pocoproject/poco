@@ -16,24 +16,36 @@
 namespace CppUnit {
 
 
+TextTestResult::TextTestResult():
+        _ostr(std::cout)
+{
+}
+
+
+TextTestResult::TextTestResult(std::ostream& ostr):
+        _ostr(ostr)
+{
+}
+
+
 void TextTestResult::addError(Test* test, CppUnitException* e)
 {
-	TestResult::addError(test, e);
-	std::cerr << "ERROR" << std::flush;
+        TestResult::addError(test, e);
+        _ostr << "ERROR" << std::flush;
 }
 
 
 void TextTestResult::addFailure(Test* test, CppUnitException* e)
 {
-	TestResult::addFailure(test, e);
-	std::cerr << "FAILURE" << std::flush;
+        TestResult::addFailure(test, e);
+        _ostr << "FAILURE" << std::flush;
 }
 
 
 void TextTestResult::startTest(Test* test)
 {
-	TestResult::startTest(test);
-	std::cerr << "\n" << shortName(test->toString()) << ": ";
+        TestResult::startTest(test);
+        _ostr << "\n" << shortName(test->toString()) << ": ";
 }
 
 
@@ -144,16 +156,16 @@ void TextTestResult::print(std::ostream& stream)
 
 void TextTestResult::printHeader(std::ostream& stream)
 {
-	std::cout << "\n\n";
-	if (wasSuccessful())
-		std::cout << "OK (" 
-		          << runTests() << " tests)" 
-		          << std::endl;
-	else
-		std::cout << "!!!FAILURES!!!" << std::endl
-		          << "Runs: "
-		          << runTests ()
-		          << "   Failures: "
+        stream << "\n\n";
+        if (wasSuccessful())
+                stream << "OK (" 
+                          << runTests() << " tests)" 
+                          << std::endl;
+        else
+                stream << "!!!FAILURES!!!" << std::endl
+                          << "Runs: "
+                          << runTests ()
+                          << "   Failures: "
 		          << testFailures ()
 		          << "   Errors: "
 		          << testErrors ()

@@ -20,16 +20,22 @@ namespace CppUnit {
 class CppUnit_API TextTestResult: public TestResult
 {
 public:
-	virtual void addError(Test* test, CppUnitException* e);
-	virtual void addFailure(Test* test, CppUnitException* e);
-	virtual void startTest(Test* test);
+        TextTestResult();
+        TextTestResult(std::ostream& ostr);
+        
+        virtual void addError(Test* test, CppUnitException* e);
+        virtual void addFailure(Test* test, CppUnitException* e);
+        virtual void startTest(Test* test);
 	virtual void print(std::ostream& stream);
 	virtual void printErrors(std::ostream& stream);
 	virtual void printFailures(std::ostream& stream);
 	virtual void printHeader(std::ostream& stream);
-	
+        
 protected:
-	std::string shortName(const std::string& testName);
+        std::string shortName(const std::string& testName);
+        
+private:
+        std::ostream& _ostr;
 };
 
 
