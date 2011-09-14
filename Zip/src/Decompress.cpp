@@ -43,7 +43,7 @@
 #include "Poco/Exception.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Delegate.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 
 
 namespace Poco {
@@ -123,23 +123,17 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		dest.makeFile();
 		if (dest.depth() > 0)
 		{
-			Poco::File aFile(dest.parent());
-			aFile.createDirectories();
-		}
-		std::ofstream out(dest.toString().c_str(), std::ios::binary);
-		if (!out)
-		{
-			std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Failed to open output stream " + dest.toString());
-			EError.notify(this, tmp);
-			return false;
-		}
-		ZipInputStream inp(zipStream, hdr, false);
-		Poco::StreamCopier::copyStream(inp, out);
-		out.close();
-		Poco::File aFile(file);
-		if (!aFile.exists() || !aFile.isFile())
-		{
-			std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Failed to create output stream " + dest.toString());
+                        Poco::File aFile(dest.parent());
+                        aFile.createDirectories();
+                }
+                Poco::FileOutputStream out(dest.toString());
+                ZipInputStream inp(zipStream, hdr, false);
+                Poco::StreamCopier::copyStream(inp, out);
+                out.close();
+                Poco::File aFile(dest.toString());
+                if (!aFile.exists() || !aFile.isFile())
+                {
+                        std::pair<const ZipLocalFileHeader, const std::string> tmp = std::make_pair(hdr, "Failed to create output stream " + dest.toString());
 			EError.notify(this, tmp);
 			return false;
 		}

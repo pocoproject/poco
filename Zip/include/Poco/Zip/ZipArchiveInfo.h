@@ -83,11 +83,14 @@ public:
 	std::streamoff getHeaderOffset() const;
 		/// Returns the offset of the header in relation to the begin of this disk
 
-	const std::string& getZipComment() const;
-		/// Returns the (optional) Zip Comment
+        const std::string& getZipComment() const;
+                /// Returns the (optional) Zip Comment
 
-	void setNumberOfEntries(Poco::UInt16 val);
-		/// Returns the number of entries on this disk
+        void setZipComment(const std::string& comment);
+                /// Sets the optional Zip comment.
+
+        void setNumberOfEntries(Poco::UInt16 val);
+                /// Returns the number of entries on this disk
 
 	void setTotalNumberOfEntries(Poco::UInt16 val);
 		/// Returns the total number of entries on all disks

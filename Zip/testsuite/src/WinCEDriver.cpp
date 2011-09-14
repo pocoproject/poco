@@ -1,17 +1,11 @@
 //
-// Zip.h
+// WinCEDriver.cpp
 //
-// $Id: //poco/Main/Zip/include/Poco/Zip/Zip.h#5 $
+// $Id: //poco/1.4/Zip/testsuite/src/WinCEDriver.cpp#1 $
 //
-// Library: Zip
-// Package: Zip
-// Module:  Zip
+// Console-based test driver for Windows CE.
 //
-// Basic definitions for the Poco Zip library.
-// This file must be the first file included by every other Zip
-// header file.
-//
-// Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -38,43 +32,21 @@
 //
 
 
-#ifndef Zip_Zip_INCLUDED
-#define Zip_Zip_INCLUDED
+#include "CppUnit/TestRunner.h"
+#include "ZipTestSuite.h"
+#include <cstdlib>
 
 
-#include "Poco/Foundation.h"
-
-
-//
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the Zip_EXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
-// Zip_API functions as being imported from a DLL, wheras this DLL sees symbols
-// defined with this macro as being exported.
-//
-#if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(Zip_EXPORTS)
-		#define Zip_API __declspec(dllexport)
-	#else
-		#define Zip_API __declspec(dllimport)
-	#endif
-#endif
-
-
-#if !defined(Zip_API)
-	#define Zip_API
-#endif
-
-
-//
-// Automatically link Zip library.
-//
-#if defined(_MSC_VER)
-        #if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Zip_EXPORTS)
-                #pragma comment(lib, "PocoZip" POCO_LIB_SUFFIX)
-        #endif
-#endif
-
-
-#endif // Zip_Zip_INCLUDED
+int _tmain(int argc, wchar_t* argv[])
+{
+        std::vector<std::string> args;
+        for (int i = 0; i < argc; ++i)
+        {
+                char buffer[1024];
+                std::wcstombs(buffer, argv[i], sizeof(buffer));
+                args.push_back(std::string(buffer));
+        }
+        CppUnit::TestRunner runner;     
+        runner.addTest("ZipTestSuite", ZipTestSuite::suite());
+        return runner.run(args) ? 0 : 1;
+}

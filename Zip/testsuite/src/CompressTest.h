@@ -48,12 +48,13 @@ public:
 
 	void testSingleFile();
 	void testDirectory();
-	void testManipulator();
-	void testManipulatorDel();
-	void testManipulatorReplace();
+        void testManipulator();
+        void testManipulatorDel();
+        void testManipulatorReplace();
+    void testSetZipComment();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

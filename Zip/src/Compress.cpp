@@ -42,7 +42,7 @@
 #include "Poco/Zip/ZipException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/File.h"
-#include <fstream>
+#include "Poco/FileStream.h"
 
 
 namespace Poco {
@@ -173,22 +173,19 @@ void Compress::addFile(std::istream& in, const Poco::DateTime& lastModifiedAt, c
 
 void Compress::addFile(const Poco::Path& file, const Poco::Path& fileName, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl)
 {
-	Poco::File aFile(file);
-	Poco::File::FileSize size = aFile.getSize();
-	if (size < 16)
-	{
-		cm = ZipCommon::CM_STORE;
-		cl = ZipCommon::CL_NORMAL;
-	}
-	std::ifstream in(file.toString().c_str(), std::ios::binary);
-	if (!in.good())
-		throw ZipException("Invalid input stream for " + aFile.path());
-	if (fileName.depth() > 1)
-	{
-		Poco::File aParent(file.parent());
+        Poco::File aFile(file);
+        Poco::File::FileSize size = aFile.getSize();
+        if (size < 16)
+        {
+                cm = ZipCommon::CM_STORE;
+                cl = ZipCommon::CL_NORMAL;
+        }
+        Poco::FileInputStream in(file.toString());
+        if (fileName.depth() > 1)
+        {
+                Poco::File aParent(file.parent());
 		addDirectory(fileName.parent(), aParent.getLastModified());
 	}
-
 	addFile(in, aFile.getLastModified(), fileName, cm, cl);
 }
 
@@ -308,12 +305,16 @@ ZipArchive Compress::close()
 	Poco::UInt16 numEntries = static_cast<Poco::UInt16>(_infos.size());
 	ZipArchiveInfo central;
 	central.setCentralDirectorySize(centralDirSize);
-	central.setNumberOfEntries(numEntries);
-	central.setTotalNumberOfEntries(numEntries);
-	central.setHeaderOffset(centralDirStart);
-	std::string centr(central.createHeader());
-	_out.write(centr.c_str(), static_cast<std::streamsize>(centr.size()));
-	_out.flush();
+        central.setNumberOfEntries(numEntries);
+        central.setTotalNumberOfEntries(numEntries);
+        central.setHeaderOffset(centralDirStart);
+        if (!_comment.empty() && _comment.size() <= 65535)
+        {
+                central.setZipComment(_comment);
+        }
+        std::string centr(central.createHeader());
+        _out.write(centr.c_str(), static_cast<std::streamsize>(centr.size()));
+        _out.flush();
 	_dirs.insert(std::make_pair(0, central));
 	return ZipArchive(_files, _infos, _dirs);
 }

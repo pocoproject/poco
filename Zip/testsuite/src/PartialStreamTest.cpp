@@ -57,11 +57,11 @@ void PartialStreamTest::testReading()
 	std::string postfix(" post");
 	std::string result(prefix+message+postfix);
 	std::istringstream istr(message);
-	PartialInputStream in(istr, 0, static_cast<std::streamoff>(message.length()), true, prefix, postfix);
-	char buf[124];
-	in.read(buf, 124);
-	std::string res(buf, in.gcount());
-	assert (res == result);
+        PartialInputStream in(istr, 0, static_cast<std::streamoff>(message.length()), true, prefix, postfix);
+        char buf[124];
+        in.read(buf, 124);
+        std::string res(buf, static_cast<std::string::size_type>(in.gcount()));
+        assert (res == result);
 }
 
 

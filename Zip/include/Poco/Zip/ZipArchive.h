@@ -81,10 +81,12 @@ public:
 
 	FileHeaders::const_iterator headerBegin() const;
 
-	FileHeaders::const_iterator headerEnd() const;
+        FileHeaders::const_iterator headerEnd() const;
+
+    const std::string& getZipComment() const;
 
 private:
-	void parse(std::istream& in, ParseCallback& pc);
+        void parse(std::istream& in, ParseCallback& pc);
 
 	ZipArchive(const FileHeaders& entries, const FileInfos& infos, const DirectoryInfos& dirs	);
 

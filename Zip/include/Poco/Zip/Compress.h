@@ -73,11 +73,17 @@ public:
 		/// Adds a directory entry excluding all children to the Zip file, entryName must not be empty.
 
 	void addRecursive(const Poco::Path& entry, ZipCommon::CompressionLevel cl = ZipCommon::CL_MAXIMUM, bool excludeRoot = true, const Poco::Path& name = Poco::Path());
-		/// Adds a directory entry recursively to the zip file, set excludeRoot to false to exclude the parent directory.
-		/// If excludeRoot is true you can specify an empty name to add the files as relative files
+                /// Adds a directory entry recursively to the zip file, set excludeRoot to false to exclude the parent directory.
+                /// If excludeRoot is true you can specify an empty name to add the files as relative files
 
-	ZipArchive close();
-		/// Finalizes the ZipArchive, closes it.
+        void setZipComment(const std::string& comment);
+                /// Sets the Zip file comment.
+
+        const std::string& getZipComment() const;
+                /// Returns the Zip file comment.
+                
+        ZipArchive close();
+                /// Finalizes the ZipArchive, closes it.
 
 private:
 	enum
@@ -99,13 +105,29 @@ private:
 	std::ostream&              _out;
 	bool                       _seekableOut;
 	ZipArchive::FileHeaders    _files;
-	ZipArchive::FileInfos      _infos;
-	ZipArchive::DirectoryInfos _dirs;
-	Poco::UInt32               _offset;
+        ZipArchive::FileInfos      _infos;
+        ZipArchive::DirectoryInfos _dirs;
+        Poco::UInt32               _offset;
+    std::string                _comment;
 
-	friend class Keep;
-	friend class Rename;
+        friend class Keep;
+        friend class Rename;
 };
+
+
+//
+// inlines
+//
+inline void Compress::setZipComment(const std::string& comment)
+{
+        _comment = comment;
+}
+
+
+inline const std::string& Compress::getZipComment() const
+{
+        return _comment;
+}
 
 
 } } // namespace Poco::Zip

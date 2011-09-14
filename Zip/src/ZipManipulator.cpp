@@ -46,7 +46,6 @@
 #include "Poco/Delegate.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
-#include <fstream>
 
 
 namespace Poco {
@@ -56,11 +55,11 @@ namespace Zip {
 ZipManipulator::ZipManipulator(const std::string& zipFile, bool backupOriginalFile):
 	_zipFile(zipFile),
 	_backupOriginalFile(backupOriginalFile),
-	_changes(),
-	_in(0)
+        _changes(),
+        _in(0)
 {
-	std::ifstream in(zipFile.c_str(), std::ios::binary);
-	_in = new ZipArchive(in);
+        Poco::FileInputStream in(zipFile);
+        _in = new ZipArchive(in);
 }
 
 
