@@ -37,7 +37,7 @@ ELSE ()
 ENDIF ()
 
 # Set local include path
-include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include Crypto/include)
+include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include Crypto/include Web/include)
 
 include(CheckTypeSize)
 include(FindCygwin)
@@ -55,7 +55,7 @@ if(CMAKE_SYSTEM MATCHES "Windows")
  set(SYSLIBS iphlpapi gdi32 odbc32)
  
  if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
-	message(STATUS "XXX: MS Visual Compiler detected")
+        message(STATUS "XXX: MS Visual Compiler detected")
  endif (CMAKE_C_COMPILER_ID MATCHES "MSVC")
 
 endif(CMAKE_SYSTEM MATCHES "Windows")
@@ -98,6 +98,7 @@ add_subdirectory(Foundation)
 add_subdirectory(XML)
 add_subdirectory(Util)
 add_subdirectory(Net)
+#add_subdirectory(Web)
 
 if(OPENSSL_FOUND)
     add_subdirectory(NetSSL_OpenSSL)
@@ -134,11 +135,6 @@ SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 
 INCLUDE(CPack)
-
-set(DEBUG_CXX_FLAGS "")
-set(RELEASE_CXX_FLAGS "")
-set(CXX_FLAGS "")
-set(C_FLAGS "")
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
 message(STATUS "XXX: DEBUG  =${DEBUG_CXX_FLAGS}")
