@@ -74,16 +74,10 @@
     <ClCompile Include="src\Connector.cpp">
       <Filter>ODBC\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataTypes.cpp">
-      <Filter>ODBC\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\EnvironmentHandle.cpp">
       <Filter>ODBC\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Extractor.cpp">
-      <Filter>ODBC\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ODBCColumn.cpp">
       <Filter>ODBC\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ODBCException.cpp">
@@ -95,13 +89,22 @@
     <ClCompile Include="src\Parameter.cpp">
       <Filter>ODBC\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Preparation.cpp">
-      <Filter>ODBC\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\SessionImpl.cpp">
       <Filter>ODBC\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utility.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ODBCMetaColumn.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Preparator.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TypeInfo.cpp">
+      <Filter>ODBC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Unicode.cpp">
       <Filter>ODBC\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

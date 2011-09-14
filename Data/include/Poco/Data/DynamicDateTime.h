@@ -41,6 +41,8 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Dynamic/Var.h"
 
 

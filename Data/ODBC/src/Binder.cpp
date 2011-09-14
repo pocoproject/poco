@@ -251,7 +251,7 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 	if (isOutBound(dir) || !isInBound(dir))
 		throw NotImplementedException("NULL parameter type can only be inbound.");
 
-	_inParams.insert(ParamMap::value_type(0, 0));
+	_inParams.insert(ParamMap::value_type(SQLPOINTER(0), SQLINTEGER(0)));
 
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = SQL_NULL_DATA;

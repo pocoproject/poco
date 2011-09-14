@@ -35,14 +35,13 @@
 
 
 #include "Poco/Data/ArchiveStrategy.h"
-
+#include "Poco/Ascii.h"
 
 namespace Poco {
 namespace Data {
 
 
 using namespace Keywords;
-
 
 //
 // ArchiveStrategy
@@ -142,11 +141,11 @@ void ArchiveByAgeStrategy::setThreshold(const std::string& age)
 	std::string::const_iterator it  = age.begin();
 	std::string::const_iterator end = age.end();
 	int n = 0;
-	while (it != end && std::isspace(*it)) ++it;
-	while (it != end && std::isdigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && std::isspace(*it)) ++it;
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
-	while (it != end && std::isalpha(*it)) unit += *it++;
+	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
 	
 	Timespan::TimeDiff factor = Timespan::SECONDS;
 	if (unit == "minutes")

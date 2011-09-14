@@ -10,8 +10,8 @@ SET(RELEASE_NAME "Unstable-trunk")
 SET(PROJECT_VERSION ${COMPLETE_VERSION})
 
 #set(COMMON_CXX "-Wall -Wno-sign-compare")
-set(DEBUG_CXX_FLAGS   "${COMMON_CXX} ${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-set(RELEASE_CXX_FLAGS "${COMMON_CXX} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+set(DEBUG_CXX_FLAGS   "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+set(RELEASE_CXX_FLAGS "${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
@@ -50,8 +50,14 @@ include(contrib/cmake/FindApache2.cmake)
 
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
- add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DPOCO_WIN32_UTF8)
-  set(SYSLIBS iphlpapi gdi32 odbc32)
+ 
+ add_definitions( -DPOCO_OS_FAMILY_WINDOWS)
+ set(SYSLIBS iphlpapi gdi32 odbc32)
+ 
+ if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
+	message(STATUS "XXX: MS Visual Compiler detected")
+ endif (CMAKE_C_COMPILER_ID MATCHES "MSVC")
+
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
 if (CMAKE_SYSTEM MATCHES "Linux")
@@ -69,14 +75,14 @@ if (CMAKE_SYSTEM MATCHES "SunOS")
 endif(CMAKE_SYSTEM MATCHES "SunOS")
 
 if (CMAKE_COMPILER_IS_MINGW)
-    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
+    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
     add_definitions(-mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED )
   link_directories(/usr/local/lib /usr/lib)
   include_directories(/usr/local/include /usr/include)
 endif (CMAKE_COMPILER_IS_MINGW)
 
 if (CMAKE_COMPILER_IS_CYGWIN)
-#    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
+#    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
 endif (CMAKE_COMPILER_IS_CYGWIN)
 
 # SunPro C++
@@ -129,7 +135,12 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 
 INCLUDE(CPack)
 
+set(DEBUG_CXX_FLAGS "")
+set(RELEASE_CXX_FLAGS "")
+set(CXX_FLAGS "")
+set(C_FLAGS "")
+
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
-message(STATUS "XXX: CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
-message(STATUS "XXX: CMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}")
-message(STATUS "XXX: CMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}")
+message(STATUS "XXX: DEBUG  =${DEBUG_CXX_FLAGS}")
+message(STATUS "XXX: RELEASE=${RELEASE_CXX_FLAGS}")
+

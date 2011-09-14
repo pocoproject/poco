@@ -41,6 +41,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Dynamic/Var.h"
 
 
