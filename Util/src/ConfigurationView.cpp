@@ -78,10 +78,17 @@ void ConfigurationView::enumerate(const std::string& key, Keys& range) const
 }
 
 
+void ConfigurationView::removeRaw(const std::string& key)
+{
+	std::string translatedKey = translateKey(key);
+	_pConfig->remove(translatedKey);
+}
+
+
 std::string ConfigurationView::translateKey(const std::string& key) const
 {
 	std::string result = _prefix;
-	if (!result.empty() && !key.empty()) result += '.';
+	if (!result.empty() && !key.empty() && key[0] != '[') result += '.';
 	result += key;
 	return result;
 }

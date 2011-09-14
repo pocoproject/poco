@@ -120,6 +120,19 @@ void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, boo
 }
 
 
+void LayeredConfiguration::removeConfiguration(AbstractConfiguration* pConfig)
+{
+	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
+	{
+		if (it->pConfig == pConfig)
+		{
+			_configs.erase(it);
+			break;
+		}
+	}
+}
+
+
 bool LayeredConfiguration::getRaw(const std::string& key, std::string& value) const
 {
 	for (ConfigList::const_iterator it = _configs.begin(); it != _configs.end(); ++it)
@@ -159,6 +172,19 @@ void LayeredConfiguration::enumerate(const std::string& key, Keys& range) const
 				range.push_back(*itr);
 				keys.insert(*itr);
 			}
+		}
+	}
+}
+
+
+void LayeredConfiguration::removeRaw(const std::string& key)
+{
+	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
+	{
+		if (it->writeable)
+		{
+			it->pConfig->remove(key);
+			return;
 		}
 	}
 }

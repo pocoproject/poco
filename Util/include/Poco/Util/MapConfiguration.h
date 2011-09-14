@@ -66,6 +66,7 @@ protected:
 	bool getRaw(const std::string& key, std::string& value) const;
 	void setRaw(const std::string& key, const std::string& value);
 	void enumerate(const std::string& key, Keys& range) const;
+	void removeRaw(const std::string& key);
 	~MapConfiguration();
 
 	iterator begin() const;

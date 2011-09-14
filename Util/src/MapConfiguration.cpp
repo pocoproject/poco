@@ -102,6 +102,24 @@ void MapConfiguration::enumerate(const std::string& key, Keys& range) const
 }
 
 
+void MapConfiguration::removeRaw(const std::string& key)
+{
+	std::string prefix = key;
+	if (!prefix.empty()) prefix += '.';
+	std::string::size_type psize = prefix.size();
+	StringMap::iterator it = _map.begin();
+	StringMap::iterator itCur;
+	while (it != _map.end())
+	{
+		itCur = it++;
+		if ((itCur->first == key) || (itCur->first.compare(0, psize, prefix) == 0))
+		{
+			_map.erase(itCur);
+		}
+	}
+}
+
+
 MapConfiguration::iterator MapConfiguration::begin() const
 {
 	return _map.begin();

@@ -37,12 +37,16 @@
 #include "Poco/Util/ServerApplication.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
+#include "Poco/Util/OptionException.h"
 #include "Poco/Exception.h"
+#if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
-#include "Poco/NumberFormatter.h"
 #include "Poco/NamedEvent.h"
+#endif
+#include "Poco/NumberFormatter.h"
 #include "Poco/Logger.h"
-#if defined(POCO_OS_FAMILY_UNIX)
+#include "Poco/String.h"
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/TemporaryFile.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -51,7 +55,10 @@
 #include <sys/stat.h>
 #include <fstream>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
+#if !defined(_WIN32_WCE)
 #include "Poco/Util/WinService.h"
+#include "Poco/Util/WinRegistryKey.h"
+#endif
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
@@ -60,8 +67,6 @@
 #endif
 
 
-using Poco::NamedEvent;
-using Poco::Process;
 using Poco::NumberFormatter;
 using Poco::Exception;
 using Poco::SystemException;
@@ -72,17 +77,25 @@ namespace Util {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
+#if !defined(_WIN32_WCE)
 Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus; 
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
+#endif
+#endif
+#if defined(POCO_VXWORKS)
+Poco::Event ServerApplication::_terminate;
 #endif
 
 
 ServerApplication::ServerApplication()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if !defined(_WIN32_WCE)
 	_action = SRV_RUN;
 	std::memset(&_serviceStatus, 0, sizeof(_serviceStatus));
+#endif
 #endif
 }
 
@@ -107,11 +120,18 @@ int ServerApplication::run()
 
 void ServerApplication::terminate()
 {
-	Process::requestTermination(Process::id());
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_terminate.set();
+#elif defined(POCO_VXWORKS)
+	_terminate.set();
+#else
+	Poco::Process::requestTermination(Process::id());
+#endif
 }
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+#if !defined(_WIN32_WCE)
 
 
 //
@@ -207,13 +227,6 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 		_serviceStatus.dwWin32ExitCode           = ERROR_SERVICE_SPECIFIC_ERROR;
 		_serviceStatus.dwServiceSpecificExitCode = EXIT_SOFTWARE; 
 	}
-	try
-	{
-		app.uninitialize();
-	}
-	catch (...)
-	{
-	}
 	_serviceStatus.dwCurrentState = SERVICE_STOPPED;
 	SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
 }
@@ -222,10 +235,7 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 void ServerApplication::waitForTerminationRequest()
 {
 	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
-	std::string evName("POCOTRM");
-	NumberFormatter::appendHex(evName, Process::id(), 8);
-	NamedEvent ev(evName);
-	ev.wait();
+	_terminate.wait();
 	_terminated.set();
 }
 
@@ -254,7 +264,42 @@ int ServerApplication::run(int argc, char** argv)
 				break;
 			default:
 				rc = run();
-				uninitialize();
+			}
+		}
+		catch (Exception& exc)
+		{
+			logger().log(exc);
+			rc = EXIT_SOFTWARE;
+		}
+		return rc;
+	}
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	if (!hasConsole() && isService())
+	{
+		return 0;
+	}
+	else 
+	{
+		int rc = EXIT_OK;
+		try
+		{
+			init(args);
+			switch (_action)
+			{
+			case SRV_REGISTER:
+				registerService();
+				rc = EXIT_OK;
+				break;
+			case SRV_UNREGISTER:
+				unregisterService();
+				rc = EXIT_OK;
+				break;
+			default:
+				rc = run();
 			}
 		}
 		catch (Exception& exc)
@@ -292,7 +337,6 @@ int ServerApplication::run(int argc, wchar_t** argv)
 				break;
 			default:
 				rc = run();
-				uninitialize();
 			}
 		}
 		catch (Exception& exc)
@@ -329,7 +373,7 @@ bool ServerApplication::isService()
 bool ServerApplication::hasConsole()
 {
 	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	return  hStdOut != INVALID_HANDLE_VALUE && hStdOut != NULL;
+	return hStdOut != INVALID_HANDLE_VALUE && hStdOut != NULL;
 }
 
 
@@ -343,7 +387,13 @@ void ServerApplication::registerService()
 		service.registerService(path);
 	else
 		service.registerService(path, _displayName);
-	logger().information("The application has been successfully registered as a service");
+	if (_startup == "auto")
+                service.setStartup(WinService::SVC_AUTO_START);
+        else if (_startup == "manual")
+                service.setStartup(WinService::SVC_MANUAL_START);
+        if (!_description.empty())
+                service.setDescription(_description);
+        logger().information("The application has been successfully registered as a service.");
 }
 
 
@@ -353,7 +403,7 @@ void ServerApplication::unregisterService()
 	
 	WinService service(name);
 	service.unregisterService();
-	logger().information("The service has been successfully unregistered");
+	logger().information("The service has been successfully unregistered.");
 }
 
 
@@ -362,33 +412,203 @@ void ServerApplication::defineOptions(OptionSet& options)
 	Application::defineOptions(options);
 
 	options.addOption(
-		Option("registerService", "", "register application as a service")
-			.required(false)
-			.repeatable(false));
-
-	options.addOption(
-		Option("unregisterService", "", "unregister application as a service")
-			.required(false)
-			.repeatable(false));
-
-	options.addOption(
-		Option("displayName", "", "specify a display name for the service (only with /registerService)")
+		Option("registerService", "", "Register the application as a service.")
 			.required(false)
 			.repeatable(false)
-			.argument("name"));
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleRegisterService)));
+
+	options.addOption(
+		Option("unregisterService", "", "Unregister the application as a service.")
+			.required(false)
+			.repeatable(false)
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleUnregisterService)));
+
+	options.addOption(
+		Option("displayName", "", "Specify a display name for the service (only with /registerService).")
+			.required(false)
+			.repeatable(false)
+			.argument("name")
+                        .callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDisplayName)));
+
+        options.addOption(
+                Option("description", "", "Specify a description for the service (only with /registerService).")
+                        .required(false)
+                        .repeatable(false)
+                        .argument("text")
+                        .callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDescription)));
+
+        options.addOption(
+                Option("startup", "", "Specify the startup mode for the service (only with /registerService).")
+                        .required(false)
+                        .repeatable(false)
+			.argument("automatic|manual")
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleStartup)));
 }
 
 
-void ServerApplication::handleOption(const std::string& name, const std::string& value)
+void ServerApplication::handleRegisterService(const std::string& name, const std::string& value)
 {
-	if (name == "registerService")
-		_action = SRV_REGISTER;
-	else if (name == "unregisterService")
-		_action = SRV_UNREGISTER;
-	else if (name == "displayName")
-		_displayName = value;
+	_action = SRV_REGISTER;
+}
+
+
+void ServerApplication::handleUnregisterService(const std::string& name, const std::string& value)
+{
+	_action = SRV_UNREGISTER;
+}
+
+
+void ServerApplication::handleDisplayName(const std::string& name, const std::string& value)
+{
+	_displayName = value;
+}
+
+
+void ServerApplication::handleDescription(const std::string& name, const std::string& value)
+{
+        _description = value;
+}
+
+
+void ServerApplication::handleStartup(const std::string& name, const std::string& value)
+{
+        if (Poco::icompare(value, 4, std::string("auto")) == 0)
+		_startup = "auto";
+	else if (Poco::icompare(value, std::string("manual")) == 0)
+		_startup = "manual";
 	else
-		Application::handleOption(name, value);
+		throw InvalidArgumentException("argument to startup option must be 'auto[matic]' or 'manual'");
+}
+
+
+#else // _WIN32_WCE
+void ServerApplication::waitForTerminationRequest()
+{
+	_terminate.wait();
+}
+
+
+int ServerApplication::run(int argc, char** argv)
+{
+	try
+	{
+		init(argc, argv);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	int rc = run();
+	try
+	{
+		uninitialize();
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		rc = EXIT_CONFIG;
+	}
+	return rc;
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	try
+	{
+		init(args);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	int rc = run();
+	try
+	{
+		uninitialize();
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		rc = EXIT_CONFIG;
+	}
+	return rc;
+}
+
+
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+int ServerApplication::run(int argc, wchar_t** argv)
+{
+	try
+	{
+		init(argc, argv);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	int rc = run();
+	try
+	{
+		uninitialize();
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		rc = EXIT_CONFIG;
+	}
+	return rc;
+}
+#endif
+
+
+#endif // _WIN32_WCE
+#elif defined(POCO_VXWORKS)
+//
+// VxWorks specific code
+//
+void ServerApplication::waitForTerminationRequest()
+{
+	_terminate.wait();
+}
+
+
+int ServerApplication::run(int argc, char** argv)
+{
+	try
+	{
+		init(argc, argv);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	return run();
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	try
+	{
+		init(args);
+	}
+	catch (Exception& exc)
+	{
+		logger().log(exc);
+		return EXIT_CONFIG;
+	}
+	return run();
+}
+
+
+void ServerApplication::defineOptions(OptionSet& options)
+{
+	Application::defineOptions(options);
 }
 
 
@@ -402,7 +622,10 @@ void ServerApplication::waitForTerminationRequest()
 {
 	sigset_t sset;
 	sigemptyset(&sset);
-	sigaddset(&sset, SIGINT);
+	if (!std::getenv("POCO_ENABLE_DEBUGGER"))
+	{
+		sigaddset(&sset, SIGINT);
+	}
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
 	sigprocmask(SIG_BLOCK, &sset, NULL);
@@ -432,17 +655,40 @@ int ServerApplication::run(int argc, char** argv)
 		logger().log(exc);
 		return EXIT_CONFIG;
 	}
-	int rc = run();
+	return run();
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
+	bool runAsDaemon = false;
+	for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+	{
+		if (*it == "--daemon")
+		{
+			runAsDaemon = true;
+			break;
+		}
+	}		
+	if (runAsDaemon)
+	{
+		beDaemon();
+	}
 	try
 	{
-		uninitialize();
+		init(args);
+		if (runAsDaemon)
+		{
+			int rc = chdir("/");
+			if (rc != 0) return EXIT_OSERR;
+		}
 	}
 	catch (Exception& exc)
 	{
 		logger().log(exc);
-		rc = EXIT_CONFIG;
+		return EXIT_CONFIG;
 	}
-	return rc;
+	return run();
 }
 
 
@@ -487,34 +733,34 @@ void ServerApplication::defineOptions(OptionSet& options)
 	Application::defineOptions(options);
 
 	options.addOption(
-		Option("daemon", "", "run application as a daemon")
-			.required(false)
-			.repeatable(false));
-
-	options.addOption(
-		Option("pidfile", "", "write PID to given file")
+		Option("daemon", "", "Run application as a daemon.")
 			.required(false)
 			.repeatable(false)
-			.argument("path"));
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDaemon)));
+
+	options.addOption(
+		Option("pidfile", "", "Write the process ID of the application to given file.")
+			.required(false)
+			.repeatable(false)
+			.argument("path")
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handlePidFile)));
 }
 
 
-void ServerApplication::handleOption(const std::string& name, const std::string& value)
+void ServerApplication::handleDaemon(const std::string& name, const std::string& value)
 {
-	if (name == "daemon")
-	{
-		config().setBool("application.runAsDaemon", true);
-	}
-	else if (name == "pidfile")
-	{
-		std::ofstream ostr(value.c_str());
-		if (ostr.good())
-			ostr << Poco::Process::id() << std::endl;
-		else
-			throw Poco::CreateFileException("Cannot write PID to file", value);
-		Poco::TemporaryFile::registerForDeletion(value);
-	}
-	else Application::handleOption(name, value);
+	config().setBool("application.runAsDaemon", true);
+}
+
+
+void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
+{
+	std::ofstream ostr(value.c_str());
+	if (ostr.good())
+		ostr << Poco::Process::id() << std::endl;
+	else
+		throw Poco::CreateFileException("Cannot write PID to file", value);
+	Poco::TemporaryFile::registerForDeletion(value);
 }
 
 
@@ -552,8 +798,8 @@ void ServerApplication::waitForTerminationRequest()
 	sys$qiow(0, ioChan, IO$_SETMODE | IO$M_CTRLCAST, 0, 0, 0, terminate, 0, 0, 0, 0, 0);
 
 	std::string evName("POCOTRM");
-	NumberFormatter::appendHex(evName, Process::id(), 8);
-	NamedEvent ev(evName);
+	NumberFormatter::appendHex(evName, Poco::Process::id(), 8);
+	Poco::NamedEvent ev(evName);
 	try
 	{
 		ev.wait();
@@ -578,29 +824,28 @@ int ServerApplication::run(int argc, char** argv)
 		logger().log(exc);
 		return EXIT_CONFIG;
 	}
-	int rc = run();
+	return run();
+}
+
+
+int ServerApplication::run(const std::vector<std::string>& args)
+{
 	try
 	{
-		uninitialize();
+		init(args);
 	}
 	catch (Exception& exc)
 	{
 		logger().log(exc);
-		rc = EXIT_CONFIG;
+		return EXIT_CONFIG;
 	}
-	return rc;
+	return run();
 }
 
 
 void ServerApplication::defineOptions(OptionSet& options)
 {
 	Application::defineOptions(options);
-}
-
-
-void ServerApplication::handleOption(const std::string& name, const std::string& value)
-{
-	Application::handleOption(name, value);
 }
 
 

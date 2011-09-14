@@ -72,19 +72,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Util_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoUtild.lib")
-			#else
-				#pragma comment(lib, "PocoUtil.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoUtilmtd.lib")
-			#else
-				#pragma comment(lib, "PocoUtilmt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoUtil" POCO_LIB_SUFFIX)
 	#endif
 #endif
 

@@ -104,6 +104,13 @@ void ConfigurationMapper::enumerate(const std::string& key, Keys& range) const
 }
 
 
+void ConfigurationMapper::removeRaw(const std::string& key)
+{
+	std::string translatedKey = translateKey(key);
+	_pConfig->remove(translatedKey);
+}
+
+
 std::string ConfigurationMapper::translateKey(const std::string& key) const
 {
 	std::string result(key);

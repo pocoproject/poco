@@ -126,14 +126,24 @@ public:
 	void setStartup(Startup startup);
 		/// Sets the startup mode for the service.
 		
-	Startup getStartup() const;
-		/// Returns the startup mode for the service.
+        Startup getStartup() const;
+                /// Returns the startup mode for the service.
+                
+        void setDescription(const std::string& description);
+                /// Sets the service description in the registry.
+                
+        std::string getDescription() const;
+                /// Returns the service description from the registry.
 
-	static const int STARTUP_TIMEOUT;
+        static const int STARTUP_TIMEOUT;
+
+protected:
+        static const std::string REGISTRY_KEY;
+        static const std::string REGISTRY_DESCRIPTION;
 
 private:
-	void open() const;
-	bool tryOpen() const;
+        void open() const;
+        bool tryOpen() const;
 	void close() const;
 	POCO_LPQUERY_SERVICE_CONFIG config() const;
 

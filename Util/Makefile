@@ -17,8 +17,8 @@ objects = AbstractConfiguration Application ConfigurationMapper \
 	Validator IntValidator RegExpValidator OptionCallback \
 	Timer TimerTask
 
-ifeq ($(POCO_CONFIG),MinGW)
-	objects += WinService 
+ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
+	objects += WinService WinRegistryKey WinRegistryConfiguration
 endif
 
 target         = PocoUtil

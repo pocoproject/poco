@@ -39,7 +39,7 @@
 #include "Poco/String.h"
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 #include <set>
 
 
@@ -109,7 +109,7 @@ bool IniFileConfiguration::getRaw(const std::string& key, std::string& value) co
 
 void IniFileConfiguration::setRaw(const std::string& key, const std::string& value)
 {
-	throw Poco::NotImplementedException("Setting a property in an IniFileConfiguration");
+	_map[key] = value;
 }
 
 
@@ -139,6 +139,24 @@ void IniFileConfiguration::enumerate(const std::string& key, Keys& range) const
 }
 
 
+void IniFileConfiguration::removeRaw(const std::string& key)
+{
+	std::string prefix = key;
+	if (!prefix.empty()) prefix += '.';
+	std::string::size_type psize = prefix.size();
+	IStringMap::iterator it = _map.begin();
+	IStringMap::iterator itCur;
+	while (it != _map.end())
+	{
+		itCur = it++;
+		if ((icompare(itCur->first, key) == 0) || (icompare(itCur->first, psize, prefix) == 0))
+		{
+			_map.erase(itCur);
+		}
+	}
+}
+
+
 bool IniFileConfiguration::ICompare::operator () (const std::string& s1, const std::string& s2) const
 {
 	return icompare(s1, s2) < 0;
@@ -150,7 +168,7 @@ void IniFileConfiguration::parseLine(std::istream& istr)
 	static const int eof = std::char_traits<char>::eof(); 
 
 	int c = istr.get();
-	while (c != eof && std::isspace((char) c)) c = istr.get();
+	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();
 	if (c != eof)
 	{
 		if (c == ';')

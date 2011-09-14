@@ -58,8 +58,8 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	/// from an XML document. An XPath-like syntax for property
 	/// names is supported to allow full access to the XML document.
 	/// XML namespaces are not supported. The name of the root element
-	/// of an XML document is not significant. Periods in tag names
-	/// are not supported.
+	/// of the XML document is not significant and ignored. 
+	/// Periods in tag names are not supported.
 	/// 
 	/// Given the following XML document as an example:
 	///
@@ -70,8 +70,8 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	///            <prop4 attr="value3"/>
 	///            <prop4 attr="value4"/>
 	///         </prop3>
-	///         <prop5>value5</prop5>
-	///         <prop5>value6</prop5>
+	///         <prop5 id="first">value5</prop5>
+	///         <prop5 id="second">value6</prop5>
 	///     </config>
 	///
 	/// The following property names would be valid and would
@@ -84,6 +84,8 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	///     prop3.prop4[1][@attr] -> value4
 	///     prop5[0]              -> value5
 	///     prop5[1]              -> value6
+	///     prop5[@id=first]      -> value5
+	///     prop5[@id='second']   -> value6
 	///
 	/// Enumerating attributes is not supported.
 	/// Calling keys("prop3.prop4") will return an empty range. 
@@ -158,13 +160,16 @@ protected:
 	bool getRaw(const std::string& key, std::string& value) const;
 	void setRaw(const std::string& key, const std::string& value);
 	void enumerate(const std::string& key, Keys& range) const;
+	void removeRaw(const std::string& key);
 	~XMLConfiguration();
 
 private:
 	const Poco::XML::Node* findNode(const std::string& key) const;
+	Poco::XML::Node* findNode(const std::string& key);
 	static Poco::XML::Node* findNode(std::string::const_iterator& it, const std::string::const_iterator& end, Poco::XML::Node* pNode, bool create = false);
 	static Poco::XML::Node* findElement(const std::string& name, Poco::XML::Node* pNode, bool create);
 	static Poco::XML::Node* findElement(int index, Poco::XML::Node* pNode, bool create);
+	static Poco::XML::Node* findElement(const std::string& attr, const std::string& value, Poco::XML::Node* pNode);
 	static Poco::XML::Node* findAttribute(const std::string& name, Poco::XML::Node* pNode, bool create);
 
 	Poco::XML::AutoPtr<Poco::XML::Node>     _pRoot;

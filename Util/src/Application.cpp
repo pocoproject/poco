@@ -55,7 +55,7 @@
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/UnWindows.h"
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
 #endif
 #if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
@@ -106,13 +106,6 @@ Application::Application(int argc, char* argv[]):
 
 Application::~Application()
 {
-	try
-	{
-		uninitialize();
-	}
-	catch (...)
-	{
-	}
 	_pInstance = 0;
 }
 
@@ -120,16 +113,18 @@ Application::~Application()
 void Application::setup()
 {
 	poco_assert (_pInstance == 0);
-
+	
 	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false, false);
 	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true, false);
-	
-	addSubsystem(new LoggingSubsystem);
-	
-#if defined(POCO_OS_FAMILY_UNIX)
-	#if !defined(_DEBUG)
-	Poco::SignalHandler::install();
-	#endif
+        
+        addSubsystem(new LoggingSubsystem);
+        
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+        _workingDirAtLaunch = Path::current();
+
+        #if !defined(_DEBUG)
+        Poco::SignalHandler::install();
+        #endif
 #else
 	setUnixOptions(false);
 #endif
@@ -188,7 +183,6 @@ void Application::init()
 	_pConfig->setString("application.dir", appPath.parent().toString());
 	_pConfig->setString("application.configDir", appPath.parent().toString());
 	processOptions();
-	initialize(*this);
 }
 
 
@@ -305,9 +299,11 @@ void Application::stopOptionsProcessing()
 
 int Application::run()
 {
+	int rc = EXIT_SOFTWARE;
+	initialize(*this);
 	try
 	{
-		return main(_args);
+		rc = main(_args);
 	}
 	catch (Poco::Exception& exc)
 	{
@@ -321,7 +317,8 @@ int Application::run()
 	{
 		logger().fatal("system exception");
 	}
-	return EXIT_SOFTWARE;
+	uninitialize();
+	return rc;
 }
 
 
@@ -389,26 +386,26 @@ void Application::processOptions()
 
 void Application::getApplicationPath(Poco::Path& appPath) const
 {
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	if (_command.find('/') != std::string::npos)
 	{
 		Path path(_command);
 		if (path.isAbsolute())
 		{
 			appPath = path;
-		}
-		else
-		{
-			appPath = Path::current();
-			appPath.append(path);
-		}
-	}
-	else
-	{
-		if (!Path::find(Environment::get("PATH"), _command, appPath))
-			appPath = Path(Path::current(), _command);
-		appPath.makeAbsolute();
-	}
+                }
+                else
+                {
+                        appPath = _workingDirAtLaunch;
+                        appPath.append(path);
+                }
+        }
+        else
+        {
+                if (!Path::find(Environment::get("PATH"), _command, appPath))
+                        appPath = Path(_workingDirAtLaunch, _command);
+                appPath.makeAbsolute();
+        }
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		wchar_t path[1024];
