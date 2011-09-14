@@ -46,19 +46,20 @@ public:
 	ParserWriterTest(const std::string& name);
 	~ParserWriterTest();
 
-	void testParseWriteXHTML();
-	void testParseWriteXHTML2();
-	void testParseWriteWSDL();
+        void testParseWriteXHTML();
+        void testParseWriteXHTML2();
+        void testParseWriteWSDL();
+        void testParseWriteSimple();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 
 private:
-	static const std::string XHTML;
-	static const std::string XHTML2;
-	static const std::string WSDL;
+        static const std::string XHTML;
+        static const std::string XHTML2;
+        static const std::string WSDL;
 };
 
 

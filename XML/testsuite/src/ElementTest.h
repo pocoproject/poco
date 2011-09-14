@@ -52,12 +52,14 @@ public:
 	void testAttrMapNS();
 	void testElementsByTagName();
 	void testElementsByTagNameNS();
-	void testInnerText();
-	void testChildElement();
-	void testChildElementNS();
-	
-	void setUp();
-	void tearDown();
+        void testInnerText();
+        void testChildElement();
+        void testChildElementNS();
+        void testNodeByPath();
+        void testNodeByPathNS();
+        
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

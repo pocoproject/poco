@@ -66,12 +66,13 @@ public:
 	void testUndeclaredNamespaceNoPrefixes();
 	void testUndeclaredNoNamespace();
 	void testRSS();
-	void testEncoding();
-	void testParseMemory();
-	void testCharacters();
+        void testEncoding();
+        void testParseMemory();
+        void testCharacters();
+        void testParsePartialReads();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	std::string parse(Poco::XML::XMLReader& reader, int options, const std::string& data);
 	std::string parseMemory(Poco::XML::XMLReader& reader, int options, const std::string& data);
@@ -93,9 +94,10 @@ public:
 	static const std::string DEFAULT_NAMESPACE;
 	static const std::string NAMESPACES;
 	static const std::string UNDECLARED_NAMESPACE;
-	static const std::string XHTML_LATIN1_ENTITIES;
-	static const std::string RSS;
-	static const std::string ENCODING;
+        static const std::string XHTML_LATIN1_ENTITIES;
+        static const std::string RSS;
+        static const std::string ENCODING;
+        static const std::string WSDL;
 };
 
 
