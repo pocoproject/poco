@@ -1,7 +1,7 @@
 //
 // TCPServerTest.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/TCPServerTest.h#7 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/TCPServerTest.h#1 $
 //
 // Definition of the TCPServerTest class.
 //
@@ -46,12 +46,14 @@ public:
 	TCPServerTest(const std::string& name);
 	~TCPServerTest();
 
-	void testOneConnection();
-	void testTwoConnections();
-	void testMultiConnections();
+        void testOneConnection();
+        void testTwoConnections();
+        void testMultiConnections();
+        void testReuseSocket();
+        void testReuseSession();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

@@ -123,22 +123,32 @@ public:
 		/// request completes.
 		///
 		/// Returns a new SSL socket for the connection
-		/// with the client.
-		///
-		/// The client socket's address is returned in clientAddr.
+                /// with the client.
+                ///
+                /// The client socket's address is returned in clientAddr.
+                ///
+                /// No SSL handshake is performed on the new connection.
+                /// The SSL handshake will be performed the first time
+                /// sendBytes(), receiveBytes() or completeHandshake()
+                /// is called on the returned SecureStreamSocket.
 
-	StreamSocket acceptConnection();
-		/// Get the next completed connection from the
+        StreamSocket acceptConnection();
+                /// Get the next completed connection from the
 		/// socket's completed connection queue.
 		///
 		/// If the queue is empty, waits until a connection
 		/// request completes.
-		///
-		/// Returns a new SSL socket for the connection
-		/// with the client.
+                ///
+                /// Returns a new SSL socket for the connection
+                /// with the client.
+                ///
+                /// No SSL handshake is performed on the new connection.
+                /// The SSL handshake will be performed the first time
+                /// sendBytes(), receiveBytes() or completeHandshake()
+                /// is called on the returned SecureStreamSocket.
 
-	Context::Ptr context() const;
-		/// Returns the SSL context used by this socket.
+        Context::Ptr context() const;
+                /// Returns the SSL context used by this socket.
 };
 
 

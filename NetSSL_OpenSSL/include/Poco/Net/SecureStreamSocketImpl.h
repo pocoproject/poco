@@ -9,7 +9,7 @@
 //
 // Definition of the SecureStreamSocketImpl class.
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -63,15 +63,12 @@ public:
 
 	SocketImpl* acceptConnection(SocketAddress& clientAddr);
 		/// Not supported by a SecureStreamSocket.
-		///
-		/// Throws a Poco::InvalidAccessException.
+                ///
+                /// Throws a Poco::InvalidAccessException.
 
-	void acceptSSL();
-		/// Performs a SSL server-side handshake.
-	
-	void connect(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
-		/// the TCP server at the given address.
+        void connect(const SocketAddress& address);
+                /// Initializes the socket and establishes a connection to 
+                /// the TCP server at the given address.
 		///
 		/// Can also be used for UDP sockets. In this case, no
 		/// connection is established. Instead, incoming and outgoing
@@ -83,15 +80,12 @@ public:
 
 	void connectNB(const SocketAddress& address);
 		/// Initializes the socket and establishes a connection to 
-		/// the TCP server at the given address. Prior to opening the
-		/// connection the socket is set to nonblocking mode.
-		
-	void connectSSL();
-		/// Performs a SSL client-side handshake on an already connected TCP socket.
-	
-	void bind(const SocketAddress& address, bool reuseAddress = false);
-		/// Not supported by a SecureStreamSocket.
-		///
+                /// the TCP server at the given address. Prior to opening the
+                /// connection the socket is set to nonblocking mode.
+                
+        void bind(const SocketAddress& address, bool reuseAddress = false);
+                /// Not supported by a SecureStreamSocket.
+                ///
 		/// Throws a Poco::InvalidAccessException.
 		
 	void listen(int backlog = 64);
@@ -127,12 +121,20 @@ public:
 	
 	void sendUrgent(unsigned char data);
 		/// Not supported by a SecureStreamSocket.
-		///
-		/// Throws a Poco::InvalidAccessException.
+                ///
+                /// Throws a Poco::InvalidAccessException.
 
-	void shutdownReceive();
-		/// Shuts down the receiving part of the socket connection.
-		///
+        int available();
+                /// Returns the number of bytes available that can be read
+                /// without causing the socket to block.
+                ///
+                /// For an SSL connection, returns the number of bytes that
+                /// can be read from the currently buffered SSL record,
+                /// before a new record is read from the underlying socket.
+
+        void shutdownReceive();
+                /// Shuts down the receiving part of the socket connection.
+                ///
 		/// Since SSL does not support a half shutdown, this does
 		/// nothing.
 		
@@ -142,24 +144,89 @@ public:
 		/// Since SSL does not support a half shutdown, this does
 		/// nothing.
 		
-	void shutdown();
-		/// Shuts down the SSL connection.
+        void shutdown();
+                /// Shuts down the SSL connection.
+                
+        void abort();
+                /// Aborts the connection by closing the underlying
+                /// TCP connection. No orderly SSL shutdown is performed.
+                
+        bool secure() const;
+                /// Returns true iff the socket's connection is secure
+                /// (using SSL or TLS).
 
-	void setPeerHostName(const std::string& hostName);
-		/// Sets the peer host name for certificate validation purposes.
-		
-	const std::string& getPeerHostName() const;
-		/// Returns the peer host name.
+        void setPeerHostName(const std::string& hostName);
+                /// Sets the peer host name for certificate validation purposes.
+                
+        const std::string& getPeerHostName() const;
+                /// Returns the peer host name.
 
-	X509Certificate peerCertificate() const;
-		/// Returns the peer's X509 certificate.
-		
-	Context::Ptr context() const;
-		/// Returns the SSL context used by this socket.
+        bool havePeerCertificate() const;
+                /// Returns true iff the peer has presented a
+                /// certificate.
 
+        X509Certificate peerCertificate() const;
+                /// Returns the peer's X509 certificate.
+                ///
+                /// Throws a SSLException if the peer did not
+                /// present a certificate.
+                
+        Context::Ptr context() const;
+                /// Returns the SSL context used by this socket.
+
+        void setLazyHandshake(bool flag = true);
+                /// Enable lazy SSL handshake. If enabled, the SSL handshake
+                /// will be performed the first time date is sent or
+                /// received over the connection.
+                
+        bool getLazyHandshake() const;
+                /// Returns true if setLazyHandshake(true) has been called.
+
+        void verifyPeerCertificate();
+                /// Performs post-connect (or post-accept) peer certificate validation,
+                /// using the peer's IP address as host name.
+
+        void verifyPeerCertificate(const std::string& hostName);
+                /// Performs post-connect (or post-accept) peer certificate validation
+                /// using the given host name.
+
+        int completeHandshake();
+                /// Completes the SSL handshake.
+                ///
+                /// If the SSL connection was the result of an accept(),
+                /// the server-side handshake is completed, otherwise
+                /// a client-side handshake is performed. 
+
+        Session::Ptr currentSession();
+                /// Returns the SSL session of the current connection,
+                /// for reuse in a future connection (if session caching
+                /// is enabled).
+                ///
+                /// If no connection is established, returns null.
+                
+        void useSession(Session::Ptr pSession);
+                /// Sets the SSL session to use for the next
+                /// connection. Setting a previously saved Session
+                /// object is necessary to enable session caching.
+                ///
+                /// To remove the currently set session, a null pointer
+                /// can be given.
+                ///
+                /// Must be called before connect() to be effective.
+                
+        bool sessionWasReused();
+                /// Returns true iff a reused session was negotiated during
+                /// the handshake.
+                
 protected:
-	~SecureStreamSocketImpl();
-		/// Destroys the SecureStreamSocketImpl.
+        void acceptSSL();
+                /// Performs a SSL server-side handshake.
+        
+        void connectSSL();
+                /// Performs a SSL client-side handshake on an already connected TCP socket.
+        
+        ~SecureStreamSocketImpl();
+                /// Destroys the SecureStreamSocketImpl.
 
 	static int lastError();
 	static void error();
@@ -169,12 +236,13 @@ protected:
 
 private:
 	SecureStreamSocketImpl(const SecureStreamSocketImpl&);
-	SecureStreamSocketImpl& operator = (const SecureStreamSocketImpl&);
+        SecureStreamSocketImpl& operator = (const SecureStreamSocketImpl&);
 
-	SecureSocketImpl _impl;
-	std::string      _peerHostName;
+        SecureSocketImpl _impl;
+        bool             _lazyHandshake;
 
-	friend class SecureSocketImpl;
+        friend class SecureSocketImpl;
+        friend class SecureStreamSocket;
 };
 
 
@@ -183,7 +251,13 @@ private:
 //
 inline const std::string& SecureStreamSocketImpl::getPeerHostName() const
 {
-	return _peerHostName;
+        return _impl.getPeerHostName();
+}
+
+
+inline void SecureStreamSocketImpl::setPeerHostName(const std::string& peerHostName)
+{
+        _impl.setPeerHostName(peerHostName);
 }
 
 
@@ -193,9 +267,27 @@ inline Context::Ptr SecureStreamSocketImpl::context() const
 }
 
 
+inline Session::Ptr SecureStreamSocketImpl::currentSession()
+{
+        return _impl.currentSession();
+}
+
+        
+inline void SecureStreamSocketImpl::useSession(Session::Ptr pSession)
+{
+        _impl.useSession(pSession);
+}
+
+        
+inline bool SecureStreamSocketImpl::sessionWasReused()
+{
+        return _impl.sessionWasReused();
+}
+
+
 inline int SecureStreamSocketImpl::lastError()
 {
-	return SocketImpl::lastError();
+        return SocketImpl::lastError();
 }
 
 

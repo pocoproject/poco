@@ -68,6 +68,15 @@ HTTPSStreamFactory::HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt1
 }
 
 
+HTTPSStreamFactory::HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword):
+        _proxyHost(proxyHost),
+        _proxyPort(proxyPort),
+        _proxyUsername(proxyUsername),
+        _proxyPassword(proxyPassword)
+{
+}
+
+
 HTTPSStreamFactory::~HTTPSStreamFactory()
 {
 }
@@ -91,12 +100,13 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 			else
 				pSession = new HTTPClientSession(resolvedURI.getHost(), resolvedURI.getPort());
 			if (proxyUri.empty())
-				pSession->setProxy(_proxyHost, _proxyPort);
-			else
-				pSession->setProxy(proxyUri.getHost(), proxyUri.getPort());
-			std::string path = resolvedURI.getPathAndQuery();
-			if (path.empty()) path = "/";
-			HTTPRequest req(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+                                pSession->setProxy(_proxyHost, _proxyPort);
+                        else
+                                pSession->setProxy(proxyUri.getHost(), proxyUri.getPort());
+                        pSession->setProxyCredentials(_proxyUsername, _proxyPassword);
+                        std::string path = resolvedURI.getPathAndQuery();
+                        if (path.empty()) path = "/";
+                        HTTPRequest req(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
 			pSession->sendRequest(req);
 			HTTPResponse res;
 			std::istream& rs = pSession->receiveResponse(res);

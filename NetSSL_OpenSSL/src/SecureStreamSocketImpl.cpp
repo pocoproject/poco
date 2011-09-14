@@ -7,7 +7,7 @@
 // Package: SSLSockets
 // Module:  SecureStreamSocketImpl
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,6 +36,7 @@
 
 #include "Poco/Net/SecureStreamSocketImpl.h"
 #include "Poco/Net/SSLException.h"
+#include "Poco/Thread.h"
 
 
 namespace Poco {
@@ -43,22 +44,23 @@ namespace Net {
 
 
 SecureStreamSocketImpl::SecureStreamSocketImpl(Context::Ptr pContext):
-	_impl(new StreamSocketImpl, pContext)
+        _impl(new StreamSocketImpl, pContext),
+        _lazyHandshake(false)
 {
 }
 
 
 SecureStreamSocketImpl::SecureStreamSocketImpl(StreamSocketImpl* pStreamSocket, Context::Ptr pContext):
-	_impl(pStreamSocket, pContext)
+        _impl(pStreamSocket, pContext),
+        _lazyHandshake(false)
 {
-	pStreamSocket->duplicate();
-	reset(_impl.sockfd());
+        pStreamSocket->duplicate();
+        reset(_impl.sockfd());
 }
 
 
 SecureStreamSocketImpl::~SecureStreamSocketImpl()
 {
-	reset();
 }
 
 
@@ -76,34 +78,30 @@ void SecureStreamSocketImpl::acceptSSL()
 
 void SecureStreamSocketImpl::connect(const SocketAddress& address)
 {
-	if (_peerHostName.empty()) _peerHostName = address.host().toString();
-	_impl.connect(address, _peerHostName);
-	reset(_impl.sockfd());
+        _impl.connect(address, !_lazyHandshake);
+        reset(_impl.sockfd());
 }
 
 
 void SecureStreamSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
-	if (_peerHostName.empty()) _peerHostName = address.host().toString();
-	_impl.connect(address, _peerHostName, timeout);
-	reset(_impl.sockfd());
+        _impl.connect(address, timeout, !_lazyHandshake);
+        reset(_impl.sockfd());
 }
-	
+        
 
 void SecureStreamSocketImpl::connectNB(const SocketAddress& address)
 {
-	if (_peerHostName.empty()) _peerHostName = address.host().toString();
-	_impl.connectNB(address, _peerHostName);
-	reset(_impl.sockfd());
+        _impl.connectNB(address);
+        reset(_impl.sockfd());
 }
 
 
 void SecureStreamSocketImpl::connectSSL()
 {
-	if (_peerHostName.empty()) _peerHostName = peerAddress().host().toString();
-	_impl.connectSSL(_peerHostName);
+        _impl.connectSSL(!_lazyHandshake);
 }
-	
+        
 
 void SecureStreamSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 {
@@ -122,19 +120,34 @@ void SecureStreamSocketImpl::close()
 	reset();
 	_impl.close();
 }
-	
+
+
+void SecureStreamSocketImpl::abort()
+{
+        reset();
+        _impl.abort();
+}
+
 
 int SecureStreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
-	const char* p = reinterpret_cast<const char*>(buffer);
-	int remaining = length;
-	while (remaining > 0)
-	{
-		int n = _impl.sendBytes(p, length, flags);
-		p += n; 
-		remaining -= n;
-	}
-	return length;
+        const char* p = reinterpret_cast<const char*>(buffer);
+        int remaining = length;
+        int sent = 0;
+        bool blocking = getBlocking();
+        while (remaining > 0)
+        {
+                int n = _impl.sendBytes(p, remaining, flags);
+                if (n < 0 && !blocking) return n;
+                p += n; 
+                sent += n;
+                remaining -= n;
+                if (blocking && remaining > 0)
+                        Poco::Thread::yield();
+                else
+                        break;
+        }
+        return sent;
 }
 
 
@@ -162,6 +175,12 @@ void SecureStreamSocketImpl::sendUrgent(unsigned char data)
 }
 
 
+int SecureStreamSocketImpl::available()
+{
+        return _impl.available();
+}
+
+
 void SecureStreamSocketImpl::shutdownReceive()
 {
 }
@@ -178,19 +197,61 @@ void SecureStreamSocketImpl::shutdown()
 }
 
 
-void SecureStreamSocketImpl::setPeerHostName(const std::string& peerHostName)
+bool SecureStreamSocketImpl::secure() const
 {
-	_peerHostName = peerHostName;
+        return true;
+}
+
+
+bool SecureStreamSocketImpl::havePeerCertificate() const
+{
+        X509* pCert = _impl.peerCertificate();
+        if (pCert)
+        {
+                X509_free(pCert);
+                return true;
+        }
+        else return false;
 }
 
 
 X509Certificate SecureStreamSocketImpl::peerCertificate() const
 {
 	X509* pCert = _impl.peerCertificate();
-	if (pCert)
-		return X509Certificate(pCert);
-	else
-		throw SSLException("No certificate available yet");
+        if (pCert)
+                return X509Certificate(pCert);
+        else
+                throw SSLException("No certificate available");
+}
+
+
+void SecureStreamSocketImpl::setLazyHandshake(bool flag)
+{
+        _lazyHandshake = flag;
+}
+
+        
+bool SecureStreamSocketImpl::getLazyHandshake() const
+{
+        return _lazyHandshake;
+}
+
+
+void SecureStreamSocketImpl::verifyPeerCertificate()
+{
+        _impl.verifyPeerCertificate();
+}
+
+
+void SecureStreamSocketImpl::verifyPeerCertificate(const std::string& hostName)
+{
+        _impl.verifyPeerCertificate(hostName);
+}
+
+
+int SecureStreamSocketImpl::completeHandshake()
+{
+        return _impl.completeHandshake();
 }
 
 

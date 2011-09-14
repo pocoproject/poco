@@ -61,9 +61,20 @@ HTTPSTestServer::HTTPSTestServer():
 }
 
 
+HTTPSTestServer::HTTPSTestServer(Poco::Net::Context::Ptr pContext):
+        _socket(SocketAddress(), 64, pContext),
+        _thread("HTTPSTestServer"),
+        _stop(false)
+{
+        _thread.start(*this);
+        _ready.wait();
+        _lastRequest.reserve(4000);
+}
+
+
 HTTPSTestServer::~HTTPSTestServer()
 {
-	_stop = true;
+        _stop = true;
 	_thread.join();
 }
 

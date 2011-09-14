@@ -1,7 +1,7 @@
 //
 // HTTPSTestServer.h
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/HTTPSTestServer.h#7 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/HTTPSTestServer.h#1 $
 //
 // Definition of the HTTPSTestServer class.
 //
@@ -46,11 +46,14 @@ class HTTPSTestServer: public Poco::Runnable
 	/// A simple sequential echo server.
 {
 public:
-	HTTPSTestServer();
-		/// Creates the HTTPSTestServer.
+        HTTPSTestServer();
+                /// Creates the HTTPSTestServer.
 
-	~HTTPSTestServer();
-		/// Destroys the HTTPSTestServer.
+        explicit HTTPSTestServer(Poco::Net::Context::Ptr pContext);
+                /// Creates the HTTPSTestServer using the given Context.
+
+        ~HTTPSTestServer();
+                /// Destroys the HTTPSTestServer.
 
 	Poco::UInt16 port() const;
 		/// Returns the port the echo server is

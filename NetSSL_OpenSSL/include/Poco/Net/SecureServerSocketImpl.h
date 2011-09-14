@@ -130,11 +130,15 @@ public:
 	
 	void sendUrgent(unsigned char data);
 		/// Not supported by this kind of socket.
-		///
-		/// Throws a Poco::InvalidAccessException.
-		
-	Context::Ptr context() const;
-		/// Returns the SSL context used by this socket.
+                ///
+                /// Throws a Poco::InvalidAccessException.
+
+        bool secure() const;
+                /// Returns true iff the socket's connection is secure
+                /// (using SSL or TLS).
+                
+        Context::Ptr context() const;
+                /// Returns the SSL context used by this socket.
 
 protected:
 	~SecureServerSocketImpl();

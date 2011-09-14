@@ -65,11 +65,27 @@ using Poco::Net::InvalidCertificateHandler;
 using Poco::Net::ConsoleCertificateHandler;
 
 
+class SSLInitializer
+{
+public:
+        SSLInitializer()
+        {
+                Poco::Net::initializeSSL();
+        }
+        
+        ~SSLInitializer()
+        {
+                Poco::Net::uninitializeSSL();
+        }
+};
+
+
 int main(int argc, char** argv)
 {
-	HTTPStreamFactory::registerFactory();
-	HTTPSStreamFactory::registerFactory();
-	FTPStreamFactory::registerFactory();
+        SSLInitializer sslInitializer;
+        HTTPStreamFactory::registerFactory();
+        HTTPSStreamFactory::registerFactory();
+        FTPStreamFactory::registerFactory();
 	
 	if (argc != 2)
 	{

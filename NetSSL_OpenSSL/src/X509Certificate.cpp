@@ -71,8 +71,14 @@ X509Certificate::X509Certificate(X509* pCert):
 }
 
 
+X509Certificate::X509Certificate(X509* pCert, bool shared):
+        Poco::Crypto::X509Certificate(pCert, shared)
+{
+}
+
+
 X509Certificate::X509Certificate(const Poco::Crypto::X509Certificate& cert):
-	Poco::Crypto::X509Certificate(cert)
+        Poco::Crypto::X509Certificate(cert)
 {
 }
 
@@ -90,16 +96,16 @@ X509Certificate::~X509Certificate()
 }
 
 
-long X509Certificate::verify(const std::string& hostName) const
+bool X509Certificate::verify(const std::string& hostName) const
 {
-	return verify(*this, hostName);
+        return verify(*this, hostName);
 }
 
 
-long X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, const std::string& hostName)
-{		
-	std::string commonName;
-	std::set<std::string> dnsNames;
+bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, const std::string& hostName)
+{               
+        std::string commonName;
+        std::set<std::string> dnsNames;
 	certificate.extractNames(commonName, dnsNames);
 	bool ok = (dnsNames.find(hostName) != dnsNames.end());
 
@@ -142,18 +148,13 @@ long X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 					ok = matchByAlias(commonName, heData);
 				}
 			}
-		}
-		catch (HostNotFoundException&)
-		{
-			return X509_V_ERR_APPLICATION_VERIFICATION;
-		}
-	}
-
-	// we already have a verify callback registered so no need to ask twice SSL_get_verify_result(pSSL);
-	if (ok)
-		return X509_V_OK;
-	else
-		return X509_V_ERR_APPLICATION_VERIFICATION;
+                }
+                catch (HostNotFoundException&)
+                {
+                        return false;
+                }
+        }
+        return ok;
 }
 
 
@@ -165,11 +166,12 @@ bool X509Certificate::containsWildcards(const std::string& commonName)
 
 bool X509Certificate::matchByAlias(const std::string& alias, const HostEntry& heData)
 {
-	// fix wildcards
-	std::string aliasRep = Poco::replace(alias, "*", ".*");
-	Poco::replaceInPlace(aliasRep, "..*", ".*");
-	Poco::replaceInPlace(aliasRep, "?", ".?");
-	Poco::replaceInPlace(aliasRep, "..?", ".?");
+        // fix wildcards
+        std::string aliasRep = Poco::replace(alias, ".", "\\.");
+        Poco::replaceInPlace(aliasRep, "*", ".*");
+        Poco::replaceInPlace(aliasRep, "..*", ".*");
+        Poco::replaceInPlace(aliasRep, "?", ".?");
+        Poco::replaceInPlace(aliasRep, "..?", ".?");
 	// compare by name
 	Poco::RegularExpression expr(aliasRep);
 	bool found = false;
@@ -177,10 +179,16 @@ bool X509Certificate::matchByAlias(const std::string& alias, const HostEntry& he
 	HostEntry::AliasList::const_iterator it = aliases.begin();
 	HostEntry::AliasList::const_iterator itEnd = aliases.end();
 	for (; it != itEnd && !found; ++it)
-	{
-		found = expr.match(*it);
-	}
-	return found;
+        {
+                found = expr.match(*it);
+        }
+        // Handle the case where the list of aliases is empty.
+        if (aliases.empty())
+        {
+                // Compare the host name against the wildcard host name in the certificate.
+                found = expr.match(heData.name());
+        }
+        return found;
 }
 
 

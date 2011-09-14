@@ -1,7 +1,7 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/testsuite/src/WinDriver.cpp#8 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/WinDriver.cpp#1 $
 //
 // Windows test driver for Poco OpenSSL.
 //
@@ -42,44 +42,55 @@
 class NetSSLApp: public Poco::Util::Application
 {
 public:
-	NetSSLApp()
-	{
-	}
+        NetSSLApp()
+        {
+                Poco::Net::initializeSSL();
+                Poco::Net::HTTPStreamFactory::registerFactory();
+                Poco::Net::HTTPSStreamFactory::registerFactory();
+        }
 
-	~NetSSLApp()
-	{
-	}
+        ~NetSSLApp()
+        {
+                Poco::Net::uninitializeSSL();
+        }
 
-protected:	
-	void initialize(Application& self)
-	{
-		loadConfiguration(); // load default configuration files, if present
-		Application::initialize(self);
-	}
+        int main(const std::vector<std::string>& args)
+        {
+                CppUnit::WinTestRunner runner;
+                runner.addTest(NetSSLTestSuite::suite());
+                runner.run();
+                return 0;
+        }
+        
+protected:
+        void initialize(Poco::Util::Application& self)
+        {
+                loadConfiguration(); // load default configuration files, if present
+                Poco::Util::Application::initialize(self);
+        }
+        
+private:
+        std::vector<std::string> _targs;
 };
 
 
 class TestDriver: public CppUnit::WinTestRunnerApp
 {
-	void TestMain()
-	{
-		CppUnit::WinTestRunner runner;
-		Poco::Net::HTTPStreamFactory::registerFactory();
-		Poco::Net::HTTPSStreamFactory::registerFactory();
-		NetSSLApp app;
-		std::string argv("OpenSSLTest");
-		const char* pArgv = argv.c_str();
-		try
-		{
-			app.init(1, (char**)&pArgv);
-		}
-		catch (Poco::Exception& exc)
-		{
-			app.logger().log(exc);
-		}
-		runner.addTest(NetSSLTestSuite::suite());
-		runner.run();
-	}
+        void TestMain()
+        {
+                NetSSLApp app;
+                std::string argv("TestSuite");
+                const char* pArgv = argv.c_str();
+                try
+                {
+                        app.init(1, (char**)&pArgv);
+                        app.run();
+                }
+                catch (Poco::Exception& exc)
+                {
+                        app.logger().log(exc);
+                }
+        }
 };
 
 

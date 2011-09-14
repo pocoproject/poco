@@ -57,13 +57,20 @@ public:
 	HTTPSStreamFactory();
 		/// Creates the HTTPSStreamFactory.
 
-	HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort = HTTPSession::HTTP_PORT);
-		/// Creates the HTTPSStreamFactory.
-		///
-		/// HTTP connections will use the given proxy.
+        HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort = HTTPSession::HTTP_PORT);
+                /// Creates the HTTPSStreamFactory.
+                ///
+                /// HTTPS connections will use the given proxy.
 
-	~HTTPSStreamFactory();
-		/// Destroys the HTTPSStreamFactory.
+        HTTPSStreamFactory(const std::string& proxyHost, Poco::UInt16 proxyPort, const std::string& proxyUsername, const std::string& proxyPassword);
+                /// Creates the HTTPSStreamFactory.
+                ///
+                /// HTTPS connections will use the given proxy and
+                /// will be authorized against the proxy using Basic authentication
+                /// with the given proxyUsername and proxyPassword.
+
+        ~HTTPSStreamFactory();
+                /// Destroys the HTTPSStreamFactory.
 		
 	std::istream* open(const Poco::URI& uri);
 		/// Creates and opens a HTTPS stream for the given URI.
@@ -80,9 +87,11 @@ private:
 	{
 		MAX_REDIRECTS = 10
 	};
-	
-	std::string  _proxyHost;
-	Poco::UInt16 _proxyPort;
+        
+        std::string  _proxyHost;
+        Poco::UInt16 _proxyPort;
+        std::string  _proxyUsername;
+        std::string  _proxyPassword;
 };
 
 

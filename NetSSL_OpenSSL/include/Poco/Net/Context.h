@@ -9,7 +9,7 @@
 //
 // Definition of the Context class.
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -41,9 +41,13 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/Net/SocketDefs.h"
+#include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/RSAKey.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
+#include <cstdlib>
 
 
 namespace Poco {
@@ -56,6 +60,9 @@ class NetSSL_API Context: public Poco::RefCountedObject
 	/// verification mode and the location of certificates
 	/// and private key files, as well as the list of
 	/// supported ciphers.
+	///
+	/// The Context class is also used to control
+	/// SSL session caching on the server and client side.
 {
 public:
 	typedef Poco::AutoPtr<Context> Ptr;
@@ -88,13 +95,13 @@ public:
 			/// immediately terminated with an alert message containing the 
 			/// reason for the verification failure. 
 			
-		VERIFY_STRICT  = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
-			/// Server: If the client did not return a certificate, the TLS/SSL 
-			/// handshake is immediately terminated with a handshake failure
-			/// alert. This flag must be used together with SSL_VERIFY_PEER. 
-			///
-			/// Client: Same as VERIFY_RELAXED. 
-			
+                VERIFY_STRICT  = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
+                        /// Server: If the client did not return a certificate, the TLS/SSL 
+                        /// handshake is immediately terminated with a handshake failure
+                        /// alert. This flag must be used together with SSL_VERIFY_PEER. 
+                        ///
+                        /// Client: Same as VERIFY_RELAXED. 
+                        
 		VERIFY_ONCE    = SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE
 			/// Server: Only request a client certificate on the initial 
 			/// TLS/SSL handshake. Do not ask for a client certificate 
@@ -125,26 +132,155 @@ public:
 			///     are used (see loadDefaultCAs).
 			///   * verificationMode specifies whether and how peer certificates are validated.
 			///   * verificationDepth sets the upper limit for verification chain sizes. Verification
-			///     will fail if a certificate chain larger than this is encountered.
-			///   * loadDefaultCAs specifies wheter the builtin CA certificates from OpenSSL are used.
-			///   * cipherList specifies the supported ciphers in OpenSSL notation.
+                        ///     will fail if a certificate chain larger than this is encountered.
+                        ///   * loadDefaultCAs specifies wheter the builtin CA certificates from OpenSSL are used.
+                        ///   * cipherList specifies the supported ciphers in OpenSSL notation.
+                        ///
+                        /// Note: If the private key is protected by a passphrase, a PrivateKeyPassphraseHandler
+                        /// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
+                        /// event must be handled.
 
-	~Context();
-		/// Destroys the Context.
+        Context(
+                Usage usage,
+                const std::string& caLocation, 
+                VerificationMode verificationMode = VERIFY_RELAXED,
+                int verificationDepth = 9,
+                bool loadDefaultCAs = false,
+                const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+                        /// Creates a Context.
+                        /// 
+                        ///   * usage specifies whether the context is used by a client or server.
+                        ///   * caLocation contains the path to the file or directory containing the
+                        ///     CA/root certificates. Can be empty if the OpenSSL builtin CA certificates
+                        ///     are used (see loadDefaultCAs).
+                        ///   * verificationMode specifies whether and how peer certificates are validated.
+                        ///   * verificationDepth sets the upper limit for verification chain sizes. Verification
+                        ///     will fail if a certificate chain larger than this is encountered.
+                        ///   * loadDefaultCAs specifies wheter the builtin CA certificates from OpenSSL are used.
+                        ///   * cipherList specifies the supported ciphers in OpenSSL notation.
+                        ///
+                        /// Note that a private key and/or certificate must be specified with
+                        /// usePrivateKey()/useCertificate() before the Context can be used.
 
-	SSL_CTX* sslContext() const;
-		/// Returns the underlying OpenSSL SSL Context object.
+        ~Context();
+                /// Destroys the Context.
+
+        void useCertificate(const Poco::Crypto::X509Certificate& certificate);
+                /// Sets the certificate to be used by the Context.
+                ///
+                /// To set-up a complete certificate chain, it might be
+                /// necessary to call addChainCertificate() to specify
+                /// additional certificates.
+                ///
+                /// Note that useCertificate() must always be called before
+                /// usePrivateKey().
+                
+        void addChainCertificate(const Poco::Crypto::X509Certificate& certificate);
+                /// Adds a certificate for certificate chain validation.
+                
+        void usePrivateKey(const Poco::Crypto::RSAKey& key);
+                /// Sets the private key to be used by the Context.
+                ///
+                /// Note that useCertificate() must always be called before
+                /// usePrivateKey().
+                ///
+                /// Note: If the private key is protected by a passphrase, a PrivateKeyPassphraseHandler
+                /// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
+                /// event must be handled.
+
+        SSL_CTX* sslContext() const;
+                /// Returns the underlying OpenSSL SSL Context object.
 
 	Usage usage() const;
 		/// Returns whether the context is for use by a client or by a server.
 
-	Context::VerificationMode verificationMode() const;
-		/// Returns the verification mode.
+        Context::VerificationMode verificationMode() const;
+                /// Returns the verification mode.
+                
+        void enableSessionCache(bool flag = true);
+                /// Enable or disable SSL/TLS session caching.
+                /// For session caching to work, it must be enabled
+                /// on the server, as well as on the client side.
+                ///
+                /// The default is disabled session caching.
+                ///
+                /// To enable session caching on the server side, use the
+                /// two-argument version of this method to specify
+                /// a session ID context.
+
+        void enableSessionCache(bool flag, const std::string& sessionIdContext);
+                /// Enables or disables SSL/TLS session caching on the server.
+                /// For session caching to work, it must be enabled
+                /// on the server, as well as on the client side.
+                ///
+                /// SessionIdContext contains the application's unique
+                /// session ID context, which becomes part of each
+                /// session identifier generated by the server within this
+                /// context. SessionIdContext can be an arbitrary sequence 
+                /// of bytes with a maximum length of SSL_MAX_SSL_SESSION_ID_LENGTH.
+                ///
+                /// A non-empty sessionIdContext should be specified even if
+                /// session caching is disabled to avoid problems with clients
+                /// requesting to reuse a session (e.g. Firefox 3.6).
+                ///
+                /// This method may only be called on SERVER_USE Context objects.
+                
+        bool sessionCacheEnabled() const;
+                /// Returns true iff the session cache is enabled.
+                
+        void setSessionCacheSize(std::size_t size);
+                /// Sets the maximum size of the server session cache, in number of
+                /// sessions. The default size (according to OpenSSL documentation)
+                /// is 1024*20, which may be too large for many applications,
+                /// especially on embedded platforms with limited memory.
+                ///
+                /// Specifying a size of 0 will set an unlimited cache size.
+                ///
+                /// This method may only be called on SERVER_USE Context objets.
+                
+        std::size_t getSessionCacheSize() const;
+                /// Returns the current maximum size of the server session cache.
+                ///
+                /// This method may only be called on SERVER_USE Context objets.
+                
+        void setSessionTimeout(long seconds);
+                /// Sets the timeout (in seconds) of cached sessions on the server.
+                /// A cached session will be removed from the cache if it has
+                /// not been used for the given number of seconds.
+                ///
+                /// This method may only be called on SERVER_USE Context objets.
+
+        long getSessionTimeout() const;
+                /// Returns the timeout (in seconds) of cached sessions on the server.
+                ///
+                /// This method may only be called on SERVER_USE Context objets.
+
+        void flushSessionCache();
+                /// Flushes the SSL session cache on the server.
+                ///
+                /// This method may only be called on SERVER_USE Context objets.
+                                
+        void enableExtendedCertificateVerification(bool flag = true);
+                /// Enable or disable the automatic post-connection
+                /// extended certificate verification.
+                ///
+                /// See X509Certificate::verify() for more information.
+                
+        bool extendedCertificateVerificationEnabled() const;
+                /// Returns true iff automatic extended certificate 
+                /// verification is enabled.
+                
+        void disableStatelessSessionResumption();
+                /// Newer versions of OpenSSL support RFC 4507 tickets for stateless
+                /// session resumption.
+                ///
+                /// The feature can be disabled by calling this method.
 
 private:
-	Usage _usage;
-	VerificationMode _mode;
-	SSL_CTX* _pSSLContext;
+        Usage _usage;
+        VerificationMode _mode;
+        SSL_CTX* _pSSLContext;
+        bool _extendedCertificateVerification;
 };
 
 
@@ -166,6 +302,12 @@ inline Context::VerificationMode Context::verificationMode() const
 inline SSL_CTX* Context::sslContext() const
 {
 	return _pSSLContext;
+}
+
+
+inline bool Context::extendedCertificateVerificationEnabled() const
+{
+        return _extendedCertificateVerification;
 }
 
 

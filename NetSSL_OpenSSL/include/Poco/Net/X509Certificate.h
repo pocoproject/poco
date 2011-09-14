@@ -41,11 +41,11 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/Net/SocketDefs.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <set>
-#include <openssl/ssl.h>
 
 
 namespace Poco {
@@ -70,32 +70,44 @@ public:
 
 	explicit X509Certificate(X509* pCert);
 		/// Creates the X509Certificate from an existing
-		/// OpenSSL certificate. Ownership is taken of 
-		/// the certificate.
+                /// OpenSSL certificate. Ownership is taken of 
+                /// the certificate.
 
-	X509Certificate(const Poco::Crypto::X509Certificate& cert);
-		/// Creates the certificate by copying another one.
+        X509Certificate(X509* pCert, bool shared);
+                /// Creates the X509Certificate from an existing
+                /// OpenSSL certificate. Ownership is taken of 
+                /// the certificate. If shared is true, the 
+                /// certificate's reference count is incremented.
+
+        X509Certificate(const Poco::Crypto::X509Certificate& cert);
+                /// Creates the certificate by copying another one.
 
 	X509Certificate& operator = (const Poco::Crypto::X509Certificate& cert);
 		/// Assigns a certificate.
 
-	~X509Certificate();
-		/// Destroys the X509Certificate.
+        ~X509Certificate();
+                /// Destroys the X509Certificate.
 
-	long verify(const std::string& hostName) const;
-		/// Verifies the validity of the certificate against the host name.
-		///
-		/// Returns X509_V_OK if verification succeeded, or an
-		/// error code (X509_V_ERR_APPLICATION_VERIFICATION) otherwise.
-		
-	static long verify(const Poco::Crypto::X509Certificate& cert, const std::string& hostName);
-		/// Verifies the validity of the certificate against the host name.
-		///
-		/// Returns X509_V_OK if verification succeeded, or an
-		/// error code (X509_V_ERR_APPLICATION_VERIFICATION) otherwise.
-		
+        bool verify(const std::string& hostName) const;
+                /// Verifies the validity of the certificate against the host name.
+                ///
+                /// For this check to be successful, the certificate must contain
+                /// a domain name that matches the domain name
+                /// of the host.
+                /// 
+                /// Returns true if verification succeeded, or false otherwise.
+                
+        static bool verify(const Poco::Crypto::X509Certificate& cert, const std::string& hostName);
+                /// Verifies the validity of the certificate against the host name.
+                ///
+                /// For this check to be successful, the certificate must contain
+                /// a domain name that matches the domain name
+                /// of the host.
+                ///
+                /// Returns true if verification succeeded, or false otherwise.
+                
 protected:
-	static bool containsWildcards(const std::string& commonName);
+        static bool containsWildcards(const std::string& commonName);
 	static bool matchByAlias(const std::string& alias, const HostEntry& heData);
 	
 private:

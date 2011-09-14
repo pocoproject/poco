@@ -7,7 +7,7 @@
 // Package: SSLSockets
 // Module:  SecureSocketImpl
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -47,6 +47,7 @@
 #include "Poco/Net/DNS.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
+#include "Poco/Format.h"
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 
@@ -67,21 +68,28 @@ namespace Net {
 
 
 SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext): 
-	_pSSL(0),
-	_pSocket(pSocketImpl),
-	_pContext(pContext)
+        _pSSL(0),
+        _pSocket(pSocketImpl),
+        _pContext(pContext),
+        _needHandshake(false)
 {
-	poco_check_ptr (_pSocket);
-	poco_check_ptr (_pContext);
+        poco_check_ptr (_pSocket);
+        poco_check_ptr (_pContext);
 }
 
 
 SecureSocketImpl::~SecureSocketImpl()
 {
-	close();
+        try
+        {
+                reset();
+        }
+        catch (...)
+        {
+        }
 }
 
-	
+        
 SocketImpl* SecureSocketImpl::acceptConnection(SocketAddress& clientAddr)
 {
 	poco_assert (!_pSSL);
@@ -98,117 +106,92 @@ void SecureSocketImpl::acceptSSL()
 {
 	poco_assert (!_pSSL);
 
-	BIO* pBIO = BIO_new(BIO_s_socket());
-	if (!pBIO) throw SSLException("Cannot create BIO object");
-	BIO_set_fd(pBIO, _pSocket->sockfd(), BIO_NOCLOSE);
+        BIO* pBIO = BIO_new(BIO_s_socket());
+        if (!pBIO) throw SSLException("Cannot create BIO object");
+        BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
 
-	_pSSL = SSL_new(_pContext->sslContext());
-	if (!_pSSL)
+        _pSSL = SSL_new(_pContext->sslContext());
+        if (!_pSSL)
+	{
+		BIO_free(pBIO);
+                throw SSLException("Cannot create SSL object");
+        }
+        SSL_set_bio(_pSSL, pBIO, pBIO);
+        SSL_set_accept_state(_pSSL);
+        _needHandshake = true;
+}
+
+
+void SecureSocketImpl::connect(const SocketAddress& address, bool performHandshake)
+{
+        if (_pSSL) reset();
+        
+        poco_assert (!_pSSL);
+
+        _pSocket->connect(address);
+        connectSSL(performHandshake);
+}
+
+
+void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout, bool performHandshake)
+{
+        if (_pSSL) reset();
+        
+        poco_assert (!_pSSL);
+
+        _pSocket->connect(address, timeout);
+        connectSSL(performHandshake);
+}
+
+
+void SecureSocketImpl::connectNB(const SocketAddress& address)
+{
+        if (_pSSL) reset();
+        
+        poco_assert (!_pSSL);
+
+        _pSocket->connectNB(address);
+        connectSSL(false);
+}
+
+
+void SecureSocketImpl::connectSSL(bool performHandshake)
+{
+        poco_assert (!_pSSL);
+        poco_assert (_pSocket->initialized());
+        
+        BIO* pBIO = BIO_new(BIO_s_socket());
+        if (!pBIO) throw SSLException("Cannot create SSL BIO object");
+        BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
+
+        _pSSL = SSL_new(_pContext->sslContext());
+        if (!_pSSL) 
 	{
 		BIO_free(pBIO);
 		throw SSLException("Cannot create SSL object");
-	}
-	SSL_set_bio(_pSSL, pBIO, pBIO);
-
-	try
-	{
-		if (_pSocket->getBlocking())
-		{
-			int err = SSL_accept(_pSSL);			
-			if (err > 0)
-			{
-				std::string clientName = _pSocket->peerAddress().host().toString();
-				long certErr = verifyCertificate(clientName);
-				if (certErr != X509_V_OK)
-				{
-					std::string msg = Utility::convertCertificateError(certErr);
-					throw CertificateValidationException("Unacceptable certificate from " + clientName, msg);
-				}
-			}
-			else
-			{
-				handleError(err);
-			}
-		}
-		else
-		{
-			SSL_set_accept_state(_pSSL);
-		}
-	}
-	catch (...)
-	{
-		SSL_shutdown(_pSSL);
-		SSL_free(_pSSL);
-		_pSSL = 0;
-		throw;
-	}
-}
-
-
-void SecureSocketImpl::connect(const SocketAddress& address, const std::string& hostName)
-{
-	poco_assert (!_pSSL);
-
-	_pSocket->connect(address);
-	connectSSL(hostName);
-}
-
-
-void SecureSocketImpl::connect(const SocketAddress& address, const std::string& hostName, const Poco::Timespan& timeout)
-{
-	poco_assert (!_pSSL);
-
-	_pSocket->connect(address, timeout);
-	connectSSL(hostName);
-}
-
-
-void SecureSocketImpl::connectNB(const SocketAddress& address, const std::string& hostName)
-{
-	poco_assert (!_pSSL);
-
-	_pSocket->connectNB(address);
-	connectSSL(hostName);
-}
-
-
-void SecureSocketImpl::connectSSL(const std::string& hostName)
-{
-	poco_assert (!_pSSL);
-	poco_assert (_pSocket->initialized());
-	
-	BIO* pBIO = BIO_new(BIO_s_socket());
-	if (!pBIO) throw SSLException("Cannot create SSL BIO object");
-	BIO_set_fd(pBIO, _pSocket->sockfd(), BIO_NOCLOSE);
-
-	_pSSL = SSL_new(_pContext->sslContext());
-	if (!_pSSL) 
-	{
-		BIO_free(pBIO);
-		throw SSLException("Cannot create SSL object");
-	}
-	SSL_set_bio(_pSSL, pBIO, pBIO);
-	
-	try
-	{
-		if (_pSocket->getBlocking())
-		{
-			int ret = SSL_connect(_pSSL);
-			handleError(ret);
-		
-			long certErr = verifyCertificate(hostName);
-			if (certErr != X509_V_OK)
-			{
-				std::string msg = Utility::convertCertificateError(certErr);
-				throw InvalidCertificateException(msg);
-			}
-		}
-		else
-		{
-			SSL_set_connect_state(_pSSL);
-		}
-	}
-	catch (...)
+        }
+        SSL_set_bio(_pSSL, pBIO, pBIO);
+        
+        if (_pSession)
+        {
+                SSL_set_session(_pSSL, _pSession->sslSession());
+        }
+        
+        try
+        {
+                if (performHandshake && _pSocket->getBlocking())
+                {
+                        int ret = SSL_connect(_pSSL);
+                        handleError(ret);
+                        verifyPeerCertificate();
+                }
+                else
+                {
+                        SSL_set_connect_state(_pSSL);
+                        _needHandshake = true;
+                }
+        }
+        catch (...)
 	{
 		SSL_free(_pSSL);
 		_pSSL = 0;
@@ -235,23 +218,28 @@ void SecureSocketImpl::listen(int backlog)
 
 void SecureSocketImpl::shutdown()
 {
-	if (_pSSL)
-	{
-		// A proper clean shutdown would require us to
-		// retry the shutdown if we get a zero return
-		// value, until SSL_shutdown() returns 1.
-		// However, this will lead to problems with
-		// most web browsers, so we just set the shutdown
-		// flag by calling SSL_shutdown() once and be
-		// done with it.
-		int rc = SSL_shutdown(_pSSL);
-		if (rc < 0) handleError(rc);
-		SSL_clear(_pSSL);
-		SSL_free(_pSSL);
-		_pSSL = 0;
-	}
+    if (_pSSL)
+    {
+        // Don't shut down the socket more than once.
+        int shutdownState = SSL_get_shutdown(_pSSL);
+        bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
+        if (!shutdownSent)
+        {
+            // A proper clean shutdown would require us to
+            // retry the shutdown if we get a zero return
+            // value, until SSL_shutdown() returns 1.
+            // However, this will lead to problems with
+            // most web browsers, so we just set the shutdown
+            // flag by calling SSL_shutdown() once and be
+            // done with it.
+            int rc = SSL_shutdown(_pSSL);
+            if (rc < 0) handleError(rc);
+            SSL_clear(_pSSL);
+            SSL_free(_pSSL);
+            _pSSL = 0;
+        }
+    }
 }
-
 
 void SecureSocketImpl::close()
 {
@@ -263,31 +251,50 @@ void SecureSocketImpl::close()
 int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	poco_assert (_pSocket->initialized());
-	poco_check_ptr (_pSSL);
+        poco_check_ptr (_pSSL);
 
-	int rc;
-	do
-	{
-		rc = SSL_write(_pSSL, buffer, length);
+        int rc;
+        if (_needHandshake)
+        {
+                rc = completeHandshake();
+                if (rc == 1)
+                        verifyPeerCertificate();
+                else if (rc == 0)
+                        throw SSLConnectionUnexpectedlyClosedException();
+                else
+                        return rc;
+        }
+        do
+        {
+                rc = SSL_write(_pSSL, buffer, length);
 	}
-	while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
-	if (rc <= 0) 
-	{
-		return handleError(rc);
-	}
-	return rc;
+        while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
+        if (rc <= 0) 
+        {
+                rc = handleError(rc);
+                if (rc == 0) throw SSLConnectionUnexpectedlyClosedException();
+        }
+        return rc;
 }
 
 
 int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
 	poco_assert (_pSocket->initialized());
-	poco_check_ptr (_pSSL);
+        poco_check_ptr (_pSSL);
 
-	int rc;
-	do
-	{
-		rc = SSL_read(_pSSL, buffer, length);
+        int rc;
+        if (_needHandshake)
+        {
+                rc = completeHandshake();
+                if (rc == 1)
+                        verifyPeerCertificate();
+                else
+                        return rc;
+        }
+        do
+        {
+                rc = SSL_read(_pSSL, buffer, length);
 	}
 	while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
 	if (rc <= 0) 
@@ -298,23 +305,71 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 }
 
 
-long SecureSocketImpl::verifyCertificate(const std::string& hostName)
+int SecureSocketImpl::available() const
 {
-	Context::VerificationMode mode = _pContext->verificationMode();
-	if (mode == Context::VERIFY_NONE || (isLocalHost(hostName) && mode != Context::VERIFY_STRICT))
-	{
-		return X509_V_OK;
-	}
+        poco_check_ptr (_pSSL);
 
-	X509* pCert = SSL_get_peer_certificate(_pSSL);
-	if (pCert)
-	{
-		X509Certificate cert(pCert);
-		return cert.verify(hostName);
-	}
-	else return X509_V_OK;
+        return SSL_pending(_pSSL);
 }
 
+
+int SecureSocketImpl::completeHandshake()
+{
+        poco_assert (_pSocket->initialized());
+        poco_check_ptr (_pSSL);
+
+        int rc;
+        do
+        {
+                rc = SSL_do_handshake(_pSSL);
+        }
+        while (rc <= 0 && _pSocket->lastError() == POCO_EINTR);
+        if (rc <= 0) 
+        {
+                return handleError(rc);
+        }
+        _needHandshake = false;
+        return rc;
+}
+
+
+void SecureSocketImpl::verifyPeerCertificate()
+{
+        if (_peerHostName.empty())
+                _peerHostName = _pSocket->peerAddress().host().toString();
+                
+        verifyPeerCertificate(_peerHostName);
+}
+
+
+void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
+{
+        long certErr = verifyPeerCertificateImpl(hostName);
+        if (certErr != X509_V_OK)
+        {
+                std::string msg = Utility::convertCertificateError(certErr);
+                throw CertificateValidationException("Unacceptable certificate from " + hostName, msg);
+        }
+}
+
+
+long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
+{
+        Context::VerificationMode mode = _pContext->verificationMode();
+        if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
+            (isLocalHost(hostName) && mode != Context::VERIFY_STRICT))
+        {
+                return X509_V_OK;
+        }
+
+	X509* pCert = SSL_get_peer_certificate(_pSSL);
+        if (pCert)
+        {
+                X509Certificate cert(pCert);
+                return cert.verify(hostName) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
+        }
+        else return X509_V_OK;
+}
 
 
 bool SecureSocketImpl::isLocalHost(const std::string& hostName)
@@ -349,37 +404,91 @@ int SecureSocketImpl::handleError(int rc)
 	case SSL_ERROR_WANT_CONNECT: 
 	case SSL_ERROR_WANT_ACCEPT:
 	case SSL_ERROR_WANT_X509_LOOKUP:
-		// these should not occur
-		poco_bugcheck();
-		return rc;
-	case SSL_ERROR_SYSCALL:
-	case SSL_ERROR_SSL:
-		{
-			long lastError = ERR_get_error();
-			if (lastError == 0)
-			{
-				if (rc == 0)
-				{
-					throw SSLException("The underlying socket connection has been unexpectedly closed");
-				}
-				else if (rc == -1)
-				{
-					SecureStreamSocketImpl::error("The BIO reported an error");
-				}
-			}
-			else
+                // these should not occur
+                poco_bugcheck();
+                return rc;
+        default:
+                {
+                        long lastError = ERR_get_error();
+                        if (lastError == 0)
+                        {
+                                if (rc == 0)
+                                {
+                                        throw SSLConnectionUnexpectedlyClosedException();
+                                }
+                                else
+                                {
+                                        SecureStreamSocketImpl::error(Poco::format("The BIO reported an error: %d", rc));
+                                }
+                        }
+                        else
 			{
 				char buffer[256];
 				ERR_error_string_n(lastError, buffer, sizeof(buffer));
 				std::string msg(buffer);
 				throw SSLException(msg);
-			}
-		}
- 		break;
-	default:
-		break;
-	}
-	return rc;
+                        }
+                }
+                break;
+        }
+        return rc;
+}
+
+
+void SecureSocketImpl::setPeerHostName(const std::string& peerHostName)
+{
+        _peerHostName = peerHostName;
+}
+
+
+void SecureSocketImpl::reset()
+{
+        close();
+        if (_pSSL)
+        {
+                SSL_free(_pSSL);
+                _pSSL = 0;
+        }
+}
+
+
+void SecureSocketImpl::abort()
+{
+        _pSocket->shutdown();
+}
+
+
+Session::Ptr SecureSocketImpl::currentSession()
+{
+        if (_pSSL)
+        {
+                SSL_SESSION* pSession = SSL_get1_session(_pSSL);
+                if (pSession)
+                {
+                        if (_pSession && pSession == _pSession->sslSession())
+                        {
+                                SSL_SESSION_free(pSession);
+                                return _pSession;
+                        }
+                        else return new Session(pSession);
+                }
+        }
+        return 0;
+}
+
+        
+void SecureSocketImpl::useSession(Session::Ptr pSession)
+{
+        _pSession = pSession;
+}
+
+
+bool SecureSocketImpl::sessionWasReused()
+{
+        if (_pSSL)
+                return SSL_session_reused(_pSSL) != 0;
+        else
+                return false;
 }
 
 

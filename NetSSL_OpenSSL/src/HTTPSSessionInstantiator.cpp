@@ -55,10 +55,11 @@ HTTPSSessionInstantiator::~HTTPSSessionInstantiator()
 
 HTTPClientSession* HTTPSSessionInstantiator::createClientSession(const Poco::URI& uri)
 {
-	poco_assert (uri.getScheme() == "https");
-	HTTPSClientSession* pSession = new HTTPSClientSession(uri.getHost(), uri.getPort());
-	pSession->setProxy(proxyHost(), proxyPort());
-	return pSession;
+        poco_assert (uri.getScheme() == "https");
+        HTTPSClientSession* pSession = new HTTPSClientSession(uri.getHost(), uri.getPort());
+        pSession->setProxy(proxyHost(), proxyPort());
+        pSession->setProxyCredentials(proxyUsername(), proxyPassword());
+        return pSession;
 }
 
 

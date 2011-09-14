@@ -125,6 +125,12 @@ void SecureServerSocketImpl::sendUrgent(unsigned char data)
 {
 	throw Poco::InvalidAccessException("Cannot sendUrgent() on a SecureServerSocket");
 }
-	
+
+
+bool SecureServerSocketImpl::secure() const
+{
+        return true;
+}
+
 
 } } // namespace Poco::Net

@@ -43,10 +43,16 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/SecureStreamSocket.h"
+#include "Poco/Net/Context.h"
+#include "Poco/Net/Session.h"
+#include "Poco/Net/SSLManager.h"
+#include "Poco/Util/Application.h"
+#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Exception.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
+#include "Poco/Thread.h"
 #include "HTTPSTestServer.h"
 #include <istream>
 #include <ostream>
@@ -54,7 +60,9 @@
 
 
 using namespace Poco::Net;
+using Poco::Util::Application;
 using Poco::StreamCopier;
+using Poco::Thread;
 
 
 class TestRequestHandler: public HTTPRequestHandler
@@ -281,16 +289,16 @@ void HTTPSClientSessionTest::testKeepAlive()
 	s.sendRequest(request);
 	std::istream& rs3 = s.receiveResponse(response);
 	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getChunkedTransferEncoding());
-	assert (response.getKeepAlive());
-	std::ostringstream ostr3;
-	int n = StreamCopier::copyStream(rs3, ostr3);
-	assert (ostr3.str() == HTTPSTestServer::LARGE_BODY);
+        assert (response.getChunkedTransferEncoding());
+        assert (response.getKeepAlive());
+        std::ostringstream ostr3;
+        StreamCopier::copyStream(rs3, ostr3);
+        assert (ostr3.str() == HTTPSTestServer::LARGE_BODY);
 
-	request.setMethod(HTTPRequest::HTTP_HEAD);
+        request.setMethod(HTTPRequest::HTTP_HEAD);
 	request.setURI("/large");
 	s.sendRequest(request);
-	std::istream& rs4= s.receiveResponse(response);
+	std::istream& rs4 = s.receiveResponse(response);
 	assert (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
 	assert (response.getContentType() == "text/plain");
 	assert (!response.getKeepAlive());
@@ -317,12 +325,15 @@ void HTTPSClientSessionTest::testInterop()
 
 void HTTPSClientSessionTest::testProxy()
 {
-	HTTPSTestServer srv;
-	HTTPSClientSession s("secure.appinf.com");
-	s.setProxy("proxy.aon.at", 8080);
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
-	s.sendRequest(request);
-	X509Certificate cert = s.serverCertificate();
+        HTTPSTestServer srv;
+        HTTPSClientSession s("secure.appinf.com");
+        s.setProxy(
+                Application::instance().config().getString("testsuite.proxy.host"), 
+                Application::instance().config().getInt("testsuite.proxy.port")
+        );
+        HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
+        s.sendRequest(request);
+        X509Certificate cert = s.serverCertificate();
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
 	std::ostringstream ostr;
@@ -330,6 +341,96 @@ void HTTPSClientSessionTest::testProxy()
 	std::string str(ostr.str());
 	assert (str == "This is a test file for NetSSL.\n");
 	assert (cert.commonName() == "secure.appinf.com");
+}
+
+
+void HTTPSClientSessionTest::testCachedSession()
+{
+        // ensure OpenSSL machinery is fully setup
+        Context::Ptr pDefaultServerContext = SSLManager::instance().defaultServerContext();
+        Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
+        
+        Context::Ptr pServerContext = new Context(
+                Context::SERVER_USE, 
+                Application::instance().config().getString("openSSL.server.privateKeyFile"),
+                Application::instance().config().getString("openSSL.server.privateKeyFile"),
+                Application::instance().config().getString("openSSL.server.caConfig"),
+                Context::VERIFY_NONE,
+                9,
+                true,
+                "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");   
+        pServerContext->enableSessionCache(true, "TestSuite");
+        pServerContext->setSessionTimeout(10);
+        pServerContext->setSessionCacheSize(1000);
+        pServerContext->disableStatelessSessionResumption();
+
+        HTTPSTestServer srv(pServerContext);
+
+        Context::Ptr pClientContext = new Context(
+                Context::CLIENT_USE, 
+                Application::instance().config().getString("openSSL.client.privateKeyFile"),
+                Application::instance().config().getString("openSSL.client.privateKeyFile"),
+                Application::instance().config().getString("openSSL.client.caConfig"),
+                Context::VERIFY_RELAXED,
+                9,
+                true,
+                "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+        pClientContext->enableSessionCache(true);
+
+        HTTPSClientSession s1("localhost", srv.port(), pClientContext);
+        HTTPRequest request1(HTTPRequest::HTTP_GET, "/small");
+        s1.sendRequest(request1);
+        Session::Ptr pSession1 = s1.sslSession();
+        HTTPResponse response1;
+        std::istream& rs1 = s1.receiveResponse(response1);
+        assert (response1.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+        assert (response1.getContentType() == "text/plain");
+        std::ostringstream ostr1;
+        StreamCopier::copyStream(rs1, ostr1);
+        assert (ostr1.str() == HTTPSTestServer::SMALL_BODY);
+
+        HTTPSClientSession s2("localhost", srv.port(), pClientContext, pSession1);
+        HTTPRequest request2(HTTPRequest::HTTP_GET, "/small");
+        s2.sendRequest(request2);
+        Session::Ptr pSession2 = s2.sslSession();
+        HTTPResponse response2;
+        std::istream& rs2 = s2.receiveResponse(response2);
+        assert (response2.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+        assert (response2.getContentType() == "text/plain");
+        std::ostringstream ostr2;
+        StreamCopier::copyStream(rs2, ostr2);
+        assert (ostr2.str() == HTTPSTestServer::SMALL_BODY);
+        
+        assert (pSession1 == pSession2);
+
+        HTTPRequest request3(HTTPRequest::HTTP_GET, "/small");
+        s2.sendRequest(request3);
+        Session::Ptr pSession3 = s2.sslSession();
+        HTTPResponse response3;
+        std::istream& rs3 = s2.receiveResponse(response3);
+        assert (response3.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+        assert (response3.getContentType() == "text/plain");
+        std::ostringstream ostr3;
+        StreamCopier::copyStream(rs3, ostr3);
+        assert (ostr3.str() == HTTPSTestServer::SMALL_BODY);
+
+        assert (pSession1 == pSession3);
+
+        Thread::sleep(15000); // wait for session to expire
+        pServerContext->flushSessionCache();
+        
+        HTTPRequest request4(HTTPRequest::HTTP_GET, "/small");
+        s2.sendRequest(request4);
+        Session::Ptr pSession4 = s2.sslSession();
+        HTTPResponse response4;
+        std::istream& rs4 = s2.receiveResponse(response4);
+        assert (response4.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+        assert (response4.getContentType() == "text/plain");
+        std::ostringstream ostr4;
+        StreamCopier::copyStream(rs4, ostr4);
+        assert (ostr4.str() == HTTPSTestServer::SMALL_BODY);
+
+        assert (pSession1 != pSession4);
 }
 
 
@@ -355,9 +456,10 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallChunked);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunked);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunkedKeepAlive);
-	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
-	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
-	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
+        CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
+        CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
+        CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
+        CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
 
-	return pSuite;
+        return pSuite;
 }

@@ -1,7 +1,7 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/Main/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#6 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/samples/HTTPSTimeServer/src/HTTPSTimeServer.cpp#2 $
 //
 // This sample demonstrates the HTTPServer and related classes.
 //
@@ -36,10 +36,12 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerParams.h"
-#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureServerSocket.h"
+#include "Poco/Net/X509Certificate.h"
 #include "Poco/Timestamp.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
@@ -56,10 +58,13 @@
 
 
 using Poco::Net::SecureServerSocket;
+using Poco::Net::SecureStreamSocket;
 using Poco::Net::HTTPRequestHandler;
 using Poco::Net::HTTPRequestHandlerFactory;
 using Poco::Net::HTTPServer;
 using Poco::Net::HTTPServerRequest;
+using Poco::Net::HTTPServerRequestImpl;
+using Poco::Net::X509Certificate;
 using Poco::Net::HTTPServerResponse;
 using Poco::Net::HTTPServerParams;
 using Poco::Timestamp;
@@ -90,11 +95,22 @@ public:
 	
 	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 	{
-		Application& app = Application::instance();
-		app.logger().information("Request from " + request.clientAddress().toString());
+                Application& app = Application::instance();
+                app.logger().information("Request from " + request.clientAddress().toString());
 
-		Timestamp now;
-		std::string dt(DateTimeFormatter::format(now, _format));
+                SecureStreamSocket socket = static_cast<HTTPServerRequestImpl&>(request).socket();
+                if (socket.havePeerCertificate())
+                {
+                        X509Certificate cert = socket.peerCertificate();
+                        app.logger().information("Client certificate: " + cert.subjectName());
+                }
+                else
+                {
+                        app.logger().information("No client certificate available.");
+                }
+                
+                Timestamp now;
+                std::string dt(DateTimeFormatter::format(now, _format));
 
 		response.setChunkedTransferEncoding(true);
 		response.setContentType("text/html");
@@ -145,21 +161,23 @@ class HTTPSTimeServer: public Poco::Util::ServerApplication
 	/// To use the sample configuration file (HTTPTimeServer.properties),
 	/// copy the file to the directory where the HTTPTimeServer executable
 	/// resides. If you start the debug version of the HTTPTimeServer
-	/// (HTTPTimeServerd[.exe]), you must also create a copy of the configuration
-	/// file named HTTPTimeServerd.properties. In the configuration file, you
-	/// can specify the port on which the server is listening (default
-	/// 9980) and the format of the date/time string sent back to the client.
-	///
-	/// To test the TimeServer you can use any web browser (https://localhost:9980/).
+        /// (HTTPTimeServerd[.exe]), you must also create a copy of the configuration
+        /// file named HTTPTimeServerd.properties. In the configuration file, you
+        /// can specify the port on which the server is listening (default
+        /// 9443) and the format of the date/time string sent back to the client.
+        ///
+        /// To test the TimeServer you can use any web browser (https://localhost:9443/).
 {
 public:
-	HTTPSTimeServer(): _helpRequested(false)
-	{
-	}
-	
-	~HTTPSTimeServer()
-	{
-	}
+        HTTPSTimeServer(): _helpRequested(false)
+        {
+                Poco::Net::initializeSSL();
+        }
+        
+        ~HTTPSTimeServer()
+        {
+                Poco::Net::uninitializeSSL();
+        }
 
 protected:
 	void initialize(Application& self)
@@ -206,14 +224,14 @@ protected:
 		{
 			displayHelp();
 		}
-		else
-		{
-			// get parameters from configuration file
-			unsigned short port = (unsigned short) config().getInt("HTTPTimeServer.port", 9980);
-			std::string format(config().getString("HTTPTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
-			
-			// set-up a server socket
-			SecureServerSocket svs(port);
+                else
+                {
+                        // get parameters from configuration file
+                        unsigned short port = (unsigned short) config().getInt("HTTPSTimeServer.port", 9443);
+                        std::string format(config().getString("HTTPSTimeServer.format", DateTimeFormat::SORTABLE_FORMAT));
+                        
+                        // set-up a server socket
+                        SecureServerSocket svs(port);
 			// set-up a HTTPServer instance
 			HTTPServer srv(new TimeRequestHandlerFactory(format), svs, new HTTPServerParams);
 			// start the HTTPServer

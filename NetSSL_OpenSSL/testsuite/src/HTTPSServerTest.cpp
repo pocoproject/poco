@@ -74,13 +74,13 @@ namespace
 				response.setContentLength(request.getContentLength());
 			
 			response.setContentType(request.getContentType());
-			
-			std::istream& istr = request.stream();
-			std::ostream& ostr = response.send();
-			int n = StreamCopier::copyStream(istr, ostr);
-		}
-	};
-	
+                        
+                        std::istream& istr = request.stream();
+                        std::ostream& ostr = response.send();
+                        StreamCopier::copyStream(istr, ostr);
+                }
+        };
+        
 	class EchoHeaderRequestHandler: public HTTPRequestHandler
 	{
 	public:
