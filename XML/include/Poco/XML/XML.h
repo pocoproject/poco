@@ -71,21 +71,9 @@
 // Automatically link XML library.
 //
 #if defined(_MSC_VER)
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(XML_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoXMLd.lib")
-			#else
-				#pragma comment(lib, "PocoXML.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoXMLmtd.lib")
-			#else
-				#pragma comment(lib, "PocoXMLmt.lib")
-			#endif
-		#endif
-	#endif
+        #if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(XML_EXPORTS)
+                #pragma comment(lib, "PocoXML" POCO_LIB_SUFFIX)
+        #endif
 #endif
 
 

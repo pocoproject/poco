@@ -46,15 +46,15 @@ namespace Poco {
 namespace XML {
 
 
-const XMLString DOMParser::FEATURE_WHITESPACE = toXMLString("http://www.appinf.com/features/no-whitespace-in-element-content");
+const XMLString DOMParser::FEATURE_FILTER_WHITESPACE = toXMLString("http://www.appinf.com/features/no-whitespace-in-element-content");
 
 
 DOMParser::DOMParser(NamePool* pNamePool):
-	_pNamePool(pNamePool),
-	_whitespace(true)
+        _pNamePool(pNamePool),
+        _filterWhitespace(false)
 {
-	if (_pNamePool) _pNamePool->duplicate();
-	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
+        if (_pNamePool) _pNamePool->duplicate();
+        _saxParser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
 	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 }
 
@@ -85,51 +85,51 @@ void DOMParser::addEncoding(const XMLString& name, Poco::TextEncoding* pEncoding
 
 void DOMParser::setFeature(const XMLString& name, bool state)
 {
-	if (name == FEATURE_WHITESPACE)
-		_whitespace = state;
-	else
-		_saxParser.setFeature(name, state);
+        if (name == FEATURE_FILTER_WHITESPACE)
+                _filterWhitespace = state;
+        else
+                _saxParser.setFeature(name, state);
 }
 
 
 bool DOMParser::getFeature(const XMLString& name) const
 {
-	if (name == FEATURE_WHITESPACE)
-		return _whitespace;
-	else
-		return _saxParser.getFeature(name);
+        if (name == FEATURE_FILTER_WHITESPACE)
+                return _filterWhitespace;
+        else
+                return _saxParser.getFeature(name);
 }
 
 
 Document* DOMParser::parse(const XMLString& uri)
 {
-	if (_whitespace)
-	{
-		DOMBuilder builder(_saxParser, _pNamePool);
-		return builder.parse(uri);
-	}
-	else
-	{
-		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
-		return builder.parse(uri);
-	}
+        if (_filterWhitespace)
+        {
+                WhitespaceFilter filter(&_saxParser);
+                DOMBuilder builder(filter, _pNamePool);
+                return builder.parse(uri);
+        }
+        else
+        {
+                DOMBuilder builder(_saxParser, _pNamePool);
+                return builder.parse(uri);
+        }
 }
 
 
 Document* DOMParser::parse(InputSource* pInputSource)
 {
-	if (_whitespace)
-	{
-		DOMBuilder builder(_saxParser, _pNamePool);
-		return builder.parse(pInputSource);
-	}
-	else
-	{
-		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
-		return builder.parse(pInputSource);
-	}
+        if (_filterWhitespace)
+        {
+                WhitespaceFilter filter(&_saxParser);
+                DOMBuilder builder(filter, _pNamePool);
+                return builder.parse(pInputSource);
+        }
+        else
+        {
+                DOMBuilder builder(_saxParser, _pNamePool);
+                return builder.parse(pInputSource);
+        }
 }
 
 
@@ -141,17 +141,17 @@ Document* DOMParser::parseString(const std::string& xml)
 
 Document* DOMParser::parseMemory(const char* xml, std::size_t size)
 {
-	if (_whitespace)
-	{
-		DOMBuilder builder(_saxParser, _pNamePool);
-		return builder.parseMemoryNP(xml, size);
-	}
-	else
-	{
-		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
-		return builder.parseMemoryNP(xml, size);
-	}
+        if (_filterWhitespace)
+        {
+                WhitespaceFilter filter(&_saxParser);
+                DOMBuilder builder(filter, _pNamePool);
+                return builder.parseMemoryNP(xml, size);
+        }
+        else
+        {
+                DOMBuilder builder(_saxParser, _pNamePool);
+                return builder.parseMemoryNP(xml, size);
+        }
 }
 
 

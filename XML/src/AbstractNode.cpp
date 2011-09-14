@@ -237,9 +237,21 @@ XMLString AbstractNode::innerText() const
 }
 
 
+Node* AbstractNode::getNodeByPath(const XMLString& path) const
+{
+        return 0;
+}
+
+
+Node* AbstractNode::getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const
+{
+        return 0;
+}
+
+
 void AbstractNode::addEventListener(const XMLString& type, EventListener* listener, bool useCapture)
 {
-	if (_pEventDispatcher)
+        if (_pEventDispatcher)
 		_pEventDispatcher->removeEventListener(type, listener, useCapture);
 	else
 		_pEventDispatcher = new EventDispatcher;

@@ -53,8 +53,9 @@ namespace XML {
 
 
 DOMWriter::DOMWriter():
-	_pTextEncoding(0),
-	_options(0)
+        _pTextEncoding(0),
+        _options(0),
+        _indent("\t")
 {
 }
 
@@ -83,17 +84,24 @@ void DOMWriter::setNewLine(const std::string& newLine)
 }
 
 
+void DOMWriter::setIndent(const std::string& indent)
+{
+        _indent = indent;
+}
+
+
 void DOMWriter::writeNode(XMLByteOutputStream& ostr, const Node* pNode)
 {
-	poco_check_ptr (pNode);
+        poco_check_ptr (pNode);
 
 	bool isFragment = pNode->nodeType() != Node::DOCUMENT_NODE;
 
-	XMLWriter writer(ostr, _options, _encodingName, _pTextEncoding);
-	writer.setNewLine(_newLine);
-	
-	DOMSerializer serializer;
-	serializer.setContentHandler(&writer);
+        XMLWriter writer(ostr, _options, _encodingName, _pTextEncoding);
+        writer.setNewLine(_newLine);
+        writer.setIndent(_indent);
+        
+        DOMSerializer serializer;
+        serializer.setContentHandler(&writer);
 	serializer.setDTDHandler(&writer);
 	serializer.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<LexicalHandler*>(&writer));
 	if (isFragment) writer.startFragment();

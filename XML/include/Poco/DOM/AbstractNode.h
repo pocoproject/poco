@@ -91,10 +91,12 @@ public:
 	void removeEventListener(const XMLString& type, EventListener* listener, bool useCapture);
 	bool dispatchEvent(Event* evt);
 
-	// Extensions
-	XMLString innerText() const;
+        // Extensions
+        XMLString innerText() const;
+        Node* getNodeByPath(const XMLString& path) const;
+        Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
 
-	virtual void autoRelease();
+        virtual void autoRelease();
 
 protected:
 	AbstractNode(Document* pOwnerDocument);

@@ -83,14 +83,29 @@ class XML_API XMLWriter: public ContentHandler, public LexicalHandler, public DT
 	/// prefixes in the form ns1, ns2, etc.
 {
 public:
-	enum Options
-	{
-		CANONICAL             = 0x00, /// do not write an XML declaration
-		WRITE_XML_DECLARATION = 0x01, /// write an XML declaration 
-		PRETTY_PRINT          = 0x02  /// pretty-print XML markup
-	};
+        enum Options
+        {
+                CANONICAL               = 0x00,
+                        /// Do not write an XML declaration (default).
 
-	XMLWriter(XMLByteOutputStream& str, int options);
+                CANONICAL_XML           = 0x01, 
+                        /// Enables basic support for Canonical XML: 
+                        ///   - do not write an XML declaration
+                        ///   - do not use special empty element syntax
+                        ///   - set the New Line character to NEWLINE_LF
+
+                WRITE_XML_DECLARATION   = 0x02, 
+                        /// Write an XML declaration.
+
+                PRETTY_PRINT            = 0x04, 
+                        /// Pretty-print XML markup.
+
+                PRETTY_PRINT_ATTRIBUTES = 0x08
+                        /// Write each attribute on a separate line. 
+                        /// PRETTY_PRINT must be specified as well.
+        };
+
+        XMLWriter(XMLByteOutputStream& str, int options);
 		/// Creates the XMLWriter and sets the specified options.
 		///
 		/// The resulting stream will be UTF-8 encoded.
@@ -123,12 +138,23 @@ public:
 		///   * NEWLINE_LF      (Unix),
 		///   * NEWLINE_CR      (Macintosh)
 
-	const std::string& getNewLine() const;
-		/// Returns the line ending currently in use.
+        const std::string& getNewLine() const;
+                /// Returns the line ending currently in use.
 
-	// ContentHandler
-	void setDocumentLocator(const Locator* loc);
-		/// Currently unused.
+        void setIndent(const std::string& indent);
+                /// Sets the string used for one indentation step.
+                ///
+                /// The default is a single TAB character.
+                /// The given string should only contain TAB or SPACE
+                /// characters (e.g., a single TAB character, or
+                /// two to four SPACE characters).
+                
+        const std::string& getIndent() const;
+                /// Returns the string used for one indentation step.
+
+        // ContentHandler
+        void setDocumentLocator(const Locator* loc);
+                /// Currently unused.
 
 	void startDocument();
 		/// Writes a generic XML declaration to the stream.
@@ -260,12 +286,13 @@ protected:
 	void writeEndElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
 	void writeMarkup(const std::string& str) const;
 	void writeXML(const XMLString& str) const;
-	void writeXML(XMLChar ch) const;
-	void writeNewLine() const;
-	void writeIndent() const;
-	void writeName(const XMLString& prefix, const XMLString& localName);
-	void writeXMLDeclaration();
-	void closeStartTag();
+        void writeXML(XMLChar ch) const;
+        void writeNewLine() const;
+        void writeIndent() const;
+        void writeIndent(int indent) const;
+        void writeName(const XMLString& prefix, const XMLString& localName);
+        void writeXMLDeclaration();
+        void closeStartTag();
 	void declareAttributeNamespaces(const Attributes& attributes);
 	void addNamespaceAttributes(AttributeMap& attributeMap);
 	void addAttributes(AttributeMap& attributeMap, const Attributes& attributes, const XMLString& elementNamespaceURI);
@@ -302,18 +329,23 @@ private:
 	bool             _inInternalDTD;
 	bool             _contentWritten;
 	bool             _unclosedStartTag;
-	ElementStack     _elementStack;
-	NamespaceSupport _namespaces;
-	int              _prefix;
+        ElementStack     _elementStack;
+        NamespaceSupport _namespaces;
+        int              _prefix;
+        bool             _nsContextPushed;
+        std::string      _indent;
 
-	static const std::string MARKUP_QUOTENC;
-	static const std::string MARKUP_APOSENC;
-	static const std::string MARKUP_AMPENC;
-	static const std::string MARKUP_LTENC;
-	static const std::string MARKUP_GTENC;
-	static const std::string MARKUP_LT;
-	static const std::string MARKUP_GT;
-	static const std::string MARKUP_SLASHGT;
+        static const std::string MARKUP_QUOTENC;
+        static const std::string MARKUP_APOSENC;
+        static const std::string MARKUP_AMPENC;
+        static const std::string MARKUP_LTENC;
+        static const std::string MARKUP_GTENC;
+        static const std::string MARKUP_TABENC;
+        static const std::string MARKUP_CRENC;
+        static const std::string MARKUP_LFENC;
+        static const std::string MARKUP_LT;
+        static const std::string MARKUP_GT;
+        static const std::string MARKUP_SLASHGT;
 	static const std::string MARKUP_LTSLASH;
 	static const std::string MARKUP_COLON;
 	static const std::string MARKUP_EQQUOT;

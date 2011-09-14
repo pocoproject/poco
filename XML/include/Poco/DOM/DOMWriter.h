@@ -86,11 +86,22 @@ public:
 		/// of supported values. 
 
 	const std::string& getNewLine() const;
-		/// Returns the line ending characters used by the
-		/// internal XMLWriter.
+                /// Returns the line ending characters used by the
+                /// internal XMLWriter.
 
-	void writeNode(XMLByteOutputStream& ostr, const Node* pNode);
-		/// Writes the XML for the given node to the specified stream.
+        void setIndent(const std::string& indent);
+                /// Sets the string used for one indentation step.
+                ///
+                /// The default is a single TAB character.
+                /// The given string should only contain TAB or SPACE
+                /// characters (e.g., a single TAB character, or
+                /// two to four SPACE characters).
+                
+        const std::string& getIndent() const;
+                /// Returns the string used for one indentation step.
+
+        void writeNode(XMLByteOutputStream& ostr, const Node* pNode);
+                /// Writes the XML for the given node to the specified stream.
 
 	void writeNode(const std::string& systemId, const Node* pNode);
 		/// Writes the XML for the given node to the file specified in systemId,
@@ -98,9 +109,10 @@ public:
 
 private:
 	std::string         _encodingName;
-	Poco::TextEncoding* _pTextEncoding;
-	int                 _options;
-	std::string         _newLine;
+        Poco::TextEncoding* _pTextEncoding;
+        int                 _options;
+        std::string         _newLine;
+        std::string         _indent;
 };
 
 
@@ -122,6 +134,12 @@ inline int DOMWriter::getOptions() const
 inline const std::string& DOMWriter::getNewLine() const
 {
 	return _newLine;
+}
+
+
+inline const std::string& DOMWriter::getIndent() const
+{
+        return _indent;
 }
 
 

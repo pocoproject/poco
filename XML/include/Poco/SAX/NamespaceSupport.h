@@ -92,13 +92,13 @@ public:
 		/// Remove the given namespace prefix.
 	
 	void getDeclaredPrefixes(PrefixSet& prefixes) const;
-		/// Return an enumeration of all prefixes declared in this context.
-		/// 
-		/// The empty (default) prefix will be included in this enumeration; note that
-		/// this behaviour differs from that of getPrefix(java.lang.String) and getPrefixes().
+                /// Return an enumeration of all prefixes declared in this context.
+                /// 
+                /// The empty (default) prefix will be included in this enumeration; note that
+                /// this behaviour differs from that of getPrefix() and getPrefixes().
 
-	const XMLString& getPrefix(const XMLString& namespaceURI) const;
-		/// Return one of the prefixes mapped to a Namespace URI.
+        const XMLString& getPrefix(const XMLString& namespaceURI) const;
+                /// Return one of the prefixes mapped to a Namespace URI.
 		/// 
 		/// If more than one prefix is currently mapped to the same URI, this method
 		/// will make an arbitrary selection; if you want all of the prefixes, use the
@@ -179,14 +179,14 @@ public:
 		/// prefixes currently declared. The result will be returned in
 		/// namespaceURI and localName.
 		/// If the raw name has a prefix that has not been declared, then the return
-		/// value will be false, otherwise true.
-		///
-		/// Note that attribute names are processed differently than element names: 
-		/// an unprefixed element name will received the
-		/// default Namespace (if any), while an unprefixed element name will not.
+                /// value will be false, otherwise true.
+                ///
+                /// Note that attribute names are processed differently than element names: 
+                /// an unprefixed element name will receive the
+                /// default Namespace (if any), while an unprefixed attribute name will not.
 
-	void reset();
-		/// Reset this Namespace support object for reuse.
+        void reset();
+                /// Reset this Namespace support object for reuse.
 		/// 
 		/// It is necessary to invoke this method before reusing the Namespace support
 		/// object for a new session. If namespace declaration URIs are to be supported,

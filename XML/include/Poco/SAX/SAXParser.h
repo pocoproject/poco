@@ -56,12 +56,16 @@ class XML_API SAXParser: public XMLReader
 	///   * http://xml.org/sax/features/external-general-entities
 	///   * http://xml.org/sax/features/external-parameter-entities
 	///   * http://xml.org/sax/features/namespaces
-	///   * http://xml.org/sax/features/namespace-prefixes
-	///   * http://xml.org/sax/properties/lexical-handler
-	///   * http://xml.org/sax/properties/declaration-handler
+        ///   * http://xml.org/sax/features/namespace-prefixes
+        ///   * http://xml.org/sax/properties/lexical-handler
+        ///   * http://xml.org/sax/properties/declaration-handler
+        ///
+        /// The following proprietary extensions are supported:
+        ///   * http://www.appinf.com/features/enable-partial-reads --
+        ///     see ParserEngine::setEnablePartialReads()
 {
 public:
-	SAXParser();
+        SAXParser();
 		/// Creates an SAXParser.
 
 	SAXParser(const XMLString& encoding);
@@ -100,11 +104,13 @@ public:
 	void parse(const XMLString& systemId);
 	void parseMemoryNP(const char* xml, std::size_t size);
 	
-	/// Extensions
-	void parseString(const std::string& xml);
+        /// Extensions
+        void parseString(const std::string& xml);
+        
+        static const XMLString FEATURE_PARTIAL_READS;
 
 protected:
-	void setupParse();
+        void setupParse();
 
 private:
 	ParserEngine _engine;

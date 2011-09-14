@@ -76,13 +76,17 @@ unsigned long ElementsByTagNameList::length() const
 }
 
 
+namespace
+{
+        static const XMLString asterisk = toXMLString("*");
+}
+
+
 Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) const
 {
-	static const XMLString asterisk = toXMLString("*");
+        if (!pParent) return 0;
 
-	if (!pParent) return 0;
-
-	// preorder search
+        // preorder search
 	Node* pCur = pParent->firstChild();
 	while (pCur)
 	{
@@ -141,11 +145,9 @@ unsigned long ElementsByTagNameListNS::length() const
 
 Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) const
 {
-	static const XMLString asterisk = toXMLString("*");
+        if (!pParent) return 0;
 
-	if (!pParent) return 0;
-
-	// preorder search
+        // preorder search
 	Node* pCur = pParent->firstChild();
 	while (pCur)
 	{

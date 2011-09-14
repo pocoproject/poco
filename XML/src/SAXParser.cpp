@@ -46,9 +46,12 @@ namespace Poco {
 namespace XML {
 
 
+const XMLString SAXParser::FEATURE_PARTIAL_READS = toXMLString("http://www.appinf.com/features/enable-partial-reads");
+
+
 SAXParser::SAXParser():
-	_namespaces(true),
-	_namespacePrefixes(false)
+        _namespaces(true),
+        _namespacePrefixes(false)
 {
 }
 
@@ -141,10 +144,12 @@ void SAXParser::setFeature(const XMLString& featureId, bool state)
 	else if (featureId == XMLReader::FEATURE_EXTERNAL_PARAMETER_ENTITIES)
 		_engine.setExternalParameterEntities(state);
 	else if (featureId == XMLReader::FEATURE_NAMESPACES)
-		_namespaces = state;
-	else if (featureId == XMLReader::FEATURE_NAMESPACE_PREFIXES)
-		_namespacePrefixes = state;
-	else throw SAXNotRecognizedException(fromXMLString(featureId));
+                _namespaces = state;
+        else if (featureId == XMLReader::FEATURE_NAMESPACE_PREFIXES)
+                _namespacePrefixes = state;
+        else if (featureId == FEATURE_PARTIAL_READS)
+                _engine.setEnablePartialReads(state);
+        else throw SAXNotRecognizedException(fromXMLString(featureId));
 }
 
 
@@ -157,10 +162,12 @@ bool SAXParser::getFeature(const XMLString& featureId) const
 	else if (featureId == XMLReader::FEATURE_EXTERNAL_PARAMETER_ENTITIES)
 		return _engine.getExternalParameterEntities();
 	else if (featureId == XMLReader::FEATURE_NAMESPACES)
-		return _namespaces;
-	else if (featureId == XMLReader::FEATURE_NAMESPACE_PREFIXES)
-		return _namespacePrefixes;
-	else throw SAXNotRecognizedException(fromXMLString(featureId));
+                return _namespaces;
+        else if (featureId == XMLReader::FEATURE_NAMESPACE_PREFIXES)
+                return _namespacePrefixes;
+        else if (featureId == FEATURE_PARTIAL_READS)
+                return _engine.getEnablePartialReads();
+        else throw SAXNotRecognizedException(fromXMLString(featureId));
 }
 
 

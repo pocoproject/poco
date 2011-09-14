@@ -66,11 +66,12 @@ protected:
 	Node* find(const Node* pParent, unsigned long index) const;
 
 	const Node* _pParent;
-	XMLString   _name;
-	mutable unsigned long _count;
-	
-	friend class Element;
-	friend class Document;
+        XMLString   _name;
+        mutable unsigned long _count;
+        
+        friend class AbstractContainerNode;
+        friend class Element;
+        friend class Document;
 };
 
 
@@ -92,11 +93,12 @@ protected:
 
 	const Node* _pParent;
 	XMLString   _localName;
-	XMLString   _namespaceURI;
-	mutable unsigned long _count;
-	
-	friend class Element;
-	friend class Document;
+        XMLString   _namespaceURI;
+        mutable unsigned long _count;
+        
+        friend class AbstractContainerNode;
+        friend class Element;
+        friend class Document;
 };
 
 

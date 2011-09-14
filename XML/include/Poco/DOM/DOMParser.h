@@ -111,15 +111,15 @@ public:
 	EntityResolver* getEntityResolver() const;
 		/// Returns the entity resolver used by the underlying SAXParser.
 
-	void setEntityResolver(EntityResolver* pEntityResolver);
-		/// Sets the entity resolver on the underlying SAXParser.
+        void setEntityResolver(EntityResolver* pEntityResolver);
+                /// Sets the entity resolver on the underlying SAXParser.
 
-	static const XMLString FEATURE_WHITESPACE;
-	
+        static const XMLString FEATURE_FILTER_WHITESPACE;
+        
 private:
-	SAXParser _saxParser;
-	NamePool* _pNamePool;
-	bool      _whitespace;
+        SAXParser _saxParser;
+        NamePool* _pNamePool;
+        bool      _filterWhitespace;
 };
 
 

@@ -77,13 +77,13 @@ class XML_API TreeWalker
 {
 public:
 	TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter = 0);
-		/// Creates a TreeWalker over the subtree rooted at the specified node.
-		
-	TreeWalker(const TreeWalker& walker);
-		/// Creates a TreeWalker by copying another NodeIterator.
-		
-	TreeWalker& operator = (const TreeWalker& walker);
-		/// Assignment operator.
+                /// Creates a TreeWalker over the subtree rooted at the specified node.
+                
+        TreeWalker(const TreeWalker& walker);
+                /// Creates a TreeWalker by copying another TreeWalker.
+                
+        TreeWalker& operator = (const TreeWalker& walker);
+                /// Assignment operator.
 	
 	~TreeWalker();
 		/// Destroys the TreeWalker.

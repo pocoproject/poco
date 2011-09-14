@@ -43,6 +43,7 @@
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/AbstractContainerNode.h"
 #include "Poco/DOM/DocumentEvent.h"
+#include "Poco/DOM/Element.h"
 #include "Poco/XML/XMLString.h"
 #include "Poco/XML/NamePool.h"
 #include "Poco/AutoReleasePool.h"
