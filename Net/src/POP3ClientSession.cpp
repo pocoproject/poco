@@ -42,8 +42,8 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/UnbufferedStreamBuf.h"
+#include "Poco/Ascii.h"
 #include <istream>
-#include <cctype>
 
 
 using Poco::NumberFormatter;
@@ -156,7 +156,7 @@ void POP3ClientSession::login(const std::string& username, const std::string& pa
 {
 	std::string response;
 	_socket.receiveMessage(response);
-	if (!isPositive(response)) throw SMTPException("The POP3 service is unavailable", response);
+	if (!isPositive(response)) throw POP3Exception("The POP3 service is unavailable", response);
 	sendCommand("USER", username, response);
 	if (!isPositive(response)) throw POP3Exception("Login rejected for user", response);
 	sendCommand("PASS", password, response);
@@ -184,9 +184,9 @@ int POP3ClientSession::messageCount()
 	std::string::const_iterator it  = response.begin();
 	std::string::const_iterator end = response.end();
 	int count = 0;
-	while (it != end && !std::isspace(*it)) ++it;
-	while (it != end && std::isspace(*it)) ++it;
-	while (it != end && std::isdigit(*it)) count = count*10 + *it++ - '0';
+	while (it != end && !Poco::Ascii::isSpace(*it)) ++it;
+	while (it != end && Poco::Ascii::isSpace(*it)) ++it;
+	while (it != end && Poco::Ascii::isDigit(*it)) count = count*10 + *it++ - '0';
 	return count;
 }
 
@@ -203,9 +203,9 @@ void POP3ClientSession::listMessages(MessageInfoVec& messages)
 		MessageInfo info = {0, 0};
 		std::string::const_iterator it  = response.begin();
 		std::string::const_iterator end = response.end();
-		while (it != end && std::isdigit(*it)) info.id = info.id*10 + *it++ - '0';
-		while (it != end && std::isspace(*it)) ++it;
-		while (it != end && std::isdigit(*it)) info.size = info.size*10 + *it++ - '0';
+		while (it != end && Poco::Ascii::isDigit(*it)) info.id = info.id*10 + *it++ - '0';
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
+		while (it != end && Poco::Ascii::isDigit(*it)) info.size = info.size*10 + *it++ - '0';
 		messages.push_back(info);
 		_socket.receiveMessage(response);
 	}

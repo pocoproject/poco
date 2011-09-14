@@ -124,6 +124,9 @@ public:
 		///
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
+		///
+		/// Certain socket implementations may also return a negative
+		/// value denoting a certain condition.
 
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it

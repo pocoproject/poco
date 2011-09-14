@@ -266,12 +266,14 @@ void MailMessageTest::testWriteMultiPart()
 	message.addRecipient(r1);
 	message.setSubject("Test Message");
 	message.setSender("poco@appinf.com");
-	Timestamp ts(0);
-	message.setDate(ts);
-	message.addContent(new StringPartSource("Hello World!\r\n", "text/plain"), MailMessage::ENCODING_8BIT);
-	message.addAttachment("sample", new StringPartSource("This is some binary data. Really.", "application/octet-stream", "sample.dat"));
+        Timestamp ts(0);
+        message.setDate(ts);
+        message.addContent(new StringPartSource("Hello World!\r\n", "text/plain"), MailMessage::ENCODING_8BIT);
+        StringPartSource* pSPS = new StringPartSource("This is some binary data. Really.", "application/octet-stream", "sample.dat");
+        pSPS->headers().set("Content-ID", "abcd1234");
+        message.addAttachment("sample", pSPS);
 
-	assert (message.isMultipart());
+        assert (message.isMultipart());
 
 	std::ostringstream str;
 	message.write(str);
@@ -290,12 +292,13 @@ void MailMessageTest::testWriteMultiPart()
 		"Content-Type: text/plain\r\n"
 		"\r\n"
 		"Hello World!\r\n"
-		"\r\n"
-		"--$\r\n"
-		"Content-Disposition: attachment; filename=sample.dat\r\n"
-		"Content-Transfer-Encoding: base64\r\n"
-		"Content-Type: application/octet-stream; name=sample\r\n"
-		"\r\n"
+                "\r\n"
+                "--$\r\n"
+                "Content-Disposition: attachment; filename=sample.dat\r\n"
+                "Content-ID: abcd1234\r\n"
+                "Content-Transfer-Encoding: base64\r\n"
+                "Content-Type: application/octet-stream; name=sample\r\n"
+                "\r\n"
 		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
 		"--$--\r\n"
 	);
@@ -413,6 +416,28 @@ void MailMessageTest::testReadMultiPart()
 }
 
 
+void MailMessageTest::testEncodeWord()
+{
+        std::string plain("this is pure ASCII");
+        std::string encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
+        assert (encoded == plain);
+        
+        plain = "This text contains German Umlauts: \304\326";
+        encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
+        assert (encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6?=");
+        
+        plain = "This text contains German Umlauts: \304\326. "
+                "It is also a very long text. Longer than 75 "
+                "characters. Long enough to become three lines "
+                "after being word-encoded.";
+        encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
+        assert (encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6=2E_It_?=\r\n"
+                           " =?ISO-8859-1?q?is_also_a_very_long_text=2E_Longer_than_75_characters=2E_?=\r\n"
+                           " =?ISO-8859-1?q?Long_enough_to_become_three_lines_after_being_word-encode?=\r\n"
+                           " =?ISO-8859-1?q?d=2E?=");
+}
+
+
 void MailMessageTest::setUp()
 {
 }
@@ -432,9 +457,10 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteBase64);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteManyRecipients);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteMultiPart);
-	CppUnit_addTest(pSuite, MailMessageTest, testReadQP);
-	CppUnit_addTest(pSuite, MailMessageTest, testRead8Bit);
-	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
+        CppUnit_addTest(pSuite, MailMessageTest, testReadQP);
+        CppUnit_addTest(pSuite, MailMessageTest, testRead8Bit);
+        CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
+        CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);
 
-	return pSuite;
+        return pSuite;
 }

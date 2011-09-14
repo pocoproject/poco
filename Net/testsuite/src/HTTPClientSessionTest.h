@@ -54,12 +54,13 @@ public:
 	void testPostSmallChunked();
 	void testPostLargeChunked();
 	void testPostSmallClose();
-	void testPostLargeClose();
-	void testKeepAlive();
-	void testProxy();
+        void testPostLargeClose();
+        void testKeepAlive();
+        void testProxy();
+        void testProxyAuth();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

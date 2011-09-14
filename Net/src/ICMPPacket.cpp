@@ -39,7 +39,6 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
-#include "Poco/Process.h"
 #include "Poco/NumberFormatter.h"
 #include <sstream>
 
@@ -48,7 +47,6 @@ using Poco::InvalidArgumentException;
 using Poco::NotImplementedException;
 using Poco::Timestamp;
 using Poco::Timespan;
-using Poco::Process;
 using Poco::NumberFormatter;
 using Poco::UInt8;
 using Poco::UInt16;

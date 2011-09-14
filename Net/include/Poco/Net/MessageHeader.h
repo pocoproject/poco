@@ -136,13 +136,13 @@ public:
 		///
 		/// Enclosing quotes of parameter values are removed.
 
-	static void quote(const std::string& value, std::string& result, bool allowSpace = false);
-		/// Checks if the value must be quoted. If so, the value is
-		/// appended to result, enclosed in double-quotes.
-		/// Otherwise. the value is appended to result as-is.
-		
+        static void quote(const std::string& value, std::string& result, bool allowSpace = false);
+                /// Checks if the value must be quoted. If so, the value is
+                /// appended to result, enclosed in double-quotes.
+                /// Otherwise, the value is appended to result as-is.
+                
 private:
-	enum Limits
+        enum Limits
 		/// Limits for basic sanity checks when reading a header
 	{
 		MAX_NAME_LENGTH  = 256,

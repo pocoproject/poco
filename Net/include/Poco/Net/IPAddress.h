@@ -9,7 +9,7 @@
 //
 // Definition of the IPAddress class.
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -106,11 +106,18 @@ public:
 
 	IPAddress(const void* addr, poco_socklen_t length);
 		/// Creates an IPAddress from a native internet address.
-		/// A pointer to a in_addr or a in6_addr structure may be 
-		/// passed.
+                /// A pointer to a in_addr or a in6_addr structure may be 
+                /// passed.
 
-	~IPAddress();
-		/// Destroys the IPAddress.
+        IPAddress(const void* addr, poco_socklen_t length, Poco::UInt32 scope);
+                /// Creates an IPAddress from a native internet address.
+                /// A pointer to a in_addr or a in6_addr structure may be 
+                /// passed. Additionally, for an IPv6 address, a scope ID
+                /// may be specified. The scope ID will be ignored if an IPv4
+                /// address is specified.
+
+        ~IPAddress();
+                /// Destroys the IPAddress.
 
 	IPAddress& operator = (const IPAddress& addr);
 		/// Assigns an IPAddress.
@@ -118,12 +125,17 @@ public:
 	void swap(IPAddress& address);
 		/// Swaps the IPAddress with another one.
 		
-	Family family() const;
-		/// Returns the address family (IPv4 or IPv6) of the address.
-		
-	std::string toString() const;
-		/// Returns a string containing a representation of the address
-		/// in presentation format.
+        Family family() const;
+                /// Returns the address family (IPv4 or IPv6) of the address.
+
+        Poco::UInt32 scope() const;
+                /// Returns the IPv6 scope identifier of the address. Returns 0 if
+                /// the address is an IPv4 address, or the address is an
+                /// IPv6 address but does not have a scope identifier.
+
+        std::string toString() const;
+                /// Returns a string containing a representation of the address
+                /// in presentation format.
 		///
 		/// For IPv4 addresses the result will be in dotted-decimal
 		/// (d.d.d.d) notation.
@@ -145,12 +157,18 @@ public:
 		///
 		/// For dealing with IPv4 compatible addresses in a mixed environment,
 		/// a special syntax is available: x:x:x:x:x:x:d.d.d.d, where the 'x's are the 
-		/// hexadecimal values of the six high-order 16-bit pieces of the address, 
+                /// hexadecimal values of the six high-order 16-bit pieces of the address, 
         /// and the 'd's are the decimal values of the four low-order 8-bit pieces of the 
         /// standard IPv4 representation address. Example: ::FFFF:192.168.1.120
-	
-	bool isWildcard() const;
-		/// Returns true iff the address is a wildcard (all zero)
+        ///
+        /// If an IPv6 address contains a non-zero scope identifier, it is added
+        /// to the string, delimited by a percent character. On Windows platforms,
+        /// the numeric value (which specifies an interface index) is directly
+        /// appended. On Unix platforms, the name of the interface corresponding
+        /// to the index (interpretation of the scope identifier) is added.
+        
+        bool isWildcard() const;
+                /// Returns true iff the address is a wildcard (all zero)
 		/// address.
 		
 	bool isBroadcast() const;
@@ -322,6 +340,12 @@ public:
 		///
 		/// Returns false and leaves result unchanged otherwise.
 
+	static IPAddress wildcard(Family family = IPv4);
+		/// Returns a wildcard IPv4 or IPv6 address (0.0.0.0).
+		
+	static IPAddress broadcast();
+		/// Returns a broadcast IPv4 address (255.255.255.255).
+
 	enum
 	{
 		MAX_ADDRESS_LENGTH = 
@@ -344,9 +368,9 @@ private:
 //
 // inlines
 //
-inline void swap(IPAddress& a1, IPAddress& a2)
+inline void swap(IPAddress& addr1, IPAddress& addr2)
 {
-	a1.swap(a2);
+	addr1.swap(addr2);
 }
 
 

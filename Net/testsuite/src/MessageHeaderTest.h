@@ -48,12 +48,13 @@ public:
 
 	void testWrite();
 	void testRead1();
-	void testRead2();
-	void testRead3();
-	void testRead4();
-	void testReadFolding1();
-	void testReadFolding2();
-	void testReadFolding3();
+        void testRead2();
+        void testRead3();
+        void testRead4();
+        void testRead5();
+        void testReadFolding1();
+        void testReadFolding2();
+        void testReadFolding3();
 	void testReadFolding4();
 	void testReadFolding5();
 	void testReadInvalid1();

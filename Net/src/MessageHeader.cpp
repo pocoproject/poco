@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/Main/Net/src/MessageHeader.cpp#13 $
+// $Id: //poco/1.4/Net/src/MessageHeader.cpp#3 $
 //
 // Library: Net
 // Package: Messages
@@ -37,7 +37,7 @@
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/String.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 namespace Poco {
@@ -81,35 +81,38 @@ void MessageHeader::write(std::ostream& ostr) const
 void MessageHeader::read(std::istream& istr)
 {
 	static const int eof = std::char_traits<char>::eof();
+	std::streambuf& buf = *istr.rdbuf();
+
 	std::string name;
 	std::string value;
 	name.reserve(32);
 	value.reserve(64);
-	int ch = istr.get();
+	int ch = buf.sbumpc();
 	while (ch != eof && ch != '\r' && ch != '\n')
 	{
 		name.clear();
 		value.clear();
-		while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = istr.get(); }
-		if (ch == '\n') { ch = istr.get(); continue; } // ignore invalid header lines
+		while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = buf.sbumpc(); }
+		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
-		if (ch != eof) ch = istr.get(); // ':'
-		while (std::isspace(ch)) ch = istr.get();
-		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = istr.get(); }
-		if (ch == '\r') ch = istr.get();
+		if (ch != eof) ch = buf.sbumpc(); // ':'
+		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
+		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = buf.sbumpc(); }
+		if (ch == '\r') ch = buf.sbumpc();
 		if (ch == '\n')
-			ch = istr.get();
+			ch = buf.sbumpc();
 		else if (ch != eof)
 			throw MessageException("Field value too long/no CRLF found");
 		while (ch == ' ' || ch == '\t') // folding
 		{
-			while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = istr.get(); }
-			if (ch == '\r') ch = istr.get();
+			while (ch != eof && ch != '\r' && ch != '\n' && value.length() < MAX_VALUE_LENGTH) { value += ch; ch = buf.sbumpc(); }
+			if (ch == '\r') ch = buf.sbumpc();
 			if (ch == '\n')
-				ch = istr.get();
+				ch = buf.sbumpc();
 			else if (ch != eof)
 				throw MessageException("Folded field value too long/no CRLF found");
 		}
+		Poco::trimRightInPlace(value);
 		add(name, value);
 	}
 	istr.putback(ch);
@@ -169,7 +172,7 @@ void MessageHeader::splitParameters(const std::string& s, std::string& value, Na
 	parameters.clear();
 	std::string::const_iterator it  = s.begin();
 	std::string::const_iterator end = s.end();
-	while (it != end && std::isspace(*it)) ++it;
+	while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 	while (it != end && *it != ';') value += *it++;
 	Poco::trimRightInPlace(value);
 	if (it != end) ++it;
@@ -188,11 +191,11 @@ void MessageHeader::splitParameters(const std::string::const_iterator& begin, co
 	{
 		pname.clear();
 		pvalue.clear();
-		while (it != end && std::isspace(*it)) ++it;
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 		while (it != end && *it != '=' && *it != ';') pname += *it++;
 		Poco::trimRightInPlace(pname);
 		if (it != end && *it != ';') ++it;
-		while (it != end && std::isspace(*it)) ++it;
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 		while (it != end && *it != ';')
 		{
 			if (*it == '"')
@@ -228,7 +231,7 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 	bool mustQuote = false;
 	for (std::string::const_iterator it = value.begin(); !mustQuote && it != value.end(); ++it)
 	{
-		if (!std::isalnum(*it) && *it != '.' && *it != '_' && *it != '-' && !(std::isspace(*it) && allowSpace))
+		if (!Poco::Ascii::isAlphaNumeric(*it) && *it != '.' && *it != '_' && *it != '-' && !(Poco::Ascii::isSpace(*it) && allowSpace))
 			mustQuote = true;
 	}
 	if (mustQuote) result += '"';

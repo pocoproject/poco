@@ -1,7 +1,7 @@
 //
 // HTTPServerRequestImpl.cpp
 //
-// $Id: //poco/Main/Net/src/HTTPServerRequestImpl.cpp#4 $
+// $Id: //poco/1.4/Net/src/HTTPServerRequestImpl.cpp#1 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -56,6 +56,7 @@ const std::string HTTPServerRequestImpl::EXPECT("Expect");
 
 HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPServerSession& session, HTTPServerParams* pParams):
 	_response(response),
+	_session(session),
 	_pStream(0),
 	_pParams(pParams, true)
 {
@@ -80,6 +81,18 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponse& response, HTTPS
 HTTPServerRequestImpl::~HTTPServerRequestImpl()
 {
 	delete _pStream;
+}
+
+
+StreamSocket& HTTPServerRequestImpl::socket()
+{
+	return _session.socket();
+}
+
+
+StreamSocket HTTPServerRequestImpl::detachSocket()
+{
+	return _session.detachSocket();
 }
 
 

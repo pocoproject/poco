@@ -49,8 +49,9 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/NumberFormatter.h"
 #include <sstream>
-#include <cctype>
 
 
 using Poco::Base64Encoder;
@@ -82,12 +83,7 @@ namespace
 		
 		void handlePart(const MessageHeader& header, std::istream& stream)
 		{
-			int ch = stream.get();
-			while (ch >= 0)
-			{
-				_str += (char) ch;
-				ch = stream.get();
-			}
+			Poco::StreamCopier::copyToString(stream, _str);
 		}
 		
 	private:
@@ -320,7 +316,7 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 
 void MailMessage::writePart(MultipartWriter& writer, const Part& part) const
 {
-	MessageHeader partHeader;
+	MessageHeader partHeader(part.pSource->headers());
 	MediaType mediaType(part.pSource->mediaType());
 	if (!part.name.empty())
 		mediaType.setParameter("name", part.name);
@@ -356,12 +352,14 @@ void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTr
 		{
 			QuotedPrintableEncoder encoder(ostr);
 			StreamCopier::copyStream(istr, encoder);
+			encoder.close();
 		}
 		break;
 	case ENCODING_BASE64:
 		{
 			Base64Encoder encoder(ostr);
 			StreamCopier::copyStream(istr, encoder);
+			encoder.close();
 		}
 		break;
 	}
@@ -458,7 +456,7 @@ const std::string& MailMessage::contentTransferEncodingToString(ContentTransferE
 	switch (encoding)
 	{
 	case ENCODING_7BIT:
-		return CTE_8BIT;
+		return CTE_7BIT;
 	case ENCODING_8BIT:
 		return CTE_8BIT;
 	case ENCODING_QUOTED_PRINTABLE:
@@ -498,6 +496,81 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 	rec.append(">");
 	if (lineLength(str) + rec.length() > 70) str.append("\r\n\t");
 	str.append(rec);
+}
+
+
+std::string MailMessage::encodeWord(const std::string& text, const std::string& charset)
+{
+	bool containsNonASCII = false;
+	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	{
+		if (static_cast<unsigned char>(*it) > 127)
+		{
+			containsNonASCII = true;
+			break;
+		}
+	}
+	if (!containsNonASCII) return text;
+	
+	std::string encodedText;
+	std::string::size_type lineLength = 0;
+	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	{
+		if (lineLength == 0)
+		{
+			encodedText += "=?";
+			encodedText += charset;
+			encodedText += "?q?";
+			lineLength += charset.length() + 5;
+		}
+		switch (*it)
+		{
+		case ' ':
+			encodedText += '_';
+			lineLength++;
+			break;
+		case '=':
+		case '?':
+		case '_':
+		case '(':
+		case ')':
+		case '[':
+		case ']':
+		case '<':
+		case '>':
+		case ',':
+		case ';':
+		case ':':
+		case '.':
+		case '@':
+			encodedText += '=';
+			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(*it)), 2);
+			lineLength += 3;
+			break;
+		default:
+			if (*it > 32 && *it < 127)
+			{
+				encodedText += *it;
+				lineLength++;
+			}
+			else
+			{
+				encodedText += '=';
+				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(*it)), 2);
+				lineLength += 3;
+			}
+		}
+		if ((lineLength >= 64 && (*it == ' ' || *it == '\t' || *it == '\r' || *it == '\n')) || lineLength >= 72)
+		{
+			encodedText += "?=\r\n ";
+			lineLength = 0;
+		}
+	}
+	if (lineLength > 0)
+	{
+		encodedText += "?=";
+	}	
+	return encodedText;
 }
 
 

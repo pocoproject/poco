@@ -1,7 +1,7 @@
 //
 // QuotedPrintableDecoder.cpp
 //
-// $Id: //poco/svn/Net/src/QuotedPrintableDecoder.cpp#2 $
+// $Id: //poco/1.4/Net/src/QuotedPrintableDecoder.cpp#2 $
 //
 // Library: Net
 // Package: Messages
@@ -37,7 +37,7 @@
 #include "Poco/Net/QuotedPrintableDecoder.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 using Poco::UnbufferedStreamBuf;
@@ -50,7 +50,7 @@ namespace Net {
 
 
 QuotedPrintableDecoderBuf::QuotedPrintableDecoderBuf(std::istream& istr): 
-	_istr(istr)
+	_buf(*istr.rdbuf())
 {
 }
 
@@ -62,20 +62,20 @@ QuotedPrintableDecoderBuf::~QuotedPrintableDecoderBuf()
 
 int QuotedPrintableDecoderBuf::readFromDevice()
 {
-	int ch = _istr.get();
+	int ch = _buf.sbumpc();
 	while (ch == '=')
 	{
-		ch = _istr.get();
+		ch = _buf.sbumpc();
 		if (ch == '\r')
 		{
-			ch = _istr.get(); // read \n
+			ch = _buf.sbumpc(); // read \n
 		}
-		else if (std::isxdigit(ch))
+		else if (Poco::Ascii::isHexDigit(ch))
 		{
 			std::string hex;
 			hex += (char) ch;
-			ch = _istr.get();
-			if (std::isxdigit(ch))
+			ch = _buf.sbumpc();
+			if (Poco::Ascii::isHexDigit(ch))
 			{
 				hex += (char) ch;
 				return NumberParser::parseHex(hex);
@@ -86,7 +86,7 @@ int QuotedPrintableDecoderBuf::readFromDevice()
 		{
 			throw DataFormatException("Invalid occurrence of '=' in quoted-printable encoded stream");
 		}
-		ch = _istr.get();
+		ch = _buf.sbumpc();
 	}
 	return ch;
 }

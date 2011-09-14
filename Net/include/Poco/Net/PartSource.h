@@ -41,6 +41,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/MessageHeader.h"
 #include <istream>
 
 
@@ -67,6 +68,14 @@ public:
 	
 	const std::string& mediaType() const;
 		/// Returns the MIME media type for this part or attachment.
+		
+	MessageHeader& headers();
+		/// Returns a MessageHeader containing additional header
+		/// fields for the part.
+
+	const MessageHeader& headers() const;
+		/// Returns a MessageHeader containing additional header
+		/// fields for the part.
 
 	virtual ~PartSource();
 		/// Destroys the PartSource.
@@ -85,6 +94,7 @@ private:
 	PartSource& operator = (const PartSource&);
 
 	std::string _mediaType;
+	MessageHeader _headers;
 };
 
 
@@ -94,6 +104,18 @@ private:
 inline const std::string& PartSource::mediaType() const
 {
 	return _mediaType;
+}
+
+
+inline MessageHeader& PartSource::headers()
+{
+	return _headers;
+}
+
+
+inline const MessageHeader& PartSource::headers() const
+{
+	return _headers;
 }
 
 

@@ -68,6 +68,17 @@ FilePartSource::FilePartSource(const std::string& path, const std::string& media
 }
 
 
+FilePartSource::FilePartSource(const std::string& path, const std::string& filename, const std::string& mediaType):
+	PartSource(mediaType),
+	_filename(filename),
+	_istr(path)
+{
+	Path p(path);
+	if (!_istr.good())
+		throw OpenFileException(path);
+}
+
+
 FilePartSource::~FilePartSource()
 {
 }

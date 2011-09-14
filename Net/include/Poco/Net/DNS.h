@@ -45,7 +45,6 @@
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/HostEntry.h"
 #include "Poco/Mutex.h"
-#include <map>
 
 
 namespace Poco {
@@ -56,13 +55,13 @@ class Net_API DNS
 	/// This class provides an interface to the
 	/// domain name service.
 	///
-	/// An internal DNS cache is used to speed up name lookups.
+        /// An internal DNS cache is used to speed up name lookups.
 {
 public:
-	static HostEntry hostByName(const std::string& hostname);
-		/// Returns a HostEntry object containing the DNS information
-		/// for the host with the given name.
-		///
+        static HostEntry hostByName(const std::string& hostname);
+                /// Returns a HostEntry object containing the DNS information
+                /// for the host with the given name.
+                ///
 		/// Throws a HostNotFoundException if a host with the given
 		/// name cannot be found.
 		///
@@ -70,24 +69,24 @@ public:
 		/// found for the hostname.
 		///
 		/// Throws a DNSException in case of a general DNS error.
-		///
-		/// Throws an IOException in case of any other error.
-		
-	static HostEntry hostByAddress(const IPAddress& address);
-		/// Returns a HostEntry object containing the DNS information
-		/// for the host with the given IP address.
-		///
+                ///
+                /// Throws an IOException in case of any other error.
+                
+        static HostEntry hostByAddress(const IPAddress& address);
+                /// Returns a HostEntry object containing the DNS information
+                /// for the host with the given IP address.
+                ///
 		/// Throws a HostNotFoundException if a host with the given
 		/// name cannot be found.
 		///
 		/// Throws a DNSException in case of a general DNS error.
-		///
-		/// Throws an IOException in case of any other error.
+                ///
+                /// Throws an IOException in case of any other error.
 
-	static HostEntry resolve(const std::string& address);
-		/// Returns a HostEntry object containing the DNS information
-		/// for the host with the given IP address or host name.
-		///
+        static HostEntry resolve(const std::string& address);
+                /// Returns a HostEntry object containing the DNS information
+                /// for the host with the given IP address or host name.
+                ///
 		/// Throws a HostNotFoundException if a host with the given
 		/// name cannot be found.
 		///
@@ -99,13 +98,13 @@ public:
 		/// Throws an IOException in case of any other error.
 		
 	static IPAddress resolveOne(const std::string& address);
-		/// Convenience method that calls resolve(address) and returns 
-		/// the first address from the HostInfo.
+                /// Convenience method that calls resolve(address) and returns 
+                /// the first address from the HostInfo.
 
-	static HostEntry thisHost();
-		/// Returns a HostEntry object containing the DNS information
-		/// for this host.
-		///
+        static HostEntry thisHost();
+                /// Returns a HostEntry object containing the DNS information
+                /// for this host.
+                ///
 		/// Throws a HostNotFoundException if DNS information 
 		/// for this host cannot be found.
 		///
@@ -113,27 +112,28 @@ public:
 		/// found for this host.
 		///
 		/// Throws a DNSException in case of a general DNS error.
-		///
-		/// Throws an IOException in case of any other error.
+                ///
+                /// Throws an IOException in case of any other error.
 
-	static void flushCache();
-		/// Flushes the internal DNS cache.
-		
-	static std::string hostName();
-		/// Returns the host name of this host.
+        //@ deprecated
+        static void flushCache();
+                /// Flushes the internal DNS cache.
+                ///
+                /// As of 1.4.2, the DNS cache is no longer used
+                /// and this method does not do anything.
+                
+        static std::string hostName();
+                /// Returns the host name of this host.
 
 protected:
 	static int lastError();
 		/// Returns the code of the last error.
 		
-	static void error(int code, const std::string& arg);
-		/// Throws an exception according to the error code.
-		
-private:
-	typedef std::map<std::string, HostEntry> DNSCache;
-	
-	static DNSCache _cache;
-	static Poco::FastMutex _mutex;
+        static void error(int code, const std::string& arg);
+                /// Throws an exception according to the error code.
+
+        static void aierror(int code, const std::string& arg);
+                /// Throws an exception according to the getaddrinfo() error code.
 };
 
 

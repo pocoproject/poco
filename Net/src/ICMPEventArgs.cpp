@@ -41,6 +41,7 @@
 #include "Poco/Net/DNS.h"
 #include "Poco/Exception.h"
 #include "Poco/Net/NetException.h"
+#include <numeric>
 
 
 using Poco::IOException;
@@ -56,7 +57,7 @@ ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int 
 	_sent(0),
 	_dataSize(dataSize), 
 	_ttl(ttl), 
-	_rtt(0, repetitions), 
+	_rtt(repetitions, 0), 
 	_errors(repetitions)
 {
 }
@@ -97,8 +98,8 @@ std::string ICMPEventArgs::hostAddress() const
 
 void ICMPEventArgs::setRepetitions(int repetitions)
 {
-	_rtt.apply(&ICMPEventArgs::zeroVal);
-	if (_rtt.size() != repetitions) _rtt.resize(repetitions, 0);
+	_rtt.clear();
+	_rtt.resize(repetitions, 0);
 	_errors.assign(repetitions, "");
 }
 
@@ -174,7 +175,7 @@ int ICMPEventArgs::avgRTT() const
 {
 	if (0 == _rtt.size()) return 0;
 	
-	return (int) (_rtt.sum() / _rtt.size());
+	return (int) (std::accumulate(_rtt.begin(), _rtt.end(), 0) / _rtt.size());
 }
 
 
@@ -183,12 +184,6 @@ float ICMPEventArgs::percent() const
 	if (0 == _rtt.size()) return 0;
 
 	return ((float) received() / (float) _rtt.size()) * (float) 100.0;
-}
-
-
-int ICMPEventArgs::zeroVal(int n)
-{
-	 return n*0;
 }
 
 

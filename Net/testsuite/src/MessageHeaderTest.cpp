@@ -123,9 +123,22 @@ void MessageHeaderTest::testRead4()
 }
 
 
+void MessageHeaderTest::testRead5()
+{
+        std::string s("name1:\r\nname2: value2\r\nname3: value3  \r\n");
+        std::istringstream istr(s);
+        MessageHeader mh;
+        mh.read(istr);
+        assert (mh.size() == 3);
+        assert (mh["name1"] == "");
+        assert (mh["name2"] == "value2");
+        assert (mh["name3"] == "value3");
+}
+
+
 void MessageHeaderTest::testReadFolding1()
 {
-	std::string s("name1: value1\r\nname2: value21\r\n value22\r\nname3: value3\r\n");
+        std::string s("name1: value1\r\nname2: value21\r\n value22\r\nname3: value3\r\n");
 	std::istringstream istr(s);
 	MessageHeader mh;
 	mh.read(istr);
@@ -368,12 +381,13 @@ CppUnit::Test* MessageHeaderTest::suite()
 
 	CppUnit_addTest(pSuite, MessageHeaderTest, testWrite);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testRead1);
-	CppUnit_addTest(pSuite, MessageHeaderTest, testRead2);
-	CppUnit_addTest(pSuite, MessageHeaderTest, testRead3);
-	CppUnit_addTest(pSuite, MessageHeaderTest, testRead4);
-	CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding1);
-	CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding2);
-	CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding3);
+        CppUnit_addTest(pSuite, MessageHeaderTest, testRead2);
+        CppUnit_addTest(pSuite, MessageHeaderTest, testRead3);
+        CppUnit_addTest(pSuite, MessageHeaderTest, testRead4);
+        CppUnit_addTest(pSuite, MessageHeaderTest, testRead5);
+        CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding1);
+        CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding2);
+        CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding3);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding4);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testReadFolding5);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testReadInvalid1);

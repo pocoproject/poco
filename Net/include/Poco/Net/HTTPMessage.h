@@ -62,19 +62,19 @@ public:
 	void setVersion(const std::string& version);
 		/// Sets the HTTP version for this message.
 		
-	const std::string& getVersion() const;
-		/// Returns the HTTP version for this message.
-		
-	void setContentLength(int length);
-		/// Sets the Content-Length header.
-		///
-		/// If length is UNKNOWN_CONTENT_LENGTH, removes
-		/// the Content-Length header.
-		
-	int getContentLength() const;
-		/// Returns the content length for this message,
-		/// which may be UNKNOWN_CONTENT_LENGTH if
-		/// no Content-Length header is present.
+        const std::string& getVersion() const;
+                /// Returns the HTTP version for this message.
+                
+        void setContentLength(std::streamsize length);
+                /// Sets the Content-Length header.
+                ///
+                /// If length is UNKNOWN_CONTENT_LENGTH, removes
+                /// the Content-Length header.
+                
+        std::streamsize getContentLength() const;
+                /// Returns the content length for this message,
+                /// which may be UNKNOWN_CONTENT_LENGTH if
+                /// no Content-Length header is present.
 
 	void setTransferEncoding(const std::string& transferEncoding);
 		/// Sets the transfer encoding for this message.

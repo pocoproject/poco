@@ -37,8 +37,8 @@
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/String.h"
+#include "Poco/Ascii.h"
 #include <algorithm>
-#include <cctype>
 
 
 using Poco::icompare;
@@ -172,6 +172,28 @@ bool MediaType::matches(const std::string& type) const
 }
 
 
+bool MediaType::matchesRange(const MediaType& mediaType) const
+{
+	return matchesRange(mediaType._type, mediaType._subType);
+}
+
+
+bool MediaType::matchesRange(const std::string& type, const std::string& subType) const
+{
+	if (_type == "*" || type == "*" || icompare(_type, type) == 0) 
+	{
+		return _subType == "*" || subType == "*" || icompare(_subType, subType) == 0;
+	}
+	else return false;
+}
+
+
+bool MediaType::matchesRange(const std::string& type) const
+{
+	return _type == "*" || type == "*" || matches(type);
+}
+
+
 void MediaType::parse(const std::string& mediaType)
 {
 	_type.clear();
@@ -179,10 +201,10 @@ void MediaType::parse(const std::string& mediaType)
 	_parameters.clear();
 	std::string::const_iterator it  = mediaType.begin();
 	std::string::const_iterator end = mediaType.end();
-	while (it != end && std::isspace(*it)) ++it;
+	while (it != end && Poco::Ascii::isSpace(*it)) ++it;
 	while (it != end && *it != '/') _type += *it++;
 	if (it != end) ++it;
-	while (it != end && *it != ';' && !std::isspace(*it)) _subType += *it++;
+	while (it != end && *it != ';' && !Poco::Ascii::isSpace(*it)) _subType += *it++;
 	while (it != end && *it != ';') ++it;
 	MessageHeader::splitParameters(it, end, _parameters);
 }

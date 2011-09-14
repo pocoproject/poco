@@ -52,12 +52,14 @@ public:
 	void testClassification();
 	void testMCClassification();
 	void testClassification6();
-	void testMCClassification6();
-	void testRelationals();
-	void testRelationals6();
-	
-	void setUp();
-	void tearDown();
+        void testMCClassification6();
+        void testRelationals();
+        void testRelationals6();
+        void testWildcard();
+        void testBroadcast();
+        
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

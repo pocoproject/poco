@@ -43,17 +43,12 @@ namespace Poco {
 namespace Net {
 
 
-//
-// HostEntryImpl
-//
-
-
-HostEntryImpl::HostEntryImpl()
+HostEntry::HostEntry()
 {
 }
 
 	
-HostEntryImpl::HostEntryImpl(struct hostent* entry)
+HostEntry::HostEntry(struct hostent* entry)
 {
 	poco_check_ptr (entry);
 	
@@ -79,10 +74,10 @@ HostEntryImpl::HostEntryImpl(struct hostent* entry)
 }
 
 
-#if defined(_WIN32) && defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6)
 
 
-HostEntryImpl::HostEntryImpl(struct addrinfo* ainfo)
+HostEntry::HostEntry(struct addrinfo* ainfo)
 {
 	poco_check_ptr (ainfo);
 	
@@ -97,66 +92,63 @@ HostEntryImpl::HostEntryImpl(struct addrinfo* ainfo)
 			switch (ai->ai_addr->sa_family)
 			{
 			case AF_INET:
-				_addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in*>(ai->ai_addr)->sin_addr, sizeof(in_addr)));
-				break;
-			case AF_INET6:
-				_addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in6*>(ai->ai_addr)->sin6_addr, sizeof(in6_addr)));
-				break;
-			}
-		}
+                                _addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in*>(ai->ai_addr)->sin_addr, sizeof(in_addr)));
+                                break;
+                        case AF_INET6:
+                                _addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in6*>(ai->ai_addr)->sin6_addr, sizeof(in6_addr), reinterpret_cast<struct sockaddr_in6*>(ai->ai_addr)->sin6_scope_id));
+                                break;
+                        }
+                }
 	}
 }
 
 
-#endif
+#endif // POCO_HAVE_IPv6
 
 
-HostEntryImpl::~HostEntryImpl()
+#if defined(POCO_VXWORKS)
+
+
+HostEntry::HostEntry(const std::string& name, const IPAddress& addr):
+        _name(name)
 {
+        _addresses.push_back(addr);
 }
 
 
-//
-// HostEntry
-//
-
-
-HostEntry::HostEntry():
-	_pImpl(new HostEntryImpl)
-{
-}
-
-	
-HostEntry::HostEntry(struct hostent* entry):
-	_pImpl(new HostEntryImpl(entry))
-{
-}
-
-
-#if defined(_WIN32) && defined(POCO_HAVE_IPv6)
-HostEntry::HostEntry(struct addrinfo* info):
-	_pImpl(new HostEntryImpl(info))
-{
-}
-#endif
-
-
-HostEntry::~HostEntry()
-{
-}
+#endif // POCO_VXWORKS
 
 
 HostEntry::HostEntry(const HostEntry& entry):
-	_pImpl(entry._pImpl)
+	_name(entry._name),
+	_aliases(entry._aliases),
+	_addresses(entry._addresses)
 {
 }
 
 
 HostEntry& HostEntry::operator = (const HostEntry& entry)
 {
-	HostEntry tmp(entry);
-	tmp.swap(*this);
+	if (&entry != this)
+	{
+		_name          = entry._name;
+		_aliases       = entry._aliases;
+		_addresses     = entry._addresses;
+	}
 	return *this;
+}
+
+
+void HostEntry::swap(HostEntry& hostEntry)
+{
+	std::swap(_name, hostEntry._name);
+	std::swap(_aliases, hostEntry._aliases);
+	std::swap(_addresses, hostEntry._addresses);
+}
+
+
+HostEntry::~HostEntry()
+{
 }
 
 

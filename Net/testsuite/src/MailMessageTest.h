@@ -51,12 +51,13 @@ public:
 	void testWriteBase64();
 	void testWriteManyRecipients();
 	void testWriteMultiPart();
-	void testReadQP();
-	void testRead8Bit();
-	void testReadMultiPart();
+        void testReadQP();
+        void testRead8Bit();
+        void testReadMultiPart();
+        void testEncodeWord();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

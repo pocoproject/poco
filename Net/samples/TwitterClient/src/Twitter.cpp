@@ -110,7 +110,7 @@ Poco::AutoPtr<Poco::XML::Document> Twitter::invoke(const std::string& httpMethod
 	
 	// Create a DOM document from the response.
 	Poco::XML::DOMParser parser;
-	parser.setFeature(Poco::XML::DOMParser::FEATURE_WHITESPACE, true);
+	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
 	Poco::XML::InputSource source(rs);
 	Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parse(&source);

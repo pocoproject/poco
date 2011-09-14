@@ -59,6 +59,8 @@ HTTPServerSession::~HTTPServerSession()
 
 bool HTTPServerSession::hasMoreRequests()
 {
+	if (!socket().impl()->initialized()) return false;
+
 	if (_firstRequest)
 	{
 		_firstRequest = false;

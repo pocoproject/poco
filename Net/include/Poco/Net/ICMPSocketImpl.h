@@ -75,6 +75,7 @@ protected:
 
 private:
 	ICMPPacket _icmpPacket;
+	int _timeout;
 };
 
 

@@ -198,6 +198,13 @@ protected:
 		/// dispatches the ShutdownNotification and thus should be called by overriding
 		/// implementations.
 
+	virtual void onBusy();
+		/// Called when the SocketReactor is busy and at least one notification
+		/// has been dispatched.
+		///
+		/// Can be overridden by subclasses to perform additional
+		/// periodic tasks. The default implementation does nothing.
+
 	void dispatch(const Socket& socket, SocketNotification* pNotification);
 		/// Dispatches the given notification to all observers
 		/// registered for the given socket.

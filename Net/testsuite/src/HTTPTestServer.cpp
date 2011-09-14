@@ -100,12 +100,20 @@ void HTTPTestServer::run()
 					else
 						n = 0;
 				}
-				std::string response = handleRequest();
-				ss.sendBytes(response.data(), (int) response.size());
-				Poco::Thread::sleep(1000);
-			}
-			catch (Poco::Exception& exc)
-			{
+                                std::string response = handleRequest();
+                                ss.sendBytes(response.data(), (int) response.size());
+                                Poco::Thread::sleep(1000);
+                                try
+                                {
+                                        ss.shutdown();
+                                        Poco::Thread::sleep(1000);
+                                }
+                                catch (Poco::Exception& exc)
+                                {
+                                }
+                        }
+                        catch (Poco::Exception& exc)
+                        {
 				std::cerr << "HTTPTestServer: " << exc.displayText() << std::endl;
 			}
 		}

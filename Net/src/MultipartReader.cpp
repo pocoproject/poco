@@ -1,7 +1,7 @@
 //
 // MultipartReader.cpp
 //
-// $Id: //poco/Main/Net/src/MultipartReader.cpp#13 $
+// $Id: //poco/1.4/Net/src/MultipartReader.cpp#2 $
 //
 // Library: Net
 // Package: Messages
@@ -37,7 +37,7 @@
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
-#include <cctype>
+#include "Poco/Ascii.h"
 
 
 using Poco::BufferedStreamBuf;
@@ -72,58 +72,60 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	poco_assert_dbg (length >= _boundary.length() + 6);
 
 	static const int eof = std::char_traits<char>::eof();
+	std::streambuf& buf = *_istr.rdbuf();
+
 	int n  = 0;
-	int ch = _istr.get();
+	int ch = buf.sbumpc();
 	if (ch == eof) return -1;
 	*buffer++ = (char) ch; ++n;
-	if (ch == '\n' || (ch == '\r' && _istr.peek() == '\n'))
+	if (ch == '\n' || (ch == '\r' && buf.sgetc() == '\n'))
 	{
 		if (ch == '\r')
 		{
-			ch = _istr.get(); // '\n'
+			ch = buf.sbumpc(); // '\n'
 			*buffer++ = (char) ch; ++n;
 		}
-		ch = _istr.peek();
+		ch = buf.sgetc();
 		if (ch == '\r' || ch == '\n') return n;
-		*buffer++ = (char) _istr.get(); ++n;
-		if (ch == '-' && _istr.peek() == '-')
+		*buffer++ = (char) buf.sbumpc(); ++n;
+		if (ch == '-' && buf.sgetc() == '-')
 		{
-			ch = _istr.get(); // '-'
+			ch = buf.sbumpc(); // '-'
 			*buffer++ = (char) ch; ++n;
 			std::string::const_iterator it  = _boundary.begin();
 			std::string::const_iterator end = _boundary.end();
-			ch = _istr.get();
+			ch = buf.sbumpc();
 			*buffer++ = (char) ch; ++n;
 			while (it != end && ch == *it)
 			{
 				++it;
-				ch = _istr.get();
+				ch = buf.sbumpc();
 				*buffer++ = (char) ch; ++n;
 			}
 			if (it == end)
 			{
-				if (ch == '\n' || (ch == '\r' && _istr.peek() == '\n'))
+				if (ch == '\n' || (ch == '\r' && buf.sgetc() == '\n'))
 				{
 					if (ch == '\r')
 					{
-						ch = _istr.get(); // '\n'
+						ch = buf.sbumpc(); // '\n'
 					}
 					return 0;					
 				}
-				else if (ch == '-' && _istr.peek() == '-')
+				else if (ch == '-' && buf.sgetc() == '-')
 				{
-					ch = _istr.get(); // '-'
+					ch = buf.sbumpc(); // '-'
 					_lastPart = true;
 					return 0;
 				}
 			}
 		}
 	}
-	ch = _istr.peek();
+	ch = buf.sgetc();
 	while (ch != eof && ch != '\r' && ch != '\n' && n < length)
 	{
-		*buffer++ = (char) _istr.get(); ++n;
-		ch = _istr.peek();
+		*buffer++ = (char) buf.sbumpc(); ++n;
+		ch = buf.sgetc();
 	}
 	return n;
 }
@@ -268,7 +270,7 @@ void MultipartReader::guessBoundary()
 {
 	static const int eof = std::char_traits<char>::eof();
 	int ch = _istr.get();
-	while (std::isspace(ch))
+	while (Poco::Ascii::isSpace(ch))
 		ch = _istr.get();
 	if (ch == '-' && _istr.peek() == '-')
 	{

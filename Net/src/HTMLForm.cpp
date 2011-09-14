@@ -48,7 +48,6 @@
 #include "Poco/URI.h"
 #include "Poco/String.h"
 #include <sstream>
-#include <cctype>
 
 
 using Poco::NullInputStream;
@@ -125,7 +124,7 @@ void HTMLForm::addPart(const std::string& name, PartSource* pSource)
 void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
 {
 	clear();
-	if (request.getMethod() == HTTPRequest::HTTP_POST)
+	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
 		std::string mediaType;
 		NameValueCollection params;
@@ -176,7 +175,7 @@ void HTMLForm::read(std::istream& istr, PartHandler& handler)
 
 void HTMLForm::prepareSubmit(HTTPRequest& request)
 {
-	if (request.getMethod() == HTTPRequest::HTTP_POST)
+	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
 		if (_encoding == ENCODING_URL)
 		{
@@ -320,9 +319,9 @@ void HTMLForm::writeUrl(std::ostream& ostr)
 	{
 		if (it != begin()) ostr << "&";
 		std::string name;
-		URI::encode(it->first, "=&+", name);
+		URI::encode(it->first, "=&+;", name);
 		std::string value;
-		URI::encode(it->second, "=&+", value);
+		URI::encode(it->second, "=&+;", value);
 		ostr << name << "=" << value;
 	}
 }
@@ -343,8 +342,8 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	}	
 	for (PartVec::iterator ita = _parts.begin(); ita != _parts.end(); ++ita)
 	{
-		MessageHeader header;
-		std::string disp("file; name=\"");
+		MessageHeader header(ita->pSource->headers());
+		std::string disp("form-data; name=\"");
 		disp.append(ita->name);
 		disp.append("\"");
 		std::string filename = ita->pSource->filename();

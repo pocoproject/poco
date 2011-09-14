@@ -91,6 +91,10 @@ public:
 		
 	void setHost(const std::string& host, Poco::UInt16 port);
 		/// Sets the value of the Host header field.
+		///
+		/// If the given port number is a non-standard
+		/// port number (other than 80 or 443), it is
+		/// included in the Host header field.
 		
 	const std::string& getHost() const;
 		/// Returns the value of the Host header field.

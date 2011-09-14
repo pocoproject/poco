@@ -44,6 +44,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
+#include "Poco/Any.h"
 #include <ios>
 
 
@@ -81,7 +82,7 @@ public:
 	bool connected() const;
 		/// Returns true if the underlying socket is connected.
 
-	void abort();
+	virtual void abort();
 		/// Aborts a session in progress by shutting down
 		/// and closing the underlying socket.
 		
@@ -91,6 +92,20 @@ public:
 		/// pointer to this exception is returned.
 		/// 
 		/// Otherwise, NULL is returned.
+
+	void attachSessionData(const Poco::Any& data);
+		/// Allows to attach an application-specific data 
+		/// item to the session.
+		///
+		/// On the server side, this can be used to manage
+		/// data that must be maintained over the entire
+		/// lifetime of a persistent connection (that is,
+		/// multiple requests sent over the same connection).
+	
+	const Poco::Any& sessionData() const;
+		/// Returns the data attached with attachSessionData(),
+		/// or an empty Poco::Any if no user data has been
+		/// attached.
 
 	enum
 	{
@@ -102,7 +117,10 @@ public:
 		///
 		/// The socket is returned, and a new, uninitialized socket is
 		/// attached to the session.
-		
+
+	StreamSocket& socket();
+		/// Returns a reference to the underlying socket.
+
 protected:
 	HTTPSession();
 		/// Creates a HTTP session using an
@@ -150,9 +168,6 @@ protected:
 	int buffered() const;
 		/// Returns the number of bytes in the buffer.
 
-	StreamSocket& socket();
-		/// Returns a reference to the underlying socket.
-		
 	void refill();
 		/// Refills the internal buffer.
 		
@@ -186,6 +201,7 @@ private:
 	bool             _keepAlive;
 	Poco::Timespan   _timeout;
 	Poco::Exception* _pException;
+	Poco::Any        _data;
 	
 	friend class HTTPStreamBuf;
 	friend class HTTPHeaderStreamBuf;
@@ -224,6 +240,12 @@ inline const Poco::Exception* HTTPSession::networkException() const
 inline int HTTPSession::buffered() const
 {
 	return static_cast<int>(_pEnd - _pCurrent);
+}
+
+
+inline const Poco::Any& HTTPSession::sessionData() const
+{
+	return _data;
 }
 
 

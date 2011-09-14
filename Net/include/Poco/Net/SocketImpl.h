@@ -103,12 +103,29 @@ public:
 		/// socket. TCP clients should not bind a socket to a
 		/// specific address.
 		///
-		/// If reuseAddress is true, sets the SO_REUSEADDR
-		/// socket option.
-		
-	virtual void listen(int backlog = 64);
-		/// Puts the socket into listening state.
-		///
+                /// If reuseAddress is true, sets the SO_REUSEADDR
+                /// socket option.
+                
+        virtual void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
+                /// Bind a local IPv6 address to the socket.
+                ///
+                /// This is usually only done when establishing a server
+                /// socket. TCP clients should not bind a socket to a
+                /// specific address.
+                ///
+                /// If reuseAddress is true, sets the SO_REUSEADDR
+                /// socket option.
+                ///
+                /// The given address must be an IPv6 address. The
+                /// IPPROTO_IPV6/IPV6_V6ONLY option is set on the socket
+                /// according to the ipV6Only parameter.
+                ///
+                /// If the library has not been built with IPv6 support,
+                /// a Poco::NotImplementedException will be thrown.
+                
+        virtual void listen(int backlog = 64);
+                /// Puts the socket into listening state.
+                ///
 		/// The socket becomes a passive socket that
 		/// can accept incoming connection requests.
 		///
@@ -135,12 +152,18 @@ public:
 		///
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
+		///
+		/// Certain socket implementations may also return a negative
+		/// value denoting a certain condition.
 	
 	virtual int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		///
 		/// Returns the number of bytes received.
+		///
+		/// Certain socket implementations may also return a negative
+		/// value denoting a certain condition.
 	
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 		/// Sends the contents of the given buffer through
@@ -329,23 +352,27 @@ public:
 
 	virtual bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
-		/// This method will only work if the blocking modes of 
-		/// the socket are changed via the setBlocking method!
+                /// This method will only work if the blocking modes of 
+                /// the socket are changed via the setBlocking method!
+                
+        virtual bool secure() const;
+                /// Returns true iff the socket's connection is secure
+                /// (using SSL or TLS).
 
-	int socketError();
-		/// Returns the value of the SO_ERROR socket option.
-	
+        int socketError();
+                /// Returns the value of the SO_ERROR socket option.
+        
 	poco_socket_t sockfd() const;
-		/// Returns the socket descriptor for the 
-		/// underlying native socket.
-	
-	void ioctl(int request, int& arg);
-		/// A wrapper for the ioctl system call.
+                /// Returns the socket descriptor for the 
+                /// underlying native socket.
+        
+        void ioctl(poco_ioctl_request_t request, int& arg);
+                /// A wrapper for the ioctl system call.
 
-	void ioctl(int request, void* arg);
-		/// A wrapper for the ioctl system call.
-	
-	bool initialized() const;
+        void ioctl(poco_ioctl_request_t request, void* arg);
+                /// A wrapper for the ioctl system call.
+        
+        bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
 	
 protected:
@@ -381,13 +408,13 @@ protected:
 		/// or SOCK_RAW.
 		///
 		/// The third argument, proto, is normally set to 0,
-		/// except for raw sockets.
+                /// except for raw sockets.
 
-	void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
-		/// Allows subclasses to set the socket manually, iff no valid socket is set yet!
-	
-	static int lastError();
-		/// Returns the last error code.
+        void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
+                /// Allows subclasses to set the socket manually, iff no valid socket is set yet.
+        
+        static int lastError();
+                /// Returns the last error code.
 
 	static void error();
 		/// Throws an appropriate exception for the last error.

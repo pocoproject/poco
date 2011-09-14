@@ -36,6 +36,7 @@
 #include "EchoServer.h"
 #include "Poco/Net/DialogSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include <cstring>
 
 
 using Poco::Net::DialogSocket;
@@ -91,9 +92,23 @@ void DialogSocketTest::testDialogSocket()
 	assert (str == "220-line1\nline2\n220 line3");
 
 	ds.sendMessage("Hello, world!");
-	status = ds.receiveStatusMessage(str);
-	assert (status == 0);
-	assert (str == "Hello, world!");
+        status = ds.receiveStatusMessage(str);
+        assert (status == 0);
+        assert (str == "Hello, world!");
+        
+        ds.sendString("Header\nMore Bytes");
+        status = ds.receiveStatusMessage(str);
+        assert (status == 0);
+        assert (str == "Header");
+        char buffer[16];
+        int n = ds.receiveRawBytes(buffer, sizeof(buffer));
+        assert (n == 10);
+        assert (std::memcmp(buffer, "More Bytes", 10) == 0);
+
+        ds.sendString("Even More Bytes");
+        n = ds.receiveRawBytes(buffer, sizeof(buffer));
+        assert (n == 15);
+        assert (std::memcmp(buffer, "Even More Bytes", 15) == 0);
 }
 
 

@@ -46,12 +46,13 @@ public:
 	MediaTypeTest(const std::string& name);
 	~MediaTypeTest();
 
-	void testParse();
-	void testToString();
-	void testMatch();
+        void testParse();
+        void testToString();
+        void testMatch();
+        void testMatchRange();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

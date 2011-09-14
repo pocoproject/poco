@@ -47,6 +47,7 @@ namespace Net {
 
 POCO_IMPLEMENT_EXCEPTION(NetException, IOException, "Net Exception")
 POCO_IMPLEMENT_EXCEPTION(InvalidAddressException, NetException, "Invalid address")
+POCO_IMPLEMENT_EXCEPTION(InvalidSocketException, NetException, "Invalid socket")
 POCO_IMPLEMENT_EXCEPTION(ServiceNotFoundException, NetException, "Service not found")
 POCO_IMPLEMENT_EXCEPTION(ConnectionAbortedException, NetException, "Software caused connection abort")
 POCO_IMPLEMENT_EXCEPTION(ConnectionResetException, NetException, "Connection reset by peer")

@@ -1,7 +1,7 @@
 //
 // HTTPCookieTest.h
 //
-// $Id: //poco/svn/Net/testsuite/src/HTTPCookieTest.h#2 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.h#1 $
 //
 // Definition of the HTTPCookieTest class.
 //
@@ -44,12 +44,14 @@ class HTTPCookieTest: public CppUnit::TestCase
 {
 public:
 	HTTPCookieTest(const std::string& name);
-	~HTTPCookieTest();
+        ~HTTPCookieTest();
 
-	void testCookie();
+        void testCookie();
+        void testEscape();
+        void testUnescape();
 
-	void setUp();
-	void tearDown();
+        void setUp();
+        void tearDown();
 
 	static CppUnit::Test* suite();
 

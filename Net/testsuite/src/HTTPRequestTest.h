@@ -1,7 +1,7 @@
 //
 // HTTPRequestTest.h
 //
-// $Id: //poco/svn/Net/testsuite/src/HTTPRequestTest.h#2 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPRequestTest.h#2 $
 //
 // Definition of the HTTPRequestTest class.
 //
@@ -49,12 +49,13 @@ public:
 	void testWrite1();
 	void testWrite2();
 	void testWrite3();
-	void testRead1();
-	void testRead2();
-	void testRead3();
-	void testInvalid1();
-	void testInvalid2();
-	void testInvalid3();
+        void testRead1();
+        void testRead2();
+        void testRead3();
+        void testRead4();
+        void testInvalid1();
+        void testInvalid2();
+        void testInvalid3();
 	void testCookies();
 	
 	void setUp();

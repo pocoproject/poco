@@ -42,7 +42,7 @@
 
 
 namespace Poco{
-	class Timespan;
+        class Timespan;
 }
 
 class SocketTest: public CppUnit::TestCase
@@ -54,12 +54,13 @@ public:
 	void testEcho();
 	void testPoll();
 	void testAvailable();
-	void testConnect();
-	void testConnectRefused();
-	void testConnectRefusedNB();
-	void testAddress();
-	void testAssign();
-	void testTimeout();
+        void testConnect();
+        void testConnectRefused();
+        void testConnectRefusedNB();
+        void testNonBlocking();
+        void testAddress();
+        void testAssign();
+        void testTimeout();
 	void testBufferSize();
 	void testOptions();
 	void testSelect();
@@ -69,17 +70,17 @@ public:
 	void setUp();
 	void tearDown();
 
-	static CppUnit::Test* suite();
+        static CppUnit::Test* suite();
 
 private:
-	typedef int (*SelectPtr)(Poco::Net::Socket::SocketList&, 
-		Poco::Net::Socket::SocketList&, 
-		Poco::Net::Socket::SocketList&, 
-		const Poco::Timespan&);
+        typedef int (*SelectPtr)(Poco::Net::Socket::SocketList&, 
+                Poco::Net::Socket::SocketList&, 
+                Poco::Net::Socket::SocketList&, 
+                const Poco::Timespan&);
 
-	void doSelectOrPoll1(SelectPtr);
-	void doSelectOrPoll2(SelectPtr);
-	void doSelectOrPoll3(SelectPtr);
+        void doSelectOrPoll1(SelectPtr);
+        void doSelectOrPoll2(SelectPtr);
+        void doSelectOrPoll3(SelectPtr);
 };
 
 

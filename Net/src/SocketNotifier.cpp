@@ -85,10 +85,14 @@ void SocketNotifier::removeObserver(SocketReactor* pReactor, const Poco::Abstrac
 }
 
 
-void SocketNotifier::dispatch(SocketNotification* pNotification)
+namespace
 {
 	static Socket nullSocket;
+}
 
+
+void SocketNotifier::dispatch(SocketNotification* pNotification)
+{
 	pNotification->setSocket(_socket);
 	pNotification->duplicate();
 	try

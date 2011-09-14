@@ -67,27 +67,29 @@ void SocketAddressTest::testSocketAddress()
 	assert (sa1.port() == 100);
 	
 	SocketAddress sa2("192.168.1.100", "100");
-	assert (sa2.host().toString() == "192.168.1.100");
-	assert (sa2.port() == 100);
+        assert (sa2.host().toString() == "192.168.1.100");
+        assert (sa2.port() == 100);
 
-	SocketAddress sa3("192.168.1.100", "ftp");
-	assert (sa3.host().toString() == "192.168.1.100");
-	assert (sa3.port() == 21);
+#if !defined(_WIN32_WCE)
+        SocketAddress sa3("192.168.1.100", "ftp");
+        assert (sa3.host().toString() == "192.168.1.100");
+        assert (sa3.port() == 21);
+#endif
 
-	try
-	{
+        try
+        {
 		SocketAddress sa3("192.168.1.100", "f00bar");
 		fail("bad service name - must throw");
 	}
 	catch (ServiceNotFoundException&)
 	{
-	}
-	
-	SocketAddress sa4("www.appinf.com", 80);
-	assert (sa4.host().toString() == "216.146.46.35");
-	assert (sa4.port() == 80);
-	
-	try
+        }
+        
+        SocketAddress sa4("www.appinf.com", 80);
+        assert (sa4.host().toString() == "50.57.108.29");
+        assert (sa4.port() == 80);
+        
+        try
 	{
 		SocketAddress sa5("192.168.2.260", 80);
 		fail("invalid address - must throw");

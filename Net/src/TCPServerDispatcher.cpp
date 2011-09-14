@@ -147,6 +147,12 @@ void TCPServerDispatcher::run()
 	}
 }
 
+
+namespace
+{
+	static const std::string threadName("TCPServerConnection");
+}
+
 	
 void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 {
@@ -159,7 +165,6 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 		{
 			try
 			{
-				static const std::string threadName("TCPServerConnection");
 				_threadPool.startWithPriority(_pParams->getThreadPriority(), *this, threadName);
 				++_currentThreads;
 			}

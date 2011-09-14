@@ -119,12 +119,13 @@ HTTPClientSession* HTTPSessionFactory::createClientSession(const Poco::URI& uri)
 	if (uri.isRelative()) throw Poco::UnknownURISchemeException("Relative URIs are not supported by HTTPSessionFactory.");
 
 	Instantiators::iterator it = _instantiators.find(uri.getScheme());
-	if (it != _instantiators.end())
-	{
-		it->second.pIn->setProxy(_proxyHost, _proxyPort);
-		return it->second.pIn->createClientSession(uri);
-	}
-	else throw Poco::UnknownURISchemeException(uri.getScheme());
+        if (it != _instantiators.end())
+        {
+                it->second.pIn->setProxy(_proxyHost, _proxyPort);
+                it->second.pIn->setProxyCredentials(_proxyUsername, _proxyPassword);
+                return it->second.pIn->createClientSession(uri);
+        }
+        else throw Poco::UnknownURISchemeException(uri.getScheme());
 }
 
 
@@ -137,10 +138,24 @@ void HTTPSessionFactory::setProxy(const std::string& host, Poco::UInt16 port)
 }
 
 
+void HTTPSessionFactory::setProxyCredentials(const std::string& username, const std::string& password)
+{
+        FastMutex::ScopedLock lock(_mutex);
+
+        _proxyUsername = username;
+        _proxyPassword = password;
+}
+
+
+namespace
+{
+        static SingletonHolder<HTTPSessionFactory> singleton;
+}
+
+
 HTTPSessionFactory& HTTPSessionFactory::defaultFactory()
 {
-	static SingletonHolder<HTTPSessionFactory> singleton;
-	return *singleton.get();
+        return *singleton.get();
 }
 
 

@@ -54,13 +54,14 @@ void NetworkInterfaceTest::testList()
 {
 	NetworkInterface::NetworkInterfaceList list = NetworkInterface::list();
 	assert (!list.empty());
-	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
-	{
-		std::cout << "Name:      " << it->name() << std::endl;
-		std::cout << "Address:   " << it->address().toString() << std::endl;
-		std::cout << "Subnet:    " << it->subnetMask().toString() << std::endl;
-		std::cout << "Broadcast: " << it->broadcastAddress().toString() << std::endl;
-		std::cout << "Index:     " << it->index() << std::endl;		
+        for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
+        {
+                std::cout << "Name:        " << it->name() << std::endl;
+                std::cout << "DisplayName: " << it->displayName() << std::endl;
+                std::cout << "Address:     " << it->address().toString() << std::endl;
+                std::cout << "Subnet:      " << it->subnetMask().toString() << std::endl;
+                std::cout << "Broadcast:   " << it->broadcastAddress().toString() << std::endl;
+		std::cout << "Index:       " << it->index() << std::endl;		
 	}
 }
 

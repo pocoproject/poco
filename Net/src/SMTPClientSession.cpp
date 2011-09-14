@@ -45,10 +45,12 @@
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/HMACEngine.h"
 #include "Poco/MD5Engine.h"
+#include "Poco/SHA1Engine.h"
 #include "Poco/DigestStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
+#include "Poco/String.h"
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -57,6 +59,7 @@
 using Poco::DigestEngine;
 using Poco::HMACEngine;
 using Poco::MD5Engine;
+using Poco::SHA1Engine;
 using Poco::DigestOutputStream;
 using Poco::StreamCopier;
 using Poco::Base64Encoder;
@@ -112,7 +115,7 @@ void SMTPClientSession::login(const std::string& hostname, std::string& response
 	int status = sendCommand("EHLO", hostname, response);
 	if (isPermanentNegative(status))
 		status = sendCommand("HELO", hostname, response);
-	if (!isPositiveCompletion(status)) throw SMTPException("Login failed", response);
+	if (!isPositiveCompletion(status)) throw SMTPException("Login failed", response, status);
 }
 
 
@@ -129,21 +132,34 @@ void SMTPClientSession::login()
 }
 
 
-void SMTPClientSession::loginUsingCRAM_MD5(const std::string& username, const std::string& password)
+void SMTPClientSession::loginUsingCRAMMD5(const std::string& username, const std::string& password)
+{
+	HMACEngine<MD5Engine> hmac(password);
+	loginUsingCRAM(username, "CRAM-MD5", hmac);
+}
+
+
+void SMTPClientSession::loginUsingCRAMSHA1(const std::string& username, const std::string& password)
+{
+	HMACEngine<SHA1Engine> hmac(password);
+	loginUsingCRAM(username, "CRAM-SHA1", hmac);
+}
+
+
+void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::string& method, Poco::DigestEngine& hmac)
 {
 	int status = 0;
 	std::string response;
 	
-	status = sendCommand("AUTH CRAM-MD5", response);
-	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate CRAM-MD5", response);
+	status = sendCommand(std::string("AUTH ") + method, response);
+	if (!isPositiveIntermediate(status)) throw SMTPException(std::string("Cannot authenticate using ") + method, response, status);
 	std::string challengeBase64 = response.substr(4);
 	
 	std::istringstream istr(challengeBase64);
 	Base64Decoder decoder(istr);
 	std::string challenge;
-	decoder >> challenge;
+	StreamCopier::copyToString(decoder, challenge);
 	
-	HMACEngine<MD5Engine> hmac(password);
 	hmac.update(challenge);
 	
 	const DigestEngine::Digest& digest = hmac.digest();
@@ -157,7 +173,7 @@ void SMTPClientSession::loginUsingCRAM_MD5(const std::string& username, const st
 	encoder.close();
 	
 	status = sendCommand(challengeResponseBase64.str(), response);
-  	if (!isPositiveCompletion(status)) throw SMTPException("Login using CRAM-MD5 failed", response);  
+  	if (!isPositiveCompletion(status)) throw SMTPException(std::string("Login using ") + method + " failed", response, status);  
 }
 
 
@@ -167,7 +183,7 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	std::string response;
 	
 	status = sendCommand("AUTH LOGIN", response);
-	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate LOGIN", response);
+	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate using LOGIN", response, status);
 	
 	std::ostringstream usernameBase64;
 	Base64Encoder usernameEncoder(usernameBase64);
@@ -189,38 +205,71 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	//C: user_password
 	//S: login:
 	//C: user_login
-	if (response == "334 VXNlcm5hbWU6") // username first (md5("Username:"))
+	
+	std::string decodedResponse;
+	std::istringstream responseStream(response.substr(4));
+	Base64Decoder responseDecoder(responseStream);
+	StreamCopier::copyToString(responseDecoder, decodedResponse);
+	
+	if (Poco::icompare(decodedResponse, 0, 8, "username") == 0) // username first (md5("Username:"))
 	{
 		status = sendCommand(usernameBase64.str(), response);
-		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN user name failed", response);
+		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN username failed", response, status);
 		
 		status = sendCommand(passwordBase64.str(), response);
-		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN password failed", response);  
+		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN password failed", response, status);  
 	}
-	else if (response == "334 UGFzc3dvcmQ6") // password first (md5("Password:"))
+	else if  (Poco::icompare(decodedResponse, 0, 8, "password") == 0) // password first (md5("Password:"))
 	{
 		status = sendCommand(passwordBase64.str(), response);
-		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN password failed", response);  
+		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN password failed", response, status);  
 		
 		status = sendCommand(usernameBase64.str(), response);
-		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN user name failed", response);
+		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN username failed", response, status);
 	}
-  
+}
+
+void SMTPClientSession::loginUsingPlain(const std::string& username, const std::string& password)
+{
+	int status = 0;
+	std::string response;
+	
+	std::ostringstream credentialsBase64;
+	Base64Encoder credentialsEncoder(credentialsBase64);
+	credentialsEncoder << username << '\0' << password;
+	credentialsEncoder.close();
+
+	status = sendCommand("AUTH PLAIN", credentialsBase64.str(), response);
+	if (!isPositiveCompletion(status)) throw SMTPException("Login using PLAIN failed", response, status);
 }
 
 
 void SMTPClientSession::login(LoginMethod loginMethod, const std::string& username, const std::string& password)
 {
+	login(Environment::nodeName(), loginMethod, username, password);
+}
+
+
+void SMTPClientSession::login(const std::string& hostname, LoginMethod loginMethod, const std::string& username, const std::string& password)
+{
 	std::string response;
-	login(Environment::nodeName(), response);
+	login(hostname, response);
 	
 	if (loginMethod == AUTH_CRAM_MD5)
 	{
 		if (response.find("CRAM-MD5", 0) != std::string::npos)
 		{
-			loginUsingCRAM_MD5(username, password);
+			loginUsingCRAMMD5(username, password);
 		}
 		else throw SMTPException("The mail service does not support CRAM-MD5 authentication", response);
+	}
+	else if (loginMethod == AUTH_CRAM_SHA1)
+	{
+		if (response.find("CRAM-SHA1", 0) != std::string::npos)
+		{
+			loginUsingCRAMSHA1(username, password);
+		}
+		else throw SMTPException("The mail service does not support CRAM-SHA1 authentication", response);
 	}
 	else if (loginMethod == AUTH_LOGIN)
 	{
@@ -229,6 +278,14 @@ void SMTPClientSession::login(LoginMethod loginMethod, const std::string& userna
 			loginUsingLogin(username, password);
 		}
 		else throw SMTPException("The mail service does not support LOGIN authentication", response);
+	}
+	else if (loginMethod == AUTH_PLAIN)
+	{
+		if (response.find("PLAIN", 0) != std::string::npos)
+		{
+			loginUsingPlain(username, password);
+		}
+		else throw SMTPException("The mail service does not support PLAIN authentication", response);
 	}
 	else if (loginMethod != AUTH_NONE)
 	{
@@ -243,7 +300,7 @@ void SMTPClientSession::open()
 	{
 		std::string response;
 		int status = _socket.receiveStatusMessage(response);
-		if (!isPositiveCompletion(status)) throw SMTPException("The mail service is unavailable", response);
+		if (!isPositiveCompletion(status)) throw SMTPException("The mail service is unavailable", response, status);
 		_isOpen = true;
 	}
 }
@@ -278,24 +335,24 @@ void SMTPClientSession::sendMessage(const MailMessage& message)
 	{
 		status = sendCommand("MAIL FROM:", fromField.substr(emailPos, fromField.size() - emailPos), response);
 	}
-	if (!isPositiveCompletion(status)) throw SMTPException("Cannot send message", response);
+	if (!isPositiveCompletion(status)) throw SMTPException("Cannot send message", response, status);
 	for (MailMessage::Recipients::const_iterator it = message.recipients().begin(); it != message.recipients().end(); ++it)
 	{
 		std::string recipient("<");
 		recipient.append(it->getAddress());
 		recipient.append(">");
 		int status = sendCommand("RCPT TO:", recipient, response);
-		if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient, response);
+		if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient, response, status);
 	}
 	status = sendCommand("DATA", response);
-	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot send message data", response);
+	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot send message data", response, status);
 	SocketOutputStream socketStream(_socket);
 	MailOutputStream mailStream(socketStream);
 	message.write(mailStream);
 	mailStream.close();
 	socketStream.flush();
 	status = _socket.receiveStatusMessage(response);
-	if (!isPositiveCompletion(status)) throw SMTPException("The server rejected the message", response);
+	if (!isPositiveCompletion(status)) throw SMTPException("The server rejected the message", response, status);
 }
 
 

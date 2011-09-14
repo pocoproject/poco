@@ -133,13 +133,19 @@ public:
 		/// If the total number of sockets passed in readList, writeList and
 		/// exceptList is zero, select() will return immediately and the
 		/// return value will be 0.
+		///
+		/// If one of the sockets passed to select() is closed while
+		/// select() runs, select will return immediately. However,
+		/// the closed socket will not be included in any list.
+		/// In this case, the return value may be greater than the sum
+		/// of all sockets in all list.
 
-	bool poll(const Poco::Timespan& timeout, int mode) const;
-		/// Determines the status of the socket, using a 
-		/// call to poll() or select().
-		/// 
-		/// The mode argument is constructed by combining the values
-		/// of the SelectMode enumeration.
+        bool poll(const Poco::Timespan& timeout, int mode) const;
+                /// Determines the status of the socket, using a 
+                /// call to poll() or select().
+                /// 
+                /// The mode argument is constructed by combining the values
+                /// of the SelectMode enumeration.
 		///
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
@@ -287,12 +293,16 @@ public:
 	SocketAddress peerAddress() const;
 		/// Returns the IP address and port number of the peer socket.
 
-	SocketImpl* impl() const;
-		/// Returns the SocketImpl for this socket.
-		
-	static bool supportsIPv4();
-		/// Returns true if the system supports IPv4.
-		
+        SocketImpl* impl() const;
+                /// Returns the SocketImpl for this socket.
+                
+        bool secure() const;
+                /// Returns true iff the socket's connection is secure
+                /// (using SSL or TLS).
+                
+        static bool supportsIPv4();
+                /// Returns true if the system supports IPv4.
+                
 	static bool supportsIPv6();
 		/// Returns true if the system supports IPv6.
 
@@ -302,27 +312,27 @@ protected:
 		/// The socket takes owership of the SocketImpl.
 
 	poco_socket_t sockfd() const;
-		/// Returns the socket descriptor for this socket.
+                /// Returns the socket descriptor for this socket.
 
 private:
 
 #if defined(POCO_HAVE_FD_POLL)
-	class FDCompare
-		/// Utility functor used to compare socket file descriptors.
-		/// Used in poll() member function.
-	{
-	public:
-		FDCompare(int fd): _fd(fd) { }
-		inline bool operator()(const Socket& socket) const
-		{ return socket.sockfd() == _fd; }
+        class FDCompare
+                /// Utility functor used to compare socket file descriptors.
+                /// Used in poll() member function.
+        {
+        public:
+                FDCompare(int fd): _fd(fd) { }
+                inline bool operator()(const Socket& socket) const
+                { return socket.sockfd() == _fd; }
 
-	private:
-		FDCompare();
-		int _fd;
-	};
+        private:
+                FDCompare();
+                int _fd;
+        };
 #endif
 
-	SocketImpl* _pImpl;
+        SocketImpl* _pImpl;
 };
 
 
@@ -601,16 +611,16 @@ inline SocketAddress Socket::peerAddress() const
 
 inline bool Socket::supportsIPv4()
 {
-	return true;
+        return true;
 }
-	
-	
+
+
 inline bool Socket::supportsIPv6()
 {
 #if defined(POCO_HAVE_IPv6)
-	return true;
+        return true;
 #else
-	return false;
+        return false;
 #endif
 }
 

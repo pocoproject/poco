@@ -7,7 +7,7 @@
 // Package: NetCore
 // Module:  SocketAddress
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -56,6 +56,15 @@ namespace Poco {
 namespace Net {
 
 
+struct AFLT
+{
+        bool operator () (const IPAddress& a1, const IPAddress& a2)
+        {
+                return a1.af() < a2.af();
+        }
+};
+
+
 //
 // SocketAddressImpl
 //
@@ -71,14 +80,20 @@ public:
 	virtual int af() const = 0;
 	
 protected:
-	SocketAddressImpl()
-	{
-	}
-	
-	virtual ~SocketAddressImpl()
-	{
-	}
-	
+        SocketAddressImpl()
+        {
+#if defined(_WIN32)
+                Poco::Net::initializeNetwork();
+#endif
+        }
+        
+        virtual ~SocketAddressImpl()
+        {
+#if defined(_WIN32)
+                Poco::Net::uninitializeNetwork();
+#endif
+        }
+        
 private:
 	SocketAddressImpl(const SocketAddressImpl&);
 	SocketAddressImpl& operator = (const SocketAddressImpl&);
@@ -155,15 +170,25 @@ public:
 		_addr.sin6_family = AF_INET6;
 		poco_set_sin6_len(&_addr);
 		std::memcpy(&_addr.sin6_addr, addr, sizeof(_addr.sin6_addr));
-		_addr.sin6_port = port;
-	}
+                _addr.sin6_port = port;
+        }
 
-	IPAddress host() const
-	{
-		return IPAddress(&_addr.sin6_addr, sizeof(_addr.sin6_addr));
-	}
-	
-	UInt16 port() const
+        IPv6SocketAddressImpl(const void* addr, UInt16 port, UInt32 scope)
+        {
+                std::memset(&_addr, 0, sizeof(_addr));
+                _addr.sin6_family = AF_INET6;
+                poco_set_sin6_len(&_addr);
+                std::memcpy(&_addr.sin6_addr, addr, sizeof(_addr.sin6_addr));
+                _addr.sin6_port = port;
+                _addr.sin6_scope_id = scope;
+        }
+
+        IPAddress host() const
+        {
+                return IPAddress(&_addr.sin6_addr, sizeof(_addr.sin6_addr), _addr.sin6_scope_id);
+        }
+        
+        UInt16 port() const
 	{
 		return _addr.sin6_port;
 	}
@@ -339,29 +364,36 @@ std::string SocketAddress::toString() const
 void SocketAddress::init(const IPAddress& host, Poco::UInt16 port)
 {
 	if (host.family() == IPAddress::IPv4)
-		_pImpl = new IPv4SocketAddressImpl(host.addr(), htons(port));
+                _pImpl = new IPv4SocketAddressImpl(host.addr(), htons(port));
 #if defined(POCO_HAVE_IPv6)
-	else if (host.family() == IPAddress::IPv6)
-		_pImpl = new IPv6SocketAddressImpl(host.addr(), htons(port));
+        else if (host.family() == IPAddress::IPv6)
+                _pImpl = new IPv6SocketAddressImpl(host.addr(), htons(port), host.scope());
 #endif
-	else throw Poco::NotImplementedException("unsupported IP address family");
+        else throw Poco::NotImplementedException("unsupported IP address family");
 }
 
 
 void SocketAddress::init(const std::string& host, Poco::UInt16 port)
 {
 	IPAddress ip;
-	if (IPAddress::tryParse(host, ip))
-	{
-		init(ip, port);
-	}
-	else
-	{
-		HostEntry he = DNS::hostByName(host);
-		if (he.addresses().size() > 0)
-			init(he.addresses()[0], port);
-		else throw HostNotFoundException("No address found for host", host);
-	}
+        if (IPAddress::tryParse(host, ip))
+        {
+                init(ip, port);
+        }
+        else
+        {
+                HostEntry he = DNS::hostByName(host);
+                HostEntry::AddressList addresses = he.addresses();
+                if (addresses.size() > 0)
+                {
+#if defined(POCO_HAVE_IPv6)
+                        // if we get both IPv4 and IPv6 addresses, prefer IPv4
+                        std::sort(addresses.begin(), addresses.end(), AFLT());
+#endif
+                        init(addresses[0], port);
+                }
+                else throw HostNotFoundException("No address found for host", host);
+        }
 }
 
 
@@ -374,11 +406,15 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 	}
 	else
 	{
+#if defined(POCO_VXWORKS)
+		throw ServiceNotFoundException(service);
+#else
 		struct servent* se = getservbyname(service.c_str(), NULL);
 		if (se)
 			return ntohs(se->s_port);
 		else
 			throw ServiceNotFoundException(service);
+#endif
 	}
 }
 

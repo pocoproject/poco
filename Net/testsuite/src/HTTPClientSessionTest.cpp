@@ -242,13 +242,13 @@ void HTTPClientSessionTest::testKeepAlive()
 	s.sendRequest(request);
 	std::istream& rs3 = s.receiveResponse(response);
 	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getChunkedTransferEncoding());
-	assert (response.getKeepAlive());
-	std::ostringstream ostr3;
-	StreamCopier::copyStream(rs3, ostr3);
-	assert (ostr3.str() == HTTPTestServer::LARGE_BODY);
+        assert (response.getChunkedTransferEncoding());
+        assert (response.getKeepAlive());
+        std::ostringstream ostr3;
+        StreamCopier::copyStream(rs3, ostr3);
+        assert (ostr3.str() == HTTPTestServer::LARGE_BODY);
 
-	request.setMethod(HTTPRequest::HTTP_HEAD);
+        request.setMethod(HTTPRequest::HTTP_HEAD);
 	request.setURI("/large");
 	s.sendRequest(request);
 	std::istream& rs4= s.receiveResponse(response);
@@ -277,6 +277,26 @@ void HTTPClientSessionTest::testProxy()
 }
 
 
+void HTTPClientSessionTest::testProxyAuth()
+{
+        HTTPTestServer srv;
+        HTTPClientSession s("www.somehost.com");
+        s.setProxy("localhost", srv.port());
+        s.setProxyCredentials("user", "pass");
+        HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
+        s.sendRequest(request);
+        HTTPResponse response;
+        std::istream& rs = s.receiveResponse(response);
+        assert (response.getContentLength() == HTTPTestServer::LARGE_BODY.length());
+        assert (response.getContentType() == "text/plain");
+        std::ostringstream ostr;
+        StreamCopier::copyStream(rs, ostr);
+        assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+        std::string r = srv.lastRequest();
+        assert (r.find("Proxy-Authorization: Basic dXNlcjpwYXNz\r\n") != std::string::npos);    
+}
+
+
 void HTTPClientSessionTest::setUp()
 {
 }
@@ -299,9 +319,10 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostSmallChunked);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostLargeChunked);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostSmallClose);
-	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostLargeClose);
-	CppUnit_addTest(pSuite, HTTPClientSessionTest, testKeepAlive);
-	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxy);
+        CppUnit_addTest(pSuite, HTTPClientSessionTest, testPostLargeClose);
+        CppUnit_addTest(pSuite, HTTPClientSessionTest, testKeepAlive);
+        CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxy);
+        CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyAuth);
 
-	return pSuite;
+        return pSuite;
 }

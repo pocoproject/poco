@@ -79,6 +79,26 @@ void HTTPCookieTest::testCookie()
 }
 
 
+void HTTPCookieTest::testEscape()
+{
+        std::string escaped = HTTPCookie::escape("this is a test!");
+        assert (escaped == "this%20is%20a%20test!");
+
+        escaped = HTTPCookie::escape("\n\t@,;\"'");
+        assert (escaped == "%0A%09@%2C%3B%22%27");
+}
+
+
+void HTTPCookieTest::testUnescape()
+{
+        std::string unescaped = HTTPCookie::unescape("this%20is%20a%20test!");
+        assert (unescaped == "this is a test!");
+
+        unescaped = HTTPCookie::unescape("%0a%09@%2c%3b%22%27");
+        assert (unescaped == "\n\t@,;\"'");
+}
+
+
 void HTTPCookieTest::setUp()
 {
 }
@@ -91,9 +111,11 @@ void HTTPCookieTest::tearDown()
 
 CppUnit::Test* HTTPCookieTest::suite()
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPCookieTest");
+        CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPCookieTest");
 
-	CppUnit_addTest(pSuite, HTTPCookieTest, testCookie);
+        CppUnit_addTest(pSuite, HTTPCookieTest, testCookie);
+        CppUnit_addTest(pSuite, HTTPCookieTest, testEscape);
+        CppUnit_addTest(pSuite, HTTPCookieTest, testUnescape);
 
-	return pSuite;
+        return pSuite;
 }

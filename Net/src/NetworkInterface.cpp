@@ -1,7 +1,7 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/Main/Net/src/NetworkInterface.cpp#24 $
+// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#3 $
 //
 // Library: Net
 // Package: Sockets
@@ -12,7 +12,7 @@
 //
 // Permission is hereby granted, free of charge, to any person or organization
 // obtaining a copy of the software and accompanying documentation covered by
-// this license (the "Software") to use, reproduce, display, distribute,
+// this license (the "Software") to use, reproduce, display, distribute ,
 // execute, and transmit the Software, and to prepare derivative works of the
 // Software, and to permit third-parties to whom the Software is furnished to
 // do so, all subject to the following:
@@ -97,7 +97,7 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_address(address),
 	_index(index)
 {
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(POCO_VXWORKS)
 	if (index == -1) // IPv4
 	{
 		struct ifreq ifr;

@@ -158,13 +158,13 @@ void SocketTest::testConnectRefusedNB()
 	ServerSocket serv;
 	serv.bind(SocketAddress());
 	serv.listen();
-	Poco::UInt16 port = serv.address().port();
-	serv.close();
-	StreamSocket ss;
-	Timespan timeout(10000);
-	try
-	{
-		ss.connect(SocketAddress("localhost", port), timeout);
+        Poco::UInt16 port = serv.address().port();
+        serv.close();
+        StreamSocket ss;
+        Timespan timeout(2, 0);
+        try
+        {
+                ss.connect(SocketAddress("localhost", port), timeout);
 		fail("connection refused - must throw");
 	}
 	catch (TimeoutException&)
@@ -176,9 +176,31 @@ void SocketTest::testConnectRefusedNB()
 }
 
 
+void SocketTest::testNonBlocking()
+{
+        EchoServer echoServer;
+        StreamSocket ss;
+        ss.connect(SocketAddress("localhost", echoServer.port()));
+        ss.setBlocking(false);
+
+        Timespan timeout(1000000);
+        assert (ss.poll(timeout, Socket::SELECT_WRITE));
+        int n = ss.sendBytes("hello", 5);
+        assert (n == 5);
+
+        char buffer[256];
+        assert (ss.poll(timeout, Socket::SELECT_READ));
+        n = ss.receiveBytes(buffer, sizeof(buffer));
+        assert (n == 5);
+        assert (std::string(buffer, n) == "hello");
+        ss.close();
+}
+
+
+
 void SocketTest::testAddress()
 {
-	ServerSocket serv;
+        ServerSocket serv;
 	serv.bind(SocketAddress());
 	serv.listen();
 	StreamSocket ss;
@@ -454,12 +476,13 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testEcho);
 	CppUnit_addTest(pSuite, SocketTest, testPoll);
 	CppUnit_addTest(pSuite, SocketTest, testAvailable);
-	CppUnit_addTest(pSuite, SocketTest, testConnect);
-	CppUnit_addTest(pSuite, SocketTest, testConnectRefused);
-	CppUnit_addTest(pSuite, SocketTest, testConnectRefusedNB);
-	CppUnit_addTest(pSuite, SocketTest, testAddress);
-	CppUnit_addTest(pSuite, SocketTest, testAssign);
-	CppUnit_addTest(pSuite, SocketTest, testTimeout);
+        CppUnit_addTest(pSuite, SocketTest, testConnect);
+        CppUnit_addTest(pSuite, SocketTest, testConnectRefused);
+        CppUnit_addTest(pSuite, SocketTest, testConnectRefusedNB);
+        CppUnit_addTest(pSuite, SocketTest, testNonBlocking);
+        CppUnit_addTest(pSuite, SocketTest, testAddress);
+        CppUnit_addTest(pSuite, SocketTest, testAssign);
+        CppUnit_addTest(pSuite, SocketTest, testTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testBufferSize);
 	CppUnit_addTest(pSuite, SocketTest, testOptions);
 	CppUnit_addTest(pSuite, SocketTest, testSelect);

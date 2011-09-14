@@ -142,18 +142,37 @@ void HTTPRequestTest::testRead3()
 }
 
 
+void HTTPRequestTest::testRead4()
+{
+        std::string s("POST /test.cgi HTTP/1.1\r\nConnection: Close\r\nContent-Length:   100  \r\nContent-Type: text/plain\r\nHost: localhost:8000\r\nUser-Agent: Poco\r\n\r\n");
+        std::istringstream istr(s);
+        HTTPRequest request;
+        request.read(istr);
+        assert (request.getMethod() == HTTPRequest::HTTP_POST);
+        assert (request.getURI() == "/test.cgi");
+        assert (request.getVersion() == HTTPMessage::HTTP_1_1);
+        assert (request.size() == 5);
+        assert (request["Connection"] == "Close");
+        assert (request["Host"] == "localhost:8000");
+        assert (request["User-Agent"] == "Poco");
+        assert (request.getContentType() == "text/plain");
+        assert (request.getContentLength() == 100);
+        assert (istr.get() == -1);
+}
+
+
 void HTTPRequestTest::testInvalid1()
 {
-	std::string s(256, 'x');
+        std::string s(256, 'x');
 	std::istringstream istr(s);
 	HTTPRequest request;
-	try
-	{
-		request.read(istr);
-		fail("invalid request - must throw");
-	}
-	catch (MessageException&)
-	{
+        try
+        {
+                request.read(istr);
+                fail("invalid request - must throw");
+        }
+        catch (MessageException&)
+        {
 	}
 }
 
@@ -165,13 +184,13 @@ void HTTPRequestTest::testInvalid2()
 	s.append("HTTP/1.0");
 	std::istringstream istr(s);
 	HTTPRequest request;
-	try
-	{
-		request.read(istr);
-		fail("invalid request - must throw");
-	}
-	catch (MessageException&)
-	{
+        try
+        {
+                request.read(istr);
+                fail("invalid request - must throw");
+        }
+        catch (MessageException&)
+        {
 	}
 }
 
@@ -181,13 +200,13 @@ void HTTPRequestTest::testInvalid3()
 	std::string s("GET / HTTP/1.10");
 	std::istringstream istr(s);
 	HTTPRequest request;
-	try
-	{
-		request.read(istr);
-		fail("invalid request - must throw");
-	}
-	catch (MessageException&)
-	{
+        try
+        {
+                request.read(istr);
+                fail("invalid request - must throw");
+        }
+        catch (MessageException&)
+        {
 	}
 }
 
@@ -234,12 +253,13 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite1);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite3);
-	CppUnit_addTest(pSuite, HTTPRequestTest, testRead1);
-	CppUnit_addTest(pSuite, HTTPRequestTest, testRead2);
-	CppUnit_addTest(pSuite, HTTPRequestTest, testRead3);
-	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid1);
-	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid2);
-	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid3);
+        CppUnit_addTest(pSuite, HTTPRequestTest, testRead1);
+        CppUnit_addTest(pSuite, HTTPRequestTest, testRead2);
+        CppUnit_addTest(pSuite, HTTPRequestTest, testRead3);
+        CppUnit_addTest(pSuite, HTTPRequestTest, testRead4);
+        CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid1);
+        CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid2);
+        CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid3);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testCookies);
 
 	return pSuite;

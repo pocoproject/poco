@@ -84,9 +84,15 @@ HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 
 HTTPSession::~HTTPSession()
 {
-	if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
-	close();
-	delete _pException;
+        if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
+        try
+        {
+                close();
+        }
+        catch (...)
+        {
+        }
+        delete _pException;
 }
 
 
@@ -226,6 +232,12 @@ StreamSocket HTTPSession::detachSocket()
 void HTTPSession::attachSocket(const StreamSocket& socket)
 {
 	_socket = socket;
+}
+
+
+void HTTPSession::attachSessionData(const Poco::Any& data)
+{
+	_data = data;
 }
 
 

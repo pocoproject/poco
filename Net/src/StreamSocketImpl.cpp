@@ -36,6 +36,7 @@
 
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Exception.h"
+#include "Poco/Thread.h"
 
 
 namespace Poco {
@@ -73,14 +74,21 @@ int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	const char* p = reinterpret_cast<const char*>(buffer);
 	int remaining = length;
+	int sent = 0;
+	bool blocking = getBlocking();
 	while (remaining > 0)
 	{
 		int n = SocketImpl::sendBytes(p, remaining, flags);
-		if (n <= 0) return n;
+		poco_assert_dbg (n >= 0);
 		p += n; 
+		sent += n;
 		remaining -= n;
+		if (blocking && remaining > 0)
+			Poco::Thread::yield();
+		else
+			break;
 	}
-	return length;
+	return sent;
 }
 
 

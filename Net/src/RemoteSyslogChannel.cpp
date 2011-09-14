@@ -1,7 +1,7 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/Main/Net/src/RemoteSyslogChannel.cpp#4 $
+// $Id: //poco/1.4/Net/src/RemoteSyslogChannel.cpp#2 $
 //
 // Library: Net
 // Package: Logging
@@ -89,13 +89,11 @@ void RemoteSyslogChannel::open()
 {
 	if (_open) return;
 	
-	SocketAddress sa;
 	if (_logHost.find(':') != std::string::npos)
-		sa = SocketAddress(_logHost);
+		_socketAddress = SocketAddress(_logHost);
 	else
-		sa = SocketAddress(_logHost, SYSLOG_PORT);
+		_socketAddress = SocketAddress(_logHost, SYSLOG_PORT);
 
-	_socket.connect(sa);
 	if (_host.empty())
 	{
 		try
@@ -122,6 +120,8 @@ void RemoteSyslogChannel::close()
 	
 void RemoteSyslogChannel::log(const Message& msg)
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (!_open) open();
 
 	std::string m;
@@ -151,7 +151,7 @@ void RemoteSyslogChannel::log(const Message& msg)
 	m += ' ';
 	m += msg.getText();
 
-	_socket.sendBytes(m.data(), (int) m.size());
+	_socket.sendTo(m.data(), static_cast<int>(m.size()), _socketAddress);
 }
 
 	
@@ -231,7 +231,7 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 	}
 	else if (name == PROP_FORMAT)
 	{
-		_bsdFormat = (value == "bsd");
+		_bsdFormat = (value == "bsd" || value == "rfc3164");
 	}
 	else
 	{
@@ -312,7 +312,7 @@ std::string RemoteSyslogChannel::getProperty(const std::string& name) const
 	}
 	else if (name == PROP_FORMAT)
 	{
-		return _bsdFormat ? "bsd" : "new";
+		return _bsdFormat ? "rfc3164" : "rfc5424";
 	}
 	else
 	{

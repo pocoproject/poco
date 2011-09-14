@@ -126,12 +126,15 @@ public:
 	std::string toString() const;
 		/// Returns a string representation of the address.
 		
-	IPAddress::Family family() const;
-		/// Returns the address family of the host's address.
-		
-	enum
-	{
-		MAX_ADDRESS_LENGTH = 
+        IPAddress::Family family() const;
+                /// Returns the address family of the host's address.
+                
+        bool operator == (const SocketAddress& addr) const;
+        bool operator != (const SocketAddress& addr) const;
+                        
+        enum
+        {
+                MAX_ADDRESS_LENGTH = 
 #if defined(POCO_HAVE_IPv6)
 			sizeof(struct sockaddr_in6)
 #else
@@ -162,6 +165,18 @@ inline void swap(SocketAddress& a1, SocketAddress& a2)
 inline IPAddress::Family SocketAddress::family() const
 {
 	return host().family();
+}
+
+
+inline  bool SocketAddress::operator == (const SocketAddress& addr) const
+{
+        return host() == addr.host() && port() == addr.port();
+}
+
+
+inline bool SocketAddress::operator != (const SocketAddress& addr) const
+{
+        return host() != addr.host() || port() != addr.port();
 }
 
 

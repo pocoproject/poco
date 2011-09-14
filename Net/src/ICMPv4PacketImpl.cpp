@@ -38,8 +38,10 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
-#include "Poco/Process.h"
 #include "Poco/NumberFormatter.h"
+#if !defined(POCO_VXWORKS)
+#include "Poco/Process.h"
+#endif
 #include <sstream>
 
 
@@ -57,11 +59,11 @@ namespace Poco {
 namespace Net {
 
 
-const UInt8 ICMPv4PacketImpl::DESTINATION_UNREACHABLE_TYPE = 3;
-const UInt8 ICMPv4PacketImpl::SOURCE_QUENCH_TYPE           = 4;
-const UInt8 ICMPv4PacketImpl::REDIRECT_MESSAGE_TYPE        = 5;
-const UInt8 ICMPv4PacketImpl::TIME_EXCEEDED_TYPE           = 11;
-const UInt8 ICMPv4PacketImpl::PARAMETER_PROBLEM_TYPE       = 12;
+const UInt8 ICMPv4PacketImpl::DESTINATION_UNREACHABLE_TYPE       = 3;
+const Poco::UInt8 ICMPv4PacketImpl::SOURCE_QUENCH_TYPE     = 4;
+const Poco::UInt8 ICMPv4PacketImpl::REDIRECT_MESSAGE_TYPE  = 5;
+const UInt8 ICMPv4PacketImpl::TIME_EXCEEDED_TYPE                 = 11;
+const Poco::UInt8 ICMPv4PacketImpl::PARAMETER_PROBLEM_TYPE = 12;
 
 
 const std::string ICMPv4PacketImpl::MESSAGE_TYPE[] = 
@@ -125,10 +127,10 @@ const std::string ICMPv4PacketImpl::PARAMETER_PROBLEM_CODE[] =
 
 
 ICMPv4PacketImpl::ICMPv4PacketImpl(int dataSize): 
-	ICMPPacketImpl(dataSize),
-	_seq(0)
+        ICMPPacketImpl(dataSize),
+        _seq(0)
 {
-	initPacket();
+        initPacket();
 }
 
 
@@ -152,8 +154,12 @@ void ICMPv4PacketImpl::initPacket()
 	icp->code     = 0;
 	icp->checksum = 0;
 	icp->seq      = ++_seq;
-	icp->id       = static_cast<UInt16>(Process::id());
-	
+#if defined(POCO_VXWORKS)
+	icp->id       = 0;
+#else
+	icp->id       = static_cast<UInt16>(Poco::Process::id());
+#endif
+
 	struct timeval* ptp = (struct timeval *) (icp + 1);
 	*ptp = time();
 
@@ -202,7 +208,11 @@ Poco::UInt8* ICMPv4PacketImpl::data(Poco::UInt8* buffer, int length) const
 bool ICMPv4PacketImpl::validReplyID(Poco::UInt8* buffer, int length) const
 {
 	Header *icp = header(buffer, length);
-	return icp && (Process::id() == icp->id);
+#if defined(POCO_VXWORKS)
+	return icp && icp->id == 0;
+#else
+	return icp && (static_cast<Poco::UInt16>(Process::id()) == icp->id);
+#endif
 }
 
 

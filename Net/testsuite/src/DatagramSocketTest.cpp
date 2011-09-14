@@ -98,13 +98,13 @@ void DatagramSocketTest::testBroadcast()
 {
 	UDPEchoServer echoServer;
 	DatagramSocket ss(IPAddress::IPv4);
-	SocketAddress sa("255.255.255.255", echoServer.port());
-	try
-	{
-		ss.sendTo("hello", 5, sa);
-		// not all socket implementations fail if broadcast option is not set
-		// fail ("broadcast option not set - must throw");
-	}
+        SocketAddress sa("255.255.255.255", echoServer.port());
+        try
+        {
+                int n = ss.sendTo("hello", 5, sa);
+                // not all socket implementations fail if broadcast option is not set
+                // fail ("broadcast option not set - must throw");
+        }
 	catch (IOException&)
 	{
 	}

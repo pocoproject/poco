@@ -123,6 +123,8 @@ void SocketReactor::run()
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{
+				onBusy();
+
 				for (Socket::SocketList::iterator it = readable.begin(); it != readable.end(); ++it)
 					dispatch(*it, _pReadableNotification);
 				for (Socket::SocketList::iterator it = writable.begin(); it != writable.end(); ++it)
@@ -169,31 +171,41 @@ const Poco::Timespan& SocketReactor::getTimeout() const
 
 void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
 	NotifierPtr pNotifier;
-	EventHandlerMap::iterator it = _handlers.find(socket);
-	if (it == _handlers.end())
 	{
-		pNotifier = new SocketNotifier(socket);
-		_handlers[socket] = pNotifier;
+		FastMutex::ScopedLock lock(_mutex);
+		
+		EventHandlerMap::iterator it = _handlers.find(socket);
+		if (it == _handlers.end())
+		{
+			pNotifier = new SocketNotifier(socket);
+			_handlers[socket] = pNotifier;
+		}
+		else pNotifier = it->second;
 	}
-	else pNotifier = it->second;
 	pNotifier->addObserver(this, observer);
 }
 
 
 void SocketReactor::removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
-	FastMutex::ScopedLock lock(_mutex);
-	
-	EventHandlerMap::iterator it = _handlers.find(socket);
-	if (it != _handlers.end())
+	NotifierPtr pNotifier;
 	{
-		NotifierPtr pNotifier = it->second;
+		FastMutex::ScopedLock lock(_mutex);
+		
+		EventHandlerMap::iterator it = _handlers.find(socket);
+		if (it != _handlers.end())
+		{
+			pNotifier = it->second;
+			if (pNotifier->countObservers() == 1)
+			{
+				_handlers.erase(it);
+			}
+		}
+	}
+	if (pNotifier)
+	{
 		pNotifier->removeObserver(this, observer);
-		if (!pNotifier->hasObservers())
-			_handlers.erase(it);
 	}
 }
 
@@ -213,6 +225,11 @@ void SocketReactor::onIdle()
 void SocketReactor::onShutdown()
 {
 	dispatch(_pShutdownNotification);
+}
+
+
+void SocketReactor::onBusy()
+{
 }
 
 

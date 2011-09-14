@@ -116,6 +116,7 @@ void HTTPBasicCredentials::authenticate(HTTPRequest& request)
 {
 	std::ostringstream ostr;
 	Base64Encoder encoder(ostr);
+	encoder.rdbuf()->setLineLength(0);
 	encoder << _username << ":" << _password;
 	encoder.close();
 	request.setCredentials(SCHEME, ostr.str());
