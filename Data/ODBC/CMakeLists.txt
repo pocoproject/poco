@@ -1,4 +1,4 @@
-set(LIBNAME "PocoODBC")
+set(LIBNAME "PocoDataODBC")
 set(LIBNAMED "${LIBNAME}d")
 
 set(SRCS 

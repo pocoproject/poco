@@ -1,4 +1,4 @@
-set(LIBNAME "PocoMySQL")
+set(LIBNAME "PocoDataMySQL")
 set(LIBNAMED "${LIBNAME}d")
 
 set(SRCS "")
