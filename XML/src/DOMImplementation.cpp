@@ -67,15 +67,15 @@ DOMImplementation::~DOMImplementation()
 
 bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& version) const
 {
-	XMLString lcFeature = Poco::toLower(feature);
-	return lcFeature == FEATURE_XML && version == VERSION_1_0 ||
-	       lcFeature == FEATURE_CORE && version == VERSION_2_0 ||
-	       lcFeature == FEATURE_EVENTS && version == VERSION_2_0 ||
-	       lcFeature == FEATURE_MUTATIONEVENTS && version == VERSION_2_0 ||
-	       lcFeature == FEATURE_TRAVERSAL && version == VERSION_2_0;
+        XMLString lcFeature = Poco::toLower(feature);
+        return (lcFeature == FEATURE_XML && version == VERSION_1_0) ||
+               (lcFeature == FEATURE_CORE && version == VERSION_2_0) ||
+               (lcFeature == FEATURE_EVENTS && version == VERSION_2_0) ||
+               (lcFeature == FEATURE_MUTATIONEVENTS && version == VERSION_2_0) ||
+               (lcFeature == FEATURE_TRAVERSAL && version == VERSION_2_0);
 }
 
-		
+                
 DocumentType* DOMImplementation::createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
 {
 	return new DocumentType(0, name, publicId, systemId);
@@ -93,10 +93,15 @@ Document* DOMImplementation::createDocument(const XMLString& namespaceURI, const
 }
 
 
+namespace
+{
+        static Poco::SingletonHolder<DOMImplementation> sh;
+}
+
+
 const DOMImplementation& DOMImplementation::instance()
 {
-	static Poco::SingletonHolder<DOMImplementation> sh;
-	return *sh.get();
+        return *sh.get();
 }
 
 
