@@ -69,12 +69,18 @@ public:
 	  _helpRequested(false),
 		 _length(RSAKey::KL_1024),
 		 _exp(RSAKey::EXP_LARGE),
-		 _name(),
-		 _pwd()
-	{
-	}
+                 _name(),
+                 _pwd()
+        {
+                Poco::Crypto::initializeCrypto();
+        }
+        
+        ~RSAApp()
+        {
+                Poco::Crypto::uninitializeCrypto();
+        }
 
-protected:	
+protected:      
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present

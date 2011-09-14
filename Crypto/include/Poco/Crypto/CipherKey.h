@@ -1,7 +1,7 @@
 //
 // CipherKey.h
 //
-// $Id: //poco/Main/Crypto/include/Poco/Crypto/CipherKey.h#2 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherKey.h#1 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -65,7 +65,7 @@ class Crypto_API CipherKey
 	///
 	///     std::string password = "secret";
 	///     std::string salt("asdff8723lasdf(**923412");
-	///		CipherKey key("aes-256", password, salt);
+	///     CipherKey key("aes-256", password, salt);
 	///
 {
 public:

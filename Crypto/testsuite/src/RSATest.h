@@ -46,14 +46,14 @@ public:
 	RSATest(const std::string& name);
 	~RSATest();
 
-	void testNewKeys();
-	void testSign();
-	void testSignManipulated();
-	void createRSACipher();
-	void createRSACipherLarge();
-	void testCertificate();
+        void testNewKeys();
+        void testSign();
+        void testSignManipulated();
+        void testRSACipher();
+        void testRSACipherLarge();
+        void testCertificate();
 
-	void setUp();
+        void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();

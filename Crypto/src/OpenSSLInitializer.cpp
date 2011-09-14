@@ -1,7 +1,7 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/Main/Crypto/src/OpenSSLInitializer.cpp#1 $
+// $Id: //poco/1.4/Crypto/src/OpenSSLInitializer.cpp#1 $
 //
 // Library: Crypto
 // Package: CryotpCore
@@ -41,27 +41,27 @@
 #include <openssl/rand.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#if SSLEAY_VERSION_NUMBER >= 0x0907000L
+#include <openssl/conf.h>
+#endif
 
 
 using Poco::RandomInputStream;
 using Poco::Thread;
-using Poco::FastMutex;
 
 
 namespace Poco {
 namespace Crypto {
 
 
-FastMutex* OpenSSLInitializer::_mutexes(0);
+Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
+Poco::FastMutex OpenSSLInitializer::_mutex;
 int OpenSSLInitializer::_rc(0);
-
-
-static OpenSSLInitializer initializer;
 
 
 OpenSSLInitializer::OpenSSLInitializer()
 {
-	initialize();
+        initialize();
 }
 
 
@@ -73,10 +73,16 @@ OpenSSLInitializer::~OpenSSLInitializer()
 
 void OpenSSLInitializer::initialize()
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	
 	if (++_rc == 1)
 	{
-		poco_assert (1 == SSL_library_init()); // always returns 1
+#if OPENSSL_VERSION_NUMBER >= 0x0907000L
+		OPENSSL_config(NULL);
+#endif
+		SSL_library_init();
 		SSL_load_error_strings();
+		OpenSSL_add_all_algorithms();
 		
 		char seed[SEEDSIZE];
 		RandomInputStream rnd;
@@ -84,7 +90,7 @@ void OpenSSLInitializer::initialize()
 		RAND_seed(seed, SEEDSIZE);
 		
 		int nMutexes = CRYPTO_num_locks();
-		_mutexes = new FastMutex[nMutexes];
+		_mutexes = new Poco::FastMutex[nMutexes];
 		CRYPTO_set_locking_callback(&OpenSSLInitializer::lock);
 #ifndef POCO_OS_FAMILY_WINDOWS // SF# 1828231: random unhandled exceptions when linking with ssl
 		CRYPTO_set_id_callback(&OpenSSLInitializer::id);
@@ -98,6 +104,8 @@ void OpenSSLInitializer::initialize()
 
 void OpenSSLInitializer::uninitialize()
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (--_rc == 0)
 	{
 		EVP_cleanup();
@@ -119,8 +127,10 @@ void OpenSSLInitializer::lock(int mode, int n, const char* file, int line)
 
 unsigned long OpenSSLInitializer::id()
 {
-	Thread* pThread = Thread::current();
-	return pThread ? pThread->id() : 0;
+	// Note: we use an old-style C cast here because
+	// neither static_cast<> nor reinterpret_cast<>
+	// work uniformly across all platforms.
+	return (unsigned long) Poco::Thread::currentTid();
 }
 
 
@@ -144,6 +154,18 @@ void OpenSSLInitializer::dynlock(int mode, struct CRYPTO_dynlock_value* lock, co
 void OpenSSLInitializer::dynlockDestroy(struct CRYPTO_dynlock_value* lock, const char* file, int line)
 {
 	delete lock;
+}
+
+
+void initializeCrypto()
+{
+	OpenSSLInitializer::initialize();
+}
+
+
+void uninitializeCrypto()
+{
+	OpenSSLInitializer::uninitialize();
 }
 
 

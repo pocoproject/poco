@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Crypto">
+      <UniqueIdentifier>{02debdde-8664-412b-ba6c-4c13197de6f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Crypto\Header Files">
+      <UniqueIdentifier>{2311d4f4-8f52-459d-8caa-4febea4f0654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Crypto\Source Files">
+      <UniqueIdentifier>{536bcab9-b11f-4dc2-bb55-ed2fc7101adf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{4d25d62e-2b08-4863-8e6e-a37a27784732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{a197b9e5-7e95-4f57-a438-237041d9a3c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{9df90fce-71cf-4b62-af6b-b1edadb7e6e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{a248980e-d5c3-41f7-a739-cd98b2f9f766}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{e3b401c0-2adc-4abc-96a3-07d3520ba75d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CryptoTest.h">
+      <Filter>Crypto\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RSATest.h">
+      <Filter>Crypto\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CryptoTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CryptoTest.cpp">
+      <Filter>Crypto\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RSATest.cpp">
+      <Filter>Crypto\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CryptoTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinDriver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

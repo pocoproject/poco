@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.h
 //
-// $Id: //poco/Main/Crypto/include/Poco/Crypto/RSACipherImpl.h#2 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSACipherImpl.h#1 $
 //
 // Library: Crypto
 // Package: RSA
@@ -43,6 +43,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/RSAKey.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include <openssl/evp.h>
 
 
@@ -77,8 +78,9 @@ public:
 		/// Creates a decrytor object.
 
 private:
-	RSAKey _key;
-	RSAPaddingMode _paddingMode;
+        RSAKey _key;
+        RSAPaddingMode _paddingMode;
+        OpenSSLInitializer _openSSLInitializer;
 };
 
 

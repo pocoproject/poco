@@ -1,7 +1,7 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/Main/Crypto/include/Poco/Crypto/X509Certificate.h#1 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/X509Certificate.h#1 $
 //
 // Library: Crypto
 // Package: Certificate
@@ -41,6 +41,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <set>
@@ -80,6 +81,12 @@ public:
 		/// Creates the X509Certificate from an existing
 		/// OpenSSL certificate. Ownership is taken of 
 		/// the certificate.
+
+	X509Certificate(X509* pCert, bool shared);
+		/// Creates the X509Certificate from an existing
+		/// OpenSSL certificate. Ownership is taken of 
+		/// the certificate. If shared is true, the 
+		/// certificate's reference count is incremented.
 
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.
@@ -164,9 +171,10 @@ private:
 		NAME_BUFFER_SIZE = 256
 	};
 	
-	std::string _issuerName;
-	std::string _subjectName;
-	X509*       _pCert;
+        std::string _issuerName;
+        std::string _subjectName;
+        X509*       _pCert;
+        OpenSSLInitializer _openSSLInitializer;
 };
 
 

@@ -1,11 +1,11 @@
 //
-// CryptoTest.h
+// WinCEDriver.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.h#2 $
+// $Id: //poco/1.4/Crypto/testsuite/src/WinCEDriver.cpp#1 $
 //
-// Definition of the CryptoTest class.
+// Console-based test driver for Windows CE.
 //
-// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -32,37 +32,39 @@
 //
 
 
-#ifndef CryptoTest_INCLUDED
-#define CryptoTest_INCLUDED
-
-
+#include "CppUnit/TestRunner.h"
+#include "CryptoTestSuite.h"
 #include "Poco/Crypto/Crypto.h"
-#include "CppUnit/TestCase.h"
+#include <cstdlib>
 
 
-class CryptoTest: public CppUnit::TestCase
+class CryptoInitializer
 {
 public:
-        enum 
+        CryptoInitializer()
         {
-                MAX_DATA_SIZE = 10000
-        };
+                Poco::Crypto::initializeCrypto();
+        }
         
-        CryptoTest(const std::string& name);
-        ~CryptoTest();
-
-        void testEncryptDecrypt();
-        void testEncryptDecryptWithSalt();
-        void testStreams();
-        void testCertificate();
-        
-        void setUp();
-	void tearDown();
-
-	static CppUnit::Test* suite();
-
-private:
+        ~CryptoInitializer()
+        {
+                Poco::Crypto::uninitializeCrypto();
+        }
 };
 
 
-#endif // CryptoTest_INCLUDED
+int _tmain(int argc, wchar_t* argv[])
+{
+        CryptoInitializer ci;
+
+        std::vector<std::string> args;
+        for (int i = 0; i < argc; ++i)
+        {
+                char buffer[1024];
+                std::wcstombs(buffer, argv[i], sizeof(buffer));
+                args.push_back(std::string(buffer));
+        }
+        CppUnit::TestRunner runner;     
+        runner.addTest("CryptoTestSuite", CryptoTestSuite::suite());
+        return runner.run(args) ? 0 : 1;
+}

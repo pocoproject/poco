@@ -42,6 +42,12 @@
 #define Crypto_Crypto_INCLUDED
 
 
+#if defined(__APPLE__)
+// OS X 10.7 deprecates some OpenSSL functions
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
+#endif
+
+
 #include "Poco/Foundation.h"
 
 
@@ -93,21 +99,37 @@ enum RSAPaddingMode
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Crypto_EXPORTS)
-		#if defined(POCO_DLL)
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoCryptod.lib")
-			#else
-				#pragma comment(lib, "PocoCrypto.lib")
-			#endif
-		#else
-			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoCryptomtd.lib")
-			#else
-				#pragma comment(lib, "PocoCryptomt.lib")
-			#endif
-		#endif
+		#pragma comment(lib, "PocoCrypto" POCO_LIB_SUFFIX)
 	#endif
 #endif
+
+
+namespace Poco {
+namespace Crypto {
+
+
+void Crypto_API initializeCrypto();
+	/// Initialize the Crypto library, as well as the underlying OpenSSL
+        /// libraries, by calling OpenSSLInitializer::initialize().
+        ///
+        /// Should be called before using any class from the Crypto library.
+        /// The Crypto library will be initialized automatically, through  
+        /// OpenSSLInitializer instances held by various Crypto classes
+        /// (Cipher, CipherKey, RSAKey, X509Certificate).
+        /// However, it is recommended to call initializeCrypto()
+        /// in any case at application startup.
+        ///
+        /// Can be called multiple times; however, for every call to
+	/// initializeCrypto(), a matching call to uninitializeCrypto()
+	/// must be performed.
+	
+
+void Crypto_API uninitializeCrypto();
+	/// Uninitializes the Crypto library by calling 
+	/// OpenSSLInitializer::uninitialize().
+
+
+} } // namespace Poco::Crypto
 
 
 #endif // Crypto_Crypto_INCLUDED

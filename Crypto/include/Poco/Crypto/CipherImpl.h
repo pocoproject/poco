@@ -1,7 +1,7 @@
 //
 // CipherImpl.h
 //
-// $Id: //poco/Main/Crypto/include/Poco/Crypto/CipherImpl.h#3 $
+// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherImpl.h#1 $
 //
 // Library: Crypto
 // Package: Cipher
@@ -43,7 +43,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherKey.h"
-
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include <openssl/evp.h>
 
 
@@ -71,7 +71,8 @@ public:
 		/// Creates a decrytor object.
 
 private:
-	CipherKey _key;
+        CipherKey _key;
+        OpenSSLInitializer _openSSLInitializer;
 };
 
 

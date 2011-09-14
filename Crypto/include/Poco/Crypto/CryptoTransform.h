@@ -74,13 +74,13 @@ public:
 		/// Transforms a chunk of data. The inputLength is arbitrary and does not
 		/// need to be a multiple of the block size. The output buffer has a maximum
 		/// capacity of the given outputLength that must be at least
-		///   inputLength + bufferSize() - 1
+		///   inputLength + blockSize() - 1
 		/// Returns the number of bytes written to the output buffer.
 
 	virtual std::streamsize finalize(unsigned char* output, std::streamsize length) = 0;
 		/// Finalizes the transformation. The output buffer must contain enough
-		/// space for at least one block, ie.
-		///   length >= bufferSize()
+		/// space for at least two blocks, ie.
+		///   length >= 2*blockSize()
 		/// must be true.  Returns the number of bytes written to the output
 		/// buffer.
 };

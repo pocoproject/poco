@@ -1,7 +1,7 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/Main/Crypto/src/RSACipherImpl.cpp#2 $
+// $Id: //poco/1.4/Crypto/src/RSACipherImpl.cpp#1 $
 //
 // Library: Crypto
 // Package: RSA
@@ -86,15 +86,11 @@ namespace
 	class RSAEncryptImpl: public CryptoTransform
 	{
 	public:
-		enum
-		{
-			OVERFLOW = 11
-		};
-		
 		RSAEncryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
 		~RSAEncryptImpl();
 		
 		std::size_t blockSize() const;
+		std::size_t maxDataSize() const;
 
 		std::streamsize transform(
 			const unsigned char* input,
@@ -122,15 +118,34 @@ namespace
 	}
 
 
-	RSAEncryptImpl::~RSAEncryptImpl()
-	{
-		delete _pBuf;
-	}
+        RSAEncryptImpl::~RSAEncryptImpl()
+        {
+                delete [] _pBuf;
+        }
 
 
 	std::size_t RSAEncryptImpl::blockSize() const
 	{
 		return RSA_size(_pRSA);
+	}
+
+
+	std::size_t RSAEncryptImpl::maxDataSize() const
+	{
+		std::size_t size = blockSize();
+		switch (_paddingMode)
+		{
+		case RSA_PADDING_PKCS1:
+		case RSA_PADDING_SSLV23:
+			size -= 11;
+			break;
+		case RSA_PADDING_PKCS1_OAEP:
+			size -= 41;
+			break;
+		default:
+			break;
+		}
+		return size;
 	}
 
 
@@ -141,24 +156,25 @@ namespace
 		std::streamsize		 outputLength)
 	{
 		// always fill up the buffer before writing!
+		std::streamsize maxSize = static_cast<std::streamsize>(maxDataSize());
 		std::streamsize rsaSize = static_cast<std::streamsize>(blockSize());
-		poco_assert_dbg(_pos <= rsaSize);
+		poco_assert_dbg(_pos <= maxSize);
 		poco_assert (outputLength >= rsaSize);
 		int rc = 0;
 		while (inputLength > 0)
 		{
 			// check how many data bytes we are missing to get the buffer full
-			poco_assert_dbg (rsaSize >= _pos);
-			std::streamsize missing = rsaSize - _pos;
+			poco_assert_dbg (maxSize >= _pos);
+			std::streamsize missing = maxSize - _pos;
 			if (missing == 0)
 			{
 				poco_assert (outputLength >= rsaSize);
-				int tmp = RSA_public_encrypt(rsaSize, _pBuf, output, const_cast<RSA*>(_pRSA), RSA_NO_PADDING);
-				if (tmp == -1)
+				int n = RSA_public_encrypt(static_cast<int>(maxSize), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+				if (n == -1)
 					throwError();
-				rc += tmp;
-				output += tmp;
-				outputLength -= tmp;
+				rc += n;
+				output += n;
+				outputLength -= n;
 				_pos = 0;
 				
 			}
@@ -167,13 +183,12 @@ namespace
 				if (missing > inputLength)
 					missing = inputLength;
 
-				std::memcpy(_pBuf+_pos, input, missing);
+				std::memcpy(_pBuf + _pos, input, static_cast<std::size_t>(missing));
 				input += missing;
 				_pos += missing;
 				inputLength -= missing;
 			}
 		}
-
 		return rc;
 	}
 
@@ -181,14 +196,13 @@ namespace
 	std::streamsize RSAEncryptImpl::finalize(unsigned char*	output, std::streamsize length)
 	{
 		poco_assert (length >= blockSize());
+		poco_assert (_pos <= maxDataSize());
 		int rc = 0;
 		if (_pos > 0)
 		{
-			rc = RSA_public_encrypt(_pos, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
-			if (rc == -1)
-				throwError();
+			rc = RSA_public_encrypt(static_cast<int>(_pos), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+			if (rc == -1) throwError();
 		}
-
 		return rc;
 	}
 
@@ -196,11 +210,6 @@ namespace
 	class RSADecryptImpl: public CryptoTransform
 	{
 	public:
-		enum
-		{
-			OVERFLOW = 11
-		};
-		
 		RSADecryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
 		~RSADecryptImpl();
 		
@@ -234,10 +243,10 @@ namespace
 	}
 
 
-	RSADecryptImpl::~RSADecryptImpl()
-	{
-		delete _pBuf;
-	}
+        RSADecryptImpl::~RSADecryptImpl()
+        {
+                delete [] _pBuf;
+        }
 
 
 	std::size_t RSADecryptImpl::blockSize() const
@@ -265,7 +274,7 @@ namespace
 			std::streamsize missing = rsaSize - _pos;
 			if (missing == 0)
 			{
-				int tmp = RSA_private_decrypt(rsaSize, _pBuf, output, const_cast<RSA*>(_pRSA), RSA_NO_PADDING);
+				int tmp = RSA_private_decrypt(static_cast<int>(rsaSize), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 				if (tmp == -1)
 					throwError();
 				rc += tmp;
@@ -279,13 +288,12 @@ namespace
 				if (missing > inputLength)
 					missing = inputLength;
 
-				std::memcpy(_pBuf+_pos, input, missing);
+				std::memcpy(_pBuf + _pos, input, static_cast<std::size_t>(missing));
 				input += missing;
 				_pos += missing;
 				inputLength -= missing;
 			}
 		}
-
 		return rc;
 	}
 
@@ -296,19 +304,18 @@ namespace
 		int rc = 0;
 		if (_pos > 0)
 		{
-			rc = RSA_private_decrypt(_pos, _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+			rc = RSA_private_decrypt(static_cast<int>(_pos), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 			if (rc == -1)
 				throwError();
 		}
-
 		return rc;
 	}
 }
 
 
 RSACipherImpl::RSACipherImpl(const RSAKey& key, RSAPaddingMode paddingMode):
-	_key(key),
-	_paddingMode(paddingMode)
+        _key(key),
+        _paddingMode(paddingMode)
 {
 }
 

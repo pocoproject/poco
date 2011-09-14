@@ -34,6 +34,32 @@
 
 #include "CppUnit/TestRunner.h"
 #include "CryptoTestSuite.h"
+#include "Poco/Crypto/Crypto.h"
 
 
-CppUnitMain(CryptoTestSuite)
+class CryptoInitializer
+{
+public:
+        CryptoInitializer()
+        {
+                Poco::Crypto::initializeCrypto();
+        }
+        
+        ~CryptoInitializer()
+        {
+                Poco::Crypto::uninitializeCrypto();
+        }
+};
+
+
+int main(int ac, char **av)
+{
+        CryptoInitializer ci;
+        
+        std::vector<std::string> args;
+        for (int i = 0; i < ac; ++i)
+                args.push_back(std::string(av[i]));
+        CppUnit::TestRunner runner;
+        runner.addTest("CryptoTestSuite", CryptoTestSuite::suite());
+        return runner.run(args) ? 0 : 1;
+}

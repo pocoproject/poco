@@ -86,8 +86,6 @@ public:
 		/// Returns the default CipherFactory.
 
 private:
-	static int _instanceCount;
-
 	CipherFactory(const CipherFactory&);
 	CipherFactory& operator = (const CipherFactory&);
 };

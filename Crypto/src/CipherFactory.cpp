@@ -50,35 +50,25 @@ namespace Poco {
 namespace Crypto {
 
 
-int CipherFactory::_instanceCount = 0;
-
-
 CipherFactory::CipherFactory()
 {
-	if (_instanceCount == 0)
-	{
-		OpenSSL_add_all_algorithms();
-		ERR_load_crypto_strings();
-	}
-	++_instanceCount;
 }
 
 
 CipherFactory::~CipherFactory()
 {
-	--_instanceCount;
-	if (_instanceCount == 0)
-	{
-		ERR_free_strings();
-		EVP_cleanup();
-	}
+}
+
+
+namespace
+{
+	static Poco::SingletonHolder<CipherFactory> holder;
 }
 
 
 CipherFactory& CipherFactory::defaultFactory()
 {
-	static Poco::SingletonHolder<CipherFactory> holder;
-	return *holder.get();
+        return *holder.get();
 }
 
 
