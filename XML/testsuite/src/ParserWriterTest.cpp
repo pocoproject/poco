@@ -97,7 +97,7 @@ void ParserWriterTest::testParseWriteWSDL()
 	std::ostringstream ostr;
 
 	DOMParser parser;
-	parser.setFeature(DOMParser::FEATURE_WHITESPACE, false);
+	parser.setFeature(DOMParser::FEATURE_FILTER_WHITESPACE, false);
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	DOMWriter writer;
 	writer.setOptions(XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
