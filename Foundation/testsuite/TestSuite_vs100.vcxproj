@@ -301,12 +301,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\AnyTest.cpp" />
+    <ClCompile Include="src\ArrayTest.cpp" />
     <ClCompile Include="src\AutoPtrTest.cpp" />
     <ClCompile Include="src\AutoReleasePoolTest.cpp" />
     <ClCompile Include="src\ByteOrderTest.cpp" />
     <ClCompile Include="src\CoreTest.cpp" />
     <ClCompile Include="src\CoreTestSuite.cpp" />
-    <ClCompile Include="src\DynamicAnyTest.cpp" />
     <ClCompile Include="src\DynamicFactoryTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
     <ClCompile Include="src\FPETest.cpp" />
@@ -333,6 +333,7 @@
     <ClCompile Include="src\StreamsTestSuite.cpp" />
     <ClCompile Include="src\StreamTokenizerTest.cpp" />
     <ClCompile Include="src\TeeStreamTest.cpp" />
+    <ClCompile Include="src\VarTest.cpp" />
     <ClCompile Include="src\ZLibTest.cpp" />
     <ClCompile Include="src\CryptTestSuite.cpp" />
     <ClCompile Include="src\DigestStreamTest.cpp" />
