@@ -47,7 +47,7 @@
 namespace Poco {
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(MINGW32) 
+#if defined(_MSC_VER) 
 #define POCO_TYPEWRAPPER_DEFAULTVALUE(T) TypeWrapper<T>::TYPE()
 #else
 #define POCO_TYPEWRAPPER_DEFAULTVALUE(T) typename TypeWrapper<T>::TYPE()

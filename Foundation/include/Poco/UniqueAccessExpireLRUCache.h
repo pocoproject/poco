@@ -90,4 +90,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_UniqueAccessExpireLRUCache_INCLUDED

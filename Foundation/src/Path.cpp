@@ -454,20 +454,22 @@ Path& Path::resolve(const Path& path)
 }
 
 
-void Path::setNode(const std::string& node)
+Path& Path::setNode(const std::string& node)
 {
-	_node     = node;
-	_absolute = _absolute || !node.empty();
+        _node     = node;
+        _absolute = _absolute || !node.empty();
+        return *this;
 }
 
-	
-void Path::setDevice(const std::string& device)
+        
+Path& Path::setDevice(const std::string& device)
 {
-	_device   = device;
-	_absolute = _absolute || !device.empty();
+        _device   = device;
+        _absolute = _absolute || !device.empty();
+        return *this;
 }
 
-	
+        
 const std::string& Path::directory(int n) const
 {
 	poco_assert (0 <= n && n <= _dirs.size());
@@ -489,11 +491,11 @@ const std::string& Path::operator [] (int n) const
 		return _name;	
 }
 
-	
-void Path::pushDirectory(const std::string& dir)
+        
+Path& Path::pushDirectory(const std::string& dir)
 {
-	if (!dir.empty() && dir != ".")
-	{
+        if (!dir.empty() && dir != ".")
+        {
 #if defined(POCO_OS_FAMILY_VMS)
 		if (dir == ".." || dir == "-")
 		{
@@ -511,44 +513,49 @@ void Path::pushDirectory(const std::string& dir)
 			else if (!_absolute)
 				_dirs.push_back(dir);
 		}
-		else _dirs.push_back(dir);
+                else _dirs.push_back(dir);
 #endif
-	}
+        }
+        return *this;
 }
 
-	
-void Path::popDirectory()
+        
+Path& Path::popDirectory()
 {
-	poco_assert (!_dirs.empty());
-	
-	_dirs.pop_back();
+        poco_assert (!_dirs.empty());
+        
+        _dirs.pop_back();
+        return *this;
 }
 
 
-void Path::popFrontDirectory()
+Path& Path::popFrontDirectory()
 {
         poco_assert (!_dirs.empty());
         
         StringVec::iterator it = _dirs.begin();
         _dirs.erase(it);
+        return *this;
 }
 
         
-void Path::setFileName(const std::string& name)
+Path& Path::setFileName(const std::string& name)
 {
         _name = name;
+        return *this;
 }
 
 
-void Path::setBaseName(const std::string& name)
+Path& Path::setBaseName(const std::string& name)
 {
-	std::string ext = getExtension();
-	_name = name;
+        std::string ext = getExtension();
+        _name = name;
 	if (!ext.empty())
 	{
-		_name.append(".");
-		_name.append(ext);
-	}
+                _name.append(".");
+                _name.append(ext);
+        }
+        return *this;
 }
 
 
@@ -562,17 +569,18 @@ std::string Path::getBaseName() const
 }
 
 
-void Path::setExtension(const std::string& extension)
+Path& Path::setExtension(const std::string& extension)
 {
-	_name = getBaseName();
-	if (!extension.empty())
+        _name = getBaseName();
+        if (!extension.empty())
 	{
-		_name.append(".");
-		_name.append(extension);
-	}
+                _name.append(".");
+                _name.append(extension);
+        }
+        return *this;
 }
 
-			
+                        
 std::string Path::getExtension() const
 {
 	std::string::size_type pos = _name.rfind('.');
@@ -583,14 +591,15 @@ std::string Path::getExtension() const
 }
 
 
-void Path::clear()
+Path& Path::clear()
 {
-	_node.clear();
-	_device.clear();
+        _node.clear();
+        _device.clear();
 	_name.clear();
-	_dirs.clear();
-	_version.clear();
-	_absolute = false;
+        _dirs.clear();
+        _version.clear();
+        _absolute = false;
+    return *this;
 }
 
 
@@ -688,20 +697,20 @@ void Path::parseUnix(const std::string& path)
 			if (it != end)
 			{
 				if (_dirs.empty())
-                                {
-                                        if (!name.empty() && *(name.rbegin()) == ':')
-                                        {
-                                                _absolute = true;
-                                                _device.assign(name, 0, name.length() - 1);
-                                        }
-                                        else
-                                        {
-                                                pushDirectory(name);
-                                        }
-                                }
-                                else pushDirectory(name);
-                        }
-                        else _name = name;
+				{
+					if (!name.empty() && *(name.rbegin()) == ':')
+					{
+						_absolute = true;
+						_device.assign(name, 0, name.length() - 1);
+					}
+					else
+					{
+						pushDirectory(name);
+					}
+				}
+				else pushDirectory(name);
+			}
+			else _name = name;
 			if (it != end) ++it;
 		}
 	}
@@ -726,17 +735,17 @@ void Path::parseWindows(const std::string& path)
 		}
 		else if (it != end)
 		{
-                        char d = *it++;
-                        if (it != end && *it == ':') // drive letter
-                        {
-                                if (_absolute || !((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z'))) throw PathSyntaxException(path);
-                                _absolute = true;
-                                _device += d;
-                                ++it;
-                                if (it == end || (*it != '\\' && *it != '/')) throw PathSyntaxException(path);
-                                ++it;
-                        }
-                        else --it;
+			char d = *it++;
+			if (it != end && *it == ':') // drive letter
+			{
+				if (_absolute || !((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z'))) throw PathSyntaxException(path);
+				_absolute = true;
+				_device += d;
+				++it;
+				if (it == end || (*it != '\\' && *it != '/')) throw PathSyntaxException(path);
+				++it;
+			}
+			else --it;
 		}
 		while (it != end)
 		{

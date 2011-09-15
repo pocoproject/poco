@@ -157,33 +157,33 @@ public:
 		/// On such platforms, created() returns
 		/// the time of the last inode modification.
 
-	Timestamp getLastModified() const;
-		/// Returns the modification date of the file.
-		
-	void setLastModified(const Timestamp& ts);
-		/// Sets the modification date of the file.
-		
-	FileSize getSize() const;
-		/// Returns the size of the file in bytes.
-		
-	void setSize(FileSize size);
-		/// Sets the size of the file in bytes. Can be used
-		/// to truncate a file.
-		
-	void setWriteable(bool flag = true);
-		/// Makes the file writeable (if flag is true), or
-		/// non-writeable (if flag is false) by setting the
-		/// file's flags in the filesystem accordingly.
-		
-	void setReadOnly(bool flag = true);
-		/// Makes the file non-writeable (if flag is true), or
-		/// writeable (if flag is false) by setting the
-		/// file's flags in the filesystem accordingly.
-		
-	void setExecutable(bool flag = true);
-		/// Makes the file executable (if flag is true), or
-		/// non-executable (if flag is false) by setting
-		/// the file's permission bits accordingly.
+        Timestamp getLastModified() const;
+                /// Returns the modification date of the file.
+                
+        File& setLastModified(const Timestamp& ts);
+                /// Sets the modification date of the file.
+                
+        FileSize getSize() const;
+                /// Returns the size of the file in bytes.
+                
+        File& setSize(FileSize size);
+                /// Sets the size of the file in bytes. Can be used
+                /// to truncate a file.
+                
+        File& setWriteable(bool flag = true);
+                /// Makes the file writeable (if flag is true), or
+                /// non-writeable (if flag is false) by setting the
+                /// file's flags in the filesystem accordingly.
+                
+        File& setReadOnly(bool flag = true);
+                /// Makes the file non-writeable (if flag is true), or
+                /// writeable (if flag is false) by setting the
+                /// file's flags in the filesystem accordingly.
+                
+        File& setExecutable(bool flag = true);
+                /// Makes the file executable (if flag is true), or
+                /// non-executable (if flag is false) by setting
+                /// the file's permission bits accordingly.
 		///
 		/// Does nothing on Windows and OpenVMS.	
 		

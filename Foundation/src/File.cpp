@@ -189,43 +189,48 @@ Timestamp File::getLastModified() const
 	return getLastModifiedImpl();
 }
 
-	
-void File::setLastModified(const Timestamp& ts)
+        
+File& File::setLastModified(const Timestamp& ts)
 {
-	setLastModifiedImpl(ts);
+        setLastModifiedImpl(ts);
+    return *this;
 }
 
-	
+        
 File::FileSize File::getSize() const
 {
 	return getSizeImpl();
 }
 
-	
-void File::setSize(FileSizeImpl size)
+        
+File& File::setSize(FileSizeImpl size)
 {
-	setSizeImpl(size);
+        setSizeImpl(size);
+    return *this;
 }
 
-	
-void File::setWriteable(bool flag)
+        
+File& File::setWriteable(bool flag)
 {
-	setWriteableImpl(flag);
-}
-
-
-void File::setReadOnly(bool flag)
-{
-	setWriteableImpl(!flag);
+        setWriteableImpl(flag);
+    return *this;
 }
 
 
-void File::setExecutable(bool flag)
+File& File::setReadOnly(bool flag)
 {
-	setExecutableImpl(flag);
+        setWriteableImpl(!flag);
+    return *this;
 }
 
-	
+
+File& File::setExecutable(bool flag)
+{
+        setExecutableImpl(flag);
+    return *this;
+}
+
+        
 void File::copyTo(const std::string& path) const
 {
 	Path src(getPathImpl());

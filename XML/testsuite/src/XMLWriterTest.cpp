@@ -68,20 +68,20 @@ void XMLWriterTest::testTrivial()
 
 void XMLWriterTest::testTrivialCanonical()
 {
-        std::ostringstream str;
-        XMLWriter writer(str, XMLWriter::CANONICAL_XML);
-        writer.startDocument();
-        writer.startElement("", "", "foo");
-        writer.endElement("", "", "foo");
-        writer.endDocument();
-        std::string xml = str.str();
-        assert (xml == "<foo></foo>");
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::CANONICAL_XML);
+	writer.startDocument();
+	writer.startElement("", "", "foo");
+	writer.endElement("", "", "foo");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<foo></foo>");
 }
 
 
 void XMLWriterTest::testTrivialDecl()
 {
-        std::ostringstream str;
+	std::ostringstream str;
 	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION);
 	writer.startDocument();
 	writer.startElement("", "", "foo");
@@ -237,18 +237,18 @@ void XMLWriterTest::testAttributes()
 
 void XMLWriterTest::testAttributesPretty()
 {
-        std::ostringstream str;
-        XMLWriter writer(str, XMLWriter::PRETTY_PRINT | XMLWriter::PRETTY_PRINT_ATTRIBUTES);
-        writer.setNewLine(XMLWriter::NEWLINE_LF);
-        writer.startDocument();
-        AttributesImpl attrs;
-        attrs.addAttribute("", "", "a1", "CDATA", "v1");
-        attrs.addAttribute("", "", "a2", "CDATA", "v2");
-        writer.startElement("", "", "el", attrs);
-        writer.endElement("", "", "el");
-        writer.endDocument();
-        std::string xml = str.str();
-        assert (xml == "<el\n\ta1=\"v1\"\n\ta2=\"v2\"/>\n");
+	std::ostringstream str;
+	XMLWriter writer(str, XMLWriter::PRETTY_PRINT | XMLWriter::PRETTY_PRINT_ATTRIBUTES);
+	writer.setNewLine(XMLWriter::NEWLINE_LF);
+	writer.startDocument();
+	AttributesImpl attrs;
+	attrs.addAttribute("", "", "a1", "CDATA", "v1");
+	attrs.addAttribute("", "", "a2", "CDATA", "v2");
+	writer.startElement("", "", "el", attrs);
+	writer.endElement("", "", "el");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<el\n\ta1=\"v1\"\n\ta2=\"v2\"/>\n");
 }
 
 
@@ -402,17 +402,17 @@ void XMLWriterTest::testRawCharacters()
 
 void XMLWriterTest::testAttributeCharacters()
 {
-        std::ostringstream str;
-        XMLWriter writer(str, 0);
-        writer.startDocument();
-        AttributesImpl attrs;
-        attrs.addAttribute("", "", "a1", "CDATA", "a b c\n\td");
-        attrs.addAttribute("", "", "a2", "CDATA", "a b c\r\nd");
-        writer.startElement("", "", "el", attrs);
-        writer.endElement("", "", "el");
-        writer.endDocument();
-        std::string xml = str.str();
-        assert (xml == "<el a1=\"a b c&#xA;&#x9;d\" a2=\"a b c&#xD;&#xA;d\"/>");
+	std::ostringstream str;
+	XMLWriter writer(str, 0);
+	writer.startDocument();
+	AttributesImpl attrs;
+	attrs.addAttribute("", "", "a1", "CDATA", "a b c\n\td");
+	attrs.addAttribute("", "", "a2", "CDATA", "a b c\r\nd");
+	writer.startElement("", "", "el", attrs);
+	writer.endElement("", "", "el");
+	writer.endDocument();
+	std::string xml = str.str();
+	assert (xml == "<el a1=\"a b c&#xA;&#x9;d\" a2=\"a b c&#xD;&#xA;d\"/>");
 }
 
 
@@ -487,7 +487,7 @@ void XMLWriterTest::testAttributeNamespaces()
         writer.endElement("urn:ns", "r", "");
         writer.endDocument();
         std::string xml = str.str();
-        assert (xml == "<ns1:r myattr2=\"attrValue2\" ns2:myattr=\"attrValue\" xmlns:ns1=\"urn:ns\" xmlns:ns2=\"urn:other\">data</ns1:r>");
+        assert (xml == "<ns2:r ns1:myattr=\"attrValue\" ns2:myattr2=\"attrValue2\" xmlns:ns1=\"urn:other\" xmlns:ns2=\"urn:ns\">data</ns2:r>");
 }
 
 
@@ -611,34 +611,34 @@ void XMLWriterTest::tearDown()
 
 CppUnit::Test* XMLWriterTest::suite()
 {
-        CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("XMLWriterTest");
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("XMLWriterTest");
 
-        CppUnit_addTest(pSuite, XMLWriterTest, testTrivial);
-        CppUnit_addTest(pSuite, XMLWriterTest, testTrivialCanonical);
-        CppUnit_addTest(pSuite, XMLWriterTest, testTrivialDecl);
-        CppUnit_addTest(pSuite, XMLWriterTest, testTrivialDeclPretty);
-        CppUnit_addTest(pSuite, XMLWriterTest, testTrivialFragment);
+	CppUnit_addTest(pSuite, XMLWriterTest, testTrivial);
+	CppUnit_addTest(pSuite, XMLWriterTest, testTrivialCanonical);
+	CppUnit_addTest(pSuite, XMLWriterTest, testTrivialDecl);
+	CppUnit_addTest(pSuite, XMLWriterTest, testTrivialDeclPretty);
+	CppUnit_addTest(pSuite, XMLWriterTest, testTrivialFragment);
 	CppUnit_addTest(pSuite, XMLWriterTest, testTrivialFragmentPretty);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDTDPretty);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDTD);
-        CppUnit_addTest(pSuite, XMLWriterTest, testDTDNotation);
-        CppUnit_addTest(pSuite, XMLWriterTest, testDTDEntity);
-        CppUnit_addTest(pSuite, XMLWriterTest, testAttributes);
-        CppUnit_addTest(pSuite, XMLWriterTest, testAttributesPretty);
-        CppUnit_addTest(pSuite, XMLWriterTest, testData);
-        CppUnit_addTest(pSuite, XMLWriterTest, testEmptyData);
-        CppUnit_addTest(pSuite, XMLWriterTest, testDataPretty);
+	CppUnit_addTest(pSuite, XMLWriterTest, testDTDNotation);
+	CppUnit_addTest(pSuite, XMLWriterTest, testDTDEntity);
+	CppUnit_addTest(pSuite, XMLWriterTest, testAttributes);
+	CppUnit_addTest(pSuite, XMLWriterTest, testAttributesPretty);
+	CppUnit_addTest(pSuite, XMLWriterTest, testData);
+	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyData);
+	CppUnit_addTest(pSuite, XMLWriterTest, testDataPretty);
 	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyDataPretty);
 	CppUnit_addTest(pSuite, XMLWriterTest, testComment);
 	CppUnit_addTest(pSuite, XMLWriterTest, testPI);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCharacters);
-        CppUnit_addTest(pSuite, XMLWriterTest, testEmptyCharacters);
-        CppUnit_addTest(pSuite, XMLWriterTest, testCDATA);
-        CppUnit_addTest(pSuite, XMLWriterTest, testRawCharacters);
-        CppUnit_addTest(pSuite, XMLWriterTest, testAttributeCharacters);
-        CppUnit_addTest(pSuite, XMLWriterTest, testDefaultNamespace);
-        CppUnit_addTest(pSuite, XMLWriterTest, testQNamespaces);
-        CppUnit_addTest(pSuite, XMLWriterTest, testQNamespacesNested);
+	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyCharacters);
+	CppUnit_addTest(pSuite, XMLWriterTest, testCDATA);
+	CppUnit_addTest(pSuite, XMLWriterTest, testRawCharacters);
+	CppUnit_addTest(pSuite, XMLWriterTest, testAttributeCharacters);
+	CppUnit_addTest(pSuite, XMLWriterTest, testDefaultNamespace);
+	CppUnit_addTest(pSuite, XMLWriterTest, testQNamespaces);
+	CppUnit_addTest(pSuite, XMLWriterTest, testQNamespacesNested);
 	CppUnit_addTest(pSuite, XMLWriterTest, testNamespaces);
 	CppUnit_addTest(pSuite, XMLWriterTest, testAttributeNamespaces);
 	CppUnit_addTest(pSuite, XMLWriterTest, testNamespacesNested);
