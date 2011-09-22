@@ -74,15 +74,15 @@
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(SQLite_EXPORTS)
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoSQLited.lib")
+				#pragma comment(lib, "PocoDataSQLited.lib")
 			#else
-				#pragma comment(lib, "PocoSQLite.lib")
+				#pragma comment(lib, "PocoDataSQLite.lib")
 			#endif
 		#else
 			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoSQLitemtd.lib")
+				#pragma comment(lib, "PocoDataSQLitemtd.lib")
 			#else
-				#pragma comment(lib, "PocoSQLitemt.lib")
+				#pragma comment(lib, "PocoDataSQLitemt.lib")
 			#endif
 		#endif
 	#endif
