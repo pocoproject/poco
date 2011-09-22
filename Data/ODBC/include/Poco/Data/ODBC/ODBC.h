@@ -81,15 +81,15 @@
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(ODBC_EXPORTS)
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoODBCd.lib")
+				#pragma comment(lib, "PocoDataODBCd.lib")
 			#else
-				#pragma comment(lib, "PocoODBC.lib")
+				#pragma comment(lib, "PocoDataODBC.lib")
 			#endif
 		#else
 			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoODBCmtd.lib")
+				#pragma comment(lib, "PocoDataODBCmtd.lib")
 			#else
-				#pragma comment(lib, "PocoODBCmt.lib")
+				#pragma comment(lib, "PocoDataODBCmt.lib")
 			#endif
 		#endif
 	#endif

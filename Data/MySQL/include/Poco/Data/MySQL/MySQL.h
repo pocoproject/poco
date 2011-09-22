@@ -72,15 +72,15 @@
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MYSQL_EXPORTS)
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoMySQLd.lib")
+				#pragma comment(lib, "PocoDataMySQLd.lib")
 			#else
-				#pragma comment(lib, "PocoMySQL.lib")
+				#pragma comment(lib, "PocoDataMySQL.lib")
 			#endif
 		#else
 			#if defined(_DEBUG)
-				#pragma comment(lib, "PocoMySQLmtd.lib")
+				#pragma comment(lib, "PocoDataMySQLmtd.lib")
 			#else
-				#pragma comment(lib, "PocoMySQLmt.lib")
+				#pragma comment(lib, "PocoDataMySQLmt.lib")
 			#endif
 		#endif
 	#endif
