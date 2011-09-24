@@ -1,7 +1,7 @@
 //
 // SharedLibrary_HPUX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary_HPUX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/SharedLibrary_HPUX.cpp#2 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -55,7 +55,7 @@ SharedLibraryImpl::~SharedLibraryImpl()
 }
 
 
-void SharedLibraryImpl::loadImpl(const std::string& path)
+void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 {
 	FastMutex::ScopedLock lock(_mutex);
 

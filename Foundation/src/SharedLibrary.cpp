@@ -1,7 +1,7 @@
 //
 // SharedLibrary.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/SharedLibrary.cpp#3 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -63,7 +63,13 @@ SharedLibrary::SharedLibrary()
 
 SharedLibrary::SharedLibrary(const std::string& path)
 {
-	loadImpl(path);
+	loadImpl(path, 0);
+}
+
+
+SharedLibrary::SharedLibrary(const std::string& path, int flags)
+{
+	loadImpl(path, flags);
 }
 
 
@@ -74,7 +80,13 @@ SharedLibrary::~SharedLibrary()
 
 void SharedLibrary::load(const std::string& path)
 {
-	loadImpl(path);
+	loadImpl(path, 0);
+}
+
+
+void SharedLibrary::load(const std::string& path, int flags)
+{
+	loadImpl(path, flags);
 }
 
 
