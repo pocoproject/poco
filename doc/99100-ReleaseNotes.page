@@ -2,6 +2,20 @@ POCO C++ Libraries Release Notes
 AAAIntroduction
 
 
+!!!Release 1.4.2p1
+
+!! Summary of Changes
+
+  - On Linux, the RTLD_DEEPBIND option is no longer passed to dlopen(). 
+    This change was introduced in 1.4.2 to solve a specific problem one customer 
+    was having. Unfortunately, it leads to problems with RTTI.
+  - It's now possible to pass flags (SHLIB_GLOBAL, SHLIB_LOCAL) to 
+    Poco::SharedLibrary::load() (and the constructor implicitly calling load()), 
+    controlling the mode flags (RTLD_GLOBAL, RTLD_LOCAL) passed to dlopen(). 
+    On platforms not using dlopen(), these flags are ignored.
+  - fixed SF# 3400267: Path_WIN32.cpp bug
+
+
 !!!Release 1.4.2
 
 !! Summary of Changes
