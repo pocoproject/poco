@@ -13,7 +13,7 @@ SET(PROJECT_VERSION ${COMPLETE_VERSION})
 
 #set(COMMON_CXX "-Wall -Wno-sign-compare")
 set(DEBUG_CXX_FLAGS   "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-set(RELEASE_CXX_FLAGS "${CMAKE_CXX_FLAGS_MINSIZEREL}")
+set(RELEASE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}")
 
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
