@@ -42,11 +42,13 @@
 
 #include "Poco/Foundation.h"
 #if POCO_OS == POCO_OS_WINDOWS_NT
-#include "Poco/UnWindows.h"
+    #include "Poco/UnWindows.h"
 #elif POCO_OS == POCO_OS_MAC_OS_X
-#include <libkern/OSAtomic.h>
+    #include <libkern/OSAtomic.h>
+#elif (POCO_OS == POCO_OS_LINUX) && ((POCO_ARCH == POCO_ARCH_IA32) || (POCO_ARCH == POCO_ARCH_AMD64)) && defined(__GNUC__)
+    #define POCO_ARCH_GCC_INTEL_X32_64 1
 #else
-#include "Poco/Mutex.h"
+    #include "Poco/Mutex.h"
 #endif // POCO_OS
 
 
@@ -117,9 +119,11 @@ public:
 
 private:
 #if POCO_OS == POCO_OS_WINDOWS_NT
-	typedef volatile LONG ImplType;
+	typedef LONG ImplType;
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	typedef int32_t ImplType;
+#elif defined(POCO_ARCH_GCC_INTEL_X32_64)
+	typedef int ImplType;
 #else // generic implementation based on FastMutex
 	struct ImplType
 	{
@@ -128,7 +132,7 @@ private:
 	};
 #endif // POCO_OS
 
-	ImplType _counter;
+	volatile ImplType _counter;
 };
 
 
@@ -230,6 +234,72 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 inline bool AtomicCounter::operator ! () const
 {
 	return _counter == 0;
+}
+
+
+#elif defined(POCO_ARCH_GCC_INTEL_X32_64)
+//
+// Generic Intel & GCC
+//
+
+//
+// From boost atomic_count_gcc_x86
+//
+inline int poco_atomic_exchange_and_add( volatile int * pw, int dv )
+{
+    int r;
+
+    __asm__ __volatile__
+    (
+        "lock\n\t"
+        "xadd %1, %0":
+        "+m"( *pw ), "=r"( r ): // outputs (%0, %1)
+        "1"( dv ): // inputs (%2 == %1)
+        "memory", "cc" // clobbers
+    );
+
+    return r;
+}
+
+inline AtomicCounter::operator AtomicCounter::ValueType () const
+{
+    return _counter;
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::value() const
+{
+    return _counter;
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
+{
+    return poco_atomic_exchange_and_add( &_counter, +1 ) + 1;
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
+{
+    return poco_atomic_exchange_and_add( &_counter, +1 );
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
+{
+    return poco_atomic_exchange_and_add( &_counter, -1 ) - 1;
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
+{
+    return poco_atomic_exchange_and_add( &_counter, -1 );
+}
+
+
+inline bool AtomicCounter::operator ! () const
+{
+    return _counter == 0;
 }
 
 

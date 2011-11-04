@@ -122,6 +122,47 @@ AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
 }
 
 
+#elif defined(POCO_ARCH_GCC_INTEL_X32_64)
+//
+// GCC & Linux
+//
+AtomicCounter::AtomicCounter():
+	_counter(0)
+{
+}
+
+	
+AtomicCounter::AtomicCounter(AtomicCounter::ValueType initialValue):
+	_counter(initialValue)
+{
+}
+
+
+AtomicCounter::AtomicCounter(const AtomicCounter& counter):
+	_counter(counter.value())
+{
+}
+
+
+AtomicCounter::~AtomicCounter()
+{
+}
+
+
+AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)
+{
+	_counter = counter.value();
+	return *this;
+}
+
+	
+AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
+{
+	_counter = value;
+	return *this;
+}
+
+
 #else
 //
 // Generic implementation based on FastMutex
