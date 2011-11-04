@@ -260,6 +260,8 @@ public:
 		///
 		/// Does nothing if the key does not exist.
 	
+	void setPropertyEventingMode(bool enabled);
+		/// Enable/Disable property eventing.
 protected:
 	virtual bool getRaw(const std::string& key, std::string& value) const = 0;
 		/// If the property with the given key exists, stores the property's value
@@ -300,6 +302,8 @@ private:
 
 	mutable int _depth;
 	mutable Poco::FastMutex _mutex;
+	
+	bool _propertyEventing;
 	
 	friend class LayeredConfiguration;
 	friend class ConfigurationView;

@@ -55,7 +55,7 @@ namespace Poco {
 namespace Util {
 
 
-AbstractConfiguration::AbstractConfiguration(): _depth(0)
+AbstractConfiguration::AbstractConfiguration(): _depth(0), _propertyEventing(true) 
 {
 }
 
@@ -292,13 +292,13 @@ std::string AbstractConfiguration::expand(const std::string& value) const
 
 void AbstractConfiguration::remove(const std::string& key)
 {
-	propertyRemoving(this, key);
+	if (_propertyEventing) propertyRemoving(this, key);
 	{
 		FastMutex::ScopedLock lock(_mutex);
 
 		removeRaw(key);
 	}
-	propertyRemoved(this, key);
+	if (_propertyEventing) propertyRemoved(this, key);
 }
 
 
@@ -386,14 +386,18 @@ bool AbstractConfiguration::parseBool(const std::string& value)
 void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string value)
 {
 	KeyValue kv(key, value);
-	propertyChanging(this, kv);
+	if (_propertyEventing) propertyChanging(this, kv);
 	{
 		FastMutex::ScopedLock lock(_mutex);
 
 		setRaw(key, value);
 	}
-	propertyChanged(this, kv);
+	if (_propertyEventing) propertyChanged(this, kv);
 }
 
+void AbstractConfiguration::setPropertyEventingMode(bool enabled)
+{
+	_propertyEventing = enabled;
+}
 
 } } // namespace Poco::Util

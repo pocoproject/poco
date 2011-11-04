@@ -59,9 +59,9 @@ SharedLibraryImpl::~SharedLibraryImpl()
 }
 
 
-void SharedLibraryImpl::loadImpl(const std::string& path)
+void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 {
-	FastMutex::ScopedLock lock(_mutex);
+        FastMutex::ScopedLock lock(_mutex);
 
 	if (!_path.empty()) throw LibraryAlreadyLoadedException(path);
 	_path = path;

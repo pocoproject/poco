@@ -55,9 +55,9 @@ SharedLibraryImpl::~SharedLibraryImpl()
 }
 
 
-void SharedLibraryImpl::loadImpl(const std::string& path)
+void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 {
-	FastMutex::ScopedLock lock(_mutex);
+        FastMutex::ScopedLock lock(_mutex);
 
 	if (_handle) throw LibraryAlreadyLoadedException(path);
 	_handle = shl_load(path.c_str(), BIND_DEFERRED, 0);

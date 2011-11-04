@@ -56,17 +56,17 @@ SharedLibraryImpl::~SharedLibraryImpl()
 }
 
 
-void SharedLibraryImpl::loadImpl(const std::string& path)
+void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 {
         FastMutex::ScopedLock lock(_mutex);
 
-        if (_handle) throw LibraryAlreadyLoadedException(_path);
-        DWORD flags(0);
-        Path p(path);
-        if (p.isAbsolute()) flags |= LOAD_WITH_ALTERED_SEARCH_PATH;
-        _handle = LoadLibraryExA(path.c_str(), 0, flags);
-        if (!_handle) throw LibraryLoadException(path);
-        _path = path;
+	if (_handle) throw LibraryAlreadyLoadedException(_path);
+	DWORD flags(0);
+	Path p(path);
+	if (p.isAbsolute()) flags |= LOAD_WITH_ALTERED_SEARCH_PATH;
+	_handle = LoadLibraryExA(path.c_str(), 0, flags);
+	if (!_handle) throw LibraryLoadException(path);
+	_path = path;
 }
 
 

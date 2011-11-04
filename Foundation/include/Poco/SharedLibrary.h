@@ -63,28 +63,60 @@ namespace Poco {
 
 class Foundation_API SharedLibrary: private SharedLibraryImpl
 	/// The SharedLibrary class dynamically 
-	/// loads shared libraries at run-time.
+        /// loads shared libraries at run-time.
 {
 public:
-	SharedLibrary();
-		/// Creates a SharedLibrary object.
-		
-	SharedLibrary(const std::string& path);
-		/// Creates a SharedLibrary object and loads a library
-		/// from the given path.
+        enum Flags
+        {
+                SHLIB_GLOBAL = 1,
+                        /// On platforms that use dlopen(), use RTLD_GLOBAL. This is the default
+                        /// if no flags are given.
+                        ///
+                        /// This flag is ignored on platforms that do not use dlopen().
 
-	virtual ~SharedLibrary();
-		/// Destroys the SharedLibrary. The actual library
-		/// remains loaded.
+                SHLIB_LOCAL  = 2  
+                        /// On platforms that use dlopen(), use RTLD_LOCAL instead of RTLD_GLOBAL.
+                        ///
+                        /// Note that if this flag is specified, RTTI (including dynamic_cast and throw) will
+                        /// not work for types defined in the shared library with GCC and possibly other
+                        /// compilers as well. See http://gcc.gnu.org/faq.html#dso for more information.
+                        ///
+                        /// This flag is ignored on platforms that do not use dlopen().
+        };
+        
+        SharedLibrary();
+                /// Creates a SharedLibrary object.
+                
+	SharedLibrary(const std::string& path);
+                /// Creates a SharedLibrary object and loads a library
+                /// from the given path.
+
+        SharedLibrary(const std::string& path, int flags);
+                /// Creates a SharedLibrary object and loads a library
+                /// from the given path, using the given flags. 
+                /// See the Flags enumeration for valid values.
+
+        virtual ~SharedLibrary();
+                /// Destroys the SharedLibrary. The actual library
+                /// remains loaded.
 
 	void load(const std::string& path);
 		/// Loads a shared library from the given path.
-		/// Throws a LibraryAlreadyLoadedException if
-		/// a library has already been loaded.
-		/// Throws a LibraryLoadException if the library
-		/// cannot be loaded.
+                /// Throws a LibraryAlreadyLoadedException if
+                /// a library has already been loaded.
+                /// Throws a LibraryLoadException if the library
+                /// cannot be loaded.
 
-	void unload();
+        void load(const std::string& path, int flags);
+                /// Loads a shared library from the given path,
+                /// using the given flags. See the Flags enumeration
+                /// for valid values.
+                /// Throws a LibraryAlreadyLoadedException if
+                /// a library has already been loaded.
+                /// Throws a LibraryLoadException if the library
+                /// cannot be loaded.
+
+        void unload();
 		/// Unloads a shared library.
 
 	bool isLoaded() const;

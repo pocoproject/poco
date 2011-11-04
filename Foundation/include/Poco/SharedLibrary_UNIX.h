@@ -50,12 +50,18 @@ namespace Poco {
 class Foundation_API SharedLibraryImpl
 {
 protected:
-	SharedLibraryImpl();
-	~SharedLibraryImpl();
-	void loadImpl(const std::string& path);
-	void unloadImpl();
-	bool isLoadedImpl() const;
-	void* findSymbolImpl(const std::string& name);
+        enum Flags
+        {
+                SHLIB_GLOBAL_IMPL = 1,
+                SHLIB_LOCAL_IMPL  = 2  
+        };
+
+        SharedLibraryImpl();
+        ~SharedLibraryImpl();
+        void loadImpl(const std::string& path, int flags);
+        void unloadImpl();
+        bool isLoadedImpl() const;
+        void* findSymbolImpl(const std::string& name);
 	const std::string& getPathImpl() const;
 	static std::string suffixImpl();
 

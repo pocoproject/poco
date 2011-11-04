@@ -57,21 +57,21 @@ SharedLibraryImpl::~SharedLibraryImpl()
 }
 
 
-void SharedLibraryImpl::loadImpl(const std::string& path)
+void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 {
         FastMutex::ScopedLock lock(_mutex);
 
-        if (_handle) throw LibraryAlreadyLoadedException(_path);
-        DWORD flags(0);
+	if (_handle) throw LibraryAlreadyLoadedException(_path);
+	DWORD flags(0);
 #if !defined(_WIN32_WCE)
-        Path p(path);
-        if (p.isAbsolute()) flags |= LOAD_WITH_ALTERED_SEARCH_PATH;
+	Path p(path);
+	if (p.isAbsolute()) flags |= LOAD_WITH_ALTERED_SEARCH_PATH;
 #endif
-        std::wstring upath;
-        UnicodeConverter::toUTF16(path, upath);
-        _handle = LoadLibraryExW(upath.c_str(), 0, flags);
-        if (!_handle) throw LibraryLoadException(path);
-        _path = path;
+	std::wstring upath;
+	UnicodeConverter::toUTF16(path, upath);
+	_handle = LoadLibraryExW(upath.c_str(), 0, flags);
+	if (!_handle) throw LibraryLoadException(path);
+	_path = path;
 }
 
 
@@ -98,17 +98,17 @@ void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-        if (_handle)
-        {
+	if (_handle)
+	{
 #if defined(_WIN32_WCE)
-                std::wstring uname;
-                UnicodeConverter::toUTF16(name, uname);
-                return (void*) GetProcAddressW((HMODULE) _handle, uname.c_str());
+		std::wstring uname;
+		UnicodeConverter::toUTF16(name, uname);
+		return (void*) GetProcAddressW((HMODULE) _handle, uname.c_str());
 #else
-                return (void*) GetProcAddress((HMODULE) _handle, name.c_str());
+		return (void*) GetProcAddress((HMODULE) _handle, name.c_str());
 #endif
-        }
-        else return 0;
+	}
+	else return 0;
 }
 
 
