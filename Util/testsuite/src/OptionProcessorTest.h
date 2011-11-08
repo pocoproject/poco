@@ -1,7 +1,7 @@
 //
 // OptionProcessorTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/OptionProcessorTest.h#1 $
+// $Id: //poco/1.4/Util/testsuite/src/OptionProcessorTest.h#2 $
 //
 // Definition of the OptionProcessorTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testUnix();
 	void testDefault();
 	void testRequired();
+	void testArgs();
 
 	void setUp();
 	void tearDown();

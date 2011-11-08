@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/XMLConfigurationTest.cpp#1 $
+// $Id: //poco/1.4/Util/testsuite/src/XMLConfigurationTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -246,6 +246,43 @@ void XMLConfigurationTest::testLoadAppendSave()
 }
 
 
+void XMLConfigurationTest::testOtherDelimiter()
+{
+	static const std::string xmlFile = 
+		"<config>"
+		"	<prop1>value1</prop1>"
+		"	<prop2>value2</prop2>"
+		"	<prop3>"
+		"		<prop4 attr='value3'/>"
+		"		<prop4 attr='value4'/>"
+		"	</prop3>"
+		"	<prop5 id='1'>value5</prop5>"
+		"	<prop5 id='2'>value6</prop5>"
+		"   <prop6 id='foo'>"
+		"       <prop7>value7</prop7>"
+		"   </prop6>"
+		"   <prop6 id='bar'>"
+		"       <prop7>value8</prop7>"
+		"   </prop6>"
+		"</config>";
+		
+	std::istringstream istr(xmlFile);	
+	AutoPtr<XMLConfiguration> pConf = new XMLConfiguration(istr, '/');
+	
+	assert (pConf->getString("prop1") == "value1");
+	assert (pConf->getString("prop2") == "value2");
+	assert (pConf->getString("prop3/prop4[@attr]") == "value3");
+	assert (pConf->getString("prop3/prop4[1][@attr]") == "value4");
+	assert (pConf->getString("prop5") == "value5");
+	assert (pConf->getString("prop5[0]") == "value5");
+	assert (pConf->getString("prop5[1]") == "value6");
+	assert (pConf->getString("prop5[@id=1]") == "value5");
+	assert (pConf->getString("prop5[@id='2']") == "value6");
+	assert (pConf->getString("prop6[@id=foo]/prop7") == "value7");
+	assert (pConf->getString("prop6[@id='bar']/prop7") == "value8");
+}
+
+
 AbstractConfiguration* XMLConfigurationTest::allocConfiguration() const
 {
 	XMLConfiguration* pConfig = new XMLConfiguration();
@@ -273,6 +310,7 @@ CppUnit::Test* XMLConfigurationTest::suite()
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testSave);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoadAppendSave);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testOtherDelimiter);
 
 	return pSuite;
 }

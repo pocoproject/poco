@@ -1,5 +1,22 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.4.3 (2011-11-xx)
+==========================
+
+- fixed a compilation error with Data/MySQL on QNX.
+- fixed Util project files for WinCE (removed sources not compileable on CE)
+- removed MD2 license text from Ackowledgements document
+- fixed iPhone build config for Xcode 4.2 (compiler name changed to llvm-g++)
+- Poco::Util::XMLConfiguration: delimiter char (default '.') is now configurable.
+  This allows for working with XML documents having element names with '.' in them.
+- Poco::Util::OptionProcessor: Required option arguments can now be specified as 
+  separate command line arguments, as in "--option value" in addition to the 
+  "--option=value" format.
+- Poco::Util::HelpFormatter: improved option help formatting if  indentation has 
+  been set explicitely.
+- added Mail sample to NetSSL_OpenSSL, showing use of SecureSMTPClientSession.
+
+
 Release 1.4.2p1 (2011-09-24)
 ============================
 
@@ -1593,4 +1610,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#30 $
+$Id: //poco/1.4/dist/CHANGELOG#31 $

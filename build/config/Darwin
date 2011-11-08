@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/Darwin#3 $
+# $Id: //poco/1.4/build/config/Darwin#5 $
 #
 # Darwin
 #
@@ -16,16 +16,16 @@
 #
 LINKMODE ?= SHARED
 
-ARCHFLAGS          ?= -arch x86_64
 POCO_TARGET_OSARCH ?= x86_64
 POCO_HOST_OSARCH   := $(POCO_TARGET_OSARCH)
+ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH)
 
 
 #
 # Tools
 #
-CC      = gcc-4.2
-CXX     = g++-4.2
+CC      = gcc
+CXX     = g++
 LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib

@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.4/Util/src/Application.cpp#4 $
+// $Id: //poco/1.4/Util/src/Application.cpp#5 $
 //
 // Library: Util
 // Package: Application
@@ -371,7 +371,7 @@ void Application::processOptions()
 		std::string value;
 		if (processor.process(*it, name, value))
 		{
-			if (!name.empty()) // "--" option to end options processing
+			if (!name.empty()) // "--" option to end options processing or deferred argument
 			{
 				handleOption(name, value);
 			}

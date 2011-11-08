@@ -1,7 +1,7 @@
 //
 // XMLConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/XMLConfiguration.cpp#1 $
+// $Id: //poco/1.4/Util/src/XMLConfiguration.cpp#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -51,36 +51,83 @@ namespace Poco {
 namespace Util {
 
 
-XMLConfiguration::XMLConfiguration()
+XMLConfiguration::XMLConfiguration():
+	_delim('.')
 {
 }
 
 
-XMLConfiguration::XMLConfiguration(Poco::XML::InputSource* pInputSource)
+XMLConfiguration::XMLConfiguration(char delim):
+	_delim(delim)
+{
+}
+
+
+XMLConfiguration::XMLConfiguration(Poco::XML::InputSource* pInputSource):
+	_delim('.')
 {
 	load(pInputSource);
 }
 
 
-XMLConfiguration::XMLConfiguration(std::istream& istr)
+XMLConfiguration::XMLConfiguration(Poco::XML::InputSource* pInputSource, char delim):
+	_delim(delim)
+{
+	load(pInputSource);
+}
+
+
+XMLConfiguration::XMLConfiguration(std::istream& istr):
+	_delim('.')
 {
 	load(istr);
 }
 
 
-XMLConfiguration::XMLConfiguration(const std::string& path)
+XMLConfiguration::XMLConfiguration(std::istream& istr, char delim):
+	_delim(delim)
+{
+	load(istr);
+}
+
+
+XMLConfiguration::XMLConfiguration(const std::string& path):
+	_delim('.')
 {
 	load(path);
 }
 
 
-XMLConfiguration::XMLConfiguration(const Poco::XML::Document* pDocument)
+XMLConfiguration::XMLConfiguration(const std::string& path, char delim):
+	_delim(delim)
+{
+	load(path);
+}
+
+
+XMLConfiguration::XMLConfiguration(const Poco::XML::Document* pDocument):
+	_delim('.')
+{
+	load(pDocument);
+}
+
+
+XMLConfiguration::XMLConfiguration(const Poco::XML::Document* pDocument, char delim):
+	_delim(delim)
 {
 	load(pDocument);
 }
 
 	
-XMLConfiguration::XMLConfiguration(const Poco::XML::Node* pNode)
+XMLConfiguration::XMLConfiguration(const Poco::XML::Node* pNode):
+	_delim('.')
+{
+	load(pNode);
+}
+
+
+XMLConfiguration::XMLConfiguration(const Poco::XML::Node* pNode, char delim):
+	_delim(delim)
 {
 	load(pNode);
 }
@@ -294,7 +341,7 @@ Poco::XML::Node* XMLConfiguration::findNode(const std::string& key)
 }
 
 
-Poco::XML::Node* XMLConfiguration::findNode(std::string::const_iterator& it, const std::string::const_iterator& end, Poco::XML::Node* pNode, bool create)
+Poco::XML::Node* XMLConfiguration::findNode(std::string::const_iterator& it, const std::string::const_iterator& end, Poco::XML::Node* pNode, bool create) const
 {
 	if (pNode && it != end)
 	{
@@ -339,9 +386,9 @@ Poco::XML::Node* XMLConfiguration::findNode(std::string::const_iterator& it, con
 		}
 		else
 		{
-			while (it != end && *it == '.') ++it;
+			while (it != end && *it == _delim) ++it;
 			std::string key;
-			while (it != end && *it != '.' && *it != '[') key += *it++;
+			while (it != end && *it != _delim && *it != '[') key += *it++;
 			return findNode(it, end, findElement(key, pNode, create), create);
 		}
 	}

@@ -1,7 +1,7 @@
 //
 // OptionProcessorTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/OptionProcessorTest.cpp#1 $
+// $Id: //poco/1.4/Util/testsuite/src/OptionProcessorTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -111,6 +111,20 @@ void OptionProcessorTest::testUnix()
 	assert (p1.process("--include:/usr/local/include", name, value));
 	assert (name == "include-dir");
 	assert (value == "/usr/local/include");
+	
+	assert (p1.process("-I", name, value));
+	assert (name.empty());
+	assert (value.empty());
+	assert (p1.process("/usr/include", name, value));
+	assert (name == "include-dir");
+	assert (value == "/usr/include");
+
+	assert (p1.process("-I", name, value));
+	assert (name.empty());
+	assert (value.empty());
+	assert (p1.process("-L", name, value));
+	assert (name == "include-dir");
+	assert (value == "-L");
 
 	assert (p1.process("--lib=/usr/local/lib", name, value));
 	assert (name == "library-dir");
@@ -224,6 +238,13 @@ void OptionProcessorTest::testDefault()
 	assert (name == "include-dir");
 	assert (value == "/usr/local/include");
 
+	assert (p1.process("/Inc", name, value));
+	assert (name.empty());
+	assert (value.empty());
+	assert (p1.process("/usr/include", name, value));
+	assert (name == "include-dir");
+	assert (value == "/usr/include");
+
 	assert (p1.process("/lib=/usr/local/lib", name, value));
 	assert (name == "library-dir");
 	assert (value == "/usr/local/lib");
@@ -303,6 +324,58 @@ void OptionProcessorTest::testRequired()
 }
 
 
+void OptionProcessorTest::testArgs()
+{
+	OptionSet set;
+	set.addOption(
+		Option("include-dir", "I", "specify a search path for locating header files")
+			.required(false)
+			.repeatable(true)
+			.argument("path"));
+		
+	set.addOption(
+		Option("optimize", "O")
+		.description("enable optimization")
+		.required(false)
+		.repeatable(true)
+		.argument("level", false));
+
+	OptionProcessor p1(set);
+	std::string name;
+	std::string value;
+	
+	assert (p1.process("-I/usr/include", name, value));
+	assert (name == "include-dir");
+	assert (value == "/usr/include");
+
+	assert (p1.process("--include:/usr/local/include", name, value));
+	assert (name == "include-dir");
+	assert (value == "/usr/local/include");
+	
+	assert (p1.process("-I", name, value));
+	assert (name.empty());
+	assert (value.empty());
+	assert (p1.process("/usr/include", name, value));
+	assert (name == "include-dir");
+	assert (value == "/usr/include");
+
+	assert (p1.process("-I", name, value));
+	assert (name.empty());
+	assert (value.empty());
+	assert (p1.process("-L", name, value));
+	assert (name == "include-dir");
+	assert (value == "-L");
+
+	assert (p1.process("-O", name, value));
+	assert (name == "optimize");
+	assert (value.empty());
+	
+	assert (p1.process("-O2", name, value));
+	assert (name == "optimize");
+	assert (value == "2");
+}
+
+
 void OptionProcessorTest::setUp()
 {
 }
@@ -320,6 +393,7 @@ CppUnit::Test* OptionProcessorTest::suite()
 	CppUnit_addTest(pSuite, OptionProcessorTest, testUnix);
 	CppUnit_addTest(pSuite, OptionProcessorTest, testDefault);
 	CppUnit_addTest(pSuite, OptionProcessorTest, testRequired);
+	CppUnit_addTest(pSuite, OptionProcessorTest, testArgs);
 
 	return pSuite;
 }

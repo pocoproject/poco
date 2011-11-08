@@ -1,7 +1,7 @@
 //
 // XMLConfigurationTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/XMLConfigurationTest.h#1 $
+// $Id: //poco/1.4/Util/testsuite/src/XMLConfigurationTest.h#2 $
 //
 // Definition of the XMLConfigurationTest class.
 //
@@ -49,6 +49,7 @@ public:
 	void testLoad();
 	void testSave();
 	void testLoadAppendSave();
+	void testOtherDelimiter();
 
 	void setUp();
 	void tearDown();

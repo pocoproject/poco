@@ -1,7 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/SessionImpl.cpp#1 $
+// $Id: //poco/1.4/Data/MySQL/src/SessionImpl.cpp#2 $
 //
 // Library: Data/MySQL
 // Package: MySQL
@@ -37,6 +37,7 @@
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
 #include "Poco/NumberParser.h"
+#include <cctype>
 
 
 namespace
@@ -44,9 +45,9 @@ namespace
 	std::string copyStripped(std::string::const_iterator from, std::string::const_iterator to)
 	{
 		// skip leading spaces
-		while ((from != to) && isspace(*from)) from++;
+		while ((from != to) && std::isspace(*from)) from++;
 		// skip trailing spaces
-		while ((from != to) && isspace(*(to - 1))) to--;
+		while ((from != to) && std::isspace(*(to - 1))) to--;
 
 		return std::string(from, to);
 	}

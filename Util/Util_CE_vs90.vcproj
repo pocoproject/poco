@@ -1,34 +1,44 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="Util"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="Util"
 	ProjectGUID="{6FF56CDB-787A-4714-A28C-919003F9FA6C}"
 	RootNamespace="Util"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="Digi JumpStart (ARMV4I)"/>
+			Name="Digi JumpStart (ARMV4I)"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"/>
+				TargetEnvironment="1"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -44,13 +54,17 @@
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
@@ -68,43 +82,58 @@
 				EnableCOMDATFolding="0"
 				RandomizedBaseAddress="1"
 				ImportLibrary="..\lib\$(PlatformName)\PocoUtild.lib"
-				TargetMachine="0"/>
+				TargetMachine="0"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCCodeSignTool"/>
+				Name="VCCodeSignTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""/>
-			<DebuggerTool/>
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"/>
+				TargetEnvironment="1"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -122,13 +151,17 @@
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
@@ -145,43 +178,58 @@
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
 				ImportLibrary="..\lib\$(PlatformName)\PocoUtil.lib"
-				TargetMachine="0"/>
+				TargetMachine="0"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCCodeSignTool"/>
+				Name="VCCodeSignTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""/>
-			<DebuggerTool/>
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"/>
+				TargetEnvironment="1"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -200,52 +248,71 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoUtilmtd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoUtilmtd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCCodeSignTool"/>
+				Name="VCCodeSignTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""/>
-			<DebuggerTool/>
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"/>
+				TargetEnvironment="1"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -265,52 +332,71 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoUtilmt.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoUtilmt.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCCodeSignTool"/>
+				Name="VCCodeSignTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""/>
-			<DebuggerTool/>
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"/>
+				TargetEnvironment="1"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -329,52 +415,71 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoUtilmdd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoUtilmdd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCCodeSignTool"/>
+				Name="VCCodeSignTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""/>
-			<DebuggerTool/>
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Digi JumpStart (ARMV4I)"
 			OutputDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1">
+			CharacterSet="1"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="1"/>
+				TargetEnvironment="1"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
@@ -394,211 +499,329 @@
 				CompileAs="0"
 				DisableSpecificWarnings="4800;"
 				CompileForArchitecture="2"
-				InterworkCalls="false"/>
+				InterworkCalls="false"
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoUtilmd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoUtilmd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCCodeSignTool"/>
+				Name="VCCodeSignTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""/>
-			<DebuggerTool/>
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
-			Name="Application">
+			Name="Application"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Util\Application.h"/>
+					RelativePath=".\include\Poco\Util\Application.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\LoggingSubsystem.h"/>
+					RelativePath=".\include\Poco\Util\LoggingSubsystem.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\ServerApplication.h"/>
+					RelativePath=".\include\Poco\Util\ServerApplication.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\Subsystem.h"/>
+					RelativePath=".\include\Poco\Util\Subsystem.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\Application.cpp"/>
+					RelativePath=".\src\Application.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\LoggingSubsystem.cpp"/>
+					RelativePath=".\src\LoggingSubsystem.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\ServerApplication.cpp"/>
+					RelativePath=".\src\ServerApplication.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Subsystem.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Configuration">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Util\AbstractConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\ConfigurationMapper.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\ConfigurationView.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\FilesystemConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\IniFileConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\LayeredConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\LoggingConfigurator.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\MapConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\PropertyFileConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\SystemConfiguration.h"/>
-				<File
-					RelativePath=".\include\Poco\Util\XMLConfiguration.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\AbstractConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\ConfigurationMapper.cpp"/>
-				<File
-					RelativePath=".\src\ConfigurationView.cpp"/>
-				<File
-					RelativePath=".\src\FilesystemConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\IniFileConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\LayeredConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\LoggingConfigurator.cpp"/>
-				<File
-					RelativePath=".\src\MapConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\PropertyFileConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\SystemConfiguration.cpp"/>
-				<File
-					RelativePath=".\src\XMLConfiguration.cpp"/>
+					RelativePath=".\src\Subsystem.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Options">
+			Name="Configuration"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Util\HelpFormatter.h"/>
+					RelativePath=".\include\Poco\Util\AbstractConfiguration.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\IntValidator.h"/>
+					RelativePath=".\include\Poco\Util\ConfigurationMapper.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\Option.h"/>
+					RelativePath=".\include\Poco\Util\ConfigurationView.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\OptionCallback.h"/>
+					RelativePath=".\include\Poco\Util\FilesystemConfiguration.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\OptionException.h"/>
+					RelativePath=".\include\Poco\Util\IniFileConfiguration.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\OptionProcessor.h"/>
+					RelativePath=".\include\Poco\Util\LayeredConfiguration.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\OptionSet.h"/>
+					RelativePath=".\include\Poco\Util\LoggingConfigurator.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\RegExpValidator.h"/>
+					RelativePath=".\include\Poco\Util\MapConfiguration.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\Validator.h"/>
+					RelativePath=".\include\Poco\Util\PropertyFileConfiguration.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\SystemConfiguration.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\XMLConfiguration.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\HelpFormatter.cpp"/>
+					RelativePath=".\src\AbstractConfiguration.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\IntValidator.cpp"/>
+					RelativePath=".\src\ConfigurationMapper.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Option.cpp"/>
+					RelativePath=".\src\ConfigurationView.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\OptionCallback.cpp"/>
+					RelativePath=".\src\FilesystemConfiguration.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\OptionException.cpp"/>
+					RelativePath=".\src\IniFileConfiguration.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\OptionProcessor.cpp"/>
+					RelativePath=".\src\LayeredConfiguration.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\OptionSet.cpp"/>
+					RelativePath=".\src\LoggingConfigurator.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\RegExpValidator.cpp"/>
+					RelativePath=".\src\MapConfiguration.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Validator.cpp"/>
+					RelativePath=".\src\PropertyFileConfiguration.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SystemConfiguration.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\XMLConfiguration.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Windows">
+			Name="Options"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Util\WinRegistryConfiguration.h"/>
+					RelativePath=".\include\Poco\Util\HelpFormatter.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\WinRegistryKey.h"/>
+					RelativePath=".\include\Poco\Util\IntValidator.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\WinService.h"/>
+					RelativePath=".\include\Poco\Util\Option.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\OptionCallback.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\OptionException.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\OptionProcessor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\OptionSet.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\RegExpValidator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Util\Validator.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\WinRegistryConfiguration.cpp"/>
+					RelativePath=".\src\HelpFormatter.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\WinRegistryKey.cpp"/>
+					RelativePath=".\src\IntValidator.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\WinService.cpp"/>
+					RelativePath=".\src\Option.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\OptionCallback.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\OptionException.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\OptionProcessor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\OptionSet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RegExpValidator.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Validator.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Util">
+			Name="Util"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Util\Util.h"/>
+					RelativePath=".\include\Poco\Util\Util.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files"/>
+				Name="Source Files"
+				>
+			</Filter>
 		</Filter>
 		<Filter
-			Name="Timer">
+			Name="Timer"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Util\Timer.h"/>
+					RelativePath=".\include\Poco\Util\Timer.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\TimerTask.h"/>
+					RelativePath=".\include\Poco\Util\TimerTask.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Util\TimerTaskAdapter.h"/>
+					RelativePath=".\include\Poco\Util\TimerTaskAdapter.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\Timer.cpp"/>
+					RelativePath=".\src\Timer.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\TimerTask.cpp"/>
+					RelativePath=".\src\TimerTask.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

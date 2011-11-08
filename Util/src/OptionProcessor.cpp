@@ -1,7 +1,7 @@
 //
 // OptionProcessor.cpp
 //
-// $Id: //poco/1.4/Util/src/OptionProcessor.cpp#1 $
+// $Id: //poco/1.4/Util/src/OptionProcessor.cpp#2 $
 //
 // Library: Util
 // Package: Options
@@ -65,9 +65,13 @@ void OptionProcessor::setUnixStyle(bool flag)
 
 bool OptionProcessor::process(const std::string& argument, std::string& optionName, std::string& optionArg)
 {
+	optionName.clear();
+	optionArg.clear();
 	if (!_ignore)
 	{
-		if (_unixStyle)
+		if (!_deferredOption.empty())
+			return processCommon(argument, false, optionName, optionArg);
+		else if (_unixStyle)
 			return processUnix(argument, optionName, optionArg);
 		else
 			return processDefault(argument, optionName, optionArg);
@@ -82,6 +86,12 @@ void OptionProcessor::checkRequired() const
 	{
 		if (it->required() && _specifiedOptions.find(it->fullName()) == _specifiedOptions.end())
 			throw MissingOptionException(it->fullName());
+	}
+	if (!_deferredOption.empty())
+	{
+		std::string optionArg;
+		const Option& option = _options.getOption(_deferredOption, false);
+		option.process(_deferredOption, optionArg); // will throw MissingArgumentException
 	}
 }
 
@@ -133,6 +143,17 @@ bool OptionProcessor::processDefault(const std::string& argument, std::string& o
 
 bool OptionProcessor::processCommon(const std::string& optionStr, bool isShort, std::string& optionName, std::string& optionArg)
 {
+	if (!_deferredOption.empty())
+	{
+		const Option& option = _options.getOption(_deferredOption, false);
+		std::string optionWithArg(_deferredOption);
+		_deferredOption.clear();
+		optionWithArg += '=';
+		optionWithArg += optionStr;
+		option.process(optionWithArg, optionArg);
+		optionName = option.fullName();
+		return true;
+	}
 	if (optionStr.empty()) throw EmptyOptionException();
 	const Option& option = _options.getOption(optionStr, isShort);
 	const std::string& group = option.group();
@@ -146,6 +167,11 @@ bool OptionProcessor::processCommon(const std::string& optionStr, bool isShort, 
 	if (_specifiedOptions.find(option.fullName()) != _specifiedOptions.end() && !option.repeatable())
 		throw DuplicateOptionException(option.fullName());
 	_specifiedOptions.insert(option.fullName());
+	if (option.argumentRequired() && ((!isShort && optionStr.find_first_of(":=") == std::string::npos) || (isShort && optionStr.length() == option.shortName().length())))
+	{
+		_deferredOption = option.fullName();
+		return true;
+	}
 	option.process(optionStr, optionArg);
 	optionName = option.fullName();
 	return true;

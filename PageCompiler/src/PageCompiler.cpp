@@ -1,7 +1,7 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/PageCompiler.cpp#1 $
+// $Id: //poco/1.4/PageCompiler/src/PageCompiler.cpp#2 $
 //
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
@@ -225,6 +225,7 @@ protected:
 			"For more information, please see the POCO C++ Libraries "
 			"documentation at <http://pocoproject.org/docs/>."
 		);
+		helpFormatter.setIndent(8);
 		helpFormatter.format(std::cout);
 	}
 	
