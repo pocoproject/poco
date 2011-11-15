@@ -116,15 +116,15 @@ void Application::setup()
 	
 	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false, false);
 	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true, false);
-        
-        addSubsystem(new LoggingSubsystem);
-        
+	
+	addSubsystem(new LoggingSubsystem);
+	
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
-        _workingDirAtLaunch = Path::current();
+	_workingDirAtLaunch = Path::current();
 
-        #if !defined(_DEBUG)
-        Poco::SignalHandler::install();
-        #endif
+	#if !defined(_DEBUG)
+	Poco::SignalHandler::install();
+	#endif
 #else
 	setUnixOptions(false);
 #endif
@@ -368,13 +368,13 @@ void Application::processOptions()
 	while (it != _args.end() && !_stopOptionsProcessing)
 	{
 		std::string name;
-		std::string value;
-		if (processor.process(*it, name, value))
-		{
-			if (!name.empty()) // "--" option to end options processing
-			{
-				handleOption(name, value);
-			}
+                std::string value;
+                if (processor.process(*it, name, value))
+                {
+                        if (!name.empty()) // "--" option to end options processing or deferred argument
+                        {
+                                handleOption(name, value);
+                        }
 			it = _args.erase(it);
 		}
 		else ++it;
@@ -393,19 +393,19 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 		if (path.isAbsolute())
 		{
 			appPath = path;
-                }
-                else
-                {
-                        appPath = _workingDirAtLaunch;
-                        appPath.append(path);
-                }
-        }
-        else
-        {
-                if (!Path::find(Environment::get("PATH"), _command, appPath))
-                        appPath = Path(_workingDirAtLaunch, _command);
-                appPath.makeAbsolute();
-        }
+		}
+		else
+		{
+			appPath = _workingDirAtLaunch;
+			appPath.append(path);
+		}
+	}
+	else
+	{
+		if (!Path::find(Environment::get("PATH"), _command, appPath))
+			appPath = Path(_workingDirAtLaunch, _command);
+		appPath.makeAbsolute();
+	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		wchar_t path[1024];

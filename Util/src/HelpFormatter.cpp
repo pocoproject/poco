@@ -173,12 +173,20 @@ int HelpFormatter::calcIndent() const
 void HelpFormatter::formatOptions(std::ostream& ostr) const
 {
 	int optWidth = calcIndent();
-	for (OptionSet::Iterator it = _options.begin(); it != _options.end(); ++it)
-	{
-		formatOption(ostr, *it, optWidth);
-		formatText(ostr, it->description(), _indent, optWidth);
-		ostr << '\n';
-	}
+        for (OptionSet::Iterator it = _options.begin(); it != _options.end(); ++it)
+        {
+                formatOption(ostr, *it, optWidth);
+                if (_indent < optWidth)
+                {
+                        ostr << '\n' << std::string(_indent, ' ');
+                        formatText(ostr, it->description(), _indent, _indent);
+                }
+                else
+                {
+                        formatText(ostr, it->description(), _indent, optWidth);
+                }
+                ostr << '\n';
+        }
 }
 
 
