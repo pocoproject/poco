@@ -1,7 +1,7 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -39,6 +39,7 @@
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Ascii.h"
+#include "Poco/String.h"
 
 
 using Poco::NumberFormatter;
@@ -151,7 +152,7 @@ void HTTPRequest::setCookies(const NameValueCollection& cookies)
 void HTTPRequest::getCookies(NameValueCollection& cookies) const
 {
 	NameValueCollection::ConstIterator it = find(COOKIE);
-	while (it != end() && it->first == COOKIE)
+	while (it != end() && Poco::icompare(it->first, COOKIE) == 0)
 	{
 		splitParameters(it->second.begin(), it->second.end(), cookies);
 		++it;

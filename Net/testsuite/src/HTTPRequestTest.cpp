@@ -1,7 +1,7 @@
 //
 // HTTPRequestTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPRequestTest.cpp#2 $
+// $Id: //poco/1.4/Net/testsuite/src/HTTPRequestTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -233,6 +233,15 @@ void HTTPRequestTest::testCookies()
 	assert (cookies3["cookie1"] == "value1");
 	assert (cookies3["cookie2"] == "value2");
 	assert (cookies3["cookie3"] == "value3");	
+	
+	HTTPRequest request3;
+	request3.add("Cookie", "cookie1=value1");
+	request3.add("cookie", "cookie2=value2");
+	NameValueCollection cookies4;
+	request3.getCookies(cookies4);
+	assert (cookies4.size() == 2);
+	assert (cookies4["cookie1"] == "value1");
+	assert (cookies4["cookie2"] == "value2");	
 }
 
 

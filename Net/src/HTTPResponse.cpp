@@ -1,7 +1,7 @@
 //
 // HTTPResponse.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPResponse.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPResponse.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -43,6 +43,7 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/Ascii.h"
+#include "Poco/String.h"
 
 
 using Poco::DateTime;
@@ -200,7 +201,7 @@ void HTTPResponse::getCookies(std::vector<HTTPCookie>& cookies) const
 {
 	cookies.clear();
 	NameValueCollection::ConstIterator it = find(SET_COOKIE);
-	while (it != end() && it->first == SET_COOKIE)
+	while (it != end() && Poco::icompare(it->first, SET_COOKIE) == 0)
 	{
 		NameValueCollection nvc;
 		splitParameters(it->second.begin(), it->second.end(), nvc);

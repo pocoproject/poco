@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.4/Net/src/HTMLForm.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTMLForm.cpp#3 $
 //
 // Library: Net
 // Package: HTML
@@ -170,6 +170,19 @@ void HTMLForm::read(std::istream& istr, PartHandler& handler)
 		readUrl(istr);
 	else
 		readMultipart(istr, handler);
+}
+
+
+void HTMLForm::read(std::istream& istr)
+{
+	readUrl(istr);
+}
+
+
+void HTMLForm::read(const std::string& queryString)
+{
+	std::istringstream istr(queryString);
+	readUrl(istr);
 }
 
 

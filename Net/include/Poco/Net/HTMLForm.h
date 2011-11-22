@@ -1,7 +1,7 @@
 //
 // HTMLForm.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTMLForm.h#1 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTMLForm.h#2 $
 //
 // Library: Net
 // Package: HTML
@@ -136,6 +136,21 @@ public:
 		///
 		/// The form data read from the stream must be
 		/// in the encoding specified for the form.
+		///
+		/// Note that read() does not clear the form before
+		/// reading the new values.
+
+	void read(std::istream& istr);
+		/// Reads the URL-encoded form data from the given input stream.
+		///
+		/// Note that read() does not clear the form before
+		/// reading the new values.
+		
+	void read(const std::string& queryString);
+		/// Reads the form data from the given HTTP query string.
+		///
+		/// Note that read() does not clear the form before
+		/// reading the new values.
 		
 	void prepareSubmit(HTTPRequest& request);
 		/// Fills out the request object for submitting the form.
