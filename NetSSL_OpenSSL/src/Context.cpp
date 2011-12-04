@@ -1,7 +1,7 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/Context.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/Context.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -68,22 +68,7 @@ Context::Context(
 {
 	Poco::Crypto::OpenSSLInitializer::initialize();
 	
-	if (SSLManager::isFIPSEnabled())
-	{
-		_pSSLContext = SSL_CTX_new(TLSv1_method());
-	}
-	else
-	{
-		_pSSLContext = SSL_CTX_new(SSLv23_method());
-	}
-	if (!_pSSLContext) 
-	{
-		unsigned long err = ERR_get_error();
-		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
-	}
-	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
-	Utility::clearErrorStack();
-	SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
+	createSSLContext();
 
 	int errCode = 0;
 	if (!caLocation.empty())
@@ -134,7 +119,7 @@ Context::Context(
 		}
 	}
 
-	if (usage == SERVER_USE)
+	if (isForServerUse())
 		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyServerCallback);
 	else
 		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyClientCallback);
@@ -160,22 +145,7 @@ Context::Context(
 {
 	Poco::Crypto::OpenSSLInitializer::initialize();
 	
-	if (SSLManager::isFIPSEnabled())
-	{
-		_pSSLContext = SSL_CTX_new(TLSv1_method());
-	}
-	else
-	{
-		_pSSLContext = SSL_CTX_new(SSLv23_method());
-	}
-	if (!_pSSLContext) 
-	{
-		unsigned long err = ERR_get_error();
-		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
-	}
-	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
-	Utility::clearErrorStack();
-	SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
+	createSSLContext();
 
 	int errCode = 0;
 	if (!caLocation.empty())
@@ -204,7 +174,7 @@ Context::Context(
 		}
 	}
 
-	if (usage == SERVER_USE)
+	if (isForServerUse())
 		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyServerCallback);
 	else
 		SSL_CTX_set_verify(_pSSLContext, verificationMode, &SSLManager::verifyClientCallback);
@@ -261,7 +231,7 @@ void Context::enableSessionCache(bool flag)
 {
 	if (flag)
 	{
-		SSL_CTX_set_session_cache_mode(_pSSLContext, _usage == SERVER_USE ? SSL_SESS_CACHE_SERVER : SSL_SESS_CACHE_CLIENT);
+		SSL_CTX_set_session_cache_mode(_pSSLContext, isForServerUse() ? SSL_SESS_CACHE_SERVER : SSL_SESS_CACHE_CLIENT);
 	}
 	else
 	{
@@ -272,7 +242,7 @@ void Context::enableSessionCache(bool flag)
 
 void Context::enableSessionCache(bool flag, const std::string& sessionIdContext)
 {
-	poco_assert (_usage == SERVER_USE);
+	poco_assert (isForServerUse());
 
 	if (flag)
 	{
@@ -298,7 +268,7 @@ bool Context::sessionCacheEnabled() const
 
 void Context::setSessionCacheSize(std::size_t size)
 {
-	poco_assert (_usage == SERVER_USE);
+	poco_assert (isForServerUse());
 	
 	SSL_CTX_sess_set_cache_size(_pSSLContext, static_cast<long>(size));
 }
@@ -306,7 +276,7 @@ void Context::setSessionCacheSize(std::size_t size)
 	
 std::size_t Context::getSessionCacheSize() const
 {
-	poco_assert (_usage == SERVER_USE);
+	poco_assert (isForServerUse());
 	
 	return static_cast<std::size_t>(SSL_CTX_sess_get_cache_size(_pSSLContext));
 }
@@ -314,7 +284,7 @@ std::size_t Context::getSessionCacheSize() const
 
 void Context::setSessionTimeout(long seconds)
 {
-	poco_assert (_usage == SERVER_USE);
+	poco_assert (isForServerUse());
 
 	SSL_CTX_set_timeout(_pSSLContext, seconds);
 }
@@ -348,6 +318,44 @@ void Context::disableStatelessSessionResumption()
 #if defined(SSL_OP_NO_TICKET)
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_TICKET);
 #endif
+}
+
+
+void Context::createSSLContext()
+{
+	if (SSLManager::isFIPSEnabled())
+	{
+		_pSSLContext = SSL_CTX_new(TLSv1_method());
+	}
+	else
+	{
+		switch (_usage)
+		{
+		case CLIENT_USE:
+			_pSSLContext = SSL_CTX_new(SSLv23_client_method());
+			break;
+		case SERVER_USE:
+			_pSSLContext = SSL_CTX_new(SSLv23_server_method());
+			break;
+		case TLSV1_CLIENT_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_client_method());
+			break;
+		case TLSV1_SERVER_USE:
+			_pSSLContext = SSL_CTX_new(TLSv1_server_method());
+			break;
+		default:
+			throw Poco::InvalidArgumentException("Invalid usage");
+		}
+	}
+	if (!_pSSLContext) 
+	{
+		unsigned long err = ERR_get_error();
+		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
+	}
+
+	SSL_CTX_set_default_passwd_cb(_pSSLContext, &SSLManager::privateKeyPassphraseCallback);
+	Utility::clearErrorStack();
+	SSL_CTX_set_options(_pSSLContext, SSL_OP_ALL);
 }
 
 

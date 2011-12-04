@@ -1,7 +1,7 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SSLManager.cpp#2 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/SSLManager.cpp#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -73,6 +73,7 @@ const std::string SSLManager::CFG_SESSION_ID_CONTEXT("sessionIdContext");
 const std::string SSLManager::CFG_SESSION_CACHE_SIZE("sessionCacheSize");
 const std::string SSLManager::CFG_SESSION_TIMEOUT("sessionTimeout");
 const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
+const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 #ifdef OPENSSL_FIPS
 const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
 const bool        SSLManager::VAL_FIPS_MODE(false);
@@ -269,10 +270,11 @@ void SSLManager::initDefaultContext(bool server)
 	bool loadDefCA = config.getBool(prefix + CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
 	std::string cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
 	cipherList = config.getString(prefix + CFG_CYPHER_LIST, cipherList); // for backwards compatibility
+	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	if (server)
-		_ptrDefaultServerContext = new Context(Context::SERVER_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+		_ptrDefaultServerContext = new Context(requireTLSv1 ? Context::TLSV1_SERVER_USE : Context::SERVER_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
 	else
-		_ptrDefaultClientContext = new Context(Context::CLIENT_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+		_ptrDefaultClientContext = new Context(requireTLSv1 ? Context::TLSV1_CLIENT_USE : Context::CLIENT_USE, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
 		
 	bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 	if (server)

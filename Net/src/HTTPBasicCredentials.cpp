@@ -1,7 +1,7 @@
 //
 // HTTPBasicCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPBasicCredentials.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPBasicCredentials.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -69,29 +69,20 @@ HTTPBasicCredentials::HTTPBasicCredentials(const std::string& username, const st
 
 HTTPBasicCredentials::HTTPBasicCredentials(const HTTPRequest& request)
 {
-	static const int eof = std::char_traits<char>::eof();
-
 	std::string scheme;
-	std::string info;
-	request.getCredentials(scheme, info);
+	std::string authInfo;
+	request.getCredentials(scheme, authInfo);
 	if (icompare(scheme, SCHEME) == 0)
 	{
-		std::istringstream istr(info);
-		Base64Decoder decoder(istr);
-		int ch = decoder.get();
-		while (ch != eof && ch != ':')
-		{
-			_username += (char) ch;
-			ch = decoder.get();
-		}
-		if (ch == ':') ch = decoder.get();
-		while (ch != eof)
-		{
-			_password += (char) ch;
-			ch = decoder.get();
-		}
+		parseAuthInfo(authInfo);
 	}
 	else throw NotAuthenticatedException("Basic authentication expected");
+}
+
+
+HTTPBasicCredentials::HTTPBasicCredentials(const std::string& authInfo)
+{
+	parseAuthInfo(authInfo);
 }
 
 
@@ -120,6 +111,27 @@ void HTTPBasicCredentials::authenticate(HTTPRequest& request)
 	encoder << _username << ":" << _password;
 	encoder.close();
 	request.setCredentials(SCHEME, ostr.str());
+}
+
+
+void HTTPBasicCredentials::parseAuthInfo(const std::string& authInfo)
+{
+	static const int eof = std::char_traits<char>::eof();
+
+	std::istringstream istr(authInfo);
+	Base64Decoder decoder(istr);
+	int ch = decoder.get();
+	while (ch != eof && ch != ':')
+	{
+		_username += (char) ch;
+		ch = decoder.get();
+	}
+	if (ch == ':') ch = decoder.get();
+	while (ch != eof)
+	{
+		_password += (char) ch;
+		ch = decoder.get();
+	}
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Context.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/Context.h#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/Context.h#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
@@ -69,8 +69,10 @@ public:
 	
 	enum Usage
 	{
-		CLIENT_USE, /// Context is used by a client.
-		SERVER_USE  /// Context is used by a server.
+		CLIENT_USE, 	  /// Context is used by a client.
+		SERVER_USE,       /// Context is used by a server.
+		TLSV1_CLIENT_USE, /// Context is used by a client requiring TLSv1.
+		TLSV1_SERVER_USE  /// Context is used by a server requiring TLSv2.
 	};
 	
 	enum VerificationMode 
@@ -192,7 +194,11 @@ public:
 		/// Returns the underlying OpenSSL SSL Context object.
 
 	Usage usage() const;
-		/// Returns whether the context is for use by a client or by a server.
+		/// Returns whether the context is for use by a client or by a server
+		/// and whether TLSv1 is required.
+		
+	bool isForServerUse() const;
+		/// Returns true iff the context is for use by a server.
 
 	Context::VerificationMode verificationMode() const;
 		/// Returns the verification mode.
@@ -277,6 +283,9 @@ public:
 		/// The feature can be disabled by calling this method.
 
 private:
+	void createSSLContext();
+		/// Create a SSL_CTX object according to Context configuration.
+
 	Usage _usage;
 	VerificationMode _mode;
 	SSL_CTX* _pSSLContext;
@@ -290,6 +299,12 @@ private:
 inline Context::Usage Context::usage() const
 {
 	return _usage;
+}
+
+
+inline bool Context::isForServerUse() const
+{
+	return _usage == SERVER_USE || _usage == TLSV1_SERVER_USE;
 }
 
 

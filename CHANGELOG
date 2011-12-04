@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.3 (2011-11-xx)
+Release 1.4.3 (2011-12-xx)
 ==========================
 
 - fixed a compilation error with Data/MySQL on QNX.
@@ -17,6 +17,10 @@ Release 1.4.3 (2011-11-xx)
 - added Mail sample to NetSSL_OpenSSL, showing use of SecureSMTPClientSession.
 - added additional read() overloads to Poco::Net::HTMLForm.
 - fixed SF# 3440769: Poco::Net::HTTPResponse doesn't like Amazon EC2 cookies.
+- added support for requiring TLSv1 to Poco::Net::Context.
+- added an additional constructor to Poco::Net::HTTPBasicCredentials, allowing
+  the object to be created from a string containing a base64-encoded, colon-separated
+  username and password.
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1612,4 +1616,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#32 $
+$Id: //poco/1.4/dist/CHANGELOG#33 $
