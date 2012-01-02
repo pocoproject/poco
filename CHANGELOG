@@ -38,6 +38,7 @@ Release 1.4.3 (2012-01-xx)
   (contributed by Alexey Milovidov)
 - made Poco::Logger::formatDump() public as it may be useful for others as well
   (SF# 3453446)
+- Poco::Net::DialogSocket now has a proper copy constructor (SF# 3414602)
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1633,4 +1634,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#36 $
+$Id: //poco/1.4/dist/CHANGELOG#37 $

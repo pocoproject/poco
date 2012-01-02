@@ -1,7 +1,7 @@
 //
 // DialogSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/DialogSocket.cpp#1 $
+// $Id: //poco/1.4/Net/src/DialogSocket.cpp#2 $
 //
 // Library: Net
 // Package: Sockets
@@ -63,6 +63,16 @@ DialogSocket::DialogSocket(const SocketAddress& address):
 
 
 DialogSocket::DialogSocket(const Socket& socket): 
+	StreamSocket(socket),
+	_pBuffer(0),
+	_pNext(0),
+	_pEnd(0)
+{
+	allocBuffer();
+}
+
+
+DialogSocket::DialogSocket(const DialogSocket& socket):
 	StreamSocket(socket),
 	_pBuffer(0),
 	_pNext(0),
