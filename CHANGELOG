@@ -36,6 +36,8 @@ Release 1.4.3 (2012-01-xx)
 - added Poco::Util::AbstractConfiguration::enableEvents() 
 - Poco::AtomicCounter now uses GCC builtins with GCC 4.1 or newer 
   (contributed by Alexey Milovidov)
+- made Poco::Logger::formatDump() public as it may be useful for others as well
+  (SF# 3453446)
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1631,4 +1633,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#35 $
+$Id: //poco/1.4/dist/CHANGELOG#36 $
