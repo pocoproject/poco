@@ -1,7 +1,7 @@
 //
 // Environment_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_WINCE.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Environment_WINCE.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -81,6 +81,12 @@ void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 std::string EnvironmentImpl::osNameImpl()
 {
 	return "Windows CE";
+}
+
+
+std::string EnvironmentImpl::osDisplayNameImpl()
+{
+	return osNameImpl();
 }
 
 

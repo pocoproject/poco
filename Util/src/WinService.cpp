@@ -1,7 +1,7 @@
 //
 // WinService.cpp
 //
-// $Id: //poco/1.4/Util/src/WinService.cpp#2 $
+// $Id: //poco/1.4/Util/src/WinService.cpp#4 $
 //
 // Library: Util
 // Package: Windows
@@ -32,6 +32,9 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+
+
+#if !defined(_WIN32_WCE)
 
 
 #include "Poco/Util/WinService.h"
@@ -286,13 +289,16 @@ void WinService::open() const
 
 bool WinService::tryOpen() const
 {
+	if (!_svcHandle)
+	{
 #if defined(POCO_WIN32_UTF8)
-	std::wstring uname;
-	Poco::UnicodeConverter::toUTF16(_name, uname);
-	_svcHandle = OpenServiceW(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
+		std::wstring uname;
+		Poco::UnicodeConverter::toUTF16(_name, uname);
+		_svcHandle = OpenServiceW(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
 #else
-	_svcHandle = OpenService(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
+		_svcHandle = OpenService(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
 #endif
+	}
 	return _svcHandle != 0;
 }
 
@@ -302,6 +308,7 @@ void WinService::close() const
 	if (_svcHandle)
 	{
 		CloseServiceHandle(_svcHandle);
+		_svcHandle = 0;
 	}
 }
 
@@ -340,3 +347,6 @@ POCO_LPQUERY_SERVICE_CONFIG WinService::config() const
 
 
 } } // namespace Poco::Util
+
+
+#endif // !defined(_WIN32_WCE)

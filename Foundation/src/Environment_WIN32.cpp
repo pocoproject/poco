@@ -1,7 +1,7 @@
 //
 // Environment_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_WIN32.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Environment_WIN32.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -88,6 +88,53 @@ std::string EnvironmentImpl::osNameImpl()
 		return vi.dwMinorVersion == 0 ? "Windows 95" : "Windows 98";
 	case VER_PLATFORM_WIN32_NT:
 		return "Windows NT";
+	default:
+		return "Unknown";
+	}
+}
+
+
+std::string EnvironmentImpl::osDisplayNameImpl()
+{
+	OSVERSIONINFO vi;
+	vi.dwOSVersionInfoSize = sizeof(vi);
+	if (GetVersionEx(&vi) == 0) throw SystemException("Cannot get OS version information");
+	switch(vi.dwMajorVersion)
+	{
+	case 6:
+		switch (vi.dwMinorVersion)
+		{
+		case 0:
+			return "Windows Vista/Server 2008";
+		case 1:
+			return "Windows 7/Server 2008 SP2";
+		default:
+			return "Unknown";
+		}
+	case 5:
+		switch (vi.dwMinorVersion)
+		{
+		case 0:
+			return "Windows 2000";
+		case 1:
+			return "Windows XP";
+		case 2:
+			return "Windows Server 2003/Windows Server 2003 R2";
+		default:
+			return "Unknown";
+		}
+	case 4:
+		switch (vi.dwMinorVersion)
+		{
+		case 0:
+			return "Windows 95/Windows NT 4.0";
+		case 10:
+			return "Windows 98";
+		case 90:
+			return "Windows ME";
+		default:
+			return "Unknown";
+		}
 	default:
 		return "Unknown";
 	}

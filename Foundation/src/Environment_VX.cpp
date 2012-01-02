@@ -1,7 +1,7 @@
 
 // Environment_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -105,6 +105,12 @@ void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 std::string EnvironmentImpl::osNameImpl()
 {
 	return runtimeName;
+}
+
+
+std::string EnvironmentImpl::osDisplayNameImpl()
+{
+	return osNameImpl();
 }
 
 

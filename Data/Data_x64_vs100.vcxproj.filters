@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{53e27726-db0d-4651-9dce-20651db30f07}</UniqueIdentifier>
+      <UniqueIdentifier>{a3d06231-26e6-486e-afaa-6448fe8e89be}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{edbd7ec0-f5f3-444f-9604-8aeb6bee0fd0}</UniqueIdentifier>
+      <UniqueIdentifier>{bcef18b9-e59f-494c-9c65-dfb7e43d48b9}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{26f59b32-59e6-48ee-a744-564a69405d68}</UniqueIdentifier>
+      <UniqueIdentifier>{bac26490-9472-4770-aa79-fc6296feb180}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{d08f77fa-eebc-4986-a15c-8e23d50794cd}</UniqueIdentifier>
+      <UniqueIdentifier>{2cdf7b70-dfda-49b2-b53f-9fbb2c9788c3}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{b144f6d0-649d-415d-991d-de6bf6732c0d}</UniqueIdentifier>
+      <UniqueIdentifier>{61e8c86a-32ed-4bf6-9dcb-dc1822b9f73e}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{fd54f1b5-e464-4cc8-b644-c9a1bb42fb50}</UniqueIdentifier>
+      <UniqueIdentifier>{3bcb161f-e79f-483a-96ad-b8bb4651d86a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -185,5 +185,8 @@
     <ClCompile Include="src\SessionPool.cpp">
       <Filter>SessionPooling\Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>

@@ -2,40 +2,40 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Cipher">
-      <UniqueIdentifier>{fb87242a-c5c9-427d-8c5b-ff7e973a09d2}</UniqueIdentifier>
+      <UniqueIdentifier>{50e51105-143d-4141-8093-762cdd167f8d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cipher\Header Files">
-      <UniqueIdentifier>{29625e7a-4c64-4f46-a160-696f5df0bf0f}</UniqueIdentifier>
+      <UniqueIdentifier>{1767a8f8-e5e0-4bc9-ad90-6cca1834208b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cipher\Source Files">
-      <UniqueIdentifier>{863b337e-7970-47a3-8c3a-ac7ca18fff1a}</UniqueIdentifier>
+      <UniqueIdentifier>{029ae0f9-02b9-4192-b10c-337f10c65599}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA">
-      <UniqueIdentifier>{9bfb5ff5-db5b-4920-b1fa-4f670bb6ed15}</UniqueIdentifier>
+      <UniqueIdentifier>{d65b1308-a581-4d39-b2e7-6ffd5b514475}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA\Header Files">
-      <UniqueIdentifier>{987d81ee-3336-4a5c-9bda-1e58081dea22}</UniqueIdentifier>
+      <UniqueIdentifier>{e131e1d2-d347-4f2e-abc6-95ab72d7a581}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA\Source Files">
-      <UniqueIdentifier>{7fd9a8fd-a722-4926-a7ed-3b4bc1bd51d3}</UniqueIdentifier>
+      <UniqueIdentifier>{f88905e9-6f9c-4eff-acfd-ca70eaa0f74c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate">
-      <UniqueIdentifier>{8ac4a3ba-cfae-43d5-997d-c2a61fdfd88b}</UniqueIdentifier>
+      <UniqueIdentifier>{aa0889dc-1ba2-49f9-b67b-b72a8dff2bbf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate\Header Files">
-      <UniqueIdentifier>{78a5514f-52e9-437f-98ac-c03037383c4a}</UniqueIdentifier>
+      <UniqueIdentifier>{4b7aa80e-9cf2-4c9d-9a11-c94ef1b58c68}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate\Source Files">
-      <UniqueIdentifier>{e986f474-79c0-4f8e-aace-1fa5b5c8b609}</UniqueIdentifier>
+      <UniqueIdentifier>{fad78493-b058-46e6-965a-6785d16573cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore">
-      <UniqueIdentifier>{0a48cb3b-08ac-4a8c-9197-1d02406f7e58}</UniqueIdentifier>
+      <UniqueIdentifier>{e7b8685b-3c47-4d5c-aec5-1544de75f063}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore\Header Files">
-      <UniqueIdentifier>{3ac5d95d-62d7-46c2-8acb-7e3b2b5e24f0}</UniqueIdentifier>
+      <UniqueIdentifier>{e38e78a1-9588-4ddd-829c-30759dc1dd62}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore\Source Files">
-      <UniqueIdentifier>{52c2a894-ba8f-4207-83c1-7c10309b15fc}</UniqueIdentifier>
+      <UniqueIdentifier>{b570bd37-1df0-4e64-aa2f-18f24cfe9e2d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -122,5 +122,8 @@
     <ClCompile Include="src\OpenSSLInitializer.cpp">
       <Filter>CryptoCore\Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>

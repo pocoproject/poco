@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/Path.cpp#5 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -643,7 +643,16 @@ bool Path::find(StringVec::const_iterator it, StringVec::const_iterator end, con
 {
 	while (it != end)
 	{
+#if defined(WIN32)
+		std::string cleanPath(*it);
+		if (cleanPath.size() > 1 && cleanPath[0] == '"' && cleanPath[cleanPath.size() - 1] == '"')
+		{
+			cleanPath = cleanPath.substr(1, cleanPath.size() - 2);
+		}
+		Path p(cleanPath);
+#else
 		Path p(*it);
+#endif
 		p.makeDirectory();
 		p.resolve(Path(name));
 		File f(p);

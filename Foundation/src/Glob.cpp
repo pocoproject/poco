@@ -1,7 +1,7 @@
 //
 // Glob.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Glob.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Glob.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -259,7 +259,16 @@ void Glob::collect(const Path& pathPattern, const Path& base, const Path& curren
 bool Glob::isDirectory(const Path& path, bool followSymlink)
 {
 	File f(path);
-	if (f.isDirectory())
+	bool isDir = false;
+	try
+	{
+		isDir = f.isDirectory();
+	}
+	catch (Poco::Exception&)
+	{
+		return false;
+	}
+	if (isDir)
 	{
 		return true;
 	}

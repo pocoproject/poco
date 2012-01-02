@@ -1,7 +1,7 @@
 //
 // CoreTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/CoreTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/CoreTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -176,6 +176,7 @@ void CoreTest::testEnvironment()
 	}
 	
 	std::cout << "OS Name:         " << Environment::osName() << std::endl;
+	std::cout << "OS Display Name: " << Environment::osDisplayName() << std::endl;
 	std::cout << "OS Version:      " << Environment::osVersion() << std::endl;
 	std::cout << "OS Architecture: " << Environment::osArchitecture() << std::endl;
 	std::cout << "Node Name:       " << Environment::nodeName() << std::endl;

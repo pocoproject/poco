@@ -12,6 +12,7 @@ vc.project.compiler.defines = SQLITE_THREADSAFE=1;SQLITE_OMIT_UTF16;SQLITE_OMIT_
 vc.project.compiler.defines.shared = ${vc.project.name}_EXPORTS
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
+vc.project.compiler.defines.WinCE = SQLITE_OMIT_LOCALTIME
 vc.project.compiler.disableWarnings = 4996;4244;4018
 vc.solution.create = true
 vc.solution.include = testsuite\\TestSuite

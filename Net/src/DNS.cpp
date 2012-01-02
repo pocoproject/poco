@@ -1,7 +1,7 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#9 $
+// $Id: //poco/1.4/Net/src/DNS.cpp#10 $
 //
 // Library: Net
 // Package: NetCore
@@ -75,7 +75,7 @@ HostEntry DNS::hostByName(const std::string& hostname)
 {
 	NetworkInitializer networkInitializer;
 	
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
 	struct addrinfo* pAI;
 	struct addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
@@ -113,7 +113,7 @@ HostEntry DNS::hostByAddress(const IPAddress& address)
 {
 	NetworkInitializer networkInitializer;
 
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
 	static char fqname[1024];
 	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD); 

@@ -2,40 +2,40 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="SSLCore">
-      <UniqueIdentifier>{d9eaf0d6-f474-4ee8-aca5-32b62781b273}</UniqueIdentifier>
+      <UniqueIdentifier>{38772158-243e-4af8-bf91-805db330e1a6}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLCore\Header Files">
-      <UniqueIdentifier>{2998d636-8208-443f-be6d-13715d6203eb}</UniqueIdentifier>
+      <UniqueIdentifier>{934afcf7-dcdb-4c42-a4a4-5ab17bb2c063}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLCore\Source Files">
-      <UniqueIdentifier>{1934c0e0-1d82-426d-a11e-581ea7ce5530}</UniqueIdentifier>
+      <UniqueIdentifier>{65c5d339-2f4d-477d-b831-8419b301327e}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient">
-      <UniqueIdentifier>{affd39f4-c370-4ba3-b1f1-9b7881bbe432}</UniqueIdentifier>
+      <UniqueIdentifier>{a8f7f5e1-2e75-4900-b14e-c455067e2758}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Header Files">
-      <UniqueIdentifier>{7e2fce43-24c5-4d04-a1ec-a572a20702fe}</UniqueIdentifier>
+      <UniqueIdentifier>{c198da32-79cd-401f-a366-d69a14c7d2ba}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Source Files">
-      <UniqueIdentifier>{70a55b6d-855e-4e34-931f-2b3d2a5a66bf}</UniqueIdentifier>
+      <UniqueIdentifier>{bbca47db-4e02-4642-839c-6b0ec90ae9d4}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets">
-      <UniqueIdentifier>{4d42ad9b-28fa-46d0-bba8-9c61d26a2715}</UniqueIdentifier>
+      <UniqueIdentifier>{f531875d-ed55-4aec-9968-0411127f2cf6}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets\Header Files">
-      <UniqueIdentifier>{548fa4c8-2205-48cb-ac60-ab525fadcd72}</UniqueIdentifier>
+      <UniqueIdentifier>{6c27a1c6-5cab-4707-92ec-f4a18519f6a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets\Source Files">
-      <UniqueIdentifier>{fb31cd98-5924-4db5-889a-49a91b53c5e0}</UniqueIdentifier>
+      <UniqueIdentifier>{95695f98-40e9-4d2c-9809-1654fb150ade}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail">
-      <UniqueIdentifier>{3dbb15f4-2822-47e4-8a2b-0da5c4b567a5}</UniqueIdentifier>
+      <UniqueIdentifier>{33b4c949-1c95-4017-af6f-06c2e5b4f98c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Header Files">
-      <UniqueIdentifier>{235da22e-e34e-4ac2-a809-0b8789ead1c4}</UniqueIdentifier>
+      <UniqueIdentifier>{7d08b1e6-8c9a-4614-ac17-f42f95324e0f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Source Files">
-      <UniqueIdentifier>{eee01a7c-24b9-42a3-9151-b6e909f68c00}</UniqueIdentifier>
+      <UniqueIdentifier>{c0dc2c55-9a50-4580-9a5d-5efb535b5ac6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -206,5 +206,8 @@
     <ClCompile Include="src\SecureSMTPClientSession.cpp">
       <Filter>Mail\Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>

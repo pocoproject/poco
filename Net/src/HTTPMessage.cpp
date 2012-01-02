@@ -1,7 +1,7 @@
 //
 // HTTPMessage.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPMessage.cpp#3 $
+// $Id: //poco/1.4/Net/src/HTTPMessage.cpp#4 $
 //
 // Library: Net
 // Package: HTTP
@@ -109,6 +109,28 @@ std::streamsize HTTPMessage::getContentLength() const
 	}
 	else return UNKNOWN_CONTENT_LENGTH;
 }
+
+
+#if defined(POCO_HAVE_INT64)	
+void HTTPMessage::setContentLength64(Poco::Int64 length)
+{
+	if (length != UNKNOWN_CONTENT_LENGTH)
+		set(CONTENT_LENGTH, NumberFormatter::format(length));
+	else
+		erase(CONTENT_LENGTH);
+}
+
+	
+Poco::Int64 HTTPMessage::getContentLength64() const
+{
+	const std::string& contentLength = get(CONTENT_LENGTH, EMPTY);
+	if (!contentLength.empty())
+	{
+		return NumberParser::parse64(contentLength);
+	}
+	else return UNKNOWN_CONTENT_LENGTH;
+}
+#endif // defined(POCO_HAVE_INT64)	
 
 
 void HTTPMessage::setTransferEncoding(const std::string& transferEncoding)

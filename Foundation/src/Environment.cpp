@@ -1,7 +1,7 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Environment.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -90,6 +90,12 @@ void Environment::set(const std::string& name, const std::string& value)
 std::string Environment::osName()
 {
 	return EnvironmentImpl::osNameImpl();
+}
+
+
+std::string Environment::osDisplayName()
+{
+	return EnvironmentImpl::osDisplayNameImpl();
 }
 
 	

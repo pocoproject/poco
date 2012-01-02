@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.3 (2011-12-xx)
+Release 1.4.3 (2012-01-xx)
 ==========================
 
 - fixed a compilation error with Data/MySQL on QNX.
@@ -21,6 +21,19 @@ Release 1.4.3 (2011-12-xx)
 - added an additional constructor to Poco::Net::HTTPBasicCredentials, allowing
   the object to be created from a string containing a base64-encoded, colon-separated
   username and password.
+- Poco::Zip::ZipStream: fixed a crash if CM_STORE was used.
+- Added setContentLength64() and getContentLength64() to Poco::Net::HTTPMessage.
+- added Poco::Environment::osDisplayName().
+- fixed SF# 3463096: WinService leaves dangling handles (open() now does not reopen the 
+  service handle if it's already open)
+- fixed SF# 3426537: WinRegistryConfiguration can't read virtualized keys
+- added Poco::Buffer::resize()
+- fixed SF# 3441822: thread safety issue in HTTPClientSession:
+  always use getaddrinfo() instead of gethostbyname() on all platforms supporting it
+- added version resource to POCO DLLs
+- fixed SF# 3440599: Dir Path in Quotes in PATH cause PathTest::testFind to fail.
+- fixed SF# 3406030: Glob::collect problem
+- added Poco::Util::AbstractConfiguration::enableEvents() 
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1616,4 +1629,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#33 $
+$Id: //poco/1.4/dist/CHANGELOG#34 $

@@ -1,7 +1,7 @@
 //
 // Environment_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_VMS.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Environment_VMS.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -100,6 +100,12 @@ void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 std::string EnvironmentImpl::osNameImpl()
 {
 	return getsyi(SYI$_NODE_SWTYPE);
+}
+
+
+std::string EnvironmentImpl::osDisplayNameImpl()
+{
+	return osNameImpl();
 }
 
 

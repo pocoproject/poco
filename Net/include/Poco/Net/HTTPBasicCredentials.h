@@ -1,7 +1,7 @@
 //
 // HTTPBasicCredentials.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPBasicCredentials.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPBasicCredentials.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -102,7 +102,7 @@ protected:
 
 private:
 	HTTPBasicCredentials(const HTTPBasicCredentials&);
-	HTTPBasicCredentials& operator = (const HTTPBasicCredentials);
+	HTTPBasicCredentials& operator = (const HTTPBasicCredentials&);
 	
 	std::string _username;
 	std::string _password;

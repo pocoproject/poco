@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#2 $
+// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#3 $
 //
 // Library: Util
 // Package: Windows
@@ -32,6 +32,9 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+
+
+#if !defined(_WIN32_WCE)
 
 
 #include "Poco/Util/WinRegistryKey.h"
@@ -531,3 +534,6 @@ void WinRegistryKey::values(WinRegistryKey::Values& vals)
 
 
 } } // namespace Poco::Util
+
+
+#endif // !defined(_WIN32_WCE)

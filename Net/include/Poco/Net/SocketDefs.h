@@ -1,7 +1,7 @@
 //
 // SocketDefs.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketDefs.h#3 $
+// $Id: //poco/1.4/Net/include/Poco/Net/SocketDefs.h#5 $
 //
 // Library: Net
 // Package: NetCore
@@ -236,8 +236,20 @@
 #endif
 
 
+#if POCO_OS != POCO_OS_VXWORKS
+#define POCO_HAVE_ADDRINFO   1
+#endif
+
+
 #if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_WINDOWS_CE)
 #define POCO_BROKEN_TIMEOUTS 1
+#endif
+
+
+#if defined(POCO_HAVE_ADDRINFO)
+#if !defined(AI_ADDRCONFIG)
+#define AI_ADDRCONFIG 0
+#endif
 #endif
 
 

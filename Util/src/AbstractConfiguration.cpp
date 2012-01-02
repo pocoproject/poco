@@ -1,7 +1,7 @@
 //
 // AbstractConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/AbstractConfiguration.cpp#1 $
+// $Id: //poco/1.4/Util/src/AbstractConfiguration.cpp#2 $
 //
 // Library: Util
 // Package: Configuration
@@ -55,7 +55,9 @@ namespace Poco {
 namespace Util {
 
 
-AbstractConfiguration::AbstractConfiguration(): _depth(0)
+AbstractConfiguration::AbstractConfiguration(): 
+	_depth(0),
+	_eventsEnabled(true)
 {
 }
 
@@ -292,13 +294,31 @@ std::string AbstractConfiguration::expand(const std::string& value) const
 
 void AbstractConfiguration::remove(const std::string& key)
 {
-	propertyRemoving(this, key);
+	if (_eventsEnabled)
+	{
+		propertyRemoving(this, key);
+	}
 	{
 		FastMutex::ScopedLock lock(_mutex);
 
 		removeRaw(key);
 	}
-	propertyRemoved(this, key);
+	if (_eventsEnabled)
+	{
+		propertyRemoved(this, key);
+	}
+}
+
+
+void AbstractConfiguration::enableEvents(bool enable)
+{
+	_eventsEnabled = enable;
+}
+
+	
+bool AbstractConfiguration::eventsEnabled() const
+{
+	return _eventsEnabled;
 }
 
 
@@ -386,13 +406,19 @@ bool AbstractConfiguration::parseBool(const std::string& value)
 void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string value)
 {
 	KeyValue kv(key, value);
-	propertyChanging(this, kv);
+	if (_eventsEnabled)
+	{
+		propertyChanging(this, kv);
+	}
 	{
 		FastMutex::ScopedLock lock(_mutex);
 
 		setRaw(key, value);
 	}
-	propertyChanged(this, kv);
+	if (_eventsEnabled)
+	{
+		propertyChanged(this, kv);
+	}
 }
 
 

@@ -1,7 +1,7 @@
 //
 // HTTPServerResponseImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerResponseImpl.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPServerResponseImpl.cpp#2 $
 //
 // Library: Net
 // Package: HTTPServer
@@ -119,7 +119,11 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 	Timestamp dateTime    = f.getLastModified();
 	File::FileSize length = f.getSize();
 	set("Last-Modified", DateTimeFormatter::format(dateTime, DateTimeFormat::HTTP_FORMAT));
+#if defined(POCO_HAVE_INT64)	
+	setContentLength64(length);
+#else
 	setContentLength(static_cast<int>(length));
+#endif
 	setContentType(mediaType);
 	setChunkedTransferEncoding(false);
 
