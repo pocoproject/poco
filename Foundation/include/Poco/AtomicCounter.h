@@ -1,7 +1,7 @@
 //
 // AtomicCounter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AtomicCounter.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/AtomicCounter.h#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -45,6 +45,10 @@
 #include "Poco/UnWindows.h"
 #elif POCO_OS == POCO_OS_MAC_OS_X
 #include <libkern/OSAtomic.h>
+#elif ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1) || __GNUC__ > 4) && (defined(__x86_64__) || defined(__i386__))
+#if !defined(POCO_HAVE_GCC_ATOMICS)
+#define POCO_HAVE_GCC_ATOMICS
+#endif
 #else
 #include "Poco/Mutex.h"
 #endif // POCO_OS
@@ -71,6 +75,7 @@ class Foundation_API AtomicCounter
 	/// primitives:
 	///   - Windows
 	///   - Mac OS X
+	///   - GCC 4.1+ (Intel platforms only)
 {
 public:
 	typedef int ValueType; /// The underlying integer type.
@@ -120,6 +125,8 @@ private:
 	typedef volatile LONG ImplType;
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	typedef int32_t ImplType;
+#elif defined(POCO_HAVE_GCC_ATOMICS)
+	typedef int ImplType;
 #else // generic implementation based on FastMutex
 	struct ImplType
 	{
@@ -224,6 +231,51 @@ inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
 {
 	ValueType result = OSAtomicDecrement32(&_counter);
 	return ++result;
+}
+
+	
+inline bool AtomicCounter::operator ! () const
+{
+	return _counter == 0;
+}
+
+#elif defined(POCO_HAVE_GCC_ATOMICS)
+//
+// GCC 4.1+ atomic builtins.
+//
+inline AtomicCounter::operator AtomicCounter::ValueType () const
+{
+	return _counter;
+}
+
+	
+inline AtomicCounter::ValueType AtomicCounter::value() const
+{
+	return _counter;
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::operator ++ () // prefix
+{
+	return __sync_add_and_fetch(&_counter, 1);
+}
+
+	
+inline AtomicCounter::ValueType AtomicCounter::operator ++ (int) // postfix
+{
+	return __sync_fetch_and_add(&_counter, 1);
+}
+
+
+inline AtomicCounter::ValueType AtomicCounter::operator -- () // prefix
+{
+	return __sync_sub_and_fetch(&_counter, 1);
+}
+
+	
+inline AtomicCounter::ValueType AtomicCounter::operator -- (int) // postfix
+{
+	return __sync_fetch_and_sub(&_counter, 1);
 }
 
 	

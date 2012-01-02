@@ -1,7 +1,7 @@
 //
 // TCPServerTest.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/TCPServerTest.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/TCPServerTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -338,7 +338,7 @@ void TCPServerTest::testReuseSession()
 	assert (srv.totalConnections() == 0);
 	
 	Context::Ptr pClientContext = new Context(
-		Context::SERVER_USE, 
+		Context::CLIENT_USE, 
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.caConfig"),

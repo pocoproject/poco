@@ -34,6 +34,8 @@ Release 1.4.3 (2012-01-xx)
 - fixed SF# 3440599: Dir Path in Quotes in PATH cause PathTest::testFind to fail.
 - fixed SF# 3406030: Glob::collect problem
 - added Poco::Util::AbstractConfiguration::enableEvents() 
+- Poco::AtomicCounter now uses GCC builtins with GCC 4.1 or newer 
+  (contributed by Alexey Milovidov)
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1629,4 +1631,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#34 $
+$Id: //poco/1.4/dist/CHANGELOG#35 $

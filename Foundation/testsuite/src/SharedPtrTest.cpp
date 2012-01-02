@@ -1,7 +1,7 @@
 //
 // SharedPtrTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SharedPtrTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/SharedPtrTest.cpp#2 $
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -145,7 +145,7 @@ void SharedPtrTest::testSharedPtr()
 	assert (ptr2 < ptr1);
 	ptr2.swap(ptr1);
 
-	assert (ptr1->data() == "one" && ptr2->data() == "two" || ptr1->data() == "two" && ptr2->data() == "one");
+	assert ((ptr1->data() == "one" && ptr2->data() == "two") || (ptr1->data() == "two" && ptr2->data() == "one"));
 	
 	try
 	{
