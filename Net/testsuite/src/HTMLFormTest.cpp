@@ -1,7 +1,7 @@
 //
 // HTMLFormTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTMLFormTest.cpp#2 $
+// $Id: //poco/1.4/Net/testsuite/src/HTMLFormTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -38,6 +38,7 @@
 #include "Poco/Net/StringPartSource.h"
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/NetException.h"
 #include <sstream>
 
 
@@ -284,6 +285,65 @@ void HTMLFormTest::testSubmit3()
 }
 
 
+void HTMLFormTest::testFieldLimitUrl()
+{
+	HTTPRequest req("GET", "/form.cgi?field1=value1&field2=value%202&field3=value%3D3&field4=value%264");
+	HTMLForm form;
+	form.setFieldLimit(3);
+	try
+	{
+		form.load(req);
+		fail("field limit violated - must throw");
+	}
+	catch (Poco::Net::HTMLFormException&)
+	{
+	}
+}
+
+
+void HTMLFormTest::testFieldLimitMultipart()
+{
+	std::istringstream istr(
+		"\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: form-data; name=\"field1\"\r\n"
+		"\r\n"
+		"value1\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: form-data; name=\"field2\"\r\n"
+		"\r\n"
+		"value 2\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: form-data; name=\"field3\"\r\n"
+		"\r\n"
+		"value=3\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: form-data; name=\"field4\"\r\n"
+		"\r\n"
+		"value&4\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: file; name=\"attachment1\"; filename=\"att1.txt\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"This is an attachment\r\n"
+		"--MIME_boundary_0123456789--\r\n"
+	);
+	HTTPRequest req("POST", "/form.cgi");
+	req.setContentType(HTMLForm::ENCODING_MULTIPART + "; boundary=\"MIME_boundary_0123456789\"");
+	StringPartHandler sah;
+	HTMLForm form;
+	form.setFieldLimit(3);
+	try
+	{
+		form.load(req, istr, sah);	
+		fail("field limit violated - must throw");
+	}
+	catch (Poco::Net::HTMLFormException&)
+	{
+	}
+}
+
+
 void HTMLFormTest::setUp()
 {
 }
@@ -306,6 +366,8 @@ CppUnit::Test* HTMLFormTest::suite()
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit1);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit2);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit3);
+	CppUnit_addTest(pSuite, HTMLFormTest, testFieldLimitUrl);
+	CppUnit_addTest(pSuite, HTMLFormTest, testFieldLimitMultipart);
 
 	return pSuite;
 }

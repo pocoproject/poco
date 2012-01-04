@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.4/Net/src/MessageHeader.cpp#3 $
+// $Id: //poco/1.4/Net/src/MessageHeader.cpp#4 $
 //
 // Library: Net
 // Package: Messages
@@ -44,13 +44,15 @@ namespace Poco {
 namespace Net {
 
 
-MessageHeader::MessageHeader()
+MessageHeader::MessageHeader():
+	_fieldLimit(DFL_FIELD_LIMIT)
 {
 }
 
 
 MessageHeader::MessageHeader(const MessageHeader& messageHeader):
-	NameValueCollection(messageHeader)
+	NameValueCollection(messageHeader),
+	_fieldLimit(DFL_FIELD_LIMIT)
 {
 }
 
@@ -88,8 +90,11 @@ void MessageHeader::read(std::istream& istr)
 	name.reserve(32);
 	value.reserve(64);
 	int ch = buf.sbumpc();
+	int fields = 0;
 	while (ch != eof && ch != '\r' && ch != '\n')
 	{
+		if (_fieldLimit > 0 && fields == _fieldLimit)
+			throw MessageException("Too many header fields");
 		name.clear();
 		value.clear();
 		while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = buf.sbumpc(); }
@@ -114,8 +119,23 @@ void MessageHeader::read(std::istream& istr)
 		}
 		Poco::trimRightInPlace(value);
 		add(name, value);
+		++fields;
 	}
 	istr.putback(ch);
+}
+
+
+int MessageHeader::getFieldLimit() const
+{
+	return _fieldLimit;
+}
+
+	
+void MessageHeader::setFieldLimit(int limit)
+{
+	poco_assert (limit >= 0);
+	
+	_fieldLimit = limit;
 }
 
 

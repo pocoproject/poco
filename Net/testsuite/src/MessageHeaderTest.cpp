@@ -1,7 +1,7 @@
 //
 // MessageHeaderTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.cpp#2 $
+// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.cpp#3 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -365,6 +365,23 @@ void MessageHeaderTest::testSplitParameters()
 }
 
 
+void MessageHeaderTest::testFieldLimit()
+{
+	std::string s("name1: value1\r\nname2: value2\r\nname3: value3\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.setFieldLimit(2);
+	try
+	{
+		mh.read(istr);
+		fail("Field limit exceeded - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+
 void MessageHeaderTest::setUp()
 {
 }
@@ -394,6 +411,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testReadInvalid2);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitElements);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParameters);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
 
 	return pSuite;
 }

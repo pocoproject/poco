@@ -1,7 +1,7 @@
 //
 // HTMLFormTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTMLFormTest.h#1 $
+// $Id: //poco/1.4/Net/testsuite/src/HTMLFormTest.h#2 $
 //
 // Definition of the HTMLFormTest class.
 //
@@ -54,6 +54,8 @@ public:
 	void testSubmit1();
 	void testSubmit2();
 	void testSubmit3();
+	void testFieldLimitUrl();
+	void testFieldLimitMultipart();
 
 	void setUp();
 	void tearDown();

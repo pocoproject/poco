@@ -1,7 +1,7 @@
 //
 // MessageHeaderTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.h#1 $
+// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.h#2 $
 //
 // Definition of the MessageHeaderTest class.
 //
@@ -61,6 +61,7 @@ public:
 	void testReadInvalid2();
 	void testSplitElements();
 	void testSplitParameters();
+	void testFieldLimit();
 
 	void setUp();
 	void tearDown();

@@ -1,7 +1,7 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.4/Net/src/HTMLForm.cpp#3 $
+// $Id: //poco/1.4/Net/src/HTMLForm.cpp#4 $
 //
 // Library: Net
 // Package: HTML
@@ -41,10 +41,10 @@
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/NullPartHandler.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/NullStream.h"
 #include "Poco/CountingStream.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/Exception.h"
 #include "Poco/URI.h"
 #include "Poco/String.h"
 #include <sstream>
@@ -66,30 +66,35 @@ const std::string HTMLForm::ENCODING_MULTIPART = "multipart/form-data";
 
 
 HTMLForm::HTMLForm():
+	_fieldLimit(DFL_FIELD_LIMIT),
 	_encoding(ENCODING_URL)
 {
 }
 
 	
 HTMLForm::HTMLForm(const std::string& encoding):
+	_fieldLimit(DFL_FIELD_LIMIT),
 	_encoding(encoding)
 {
 }
 
 
-HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
+HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler):
+	_fieldLimit(DFL_FIELD_LIMIT)
 {
 	load(request, requestBody, handler);
 }
 
 
-HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody)
+HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody):
+	_fieldLimit(DFL_FIELD_LIMIT)
 {
 	load(request, requestBody);
 }
 
 
-HTMLForm::HTMLForm(const HTTPRequest& request)
+HTMLForm::HTMLForm(const HTTPRequest& request):
+	_fieldLimit(DFL_FIELD_LIMIT)
 {
 	load(request);
 }
@@ -256,9 +261,12 @@ void HTMLForm::readUrl(std::istream& istr)
 {
 	static const int eof = std::char_traits<char>::eof();
 
+	int fields = 0;
 	int ch = istr.get();
 	while (ch != eof)
 	{
+		if (_fieldLimit > 0 && fields == _fieldLimit)
+			throw HTMLFormException("Too many form fields");
 		std::string name;
 		std::string value;
 		while (ch != eof && ch != '=' && ch != '&')
@@ -282,6 +290,7 @@ void HTMLForm::readUrl(std::istream& istr)
 		URI::decode(name, decodedName);
 		URI::decode(value, decodedValue);
 		add(decodedName, decodedValue);
+		++fields;
 		if (ch == '&') ch = istr.get();
 	}
 }
@@ -291,9 +300,12 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 {
 	static const int eof = std::char_traits<char>::eof();
 
+	int fields = 0;
 	MultipartReader reader(istr, _boundary);
 	while (reader.hasNextPart())
 	{
+		if (_fieldLimit > 0 && fields == _fieldLimit)
+			throw HTMLFormException("Too many form fields");
 		MessageHeader header;
 		reader.nextPart(header);
 		std::string disp;
@@ -322,6 +334,7 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 			}
 			add(name, value);
 		}
+		++fields;
 	}
 }
 
@@ -373,6 +386,14 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	}
 	writer.close();
 	_boundary = writer.boundary();
+}
+
+
+void HTMLForm::setFieldLimit(int limit)
+{
+	poco_assert (limit >= 0);
+	
+	_fieldLimit = limit;
 }
 
 

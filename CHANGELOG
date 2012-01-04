@@ -39,6 +39,10 @@ Release 1.4.3 (2012-01-xx)
 - made Poco::Logger::formatDump() public as it may be useful for others as well
   (SF# 3453446)
 - Poco::Net::DialogSocket now has a proper copy constructor (SF# 3414602)
+- Poco::Net::MessageHeader and Poco::Net::HTMLForm now limit the maximum number of
+  fields parsed from a message to prevent certain kinds of denial-of-service
+  attacks. The field limit can be changed with the new method setFieldLimit().
+  The default limit is 100.
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1634,4 +1638,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#37 $
+$Id: //poco/1.4/dist/CHANGELOG#38 $

@@ -1,7 +1,7 @@
 //
 // NetException.cpp
 //
-// $Id: //poco/1.4/Net/src/NetException.cpp#2 $
+// $Id: //poco/1.4/Net/src/NetException.cpp#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -66,6 +66,7 @@ POCO_IMPLEMENT_EXCEPTION(FTPException, NetException, "FTP Exception")
 POCO_IMPLEMENT_EXCEPTION(SMTPException, NetException, "SMTP Exception")
 POCO_IMPLEMENT_EXCEPTION(POP3Exception, NetException, "POP3 Exception")
 POCO_IMPLEMENT_EXCEPTION(ICMPException, NetException, "ICMP Exception")
+POCO_IMPLEMENT_EXCEPTION(HTMLFormException, NetException, "HTML Form Exception")
 
 
 } } // namespace Poco::Net

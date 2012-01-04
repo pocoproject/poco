@@ -1,7 +1,7 @@
 //
 // NetException.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NetException.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/NetException.h#3 $
 //
 // Library: Net
 // Package: NetCore
@@ -69,6 +69,7 @@ POCO_DECLARE_EXCEPTION(Net_API, FTPException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, SMTPException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, POP3Exception, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, ICMPException, NetException)
+POCO_DECLARE_EXCEPTION(Net_API, HTMLFormException, NetException)
 
 
 } } // namespace Poco::Net
