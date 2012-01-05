@@ -43,6 +43,11 @@ Release 1.4.3 (2012-01-xx)
   fields parsed from a message to prevent certain kinds of denial-of-service
   attacks. The field limit can be changed with the new method setFieldLimit().
   The default limit is 100.
+- Poco::NumberFormatter, Poco::NumberParser and Poco::format() now always use the
+  classic ("C") locale to format and parse floating-point numbers.
+- added Poco::StreamCopier::copyStream64(), Poco::StreamCopier::copyStreamUnbuffered64()
+  and Poco::StreamCopier::copyToString64(). These functions use a 64-bit integer
+  to count the number of bytes copied.
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1638,4 +1643,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#38 $
+$Id: //poco/1.4/dist/CHANGELOG#39 $

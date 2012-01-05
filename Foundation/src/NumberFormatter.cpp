@@ -1,7 +1,7 @@
 //
 // NumberFormatter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NumberFormatter.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/NumberFormatter.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -35,6 +35,9 @@
 
 
 #include "Poco/NumberFormatter.h"
+#include "Poco/MemoryStream.h"
+#include <iomanip>
+#include <locale>
 #include <cstdio>
 
 
@@ -335,16 +338,20 @@ void NumberFormatter::appendHex(std::string& str, UInt64 value, int width)
 void NumberFormatter::append(std::string& str, float value)
 {
 	char buffer[64];
-	std::sprintf(buffer, "%.*g", 8, (double) value);
-	str.append(buffer);
+	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+	ostr.imbue(std::locale::classic());
+	ostr << std::setprecision(8) << value;
+	str.append(buffer, ostr.charsWritten());
 }
 
 
 void NumberFormatter::append(std::string& str, double value)
 {
 	char buffer[64];
-	std::sprintf(buffer, "%.*g", 16, value);
-	str.append(buffer);
+	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+	ostr.imbue(std::locale::classic());
+	ostr << std::setprecision(16) << value;
+	str.append(buffer, ostr.charsWritten());
 }
 
 
@@ -353,8 +360,10 @@ void NumberFormatter::append(std::string& str, double value, int precision)
 	poco_assert (precision >= 0 && precision < 32);
 
 	char buffer[64];
-	std::sprintf(buffer, "%.*f", precision, value);
-	str.append(buffer);
+	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+	ostr.imbue(std::locale::classic());
+	ostr << std::fixed << std::showpoint << std::setprecision(precision) << value;
+	str.append(buffer, ostr.charsWritten());
 }
 
 
@@ -363,8 +372,10 @@ void NumberFormatter::append(std::string& str, double value, int width, int prec
 	poco_assert (width > 0 && width < 64 && precision >= 0 && precision < width);
 
 	char buffer[64];
-	std::sprintf(buffer, "%*.*f", width, precision, value);
-	str.append(buffer);
+	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+	ostr.imbue(std::locale::classic());
+	ostr << std::fixed << std::showpoint << std::setw(width) << std::setprecision(precision) << value;
+	str.append(buffer, ostr.charsWritten());
 }
 
 

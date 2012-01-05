@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Format.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Format.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -38,6 +38,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 #include <sstream>
+#include <locale>
 #include <cstddef>
 
 
@@ -166,6 +167,7 @@ namespace
 	void formatOne(std::string& result, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
 	{
 		std::ostringstream str;
+		str.imbue(std::locale::classic());
 		parseFlags(str, itFmt, endFmt);
 		parseWidth(str, itFmt, endFmt);
 		parsePrec(str, itFmt, endFmt);
