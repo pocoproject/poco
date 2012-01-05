@@ -1,7 +1,7 @@
 //
 // StreamCopierTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/StreamCopierTest.h#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/StreamCopierTest.h#2 $
 //
 // Definition of the StreamCopierTest class.
 //
@@ -49,6 +49,11 @@ public:
 	void testBufferedCopy();
 	void testUnbufferedCopy();
 	void testCopyToString();
+#if defined(POCO_HAVE_INT64)
+	void testBufferedCopy64();
+	void testUnbufferedCopy64();
+	void testCopyToString64();
+#endif
 
 	void setUp();
 	void tearDown();
