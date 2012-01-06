@@ -15,11 +15,14 @@ SOURCES="
 	FTPStreamFactory.cpp
 	FilePartSource.cpp
 	HTMLForm.cpp
+	HTTPAuthenticationParams.cpp
 	HTTPBasicCredentials.cpp
 	HTTPBufferAllocator.cpp
 	HTTPChunkedStream.cpp
 	HTTPClientSession.cpp
 	HTTPCookie.cpp
+	HTTPCredentials.cpp
+	HTTPDigestCredentials.cpp
 	HTTPFixedLengthStream.cpp
 	HTTPHeaderStream.cpp
 	HTTPIOStream.cpp

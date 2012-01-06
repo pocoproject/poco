@@ -541,6 +541,8 @@
 			<Filter
 				Name="Header Files">
 				<File
+					RelativePath=".\include\Poco\Net\HTTPAuthenticationParams.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\HTTPBasicCredentials.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\HTTPBasicStreamBuf.h"/>
@@ -550,6 +552,10 @@
 					RelativePath=".\include\Poco\Net\HTTPChunkedStream.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\HTTPCookie.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPCredentials.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPDigestCredentials.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\HTTPFixedLengthStream.h"/>
 				<File
@@ -568,6 +574,8 @@
 			<Filter
 				Name="Source Files">
 				<File
+					RelativePath=".\src\HTTPAuthenticationParams.cpp"/>
+				<File
 					RelativePath=".\src\HTTPBasicCredentials.cpp"/>
 				<File
 					RelativePath=".\src\HTTPBufferAllocator.cpp"/>
@@ -575,6 +583,10 @@
 					RelativePath=".\src\HTTPChunkedStream.cpp"/>
 				<File
 					RelativePath=".\src\HTTPCookie.cpp"/>
+				<File
+					RelativePath=".\src\HTTPCredentials.cpp"/>
+				<File
+					RelativePath=".\src\HTTPDigestCredentials.cpp"/>
 				<File
 					RelativePath=".\src\HTTPFixedLengthStream.cpp"/>
 				<File

@@ -50,6 +50,10 @@ Release 1.4.3 (2012-01-xx)
   to count the number of bytes copied.
 - upgraded internal zlib to 1.2.5
 - XML: integrated bugfix for Expat bug# 2958794 (memory leak in poolGrow)
+- Added support for HTTP Digest authentication (based on a contribution by
+  Anton V. Yabchinskiy (arn at bestmx dot ru)). For information on how
+  to use this, see the Poco::Net::HTTPCredentials, Poco::Net::HTTPDigestCredentials
+  and Poco::Net::HTTPAuthenticationParams classes.
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1645,4 +1649,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#41 $
+$Id: //poco/1.4/dist/CHANGELOG#42 $

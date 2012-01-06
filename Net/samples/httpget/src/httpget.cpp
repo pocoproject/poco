@@ -1,11 +1,11 @@
 //
 // httpget.cpp
 //
-// $Id: //poco/1.4/Net/samples/httpget/src/httpget.cpp#1 $
+// $Id: //poco/1.4/Net/samples/httpget/src/httpget.cpp#2 $
 //
-// This sample demonstrates the HTTPClientSession class.
+// This sample demonstrates the HTTPClientSession and the HTTPCredentials classes.
 //
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2005-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -35,7 +35,9 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include <Poco/Net/HTTPCredentials.h>
 #include "Poco/StreamCopier.h"
+#include "Poco/NullStream.h"
 #include "Poco/Path.h"
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
@@ -50,6 +52,27 @@ using Poco::StreamCopier;
 using Poco::Path;
 using Poco::URI;
 using Poco::Exception;
+
+
+bool doRequest(Poco::Net::HTTPClientSession& session, Poco::Net::HTTPRequest& request, Poco::Net::HTTPResponse& response)
+{
+	request.write(std::cout);
+	session.sendRequest(request);
+	std::istream& rs = session.receiveResponse(response);
+	std::cout << response.getStatus() << " " << response.getReason() << std::endl;
+	if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
+	{
+		StreamCopier::copyStream(rs, std::cout);
+		return true;
+	}
+	else
+	{
+		response.write(std::cout);
+		Poco::NullOutputStream null;
+		StreamCopier::copyStream(rs, null);
+		return false;
+	}
+}
 
 
 int main(int argc, char** argv)
@@ -68,13 +91,23 @@ int main(int argc, char** argv)
 		std::string path(uri.getPathAndQuery());
 		if (path.empty()) path = "/";
 
+        std::string username;
+        std::string password;
+        Poco::Net::HTTPCredentials::extractCredentials(uri, username, password);
+        Poco::Net::HTTPCredentials credentials(username, password);
+
 		HTTPClientSession session(uri.getHost(), uri.getPort());
-		HTTPRequest req(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
-		session.sendRequest(req);
-		HTTPResponse res;
-		std::istream& rs = session.receiveResponse(res);
-		std::cout << res.getStatus() << " " << res.getReason() << std::endl;
-		StreamCopier::copyStream(rs, std::cout);
+		HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+		HTTPResponse response;
+		if (!doRequest(session, request, response))
+		{
+            credentials.authenticate(request, response);
+			if (!doRequest(session, request, response))
+			{
+				std::cerr << "Invalid username or password" << std::endl;
+				return 1;
+			}
+		}
 	}
 	catch (Exception& exc)
 	{
