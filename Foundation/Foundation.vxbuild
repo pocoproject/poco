@@ -1,7 +1,7 @@
 #
 # Foundation.vxbuild
 #
-# $Id: //poco/1.4/Foundation/Foundation.vxbuild#3 $
+# $Id: //poco/1.4/Foundation/Foundation.vxbuild#5 $
 #
 TARGET=pocoFoundation
 SOURCES="
@@ -136,7 +136,6 @@ SOURCES="
 	compress.c
 	crc32.c 
 	deflate.c 
-	gzio.c 
 	infback.c 
 	inffast.c 
 	inflate.c 

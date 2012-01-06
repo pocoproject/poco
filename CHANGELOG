@@ -48,6 +48,7 @@ Release 1.4.3 (2012-01-xx)
 - added Poco::StreamCopier::copyStream64(), Poco::StreamCopier::copyStreamUnbuffered64()
   and Poco::StreamCopier::copyToString64(). These functions use a 64-bit integer
   to count the number of bytes copied.
+- upgraded internal zlib to 1.2.5
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1643,4 +1644,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#39 $
+$Id: //poco/1.4/dist/CHANGELOG#40 $

@@ -1,9 +1,9 @@
 /* compress.c -- compress a memory buffer
- * Copyright (C) 1995-2003 Jean-loup Gailly.
+ * Copyright (C) 1995-2005 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id: //poco/1.4/Foundation/src/compress.c#1 $ */
+/* @(#) $Id: //poco/1.4/Foundation/src/compress.c#2 $ */
 
 #define ZLIB_INTERNAL
 #include "zlib.h"
@@ -75,5 +75,6 @@ int ZEXPORT compress (dest, destLen, source, sourceLen)
 uLong ZEXPORT compressBound (sourceLen)
     uLong sourceLen;
 {
-    return sourceLen + (sourceLen >> 12) + (sourceLen >> 14) + 11;
+    return sourceLen + (sourceLen >> 12) + (sourceLen >> 14) +
+           (sourceLen >> 25) + 13;
 }
