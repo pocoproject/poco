@@ -54,6 +54,8 @@ Release 1.4.3 (2012-01-xx)
   Anton V. Yabchinskiy (arn at bestmx dot ru)). For information on how
   to use this, see the Poco::Net::HTTPCredentials, Poco::Net::HTTPDigestCredentials
   and Poco::Net::HTTPAuthenticationParams classes.
+- Poco::Net::HTTPStreamFactory and Poco::Net::HTTPSStreamFactory now support Basic
+  and Digest authentication. Username and password must be provided in the URI.
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1649,4 +1651,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#42 $
+$Id: //poco/1.4/dist/CHANGELOG#43 $

@@ -1,7 +1,7 @@
 //
 // httpget.cpp
 //
-// $Id: //poco/1.4/Net/samples/httpget/src/httpget.cpp#2 $
+// $Id: //poco/1.4/Net/samples/httpget/src/httpget.cpp#3 $
 //
 // This sample demonstrates the HTTPClientSession and the HTTPCredentials classes.
 //
@@ -56,7 +56,6 @@ using Poco::Exception;
 
 bool doRequest(Poco::Net::HTTPClientSession& session, Poco::Net::HTTPRequest& request, Poco::Net::HTTPResponse& response)
 {
-	request.write(std::cout);
 	session.sendRequest(request);
 	std::istream& rs = session.receiveResponse(response);
 	std::cout << response.getStatus() << " " << response.getReason() << std::endl;
@@ -67,7 +66,6 @@ bool doRequest(Poco::Net::HTTPClientSession& session, Poco::Net::HTTPRequest& re
 	}
 	else
 	{
-		response.write(std::cout);
 		Poco::NullOutputStream null;
 		StreamCopier::copyStream(rs, null);
 		return false;

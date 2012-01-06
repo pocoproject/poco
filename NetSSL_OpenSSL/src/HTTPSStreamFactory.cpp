@@ -1,13 +1,13 @@
 //
 // HTTPSStreamFactory.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSStreamFactory.cpp#1 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSStreamFactory.cpp#2 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
 // Module:  HTTPSStreamFactory
 //
-// Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -39,10 +39,13 @@
 #include "Poco/Net/HTTPIOStream.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPCredentials.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/URI.h"
 #include "Poco/URIStreamOpener.h"
 #include "Poco/UnbufferedStreamBuf.h"
+#include "Poco/NullStream.h"
+#include "Poco/StreamCopier.h"
 
 
 using Poco::URIStreamFactory;
@@ -89,26 +92,41 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 	URI resolvedURI(uri);
 	URI proxyUri;
 	HTTPClientSession* pSession = 0;
+	HTTPResponse res;
 	try
 	{
 		bool retry = false;
+		bool authorize = false;
 		int redirects = 0;
+		std::string username;
+		std::string password;
+		
 		do
 		{
-			if (resolvedURI.getScheme() != "http")
-				pSession = new HTTPSClientSession(resolvedURI.getHost(), resolvedURI.getPort());
-			else
-				pSession = new HTTPClientSession(resolvedURI.getHost(), resolvedURI.getPort());
-			if (proxyUri.empty())
-				pSession->setProxy(_proxyHost, _proxyPort);
-			else
-				pSession->setProxy(proxyUri.getHost(), proxyUri.getPort());
-			pSession->setProxyCredentials(_proxyUsername, _proxyPassword);
+			if (!pSession)
+			{
+				if (resolvedURI.getScheme() != "http")
+					pSession = new HTTPSClientSession(resolvedURI.getHost(), resolvedURI.getPort());
+				else
+					pSession = new HTTPClientSession(resolvedURI.getHost(), resolvedURI.getPort());
+				if (proxyUri.empty())
+					pSession->setProxy(_proxyHost, _proxyPort);
+				else
+					pSession->setProxy(proxyUri.getHost(), proxyUri.getPort());
+				pSession->setProxyCredentials(_proxyUsername, _proxyPassword);
+			}
 			std::string path = resolvedURI.getPathAndQuery();
 			if (path.empty()) path = "/";
 			HTTPRequest req(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+			
+			if (authorize)
+			{
+				HTTPCredentials::extractCredentials(uri, username, password);
+				HTTPCredentials cred(username, password);
+				cred.authenticate(req, res);
+			}
+
 			pSession->sendRequest(req);
-			HTTPResponse res;
 			std::istream& rs = pSession->receiveResponse(res);
 			bool moved = (res.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY || 
 			              res.getStatus() == HTTPResponse::HTTP_FOUND || 
@@ -117,7 +135,11 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 			if (moved)
 			{
 				resolvedURI.resolve(res.get("Location"));
-				//throw URIRedirection(resolvedURI.toString());
+				if (!username.empty())
+				{
+					resolvedURI.setUserInfo(username + ":" + password);
+					authorize = false;
+				}
 				delete pSession; pSession = 0;
 				++redirects;
 				retry = true;
@@ -137,11 +159,14 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 				delete pSession; pSession = 0;
 				retry = true; // only allow useproxy once
 			}
-			else 
+			else if (res.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED && !authorize)
 			{
-				delete pSession; pSession = 0;
-				throw HTTPException(res.getReason(), uri.toString());
+				authorize = true;
+				retry = true;
+				Poco::NullOutputStream null;
+				Poco::StreamCopier::copyStream(rs, null);
 			}
+			else throw HTTPException(res.getReason(), uri.toString());
 		}
 		while (retry && redirects < MAX_REDIRECTS);
 		throw HTTPException("Too many redirects", uri.toString());
