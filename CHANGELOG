@@ -49,6 +49,7 @@ Release 1.4.3 (2012-01-xx)
   and Poco::StreamCopier::copyToString64(). These functions use a 64-bit integer
   to count the number of bytes copied.
 - upgraded internal zlib to 1.2.5
+- upgraded internal sqlite to 3.7.9
 - XML: integrated bugfix for Expat bug# 2958794 (memory leak in poolGrow)
 - Added support for HTTP Digest authentication (based on a contribution by
   Anton V. Yabchinskiy (arn at bestmx dot ru)). For information on how
