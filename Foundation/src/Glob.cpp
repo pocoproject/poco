@@ -129,13 +129,13 @@ bool Glob::match(TextIterator& itp, const TextIterator& endp, TextIterator& its,
 			{
 				bool invert = *itp == '!';
 				if (invert) ++itp;
-                                if (itp != endp)
-                                {
-                                        bool mtch = matchSet(itp, endp, *its++);
-                                        if ((invert && mtch) || (!invert && !mtch)) return false;
-                                        break;
-                                }
-                        }
+				if (itp != endp)
+				{
+					bool mtch = matchSet(itp, endp, *its++);
+					if ((invert && mtch) || (!invert && !mtch)) return false;
+					break;
+				}
+			}
 			throw SyntaxException("bad range syntax in glob pattern");
 		case '\\':
 			if (++itp == endp) throw SyntaxException("backslash must be followed by character in glob pattern");
@@ -259,11 +259,20 @@ void Glob::collect(const Path& pathPattern, const Path& base, const Path& curren
 
 bool Glob::isDirectory(const Path& path, bool followSymlink)
 {
-	File f(path);
-	if (f.isDirectory())
-	{
-		return true;
-	}
+        File f(path);
+        bool isDir = false;
+        try
+        {
+                isDir = f.isDirectory();
+        }
+        catch (Poco::Exception&)
+        {
+                return false;
+        }
+        if (isDir)
+        {
+                return true;
+        }
 	else if (followSymlink && f.isLink())
 	{
 		try

@@ -110,25 +110,25 @@ public:
 		
 	Channel* getChannel() const;
 		/// Returns the Channel attached to the logger.
-                
-        void setLevel(int level);
-                /// Sets the Logger's log level.
-                ///
-                /// See Message::Priority for valid log levels.
-                /// Setting the log level to zero turns off
-                /// logging for that Logger.
-                
-        int getLevel() const;
-                /// Returns the Logger's log level.
+		
+	void setLevel(int level);
+		/// Sets the Logger's log level.
+		///
+		/// See Message::Priority for valid log levels.
+		/// Setting the log level to zero turns off
+		/// logging for that Logger.
+		
+	int getLevel() const;
+		/// Returns the Logger's log level.
 		
 	void setLevel(const std::string& level);
-                /// Sets the Logger's log level using a symbolic value.
-                ///
-                /// Valid values are:
-                ///   - none (turns off logging)
-                ///   - fatal
-                ///   - critical
-                ///   - error
+		/// Sets the Logger's log level using a symbolic value.
+		///
+		/// Valid values are:
+		///   - none (turns off logging)
+		///   - fatal
+		///   - critical
+		///   - error
 		///   - warning
 		///   - notice
 		///   - information
@@ -337,12 +337,16 @@ public:
 
 	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2, const std::string& arg3);	
 		/// Replaces all occurences of $<n> in fmt with the string given in arg<n> and
-		/// returns the result. To include a dollar sign in the result string,
-		/// specify two dollar signs ($$) in the format string.
+                /// returns the result. To include a dollar sign in the result string,
+                /// specify two dollar signs ($$) in the format string.
 
-	static void setLevel(const std::string& name, int level);
-		/// Sets the given log level on all loggers that are
-		/// descendants of the Logger with the given name.
+        static void formatDump(std::string& message, const void* buffer, std::size_t length);
+                /// Creates a hex-dump of the given buffer and appends it to the
+                /// given message string.
+                
+        static void setLevel(const std::string& name, int level);
+                /// Sets the given log level on all loggers that are
+                /// descendants of the Logger with the given name.
 		
 	static void setChannel(const std::string& name, Channel* pChannel);
 		/// Attaches the given Channel to all loggers that are
@@ -404,13 +408,12 @@ protected:
 	~Logger();
 	
 	void log(const std::string& text, Message::Priority prio);
-	void log(const std::string& text, Message::Priority prio, const char* file, int line);
+        void log(const std::string& text, Message::Priority prio, const char* file, int line);
 
-	static std::string format(const std::string& fmt, int argc, std::string argv[]);
-	static void formatDump(std::string& message, const void* buffer, std::size_t length);
-	static Logger& parent(const std::string& name);
-	static void add(Logger* pLogger);
-	static Logger* find(const std::string& name);
+        static std::string format(const std::string& fmt, int argc, std::string argv[]);
+        static Logger& parent(const std::string& name);
+        static void add(Logger* pLogger);
+        static Logger* find(const std::string& name);
 
 private:
 	Logger();

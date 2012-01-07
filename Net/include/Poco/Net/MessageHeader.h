@@ -59,12 +59,19 @@ class Net_API MessageHeader: public NameValueCollection
 	///
 	/// There can be more than one name-value pair with the 
 	/// same name.
-	///
-	/// MessageHeader supports writing and reading the
-	/// header data in RFC 2822 format.
+        ///
+        /// MessageHeader supports writing and reading the
+        /// header data in RFC 2822 format.
+        ///
+        /// The maximum number of fields can be restricted
+        /// by calling setFieldLimit(). This is useful to
+        /// defend against certain kinds of denial-of-service
+        /// attacks. The limit is only enforced when parsing
+        /// header fields from a stream, not when programmatically
+        /// adding them. The default limit is 100.
 {
 public:
-	MessageHeader();
+        MessageHeader();
 		/// Creates the MessageHeader.
 
 	MessageHeader(const MessageHeader& messageHeader);
@@ -99,12 +106,26 @@ public:
 		/// Some basic sanity checking of the input stream is
 		/// performed.
 		///
-		/// Throws a MessageException if the input stream is
-		/// malformed.
-		
-	static void splitElements(const std::string& s, std::vector<std::string>& elements, bool ignoreEmpty = true);
-		/// Splits the given string into separate elements. Elements are expected
-		/// to be separated by commas.
+                /// Throws a MessageException if the input stream is
+                /// malformed.
+                
+        int getFieldLimit() const;
+                /// Returns the maximum number of header fields
+                /// allowed.
+                ///
+                /// See setFieldLimit() for more information.
+                
+        void setFieldLimit(int limit);
+                /// Sets the maximum number of header fields
+                /// allowed. This limit is used to defend certain
+                /// kinds of denial-of-service attacks.
+                /// Specify 0 for unlimited (not recommended).
+                ///
+                /// The default limit is 100.
+                
+        static void splitElements(const std::string& s, std::vector<std::string>& elements, bool ignoreEmpty = true);
+                /// Splits the given string into separate elements. Elements are expected
+                /// to be separated by commas.
 		///
 		/// For example, the string 
 		///   text/plain; q=0.5, text/html, text/x-dvi; q=0.8
@@ -136,18 +157,21 @@ public:
 		///
 		/// Enclosing quotes of parameter values are removed.
 
-        static void quote(const std::string& value, std::string& result, bool allowSpace = false);
-                /// Checks if the value must be quoted. If so, the value is
-                /// appended to result, enclosed in double-quotes.
-                /// Otherwise, the value is appended to result as-is.
-                
+	static void quote(const std::string& value, std::string& result, bool allowSpace = false);
+		/// Checks if the value must be quoted. If so, the value is
+		/// appended to result, enclosed in double-quotes.
+		/// Otherwise, the value is appended to result as-is.
+		
 private:
-        enum Limits
-		/// Limits for basic sanity checks when reading a header
-	{
-		MAX_NAME_LENGTH  = 256,
-		MAX_VALUE_LENGTH = 4096
-	};
+	enum Limits
+                /// Limits for basic sanity checks when reading a header
+        {
+                MAX_NAME_LENGTH  = 256,
+                MAX_VALUE_LENGTH = 4096,
+                DFL_FIELD_LIMIT  = 100
+        };
+        
+        int _fieldLimit;
 };
 
 

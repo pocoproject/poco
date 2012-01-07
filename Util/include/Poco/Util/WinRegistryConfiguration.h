@@ -54,19 +54,21 @@ class Util_API WinRegistryConfiguration: public AbstractConfiguration
 	/// in the Windows registry.
 	///
 	/// Removing key is not supported. An attempt to remove a key results
-	/// in a NotImplementedException being thrown.
+        /// in a NotImplementedException being thrown.
 {
 public:
-	WinRegistryConfiguration(const std::string& rootPath);
-		/// Creates the WinRegistryConfiguration. 
-		/// The rootPath must start with one of the root key names
-		/// like HKEY_CLASSES_ROOT, e.g. HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services.
-		/// All further keys are relativ to the root path and can be
-		/// dot seperated, e.g. the path MyService.ServiceName will be converted to
-		/// HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MyService\ServiceName.
+        WinRegistryConfiguration(const std::string& rootPath, REGSAM extraSam = 0);
+                /// Creates the WinRegistryConfiguration. 
+                /// The rootPath must start with one of the root key names
+                /// like HKEY_CLASSES_ROOT, e.g. HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services.
+                /// All further keys are relativ to the root path and can be
+                /// dot seperated, e.g. the path MyService.ServiceName will be converted to
+                /// HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MyService\ServiceName.
+        /// The extraSam parameter will be passed along to WinRegistryKey, to control
+        /// registry virtualization for example.
 
 protected:
-	~WinRegistryConfiguration();
+        ~WinRegistryConfiguration();
 		/// Destroys the WinRegistryConfiguration.
 
 	bool getRaw(const std::string& key, std::string& value) const;
@@ -79,7 +81,8 @@ protected:
 		/// registry format A\B\C, the last entry is the keyName, the rest is returned as path
 
 private:
-	std::string _rootPath;
+        std::string _rootPath;
+    REGSAM _extraSam;
 };
 
 

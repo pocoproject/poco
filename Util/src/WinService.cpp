@@ -1,7 +1,7 @@
 //
 // WinService.cpp
 //
-// $Id: //poco/Main/Util/src/WinService.cpp#10 $
+// $Id: //poco/1.4/Util/src/WinService.cpp#4 $
 //
 // Library: Util
 // Package: Windows
@@ -32,6 +32,9 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //
+
+
+#if !defined(_WIN32_WCE)
 
 
 #include "Poco/Util/WinService.h"
@@ -261,48 +264,52 @@ WinService::Startup WinService::getStartup() const
 
 void WinService::setDescription(const std::string& description)
 {
-        std::string key(REGISTRY_KEY);
-        key += _name;
-        WinRegistryKey regKey(HKEY_LOCAL_MACHINE, key);
-        regKey.setString(REGISTRY_DESCRIPTION, description);
+	std::string key(REGISTRY_KEY);
+	key += _name;
+	WinRegistryKey regKey(HKEY_LOCAL_MACHINE, key);
+	regKey.setString(REGISTRY_DESCRIPTION, description);
 }
 
 
 std::string WinService::getDescription() const
 {
-        std::string key(REGISTRY_KEY);
-        key += _name;
-        WinRegistryKey regKey(HKEY_LOCAL_MACHINE, key, true);
-        return regKey.getString(REGISTRY_DESCRIPTION);
+	std::string key(REGISTRY_KEY);
+	key += _name;
+	WinRegistryKey regKey(HKEY_LOCAL_MACHINE, key, true);
+	return regKey.getString(REGISTRY_DESCRIPTION);
 }
 
 
 void WinService::open() const
 {
-        if (!tryOpen())
+	if (!tryOpen())
 		throw NotFoundException("service does not exist", _name);
 }
 
 
 bool WinService::tryOpen() const
 {
+        if (!_svcHandle)
+        {
 #if defined(POCO_WIN32_UTF8)
-	std::wstring uname;
-	Poco::UnicodeConverter::toUTF16(_name, uname);
-	_svcHandle = OpenServiceW(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
+                std::wstring uname;
+                Poco::UnicodeConverter::toUTF16(_name, uname);
+		_svcHandle = OpenServiceW(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
 #else
-	_svcHandle = OpenService(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
+                _svcHandle = OpenService(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
 #endif
-	return _svcHandle != 0;
+        }
+        return _svcHandle != 0;
 }
 
 
 void WinService::close() const
 {
-	if (_svcHandle)
-	{
-		CloseServiceHandle(_svcHandle);
-	}
+        if (_svcHandle)
+        {
+                CloseServiceHandle(_svcHandle);
+                _svcHandle = 0;
+        }
 }
 
 
@@ -340,3 +347,6 @@ POCO_LPQUERY_SERVICE_CONFIG WinService::config() const
 
 
 } } // namespace Poco::Util
+
+
+#endif // !defined(_WIN32_WCE)

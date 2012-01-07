@@ -1,7 +1,7 @@
 
 // Environment_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -108,9 +108,15 @@ std::string EnvironmentImpl::osNameImpl()
 }
 
 
+std::string EnvironmentImpl::osDisplayNameImpl()
+{
+        return osNameImpl();
+}
+
+
 std::string EnvironmentImpl::osVersionImpl()
 {
-	return runtimeVersion;
+        return runtimeVersion;
 }
 
 
@@ -150,25 +156,25 @@ unsigned EnvironmentImpl::processorCountImpl()
 
 void EnvironmentImpl::nodeIdImpl(NodeId& id)
 {
-        std::memset(&id, 0, sizeof(id));
+	std::memset(&id, 0, sizeof(id));
 
-        int ifIndex = 1;
-        char ifName[32];
-        for (;;)
-        {
-                if (ifIndexToIfName(ifIndex, ifName) == OK)
-                {
-                        struct ifnet* pIf = ifunit(ifName);
-                        if (pIf)
-                        {
-                                std::memcpy(&id, ((struct arpcom *) pIf)->ac_enaddr, sizeof(id));
-                                return;
-                        }
-                }
-                else break;     
-                ++ifIndex;
-        }
-        throw SystemException("cannot get Ethernet hardware address");
+	int ifIndex = 1;
+	char ifName[32];
+	for (;;)
+	{
+		if (ifIndexToIfName(ifIndex, ifName) == OK)
+		{
+			struct ifnet* pIf = ifunit(ifName);
+			if (pIf)
+			{
+				std::memcpy(&id, ((struct arpcom *) pIf)->ac_enaddr, sizeof(id));
+				return;
+			}
+		}
+		else break;	
+		++ifIndex;
+	}
+	throw SystemException("cannot get Ethernet hardware address");
 }
 
 

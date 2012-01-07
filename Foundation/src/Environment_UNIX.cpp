@@ -1,7 +1,7 @@
 
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_UNIX.cpp#7 $
+// $Id: //poco/1.4/Foundation/src/Environment_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -102,9 +102,15 @@ std::string EnvironmentImpl::osNameImpl()
 }
 
 
+std::string EnvironmentImpl::osDisplayNameImpl()
+{
+        return osNameImpl();
+}
+
+
 std::string EnvironmentImpl::osVersionImpl()
 {
-	struct utsname uts;
+        struct utsname uts;
 	uname(&uts);
 	return uts.release;
 }

@@ -79,25 +79,26 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 		std::string crc(4, ' ');
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, start);
-		}
-		else
-			_ptrHelper = new PartialInputStream(istr, start, end, reposition, init, crc);
-		_ptrBuf = new Poco::InflatingInputStream(*_ptrHelper, Poco::InflatingStreamBuf::STREAM_ZIP);
-	}
-	else if (fileEntry.getCompressionMethod() == ZipCommon::CM_STORE)
+                        _ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, start);
+                }
+                else
+                {
+                        _ptrHelper = new PartialInputStream(istr, start, end, reposition, init, crc);
+                }
+                _ptrBuf = new Poco::InflatingInputStream(*_ptrHelper, Poco::InflatingStreamBuf::STREAM_ZIP);
+        }
+        else if (fileEntry.getCompressionMethod() == ZipCommon::CM_STORE)
 	{
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, start);
-		}
-		else
-			_ptrBuf = new PartialInputStream(istr, start, end, reposition);
-	}
-	else
-	{
-		throw Poco::NotImplementedException("Unsupported compression method");
-	}
+                        _ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, start);
+                }
+                else
+                {
+                        _ptrBuf = new PartialInputStream(istr, start, end, reposition);
+                }
+        }
+        else throw Poco::NotImplementedException("Unsupported compression method");
 }
 
 
@@ -142,18 +143,16 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 			_ptrOHelper = new PartialOutputStream(*_pOstr, 2, 4, false); 
 			_ptrOBuf = new Poco::DeflatingOutputStream(*_ptrOHelper, DeflatingStreamBuf::STREAM_ZLIB, level);
 		}
-		else if (fileEntry.getCompressionMethod() == ZipCommon::CM_STORE)
-		{
-			_ptrOHelper = new PartialOutputStream(*_pOstr, 0, 0, false);
-			_ptrOBuf = _ptrOHelper;
-		}
-		else
-		{
-			throw Poco::NotImplementedException("Unsupported compression method");
-		}
-		// now write the header to the ostr!
-		std::string header = fileEntry.createHeader();
-		ostr.write(header.c_str(), static_cast<std::streamsize>(header.size()));
+                else if (fileEntry.getCompressionMethod() == ZipCommon::CM_STORE)
+                {
+                        _ptrOHelper = new PartialOutputStream(*_pOstr, 0, 0, false);
+                        _ptrOBuf = new PartialOutputStream(*_ptrOHelper, 0, 0, false);
+                }
+                else throw Poco::NotImplementedException("Unsupported compression method");
+
+                // now write the header to the ostr!
+                std::string header = fileEntry.createHeader();
+                ostr.write(header.c_str(), static_cast<std::streamsize>(header.size()));
 	}
 }
 

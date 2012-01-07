@@ -257,14 +257,18 @@ public:
 
 	void remove(const std::string& key);
 		/// Removes the property with the given key.
-		///
-		/// Does nothing if the key does not exist.
-	
-	void setPropertyEventingMode(bool enabled);
-		/// Enable/Disable property eventing.
+                ///
+                /// Does nothing if the key does not exist.
+                
+        void enableEvents(bool enable = true);
+                /// Enables (or disables) events.
+                
+        bool eventsEnabled() const;
+                /// Returns true iff events are enabled.
+        
 protected:
-	virtual bool getRaw(const std::string& key, std::string& value) const = 0;
-		/// If the property with the given key exists, stores the property's value
+        virtual bool getRaw(const std::string& key, std::string& value) const = 0;
+                /// If the property with the given key exists, stores the property's value
 		/// in value and returns true. Otherwise, returns false.
 		///
 		/// Must be overridden by subclasses.
@@ -298,16 +302,15 @@ private:
 	std::string uncheckedExpand(const std::string& value) const;
 
 	AbstractConfiguration(const AbstractConfiguration&);
-	AbstractConfiguration& operator = (const AbstractConfiguration&);
+        AbstractConfiguration& operator = (const AbstractConfiguration&);
 
-	mutable int _depth;
-	mutable Poco::FastMutex _mutex;
-	
-	bool _propertyEventing;
-	
-	friend class LayeredConfiguration;
-	friend class ConfigurationView;
-	friend class ConfigurationMapper;
+        mutable int _depth;
+        bool        _eventsEnabled;
+        mutable Poco::FastMutex _mutex;
+        
+        friend class LayeredConfiguration;
+        friend class ConfigurationView;
+        friend class ConfigurationMapper;
 };
 
 

@@ -71,12 +71,22 @@ public:
 		/// Sets the environment variable with the given name
 		/// to the given value.
 
-	static std::string osName();
-		/// Returns the operating system name.
-		
-	static std::string osVersion();
-		/// Returns the operating system version.
-		
+        static std::string osName();
+                /// Returns the operating system name.
+                
+        static std::string osDisplayName();
+                /// Returns the operating system name in a
+                /// "user-friendly" way.
+                ///
+                /// Currently this is only implemented for
+                /// Windows. There it will return names like
+                /// "Windows XP" or "Windows 7/Server 2008 SP2".
+                /// On other platform, returns the same as
+                /// osName().
+                
+        static std::string osVersion();
+                /// Returns the operating system version.
+                
 	static std::string osArchitecture();
 		/// Returns the operating system architecture.
 		

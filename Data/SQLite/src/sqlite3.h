@@ -107,9 +107,9 @@ extern "C" {
 ** [sqlite3_libversion_number()], [sqlite3_sourceid()],
 ** [sqlite_version()] and [sqlite_source_id()].
 */
-#define SQLITE_VERSION        "3.7.7.1"
-#define SQLITE_VERSION_NUMBER 3007007
-#define SQLITE_SOURCE_ID      "2011-06-28 17:39:05 af0d91adf497f5f36ec3813f04235a6e195a605f"
+#define SQLITE_VERSION        "3.7.9"
+#define SQLITE_VERSION_NUMBER 3007009
+#define SQLITE_SOURCE_ID      "2011-11-01 00:52:41 c7c6050ef060877ebe77b41d959e9df13f8c9b5e"
 
 /*
 ** CAPI3REF: Run-Time Library Version Numbers
@@ -741,6 +741,41 @@ struct sqlite3_io_methods {
 ** Applications should not call [sqlite3_file_control()] with this
 ** opcode as doing so may disrupt the operation of the specialized VFSes
 ** that do require it.  
+**
+** ^The [SQLITE_FCNTL_WIN32_AV_RETRY] opcode is used to configure automatic
+** retry counts and intervals for certain disk I/O operations for the
+** windows [VFS] in order to work to provide robustness against
+** anti-virus programs.  By default, the windows VFS will retry file read,
+** file write, and file delete operations up to 10 times, with a delay
+** of 25 milliseconds before the first retry and with the delay increasing
+** by an additional 25 milliseconds with each subsequent retry.  This
+** opcode allows those to values (10 retries and 25 milliseconds of delay)
+** to be adjusted.  The values are changed for all database connections
+** within the same process.  The argument is a pointer to an array of two
+** integers where the first integer i the new retry count and the second
+** integer is the delay.  If either integer is negative, then the setting
+** is not changed but instead the prior value of that setting is written
+** into the array entry, allowing the current retry settings to be
+** interrogated.  The zDbName parameter is ignored.
+**
+** ^The [SQLITE_FCNTL_PERSIST_WAL] opcode is used to set or query the
+** persistent [WAL | Write AHead Log] setting.  By default, the auxiliary
+** write ahead log and shared memory files used for transaction control
+** are automatically deleted when the latest connection to the database
+** closes.  Setting persistent WAL mode causes those files to persist after
+** close.  Persisting the files is useful when other processes that do not
+** have write permission on the directory containing the database file want
+** to read the database file, as the WAL and shared memory files must exist
+** in order for the database to be readable.  The fourth parameter to
+** [sqlite3_file_control()] for this opcode should be a pointer to an integer.
+** That integer is 0 to disable persistent WAL mode or 1 to enable persistent
+** WAL mode.  If the integer is -1, then it is overwritten with the current
+** WAL persistence setting.
+**
+** ^The [SQLITE_FCNTL_OVERWRITE] opcode is invoked by SQLite after opening
+** a write transaction to indicate that, unless it is rolled back for some
+** reason, the entire database file will be overwritten by the current 
+** transaction. This is used by VACUUM operations.
 */
 #define SQLITE_FCNTL_LOCKSTATE        1
 #define SQLITE_GET_LOCKPROXYFILE      2
@@ -750,7 +785,9 @@ struct sqlite3_io_methods {
 #define SQLITE_FCNTL_CHUNK_SIZE       6
 #define SQLITE_FCNTL_FILE_POINTER     7
 #define SQLITE_FCNTL_SYNC_OMITTED     8
-
+#define SQLITE_FCNTL_WIN32_AV_RETRY   9
+#define SQLITE_FCNTL_PERSIST_WAL     10
+#define SQLITE_FCNTL_OVERWRITE       11
 
 /*
 ** CAPI3REF: Mutex Handle
@@ -1178,16 +1215,10 @@ SQLITE_API int sqlite3_db_config(sqlite3*, int op, ...);
 ** order to verify that SQLite recovers gracefully from such
 ** conditions.
 **
-** The xMalloc and xFree methods must work like the
-** malloc() and free() functions from the standard C library.
-** The xRealloc method must work like realloc() from the standard C library
-** with the exception that if the second argument to xRealloc is zero,
-** xRealloc must be a no-op - it must not perform any allocation or
-** deallocation.  ^SQLite guarantees that the second argument to
+** The xMalloc, xRealloc, and xFree methods must work like the
+** malloc(), realloc() and free() functions from the standard C library.
+** ^SQLite guarantees that the second argument to
 ** xRealloc is always a value returned by a prior call to xRoundup.
-** And so in cases where xRoundup always returns a positive number,
-** xRealloc can perform exactly as the standard library realloc() and
-** still be in compliance with this specification.
 **
 ** xSize should return the allocated size of a memory allocation
 ** previously obtained from xMalloc or xRealloc.  The allocated size
@@ -1373,8 +1404,8 @@ struct sqlite3_mem_methods {
 ** allocator is engaged to handle all of SQLites memory allocation needs.
 ** The first pointer (the memory pointer) must be aligned to an 8-byte
 ** boundary or subsequent behavior of SQLite will be undefined.
-** The minimum allocation size is capped at 2^12. Reasonable values
-** for the minimum allocation size are 2^5 through 2^8.</dd>
+** The minimum allocation size is capped at 2**12. Reasonable values
+** for the minimum allocation size are 2**5 through 2**8.</dd>
 **
 ** [[SQLITE_CONFIG_MUTEX]] <dt>SQLITE_CONFIG_MUTEX</dt>
 ** <dd> ^(This option takes a single argument which is a pointer to an
@@ -2773,7 +2804,8 @@ SQLITE_API int sqlite3_limit(sqlite3*, int id, int newVal);
 ** that the supplied string is nul-terminated, then there is a small
 ** performance advantage to be gained by passing an nByte parameter that
 ** is equal to the number of bytes in the input string <i>including</i>
-** the nul-terminator bytes.
+** the nul-terminator bytes as this saves SQLite from having to
+** make a copy of the input string.
 **
 ** ^If pzTail is not NULL then *pzTail is made to point to the first byte
 ** past the end of the first SQL statement in zSql.  These routines only
@@ -2824,7 +2856,7 @@ SQLITE_API int sqlite3_limit(sqlite3*, int id, int newVal);
 ** ^The specific value of WHERE-clause [parameter] might influence the 
 ** choice of query plan if the parameter is the left-hand side of a [LIKE]
 ** or [GLOB] operator or if the parameter is compared to an indexed column
-** and the [SQLITE_ENABLE_STAT2] compile-time option is enabled.
+** and the [SQLITE_ENABLE_STAT3] compile-time option is enabled.
 ** the 
 ** </li>
 ** </ol>
@@ -2994,6 +3026,13 @@ typedef struct sqlite3_context sqlite3_context;
 ** number of <u>bytes</u> in the value, not the number of characters.)^
 ** ^If the fourth parameter is negative, the length of the string is
 ** the number of bytes up to the first zero terminator.
+** If a non-negative fourth parameter is provided to sqlite3_bind_text()
+** or sqlite3_bind_text16() then that parameter must be the byte offset
+** where the NUL terminator would occur assuming the string were NUL
+** terminated.  If any NUL characters occur at byte offsets less than 
+** the value of the fourth parameter then the resulting string value will
+** contain embedded NULs.  The result of expressions involving strings
+** with embedded NULs is undefined.
 **
 ** ^The fifth argument to sqlite3_bind_blob(), sqlite3_bind_text(), and
 ** sqlite3_bind_text16() is a destructor used to dispose of the BLOB or
@@ -3327,6 +3366,12 @@ SQLITE_API int sqlite3_step(sqlite3_stmt*);
 ** (via calls to the [sqlite3_column_int | sqlite3_column_*()] of
 ** interfaces) then sqlite3_data_count(P) returns 0.
 ** ^The sqlite3_data_count(P) routine also returns 0 if P is a NULL pointer.
+** ^The sqlite3_data_count(P) routine returns 0 if the previous call to
+** [sqlite3_step](P) returned [SQLITE_DONE].  ^The sqlite3_data_count(P)
+** will return non-zero if previous call to [sqlite3_step](P) returned
+** [SQLITE_ROW], except in the case of the [PRAGMA incremental_vacuum]
+** where it always returns zero since each step of that multi-step
+** pragma returns 0 columns of data.
 **
 ** See also: [sqlite3_column_count()]
 */
@@ -4006,7 +4051,12 @@ typedef void (*sqlite3_destructor_type)(void*);
 ** ^If the 3rd parameter to the sqlite3_result_text* interfaces
 ** is non-negative, then as many bytes (not characters) of the text
 ** pointed to by the 2nd parameter are taken as the application-defined
-** function result.
+** function result.  If the 3rd parameter is non-negative, then it
+** must be the byte offset into the string where the NUL terminator would
+** appear if the string where NUL terminated.  If any NUL characters occur
+** in the string at a byte offset that is less than the value of the 3rd
+** parameter, then the resulting string will contain embedded NULs and the
+** result of expressions operating on strings with embedded NULs is undefined.
 ** ^If the 4th parameter to the sqlite3_result_text* interfaces
 ** or sqlite3_result_blob is a non-NULL pointer, then SQLite calls that
 ** function as the destructor on the text or BLOB result when it has
@@ -5789,6 +5839,18 @@ SQLITE_API int sqlite3_db_status(sqlite3*, int op, int *pCur, int *pHiwtr, int r
 ** the database connection.)^
 ** ^The highwater mark associated with SQLITE_DBSTATUS_STMT_USED is always 0.
 ** </dd>
+**
+** [[SQLITE_DBSTATUS_CACHE_HIT]] ^(<dt>SQLITE_DBSTATUS_CACHE_HIT</dt>
+** <dd>This parameter returns the number of pager cache hits that have
+** occurred.)^ ^The highwater mark associated with SQLITE_DBSTATUS_CACHE_HIT 
+** is always 0.
+** </dd>
+**
+** [[SQLITE_DBSTATUS_CACHE_MISS]] ^(<dt>SQLITE_DBSTATUS_CACHE_MISS</dt>
+** <dd>This parameter returns the number of pager cache misses that have
+** occurred.)^ ^The highwater mark associated with SQLITE_DBSTATUS_CACHE_MISS 
+** is always 0.
+** </dd>
 ** </dl>
 */
 #define SQLITE_DBSTATUS_LOOKASIDE_USED       0
@@ -5798,7 +5860,9 @@ SQLITE_API int sqlite3_db_status(sqlite3*, int op, int *pCur, int *pHiwtr, int r
 #define SQLITE_DBSTATUS_LOOKASIDE_HIT        4
 #define SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE  5
 #define SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL  6
-#define SQLITE_DBSTATUS_MAX                  6   /* Largest defined DBSTATUS */
+#define SQLITE_DBSTATUS_CACHE_HIT            7
+#define SQLITE_DBSTATUS_CACHE_MISS           8
+#define SQLITE_DBSTATUS_MAX                  8   /* Largest defined DBSTATUS */
 
 
 /*
@@ -5852,7 +5916,6 @@ SQLITE_API int sqlite3_stmt_status(sqlite3_stmt*, int op,int resetFlg);
 ** A non-zero value in this counter may indicate an opportunity to
 ** improvement performance by adding permanent indices that do not
 ** need to be reinitialized each time the statement is run.</dd>
-**
 ** </dl>
 */
 #define SQLITE_STMTSTATUS_FULLSCAN_STEP     1

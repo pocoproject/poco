@@ -72,12 +72,12 @@ setjmp and stdarg are used is when NO_RECURSE is set. */
 
 #include <ctype.h>
 #include <limits.h>
-#include <setjmp.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
+#include <stdarg.h>
 
 /* When compiling a DLL for Windows, the exported symbols have to be declared
 using some MS magic. I found some useful information on this web page:
@@ -113,7 +113,7 @@ PCRE_EXP_DATA_DEFN only if they are not already set. */
 #      define PCRE_EXP_DEFN       __declspec(dllexport)
 #      define PCRE_EXP_DATA_DEFN  __declspec(dllexport)
 #    else
-#      define PCRE_EXP_DECL       extern
+#      define PCRE_EXP_DECL       extern 
 #      define PCRE_EXP_DEFN
 #      define PCRE_EXP_DATA_DEFN
 #    endif

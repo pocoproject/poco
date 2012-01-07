@@ -1,7 +1,7 @@
 //
 // Environment_VMS.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Environment_VMS.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/Environment_VMS.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -103,9 +103,15 @@ std::string EnvironmentImpl::osNameImpl()
 }
 
 
+std::string EnvironmentImpl::osDisplayNameImpl()
+{
+        return osNameImpl();
+}
+
+
 std::string EnvironmentImpl::osVersionImpl()
 {
-	return getsyi(SYI$_VERSION);
+        return getsyi(SYI$_VERSION);
 }
 
 

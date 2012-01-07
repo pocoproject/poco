@@ -39,6 +39,7 @@
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Ascii.h"
+#include "Poco/String.h"
 
 
 using Poco::NumberFormatter;
@@ -150,11 +151,11 @@ void HTTPRequest::setCookies(const NameValueCollection& cookies)
 	
 void HTTPRequest::getCookies(NameValueCollection& cookies) const
 {
-	NameValueCollection::ConstIterator it = find(COOKIE);
-	while (it != end() && it->first == COOKIE)
-	{
-		splitParameters(it->second.begin(), it->second.end(), cookies);
-		++it;
+        NameValueCollection::ConstIterator it = find(COOKIE);
+        while (it != end() && Poco::icompare(it->first, COOKIE) == 0)
+        {
+                splitParameters(it->second.begin(), it->second.end(), cookies);
+                ++it;
 	}
 }
 

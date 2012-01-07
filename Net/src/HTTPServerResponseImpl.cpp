@@ -116,12 +116,16 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 	poco_assert (!_pStream);
 
 	File f(path);
-	Timestamp dateTime    = f.getLastModified();
-	File::FileSize length = f.getSize();
-	set("Last-Modified", DateTimeFormatter::format(dateTime, DateTimeFormat::HTTP_FORMAT));
-	setContentLength(static_cast<int>(length));
-	setContentType(mediaType);
-	setChunkedTransferEncoding(false);
+        Timestamp dateTime    = f.getLastModified();
+        File::FileSize length = f.getSize();
+        set("Last-Modified", DateTimeFormatter::format(dateTime, DateTimeFormat::HTTP_FORMAT));
+#if defined(POCO_HAVE_INT64)    
+        setContentLength64(length);
+#else
+        setContentLength(static_cast<int>(length));
+#endif
+        setContentType(mediaType);
+        setChunkedTransferEncoding(false);
 
 	Poco::FileInputStream istr(path);
 	if (istr.good())

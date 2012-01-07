@@ -37,7 +37,11 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SessionFactory.h"
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
 #include "sqlite3.h"
+#endif
 
 
 namespace Poco {
@@ -59,15 +63,15 @@ Connector::~Connector()
 
 
 Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString,
-	std::size_t timeout)
+        std::size_t timeout)
 {
-	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString, timeout));
+        return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString, timeout));
 }
 
 
 void Connector::registerConnector()
 {
-	Poco::Data::SessionFactory::instance().add(new Connector());
+        Poco::Data::SessionFactory::instance().add(new Connector());
 }
 
 

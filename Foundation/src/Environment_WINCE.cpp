@@ -1,7 +1,7 @@
 //
 // Environment_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_WINCE.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Environment_WINCE.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -84,9 +84,15 @@ std::string EnvironmentImpl::osNameImpl()
 }
 
 
+std::string EnvironmentImpl::osDisplayNameImpl()
+{
+        return osNameImpl();
+}
+
+
 std::string EnvironmentImpl::osVersionImpl()
 {
-	OSVERSIONINFOW vi;
+        OSVERSIONINFOW vi;
 	vi.dwOSVersionInfoSize = sizeof(vi);
 	if (GetVersionExW(&vi) == 0) throw SystemException("Cannot get OS version information");
 	std::ostringstream str;

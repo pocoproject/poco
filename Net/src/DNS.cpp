@@ -51,7 +51,7 @@ using Poco::IOException;
 
 namespace
 {
-        class NetworkInitializer
+	class NetworkInitializer
 	{
 	public:
 		NetworkInitializer()
@@ -61,9 +61,9 @@ namespace
 		
 		~NetworkInitializer()
 		{
-                        Poco::Net::uninitializeNetwork();
-                }               
-        };
+			Poco::Net::uninitializeNetwork();
+		}		
+	};
 }
 
 
@@ -75,37 +75,37 @@ HostEntry DNS::hostByName(const std::string& hostname)
 {
         NetworkInitializer networkInitializer;
         
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
         struct addrinfo* pAI;
         struct addrinfo hints;
         std::memset(&hints, 0, sizeof(hints));
-        hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
-        int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI); 
-        if (rc == 0)
-        {
-                HostEntry result(pAI);
-                freeaddrinfo(pAI);
-                return result;
-        }
-        else
-        {
-                aierror(rc, hostname);
-        }
+	hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
+	int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI); 
+	if (rc == 0)
+	{
+		HostEntry result(pAI);
+		freeaddrinfo(pAI);
+		return result;
+	}
+	else
+	{
+		aierror(rc, hostname);
+	}
 #elif defined(POCO_VXWORKS)
-        int addr = hostGetByName(const_cast<char*>(hostname.c_str()));
-        if (addr != ERROR)
-        {
-                return HostEntry(hostname, IPAddress(&addr, sizeof(addr)));
-        }
+	int addr = hostGetByName(const_cast<char*>(hostname.c_str()));
+	if (addr != ERROR)
+	{
+		return HostEntry(hostname, IPAddress(&addr, sizeof(addr)));
+	}
 #else
-        struct hostent* he = gethostbyname(hostname.c_str());
-        if (he)
-        {
-                return HostEntry(he);
-        }
+	struct hostent* he = gethostbyname(hostname.c_str());
+	if (he)
+	{
+		return HostEntry(he);
+	}
 #endif
-        error(lastError(), hostname);      // will throw an appropriate exception
-        throw NetException(); // to silence compiler
+	error(lastError(), hostname);      // will throw an appropriate exception
+	throw NetException(); // to silence compiler
 }
 
 
@@ -113,46 +113,46 @@ HostEntry DNS::hostByAddress(const IPAddress& address)
 {
         NetworkInitializer networkInitializer;
 
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
         SocketAddress sa(address, 0);
         static char fqname[1024];
         int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD); 
-        if (rc == 0)
-        {
-                struct addrinfo* pAI;
-                struct addrinfo hints;
-                std::memset(&hints, 0, sizeof(hints));
-                hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
-                rc = getaddrinfo(fqname, NULL, &hints, &pAI);
-                if (rc == 0)
-                {
-                        HostEntry result(pAI);
-                        freeaddrinfo(pAI);
-                        return result;
-                }
-                else
-                {
-                        aierror(rc, address.toString());
-                }
-        }
-        else
-        {
-                aierror(rc, address.toString());
-        }
+	if (rc == 0)
+	{
+		struct addrinfo* pAI;
+		struct addrinfo hints;
+		std::memset(&hints, 0, sizeof(hints));
+		hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
+		rc = getaddrinfo(fqname, NULL, &hints, &pAI);
+		if (rc == 0)
+		{
+			HostEntry result(pAI);
+			freeaddrinfo(pAI);
+			return result;
+		}
+		else
+		{
+			aierror(rc, address.toString());
+		}
+	}
+	else
+	{
+		aierror(rc, address.toString());
+	}
 #elif defined(POCO_VXWORKS)
-        char name[MAXHOSTNAMELEN + 1];
-        if (hostGetByAddr(*reinterpret_cast<const int*>(address.addr()), name) == OK)
-        {
-                return HostEntry(std::string(name), address);
-        }
+	char name[MAXHOSTNAMELEN + 1];
+	if (hostGetByAddr(*reinterpret_cast<const int*>(address.addr()), name) == OK)
+	{
+		return HostEntry(std::string(name), address);
+	}
 #else
-        struct hostent* he = gethostbyaddr(reinterpret_cast<const char*>(address.addr()), address.length(), address.af());
-        if (he)
-        {
-                return HostEntry(he);
-        }
+	struct hostent* he = gethostbyaddr(reinterpret_cast<const char*>(address.addr()), address.length(), address.af());
+	if (he)
+	{
+		return HostEntry(he);
+	}
 #endif
-        int err = lastError();
+	int err = lastError();
 	error(err, address.toString());      // will throw an appropriate exception
 	throw NetException(); // to silence compiler
 }
@@ -160,11 +160,11 @@ HostEntry DNS::hostByAddress(const IPAddress& address)
 
 HostEntry DNS::resolve(const std::string& address)
 {
-        NetworkInitializer networkInitializer;
+	NetworkInitializer networkInitializer;
 
-        IPAddress ip;
-        if (IPAddress::tryParse(address, ip))
-                return hostByAddress(ip);
+	IPAddress ip;
+	if (IPAddress::tryParse(address, ip))
+		return hostByAddress(ip);
 	else
 		return hostByName(address);
 }
@@ -172,11 +172,11 @@ HostEntry DNS::resolve(const std::string& address)
 
 IPAddress DNS::resolveOne(const std::string& address)
 {
-        NetworkInitializer networkInitializer;
+	NetworkInitializer networkInitializer;
 
-        const HostEntry& entry = resolve(address);
-        if (!entry.addresses().empty())
-                return entry.addresses()[0];
+	const HostEntry& entry = resolve(address);
+	if (!entry.addresses().empty())
+		return entry.addresses()[0];
 	else
 		throw NoAddressFoundException(address);
 }
@@ -184,7 +184,7 @@ IPAddress DNS::resolveOne(const std::string& address)
 
 HostEntry DNS::thisHost()
 {
-        return hostByName(hostName());
+	return hostByName(hostName());
 }
 
 
@@ -195,11 +195,11 @@ void DNS::flushCache()
 
 std::string DNS::hostName()
 {
-        NetworkInitializer networkInitializer;
+	NetworkInitializer networkInitializer;
 
-        char buffer[256];
-        int rc = gethostname(buffer, sizeof(buffer));
-        if (rc == 0)
+	char buffer[256];
+	int rc = gethostname(buffer, sizeof(buffer));
+	if (rc == 0)
 		return std::string(buffer);
 	else
 		throw NetException("Cannot get host name");
@@ -243,30 +243,30 @@ void DNS::error(int code, const std::string& arg)
 void DNS::aierror(int code, const std::string& arg)
 {
 #if defined(POCO_HAVE_IPv6)
-        switch (code)
-        {
-        case EAI_AGAIN:
-                throw DNSException("Temporary DNS error while resolving", arg);
-        case EAI_FAIL:
-                throw DNSException("Non recoverable DNS error while resolving", arg);
+	switch (code)
+	{
+	case EAI_AGAIN:
+		throw DNSException("Temporary DNS error while resolving", arg);
+	case EAI_FAIL:
+		throw DNSException("Non recoverable DNS error while resolving", arg);
 #if !defined(_WIN32) // EAI_NODATA and EAI_NONAME have the same value
-        case EAI_NODATA:
-                throw NoAddressFoundException(arg);
+	case EAI_NODATA:
+		throw NoAddressFoundException(arg);
 #endif
-        case EAI_NONAME:
-                throw HostNotFoundException(arg);
+	case EAI_NONAME:
+		throw HostNotFoundException(arg);
 #if defined(EAI_SYSTEM)
-        case EAI_SYSTEM:
-                error(lastError(), arg);
-                break;
+	case EAI_SYSTEM:
+		error(lastError(), arg);
+		break;
 #endif
 #if defined(_WIN32)
-        case WSANO_DATA: // may happen on XP
-                throw HostNotFoundException(arg);
+	case WSANO_DATA: // may happen on XP
+		throw HostNotFoundException(arg);
 #endif
-        default:
-                throw DNSException("EAI", NumberFormatter::format(code));
-        }
+	default:
+		throw DNSException("EAI", NumberFormatter::format(code));
+	}
 #endif // POCO_HAVE_IPv6
 }
 
@@ -279,24 +279,24 @@ static Poco::AtomicCounter initializeCount;
 void initializeNetwork()
 {
 #if defined(_WIN32)
-        if (++initializeCount == 1)
-        {
-                WORD    version = MAKEWORD(2, 2);
-                WSADATA data;
-                if (WSAStartup(version, &data) != 0)
-                        throw NetException("Failed to initialize network subsystem");
-        }
+	if (++initializeCount == 1)
+	{
+		WORD    version = MAKEWORD(2, 2);
+		WSADATA data;
+		if (WSAStartup(version, &data) != 0)
+			throw NetException("Failed to initialize network subsystem");
+	}
 #endif // _WIN32
 }
-                
+		
 
 void uninitializeNetwork()
 {
 #if defined(_WIN32)
-        if (--initializeCount == 0)
-        {
-                WSACleanup();
-        }
+	if (--initializeCount == 0)
+	{
+		WSACleanup();
+	}
 #endif // _WIN32
 }
 

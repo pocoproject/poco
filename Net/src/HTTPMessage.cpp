@@ -90,30 +90,52 @@ void HTTPMessage::setVersion(const std::string& version)
 
 void HTTPMessage::setContentLength(std::streamsize length)
 {
-        if (length != UNKNOWN_CONTENT_LENGTH)
-                set(CONTENT_LENGTH, NumberFormatter::format(length));
+	if (length != UNKNOWN_CONTENT_LENGTH)
+		set(CONTENT_LENGTH, NumberFormatter::format(length));
 	else
 		erase(CONTENT_LENGTH);
 }
 
-        
+	
 std::streamsize HTTPMessage::getContentLength() const
+{
+	const std::string& contentLength = get(CONTENT_LENGTH, EMPTY);
+	if (!contentLength.empty())
+	{
+		if (sizeof(std::streamsize) == sizeof(Poco::Int64))
+			return static_cast<std::streamsize>(NumberParser::parse64(contentLength));
+		else
+			return static_cast<std::streamsize>(NumberParser::parse(contentLength));
+	}
+	else return UNKNOWN_CONTENT_LENGTH;
+}
+
+
+#if defined(POCO_HAVE_INT64)    
+void HTTPMessage::setContentLength64(Poco::Int64 length)
+{
+        if (length != UNKNOWN_CONTENT_LENGTH)
+                set(CONTENT_LENGTH, NumberFormatter::format(length));
+        else
+                erase(CONTENT_LENGTH);
+}
+
+        
+Poco::Int64 HTTPMessage::getContentLength64() const
 {
         const std::string& contentLength = get(CONTENT_LENGTH, EMPTY);
         if (!contentLength.empty())
         {
-                if (sizeof(std::streamsize) == sizeof(Poco::Int64))
-                        return static_cast<std::streamsize>(NumberParser::parse64(contentLength));
-                else
-                        return static_cast<std::streamsize>(NumberParser::parse(contentLength));
+                return NumberParser::parse64(contentLength);
         }
         else return UNKNOWN_CONTENT_LENGTH;
 }
+#endif // defined(POCO_HAVE_INT64)      
 
 
 void HTTPMessage::setTransferEncoding(const std::string& transferEncoding)
 {
-	if (icompare(transferEncoding, IDENTITY_TRANSFER_ENCODING) == 0)
+        if (icompare(transferEncoding, IDENTITY_TRANSFER_ENCODING) == 0)
 		erase(TRANSFER_ENCODING);
 	else
 		set(TRANSFER_ENCODING, transferEncoding);

@@ -82,11 +82,14 @@ public:
 	DialogSocket(const Socket& socket);
 		/// Creates the DialogSocket with the SocketImpl
 		/// from another socket. The SocketImpl must be
-		/// a StreamSocketImpl, otherwise an InvalidArgumentException
-		/// will be thrown.
+                /// a StreamSocketImpl, otherwise an InvalidArgumentException
+                /// will be thrown.
 
-	~DialogSocket();
-		/// Destroys the DialogSocket.
+        DialogSocket(const DialogSocket& socket);
+                /// Creates the DialogSocket as copy of another dialog socket.
+
+        ~DialogSocket();
+                /// Destroys the DialogSocket.
 
 	DialogSocket& operator = (const Socket& socket);
 		/// Assignment operator.

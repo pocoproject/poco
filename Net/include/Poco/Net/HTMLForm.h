@@ -57,11 +57,18 @@ class PartSource;
 
 
 class Net_API HTMLForm: public NameValueCollection
-	/// HTMLForm is a helper class for working with HTML forms,
-	/// both on the client and on the server side.
+        /// HTMLForm is a helper class for working with HTML forms,
+        /// both on the client and on the server side.
+        ///
+        /// The maximum number of form fields can be restricted
+        /// by calling setFieldLimit(). This is useful to
+        /// defend against certain kinds of denial-of-service
+        /// attacks. The limit is only enforced when parsing
+        /// form data from a stream or string, not when adding
+        /// form fields programmatically. The default limit is 100.
 {
 public:
-	HTMLForm();
+        HTMLForm();
 		/// Creates an empty HTMLForm and sets the
 		/// encoding to "application/x-www-form-urlencoded".
 		
@@ -133,12 +140,27 @@ public:
 
 	void read(std::istream& istr, PartHandler& handler);
 		/// Reads the form data from the given input stream.
-		///
-		/// The form data read from the stream must be
-		/// in the encoding specified for the form.
-		
-	void prepareSubmit(HTTPRequest& request);
-		/// Fills out the request object for submitting the form.
+                ///
+                /// The form data read from the stream must be
+                /// in the encoding specified for the form.
+                ///
+                /// Note that read() does not clear the form before
+                /// reading the new values.
+
+        void read(std::istream& istr);
+                /// Reads the URL-encoded form data from the given input stream.
+                ///
+                /// Note that read() does not clear the form before
+                /// reading the new values.
+                
+        void read(const std::string& queryString);
+                /// Reads the form data from the given HTTP query string.
+                ///
+                /// Note that read() does not clear the form before
+                /// reading the new values.
+                
+        void prepareSubmit(HTTPRequest& request);
+                /// Fills out the request object for submitting the form.
 		///
 		/// If the request method is GET, the encoded form is appended to the
 		/// request URI as query string. Otherwise (the method is
@@ -161,11 +183,25 @@ public:
 		/// using the specified encoding.
 
 	const std::string& boundary() const;
-		/// Returns the MIME boundary used for writing
-		/// multipart form data.
+                /// Returns the MIME boundary used for writing
+                /// multipart form data.
 
-	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
-	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
+        int getFieldLimit() const;
+                /// Returns the maximum number of header fields
+                /// allowed.
+                ///
+                /// See setFieldLimit() for more information.
+                
+        void setFieldLimit(int limit);
+                /// Sets the maximum number of header fields
+                /// allowed. This limit is used to defend certain
+                /// kinds of denial-of-service attacks.
+                /// Specify 0 for unlimited (not recommended).
+                ///
+                /// The default limit is 100.
+
+        static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
+        static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
 
 protected:
 	void readUrl(std::istream& istr);
@@ -174,20 +210,26 @@ protected:
 	void writeMultipart(std::ostream& ostr);
 
 private:
-	HTMLForm(const HTMLForm&);
-	HTMLForm& operator = (const HTMLForm&);
+        HTMLForm(const HTMLForm&);
+        HTMLForm& operator = (const HTMLForm&);
 
-	struct Part
-	{
-		std::string name;
+        enum Limits
+        {
+                DFL_FIELD_LIMIT = 100
+        };
+
+        struct Part
+        {
+                std::string name;
 		PartSource* pSource;
 	};
-	
-	typedef std::vector<Part> PartVec;
-	
-	std::string _encoding;
-	std::string _boundary;
-	PartVec     _parts;
+        
+        typedef std::vector<Part> PartVec;
+        
+        int         _fieldLimit;
+        std::string _encoding;
+        std::string _boundary;
+        PartVec     _parts;
 };
 
 
@@ -203,6 +245,12 @@ inline const std::string& HTMLForm::getEncoding() const
 inline const std::string& HTMLForm::boundary() const
 {
 	return _boundary;
+}
+
+
+inline int HTMLForm::getFieldLimit() const
+{
+        return _fieldLimit;
 }
 
 

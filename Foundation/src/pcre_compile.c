@@ -54,7 +54,7 @@ supporting internal functions that are not used by other modules. */
 /* When DEBUG is defined, we need the pcre_printint() function, which is also
 used by pcretest. DEBUG is not defined when building a production library. */
 
-#ifdef DEBUG
+#if defined(DEBUG)
 #include "pcre_printint.src"
 #endif
 

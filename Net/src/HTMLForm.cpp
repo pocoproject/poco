@@ -41,10 +41,10 @@
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/NullPartHandler.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/NullStream.h"
 #include "Poco/CountingStream.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/Exception.h"
 #include "Poco/URI.h"
 #include "Poco/String.h"
 #include <sstream>
@@ -66,32 +66,37 @@ const std::string HTMLForm::ENCODING_MULTIPART = "multipart/form-data";
 
 
 HTMLForm::HTMLForm():
-	_encoding(ENCODING_URL)
+        _fieldLimit(DFL_FIELD_LIMIT),
+        _encoding(ENCODING_URL)
 {
 }
 
-	
+        
 HTMLForm::HTMLForm(const std::string& encoding):
-	_encoding(encoding)
+        _fieldLimit(DFL_FIELD_LIMIT),
+        _encoding(encoding)
 {
 }
 
 
-HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler)
+HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler):
+        _fieldLimit(DFL_FIELD_LIMIT)
 {
-	load(request, requestBody, handler);
+        load(request, requestBody, handler);
 }
 
 
-HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody)
+HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody):
+        _fieldLimit(DFL_FIELD_LIMIT)
 {
-	load(request, requestBody);
+        load(request, requestBody);
 }
 
 
-HTMLForm::HTMLForm(const HTTPRequest& request)
+HTMLForm::HTMLForm(const HTTPRequest& request):
+        _fieldLimit(DFL_FIELD_LIMIT)
 {
-	load(request);
+        load(request);
 }
 
 	
@@ -173,9 +178,22 @@ void HTMLForm::read(std::istream& istr, PartHandler& handler)
 }
 
 
+void HTMLForm::read(std::istream& istr)
+{
+        readUrl(istr);
+}
+
+
+void HTMLForm::read(const std::string& queryString)
+{
+        std::istringstream istr(queryString);
+        readUrl(istr);
+}
+
+
 void HTMLForm::prepareSubmit(HTTPRequest& request)
 {
-	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
+        if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
 		if (_encoding == ENCODING_URL)
 		{
@@ -241,14 +259,17 @@ void HTMLForm::write(std::ostream& ostr)
 
 void HTMLForm::readUrl(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+        static const int eof = std::char_traits<char>::eof();
 
-	int ch = istr.get();
-	while (ch != eof)
-	{
-		std::string name;
-		std::string value;
-		while (ch != eof && ch != '=' && ch != '&')
+        int fields = 0;
+        int ch = istr.get();
+        while (ch != eof)
+        {
+                if (_fieldLimit > 0 && fields == _fieldLimit)
+                        throw HTMLFormException("Too many form fields");
+                std::string name;
+                std::string value;
+                while (ch != eof && ch != '=' && ch != '&')
 		{
 			if (ch == '+') ch = ' ';
 			name += (char) ch;
@@ -266,24 +287,28 @@ void HTMLForm::readUrl(std::istream& istr)
 		}
 		std::string decodedName;
 		std::string decodedValue;
-		URI::decode(name, decodedName);
-		URI::decode(value, decodedValue);
-		add(decodedName, decodedValue);
-		if (ch == '&') ch = istr.get();
-	}
+                URI::decode(name, decodedName);
+                URI::decode(value, decodedValue);
+                add(decodedName, decodedValue);
+                ++fields;
+                if (ch == '&') ch = istr.get();
+        }
 }
 
 
 void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 {
-	static const int eof = std::char_traits<char>::eof();
+        static const int eof = std::char_traits<char>::eof();
 
-	MultipartReader reader(istr, _boundary);
-	while (reader.hasNextPart())
-	{
-		MessageHeader header;
-		reader.nextPart(header);
-		std::string disp;
+        int fields = 0;
+        MultipartReader reader(istr, _boundary);
+        while (reader.hasNextPart())
+        {
+                if (_fieldLimit > 0 && fields == _fieldLimit)
+                        throw HTMLFormException("Too many form fields");
+                MessageHeader header;
+                reader.nextPart(header);
+                std::string disp;
 		NameValueCollection params;
 		if (header.has("Content-Disposition"))
 		{
@@ -306,10 +331,11 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 			{
 				value += (char) ch;
 				ch = istr.get();
-			}
-			add(name, value);
-		}
-	}
+                        }
+                        add(name, value);
+                }
+                ++fields;
+        }
 }
 
 
@@ -360,6 +386,14 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	}
 	writer.close();
 	_boundary = writer.boundary();
+}
+
+
+void HTMLForm::setFieldLimit(int limit)
+{
+        poco_assert (limit >= 0);
+        
+        _fieldLimit = limit;
 }
 
 

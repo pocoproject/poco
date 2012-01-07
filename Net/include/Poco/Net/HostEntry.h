@@ -62,15 +62,19 @@ public:
 	HostEntry();
 		/// Creates an empty HostEntry.
 		
-	HostEntry(struct hostent* entry);
-		/// Creates the HostEntry from the data in a hostent structure.
+        HostEntry(struct hostent* entry);
+                /// Creates the HostEntry from the data in a hostent structure.
 
-#if defined(_WIN32) && defined(POCO_HAVE_IPv6)
-	HostEntry(struct addrinfo* info);
-		/// Creates the HostEntry from the data in a Windows addrinfo structure.
+#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
+        HostEntry(struct addrinfo* info);
+                /// Creates the HostEntry from the data in an addrinfo structure.
 #endif
 
-	HostEntry(const HostEntry& entry);
+#if defined(POCO_VXWORKS)
+        HostEntry(const std::string& name, const IPAddress& addr);
+#endif
+
+        HostEntry(const HostEntry& entry);
 		/// Creates the HostEntry by copying another one.
 
 	HostEntry& operator = (const HostEntry& entry);

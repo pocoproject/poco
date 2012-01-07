@@ -291,7 +291,7 @@
 #    ifdef FAR
 #      undef FAR
 #    endif
-#    include "Poco/UnWindows.h"
+#    include <windows.h>
      /* No need for _export, use ZLIB.DEF instead. */
      /* For complete Windows compatibility, use WINAPI, not __stdcall. */
 #    define ZEXPORT WINAPI
@@ -356,14 +356,34 @@ typedef uLong FAR uLongf;
    typedef Byte       *voidp;
 #endif
 
-#if 0           /* HAVE_UNISTD_H -- this line is updated by ./configure */
+#ifdef HAVE_UNISTD_H    /* may be set to #if 1 by ./configure */
+#  define Z_HAVE_UNISTD_H
+#endif
+
+#ifdef STDC
 #  include <sys/types.h>    /* for off_t */
+#endif
+
+/* a little trick to accommodate both "#define _LARGEFILE64_SOURCE" and
+ * "#define _LARGEFILE64_SOURCE 1" as requesting 64-bit operations, (even
+ * though the former does not conform to the LFS document), but considering
+ * both "#undef _LARGEFILE64_SOURCE" and "#define _LARGEFILE64_SOURCE 0" as
+ * equivalently requesting no 64-bit operations
+ */
+#if -_LARGEFILE64_SOURCE - -1 == 1
+#  undef _LARGEFILE64_SOURCE
+#endif
+
+#if defined(Z_HAVE_UNISTD_H) || defined(_LARGEFILE64_SOURCE)
 #  include <unistd.h>       /* for SEEK_* and off_t */
 #  ifdef VMS
 #    include <unixio.h>     /* for off_t */
 #  endif
+#  ifndef z_off_t
 #    define z_off_t off_t
 #  endif
+#endif
+
 #ifndef SEEK_SET
 #  define SEEK_SET        0       /* Seek from beginning of file.  */
 #  define SEEK_CUR        1       /* Seek from current position.  */
@@ -386,9 +406,6 @@ typedef uLong FAR uLongf;
 
 #if defined(__MVS__)
 #  define NO_vsnprintf
-#  ifdef FAR
-#    undef FAR
-#  endif
 #endif
 
 /* MVS linker does not support external names larger than 8 bytes */

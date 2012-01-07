@@ -456,20 +456,20 @@ Path& Path::resolve(const Path& path)
 
 Path& Path::setNode(const std::string& node)
 {
-        _node     = node;
-        _absolute = _absolute || !node.empty();
-        return *this;
+	_node     = node;
+	_absolute = _absolute || !node.empty();
+	return *this;
 }
 
-        
+	
 Path& Path::setDevice(const std::string& device)
 {
-        _device   = device;
-        _absolute = _absolute || !device.empty();
-        return *this;
+	_device   = device;
+	_absolute = _absolute || !device.empty();
+	return *this;
 }
 
-        
+	
 const std::string& Path::directory(int n) const
 {
 	poco_assert (0 <= n && n <= _dirs.size());
@@ -491,11 +491,11 @@ const std::string& Path::operator [] (int n) const
 		return _name;	
 }
 
-        
+	
 Path& Path::pushDirectory(const std::string& dir)
 {
-        if (!dir.empty() && dir != ".")
-        {
+	if (!dir.empty() && dir != ".")
+	{
 #if defined(POCO_OS_FAMILY_VMS)
 		if (dir == ".." || dir == "-")
 		{
@@ -513,49 +513,49 @@ Path& Path::pushDirectory(const std::string& dir)
 			else if (!_absolute)
 				_dirs.push_back(dir);
 		}
-                else _dirs.push_back(dir);
+		else _dirs.push_back(dir);
 #endif
-        }
-        return *this;
+	}
+	return *this;
 }
 
-        
+	
 Path& Path::popDirectory()
 {
-        poco_assert (!_dirs.empty());
-        
-        _dirs.pop_back();
-        return *this;
+	poco_assert (!_dirs.empty());
+	
+	_dirs.pop_back();
+	return *this;
 }
 
 
 Path& Path::popFrontDirectory()
 {
-        poco_assert (!_dirs.empty());
-        
-        StringVec::iterator it = _dirs.begin();
-        _dirs.erase(it);
-        return *this;
+	poco_assert (!_dirs.empty());
+	
+	StringVec::iterator it = _dirs.begin();
+	_dirs.erase(it);
+	return *this;
 }
 
-        
+	
 Path& Path::setFileName(const std::string& name)
 {
-        _name = name;
-        return *this;
+	_name = name;
+	return *this;
 }
 
 
 Path& Path::setBaseName(const std::string& name)
 {
-        std::string ext = getExtension();
-        _name = name;
+	std::string ext = getExtension();
+	_name = name;
 	if (!ext.empty())
 	{
-                _name.append(".");
-                _name.append(ext);
-        }
-        return *this;
+		_name.append(".");
+		_name.append(ext);
+	}
+	return *this;
 }
 
 
@@ -571,16 +571,16 @@ std::string Path::getBaseName() const
 
 Path& Path::setExtension(const std::string& extension)
 {
-        _name = getBaseName();
-        if (!extension.empty())
+	_name = getBaseName();
+	if (!extension.empty())
 	{
-                _name.append(".");
-                _name.append(extension);
-        }
-        return *this;
+		_name.append(".");
+		_name.append(extension);
+	}
+	return *this;
 }
 
-                        
+			
 std::string Path::getExtension() const
 {
 	std::string::size_type pos = _name.rfind('.');
@@ -593,12 +593,12 @@ std::string Path::getExtension() const
 
 Path& Path::clear()
 {
-        _node.clear();
-        _device.clear();
+	_node.clear();
+	_device.clear();
 	_name.clear();
-        _dirs.clear();
-        _version.clear();
-        _absolute = false;
+	_dirs.clear();
+	_version.clear();
+	_absolute = false;
     return *this;
 }
 
@@ -641,12 +641,21 @@ void Path::listRoots(std::vector<std::string>& roots)
 
 bool Path::find(StringVec::const_iterator it, StringVec::const_iterator end, const std::string& name, Path& path)
 {
-	while (it != end)
-	{
-		Path p(*it);
-		p.makeDirectory();
-		p.resolve(Path(name));
-		File f(p);
+        while (it != end)
+        {
+#if defined(WIN32)
+                std::string cleanPath(*it);
+                if (cleanPath.size() > 1 && cleanPath[0] == '"' && cleanPath[cleanPath.size() - 1] == '"')
+                {
+                        cleanPath = cleanPath.substr(1, cleanPath.size() - 2);
+                }
+                Path p(cleanPath);
+#else
+                Path p(*it);
+#endif
+                p.makeDirectory();
+                p.resolve(Path(name));
+                File f(p);
 		if (f.exists())
 		{
 			path = p;

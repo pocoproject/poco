@@ -43,6 +43,7 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/Ascii.h"
+#include "Poco/String.h"
 
 
 using Poco::DateTime;
@@ -198,12 +199,12 @@ void HTTPResponse::addCookie(const HTTPCookie& cookie)
 
 void HTTPResponse::getCookies(std::vector<HTTPCookie>& cookies) const
 {
-	cookies.clear();
-	NameValueCollection::ConstIterator it = find(SET_COOKIE);
-	while (it != end() && it->first == SET_COOKIE)
-	{
-		NameValueCollection nvc;
-		splitParameters(it->second.begin(), it->second.end(), nvc);
+        cookies.clear();
+        NameValueCollection::ConstIterator it = find(SET_COOKIE);
+        while (it != end() && Poco::icompare(it->first, SET_COOKIE) == 0)
+        {
+                NameValueCollection nvc;
+                splitParameters(it->second.begin(), it->second.end(), nvc);
 		cookies.push_back(HTTPCookie(nvc));
 		++it;
 	}

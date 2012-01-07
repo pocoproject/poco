@@ -84,12 +84,12 @@ inline void MutexImpl::lockImpl()
 
 inline bool MutexImpl::tryLockImpl()
 {
-	try
-	{
-		return TryEnterCriticalSection(&_cs) == TRUE;
-	}
-	catch (...)
-	{
+        try
+        {
+                return TryEnterCriticalSection(&_cs) != 0;
+        }
+        catch (...)
+        {
 	}
 	throw SystemException("cannot lock mutex");
 }

@@ -74,7 +74,7 @@ HostEntry::HostEntry(struct hostent* entry)
 }
 
 
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
 
 
 HostEntry::HostEntry(struct addrinfo* ainfo)
@@ -91,15 +91,17 @@ HostEntry::HostEntry(struct addrinfo* ainfo)
 		{
 			switch (ai->ai_addr->sa_family)
 			{
-			case AF_INET:
+                        case AF_INET:
                                 _addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in*>(ai->ai_addr)->sin_addr, sizeof(in_addr)));
                                 break;
+#if defined(POCO_HAVE_IPv6)
                         case AF_INET6:
                                 _addresses.push_back(IPAddress(&reinterpret_cast<struct sockaddr_in6*>(ai->ai_addr)->sin6_addr, sizeof(in6_addr), reinterpret_cast<struct sockaddr_in6*>(ai->ai_addr)->sin6_scope_id));
                                 break;
+#endif
                         }
                 }
-	}
+        }
 }
 
 
@@ -110,9 +112,9 @@ HostEntry::HostEntry(struct addrinfo* ainfo)
 
 
 HostEntry::HostEntry(const std::string& name, const IPAddress& addr):
-        _name(name)
+	_name(name)
 {
-        _addresses.push_back(addr);
+	_addresses.push_back(addr);
 }
 
 

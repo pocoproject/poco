@@ -38,6 +38,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 #include <sstream>
+#include <locale>
 #include <cstddef>
 
 
@@ -63,13 +64,13 @@ namespace
 	}
 
 
-        void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
-        {
-                int width = 0;
-                while (itFmt != endFmt && Ascii::isDigit(*itFmt))
-                {
-                        width = 10*width + *itFmt - '0';
-                        ++itFmt;
+	void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
+	{
+		int width = 0;
+		while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+		{
+			width = 10*width + *itFmt - '0';
+			++itFmt;
 		}
 		if (width != 0) str.width(width);
 	}
@@ -78,13 +79,13 @@ namespace
 	void parsePrec(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
 	{
 		if (itFmt != endFmt && *itFmt == '.')
-                {
-                        ++itFmt;
-                        int prec = 0;
-                        while (itFmt != endFmt && Ascii::isDigit(*itFmt))
-                        {
-                                prec = 10*prec + *itFmt - '0';
-                                ++itFmt;
+		{
+			++itFmt;
+			int prec = 0;
+			while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+			{
+				prec = 10*prec + *itFmt - '0';
+				++itFmt;
 			}
 			if (prec >= 0) str.precision(prec);
 		}
@@ -103,23 +104,23 @@ namespace
 			case '?': mod = *itFmt++; break;
 			}
 		}
-                return mod;
-        }
-        
-        std::size_t parseIndex(std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
-        {
-                int index = 0;
-                while (itFmt != endFmt && Ascii::isDigit(*itFmt))
-                {
-                        index = 10*index + *itFmt - '0';
-                        ++itFmt;
-                }
-                if (itFmt != endFmt && *itFmt == ']') ++itFmt;
-                return index;
-        }
+		return mod;
+	}
+	
+	std::size_t parseIndex(std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
+	{
+		int index = 0;
+		while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+		{
+			index = 10*index + *itFmt - '0';
+			++itFmt;
+		}
+		if (itFmt != endFmt && *itFmt == ']') ++itFmt;
+		return index;
+	}
 
-        void prepareFormat(std::ostream& str, char type)
-        {
+	void prepareFormat(std::ostream& str, char type)
+	{
 		switch (type)
 		{
 		case 'd':
@@ -163,12 +164,13 @@ namespace
 	}
 
 
-	void formatOne(std::string& result, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
-	{
-		std::ostringstream str;
-		parseFlags(str, itFmt, endFmt);
-		parseWidth(str, itFmt, endFmt);
-		parsePrec(str, itFmt, endFmt);
+        void formatOne(std::string& result, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
+        {
+                std::ostringstream str;
+                str.imbue(std::locale::classic());
+                parseFlags(str, itFmt, endFmt);
+                parseWidth(str, itFmt, endFmt);
+                parsePrec(str, itFmt, endFmt);
 		char mod = parseMod(itFmt, endFmt);
 		if (itFmt != endFmt)
 		{
@@ -355,33 +357,33 @@ void format(std::string& result, const std::string& fmt, const std::vector<Any>&
 	{
 		switch (*itFmt)
 		{
-                case '%':
-                        ++itFmt;
-                        if (itFmt != endFmt && itVal != endVal)
-                        {
-                                if (*itFmt == '[')
-                                {
-                                        ++itFmt;
-                                        std::size_t index = parseIndex(itFmt, endFmt);
-                                        if (index < values.size())
-                                        {
-                                                std::vector<Any>::const_iterator it = values.begin() + index;
-                                                formatOne(result, itFmt, endFmt, it);
-                                        }
-                                        else throw InvalidArgumentException("format argument index out of range", fmt);
-                                }
-                                else
-                                {
-                                        formatOne(result, itFmt, endFmt, itVal);
-                                }
-                        }
-                        else if (itFmt != endFmt)
-                        {
-                                result += *itFmt++;
-                        }
-                        break;
-                default:
-                        result += *itFmt;
+		case '%':
+			++itFmt;
+			if (itFmt != endFmt && itVal != endVal)
+			{
+				if (*itFmt == '[')
+				{
+					++itFmt;
+					std::size_t index = parseIndex(itFmt, endFmt);
+					if (index < values.size())
+					{
+						std::vector<Any>::const_iterator it = values.begin() + index;
+						formatOne(result, itFmt, endFmt, it);
+					}
+					else throw InvalidArgumentException("format argument index out of range", fmt);
+				}
+				else
+				{
+					formatOne(result, itFmt, endFmt, itVal);
+				}
+			}
+			else if (itFmt != endFmt)
+			{
+				result += *itFmt++;
+			}
+			break;
+		default:
+			result += *itFmt;
 			++itFmt;
 		}
 	}

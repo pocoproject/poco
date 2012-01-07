@@ -42,6 +42,11 @@
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/Exception.h"
+#if defined(POCO_UNBUNDLED)
+#include <sqlite3.h>
+#else
+#include "sqlite3.h"
+#endif
 #include <cstdlib>
 
 
@@ -85,17 +90,17 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 #ifndef POCO_LONG_IS_64_BIT
 bool Extractor::extract(std::size_t pos, long& val)
 {
-	if (isNull(pos))
-		return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+        if (isNull(pos))
+                return false;
+        val = sqlite3_column_int(_pStmt, (int) pos);
+        return true;
 }
 #endif
 
 
 bool Extractor::extract(std::size_t pos, double& val)
 {
-	if (isNull(pos))
+        if (isNull(pos))
 		return false;
 	val = sqlite3_column_double(_pStmt, (int) pos);
 	return true;
@@ -117,7 +122,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 {
-	if (isNull(pos))
+        if (isNull(pos))
 		return false;
 	val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
@@ -197,60 +202,60 @@ bool Extractor::extract(std::size_t pos, char& val)
 
 bool Extractor::extract(std::size_t pos, Date& val)
 {
-	std::string str;
-	extract(pos, str);
-	int tzd;
-	DateTime dt = DateTimeParser::parse(Utility::SQLITE_DATE_FORMAT, str, tzd);
-	val = dt;
-	return true;
+        std::string str;
+        extract(pos, str);
+        int tzd;
+        DateTime dt = DateTimeParser::parse(Utility::SQLITE_DATE_FORMAT, str, tzd);
+        val = dt;
+        return true;
 }
 
 
 bool Extractor::extract(std::size_t pos, Time& val)
-{
-	std::string str;
-	extract(pos, str);
-	int tzd;
-	DateTime dt = DateTimeParser::parse(Utility::SQLITE_TIME_FORMAT, str, tzd);
-	val = dt;
-	return true;
-}
+        {
+        std::string str;
+        extract(pos, str);
+        int tzd;
+        DateTime dt = DateTimeParser::parse(Utility::SQLITE_TIME_FORMAT, str, tzd);
+        val = dt;
+        return true;
+        }
 
 
 bool Extractor::extract(std::size_t pos, DateTime& val)
-{
-	std::string dt;
-	extract(pos, dt);
-	int tzd;
-	DateTimeParser::parse(dt, val, tzd);
-	return true;
-}
+        {
+        std::string dt;
+        extract(pos, dt);
+        int tzd;
+        DateTimeParser::parse(dt, val, tzd);
+        return true;
+        }
 
 
 bool Extractor::extract(std::size_t pos, Poco::Any& val)
-{
-	return extractImpl(pos, val);
-}
+        {
+        return extractImpl(pos, val);
+        }
 
 
 bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
-{
-	return extractImpl(pos, val);
-}
+        {
+        return extractImpl(pos, val);
+        }
 
 
 bool Extractor::isNull(std::size_t pos, std::size_t)
 {
-	if (pos >= _nulls.size())
-		_nulls.resize(pos + 1);
+        if (pos >= _nulls.size())
+                _nulls.resize(pos + 1);
 
-	if (!_nulls[pos].first)
-	{
-		_nulls[pos].first = true;
-		_nulls[pos].second = (SQLITE_NULL == sqlite3_column_type(_pStmt, pos));
-	}
-	
-	return _nulls[pos].second;
+        if (!_nulls[pos].first)
+{
+                _nulls[pos].first = true;
+                _nulls[pos].second = (SQLITE_NULL == sqlite3_column_type(_pStmt, pos));
+        }
+        
+        return _nulls[pos].second;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.4/Net/src/MessageHeader.cpp#3 $
+// $Id: //poco/1.4/Net/src/MessageHeader.cpp#4 $
 //
 // Library: Net
 // Package: Messages
@@ -44,13 +44,15 @@ namespace Poco {
 namespace Net {
 
 
-MessageHeader::MessageHeader()
+MessageHeader::MessageHeader():
+        _fieldLimit(DFL_FIELD_LIMIT)
 {
 }
 
 
 MessageHeader::MessageHeader(const MessageHeader& messageHeader):
-	NameValueCollection(messageHeader)
+        NameValueCollection(messageHeader),
+        _fieldLimit(DFL_FIELD_LIMIT)
 {
 }
 
@@ -85,14 +87,17 @@ void MessageHeader::read(std::istream& istr)
 
 	std::string name;
 	std::string value;
-	name.reserve(32);
-	value.reserve(64);
-	int ch = buf.sbumpc();
-	while (ch != eof && ch != '\r' && ch != '\n')
-	{
-		name.clear();
-		value.clear();
-		while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = buf.sbumpc(); }
+        name.reserve(32);
+        value.reserve(64);
+        int ch = buf.sbumpc();
+        int fields = 0;
+        while (ch != eof && ch != '\r' && ch != '\n')
+        {
+                if (_fieldLimit > 0 && fields == _fieldLimit)
+                        throw MessageException("Too many header fields");
+                name.clear();
+                value.clear();
+                while (ch != eof && ch != ':' && ch != '\n' && name.length() < MAX_NAME_LENGTH) { name += ch; ch = buf.sbumpc(); }
 		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
 		if (ch != eof) ch = buf.sbumpc(); // ':'
@@ -111,17 +116,32 @@ void MessageHeader::read(std::istream& istr)
 				ch = buf.sbumpc();
 			else if (ch != eof)
 				throw MessageException("Folded field value too long/no CRLF found");
-		}
-		Poco::trimRightInPlace(value);
-		add(name, value);
-	}
-	istr.putback(ch);
+                }
+                Poco::trimRightInPlace(value);
+                add(name, value);
+                ++fields;
+        }
+        istr.putback(ch);
+}
+
+
+int MessageHeader::getFieldLimit() const
+{
+        return _fieldLimit;
+}
+
+        
+void MessageHeader::setFieldLimit(int limit)
+{
+        poco_assert (limit >= 0);
+        
+        _fieldLimit = limit;
 }
 
 
 void MessageHeader::splitElements(const std::string& s, std::vector<std::string>& elements, bool ignoreEmpty)
 {
-	elements.clear();
+        elements.clear();
 	std::string::const_iterator it  = s.begin();
 	std::string::const_iterator end = s.end();
 	std::string elem;
