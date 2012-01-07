@@ -1,5 +1,4 @@
 set(LIBNAME  "PocoDataSQLite")
-set(LIBNAMED "${LIBNAME}d")
 
 include_directories( include src )
 
@@ -10,15 +9,9 @@ add_definitions(-DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS -DSQLITE_OMIT_UTF16 -
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
-	PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS}
+	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
 target_link_libraries( ${LIBNAME} PocoData PocoFoundation)
-
-add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAMED}  
-	PROPERTIES COMPILE_FLAGS "${DEBUG_CXX_FLAGS}" 
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAMED} PocoDatad PocoFoundationd )
 
 install(
     DIRECTORY include/Poco
@@ -27,7 +20,7 @@ install(
     )
     
 install(
-    TARGETS ${LIBNAME} ${LIBNAMED}
+    TARGETS ${LIBNAME}
     DESTINATION lib
     )
 

@@ -1,5 +1,4 @@
 set(LIBNAME  "PocoExtJS")
-set(LIBNAMED "${LIBNAME}d")
 
 include_directories( include src )
 
@@ -10,17 +9,10 @@ add_definitions(-DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMI
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
-	PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS}
+	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION}
 	SOVERSION ${SHARED_LIBRARY_VERSION})
 target_link_libraries( ${LIBNAME} PocoWebWidgets PocoData )
-
-add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAMED}  
-	PROPERTIES COMPILE_FLAGS "${DEBUG_CXX_FLAGS}" 
-	VERSION ${SHARED_LIBRARY_VERSION}
-	SOVERSION ${SHARED_LIBRARY_VERSION})
-target_link_libraries( ${LIBNAMED} PocoWebWidgetsd PocoDatad )
 
 install(
     DIRECTORY include/Poco
@@ -29,7 +21,7 @@ install(
     )
     
 install(
-    TARGETS ${LIBNAME} ${LIBNAMED}
+    TARGETS ${LIBNAME}
     DESTINATION lib
     )
 

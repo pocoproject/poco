@@ -1,19 +1,12 @@
 set(LIBNAME "PocoCrypto")
-set(LIBNAMED "${LIBNAME}d")
 
 aux_source_directory(src SRCS)
 
 include_directories( include) 
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+set_target_properties( ${LIBNAME} PROPERTIES VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
 target_link_libraries( ${LIBNAME} PocoNetSSL PocoNet ssl crypto)
-
-add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAMED}  
-	PROPERTIES COMPILE_FLAGS "${DEBUG_CXX_FLAGS}" 
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAMED}  PocoNetSSLd PocoNetd ssl crypto)
 
 install(
     DIRECTORY include/Poco
@@ -22,7 +15,7 @@ install(
     )
     
 install(
-    TARGETS ${LIBNAME} ${LIBNAMED}
+    TARGETS ${LIBNAME}
     DESTINATION lib
     )
 

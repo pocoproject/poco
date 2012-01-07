@@ -1,5 +1,4 @@
 set(LIBNAME "PocoUtil")
-set(LIBNAMED "${LIBNAME}d")
 
 set( BASE_SRCS
 src/AbstractConfiguration.cpp
@@ -44,15 +43,9 @@ endif(CMAKE_SYSTEM MATCHES "Windows")
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
-	PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS}
+	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
 target_link_libraries( ${LIBNAME} PocoXML PocoFoundation)
-
-add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAMED}  
-	PROPERTIES COMPILE_FLAGS "${DEBUG_CXX_FLAGS}" 
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAMED} PocoXMLd PocoFoundationd )
 
 install(
     DIRECTORY include/Poco
@@ -61,7 +54,7 @@ install(
     )
     
 install(
-    TARGETS ${LIBNAME} ${LIBNAMED}
+    TARGETS ${LIBNAME}
     DESTINATION lib
     )
 

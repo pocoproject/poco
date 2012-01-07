@@ -1,5 +1,4 @@
 set(LIBNAME "PocoDataMySQL")
-set(LIBNAMED "${LIBNAME}d")
 
 set(SRCS "")
 aux_source_directory(src SRCS)
@@ -11,15 +10,9 @@ include_directories( include ${MYSQL_INCLUDE_DIR})
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
-	PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS}
+	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
 target_link_libraries( ${LIBNAME} PocoData PocoFoundation ${MYSQL_LIB})
-
-add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAMED}  
-	PROPERTIES COMPILE_FLAGS "${DEBUG_CXX_FLAGS}" 
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAMED} PocoDatad PocoFoundationd ${MYSQL_LIB})
 
 install(
     DIRECTORY include/Poco
@@ -28,7 +21,7 @@ install(
     )
     
 install(
-    TARGETS ${LIBNAME} ${LIBNAMED}
+    TARGETS ${LIBNAME}
     DESTINATION lib
     )
 

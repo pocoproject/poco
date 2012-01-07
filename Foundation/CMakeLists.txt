@@ -1,5 +1,8 @@
 set(LIBNAME "PocoFoundation")
-set(LIBNAMED "${LIBNAME}d")
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    set(LIBNAME "${LIBNAME}d")
+endif()
+
 
 set( BASE_SRCS 
   src/ASCIIEncoding.cpp
@@ -193,18 +196,11 @@ else (CMAKE_SYSTEM MATCHES "Windows")
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
+set_target_properties( ${LIBNAME} PROPERTIES VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
  set_target_properties( ${LIBNAME} PROPERTIES LINK_FLAGS "-library=stlport4")
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 target_link_libraries( ${LIBNAME} ${SYSLIBS})
-
-add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAMED} PROPERTIES COMPILE_FLAGS ${DEBUG_CXX_FLAGS} VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
- set_target_properties( ${LIBNAMED} PROPERTIES LINK_FLAGS "-library=stlport4")
-endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-target_link_libraries( ${LIBNAMED} ${SYSLIBS})
 
 install(
     DIRECTORY include/Poco
@@ -213,7 +209,7 @@ install(
     )
     
 install(
-    TARGETS ${LIBNAME} ${LIBNAMED}
+    TARGETS ${LIBNAME}
     DESTINATION lib
     )
 

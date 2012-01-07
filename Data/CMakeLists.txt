@@ -1,5 +1,4 @@
 set(LIBNAME "PocoData")
-set(LIBNAMED "${LIBNAME}d")
 
 set(SRCS "")
 aux_source_directory(src SRCS)
@@ -7,15 +6,9 @@ include_directories( SQLite/include )
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
-	PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS}
+	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
 target_link_libraries( ${LIBNAME} PocoFoundation )
-
-add_library( ${LIBNAMED} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAMED}  
-	PROPERTIES COMPILE_FLAGS "${DEBUG_CXX_FLAGS}" 
-	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAMED} PocoFoundationd )
 
 install(
     DIRECTORY include/Poco
@@ -24,7 +17,7 @@ install(
     )
     
 install(
-    TARGETS ${LIBNAME} ${LIBNAMED}
+    TARGETS ${LIBNAME}
     DESTINATION lib
     )
 

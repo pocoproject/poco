@@ -11,9 +11,30 @@ SET(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINO
 SET(RELEASE_NAME "Unstable-trunk")
 SET(PROJECT_VERSION ${COMPLETE_VERSION})
 
-#set(COMMON_CXX "-Wall -Wno-sign-compare")
-set(DEBUG_CXX_FLAGS   "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-set(RELEASE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}")
+if(POCO_DEBUG)
+    set( CMAKE_BUILD_TYPE "Debug" )
+endif(POCO_DEBUG)
+
+if (CMAKE_BUILD_TYPE MATCHES "")
+    set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
+endif (CMAKE_BUILD_TYPE MATCHES "")
+
+# http://www.cmake.org/Wiki/CMake_Useful_Variables :
+# CMAKE_BUILD_TYPE 
+#    Choose the type of build. CMake has default flags for these: 
+#
+#    * None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
+#    * Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
+#    * Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
+#    * RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
+#    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL) 
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+  message(STATUS "Debug output enabled")
+  set(LIB_EXT "d")
+else (CMAKE_BUILD_TYPE MATCHES "Debug")
+  message(STATUS "Optimized output enabled")
+  set(LIB_EXT "r")
+endif (CMAKE_BUILD_TYPE MATCHES "Debug")
 
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
@@ -139,6 +160,7 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 INCLUDE(CPack)
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
-message(STATUS "XXX: DEBUG  =${DEBUG_CXX_FLAGS}")
-message(STATUS "XXX: RELEASE=${RELEASE_CXX_FLAGS}")
+
+message(STATUS "C_FLAGS:  =${CMAKE_C_FLAGS}")
+message(STATUS "CXX_FLAGS:=${CMAKE_CXX_FLAGS}")
 
