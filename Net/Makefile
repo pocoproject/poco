@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Net/Makefile#2 $
+# $Id: //poco/1.4/Net/Makefile#3 $
 #
 # Makefile for Poco Net
 #
@@ -30,7 +30,8 @@ objects = \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
-	RemoteSyslogChannel RemoteSyslogListener
+	RemoteSyslogChannel RemoteSyslogListener \
+	WebSocket WebSocketImpl
 
 target         = PocoNet
 target_version = $(LIBVERSION)

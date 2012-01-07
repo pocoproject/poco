@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TimeServer", "TimeServer\Ti
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwitterClient", "TwitterClient\TwitterClient_x64_vs90.vcproj", "{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebSocketServer", "WebSocketServer\WebSocketServer_x64_vs90.vcproj", "{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_shared|x64 = debug_shared|x64
@@ -230,6 +232,24 @@ Global
 		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_md|x64.ActiveCfg = release_static_md|x64
 		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_md|x64.Build.0 = release_static_md|x64
 		{CCDD82BC-680D-39C0-AE25-1FBC5B615F7E}.release_static_md|x64.Deploy.0 = release_static_md|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_shared|x64.ActiveCfg = debug_shared|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_shared|x64.Build.0 = debug_shared|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_shared|x64.Deploy.0 = debug_shared|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_shared|x64.ActiveCfg = release_shared|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_shared|x64.Build.0 = release_shared|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_shared|x64.Deploy.0 = release_shared|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_static_mt|x64.ActiveCfg = debug_static_mt|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_static_mt|x64.Build.0 = debug_static_mt|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_static_mt|x64.Deploy.0 = debug_static_mt|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_mt|x64.ActiveCfg = release_static_mt|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_mt|x64.Build.0 = release_static_mt|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_mt|x64.Deploy.0 = release_static_mt|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_static_md|x64.ActiveCfg = debug_static_md|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_static_md|x64.Build.0 = debug_static_md|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.debug_static_md|x64.Deploy.0 = debug_static_md|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_md|x64.ActiveCfg = release_static_md|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_md|x64.Build.0 = release_static_md|x64
+		{0DC40FE3-6C42-365E-8DAB-899C50ECFB1C}.release_static_md|x64.Deploy.0 = release_static_md|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -357,6 +357,8 @@
     <ClInclude Include="include\Poco\Net\ICMPv4PacketImpl.h"/>
     <ClInclude Include="include\Poco\Net\RemoteSyslogChannel.h"/>
     <ClInclude Include="include\Poco\Net\RemoteSyslogListener.h"/>
+    <ClInclude Include="include\Poco\Net\WebSocket.h"/>
+    <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp"/>
@@ -446,6 +448,8 @@
     <ClCompile Include="src\ICMPv4PacketImpl.cpp"/>
     <ClCompile Include="src\RemoteSyslogChannel.cpp"/>
     <ClCompile Include="src\RemoteSyslogListener.cpp"/>
+    <ClCompile Include="src\WebSocket.cpp"/>
+    <ClCompile Include="src\WebSocketImpl.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">

@@ -856,6 +856,23 @@
 					RelativePath=".\src\RemoteSyslogListener.cpp"/>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="WebSocket">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Net\WebSocket.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\WebSocketImpl.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\WebSocket.cpp"/>
+				<File
+					RelativePath=".\src\WebSocketImpl.cpp"/>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
