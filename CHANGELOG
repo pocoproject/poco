@@ -57,6 +57,12 @@ Release 1.4.3 (2012-01-xx)
   and Poco::Net::HTTPAuthenticationParams classes.
 - Poco::Net::HTTPStreamFactory and Poco::Net::HTTPSStreamFactory now support Basic
   and Digest authentication. Username and password must be provided in the URI.
+- added Poco::Net::WebSocket, supporting the WebSocket protocol as described in RFC 6455
+- NetSSL_OpenSSL: added client-side support for Server Name Indication.
+  Poco::Net::SecureSocketImpl::connectSSL() now calls SSL_set_tlsext_host_name()
+  if its available (OpenSSL 9.8.6f and later).
+- added Poco::Net::HTTPClientSession::proxyConnect() (factored out from
+  Poco::Net::HTTPSClientSession::connect())
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1652,4 +1658,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#43 $
+$Id: //poco/1.4/dist/CHANGELOG#46 $

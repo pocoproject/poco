@@ -1,7 +1,7 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPClientSession.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPClientSession.h#4 $
 //
 // Library: Net
 // Package: HTTPClient
@@ -271,6 +271,14 @@ protected:
 	void proxyAuthenticateImpl(HTTPRequest& request);
 		/// Sets the proxy credentials (Proxy-Authorization header), if
 		/// proxy username and password have been set.
+		
+	StreamSocket proxyConnect();
+		/// Sends a CONNECT request to the proxy server and returns
+		/// a StreamSocket for the resulting connection.
+		
+	void proxyTunnel();
+		/// Calls proxyConnect() and attaches the resulting StreamSocket
+		/// to the HTTPClientSession.
 
 private:
 	std::string     _host;
@@ -289,6 +297,8 @@ private:
 	
 	HTTPClientSession(const HTTPClientSession&);
 	HTTPClientSession& operator = (const HTTPClientSession&);
+
+	friend class WebSocket;
 };
 
 

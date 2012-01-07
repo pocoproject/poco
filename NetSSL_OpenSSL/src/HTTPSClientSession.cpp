@@ -1,7 +1,7 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#2 $
+// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#3 $
 //
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
@@ -179,23 +179,7 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 	}
 	else
 	{
-		HTTPClientSession proxySession(address);
-		proxySession.setHost(getProxyHost());
-		proxySession.setPort(getProxyPort());
-		proxySession.setTimeout(getTimeout());
-		SocketAddress targetAddress(getHost(), getPort());
-		HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress.toString(), HTTPMessage::HTTP_1_1);
-		HTTPResponse proxyResponse;
-		proxyRequest.set("Proxy-Connection", "keep-alive");
-		proxyRequest.set("Host", getHost());
-		proxyAuthenticateImpl(proxyRequest);
-		proxySession.setKeepAlive(true);
-		proxySession.sendRequest(proxyRequest);
-		proxySession.receiveResponse(proxyResponse);
-		if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
-			throw HTTPException("Cannot establish proxy connection", proxyResponse.getReason());
-		
-		StreamSocket proxySocket(proxySession.detachSocket());
+		StreamSocket proxySocket(proxyConnect());
 		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
 		attachSocket(secureSocket);
 		if (_pContext->sessionCacheEnabled())

@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <OutDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">bin\</OutDir>
     <IntDir Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">obj\$(Configuration)\</IntDir>
     <LinkIncremental Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;debug_shared|Win32&apos;">true</LinkIncremental>
@@ -353,6 +353,8 @@
     <ClInclude Include="src\ICMPClientTestSuite.h"/>
     <ClInclude Include="src\ICMPSocketTest.h"/>
     <ClInclude Include="src\SyslogTest.h"/>
+    <ClInclude Include="src\WebSocketTest.h"/>
+    <ClInclude Include="src\WebSocketTestSuite.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNSTest.cpp"/>
@@ -409,6 +411,8 @@
     <ClCompile Include="src\ICMPClientTestSuite.cpp"/>
     <ClCompile Include="src\ICMPSocketTest.cpp"/>
     <ClCompile Include="src\SyslogTest.cpp"/>
+    <ClCompile Include="src\WebSocketTest.cpp"/>
+    <ClCompile Include="src\WebSocketTestSuite.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

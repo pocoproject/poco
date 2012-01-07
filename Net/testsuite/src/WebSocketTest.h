@@ -1,9 +1,11 @@
 //
-// NetTestSuite.cpp
+// WebSocketTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/NetTestSuite.cpp#2 $
+// $Id: //poco/1.4/Net/testsuite/src/WebSocketTest.h#1 $
 //
-// Copyright (c) 2005-2012, Applied Informatics Software Engineering GmbH.
+// Definition of the WebSocketTest class.
+//
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -30,41 +32,29 @@
 //
 
 
-#include "NetTestSuite.h"
-#include "NetCoreTestSuite.h"
-#include "SocketsTestSuite.h"
-#include "MessagesTestSuite.h"
-#include "HTTPTestSuite.h"
-#include "HTTPClientTestSuite.h"
-#include "TCPServerTestSuite.h"
-#include "HTTPServerTestSuite.h"
-#include "HTMLTestSuite.h"
-#include "ReactorTestSuite.h"
-#include "FTPClientTestSuite.h"
-#include "MailTestSuite.h"
-#include "ICMPClientTestSuite.h"
-#include "WebSocketTestSuite.h"
-#include "SyslogTest.h"
+#ifndef WebSocketTest_INCLUDED
+#define WebSocketTest_INCLUDED
 
 
-CppUnit::Test* NetTestSuite::suite()
+#include "Poco/Net/Net.h"
+#include "CppUnit/TestCase.h"
+
+
+class WebSocketTest: public CppUnit::TestCase
 {
-	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetTestSuite");
+public:
+	WebSocketTest(const std::string& name);
+	~WebSocketTest();
 
-	pSuite->addTest(NetCoreTestSuite::suite());
-	pSuite->addTest(SocketsTestSuite::suite());
-	pSuite->addTest(MessagesTestSuite::suite());
-	pSuite->addTest(HTTPTestSuite::suite());
-	pSuite->addTest(HTTPClientTestSuite::suite());
-	pSuite->addTest(TCPServerTestSuite::suite());
-	pSuite->addTest(HTTPServerTestSuite::suite());
-	pSuite->addTest(HTMLTestSuite::suite());
-	pSuite->addTest(ReactorTestSuite::suite());
-	pSuite->addTest(FTPClientTestSuite::suite());
-	pSuite->addTest(MailTestSuite::suite());
-	pSuite->addTest(ICMPClientTestSuite::suite());
-	pSuite->addTest(WebSocketTestSuite::suite());
-	pSuite->addTest(SyslogTest::suite());
+	void testWebSocket();
 
-	return pSuite;
-}
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+};
+
+
+#endif // WebSocketTest_INCLUDED

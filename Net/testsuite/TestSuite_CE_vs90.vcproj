@@ -802,6 +802,23 @@
 					RelativePath=".\src\SyslogTest.cpp"/>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="WebSocket">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\src\WebSocketTest.h"/>
+				<File
+					RelativePath=".\src\WebSocketTestSuite.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\WebSocketTest.cpp"/>
+				<File
+					RelativePath=".\src\WebSocketTestSuite.cpp"/>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals/>
 </VisualStudioProject>

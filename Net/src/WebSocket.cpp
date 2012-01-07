@@ -1,7 +1,7 @@
 //
 // WebSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocket.cpp#1 $
+// $Id: //poco/1.4/Net/src/WebSocket.cpp#3 $
 //
 // Library: Net
 // Package: WebSocket
@@ -157,13 +157,17 @@ WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse&
 
 WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response, HTTPCredentials& credentials)
 {
+	if (!cs.getProxyHost().empty() && !cs.secure())
+	{
+		cs.proxyTunnel();
+	}
 	std::string key = createKey();
 	request.set("Connection", "Upgrade");
 	request.set("Upgrade", "websocket");
 	request.set("Sec-WebSocket-Version", WEBSOCKET_VERSION);
 	request.set("Sec-WebSocket-Key", key);
-	request.setContentLength(0);
 	request.setChunkedTransferEncoding(false);
+	cs.setKeepAlive(true);
 	cs.sendRequest(request);
 	std::istream& istr = cs.receiveResponse(response);
 	if (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS)
@@ -175,6 +179,11 @@ WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, H
 		Poco::NullOutputStream null;
 		Poco::StreamCopier::copyStream(istr, null);
 		credentials.authenticate(request, response);
+		if (!cs.getProxyHost().empty() && !cs.secure())
+		{
+			cs.reset();
+			cs.proxyTunnel();
+		}
 		cs.sendRequest(request);
 		cs.receiveResponse(response);
 		if (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS)
