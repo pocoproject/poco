@@ -1,7 +1,7 @@
 //
 // Process_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_VMS.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Process_VMS.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -122,6 +122,12 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		delete [] argv;
 		throw;
 	}
+}
+
+
+void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
+{
+	killImpl(handle.id());
 }
 
 

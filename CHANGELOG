@@ -63,6 +63,8 @@ Release 1.4.3 (2012-01-xx)
   if its available (OpenSSL 9.8.6f and later).
 - added Poco::Net::HTTPClientSession::proxyConnect() (factored out from
   Poco::Net::HTTPSClientSession::connect())
+- added Poco::Process::kill(const Poco::ProcessHandle&) which is preferable to
+  kill(pid) on Windows, as process IDs on Windows may be reused.
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1658,4 +1660,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#46 $
+$Id: //poco/1.4/dist/CHANGELOG#47 $

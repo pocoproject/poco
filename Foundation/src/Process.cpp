@@ -1,7 +1,7 @@
 //
 // Process.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Process.cpp#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -124,6 +124,12 @@ ProcessHandle Process::launch(const std::string& command, const Args& args, Pipe
 int Process::wait(const ProcessHandle& handle)
 {
 	return handle.wait();
+}
+
+
+void Process::kill(const ProcessHandle& handle)
+{
+	killImpl(*handle._pImpl);
 }
 
 

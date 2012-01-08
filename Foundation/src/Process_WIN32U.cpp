@@ -1,7 +1,7 @@
 //
 // Process_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_WIN32U.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Process_WIN32U.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -64,6 +64,12 @@ ProcessHandleImpl::~ProcessHandleImpl()
 UInt32 ProcessHandleImpl::id() const
 {
 	return _pid;
+}
+
+
+HANDLE ProcessHandleImpl::process() const
+{
+	return _hProcess;
 }
 
 
@@ -177,6 +183,17 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		return new ProcessHandleImpl(processInfo.hProcess, processInfo.dwProcessId);
 	}
 	else throw SystemException("Cannot launch process", command);
+}
+
+
+void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
+{
+	if (TerminateProcess(handle.process(), 0) == 0)
+	{
+		CloseHandle(handle.process());
+		throw SystemException("cannot kill process");
+	}
+	CloseHandle(handle.process());
 }
 
 
