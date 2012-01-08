@@ -3,7 +3,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* @(#) $Id: //poco/1.4/Foundation/src/zconf.h#3 $ */
+/* @(#) $Id: //poco/1.4/Foundation/src/zconf.h#4 $ */
 
 #ifndef ZCONF_H
 #define ZCONF_H
@@ -360,8 +360,10 @@ typedef uLong FAR uLongf;
 #  define Z_HAVE_UNISTD_H
 #endif
 
+#ifndef _WIN32_WCE
 #ifdef STDC
 #  include <sys/types.h>    /* for off_t */
+#endif
 #endif
 
 /* a little trick to accommodate both "#define _LARGEFILE64_SOURCE" and

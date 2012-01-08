@@ -1,7 +1,7 @@
 //
 // NumberParser.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NumberParser.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/NumberParser.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -37,7 +37,9 @@
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
 #include "Poco/MemoryStream.h"
+#if !defined(POCO_NO_LOCALE)
 #include <locale>
+#endif
 #include <cstdio>
 
 
@@ -174,7 +176,9 @@ double NumberParser::parseFloat(const std::string& s)
 bool NumberParser::tryParseFloat(const std::string& s, double& value)
 {
 	Poco::MemoryInputStream istr(s.data(), s.size());
+#if !defined(POCO_NO_LOCALE)
 	istr.imbue(std::locale::classic());
+#endif
 	istr >> value;
 	return istr.eof() && !istr.fail();
 }

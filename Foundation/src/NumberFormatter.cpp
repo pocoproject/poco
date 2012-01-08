@@ -1,7 +1,7 @@
 //
 // NumberFormatter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NumberFormatter.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/NumberFormatter.cpp#3 $
 //
 // Library: Foundation
 // Package: Core
@@ -37,7 +37,9 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/MemoryStream.h"
 #include <iomanip>
+#if !defined(POCO_NO_LOCALE)
 #include <locale>
+#endif
 #include <cstdio>
 
 
@@ -339,7 +341,9 @@ void NumberFormatter::append(std::string& str, float value)
 {
 	char buffer[64];
 	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+#if !defined(POCO_NO_LOCALE)
 	ostr.imbue(std::locale::classic());
+#endif
 	ostr << std::setprecision(8) << value;
 	str.append(buffer, ostr.charsWritten());
 }
@@ -349,7 +353,9 @@ void NumberFormatter::append(std::string& str, double value)
 {
 	char buffer[64];
 	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+#if !defined(POCO_NO_LOCALE)
 	ostr.imbue(std::locale::classic());
+#endif
 	ostr << std::setprecision(16) << value;
 	str.append(buffer, ostr.charsWritten());
 }
@@ -361,7 +367,9 @@ void NumberFormatter::append(std::string& str, double value, int precision)
 
 	char buffer[64];
 	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+#if !defined(POCO_NO_LOCALE)
 	ostr.imbue(std::locale::classic());
+#endif
 	ostr << std::fixed << std::showpoint << std::setprecision(precision) << value;
 	str.append(buffer, ostr.charsWritten());
 }
@@ -373,7 +381,9 @@ void NumberFormatter::append(std::string& str, double value, int width, int prec
 
 	char buffer[64];
 	Poco::MemoryOutputStream ostr(buffer, sizeof(buffer));
+#if !defined(POCO_NO_LOCALE)
 	ostr.imbue(std::locale::classic());
+#endif
 	ostr << std::fixed << std::showpoint << std::setw(width) << std::setprecision(precision) << value;
 	str.append(buffer, ostr.charsWritten());
 }
