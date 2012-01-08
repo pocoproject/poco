@@ -138,7 +138,7 @@ if(OPENSSL_FOUND)
 endif(OPENSSL_FOUND)
 
 add_subdirectory(Data)
-add_subdirectory(WebWidgets)
+#add_subdirectory(WebWidgets)
 add_subdirectory(Zip)
 
 if(APRUTIL_FOUND AND APACHE_FOUND)
