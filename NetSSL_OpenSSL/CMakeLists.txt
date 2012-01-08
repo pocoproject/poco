@@ -1,4 +1,5 @@
 set(LIBNAME "PocoNetSSL")
+set(LIBNAME "${LIBNAME}${LIB_EXT}")
 
 aux_source_directory(src SRCS)
 include_directories( ${OPENSSL_INCLUDE_DIR} )
@@ -11,7 +12,7 @@ add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAME} ssl crypto)
+target_link_libraries( ${LIBNAME} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} )
 
 install(
     DIRECTORY include/Poco

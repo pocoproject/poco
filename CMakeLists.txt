@@ -11,13 +11,21 @@ SET(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINO
 SET(RELEASE_NAME "Unstable-trunk")
 SET(PROJECT_VERSION ${COMPLETE_VERSION})
 
-if(POCO_DEBUG)
-    set( CMAKE_BUILD_TYPE "Debug" )
-endif(POCO_DEBUG)
+#################################################################################
+# Setup C/C++ compiler options
+#################################################################################
 
-if (CMAKE_BUILD_TYPE MATCHES "")
+if(NOT MSVC_IDE)
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING
+      "Choose the type of build, options are: None Debug Release" FORCE)
+  endif()
+  message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "")
     set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
-endif (CMAKE_BUILD_TYPE MATCHES "")
+endif ()
 
 # http://www.cmake.org/Wiki/CMake_Useful_Variables :
 # CMAKE_BUILD_TYPE 
@@ -28,13 +36,13 @@ endif (CMAKE_BUILD_TYPE MATCHES "")
 #    * Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
 #    * RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
 #    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL) 
-if (CMAKE_BUILD_TYPE MATCHES "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Debug output enabled")
-  set(LIB_EXT "d")
-else (CMAKE_BUILD_TYPE MATCHES "Debug")
+  set(LIB_EXT "d" CACHE STRING "Set debug library postfix" FORCE)
+else ()
   message(STATUS "Optimized output enabled")
-  set(LIB_EXT "r")
-endif (CMAKE_BUILD_TYPE MATCHES "Debug")
+  set(LIB_EXT "" CACHE STRING "Set debug library postfix" FORCE)
+endif ()
 
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
@@ -123,6 +131,7 @@ add_subdirectory(Util)
 add_subdirectory(Net)
 #add_subdirectory(Web)
 
+# OPENSSL_SSL_LIBRARY
 if(OPENSSL_FOUND)
     add_subdirectory(NetSSL_OpenSSL)
     add_subdirectory(Crypto)

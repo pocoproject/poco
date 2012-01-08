@@ -1,4 +1,5 @@
 set(LIBNAME  "PocoExtJS")
+set(LIBNAME "${LIBNAME}${LIB_EXT}")
 
 include_directories( include src )
 
@@ -14,7 +15,7 @@ set_target_properties( ${LIBNAME}
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION}
 	SOVERSION ${SHARED_LIBRARY_VERSION})
-target_link_libraries( ${LIBNAME} PocoWebWidgets PocoData )
+target_link_libraries( ${LIBNAME} PocoWebWidgets${LIB_EXT} )
 
 install(
     DIRECTORY include/Poco

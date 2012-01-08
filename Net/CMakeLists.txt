@@ -1,4 +1,5 @@
 set(LIBNAME "PocoNet")
+set(LIBNAME "${LIBNAME}${LIB_EXT}")
 
 aux_source_directory(src BASE_SRCS)
 
@@ -23,7 +24,7 @@ add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION} )
-target_link_libraries( ${LIBNAME} PocoFoundation ${SYSLIBS})
+target_link_libraries( ${LIBNAME} PocoFoundation${LIB_EXT} ${SYSLIBS})
 
 install(
     DIRECTORY include/Poco
