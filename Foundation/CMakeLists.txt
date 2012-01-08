@@ -188,7 +188,7 @@ set(LIN_SRCS
 
 if(CMAKE_SYSTEM MATCHES "Windows")
  set(SRCS ${BASE_SRCS} ${WIN_SRCS})
- add_definitions( -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC -DFoundation_EXPORTS)
+ add_definitions( -DPCRE_STATIC -DFoundation_EXPORTS)
  set(SYSLIBS ${SYSLIBS} iphlpapi)
 else (CMAKE_SYSTEM MATCHES "Windows")
  set(SRCS ${BASE_SRCS} ${LIN_SRCS})

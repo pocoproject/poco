@@ -5,7 +5,9 @@ include_directories( include src )
 set(SRCS "")
 aux_source_directory(src SRCS)
 
-add_definitions(-DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE -DSQLITE_OMIT_TCL_VARIABLE)
+if (NOT POCO_STATIC)
+  add_definitions(-DExtJS_EXPORTS)
+endif (NOT POCO_STATIC)
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 

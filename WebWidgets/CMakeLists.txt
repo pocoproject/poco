@@ -3,6 +3,10 @@ set(LIBNAME "PocoWebWidgets")
 set(SRCS "")
 aux_source_directory(src SRCS)
 
+if (NOT POCO_STATIC)
+  add_definitions(-DWebWidgets_EXPORTS)
+endif (NOT POCO_STATIC)
+
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES

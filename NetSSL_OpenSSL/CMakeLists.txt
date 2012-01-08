@@ -1,6 +1,11 @@
 set(LIBNAME "PocoNetSSL")
 
 aux_source_directory(src SRCS)
+include_directories( ${OPENSSL_INCLUDE_DIR} )
+
+if (NOT POCO_STATIC)
+  add_definitions(-DNetSSL_EXPORTS)
+endif (NOT POCO_STATIC)
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 

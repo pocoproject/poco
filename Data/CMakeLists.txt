@@ -4,6 +4,10 @@ set(SRCS "")
 aux_source_directory(src SRCS)
 include_directories( SQLite/include )
 
+if (NOT POCO_STATIC)
+  add_definitions(-DData_EXPORTS -DTHREADSAFE -DODBC_EXPORTS -DMySQL_EXPORTS -DSQLite_EXPORTS)
+endif (NOT POCO_STATIC)
+
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} 
 	PROPERTIES

@@ -37,6 +37,7 @@ src/WinService.cpp
 
 if(CMAKE_SYSTEM MATCHES "Windows")
  set(SRCS ${BASE_SRCS} ${WIN_SRCS})
+ add_definitions(-DUtil_EXPORTS)
 else (CMAKE_SYSTEM MATCHES "Windows")
  set(SRCS ${BASE_SRCS})
 endif(CMAKE_SYSTEM MATCHES "Windows")
