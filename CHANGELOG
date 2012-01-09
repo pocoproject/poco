@@ -65,6 +65,7 @@ Release 1.4.3 (2012-01-xx)
   Poco::Net::HTTPSClientSession::connect())
 - added Poco::Process::kill(const Poco::ProcessHandle&) which is preferable to
   kill(pid) on Windows, as process IDs on Windows may be reused.
+- fixed SF# 3471463: Compiler warnings with -Wformat
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1660,4 +1661,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#47 $
+$Id: //poco/1.4/dist/CHANGELOG#48 $

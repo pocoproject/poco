@@ -1,7 +1,7 @@
 //
 // DNSTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/DNSTest.cpp#3 $
+// $Id: //poco/1.4/Net/testsuite/src/DNSTest.cpp#4 $
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -62,7 +62,7 @@ void DNSTest::testHostByName()
 	HostEntry he1 = DNS::hostByName("aliastest.appinf.com");
 	// different systems report different canonical names, unfortunately.
 	assert (he1.name() == "dnstest.appinf.com" || he1.name() == "aliastest.appinf.com");
-#if !defined(_WIN32) && !defined(POCO_HAVE_IPv6)
+#if !defined(POCO_HAVE_ADDRINFO)
 	// getaddrinfo() does not report any aliases
 	assert (!he1.aliases().empty());
 	assert (he1.aliases()[0] == "aliastest.appinf.com");
