@@ -1,7 +1,7 @@
 //
 // HTTPDigestCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPDigestCredentials.cpp#3 $
+// $Id: //poco/1.4/Net/src/HTTPDigestCredentials.cpp#4 $
 //
 // Library: Net
 // Package: HTTP
@@ -190,7 +190,6 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 
 	_requestAuthParams.clear();
 	_requestAuthParams.set(USERNAME_PARAM, _username);
-	_requestAuthParams.set(URI_PARAM, request.getURI());
 	_requestAuthParams.set(NONCE_PARAM, nonce);
 	_requestAuthParams.setRealm(realm);
 	if (responseAuthParams.has(OPAQUE_PARAM)) 
@@ -217,8 +216,8 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 				break;
 			}
 		}
-		if (!qopSupported)
-			NotImplementedException("Unsupported QoP requested", qop);
+		if (!qopSupported) 
+			throw NotImplementedException("Unsupported QoP requested", qop);
 	} 
 }
 
@@ -229,6 +228,8 @@ void HTTPDigestCredentials::updateAuthParams(const HTTPRequest& request)
 	const std::string& qop = _requestAuthParams.get(QOP_PARAM, DEFAULT_QOP);
 	const std::string& realm = _requestAuthParams.getRealm();
 	const std::string& nonce = _requestAuthParams.get(NONCE_PARAM);
+
+	_requestAuthParams.set(URI_PARAM, request.getURI());
 
 	if (qop.empty())
 	{
