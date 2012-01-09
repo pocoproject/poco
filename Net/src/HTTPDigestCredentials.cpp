@@ -1,7 +1,7 @@
 //
 // HTTPDigestCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPDigestCredentials.cpp#2 $
+// $Id: //poco/1.4/Net/src/HTTPDigestCredentials.cpp#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -200,12 +200,7 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 
 	if (qop.empty())
 	{
-		MD5Engine engine;
-
-		const std::string ha1 = digest(engine, _username, realm, _password);
-		const std::string ha2 = digest(engine, request.getMethod(), request.getURI());
-
-		_requestAuthParams.set(RESPONSE_PARAM, digest(engine, ha1, nonce, ha2));
+		updateAuthParams(request);
 	} 
 	else
 	{
@@ -230,13 +225,20 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 
 void HTTPDigestCredentials::updateAuthParams(const HTTPRequest& request)
 {
+	MD5Engine engine;
 	const std::string& qop = _requestAuthParams.get(QOP_PARAM, DEFAULT_QOP);
-	if (icompare(qop, AUTH_PARAM) == 0) 
-	{
-		MD5Engine engine;
+	const std::string& realm = _requestAuthParams.getRealm();
+	const std::string& nonce = _requestAuthParams.get(NONCE_PARAM);
 
-		const std::string& nonce = _requestAuthParams.get(NONCE_PARAM);
-		const std::string& realm = _requestAuthParams.getRealm();
+	if (qop.empty())
+	{
+		const std::string ha1 = digest(engine, _username, realm, _password);
+		const std::string ha2 = digest(engine, request.getMethod(), request.getURI());
+
+		_requestAuthParams.set(RESPONSE_PARAM, digest(engine, ha1, nonce, ha2));
+	}
+	else if (icompare(qop, AUTH_PARAM) == 0) 
+	{
 		const std::string& cnonce = _requestAuthParams.get(CNONCE_PARAM);
 
 		const std::string ha1 = digest(engine, _username, realm, _password);

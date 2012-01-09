@@ -1,7 +1,7 @@
 //
 // HTTPCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPCredentials.cpp#1 $
+// $Id: //poco/1.4/Net/src/HTTPCredentials.cpp#2 $
 //
 // Library: Net
 // Package: HTTP
@@ -42,6 +42,7 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/String.h"
+#include "Poco/Ascii.h"
 #include "Poco/URI.h"
 
 
@@ -68,6 +69,30 @@ HTTPCredentials::~HTTPCredentials()
 }
 
 
+void HTTPCredentials::fromUserInfo(const std::string& userInfo)
+{
+	std::string username;
+	std::string password;
+
+	extractCredentials(userInfo, username, password);
+	setUsername(username);
+	setPassword(password);
+	// TODO: Reset digest state?
+}
+
+
+void HTTPCredentials::fromURI(const URI& uri)
+{
+	std::string username;
+	std::string password;
+
+	extractCredentials(uri, username, password);
+	setUsername(username);
+	setPassword(password);
+	// TODO: Reset digest state?
+}
+
+
 void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& response)
 {
 	for (HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
@@ -88,9 +113,9 @@ void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& res
 
 void HTTPCredentials::updateAuthInfo(HTTPRequest& request)
 {
-	if (request.has("Authorization")) 
+	if (request.has(HTTPRequest::AUTHORIZATION)) 
 	{
-		const std::string& authorization = request.get("Authorization");
+		const std::string& authorization = request.get(HTTPRequest::AUTHORIZATION);
 
 		if (isBasicCredentials(authorization)) 
 		{
@@ -106,13 +131,25 @@ void HTTPCredentials::updateAuthInfo(HTTPRequest& request)
 
 bool HTTPCredentials::isBasicCredentials(const std::string& header)
 {
-	return icompare(header, 0, 6, "Basic ") == 0;
+	return icompare(header, 0, 5, "Basic") == 0 && (header.size() > 5 ? Poco::Ascii::isSpace(header[5]) : true);
 }
 
 
 bool HTTPCredentials::isDigestCredentials(const std::string& header)
 {
-	return icompare(header, 0, 7, "Digest ") == 0;
+	return icompare(header, 0, 6, "Digest") == 0 && (header.size() > 6 ? Poco::Ascii::isSpace(header[6]) : true);
+}
+
+
+bool HTTPCredentials::hasBasicCredentials(const HTTPRequest& request)
+{
+	return request.has(HTTPRequest::AUTHORIZATION) && isBasicCredentials(request.get(HTTPRequest::AUTHORIZATION));
+}
+
+
+bool HTTPCredentials::hasDigestCredentials(const HTTPRequest& request)
+{
+	return request.has(HTTPRequest::AUTHORIZATION) && isDigestCredentials(request.get(HTTPRequest::AUTHORIZATION));
 }
 
 

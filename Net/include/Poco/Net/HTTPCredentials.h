@@ -1,7 +1,7 @@
 //
 // HTTPCredentials.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCredentials.h#2 $
+// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCredentials.h#3 $
 //
 // Library: Net
 // Package: HTTP
@@ -102,6 +102,16 @@ public:
 	~HTTPCredentials();
 		/// Destroys the HTTPCredentials.
 
+	void fromUserInfo(const std::string& userInfo);
+		/// Parses username:password string and sets username and password of
+		/// the credentials object.
+		/// Throws SyntaxException on invalid user information.
+
+	void fromURI(const URI& uri);
+		/// Extracts username and password from the given URI and sets username
+		/// and password of the credentials object.
+		/// Does nothing if URI has no user info part.
+
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
@@ -131,6 +141,12 @@ public:
 
 	static bool isDigestCredentials(const std::string& header);
 		/// Returns true if authentication header is for Digest authentication.
+
+	static bool hasBasicCredentials(const HTTPRequest& request);
+		/// Returns true if Authorization with Basic credentials header is present in the request.
+
+	static bool hasDigestCredentials(const HTTPRequest& request);
+		/// Returns true if Authorization with Digest credentials header is present in the request.
 
 	static void extractCredentials(const std::string& userInfo, std::string& username, std::string& password);
 		/// Extracts username and password from user:password information string.
