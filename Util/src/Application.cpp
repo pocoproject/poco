@@ -1,7 +1,7 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.4/Util/src/Application.cpp#5 $
+// $Id: //poco/1.4/Util/src/Application.cpp#6 $
 //
 // Library: Util
 // Package: Application
@@ -299,11 +299,13 @@ void Application::stopOptionsProcessing()
 
 int Application::run()
 {
-	int rc = EXIT_SOFTWARE;
-	initialize(*this);
+	int rc = EXIT_CONFIG;
 	try
 	{
+		initialize(*this);
+		rc = EXIT_SOFTWARE;
 		rc = main(_args);
+		uninitialize();
 	}
 	catch (Poco::Exception& exc)
 	{
@@ -317,7 +319,6 @@ int Application::run()
 	{
 		logger().fatal("system exception");
 	}
-	uninitialize();
 	return rc;
 }
 

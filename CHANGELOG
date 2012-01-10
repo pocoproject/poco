@@ -14,14 +14,14 @@ Release 1.4.3 (2012-01-xx)
   "--option=value" format.
 - Poco::Util::HelpFormatter: improved option help formatting if  indentation has 
   been set explicitely.
-- added Mail sample to NetSSL_OpenSSL, showing use of SecureSMTPClientSession.
+- added Mail sample to NetSSL_OpenSSL, showing use of Poco::Net::SecureSMTPClientSession.
 - added additional read() overloads to Poco::Net::HTMLForm.
 - fixed SF# 3440769: Poco::Net::HTTPResponse doesn't like Amazon EC2 cookies.
 - added support for requiring TLSv1 to Poco::Net::Context.
 - added an additional constructor to Poco::Net::HTTPBasicCredentials, allowing
   the object to be created from a string containing a base64-encoded, colon-separated
   username and password.
-- Poco::Zip::ZipStream: fixed a crash if CM_STORE was used.
+- Poco::Zip::ZipStreamBuf: fixed a crash if CM_STORE was used.
 - Added setContentLength64() and getContentLength64() to Poco::Net::HTTPMessage.
 - added Poco::Environment::osDisplayName().
 - fixed SF# 3463096: WinService leaves dangling handles (open() now does not reopen the 
@@ -66,6 +66,9 @@ Release 1.4.3 (2012-01-xx)
 - added Poco::Process::kill(const Poco::ProcessHandle&) which is preferable to
   kill(pid) on Windows, as process IDs on Windows may be reused.
 - fixed SF# 3471463: Compiler warnings with -Wformat
+- Poco::Util::Application::run() now catches and logs exceptions thrown in initialize()
+- Fixed a WinCE-specific bug in Poco::Util::ServerApplication where uninitialize() would
+  be called twice.
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1661,4 +1664,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#48 $
+$Id: //poco/1.4/dist/CHANGELOG#51 $

@@ -1,7 +1,7 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.4/Util/src/ServerApplication.cpp#5 $
+// $Id: //poco/1.4/Util/src/ServerApplication.cpp#6 $
 //
 // Library: Util
 // Package: Application
@@ -499,17 +499,7 @@ int ServerApplication::run(int argc, char** argv)
 		logger().log(exc);
 		return EXIT_CONFIG;
 	}
-	int rc = run();
-	try
-	{
-		uninitialize();
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		rc = EXIT_CONFIG;
-	}
-	return rc;
+	return run();
 }
 
 
@@ -524,17 +514,7 @@ int ServerApplication::run(const std::vector<std::string>& args)
 		logger().log(exc);
 		return EXIT_CONFIG;
 	}
-	int rc = run();
-	try
-	{
-		uninitialize();
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		rc = EXIT_CONFIG;
-	}
-	return rc;
+	return run();
 }
 
 
@@ -550,17 +530,7 @@ int ServerApplication::run(int argc, wchar_t** argv)
 		logger().log(exc);
 		return EXIT_CONFIG;
 	}
-	int rc = run();
-	try
-	{
-		uninitialize();
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		rc = EXIT_CONFIG;
-	}
-	return rc;
+	return run();
 }
 #endif
 

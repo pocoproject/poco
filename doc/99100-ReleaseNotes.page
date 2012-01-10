@@ -1,10 +1,81 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.4.3
+
+!!Summary of Changes
+
+  - fixed a compilation error with Data/MySQL on QNX.
+  - fixed Util project files for WinCE (removed sources not compileable on CE)
+  - removed MD2 license text from Ackowledgements document
+  - fixed iPhone build config for Xcode 4.2 (compiler name changed to llvm-g++)
+  - Poco::Util::XMLConfiguration: delimiter char (default '.') is now configurable.
+    This allows for working with XML documents having element names with '.' in them.
+  - Poco::Util::OptionProcessor: Required option arguments can now be specified as 
+    separate command line arguments, as in "--option value" in addition to the 
+    "--option=value" format.
+  - Poco::Util::HelpFormatter: improved option help formatting if  indentation has 
+    been set explicitely.
+  - added Mail sample to NetSSL_OpenSSL, showing use of Poco::Net::SecureSMTPClientSession.
+  - added additional read() overloads to Poco::Net::HTMLForm.
+  - fixed SF# 3440769: Poco::Net::HTTPResponse doesn't like Amazon EC2 cookies.
+  - added support for requiring TLSv1 to Poco::Net::Context.
+  - added an additional constructor to Poco::Net::HTTPBasicCredentials, allowing
+    the object to be created from a string containing a base64-encoded, colon-separated
+    username and password.
+  - Poco::Zip::ZipStreamBuf: fixed a crash if CM_STORE was used.
+  - Added setContentLength64() and getContentLength64() to Poco::Net::HTTPMessage.
+  - added Poco::Environment::osDisplayName().
+  - fixed SF# 3463096: WinService leaves dangling handles (open() now does not reopen the 
+    service handle if it's already open)
+  - fixed SF# 3426537: WinRegistryConfiguration can't read virtualized keys
+  - added Poco::Buffer::resize()
+  - fixed SF# 3441822: thread safety issue in Poco::Net::HTTPClientSession:
+    always use getaddrinfo() instead of gethostbyname() on all platforms supporting it
+  - added version resource to POCO DLLs
+  - fixed SF# 3440599: Dir Path in Quotes in PATH cause PathTest::testFind to fail.
+  - fixed SF# 3406030: Poco::Glob::collect() problem
+  - added Poco::Util::AbstractConfiguration::enableEvents() 
+  - Poco::AtomicCounter now uses GCC builtins with GCC 4.1 or newer 
+    (contributed by Alexey Milovidov)
+  - made Poco::Logger::formatDump() public as it may be useful for others as well
+    (SF# 3453446)
+  - Poco::Net::DialogSocket now has a proper copy constructor (SF# 3414602)
+  - Poco::Net::MessageHeader and Poco::Net::HTMLForm now limit the maximum number of
+    fields parsed from a message to prevent certain kinds of denial-of-service
+    attacks. The field limit can be changed with the new method setFieldLimit().
+    The default limit is 100.
+  - Poco::NumberFormatter, Poco::NumberParser and Poco::format() now always use the
+    classic ("C") locale to format and parse floating-point numbers.
+  - added Poco::StreamCopier::copyStream64(), Poco::StreamCopier::copyStreamUnbuffered64()
+    and Poco::StreamCopier::copyToString64(). These functions use a 64-bit integer
+    to count the number of bytes copied.
+  - upgraded internal zlib to 1.2.5
+  - upgraded internal sqlite to 3.7.9
+  - XML: integrated bugfix for Expat bug# 2958794 (memory leak in poolGrow)
+  - Added support for HTTP Digest authentication (based on a contribution by
+    Anton V. Yabchinskiy (arn at bestmx dot ru)). For information on how
+    to use this, see the Poco::Net::HTTPCredentials, Poco::Net::HTTPDigestCredentials
+    and Poco::Net::HTTPAuthenticationParams classes.
+  - Poco::Net::HTTPStreamFactory and Poco::Net::HTTPSStreamFactory now support Basic
+    and Digest authentication. Username and password must be provided in the URI.
+  - added Poco::Net::WebSocket, supporting the WebSocket protocol as described in RFC 6455
+  - NetSSL_OpenSSL: added client-side support for Server Name Indication.
+    Poco::Net::SecureSocketImpl::connectSSL() now calls SSL_set_tlsext_host_name()
+    if its available (OpenSSL 9.8.6f and later).
+  - added Poco::Net::HTTPClientSession::proxyConnect() (factored out from
+    Poco::Net::HTTPSClientSession::connect())
+  - added Poco::Process::kill(const Poco::ProcessHandle&) which is preferable to
+    kill(pid) on Windows, as process IDs on Windows may be reused.
+  - fixed SF# 3471463: Compiler warnings with -Wformat
+  - Poco::Util::Application::run() now catches and logs exceptions thrown in initialize()
+  - Fixed a WinCE-specific bug in Poco::Util::ServerApplication where uninitialize() would
+    be called twice.
+
 
 !!!Release 1.4.2p1
 
-!! Summary of Changes
+!!Summary of Changes
 
   - On Linux, the RTLD_DEEPBIND option is no longer passed to dlopen(). 
     This change was introduced in 1.4.2 to solve a specific problem one customer 
@@ -18,7 +89,7 @@ AAAIntroduction
 
 !!!Release 1.4.2
 
-!! Summary of Changes
+!!Summary of Changes
 
   - added Poco::DateTimeFormat::ISO8601_FRAC_FORMAT
   - added new Poco::DateTimeFormatter and Poco::DateTimeParser format specifier:
@@ -128,7 +199,7 @@ AAAIntroduction
 
 !!!Release 1.4.1p1
 
-!! Summary of Changes
+!!Summary of Changes
 
   - Poco::Mutex is now a recursive mutex again on Linux
     (this was caused by an unfortunate feature test for
@@ -142,7 +213,7 @@ AAAIntroduction
 
 !!!Release 1.4.1
 
-!! Summary of Changes
+!!Summary of Changes
 
   - fixed SF# 3150223: Poco::BinaryReader cannot read std::vector correctly
   - fixed SF# 3146326: Poco::SharedMemory issue

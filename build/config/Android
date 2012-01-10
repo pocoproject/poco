@@ -1,5 +1,5 @@
 #
-# $Id: //poco/1.4/build/config/Android#2 $
+# $Id: //poco/1.4/build/config/Android#3 $
 #
 # Android
 #
@@ -58,26 +58,26 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = $(ARCHFLAGS)
+CFLAGS          = $(ARCHFLAGS) -fpic -ffunction-sections -funwind-tables -fstack-protector -fno-strict-aliasing -finline-limit=64
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = $(ARCHFLAGS)
+CXXFLAGS        = $(ARCHFLAGS) -fpic -ffunction-sections -funwind-tables -fstack-protector -fno-strict-aliasing -finline-limit=64 -frtti -fexceptions
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS      += 
 LINKFLAGS32     =
 LINKFLAGS64     =
-STATICOPT_CC    =
-STATICOPT_CXX   =
+STATICOPT_CC    = 
+STATICOPT_CXX   = 
 STATICOPT_LINK  = -static
-SHAREDOPT_CC    = -fPIC
-SHAREDOPT_CXX   = -fPIC
+SHAREDOPT_CC    = 
+SHAREDOPT_CXX   = 
 SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
-RELEASEOPT_CC   = -O3 -DNDEBUG
-RELEASEOPT_CXX  = -O2 -DNDEBUG
+RELEASEOPT_CC   = -O3 -DNDEBUG -fomit-frame-pointer
+RELEASEOPT_CXX  = -O2 -DNDEBUG -fomit-frame-pointer
 RELEASEOPT_LINK = -O2
 
 #
