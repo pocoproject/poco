@@ -69,6 +69,7 @@ Release 1.4.3 (2012-01-xx)
 - Poco::Util::Application::run() now catches and logs exceptions thrown in initialize()
 - Fixed a WinCE-specific bug in Poco::Util::ServerApplication where uninitialize() would
   be called twice.
+- fixed SF# 3471957: WinRegistryKey::deleteKey() unable to delete alt views
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1664,4 +1665,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#51 $
+$Id: //poco/1.4/dist/CHANGELOG#52 $

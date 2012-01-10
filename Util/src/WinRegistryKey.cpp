@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#3 $
+// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#4 $
 //
 // Library: Util
 // Package: Windows
@@ -272,10 +272,10 @@ void WinRegistryKey::deleteKey()
 #if defined(POCO_WIN32_UTF8)
 	std::wstring usubKey;
 	Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
-	if (RegDeleteKeyW(_hRootKey, usubKey.c_str()) != ERROR_SUCCESS)
+	if (RegDeleteKeyExW(_hRootKey, usubKey.c_str(), _extraSam, 0) != ERROR_SUCCESS)
 		throw NotFoundException(key());
 #else
-	if (RegDeleteKey(_hRootKey, _subKey.c_str()) != ERROR_SUCCESS)
+	if (RegDeleteKeyEx(_hRootKey, _subKey.c_str(), _extraSam, 0) != ERROR_SUCCESS)
 		throw NotFoundException(key());
 #endif
 }
