@@ -75,6 +75,9 @@ AAAIntroduction
   - Added additional constructor to Poco::ScopedLock and Poco::ScopedLockWithUnlock 
     accepting a timeout as second argument.
   - Added Poco::Logger::parseLevel()
+  - Poco::format(): an argument that does not match the format
+    specifier no longer results in a BadCastException. The string [ERRFMT] is 
+	written to the result string instead.
 
 
 !!!Release 1.4.2p1

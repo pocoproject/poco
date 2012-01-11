@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Format.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/Format.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -172,68 +172,75 @@ namespace
 #if !defined(POCO_NO_LOCALE)
 		str.imbue(std::locale::classic());
 #endif
-		parseFlags(str, itFmt, endFmt);
-		parseWidth(str, itFmt, endFmt);
-		parsePrec(str, itFmt, endFmt);
-		char mod = parseMod(itFmt, endFmt);
-		if (itFmt != endFmt)
+		try
 		{
-			char type = *itFmt++;
-			prepareFormat(str, type);
-			switch (type)
+			parseFlags(str, itFmt, endFmt);
+			parseWidth(str, itFmt, endFmt);
+			parsePrec(str, itFmt, endFmt);
+			char mod = parseMod(itFmt, endFmt);
+			if (itFmt != endFmt)
 			{
-			case 'b':
-				str << AnyCast<bool>(*itVal++);
-				break;
-			case 'c':
-				str << AnyCast<char>(*itVal++);
-				break;
-			case 'd':
-			case 'i':
-				switch (mod)
+				char type = *itFmt++;
+				prepareFormat(str, type);
+				switch (type)
 				{
-				case 'l': str << AnyCast<long>(*itVal++); break;
-				case 'L': str << AnyCast<Int64>(*itVal++); break;
-				case 'h': str << AnyCast<short>(*itVal++); break;
-				case '?': writeAnyInt(str, *itVal++); break;
-				default:  str << AnyCast<int>(*itVal++); break;
+				case 'b':
+					str << AnyCast<bool>(*itVal++);
+					break;
+				case 'c':
+					str << AnyCast<char>(*itVal++);
+					break;
+				case 'd':
+				case 'i':
+					switch (mod)
+					{
+					case 'l': str << AnyCast<long>(*itVal++); break;
+					case 'L': str << AnyCast<Int64>(*itVal++); break;
+					case 'h': str << AnyCast<short>(*itVal++); break;
+					case '?': writeAnyInt(str, *itVal++); break;
+					default:  str << AnyCast<int>(*itVal++); break;
+					}
+					break;
+				case 'o':
+				case 'u':
+				case 'x':
+				case 'X':
+					switch (mod)
+					{
+					case 'l': str << AnyCast<unsigned long>(*itVal++); break;
+					case 'L': str << AnyCast<UInt64>(*itVal++); break;
+					case 'h': str << AnyCast<unsigned short>(*itVal++); break;
+					case '?': writeAnyInt(str, *itVal++); break;
+					default:  str << AnyCast<unsigned>(*itVal++); break;
+					}
+					break;
+				case 'e':
+				case 'E':
+				case 'f':
+					switch (mod)
+					{
+					case 'l': str << AnyCast<long double>(*itVal++); break;
+					case 'L': str << AnyCast<long double>(*itVal++); break;
+					case 'h': str << AnyCast<float>(*itVal++); break;
+					default:  str << AnyCast<double>(*itVal++); break;
+					}
+					break;
+				case 's':
+					str << RefAnyCast<std::string>(*itVal++);
+					break;
+				case 'z':
+					str << AnyCast<std::size_t>(*itVal++); 
+					break;
+				case 'I':
+				case 'D':
+				default:
+					str << type;
 				}
-				break;
-			case 'o':
-			case 'u':
-			case 'x':
-			case 'X':
-				switch (mod)
-				{
-				case 'l': str << AnyCast<unsigned long>(*itVal++); break;
-				case 'L': str << AnyCast<UInt64>(*itVal++); break;
-				case 'h': str << AnyCast<unsigned short>(*itVal++); break;
-				case '?': writeAnyInt(str, *itVal++); break;
-				default:  str << AnyCast<unsigned>(*itVal++); break;
-				}
-				break;
-			case 'e':
-			case 'E':
-			case 'f':
-				switch (mod)
-				{
-				case 'l': str << AnyCast<long double>(*itVal++); break;
-				case 'L': str << AnyCast<long double>(*itVal++); break;
-				case 'h': str << AnyCast<float>(*itVal++); break;
-				default:  str << AnyCast<double>(*itVal++); break;
-				}
-				break;
-			case 's':
-				str << RefAnyCast<std::string>(*itVal++);
-				break;
-			case 'z':
-				str << AnyCast<std::size_t>(*itVal++); 
-				break;
-			case 'I':
-			case 'D':
-			default:
-				str << type;
 			}
+		}
+		catch (Poco::BadCastException&)
+		{
+			str << "[ERRFMT]";
 		}
 		result.append(str.str());
 	}
