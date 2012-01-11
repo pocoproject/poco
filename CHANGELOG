@@ -72,6 +72,7 @@ Release 1.4.3 (2012-01-xx)
 - fixed SF# 3471957: WinRegistryKey::deleteKey() unable to delete alt views
 - Added additional constructor to Poco::ScopedLock and Poco::ScopedLockWithUnlock 
   accepting a timeout as second argument. 
+- Added Poco::Logger::parseLevel()
 
 
 Release 1.4.2p1 (2011-09-24)
@@ -1667,4 +1668,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#53 $
+$Id: //poco/1.4/dist/CHANGELOG#54 $
