@@ -1,7 +1,7 @@
 //
 // ScopedLock.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ScopedLock.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/ScopedLock.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -60,7 +60,7 @@ public:
 		_mutex.lock();
 	}
 	
-	ScopedLock(M& mutex, long milliseconds)
+	ScopedLock(M& mutex, long milliseconds): _mutex(mutex)
 	{
 		_mutex.lock(milliseconds);
 	}
@@ -95,7 +95,7 @@ public:
 		_pMutex->lock();
 	}
 	
-	ScopedLockWithUnlock(M& mutex, long milliseconds)
+	ScopedLockWithUnlock(M& mutex, long milliseconds): _pMutex(&mutex)
 	{
 		_pMutex->lock(milliseconds);
 	}
