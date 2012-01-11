@@ -72,6 +72,8 @@ AAAIntroduction
   - Fixed a WinCE-specific bug in Poco::Util::ServerApplication where uninitialize() would
     be called twice.
   - fixed SF# 3471957: WinRegistryKey::deleteKey() unable to delete alt views
+  - Added additional constructor to Poco::ScopedLock and Poco::ScopedLockWithUnlock 
+    accepting a timeout as second argument.
 
 
 !!!Release 1.4.2p1
