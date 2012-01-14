@@ -1,7 +1,7 @@
 //
 // NumberFormatter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NumberFormatter.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/NumberFormatter.cpp#4 $
 //
 // Library: Foundation
 // Package: Core
@@ -345,7 +345,7 @@ void NumberFormatter::append(std::string& str, float value)
 	ostr.imbue(std::locale::classic());
 #endif
 	ostr << std::setprecision(8) << value;
-	str.append(buffer, ostr.charsWritten());
+	str.append(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
 }
 
 
@@ -357,7 +357,7 @@ void NumberFormatter::append(std::string& str, double value)
 	ostr.imbue(std::locale::classic());
 #endif
 	ostr << std::setprecision(16) << value;
-	str.append(buffer, ostr.charsWritten());
+	str.append(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
 }
 
 
@@ -371,7 +371,7 @@ void NumberFormatter::append(std::string& str, double value, int precision)
 	ostr.imbue(std::locale::classic());
 #endif
 	ostr << std::fixed << std::showpoint << std::setprecision(precision) << value;
-	str.append(buffer, ostr.charsWritten());
+	str.append(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
 }
 
 
@@ -385,7 +385,7 @@ void NumberFormatter::append(std::string& str, double value, int width, int prec
 	ostr.imbue(std::locale::classic());
 #endif
 	ostr << std::fixed << std::showpoint << std::setw(width) << std::setprecision(precision) << value;
-	str.append(buffer, ostr.charsWritten());
+	str.append(buffer, static_cast<std::string::size_type>(ostr.charsWritten()));
 }
 
 
