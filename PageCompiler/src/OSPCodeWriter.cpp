@@ -1,7 +1,7 @@
 //
 // OSPCodeWriter.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/OSPCodeWriter.cpp#1 $
+// $Id: //poco/1.4/PageCompiler/src/OSPCodeWriter.cpp#2 $
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -128,7 +128,14 @@ void OSPCodeWriter::writeSession(std::ostream& ostr)
 		ostr << "\t\tif (pWebSessionManagerRef)\n";
 		ostr << "\t\t{\n";
 		ostr << "\t\t\tPoco::OSP::Web::WebSessionManager::Ptr pWebSessionManager = pWebSessionManagerRef->castedInstance<Poco::OSP::Web::WebSessionManager>();\n";
-		ostr << "\t\t\tsession = pWebSessionManager->get(" << sessionCode << ", request, " << sessionTimeoutCode << ", context());\n";
+		if (page().get("page.createSession", "true") != "false")
+		{
+			ostr << "\t\t\tsession = pWebSessionManager->get(" << sessionCode << ", request, " << sessionTimeoutCode << ", context());\n";
+		}
+		else
+		{
+			ostr << "\t\t\tsession = pWebSessionManager->find(" << sessionCode << ", request);\n";
+		}
 		ostr << "\t\t}\n";
 		ostr << "\t}\n";
 	}

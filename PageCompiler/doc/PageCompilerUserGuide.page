@@ -264,6 +264,15 @@ Specifies the session timeout in minutes.
 If the argument is a string, it is considered to be a bundle property name
 and the timeout value is read from the respective bundle property.
 
+!createSession (OSP only)
+
+For use with the POCO Open Service Platform only.
+
+If set to <[true]>, which is the default if the attribute is not specified, 
+a new session will be created if the request does not contain a (valid) session cookie.
+If set to <[false]> and there is no existing session that matches the session
+cookie. the <[session]> variable will be null. 
+
 !buffered
 
 Enables or disables response buffering. Response buffering is disabled by default.
@@ -313,7 +322,8 @@ setting the <[form]> page attribute to <[false]>.
 An instance of Poco::OSP::Web::WebSession::Ptr for accessing the
 Poco::OSP::Web::WebSession object for the current session.
 Only available with the POCO Open Service Platform, and if the
-<[session]> page attribute has been specified.
+<[session]> page attribute has been specified. May be null if
+the <[createSession]> attribute is false and no session exists.
 
 
 !!!Invoking the Page Compiler
