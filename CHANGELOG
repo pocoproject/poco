@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.4.3 (2012-01-xx)
+Release 1.4.3 (2012-01-16)
 ==========================
 
 - fixed a compilation error with Data/MySQL on QNX.
