@@ -1,7 +1,7 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#1 $
+// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#2 $
 //
 // Library: Net
 // Package: WebSocket
@@ -110,7 +110,7 @@ int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	{
 		std::memcpy(frame.begin() + ostr.charsWritten(), buffer, length);
 	}
-	_pStreamSocketImpl->sendBytes(frame.begin(), length + ostr.charsWritten());
+	_pStreamSocketImpl->sendBytes(frame.begin(), length + static_cast<int>(ostr.charsWritten()));
 	return length;
 }
 
