@@ -1,7 +1,7 @@
 //
 // FormatTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FormatTest.cpp#1 $
+// $Id: //poco/1.4/Foundation/testsuite/src/FormatTest.cpp#2 $
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
@@ -64,14 +64,8 @@ void FormatTest::testChar()
 	s = format("%-2c", c);
 	assert (s == "a ");
 	
-	try
-	{
-		s = format("%c", std::string("foo"));
-		fail("bad argument - must throw");
-	}
-	catch (BadCastException&)
-	{
-	}
+	s = format("%c", std::string("foo"));
+	assert (s == "[ERRFMT]");
 }
 
 
@@ -188,14 +182,8 @@ void FormatTest::testInt()
 	s = format("%#x", x);
 	assert (s == "0x42");
 	
-	try
-	{
-		s = format("%d", l);
-		fail("bad argument - must throw");
-	}
-	catch (BadCastException&)
-	{
-	}
+	s = format("%d", l);
+	assert (s == "[ERRFMT]");
 }
 
 
