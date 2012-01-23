@@ -1,5 +1,11 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.4.3p1 (2012-01-23)
+============================
+
+- fixed SF# 3476926: RegDeleteKeyEx not available on Windows XP 32-bit
+
+
 Release 1.4.3 (2012-01-16)
 ==========================
 
@@ -1672,4 +1678,4 @@ building the libraries.
 
 
 --
-$Id: //poco/1.4/dist/CHANGELOG#56 $
+$Id: //poco/1.4/dist/CHANGELOG#58 $

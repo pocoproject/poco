@@ -1,7 +1,7 @@
 //
 // WinRegistryKey.cpp
 //
-// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#4 $
+// $Id: //poco/1.4/Util/src/WinRegistryKey.cpp#6 $
 //
 // Library: Util
 // Package: Windows
@@ -51,6 +51,32 @@ using Poco::InvalidArgumentException;
 
 namespace Poco {
 namespace Util {
+
+
+namespace
+{
+	class AutoHandle
+	{
+	public:
+		AutoHandle(HMODULE h):
+			_h(h)
+		{
+		}
+		
+		~AutoHandle()
+		{
+			FreeLibrary(_h);
+		}
+		
+		HMODULE handle()
+		{
+			return _h;
+		}
+		
+	private:
+		HMODULE _h;
+	};
+}
 
 
 WinRegistryKey::WinRegistryKey(const std::string& key, bool readOnly, REGSAM extraSam):
@@ -269,13 +295,49 @@ void WinRegistryKey::deleteKey()
 		WinRegistryKey subRegKey(_hRootKey, subKey);
 		subRegKey.deleteKey();
 	}
+
+	// NOTE: RegDeleteKeyEx is only available on Windows XP 64-bit SP3, Windows Vista or later.
+	// We cannot call it directly as this would prevent the code running on Windows XP 32-bit.
+	// Therefore, if we need to call RegDeleteKeyEx (_extraSam != 0) we need to check for
+	// its existence in ADVAPI32.DLL and call it indirectly.
 #if defined(POCO_WIN32_UTF8)
 	std::wstring usubKey;
 	Poco::UnicodeConverter::toUTF16(_subKey, usubKey);
-	if (RegDeleteKeyExW(_hRootKey, usubKey.c_str(), _extraSam, 0) != ERROR_SUCCESS)
+	
+	typedef LONG (WINAPI *RegDeleteKeyExWFunc)(HKEY hKey, const wchar_t* lpSubKey, REGSAM samDesired, DWORD Reserved);
+	if (_extraSam != 0)
+	{
+		AutoHandle advAPI32(LoadLibraryW(L"ADVAPI32.DLL"));
+		if (advAPI32.handle())
+		{
+			RegDeleteKeyExWFunc pRegDeleteKeyExW = reinterpret_cast<RegDeleteKeyExWFunc>(GetProcAddress(advAPI32.handle() , "RegDeleteKeyExW"));
+			if (pRegDeleteKeyExW)
+			{
+				if ((*pRegDeleteKeyExW)(_hRootKey, usubKey.c_str(), _extraSam, 0) != ERROR_SUCCESS)
+					throw NotFoundException(key());
+				return;
+			}
+		}
+	}
+	if (RegDeleteKeyW(_hRootKey, usubKey.c_str()) != ERROR_SUCCESS)
 		throw NotFoundException(key());
 #else
-	if (RegDeleteKeyEx(_hRootKey, _subKey.c_str(), _extraSam, 0) != ERROR_SUCCESS)
+	typedef LONG (WINAPI *RegDeleteKeyExAFunc)(HKEY hKey, const char* lpSubKey, REGSAM samDesired, DWORD Reserved);
+	if (_extraSam != 0)
+	{
+		AutoHandle advAPI32(LoadLibraryA("ADVAPI32.DLL"));
+		if (advAPI32.handle())
+		{
+			RegDeleteKeyExAFunc pRegDeleteKeyExA = reinterpret_cast<RegDeleteKeyExAFunc>(GetProcAddress(advAPI32.handle() , "RegDeleteKeyExA"));
+			if (pRegDeleteKeyExA)
+			{
+				if ((*pRegDeleteKeyExA)(_hRootKey, _subKey.c_str(), _extraSam, 0) != ERROR_SUCCESS)
+					throw NotFoundException(key());
+				return;
+			}
+		}
+	}
+	if (RegDeleteKey(_hRootKey, _subKey.c_str()) != ERROR_SUCCESS)
 		throw NotFoundException(key());
 #endif
 }

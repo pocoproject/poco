@@ -1,6 +1,13 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.4.3p1
+
+!!Summary of Changes
+
+  - fixed SF# 3476926: RegDeleteKeyEx not available on Windows XP 32-bit.
+
+
 !!!Release 1.4.3
 
 !!Summary of Changes
@@ -78,7 +85,6 @@ AAAIntroduction
   - Poco::format(): an argument that does not match the format
     specifier no longer results in a BadCastException. The string [ERRFMT] is 
     written to the result string instead.
-  - PageCompiler: added createSession page attribute.
 
 
 !!!Release 1.4.2p1
