@@ -14,6 +14,7 @@ if(CMAKE_SYSTEM MATCHES "Windows")
  set(SYSLIBS ${SYSLIBS} ws2_32) 
 else (CMAKE_SYSTEM MATCHES "Windows")
  set(SRCS ${BASE_SRCS} ${LIN_SRCS})
+  add_definitions(-DPOCO_HAVE_FD_POLL)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
 if (NOT POCO_STATIC)

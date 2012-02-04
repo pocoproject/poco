@@ -609,6 +609,11 @@ inline SocketAddress Socket::peerAddress() const
 }
 
 
+inline bool Socket::secure() const
+{
+	return _pImpl->secure();
+}
+
 inline bool Socket::supportsIPv4()
 {
         return true;
