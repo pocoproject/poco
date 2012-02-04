@@ -56,11 +56,12 @@ class Foundation_API ProcessHandleImpl: public RefCountedObject
 {
 public:
 	ProcessHandleImpl(HANDLE _hProcess, UInt32 pid);
-	~ProcessHandleImpl();
-	
-	UInt32 id() const;
-	int wait() const;
-	
+        ~ProcessHandleImpl();
+        
+        UInt32 id() const;
+        HANDLE process() const;
+        int wait() const;
+        
 private:
 	HANDLE _hProcess;
 	UInt32 _pid;
@@ -76,12 +77,13 @@ public:
 	typedef UInt32 PIDImpl;
 	typedef std::vector<std::string> ArgsImpl;
 	
-	static PIDImpl idImpl();
-	static void timesImpl(long& userTime, long& kernelTime);
-	static ProcessHandleImpl* launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe);		
-	static void killImpl(PIDImpl pid);
-	static void requestTerminationImpl(PIDImpl pid);
-	static std::string terminationEventName(PIDImpl pid);
+        static PIDImpl idImpl();
+        static void timesImpl(long& userTime, long& kernelTime);
+        static ProcessHandleImpl* launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe);             
+        static void killImpl(const ProcessHandleImpl& handle);
+        static void killImpl(PIDImpl pid);
+        static void requestTerminationImpl(PIDImpl pid);
+        static std::string terminationEventName(PIDImpl pid);
 };
 
 

@@ -360,8 +360,10 @@ typedef uLong FAR uLongf;
 #  define Z_HAVE_UNISTD_H
 #endif
 
+#ifndef _WIN32_WCE
 #ifdef STDC
 #  include <sys/types.h>    /* for off_t */
+#endif
 #endif
 
 /* a little trick to accommodate both "#define _LARGEFILE64_SOURCE" and

@@ -299,14 +299,16 @@ void Application::stopOptionsProcessing()
 
 int Application::run()
 {
-	int rc = EXIT_SOFTWARE;
-	initialize(*this);
-	try
-	{
-		rc = main(_args);
-	}
-	catch (Poco::Exception& exc)
-	{
+        int rc = EXIT_CONFIG;
+        try
+        {
+                initialize(*this);
+                rc = EXIT_SOFTWARE;
+                rc = main(_args);
+                uninitialize();
+        }
+        catch (Poco::Exception& exc)
+        {
 		logger().log(exc);
 	}
 	catch (std::exception& exc)
@@ -314,11 +316,10 @@ int Application::run()
 		logger().error(exc.what());
 	}
 	catch (...)
-	{
-		logger().fatal("system exception");
-	}
-	uninitialize();
-	return rc;
+        {
+                logger().fatal("system exception");
+        }
+        return rc;
 }
 
 
@@ -368,13 +369,13 @@ void Application::processOptions()
 	while (it != _args.end() && !_stopOptionsProcessing)
 	{
 		std::string name;
-                std::string value;
-                if (processor.process(*it, name, value))
-                {
-                        if (!name.empty()) // "--" option to end options processing or deferred argument
-                        {
-                                handleOption(name, value);
-                        }
+		std::string value;
+		if (processor.process(*it, name, value))
+		{
+			if (!name.empty()) // "--" option to end options processing or deferred argument
+			{
+				handleOption(name, value);
+			}
 			it = _args.erase(it);
 		}
 		else ++it;

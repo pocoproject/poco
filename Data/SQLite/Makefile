@@ -17,7 +17,7 @@ objects = Binder Extractor SessionImpl Connector \
 	SQLiteException SQLiteStatementImpl Utility \
 	sqlite3
 
-target         = PocoSQLite
+target         = PocoDataSQLite
 target_version = $(LIBVERSION)
 target_libs    = PocoData PocoFoundation
 

@@ -44,7 +44,7 @@ objects = Binder ConnectionHandle Connector EnvironmentHandle \
 	Extractor ODBCMetaColumn ODBCException ODBCStatementImpl \
 	Parameter Preparator SessionImpl TypeInfo Unicode Utility 
 
-target         = PocoODBC
+target         = PocoDataODBC
 target_version = $(LIBVERSION)
 target_libs    = PocoData PocoFoundation
 

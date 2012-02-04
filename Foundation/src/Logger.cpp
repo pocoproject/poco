@@ -39,6 +39,7 @@
 #include "Poco/LoggingRegistry.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
@@ -83,26 +84,7 @@ void Logger::setLevel(int level)
 
 void Logger::setLevel(const std::string& level)
 {
-        if (level == "none")
-                setLevel(0);
-        else if (level == "fatal")
-                setLevel(Message::PRIO_FATAL);
-        else if (level == "critical")
-                setLevel(Message::PRIO_CRITICAL);
-	else if (level == "error")
-		setLevel(Message::PRIO_ERROR);
-	else if (level == "warning")
-		setLevel(Message::PRIO_WARNING);
-	else if (level == "notice")
-		setLevel(Message::PRIO_NOTICE);
-	else if (level == "information")
-		setLevel(Message::PRIO_INFORMATION);
-	else if (level == "debug")
-		setLevel(Message::PRIO_DEBUG);
-	else if (level == "trace")
-		setLevel(Message::PRIO_TRACE);
-	else
-		throw InvalidArgumentException("Not a valid log level", level);
+        setLevel(parseLevel(level));
 }
 
 
@@ -446,6 +428,31 @@ Logger& Logger::parent(const std::string& name)
 			return parent(pname);
 	}
 	else return unsafeGet(ROOT);
+}
+
+
+int Logger::parseLevel(const std::string& level)
+{
+        if (icompare(level, "none") == 0)
+                return 0;
+        else if (icompare(level, "fatal") == 0)
+                return Message::PRIO_FATAL;
+        else if (icompare(level, "critical") == 0)
+                return Message::PRIO_CRITICAL;
+        else if (icompare(level, "error") == 0)
+                return Message::PRIO_ERROR;
+        else if (icompare(level, "warning") == 0)
+                return Message::PRIO_WARNING;
+        else if (icompare(level, "notice") == 0)
+                return Message::PRIO_NOTICE;
+        else if (icompare(level, "information") == 0)
+                return Message::PRIO_INFORMATION;
+        else if (icompare(level, "debug") == 0)
+                return Message::PRIO_DEBUG;
+        else if (icompare(level, "trace") == 0)
+                return Message::PRIO_TRACE;
+        else
+                throw InvalidArgumentException("Not a valid log level", level);
 }
 
 

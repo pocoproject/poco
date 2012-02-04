@@ -415,4 +415,30 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request)
 }
 
 
+StreamSocket HTTPClientSession::proxyConnect()
+{
+        HTTPClientSession proxySession(getProxyHost(), getProxyPort());
+        proxySession.setTimeout(getTimeout());
+        SocketAddress targetAddress(getHost(), getPort());
+        HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress.toString(), HTTPMessage::HTTP_1_1);
+        HTTPResponse proxyResponse;
+        proxyRequest.set("Proxy-Connection", "keep-alive");
+        proxyRequest.set("Host", getHost());
+        proxyAuthenticateImpl(proxyRequest);
+        proxySession.setKeepAlive(true);
+        proxySession.sendRequest(proxyRequest);
+        proxySession.receiveResponse(proxyResponse);
+        if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
+                throw HTTPException("Cannot establish proxy connection", proxyResponse.getReason());
+        return proxySession.detachSocket();
+}
+
+
+void HTTPClientSession::proxyTunnel()
+{
+        StreamSocket ss = proxyConnect();
+        attachSocket(ss);
+}
+
+
 } } // namespace Poco::Net

@@ -41,7 +41,7 @@
 #include <openssl/rand.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
-#if SSLEAY_VERSION_NUMBER >= 0x0907000L
+#if OPENSSL_VERSION_NUMBER >= 0x0907000L
 #include <openssl/conf.h>
 #endif
 
@@ -61,7 +61,7 @@ int OpenSSLInitializer::_rc(0);
 
 OpenSSLInitializer::OpenSSLInitializer()
 {
-        initialize();
+	initialize();
 }
 
 

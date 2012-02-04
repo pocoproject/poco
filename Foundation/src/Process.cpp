@@ -127,9 +127,15 @@ int Process::wait(const ProcessHandle& handle)
 }
 
 
+void Process::kill(const ProcessHandle& handle)
+{
+        killImpl(*handle._pImpl);
+}
+
+
 void Process::kill(PID pid)
 {
-	killImpl(pid);
+        killImpl(pid);
 }
 
 

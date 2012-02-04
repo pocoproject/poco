@@ -17,7 +17,7 @@ SET(PROJECT_VERSION ${COMPLETE_VERSION})
 
 if(NOT MSVC_IDE)
   if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING
+    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
       "Choose the type of build, options are: None Debug Release" FORCE)
   endif()
   message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")

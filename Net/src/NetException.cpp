@@ -67,6 +67,7 @@ POCO_IMPLEMENT_EXCEPTION(SMTPException, NetException, "SMTP Exception")
 POCO_IMPLEMENT_EXCEPTION(POP3Exception, NetException, "POP3 Exception")
 POCO_IMPLEMENT_EXCEPTION(ICMPException, NetException, "ICMP Exception")
 POCO_IMPLEMENT_EXCEPTION(HTMLFormException, NetException, "HTML Form Exception")
+POCO_IMPLEMENT_EXCEPTION(WebSocketException, NetException, "WebSocket Exception")
 
 
 } } // namespace Poco::Net

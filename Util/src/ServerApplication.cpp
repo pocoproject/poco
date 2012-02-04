@@ -388,12 +388,12 @@ void ServerApplication::registerService()
 	else
 		service.registerService(path, _displayName);
 	if (_startup == "auto")
-                service.setStartup(WinService::SVC_AUTO_START);
-        else if (_startup == "manual")
-                service.setStartup(WinService::SVC_MANUAL_START);
-        if (!_description.empty())
-                service.setDescription(_description);
-        logger().information("The application has been successfully registered as a service.");
+		service.setStartup(WinService::SVC_AUTO_START);
+	else if (_startup == "manual")
+		service.setStartup(WinService::SVC_MANUAL_START);
+	if (!_description.empty())
+		service.setDescription(_description);
+	logger().information("The application has been successfully registered as a service.");
 }
 
 
@@ -428,19 +428,19 @@ void ServerApplication::defineOptions(OptionSet& options)
 			.required(false)
 			.repeatable(false)
 			.argument("name")
-                        .callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDisplayName)));
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDisplayName)));
 
-        options.addOption(
-                Option("description", "", "Specify a description for the service (only with /registerService).")
-                        .required(false)
-                        .repeatable(false)
-                        .argument("text")
-                        .callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDescription)));
+	options.addOption(
+		Option("description", "", "Specify a description for the service (only with /registerService).")
+			.required(false)
+			.repeatable(false)
+			.argument("text")
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDescription)));
 
-        options.addOption(
-                Option("startup", "", "Specify the startup mode for the service (only with /registerService).")
-                        .required(false)
-                        .repeatable(false)
+	options.addOption(
+		Option("startup", "", "Specify the startup mode for the service (only with /registerService).")
+			.required(false)
+			.repeatable(false)
 			.argument("automatic|manual")
 			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleStartup)));
 }
@@ -466,13 +466,13 @@ void ServerApplication::handleDisplayName(const std::string& name, const std::st
 
 void ServerApplication::handleDescription(const std::string& name, const std::string& value)
 {
-        _description = value;
+	_description = value;
 }
 
 
 void ServerApplication::handleStartup(const std::string& name, const std::string& value)
 {
-        if (Poco::icompare(value, 4, std::string("auto")) == 0)
+	if (Poco::icompare(value, 4, std::string("auto")) == 0)
 		_startup = "auto";
 	else if (Poco::icompare(value, std::string("manual")) == 0)
 		_startup = "manual";
@@ -496,20 +496,10 @@ int ServerApplication::run(int argc, char** argv)
 	}
 	catch (Exception& exc)
 	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	int rc = run();
-	try
-	{
-		uninitialize();
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		rc = EXIT_CONFIG;
-	}
-	return rc;
+                logger().log(exc);
+                return EXIT_CONFIG;
+        }
+        return run();
 }
 
 
@@ -521,20 +511,10 @@ int ServerApplication::run(const std::vector<std::string>& args)
 	}
 	catch (Exception& exc)
 	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	int rc = run();
-	try
-	{
-		uninitialize();
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		rc = EXIT_CONFIG;
-	}
-	return rc;
+                logger().log(exc);
+                return EXIT_CONFIG;
+        }
+        return run();
 }
 
 
@@ -547,20 +527,10 @@ int ServerApplication::run(int argc, wchar_t** argv)
 	}
 	catch (Exception& exc)
 	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	int rc = run();
-	try
-	{
-		uninitialize();
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		rc = EXIT_CONFIG;
-	}
-	return rc;
+                logger().log(exc);
+                return EXIT_CONFIG;
+        }
+        return run();
 }
 #endif
 

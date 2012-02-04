@@ -269,12 +269,20 @@ protected:
 		/// proxy username and password have been set.
 
 	void proxyAuthenticateImpl(HTTPRequest& request);
-		/// Sets the proxy credentials (Proxy-Authorization header), if
-		/// proxy username and password have been set.
+                /// Sets the proxy credentials (Proxy-Authorization header), if
+                /// proxy username and password have been set.
+                
+        StreamSocket proxyConnect();
+                /// Sends a CONNECT request to the proxy server and returns
+                /// a StreamSocket for the resulting connection.
+                
+        void proxyTunnel();
+                /// Calls proxyConnect() and attaches the resulting StreamSocket
+                /// to the HTTPClientSession.
 
 private:
-	std::string     _host;
-	Poco::UInt16    _port;
+        std::string     _host;
+        Poco::UInt16    _port;
 	std::string     _proxyHost;
 	Poco::UInt16    _proxyPort;
 	std::string     _proxyUsername;
@@ -286,9 +294,11 @@ private:
 	bool            _expectResponseBody;
 	std::ostream*   _pRequestStream;
 	std::istream*   _pResponseStream;
-	
-	HTTPClientSession(const HTTPClientSession&);
-	HTTPClientSession& operator = (const HTTPClientSession&);
+        
+        HTTPClientSession(const HTTPClientSession&);
+        HTTPClientSession& operator = (const HTTPClientSession&);
+
+        friend class WebSocket;
 };
 
 

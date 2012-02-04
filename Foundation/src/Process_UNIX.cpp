@@ -169,9 +169,15 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 }
 
 
+void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
+{
+        killImpl(handle.id());
+}
+
+
 void ProcessImpl::killImpl(PIDImpl pid)
 {
-	if (kill(pid, SIGKILL) != 0)
+        if (kill(pid, SIGKILL) != 0)
 	{
 		switch (errno)
 		{

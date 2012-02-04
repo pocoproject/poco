@@ -67,9 +67,15 @@ UInt32 ProcessHandleImpl::id() const
 }
 
 
+HANDLE ProcessHandleImpl::process() const
+{
+        return _hProcess;
+}
+
+
 int ProcessHandleImpl::wait() const
 {
-	DWORD rc = WaitForSingleObject(_hProcess, INFINITE);
+        DWORD rc = WaitForSingleObject(_hProcess, INFINITE);
 	if (rc != WAIT_OBJECT_0)
 		throw SystemException("Wait failed for process", NumberFormatter::format(_pid));
 
@@ -180,9 +186,20 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 }
 
 
+void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
+{
+        if (TerminateProcess(handle.process(), 0) == 0)
+        {
+                CloseHandle(handle.process());
+                throw SystemException("cannot kill process");
+        }
+        CloseHandle(handle.process());
+}
+
+
 void ProcessImpl::killImpl(PIDImpl pid)
 {
-	HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+        HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
 	if (hProc)
 	{
 		if (TerminateProcess(hProc, 0) == 0)

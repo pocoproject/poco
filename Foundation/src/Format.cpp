@@ -38,7 +38,9 @@
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 #include <sstream>
+#if !defined(POCO_NO_LOCALE)
 #include <locale>
+#endif
 #include <cstddef>
 
 
@@ -167,72 +169,81 @@ namespace
         void formatOne(std::string& result, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
         {
                 std::ostringstream str;
+#if !defined(POCO_NO_LOCALE)
                 str.imbue(std::locale::classic());
-                parseFlags(str, itFmt, endFmt);
-                parseWidth(str, itFmt, endFmt);
-                parsePrec(str, itFmt, endFmt);
-		char mod = parseMod(itFmt, endFmt);
-		if (itFmt != endFmt)
-		{
-			char type = *itFmt++;
-			prepareFormat(str, type);
-			switch (type)
+#endif
+                try
+                {
+                        parseFlags(str, itFmt, endFmt);
+                        parseWidth(str, itFmt, endFmt);
+                        parsePrec(str, itFmt, endFmt);
+			char mod = parseMod(itFmt, endFmt);
+			if (itFmt != endFmt)
 			{
-			case 'b':
-				str << AnyCast<bool>(*itVal++);
-				break;
-			case 'c':
-				str << AnyCast<char>(*itVal++);
-				break;
-			case 'd':
-			case 'i':
-				switch (mod)
+				char type = *itFmt++;
+				prepareFormat(str, type);
+				switch (type)
 				{
-				case 'l': str << AnyCast<long>(*itVal++); break;
-				case 'L': str << AnyCast<Int64>(*itVal++); break;
-				case 'h': str << AnyCast<short>(*itVal++); break;
-				case '?': writeAnyInt(str, *itVal++); break;
-				default:  str << AnyCast<int>(*itVal++); break;
-				}
-				break;
-			case 'o':
-			case 'u':
-			case 'x':
-			case 'X':
-				switch (mod)
-				{
-				case 'l': str << AnyCast<unsigned long>(*itVal++); break;
-				case 'L': str << AnyCast<UInt64>(*itVal++); break;
-				case 'h': str << AnyCast<unsigned short>(*itVal++); break;
-				case '?': writeAnyInt(str, *itVal++); break;
-				default:  str << AnyCast<unsigned>(*itVal++); break;
-				}
-				break;
-			case 'e':
-			case 'E':
-			case 'f':
-				switch (mod)
-				{
-				case 'l': str << AnyCast<long double>(*itVal++); break;
-				case 'L': str << AnyCast<long double>(*itVal++); break;
-				case 'h': str << AnyCast<float>(*itVal++); break;
-				default:  str << AnyCast<double>(*itVal++); break;
-				}
-				break;
-			case 's':
-				str << RefAnyCast<std::string>(*itVal++);
-				break;
-			case 'z':
-				str << AnyCast<std::size_t>(*itVal++); 
-				break;
-			case 'I':
-			case 'D':
-			default:
-				str << type;
-			}
-		}
-		result.append(str.str());
-	}
+				case 'b':
+					str << AnyCast<bool>(*itVal++);
+					break;
+				case 'c':
+					str << AnyCast<char>(*itVal++);
+					break;
+				case 'd':
+				case 'i':
+					switch (mod)
+					{
+					case 'l': str << AnyCast<long>(*itVal++); break;
+					case 'L': str << AnyCast<Int64>(*itVal++); break;
+					case 'h': str << AnyCast<short>(*itVal++); break;
+					case '?': writeAnyInt(str, *itVal++); break;
+					default:  str << AnyCast<int>(*itVal++); break;
+					}
+					break;
+				case 'o':
+				case 'u':
+				case 'x':
+				case 'X':
+					switch (mod)
+					{
+					case 'l': str << AnyCast<unsigned long>(*itVal++); break;
+					case 'L': str << AnyCast<UInt64>(*itVal++); break;
+					case 'h': str << AnyCast<unsigned short>(*itVal++); break;
+					case '?': writeAnyInt(str, *itVal++); break;
+					default:  str << AnyCast<unsigned>(*itVal++); break;
+					}
+					break;
+				case 'e':
+				case 'E':
+				case 'f':
+					switch (mod)
+					{
+					case 'l': str << AnyCast<long double>(*itVal++); break;
+					case 'L': str << AnyCast<long double>(*itVal++); break;
+					case 'h': str << AnyCast<float>(*itVal++); break;
+					default:  str << AnyCast<double>(*itVal++); break;
+					}
+					break;
+				case 's':
+					str << RefAnyCast<std::string>(*itVal++);
+					break;
+				case 'z':
+					str << AnyCast<std::size_t>(*itVal++); 
+					break;
+				case 'I':
+				case 'D':
+				default:
+                                        str << type;
+                                }
+                        }
+                }
+                catch (Poco::BadCastException&)
+                {
+                        str << "[ERRFMT]";
+                }
+                result.append(str.str());
+        }
 }
 
 

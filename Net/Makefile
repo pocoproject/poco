@@ -20,7 +20,8 @@ objects = \
 	HTTPFixedLengthStream HTTPServerRequest HTTPServerRequestImpl MultipartWriter StreamSocketImpl \
 	HTTPHeaderStream HTTPServerResponse HTTPServerResponseImpl NameValueCollection TCPServer \
 	HTTPMessage HTTPServerSession NetException TCPServerConnection HTTPBufferAllocator \
-	HTTPRequest HTTPSession HTTPSessionInstantiator HTTPSessionFactory NetworkInterface TCPServerConnectionFactory \
+	HTTPCredentials HTTPDigestCredentials HTTPAuthenticationParams TCPServerConnectionFactory \
+	HTTPRequest HTTPSession HTTPSessionInstantiator HTTPSessionFactory NetworkInterface \
 	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher \
 	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
 	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
@@ -29,7 +30,8 @@ objects = \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
-	RemoteSyslogChannel RemoteSyslogListener SMTPChannel
+	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
+	WebSocket WebSocketImpl
 
 target         = PocoNet
 target_version = $(LIBVERSION)
