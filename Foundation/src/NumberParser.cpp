@@ -38,7 +38,7 @@
 #include "Poco/Exception.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/String.h"
-#ifdef POCO_LOCALE
+#if !defined(POCO_NO_LOCALE)
 #include <locale>
 #endif
 #include <cstdio>

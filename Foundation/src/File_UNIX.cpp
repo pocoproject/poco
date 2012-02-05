@@ -404,12 +404,12 @@ void FileImpl::removeImpl()
 
 bool FileImpl::createFileImpl()
 {
-	poco_assert (!_path.empty());
-	
-	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-	if (n != -1)
-	{
-		close(n);
+        poco_assert (!_path.empty());
+        
+        int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+        if (n != -1)
+        {
+                close(n);
 		return true;
 	}
 	if (n == -1 && errno == EEXIST)
@@ -424,11 +424,11 @@ bool FileImpl::createDirectoryImpl()
 {
 	poco_assert (!_path.empty());
 
-	if (existsImpl() && isDirectoryImpl())
-		return false;
-	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) 
-		handleLastErrorImpl(_path);
-	return true;
+        if (existsImpl() && isDirectoryImpl())
+                return false;
+        if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) 
+                handleLastErrorImpl(_path);
+        return true;
 }
 
 
