@@ -1,7 +1,7 @@
 //
 // UnufferedStreamBuf.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/UnbufferedStreamBuf.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/UnbufferedStreamBuf.h#1 $
 //
 // Library: Foundation
 // Package: Streams

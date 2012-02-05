@@ -1,7 +1,7 @@
 //
 // File_VMS.cpp
 //
-// $Id: //poco/Main/Foundation/src/File_VMS.cpp#18 $
+// $Id: //poco/1.4/Foundation/src/File_VMS.cpp#1 $
 //
 // Library: Foundation
 // Package: Filesystem

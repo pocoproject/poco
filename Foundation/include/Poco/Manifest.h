@@ -1,7 +1,7 @@
 //
 // Manifest.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Manifest.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Manifest.h#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary

@@ -1,7 +1,7 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URI.cpp#4 $
+// $Id: //poco/1.4/Foundation/src/URI.cpp#5 $
 //
 // Library: Foundation
 // Package: URI
@@ -226,16 +226,16 @@ std::string URI::toString() const
 		if (!_path.empty())
 		{
 			if (!auth.empty() && _path[0] != '/')
-                                uri += '/';
-                        encode(_path, RESERVED_PATH, uri);
-                }
-                else if (!_query.empty() || !_fragment.empty())
-                {
-                        uri += '/';
-                }
-        }
-        if (!_query.empty())
-        {
+				uri += '/';
+			encode(_path, RESERVED_PATH, uri);
+		}
+		else if (!_query.empty() || !_fragment.empty())
+		{
+			uri += '/';
+		}
+	}
+	if (!_query.empty())
+	{
 		uri += '?';
 		uri.append(_query);
 	}
@@ -290,19 +290,19 @@ std::string URI::getAuthority() const
 	std::string auth;
 	if (!_userInfo.empty())
 	{
-                auth.append(_userInfo);
-                auth += '@';
-        }
-        if (_host.find(':') != std::string::npos)
-        {
-                auth += '[';
-                auth += _host;
-                auth += ']';
-        }
-        else auth.append(_host);
-        if (_port && !isWellKnownPort())
-        {
-                auth += ':';
+		auth.append(_userInfo);
+		auth += '@';
+	}
+	if (_host.find(':') != std::string::npos)
+	{
+		auth += '[';
+		auth += _host;
+		auth += ']';
+	}
+	else auth.append(_host);
+	if (_port && !isWellKnownPort())
+	{
+		auth += ':';
 		NumberFormatter::append(auth, _port);
 	}
 	return auth;
@@ -370,13 +370,13 @@ std::string URI::getPathEtc() const
 {
 	std::string pathEtc;
 	encode(_path, RESERVED_PATH, pathEtc);
-        if (!_query.empty())
-        {
-                pathEtc += '?';
-                pathEtc += _query;
-        }
-        if (!_fragment.empty())
-        {
+	if (!_query.empty())
+	{
+		pathEtc += '?';
+		pathEtc += _query;
+	}
+	if (!_fragment.empty())
+	{
 		pathEtc += '#';
 		encode(_fragment, RESERVED_FRAGMENT, pathEtc);
 	}
@@ -388,12 +388,12 @@ std::string URI::getPathAndQuery() const
 {
 	std::string pathAndQuery;
 	encode(_path, RESERVED_PATH, pathAndQuery);
-        if (!_query.empty())
-        {
-                pathAndQuery += '?';
-                pathAndQuery += _query;
-        }
-        return pathAndQuery;
+	if (!_query.empty())
+	{
+		pathAndQuery += '?';
+		pathAndQuery += _query;
+	}
+	return pathAndQuery;
 }
 
 	
@@ -448,8 +448,8 @@ void URI::resolve(const URI& relativeURI)
 				_query = relativeURI._query;
 			}
 		}
-        }
-        _fragment = relativeURI._fragment;      
+	}
+	_fragment = relativeURI._fragment;      
 }
 
 
@@ -574,15 +574,15 @@ void URI::getPathSegments(const std::string& path, std::vector<std::string>& seg
 
 void URI::encode(const std::string& str, const std::string& reserved, std::string& encodedStr)
 {
-        for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
-        {
-                char c = *it;
-                if ((c >= 'a' && c <= 'z') || 
-                    (c >= 'A' && c <= 'Z') || 
-                    (c >= '0' && c <= '9') ||
-                    c == '-' || c == '_' || 
-                    c == '.' || c == '~')
-                {
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
+	{
+		char c = *it;
+		if ((c >= 'a' && c <= 'z') || 
+		    (c >= 'A' && c <= 'Z') || 
+		    (c >= '0' && c <= '9') ||
+		    c == '-' || c == '_' || 
+		    c == '.' || c == '~')
+		{
 			encodedStr += c;
 		}
 		else if (c <= 0x20 || c >= 0x7F || ILLEGAL.find(c) != std::string::npos || reserved.find(c) != std::string::npos)
@@ -648,19 +648,19 @@ unsigned short URI::getWellKnownPort() const
 	else if (_scheme == "nntp")
 		return 119;
 	else if (_scheme == "ldap")
-                return 389;
-        else if (_scheme == "https")
-                return 443;
-        else if (_scheme == "rtsp")
-                return 554;
-        else if (_scheme == "sip")
-                return 5060;
-        else if (_scheme == "sips")
-                return 5061;
-        else if (_scheme == "xmpp")
-                return 5222;
-        else
-                return 0;
+		return 389;
+	else if (_scheme == "https")
+		return 443;
+	else if (_scheme == "rtsp")
+		return 554;
+	else if (_scheme == "sip")
+		return 5060;
+	else if (_scheme == "sips")
+		return 5061;
+	else if (_scheme == "xmpp")
+		return 5222;
+	else
+		return 0;
 }
 
 
@@ -725,16 +725,16 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 {
 	if (it == end) return;
 	std::string host;
-        if (*it == '[')
-        {
-                // IPv6 address
-                ++it;
-                while (it != end && *it != ']') host += *it++;
-                if (it == end) throw SyntaxException("unterminated IPv6 address");
-                ++it;
-        }
-        else
-        {
+	if (*it == '[')
+	{
+		// IPv6 address
+		++it;
+		while (it != end && *it != ']') host += *it++;
+		if (it == end) throw SyntaxException("unterminated IPv6 address");
+		++it;
+	}
+	else
+	{
 		while (it != end && *it != ':') host += *it++;
 	}
 	if (it != end && *it == ':')
@@ -810,14 +810,14 @@ void URI::mergePath(const std::string& path)
 		bool endsWithSlash = *(_path.rbegin()) == '/';
 		if (!endsWithSlash && !segments.empty())
 			segments.pop_back();
-                addLeadingSlash = _path[0] == '/';
-        }
-        getPathSegments(path, segments);
-        addLeadingSlash = addLeadingSlash || (!path.empty() && path[0] == '/');
-        bool hasTrailingSlash = (!path.empty() && *(path.rbegin()) == '/');
-        bool addTrailingSlash = false;
-        for (std::vector<std::string>::const_iterator it = segments.begin(); it != segments.end(); ++it)
-        {
+		addLeadingSlash = _path[0] == '/';
+	}
+	getPathSegments(path, segments);
+	addLeadingSlash = addLeadingSlash || (!path.empty() && path[0] == '/');
+	bool hasTrailingSlash = (!path.empty() && *(path.rbegin()) == '/');
+	bool addTrailingSlash = false;
+	for (std::vector<std::string>::const_iterator it = segments.begin(); it != segments.end(); ++it)
+	{
 		if (*it == "..")
 		{
 			addTrailingSlash = true;

@@ -1,7 +1,7 @@
 //
 // Process_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Process_VX.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Process_VX.h#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -74,12 +74,12 @@ public:
 	typedef int PIDImpl;
 	typedef std::vector<std::string> ArgsImpl;
 	
-        static PIDImpl idImpl();
-        static void timesImpl(long& userTime, long& kernelTime);
-        static ProcessHandleImpl* launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe);             
-        static void killImpl(const ProcessHandleImpl& handle);
-        static void killImpl(PIDImpl pid);
-        static void requestTerminationImpl(PIDImpl pid);
+	static PIDImpl idImpl();
+	static void timesImpl(long& userTime, long& kernelTime);
+	static ProcessHandleImpl* launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe);		
+	static void killImpl(const ProcessHandleImpl& handle);
+	static void killImpl(PIDImpl pid);
+	static void requestTerminationImpl(PIDImpl pid);
 };
 
 

@@ -1,7 +1,7 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/Main/Foundation/src/Thread_POSIX.cpp#20 $
+// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#5 $
 //
 // Library: Foundation
 // Package: Threading
@@ -161,15 +161,15 @@ void ThreadImpl::setStackSizeImpl(int size)
  	{
 #if defined(__APPLE__)
 		// we must round up to a multiple of the memory page size
-                const int PAGE_SIZE = 4096;
-                size = ((size + PAGE_SIZE - 1)/PAGE_SIZE)*PAGE_SIZE;
+		const int PAGE_SIZE = 4096;
+		size = ((size + PAGE_SIZE - 1)/PAGE_SIZE)*PAGE_SIZE;
 #endif
 #if !defined(POCO_ANDROID)
-                if (size < PTHREAD_STACK_MIN)
-                        size = PTHREAD_STACK_MIN;
+ 		if (size < PTHREAD_STACK_MIN)
+ 			size = PTHREAD_STACK_MIN;
 #endif
-        }
-        _pData->stackSize = size;
+	}
+ 	_pData->stackSize = size;
 #endif
 }
 

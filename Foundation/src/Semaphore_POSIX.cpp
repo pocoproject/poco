@@ -1,7 +1,7 @@
 //
 // Semaphore_POSIX.cpp
 //
-// $Id: //poco/svn/Foundation/src/Semaphore_POSIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Semaphore_POSIX.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading

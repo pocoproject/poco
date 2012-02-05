@@ -1,7 +1,7 @@
 //
 // HexBinaryDecoder.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/HexBinaryDecoder.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/HexBinaryDecoder.h#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -52,25 +52,25 @@ class Foundation_API HexBinaryDecoderBuf: public UnbufferedStreamBuf
 	/// This streambuf decodes all hexBinary-encoded data read
 	/// from the istream connected to it.
 	/// In hexBinary encoding, each binary octet is encoded as a character tuple,  
-        /// consisting of two hexadecimal digits ([0-9a-fA-F]) representing the octet code.
-        /// See also: XML Schema Part 2: Datatypes (http://www.w3.org/TR/xmlschema-2/),
-        /// section 3.2.15.
-        ///
-        /// Note: For performance reasons, the characters 
-        /// are read directly from the given istream's 
-        /// underlying streambuf, so the state
-        /// of the istream will not reflect that of
-        /// its streambuf.
+	/// consisting of two hexadecimal digits ([0-9a-fA-F]) representing the octet code.
+	/// See also: XML Schema Part 2: Datatypes (http://www.w3.org/TR/xmlschema-2/),
+	/// section 3.2.15.
+	///
+	/// Note: For performance reasons, the characters 
+	/// are read directly from the given istream's 
+	/// underlying streambuf, so the state
+	/// of the istream will not reflect that of
+	/// its streambuf.
 {
 public:
-        HexBinaryDecoderBuf(std::istream& istr);
+	HexBinaryDecoderBuf(std::istream& istr);
 	~HexBinaryDecoderBuf();
 	
 private:
-        int readFromDevice();
-        int readOne();
+	int readFromDevice();
+	int readOne();
 
-        std::streambuf& _buf;
+	std::streambuf& _buf;
 };
 
 
@@ -94,18 +94,18 @@ class Foundation_API HexBinaryDecoder: public HexBinaryDecoderIOS, public std::i
 	/// This istream decodes all hexBinary-encoded data read
 	/// from the istream connected to it.
 	/// In hexBinary encoding, each binary octet is encoded as a character tuple,  
-        /// consisting of two hexadecimal digits ([0-9a-fA-F]) representing the octet code.
-        /// See also: XML Schema Part 2: Datatypes (http://www.w3.org/TR/xmlschema-2/),
-        /// section 3.2.15.
-        ///
-        /// Note: For performance reasons, the characters 
-        /// are read directly from the given istream's 
-        /// underlying streambuf, so the state
-        /// of the istream will not reflect that of
-        /// its streambuf.
+	/// consisting of two hexadecimal digits ([0-9a-fA-F]) representing the octet code.
+	/// See also: XML Schema Part 2: Datatypes (http://www.w3.org/TR/xmlschema-2/),
+	/// section 3.2.15.
+	///
+	/// Note: For performance reasons, the characters 
+	/// are read directly from the given istream's 
+	/// underlying streambuf, so the state
+	/// of the istream will not reflect that of
+	/// its streambuf.
 {
 public:
-        HexBinaryDecoder(std::istream& istr);
+	HexBinaryDecoder(std::istream& istr);
 	~HexBinaryDecoder();
 };
 

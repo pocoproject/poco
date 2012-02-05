@@ -1,7 +1,7 @@
 //
 // Path.cpp
 //
-// $Id: //poco/svn/Foundation/src/Path.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Path.cpp#5 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -641,21 +641,21 @@ void Path::listRoots(std::vector<std::string>& roots)
 
 bool Path::find(StringVec::const_iterator it, StringVec::const_iterator end, const std::string& name, Path& path)
 {
-        while (it != end)
-        {
+	while (it != end)
+	{
 #if defined(WIN32)
-                std::string cleanPath(*it);
-                if (cleanPath.size() > 1 && cleanPath[0] == '"' && cleanPath[cleanPath.size() - 1] == '"')
-                {
-                        cleanPath = cleanPath.substr(1, cleanPath.size() - 2);
-                }
-                Path p(cleanPath);
+		std::string cleanPath(*it);
+		if (cleanPath.size() > 1 && cleanPath[0] == '"' && cleanPath[cleanPath.size() - 1] == '"')
+		{
+			cleanPath = cleanPath.substr(1, cleanPath.size() - 2);
+		}
+		Path p(cleanPath);
 #else
-                Path p(*it);
+		Path p(*it);
 #endif
-                p.makeDirectory();
-                p.resolve(Path(name));
-                File f(p);
+		p.makeDirectory();
+		p.resolve(Path(name));
+		File f(p);
 		if (f.exists())
 		{
 			path = p;

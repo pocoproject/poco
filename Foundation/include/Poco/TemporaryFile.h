@@ -1,7 +1,7 @@
 //
 // TemporaryFile.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/TemporaryFile.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/TemporaryFile.h#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -65,13 +65,13 @@ class Foundation_API TemporaryFile: public File
 {
 public:
 	TemporaryFile();
-                /// Creates the TemporaryFile.
+		/// Creates the TemporaryFile.
 
     TemporaryFile(const std::string& tempDir);
-                /// Creates the TemporaryFile using the given directory.
+		/// Creates the TemporaryFile using the given directory.
 
-        ~TemporaryFile();
-                /// Destroys the TemporaryFile and
+	~TemporaryFile();
+		/// Destroys the TemporaryFile and
 		/// deletes the corresponding file on
 		/// disk unless keep() or keepUntilExit()
 		/// has been called.
@@ -89,14 +89,14 @@ public:
 		/// Registers the given file for deletion
 		/// at process termination.
 
-        static std::string tempName(const std::string& tempDir = "");
-                /// Returns a unique path name for a temporary
-                /// file in the system's scratch directory (see Path::temp())
-                /// if tempDir is empty or in the directory specified in tempDir
-                /// otherwise.
+	static std::string tempName(const std::string& tempDir = "");
+		/// Returns a unique path name for a temporary
+		/// file in the system's scratch directory (see Path::temp())
+		/// if tempDir is empty or in the directory specified in tempDir
+		/// otherwise.
 
 private:
-        bool _keep;
+	bool _keep;
 };
 
 

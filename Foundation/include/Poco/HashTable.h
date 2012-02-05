@@ -1,7 +1,7 @@
 //
 // HashTable.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/HashTable.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/HashTable.h#1 $
 //
 // Library: Foundation
 // Package: Hashing
@@ -77,13 +77,13 @@ public:
 		_entries(0), 
 		_size(0), 
 		_maxCapacity(initialSize)
-		/// Creates the HashTable.
-	{
-		_entries = new HashEntryMap*[initialSize];
-		std::memset(_entries, '\0', sizeof(HashEntryMap*)*initialSize);
-	}
+                /// Creates the HashTable.
+        {
+                _entries = new HashEntryMap*[initialSize];
+                std::memset(_entries, '\0', sizeof(HashEntryMap*)*initialSize);
+        }
 
-	HashTable(const HashTable& ht):
+        HashTable(const HashTable& ht):
 		_entries(new HashEntryMap*[ht._maxCapacity]),
 		_size(ht._size),
 		_maxCapacity(ht._maxCapacity)
@@ -312,13 +312,13 @@ public:
 		{
 			HashTableVector cpy = _entries;
 			_entries = 0;
-			UInt32 oldSize = _maxCapacity;
-			_maxCapacity = newSize;
-			_entries = new HashEntryMap*[_maxCapacity];
-			std::memset(_entries, '\0', sizeof(HashEntryMap*)*_maxCapacity);
+                        UInt32 oldSize = _maxCapacity;
+                        _maxCapacity = newSize;
+                        _entries = new HashEntryMap*[_maxCapacity];
+                        std::memset(_entries, '\0', sizeof(HashEntryMap*)*_maxCapacity);
 
-			if (_size == 0)
-			{
+                        if (_size == 0)
+                        {
 				// no data was yet inserted
 				delete[] cpy;
 				return;

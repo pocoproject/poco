@@ -1,7 +1,7 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Format.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Format.cpp#5 $
 //
 // Library: Foundation
 // Package: Core
@@ -166,17 +166,17 @@ namespace
 	}
 
 
-        void formatOne(std::string& result, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
-        {
-                std::ostringstream str;
+	void formatOne(std::string& result, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
+	{
+		std::ostringstream str;
 #if !defined(POCO_NO_LOCALE)
-                str.imbue(std::locale::classic());
+		str.imbue(std::locale::classic());
 #endif
-                try
-                {
-                        parseFlags(str, itFmt, endFmt);
-                        parseWidth(str, itFmt, endFmt);
-                        parsePrec(str, itFmt, endFmt);
+		try
+		{
+			parseFlags(str, itFmt, endFmt);
+			parseWidth(str, itFmt, endFmt);
+			parsePrec(str, itFmt, endFmt);
 			char mod = parseMod(itFmt, endFmt);
 			if (itFmt != endFmt)
 			{
@@ -234,16 +234,16 @@ namespace
 				case 'I':
 				case 'D':
 				default:
-                                        str << type;
-                                }
-                        }
-                }
-                catch (Poco::BadCastException&)
-                {
-                        str << "[ERRFMT]";
-                }
-                result.append(str.str());
-        }
+					str << type;
+				}
+			}
+		}
+		catch (Poco::BadCastException&)
+		{
+			str << "[ERRFMT]";
+		}
+		result.append(str.str());
+	}
 }
 
 

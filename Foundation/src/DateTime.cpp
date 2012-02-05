@@ -1,7 +1,7 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/svn/Foundation/src/DateTime.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/DateTime.cpp#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -335,9 +335,19 @@ double DateTime::toJulianDay(int year, int month, int day, int hour, int minute,
 }
 
 
+void DateTime::checkLimit(short& lower, short& higher, short limit)
+{
+        if (lower >= limit)
+        {
+                higher += short(lower / limit);
+                lower   = short(lower % limit);
+        }
+}
+
+
 void DateTime::normalize()
 {
-	checkLimit(_microsecond, _millisecond, 1000);
+        checkLimit(_microsecond, _millisecond, 1000);
 	checkLimit(_millisecond, _second, 1000);
 	checkLimit(_second, _minute, 60);
 	checkLimit(_minute, _hour, 60);

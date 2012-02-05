@@ -1,7 +1,7 @@
 //
 // MetaObject.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/MetaObject.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/MetaObject.h#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary

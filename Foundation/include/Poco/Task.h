@@ -1,7 +1,7 @@
 //
 // Task.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Task.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Task.h#2 $
 //
 // Library: Foundation
 // Package: Tasks

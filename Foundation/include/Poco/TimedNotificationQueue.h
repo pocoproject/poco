@@ -1,7 +1,7 @@
 //
 // TimedNotificationQueue.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/TimedNotificationQueue.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/TimedNotificationQueue.h#1 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -102,14 +102,14 @@ public:
 	Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
-		/// to be enqueued. 
-		/// The caller gains ownership of the notification and
-		/// is expected to release it when done with it.
-		/// This method returns 0 (null) if wakeUpWaitingThreads()
-		/// has been called by another thread.
-		///
-		/// It is highly recommended that the result is immediately
-		/// assigned to a Notification::Ptr, to avoid potential
+                /// to be enqueued. 
+                /// The caller gains ownership of the notification and
+                /// is expected to release it when done with it.
+                /// This method returns 0 (null) if wakeUpWaitingThreads()
+                /// has been called by another thread.
+                ///
+                /// It is highly recommended that the result is immediately
+                /// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
 	Notification* waitDequeueNotification(long milliseconds);

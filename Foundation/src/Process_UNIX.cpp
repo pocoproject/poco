@@ -1,7 +1,7 @@
 //
 // Process_UNIX.cpp
 //
-// $Id: //poco/svn/Foundation/src/Process_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Process_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -171,13 +171,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
 {
-        killImpl(handle.id());
+	killImpl(handle.id());
 }
 
 
 void ProcessImpl::killImpl(PIDImpl pid)
 {
-        if (kill(pid, SIGKILL) != 0)
+	if (kill(pid, SIGKILL) != 0)
 	{
 		switch (errno)
 		{

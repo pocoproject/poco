@@ -1,7 +1,7 @@
 //
 // Condition.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Condition.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Condition.h#1 $
 //
 // Library: Foundation
 // Package: Threading

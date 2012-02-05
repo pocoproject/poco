@@ -1,7 +1,7 @@
 //
 // SynchronizedObject.cpp
 //
-// $Id: //poco/svn/Foundation/src/SynchronizedObject.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/SynchronizedObject.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading

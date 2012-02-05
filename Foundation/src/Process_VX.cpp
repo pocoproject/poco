@@ -1,7 +1,7 @@
 //
 // Process_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_VX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Process_VX.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -91,13 +91,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 void ProcessImpl::killImpl(const ProcessHandleImpl& handle)
 {
-        throw Poco::NotImplementedException("Process::kill()");
+	throw Poco::NotImplementedException("Process::kill()");
 }
 
 
 void ProcessImpl::killImpl(PIDImpl pid)
 {
-        throw Poco::NotImplementedException("Process::kill()");
+	throw Poco::NotImplementedException("Process::kill()");
 }
 
 

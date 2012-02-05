@@ -1,7 +1,7 @@
 //
 // NamedEvent_UNIX.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/NamedEvent_UNIX.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/NamedEvent_UNIX.h#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -58,13 +58,13 @@ protected:
 	void waitImpl();
 	
 private:
-        std::string getFileName();
+	std::string getFileName();
 
-        std::string _name;
+	std::string _name;
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
-        sem_t* _sem;
+	sem_t* _sem;
 #else
-        int _lockfd; // lock file descriptor
+	int _lockfd; // lock file descriptor
 	int _semfd;  // file used to identify semaphore
 	int _semid;  // semaphore id
 #endif

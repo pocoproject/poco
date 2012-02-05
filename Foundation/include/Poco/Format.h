@@ -1,7 +1,7 @@
 //
 // Format.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Format.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Format.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -106,18 +106,18 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	/// If the number of characters in the output value is less than the specified width, blanks or
 	/// leading zeros are added, according to the specified flags (-, +, 0).
 	///
-        /// Precision is a nonnegative decimal integer, preceded by a period (.), which specifies the number of characters 
-        /// to be printed, the number of decimal places, or the number of significant digits.
-        ///
-        /// Throws an InvalidArgumentException if an argument index is out of range.
-        ///
-        /// Starting with release 1.4.3, an argument that does not match the format
-        /// specifier no longer results in a BadCastException. The string [ERRFMT] is 
-        /// written to the result string instead.
-        /// 
-        /// If there are more format specifiers than values, the format specifiers without a corresponding value
-        /// are copied verbatim to output.
-        ///
+	/// Precision is a nonnegative decimal integer, preceded by a period (.), which specifies the number of characters 
+	/// to be printed, the number of decimal places, or the number of significant digits.
+	///
+	/// Throws an InvalidArgumentException if an argument index is out of range.
+	///
+	/// Starting with release 1.4.3, an argument that does not match the format
+	/// specifier no longer results in a BadCastException. The string [ERRFMT] is 
+	/// written to the result string instead.
+	/// 
+	/// If there are more format specifiers than values, the format specifiers without a corresponding value
+	/// are copied verbatim to output.
+	///
 	/// If there are more values than format specifiers, the superfluous values are ignored.
 	///
 	/// Usage Examples:

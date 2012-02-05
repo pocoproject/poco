@@ -1,7 +1,7 @@
 //
 // HashFunction.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/HashFunction.h#5 $
+// $Id: //poco/1.4/Foundation/include/Poco/HashFunction.h#1 $
 //
 // Library: Foundation
 // Package: Hashing

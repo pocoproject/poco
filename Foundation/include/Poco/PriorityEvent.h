@@ -1,7 +1,7 @@
 //
 // PriorityEvent.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/PriorityEvent.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/PriorityEvent.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -9,7 +9,7 @@
 //
 // Implementation of the PriorityEvent template.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,14 +36,13 @@
 //
 
 
-#ifndef  Foundation_PriorityEvent_INCLUDED
-#define  Foundation_PriorityEvent_INCLUDED
+#ifndef Foundation_PriorityEvent_INCLUDED
+#define Foundation_PriorityEvent_INCLUDED
 
 
 #include "Poco/AbstractEvent.h"
-#include "Poco/DefaultStrategy.h"
+#include "Poco/PriorityStrategy.h"
 #include "Poco/AbstractPriorityDelegate.h"
-#include "Poco/CompareFunctions.h"
 
 
 namespace Poco {
@@ -51,41 +50,34 @@ namespace Poco {
 
 template <class TArgs, class TMutex = FastMutex> 
 class PriorityEvent: public AbstractEvent < 
-	TArgs,
-	DefaultStrategy<TArgs, AbstractPriorityDelegate< TArgs>, p_less<AbstractPriorityDelegate<TArgs> > >,
-	AbstractPriorityDelegate<TArgs>,
-	TMutex
+        TArgs,
+        PriorityStrategy<TArgs, AbstractPriorityDelegate<TArgs> >,
+        AbstractPriorityDelegate<TArgs>,
+        TMutex
 >
-	/// A PriorityEvent uses internally a DefaultStrategy which 
-	/// invokes delegates in a manner determined by the priority field 
-	/// in the PriorityDelegates (lower priorities first).
-	/// PriorityEvents can only be used together with PriorityDelegates.
-	/// PriorityDelegates are sorted according to the priority value, when
-	/// two delegates have the same priority, they are invoked in
-	/// an arbitrary manner.
-	/// Note that one object can register several methods as long as they differ
-	/// in their priority value:
-	///     PriorityEvent<int> tmp;
-	///     MyClass myObject;
-	///     tmp += priorityDelegate(&myObject, &MyClass::myMethod1, 1);
-	///     tmp += priorityDelegate(&myObject, &MyClass::myMethod2, 2);
+        /// A PriorityEvent uses internally a PriorityStrategy which 
+        /// invokes delegates in order of priority (lower priorities first).
+        /// PriorityEvent's can only be used together with PriorityDelegate's.
+        /// PriorityDelegate's are sorted according to the priority value, when
+        /// two delegates have the same priority, they are invoked in
+        /// an arbitrary manner.
 {
 public:
-	PriorityEvent()
+        PriorityEvent()
 	{
 	}
 
 	~PriorityEvent()
 	{
-	}
+        }
 
 private:
-	PriorityEvent(const PriorityEvent& e);
-	PriorityEvent& operator = (const PriorityEvent& e);
+        PriorityEvent(const PriorityEvent&);
+        PriorityEvent& operator = (const PriorityEvent&);
 };
 
 
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_PriorityEvent_INCLUDED

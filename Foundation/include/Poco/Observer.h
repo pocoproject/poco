@@ -1,7 +1,7 @@
 //
 // Observer.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Observer.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Observer.h#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -92,24 +92,24 @@ public:
 		}
 		return *this;
 	}
-        
-        void notify(Notification* pNf) const
-        {
-                Poco::Mutex::ScopedLock lock(_mutex);
+	
+	void notify(Notification* pNf) const
+	{
+		Poco::Mutex::ScopedLock lock(_mutex);
 
-                if (_pObject)
-                {
-                        N* pCastNf = dynamic_cast<N*>(pNf);
-                        if (pCastNf)
-                        {
+		if (_pObject)
+		{
+			N* pCastNf = dynamic_cast<N*>(pNf);
+			if (pCastNf)
+			{
 				pCastNf->duplicate();
-                                (_pObject->*_method)(pCastNf);
-                        }
-                }
-        }
-        
-        bool equals(const AbstractObserver& abstractObserver) const
-        {
+				(_pObject->*_method)(pCastNf);
+			}
+		}
+	}
+	
+	bool equals(const AbstractObserver& abstractObserver) const
+	{
 		const Observer* pObs = dynamic_cast<const Observer*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_method == _method;
 	}
@@ -121,22 +121,22 @@ public:
 	
 	AbstractObserver* clone() const
 	{
-                return new Observer(*this);
-        }
-        
-        void disable()
-        {
-                Poco::Mutex::ScopedLock lock(_mutex);
-                
-                _pObject = 0;
-        }
-        
+		return new Observer(*this);
+	}
+	
+	void disable()
+	{
+		Poco::Mutex::ScopedLock lock(_mutex);
+		
+		_pObject = 0;
+	}
+	
 private:
-        Observer();
+	Observer();
 
-        C*       _pObject;
-        Callback _method;
-        mutable Poco::Mutex _mutex;
+	C*       _pObject;
+	Callback _method;
+	mutable Poco::Mutex _mutex;
 };
 
 

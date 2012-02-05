@@ -1,7 +1,7 @@
 //
 // Condition.cpp
 //
-// $Id: //poco/svn/Foundation/src/Condition.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Condition.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading

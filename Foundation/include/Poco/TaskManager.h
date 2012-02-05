@@ -1,7 +1,7 @@
 //
 // TaskManager.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/TaskManager.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/TaskManager.h#2 $
 //
 // Library: Foundation
 // Package: Tasks

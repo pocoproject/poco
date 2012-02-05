@@ -1,7 +1,7 @@
 //
 // NotificationCenter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/NotificationCenter.h#4 $
+// $Id: //poco/1.4/Foundation/include/Poco/NotificationCenter.h#2 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -133,22 +133,22 @@ public:
 	bool hasObservers() const;
 		/// Returns true iff there is at least one registered observer.
 		///
-                /// Can be used to improve performance if an expensive notification
-                /// shall only be created and posted if there are any observers.
-                
-        std::size_t countObservers() const;
-                /// Returns the number of registered observers.
-                
-        static NotificationCenter& defaultCenter();
-                /// Returns a reference to the default
-                /// NotificationCenter.
+		/// Can be used to improve performance if an expensive notification
+		/// shall only be created and posted if there are any observers.
+		
+	std::size_t countObservers() const;
+		/// Returns the number of registered observers.
+		
+	static NotificationCenter& defaultCenter();
+		/// Returns a reference to the default
+		/// NotificationCenter.
 
 private:
-        typedef SharedPtr<AbstractObserver> AbstractObserverPtr;
-        typedef std::vector<AbstractObserverPtr> ObserverList;
+	typedef SharedPtr<AbstractObserver> AbstractObserverPtr;
+	typedef std::vector<AbstractObserverPtr> ObserverList;
 
-        ObserverList  _observers;
-        mutable Mutex _mutex;
+	ObserverList  _observers;
+	mutable Mutex _mutex;
 };
 
 

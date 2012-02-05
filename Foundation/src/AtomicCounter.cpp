@@ -1,7 +1,7 @@
 //
 // AtomicCounter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/AtomicCounter.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/AtomicCounter.cpp#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -127,7 +127,7 @@ AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
 // GCC 4.1+ atomic builtins.
 //
 AtomicCounter::AtomicCounter():
-        _counter(0)
+	_counter(0)
 {
 }
 
@@ -151,15 +151,15 @@ AtomicCounter::~AtomicCounter()
 
 AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)
 {
-        __sync_lock_test_and_set(&_counter, counter.value());
-        return *this;
+	__sync_lock_test_and_set(&_counter, counter.value());
+	return *this;
 }
 
-        
+	
 AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
 {
-        __sync_lock_test_and_set(&_counter, value);
-        return *this;
+	__sync_lock_test_and_set(&_counter, value);
+	return *this;
 }
 
 

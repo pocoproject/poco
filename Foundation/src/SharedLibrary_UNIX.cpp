@@ -1,7 +1,7 @@
 //
 // SharedLibrary_UNIX.cpp
 //
-// $Id: //poco/svn/Foundation/src/SharedLibrary_UNIX.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/SharedLibrary_UNIX.cpp#3 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -64,18 +64,18 @@ SharedLibraryImpl::~SharedLibraryImpl()
 
 void SharedLibraryImpl::loadImpl(const std::string& path, int flags)
 {
-        FastMutex::ScopedLock lock(_mutex);
+	FastMutex::ScopedLock lock(_mutex);
 
-        if (_handle) throw LibraryAlreadyLoadedException(path);
-        int realFlags = RTLD_LAZY;
-        if (flags & SHLIB_LOCAL_IMPL)
-                realFlags |= RTLD_LOCAL;
-        else
-                realFlags |= RTLD_GLOBAL;
-        _handle = dlopen(path.c_str(), realFlags);
-        if (!_handle)
-        {
-                const char* err = dlerror();
+	if (_handle) throw LibraryAlreadyLoadedException(path);
+	int realFlags = RTLD_LAZY;
+	if (flags & SHLIB_LOCAL_IMPL)
+		realFlags |= RTLD_LOCAL;
+	else
+		realFlags |= RTLD_GLOBAL;
+	_handle = dlopen(path.c_str(), realFlags);
+	if (!_handle)
+	{
+		const char* err = dlerror();
 		throw LibraryLoadException(err ? std::string(err) : path);
 	}
 	_path = path;

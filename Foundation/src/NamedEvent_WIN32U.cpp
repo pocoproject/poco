@@ -1,7 +1,7 @@
 //
 // NamedEvent_WIN32.cpp
 //
-// $Id: //poco/svn/Foundation/src/NamedEvent_WIN32U.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/NamedEvent_WIN32U.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes

@@ -1,7 +1,7 @@
 //
 // MemoryPool.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/MemoryPool.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/MemoryPool.h#1 $
 //
 // Library: Foundation
 // Package: Core

@@ -1,7 +1,7 @@
 //
 // LineEndingConverter.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/LineEndingConverter.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/LineEndingConverter.h#1 $
 //
 // Library: Foundation
 // Package: Streams

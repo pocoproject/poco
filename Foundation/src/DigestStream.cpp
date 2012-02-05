@@ -1,7 +1,7 @@
 //
 // DigestStream.cpp
 //
-// $Id: //poco/svn/Foundation/src/DigestStream.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/DigestStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Crypt

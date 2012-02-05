@@ -1,7 +1,7 @@
 //
 // PriorityExpire.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/PriorityExpire.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/PriorityExpire.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -9,7 +9,7 @@
 //
 // Implementation of the PriorityExpire template.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_PriorityExpire_INCLUDED
-#define  Foundation_PriorityExpire_INCLUDED
+#ifndef Foundation_PriorityExpire_INCLUDED
+#define Foundation_PriorityExpire_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -54,27 +54,27 @@ class PriorityExpire: public AbstractPriorityDelegate<TArgs>
 	/// expiring of registrations to AbstractPriorityDelegate.
 {
 public:
-	PriorityExpire(const AbstractPriorityDelegate<TArgs>& p, Timestamp::TimeDiff expireMilliSec):
-		AbstractPriorityDelegate<TArgs>(p),
-		_pDelegate(p.clone()), 
-		_expire(expireMilliSec*1000)
-	{
-	}
-	
-	PriorityExpire(const PriorityExpire& expire):
-		AbstractPriorityDelegate<TArgs>(expire),
-		_pDelegate(expire._pDelegate->clone()),
-		_expire(expire._expire),
-		_creationTime(expire._creationTime)
-	{
+        PriorityExpire(const AbstractPriorityDelegate<TArgs>& p, Timestamp::TimeDiff expireMilliSec):
+                AbstractPriorityDelegate<TArgs>(p),
+                _pDelegate(static_cast<AbstractPriorityDelegate<TArgs>*>(p.clone())), 
+                _expire(expireMilliSec*1000)
+        {
+        }
+        
+        PriorityExpire(const PriorityExpire& expire):
+                AbstractPriorityDelegate<TArgs>(expire),
+                _pDelegate(static_cast<AbstractPriorityDelegate<TArgs>*>(expire._pDelegate->clone())),
+                _expire(expire._expire),
+                _creationTime(expire._creationTime)
+        {
 	}
 
-	~PriorityExpire()
-	{
-		destroy();
-	}
-	
-	PriorityExpire& operator = (const PriorityExpire& expire)
+        ~PriorityExpire()
+        {
+                delete _pDelegate;
+        }
+        
+        PriorityExpire& operator = (const PriorityExpire& expire)
 	{
 		if (&expire != this)
 		{
@@ -92,24 +92,28 @@ public:
 		if (!expired())
 			return this->_pDelegate->notify(sender, arguments);
 		else
-			return false;
-	}
+                        return false;
+        }
 
-	AbstractPriorityDelegate<TArgs>* clone() const
-	{
-		return new PriorityExpire(*this);
-	}
+        bool equals(const AbstractDelegate<TArgs>& other) const
+        {
+                return other.equals(*_pDelegate);
+        }
 
-	void destroy()
-	{
-		delete this->_pDelegate;
-		this->_pDelegate = 0;
-	}
+        AbstractPriorityDelegate<TArgs>* clone() const
+        {
+                return new PriorityExpire(*this);
+        }
 
-	const AbstractPriorityDelegate<TArgs>& getDelegate() const
-	{
-		return *this->_pDelegate;
-	}
+        void disable()
+        {
+                _pDelegate->disable();
+        }
+
+        const AbstractPriorityDelegate<TArgs>* unwrap() const
+        {
+                return this->_pDelegate;
+        }
 
 protected:
 	bool expired() const
@@ -129,4 +133,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_PriorityExpire_INCLUDED

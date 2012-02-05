@@ -1,7 +1,7 @@
 //
 // ConsoleChannel.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/ConsoleChannel.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/ConsoleChannel.h#1 $
 //
 // Library: Foundation
 // Package: Logging

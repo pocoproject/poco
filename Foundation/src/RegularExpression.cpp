@@ -1,7 +1,7 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/svn/Foundation/src/RegularExpression.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/RegularExpression.cpp#1 $
 //
 // Library: Foundation
 // Package: RegExp

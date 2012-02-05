@@ -1,7 +1,7 @@
 //
 // Mutex.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Mutex.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/Mutex.h#2 $
 //
 // Library: Foundation
 // Package: Threading
@@ -181,43 +181,43 @@ class Foundation_API NullMutex
 {
 public:
         typedef Poco::ScopedLock<NullMutex> ScopedLock;
-        
-        NullMutex()
-                /// Creates the NullMutex.
-        {
-        }
-                
-        ~NullMutex()
-                /// Destroys the NullMutex.
-        {
-        }
+	
+	NullMutex()
+		/// Creates the NullMutex.
+	{
+	}
+		
+	~NullMutex()
+		/// Destroys the NullMutex.
+	{
+	}
 
-        void lock()
-                /// Does nothing.
-        {
-        }
-                
-        void lock(long)
-                /// Does nothing.
-        {
-        }
+	void lock()
+		/// Does nothing.
+	{
+	}
+		
+	void lock(long)
+		/// Does nothing.
+	{
+	}
 
-        bool tryLock()
-                /// Does nothing and always returns true.
-        {
-                return true;
-        }
+	bool tryLock()
+		/// Does nothing and always returns true.
+	{
+		return true;
+	}
 
-        bool tryLock(long)
-                /// Does nothing and always returns true.
-        {
-                return true;
-        }
+	bool tryLock(long)
+		/// Does nothing and always returns true.
+	{
+		return true;
+	}
 
-        void unlock()
-                /// Does nothing.
-        {
-        }
+	void unlock()
+		/// Does nothing.
+	{
+	}
 };
 
 

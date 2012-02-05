@@ -1,7 +1,7 @@
 //
 // PipeStream.cpp
 //
-// $Id: //poco/svn/Foundation/src/PipeStream.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/PipeStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes

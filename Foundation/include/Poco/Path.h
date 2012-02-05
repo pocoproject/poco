@@ -1,7 +1,7 @@
 //
 // Path.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Path.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Path.h#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -206,21 +206,21 @@ public:
 		/// (the filename part is empty).
 		
 	bool isFile() const;
-                /// Returns true iff the path references a file
-                /// (the filename part is not empty).
-        
-        Path& setNode(const std::string& node);
-                /// Sets the node name.
-                /// Setting a non-empty node automatically makes
-                /// the path an absolute one.
+		/// Returns true iff the path references a file
+		/// (the filename part is not empty).
+	
+	Path& setNode(const std::string& node);
+		/// Sets the node name.
+		/// Setting a non-empty node automatically makes
+		/// the path an absolute one.
 		
-        const std::string& getNode() const;
-                /// Returns the node name.
-                
-        Path& setDevice(const std::string& device);
-                /// Sets the device name.
-                /// Setting a non-empty device automatically makes
-                /// the path an absolute one.
+	const std::string& getNode() const;
+		/// Returns the node name.
+		
+	Path& setDevice(const std::string& device);
+		/// Sets the device name.
+		/// Setting a non-empty device automatically makes
+		/// the path an absolute one.
 		
 	const std::string& getDevice() const;
 		/// Returns the device name.
@@ -233,45 +233,45 @@ public:
 		/// If n == depth(), returns the filename.
 		
 	const std::string& operator [] (int n) const;
-                /// Returns the n'th directory in the directory list.
-                /// If n == depth(), returns the filename.
-                
-        Path& pushDirectory(const std::string& dir);
-                /// Adds a directory to the directory list.
-                
-        Path& popDirectory();
-                /// Removes the last directory from the directory list.
-                
-        Path& popFrontDirectory();
-                /// Removes the first directory from the directory list.
-                
-        Path& setFileName(const std::string& name);
-                /// Sets the filename.
-                
-        const std::string& getFileName() const;
-                /// Returns the filename.
+		/// Returns the n'th directory in the directory list.
+		/// If n == depth(), returns the filename.
+		
+	Path& pushDirectory(const std::string& dir);
+		/// Adds a directory to the directory list.
+		
+	Path& popDirectory();
+		/// Removes the last directory from the directory list.
+		
+	Path& popFrontDirectory();
+		/// Removes the first directory from the directory list.
+		
+	Path& setFileName(const std::string& name);
+		/// Sets the filename.
+		
+	const std::string& getFileName() const;
+		/// Returns the filename.
 
-        Path& setBaseName(const std::string& name);
-                /// Sets the basename part of the filename and
-                /// does not change the extension.
+	Path& setBaseName(const std::string& name);
+		/// Sets the basename part of the filename and
+		/// does not change the extension.
 
 	std::string getBaseName() const;
-                /// Returns the basename (the filename sans
-                /// extension) of the path.
+		/// Returns the basename (the filename sans
+		/// extension) of the path.
 
-        Path& setExtension(const std::string& extension);
-                /// Sets the filename extension.
-                                
-        std::string getExtension() const;
+	Path& setExtension(const std::string& extension);
+		/// Sets the filename extension.
+				
+	std::string getExtension() const;
 		/// Returns the filename extension.
 		
-        const std::string& version() const;
-                /// Returns the file version. VMS only.
-                
-        Path& clear();
-                /// Clears all components.
+	const std::string& version() const;
+		/// Returns the file version. VMS only.
+		
+	Path& clear();
+		/// Clears all components.
 
-        Path parent() const;
+	Path parent() const;
 		/// Returns a path referring to the path's
 		/// directory.
 		

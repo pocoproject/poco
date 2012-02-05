@@ -1,7 +1,7 @@
 //
 // Process_VMS.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Process_VMS.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Process_VMS.h#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -73,11 +73,12 @@ public:
 	typedef std::vector<std::string> ArgsImpl;
 	
 	static PIDImpl idImpl();
-	static void timesImpl(long& userTime, long& kernelTime);
-	static ProcessHandleImpl* launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe);		
-	static int waitImpl(PIDImpl pid);
-	static void killImpl(PIDImpl pid);
-	static void requestTerminationImpl(PIDImpl pid);
+        static void timesImpl(long& userTime, long& kernelTime);
+        static ProcessHandleImpl* launchImpl(const std::string& command, const ArgsImpl& args, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe);             
+        static int waitImpl(PIDImpl pid);
+        static void killImpl(const ProcessHandleImpl& handle);
+        static void killImpl(PIDImpl pid);
+        static void requestTerminationImpl(PIDImpl pid);
 };
 
 

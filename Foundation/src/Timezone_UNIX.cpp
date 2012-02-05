@@ -1,7 +1,7 @@
 //
 // Timezone_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_UNIX.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/Timezone_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -49,13 +49,13 @@ public:
 	{
 		tzset();
 	}
-        
-        int timeZone()
-        {
-        #if defined(__APPLE__)  || defined(__FreeBSD__) || defined(POCO_ANDROID) // no timezone global var
-                std::time_t now = std::time(NULL);
-                struct std::tm t;
-                gmtime_r(&now, &t);
+	
+	int timeZone()
+	{
+	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined(POCO_ANDROID) // no timezone global var
+		std::time_t now = std::time(NULL);
+		struct std::tm t;
+		gmtime_r(&now, &t);
 		std::time_t utc = std::mktime(&t);
 		return now - utc;
 	#elif defined(__CYGWIN__)

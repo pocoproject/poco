@@ -1,7 +1,7 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/svn/Foundation/src/SharedMemory_POSIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/SharedMemory_POSIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Processes
@@ -60,24 +60,24 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	_name.append("tmp/");
 #endif
 
-        _name.append(name);
+	_name.append(name);
 
-        int flags = _server ? O_CREAT : 0;
-        if (_access == SharedMemory::AM_WRITE)
-                flags |= O_RDWR;
-        else
+	int flags = _server ? O_CREAT : 0;
+	if (_access == SharedMemory::AM_WRITE)
+		flags |= O_RDWR;
+	else
 		flags |= O_RDONLY;
 
 	// open the shared memory segment
 	_fd = ::shm_open(_name.c_str(), flags, S_IRUSR | S_IWUSR);
 	if (_fd == -1)
-                throw SystemException("Cannot create shared memory object", _name);
+		throw SystemException("Cannot create shared memory object", _name);
 
-        // now set the correct size for the segment
-        if (_server && -1 == ::ftruncate(_fd, size))
-        {
-                ::close(_fd);
-                _fd = -1;
+	// now set the correct size for the segment
+	if (_server && -1 == ::ftruncate(_fd, size))
+	{
+		::close(_fd);
+		_fd = -1;
 		::shm_unlink(_name.c_str());
 		throw SystemException("Cannot resize shared memory object", _name);
 	}

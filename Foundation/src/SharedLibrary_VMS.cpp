@@ -1,7 +1,7 @@
 //
 // SharedLibrary_VMS.cpp
 //
-// $Id: //poco/svn/Foundation/src/SharedLibrary_VMS.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/SharedLibrary_VMS.cpp#2 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -61,7 +61,7 @@ SharedLibraryImpl::~SharedLibraryImpl()
 
 void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 {
-        FastMutex::ScopedLock lock(_mutex);
+	FastMutex::ScopedLock lock(_mutex);
 
 	if (!_path.empty()) throw LibraryAlreadyLoadedException(path);
 	_path = path;

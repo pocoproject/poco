@@ -1,7 +1,7 @@
 //
 // FileChannel.h
 //
-// $Id: //poco/1.3/Foundation/include/Poco/FileChannel.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#2 $
 //
 // Library: Foundation
 // Package: Logging
@@ -137,13 +137,13 @@ class Foundation_API FileChannel: public Channel
 	/// for the "times" property are supported:
 	///
 	///   * utc:        Rotation strategy is based on UTC time (default).
-	///   * local:      Rotation strategy is based on local time.
-	///
-	/// Archived log files can be compressed using the gzip compression
-	/// method. Compressing can be controlled with the "compression"
-	/// property. The following values for the "compress" property
-	/// are supported:
-	///
+        ///   * local:      Rotation strategy is based on local time.
+        ///
+        /// Archived log files can be compressed using the gzip compression
+        /// method. Compressing can be controlled with the "compression"
+        /// property. The following values for the "compress" property
+        /// are supported:
+        ///
 	///   * true:       Compress archived log files.
 	///   * false:      Do not compress archived log files.
 	///
@@ -151,23 +151,23 @@ class Foundation_API FileChannel: public Channel
 	/// they reach a certain age, or if the number of archived
 	/// log files reaches a given maximum number. This is 
 	/// controlled by the purgeAge and purgeCount properties.
-	///
-	/// The purgeAge property can have the following values:
-	///
-	///   * "none" or ""   no purging
-	///   * <n> [seconds]  the maximum age is <n> seconds.
-	///   * <n> minutes:   the maximum age is <n> minutes.
-	///   * <n> hours:     the maximum age is <n> hours.
+        ///
+        /// The purgeAge property can have the following values:
+        ///
+        ///   * "none" or ""   no purging
+        ///   * <n> [seconds]  the maximum age is <n> seconds.
+        ///   * <n> minutes:   the maximum age is <n> minutes.
+        ///   * <n> hours:     the maximum age is <n> hours.
 	///   * <n> days:      the maximum age is <n> days.
-	///   * <n> weeks:     the maximum age is <n> weeks.
-	///   * <n> months:    the maximum age is <n> months, where a month has 30 days.
-	///
-	/// The purgeCount property has an integer value that specifies the maximum number 
-	/// of archived log files. If the number is exceeded, archived log files are 
-	/// deleted, starting with the oldest. When "none" or empty string are
-	/// supplied, they reset purgeCount to none (no purging).
-	///
-	/// For a more lightweight file channel class, see SimpleFileChannel.
+        ///   * <n> weeks:     the maximum age is <n> weeks.
+        ///   * <n> months:    the maximum age is <n> months, where a month has 30 days.
+        ///
+        /// The purgeCount property has an integer value that specifies the maximum number 
+        /// of archived log files. If the number is exceeded, archived log files are 
+        /// deleted, starting with the oldest. When "none" or empty string are
+        /// supplied, they reset purgeCount to none (no purging).
+        ///
+        /// For a more lightweight file channel class, see SimpleFileChannel.
 {
 public:
 	FileChannel();

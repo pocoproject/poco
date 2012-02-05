@@ -1,7 +1,7 @@
 //
 // Process.cpp
 //
-// $Id: //poco/svn/Foundation/src/Process.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Process.cpp#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -129,13 +129,13 @@ int Process::wait(const ProcessHandle& handle)
 
 void Process::kill(const ProcessHandle& handle)
 {
-        killImpl(*handle._pImpl);
+	killImpl(*handle._pImpl);
 }
 
 
 void Process::kill(PID pid)
 {
-        killImpl(pid);
+	killImpl(pid);
 }
 
 

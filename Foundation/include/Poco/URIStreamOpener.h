@@ -1,7 +1,7 @@
 //
 // URIStreamOpener.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/URIStreamOpener.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/URIStreamOpener.h#1 $
 //
 // Library: Foundation
 // Package: URI

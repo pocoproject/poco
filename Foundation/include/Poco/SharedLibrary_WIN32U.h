@@ -1,7 +1,7 @@
 //
 // SharedLibrary_WIN32U.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/SharedLibrary_WIN32U.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/SharedLibrary_WIN32U.h#2 $
 //
 // Library: Foundation
 // Package: SharedLibrary
@@ -50,12 +50,12 @@ namespace Poco {
 class Foundation_API SharedLibraryImpl
 {
 protected:
-        SharedLibraryImpl();
-        ~SharedLibraryImpl();
-        void loadImpl(const std::string& path, int flags);
-        void unloadImpl();
-        bool isLoadedImpl() const;
-        void* findSymbolImpl(const std::string& name);
+	SharedLibraryImpl();
+	~SharedLibraryImpl();
+	void loadImpl(const std::string& path, int flags);
+	void unloadImpl();
+	bool isLoadedImpl() const;
+	void* findSymbolImpl(const std::string& name);
 	const std::string& getPathImpl() const;
 	static std::string suffixImpl();
 

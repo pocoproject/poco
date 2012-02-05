@@ -8,7 +8,7 @@
    subject to change. Applications should only use zlib.h.
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: //poco/1.4/Foundation/src/deflate.h#2 $ */
 
 #ifndef DEFLATE_H
 #define DEFLATE_H

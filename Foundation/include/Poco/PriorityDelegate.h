@@ -1,7 +1,7 @@
 //
 // PriorityDelegate.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/PriorityDelegate.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/PriorityDelegate.h#5 $
 //
 // Library: Foundation
 // Package: Events
@@ -9,7 +9,7 @@
 //
 // Implementation of the PriorityDelegate template.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,14 +36,15 @@
 //
 
 
-#ifndef  Foundation_PriorityDelegate_INCLUDED
-#define  Foundation_PriorityDelegate_INCLUDED
+#ifndef Foundation_PriorityDelegate_INCLUDED
+#define Foundation_PriorityDelegate_INCLUDED
 
 
 #include "Poco/Foundation.h"
 #include "Poco/AbstractPriorityDelegate.h"
 #include "Poco/PriorityExpire.h"
 #include "Poco/FunctionPriorityDelegate.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
@@ -53,20 +54,20 @@ template <class TObj, class TArgs, bool useSender = true>
 class PriorityDelegate: public AbstractPriorityDelegate<TArgs>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
+        typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
 
-	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
-		AbstractPriorityDelegate<TArgs>(obj, prio),
-		_receiverObject(obj),
-		_receiverMethod(method)
-	{
-	}
-	
-	PriorityDelegate(const PriorityDelegate& delegate):
-		AbstractPriorityDelegate<TArgs>(delegate._pTarget, delegate._priority),
-		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod)
-	{
+        PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
+                AbstractPriorityDelegate<TArgs>(prio),
+                _receiverObject(obj),
+                _receiverMethod(method)
+        {
+        }
+        
+        PriorityDelegate(const PriorityDelegate& delegate):
+                AbstractPriorityDelegate<TArgs>(delegate),
+                _receiverObject(delegate._receiverObject),
+                _receiverMethod(delegate._receiverMethod)
+        {
 	}
 	
 	PriorityDelegate& operator = (const PriorityDelegate& delegate)
@@ -85,45 +86,62 @@ public:
 	{
 	}
 
-	bool notify(const void* sender, TArgs& arguments)
-	{
-		(_receiverObject->*_receiverMethod)(sender, arguments);
-		return true; // per default the delegate never expires
-	}
+        bool notify(const void* sender, TArgs& arguments)
+        {
+                Mutex::ScopedLock lock(_mutex);
+                if (_receiverObject)
+                {
+                        (_receiverObject->*_receiverMethod)(sender, arguments);
+                        return true; 
+                }
+                else return false;
+        }
 
-	AbstractPriorityDelegate<TArgs>* clone() const
-	{
-		return new PriorityDelegate(*this);
-	}
+        bool equals(const AbstractDelegate<TArgs>& other) const
+        {
+                const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
+                return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
+        }
 
+        AbstractDelegate<TArgs>* clone() const
+        {
+                return new PriorityDelegate(*this);
+        }
+
+        void disable()
+        {
+                Mutex::ScopedLock lock(_mutex);
+                _receiverObject = 0;
+        }
+        
 protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
+        TObj*        _receiverObject;
+        NotifyMethod _receiverMethod;
+        Mutex _mutex;
 
 private:
-	PriorityDelegate();
+        PriorityDelegate();
 };
-
 
 
 template <class TObj, class TArgs> 
 class PriorityDelegate<TObj, TArgs, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(TArgs&);
+        typedef void (TObj::*NotifyMethod)(TArgs&);
 
-	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
-		AbstractPriorityDelegate<TArgs>(obj, prio),
-		_receiverObject(obj),
-		_receiverMethod(method)
-	{
-	}
-	
-	PriorityDelegate(const PriorityDelegate& delegate):
-		AbstractPriorityDelegate<TArgs>(delegate._pTarget, delegate._priority),
-		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod)
-	{
+        PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
+                AbstractPriorityDelegate<TArgs>(prio),
+                _receiverObject(obj),
+                _receiverMethod(method)
+        {
+        }
+        
+        PriorityDelegate(const PriorityDelegate& delegate):
+                AbstractPriorityDelegate<TArgs>(delegate),
+                _receiverObject(delegate._receiverObject),
+                _receiverMethod(delegate._receiverMethod)
+        {
 	}
 	
 	PriorityDelegate& operator = (const PriorityDelegate& delegate)
@@ -142,23 +160,41 @@ public:
 	{
 	}
 
-	bool notify(const void* sender, TArgs& arguments)
-	{
-		(_receiverObject->*_receiverMethod)(arguments);
-		return true; // per default the delegate never expires
-	}
+        bool notify(const void* sender, TArgs& arguments)
+        {
+                Mutex::ScopedLock lock(_mutex);
+                if (_receiverObject)
+                {
+                        (_receiverObject->*_receiverMethod)(arguments);
+                        return true;
+                }
+                return false;
+        }
 
-	AbstractPriorityDelegate<TArgs>* clone() const
-	{
-		return new PriorityDelegate(*this);
-	}
+        bool equals(const AbstractDelegate<TArgs>& other) const
+        {
+                const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
+                return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
+        }
+
+        AbstractDelegate<TArgs>* clone() const
+        {
+                return new PriorityDelegate(*this);
+        }
+
+        void disable()
+        {
+                Mutex::ScopedLock lock(_mutex);
+                _receiverObject = 0;
+        }
 
 protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
+        TObj*        _receiverObject;
+        NotifyMethod _receiverMethod;
+        Mutex _mutex;
 
 private:
-	PriorityDelegate();
+        PriorityDelegate();
 };
 
 
@@ -235,4 +271,4 @@ static FunctionPriorityDelegate<TArgs, false> priorityDelegate(void (*NotifyMeth
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_PriorityDelegate_INCLUDED

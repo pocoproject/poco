@@ -1,7 +1,7 @@
 //
 // TextIterator.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/TextIterator.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/TextIterator.h#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -64,14 +64,14 @@ class Foundation_API TextIterator
 	///     int n = 0;
 	///     while (it != end) { ++n; ++it; }
 	///
-        /// NOTE: When an UTF-16 encoding is used, surrogate pairs will be
-        /// reported as two separate characters, due to restrictions of
-        /// the TextEncoding class.
-        ///
-        /// For iterating over char buffers, see the TextBufferIterator class.
+	/// NOTE: When an UTF-16 encoding is used, surrogate pairs will be
+	/// reported as two separate characters, due to restrictions of
+	/// the TextEncoding class.
+	///
+	/// For iterating over char buffers, see the TextBufferIterator class.
 {
 public:
-        TextIterator();
+	TextIterator();
 		/// Creates an uninitialized TextIterator.
 		
 	TextIterator(const std::string& str, const TextEncoding& encoding);
@@ -116,16 +116,16 @@ public:
 	bool operator == (const TextIterator& it) const;
 		/// Compares two iterators for equality.
 		
-        bool operator != (const TextIterator& it) const;
-                /// Compares two iterators for inequality.
-                
-        TextIterator end() const;
-                /// Returns the end iterator for the range handled
-                /// by the iterator.
-                
+	bool operator != (const TextIterator& it) const;
+		/// Compares two iterators for inequality.
+		
+	TextIterator end() const;
+		/// Returns the end iterator for the range handled
+		/// by the iterator.
+		
 private:
-        const TextEncoding*         _pEncoding;
-        std::string::const_iterator _it;
+	const TextEncoding*         _pEncoding;
+	std::string::const_iterator _it;
 	std::string::const_iterator _end;
 };
 
@@ -153,7 +153,7 @@ inline void swap(TextIterator& it1, TextIterator& it2)
 
 inline TextIterator TextIterator::end() const
 {
-        return TextIterator(_end);
+	return TextIterator(_end);
 }
 
 

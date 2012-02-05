@@ -1,7 +1,7 @@
 //
 // DateTime.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/DateTime.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/DateTime.h#1 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -52,16 +52,16 @@ class Foundation_API DateTime
 	/// This class represents an instant in time, expressed
 	/// in years, months, days, hours, minutes, seconds
 	/// and milliseconds based on the Gregorian calendar.
-        /// The class is mainly useful for conversions between
-        /// UTC, Julian day and Gregorian calendar dates.
-        ///
-        /// The date and time stored in a DateTime is always in UTC
-        /// (Coordinated Universal Time) and thus independent of the 
-        /// timezone in effect on the system.
-        ///
-        /// Conversion calculations are based on algorithms
-        /// collected and described by Peter Baum at
-        /// http://vsg.cape.com/~pbaum/date/date0.htm
+	/// The class is mainly useful for conversions between
+	/// UTC, Julian day and Gregorian calendar dates.
+	///
+	/// The date and time stored in a DateTime is always in UTC
+	/// (Coordinated Universal Time) and thus independent of the 
+	/// timezone in effect on the system.
+	///
+	/// Conversion calculations are based on algorithms
+	/// collected and described by Peter Baum at
+	/// http://vsg.cape.com/~pbaum/date/date0.htm
 	///
 	/// Internally, this class stores a date/time in two
 	/// forms (UTC and broken down) for performance reasons. Only use 
@@ -428,16 +428,6 @@ inline bool DateTime::isLeapYear(int year)
 inline void swap(DateTime& d1, DateTime& d2)
 {
 	d1.swap(d2);
-}
-
-
-inline void DateTime::checkLimit(short& lower, short& higher, short limit)
-{
-        if (lower >= limit)
-        {
-                higher += short(lower / limit);
-                lower = short(lower % limit);
-        }
 }
 
 

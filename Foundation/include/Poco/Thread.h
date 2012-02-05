@@ -1,7 +1,7 @@
 //
 // Thread.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Thread.h#7 $
+// $Id: //poco/1.4/Foundation/include/Poco/Thread.h#3 $
 //
 // Library: Foundation
 // Package: Threading
@@ -104,13 +104,13 @@ public:
 		/// Returns the native thread ID of the thread.
 
 	std::string name() const;
-                /// Returns the name of the thread.
+		/// Returns the name of the thread.
 
-        std::string getName() const;
-                /// Returns the name of the thread.
+	std::string getName() const;
+		/// Returns the name of the thread.
 
-        void setName(const std::string& name);
-                /// Sets the name of the thread.
+	void setName(const std::string& name);
+		/// Sets the name of the thread.
 
 	void setPriority(Priority prio);
 		/// Sets the thread's priority.

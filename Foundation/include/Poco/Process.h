@@ -1,7 +1,7 @@
 //
 // Process.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Process.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Process.h#3 $
 //
 // Library: Foundation
 // Package: Processes
@@ -151,18 +151,18 @@ public:
 		///     int rc = ph.wait();
 		
 	static int wait(const ProcessHandle& handle);
-                /// Waits for the process specified by handle to terminate
-                /// and returns the exit code of the process.
-                
-        static void kill(const ProcessHandle& handle);
-                /// Kills the process specified by handle.
-                ///
-                /// This is preferable on Windows where process IDs
-                /// may be reused.
+		/// Waits for the process specified by handle to terminate
+		/// and returns the exit code of the process.
+		
+	static void kill(const ProcessHandle& handle);
+		/// Kills the process specified by handle.
+		///
+		/// This is preferable on Windows where process IDs
+		/// may be reused.
 
-        static void kill(PID pid);
-                /// Kills the process with the given pid.
-                
+	static void kill(PID pid);
+		/// Kills the process with the given pid.
+		
 	static void requestTermination(PID pid);
 		/// Requests termination of the process with the give PID.
 		///

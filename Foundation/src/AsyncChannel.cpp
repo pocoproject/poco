@@ -1,7 +1,7 @@
 //
 // AsyncChannel.cpp
 //
-// $Id: //poco/svn/Foundation/src/AsyncChannel.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/AsyncChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging

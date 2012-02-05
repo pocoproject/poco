@@ -1,7 +1,7 @@
 //
 // PriorityNotificationQueue.cpp
 //
-// $Id: //poco/Main/Foundation/src/PriorityNotificationQueue.cpp#1 $
+// $Id: //poco/1.4/Foundation/src/PriorityNotificationQueue.cpp#1 $
 //
 // Library: Foundation
 // Package: Notifications
@@ -197,13 +197,13 @@ Notification::Ptr PriorityNotificationQueue::dequeueOne()
 
 namespace
 {
-        static SingletonHolder<PriorityNotificationQueue> sh;
+	static SingletonHolder<PriorityNotificationQueue> sh;
 }
 
 
 PriorityNotificationQueue& PriorityNotificationQueue::defaultQueue()
 {
-        return *sh.get();
+	return *sh.get();
 }
 
 

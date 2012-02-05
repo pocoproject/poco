@@ -1,7 +1,7 @@
 //
 // Buffer.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Buffer.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Buffer.h#2 $
 //
 // Library: Foundation
 // Package: Core
@@ -50,131 +50,131 @@ namespace Poco {
 
 template <class T>
 class Buffer
-	/// A buffer class that allocates a buffer of a given type and size.
-	/// Buffer can be zero-size, resized, copy-constructed and assigned.
-	/// Memory allocation, resizing and deallocation is managed automatically.
-	///
-	/// This class is useful everywhere where a temporary buffer
-	/// is needed.
+        /// A buffer class that allocates a buffer of a given type and size.
+        /// Buffer can be zero-size, resized, copy-constructed and assigned.
+        /// Memory allocation, resizing and deallocation is managed automatically.
+        ///
+        /// This class is useful everywhere where a temporary buffer
+        /// is needed.
 {
 public:
-	Buffer(std::size_t size):
-		_size(size),
-		_ptr(size ? new T[size] : 0)
-		/// Creates and allocates the Buffer.
-	{
-	}
-	
-	Buffer(): _size(0),	_ptr(0)
-		/// Creates the Buffer.
-	{
-	}
+        Buffer(std::size_t size):
+                _size(size),
+                _ptr(size ? new T[size] : 0)
+                /// Creates and allocates the Buffer.
+        {
+        }
+        
+        Buffer(): _size(0),     _ptr(0)
+                /// Creates the Buffer.
+        {
+        }
+        
+        Buffer(const Buffer& other):
+                /// Copy constructor.
+                _size(other._size),
+                _ptr(other._size ? new T[other._size] : 0)
+        {
+                if (_size)
+                        std::memcpy(_ptr, other._ptr, _size * sizeof(T));
+        }
 
-	Buffer(const Buffer& other):
-		/// Copy constructor.
-		_size(other._size),
-		_ptr(other._size ? new T[other._size] : 0)
-	{
-		if (_size)
-			std::memcpy(_ptr, other._ptr, _size * sizeof(T));
-	}
+        Buffer& operator = (const Buffer& other)
+                /// Assignment operator.
+                {
+                if (this != &other)
+                {
+                        Buffer tmp(other);
+                        swap(tmp);
+                }
 
-	Buffer& operator = (const Buffer& other)
-		/// Assignment operator.
-	{
-		if (this != &other)
-		{
-			Buffer tmp(other);
-			swap(tmp);
-		}
+                return *this;
+        }
 
-		return *this;
-	}
-
-	~Buffer()
-		/// Destroys the Buffer.
-	{
-		delete [] _ptr;
-	}
-	
-	void swap(Buffer& other)
-		/// Swaps the buffer with another one.
-	{
-		using std::swap;
-		
-		swap(_ptr, other._ptr);
-		swap(_size, other._size);
-	}
-
-	std::size_t size() const
+        ~Buffer()
+                /// Destroys the Buffer.
+        {
+                delete [] _ptr;
+        }
+        
+        void swap(Buffer& other)
+                /// Swaps the buffer with another one.
+        {
+                using std::swap;
+                
+                swap(_ptr, other._ptr);
+                swap(_size, other._size);
+        }
+        
+        std::size_t size() const
 		/// Returns the size of the buffer.
 	{
-		return _size;
-	}
-	
-	void clear()
-		/// Sets the contents of the bufer to zero.
-	{
-		std::memset(_ptr, 0, _size * sizeof(T));
-	}
+                return _size;
+        }
+        
+        void clear()
+                /// Sets the contents of the bufer to zero.
+        {
+                std::memset(_ptr, 0, _size * sizeof(T));
+        }
 
-	void resize(std::size_t newSize, bool preserve = false)
-		/// Resizes the buffer. If preserve is true, the contents
-		/// of the buffer is preserved. If the newSize is smaller
-		/// than the current size, data truncation will occur.
-		/// 
-		/// For efficiency sake, the default behavior is not to
-		/// preserve the contents.
-	{
-		if (preserve) 
-		{
-			if (_size == newSize) return;
-			Buffer tmp;
-			tmp = *this;
-			recreate(newSize);
-			std::size_t size = _size < tmp._size ? _size : tmp._size;
-			std::memcpy(_ptr, tmp._ptr, size * sizeof(T));
-			return;
-		}
-		else if (_size == newSize) 
-		{
-			clear();
-			return;
-		}
+        void resize(std::size_t newSize, bool preserve = false)
+                /// Resizes the buffer. If preserve is true, the contents
+                /// of the buffer is preserved. If the newSize is smaller
+                /// than the current size, data truncation will occur.
+                /// 
+                /// For efficiency sake, the default behavior is not to
+                /// preserve the contents.
+        {
+                if (preserve) 
+                {
+                        if (_size == newSize) return;
+                        Buffer tmp;
+                        tmp = *this;
+                        recreate(newSize);
+                        std::size_t size = _size < tmp._size ? _size : tmp._size;
+                        std::memcpy(_ptr, tmp._ptr, size * sizeof(T));
+                        return;
+                }
+                else if (_size == newSize) 
+                {
+                        clear();
+                        return;
+                }
 
-		recreate(newSize);
-	}
+                recreate(newSize);
+        }
 
-	void append(const T* buf, std::size_t sz)
-		/// Resizes this buffer and appends the argument buffer.
-	{
-		if (0 == sz) return;
-		std::size_t oldSize = _size;
-		resize(_size + sz, true);
-		std::memcpy(_ptr + oldSize, buf, sz);
-	}
+        void append(const T* buf, std::size_t sz)
+                /// Resizes this buffer and appends the argument buffer.
+        {
+                if (0 == sz) return;
+                std::size_t oldSize = _size;
+                resize(_size + sz, true);
+                std::memcpy(_ptr + oldSize, buf, sz);
+        }
 
-	void append(const Buffer& buf)
-		/// Resizes this buffer and appends the argument buffer.
-	{
-		append(buf.begin(), buf.size());
-	}
+        void append(const Buffer& buf)
+                /// Resizes this buffer and appends the argument buffer.
+        {
+                append(buf.begin(), buf.size());
+        }
 
-	std::size_t elementSize() const
-		/// Returns the size of the buffer element.
-	{
-		return sizeof(T);
-	}
+        std::size_t elementSize() const
+                /// Returns the size of the buffer element.
+        {
+                return sizeof(T);
+        }
 
-	std::size_t byteCount() const
-		/// Returns the total length of the buffer in bytes.
-	{
-		return _size * sizeof(T);
-	}
+        std::size_t byteCount() const
+                /// Returns the total length of the buffer in bytes.
+        {
+                return _size * sizeof(T);
+        }
 
-	T* begin()
-		/// Returns a pointer to the beginning of the buffer.
-	{
+        T* begin()
+                /// Returns a pointer to the beginning of the buffer.
+        {
 		return _ptr;
 	}
 	
@@ -193,18 +193,18 @@ public:
 	const T* end() const
 		/// Returns a pointer to the end of the buffer.
 	{
-		return _ptr + _size;
-	}
-	
-	bool isEmpty() const
-		/// Return true if buffer is empty.
-	{
-		return 0 == _size;
-	}
+                return _ptr + _size;
+        }
+        
+        bool isEmpty() const
+                /// Return true if buffer is empty.
+        {
+                return 0 == _size;
+        }
 
-	T& operator [] (std::size_t index)
-	{
-		poco_assert (index < _size);
+        T& operator [] (std::size_t index)
+        {
+                poco_assert (index < _size);
 		
 		return _ptr[index];
 	}
@@ -214,26 +214,26 @@ public:
 		poco_assert (index < _size);
 		
 		return _ptr[index];
-	}
+        }
 
 private:
 
-	void recreate(std::size_t newSize)
-	{
-		if (newSize != _size)
-		{
-			delete [] _ptr;
-			if (0 == newSize)
-				_ptr = 0;
-			else
-				_ptr = new T[newSize];
+        void recreate(std::size_t newSize)
+        {
+                if (newSize != _size)
+                {
+                        delete [] _ptr;
+                        if (0 == newSize)
+                                _ptr = 0;
+                        else
+                                _ptr = new T[newSize];
 
-			_size = newSize;
-		}
-	}
+                        _size = newSize;
+                }
+        }
 
-	std::size_t _size;
-	T*          _ptr;
+        std::size_t _size;
+        T* _ptr;
 };
 
 

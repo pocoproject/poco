@@ -1,7 +1,7 @@
 //
 // ActiveRunnable.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/ActiveRunnable.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/ActiveRunnable.h#1 $
 //
 // Library: Foundation
 // Package: Threading

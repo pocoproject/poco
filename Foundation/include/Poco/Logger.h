@@ -1,7 +1,7 @@
 //
 // Logger.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Logger.h#3 $
+// $Id: //poco/1.4/Foundation/include/Poco/Logger.h#5 $
 //
 // Library: Foundation
 // Package: Logging
@@ -396,28 +396,28 @@ public:
 		/// Loggers.
 		
 	static void names(std::vector<std::string>& names);
-                /// Fills the given vector with the names
-                /// of all currently defined loggers.
-                
-        static int parseLevel(const std::string& level);
-                /// Parses a symbolic log level from a string and
-                /// returns the resulting numeric level.
-                ///
-                /// Valid symbolic levels are:
-                ///   - none (turns off logging)
-                ///   - fatal
-                ///   - critical
-                ///   - error
-                ///   - warning
-                ///   - notice
-                ///   - information
-                ///   - debug
-                ///   - trace
-                ///
-                /// The level is not case sensitive.
-                
-        static const std::string ROOT; /// The name of the root logger ("").    
-                
+		/// Fills the given vector with the names
+		/// of all currently defined loggers.
+		
+	static int parseLevel(const std::string& level);
+		/// Parses a symbolic log level from a string and
+		/// returns the resulting numeric level.
+		///
+		/// Valid symbolic levels are:
+		///   - none (turns off logging)
+		///   - fatal
+		///   - critical
+		///   - error
+		///   - warning
+		///   - notice
+		///   - information
+		///   - debug
+		///   - trace
+		///
+		/// The level is not case sensitive.
+		
+	static const std::string ROOT; /// The name of the root logger ("").	
+		
 protected:
 	typedef std::map<std::string, Logger*> LoggerMap;
 

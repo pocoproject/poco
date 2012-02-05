@@ -1,7 +1,7 @@
 //
 // DateTimeFormatter.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/DateTimeFormatter.h#4 $
+// $Id: //poco/1.4/Foundation/include/Poco/DateTimeFormatter.h#2 $
 //
 // Library: Foundation
 // Package: DateTime
@@ -89,17 +89,17 @@ public:
 		///   * %H - hour (00 .. 23)
 		///   * %h - hour (00 .. 12)
 		///   * %a - am/pm
-                ///   * %A - AM/PM
-                ///   * %M - minute (00 .. 59)
-                ///   * %S - second (00 .. 59)
-                ///   * %s - seconds and microseconds (equivalent to %S.%F)
-                ///   * %i - millisecond (000 .. 999)
-                ///   * %c - centisecond (0 .. 9)
-                ///   * %F - fractional seconds/microseconds (000000 - 999999)
-                ///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN)
-                ///   * %Z - time zone differential in RFC format (GMT or +NNNN)
-                ///   * %% - percent sign
-                ///
+		///   * %A - AM/PM
+		///   * %M - minute (00 .. 59)
+		///   * %S - second (00 .. 59)
+		///   * %s - seconds and microseconds (equivalent to %S.%F)
+		///   * %i - millisecond (000 .. 999)
+		///   * %c - centisecond (0 .. 9)
+		///   * %F - fractional seconds/microseconds (000000 - 999999)
+		///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN)
+		///   * %Z - time zone differential in RFC format (GMT or +NNNN)
+		///   * %% - percent sign
+		///
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
 
 	static std::string format(const DateTime& dateTime, const std::string& fmt, int timeZoneDifferential = UTC);

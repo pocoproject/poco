@@ -1,7 +1,7 @@
 //
 // FPEnvironment_SUN.cpp
 //
-// $Id: //poco/svn/Foundation/src/FPEnvironment_SUN.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/FPEnvironment_SUN.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -34,7 +34,7 @@
 //
 
 #ifndef __EXTENSIONS__
-#	define __EXTENSIONS__
+#       define __EXTENSIONS__
 #endif
 #include <math.h>
 #include "Poco/FPEnvironment_SUN.h"

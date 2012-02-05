@@ -1,7 +1,7 @@
 //
 // TextEncoding.cpp
 //
-// $Id: //poco/svn/Foundation/src/TextEncoding.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/TextEncoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -67,17 +67,17 @@ public:
 		TextEncoding::Ptr pUtf8Encoding(new UTF8Encoding);
 		add(pUtf8Encoding, TextEncoding::GLOBAL); 
 
-		add(new ASCIIEncoding);
-		add(new Latin1Encoding);
-		add(new Latin2Encoding);
-		add(new Latin9Encoding);
-		add(pUtf8Encoding);
-		add(new UTF16Encoding);
-		add(new Windows1250Encoding);
-		add(new Windows1251Encoding);
-		add(new Windows1252Encoding);
-	}
-	
+                add(new ASCIIEncoding);
+                add(new Latin1Encoding);
+                add(new Latin2Encoding);
+                add(new Latin9Encoding);
+                add(pUtf8Encoding);
+                add(new UTF16Encoding);
+                add(new Windows1250Encoding);
+                add(new Windows1251Encoding);
+                add(new Windows1252Encoding);
+        }
+        
 	~TextEncodingManager()
 	{
 	}

@@ -1,7 +1,7 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/svn/Foundation/src/Logger.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Logger.cpp#4 $
 //
 // Library: Foundation
 // Package: Logging
@@ -84,7 +84,7 @@ void Logger::setLevel(int level)
 
 void Logger::setLevel(const std::string& level)
 {
-        setLevel(parseLevel(level));
+	setLevel(parseLevel(level));
 }
 
 
@@ -433,26 +433,26 @@ Logger& Logger::parent(const std::string& name)
 
 int Logger::parseLevel(const std::string& level)
 {
-        if (icompare(level, "none") == 0)
-                return 0;
-        else if (icompare(level, "fatal") == 0)
-                return Message::PRIO_FATAL;
-        else if (icompare(level, "critical") == 0)
-                return Message::PRIO_CRITICAL;
-        else if (icompare(level, "error") == 0)
-                return Message::PRIO_ERROR;
-        else if (icompare(level, "warning") == 0)
-                return Message::PRIO_WARNING;
-        else if (icompare(level, "notice") == 0)
-                return Message::PRIO_NOTICE;
-        else if (icompare(level, "information") == 0)
-                return Message::PRIO_INFORMATION;
-        else if (icompare(level, "debug") == 0)
-                return Message::PRIO_DEBUG;
-        else if (icompare(level, "trace") == 0)
-                return Message::PRIO_TRACE;
-        else
-                throw InvalidArgumentException("Not a valid log level", level);
+	if (icompare(level, "none") == 0)
+		return 0;
+	else if (icompare(level, "fatal") == 0)
+		return Message::PRIO_FATAL;
+	else if (icompare(level, "critical") == 0)
+		return Message::PRIO_CRITICAL;
+	else if (icompare(level, "error") == 0)
+		return Message::PRIO_ERROR;
+	else if (icompare(level, "warning") == 0)
+		return Message::PRIO_WARNING;
+	else if (icompare(level, "notice") == 0)
+		return Message::PRIO_NOTICE;
+	else if (icompare(level, "information") == 0)
+		return Message::PRIO_INFORMATION;
+	else if (icompare(level, "debug") == 0)
+		return Message::PRIO_DEBUG;
+	else if (icompare(level, "trace") == 0)
+		return Message::PRIO_TRACE;
+	else
+		throw InvalidArgumentException("Not a valid log level", level);
 }
 
 

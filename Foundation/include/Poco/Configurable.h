@@ -1,7 +1,7 @@
 //
 // Configurable.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Configurable.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Configurable.h#1 $
 //
 // Library: Foundation
 // Package: Logging

@@ -1,7 +1,7 @@
 //
 // Bugcheck.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Bugcheck.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Bugcheck.h#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -96,10 +96,10 @@ protected:
 // useful macros (these automatically supply line number and file name)
 //
 #if defined(_DEBUG)
-#	define poco_assert_dbg(cond) \
+	#define poco_assert_dbg(cond) \
 		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
 #else
-#	define poco_assert_dbg(cond)
+	#define poco_assert_dbg(cond)
 #endif
 
 
@@ -129,7 +129,7 @@ protected:
 
 #if defined(_DEBUG)
 #	define poco_stdout_dbg(outstr) \
-		std::cout << __FILE__ << '(' << std::dec << __LINE__ << "):" << outstr << std::endl;
+	std::cout << __FILE__ << '(' << std::dec << __LINE__ << "):" << outstr << std::endl;
 #else
 #	define poco_stdout_dbg(outstr)
 #endif

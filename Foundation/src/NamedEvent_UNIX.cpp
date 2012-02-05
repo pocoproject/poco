@@ -1,7 +1,7 @@
 //
 // NamedEvent_UNIX.cpp
 //
-// $Id: //poco/svn/Foundation/src/NamedEvent_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/NamedEvent_UNIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Processes
@@ -57,13 +57,13 @@ namespace Poco {
 	{
 		int                 val;
 		struct semid_ds*    buf;
-                unsigned short int* array;
-                struct seminfo*     __buf;
-        };
+		unsigned short int* array;
+		struct seminfo*     __buf;
+	};
 #elif defined(__hpux)
-        union semun
-        {
-                int              val;
+	union semun
+	{
+		int              val;
 		struct semid_ds* buf;
 		ushort*          array;
 	};
@@ -71,13 +71,13 @@ namespace Poco {
 
 
 NamedEventImpl::NamedEventImpl(const std::string& name):
-        _name(name)
+	_name(name)
 {
-        std::string fileName = getFileName();
+	std::string fileName = getFileName();
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
-        _sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 0);
-        if ((long) _sem == (long) SEM_FAILED) 
-                throw SystemException("cannot create named event (sem_open() failed)", _name);
+	_sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 0);
+	if ((long) _sem == (long) SEM_FAILED) 
+		throw SystemException("cannot create named event (sem_open() failed)", _name);
 #else
 	int fd = open(fileName.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd != -1)
@@ -96,9 +96,9 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	}
 	else if (errno == EEXIST)
 	{
-                _semid = semget(key, 1, 0);
-        }
-        else throw SystemException("cannot create named event (semget() failed)", _name);
+		_semid = semget(key, 1, 0);
+	}
+	else throw SystemException("cannot create named event (semget() failed)", _name);
 #endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 }
 
@@ -106,7 +106,7 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 NamedEventImpl::~NamedEventImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
-        sem_close(_sem);
+	sem_close(_sem);
 #endif
 }
 
@@ -114,8 +114,8 @@ NamedEventImpl::~NamedEventImpl()
 void NamedEventImpl::setImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
-        if (sem_post(_sem) != 0)
-                throw SystemException("cannot set named event", _name);
+	if (sem_post(_sem) != 0)
+	   	throw SystemException("cannot set named event", _name);
 #else
 	struct sembuf op;
 	op.sem_num = 0;
@@ -130,9 +130,9 @@ void NamedEventImpl::setImpl()
 void NamedEventImpl::waitImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
-        int err;
-        do
-        {
+	int err;
+	do
+	{
 		err = sem_wait(_sem);
 	}
 	while (err && errno == EINTR);

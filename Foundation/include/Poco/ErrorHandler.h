@@ -1,7 +1,7 @@
 //
 // ErrorHandler.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/ErrorHandler.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/ErrorHandler.h#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -56,13 +56,13 @@ class Foundation_API ErrorHandler
 	/// about it.
 	/// 
 	/// The Thread class provides the possibility to register a
-	/// global ErrorHandler that is invoked whenever a thread has
-	/// been terminated by an unhandled exception.
-	/// The ErrorHandler must be derived from this class and can
-	/// provide implementations of all three handleException() overloads.
-	///
-	/// The ErrorHandler is always invoked within the context of
-	/// the offending thread.
+        /// global ErrorHandler that is invoked whenever a thread has
+        /// been terminated by an unhandled exception.
+        /// The ErrorHandler must be derived from this class and can
+        /// provide implementations of all three exception() overloads.
+        ///
+        /// The ErrorHandler is always invoked within the context of
+        /// the offending thread.
 {
 public:
 	ErrorHandler();

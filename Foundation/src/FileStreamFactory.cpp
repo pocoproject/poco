@@ -1,7 +1,7 @@
 //
 // FileStreamFactory.cpp
 //
-// $Id: //poco/svn/Foundation/src/FileStreamFactory.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/FileStreamFactory.cpp#1 $
 //
 // Library: Foundation
 // Package: URI

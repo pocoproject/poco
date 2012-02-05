@@ -1,7 +1,7 @@
 //
 // DateTimeFormat.cpp
 //
-// $Id: //poco/svn/Foundation/src/DateTimeFormat.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/DateTimeFormat.cpp#2 $
 //
 // Library: Foundation
 // Package: DateTime

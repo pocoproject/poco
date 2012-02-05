@@ -47,7 +47,7 @@
  *
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: //poco/1.4/Foundation/src/deflate.c#2 $ */
 
 #include "deflate.h"
 

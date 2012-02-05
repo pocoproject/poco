@@ -1,7 +1,7 @@
 //
 // FileChannel.cpp
 //
-// $Id: //poco/1.3/Foundation/src/FileChannel.cpp#3 $
+// $Id: //poco/1.4/Foundation/src/FileChannel.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -217,17 +217,17 @@ const std::string& FileChannel::path() const
 
 void FileChannel::setRotation(const std::string& rotation)
 {
-        std::string::const_iterator it  = rotation.begin();
-        std::string::const_iterator end = rotation.end();
-        int n = 0;
-        while (it != end && Ascii::isSpace(*it)) ++it;
-        while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
-        while (it != end && Ascii::isSpace(*it)) ++it;
-        std::string unit;
-        while (it != end && Ascii::isAlpha(*it)) unit += *it++;
-        
-        RotateStrategy* pStrategy = 0;
-        if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
+	std::string::const_iterator it  = rotation.begin();
+	std::string::const_iterator end = rotation.end();
+	int n = 0;
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	std::string unit;
+	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
+	
+	RotateStrategy* pStrategy = 0;
+	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
 		if (_times == "utc")
 			pStrategy = new RotateAtTimeStrategy<DateTime>(rotation);
@@ -313,12 +313,12 @@ void FileChannel::setPurgeAge(const std::string& age)
         int n = 0;
         while (it != end && Ascii::isSpace(*it)) ++it;
         while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
-        while (it != end && Ascii::isSpace(*it)) ++it;
-        std::string unit;
-        while (it != end && Ascii::isAlpha(*it)) unit += *it++;
-        
-        Timespan::TimeDiff factor = Timespan::SECONDS;
-        if (unit == "minutes")
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	std::string unit;
+	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
+	
+	Timespan::TimeDiff factor = Timespan::SECONDS;
+	if (unit == "minutes")
 		factor = Timespan::MINUTES;
 	else if (unit == "hours")
 		factor = Timespan::HOURS;
@@ -350,9 +350,9 @@ void FileChannel::setPurgeCount(const std::string& count)
         std::string::const_iterator it  = count.begin();
         std::string::const_iterator end = count.end();
 
-	while (it != end && Ascii::isSpace(*it)) ++it;
-	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
-	while (it != end && Ascii::isSpace(*it)) ++it;
+        while (it != end && Ascii::isSpace(*it)) ++it;
+        while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+        while (it != end && Ascii::isSpace(*it)) ++it;
 
         if (0 == n)
                 throw InvalidArgumentException("Zero is not valid purge count.");

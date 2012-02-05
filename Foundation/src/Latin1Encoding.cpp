@@ -1,7 +1,7 @@
 //
 // Latin1Encoding.cpp
 //
-// $Id: //poco/svn/Foundation/src/Latin1Encoding.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Latin1Encoding.cpp#1 $
 //
 // Library: Foundation
 // Package: Text

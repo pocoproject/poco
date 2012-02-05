@@ -1,7 +1,7 @@
 //
 // FIFOEvent.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/FIFOEvent.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/FIFOEvent.h#2 $
 //
 // Library: Foundation
 // Package: Events
@@ -9,7 +9,7 @@
 //
 // Implementation of the FIFOEvent template.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,42 +36,36 @@
 //
 
 
-#ifndef  Foundation_FIFOEvent_INCLUDED
-#define  Foundation_FIFOEvent_INCLUDED
+#ifndef Foundation_FIFOEvent_INCLUDED
+#define Foundation_FIFOEvent_INCLUDED
 
 
 #include "Poco/AbstractEvent.h"
 #include "Poco/FIFOStrategy.h"
 #include "Poco/AbstractDelegate.h"
-#include "Poco/CompareFunctions.h"
 
 
 namespace Poco {
 
 
+//@ deprecated
 template <class TArgs, class TMutex = FastMutex> 
 class FIFOEvent: public AbstractEvent < 
-	TArgs, 
-	FIFOStrategy<TArgs, AbstractDelegate<TArgs>, p_less<AbstractDelegate< TArgs> > >,
-	AbstractDelegate<TArgs>,
-	TMutex
+        TArgs, 
+        FIFOStrategy<TArgs, AbstractDelegate<TArgs> >,
+        AbstractDelegate<TArgs>,
+        TMutex
 >
 	/// A FIFOEvent uses internally a FIFOStrategy which guarantees
-	/// that delegates are invoked in the order they were added to
-	/// the event.
-	///
-	/// Note that one object can only register one method to a FIFOEvent.
-	/// Subsequent registrations will overwrite the existing delegate.
-	/// For example:
-	///     FIFOEvent<int> tmp;
-	///     MyClass myObject;
-	///     tmp += delegate(&myObject, &MyClass::myMethod1);
-	///     tmp += delegate(&myObject, &MyClass::myMethod2);
-	///
-	/// The second registration will overwrite the first one.
+        /// that delegates are invoked in the order they were added to
+        /// the event.
+        ///
+        /// Note that as of release 1.4.2, this is the default behavior
+        /// implemented by BasicEvent, so this class is provided
+        /// for backwards compatibility only.
 {
 public:
-	FIFOEvent()
+        FIFOEvent()
 	{
 	}
 
@@ -88,4 +82,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_FIFOEvent_INCLUDED

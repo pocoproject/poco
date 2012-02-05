@@ -1,7 +1,7 @@
 //
 // NestedDiagnosticContext.cpp
 //
-// $Id: //poco/svn/Foundation/src/NestedDiagnosticContext.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/NestedDiagnosticContext.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -138,13 +138,13 @@ void NestedDiagnosticContext::clear()
 
 namespace
 {
-        static ThreadLocal<NestedDiagnosticContext> ndc;
+	static ThreadLocal<NestedDiagnosticContext> ndc;
 }
 
 
 NestedDiagnosticContext& NestedDiagnosticContext::current()
 {
-        return ndc.get();
+	return ndc.get();
 }
 
 

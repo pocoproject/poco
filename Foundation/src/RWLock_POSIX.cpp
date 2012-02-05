@@ -1,7 +1,7 @@
 //
 // RWLock_POSIX.cpp
 //
-// $Id: //poco/svn/Foundation/src/RWLock_POSIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/RWLock_POSIX.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading

@@ -1,7 +1,7 @@
 //
 // Unicode.cpp
 //
-// $Id: //poco/1.3/Foundation/src/Unicode.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Unicode.cpp#1 $
 //
 // Library: Foundation
 // Package: Text
@@ -55,7 +55,7 @@ void Unicode::properties(int ch, CharacterProperties& props)
 	props.script   = static_cast<Script>(ucd->script);
 }
 
-	
+
 int Unicode::toLower(int ch)
 {
 	if (isUpper(ch))

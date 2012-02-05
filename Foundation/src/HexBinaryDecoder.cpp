@@ -1,7 +1,7 @@
 //
 // HexBinaryDecoder.cpp
 //
-// $Id: //poco/svn/Foundation/src/HexBinaryDecoder.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/HexBinaryDecoder.cpp#2 $
 //
 // Library: Foundation
 // Package: Streams
@@ -42,7 +42,7 @@ namespace Poco {
 
 
 HexBinaryDecoderBuf::HexBinaryDecoderBuf(std::istream& istr): 
-        _buf(*istr.rdbuf())
+	_buf(*istr.rdbuf())
 {
 }
 
@@ -62,13 +62,13 @@ int HexBinaryDecoderBuf::readFromDevice()
 	else if (n >= 'A' && n <= 'F')
 		c = n - 'A' + 10;
 	else if (n >= 'a' && n <= 'f')
-                c = n - 'a' + 10;
-        else throw DataFormatException();
-        c <<= 4;
-        if ((n = readOne()) == -1) throw DataFormatException();
-        if (n >= '0' && n <= '9')
-                c |= n - '0';
-        else if (n >= 'A' && n <= 'F')
+		c = n - 'a' + 10;
+	else throw DataFormatException();
+	c <<= 4;
+	if ((n = readOne()) == -1) throw DataFormatException();
+	if (n >= '0' && n <= '9')
+		c |= n - '0';
+	else if (n >= 'A' && n <= 'F')
 		c |= n - 'A' + 10;
 	else if (n >= 'a' && n <= 'f')
 		c |= n - 'a' + 10;
@@ -79,10 +79,10 @@ int HexBinaryDecoderBuf::readFromDevice()
 
 int HexBinaryDecoderBuf::readOne()
 {
-        int ch = _buf.sbumpc();
-        while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n')
-                ch = _buf.sbumpc();
-        return ch;
+	int ch = _buf.sbumpc();
+	while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n')
+		ch = _buf.sbumpc();
+	return ch;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // RWLock.cpp
 //
-// $Id: //poco/svn/Foundation/src/RWLock.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/RWLock.cpp#3 $
 //
 // Library: Foundation
 // Package: Threading

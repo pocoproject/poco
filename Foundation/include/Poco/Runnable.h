@@ -1,7 +1,7 @@
 //
 // Runnable.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Runnable.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Runnable.h#1 $
 //
 // Library: Foundation
 // Package: Threading
@@ -51,7 +51,7 @@ class Foundation_API Runnable
 	/// must be implemented by classes that provide
 	/// an entry point for a thread.
 {
-public:
+public:	
 	Runnable();
 	virtual ~Runnable();
 	

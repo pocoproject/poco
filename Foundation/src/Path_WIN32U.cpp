@@ -1,7 +1,7 @@
 //
 // Path_WIN32U.cpp
 //
-// $Id: //poco/svn/Foundation/src/Path_WIN32U.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Path_WIN32U.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -53,13 +53,13 @@ std::string PathImpl::currentImpl()
 	{
 		Buffer<wchar_t> buffer(len);
 		DWORD n = GetCurrentDirectoryW(len, buffer.begin());
-                if (n > 0 && n <= len)
-                {
-                        UnicodeConverter::toUTF8(buffer.begin(), result);
-                        if (result[result.size() - 1] != '\\')
-                                result.append("\\");
-                        return result;
-                }
+		if (n > 0 && n <= len)
+		{
+			UnicodeConverter::toUTF8(buffer.begin(), result);
+			if (result[result.size() - 1] != '\\')
+				result.append("\\");
+			return result;
+		}
 	}
 	throw SystemException("Cannot get current directory");
 }
@@ -79,18 +79,18 @@ std::string PathImpl::homeImpl()
 std::string PathImpl::tempImpl()
 {
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
-        DWORD n = GetTempPathW(static_cast<DWORD>(buffer.size()), buffer.begin());
-        if (n > 0)
-        {
-                n = GetLongPathNameW(buffer.begin(), buffer.begin(), static_cast<DWORD>(buffer.size()));
-                if (n <= 0) throw SystemException("Cannot get temporary directory long path name");
-                std::string result;
-                UnicodeConverter::toUTF8(buffer.begin(), result);
-                if (result[result.size() - 1] != '\\')
-                        result.append("\\");
-                return result;
-        }
-        throw SystemException("Cannot get temporary directory path");
+	DWORD n = GetTempPathW(static_cast<DWORD>(buffer.size()), buffer.begin());
+	if (n > 0)
+	{
+		n = GetLongPathNameW(buffer.begin(), buffer.begin(), static_cast<DWORD>(buffer.size()));
+		if (n <= 0) throw SystemException("Cannot get temporary directory long path name");
+		std::string result;
+		UnicodeConverter::toUTF8(buffer.begin(), result);
+		if (result[result.size() - 1] != '\\')
+			result.append("\\");
+		return result;
+	}
+	throw SystemException("Cannot get temporary directory path");
 }
 
 

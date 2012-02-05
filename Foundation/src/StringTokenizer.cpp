@@ -1,7 +1,7 @@
 //
 // StringTokenizer.cpp
 //
-// $Id: //poco/svn/Foundation/src/StringTokenizer.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/StringTokenizer.cpp#1 $
 //
 // Library: Foundation
 // Package: Core
@@ -85,53 +85,53 @@ StringTokenizer::~StringTokenizer()
 
 bool StringTokenizer::has(const std::string& token) const
 {
-	Iterator it = begin();
-	Iterator stop = end();
-	for (; it != stop; ++it)
-		if (*it == token) return true;
+        Iterator it = begin();
+        Iterator stop = end();
+        for (; it != stop; ++it)
+                if (*it == token) return true;
 
-	return false;
+        return false;
 }
 
 
 std::size_t StringTokenizer::find(const std::string& token, std::size_t pos) const
 {
-	Iterator it = begin();
-	Iterator stop = end();
-	for (it += pos; it != stop; ++it)
-		if (*it == token) return it - begin();
+        Iterator it = begin();
+        Iterator stop = end();
+        for (it += pos; it != stop; ++it)
+                if (*it == token) return it - begin();
 
-	throw NotFoundException(token);
+        throw NotFoundException(token);
 }
 
 
 std::size_t StringTokenizer::replace(const std::string& oldToken, const std::string& newToken, std::size_t pos)
 {
-	std::size_t count = 0;
-	TokenVec::iterator it = _tokens.begin();
-	TokenVec::iterator stop = _tokens.end();
-	for (it += pos; it != stop; ++it)
-	{
-		if (*it == oldToken)
-		{
-			*it = newToken;
-			++count;
-		}
-	}
+        std::size_t count = 0;
+        TokenVec::iterator it = _tokens.begin();
+        TokenVec::iterator stop = _tokens.end();
+        for (it += pos; it != stop; ++it)
+        {
+                if (*it == oldToken)
+                {
+                        *it = newToken;
+                        ++count;
+                }
+        }
 
-	return count;
+        return count;
 }
 
 
 std::size_t StringTokenizer::count(const std::string& token) const
 {
-	std::size_t cnt = 0;
-	Iterator it = begin();
-	Iterator stop = end();
-	for (; it != stop; ++it)
-		if (*it == token) ++cnt;
+        std::size_t cnt = 0;
+        Iterator it = begin();
+        Iterator stop = end();
+        for (; it != stop; ++it)
+                if (*it == token) ++cnt;
 
-	return cnt;
+        return cnt;
 }
 
 

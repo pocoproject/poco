@@ -1,7 +1,7 @@
 //
 // Delegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Delegate.h#1 $
+// $Id: //poco/1.4/Foundation/include/Poco/Delegate.h#5 $
 //
 // Library: Foundation
 // Package: Events
@@ -9,7 +9,7 @@
 //
 // Implementation of the Delegate template.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -44,22 +44,22 @@
 #include "Poco/AbstractDelegate.h"
 #include "Poco/FunctionDelegate.h"
 #include "Poco/Expire.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
 
 
-template <class TObj, class TArgs, bool withSender=true> 
+template <class TObj, class TArgs, bool withSender = true> 
 class Delegate: public AbstractDelegate<TArgs>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
+        typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
 
-	Delegate(TObj* obj, NotifyMethod method):
-		AbstractDelegate<TArgs>(obj),
-		_receiverObject(obj), 
-		_receiverMethod(method)
-	{
+        Delegate(TObj* obj, NotifyMethod method):
+                _receiverObject(obj), 
+                _receiverMethod(method)
+        {
 	}
 
 	Delegate(const Delegate& delegate):
@@ -74,33 +74,50 @@ public:
 	}
 	
 	Delegate& operator = (const Delegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_pTarget        = delegate._pTarget;
-			this->_receiverObject = delegate._receiverObject;
-			this->_receiverMethod = delegate._receiverMethod;
-		}
+        {
+                if (&delegate != this)
+                {
+                        this->_receiverObject = delegate._receiverObject;
+                        this->_receiverMethod = delegate._receiverMethod;
+                }
 		return *this;
 	}
 
-	bool notify(const void* sender, TArgs& arguments)
-	{
-		(_receiverObject->*_receiverMethod)(sender, arguments);
-		return true; // a "standard" delegate never expires
-	}
+        bool notify(const void* sender, TArgs& arguments)
+        {
+                Mutex::ScopedLock lock(_mutex);
+                if (_receiverObject)
+                {
+                        (_receiverObject->*_receiverMethod)(sender, arguments);
+                        return true;
+                }
+                else return false;
+        }
 
-	AbstractDelegate<TArgs>* clone() const
+        bool equals(const AbstractDelegate<TArgs>& other) const
+        {
+                const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+                return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
+        }
+
+        AbstractDelegate<TArgs>* clone() const
 	{
-		return new Delegate(*this);
-	}
+                return new Delegate(*this);
+        }
+        
+        void disable()
+        {
+                Mutex::ScopedLock lock(_mutex);
+                _receiverObject = 0;
+        }
 
 protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
+        TObj*        _receiverObject;
+        NotifyMethod _receiverMethod;
+        Mutex        _mutex;
 
 private:
-	Delegate();
+        Delegate();
 };
 
 
@@ -108,13 +125,12 @@ template <class TObj, class TArgs>
 class Delegate<TObj, TArgs, false>: public AbstractDelegate<TArgs>
 {
 public:
-	typedef void (TObj::*NotifyMethod)(TArgs&);
+        typedef void (TObj::*NotifyMethod)(TArgs&);
 
-	Delegate(TObj* obj, NotifyMethod method):
-		AbstractDelegate<TArgs>(obj),
-		_receiverObject(obj), 
-		_receiverMethod(method)
-	{
+        Delegate(TObj* obj, NotifyMethod method):
+                _receiverObject(obj), 
+                _receiverMethod(method)
+        {
 	}
 
 	Delegate(const Delegate& delegate):
@@ -139,23 +155,41 @@ public:
 		return *this;
 	}
 
-	bool notify(const void*, TArgs& arguments)
-	{
-		(_receiverObject->*_receiverMethod)(arguments);
-		return true; // a "standard" delegate never expires
-	}
+        bool notify(const void*, TArgs& arguments)
+        {
+                Mutex::ScopedLock lock(_mutex);
+                if (_receiverObject)
+                {
+                        (_receiverObject->*_receiverMethod)(arguments);
+                        return true;
+                }
+                else return false;
+        }
 
-	AbstractDelegate<TArgs>* clone() const
+        bool equals(const AbstractDelegate<TArgs>& other) const
+        {
+                const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+                return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
+        }
+
+        AbstractDelegate<TArgs>* clone() const
 	{
-		return new Delegate(*this);
-	}
+                return new Delegate(*this);
+        }
+        
+        void disable()
+        {
+                Mutex::ScopedLock lock(_mutex);
+                _receiverObject = 0;
+        }
 
 protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
+        TObj*        _receiverObject;
+        NotifyMethod _receiverMethod;
+        Mutex        _mutex;
 
 private:
-	Delegate();
+        Delegate();
 };
 
 
@@ -171,7 +205,6 @@ static Delegate<TObj, TArgs, false> delegate(TObj* pObj, void (TObj::*NotifyMeth
 {
 	return Delegate<TObj, TArgs, false>(pObj, NotifyMethod);
 }
-
 
 
 template <class TObj, class TArgs>
@@ -205,7 +238,7 @@ static Expire<TArgs> delegate(void (*NotifyMethod)(void*, TArgs&), Timestamp::Ti
 template <class TArgs>
 static Expire<TArgs> delegate(void (*NotifyMethod)(TArgs&), Timestamp::TimeDiff expireMillisecs)
 {
-	return Expire<TArgs>(FunctionDelegate<TArgs, false>( NotifyMethod), expireMillisecs);
+	return Expire<TArgs>(FunctionDelegate<TArgs, false>(NotifyMethod), expireMillisecs);
 }
 
 

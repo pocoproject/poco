@@ -1,7 +1,7 @@
 //
 // DirectoryIterator_UNIX.cpp
 //
-// $Id: //poco/svn/Foundation/src/DirectoryIterator_UNIX.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/DirectoryIterator_UNIX.cpp#2 $
 //
 // Library: Foundation
 // Package: Filesystem

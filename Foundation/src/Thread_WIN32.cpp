@@ -1,7 +1,7 @@
 //
 // Thread_WIN32.h
 //
-// $Id: //poco/Main/Foundation/src/Thread_WIN32.cpp#17 $
+// $Id: //poco/1.4/Foundation/src/Thread_WIN32.cpp#4 $
 //
 // Library: Foundation
 // Package: Threading
@@ -141,12 +141,12 @@ void ThreadImpl::startImpl(Runnable& target)
 
 void ThreadImpl::startImpl(Callable target, void* pData)
 {
-        if (isRunningImpl())
-                throw SystemException("thread already running");
+	if (isRunningImpl())
+		throw SystemException("thread already running");
 
-        threadCleanup();
-        _callbackTarget.callback = target;
-        _callbackTarget.pData = pData;
+	threadCleanup();
+	_callbackTarget.callback = target;
+	_callbackTarget.pData = pData;
 
 	createImpl(callableEntry, this);
 }

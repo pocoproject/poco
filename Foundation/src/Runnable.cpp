@@ -1,7 +1,7 @@
 //
 // Runnable.cpp
 //
-// $Id: //poco/svn/Foundation/src/Runnable.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Runnable.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading

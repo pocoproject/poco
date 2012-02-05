@@ -1,7 +1,7 @@
 //
 // ClassLoader.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/ClassLoader.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/ClassLoader.h#1 $
 //
 // Library: Foundation
 // Package: SharedLibrary

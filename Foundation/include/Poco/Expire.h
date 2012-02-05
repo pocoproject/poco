@@ -1,7 +1,7 @@
 //
 // Expire.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Expire.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/Expire.h#3 $
 //
 // Library: Foundation
 // Package: Events
@@ -9,7 +9,7 @@
 //
 // Implementation of the Expire template.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // Permission is hereby granted, free of charge, to any person or organization
@@ -36,8 +36,8 @@
 //
 
 
-#ifndef  Foundation_Expire_INCLUDED
-#define  Foundation_Expire_INCLUDED
+#ifndef Foundation_Expire_INCLUDED
+#define Foundation_Expire_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -50,15 +50,14 @@ namespace Poco {
 
 template <class TArgs>
 class Expire: public AbstractDelegate<TArgs>
-	/// Decorator for AbstractDelegate adding automatic 
-	/// expiring of registrations to AbstractDelegates.
+        /// Decorator for AbstractDelegate adding automatic 
+        /// expiration of registrations to AbstractDelegate's.
 {
 public:
-	Expire(const AbstractDelegate<TArgs>& p, Timestamp::TimeDiff expireMillisecs):
-		AbstractDelegate<TArgs>(p),
-		_pDelegate(p.clone()), 
-		_expire(expireMillisecs*1000)
-	{
+        Expire(const AbstractDelegate<TArgs>& p, Timestamp::TimeDiff expireMillisecs):
+                _pDelegate(p.clone()), 
+                _expire(expireMillisecs*1000)
+        {
 	}
 
 	Expire(const Expire& expire):
@@ -69,12 +68,12 @@ public:
 	{
 	}
 
-	~Expire()
-	{
-		destroy();
-	}
-	
-	Expire& operator = (const Expire& expire)
+        ~Expire()
+        {
+                delete _pDelegate;
+        }
+        
+        Expire& operator = (const Expire& expire)
 	{
 		if (&expire != this)
 		{
@@ -92,24 +91,28 @@ public:
 		if (!expired())
 			return this->_pDelegate->notify(sender, arguments);
 		else
-			return false;
-	}
+                        return false;
+        }
 
-	AbstractDelegate<TArgs>* clone() const
-	{
-		return new Expire(*this);
-	}
+        bool equals(const AbstractDelegate<TArgs>& other) const
+        {
+                return other.equals(*_pDelegate);
+        }
 
-	void destroy()
-	{
-		delete this->_pDelegate;
-		this->_pDelegate = 0;
-	}
+        AbstractDelegate<TArgs>* clone() const
+        {
+                return new Expire(*this);
+        }
+        
+        void disable()
+        {
+                _pDelegate->disable();
+        }
 
-	const AbstractDelegate<TArgs>& getDelegate() const
-	{
-		return *this->_pDelegate;
-	}
+        const AbstractDelegate<TArgs>* unwrap() const
+        {
+                return this->_pDelegate;
+        }
 
 protected:
 	bool expired() const
@@ -129,4 +132,4 @@ private:
 } // namespace Poco
 
 
-#endif
+#endif // Foundation_Expire_INCLUDED

@@ -1,7 +1,7 @@
 //
 // File.cpp
 //
-// $Id: //poco/Main/Foundation/src/File.cpp#22 $
+// $Id: //poco/1.4/Foundation/src/File.cpp#3 $
 //
 // Library: Foundation
 // Package: Filesystem
@@ -189,48 +189,48 @@ Timestamp File::getLastModified() const
 	return getLastModifiedImpl();
 }
 
-        
+	
 File& File::setLastModified(const Timestamp& ts)
 {
-        setLastModifiedImpl(ts);
+	setLastModifiedImpl(ts);
     return *this;
 }
 
-        
+	
 File::FileSize File::getSize() const
 {
 	return getSizeImpl();
 }
 
-        
+	
 File& File::setSize(FileSizeImpl size)
 {
-        setSizeImpl(size);
+	setSizeImpl(size);
     return *this;
 }
 
-        
+	
 File& File::setWriteable(bool flag)
 {
-        setWriteableImpl(flag);
+	setWriteableImpl(flag);
     return *this;
 }
 
 
 File& File::setReadOnly(bool flag)
 {
-        setWriteableImpl(!flag);
+	setWriteableImpl(!flag);
     return *this;
 }
 
 
 File& File::setExecutable(bool flag)
 {
-        setExecutableImpl(flag);
+	setExecutableImpl(flag);
     return *this;
 }
 
-        
+	
 void File::copyTo(const std::string& path) const
 {
 	Path src(getPathImpl());

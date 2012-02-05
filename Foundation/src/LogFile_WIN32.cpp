@@ -1,7 +1,7 @@
 //
 // LogFile_WIN32.cpp
 //
-// $Id: //poco/svn/Foundation/src/LogFile_WIN32.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/LogFile_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging
@@ -126,6 +126,5 @@ void LogFileImpl::createFile()
 	else
 		_creationDate = File(_path).created();
 }
-
 
 } // namespace Poco

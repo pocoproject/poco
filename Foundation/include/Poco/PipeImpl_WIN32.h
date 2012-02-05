@@ -1,7 +1,7 @@
 //
 // PipeImpl_WIN32.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/PipeImpl_WIN32.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/PipeImpl_WIN32.h#1 $
 //
 // Library: Foundation
 // Package: Processes

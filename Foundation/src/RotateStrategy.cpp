@@ -1,7 +1,7 @@
 //
 // RotateStrategy.cpp
 //
-// $Id: //poco/Main/Foundation/src/RotateStrategy.cpp#8 $
+// $Id: //poco/1.4/Foundation/src/RotateStrategy.cpp#1 $
 //
 // Library: Foundation
 // Package: Logging

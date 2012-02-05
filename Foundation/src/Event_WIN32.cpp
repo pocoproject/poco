@@ -1,7 +1,7 @@
 //
 // Event_WIN32.cpp
 //
-// $Id: //poco/svn/Foundation/src/Event_WIN32.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/Event_WIN32.cpp#1 $
 //
 // Library: Foundation
 // Package: Threading

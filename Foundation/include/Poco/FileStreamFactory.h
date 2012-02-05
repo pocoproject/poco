@@ -1,7 +1,7 @@
 //
 // FileStreamFactory.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/FileStreamFactory.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/FileStreamFactory.h#1 $
 //
 // Library: Foundation
 // Package: URI

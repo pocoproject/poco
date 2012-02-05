@@ -1,7 +1,7 @@
 //
 // NullStream.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/NullStream.h#2 $
+// $Id: //poco/1.4/Foundation/include/Poco/NullStream.h#1 $
 //
 // Library: Foundation
 // Package: Streams

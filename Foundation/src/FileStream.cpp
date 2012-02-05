@@ -1,7 +1,7 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/svn/Foundation/src/FileStream.cpp#2 $
+// $Id: //poco/1.4/Foundation/src/FileStream.cpp#1 $
 //
 // Library: Foundation
 // Package: Streams
