@@ -1,3 +1,8 @@
+# POCO_BUILD_TYPE
+# POCO_STATIC
+# POCO_UNBUNDLED
+# POCO_NO_LOCALE
+
 PROJECT(Poco)
 
 cmake_minimum_required(VERSION 2.8.0)
@@ -10,6 +15,13 @@ set(CPACK_PACKAGE_VERSION_PATCH "0")
 SET(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 SET(RELEASE_NAME "Unstable-trunk")
 SET(PROJECT_VERSION ${COMPLETE_VERSION})
+
+# Put the libaries and binaries that get built into directories at the
+# top of the build tree rather than in hard-to-find leaf
+# directories. This simplifies manual testing and the use of the build
+# tree rather than installed Boost libraries.
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 #################################################################################
 # Setup C/C++ compiler options
@@ -50,6 +62,9 @@ option(ENABLE_TESTS
 option(POCO_STATIC
   "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
 
+option(POCO_UNBUNDLED
+  "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
+
 # Uncomment from next two lines to force statitc or dynamic library, default is autodetection
 if(POCO_STATIC)
     set( LIB_MODE STATIC )
@@ -65,6 +80,13 @@ IF (ENABLE_TESTS)
   message(STATUS "Building with unittests & samples")
 ELSE ()
   message(STATUS "Building without tests & samples")
+ENDIF ()
+
+IF (!POCO_UNBUNDLED)
+  message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
+ELSE ()
+ add_definitions( -DPOCO_UNBUNDLED)
+  message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
 ENDIF ()
 
 # Set local include path
