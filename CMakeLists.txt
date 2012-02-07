@@ -82,11 +82,11 @@ ELSE ()
   message(STATUS "Building without tests & samples")
 ENDIF ()
 
-IF (!POCO_UNBUNDLED)
-  message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
-ELSE ()
- add_definitions( -DPOCO_UNBUNDLED)
+IF (POCO_UNBUNDLED)
+  add_definitions( -DPOCO_UNBUNDLED)
   message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
+ELSE ()
+  message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
 ENDIF ()
 
 # Set local include path
@@ -191,6 +191,7 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 INCLUDE(CPack)
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
+message(STATUS "Installation target path: ${CMAKE_INSTALL_PREFIX}")
 
 message(STATUS "C_FLAGS:  =${CMAKE_C_FLAGS}")
 message(STATUS "CXX_FLAGS:=${CMAKE_CXX_FLAGS}")
