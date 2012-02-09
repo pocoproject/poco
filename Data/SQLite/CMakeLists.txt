@@ -3,6 +3,8 @@ set(LIBNAME "${LIBNAME}${LIB_EXT}")
 
 include_directories( include src )
 
+set(SRCS "")
+
 set(SRCS 
 	src/Binder.cpp
 	src/Connector.cpp
@@ -14,11 +16,11 @@ set(SRCS
 )
 
 
-if (!POCO_UNBUNDLED)
-	set(SRCS "${SRCS} src/sqlite3.c")
-	set(DATASQLITELIBS PocoData${LIB_EXT} PocoFoundation${LIB_EXT} )
+if (POCO_UNBUNDLED)
+	set(DATASQLITELIBS PocoData${LIB_EXT} PocoFoundatio ${LIB_EXT} sqlite3)
 else()
-	set(DATASQLITELIBS PocoData${LIB_EXT} PocoFoundation${LIB_EXT} sqlite3)
+	set(SRCS ${SRCS} src/sqlite3.c)
+	set(DATASQLITELIBS PocoData${LIB_EXT} PocoFoundation${LIB_EXT})
 endif()
 
 add_definitions(-DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE -DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED)
