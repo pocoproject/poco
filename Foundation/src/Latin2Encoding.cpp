@@ -106,16 +106,16 @@ const TextEncoding::CharacterMap& Latin2Encoding::characterMap() const
 
 int Latin2Encoding::convert(const unsigned char* bytes) const
 {
-	return *bytes;
+	return _charMap[*bytes];
 }
 
 
 int Latin2Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
-	if (ch >= 0 && ch <= 255)
+	if (ch >= 0 && ch <= 255 && _charMap[ch] == ch)
 	{
 		if (bytes && length >= 1)
-			*bytes = ch;
+			*bytes = (unsigned char) ch;
 		return 1;
 	}
 	else switch (ch)
@@ -131,6 +131,20 @@ int Latin2Encoding::convert(int ch, unsigned char* bytes, int length) const
 	*/
 	default: return 0;
 	}
+}
+
+int Latin2Encoding::queryConvert(const unsigned char* bytes, int length) const
+{
+	if (1 <= length)
+		return _charMap[*bytes];
+	else
+		return -1;
+}
+
+
+int Latin2Encoding::sequenceLength(const unsigned char* bytes, int length) const
+{
+	return 1;
 }
 
 

@@ -106,13 +106,13 @@ const TextEncoding::CharacterMap& Latin1Encoding::characterMap() const
 
 int Latin1Encoding::convert(const unsigned char* bytes) const
 {
-	return *bytes;
+	return _charMap[*bytes];
 }
 
 
 int Latin1Encoding::convert(int ch, unsigned char* bytes, int length) const
 {
-	if (ch >= 0 && ch <= 255)
+	if (ch >= 0 && ch <= 255 && _charMap[ch] == ch)
 	{
 		if (bytes && length >= 1)
 			*bytes = (unsigned char) ch;
@@ -125,7 +125,7 @@ int Latin1Encoding::convert(int ch, unsigned char* bytes, int length) const
 int Latin1Encoding::queryConvert(const unsigned char* bytes, int length) const
 {
 	if (1 <= length)
-		return *bytes;
+		return _charMap[*bytes];
 	else
 		return -1;
 }
