@@ -14,7 +14,7 @@ make install
 
 rm -rf CMakeCache.txt
 
-cmake ../.  $1 $2 $3 $4 $5
+cmake ../. -DCMAKE_BUILD_TYPE=Release $1 $2 $3 $4 $5
 make -j3
 make install
 
