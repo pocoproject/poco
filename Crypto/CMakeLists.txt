@@ -2,7 +2,7 @@ set(LIBNAME "PocoCrypto")
 set(LIBNAME "${LIBNAME}${LIB_EXT}")
 
 aux_source_directory(src SRCS)
-
+add_definitions(-D_USRDLL -DCrypto_EXPORTS)
 include_directories( include) 
 
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
