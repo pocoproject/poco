@@ -155,6 +155,7 @@ add_subdirectory(Net)
 
 # OPENSSL_SSL_LIBRARY
 if(OPENSSL_FOUND)
+    include_directories(${OPENSSL_INCLUDE_DIR})
     add_subdirectory(NetSSL_OpenSSL)
     add_subdirectory(Crypto)
 endif(OPENSSL_FOUND)
