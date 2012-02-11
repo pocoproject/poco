@@ -7,13 +7,11 @@ mkdir cmake-build
 cd cmake-build
 
 cmake ../. -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=Debug  %1 %2 %3 %4 %5
-nmake
 nmake install
 
 del CMakeCache.txt
 
-cmake ../. -G"NMake Makefiles" %1 %2 %3 %4 %5
-nmake
+cmake ../. -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=Release %1 %2 %3 %4 %5
 nmake install
 
 
