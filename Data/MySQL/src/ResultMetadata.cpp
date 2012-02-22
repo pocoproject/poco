@@ -82,13 +82,14 @@ namespace
 		case MYSQL_TYPE_DOUBLE:   return sizeof(double);
 		case MYSQL_TYPE_LONGLONG: return sizeof(Poco::Int64);
 
+		case MYSQL_TYPE_TINY_BLOB:
+		case MYSQL_TYPE_MEDIUM_BLOB:
+		case MYSQL_TYPE_LONG_BLOB:
+      return 0;
 		case MYSQL_TYPE_DECIMAL:
 		case MYSQL_TYPE_NEWDECIMAL:
 		case MYSQL_TYPE_STRING:
 		case MYSQL_TYPE_VAR_STRING:
-		case MYSQL_TYPE_TINY_BLOB:
-		case MYSQL_TYPE_MEDIUM_BLOB:
-		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
 		case MYSQL_TYPE_NULL:
 		case MYSQL_TYPE_TIMESTAMP:
